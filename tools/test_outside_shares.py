@@ -70,12 +70,44 @@ def main():
             S.build(p)
             check("planted register total mismatch is caught", any("hedgeqp_i" in x for x in p))
             shutil.copy(real_oracle / "outside_register_i.json", o / "outside_register_i.json")
+            # planted downgrade of the stage G per-case register (oracle/OUTSIDE_G_R6.json, oracle lane 2)
+            if (real_oracle / "OUTSIDE_G_R6.json").is_file():
+                shutil.copy(real_oracle / "OUTSIDE_G_R6.json", o / "OUTSIDE_G_R6.json")
+                base = S.build([])["stages"]["G"]["without_sweeps"]["counted"]
+                pg = json.loads((o / "OUTSIDE_G_R6.json").read_text(encoding="utf-8"))
+                for suite in pg["suites"].values():
+                    for c in suite["cases"]:
+                        c["checks"][0]["pass"] = False
+                (o / "OUTSIDE_G_R6.json").write_text(json.dumps(pg), encoding="utf-8")
+                down = S.build([])["stages"]["G"]["without_sweeps"]
+                check("planted G per-case downgrade lowers the counted cases", down["counted"] < base)
+                reg = json.loads((o / "outside_register_g.json").read_text(encoding="utf-8"))
+                reg["expsim_g"]["counted"] = 0  # plus the per-case downgrade: G falls under 60%
+                (o / "outside_register_g.json").write_text(json.dumps(reg), encoding="utf-8")
+                p = []
+                S.build(p)
+                check("planted G downgrade fails the 60% floor", any("stage G" in x and "floor" in x for x in p))
+                shutil.copy(real_oracle / "OUTSIDE_G_R6.json", o / "OUTSIDE_G_R6.json")
+                shutil.copy(real_oracle / "outside_register_g.json", o / "outside_register_g.json")
+            # re-derivation: counts for an allowed class (FRTB), refused for any other operation (owner 2026-11-12)
+            gf = json.loads((g / "stage_f" / "frtb_f.json").read_text(encoding="utf-8"))
+            frtb_id = next(c["case_id"] for c in gf["cases"] if c["expected"]["status"] == "ok")
+            g4 = json.loads((g / "stage_f" / "risk_f4b.json").read_text(encoding="utf-8"))
+            other = next(c for c in g4["cases"] if c["expected"]["status"] == "ok")
+            (o / "REDERIVATION_REGISTER.json").write_text(json.dumps({"source": "planted", "cases": [
+                {"case_id": frtb_id, "operation": "risk.frtb.girr_delta", "pass": True},
+                {"case_id": other["case_id"], "operation": other["operation"], "pass": True}]}), encoding="utf-8")
+            p = []
+            fw = S.build(p)["stages"]["F"]["without_sweeps"]
+            check("re-derivation counts for an allowed class only", fw[S.REDERIVED] == 1 and fw["counted_with_rederivation"] == fw["counted"] + 1)
+            check("re-derivation outside the four classes is a problem", any(other["case_id"] in x and "outside the four" in x for x in p))
+            (o / "REDERIVATION_REGISTER.json").unlink()
             p = []
             doc = S.build(p)
             f = doc["stages"]["F"]["without_sweeps"]
-            check("a stage under 60% of value cases fails", (f["share"] < S.FLOOR) == any("stage F" in x and "floor" in x for x in p))
+            check("a stage under 60% of value cases fails", (f["share_with_rederivation"] < S.FLOOR) == any("stage F" in x and "floor" in x for x in p))
             d = doc["stages"]["D"]["without_sweeps"]
-            check("error cases leave the denominator (stage D: 520 value cases of 654)", d["cases"] == 520 and d["error_and_invariance_cases"] == 134)
+            check("error cases leave the denominator (stage D: 521 value cases of 654)", d["cases"] == 521 and d["error_and_invariance_cases"] == 133)
         finally:
             S.GOLDEN, S.ORACLE = real_golden, real_oracle
     c = S.classify_case_register([{"case_id": "x", "library": "QuantLib", "convention_rows": ["SCIPY.CHI2"]}], set())

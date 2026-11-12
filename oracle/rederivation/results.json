@@ -1,0 +1,4313 @@
+[
+ {
+  "case_id": "cdsidx_f-0001",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.005473894059585584,
+  "exercise_upfront": -196989.80297049775,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 57249.28607162363,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.377551177122172,
+  "strike_hazard": 0.009251466532507543,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0002",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.005473894059585584,
+  "exercise_upfront": -196989.80297049775,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 7083.69030390838,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.377551177122172,
+  "strike_hazard": 0.009251466532507543,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0003",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.005473894059585584,
+  "exercise_upfront": -196989.80297049775,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 50165.59576771527,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.377551177122172,
+  "strike_hazard": 0.009251466532507543,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0004",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.005473894059585584,
+  "exercise_upfront": -196989.80297049775,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 0.0,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.377551177122172,
+  "strike_hazard": 0.009251466532507543,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0005",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.0064934570451822046,
+  "exercise_upfront": -152615.34194533198,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 29755.446216927958,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.360438341295199,
+  "strike_hazard": 0.010933556192350992,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0006",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.0064934570451822046,
+  "exercise_upfront": -152615.34194533198,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 23516.760412791977,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.360438341295199,
+  "strike_hazard": 0.010933556192350992,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0007",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.008007978600525819,
+  "exercise_upfront": -86698.78879580638,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 8913.927806467234,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.334939439790319,
+  "strike_hazard": 0.01345669422888533,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0008",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.008007978600525819,
+  "exercise_upfront": -86698.78879580638,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 67926.97528347676,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.334939439790319,
+  "strike_hazard": 0.01345669422888533,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0009",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.0054752989873370645,
+  "adjusted_strike": 0.004988192098453881,
+  "exercise_upfront": -226150.70690569544,
+  "forward_spread": 0.005350767977240632,
+  "front_end_protection": 5597.680644612928,
+  "price": 28513.193766395132,
+  "risky_annuity": 4.495009427995719,
+  "strike_annuity": 4.523014138113909,
+  "strike_hazard": 0.008410006496612263,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0010",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.0054752989873370645,
+  "adjusted_strike": 0.004988192098453881,
+  "exercise_upfront": -226150.70690569544,
+  "forward_spread": 0.005350767977240632,
+  "front_end_protection": 5597.680644612928,
+  "price": 6617.693186679418,
+  "risky_annuity": 4.495009427995719,
+  "strike_annuity": 4.523014138113909,
+  "strike_hazard": 0.008410006496612263,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0011",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.0054752989873370645,
+  "adjusted_strike": 0.004988192098453881,
+  "exercise_upfront": -226150.70690569544,
+  "forward_spread": 0.005350767977240632,
+  "front_end_protection": 5597.680644612928,
+  "price": 21895.500579715725,
+  "risky_annuity": 4.495009427995719,
+  "strike_annuity": 4.523014138113909,
+  "strike_hazard": 0.008410006496612263,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0012",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.0054752989873370645,
+  "adjusted_strike": 0.004988192098453881,
+  "exercise_upfront": -226150.70690569544,
+  "forward_spread": 0.005350767977240632,
+  "front_end_protection": 5597.680644612928,
+  "price": 0.0,
+  "risky_annuity": 4.495009427995719,
+  "strike_annuity": 4.523014138113909,
+  "strike_hazard": 0.008410006496612263,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0013",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.0054752989873370645,
+  "adjusted_strike": 0.0058037064348547465,
+  "exercise_upfront": -189351.78178889494,
+  "forward_spread": 0.005350767977240632,
+  "front_end_protection": 5597.680644612928,
+  "price": 9964.998292931601,
+  "risky_annuity": 4.495009427995719,
+  "strike_annuity": 4.508375756878451,
+  "strike_hazard": 0.009755610826633936,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0014",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.0054752989873370645,
+  "adjusted_strike": 0.0058037064348547465,
+  "exercise_upfront": -189351.78178889494,
+  "forward_spread": 0.005350767977240632,
+  "front_end_protection": 5597.680644612928,
+  "price": 24726.944021091538,
+  "risky_annuity": 4.495009427995719,
+  "strike_annuity": 4.508375756878451,
+  "strike_hazard": 0.009755610826633936,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0015",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.04084163252824037,
+  "adjusted_strike": 0.029152037445213323,
+  "exercise_upfront": -809731.897481444,
+  "forward_spread": 0.0381462384939062,
+  "front_end_protection": 103632.85311976526,
+  "price": 479315.4691114744,
+  "risky_annuity": 3.8448127360853577,
+  "strike_annuity": 4.048659487407219,
+  "strike_hazard": 0.04325424853223723,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0016",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.04084163252824037,
+  "adjusted_strike": 0.029152037445213323,
+  "exercise_upfront": -809731.897481444,
+  "forward_spread": 0.0381462384939062,
+  "front_end_protection": 103632.85311976526,
+  "price": 29872.428562442612,
+  "risky_annuity": 3.8448127360853577,
+  "strike_annuity": 4.048659487407219,
+  "strike_hazard": 0.04325424853223723,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0017",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.04084163252824037,
+  "adjusted_strike": 0.029152037445213323,
+  "exercise_upfront": -809731.897481444,
+  "forward_spread": 0.0381462384939062,
+  "front_end_protection": 103632.85311976526,
+  "price": 449443.04054903163,
+  "risky_annuity": 3.8448127360853577,
+  "strike_annuity": 4.048659487407219,
+  "strike_hazard": 0.04325424853223723,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0018",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.04084163252824037,
+  "adjusted_strike": 0.029152037445213323,
+  "exercise_upfront": -809731.897481444,
+  "forward_spread": 0.0381462384939062,
+  "front_end_protection": 103632.85311976526,
+  "price": 0.0,
+  "risky_annuity": 3.8448127360853577,
+  "strike_annuity": 4.048659487407219,
+  "strike_hazard": 0.04325424853223723,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0019",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.04084163252824037,
+  "adjusted_strike": 0.038338734214703685,
+  "exercise_upfront": -452921.9028741701,
+  "forward_spread": 0.0381462384939062,
+  "front_end_protection": 103632.85311976526,
+  "price": 241851.69780763352,
+  "risky_annuity": 3.8448127360853577,
+  "strike_annuity": 3.9384513293406087,
+  "strike_hazard": 0.05551008133427672,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0020",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.04084163252824037,
+  "adjusted_strike": 0.038338734214703685,
+  "exercise_upfront": -452921.9028741701,
+  "forward_spread": 0.0381462384939062,
+  "front_end_protection": 103632.85311976526,
+  "price": 145619.9446775092,
+  "risky_annuity": 3.8448127360853577,
+  "strike_annuity": 3.9384513293406087,
+  "strike_hazard": 0.05551008133427672,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0021",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.04084163252824037,
+  "adjusted_strike": 0.04503478955777773,
+  "exercise_upfront": -192848.0666736528,
+  "forward_spread": 0.0381462384939062,
+  "front_end_protection": 103632.85311976526,
+  "price": 135187.47147374597,
+  "risky_annuity": 3.8448127360853577,
+  "strike_annuity": 3.8569613334730524,
+  "strike_hazard": 0.06488239631096998,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0022",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.04084163252824037,
+  "adjusted_strike": 0.04503478955777773,
+  "exercise_upfront": -192848.0666736528,
+  "forward_spread": 0.0381462384939062,
+  "front_end_protection": 103632.85311976526,
+  "price": 296406.50698945706,
+  "risky_annuity": 3.8448127360853577,
+  "strike_annuity": 3.8569613334730524,
+  "strike_hazard": 0.06488239631096998,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0023",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.06377998395290913,
+  "adjusted_strike": 0.044617672763701474,
+  "exercise_upfront": -185892.2262865245,
+  "forward_spread": 0.055470411591360146,
+  "front_end_protection": 281783.57256732683,
+  "price": 777115.0360004228,
+  "risky_annuity": 3.3910718904287833,
+  "strike_annuity": 3.7178445257304866,
+  "strike_hazard": 0.06489850377870837,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0024",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.06377998395290913,
+  "adjusted_strike": 0.044617672763701474,
+  "exercise_upfront": -185892.2262865245,
+  "forward_spread": 0.055470411591360146,
+  "front_end_protection": 281783.57256732683,
+  "price": 127307.28770671268,
+  "risky_annuity": 3.3910718904287833,
+  "strike_annuity": 3.7178445257304866,
+  "strike_hazard": 0.06489850377870837,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0025",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.06377998395290913,
+  "adjusted_strike": 0.044617672763701474,
+  "exercise_upfront": -185892.2262865245,
+  "forward_spread": 0.055470411591360146,
+  "front_end_protection": 281783.57256732683,
+  "price": 649807.74829371,
+  "risky_annuity": 3.3910718904287833,
+  "strike_annuity": 3.7178445257304866,
+  "strike_hazard": 0.06489850377870837,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0026",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.06377998395290913,
+  "adjusted_strike": 0.044617672763701474,
+  "exercise_upfront": -185892.2262865245,
+  "forward_spread": 0.055470411591360146,
+  "front_end_protection": 281783.57256732683,
+  "price": 0.0,
+  "risky_annuity": 3.3910718904287833,
+  "strike_annuity": 3.7178445257304866,
+  "strike_hazard": 0.06489850377870837,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0027",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.06377998395290913,
+  "adjusted_strike": 0.060286222940787504,
+  "exercise_upfront": 355260.6147108768,
+  "forward_spread": 0.055470411591360146,
+  "front_end_protection": 281783.57256732683,
+  "price": 482235.70991686214,
+  "risky_annuity": 3.3910718904287833,
+  "strike_annuity": 3.5526061471087695,
+  "strike_hazard": 0.08653324029220683,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0028",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.06377998395290913,
+  "adjusted_strike": 0.060286222940787504,
+  "exercise_upfront": 355260.6147108768,
+  "forward_spread": 0.055470411591360146,
+  "front_end_protection": 281783.57256732683,
+  "price": 363759.76231604564,
+  "risky_annuity": 3.3910718904287833,
+  "strike_annuity": 3.5526061471087695,
+  "strike_hazard": 0.08653324029220683,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0029",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.008358342203874524,
+  "adjusted_strike": 0.00594472781485145,
+  "exercise_upfront": -181434.31027713342,
+  "forward_spread": 0.0071207497179969536,
+  "front_end_protection": 54437.13453692261,
+  "price": 115701.29235009712,
+  "risky_annuity": 4.398631630210772,
+  "strike_annuity": 4.535857756928336,
+  "strike_hazard": 0.010111292009314762,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0030",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.008358342203874524,
+  "adjusted_strike": 0.00594472781485145,
+  "exercise_upfront": -181434.31027713342,
+  "forward_spread": 0.0071207497179969536,
+  "front_end_protection": 54437.13453692261,
+  "price": 9535.286403209677,
+  "risky_annuity": 4.398631630210772,
+  "strike_annuity": 4.535857756928336,
+  "strike_hazard": 0.010111292009314762,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0031",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.008358342203874524,
+  "adjusted_strike": 0.00594472781485145,
+  "exercise_upfront": -181434.31027713342,
+  "forward_spread": 0.0071207497179969536,
+  "front_end_protection": 54437.13453692261,
+  "price": 106166.00594688744,
+  "risky_annuity": 4.398631630210772,
+  "strike_annuity": 4.535857756928336,
+  "strike_hazard": 0.010111292009314762,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0032",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.008358342203874524,
+  "adjusted_strike": 0.00594472781485145,
+  "exercise_upfront": -181434.31027713342,
+  "forward_spread": 0.0071207497179969536,
+  "front_end_protection": 54437.13453692261,
+  "price": 0.0,
+  "risky_annuity": 4.398631630210772,
+  "strike_annuity": 4.535857756928336,
+  "strike_hazard": 0.010111292009314762,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0033",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.008358342203874524,
+  "adjusted_strike": 0.007480508826658636,
+  "exercise_upfront": -112722.9252227791,
+  "forward_spread": 0.0071207497179969536,
+  "front_end_protection": 54437.13453692261,
+  "price": 70289.67471668916,
+  "risky_annuity": 4.398631630210772,
+  "strike_annuity": 4.508917008911163,
+  "strike_hazard": 0.01263911988426312,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0034",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.008358342203874524,
+  "adjusted_strike": 0.007480508826658636,
+  "exercise_upfront": -112722.9252227791,
+  "forward_spread": 0.0071207497179969536,
+  "front_end_protection": 54437.13453692261,
+  "price": 31677.01812592364,
+  "risky_annuity": 4.398631630210772,
+  "strike_annuity": 4.508917008911163,
+  "strike_hazard": 0.01263911988426312,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0046",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.011961228190116104,
+  "exercise_upfront": 85358.57530453283,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 180.25957676585102,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.2679287652266416,
+  "strike_hazard": 0.02018508674274633,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0047",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.011961228190116104,
+  "exercise_upfront": 85358.57530453283,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 229515.33839338078,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.2679287652266416,
+  "strike_hazard": 0.02018508674274633,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0048",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.014846396526204769,
+  "exercise_upfront": 210929.81679668085,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 8.112221762418306,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.218596335933618,
+  "strike_hazard": 0.02523140894002423,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0049",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.014846396526204769,
+  "exercise_upfront": 210929.81679668085,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 353647.94858601806,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.218596335933618,
+  "strike_hazard": 0.02523140894002423,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0050",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.019507834012351104,
+  "exercise_upfront": 413809.657446452,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 0.054613453621605676,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.1380965744645195,
+  "strike_hazard": 0.033642011027907134,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0051",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.006638259698725054,
+  "adjusted_strike": 0.019507834012351104,
+  "exercise_upfront": 413809.657446452,
+  "forward_spread": 0.006242251539712262,
+  "front_end_protection": 17061.638164137938,
+  "price": 554473.5301422206,
+  "risky_annuity": 4.308405717364726,
+  "strike_annuity": 4.1380965744645195,
+  "strike_hazard": 0.033642011027907134,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0052",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.04084163252824037,
+  "adjusted_strike": 0.054809635741693376,
+  "exercise_upfront": 186805.56745444494,
+  "forward_spread": 0.0381462384939062,
+  "front_end_protection": 103632.85311976526,
+  "price": 53212.37351542428,
+  "risky_annuity": 3.8448127360853577,
+  "strike_annuity": 3.7361113490889006,
+  "strike_hazard": 0.0793017592694567,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0053",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.04084163252824037,
+  "adjusted_strike": 0.054809635741693376,
+  "exercise_upfront": 186805.56745444494,
+  "forward_spread": 0.0381462384939062,
+  "front_end_protection": 103632.85311976526,
+  "price": 590255.9400430772,
+  "risky_annuity": 3.8448127360853577,
+  "strike_annuity": 3.7361113490889006,
+  "strike_hazard": 0.0793017592694567,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0054",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.04084163252824037,
+  "adjusted_strike": 0.06835523522045314,
+  "exercise_upfront": 712914.7227081553,
+  "forward_spread": 0.0381462384939062,
+  "front_end_protection": 103632.85311976526,
+  "price": 13365.643166101068,
+  "risky_annuity": 3.8448127360853577,
+  "strike_annuity": 3.5645736135407757,
+  "strike_hazard": 0.10093193897317161,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0055",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.04084163252824037,
+  "adjusted_strike": 0.06835523522045314,
+  "exercise_upfront": 712914.7227081553,
+  "forward_spread": 0.0381462384939062,
+  "front_end_protection": 103632.85311976526,
+  "price": 1071212.1436322217,
+  "risky_annuity": 3.8448127360853577,
+  "strike_annuity": 3.5645736135407757,
+  "strike_hazard": 0.10093193897317161,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0056",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 6.312489259606934e-11,
+  "adjusted_strike": 9.999999607608919e-09,
+  "exercise_upfront": 0.44733221429001624,
+  "forward_spread": 5.94501392485551e-11,
+  "front_end_protection": 0.00016272562516595355,
+  "price": 2.682700109300165e-106,
+  "risky_annuity": 4.428205372641626,
+  "strike_annuity": 4.473322142900162,
+  "strike_hazard": 1.682081633739851e-08,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0057",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 6.312489259606934e-11,
+  "adjusted_strike": 9.999999607608919e-09,
+  "exercise_upfront": 0.44733221429001624,
+  "forward_spread": 5.94501392485551e-11,
+  "front_end_protection": 0.00016272562516595355,
+  "price": 0.44002522000286626,
+  "risky_annuity": 4.428205372641626,
+  "strike_annuity": 4.473322142900162,
+  "strike_hazard": 1.682081633739851e-08,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0058",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.05668925035447257,
+  "adjusted_strike": 0.05,
+  "exercise_upfront": 0.0,
+  "forward_spread": 0.05548632614049099,
+  "front_end_protection": 45737.10280827745,
+  "price": 301512.15105847333,
+  "risky_annuity": 3.8021599595947295,
+  "strike_annuity": 3.9087174483418043,
+  "strike_hazard": 0.07208931127417653,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0059",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.05668925035447257,
+  "adjusted_strike": 0.05,
+  "exercise_upfront": 0.0,
+  "forward_spread": 0.05548632614049099,
+  "front_end_protection": 45737.10280827745,
+  "price": 47176.15248366885,
+  "risky_annuity": 3.8021599595947295,
+  "strike_annuity": 3.9087174483418043,
+  "strike_hazard": 0.07208931127417653,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0060",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.06339694778278779,
+  "adjusted_strike": 0.05,
+  "exercise_upfront": 0.0,
+  "forward_spread": 0.055483733379573,
+  "front_end_protection": 268732.8860678396,
+  "price": 598920.0523207157,
+  "risky_annuity": 3.3960015788105693,
+  "strike_annuity": 3.6605132333049926,
+  "strike_hazard": 0.07209260470275455,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0061",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.06339694778278779,
+  "adjusted_strike": 0.05,
+  "exercise_upfront": 0.0,
+  "forward_spread": 0.055483733379573,
+  "front_end_protection": 268732.8860678396,
+  "price": 143959.49410481498,
+  "risky_annuity": 3.3960015788105693,
+  "strike_annuity": 3.6605132333049926,
+  "strike_hazard": 0.07209260470275455,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0062",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.073169877814633,
+  "adjusted_strike": 0.05,
+  "exercise_upfront": 0.0,
+  "forward_spread": 0.05548346534443388,
+  "front_end_protection": 518636.59529949486,
+  "price": 844928.1125568544,
+  "risky_annuity": 2.9324013344898305,
+  "strike_annuity": 3.346207144698043,
+  "strike_hazard": 0.07209298726461917,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0063",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.073169877814633,
+  "adjusted_strike": 0.05,
+  "exercise_upfront": 0.0,
+  "forward_spread": 0.05548346534443388,
+  "front_end_protection": 518636.59529949486,
+  "price": 165494.3063208931,
+  "risky_annuity": 2.9324013344898305,
+  "strike_annuity": 3.346207144698043,
+  "strike_hazard": 0.07209298726461917,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0064",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.10168154838868909,
+  "adjusted_strike": 0.05,
+  "exercise_upfront": 0.0,
+  "forward_spread": 0.05548276592516995,
+  "front_end_protection": 962285.6050243654,
+  "price": 1211268.1670106626,
+  "risky_annuity": 2.0829241675021066,
+  "strike_annuity": 2.6635802080174225,
+  "strike_hazard": 0.07209397229852171,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "cdsidx_f-0065",
+  "operation": "credit.cdsindex.option_price",
+  "adjusted_forward": 0.10168154838868909,
+  "adjusted_strike": 0.05,
+  "exercise_upfront": 0.0,
+  "forward_spread": 0.05548276592516995,
+  "front_end_protection": 962285.6050243654,
+  "price": 134780.70548336173,
+  "risky_annuity": 2.0829241675021066,
+  "strike_annuity": 2.6635802080174225,
+  "strike_hazard": 0.07209397229852171,
+  "basis": "own-knowledge-of-paper",
+  "basis_note": "Pedersen (2003) adjusted forward/strike derived from own knowledge and first principles; paper not opened. Leg schedule, day counts, mid-date rule, strike-hazard solve are conventions taken from the spec page (spec-only part)."
+ },
+ {
+  "case_id": "frtb_f-0001",
+  "operation": "risk.frtb.girr_delta",
+  "binding_scenario": "high",
+  "capital": 11000.0,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "USD",
+      "k": 11000.0,
+      "s": 11000.0,
+      "s_used": 11000.0,
+      "currency": "USD"
+     }
+    ],
+    "delta": 11000.0,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "USD",
+      "k": 11000.0,
+      "s": 11000.0,
+      "s_used": 11000.0,
+      "currency": "USD"
+     }
+    ],
+    "delta": 11000.0,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "USD",
+      "k": 11000.0,
+      "s": 11000.0,
+      "s_used": 11000.0,
+      "currency": "USD"
+     }
+    ],
+    "delta": 11000.0,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f-0002",
+  "operation": "risk.frtb.girr_delta",
+  "binding_scenario": "low",
+  "capital": 8812.367005370525,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "USD",
+      "k": 200.0,
+      "s": -200.0,
+      "s_used": -200.0,
+      "currency": "USD"
+     }
+    ],
+    "delta": 200.0,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "USD",
+      "k": 6232.889066770845,
+      "s": -200.0,
+      "s_used": -200.0,
+      "currency": "USD"
+     }
+    ],
+    "delta": 6232.889066770845,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "USD",
+      "k": 8812.367005370525,
+      "s": -200.0,
+      "s_used": -200.0,
+      "currency": "USD"
+     }
+    ],
+    "delta": 8812.367005370525,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f-0003",
+  "operation": "risk.frtb.girr_delta",
+  "binding_scenario": "high",
+  "capital": 4400.0,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 4400.0,
+      "s": 4400.0,
+      "s_used": 4400.0,
+      "currency": "EUR"
+     }
+    ],
+    "delta": 4400.0,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 4377.054649041334,
+      "s": 4400.0,
+      "s_used": 4400.0,
+      "currency": "EUR"
+     }
+    ],
+    "delta": 4377.054649041334,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 4353.988378646493,
+      "s": 4400.0,
+      "s_used": 4400.0,
+      "currency": "EUR"
+     }
+    ],
+    "delta": 4353.988378646493,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f-0004",
+  "operation": "risk.frtb.girr_delta",
+  "binding_scenario": "high",
+  "capital": 3400.0,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "GBP",
+      "k": 3400.0,
+      "s": 3000.0,
+      "s_used": 3000.0,
+      "currency": "GBP"
+     }
+    ],
+    "delta": 3400.0,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "GBP",
+      "k": 3294.8444576337743,
+      "s": 3000.0,
+      "s_used": 3000.0,
+      "currency": "GBP"
+     }
+    ],
+    "delta": 3294.8444576337743,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "GBP",
+      "k": 3186.220331364421,
+      "s": 3000.0,
+      "s_used": 3000.0,
+      "currency": "GBP"
+     }
+    ],
+    "delta": 3186.220331364421,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f-0005",
+  "operation": "risk.frtb.girr_delta",
+  "binding_scenario": "low",
+  "capital": 12298.373876248843,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 11000.0,
+      "s": -11000.0,
+      "s_used": -11000.0,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "USD",
+      "k": 11000.0,
+      "s": 11000.0,
+      "s_used": 11000.0,
+      "currency": "USD"
+     }
+    ],
+    "delta": 9526.279441628825,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 11000.0,
+      "s": -11000.0,
+      "s_used": -11000.0,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "USD",
+      "k": 11000.0,
+      "s": 11000.0,
+      "s_used": 11000.0,
+      "currency": "USD"
+     }
+    ],
+    "delta": 11000.0,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 11000.0,
+      "s": -11000.0,
+      "s_used": -11000.0,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "USD",
+      "k": 11000.0,
+      "s": 11000.0,
+      "s_used": 11000.0,
+      "currency": "USD"
+     }
+    ],
+    "delta": 12298.373876248843,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f-0006",
+  "operation": "risk.frtb.girr_delta",
+  "binding_scenario": "low",
+  "capital": 35777.08763999664,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 32000.0,
+      "s": -64000.0,
+      "s_used": -32000.0,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "USD",
+      "k": 32000.0,
+      "s": 64000.0,
+      "s_used": 32000.0,
+      "currency": "USD"
+     }
+    ],
+    "delta": 27712.812921102035,
+    "alternative_used": true
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 32000.0,
+      "s": -64000.0,
+      "s_used": -32000.0,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "USD",
+      "k": 32000.0,
+      "s": 64000.0,
+      "s_used": 32000.0,
+      "currency": "USD"
+     }
+    ],
+    "delta": 32000.0,
+    "alternative_used": true
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 32000.0,
+      "s": -64000.0,
+      "s_used": -32000.0,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "USD",
+      "k": 32000.0,
+      "s": 64000.0,
+      "s_used": 32000.0,
+      "currency": "USD"
+     }
+    ],
+    "delta": 35777.08763999664,
+    "alternative_used": true
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f-0007",
+  "operation": "risk.frtb.girr_delta",
+  "binding_scenario": "low",
+  "capital": 3755.5850969278536,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "BRL",
+      "k": 1300.0,
+      "s": 1300.0,
+      "s_used": 1300.0,
+      "currency": "BRL"
+     },
+     {
+      "bucket": "USD",
+      "k": 2899.9723360630815,
+      "s": 1838.4776310850239,
+      "s_used": 1838.4776310850239,
+      "currency": "USD"
+     }
+    ],
+    "delta": 3617.646431099138,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "BRL",
+      "k": 1300.0,
+      "s": 1300.0,
+      "s_used": 1300.0,
+      "currency": "BRL"
+     },
+     {
+      "bucket": "USD",
+      "k": 3084.7806469739357,
+      "s": 1838.4776310850239,
+      "s_used": 1838.4776310850239,
+      "currency": "USD"
+     }
+    ],
+    "delta": 3687.2608478863367,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "BRL",
+      "k": 1300.0,
+      "s": 1300.0,
+      "s_used": 1300.0,
+      "currency": "BRL"
+     },
+     {
+      "bucket": "USD",
+      "k": 3259.126221851295,
+      "s": 1838.4776310850239,
+      "s_used": 1838.4776310850239,
+      "currency": "USD"
+     }
+    ],
+    "delta": 3755.5850969278536,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f-0008",
+  "operation": "risk.frtb.girr_delta",
+  "binding_scenario": "low",
+  "capital": 11607.352223472853,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "USD",
+      "k": 10898.34244001881,
+      "s": 14244.09511,
+      "s_used": 14244.09511,
+      "currency": "USD"
+     }
+    ],
+    "delta": 10898.34244001881,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "USD",
+      "k": 11258.430032195334,
+      "s": 14244.09511,
+      "s_used": 14244.09511,
+      "currency": "USD"
+     }
+    ],
+    "delta": 11258.430032195334,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "USD",
+      "k": 11607.352223472853,
+      "s": 14244.09511,
+      "s_used": 14244.09511,
+      "currency": "USD"
+     }
+    ],
+    "delta": 11607.352223472853,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f-0009",
+  "operation": "risk.frtb.girr_delta",
+  "binding_scenario": "high",
+  "capital": 21021.437686209272,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 8177.4999999249085,
+      "s": -5032.991444415393,
+      "s_used": -5032.991444415393,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "USD",
+      "k": 16429.611690888043,
+      "s": -16705.32477453877,
+      "s_used": -16705.32477453877,
+      "currency": "USD"
+     }
+    ],
+    "delta": 21021.437686209272,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 8319.465703819693,
+      "s": -5032.991444415393,
+      "s_used": -5032.991444415393,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "USD",
+      "k": 15673.391608405847,
+      "s": -16705.32477453877,
+      "s_used": -16705.32477453877,
+      "currency": "USD"
+     }
+    ],
+    "delta": 19973.644403911698,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 8459.04917501322,
+      "s": -5032.991444415393,
+      "s_used": -5032.991444415393,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "USD",
+      "k": 14878.785861337234,
+      "s": -16705.32477453877,
+      "s_used": -16705.32477453877,
+      "currency": "USD"
+     }
+    ],
+    "delta": 18867.75289091539,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f-0010",
+  "operation": "risk.frtb.girr_delta",
+  "binding_scenario": "low",
+  "capital": 41887.73119870701,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 40430.15308715312,
+      "s": -43570.98151,
+      "s_used": -43570.98151,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "JPY",
+      "k": 19362.97899899638,
+      "s": -16753.398259999998,
+      "s_used": -16753.398259999998,
+      "currency": "JPY"
+     },
+     {
+      "bucket": "USD",
+      "k": 26662.067607221386,
+      "s": 27793.5536,
+      "s_used": 27793.5536,
+      "currency": "USD"
+     }
+    ],
+    "delta": 39205.28647482506,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 38211.56343308779,
+      "s": -43570.98151,
+      "s_used": -43570.98151,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "JPY",
+      "k": 20020.58910096107,
+      "s": -16753.398259999998,
+      "s_used": -16753.398259999998,
+      "currency": "JPY"
+     },
+     {
+      "bucket": "USD",
+      "k": 27046.95112266498,
+      "s": 27793.5536,
+      "s_used": 27793.5536,
+      "currency": "USD"
+     }
+    ],
+    "delta": 40568.685661161326,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 35855.96019284863,
+      "s": -43570.98151,
+      "s_used": -43570.98151,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "JPY",
+      "k": 20657.275236184163,
+      "s": -16753.398259999998,
+      "s_used": -16753.398259999998,
+      "currency": "JPY"
+     },
+     {
+      "bucket": "USD",
+      "k": 27426.433982047554,
+      "s": 27793.5536,
+      "s_used": 27793.5536,
+      "currency": "USD"
+     }
+    ],
+    "delta": 41887.73119870701,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f-0011",
+  "operation": "risk.frtb.girr_delta",
+  "binding_scenario": "low",
+  "capital": 14987.85965299428,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "USD",
+      "k": 14234.478448481148,
+      "s": -10677.932839690953,
+      "s_used": -10677.932839690953,
+      "currency": "USD"
+     }
+    ],
+    "delta": 14234.478448481148,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "USD",
+      "k": 14616.023975044116,
+      "s": -10677.932839690953,
+      "s_used": -10677.932839690953,
+      "currency": "USD"
+     }
+    ],
+    "delta": 14616.023975044116,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "USD",
+      "k": 14987.85965299428,
+      "s": -10677.932839690953,
+      "s_used": -10677.932839690953,
+      "currency": "USD"
+     }
+    ],
+    "delta": 14987.85965299428,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f-0012",
+  "operation": "risk.frtb.girr_delta",
+  "binding_scenario": "high",
+  "capital": 33629.83967379045,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 14586.39196616148,
+      "s": -14549.129019999998,
+      "s_used": -14549.129019999998,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "USD",
+      "k": 21615.855757483925,
+      "s": -24796.42954,
+      "s_used": -24796.42954,
+      "currency": "USD"
+     }
+    ],
+    "delta": 33629.83967379045,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 13963.175761501141,
+      "s": -14549.129019999998,
+      "s_used": -14549.129019999998,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "USD",
+      "k": 20967.892957942146,
+      "s": -24796.42954,
+      "s_used": -24796.42954,
+      "currency": "USD"
+     }
+    ],
+    "delta": 31549.790253741656,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 13310.812300631615,
+      "s": -14549.129019999998,
+      "s_used": -14549.129019999998,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "USD",
+      "k": 20299.25737713301,
+      "s": -24796.42954,
+      "s_used": -24796.42954,
+      "currency": "USD"
+     }
+    ],
+    "delta": 29322.558101661838,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f-0013",
+  "operation": "risk.frtb.girr_delta",
+  "binding_scenario": "high",
+  "capital": 25928.886105466547,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 15345.112106257215,
+      "s": -15043.046450708209,
+      "s_used": -15043.046450708209,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "JPY",
+      "k": 3605.8479808484235,
+      "s": 175.92444070647718,
+      "s_used": 175.92444070647718,
+      "currency": "JPY"
+     },
+     {
+      "bucket": "USD",
+      "k": 13614.376565157396,
+      "s": -13010.686504182862,
+      "s_used": -13010.686504182862,
+      "currency": "USD"
+     }
+    ],
+    "delta": 25928.886105466547,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 14870.502227535466,
+      "s": -15043.046450708209,
+      "s_used": -15043.046450708209,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "JPY",
+      "k": 7156.510830069128,
+      "s": 175.92444070647718,
+      "s_used": 175.92444070647718,
+      "currency": "JPY"
+     },
+     {
+      "bucket": "USD",
+      "k": 13540.178666302447,
+      "s": -13010.686504182862,
+      "s_used": -13010.686504182862,
+      "currency": "USD"
+     }
+    ],
+    "delta": 25425.753602078996,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 14380.236696406388,
+      "s": -15043.046450708209,
+      "s_used": -15043.046450708209,
+      "currency": "EUR"
+     },
+     {
+      "bucket": "JPY",
+      "k": 9456.698941004957,
+      "s": 175.92444070647718,
+      "s_used": 175.92444070647718,
+      "currency": "JPY"
+     },
+     {
+      "bucket": "USD",
+      "k": 13465.571928918474,
+      "s": -13010.686504182862,
+      "s_used": -13010.686504182862,
+      "currency": "USD"
+     }
+    ],
+    "delta": 24912.46189755259,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0001",
+  "operation": "risk.frtb.fx_delta",
+  "binding_scenario": "high",
+  "capital": 150000.0,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 150000.0,
+      "s": 150000.0,
+      "s_used": 150000.0
+     }
+    ],
+    "delta": 150000.0,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 150000.0,
+      "s": 150000.0,
+      "s_used": 150000.0
+     }
+    ],
+    "delta": 150000.0,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 150000.0,
+      "s": 150000.0,
+      "s_used": 150000.0
+     }
+    ],
+    "delta": 150000.0,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0002",
+  "operation": "risk.frtb.fx_delta",
+  "binding_scenario": "low",
+  "capital": 134164.07864998738,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 150000.0,
+      "s": 150000.0,
+      "s_used": 150000.0
+     },
+     {
+      "bucket": "USDJPY",
+      "k": 60000.0,
+      "s": -60000.0,
+      "s_used": -60000.0
+     }
+    ],
+    "delta": 112249.72160321825,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 150000.0,
+      "s": 150000.0,
+      "s_used": 150000.0
+     },
+     {
+      "bucket": "USDJPY",
+      "k": 60000.0,
+      "s": -60000.0,
+      "s_used": -60000.0
+     }
+    ],
+    "delta": 123693.16876852981,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 150000.0,
+      "s": 150000.0,
+      "s_used": 150000.0
+     },
+     {
+      "bucket": "USDJPY",
+      "k": 60000.0,
+      "s": -60000.0,
+      "s_used": -60000.0
+     }
+    ],
+    "delta": 134164.07864998738,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0003",
+  "operation": "risk.frtb.fx_delta",
+  "binding_scenario": "low",
+  "capital": 94868.32980505135,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 106066.01717798211,
+      "s": 106066.01717798211,
+      "s_used": 106066.01717798211
+     },
+     {
+      "bucket": "USDJPY",
+      "k": 42426.40687119285,
+      "s": -42426.40687119285,
+      "s_used": -42426.40687119285
+     }
+    ],
+    "delta": 79372.5393319377,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 106066.01717798211,
+      "s": 106066.01717798211,
+      "s_used": 106066.01717798211
+     },
+     {
+      "bucket": "USDJPY",
+      "k": 42426.40687119285,
+      "s": -42426.40687119285,
+      "s_used": -42426.40687119285
+     }
+    ],
+    "delta": 87464.27842267949,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 106066.01717798211,
+      "s": 106066.01717798211,
+      "s_used": 106066.01717798211
+     },
+     {
+      "bucket": "USDJPY",
+      "k": 42426.40687119285,
+      "s": -42426.40687119285,
+      "s_used": -42426.40687119285
+     }
+    ],
+    "delta": 94868.32980505135,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0004",
+  "operation": "risk.frtb.fx_delta",
+  "binding_scenario": "low",
+  "capital": 416233.1077653482,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 150000.0,
+      "s": 150000.0,
+      "s_used": 150000.0
+     },
+     {
+      "bucket": "USDBRL",
+      "k": 300000.0,
+      "s": 300000.0,
+      "s_used": 300000.0
+     },
+     {
+      "bucket": "USDTRY",
+      "k": 450000.0,
+      "s": -450000.0,
+      "s_used": -450000.0
+     }
+    ],
+    "delta": 280624.3040080456,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 150000.0,
+      "s": 150000.0,
+      "s_used": 150000.0
+     },
+     {
+      "bucket": "USDBRL",
+      "k": 300000.0,
+      "s": 300000.0,
+      "s_used": 300000.0
+     },
+     {
+      "bucket": "USDTRY",
+      "k": 450000.0,
+      "s": -450000.0,
+      "s_used": -450000.0
+     }
+    ],
+    "delta": 354964.78698597697,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 150000.0,
+      "s": 150000.0,
+      "s_used": 150000.0
+     },
+     {
+      "bucket": "USDBRL",
+      "k": 300000.0,
+      "s": 300000.0,
+      "s_used": 300000.0
+     },
+     {
+      "bucket": "USDTRY",
+      "k": 450000.0,
+      "s": -450000.0,
+      "s_used": -450000.0
+     }
+    ],
+    "delta": 416233.1077653482,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0007",
+  "operation": "risk.frtb.equity_delta",
+  "binding_scenario": "high",
+  "capital": 300000.0,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 300000.0,
+      "s": 300000.0,
+      "s_used": 300000.0
+     }
+    ],
+    "delta": 300000.0,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 300000.0,
+      "s": 300000.0,
+      "s_used": 300000.0
+     }
+    ],
+    "delta": 300000.0,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 300000.0,
+      "s": 300000.0,
+      "s_used": 300000.0
+     }
+    ],
+    "delta": 300000.0,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0008",
+  "operation": "risk.frtb.equity_delta",
+  "binding_scenario": "high",
+  "capital": 450000.0,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 450000.0,
+      "s": 450000.0,
+      "s_used": 450000.0
+     }
+    ],
+    "delta": 450000.0,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 449899.98888641904,
+      "s": 450000.0,
+      "s_used": 450000.0
+     }
+    ],
+    "delta": 449899.98888641904,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 449799.95553579147,
+      "s": 450000.0,
+      "s_used": 450000.0
+     }
+    ],
+    "delta": 449799.95553579147,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0009",
+  "operation": "risk.frtb.equity_delta",
+  "binding_scenario": "low",
+  "capital": 309356.2267031326,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 290444.7021379457,
+      "s": 150000.0,
+      "s_used": 150000.0
+     }
+    ],
+    "delta": 290444.7021379457,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 300049.4959169237,
+      "s": 150000.0,
+      "s_used": 150000.0
+     }
+    ],
+    "delta": 300049.4959169237,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 309356.2267031326,
+      "s": 150000.0,
+      "s_used": 150000.0
+     }
+    ],
+    "delta": 309356.2267031326,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0010",
+  "operation": "risk.frtb.equity_delta",
+  "binding_scenario": "low",
+  "capital": 711380.6997663066,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 1,
+      "k": 550000.0,
+      "s": 550000.0,
+      "s_used": 550000.0
+     },
+     {
+      "bucket": 9,
+      "k": 350000.0,
+      "s": 350000.0,
+      "s_used": 350000.0
+     },
+     {
+      "bucket": 12,
+      "k": 300000.0,
+      "s": -300000.0,
+      "s_used": -300000.0
+     },
+     {
+      "bucket": 13,
+      "k": 250000.0,
+      "s": 250000.0,
+      "s_used": 250000.0
+     }
+    ],
+    "delta": 677080.128197542,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 1,
+      "k": 550000.0,
+      "s": 550000.0,
+      "s_used": 550000.0
+     },
+     {
+      "bucket": 9,
+      "k": 350000.0,
+      "s": 350000.0,
+      "s_used": 350000.0
+     },
+     {
+      "bucket": 12,
+      "k": 300000.0,
+      "s": -300000.0,
+      "s_used": -300000.0
+     },
+     {
+      "bucket": 13,
+      "k": 250000.0,
+      "s": 250000.0,
+      "s_used": 250000.0
+     }
+    ],
+    "delta": 694442.2222186667,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 1,
+      "k": 550000.0,
+      "s": 550000.0,
+      "s_used": 550000.0
+     },
+     {
+      "bucket": 9,
+      "k": 350000.0,
+      "s": 350000.0,
+      "s_used": 350000.0
+     },
+     {
+      "bucket": 12,
+      "k": 300000.0,
+      "s": -300000.0,
+      "s_used": -300000.0
+     },
+     {
+      "bucket": 13,
+      "k": 250000.0,
+      "s": 250000.0,
+      "s_used": 250000.0
+     }
+    ],
+    "delta": 711380.6997663066,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0011",
+  "operation": "risk.frtb.equity_delta",
+  "binding_scenario": "low",
+  "capital": 620735.4508967568,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 12,
+      "k": 450000.0,
+      "s": 450000.0,
+      "s_used": 450000.0
+     },
+     {
+      "bucket": 13,
+      "k": 750000.0,
+      "s": -750000.0,
+      "s_used": -750000.0
+     }
+    ],
+    "delta": 363575.9893062247,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 12,
+      "k": 450000.0,
+      "s": 450000.0,
+      "s_used": 450000.0
+     },
+     {
+      "bucket": 13,
+      "k": 750000.0,
+      "s": -750000.0,
+      "s_used": -750000.0
+     }
+    ],
+    "delta": 508674.74873439514,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 12,
+      "k": 450000.0,
+      "s": 450000.0,
+      "s_used": 450000.0
+     },
+     {
+      "bucket": 13,
+      "k": 750000.0,
+      "s": -750000.0,
+      "s_used": -750000.0
+     }
+    ],
+    "delta": 620735.4508967568,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0012",
+  "operation": "risk.frtb.equity_delta",
+  "binding_scenario": "high",
+  "capital": 1431782.1063276352,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 300000.0,
+      "s": 300000.0,
+      "s_used": 300000.0
+     },
+     {
+      "bucket": 11,
+      "k": 1400000.0,
+      "s": 0.0,
+      "s_used": 0.0
+     }
+    ],
+    "delta": 1431782.1063276352,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 300000.0,
+      "s": 300000.0,
+      "s_used": 300000.0
+     },
+     {
+      "bucket": 11,
+      "k": 1400000.0,
+      "s": 0.0,
+      "s_used": 0.0
+     }
+    ],
+    "delta": 1431782.1063276352,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 300000.0,
+      "s": 300000.0,
+      "s_used": 300000.0
+     },
+     {
+      "bucket": 11,
+      "k": 1400000.0,
+      "s": 0.0,
+      "s_used": 0.0
+     }
+    ],
+    "delta": 1431782.1063276352,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0016",
+  "operation": "risk.frtb.csr_delta",
+  "binding_scenario": "high",
+  "capital": 50000.0,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 50000.0,
+      "s": 50000.0,
+      "s_used": 50000.0
+     }
+    ],
+    "delta": 50000.0,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 50000.0,
+      "s": 50000.0,
+      "s_used": 50000.0
+     }
+    ],
+    "delta": 50000.0,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 50000.0,
+      "s": 50000.0,
+      "s_used": 50000.0
+     }
+    ],
+    "delta": 50000.0,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0017",
+  "operation": "risk.frtb.csr_delta",
+  "binding_scenario": "high",
+  "capital": 26865.09992071498,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 26865.09992071498,
+      "s": 30000.0,
+      "s_used": 30000.0
+     }
+    ],
+    "delta": 26865.09992071498,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 26681.208274738983,
+      "s": 30000.0,
+      "s_used": 30000.0
+     }
+    ],
+    "delta": 26681.208274738983,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 26496.040388141017,
+      "s": 30000.0,
+      "s_used": 30000.0
+     }
+    ],
+    "delta": 26496.040388141017,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0018",
+  "operation": "risk.frtb.csr_delta",
+  "binding_scenario": "low",
+  "capital": 74293.3375209379,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 50000.0,
+      "s": 50000.0,
+      "s_used": 50000.0
+     },
+     {
+      "bucket": 11,
+      "k": 48000.0,
+      "s": 48000.0,
+      "s_used": 48000.0
+     },
+     {
+      "bucket": 17,
+      "k": 30000.0,
+      "s": -30000.0,
+      "s_used": -30000.0
+     }
+    ],
+    "delta": 73460.87393980553,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 50000.0,
+      "s": 50000.0,
+      "s_used": 50000.0
+     },
+     {
+      "bucket": 11,
+      "k": 48000.0,
+      "s": 48000.0,
+      "s_used": 48000.0
+     },
+     {
+      "bucket": 17,
+      "k": 30000.0,
+      "s": -30000.0,
+      "s_used": -30000.0
+     }
+    ],
+    "delta": 73878.27826905552,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 50000.0,
+      "s": 50000.0,
+      "s_used": 50000.0
+     },
+     {
+      "bucket": 11,
+      "k": 48000.0,
+      "s": 48000.0,
+      "s_used": 48000.0
+     },
+     {
+      "bucket": 17,
+      "k": 30000.0,
+      "s": -30000.0,
+      "s_used": -30000.0
+     }
+    ],
+    "delta": 74293.3375209379,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0019",
+  "operation": "risk.frtb.csr_delta",
+  "binding_scenario": "high",
+  "capital": 260000.0,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 1,
+      "k": 100000.0,
+      "s": 100000.0,
+      "s_used": 100000.0
+     },
+     {
+      "bucket": 16,
+      "k": 240000.0,
+      "s": 0.0,
+      "s_used": 0.0
+     }
+    ],
+    "delta": 260000.0,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 1,
+      "k": 100000.0,
+      "s": 100000.0,
+      "s_used": 100000.0
+     },
+     {
+      "bucket": 16,
+      "k": 240000.0,
+      "s": 0.0,
+      "s_used": 0.0
+     }
+    ],
+    "delta": 260000.0,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 1,
+      "k": 100000.0,
+      "s": 100000.0,
+      "s_used": 100000.0
+     },
+     {
+      "bucket": 16,
+      "k": 240000.0,
+      "s": 0.0,
+      "s_used": 0.0
+     }
+    ],
+    "delta": 260000.0,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0022",
+  "operation": "risk.frtb.commodity_delta",
+  "binding_scenario": "high",
+  "capital": 350000.0,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 350000.0,
+      "s": 350000.0,
+      "s_used": 350000.0
+     }
+    ],
+    "delta": 350000.0,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 350000.0,
+      "s": 350000.0,
+      "s_used": 350000.0
+     }
+    ],
+    "delta": 350000.0,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 350000.0,
+      "s": 350000.0,
+      "s_used": 350000.0
+     }
+    ],
+    "delta": 350000.0,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0023",
+  "operation": "risk.frtb.commodity_delta",
+  "binding_scenario": "low",
+  "capital": 158004.74676414006,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 0.0,
+      "s": 0.0,
+      "s_used": 0.0
+     }
+    ],
+    "delta": 0.0,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 111726.22789658657,
+      "s": 0.0,
+      "s_used": 0.0
+     }
+    ],
+    "delta": 111726.22789658657,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 158004.74676414006,
+      "s": 0.0,
+      "s_used": 0.0
+     }
+    ],
+    "delta": 158004.74676414006,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2b-0024",
+  "operation": "risk.frtb.commodity_delta",
+  "binding_scenario": "low",
+  "capital": 193390.79605813717,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 0.0,
+      "s": 0.0,
+      "s_used": 0.0
+     },
+     {
+      "bucket": 7,
+      "k": 100000.0,
+      "s": 100000.0,
+      "s_used": 100000.0
+     },
+     {
+      "bucket": 11,
+      "k": 150000.0,
+      "s": 150000.0,
+      "s_used": 150000.0
+     }
+    ],
+    "delta": 180277.56377319945,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 49497.474683058324,
+      "s": 0.0,
+      "s_used": 0.0
+     },
+     {
+      "bucket": 7,
+      "k": 100000.0,
+      "s": 100000.0,
+      "s_used": 100000.0
+     },
+     {
+      "bucket": 11,
+      "k": 150000.0,
+      "s": 150000.0,
+      "s_used": 150000.0
+     }
+    ],
+    "delta": 186949.19095839918,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 70000.0,
+      "s": 0.0,
+      "s_used": 0.0
+     },
+     {
+      "bucket": 7,
+      "k": 100000.0,
+      "s": 100000.0,
+      "s_used": 100000.0
+     },
+     {
+      "bucket": 11,
+      "k": 150000.0,
+      "s": 150000.0,
+      "s_used": 150000.0
+     }
+    ],
+    "delta": 193390.79605813717,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2c-0001",
+  "operation": "risk.frtb.vega",
+  "binding_scenario": "high",
+  "capital": 1095445.1150103323,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 400000.0,
+      "s": 400000.0,
+      "s_used": 400000.0
+     },
+     {
+      "bucket": "USD",
+      "k": 800000.0,
+      "s": 800000.0,
+      "s_used": 800000.0
+     }
+    ],
+    "vega": 1095445.1150103323,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 467466.2454115197,
+      "s": 400000.0,
+      "s_used": 400000.0
+     },
+     {
+      "bucket": "USD",
+      "k": 800000.0,
+      "s": 800000.0,
+      "s_used": 800000.0
+     }
+    ],
+    "vega": 1085598.770540545,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 526354.8054290815,
+      "s": 400000.0,
+      "s_used": 400000.0
+     },
+     {
+      "bucket": "USD",
+      "k": 800000.0,
+      "s": 800000.0,
+      "s_used": 800000.0
+     }
+    ],
+    "vega": 1075662.2988644189,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2c-0002",
+  "operation": "risk.frtb.vega",
+  "binding_scenario": "high",
+  "capital": 667079.0507878357,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 388900.0,
+      "s": 388900.0,
+      "s_used": 388900.0
+     },
+     {
+      "bucket": 9,
+      "k": 300000.0,
+      "s": 300000.0,
+      "s_used": 300000.0
+     },
+     {
+      "bucket": 11,
+      "k": 400000.0,
+      "s": 0.0,
+      "s_used": 0.0
+     }
+    ],
+    "vega": 667079.0507878357,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 396563.7279621498,
+      "s": 388900.0,
+      "s_used": 388900.0
+     },
+     {
+      "bucket": 9,
+      "k": 300000.0,
+      "s": 300000.0,
+      "s_used": 300000.0
+     },
+     {
+      "bucket": 11,
+      "k": 400000.0,
+      "s": 0.0,
+      "s_used": 0.0
+     }
+    ],
+    "vega": 665029.1650260445,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 404082.13356999075,
+      "s": 388900.0,
+      "s_used": 388900.0
+     },
+     {
+      "bucket": 9,
+      "k": 300000.0,
+      "s": 300000.0,
+      "s_used": 300000.0
+     },
+     {
+      "bucket": 11,
+      "k": 400000.0,
+      "s": 0.0,
+      "s_used": 0.0
+     }
+    ],
+    "vega": 662972.9411299346,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21.",
+  "alt_capital_unrounded_vega_rw": 667084.8762233466
+ },
+ {
+  "case_id": "frtb_f2c-0003",
+  "operation": "risk.frtb.vega",
+  "binding_scenario": "low",
+  "capital": 1068101.9246281784,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 1225997.3636420937,
+      "s": 1400000.0,
+      "s_used": 1400000.0
+     },
+     {
+      "bucket": 11,
+      "k": 300000.0,
+      "s": -300000.0,
+      "s_used": -300000.0
+     }
+    ],
+    "vega": 1033474.4968587102,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 1197687.6172549718,
+      "s": 1400000.0,
+      "s_used": 1400000.0
+     },
+     {
+      "bucket": 11,
+      "k": 300000.0,
+      "s": -300000.0,
+      "s_used": -300000.0
+     }
+    ],
+    "vega": 1050930.8390783344,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 1168692.3125418506,
+      "s": 1400000.0,
+      "s_used": 1400000.0
+     },
+     {
+      "bucket": 11,
+      "k": 300000.0,
+      "s": -300000.0,
+      "s_used": -300000.0
+     }
+    ],
+    "vega": 1068101.9246281784,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2c-0004",
+  "operation": "risk.frtb.vega",
+  "binding_scenario": "low",
+  "capital": 601664.3582596531,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 100000.0,
+      "s": 100000.0,
+      "s_used": 100000.0
+     },
+     {
+      "bucket": 7,
+      "k": 400000.0,
+      "s": 400000.0,
+      "s_used": 400000.0
+     }
+    ],
+    "vega": 435889.89435406734,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 316227.7660168379,
+      "s": 100000.0,
+      "s_used": 100000.0
+     },
+     {
+      "bucket": 7,
+      "k": 400000.0,
+      "s": 400000.0,
+      "s_used": 400000.0
+     }
+    ],
+    "vega": 525357.021462548,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 435889.8943540676,
+      "s": 100000.0,
+      "s_used": 100000.0
+     },
+     {
+      "bucket": 7,
+      "k": 400000.0,
+      "s": 400000.0,
+      "s_used": 400000.0
+     }
+    ],
+    "vega": 601664.3582596531,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2c-0005",
+  "operation": "risk.frtb.vega",
+  "binding_scenario": "low",
+  "capital": 1776208.7991007294,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 2000000.0,
+      "s": 2000000.0,
+      "s_used": 2000000.0
+     },
+     {
+      "bucket": "USDJPY",
+      "k": 500000.0,
+      "s": -500000.0,
+      "s_used": -500000.0
+     }
+    ],
+    "vega": 1658312.3951776999,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 1975464.2110150787,
+      "s": 2000000.0,
+      "s_used": 2000000.0
+     },
+     {
+      "bucket": "USDJPY",
+      "k": 500000.0,
+      "s": -500000.0,
+      "s_used": -500000.0
+     }
+    ],
+    "vega": 1718272.0532562437,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 1950619.8240566652,
+      "s": 2000000.0,
+      "s_used": 2000000.0
+     },
+     {
+      "bucket": "USDJPY",
+      "k": 500000.0,
+      "s": -500000.0,
+      "s_used": -500000.0
+     }
+    ],
+    "vega": 1776208.7991007294,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2c-0006",
+  "operation": "risk.frtb.vega",
+  "binding_scenario": "high",
+  "capital": 1000000.0,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 1000000.0,
+      "s": 1000000.0,
+      "s_used": 1000000.0
+     }
+    ],
+    "vega": 1000000.0,
+    "alternative_used": false
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 1000000.0,
+      "s": 1000000.0,
+      "s_used": 1000000.0
+     }
+    ],
+    "vega": 1000000.0,
+    "alternative_used": false
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EURUSD",
+      "k": 1000000.0,
+      "s": 1000000.0,
+      "s_used": 1000000.0
+     }
+    ],
+    "vega": 1000000.0,
+    "alternative_used": false
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2c-0010",
+  "operation": "risk.frtb.curvature",
+  "binding_scenario": "high",
+  "capital": 0.0,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 0.0,
+      "s": 0.0,
+      "selected": "down"
+     }
+    ],
+    "curvature": 0.0
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 0.0,
+      "s": 0.0,
+      "selected": "down"
+     }
+    ],
+    "curvature": 0.0
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 5,
+      "k": 0.0,
+      "s": 0.0,
+      "selected": "down"
+     }
+    ],
+    "curvature": 0.0
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2c-0011",
+  "operation": "risk.frtb.curvature",
+  "binding_scenario": "low",
+  "capital": 440283.9992550263,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 1,
+      "k": 200000.0,
+      "s": 200000.0,
+      "selected": "up"
+     },
+     {
+      "bucket": 5,
+      "k": 384057.2873934304,
+      "s": 200000.0,
+      "selected": "down"
+     }
+    ],
+    "curvature": 435603.03029249003
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 1,
+      "k": 200000.0,
+      "s": 200000.0,
+      "selected": "up"
+     },
+     {
+      "bucket": 5,
+      "k": 387298.33462074166,
+      "s": 200000.0,
+      "selected": "down"
+     }
+    ],
+    "curvature": 437949.76880916377
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 1,
+      "k": 200000.0,
+      "s": 200000.0,
+      "selected": "up"
+     },
+     {
+      "bucket": 5,
+      "k": 390512.4837953327,
+      "s": 200000.0,
+      "selected": "down"
+     }
+    ],
+    "curvature": 440283.9992550263
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2c-0012",
+  "operation": "risk.frtb.curvature",
+  "binding_scenario": "high",
+  "capital": 731436.9419163896,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 500000.0,
+      "s": 500000.0,
+      "selected": "up"
+     },
+     {
+      "bucket": "USD",
+      "k": 400000.0,
+      "s": 400000.0,
+      "selected": "down"
+     }
+    ],
+    "curvature": 731436.9419163896
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 500000.0,
+      "s": 500000.0,
+      "selected": "up"
+     },
+     {
+      "bucket": "USD",
+      "k": 400000.0,
+      "s": 400000.0,
+      "selected": "down"
+     }
+    ],
+    "curvature": 714142.842854285
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EUR",
+      "k": 500000.0,
+      "s": 500000.0,
+      "selected": "up"
+     },
+     {
+      "bucket": "USD",
+      "k": 400000.0,
+      "s": 400000.0,
+      "selected": "down"
+     }
+    ],
+    "curvature": 696419.413859206
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2c-0013",
+  "operation": "risk.frtb.curvature",
+  "binding_scenario": "low",
+  "capital": 357997.90502180316,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 192191.3109378257,
+      "s": 150000.0,
+      "selected": "down"
+     },
+     {
+      "bucket": 16,
+      "k": 300000.0,
+      "s": 300000.0,
+      "selected": "up"
+     }
+    ],
+    "curvature": 356282.8932182964
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 193778.223750761,
+      "s": 150000.0,
+      "selected": "down"
+     },
+     {
+      "bucket": 16,
+      "k": 300000.0,
+      "s": 300000.0,
+      "selected": "up"
+     }
+    ],
+    "curvature": 357141.4285685714
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 3,
+      "k": 195352.245955863,
+      "s": 150000.0,
+      "selected": "down"
+     },
+     {
+      "bucket": 16,
+      "k": 300000.0,
+      "s": 300000.0,
+      "selected": "up"
+     }
+    ],
+    "curvature": 357997.90502180316
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2c-0014",
+  "operation": "risk.frtb.curvature",
+  "binding_scenario": "high",
+  "capital": 300000.0,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 300000.0,
+      "s": 300000.0,
+      "selected": "down"
+     }
+    ],
+    "curvature": 300000.0
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 293428.0150224242,
+      "s": 300000.0,
+      "selected": "down"
+     }
+    ],
+    "curvature": 293428.0150224242
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 2,
+      "k": 286705.423736629,
+      "s": 300000.0,
+      "selected": "down"
+     }
+    ],
+    "curvature": 286705.423736629
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2c-0015",
+  "operation": "risk.frtb.curvature",
+  "binding_scenario": "high",
+  "capital": 233238.07579381202,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": "EURGBP",
+      "k": 60000.0,
+      "s": 60000.0,
+      "selected": "down"
+     },
+     {
+      "bucket": "EURJPY",
+      "k": 200000.0,
+      "s": 200000.0,
+      "selected": "up"
+     }
+    ],
+    "curvature": 233238.07579381202
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": "EURGBP",
+      "k": 60000.0,
+      "s": 60000.0,
+      "selected": "down"
+     },
+     {
+      "bucket": "EURJPY",
+      "k": 200000.0,
+      "s": 200000.0,
+      "selected": "up"
+     }
+    ],
+    "curvature": 228560.71403458645
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": "EURGBP",
+      "k": 60000.0,
+      "s": 60000.0,
+      "selected": "down"
+     },
+     {
+      "bucket": "EURJPY",
+      "k": 200000.0,
+      "s": 200000.0,
+      "selected": "up"
+     }
+    ],
+    "curvature": 223785.61169118984
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "frtb_f2c-0016",
+  "operation": "risk.frtb.curvature",
+  "binding_scenario": "high",
+  "capital": 100000.0,
+  "scenarios": {
+   "high": {
+    "buckets": [
+     {
+      "bucket": 11,
+      "k": 100000.0,
+      "s": 50000.0,
+      "selected": "up"
+     }
+    ],
+    "curvature": 100000.0
+   },
+   "medium": {
+    "buckets": [
+     {
+      "bucket": 11,
+      "k": 100000.0,
+      "s": 50000.0,
+      "selected": "up"
+     }
+    ],
+    "curvature": 100000.0
+   },
+   "low": {
+    "buckets": [
+     {
+      "bucket": 11,
+      "k": 100000.0,
+      "s": 50000.0,
+      "selected": "up"
+     }
+    ],
+    "curvature": 100000.0
+   }
+  },
+  "basis": "primary-text",
+  "basis_note": "All parameters/formulas from Basel Framework MAR21 (PDF pp. 570-574, 592-618). binding_scenario tie-break (first of high, medium, low) is a convention not in MAR21."
+ },
+ {
+  "case_id": "book_f-0001",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [
+   {
+    "instrument": "UST10",
+    "quantity": 30.0,
+    "average_cost": 99.75
+   }
+  ],
+  "realized_pnl": [
+   {
+    "instrument": "UST10",
+    "pnl": 90.0
+   }
+  ],
+  "total_realized": 90.0,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0002",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [
+   {
+    "instrument": "SR3Z6",
+    "quantity": 5.0,
+    "average_cost": 95.7
+   }
+  ],
+  "realized_pnl": [
+   {
+    "instrument": "SR3Z6",
+    "pnl": 1.0
+   }
+  ],
+  "total_realized": 1.0,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0003",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [],
+  "realized_pnl": [
+   {
+    "instrument": "AAPL",
+    "pnl": 2100.0
+   }
+  ],
+  "total_realized": 2100.0,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0004",
+  "operation": "book.lifecycle.apply",
+  "fixings": [
+   {
+    "index": "ESTR",
+    "date": "2026-11-02",
+    "value": 0.0193
+   },
+   {
+    "index": "SOFR",
+    "date": "2026-11-02",
+    "value": 0.0431
+   },
+   {
+    "index": "SOFR",
+    "date": "2026-11-03",
+    "value": 0.043
+   }
+  ],
+  "positions": [],
+  "realized_pnl": [],
+  "total_realized": 0.0,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0005",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [],
+  "realized_pnl": [
+   {
+    "instrument": "SPX-C-6000",
+    "pnl": 76.25
+   }
+  ],
+  "total_realized": 76.25,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0006",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [],
+  "realized_pnl": [
+   {
+    "instrument": "BOND-X",
+    "pnl": -590.0
+   }
+  ],
+  "total_realized": -590.0,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0007",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [
+   {
+    "instrument": "SR3H7",
+    "quantity": -20.0,
+    "average_cost": 96.01
+   }
+  ],
+  "realized_pnl": [
+   {
+    "instrument": "SR3Z6",
+    "pnl": 1.6
+   }
+  ],
+  "total_realized": 1.6,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0008",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [
+   {
+    "instrument": "A",
+    "quantity": 31.0,
+    "average_cost": 93.22144444444444
+   }
+  ],
+  "realized_pnl": [
+   {
+    "instrument": "A",
+    "pnl": -818.1552222222223
+   }
+  ],
+  "total_realized": -818.1552222222223,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0009",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [
+   {
+    "instrument": "A",
+    "quantity": -1.0,
+    "average_cost": 94.90393375277573
+   },
+   {
+    "instrument": "B",
+    "quantity": 54.0,
+    "average_cost": 101.1431229870933
+   }
+  ],
+  "realized_pnl": [
+   {
+    "instrument": "A",
+    "pnl": -2459.2739337527755
+   },
+   {
+    "instrument": "B",
+    "pnl": 239.54864130303832
+   }
+  ],
+  "total_realized": -2219.7252924497375,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0010",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [
+   {
+    "instrument": "A",
+    "quantity": -23.0,
+    "average_cost": 111.97
+   },
+   {
+    "instrument": "B",
+    "quantity": 114.0,
+    "average_cost": 100.02380286738351
+   },
+   {
+    "instrument": "C",
+    "quantity": -148.0,
+    "average_cost": 101.47198543324888
+   }
+  ],
+  "realized_pnl": [
+   {
+    "instrument": "A",
+    "pnl": 3655.44
+   },
+   {
+    "instrument": "B",
+    "pnl": -126.75647311827957
+   },
+   {
+    "instrument": "C",
+    "pnl": 1198.676155879166
+   }
+  ],
+  "total_realized": 4727.359682760886,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0011",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [
+   {
+    "instrument": "A",
+    "quantity": 84.0,
+    "average_cost": 116.73690476190477
+   }
+  ],
+  "realized_pnl": [
+   {
+    "instrument": "A",
+    "pnl": -3140.3
+   }
+  ],
+  "total_realized": -3140.3,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0012",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [
+   {
+    "instrument": "A",
+    "quantity": 305.0,
+    "average_cost": 101.60087471312326
+   },
+   {
+    "instrument": "B",
+    "quantity": -471.0,
+    "average_cost": 100.50917181968137
+   }
+  ],
+  "realized_pnl": [
+   {
+    "instrument": "A",
+    "pnl": -1997.603212497406
+   },
+   {
+    "instrument": "B",
+    "pnl": 667.030072930073
+   }
+  ],
+  "total_realized": -1330.573139567333,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0013",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [
+   {
+    "instrument": "A",
+    "quantity": 236.0,
+    "average_cost": 95.53899633685346
+   },
+   {
+    "instrument": "B",
+    "quantity": -289.0,
+    "average_cost": 94.79267858021066
+   },
+   {
+    "instrument": "C",
+    "quantity": 13.0,
+    "average_cost": 100.85226541583094
+   }
+  ],
+  "realized_pnl": [
+   {
+    "instrument": "A",
+    "pnl": -1163.3768645025839
+   },
+   {
+    "instrument": "B",
+    "pnl": -670.2941096808796
+   },
+   {
+    "instrument": "C",
+    "pnl": -846.2305495941978
+   }
+  ],
+  "total_realized": -2679.901523777661,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0014",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [
+   {
+    "instrument": "A",
+    "quantity": -595.0,
+    "average_cost": 100.15015978773586
+   }
+  ],
+  "realized_pnl": [
+   {
+    "instrument": "A",
+    "pnl": -2458.7350737028332
+   }
+  ],
+  "total_realized": -2458.7350737028332,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0015",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [
+   {
+    "instrument": "A",
+    "quantity": -59.0,
+    "average_cost": 94.48600877192982
+   },
+   {
+    "instrument": "B",
+    "quantity": -329.0,
+    "average_cost": 98.3242435092231
+   }
+  ],
+  "realized_pnl": [
+   {
+    "instrument": "A",
+    "pnl": -4303.37451754386
+   },
+   {
+    "instrument": "B",
+    "pnl": -2293.5861145343983
+   }
+  ],
+  "total_realized": -6596.960632078258,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0016",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [
+   {
+    "instrument": "A",
+    "quantity": 199.0,
+    "average_cost": 103.46271071133265
+   },
+   {
+    "instrument": "B",
+    "quantity": -105.0,
+    "average_cost": 95.24141972789116
+   },
+   {
+    "instrument": "C",
+    "quantity": -48.0,
+    "average_cost": 113.69895458910688
+   }
+  ],
+  "realized_pnl": [
+   {
+    "instrument": "A",
+    "pnl": 325.139431555196
+   },
+   {
+    "instrument": "B",
+    "pnl": -431.21907142857145
+   },
+   {
+    "instrument": "C",
+    "pnl": 6948.71017972287
+   }
+  ],
+  "total_realized": 6842.630539849495,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0017",
+  "operation": "book.lifecycle.apply",
+  "fixings": [],
+  "positions": [
+   {
+    "instrument": "A",
+    "quantity": -278.0,
+    "average_cost": 95.00100538051569
+   }
+  ],
+  "realized_pnl": [
+   {
+    "instrument": "A",
+    "pnl": -9399.049495783363
+   }
+  ],
+  "total_realized": -9399.049495783363,
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0024",
+  "operation": "book.marks.resolve",
+  "marks": [
+   {
+    "instrument": "UST10",
+    "price": 99.75,
+    "source": "VENDOR_A",
+    "status": "PRIMARY",
+    "age_days": 0,
+    "ipv_diff": 0.0005015045135406219,
+    "ipv_breach": false
+   },
+   {
+    "instrument": "BUND10",
+    "price": 131.2,
+    "source": "VENDOR_B",
+    "status": "FALLBACK",
+    "age_days": 0,
+    "ipv_diff": 0.009230769230769232,
+    "ipv_breach": true
+   },
+   {
+    "instrument": "SPX",
+    "price": 6020.0,
+    "source": "VENDOR_B",
+    "status": "STALE",
+    "age_days": 1,
+    "ipv_diff": null,
+    "ipv_breach": false
+   },
+   {
+    "instrument": "ILLIQ",
+    "price": null,
+    "source": null,
+    "status": "MISSING",
+    "age_days": null,
+    "ipv_diff": null,
+    "ipv_breach": false
+   }
+  ],
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0025",
+  "operation": "book.marks.resolve",
+  "marks": [
+   {
+    "instrument": "UST10",
+    "price": 99.75,
+    "source": "VENDOR_A",
+    "status": "PRIMARY",
+    "age_days": 0,
+    "ipv_diff": 0.0005015045135406219,
+    "ipv_breach": false
+   },
+   {
+    "instrument": "BUND10",
+    "price": 131.2,
+    "source": "VENDOR_B",
+    "status": "FALLBACK",
+    "age_days": 0,
+    "ipv_diff": 0.009230769230769232,
+    "ipv_breach": true
+   },
+   {
+    "instrument": "SPX",
+    "price": 6020.0,
+    "source": "VENDOR_B",
+    "status": "STALE",
+    "age_days": 1,
+    "ipv_diff": null,
+    "ipv_breach": false
+   },
+   {
+    "instrument": "ILLIQ",
+    "price": 88.0,
+    "source": "VENDOR_B",
+    "status": "STALE",
+    "age_days": 9,
+    "ipv_diff": null,
+    "ipv_breach": false
+   }
+  ],
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0026",
+  "operation": "book.marks.resolve",
+  "marks": [
+   {
+    "instrument": "UST10",
+    "price": 99.75,
+    "source": "VENDOR_A",
+    "status": "PRIMARY",
+    "age_days": 0,
+    "ipv_diff": 0.0005015045135406219,
+    "ipv_breach": true
+   },
+   {
+    "instrument": "BUND10",
+    "price": 131.2,
+    "source": "VENDOR_B",
+    "status": "FALLBACK",
+    "age_days": 0,
+    "ipv_diff": 0.009230769230769232,
+    "ipv_breach": true
+   },
+   {
+    "instrument": "SPX",
+    "price": 6020.0,
+    "source": "VENDOR_B",
+    "status": "STALE",
+    "age_days": 1,
+    "ipv_diff": null,
+    "ipv_breach": false
+   },
+   {
+    "instrument": "ILLIQ",
+    "price": null,
+    "source": null,
+    "status": "MISSING",
+    "age_days": null,
+    "ipv_diff": null,
+    "ipv_breach": false
+   }
+  ],
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0027",
+  "operation": "book.marks.resolve",
+  "marks": [
+   {
+    "instrument": "UST10",
+    "price": 99.75,
+    "source": "VENDOR_A",
+    "status": "PRIMARY",
+    "age_days": 0,
+    "ipv_diff": null,
+    "ipv_breach": false
+   },
+   {
+    "instrument": "BUND10",
+    "price": 131.2,
+    "source": "VENDOR_B",
+    "status": "FALLBACK",
+    "age_days": 0,
+    "ipv_diff": null,
+    "ipv_breach": false
+   },
+   {
+    "instrument": "SPX",
+    "price": 6020.0,
+    "source": "VENDOR_B",
+    "status": "STALE",
+    "age_days": 1,
+    "ipv_diff": null,
+    "ipv_breach": false
+   },
+   {
+    "instrument": "ILLIQ",
+    "price": null,
+    "source": null,
+    "status": "MISSING",
+    "age_days": null,
+    "ipv_diff": null,
+    "ipv_breach": false
+   }
+  ],
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0028",
+  "operation": "book.marks.resolve",
+  "marks": [
+   {
+    "instrument": "UST10",
+    "price": 99.75,
+    "source": "VENDOR_A",
+    "status": "PRIMARY",
+    "age_days": 0,
+    "ipv_diff": 0.0005015045135406219,
+    "ipv_breach": false
+   },
+   {
+    "instrument": "BUND10",
+    "price": null,
+    "source": null,
+    "status": "MISSING",
+    "age_days": null,
+    "ipv_diff": null,
+    "ipv_breach": false
+   },
+   {
+    "instrument": "SPX",
+    "price": 6012.5,
+    "source": "VENDOR_A",
+    "status": "STALE",
+    "age_days": 3,
+    "ipv_diff": null,
+    "ipv_breach": false
+   },
+   {
+    "instrument": "ILLIQ",
+    "price": null,
+    "source": null,
+    "status": "MISSING",
+    "age_days": null,
+    "ipv_diff": null,
+    "ipv_breach": false
+   }
+  ],
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "book_f-0029",
+  "operation": "book.marks.resolve",
+  "marks": [
+   {
+    "instrument": "UST10",
+    "price": 99.8,
+    "source": "VENDOR_B",
+    "status": "PRIMARY",
+    "age_days": 0,
+    "ipv_diff": 0.0010030090270812437,
+    "ipv_breach": false
+   },
+   {
+    "instrument": "BUND10",
+    "price": 131.2,
+    "source": "VENDOR_B",
+    "status": "PRIMARY",
+    "age_days": 0,
+    "ipv_diff": 0.009230769230769232,
+    "ipv_breach": true
+   },
+   {
+    "instrument": "SPX",
+    "price": 6020.0,
+    "source": "VENDOR_B",
+    "status": "STALE",
+    "age_days": 1,
+    "ipv_diff": null,
+    "ipv_breach": false
+   },
+   {
+    "instrument": "ILLIQ",
+    "price": null,
+    "source": null,
+    "status": "MISSING",
+    "age_days": null,
+    "ipv_diff": null,
+    "ipv_breach": false
+   }
+  ],
+  "basis": "spec-only",
+  "basis_note": "independent implementation from the spec by a different model; no primary source"
+ },
+ {
+  "case_id": "risk_f4-0082",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.08105851616218128,
+  "plus_factor": 0.0,
+  "zone": "GREEN",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 0
+ },
+ {
+  "case_id": "risk_f4-0083",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.2857517387939524,
+  "plus_factor": 0.0,
+  "zone": "GREEN",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 0
+ },
+ {
+  "case_id": "risk_f4-0084",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.5431689733157253,
+  "plus_factor": 0.0,
+  "zone": "GREEN",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 0
+ },
+ {
+  "case_id": "risk_f4-0085",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.7581166977648828,
+  "plus_factor": 0.0,
+  "zone": "GREEN",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 0
+ },
+ {
+  "case_id": "risk_f4-0086",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.892187626903625,
+  "plus_factor": 0.0,
+  "zone": "GREEN",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 0
+ },
+ {
+  "case_id": "risk_f4-0087",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.9588168159301516,
+  "plus_factor": 0.2,
+  "zone": "YELLOW",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 0.4
+ },
+ {
+  "case_id": "risk_f4-0088",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.9862985521447963,
+  "plus_factor": 0.26,
+  "zone": "YELLOW",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 0.5
+ },
+ {
+  "case_id": "risk_f4-0089",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.9959746612881921,
+  "plus_factor": 0.33,
+  "zone": "YELLOW",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 0.65
+ },
+ {
+  "case_id": "risk_f4-0090",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.9989434675026432,
+  "plus_factor": 0.38,
+  "zone": "YELLOW",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 0.75
+ },
+ {
+  "case_id": "risk_f4-0091",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.9997498099312595,
+  "plus_factor": 0.42,
+  "zone": "YELLOW",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 0.85
+ },
+ {
+  "case_id": "risk_f4-0092",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.999946101370953,
+  "plus_factor": 0.5,
+  "zone": "RED",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 1.0
+ },
+ {
+  "case_id": "risk_f4-0093",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.999989361192373,
+  "plus_factor": 0.5,
+  "zone": "RED",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 1.0
+ },
+ {
+  "case_id": "risk_f4-0094",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.9999980641362446,
+  "plus_factor": 0.5,
+  "zone": "RED",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 1.0
+ },
+ {
+  "case_id": "risk_f4-0095",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.9999996735384523,
+  "plus_factor": 0.5,
+  "zone": "RED",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%).",
+  "spec_page_reading_plus_factor_NOT_FROM_PRIMARY": 1.0
+ },
+ {
+  "case_id": "risk_f4-0096",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.932889840086295,
+  "plus_factor": null,
+  "zone": "GREEN",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%)."
+ },
+ {
+  "case_id": "risk_f4-0097",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.9980995068161168,
+  "plus_factor": null,
+  "zone": "YELLOW",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%)."
+ },
+ {
+  "case_id": "risk_f4-0098",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.9833708518007717,
+  "plus_factor": null,
+  "zone": "YELLOW",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%)."
+ },
+ {
+  "case_id": "risk_f4-0099",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.8661871919328943,
+  "plus_factor": null,
+  "zone": "GREEN",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%)."
+ },
+ {
+  "case_id": "risk_f4-0100",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.9004921849977677,
+  "plus_factor": null,
+  "zone": "GREEN",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%)."
+ },
+ {
+  "case_id": "risk_f4-0101",
+  "operation": "risk.backtest.traffic_light",
+  "cumulative_probability": 0.0017830105982345973,
+  "plus_factor": null,
+  "zone": "GREEN",
+  "basis": "primary-text",
+  "basis_note": "MAR32.9 Table 1, MAR99.9-99.17 Table 2, MAR33.42. plus_factor = multiplier - 1.5; null where the PDF gives no table (n != 250 or confidence != 99%)."
+ }
+]

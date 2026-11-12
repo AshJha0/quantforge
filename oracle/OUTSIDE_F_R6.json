@@ -1,0 +1,1660 @@
+{
+ "rule": "per case; every output within tolerance",
+ "library": "scipy 1.18.1 minimize_scalar (bounded Brent) on the Bernoulli and Markov likelihoods; numpy 2.5.4 transition counts; scipy chi2.sf",
+ "tolerance": 1e-07,
+ "suites": {
+  "risk_f4": {
+   "kupiec": [
+    {
+     "case_id": "risk_f4-0042",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 5.025167926750725,
+       "outside": 5.025167926750726,
+       "gap": -8.881784197001252e-16,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.024981503053449705,
+       "outside": 0.02498150305344973,
+       "gap": -2.42861286636753e-17,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0043",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 1.1764911353210787,
+       "outside": 1.1764911353210792,
+       "gap": -4.440892098500626e-16,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.2780714900139556,
+       "outside": 0.2780714900139524,
+       "gap": 3.164135620181696e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0044",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.10843521623680422,
+       "outside": 0.10843521623682406,
+       "gap": -1.9845236565174673e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.7419327009526223,
+       "outside": 0.7419327009525996,
+       "gap": 2.275957200481571e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0045",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.7691383643858456,
+       "outside": 0.7691383643858671,
+       "gap": -2.1538326677728037e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.3804837382389541,
+       "outside": 0.38048373823894743,
+       "gap": 6.661338147750939e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0046",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 1.956809788230625,
+       "outside": 1.9568097882306148,
+       "gap": 1.021405182655144e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.1618549171960424,
+       "outside": 0.1618549171960395,
+       "gap": 2.886579864025407e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0047",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 5.496990447792691,
+       "outside": 5.496990447792712,
+       "gap": -2.042810365310288e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.01904923089052644,
+       "outside": 0.019049230890526167,
+       "gap": 2.740863092043355e-16,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0048",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 12.955491062356028,
+       "outside": 12.955491062356046,
+       "gap": -1.7763568394002505e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.0003189845082133819,
+       "outside": 0.0003189845082133789,
+       "gap": 2.9815559743351372e-18,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0049",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 29.395002180486195,
+       "outside": 29.395002180486216,
+       "gap": -2.1316282072803006e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 5.902967974643688e-08,
+       "outside": 5.902967974643621e-08,
+       "gap": 6.683619349428464e-22,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0050",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.0,
+       "outside": 0.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 1.0,
+       "outside": 1.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0051",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 7.110709542123496,
+       "outside": 7.110709542123544,
+       "gap": -4.796163466380676e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.007662477434669638,
+       "outside": 0.0076624774346694255,
+       "gap": 2.1250362580715887e-16,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0052",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.0,
+       "outside": 0.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 1.0,
+       "outside": 1.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0053",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.0,
+       "outside": 0.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 1.0,
+       "outside": 1.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0054",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.0,
+       "outside": 0.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 1.0,
+       "outside": 1.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0055",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 2302.585092994045,
+       "outside": 2302.5850929940457,
+       "gap": -4.547473508864641e-13,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.0,
+       "outside": 0.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0056",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.0,
+       "outside": 0.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 1.0,
+       "outside": 1.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0057",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.07544757093299857,
+       "outside": 0.07544757093307197,
+       "gap": -7.339961971553066e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.7835642399772066,
+       "outside": 0.7835642399771039,
+       "gap": 1.0269562977782698e-13,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0058",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.004091946912498708,
+       "outside": 0.004091946912694766,
+       "gap": -1.9605844725489874e-13,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.9489954461979284,
+       "outside": 0.9489954461967082,
+       "gap": 1.2202461263655096e-12,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0059",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.0201006717070029,
+       "outside": 0.0201006717070029,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.8872562800759088,
+       "outside": 0.8872562800759088,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0060",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 9.210340371976182,
+       "outside": 9.210340371976182,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.0024065194588227612,
+       "outside": 0.002406519458822761,
+       "gap": 4.336808689942018e-19,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0061",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 2.1393269640289985,
+       "outside": 2.13932696402901,
+       "gap": -1.1546319456101628e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_value",
+       "golden": 0.14356486427364676,
+       "outside": 0.14356486427364146,
+       "gap": 5.3013149425851225e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      }
+     ]
+    }
+   ],
+   "christoffersen": [
+    {
+     "case_id": "risk_f4-0064",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.09494012266443565,
+       "outside": 0.09494012266445395,
+       "gap": -1.830480211850727e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 0.07317254548594249,
+       "outside": 0.07317254548595997,
+       "gap": -1.7486012637846216e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 0.16811266815037815,
+       "outside": 0.16811266815041392,
+       "gap": -3.577693696854567e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 0.7579883213732863,
+       "outside": 0.7579883213732637,
+       "gap": 2.2648549702353193e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 0.7867723531107673,
+       "outside": 0.7867723531107425,
+       "gap": 2.4868995751603507e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 0.9193794622445056,
+       "outside": 0.9193794622444892,
+       "gap": 1.6431300764452317e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 243,
+        "n01": 3,
+        "n10": 3,
+        "n11": 0
+       },
+       "outside": {
+        "n00": 243,
+        "n01": 3,
+        "n10": 3,
+        "n11": 0
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0065",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.10843521623680422,
+       "outside": 0.10843521623682406,
+       "gap": -1.9845236565174673e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 0.032389017899145056,
+       "outside": 0.03238901789914195,
+       "gap": 3.1086244689504383e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 0.14082423413594927,
+       "outside": 0.140824234135966,
+       "gap": -1.6736612096224235e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 0.7419327009526223,
+       "outside": 0.7419327009525996,
+       "gap": 2.275957200481571e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 0.8571765192955723,
+       "outside": 0.8571765192955791,
+       "gap": -6.8833827526759706e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 0.932009643666921,
+       "outside": 0.9320096436669132,
+       "gap": 7.771561172376096e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 245,
+        "n01": 2,
+        "n10": 2,
+        "n11": 0
+       },
+       "outside": {
+        "n00": 245,
+        "n01": 2,
+        "n10": 2,
+        "n11": 0
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0066",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 1.956809788230625,
+       "outside": 1.9568097882306148,
+       "gap": 1.021405182655144e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 9.894654433330167,
+       "outside": 9.894654433330174,
+       "gap": -7.105427357601002e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 11.851464221560793,
+       "outside": 11.85146422156079,
+       "gap": 3.552713678800501e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 0.1618549171960424,
+       "outside": 0.1618549171960395,
+       "gap": 2.886579864025407e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 0.0016575957546647623,
+       "outside": 0.001657595754664753,
+       "gap": 9.324138683375338e-18,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 0.0026698523418412826,
+       "outside": 0.002669852341841288,
+       "gap": -5.204170427930421e-18,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 241,
+        "n01": 3,
+        "n10": 3,
+        "n11": 2
+       },
+       "outside": {
+        "n00": 241,
+        "n01": 3,
+        "n10": 3,
+        "n11": 2
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0067",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.0,
+       "outside": 0.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 4.479936408495848,
+       "outside": 4.4799364084958455,
+       "gap": 2.6645352591003757e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 4.479936408495848,
+       "outside": 4.4799364084958455,
+       "gap": 2.6645352591003757e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 1.0,
+       "outside": 1.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 0.03429499706084442,
+       "outside": 0.0342949970608443,
+       "gap": 1.1796119636642288e-16,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 0.10646188936127819,
+       "outside": 0.10646188936127829,
+       "gap": -9.71445146547012e-17,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 490,
+        "n01": 4,
+        "n10": 4,
+        "n11": 1
+       },
+       "outside": {
+        "n00": 490,
+        "n01": 4,
+        "n10": 4,
+        "n11": 1
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0068",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 2.9922933136053316,
+       "outside": 2.992293313605444,
+       "gap": -1.1235457009206584e-13,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 0.023909911043663266,
+       "outside": 0.023909911043801912,
+       "gap": -1.3864603909397033e-13,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 3.016203224648995,
+       "outside": 3.016203224649246,
+       "gap": -2.509104035652854e-13,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 0.08366160924777183,
+       "outside": 0.08366160924776625,
+       "gap": 5.578870698741412e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 0.8771143584512592,
+       "outside": 0.8771143584509058,
+       "gap": 3.5338398873818733e-13,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 0.22132974905700406,
+       "outside": 0.22132974905697636,
+       "gap": 2.7700064464397656e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 932,
+        "n01": 33,
+        "n10": 33,
+        "n11": 1
+       },
+       "outside": {
+        "n00": 932,
+        "n01": 33,
+        "n10": 33,
+        "n11": 1
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0069",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 1.849422103238608,
+       "outside": 1.8494221032386235,
+       "gap": -1.554312234475219e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 2.7549661142196142,
+       "outside": 2.7549661142197692,
+       "gap": -1.5498713423767185e-13,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 4.604388217458222,
+       "outside": 4.604388217458393,
+       "gap": -1.7053025658242404e-13,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 0.1738506221342827,
+       "outside": 0.173850622134277,
+       "gap": 5.717648576819556e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 0.09695287063096027,
+       "outside": 0.09695287063095089,
+       "gap": 9.381384558082573e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 0.10003910607092449,
+       "outside": 0.10003910607091594,
+       "gap": 8.548717289613705e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 938,
+        "n01": 29,
+        "n10": 29,
+        "n11": 3
+       },
+       "outside": {
+        "n00": 938,
+        "n01": 29,
+        "n10": 29,
+        "n11": 3
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0070",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 1.5402866138388276,
+       "outside": 1.5402866138388163,
+       "gap": 1.1324274851176597e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 0.026704480171340368,
+       "outside": 0.026704480171318323,
+       "gap": 2.2044865932713265e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 1.566991094010168,
+       "outside": 1.5669910940101346,
+       "gap": 3.3306690738754696e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 0.21457514830975763,
+       "outside": 0.21457514830975571,
+       "gap": 1.915134717478395e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 0.8701916501104733,
+       "outside": 0.8701916501105265,
+       "gap": -5.3179682879545e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 0.45680642888182216,
+       "outside": 0.45680642888182965,
+       "gap": -7.494005416219807e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 216,
+        "n01": 16,
+        "n10": 16,
+        "n11": 1
+       },
+       "outside": {
+        "n00": 216,
+        "n01": 16,
+        "n10": 16,
+        "n11": 1
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0071",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 46.678478547971494,
+       "outside": 46.67847854797145,
+       "gap": 4.263256414560601e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 23.130043602344887,
+       "outside": 23.130043602344927,
+       "gap": -3.907985046680551e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 69.80852215031638,
+       "outside": 69.80852215031638,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 8.364256525151521e-12,
+       "outside": 8.364256525151716e-12,
+       "gap": -1.954860432010085e-25,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 1.5140642551575738e-06,
+       "outside": 1.5140642551575397e-06,
+       "gap": 3.409307612698559e-20,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 6.93860268998825e-16,
+       "outside": 6.93860268998827e-16,
+       "gap": -1.9721522630525295e-30,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 192,
+        "n01": 24,
+        "n10": 24,
+        "n11": 19
+       },
+       "outside": {
+        "n00": 192,
+        "n01": 24,
+        "n10": 24,
+        "n11": 19
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0072",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.28482036799330696,
+       "outside": 0.28482036799337607,
+       "gap": -6.9111383282916e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 3.31175277709614,
+       "outside": 3.311752777096146,
+       "gap": -5.773159728050814e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 3.596573145089447,
+       "outside": 3.596573145089522,
+       "gap": -7.505107646466058e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 0.5935590422683581,
+       "outside": 0.5935590422683135,
+       "gap": 4.463096558993129e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 0.06878608843777863,
+       "outside": 0.06878608843777867,
+       "gap": -4.163336342344337e-17,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 0.16558235865865506,
+       "outside": 0.16558235865864887,
+       "gap": 6.189493362285248e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 734,
+        "n01": 7,
+        "n10": 7,
+        "n11": 1
+       },
+       "outside": {
+        "n00": 734,
+        "n01": 7,
+        "n10": 7,
+        "n11": 1
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0073",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 33.151665299011626,
+       "outside": 33.15166529901167,
+       "gap": -4.263256414560601e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 41.85926255075651,
+       "outside": 41.859262550756526,
+       "gap": -1.4210854715202004e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 75.01092784976814,
+       "outside": 75.0109278497682,
+       "gap": -5.684341886080802e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 8.524333788385767e-09,
+       "outside": 8.524333788385581e-09,
+       "gap": 1.852884572118782e-22,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 9.808502372205964e-11,
+       "outside": 9.80850237220592e-11,
+       "gap": 4.3943970041879595e-25,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 5.1473532782395755e-17,
+       "outside": 5.1473532782394214e-17,
+       "gap": 1.5407439555097887e-30,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 227,
+        "n01": 6,
+        "n10": 6,
+        "n11": 10
+       },
+       "outside": {
+        "n00": 227,
+        "n01": 6,
+        "n10": 6,
+        "n11": 10
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0074",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 1.4961466568026658,
+       "outside": 1.496146656802722,
+       "gap": -5.617728504603292e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 0.2728135030835011,
+       "outside": 0.2728135030834551,
+       "gap": 4.601874437071274e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 1.7689601598861668,
+       "outside": 1.768960159886177,
+       "gap": -1.021405182655144e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 0.22126521495105816,
+       "outside": 0.22126521495104595,
+       "gap": 1.2212453270876722e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 0.6014506645593223,
+       "outside": 0.6014506645593528,
+       "gap": -3.0531133177191805e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 0.41292880744698063,
+       "outside": 0.41292880744697846,
+       "gap": 2.1649348980190553e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 466,
+        "n01": 16,
+        "n10": 16,
+        "n11": 1
+       },
+       "outside": {
+        "n00": 466,
+        "n01": 16,
+        "n10": 16,
+        "n11": 1
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0075",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 0.0,
+       "outside": 0.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 1.6839211953059725,
+       "outside": 1.6839211953060271,
+       "gap": -5.46229728115577e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 1.6839211953059725,
+       "outside": 1.6839211953060271,
+       "gap": -5.46229728115577e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 1.0,
+       "outside": 1.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 0.1944042316641343,
+       "outside": 0.19440423166412338,
+       "gap": 1.0935696792557792e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 0.43086494198343794,
+       "outside": 0.4308649419834262,
+       "gap": 1.176836406102666e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 1960,
+        "n01": 19,
+        "n10": 19,
+        "n11": 1
+       },
+       "outside": {
+        "n00": 1960,
+        "n01": 19,
+        "n10": 19,
+        "n11": 1
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0076",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 5.025167926750725,
+       "outside": 5.025167926750726,
+       "gap": -8.881784197001252e-16,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 0.0,
+       "outside": 0.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 5.025167926750725,
+       "outside": 5.025167926750726,
+       "gap": -8.881784197001252e-16,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 0.024981503053449705,
+       "outside": 0.02498150305344973,
+       "gap": -2.42861286636753e-17,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 1.0,
+       "outside": 1.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 0.08105851616218128,
+       "outside": 0.08105851616218127,
+       "gap": 1.3877787807814457e-17,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 249,
+        "n01": 0,
+        "n10": 0,
+        "n11": 0
+       },
+       "outside": {
+        "n00": 249,
+        "n01": 0,
+        "n10": 0,
+        "n11": 0
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0077",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 11.758000872194478,
+       "outside": 11.7580008721945,
+       "gap": -2.3092638912203256e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 20.90735456652713,
+       "outside": 20.907354566527125,
+       "gap": 3.552713678800501e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 32.665355438721605,
+       "outside": 32.665355438721626,
+       "gap": -2.1316282072803006e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 0.0006058225882765708,
+       "outside": 0.0006058225882765629,
+       "gap": 7.914675859144182e-18,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 4.82040294610173e-06,
+       "outside": 4.820402946101733e-06,
+       "gap": -2.541098841762901e-21,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 8.06878589777712e-08,
+       "outside": 8.068785897777046e-08,
+       "gap": 7.411538288475128e-22,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 92,
+        "n01": 2,
+        "n10": 1,
+        "n11": 4
+       },
+       "outside": {
+        "n00": 92,
+        "n01": 2,
+        "n10": 1,
+        "n11": 4
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0078",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 3.571134054443408,
+       "outside": 3.5711340544434265,
+       "gap": -1.865174681370263e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 0.060811851944443364,
+       "outside": 0.06081185194445027,
+       "gap": -6.904199434387692e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 3.631945906387851,
+       "outside": 3.6319459063878767,
+       "gap": -2.5757174171303632e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 0.05879214727800159,
+       "outside": 0.058792147278000625,
+       "gap": 9.645062526431047e-16,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 0.8052173463927487,
+       "outside": 0.8052173463927379,
+       "gap": 1.0769163338864018e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 0.16267955177641535,
+       "outside": 0.16267955177641324,
+       "gap": 2.1094237467877974e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 293,
+        "n01": 3,
+        "n10": 3,
+        "n11": 0
+       },
+       "outside": {
+        "n00": 293,
+        "n01": 3,
+        "n10": 3,
+        "n11": 0
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0079",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 1.1764911353210787,
+       "outside": 1.1764911353210792,
+       "gap": -4.440892098500626e-16,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 0.0,
+       "outside": 0.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 1.1764911353210787,
+       "outside": 1.1764911353210792,
+       "gap": -4.440892098500626e-16,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 0.2780714900139556,
+       "outside": 0.2780714900139524,
+       "gap": 3.164135620181696e-15,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 1.0,
+       "outside": 1.0,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 0.5553006680674142,
+       "outside": 0.555300668067414,
+       "gap": 2.220446049250313e-16,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 248,
+        "n01": 1,
+        "n10": 0,
+        "n11": 0
+       },
+       "outside": {
+        "n00": 248,
+        "n01": 1,
+        "n10": 0,
+        "n11": 0
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "risk_f4-0080",
+     "pass": true,
+     "checks": [
+      {
+       "output": "lr_uc",
+       "golden": 231.52440630685078,
+       "outside": 231.52440630685084,
+       "gap": -5.684341886080802e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_ind",
+       "golden": 6.212098301327245,
+       "outside": 6.212098301327245,
+       "gap": 0.0,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "lr_cc",
+       "golden": 237.73650460817802,
+       "outside": 237.73650460817808,
+       "gap": -5.684341886080802e-14,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_uc",
+       "golden": 2.772679434753336e-52,
+       "outside": 2.772679434753291e-52,
+       "gap": 4.48813944233178e-66,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_ind",
+       "golden": 0.012688014838514406,
+       "outside": 0.012688014838514394,
+       "gap": 1.214306433183765e-17,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "p_cc",
+       "golden": 2.3777924889198543e-52,
+       "outside": 2.3777924889198157e-52,
+       "gap": 3.857574396714918e-66,
+       "tolerance": 1e-07,
+       "pass": true
+      },
+      {
+       "output": "transitions",
+       "golden": {
+        "n00": 0,
+        "n01": 9,
+        "n10": 10,
+        "n11": 20
+       },
+       "outside": {
+        "n00": 0,
+        "n01": 9,
+        "n10": 10,
+        "n11": 20
+       },
+       "tolerance": "exact",
+       "pass": true
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

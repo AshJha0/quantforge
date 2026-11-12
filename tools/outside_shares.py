@@ -32,13 +32,34 @@ ORACLE = ROOT / "oracle"
 GOLDEN = ROOT / "datasets" / "golden"
 FLOOR = 0.60
 COUNTED = ("library-object", "library-primitive")
-CLASSES = COUNTED + ("reimplementation", "none")
+REDERIVED = "independent-rederivation"
+CLASSES = COUNTED + (REDERIVED, "reimplementation", "none")
+
+# Owner decision 2026-11-12 (plan R6-13): `independent-rederivation` (a different model, blind to the goldens,
+# judged at each golden's own tolerance by oracle/python/compare_rederivation.py, which writes
+# oracle/REDERIVATION_REGISTER.json) counts toward the floor ONLY for the four value classes with no free outside
+# library. A re-derivation entry for any other operation is reported as a problem and not counted.
+REDERIVE_OPS = ("credit.cdsindex.option_price", "risk.frtb.", "book.lifecycle.apply", "book.marks.resolve",
+                "risk.backtest.traffic_light")
+
+
+def rederive_allowed(op):
+    return any(op == p or (p.endswith(".") and op.startswith(p)) for p in REDERIVE_OPS)
+
+
+def load_rederivation():
+    p = ORACLE / "REDERIVATION_REGISTER.json"
+    if not p.is_file():
+        return {}, ""
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    return {c["case_id"]: c["operation"] for c in doc["cases"] if c["pass"]}, doc.get("source", "independent re-derivation")
 
 STAGE_DIRS = {"D": ["stage_d"], "E": ["stage_e", "stage_e_b"], "F": ["stage_f"], "G": ["stage_g"], "I": ["stage_i"]}
 
 # Stage F convention rows naming a numpy or scipy primitive. Kupiec (SCIPY.BINOM) and Christoffersen (SCIPY.CHI2)
 # cases rebuild the spec's likelihood-ratio formula around a distribution call: reimplementation (review finding 6).
-PRIMITIVE_ROWS = {"SCIPY.QUAD", "SCIPY.EIGH", "NUMPY.QUANTILE", "SCIPY.NORM", "SCIPY.LSTSQ"}
+# SCIPY.MLE (R6 oracle lane 2): Kupiec and Christoffersen likelihoods maximised numerically, not the closed form.
+PRIMITIVE_ROWS = {"SCIPY.QUAD", "SCIPY.EIGH", "NUMPY.QUANTILE", "SCIPY.NORM", "SCIPY.LSTSQ", "SCIPY.MLE", "SCIPY.TOEPLITZ", "SCIPY.BRENTQ"}
 REIMPL_ROWS = {"SCIPY.BINOM", "SCIPY.CHI2"}
 
 # Suite-level rulings for registers that hold counts only (stage G, stage I). Reviewed 2026-11-12 by the R6
@@ -144,6 +165,21 @@ def load_suite_register(stage):
     return out
 
 
+# Stage G suites with a per-case outside register (oracle/OUTSIDE_G_R6.json, written by oracle/python/outside_g_r6.py;
+# R6 oracle lane 2). A case counts only if every compared output passed its stated tolerance.
+PERCASE_G_CLASS = {"bermudan_g": "library-object", "aadladder_g": "library-object", "callable_g": "library-object",
+                   "hwcal_g": "library-primitive", "barrier_g": "library-object"}
+
+
+def load_percase_g():
+    p = ORACLE / "OUTSIDE_G_R6.json"
+    if not p.is_file():
+        return {}
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    return {s: (PERCASE_G_CLASS[s], v["library"], {c["case_id"] for c in v["cases"] if c["pass"] and all(x["pass"] for x in c["checks"])})
+            for s, v in doc["suites"].items() if s in PERCASE_G_CLASS}
+
+
 def stage_report(stage, problems):
     """Rows (suite, operation, class, sweep, library, value-checked)."""
     suites = golden_suites(stage)
@@ -153,9 +189,16 @@ def stage_report(stage, problems):
         known = {cid for s in suites.values() for cid, _, _ in s}
         for cid in sorted(set(reg) - known):
             problems.append(f"stage {stage}: register case {cid} is not in the goldens")
+        red, red_src = load_rederivation() if stage == "F" else ({}, "")
+        for cid in sorted(set(red) - known):
+            problems.append(f"stage {stage}: re-derivation case {cid} is not in the goldens")
         for suite, cases in suites.items():
             for cid, op, st in cases:
                 cls, lib = reg.get(cid, ("none", ""))
+                if cid in red and not rederive_allowed(op):
+                    problems.append(f"stage {stage}: re-derivation for {cid} ({op}) is outside the four allowed classes")
+                elif cid in red and cls not in COUNTED:
+                    cls, lib = REDERIVED, red_src
                 rows.append((suite, op, cls, is_sweep(stage, suite), lib, st == "ok"))
     else:
         reg = load_suite_register(stage)
@@ -166,7 +209,14 @@ def stage_report(stage, problems):
             merged[base][1] += v["total"]
             if v["counted"] and k not in SUITE_CLASS:
                 problems.append(f"stage {stage}: register suite {k} has counted cases but no ruling in SUITE_CLASS")
+        percase = load_percase_g() if stage == "G" else {}
         for suite, cases in suites.items():
+            if suite in percase:
+                cls0, lib0, passed = percase[suite]
+                for cid, op, st in cases:
+                    ok = cid in passed
+                    rows.append((suite, op, cls0 if ok else "none", is_sweep(stage, suite), lib0 if ok else "", st == "ok"))
+                continue
             counted, total = merged.get(suite, (0, 0))
             if suite in merged and total != len(cases):
                 problems.append(f"stage {stage}: register says {suite} has {total} cases, the golden has {len(cases)}")
@@ -192,7 +242,10 @@ def share(rows):
     n = len(rows)
     c = Counter(r[2] for r in rows)
     k = sum(c[x] for x in COUNTED)
-    return {"cases": n, **{x: c[x] for x in CLASSES}, "counted": k, "share": round(k / n, 4) if n else None}
+    kr = k + c[REDERIVED]
+    return {"cases": n, **{x: c[x] for x in CLASSES}, "counted": k, "share": round(k / n, 4) if n else None,
+            "rederived_book_spec_only": sum(1 for r in rows if r[2] == REDERIVED and r[1].startswith("book.")),
+            "counted_with_rederivation": kr, "share_with_rederivation": round(kr / n, 4) if n else None}
 
 
 def build(problems):
@@ -210,10 +263,10 @@ def build(problems):
                  "libraries": dict(sorted(libs.items())),
                  "no_outside_reference": {k: v for k, v in NO_REFERENCE.items() if any(r[0] == k for r in rows)},
                  "per_operation": {op: vshare(rs) for op, rs in sorted(ops.items())}}
-        s = entry["without_sweeps"]["share"] or 0.0
+        s = entry["without_sweeps"]["share_with_rederivation"] or 0.0
         entry["meets_floor"] = s >= FLOOR
         if not entry["meets_floor"]:
-            problems.append(f"stage {st}: {s:.1%} of value-checked cases is under the {FLOOR:.0%} floor")
+            problems.append(f"stage {st}: {s:.1%} of value-checked cases (library plus re-derivation) is under the {FLOOR:.0%} floor")
         out["stages"][st] = entry
     return out
 
@@ -224,19 +277,24 @@ def markdown(doc):
          "`library-primitive`, and only if every compared output is checked. **Floor: 60% of the stage's value-checked "
          "cases.** Error and invariance cases are a separate evidence class, outside the denominator; the old all-case "
          "share is shown beside the new one. Generated sweeps (F `e1_*`, I `*5_i`) are shown separately; the floor applies without them.", "",
-         "| Stage | Value cases (no sweeps) | library-object | library-primitive | reimplementation | none | Value share | Old all-case share | With sweeps (value) | Error and invariance cases | Floor 60% |",
-         "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
+         "| Stage | Value cases (no sweeps) | library-object | library-primitive | independent-rederivation | reimplementation | none | Library-only share | Library plus re-derivation (floor) | Old all-case share | With sweeps (value) | Error and invariance cases | Floor 60% |",
+         "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
     for st, e in doc["stages"].items():
         w, a = e["without_sweeps"], e["with_sweeps"]
-        L.append(f"| {st} | {w['cases']} | {w['library-object']} | {w['library-primitive']} | {w['reimplementation']} | "
-                 f"{w['none']} | {w['share']:.1%} | {w['all_cases_share']:.1%} | {a['share']:.1%} ({a['counted']} of {a['cases']}) | "
+        L.append(f"| {st} | {w['cases']} | {w['library-object']} | {w['library-primitive']} | {w[REDERIVED]} | {w['reimplementation']} | "
+                 f"{w['none']} | {w['share']:.1%} | {w['share_with_rederivation']:.1%} | {w['all_cases_share']:.1%} | {a['share']:.1%} ({a['counted']} of {a['cases']}) | "
                  f"{w['error_and_invariance_cases']} | {'met' if e['meets_floor'] else 'NOT MET'} |")
+    wf = doc["stages"]["F"]["without_sweeps"]
+    L += ["", f"Stage F re-derivation sub-count: {wf[REDERIVED]} cases, of which {wf['rederived_book_spec_only']} are spec-only book lifecycle and marks "
+          "(no source outside the spec, so the re-derivation checks the spec against itself; shown separately for that reason). "
+          f"Library plus re-derivation without them: {(wf['counted_with_rederivation'] - wf['rederived_book_spec_only'])} of {wf['cases']} = "
+          f"{(wf['counted_with_rederivation'] - wf['rederived_book_spec_only']) / wf['cases']:.1%}."]
     L += ["", "## Value classes with no free outside reference", "", "| Suite | Reason |", "|---|---|"]
     for e in doc["stages"].values():
         L += [f"| `{k}` | {v} |" for k, v in e["no_outside_reference"].items()]
     for st, e in doc["stages"].items():
-        L += ["", f"## Stage {st} per operation (no sweeps)", "", "| Operation | Value cases | Counted | Value share | Old all-case share |", "|---|---:|---:|---:|---:|"]
-        L += [f"| `{op}` | {s['cases']} | {s['counted']} | {(s['share'] or 0):.0%} | {(s['all_cases_share'] or 0):.0%} |" for op, s in e["per_operation"].items()]
+        L += ["", f"## Stage {st} per operation (no sweeps)", "", "| Operation | Value cases | Library | Library share | Plus re-derivation | Old all-case share |", "|---|---:|---:|---:|---:|---:|"]
+        L += [f"| `{op}` | {s['cases']} | {s['counted']} | {(s['share'] or 0):.0%} | {(s['share_with_rederivation'] or 0):.0%} | {(s['all_cases_share'] or 0):.0%} |" for op, s in e["per_operation"].items()]
         L += ["", "Libraries (counted cases, sweeps included): " + "; ".join(f"{k} {v}" for k, v in e["libraries"].items())]
     return chr(10).join(L) + chr(10)
 

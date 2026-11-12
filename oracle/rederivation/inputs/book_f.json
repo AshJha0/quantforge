@@ -1,0 +1,3745 @@
+[
+ {
+  "case_id": "book_f-0001",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [],
+   "events": [
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "UST10",
+     "quantity": 100.0,
+     "price": 99.5
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "UST10",
+     "quantity": 50.0,
+     "price": 100.25
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "UST10",
+     "quantity": -120.0,
+     "price": 100.5
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0002",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [],
+   "events": [
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "SR3Z6",
+     "quantity": -10.0,
+     "price": 95.8
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "SR3Z6",
+     "quantity": 15.0,
+     "price": 95.7
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0003",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [
+    {
+     "instrument": "AAPL",
+     "quantity": 200.0,
+     "average_cost": 180.0
+    }
+   ],
+   "events": [
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "AAPL",
+     "quantity": -200.0,
+     "price": 190.5
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0004",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [],
+   "events": [
+    {
+     "date": "2026-11-02",
+     "type": "FIXING",
+     "index": "SOFR",
+     "value": 0.0431
+    },
+    {
+     "date": "2026-11-02",
+     "type": "FIXING",
+     "index": "ESTR",
+     "value": 0.0193
+    },
+    {
+     "date": "2026-11-03",
+     "type": "FIXING",
+     "index": "SOFR",
+     "value": 0.043
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0005",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [
+    {
+     "instrument": "SPX-C-6000",
+     "quantity": 5.0,
+     "average_cost": 42.0
+    }
+   ],
+   "events": [
+    {
+     "date": "2026-12-18",
+     "type": "EXPIRY",
+     "instrument": "SPX-C-6000",
+     "settlement_price": 57.25
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0006",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [
+    {
+     "instrument": "BOND-X",
+     "quantity": 1000.0,
+     "average_cost": 0.97
+    }
+   ],
+   "events": [
+    {
+     "date": "2026-11-20",
+     "type": "DEFAULT",
+     "instrument": "BOND-X",
+     "recovery_price": 0.38
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0007",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [
+    {
+     "instrument": "SR3Z6",
+     "quantity": -20.0,
+     "average_cost": 95.9
+    }
+   ],
+   "events": [
+    {
+     "date": "2026-12-10",
+     "type": "ROLL",
+     "from": "SR3Z6",
+     "to": "SR3H7",
+     "from_price": 95.82,
+     "to_price": 96.01
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0008",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [],
+   "events": [
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 1.0,
+     "price": 105.25
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -14.0,
+     "price": 104.79
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -10.0,
+     "price": 96.87
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -36.0,
+     "price": 115.59
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 44.0,
+     "price": 88.2
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 58.0,
+     "price": 114.11
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -97.0,
+     "price": 85.37
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 89.0,
+     "price": 100.77
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 41.0,
+     "price": 95.91
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 47.0,
+     "price": 97.79
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 18.0,
+     "price": 91.23
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 15.0,
+     "price": 98.44
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -96.0,
+     "price": 99.38
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -2.0,
+     "price": 93.31
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -14.0,
+     "price": 115.38
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -18.0,
+     "price": 101.29
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 25.0,
+     "price": 102.73
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 54.0,
+     "price": 86.87
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -53.0,
+     "price": 89.77
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -21.0,
+     "price": 93.81
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0009",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [],
+   "events": [
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -77.0,
+     "price": 84.23
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -81.0,
+     "price": 120.26
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -65.0,
+     "price": 94.5
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -57.0,
+     "price": 99.5
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 42.0,
+     "price": 102.37
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 96.0,
+     "price": 106.28
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 87.0,
+     "price": 102.22
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 32.0,
+     "price": 113.79
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 70.0,
+     "price": 103.16
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -9.0,
+     "price": 99.4
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 64.0,
+     "price": 94.11
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 29.0,
+     "price": 78.36
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -76.0,
+     "price": 107.97
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -31.0,
+     "price": 95.07
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -79.0,
+     "price": 87.34
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 60.0,
+     "price": 99.05
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 85.0,
+     "price": 107.05
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 71.0,
+     "price": 100.41
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -50.0,
+     "price": 93.02
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -12.0,
+     "price": 116.17
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -1.0,
+     "price": 87.09
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -21.0,
+     "price": 107.08
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 36.0,
+     "price": 101.46
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 18.0,
+     "price": 115.82
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -78.0,
+     "price": 96.24
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0010",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [],
+   "events": [
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 99.0,
+     "price": 97.1
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -1.0,
+     "price": 98.44
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -58.0,
+     "price": 84.8
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 58.0,
+     "price": 90.56
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 52.0,
+     "price": 96.77
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -28.0,
+     "price": 102.2
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -27.0,
+     "price": 102.07
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 97.0,
+     "price": 104.01
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -71.0,
+     "price": 116.13
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -72.0,
+     "price": 88.25
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 34.0,
+     "price": 111.64
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 54.0,
+     "price": 99.67
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 32.0,
+     "price": 104.17
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -58.0,
+     "price": 106.4
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -99.0,
+     "price": 107.33
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -63.0,
+     "price": 123.74
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 51.0,
+     "price": 96.46
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -86.0,
+     "price": 110.72
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -34.0,
+     "price": 83.34
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 33.0,
+     "price": 95.35
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -52.0,
+     "price": 87.37
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -45.0,
+     "price": 105.46
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -19.0,
+     "price": 109.23
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 57.0,
+     "price": 83.35
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 53.0,
+     "price": 102.18
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -29.0,
+     "price": 98.78
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -84.0,
+     "price": 111.97
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 37.0,
+     "price": 104.9
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 19.0,
+     "price": 93.97
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 93.0,
+     "price": 91.41
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0011",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [],
+   "events": [
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -11.0,
+     "price": 87.88
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -87.0,
+     "price": 106.25
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -14.0,
+     "price": 99.13
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -40.0,
+     "price": 97.04
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -3.0,
+     "price": 113.54
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 49.0,
+     "price": 108.46
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 36.0,
+     "price": 92.05
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 64.0,
+     "price": 104.85
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 1.0,
+     "price": 81.24
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -14.0,
+     "price": 100.53
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -49.0,
+     "price": 97.46
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 38.0,
+     "price": 91.6
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -24.0,
+     "price": 96.8
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -87.0,
+     "price": 92.96
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 48.0,
+     "price": 109.94
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 2.0,
+     "price": 113.55
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -72.0,
+     "price": 104.62
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 76.0,
+     "price": 96.63
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -56.0,
+     "price": 105.06
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 2.0,
+     "price": 102.95
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 72.0,
+     "price": 107.04
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 53.0,
+     "price": 98.52
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -39.0,
+     "price": 102.65
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -6.0,
+     "price": 97.37
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 87.0,
+     "price": 119.01
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 47.0,
+     "price": 92.72
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -20.0,
+     "price": 94.02
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -76.0,
+     "price": 96.14
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 63.0,
+     "price": 108.25
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 51.0,
+     "price": 107.2
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -7.0,
+     "price": 100.6
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -86.0,
+     "price": 101.7
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 38.0,
+     "price": 110.33
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -23.0,
+     "price": 106.29
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 71.0,
+     "price": 117.91
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0012",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [],
+   "events": [
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 98.0,
+     "price": 106.24
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -81.0,
+     "price": 102.56
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 76.0,
+     "price": 90.77
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 69.0,
+     "price": 93.15
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 67.0,
+     "price": 119.27
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 70.0,
+     "price": 101.09
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -28.0,
+     "price": 91.42
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 26.0,
+     "price": 75.89
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -98.0,
+     "price": 104.77
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -72.0,
+     "price": 83.61
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 95.0,
+     "price": 95.49
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -29.0,
+     "price": 82.14
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -81.0,
+     "price": 105.26
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -5.0,
+     "price": 100.08
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 63.0,
+     "price": 102.22
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 21.0,
+     "price": 105.19
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 21.0,
+     "price": 101.64
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 82.0,
+     "price": 90.5
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -87.0,
+     "price": 95.43
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 48.0,
+     "price": 106.66
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -70.0,
+     "price": 102.91
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -13.0,
+     "price": 91.68
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -48.0,
+     "price": 101.4
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 63.0,
+     "price": 90.74
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -96.0,
+     "price": 101.38
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 27.0,
+     "price": 116.65
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 25.0,
+     "price": 99.23
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -80.0,
+     "price": 79.97
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -2.0,
+     "price": 96.85
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -86.0,
+     "price": 98.89
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -23.0,
+     "price": 107.78
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -63.0,
+     "price": 99.84
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -67.0,
+     "price": 104.38
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -89.0,
+     "price": 100.68
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 32.0,
+     "price": 87.77
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -71.0,
+     "price": 104.41
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 52.0,
+     "price": 88.07
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 48.0,
+     "price": 108.07
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -46.0,
+     "price": 102.22
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 86.0,
+     "price": 112.53
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0013",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [],
+   "events": [
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 19.0,
+     "price": 108.64
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 7.0,
+     "price": 83.2
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -44.0,
+     "price": 92.7
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 17.0,
+     "price": 103.39
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 84.0,
+     "price": 98.69
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 33.0,
+     "price": 101.38
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 79.0,
+     "price": 92.22
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -12.0,
+     "price": 98.35
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -67.0,
+     "price": 80.02
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -27.0,
+     "price": 98.81
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 97.0,
+     "price": 108.98
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 70.0,
+     "price": 109.19
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 31.0,
+     "price": 115.85
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -33.0,
+     "price": 87.15
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -4.0,
+     "price": 99.97
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 40.0,
+     "price": 101.2
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 11.0,
+     "price": 92.9
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 71.0,
+     "price": 84.0
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 26.0,
+     "price": 87.17
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -34.0,
+     "price": 91.44
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 61.0,
+     "price": 100.89
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 70.0,
+     "price": 91.73
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -17.0,
+     "price": 106.58
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -38.0,
+     "price": 110.17
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -14.0,
+     "price": 87.49
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -47.0,
+     "price": 112.92
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 26.0,
+     "price": 97.63
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 43.0,
+     "price": 105.26
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -70.0,
+     "price": 111.17
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -96.0,
+     "price": 85.06
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 50.0,
+     "price": 98.35
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -96.0,
+     "price": 90.88
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -48.0,
+     "price": 86.93
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -21.0,
+     "price": 95.83
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -76.0,
+     "price": 103.05
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 44.0,
+     "price": 93.78
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -60.0,
+     "price": 101.19
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 46.0,
+     "price": 108.6
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 51.0,
+     "price": 97.82
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 56.0,
+     "price": 77.65
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -16.0,
+     "price": 102.92
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -42.0,
+     "price": 85.49
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -98.0,
+     "price": 96.67
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -44.0,
+     "price": 99.25
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -68.0,
+     "price": 92.1
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0014",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [],
+   "events": [
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -51.0,
+     "price": 92.48
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 88.0,
+     "price": 95.17
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 35.0,
+     "price": 117.3
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -85.0,
+     "price": 116.41
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -59.0,
+     "price": 79.63
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -51.0,
+     "price": 105.49
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -94.0,
+     "price": 99.22
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 4.0,
+     "price": 86.72
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -27.0,
+     "price": 114.01
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 92.0,
+     "price": 115.87
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -40.0,
+     "price": 106.0
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -74.0,
+     "price": 94.0
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 84.0,
+     "price": 93.72
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -1.0,
+     "price": 103.8
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -80.0,
+     "price": 105.43
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 14.0,
+     "price": 115.16
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -21.0,
+     "price": 113.8
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -58.0,
+     "price": 87.03
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -2.0,
+     "price": 112.64
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -76.0,
+     "price": 103.41
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -63.0,
+     "price": 109.49
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 14.0,
+     "price": 108.77
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 15.0,
+     "price": 110.42
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 60.0,
+     "price": 117.27
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -80.0,
+     "price": 93.46
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -38.0,
+     "price": 108.54
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 61.0,
+     "price": 95.72
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -70.0,
+     "price": 93.67
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 97.0,
+     "price": 109.22
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 32.0,
+     "price": 99.86
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 54.0,
+     "price": 101.88
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -82.0,
+     "price": 88.13
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 7.0,
+     "price": 108.4
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -64.0,
+     "price": 111.34
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 77.0,
+     "price": 106.04
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -66.0,
+     "price": 93.64
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -2.0,
+     "price": 91.8
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 8.0,
+     "price": 93.75
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -3.0,
+     "price": 110.02
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 75.0,
+     "price": 95.23
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -15.0,
+     "price": 115.83
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -20.0,
+     "price": 90.99
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -97.0,
+     "price": 114.27
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -34.0,
+     "price": 94.4
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -44.0,
+     "price": 106.1
+    },
+    {
+     "date": "2026-11-17",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 9.0,
+     "price": 100.51
+    },
+    {
+     "date": "2026-11-17",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -90.0,
+     "price": 90.88
+    },
+    {
+     "date": "2026-11-17",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 4.0,
+     "price": 88.27
+    },
+    {
+     "date": "2026-11-18",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 22.0,
+     "price": 93.89
+    },
+    {
+     "date": "2026-11-18",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 40.0,
+     "price": 89.1
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0015",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [],
+   "events": [
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -10.0,
+     "price": 104.09
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 1.0,
+     "price": 119.05
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -65.0,
+     "price": 66.88
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 54.0,
+     "price": 113.28
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -71.0,
+     "price": 83.61
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -56.0,
+     "price": 106.29
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 100.0,
+     "price": 105.81
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -36.0,
+     "price": 99.2
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 99.0,
+     "price": 101.47
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -22.0,
+     "price": 109.89
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -79.0,
+     "price": 74.39
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 63.0,
+     "price": 93.0
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -66.0,
+     "price": 89.37
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -73.0,
+     "price": 109.21
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -99.0,
+     "price": 97.33
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 18.0,
+     "price": 84.3
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -69.0,
+     "price": 95.67
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -20.0,
+     "price": 90.03
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -78.0,
+     "price": 90.67
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 95.0,
+     "price": 90.61
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -80.0,
+     "price": 96.94
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 91.0,
+     "price": 94.24
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 57.0,
+     "price": 97.62
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -64.0,
+     "price": 85.8
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -60.0,
+     "price": 106.02
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -9.0,
+     "price": 98.68
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -68.0,
+     "price": 95.5
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -38.0,
+     "price": 110.94
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 42.0,
+     "price": 91.67
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -21.0,
+     "price": 87.36
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 20.0,
+     "price": 86.39
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -82.0,
+     "price": 88.2
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 88.0,
+     "price": 94.15
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -24.0,
+     "price": 105.02
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -36.0,
+     "price": 116.87
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 34.0,
+     "price": 101.26
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 86.0,
+     "price": 90.77
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -5.0,
+     "price": 106.04
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 76.0,
+     "price": 108.68
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -54.0,
+     "price": 78.88
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -84.0,
+     "price": 98.74
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 36.0,
+     "price": 104.86
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -65.0,
+     "price": 96.84
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -89.0,
+     "price": 99.81
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -21.0,
+     "price": 105.1
+    },
+    {
+     "date": "2026-11-17",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 7.0,
+     "price": 99.91
+    },
+    {
+     "date": "2026-11-17",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 77.0,
+     "price": 101.37
+    },
+    {
+     "date": "2026-11-17",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 24.0,
+     "price": 93.59
+    },
+    {
+     "date": "2026-11-18",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 61.0,
+     "price": 103.92
+    },
+    {
+     "date": "2026-11-18",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -83.0,
+     "price": 102.55
+    },
+    {
+     "date": "2026-11-18",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 47.0,
+     "price": 105.55
+    },
+    {
+     "date": "2026-11-19",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 8.0,
+     "price": 114.64
+    },
+    {
+     "date": "2026-11-19",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 61.0,
+     "price": 97.94
+    },
+    {
+     "date": "2026-11-19",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 31.0,
+     "price": 106.18
+    },
+    {
+     "date": "2026-11-20",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -37.0,
+     "price": 97.06
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0016",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [],
+   "events": [
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -44.0,
+     "price": 90.94
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -47.0,
+     "price": 109.97
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -4.0,
+     "price": 104.42
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 50.0,
+     "price": 101.34
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 34.0,
+     "price": 100.66
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 43.0,
+     "price": 86.01
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 93.0,
+     "price": 115.79
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -69.0,
+     "price": 112.06
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 10.0,
+     "price": 103.32
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 79.0,
+     "price": 91.14
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 77.0,
+     "price": 96.88
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -68.0,
+     "price": 105.49
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -67.0,
+     "price": 78.59
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -46.0,
+     "price": 118.63
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -86.0,
+     "price": 116.74
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 98.0,
+     "price": 97.59
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 100.0,
+     "price": 106.49
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 46.0,
+     "price": 97.22
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -40.0,
+     "price": 107.6
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 45.0,
+     "price": 103.13
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 37.0,
+     "price": 90.32
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 48.0,
+     "price": 85.55
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -78.0,
+     "price": 106.06
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -97.0,
+     "price": 119.7
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 91.0,
+     "price": 112.31
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 45.0,
+     "price": 102.99
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -42.0,
+     "price": 94.36
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 10.0,
+     "price": 102.56
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 28.0,
+     "price": 98.29
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -94.0,
+     "price": 107.24
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -38.0,
+     "price": 112.57
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -19.0,
+     "price": 104.26
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -96.0,
+     "price": 104.37
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 16.0,
+     "price": 98.96
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -90.0,
+     "price": 91.06
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 37.0,
+     "price": 114.71
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -86.0,
+     "price": 81.55
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -60.0,
+     "price": 119.3
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -38.0,
+     "price": 104.46
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 72.0,
+     "price": 93.76
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 47.0,
+     "price": 94.15
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 84.0,
+     "price": 112.35
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -2.0,
+     "price": 105.57
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 87.0,
+     "price": 97.66
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 7.0,
+     "price": 100.51
+    },
+    {
+     "date": "2026-11-17",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 16.0,
+     "price": 112.06
+    },
+    {
+     "date": "2026-11-17",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 61.0,
+     "price": 99.31
+    },
+    {
+     "date": "2026-11-17",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": -60.0,
+     "price": 111.96
+    },
+    {
+     "date": "2026-11-18",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -83.0,
+     "price": 112.82
+    },
+    {
+     "date": "2026-11-18",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -34.0,
+     "price": 107.24
+    },
+    {
+     "date": "2026-11-18",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 19.0,
+     "price": 93.38
+    },
+    {
+     "date": "2026-11-19",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 8.0,
+     "price": 117.64
+    },
+    {
+     "date": "2026-11-19",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 35.0,
+     "price": 103.63
+    },
+    {
+     "date": "2026-11-19",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -19.0,
+     "price": 103.08
+    },
+    {
+     "date": "2026-11-20",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -34.0,
+     "price": 90.51
+    },
+    {
+     "date": "2026-11-20",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 75.0,
+     "price": 89.68
+    },
+    {
+     "date": "2026-11-20",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -80.0,
+     "price": 103.08
+    },
+    {
+     "date": "2026-11-21",
+     "type": "TRADE",
+     "instrument": "C",
+     "quantity": 74.0,
+     "price": 104.15
+    },
+    {
+     "date": "2026-11-21",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": 50.0,
+     "price": 94.2
+    },
+    {
+     "date": "2026-11-21",
+     "type": "TRADE",
+     "instrument": "B",
+     "quantity": -55.0,
+     "price": 98.59
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0017",
+  "operation": "book.lifecycle.apply",
+  "inputs": {
+   "positions": [],
+   "events": [
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -48.0,
+     "price": 112.65
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 33.0,
+     "price": 105.33
+    },
+    {
+     "date": "2026-11-02",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -18.0,
+     "price": 85.5
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -17.0,
+     "price": 112.7
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 12.0,
+     "price": 106.33
+    },
+    {
+     "date": "2026-11-03",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -90.0,
+     "price": 113.25
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 26.0,
+     "price": 103.45
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -55.0,
+     "price": 108.58
+    },
+    {
+     "date": "2026-11-04",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -97.0,
+     "price": 90.21
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -60.0,
+     "price": 96.61
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 93.0,
+     "price": 100.77
+    },
+    {
+     "date": "2026-11-05",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 1.0,
+     "price": 101.61
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -84.0,
+     "price": 97.58
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 84.0,
+     "price": 122.93
+    },
+    {
+     "date": "2026-11-06",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -54.0,
+     "price": 87.38
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 57.0,
+     "price": 93.3
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 94.0,
+     "price": 89.95
+    },
+    {
+     "date": "2026-11-07",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 68.0,
+     "price": 86.63
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -60.0,
+     "price": 104.52
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -93.0,
+     "price": 95.62
+    },
+    {
+     "date": "2026-11-08",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -2.0,
+     "price": 96.15
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 28.0,
+     "price": 95.64
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -6.0,
+     "price": 100.67
+    },
+    {
+     "date": "2026-11-09",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -83.0,
+     "price": 100.44
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 22.0,
+     "price": 99.47
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 21.0,
+     "price": 94.31
+    },
+    {
+     "date": "2026-11-10",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -8.0,
+     "price": 108.57
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -6.0,
+     "price": 85.6
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -28.0,
+     "price": 93.58
+    },
+    {
+     "date": "2026-11-11",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -56.0,
+     "price": 86.46
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -27.0,
+     "price": 101.89
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -31.0,
+     "price": 99.05
+    },
+    {
+     "date": "2026-11-12",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 72.0,
+     "price": 110.44
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -14.0,
+     "price": 95.07
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -38.0,
+     "price": 100.55
+    },
+    {
+     "date": "2026-11-13",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 49.0,
+     "price": 117.56
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -33.0,
+     "price": 117.7
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 61.0,
+     "price": 106.18
+    },
+    {
+     "date": "2026-11-14",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 74.0,
+     "price": 101.45
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -5.0,
+     "price": 107.8
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 64.0,
+     "price": 125.83
+    },
+    {
+     "date": "2026-11-15",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -93.0,
+     "price": 84.58
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 53.0,
+     "price": 105.97
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 40.0,
+     "price": 94.99
+    },
+    {
+     "date": "2026-11-16",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 19.0,
+     "price": 113.32
+    },
+    {
+     "date": "2026-11-17",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 30.0,
+     "price": 110.68
+    },
+    {
+     "date": "2026-11-17",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -21.0,
+     "price": 96.46
+    },
+    {
+     "date": "2026-11-17",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -94.0,
+     "price": 93.57
+    },
+    {
+     "date": "2026-11-18",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -63.0,
+     "price": 82.99
+    },
+    {
+     "date": "2026-11-18",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -92.0,
+     "price": 102.0
+    },
+    {
+     "date": "2026-11-18",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 85.0,
+     "price": 108.03
+    },
+    {
+     "date": "2026-11-19",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 74.0,
+     "price": 97.29
+    },
+    {
+     "date": "2026-11-19",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -64.0,
+     "price": 102.04
+    },
+    {
+     "date": "2026-11-19",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 29.0,
+     "price": 100.03
+    },
+    {
+     "date": "2026-11-20",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 3.0,
+     "price": 89.72
+    },
+    {
+     "date": "2026-11-20",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 16.0,
+     "price": 90.65
+    },
+    {
+     "date": "2026-11-20",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -81.0,
+     "price": 83.37
+    },
+    {
+     "date": "2026-11-21",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 56.0,
+     "price": 111.53
+    },
+    {
+     "date": "2026-11-21",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 60.0,
+     "price": 91.67
+    },
+    {
+     "date": "2026-11-21",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -81.0,
+     "price": 99.64
+    },
+    {
+     "date": "2026-11-22",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -43.0,
+     "price": 86.14
+    },
+    {
+     "date": "2026-11-22",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 71.0,
+     "price": 115.29
+    },
+    {
+     "date": "2026-11-22",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": 26.0,
+     "price": 96.2
+    },
+    {
+     "date": "2026-11-23",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -10.0,
+     "price": 109.63
+    },
+    {
+     "date": "2026-11-23",
+     "type": "TRADE",
+     "instrument": "A",
+     "quantity": -44.0,
+     "price": 99.02
+    }
+   ]
+  },
+  "output_names": [
+   "fixings",
+   "positions",
+   "realized_pnl",
+   "total_realized"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0024",
+  "operation": "book.marks.resolve",
+  "inputs": {
+   "as_of": "2026-11-10",
+   "instruments": [
+    "UST10",
+    "BUND10",
+    "SPX",
+    "ILLIQ"
+   ],
+   "max_age_days": 3,
+   "ipv_threshold": 0.005,
+   "sources": [
+    {
+     "name": "VENDOR_A",
+     "quotes": [
+      {
+       "instrument": "UST10",
+       "date": "2026-11-10",
+       "price": 99.75
+      },
+      {
+       "instrument": "SPX",
+       "date": "2026-11-07",
+       "price": 6012.5
+      }
+     ]
+    },
+    {
+     "name": "VENDOR_B",
+     "quotes": [
+      {
+       "instrument": "BUND10",
+       "date": "2026-11-10",
+       "price": 131.2
+      },
+      {
+       "instrument": "UST10",
+       "date": "2026-11-10",
+       "price": 99.8
+      },
+      {
+       "instrument": "SPX",
+       "date": "2026-11-09",
+       "price": 6020.0
+      },
+      {
+       "instrument": "ILLIQ",
+       "date": "2026-11-01",
+       "price": 88.0
+      }
+     ]
+    }
+   ],
+   "ipv": [
+    {
+     "instrument": "UST10",
+     "price": 99.7
+    },
+    {
+     "instrument": "BUND10",
+     "price": 130.0
+    }
+   ]
+  },
+  "output_names": [
+   "marks"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0025",
+  "operation": "book.marks.resolve",
+  "inputs": {
+   "as_of": "2026-11-10",
+   "instruments": [
+    "UST10",
+    "BUND10",
+    "SPX",
+    "ILLIQ"
+   ],
+   "max_age_days": 10,
+   "ipv_threshold": 0.005,
+   "sources": [
+    {
+     "name": "VENDOR_A",
+     "quotes": [
+      {
+       "instrument": "UST10",
+       "date": "2026-11-10",
+       "price": 99.75
+      },
+      {
+       "instrument": "SPX",
+       "date": "2026-11-07",
+       "price": 6012.5
+      }
+     ]
+    },
+    {
+     "name": "VENDOR_B",
+     "quotes": [
+      {
+       "instrument": "BUND10",
+       "date": "2026-11-10",
+       "price": 131.2
+      },
+      {
+       "instrument": "UST10",
+       "date": "2026-11-10",
+       "price": 99.8
+      },
+      {
+       "instrument": "SPX",
+       "date": "2026-11-09",
+       "price": 6020.0
+      },
+      {
+       "instrument": "ILLIQ",
+       "date": "2026-11-01",
+       "price": 88.0
+      }
+     ]
+    }
+   ],
+   "ipv": [
+    {
+     "instrument": "UST10",
+     "price": 99.7
+    },
+    {
+     "instrument": "BUND10",
+     "price": 130.0
+    }
+   ]
+  },
+  "output_names": [
+   "marks"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0026",
+  "operation": "book.marks.resolve",
+  "inputs": {
+   "as_of": "2026-11-10",
+   "instruments": [
+    "UST10",
+    "BUND10",
+    "SPX",
+    "ILLIQ"
+   ],
+   "max_age_days": 3,
+   "ipv_threshold": 0.0001,
+   "sources": [
+    {
+     "name": "VENDOR_A",
+     "quotes": [
+      {
+       "instrument": "UST10",
+       "date": "2026-11-10",
+       "price": 99.75
+      },
+      {
+       "instrument": "SPX",
+       "date": "2026-11-07",
+       "price": 6012.5
+      }
+     ]
+    },
+    {
+     "name": "VENDOR_B",
+     "quotes": [
+      {
+       "instrument": "BUND10",
+       "date": "2026-11-10",
+       "price": 131.2
+      },
+      {
+       "instrument": "UST10",
+       "date": "2026-11-10",
+       "price": 99.8
+      },
+      {
+       "instrument": "SPX",
+       "date": "2026-11-09",
+       "price": 6020.0
+      },
+      {
+       "instrument": "ILLIQ",
+       "date": "2026-11-01",
+       "price": 88.0
+      }
+     ]
+    }
+   ],
+   "ipv": [
+    {
+     "instrument": "UST10",
+     "price": 99.7
+    },
+    {
+     "instrument": "BUND10",
+     "price": 130.0
+    }
+   ]
+  },
+  "output_names": [
+   "marks"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0027",
+  "operation": "book.marks.resolve",
+  "inputs": {
+   "as_of": "2026-11-10",
+   "instruments": [
+    "UST10",
+    "BUND10",
+    "SPX",
+    "ILLIQ"
+   ],
+   "max_age_days": 3,
+   "ipv_threshold": 0.005,
+   "sources": [
+    {
+     "name": "VENDOR_A",
+     "quotes": [
+      {
+       "instrument": "UST10",
+       "date": "2026-11-10",
+       "price": 99.75
+      },
+      {
+       "instrument": "SPX",
+       "date": "2026-11-07",
+       "price": 6012.5
+      }
+     ]
+    },
+    {
+     "name": "VENDOR_B",
+     "quotes": [
+      {
+       "instrument": "BUND10",
+       "date": "2026-11-10",
+       "price": 131.2
+      },
+      {
+       "instrument": "UST10",
+       "date": "2026-11-10",
+       "price": 99.8
+      },
+      {
+       "instrument": "SPX",
+       "date": "2026-11-09",
+       "price": 6020.0
+      },
+      {
+       "instrument": "ILLIQ",
+       "date": "2026-11-01",
+       "price": 88.0
+      }
+     ]
+    }
+   ],
+   "ipv": []
+  },
+  "output_names": [
+   "marks"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0028",
+  "operation": "book.marks.resolve",
+  "inputs": {
+   "as_of": "2026-11-10",
+   "instruments": [
+    "UST10",
+    "BUND10",
+    "SPX",
+    "ILLIQ"
+   ],
+   "max_age_days": 3,
+   "ipv_threshold": 0.005,
+   "sources": [
+    {
+     "name": "VENDOR_A",
+     "quotes": [
+      {
+       "instrument": "UST10",
+       "date": "2026-11-10",
+       "price": 99.75
+      },
+      {
+       "instrument": "SPX",
+       "date": "2026-11-07",
+       "price": 6012.5
+      }
+     ]
+    }
+   ],
+   "ipv": [
+    {
+     "instrument": "UST10",
+     "price": 99.7
+    },
+    {
+     "instrument": "BUND10",
+     "price": 130.0
+    }
+   ]
+  },
+  "output_names": [
+   "marks"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "book_f-0029",
+  "operation": "book.marks.resolve",
+  "inputs": {
+   "as_of": "2026-11-10",
+   "instruments": [
+    "UST10",
+    "BUND10",
+    "SPX",
+    "ILLIQ"
+   ],
+   "max_age_days": 3,
+   "ipv_threshold": 0.005,
+   "sources": [
+    {
+     "name": "VENDOR_B",
+     "quotes": [
+      {
+       "instrument": "BUND10",
+       "date": "2026-11-10",
+       "price": 131.2
+      },
+      {
+       "instrument": "UST10",
+       "date": "2026-11-10",
+       "price": 99.8
+      },
+      {
+       "instrument": "SPX",
+       "date": "2026-11-09",
+       "price": 6020.0
+      },
+      {
+       "instrument": "ILLIQ",
+       "date": "2026-11-01",
+       "price": 88.0
+      }
+     ]
+    },
+    {
+     "name": "VENDOR_A",
+     "quotes": [
+      {
+       "instrument": "UST10",
+       "date": "2026-11-10",
+       "price": 99.75
+      },
+      {
+       "instrument": "SPX",
+       "date": "2026-11-07",
+       "price": 6012.5
+      }
+     ]
+    }
+   ],
+   "ipv": [
+    {
+     "instrument": "UST10",
+     "price": 99.7
+    },
+    {
+     "instrument": "BUND10",
+     "price": 130.0
+    }
+   ]
+  },
+  "output_names": [
+   "marks"
+  ],
+  "tolerance_class": "simple_analytic"
+ }
+]

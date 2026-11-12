@@ -23,7 +23,7 @@ jobs:
   outside-d:
     name: oracle-outside-registers
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -46,6 +46,31 @@ jobs:
             echo "::error::an outside register differs from a fresh run; rerun the outside_*.py scripts and commit the registers"
             exit 1
           fi
+      - name: Regenerate the stage G per-case register (QuantLib FD, tree, MC; about 20 minutes)
+        shell: bash
+        run: |
+          git show HEAD:oracle/OUTSIDE_G_R6.json > "$RUNNER_TEMP/g_committed.json"
+          uv run --frozen python -W ignore outside_g_r6.py
+          uv run --frozen python -W ignore outside_g_barrier_r6.py
+        working-directory: oracle/python
+      - name: Stage G per-case verdicts match the committed copy
+        # floats from QuantLib's MC and FD may differ in the last digits across platforms; the verdicts may not
+        run: |
+          python3 - "$RUNNER_TEMP/g_committed.json" oracle/OUTSIDE_G_R6.json <<'EOF'
+          import json, sys
+          v = lambda p: {s: {c["case_id"]: c["pass"] for c in d["cases"]} for s, d in json.load(open(p))["suites"].items()}
+          a, b = v(sys.argv[1]), v(sys.argv[2])
+          if a != b:
+              print("::error::stage G per-case outside verdicts differ from a fresh run:", {s: {k: (a.get(s, {}).get(k), x) for k, x in b[s].items() if a.get(s, {}).get(k) != x} for s in b})
+              sys.exit(1)
+          EOF
+          git checkout -- oracle/OUTSIDE_G_R6.json
+      - name: Stage F blind re-derivation judged at each golden's tolerance (four no-library classes only)
+        # oracle/rederivation/results.json is the frozen output of a model blind to the goldens; disagreements are
+        # printed (spec-lane findings), and the committed verdict register must equal a fresh judgement
+        run: |
+          python3 oracle/python/compare_rederivation.py oracle/rederivation/results.json --source "blind re-derivation, Sonnet 5.5, 2026-11-12" --write
+          git diff --exit-code -- oracle/REDERIVATION_REGISTER.json
       - name: D6 shares, floor and register-against-golden check (R6-13)
         run: |
           python3 tools/test_outside_shares.py

@@ -33,6 +33,9 @@ ROWS = {
     "TERM.HELPERS": ("02-curves/projection-and-fra.md USD-TERM-3M deposits, FRAs, swaps", "IborIndex TERM 3M (2 days, US GovernmentBond, ModifiedFollowing, Actual360); DepositRateHelper, FraRateHelper, SwapRateHelper(Annual, ModifiedFollowing, Thirty360 BondBasis, exogenous discount)"),
     "CRV.LOG_LINEAR_DF": ("02-curves/curve-framework.md LOG_LINEAR_DF", "PiecewiseLogLinearDiscount(ref, helpers, Actual365Fixed)"),
     "SCIPY.CHI2": ("06-risk/var-es-and-backtests.md Kupiec, Christoffersen p-values", "scipy.stats.chi2.sf(lr, dof); likelihood ratios from scipy.stats.binom.logpmf and scipy.special.xlogy"),
+    "SCIPY.MLE": ("06-risk/var-es-and-backtests.md Kupiec, Christoffersen (R6-13)", "Bernoulli and first-order Markov likelihoods maximised numerically by scipy.optimize.minimize_scalar (bounded Brent, xatol 1e-15), not the closed-form MLE; transitions by numpy; p-values scipy.stats.chi2.sf; oracle/python/outside_f_r6.py"),
+    "SCIPY.TOEPLITZ": ("06-risk/portfolio-risk-tools.md risk.vol.horizon", "variance of the h-day sum as 1' Sigma 1 with Sigma = sigma^2 scipy.linalg.toeplitz(rho^k), numpy matmul; not the closed-form sum"),
+    "SCIPY.BRENTQ": ("06-risk/portfolio-risk-tools.md risk.stress.reverse", "scipy.optimize.brentq on the matrix delta-gamma P&L along k d (numpy), bracket by a geometric scan from 0 so the smallest positive root is taken; not the quadratic formula"),
     "SCIPY.BINOM": ("06-risk/var-es-and-backtests.md traffic light", "scipy.stats.binom.cdf(x, n, 1 - c); zones at 0.95 and 0.9999; plus factor Basel 1996 Table 2"),
     "SCIPY.NORM": ("06-risk/var-es-and-backtests.md parametric VaR and ES", "scipy.stats.norm.ppf; ES by scipy.integrate.quad of the normal tail (not the closed form)"),
     "NUMPY.QUANTILE": ("06-risk/var-es-and-backtests.md historical VaR", "numpy.quantile(losses, c, method='inverted_cdf') (Hyndman and Fan type 1); ES as the mean of the sorted losses from the first position holding that quantile (agrees with the spec without ties; a tie at the VaR scenario, risk_f4-0107, is not outside-checked)"),
@@ -239,32 +242,18 @@ def h_joint(i):
 
 
 def h_kupiec(i):
-    from scipy import stats, special
-    n, x, p = i["observations"], i["exceptions"], 1 - i["confidence"]
-    lr = max(2 * (stats.binom.logpmf(x, n, x / n) - stats.binom.logpmf(x, n, p)), 0.0)
-    lr = 0.0 if lr < 1e-12 else lr  # spec rule, ruling F-32
-    return {"lr_uc": lr, "p_value": float(stats.chi2.sf(lr, 1))}, {"SCIPY.CHI2"}
+    # R6-13 (D6): the closed-form LR around binom.logpmf was ruled reimplementation. The likelihoods are now
+    # maximised numerically (scipy bounded Brent), a different formulation; oracle/python/outside_f_r6.py.
+    from scipy import stats
+    from outside_f_r6 import lr_uc
+    lr = float(lr_uc(i["observations"], i["exceptions"], i["confidence"]))
+    return {"lr_uc": lr, "p_value": 1.0 if lr == 0.0 else float(stats.chi2.sf(lr, 1))}, {"SCIPY.MLE"}
 
 
 def h_christ(i):
-    from scipy import stats
-    from scipy.special import xlogy
-    I = [int(v) for v in i["exceptions"]]
-    out, _ = h_kupiec({"observations": len(I), "exceptions": sum(I), "confidence": i["confidence"]})
-    nn = {(a, b): 0 for a in (0, 1) for b in (0, 1)}
-    for a, b in zip(I, I[1:]):
-        nn[(a, b)] += 1
-    n00, n01, n10, n11 = nn[(0, 0)], nn[(0, 1)], nn[(1, 0)], nn[(1, 1)]
-    pi = (n01 + n11) / (n00 + n01 + n10 + n11)
-    p01 = n01 / (n00 + n01) if n00 + n01 else 0.0
-    p11 = n11 / (n10 + n11) if n10 + n11 else 0.0
-    l0 = xlogy(n00 + n10, 1 - pi) + xlogy(n01 + n11, pi)
-    l1 = xlogy(n00, 1 - p01) + xlogy(n01, p01) + xlogy(n10, 1 - p11) + xlogy(n11, p11)
-    ind = max(-2 * (l0 - l1), 0.0)
-    ind = 0.0 if ind < 1e-12 else ind  # ruling F-32
-    cc = out["lr_uc"] + ind
-    return {"lr_uc": out["lr_uc"], "lr_ind": ind, "lr_cc": cc, "p_uc": out["p_value"], "p_ind": float(stats.chi2.sf(ind, 1)), "p_cc": float(stats.chi2.sf(cc, 2)),
-            "transitions": {"n00": n00, "n01": n01, "n10": n10, "n11": n11}}, {"SCIPY.CHI2"}
+    from outside_f_r6 import christoffersen
+    out = christoffersen(i["exceptions"], i["confidence"])
+    return {k: (float(v) if not isinstance(v, dict) else v) for k, v in out.items()}, {"SCIPY.MLE"}
 
 
 def h_traffic(i):
@@ -368,7 +357,99 @@ def h_cross_gamma(i):
     return {"value": base, "cross_gamma": G}, {"OIS.HELPER", "IDX", "CRV.LOG_LINEAR_DF"}
 
 
-HANDLERS = {"risk.curve.cross_gamma": h_cross_gamma, "usecase.factor_attribution": h_uc4, "risk.backtest.kupiec": h_kupiec, "risk.backtest.christoffersen": h_christ, "risk.backtest.traffic_light": h_traffic,
+# ---------------------------------------------------------------- R6 oracle lane 2 (different formulations)
+def _bsm(spot, q, r, vol, T):
+    today = ql.Date(10, 11, 2026)
+    ql.Settings.instance().evaluationDate = today
+    dc = ql.Actual365Fixed()
+    ts = lambda x: ql.YieldTermStructureHandle(ql.FlatForward(today, x, dc))  # noqa: E731
+    return today, dc, ql.BlackScholesMertonProcess(ql.QuoteHandle(ql.SimpleQuote(spot)), ts(q), ts(r),
+                                                   ql.BlackVolTermStructureHandle(ql.BlackConstantVol(today, ql.NullCalendar(), vol, dc)))
+
+
+def h_divborrow(i):
+    """QuantLib AnalyticEuropeanEngine on yield q + borrow; dividendRho is QuantLib's own analytic Greek."""
+    T = i["expiry_years"]
+    if abs(T * 365 - round(T * 365)) > 1e-9:
+        raise NotImplementedError("maturity not on a whole day")
+    today, dc, proc = _bsm(i["spot"], i["dividend_yield"] + i["borrow_rate"], i["rate"], i["vol"], T)
+    o = ql.VanillaOption(ql.PlainVanillaPayoff(ql.Option.Call if i["option_type"] == "CALL" else ql.Option.Put, i["strike"]),
+                         ql.EuropeanExercise(today + int(round(T * 365))))
+    o.setPricingEngine(ql.AnalyticEuropeanEngine(proc))
+    d01 = o.dividendRho() * 1e-4
+    return {"price": o.NPV(), "dividend01": d01, "borrow01": d01}, set()
+
+
+def h_correlation(i):
+    """QuantLib MargrabeOption (AnalyticEuropeanMargrabeEngine); correlation01 by a Richardson-extrapolated central
+    bump of QuantLib's price; spread_vol by inverting QuantLib's price for the exchange-option vol (scipy brentq)."""
+    from scipy.optimize import brentq
+    T = i["expiry_years"]
+    if abs(T * 365 - round(T * 365)) > 1e-9:
+        raise NotImplementedError("maturity not on a whole day")
+
+    def price(rho, v1=i["vol1"], v2=i["vol2"]):
+        today, dc, p1 = _bsm(i["spot1"], i["yield1"], 0.0, v1, T)
+        _, _, p2 = _bsm(i["spot2"], i["yield2"], 0.0, v2, T)
+        o = ql.MargrabeOption(int(i["quantity1"]) if float(i["quantity1"]).is_integer() else i["quantity1"],
+                              int(i["quantity2"]) if float(i["quantity2"]).is_integer() else i["quantity2"],
+                              ql.EuropeanExercise(today + int(round(T * 365))))
+        o.setPricingEngine(ql.AnalyticEuropeanMargrabeEngine(p1, p2, rho))
+        return o.NPV()
+
+    rho = i["correlation"]
+    h = 1e-3
+    c = lambda hh: (price(rho + hh) - price(rho - hh)) / (2 * hh)  # noqa: E731
+    d = (4 * c(h / 2) - c(h)) / 3
+    v = price(rho)
+    # exchange option = one-asset option with vol s on the ratio: invert QuantLib's own price with rho = 0, v2 = 0
+    s = brentq(lambda x: price(0.0, v1=x, v2=0.0) - v, 1e-6, 5.0, xtol=1e-15, rtol=1e-15)
+    return {"price": v, "correlation01": d * 0.01, "spread_vol": s}, set()
+
+
+def h_horizon(i):
+    """Variance of the h-day sum as 1' Sigma 1 with the AR(1) Toeplitz covariance (scipy.linalg.toeplitz, numpy),
+    not the closed-form weighted sum of the spec."""
+    import numpy as np
+    from scipy.linalg import toeplitz
+    s, r, h = i["daily_vol"], i["ar1"], i["horizon_days"]
+    S = s * s * toeplitz(r ** np.arange(h))
+    one = np.ones(h)
+    var, var0 = float(one @ S @ one), float(one @ (s * s * np.eye(h)) @ one)
+    return {"vol": math.sqrt(var), "sqrt_rule_vol": math.sqrt(var0), "variance_ratio": var / var0}, {"SCIPY.TOEPLITZ"}
+
+
+def h_reverse(i):
+    """Smallest k > 0 with the delta-gamma P&L of the shock vector k d equal to -L, by scipy brentq on the matrix
+    form d'delta k + k^2 d'Gamma d / 2 (numpy), bracketed by a scan; not the spec's cancellation-free quadratic."""
+    import numpy as np
+    from scipy.optimize import brentq
+    d, de, G, L = np.array(i["direction"], float), np.array(i["delta"], float), np.array(i["gamma"], float), i["target_loss"]
+    pnl = lambda k: float(de @ (k * d) + 0.5 * (k * d) @ G @ (k * d))  # noqa: E731
+    f = lambda k: pnl(k) + L  # noqa: E731
+    k0, step = 0.0, 1e-6
+    while f(k0 + step) > 0:
+        k0 += step
+        step *= 1.5
+        if step > 1e12:
+            raise NotImplementedError("no root")
+    k = brentq(f, k0, k0 + step, xtol=1e-300, rtol=1e-15, maxiter=500)
+    return {"scale": k, "shocks": [float(x) for x in k * d], "pnl": -L}, {"SCIPY.BRENTQ"}
+
+
+# Method tolerances (R6 oracle lane 2), fixed before the run. QuantLib analytic: the golden's own class. The bump:
+# Richardson on h = 1e-3 leaves O(h^4) ~ 1e-12 relative plus round-off eps * price / h ~ 1e-13 absolute per unit;
+# the inversion: brentq to rtol 4e-16 on a function whose slope (vega) is O(price), so ~1e-13 relative.
+METHOD_TOL = {
+    "risk.sens.correlation": {"absolute": 1e-10, "relative": 1e-9, "reason": "Richardson bump of QuantLib Margrabe; brentq inversion"},
+    "risk.stress.reverse": {"absolute": 1e-12, "relative": 1e-12, "reason": "brentq to 4.5e-16 relative"},
+    "risk.vol.horizon": {"absolute": 1e-12, "relative": 1e-12, "reason": "matrix sum, h <= 250 terms"},
+}
+
+
+HANDLERS = {"risk.sens.dividend_borrow": h_divborrow, "risk.sens.correlation": h_correlation, "risk.vol.horizon": h_horizon,
+            "risk.stress.reverse": h_reverse,
+            "risk.curve.cross_gamma": h_cross_gamma, "usecase.factor_attribution": h_uc4, "risk.backtest.kupiec": h_kupiec, "risk.backtest.christoffersen": h_christ, "risk.backtest.traffic_light": h_traffic,
             "risk.var.parametric": h_param, "risk.var.historical": h_hist, "risk.curve.pca": h_pca,
             "rates.ois.bootstrap": h_bootstrap, "rates.curve.inspect": h_inspect, "rates.curve.joint_solve": h_joint}
 
@@ -412,6 +493,11 @@ def main():
                 if c["operation"] == "rates.curve.inspect" and c["inputs"]["curve"]["interpolation"] == "MONOTONE_CONVEX":
                     partly.append({"case_id": c["case_id"], "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"})
                 continue
+            if c["operation"] in METHOD_TOL:
+                # R6 oracle lane 2: a bump or a numerical inverse has its own error; the tolerance is the method's,
+                # fixed before the run and stated in METHOD_TOL, never fitted to the gap
+                lim = METHOD_TOL[c["operation"]]
+                c = dict(c, tolerance_limit=lim, output_classes={})
             ok, why, _ = judge(c, got)
             if ok:
                 n_ok += 1
