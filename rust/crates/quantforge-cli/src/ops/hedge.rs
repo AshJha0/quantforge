@@ -685,3 +685,59 @@ super::registry! {
             ]))
         }
 }
+
+/// `usecase.option_hedge_lots` (use case 6, ruling R6-11.20), dispatched from `usecase`.
+pub(crate) fn option_hedge_lots(i: &Inputs) -> Result<Outcome> {
+    let market = hs::GreekMarket {
+        spot: i.f64("spot")?,
+        rate: i.f64("rate")?,
+        dividend_yield: i.f64("dividend_yield")?,
+        volatility: i.f64("volatility")?,
+    };
+    let portfolio = i
+        .array("portfolio")?
+        .iter()
+        .map(|v| leg(i, "portfolio", v, true))
+        .collect::<Result<Vec<_>>>()?;
+    let mut hedges = Vec::new();
+    for v in i.array("hedges")? {
+        let Json::Obj(keys) = v else {
+            return i.fail("hedges", "expected objects");
+        };
+        let num = |k: &str| match v.get(k) {
+            Some(x) => x.as_f64().ok_or(()),
+            None => Err(()),
+        };
+        let (Ok(lot_size), Ok(half_spread)) = (num("lot_size"), num("half_spread")) else {
+            return i.fail("hedges", "lot_size and half_spread are required numbers");
+        };
+        let rest = Json::Obj(
+            keys.iter()
+                .filter(|(k, _)| k != "lot_size" && k != "half_spread")
+                .cloned()
+                .collect(),
+        );
+        let (l, _) = leg(i, "hedges", &rest, false)?;
+        hedges.push(hs::LotHedge { leg: l, lot_size, half_spread });
+    }
+    let targets = i
+        .array("targets")?
+        .iter()
+        .map(|t| match t.as_str() {
+            Some("DELTA") => Ok(Greek::Delta),
+            Some("GAMMA") => Ok(Greek::Gamma),
+            Some("VEGA") => Ok(Greek::Vega),
+            _ => i.fail("targets", "must be DELTA, GAMMA or VEGA"),
+        })
+        .collect::<Result<Vec<_>>>()?;
+    let max_lots = i.int("max_lots")?;
+    i.gate()?;
+    let r = hs::option_hedge_lots(&market, &portfolio, &hedges, &targets, max_lots)?;
+    plain(obj([
+        ("greeks_before", greeks_obj(r.before)),
+        ("lots", Json::Arr(r.lots.iter().map(|v| Json::Int(*v)).collect())),
+        ("greeks_after", greeks_obj(r.after)),
+        ("hedge_cost", r.hedge_cost.into()),
+        ("rounding_cost", r.rounding_cost.into()),
+    ]))
+}

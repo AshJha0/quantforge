@@ -291,8 +291,9 @@ fn select_subsets_above(i: &Json, max: i128) -> bool {
         .and_then(|a| a.first())
         .and_then(Json::as_array)
         .map_or(0, |r| r.len() as i128);
-    let k = int(i, "max_instruments").unwrap_or(0).min(n);
-    if n > 20 || k < 1 {
+    // R6-11.6: K outside 1..n is E_INPUT, decided before this limit.
+    let k = int(i, "max_instruments").unwrap_or(0);
+    if n > 20 || k < 1 || k > n {
         return false;
     }
     let (mut c, mut total) = (1i128, 0i128);

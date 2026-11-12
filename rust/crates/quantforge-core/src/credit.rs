@@ -163,10 +163,9 @@ fn periods(t: Date, maturity: Date) -> Result<Vec<Period>> {
     if maturity <= t {
         return fail("E_INPUT", "maturity is not after the trade date");
     }
+    // R6-7.3 (replacing D19's E_INPUT): T on an adjusted coupon date is priced; the first
+    // period then starts on T and one day is accrued at step-in.
     let first = last_imm_on_or_before(t);
-    if weekday_on_or_after(first) == t {
-        return fail("E_INPUT", "trade date is on an adjusted coupon date");
-    }
     let mut raw = vec![first];
     let mut k = 1;
     loop {

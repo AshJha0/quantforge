@@ -43,6 +43,12 @@ pub fn mbs_cashflows(p: &Pool) -> Result<MbsFlows> {
     if p.balance <= 0.0 || bad {
         return fail("E_DOMAIN", "balance or prepayment out of range");
     }
+    // R6-7.1: a PSA speed whose monthly CPR reaches 1 has no SMM.
+    if let Prepayment::Psa(s) = p.prepayment
+        && (1..=p.wam).any(|k| (((p.age + k) as f64) / 30.0).min(1.0) * 0.06 * s / 100.0 >= 1.0)
+    {
+        return fail("E_DOMAIN", "a PSA monthly CPR reaches 1");
+    }
     let r = p.wac / 12.0;
     let n_total = p.wam as usize;
     let mut out = MbsFlows {

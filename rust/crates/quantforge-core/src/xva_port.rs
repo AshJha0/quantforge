@@ -21,8 +21,9 @@ pub struct PortfolioExposure {
 
 /// Half-width of the integration range in standard deviations of `x(t)`.
 const ZMAX: f64 = 16.0;
-/// Grid used to locate sign changes before bisection.
-const NGRID: usize = 3200;
+/// Scan of the analytic `f'` used to bracket the critical points of `f` (ruling R6-5.5: at least
+/// 6,001 points over +-12 sd; this scan is 8,001 points over +-16 sd, step 0.004 <= 24/6000).
+const NGRID: usize = 8000;
 
 /// Deflated value of the netting set at `t` as a function of the standard normal `z`.
 /// One trade as `(sign x notional, fixed rate, [(tau, ln P(0,T) - ln P(0,t), H(T))])`.
@@ -35,8 +36,9 @@ struct Deflated {
     lp0t: f64,
     ht: f64,
     zeta: f64,
-    /// `value` on the root-finding grid.
-    grid: Vec<f64>,
+    /// `-ZMAX`, the critical points of `value` in between, and `ZMAX` (R6-5.5): `value` is
+    /// monotone between consecutive knots.
+    knots: Vec<f64>,
 }
 
 #[allow(clippy::cast_precision_loss)]
@@ -67,10 +69,10 @@ impl Deflated {
             lp0t,
             ht: h(t),
             zeta,
-            grid: Vec::new(),
+            knots: Vec::new(),
         };
         if zeta > 0.0 {
-            d.grid = (0..=NGRID).map(|k| d.value(zgrid(k))).collect();
+            d.knots = d.critical_knots();
         }
         d
     }
@@ -93,27 +95,77 @@ impl Deflated {
         v * (-ln_num).exp()
     }
 
-    /// Points in `[-ZMAX, ZMAX]` where `value - y` changes sign, refined by bisection.
+    /// Analytic `d value / dz`.
+    fn slope(&self, z: f64) -> f64 {
+        let sz = self.zeta.sqrt();
+        let x = sz * z;
+        let ht = self.ht;
+        let ln_num = ht * x + ht * ht * self.zeta / 2.0 - self.lp0t;
+        let (mut v, mut dv) = (0.0, 0.0);
+        for (sn, k, pays) in &self.legs {
+            let (mut fixed, mut dfixed, mut last, mut dlast) = (0.0, 0.0, 1.0, 0.0);
+            for (tau, lp, h_end) in pays {
+                let p = (lp - (h_end - ht) * x - (h_end * h_end - ht * ht) * self.zeta / 2.0).exp();
+                let dp = -(h_end - ht) * p;
+                fixed += tau * p;
+                dfixed += tau * dp;
+                last = p;
+                dlast = dp;
+            }
+            v += sn * (1.0 - last - k * fixed);
+            dv += sn * (-dlast - k * dfixed);
+        }
+        (dv - ht * v) * (-ln_num).exp() * sz
+    }
+
+    /// Bisection on `[lo, hi]` for a sign change of `g`, to the binary64 resolution.
+    fn bisect(g: &dyn Fn(f64) -> f64, mut lo: f64, mut hi: f64) -> f64 {
+        let neg_lo = g(lo) < 0.0;
+        for _ in 0..200 {
+            let m = 0.5 * (lo + hi);
+            if m <= lo || m >= hi {
+                break;
+            }
+            if (g(m) < 0.0) == neg_lo {
+                lo = m;
+            } else {
+                hi = m;
+            }
+        }
+        0.5 * (lo + hi)
+    }
+
+    /// R6-5.5: bracket the zeros of the analytic slope on the scan and refine each.
+    fn critical_knots(&self) -> Vec<f64> {
+        let mut out = vec![-ZMAX];
+        let slope = |z: f64| self.slope(z);
+        let mut prev = slope(zgrid(0));
+        for k in 1..=NGRID {
+            let cur = slope(zgrid(k));
+            if prev * cur < 0.0 {
+                out.push(Self::bisect(&slope, zgrid(k - 1), zgrid(k)));
+            } else if cur == 0.0 && k < NGRID {
+                out.push(zgrid(k));
+            }
+            prev = cur;
+        }
+        out.push(ZMAX);
+        out
+    }
+
+    /// Points in `[-ZMAX, ZMAX]` where `value - y` changes sign: at most one per monotone
+    /// piece between knots, found by bisection.
     fn roots(&self, y: f64) -> Vec<f64> {
         let mut out = Vec::new();
-        for k in 1..=NGRID {
-            let (g0, g1) = (self.grid[k - 1] - y, self.grid[k] - y);
+        let g = |z: f64| self.value(z) - y;
+        for w in self.knots.windows(2) {
+            let (g0, g1) = (g(w[0]), g(w[1]));
             if g0 == 0.0 {
-                out.push(zgrid(k - 1));
-            } else if g0 * g1 < 0.0 {
-                let (mut lo, mut hi) = (zgrid(k - 1), zgrid(k));
-                for _ in 0..200 {
-                    let m = 0.5 * (lo + hi);
-                    if m <= lo || m >= hi {
-                        break;
-                    }
-                    if ((self.value(m) - y) < 0.0) == (g0 < 0.0) {
-                        lo = m;
-                    } else {
-                        hi = m;
-                    }
+                if w[0] > -ZMAX {
+                    out.push(w[0]);
                 }
-                out.push(0.5 * (lo + hi));
+            } else if g0 * g1 < 0.0 {
+                out.push(Self::bisect(&g, w[0], w[1]));
             }
         }
         out
@@ -172,7 +224,7 @@ impl Deflated {
         if self.cdf(0.0) >= q {
             return 0.0;
         }
-        let mut hi = self.grid.iter().copied().fold(0.0_f64, f64::max);
+        let mut hi = self.knots.iter().map(|z| self.value(*z)).fold(0.0_f64, f64::max);
         let mut lo = 0.0;
         for _ in 0..200 {
             let m = 0.5 * (lo + hi);

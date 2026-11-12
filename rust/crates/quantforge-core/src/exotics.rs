@@ -123,6 +123,19 @@ pub fn barrier_discrete(
         );
     }
     let dt = x.expiry_years / n;
+    // R6-2.1: BGK only inside its accuracy envelope (regular knock-out, no rebate, barrier
+    // at least 1.25 vol sqrt(dt) away in log terms); everything else is E_DOMAIN.
+    let regular = match kind {
+        BarrierType::DownOut => x.call && h <= x.strike,
+        BarrierType::UpOut => !x.call && h >= x.strike,
+        _ => false,
+    };
+    if !regular || rebate != 0.0 || (x.spot / h).ln().abs() < 1.25 * x.vol * dt.sqrt() {
+        return fail(
+            "E_DOMAIN",
+            "discrete barrier outside the BGK accuracy envelope (R6-2.1)",
+        );
+    }
     let shift = (BGK_BETA * x.vol * dt.sqrt()).exp();
     let hs = if down { h / shift } else { h * shift };
     barrier(x, hs, rebate, kind)
