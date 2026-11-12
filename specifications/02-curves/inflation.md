@@ -24,7 +24,7 @@ For a date `d` in month `m`: `ref(d) = I(m-3) + (day(d) - 1)/days_in_month(m) (I
 
 ## `infl.linker.price`
 
-Inputs: `bond` (as `04-pricing/bonds.md`), `settlement`, `real_yield`, `base_ref_cpi`, `cpi_fixings` `[{month, value}]`. Outputs: `ref_cpi` (from the fixings), `index_ratio = ref_cpi/base_ref_cpi`, `real_clean`, `real_accrued` (`bond.price.from_yield` at the real yield), `nominal_clean`, `nominal_accrued` (the real ones times `index_ratio`). A needed fixing missing: `E_INPUT`. No deflation floor in this stage.
+Inputs: `bond` (as `04-pricing/bonds.md`), `settlement`, `real_yield`, `base_ref_cpi`, `cpi_fixings` `[{month, value}]`. Outputs: `ref_cpi` (from the fixings), `index_ratio = ref_cpi/base_ref_cpi`, both rounded as Treasury does (ruling R6-7.5, 31 CFR Part 356 Appendix B, read 2026-11-12 at law.cornell.edu: truncate to six decimals, then round half up to five; the index ratio is formed from the rounded Ref CPI), `real_clean`, `real_accrued` (`bond.price.from_yield` at the real yield), `nominal_clean`, `nominal_accrued` (the real ones times `index_ratio`). A needed fixing missing: `E_INPUT`. No deflation floor in this stage.
 
 ## `infl.linker.price_curve`
 
