@@ -20,6 +20,7 @@ env:
   CONFIG: conformance/quality/stage_e.json
 jobs:
   plan:
+    name: coverage-stage-plan
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
@@ -42,6 +43,7 @@ jobs:
               print(f"{lang}={'true' if on else 'false'}")
           PY
   java:
+    name: coverage-stage-java
     needs: plan
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -58,6 +60,7 @@ jobs:
         working-directory: java25
       - run: python3 tools/quality_gate.py --config "$CONFIG" --lang java --coverage java25/target/site/jacoco/jacoco.xml --floor
   cpp:
+    name: coverage-stage-cpp
     needs: plan
     runs-on: ubuntu-24.04
     container: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
@@ -74,6 +77,7 @@ jobs:
       - run: gcovr --root . --filter 'cpp26/src/' --cobertura coverage.xml build
       - run: python3 tools/quality_gate.py --config "$CONFIG" --lang cpp --coverage coverage.xml --floor
   python:
+    name: coverage-stage-python
     needs: plan
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -87,6 +91,7 @@ jobs:
         working-directory: python
       - run: python3 tools/quality_gate.py --config "$CONFIG" --lang python --coverage python/coverage.json --floor
   rust:
+    name: coverage-stage-rust
     needs: plan
     runs-on: ubuntu-24.04
     timeout-minutes: 30

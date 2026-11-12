@@ -127,6 +127,26 @@ def release_problems(files, released):
     return bad
 
 
+# R6-12 (review finding 2): a headline case count must say what it counts. At v0.8.0 "14,935 golden cases" was
+# 7,413 value-checked, 5,008 error, 1,257 `any` and 1,257 `same_as` cases. A count of 1,000 or more followed by
+# "cases" (or "golden cases", "conformance cases") fails unless the same line names a class.
+CASE_COUNT = re.compile(r"\b(\d{1,3}(?:,\d{3})+|\d{4,})\s+(?:golden\s+|conformance\s+|test\s+)?cases\b", re.I)
+CASE_CLASS = re.compile(r"value[- ]checked|check(?:s|ing)? a value|error cases|invariance|\bany\b|same_as|by class", re.I)
+
+
+def case_count_problems(files):
+    """files: {path: text}. Flags a case count of 1,000 or more on a line that names no case class."""
+    bad = []
+    for path, text in files.items():
+        if path.startswith("program/"):  # dated hand-over records, not published figures
+            continue
+        for n, line in enumerate(text.split("\n"), 1):
+            for m in CASE_COUNT.finditer(line):
+                if not CASE_CLASS.search(line):
+                    bad.append(f"{path}:{n}: case count {m.group(1)!r} without its class (value-checked, error, invariance): {line.strip()[:100]}")
+    return bad
+
+
 def git(*args, root=ROOT):
     return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, check=True).stdout.split("\n")
 
@@ -143,7 +163,7 @@ def main():
     tags = [t for t in git("tag", "-l", "v*") if t]
     released = released_stages((ROOT / "CHANGELOG.md").read_text(encoding="utf-8"), tags)
     files = docs_files()
-    bad += release_problems(files, released) + unknown_operations(files, ops)
+    bad += release_problems(files, released) + unknown_operations(files, ops) + case_count_problems(files)
     for b in bad:
         print("BAD", b)
     print(f"docs status: curve table checked; {len(tags)} release tags, stages released {''.join(sorted(released)) or 'none found'}; {len(bad)} problems")

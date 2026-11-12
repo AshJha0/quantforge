@@ -22,6 +22,33 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 LANGS = ("java", "cpp", "python", "rust")
 MIN_FOR_GATE = 10
+# R6-14 acceptance: no module-language with a lower 95% Wilson bound under 65% or a point estimate under 80%,
+# unless conformance/mutation/reasons.json lists it with a reason and a second reviewer.
+LOWER_BOUND = 0.65
+Z95 = 1.959963984540054
+
+
+def wilson(k, n, z=Z95):
+    """95% Wilson score interval for k successes out of n."""
+    if n == 0:
+        return (0.0, 1.0)
+    p = k / n
+    d = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / d
+    h = z * ((p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5) / d
+    return (max(0.0, c - h), min(1.0, c + h))
+
+
+def load_reasons(path):
+    """{(lang, module): reason} for countersigned exceptions; an entry without a second reviewer does not count."""
+    path = Path(path)
+    if not path.is_file():
+        return {}
+    out = {}
+    for r in json.loads(path.read_text(encoding="utf-8")).get("exceptions", []):
+        if r.get("second_reviewer"):
+            out[(r["lang"], r["module"])] = r["reason"]
+    return out
 
 
 SUMMED = ("mutants", "unviable", "unit_killed_all", "sampled", "sample_unit_killed", "sample_golden_killed",
@@ -75,41 +102,58 @@ def pct(k, s):
     return f"{100 * k / (k + s):.1f}%" if k + s else "-"
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", default="D")
     ap.add_argument("--results", required=True)
     ap.add_argument("--stages", default=str(HERE / "stages.json"))
     ap.add_argument("--out")
     ap.add_argument("--gate", action="store_true")
-    a = ap.parse_args()
+    ap.add_argument("--reasons", default=str(HERE / "reasons.json"))
+    a = ap.parse_args(argv)
     cfg = json.loads(Path(a.stages).read_text(encoding="utf-8"))
-    target = cfg["target"].get(a.stage)
+    if a.stage == "ALL":
+        mods, seen = [], set()
+        for st in cfg["stages"].values():
+            for m in st:
+                if m["module"] not in seen:
+                    seen.add(m["module"])
+                    mods.append(m)
+        target = 0.80
+    else:
+        mods = cfg["stages"][a.stage]
+        target = cfg["target"].get(a.stage)
+    reasons = load_reasons(a.reasons)
     res = Path(a.results)
     rows, tk, ts, below, missing = [], 0, 0, [], []
-    for m in cfg["stages"][a.stage]:
+    for m in mods:
         for lang in LANGS:
             if not m.get(lang):
-                rows.append([m["module"], lang, "not mapped", "", "", "no module for this language in stages.json"])
+                rows.append([m["module"], lang, "not mapped", "", "", "", "no module for this language in stages.json"])
                 continue
             f = res / f"{lang}--{m['module']}.{'xml' if lang == 'java' else 'json'}"
             if not shard_files(f):
                 missing.append(f.name)
-                rows.append([m["module"], lang, "no result", "", "", f"`{m[lang]}`"])
+                rows.append([m["module"], lang, "no result", "", "", "", f"`{m[lang]}`"])
                 continue
             k, s, note = score_file(lang, f)
             tk, ts = tk + k, ts + s
             flag = ""
-            if target is not None and k + s >= MIN_FOR_GATE and k / (k + s) < target:
-                below.append(f"{lang} {m['module']}")
-                flag = " (below target)"
-            rows.append([m["module"], lang, pct(k, s) + flag, k, s, note])
+            lo, hi = wilson(k, k + s)
+            if target is not None and k + s >= MIN_FOR_GATE and (k / (k + s) < target or lo < LOWER_BOUND):
+                if (lang, m["module"]) in reasons:
+                    flag = " (below; countersigned reason)"
+                else:
+                    below.append(f"{lang} {m['module']}")
+                    flag = " (below target)"
+            rows.append([m["module"], lang, pct(k, s) + flag, k, s, f"{lo:.0%} to {hi:.0%}" if k + s else "", note])
     lines = [f"# Mutation report, stage {a.stage}", "",
              f"Target: {target:.0%} per module and language with at least {MIN_FOR_GATE} scored mutants, and pooled." if target is not None else "No target set.",
              f"Pooled: **{pct(tk, ts)}** ({tk} killed, {ts} survived). Below target: {', '.join(below) or 'none'}. "
              f"Missing results: {len(missing)}.", "",
              "Survivors have not been sorted into equivalent mutants and real gaps, so the score is a lower bound on test strength.", "",
-             "| Module | Language | Score | Killed | Survived | Basis |", "|---|---|---|---:|---:|---|"]
+             f"Each module-language also needs a lower 95% Wilson bound of at least {LOWER_BOUND:.0%} (R6-14).", "",
+             "| Module | Language | Score | Killed | Survived | 95% Wilson | Basis |", "|---|---|---|---:|---:|---|---|"]
     lines += ["| " + " | ".join(str(x) for x in r) + " |" for r in rows]
     text = "\n".join(lines) + "\n"
     if a.out:

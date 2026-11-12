@@ -58,7 +58,9 @@
      "source": "https://www.sifma.org/resources/general/holiday-schedule/",
      "text": "Good Friday 2026-04-03, early close 12:00 p.m. ET (17 Dec 2025 release)"
     }
-   ]
+   ],
+   "awaiting_publication_until": "2027-01-31",
+   "awaiting_publication_note": "SIFMA publishes the next year usually in December; amber until 2027-01-31, red after (R6-15)"
   }
  }
 }
