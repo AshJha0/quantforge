@@ -53,3 +53,7 @@ J-R6-1 negative-pivot band; J-R6-2 `hedgecorr_i-0015` expects `E_DOMAIN` against
 Applied: iteration cap `10 (n + p) + 100` with `p` the constraints (dual active set: its constraint count; sign search: the equalities); minvar scaled pivot at or below -1e-12 is `E_NOT_POSITIVE_DEFINITE`, absolute size below 1e-12 `E_SINGULAR`; `MIN_NORM` unscaled; `hedgecorr_i-0015` `E_DOMAIN` confirmed. Every J-R6 question is closed.
 
 Results: conformance **15,918 of 15,918** pass on the goldens present after this merge (the runner counts every file now on `r6`, which is more than the 15,076 stated for wave 3; the coordinator should check the expected total). The 4 regenerated goldens pass. `mvn -o verify`: 528 tests, 0 failures, 0 skipped.
+
+## Wave 3C (r6 merged at `a8a363e`)
+
+The stray files `stage_f/e1_risk_1.json` and `e1_risk_2.json` are gone. Conformance **15,076 of 15,076** (7,440 value, 5,122 error, 2,514 invariance). `mvn -o verify`: 526 tests, 0 failures, 0 skipped, BUILD SUCCESS.
