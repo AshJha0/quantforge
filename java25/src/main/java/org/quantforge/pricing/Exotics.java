@@ -75,6 +75,12 @@ public final class Exotics {
         if (n < 1) {
             throw new QfError("E_DOMAIN", "no monitoring date before expiry (ruling G-30)", "monitoring_per_year");
         }
+        // Ruling R6-2.1: the BGK price is returned only for a regular knock-out away from the barrier.
+        boolean regular = (type == BarrierType.DOWN_OUT && phi > 0 && h <= k)
+                || (type == BarrierType.UP_OUT && phi < 0 && h >= k);
+        if (!regular || rebate != 0.0 || !(Math.abs(Math.log(s / h)) >= 1.25 * v * Math.sqrt(t / n))) {
+            throw new QfError("E_DOMAIN", "outside the BGK accuracy envelope (ruling R6-2.1)", "barrier");
+        }
         double shift = Math.exp(BGK_BETA * v * Math.sqrt(t / n));
         return barrier(phi, type, s, k, t, r, q, v, down ? h / shift : h * shift, rebate);
     }
