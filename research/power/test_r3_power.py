@@ -32,6 +32,18 @@ class PowerTest(unittest.TestCase):
         sr, se = p.lo_sharpe(x, 12, 0)
         self.assertAlmostEqual(se[0], math.sqrt((1 + (sr[0] / math.sqrt(12)) ** 2 / 2) / 1200) * math.sqrt(12), places=12)
 
+    def test_secondary_statistic_size_and_power(self):
+        """R6-20: the undeflated one-sided p-value keeps its size near the nominal level at SR 0 (5% at 0.05, within
+        3 simulation SE) and has more power than the deflated pass rule at the MDS."""
+        for study in ("R3-01", "R3-03"):
+            a0, b0, c0, d0 = p.both_statistics(study, 0.0, sims=2000)
+            self.assertLess(abs(c0 - 0.05), 3 * math.sqrt(0.05 * 0.95 / 2000) + 0.01, study)
+            self.assertLessEqual(d0, c0)
+            self.assertLessEqual(a0, c0)
+            mds = p.STUDIES[study][4]
+            a1, _, c1, _ = p.both_statistics(study, mds, sims=2000)
+            self.assertGreater(c1, a1, study)
+
     def test_forward_rule_size(self):
         # true SR 0: the rule passes about half the time (sign), so the forward log alone confirms nothing
         self.assertLess(p.forward_pass_probability(0.0, 0.67, sims=5000), 0.55)
