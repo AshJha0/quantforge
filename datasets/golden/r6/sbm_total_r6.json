@@ -1,0 +1,491 @@
+{
+ "schema_version": "1.0",
+ "suite": "sbm_total_r6",
+ "spec": "specifications/06-risk/frtb-sa-girr.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_r6_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "sbm_total_r6-0001",
+   "operation": "risk.frtb.sbm_total",
+   "inputs": {
+    "components": [
+     {
+      "risk_class": "GIRR",
+      "measure": "DELTA",
+      "scenarios": {
+       "high": 4400.0,
+       "medium": 4377.054649041334,
+       "low": 4353.9883786464925
+      }
+     },
+     {
+      "risk_class": "FX",
+      "measure": "DELTA",
+      "scenarios": {
+       "high": 112249.72160321825,
+       "medium": 123693.16876852981,
+       "low": 134164.07864998738
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenario_totals": {
+      "high": 116649.72160321825,
+      "medium": 128070.22341757115,
+      "low": 138518.06702863387
+     },
+     "capital": 138518.06702863387,
+     "binding_scenario": "low",
+     "sum_of_component_capitals": 138564.07864998738
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "brute force over scenarios"
+   ],
+   "tags": [
+    "r6",
+    "frtb",
+    "synthetic"
+   ],
+   "description": "GIRR frtb_f-0003 (binds high) plus FX frtb_f2b-0002 (binds low)",
+   "output_classes": {
+    "binding_scenario": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "sbm_total_r6-0002",
+   "operation": "risk.frtb.sbm_total",
+   "inputs": {
+    "components": [
+     {
+      "risk_class": "GIRR",
+      "measure": "DELTA",
+      "scenarios": {
+       "high": 100.0,
+       "medium": 90.0,
+       "low": 80.0
+      }
+     },
+     {
+      "risk_class": "FX",
+      "measure": "DELTA",
+      "scenarios": {
+       "high": 50.0,
+       "medium": 55.0,
+       "low": 60.0
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenario_totals": {
+      "high": 150.0,
+      "medium": 145.0,
+      "low": 140.0
+     },
+     "capital": 150.0,
+     "binding_scenario": "high",
+     "sum_of_component_capitals": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "brute force over scenarios"
+   ],
+   "tags": [
+    "r6",
+    "frtb",
+    "synthetic"
+   ],
+   "description": "hand: per-class maxima from different scenarios",
+   "output_classes": {
+    "binding_scenario": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "sbm_total_r6-0003",
+   "operation": "risk.frtb.sbm_total",
+   "inputs": {
+    "components": [
+     {
+      "risk_class": "EQ",
+      "measure": "VEGA",
+      "scenarios": {
+       "high": 3.0,
+       "medium": 2.0,
+       "low": 1.0
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenario_totals": {
+      "high": 3.0,
+      "medium": 2.0,
+      "low": 1.0
+     },
+     "capital": 3.0,
+     "binding_scenario": "high",
+     "sum_of_component_capitals": 3.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "brute force over scenarios"
+   ],
+   "tags": [
+    "r6",
+    "frtb",
+    "synthetic"
+   ],
+   "description": "hand: one component equals its own capital",
+   "output_classes": {
+    "binding_scenario": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "sbm_total_r6-0004",
+   "operation": "risk.frtb.sbm_total",
+   "inputs": {
+    "components": [
+     {
+      "risk_class": "GIRR",
+      "measure": "DELTA",
+      "scenarios": {
+       "high": 10.0,
+       "medium": 5.0,
+       "low": 4.0
+      }
+     },
+     {
+      "risk_class": "GIRR",
+      "measure": "CURVATURE",
+      "scenarios": {
+       "high": 0.0,
+       "medium": 4.0,
+       "low": 6.0
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenario_totals": {
+      "high": 10.0,
+      "medium": 9.0,
+      "low": 10.0
+     },
+     "capital": 10.0,
+     "binding_scenario": "high",
+     "sum_of_component_capitals": 16.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "brute force over scenarios"
+   ],
+   "tags": [
+    "r6",
+    "frtb",
+    "synthetic"
+   ],
+   "description": "hand: tie between high and low goes to high",
+   "output_classes": {
+    "binding_scenario": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "sbm_total_r6-0005",
+   "operation": "risk.frtb.sbm_total",
+   "inputs": {
+    "components": [
+     {
+      "risk_class": "COMM",
+      "measure": "DELTA",
+      "scenarios": {
+       "high": 7.0,
+       "medium": 6.5,
+       "low": 6.0
+      }
+     },
+     {
+      "risk_class": "COMM",
+      "measure": "VEGA",
+      "scenarios": {
+       "high": 1.0,
+       "medium": 1.5,
+       "low": 2.5
+      }
+     },
+     {
+      "risk_class": "COMM",
+      "measure": "CURVATURE",
+      "scenarios": {
+       "high": 0.5,
+       "medium": 0.5,
+       "low": 0.25
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenario_totals": {
+      "high": 8.5,
+      "medium": 8.5,
+      "low": 8.75
+     },
+     "capital": 8.75,
+     "binding_scenario": "low",
+     "sum_of_component_capitals": 10.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "brute force over scenarios"
+   ],
+   "tags": [
+    "r6",
+    "frtb",
+    "synthetic"
+   ],
+   "description": "hand: three measures of one class",
+   "output_classes": {
+    "binding_scenario": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "sbm_total_r6-0006",
+   "operation": "risk.frtb.sbm_total",
+   "inputs": {
+    "components": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "frtb",
+    "invalid"
+   ],
+   "description": "empty components"
+  },
+  {
+   "case_id": "sbm_total_r6-0007",
+   "operation": "risk.frtb.sbm_total",
+   "inputs": {
+    "components": [
+     {
+      "risk_class": "CRYPTO",
+      "measure": "DELTA",
+      "scenarios": {
+       "high": 100.0,
+       "medium": 90.0,
+       "low": 80.0
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "frtb",
+    "invalid"
+   ],
+   "description": "unknown risk class"
+  },
+  {
+   "case_id": "sbm_total_r6-0008",
+   "operation": "risk.frtb.sbm_total",
+   "inputs": {
+    "components": [
+     {
+      "risk_class": "GIRR",
+      "measure": "GAMMA",
+      "scenarios": {
+       "high": 100.0,
+       "medium": 90.0,
+       "low": 80.0
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "frtb",
+    "invalid"
+   ],
+   "description": "unknown measure"
+  },
+  {
+   "case_id": "sbm_total_r6-0009",
+   "operation": "risk.frtb.sbm_total",
+   "inputs": {
+    "components": [
+     {
+      "risk_class": "GIRR",
+      "measure": "DELTA",
+      "scenarios": {
+       "high": 1.0,
+       "medium": 1.0
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "frtb",
+    "invalid"
+   ],
+   "description": "missing scenario"
+  },
+  {
+   "case_id": "sbm_total_r6-0010",
+   "operation": "risk.frtb.sbm_total",
+   "inputs": {
+    "components": [
+     {
+      "risk_class": "GIRR",
+      "measure": "DELTA",
+      "scenarios": {
+       "high": -1.0,
+       "medium": 1.0,
+       "low": 1.0
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "frtb",
+    "invalid"
+   ],
+   "description": "negative charge"
+  },
+  {
+   "case_id": "sbm_total_r6-0011",
+   "operation": "risk.frtb.sbm_total",
+   "inputs": {
+    "components": [
+     {
+      "risk_class": "GIRR",
+      "measure": "DELTA",
+      "scenarios": {
+       "high": 100.0,
+       "medium": 90.0,
+       "low": 80.0
+      }
+     },
+     {
+      "risk_class": "GIRR",
+      "measure": "DELTA",
+      "scenarios": {
+       "high": 100.0,
+       "medium": 90.0,
+       "low": 80.0
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "frtb",
+    "invalid"
+   ],
+   "description": "same class and measure twice"
+  },
+  {
+   "case_id": "sbm_total_r6-0012",
+   "operation": "risk.frtb.sbm_total",
+   "inputs": {
+    "components": [
+     {
+      "risk_class": "GIRR",
+      "measure": "DELTA",
+      "scenarios": {
+       "high": "NaN",
+       "medium": 1.0,
+       "low": 1.0
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "frtb",
+    "invalid",
+    "e1"
+   ],
+   "description": "NaN charge"
+  }
+ ]
+}

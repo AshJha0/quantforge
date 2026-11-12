@@ -10,7 +10,7 @@ The ISDA CDS standard model: piecewise-flat hazard and forward rates, exact inte
 
 Roll date: 20 December of `T`'s year if `T` is on or after 20 September; 20 June if on or after 20 March; else 20 December of the year before. Tenor `nM`/`nY` maturity: roll date plus that many months, on the 20th, unadjusted.
 
-Accrual periods run between 20 March, June, September, December, from the last such date on or before `T` to maturity. Each start and end is moved to the next weekday if on a weekend, except maturity itself. Payment `p_i` is the adjusted end (the last: maturity adjusted). Accrual `alpha_i = (end_i - start_i)/360`, plus one day for the last period. `T` on an adjusted coupon date: `E_INPUT` (ruling D19).
+Accrual periods run between 20 March, June, September, December, from the last such date on or before `T` to maturity. Each start and end is moved to the next weekday if on a weekend, except maturity itself. Payment `p_i` is the adjusted end (the last: maturity adjusted). Accrual `alpha_i = (end_i - start_i)/360`, plus one day for the last period. `T` on an adjusted coupon date is priced (ruling R6-7.3, replacing D19's `E_INPUT`): the last coupon date on or before `T` is `T` itself, so the first period starts on `T`, and the accrued premium at step-in `T + 1` is one day. QuantLib 1.44 `IsdaCdsEngine` on a CDS2015 schedule agrees to 1.3e-11 per unit on four such dates (`r6/cds_imm_r6`), so the rule now has its outside check.
 
 ## Curves
 
@@ -41,7 +41,7 @@ Inputs: `trade_date`, `discount`, `hazard`, `recovery` `R`, `trade` `{maturity, 
 
 ## `credit.cds.bootstrap`
 
-Inputs: `trade_date`, `discount`, `recovery`, `quotes` `[{tenor, spread}]`. Output: `pillars` `[{date, survival}]`, one per quote at its maturity (not maturity + 1, ruling D20). Each quote's `par_spread` equals its spread, solved in tenor order, below 1e-13.
+Inputs: `trade_date`, `discount`, `recovery`, `quotes` `[{tenor, spread}]`. Output: `pillars` `[{date, survival}]`, one per quote at its maturity (not maturity + 1, ruling D20). Each quote's `par_spread` equals its spread, solved in tenor order, below 1e-13 in the oracle's own replay. Against QuantLib's `IsdaCdsEngine` the fair spreads agree to about 1e-11 (not 1e-13) where a maturity or coupon date falls on a weekend and is adjusted (R6-25; 1.3e-11 measured on the `r6/cds_imm_r6` curves).
 
 Checks, in order: `recovery` outside `[0, 1)`: `E_DOMAIN`. Maturities not strictly increasing: `E_INPUT`. A spread `<= 0`: `E_DOMAIN`. `T` on a coupon date: `E_INPUT`.
 

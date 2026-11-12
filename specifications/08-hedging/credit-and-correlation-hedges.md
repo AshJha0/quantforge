@@ -113,3 +113,9 @@ A finite-difference stencil on QuantLib's Margrabe NPV was tried first for the o
 | Q-I5 | CS01 by bumping quotes and re-bootstrapping, or by bumping hazards? | Hazards (I-15). A quote bump needs the quotes, which the hazard-curve input does not carry, and a bootstrap inside a risk call. The two differ by second-order terms. A quote-based CS01 can be added later as a new target name |
 | Q-I6 | JTD with or without the accrued premium? | With: `pv` already includes `accrued Pcs`, and `JTD = (1 - R) - pv` uses it unchanged. `risk.credit.jtd` takes a clean market value as input; here the value is computed, so no input convention is needed (I-16) |
 | Q-I7 | Can exchange options hedge correlation on their own? | No (I-17); a singular case pins it |
+
+## R6 amendments (R6-11.8, R6-11.9, R6-11.16)
+
+- `CS01` together with every bucket is a degenerate target set: CS01 is the sum of the buckets to first order, so the system is nearly dependent and the hedge notionals depend on the bump size. The scaled I-3 test decides; no special refusal.
+- A downward CS01 bump that makes any hazard `h_k - eps` negative is `E_DOMAIN`.
+- `hedge.correlation.neutralise`: a spread volatility `s <= 1e-12 (v1 + v2)` is `E_SINGULAR`.

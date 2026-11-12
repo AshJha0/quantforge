@@ -37,7 +37,7 @@ One-off: 2001-12-31.
 
 - New Year: 1 January, or Monday 2 January if a Sunday. If a Saturday, there is no holiday in lieu.
 - Martin Luther King Day: third Monday of January. Presidents' Day: third Monday of February.
-- Good Friday, except in years when SIFMA recommended an early close instead of a full close: 2007, 2010, 2012, 2015, 2021, 2023 and 2026. The market is open on an early close, so it is a business day for settlement, accrual and schedules (ruling R1-6). Sources per year: `datasets/calendar_provenance.json`.
+- Good Friday, except in years when SIFMA recommended an early close instead of a full close: 2007, 2010, 2012, 2015, 2021, 2023 and 2026. Each of those Good Fridays fell on the first Friday of its month, when the US employment report is published, which is why SIFMA recommended an early close rather than a full close (R6-25). The rule is the published list, not the first-Friday pattern: a future first-Friday Good Friday is a full holiday in this calendar until SIFMA publishes its recommendation and the list is extended. The market is open on an early close, so it is a business day for settlement, accrual and schedules (ruling R1-6). Sources per year: `datasets/calendar_provenance.json`.
 - Memorial Day: last Monday of May.
 - Juneteenth: 19 June from 2022 on, Friday if a Saturday, Monday if a Sunday.
 - Independence Day: 4 July, Friday if a Saturday, Monday if a Sunday.

@@ -31,6 +31,8 @@ jobs:
         run: python3 tools/check_job_names.py
       - name: E9 fixed-seed Monte Carlo hash (R6-15)
         run: python3 tools/check_mc_hash.py --self-test
+      - name: per-file coverage gate self-test (R6-26)
+        run: python3 tools/test_coverage_gate.py
       - name: mutation stages map every stage (R6-14)
         run: python3 conformance/mutation/check_stages.py && python3 conformance/mutation/test_gates.py
       - name: golden case figures by class (R6-12)

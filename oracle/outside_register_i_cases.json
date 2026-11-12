@@ -1,0 +1,3546 @@
+[
+ {
+  "case_id": "hedgebeta_i-0001",
+  "suite": "hedgebeta_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebeta_i-0002",
+  "suite": "hedgebeta_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebeta_i-0003",
+  "suite": "hedgebeta_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebeta_i-0004",
+  "suite": "hedgebeta_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebeta_i-0005",
+  "suite": "hedgebeta_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebeta_i-0006",
+  "suite": "hedgebeta_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebeta_i-0007",
+  "suite": "hedgebeta_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebeta_i-0008",
+  "suite": "hedgebeta_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebeta_i-0009",
+  "suite": "hedgebeta_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebeta_i-0010",
+  "suite": "hedgebeta_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebeta_i-0011",
+  "suite": "hedgebeta_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebeta_i-0012",
+  "suite": "hedgebeta_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebt_i-0001",
+  "suite": "hedgebt_i",
+  "value": true,
+  "sweep": false,
+  "class": "reimplementation",
+  "library": "quantlib-1.44-analytic-european-daily"
+ },
+ {
+  "case_id": "hedgebt_i-0002",
+  "suite": "hedgebt_i",
+  "value": true,
+  "sweep": false,
+  "class": "reimplementation",
+  "library": "quantlib-1.44-analytic-european-daily"
+ },
+ {
+  "case_id": "hedgebt_i-0003",
+  "suite": "hedgebt_i",
+  "value": true,
+  "sweep": false,
+  "class": "reimplementation",
+  "library": "quantlib-1.44-analytic-european-daily"
+ },
+ {
+  "case_id": "hedgebt_i-0004",
+  "suite": "hedgebt_i",
+  "value": true,
+  "sweep": false,
+  "class": "reimplementation",
+  "library": "quantlib-1.44-analytic-european-daily"
+ },
+ {
+  "case_id": "hedgebt_i-0005",
+  "suite": "hedgebt_i",
+  "value": true,
+  "sweep": false,
+  "class": "reimplementation",
+  "library": "quantlib-1.44-analytic-european-daily"
+ },
+ {
+  "case_id": "hedgebt_i-0006",
+  "suite": "hedgebt_i",
+  "value": true,
+  "sweep": false,
+  "class": "reimplementation",
+  "library": "quantlib-1.44-analytic-european-daily"
+ },
+ {
+  "case_id": "hedgebt_i-0007",
+  "suite": "hedgebt_i",
+  "value": true,
+  "sweep": false,
+  "class": "reimplementation",
+  "library": "quantlib-1.44-analytic-european-daily"
+ },
+ {
+  "case_id": "hedgebt_i-0008",
+  "suite": "hedgebt_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebt_i-0009",
+  "suite": "hedgebt_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebt_i-0010",
+  "suite": "hedgebt_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebt_i-0011",
+  "suite": "hedgebt_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebt_i-0012",
+  "suite": "hedgebt_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebt_i-0013",
+  "suite": "hedgebt_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebt_i-0014",
+  "suite": "hedgebt_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebt_i-0015",
+  "suite": "hedgebt_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebt_i-0016",
+  "suite": "hedgebt_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebtcost_i-0001",
+  "suite": "hedgebtcost_i",
+  "value": true,
+  "sweep": false,
+  "class": "reimplementation",
+  "library": "quantlib-1.44-analytic-european-daily"
+ },
+ {
+  "case_id": "hedgebtcost_i-0002",
+  "suite": "hedgebtcost_i",
+  "value": true,
+  "sweep": false,
+  "class": "reimplementation",
+  "library": "quantlib-1.44-analytic-european-daily"
+ },
+ {
+  "case_id": "hedgebtcost_i-0003",
+  "suite": "hedgebtcost_i",
+  "value": true,
+  "sweep": false,
+  "class": "reimplementation",
+  "library": "quantlib-1.44-analytic-european-daily"
+ },
+ {
+  "case_id": "hedgebtcost_i-0004",
+  "suite": "hedgebtcost_i",
+  "value": true,
+  "sweep": false,
+  "class": "reimplementation",
+  "library": "quantlib-1.44-analytic-european-daily"
+ },
+ {
+  "case_id": "hedgebtcost_i-0005",
+  "suite": "hedgebtcost_i",
+  "value": true,
+  "sweep": false,
+  "class": "reimplementation",
+  "library": "quantlib-1.44-analytic-european-daily"
+ },
+ {
+  "case_id": "hedgebtcost_i-0006",
+  "suite": "hedgebtcost_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebtcost_i-0007",
+  "suite": "hedgebtcost_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgebtcost_i-0008",
+  "suite": "hedgebtcost_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecorr5_i-0001",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0002",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0003",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0004",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0005",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0006",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0007",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0008",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0009",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0010",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0011",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0012",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0013",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0014",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0015",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0016",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0017",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0018",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0019",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0020",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0021",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0022",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0023",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0024",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0025",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0026",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0027",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0028",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0029",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0030",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0031",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0032",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0033",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0034",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr5_i-0035",
+  "suite": "hedgecorr5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr_i-0001",
+  "suite": "hedgecorr_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr_i-0002",
+  "suite": "hedgecorr_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr_i-0003",
+  "suite": "hedgecorr_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr_i-0004",
+  "suite": "hedgecorr_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr_i-0005",
+  "suite": "hedgecorr_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr_i-0006",
+  "suite": "hedgecorr_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr_i-0007",
+  "suite": "hedgecorr_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr_i-0008",
+  "suite": "hedgecorr_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr_i-0009",
+  "suite": "hedgecorr_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-margrabe, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecorr_i-0010",
+  "suite": "hedgecorr_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecorr_i-0011",
+  "suite": "hedgecorr_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecorr_i-0012",
+  "suite": "hedgecorr_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecorr_i-0013",
+  "suite": "hedgecorr_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecorr_i-0014",
+  "suite": "hedgecorr_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecorr_i-0015",
+  "suite": "hedgecorr_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecorr_i-0016",
+  "suite": "hedgecorr_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecorr_i-0017",
+  "suite": "hedgecorr_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecorr_i-0018",
+  "suite": "hedgecorr_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecorr_i-0019",
+  "suite": "hedgecorr_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecorr_i-0020",
+  "suite": "hedgecorr_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecost_i-0001",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-trust-constr-split"
+ },
+ {
+  "case_id": "hedgecost_i-0002",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-trust-constr-split"
+ },
+ {
+  "case_id": "hedgecost_i-0003",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp-split"
+ },
+ {
+  "case_id": "hedgecost_i-0004",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-trust-constr-split"
+ },
+ {
+  "case_id": "hedgecost_i-0005",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls-or-lstsq"
+ },
+ {
+  "case_id": "hedgecost_i-0006",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-trust-constr-split"
+ },
+ {
+  "case_id": "hedgecost_i-0007",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp-split"
+ },
+ {
+  "case_id": "hedgecost_i-0008",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp-split"
+ },
+ {
+  "case_id": "hedgecost_i-0009",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp-split"
+ },
+ {
+  "case_id": "hedgecost_i-0010",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp-split"
+ },
+ {
+  "case_id": "hedgecost_i-0011",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp-split"
+ },
+ {
+  "case_id": "hedgecost_i-0012",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls-or-lstsq"
+ },
+ {
+  "case_id": "hedgecost_i-0013",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecost_i-0014",
+  "suite": "hedgecost_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecost_i-0015",
+  "suite": "hedgecost_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecost_i-0016",
+  "suite": "hedgecost_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecost_i-0017",
+  "suite": "hedgecost_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecost_i-0018",
+  "suite": "hedgecost_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecost_i-0019",
+  "suite": "hedgecost_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecost_i-0020",
+  "suite": "hedgecost_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecost_i-0021",
+  "suite": "hedgecost_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecost_i-0022",
+  "suite": "hedgecost_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecost_i-0023",
+  "suite": "hedgecost_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp-split"
+ },
+ {
+  "case_id": "hedgecredit_i-0001",
+  "suite": "hedgecredit_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-isda-cds-engine, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecredit_i-0002",
+  "suite": "hedgecredit_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-isda-cds-engine, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecredit_i-0003",
+  "suite": "hedgecredit_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-isda-cds-engine, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecredit_i-0004",
+  "suite": "hedgecredit_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-isda-cds-engine, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecredit_i-0005",
+  "suite": "hedgecredit_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-isda-cds-engine, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecredit_i-0006",
+  "suite": "hedgecredit_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-isda-cds-engine, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecredit_i-0007",
+  "suite": "hedgecredit_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-isda-cds-engine, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecredit_i-0008",
+  "suite": "hedgecredit_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-isda-cds-engine, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecredit_i-0009",
+  "suite": "hedgecredit_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-isda-cds-engine, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecredit_i-0010",
+  "suite": "hedgecredit_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-isda-cds-engine, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgecredit_i-0011",
+  "suite": "hedgecredit_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecredit_i-0012",
+  "suite": "hedgecredit_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecredit_i-0013",
+  "suite": "hedgecredit_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecredit_i-0014",
+  "suite": "hedgecredit_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecredit_i-0015",
+  "suite": "hedgecredit_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecredit_i-0016",
+  "suite": "hedgecredit_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecredit_i-0017",
+  "suite": "hedgecredit_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecredit_i-0018",
+  "suite": "hedgecredit_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgecredit_i-0019",
+  "suite": "hedgecredit_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeeff5_i-0001",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0002",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0003",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0004",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0005",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0006",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0007",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0008",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0009",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0010",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0011",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0012",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0013",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0014",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0015",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0016",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0017",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0018",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0019",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff5_i-0020",
+  "suite": "hedgeeff5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff_i-0001",
+  "suite": "hedgeeff_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff_i-0002",
+  "suite": "hedgeeff_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff_i-0003",
+  "suite": "hedgeeff_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff_i-0004",
+  "suite": "hedgeeff_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff_i-0005",
+  "suite": "hedgeeff_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-polyfit-corrcoef-var"
+ },
+ {
+  "case_id": "hedgeeff_i-0006",
+  "suite": "hedgeeff_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeeff_i-0007",
+  "suite": "hedgeeff_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeeff_i-0008",
+  "suite": "hedgeeff_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeeff_i-0009",
+  "suite": "hedgeeff_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeeff_i-0010",
+  "suite": "hedgeeff_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgefrontier_i-0001",
+  "suite": "hedgefrontier_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgefrontier_i-0002",
+  "suite": "hedgefrontier_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls-or-lstsq"
+ },
+ {
+  "case_id": "hedgefrontier_i-0003",
+  "suite": "hedgefrontier_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp-split, scipy-1.18-trust-constr-split"
+ },
+ {
+  "case_id": "hedgefrontier_i-0004",
+  "suite": "hedgefrontier_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgefrontier_i-0005",
+  "suite": "hedgefrontier_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgefrontier_i-0006",
+  "suite": "hedgefrontier_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgefrontier_i-0007",
+  "suite": "hedgefrontier_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgefrontier_i-0008",
+  "suite": "hedgefrontier_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgefrontier_i-0009",
+  "suite": "hedgefrontier_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgefrontier_i-0010",
+  "suite": "hedgefrontier_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgegreeks5_i-0001",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0002",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0003",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0004",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0005",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0006",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0007",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0008",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0009",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0010",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0011",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0012",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0013",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0014",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0015",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0016",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0017",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0018",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0019",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0020",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0021",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0022",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0023",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0024",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0025",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0026",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0027",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0028",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0029",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0030",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0031",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0032",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0033",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0034",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0035",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0036",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0037",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0038",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0039",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0040",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0041",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0042",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0043",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0044",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0045",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0046",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0047",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0048",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0049",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks5_i-0050",
+  "suite": "hedgegreeks5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks_i-0001",
+  "suite": "hedgegreeks_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks_i-0002",
+  "suite": "hedgegreeks_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks_i-0003",
+  "suite": "hedgegreeks_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks_i-0004",
+  "suite": "hedgegreeks_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks_i-0005",
+  "suite": "hedgegreeks_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks_i-0006",
+  "suite": "hedgegreeks_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks_i-0007",
+  "suite": "hedgegreeks_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks_i-0008",
+  "suite": "hedgegreeks_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks_i-0009",
+  "suite": "hedgegreeks_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks_i-0010",
+  "suite": "hedgegreeks_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-analytic-european, numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgegreeks_i-0011",
+  "suite": "hedgegreeks_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgegreeks_i-0012",
+  "suite": "hedgegreeks_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgegreeks_i-0013",
+  "suite": "hedgegreeks_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgegreeks_i-0014",
+  "suite": "hedgegreeks_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgegreeks_i-0015",
+  "suite": "hedgegreeks_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgegreeks_i-0016",
+  "suite": "hedgegreeks_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgegreeks_i-0017",
+  "suite": "hedgegreeks_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgegreeks_i-0018",
+  "suite": "hedgegreeks_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgegreeks_i-0019",
+  "suite": "hedgegreeks_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgegreeks_i-0020",
+  "suite": "hedgegreeks_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgegreeks_i-0021",
+  "suite": "hedgegreeks_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0001",
+  "suite": "hedgeint_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0002",
+  "suite": "hedgeint_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0003",
+  "suite": "hedgeint_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0004",
+  "suite": "hedgeint_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0005",
+  "suite": "hedgeint_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0006",
+  "suite": "hedgeint_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0007",
+  "suite": "hedgeint_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0008",
+  "suite": "hedgeint_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0009",
+  "suite": "hedgeint_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0010",
+  "suite": "hedgeint_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0011",
+  "suite": "hedgeint_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0012",
+  "suite": "hedgeint_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0013",
+  "suite": "hedgeint_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0014",
+  "suite": "hedgeint_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0015",
+  "suite": "hedgeint_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0016",
+  "suite": "hedgeint_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0017",
+  "suite": "hedgeint_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0018",
+  "suite": "hedgeint_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeint_i-0019",
+  "suite": "hedgeint_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgemv5_i-0001",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0002",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0003",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0004",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0005",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0006",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0007",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0008",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0009",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0010",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0011",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0012",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0013",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0014",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0015",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0016",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0017",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0018",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0019",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0020",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0021",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0022",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0023",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0024",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0025",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0026",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0027",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0028",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv5_i-0029",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv5_i-0030",
+  "suite": "hedgemv5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv_i-0001",
+  "suite": "hedgemv_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv_i-0002",
+  "suite": "hedgemv_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv_i-0003",
+  "suite": "hedgemv_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv_i-0004",
+  "suite": "hedgemv_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv_i-0005",
+  "suite": "hedgemv_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv_i-0006",
+  "suite": "hedgemv_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv_i-0007",
+  "suite": "hedgemv_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv_i-0008",
+  "suite": "hedgemv_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-lstsq-ols"
+ },
+ {
+  "case_id": "hedgemv_i-0009",
+  "suite": "hedgemv_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "numpy-2.5-solve"
+ },
+ {
+  "case_id": "hedgemv_i-0010",
+  "suite": "hedgemv_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgemv_i-0011",
+  "suite": "hedgemv_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgemv_i-0012",
+  "suite": "hedgemv_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgemv_i-0013",
+  "suite": "hedgemv_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgemv_i-0014",
+  "suite": "hedgemv_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgemv_i-0015",
+  "suite": "hedgemv_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgemv_i-0016",
+  "suite": "hedgemv_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgemv_i-0017",
+  "suite": "hedgemv_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgemv_i-0018",
+  "suite": "hedgemv_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp5_i-0001",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0002",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0003",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls"
+ },
+ {
+  "case_id": "hedgeqp5_i-0004",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp5_i-0005",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0006",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0007",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls"
+ },
+ {
+  "case_id": "hedgeqp5_i-0008",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp"
+ },
+ {
+  "case_id": "hedgeqp5_i-0009",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0010",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0011",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls"
+ },
+ {
+  "case_id": "hedgeqp5_i-0012",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp"
+ },
+ {
+  "case_id": "hedgeqp5_i-0013",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0014",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0015",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls"
+ },
+ {
+  "case_id": "hedgeqp5_i-0016",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp"
+ },
+ {
+  "case_id": "hedgeqp5_i-0017",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0018",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0019",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls"
+ },
+ {
+  "case_id": "hedgeqp5_i-0020",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp"
+ },
+ {
+  "case_id": "hedgeqp5_i-0021",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0022",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0023",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls"
+ },
+ {
+  "case_id": "hedgeqp5_i-0024",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp"
+ },
+ {
+  "case_id": "hedgeqp5_i-0025",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0026",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0027",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls"
+ },
+ {
+  "case_id": "hedgeqp5_i-0028",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp"
+ },
+ {
+  "case_id": "hedgeqp5_i-0029",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp5_i-0030",
+  "suite": "hedgeqp5_i",
+  "value": true,
+  "sweep": true,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0001",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0002",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0003",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0004",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0005",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0006",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0007",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0008",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0009",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls"
+ },
+ {
+  "case_id": "hedgeqp_i-0010",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls"
+ },
+ {
+  "case_id": "hedgeqp_i-0011",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls"
+ },
+ {
+  "case_id": "hedgeqp_i-0012",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-bvls"
+ },
+ {
+  "case_id": "hedgeqp_i-0013",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0014",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp"
+ },
+ {
+  "case_id": "hedgeqp_i-0015",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp"
+ },
+ {
+  "case_id": "hedgeqp_i-0016",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp"
+ },
+ {
+  "case_id": "hedgeqp_i-0017",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp"
+ },
+ {
+  "case_id": "hedgeqp_i-0018",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0019",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0020",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0021",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0022",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0023",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0024",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-slsqp"
+ },
+ {
+  "case_id": "hedgeqp_i-0025",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0026",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0027",
+  "suite": "hedgeqp_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq"
+ },
+ {
+  "case_id": "hedgeqp_i-0028",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0029",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0030",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0031",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0032",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0033",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0034",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0035",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0036",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0037",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0038",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0039",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0040",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0041",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0042",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0043",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeqp_i-0044",
+  "suite": "hedgeqp_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeres_i-0001",
+  "suite": "hedgeres_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeres_i-0002",
+  "suite": "hedgeres_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeres_i-0003",
+  "suite": "hedgeres_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeres_i-0004",
+  "suite": "hedgeres_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeres_i-0005",
+  "suite": "hedgeres_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeres_i-0006",
+  "suite": "hedgeres_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeres_i-0007",
+  "suite": "hedgeres_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeres_i-0008",
+  "suite": "hedgeres_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeres_i-0009",
+  "suite": "hedgeres_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeres_i-0010",
+  "suite": "hedgeres_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeres_i-0011",
+  "suite": "hedgeres_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeselect_i-0001",
+  "suite": "hedgeselect_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq-bvls-per-subset"
+ },
+ {
+  "case_id": "hedgeselect_i-0002",
+  "suite": "hedgeselect_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq-bvls-per-subset"
+ },
+ {
+  "case_id": "hedgeselect_i-0003",
+  "suite": "hedgeselect_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq-bvls-per-subset"
+ },
+ {
+  "case_id": "hedgeselect_i-0004",
+  "suite": "hedgeselect_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq-bvls-per-subset"
+ },
+ {
+  "case_id": "hedgeselect_i-0005",
+  "suite": "hedgeselect_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq-bvls-per-subset"
+ },
+ {
+  "case_id": "hedgeselect_i-0006",
+  "suite": "hedgeselect_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq-bvls-per-subset"
+ },
+ {
+  "case_id": "hedgeselect_i-0007",
+  "suite": "hedgeselect_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq-bvls-per-subset"
+ },
+ {
+  "case_id": "hedgeselect_i-0008",
+  "suite": "hedgeselect_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq-bvls-per-subset"
+ },
+ {
+  "case_id": "hedgeselect_i-0009",
+  "suite": "hedgeselect_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq-bvls-per-subset"
+ },
+ {
+  "case_id": "hedgeselect_i-0010",
+  "suite": "hedgeselect_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "scipy-1.18-lstsq-bvls-per-subset"
+ },
+ {
+  "case_id": "hedgeselect_i-0011",
+  "suite": "hedgeselect_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeselect_i-0012",
+  "suite": "hedgeselect_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeselect_i-0013",
+  "suite": "hedgeselect_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeselect_i-0014",
+  "suite": "hedgeselect_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeselect_i-0015",
+  "suite": "hedgeselect_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeselect_i-0016",
+  "suite": "hedgeselect_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeselect_i-0017",
+  "suite": "hedgeselect_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeselect_i-0018",
+  "suite": "hedgeselect_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeslip_i-0001",
+  "suite": "hedgeslip_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeslip_i-0002",
+  "suite": "hedgeslip_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeslip_i-0003",
+  "suite": "hedgeslip_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeslip_i-0004",
+  "suite": "hedgeslip_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeslip_i-0005",
+  "suite": "hedgeslip_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeslip_i-0006",
+  "suite": "hedgeslip_i",
+  "value": true,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeslip_i-0007",
+  "suite": "hedgeslip_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeslip_i-0008",
+  "suite": "hedgeslip_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeslip_i-0009",
+  "suite": "hedgeslip_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeslip_i-0010",
+  "suite": "hedgeslip_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeslip_i-0011",
+  "suite": "hedgeslip_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgeslip_i-0012",
+  "suite": "hedgeslip_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgexa_i-0001",
+  "suite": "hedgexa_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-zerocurve-analytic-european, numpy-2.5-lstsq"
+ },
+ {
+  "case_id": "hedgexa_i-0002",
+  "suite": "hedgexa_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-zerocurve-analytic-european, numpy-2.5-lstsq"
+ },
+ {
+  "case_id": "hedgexa_i-0003",
+  "suite": "hedgexa_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-zerocurve-analytic-european, numpy-2.5-lstsq"
+ },
+ {
+  "case_id": "hedgexa_i-0004",
+  "suite": "hedgexa_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-zerocurve-analytic-european, numpy-2.5-lstsq"
+ },
+ {
+  "case_id": "hedgexa_i-0005",
+  "suite": "hedgexa_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-zerocurve-analytic-european, numpy-2.5-lstsq"
+ },
+ {
+  "case_id": "hedgexa_i-0006",
+  "suite": "hedgexa_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-zerocurve-analytic-european, numpy-2.5-lstsq"
+ },
+ {
+  "case_id": "hedgexa_i-0007",
+  "suite": "hedgexa_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-zerocurve-analytic-european, numpy-2.5-lstsq"
+ },
+ {
+  "case_id": "hedgexa_i-0008",
+  "suite": "hedgexa_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-zerocurve-analytic-european, numpy-2.5-lstsq"
+ },
+ {
+  "case_id": "hedgexa_i-0009",
+  "suite": "hedgexa_i",
+  "value": true,
+  "sweep": false,
+  "class": "library-primitive",
+  "library": "quantlib-1.44-zerocurve-analytic-european, numpy-2.5-lstsq"
+ },
+ {
+  "case_id": "hedgexa_i-0010",
+  "suite": "hedgexa_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgexa_i-0011",
+  "suite": "hedgexa_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgexa_i-0012",
+  "suite": "hedgexa_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgexa_i-0013",
+  "suite": "hedgexa_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgexa_i-0014",
+  "suite": "hedgexa_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgexa_i-0015",
+  "suite": "hedgexa_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgexa_i-0016",
+  "suite": "hedgexa_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ },
+ {
+  "case_id": "hedgexa_i-0017",
+  "suite": "hedgexa_i",
+  "value": false,
+  "sweep": false,
+  "class": "none",
+  "library": ""
+ }
+]

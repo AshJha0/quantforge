@@ -1,7 +1,7 @@
 # CLI contract
 
-Version 1.11.0 (stage I; the blocks below give the minor versions each stage added). `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
-From stage I (ruling I-51) a build reports `contract_version` `1.11.0`, and the runner stops on any other value. Before stage I every build reported `1.0.0`; nothing in 1.1.0 to 1.11.0 breaks the wire format.
+Version 1.12.0 (R6, v0.8.1; the blocks below give the minor versions each stage added). `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
+From R6 (ruling R6-0.1) a build reports `contract_version` `1.12.0` (stage I: `1.11.0`, ruling I-51), and the runner stops on any other value. Before stage I every build reported `1.0.0`; nothing in 1.1.0 to 1.11.0 breaks the wire format.
  Applies identically to the Java, C++, Python and Rust implementations.
 
 The idea: every implementation is a black box that reads a case and writes a result. The neutral
@@ -18,7 +18,7 @@ to start it from `conformance/runner/implementations.json`.
 | `quantforge run` | Read one case JSON document from stdin to end of file. Write one result JSON document to stdout. |
 | `quantforge batch` | Read JSON Lines from stdin, one case per line. Write one result per line to stdout, in the same order, flushing after each line. |
 | `quantforge --batch` | Exactly the same as `quantforge batch` (1.6.0). Both spellings must work. |
-| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.11.0", "toolchain":...}`. |
+| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.12.0", "toolchain":...}`. |
 | `quantforge operations` | Write a JSON array of the operation names this build supports, sorted. |
 
 `batch` exists because a JVM start per case would dominate run time. `run` and `batch` must give
@@ -141,7 +141,7 @@ These are the same in all four languages. A case that expects an error passes on
 | `E_OUT_OF_RANGE` | An interpolation point lies outside the knots |
 | `E_NONEXISTENT_LOCAL_TIME` | A local time falls in a daylight-saving gap |
 | `E_AMBIGUOUS_LOCAL_TIME` | A local time falls in a daylight-saving overlap and no choice was given |
-| `E_NON_FINITE` | A result would be NaN or infinite |
+| `E_NON_FINITE` | A result would be NaN or infinite, including an intermediate that overflows from finite inputs (ruling R6-8.1: never a crash, never `E_DOMAIN`) |
 | `E_CURRENCY_MISMATCH` | Two amounts in different currencies were combined |
 | `E_ARBITRAGE` | A model result breaks no-arbitrage and the case asked to reject it (`vol.sabr.density`) |
 | `E_LIMIT` | A size-like input is above its limit in `01-core/limits.md`. No work is started |
@@ -355,3 +355,15 @@ Stage I adds operations and one error code, `E_INFEASIBLE` (ruling I-1). `stage-
 
 Adding an operation or an error code is a minor version. Changing the meaning of a key, a code or an
 exit status is a major version, and all four implementations and the runner move together.
+
+## R6 changes (contract 1.12.0, rulings `r6-rulings.md`)
+
+| Operation | Change | Spec |
+|---|---|---|
+| `risk.curve.jacobian` | No entry is set to 0 (R6-1.1); new optional inputs `tension`, `step_end` as `rates.ois.bootstrap` (R6-1.2) | `06-risk/par-and-key-rate.md` |
+| `risk.var.historical`, `risk.var.filtered_historical`, `risk.var.monte_carlo` | `es` is the Acerbi-Tasche estimator with a fractional tail weight; `tail_count = ceil(n - n c)` (R6-3.1) | `06-risk/var-es-and-backtests.md` |
+| `risk.frtb.sbm_total` (new) | MAR21.7 total across classes and measures, per scenario then the largest (R6-4.1) | `06-risk/frtb-sa-girr.md` |
+| every operation | A non-finite result from finite inputs is `E_NON_FINITE`, never a crash and never `E_DOMAIN` (R6-8.1) | this page, error table |
+| policy | New tolerance class `per_unit` (absolute 1e-10, relative 1e-8) for rates, spreads, vols and ratios (R6-10.1, R6-10.2) | `conformance/tolerances/policy.yaml` |
+
+Later R6 waves append rows here (see `program/R6_HANDOVER.md`).

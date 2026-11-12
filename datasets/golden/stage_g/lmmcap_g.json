@@ -115,6 +115,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -226,6 +230,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -337,6 +345,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -448,6 +460,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -547,6 +563,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -646,6 +666,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -745,6 +769,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -844,6 +872,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -955,6 +987,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -1066,6 +1102,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -1177,6 +1217,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -1288,6 +1332,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -1387,6 +1435,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -1486,6 +1538,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -1585,6 +1641,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -1684,6 +1744,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
@@ -1753,6 +1817,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    }
   },
   {
