@@ -40,7 +40,7 @@ class ReviewR6Test {
         for (int i = 0; i < jac.size(); i++) {
             List<?> row = (List<?>) jac.get(i);
             for (int j = i + 1; j < row.size(); j++) {
-                m = Math.max(m, Math.abs(((Number) row.get(j)).doubleValue()));
+                m = Math.max(m, Math.abs(((Json.Number) row.get(j)).value()));
             }
         }
         return m;
