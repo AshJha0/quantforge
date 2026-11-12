@@ -205,3 +205,61 @@ fn core_goldens() {
 fn r2_goldens() {
     replay("r2");
 }
+
+#[test]
+fn stage_i_goldens() {
+    replay("stage_i");
+}
+
+/// The stage I tutorial inputs under `examples/` (handover follow-up to waves 1 to 4d): each
+/// file holds the inputs of one golden case, runs with status `ok`, and that case passes.
+#[test]
+fn stage_i_examples() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
+    let pairs = [
+        ("hedge_greeks_i", "hedgegreeks_i", "hedgegreeks_i-0003"),
+        ("hedge_minvar_i", "hedgemv_i", "hedgemv_i-0006"),
+        ("hedge_beta_i", "hedgebeta_i", "hedgebeta_i-0001"),
+        ("hedge_qp_keyrate_i", "hedgeqp_i", "hedgeqp_i-0009"),
+        ("hedge_qp_minnorm_i", "hedgeqp_i", "hedgeqp_i-0018"),
+        ("hedge_integer_i", "hedgeint_i", "hedgeint_i-0010"),
+        ("hedge_residual_i", "hedgeres_i", "hedgeres_i-0002"),
+        ("hedge_credit_i", "hedgecredit_i", "hedgecredit_i-0004"),
+        ("hedge_correlation_i", "hedgecorr_i", "hedgecorr_i-0003"),
+        ("hedge_crossasset_i", "hedgexa_i", "hedgexa_i-0002"),
+        ("hedge_cost_i", "hedgecost_i", "hedgecost_i-0002"),
+        (
+            "hedge_frontier_i",
+            "hedgefrontier_i",
+            "hedgefrontier_i-0001",
+        ),
+        ("hedge_backtest_i", "hedgebt_i", "hedgebt_i-0001"),
+        ("hedge_effectiveness_i", "hedgeeff_i", "hedgeeff_i-0001"),
+        ("hedge_select_i", "hedgeselect_i", "hedgeselect_i-0009"),
+        ("hedge_slippage_i", "hedgeslip_i", "hedgeslip_i-0003"),
+    ];
+    for (file, suite, id) in pairs {
+        let text = std::fs::read_to_string(root.join(format!("examples/{file}.json"))).unwrap();
+        let (doc, _) = parse(&text).unwrap();
+        let (_, ok) = run_case(text.as_bytes());
+        assert!(ok, "{file} did not return status ok");
+        let golden =
+            std::fs::read_to_string(root.join(format!("datasets/golden/stage_i/{suite}.json")))
+                .unwrap();
+        let (g, _) = parse(&golden).unwrap();
+        let case = g
+            .get("cases")
+            .and_then(Json::as_array)
+            .unwrap()
+            .iter()
+            .find(|c| c.get("case_id").and_then(Json::as_str) == Some(id))
+            .unwrap();
+        assert_eq!(
+            doc.get("inputs"),
+            case.get("inputs"),
+            "{file} inputs differ from {id}"
+        );
+        let m = judge(case);
+        assert!(m.is_empty(), "{id}: {m:?}");
+    }
+}

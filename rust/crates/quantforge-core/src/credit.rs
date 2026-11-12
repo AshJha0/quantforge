@@ -48,6 +48,28 @@ impl Hazard {
         }
     }
 
+    /// The curve with the hazard rate of section `k` (between pillars `k - 1` and `k`, the
+    /// first from `as_of`, the last extended past the last pillar) raised by `shifts[k]`:
+    /// `ln Q_k` moves by `-sum_{j <= k} shifts_j (t_j - t_{j-1})`, `t` in ACT/365F.
+    ///
+    /// # Panics
+    /// If `shifts` does not have one entry per pillar (a caller bug).
+    #[must_use]
+    pub fn with_hazard_shifts(&self, shifts: &[f64]) -> Hazard {
+        assert_eq!(shifts.len(), self.dates.len() - 1, "one shift per section");
+        let mut logs = vec![0.0];
+        let mut moved = 0.0;
+        for k in 1..self.dates.len() {
+            moved += shifts[k - 1] * years(self.dates[k - 1], self.dates[k]);
+            logs.push(self.logs[k] - moved);
+        }
+        Hazard {
+            as_of: self.as_of,
+            dates: self.dates.clone(),
+            logs,
+        }
+    }
+
     pub fn pillars(&self) -> Vec<(Date, f64)> {
         self.dates[1..]
             .iter()

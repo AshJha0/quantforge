@@ -14,7 +14,7 @@ use quantforge_core::json::{Flags, Json, nesting_exceeds, obj, parse};
 use std::io::{BufRead, Read, Write};
 use std::process::ExitCode;
 
-const CONTRACT: &str = "1.0.0";
+const CONTRACT: &str = "1.11.0";
 const SCHEMA: &str = "1.0";
 const MAX_CASE_NESTING: usize = 80;
 
@@ -312,7 +312,14 @@ mod tests {
     fn operations_are_sorted_and_all_dispatch() {
         assert!(operations().windows(2).all(|w| w[0] < w[1]));
         for op in operations() {
-            assert_eq!(code(&case(op, "{}")), Some("E_SCHEMA"), "{op}");
+            // Every key of `hedge.minvar.ratio` is optional, and its spec makes "neither input
+            // form" an `E_INPUT` (hedge-solvers.md, check 1).
+            let want = if *op == "hedge.minvar.ratio" {
+                "E_INPUT"
+            } else {
+                "E_SCHEMA"
+            };
+            assert_eq!(code(&case(op, "{}")), Some(want), "{op}");
         }
     }
 
@@ -636,5 +643,89 @@ mod stage_d_rulings2_tests {
         assert_eq!(b("2026-12-01"), None);
         assert_eq!(b("2026-11-09").as_deref(), Some("E_DATE_ORDER"));
         assert_eq!(b("2028-01-03").as_deref(), Some("E_INPUT"));
+    }
+
+    #[test]
+    fn stage_i_null_keys_and_limits() {
+        let qp = |extra: &str| {
+            code(
+                "hedge.qp.solve",
+                &format!(
+                    r#"{{"a":[[1.0,0.0],[0.0,1.0]],"b":[1.0,2.0],"weights":[1.0,1.0]{extra}}}"#
+                ),
+            )
+        };
+        assert_eq!(qp(""), None);
+        assert_eq!(qp(r#","lower":[null,0.0],"upper":[null,null]"#), None);
+        assert_eq!(qp(r#","ridge":null"#).as_deref(), Some("E_SCHEMA"));
+        assert_eq!(qp(r#","lower":null"#).as_deref(), Some("E_SCHEMA"));
+        assert_eq!(qp(r#","singular":"PSEUDO""#).as_deref(), Some("E_SCHEMA"));
+        assert_eq!(
+            qp(r#","eq_matrix":[[1.0,1.0]]"#).as_deref(),
+            Some("E_INPUT")
+        );
+        let wide = format!("[{}]", vec!["1.0"; 201].join(","));
+        let r = code(
+            "hedge.qp.solve",
+            &format!(r#"{{"a":[{wide}],"b":[1.0],"weights":[1.0]}}"#),
+        );
+        assert_eq!(r.as_deref(), Some("E_LIMIT"));
+        let lots = |extra: &str| {
+            code(
+                "hedge.integer.solve",
+                &format!(r#"{{"a":[[1.0]],"b":[-0.4],"weights":[1.0],"lot_sizes":[1.0]{extra}}}"#),
+            )
+        };
+        assert_eq!(lots(r#","lower_lots":[null],"upper_lots":[3]"#), None);
+        assert_eq!(lots(r#","upper_lots":[1.5]"#).as_deref(), Some("E_SCHEMA"));
+        let beta = |extra: &str| {
+            code(
+                "hedge.beta.futures",
+                &format!(
+                    r#"{{"portfolio_value":1.0,"portfolio_beta":1.0,"target_beta":0.0,"futures_price":1.0,"multiplier":1.0{extra}}}"#
+                ),
+            )
+        };
+        assert_eq!(beta(r#","rounding":"NONE""#), None);
+        assert_eq!(beta(r#","rounding":"UP""#).as_deref(), Some("E_SCHEMA"));
+        let mv = |inputs: &str| code("hedge.minvar.ratio", inputs);
+        assert_eq!(mv(r#"{"covariance":[[1.0,0.5],[0.5,1.0]]}"#), None);
+        assert_eq!(mv("{}").as_deref(), Some("E_INPUT"));
+        assert_eq!(
+            mv(r#"{"exposure_changes":[1.0,2.0,3.0]}"#).as_deref(),
+            Some("E_INPUT")
+        );
+        let leg = r#"{"instrument":"UNDERLYING"}"#;
+        let greeks = |hedges: &str, targets: &str| {
+            code(
+                "hedge.greeks.neutralise",
+                &format!(
+                    r#"{{"spot":100.0,"rate":0.0,"dividend_yield":0.0,"volatility":0.2,"portfolio":[{{"instrument":"CALL","strike":100.0,"expiry_years":1.0,"quantity":1.0}}],"hedges":[{hedges}],"targets":[{targets}]}}"#
+                ),
+            )
+        };
+        assert_eq!(greeks(leg, r#""DELTA""#), None);
+        assert_eq!(
+            greeks(r#"{"instrument":"FUTURE"}"#, r#""DELTA""#).as_deref(),
+            Some("E_SCHEMA")
+        );
+        assert_eq!(greeks(leg, r#""RHO""#).as_deref(), Some("E_SCHEMA"));
+        let four = [leg; 4].join(",");
+        assert_eq!(greeks(&four, r#""DELTA""#).as_deref(), Some("E_LIMIT"));
+        // I-53: n = 20 allows K = 6 (60,459 subsets) but not K = 7 (137,979).
+        let row = format!("[{}]", vec!["0.0"; 20].join(","));
+        let select = |k: i64| {
+            code(
+                "hedge.select.solve",
+                &format!(r#"{{"a":[{row}],"b":[1.0],"weights":[1.0],"max_instruments":{k}}}"#),
+            )
+        };
+        assert_eq!(select(7).as_deref(), Some("E_LIMIT"));
+        assert_ne!(select(6).as_deref(), Some("E_LIMIT"));
+        let res = code(
+            "hedge.residual.report",
+            r#"{"a":[[1.0]],"b":[1.0],"x":[0.5],"covariance":[[2.0]]}"#,
+        );
+        assert_eq!(res, None);
     }
 }
