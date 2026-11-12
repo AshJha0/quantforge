@@ -18,6 +18,7 @@ env:
   FUZZ_ARGS: --seconds ${{ inputs.seconds || '180' }} --seed ${{ github.run_number }} --focus-config conformance/quality/stage_e.json
 jobs:
   java:
+    name: fuzz-java
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -38,6 +39,7 @@ jobs:
           name: fuzz-java
           path: conformance/reports/fuzz/
   cpp:
+    name: fuzz-cpp
     runs-on: ubuntu-24.04
     container:
       image: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
@@ -57,6 +59,7 @@ jobs:
           name: fuzz-cpp
           path: conformance/reports/fuzz/
   python:
+    name: fuzz-python
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -72,6 +75,7 @@ jobs:
           name: fuzz-python
           path: conformance/reports/fuzz/
   rust:
+    name: fuzz-rust
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:

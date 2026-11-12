@@ -14,6 +14,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   changelog:
+    name: release-changelog
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
@@ -37,18 +38,23 @@ jobs:
           name: notes
           path: notes.md
   python-ci:
+    name: release-python-ci
     needs: changelog
     uses: ./.github/workflows/python.yml
   rust-ci:
+    name: release-rust-ci
     needs: changelog
     uses: ./.github/workflows/rust.yml
   java-ci:
+    name: release-java-ci
     needs: changelog
     uses: ./.github/workflows/java25.yml
   cpp-ci:
+    name: release-cpp-ci
     needs: changelog
     uses: ./.github/workflows/cpp26.yml
   build-python:
+    name: release-build-python
     needs: changelog
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -64,6 +70,7 @@ jobs:
           name: python
           path: dist/*
   build-rust:
+    name: release-build-rust
     needs: changelog
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -85,6 +92,7 @@ jobs:
           name: rust
           path: quantforge-rust-cli-*.tar.gz
   build-java:
+    name: release-build-java
     needs: changelog
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -103,6 +111,7 @@ jobs:
           name: java
           path: java25/target/quantforge-*.jar
   build-cpp:
+    name: release-build-cpp
     needs: changelog
     runs-on: ubuntu-24.04
     container: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
@@ -124,6 +133,7 @@ jobs:
           name: cpp
           path: quantforge-cli-*.tar.gz
   release:
+    name: release
     needs: [changelog, python-ci, rust-ci, java-ci, cpp-ci, build-python, build-rust, build-java, build-cpp]
     runs-on: ubuntu-24.04
     timeout-minutes: 20

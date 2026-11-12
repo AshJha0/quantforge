@@ -1,8 +1,13 @@
 name: Cross-platform conformance
 # Weekly Linux, Windows and macOS x the four languages (plan 11.1.5). Standard runners are free on a public repo.
-# Not on pull requests, so it never slows one; run it by hand before a release. The Linux leg repeats
-# conformance.yml on purpose, so the three columns of one run share a commit.
+# R6-15 (review finding 15): also on pull requests that touch core maths (the four implementations or the
+# goldens), over every golden case; at v0.8.0 stages E to I had never run on Windows or macOS in CI. The Linux
+# leg repeats conformance.yml on purpose, so the three columns of one run share a commit.
 on:
+  pull_request:
+    paths: ['cpp26/src/**', 'cpp26/include/**', 'java25/src/main/**', 'python/quantforge_core/**',
+            'rust/crates/*/src/**', 'datasets/golden/**', 'conformance/runner/**', 'conformance/tolerances/**',
+            '.github/workflows/cross-platform.yml']
   schedule:
     - cron: '17 4 * * 0'
   workflow_dispatch:
@@ -19,6 +24,7 @@ env:
   GOLDEN: ${{ inputs.golden || 'datasets/golden' }}
 jobs:
   conformance:
+    name: cross-platform-conformance
     strategy:
       fail-fast: false
       matrix:
@@ -103,6 +109,7 @@ jobs:
           path: conformance/reports/
           if-no-files-found: ignore
   summary:
+    name: cross-platform-summary
     needs: conformance
     if: always()
     runs-on: ubuntu-24.04
