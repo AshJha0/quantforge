@@ -203,3 +203,11 @@ Recomputed from the suite register (every counted case is a value case): **102 o
 ### Stage I per-case register (replaces the suite-count assumption)
 
 `tools/stage_i_case_register.py` writes `oracle/outside_register_i_cases.json` from each case's own `verified_by` (a library is named there only when it agreed within the case tolerance, I-2). Real figures, no assumption: **102 of 153 value cases = 66.7%** without wave 5 and without added cases; 266 of 318 = 83.6% with wave 5; old all-case rule 102 of 278 = 36.7%. The per-case count equals the favourable suite-count reading exactly: every counted case is a value case. No R6 case is added to stage I. Uncounted value cases and reasons, confirmed: `hedgeint_i` 12 (no free bounded integer least-squares solver; HiGHS is MILP or continuous QP); `hedgebeta_i` 8 and `hedgeres_i` 7 (closed-form arithmetic; a check would restate the formula: correct); `hedgeslip_i` 6 (exact rational arithmetic is the oracle itself: correct); `hedgebt_i` 7 and `hedgebtcost_i` 5 (QuantLib values, then the spec's cash-account arithmetic: reimplementation); plus 1 in `hedgecost_i`, 2 in `hedgefrontier_i`, 1 in `hedgemv_i`, 2 in `hedgeqp_i` where no outside solver agreed within tolerance (left uncounted, as I-2 says). Merged `r6-evidence` at `b9b2b3c`.
+
+### R6-1 oracle side: met (plan row reworded to match R6-1.3)
+
+Per-case Richardson gaps, largest upper entry and the truncation explanation: `oracle/R6_JACOBIAN_RICHARDSON.json` (8 value cases of `r6/jacobian_r6`; smooth methods about 5e-6, piecewise SOFR `MONOTONE_CONVEX` and `HYBRID` 1.4e-3). No golden or build change. R6-11.9 and R6-11.16 stay open without goldens: each needs a new check in the language builds, beyond the rulings already implemented.
+
+### R6-1: cause of the 1.4e-3 gaps (follow-up)
+
+Not truncation in the usual small-`h` sense and not a kink: `oracle/R6_JACOBIAN_KINK.json` shows, for entry [10, 9] under SOFR `MONOTONE_CONVEX` and `HYBRID`, central quotients -0.237553 (1 bp), -0.236481 (0.5 bp), -0.236060 (0.1 bp), -0.2360156 (0.01 bp), and forward minus backward 0.0319, 0.0157, 0.00328, 0.000328, which shrinks in proportion to the bump. The zero rate is smooth but strongly curved in that quote, so 1 bp is outside the `h^2` range. Not a defect; documented as a known limit in `par-and-key-rate.md` and R6-1.3. No golden or build change.
