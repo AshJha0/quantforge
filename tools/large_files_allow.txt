@@ -5,3 +5,5 @@
 # the runners. They compress well in git packs.
 datasets/golden/core/limits.json
 datasets/golden/core/limit_order.json
+# R6-8: the n=200 hedge goldens carry full 200-instrument exposure matrices (1.35 MB); shrinking n would drop the large-n evidence the review asked for.
+datasets/golden/r6/hedgeqp_large_r6.json
