@@ -594,7 +594,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1.
 - **Challenger:** ORE 1.8.17 simulation (LGM), and the wave 4a Jamshidian EE for single swaps.
 - **Monitoring thresholds:** EE or CVA against ORE beyond the G-42 bound on a rerun.
-- **Data lineage hash:** sha256 9b7f797c534f58cc47a0906fa156923186607d087a7acad7835e575ee78c4bf3 (`expsim_g`)
+- **Data lineage hash:** sha256 49b806c2c32644e5ac4a9faa4a9902cee2e8a5e2125f6074e614c4ae9f7465ba (`expsim_g`)
 - **Retirement trigger:** a multi-factor or cross-currency exposure engine.
 - **Validation report:** `specifications/06-risk/xva-exposure-portfolio.md`.
 

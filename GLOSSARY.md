@@ -174,6 +174,26 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases at mer
 | Wrong-way risk | Exposure that grows when the counterparty is more likely to default |
 | BGK correction | Broadie, Glasserman and Kou's barrier shift `exp(0.5826 sigma sqrt(dt))`, which turns a continuous barrier formula into a discrete one (ruling G-7) |
 
+## Stage I terms
+
+| Term | Meaning |
+|---|---|
+| Hedge ratio | Units of a hedge instrument held per unit of the exposure; a positively correlated hedge is held short (`hedge.minvar.ratio`, ruling I-8) |
+| Minimum-variance hedge | The holding that minimises the variance of the hedged position's value change, from return or price-change series (`08-hedging/hedge-solvers.md`) |
+| Constrained least squares | Minimising a weighted sum of squared residual risks, with optional equalities and bounds on positions (`hedge.qp.solve`) |
+| Ridge | A penalty `ridge sum x_j^2` added to the objective, which makes a near-singular hedge regular at the price of a small bias |
+| Minimum-norm solution (`MIN_NORM`) | Among all hedges with the least objective, the one with the smallest Euclidean norm; the answer to a singular problem when asked for (ruling I-5) |
+| Residual risk | The book's risk left after the hedge, `A x + b`, and its variance (`hedge.residual.report`) |
+| Integer lots | Positions in whole contracts; found by exact search, since rounding the continuous answer can be far from best (`hedge.integer.solve`, `hedgeint_i-0010`) |
+| CS01 | The change in value for a 1 bp move in credit spread, taken here as half the difference of two repricings with hazards bumped by `±1e-4/(1 − R)` (ruling I-15) |
+| Jump to default (JTD) | The loss or gain if the reference name defaults now: `(1 − R) − pv` per unit of bought protection (ruling I-16) |
+| Correlation01 | The change in value per 0.01 of correlation (ruling I-18) |
+| Market impact | A cost that grows with trade size, here quadratic in the traded amount (`hedge-costs-and-frontier.md`) |
+| Risk-against-cost frontier | The hedges that minimise risk plus a cost weight times cost, traced over a list of weights (`hedge.frontier.solve`) |
+| Dollar offset | Minus the sum of the hedge's value changes over the sum of the hedged item's changes; 1 is a perfect offset, and it swings widely when the item's total change is small (`hedge.effectiveness`, `08-hedging/dynamic-hedge-and-effectiveness.md`) |
+| Implementation shortfall | Execution cost against the decision price plus the opportunity cost of the unfilled quantity, `(Q − q_f)(final_price − d)` (`hedge.slippage.report`, ruling I-36) |
+| Slippage | Execution cost less the cost the model predicted (`hedge.slippage.report`) |
+
 ## Tutorial terms
 
 Terms the [tutorials](docs/getting-started/README.md) use that the stage sections above do not define.

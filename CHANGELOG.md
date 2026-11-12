@@ -8,6 +8,28 @@
 - `tools/check_tutorial.py` checks every `tutorial-*.md` page by default, and checks that a script listed on a page equals the file (`tutorial:source`). `tutorial.yml` runs all pages and watches the new paths.
 - GLOSSARY: a section of tutorial terms.
 
+### Stage I, hedging (draft for 0.8.0)
+
+Stage I takes the hedging domain (plan section 4 row I, TRACEABILITY Domain 08) and plan item Q6, ahead of stage H, and is to be released as 0.8.0 (`program/STAGE_I_HANDOVER.md`). This draft records what is specified and generated; the conformance results of the four builds are added at release, and none is claimed here.
+
+Added (specified, with goldens; `specifications/08-hedging/`, rulings I-1 to I-52 in `specifications/stage-i-rulings.md`, CLI contract block "Stage I operations" and error code `E_INFEASIBLE`):
+- Hedge solvers (wave 1): constrained least squares with equalities, bounds, ridge and a `MIN_NORM` option for singular problems (`hedge.qp.solve`); integer lots by exact search (`hedge.integer.solve`); minimum-variance ratios (`hedge.minvar.ratio`); delta, gamma and vega neutralisation (`hedge.greeks.neutralise`); equity-beta futures (`hedge.beta.futures`); residual risk with per-factor contributions (`hedge.residual.report`). Spec `hedge-solvers.md`.
+- Credit and correlation hedges (wave 2): CS01, bucketed CS01 and jump-to-default hedges with CDS (`hedge.credit.cds`); correlation and vega hedges of exchange options with vanillas (`hedge.correlation.neutralise`). Spec `credit-and-correlation-hedges.md`.
+- Cross-asset hedge of equity and key-rate risk, the risk matrix built by repricing (`hedge.crossasset.solve`, wave 3; `cross-asset-hedge.md`).
+- Costs, impact, liquidity bounds and margin as optional inputs of `hedge.qp.solve`, and the risk-against-cost frontier (`hedge.frontier.solve`, wave 4a; `hedge-costs-and-frontier.md`).
+- Dynamic delta-hedge backtest on a given path, with optional spread and impact costs, and hedge effectiveness by dollar offset, regression and variance reduction (`hedge.backtest.delta`, `hedge.effectiveness`, waves 4b and 4e; `dynamic-hedge-and-effectiveness.md`).
+- Instrument selection by exhaustive subset search (`hedge.select.solve`, wave 4c; `instrument-selection.md`) and execution slippage against a model cost (`hedge.slippage.report`, wave 4d; `hedge-slippage.md`).
+- 276 golden cases in 16 suites under `datasets/golden/stage_i/` (computed: 50-digit mpmath or exact rational references, with outside checks where registered).
+- Sixteen example inputs `examples/hedge_*_i.json`, each one case copied from a named golden; recipes in the COOKBOOK.
+- Q6: the churn bound is preregistered (`research/preregs/Q6-01-churn-bound.md`, hash-checked by `research/test_preregs.py`) before any data or fit.
+
+Known issues (stage I, at this draft):
+- **Q6 is blocked by data terms.** The Cboe delayed-quote pages prohibit automated download, and the Cboe website terms (section 2) and the Deribit terms of service (clause 32.3) forbid publishing derived data without written consent. Q6 waits for an owner decision on the data source; no data were downloaded and nothing was fitted (handover, "Q6 status").
+- **Outside-oracle share 113 of 276 (40.9%), below the 60% floor of ruling I-2.** Error cases count in the denominator and never in the numerator. Integer lots have no free outside solver, and the beta, residual and slippage suites are arithmetic only, so even counting every value case would not close the gap without an owner decision (handover, "Stage I spec status after session 1").
+- **I-48:** Java and C++ return `E_LIMIT` above 20 instruments with a sign-open cost or margin term in `hedge.qp.solve`; the ruling allows no limit below 200 instruments, and both builds must replace the orthant enumeration before release. No golden reaches 20 such instruments. Open at this draft.
+- Tutorials 17 to 21 (hedging) are planned, not written: they need the integrated four-language tree (handover, "Tutorials").
+- Stage G carry-overs: G-42b (needs WSL) and the C++ sanitizer run on wave 4c are still open; the follow-up of the 0.7.0 PFE fix is done: all 96 `expsim_g` value cases were regenerated with the mpmath generator, 1,683 values moved by at most 8.6e-5 (9.2e-4 of the runner limit), and all four builds pass 102 of 102 on the new goldens (observed, `program/STAGE_I_CARRY.md`).
+
 ## 0.7.0: stage G, rates models and xVA (2026-11-11)
 
 Tag `v0.7.0` on `e150116`. Stage G is at Implemented, not Validated. No golden value of an earlier stage changed.
