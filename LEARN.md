@@ -8,7 +8,7 @@ QuantForge has four equal implementations of the same maths, in Java, C++, Pytho
 
 Two ways in:
 
-- **New to quantitative finance, or to this project.** Work through the [tutorials](docs/getting-started/README.md), starting with [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md): quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Tutorials 2 to 16 go on, 10 to 15 minutes each, to bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk and the LIBOR market model, with every number checked in all four languages. Then read the topics below in order.
+- **New to quantitative finance, or to this project.** Work through the [tutorials](docs/getting-started/README.md), starting with [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md): quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Tutorials 2 to 16 go on, 10 to 15 minutes each, to bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk and the LIBOR market model, with every number checked in all four languages. Tutorials 17 to 21 cover stage I, hedging: Greek and dynamic delta hedges, minimum-variance and constrained hedges, credit and correlation hedges, a cross-asset hedge with instrument selection, and what a hedge costs. Then read the topics below in order.
 - **Practitioner.** Jump to a topic. Each worked example names its golden case, so you can rerun it as `COOKBOOK.md` shows and check the number yourself.
 
 Sources: every model and convention cites its papers, books and standards in the `## Sources` section of its spec. [References](docs/references.md) collects them all by topic, with each one's status (read, not opened, or paywalled) and the specs that rely on it.
@@ -453,6 +453,8 @@ Stage G (released as v0.7.0 on 2026-11-11) is at Implemented, not Validated. On 
 ## Stage I: hedging
 
 Stage I is built and is to be released as v0.8.0. Everything below is specified in `specifications/08-hedging/` (rulings I-1 to I-55) and pinned by 443 golden cases in 21 suites in `datasets/golden/stage_i/`. On the integration tree, at CLI contract 1.11.0, each of the four builds passed 14,935 of 14,935 golden cases, all stages included (2026-11-11, observed on one Windows machine through the neutral runner). Every input is synthetic.
+
+Tutorials 17 to 21 work through this section with real outputs in all four languages: [17, delta hedges](docs/getting-started/tutorial-17-delta-hedge.md), [18, the QP solver](docs/getting-started/tutorial-18-minvar-qp.md), [19, credit and correlation](docs/getting-started/tutorial-19-credit-correlation.md), [20, equity and rates](docs/getting-started/tutorial-20-cross-asset.md) and [21, costs](docs/getting-started/tutorial-21-hedge-costs.md).
 
 ### A hedge is a small least-squares problem
 

@@ -1,8 +1,8 @@
 name: Tutorial
 # Runs every code block of the tutorials (docs/getting-started/tutorial-*.md) on a fresh runner, one job per
 # language, and fails if a block prints anything other than the lines a page shows (plan 13.2 E2). Page 1 builds
-# each CLI and pages 2 to 16 reuse it. Tutorial 1's acceptance test is under 10 minutes per language from a cold
-# start, so the jobs use no build cache; the timeout allows for the fifteen later pages.
+# each CLI and pages 2 to 21 reuse it. Tutorial 1's acceptance test is under 10 minutes per language from a cold
+# start, so the jobs use no build cache; the timeout allows for the twenty later pages.
 on:
   push:
     branches: [main]
