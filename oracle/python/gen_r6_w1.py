@@ -45,12 +45,23 @@ def jac(conv, kind, quotes, kw, h):
     return [[cols[j][i] for j in range(n)] for i in range(n)]
 
 
+CACHE = Path(__file__).resolve().parent / ".r6_jac_cache"  # git-ignored scratch; a rerun after a failure reuses finished builds
+
+
 def one_build(b):
+    import datetime
     conv, kind, kw = b
+    f = CACHE / f"{conv}_{kind}.json"
+    if f.exists():
+        d = json.loads(f.read_text())
+        return [datetime.date.fromisoformat(x) for x in d["pil"]], d["z0"], d["J"], d["Jh"]
     _estr()
     q = Q1.QUOTES[conv]
     pil, z0 = zeros_at(conv, kind, q, kw)
-    return pil, z0, jac(conv, kind, q, kw, BP), jac(conv, kind, q, kw, BP / 2)
+    J, Jh = jac(conv, kind, q, kw, BP), jac(conv, kind, q, kw, BP / 2)
+    CACHE.mkdir(exist_ok=True)
+    f.write_text(json.dumps({"pil": [d.isoformat() for d in pil], "z0": z0, "J": J, "Jh": Jh}))
+    return pil, z0, J, Jh
 
 
 def _estr():
@@ -61,7 +72,7 @@ def _estr():
 def jacobian_suite():
     s = Suite("jacobian_r6", "specifications/06-risk/par-and-key-rate.md", G)
     builds = [("SOFR", "MONOTONE_CONVEX", {}), ("SOFR", "MONOTONIC_LOG_CUBIC", {}), ("SOFR", "TENSION_SPLINE", {"tension": 0.5}),
-              ("SOFR", "HYBRID", {"step_end_idx": 2}), ("SONIA", "MONOTONE_CONVEX", {}), ("ESTR", "MONOTONIC_LOG_CUBIC", {}),
+              ("SOFR", "HYBRID", {"step_end_idx": 2}), ("SONIA", "MONOTONE_CONVEX", {}), ("ESTR", "MONOTONE_CONVEX", {}),
               ("SOFR", "LOG_LINEAR_DF", {}), ("SOFR", "LINEAR_ZERO", {})]
     worst = {}
     from concurrent.futures import ProcessPoolExecutor

@@ -49,3 +49,46 @@ Baseline before R6 goldens: 14,941 cases (7,419 value-checked) after the evidenc
 Every wave 1 golden comes from the oracle (`oracle/python/gen_r6_w1.py`; ES from `gen_stage_f_w2.py F4`). Independent checks run before writing: ES against a numpy Acerbi-Tasche written from the paper's form (20 of 20 historical cases within 1e-9); SBM total against a brute-force recomputation; tolerance re-judging on three builds (`conformance/tolerances/R6_REJUDGE_*.json`).
 
 WAVE 1A READY 2826732 (sbm_total_r6, nonfinite_r6, risk_f4, per_unit classes, all rulings above; jacobian_r6 follows as WAVE 1B)
+
+## Wave 2: R6-2, R6-5, R6-7 (and R6-3's ES spec already in wave 1)
+
+Read: `specifications/r6-rulings.md` R6-2.1, R6-2.2, R6-5.1 to R6-5.6, R6-7.1 to R6-7.6; specs `04-pricing/exotics.md` (stage G section), `06-risk/xva-exposure-portfolio.md`, `04-pricing/mbs.md`, `04-pricing/credit.md` (Dates), `04-pricing/bonds.md` (basis), `02-curves/inflation.md` (`infl.linker.price`).
+
+### Behaviour changes
+
+| Ruling | Operation | Change |
+|---|---|---|
+| R6-2.1 | `exotic.barrier.price`, `DISCRETE` | `E_DOMAIN` outside the envelope: allowed only for `DOWN_OUT` `CALL` with `barrier <= strike` or `UP_OUT` `PUT` with `barrier >= strike`, `rebate == 0`, and `abs(ln(spot/barrier)) >= 1.25 * vol * sqrt(T/n)` with `n = floor(m T + 0.5)`. Checked after the existing domain checks (E-A19, `n = 0`); compute in binary64, the goldens keep every decision away from 1.25 (closest inside 1.32, closest outside 0.91) |
+| R6-5.1 | `xva.exposure.portfolio_hw` | Output keys `pfe_95`, `pfe_99` renamed `deflated_pfe_95`, `deflated_pfe_99` (general rule R6-5.6). Values unchanged |
+| R6-5.5 | `xva.exposure.portfolio_hw` | Find every zero and level crossing as stated (critical points from `f'`, at least 6,001 scan points over +-12 sd, bisection). No golden value changes (stage G goldens were corrected by `fix_w4c_pfe.py`); builds that scan coarsely may fail `pfe_99` |
+| R6-7.1 | `mbs.cashflows`, `mbs.price` | PSA with any monthly `CPR_k >= 1` (k = 1..wam): `E_DOMAIN`, after the existing checks. Python v0.8.0 crashes here (`complex` not serialisable: reproduced) |
+| R6-7.3 | `credit.cds.*` | Trade date on an adjusted coupon date is priced: the last IMM date on or before `T` is `T`'s own unadjusted date, the first period starts at `T` (adjusted), one day accrued at step-in. Remove the D19 `E_INPUT` |
+| R6-7.5 | `infl.linker.price` | `ref_cpi = round5(trunc6(raw))`, `index_ratio = round5(trunc6(ref_cpi / base_ref_cpi))`, nominal figures times that rounded ratio; `trunc6(x) = floor(x * 1e6) / 1e6`, `round5(t) = floor(t * 1e5 + 0.5) / 1e5` in binary64 |
+| R6-7.2, R6-7.4, R6-7.6 | basis, ESTR, MBS delay | No behaviour change (new golden; ESTR lag 2 confirmed; `delay_days` documented) |
+
+### Golden files (wave 2)
+
+| File | Cases | Value | Error | Notes |
+|---|---:|---:|---:|---|
+| `r6/barrier_r6.json` (new) | 14 | 6 | 8 | edge of the envelope; every value case MC-checked |
+| `stage_g/barrier_g.json` (changed) | 37 | 9 (was 31) | 28 (was 6) | 22 value cases now `E_DOMAIN`, same ids |
+| `r6/mbs_r6.json` (new) | 10 | 2 | 8 | |
+| `r6/cds_imm_r6.json` (new) | 8 | 8 | 0 | QuantLib `IsdaCdsEngine` within 1.3e-11 |
+| `stage_d/credit_d.json` (changed) | 19 | 14 (was 13) | 5 (was 6) | `credit_d-0017` now a value case |
+| `r6/basis_r6.json` (new) | 1 | 1 | 0 | |
+| `stage_d/inflation_d.json` (changed) | 13 | 8 | 5 | `-0010`, `-0011` rounded |
+| `stage_g/expsim_g.json` (changed) | 102 | 96 | 6 | keys renamed |
+
+### Expected totals after wave 2 (with wave 1B)
+
+**15,000** cases: value-checked **7,428**, error **5,058**, invariance **2,514**.
+
+### Python v0.8.0 against wave 2 (`tools/r6_judge.py`): every failure is an intended change
+
+`barrier_g` 22 fail (now `E_DOMAIN`), `barrier_r6` 8 fail, `mbs_r6` crash (complex), `cds_imm_r6` 8 fail and `credit_d-0017` (`E_INPUT`), `inflation_d` 2 fail (rounding), `expsim_g` 96 fail (keys); `basis_r6` passes.
+
+### Oracle agreement
+
+Goldens from `oracle/python/gen_r6_w2.py`, `gen_stage_g_w1.py R9`, `gen_stage_d_credit.py`, `gen_stage_d_w3.py`; MC acceptance 13 of 13 (`oracle/R6_BARRIER_ACCEPTANCE.json`); QuantLib CDS within 1.3e-11; basis implied repo re-solved by brentq within 1e-12.
+
+WAVE 2 READY 3c5bcfe
