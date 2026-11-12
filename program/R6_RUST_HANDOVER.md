@@ -48,3 +48,16 @@ See the final section, written after the last run.
 1. Final conformance on 3C (expect 15,076 = 7,440 / 5,122 / 2,514).
 2. `cargo clippy --workspace --all-targets -- -D warnings` and `cargo test --workspace` (run detached, `-j 2`) after waves 2-3.
 3. T6 timing target (5 s at n = 200) not met: 121 s and 158 s.
+
+## Final results (2026-11-12, 21:48, supersede the sections above)
+
+WSL release build from `git archive e0d2a65` (r6 at `c7c6bd7`, wave 4, merged in; cargo `-j2`; log `/home/ashish/r6rust2.log`):
+
+- `cargo clippy --workspace --all-targets -- -D warnings`: clean.
+- `cargo test --release --workspace`: all pass.
+- Conformance: 15,077 of 15,077 pass (includes `aadladder_r6` 1 of 1). This replaces the void 15,918.
+- `hedgeqp_large_r6`: 5 of 5 pass in 105.2 s for the suite, under shared load (53.8 s and 56.6 s on earlier runs today). T6 (5 s per case at n = 200) is still not met.
+- Coverage: cargo-llvm-cov is not installed in WSL, so CI is the only source (`coverage-stage-rust`).
+- Spec ruling J-R6-5 on `p` in `10 (n + p) + 100` counts equality rows, finite bounds and the margin row. Rust already did this, so no change was needed.
+
+Fixes made in this run: the golden replay test was missing the `per_unit` class (R6-10.2); two unit tests still expected pre-wave-2 behaviour (R6-2.1 envelope; D19 check removed); two clippy doc lints in `var.rs`; and the Jacobi-unscaled QP answer could land one ulp outside a bound, so it is now clamped to the caller's bounds (a proptest found this).
