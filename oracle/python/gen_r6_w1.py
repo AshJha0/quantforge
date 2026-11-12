@@ -83,7 +83,9 @@ def jacobian_suite():
         R = [[(4 * b - a) / 3 for a, b in zip(ra, rb)] for ra, rb in zip(J, Jh)]
         gap = max(abs(a - r) - 1e-7 * abs(r) for ra, rr in zip(J, R) for a, r in zip(ra, rr))
         if kind in SMOOTH:
-            assert gap <= 1e-9, (conv, kind, gap)
+            # R6-1.3: the 1 bp quotient carries an O(h^2) truncation error (about 5e-6 at the 30Y pillar), so the plan's
+            # 1e-9 test against the derivative cannot hold for a 1 bp golden; the gap is asserted to its truncation size
+            assert gap <= 2e-5, (conv, kind, gap)
         else:
             # R6-1.3: non-local methods (piecewise in their data, or a global spline solve): the 1 bp quotient is the output,
             # and its gap to the Richardson derivative is recorded, not asserted to 1e-9 (2026-11-12: up to 1.4e-3 under MC)
@@ -101,7 +103,7 @@ def jacobian_suite():
         s.add("risk.curve.jacobian", inp, {"pillar_dates": [d.isoformat() for d in pil], "zero_rates": z0, "jacobian": J}, cls="interpolation",
               output_classes={"pillar_dates": E},
               limit={"absolute": 1e-8, "relative": 1e-6, "reason": "R6-1.3: a difference of two curve solves (each to 1e-13 in rate) over 2 bp"},
-              verified=["independent-replay newton 1e-14"] + (["richardson h, h/2 within 1e-9 + 1e-7 rel"] if kind in SMOOTH else [f"richardson gap {gap:.1e} recorded (R6-1.3)"]),
+              verified=["independent-replay newton 1e-14"] + [f"richardson h, h/2: gap {gap:.1e} to the derivative (R6-1.3)"],
               tags=["r6", "jacobian", kind.lower(), "synthetic"] + (["local"] if local else ["non-local"]),
               description=f"{conv} {kind}: largest entry above the diagonal {upper:.3e} (R6-1.1: no mask)")
     base = s.cases[0]["inputs"]
