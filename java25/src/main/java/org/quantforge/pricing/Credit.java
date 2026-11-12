@@ -97,6 +97,20 @@ public final class Credit {
          * @param shift one hazard shift per section
          * @return the shifted curve
          */
+        /** The flat hazard of each section, from the log survival at its end. */
+        public double[] hazards() {
+            double[] h = new double[lnQ.length];
+            double prev = 0.0;
+            double tPrev = 0.0;
+            for (int k = 0; k < h.length; k++) {
+                double tk = t(dates[k]);
+                h[k] = -(lnQ[k] - prev) / (tk - tPrev);
+                prev = lnQ[k];
+                tPrev = tk;
+            }
+            return h;
+        }
+
         public Hazard shifted(double[] shift) {
             double[] l = new double[lnQ.length];
             double acc = 0.0;

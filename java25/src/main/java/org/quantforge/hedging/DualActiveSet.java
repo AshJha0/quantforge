@@ -51,7 +51,7 @@ final class DualActiveSet {
         double[] u = new double[n];
         boolean[] isActive = new boolean[p];
         int q = 0;
-        for (int iter = 0; iter < 20 * (p + n) + 100; iter++) {
+        for (int iter = 0; iter < LeastSquaresHedge.iterationCap(n); iter++) { // R6-6.1
             int pick = mostViolated(c, d, y, isActive);
             if (pick < 0) {
                 double[] lambda = new double[p];

@@ -218,8 +218,11 @@ public final class CorrelationHedge {
                 exchange |= in.kind() == Kind.EXCHANGE;
             }
         }
-        if (exchange && !(mk.spreadVol() > 0.0)) {
+        if (exchange && !(mk.spreadVol() > 0.0)) { // golden hedgecorr_i-0015 keeps E_DOMAIN at exactly 0
             throw domain("correlation");
+        }
+        if (exchange && !(mk.spreadVol() > 1e-12 * (mk.vol1() + mk.vol2()))) { // ruling R6-11.16
+            throw new QfError("E_SINGULAR", "the spread volatility is degenerate", "correlation");
         }
         double[] before = new double[5];
         for (Instrument in : book) {

@@ -58,7 +58,17 @@ public final class LeastSquaresHedge {
             Double marginLimit) {}
 
     /** Relative slack in the subgradient test at a kink before a sign is flipped. */
-    private static final double KINK_TOL = 1e-9;
+    private static final double KINK_TOL = 1e-11; // ruling R6-6.1: one kink tolerance for every build
+
+    /** Ruling R6-6.1: iteration cap {@code 10 n + 100}; a test may lower it (property test of the cap). */
+    static int capOverride = -1;
+
+    /** Ruling R6-6.1: at most 1,000,000 enumerated lattice points; a test may lower it. */
+    static long nodeCapOverride = -1;
+
+    static int iterationCap(int n) {
+        return capOverride >= 0 ? capOverride : 10 * n + 100;
+    }
 
     /**
      * A {@code hedge.integer.solve} answer.
@@ -566,7 +576,7 @@ public final class LeastSquaresHedge {
         if (cur == null) {
             throw new QfError("E_INFEASIBLE", "no point satisfies the bounds, equalities and margin limit");
         }
-        for (int iter = 0; iter < 4 * n + 100; iter++) {
+        for (int iter = 0; iter < iterationCap(n); iter++) {
             List<Integer> broken = new ArrayList<>();
             int worst = -1;
             double worstExcess = 0.0;
@@ -634,12 +644,12 @@ public final class LeastSquaresHedge {
         }
         if (r == 0) {
             for (int j = 0; j < n; j++) {
-                double tol = 1e-10 * Math.max(1.0, Math.abs(xp[j]));
+                double tol = 1e-9 * Math.max(1.0, Math.abs(xp[j]));
                 if (xp[j] < lo[j] - tol || xp[j] > hi[j] + tol) {
                     throw new QfError("E_INFEASIBLE", "the equalities fix a point outside the bounds");
                 }
             }
-            if (row != null && Dense.dot(row, xp) > limit + 1e-10 * Math.max(1.0, limit)) {
+            if (row != null && Dense.dot(row, xp) > limit + 1e-9 * Math.max(1.0, limit)) {
                 throw new QfError("E_INFEASIBLE", "the equalities fix a point above the margin limit");
             }
             return new double[0];
@@ -933,7 +943,12 @@ public final class LeastSquaresHedge {
         }
 
         /** Fixes coordinates {@code i, i-1, ..., 0} given {@code nn[i+1..]} and their partial sum. */
+        private long nodes;
+
         void enumerate(int i, long[] nn, double partial) {
+            if (++nodes > (nodeCapOverride >= 0 ? nodeCapOverride : 1_000_000L)) {
+                throw new QfError("E_NO_CONVERGENCE", "integer search passed 1,000,000 points (ruling R6-6.1)");
+            }
             if (i < 0) {
                 offer(nn);
                 return;

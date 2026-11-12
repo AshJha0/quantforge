@@ -234,7 +234,7 @@ public final class HedgeRatios {
     public record GreekHedge(double[] quantities, double[] before, double[] after) {}
 
     /** Per-unit delta, gamma and vega of one instrument. */
-    static double[] greeks(Market mk, Position p) {
+    public static double[] greeks(Market mk, Position p) {
         if (p.instrument() == Instrument.UNDERLYING) {
             return new double[] {1.0, 0.0, 0.0};
         }

@@ -104,6 +104,12 @@ public final class CreditHedge {
         for (int k = 0; k < shift.length; k++) {
             down[k] = -shift[k];
         }
+        double[] h = q.hazards();
+        for (int k = 0; k < h.length; k++) {
+            if (h[k] - shift[k] < 0.0) { // ruling R6-11.9
+                throw new QfError("E_DOMAIN", "a downward hazard bump goes below 0", "spreads");
+            }
+        }
         double up = Credit.price(t, p, q.shifted(shift), r, maturity, coupon, 1.0, true, false).pv();
         double dn = Credit.price(t, p, q.shifted(down), r, maturity, coupon, 1.0, true, false).pv();
         return (up - dn) / 2.0;
