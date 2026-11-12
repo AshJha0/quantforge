@@ -45,9 +45,29 @@ def listed():
     return set(re.findall(r"^- `([^`]+)` \|", NOTE.read_text(encoding="utf-8"), re.M))
 
 
+RULE_NOTE = D / "DEVIATION-2026-11-12-recorder-rule.md"
+
+
+def rules():
+    """Rule lines of the recorder note: a location pattern with `*` for the report date, and a date range."""
+    out = []
+    for pat, lo, hi in re.findall(r"^- rule `([^`]+)` \|[^|]*\|[^|]*\| (\d{4}-\d\d-\d\d) to (\d{4}-\d\d-\d\d)$",
+                                  RULE_NOTE.read_text(encoding="utf-8"), re.M):
+        out.append((re.compile("^" + re.escape(pat).replace(r"\*", r"(\d{4}-\d\d-\d\d)") + "$"), lo, hi))
+    return out
+
+
+def covered(loc, rs):
+    for rx, lo, hi in rs:
+        m = rx.match(loc)
+        if m and lo <= m.group(1) <= hi:
+            return True
+    return False
+
+
 def unlisted(hits):
-    ok = listed()
-    return sorted({h[0] for h in hits} - ok)
+    ok, rs = listed(), rules()
+    return sorted(loc for loc in {h[0] for h in hits} - ok if not covered(loc, rs))
 
 
 class HoldoutObservations(unittest.TestCase):
@@ -73,6 +93,16 @@ class HoldoutObservations(unittest.TestCase):
         good = holdout_scan.scan_text("docs/y.md", "SOFR fixing on 2026-11-12: 3.90%")
         self.assertEqual(unlisted(bad), ["docs/x.md"])
         self.assertEqual(good, [])
+
+    def test_recorder_rule_covers_only_its_files_and_dates(self):
+        rs = rules()
+        self.assertEqual(len(rs), 2)
+        self.assertTrue(covered("forward-log:reports/2026-11-12/sofr-check.json", rs))
+        self.assertTrue(covered("forward-log:reports/2026-11-12/sofr-check.md", rs))
+        self.assertFalse(covered("forward-log:reports/2026-11-05/sofr-check.json", rs))  # before the rule's range
+        self.assertFalse(covered("forward-log:reports/2027-05-03/sofr-check.json", rs))  # after it
+        self.assertFalse(covered("forward-log:reports/2026-11-12/p&l-explain.json", rs))  # another report
+        self.assertEqual(unlisted([("forward-log:reports/2026-11-12/sofr-check.json",), ("docs/x.md",)]), ["docs/x.md"])
 
 
 class Q6Prereg(unittest.TestCase):

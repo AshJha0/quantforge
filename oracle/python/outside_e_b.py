@@ -161,7 +161,11 @@ def _qm(M):
 def h_validate(u, i, exp):
     M = i["matrix"]
     n = len(M)
-    me = min(u("CORR.EIGEN", _qm([[(M[a][b] + M[b][a]) / 2 for b in range(n)] for a in range(n)])).eigenvalues())
+    ev = list(u("CORR.EIGEN", _qm([[(M[a][b] + M[b][a]) / 2 for b in range(n)] for a in range(n)])).eigenvalues())
+    if len(ev) != n or n == 0:
+        # Degenerate input or a QuantLib build that returned no spectrum: the case is not checked and never counts as passing.
+        raise NotImplementedError(f"QuantLib returned {len(ev)} eigenvalues for an n = {n} matrix; not a check of the golden")
+    me = min(ev)
     sym = all(M[a][b] == M[b][a] for a in range(n) for b in range(n))
     dg = all(M[a][a] == 1.0 for a in range(n))
     rg = all(-1 <= x <= 1 for r in M for x in r)
