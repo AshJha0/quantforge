@@ -59,11 +59,14 @@ jobs:
         run: |
           python3 oracle/python/compare_rederivation.py oracle/rederivation/results.json --source "blind re-derivation, Sonnet 5.5, 2026-11-12" --write
           git diff --exit-code -- oracle/REDERIVATION_REGISTER.json
-      - name: Show which oracle files this job rewrote (diagnostic)
+      - name: Stage D register matches the committed copy
+        # outside_d.py (the floor step) rewrites oracle/outside_register.json; stage E and F registers are diffed in
+        # job oracle-outside-registers-ef. This step kept the D diff when E/F moved to Windows (PR 35).
         run: |
-          git status --short -- oracle/
-          git diff --stat -- oracle/
-          git diff -U0 -- oracle/outside_register.json | head -60
+          if ! git diff --exit-code -- oracle/outside_register.json; then
+            echo "::error::oracle/outside_register.json differs from a fresh run; rerun outside_d.py and commit the register"
+            exit 1
+          fi
       - name: D6 shares, floor and register-against-golden check (R6-13)
         run: |
           python3 tools/test_outside_shares.py
