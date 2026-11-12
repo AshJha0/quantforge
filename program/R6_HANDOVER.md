@@ -211,3 +211,7 @@ Per-case Richardson gaps, largest upper entry and the truncation explanation: `o
 ### R6-1: cause of the 1.4e-3 gaps (follow-up)
 
 Not truncation in the usual small-`h` sense and not a kink: `oracle/R6_JACOBIAN_KINK.json` shows, for entry [10, 9] under SOFR `MONOTONE_CONVEX` and `HYBRID`, central quotients -0.237553 (1 bp), -0.236481 (0.5 bp), -0.236060 (0.1 bp), -0.2360156 (0.01 bp), and forward minus backward 0.0319, 0.0157, 0.00328, 0.000328, which shrinks in proportion to the bump. The zero rate is smooth but strongly curved in that quote, so 1 bp is outside the `h^2` range. Not a defect; documented as a known limit in `par-and-key-rate.md` and R6-1.3. No golden or build change.
+
+## Rulings on the Python lane questions (2026-11-12)
+
+See `r6-rulings.md`, section "Python lane questions": R6-6.2a (no scaling under `MIN_NORM`: confirmed), R6-6.1a (exact-zero kink test conforms for an exact active set; coverage gap: no golden distinguishes it), R6-16a (test file names are not G4 modules), E-Q7 and E-Q11 ruled as Python built them, F-Q1 and F-Q4 ruled (field text and method not normative), G-Q2 deferred to J-10, R6-6.4a (Python's large hedge solve missed T6/T7: 412.6 s against 46 s; target unchanged; `expsim_g` has no target). R6-1.3 wording now matches the corrected plan row: R6-1 met.
