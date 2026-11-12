@@ -36,6 +36,8 @@ Each model below gets one entry, the "page" the plan asks for. Outside-checked s
 | M22 | Least-squares calibration | `03-calibration/least-squares.md` | B | Implemented | known truth only |
 | M23 | Linear-cost hedge solver | `08-hedging/stage-b-hedges.md` | B | Implemented | none |
 
+The index covers stages B to D (M1 to M23). Stage E entries are under "Stage E models" below; stage F, G and I entries (MF-, MG-, MI-) are under "Stage F, G and I models".
+
 Numerical engines in `01-core` (root finders, quadrature, PDE, Monte Carlo, COS, RNG, Sobol) are tools, not models. They are tested against analytic and library values in stage A.
 
 ## Entries
@@ -321,7 +323,7 @@ Outside-checked counts are from `oracle/outside_register_e_b.json`.
 
 Measured on branch `stage-e`. Pooled CI score before the closeout tests: **84.3%** (2,360 killed, 439 survived; CI run 42590488102, `mutation-report.md`). Two columns: the score before the closeout tests, and the score after them where tests were added.
 
-Evidence classes. Java: PIT on unit tests, full mutant set (observed, CI). C++ "before": local `--unit` runs on a 40-site sample, 0 timeouts (observed, local); the CI report's golden-only C++ scores are lower because they do not run the unit tests. Python and Rust "before": CI sample of 40 mutants, unit or golden (observed, CI). Every "after" score is a hand-applied survivor check: each surviving sampled mutant was applied by hand against the new tests (`cpp26/tests/test_mutants_e.cpp` after commit `996527c`, `python/tests/test_mutants_e.py`, `rust/crates/quantforge-core/tests/mutants_e.rs`). It is not a fresh full mutation run. Remaining survivors are classed as equivalent by the author, with reasons in those test files; a second reviewer's sign-off is scheduled (plan 13.2 T).
+Evidence classes. Java: PIT on unit tests, full mutant set (observed, CI). C++ "before": local `--unit` runs on a 40-site sample, 0 timeouts (observed, local); the CI report's golden-only C++ scores are lower because they do not run the unit tests. Python and Rust "before": CI sample of 40 mutants, unit or golden (observed, CI). Every "after" score is a hand-applied survivor check: each surviving sampled mutant was applied by hand against the new tests (`cpp26/tests/test_boundaries_vol_credit.cpp`, first added as `test_mutants_e.cpp` in commit `996527c`, `python/tests/test_mutants_e.py`, `rust/crates/quantforge-core/tests/garch_mutants.rs`). It is not a fresh full mutation run. Remaining survivors are classed as equivalent by the author, with reasons in those test files; a second reviewer's sign-off is scheduled (plan 13.2 T).
 
 | Module | Java (PIT) | C++ before | C++ after | Python before | Python after | Rust before | Rust after |
 |---|---|---|---|---|---|---|---|
@@ -336,7 +338,7 @@ Evidence classes. Java: PIT on unit tests, full mutant set (observed, CI). C++ "
 
 Every cell is at or above the 80% target after the closeout tests, on the evidence classes above.
 
-## Stage F models (waves 1 to 3: F1 curve layer, F3 sensitivities, F4 portfolio risk, F5 book, F6 model fixes)
+## Stage F, G and I models (MF-1 to MF-11 stage F; MG-1 to MG-14 stage G; MI-1 to MI-7 stage I)
 
 Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of the golden suite file that pins the model, as committed by the spec session (`sha256sum datasets/golden/stage_f/<suite>.json`); a golden regeneration changes it and must be recorded here. Tier: 1 = feeds prices or risk that a desk would act on; 2 = feeds analytics and reports; 3 = research or challenger.
 
