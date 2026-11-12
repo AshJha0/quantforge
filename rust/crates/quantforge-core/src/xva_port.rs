@@ -224,7 +224,11 @@ impl Deflated {
         if self.cdf(0.0) >= q {
             return 0.0;
         }
-        let mut hi = self.knots.iter().map(|z| self.value(*z)).fold(0.0_f64, f64::max);
+        let mut hi = self
+            .knots
+            .iter()
+            .map(|z| self.value(*z))
+            .fold(0.0_f64, f64::max);
         let mut lo = 0.0;
         for _ in 0..200 {
             let m = 0.5 * (lo + hi);

@@ -23,7 +23,9 @@ thread_local! {
 
 /// `10 (n + p) + 100`, `n` instruments and `p` constraints (R6-6.1 as amended in wave 3B).
 fn set_cap(n: usize, p: usize) {
-    let cap = PLANTED_CAP.with(std::cell::Cell::get).unwrap_or(10 * (n + p) + 100);
+    let cap = PLANTED_CAP
+        .with(std::cell::Cell::get)
+        .unwrap_or(10 * (n + p) + 100);
     ITERATION_CAP.with(|c| c.set(cap));
 }
 
@@ -501,7 +503,13 @@ fn reduced(h: &Matrix, c: &[f64], xp: &[f64], z_rows: &Matrix) -> (Matrix, Vec<f
 fn jacobi(h: &Matrix) -> Vec<f64> {
     h.iter()
         .enumerate()
-        .map(|(j, row)| if row[j] > 0.0 { 1.0 / row[j].sqrt() } else { 1.0 })
+        .map(|(j, row)| {
+            if row[j] > 0.0 {
+                1.0 / row[j].sqrt()
+            } else {
+                1.0
+            }
+        })
         .collect()
 }
 
@@ -509,7 +517,12 @@ fn jacobi(h: &Matrix) -> Vec<f64> {
 fn scaled(m: &Matrix, d: &[f64]) -> Matrix {
     m.iter()
         .enumerate()
-        .map(|(i, row)| row.iter().enumerate().map(|(j, v)| d[i] * v * d[j]).collect())
+        .map(|(i, row)| {
+            row.iter()
+                .enumerate()
+                .map(|(j, v)| d[i] * v * d[j])
+                .collect()
+        })
         .collect()
 }
 
@@ -519,7 +532,11 @@ fn scaled_rows(e: &[Vec<f64>], d: &[f64]) -> Vec<Vec<f64>> {
         .map(|r| {
             let v: Vec<f64> = r.iter().zip(d).map(|(a, b)| a * b).collect();
             let norm = v.iter().map(|x| x * x).sum::<f64>().sqrt();
-            if norm > 0.0 { v.iter().map(|x| x / norm).collect() } else { v }
+            if norm > 0.0 {
+                v.iter().map(|x| x / norm).collect()
+            } else {
+                v
+            }
         })
         .collect()
 }
@@ -765,7 +782,10 @@ fn nonsmooth_minimiser(
         }
     }
     if !converged {
-        return fail("E_NO_CONVERGENCE", "sign-state iteration limit reached (R6-6.1)");
+        return fail(
+            "E_NO_CONVERGENCE",
+            "sign-state iteration limit reached (R6-6.1)",
+        );
     }
     Ok(Some(last))
 }
@@ -830,9 +850,14 @@ pub fn qp_solve(p: &QpProblem) -> Result<QpSolution> {
     // solution unchanged and keeps mixed-unit problems away from false E_SINGULAR. A scalar
     // ridge is not invariant under column scaling, so a ridged problem is solved as given.
     if let Some(d) = jacobi_for(p) {
-        let a: Matrix = p.a.iter().map(|r| r.iter().zip(&d).map(|(v, s)| v * s).collect()).collect();
+        let a: Matrix =
+            p.a.iter()
+                .map(|r| r.iter().zip(&d).map(|(v, s)| v * s).collect())
+                .collect();
         let e: Option<Matrix> = p.eq_matrix.map(|e| {
-            e.iter().map(|r| r.iter().zip(&d).map(|(v, s)| v * s).collect()).collect()
+            e.iter()
+                .map(|r| r.iter().zip(&d).map(|(v, s)| v * s).collect())
+                .collect()
         });
         let sb = |b: Option<&[Option<f64>]>| -> Option<Vec<Option<f64>>> {
             b.map(|b| b.iter().zip(&d).map(|(v, s)| v.map(|v| v / s)).collect())
@@ -892,8 +917,12 @@ fn jacobi_for(p: &QpProblem) -> Option<Vec<f64>> {
     let cw = p.costs.cost_weight.unwrap_or(1.0);
     let d: Vec<f64> = (0..n)
         .map(|j| {
-            let h: f64 = p.a.iter().zip(p.weights).map(|(r, w)| w * r[j] * r[j]).sum::<f64>()
-                + p.costs.impact.map_or(0.0, |v| cw * v[j]);
+            let h: f64 =
+                p.a.iter()
+                    .zip(p.weights)
+                    .map(|(r, w)| w * r[j] * r[j])
+                    .sum::<f64>()
+                    + p.costs.impact.map_or(0.0, |v| cw * v[j]);
             1.0 / h.sqrt()
         })
         .collect();
@@ -983,7 +1012,11 @@ fn qp_solve_unscaled(p: &QpProblem) -> Result<QpSolution> {
         eigen_pairs(&g)?
     };
     // R6-6.2: the singularity decision (and the reported rank) on the Jacobi-scaled form.
-    let rank = if dim == 0 { 0 } else { scaled_reduced_rank(&h, e)? };
+    let rank = if dim == 0 {
+        0
+    } else {
+        scaled_reduced_rank(&h, e)?
+    };
     let margin = costs.margin_rates.zip(costs.margin_limit);
     let kinks = Kinks {
         spread: half_spreads.iter().map(|s| cost_weight * s).collect(),
@@ -1176,7 +1209,10 @@ impl LotSearch<'_> {
     fn branch(&mut self, lower: &mut [Option<f64>], upper: &mut [Option<f64>]) -> Result<()> {
         self.nodes += 1;
         if self.nodes > self.node_cap {
-            return fail("E_NO_CONVERGENCE", "integer search node limit reached (R6-6.1)");
+            return fail(
+                "E_NO_CONVERGENCE",
+                "integer search node limit reached (R6-6.1)",
+            );
         }
         let Some(y) = bounded_minimiser(&self.g, &self.lin, &self.eye, &self.zero, lower, upper)?
         else {
@@ -1289,7 +1325,9 @@ pub fn integer_solve(p: &IntegerProblem) -> Result<IntegerSolution> {
         lot_sizes: s,
         best: None,
         nodes: 0,
-        node_cap: PLANTED_CAP.with(std::cell::Cell::get).unwrap_or(INTEGER_NODE_CAP),
+        node_cap: PLANTED_CAP
+            .with(std::cell::Cell::get)
+            .unwrap_or(INTEGER_NODE_CAP),
     };
     let Some(relaxed) =
         bounded_minimiser(&search.g, &search.lin, &search.eye, &search.zero, &lo, &hi)?
@@ -1425,11 +1463,15 @@ pub fn minvar_ratio(input: MinVarInput) -> Result<MinVar> {
     let mut lc = vec![vec![0.0; k]; k];
     for i in 0..k {
         for j in 0..=i {
-            let v = s[i + 1][j + 1] * d[i] * d[j] - (0..j).map(|q| lc[i][q] * lc[j][q]).sum::<f64>();
+            let v =
+                s[i + 1][j + 1] * d[i] * d[j] - (0..j).map(|q| lc[i][q] * lc[j][q]).sum::<f64>();
             if i == j {
                 // R6 wave 3B: at or below -1e-12 indefinite; absolute size below 1e-12 singular.
                 if v <= -THRESHOLD {
-                    return fail("E_NOT_POSITIVE_DEFINITE", "the hedge block is not positive definite");
+                    return fail(
+                        "E_NOT_POSITIVE_DEFINITE",
+                        "the hedge block is not positive definite",
+                    );
                 }
                 if v.abs() < THRESHOLD {
                     return fail("E_SINGULAR", "the hedge instruments are not independent");
@@ -1907,7 +1949,6 @@ pub fn select_solve(p: &QpProblem, max_instruments: i64, extra_keys: bool) -> Re
         residual,
         objective,
     })
-
 }
 
 /// One listed hedge of use case 6: the instrument, contracts per lot and the half-spread per
@@ -1947,7 +1988,15 @@ pub fn option_hedge_lots(
         finite("portfolio", &[leg.strike, leg.expiry, Some(*q)])?;
     }
     for h in hedges {
-        finite("hedges", &[h.leg.strike, h.leg.expiry, Some(h.lot_size), Some(h.half_spread)])?;
+        finite(
+            "hedges",
+            &[
+                h.leg.strike,
+                h.leg.expiry,
+                Some(h.lot_size),
+                Some(h.half_spread),
+            ],
+        )?;
     }
     if hedges.is_empty() {
         return fail("E_INPUT", "hedges is empty");
@@ -1959,9 +2008,15 @@ pub fn option_hedge_lots(
         .iter()
         .map(|(leg, q)| Ok((leg.instrument()?, *q)))
         .collect::<Result<_>>()?;
-    let insts: Vec<GreekInstrument> =
-        hedges.iter().map(|h| h.leg.instrument()).collect::<Result<_>>()?;
-    if hedges.iter().any(|h| h.lot_size <= 0.0 || h.half_spread < 0.0) || max_lots < 1 {
+    let insts: Vec<GreekInstrument> = hedges
+        .iter()
+        .map(|h| h.leg.instrument())
+        .collect::<Result<_>>()?;
+    if hedges
+        .iter()
+        .any(|h| h.lot_size <= 0.0 || h.half_spread < 0.0)
+        || max_lots < 1
+    {
         return fail(
             "E_DOMAIN",
             "lot_size must be positive, half_spread non-negative, max_lots at least 1",
@@ -2033,7 +2088,12 @@ mod r6_cap_tests {
     /// `E_NO_CONVERGENCE`.
     #[test]
     fn planted_cap_of_one_is_no_convergence() {
-        let a: Matrix = vec![vec![1.0, 0.3, 0.2], vec![0.1, 1.0, 0.4], vec![0.2, 0.1, 1.0], vec![0.5, 0.5, 0.5]];
+        let a: Matrix = vec![
+            vec![1.0, 0.3, 0.2],
+            vec![0.1, 1.0, 0.4],
+            vec![0.2, 0.1, 1.0],
+            vec![0.5, 0.5, 0.5],
+        ];
         let b = [1.0, -2.0, 0.5, 0.7];
         let w = [1.0; 4];
         PLANTED_CAP.with(|c| c.set(Some(1)));
@@ -2048,11 +2108,22 @@ mod r6_cap_tests {
             lower: None,
             upper: None,
             singular: Singular::Error,
-            costs: Costs { half_spreads: Some(&spreads), ..Costs::default() },
+            costs: Costs {
+                half_spreads: Some(&spreads),
+                ..Costs::default()
+            },
         };
         let r = qp_solve(&q);
         let lots = [0.01, 0.01, 0.01];
-        let ip = IntegerProblem { a: &a, b: &b, weights: &w, ridge: 0.0, lot_sizes: &lots, lower_lots: None, upper_lots: None };
+        let ip = IntegerProblem {
+            a: &a,
+            b: &b,
+            weights: &w,
+            ridge: 0.0,
+            lot_sizes: &lots,
+            lower_lots: None,
+            upper_lots: None,
+        };
         let ri = integer_solve(&ip);
         PLANTED_CAP.with(|c| c.set(None));
         assert_eq!(r.unwrap_err().code, "E_NO_CONVERGENCE");

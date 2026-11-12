@@ -718,7 +718,11 @@ pub(crate) fn option_hedge_lots(i: &Inputs) -> Result<Outcome> {
                 .collect(),
         );
         let (l, _) = leg(i, "hedges", &rest, false)?;
-        hedges.push(hs::LotHedge { leg: l, lot_size, half_spread });
+        hedges.push(hs::LotHedge {
+            leg: l,
+            lot_size,
+            half_spread,
+        });
     }
     let targets = i
         .array("targets")?
@@ -735,7 +739,10 @@ pub(crate) fn option_hedge_lots(i: &Inputs) -> Result<Outcome> {
     let r = hs::option_hedge_lots(&market, &portfolio, &hedges, &targets, max_lots)?;
     plain(obj([
         ("greeks_before", greeks_obj(r.before)),
-        ("lots", Json::Arr(r.lots.iter().map(|v| Json::Int(*v)).collect())),
+        (
+            "lots",
+            Json::Arr(r.lots.iter().map(|v| Json::Int(*v)).collect()),
+        ),
         ("greeks_after", greeks_obj(r.after)),
         ("hedge_cost", r.hedge_cost.into()),
         ("rounding_cost", r.rounding_cost.into()),
