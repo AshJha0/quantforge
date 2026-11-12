@@ -47,3 +47,9 @@ R6-6.1b: after the sign state is found, Java's final step is an exact re-solve o
 ### Open questions (detail in `java25/SPEC_QUESTIONS.md`, section R6)
 
 J-R6-1 negative-pivot band; J-R6-2 `hedgecorr_i-0015` expects `E_DOMAIN` against R6-11.16 `E_SINGULAR`; J-R6-3 the 4 stale goldens above; J-R6-4 scaled test not applied under `MIN_NORM`; J-R6-5 dual active-set cap now `10 n + 100`.
+
+## Wave 3B (r6 merged at `b19054f` or later)
+
+Applied: iteration cap `10 (n + p) + 100` with `p` the constraints (dual active set: its constraint count; sign search: the equalities); minvar scaled pivot at or below -1e-12 is `E_NOT_POSITIVE_DEFINITE`, absolute size below 1e-12 `E_SINGULAR`; `MIN_NORM` unscaled; `hedgecorr_i-0015` `E_DOMAIN` confirmed. Every J-R6 question is closed.
+
+Results: conformance **15,918 of 15,918** pass on the goldens present after this merge (the runner counts every file now on `r6`, which is more than the 15,076 stated for wave 3; the coordinator should check the expected total). The 4 regenerated goldens pass. `mvn -o verify`: 528 tests, 0 failures, 0 skipped.
