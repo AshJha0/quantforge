@@ -16,13 +16,13 @@ class ReviewR6Test {
         return (Map<?, ?>) Json.parse(Main.handle(request).json()).value();
     }
 
-    /** Finding 15, R6-8: a finite coupon that overflows the conversion factor is E_DOMAIN, not a crash. */
+    /** Finding 15, R6-8: a finite coupon that overflows the conversion factor is E_NON_FINITE (R6-8.1), not a crash. */
     @Test
-    void conversionFactorOverflowIsDomain() {
+    void conversionFactorOverflowIsNonFinite() {
         Map<?, ?> r = run("bond.futures.conversion_factor", "\"bond\":{\"maturity\":\"2033-11-15\",\"coupon\":-1e308,"
                 + "\"frequency\":2},\"delivery_month\":\"2026-12\",\"notional_coupon\":0.06");
         assertEquals("error", r.get("status"));
-        assertEquals("E_DOMAIN", ((Map<?, ?>) r.get("error")).get("code"));
+        assertEquals("E_NON_FINITE", ((Map<?, ?>) r.get("error")).get("code"));
     }
 
     private static final String QUOTES = "\"as_of\":\"2026-11-06\",\"convention\":\"SOFR\",\"quotes\":["

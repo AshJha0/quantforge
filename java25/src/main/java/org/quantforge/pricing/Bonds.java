@@ -259,8 +259,8 @@ public final class Bonds {
         double bb = cpn / 2.0 * (6.0 - v) / 6.0;
         double c = z < 7 ? Math.pow(1.03, -2.0 * n) : Math.pow(1.03, -2.0 * n - 1.0);
         double cf = a * (cpn / 2.0 + cpn / 0.06 * (1.0 - c) + c) - bb;
-        if (!Double.isFinite(cf)) { // a finite coupon such as -1e308 can overflow (ruling R6-8)
-            throw new QfError("E_DOMAIN", "conversion factor overflows binary64", "bond");
+        if (!Double.isFinite(cf)) { // a finite coupon such as -1e308 can overflow (ruling R6-8.1)
+            throw new QfError("E_NON_FINITE", "conversion factor overflows binary64", "bond");
         }
         return new BigDecimal(cf).setScale(4, RoundingMode.HALF_EVEN).doubleValue();
     }

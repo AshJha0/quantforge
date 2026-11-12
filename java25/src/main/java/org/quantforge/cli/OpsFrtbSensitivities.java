@@ -78,7 +78,66 @@ final class OpsFrtbSensitivities {
         return out;
     }
 
+    private enum RiskClass { GIRR, CSR_NONSEC, EQ, COMM, FX }
+
+    private enum Measure { DELTA, VEGA, CURVATURE }
+
+    private static final String[] SCENARIOS = {"high", "medium", "low"};
+
+    /** MAR21.7 total over risk classes and measures within each scenario, then the worst scenario (R6-4.1). */
+    private static Out sbmTotal(In in) {
+        List<In> list = in.objects("components");
+        in.limit(list.size() > MAX, "components");
+        List<String> ids = new ArrayList<>();
+        double[][] charge = new double[list.size()][3];
+        for (int i = 0; i < list.size(); i++) {
+            In x = list.get(i);
+            RiskClass rc = x.choice("risk_class", RiskClass.class);
+            Measure m = x.choice("measure", Measure.class);
+            In sc = x.object("scenarios");
+            for (int k = 0; k < 3; k++) {
+                charge[i][k] = sc.real(SCENARIOS[k]);
+            }
+            ids.add(rc + "/" + m);
+        }
+        in.gate();
+        if (list.isEmpty()) {
+            throw new org.quantforge.core.QfError("E_INPUT", "at least one component is needed", "components");
+        }
+        for (double[] c : charge) {
+            for (double v : c) {
+                if (v < 0.0) {
+                    throw new org.quantforge.core.QfError("E_DOMAIN", "a charge is negative", "components");
+                }
+            }
+        }
+        if (new HashSet<>(ids).size() != ids.size()) {
+            throw new org.quantforge.core.QfError("E_INPUT", "a risk class and measure appear twice", "components");
+        }
+        double[] total = new double[3];
+        double sumOwn = 0.0;
+        for (double[] c : charge) {
+            for (int k = 0; k < 3; k++) {
+                total[k] += c[k];
+            }
+            sumOwn += Math.max(c[0], Math.max(c[1], c[2]));
+        }
+        int bind = 0;
+        for (int k = 1; k < 3; k++) {
+            if (total[k] > total[bind]) {
+                bind = k;
+            }
+        }
+        Map<String, Object> totals = new java.util.LinkedHashMap<>();
+        for (int k = 0; k < 3; k++) {
+            totals.put(SCENARIOS[k], total[k]);
+        }
+        return Operations.out("scenario_totals", totals, "capital", total[bind], "binding_scenario", SCENARIOS[bind],
+                "sum_of_component_capitals", sumOwn);
+    }
+
     static void register(Map<String, Function<In, Out>> table) {
+        table.put("risk.frtb.sbm_total", OpsFrtbSensitivities::sbmTotal);
         table.put("risk.frtb.fx_delta", in -> {
             Rows r = rows(in, false, "pair");
             Set<String> spec = in.has("specified_pairs") ? new HashSet<>(in.strings("specified_pairs")) : Set.of();
