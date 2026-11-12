@@ -181,8 +181,8 @@ TwoAssetGreeks unit_two_asset_greeks(const TwoAssetMarket& m, const TwoAssetPosi
             // Margrabe [M78]: receive Q1 S1 for Q2 S2 at expiry.
             const double t = p.expiry_years, sq = std::sqrt(t), rho = m.correlation;
             const double s = std::sqrt(m.vol1 * m.vol1 + m.vol2 * m.vol2 - 2.0 * rho * m.vol1 * m.vol2);
-            if (!(s > 1e-12 * (m.vol1 + m.vol2)))  // R6-11.16: a degenerate Margrabe volatility
-                throw Error("E_SINGULAR", "the spread volatility of an exchange option is 0", "hedges");
+            if (!(s > 1e-12 * (m.vol1 + m.vol2)))  // R6-11.16 (corrected to E_DOMAIN): a degenerate Margrabe volatility
+                throw Error("E_DOMAIN", "the spread volatility of an exchange option is 0", "hedges");
             const double c1 = p.quantity1 * std::exp(-m.yield1 * t), c2 = p.quantity2 * std::exp(-m.yield2 * t);
             const double f1 = c1 * m.spot1, f2 = c2 * m.spot2;
             const double d1 = (std::log(f1 / f2) + 0.5 * s * s * t) / (s * sq), d2 = d1 - s * sq;

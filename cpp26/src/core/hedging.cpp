@@ -243,7 +243,7 @@ public:
     }
 
     bool solve() {
-        const auto max_steps = std::size_t(detail::effort_cap(10 * (long long)n_ + 100));  // R6-6.1
+        const auto max_steps = std::size_t(detail::effort_cap(10 * (long long)(n_ + normals_.size()) + 100));  // R6-6.1, J-R6-5
         std::vector<char> in_active(normals_.size(), 0);
         for (std::size_t step = 0; step < max_steps;) {
             // Step 1: the most violated constraint not yet active.
@@ -645,7 +645,11 @@ private:
             for (const std::size_t j : free_) sign_[j] = smooth[j] < 0.0 ? -1 : 1;
         }
         std::vector<std::vector<int>> seen;
-        const long long cap = detail::effort_cap(10 * (long long)n_ + 100);  // R6-6.1
+        // R6-6.1 as amended (J-R6-5): 10 (n + p) + 100, p the equality rows, finite bounds and the margin row.
+        long long constraints = (long long)(n_ - (ns_.z.empty() ? 0 : ns_.z.front().size())) + (margined_ ? 1 : 0);
+        for (std::size_t j = 0; j < lower_.size(); ++j) constraints += lower_[j] ? 1 : 0;
+        for (std::size_t j = 0; j < upper_.size(); ++j) constraints += upper_[j] ? 1 : 0;
+        const long long cap = detail::effort_cap(10 * ((long long)n_ + constraints) + 100);
         for (long long iteration = 0;; ++iteration) {
             if (iteration >= cap) throw Error("E_NO_CONVERGENCE", "the sign-state method passed 10 n + 100 iterations (R6-6.1)");
             seen.push_back(sign_);
@@ -835,12 +839,16 @@ QpResult solve_qp_impl(const QpProblem& p, bool by_orthants) {
     const double hs_max = largest_abs(jacobi_eigen(hs).values);
     const NullSpace nss = null_space(ed, Vec(k, 0.0), n);
     const Vec res = jacobi_eigen(project(nss.z, hs)).values;
-    const auto rank = std::ranges::count_if(res, [&](double v) { return v > singular_threshold * hs_max; });
+    const auto scaled_rank = std::ranges::count_if(res, [&](double v) { return v > singular_threshold * hs_max; });
     const double h_max = largest_abs(jacobi_eigen(q.h).values);
     const NullSpace ns = null_space(e, k ? *p.eq_rhs : Vec{}, n);
     const Matrix reduced = project(ns.z, q.h);
     const Eigen re = jacobi_eigen(reduced);
     const double threshold = singular_threshold * h_max;
+    // MIN_NORM keeps the unscaled rank and pseudo-inverse (R6-6.2a, J-R6-4).
+    const auto rank = p.singular == Singular::MinNorm
+                          ? std::ranges::count_if(re.values, [&](double v) { return v > threshold; })
+                          : scaled_rank;
     if (p.singular == Singular::Error && std::size_t(rank) < reduced.size())
         throw Error("E_SINGULAR", "the hedge has no unique minimiser", "a");
     // Gradient of the reduced objective at y = 0, halved: Z^T (H x_p + c).
@@ -1072,9 +1080,10 @@ MinVarResult min_variance(const Matrix& cov) {
         // R6-11.7 and R6-6.2: a negative pivot is an indefinite hedge block; a small pivot is judged on the
         // correlation (Jacobi-scaled) form, whose pivots are d / S_jj.
         const double sjj = cov[j + 1][j + 1];
-        if (d < 0.0 || sjj < 0.0)
+        // Band (Java lane ruling): scaled pivot <= -1e-12 indefinite; |scaled pivot| < 1e-12 singular.
+        if (sjj < 0.0 || (sjj > 0.0 && d / sjj <= -singular_threshold))
             throw Error("E_NOT_POSITIVE_DEFINITE", "the hedge covariance block is indefinite", "covariance");
-        if (!(sjj > 0.0) || d / sjj <= singular_threshold)
+        if (!(sjj > 0.0) || d / sjj < singular_threshold)
             throw Error("E_SINGULAR", "the hedge instruments are linearly dependent", "covariance");
         l[j][j] = std::sqrt(d);
         for (std::size_t i = j + 1; i < k; ++i) {
