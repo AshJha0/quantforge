@@ -13,141 +13,53 @@
     "records": [
      {
       "sequence": 1,
-      "series_id": "A",
-      "event_time": "2026-11-02T16:05:00Z",
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
       "knowledge_time": "2026-11-02T16:05:00Z",
-      "value": "NaN",
-      "note": [
-       [
-        [
-         [
-          [
-           [
-            [
-             [
-              [
-               [
-                [
-                 [
-                  [
-                   [
-                    [
-                     [
-                      [
-                       [
-                        [
-                         [
-                          [
-                           [
-                            [
-                             [
-                              [
-                               [
-                                [
-                                 [
-                                  [
-                                   [
-                                    [
-                                     [
-                                      [
-                                       [
-                                        [
-                                         [
-                                          [
-                                           [
-                                            [
-                                             [
-                                              [
-                                               [
-                                                [
-                                                 [
-                                                  [
-                                                   [
-                                                    [
-                                                     [
-                                                      [
-                                                       [
-                                                        [
-                                                         [
-                                                          [
-                                                           [
-                                                            [
-                                                             [
-                                                              [
-                                                               [
-                                                                [
-                                                                 [
-                                                                  [
-                                                                   [
-                                                                    [
-                                                                     [
-                                                                      [
-                                                                       1
-                                                                      ]
-                                                                     ]
-                                                                    ]
-                                                                   ]
-                                                                  ]
-                                                                 ]
-                                                                ]
-                                                               ]
-                                                              ]
-                                                             ]
-                                                            ]
-                                                           ]
-                                                          ]
-                                                         ]
-                                                        ]
-                                                       ]
-                                                      ]
-                                                     ]
-                                                    ]
-                                                   ]
-                                                  ]
-                                                 ]
-                                                ]
-                                               ]
-                                              ]
-                                             ]
-                                            ]
-                                           ]
-                                          ]
-                                         ]
-                                        ]
-                                       ]
-                                      ]
-                                     ]
-                                    ]
-                                   ]
-                                  ]
-                                 ]
-                                ]
-                               ]
-                              ]
-                             ]
-                            ]
-                           ]
-                          ]
-                         ]
-                        ]
-                       ]
-                      ]
-                     ]
-                    ]
-                   ]
-                  ]
-                 ]
-                ]
-               ]
-              ]
-             ]
-            ]
-           ]
-          ]
-         ]
-        ]
-       ]
-      ]
+      "value": "NaN"
+     },
+     {
+      "sequence": 2,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.08
+     },
+     {
+      "sequence": 3,
+      "series_id": "SONIA",
+      "event_time": "2026-11-03T16:00:00Z",
+      "knowledge_time": "2026-11-03T16:05:00Z",
+      "value": 3.74
+     },
+     {
+      "sequence": 4,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": 3.72
+     },
+     {
+      "sequence": 5,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": null,
+      "deleted": true
+     },
+     {
+      "sequence": 6,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": 1.09
+     },
+     {
+      "sequence": 7,
+      "series_id": "SONIA",
+      "event_time": "2026-11-01T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": null
      }
     ]
    },
@@ -164,10 +76,82 @@
     "e1",
     "non-finite-input"
    ],
-   "description": "F-2: NaN at records/0/value (from limit_order-0014)"
+   "description": "F-2: NaN at records/0/value (from store-0015)"
   },
   {
    "case_id": "e1_r6-0002",
+   "operation": "core.store.chain",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 3.73
+     },
+     {
+      "sequence": 2,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.08
+     },
+     {
+      "sequence": 3,
+      "series_id": "SONIA",
+      "event_time": "2026-11-03T16:00:00Z",
+      "knowledge_time": "2026-11-03T16:05:00Z",
+      "value": 3.74
+     },
+     {
+      "sequence": 4,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": 3.72
+     },
+     {
+      "sequence": 5,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": null,
+      "deleted": true
+     },
+     {
+      "sequence": 6,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": "-Infinity"
+     },
+     {
+      "sequence": 7,
+      "series_id": "SONIA",
+      "event_time": "2026-11-01T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": null
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at records/5/value (from store-0015)"
+  },
+  {
+   "case_id": "e1_r6-0003",
    "operation": "core.store.query_as_of",
    "inputs": {
     "records": [
@@ -240,7 +224,7 @@
    "description": "F-2: NaN at records/0/value (from store-0001)"
   },
   {
-   "case_id": "e1_r6-0003",
+   "case_id": "e1_r6-0004",
    "operation": "core.store.query_as_of",
    "inputs": {
     "records": [
@@ -313,7 +297,7 @@
    "description": "F-2: -Infinity at records/5/value (from store-0001)"
   },
   {
-   "case_id": "e1_r6-0004",
+   "case_id": "e1_r6-0005",
    "operation": "hedge.backtest.delta",
    "inputs": {
     "rate": "NaN",
@@ -474,7 +458,7 @@
    "description": "F-2: NaN at rate (from hedgebt_i-0001)"
   },
   {
-   "case_id": "e1_r6-0005",
+   "case_id": "e1_r6-0006",
    "operation": "hedge.backtest.delta",
    "inputs": {
     "rate": 0.03,
@@ -635,7 +619,7 @@
    "description": "F-2: -Infinity at spots/63 (from hedgebt_i-0001)"
   },
   {
-   "case_id": "e1_r6-0006",
+   "case_id": "e1_r6-0007",
    "operation": "hedge.correlation.neutralise",
    "inputs": {
     "spot1": "NaN",
@@ -690,7 +674,7 @@
    "description": "F-2: NaN at spot1 (from hedgecorr5_i-0001)"
   },
   {
-   "case_id": "e1_r6-0007",
+   "case_id": "e1_r6-0008",
    "operation": "hedge.correlation.neutralise",
    "inputs": {
     "spot1": 131.5256,
@@ -745,7 +729,7 @@
    "description": "F-2: -Infinity at hedges/0/expiry_years (from hedgecorr5_i-0001)"
   },
   {
-   "case_id": "e1_r6-0008",
+   "case_id": "e1_r6-0009",
    "operation": "hedge.credit.cds",
    "inputs": {
     "trade_date": "2026-11-06",
@@ -819,7 +803,7 @@
    "description": "F-2: NaN at discount/pillars/0/discount_factor (from hedgecredit_i-0001)"
   },
   {
-   "case_id": "e1_r6-0009",
+   "case_id": "e1_r6-0010",
    "operation": "hedge.credit.cds",
    "inputs": {
     "trade_date": "2026-11-06",
@@ -893,7 +877,7 @@
    "description": "F-2: -Infinity at hedges/0/coupon (from hedgecredit_i-0001)"
   },
   {
-   "case_id": "e1_r6-0010",
+   "case_id": "e1_r6-0011",
    "operation": "hedge.crossasset.solve",
    "inputs": {
     "spot": "NaN",
@@ -984,7 +968,7 @@
    "description": "F-2: NaN at spot (from hedgexa_i-0001)"
   },
   {
-   "case_id": "e1_r6-0011",
+   "case_id": "e1_r6-0012",
    "operation": "hedge.crossasset.solve",
    "inputs": {
     "spot": 4000.0,
@@ -1075,7 +1059,7 @@
    "description": "F-2: -Infinity at weights/4 (from hedgexa_i-0001)"
   },
   {
-   "case_id": "e1_r6-0012",
+   "case_id": "e1_r6-0013",
    "operation": "hedge.effectiveness",
    "inputs": {
     "item_changes": [
@@ -1111,7 +1095,7 @@
    "description": "F-2: NaN at item_changes/0 (from hedgeeff5_i-0001)"
   },
   {
-   "case_id": "e1_r6-0013",
+   "case_id": "e1_r6-0014",
    "operation": "hedge.effectiveness",
    "inputs": {
     "item_changes": [
@@ -1147,7 +1131,7 @@
    "description": "F-2: -Infinity at hedge_changes/5 (from hedgeeff5_i-0001)"
   },
   {
-   "case_id": "e1_r6-0014",
+   "case_id": "e1_r6-0015",
    "operation": "hedge.frontier.solve",
    "inputs": {
     "a": [
@@ -1222,7 +1206,7 @@
    "description": "F-2: NaN at a/0/0 (from hedgefrontier_i-0001)"
   },
   {
-   "case_id": "e1_r6-0015",
+   "case_id": "e1_r6-0016",
    "operation": "hedge.frontier.solve",
    "inputs": {
     "a": [
@@ -1297,7 +1281,7 @@
    "description": "F-2: -Infinity at cost_weights/6 (from hedgefrontier_i-0001)"
   },
   {
-   "case_id": "e1_r6-0016",
+   "case_id": "e1_r6-0017",
    "operation": "hedge.greeks.neutralise",
    "inputs": {
     "spot": "NaN",
@@ -1345,7 +1329,7 @@
    "description": "F-2: NaN at spot (from hedgegreeks5_i-0001)"
   },
   {
-   "case_id": "e1_r6-0017",
+   "case_id": "e1_r6-0018",
    "operation": "hedge.greeks.neutralise",
    "inputs": {
     "spot": 186.4793,
@@ -1393,7 +1377,7 @@
    "description": "F-2: -Infinity at hedges/0/expiry_years (from hedgegreeks5_i-0001)"
   },
   {
-   "case_id": "e1_r6-0018",
+   "case_id": "e1_r6-0019",
    "operation": "hedge.integer.solve",
    "inputs": {
     "a": [
@@ -1459,7 +1443,7 @@
    "description": "F-2: NaN at a/0/0 (from hedgeint_i-0001)"
   },
   {
-   "case_id": "e1_r6-0019",
+   "case_id": "e1_r6-0020",
    "operation": "hedge.integer.solve",
    "inputs": {
     "a": [
@@ -1525,7 +1509,7 @@
    "description": "F-2: -Infinity at lot_sizes/2 (from hedgeint_i-0001)"
   },
   {
-   "case_id": "e1_r6-0020",
+   "case_id": "e1_r6-0021",
    "operation": "hedge.minvar.ratio",
    "inputs": {
     "covariance": [
@@ -1555,7 +1539,7 @@
    "description": "F-2: NaN at covariance/0/0 (from hedgemv5_i-0001)"
   },
   {
-   "case_id": "e1_r6-0021",
+   "case_id": "e1_r6-0022",
    "operation": "hedge.minvar.ratio",
    "inputs": {
     "covariance": [
@@ -1585,7 +1569,7 @@
    "description": "F-2: -Infinity at covariance/1/1 (from hedgemv5_i-0001)"
   },
   {
-   "case_id": "e1_r6-0022",
+   "case_id": "e1_r6-0023",
    "operation": "hedge.residual.report",
    "inputs": {
     "a": [
@@ -1649,7 +1633,7 @@
    "description": "F-2: NaN at a/0/0 (from hedgeres_i-0001)"
   },
   {
-   "case_id": "e1_r6-0023",
+   "case_id": "e1_r6-0024",
    "operation": "hedge.residual.report",
    "inputs": {
     "a": [
@@ -1713,7 +1697,7 @@
    "description": "F-2: -Infinity at covariance/2/2 (from hedgeres_i-0001)"
   },
   {
-   "case_id": "e1_r6-0024",
+   "case_id": "e1_r6-0025",
    "operation": "hedge.select.solve",
    "inputs": {
     "a": [
@@ -1785,7 +1769,7 @@
    "description": "F-2: NaN at a/0/0 (from hedgeselect_i-0001)"
   },
   {
-   "case_id": "e1_r6-0025",
+   "case_id": "e1_r6-0026",
    "operation": "hedge.select.solve",
    "inputs": {
     "a": [
@@ -1857,7 +1841,7 @@
    "description": "F-2: -Infinity at weights/4 (from hedgeselect_i-0001)"
   },
   {
-   "case_id": "e1_r6-0026",
+   "case_id": "e1_r6-0027",
    "operation": "hedge.slippage.report",
    "inputs": {
     "orders": [
@@ -1896,7 +1880,7 @@
    "description": "F-2: NaN at orders/0/quantity (from hedgeslip_i-0001)"
   },
   {
-   "case_id": "e1_r6-0027",
+   "case_id": "e1_r6-0028",
    "operation": "hedge.slippage.report",
    "inputs": {
     "orders": [
@@ -1935,7 +1919,7 @@
    "description": "F-2: -Infinity at orders/0/fills/1/price (from hedgeslip_i-0001)"
   },
   {
-   "case_id": "e1_r6-0028",
+   "case_id": "e1_r6-0029",
    "operation": "risk.concentration.measures",
    "inputs": {
     "exposures": [
@@ -1962,7 +1946,7 @@
    "description": "F-2: NaN at exposures/0 (from risk_f4b-0012)"
   },
   {
-   "case_id": "e1_r6-0029",
+   "case_id": "e1_r6-0030",
    "operation": "risk.concentration.measures",
    "inputs": {
     "exposures": [
@@ -1989,7 +1973,7 @@
    "description": "F-2: -Infinity at exposures/3 (from risk_f4b-0012)"
   },
   {
-   "case_id": "e1_r6-0030",
+   "case_id": "e1_r6-0031",
    "operation": "risk.frtb.commodity_delta",
    "inputs": {
     "sensitivities": [
@@ -2018,7 +2002,7 @@
    "description": "F-2: NaN at sensitivities/0/sensitivity (from frtb_f2b-0022)"
   },
   {
-   "case_id": "e1_r6-0031",
+   "case_id": "e1_r6-0032",
    "operation": "risk.frtb.csr_delta",
    "inputs": {
     "sensitivities": [
@@ -2047,7 +2031,7 @@
    "description": "F-2: NaN at sensitivities/0/sensitivity (from frtb_f2b-0016)"
   },
   {
-   "case_id": "e1_r6-0032",
+   "case_id": "e1_r6-0033",
    "operation": "risk.frtb.curvature",
    "inputs": {
     "risk_class": "EQUITY",
@@ -2076,7 +2060,7 @@
    "description": "F-2: NaN at factors/0/cvr_up (from frtb_f2c-0010)"
   },
   {
-   "case_id": "e1_r6-0033",
+   "case_id": "e1_r6-0034",
    "operation": "risk.frtb.curvature",
    "inputs": {
     "risk_class": "EQUITY",
@@ -2105,7 +2089,7 @@
    "description": "F-2: -Infinity at factors/0/cvr_down (from frtb_f2c-0010)"
   },
   {
-   "case_id": "e1_r6-0034",
+   "case_id": "e1_r6-0035",
    "operation": "risk.frtb.equity_delta",
    "inputs": {
     "sensitivities": [
@@ -2133,7 +2117,7 @@
    "description": "F-2: NaN at sensitivities/0/sensitivity (from frtb_f2b-0007)"
   },
   {
-   "case_id": "e1_r6-0035",
+   "case_id": "e1_r6-0036",
    "operation": "risk.frtb.fx_delta",
    "inputs": {
     "sensitivities": [
@@ -2159,7 +2143,7 @@
    "description": "F-2: NaN at sensitivities/0/sensitivity (from frtb_f2b-0001)"
   },
   {
-   "case_id": "e1_r6-0036",
+   "case_id": "e1_r6-0037",
    "operation": "risk.frtb.vega",
    "inputs": {
     "risk_class": "GIRR",
@@ -2200,7 +2184,7 @@
    "description": "F-2: NaN at sensitivities/0/option_maturity (from frtb_f2c-0001)"
   },
   {
-   "case_id": "e1_r6-0037",
+   "case_id": "e1_r6-0038",
    "operation": "risk.frtb.vega",
    "inputs": {
     "risk_class": "GIRR",
@@ -2241,7 +2225,7 @@
    "description": "F-2: -Infinity at sensitivities/2/vega (from frtb_f2c-0001)"
   },
   {
-   "case_id": "e1_r6-0038",
+   "case_id": "e1_r6-0039",
    "operation": "risk.limits.check",
    "inputs": {
     "measures": {
@@ -2280,7 +2264,7 @@
    "description": "F-2: NaN at measures/VAR99 (from risk_f4b-0007)"
   },
   {
-   "case_id": "e1_r6-0039",
+   "case_id": "e1_r6-0040",
    "operation": "risk.limits.check",
    "inputs": {
     "measures": {
@@ -2319,7 +2303,7 @@
    "description": "F-2: -Infinity at limits/VEGA/hard (from risk_f4b-0007)"
   },
   {
-   "case_id": "e1_r6-0040",
+   "case_id": "e1_r6-0041",
    "operation": "risk.sens.correlation",
    "inputs": {
     "spot1": "NaN",
@@ -2349,7 +2333,7 @@
    "description": "F-2: NaN at spot1 (from risk_f3b-0013)"
   },
   {
-   "case_id": "e1_r6-0041",
+   "case_id": "e1_r6-0042",
    "operation": "risk.sens.correlation",
    "inputs": {
     "spot1": 100.0,
@@ -2379,7 +2363,7 @@
    "description": "F-2: -Infinity at expiry_years (from risk_f3b-0013)"
   },
   {
-   "case_id": "e1_r6-0042",
+   "case_id": "e1_r6-0043",
    "operation": "risk.sens.dividend_borrow",
    "inputs": {
     "spot": "NaN",
@@ -2407,7 +2391,7 @@
    "description": "F-2: NaN at spot (from risk_f3b-0006)"
   },
   {
-   "case_id": "e1_r6-0043",
+   "case_id": "e1_r6-0044",
    "operation": "risk.sens.dividend_borrow",
    "inputs": {
     "spot": 100.0,
@@ -2435,7 +2419,7 @@
    "description": "F-2: -Infinity at vol (from risk_f3b-0006)"
   },
   {
-   "case_id": "e1_r6-0044",
+   "case_id": "e1_r6-0045",
    "operation": "risk.sens.inflation01",
    "inputs": {
     "notional": "NaN",
@@ -2460,7 +2444,7 @@
    "description": "F-2: NaN at notional (from risk_f3b-0001)"
   },
   {
-   "case_id": "e1_r6-0045",
+   "case_id": "e1_r6-0046",
    "operation": "risk.sens.inflation01",
    "inputs": {
     "notional": 10000000.0,
@@ -2485,7 +2469,7 @@
    "description": "F-2: -Infinity at discount_factor (from risk_f3b-0001)"
   },
   {
-   "case_id": "e1_r6-0046",
+   "case_id": "e1_r6-0047",
    "operation": "risk.stress.reverse",
    "inputs": {
     "direction": [
@@ -2533,7 +2517,7 @@
    "description": "F-2: NaN at direction/0 (from risk_f4b-0001)"
   },
   {
-   "case_id": "e1_r6-0047",
+   "case_id": "e1_r6-0048",
    "operation": "risk.stress.reverse",
    "inputs": {
     "direction": [
@@ -2581,7 +2565,7 @@
    "description": "F-2: -Infinity at target_loss (from risk_f4b-0001)"
   },
   {
-   "case_id": "e1_r6-0048",
+   "case_id": "e1_r6-0049",
    "operation": "risk.var.liquidity_adjusted",
    "inputs": {
     "var": "NaN",
@@ -2618,7 +2602,7 @@
    "description": "F-2: NaN at var (from risk_f4b-0017)"
   },
   {
-   "case_id": "e1_r6-0049",
+   "case_id": "e1_r6-0050",
    "operation": "risk.var.liquidity_adjusted",
    "inputs": {
     "var": 1200000.0,
@@ -2655,7 +2639,7 @@
    "description": "F-2: -Infinity at spread_vol/2 (from risk_f4b-0017)"
   },
   {
-   "case_id": "e1_r6-0050",
+   "case_id": "e1_r6-0051",
    "operation": "risk.vol.horizon",
    "inputs": {
     "daily_vol": "NaN",
@@ -2678,7 +2662,7 @@
    "description": "F-2: NaN at daily_vol (from risk_f4b-0020)"
   },
   {
-   "case_id": "e1_r6-0051",
+   "case_id": "e1_r6-0052",
    "operation": "risk.vol.horizon",
    "inputs": {
     "daily_vol": 0.01,
@@ -2701,7 +2685,7 @@
    "description": "F-2: -Infinity at ar1 (from risk_f4b-0020)"
   },
   {
-   "case_id": "e1_r6-0052",
+   "case_id": "e1_r6-0053",
    "operation": "xva.exposure.portfolio_hw",
    "inputs": {
     "curve": {
@@ -2770,7 +2754,7 @@
    "description": "F-2: NaN at curve/times/0 (from expsim_g-0001)"
   },
   {
-   "case_id": "e1_r6-0053",
+   "case_id": "e1_r6-0054",
    "operation": "xva.exposure.portfolio_hw",
    "inputs": {
     "curve": {

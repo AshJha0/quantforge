@@ -60,7 +60,7 @@ def main():
             op = c["operation"]
             if c["expected"]["status"] == "error" and c["expected"].get("error_code") == "E_DOMAIN" and has_nf(c["inputs"]):
                 covered.add(op)
-            if c["expected"]["status"] == "ok" and op not in first:
+            if c["expected"]["status"] == "ok" and op not in first and "limit" not in c["case_id"] and "limit" not in c.get("tags", []):
                 first[op] = c
             any_real[op] = any_real.get(op, False) or any(True for _ in real_paths(c["inputs"]))
     s = Suite("e1_r6", "specifications/stage-f-rulings.md", G)
