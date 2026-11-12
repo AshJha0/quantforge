@@ -16,13 +16,13 @@ Inputs: `curve`, `mean_reversion`, `sigma` (Hull-White rules); `trades`: at leas
 
 Formal statement. At an exposure time `t`, the deflated netting-set value is `f(x) = sum_trades sgn N_tr (1 - P(t, T_n, x) - K sum tau_i P(t, T_i, x)) / N(t, x)` (a payer is floater minus fixed; at a reset date the floater is worth par). Then:
 - `discounted_ee(t) = E[max(f, 0)]`, `discounted_ene(t) = E[min(f, 0)]` (Gaussian integrals split at the zeros of `f`);
-- `pfe_q(t)` = the smallest `y >= 0` with `P(max(f, 0) <= y) >= q` (0 if the exposure is 0 with probability at least `q`); it is a quantile of the **discounted** exposure under the LGM measure, the quantity ORE's cube holds;
+- `deflated_pfe_q(t)` (outputs `deflated_pfe_95`, `deflated_pfe_99`; named `pfe_95`, `pfe_99` until v0.8.0, renamed by ruling R6-5.1 because the quantity is not PFE as a desk reads it) = the smallest `y >= 0` with `P(max(f, 0) <= y) >= q` (0 if the exposure is 0 with probability at least `q`); it is a quantile of the **discounted** exposure under the LGM measure, the quantity ORE's cube holds. It is **not** a potential future exposure in the usual sense (a quantile of the undeflated exposure in currency at `t`, under the real-world or `t`-forward measure); dividing by the numeraire changes both the units and the measure, so the two can differ by much more than discounting at the risk-free rate. An undeflated PFE is not built (R6-5.1);
 - `epe = sum_i discounted_ee(t_i)(t_i - t_(i-1)) / t_n` (`t_0 = 0`);
 - `cva = (1 - R) sum_i discounted_ee(t_i)(e^(-h t_(i-1)) - e^(-h t_i))` (G-16 buckets).
 
 Builds may use any one-dimensional quadrature that resolves the kinks (split at the zeros of `f`) to 1e-10 relative. Outputs in the order of `exposure_times`.
 
-Worked example (the ORE demo, `oracle/ore/ORE_DEMO.json`). The `exposure_g-0001` swap (5-year payer at 3% on 10 million, `a = 0.05`, `sigma = 0.01`): this operation gives `discounted_ee = 352,680.98, 285,620.69, 204,079.27, 107,026.77`, equal to the Jamshidian values of wave 4a to every printed digit, and `pfe_95` at one year 824,786.37. ORE prices the swap today at 419,429.419545 against the closed-form 419,429.419545, and with 8,000 paths its EE lies within 1.0 standard error at every date.
+Worked example (the ORE demo, `oracle/ore/ORE_DEMO.json`). The `exposure_g-0001` swap (5-year payer at 3% on 10 million, `a = 0.05`, `sigma = 0.01`): this operation gives `discounted_ee = 352,680.98, 285,620.69, 204,079.27, 107,026.77`, equal to the Jamshidian values of wave 4a to every printed digit, and `deflated_pfe_95` at one year 824,786.37. ORE prices the swap today at 419,429.419545 against the closed-form 419,429.419545, and with 8,000 paths its EE lies within 1.0 standard error at every date.
 
 ## The ORE check (ruling G-42)
 

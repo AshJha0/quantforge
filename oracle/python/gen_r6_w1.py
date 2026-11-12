@@ -27,6 +27,7 @@ G = "oracle/python/gen_r6_w1.py"
 ROOT = Path(__file__).resolve().parents[2]
 E = "date_and_convention"
 BP = 1e-4
+SMOOTH = ("LOG_LINEAR_DF", "LINEAR_ZERO", "TENSION_SPLINE")
 
 
 def zeros_at(conv, kind, quotes, kw):
@@ -57,7 +58,12 @@ def jacobian_suite():
         Jh = jac(conv, kind, q, kw, BP / 2)
         R = [[(4 * b - a) / 3 for a, b in zip(ra, rb)] for ra, rb in zip(J, Jh)]
         gap = max(abs(a - r) - 1e-7 * abs(r) for ra, rr in zip(J, R) for a, r in zip(ra, rr))
-        assert gap <= 1e-9, (conv, kind, gap)
+        if kind in SMOOTH:
+            assert gap <= 1e-9, (conv, kind, gap)
+        else:
+            # R6-1.3: piecewise in its data (Hagan-West regions, Hyman filter): the 1 bp quotient is the output, and its
+            # gap to the derivative is recorded, not asserted to 1e-9 (diagnosed 2026-11-12: up to 1.4e-3 under MC)
+            assert gap <= 5e-3, (conv, kind, gap)
         upper = max((abs(J[i][j]) for i in range(len(J)) for j in range(i + 1, len(J))), default=0.0)
         worst[f"{conv} {kind}"] = (upper, gap)
         local = kind in ("LOG_LINEAR_DF", "LINEAR_ZERO")
@@ -71,7 +77,7 @@ def jacobian_suite():
         s.add("risk.curve.jacobian", inp, {"pillar_dates": [d.isoformat() for d in pil], "zero_rates": z0, "jacobian": J}, cls="interpolation",
               output_classes={"pillar_dates": E},
               limit={"absolute": 1e-8, "relative": 1e-6, "reason": "R6-1.3: a difference of two curve solves (each to 1e-13 in rate) over 2 bp"},
-              verified=["independent-replay newton 1e-14", "richardson h, h/2 within 1e-9 + 1e-7 rel"],
+              verified=["independent-replay newton 1e-14"] + (["richardson h, h/2 within 1e-9 + 1e-7 rel"] if kind in SMOOTH else [f"richardson gap {gap:.1e} recorded (R6-1.3)"]),
               tags=["r6", "jacobian", kind.lower(), "synthetic"] + (["local"] if local else ["non-local"]),
               description=f"{conv} {kind}: largest entry above the diagonal {upper:.3e} (R6-1.1: no mask)")
     base = s.cases[0]["inputs"]

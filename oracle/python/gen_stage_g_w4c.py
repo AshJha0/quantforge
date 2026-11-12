@@ -163,7 +163,7 @@ def golden(inp):
     epe = sum(e * (ts[i + 1] - ts[i]) for i, e in enumerate(ee)) / ts[-1]
     cva = sum((1 - mp.mpf(REC)) * e * (mp.exp(-HAZ * ts[i]) - mp.exp(-HAZ * ts[i + 1])) for i, e in enumerate(ee))
     return {"discounted_ee": [float(x) for x in ee], "discounted_ene": [float(r[1]) for r in rows],
-            "pfe_95": [float(r[2][0]) for r in rows], "pfe_99": [float(r[2][1]) for r in rows],
+            "deflated_pfe_95": [float(r[2][0]) for r in rows], "deflated_pfe_99": [float(r[2][1]) for r in rows],
             "epe": float(epe), "cva": float(cva)}
 
 
@@ -268,7 +268,7 @@ def check_case(gold, inp, samples):
     for i in range(len(ts)):
         zs.append(("ee", ts[i], z_mean([max(v, 0) for v in X[i]], gold["discounted_ee"][i])))
         zs.append(("ene", ts[i], z_mean([min(v, 0) for v in X[i]], gold["discounted_ene"][i])))
-        for q, key in zip(Q, ("pfe_95", "pfe_99")):
+        for q, key in zip(Q, ("deflated_pfe_95", "deflated_pfe_99")):
             y = gold[key][i]
             F = sum(1 for v in X[i] if max(v, 0) <= y * (1 + 1e-12)) / n
             se = math.sqrt(q * (1 - q) / n)
@@ -386,7 +386,7 @@ def check_case_b(gold, inp, samples):
         raw.append(("ene", t, mean_check([min(v, 0) for v in X[i]], gold["discounted_ene"][i]) if n * pn >= 3 else None))
         D = eps * gross_deflated(inp, t)
         s = sorted(max(v, 0) for v in X[i])
-        for q, key in zip(Q, ("pfe_95", "pfe_99")):
+        for q, key in zip(Q, ("deflated_pfe_95", "deflated_pfe_99")):
             raw.append((key, t, ("pfe", s, q, gold[key][i], D) if n * (1 - q) >= 3 else None))
     t0 = [0.0] + ts
     raw.append(("epe", None, mean_check([sum(max(X[i][p], 0) * (t0[i + 1] - t0[i]) for i in range(len(ts))) / ts[-1] for p in range(n)], gold["epe"])))
