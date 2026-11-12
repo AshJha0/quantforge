@@ -7,11 +7,11 @@ Updated 2026-11-12. Nothing pushed. No new golden cases were added (conformance 
 | Stage | Before (value) | After (value) | Old all-case before / after | With added cases |
 |---|---:|---:|---:|---|
 | F | 165 / 417 = 39.6% | 202 / 417 = 48.4% | 31.4% / 38.5% | none added |
-| G | 332 / 463 = 71.7% | 353 / 463 = 76.2% (barrier rows pending, see below) | 56.4% / 59.9% | none added |
+| G | 332 / 463 = 71.7% | 371 / 463 = 80.1% | 56.4% / 63.0% | none added |
 
 **F is under the 60% floor (needs 251, has 202).** See "Shortfall" below: the classes with no free outside reference hold 140 of the 417 value cases, so 60% would need 251 of the remaining 277 (91%), including plain arithmetic operations. Not reachable by genuine checks without a ruling.
 
-**G without the suite-count assumption.** Four suites now have a real per-case register (`oracle/OUTSIDE_G_R6.json`, loaded by `tools/outside_shares.py` `load_percase_g`): bermudan_g, callable_g, hwcal_g, aadladder_g (barrier_g when the run below is committed). The other G suites still hold counts. Those counts come from generator loops that only run the outside check on `ok` cases (for example `gen_stage_g_w1.py` r9, g2a, g2b), so "counted cases are value cases" holds by construction there, not by assumption; a full per-case regeneration of every G generator is still open. Counting only per-case-proven value cases plus suites whose generator proves it gives the same 353.
+**G without the suite-count assumption.** Four suites now have a real per-case register (`oracle/OUTSIDE_G_R6.json`, loaded by `tools/outside_shares.py` `load_percase_g`): bermudan_g, callable_g, hwcal_g, aadladder_g and barrier_g. The other G suites still hold counts. Those counts come from generator loops that only run the outside check on `ok` cases (for example `gen_stage_g_w1.py` r9, g2a, g2b), so "counted cases are value cases" holds by construction there, not by assumption; a full per-case regeneration of every G generator is still open. Counting only per-case-proven value cases plus suites whose generator proves it gives the same 353.
 
 ## Per operation (changes only)
 
@@ -23,7 +23,7 @@ Updated 2026-11-12. Nothing pushed. No new golden cases were added (conformance 
 | `rates.shortrate.callable_bond` (G) | 0/8 | 8/8 | QuantLib 1.44 `TreeCallableFixedRateBondEngine` 2000 and 4000 steps | `3 e_grid + 3 |tree2000 - tree4000|`; `e_grid` the scheme's straight-bond-limit error at 100 steps/yr (BERMUDAN_EVIDENCE_G); QuantLib has no FD callable engine | none |
 | `rates.shortrate.hw_calibrate` (G) | 0/3 | 3/3 | scipy bounded Brent on QuantLib `HullWhite.discountBondOption` (Jamshidian) | sigma 2e-8 relative (optimiser resolution at a quadratic minimum); prices 1e-7 relative; rmse 1e-6 relative | none |
 | `rates.shortrate.bermudan_ladder` (G) | 0/3 | 0/3 | QuantLib FD + central bump-and-revalue | as Bermudan | **finding for the spec lane**: price agrees; `d_price_d_mean_reversion` (case 1: golden -52,528, gap 900, tol 322) and several `d_price_d_discount_factors` disagree (case 1 entry 1: golden 191,964, gap -30,380, tol 2,119; entry 2 gap 16,700; entry 3 gap 11,880; case 2 entry 1 gap -12,150; case 3 entry 2 gap -17,830). Probably the adjoint of the piecewise-flat forward in `alpha(t)` versus QuantLib's curve-bump response; not resolved. Goldens unchanged. Numbers in `oracle/OUTSIDE_G_R6.json` |
-| `exotic.barrier.price` discrete rows (G) | 2/31 | pending | QuantLib 1.44 `MCPRBarrierEngine`, one step per monitoring date, no bridge (exact discrete contract), 200k antithetic paths | 3 MC standard errors (repo R9 rule); BGK rows outside 3 SE are recorded as BGK approximation gaps, not counted; rebate rows skipped (QL MC pays no rebate) | see `barrier_r6.log` once run |
+| `exotic.barrier.price` (G) | 2/31 | 22/31 (2 continuous by AnalyticBarrierEngine at 1e-10, 20 discrete by MC) | QuantLib 1.44 `MCPRBarrierEngine`, one step per monitoring date, no bridge (exact discrete contract), 200k antithetic paths | 3 MC standard errors (repo R9 rule); BGK rows outside 3 SE are recorded as BGK approximation gaps, not counted; rebate rows skipped (QL MC pays no rebate) | 6 BGK rows outside 3 SE (approximation error of the continuity correction at coarse monitoring, not a golden error; spec lane may want to document the BGK accuracy limit): 0005 DOWN_OUT PUT m=52 z +5.6; 0006 DOWN_OUT PUT m=12 z +25.0; 0012 DOWN_IN PUT m=12 z -3.7; 0014 UP_OUT CALL m=52 z +5.5; 0015 UP_OUT CALL m=12 z +20.1; 0021 UP_IN CALL m=12 z -4.7. 3 rebate rows not checked |
 
 ## Gate (task item 3)
 

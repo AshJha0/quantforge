@@ -1669,24 +1669,24 @@
   "G": {
    "without_sweeps": {
     "cases": 463,
-    "library-object": 297,
+    "library-object": 315,
     "library-primitive": 56,
     "reimplementation": 6,
-    "none": 104,
-    "counted": 353,
-    "share": 0.7624,
-    "all_cases_share": 0.5993,
+    "none": 86,
+    "counted": 371,
+    "share": 0.8013,
+    "all_cases_share": 0.6299,
     "error_and_invariance_cases": 126
    },
    "with_sweeps": {
     "cases": 463,
-    "library-object": 297,
+    "library-object": 315,
     "library-primitive": 56,
     "reimplementation": 6,
-    "none": 104,
-    "counted": 353,
-    "share": 0.7624,
-    "all_cases_share": 0.5993,
+    "none": 86,
+    "counted": 371,
+    "share": 0.8013,
+    "all_cases_share": 0.6299,
     "error_and_invariance_cases": 126
    },
    "sweeps": null,
@@ -1695,8 +1695,8 @@
     "QuantLib 1.44 FdHullWhiteSwaptionEngine (Crank-Nicolson/Douglas 800x801 and 1600x1601; implicit Euler at the golden grid as the error yardstick)": 10,
     "QuantLib 1.44 G2 discountBond and discountBondOption": 35,
     "QuantLib 1.44 JamshidianSwaptionEngine": 64,
+    "QuantLib 1.44 MCPRBarrierEngine, one step per monitoring date, no bridge, 200000 antithetic paths, seed 20261112; tolerance 3 SE": 20,
     "QuantLib 1.44 TreeCallableFixedRateBondEngine (2000 and 4000 steps)": 8,
-    "QuantLib 1.44 analytic barrier engine, continuous-monitoring rows only": 2,
     "QuantLib 1.44 discountBondOption per caplet; (1 + K tau) scaling is the identity": 36,
     "QuantLib 1.44 short-rate model discountBond and discountBondOption": 62,
     "QuantLib AbcdFunction.covariance and blackFormula assembled per caplet": 17,
@@ -1707,13 +1707,13 @@
    "per_operation": {
     "exotic.barrier.price": {
      "cases": 31,
-     "library-object": 2,
+     "library-object": 20,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 29,
-     "counted": 2,
-     "share": 0.0645,
-     "all_cases_share": 0.0526,
+     "none": 11,
+     "counted": 20,
+     "share": 0.6452,
+     "all_cases_share": 0.5263,
      "error_and_invariance_cases": 7
     },
     "rates.g2pp.zcb": {
