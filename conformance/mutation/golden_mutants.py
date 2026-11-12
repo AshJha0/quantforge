@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Scores Rust and Python mutants against the golden cases as well as the unit tests.
 
-The mutants come from the same tools as before: cargo-mutants and mutmut. Those tools run the unit
-tests first, which gives the unit verdict. This script then runs a sample of the same mutants
-through the neutral runner, so each mutant has two verdicts and the two scores are comparable.
+The mutants come from the same tools as before: cargo-mutants and mutmut. For Python, mutmut runs the
+unit tests on every mutant first, which gives the unit verdict. For Rust, cargo-mutants only lists the
+mutants and this script runs `cargo test -p quantforge-core` on the sampled ones (testing all of them
+took over three hours per module in CI). A sample of the mutants then also goes through the neutral
+runner, so each sampled mutant has two verdicts and the two scores are comparable.
 Everything happens in a private copy; the working tree is never changed.
 
 Usage: golden_mutants.py --impl rust --target '**/compounding.rs' [--suite GLOB] [--max N] [--seed N]
@@ -17,6 +19,7 @@ import json
 import os
 import random
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -42,10 +45,21 @@ MEMCAP = (["prlimit", f"--as={os.environ['QF_MUTANT_AS']}", "--"]
 
 
 def run(cmd, cwd=None, env=None, timeout=None):
-    """Returns the exit code, with None for a timeout. Output is kept out of the way."""
+    """Returns the exit code, with None for a timeout. Output is kept out of the way.
+
+    The command runs in its own process group so a timeout also kills what it started (a hung test
+    binary under cargo), not just the direct child."""
+    posix = os.name == "posix"
+    p = subprocess.Popen(cmd, cwd=cwd, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         start_new_session=posix)
     try:
-        return subprocess.run(cmd, cwd=cwd, env=env, timeout=timeout, capture_output=True).returncode
+        return p.wait(timeout=timeout)
     except subprocess.TimeoutExpired:
+        if posix:
+            os.killpg(p.pid, signal.SIGKILL)
+        else:
+            p.kill()
+        p.wait()
         return None
 
 
@@ -76,17 +90,20 @@ def copy_tree(work):
 
 
 def rust_mutants(repo, target):
-    out = repo / "rust" / "cm"
-    code = run(["cargo", "mutants", "--in-place", "-p", "quantforge-core", "-f", target, "-o", str(out)], cwd=repo / "rust")
-    if code not in (0, 2, 3):  # 2 means some were missed, 3 some timed out
-        raise SystemExit(f"cargo mutants failed with exit code {code}")
-    rows = []
-    for o in json.loads((out / "mutants.out" / "outcomes.json").read_text(encoding="utf-8"))["outcomes"]:
-        scenario = o["scenario"]
-        if isinstance(scenario, dict) and "Mutant" in scenario:
-            m = scenario["Mutant"]
-            rows.append({"id": m["name"], "mutant": m, "unit": RUST_VERDICT.get(o["summary"], o["summary"])})
-    return rows
+    """Every mutant cargo-mutants would make in the target file, listed but not run.
+
+    Running cargo-mutants itself tests every mutant (1258 in exotics.rs), which took more than 180
+    minutes per module on a CI runner, while the report scores only the sample. So the unit verdict
+    is taken for the sampled mutants alone, in score_rust."""
+    out = run_capture(["cargo", "mutants", "--list", "--json", "-p", "quantforge-core", "-f", target], cwd=repo / "rust")
+    if out is None:
+        raise SystemExit("cargo mutants --list failed")
+    return [{"id": m["name"], "mutant": m} for m in json.loads(out)]
+
+
+def run_capture(cmd, cwd=None):
+    r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+    return r.stdout if r.returncode == 0 else None
 
 
 def splice(text, span, replacement):
@@ -99,18 +116,45 @@ def splice(text, span, replacement):
 
 
 def score_rust(a, work):
+    """Unit verdict (cargo test -p quantforge-core, as cargo-mutants runs it) and golden verdict for a
+    seeded sample of live mutants. A mutant whose tests do not build is unviable and the next one in
+    the shuffled order takes its slot, so the sample matches sample() on a full cargo-mutants run."""
     repo = copy_tree(work)
+    rust = repo / "rust"
     rows = rust_mutants(repo, a.target)
     build = ["cargo", "build", "--release", "-p", "quantforge-cli"]
-    golden = Golden("rust", [str(repo / "rust" / "target" / "release" / "quantforge")], repo, work, a.suite)
-    if run(build, cwd=repo / "rust") or golden.baseline()[0]:
+    tests = ["cargo", "test", "-p", "quantforge-core"]
+    golden = Golden("rust", [str(rust / "target" / "release" / "quantforge")], repo, work, a.suite)
+    if run(build, cwd=rust) or golden.baseline()[0] or run(tests + ["--no-run"], cwd=rust):
         raise SystemExit("the unmutated build does not pass")
-    for row in sample(rows, a):
-        path = repo / "rust" / row["mutant"]["file"]
+    start = time.monotonic()
+    if run(tests, cwd=rust):
+        raise SystemExit("the unmutated unit tests do not pass")
+    unit_limit = max(60.0, 5 * (time.monotonic() - start))
+    order = list(rows)
+    random.Random(a.seed).shuffle(order)
+    k, n = a.shard
+    order = order[k::n]  # shard k of n takes every n-th mutant of the shuffled order, and its share of MAX
+    quota = a.max // n + (k < a.max % n)
+    live = 0
+    for row in order:
+        if live >= quota:
+            break
+        path = rust / row["mutant"]["file"]
         original = path.read_bytes().decode("utf-8")
         path.write_bytes(splice(original, row["mutant"]["span"], row["mutant"]["replacement"]).encode("utf-8"))
-        row["golden"] = "unviable" if run(build, cwd=repo / "rust") else verdict(golden.check())
-        path.write_bytes(original.encode("utf-8"))
+        try:
+            if run(tests + ["--no-run"], cwd=rust):
+                row["unit"] = "unviable"
+                continue
+            code = run(tests, cwd=rust, timeout=unit_limit)
+            row["unit"] = "timeout" if code is None else "survived" if code == 0 else "killed"
+            row["golden"] = "unviable" if run(build, cwd=rust) else verdict(golden.check())
+            live += 1
+        finally:
+            path.write_bytes(original.encode("utf-8"))
+    for row in rows:
+        row.setdefault("unit", "not run")
     return rows
 
 
@@ -159,8 +203,8 @@ def summarise(a, rows):
     def caught(r, key):
         return r[key] in ("killed", "timeout")
 
-    unit_all = [r for r in rows if r["unit"] != "unviable"]
-    both = {"mutants": len(rows), "unviable": len(rows) - len(unit_all),
+    unit_all = [r for r in rows if r["unit"] not in ("unviable", "not run")]
+    both = {"mutants": len(rows), "unviable": sum(r["unit"] == "unviable" for r in rows),
             "unit_killed_all": sum(caught(r, "unit") for r in unit_all), "sampled": len(done),
             "sample_unit_killed": sum(caught(r, "unit") for r in done),
             "sample_golden_killed": sum(caught(r, "golden") for r in done),
@@ -174,6 +218,13 @@ def summarise(a, rows):
     return both
 
 
+def shard(text):
+    k, n = (int(x) for x in text.split("/"))
+    if not 0 <= k < n:
+        raise argparse.ArgumentTypeError("shard is K/N with 0 <= K < N")
+    return k, n
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--impl", required=True, choices=["rust", "python"])
@@ -181,6 +232,8 @@ def main():
     ap.add_argument("--suite", default="*")
     ap.add_argument("--max", type=int, default=20)
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--shard", type=shard, default=(0, 1),
+                    help="rust: K/N runs only shard K (0-based) of N; stage_report.py merges the shards")
     ap.add_argument("--out", help="write every mutant and both verdicts to this JSON file")
     a = ap.parse_args()
     with tempfile.TemporaryDirectory(prefix="qf-golden-mutants-") as tmp:

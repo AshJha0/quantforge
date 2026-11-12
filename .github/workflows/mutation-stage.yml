@@ -76,12 +76,16 @@ jobs:
       max-parallel: 8
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     runs-on: ubuntu-24.04
-    # Rust exotics needed 89 of 90 minutes in stage F (1220 mutants) and has 1258 now.
-    timeout-minutes: 180
+    # Rust used to run cargo-mutants over every mutant of a file (1258 in exotics.rs) and hit 180
+    # minutes (run 43100924809). golden_mutants.py now lists the mutants and tests only the sample
+    # of MAX, so a Rust module takes roughly MAX x (incremental test build + tests + release build +
+    # golden run), split over plan_matrix.RUST_SHARDS jobs. Keep the limit well clear of the 360-minute runner cap.
+    timeout-minutes: 120
     env:
       TARGET: ${{ matrix.target }}
       SUITE: ${{ matrix.suite }}
-      OUT: results/${{ matrix.lang }}--${{ matrix.module }}
+      OUT: results/${{ matrix.lang }}--${{ matrix.module }}${{ matrix.part }}
+      SHARD: ${{ matrix.shard }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -119,11 +123,11 @@ jobs:
           echo "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER=$RUNNER_TEMP/memcap" >> "$GITHUB_ENV"
           echo "QF_MUTANT_AS=8589934592" >> "$GITHUB_ENV"
       - if: matrix.lang == 'python' || matrix.lang == 'rust'
-        run: python3 conformance/mutation/golden_mutants.py --impl "${{ matrix.lang }}" --target "$TARGET" --suite "$SUITE" --max "$MAX" --out "$OUT.json"
+        run: python3 conformance/mutation/golden_mutants.py --impl "${{ matrix.lang }}" --target "$TARGET" --suite "$SUITE" --max "$MAX" --shard "$SHARD" --out "$OUT.json"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
-          name: mutation-${{ matrix.lang }}-${{ matrix.module }}
+          name: mutation-${{ matrix.lang }}-${{ matrix.module }}${{ matrix.part }}
           path: results/
           if-no-files-found: ignore
   report:

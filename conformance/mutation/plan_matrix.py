@@ -36,9 +36,22 @@ def touched(lang, target, changed):
     return any(fnmatch.fnmatch(c, g) or fnmatch.fnmatch(c, "*/" + g.lstrip("*/")) for c in changed)
 
 
+# Rust jobs build and test each sampled mutant (debug tests plus a release CLI), so the sample is split
+# over this many jobs; stage_report.py merges <lang>--<module>--s<K>.json back into one module result.
+RUST_SHARDS = 2
+
+
 def entries(mods, langs_filter=None):
-    return [{"lang": l, "module": m["module"], "target": m[l], "suite": m.get(l + "_suite", m["suite"])}
-            for m in mods for l in LANGS if m.get(l) and (langs_filter is None or (m["module"], l) in langs_filter)]
+    out = []
+    for m in mods:
+        for l in LANGS:
+            if not m.get(l) or (langs_filter is not None and (m["module"], l) not in langs_filter):
+                continue
+            e = {"lang": l, "module": m["module"], "target": m[l], "suite": m.get(l + "_suite", m["suite"]),
+                 "shard": "0/1", "part": ""}
+            n = RUST_SHARDS if l == "rust" else 1
+            out += [dict(e, shard=f"{k}/{n}", part=f"--s{k}") for k in range(n)] if n > 1 else [e]
+    return out
 
 
 def plan(cfg, stage=None, changed=None):

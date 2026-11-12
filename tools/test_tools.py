@@ -897,9 +897,25 @@ class StageFInfra(unittest.TestCase):
         self.assertEqual([e["lang"] for e in inc], ["python"])
         self.assertEqual(list(frag["stages"]["PR"][0]), ["module", "suite", "python"])
         inc, _ = pm.plan(cfg, changed=["java25/src/main/java/org/q/vol/Surf.java", "rust/crates/c/src/m.rs"])
-        self.assertEqual(sorted(e["lang"] for e in inc), ["java", "rust"])
+        self.assertEqual(sorted(e["lang"] for e in inc), ["java"] + ["rust"] * pm.RUST_SHARDS)
+        self.assertEqual([e["shard"] for e in inc if e["lang"] == "rust"],
+                         [f"{k}/{pm.RUST_SHARDS}" for k in range(pm.RUST_SHARDS)])
         self.assertEqual(pm.plan(cfg, changed=["docs/x.md"])[0], [])
-        self.assertEqual(len(pm.plan(cfg, stage="E")[0]), 4)
+        self.assertEqual(len(pm.plan(cfg, stage="E")[0]), 3 + pm.RUST_SHARDS)
+
+    def test_mutation_report_merges_rust_shards(self):
+        sr = load("stage_report", "conformance/mutation/stage_report.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp) / "rust--m.json"
+            for k, (sampled, either) in enumerate([(20, 18), (20, 15)]):
+                summary = {"mutants": 100, "unviable": 2, "unit_killed_all": either, "sampled": sampled,
+                           "sample_unit_killed": either, "sample_golden_killed": 5, "sample_either_killed": either,
+                           "sample_golden_timeouts": 0, "unit_verdicts": {"killed": either, "not run": 70}}
+                (Path(tmp) / f"rust--m--s{k}.json").write_text(json.dumps({"summary": summary}), encoding="utf-8")
+            self.assertEqual(len(sr.shard_files(base)), 2)
+            killed, survived, note = sr.score_file("rust", base)
+            self.assertEqual((killed, survived), (33, 7))
+            self.assertIn("sample 40 of 100", note)
 
 
 class DocsStatus(unittest.TestCase):
