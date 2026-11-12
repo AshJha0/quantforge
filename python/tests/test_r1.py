@@ -75,7 +75,7 @@ def test_bad_arguments(monkeypatch, args):
 
 def test_version_and_operations(monkeypatch):
     _, rows, _ = invoke(monkeypatch, ["version"])
-    assert rows[0]["language"] == "python" and rows[0]["contract_version"] == "1.0.0"
+    assert rows[0]["language"] == "python" and rows[0]["contract_version"] == "1.11.0"
     _, rows, _ = invoke(monkeypatch, ["operations"])
     assert "bond.futures.conversion_factor" in rows[0] and rows[0] == sorted(rows[0])
 

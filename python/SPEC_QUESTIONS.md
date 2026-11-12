@@ -264,3 +264,33 @@ F-Q1, F-Q2 and F-Q4 have no ruling yet.
   a root scan coarser than that misses it and overstates `P(f <= y)`, which is what a too-low
   quantile needs. Python's scan has 0.01-standard-deviation steps plus Brent refinement. Asked:
   regenerate the eight `pfe_99` values (or confirm the definition).
+
+## Stage I (2026-11-11)
+
+Wave 1 (hedge solvers) passes 121 of 121 with no open question. Choices made where the spec is silent:
+
+- I-Q1 (I-4, `hedge.minvar.ratio`). "Instruments 200" is read as at most 200 hedge instruments, so the
+  covariance may be 201 x 201 (the position plus 200) and `hedge_changes` at most 200 series; the
+  series length uses the generic 100,000. `hedge.residual.report` caps `covariance` at 1,000 x 1,000
+  (factors) and `a` at 1,000 x 200. `hedge.integer.solve` counts instruments by the row length of
+  `a` and the length of `lot_sizes`. No golden tests these readings beyond the integer case.
+- I-Q2 (`hedge.greeks.neutralise`). A `quantity` on a hedge instrument is ignored, not refused; check
+  1 is applied to the portfolio and the hedges together, so an underlying hedge with a strike is
+  `E_INPUT` too.
+- I-Q3 (`hedge.qp.solve`). `E_INFEASIBLE` is decided by a phase-1 simplex with a relative tolerance
+  of 1e-9 on the artificial sum; I-14 asks for an exact decision and the goldens keep feasible cases
+  clear of the boundary, so the tolerance never decides a golden.
+- I-Q4 (I-31, wave 4b property note). The handover's corrected property says a constant-spot path
+  makes `hedge.backtest.delta` return `E_DOMAIN` because the hedge leg has zero variance. In
+  double arithmetic that leg is zero only up to rounding (the cash account and the rebalances
+  cancel to about 1e-16 per step), so Python's exact `var == 0` test does not fire and the
+  statistics are computed on noise. No golden is affected. Asked: either pin the zero-variance
+  test with a relative threshold (for example `var(y) <= 1e-24 var(x)`, in the spirit of I-3), or
+  drop the claim from the property notes. Python's test checks the replay itself instead.
+- Rulings after the builds (I-41 to I-52) applied: I-41 fixed Greek key sets (`E_INPUT`), I-42
+  unknown correlation targets `E_SCHEMA`, I-43 relative zero tests (answers I-Q4), I-44 hedged
+  variance tolerance, I-45 (answers I-Q1; `lot_sizes` length is `E_INPUT`), I-46 (answers I-Q3;
+  no change), I-47 `null` outside the bound lists is `E_SCHEMA` in every stage I operation, I-49
+  lot counts beyond 2^52 `E_LIMIT`, I-50 confirmed. I-41 also answers I-Q2. I-51
+  (`contract_version` 1.11.0) is not applied on this branch: the runner still checks 1.0.0, so it
+  moves with the runner in the integration PR.

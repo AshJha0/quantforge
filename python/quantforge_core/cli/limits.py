@@ -94,6 +94,27 @@ def _hedge(raw: Raw) -> None:
         raise _over("a", 20)
 
 
+def _rows_cols(key: str, rows: int, cols: int) -> Callable[[Raw], None]:
+    """A matrix input of at most `rows` rows of at most `cols` entries."""
+    def check(raw: Raw) -> None:
+        value = raw.get(key)
+        if isinstance(value, list):
+            if len(value) > rows:
+                raise _over(key, rows)
+            if any(isinstance(r, list) and len(r) > cols for r in value):
+                raise _over(key, cols)
+
+    return check
+
+
+def _all(*checks: Callable[[Raw], None]) -> Callable[[Raw], None]:
+    def check(raw: Raw) -> None:
+        for c in checks:
+            c(raw)
+
+    return check
+
+
 _RNG = _caps(count=MAX_ARRAY, skip=MAX_SKIP)
 _ROOT = _caps(max_iter=100_000)
 _POINTS = _caps(n=10_000_000)
@@ -143,6 +164,55 @@ def _slv_grid(raw: Raw) -> None:
             _cap(grid, key, limit)
 
 
+# Ruling I-4: factors 1,000, instruments 200, equality rows 200, integer instruments 12, series
+# 100,000 (the generic array cap), portfolio positions 1,000, Greek hedge instruments 3.
+_I_FACTORS, _I_INSTRUMENTS = 1000, 200
+_HEDGE_QP = _all(_rows_cols("a", _I_FACTORS, _I_INSTRUMENTS),
+                 _rows_cols("eq_matrix", _I_INSTRUMENTS, _I_INSTRUMENTS))
+_HEDGE_INTEGER = _rows_cols("a", _I_FACTORS, 12)  # instruments are columns of a (I-45)
+_HEDGE_MINVAR = _all(_rows_cols("covariance", _I_INSTRUMENTS + 1, _I_INSTRUMENTS + 1),
+                     _rows_cols("hedge_changes", _I_INSTRUMENTS, MAX_ARRAY))
+_HEDGE_GREEKS = _all(_caps_list("portfolio", 1000), _caps_list("hedges", 3))
+# Ruling I-19: credit book 1,000 trades and 50 hedges; correlation book 1,000 and 5 hedges.
+_HEDGE_CREDIT = _all(_caps_list("book", 1000), _caps_list("hedges", 50))
+_HEDGE_CORRELATION = _all(_caps_list("book", 1000), _caps_list("hedges", 5))
+# Ruling I-23: cross-asset book 1,000 positions, hedges 200, curve pillars 100.
+def _crossasset_curve(raw: Raw) -> None:
+    curve = raw.get("curve")
+    if isinstance(curve, dict):
+        _caps_list("times", 100)(curve)
+        _caps_list("zero_rates", 100)(curve)
+
+
+_HEDGE_CROSSASSET = _all(_caps_list("book", 1000), _caps_list("hedges", 200), _crossasset_curve)
+_HEDGE_RESIDUAL = _all(_rows_cols("a", _I_FACTORS, _I_INSTRUMENTS),
+                       _rows_cols("covariance", _I_FACTORS, _I_FACTORS))
+
+
+def _slippage_sizes(raw: Raw) -> None:
+    """Ruling I-38: 10,000 orders and 1,000,000 fills in total."""
+    orders = raw.get("orders")
+    if isinstance(orders, list):
+        if len(orders) > 10_000:
+            raise _over("orders", 10_000)
+        fills = sum(len(o["fills"]) for o in orders
+                    if isinstance(o, dict) and isinstance(o.get("fills"), list))
+        if fills > 1_000_000:
+            raise _over("fills", 1_000_000)
+
+
+
+def _select_subsets(raw: Raw) -> None:
+    """Ruling I-53: at most 100,000 candidate subsets, sum over k = 1..min(K, n) of C(n, k),
+    with n the columns of `a` and K = max_instruments."""
+    rows, k = raw.get("a"), raw.get("max_instruments")
+    if not isinstance(rows, list) or not isinstance(k, int) or isinstance(k, bool):
+        return
+    n = max((len(r) for r in rows if isinstance(r, list)), default=0)
+    if sum(math.comb(n, j) for j in range(1, min(k, n) + 1)) > 100_000:
+        raise _over("max_instruments", 100_000)
+
+
 _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "core.integrate.trapezoid": _POINTS,
     "core.integrate.simpson": _POINTS,
@@ -190,6 +260,20 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "rates.shortrate.bermudan_swaption": _scheme_grid,
     "rates.shortrate.callable_bond": _scheme_grid,
     "rates.shortrate.bermudan_ladder": _scheme_grid,
+    # Stage I wave 1 (ruling I-4).
+    "hedge.qp.solve": _HEDGE_QP,
+    "hedge.integer.solve": _HEDGE_INTEGER,
+    "hedge.minvar.ratio": _HEDGE_MINVAR,
+    "hedge.greeks.neutralise": _HEDGE_GREEKS,
+    "hedge.residual.report": _HEDGE_RESIDUAL,
+    "hedge.credit.cds": _HEDGE_CREDIT,
+    "hedge.correlation.neutralise": _HEDGE_CORRELATION,
+    "hedge.crossasset.solve": _HEDGE_CROSSASSET,
+    "hedge.frontier.solve": _all(_HEDGE_QP, _caps_list("cost_weights", 50)),
+    # Ruling I-35: selection over at most 20 instruments. I-32 (paths and series of 100,000)
+    # is the generic array cap.
+    "hedge.select.solve": _all(_rows_cols("a", _I_FACTORS, 20), _select_subsets),
+    "hedge.slippage.report": _slippage_sizes,
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")
