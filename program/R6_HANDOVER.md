@@ -158,3 +158,5 @@ New gates (both shown red on a planted fault): `python tools/check_e1_coverage.p
 ### Oracle agreement and evidence
 
 Goldens from `oracle/python/gen_r6_w3.py` (large QP, scaling, audit, use case 6) and `gen_r6_e1.py`. Audit hand examples recomputed by the oracle: all agree (`oracle/python/r6_audit_examples.py`). Integer `E_NO_CONVERGENCE` has no golden (method-dependent stop); property tests only.
+
+WAVE 3 READY b877bc4
