@@ -1,0 +1,2842 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1_r6",
+ "spec": "specifications/stage-f-rulings.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_r6_e1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "e1_r6-0001",
+   "operation": "core.store.chain",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "event_time": "2026-11-02T16:05:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": "NaN",
+      "note": [
+       [
+        [
+         [
+          [
+           [
+            [
+             [
+              [
+               [
+                [
+                 [
+                  [
+                   [
+                    [
+                     [
+                      [
+                       [
+                        [
+                         [
+                          [
+                           [
+                            [
+                             [
+                              [
+                               [
+                                [
+                                 [
+                                  [
+                                   [
+                                    [
+                                     [
+                                      [
+                                       [
+                                        [
+                                         [
+                                          [
+                                           [
+                                            [
+                                             [
+                                              [
+                                               [
+                                                [
+                                                 [
+                                                  [
+                                                   [
+                                                    [
+                                                     [
+                                                      [
+                                                       [
+                                                        [
+                                                         [
+                                                          [
+                                                           [
+                                                            [
+                                                             [
+                                                              [
+                                                               [
+                                                                [
+                                                                 [
+                                                                  [
+                                                                   [
+                                                                    [
+                                                                     [
+                                                                      [
+                                                                       1
+                                                                      ]
+                                                                     ]
+                                                                    ]
+                                                                   ]
+                                                                  ]
+                                                                 ]
+                                                                ]
+                                                               ]
+                                                              ]
+                                                             ]
+                                                            ]
+                                                           ]
+                                                          ]
+                                                         ]
+                                                        ]
+                                                       ]
+                                                      ]
+                                                     ]
+                                                    ]
+                                                   ]
+                                                  ]
+                                                 ]
+                                                ]
+                                               ]
+                                              ]
+                                             ]
+                                            ]
+                                           ]
+                                          ]
+                                         ]
+                                        ]
+                                       ]
+                                      ]
+                                     ]
+                                    ]
+                                   ]
+                                  ]
+                                 ]
+                                ]
+                               ]
+                              ]
+                             ]
+                            ]
+                           ]
+                          ]
+                         ]
+                        ]
+                       ]
+                      ]
+                     ]
+                    ]
+                   ]
+                  ]
+                 ]
+                ]
+               ]
+              ]
+             ]
+            ]
+           ]
+          ]
+         ]
+        ]
+       ]
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at records/0/value (from limit_order-0014)"
+  },
+  {
+   "case_id": "e1_r6-0002",
+   "operation": "core.store.query_as_of",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": "NaN"
+     },
+     {
+      "sequence": 2,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.08
+     },
+     {
+      "sequence": 3,
+      "series_id": "SONIA",
+      "event_time": "2026-11-03T16:00:00Z",
+      "knowledge_time": "2026-11-03T16:05:00Z",
+      "value": 3.74
+     },
+     {
+      "sequence": 4,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": 3.72
+     },
+     {
+      "sequence": 5,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": null,
+      "deleted": true
+     },
+     {
+      "sequence": 6,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": 1.09
+     },
+     {
+      "sequence": 7,
+      "series_id": "SONIA",
+      "event_time": "2026-11-01T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": null
+     }
+    ],
+    "as_of": "2026-11-02T16:04:59Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at records/0/value (from store-0001)"
+  },
+  {
+   "case_id": "e1_r6-0003",
+   "operation": "core.store.query_as_of",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 3.73
+     },
+     {
+      "sequence": 2,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.08
+     },
+     {
+      "sequence": 3,
+      "series_id": "SONIA",
+      "event_time": "2026-11-03T16:00:00Z",
+      "knowledge_time": "2026-11-03T16:05:00Z",
+      "value": 3.74
+     },
+     {
+      "sequence": 4,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": 3.72
+     },
+     {
+      "sequence": 5,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": null,
+      "deleted": true
+     },
+     {
+      "sequence": 6,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": "-Infinity"
+     },
+     {
+      "sequence": 7,
+      "series_id": "SONIA",
+      "event_time": "2026-11-01T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": null
+     }
+    ],
+    "as_of": "2026-11-02T16:04:59Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at records/5/value (from store-0001)"
+  },
+  {
+   "case_id": "e1_r6-0004",
+   "operation": "hedge.backtest.delta",
+   "inputs": {
+    "rate": "NaN",
+    "dividend_yield": 0.01,
+    "hedge_volatility": 0.2,
+    "quantity": -100.0,
+    "option": {
+     "type": "CALL",
+     "strike": 100.0,
+     "expiry_years": 0.1726027397260274
+    },
+    "times": [
+     0.0,
+     0.0027397260273972603,
+     0.005479452054794521,
+     0.00821917808219178,
+     0.010958904109589041,
+     0.0136986301369863,
+     0.01643835616438356,
+     0.019178082191780823,
+     0.021917808219178082,
+     0.024657534246575342,
+     0.0273972602739726,
+     0.030136986301369864,
+     0.03287671232876712,
+     0.03561643835616438,
+     0.038356164383561646,
+     0.0410958904109589,
+     0.043835616438356165,
+     0.04657534246575343,
+     0.049315068493150684,
+     0.052054794520547946,
+     0.0547945205479452,
+     0.057534246575342465,
+     0.06027397260273973,
+     0.06301369863013699,
+     0.06575342465753424,
+     0.0684931506849315,
+     0.07123287671232877,
+     0.07397260273972603,
+     0.07671232876712329,
+     0.07945205479452055,
+     0.0821917808219178,
+     0.08493150684931507,
+     0.08767123287671233,
+     0.09041095890410959,
+     0.09315068493150686,
+     0.0958904109589041,
+     0.09863013698630137,
+     0.10136986301369863,
+     0.10410958904109589,
+     0.10684931506849316,
+     0.1095890410958904,
+     0.11232876712328767,
+     0.11506849315068493,
+     0.1178082191780822,
+     0.12054794520547946,
+     0.1232876712328767,
+     0.12602739726027398,
+     0.12876712328767123,
+     0.13150684931506848,
+     0.13424657534246576,
+     0.136986301369863,
+     0.13972602739726028,
+     0.14246575342465753,
+     0.14520547945205478,
+     0.14794520547945206,
+     0.1506849315068493,
+     0.15342465753424658,
+     0.15616438356164383,
+     0.1589041095890411,
+     0.16164383561643836,
+     0.1643835616438356,
+     0.16712328767123288,
+     0.16986301369863013,
+     0.1726027397260274
+    ],
+    "spots": [
+     100.0,
+     97.4402,
+     98.3573,
+     97.7108,
+     98.645,
+     99.3159,
+     97.2947,
+     98.6075,
+     99.7136,
+     100.8615,
+     101.1766,
+     101.7221,
+     102.3997,
+     103.4948,
+     104.4947,
+     104.082,
+     103.9293,
+     104.064,
+     104.4841,
+     102.9617,
+     103.2368,
+     102.4126,
+     104.2918,
+     105.4294,
+     105.2606,
+     104.6715,
+     104.072,
+     104.8869,
+     103.9255,
+     103.6676,
+     102.4801,
+     103.6239,
+     104.9003,
+     105.0894,
+     105.72,
+     104.9522,
+     105.9338,
+     106.4331,
+     104.5656,
+     104.0247,
+     102.4998,
+     102.7706,
+     102.2494,
+     102.113,
+     103.1903,
+     103.9907,
+     103.6985,
+     104.7405,
+     104.9381,
+     104.8105,
+     104.4178,
+     105.4343,
+     104.5065,
+     103.7485,
+     102.7262,
+     101.5357,
+     101.9523,
+     101.4637,
+     100.7354,
+     101.1007,
+     103.089,
+     103.0976,
+     104.4515,
+     104.5436
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at rate (from hedgebt_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0005",
+   "operation": "hedge.backtest.delta",
+   "inputs": {
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "hedge_volatility": 0.2,
+    "quantity": -100.0,
+    "option": {
+     "type": "CALL",
+     "strike": 100.0,
+     "expiry_years": 0.1726027397260274
+    },
+    "times": [
+     0.0,
+     0.0027397260273972603,
+     0.005479452054794521,
+     0.00821917808219178,
+     0.010958904109589041,
+     0.0136986301369863,
+     0.01643835616438356,
+     0.019178082191780823,
+     0.021917808219178082,
+     0.024657534246575342,
+     0.0273972602739726,
+     0.030136986301369864,
+     0.03287671232876712,
+     0.03561643835616438,
+     0.038356164383561646,
+     0.0410958904109589,
+     0.043835616438356165,
+     0.04657534246575343,
+     0.049315068493150684,
+     0.052054794520547946,
+     0.0547945205479452,
+     0.057534246575342465,
+     0.06027397260273973,
+     0.06301369863013699,
+     0.06575342465753424,
+     0.0684931506849315,
+     0.07123287671232877,
+     0.07397260273972603,
+     0.07671232876712329,
+     0.07945205479452055,
+     0.0821917808219178,
+     0.08493150684931507,
+     0.08767123287671233,
+     0.09041095890410959,
+     0.09315068493150686,
+     0.0958904109589041,
+     0.09863013698630137,
+     0.10136986301369863,
+     0.10410958904109589,
+     0.10684931506849316,
+     0.1095890410958904,
+     0.11232876712328767,
+     0.11506849315068493,
+     0.1178082191780822,
+     0.12054794520547946,
+     0.1232876712328767,
+     0.12602739726027398,
+     0.12876712328767123,
+     0.13150684931506848,
+     0.13424657534246576,
+     0.136986301369863,
+     0.13972602739726028,
+     0.14246575342465753,
+     0.14520547945205478,
+     0.14794520547945206,
+     0.1506849315068493,
+     0.15342465753424658,
+     0.15616438356164383,
+     0.1589041095890411,
+     0.16164383561643836,
+     0.1643835616438356,
+     0.16712328767123288,
+     0.16986301369863013,
+     0.1726027397260274
+    ],
+    "spots": [
+     100.0,
+     97.4402,
+     98.3573,
+     97.7108,
+     98.645,
+     99.3159,
+     97.2947,
+     98.6075,
+     99.7136,
+     100.8615,
+     101.1766,
+     101.7221,
+     102.3997,
+     103.4948,
+     104.4947,
+     104.082,
+     103.9293,
+     104.064,
+     104.4841,
+     102.9617,
+     103.2368,
+     102.4126,
+     104.2918,
+     105.4294,
+     105.2606,
+     104.6715,
+     104.072,
+     104.8869,
+     103.9255,
+     103.6676,
+     102.4801,
+     103.6239,
+     104.9003,
+     105.0894,
+     105.72,
+     104.9522,
+     105.9338,
+     106.4331,
+     104.5656,
+     104.0247,
+     102.4998,
+     102.7706,
+     102.2494,
+     102.113,
+     103.1903,
+     103.9907,
+     103.6985,
+     104.7405,
+     104.9381,
+     104.8105,
+     104.4178,
+     105.4343,
+     104.5065,
+     103.7485,
+     102.7262,
+     101.5357,
+     101.9523,
+     101.4637,
+     100.7354,
+     101.1007,
+     103.089,
+     103.0976,
+     104.4515,
+     "-Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at spots/63 (from hedgebt_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0006",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": "NaN",
+    "spot2": 143.5386,
+    "rate": 0.0076,
+    "yield1": 0.0237,
+    "yield2": 0.0257,
+    "vol1": 0.4843,
+    "vol2": 0.1528,
+    "correlation": 0.6308,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.9506849315068493,
+      "quantity": 727.633
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.6328767123287671,
+      "quantity": -434.0253
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.6136986301369863
+     }
+    ],
+    "targets": [
+     "CORRELATION"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at spot1 (from hedgecorr5_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0007",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 131.5256,
+    "spot2": 143.5386,
+    "rate": 0.0076,
+    "yield1": 0.0237,
+    "yield2": 0.0257,
+    "vol1": 0.4843,
+    "vol2": 0.1528,
+    "correlation": 0.6308,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.9506849315068493,
+      "quantity": 727.633
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.6328767123287671,
+      "quantity": -434.0253
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": "-Infinity"
+     }
+    ],
+    "targets": [
+     "CORRELATION"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at hedges/0/expiry_years (from hedgecorr5_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0008",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": "NaN"
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "CS01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at discount/pillars/0/discount_factor (from hedgecredit_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0009",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": "-Infinity"
+     }
+    ],
+    "targets": [
+     "CS01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at hedges/0/coupon (from hedgecredit_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0010",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": "NaN",
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "FORWARD",
+      "strike": 4000.0,
+      "expiry_years": 1.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 1.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 5.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 10.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at spot (from hedgexa_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0011",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "FORWARD",
+      "strike": 4000.0,
+      "expiry_years": 1.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 1.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 5.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 10.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     "-Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at weights/4 (from hedgexa_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0012",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     "NaN",
+     532.11,
+     1726.67,
+     -1405.09,
+     -925.23,
+     -145.45
+    ],
+    "hedge_changes": [
+     -543.35,
+     -118.15,
+     -1243.78,
+     785.99,
+     371.12,
+     59.2
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at item_changes/0 (from hedgeeff5_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0013",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     818.48,
+     532.11,
+     1726.67,
+     -1405.09,
+     -925.23,
+     -145.45
+    ],
+    "hedge_changes": [
+     -543.35,
+     -118.15,
+     -1243.78,
+     785.99,
+     371.12,
+     "-Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at hedge_changes/5 (from hedgeeff5_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0014",
+   "operation": "hedge.frontier.solve",
+   "inputs": {
+    "a": [
+     [
+      "NaN",
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.1,
+     0.02
+    ],
+    "cost_weights": [
+     0.0,
+     0.5,
+     1.0,
+     2.0,
+     5.0,
+     10.0,
+     50.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at a/0/0 (from hedgefrontier_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0015",
+   "operation": "hedge.frontier.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.1,
+     0.02
+    ],
+    "cost_weights": [
+     0.0,
+     0.5,
+     1.0,
+     2.0,
+     5.0,
+     10.0,
+     "-Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at cost_weights/6 (from hedgefrontier_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0016",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": "NaN",
+    "rate": 0.0317,
+    "dividend_yield": 0.0052,
+    "volatility": 0.5965,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 227.5486,
+      "expiry_years": 0.863013698630137,
+      "quantity": 584.5566
+     },
+     {
+      "instrument": "CALL",
+      "strike": 226.0185,
+      "expiry_years": 0.9452054794520548,
+      "quantity": 776.3642
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 131.8657,
+      "expiry_years": 1.7671232876712328
+     }
+    ],
+    "targets": [
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at spot (from hedgegreeks5_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0017",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 186.4793,
+    "rate": 0.0317,
+    "dividend_yield": 0.0052,
+    "volatility": 0.5965,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 227.5486,
+      "expiry_years": 0.863013698630137,
+      "quantity": 584.5566
+     },
+     {
+      "instrument": "CALL",
+      "strike": 226.0185,
+      "expiry_years": 0.9452054794520548,
+      "quantity": 776.3642
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 131.8657,
+      "expiry_years": "-Infinity"
+     }
+    ],
+    "targets": [
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at hedges/0/expiry_years (from hedgegreeks5_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0018",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      "NaN",
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -20.0,
+     15.0,
+     -7.0,
+     9.0,
+     -11.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at a/0/0 (from hedgeint_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0019",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -20.0,
+     15.0,
+     -7.0,
+     9.0,
+     -11.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0,
+     "-Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at lot_sizes/2 (from hedgeint_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0020",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      "NaN",
+      0.0019590000000000007
+     ],
+     [
+      0.0019590000000000007,
+      0.021918700000000003
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at covariance/0/0 (from hedgemv5_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0021",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.01526571,
+      0.0019590000000000007
+     ],
+     [
+      0.0019590000000000007,
+      "-Infinity"
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at covariance/1/1 (from hedgemv5_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0022",
+   "operation": "hedge.residual.report",
+   "inputs": {
+    "a": [
+     [
+      "NaN",
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7
+    ],
+    "x": [
+     2.9531821506949525,
+     -2.3979517190929043,
+     1.228968544257498
+    ],
+    "covariance": [
+     [
+      0.0001,
+      4e-05,
+      1e-05
+     ],
+     [
+      4e-05,
+      9e-05,
+      3e-05
+     ],
+     [
+      1e-05,
+      3e-05,
+      0.00016
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at a/0/0 (from hedgeres_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0023",
+   "operation": "hedge.residual.report",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7
+    ],
+    "x": [
+     2.9531821506949525,
+     -2.3979517190929043,
+     1.228968544257498
+    ],
+    "covariance": [
+     [
+      0.0001,
+      4e-05,
+      1e-05
+     ],
+     [
+      4e-05,
+      9e-05,
+      3e-05
+     ],
+     [
+      1e-05,
+      3e-05,
+      "-Infinity"
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at covariance/2/2 (from hedgeres_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0024",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      "NaN",
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at a/0/0 (from hedgeselect_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0025",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     "-Infinity"
+    ],
+    "max_instruments": 1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at weights/4 (from hedgeselect_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0026",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": [
+     {
+      "quantity": "NaN",
+      "decision_price": 100.0,
+      "final_price": 101.5,
+      "half_spread": 0.02,
+      "impact": 0.0001,
+      "fills": [
+       {
+        "quantity": 400.0,
+        "price": 100.05
+       },
+       {
+        "quantity": 600.0,
+        "price": 100.12
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at orders/0/quantity (from hedgeslip_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0027",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": [
+     {
+      "quantity": 1000.0,
+      "decision_price": 100.0,
+      "final_price": 101.5,
+      "half_spread": 0.02,
+      "impact": 0.0001,
+      "fills": [
+       {
+        "quantity": 400.0,
+        "price": 100.05
+       },
+       {
+        "quantity": 600.0,
+        "price": "-Infinity"
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at orders/0/fills/1/price (from hedgeslip_i-0001)"
+  },
+  {
+   "case_id": "e1_r6-0028",
+   "operation": "risk.concentration.measures",
+   "inputs": {
+    "exposures": [
+     "NaN",
+     10.0,
+     10.0,
+     10.0
+    ],
+    "top_n": 2
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at exposures/0 (from risk_f4b-0012)"
+  },
+  {
+   "case_id": "e1_r6-0029",
+   "operation": "risk.concentration.measures",
+   "inputs": {
+    "exposures": [
+     10.0,
+     10.0,
+     10.0,
+     "-Infinity"
+    ],
+    "top_n": 2
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at exposures/3 (from risk_f4b-0012)"
+  },
+  {
+   "case_id": "e1_r6-0030",
+   "operation": "risk.frtb.commodity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "commodity": "BRENT",
+      "bucket": 2,
+      "tenor": "1Y",
+      "location": "ICE",
+      "sensitivity": "NaN"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at sensitivities/0/sensitivity (from frtb_f2b-0022)"
+  },
+  {
+   "case_id": "e1_r6-0031",
+   "operation": "risk.frtb.csr_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 3,
+      "tenor": "5Y",
+      "curve": "BOND",
+      "sensitivity": "NaN"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at sensitivities/0/sensitivity (from frtb_f2b-0016)"
+  },
+  {
+   "case_id": "e1_r6-0032",
+   "operation": "risk.frtb.curvature",
+   "inputs": {
+    "risk_class": "EQUITY",
+    "factors": [
+     {
+      "bucket": 5,
+      "name": "A",
+      "cvr_up": "NaN",
+      "cvr_down": 0.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at factors/0/cvr_up (from frtb_f2c-0010)"
+  },
+  {
+   "case_id": "e1_r6-0033",
+   "operation": "risk.frtb.curvature",
+   "inputs": {
+    "risk_class": "EQUITY",
+    "factors": [
+     {
+      "bucket": 5,
+      "name": "A",
+      "cvr_up": -3.0,
+      "cvr_down": "-Infinity"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at factors/0/cvr_down (from frtb_f2c-0010)"
+  },
+  {
+   "case_id": "e1_r6-0034",
+   "operation": "risk.frtb.equity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 5,
+      "kind": "SPOT",
+      "sensitivity": "NaN"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at sensitivities/0/sensitivity (from frtb_f2b-0007)"
+  },
+  {
+   "case_id": "e1_r6-0035",
+   "operation": "risk.frtb.fx_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "pair": "EURUSD",
+      "sensitivity": "NaN"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at sensitivities/0/sensitivity (from frtb_f2b-0001)"
+  },
+  {
+   "case_id": "e1_r6-0036",
+   "operation": "risk.frtb.vega",
+   "inputs": {
+    "risk_class": "GIRR",
+    "sensitivities": [
+     {
+      "bucket": "EUR",
+      "option_maturity": "NaN",
+      "underlying_maturity": 5.0,
+      "vega": 1000000.0
+     },
+     {
+      "bucket": "EUR",
+      "option_maturity": 5.0,
+      "underlying_maturity": 10.0,
+      "vega": -600000.0
+     },
+     {
+      "bucket": "USD",
+      "option_maturity": 1.0,
+      "underlying_maturity": 5.0,
+      "vega": 800000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at sensitivities/0/option_maturity (from frtb_f2c-0001)"
+  },
+  {
+   "case_id": "e1_r6-0037",
+   "operation": "risk.frtb.vega",
+   "inputs": {
+    "risk_class": "GIRR",
+    "sensitivities": [
+     {
+      "bucket": "EUR",
+      "option_maturity": 1.0,
+      "underlying_maturity": 5.0,
+      "vega": 1000000.0
+     },
+     {
+      "bucket": "EUR",
+      "option_maturity": 5.0,
+      "underlying_maturity": 10.0,
+      "vega": -600000.0
+     },
+     {
+      "bucket": "USD",
+      "option_maturity": 1.0,
+      "underlying_maturity": 5.0,
+      "vega": "-Infinity"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at sensitivities/2/vega (from frtb_f2c-0001)"
+  },
+  {
+   "case_id": "e1_r6-0038",
+   "operation": "risk.limits.check",
+   "inputs": {
+    "measures": {
+     "VAR99": "NaN",
+     "DV01": -48000.0,
+     "VEGA": 120000.0
+    },
+    "limits": {
+     "VAR99": {
+      "soft": 8000000.0,
+      "hard": 10000000.0
+     },
+     "DV01": {
+      "soft": 40000.0,
+      "hard": 50000.0
+     },
+     "VEGA": {
+      "soft": 150000.0,
+      "hard": 200000.0
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at measures/VAR99 (from risk_f4b-0007)"
+  },
+  {
+   "case_id": "e1_r6-0039",
+   "operation": "risk.limits.check",
+   "inputs": {
+    "measures": {
+     "VAR99": 9500000.0,
+     "DV01": -48000.0,
+     "VEGA": 120000.0
+    },
+    "limits": {
+     "VAR99": {
+      "soft": 8000000.0,
+      "hard": 10000000.0
+     },
+     "DV01": {
+      "soft": 40000.0,
+      "hard": 50000.0
+     },
+     "VEGA": {
+      "soft": 150000.0,
+      "hard": "-Infinity"
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at limits/VEGA/hard (from risk_f4b-0007)"
+  },
+  {
+   "case_id": "e1_r6-0040",
+   "operation": "risk.sens.correlation",
+   "inputs": {
+    "spot1": "NaN",
+    "spot2": 95.0,
+    "quantity1": 1.0,
+    "quantity2": 1.0,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.3,
+    "vol2": 0.25,
+    "correlation": 0.5,
+    "expiry_years": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at spot1 (from risk_f3b-0013)"
+  },
+  {
+   "case_id": "e1_r6-0041",
+   "operation": "risk.sens.correlation",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "quantity1": 1.0,
+    "quantity2": 1.0,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.3,
+    "vol2": 0.25,
+    "correlation": 0.5,
+    "expiry_years": "-Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at expiry_years (from risk_f3b-0013)"
+  },
+  {
+   "case_id": "e1_r6-0042",
+   "operation": "risk.sens.dividend_borrow",
+   "inputs": {
+    "spot": "NaN",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.02,
+    "borrow_rate": 0.005,
+    "vol": 0.25,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at spot (from risk_f3b-0006)"
+  },
+  {
+   "case_id": "e1_r6-0043",
+   "operation": "risk.sens.dividend_borrow",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.02,
+    "borrow_rate": 0.005,
+    "vol": "-Infinity",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at vol (from risk_f3b-0006)"
+  },
+  {
+   "case_id": "e1_r6-0044",
+   "operation": "risk.sens.inflation01",
+   "inputs": {
+    "notional": "NaN",
+    "years": 10,
+    "fixed_rate": 0.025,
+    "market_rate": 0.027,
+    "discount_factor": 0.75
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at notional (from risk_f3b-0001)"
+  },
+  {
+   "case_id": "e1_r6-0045",
+   "operation": "risk.sens.inflation01",
+   "inputs": {
+    "notional": 10000000.0,
+    "years": 10,
+    "fixed_rate": 0.025,
+    "market_rate": 0.027,
+    "discount_factor": "-Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at discount_factor (from risk_f3b-0001)"
+  },
+  {
+   "case_id": "e1_r6-0046",
+   "operation": "risk.stress.reverse",
+   "inputs": {
+    "direction": [
+     "NaN",
+     0.5,
+     -0.25
+    ],
+    "delta": [
+     -1000.0,
+     -400.0,
+     300.0
+    ],
+    "gamma": [
+     [
+      -2000.0,
+      0,
+      0
+     ],
+     [
+      0,
+      -800.0,
+      100.0
+     ],
+     [
+      0,
+      100.0,
+      -500.0
+     ]
+    ],
+    "target_loss": 50.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at direction/0 (from risk_f4b-0001)"
+  },
+  {
+   "case_id": "e1_r6-0047",
+   "operation": "risk.stress.reverse",
+   "inputs": {
+    "direction": [
+     1.0,
+     0.5,
+     -0.25
+    ],
+    "delta": [
+     -1000.0,
+     -400.0,
+     300.0
+    ],
+    "gamma": [
+     [
+      -2000.0,
+      0,
+      0
+     ],
+     [
+      0,
+      -800.0,
+      100.0
+     ],
+     [
+      0,
+      100.0,
+      -500.0
+     ]
+    ],
+    "target_loss": "-Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at target_loss (from risk_f4b-0001)"
+  },
+  {
+   "case_id": "e1_r6-0048",
+   "operation": "risk.var.liquidity_adjusted",
+   "inputs": {
+    "var": "NaN",
+    "z": 2.326,
+    "position_values": [
+     5000000.0,
+     -3000000.0,
+     2000000.0
+    ],
+    "spread_mean": [
+     0.001,
+     0.002,
+     0.004
+    ],
+    "spread_vol": [
+     0.0005,
+     0.001,
+     0.003
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at var (from risk_f4b-0017)"
+  },
+  {
+   "case_id": "e1_r6-0049",
+   "operation": "risk.var.liquidity_adjusted",
+   "inputs": {
+    "var": 1200000.0,
+    "z": 2.326,
+    "position_values": [
+     5000000.0,
+     -3000000.0,
+     2000000.0
+    ],
+    "spread_mean": [
+     0.001,
+     0.002,
+     0.004
+    ],
+    "spread_vol": [
+     0.0005,
+     0.001,
+     "-Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at spread_vol/2 (from risk_f4b-0017)"
+  },
+  {
+   "case_id": "e1_r6-0050",
+   "operation": "risk.vol.horizon",
+   "inputs": {
+    "daily_vol": "NaN",
+    "ar1": 0.0,
+    "horizon_days": 10
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at daily_vol (from risk_f4b-0020)"
+  },
+  {
+   "case_id": "e1_r6-0051",
+   "operation": "risk.vol.horizon",
+   "inputs": {
+    "daily_vol": 0.01,
+    "ar1": "-Infinity",
+    "horizon_days": 10
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at ar1 (from risk_f4b-0020)"
+  },
+  {
+   "case_id": "e1_r6-0052",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      "NaN",
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.03,
+    "sigma": 0.005,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at curve/times/0 (from expsim_g-0001)"
+  },
+  {
+   "case_id": "e1_r6-0053",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.03,
+    "sigma": 0.005,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": "-Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at recovery (from expsim_g-0001)"
+  }
+ ]
+}

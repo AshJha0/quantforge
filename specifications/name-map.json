@@ -5884,6 +5884,24 @@
     "scenarios"
    ]
   },
+  "risk.frtb.sbm_total": {
+   "spec": "specifications/06-risk/frtb-sa-girr.md",
+   "rust": "quantforge::risk::frtb_sbm_total",
+   "python": "quantforge.risk.frtb_sbm_total",
+   "java": "Risk.frtbSbmTotal",
+   "cpp": "qf::risk::frtb_sbm_total",
+   "inputs": {
+    "components": {
+     "java": "components"
+    }
+   },
+   "outputs": [
+    "binding_scenario",
+    "capital",
+    "scenario_totals",
+    "sum_of_component_capitals"
+   ]
+  },
   "risk.frtb.vega": {
    "spec": "specifications/06-risk/frtb-sa-vega-curvature.md",
    "rust": "quantforge::risk::frtb_vega",
@@ -7845,11 +7863,11 @@
    },
    "outputs": [
     "cva",
+    "deflated_pfe_95",
+    "deflated_pfe_99",
     "discounted_ee",
     "discounted_ene",
-    "epe",
-    "pfe_95",
-    "pfe_99"
+    "epe"
    ]
   },
   "xva.exposure.swap_ee_hw": {
