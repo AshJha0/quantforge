@@ -43,3 +43,14 @@ Remaining uncounted F value cases (about 75, small operations: curve inspect 11,
 ## Files
 
 New: `oracle/python/outside_f_r6.py`, `oracle/python/outside_g_r6.py`, `oracle/python/outside_g_barrier_r6.py`, `oracle/OUTSIDE_F_R6.json`, `oracle/OUTSIDE_G_R6.json`. Changed: `oracle/python/outside_f.py` (Kupiec, Christoffersen handlers; SCIPY.MLE row), `oracle/outside_register_f.json`, `oracle/CONVENTION_MAP_F.md`, `tools/outside_shares.py` (SCIPY.MLE primitive row, per-case G loader), `tools/test_outside_shares.py`, `oracle/OUTSIDE_SHARES.{json,md}`. Installs: none blocked (statsmodels, highspy, cvxpy not needed and not installed).
+
+## UNFINISHED at shutdown (2026-11-12, after 21536be)
+
+- F library-only now 214/417 = 51.3% (value), old all-case 40.8%. Added this round: dividend/borrow 5 (QuantLib dividendRho), correlation 4 (QuantLib Margrabe, Richardson bump, brentq inverse), vol horizon 4 (Toeplitz covariance), reverse stress 4 (brentq on matrix P&L), all pass; METHOD_TOL in outside_f.py states the tolerances.
+- REGRESSION to check: after merging r6 (risk_f4 goldens changed), FHS cases risk_f4-0019..0024 and garch_f-0009 no longer verify against the cached arch values (oracle/outside_arch_f.json is stale; es and tail_count differ). Regenerate the arch cache (outside_garch_arch.py, WSL) or report to spec lane. Log: outside_f_r6.log in the worktree root (not committed).
+- tools/test_outside_shares.py has 1 failure after the latest merge: not yet diagnosed (run it).
+- Tool: three-way shares (library only, library plus re-derivation, old all-case), class independent-rederivation restricted to CDS index, FRTB, book, traffic light; floor on library plus re-derivation: DONE (be5c743). Sub-count for the 23 spec-only book cases: NOT yet shown separately.
+- compare_rederivation.py: written and self-tested on a planted file; NOT run on C:\Work\Claude\qf-rederive\results.json. oracle/rederivation/ copy and README: NOT done.
+- aadladder_g: left uncounted per spec ruling (golden = exact derivative at the case grid; converged values differ, evidence of grid sensitivity).
+- Remaining F library candidates not done: curve inspect 11, ois_sensitivity 5, inflation01 3, dupire 4, MC VaR 4 (repo RNG: not independent), joint 3, funding 3, ois boot 2; no reference: jtd, limits, concentration, lvar (plain arithmetic), vix term variance (Cboe method, no library).
+- No detached job running. barrier_r6.log and outside_f_r6.log are local logs, not committed.
