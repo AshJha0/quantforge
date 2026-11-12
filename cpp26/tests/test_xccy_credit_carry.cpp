@@ -157,7 +157,7 @@ TEST_CASE("CPI curve, ZCIS and linkers") {
     const auto l = linker_price(bond, d("2026-11-16"), 0.015, 290.0, fx);
     CHECK(l.index_ratio == 1.03966);  // R6-7.5 hand value: 301.5 / 290 = 1.0396551..., trunc6 1.039655, round5 1.03966
     CHECK(l.nominal_clean == Approx(l.real_clean * 1.03966).epsilon(1e-15));
-    CHECK(l.nominal_clean == Approx(l.real_clean * l.ref_cpi / 290.0).epsilon(1e-15));
+    CHECK(l.ref_cpi == 301.5);  // 300 + 15/30 * 3, exact at five decimals
     CHECK(code_of([&] { linker_price(bond, d("2026-12-16"), 0.015, 290.0, fx); }) == "E_INPUT");
     CHECK(linker_price_curve(bond, d("2026-11-16"), 300.0, c, disc) > 0.0);
     CHECK(code_of([&] { linker_price_curve(bond, d("2026-11-16"), 300.0, CpiCurve{b + 12, 300, {{1, 0.03}}, std::nullopt}, disc); }) == "E_OUT_OF_RANGE");
