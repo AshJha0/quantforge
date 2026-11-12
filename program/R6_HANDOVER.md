@@ -100,3 +100,5 @@ WAVE 2 READY 3c5bcfe
 **Which builds had the mask (finding 3, for the release notes):** Python (`risk_curve.py:197`, reproduced: code and v0.8.0 build), Rust (`risk_curve.rs:404`; the v0.8.0 binary returns 0.0 above the diagonal on 6 of 8 value cases: reproduced), C++ (`core/risk.cpp`, loop from `i = j`; the v0.8.0 binary returns 0 on the same entries and also lacked `tension`/`step_end`: reproduced). Java: no mask (Java lane, phase 0; largest upper entry 0.038): not reproduced in Java.
 
 Totals with wave 1B: as stated under wave 2 (15,000 after waves 1 and 2).
+
+WAVE 1 READY 96f7a33 (1A and 1B: every wave 1 golden committed)
