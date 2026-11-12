@@ -3,6 +3,7 @@
 import hashlib
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -1018,7 +1019,8 @@ class DoctorAndQuickstart(unittest.TestCase):
         for page in check_tutorial.PAGES:
             text = page.read_text(encoding="utf-8")
             runs, expected = check_tutorial.blocks(text)
-            self.assertEqual(set(runs), {"python", "rust", "java", "cpp"}, page.name)
+            only = re.search(r"<!-- tutorial:only (\w+) -->", text)
+            self.assertEqual(set(runs), {only.group(1)} if only else {"python", "rust", "java", "cpp"}, page.name)
             self.assertGreaterEqual(len(expected), 4, page.name)
             self.assertEqual(check_tutorial.sources(text), [], page.name)  # listings equal their scripts
         first = check_tutorial.PAGES[0]
