@@ -45,7 +45,7 @@ Rules learned the hard way:
 - **Limit parallelism to `-j3`.** WSL gets about 7 GB here. An unbounded `--parallel` on 12 cores ran the VM out of memory and hung the WSL service for every session. Recovery needed `wsl --shutdown`.
 - **No Docker or Podman is installed, and none is needed.** If GCC 16 itself is wanted locally, the zero-cost route is the CI container image under a rootless Podman inside WSL. That is not set up.
 
-Measured 2026-11-07 at commit `af081b9`, GCC 15.2.0 in WSL Ubuntu 26.04 with `-j3`: the build and ctest pass, and the runner passes all 5,514 golden cases with 0 failures. Configure, build, test and conformance together took 7 min 40 s.
+Measured 2026-11-07 at commit `af081b9`, GCC 15.2.0 in WSL Ubuntu 26.04 with `-j3`: the build and ctest pass, and the runner passes all 5,514 golden cases (value-checked and error cases counted together) with 0 failures. Configure, build, test and conformance together took 7 min 40 s.
 
 ## Daily workflows (a) and (c)
 

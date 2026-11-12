@@ -8,15 +8,15 @@ daycount Strata ACT_ACT_AFB: 11 differences, all with end on 28 February, all re
 daycount Strata ONE_ONE: 6 differences, all start = end; Strata documents 1/1 as always 1
 daycount Strata THIRTY_E_360_ISDA: 1 difference, same case as QuantLib, -1/360; the spec gives 0
 daycount: no other difference from QuantLib or Strata, ACT_ACT_ICMA included
-suite daycount: 1756 cases
+suite daycount: 1756 cases (1750 value-checked, 6 error)
 add_tenor: text of calendars.md matches QuantLib on every day 2021 to 2026, two calendars, all conventions
-suite calendar: 1169 cases
-suite compounding: 846 cases
+suite calendar: 1169 cases (1165 value-checked, 4 error)
+suite compounding: 846 cases (841 value-checked, 5 error)
 rng: xoshiro256** and SplitMix64 match the published reference vectors
 rng: PPND16 worst relative error against 50-digit erfinv over 17 points: 3.40e-16
-suite rng: 28 cases
+suite rng: 28 cases (23 value-checked, 5 error)
 sobol: own code, QuantLib JoeKuoD6 and SciPy agree bit for bit on all stored cases
-suite sobol: 10 cases
+suite sobol: 10 cases (8 value-checked, 2 error)
 mc CALL PLAIN N=100000 m=1: price 9.293666 true 9.227006 err 6.67e-02 stderr 0.04393
 mc PUT PLAIN N=50000 m=1: price 6.291901 true 6.330081 err 3.82e-02 stderr 0.04092
 mc CALL PLAIN N=20000 m=4: price 9.365804 true 9.227006 err 1.39e-01 stderr 0.09867
@@ -27,20 +27,20 @@ mc PUT CONTROL_VARIATE N=50000 m=2: price 6.326961 true 6.330081 err 3.12e-03 st
 mc CALL SOBOL N=65536 m=1: price 9.225903 true 9.227006 err 1.10e-03 stderr 0.05401
 mc CALL SOBOL N=16384 m=4: price 9.219085 true 9.227006 err 7.92e-03 stderr 0.10792
 mc CALL PLAIN N=50000 m=1: price 5.881570 true 5.800638 err 8.09e-02 stderr 0.07682
-suite monte_carlo: 13 cases
-suite root: 28 cases
-suite integrate: 95 cases
+suite monte_carlo: 13 cases (10 value-checked, 3 error)
+suite root: 28 cases (20 value-checked, 8 error)
+suite integrate: 95 cases (91 value-checked, 4 error)
 tension: limits to natural cubic (p=0.011) and to linear (p=400) hold; s' continuous at every knot
 monotone convex: every g integrates to 0, matches node forwards, closed-form G matches quadrature; all inputs reprice
-suite interp: 52 cases
-suite diff_linalg: 17 cases
-suite stats: 31 cases
+suite interp: 52 cases (44 value-checked, 8 error)
+suite diff_linalg: 17 cases (12 value-checked, 5 error)
+suite stats: 31 cases (22 value-checked, 9 error)
 pde J=100 M=50: price err 1.448e-03 delta err 1.843e-04 gamma err 1.171e-06
 pde J=200 M=100: price err 3.644e-04 delta err 4.603e-05 gamma err 2.754e-07
 pde J=400 M=200: price err 9.124e-05 delta err 1.151e-05 gamma err 6.777e-08
 pde J=800 M=400: price err 2.282e-05 delta err 2.877e-06 gamma err 1.688e-08
 pde convergence ratios on halving h and dt: [3.974, 3.994, 3.998]
-suite pde: 11 cases
+suite pde: 11 cases (8 value-checked, 3 error)
 cos BS CALL K=100.0 sig=0.2 t=1.0: err 3.89e-24
 cos BS PUT K=100.0 sig=0.2 t=1.0: err 3.89e-24
 cos BS CALL K=80.0 sig=0.3 t=0.25: err 4.92e-24
@@ -51,99 +51,99 @@ cos Heston PUT K=90.0 t=1.0: against QuantLib err 6.78e-11
 cos Heston CALL K=120.0 t=2.0: against QuantLib err 8.90e-12
 cos Heston PUT K=100.0 t=0.5: against QuantLib err 5.59e-09
 cos Heston near zero vol-of-vol against BS at average variance: err 2.11e-06
-suite cos: 14 cases
+suite cos: 14 cases (10 value-checked, 4 error)
 snapshot: hand-written canonical form matches; hashlib matches NIST abc and system sha256sum
-suite snapshot: 21 cases
-suite data_checks: 27 cases
+suite snapshot: 21 cases (14 value-checked, 7 error)
+suite data_checks: 27 cases (24 value-checked, 3 error)
 time: rule table matches zoneinfo at 2717520 half-hour instants, 2007 to 2037, five zones
-suite time: 123 cases
-suite rulings: 39 cases
-suite store: 21 cases
+suite time: 123 cases (116 value-checked, 7 error)
+suite rulings: 39 cases (13 value-checked, 26 error)
+suite store: 21 cases (16 value-checked, 5 error)
 store: expected rows hand-written; hashes from the oracle canonical form, one source by nature
 limits: mc at limit, price 9.24164, stderr 0.01384
-suite limits: 61 cases
-suite store_a4: 6 cases
-suite limit_order: 15 cases
-suite store_rulings: 11 cases
-suite units: 26 cases
-suite schedule: 7 cases
-suite curve: 7 cases
+suite limits: 61 cases (22 value-checked, 39 error)
+suite store_a4: 6 cases (1 value-checked, 5 error)
+suite limit_order: 15 cases (2 value-checked, 13 error)
+suite store_rulings: 11 cases (5 value-checked, 6 error)
+suite units: 26 cases (20 value-checked, 6 error)
+suite schedule: 7 cases (5 value-checked, 2 error)
+suite curve: 7 cases (4 value-checked, 3 error)
 ois: replay matches QuantLib to 5e-12 at every pillar, SONIA and SOFR, both interpolations
 ois: swap PVs match QuantLib OvernightIndexedSwap within 1e-5 on 1e6, with and without payment lag
 ois: with payment lag the telescoped form misses the leg by 1.13e-04 per unit notional on 10Y
-suite ois: 32 cases
+suite ois: 32 cases (25 value-checked, 7 error)
 projection: replay against QuantLib, max pillar difference 1.09e-14
 projection: vanilla swap PVs match QuantLib within 1e-5 on 1e6
-suite projection: 6 cases
-suite fx: 14 cases
+suite projection: 6 cases (6 value-checked, 0 error)
+suite fx: 14 cases (11 value-checked, 3 error)
 risk: key-rate sums match the parallel DV01 to under 1e-5 relative at a 1 bp bump
-suite risk: 6 cases
-suite hedge: 10 cases
+suite risk: 6 cases (4 value-checked, 2 error)
+suite hedge: 10 cases (6 value-checked, 4 error)
 calibration: Nelson-Siegel objective LM 7.2e-35, BFGS 4.3e-15; Gauss-Newton and BFGS reach the exponential minima
-suite calibration: 25 cases
+suite calibration: 25 cases (18 value-checked, 7 error)
 use case 1: book PV 59903.6465 and delta 2054546.4912, QuantLib FxForward gap 9.90e-10 and 7.59e-04
 use case 2: DV01 5359.88 on 1e7, residual key-rate norm 0.02 against 3847.77 unhedged
-suite usecases: 2 cases
+suite usecases: 2 cases (2 value-checked, 0 error)
 schedule_deep: 48 cases against QuantLib, 48 also equal to Strata PeriodicSchedule
-suite schedule_deep: 48 cases
-suite curve_deep: 8 cases
+suite schedule_deep: 48 cases (48 value-checked, 0 error)
+suite curve_deep: 8 cases (8 value-checked, 0 error)
 ois_deep: 20 swap PVs against Strata's pricer on 1e6, worst difference 4.075e-10
-suite ois_deep: 36 cases
+suite ois_deep: 36 cases (36 value-checked, 0 error)
 projection_deep: pillars, swaps and FRAs match QuantLib, including month-end spot, a holiday in the spot lag and negative rates
-suite projection_deep: 19 cases
+suite projection_deep: 19 cases (19 value-checked, 0 error)
 risk_deep: DV01 and every key rate against bumped QuantLib quotes, worst difference 3.339e-06 on 1e6
-suite risk_deep: 6 cases
+suite risk_deep: 6 cases (6 value-checked, 0 error)
 fx_deep: implied ratios against QuantLib FxSwapRateHelper, worst difference 1.887e-15
-suite fx_deep: 33 cases
+suite fx_deep: 33 cases (33 value-checked, 0 error)
 hedge_deep: exact enumeration against SciPy L-BFGS-B, worst difference 6.04e-10
-suite hedge_deep: 12 cases
-suite rulings_b: 46 cases
+suite hedge_deep: 12 cases (12 value-checked, 0 error)
+suite rulings_b: 46 cases (8 value-checked, 38 error)
 mutants: 23 deliberate errors, all caught
-suite equity_forward: 26 cases
+suite equity_forward: 26 cases (12 value-checked, 14 error)
 equity_forward: 26 cases
-suite black: 61 cases
+suite black: 61 cases (49 value-checked, 12 error)
 black: 61 cases
-suite black_deep: 156 cases
+suite black_deep: 156 cases (156 value-checked, 0 error)
 black_deep: 156 cases
 equity_forward_deep: 6 QuantLib checks, 3 with a borrow on the shipped engine; the wrong forward misses by up to 4.234e-02
-suite equity_forward_deep: 15 cases
+suite equity_forward_deep: 15 cases (9 value-checked, 6 error)
 equity_forward_deep: 15 cases
-suite greeks: 45 cases
+suite greeks: 45 cases (43 value-checked, 2 error)
 greeks: 45 cases
-suite smile: 57 cases
+suite smile: 57 cases (30 value-checked, 27 error)
 smile: 57 cases
-suite surface: 14 cases
+suite surface: 14 cases (6 value-checked, 8 error)
 surface: 14 cases
-suite sabr: 25 cases
+suite sabr: 25 cases (10 value-checked, 15 error)
 sabr: 25 cases
 sabr_deep: arbitrage-free recipe against QuantLib CEV at nu=0: worst call error 1.51e-05
 sabr_deep: against QuantLib NoArbSabr (Doust, another method): worst vol gap 1.79e-02
-suite sabr_deep: 13 cases
+suite sabr_deep: 13 cases (6 value-checked, 7 error)
 sabr_deep: 13 cases
 strata_vol: Black, Greeks, Bachelier, Hagan against Strata, worst gap 2.04e-14
-suite strata_vol: 32 cases
+suite strata_vol: 32 cases (32 value-checked, 0 error)
 strata_vol: 32 cases
-suite usecases_c: 2 cases
+suite usecases_c: 2 cases (1 value-checked, 1 error)
 usecases_c: 2 cases
 stage C mutants: 30 caught; arbitrage-free against CEV [1.5084564432291114e-05], Hagan [0.005817758552876473], Doust [0.017899914994640886]
 ois_d: ESTR and SOFR pillars match QuantLib OISRateHelper within 5e-12, both interpolations, two dates
 ois_d: turn-of-year jump curves match QuantLib's jump mechanism within 5e-12 at pillars and around the turn
 ois_d: ESTR and SOFR swap PVs match QuantLib MakeOIS within 1e-9 per unit notional
-suite ois_d: 25 cases
+suite ois_d: 25 cases (21 value-checked, 4 error)
 compound_d: lookback, observation shift and lockout match QuantLib OvernightIndexedCoupon within 5e-14 (lockout k as QuantLib k-1)
 compound_d: IBOR fallback rates match QuantLib with 2-day observation shift; spreads are ISDA's fixed 2021-03-05 values
-suite compound_d: 35 cases
+suite compound_d: 35 cases (25 value-checked, 10 error)
 steps_d: step curves match QuantLib ForwardCurve (backward flat) with jumps within 2e-15
 steps_d: fit recovers the step rates behind QuantLib MakeOIS par rates within 1e-12
-suite steps_d: 11 cases
+suite steps_d: 11 cases (5 value-checked, 6 error)
 futures_d: Hull-White convexity matches QuantLib HullWhite.convexityBias, including a = 0 by limit
-suite futures_d: 10 cases
+suite futures_d: 10 cases (6 value-checked, 4 error)
 csa_d: OIS index basis equals the difference of QuantLib par rates on the two projection curves within 1e-12
 csa_d: joint bootstrap agrees with QuantLib's two-step build within 1e-10
-suite csa_d: 13 cases
+suite csa_d: 13 cases (10 value-checked, 3 error)
 fits_d: smoothness-regularised forward fits solved in exact rationals; NumPy agrees within 1e-9
 fits_d: Huber Nelson-Siegel fits (fixed tau) agree with SciPy least_squares loss='huber' from three starts within 1e-8
-suite fits_d: 16 cases
+suite fits_d: 16 cases (8 value-checked, 8 error)
 stage D: 65 wrong-convention checks, each caught
   mutant ois_d: ESTR payment lag 1 instead of 2: gap 1.873e-04
   mutant ois_d: SOFR turn of year ignored: gap 4.675e-07
@@ -212,11 +212,11 @@ stage D: 65 wrong-convention checks, each caught
   mutant fits_d: plain least squares instead of Huber ([6]): gap 1.340e-03
 bonds_d: clean price, accrued, modified duration and convexity match QuantLib FixedRateBond (ACT/ACT ICMA, compounded) within 1e-10
 bonds_d: curve prices and Z-spreads match QuantLib BondFunctions.zSpread (continuous, ACT/365F) within 1e-10
-suite bonds_d: 49 cases
+suite bonds_d: 49 cases (44 value-checked, 5 error)
 repo_d: FRN at zero margins on its own curve, settled on a coupon date, prices at 100 within 1e-11
 repo_d: CTD is bond 2; implied repo gap to next 1.04e-01
-suite repo_d: 19 cases
-suite bondfit_d: 4 cases
+suite repo_d: 19 cases (17 value-checked, 2 error)
+suite bondfit_d: 4 cases (2 value-checked, 2 error)
 stage D wave 2: 26 wrong-convention checks, each caught
   mutant bonds_d: accrued on ACT/365 for 2029-11-15: gap 1.690e-02
   mutant bonds_d: accrued on ACT/365 for 2031-02-28: gap 5.960e-03
@@ -245,46 +245,46 @@ stage D wave 2: 26 wrong-convention checks, each caught
   mutant repo_d: repo on clean, not dirty 2031-02-28: gap 9.427e-03
   mutant bondfit_d: zero-weight (rich) bond fitted as normal: gap 7.101e-03
 xccy_d: bootstrap recovers the basis-adjusted curve within 1e-13; foreign legs match QuantLib OvernightLeg NPVs within 1e-6 on 1e7
-suite xccy_d: 13 cases
+suite xccy_d: 13 cases (7 value-checked, 6 error)
 stage D D3: 12 wrong-convention checks, each caught
 credit_d: ISDA bootstrap replay reprices with QuantLib IsdaCdsEngine fair spreads within 1.9e-10
 credit_d: CDS NPV and upfront match QuantLib IsdaCdsEngine within 6.9e-16 per unit
 credit_d: on the SOFR curve, QuantLib's IsdaCdsEngine fair spreads agree with the replay within 1.2e-11
-suite credit_d: 19 cases
+suite credit_d: 19 cases (13 value-checked, 6 error)
 stage D D4: 13 wrong-convention checks, each caught
 equity_d: forwards replayed through a QuantLib DiscountCurve within 1e-9 (interpolation only, not an outside model); implied borrow and financing spreads are known truth
-suite equity_d: 10 cases
-suite index_d: 12 cases
-suite trs_d: 3 cases
+suite equity_d: 10 cases (7 value-checked, 3 error)
+suite index_d: 12 cases (6 value-checked, 6 error)
+suite trs_d: 3 cases (2 value-checked, 1 error)
 stage D D5: 9 wrong-convention checks, each caught
 inflation_d: CPI pillars reprice every ZCIS quote with and without seasonality
-suite inflation_d: 13 cases
+suite inflation_d: 13 cases (8 value-checked, 5 error)
 stage D D6: 5 wrong-convention checks, each caught
 capswaption_d: option values from QuantLib blackFormula and bachelierBlackFormula; schedules and curves as stage B
-suite capswaption_d: 14 cases
+suite capswaption_d: 14 cases (9 value-checked, 5 error)
 stage D D7: 9 wrong-convention checks, each caught
 commodity_d: seasonal curves reprice every quote; carry values kept at least 1e-6 from zero
-suite commodity_d: 10 cases
+suite commodity_d: 10 cases (4 value-checked, 6 error)
 stage D D8: 3 wrong-convention checks, each caught
 mbs_d: PSA ramp, SMM, level-pay amortisation by the standard formulas; the last month retires the balance within 1e-6
-suite mbs_d: 12 cases
+suite mbs_d: 12 cases (6 value-checked, 6 error)
 stage D D9: 10 wrong-convention checks, each caught
-suite rulings_d: 18 cases
+suite rulings_d: 18 cases (1 value-checked, 17 error)
 rulings_d: 18 cases
-suite rulings2_d: 25 cases
+suite rulings2_d: 25 cases (2 value-checked, 23 error)
 rulings2_d: 25 cases
-suite outside_d: 284 cases
+suite outside_d: 284 cases (284 value-checked, 0 error)
 outside_d: all 284 cases re-priced in QuantLib 1.44 through the convention map
-suite edge_d: 24 cases
+suite edge_d: 24 cases (24 value-checked, 0 error)
 edge_d: 24 edge-case register cases
-suite rulings_r1: 15 cases
+suite rulings_r1: 15 cases (9 value-checked, 6 error)
 rulings_r1: 15 cases (R1-3 conversion factor, R1-4 CDS discount interpolation)
-suite risk_r2: 41 cases
+suite risk_r2: 41 cases (32 value-checked, 9 error)
 risk_r2: QuantLib worst gaps per unit notional: par 1.8e-12, key-rate 3.7e-16; Jacobian 1.7e-08; par-from-zero identity worst 5.0e-06 of par DV01
-suite pnl_r2: 44 cases
+suite pnl_r2: 44 cases (42 value-checked, 2 error)
 pnl_r2: 44 cases, 4 not explained (large moves on long products); largest |unexplained|/threshold 3.24; no case within 0.9-1.1
 invariants: 256620 day-count evaluations, none negative, all equal-date results 0
-invariants: 4394 golden cases checked, none breaks a stated invariant
+invariants: 4394 golden cases checked (value-checked and error cases alike), none breaks a stated invariant
 invariants: 343 stage B cases checked, none breaks one
 invariants:   FX delta sign follows side: 11
 invariants:   OIS PV equals notional x (par - fixed) x annuity: 26

@@ -2,7 +2,9 @@
 
 Standard library only and no financial logic: tools/workflows/keyrate_explain.py makes the CLI calls, and this file
 draws what comes back. Inputs are a committed snapshot in docs/curves/data/pnl-explain.json (US Treasury par
-yields are a US government work), so --check reruns the Python CLI offline. `--refresh-real` fetches a new snapshot.
+yields are a US government work), so --check reruns the Python CLI offline. `--refresh-real` fetches a new snapshot,
+from the forward start (2026-11-10) only; with fewer than DAYS + 1 forward days there is no page. The 2026-10-23
+to 2026-11-06 snapshot was withdrawn on 2026-11-12: it fell in the R3 holdout windows (`research/preregs/DEVIATION-2026-11-12.md`).
 """
 import datetime as dt
 import json
@@ -24,7 +26,10 @@ def fetch_inputs():
     rows = eod_curves.treasury(common.fetch(common.source_url("us-treasury-par-yields", year)))
     if len(rows) < DAYS + 1:
         rows = eod_curves.treasury(common.fetch(common.source_url("us-treasury-par-yields", year - 1))) + rows
-    rows = rows[-(DAYS + 1):]
+    # Plan 14.10 rule 6: only observations on or after the forward start (outside every R3 holdout window).
+    rows = [r for r in rows if r[0] >= common.FORWARD_START][-(DAYS + 1):]
+    if len(rows) < DAYS + 1:
+        return None
     tenors = set.intersection(*[{q["tenor"] for q in qs} for _, qs in rows])
     return {"history": [[d, [q for q in qs if q["tenor"] in tenors]] for d, qs in rows], "trades": TRADES,
             "fetched": dt.date.today().isoformat()}

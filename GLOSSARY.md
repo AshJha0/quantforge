@@ -146,7 +146,7 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | Large homogeneous pool (LHP) | Vasicek's limit of a very large pool of identical names: losses depend on one common factor only |
 | Tranche, attachment, detachment | A slice of pool losses between two levels; the slice's expected loss as a fraction of its width |
 
-Stage E is Implemented in all four languages (6,817 of 6,817 golden cases at merge `597abf2`), not Validated. All inputs are synthetic. QuantLib's Python wheel has no GARCH, VIX, bivariate t or large-pool model, and no SLV or American FD reference, so those goldens rest on hand cases and high-precision replicas; 557 of 895 stage E cases (62.2%) are outside-checked under rule 11.2.5 and rulings E-A17 and E-B28.
+Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value-checked and error cases counted together) at merge `597abf2`), not Validated. All inputs are synthetic. QuantLib's Python wheel has no GARCH, VIX, bivariate t or large-pool model, and no SLV or American FD reference, so those goldens rest on hand cases and high-precision replicas; 557 of 895 stage E cases (62.2%) are outside-checked under rule 11.2.5 and rulings E-A17 and E-B28.
 
 ## Stage F terms
 

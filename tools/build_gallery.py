@@ -260,8 +260,8 @@ PLANNED = [
 # Stage D curves. Each gets a page: a planned page until `cli` names a CLI operation and a renderer
 # is registered for its `kind`, then the renderer's page. Text here is plain description, no numbers.
 STAGE_D = {
-    "ois-full": {"kind": "stage-d", "title": "OIS curves: full SOFR, ESTR and SONIA", "short": "Full SOFR, ESTR, SONIA OIS", "cli": "rates.ois.bootstrap", "examples": {"rates.ois.bootstrap": "estr_ois_d.json", "rates.ois.compound_dated": "real_sofr_compound_2026_10.json"},
-                 "real": {"real_sofr_compound_2026_10.json": "Real data: SOFR fixings from 2026-09-21 to 2026-11-05, from the Federal Reserve Bank of New York markets API, fetched 2026-11-07, converted from percent to decimal (the only modification). The SOFR data is subject to the Terms of Use posted at newyorkfed.org; the New York Fed does not endorse this use, and SOFR is calculated using data licensed from DTCC Solutions LLC."},
+    "ois-full": {"kind": "stage-d", "title": "OIS curves: full SOFR, ESTR and SONIA", "short": "Full SOFR, ESTR, SONIA OIS", "cli": "rates.ois.bootstrap", "examples": {"rates.ois.bootstrap": "estr_ois_d.json", "rates.ois.compound_dated": "real_sofr_compound_2022_10.json"},
+                 "real": {"real_sofr_compound_2022_10.json": "Real data: SOFR fixings from 2022-09-21 to 2022-11-04, from the Federal Reserve Bank of New York markets API, fetched 2026-11-12, converted from percent to decimal (the only modification). The dates are in-sample for every R3 study (plan 14.10 rule 6; the 2026 window used before fell in the R3-02 holdout and was withdrawn, `research/preregs/DEVIATION-2026-11-12.md`). The SOFR data is subject to the Terms of Use posted at newyorkfed.org; the New York Fed does not endorse this use, and SOFR is calculated using data licensed from DTCC Solutions LLC."},
                  "shows": "Discount factors and forwards, with meeting-date steps and observation conventions, and compounding of published overnight fixings. The ESTR payment lag of 2 days is a library choice, from Strata 2.12.78, not a market standard; TP ICAP terms use 1 (ruling R1-2)."},
     "bond-fit": {"kind": "stage-d", "title": "Bond and sovereign curve fits", "short": "Bond and sovereign fits", "cli": "bond.fit.nelson_siegel", "examples": {"bond.fit.nelson_siegel": "bond_fit_ns_d.json"},
                  "shows": "A fitted yield curve against bond yields, with residuals per bond."},
@@ -1094,6 +1094,8 @@ def generate_real(meta, refresh):
 def generate_pnl(meta, refresh):
     path = DATA / f"{gallery_pnl.SLUG}.json"
     inputs = gallery_pnl.fetch_inputs() if refresh or not path.is_file() else json.loads(path.read_text(encoding="utf-8"))["inputs"]
+    if inputs is None:  # not enough forward-dated days yet (plan 14.10 rule 6)
+        return None
     results = {lang: gallery_pnl.run(lang, inputs) for lang in LANGS}
     d = {"meta": meta, "inputs": inputs, "reference": results["python"], "agreement": gallery_pnl.agreement(results)}
     path.write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
@@ -1210,9 +1212,13 @@ def generate(refresh_real=False, real_only=False, stage_e_only=False, stage_f_on
     if real_only:  # keep every synthetic page's committed data; rebuild only the real-data page and the index
         all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs()}
         all_data[gallery_real.SLUG] = generate_real({**meta, "data": "real"}, refresh_real)
-        all_data[gallery_pnl.SLUG] = generate_pnl({**meta, "data": "real"}, refresh_real)
+        pnl = generate_pnl({**meta, "data": "real"}, refresh_real)
+        if pnl is not None:  # None until enough forward-dated days exist (plan 14.10 rule 6)
+            all_data[gallery_pnl.SLUG] = pnl
+        rendered = render_all(all_data)
         for name in ("README.md", f"{gallery_real.SLUG}.md", f"{gallery_pnl.SLUG}.md"):
-            (OUT / name).write_text(render_all(all_data)[name], encoding="utf-8", newline="\n")
+            if name in rendered:
+                (OUT / name).write_text(rendered[name], encoding="utf-8", newline="\n")
         print(f"real-data page written to {OUT}")
         return 0
     for slug, spec in CURVES.items():

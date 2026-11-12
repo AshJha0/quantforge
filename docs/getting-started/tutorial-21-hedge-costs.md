@@ -150,6 +150,39 @@ python examples/tutorial_hedge_21.py cpp26/build/quantforge
 
 Each prints the thirteen lines of step 1, digit for digit. The full checks are the conformance suites `hedgecost_i`, `hedgefrontier_i`, `hedgebtcost_i` and `hedgeslip_i`.
 
+## Use case 6: hedging an option book in whole lots
+
+Plain idea: a desk holding options hedges with listed contracts that trade in lots, so the hedge must be a whole number of lots, and rounding to whole lots leaves some risk and some cost behind. Use case 6 (`usecase.option_hedge_lots`, spec `specifications/04-pricing/use-cases.md`, ruling R6-11.20) takes the book, the hedge instruments with lot size and half-spread, and the Greeks to neutralise; it weights each Greek by `1/max(1, |b_t|)^2`, solves `hedge.integer.solve` with lot bounds of plus or minus `max_lots`, and reports the Greeks before and after, the lots, `hedge_cost` and `rounding_cost`.
+
+Worked example, golden case `uc6_r6-0001` (synthetic; expected outputs from the oracle at 50 digits with an exact integer search): a book short 1,500 six-month 105 calls, long 800 one-year 92 puts and long 600 three-month 100 calls (spot 100, rate 3%, dividend yield 1%, vol 22%), hedged in the underlying in lots of 100 with a half-spread of 0.01.
+
+| Output | Value |
+|---|---|
+| Delta before | -543.96 |
+| Lots bought | 5 (500 units) |
+| Delta after | -43.96 |
+| Gamma and vega | unchanged (-3.98 and -2,902.44): the underlying has neither |
+| `hedge_cost` | 5.0 (500 units times the 0.01 half-spread) |
+| `rounding_cost` | 0.0065, the objective lost by rounding to whole lots |
+
+To run the case through any build's CLI (`examples/tutorial_uc6.py` sends the golden inputs to `quantforge batch` and prints three lines):
+
+```bash
+python examples/tutorial_uc6.py rust/target/release/quantforge
+python examples/tutorial_uc6.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorial_uc6.py cpp26/build/quantforge
+```
+
+Expected output (rounded from the golden):
+
+```text
+delta before -543.96  lots [5]  delta after -43.96
+gamma -3.98  vega -2902.44
+hedge_cost 5.0000  rounding_cost 0.0065
+```
+
+**PENDING the language lanes:** the operation is new in CLI contract 1.12.0, and the block is not yet run by CI (no `tutorial:run` marker) because no build on `r6` implements `usecase.option_hedge_lots` (`git grep` over the four source trees, 2026-11-12). The marker goes on once the four builds pass `datasets/golden/r6/uc6_r6.json`.
+
 ## For practitioners
 
 - **Square-root impact is not here.** Empirical impact is often closer to the square root of size than linear in it. That cost grows as `|x|^{3/2}`, which is not a quadratic program; linear impact is the QP-compatible approximation the spec chose.

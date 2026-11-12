@@ -20,7 +20,7 @@ These targets are for batch and end-of-day use: a desk's overnight run, a risk r
 
 | # | Measure | Workload | Target, every language | Stretch (Rust, C++) |
 |---|---|---|---:|---:|
-| T1 | Single curve bootstrap, p99 latency per case within a warm batch | `rates.ois.bootstrap`, 13 SOFR OIS quotes 1W to 30Y, `LOG_LINEAR_DF`, `SEQUENTIAL`; 10,000 cases, each with quotes jittered by a seeded ±5 bp | ≤ 5 ms | ≤ 1 ms |
+| T1 | Single curve bootstrap, p99 latency per case within a warm batch | `rates.ois.bootstrap`, 13 SOFR OIS quotes 1W to 30Y, `LOG_LINEAR_DF`, `SEQUENTIAL`; 10,000 inputs, each with quotes jittered by a seeded ±5 bp | ≤ 5 ms | ≤ 1 ms |
 | T2 | 10,000-swap book PV, wall time, one core | One bootstrapped SOFR curve, then 10,000 `rates.swap.pv` cases (book below) | ≤ 60 s | ≤ 10 s |
 | T3 | 10,000-swap book key-rate risk, wall time, one core | T2's book, `risk.ois.dv01` on 13 key rates (one bump per pillar, so 14 curve builds) | ≤ 15 min | ≤ 2 min |
 | T4 | Batch start-up | `quantforge version`, median of 20 cold-ish runs (OS file cache warm) | ≤ 1.0 s (Python through `uv run`), ≤ 0.5 s (Java), ≤ 0.1 s (Rust, C++) | — |

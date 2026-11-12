@@ -23,7 +23,7 @@ python benchmarks/cli_throughput.py --suite daycount --cases 20000 --repeats 5 -
 
 Observed, 2026-11-06, commit `c956604`, one run on a laptop in normal use, so treat differences of a few percent as noise. The raw file is `results/2026-11-06-windows-daycount.json`.
 
-Machine: Intel Core 5 120U, 12 logical CPUs, 15.6 GiB, Windows 11 (10.0.26200), mains or battery state not recorded. Workload: 20,000 cases from the `daycount` suite (1,756 distinct), 5 repeats.
+Machine: Intel Core 5 120U, 12 logical CPUs, 15.6 GiB, Windows 11 (10.0.26200), mains or battery state not recorded. Workload: 20,000 inputs from the `daycount` suite (1,756 distinct), 5 repeats.
 
 | Language | Toolchain and build | cases/s | marginal cases/s | start-up, s |
 |---|---|---:|---:|---:|
