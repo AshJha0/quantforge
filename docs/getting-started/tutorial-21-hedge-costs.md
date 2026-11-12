@@ -181,7 +181,7 @@ gamma -3.98  vega -2902.44
 hedge_cost 5.0000  rounding_cost 0.0065
 ```
 
-**PENDING the language lanes:** the operation is new in CLI contract 1.12.0, and the block is not yet run by CI (no `tutorial:run` marker) because no build on `r6` implements `usecase.option_hedge_lots` (`git grep` over the four source trees, 2026-11-12). The marker goes on once the four builds pass `datasets/golden/r6/uc6_r6.json`.
+All four builds pass `datasets/golden/r6/uc6_r6.json` on the merged tree (conformance 15,077 of 15,077 in each language, 2026-11-12). The block does not yet carry a `tutorial:run` marker; it gains one after the first CI run confirms the printed lines in every language.
 
 ## For practitioners
 

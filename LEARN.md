@@ -450,7 +450,7 @@ Tutorials for this section: [6, interest rate models](docs/getting-started/tutor
 **Worked example.** `xvaadj_g-0001`: four half-yearly dates, `EE` 120, 150, 130, 80, counterparty hazard 2% and recovery 40%. CVA is 2.7099, DVA 0.8998 and FVA 0.6129 (FCA 1.8156 less FBA 1.2027); checked by mpmath at 50 digits.
 
 ### What stage G's evidence does and does not show
-- **Outside oracle: 332 of 463 value-checked cases (71.7%) under the tight rule D6, 56.4% under the old all-case count; v0.7.0 published 57.4%.** The figure rests on a suite-level register until a per-case one confirms it. Wave 4c compared portfolio exposure with ORE 1.8.17; 80 of 102 `expsim_g` cases count under ruling G-42. The re-test G-42b needs WSL and is carried to stage I (G-52).
+- **Outside oracle: 359 of 441 value-checked cases (81.4%) under the tight rule D6, 61.0% under the old all-case count; v0.7.0 published 57.4%.** From the per-case register (`oracle/OUTSIDE_SHARES.md`, regenerated 2026-11-12). Wave 4c compared portfolio exposure with ORE 1.8.17; 80 of 102 `expsim_g` cases count under ruling G-42. The re-test G-42b needs WSL and is carried to stage I (G-52).
 - **The stage demo ran.** ORE's NPV of the demo swap equals the closed form to 1e-6, and its EE is within 1 SE at 8,000 paths (`oracle/ore/ORE_DEMO.json`). ORE is a Monte Carlo check: it confirms the profiles to a few standard errors, not to the goldens' digits.
 - **18 PFE goldens were wrong and are fixed** (G-Q4): a grid scan missed level crossings near a flat peak. The four builds found it, because they solve for the crossings exactly.
 - **G-10 is inconclusive**; the powered test G-10b passed (`specifications/stage-g-rulings.md`). R9 acceptance has modest power (ruling G-34).
