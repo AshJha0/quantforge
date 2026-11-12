@@ -507,6 +507,13 @@ TEST_CASE("Q3b AAD ladder matches Richardson bumps of the scheme, and costs at m
         if (lad / one <= 5.0) break;
     }
     std::printf("Q3b AAD cost ratio (price + ladder) / price = %.2f (sink %.3f)\n", lad / one, sink);
+    // R6-16: record the measured ratio for the model inventory; CI sets QF_G9_RECORD and uploads the file.
+    if (const char* path = std::getenv("QF_G9_RECORD")) {
+        if (std::FILE* f = std::fopen(path, "w")) {
+            std::fprintf(f, "{\"gate\":\"G-9\",\"language\":\"cpp\",\"ratio\":%.4f,\"limit\":5.0}\n", lad / one);
+            std::fclose(f);
+        }
+    }
     // The G-9 gate is a performance claim about an optimised build; sanitizer instrumentation distorts the ratio
     // (9.3 under ASan), so it is reported but not judged there.
 #if defined(__SANITIZE_ADDRESS__) || QF_HAS_ASAN

@@ -1,5 +1,5 @@
-#include "quantforge/core/risk_f4.hpp"
-// CLI handlers, stage F risk_f4. Included by dispatch.cpp inside its unnamed namespace.
+#include "quantforge/core/var_frtb.hpp"
+// CLI handlers: VaR, ES, backtests and FRTB-SA GIRR delta. Included by dispatch.cpp inside its unnamed namespace.
 
 constexpr std::size_t max_f4_scenarios = 1000000;
 

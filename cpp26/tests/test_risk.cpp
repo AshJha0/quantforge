@@ -1,6 +1,8 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <cmath>
+#include <algorithm>
+#include <cstdio>
 
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/risk.hpp"
@@ -121,4 +123,30 @@ TEST_CASE("P&L explain: small moves are explained, large ones leave second-order
     other.back().tenor = Tenor{12, 'Y'};
     CHECK(code_of([&] { pnl_explain(sofr_conv(), as_of_date(), q0, other, CurveInterpolation::LogLinearDf, pv, 1.0, 1e7); }) == "E_INPUT");
     CHECK(code_of([&] { pnl_explain(sofr_conv(), as_of_date(), q0, {q0.begin(), q0.end() - 1}, CurveInterpolation::LogLinearDf, pv, 1.0, 1e7); }) == "E_INPUT");
+}
+
+namespace {
+double zr(const Curve& c, Date x) { return -std::log(c.discount(x)) / c.time(x); }
+}  // namespace
+
+// R6 finding 3 (review 2026-11-12): under a non-local interpolation a pillar's zero rate moves with later quotes, so
+// the Jacobian above the diagonal is not zero. Hidden reproducer, run with "[r6-repro]"; it fails while the mask stands.
+TEST_CASE("R6 finding 3 reproducer: Jacobian upper triangle against a central difference", "[.][r6-repro]") {
+    const auto q = quotes();
+    const ZeroJacobian j = zero_jacobian(sofr_conv(), as_of_date(), q, CurveInterpolation::MonotoneConvex, 1.0);
+    double worst = 0.0;
+    for (std::size_t col = 0; col < q.size(); ++col) {
+        auto up = q, dn = q;
+        up[col].rate += 1e-4;
+        dn[col].rate -= 1e-4;
+        const Curve cu = ois_bootstrap(sofr_conv(), as_of_date(), up, CurveInterpolation::MonotoneConvex, SolveMethod::Sequential).curve;
+        const Curve cd = ois_bootstrap(sofr_conv(), as_of_date(), dn, CurveInterpolation::MonotoneConvex, SolveMethod::Sequential).curve;
+        for (std::size_t row = 0; row < col; ++row) {
+            const double fd = (zr(cu, j.pillar_dates[row]) - zr(cd, j.pillar_dates[row])) / 2e-4;
+            INFO("row " << row << " col " << col << " jacobian " << j.jacobian[row][col] << " central " << fd);
+            worst = std::max(worst, std::fabs(fd));
+            CHECK(std::fabs(j.jacobian[row][col] - fd) <= 1e-8);
+        }
+    }
+    std::printf("R6 finding 3: largest upper-triangle central difference %.3e bp per bp\n", worst);
 }

@@ -58,8 +58,8 @@
 #include "quantforge/core/heston.hpp"
 #include "quantforge/core/vol_stats.hpp"
 #include "quantforge/core/joint.hpp"
-#include "quantforge/core/risk_f3.hpp"
-#include "quantforge/core/risk_f4.hpp"
+#include "quantforge/core/book_sensitivity.hpp"
+#include "quantforge/core/var_frtb.hpp"
 #include "quantforge/core/book.hpp"
 #include "quantforge/core/shortrate.hpp"
 #include "quantforge/core/lmm.hpp"
@@ -307,13 +307,13 @@ struct Entry {
 #include "ops_mbs.inc"
 #include "ops_credit.inc"
 #include "ops_exotics.inc"
-#include "ops_risk_f3.inc"
-#include "ops_risk_f4.inc"
+#include "ops_book_sensitivity.inc"
+#include "ops_var_frtb.inc"
 #include "ops_book.inc"
 #include "ops_shortrate.inc"
 #include "ops_xva.inc"
-#include "ops_risk_gb.inc"
-#include "ops_frtb_gb.inc"
+#include "ops_sensitivity_portfolio.inc"
+#include "ops_frtb_sbm.inc"
 
 // Every verb this build runs. The operations command, and dispatch, are generated from this list alone.
 constexpr std::span<const Entry> registry[] = {

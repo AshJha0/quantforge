@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "quantforge/core/error.hpp"
-#include "quantforge/core/risk_f4.hpp"
+#include "quantforge/core/var_frtb.hpp"
 #include "quantforge/core/rng.hpp"
 
 using namespace quantforge;
