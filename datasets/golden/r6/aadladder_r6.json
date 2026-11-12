@@ -1,0 +1,105 @@
+{
+ "schema_version": "1.0",
+ "suite": "aadladder_r6",
+ "spec": "specifications/06-risk/aad-core.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_r6_w4.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "aadladder_r6-0001",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 501,
+     "steps_per_year": 250,
+     "width": 6.0
+    },
+    "fixed_rate": 0.044462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14547.27862557731,
+     "d_price_d_discount_factors": [
+      81.348509506649,
+      96865.2328670544,
+      129443.35502117481,
+      151391.92845088802,
+      -145773.01837261158,
+      -279691.4041476038,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "d_price_d_mean_reversion": -51378.25673033754,
+     "d_price_d_sigma": 2131939.0330190794
+    }
+   },
+   "tolerance_class": "aad_sensitivity",
+   "verified_by": [
+    "reference-scheme-float64",
+    "richardson-two-pairs (agreement 1.9e-09, gate 2.5e-9 = tolerance/4)",
+    "gap to the 801/400 ladder per entry: 0.00%, 0.45%, 0.65%, 0.99%, 0.35%, 0.25%, 0.00%, 0.00%, 0.00%, 0.00%, 0.13%, 0.07%"
+   ],
+   "tags": [
+    "aad",
+    "bermudan",
+    "r6",
+    "synthetic"
+   ],
+   "description": "aadladder_g-0002 on nx = 501, 250 steps a year: every ladder entry within 2% of the 801/400 ladder (R6-27)",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "Q3a rule per unit notional (G-9); price at 1e-9 relative"
+   }
+  }
+ ]
+}
