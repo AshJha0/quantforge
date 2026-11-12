@@ -19,7 +19,7 @@ fn check_confidence(c: f64) -> Result<()> {
     Ok(())
 }
 
-/// Ruling F-31 on P&L scenarios for VaR: `k = ceil(n c)`, the `k`-th smallest loss. ES by
+/// Ruling F-31 on `P&L` scenarios for VaR: `k = ceil(n c)`, the `k`-th smallest loss. ES by
 /// ruling R6-3.1 (Acerbi-Tasche, fractional tail weight): `w = n - n c`, `m = floor(w)`,
 /// `es = (L_1 + ... + L_m + (w - m) L_(m+1)) / w` over losses sorted descending; `w <= 0`
 /// gives `L_1`; `tail_count = ceil(w)` (1 when `w <= 0`).
