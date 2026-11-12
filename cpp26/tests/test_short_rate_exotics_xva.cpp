@@ -141,6 +141,7 @@ TEST_CASE("R9 daily down-and-out call and put match an exact-date Monte Carlo wi
         const double c = out ? 0.0 : D * std::max(ST - K, 0.0), pu = out ? 0.0 : D * std::max(K - ST, 0.0);
         sc += c, sc2 += c * c, sp += pu, sp2 += pu * pu;
     }
+    (void)sp, (void)sp2;  // the put row left the R9 check under R6-2.1
     const double n = static_cast<double>(paths);
     const auto se = [&](double s1, double s2) { return std::sqrt((s2 - s1 * s1 / n) / (n - 1) / n); };
     const auto cli_price = [&](const char* type) {
@@ -152,14 +153,15 @@ TEST_CASE("R9 daily down-and-out call and put match an exact-date Monte Carlo wi
         INFO(res.json);
         return g_number_after(res.json, "price");
     };
-    const double call = cli_price("CALL"), put = cli_price("PUT");
+    const double call = cli_price("CALL");
+    // R6-2.1: the down-and-out put is a reverse barrier, outside the BGK envelope.
+    CHECK(cli::run_case(std::string(R"({"schema_version":"1.0","case_id":"r9","operation":"exotic.barrier.price","inputs":{"spot":100,"strike":100,"expiry_years":1,"rate":0.05,"dividend_yield":0.02,"vol":0.25,"option_type":"PUT","barrier":90,"barrier_type":"DOWN_OUT","rebate":0,"monitoring":"DISCRETE","monitoring_per_year":252}})"))
+              .json.find("E_DOMAIN") != std::string::npos);
     // The CLI value is the stage E formula at the BGK-shifted barrier (G-7).
     const ExoticMarket mc{S, K, T, r, q, v, OptionType::Call};
     CHECK(g_rel(call, barrier_price(mc, H * std::exp(-0.5826 * v * std::sqrt(1.0 / m)), 0.0, BarrierType::DownOut)) <= 1e-12);
     INFO("call BGK " << call << " MC " << sc / n << " +- " << se(sc, sc2));
-    INFO("put BGK " << put << " MC " << sp / n << " +- " << se(sp, sp2));
     CHECK(std::fabs(call - sc / n) <= 3 * se(sc, sc2));
-    CHECK(std::fabs(put - sp / n) <= 3 * se(sp, sp2));
     // The check discriminates: the continuous price is outside 3 SE of the call MC.
     CHECK(std::fabs(barrier_price(mc, H, 0.0, BarrierType::DownOut) - sc / n) > 3 * se(sc, sc2));
 }

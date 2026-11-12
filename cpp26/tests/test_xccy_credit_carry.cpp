@@ -155,7 +155,8 @@ TEST_CASE("CPI curve, ZCIS and linkers") {
     const std::vector<CpiFixing> fx{{month_index(d("2026-08-01")), 300.0}, {month_index(d("2026-09-01")), 303.0}};
     const Bond bond{d("2029-11-15"), 0.02, 2};
     const auto l = linker_price(bond, d("2026-11-16"), 0.015, 290.0, fx);
-    CHECK(l.ref_cpi == Approx(300.0 + 15.0 / 30.0 * 3.0).epsilon(1e-15));
+    CHECK(l.index_ratio == 1.03966);  // R6-7.5 hand value: 301.5 / 290 = 1.0396551..., trunc6 1.039655, round5 1.03966
+    CHECK(l.nominal_clean == Approx(l.real_clean * 1.03966).epsilon(1e-15));
     CHECK(l.nominal_clean == Approx(l.real_clean * l.ref_cpi / 290.0).epsilon(1e-15));
     CHECK(code_of([&] { linker_price(bond, d("2026-12-16"), 0.015, 290.0, fx); }) == "E_INPUT");
     CHECK(linker_price_curve(bond, d("2026-11-16"), 300.0, c, disc) > 0.0);
