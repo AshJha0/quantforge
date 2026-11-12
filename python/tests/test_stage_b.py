@@ -1,10 +1,11 @@
 """Checks from the stage B specs, beyond the golden files."""
 from datetime import date
+from typing import Any
 
 import pytest
 
 from quantforge_core import curves, hedging, money, ois, schedules, sensitivities
-from quantforge_core.calibration import fit
+from quantforge_core.calibration import check_bid_ask, fit
 from quantforge_core.errors import QfError
 from quantforge_core.ois import OisTrade, Quote
 
@@ -99,3 +100,39 @@ def test_non_finite_start_stops_at_once() -> None:
     with pytest.raises(QfError) as e:
         fit("ROSENBROCK", [], [], [-1.2e300, 1.0], "BFGS")
     assert e.value.code == "E_NON_FINITE"
+
+
+@pytest.mark.parametrize(("kwargs", "code", "field"), [
+    ({"prior": [0.0]}, "E_INPUT", "prior"),
+    ({"lower": [0.0], "upper": [1.0, 1.0]}, "E_INPUT", None),
+    ({"lower": [2.0, 0.0], "upper": [1.0, 1.0]}, "E_INPUT", None),
+    ({"max_iter": 0}, "E_INPUT", "max_iter"),
+    ({"weights": [1.0, -1.0, 1.0]}, "E_DOMAIN", "weights"),
+    ({"weights": [1.0]}, "E_INPUT", "weights"),
+    ({"regularisation": -1e-9}, "E_DOMAIN", "regularisation"),
+])
+def test_fit_rejects_bad_inputs(kwargs: dict[str, Any], code: str, field: str | None) -> None:
+    with pytest.raises(QfError) as e:
+        fit("LINEAR", [1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [0.0, 0.0], "LEVENBERG_MARQUARDT", **kwargs)
+    assert (e.value.code, e.value.field) == (code, field)
+
+
+def test_fit_rejects_a_non_finite_gradient_and_stops_within_max_iter() -> None:
+    with pytest.raises(QfError) as e:
+        fit("LINEAR", [1.0, 2.0], [1.0, 1e308], [0.0, 0.0], "GAUSS_NEWTON")
+    assert e.value.code == "E_NON_FINITE"
+    for method in ("GAUSS_NEWTON", "BFGS"):
+        with pytest.raises(QfError) as e:
+            fit("ROSENBROCK", [], [], [-1.2, 1.0], method, max_iter=1)
+        assert e.value.code == "E_NO_CONVERGENCE"
+
+
+def test_check_bid_ask_reports_both_sides_and_rejects_bad_quotes() -> None:
+    out = check_bid_ask([0.9, 1.5, 2.6], [1.0, 1.4, 2.4], [1.1, 1.6, 2.5])
+    assert [(b["index"], b["side"]) for b in out] == [(0, "BID"), (2, "ASK")]
+    assert out[0]["distance"] == pytest.approx(0.1) and out[1]["distance"] == pytest.approx(0.1)
+    assert check_bid_ask([1.0], [1.0], [1.0]) == []  # touching a quote is not a breach
+    for args in (([1.0], [1.0, 2.0], [1.0]), ([1.0], [2.0], [1.0])):
+        with pytest.raises(QfError) as e:
+            check_bid_ask(*args)
+        assert e.value.code == "E_INPUT"

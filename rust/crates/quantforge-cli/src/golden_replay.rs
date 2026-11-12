@@ -1,4 +1,4 @@
-//! Replays the core and stage B, C and D goldens through `run_case` in process, judged the way
+//! Replays the core, R2 and stage B to I goldens through `run_case` in process, judged the way
 //! `conformance/runner/runner.py` judges them, with the classes of
 //! `conformance/tolerances/policy.yaml`. This puts the operation adapters and the stage C modules
 //! under `cargo test`, not only under the external runner.
@@ -13,11 +13,16 @@ fn class(name: &str) -> Option<Option<(f64, f64)>> {
     Some(match name {
         "date_and_convention" | "bit_exact" => None,
         "simple_analytic" => Some((1e-12, 1e-10)),
-        "interpolation" => Some((1e-10, 1e-8)),
+        "interpolation" | "aad_sensitivity" => Some((1e-10, 1e-8)),
         "root_finding" => Some((1e-10, 1e-10)),
         "quadrature" | "statistics" => Some((1e-11, 1e-10)),
         "numerical_scheme" => Some((1e-8, 1e-8)),
         "fourier" | "common_rng" => Some((1e-9, 1e-9)),
+        "likelihood_sum" => Some((1e-9, 1e-10)),
+        "jacobian" => Some((1e-9, 1e-6)),
+        "jacobian_piecewise" => Some((1e-7, 1e-5)),
+        "standard_error" => Some((1e-15, 1e-5)),
+        "ift_jacobian" => Some((1e-11, 1e-9)),
         "calibration" | "monte_carlo" => Some((f64::NAN, f64::NAN)),
         _ => return None,
     })
@@ -66,8 +71,39 @@ fn compare(a: &Json, e: &Json, tol: Option<(f64, f64)>, path: &str, out: &mut Ve
     }
 }
 
-/// Returns the mismatches for one golden case; empty means pass.
-fn judge(case: &Json) -> Vec<String> {
+/// Structural zeros (rulings F-25, F-26, F-30): `name` is a dotted path to a matrix, and every
+/// `[row, column]` in `positions` must be exactly 0.0 or -0.0.
+fn exact_zero(chk: &Json, name: &str, outs: &Json, msgs: &mut Vec<String>) {
+    let mut m = Some(outs);
+    for k in name.split('.') {
+        m = m.and_then(|v| v.get(k));
+    }
+    let Some(rows) = m.and_then(Json::as_array) else {
+        msgs.push(format!("extra check {name} missing"));
+        return;
+    };
+    for pos in chk.get("positions").and_then(Json::as_array).unwrap_or(&[]) {
+        let ij: Vec<usize> = pos
+            .as_array()
+            .unwrap_or(&[])
+            .iter()
+            .filter_map(|x| x.as_f64().map(|f| f as usize))
+            .collect();
+        let v = rows
+            .get(ij[0])
+            .and_then(Json::as_array)
+            .and_then(|r| r.get(ij[1]))
+            .and_then(Json::as_f64);
+        if v != Some(0.0) {
+            msgs.push(format!(
+                "extra check {name}: {v:?} at {ij:?} is not exactly zero"
+            ));
+        }
+    }
+}
+
+/// Runs one golden case in process and returns the result document.
+fn run(case: &Json) -> Json {
     let text = |k: &str| case.get(k).and_then(Json::as_str).unwrap_or_default();
     let doc = obj([
         ("schema_version", "1.0".into()),
@@ -78,13 +114,61 @@ fn judge(case: &Json) -> Vec<String> {
     // The parser keeps a lone surrogate escape as U+FFFD; no golden holds a real U+FFFD, so
     // writing a lone escape back restores the document the runner sends (cases store_a4-*).
     let wire = doc.to_text().replace('\u{FFFD}', "\\ud800");
-    let (res, _) = run_case(wire.as_bytes());
-    let exp = case.get("expected").unwrap();
+    run_case(wire.as_bytes()).0
+}
+
+/// Returns the mismatches for one golden case against its result; empty means pass. `peers`
+/// holds the results of the other cases of the suite, for expected status `same_as` (rule F-3).
+fn judge(case: &Json, res: &Json, peers: &std::collections::HashMap<String, Json>) -> Vec<String> {
+    let text = |k: &str| case.get(k).and_then(Json::as_str).unwrap_or_default();
+    let mut exp = case.get("expected").unwrap().clone();
     let status = res.get("status").and_then(Json::as_str);
     if res.get("case_id").and_then(Json::as_str) != Some(text("case_id")) {
         return vec!["case_id".into()];
     }
+    match exp.get("status").and_then(Json::as_str) {
+        Some("any") => {
+            return if matches!(status, Some("ok" | "error")) {
+                Vec::new()
+            } else {
+                vec![format!("bad status {status:?}")]
+            };
+        }
+        Some("same_as") => {
+            let id = exp
+                .get("case_id")
+                .and_then(Json::as_str)
+                .unwrap_or_default();
+            let Some(peer) = peers.get(id) else {
+                return vec![format!("peer {id} has no result")];
+            };
+            exp = match peer.get("status").and_then(Json::as_str) {
+                Some("error") => obj([
+                    ("status", "error".into()),
+                    (
+                        "error_code",
+                        peer.get("error")
+                            .and_then(|e| e.get("code"))
+                            .cloned()
+                            .unwrap_or(Json::Null),
+                    ),
+                ]),
+                Some("ok") => obj([
+                    ("status", "ok".into()),
+                    (
+                        "outputs",
+                        peer.get("outputs").cloned().unwrap_or(Json::Null),
+                    ),
+                ]),
+                _ => return vec![format!("peer {id} has no well-formed result")],
+            };
+        }
+        _ => {}
+    }
     if exp.get("status").and_then(Json::as_str) == Some("error") {
+        if status != Some("error") {
+            return vec![format!("expected an error, got {}", res.to_text())];
+        }
         let code = res.get("error").and_then(|e| e.get("code"));
         return if code == exp.get("error_code") {
             Vec::new()
@@ -137,6 +221,10 @@ fn judge(case: &Json) -> Vec<String> {
         .unwrap_or(&[])
     {
         let name = chk.get("output").and_then(Json::as_str).unwrap();
+        if chk.get("method").and_then(Json::as_str) == Some("exact_zero") {
+            exact_zero(chk, name, outs, &mut msgs);
+            continue;
+        }
         let (Some(a), Some(e)) = (num(outs.get(name)), num(chk.get("expected"))) else {
             msgs.push(format!("extra check {name} missing"));
             continue;
@@ -168,9 +256,16 @@ fn replay(stage: &str) {
     let (mut seen, mut failures) = (0, Vec::new());
     for f in files {
         let (doc, _) = parse(&std::fs::read_to_string(&f).unwrap()).unwrap();
-        for case in doc.get("cases").and_then(Json::as_array).unwrap() {
+        let cases = doc.get("cases").and_then(Json::as_array).unwrap();
+        let results: Vec<Json> = cases.iter().map(run).collect();
+        let peers: std::collections::HashMap<String, Json> = cases
+            .iter()
+            .zip(&results)
+            .filter_map(|(c, r)| Some((c.get("case_id")?.as_str()?.to_owned(), r.clone())))
+            .collect();
+        for (case, res) in cases.iter().zip(&results) {
             seen += 1;
-            let m = judge(case);
+            let m = judge(case, res, &peers);
             if !m.is_empty() {
                 let id = case.get("case_id").map(Json::to_text).unwrap_or_default();
                 failures.push(format!("{id}: {}", m.join("; ")));
@@ -204,6 +299,31 @@ fn core_goldens() {
 #[test]
 fn r2_goldens() {
     replay("r2");
+}
+
+#[test]
+fn stage_e_goldens() {
+    replay("stage_e");
+}
+
+#[test]
+fn stage_e_b_goldens() {
+    replay("stage_e_b");
+}
+
+#[test]
+fn stage_f_goldens() {
+    replay("stage_f");
+}
+
+#[test]
+fn stage_g_goldens() {
+    replay("stage_g");
+}
+
+#[test]
+fn stage_g_e1_goldens() {
+    replay("stage_g_e1");
 }
 
 #[test]
@@ -259,7 +379,7 @@ fn stage_i_examples() {
             case.get("inputs"),
             "{file} inputs differ from {id}"
         );
-        let m = judge(case);
+        let m = judge(case, &run(case), &std::collections::HashMap::new());
         assert!(m.is_empty(), "{id}: {m:?}");
     }
 }
