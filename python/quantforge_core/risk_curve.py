@@ -178,14 +178,16 @@ def key_rate(data: CurveData, mode: str, key_dates: Sequence[date] | None, produ
 
 
 def jacobian(as_of: date, convention: str, quotes: Sequence[Quote], interpolation: str,
-             bump_bp: float) -> dict[str, object]:
+             bump_bp: float, tension: float | None = None,
+             step_end: date | None = None) -> dict[str, object]:
     if not 0 < bump_bp <= 100:
         raise QfError("E_DOMAIN", "bump_bp must be in (0, 100]", "bump_bp")
     n, h = len(quotes), bump_bp * BP
 
     def zeros(shifts: Sequence[float]) -> tuple[CurveData, list[float]]:
         moved = [Quote(q.tenor, q.mid + s) for q, s in zip(quotes, shifts, strict=True)]
-        data = ois.bootstrap(convention, as_of, moved, interpolation)[0]
+        data = ois.bootstrap(convention, as_of, moved, interpolation, tension=tension,
+                             step_end=step_end)[0]
         return data, [-math.log(v) / ((d - as_of).days / 365)
                       for d, v in zip(data.dates, data.discount_factors, strict=True)]
 
