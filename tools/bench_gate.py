@@ -10,7 +10,9 @@ Reads every <lang>.json in --current (schema: {"lang", "benchmarks": {id: {"ns_p
     baseline's "machine" equals --machine, since timings from another machine class say nothing;
   * allocations: fails if allocs_per_op or alloc_bytes_per_op grows by more than --alloc-ratio (default 1.10)
     plus 1 allocation (or 64 bytes). Also only on the same machine class: allocator, runtime and OS change counts;
-  * a benchmark in the baseline that is missing from the results fails.
+  * a benchmark in the baseline that is missing from the results fails;
+  * with --require-baseline (R6-15, review finding 15): fails unless the stored baseline was recorded on --machine
+    and holds every language in the results. At v0.8.0 the baseline was empty and the gate compared nothing.
 Prints a Markdown table (ns/op and allocs/op per language) for the job summary. Exit 1 on any failure.
 """
 import argparse
@@ -77,6 +79,7 @@ def main(argv=None):
     ap.add_argument("--time-ratio", type=float, default=1.5)
     ap.add_argument("--alloc-ratio", type=float, default=1.10)
     ap.add_argument("--write-baseline", action="store_true")
+    ap.add_argument("--require-baseline", action="store_true")
     a = ap.parse_args(argv)
     current = load_results(a.current)
     if a.write_baseline:
@@ -86,6 +89,11 @@ def main(argv=None):
         return 0
     baseline = json.loads(Path(a.baseline).read_text(encoding="utf-8"))
     lines, fails = compare(current, baseline, a.machine, a.time_ratio, a.alloc_ratio)
+    if a.require_baseline:
+        if baseline.get("machine") != a.machine:
+            fails.append(f"stored baseline machine is {baseline.get('machine')!r}, not {a.machine!r}: the gate compares nothing")
+        for lang in sorted(set(current) - set(baseline.get("results", {}))):
+            fails.append(f"{lang}: no stored baseline")
     print("\n".join(lines))
     for f in fails:
         print("BAD", f)

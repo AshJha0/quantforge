@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   test:
+    name: python-test
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     defaults:

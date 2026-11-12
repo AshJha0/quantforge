@@ -16,6 +16,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   site:
+    name: docs-site
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -45,6 +46,7 @@ jobs:
         with:
           path: site/
   deploy:
+    name: docs-deploy
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && !github.event.repository.private
     needs: site
     runs-on: ubuntu-24.04

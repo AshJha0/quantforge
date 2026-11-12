@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Job matrix for mutation-stage.yml (plan 12.2 G6, 13.2 E10). Standard library only.
 
-    plan_matrix.py --stage F                       every module of one stage (the weekly and manual full run)
+    plan_matrix.py --stage F                       every module of one stage (a manual full run)
+    plan_matrix.py --stage ALL                     every module of every stage (the weekly run, R6-14)
     plan_matrix.py --changed changed.txt           PR mode: only modules, from any stage, whose target file is
                                                    in the list of changed paths (one per line)
 
@@ -57,7 +58,15 @@ def entries(mods, langs_filter=None):
 def plan(cfg, stage=None, changed=None):
     """(matrix include list, stages.json fragment for the report)."""
     if changed is None:
-        mods = cfg["stages"].get(stage, [])
+        if stage == "ALL":
+            mods, seen = [], set()
+            for st in cfg["stages"].values():
+                for m in st:
+                    if m["module"] not in seen:
+                        seen.add(m["module"])
+                        mods.append(m)
+        else:
+            mods = cfg["stages"].get(stage, [])
         return entries(mods), None
     picked, sel, seen = [], set(), set()
     for st, mods in cfg["stages"].items():
@@ -88,6 +97,10 @@ def main(argv=None):
         Path(a.stages_out).write_text(json.dumps(frag, indent=1), encoding="utf-8")
     print("matrix=" + json.dumps({"include": inc}))
     print("any=" + ("true" if inc else "false"))
+    if changed is None and not inc:
+        # R6-14 (review finding 5): a full-stage run that plans nothing is a broken gate, not a pass.
+        print(f"error: stage {a.stage!r} plans no mutants; add its modules to stages.json", file=sys.stderr)
+        return 1
     return 0
 
 

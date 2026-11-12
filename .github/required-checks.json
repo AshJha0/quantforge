@@ -1,0 +1,24 @@
+{
+  "_note": "R6-15 and owner decision D7: the exact check names the owner sets as required in the main-branch ruleset. Every name is unique across .github/workflows (tools/check_job_names.py) and comes from a workflow that runs on every pull request, so no required check waits forever on a PR its path filter skips. Steps: program/R6_OWNER_SETTINGS.md (copy in the plan folder).",
+  "required": [
+    "repo-gates",
+    "python-test",
+    "rust-test",
+    "java25-test",
+    "cpp26-gcc",
+    "cpp26-clang",
+    "conformance-scope",
+    "conformance-runner-self-test",
+    "conformance-java",
+    "conformance-cpp",
+    "conformance-python",
+    "conformance-rust",
+    "sanitizers-asan-ubsan",
+    "mutation-plan",
+    "mutation-report",
+    "coverage-stage-java",
+    "coverage-stage-cpp",
+    "coverage-stage-python",
+    "coverage-stage-rust"
+  ]
+}

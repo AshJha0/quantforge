@@ -13,6 +13,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   stability:
+    name: calib-stability-stability
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
