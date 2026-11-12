@@ -135,6 +135,34 @@ def pass_probability(study, sr_ann, sims=4000, seed=SEED, phi=0.0, trials=FAMILY
     return float(np.mean((z > Z95) & stable)), float(np.mean((z > norm_ppf(1 - 0.05 / 3)) & stable))
 
 
+def both_statistics(study, sr_ann, sims=4000, seed=SEED, phi=0.0, trials=FAMILY_TRIALS):
+    """R6-20 (amendment 2, owner decision D3). On the same simulated holdouts:
+    primary   = the amendment-1 pass rule (deflated, thirds stable), as in pass_probability;
+    secondary = undeflated one-sided p-value p2 = 1 - Phi(SR_hat / SE) at or below the Holm level. Reported beside the
+                pass rule, never deciding it. Thirds stability is not part of the secondary statistic.
+    Returns (primary at 0.05, primary at 0.05/3, secondary at 0.05, secondary at 0.05/3): rejection rates, so at
+    sr_ann = 0 they are the size and at sr_ann > 0 the power."""
+    years, q, method, lag, _ = STUDIES[study]
+    n = int(round(years * q))
+    rng = np.random.default_rng(seed)
+    x = simulate_returns(rng, sims, n, sr_ann, q, phi)
+    sr, se = lo_sharpe(x, q, lag) if method == "lo" else boot_sharpe(x, q, lag, rng)
+    z_def = (sr - se * expected_max_z(trials)) / se
+    z_raw = sr / se
+    stable = thirds_positive(x)
+    hi, lo = Z95, norm_ppf(1 - 0.05 / 3)
+    return (float(np.mean((z_def > hi) & stable)), float(np.mean((z_def > lo) & stable)),
+            float(np.mean(z_raw > hi)), float(np.mean(z_raw > lo)))
+
+
+def both_table(sims=4000, seed=SEED):
+    rows = []
+    for s, spec in STUDIES.items():
+        for sr in (0.0, 0.5, spec[4]):
+            rows.append((s, sr) + both_statistics(s, sr, sims, seed))
+    return rows
+
+
 def forward_pass_probability(sr_true, holdout_sr, sims=20000, seed=SEED, days=250):
     """Forward-log rule: the 250-day SR has the holdout's sign, and its two-sided 95% CI (Lo, iid,
     daily) contains the holdout estimate."""
@@ -157,6 +185,10 @@ if __name__ == "__main__":
     print("study  true_SR  phi  pass(Holm 0.05)  pass(Holm 0.05/3)")
     for s, sr, phi, a, b in table():
         print(f"{s}  {sr:5.2f}  {phi:.1f}  {a:.4f}  {b:.4f}")
+    print("R6-20, both statistics on the same paths (phi 0): rejection rate = size at SR 0, power above")
+    print("study  true_SR  primary(0.05)  primary(0.05/3)  secondary(0.05)  secondary(0.05/3)")
+    for s, sr, a, b, c2, d in both_table():
+        print(f"{s}  {sr:5.2f}  {a:.4f}  {b:.4f}  {c2:.4f}  {d:.4f}")
     for s, spec in STUDIES.items():
         m = spec[4]
         print(f"forward {s}: true = holdout = {m}: {forward_pass_probability(m, m):.4f}; true 0, holdout {m}: {forward_pass_probability(0.0, m):.4f}")

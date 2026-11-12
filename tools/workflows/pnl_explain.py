@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """P&L explain over real daily moves (plan 11.2.1, spec specifications/06-risk/pnl-explain.md). Standard library only.
 
-  python tools/workflows/pnl_explain.py [--impl python] [--years 2024 2025] [--out reports/workflows] [--data DIR]
+  python tools/workflows/pnl_explain.py [--impl python] [--years 2026] [--out reports/workflows] [--data DIR]
 
 For each pair of consecutive published days of the US Treasury par yield curve (the workflow (a) proxy curve, SOFR OIS
 conventions), it sends one `risk.pnl.explain` case per product of a fixed sample book through the CLI's batch mode, and
@@ -84,7 +84,7 @@ def pct(xs, p):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--impl", default="python")
-    ap.add_argument("--years", type=int, nargs="+", default=[dt.date.today().year - 1])
+    ap.add_argument("--years", type=int, nargs="+", default=[dt.date.today().year])
     ap.add_argument("--out", default=str(c.ROOT / "reports" / "workflows"))
     ap.add_argument("--data")
     a = ap.parse_args()
@@ -92,7 +92,8 @@ def main():
     for y in a.years:
         raw = (Path(a.data) / f"us-treasury-par-yields-{y}.csv").read_bytes() if a.data else c.fetch(c.source_url("us-treasury-par-yields", y))
         days += treasury(raw)
-    days.sort()
+    # R6-19: report only forward dates; earlier Treasury days are inside the R3-01/R3-03 holdout windows.
+    days = sorted(d for d in days if d[0] >= c.FORWARD_START)
     cases, meta = [], {}
     for (d0, q0), (d1, q1) in zip(days, days[1:]):
         t1 = {x["tenor"] for x in q1}

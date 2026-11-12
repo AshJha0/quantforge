@@ -8,8 +8,11 @@ hash `head`, so a rewrite of any line up to `count` is caught even if every late
 
   anchor.py make   --log FILE --out-dir DIR [--stamp]   write DIR/<UTC time>.json (and stamp it with `ots`)
   anchor.py verify --log FILE --anchors DIR [--ots]     chain check, then every anchor; --ots also runs `ots verify`
+  --preregs DIR (both commands): each anchor carries the SHA-256 of every file in research/preregs, and verify
+  fails if an anchored prereg file has changed (R6-22)
 """
 import argparse
+import hashlib
 import json
 import shutil
 import subprocess
@@ -21,7 +24,26 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import forward_log as fl  # noqa: E402
 
 
-def make(log, out_dir, when=None):
+def prereg_hashes(preregs_dir):
+    """R6-22: {file name: SHA-256 of the whole file} for every prereg, amendment and deviation note."""
+    return {f.name: hashlib.sha256(f.read_bytes()).hexdigest() for f in sorted(Path(preregs_dir).glob("*.md"))
+            if f.name != "README.md"} | {"README.md": hashlib.sha256((Path(preregs_dir) / "README.md").read_bytes()).hexdigest()}
+
+
+def check_preregs(anchors_dir, preregs_dir):
+    """Every prereg file named in any anchor must still hash to the anchored value: an edit to body and header
+    together, which the header hashes alone cannot catch, fails here. New files are allowed. Returns files checked."""
+    now = prereg_hashes(preregs_dir)
+    seen = set()
+    for f in sorted(Path(anchors_dir).glob("*.json")):
+        for name, h in json.loads(f.read_text(encoding="utf-8")).get("preregs", {}).items():
+            if now.get(name) != h:
+                raise ValueError(f"{f.name}: prereg {name} differs from its anchored hash (edited or removed after stamping)")
+            seen.add(name)
+    return len(seen)
+
+
+def make(log, out_dir, when=None, preregs_dir=None):
     n, head = fl.verify(log)
     if n == 0:
         raise ValueError("log is empty; nothing to anchor")
@@ -29,7 +51,10 @@ def make(log, out_dir, when=None):
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     p = out / f"{when}.json"
-    p.write_text(json.dumps({"count": n, "head": head, "time": when}, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    rec = {"count": n, "head": head, "time": when}
+    if preregs_dir:
+        rec["preregs"] = prereg_hashes(preregs_dir)
+    p.write_text(json.dumps(rec, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
     return p
 
 
@@ -73,12 +98,13 @@ def main():
     ap.add_argument("--anchors")
     ap.add_argument("--stamp", action="store_true")
     ap.add_argument("--ots", action="store_true")
+    ap.add_argument("--preregs", help="research/preregs: carry (make) or check (verify) every prereg file hash")
     a = ap.parse_args()
     try:
         if a.command == "make":
             if not a.out_dir:
                 ap.error("make needs --out-dir")
-            p = make(a.log, a.out_dir)
+            p = make(a.log, a.out_dir, preregs_dir=a.preregs)
             if a.stamp:
                 subprocess.run(["ots", "stamp", str(p)], check=True)
             print(p)
@@ -87,6 +113,8 @@ def main():
             ap.error("verify needs --anchors")
         k = check_anchors(a.log, a.anchors)
         msg = f"chain ok, {k} anchors match"
+        if a.preregs:
+            msg += f"; {check_preregs(a.anchors, a.preregs)} anchored prereg files unchanged"
         if a.ots:
             c, p = ots_verify(a.anchors)
             msg += f"; OpenTimestamps: {c} confirmed, {p} pending"

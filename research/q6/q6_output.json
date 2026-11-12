@@ -1,0 +1,55 @@
+{
+ "label": "Synthetic quotes from a known SSVI surface; a method test, not a calibration to real option quotes.",
+ "seed": 20261112,
+ "days": 60,
+ "selection_days": 12,
+ "trials": [
+  {
+   "lambda": 0,
+   "median_R": 0.9857250736485065,
+   "p95_R": 1.538081787122323,
+   "inside_share": 0.8466666666666667
+  },
+  {
+   "lambda": 0.1,
+   "median_R": 0.9470548707183293,
+   "p95_R": 1.6661895855982745,
+   "inside_share": 0.6211111111111111
+  },
+  {
+   "lambda": 0.3,
+   "median_R": 0.9346535842146959,
+   "p95_R": 1.5039646372052229,
+   "inside_share": 0.47
+  },
+  {
+   "lambda": 1,
+   "median_R": 0.7783804010698216,
+   "p95_R": 1.051416752898811,
+   "inside_share": 0.35333333333333333
+  },
+  {
+   "lambda": 3,
+   "median_R": 0.44810083997320543,
+   "p95_R": 0.816068030269884,
+   "inside_share": 0.30666666666666664
+  },
+  {
+   "lambda": 10,
+   "median_R": 0.16654562584115093,
+   "p95_R": 0.2904055875324778,
+   "inside_share": 0.26666666666666666
+  }
+ ],
+ "chosen_lambda": 0,
+ "test_median_R": 0.9942593269233609,
+ "test_p95_R": 1.6381765815057034,
+ "churn_bound_met": true,
+ "test_inside_share": 0.7836111111111111,
+ "fit_quality_met": false,
+ "calendar_free_days": 48,
+ "butterfly_free_days": 48,
+ "test_days": 48,
+ "rms_error_to_truth_on_grid_vol": 0.0019694089275598594,
+ "result": "FAIL"
+}

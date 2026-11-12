@@ -29,6 +29,7 @@ Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the f
 | [19. Hedging credit and correlation](tutorial-19-credit-correlation.md) | A CDS hedge in CS01 and jump to default, the bucket risk left, an exchange-option correlation hedge and why exchange options alone cannot do it | `hedge.credit.cds`, `hedge.correlation.neutralise` | I |
 | [20. One hedge for equity and rates](tutorial-20-cross-asset.md) | An equity book's equity and key-rate risks hedged together, and the best two instruments out of three | `hedge.crossasset.solve`, `hedge.select.solve` | I |
 | [21. What a hedge costs](tutorial-21-hedge-costs.md) | Spread, impact and margin in a hedge, the risk-against-cost frontier, a backtest with costs, slippage | `hedge.qp.solve`, `hedge.frontier.solve`, `hedge.backtest.delta`, `hedge.slippage.report` | I |
+| [22. A calibration method test](tutorial-22-q6-method-test.md) | Q6 on synthetic noisy quotes: arbitrage check, churn bound, fit quality; a labelled method test, not real quotes | `research/q6/q6_method_test.py` (Python research tool) | R6 |
 
 ## How the scripts work
 
