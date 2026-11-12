@@ -48,4 +48,4 @@ Baseline before R6 goldens: 14,941 cases (7,419 value-checked) after the evidenc
 
 Every wave 1 golden comes from the oracle (`oracle/python/gen_r6_w1.py`; ES from `gen_stage_f_w2.py F4`). Independent checks run before writing: ES against a numpy Acerbi-Tasche written from the paper's form (20 of 20 historical cases within 1e-9); SBM total against a brute-force recomputation; tolerance re-judging on three builds (`conformance/tolerances/R6_REJUDGE_*.json`).
 
-WAVE 1A READY (sbm_total_r6, nonfinite_r6, risk_f4, per_unit classes, all rulings above) at the commit that adds this line; see `git log -1 -- program/R6_HANDOVER.md`.
+WAVE 1A READY 2826732 (sbm_total_r6, nonfinite_r6, risk_f4, per_unit classes, all rulings above; jacobian_r6 follows as WAVE 1B)
