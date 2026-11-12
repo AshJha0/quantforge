@@ -307,6 +307,20 @@ class GapMonitor(unittest.TestCase):
             r = self.run_gap("gaps", "--log", str(log), "--holidays", str(hol), "--until", "2026-11-12", "--recent", "1")
             self.assertEqual(r.returncode, 0)
 
+    def test_known_gap_fails_once_then_is_only_listed(self):
+        """R6-21, planted fault: a new gap fails the run; the next run, which finds it in the previous --out .json,
+        lists it and passes; a further new gap fails again."""
+        with tempfile.TemporaryDirectory() as d:
+            log, out = Path(d) / "a.jsonl", Path(d) / "gaps.md"
+            self.write(log, ["2026-11-09", "2026-11-11", "2026-11-12"])  # Tue 10 missing
+            args = ("gaps", "--log", str(log), "--until", "2026-11-12", "--recent", "3", "--out", str(out))
+            self.assertEqual(self.run_gap(*args).returncode, 1)
+            r = self.run_gap(*args)
+            self.assertEqual(r.returncode, 0, r.stdout)
+            self.assertIn("2026-11-10", r.stdout)
+            r = self.run_gap("gaps", "--log", str(log), "--until", "2026-11-13", "--recent", "3", "--out", str(out))
+            self.assertEqual(r.returncode, 1)  # Fri 13 is new
+
     def test_prereg_inputs_and_study_rows_fail_on_any_missing_day(self):
         with tempfile.TemporaryDirectory() as d:
             log, studies = Path(d) / "a.jsonl", Path(d) / "s.json"
