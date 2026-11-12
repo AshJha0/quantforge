@@ -1,6 +1,6 @@
 # Java 25 implementation
 
-Stages A to G (stage G released as v0.7.0) and stage I waves 1 to 5 (hedging, built, to be tagged as v0.8.0) of QuantForge, written
+Stages A to G (stage G released as v0.7.0) and stage I waves 1 to 5 (hedging, released as v0.8.0) of QuantForge, written
 from the specifications. It uses JDK 25
 final features only, and has no runtime dependencies; JUnit is for tests only.
 

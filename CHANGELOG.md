@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.8.0: stage I, hedging (Unreleased)
+## 0.8.0: stage I, hedging (2026-11-12)
 
 Stage I takes the hedging domain (plan section 4 row I, TRACEABILITY Domain 08) and plan item Q6, ahead of stage H (`program/STAGE_I_HANDOVER.md`). The date is set when the tag is made.
 
