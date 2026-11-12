@@ -30,3 +30,20 @@ Fuzz after the fix: `fuzz_cli.py --impl java --seconds 400 --seed 7`, 20,200 inp
 
 1. R6-8 says `E_DOMAIN` when a finite input overflows; `cli-contract.md` says a non-finite output is `E_NON_FINITE`. Which code applies when an operation's arithmetic overflows to a non-finite result? Java uses `E_DOMAIN` only at the conversion factor until ruled.
 2. A golden for the conversion factor overflow input (coupon -1e308) is expected per R6-8 acceptance.
+
+## Waves 1A, 1B, 2 and 3 (r6 merged at `d51d30a` and later; R6-6.1b read at `24b7c94`)
+
+Implemented: contract 1.12.0 (R6-0.1); Jacobian `tension`/`step_end` (R6-1.2; no mask, R6-1.1); ES tail weight `w = n - n c` (R6-3.1); `risk.frtb.sbm_total` (R6-4.1); conversion factor overflow is `E_NON_FINITE` (R6-8.1, `Bonds.java`); `per_unit` class in `GoldenSuiteTest` (R6-10); BGK envelope (R6-2.1); `deflated_pfe_` keys (R6-5.1); PSA CPR cap (R6-7.1); CDS trade date on an IMM date priced (R6-7.3); TIPS rounding (R6-7.5); kink tolerance 1e-11, caps `10 n + 100` and 1,000,000 lattice points (R6-6.1, `IterationCapTest`); Jacobi-scaled singularity decision (R6-6.2); feasibility 1e-9 (R6-11.3); select K > n `E_INPUT` (R6-11.6); scaled minvar pivots (R6-11.7); hazard bump floor (R6-11.9); empty `eq_matrix` `E_INPUT` (R6-11.13); spread vol threshold (R6-11.16, see J-R6-2); use case 6 `usecase.option_hedge_lots` (R6-11.20). Beta order (R6-11.12) and unknown instrument `E_SCHEMA` (R6-11.18) already held.
+
+R6-6.1b: after the sign state is found, Java's final step is an exact re-solve on that state: positions at a kink are fixed to exactly 0 (the closed orthant bound), never left near zero.
+
+### Results
+
+- Conformance: **15,072 of 15,076**. The 4 failures are goldens that were not regenerated after the R6 rulings: `e1_risk-0372` (copy of `risk_f4-0039`; the regenerated `risk_f4-0039` expects ES 52,593.474 and `tail_count` 50, Java's value, but the copy still holds the old 52,486.18 and 51) and `edge_d-0015` to `-0017` (`infl.linker.price` without the R6-7.5 rounding). Java follows the rulings. Expected split once regenerated: 7,440 value, 5,122 error, 2,514 invariance.
+- Unit tests (`-Pcoverage verify`): 526 run, 1 skipped (the G-9 bound under the coverage agent), 2 failures, both `GoldenSuiteTest` on the same 4 stale goldens.
+- Coverage (R6-26): 137 files, line 98.21% (17,344 lines), branch 91.91%. Every file is at or above 90% line coverage, so none needs the allow-list; lowest `calibration/LeastSquares` 92.3%, `core/Finite` 92.9%, `curves/DatedCompounding` 93.4%.
+- Large hedge goldens (`hedgeqp_large_r6`, warm batch, laptop under load from other lanes; Actions runner figures count): n = 50: 22 to 35 ms (T7 target 0.5 s, stretch 0.05 s: both met); n = 200: 3.0 to 4.9 s (T6 target 5 s: met with little margin; stretch 0.5 s not met). Cold single runs: 0.5 to 0.9 s at n = 50, 4.5 to 13.1 s at n = 200.
+
+### Open questions (detail in `java25/SPEC_QUESTIONS.md`, section R6)
+
+J-R6-1 negative-pivot band; J-R6-2 `hedgecorr_i-0015` expects `E_DOMAIN` against R6-11.16 `E_SINGULAR`; J-R6-3 the 4 stale goldens above; J-R6-4 scaled test not applied under `MIN_NORM`; J-R6-5 dual active-set cap now `10 n + 100`.
