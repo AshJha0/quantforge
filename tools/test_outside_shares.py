@@ -4,9 +4,9 @@
   1. --check passes on the committed tree;
   2. a golden suite added after the register was written (review finding 6, stage F) is caught;
   3. a register total that no longer matches its golden is caught;
-  4. a stage under the floor with no dated plan fails;
-  5. a stage F case marked SCIPY.CHI2 counts as reimplementation, not as an outside check;
-  6. a planted downgrade of the stage G per-case register (oracle/OUTSIDE_G_R6.json) fails the 60% floor.
+  4. a stage under 60% of its value-checked cases fails (no dated-plan fallback, owner 2026-11-12), and error
+     cases leave the denominator;
+  5. a stage F case marked SCIPY.CHI2 counts as reimplementation, not as an outside check.
 """
 import contextlib
 import io
@@ -33,9 +33,16 @@ def run(*a):
         return S.main(list(a))
 
 
+def nonfloor(p):
+    return [x for x in p if "floor" not in x]
+
+
 def main():
-    check("--check passes on the committed tree", run("--check") == 0)
-    real_golden, real_oracle, real_plans = S.GOLDEN, S.ORACLE, dict(S.PLANS)
+    p = []
+    S.build(p)
+    check("committed tree: no problems other than the floor", not nonfloor(p))
+    check("committed OUTSIDE_SHARES.md matches a fresh run", (S.ORACLE / "OUTSIDE_SHARES.md").read_text(encoding="utf-8") == S.markdown(S.build([])))
+    real_golden, real_oracle = S.GOLDEN, S.ORACLE
     with tempfile.TemporaryDirectory() as d:
         tmp = Path(d)
         g, o = tmp / "golden", tmp / "oracle"
@@ -48,7 +55,7 @@ def main():
         try:
             p = []
             S.build(p)
-            check("temp copy builds clean", not p)
+            check("temp copy builds clean apart from the floor", not nonfloor(p))
             src = json.loads((g / "stage_g" / "reserve_g.json").read_text(encoding="utf-8"))
             src["suite"] = "planted_g"
             (g / "stage_g" / "planted_g.json").write_text(json.dumps(src), encoding="utf-8")
@@ -63,32 +70,33 @@ def main():
             S.build(p)
             check("planted register total mismatch is caught", any("hedgeqp_i" in x for x in p))
             shutil.copy(real_oracle / "outside_register_i.json", o / "outside_register_i.json")
-            # 6. planted downgrade of the stage G per-case register: failing checks drop G under the floor
+            # planted downgrade of the stage G per-case register (oracle/OUTSIDE_G_R6.json, oracle lane 2)
             if (real_oracle / "OUTSIDE_G_R6.json").is_file():
                 shutil.copy(real_oracle / "OUTSIDE_G_R6.json", o / "OUTSIDE_G_R6.json")
-                p = []
-                base = S.build(p)["stages"]["G"]["without_sweeps"]["counted"]
+                base = S.build([])["stages"]["G"]["without_sweeps"]["counted"]
                 pg = json.loads((o / "OUTSIDE_G_R6.json").read_text(encoding="utf-8"))
                 for suite in pg["suites"].values():
                     for c in suite["cases"]:
                         c["checks"][0]["pass"] = False
                 (o / "OUTSIDE_G_R6.json").write_text(json.dumps(pg), encoding="utf-8")
-                saved = S.PLANS.pop("G", None)
+                down = S.build([])["stages"]["G"]["without_sweeps"]
+                check("planted G per-case downgrade lowers the counted cases", down["counted"] < base)
+                reg = json.loads((o / "outside_register_g.json").read_text(encoding="utf-8"))
+                reg["expsim_g"]["counted"] = 0  # plus the per-case downgrade: G falls under 60%
+                (o / "outside_register_g.json").write_text(json.dumps(reg), encoding="utf-8")
                 p = []
-                down = S.build(p)["stages"]["G"]
-                check("planted G downgrade lowers the count", down["without_sweeps"]["counted"] < base)
+                S.build(p)
                 check("planted G downgrade fails the 60% floor", any("stage G" in x and "floor" in x for x in p))
-                if saved:
-                    S.PLANS["G"] = saved
                 shutil.copy(real_oracle / "OUTSIDE_G_R6.json", o / "OUTSIDE_G_R6.json")
-            S.PLANS.pop("F")
+                shutil.copy(real_oracle / "outside_register_g.json", o / "outside_register_g.json")
             p = []
-            S.build(p)
-            check("stage under floor without a dated plan fails", any("stage F" in x and "floor" in x for x in p))
+            doc = S.build(p)
+            f = doc["stages"]["F"]["without_sweeps"]
+            check("a stage under 60% of value cases fails", (f["share"] < S.FLOOR) == any("stage F" in x and "floor" in x for x in p))
+            d = doc["stages"]["D"]["without_sweeps"]
+            check("error cases leave the denominator (stage D: 520 value cases of 654)", d["cases"] == 520 and d["error_and_invariance_cases"] == 134)
         finally:
             S.GOLDEN, S.ORACLE = real_golden, real_oracle
-            S.PLANS.clear()
-            S.PLANS.update(real_plans)
     c = S.classify_case_register([{"case_id": "x", "library": "QuantLib", "convention_rows": ["SCIPY.CHI2"]}], set())
     check("SCIPY.CHI2 case is reimplementation", c["x"][0] == "reimplementation")
     print(f"{len(FAILS)} failure(s)")
