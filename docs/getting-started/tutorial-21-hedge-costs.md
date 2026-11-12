@@ -165,7 +165,23 @@ Worked example, golden case `uc6_r6-0001` (synthetic; expected outputs from the 
 | `hedge_cost` | 5.0 (500 units times the 0.01 half-spread) |
 | `rounding_cost` | 0.0065, the objective lost by rounding to whole lots |
 
-The CLI run of this case in each language is not shown yet: the operation is new in contract 1.12.0, and the page gains a runnable block once the four builds pass `datasets/golden/r6/uc6_r6.json`.
+To run the case through any build's CLI (`examples/tutorial_uc6.py` sends the golden inputs to `quantforge batch` and prints three lines):
+
+```bash
+python examples/tutorial_uc6.py rust/target/release/quantforge
+python examples/tutorial_uc6.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorial_uc6.py cpp26/build/quantforge
+```
+
+Expected output (rounded from the golden):
+
+```text
+delta before -543.96  lots [5]  delta after -43.96
+gamma -3.98  vega -2902.44
+hedge_cost 5.0000  rounding_cost 0.0065
+```
+
+**PENDING the language lanes:** the operation is new in CLI contract 1.12.0, and the block is not yet run by CI (no `tutorial:run` marker) because no build on `r6` implements `usecase.option_hedge_lots` (`git grep` over the four source trees, 2026-11-12). The marker goes on once the four builds pass `datasets/golden/r6/uc6_r6.json`.
 
 ## For practitioners
 
