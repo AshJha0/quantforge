@@ -36,7 +36,8 @@ STAGE_DIRS = {"D": ["stage_d"], "E": ["stage_e", "stage_e_b"], "F": ["stage_f"],
 
 # Stage F convention rows naming a numpy or scipy primitive. Kupiec (SCIPY.BINOM) and Christoffersen (SCIPY.CHI2)
 # cases rebuild the spec's likelihood-ratio formula around a distribution call: reimplementation (review finding 6).
-PRIMITIVE_ROWS = {"SCIPY.QUAD", "SCIPY.EIGH", "NUMPY.QUANTILE", "SCIPY.NORM", "SCIPY.LSTSQ"}
+# SCIPY.MLE (R6 oracle lane 2): Kupiec and Christoffersen likelihoods maximised numerically, not the closed form.
+PRIMITIVE_ROWS = {"SCIPY.QUAD", "SCIPY.EIGH", "NUMPY.QUANTILE", "SCIPY.NORM", "SCIPY.LSTSQ", "SCIPY.MLE"}
 REIMPL_ROWS = {"SCIPY.BINOM", "SCIPY.CHI2"}
 
 # Suite-level rulings for registers that hold counts only (stage G, stage I). Reviewed 2026-11-12 by the R6

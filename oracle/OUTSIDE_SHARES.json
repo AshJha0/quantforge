@@ -978,20 +978,20 @@
    "without_sweeps": {
     "cases": 525,
     "library-object": 71,
-    "library-primitive": 94,
-    "reimplementation": 57,
+    "library-primitive": 131,
+    "reimplementation": 20,
     "none": 303,
-    "counted": 165,
-    "share": 0.3143
+    "counted": 202,
+    "share": 0.3848
    },
    "with_sweeps": {
     "cases": 6060,
     "library-object": 71,
-    "library-primitive": 94,
-    "reimplementation": 57,
+    "library-primitive": 131,
+    "reimplementation": 20,
     "none": 5838,
-    "counted": 165,
-    "share": 0.0272
+    "counted": 202,
+    "share": 0.0333
    },
    "sweeps": {
     "cases": 5535,
@@ -1008,6 +1008,7 @@
     "numpy (NUMPY.QUANTILE)": 19,
     "scipy (SCIPY.EIGH)": 24,
     "scipy (SCIPY.LSTSQ)": 24,
+    "scipy (SCIPY.MLE)": 37,
     "scipy (SCIPY.NORM)": 10,
     "scipy (SCIPY.QUAD)": 17
    },
@@ -1078,20 +1079,20 @@
     "risk.backtest.christoffersen": {
      "cases": 18,
      "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 17,
+     "library-primitive": 17,
+     "reimplementation": 0,
      "none": 1,
-     "counted": 0,
-     "share": 0.0
+     "counted": 17,
+     "share": 0.9444
     },
     "risk.backtest.kupiec": {
      "cases": 22,
      "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 20,
+     "library-primitive": 20,
+     "reimplementation": 0,
      "none": 2,
-     "counted": 0,
-     "share": 0.0
+     "counted": 20,
+     "share": 0.9091
     },
     "risk.backtest.traffic_light": {
      "cases": 21,

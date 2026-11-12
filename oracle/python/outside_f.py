@@ -33,6 +33,7 @@ ROWS = {
     "TERM.HELPERS": ("02-curves/projection-and-fra.md USD-TERM-3M deposits, FRAs, swaps", "IborIndex TERM 3M (2 days, US GovernmentBond, ModifiedFollowing, Actual360); DepositRateHelper, FraRateHelper, SwapRateHelper(Annual, ModifiedFollowing, Thirty360 BondBasis, exogenous discount)"),
     "CRV.LOG_LINEAR_DF": ("02-curves/curve-framework.md LOG_LINEAR_DF", "PiecewiseLogLinearDiscount(ref, helpers, Actual365Fixed)"),
     "SCIPY.CHI2": ("06-risk/var-es-and-backtests.md Kupiec, Christoffersen p-values", "scipy.stats.chi2.sf(lr, dof); likelihood ratios from scipy.stats.binom.logpmf and scipy.special.xlogy"),
+    "SCIPY.MLE": ("06-risk/var-es-and-backtests.md Kupiec, Christoffersen (R6-13)", "Bernoulli and first-order Markov likelihoods maximised numerically by scipy.optimize.minimize_scalar (bounded Brent, xatol 1e-15), not the closed-form MLE; transitions by numpy; p-values scipy.stats.chi2.sf; oracle/python/outside_f_r6.py"),
     "SCIPY.BINOM": ("06-risk/var-es-and-backtests.md traffic light", "scipy.stats.binom.cdf(x, n, 1 - c); zones at 0.95 and 0.9999; plus factor Basel 1996 Table 2"),
     "SCIPY.NORM": ("06-risk/var-es-and-backtests.md parametric VaR and ES", "scipy.stats.norm.ppf; ES by scipy.integrate.quad of the normal tail (not the closed form)"),
     "NUMPY.QUANTILE": ("06-risk/var-es-and-backtests.md historical VaR", "numpy.quantile(losses, c, method='inverted_cdf') (Hyndman and Fan type 1); ES as the mean of the sorted losses from the first position holding that quantile (agrees with the spec without ties; a tie at the VaR scenario, risk_f4-0107, is not outside-checked)"),
@@ -239,32 +240,18 @@ def h_joint(i):
 
 
 def h_kupiec(i):
-    from scipy import stats, special
-    n, x, p = i["observations"], i["exceptions"], 1 - i["confidence"]
-    lr = max(2 * (stats.binom.logpmf(x, n, x / n) - stats.binom.logpmf(x, n, p)), 0.0)
-    lr = 0.0 if lr < 1e-12 else lr  # spec rule, ruling F-32
-    return {"lr_uc": lr, "p_value": float(stats.chi2.sf(lr, 1))}, {"SCIPY.CHI2"}
+    # R6-13 (D6): the closed-form LR around binom.logpmf was ruled reimplementation. The likelihoods are now
+    # maximised numerically (scipy bounded Brent), a different formulation; oracle/python/outside_f_r6.py.
+    from scipy import stats
+    from outside_f_r6 import lr_uc
+    lr = float(lr_uc(i["observations"], i["exceptions"], i["confidence"]))
+    return {"lr_uc": lr, "p_value": 1.0 if lr == 0.0 else float(stats.chi2.sf(lr, 1))}, {"SCIPY.MLE"}
 
 
 def h_christ(i):
-    from scipy import stats
-    from scipy.special import xlogy
-    I = [int(v) for v in i["exceptions"]]
-    out, _ = h_kupiec({"observations": len(I), "exceptions": sum(I), "confidence": i["confidence"]})
-    nn = {(a, b): 0 for a in (0, 1) for b in (0, 1)}
-    for a, b in zip(I, I[1:]):
-        nn[(a, b)] += 1
-    n00, n01, n10, n11 = nn[(0, 0)], nn[(0, 1)], nn[(1, 0)], nn[(1, 1)]
-    pi = (n01 + n11) / (n00 + n01 + n10 + n11)
-    p01 = n01 / (n00 + n01) if n00 + n01 else 0.0
-    p11 = n11 / (n10 + n11) if n10 + n11 else 0.0
-    l0 = xlogy(n00 + n10, 1 - pi) + xlogy(n01 + n11, pi)
-    l1 = xlogy(n00, 1 - p01) + xlogy(n01, p01) + xlogy(n10, 1 - p11) + xlogy(n11, p11)
-    ind = max(-2 * (l0 - l1), 0.0)
-    ind = 0.0 if ind < 1e-12 else ind  # ruling F-32
-    cc = out["lr_uc"] + ind
-    return {"lr_uc": out["lr_uc"], "lr_ind": ind, "lr_cc": cc, "p_uc": out["p_value"], "p_ind": float(stats.chi2.sf(ind, 1)), "p_cc": float(stats.chi2.sf(cc, 2)),
-            "transitions": {"n00": n00, "n01": n01, "n10": n10, "n11": n11}}, {"SCIPY.CHI2"}
+    from outside_f_r6 import christoffersen
+    out = christoffersen(i["exceptions"], i["confidence"])
+    return {k: (float(v) if not isinstance(v, dict) else v) for k, v in out.items()}, {"SCIPY.MLE"}
 
 
 def h_traffic(i):
