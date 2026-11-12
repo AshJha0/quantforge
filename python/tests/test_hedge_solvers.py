@@ -409,7 +409,10 @@ def test_property_minvar_effectiveness_is_ols_r_squared(k: int, extra: int,
     coef, *_ = np.linalg.lstsq(design, exposure, rcond=None)
     fitted = design @ coef
     y = np.asarray(exposure)
-    r2 = 1 - float(np.sum((y - fitted) ** 2)) / float(np.sum((y - y.mean()) ** 2))
+    # R-squared is undefined for a constant exposure series (zero total sum of squares); numpy's
+    # reference then turns rounding noise into a ratio, so the property only holds with variance.
+    assume(float(np.sum((y - y.mean()) ** 2)) > 1e-12)
+    r2 = 1 -float(np.sum((y - fitted) ** 2)) / float(np.sum((y - y.mean()) ** 2))
     assert out["effectiveness"] == pytest.approx(r2, abs=1e-8)
     assert np.allclose(out["hedge"], -coef[1:], rtol=1e-7, atol=1e-8)
 
