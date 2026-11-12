@@ -41,7 +41,7 @@ Inputs: `trade_date`, `discount`, `hazard`, `recovery` `R`, `trade` `{maturity, 
 
 ## `credit.cds.bootstrap`
 
-Inputs: `trade_date`, `discount`, `recovery`, `quotes` `[{tenor, spread}]`. Output: `pillars` `[{date, survival}]`, one per quote at its maturity (not maturity + 1, ruling D20). Each quote's `par_spread` equals its spread, solved in tenor order, below 1e-13.
+Inputs: `trade_date`, `discount`, `recovery`, `quotes` `[{tenor, spread}]`. Output: `pillars` `[{date, survival}]`, one per quote at its maturity (not maturity + 1, ruling D20). Each quote's `par_spread` equals its spread, solved in tenor order, below 1e-13 in the oracle's own replay. Against QuantLib's `IsdaCdsEngine` the fair spreads agree to about 1e-11 (not 1e-13) where a maturity or coupon date falls on a weekend and is adjusted (R6-25; 1.3e-11 measured on the `r6/cds_imm_r6` curves).
 
 Checks, in order: `recovery` outside `[0, 1)`: `E_DOMAIN`. Maturities not strictly increasing: `E_INPUT`. A spread `<= 0`: `E_DOMAIN`. `T` on a coupon date: `E_INPUT`.
 

@@ -15,6 +15,10 @@
     "conformance-rust",
     "sanitizers-asan-ubsan",
     "mutation-plan",
-    "mutation-report"
+    "mutation-report",
+    "coverage-stage-java",
+    "coverage-stage-cpp",
+    "coverage-stage-python",
+    "coverage-stage-rust"
   ]
 }

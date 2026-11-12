@@ -5675,6 +5675,12 @@
     },
     "quotes": {
      "java": "quotes"
+    },
+    "step_end": {
+     "java": "stepEnd"
+    },
+    "tension": {
+     "java": "tension"
     }
    },
    "outputs": [
