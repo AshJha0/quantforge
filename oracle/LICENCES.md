@@ -39,10 +39,13 @@ From the stage B data survey of 2026-11-06, which is a reading of published term
 | **FRED** | **Dropped** | Terms bar storing, caching or archiving content, and the API needs a key | Do not record, do not use |
 | CME, ICE | Not usable | Personal non-commercial use only; CME from search snippets only | No |
 
-## Not yet used
+## Read 2026-11-12 (R6-18)
+
+| Tool | Version | Licence | How checked |
+|---|---|---|---|
+| Open Source Risk Engine (ORE) | 1.8.17.0 (Python wheel, run under WSL for stage G wave 4c) | Modified BSD (3-clause): copyright Quaternion Risk Management Ltd. 2016-2020 and Acadia Inc. 2021; redistribution with or without modification allowed if the notice is kept; no use of the holders' or the Open Source Risk Group's names to endorse | `license.txt` in the OpenSourceRisk/Engine repository, read through the GitHub API on 2026-11-12. Oracle only: `oracle/ore/` holds input builders and output summaries, no ORE code |
 
 | Tool | Status |
 |---|---|
-| ISDA CDS Standard Model | Published under the "ISDA CDS Standard Model Public License"; [cdsmodel.com](https://cdsmodel.com/) is described as allowing change and redistribution. The licence text has not been read. Read it before stage D |
-| Open Source Risk Engine | Believed to be modified BSD. Not verified. Check before stage G |
-| ISDA SIMM | Believed to be proprietary and licensed by ISDA. Not verified. Plan: own parameters, "SIMM-style", no ISDA parameters and no compliance claim |
+| ISDA CDS Standard Model | Not used, and no code or output of it is in the repository. The licensing page at cdsmodel.com, read 2026-11-12, says only that the source is ISDA copyright "available under an Open Source license" and does not print the terms, which ship inside the source download. Stage D CDS cases were checked against QuantLib's `IsdaCdsEngine` (BSD-3-Clause, above), not the ISDA code. Any future use first reads the licence file in the download and records it here |
+| ISDA SIMM | Not used. SIMM methodology and parameters are ISDA's and licensed by ISDA (ISDA states this on its SIMM pages). QuantForge uses its own parameters, labelled "SIMM-style", with no ISDA parameters and no compliance claim |

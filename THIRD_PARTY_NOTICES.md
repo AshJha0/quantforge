@@ -13,6 +13,10 @@ No raw market data is in this repository, so these notices apply to anyone who p
 - **US Treasury:** cite the US Department of the Treasury.
 - **FRED:** not used. Its terms bar storing content.
 
+## NumPy
+
+The Python implementation depends on NumPy at run time (symmetric eigenvalues and condition numbers); NumPy is installed from PyPI, not vendored. NumPy is under the BSD-3-Clause licence (copyright NumPy Developers), with bundled parts under 0BSD, MIT, Zlib and CC0-1.0; its licence files ship inside the NumPy wheel. `oracle/LICENCES.md` records the version read.
+
 ## Joe-Kuo Sobol direction numbers
 
 The first 64 dimensions of `new-joe-kuo-6.21201` are stored in `specifications/01-core/data/sobol-joe-kuo-d6-64.json` and are compiled or copied into all four implementations (`cpp26/src/core/sobol.cpp`, `java25/.../SobolData.java`, `python/quantforge_core/_sobol_data.py`, `rust/crates/quantforge-core/src/sobol.rs`). The licence below was copied on 2026-11-06 from <https://web.maths.unsw.edu.au/~fkuo/sobol/licence>. A binary release must carry this file in its documentation.
