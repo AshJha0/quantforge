@@ -691,7 +691,8 @@ class QualityGateFailPaths(unittest.TestCase):
 
     def test_cli_coverage_gate_and_floor_breach(self):
         cfg = {"stage": "T", "coverage_min": 0.9, "modules": [{"module": "x", "python": "python/quantforge_core/heston.py"}]}
-        good = {"files": {"quantforge_core/heston.py": {"summary": {"covered_lines": 95, "num_statements": 100}}}}
+        floor = json.loads((ROOT / "conformance/quality/floors.json").read_text(encoding="utf-8"))["python"]
+        good = {"files": {"quantforge_core/heston.py": {"summary": {"covered_lines": round(100 * floor) + 1, "num_statements": 100}}}}
         low = {"files": {"quantforge_core/heston.py": {"summary": {"covered_lines": 80, "num_statements": 100}}}}
         with tempfile.TemporaryDirectory() as d:
             c, g, lo = Path(d, "c.json"), Path(d, "g.json"), Path(d, "l.json")
@@ -875,6 +876,10 @@ class SiteHome(unittest.TestCase):
         self.assertIn("<td>E</td>", sf.home_figures()["stage_rows"])
         self.assertEqual(sf.check_status(sf.home_figures(), rows), [])
         self.assertTrue(sf.check_status({"implemented_stages": "A to D"}, rows))  # drift fails the build
+        # Stages can finish out of letter order (I before H): the span must not claim H.
+        self.assertEqual(sf.stage_span(list("ABCDEFGI")), "A to G and I")
+        self.assertEqual(sf.stage_span(list("ACE")), "A, C and E")
+        self.assertEqual(sf.stage_span([]), "")
         self.assertNotIn("<tr><td>", (ROOT / "tools/site_home.html").read_text(encoding="utf-8"))
 
     def test_site_search_and_accessibility_markup(self):

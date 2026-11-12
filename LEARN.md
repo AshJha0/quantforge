@@ -387,6 +387,8 @@ Every topic is Implemented, not Validated, and all inputs are synthetic unless a
 
 Stage F (v0.6.0) is at Implemented, not Validated. On the merged part 2 tree (`stage-f-part2` at `db99d87`, 2026-11-10, observed on one Windows machine through the neutral runner), each of the four builds passed 12,462 of 12,462 golden cases: Java (JDK 25.0.5), Python (CPython 3.15.2), Rust (1.99.1) and C++ (GCC 15.2.0 under WSL, built with `-DQF_WERROR=ON`). Specs and rulings F-1 to F-44 are in `specifications/`. Every number quoted here is the expected output of the named golden case, computed by the oracle at 40 or more digits.
 
+Tutorials for this section: [5, risk](docs/getting-started/tutorial-5-risk.md) (VaR, ES, backtests, FRTB delta), [8, multi-curve building](docs/getting-started/tutorial-8-multicurve.md) (joint solve and Jacobian), [14, the trading book](docs/getting-started/tutorial-14-book.md) and [15, advanced risk](docs/getting-started/tutorial-15-advanced-risk.md).
+
 ### Five more ways to draw a curve
 **Plain idea.** Between quoted dates a curve must be filled in, and the method changes the forward rates a trader sees. Stage F adds monotone convex (Hagan and West), monotonic log cubic, a tension spline and a hybrid that is stepwise at the front and smooth behind. Spec: `02-curves/curve-framework.md`, "Stage F: pluggable interpolation". **Watch for:** monotone convex is piecewise in its data, so its derivative jumps where a section changes rule. Ruling F-28 shows how a too-large bump straddled such a kink and looked like a 2e-3 error.
 
@@ -418,6 +420,8 @@ Use case 4 regresses a portfolio's returns on factor returns, and each factor's 
 ## Stage G: rates models and xVA
 
 Stage G (released as v0.7.0 on 2026-11-11) is at Implemented, not Validated. On the integration tree `stage-g-int` (2026-11-11, observed on one Windows machine through the neutral runner) each of the four builds passed 14,492 of 14,492 golden cases, of which 589 are stage G value and error cases and 1,026 are E1 cases for the first 20 stage G operations.
+
+Tutorials for this section: [6, interest rate models](docs/getting-started/tutorial-6-hull-white.md), [7, counterparty risk](docs/getting-started/tutorial-7-counterparty.md), [12, exotic options](docs/getting-started/tutorial-12-exotics.md) (discrete barriers), [15, advanced risk](docs/getting-started/tutorial-15-advanced-risk.md) (AAD ladder, MC Greeks, model reserve) and [16, the LIBOR market model](docs/getting-started/tutorial-16-lmm.md).
 
 ### Short-rate models
 
@@ -452,7 +456,7 @@ Stage G (released as v0.7.0 on 2026-11-11) is at Implemented, not Validated. On 
 
 ## Stage I: hedging
 
-Stage I is built and is to be released as v0.8.0. Everything below is specified in `specifications/08-hedging/` (rulings I-1 to I-55) and pinned by 443 golden cases in 21 suites in `datasets/golden/stage_i/`. On the integration tree, at CLI contract 1.11.0, each of the four builds passed 14,935 of 14,935 golden cases, all stages included (2026-11-11, observed on one Windows machine through the neutral runner). Every input is synthetic.
+Stage I was released as v0.8.0 on 2026-11-12. Everything below is specified in `specifications/08-hedging/` (rulings I-1 to I-55) and pinned by 443 golden cases in 21 suites in `datasets/golden/stage_i/`. On the integration tree, at CLI contract 1.11.0, each of the four builds passed 14,935 of 14,935 golden cases, all stages included (2026-11-11, observed on one Windows machine through the neutral runner). Every input is synthetic.
 
 Tutorials 17 to 21 work through this section with real outputs in all four languages: [17, delta hedges](docs/getting-started/tutorial-17-delta-hedge.md), [18, the QP solver](docs/getting-started/tutorial-18-minvar-qp.md), [19, credit and correlation](docs/getting-started/tutorial-19-credit-correlation.md), [20, equity and rates](docs/getting-started/tutorial-20-cross-asset.md) and [21, costs](docs/getting-started/tutorial-21-hedge-costs.md).
 
@@ -492,7 +496,7 @@ Tutorials 17 to 21 work through this section with real outputs in all four langu
 
 ## Appendix: stage history
 
-The order things were built, with each stage's own summary. The topics above reuse these stages' worked examples.
+The order things were built, with each stage's own summary. The topics above reuse these stages' worked examples. The [tutorial index](docs/getting-started/README.md) has a Stage column: stage B is tutorial 1; C is 3 and 5; D is 2, 4, 8, 9, 10 and 11; E is 3, 9, 12 and 13; F is 5, 8, 14 and 15; G is 5, 6, 7, 12, 15 and 16; I is 17 to 21.
 
 ### Stage A: Foundation
 

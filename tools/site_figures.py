@@ -46,10 +46,26 @@ def stage_rows(rows):
                      f'<a href="ROADMAP.html#stage-status">Details</a></td></tr>' for st, scope, status in rows)
 
 
+def stage_span(done):
+    """Done stages as runs of consecutive letters: ['A'..'G', 'I'] -> 'A to G and I'.
+
+    Stages need not finish in letter order (stage I was built before H), so one 'first to
+    last' range would claim a stage that is not done.
+    """
+    runs = []
+    for st in sorted(done):
+        if runs and ord(st) == ord(runs[-1][-1]) + 1:
+            runs[-1].append(st)
+        else:
+            runs.append([st])
+    parts = [r[0] if len(r) == 1 else f"{r[0]} to {r[-1]}" for r in runs]
+    return " and ".join([", ".join(parts[:-1]), parts[-1]]) if len(parts) > 1 else (parts[0] if parts else "")
+
+
 def check_status(figures, rows):
     """Problems where site_facts.json disagrees with ROADMAP: implemented_stages must span the Done stages."""
     done = [st for st, _, status in rows if status.lower().startswith("done") and len(st) == 1]
-    want = f"{done[0]} to {done[-1]}" if len(done) > 1 else (done[0] if done else "")
+    want = stage_span(done)
     have = figures.get("implemented_stages", "")
     return [] if have == want else [f"site_facts.json implemented_stages is '{have}', ROADMAP says '{want}'"]
 

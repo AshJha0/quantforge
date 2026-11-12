@@ -36,6 +36,43 @@ Each model below gets one entry, the "page" the plan asks for. Outside-checked s
 | M22 | Least-squares calibration | `03-calibration/least-squares.md` | B | Implemented | known truth only |
 | M23 | Linear-cost hedge solver | `08-hedging/stage-b-hedges.md` | B | Implemented | none |
 
+Stage E has its own index tables (ME-A1 to ME-A8, EB1 to EB12) under "Stage E models". Stages F, G and I, with fields taken from each entry below (outside-checked counts as the entry's Validation line states them, "see entry" where it gives none):
+
+| # | Model | Spec | Stage | Status | Outside-checked |
+|---|---|---|---|---|---|
+| MF-1 | CDS index option (Pedersen) | `04-pricing/credit-options-and-copulas.md` | F | Implemented | see entry |
+| MF-2 | GARCH estimate | `oracle/REPORT.md` | F | Implemented | see entry |
+| MF-3 | VIX null quotes and local-vol continuity | `05-volatility/vix-index.md` | F | Implemented | see entry |
+| MF-4 | Curve interpolation (Q1) | `02-curves/curve-framework.md` | F | Implemented | see entry |
+| MF-5 | Joint multi-curve solve (Q4) | `02-curves/joint-solve-and-funding.md` | F | Implemented | see entry |
+| MF-6 | Funding curve | `02-curves/joint-solve-and-funding.md` | F | Implemented | see entry |
+| MF-7 | Book sensitivities (Q3a, F3) | `06-risk/book-sensitivities.md` | F | Implemented | see entry |
+| MF-8 | VaR, ES and backtests (Q2) | `06-risk/var-es-and-backtests.md` | F | Implemented | see entry |
+| MF-9 | FRTB-SA GIRR delta (Q2) | `06-risk/frtb-sa-girr.md` | F | Implemented | see entry |
+| MF-10 | Book lifecycle and marks (F5) | `07-portfolio/book-lifecycle.md` | F | Implemented | see entry |
+| MF-11 | Factor attribution (use case 4) | `04-pricing/use-cases.md` | F | Implemented | see entry |
+| MG-1 | One-factor short-rate models (G1) | `04-pricing/short-rate-models.md` | G | Implemented | 61 of 78 bond cases, 33 of 40 swaption cases |
+| MG-2 | Discrete barrier correction (R9) | `04-pricing/exotics.md` | G | Implemented | see entry |
+| MG-3 | Monte Carlo Greeks (Q9 part 1) | `06-risk/mc-greeks.md` | G | Implemented | see entry |
+| MG-4 | Closed-form swap exposure and CVA (G5a) | `06-risk/xva-exposure.md` | G | Implemented | 7 of 15 |
+| MG-5 | LIBOR market model, closed-form layer and simulation (G4a, waves 3b and 3c) | `04-pricing/lmm.md` | G | Implemented | 17 of 26, 36 of 42 |
+| MG-6 | AAD ladder of the Bermudan scheme (Q3b) | `06-risk/aad-core.md` | G | Implemented | see entry |
+| MG-7 | Model-reserve dispersion (Q9 part 2) | `06-risk/model-reserve.md` | G | Implemented | see entry |
+| MG-8 | Deterministic xVA layer (G5b) | `06-risk/xva-framework.md` | G | Implemented | see entry |
+| MG-9 | Portfolio exposure under Hull-White, ORE-checked (G5c) | `06-risk/xva-exposure-portfolio.md` | G | Implemented | 80 of 102 |
+| MG-10 | F3 sensitivities (inflation01, dividend and borrow, correlation) | `06-risk/f3-sensitivities.md` | G | Implemented | 9 of 18 |
+| MG-11 | FRTB-SA delta for FX, equity, CSR and commodity | `06-risk/frtb-sa-fx-equity.md` | G | Implemented | see entry |
+| MG-12 | FRTB-SA vega and curvature | `06-risk/frtb-sa-vega-curvature.md` | G | Implemented | see entry |
+| MG-13 | F4 portfolio-risk tools | `06-risk/portfolio-risk-tools.md` | G | Implemented | see entry |
+| MG-14 | Heston and SABR calibration surrogate (A5, challenger) | `11-research/a5-surrogate.md` | G | Challenger only; acceptance harness, no surrogate trained yet | see entry |
+| MI-1 | Hedge solvers (stage I wave 1) | `08-hedging/hedge-solvers.md` | I | Implemented | 44 of 121 |
+| MI-2 | Credit and correlation hedges (stage I wave 2) | `08-hedging/credit-and-correlation-hedges.md` | I | Implemented | 19 of 39 |
+| MI-3 | Cross-asset hedge, equity and rates (stage I wave 3) | `08-hedging/cross-asset-hedge.md` | I | Implemented | 9 of 17 |
+| MI-4 | Hedge costs, impact, margin and the risk-against-cost frontier (stage I wave 4a) | `08-hedging/hedge-costs-and-frontier.md` | I | Implemented | 15 of 33 |
+| MI-5 | Dynamic delta-hedge backtest and hedge effectiveness (stage I wave 4b) | `08-hedging/dynamic-hedge-and-effectiveness.md` | I | Implemented | 12 of 25 |
+| MI-6 | Instrument selection (stage I wave 4c) | `08-hedging/instrument-selection.md` | I | Implemented | 10 of 17 |
+| MI-7 | Hedge slippage report (stage I wave 4d) | `08-hedging/hedge-slippage.md` | I | Implemented | 0 of 12 |
+
 Numerical engines in `01-core` (root finders, quadrature, PDE, Monte Carlo, COS, RNG, Sobol) are tools, not models. They are tested against analytic and library values in stage A.
 
 ## Entries
@@ -321,7 +358,7 @@ Outside-checked counts are from `oracle/outside_register_e_b.json`.
 
 Measured on branch `stage-e`. Pooled CI score before the closeout tests: **84.3%** (2,360 killed, 439 survived; CI run 42590488102, `mutation-report.md`). Two columns: the score before the closeout tests, and the score after them where tests were added.
 
-Evidence classes. Java: PIT on unit tests, full mutant set (observed, CI). C++ "before": local `--unit` runs on a 40-site sample, 0 timeouts (observed, local); the CI report's golden-only C++ scores are lower because they do not run the unit tests. Python and Rust "before": CI sample of 40 mutants, unit or golden (observed, CI). Every "after" score is a hand-applied survivor check: each surviving sampled mutant was applied by hand against the new tests (`cpp26/tests/test_mutants_e.cpp` after commit `996527c`, `python/tests/test_mutants_e.py`, `rust/crates/quantforge-core/tests/mutants_e.rs`). It is not a fresh full mutation run. Remaining survivors are classed as equivalent by the author, with reasons in those test files; a second reviewer's sign-off is scheduled (plan 13.2 T).
+Evidence classes. Java: PIT on unit tests, full mutant set (observed, CI). C++ "before": local `--unit` runs on a 40-site sample, 0 timeouts (observed, local); the CI report's golden-only C++ scores are lower because they do not run the unit tests. Python and Rust "before": CI sample of 40 mutants, unit or golden (observed, CI). Every "after" score is a hand-applied survivor check: each surviving sampled mutant was applied by hand against the new tests (`cpp26/tests/test_boundaries_vol_credit.cpp`, first added as `test_mutants_e.cpp` in commit `996527c`, `python/tests/test_mutants_e.py`, `rust/crates/quantforge-core/tests/garch_mutants.rs`). It is not a fresh full mutation run. Remaining survivors are classed as equivalent by the author, with reasons in those test files; a second reviewer's sign-off is scheduled (plan 13.2 T).
 
 | Module | Java (PIT) | C++ before | C++ after | Python before | Python after | Rust before | Rust after |
 |---|---|---|---|---|---|---|---|
@@ -336,7 +373,7 @@ Evidence classes. Java: PIT on unit tests, full mutant set (observed, CI). C++ "
 
 Every cell is at or above the 80% target after the closeout tests, on the evidence classes above.
 
-## Stage F models (waves 1 to 3: F1 curve layer, F3 sensitivities, F4 portfolio risk, F5 book, F6 model fixes)
+## Stage F, G and I models (MF-1 to MF-11 stage F; MG-1 to MG-14 stage G; MI-1 to MI-7 stage I)
 
 Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of the golden suite file that pins the model, as committed by the spec session (`sha256sum datasets/golden/stage_f/<suite>.json`); a golden regeneration changes it and must be recorded here. Tier: 1 = feeds prices or risk that a desk would act on; 2 = feeds analytics and reports; 3 = research or challenger.
 
