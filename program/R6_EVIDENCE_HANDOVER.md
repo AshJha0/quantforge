@@ -66,3 +66,19 @@ Stage-letter or wave module names at v0.8.0: C++ `cpp26/src/core/risk_f3.cpp`, `
 - **Built:** `tools/quality_gate.py --per-file` fails on any library source file below 90% line coverage, in any stage and any of the four report formats. Exceptions go in `conformance/quality/coverage_allow.json`; an entry counts only if it has a reason. The list is empty today: the language lanes add the two entry-point files with reasons if they need to. The whole-language floors (`floors.json`: Python 0.96, Java 0.96, Rust 0.94, C++ 0.95) are unchanged and still enforced by `--floor`. All four `coverage-stage-*` jobs now pass `--floor --per-file`. The workflow runs on every PR, and the four job names are in `.github/required-checks.json` and `R6_OWNER_SETTINGS.md`.
 - **Planted fault:** `tools/test_coverage_gate.py` (in `repo-gates`, 19 checks). A planted 50% file fails in all four formats. An allow-list entry with a reason clears it; an entry without a reason does not. The end-to-end exit codes are 1 for the planted file and 0 when it is covered.
 - **Files below 90% today: not measured locally.** There is no `mvn` and no `cargo-llvm-cov` on this machine. A local Python coverage run of the full suite was cut off at 18% after about 28 minutes and produced no data. The lists come from the first CI run of `Coverage by stage` on the pushed branch: jobs `coverage-stage-python`, `coverage-stage-java`, `coverage-stage-rust` and `coverage-stage-cpp` print one `BELOW <path>: covered/total` line per file. Those jobs are expected to be red until the language lanes add tests. Copy the `BELOW` lines into this section for the lanes.
+
+## Status check 2026-11-12 (end of lane, head after b9b2b3c)
+
+Local lightweight checks re-run on this head (no language builds, no mutation campaigns):
+
+| Item | Status | Evidence path | Needs first CI run |
+|---|---|---|---|
+| R6-12 check | done; red until docs lane merges (52 lines) | `tools/check_docs_status.py` (exit 1 today, by design) | `repo-gates` after docs merge |
+| R6-13 registers + floor | done; floor now on value-checked cases (owner 2026-11-12). D, E, G (71.7%), I (66.7%) pass. **Stage F 39.6% fails the floor**: `--check` exits 1. Not fixable in this lane: needs outside checks / independent re-derivation on CDS index option, FRTB SA, book lifecycle, traffic light (spec and oracle lane) | `oracle/OUTSIDE_SHARES.md`, `tools/test_outside_shares.py` (pass) | `Outside-oracle coverage` (red until stage F is raised) |
+| R6-14 mutation | done; matrices non-empty: A 20, F 30, G 28, I 25, ALL 189; planted faults caught | `conformance/mutation/test_gates.py` (pass), `conformance/mutation/check_stages.py` (0 problems) | `Mutation by stage`, `stage=ALL gate=true` (fresh seed = run number, 40 per module) |
+| R6-15 job names | done; 54 jobs, 0 problems; 15 required in `.github/required-checks.json` | `tools/check_job_names.py` | names must exist once on main before ruleset edit |
+| R6-15 cross-platform | done | `.github/workflows/cross-platform.yml` | `Cross-platform conformance`, 12 legs |
+| R6-15 bench baseline | gate live; baseline needs a runner artifact | `tools/bench_gate.py --require-baseline` | dispatch `Microbenchmarks`, then `--write-baseline`, commit |
+| R6-15 E9 | done; self-test catches a one-ulp change | `tools/check_mc_hash.py --self-test`, `datasets/golden/core/mc_hash.json` | `Conformance` Java/C++/Rust |
+| R6-16 | done (G4 renames with language lanes) | `CHANGELOG.md` | none |
+| R6-26 | gate done; planted 50% file fails in all four formats | `tools/test_coverage_gate.py` (pass) | `Coverage by stage` x4: copy `BELOW` lines to lanes |
