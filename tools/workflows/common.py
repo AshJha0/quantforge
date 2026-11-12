@@ -19,6 +19,9 @@ from runner import resolve_command  # noqa: E402
 
 USER_AGENT = "Mozilla/5.0 (compatible; quantforge-workflows/0.1)"
 SOURCES = {s["id"]: s for s in json.loads((ROOT / "tools/recorder/sources.json").read_text(encoding="utf-8"))["sources"]}
+# R6-19: first date a workflow may download or report for R3 study inputs. Earlier dates back to each holdout start
+# are inside an R3 holdout window (research/preregs/DEVIATION-2026-11-12.md).
+FORWARD_START = min(st["start"] for st in json.loads((ROOT / "tools/recorder/studies.json").read_text(encoding="utf-8"))["studies"])
 # Batch entry point, per specifications/cli-contract.md (contract 1.6.0: `--batch` is the same command as `batch`).
 BATCH_ARGS = ["--batch"]
 # Until every CLI implements contract 1.6.0, a usage error (exit 64) on `--batch` retries with the older `batch`

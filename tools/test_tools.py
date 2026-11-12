@@ -193,6 +193,24 @@ class Recorder(unittest.TestCase):
             r = subprocess.run([sys.executable, str(gap), "recheck", "--log", str(bad)], capture_output=True, text=True)
             self.assertEqual(r.returncode, 1)
 
+    def test_observations_before_the_forward_start_are_not_logged(self):
+        """R6-19: with a study starting 2026-11-06, the 2026-11-04 and -05 bill values and every CPI month before
+        2026-11 stay out of the log."""
+        fx = ROOT / "tools/recorder/fixtures"
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            cfg = [self.source((fx / "treasury-bill-rates.csv").as_uri(), id="bill", parse={"format": "treasury_csv", "fields": ["13 WEEKS COUPON EQUIVALENT"]}),
+                   self.source((fx / "bls-cpi-v1.json").as_uri(), id="cpi", parse={"format": "bls_v1"})]
+            (d / "s.json").write_text(json.dumps({"sources": cfg}))
+            (d / "st.json").write_text(json.dumps({"studies": [{"id": "S1", "inputs": ["bill"], "status": "x", "start": "2026-11-06"}]}))
+            log = d / "log.jsonl"
+            p = subprocess.run([sys.executable, str(RECORD), "--sources", str(d / "s.json"), "--studies", str(d / "st.json"),
+                                "--data", str(d / "data"), "--log", str(log)], capture_output=True, text=True)
+            self.assertEqual(p.returncode, 0, p.stderr)
+            obs = {r["series_id"]: r["value"]["payload"]["observations"] for r in (e["record"] for e in fl.read(log)) if r["series_id"].startswith("recorder/")}
+            self.assertEqual(sorted(obs["recorder/bill"]), ["2026-11-06|13 WEEKS COUPON EQUIVALENT"])
+            self.assertEqual(obs["recorder/cpi"], {})
+
     def test_bad_feed_is_a_failure_row(self):
         with tempfile.TemporaryDirectory() as d:
             src = Path(d) / "x.csv"

@@ -39,9 +39,9 @@ def history(a):
     import datetime as dt
     year = dt.date.today().year
     rows = eod_curves.treasury(eod_curves.load("us-treasury-par-yields.csv", c.source_url("us-treasury-par-yields", year), a.data))
-    if len(rows) < a.days + 1 and not a.data:
-        rows = eod_curves.treasury(c.fetch(c.source_url("us-treasury-par-yields", year - 1))) + rows
-    rows = rows[-(a.days + 1):]
+    # R6-19: forward dates only; earlier Treasury days are inside the R3-01/R3-03 holdout windows. The window is
+    # shorter than --days until enough forward days exist.
+    rows = [r for r in rows if r[0] >= c.FORWARD_START][-(a.days + 1):]
     # Keep only tenors present on every day, so key rates line up.
     common_tenors = set.intersection(*[{q["tenor"] for q in qs} for _, qs in rows])
     return [(d, [q for q in qs if q["tenor"] in common_tenors]) for d, qs in rows]

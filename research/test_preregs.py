@@ -27,6 +27,51 @@ class PreregHashes(unittest.TestCase):
                 self.assertIn("Prior knowledge", b.decode())
 
 
+import json  # noqa: E402
+import sys  # noqa: E402
+import tempfile  # noqa: E402
+
+sys.path.insert(0, str(D.parent))
+import holdout_scan  # noqa: E402
+
+NOTE = D / "DEVIATION-2026-11-12.md"
+
+
+def listed():
+    """Locations listed in the deviation note: the first backticked field of each list line."""
+    return set(re.findall(r"^- `([^`]+)` \|", NOTE.read_text(encoding="utf-8"), re.M))
+
+
+def unlisted(hits):
+    ok = listed()
+    return sorted({h[0] for h in hits} - ok)
+
+
+class HoldoutObservations(unittest.TestCase):
+    """R6-19: no tracked file or forward-log row may carry an observation inside an R3 holdout window unless the
+    deviation note lists it."""
+
+    def test_no_unlisted_holdout_observation(self):
+        hits, have_log = holdout_scan.scan_all()
+        self.assertEqual(unlisted(hits), [], "holdout-window observation not listed in DEVIATION-2026-11-12.md")
+        if not have_log:
+            print("note: origin/forward-log not fetched; only tracked files scanned", file=sys.stderr)
+
+    def test_planted_log_row_is_caught(self):
+        row = {"hash": "x", "record": {"series_id": "recorder/us-treasury-bill-rates", "event_time": "2026-11-13T04:00:00Z",
+                                       "value": {"payload": {"observations": {"2025-06-02|13 WEEKS BANK DISCOUNT": 4.1,
+                                                                              "2026-11-12|13 WEEKS BANK DISCOUNT": 3.9}}}}}
+        hits = holdout_scan.scan_log([json.dumps(row)])
+        self.assertEqual([(h[1], h[2], h[3]) for h in hits], [("R3-02", 1, "2025-06-02")])
+        self.assertEqual(unlisted(hits), ["forward-log:actions/log.jsonl#row1:us-treasury-bill-rates"])
+
+    def test_planted_page_is_caught_and_forward_page_is_not(self):
+        bad = holdout_scan.scan_text("docs/x.md", "SOFR fixing on 2026-10-15: 4.20%")
+        good = holdout_scan.scan_text("docs/y.md", "SOFR fixing on 2026-11-12: 3.90%")
+        self.assertEqual(unlisted(bad), ["docs/x.md"])
+        self.assertEqual(good, [])
+
+
 class Q6Prereg(unittest.TestCase):
     def test_q6_churn_bound_matches_its_recorded_hash(self):
         b = (D / "Q6-01-churn-bound.md").read_bytes()
