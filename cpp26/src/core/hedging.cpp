@@ -1367,8 +1367,8 @@ SelectResult select_instruments(const QpProblem& p, long long max_instruments, b
     }
     const double best = *std::ranges::min_element(objective);
     std::size_t pick = 0;
-    const Vec none(n, 0.0);  // R6-11.5: ties within 1e-12 max(best, f(0))
-    const double f0 = objective_of(residual_of(p.a, p.b, none), p.weights, p.ridge, none);
+    const Vec zeros(n, 0.0);  // R6-11.5: ties within 1e-12 max(best, f(0))
+    const double f0 = objective_of(residual_of(p.a, p.b, zeros), p.weights, p.ridge, zeros);
     while (objective[pick] - best > 1e-12 * std::max(best, f0)) ++pick;
     SelectResult out;
     out.selected.assign(subsets[pick].begin(), subsets[pick].end());
