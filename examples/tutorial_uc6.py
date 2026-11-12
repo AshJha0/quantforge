@@ -26,7 +26,7 @@ def main(cli):
     cli = [shutil.which(cli[0]) or cli[0], *cli[1:], "batch"]  # finds quantforge.exe on Windows
     case = next(c for c in json.loads(GOLDEN.read_text(encoding="utf-8"))["cases"]
                 if c["case_id"] == "uc6_r6-0001")
-    request = {key: case[key] for key in ("case_id", "operation", "inputs")}
+    request = {"schema_version": "1.0", **{key: case[key] for key in ("case_id", "operation", "inputs")}}
     p = subprocess.run(cli, input=json.dumps(request) + "\n", capture_output=True, text=True, check=True)
     r = json.loads(p.stdout.splitlines()[0])
     if r["status"] != "ok":
