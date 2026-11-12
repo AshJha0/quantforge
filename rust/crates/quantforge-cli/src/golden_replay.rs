@@ -13,7 +13,7 @@ fn class(name: &str) -> Option<Option<(f64, f64)>> {
     Some(match name {
         "date_and_convention" | "bit_exact" => None,
         "simple_analytic" => Some((1e-12, 1e-10)),
-        "interpolation" | "aad_sensitivity" => Some((1e-10, 1e-8)),
+        "interpolation" | "aad_sensitivity" | "per_unit" => Some((1e-10, 1e-8)),
         "root_finding" => Some((1e-10, 1e-10)),
         "quadrature" | "statistics" => Some((1e-11, 1e-10)),
         "numerical_scheme" => Some((1e-8, 1e-8)),
