@@ -51,7 +51,7 @@ def cdsindex_option(i):
     prot, A = legs(per, t, r, h, R)
     F = prot / A
     T = t(exp)
-    FEP = (1 - R) * (1 - math.exp(-h * T)) * math.exp(-r * T)
+    FEP = (1 - R) * (-math.expm1(-h * T)) * math.exp(-r * T)
     tp = lambda d: (d - exp).days / 365
     def ratio(x):
         p, a = legs(per, tp, r, x, R)

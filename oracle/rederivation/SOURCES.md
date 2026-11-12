@@ -42,3 +42,7 @@ Independent implementation from `specs/book-lifecycle.md` by a different model; 
 5. **FX specified_pairs:** MAR21.88 names the Basel pairs and first-order crosses; I additionally require each listed pair to be eligible (all case pairs are). The spec says "pairs the bank elects".
 6. No numeric disagreement was found in any other FRTB parameter (risk weights, correlation tables, Table 5, equity, commodity, scalars). Note: before the tightened brief I had read parts of the FRTB and traffic-light spec pages; every number used in `results.json` was then taken from, and checked against, the PDF.
 7. **CDS:** the spec says the Pedersen worked example is not reproduced; I did not open the paper either.
+
+## Re-derivation fixes after the first blind pass (2026-11-12, spec ruling R6-28)
+- cdsidx_f-0056/0057: the first blind pass disagreed with the golden on `front_end_protection` (2.75e-10 absolute, value 1.6e-4). Cause in `cds.py`: `1 - exp(-h T)` loses digits at tiny hT; fixed with `-expm1(-h T)`. The golden was right. Both now agree; this is a correction made after seeing the golden, recorded as such.
+- risk_f4-0087..0095 (plus_factor): the spec keeps the 1996 plus factors by stated vintage. The 1996 table was not opened and cannot be re-derived independently from MAR33, so these 9 stay disagreeing in the register and are NOT counted as outside-checked.

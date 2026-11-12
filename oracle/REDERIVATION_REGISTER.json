@@ -269,14 +269,14 @@
   {
    "case_id": "cdsidx_f-0056",
    "operation": "credit.cdsindex.option_price",
-   "pass": false,
-   "strict_pass": false
+   "pass": true,
+   "strict_pass": true
   },
   {
    "case_id": "cdsidx_f-0057",
    "operation": "credit.cdsindex.option_price",
-   "pass": false,
-   "strict_pass": false
+   "pass": true,
+   "strict_pass": true
   },
   {
    "case_id": "cdsidx_f-0058",

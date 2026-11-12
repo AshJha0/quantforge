@@ -1382,6 +1382,66 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "risk_f4-0019",
+   "operation": "risk.var.filtered_historical",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4-0020",
+   "operation": "risk.var.filtered_historical",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4-0021",
+   "operation": "risk.var.filtered_historical",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4-0022",
+   "operation": "risk.var.filtered_historical",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4-0023",
+   "operation": "risk.var.filtered_historical",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4-0024",
+   "operation": "risk.var.filtered_historical",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "risk_f4-0026",
    "operation": "risk.var.parametric",
    "library": "QuantLib",
