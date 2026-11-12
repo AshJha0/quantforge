@@ -1,0 +1,13 @@
+{
+ "as_of": "2026-11-12",
+ "batch_command": {},
+ "checks": [
+  {
+   "check": "price data available",
+   "detail": "no source cleared for automated use",
+   "level": "warn",
+   "ok": false
+  }
+ ],
+ "workflow": "Rich cheap"
+}
