@@ -6,7 +6,7 @@
       {"module": "bonds", "suite": "*bond*_d",
        "java": "org.quantforge.pricing.Bonds", "cpp": "cpp26/src/core/bonds.cpp", "python": "quantforge_core.bonds*", "rust": "**/bonds.rs"},
       {"module": "credit", "suite": "credit_d",
-       "java": "org.quantforge.pricing.Credit", "cpp": "cpp26/src/core/credit.cpp", "python": "quantforge_core.credit*", "rust": "**/credit.rs"},
+       "java": "org.quantforge.pricing.Credit", "cpp": "cpp26/src/core/credit.cpp", "python": "quantforge_core.credit.*", "rust": "**/credit.rs"},
       {"module": "inflation", "suite": "inflation_d",
        "java": "org.quantforge.pricing.Inflation", "cpp": "cpp26/src/core/inflation.cpp", "python": "quantforge_core.inflation*", "rust": "**/inflation.rs"},
       {"module": "equity_d", "suite": "*_d",
