@@ -19,6 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PAGE = Path("docs") / "case-figures.md"
+HEADLINE_PAGES = ("README.md", "LEARN.md")
 CLASSES = (("ok", "value-checked"), ("error", "error"), ("same_as", "invariance (`same_as`)"), ("any", "base case of an invariance pair (`any`)"))
 
 
@@ -71,7 +72,13 @@ def main(argv):
         if have != text:
             print(f"{PAGE} is stale: run python tools/case_figures.py --write")
             return 1
-        print(f"{PAGE}: current")
+        fig = figures()
+        stale = [f for f in HEADLINE_PAGES if f"{fig['value_checked']} value-checked" not in (ROOT / f).read_text(encoding="utf-8")]
+        for f in stale:
+            print(f"{f}: headline does not give the current value-checked count {fig['value_checked']}")
+        if stale:
+            return 1
+        print(f"{PAGE}: current; headline current in {', '.join(HEADLINE_PAGES)}")
         return 0
     print(text)
     return 0

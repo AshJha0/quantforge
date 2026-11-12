@@ -7,5 +7,5 @@
   "domains": "12",
   "stages": "11 stages, A to K",
   "version": "0.8.0",
-  "outside_share": "62.8% of stage I cases (above the 60% floor)"
+  "outside_share": "Outside-library share under the tight rule: stage I 36.7% (60.1% with the cases added late), F 31.4%, G 56.4%, under the 60% floor (<a href=\"oracle/OUTSIDE_SHARES.html\">per stage</a>)."
 }

@@ -51,27 +51,27 @@ Stage E has its own index tables (ME-A1 to ME-A8, EB1 to EB12) under "Stage E mo
 | MF-9 | FRTB-SA GIRR delta (Q2) | `06-risk/frtb-sa-girr.md` | F | Implemented | see entry |
 | MF-10 | Book lifecycle and marks (F5) | `07-portfolio/book-lifecycle.md` | F | Implemented | see entry |
 | MF-11 | Factor attribution (use case 4) | `04-pricing/use-cases.md` | F | Implemented | see entry |
-| MG-1 | One-factor short-rate models (G1) | `04-pricing/short-rate-models.md` | G | Implemented | 61 of 78 bond cases, 33 of 40 swaption cases |
-| MG-2 | Discrete barrier correction (R9) | `04-pricing/exotics.md` | G | Implemented | see entry |
-| MG-3 | Monte Carlo Greeks (Q9 part 1) | `06-risk/mc-greeks.md` | G | Implemented | see entry |
-| MG-4 | Closed-form swap exposure and CVA (G5a) | `06-risk/xva-exposure.md` | G | Implemented | 7 of 15 |
-| MG-5 | LIBOR market model, closed-form layer and simulation (G4a, waves 3b and 3c) | `04-pricing/lmm.md` | G | Implemented | 17 of 26, 36 of 42 |
-| MG-6 | AAD ladder of the Bermudan scheme (Q3b) | `06-risk/aad-core.md` | G | Implemented | see entry |
-| MG-7 | Model-reserve dispersion (Q9 part 2) | `06-risk/model-reserve.md` | G | Implemented | see entry |
-| MG-8 | Deterministic xVA layer (G5b) | `06-risk/xva-framework.md` | G | Implemented | see entry |
-| MG-9 | Portfolio exposure under Hull-White, ORE-checked (G5c) | `06-risk/xva-exposure-portfolio.md` | G | Implemented | 80 of 102 |
+| MG-1 | One-factor short-rate models (G1) | `04-pricing/short-rate-models.md` | G | Implemented | 197 of 286 (197 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-2 | Discrete barrier correction (R9) | `04-pricing/exotics.md` | G | Implemented | 2 of 38 (2 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-3 | Monte Carlo Greeks (Q9 part 1) | `06-risk/mc-greeks.md` | G | Implemented | 0 of 22 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-4 | Closed-form swap exposure and CVA (G5a) | `06-risk/xva-exposure.md` | G | Implemented | 0 of 16 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-5 | LIBOR market model, closed-form layer and simulation (G4a, waves 3b and 3c) | `04-pricing/lmm.md` | G | Implemented | 53 of 68 (0 library object, 53 numpy or scipy primitive; D6, generated) |
+| MG-6 | AAD ladder of the Bermudan scheme (Q3b) | `06-risk/aad-core.md` | G | Implemented | 0 of 5 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-7 | Model-reserve dispersion (Q9 part 2) | `06-risk/model-reserve.md` | G | Implemented | 0 of 9 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-8 | Deterministic xVA layer (G5b) | `06-risk/xva-framework.md` | G | Implemented | 0 of 43 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-9 | Portfolio exposure under Hull-White, ORE-checked (G5c) | `06-risk/xva-exposure-portfolio.md` | G | Implemented | 80 of 102 (80 library object, 0 numpy or scipy primitive; D6, generated) |
 | MG-10 | F3 sensitivities (inflation01, dividend and borrow, correlation) | `06-risk/f3-sensitivities.md` | G | Implemented | 9 of 18 |
 | MG-11 | FRTB-SA delta for FX, equity, CSR and commodity | `06-risk/frtb-sa-fx-equity.md` | G | Implemented | see entry |
 | MG-12 | FRTB-SA vega and curvature | `06-risk/frtb-sa-vega-curvature.md` | G | Implemented | see entry |
 | MG-13 | F4 portfolio-risk tools | `06-risk/portfolio-risk-tools.md` | G | Implemented | see entry |
 | MG-14 | Heston and SABR calibration surrogate (A5, challenger) | `11-research/a5-surrogate.md` | G | Challenger only; acceptance harness, no surrogate trained yet | see entry |
-| MI-1 | Hedge solvers (stage I wave 1) | `08-hedging/hedge-solvers.md` | I | Implemented | 44 of 121 |
-| MI-2 | Credit and correlation hedges (stage I wave 2) | `08-hedging/credit-and-correlation-hedges.md` | I | Implemented | 19 of 39 |
-| MI-3 | Cross-asset hedge, equity and rates (stage I wave 3) | `08-hedging/cross-asset-hedge.md` | I | Implemented | 9 of 17 |
-| MI-4 | Hedge costs, impact, margin and the risk-against-cost frontier (stage I wave 4a) | `08-hedging/hedge-costs-and-frontier.md` | I | Implemented | 15 of 33 |
-| MI-5 | Dynamic delta-hedge backtest and hedge effectiveness (stage I wave 4b) | `08-hedging/dynamic-hedge-and-effectiveness.md` | I | Implemented | 12 of 25 |
-| MI-6 | Instrument selection (stage I wave 4c) | `08-hedging/instrument-selection.md` | I | Implemented | 10 of 17 |
-| MI-7 | Hedge slippage report (stage I wave 4d) | `08-hedging/hedge-slippage.md` | I | Implemented | 0 of 12 |
+| MI-1 | Hedge solvers (stage I wave 1) | `08-hedging/hedge-solvers.md` | I | Implemented | 57 of 148 (0 library object, 57 numpy or scipy primitive; D6, generated) |
+| MI-2 | Credit and correlation hedges (stage I wave 2) | `08-hedging/credit-and-correlation-hedges.md` | I | Implemented | 19 of 39 (0 library object, 19 numpy or scipy primitive; D6, generated) |
+| MI-3 | Cross-asset hedge, equity and rates (stage I wave 3) | `08-hedging/cross-asset-hedge.md` | I | Implemented | 9 of 17 (0 library object, 9 numpy or scipy primitive; D6, generated) |
+| MI-4 | Hedge costs, impact, margin and the risk-against-cost frontier (stage I wave 4a) | `08-hedging/hedge-costs-and-frontier.md` | I | Implemented | 2 of 10 (0 library object, 2 numpy or scipy primitive; D6, generated) |
+| MI-5 | Dynamic delta-hedge backtest and hedge effectiveness (stage I wave 4b) | `08-hedging/dynamic-hedge-and-effectiveness.md` | I | Implemented | 5 of 34 (0 library object, 5 numpy or scipy primitive; D6, generated) |
+| MI-6 | Instrument selection (stage I wave 4c) | `08-hedging/instrument-selection.md` | I | Implemented | 10 of 18 (0 library object, 10 numpy or scipy primitive; D6, generated) |
+| MI-7 | Hedge slippage report (stage I wave 4d) | `08-hedging/hedge-slippage.md` | I | Implemented | 0 of 12 (0 library object, 0 numpy or scipy primitive; D6, generated) |
 
 Numerical engines in `01-core` (root finders, quadrature, PDE, Monte Carlo, COS, RNG, Sobol) are tools, not models. They are tested against analytic and library values in stage A.
 
@@ -526,7 +526,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 ### MG-1 One-factor short-rate models (G1)
 - **Purpose:** zero-coupon bond prices and European bond options under Vasicek, CIR and Hull-White, and European swaptions on Hull-White by Jamshidian, sigma calibration, Bermudan swaptions by a pinned FD scheme, caps and floors under all three models, and issuer-callable bonds; the base of the stage G Bermudan, callable-bond and exposure models.
 - **Inputs:** model parameters (`a`, `sigma`, `b`), short rate, and for Hull-White a log-linear discount curve.
-- **Limitations:** one factor (perfectly correlated rates); constant parameters (no time-dependent `sigma`); Vasicek and Hull-White allow negative rates without bound; no market price of risk; calibration of `sigma` only with `a` fixed (wave 2c).
+- **Limitations:** one factor (perfectly correlated rates); constant parameters (no time-dependent `sigma`); Vasicek and Hull-White allow negative rates without bound; no market price of risk; calibration of `sigma` only with `a` fixed (wave 2c). Bermudan swaptions and callable bonds use a first-order reference scheme, and the goldens embed its bias: measured gaps of 0.17% to 1.2% against a refined grid (review, low items; plan row R6-25). The goldens pin the scheme, not the converged price.
 - **Validation:** 50-digit mpmath replicas; QuantLib 1.44 `Vasicek`, `CoxIngersollRoss`, `HullWhite` outside check (61 of 78 bond cases, 33 of 40 swaption cases). **Review:** 2026-11-10.
 - **Tier:** 1.
 - **Challenger:** G2++ (`rates.g2pp.*`, wave 2b; QuantLib `G2` outside check, 30 of 38).
@@ -566,7 +566,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Purpose:** discounted expected exposure of a vanilla swap under Hull-White at its reset dates, and a bucketed unilateral CVA; the exact anchor for the simulated exposure engine.
 - **Inputs:** Hull-White model and curve; swap times, rate, side, notional; exposure dates; flat hazard and recovery.
 - **Limitations:** single swap, no netting or collateral; reset dates only; independence of default and rates (no wrong-way risk); flat hazard; single curve.
-- **Validation:** 50-digit Jamshidian; QuantLib 1.44 `HullWhite` objects (7 of 15). **Review:** 2026-11-10.
+- **Validation:** 50-digit Jamshidian; QuantLib 1.44 `HullWhite` objects (7 of 15 as typed at v0.8.0; the current D6 count is generated in the summary table). **Review:** 2026-11-10.
 - **Tier:** 1.
 - **Challenger:** the simulated exposure engine (next xVA wave) and ORE.
 - **Monitoring thresholds:** simulated EE beyond 3 SE of these values.
@@ -617,7 +617,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Limitations:** paths are inputs (no simulation here); SIMM weights are inputs, not an ISDA calibration; bucket-end exposure; independence except in the WWR model.
 - **Validation:** 50-digit mpmath, asserted limit cases (zero thresholds give zero exposure, `b = 0` gives the independent CVA). **Review:** 2026-11-11.
 - **Tier:** 1.
-- **Challenger:** ORE's collateral and xVA engine (stage I).
+- **Challenger:** ORE's collateral and xVA engine: not run (no stage set). ORE checks only MG-9.
 - **Monitoring thresholds:** any asserted limit case failing, or exposure differing from ORE beyond 3 SE once compared.
 - **Data lineage hash:** sha256 fef567a51bb097b31a202ab9ab1536819849f12f42fe8f801e7e2375e29b8647 (`collexp_g`); d51113f2e26b021d3e71ab18fa992782592b2c727640c68efe9c21bc0b33de39 (`xvaadj_g`); 2b477e2f2be440985d9c41e1d767609483f591aa00642543e9959f6f906d512b (`simm_g`); d7f291fe26868f3174c9696986b050ae38e60d98e000937ea6c01957352582db (`wwr_g`)
 - **Retirement trigger:** a full simulated xVA engine with the bank's CSA library.
@@ -639,7 +639,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Purpose:** inflation01 of a zero-coupon inflation swap; dividend and borrow sensitivities of a European option; correlation sensitivity of an exchange option.
 - **Inputs:** swap terms and inflation rate; option terms with yield and borrow; two-asset Margrabe terms.
 - **Limitations:** closed-form products only; book-level bump-and-reprice across all pricers is not in this slice.
-- **Validation:** 50-digit mpmath; QuantLib 1.44 `dividendRho` and Margrabe central bump (9 of 18). **Review:** 2026-11-11.
+- **Validation:** 50-digit mpmath; QuantLib 1.44 `dividendRho` and Margrabe central bump (9 of 18 as typed at v0.8.0; the current D6 count is generated in the summary table). **Review:** 2026-11-11.
 - **Tier:** 2.
 - **Challenger:** bump-and-reprice on the full pricers.
 - **Monitoring thresholds:** analytic against bump beyond 1e-6 relative.
@@ -698,11 +698,11 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 ### MI-1 Hedge solvers (stage I wave 1)
 - **Purpose:** hedge positions by constrained weighted least squares (bounds, equalities, ridge, minimum-norm), integer lots, minimum-variance ratios, Black-Scholes-Merton delta, gamma and vega neutralisation, beta futures; residual risk report.
 - **Inputs:** instrument sensitivities by risk factor, the book's existing risk, weights, constraints; covariances or return series; flat Black-Scholes-Merton market.
-- **Limitations:** no costs, liquidity, margin or instrument selection yet (later stage I waves); `MIN_NORM` refuses bounds; integer lots need a strictly convex problem; Greek hedges use one flat volatility.
-- **Validation:** active-set enumeration at 50 digits with KKT re-check; exact rational enumeration for integer lots; HiGHS confirms infeasibility; scipy, numpy and QuantLib outside checks (44 of 121 cases). **Review:** 2026-11-11.
+- **Limitations:** costs, liquidity and margin are in MI-4 and instrument selection in MI-6; at v0.8.0 the largest golden was 6 by 4, so the scalable method (I-48) rests on unit tests (review finding 7; goldens at n = 50 and 200 are R6-6); the rank test is not invariant to instrument units (finding 21, R6-6); `MIN_NORM` refuses bounds; integer lots need a strictly convex problem; Greek hedges use one flat volatility.
+- **Validation:** active-set enumeration at 50 digits with KKT re-check; exact rational enumeration for integer lots; HiGHS confirms infeasibility; scipy, numpy and QuantLib outside checks (44 of 121 as typed at v0.8.0; the current D6 count is generated in the summary table). **Review:** 2026-11-11.
 - **Tier:** 2.
 - **Challenger:** scipy 1.18 `lsq_linear` (BVLS) and `minimize` (SLSQP) on the same problems.
-- **Monitoring thresholds:** a KKT residual above 1e-8 of the gradient scale, or a hedge effectiveness below the desk's floor on the dynamic backtest (later wave).
+- **Monitoring thresholds:** a KKT residual above 1e-8 of the gradient scale, or a hedge effectiveness below the desk's floor on the dynamic backtest (MI-5).
 - **Data lineage hash:** sha256 0a45713450573d2bbf6f9f363269f572b86cd577033258c3fd82ad123c512f8e (`hedgeqp_i`); 8659c72326be4654ac75059b61319efd96ffb472f8adb99ef7117b55a10a071c (`hedgeint_i`); 2cd58f846b05db9a4f43ea70f78fe842cd240c25559411e96eff3a301c5a1cbc (`hedgemv_i`); e013dbe82448fecfe4c1c9bbcea8ca0f7ce06a50978c09499db1e40ecd1e06d8 (`hedgegreeks_i`); 03f02bc3a95fcc215d27d652df70d66ed2642abe33439e7bef198fcd31b7e87e (`hedgebeta_i`); 2531eeb9dc4eddd57cf4d9dfb6c577ffb62bb583487d1b40845b0731762d1794 (`hedgeres_i`); d7ddbc7b28ad0cf16ead1e02e50be1e013e0f158c38c3ee8b7c9cc94b723aac5 (`hedgegreeks5_i`, wave 5); 8e6030343dabc17948b78be0e8960faee5dbcdf55193cad0e707575921038d5d (`hedgemv5_i`, wave 5); ae1842ca8734960cd4ffb90e990c9976c23c8dfac249cfbd7715781dc2418e2b (`hedgeqp5_i`, wave 5)
 - **Lineage regenerated 2026-11-11:** `hedgeint_i` hash refreshed after a second check (a wide-box float search with the I-7 tie rule) was added to its `verified_by` lists; no value or error code changed.
 - **Lineage regenerated 2026-11-11 (after the builds):** `hedgegreeks_i`, `hedgeint_i`, `hedgemv_i` gained computed cases for rulings I-41, I-42, I-44, I-45; earlier cases unchanged.
@@ -713,7 +713,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Purpose:** CDS hedges against CS01 (parallel and bucketed hazard bumps) and jump to default; correlation, vega and delta hedges of two-asset exchange-option books.
 - **Inputs:** ISDA CDS market (discount, hazard, recovery) and trades; two-asset Black-Scholes-Merton market with correlation; exchange options, vanillas, underlyings.
 - **Limitations:** single-name CDS only; CS01 is a hazard bump, not a quote re-bootstrap; recovery not hedged; two assets, flat volatilities.
-- **Validation:** QuantLib IsdaCdsEngine and Margrabe engine outside checks (19 of 39 cases); same-contract hedge returns its notional. **Review:** 2026-11-11.
+- **Validation:** QuantLib IsdaCdsEngine and Margrabe engine outside checks (19 of 39 as typed at v0.8.0; the current D6 count is generated in the summary table); same-contract hedge returns its notional. **Review:** 2026-11-11.
 - **Tier:** 2.
 - **Challenger:** QuantLib 1.44 `IsdaCdsEngine` and `AnalyticEuropeanMargrabeEngine` on the same trades.
 - **Monitoring thresholds:** targeted risk after the hedge above 1e-6 of the book's, or a hedge notional above 10 times the book's on a regular matrix.
@@ -725,7 +725,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Purpose:** one weighted least-squares hedge of a book's equity move and key-rate risks with forwards, options, bonds and the underlying.
 - **Inputs:** spot, dividend yield, flat volatility, a linear-in-zero discount curve; book and hedge instruments; factor weights.
 - **Limitations:** one equity, one curve, no extrapolation beyond the last pillar; the singularity test depends on instrument units (I-22).
-- **Validation:** QuantLib ZeroCurve and AnalyticEuropeanEngine outside check on every value case (9 of 17). **Review:** 2026-11-11.
+- **Validation:** QuantLib ZeroCurve and AnalyticEuropeanEngine outside check on every value case (9 of 17 as typed at v0.8.0; the current D6 count is generated in the summary table). **Review:** 2026-11-11.
 - **Tier:** 2.
 - **Challenger:** QuantLib 1.44 values with numpy least squares on the same risk definitions.
 - **Monitoring thresholds:** residual equity or key-rate risk above the desk's limit after the hedge.
@@ -737,7 +737,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Purpose:** weighted least-squares hedge with spread cost, linear market impact, liquidity bounds and a margin limit; frontier of risk against cost.
 - **Inputs:** the `hedge.qp.solve` inputs plus half-spreads, impact coefficients, cost weight(s), margin rates and limit.
 - **Limitations:** linear impact only (no square-root impact); the hedge starts from no position; margin is per instrument with no netting. No build caps the instrument count below the 200 of ruling I-4 (I-48: Java and C++ replaced their 20-instrument orthant enumeration with a sign-state active-set method), and costs are exact at a hold/not-hold switch point (I-54, `hedgecost_i-0023`).
-- **Validation:** 50-digit state enumeration with subgradient checks; wave 1 goldens reproduced exactly; HiGHS infeasibility; scipy BVLS, trust-constr and SLSQP outside checks (15 of 33). **Review:** 2026-11-11.
+- **Validation:** 50-digit state enumeration with subgradient checks; wave 1 goldens reproduced exactly; HiGHS infeasibility; scipy BVLS, trust-constr and SLSQP outside checks (15 of 33 as typed at v0.8.0; the current D6 count is generated in the summary table). **Review:** 2026-11-11.
 - **Tier:** 2.
 - **Challenger:** scipy 1.18 trust-constr and SLSQP on the split-variable QP.
 - **Monitoring thresholds:** a frontier that is not monotone, or a realised cost above the modelled cost by more than the desk's tolerance.
@@ -749,7 +749,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Purpose:** replay a delta hedge of one European option on a given path with a self-financing cash account; dollar-offset, regression and variance-reduction effectiveness.
 - **Inputs:** option, quantity, rate, dividend yield, hedge volatility, a dated spot path; or two series of value changes.
 - **Limitations:** flat hedge volatility, no transaction costs in the replay, continuous dividend yield; the dollar offset is unstable for small item changes.
-- **Validation:** QuantLib AnalyticEuropeanEngine on every date and numpy statistics outside checks on every value case (12 of 25). **Review:** 2026-11-11.
+- **Validation:** QuantLib AnalyticEuropeanEngine on every date and numpy statistics outside checks on every value case (12 of 25 as typed at v0.8.0; the current D6 count is generated in the summary table). **Review:** 2026-11-11.
 - **Tier:** 2.
 - **Challenger:** QuantLib 1.44 values on each date with the same cash arithmetic; numpy regression.
 - **Monitoring thresholds:** a live hedge's regression R² below 0.8 or dollar offset outside [0.8, 1.25] over a quarter.
@@ -762,7 +762,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Purpose:** the best weighted least-squares hedge using at most K of n instruments.
 - **Inputs:** the `hedge.qp.solve` inputs without equalities, and K.
 - **Limitations:** exhaustive search, at most 20 instruments and at most 100,000 candidate subsets (`E_LIMIT`, ruling I-53, `hedgeselect_i-0018`); no fixed cost per instrument; bounds must admit zero.
-- **Validation:** 50-digit solve of every subset; scipy per-subset outside check (10 of 17); greedy counterexample pinned. **Review:** 2026-11-11.
+- **Validation:** 50-digit solve of every subset; scipy per-subset outside check (10 of 17 as typed at v0.8.0; the current D6 count is generated in the summary table); greedy counterexample pinned. **Review:** 2026-11-11.
 - **Tier:** 2.
 - **Challenger:** the same enumeration with scipy solvers.
 - **Monitoring thresholds:** a selected hedge whose residual risk exceeds the full hedge's by more than the desk's tolerance.
@@ -774,7 +774,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Purpose:** implementation shortfall of executed hedge orders (execution and opportunity cost) and slippage against the wave 4a cost model.
 - **Inputs:** orders with decision and final prices, cost-model parameters and fills.
 - **Limitations:** one decision-price benchmark; fees not separated; no estimation across many hedges.
-- **Validation:** exact rational arithmetic with the shortfall and slippage identities asserted; no outside library (0 of 12). **Review:** 2026-11-11.
+- **Validation:** exact rational arithmetic with the shortfall and slippage identities asserted; no outside library (0 of 12 as typed at v0.8.0; the current D6 count is generated in the summary table). **Review:** 2026-11-11.
 - **Tier:** 3.
 - **Challenger:** none; the identities are the check.
 - **Monitoring thresholds:** mean slippage over a month above zero by more than two standard errors (the cost model is optimistic).
