@@ -53,7 +53,7 @@ No golden turns on these, so none blocked work. Each is this build's reading, no
 - Q48, `vol.ssvi.calibrate` has no listed check of `thetas`: it applies those of `vol.ssvi.evaluate`.
 - Q49, `gamma` at exactly 1 in `vol.ssvi.calibrate`: the fit keeps `gamma` below 1, so a true 1 is only approached.
 
-## Stage D wave 1 (open)
+## Stage D wave 1 (closed: QD1 by D27; QD2 to QD7 by D46, D42, D48, D62, D49, D51)
 
 - QD1, `stage_b/ois.json` case `ois-0023` sends `ESTR` to `rates.ois.bootstrap` and expects `E_SCHEMA`. Stage D
   (`ois-curves.md` 1.1.0, contract 1.5.0) makes `ESTR` valid, so the code returns `ok` and this one old golden fails.
@@ -67,7 +67,7 @@ No golden turns on these, so none blocked work. Each is this build's reading, no
 - QD6, limits: `ois_quotes` and `term_quotes` are taken as quote lists, capped at 100 like `quotes`.
 - QD7, `rates.ois.fit_steps`: quotes out of tenor order are caught by the pillar rule as `E_INPUT`.
 
-## Stage D waves 2 and 3 (open)
+## Stage D waves 2 and 3 (closed: QD8 by D43, QD9 by D62, QD10 by D37, QD11 by D35, QD12 by D39, QD13 by D36, D52 and D62, QD14 by D32, QD15 by D41, QD16 by D54)
 
 - QD8, `bond.yield.from_price`: golden `bonds_d-0048` gives `clean_price` -1 (dirty +1.06) and expects `E_DOMAIN`,
   but the spec's check is `clean_price + accrued <= 0`. The code gives `E_DOMAIN` for `clean_price <= 0` as well.
@@ -88,7 +88,7 @@ No golden turns on these, so none blocked work. Each is this build's reading, no
 - QD15, `eq.trs.pv`: `end <= start` gives `E_DATE_ORDER`, which is not listed.
 - QD16, `infl.*`: `seasonality` is taken as a required key that may be `null` (ruling C9 style).
 
-## Stage D wave 3 (open)
+## Stage D wave 3 (closed: QD17 by D44, QD18 by D58, QD19 by D57)
 
 - QD17, `mbs.cashflows`: golden `mbs_d-0011` has `wac` 0 and `net_coupon` 0.06 and expects `E_DOMAIN`, but the
   listed order puts `net_coupon > wac` (`E_INPUT`) first. The code checks `wac <= 0` before `net_coupon > wac`.
@@ -133,7 +133,7 @@ No stage D question is open.
 - R1-P5. R1-6 SOFR: the "USGS plus every Good Friday" calendar is used only inside `overnight.compound_dated`
   (business days, start/end check, `back`). Other SOFR uses (swap schedules, curves) keep plain `USGS`.
 
-## Stage E (open)
+## Stage E (closed except E-Q7 and E-Q11, upheld by goldens and E-A35; formal ruling asked in R6)
 
 Choices made where a stage E spec was silent or two rules pull apart. No golden depends on any of them.
 
@@ -294,3 +294,7 @@ Wave 1 (hedge solvers) passes 121 of 121 with no open question. Choices made whe
   lot counts beyond 2^52 `E_LIMIT`, I-50 confirmed. I-41 also answers I-Q2. I-51
   (`contract_version` 1.11.0) is not applied on this branch: the runner still checks 1.0.0, so it
   moves with the runner in the integration PR.
+
+## R6 status (2026-11-12, R6-25)
+
+Every heading above now names its rulings. Questions with no ruling in `specifications/`, carried to the R6 spec lane: E-Q7 (cube domain checks on every node), E-Q11 (E2 array caps), F-Q1 (E1 order against E_SCHEMA and E_INPUT, field naming), F-Q2 (G4 naming; finished in R6 by renaming `cli/ops_stage_g2.py` to `cli/ops_lmm_xva_frtb.py`), F-Q4 (R8 estimator stopping rule), G-Q2 (flat objective as E_NO_CONVERGENCE). G-Q4 is closed by G-42 (goldens regenerated).

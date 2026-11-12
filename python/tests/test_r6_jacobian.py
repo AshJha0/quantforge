@@ -39,7 +39,10 @@ def _central(interpolation: str) -> list[list[float]]:
     return [[cols[j][i] for j in range(n)] for i in range(n)]
 
 
-@pytest.mark.parametrize("interpolation", INTERPOLATIONS)
+# TENSION_SPLINE and HYBRID need tension / step_end, which risk.curve.jacobian has no input for
+# (question to the spec lane, R6_PYTHON_HANDOVER.md); they are E_INPUT today.
+@pytest.mark.parametrize("interpolation",
+                         [m for m in INTERPOLATIONS if m not in ("TENSION_SPLINE", "HYBRID")])
 def test_jacobian_matches_central_difference(interpolation: str) -> None:
     got = R.jacobian(AS_OF, "SOFR", QUOTES, interpolation, 1.0)["jacobian"]
     ref = _central(interpolation)
@@ -47,3 +50,14 @@ def test_jacobian_matches_central_difference(interpolation: str) -> None:
     for i, row in enumerate(ref):
         for j, value in enumerate(row):
             assert got[i][j] == pytest.approx(value, abs=1e-6), (interpolation, i, j)
+
+
+def test_mbs_psa_above_cpr_one_is_domain_error() -> None:
+    """R6 finding 18: above about 1667% PSA the SMM would be complex; E_DOMAIN instead."""
+    from quantforge_core import mbs
+    from quantforge_core.errors import QfError
+
+    with pytest.raises(QfError) as e:
+        mbs.mbs_cashflows((1e6, 0.065, 0.06, 60, 0, "PSA", 5000.0))
+    assert e.value.code == "E_DOMAIN"
+    assert mbs.mbs_cashflows((1e6, 0.065, 0.06, 60, 0, "PSA", 1666.0))["wal"]
