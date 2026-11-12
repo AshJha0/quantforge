@@ -5,7 +5,8 @@
   2. a golden suite added after the register was written (review finding 6, stage F) is caught;
   3. a register total that no longer matches its golden is caught;
   4. a stage under the floor with no dated plan fails;
-  5. a stage F case marked SCIPY.CHI2 counts as reimplementation, not as an outside check.
+  5. a stage F case marked SCIPY.CHI2 counts as reimplementation, not as an outside check;
+  6. a planted downgrade of the stage G per-case register (oracle/OUTSIDE_G_R6.json) fails the 60% floor.
 """
 import contextlib
 import io
@@ -62,6 +63,24 @@ def main():
             S.build(p)
             check("planted register total mismatch is caught", any("hedgeqp_i" in x for x in p))
             shutil.copy(real_oracle / "outside_register_i.json", o / "outside_register_i.json")
+            # 6. planted downgrade of the stage G per-case register: failing checks drop G under the floor
+            if (real_oracle / "OUTSIDE_G_R6.json").is_file():
+                shutil.copy(real_oracle / "OUTSIDE_G_R6.json", o / "OUTSIDE_G_R6.json")
+                p = []
+                base = S.build(p)["stages"]["G"]["without_sweeps"]["counted"]
+                pg = json.loads((o / "OUTSIDE_G_R6.json").read_text(encoding="utf-8"))
+                for suite in pg["suites"].values():
+                    for c in suite["cases"]:
+                        c["checks"][0]["pass"] = False
+                (o / "OUTSIDE_G_R6.json").write_text(json.dumps(pg), encoding="utf-8")
+                saved = S.PLANS.pop("G", None)
+                p = []
+                down = S.build(p)["stages"]["G"]
+                check("planted G downgrade lowers the count", down["without_sweeps"]["counted"] < base)
+                check("planted G downgrade fails the 60% floor", any("stage G" in x and "floor" in x for x in p))
+                if saved:
+                    S.PLANS["G"] = saved
+                shutil.copy(real_oracle / "OUTSIDE_G_R6.json", o / "OUTSIDE_G_R6.json")
             S.PLANS.pop("F")
             p = []
             S.build(p)

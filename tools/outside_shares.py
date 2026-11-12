@@ -146,6 +146,21 @@ def load_suite_register(stage):
     return out
 
 
+# Stage G suites with a per-case outside register (oracle/OUTSIDE_G_R6.json, written by oracle/python/outside_g_r6.py;
+# R6 oracle lane 2). A case counts only if every compared output passed its stated tolerance.
+PERCASE_G_CLASS = {"bermudan_g": "library-object", "aadladder_g": "library-object", "callable_g": "library-object",
+                   "hwcal_g": "library-primitive"}
+
+
+def load_percase_g():
+    p = ORACLE / "OUTSIDE_G_R6.json"
+    if not p.is_file():
+        return {}
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    return {s: (PERCASE_G_CLASS[s], v["library"], {c["case_id"] for c in v["cases"] if c["pass"] and all(x["pass"] for x in c["checks"])})
+            for s, v in doc["suites"].items() if s in PERCASE_G_CLASS}
+
+
 def stage_report(stage, problems):
     suites = golden_suites(stage)
     rows = []  # (suite, operation, class, sweep, library)
@@ -167,7 +182,14 @@ def stage_report(stage, problems):
             merged[base][1] += v["total"]
             if v["counted"] and k not in SUITE_CLASS:
                 problems.append(f"stage {stage}: register suite {k} has counted cases but no ruling in SUITE_CLASS")
+        percase = load_percase_g() if stage == "G" else {}
         for suite, cases in suites.items():
+            if suite in percase:
+                cls0, lib0, passed = percase[suite]
+                for cid, op, _ in cases:
+                    ok = cid in passed
+                    rows.append((suite, op, cls0 if ok else "none", is_sweep(stage, suite), lib0 if ok else ""))
+                continue
             counted, total = merged.get(suite, (0, 0))
             if suite in merged and total != len(cases):
                 problems.append(f"stage {stage}: register says {suite} has {total} cases, the golden has {len(cases)}")
