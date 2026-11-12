@@ -184,8 +184,8 @@ def barrier_acceptance(pairs=2_000_000):
         mc, se, paths = M.price(c["inputs"], pairs)
         g = c["expected"]["outputs"]["price"]
         lim = max(3 * se, 0.005 * mc)
-        done[c["case_id"]] = {"case_id": c["case_id"], "bgk": g, "mc": mc, "se": se, "paths": paths, "seed": 20261112, "limit": lim,
-                              "gap": g - mc, "pass": abs(g - mc) <= lim}
+        done[c["case_id"]] = {"case_id": c["case_id"], "bgk": g, "mc": float(mc), "se": float(se), "paths": paths, "seed": 20261112, "limit": float(lim),
+                              "gap": float(g - mc), "pass": bool(abs(g - mc) <= lim)}
         out.write_text(json.dumps(list(done.values()), indent=1) + chr(10), encoding="utf-8", newline=chr(10))
         note(f"{c['case_id']}: BGK {g:.6f} MC {mc:.6f} +- {se:.6f} limit {lim:.6f}: {'pass' if abs(g - mc) <= lim else 'FAIL'}")
     bad = [r for r in done.values() if not r["pass"]]

@@ -1,0 +1,72 @@
+[
+ {
+  "description": "n = 50, costs only",
+  "highs_gap": 2.969803403196636e-07,
+  "kkt_residual_rel": 1.3775324423698682e-40,
+  "states": {
+   "+": 25,
+   "-": 24,
+   "0": 1,
+   "L": 0,
+   "U": 0
+  },
+  "margin_active": false,
+  "rejected": 0
+ },
+ {
+  "description": "n = 50, costs and margin",
+  "highs_gap": 1.4897929156987288e-07,
+  "kkt_residual_rel": 9.183549615799121e-41,
+  "states": {
+   "+": 19,
+   "-": 20,
+   "0": 11,
+   "L": 0,
+   "U": 0
+  },
+  "margin_active": true,
+  "rejected": 0
+ },
+ {
+  "description": "n = 50, costs, margin, 3 equalities, bounds",
+  "highs_gap": 7.415753211503784e-08,
+  "kkt_residual_rel": 5.288997524017415e-41,
+  "states": {
+   "+": 13,
+   "-": 22,
+   "0": 12,
+   "L": 0,
+   "U": 3
+  },
+  "margin_active": true,
+  "rejected": 0
+ },
+ {
+  "description": "n = 200, costs, margin, 3 equalities, bounds",
+  "highs_gap": 2.6936750252559705e-07,
+  "kkt_residual_rel": 1.3764129180891332e-40,
+  "states": {
+   "+": 79,
+   "-": 77,
+   "0": 40,
+   "L": 2,
+   "U": 2
+  },
+  "margin_active": true,
+  "rejected": 0
+ },
+ {
+  "description": "n = 200, costs, 3 equalities, bounds, no margin",
+  "highs_gap": 1.238337440145898e-06,
+  "kkt_residual_rel": 1.1415213031557932e-40,
+  "states": {
+   "+": 89,
+   "-": 92,
+   "0": 1,
+   "L": 9,
+   "U": 9
+  },
+  "margin_active": false,
+  "rejected": 0
+ }
+]
