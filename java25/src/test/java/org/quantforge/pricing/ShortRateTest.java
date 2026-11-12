@@ -282,6 +282,10 @@ class ShortRateTest {
         assertTrue(Double.isFinite(sink));
         System.out.printf("G-9 aadladder_g-0001: price %.3f ms, price+ladder %.3f ms, ratio %.3f%n", tp[10] / 1e6,
                 tl[10] / 1e6, tl[10] / tp[10]);
+        // A coverage agent distorts timing, so the bound is asserted only on an uninstrumented run.
+        boolean instrumented = java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
+                .anyMatch(a -> a.contains("jacoco"));
+        org.junit.jupiter.api.Assumptions.assumeFalse(instrumented, "G-9 bound not asserted under a coverage agent");
         assertTrue(tl[10] / tp[10] <= 5.0, "G-9 cost ratio " + tl[10] / tp[10] + " exceeds 5");
     }
 }

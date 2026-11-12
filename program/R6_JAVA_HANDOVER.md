@@ -19,8 +19,12 @@ Fuzz after the fix: `fuzz_cli.py --impl java --seconds 400 --seed 7`, 20,200 inp
 
 ## Results
 
-- Conformance: 14,935 / 14,935 pass (golden split by expected status: 7,413 ok, 5,008 error, 1,257 any, 1,257 same_as).
-- `mvn -o verify`: 508 tests, 0 failures, BUILD SUCCESS. The coverage profile (`-Pcoverage`) was not run in this lane.
+- Conformance after merging `r6-evidence` (`aa33e85`): 14,941 / 14,941 pass, including `mc_hash` 6 of 6 (E9). Before the merge: 14,935 / 14,935 (golden split by expected status: 7,413 ok, 5,008 error, 1,257 any, 1,257 same_as).
+- `mvn -o -Pcoverage verify`: 511 tests, 0 failures, 1 skipped (the G-9 bound is not asserted under the coverage agent, which distorted the ratio to 11.2; it is asserted on every plain run).
+- Coverage (R6-26), JaCoCo, nested classes folded into their file: 137 files, line 98.26% (17,097 lines), branch 92.04%. Every file is at or above 90% line coverage before any new test, so no file needs the allow-list. Lowest five: `calibration/LeastSquares` 92.3%, `core/Finite` 92.9%, `curves/DatedCompounding` 93.4%, `cli/In` 93.8%, `core/TimeZones` 94.0%. Whole-language floor 0.96: met. Before and after are the same per file; the rewritten test below adds value checks, not lines.
+- `BookRiskCrossGammaTest` rewritten (review): revaluation cross gamma is now checked against a closed form, the product `N P_a P_b` of two pillar discount factors, whose second derivatives under `P_i exp(-s_i t_i)` are `N P_a P_b t_i t_j` (zero off the two pillars), per bp^2; and the OIS closed form `crossGammaOis` is checked entry by entry against revaluation on a receiver (the old test only compared the fall-back path with itself and checked symmetry). Writing it found that a receiver's `signedNotional` is negative, as `OpsMarketRisk` passes it; no code fault.
+- G4 rename note of the evidence lane: `conformance/mutation/stages.json` names no Java file, so nothing to update there.
+- R6-25: `java25/SPEC_QUESTIONS.md` now has Stage G (G-J1 to G-J7) and Stage I (J-I1 to J-I7) with status. Open: G-J6 (finding every zero and level crossing in `portfolio_hw` quadrature), G-J7 (PFE key naming for a general quantile), J-I6 (one kink tolerance and iteration cap for all builds, review finding 7).
 
 ## Questions for the spec lane
 
