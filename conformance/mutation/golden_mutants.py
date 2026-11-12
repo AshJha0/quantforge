@@ -34,6 +34,13 @@ MUTMUT_VERDICT = {0: "survived", 1: "killed", 3: "killed"}
 RUST_VERDICT = {"CaughtMutant": "killed", "MissedMutant": "survived", "Unviable": "unviable", "Timeout": "timeout"}
 
 
+# QF_MUTANT_AS (bytes) caps the address space of the golden run and the CLI it starts. A mutant that
+# turns a loop into `loop { v.push(..) }` then aborts on a failed allocation (counted as killed)
+# instead of exhausting the CI runner's memory, which kills the runner agent (exit 143).
+MEMCAP = (["prlimit", f"--as={os.environ['QF_MUTANT_AS']}", "--"]
+          if os.environ.get("QF_MUTANT_AS") and shutil.which("prlimit") else [])
+
+
 def run(cmd, cwd=None, env=None, timeout=None):
     """Returns the exit code, with None for a timeout. Output is kept out of the way."""
     try:
@@ -58,8 +65,9 @@ class Golden:
         return code, took
 
     def check(self, env=None):
-        return run([sys.executable, str(RUNNER), "--impl", self.impl, "--config", str(self.config), "--suite", self.suite,
-                    "--report", str(self.work / "report"), "--timeout", str(self.limit)], env=env, timeout=4 * self.limit)
+        return run(MEMCAP + [sys.executable, str(RUNNER), "--impl", self.impl, "--config", str(self.config),
+                             "--suite", self.suite, "--report", str(self.work / "report"), "--timeout", str(self.limit)],
+                   env=env, timeout=4 * self.limit)
 
 
 def copy_tree(work):
