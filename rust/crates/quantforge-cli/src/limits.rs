@@ -151,7 +151,7 @@ fn value_too_deep(op: &str, i: &Json) -> bool {
 
 /// Stage C: 100 for any quote, strike, point, dividend or position list, and per surface grid
 /// (ruling C10); 20,000 cells or steps.
-fn stage_c_above(op: &str, i: &Json) -> bool {
+fn vol_and_exotic_above(op: &str, i: &Json) -> bool {
     if !(op.starts_with("eq.")
         || op.starts_with("vol.")
         || op.starts_with("exotic.")
@@ -209,7 +209,7 @@ fn stage_c_above(op: &str, i: &Json) -> bool {
 }
 
 /// Stage F lists whose stated limit (ruling F-42) is above the generic 100,000.
-fn stage_f_raised(op: &str) -> &'static [&'static str] {
+fn raised_array_keys(op: &str) -> &'static [&'static str] {
     match op {
         "risk.var.historical" => &["pnl"],
         "risk.var.filtered_historical" => &["returns"],
@@ -220,8 +220,8 @@ fn stage_f_raised(op: &str) -> &'static [&'static str] {
 }
 
 /// The generic array rule, with the F-42 raised lists judged at 1,000,000 instead.
-fn too_long_stage_f(op: &str, i: &Json) -> bool {
-    let raised = stage_f_raised(op);
+fn too_long_with_raised(op: &str, i: &Json) -> bool {
+    let raised = raised_array_keys(op);
     let Json::Obj(keys) = i else {
         return too_long(i);
     };
@@ -254,7 +254,7 @@ fn too_long_stage_f(op: &str, i: &Json) -> bool {
 }
 
 /// Ruling F-42: stated sizes of the stage F operations.
-fn stage_f_above(op: &str, i: &Json) -> bool {
+fn risk_book_sizes_above(op: &str, i: &Json) -> bool {
     let over = |k: &str, n: i128| len(i, k).is_some_and(|m| m > n);
     let first_row = |k: &str| {
         i.get(k)
@@ -304,7 +304,7 @@ fn select_subsets_above(i: &Json, max: i128) -> bool {
 }
 
 /// Ruling I-4: stated sizes of the stage I wave 1 operations.
-fn stage_i_above(op: &str, i: &Json) -> bool {
+fn hedge_sizes_above(op: &str, i: &Json) -> bool {
     let over = |k: &str, n: i128| len(i, k).is_some_and(|m| m > n);
     let columns_over = |n: i128| {
         i.get("a")
@@ -354,13 +354,13 @@ fn stage_i_above(op: &str, i: &Json) -> bool {
 
 /// The `E_LIMIT` this case breaks, if any.
 pub fn check(op: &str, inputs: &Json) -> Option<QfError> {
-    (too_long_stage_f(op, inputs)
-        || stage_f_above(op, inputs)
-        || stage_i_above(op, inputs)
+    (too_long_with_raised(op, inputs)
+        || risk_book_sizes_above(op, inputs)
+        || hedge_sizes_above(op, inputs)
         || matrix_above(op, inputs)
         || curve_points_above(inputs)
         || value_too_deep(op, inputs)
         || operation_above(op, inputs)
-        || stage_c_above(op, inputs))
+        || vol_and_exotic_above(op, inputs))
     .then(|| err("E_LIMIT", "an input is above its limit"))
 }

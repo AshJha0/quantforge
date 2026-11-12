@@ -648,7 +648,7 @@ mod stage_d_rulings2_tests {
     }
 
     #[test]
-    fn stage_i_null_keys_and_limits() {
+    fn hedge_null_keys_and_limits() {
         let qp = |extra: &str| {
             code(
                 "hedge.qp.solve",
