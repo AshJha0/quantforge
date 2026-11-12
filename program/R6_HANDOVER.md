@@ -92,3 +92,71 @@ Read: `specifications/r6-rulings.md` R6-2.1, R6-2.2, R6-5.1 to R6-5.6, R6-7.1 to
 Goldens from `oracle/python/gen_r6_w2.py`, `gen_stage_g_w1.py R9`, `gen_stage_d_credit.py`, `gen_stage_d_w3.py`; MC acceptance 13 of 13 (`oracle/R6_BARRIER_ACCEPTANCE.json`); QuantLib CDS within 1.3e-11; basis implied repo re-solved by brentq within 1e-12.
 
 WAVE 2 READY 3c5bcfe
+
+## Wave 1B: `r6/jacobian_r6`
+
+12 cases (8 value, 4 error): SOFR under `MONOTONE_CONVEX`, `MONOTONIC_LOG_CUBIC`, `TENSION_SPLINE` (`tension` 0.5), `HYBRID` (`step_end` the third pillar), `LOG_LINEAR_DF`, `LINEAR_ZERO`; SONIA and ESTR under `MONOTONE_CONVEX`; errors: `TENSION_SPLINE` without `tension`, `HYBRID` without `step_end` (`E_INPUT`), `tension` 0 (`E_DOMAIN`), `step_end` not a pillar (`E_INPUT`). Tolerance 1e-8 absolute plus 1e-6 relative. Largest entry above the diagonal: 0.039 (SOFR monotone convex). Ruling R6-1.3 records that the plan's Richardson test cannot hold for a 1 bp quotient (gap 5e-6 even for log-linear) and what is asserted instead.
+
+**Which builds had the mask (finding 3, for the release notes):** Python (`risk_curve.py:197`, reproduced: code and v0.8.0 build), Rust (`risk_curve.rs:404`; the v0.8.0 binary returns 0.0 above the diagonal on 6 of 8 value cases: reproduced), C++ (`core/risk.cpp`, loop from `i = j`; the v0.8.0 binary returns 0 on the same entries and also lacked `tension`/`step_end`: reproduced). Java: no mask (Java lane, phase 0; largest upper entry 0.038): not reproduced in Java.
+
+Totals with wave 1B: as stated under wave 2 (15,000 after waves 1 and 2).
+
+WAVE 1 READY 96f7a33 (1A and 1B: every wave 1 golden committed)
+
+## Wave 3: R6-6, R6-9, R6-11 (audit rulings, use case 6), R6-25
+
+Read: `specifications/r6-rulings.md` R6-6.1 to R6-6.4, R6-11 table (audit items 1 to 20), R6-11.20 (use case 6); specs `08-hedging/hedge-solvers.md` and the three other hedging pages ("R6 amendments" sections), `04-pricing/use-cases.md` (use case 6), `benchmarks/targets.md` (T6, T7).
+
+**Correction to wave 2:** regenerating `barrier_g` dropped the R5 case `barrier_g-0038` (`monitoring_per_year` 1,000,001, `E_LIMIT`); restored at `e1d2584`. Pull `r6` again if you took wave 2 at `3c5bcfe`.
+
+### Behaviour changes
+
+| Ruling | Operation | Change |
+|---|---|---|
+| R6-6.1 | `hedge.qp.solve`, `hedge.frontier.solve`, `hedge.integer.solve` | Kink `|x_j| <= 1e-11 max(1, max|x|)`, then exact re-solve on the state; active-set or sign-state iterations capped at `10 n + 100`; integer search capped at 1,000,000 points or nodes; both give `E_NO_CONVERGENCE`. Property test per language: a planted run with a cap of 1 returns the code |
+| R6-6.2 | every I-3 decision | Jacobi scaling first: `D M D`, `D_jj = 1/sqrt(M_jj)`; `E` rows to unit norm and columns by `D`; reduced Hessian `Z^T D H D Z` against the largest eigenvalue of `D H D`. Solution unchanged |
+| R6-11.3, R6-11.4, R6-11.5 | qp, integer, select | Feasibility tolerance exactly 1e-9 relative; accepted answer has KKT residual at most `1e-10 max(1, max|g|)`; ties within `1e-12 max(best, f(0))` |
+| R6-11.6 | `hedge.select.solve` | `max_instruments` outside `1..n`: `E_INPUT`, before the subset-count `E_LIMIT` |
+| R6-11.7 | `hedge.minvar.ratio` | Negative pivot: `E_NOT_POSITIVE_DEFINITE`; small pivot of the scaled form: `E_SINGULAR`; lower triangle used |
+| R6-11.9, R6-11.16 | `hedge.credit.cds`, `hedge.correlation.neutralise` | Negative bumped hazard: `E_DOMAIN`; spread vol `s <= 1e-12 (v1 + v2)`: `E_SINGULAR` (no goldens yet) |
+| R6-11.12 | `hedge.beta.futures` | Evaluate `((target_beta - beta) * V) / (F * m)` in that order before rounding |
+| R6-11.13 | `hedge.qp.solve` | `eq_matrix: []` is `E_INPUT` |
+| R6-11.18 | greeks, correlation books | Unknown `instrument` string: `E_SCHEMA` |
+| R6-11.20 | `usecase.option_hedge_lots` (new) | Use case 6, spec in `use-cases.md`: book Greeks, per-lot hedge Greeks, weights `1/max(1,|b_t|)^2`, `hedge.integer.solve` with lot bounds `+-max_lots`, Greeks after for all three, `hedge_cost`, `rounding_cost`. Checks: `hedges` empty `E_INPUT`; `lot_size <= 0`, `half_spread < 0`, `max_lots < 1` `E_DOMAIN`; unknown target `E_SCHEMA`; F-2 first |
+| R6-9 | every operation | Nothing new to build if F-2 is implemented; the new E1 goldens exercise it on 29 operations that had none |
+
+### Golden files (wave 3)
+
+| File | Cases | Value | Error | Notes |
+|---|---:|---:|---:|---|
+| `r6/hedgeqp_large_r6.json` | 5 | 5 | 0 | n = 50 (3 cases) and n = 200 (2); HiGHS state, exact KKT (residual below 1e-40), HiGHS `x` within 1.2e-6; `root_finding`. Time T6/T7 per `benchmarks/targets.md` and publish |
+| `r6/hedgescale_r6.json` | 4 | 3 | 1 | mixed units; v0.8.0 Python returns `E_SINGULAR` on the three value cases (finding 21 reproduced) |
+| `r6/hedgeaudit_r6.json` | 3 | 0 | 3 | audit items 6, 7, 13; v0.8.0 Python fails all three (intended) |
+| `r6/uc6_r6.json` | 10 | 4 | 6 | use case 6 |
+| `r6/e1_r6.json` | 54 | 0 | 54 | F-2 on 29 operations (two per operation where it has two or more Real inputs); v0.8.0 Python passes 54 of 54 |
+
+New gates (both shown red on a planted fault): `python tools/check_e1_coverage.py` (`--self-test`; 254 of 276 operations covered, 22 exempt because no golden of theirs has a Real input, listed in `conformance/E1_EXEMPT.json`) and `python tools/check_tolerance_units.py` (`--self-test`). Name map regenerated: 276 operations (`risk.frtb.sbm_total`, `usecase.option_hedge_lots` added).
+
+### Expected totals after wave 3 (all waves)
+
+**15,076** cases: value-checked **7,440**, error **5,122**, invariance (`any` + `same_as`) **2,514**. Against the baseline 14,941: +135 cases, +21 value, +114 error (22 of the error increase are `barrier_g` value cases turned `E_DOMAIN`).
+
+### R6-25 (low items, this lane's share)
+
+| Item | Where |
+|---|---|
+| SSVI butterfly test is sufficient only; `false` can be a false alarm | `05-volatility/smile-and-surface.md` (`butterfly_free`) |
+| LMM simulation bias bound (`|z| <= 3` and `|mc - cf| <= 3 SE + 2%`; worst 1.2%) and a Rebonato criterion (`3 SE + 1%`; 0.41%, 0.47% pass) | `04-pricing/lmm.md` |
+| CDS repricing against QuantLib about 1e-11 (not 1e-13) with weekend dates | `04-pricing/credit.md` (`credit.cds.bootstrap`) |
+| Good Friday early closes: the listed years are first-Friday Good Fridays; the rule is the published list | `01-core/calendars.md` |
+| `hedgeslip_i`, `hedgeint_i` register wording | `oracle/outside_register_i.json` |
+
+### Stage I outside share (R6-13, coordinator request)
+
+`tools/outside_shares.py`: stage I is **102 of 278 = 36.7%** without the wave 5 sweeps and 266 of 443 = 60.05% with them. The ceiling without sweeps, even if every remaining value case got a real library check, is below 60%: 153 of the 278 cases are value cases, 125 are error cases (most `E_INPUT` and `E_DOMAIN` shape checks no library can confirm). Classes with no free outside reference: integer lots (`hedgeint_i`, 12 value cases: no free library solves bounded integer least squares; HiGHS 1.16 solves MILP and continuous QP only), the beta futures and residual report arithmetic (`hedgebeta_i` 8, `hedgeres_i` 7: closed-form arithmetic, any check is a reimplementation), slippage (`hedgeslip_i` 6), the backtests (`hedgebt_i`, `hedgebtcost_i`, 12: reimplementation). Maximum reachable by honest library checks: about 108 value cases plus about 23 `E_SINGULAR`/`E_INFEASIBLE`/`E_NOT_POSITIVE_DEFINITE` decisions confirmable by numpy or HiGHS, so about 131 of 278 = 47%. The R6 hedge goldens (in `r6/`, not counted to stage I) are checked by HiGHS but only to its 1e-6 tolerance, not the case tolerance, so they do not count under I-2 either. **Shortfall for the owner: stage I cannot reach 60% under R6-13 without counting the wave 5 sweeps; the gap is about 13 points (36 cases) at best.** Not done in this lane: the per-case register for I (the numbers above are from the suite register).
+
+### Oracle agreement and evidence
+
+Goldens from `oracle/python/gen_r6_w3.py` (large QP, scaling, audit, use case 6) and `gen_r6_e1.py`. Audit hand examples recomputed by the oracle: all agree (`oracle/python/r6_audit_examples.py`). Integer `E_NO_CONVERGENCE` has no golden (method-dependent stop); property tests only.
+
+WAVE 3 READY b877bc4
