@@ -25,7 +25,17 @@ Bounds = Sequence[float | None]
 NDArray = Any  # numpy arrays; numpy's own stubs would tie mypy to the numpy version
 THRESHOLD = 1e-12  # ruling I-3
 _MAX_ENUMERATED = 1_000_000  # integer search points or nodes before E_NO_CONVERGENCE (R6-6.1)
-_ITER_SLOPE, _ITER_BASE = 10, 100  # active-set and sign-state loops: 10 n + 100 (R6-6.1)
+_ITER_SLOPE, _ITER_BASE = 10, 100  # active-set and sign-state loops: 10 (n + p) + 100 (R6-6.1)
+
+
+def _cap(n: int, problem: object) -> int:
+    """R6-6.1 iteration cap `10 (n + p) + 100`, `p` the equality rows, finite bounds and
+    margin limit of the problem."""
+    e_mat = getattr(problem, "e_mat", None)
+    p = 0 if e_mat is None else int(e_mat.shape[0])
+    p += sum(v is not None for v in (*getattr(problem, "lower", ()), *getattr(problem, "upper", ())))
+    p += int(math.isfinite(getattr(problem, "limit", math.inf)))
+    return _ITER_SLOPE * (n + p) + _ITER_BASE
 
 
 def _z(v: float) -> float:
@@ -256,7 +266,7 @@ class _Qp:
             bound = lower[j] if side in "FL" else upper[j]
             x[j] = bound
         grad_scale = float(np.abs(2.0 * (self.big_b.T @ self.d)).max(initial=0.0))
-        for _ in range(_ITER_SLOPE * n + _ITER_BASE):
+        for _ in range(_cap(n, self)):
             free = [j for j in range(n) if j not in work]
             target = self.subproblem(free, x)
             p = target - x
@@ -460,7 +470,7 @@ class _CostQp:
         scale0 = max(float(np.abs(2.0 * (self.big_b.T @ self.d)).max(initial=0.0)),
                      float(np.abs(lin).max(initial=0.0)), 1e-300)
         k = self.e_mat.shape[0]
-        for _ in range(_ITER_SLOPE * self.n + _ITER_BASE):
+        for _ in range(_cap(self.n, self)):
             free = [j for j in range(self.n) if j not in work]
             target = self._step(free, x, lin, a_row if margin_on else None)
             p = target - x
@@ -524,7 +534,7 @@ class _CostQp:
                 signs.append(1)
             else:
                 signs.append(-1)
-        for _ in range(_ITER_SLOPE * self.n + _ITER_BASE):
+        for _ in range(_cap(self.n, self)):
             x, smooth, mu = self._orthant(x, signs)
             scale = max(float(np.abs(smooth).max(initial=0.0)),
                         float(self.spread.max(initial=0.0)), 1e-300)
@@ -955,10 +965,10 @@ def minvar_ratio(covariance: Matrix | None = None, exposure_changes: Floats | No
     low = [[0.0] * k for _ in range(k)]
     for j in range(k):
         pivot = s_hh[j][j] * scale[j] ** 2 - math.fsum(low[j][p] ** 2 for p in range(j))
-        if pivot < 0:
+        if pivot <= -THRESHOLD:  # R6-11.7 as amended
             raise QfError("E_NOT_POSITIVE_DEFINITE", "the hedge covariance is indefinite",
                           "covariance")
-        if pivot <= THRESHOLD:
+        if abs(pivot) < THRESHOLD:
             raise QfError("E_SINGULAR", "the hedge instruments are dependent", "covariance")
         low[j][j] = math.sqrt(pivot)
         for i in range(j + 1, k):
