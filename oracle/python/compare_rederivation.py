@@ -22,6 +22,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 import runner  # noqa: E402
 from outside_shares import rederive_allowed  # noqa: E402
 
+META = {"case_id", "operation", "basis", "basis_note"}
 POLICY = runner.load_policy(ROOT / "conformance" / "tolerances" / "policy.yaml")
 
 
@@ -33,6 +34,28 @@ def goldens():
         for c in json.loads(f.read_text(encoding="utf-8"))["cases"]:
             out[c["case_id"]] = c
     return out
+
+
+def normalise_labels(case, outs):
+    """Cosmetic label encoding only (bucket id as text, selected-side case, a duplicated id key the golden lacks).
+    No numeric value is touched. Strict verdicts are reported beside the normalised ones."""
+    import copy
+    o = copy.deepcopy(outs)
+    gs = case["expected"]["outputs"].get("scenarios")
+    for sc in (o.get("scenarios") or {}).values():
+        if not isinstance(sc, dict):
+            continue
+        for b in sc.get("buckets", []):
+            if "bucket" in b:
+                b["bucket"] = str(b["bucket"])
+            if "selected" in b and isinstance(b["selected"], str):
+                b["selected"] = b["selected"].upper()
+            gb = ((gs or {}).get("medium", {}).get("buckets") or [{}])[0]
+            if "currency" in b and "currency" not in gb:
+                del b["currency"]
+            if "bucket" in b and "bucket" not in gb and "currency" in gb:
+                b["currency"] = b.pop("bucket")
+    return o
 
 
 def judge(case, outputs):
@@ -54,7 +77,7 @@ def main(argv=None):
     doc = json.loads(Path(a.results).read_text(encoding="utf-8"))
     rows = doc["cases"] if isinstance(doc, dict) else doc
     gold = goldens()
-    verdicts, ignored, bad = [], [], []
+    verdicts, ignored, bad, labels = [], [], [], []
     for r in rows:
         c = gold.get(r["case_id"])
         if c is None:
@@ -66,11 +89,16 @@ def main(argv=None):
         if c["expected"]["status"] != "ok":
             ignored.append((r["case_id"], "error or invariance case (outside the value denominator)"))
             continue
-        ok, why = judge(c, r.get("outputs", {}))
-        verdicts.append({"case_id": c["case_id"], "operation": c["operation"], "pass": ok})
+        outs = r["outputs"] if "outputs" in r else {k: v for k, v in r.items() if k not in META}
+        strict, swhy = judge(c, outs)
+        ok, why = (strict, swhy) if strict else judge(c, normalise_labels(c, outs))
+        verdicts.append({"case_id": c["case_id"], "operation": c["operation"], "pass": ok, "strict_pass": strict})
         if not ok:
             bad.append((c["case_id"], "; ".join(why)))
+        elif not strict:
+            labels.append(c["case_id"])
     print(f"judged {len(verdicts)}: {sum(v['pass'] for v in verdicts)} agree, {len(verdicts) - sum(v['pass'] for v in verdicts)} disagree; ignored {len(ignored)}")
+    print(f"  strict agree {sum(v['strict_pass'] for v in verdicts)}; label-encoding-only differences {len(labels)}: {labels}")
     for cid, why in bad:
         print(f"  DISAGREE {cid}: {why}")
     for cid, why in ignored:

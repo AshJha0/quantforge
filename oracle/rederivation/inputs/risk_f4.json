@@ -1,0 +1,302 @@
+[
+ {
+  "case_id": "risk_f4-0082",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 0,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0083",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 1,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0084",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 2,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0085",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 3,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0086",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 4,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0087",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 5,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0088",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 6,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0089",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 7,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0090",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 8,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0091",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 9,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0092",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 10,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0093",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 11,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0094",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 12,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0095",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 13,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0096",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 500,
+   "exceptions": 8,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0097",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 500,
+   "exceptions": 12,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0098",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 260,
+   "exceptions": 6,
+   "confidence": 0.99
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0099",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 1000,
+   "exceptions": 30,
+   "confidence": 0.975
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0100",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 9,
+   "confidence": 0.975
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "risk_f4-0101",
+  "operation": "risk.backtest.traffic_light",
+  "inputs": {
+   "observations": 250,
+   "exceptions": 0,
+   "confidence": 0.975
+  },
+  "output_names": [
+   "cumulative_probability",
+   "plus_factor",
+   "zone"
+  ],
+  "tolerance_class": "simple_analytic"
+ }
+]

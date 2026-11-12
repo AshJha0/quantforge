@@ -1,0 +1,959 @@
+[
+ {
+  "case_id": "frtb_f-0001",
+  "operation": "risk.frtb.girr_delta",
+  "inputs": {
+   "sensitivities": [
+    {
+     "currency": "USD",
+     "curve": "SOFR",
+     "risk_factor": "5Y",
+     "sensitivity": 1000000.0
+    }
+   ],
+   "specified_currency_reduction": false
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f-0002",
+  "operation": "risk.frtb.girr_delta",
+  "inputs": {
+   "sensitivities": [
+    {
+     "currency": "USD",
+     "curve": "SOFR",
+     "risk_factor": "2Y",
+     "sensitivity": 1000000.0
+    },
+    {
+     "currency": "USD",
+     "curve": "SOFR",
+     "risk_factor": "10Y",
+     "sensitivity": -1200000.0
+    }
+   ],
+   "specified_currency_reduction": false
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f-0003",
+  "operation": "risk.frtb.girr_delta",
+  "inputs": {
+   "sensitivities": [
+    {
+     "currency": "EUR",
+     "curve": "ESTR",
+     "risk_factor": "5Y",
+     "sensitivity": 500000.0
+    },
+    {
+     "currency": "EUR",
+     "curve": "EURIBOR3M",
+     "risk_factor": "5Y",
+     "sensitivity": -400000.0
+    },
+    {
+     "currency": "EUR",
+     "curve": "EURIBOR3M",
+     "risk_factor": "10Y",
+     "sensitivity": 300000.0
+    }
+   ],
+   "specified_currency_reduction": false
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f-0004",
+  "operation": "risk.frtb.girr_delta",
+  "inputs": {
+   "sensitivities": [
+    {
+     "currency": "GBP",
+     "curve": "SONIA",
+     "risk_factor": "10Y",
+     "sensitivity": 200000.0
+    },
+    {
+     "currency": "GBP",
+     "curve": "UKRPI",
+     "risk_factor": "INFLATION",
+     "sensitivity": 100000.0
+    },
+    {
+     "currency": "GBP",
+     "curve": "GBPUSD",
+     "risk_factor": "XCCY_BASIS",
+     "sensitivity": -50000.0
+    }
+   ],
+   "specified_currency_reduction": false
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f-0005",
+  "operation": "risk.frtb.girr_delta",
+  "inputs": {
+   "sensitivities": [
+    {
+     "currency": "USD",
+     "curve": "SOFR",
+     "risk_factor": "5Y",
+     "sensitivity": 1000000.0
+    },
+    {
+     "currency": "EUR",
+     "curve": "ESTR",
+     "risk_factor": "5Y",
+     "sensitivity": -1000000.0
+    }
+   ],
+   "specified_currency_reduction": false
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f-0006",
+  "operation": "risk.frtb.girr_delta",
+  "inputs": {
+   "sensitivities": [
+    {
+     "currency": "USD",
+     "curve": "USD-B0",
+     "risk_factor": "XCCY_BASIS",
+     "sensitivity": 1000000.0
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-B1",
+     "risk_factor": "XCCY_BASIS",
+     "sensitivity": 1000000.0
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-B2",
+     "risk_factor": "XCCY_BASIS",
+     "sensitivity": 1000000.0
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-B3",
+     "risk_factor": "XCCY_BASIS",
+     "sensitivity": 1000000.0
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-B0",
+     "risk_factor": "XCCY_BASIS",
+     "sensitivity": -1000000.0
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-B1",
+     "risk_factor": "XCCY_BASIS",
+     "sensitivity": -1000000.0
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-B2",
+     "risk_factor": "XCCY_BASIS",
+     "sensitivity": -1000000.0
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-B3",
+     "risk_factor": "XCCY_BASIS",
+     "sensitivity": -1000000.0
+    }
+   ],
+   "specified_currency_reduction": false
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f-0007",
+  "operation": "risk.frtb.girr_delta",
+  "inputs": {
+   "sensitivities": [
+    {
+     "currency": "USD",
+     "curve": "SOFR",
+     "risk_factor": "1Y",
+     "sensitivity": 300000.0
+    },
+    {
+     "currency": "USD",
+     "curve": "SOFR",
+     "risk_factor": "30Y",
+     "sensitivity": -200000.0
+    },
+    {
+     "currency": "BRL",
+     "curve": "CDI",
+     "risk_factor": "2Y",
+     "sensitivity": 100000.0
+    }
+   ],
+   "specified_currency_reduction": true
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f-0008",
+  "operation": "risk.frtb.girr_delta",
+  "inputs": {
+   "sensitivities": [
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "0.5Y",
+     "sensitivity": 459970.38
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "1Y",
+     "sensitivity": -60187.03
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "2Y",
+     "sensitivity": 848512.28
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "3Y",
+     "sensitivity": -996084.5
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "5Y",
+     "sensitivity": -538764.45
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "10Y",
+     "sensitivity": 706623.81
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "20Y",
+     "sensitivity": 587590.23
+    }
+   ],
+   "specified_currency_reduction": false
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f-0009",
+  "operation": "risk.frtb.girr_delta",
+  "inputs": {
+   "sensitivities": [
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "0.25Y",
+     "sensitivity": 462245.5
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "3Y",
+     "sensitivity": 162365.3
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "10Y",
+     "sensitivity": -532304.14
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "15Y",
+     "sensitivity": -723811.67
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "30Y",
+     "sensitivity": -74316.33
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "0.25Y",
+     "sensitivity": -677722.95
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "2Y",
+     "sensitivity": -912612.27
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "5Y",
+     "sensitivity": -31999.27
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "30Y",
+     "sensitivity": 449140.11
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "0.25Y",
+     "sensitivity": -601692.63
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "0.5Y",
+     "sensitivity": -427093.99
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "1Y",
+     "sensitivity": 669980.46
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "2Y",
+     "sensitivity": -984584.11
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "3Y",
+     "sensitivity": -39908.99
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "10Y",
+     "sensitivity": 275948.19
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "15Y",
+     "sensitivity": 774679.12
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "20Y",
+     "sensitivity": -374994.15
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "30Y",
+     "sensitivity": -335179.54
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-IBOR",
+     "risk_factor": "0.5Y",
+     "sensitivity": -102643.17
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-IBOR",
+     "risk_factor": "2Y",
+     "sensitivity": 857507.89
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-IBOR",
+     "risk_factor": "3Y",
+     "sensitivity": 185094.79
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-IBOR",
+     "risk_factor": "5Y",
+     "sensitivity": -377132.86
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-IBOR",
+     "risk_factor": "10Y",
+     "sensitivity": 155466.11
+    }
+   ],
+   "specified_currency_reduction": true
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f-0010",
+  "operation": "risk.frtb.girr_delta",
+  "inputs": {
+   "sensitivities": [
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "1Y",
+     "sensitivity": 456032.17
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "2Y",
+     "sensitivity": 855734.59
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "3Y",
+     "sensitivity": 812798.4
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "5Y",
+     "sensitivity": 758838.22
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "10Y",
+     "sensitivity": -613153.45
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "15Y",
+     "sensitivity": -883908.64
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "30Y",
+     "sensitivity": 703579.18
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "0.25Y",
+     "sensitivity": -711939.4
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "0.5Y",
+     "sensitivity": 96482.33
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "3Y",
+     "sensitivity": -967404.16
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "15Y",
+     "sensitivity": -513957.91
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "20Y",
+     "sensitivity": -587505.58
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "30Y",
+     "sensitivity": -853023.91
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-OIS",
+     "risk_factor": "0.25Y",
+     "sensitivity": 286340.24
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-OIS",
+     "risk_factor": "1Y",
+     "sensitivity": 228374.64
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-OIS",
+     "risk_factor": "2Y",
+     "sensitivity": -275278.88
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-OIS",
+     "risk_factor": "5Y",
+     "sensitivity": -988918.01
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-OIS",
+     "risk_factor": "10Y",
+     "sensitivity": -245636.77
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-OIS",
+     "risk_factor": "15Y",
+     "sensitivity": -908823.0
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-OIS",
+     "risk_factor": "20Y",
+     "sensitivity": 170964.04
+    }
+   ],
+   "specified_currency_reduction": false
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f-0011",
+  "operation": "risk.frtb.girr_delta",
+  "inputs": {
+   "sensitivities": [
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "0.25Y",
+     "sensitivity": -564889.22
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "0.5Y",
+     "sensitivity": -517260.95
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "2Y",
+     "sensitivity": 659367.81
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "5Y",
+     "sensitivity": 150977.29
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "10Y",
+     "sensitivity": -905179.08
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "20Y",
+     "sensitivity": 514971.83
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "30Y",
+     "sensitivity": 769604.34
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "0.25Y",
+     "sensitivity": 777562.38
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "0.5Y",
+     "sensitivity": -797614.43
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "2Y",
+     "sensitivity": -776745.0
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "3Y",
+     "sensitivity": -78669.16
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "5Y",
+     "sensitivity": 24761.41
+    }
+   ],
+   "specified_currency_reduction": true
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f-0012",
+  "operation": "risk.frtb.girr_delta",
+  "inputs": {
+   "sensitivities": [
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "0.25Y",
+     "sensitivity": -874566.71
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "10Y",
+     "sensitivity": -246287.7
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "15Y",
+     "sensitivity": -575179.81
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "20Y",
+     "sensitivity": -510670.3
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "30Y",
+     "sensitivity": 429520.04
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "0.25Y",
+     "sensitivity": -237324.81
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "2Y",
+     "sensitivity": -666084.96
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "15Y",
+     "sensitivity": -820562.84
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "20Y",
+     "sensitivity": 537856.03
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "30Y",
+     "sensitivity": 114024.74
+    }
+   ],
+   "specified_currency_reduction": false
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f-0013",
+  "operation": "risk.frtb.girr_delta",
+  "inputs": {
+   "sensitivities": [
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "0.5Y",
+     "sensitivity": 630187.99
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "1Y",
+     "sensitivity": -628955.21
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "15Y",
+     "sensitivity": -559806.75
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-OIS",
+     "risk_factor": "30Y",
+     "sensitivity": -317584.57
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "0.25Y",
+     "sensitivity": 45414.47
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "1Y",
+     "sensitivity": 82168.92
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "2Y",
+     "sensitivity": -824297.47
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "3Y",
+     "sensitivity": -277835.83
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "5Y",
+     "sensitivity": 12806.6
+    },
+    {
+     "currency": "USD",
+     "curve": "USD-IBOR",
+     "risk_factor": "20Y",
+     "sensitivity": 220343.5
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "0.25Y",
+     "sensitivity": 524080.78
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "0.5Y",
+     "sensitivity": -992289.34
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "1Y",
+     "sensitivity": -959474.47
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "3Y",
+     "sensitivity": 567648.33
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "5Y",
+     "sensitivity": 300783.99
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "10Y",
+     "sensitivity": -395430.31
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "20Y",
+     "sensitivity": -545684.01
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-OIS",
+     "risk_factor": "30Y",
+     "sensitivity": 264250.34
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-IBOR",
+     "risk_factor": "0.25Y",
+     "sensitivity": -123193.57
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-IBOR",
+     "risk_factor": "0.5Y",
+     "sensitivity": 871851.68
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-IBOR",
+     "risk_factor": "2Y",
+     "sensitivity": -730162.66
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-IBOR",
+     "risk_factor": "5Y",
+     "sensitivity": -38573.76
+    },
+    {
+     "currency": "EUR",
+     "curve": "EUR-IBOR",
+     "risk_factor": "10Y",
+     "sensitivity": -313509.57
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-OIS",
+     "risk_factor": "0.5Y",
+     "sensitivity": 734029.29
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-OIS",
+     "risk_factor": "10Y",
+     "sensitivity": 68359.37
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-OIS",
+     "risk_factor": "20Y",
+     "sensitivity": 232358.4
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-OIS",
+     "risk_factor": "30Y",
+     "sensitivity": -451147.63
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-IBOR",
+     "risk_factor": "0.25Y",
+     "sensitivity": -968163.85
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-IBOR",
+     "risk_factor": "0.5Y",
+     "sensitivity": -904186.86
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-IBOR",
+     "risk_factor": "1Y",
+     "sensitivity": 760617.68
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-IBOR",
+     "risk_factor": "2Y",
+     "sensitivity": 903338.68
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-IBOR",
+     "risk_factor": "5Y",
+     "sensitivity": -606359.53
+    },
+    {
+     "currency": "JPY",
+     "curve": "JPY-IBOR",
+     "risk_factor": "10Y",
+     "sensitivity": 364696.04
+    }
+   ],
+   "specified_currency_reduction": true
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ }
+]

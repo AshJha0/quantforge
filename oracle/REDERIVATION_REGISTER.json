@@ -1,0 +1,846 @@
+{
+ "source": "blind re-derivation, Sonnet 5.5, 2026-11-12",
+ "rule": "owner 2026-11-12: counts only for the four no-library classes; every output at the golden's own tolerance",
+ "cases": [
+  {
+   "case_id": "cdsidx_f-0001",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0002",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0003",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0004",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0005",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0006",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0007",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0008",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0009",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0010",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0011",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0012",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0013",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0014",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0015",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0016",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0017",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0018",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0019",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0020",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0021",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0022",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0023",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0024",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0025",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0026",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0027",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0028",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0029",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0030",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0031",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0032",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0033",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0034",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0046",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0047",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0048",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0049",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0050",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0051",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0052",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0053",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0054",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0055",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0056",
+   "operation": "credit.cdsindex.option_price",
+   "pass": false,
+   "strict_pass": false
+  },
+  {
+   "case_id": "cdsidx_f-0057",
+   "operation": "credit.cdsindex.option_price",
+   "pass": false,
+   "strict_pass": false
+  },
+  {
+   "case_id": "cdsidx_f-0058",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0059",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0060",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0061",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0062",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0063",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0064",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "cdsidx_f-0065",
+   "operation": "credit.cdsindex.option_price",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "frtb_f-0001",
+   "operation": "risk.frtb.girr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f-0002",
+   "operation": "risk.frtb.girr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f-0003",
+   "operation": "risk.frtb.girr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f-0004",
+   "operation": "risk.frtb.girr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f-0005",
+   "operation": "risk.frtb.girr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f-0006",
+   "operation": "risk.frtb.girr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f-0007",
+   "operation": "risk.frtb.girr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f-0008",
+   "operation": "risk.frtb.girr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f-0009",
+   "operation": "risk.frtb.girr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f-0010",
+   "operation": "risk.frtb.girr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f-0011",
+   "operation": "risk.frtb.girr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f-0012",
+   "operation": "risk.frtb.girr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f-0013",
+   "operation": "risk.frtb.girr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2b-0001",
+   "operation": "risk.frtb.fx_delta",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "frtb_f2b-0002",
+   "operation": "risk.frtb.fx_delta",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "frtb_f2b-0003",
+   "operation": "risk.frtb.fx_delta",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "frtb_f2b-0004",
+   "operation": "risk.frtb.fx_delta",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "frtb_f2b-0007",
+   "operation": "risk.frtb.equity_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2b-0008",
+   "operation": "risk.frtb.equity_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2b-0009",
+   "operation": "risk.frtb.equity_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2b-0010",
+   "operation": "risk.frtb.equity_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2b-0011",
+   "operation": "risk.frtb.equity_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2b-0012",
+   "operation": "risk.frtb.equity_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2b-0016",
+   "operation": "risk.frtb.csr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2b-0017",
+   "operation": "risk.frtb.csr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2b-0018",
+   "operation": "risk.frtb.csr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2b-0019",
+   "operation": "risk.frtb.csr_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2b-0022",
+   "operation": "risk.frtb.commodity_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2b-0023",
+   "operation": "risk.frtb.commodity_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2b-0024",
+   "operation": "risk.frtb.commodity_delta",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2c-0001",
+   "operation": "risk.frtb.vega",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "frtb_f2c-0002",
+   "operation": "risk.frtb.vega",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2c-0003",
+   "operation": "risk.frtb.vega",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2c-0004",
+   "operation": "risk.frtb.vega",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2c-0005",
+   "operation": "risk.frtb.vega",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "frtb_f2c-0006",
+   "operation": "risk.frtb.vega",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "frtb_f2c-0010",
+   "operation": "risk.frtb.curvature",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2c-0011",
+   "operation": "risk.frtb.curvature",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2c-0012",
+   "operation": "risk.frtb.curvature",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2c-0013",
+   "operation": "risk.frtb.curvature",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2c-0014",
+   "operation": "risk.frtb.curvature",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2c-0015",
+   "operation": "risk.frtb.curvature",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "frtb_f2c-0016",
+   "operation": "risk.frtb.curvature",
+   "pass": true,
+   "strict_pass": false
+  },
+  {
+   "case_id": "book_f-0001",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0002",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0003",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0004",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0005",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0006",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0007",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0008",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0009",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0010",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0011",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0012",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0013",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0014",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0015",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0016",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0017",
+   "operation": "book.lifecycle.apply",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0024",
+   "operation": "book.marks.resolve",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0025",
+   "operation": "book.marks.resolve",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0026",
+   "operation": "book.marks.resolve",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0027",
+   "operation": "book.marks.resolve",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0028",
+   "operation": "book.marks.resolve",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "book_f-0029",
+   "operation": "book.marks.resolve",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "risk_f4-0082",
+   "operation": "risk.backtest.traffic_light",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "risk_f4-0083",
+   "operation": "risk.backtest.traffic_light",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "risk_f4-0084",
+   "operation": "risk.backtest.traffic_light",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "risk_f4-0085",
+   "operation": "risk.backtest.traffic_light",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "risk_f4-0086",
+   "operation": "risk.backtest.traffic_light",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "risk_f4-0087",
+   "operation": "risk.backtest.traffic_light",
+   "pass": false,
+   "strict_pass": false
+  },
+  {
+   "case_id": "risk_f4-0088",
+   "operation": "risk.backtest.traffic_light",
+   "pass": false,
+   "strict_pass": false
+  },
+  {
+   "case_id": "risk_f4-0089",
+   "operation": "risk.backtest.traffic_light",
+   "pass": false,
+   "strict_pass": false
+  },
+  {
+   "case_id": "risk_f4-0090",
+   "operation": "risk.backtest.traffic_light",
+   "pass": false,
+   "strict_pass": false
+  },
+  {
+   "case_id": "risk_f4-0091",
+   "operation": "risk.backtest.traffic_light",
+   "pass": false,
+   "strict_pass": false
+  },
+  {
+   "case_id": "risk_f4-0092",
+   "operation": "risk.backtest.traffic_light",
+   "pass": false,
+   "strict_pass": false
+  },
+  {
+   "case_id": "risk_f4-0093",
+   "operation": "risk.backtest.traffic_light",
+   "pass": false,
+   "strict_pass": false
+  },
+  {
+   "case_id": "risk_f4-0094",
+   "operation": "risk.backtest.traffic_light",
+   "pass": false,
+   "strict_pass": false
+  },
+  {
+   "case_id": "risk_f4-0095",
+   "operation": "risk.backtest.traffic_light",
+   "pass": false,
+   "strict_pass": false
+  },
+  {
+   "case_id": "risk_f4-0096",
+   "operation": "risk.backtest.traffic_light",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "risk_f4-0097",
+   "operation": "risk.backtest.traffic_light",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "risk_f4-0098",
+   "operation": "risk.backtest.traffic_light",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "risk_f4-0099",
+   "operation": "risk.backtest.traffic_light",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "risk_f4-0100",
+   "operation": "risk.backtest.traffic_light",
+   "pass": true,
+   "strict_pass": true
+  },
+  {
+   "case_id": "risk_f4-0101",
+   "operation": "risk.backtest.traffic_light",
+   "pass": true,
+   "strict_pass": true
+  }
+ ]
+}
