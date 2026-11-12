@@ -1,0 +1,506 @@
+{
+ "schema_version": "1.0",
+ "suite": "barrier_r6",
+ "spec": "specifications/04-pricing/exotics.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_r6_w2.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "barrier_r6-0001",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 0.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.4,
+    "expiry_years": 1.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL",
+    "barrier": 85.0,
+    "monitoring_per_year": 12
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14.273005965671246
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "closed-form-bgk",
+    "exact-date-mc-4m (R6-2.2)"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "synthetic"
+   ],
+   "description": "DOC near the edge, monthly, vol 0.4 (x = 1.41)"
+  },
+  {
+   "case_id": "barrier_r6-0002",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 0.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.3,
+    "expiry_years": 2.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL",
+    "barrier": 82.0,
+    "monitoring_per_year": 4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 16.838210427963606
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "closed-form-bgk",
+    "exact-date-mc-4m (R6-2.2)"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "synthetic"
+   ],
+   "description": "DOC quarterly, T = 2 (x = 1.32)"
+  },
+  {
+   "case_id": "barrier_r6-0003",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 105.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 0.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.25,
+    "expiry_years": 0.5,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL",
+    "barrier": 95.0,
+    "monitoring_per_year": 52
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4.139218993608891
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "closed-form-bgk",
+    "exact-date-mc-4m (R6-2.2)"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "synthetic"
+   ],
+   "description": "DOC weekly, K above spot (x = 1.48)"
+  },
+  {
+   "case_id": "barrier_r6-0004",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 0.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.4,
+    "expiry_years": 1.0,
+    "barrier_type": "UP_OUT",
+    "option_type": "PUT",
+    "barrier": 118.0,
+    "monitoring_per_year": 12
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11.750080167034353
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "closed-form-bgk",
+    "exact-date-mc-4m (R6-2.2)"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "synthetic"
+   ],
+   "description": "UOP near the edge, monthly, vol 0.4 (x = 1.43)"
+  },
+  {
+   "case_id": "barrier_r6-0005",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 95.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 0.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.2,
+    "expiry_years": 1.5,
+    "barrier_type": "UP_OUT",
+    "option_type": "PUT",
+    "barrier": 110.0,
+    "monitoring_per_year": 52
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4.050968073485517
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "closed-form-bgk",
+    "exact-date-mc-4m (R6-2.2)"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "synthetic"
+   ],
+   "description": "UOP weekly, K below spot (x = 3.44)"
+  },
+  {
+   "case_id": "barrier_r6-0006",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 0.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.25,
+    "expiry_years": 1.0,
+    "barrier_type": "UP_OUT",
+    "option_type": "PUT",
+    "barrier": 106.0,
+    "monitoring_per_year": 252
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4.305322313982064
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "closed-form-bgk",
+    "exact-date-mc-4m (R6-2.2)"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "synthetic"
+   ],
+   "description": "UOP daily, barrier 6% away (x = 3.70)"
+  },
+  {
+   "case_id": "barrier_r6-0007",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 0.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.4,
+    "expiry_years": 1.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL",
+    "barrier": 90.0,
+    "monitoring_per_year": 12
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "r6-envelope",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "DOC monthly vol 0.4: x = 0.91, outside (x = 0.91; R6-2.1)"
+  },
+  {
+   "case_id": "barrier_r6-0008",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 0.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.25,
+    "expiry_years": 1.0,
+    "barrier_type": "UP_OUT",
+    "option_type": "PUT",
+    "barrier": 110.0,
+    "monitoring_per_year": 4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "r6-envelope",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "UOP quarterly: x = 0.76, outside (x = 0.76; R6-2.1)"
+  },
+  {
+   "case_id": "barrier_r6-0009",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 0.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.25,
+    "expiry_years": 1.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "PUT",
+    "barrier": 80.0,
+    "monitoring_per_year": 252
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "r6-envelope",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "DOP (reverse), daily, x = 14: outside (x = 14.17; R6-2.1)"
+  },
+  {
+   "case_id": "barrier_r6-0010",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 0.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.25,
+    "expiry_years": 1.0,
+    "barrier_type": "UP_OUT",
+    "option_type": "CALL",
+    "barrier": 130.0,
+    "monitoring_per_year": 252
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "r6-envelope",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "UOC (reverse), daily: outside (x = 16.66; R6-2.1)"
+  },
+  {
+   "case_id": "barrier_r6-0011",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 110.0,
+    "strike": 100.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 0.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.25,
+    "expiry_years": 1.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL",
+    "barrier": 105.0,
+    "monitoring_per_year": 252
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "r6-envelope",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "DOC with H above K (reverse): outside (x = 2.95; R6-2.1)"
+  },
+  {
+   "case_id": "barrier_r6-0012",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 0.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.25,
+    "expiry_years": 1.0,
+    "barrier_type": "DOWN_IN",
+    "option_type": "CALL",
+    "barrier": 80.0,
+    "monitoring_per_year": 252
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "r6-envelope",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "knock-in: outside (x = 14.17; R6-2.1)"
+  },
+  {
+   "case_id": "barrier_r6-0013",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 0.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.25,
+    "expiry_years": 1.0,
+    "barrier_type": "UP_IN",
+    "option_type": "PUT",
+    "barrier": 130.0,
+    "monitoring_per_year": 52
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "r6-envelope",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "knock-in: outside (x = 7.57; R6-2.1)"
+  },
+  {
+   "case_id": "barrier_r6-0014",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "rebate": 1.0,
+    "monitoring": "DISCRETE",
+    "vol": 0.25,
+    "expiry_years": 1.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL",
+    "barrier": 80.0,
+    "monitoring_per_year": 252
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "barrier",
+    "discrete",
+    "r6-envelope",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "rebate: outside (x = 14.17; R6-2.1)"
+  }
+ ]
+}

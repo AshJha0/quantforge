@@ -135,7 +135,65 @@ def basis_suite():
     return s
 
 
-SUITES = {"mbs": mbs_suite, "cds": cds_suite, "basis": basis_suite}
+# ---------------------------------------------------------------------------------- R6-2 discrete barrier envelope
+def barrier_suite():
+    import gen_stage_g_w1 as W
+    from qf_oracle import mc_barrier as M
+    s = Suite("barrier_r6", "specifications/04-pricing/exotics.md", G)
+    b = dict(spot=100.0, strike=100.0, rate=0.05, dividend_yield=0.02, rebate=0.0, monitoring="DISCRETE")
+    x_of = lambda i: abs(math.log(i["spot"] / i["barrier"])) / (i["vol"] * math.sqrt(W.r9_dt(i)))  # noqa: E731
+    rows = [  # (inputs, description); value cases sit inside the envelope near its edge, error cases just outside or on the wrong side
+        (dict(b, vol=0.4, expiry_years=1.0, barrier_type="DOWN_OUT", option_type="CALL", barrier=85.0, monitoring_per_year=12), "DOC near the edge, monthly, vol 0.4"),
+        (dict(b, vol=0.3, expiry_years=2.0, barrier_type="DOWN_OUT", option_type="CALL", barrier=82.0, monitoring_per_year=4), "DOC quarterly, T = 2"),
+        (dict(b, vol=0.25, expiry_years=0.5, barrier_type="DOWN_OUT", option_type="CALL", barrier=95.0, strike=105.0, monitoring_per_year=52), "DOC weekly, K above spot"),
+        (dict(b, vol=0.4, expiry_years=1.0, barrier_type="UP_OUT", option_type="PUT", barrier=118.0, monitoring_per_year=12), "UOP near the edge, monthly, vol 0.4"),
+        (dict(b, vol=0.2, expiry_years=1.5, barrier_type="UP_OUT", option_type="PUT", barrier=110.0, strike=95.0, monitoring_per_year=52), "UOP weekly, K below spot"),
+        (dict(b, vol=0.25, expiry_years=1.0, barrier_type="UP_OUT", option_type="PUT", barrier=106.0, monitoring_per_year=252), "UOP daily, barrier 6% away"),
+        (dict(b, vol=0.4, expiry_years=1.0, barrier_type="DOWN_OUT", option_type="CALL", barrier=90.0, monitoring_per_year=12), "DOC monthly vol 0.4: x = 0.91, outside"),
+        (dict(b, vol=0.25, expiry_years=1.0, barrier_type="UP_OUT", option_type="PUT", barrier=110.0, monitoring_per_year=4), "UOP quarterly: x = 0.76, outside"),
+        (dict(b, vol=0.25, expiry_years=1.0, barrier_type="DOWN_OUT", option_type="PUT", barrier=80.0, monitoring_per_year=252), "DOP (reverse), daily, x = 14: outside"),
+        (dict(b, vol=0.25, expiry_years=1.0, barrier_type="UP_OUT", option_type="CALL", barrier=130.0, monitoring_per_year=252), "UOC (reverse), daily: outside"),
+        (dict(b, vol=0.25, expiry_years=1.0, barrier_type="DOWN_OUT", option_type="CALL", barrier=105.0, strike=100.0, spot=110.0, monitoring_per_year=252), "DOC with H above K (reverse): outside"),
+        (dict(b, vol=0.25, expiry_years=1.0, barrier_type="DOWN_IN", option_type="CALL", barrier=80.0, monitoring_per_year=252), "knock-in: outside"),
+        (dict(b, vol=0.25, expiry_years=1.0, barrier_type="UP_IN", option_type="PUT", barrier=130.0, monitoring_per_year=52), "knock-in: outside"),
+        (dict(b, vol=0.25, expiry_years=1.0, barrier_type="DOWN_OUT", option_type="CALL", barrier=80.0, rebate=1.0, monitoring_per_year=252), "rebate: outside"),
+    ]
+    for inp, d in rows:
+        x = x_of(inp)
+        if W.in_envelope(inp):
+            s.add("exotic.barrier.price", inp, {"price": W.r9_price(inp)}, verified=["closed-form-bgk", "exact-date-mc-4m (R6-2.2)"],
+                  tags=["r6", "barrier", "discrete", "synthetic"], description=f"{d} (x = {x:.2f})")
+        else:
+            s.add("exotic.barrier.price", inp, error="E_DOMAIN", cls=E, tags=["r6", "barrier", "discrete", "r6-envelope", "invalid", "synthetic"],
+                  description=f"{d} (x = {x:.2f}; R6-2.1)")
+    return s
+
+
+def barrier_acceptance(pairs=2_000_000):
+    """R6-2.2: every ok DISCRETE golden (barrier_g and barrier_r6) against exact-date MC, 4,000,000 antithetic paths:
+    |BGK - MC| <= max(3 SE, 0.5% of MC). Writes oracle/R6_BARRIER_ACCEPTANCE.json; resumes from it."""
+    from qf_oracle import mc_barrier as M
+    out = HERE.parent / "R6_BARRIER_ACCEPTANCE.json"
+    done = {r["case_id"]: r for r in json.loads(out.read_text())} if out.exists() else {}
+    gold = HERE.parents[1] / "datasets" / "golden"
+    cases = [c for f in ("stage_g/barrier_g.json", "r6/barrier_r6.json") for c in json.loads((gold / f).read_text(encoding="utf-8"))["cases"]
+             if c["expected"]["status"] == "ok" and c["inputs"].get("monitoring") == "DISCRETE"]
+    for c in cases:
+        if c["case_id"] in done:
+            continue
+        mc, se, paths = M.price(c["inputs"], pairs)
+        g = c["expected"]["outputs"]["price"]
+        lim = max(3 * se, 0.005 * mc)
+        done[c["case_id"]] = {"case_id": c["case_id"], "bgk": g, "mc": mc, "se": se, "paths": paths, "seed": 20261112, "limit": lim,
+                              "gap": g - mc, "pass": abs(g - mc) <= lim}
+        out.write_text(json.dumps(list(done.values()), indent=1) + chr(10), encoding="utf-8", newline=chr(10))
+        note(f"{c['case_id']}: BGK {g:.6f} MC {mc:.6f} +- {se:.6f} limit {lim:.6f}: {'pass' if abs(g - mc) <= lim else 'FAIL'}")
+    bad = [r for r in done.values() if not r["pass"]]
+    note(f"R6-2.2 acceptance: {len(done) - len(bad)} of {len(done)} pass")
+    return bad
+
+
+SUITES = {"mbs": mbs_suite, "cds": cds_suite, "basis": basis_suite, "barrier": barrier_suite}
 
 
 def main(which):
@@ -149,4 +207,6 @@ def main(which):
 
 
 if __name__ == "__main__":
+    if sys.argv[1:] == ["accept"]:
+        sys.exit(1 if barrier_acceptance() else 0)
     main(sys.argv[1:] or list(SUITES))

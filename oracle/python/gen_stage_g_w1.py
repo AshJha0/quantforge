@@ -315,6 +315,19 @@ def bgk_barrier(btype, H, v, dt, beta=BGK):
     return H * math.exp((-1 if btype.startswith("DOWN") else 1) * beta * v * math.sqrt(dt))
 
 
+ENVELOPE_X = 1.25  # ruling R6-2.1
+
+
+def in_envelope(inp):
+    """Ruling R6-2.1: BGK is used only for a regular knock-out (DOWN_OUT CALL with H <= K, UP_OUT PUT with H >= K), no rebate,
+    and a barrier at least ENVELOPE_X monitoring standard deviations from spot: |ln(S/H)| >= 1.25 v sqrt(dt). Outside: E_DOMAIN.
+    Evidence: oracle/R6_BARRIER_GRID.json (1M-path exact-date MC) and oracle/R6_BARRIER_ACCEPTANCE.json (4M paths)."""
+    bt, ot, H, K = inp["barrier_type"], inp["option_type"], inp["barrier"], inp["strike"]
+    regular = (bt == "DOWN_OUT" and ot == "CALL" and H <= K) or (bt == "UP_OUT" and ot == "PUT" and H >= K)
+    x = abs(math.log(inp["spot"] / H)) / (inp["vol"] * math.sqrt(r9_dt(inp)))
+    return regular and inp.get("rebate", 0.0) == 0.0 and x >= ENVELOPE_X
+
+
 def r9_dt(inp):
     """R5 M3 (ruling G-30): n = floor(m T + 0.5) observation dates, n >= 1, step dt = T / n."""
     n = math.floor(inp["monitoring_per_year"] * inp["expiry_years"] + 0.5)
@@ -386,7 +399,11 @@ def r9():
             assert abs(q - r9_price(inp)) <= 1e-10 * abs(q) + 1e-12, (q, r9_price(inp))
             ver = ["closed-form", "quantlib-1.44"]
             n_out += 1
-        s.add(BAR, inp, {"price": r9_price(inp)}, verified=ver,
+        if inp.get("monitoring") == "DISCRETE" and not in_envelope(inp):
+            s.add(BAR, inp, error="E_DOMAIN", cls="date_and_convention", tags=["barrier", "r9", "discrete", "r6-envelope", "invalid"],
+                  description=f"{inp['barrier_type']} {inp['option_type']} H={inp['barrier']} m={inp['monitoring_per_year']}: outside the BGK envelope (R6-2.1)")
+            continue
+        s.add(BAR, inp, {"price": r9_price(inp)}, verified=ver + (["exact-date-mc-4m (R6-2.2)"] if inp.get("monitoring") == "DISCRETE" else []),
               tags=["barrier", "r9", inp.get("monitoring", "CONTINUOUS").lower()],
               description=f"{inp['barrier_type']} {inp['option_type']} H={inp['barrier']} m={inp.get('monitoring_per_year', 'cont')}")
     # in-out parity on the shifted barrier (no rebate)
@@ -404,7 +421,11 @@ def r9():
           dict(base, expiry_years=1.5, barrier=120.0, barrier_type="UP_IN", option_type="PUT", rebate=1.5, monitoring="DISCRETE", monitoring_per_year=52)]
     for inp in m3:
         n = math.floor(inp["monitoring_per_year"] * inp["expiry_years"] + 0.5)
-        s.add(BAR, inp, {"price": r9_price(inp)}, verified=["closed-form-bgk"], tags=["barrier", "r9", "discrete", "m3"],
+        if not in_envelope(inp):
+            s.add(BAR, inp, error="E_DOMAIN", cls="date_and_convention", tags=["barrier", "r9", "discrete", "m3", "r6-envelope", "invalid"],
+                  description=f"{inp['barrier_type']} {inp['option_type']} T={inp['expiry_years']} m={inp['monitoring_per_year']}: outside the BGK envelope (R6-2.1)")
+            continue
+        s.add(BAR, inp, {"price": r9_price(inp)}, verified=["closed-form-bgk", "exact-date-mc-4m (R6-2.2)"], tags=["barrier", "r9", "discrete", "m3"],
               description=f"{inp['barrier_type']} {inp['option_type']} T={inp['expiry_years']} m={inp['monitoring_per_year']}: n={n}, dt=T/n")
     s.add(BAR, dict(base, expiry_years=0.3, barrier=90.0, barrier_type="DOWN_OUT", option_type="CALL", monitoring="DISCRETE", monitoring_per_year=1),
           error="E_DOMAIN", cls="date_and_convention", tags=["invalid", "r9"], description="n = floor(m T + 0.5) = 0")
@@ -413,7 +434,7 @@ def r9():
     caught("continuous price for a daily barrier", abs(r9_price(a) - r9_price(dict(a, monitoring="CONTINUOUS"))), 1e-6)
     # acceptance (plan 13.3 R9): daily-monitored down-and-out against exact-date MC within 3 SE
     accept = []
-    for ot in ("CALL", "PUT"):
+    for ot in ("CALL",):  # R6-2.1: the daily down-and-out put is a reverse barrier, now E_DOMAIN
         inp = dict(rows[0], option_type=ot)
         mc, se = r9_mc(inp, PATHS)
         bgk = r9_price(inp)
