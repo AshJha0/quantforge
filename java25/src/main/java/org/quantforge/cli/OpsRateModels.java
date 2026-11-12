@@ -379,9 +379,10 @@ final class OpsRateModels {
                 "d_price_d_mean_reversion", l.dMeanReversion(), "d_price_d_sigma", l.dSigma());
     }
 
-    /** The output key of a PFE quantile: {@code pfe_} and the percentage, as {@code pfe_95}. */
+    /** The output key of a PFE quantile (ruling R6-5.1): {@code deflated_pfe_} and the percentage, as {@code deflated_pfe_95}. */
     static String pfeKey(double q) {
-        return "pfe_" + new java.math.BigDecimal(Double.toString(q)).movePointRight(2).stripTrailingZeros()
+        return "deflated_pfe_" + // ruling R6-5.1
+                new java.math.BigDecimal(Double.toString(q)).movePointRight(2).stripTrailingZeros()
                 .toPlainString();
     }
 
