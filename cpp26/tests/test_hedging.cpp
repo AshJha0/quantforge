@@ -1130,3 +1130,77 @@ TEST_CASE("I-41 Greek instruments have fixed key sets; I-49 lot counts above 2^5
     p.b = {-1e15};
     CHECK(i_error([&] { hg::solve_integer(p); }) == "ok");
 }
+
+// ---- R6 wave 3 ----
+
+namespace {
+std::string r6_code(auto&& f) {
+    try {
+        f();
+    } catch (const Error& e) {
+        return e.code();
+    }
+    return "ok";
+}
+struct CapGuard {  // restores the ruled caps even when a CHECK throws
+    explicit CapGuard(long long cap) { hg::detail::effort_cap_override = cap; }
+    ~CapGuard() { hg::detail::effort_cap_override = 0; }
+};
+}  // namespace
+
+TEST_CASE("R6-6.1: a planted cap of 1 makes the QP and integer searches return E_NO_CONVERGENCE", "[r6]") {
+    // min (x1 - 2)^2 + (x2 - 2)^2 with x <= 1: both bounds bind, so the active set needs two steps.
+    hg::QpProblem qp;
+    qp.a = {{1, 0}, {0, 1}};
+    qp.b = {-2, -2};
+    qp.weights = {1, 1};
+    qp.upper = std::vector<hg::Bound>{1.0, 1.0};
+    const hg::QpResult ok = hg::solve_qp(qp);
+    CHECK(ok.x[0] == 1.0);  // hand value: the bound
+    CHECK(ok.x[1] == 1.0);
+    hg::IntegerProblem ip;
+    ip.a = {{1, 0}, {0, 1}};
+    ip.b = {-2.4, 1.6};
+    ip.weights = {1, 1};
+    ip.lot_sizes = {1, 1};
+    const hg::IntegerResult lots = hg::solve_integer(ip);
+    CHECK(lots.lots == std::vector<long long>{2, -2});  // hand value: nearest integers to 2.4 and -1.6
+    {
+        const CapGuard cap(1);
+        CHECK(r6_code([&] { hg::solve_qp(qp); }) == "E_NO_CONVERGENCE");
+        CHECK(r6_code([&] { hg::solve_integer(ip); }) == "E_NO_CONVERGENCE");
+    }
+    CHECK(r6_code([&] { hg::solve_qp(qp); }) == "ok");
+}
+
+TEST_CASE("R6-6.2: a regular problem in mixed units is not E_SINGULAR (hand-built, scale 1e9)", "[r6]") {
+    // Two instruments, one priced in units 1e9 larger: H = diag(1e18, 1) unscaled (ratio 1e-18), identity scaled.
+    hg::QpProblem qp;
+    qp.a = {{1e9, 0}, {0, 1}};
+    qp.b = {-1e9, -3};
+    qp.weights = {1, 1};
+    const hg::QpResult r = hg::solve_qp(qp);
+    CHECK(std::fabs(r.x[0] - 1.0) <= 1e-12);  // hand value: x = (1, 3)
+    CHECK(std::fabs(r.x[1] - 3.0) <= 1e-12);
+    CHECK(r.rank == 2);
+}
+
+TEST_CASE("R6-11.7: min variance codes a negative pivot E_NOT_POSITIVE_DEFINITE and a dependent pair E_SINGULAR", "[r6]") {
+    CHECK(r6_code([] { hg::min_variance({{1, 0.1, 0.1}, {0.1, 1, 2}, {0.1, 2, 1}}); }) == "E_NOT_POSITIVE_DEFINITE");
+    CHECK(r6_code([] { hg::min_variance({{1, 0.1, 0.1}, {0.1, 1, 1}, {0.1, 1, 1}}); }) == "E_SINGULAR");
+    // Hand value: one hedge, h = -S_he / S_hh = -0.5 / 2.
+    CHECK(std::fabs(hg::min_variance({{1, 0.5}, {0.5, 2}}).hedge[0] + 0.25) <= 1e-15);
+}
+
+TEST_CASE("R6-11.20: use case 6 with the underlying alone hedges delta to the nearest lot (hand value)", "[r6]") {
+    const std::string j = cli::run_case(
+        R"({"schema_version":"1.0","case_id":"u","operation":"usecase.option_hedge_lots","inputs":{"spot":100,"rate":0,"dividend_yield":0,"volatility":0.2,)"
+        R"("portfolio":[{"instrument":"UNDERLYING","quantity":-237}],"hedges":[{"instrument":"UNDERLYING","lot_size":100,"half_spread":0.01}],)"
+        R"("targets":["DELTA"],"max_lots":10}})")
+                              .json;
+    INFO(j);
+    // Book delta -237; lots of 100: the best is 2 lots (residual -37), hedge cost 2 * 100 * 0.01 = 2.
+    CHECK(j.find(R"("lots":[2])") != std::string::npos);
+    CHECK(j.find(R"("hedge_cost":2)") != std::string::npos);
+    CHECK(j.find(R"("greeks_after":{"delta":-37)") != std::string::npos);
+}

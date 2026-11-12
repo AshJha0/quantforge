@@ -51,7 +51,7 @@ TEST_CASE("nulls, and diagnostics") {
 
 TEST_CASE("operations are sorted and all answer") {
     const auto ops = quantforge::cli::operations();
-    CHECK(ops.size() == 275);  // R6-4.1 adds risk.frtb.sbm_total
+    CHECK(ops.size() == 276);  // R6-4.1 sbm_total, R6-11.20 usecase.option_hedge_lots
     CHECK(std::is_sorted(ops.begin(), ops.end()));
     for (const auto& op : ops) CHECK_FALSE(has(run_case(wrap(op, "{}")).json, "E_UNSUPPORTED_OPERATION"));
 }

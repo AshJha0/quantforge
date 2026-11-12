@@ -37,6 +37,8 @@ HazardCurve shifted(const HazardCurve& h, double eps, std::optional<std::size_t>
     for (std::size_t k = 0; k < h.dates.size(); ++k) {
         const double t1 = double(days_between(h.as_of, h.dates[k])) / 365.0, l1 = -std::log(h.survival[k]);
         const double hazard = (l1 - l0) / (t1 - t0) + (!only || *only == k ? eps : 0.0);
+        if (hazard < 0.0)  // R6-11.9: the downward bump makes a hazard negative
+            throw Error("E_DOMAIN", "a bumped hazard rate is below 0 (spread under about 1 bp)", "hazard");
         cumulative += hazard * (t1 - t0);
         out.survival[k] = std::exp(-cumulative);
         t0 = t1;
@@ -179,6 +181,8 @@ TwoAssetGreeks unit_two_asset_greeks(const TwoAssetMarket& m, const TwoAssetPosi
             // Margrabe [M78]: receive Q1 S1 for Q2 S2 at expiry.
             const double t = p.expiry_years, sq = std::sqrt(t), rho = m.correlation;
             const double s = std::sqrt(m.vol1 * m.vol1 + m.vol2 * m.vol2 - 2.0 * rho * m.vol1 * m.vol2);
+            if (!(s > 1e-12 * (m.vol1 + m.vol2)))  // R6-11.16: a degenerate Margrabe volatility
+                throw Error("E_SINGULAR", "the spread volatility of an exchange option is 0", "hedges");
             const double c1 = p.quantity1 * std::exp(-m.yield1 * t), c2 = p.quantity2 * std::exp(-m.yield2 * t);
             const double f1 = c1 * m.spot1, f2 = c2 * m.spot2;
             const double d1 = (std::log(f1 / f2) + 0.5 * s * s * t) / (s * sq), d2 = d1 - s * sq;

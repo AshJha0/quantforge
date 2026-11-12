@@ -132,6 +132,20 @@ struct NullSpace {
     Vec xp;
     Matrix z;  // n rows, n - k columns
 };
+// R6-6.2: Jacobi scaling before every I-3 decision. D_jj = 1 / sqrt(H_jj) (1 where H_jj <= 0, a column the
+// test then finds singular anyway); returns D.
+Vec jacobi_scale(const Matrix& h) {
+    Vec d(h.size(), 1.0);
+    for (std::size_t j = 0; j < h.size(); ++j)
+        if (h[j][j] > 0.0) d[j] = 1.0 / std::sqrt(h[j][j]);
+    return d;
+}
+Matrix scaled(Matrix h, const Vec& d) {
+    for (std::size_t i = 0; i < h.size(); ++i)
+        for (std::size_t j = 0; j < h.size(); ++j) h[i][j] *= d[i] * d[j];
+    return h;
+}
+
 NullSpace null_space(const Matrix& e, const Vec& rhs, std::size_t n) {
     const std::size_t k = e.size();
     Matrix m(n, Vec(k, 0.0));  // E^T
@@ -229,7 +243,7 @@ public:
     }
 
     bool solve() {
-        const std::size_t max_steps = 50 * (n_ + normals_.size() + 1);
+        const auto max_steps = std::size_t(detail::effort_cap(10 * (long long)n_ + 100));  // R6-6.1
         std::vector<char> in_active(normals_.size(), 0);
         for (std::size_t step = 0; step < max_steps;) {
             // Step 1: the most violated constraint not yet active.
@@ -631,7 +645,9 @@ private:
             for (const std::size_t j : free_) sign_[j] = smooth[j] < 0.0 ? -1 : 1;
         }
         std::vector<std::vector<int>> seen;
-        for (;;) {
+        const long long cap = detail::effort_cap(10 * (long long)n_ + 100);  // R6-6.1
+        for (long long iteration = 0;; ++iteration) {
+            if (iteration >= cap) throw Error("E_NO_CONVERGENCE", "the sign-state method passed 10 n + 100 iterations (R6-6.1)");
             seen.push_back(sign_);
             Multipliers mult;
             Vec x = orthant(k, with_margin, mult);
@@ -652,6 +668,10 @@ private:
             if (worst == n_) {
                 for (const std::size_t j : free_)  // a coordinate held by its sign row is exactly 0
                     if ((sign_[j] > 0 ? mult.lower[j] : mult.upper[j]) > 0.0) x[j] = 0.0;
+                double xmax = 1.0;  // R6-6.1 kink: |x_j| <= 1e-11 max(1, max |x|) is at its kink
+                for (const double v : x) xmax = std::max(xmax, std::fabs(v));
+                for (const std::size_t j : free_)
+                    if (std::fabs(x[j]) <= 1e-11 * xmax) x[j] = 0.0;
                 return x;
             }
             sign_[worst] = -sign_[worst];
@@ -789,28 +809,42 @@ QpResult solve_qp_impl(const QpProblem& p, bool by_orthants) {
     const double cost_weight = p.cost_weight.value_or(1.0);
     domain_if(cost_weight < 0.0, "cost_weight", "must be at least 0");
     domain_if(p.margin_limit && *p.margin_limit < 0.0, "margin_limit", "must be at least 0");
-    // Check 4: equality rank.
+    // The Hessian first: its diagonal gives the R6-6.2 scaling of both rank decisions.
+    Normal q = normal_equations(p.a, p.b, p.weights, p.ridge);
+    if (p.impact)  // impact counts like a ridge (I-26)
+        for (std::size_t j = 0; j < n; ++j) q.h[j][j] += cost_weight * (*p.impact)[j];
+    const Vec dsc = jacobi_scale(q.h);
+    // Check 4: equality rank, on E D with unit rows (R6-6.2).
     const std::size_t k = e.size();
+    Matrix ed(k, Vec(n, 0.0));
+    for (std::size_t i = 0; i < k; ++i) {
+        double norm = 0.0;
+        for (std::size_t j = 0; j < n; ++j) norm += (e[i][j] * dsc[j]) * (e[i][j] * dsc[j]);
+        norm = std::sqrt(norm);
+        for (std::size_t j = 0; j < n; ++j) ed[i][j] = norm > 0.0 ? e[i][j] * dsc[j] / norm : 0.0;
+    }
     if (k > 0) {
         if (k > n) throw Error("E_SINGULAR", "more equalities than instruments", "eq_matrix");
-        // One-sided Jacobi returns one value per column, so pass E^T (n x k, k <= n): k singular values.
+        // One-sided Jacobi returns one value per column, so pass (E D)^T (n x k, k <= n): k singular values.
         Matrix et(n, Vec(k));
         for (std::size_t i = 0; i < k; ++i)
-            for (std::size_t j = 0; j < n; ++j) et[j][i] = e[i][j];
+            for (std::size_t j = 0; j < n; ++j) et[j][i] = ed[i][j];
         const Vec sv = singular_values(et);
         if (sv.back() <= singular_threshold * sv.front())
             throw Error("E_SINGULAR", "the equality rows are linearly dependent", "eq_matrix");
     }
-    // Check 5: reduced Hessian, against the largest eigenvalue of H (I-3, Q-I3).
-    Normal q = normal_equations(p.a, p.b, p.weights, p.ridge);
-    if (p.impact)  // impact counts like a ridge (I-26)
-        for (std::size_t j = 0; j < n; ++j) q.h[j][j] += cost_weight * (*p.impact)[j];
+    // Check 5: reduced Hessian Z^T D H D Z, Z spanning the null space of E D, against the largest eigenvalue of
+    // D H D (I-3 as amended by R6-6.2). The solve itself uses the unscaled form.
+    const Matrix hs = scaled(q.h, dsc);
+    const double hs_max = largest_abs(jacobi_eigen(hs).values);
+    const NullSpace nss = null_space(ed, Vec(k, 0.0), n);
+    const Vec res = jacobi_eigen(project(nss.z, hs)).values;
+    const auto rank = std::ranges::count_if(res, [&](double v) { return v > singular_threshold * hs_max; });
     const double h_max = largest_abs(jacobi_eigen(q.h).values);
     const NullSpace ns = null_space(e, k ? *p.eq_rhs : Vec{}, n);
     const Matrix reduced = project(ns.z, q.h);
     const Eigen re = jacobi_eigen(reduced);
     const double threshold = singular_threshold * h_max;
-    const auto rank = std::ranges::count_if(re.values, [&](double v) { return v > threshold; });
     if (p.singular == Singular::Error && std::size_t(rank) < reduced.size())
         throw Error("E_SINGULAR", "the hedge has no unique minimiser", "a");
     // Gradient of the reduced objective at y = 0, halved: Z^T (H x_p + c).
@@ -877,6 +911,9 @@ public:
 
 private:
     void visit(std::size_t level, double partial) {
+        // R6-6.1: at most 1,000,000 lattice points or nodes, then E_NO_CONVERGENCE.
+        if (++nodes_ > detail::effort_cap(1000000))
+            throw Error("E_NO_CONVERGENCE", "the lattice search passed 1,000,000 nodes (R6-6.1)");
         if (level == 0) {
             leaf(partial);
             return;
@@ -914,6 +951,7 @@ private:
     const IntegerProblem& p_;
     std::vector<long long> lots_;
     std::vector<Candidate> found_;
+    long long nodes_ = 0;
 };
 
 }  // namespace
@@ -937,7 +975,7 @@ IntegerResult solve_integer(const IntegerProblem& p) {
     for (Vec& row : al)
         for (std::size_t j = 0; j < n; ++j) row[j] *= p.lot_sizes[j];
     const Normal q = normal_equations(al, p.b, p.weights, p.ridge);
-    const Vec eig = jacobi_eigen(q.h).values;
+    const Vec eig = jacobi_eigen(scaled(q.h, jacobi_scale(q.h))).values;  // R6-6.2
     if (eig.front() <= singular_threshold * largest_abs(eig))
         throw Error("E_SINGULAR", "the hedge in lot units has no unique minimiser", "a");
     // The continuous problem with the lot bounds as real bounds.
@@ -968,9 +1006,11 @@ IntegerResult solve_integer(const IntegerProblem& p) {
     const double scale = std::fabs(objective_of(r_free, p.weights, p.ridge, centre));
     const double radius = distance + 1e-9 * (distance + scale) + 1e-300;
     std::vector<Candidate> found = LatticeSearch(r, centre, lo, hi, radius, scale, p).run();
-    // Ties (I-7): within 1e-12 relative of the best, then the smallest sum |n|, then lexicographic.
+    // Ties (I-7, R6-11.5): within 1e-12 max(best, f(0)) of the best, then the smallest sum |n|, then lexicographic.
     double best = inf;
     for (const Candidate& c : found) best = std::min(best, c.objective);
+    const Vec zero(n, 0.0);
+    const double tie = 1e-12 * std::max(best, objective_of(residual_of(al, p.b, zero), p.weights, p.ridge, zero));
     const auto weight = [](const std::vector<long long>& v) {
         long long s = 0;
         for (const long long x : v) s += x < 0 ? -x : x;
@@ -978,7 +1018,7 @@ IntegerResult solve_integer(const IntegerProblem& p) {
     };
     const Candidate* pick = nullptr;
     for (const Candidate& c : found) {
-        if (c.objective - best > 1e-12 * std::fabs(best)) continue;
+        if (c.objective - best > tie) continue;
         if (!pick || weight(c.lots) < weight(pick->lots) ||
             (weight(c.lots) == weight(pick->lots) && c.lots < pick->lots))
             pick = &c;
@@ -1029,13 +1069,16 @@ MinVarResult min_variance(const Matrix& cov) {
             input_if(std::fabs(cov[i][j] - cov[j][i]) > singular_threshold * biggest, "covariance", "not symmetric");
     domain_if(cov[0][0] <= 0.0, "covariance", "the position must have a positive variance");
     const std::size_t k = size - 1;
-    double diag_max = 0.0;
-    for (std::size_t i = 1; i <= k; ++i) diag_max = std::max(diag_max, cov[i][i]);
     Matrix l(k, Vec(k, 0.0));
     for (std::size_t j = 0; j < k; ++j) {
         double d = cov[j + 1][j + 1];
         for (std::size_t m = 0; m < j; ++m) d -= l[j][m] * l[j][m];
-        if (d <= singular_threshold * diag_max)
+        // R6-11.7 and R6-6.2: a negative pivot is an indefinite hedge block; a small pivot is judged on the
+        // correlation (Jacobi-scaled) form, whose pivots are d / S_jj.
+        const double sjj = cov[j + 1][j + 1];
+        if (d < 0.0 || sjj < 0.0)
+            throw Error("E_NOT_POSITIVE_DEFINITE", "the hedge covariance block is indefinite", "covariance");
+        if (!(sjj > 0.0) || d / sjj <= singular_threshold)
             throw Error("E_SINGULAR", "the hedge instruments are linearly dependent", "covariance");
         l[j][j] = std::sqrt(d);
         for (std::size_t i = j + 1; i < k; ++i) {
@@ -1147,6 +1190,61 @@ GreekHedge neutralise(const Market& m, const std::vector<Position>& book, const 
     return out;
 }
 
+// ---- usecase.option_hedge_lots (use case 6, ruling R6-11.20) ----
+
+LotHedgeResult option_hedge_lots(const Market& m, const std::vector<Position>& book, const std::vector<LotHedge>& hedges,
+                                 const std::vector<Greek>& targets, long long max_lots) {
+    for (const Position& p : book) check_position(p, "portfolio");
+    for (const LotHedge& h : hedges) check_position(h.position, "hedges");
+    input_if(hedges.empty(), "hedges", "needs at least one hedge instrument");
+    input_if(targets.empty(), "targets", "needs at least one target");
+    for (std::size_t i = 0; i < targets.size(); ++i)
+        for (std::size_t j = 0; j < i; ++j) input_if(targets[i] == targets[j], "targets", "a target is repeated");
+    domain_if(m.spot <= 0.0, "spot", "must be above 0");
+    domain_if(m.volatility <= 0.0, "volatility", "must be above 0");
+    for (const Position& p : book) check_option_domain(p, "portfolio");
+    for (const LotHedge& h : hedges) {
+        check_option_domain(h.position, "hedges");
+        domain_if(!(h.lot_size > 0.0), "hedges", "lot_size must be above 0");
+        domain_if(!(h.half_spread >= 0.0), "hedges", "half_spread must be at least 0");
+    }
+    domain_if(max_lots < 1, "max_lots", "must be at least 1");
+    LotHedgeResult out;
+    for (const Position& p : book) {
+        const Greeks g = unit_greeks(m, p);
+        out.before.delta += p.quantity * g.delta;
+        out.before.gamma += p.quantity * g.gamma;
+        out.before.vega += p.quantity * g.vega;
+    }
+    std::vector<Greeks> unit;
+    for (const LotHedge& h : hedges) unit.push_back(unit_greeks(m, h.position));
+    IntegerProblem ip;
+    for (const Greek t : targets) {
+        Vec row;
+        for (std::size_t j = 0; j < hedges.size(); ++j) row.push_back(hedges[j].lot_size * greek_of(unit[j], t));
+        ip.a.push_back(std::move(row));
+        const double bt = greek_of(out.before, t);
+        ip.b.push_back(bt);
+        const double s = std::max(1.0, std::fabs(bt));
+        ip.weights.push_back(1.0 / (s * s));
+    }
+    ip.lot_sizes.assign(hedges.size(), 1.0);
+    ip.lower_lots = std::vector<std::optional<long long>>(hedges.size(), -max_lots);
+    ip.upper_lots = std::vector<std::optional<long long>>(hedges.size(), max_lots);
+    const IntegerResult r = solve_integer(ip);
+    out.lots = r.lots;
+    out.rounding_cost = r.rounding_cost;
+    out.after = out.before;
+    for (std::size_t j = 0; j < hedges.size(); ++j) {
+        const double q = double(r.lots[j]) * hedges[j].lot_size;
+        out.after.delta += q * unit[j].delta;
+        out.after.gamma += q * unit[j].gamma;
+        out.after.vega += q * unit[j].vega;
+        out.hedge_cost += std::fabs(q) * hedges[j].half_spread;
+    }
+    return out;
+}
+
 // ---- hedge.beta.futures ----
 
 BetaHedge beta_futures(double value, double beta, double target_beta, double futures_price, double multiplier,
@@ -1228,7 +1326,8 @@ SelectResult select_instruments(const QpProblem& p, long long max_instruments, b
         domain_if(!lower.empty() && lower[j] && *lower[j] > 0.0, "lower", "a bound excludes 0 (I-33)");
         domain_if(!upper.empty() && upper[j] && *upper[j] < 0.0, "upper", "a bound excludes 0 (I-33)");
     }
-    const Vec eig = jacobi_eigen(normal_equations(p.a, p.b, p.weights, p.ridge).h).values;
+    const Matrix hfull = normal_equations(p.a, p.b, p.weights, p.ridge).h;
+    const Vec eig = jacobi_eigen(scaled(hfull, jacobi_scale(hfull))).values;  // R6-6.2
     if (eig.front() <= singular_threshold * largest_abs(eig))
         throw Error("E_SINGULAR", "the full hedge has no unique minimiser", "a");
     // Every subset of 1..K instruments, by size and then lexicographically, so the first one tied with the best
@@ -1268,7 +1367,9 @@ SelectResult select_instruments(const QpProblem& p, long long max_instruments, b
     }
     const double best = *std::ranges::min_element(objective);
     std::size_t pick = 0;
-    while (objective[pick] - best > 1e-12 * std::fabs(best)) ++pick;
+    const Vec none(n, 0.0);  // R6-11.5: ties within 1e-12 max(best, f(0))
+    const double f0 = objective_of(residual_of(p.a, p.b, none), p.weights, p.ridge, none);
+    while (objective[pick] - best > 1e-12 * std::max(best, f0)) ++pick;
     SelectResult out;
     out.selected.assign(subsets[pick].begin(), subsets[pick].end());
     out.x.assign(n, 0.0);
