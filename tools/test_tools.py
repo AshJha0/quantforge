@@ -691,7 +691,8 @@ class QualityGateFailPaths(unittest.TestCase):
 
     def test_cli_coverage_gate_and_floor_breach(self):
         cfg = {"stage": "T", "coverage_min": 0.9, "modules": [{"module": "x", "python": "python/quantforge_core/heston.py"}]}
-        good = {"files": {"quantforge_core/heston.py": {"summary": {"covered_lines": 95, "num_statements": 100}}}}
+        floor = json.loads((ROOT / "conformance/quality/floors.json").read_text(encoding="utf-8"))["python"]
+        good = {"files": {"quantforge_core/heston.py": {"summary": {"covered_lines": round(100 * floor) + 1, "num_statements": 100}}}}
         low = {"files": {"quantforge_core/heston.py": {"summary": {"covered_lines": 80, "num_statements": 100}}}}
         with tempfile.TemporaryDirectory() as d:
             c, g, lo = Path(d, "c.json"), Path(d, "g.json"), Path(d, "l.json")
