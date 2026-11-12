@@ -43,6 +43,8 @@ Exact. Once the sign state is found, the result is the orthant QP solved on that
 
 - Conformance (`runner.py --impl cpp`, goldens at `r6` `e7d5332`, wave 3C, stray `e1_risk_1/2` gone): **15,076 of 15,076** (spec split 7,440 value / 5,122 error / 2,514 invariance). Release build with `-DQF_WERROR=ON`.
 - ctest (`quantforge_core_tests`): 309 test cases, 16,229 assertions, all pass.
+- WSL ASan + UBSan + float-cast-overflow, `-DQF_WERROR=ON`, RelWithDebInfo (2026-11-12 16:32): 309 test cases, 16,228 assertions, all pass, no sanitizer report (the G-9 ratio is not judged under sanitizers).
+- Coverage (R6-26): running in WSL (`~/r6cov.sh`, gcovr 8.3, output `~/r6cov.txt`); the per-file list follows when it ends.
 
 ## Questions for the spec lane
 
