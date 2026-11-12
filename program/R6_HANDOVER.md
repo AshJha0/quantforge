@@ -227,3 +227,11 @@ Changed case ids (expected results only): `e1_risk-0372` (ES and `tail_count` fr
 Why the oracle side missed them: each regeneration rewrote only its own file. `stage_f/e1_*` twins are copies made once by `gen_stage_f_e1.py` from the goldens of the day, and `edge_d` has its own copy of the linker formula in `gen_r1_edge.py`; nothing compared a copy with its source after the source changed, and the per-file diffs I checked were of the regenerated files only. New gate: `python tools/check_golden_copies.py` (any case whose inputs equal another case's inputs, `-0.0` read as `0.0`, must expect the same result; `--self-test` shows it red on a planted stale twin). The formula copy in `gen_r1_edge.py` now calls the shared `tips_round`, so it cannot drift again. A search for other copies of changed rulings (ES, TIPS, PFE keys, barrier envelope, `sbm_total`) found none beyond these four.
 
 WAVE 3B READY 516b776 (changed: e1_risk-0372, edge_d-0015, edge_d-0016, edge_d-0017; totals 15,076)
+
+## Wave 3C: correction to wave 3B
+
+What happened: while checking J-R6-3 I ran `gen_stage_f_e1.py` once. It rewrote every `stage_f/e1_*` file and also created two NEW files, `e1_risk_1.json` (713 cases) and `e1_risk_2.json` (129), because it now partitions its 6,421 cases differently from the committed layout. I restored the tracked files with `git checkout`, which does not remove untracked files, and `git add -A` committed the two new ones in `516b776`. They were regenerated E1 cases under new ids, largely duplicating the content of `e1_risk.json` (the same operations' NaN, infinity and negative-zero cases), not new behaviour. Removed. The only intended wave 3B changes stand: `e1_risk-0372`, `edge_d-0015`, `-0016`, `-0017`.
+
+New gate `python tools/check_case_total.py`: the committed totals and unique ids must equal the last `TOTALS:` line in this file (it reports 15,918 with the stray files and fails). `gen_stage_f_e1.py` must not be rerun on `r6` without restoring its file layout (noted for the evidence lane).
+
+TOTALS: 15076 value 7440 error 5122 invariance 2514
