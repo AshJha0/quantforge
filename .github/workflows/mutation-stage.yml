@@ -11,9 +11,8 @@ name: Mutation by stage
 #  the run passed (review finding 5). check_stages.py and test_gates.py run in repo-gates.yml.
 #  - Manual with `paths`: planned as a pull request touching those files (for example one Rust module).
 on:
-  pull_request:
-    paths: ['cpp26/src/**', 'java25/src/main/**', 'python/quantforge_core/**', 'rust/crates/*/src/**',
-            'conformance/mutation/**', '.github/workflows/mutation-stage.yml']
+  pull_request:  # no paths filter: mutation-report is a required check (D7); a PR touching no mapped module
+                 # plans nothing, and the skipped report counts as passing
   schedule:
     - cron: '41 5 * * 0'
   workflow_dispatch:

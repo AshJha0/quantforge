@@ -19,6 +19,7 @@ env:
   GOLDEN: ${{ inputs.golden || 'datasets/golden' }}
 jobs:
   conformance:
+    name: cross-platform-conformance
     strategy:
       fail-fast: false
       matrix:
@@ -103,6 +104,7 @@ jobs:
           path: conformance/reports/
           if-no-files-found: ignore
   summary:
+    name: cross-platform-summary
     needs: conformance
     if: always()
     runs-on: ubuntu-24.04

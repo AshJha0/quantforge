@@ -27,6 +27,8 @@ jobs:
           persist-credentials: false
           fetch-tags: true  # the docs check reads release tags
       - run: python3 tools/check_hygiene.py
+      - name: unique job names and required-check list (R6-15)
+        run: python3 tools/check_job_names.py
       - name: mutation stages map every stage (R6-14)
         run: python3 conformance/mutation/check_stages.py && python3 conformance/mutation/test_gates.py
       - run: python3 tools/quality_gate.py --check-register --check-specs --check-docs

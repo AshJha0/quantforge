@@ -25,6 +25,7 @@ env:
   INJECT_NS: '200000'
 jobs:
   bench:
+    name: bench
     strategy:
       fail-fast: false
       matrix:

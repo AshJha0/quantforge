@@ -18,6 +18,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   python:
+    name: tutorial-python
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -27,6 +28,7 @@ jobs:
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
       - run: python3 tools/check_tutorial.py --lang python
   rust:
+    name: tutorial-rust
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -35,6 +37,7 @@ jobs:
           persist-credentials: false
       - run: python3 tools/check_tutorial.py --lang rust
   java:
+    name: tutorial-java
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -47,6 +50,7 @@ jobs:
           java-version: "25.0.5"
       - run: python3 tools/check_tutorial.py --lang java
   cpp:
+    name: tutorial-cpp
     runs-on: ubuntu-24.04
     container: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
     timeout-minutes: 30

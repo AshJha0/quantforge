@@ -26,6 +26,7 @@ env:
   SUITE: ${{ inputs.suite }}
 jobs:
   java:
+    name: mutation-java
     if: inputs.language == 'java'
     runs-on: ubuntu-24.04
     timeout-minutes: 45
@@ -41,6 +42,7 @@ jobs:
       - run: mvn -B -Pmutation test-compile org.pitest:pitest-maven:mutationCoverage "-DtargetClasses=$TARGET"
         working-directory: java25
   cpp:
+    name: mutation-cpp
     if: inputs.language == 'cpp'
     runs-on: ubuntu-24.04
     container: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
@@ -52,6 +54,7 @@ jobs:
       - run: apt-get update && apt-get install -y cmake ninja-build python3
       - run: python3 conformance/mutation/cpp_mutants.py --file "$TARGET" --max 40
   python:
+    name: mutation-python
     if: inputs.language == 'python'
     runs-on: ubuntu-24.04
     timeout-minutes: 45
@@ -69,6 +72,7 @@ jobs:
       - run: python3 conformance/mutation/golden_mutants.py --impl python --target "$TARGET" --suite "$SUITE" --max 40
         if: ${{ inputs.golden }}
   rust:
+    name: mutation-rust
     if: inputs.language == 'rust'
     runs-on: ubuntu-24.04
     timeout-minutes: 45
