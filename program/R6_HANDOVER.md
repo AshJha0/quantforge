@@ -235,3 +235,5 @@ What happened: while checking J-R6-3 I ran `gen_stage_f_e1.py` once. It rewrote 
 New gate `python tools/check_case_total.py`: the committed totals and unique ids must equal the last `TOTALS:` line in this file (it reports 15,918 with the stray files and fails). `gen_stage_f_e1.py` must not be rerun on `r6` without restoring its file layout (noted for the evidence lane).
 
 TOTALS: 15076 value 7440 error 5122 invariance 2514
+
+WAVE 3C READY fde2c4a (stray files removed; 15,076 cases: value 7,440, error 5,122, invariance 2,514)
