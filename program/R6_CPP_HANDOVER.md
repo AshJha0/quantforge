@@ -25,6 +25,7 @@ Written 2026-11-12. All builds and tests ran in WSL (Ubuntu, g++ 15.2) on source
 | R6-6.1 caps | active-set and sign-state loops capped at `10 n + 100`, lattice search at 1,000,000 nodes, all `E_NO_CONVERGENCE`; planted cap of 1 tested (`detail::effort_cap_override`). Kink: see question 3 |
 | R6-6.2 scaling | Jacobi scaling before the equality-rank and reduced-Hessian tests of `hedge.qp.solve` (and so cross-asset), the lattice convexity test, the select full-hedge test, and the minvar pivots |
 | R6-11.5, .6, .7, .9, .13, .16 | ties against `max(best, f(0))` (integer, select); `max_instruments` outside 1..n `E_INPUT` before the subset `E_LIMIT`; minvar negative pivot `E_NOT_POSITIVE_DEFINITE`, scaled small pivot `E_SINGULAR`; negative bumped hazard `E_DOMAIN`; empty `eq_matrix` `E_INPUT`; degenerate Margrabe vol `E_SINGULAR`. R6-11.12 was already in the ruled order; R6-11.18 was already `E_SCHEMA` |
+| Wave 3B (J-R6-4, J-R6-5, pivot band, R6-11.16) | cap `10 (n + p) + 100` in the dual active set (`p` its constraint rows) and the sign-state loop (`p` = equality rows + finite bounds + margin row); minvar scaled pivot `<= -1e-12` `E_NOT_POSITIVE_DEFINITE`, `|pivot| < 1e-12` `E_SINGULAR`; `MIN_NORM` reports the unscaled rank; degenerate Margrabe vol `E_DOMAIN` |
 | R6-11.20 use case 6 | `usecase.option_hedge_lots` (`hedging.cpp`, `ops_hedge.inc`); hand test (237 short, lots of 100: 2 lots, cost 2, delta after -37) |
 | R6-16 G4 | no stage-letter file names in `cpp26/`; `stages.json` and `equivalents-cpp.md` follow |
 | R6-16 G-9 | the test writes the measured ratio to `QF_G9_RECORD`; 2.33 in WSL |
@@ -40,11 +41,11 @@ Exact. Once the sign state is found, the result is the orthant QP solved on that
 
 ## Totals
 
-- Conformance (`runner.py --impl cpp`, all goldens at `d51d30a`): **15,071 of 15,076**; after the kink fix `hedgecost_i` is 23 of 23, so **15,072 of 15,076**. The 4 left are golden defects, question 1 and 2.
-- ctest and sanitizers: see the run log below.
+- Conformance (`runner.py --impl cpp`, goldens at `r6` `e7d5332`, wave 3C, stray `e1_risk_1/2` gone): **15,076 of 15,076** (spec split 7,440 value / 5,122 error / 2,514 invariance). Release build with `-DQF_WERROR=ON`.
+- ctest (`quantforge_core_tests`): 309 test cases, 16,229 assertions, all pass.
 
 ## Questions for the spec lane
 
-1. `stage_d/edge_d-0015`, `-0016`, `-0017` (`infl.linker.price`) still hold the unrounded `ref_cpi` and `index_ratio` (322.85566666666665, 1.0758239651050259, 323.3929032258065). R6-7.5 rounds every linker price, so these three were not regenerated with `inflation_d`. This build gives 322.85567, 1.07582, 323.3929.
-2. `stage_f/e1_risk-0372` (`risk.var.monte_carlo`, a value case of the E1 sweep) still holds the v0.8.0 ES 52,486.18; R6-3.1 gives 52,593.47 here. The sweep was not regenerated after the ES change.
-3. R6-6.1 kink rule: this build decides a kink by the sign-row multiplier test (`nu - 2 k_j > 1e-10 scale`), then the orthant solve is exact. Adding a separate zeroing of `|x_j| <= 1e-11 max(1, max|x|)` changed `hedgecost_i-0010` (a binding margin) to `E_INFEASIBLE`, so it was removed. Is the multiplier test an accepted "proven equivalent"?
+1. Closed by wave 3B: `edge_d-0015` to `-0017` and `e1_risk-0372` were stale goldens (J-R6-3); now pass.
+2. Closed by wave 3C: the stray `e1_risk_1.json`, `e1_risk_2.json` (842 cases) were counted once here (15,918, all passing); that run is void.
+3. R6-6.1 kink rule (answered by R6-6.1a for exact active sets): this build decides a kink by the sign-row multiplier test (`nu - 2 k_j > 1e-10 scale`), then the orthant solve is exact. Adding a separate zeroing of `|x_j| <= 1e-11 max(1, max|x|)` changed `hedgecost_i-0010` (a binding margin) to `E_INFEASIBLE`, so it was removed. Is the multiplier test an accepted "proven equivalent"?
