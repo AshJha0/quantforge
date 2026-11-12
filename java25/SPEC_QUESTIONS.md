@@ -242,7 +242,7 @@ From `program/STAGE_I_JAVA_HANDOVER.md`, with the rulings of `stage-i-rulings.md
 | # | Status | Choice |
 |---|---|---|
 | J-R6-1 | open | R6-11.7: a scaled pivot in `[-1e-12, 0)` is read as rounding of a singular block (`E_SINGULAR`), not `E_NOT_POSITIVE_DEFINITE`; only a pivot below `-1e-12` is indefinite. Please confirm or state the band |
-| J-R6-2 | open | R6-11.16 says a spread vol `s <= 1e-12 (v1 + v2)` is `E_SINGULAR`, but golden `hedgecorr_i-0015` (exactly 0) still expects `E_DOMAIN`. Java keeps `E_DOMAIN` at exactly 0 and returns `E_SINGULAR` for `0 < s <= 1e-12 (v1 + v2)`. Please regenerate the golden or state the split |
+| J-R6-2 | open | R6-11.16 says `s <= 1e-12 (v1 + v2)` is `E_SINGULAR`, but golden `hedgecorr_i-0015` (vol1 = vol2 = 0.2, correlation 1; `s` is about 1e-9 in binary64, not 0) expects `E_DOMAIN`. Java returns `E_DOMAIN` for `s <= 1e-12 (v1 + v2)` so the golden passes. Please regenerate the golden or amend the ruling |
 | J-R6-3 | open | Goldens not regenerated after wave 1 and 2 rulings: `e1_risk-0372` (copy of `risk_f4-0039`, old ES and `tail_count` 51; R6-3.1 gives `w = 50`) and `edge_d-0015` to `-0017` (`infl.linker.price` without the R6-7.5 rounding). Java fails these 4 cases by following the rulings |
 | J-R6-4 | open | R6-6.2 for `MIN_NORM`: the policy makes no singularity decision, so Java keeps the unscaled rank and pseudo-inverse there (the scaled form of a rank-one all-ones matrix stalls the Jacobi eigen solver). Please confirm the scaled test applies only where a decision is made |
 | J-R6-5 | open | R6-6.1 caps the sign-state and dual active-set loops at `10 n + 100` with `n` the instruments; the dual active set previously allowed `20 (p + n) + 100` with `p` constraints. No golden comes near either |
