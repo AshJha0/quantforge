@@ -698,7 +698,11 @@ mod tests {
             (0..5)
                 .map(|k| {
                     let r = rates[k] + if k == j { s } else { 0.0 };
-                    OisQuote { tenor: tenors[k], bid: r, ask: r }
+                    OisQuote {
+                        tenor: tenors[k],
+                        bid: r,
+                        ask: r,
+                    }
                 })
                 .collect()
         };
@@ -709,23 +713,36 @@ mod tests {
             Interpolation::MonotonicLogCubic,
             Interpolation::TensionSpline(2.0),
         ] {
-            let jac = jacobian(&sofr, as_of, &qs(9, 0.0), m, 1.0).unwrap().jacobian;
+            let jac = jacobian(&sofr, as_of, &qs(9, 0.0), m, 1.0)
+                .unwrap()
+                .jacobian;
             let mut upper = 0.0_f64;
             for j in 0..5 {
-                let up = jacobian(&sofr, as_of, &qs(j, h), m, 1.0).unwrap().zero_rates;
-                let dn = jacobian(&sofr, as_of, &qs(j, -h), m, 1.0).unwrap().zero_rates;
+                let up = jacobian(&sofr, as_of, &qs(j, h), m, 1.0)
+                    .unwrap()
+                    .zero_rates;
+                let dn = jacobian(&sofr, as_of, &qs(j, -h), m, 1.0)
+                    .unwrap()
+                    .zero_rates;
                 for i in 0..5 {
                     let want = (up[i] - dn[i]) / (2.0 * h);
-                    assert!((jac[i][j] - want).abs() < 1e-9, "{m:?} [{i}][{j}] {} vs {want}", jac[i][j]);
+                    assert!(
+                        (jac[i][j] - want).abs() < 1e-9,
+                        "{m:?} [{i}][{j}] {} vs {want}",
+                        jac[i][j]
+                    );
                     if j > i {
                         upper = upper.max(want.abs());
                     }
                 }
             }
-            if m != Interpolation::LogLinearDf {
-                assert!(upper > 1e-6, "{m:?}: expected non-zero upper entries, max {upper}");
-            } else {
+            if m == Interpolation::LogLinearDf {
                 assert_eq!(upper, 0.0);
+            } else {
+                assert!(
+                    upper > 1e-6,
+                    "{m:?}: expected non-zero upper entries, max {upper}"
+                );
             }
         }
     }

@@ -44,7 +44,11 @@ fn hand_loglik(r: &[f64], omega: f64, alpha: f64, beta: f64) -> f64 {
 fn loglik_matches_the_spec_worked_example() {
     // garch.md worked example, hand-computed: sigma2 = 2.5e-4, 2.2e-4, next 2.26e-4.
     let l = quantforge_core::garch::loglik(&[0.01, -0.02], 1e-5, 0.1, 0.8, Start::Sample).unwrap();
-    assert!((l.loglik - 5.410_998_350_356_715).abs() < 1e-12, "{}", l.loglik);
+    assert!(
+        (l.loglik - 5.410_998_350_356_715).abs() < 1e-12,
+        "{}",
+        l.loglik
+    );
     assert!((l.variances[0] - 2.5e-4).abs() < 1e-18 && (l.variances[1] - 2.2e-4).abs() < 1e-18);
     assert!((l.next_variance - 2.26e-4).abs() < 1e-18);
 }
@@ -58,7 +62,12 @@ fn fit_is_a_local_maximum_of_an_independent_likelihood() {
         let f = fit(&r, Start::Sample).unwrap();
         let l0 = hand_loglik(&r, f.omega, f.alpha, f.beta);
         assert!((f.loglik - l0).abs() < 1e-9, "{} vs {l0}", f.loglik);
-        for (dw, da, db) in [(1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0), (1.0, 1.0, -1.0)] {
+        for (dw, da, db) in [
+            (1.0, 0.0, 0.0),
+            (0.0, 1.0, 0.0),
+            (0.0, 0.0, 1.0),
+            (1.0, 1.0, -1.0),
+        ] {
             for h in [1e-3, -1e-3] {
                 let (w, a, b) = (
                     f.omega * (1.0 + h * dw),
@@ -68,7 +77,10 @@ fn fit_is_a_local_maximum_of_an_independent_likelihood() {
                 if w <= 0.0 || a < 0.0 || b < 0.0 || a + b >= 1.0 {
                     continue;
                 }
-                assert!(hand_loglik(&r, w, a, b) <= l0 + 1e-8, "trend {trend} dir {dw} {da} {db} h {h}");
+                assert!(
+                    hand_loglik(&r, w, a, b) <= l0 + 1e-8,
+                    "trend {trend} dir {dw} {da} {db} h {h}"
+                );
             }
         }
     }

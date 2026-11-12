@@ -195,6 +195,40 @@ super::registry! {
         let (v, sq, ratio) = rc::vol_horizon(s, r, h)?;
         plain(obj([("vol", v.into()), ("sqrt_rule_vol", sq.into()), ("variance_ratio", ratio.into())]))
     },
+    "risk.frtb.sbm_total" => {
+        let mut comps = Vec::new();
+        for r in rows(i, "components")? {
+            let class = r.str("risk_class")?;
+            if !["GIRR", "CSR_NONSEC", "EQ", "COMM", "FX"].contains(&class) {
+                return r.fail("risk_class", "unknown risk_class");
+            }
+            let measure = r.str("measure")?;
+            if !["DELTA", "VEGA", "CURVATURE"].contains(&measure) {
+                return r.fail("measure", "unknown measure");
+            }
+            let s = r.req("scenarios")?;
+            if !matches!(s, Json::Obj(_)) {
+                return r.fail("scenarios", "expected an object");
+            }
+            let s = Inputs::new(s);
+            comps.push(f3::SbmComponent {
+                risk_class: class.to_string(),
+                measure: measure.to_string(),
+                charges: [s.f64("high")?, s.f64("medium")?, s.f64("low")?],
+            });
+        }
+        i.gate()?;
+        let t = f3::sbm_total(&comps)?;
+        let scen = |v: [f64; 3]| {
+            obj([("high", v[0].into()), ("medium", v[1].into()), ("low", v[2].into())])
+        };
+        plain(obj([
+            ("scenario_totals", scen(t.scenario_totals)),
+            ("capital", t.capital.into()),
+            ("binding_scenario", ["high", "medium", "low"][t.binding].into()),
+            ("sum_of_component_capitals", t.sum_of_component_capitals.into()),
+        ]))
+    },
     "risk.frtb.fx_delta" => {
         let mut sens = Vec::new();
         for r in rows(i, "sensitivities")? {

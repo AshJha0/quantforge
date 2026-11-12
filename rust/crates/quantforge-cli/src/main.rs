@@ -16,7 +16,7 @@ use quantforge_core::json::{Flags, Json, nesting_exceeds, obj, parse};
 use std::io::{BufRead, Read, Write};
 use std::process::ExitCode;
 
-const CONTRACT: &str = "1.11.0";
+const CONTRACT: &str = "1.12.0";
 const SCHEMA: &str = "1.0";
 const MAX_CASE_NESTING: usize = 80;
 

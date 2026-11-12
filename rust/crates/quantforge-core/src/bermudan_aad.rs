@@ -538,7 +538,9 @@ mod tests {
             black_box(bermudan_ladder(&curve, 0.05, 0.01, &swap, &ex, grid).unwrap());
         });
         let ratio = b / a;
-        println!("G-9 ladder cost ratio: {ratio:.3} (price {a:.6e} s, ladder {b:.6e} s; pass <= 5)");
+        println!(
+            "G-9 ladder cost ratio: {ratio:.3} (price {a:.6e} s, ladder {b:.6e} s; pass <= 5)"
+        );
         assert!(ratio <= 5.0, "G-9 ratio {ratio:.3} above 5");
     }
 }
