@@ -203,3 +203,70 @@ Recomputed from the suite register (every counted case is a value case): **102 o
 ### Stage I per-case register (replaces the suite-count assumption)
 
 `tools/stage_i_case_register.py` writes `oracle/outside_register_i_cases.json` from each case's own `verified_by` (a library is named there only when it agreed within the case tolerance, I-2). Real figures, no assumption: **102 of 153 value cases = 66.7%** without wave 5 and without added cases; 266 of 318 = 83.6% with wave 5; old all-case rule 102 of 278 = 36.7%. The per-case count equals the favourable suite-count reading exactly: every counted case is a value case. No R6 case is added to stage I. Uncounted value cases and reasons, confirmed: `hedgeint_i` 12 (no free bounded integer least-squares solver; HiGHS is MILP or continuous QP); `hedgebeta_i` 8 and `hedgeres_i` 7 (closed-form arithmetic; a check would restate the formula: correct); `hedgeslip_i` 6 (exact rational arithmetic is the oracle itself: correct); `hedgebt_i` 7 and `hedgebtcost_i` 5 (QuantLib values, then the spec's cash-account arithmetic: reimplementation); plus 1 in `hedgecost_i`, 2 in `hedgefrontier_i`, 1 in `hedgemv_i`, 2 in `hedgeqp_i` where no outside solver agreed within tolerance (left uncounted, as I-2 says). Merged `r6-evidence` at `b9b2b3c`.
+
+### R6-1 oracle side: met (plan row reworded to match R6-1.3)
+
+Per-case Richardson gaps, largest upper entry and the truncation explanation: `oracle/R6_JACOBIAN_RICHARDSON.json` (8 value cases of `r6/jacobian_r6`; smooth methods about 5e-6, piecewise SOFR `MONOTONE_CONVEX` and `HYBRID` 1.4e-3). No golden or build change. R6-11.9 and R6-11.16 stay open without goldens: each needs a new check in the language builds, beyond the rulings already implemented.
+
+### R6-1: cause of the 1.4e-3 gaps (follow-up)
+
+Not truncation in the usual small-`h` sense and not a kink: `oracle/R6_JACOBIAN_KINK.json` shows, for entry [10, 9] under SOFR `MONOTONE_CONVEX` and `HYBRID`, central quotients -0.237553 (1 bp), -0.236481 (0.5 bp), -0.236060 (0.1 bp), -0.2360156 (0.01 bp), and forward minus backward 0.0319, 0.0157, 0.00328, 0.000328, which shrinks in proportion to the bump. The zero rate is smooth but strongly curved in that quote, so 1 bp is outside the `h^2` range. Not a defect; documented as a known limit in `par-and-key-rate.md` and R6-1.3. No golden or build change.
+
+## Rulings on the Python lane questions (2026-11-12)
+
+See `r6-rulings.md`, section "Python lane questions": R6-6.2a (no scaling under `MIN_NORM`: confirmed), R6-6.1a (exact-zero kink test conforms for an exact active set; coverage gap: no golden distinguishes it), R6-16a (test file names are not G4 modules), E-Q7 and E-Q11 ruled as Python built them, F-Q1 and F-Q4 ruled (field text and method not normative), G-Q2 deferred to J-10, R6-6.4a (Python's large hedge solve missed T6/T7: 412.6 s against 46 s; target unchanged; `expsim_g` has no target). R6-1.3 wording now matches the corrected plan row: R6-1 met.
+
+### R6-6.1b: kink coverage closed by argument, no golden
+
+See `r6-rulings.md` R6-6.1b: a misclassified position within 1e-11 changes the answer by at most about cond x 1e-11, inside `root_finding`, so no golden can separate the two tests. The tolerance binds only builds whose final step is not an exact re-solve on the state. Python's exact-zero test conforms. Totals unchanged (15,076: value 7,440, error 5,122, invariance 2,514).
+
+## Wave 3B: stale golden copies (Java J-R6-3), rulings J-R6-4, J-R6-5, negative-pivot band, R6-11.16 corrected
+
+Changed case ids (expected results only): `e1_risk-0372` (ES and `tail_count` from its source `risk_f4-0039`), `edge_d-0015`, `edge_d-0016`, `edge_d-0017` (R6-7.5 rounding). Totals unchanged: 15,076 (value 7,440, error 5,122, invariance 2,514). `hedgecorr_i-0015` stays `E_DOMAIN`; ruling R6-11.16 was wrong and is corrected to `E_DOMAIN`. Rulings in `r6-rulings.md`, "Java lane questions".
+
+Why the oracle side missed them: each regeneration rewrote only its own file. `stage_f/e1_*` twins are copies made once by `gen_stage_f_e1.py` from the goldens of the day, and `edge_d` has its own copy of the linker formula in `gen_r1_edge.py`; nothing compared a copy with its source after the source changed, and the per-file diffs I checked were of the regenerated files only. New gate: `python tools/check_golden_copies.py` (any case whose inputs equal another case's inputs, `-0.0` read as `0.0`, must expect the same result; `--self-test` shows it red on a planted stale twin). The formula copy in `gen_r1_edge.py` now calls the shared `tips_round`, so it cannot drift again. A search for other copies of changed rulings (ES, TIPS, PFE keys, barrier envelope, `sbm_total`) found none beyond these four.
+
+WAVE 3B READY 516b776 (changed: e1_risk-0372, edge_d-0015, edge_d-0016, edge_d-0017; totals 15,076)
+
+## Wave 3C: correction to wave 3B
+
+What happened: while checking J-R6-3 I ran `gen_stage_f_e1.py` once. It rewrote every `stage_f/e1_*` file and also created two NEW files, `e1_risk_1.json` (713 cases) and `e1_risk_2.json` (129), because it now partitions its 6,421 cases differently from the committed layout. I restored the tracked files with `git checkout`, which does not remove untracked files, and `git add -A` committed the two new ones in `516b776`. They were regenerated E1 cases under new ids: 538 of the 842 have exactly the operation and inputs of an existing golden (duplicates); the other 304 are the generator's re-sweep over the R6-changed inputs and new operations, whose E1 coverage this round is already given by `r6/e1_r6` (the gate shows every operation covered). None was intended; all removed. Removed. The only intended wave 3B changes stand: `e1_risk-0372`, `edge_d-0015`, `-0016`, `-0017`.
+
+New gate `python tools/check_case_total.py`: the committed totals and unique ids must equal the last `TOTALS:` line in this file (it reports 15,918 with the stray files and fails). `gen_stage_f_e1.py` must not be rerun on `r6` without restoring its file layout (noted for the evidence lane).
+
+TOTALS: 15076 value 7440 error 5122 invariance 2514
+
+WAVE 3C READY fde2c4a (stray files removed; 15,076 cases: value 7,440, error 5,122, invariance 2,514)
+
+## `aadladder_g` gradient disagreement (second oracle lane): not a defect
+
+Recomputed from the oracle's own scheme (`gen_stage_g_berm.price`) by central differences, absolute bump 1e-6 on each discount factor: at the golden grid (101 points, 50 steps a year) the entries reproduce the golden to every digit (127, 191,964, 173,816, 147,510, -233,482, -343,473). The same derivative at finer grids: 401/200 gives 127, 220,895, 163,851, 132,970, -236,617, -347,516; 801/400 gives 127, 225,712, 158,174, 131,838, -234,410, -347,771. So the golden and the spec are right: the spec defines the ladder as the derivative of the discrete scheme at the case's grid (G-9, `aad-core.md`), and the discount-factor entries of that scheme are 15% to 18% away from the converged model's at the golden grid, while its price is only 0.24% away. The outside check compared against QuantLib's converged derivative with a tolerance sized from QuantLib's own grid behaviour, which converges faster in the curve inputs than the spec scheme: hence a gap of about 30,000 against a tolerance of about 2,100. No golden changes; no language build is affected. `aad-core.md` now states the convention (absolute change of each input discount factor, scheme derivative at the case grid, not the model derivative) with these numbers.
+
+For the second oracle lane: count the `aadladder_g` price, `d_price_d_mean_reversion` and `d_price_d_sigma` only if they pass with a tolerance measured on each derivative itself; leave the discount-factor entries uncounted (no outside library differentiates the spec's scheme, G-18), so the three cases do not count under "every compared output".
+
+## UNFINISHED at shutdown (2026-11-12)
+
+- R6-27: spec text done (`5fa5d6c`). Grid table committed: `oracle/R6_LADDER_GRIDS.json` (101/50 to 801/400) and `oracle/R6_LADDER_GRIDS_EXTRA.json` (501/250, 601/300). No single grid meets 2% for all three cases (convergence is not monotone); chosen: `aadladder_g-0002` at 501/250 (worst 0.99%, 3.3 s per price). Golden generator `oracle/python/gen_r6_w4.py` was launched detached (`run_r6_w4.cmd`, log `oracle/python/gen_r6_w4.log`); the shutdown likely killed it. Rerun detached, check the log, commit `datasets/golden/r6/aadladder_r6.json`, then write `WAVE 4 READY` with TOTALS 15077 value 7441 error 5122 invariance 2514.
+- Blind re-derivation findings not yet ruled: traffic-light plus factors (1996 vs MAR32.9/MAR33.42), equity vega 77.78% vs 77.7817%, binding-scenario tie rule as a library choice, MAR21.44 root-2 scope for inflation and cross-currency basis.
+
+## Wave 4: R6-27 (Bermudan ladder on a finer grid; tag blocker)
+
+Read: `specifications/06-risk/aad-core.md` (R6-27 section). Generator `oracle/python/gen_r6_w4.py` (run detached, 218 s, log `oracle/python/gen_r6_w4.log`).
+
+| File | Cases | Value | Error | Notes |
+|---|---:|---:|---:|---|
+| `r6/aadladder_r6.json` (new) | 1 | 1 | 0 | `aadladder_g-0002`'s inputs at `nx = 501`, 250 steps a year; every ladder entry within 0.99% of the 801/400 ladder |
+
+**Convergence is not monotone.** No single grid meets 2% for all three `aadladder_g` cases (table in `oracle/R6_LADDER_GRIDS.json` and `R6_LADDER_GRIDS_EXTRA.json`); this golden is one case on one grid, chosen because it meets 2%. The ladder at the default grid (101/50) is a derivative of the discrete scheme and is not for hedging. Real fix: stage K item K-8.
+
+**Richardson gate.** The q3b gate (two Richardson pairs agree within 1e-9) is for the 101/50 grid. On 501/250 they agree to 1.9e-9; the accepted gate here is 2.5e-9, a quarter of the case tolerance (relative 1e-8), recorded in the case's `verified_by`.
+
+**What the languages must do.** No behaviour change: `rates.shortrate.bermudan_ladder` must accept `nx = 501`, `steps_per_year = 250` and pass the case at absolute 1e-10, relative 1e-8. Cost about 3.3 s per price in the Python oracle; a build that bumps every input sequentially at this grid should check its timeout. Docs lane: inventory entry and tutorial carry the three-grid table and "not for hedging at the default grid".
+
+TOTALS: 15077 value 7441 error 5122 invariance 2514
+
+## R6-28 rulings (2026-11-12): no golden changes
+
+Traffic light keeps the 1996 plus factors, vintage now stated (R6-28.1); equity vega 77.78% (R6-28.2); ties to high, medium, low (R6-28.3); sqrt 2 covers inflation and basis (R6-28.4); `p` excludes a build's own sign rows (R6-28.5). Oracle2 findings: `risk_f4-0019`..`0024` stale arch cache (R6-28.6), `garch_f-0009` arch stops above 1e-8 (R6-28.7), `cdsidx_f-0056`/`0057` re-derivation cancels in `1 - exp` (R6-28.8): all goldens right; fixes are in oracle2's tools. `risk_f4-0087`..`0095` disagreements come from the re-derivation using the FRTB table. Builds: only advice to use `expm1` for `front_end_protection`.
+
+WAVE 4 READY 13a93f9 (aadladder_r6, 1 value case at 501/250; languages: no behaviour change, pass it at 1e-10 abs / 1e-8 rel; totals 15,077)

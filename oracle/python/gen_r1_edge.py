@@ -78,7 +78,8 @@ def main():
         k = setl.year * 12 + setl.month - 1
         m3, m2 = W3.ms(k - 3), W3.ms(k - 2)
         rc = Fr(fix[m3]) + Fr(setl.day - 1, W3.dim(setl.year, setl.month)) * (Fr(fix[m2]) - Fr(fix[m3]))
-        ir = rc / Fr(base_ref)
+        rc = W3.tips_round(rc)  # R6-7.5
+        ir = W3.tips_round(rc / Fr(base_ref))
         s.add("infl.linker.price", {"bond": b, "settlement": str(setl), "real_yield": ry, "base_ref_cpi": base_ref, "cpi_fixings": [{"month": m, "value": v} for m, v in fix.items()]},
               {"ref_cpi": float(rc), "index_ratio": float(ir), "real_clean": r["clean"], "real_accrued": r["accrued"], "nominal_clean": r["clean"] * float(ir),
                "nominal_accrued": r["accrued"] * float(ir)}, cls=A, verified=["analytic", "exact-rational"], tags=["edge-E7", "month-boundary"])

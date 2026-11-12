@@ -1,0 +1,75 @@
+{
+ "ruling": "R6-1.3",
+ "method": "Richardson (4 D(h/2) - D(h))/3 with h = 1 bp; gap = max over entries of |D(h) - R| - 1e-7 |R|",
+ "generator": "oracle/python/gen_r6_w1.py",
+ "cases": [
+  {
+   "case_id": "jacobian_r6-0001",
+   "convention": "SOFR",
+   "interpolation": "MONOTONE_CONVEX",
+   "max_gap_to_richardson": 0.0014,
+   "max_upper_entry": 0.03891867487709061,
+   "explanation": "strong curvature of the zero rate in a neighbouring quote (monotone convex regions close by); no kink at the base curve; the gap shrinks with the bump (see kink_study)"
+  },
+  {
+   "case_id": "jacobian_r6-0002",
+   "convention": "SOFR",
+   "interpolation": "MONOTONIC_LOG_CUBIC",
+   "max_gap_to_richardson": 6e-06,
+   "max_upper_entry": 0.05198367261108339,
+   "explanation": "O(h^2) truncation of the 1 bp central quotient (third derivative of the long-pillar zero rate)"
+  },
+  {
+   "case_id": "jacobian_r6-0003",
+   "convention": "SOFR",
+   "interpolation": "TENSION_SPLINE",
+   "max_gap_to_richardson": 5.5e-06,
+   "max_upper_entry": 0.05201293696407289,
+   "explanation": "O(h^2) truncation of the 1 bp central quotient (third derivative of the long-pillar zero rate)"
+  },
+  {
+   "case_id": "jacobian_r6-0004",
+   "convention": "SOFR",
+   "interpolation": "HYBRID",
+   "max_gap_to_richardson": 0.0014,
+   "max_upper_entry": 0.007082330564789352,
+   "explanation": "strong curvature of the zero rate in a neighbouring quote (monotone convex regions close by); no kink at the base curve; the gap shrinks with the bump (see kink_study)"
+  },
+  {
+   "case_id": "jacobian_r6-0005",
+   "convention": "SONIA",
+   "interpolation": "MONOTONE_CONVEX",
+   "max_gap_to_richardson": 3e-05,
+   "max_upper_entry": 0.017261038289841102,
+   "explanation": "strong curvature of the zero rate in a neighbouring quote (monotone convex regions close by); no kink at the base curve; the gap shrinks with the bump (see kink_study)"
+  },
+  {
+   "case_id": "jacobian_r6-0006",
+   "convention": "ESTR",
+   "interpolation": "MONOTONE_CONVEX",
+   "max_gap_to_richardson": 0.00036,
+   "max_upper_entry": 0.039448210617926936,
+   "explanation": "strong curvature of the zero rate in a neighbouring quote (monotone convex regions close by); no kink at the base curve; the gap shrinks with the bump (see kink_study)"
+  },
+  {
+   "case_id": "jacobian_r6-0007",
+   "convention": "SOFR",
+   "interpolation": "LOG_LINEAR_DF",
+   "max_gap_to_richardson": 4.9e-06,
+   "max_upper_entry": 0.0,
+   "explanation": "O(h^2) truncation of the 1 bp central quotient (third derivative of the long-pillar zero rate)"
+  },
+  {
+   "case_id": "jacobian_r6-0008",
+   "convention": "SOFR",
+   "interpolation": "LINEAR_ZERO",
+   "max_gap_to_richardson": 5.5e-06,
+   "max_upper_entry": 0.0,
+   "explanation": "O(h^2) truncation of the 1 bp central quotient (third derivative of the long-pillar zero rate)"
+  }
+ ],
+ "kink_study": {
+  "file": "oracle/R6_JACOBIAN_KINK.json",
+  "finding": "forward minus backward shrinks in proportion to the bump (0.0319, 0.0157, 0.00328, 0.000328 at 1, 0.5, 0.1, 0.01 bp): no kink; strong curvature makes the 1 bp quotient differ from the derivative by 1.5e-3. Not a defect."
+ }
+}
