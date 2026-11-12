@@ -209,14 +209,30 @@ Silent choices, wave 1a (F6, Q1):
 | F-J7 | R10 continuity property: `local-and-forward-vol.md` asks for `abs(w(T_j(1 - 1e-9)) - w(T_j)) <= 1e-9 w(T_j)`. A step of 1e-9 T_j moves w by `w_T T_j 1e-9`, which equals the bound when the left slope is `w_j / T_j` and goes over it at an inner node with a steeper interval. Java asserts 3e-9; please state the bound as `(w_T T_j / w_j + 1) 1e-9` or similar |
 | F-J8 | Q1: `SEQUENTIAL` with a stage F method runs the global Newton solve directly (ruling F-21 allows either; both give the same curve) |
 
-Stage G:
+## Stage G
 
-| # | Choice |
-|---|---|
-| G-J1 | `xva.exposure.swap_ee_hw`: the spec requires `start_years >= 0` but names no error code for a negative value, and no golden case covers it. Java returns `E_DOMAIN` (key `start_years`), checked after `side` and before `payment_times`. Please state the code and its place in the check order |
-| G-J2 | `rates.shortrate.hw_calibrate`: a 2,001-point log-spaced scan of `F` on `[1e-4, 1]` brackets the minimum (an end point gives `E_NO_CONVERGENCE`), then bisection on the analytic `F'` (bond-option vegas at fixed Jamshidian strikes) to a relative width of 1e-15 |
-| G-J3 | `capfloor_g-0040` ("1 + K tau <= 0") conflicts with the spec: it has `strike = -0.5` on annual periods, so `1 + K tau = 0.5 > 0`, and the rule in `short-rate-models.md` (`1 + K tau_i > 0`, else `E_DOMAIN`) makes it a valid case. The generator only asserts the code; it does not compute it. Java follows the spec and returns a price, so this case fails. Please fix the golden (for example `strike = -1.0`) or state the extra rule |
-| G-J4 | `shortrate_g-0082` ("10,001 curve pillars", `rates.shortrate.zcb` on `HULL_WHITE`) has no `short_rate`. The spec says `short_rate` is required for every model in `zcb`, and G-31 says `E_LIMIT` is checked after `E_SCHEMA`, so the case is `E_SCHEMA` (field `short_rate`), not `E_LIMIT`. Java returns `E_SCHEMA`. Please add `short_rate` to the golden's inputs |
-| G-J5 | `mcgreeks_g-0022` ("paths 10,000,001") passes `seed` as the JSON integer 1. `seed` is a decimal u64 string, and `mc-greeks.md` (R5 L5) puts the `seed` `E_SCHEMA` check before every other check. So the case is `E_SCHEMA`, not `E_LIMIT`. Java returns `E_SCHEMA`. Please make the golden's seed the string `"1"` |
-| G-J6 | `xva.exposure.portfolio_hw`: the spec asks for quadrature that "resolves the kinks (split at the zeros of `f`)" but does not say how to find the zeros or the level sets of `f - y` for the PFE. A fixed scan (the generator's 601 points over ±12 SD) misses the narrow region above `y` near the flat maximum of a long payer's deflated value; that understated `pfe_99` in 8 goldens. Java now finds every critical point of `f` from the analytic `f'` (a 6,001-point scan refined by bisection), so `f` is monotone between breakpoints and each piece has at most one root, refined by bisection. Please state a requirement in the spec: every zero and level crossing of `f` must be found, for example by bracketing the critical points |
-| G-J7 | `xva.exposure.portfolio_hw`: the PFE output key for a general quantile is not defined; the goldens only show `pfe_95` and `pfe_99`. Java writes `pfe_` followed by the percentage with trailing zeros removed (`0.975` gives `pfe_97.5`). Please state the naming rule |
+Status at R6 (2026-11-12). Closed points name their ruling; open points await one.
+
+| # | Status | Choice |
+|---|---|---|
+| G-J1 | closed, G-38 (Java order adopted) | `xva.exposure.swap_ee_hw`: the spec requires `start_years >= 0` but names no error code for a negative value, and no golden case covers it. Java returns `E_DOMAIN` (key `start_years`), checked after `side` and before `payment_times`. Please state the code and its place in the check order |
+| G-J2 | closed, G-38 (method accepted) | `rates.shortrate.hw_calibrate`: a 2,001-point log-spaced scan of `F` on `[1e-4, 1]` brackets the minimum (an end point gives `E_NO_CONVERGENCE`), then bisection on the analytic `F'` (bond-option vegas at fixed Jamshidian strikes) to a relative width of 1e-15 |
+| G-J3 | closed, G-38 (golden now strike -1.0) | `capfloor_g-0040` ("1 + K tau <= 0") conflicts with the spec: it has `strike = -0.5` on annual periods, so `1 + K tau = 0.5 > 0`, and the rule in `short-rate-models.md` (`1 + K tau_i > 0`, else `E_DOMAIN`) makes it a valid case. The generator only asserts the code; it does not compute it. Java follows the spec and returns a price, so this case fails. Please fix the golden (for example `strike = -1.0`) or state the extra rule |
+| G-J4 | closed, G-50 (golden gains `short_rate`) | `shortrate_g-0082` ("10,001 curve pillars", `rates.shortrate.zcb` on `HULL_WHITE`) has no `short_rate`. The spec says `short_rate` is required for every model in `zcb`, and G-31 says `E_LIMIT` is checked after `E_SCHEMA`, so the case is `E_SCHEMA` (field `short_rate`), not `E_LIMIT`. Java returns `E_SCHEMA`. Please add `short_rate` to the golden's inputs |
+| G-J5 | closed, G-50 (golden seed `"1"`) | `mcgreeks_g-0022` ("paths 10,000,001") passes `seed` as the JSON integer 1. `seed` is a decimal u64 string, and `mc-greeks.md` (R5 L5) puts the `seed` `E_SCHEMA` check before every other check. So the case is `E_SCHEMA`, not `E_LIMIT`. Java returns `E_SCHEMA`. Please make the golden's seed the string `"1"` |
+| G-J6 | open | `xva.exposure.portfolio_hw`: the spec asks for quadrature that "resolves the kinks (split at the zeros of `f`)" but does not say how to find the zeros or the level sets of `f - y` for the PFE. A fixed scan (the generator's 601 points over ±12 SD) misses the narrow region above `y` near the flat maximum of a long payer's deflated value; that understated `pfe_99` in 8 goldens. Java now finds every critical point of `f` from the analytic `f'` (a 6,001-point scan refined by bisection), so `f` is monotone between breakpoints and each piece has at most one root, refined by bisection. Please state a requirement in the spec: every zero and level crossing of `f` must be found, for example by bracketing the critical points |
+| G-J7 | open | `xva.exposure.portfolio_hw`: the PFE output key for a general quantile is not defined; the goldens only show `pfe_95` and `pfe_99`. Java writes `pfe_` followed by the percentage with trailing zeros removed (`0.975` gives `pfe_97.5`). Please state the naming rule |
+
+## Stage I
+
+From `program/STAGE_I_JAVA_HANDOVER.md`, with the rulings of `stage-i-rulings.md`.
+
+| # | Status | Choice |
+|---|---|---|
+| J-I1 | closed, I-45 | I-4 limits: `hedge.minvar.ratio` allows 200 hedge instruments (covariance up to 201 x 201, or 200 `hedge_changes` series); `hedge.residual.report` allows 1,000 rows of `a` and of `covariance`, 200 columns of `a` |
+| J-I2 | closed, I-46 | Feasibility in binary64: with `k = n`, `x_p` is inside a bound within `1e-10 max(1, abs(x_p_j))`; otherwise the dual active-set method reports `E_INFEASIBLE` when a violated bound has no primal step (part outside the active span below 1e-10 of the whole) and no active bound can be dropped. Within the I-46 bound of 1e-9 |
+| J-I3 | closed, I-47 | `null` for an optional scalar or array key is `E_SCHEMA`. No golden yet |
+| J-I4 | closed, I-48 | The orthant enumeration and its `E_LIMIT` above 20 sign-open instruments were replaced by a sign search (`LeastSquaresHedge`, the enumeration kept as a test oracle); the I-4 limit of 200 is the only size limit of `hedge.qp.solve` |
+| J-I5 | closed, I-43 | Relative zero-variance tests in `hedge.effectiveness` and `hedge.backtest.delta` |
+| J-I6 | open (review finding 7) | Solver tolerances not fixed by the spec: Java flips a sign at a kink with relative slack `KINK_TOL = 1e-9` (`hedging.LeastSquaresHedge`). The review found 1e-9, 1e-11 and 1e-12 across builds and different iteration caps; I-48 asks for one. Please state the kink tolerance and iteration cap for every build |
+| J-I7 | closed, I-51 | `cli.Main.CONTRACT` is 1.11.0, landed with the runner change |
