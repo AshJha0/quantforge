@@ -40,7 +40,7 @@ Stage I takes the hedging domain (plan section 4 row I, TRACEABILITY Domain 08) 
 - Rust mutation CI: an 8 GiB address-space cap on every test binary and on the golden check, so a runaway mutant no longer kills the runner (`program/STAGE_I_CARRY.md`, item 1). The eight survivors of the stage F sample are killed by named tests.
 
 ### Verified
-- Conformance on the stage I integration tree, contract 1.11.0: 14,935 of 14,935 cases in each of Java, C++, Python and Rust, 0 failures, 0 not implemented (observed on one Windows machine through the neutral runner, 2026-11-11; C++ and Rust counts in `program/STAGE_I_CPP_HANDOVER.md` and `program/STAGE_I_RUST_HANDOVER.md`).
+- Conformance on the stage I integration tree, contract 1.11.0: 14,935 of 14,935 cases (7,413 value-checked, 5,008 error, 1,257 invariance and 1,257 `any` base cases) in each of Java, C++, Python and Rust, 0 failures, 0 not implemented (observed on one Windows machine through the neutral runner, 2026-11-11; C++ and Rust counts in `program/STAGE_I_CPP_HANDOVER.md` and `program/STAGE_I_RUST_HANDOVER.md`).
 
 ### Known issues
 - **Q6 is blocked by data terms.** The Cboe delayed-quote pages prohibit automated download, and the Cboe website terms (section 2) and the Deribit terms of service (clause 32.3) forbid publishing derived data without written consent. No data were downloaded and nothing was fitted; tutorial 22 (Q6) is not shipped (handover, "Q6 status").
@@ -53,7 +53,7 @@ Stage I takes the hedging domain (plan section 4 row I, TRACEABILITY Domain 08) 
 Tag `v0.7.0` on `e150116`. Stage G is at Implemented, not Validated. No golden value of an earlier stage changed.
 
 ### Verified on the integration tree (`stage-g-int`, 2026-11-11)
-- Each of the four builds passed 14,492 of 14,492 golden cases through the neutral runner, `expsim_g` 102 of 102 included (observed, one Windows machine): Java (JDK 25), Python (CPython 3.15.2), Rust (1.99.1) and C++ (WinLibs GCC 16.2, `-DQF_WERROR=ON`). Of these, 589 are stage G cases in 20 suites over 21 operations and 1,026 are E1 cases for the first 20 stage G operations (`datasets/golden/stage_g/`, `stage_g_e1/`).
+- Each of the four builds passed 14,492 of 14,492 golden cases (value-checked, error and invariance cases counted together) through the neutral runner, `expsim_g` 102 of 102 included (observed, one Windows machine): Java (JDK 25), Python (CPython 3.15.2), Rust (1.99.1) and C++ (WinLibs GCC 16.2, `-DQF_WERROR=ON`). Of these, 589 are stage G cases in 20 suites over 21 operations and 1,026 are E1 cases for the first 20 stage G operations (`datasets/golden/stage_g/`, `stage_g_e1/`).
 - Unit tests (observed, same machine): Java `mvn -Pcoverage verify` 399 tests, 0 failures, JaCoCo line coverage 98.2% and branch 91.5%; Rust `cargo test --release` 271 passed, clippy `-D warnings` and `fmt --check` clean; C++ ctest passed, 260 test cases and 7,529 assertions; Python `pytest` 1,566 passed and 2 skipped (two opt-in tests), `ruff` and `mypy --strict` (103 files) clean. Fuzz, 45 s per language, seed 72: 0 findings for C++, Java and Rust.
 - Gates: `quality_gate.py --check-specs --check-register` (0 new gaps, 10 baseline), `check_hygiene.py` (0 problems), `gen_name_map.py --check`, `governance_gate.py`, `build_gallery.py --check` (25 entries, 0 differences), the site build (291 pages, 0 broken links) and the banned-word check (no hits).
 
@@ -89,7 +89,7 @@ Tag `v0.7.0` on `e150116`. Stage G is at Implemented, not Validated. No golden v
 Tagged `v0.6.0` on `e1ddfbb` (PR #29). Stage F landed in two pull requests. Part 1 (PR #25, merged at `5c8fa9d`) holds wave 0 and the parallel lanes. Part 2 holds waves 1 to 3, listed first below. No golden value of an earlier stage changed. Stage F is at Implemented, not Validated.
 
 ### Verified on the merged part 2 tree (`db99d87`, 2026-11-10)
-- On the merged part 2 tree (`stage-f-part2` at `db99d87`, 2026-11-10, observed on one Windows machine through the neutral runner), each of the four builds passed 12,462 of 12,462 golden cases: Java (JDK 25.0.5), Python (CPython 3.15.2), Rust (1.99.1) and C++ (GCC 15.2.0 under WSL, built with `-DQF_WERROR=ON`). Observed, one full run per language.
+- On the merged part 2 tree (`stage-f-part2` at `db99d87`, 2026-11-10, observed on one Windows machine through the neutral runner), each of the four builds passed 12,462 of 12,462 golden cases (value-checked, error and invariance cases counted together): Java (JDK 25.0.5), Python (CPython 3.15.2), Rust (1.99.1) and C++ (GCC 15.2.0 under WSL, built with `-DQF_WERROR=ON`). Observed, one full run per language.
 - Gates: `quality_gate.py --check-specs` and `--check-register` (no new gaps), `check_hygiene.py`, `gen_name_map.py --check`, `governance_gate.py`, the site build (0 broken links) and the banned-word check (`git grep -i` for the word the project does not use; no hits) all pass.
 - Outside oracle: 225 of 438 stage F value cases (51.4%), **below the 60% floor** (known issue below).
 - The CLIs of Java and Python reported version 0.4.0 at `db99d87`; both now report 0.6.0, like C++ and Rust. That changes no output.
@@ -100,7 +100,7 @@ Tagged `v0.6.0` on `e1ddfbb` (PR #29). Stage F landed in two pull requests. Part
 - F4 portfolio risk: historical, filtered historical, parametric and Monte Carlo VaR and ES; Kupiec, Christoffersen and the Basel traffic light (`06-risk/var-es-and-backtests.md`, F-31, F-32, F-39); FRTB-SA GIRR delta under MAR21 (`06-risk/frtb-sa-girr.md`, F-33).
 - F5 book and use case 4: `book.lifecycle.apply`, `book.marks.resolve` (`07-portfolio/book-lifecycle.md`, F-34); `usecase.factor_attribution` (`04-pricing/use-cases.md`).
 - F6 model fixes: R7 CDS index option on Pedersen's adjusted forward, R8 GARCH estimates with standard errors and Student-t innovations (the coverage study puts every parameter inside its preregistered band), R10 VIX null quotes and local-vol continuity at slice expiries.
-- 438 stage F value goldens in 11 suites, besides the 5,207 E1 goldens: 12,462 golden cases in 125 suite files (counted from `datasets/golden/`). New tolerance classes `jacobian`, `standard_error`, `aad_sensitivity`, `ift_jacobian`. Model inventory entries MF-1 to MF-11.
+- 438 stage F value goldens in 11 suites, besides the 5,207 E1 goldens: 12,462 golden cases (value-checked, error and invariance cases counted together) in 125 suite files (counted from `datasets/golden/`). New tolerance classes `jacobian`, `standard_error`, `aad_sensitivity`, `ift_jacobian`. Model inventory entries MF-1 to MF-11.
 - Outside oracle for stage F (`oracle/outside_f.py`): QuantLib 1.44, SciPy, NumPy and `arch` 7.2.0. `arch` runs under WSL, because Windows Application Control blocks pandas on the host.
 
 ### Added (part 1)
@@ -153,7 +153,7 @@ Tagged `v0.5.0` on `1b2bc7e` (PR #22). Two spec sessions wrote slices E1 to E8 i
 - The outside-oracle count is stricter from stage E: a case counts only if every output is a QuantLib value or plain arithmetic on QuantLib values (rulings E-A17, E-B28). Under it, 557 of 895 stage E cases count (62.2%).
 
 ### Verified on the merged tree (`597abf2`, 2026-11-08)
-- C++, Java and Rust each reported 6,817 of 6,817 golden cases passing in their final stage E commits (`5af077d`, `a9cd195`, `141245d`; reported). Java's commit also reports unit tests, batch checks and fuzz passing.
+- C++, Java and Rust each reported 6,817 of 6,817 golden cases (value-checked and error cases counted together) passing in their final stage E commits (`5af077d`, `a9cd195`, `141245d`; reported). Java's commit also reports unit tests, batch checks and fuzz passing.
 - Python passed 6,817 of 6,817 through the neutral runner (observed, local, Windows).
 - Outside oracle: spec A 280 of 446, spec B 277 of 449, stage E 557 of 895 (62.2%), every counted row on QuantLib 1.44.
 
@@ -195,7 +195,7 @@ Released as tag `v0.4.2` (PR #19). No golden value of an earlier stage changed.
 - The cross-platform matrix runs on main after the merge; its result is checked then, not before the PR.
 
 ### Verified on the merged tree (observed, local, Windows, 2026-11-08, `r2`)
-- Java, C++, Python and Rust each pass 5,922 of 5,922 golden cases and every batch check; unit tests pass in all four.
+- Java, C++, Python and Rust each pass 5,922 of 5,922 golden cases (value-checked and error cases counted together) and every batch check; unit tests pass in all four.
 - Fuzzing 60 seconds per language with seed 53 found nothing. Inputs a minute: Rust 126,600, C++ 92,600, Python 12,800 (up from about 9,500 at R1, still short of the 50,000 target), Java 8,600.
 - Calibration stability 28 of 28; P&L explain on 2025 Treasury moves PASS; stage D outside-oracle coverage 64.1%; `run_all.py` regenerated every golden byte-identical.
 
@@ -208,7 +208,7 @@ Merged as PR #17 (`3194067`). No new pricing. No golden value changed except whe
 ### Added
 - Batch mode, CLI contract 1.6.0: `quantforge --batch` as a synonym of `quantforge batch`, framing rules BT1 to BT8, the optional `--timings` flag (`diagnostics.elapsed_ns`), and 19 stream fixtures in `datasets/batch/streams.json`, checked by `conformance/runner/batch_check.py`. The wire `contract_version` stays 1.0.0.
 - Rulings R1-1 to R1-6 (`specifications/r1-rulings.md`): cross-currency is a synthetic constant-notional basis swap; the ESTR payment lag of 2 is a Strata library choice, while TP ICAP terms use 1; bond-future conversion factors take an optional `contract` input with CME rounding; every credit operation needs a `LOG_LINEAR_DF` discount curve; cap and swaption conventions are stylised; USGS Good Fridays with a SIFMA early close are business days, and SOFR compounding skips every Good Friday.
-- The edge-case register (`specifications/edge-case-register.md`, 14 rows), the model inventory (`docs/model-inventory.md`), calendar provenance (`datasets/calendar_provenance.json`) and tolerances in money (`conformance/tolerances/money.md`). 5,837 golden cases in 74 suite files.
+- The edge-case register (`specifications/edge-case-register.md`, 14 rows), the model inventory (`docs/model-inventory.md`), calendar provenance (`datasets/calendar_provenance.json`) and tolerances in money (`conformance/tolerances/money.md`). 5,837 golden cases (value-checked and error cases counted together) in 74 suite files.
 - GitHub Actions jobs: recorder and gap monitor, cross-platform conformance (3 OS by 4 languages), daily workflows (a) and (c) through `--batch`, sanity bands including Bank of England GBP curves, per-stage mutation report, outside-oracle floor, calendar expiry. A local Linux C++ path under WSL. See `docs/developer-guides/r1-infra.md`.
 - Batch performance targets, written before measuring (`benchmarks/targets.md`), and a real-data gallery page (`docs/curves/real-usd-treasury.md`).
 - Three R3 preregistrations, signed by Claude under the owner's delegation; the holdout is unread.
@@ -231,7 +231,7 @@ Tagged `v0.4` on `e4047a1` after pull request #15. Stage D is at Implemented, no
 ### Added
 - Stage D in all four implementations, from the specs alone: D1 rates core (SOFR and ESTR OIS, curve jumps, lookback, observation shift and lockout, IBOR fallbacks, meeting-date steps, Hull-White futures convexity, CSA discounting, OIS index basis, joint bootstrap, smoothness-regularised and Huber curve fits), D2 bonds, Z-spread, asset swap, FRN, repo and special repo, conversion factors and CTD, sovereign fits, D3 cross-currency basis and NDFs, D4 ISDA CDS, index CDS and composite curves, D5 implied dividends and borrow, futures basis, index dividends and dividend futures, rebalancing, corporate actions and TRS, D6 CPI curves with seasonality, zero-coupon inflation swaps and linkers, D7 caps, floors and swaptions on flat or quoted vol, D8 commodity curves with seasonality and storage carry, D9 MBS prepayment and pass-through pricing.
 - Specifications, numeric targets set before the code, and rulings D1 to D64. CLI contract 1.5.0 adds operations and no error code; the wire `contract_version` stays 1.0.0.
-- 331 golden cases in 20 suites in `datasets/golden/stage_d/`, from QuantLib (including its ISDA CDS engine), SciPy, analytic, exact-rational and hand sources. Each of the four builds passed all 5,514 cases. Wrong-convention checks are listed in `oracle/REPORT.md`, each shown to fail.
+- 331 golden cases in 20 suites in `datasets/golden/stage_d/`, from QuantLib (including its ISDA CDS engine), SciPy, analytic, exact-rational and hand sources. Each of the four builds passed all 5,514 cases (value-checked and error cases counted together). Wrong-convention checks are listed in `oracle/REPORT.md`, each shown to fail.
 - Stage D sections in `LEARN.md`, `COOKBOOK.md`, `ARCHITECTURE.md`, `GLOSSARY.md` and `ROADMAP.md`.
 
 ### Changed
@@ -251,7 +251,7 @@ Tagged v0.3 on `20d4d07` after main CI passed. Stage C is at Implemented, not Va
 ### Added
 - Stage C in all four implementations, from the specs alone: equity forwards on funding and borrow curves with discrete dividends, Black-Scholes, Black-76 and Bachelier prices and implied vols, analytic and bump Greeks, spot and forward delta conventions, risk-reversal and butterfly quotes, SVI and SSVI evaluation and fits with no-arbitrage checks, vol surface query, check and vega, Hagan SABR with a density check, arbitrage-free SABR (Hagan, Kumar, Lesniewski and Woodward, 2014), and use case 3.
 - Specifications, numeric targets set before the code, and rulings C1 to C17. CLI contract 1.4.0 adds `E_ARBITRAGE`; the wire `contract_version` stays 1.0.0.
-- 446 golden cases in 11 suites in `datasets/golden/stage_c/`, from QuantLib, Strata, analytic and hand sources. All four builds passed all 5,183 cases. 30 wrong-convention checks, each shown to fail.
+- 446 golden cases in 11 suites in `datasets/golden/stage_c/`, from QuantLib, Strata, analytic and hand sources. All four builds passed all 5,183 cases (value-checked and error cases counted together). 30 wrong-convention checks, each shown to fail.
 - Stage C sections in `LEARN.md`, `COOKBOOK.md`, `ARCHITECTURE.md`, `GLOSSARY.md` and `ROADMAP.md`.
 
 ### Fixed
@@ -272,7 +272,7 @@ Tagged v0.3 on `20d4d07` after main CI passed. Stage C is at Implemented, not Va
 - Per-stage structure in `LEARN.md`, `COOKBOOK.md`, `ARCHITECTURE.md`, `GLOSSARY.md` and `ROADMAP.md`, with done, carried and planned status for each stage.
 
 ### Changed
-- Swap and FRA checks against QuantLib now assert 1e-5 on a notional of 1,000,000. Use case 1 has an outside QuantLib check. The invariant checker covers stage B. Constructed inputs carry the `synthetic` tag. 4,737 golden cases; no golden value changed.
+- Swap and FRA checks against QuantLib now assert 1e-5 on a notional of 1,000,000. Use case 1 has an outside QuantLib check. The invariant checker covers stage B. Constructed inputs carry the `synthetic` tag. 4,737 golden cases (value-checked and error cases counted together); no golden value changed.
 - Rust checks array limits before work, closing its gap against ruling B24.
 - The recorder has six sources, each with its notice, and stores identical bytes once while still logging them.
 - All four CLIs report version 0.2.0.
@@ -284,7 +284,7 @@ Released as v0.2 (tag on `fe33b40`). Stage B is at Implemented, not Validated: v
 ### Added
 - Stage B in all four implementations, from the specs alone: units and money, convention registry, schedules, curve object, SONIA and minimal SOFR OIS bootstrap (sequential and global), bid/ask by mid, projection curves, FRAs, swaps, tenor basis, FX forwards, FX swaps, implied curves and quote-driven basis, FX delta, Gauss-Newton, Levenberg-Marquardt, BFGS, regularisation, a calibration sensitivity report, DV01, key-rate risk, duration, hedge solve with a simple spread-based cost, and use cases 1 and 2.
 - Specifications for all of that, numeric targets set before the code, and rulings B0 to B24. CLI contract 1.3.0; the wire `contract_version` stays 1.0.0.
-- 343 golden cases in 18 suites in `datasets/golden/stage_b/`. All four builds passed all 4,731 cases in 39 suites. `specifications/stage-b-rulings.md` lists which suites have an outside oracle; `usecases` and `rulings_b` have none.
+- 343 golden cases in 18 suites in `datasets/golden/stage_b/`. All four builds passed all 4,731 cases (value-checked and error cases counted together) in 39 suites. `specifications/stage-b-rulings.md` lists which suites have an outside oracle; `usecases` and `rulings_b` have none.
 - 23 deliberate convention errors in `oracle/MUTANTS.md`, each caught by the deep suites.
 - Tickets W06 to W12, W20 and W25, data and solutions for EX-005, EX-006, EX-008 and EX-009, stage B examples and worked examples.
 - Data survey results in `datasets/data-availability.md`: FRED dropped, Bank of England forwards added as conditional, and most curve inputs labelled synthetic.
@@ -302,7 +302,7 @@ Released 2026-11-06, tag `v0.1` on `a60d814`. Validation is self-assessment unti
 ### Added
 - Four equal implementations of domain 01, in Java 25, C++26, Python 3.15.2 and Rust 1.99.1, each behind the `quantforge` CLI.
 - Specifications for day counts, calendars, compounding, timezones and cut-off, data checks, snapshot hash, as-of store and replay, RNG, Sobol, root finders, integration, interpolation, differentiation and linear algebra, statistics and time series, PDE, Monte Carlo and COS, with rulings and input limits. CLI contract 1.2.0.
-- `oracle/`, using exact rationals, mpmath, QuantLib, Strata, NumPy and SciPy, hand cases and replay. 4,388 golden cases in 21 suites. All four builds passed all of them.
+- `oracle/`, using exact rationals, mpmath, QuantLib, Strata, NumPy and SciPy, hand cases and replay. 4,388 golden cases (value-checked and error cases counted together) in 21 suites. All four builds passed all of them.
 - Neutral runner, CLI fuzz driver, mutation harnesses, and CI workflows.
 - Public-data recorder with a licence manifest, and a hash-chained forward log. The recorder is built but not scheduled.
 - Schemas, tolerance policy with no global default, data-availability table, oracle map and licences, ADR-0009 and ADR-0010, numeric targets for stage B.

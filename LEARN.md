@@ -297,7 +297,7 @@ Specs: `specifications/04-pricing/credit.md`, `credit-options-and-copulas.md` an
 
 ## Risk, hedging and use cases
 
-**What it is.** Phase R2 (v0.4.2) added four risk operations on top of the existing pricers: `risk.curve.par`, `risk.curve.key_rate`, `risk.curve.jacobian` and `risk.pnl.explain`. All risk is bump and revalue (ADR-0010), and every number is money per basis point, signed: risk is the change in value for a +1 bp move, so a receiver of fixed, which loses when rates rise, has a negative DV01 (the 2Y receiver below: -4,806.94). Specs: `specifications/06-risk/par-and-key-rate.md` and `pnl-explain.md`. Goldens: `datasets/golden/r2/`, 41 risk cases and 44 P&L explain cases, each re-priced in QuantLib 1.44. All four builds reproduce these numbers: each passed 5,922 of 5,922 golden cases on the merged `r2` tree (observed, local, 2026-11-08).
+**What it is.** Phase R2 (v0.4.2) added four risk operations on top of the existing pricers: `risk.curve.par`, `risk.curve.key_rate`, `risk.curve.jacobian` and `risk.pnl.explain`. All risk is bump and revalue (ADR-0010), and every number is money per basis point, signed: risk is the change in value for a +1 bp move, so a receiver of fixed, which loses when rates rise, has a negative DV01 (the 2Y receiver below: -4,806.94). Specs: `specifications/06-risk/par-and-key-rate.md` and `pnl-explain.md`. Goldens: `datasets/golden/r2/`, 41 risk cases and 44 P&L explain cases, each re-priced in QuantLib 1.44. All four builds reproduce these numbers: each passed 5,922 of 5,922 golden cases (value-checked and error cases counted together) on the merged `r2` tree (observed, local, 2026-11-08).
 
 ### Learning path
 
@@ -385,7 +385,7 @@ Every topic is Implemented, not Validated, and all inputs are synthetic unless a
 
 ## Stage F: curves, portfolio risk and the book
 
-Stage F (v0.6.0) is at Implemented, not Validated. On the merged part 2 tree (`stage-f-part2` at `db99d87`, 2026-11-10, observed on one Windows machine through the neutral runner), each of the four builds passed 12,462 of 12,462 golden cases: Java (JDK 25.0.5), Python (CPython 3.15.2), Rust (1.99.1) and C++ (GCC 15.2.0 under WSL, built with `-DQF_WERROR=ON`). Specs and rulings F-1 to F-44 are in `specifications/`. Every number quoted here is the expected output of the named golden case, computed by the oracle at 40 or more digits.
+Stage F (v0.6.0) is at Implemented, not Validated. On the merged part 2 tree (`stage-f-part2` at `db99d87`, 2026-11-10, observed on one Windows machine through the neutral runner), each of the four builds passed 12,462 of 12,462 golden cases (value-checked, error and invariance cases counted together): Java (JDK 25.0.5), Python (CPython 3.15.2), Rust (1.99.1) and C++ (GCC 15.2.0 under WSL, built with `-DQF_WERROR=ON`). Specs and rulings F-1 to F-44 are in `specifications/`. Every number quoted here is the expected output of the named golden case, computed by the oracle at 40 or more digits.
 
 Tutorials for this section: [5, risk](docs/getting-started/tutorial-5-risk.md) (VaR, ES, backtests, FRTB delta), [8, multi-curve building](docs/getting-started/tutorial-8-multicurve.md) (joint solve and Jacobian), [14, the trading book](docs/getting-started/tutorial-14-book.md) and [15, advanced risk](docs/getting-started/tutorial-15-advanced-risk.md).
 
@@ -456,7 +456,7 @@ Tutorials for this section: [6, interest rate models](docs/getting-started/tutor
 
 ## Stage I: hedging
 
-Stage I was released as v0.8.0 on 2026-11-12. Everything below is specified in `specifications/08-hedging/` (rulings I-1 to I-55) and pinned by 443 golden cases in 21 suites in `datasets/golden/stage_i/`. On the integration tree, at CLI contract 1.11.0, each of the four builds passed 14,935 of 14,935 golden cases, all stages included (2026-11-11, observed on one Windows machine through the neutral runner). Every input is synthetic.
+Stage I was released as v0.8.0 on 2026-11-12. Everything below is specified in `specifications/08-hedging/` (rulings I-1 to I-55) and pinned by 443 golden cases in 21 suites in `datasets/golden/stage_i/`. On the integration tree, at CLI contract 1.11.0, each of the four builds passed 14,935 of 14,935 golden cases (7,413 value-checked, 5,008 error, 1,257 invariance and 1,257 `any` base cases), all stages included (2026-11-11, observed on one Windows machine through the neutral runner). Every input is synthetic.
 
 Tutorials 17 to 21 work through this section with real outputs in all four languages: [17, delta hedges](docs/getting-started/tutorial-17-delta-hedge.md), [18, the QP solver](docs/getting-started/tutorial-18-minvar-qp.md), [19, credit and correlation](docs/getting-started/tutorial-19-credit-correlation.md), [20, equity and rates](docs/getting-started/tutorial-20-cross-asset.md) and [21, costs](docs/getting-started/tutorial-21-hedge-costs.md).
 
@@ -518,7 +518,7 @@ The order things were built, with each stage's own summary. The topics above reu
 
 ### Stage D: Curves and fixed income
 
-**Status: built, target v0.4.** Implemented, not Validated. At merge `95cbf11` on 2026-11-07, each of the four implementations passed 5,514 of 5,514 golden cases locally, 331 of them in stage D's 20 suites (`conformance/README.md`). `specifications/stage-d-handover.md` lists every stage D spec; rulings D1 to D64 are in `specifications/stage-d-rulings.md`.
+**Status: built, target v0.4.** Implemented, not Validated. At merge `95cbf11` on 2026-11-07, each of the four implementations passed 5,514 of 5,514 golden cases (value-checked and error cases counted together) locally, 331 of them in stage D's 20 suites (`conformance/README.md`). `specifications/stage-d-handover.md` lists every stage D spec; rulings D1 to D64 are in `specifications/stage-d-rulings.md`.
 
 ### R2: Risk
 
@@ -528,4 +528,4 @@ Phase R2 (target v0.4.2) added `risk.curve.par`, `risk.curve.key_rate`, `risk.cu
 
 **What was built.** Eight slices: arbitrage-free SVI surfaces with local and forward vol (E1), the Heston family and SLV (E2), FX smile conventions (E3), rates and inflation vol (E4), exotics and American options (E5), correlation (E6), GARCH, variance swaps and a VIX-style index (E7), and CDS options, copulas and the large-pool model (E8). Two spec sessions wrote the specs and goldens in parallel; rulings are E-A1 to E-A40 (`specifications/stage-e-rulings.md`) and E-B1 to E-B40 (`specifications/stage-e-rulings-b.md`), and each language was built from the specs alone.
 
-**Status: implemented in all four languages.** At the stage E merge, `597abf2` (2026-11-08), the golden set holds 6,817 cases in 91 suite files (counted from `datasets/golden/`). C++, Java and Rust each reported 6,817 of 6,817 passing in their final stage E commits (`5af077d`, `a9cd195`, `141245d`; *reported*). Python passed 6,817 of 6,817 through the neutral runner on the merged tree, built from `597abf2` (*observed*, local, Windows, 2026-11-08). Outside oracle under plan rule 11.2.5, counting a case only if every output is a QuantLib 1.44 value (rulings E-A17, E-B28): 557 of the 895 stage E cases, 62.2% (spec A 280 of 446 in `oracle/outside_register_e_a.json`, spec B 277 of 449 in `oracle/outside_register_e_b.json`; *outside-checked*). All inputs are synthetic, and no model is Validated (`docs/model-inventory.md`).
+**Status: implemented in all four languages.** At the stage E merge, `597abf2` (2026-11-08), the golden set holds 6,817 cases (value-checked and error cases counted together) in 91 suite files (counted from `datasets/golden/`). C++, Java and Rust each reported 6,817 of 6,817 passing in their final stage E commits (`5af077d`, `a9cd195`, `141245d`; *reported*). Python passed 6,817 of 6,817 through the neutral runner on the merged tree, built from `597abf2` (*observed*, local, Windows, 2026-11-08). Outside oracle under plan rule 11.2.5, counting a case only if every output is a QuantLib 1.44 value (rulings E-A17, E-B28): 557 of the 895 stage E cases, 62.2% (spec A 280 of 446 in `oracle/outside_register_e_a.json`, spec B 277 of 449 in `oracle/outside_register_e_b.json`; *outside-checked*). All inputs are synthetic, and no model is Validated (`docs/model-inventory.md`).

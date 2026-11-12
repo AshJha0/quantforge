@@ -216,7 +216,7 @@ Each entry gives: purpose; inputs; known limitations; validation status; use res
 
 ## Stage E models (E1 to E8)
 
-Stage E is Implemented: all four languages pass every stage E golden (6,817 of 6,817 cases in the full set at merge `597abf2`, 2026-11-08). 557 of the 895 stage E cases (62.2%) are outside-checked under rule 11.2.5 and rulings E-A17 and E-B28. Every input is synthetic; no entry is Validated. Last full review of these entries: 2026-11-08.
+Stage E is Implemented: all four languages pass every stage E golden (6,817 of 6,817 cases (value-checked and error cases counted together) in the full set at merge `597abf2`, 2026-11-08). 557 of the 895 stage E cases (62.2%) are outside-checked under rule 11.2.5 and rulings E-A17 and E-B28. Every input is synthetic; no entry is Validated. Last full review of these entries: 2026-11-08.
 
 ### Slices E1, E2, E3, E5 (entries ME-A)
 

@@ -6,6 +6,6 @@ Each file in `core/`, `stage_b/` and `stage_c/` holds `suite`, `spec`, `spec_ver
 
 `reviewer` says "none: self-assessment until the end-of-project human review", which is the true state of every file. `verified_by` names the sources that agreed. A case with only hand or replay sources can share a misreading with the spec, as `oracle/README.md` explains.
 
-Stage A has 22 suites and 4,394 cases. Stage B has 18 suites and 343 cases, so 40 suites and 4,737 cases in all. Which stage B suites have an outside oracle is in `specifications/stage-b-rulings.md`.
+Stage A has 22 suites and 4,394 cases (4,217 value-checked, 177 error). Stage B has 18 suites and 343 cases, so 40 suites and 4,737 cases (value-checked and error cases counted together) in all. Which stage B suites have an outside oracle is in `specifications/stage-b-rulings.md`.
 
 Stage C adds 11 suites and 446 cases, in `stage_c/`. Sources per suite are in `specifications/stage-c-rulings.md`.

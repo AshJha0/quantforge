@@ -25,11 +25,11 @@ Passing means a build matches the oracle within tolerance. Agreement between lan
 ## Report
 Each run writes `conformance/reports/NAME.json`, which git ignores, and prints pass, fail and not-implemented counts per suite.
 
-Stage B result (observed, local, Windows, 2026-11-06, at commit `13d9871`): Java, C++, Python and Rust each passed 4,731 of 4,731 cases in 39 suites. CI has not run stage B, as the branch is not pushed. Stage A's cases passed in CI on pull request #1.
+Stage B result (observed, local, Windows, 2026-11-06, at commit `13d9871`): Java, C++, Python and Rust each passed 4,731 of 4,731 cases (value-checked and error cases counted together) in 39 suites. CI has not run stage B, as the branch is not pushed. Stage A's cases passed in CI on pull request #1.
 
-Stage D result (observed, local, Windows, 2026-11-07, at merge `95cbf11`): Java, C++, Python and Rust each passed 5,514 of 5,514 cases, 331 of them in stage D's 20 suites. Fuzzing with seed 17 found nothing. Figures are from the coordinating session's run.
+Stage D result (observed, local, Windows, 2026-11-07, at merge `95cbf11`): Java, C++, Python and Rust each passed 5,514 of 5,514 cases (value-checked and error cases counted together), 331 of them in stage D's 20 suites. Fuzzing with seed 17 found nothing. Figures are from the coordinating session's run.
 
-Stage C result (observed, local, Windows, 2026-11-07, at commit `39bc3db`): Java, C++, Python and Rust each passed 5,183 of 5,183 cases in 51 suites, 446 of them in stage C's 11 suites. Fuzzing for 60 seconds per language with seed 13 found nothing. Pull request #13 and main CI then passed, and the tree was tagged `v0.3`.
+Stage C result (observed, local, Windows, 2026-11-07, at commit `39bc3db`): Java, C++, Python and Rust each passed 5,183 of 5,183 cases (value-checked and error cases counted together) in 51 suites, 446 of them in stage C's 11 suites. Fuzzing for 60 seconds per language with seed 13 found nothing. Pull request #13 and main CI then passed, and the tree was tagged `v0.3`.
 
 ## Running
 

@@ -4,7 +4,7 @@
 
 | Folder | Holds |
 |---|---|
-| `golden/core/` | 22 stage A suites, 4,394 cases, written only by `oracle/` |
+| `golden/core/` | 22 stage A suites, 4,394 cases (4,217 value-checked, 177 error), written only by `oracle/` |
 | `golden/stage_b/` | 18 stage B suites, 343 cases, written only by `oracle/`. All inputs are constructed, and quotes are synthetic |
 | `golden/stage_c/` | 11 stage C suites, 446 cases, written only by `oracle/`. All inputs are constructed, and quotes are synthetic |
 | `schemas/` | JSON schemas for cases, results and market data |
