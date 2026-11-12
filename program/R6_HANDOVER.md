@@ -90,3 +90,5 @@ Read: `specifications/r6-rulings.md` R6-2.1, R6-2.2, R6-5.1 to R6-5.6, R6-7.1 to
 ### Oracle agreement
 
 Goldens from `oracle/python/gen_r6_w2.py`, `gen_stage_g_w1.py R9`, `gen_stage_d_credit.py`, `gen_stage_d_w3.py`; MC acceptance 13 of 13 (`oracle/R6_BARRIER_ACCEPTANCE.json`); QuantLib CDS within 1.3e-11; basis implied repo re-solved by brentq within 1e-12.
+
+WAVE 2 READY 3c5bcfe
