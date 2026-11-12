@@ -310,8 +310,8 @@ pub fn estimate(returns: &[f64], start: Start, student: bool, demean: bool) -> R
     let s1 = start_variance(&e, start)?;
     let var = e.iter().map(|x| x * x).sum::<f64>() / n;
     if !var.is_finite() || !s1.is_finite() {
-        // R6-8: finite returns whose mean or variance overflows binary64.
-        return fail("E_DOMAIN", "the sample variance of the returns overflows");
+        // R6-8.1: finite returns whose mean or variance overflows binary64.
+        return fail("E_NON_FINITE", "the sample variance of the returns overflows");
     }
     let no = || fail("E_NO_CONVERGENCE", "no interior maximum of the likelihood");
     let Some(mut p) = search(&e, s1, var, student) else {
