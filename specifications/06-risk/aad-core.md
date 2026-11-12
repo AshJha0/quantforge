@@ -10,7 +10,12 @@ Formal statement. Let `V(theta)` be the G-18 reference scheme price (`rates.shor
 
 Inputs: exactly those of `rates.shortrate.bermudan_swaption`, with its errors and limits (G-31).
 
-Outputs: `price`; `d_price_d_discount_factors` (one per curve pillar, in order); `d_price_d_mean_reversion`; `d_price_d_sigma`.
+Outputs (ruling R6-27; each is a derivative of the **discrete scheme at the case's grid**, not a model sensitivity):
+- `price`: the G-18 scheme price at the case grid.
+- `d_price_d_discount_factors` (one per curve pillar, in order): the scheme price's derivative per unit absolute change of each input discount factor.
+- `d_price_d_mean_reversion`, `d_price_d_sigma`: the scheme price's derivative per unit change of `a` and of `sigma`.
+
+**Use restriction: not for hedging at the default grid.** At 101 space points and 50 steps a year the discount-factor entries differ from the converged ones by up to about 18% while the price differs by 0.24% (`oracle/R6_LADDER_GRIDS.json`). Use a finer grid (the `r6/aadladder_r6` golden shows one within 2% of the 801/400 reference on every entry) or treat the ladder as a test of the AAD, not as a hedge ratio. The real fix, a second-order scheme or Richardson extrapolation so the default grid is within 1%, is stage K item K-8.
 
 Reference (the golden). Richardson-extrapolated central differences of the binary64 scheme with relative bumps `h = 1e-4` and `5e-5`: `D(h) = (V(x(1+h)) - V(x(1-h)))/(2 h x)`, `ref = (4 D(h/2) - D(h))/3`, the Q3a rule (`book-sensitivities.md`). A second pair (`5e-5`, `2.5e-5`) must agree with the first within 1e-9 relative (of the larger of the value and 1e-6 x notional). If it does not, a bump has moved an exercise decision across a grid node, the derivative is not defined there, and the case is dropped. One of the four candidate cases (`bermudan_g-0001` at the coarser grid) was dropped this way (agreement 1.1e-9).
 
