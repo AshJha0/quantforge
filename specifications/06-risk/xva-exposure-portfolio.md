@@ -20,7 +20,7 @@ Formal statement. At an exposure time `t`, the deflated netting-set value is `f(
 - `epe = sum_i discounted_ee(t_i)(t_i - t_(i-1)) / t_n` (`t_0 = 0`);
 - `cva = (1 - R) sum_i discounted_ee(t_i)(e^(-h t_(i-1)) - e^(-h t_i))` (G-16 buckets).
 
-Builds may use any one-dimensional quadrature that resolves the kinks (split at the zeros of `f`) to 1e-10 relative. Outputs in the order of `exposure_times`.
+Builds may use any one-dimensional quadrature that resolves the kinks (split at the zeros of `f`) to 1e-10 relative. Every zero of `f` and every crossing `f = y` must be found (ruling R6-5.5): bracket the critical points of `f` from the analytic `f'` on at least 6,001 points over `x` in `[-12, 12]` standard deviations, refine by bisection to 1e-14 relative, then find the at most one root on each monotone piece by bisection. Output keys for a quantile `q`: `deflated_pfe_` + `100 q` with trailing zeros removed (R6-5.6). Outputs in the order of `exposure_times`.
 
 Worked example (the ORE demo, `oracle/ore/ORE_DEMO.json`). The `exposure_g-0001` swap (5-year payer at 3% on 10 million, `a = 0.05`, `sigma = 0.01`): this operation gives `discounted_ee = 352,680.98, 285,620.69, 204,079.27, 107,026.77`, equal to the Jamshidian values of wave 4a to every printed digit, and `deflated_pfe_95` at one year 824,786.37. ORE prices the swap today at 419,429.419545 against the closed-form 419,429.419545, and with 8,000 paths its EE lies within 1.0 standard error at every date.
 
