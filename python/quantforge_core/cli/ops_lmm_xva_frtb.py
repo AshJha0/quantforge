@@ -207,6 +207,17 @@ def _commodity_delta(i: Inputs) -> Any:
     return core.frtb.commodity_delta(rows)
 
 
+@op("risk.frtb.sbm_total")
+def _sbm_total(i: Inputs) -> Any:
+    from ..frtb import SBM_CLASSES, SBM_MEASURES, SBM_SCENARIOS
+    rows = []
+    for s in _items(i, "components"):
+        cls, measure = s.enum("risk_class", SBM_CLASSES), s.enum("measure", SBM_MEASURES)
+        sc = s.object("scenarios")
+        rows.append((cls, measure, [sc.real(name) for name in SBM_SCENARIOS]))
+    return core.frtb.sbm_total(rows)
+
+
 def _bucket(s: Inputs) -> object:
     value = s.raw.get("bucket")
     if isinstance(value, bool) or not isinstance(value, (int, str)):

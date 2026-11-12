@@ -9,7 +9,7 @@ from typing import Any
 from .. import __version__, strictjson
 from ..errors import QfError
 
-CONTRACT_VERSION = "1.11.0"  # ruling I-51 (stage I)
+CONTRACT_VERSION = "1.12.0"  # ruling R6-0.1
 SCHEMA_VERSION = "1.0"
 MAX_CASE_DEPTH = 80
 MAX_LINE_BYTES = 16_777_216  # BT5
