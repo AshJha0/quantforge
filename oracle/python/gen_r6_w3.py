@@ -362,10 +362,53 @@ def audit_suite():
     return s
 
 
+# ---------------------------------------------------------------------------------- R6-11 use case 6
+def uc6_ref(inp):
+    import gen_stage_i_w1 as W
+    S, r, q, v = inp["spot"], inp["rate"], inp["dividend_yield"], inp["volatility"]
+    T = inp["targets"]
+    gb = {g: mp.fsum(p["quantity"] * W.bs_greeks(S, r, q, v, p)[g] for p in inp["portfolio"]) for g in ("DELTA", "GAMMA", "VEGA")}
+    A = [[float(h["lot_size"] * W.bs_greeks(S, r, q, v, h)[t]) for h in inp["hedges"]] for t in T]
+    b = [float(gb[t]) for t in T]
+    w = [1.0 / max(1.0, abs(x)) ** 2 for x in b]
+    n = len(inp["hedges"])
+    out, _, _ = W.int_ref({"a": A, "b": b, "weights": w, "lot_sizes": [1.0] * n, "lower_lots": [-inp["max_lots"]] * n, "upper_lots": [inp["max_lots"]] * n})
+    lots = [int(x) for x in out["lots"]]
+    after = {g: gb[g] + mp.fsum(lots[j] * inp["hedges"][j]["lot_size"] * W.bs_greeks(S, r, q, v, inp["hedges"][j])[g] for j in range(n)) for g in gb}
+    cost = sum(abs(lots[j]) * inp["hedges"][j]["lot_size"] * inp["hedges"][j]["half_spread"] for j in range(n))
+    return {"greeks_before": {g.lower(): float(x) for g, x in gb.items()}, "lots": lots, "greeks_after": {g.lower(): float(x) for g, x in after.items()},
+            "hedge_cost": float(cost), "rounding_cost": out["rounding_cost"]}
+
+
+def uc6_suite():
+    s = Suite("uc6_r6", "specifications/04-pricing/use-cases.md", G)
+    mk = dict(spot=100.0, rate=0.03, dividend_yield=0.01, volatility=0.22)
+    book = [{"instrument": "CALL", "strike": 105.0, "expiry_years": 0.5, "quantity": -1500.0},
+            {"instrument": "PUT", "strike": 92.0, "expiry_years": 1.0, "quantity": 800.0},
+            {"instrument": "CALL", "strike": 100.0, "expiry_years": 0.25, "quantity": 600.0}]
+    fut = {"instrument": "UNDERLYING", "lot_size": 100.0, "half_spread": 0.01}
+    c1 = {"instrument": "CALL", "strike": 100.0, "expiry_years": 0.75, "lot_size": 100.0, "half_spread": 0.05}
+    p1 = {"instrument": "PUT", "strike": 95.0, "expiry_years": 0.5, "lot_size": 100.0, "half_spread": 0.04}
+    cases = [("delta only, futures in lots of 100", dict(mk, portfolio=book, hedges=[fut], targets=["DELTA"], max_lots=1000)),
+             ("delta and vega with futures and one listed call", dict(mk, portfolio=book, hedges=[fut, c1], targets=["DELTA", "VEGA"], max_lots=1000)),
+             ("delta, gamma and vega with futures, a call and a put", dict(mk, portfolio=book, hedges=[fut, c1, p1], targets=["DELTA", "GAMMA", "VEGA"], max_lots=1000)),
+             ("lot bound binds", dict(mk, portfolio=book, hedges=[fut, c1], targets=["DELTA", "VEGA"], max_lots=3))]
+    for d, inp in cases:
+        s.add("usecase.option_hedge_lots", inp, uc6_ref(inp), cls="root_finding",
+              output_classes={"lots": E}, verified=["mpmath-50 Greeks", "exact rational integer search (stage I int_ref)"],
+              tags=["r6", "usecase", "hedge", "synthetic"], description=d)
+    base = cases[1][1]
+    for d, inp, code in (("no hedges", dict(base, hedges=[]), "E_INPUT"), ("lot size 0", dict(base, hedges=[dict(fut, lot_size=0.0), c1]), "E_DOMAIN"),
+                         ("unknown target", dict(base, targets=["THETA"]), "E_SCHEMA"), ("negative half-spread", dict(base, hedges=[dict(fut, half_spread=-0.01), c1]), "E_DOMAIN"),
+                         ("max_lots below 1", dict(base, max_lots=0), "E_DOMAIN"), ("NaN volatility", dict(base, volatility="NaN"), "E_DOMAIN")):
+        s.add("usecase.option_hedge_lots", inp, error=code, cls=E, tags=["r6", "usecase", "invalid", "synthetic"] + (["e1"] if "NaN" in d else []), description=d)
+    return s
+
+
 def main():
     keep = common.GOLDEN
     common.GOLDEN = keep.parent / "r6"
-    for fn in ([scaling] if "scale" in sys.argv else [audit_suite] if "audit" in sys.argv else [qp_large, scaling, audit_suite]):
+    for fn in ([scaling] if "scale" in sys.argv else [audit_suite] if "audit" in sys.argv else [uc6_suite] if "uc6" in sys.argv else [qp_large, scaling, audit_suite, uc6_suite]):
         fn().write()
     common.GOLDEN = keep
     from pathlib import Path

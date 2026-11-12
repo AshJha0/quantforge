@@ -48,6 +48,21 @@ Ordinary least squares with an intercept on `X = [1, F]`. If the smallest singul
 
 Class `interpolation`. Goldens: 40-digit normal equations. Outside: `scipy.linalg.lstsq` (rule 11.2.5) [S2, S3].
 
+## Use case 6: `usecase.option_hedge_lots` (stage I, ruling R6-11.20)
+
+**Plain idea.** A desk holds an equity options book and hedges its delta, and perhaps its gamma and vega, with listed instruments that trade only in whole contracts and cost a half-spread to trade. The use case chains three stage I pieces: the Greeks of `hedge.greeks.neutralise`, the integer search of `hedge.integer.solve`, and a spread cost as `hedge.spread_cost`.
+
+Inputs: `spot`, `rate`, `dividend_yield`, `volatility` (as `hedge.greeks.neutralise`); `portfolio` (its option list, each `{instrument, strike, expiry_years, quantity}`); `hedges`, at least one (else `E_INPUT`), each `{instrument, strike, expiry_years, lot_size, half_spread}` with `instrument` `UNDERLYING` (no `strike` or `expiry_years`), `CALL` or `PUT`; `lot_size > 0` and `half_spread >= 0` (else `E_DOMAIN`); `targets`, a non-empty subset of `DELTA`, `GAMMA`, `VEGA` (another value `E_SCHEMA`); `max_lots`, an Integer `>= 1` (else `E_DOMAIN`).
+
+1. Book Greeks `b_t` (delta, gamma, vega per unit volatility, with `e^{-qT}`), as `hedge.greeks.neutralise`.
+2. Per-lot hedge Greeks `A[t][j] = lot_size_j * greek_t(hedge_j)`, one row per target in the order given.
+3. Weights `w_t = 1 / max(1, |b_t|)^2`, so each Greek counts relative to its own size.
+4. `lots` = `hedge.integer.solve` on `a = A`, `b`, `weights = w`, `lot_sizes` all 1, `lower_lots = -max_lots`, `upper_lots = max_lots` (its I-7 tie rule and R6-11.5 floor apply).
+5. `greeks_after_g = b_g + sum_j lots_j lot_size_j greek_g(hedge_j)` for all three Greeks (also the ones not targeted).
+6. `hedge_cost = sum_j |lots_j| lot_size_j half_spread_j`; `rounding_cost` as `hedge.integer.solve`.
+
+Outputs: `greeks_before` and `greeks_after` (`{delta, gamma, vega}`), `lots` (Integers), `hedge_cost`, `rounding_cost`. Class `root_finding`, `lots` exact. Suite `r6/uc6_r6` (`oracle/python/gen_r6_w3.py`): 4 value cases (delta only; delta and vega; all three with a call and a put; a binding lot bound) and 6 error cases including an E1 case. Tutorial: tutorial 21 (hedging) gains a section on this use case (docs lane).
+
 ## Acceptance
 
 Limits are in `stage-b-targets.md`. Oracle: replay built on parts that are checked against QuantLib. Use case 1's book PV and delta are checked against QuantLib `FxForward`. The hedge sums, and use case 2's, have no outside source. Trades, hedges and costs are calculations on synthetic data: nothing is traded. Real output is in `examples/README.md`.
