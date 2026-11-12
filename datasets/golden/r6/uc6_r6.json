@@ -1,0 +1,721 @@
+{
+ "schema_version": "1.0",
+ "suite": "uc6_r6",
+ "spec": "specifications/04-pricing/use-cases.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_r6_w3.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "uc6_r6-0001",
+   "operation": "usecase.option_hedge_lots",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "volatility": 0.22,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 105.0,
+      "expiry_years": 0.5,
+      "quantity": -1500.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 92.0,
+      "expiry_years": 1.0,
+      "quantity": 800.0
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.25,
+      "quantity": 600.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING",
+      "lot_size": 100.0,
+      "half_spread": 0.01
+     }
+    ],
+    "targets": [
+     "DELTA"
+    ],
+    "max_lots": 1000
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "greeks_before": {
+      "delta": -543.9558653641492,
+      "gamma": -3.9798000582361954,
+      "vega": -2902.435779284491
+     },
+     "lots": [
+      5
+     ],
+     "greeks_after": {
+      "delta": -43.95586536414918,
+      "gamma": -3.9798000582361954,
+      "vega": -2902.435779284491
+     },
+     "hedge_cost": 5.0,
+     "rounding_cost": 0.006529897149898594
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50 Greeks",
+    "exact rational integer search (stage I int_ref)"
+   ],
+   "tags": [
+    "r6",
+    "usecase",
+    "hedge",
+    "synthetic"
+   ],
+   "description": "delta only, futures in lots of 100",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "uc6_r6-0002",
+   "operation": "usecase.option_hedge_lots",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "volatility": 0.22,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 105.0,
+      "expiry_years": 0.5,
+      "quantity": -1500.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 92.0,
+      "expiry_years": 1.0,
+      "quantity": 800.0
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.25,
+      "quantity": 600.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING",
+      "lot_size": 100.0,
+      "half_spread": 0.01
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.75,
+      "lot_size": 100.0,
+      "half_spread": 0.05
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "VEGA"
+    ],
+    "max_lots": 1000
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "greeks_before": {
+      "delta": -543.9558653641492,
+      "gamma": -3.9798000582361954,
+      "vega": -2902.435779284491
+     },
+     "lots": [
+      5,
+      1
+     ],
+     "greeks_after": {
+      "delta": 12.525360257437303,
+      "gamma": -1.9327626890542065,
+      "vega": 475.1758798657911
+     },
+     "hedge_cost": 10.0,
+     "rounding_cost": 0.027333224416551043
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50 Greeks",
+    "exact rational integer search (stage I int_ref)"
+   ],
+   "tags": [
+    "r6",
+    "usecase",
+    "hedge",
+    "synthetic"
+   ],
+   "description": "delta and vega with futures and one listed call",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "uc6_r6-0003",
+   "operation": "usecase.option_hedge_lots",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "volatility": 0.22,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 105.0,
+      "expiry_years": 0.5,
+      "quantity": -1500.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 92.0,
+      "expiry_years": 1.0,
+      "quantity": 800.0
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.25,
+      "quantity": 600.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING",
+      "lot_size": 100.0,
+      "half_spread": 0.01
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.75,
+      "lot_size": 100.0,
+      "half_spread": 0.05
+     },
+     {
+      "instrument": "PUT",
+      "strike": 95.0,
+      "expiry_years": 0.5,
+      "lot_size": 100.0,
+      "half_spread": 0.04
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "GAMMA",
+     "VEGA"
+    ],
+    "max_lots": 1000
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "greeks_before": {
+      "delta": -543.9558653641492,
+      "gamma": -3.9798000582361954,
+      "vega": -2902.435779284491
+     },
+     "lots": [
+      8,
+      -2,
+      4
+     ],
+     "greeks_after": {
+      "delta": 16.30182719847815,
+      "gamma": 1.0579383335281847,
+      "vega": 387.3353455561391
+     },
+     "hedge_cost": 34.0,
+     "rounding_cost": 0.0893715285822485
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50 Greeks",
+    "exact rational integer search (stage I int_ref)"
+   ],
+   "tags": [
+    "r6",
+    "usecase",
+    "hedge",
+    "synthetic"
+   ],
+   "description": "delta, gamma and vega with futures, a call and a put",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "uc6_r6-0004",
+   "operation": "usecase.option_hedge_lots",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "volatility": 0.22,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 105.0,
+      "expiry_years": 0.5,
+      "quantity": -1500.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 92.0,
+      "expiry_years": 1.0,
+      "quantity": 800.0
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.25,
+      "quantity": 600.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING",
+      "lot_size": 100.0,
+      "half_spread": 0.01
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.75,
+      "lot_size": 100.0,
+      "half_spread": 0.05
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "VEGA"
+    ],
+    "max_lots": 3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "greeks_before": {
+      "delta": -543.9558653641492,
+      "gamma": -3.9798000582361954,
+      "vega": -2902.435779284491
+     },
+     "lots": [
+      3,
+      1
+     ],
+     "greeks_after": {
+      "delta": -187.4746397425627,
+      "gamma": -1.9327626890542065,
+      "vega": 475.1758798657911
+     },
+     "hedge_cost": 8.0,
+     "rounding_cost": 0.017539870396373163
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50 Greeks",
+    "exact rational integer search (stage I int_ref)"
+   ],
+   "tags": [
+    "r6",
+    "usecase",
+    "hedge",
+    "synthetic"
+   ],
+   "description": "lot bound binds",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "uc6_r6-0005",
+   "operation": "usecase.option_hedge_lots",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "volatility": 0.22,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 105.0,
+      "expiry_years": 0.5,
+      "quantity": -1500.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 92.0,
+      "expiry_years": 1.0,
+      "quantity": 800.0
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.25,
+      "quantity": 600.0
+     }
+    ],
+    "hedges": [],
+    "targets": [
+     "DELTA",
+     "VEGA"
+    ],
+    "max_lots": 1000
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "usecase",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "no hedges"
+  },
+  {
+   "case_id": "uc6_r6-0006",
+   "operation": "usecase.option_hedge_lots",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "volatility": 0.22,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 105.0,
+      "expiry_years": 0.5,
+      "quantity": -1500.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 92.0,
+      "expiry_years": 1.0,
+      "quantity": 800.0
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.25,
+      "quantity": 600.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING",
+      "lot_size": 0.0,
+      "half_spread": 0.01
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.75,
+      "lot_size": 100.0,
+      "half_spread": 0.05
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "VEGA"
+    ],
+    "max_lots": 1000
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "usecase",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "lot size 0"
+  },
+  {
+   "case_id": "uc6_r6-0007",
+   "operation": "usecase.option_hedge_lots",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "volatility": 0.22,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 105.0,
+      "expiry_years": 0.5,
+      "quantity": -1500.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 92.0,
+      "expiry_years": 1.0,
+      "quantity": 800.0
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.25,
+      "quantity": 600.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING",
+      "lot_size": 100.0,
+      "half_spread": 0.01
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.75,
+      "lot_size": 100.0,
+      "half_spread": 0.05
+     }
+    ],
+    "targets": [
+     "THETA"
+    ],
+    "max_lots": 1000
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "usecase",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "unknown target"
+  },
+  {
+   "case_id": "uc6_r6-0008",
+   "operation": "usecase.option_hedge_lots",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "volatility": 0.22,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 105.0,
+      "expiry_years": 0.5,
+      "quantity": -1500.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 92.0,
+      "expiry_years": 1.0,
+      "quantity": 800.0
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.25,
+      "quantity": 600.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING",
+      "lot_size": 100.0,
+      "half_spread": -0.01
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.75,
+      "lot_size": 100.0,
+      "half_spread": 0.05
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "VEGA"
+    ],
+    "max_lots": 1000
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "usecase",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "negative half-spread"
+  },
+  {
+   "case_id": "uc6_r6-0009",
+   "operation": "usecase.option_hedge_lots",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "volatility": 0.22,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 105.0,
+      "expiry_years": 0.5,
+      "quantity": -1500.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 92.0,
+      "expiry_years": 1.0,
+      "quantity": 800.0
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.25,
+      "quantity": 600.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING",
+      "lot_size": 100.0,
+      "half_spread": 0.01
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.75,
+      "lot_size": 100.0,
+      "half_spread": 0.05
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "VEGA"
+    ],
+    "max_lots": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "usecase",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "max_lots below 1"
+  },
+  {
+   "case_id": "uc6_r6-0010",
+   "operation": "usecase.option_hedge_lots",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "volatility": "NaN",
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 105.0,
+      "expiry_years": 0.5,
+      "quantity": -1500.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 92.0,
+      "expiry_years": 1.0,
+      "quantity": 800.0
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.25,
+      "quantity": 600.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING",
+      "lot_size": 100.0,
+      "half_spread": 0.01
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0,
+      "expiry_years": 0.75,
+      "lot_size": 100.0,
+      "half_spread": 0.05
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "VEGA"
+    ],
+    "max_lots": 1000
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "usecase",
+    "invalid",
+    "synthetic",
+    "e1"
+   ],
+   "description": "NaN volatility"
+  }
+ ]
+}

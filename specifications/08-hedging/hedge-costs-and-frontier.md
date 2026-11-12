@@ -98,3 +98,7 @@ Mutants caught: costs ignored; the margin constraint ignored.
 ## Amendment after the builds
 
 Ruling I-54: answers are exact to `root_finding` at a hold/not-hold switch point too (`hedgecost_i-0023`).
+
+## R6 amendment (R6-11.10)
+
+The impact sentence above means: a trade of size `x` executed wholly at a price displaced by `impact x` costs `impact x^2` (Almgren-Chriss temporary impact); a permanent impact built up during the trade would cost half that. The definition `impact x^2` is unchanged.

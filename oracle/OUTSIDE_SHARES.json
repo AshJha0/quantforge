@@ -1,39 +1,46 @@
 {
- "rule": "R6-13 (D6): library-object + library-primitive over every case of the stage, error cases included",
+ "rule": "R6-13 (D6, owner 2026-11-12): library-object + library-primitive over the stage's value-checked cases; old all-case share beside it",
  "floor": 0.6,
  "stages": {
   "D": {
    "without_sweeps": {
-    "cases": 654,
+    "cases": 520,
     "library-object": 419,
     "library-primitive": 0,
     "reimplementation": 0,
-    "none": 235,
+    "none": 101,
     "counted": 419,
-    "share": 0.6407
+    "share": 0.8058,
+    "all_cases_share": 0.6407,
+    "error_and_invariance_cases": 134
    },
    "with_sweeps": {
-    "cases": 654,
+    "cases": 520,
     "library-object": 419,
     "library-primitive": 0,
     "reimplementation": 0,
-    "none": 235,
+    "none": 101,
     "counted": 419,
-    "share": 0.6407
+    "share": 0.8058,
+    "all_cases_share": 0.6407,
+    "error_and_invariance_cases": 134
    },
    "sweeps": null,
    "libraries": {
     "QuantLib 1.44": 419
    },
+   "no_outside_reference": {},
    "per_operation": {
     "bond.fit.nelson_siegel": {
-     "cases": 6,
+     "cases": 2,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 6,
+     "none": 2,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 4
     },
     "bond.frn.price": {
      "cases": 4,
@@ -42,25 +49,31 @@
      "reimplementation": 0,
      "none": 4,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 0
     },
     "bond.futures.basis": {
-     "cases": 4,
+     "cases": 1,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 4,
+     "none": 1,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
     },
     "bond.futures.conversion_factor": {
-     "cases": 15,
+     "cases": 13,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 15,
+     "none": 13,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
     },
     "bond.price.from_curve": {
      "cases": 35,
@@ -69,16 +82,20 @@
      "reimplementation": 0,
      "none": 0,
      "counted": 35,
-     "share": 1.0
+     "share": 1.0,
+     "all_cases_share": 1.0,
+     "error_and_invariance_cases": 0
     },
     "bond.price.from_yield": {
-     "cases": 113,
+     "cases": 110,
      "library-object": 110,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 3,
+     "none": 0,
      "counted": 110,
-     "share": 0.9735
+     "share": 1.0,
+     "all_cases_share": 0.9735,
+     "error_and_invariance_cases": 3
     },
     "bond.spread.asset_swap": {
      "cases": 5,
@@ -87,61 +104,75 @@
      "reimplementation": 0,
      "none": 5,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 0
     },
     "bond.spread.z": {
-     "cases": 71,
+     "cases": 70,
      "library-object": 70,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 1,
+     "none": 0,
      "counted": 70,
-     "share": 0.9859
+     "share": 1.0,
+     "all_cases_share": 0.9859,
+     "error_and_invariance_cases": 1
     },
     "bond.yield.from_price": {
-     "cases": 37,
+     "cases": 36,
      "library-object": 36,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 1,
+     "none": 0,
      "counted": 36,
-     "share": 0.973
+     "share": 1.0,
+     "all_cases_share": 0.973,
+     "error_and_invariance_cases": 1
     },
     "calib.curve.robust": {
-     "cases": 9,
+     "cases": 4,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 9,
+     "none": 4,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 5
     },
     "calib.curve.smooth": {
-     "cases": 8,
+     "cases": 4,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 8,
+     "none": 4,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 4
     },
     "cmdty.curve.forward": {
-     "cases": 7,
+     "cases": 2,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 7,
+     "none": 2,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 5
     },
     "cmdty.storage.carry": {
-     "cases": 5,
+     "cases": 2,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 5,
+     "none": 2,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
     },
     "core.calendar.add_business_days": {
      "cases": 1,
@@ -150,7 +181,9 @@
      "reimplementation": 0,
      "none": 1,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 0
     },
     "core.calendar.is_business_day": {
      "cases": 4,
@@ -159,7 +192,9 @@
      "reimplementation": 0,
      "none": 4,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 0
     },
     "core.conventions.lookup": {
      "cases": 1,
@@ -168,151 +203,185 @@
      "reimplementation": 0,
      "none": 1,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 0
     },
     "credit.cds.bootstrap": {
-     "cases": 10,
+     "cases": 5,
      "library-object": 4,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 6,
+     "none": 1,
      "counted": 4,
-     "share": 0.4
+     "share": 0.8,
+     "all_cases_share": 0.4,
+     "error_and_invariance_cases": 5
     },
     "credit.cds.price": {
-     "cases": 32,
+     "cases": 25,
      "library-object": 25,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 7,
+     "none": 0,
      "counted": 25,
-     "share": 0.7812
+     "share": 1.0,
+     "all_cases_share": 0.7812,
+     "error_and_invariance_cases": 7
     },
     "credit.curve.composite": {
-     "cases": 5,
+     "cases": 2,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 5,
+     "none": 2,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
     },
     "credit.index.intrinsic": {
-     "cases": 4,
+     "cases": 1,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 4,
+     "none": 1,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
     },
     "eq.borrow.implied": {
-     "cases": 4,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 4,
-     "counted": 0,
-     "share": 0.0
-    },
-    "eq.corporate_action.adjust": {
-     "cases": 6,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 6,
-     "counted": 0,
-     "share": 0.0
-    },
-    "eq.dividend.implied": {
-     "cases": 4,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 4,
-     "counted": 0,
-     "share": 0.0
-    },
-    "eq.futures.basis": {
-     "cases": 5,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 5,
-     "counted": 0,
-     "share": 0.0
-    },
-    "eq.index.dividends": {
-     "cases": 4,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 4,
-     "counted": 0,
-     "share": 0.0
-    },
-    "eq.index.rebalance": {
      "cases": 3,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 3,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 1
     },
-    "eq.trs.pv": {
+    "eq.corporate_action.adjust": {
      "cases": 4,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 4,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
     },
-    "fx.ndf.pv": {
-     "cases": 6,
+    "eq.dividend.implied": {
+     "cases": 1,
      "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 6,
-     "counted": 0,
-     "share": 0.0
-    },
-    "fx.xccy.bootstrap": {
-     "cases": 6,
-     "library-object": 1,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 5,
-     "counted": 1,
-     "share": 0.1667
-    },
-    "fx.xccy.pv": {
-     "cases": 4,
-     "library-object": 3,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 1,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
+    },
+    "eq.futures.basis": {
+     "cases": 3,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 3,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "eq.index.dividends": {
+     "cases": 1,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 1,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
+    },
+    "eq.index.rebalance": {
+     "cases": 1,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 1,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "eq.trs.pv": {
+     "cases": 2,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 2,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "fx.ndf.pv": {
+     "cases": 3,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 3,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
+    },
+    "fx.xccy.bootstrap": {
+     "cases": 1,
+     "library-object": 1,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 1,
+     "share": 1.0,
+     "all_cases_share": 0.1667,
+     "error_and_invariance_cases": 5
+    },
+    "fx.xccy.pv": {
+     "cases": 3,
+     "library-object": 3,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 0,
      "counted": 3,
-     "share": 0.75
+     "share": 1.0,
+     "all_cases_share": 0.75,
+     "error_and_invariance_cases": 1
     },
     "infl.curve.cpi": {
-     "cases": 8,
+     "cases": 2,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 8,
+     "none": 2,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 6
     },
     "infl.linker.price": {
-     "cases": 6,
+     "cases": 5,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 6,
+     "none": 5,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 1
     },
     "infl.linker.price_curve": {
      "cases": 1,
@@ -321,7 +390,9 @@
      "reimplementation": 0,
      "none": 1,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 0
     },
     "infl.zcis.pv": {
      "cases": 3,
@@ -330,52 +401,64 @@
      "reimplementation": 0,
      "none": 3,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 0
     },
     "mbs.cashflows": {
-     "cases": 9,
+     "cases": 3,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 9,
+     "none": 3,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 6
     },
     "mbs.price": {
-     "cases": 5,
+     "cases": 3,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 5,
+     "none": 3,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
     },
     "rates.basis.ois_spread": {
-     "cases": 5,
+     "cases": 4,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 5,
+     "none": 4,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 1
     },
     "rates.cap.price": {
-     "cases": 19,
+     "cases": 12,
      "library-object": 12,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 7,
+     "none": 0,
      "counted": 12,
-     "share": 0.6316
+     "share": 1.0,
+     "all_cases_share": 0.6316,
+     "error_and_invariance_cases": 7
     },
     "rates.csa.discount": {
-     "cases": 8,
+     "cases": 5,
      "library-object": 3,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 5,
+     "none": 2,
      "counted": 3,
-     "share": 0.375
+     "share": 0.6,
+     "all_cases_share": 0.375,
+     "error_and_invariance_cases": 3
     },
     "rates.curve.discount": {
      "cases": 3,
@@ -384,61 +467,75 @@
      "reimplementation": 0,
      "none": 0,
      "counted": 3,
-     "share": 1.0
+     "share": 1.0,
+     "all_cases_share": 1.0,
+     "error_and_invariance_cases": 0
     },
     "rates.curve.joint_bootstrap": {
-     "cases": 4,
+     "cases": 2,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 4,
+     "none": 2,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
     },
     "rates.fallback.rate": {
-     "cases": 5,
+     "cases": 4,
      "library-object": 4,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 1,
+     "none": 0,
      "counted": 4,
-     "share": 0.8
+     "share": 1.0,
+     "all_cases_share": 0.8,
+     "error_and_invariance_cases": 1
     },
     "rates.futures.convexity": {
-     "cases": 10,
+     "cases": 6,
      "library-object": 6,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 4,
+     "none": 0,
      "counted": 6,
-     "share": 0.6
+     "share": 1.0,
+     "all_cases_share": 0.6,
+     "error_and_invariance_cases": 4
     },
     "rates.ois.bootstrap": {
-     "cases": 14,
+     "cases": 10,
      "library-object": 10,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 4,
+     "none": 0,
      "counted": 10,
-     "share": 0.7143
+     "share": 1.0,
+     "all_cases_share": 0.7143,
+     "error_and_invariance_cases": 4
     },
     "rates.ois.compound_dated": {
-     "cases": 81,
+     "cases": 71,
      "library-object": 71,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 10,
+     "none": 0,
      "counted": 71,
-     "share": 0.8765
+     "share": 1.0,
+     "all_cases_share": 0.8765,
+     "error_and_invariance_cases": 10
     },
     "rates.ois.fit_steps": {
-     "cases": 7,
+     "cases": 2,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 7,
+     "none": 2,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 5
     },
     "rates.ois.pv": {
      "cases": 8,
@@ -447,34 +544,42 @@
      "reimplementation": 0,
      "none": 0,
      "counted": 8,
-     "share": 1.0
+     "share": 1.0,
+     "all_cases_share": 1.0,
+     "error_and_invariance_cases": 0
     },
     "rates.ois.step_curve": {
-     "cases": 8,
+     "cases": 4,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 8,
+     "none": 4,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 4
     },
     "rates.swaption.price": {
-     "cases": 13,
+     "cases": 10,
      "library-object": 10,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 3,
+     "none": 0,
      "counted": 10,
-     "share": 0.7692
+     "share": 1.0,
+     "all_cases_share": 0.7692,
+     "error_and_invariance_cases": 3
     },
     "repo.forward": {
-     "cases": 6,
+     "cases": 4,
      "library-object": 4,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 2,
+     "none": 0,
      "counted": 4,
-     "share": 0.6667
+     "share": 1.0,
+     "all_cases_share": 0.6667,
+     "error_and_invariance_cases": 2
     },
     "repo.implied_rate": {
      "cases": 4,
@@ -483,7 +588,9 @@
      "reimplementation": 0,
      "none": 0,
      "counted": 4,
-     "share": 1.0
+     "share": 1.0,
+     "all_cases_share": 1.0,
+     "error_and_invariance_cases": 0
     },
     "vol.option.price": {
      "cases": 5,
@@ -492,178 +599,217 @@
      "reimplementation": 0,
      "none": 5,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 0
     }
    },
    "meets_floor": true
   },
   "E": {
    "without_sweeps": {
-    "cases": 895,
+    "cases": 710,
     "library-object": 557,
     "library-primitive": 0,
     "reimplementation": 0,
-    "none": 338,
+    "none": 153,
     "counted": 557,
-    "share": 0.6223
+    "share": 0.7845,
+    "all_cases_share": 0.6223,
+    "error_and_invariance_cases": 185
    },
    "with_sweeps": {
-    "cases": 895,
+    "cases": 710,
     "library-object": 557,
     "library-primitive": 0,
     "reimplementation": 0,
-    "none": 338,
+    "none": 153,
     "counted": 557,
-    "share": 0.6223
+    "share": 0.7845,
+    "all_cases_share": 0.6223,
+    "error_and_invariance_cases": 185
    },
    "sweeps": null,
    "libraries": {
     "QuantLib 1.44": 557
    },
+   "no_outside_reference": {},
    "per_operation": {
     "credit.cdsoption.implied_vol": {
-     "cases": 62,
+     "cases": 60,
      "library-object": 60,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 2,
+     "none": 0,
      "counted": 60,
-     "share": 0.9677
+     "share": 1.0,
+     "all_cases_share": 0.9677,
+     "error_and_invariance_cases": 2
     },
     "credit.cdsoption.price": {
-     "cases": 114,
+     "cases": 108,
      "library-object": 108,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 6,
+     "none": 0,
      "counted": 108,
-     "share": 0.9474
+     "share": 1.0,
+     "all_cases_share": 0.9474,
+     "error_and_invariance_cases": 6
     },
     "credit.copula.joint_default": {
-     "cases": 16,
+     "cases": 10,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 16,
+     "none": 10,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 6
     },
     "credit.lhp.loss_cdf": {
-     "cases": 5,
+     "cases": 3,
      "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 5,
-     "counted": 0,
-     "share": 0.0
-    },
-    "credit.lhp.tranche_loss": {
-     "cases": 22,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 22,
-     "counted": 0,
-     "share": 0.0
-    },
-    "exotic.american.baw": {
-     "cases": 14,
-     "library-object": 12,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 2,
-     "counted": 12,
-     "share": 0.8571
-    },
-    "exotic.american.crr": {
-     "cases": 21,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 21,
-     "counted": 0,
-     "share": 0.0
-    },
-    "exotic.american.fd": {
-     "cases": 14,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 14,
-     "counted": 0,
-     "share": 0.0
-    },
-    "exotic.asian.geometric": {
-     "cases": 15,
-     "library-object": 12,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 3,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "credit.lhp.tranche_loss": {
+     "cases": 18,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 18,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 4
+    },
+    "exotic.american.baw": {
+     "cases": 12,
+     "library-object": 12,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 0,
      "counted": 12,
-     "share": 0.8
+     "share": 1.0,
+     "all_cases_share": 0.8571,
+     "error_and_invariance_cases": 2
+    },
+    "exotic.american.crr": {
+     "cases": 18,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 18,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
+    },
+    "exotic.american.fd": {
+     "cases": 9,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 9,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 5
+    },
+    "exotic.asian.geometric": {
+     "cases": 12,
+     "library-object": 12,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 12,
+     "share": 1.0,
+     "all_cases_share": 0.8,
+     "error_and_invariance_cases": 3
     },
     "exotic.barrier.price": {
-     "cases": 57,
+     "cases": 54,
      "library-object": 54,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 3,
+     "none": 0,
      "counted": 54,
-     "share": 0.9474
+     "share": 1.0,
+     "all_cases_share": 0.9474,
+     "error_and_invariance_cases": 3
     },
     "exotic.basket.moment": {
-     "cases": 6,
+     "cases": 3,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 6,
+     "none": 3,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
     },
     "exotic.chooser.price": {
-     "cases": 7,
+     "cases": 6,
      "library-object": 6,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 1,
+     "none": 0,
      "counted": 6,
-     "share": 0.8571
+     "share": 1.0,
+     "all_cases_share": 0.8571,
+     "error_and_invariance_cases": 1
     },
     "exotic.digital.price": {
-     "cases": 18,
+     "cases": 16,
      "library-object": 16,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 2,
+     "none": 0,
      "counted": 16,
-     "share": 0.8889
+     "share": 1.0,
+     "all_cases_share": 0.8889,
+     "error_and_invariance_cases": 2
     },
     "exotic.lookback.floating": {
-     "cases": 16,
+     "cases": 13,
      "library-object": 13,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 3,
+     "none": 0,
      "counted": 13,
-     "share": 0.8125
+     "share": 1.0,
+     "all_cases_share": 0.8125,
+     "error_and_invariance_cases": 3
     },
     "exotic.quanto.price": {
-     "cases": 7,
+     "cases": 6,
      "library-object": 6,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 1,
+     "none": 0,
      "counted": 6,
-     "share": 0.8571
+     "share": 1.0,
+     "all_cases_share": 0.8571,
+     "error_and_invariance_cases": 1
     },
     "exotic.spread.kirk": {
-     "cases": 6,
+     "cases": 3,
      "library-object": 3,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 3,
+     "none": 0,
      "counted": 3,
-     "share": 0.5
+     "share": 1.0,
+     "all_cases_share": 0.5,
+     "error_and_invariance_cases": 3
     },
     "fx.atm.strike": {
      "cases": 24,
@@ -672,7 +818,9 @@
      "reimplementation": 0,
      "none": 0,
      "counted": 24,
-     "share": 1.0
+     "share": 1.0,
+     "all_cases_share": 1.0,
+     "error_and_invariance_cases": 0
     },
     "fx.delta.from_strike": {
      "cases": 8,
@@ -681,169 +829,207 @@
      "reimplementation": 0,
      "none": 0,
      "counted": 8,
-     "share": 1.0
+     "share": 1.0,
+     "all_cases_share": 1.0,
+     "error_and_invariance_cases": 0
     },
     "fx.delta.to_strike": {
-     "cases": 68,
+     "cases": 64,
      "library-object": 64,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 4,
+     "none": 0,
      "counted": 64,
-     "share": 0.9412
+     "share": 1.0,
+     "all_cases_share": 0.9412,
+     "error_and_invariance_cases": 4
     },
     "fx.option.price": {
-     "cases": 17,
+     "cases": 12,
      "library-object": 12,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 5,
+     "none": 0,
      "counted": 12,
-     "share": 0.7059
+     "share": 1.0,
+     "all_cases_share": 0.7059,
+     "error_and_invariance_cases": 5
     },
     "fx.smile.from_quotes": {
-     "cases": 8,
+     "cases": 6,
      "library-object": 6,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 2,
+     "none": 0,
      "counted": 6,
-     "share": 0.75
+     "share": 1.0,
+     "all_cases_share": 0.75,
+     "error_and_invariance_cases": 2
     },
     "infl.cap.yoy_price": {
-     "cases": 6,
+     "cases": 5,
      "library-object": 5,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 1,
+     "none": 0,
      "counted": 5,
-     "share": 0.8333
+     "share": 1.0,
+     "all_cases_share": 0.8333,
+     "error_and_invariance_cases": 1
     },
     "infl.cap.zc_price": {
-     "cases": 8,
+     "cases": 6,
      "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 8,
-     "counted": 0,
-     "share": 0.0
-    },
-    "rates.bondfut.implied_vol": {
-     "cases": 8,
-     "library-object": 5,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 3,
-     "counted": 5,
-     "share": 0.625
-    },
-    "rates.bondfut.option_price": {
-     "cases": 8,
-     "library-object": 6,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 2,
-     "counted": 6,
-     "share": 0.75
-    },
-    "rates.cap.strip": {
-     "cases": 15,
-     "library-object": 8,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 7,
-     "counted": 8,
-     "share": 0.5333
-    },
-    "rates.swaption.price_cube": {
-     "cases": 48,
-     "library-object": 42,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 6,
-     "counted": 42,
-     "share": 0.875
-    },
-    "risk.corr.dispersion": {
-     "cases": 4,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 4,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
     },
-    "risk.corr.implied": {
-     "cases": 11,
-     "library-object": 0,
+    "rates.bondfut.implied_vol": {
+     "cases": 5,
+     "library-object": 5,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 11,
-     "counted": 0,
-     "share": 0.0
+     "none": 0,
+     "counted": 5,
+     "share": 1.0,
+     "all_cases_share": 0.625,
+     "error_and_invariance_cases": 3
     },
-    "risk.corr.nearest": {
-     "cases": 18,
-     "library-object": 10,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 8,
-     "counted": 10,
-     "share": 0.5556
-    },
-    "risk.corr.validate": {
-     "cases": 17,
-     "library-object": 15,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 2,
-     "counted": 15,
-     "share": 0.8824
-    },
-    "vol.bates.price": {
-     "cases": 10,
-     "library-object": 9,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 1,
-     "counted": 9,
-     "share": 0.9
-    },
-    "vol.forward.vol": {
-     "cases": 15,
+    "rates.bondfut.option_price": {
+     "cases": 6,
      "library-object": 6,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 9,
+     "none": 0,
      "counted": 6,
-     "share": 0.4
+     "share": 1.0,
+     "all_cases_share": 0.75,
+     "error_and_invariance_cases": 2
     },
-    "vol.garch.fit": {
+    "rates.cap.strip": {
+     "cases": 8,
+     "library-object": 8,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 8,
+     "share": 1.0,
+     "all_cases_share": 0.5333,
+     "error_and_invariance_cases": 7
+    },
+    "rates.swaption.price_cube": {
+     "cases": 42,
+     "library-object": 42,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 42,
+     "share": 1.0,
+     "all_cases_share": 0.875,
+     "error_and_invariance_cases": 6
+    },
+    "risk.corr.dispersion": {
      "cases": 3,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 3,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 1
+    },
+    "risk.corr.implied": {
+     "cases": 6,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 6,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 5
+    },
+    "risk.corr.nearest": {
+     "cases": 15,
+     "library-object": 10,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 5,
+     "counted": 10,
+     "share": 0.6667,
+     "all_cases_share": 0.5556,
+     "error_and_invariance_cases": 3
+    },
+    "risk.corr.validate": {
+     "cases": 15,
+     "library-object": 15,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 15,
+     "share": 1.0,
+     "all_cases_share": 0.8824,
+     "error_and_invariance_cases": 2
+    },
+    "vol.bates.price": {
+     "cases": 9,
+     "library-object": 9,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 9,
+     "share": 1.0,
+     "all_cases_share": 0.9,
+     "error_and_invariance_cases": 1
+    },
+    "vol.forward.vol": {
+     "cases": 7,
+     "library-object": 6,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 1,
+     "counted": 6,
+     "share": 0.8571,
+     "all_cases_share": 0.4,
+     "error_and_invariance_cases": 8
+    },
+    "vol.garch.fit": {
+     "cases": 2,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 2,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 1
     },
     "vol.garch.forecast": {
-     "cases": 10,
+     "cases": 6,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 10,
+     "none": 6,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 4
     },
     "vol.garch.loglik": {
-     "cases": 16,
+     "cases": 9,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 16,
+     "none": 9,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 7
     },
     "vol.heston.cf": {
      "cases": 3,
@@ -852,155 +1038,189 @@
      "reimplementation": 0,
      "none": 3,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 0
     },
     "vol.heston.price": {
-     "cases": 26,
+     "cases": 18,
      "library-object": 18,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 8,
+     "none": 0,
      "counted": 18,
-     "share": 0.6923
+     "share": 1.0,
+     "all_cases_share": 0.6923,
+     "error_and_invariance_cases": 8
     },
     "vol.local.dupire": {
+     "cases": 2,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 2,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 6
+    },
+    "vol.merton.price": {
      "cases": 8,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 8,
      "counted": 0,
-     "share": 0.0
-    },
-    "vol.merton.price": {
-     "cases": 9,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 9,
-     "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 1
     },
     "vol.slv.leverage": {
-     "cases": 10,
+     "cases": 3,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 10,
+     "none": 3,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 7
     },
     "vol.smile.dynamics": {
-     "cases": 16,
+     "cases": 12,
      "library-object": 6,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 10,
+     "none": 6,
      "counted": 6,
-     "share": 0.375
+     "share": 0.5,
+     "all_cases_share": 0.375,
+     "error_and_invariance_cases": 4
     },
     "vol.ssvi.to_svi": {
-     "cases": 6,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 6,
-     "counted": 0,
-     "share": 0.0
-    },
-    "vol.svi.fit_surface": {
-     "cases": 5,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 5,
-     "counted": 0,
-     "share": 0.0
-    },
-    "vol.svi.surface_check": {
-     "cases": 22,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 22,
-     "counted": 0,
-     "share": 0.0
-    },
-    "vol.varswap.fair_strike": {
-     "cases": 30,
-     "library-object": 18,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 12,
-     "counted": 18,
-     "share": 0.6
-    },
-    "vol.varswap.realized": {
      "cases": 4,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 4,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "vol.svi.fit_surface": {
+     "cases": 2,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 2,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
+    },
+    "vol.svi.surface_check": {
+     "cases": 10,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 10,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 12
+    },
+    "vol.varswap.fair_strike": {
+     "cases": 20,
+     "library-object": 18,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 2,
+     "counted": 18,
+     "share": 0.9,
+     "all_cases_share": 0.6,
+     "error_and_invariance_cases": 10
+    },
+    "vol.varswap.realized": {
+     "cases": 2,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 2,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
     },
     "vol.vix.index": {
+     "cases": 4,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 4
+    },
+    "vol.vix.term_variance": {
      "cases": 8,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 8,
      "counted": 0,
-     "share": 0.0
-    },
-    "vol.vix.term_variance": {
-     "cases": 16,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 16,
-     "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 8
     },
     "vol.volofvol.measure": {
-     "cases": 10,
+     "cases": 5,
      "library-object": 5,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 5,
+     "none": 0,
      "counted": 5,
-     "share": 0.5
+     "share": 1.0,
+     "all_cases_share": 0.5,
+     "error_and_invariance_cases": 5
     }
    },
    "meets_floor": true
   },
   "F": {
    "without_sweeps": {
-    "cases": 525,
+    "cases": 417,
     "library-object": 71,
     "library-primitive": 94,
     "reimplementation": 57,
-    "none": 303,
+    "none": 195,
     "counted": 165,
-    "share": 0.3143
+    "share": 0.3957,
+    "all_cases_share": 0.3143,
+    "error_and_invariance_cases": 108
    },
    "with_sweeps": {
-    "cases": 6060,
+    "cases": 472,
     "library-object": 71,
     "library-primitive": 94,
     "reimplementation": 57,
-    "none": 5838,
+    "none": 250,
     "counted": 165,
-    "share": 0.0272
+    "share": 0.3496,
+    "all_cases_share": 0.0272,
+    "error_and_invariance_cases": 5588
    },
    "sweeps": {
-    "cases": 5535,
+    "cases": 55,
     "library-object": 0,
     "library-primitive": 0,
     "reimplementation": 0,
-    "none": 5535,
+    "none": 55,
     "counted": 0,
-    "share": 0.0
+    "share": 0.0,
+    "all_cases_share": 0.0,
+    "error_and_invariance_cases": 5480
    },
    "libraries": {
     "QuantLib 1.44": 57,
@@ -1011,60 +1231,73 @@
     "scipy (SCIPY.NORM)": 10,
     "scipy (SCIPY.QUAD)": 17
    },
+   "no_outside_reference": {},
    "per_operation": {
     "book.lifecycle.apply": {
-     "cases": 23,
+     "cases": 17,
      "library-object": 0,
      "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 23,
-     "counted": 0,
-     "share": 0.0
-    },
-    "book.marks.resolve": {
-     "cases": 9,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 9,
-     "counted": 0,
-     "share": 0.0
-    },
-    "credit.cdsindex.option_price": {
-     "cases": 65,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 65,
-     "counted": 0,
-     "share": 0.0
-    },
-    "rates.curve.inspect": {
-     "cases": 53,
-     "library-object": 19,
-     "library-primitive": 17,
      "reimplementation": 0,
      "none": 17,
-     "counted": 36,
-     "share": 0.6792
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 6
     },
-    "rates.curve.joint_solve": {
-     "cases": 9,
-     "library-object": 1,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 8,
-     "counted": 1,
-     "share": 0.1111
-    },
-    "rates.funding.curve": {
+    "book.marks.resolve": {
      "cases": 6,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 6,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
+    },
+    "credit.cdsindex.option_price": {
+     "cases": 54,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 54,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 11
+    },
+    "rates.curve.inspect": {
+     "cases": 47,
+     "library-object": 19,
+     "library-primitive": 17,
+     "reimplementation": 0,
+     "none": 11,
+     "counted": 36,
+     "share": 0.766,
+     "all_cases_share": 0.6792,
+     "error_and_invariance_cases": 6
+    },
+    "rates.curve.joint_solve": {
+     "cases": 4,
+     "library-object": 1,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 3,
+     "counted": 1,
+     "share": 0.25,
+     "all_cases_share": 0.1111,
+     "error_and_invariance_cases": 5
+    },
+    "rates.funding.curve": {
+     "cases": 3,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 3,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
     },
     "rates.ois.bootstrap": {
      "cases": 33,
@@ -1073,277 +1306,339 @@
      "reimplementation": 0,
      "none": 2,
      "counted": 31,
-     "share": 0.9394
+     "share": 0.9394,
+     "all_cases_share": 0.9394,
+     "error_and_invariance_cases": 0
     },
     "risk.backtest.christoffersen": {
-     "cases": 18,
+     "cases": 17,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 17,
-     "none": 1,
+     "none": 0,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 1
     },
     "risk.backtest.kupiec": {
-     "cases": 22,
+     "cases": 20,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 20,
-     "none": 2,
+     "none": 0,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
     },
     "risk.backtest.traffic_light": {
-     "cases": 21,
+     "cases": 20,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 20,
-     "none": 1,
+     "none": 0,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 1
     },
     "risk.book.ois_sensitivity": {
-     "cases": 11,
+     "cases": 5,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 11,
+     "none": 5,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 6
     },
     "risk.concentration.measures": {
-     "cases": 5,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 5,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.credit.jtd": {
-     "cases": 9,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 9,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.curve.cross_gamma": {
-     "cases": 7,
-     "library-object": 6,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 1,
-     "counted": 6,
-     "share": 0.8571
-    },
-    "risk.curve.pca": {
-     "cases": 30,
-     "library-object": 0,
-     "library-primitive": 24,
-     "reimplementation": 0,
-     "none": 6,
-     "counted": 24,
-     "share": 0.8
-    },
-    "risk.frtb.commodity_delta": {
-     "cases": 4,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 4,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.frtb.csr_delta": {
-     "cases": 6,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 6,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.frtb.curvature": {
-     "cases": 10,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 10,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.frtb.equity_delta": {
-     "cases": 9,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 9,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.frtb.fx_delta": {
-     "cases": 6,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 6,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.frtb.girr_delta": {
-     "cases": 16,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 16,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.frtb.vega": {
-     "cases": 9,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 9,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.limits.check": {
-     "cases": 5,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 5,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.sens.correlation": {
-     "cases": 6,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 6,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.sens.dividend_borrow": {
-     "cases": 7,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 7,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.sens.inflation01": {
-     "cases": 5,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 5,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.stress.reverse": {
-     "cases": 6,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 6,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.var.filtered_historical": {
-     "cases": 7,
-     "library-object": 6,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 1,
-     "counted": 6,
-     "share": 0.8571
-    },
-    "risk.var.historical": {
-     "cases": 23,
-     "library-object": 0,
-     "library-primitive": 19,
-     "reimplementation": 0,
-     "none": 4,
-     "counted": 19,
-     "share": 0.8261
-    },
-    "risk.var.liquidity_adjusted": {
      "cases": 3,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 3,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
     },
-    "risk.var.monte_carlo": {
-     "cases": 6,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 6,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.var.parametric": {
-     "cases": 11,
-     "library-object": 0,
-     "library-primitive": 10,
-     "reimplementation": 0,
-     "none": 1,
-     "counted": 10,
-     "share": 0.9091
-    },
-    "risk.vol.horizon": {
-     "cases": 6,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 6,
-     "counted": 0,
-     "share": 0.0
-    },
-    "usecase.factor_attribution": {
-     "cases": 27,
-     "library-object": 0,
-     "library-primitive": 24,
-     "reimplementation": 0,
-     "none": 3,
-     "counted": 24,
-     "share": 0.8889
-    },
-    "vol.garch.estimate": {
-     "cases": 9,
-     "library-object": 3,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 6,
-     "counted": 3,
-     "share": 0.3333
-    },
-    "vol.garch.loglik": {
-     "cases": 8,
-     "library-object": 5,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 3,
-     "counted": 5,
-     "share": 0.625
-    },
-    "vol.local.dupire": {
+    "risk.credit.jtd": {
      "cases": 5,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 5,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 4
+    },
+    "risk.curve.cross_gamma": {
+     "cases": 6,
+     "library-object": 6,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 6,
+     "share": 1.0,
+     "all_cases_share": 0.8571,
+     "error_and_invariance_cases": 1
+    },
+    "risk.curve.pca": {
+     "cases": 24,
+     "library-object": 0,
+     "library-primitive": 24,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 24,
+     "share": 1.0,
+     "all_cases_share": 0.8,
+     "error_and_invariance_cases": 6
+    },
+    "risk.frtb.commodity_delta": {
+     "cases": 3,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 3,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 1
+    },
+    "risk.frtb.csr_delta": {
+     "cases": 4,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "risk.frtb.curvature": {
+     "cases": 7,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 7,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
+    },
+    "risk.frtb.equity_delta": {
+     "cases": 6,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 6,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
+    },
+    "risk.frtb.fx_delta": {
+     "cases": 4,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "risk.frtb.girr_delta": {
+     "cases": 13,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 13,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
+    },
+    "risk.frtb.vega": {
+     "cases": 6,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 6,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
+    },
+    "risk.limits.check": {
+     "cases": 3,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 3,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "risk.sens.correlation": {
+     "cases": 4,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "risk.sens.dividend_borrow": {
+     "cases": 5,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 5,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "risk.sens.inflation01": {
+     "cases": 3,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 3,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "risk.stress.reverse": {
+     "cases": 4,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "risk.var.filtered_historical": {
+     "cases": 6,
+     "library-object": 6,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 6,
+     "share": 1.0,
+     "all_cases_share": 0.8571,
+     "error_and_invariance_cases": 1
+    },
+    "risk.var.historical": {
+     "cases": 20,
+     "library-object": 0,
+     "library-primitive": 19,
+     "reimplementation": 0,
+     "none": 1,
+     "counted": 19,
+     "share": 0.95,
+     "all_cases_share": 0.8261,
+     "error_and_invariance_cases": 3
+    },
+    "risk.var.liquidity_adjusted": {
+     "cases": 2,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 2,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 1
+    },
+    "risk.var.monte_carlo": {
+     "cases": 4,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "risk.var.parametric": {
+     "cases": 10,
+     "library-object": 0,
+     "library-primitive": 10,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 10,
+     "share": 1.0,
+     "all_cases_share": 0.9091,
+     "error_and_invariance_cases": 1
+    },
+    "risk.vol.horizon": {
+     "cases": 4,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "usecase.factor_attribution": {
+     "cases": 24,
+     "library-object": 0,
+     "library-primitive": 24,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 24,
+     "share": 1.0,
+     "all_cases_share": 0.8889,
+     "error_and_invariance_cases": 3
+    },
+    "vol.garch.estimate": {
+     "cases": 4,
+     "library-object": 3,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 1,
+     "counted": 3,
+     "share": 0.75,
+     "all_cases_share": 0.3333,
+     "error_and_invariance_cases": 5
+    },
+    "vol.garch.loglik": {
+     "cases": 5,
+     "library-object": 5,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 5,
+     "share": 1.0,
+     "all_cases_share": 0.625,
+     "error_and_invariance_cases": 3
+    },
+    "vol.local.dupire": {
+     "cases": 4,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 1
     },
     "vol.vix.index": {
      "cases": 1,
@@ -1352,39 +1647,46 @@
      "reimplementation": 0,
      "none": 1,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 0
     },
     "vol.vix.term_variance": {
-     "cases": 9,
+     "cases": 7,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 9,
+     "none": 7,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
     }
    },
-   "meets_floor": false,
-   "plan": "2027-01-31: per-case outside checks for risk_f4 (QuantLib-free Kupiec and Christoffersen need a library backtest object or stay reimplementation), book_f, cdsidx_f (QuantLib IsdaCdsEngine), frtb_f* (no outside library exists: published as none); owner of record: spec and oracle lane, stage J close-out (J-10)"
+   "meets_floor": false
   },
   "G": {
    "without_sweeps": {
-    "cases": 589,
+    "cases": 463,
     "library-object": 279,
     "library-primitive": 53,
     "reimplementation": 6,
-    "none": 251,
+    "none": 125,
     "counted": 332,
-    "share": 0.5637
+    "share": 0.7171,
+    "all_cases_share": 0.5637,
+    "error_and_invariance_cases": 126
    },
    "with_sweeps": {
-    "cases": 589,
+    "cases": 463,
     "library-object": 279,
     "library-primitive": 53,
     "reimplementation": 6,
-    "none": 251,
+    "none": 125,
     "counted": 332,
-    "share": 0.5637
+    "share": 0.7171,
+    "all_cases_share": 0.5637,
+    "error_and_invariance_cases": 126
    },
    "sweeps": null,
    "libraries": {
@@ -1397,218 +1699,264 @@
     "QuantLib AbcdFunction.covariance and blackFormula assembled per caplet": 17,
     "QuantLib AbcdFunction.covariance and blackFormula assembled per swaption": 36
    },
+   "no_outside_reference": {},
    "per_operation": {
     "exotic.barrier.price": {
-     "cases": 38,
+     "cases": 31,
      "library-object": 2,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 36,
+     "none": 29,
      "counted": 2,
-     "share": 0.0526
+     "share": 0.0645,
+     "all_cases_share": 0.0526,
+     "error_and_invariance_cases": 7
     },
     "rates.g2pp.zcb": {
-     "cases": 19,
-     "library-object": 16,
+     "cases": 14,
+     "library-object": 14,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 3,
-     "counted": 16,
-     "share": 0.8421
+     "none": 0,
+     "counted": 14,
+     "share": 1.0,
+     "all_cases_share": 0.7368,
+     "error_and_invariance_cases": 5
     },
     "rates.g2pp.zcb_option": {
-     "cases": 25,
-     "library-object": 19,
+     "cases": 23,
+     "library-object": 21,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 6,
-     "counted": 19,
-     "share": 0.76
+     "none": 2,
+     "counted": 21,
+     "share": 0.913,
+     "all_cases_share": 0.84,
+     "error_and_invariance_cases": 2
     },
     "rates.lmm.capfloor": {
-     "cases": 26,
+     "cases": 17,
      "library-object": 0,
      "library-primitive": 17,
      "reimplementation": 0,
-     "none": 9,
+     "none": 0,
      "counted": 17,
-     "share": 0.6538
+     "share": 1.0,
+     "all_cases_share": 0.6538,
+     "error_and_invariance_cases": 9
     },
     "rates.lmm.swaption_rebonato": {
-     "cases": 42,
+     "cases": 36,
      "library-object": 0,
      "library-primitive": 36,
      "reimplementation": 0,
-     "none": 6,
+     "none": 0,
      "counted": 36,
-     "share": 0.8571
+     "share": 1.0,
+     "all_cases_share": 0.8571,
+     "error_and_invariance_cases": 6
     },
     "rates.shortrate.bermudan_ladder": {
-     "cases": 5,
+     "cases": 3,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 5,
+     "none": 3,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
     },
     "rates.shortrate.bermudan_swaption": {
-     "cases": 17,
+     "cases": 10,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 17,
-     "counted": 0,
-     "share": 0.0
-    },
-    "rates.shortrate.callable_bond": {
-     "cases": 13,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 13,
-     "counted": 0,
-     "share": 0.0
-    },
-    "rates.shortrate.capfloor": {
-     "cases": 41,
-     "library-object": 36,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 5,
-     "counted": 36,
-     "share": 0.878
-    },
-    "rates.shortrate.hw_calibrate": {
-     "cases": 6,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 6,
-     "counted": 0,
-     "share": 0.0
-    },
-    "rates.shortrate.swaption": {
-     "cases": 83,
-     "library-object": 64,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 19,
-     "counted": 64,
-     "share": 0.7711
-    },
-    "rates.shortrate.zcb": {
-     "cases": 49,
-     "library-object": 38,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 11,
-     "counted": 38,
-     "share": 0.7755
-    },
-    "rates.shortrate.zcb_option": {
-     "cases": 33,
-     "library-object": 24,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 9,
-     "counted": 24,
-     "share": 0.7273
-    },
-    "risk.mc.greeks": {
-     "cases": 22,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 22,
-     "counted": 0,
-     "share": 0.0
-    },
-    "risk.model_reserve.dispersion": {
-     "cases": 9,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 9,
-     "counted": 0,
-     "share": 0.0
-    },
-    "xva.adjustments.value": {
-     "cases": 12,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 12,
-     "counted": 0,
-     "share": 0.0
-    },
-    "xva.exposure.collateralised": {
-     "cases": 17,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 17,
-     "counted": 0,
-     "share": 0.0
-    },
-    "xva.exposure.portfolio_hw": {
-     "cases": 102,
-     "library-object": 80,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 22,
-     "counted": 80,
-     "share": 0.7843
-    },
-    "xva.exposure.swap_ee_hw": {
-     "cases": 16,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 6,
      "none": 10,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 7
     },
-    "xva.simm.ir_delta": {
+    "rates.shortrate.callable_bond": {
      "cases": 8,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 8,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 5
     },
-    "xva.wwr.cva_hw": {
+    "rates.shortrate.capfloor": {
+     "cases": 36,
+     "library-object": 36,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 36,
+     "share": 1.0,
+     "all_cases_share": 0.878,
+     "error_and_invariance_cases": 5
+    },
+    "rates.shortrate.hw_calibrate": {
+     "cases": 3,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 3,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
+    },
+    "rates.shortrate.swaption": {
+     "cases": 71,
+     "library-object": 64,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 7,
+     "counted": 64,
+     "share": 0.9014,
+     "all_cases_share": 0.7711,
+     "error_and_invariance_cases": 12
+    },
+    "rates.shortrate.zcb": {
+     "cases": 38,
+     "library-object": 38,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 38,
+     "share": 1.0,
+     "all_cases_share": 0.7755,
+     "error_and_invariance_cases": 11
+    },
+    "rates.shortrate.zcb_option": {
+     "cases": 28,
+     "library-object": 24,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 24,
+     "share": 0.8571,
+     "all_cases_share": 0.7273,
+     "error_and_invariance_cases": 5
+    },
+    "risk.mc.greeks": {
+     "cases": 12,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 12,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 10
+    },
+    "risk.model_reserve.dispersion": {
      "cases": 6,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 6,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 3
+    },
+    "xva.adjustments.value": {
+     "cases": 6,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 6,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 6
+    },
+    "xva.exposure.collateralised": {
+     "cases": 10,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 10,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 7
+    },
+    "xva.exposure.portfolio_hw": {
+     "cases": 96,
+     "library-object": 80,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 16,
+     "counted": 80,
+     "share": 0.8333,
+     "all_cases_share": 0.7843,
+     "error_and_invariance_cases": 6
+    },
+    "xva.exposure.swap_ee_hw": {
+     "cases": 7,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 6,
+     "none": 1,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 9
+    },
+    "xva.simm.ir_delta": {
+     "cases": 4,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 4
+    },
+    "xva.wwr.cva_hw": {
+     "cases": 4,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
     }
    },
-   "meets_floor": false,
-   "plan": "2027-01-31: per-case register for G (regenerated in oracle-coverage.yml); QuantLib FD and tree for bermudan_g and callable_g at a tolerance fixed before the run; stage J close-out (J-10)"
+   "meets_floor": true
   },
   "I": {
    "without_sweeps": {
-    "cases": 278,
+    "cases": 153,
     "library-object": 0,
     "library-primitive": 102,
     "reimplementation": 12,
-    "none": 164,
+    "none": 39,
     "counted": 102,
-    "share": 0.3669
+    "share": 0.6667,
+    "all_cases_share": 0.3669,
+    "error_and_invariance_cases": 125
    },
    "with_sweeps": {
-    "cases": 443,
+    "cases": 318,
     "library-object": 0,
     "library-primitive": 266,
     "reimplementation": 12,
-    "none": 165,
+    "none": 40,
     "counted": 266,
-    "share": 0.6005
+    "share": 0.8365,
+    "all_cases_share": 0.6005,
+    "error_and_invariance_cases": 125
    },
    "sweeps": {
     "cases": 165,
@@ -1617,7 +1965,9 @@
     "reimplementation": 0,
     "none": 1,
     "counted": 164,
-    "share": 0.9939
+    "share": 0.9939,
+    "all_cases_share": 0.9939,
+    "error_and_invariance_cases": 0
    },
    "libraries": {
     "QuantLib Greeks, hedge quantities by numpy solve": 10,
@@ -1636,136 +1986,169 @@
     "scipy 1.18 solvers at each frontier point": 2,
     "scipy 1.18, as hedgeqp_i (wave 5 seeded)": 29
    },
+   "no_outside_reference": {
+    "hedgeint_i": "integer lots: no free library solves integer least squares with these constraints; exact rational enumeration is the oracle",
+    "hedgebeta_i": "beta futures hedge: arithmetic on given betas; no library object computes it (Hull's worked example is a textbook check)",
+    "hedgeres_i": "residual risk report: arithmetic on the hedge solve's own outputs; no library object",
+    "hedgeslip_i": "implementation shortfall: no free library computes it; exact rational arithmetic"
+   },
    "per_operation": {
     "hedge.backtest.delta": {
-     "cases": 24,
+     "cases": 12,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 12,
-     "none": 12,
+     "none": 0,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 12
     },
     "hedge.beta.futures": {
-     "cases": 12,
+     "cases": 8,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
-     "none": 12,
+     "none": 8,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 4
     },
     "hedge.correlation.neutralise": {
-     "cases": 20,
+     "cases": 9,
      "library-object": 0,
      "library-primitive": 9,
      "reimplementation": 0,
-     "none": 11,
+     "none": 0,
      "counted": 9,
-     "share": 0.45
+     "share": 1.0,
+     "all_cases_share": 0.45,
+     "error_and_invariance_cases": 11
     },
     "hedge.credit.cds": {
-     "cases": 19,
+     "cases": 10,
      "library-object": 0,
      "library-primitive": 10,
      "reimplementation": 0,
-     "none": 9,
+     "none": 0,
      "counted": 10,
-     "share": 0.5263
+     "share": 1.0,
+     "all_cases_share": 0.5263,
+     "error_and_invariance_cases": 9
     },
     "hedge.crossasset.solve": {
-     "cases": 17,
+     "cases": 9,
      "library-object": 0,
      "library-primitive": 9,
      "reimplementation": 0,
-     "none": 8,
+     "none": 0,
      "counted": 9,
-     "share": 0.5294
+     "share": 1.0,
+     "all_cases_share": 0.5294,
+     "error_and_invariance_cases": 8
     },
     "hedge.effectiveness": {
-     "cases": 10,
+     "cases": 5,
      "library-object": 0,
      "library-primitive": 5,
      "reimplementation": 0,
-     "none": 5,
+     "none": 0,
      "counted": 5,
-     "share": 0.5
+     "share": 1.0,
+     "all_cases_share": 0.5,
+     "error_and_invariance_cases": 5
     },
     "hedge.frontier.solve": {
-     "cases": 10,
+     "cases": 4,
      "library-object": 0,
      "library-primitive": 2,
      "reimplementation": 0,
-     "none": 8,
+     "none": 2,
      "counted": 2,
-     "share": 0.2
+     "share": 0.5,
+     "all_cases_share": 0.2,
+     "error_and_invariance_cases": 6
     },
     "hedge.greeks.neutralise": {
-     "cases": 21,
+     "cases": 10,
      "library-object": 0,
      "library-primitive": 10,
      "reimplementation": 0,
-     "none": 11,
+     "none": 0,
      "counted": 10,
-     "share": 0.4762
+     "share": 1.0,
+     "all_cases_share": 0.4762,
+     "error_and_invariance_cases": 11
     },
     "hedge.integer.solve": {
-     "cases": 19,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 19,
-     "counted": 0,
-     "share": 0.0
-    },
-    "hedge.minvar.ratio": {
-     "cases": 18,
-     "library-object": 0,
-     "library-primitive": 9,
-     "reimplementation": 0,
-     "none": 9,
-     "counted": 9,
-     "share": 0.5
-    },
-    "hedge.qp.solve": {
-     "cases": 67,
-     "library-object": 0,
-     "library-primitive": 38,
-     "reimplementation": 0,
-     "none": 29,
-     "counted": 38,
-     "share": 0.5672
-    },
-    "hedge.residual.report": {
-     "cases": 11,
-     "library-object": 0,
-     "library-primitive": 0,
-     "reimplementation": 0,
-     "none": 11,
-     "counted": 0,
-     "share": 0.0
-    },
-    "hedge.select.solve": {
-     "cases": 18,
-     "library-object": 0,
-     "library-primitive": 10,
-     "reimplementation": 0,
-     "none": 8,
-     "counted": 10,
-     "share": 0.5556
-    },
-    "hedge.slippage.report": {
      "cases": 12,
      "library-object": 0,
      "library-primitive": 0,
      "reimplementation": 0,
      "none": 12,
      "counted": 0,
-     "share": 0.0
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 7
+    },
+    "hedge.minvar.ratio": {
+     "cases": 10,
+     "library-object": 0,
+     "library-primitive": 9,
+     "reimplementation": 0,
+     "none": 1,
+     "counted": 9,
+     "share": 0.9,
+     "all_cases_share": 0.5,
+     "error_and_invariance_cases": 8
+    },
+    "hedge.qp.solve": {
+     "cases": 41,
+     "library-object": 0,
+     "library-primitive": 38,
+     "reimplementation": 0,
+     "none": 3,
+     "counted": 38,
+     "share": 0.9268,
+     "all_cases_share": 0.5672,
+     "error_and_invariance_cases": 26
+    },
+    "hedge.residual.report": {
+     "cases": 7,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 7,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 4
+    },
+    "hedge.select.solve": {
+     "cases": 10,
+     "library-object": 0,
+     "library-primitive": 10,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 10,
+     "share": 1.0,
+     "all_cases_share": 0.5556,
+     "error_and_invariance_cases": 8
+    },
+    "hedge.slippage.report": {
+     "cases": 6,
+     "library-object": 0,
+     "library-primitive": 0,
+     "reimplementation": 0,
+     "none": 6,
+     "counted": 0,
+     "share": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 6
     }
    },
-   "meets_floor": false,
-   "plan": "2027-01-31: per-case register for I; outside checks for hedgeint_i (none exists: stays none), hedgebt_i through a library cash-account object if one exists; stage J close-out (J-10)"
+   "meets_floor": true
   }
  }
 }

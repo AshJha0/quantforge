@@ -446,7 +446,7 @@ def r9():
         c["tags"].append("synthetic")
     keep = common.GOLDEN
     common.GOLDEN = keep.parent / FOLDER
-    s.write()
+    s.write()  # NOTE (R6): gen_stage_g_r5.py appends barrier_g-0038 (E_LIMIT); after `R9` re-append it (program/R6_HANDOVER.md)
     common.GOLDEN = keep
     note(f"barrier_g outside (QuantLib 1.44 AnalyticBarrierEngine): {n_out} of {len(s.cases)}")
     reg = HERE.parent / "outside_register_g.json"
