@@ -6,7 +6,7 @@ New here? [Tutorial 1](docs/getting-started/tutorial-1-swap.md) builds a curve, 
 
 ## Run a tutorial script
 
-Tutorials 2 to 16 each have a script in `examples/tutorials/` that sends its operations to any build: Python in process with no argument, or another build's CLI. Tutorial 1's script, `examples/tutorial_swap.py`, takes a build's CLI command.
+Tutorials 2 to 16 each have a script in `examples/tutorials/` that sends its operations to any build: Python in process with no argument, or another build's CLI. Tutorial 1's script, `examples/tutorial_swap.py`, takes a build's CLI command, and so do the hedging tutorials' scripts, `examples/tutorial_hedge_17.py` to `tutorial_hedge_21.py`, which send cases built from the `examples/hedge_*_i.json` inputs.
 
 ```bash
 uv run --project python python examples/tutorials/t2_bonds.py                  # Python
