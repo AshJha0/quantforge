@@ -832,6 +832,28 @@ class ForwardLogAnchor(unittest.TestCase):
             fl.append(p, "a", "2026-02-01T00:00:00Z", 9.0)
             self.assertEqual(anchor.check_anchors(p, Path(d) / "an"), 1)
 
+    def test_prereg_edit_to_body_and_header_together_is_caught(self):
+        """R6-22, planted fault: rewrite a copied prereg's body and recompute its header hash, so the header check in
+        research/test_preregs.py would pass; the anchor still catches it. A new prereg file is allowed."""
+        import shutil
+        with tempfile.TemporaryDirectory() as d:
+            pre = Path(d) / "preregs"
+            shutil.copytree(ROOT / "research/preregs", pre)
+            p = self._log(d, 2)
+            anchor.make(p, Path(d) / "an", "t1", preregs_dir=pre)
+            self.assertGreaterEqual(anchor.check_preregs(Path(d) / "an", pre), 10)
+            (pre / "R3-04-new.md").write_text("new prereg\n", encoding="utf-8")
+            anchor.check_preregs(Path(d) / "an", pre)
+            f = pre / "R3-01-treasury-fly.md"
+            b = f.read_bytes()
+            mark = b"<!-- body -->\n"
+            head, body = b.split(mark, 1)
+            new_body = body.replace(b"2013-01-02", b"2014-01-02")
+            old_h, new_h = hashlib.sha256(body).hexdigest().encode(), hashlib.sha256(new_body).hexdigest().encode()
+            f.write_bytes(head.replace(old_h, new_h) + mark + new_body)
+            with self.assertRaises(ValueError):
+                anchor.check_preregs(Path(d) / "an", pre)
+
     def test_full_rewrite_with_recomputed_hashes_is_caught(self):
         with tempfile.TemporaryDirectory() as d:
             p = self._log(d, 5)

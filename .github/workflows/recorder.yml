@@ -76,9 +76,9 @@ jobs:
             printf '# forward-log-anchors\n\nOpenTimestamps anchors for branch forward-log. See docs/developer-guides/forward-log-anchors.md on main.\n' > anchors/README.md
           fi
           # a fresh run must not anchor a log that does not match the anchors already held
-          python3 code/tools/forward-log/anchor.py verify --log log/actions/log.jsonl --anchors anchors/anchors
+          python3 code/tools/forward-log/anchor.py verify --log log/actions/log.jsonl --anchors anchors/anchors --preregs code/research/preregs
           (cd anchors/anchors 2>/dev/null && ots upgrade *.json.ots || true) # fills in Bitcoin attestations once confirmed
-          python3 code/tools/forward-log/anchor.py make --log log/actions/log.jsonl --out-dir anchors/anchors --stamp
+          python3 code/tools/forward-log/anchor.py make --log log/actions/log.jsonl --out-dir anchors/anchors --stamp --preregs code/research/preregs
           cd anchors
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
