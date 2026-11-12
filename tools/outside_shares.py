@@ -4,7 +4,7 @@
     python tools/outside_shares.py            write oracle/OUTSIDE_SHARES.json and oracle/OUTSIDE_SHARES.md
     python tools/outside_shares.py --check    regenerate in memory; exit 1 if the committed copy differs, if a
                                               register's suite totals differ from the goldens, or if a stage is
-                                              under the floor without a dated plan in PLANS below
+                                              under the 60% floor on value-checked cases
 
 Evidence classes (D6). A case counts towards the outside share only as `library-object` or `library-primitive`,
 and only if every compared output of the case is checked:
@@ -13,8 +13,10 @@ and only if every compared output of the case is checked:
   reimplementation   the spec formula written again around a library call (does not count)
   none               no outside check, or a published worked example only (does not count)
 
-Denominator: every case of the stage, error cases included (ruling I-2), so a stage cannot raise its share by
-adding error cases. Generated sweeps (stage F `e1_*` edge suites, stage I wave 5 seeded variants `*5_i`) are
+Floor (owner, 2026-11-12, second decision): measured on VALUE-CHECKED cases only (`expected.status` "ok"). Error
+and invariance cases (`error`, `any`, `same_as`) are a separate evidence class and leave the denominator. The old
+all-case figure (ruling I-2, error cases in the denominator) is reported beside it. There is no dated-plan fallback:
+a stage under 60% fails. Generated sweeps (stage F `e1_*` edge suites, stage I wave 5 seeded variants `*5_i`) are
 shown separately and the floor is applied without them (plan 14.10 rule 3: report with and without added cases).
 Per-case registers (D, E, F) are classified case by case; stage G and I registers hold suite counts only, so the
 class is ruled per suite in SUITE_CLASS and the per-case regeneration of those registers is an open R6-13 item.
@@ -75,17 +77,14 @@ SUITE_CLASS = {
     "hedgebtcost_i": ("reimplementation", "as hedgebt_i, with costs"),
 }
 
-# Dated plans for stages under the floor (R6-13 acceptance: reach 60% or publish the true figure with a dated plan).
-PLANS = {
-    "F": "2027-01-31: per-case outside checks for risk_f4 (QuantLib-free Kupiec and Christoffersen need a library "
-         "backtest object or stay reimplementation), book_f, cdsidx_f (QuantLib IsdaCdsEngine), frtb_f* (no outside "
-         "library exists: published as none); owner of record: spec and oracle lane, stage J close-out (J-10)",
-    "G": "2027-01-31: per-case register for G (regenerated in oracle-coverage.yml); QuantLib FD and tree for "
-         "bermudan_g and callable_g at a tolerance fixed before the run; stage J close-out (J-10)",
-    "I": "2027-01-31: per-case register for I; outside checks for hedgeint_i (none exists: stays none), "
-         "hedgebt_i through a library cash-account object if one exists; stage J close-out (J-10)",
+# Value classes with no free outside reference (owner 2026-11-12): named with the reason. They stay in the
+# denominator; the list explains a gap, it does not excuse it.
+NO_REFERENCE = {
+    "hedgeint_i": "integer lots: no free library solves integer least squares with these constraints; exact rational enumeration is the oracle",
+    "hedgebeta_i": "beta futures hedge: arithmetic on given betas; no library object computes it (Hull's worked example is a textbook check)",
+    "hedgeres_i": "residual risk report: arithmetic on the hedge solve's own outputs; no library object",
+    "hedgeslip_i": "implementation shortfall: no free library computes it; exact rational arithmetic",
 }
-
 
 def is_sweep(stage, suite):
     return (stage == "F" and suite.startswith("e1_")) or (stage == "I" and suite.endswith("5_i"))
@@ -146,6 +145,7 @@ def load_suite_register(stage):
 
 
 def stage_report(stage, problems):
+    """Rows (suite, operation, class, sweep, library, value-checked)."""
     suites = golden_suites(stage)
     rows = []  # (suite, operation, class, sweep, library)
     if stage in ("D", "E", "F"):
@@ -154,9 +154,9 @@ def stage_report(stage, problems):
         for cid in sorted(set(reg) - known):
             problems.append(f"stage {stage}: register case {cid} is not in the goldens")
         for suite, cases in suites.items():
-            for cid, op, _ in cases:
+            for cid, op, st in cases:
                 cls, lib = reg.get(cid, ("none", ""))
-                rows.append((suite, op, cls, is_sweep(stage, suite), lib))
+                rows.append((suite, op, cls, is_sweep(stage, suite), lib, st == "ok"))
     else:
         reg = load_suite_register(stage)
         merged = defaultdict(lambda: [0, 0])
@@ -173,9 +173,19 @@ def stage_report(stage, problems):
             if suite not in merged:
                 problems.append(f"stage {stage}: golden suite {suite} is missing from the register")
             cls, lib = SUITE_CLASS.get(suite, ("none", ""))
-            for i, (cid, op, _) in enumerate(cases):
-                rows.append((suite, op, cls if i < counted else "none", is_sweep(stage, suite), lib if i < counted else ""))
+            # Suite counts carry no case ids: outside checks compare values, so they are assigned to value cases first.
+            order = sorted(cases, key=lambda c: c[2] != "ok")
+            for i, (cid, op, st) in enumerate(order):
+                rows.append((suite, op, cls if i < counted else "none", is_sweep(stage, suite), lib if i < counted else "", st == "ok"))
     return rows
+
+
+def vshare(rows):
+    """Value-checked share (the floor measure) with the old all-case share beside it."""
+    v = share([r for r in rows if r[5]])
+    v["all_cases_share"] = share(rows)["share"]
+    v["error_and_invariance_cases"] = sum(1 for r in rows if not r[5])
+    return v
 
 
 def share(rows):
@@ -186,7 +196,7 @@ def share(rows):
 
 
 def build(problems):
-    out = {"rule": "R6-13 (D6): library-object + library-primitive over every case of the stage, error cases included",
+    out = {"rule": "R6-13 (D6, owner 2026-11-12): library-object + library-primitive over the stage's value-checked cases; old all-case share beside it",
            "floor": FLOOR, "stages": {}}
     for st in STAGE_DIRS:
         rows = stage_report(st, problems)
@@ -195,41 +205,40 @@ def build(problems):
         for r in core:
             ops[r[1]].append(r)
         libs = Counter(r[4] for r in rows if r[2] in COUNTED)
-        entry = {"without_sweeps": share(core), "with_sweeps": share(rows),
-                 "sweeps": share([r for r in rows if r[3]]) if any(r[3] for r in rows) else None,
+        entry = {"without_sweeps": vshare(core), "with_sweeps": vshare(rows),
+                 "sweeps": vshare([r for r in rows if r[3]]) if any(r[3] for r in rows) else None,
                  "libraries": dict(sorted(libs.items())),
-                 "per_operation": {op: share(rs) for op, rs in sorted(ops.items())}}
+                 "no_outside_reference": {k: v for k, v in NO_REFERENCE.items() if any(r[0] == k for r in rows)},
+                 "per_operation": {op: vshare(rs) for op, rs in sorted(ops.items())}}
         s = entry["without_sweeps"]["share"] or 0.0
         entry["meets_floor"] = s >= FLOOR
         if not entry["meets_floor"]:
-            entry["plan"] = PLANS.get(st)
-            if not entry["plan"]:
-                problems.append(f"stage {st}: {s:.1%} is under the {FLOOR:.0%} floor and has no dated plan")
+            problems.append(f"stage {st}: {s:.1%} of value-checked cases is under the {FLOOR:.0%} floor")
         out["stages"][st] = entry
     return out
 
 
 def markdown(doc):
-    L = ["# Outside-check shares (R6-13, decision D6)", "",
+    L = ["# Outside-check shares (R6-13, decision D6, owner 2026-11-12)", "",
          "Generated by `tools/outside_shares.py`; do not edit. A case counts only as `library-object` or "
-         "`library-primitive`, and only if every compared output is checked. Denominator: every case of the stage, "
-         "error cases included. Generated sweeps (F `e1_*`, I `*5_i`) are shown separately; the floor applies without them.", "",
-         "| Stage | Cases (no sweeps) | library-object | library-primitive | reimplementation | none | Share | With sweeps | Floor 60% |",
-         "|---|---:|---:|---:|---:|---:|---:|---:|---|"]
+         "`library-primitive`, and only if every compared output is checked. **Floor: 60% of the stage's value-checked "
+         "cases.** Error and invariance cases are a separate evidence class, outside the denominator; the old all-case "
+         "share is shown beside the new one. Generated sweeps (F `e1_*`, I `*5_i`) are shown separately; the floor applies without them.", "",
+         "| Stage | Value cases (no sweeps) | library-object | library-primitive | reimplementation | none | Value share | Old all-case share | With sweeps (value) | Error and invariance cases | Floor 60% |",
+         "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
     for st, e in doc["stages"].items():
         w, a = e["without_sweeps"], e["with_sweeps"]
         L.append(f"| {st} | {w['cases']} | {w['library-object']} | {w['library-primitive']} | {w['reimplementation']} | "
-                 f"{w['none']} | {w['share']:.1%} | {a['share']:.1%} ({a['counted']} of {a['cases']}) | "
-                 f"{'met' if e['meets_floor'] else 'not met'} |")
-    L.append("")
+                 f"{w['none']} | {w['share']:.1%} | {w['all_cases_share']:.1%} | {a['share']:.1%} ({a['counted']} of {a['cases']}) | "
+                 f"{w['error_and_invariance_cases']} | {'met' if e['meets_floor'] else 'NOT MET'} |")
+    L += ["", "## Value classes with no free outside reference", "", "| Suite | Reason |", "|---|---|"]
+    for e in doc["stages"].values():
+        L += [f"| `{k}` | {v} |" for k, v in e["no_outside_reference"].items()]
     for st, e in doc["stages"].items():
-        if e.get("plan"):
-            L.append(f"- Stage {st} plan: {e['plan']}")
-    for st, e in doc["stages"].items():
-        L += ["", f"## Stage {st} per operation (no sweeps)", "", "| Operation | Cases | Counted | Share |", "|---|---:|---:|---:|"]
-        L += [f"| `{op}` | {s['cases']} | {s['counted']} | {s['share']:.0%} |" for op, s in e["per_operation"].items()]
+        L += ["", f"## Stage {st} per operation (no sweeps)", "", "| Operation | Value cases | Counted | Value share | Old all-case share |", "|---|---:|---:|---:|---:|"]
+        L += [f"| `{op}` | {s['cases']} | {s['counted']} | {(s['share'] or 0):.0%} | {(s['all_cases_share'] or 0):.0%} |" for op, s in e["per_operation"].items()]
         L += ["", "Libraries (counted cases, sweeps included): " + "; ".join(f"{k} {v}" for k, v in e["libraries"].items())]
-    return "\n".join(L) + "\n"
+    return chr(10).join(L) + chr(10)
 
 
 def main(argv=None):
@@ -250,7 +259,7 @@ def main(argv=None):
         mp.write_text(md, encoding="utf-8", newline="\n")
     for st, e in doc["stages"].items():
         w = e["without_sweeps"]
-        print(f"stage {st}: {w['counted']} of {w['cases']} = {w['share']:.1%} (with sweeps {e['with_sweeps']['share']:.1%})"
+        print(f"stage {st}: value {w['counted']} of {w['cases']} = {w['share']:.1%}, old all-case {w['all_cases_share']:.1%}, with sweeps {e['with_sweeps']['share']:.1%}"
               f"{'' if e['meets_floor'] else ' UNDER FLOOR'}")
     for p in problems:
         print("error:", p)
