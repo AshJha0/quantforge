@@ -1,0 +1,64 @@
+{
+ "schema_version": "1.0",
+ "suite": "nonfinite_r6",
+ "spec": "specifications/cli-contract.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_r6_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "nonfinite_r6-0001",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2033-11-15",
+     "coupon": -1e+308,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NON_FINITE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "fuzz",
+    "non-finite-result"
+   ],
+   "description": "fuzz 2026-11-09 (Java crashed in BigDecimal): coupon -1e308 overflows coupon x 800 (ruling R6-8.1)"
+  },
+  {
+   "case_id": "nonfinite_r6-0002",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2033-11-15",
+     "coupon": 1e+308,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NON_FINITE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "fuzz",
+    "non-finite-result"
+   ],
+   "description": "coupon 1e308 overflows coupon x 800 (ruling R6-8.1)"
+  }
+ ]
+}

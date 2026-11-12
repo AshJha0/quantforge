@@ -14,6 +14,11 @@ classes:
     # A few operations on well-conditioned values.
     absolute: 1.0e-12
     relative: 1.0e-10
+  per_unit:
+    # R6 ruling R6-10.2 (review finding 14): rates, spreads, vols, ratios and per-unit factors never inherit a money
+    # tolerance. Measured on the v0.8.0 Python, Rust and C++ builds: every flagged output within 1e-15 relative.
+    absolute: 1.0e-10
+    relative: 1.0e-8
   interpolation:
     # A solve or several chained operations; rounding grows with knot count.
     absolute: 1.0e-10

@@ -268,7 +268,7 @@
     "status": "ok",
     "outputs": {
      "var": 4597347.01,
-     "es": 5360005.883333333,
+     "es": 5512537.658,
      "tail_count": 3
     }
    },
@@ -548,7 +548,7 @@
     "status": "ok",
     "outputs": {
      "var": 3734436.44,
-     "es": 5230918.96,
+     "es": 5410496.8624,
      "tail_count": 7
     }
    },
@@ -1078,8 +1078,8 @@
     "status": "ok",
     "outputs": {
      "var": 4761505.78,
-     "es": 7009442.92,
-     "tail_count": 6
+     "es": 7459030.348,
+     "tail_count": 5
     }
    },
    "tolerance_class": "simple_analytic",
@@ -2108,8 +2108,8 @@
     "status": "ok",
     "outputs": {
      "var": 3507107.03,
-     "es": 4339601.523636363,
-     "tail_count": 11
+     "es": 4422850.973,
+     "tail_count": 10
     }
    },
    "tolerance_class": "simple_analytic",
@@ -2398,8 +2398,8 @@
     "status": "ok",
     "outputs": {
      "var": 1899611.2,
-     "es": 2414373.475714286,
-     "tail_count": 14
+     "es": 2453970.573846154,
+     "tail_count": 13
     }
    },
    "tolerance_class": "simple_analytic",
@@ -2528,8 +2528,8 @@
     "status": "ok",
     "outputs": {
      "var": 3754448.23,
-     "es": 3929870.935,
-     "tail_count": 2
+     "es": 4105293.64,
+     "tail_count": 1
     }
    },
    "tolerance_class": "simple_analytic",
@@ -3588,8 +3588,8 @@
     "status": "ok",
     "outputs": {
      "var": 7571.09,
-     "es": 900300.547936508,
-     "tail_count": 126
+     "es": 907442.3836000001,
+     "tail_count": 125
     }
    },
    "tolerance_class": "simple_analytic",
@@ -6149,7 +6149,7 @@
     "status": "ok",
     "outputs": {
      "var": 3246926.25,
-     "es": 5493312.308253968,
+     "es": 5511283.39672,
      "tail_count": 63
     }
    },
@@ -6479,8 +6479,8 @@
     "status": "ok",
     "outputs": {
      "var": 2459948.78,
-     "es": 2726101.465,
-     "tail_count": 4
+     "es": 2814819.026666667,
+     "tail_count": 3
     }
    },
    "tolerance_class": "simple_analytic",
@@ -6559,8 +6559,8 @@
     "status": "ok",
     "outputs": {
      "var": 1774923.76,
-     "es": 2362871.2383333333,
-     "tail_count": 6
+     "es": 2480460.734,
+     "tail_count": 5
     }
    },
    "tolerance_class": "simple_analytic",
@@ -7088,7 +7088,7 @@
     "status": "ok",
     "outputs": {
      "var": 3474017.52,
-     "es": 4143933.506,
+     "es": 4145276.023006011,
      "tail_count": 5
     }
    },
@@ -8119,7 +8119,7 @@
     "status": "ok",
     "outputs": {
      "var": 2500499.5,
-     "es": 3428245.1615384617,
+     "es": 3464391.0964035974,
      "tail_count": 26
     }
    },
@@ -8401,7 +8401,7 @@
     "status": "ok",
     "outputs": {
      "var": 4554439.95,
-     "es": 5637988.17,
+     "es": 5844378.307142852,
      "tail_count": 3
     }
    },
@@ -9005,8 +9005,8 @@
     "status": "ok",
     "outputs": {
      "var": 11510.915926298054,
-     "es": 13522.61937977379,
-     "tail_count": 6,
+     "es": 13924.960070468936,
+     "tail_count": 5,
      "sigma_next": 0.0047570631380362575
     }
    },
@@ -9289,7 +9289,7 @@
     "status": "ok",
     "outputs": {
      "var": 55058.590534291456,
-     "es": 64854.33470679171,
+     "es": 66029.82400749174,
      "tail_count": 7,
      "sigma_next": 0.005434674973726482
     }
@@ -10323,8 +10323,8 @@
     "status": "ok",
     "outputs": {
      "var": 14443.103345009487,
-     "es": 17214.967319381976,
-     "tail_count": 11,
+     "es": 17492.153716819223,
+     "tail_count": 10,
      "sigma_next": 0.006362544779207388
     }
    },
@@ -10657,8 +10657,8 @@
     "status": "ok",
     "outputs": {
      "var": 29515.676359876237,
-     "es": 34557.22768114775,
-     "tail_count": 4,
+     "es": 36237.74478823825,
+     "tail_count": 3,
      "sigma_next": 0.00644332619271261
     }
    },
@@ -10951,8 +10951,8 @@
     "status": "ok",
     "outputs": {
      "var": 136512.14450611031,
-     "es": 172759.13817268898,
-     "tail_count": 14,
+     "es": 175547.36845473349,
+     "tail_count": 13,
      "sigma_next": 0.00770617331420638
     }
    },
@@ -11735,7 +11735,7 @@
     "status": "ok",
     "outputs": {
      "var": 12105.244699592882,
-     "es": 14655.42934147723,
+     "es": 14825.441650936185,
      "tail_count": 8,
      "sigma_next": 0.0053088884767398346
     }
@@ -12095,8 +12095,8 @@
     "status": "ok",
     "outputs": {
      "var": 28999.13906474467,
-     "es": 33377.607467673784,
-     "tail_count": 101
+     "es": 33421.392151703076,
+     "tail_count": 100
     }
    },
    "tolerance_class": "common_rng",
@@ -12153,8 +12153,8 @@
     "status": "ok",
     "outputs": {
      "var": 44140.24598334091,
-     "es": 52380.84539682998,
-     "tail_count": 501
+     "es": 52397.32659565696,
+     "tail_count": 500
     }
    },
    "tolerance_class": "common_rng",
@@ -12195,8 +12195,8 @@
     "status": "ok",
     "outputs": {
      "var": 47121.60795691148,
-     "es": 52486.182672061805,
-     "tail_count": 51
+     "es": 52593.47416636481,
+     "tail_count": 50
     }
    },
    "tolerance_class": "common_rng",
@@ -12244,8 +12244,8 @@
     "status": "ok",
     "outputs": {
      "var": 22120.131009492714,
-     "es": 29080.418405446366,
-     "tail_count": 51
+     "es": 29219.62415336544,
+     "tail_count": 50
     }
    },
    "tolerance_class": "common_rng",
@@ -22534,7 +22534,7 @@
     "status": "ok",
     "outputs": {
      "var": 14846.27,
-     "es": 70873.23888888888,
+     "es": 70873.2388888889,
      "tail_count": 45
     }
    },
@@ -22829,8 +22829,8 @@
     "status": "ok",
     "outputs": {
      "var": -108848.51,
-     "es": 2176.935000000005,
-     "tail_count": 2
+     "es": 113202.38,
+     "tail_count": 1
     }
    },
    "tolerance_class": "simple_analytic",
@@ -22843,7 +22843,7 @@
     "stage-f",
     "synthetic"
    ],
-   "description": "k = 1: ES is the mean of the whole sample",
+   "description": "k = 1, n (1 - c) = 1: ES is the largest loss (R6-3.1; was the mean of the whole sample under F-31)",
    "output_classes": {
     "tail_count": "date_and_convention"
    }
@@ -22961,7 +22961,7 @@
     "outputs": {
      "var": 500.0,
      "es": 500.0,
-     "tail_count": 4
+     "tail_count": 3
     }
    },
    "tolerance_class": "simple_analytic",

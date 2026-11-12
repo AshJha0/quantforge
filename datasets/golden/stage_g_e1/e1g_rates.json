@@ -11704,7 +11704,12 @@
     "negative_zero",
     "base:lmmswn_g-0023",
     "input:/abcd/a"
-   ]
+   ],
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
+   }
   },
   {
    "case_id": "e1g_rates-0212",
@@ -11970,7 +11975,12 @@
     "negative_zero",
     "base:lmmswn_g-0023",
     "input:/abcd/b"
-   ]
+   ],
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
+   }
   },
   {
    "case_id": "e1g_rates-0216",
@@ -12880,7 +12890,12 @@
     "negative_zero",
     "base:lmmswn_g-0023",
     "input:/correlation_beta"
-   ]
+   ],
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
+   }
   },
   {
    "case_id": "e1g_rates-0230",

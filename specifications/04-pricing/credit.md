@@ -10,7 +10,7 @@ The ISDA CDS standard model: piecewise-flat hazard and forward rates, exact inte
 
 Roll date: 20 December of `T`'s year if `T` is on or after 20 September; 20 June if on or after 20 March; else 20 December of the year before. Tenor `nM`/`nY` maturity: roll date plus that many months, on the 20th, unadjusted.
 
-Accrual periods run between 20 March, June, September, December, from the last such date on or before `T` to maturity. Each start and end is moved to the next weekday if on a weekend, except maturity itself. Payment `p_i` is the adjusted end (the last: maturity adjusted). Accrual `alpha_i = (end_i - start_i)/360`, plus one day for the last period. `T` on an adjusted coupon date: `E_INPUT` (ruling D19).
+Accrual periods run between 20 March, June, September, December, from the last such date on or before `T` to maturity. Each start and end is moved to the next weekday if on a weekend, except maturity itself. Payment `p_i` is the adjusted end (the last: maturity adjusted). Accrual `alpha_i = (end_i - start_i)/360`, plus one day for the last period. `T` on an adjusted coupon date is priced (ruling R6-7.3, replacing D19's `E_INPUT`): the last coupon date on or before `T` is `T` itself, so the first period starts on `T`, and the accrued premium at step-in `T + 1` is one day. QuantLib 1.44 `IsdaCdsEngine` on a CDS2015 schedule agrees to 1.3e-11 per unit on four such dates (`r6/cds_imm_r6`), so the rule now has its outside check.
 
 ## Curves
 
