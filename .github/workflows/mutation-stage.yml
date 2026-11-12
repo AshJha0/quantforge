@@ -3,19 +3,25 @@ name: Mutation by stage
 #  - Pull requests: incremental. Only modules (from any stage in conformance/mutation/stages.json) whose
 #    target file the PR changes, with a small sample per module, gated at 80%. A PR touching no mapped
 #    module runs the plan job alone (seconds).
-#  - Weekly and manual: every module of one stage (default F) in all four languages, scored against the
-#    stage target. The weekly run gates; a manual run gates only when asked.
+#  - Weekly: every module of every stage (stage ALL, R6-14) in all four languages, a fresh seeded sample of
+#    MAX=40 mutants per module (seed = the run number, printed in the report), gated on a point estimate of
+#    80% and a 95% Wilson lower bound of 65% per module-language (reasons.json lists countersigned exceptions).
+#  - Manual: one stage (default ALL); gates only when asked.
+#  plan_matrix.py exits 1 when a full-stage run plans nothing: at v0.8.0 stage F planned an empty matrix and
+#  the run passed (review finding 5). check_stages.py and test_gates.py run in repo-gates.yml.
 #  - Manual with `paths`: planned as a pull request touching those files (for example one Rust module).
 on:
-  pull_request:
-    paths: ['cpp26/src/**', 'java25/src/main/**', 'python/quantforge_core/**', 'rust/crates/*/src/**',
-            'conformance/mutation/**', '.github/workflows/mutation-stage.yml']
+  pull_request:  # no paths filter: mutation-report is a required check (D7); a PR touching no mapped module
+                 # plans nothing, and the skipped report counts as passing
   schedule:
     - cron: '41 5 * * 0'
   workflow_dispatch:
     inputs:
       stage:
-        default: F
+        default: ALL
+      seed:
+        description: 'sample seed (default: the run number)'
+        default: ''
       max:
         description: 'mutants sampled per module (python, rust, cpp)'
         default: '40'
@@ -32,10 +38,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 env:
-  STAGE: ${{ (github.event_name == 'pull_request' || inputs.paths) && 'PR' || inputs.stage || 'F' }}
+  STAGE: ${{ (github.event_name == 'pull_request' || inputs.paths) && 'PR' || inputs.stage || 'ALL' }}
+  SEED: ${{ inputs.seed || github.run_number }}
   MAX: ${{ github.event_name == 'pull_request' && '12' || inputs.max || '40' }}
 jobs:
   plan:
+    name: mutation-plan
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
@@ -69,6 +77,7 @@ jobs:
           name: mutation-plan
           path: pr-stages.json
   mutate:
+    name: mutation-mutate (${{ matrix.lang }} ${{ matrix.module }}${{ matrix.part }})
     needs: plan
     if: needs.plan.outputs.any == 'true'
     strategy:
@@ -104,8 +113,8 @@ jobs:
         working-directory: java25
       - if: matrix.lang == 'cpp'
         run: |
-          docker run --rm -v "$PWD:/w" -w /w -e TARGET -e SUITE -e MAX -e OUT gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b \
-            bash -c 'apt-get update -qq && apt-get install -y -qq cmake ninja-build python3 >/dev/null && python3 conformance/mutation/cpp_mutants.py --file "$TARGET" --suite "$SUITE" --max "$MAX" --unit --out "$OUT.json"'
+          docker run --rm -v "$PWD:/w" -w /w -e TARGET -e SUITE -e MAX -e SEED -e OUT gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b \
+            bash -c 'apt-get update -qq && apt-get install -y -qq cmake ninja-build python3 >/dev/null && python3 conformance/mutation/cpp_mutants.py --file "$TARGET" --suite "$SUITE" --max "$MAX" --seed "$SEED" --unit --out "$OUT.json"'
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         if: matrix.lang == 'python'
       - if: matrix.lang == 'rust'
@@ -123,7 +132,7 @@ jobs:
           echo "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER=$RUNNER_TEMP/memcap" >> "$GITHUB_ENV"
           echo "QF_MUTANT_AS=8589934592" >> "$GITHUB_ENV"
       - if: matrix.lang == 'python' || matrix.lang == 'rust'
-        run: python3 conformance/mutation/golden_mutants.py --impl "${{ matrix.lang }}" --target "$TARGET" --suite "$SUITE" --max "$MAX" --shard "$SHARD" --out "$OUT.json"
+        run: python3 conformance/mutation/golden_mutants.py --impl "${{ matrix.lang }}" --target "$TARGET" --suite "$SUITE" --max "$MAX" --seed "$SEED" --shard "$SHARD" --out "$OUT.json"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
@@ -131,6 +140,7 @@ jobs:
           path: results/
           if-no-files-found: ignore
   report:
+    name: mutation-report
     needs: [plan, mutate]
     if: always() && needs.plan.outputs.any == 'true'
     runs-on: ubuntu-24.04
@@ -156,6 +166,7 @@ jobs:
           # GATE is intentionally unquoted: empty means no flag.
           # shellcheck disable=SC2086
           python3 conformance/mutation/stage_report.py --stage "$STAGE" --stages "$STAGES" --results results --out mutation-report.md $GATE
+          echo "Sample seed: $SEED; mutants per module: $MAX" >> mutation-report.md
           cat mutation-report.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()

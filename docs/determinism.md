@@ -32,7 +32,7 @@ So a curve bootstrapped in four languages agrees to about 15 significant digits,
 
 A Monte Carlo price is checked two ways (`policy.yaml`, class `monte_carlo`): against the true value within `z` reported standard errors, and, because the draws are fixed by `rng.md`, against the oracle's own run of the same draws within class `common_rng` (1e-9). Integer draws are bit-exact; the price is not, because the normals and the payoff use `exp` and `log` (reason 1).
 
-**Planned (stage F, item E9).** A fixed-seed Monte Carlo hash golden: the SHA-256 of a fixed-seed path set's integer draws and uniforms, which must be identical on Linux, Windows and macOS. The spec lane supplies the golden; this section will name its case and the cross-platform run that checked it. Cross-platform conformance on pull requests that touch core maths is also planned. Today `cross-platform.yml` runs weekly and by hand.
+**Fixed-seed hash (E9, delivered in R6).** `datasets/golden/core/mc_hash.json` holds 4,096 xoshiro256** integer draws and the matching uniforms for seed 20261112 on streams 0, 1 and 7, every case `bit_exact`; `oracle/MC_HASH_E9.json` records the SHA-256 of each case (integers as decimal strings, uniforms as `float.hex`, one per line). `tools/check_mc_hash.py` recomputes the hashes in `repo-gates.yml` and shows a one-ulp change being caught. Because the cases are bit-exact and `cross-platform.yml` runs every golden on Linux, Windows and macOS, and since R6 also runs on pull requests that touch core maths, a green cross-platform run means the hashes are identical on all three. The first such run on the R6 branch is the evidence; until it is green, treat this as built but not yet proven.
 
 ## When you see a difference
 

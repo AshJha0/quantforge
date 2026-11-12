@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.1: R6 evidence repair (unreleased)
+
+### Corrections of record (R6-16, review finding 16)
+
+Earlier entries said these items were done. Restated here as delivered, partial or not delivered; the earlier entries are left as written, and this list is the record. Plan 14.10 rule 2 applies from now on: an entry says delivered only with a path to its acceptance evidence.
+
+- **E9** (0.6.0 entry: "E9: `docs/determinism.md`"): **not delivered** at 0.6.0. The page said the fixed-seed hash golden was planned. Delivered in 0.8.1: `datasets/golden/core/mc_hash.json` (6 bit-exact cases, 4,096 draws each), hashes in `oracle/MC_HASH_E9.json`, recomputed by `tools/check_mc_hash.py`; identity on Linux, Windows and macOS is proven only by a green `cross-platform.yml` run on the R6 branch.
+- **G4** (0.6.0 entry: "modules are named by domain, not by stage letter, in all four languages"): **partial**. At 0.8.0 stage-letter or wave names remained in C++ (`risk_f3`, `risk_f4`, `hedging_w2` to `hedging_w4`), Java (`OpsRatesG`, `OpsRiskF`, `OpsHedgeI`, `OpsWave2b`) and Python (`cli/ops_stage_g2.py`); Rust had none. The renames are done by the R6 language lanes; delivered when `git grep` for those names is empty.
+- **G2** (0.6.0 entry: "a regression gate against a stored baseline"): **partial**. `benchmarks/micro/baseline.json` was empty, so the gate compared nothing; the injected-slowdown self-check ran against a baseline taken in the same job. 0.8.1 adds `tools/bench_gate.py --require-baseline` on every non-PR run; delivered when a baseline recorded on the Actions runner is committed and `bench.yml` is green on main.
+- **A5** (0.7.0 entry: "Heston and SABR calibration surrogate"): **not delivered**. What shipped is a harness with a self-test (`oracle/A5_HARNESS_SELFTEST.json`) and no trained surrogate. A trained surrogate, or A5 formally withdrawn, is stage K (plan 14.5).
+- **Q3b** (0.7.0 entry: "the AAD core and a Bermudan AAD ladder"): **partial**. AAD covers one Bermudan ladder (`aadladder_g`); AAD for xVA sensitivities, the rest of Q3b, is not delivered and moves to stage K (plan 14.5).
+
 ## 0.8.0: stage I, hedging (2026-11-12)
 
 Stage I takes the hedging domain (plan section 4 row I, TRACEABILITY Domain 08) and plan item Q6, ahead of stage H (`program/STAGE_I_HANDOVER.md`). The date is set when the tag is made.
