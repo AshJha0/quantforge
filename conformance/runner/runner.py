@@ -22,7 +22,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-CONTRACT = "1.11.0"  # ruling I-51 (stage I); every build reports this value
+CONTRACT = "1.12.0"  # ruling R6-0.1 (R6, v0.8.1); was 1.11.0 (I-51); every build reports this value
 
 
 def load_policy(path):

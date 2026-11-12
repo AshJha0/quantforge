@@ -3533,7 +3533,7 @@
    ]
   },
   "hedge.effectiveness": {
-   "spec": "specifications/08-hedging/dynamic-hedge-and-effectiveness.md",
+   "spec": "specifications/stage-f-rulings.md",
    "rust": "quantforge::hedge::effectiveness_",
    "python": "quantforge.hedge.effectiveness_",
    "java": "Hedge.effectiveness",
@@ -3596,7 +3596,7 @@
    ]
   },
   "hedge.greeks.neutralise": {
-   "spec": "specifications/08-hedging/credit-and-correlation-hedges.md",
+   "spec": "specifications/04-pricing/use-cases.md",
    "rust": "quantforge::hedge::greeks_neutralise",
    "python": "quantforge.hedge.greeks_neutralise",
    "java": "Hedge.greeksNeutralise",
@@ -3631,7 +3631,7 @@
    ]
   },
   "hedge.integer.solve": {
-   "spec": "specifications/08-hedging/cross-asset-hedge.md",
+   "spec": "specifications/04-pricing/use-cases.md",
    "rust": "quantforge::hedge::integer_solve",
    "python": "quantforge.hedge.integer_solve",
    "java": "Hedge.integerSolve",
@@ -3782,7 +3782,7 @@
    ]
   },
   "hedge.select.solve": {
-   "spec": "specifications/08-hedging/instrument-selection.md",
+   "spec": "specifications/08-hedging/hedge-solvers.md",
    "rust": "quantforge::hedge::select_solve",
    "python": "quantforge.hedge.select_solve",
    "java": "Hedge.selectSolve",
@@ -5675,6 +5675,12 @@
     },
     "quotes": {
      "java": "quotes"
+    },
+    "step_end": {
+     "java": "stepEnd"
+    },
+    "tension": {
+     "java": "tension"
     }
    },
    "outputs": [
@@ -5882,6 +5888,24 @@
     "binding_scenario",
     "capital",
     "scenarios"
+   ]
+  },
+  "risk.frtb.sbm_total": {
+   "spec": "specifications/06-risk/frtb-sa-girr.md",
+   "rust": "quantforge::risk::frtb_sbm_total",
+   "python": "quantforge.risk.frtb_sbm_total",
+   "java": "Risk.frtbSbmTotal",
+   "cpp": "qf::risk::frtb_sbm_total",
+   "inputs": {
+    "components": {
+     "java": "components"
+    }
+   },
+   "outputs": [
+    "binding_scenario",
+    "capital",
+    "scenario_totals",
+    "sum_of_component_capitals"
    ]
   },
   "risk.frtb.vega": {
@@ -6535,6 +6559,46 @@
     "hedge_spot_base",
     "pv",
     "residual_delta"
+   ]
+  },
+  "usecase.option_hedge_lots": {
+   "spec": "specifications/04-pricing/use-cases.md",
+   "rust": "quantforge::usecase::option_hedge_lots_",
+   "python": "quantforge.usecase.option_hedge_lots_",
+   "java": "Usecase.optionHedgeLots",
+   "cpp": "qf::usecase::option_hedge_lots_",
+   "inputs": {
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "hedges": {
+     "java": "hedges"
+    },
+    "max_lots": {
+     "java": "maxLots"
+    },
+    "portfolio": {
+     "java": "portfolio"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "targets": {
+     "java": "targets"
+    },
+    "volatility": {
+     "java": "volatility"
+    }
+   },
+   "outputs": [
+    "greeks_after",
+    "greeks_before",
+    "hedge_cost",
+    "lots",
+    "rounding_cost"
    ]
   },
   "usecase.rates_hedge": {
@@ -7845,11 +7909,11 @@
    },
    "outputs": [
     "cva",
+    "deflated_pfe_95",
+    "deflated_pfe_99",
     "discounted_ee",
     "discounted_ene",
-    "epe",
-    "pfe_95",
-    "pfe_99"
+    "epe"
    ]
   },
   "xva.exposure.swap_ee_hw": {

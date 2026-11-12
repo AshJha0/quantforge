@@ -342,6 +342,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -421,6 +424,9 @@
     "absolute": 0.005,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -500,6 +506,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -579,6 +588,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -659,6 +671,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -1390,11 +1405,11 @@
    "inputs": {
     "trade_date": "2026-12-21",
     "discount": {
-     "as_of": "2026-11-06",
+     "as_of": "2026-12-21",
      "interpolation": "LOG_LINEAR_DF",
      "pillars": [
       {
-       "date": "2046-11-06",
+       "date": "2046-12-21",
        "discount_factor": 0.458161174870904
       }
      ]
@@ -1428,19 +1443,52 @@
     ]
    },
    "expected": {
-    "status": "error",
-    "error_code": "E_INPUT"
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9962549909270567
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9899587627812985
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9551785099673002
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.9013720971899637
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8477225487583118
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7664714098007159
+      }
+     ]
+    }
    },
-   "tolerance_class": "date_and_convention",
+   "tolerance_class": "interpolation",
    "verified_by": [
-    "hand"
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
    ],
    "tags": [
-    "invalid",
     "ruling",
+    "r6",
     "synthetic"
    ],
-   "description": "trade date on an adjusted coupon date"
+   "description": "trade date on an adjusted coupon date: priced, accrual from T (R6-7.3; was E_INPUT under D19)",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "curve solve; spreads reprice below 1e-13"
+   }
   },
   {
    "case_id": "credit_d-0018",

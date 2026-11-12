@@ -257,7 +257,17 @@ def credit_d():
     s.add("credit.cds.bootstrap", {**b, "recovery": 1.0}, error="E_DOMAIN", cls=E, tags=["invalid"])
     s.add("credit.cds.bootstrap", {**b, "quotes": b["quotes"][::-1]}, error="E_INPUT", cls=E, tags=["invalid"])
     s.add("credit.cds.bootstrap", {**b, "quotes": [{"tenor": "5Y", "spread": -.001}]}, error="E_DOMAIN", cls=E, tags=["invalid"])
-    s.add("credit.cds.bootstrap", {**b, "trade_date": "2026-12-21"}, error="E_INPUT", cls=E, tags=["invalid", "ruling"], description="trade date on an adjusted coupon date")
+    # R6-7.3 (replaces D19): a trade date on an adjusted coupon date is priced; same case id, now a value case on a curve set at that date
+    T3 = date(2026, 12, 21)
+    disc3 = D.Curve(T3, [T3 + timedelta(7305)], [math.exp(-.039 * 7305 / 365)])
+    H3, mats3, surv3 = bootstrap(T3, disc3, .40, QUOTES)
+    dh3, ph3 = ql_setup(T3, disc3, H3, .40)
+    for (t, q), m in zip(QUOTES, mats3):
+        assert abs(ql_cds(T3, m, q, .40, dh3, ph3).fairSpread() - q) < 1e-9
+    s.add("credit.cds.bootstrap", {**b, "trade_date": str(T3), "discount": D.jcurve(disc3, disc_dates(disc3), [disc3.df(d) for d in disc_dates(disc3)])},
+          {"pillars": [{"date": str(d), "survival": v} for d, v in zip(mats3, surv3)]}, cls=I, verified=["independent-replay", QLE], tags=["ruling", "r6"],
+          limit={"absolute": 1e-9, "relative": 0.0, "reason": "curve solve; spreads reprice below 1e-13"},
+          description="trade date on an adjusted coupon date: priced, accrual from T (R6-7.3; was E_INPUT under D19)")
     # A trade date in February: roll date is the previous 20 December.
     T2 = date(2027, 2, 10)
     disc2 = D.Curve(T2, [T2 + timedelta(365 * k) for k in (1, 3, 5, 10, 15)], [math.exp(-.038 * k) for k in (1, 3, 5, 10, 15)])

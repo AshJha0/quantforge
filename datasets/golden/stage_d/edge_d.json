@@ -2380,12 +2380,12 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "ref_cpi": 322.85566666666665,
-     "index_ratio": 1.075742887357408,
+     "ref_cpi": 322.85567,
+     "index_ratio": 1.07574,
      "real_clean": 106.87808397301698,
      "real_accrued": 0.17610497237569062,
-     "nominal_clean": 114.9733386483608,
-     "nominal_accrued": 0.189443671461422
+     "nominal_clean": 114.97303005313329,
+     "nominal_accrued": 0.18944316298342542
     }
    },
    "tolerance_class": "simple_analytic",
@@ -2442,11 +2442,11 @@
     "status": "ok",
     "outputs": {
      "ref_cpi": 322.88,
-     "index_ratio": 1.0758239651050259,
+     "index_ratio": 1.07582,
      "real_clean": 106.87178963299344,
      "real_accrued": 0.1878453038674033,
-     "nominal_clean": 114.9752324808372,
-     "nominal_accrued": 0.2020884796329883
+     "nominal_clean": 114.974808722967,
+     "nominal_accrued": 0.20208773480662984
     }
    },
    "tolerance_class": "simple_analytic",
@@ -2502,12 +2502,12 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "ref_cpi": 323.3929032258065,
-     "index_ratio": 1.0775329392815072,
+     "ref_cpi": 323.3929,
+     "index_ratio": 1.07753,
      "real_clean": 106.68308832156507,
      "real_accrued": 0.5400552486187845,
-     "nominal_clean": 114.95454173076463,
-     "nominal_accrued": 0.581927319418604
+     "nominal_clean": 114.95422815913602,
+     "nominal_accrued": 0.581925732044199
     }
    },
    "tolerance_class": "simple_analytic",

@@ -25,3 +25,4 @@ oracle/ore/run*/Output/
 oracle/ore/runb*/Output/
 tools/.coverage
 .coverage
+oracle/python/.r6_jac_cache/

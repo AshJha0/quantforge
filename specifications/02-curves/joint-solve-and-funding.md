@@ -44,7 +44,7 @@ Unknown order (it is the row order of the Jacobian): curves in input order; with
 
 ### Solve
 
-All residuals together, by Newton or any proven method, until every residual is at most 1e-13 in absolute value (rates and spreads as decimals; xccy leg value per unit notional), else `E_NO_CONVERGENCE`. Starting point: flat curves at the first quote of each curve, steps at `base_rate`, turn factors 1. Because a curve's residuals depend only on its own unknowns and those of curves before it, `dR/dx` is block lower triangular, and a build may solve block by block (ruling F-25); the result is the same solution.
+All residuals together, by Newton or any proven method, until every residual is at most 1e-13 in absolute value (rates and spreads as decimals; xccy leg value per unit notional), else `E_NO_CONVERGENCE`. Starting point: flat curves at the first quote of each curve, steps at `base_rate`, turn factors 1. Because a curve's residuals depend only on its own unknowns and those of curves before it, `dR/dx` is block lower triangular, and a build may solve block by block (ruling F-25); the result is the same solution. Within a block nothing is triangular when the curve uses a non-local interpolation (`MONOTONE_CONVEX`, `MONOTONIC_LOG_CUBIC`, `TENSION_SPLINE`, `HYBRID`): a later quote moves earlier pillars, and the Jacobian has entries above its diagonal (ruling R6-1.1).
 
 ### Outputs
 

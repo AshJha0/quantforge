@@ -33839,8 +33839,8 @@
     "status": "ok",
     "outputs": {
      "var": 47121.60795691148,
-     "es": 52486.182672061805,
-     "tail_count": 51
+     "es": 52593.47416636481,
+     "tail_count": 50
     }
    },
    "tolerance_class": "common_rng",

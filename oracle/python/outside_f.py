@@ -277,8 +277,14 @@ def h_hist(i):
     v = float(np.quantile(L, i["confidence"], method="inverted_cdf"))
     s = np.sort(L)
     k = int(np.searchsorted(s, v, side="left"))  # first position holding the quantile: the VaR scenario (ties included)
-    t = s[k:]
-    return {"var": v, "es": float(np.mean(t)), "tail_count": int(t.size)}, {"NUMPY.QUANTILE"}
+    # ES (R6-3.1): Acerbi and Tasche (2002) eq. on the ordered sample X_(1) <= ... of P&L, alpha = 1 - c, written from the
+    # paper's form with n alpha (not the spec's n - n c), so the two formulations agree only up to rounding
+    X = np.sort(np.array(i["pnl"], float))
+    na = len(X) * (1.0 - i["confidence"])
+    m = int(np.floor(na + 1e-9))
+    frac = max(na - m, 0.0)
+    es = -(np.sum(X[:m]) + (frac * X[m] if m < len(X) and frac > 1e-9 else 0.0)) / na
+    return {"var": v, "es": float(es), "tail_count": int(np.ceil(na - 1e-9))}, {"NUMPY.ACERBI_TASCHE"}
 
 
 def h_pca(i):

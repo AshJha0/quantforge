@@ -68,7 +68,7 @@ Inputs: `futures_price` `F`, `settlement`, `delivery`, `repo_rate` `r`, `bonds` 
 
 `invoice = F CF + accrued(delivery)`, `gross_basis = clean - F CF`, `net_basis = forward_dirty - invoice` (`repo.forward` at `r`), `implied_repo = (invoice + sum c - dirty) / (dirty T - sum c (delivery - d)/360)`.
 
-Outputs: `bonds` (those four per bond, in input order), `ctd` (0-based index of the highest `implied_repo`). No golden has two implied repos within 1e-6.
+Outputs: `bonds` (those four per bond, in input order), `ctd` (0-based index of the highest `implied_repo`). No golden has two implied repos within 1e-6. The stage D basis golden (`repo_d`) has a futures price far from fair, so its implied repos are near -100%; `r6/basis_r6` (ruling R6-7.2) prices the futures at the CTD's fair value less 2/32 for March 2027 delivery, giving implied repos of 0.8% to 3.6% against a 3.85% repo, each re-solved by brentq on the forward identity.
 
 ## `bond.fit.nelson_siegel`
 
