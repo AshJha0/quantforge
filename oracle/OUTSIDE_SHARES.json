@@ -1522,32 +1522,32 @@
     "error_and_invariance_cases": 108
    },
    "with_sweeps": {
-    "cases": 485,
+    "cases": 472,
     "library-object": 71,
     "library-primitive": 131,
     "independent-rederivation": 0,
     "reimplementation": 20,
-    "none": 263,
+    "none": 250,
     "counted": 202,
-    "share": 0.4165,
+    "share": 0.428,
     "counted_with_rederivation": 202,
-    "share_with_rederivation": 0.4165,
-    "all_cases_share": 0.0293,
-    "error_and_invariance_cases": 6417
+    "share_with_rederivation": 0.428,
+    "all_cases_share": 0.0333,
+    "error_and_invariance_cases": 5588
    },
    "sweeps": {
-    "cases": 68,
+    "cases": 55,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 0,
     "reimplementation": 0,
-    "none": 68,
+    "none": 55,
     "counted": 0,
     "share": 0.0,
     "counted_with_rederivation": 0,
     "share_with_rederivation": 0.0,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 6309
+    "error_and_invariance_cases": 5480
    },
    "libraries": {
     "QuantLib 1.44": 57,
