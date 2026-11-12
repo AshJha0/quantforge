@@ -194,8 +194,9 @@ def jacobian(as_of: date, convention: str, quotes: Sequence[Quote], interpolatio
     for j in range(n):
         up = zeros([h if k == j else 0.0 for k in range(n)])[1]
         down = zeros([-h if k == j else 0.0 for k in range(n)])[1]
-        columns.append([(u - d) / (2 * h) if i >= j else 0.0
-                        for i, (u, d) in enumerate(zip(up, down, strict=True))])
+        # No triangular mask (R6 finding 3): non-local interpolations couple later
+        # quotes into earlier pillars; for local ones the difference is exactly zero.
+        columns.append([(u - d) / (2 * h) for u, d in zip(up, down, strict=True)])
     matrix = [[columns[j][i] for j in range(n)] for i in range(n)]
     return {"pillar_dates": [d.isoformat() for d in data.dates], "zero_rates": z0,
             "jacobian": matrix}

@@ -3,6 +3,7 @@
 with the G-9 cost ratio, xVA limits, F3/F4/FRTB identities). Goldens run in test_conformance.py."""
 import itertools
 import math
+import os
 import statistics
 import time
 from typing import Any
@@ -130,6 +131,11 @@ def test_ladder_cost_ratio_report() -> None:
 
     ratio = median(ladder) / median(one_price)
     print(f"G-9 ladder cost ratio: {ratio:.2f}")
+    # R6-16: record the measured ratio; CI sets QF_G9_OUT and keeps the file as evidence.
+    out = os.environ.get("QF_G9_OUT")
+    if out:
+        with open(out, "a", encoding="utf-8") as f:
+            f.write(f"python G-9 ladder/price ratio {ratio:.4f} (bound 5)\n")
     assert ratio <= 5
 
 

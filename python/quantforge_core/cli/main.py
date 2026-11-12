@@ -32,6 +32,8 @@ def _error(case_id: str, code: str, message: str, field: str | None = None) -> d
 def _all_finite(value: Any) -> bool:
     if isinstance(value, float):
         return math.isfinite(value)
+    if isinstance(value, complex):  # never a valid result; a crash in json.dumps otherwise
+        return False
     if isinstance(value, dict):
         return all(_all_finite(v) for v in value.values())
     if isinstance(value, list):

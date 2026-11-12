@@ -30,6 +30,8 @@ def _flows(pool: Pool) -> Flows:
     for k in range(1, wam + 1):
         n = wam - k + 1
         cpr = speed if model == "CPR" else min((age + k) / 30, 1) * 0.06 * speed / 100
+        if cpr > 1:  # R6 finding 18: above ~1667% PSA the SMM would be complex
+            raise QfError("E_DOMAIN", "PSA speed gives a CPR above 100%", "pool")
         smm = 1 - (1 - cpr) ** (1 / 12)
         if k == wam:
             sp = b
