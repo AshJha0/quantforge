@@ -30,6 +30,14 @@ Written 2026-11-12. All builds and tests ran in WSL (Ubuntu, g++ 15.2) on source
 | R6-16 G-9 | the test writes the measured ratio to `QF_G9_RECORD`; 2.33 in WSL |
 | R6-25 | `cpp26/SPEC_QUESTIONS.md`: stages G and I filled, every entry open or closed with its ruling |
 
+## R6-6.1b (cost QP final step)
+
+Exact. Once the sign state is found, the result is the orthant QP solved on that state by the dual active-set method, in which each position at its kink is held by its sign row; every position whose sign-row multiplier is positive is set to exactly 0 (`SignStates::run`, `hedging.cpp`). It never stops near zero without landing on it, so no extra tolerance step is applied.
+
+## Large hedge goldens (R6-6.3, T6/T7)
+
+`r6/hedgeqp_large_r6` 5 of 5. One `quantforge run` per case in WSL, release build, other lanes' jobs running on the same machine: n = 50: 0.12, 0.20, 0.40 s (T7 met); n = 200: case 4 31.1 s, case 5 5.2 s (T6, 5 s, **not met**: case 4 is six times over). The runner's whole-suite time was 23.5 s, so case 4 is also load-sensitive; it needs a timing on a quiet machine or the Actions runner. The cost of case 4 is in the sign-state loop (one dense orthant QP per flipped sign).
+
 ## Totals
 
 - Conformance (`runner.py --impl cpp`, all goldens at `d51d30a`): **15,071 of 15,076**; after the kink fix `hedgecost_i` is 23 of 23, so **15,072 of 15,076**. The 4 left are golden defects, question 1 and 2.
