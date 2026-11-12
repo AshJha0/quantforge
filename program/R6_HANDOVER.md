@@ -211,3 +211,19 @@ Per-case Richardson gaps, largest upper entry and the truncation explanation: `o
 ### R6-1: cause of the 1.4e-3 gaps (follow-up)
 
 Not truncation in the usual small-`h` sense and not a kink: `oracle/R6_JACOBIAN_KINK.json` shows, for entry [10, 9] under SOFR `MONOTONE_CONVEX` and `HYBRID`, central quotients -0.237553 (1 bp), -0.236481 (0.5 bp), -0.236060 (0.1 bp), -0.2360156 (0.01 bp), and forward minus backward 0.0319, 0.0157, 0.00328, 0.000328, which shrinks in proportion to the bump. The zero rate is smooth but strongly curved in that quote, so 1 bp is outside the `h^2` range. Not a defect; documented as a known limit in `par-and-key-rate.md` and R6-1.3. No golden or build change.
+
+## Rulings on the Python lane questions (2026-11-12)
+
+See `r6-rulings.md`, section "Python lane questions": R6-6.2a (no scaling under `MIN_NORM`: confirmed), R6-6.1a (exact-zero kink test conforms for an exact active set; coverage gap: no golden distinguishes it), R6-16a (test file names are not G4 modules), E-Q7 and E-Q11 ruled as Python built them, F-Q1 and F-Q4 ruled (field text and method not normative), G-Q2 deferred to J-10, R6-6.4a (Python's large hedge solve missed T6/T7: 412.6 s against 46 s; target unchanged; `expsim_g` has no target). R6-1.3 wording now matches the corrected plan row: R6-1 met.
+
+### R6-6.1b: kink coverage closed by argument, no golden
+
+See `r6-rulings.md` R6-6.1b: a misclassified position within 1e-11 changes the answer by at most about cond x 1e-11, inside `root_finding`, so no golden can separate the two tests. The tolerance binds only builds whose final step is not an exact re-solve on the state. Python's exact-zero test conforms. Totals unchanged (15,076: value 7,440, error 5,122, invariance 2,514).
+
+## Wave 3B: stale golden copies (Java J-R6-3), rulings J-R6-4, J-R6-5, negative-pivot band, R6-11.16 corrected
+
+Changed case ids (expected results only): `e1_risk-0372` (ES and `tail_count` from its source `risk_f4-0039`), `edge_d-0015`, `edge_d-0016`, `edge_d-0017` (R6-7.5 rounding). Totals unchanged: 15,076 (value 7,440, error 5,122, invariance 2,514). `hedgecorr_i-0015` stays `E_DOMAIN`; ruling R6-11.16 was wrong and is corrected to `E_DOMAIN`. Rulings in `r6-rulings.md`, "Java lane questions".
+
+Why the oracle side missed them: each regeneration rewrote only its own file. `stage_f/e1_*` twins are copies made once by `gen_stage_f_e1.py` from the goldens of the day, and `edge_d` has its own copy of the linker formula in `gen_r1_edge.py`; nothing compared a copy with its source after the source changed, and the per-file diffs I checked were of the regenerated files only. New gate: `python tools/check_golden_copies.py` (any case whose inputs equal another case's inputs, `-0.0` read as `0.0`, must expect the same result; `--self-test` shows it red on a planted stale twin). The formula copy in `gen_r1_edge.py` now calls the shared `tips_round`, so it cannot drift again. A search for other copies of changed rulings (ES, TIPS, PFE keys, barrier envelope, `sbm_total`) found none beyond these four.
+
+WAVE 3B READY 516b776 (changed: e1_risk-0372, edge_d-0015, edge_d-0016, edge_d-0017; totals 15,076)
