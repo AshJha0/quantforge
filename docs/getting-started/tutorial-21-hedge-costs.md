@@ -150,6 +150,23 @@ python examples/tutorial_hedge_21.py cpp26/build/quantforge
 
 Each prints the thirteen lines of step 1, digit for digit. The full checks are the conformance suites `hedgecost_i`, `hedgefrontier_i`, `hedgebtcost_i` and `hedgeslip_i`.
 
+## Use case 6: hedging an option book in whole lots
+
+Plain idea: a desk holding options hedges with listed contracts that trade in lots, so the hedge must be a whole number of lots, and rounding to whole lots leaves some risk and some cost behind. Use case 6 (`usecase.option_hedge_lots`, spec `specifications/04-pricing/use-cases.md`, ruling R6-11.20) takes the book, the hedge instruments with lot size and half-spread, and the Greeks to neutralise; it weights each Greek by `1/max(1, |b_t|)^2`, solves `hedge.integer.solve` with lot bounds of plus or minus `max_lots`, and reports the Greeks before and after, the lots, `hedge_cost` and `rounding_cost`.
+
+Worked example, golden case `uc6_r6-0001` (synthetic; expected outputs from the oracle at 50 digits with an exact integer search): a book short 1,500 six-month 105 calls, long 800 one-year 92 puts and long 600 three-month 100 calls (spot 100, rate 3%, dividend yield 1%, vol 22%), hedged in the underlying in lots of 100 with a half-spread of 0.01.
+
+| Output | Value |
+|---|---|
+| Delta before | -543.96 |
+| Lots bought | 5 (500 units) |
+| Delta after | -43.96 |
+| Gamma and vega | unchanged (-3.98 and -2,902.44): the underlying has neither |
+| `hedge_cost` | 5.0 (500 units times the 0.01 half-spread) |
+| `rounding_cost` | 0.0065, the objective lost by rounding to whole lots |
+
+The CLI run of this case in each language is not shown yet: the operation is new in contract 1.12.0, and the page gains a runnable block once the four builds pass `datasets/golden/r6/uc6_r6.json`.
+
 ## For practitioners
 
 - **Square-root impact is not here.** Empirical impact is often closer to the square root of size than linear in it. That cost grows as `|x|^{3/2}`, which is not a quadratic program; linear impact is the QP-compatible approximation the spec chose.

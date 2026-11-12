@@ -51,27 +51,27 @@ Stage E has its own index tables (ME-A1 to ME-A8, EB1 to EB12) under "Stage E mo
 | MF-9 | FRTB-SA GIRR delta (Q2) | `06-risk/frtb-sa-girr.md` | F | Implemented | see entry |
 | MF-10 | Book lifecycle and marks (F5) | `07-portfolio/book-lifecycle.md` | F | Implemented | see entry |
 | MF-11 | Factor attribution (use case 4) | `04-pricing/use-cases.md` | F | Implemented | see entry |
-| MG-1 | One-factor short-rate models (G1) | `04-pricing/short-rate-models.md` | G | Implemented | 197 of 286 (197 library object, 0 numpy or scipy primitive; D6, generated) |
-| MG-2 | Discrete barrier correction (R9) | `04-pricing/exotics.md` | G | Implemented | 2 of 38 (2 library object, 0 numpy or scipy primitive; D6, generated) |
-| MG-3 | Monte Carlo Greeks (Q9 part 1) | `06-risk/mc-greeks.md` | G | Implemented | 0 of 22 (0 library object, 0 numpy or scipy primitive; D6, generated) |
-| MG-4 | Closed-form swap exposure and CVA (G5a) | `06-risk/xva-exposure.md` | G | Implemented | 0 of 16 (0 library object, 0 numpy or scipy primitive; D6, generated) |
-| MG-5 | LIBOR market model, closed-form layer and simulation (G4a, waves 3b and 3c) | `04-pricing/lmm.md` | G | Implemented | 53 of 68 (0 library object, 53 numpy or scipy primitive; D6, generated) |
-| MG-6 | AAD ladder of the Bermudan scheme (Q3b) | `06-risk/aad-core.md` | G | Implemented | 0 of 5 (0 library object, 0 numpy or scipy primitive; D6, generated) |
-| MG-7 | Model-reserve dispersion (Q9 part 2) | `06-risk/model-reserve.md` | G | Implemented | 0 of 9 (0 library object, 0 numpy or scipy primitive; D6, generated) |
-| MG-8 | Deterministic xVA layer (G5b) | `06-risk/xva-framework.md` | G | Implemented | 0 of 43 (0 library object, 0 numpy or scipy primitive; D6, generated) |
-| MG-9 | Portfolio exposure under Hull-White, ORE-checked (G5c) | `06-risk/xva-exposure-portfolio.md` | G | Implemented | 80 of 102 (80 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-1 | One-factor short-rate models (G1) | `04-pricing/short-rate-models.md` | G | Implemented | 197 of 231 (197 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-2 | Discrete barrier correction (R9) | `04-pricing/exotics.md` | G | Implemented | 2 of 31 (2 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-3 | Monte Carlo Greeks (Q9 part 1) | `06-risk/mc-greeks.md` | G | Implemented | 0 of 12 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-4 | Closed-form swap exposure and CVA (G5a) | `06-risk/xva-exposure.md` | G | Implemented | 0 of 7 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-5 | LIBOR market model, closed-form layer and simulation (G4a, waves 3b and 3c) | `04-pricing/lmm.md` | G | Implemented | 53 of 53 (0 library object, 53 numpy or scipy primitive; D6, generated) |
+| MG-6 | AAD ladder of the Bermudan scheme (Q3b) | `06-risk/aad-core.md` | G | Implemented | 0 of 3 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-7 | Model-reserve dispersion (Q9 part 2) | `06-risk/model-reserve.md` | G | Implemented | 0 of 6 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-8 | Deterministic xVA layer (G5b) | `06-risk/xva-framework.md` | G | Implemented | 0 of 24 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-9 | Portfolio exposure under Hull-White, ORE-checked (G5c) | `06-risk/xva-exposure-portfolio.md` | G | Implemented | 80 of 96 (80 library object, 0 numpy or scipy primitive; D6, generated) |
 | MG-10 | F3 sensitivities (inflation01, dividend and borrow, correlation) | `06-risk/f3-sensitivities.md` | G | Implemented | 9 of 18 |
 | MG-11 | FRTB-SA delta for FX, equity, CSR and commodity | `06-risk/frtb-sa-fx-equity.md` | G | Implemented | see entry |
 | MG-12 | FRTB-SA vega and curvature | `06-risk/frtb-sa-vega-curvature.md` | G | Implemented | see entry |
 | MG-13 | F4 portfolio-risk tools | `06-risk/portfolio-risk-tools.md` | G | Implemented | see entry |
 | MG-14 | Heston and SABR calibration surrogate (A5, challenger) | `11-research/a5-surrogate.md` | G | Challenger only; acceptance harness, no surrogate trained yet | see entry |
-| MI-1 | Hedge solvers (stage I wave 1) | `08-hedging/hedge-solvers.md` | I | Implemented | 57 of 148 (0 library object, 57 numpy or scipy primitive; D6, generated) |
-| MI-2 | Credit and correlation hedges (stage I wave 2) | `08-hedging/credit-and-correlation-hedges.md` | I | Implemented | 19 of 39 (0 library object, 19 numpy or scipy primitive; D6, generated) |
-| MI-3 | Cross-asset hedge, equity and rates (stage I wave 3) | `08-hedging/cross-asset-hedge.md` | I | Implemented | 9 of 17 (0 library object, 9 numpy or scipy primitive; D6, generated) |
-| MI-4 | Hedge costs, impact, margin and the risk-against-cost frontier (stage I wave 4a) | `08-hedging/hedge-costs-and-frontier.md` | I | Implemented | 2 of 10 (0 library object, 2 numpy or scipy primitive; D6, generated) |
-| MI-5 | Dynamic delta-hedge backtest and hedge effectiveness (stage I wave 4b) | `08-hedging/dynamic-hedge-and-effectiveness.md` | I | Implemented | 5 of 34 (0 library object, 5 numpy or scipy primitive; D6, generated) |
-| MI-6 | Instrument selection (stage I wave 4c) | `08-hedging/instrument-selection.md` | I | Implemented | 10 of 18 (0 library object, 10 numpy or scipy primitive; D6, generated) |
-| MI-7 | Hedge slippage report (stage I wave 4d) | `08-hedging/hedge-slippage.md` | I | Implemented | 0 of 12 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MI-1 | Hedge solvers (stage I wave 1) | `08-hedging/hedge-solvers.md` | I | Implemented | 57 of 88 (0 library object, 57 numpy or scipy primitive; D6, generated) |
+| MI-2 | Credit and correlation hedges (stage I wave 2) | `08-hedging/credit-and-correlation-hedges.md` | I | Implemented | 19 of 19 (0 library object, 19 numpy or scipy primitive; D6, generated) |
+| MI-3 | Cross-asset hedge, equity and rates (stage I wave 3) | `08-hedging/cross-asset-hedge.md` | I | Implemented | 9 of 9 (0 library object, 9 numpy or scipy primitive; D6, generated) |
+| MI-4 | Hedge costs, impact, margin and the risk-against-cost frontier (stage I wave 4a) | `08-hedging/hedge-costs-and-frontier.md` | I | Implemented | 2 of 4 (0 library object, 2 numpy or scipy primitive; D6, generated) |
+| MI-5 | Dynamic delta-hedge backtest and hedge effectiveness (stage I wave 4b) | `08-hedging/dynamic-hedge-and-effectiveness.md` | I | Implemented | 5 of 17 (0 library object, 5 numpy or scipy primitive; D6, generated) |
+| MI-6 | Instrument selection (stage I wave 4c) | `08-hedging/instrument-selection.md` | I | Implemented | 10 of 10 (0 library object, 10 numpy or scipy primitive; D6, generated) |
+| MI-7 | Hedge slippage report (stage I wave 4d) | `08-hedging/hedge-slippage.md` | I | Implemented | 0 of 6 (0 library object, 0 numpy or scipy primitive; D6, generated) |
 
 Numerical engines in `01-core` (root finders, quadrature, PDE, Monte Carlo, COS, RNG, Sobol) are tools, not models. They are tested against analytic and library values in stage A.
 
@@ -626,7 +626,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 ### MG-9 Portfolio exposure under Hull-White, ORE-checked (G5c)
 - **Purpose:** discounted EE, ENE, PFE 95/99, EPE and CVA of netting sets of swaps at common reset dates, by exact one-factor integration.
 - **Inputs:** curve, `a`, `sigma`; swaps of the set; exposure times; quantiles; hazard and recovery.
-- **Limitations:** common annual resets only; no collateral; PFE is a quantile of the discounted exposure under the LGM measure; 16 of 96 value cases do not meet the registered ORE check (G-42; stage share 56.4% under the tight rule D6, `oracle/OUTSIDE_SHARES.md`), G-42b carried to stage I (G-52).
+- **Limitations:** common annual resets only; no collateral; PFE is a quantile of the discounted exposure under the LGM measure; 16 of 96 value cases do not meet the registered ORE check (G-42; stage share 71.7% of value-checked cases under the tight rule D6, `oracle/OUTSIDE_SHARES.md`), G-42b carried to stage I (G-52).
 - **Validation:** 40-digit and binary64 quadrature, self-check P = q at each PFE; ORE 1.8.17 within 3 MC SE (80 of 102, `oracle/ore/ORE_CHECK_4C.json`). **Review:** 2026-11-11.
 - **Tier:** 1.
 - **Challenger:** ORE 1.8.17 simulation (LGM), and the wave 4a Jamshidian EE for single swaps.

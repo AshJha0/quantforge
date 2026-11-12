@@ -35,3 +35,12 @@ Written 2026-11-12. Base `e387d29`; `r6-evidence` (`aa33e85`) and `r6-research` 
 ## Checks run (local, Windows, 2026-11-12)
 
 `tools/check_docs_status.py` 0 problems; `tools/case_figures.py --check`; `tools/inventory_counts.py --check`; `tools/build_references.py --check`; `tools/test_build_references.py`; `tools/check_hygiene.py` 0 problems; `tools/check_job_names.py` 0 problems; `tools/test_tools.py` pass; `research/test_preregs.py` 5 tests OK (with `origin/forward-log` fetched); `tools/build_site.py` 344 pages, 0 broken links; `git grep -i` for the banned word empty. Not run: the external link check over the network (`tools/check_links.py`), tutorial runs in four languages.
+
+## Second pass (2026-11-12, after `r6` at `618156d` and `r6-evidence` at `b9b2b3c`)
+
+- Case figures regenerated: 15,076 (7,440 value-checked, 5,122 error, 2,514 invariance in 1,257 pairs); `case_figures` now counts `any` with `same_as` as invariance. Inventory counts and references regenerated.
+- Outside shares on value-checked cases (owner rule) with old all-case shares beside them, in README, LEARN, ROADMAP, site facts, inventory, CHANGELOG, release notes and the post figures. No dated-plan wording.
+- Release notes: R6-1 to R6-11 and the spec part of R6-25 filled from `program/R6_HANDOVER.md`, including counts that differ from the review (finding 14: 236 cases, not 102; finding 10: 51 operations, not 53), R6-8 `E_NON_FINITE`, R6-1 as reworded (met on the oracle side; first wording a plan error), ESTR with one source only, IAS 39 AG107 unverified, no goldens for R6-11.9 and R6-11.16, Q6-01 kept as a failed test with a redesign in J-11.
+- Tutorial 12 states the R6-2.1 envelope (the tutorial's barrier is inside it); tutorial 21 gains use case 6 from golden `uc6_r6-0001` (no CLI block until the four builds pass the suite); tutorial 22 notes the owner decision; README states per-file coverage as gated.
+
+Remaining PENDING: stage F share (`r6-oracle2`); stage G per-case confirmation (`r6-oracle2`); four-language agreement on R6-1 and R6-6 and T6/T7 timing, R6-21 builds, per-file coverage tables, C++ and Python SPEC_QUESTIONS lines (language lanes); G-42b (evidence lane); mutation run, bench baseline, stage-letter grep, CI green on main, G-9 table (coordinator); owner items unchanged; a runnable use case 6 block in tutorial 21 and the four-language `ois-full` rerun (docs, after the builds).
