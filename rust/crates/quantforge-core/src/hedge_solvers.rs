@@ -21,8 +21,9 @@ thread_local! {
     static PLANTED_CAP: std::cell::Cell<Option<usize>> = const { std::cell::Cell::new(None) };
 }
 
-fn set_cap(n: usize) {
-    let cap = PLANTED_CAP.with(std::cell::Cell::get).unwrap_or(10 * n + 100);
+/// `10 (n + p) + 100`, `n` instruments and `p` constraints (R6-6.1 as amended in wave 3B).
+fn set_cap(n: usize, p: usize) {
+    let cap = PLANTED_CAP.with(std::cell::Cell::get).unwrap_or(10 * (n + p) + 100);
     ITERATION_CAP.with(|c| c.set(cap));
 }
 
@@ -902,7 +903,14 @@ fn jacobi_for(p: &QpProblem) -> Option<Vec<f64>> {
 fn qp_solve_unscaled(p: &QpProblem) -> Result<QpSolution> {
     check_finite(p)?;
     let (_, n) = check_system(p.a, p.b, p.weights)?;
-    set_cap(n);
+    let bounds = |b: Option<&[Option<f64>]>| b.map_or(0, |b| b.iter().flatten().count());
+    set_cap(
+        n,
+        p.eq_matrix.map_or(0, Vec::len)
+            + bounds(p.lower)
+            + bounds(p.upper)
+            + usize::from(p.costs.margin_limit.is_some()),
+    );
     let (e, rhs): (&[Vec<f64>], &[f64]) = match (p.eq_matrix, p.eq_rhs) {
         // R6-11.13: an empty eq_matrix is E_INPUT; no equalities means both keys absent.
         (Some(e), _) if e.is_empty() => return fail("E_INPUT", "eq_matrix is empty"),
@@ -1226,7 +1234,8 @@ pub fn integer_solve(p: &IntegerProblem) -> Result<IntegerSolution> {
     finite("ridge", &p.ridge)?;
     finite("lot_sizes", &p.lot_sizes)?;
     let (_, n) = check_system(p.a, p.b, p.weights)?;
-    set_cap(n);
+    let lots = |b: Option<&[Option<i64>]>| b.map_or(0, |b| b.iter().flatten().count());
+    set_cap(n, lots(p.lower_lots) + lots(p.upper_lots));
     let none = vec![None; n];
     let lower = p.lower_lots.unwrap_or(&none);
     let upper = p.upper_lots.unwrap_or(&none);
@@ -1418,10 +1427,11 @@ pub fn minvar_ratio(input: MinVarInput) -> Result<MinVar> {
         for j in 0..=i {
             let v = s[i + 1][j + 1] * d[i] * d[j] - (0..j).map(|q| lc[i][q] * lc[j][q]).sum::<f64>();
             if i == j {
-                if v < 0.0 {
+                // R6 wave 3B: at or below -1e-12 indefinite; absolute size below 1e-12 singular.
+                if v <= -THRESHOLD {
                     return fail("E_NOT_POSITIVE_DEFINITE", "the hedge block is not positive definite");
                 }
-                if v <= THRESHOLD {
+                if v.abs() < THRESHOLD {
                     return fail("E_SINGULAR", "the hedge instruments are not independent");
                 }
                 lc[i][i] = v.sqrt();
