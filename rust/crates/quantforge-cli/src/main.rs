@@ -1,5 +1,7 @@
 //! The `quantforge` executable (`specifications/cli-contract.md`).
 
+#[cfg(test)]
+mod envelope_tests;
 mod functions;
 #[cfg(test)]
 mod golden_replay;
