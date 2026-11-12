@@ -225,8 +225,9 @@ Vec project(const Matrix& z, const Vec& v) {
 // nothing when the constraints have no common point. active receives the indices of the active constraints.
 class DualActiveSet {
 public:
-    DualActiveSet(const Matrix& g, const Vec& g0, const Matrix& normals, const Vec& rhs)
-        : n_(g.size()), normals_(normals), rhs_(rhs), j_(n_, Vec(n_, 0.0)), r_(n_, Vec(n_, 0.0)) {
+    // own_rows: rows the caller added for its own reformulation (R6-28.5: not counted in the cap's p).
+    DualActiveSet(const Matrix& g, const Vec& g0, const Matrix& normals, const Vec& rhs, std::size_t own_rows = 0)
+        : n_(g.size()), own_rows_(own_rows), normals_(normals), rhs_(rhs), j_(n_, Vec(n_, 0.0)), r_(n_, Vec(n_, 0.0)) {
         const Matrix l = cholesky_lower(g);
         // J = L^{-T}: column c of J solves L^T j = e_c.
         for (std::size_t c = 0; c < n_; ++c) {
@@ -243,7 +244,7 @@ public:
     }
 
     bool solve() {
-        const auto max_steps = std::size_t(detail::effort_cap(10 * (long long)(n_ + normals_.size()) + 100));  // R6-6.1, J-R6-5
+        const auto max_steps = std::size_t(detail::effort_cap(10 * (long long)(n_ + normals_.size() - own_rows_) + 100));  // R6-6.1, J-R6-5, R6-28.5
         std::vector<char> in_active(normals_.size(), 0);
         for (std::size_t step = 0; step < max_steps;) {
             // Step 1: the most violated constraint not yet active.
@@ -389,7 +390,7 @@ private:
         }
     }
 
-    std::size_t n_;
+    std::size_t n_, own_rows_;
     const Matrix& normals_;
     const Vec& rhs_;
     Matrix j_, r_;
@@ -415,7 +416,7 @@ struct Multipliers {
 // general row: general . x >= general_rhs (the 4a margin within an orthant). Throws E_INFEASIBLE.
 Vec bounded_minimiser(const Matrix& reduced, const Vec& g0, const NullSpace& ns, const std::vector<Bound>& lower,
                       const std::vector<Bound>& upper, const Vec* general = nullptr, double general_rhs = 0.0,
-                      Multipliers* mult = nullptr) {
+                      Multipliers* mult = nullptr, std::size_t own_rows = 0) {
     const std::size_t n = ns.xp.size(), r = reduced.size();
     std::vector<BoundRow> rows;
     for (std::size_t j = 0; j < n; ++j) {
@@ -459,7 +460,7 @@ Vec bounded_minimiser(const Matrix& reduced, const Vec& g0, const NullSpace& ns,
         normals.push_back(std::move(row));
         rhs.push_back(general_rhs - at_xp);
     }
-    DualActiveSet qp(reduced, g0, normals, rhs);
+    DualActiveSet qp(reduced, g0, normals, rhs, std::min(own_rows, normals.size()));
     if (!qp.solve()) throw Error("E_INFEASIBLE", "no point satisfies the equalities and the bounds");
     for (std::size_t j = 0; j < n; ++j)
         for (std::size_t c = 0; c < r; ++c) x[j] += ns.z[j][c] * qp.y()[c];
@@ -620,9 +621,11 @@ private:
     Vec orthant(const Vec& k, bool with_margin, Multipliers& mult) const {
         std::vector<Bound> lo(n_), up(n_);
         Vec c = q_.c, row;
+        std::size_t sign_rows = 0;  // bounds that exist only as sign rows (R6-28.5: not in p)
         for (std::size_t j = 0; j < n_; ++j) {
             if (!lower_.empty()) lo[j] = lower_[j];
             if (!upper_.empty()) up[j] = upper_[j];
+            if ((sign_[j] > 0 && !lo[j]) || (sign_[j] < 0 && !up[j])) ++sign_rows;
             if (sign_[j] > 0) lo[j] = std::max(lo[j].value_or(0.0), 0.0);
             if (sign_[j] < 0) up[j] = std::min(up[j].value_or(0.0), 0.0);
             c[j] += k[j] * double(sign_[j]);
@@ -634,7 +637,7 @@ private:
         Vec hxp(c);
         for (std::size_t i = 0; i < n_; ++i) hxp[i] += dot(q_.h[i], ns_.xp);
         return bounded_minimiser(reduced_, project(ns_.z, hxp), ns_, lo, up, with_margin ? &row : nullptr, -limit_,
-                                 &mult);
+                                 &mult, sign_rows);
     }
 
     Vec run(const Vec& k, bool with_margin, std::optional<std::vector<int>> from) {
