@@ -848,6 +848,19 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "joint_f-0004",
+   "operation": "rates.curve.joint_solve",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER",
+    "TERM.HELPERS"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "risk_f3-0010",
    "operation": "risk.curve.pca",
    "library": "QuantLib",

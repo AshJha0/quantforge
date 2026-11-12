@@ -33,19 +33,7 @@ jobs:
         shell: bash # explicit bash adds pipefail, so tee keeps the exit status
         run: uv run --frozen python -W ignore outside_d.py | tee "$RUNNER_TEMP/coverage.md"
         working-directory: oracle/python
-      - name: Regenerate the stage E and F registers
-        shell: bash
-        run: |
-          uv run --frozen python -W ignore outside_e_a.py
-          uv run --frozen python -W ignore outside_e_b.py
-          uv run --frozen python -W ignore outside_f.py
-        working-directory: oracle/python
-      - name: Registers match the committed copies
-        run: |
-          if ! git diff --exit-code -- oracle/outside_register*.json; then
-            echo "::error::an outside register differs from a fresh run; rerun the outside_*.py scripts and commit the registers"
-            exit 1
-          fi
+      # Stage E and F registers: job oracle-outside-registers-ef below (Windows; owner approved 2026-11-12).
       - name: Regenerate the stage G per-case register (QuantLib FD, tree, MC; about 20 minutes)
         shell: bash
         run: |
@@ -79,3 +67,31 @@ jobs:
       - name: Summary
         if: always()
         run: cat "$RUNNER_TEMP/coverage.md" >> "$GITHUB_STEP_SUMMARY" || true
+
+  outside-ef:
+    # Stage E and F registers run on Windows: the Linux QuantLib 1.44 wheel's SymmetricSchurDecomposition returned
+    # garbage on CI (min eigenvalue 5.8e180 or denormals for corr_e-0003/0005/0009, then MemoryError), while the
+    # Windows wheel decomposes every matrix; the committed registers are generated on Windows (PR 35).
+    name: oracle-outside-registers-ef
+    runs-on: windows-2025
+    timeout-minutes: 30
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: Regenerate the stage E and F registers
+        shell: bash
+        run: |
+          uv run --frozen python -W ignore outside_e_a.py
+          uv run --frozen python -W ignore outside_e_b.py
+          uv run --frozen python -W ignore outside_f.py
+        working-directory: oracle/python
+      - name: Registers match the committed copies
+        shell: bash
+        run: |
+          if ! git diff --exit-code -- oracle/outside_register*.json; then
+            echo "::error::an outside register differs from a fresh run; rerun the outside_*.py scripts and commit the registers"
+            exit 1
+          fi
