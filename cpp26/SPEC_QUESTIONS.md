@@ -140,13 +140,32 @@ E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7 (`garch.md`, `var
 
 ## Stage G
 
-- `capfloor_g-0040` (golden defect, reported 2026-11-11): HULL_WHITE cap with `period_times` [1, 2, 3] and `strike` -0.5
+- **Closed by G-38 (G-J3):** `capfloor_g-0040` (golden defect, reported 2026-11-11): HULL_WHITE cap with `period_times` [1, 2, 3] and `strike` -0.5
   expects `E_DOMAIN` with description "1 + K tau <= 0", but `1 + K tau = 0.5 > 0` for every period, so the spec rule
   does not apply and this build prices it. The other 40 `capfloor_g` cases pass.
-- `expsim_g` wave 4c, 8 cases (`-0039`, `-0045`, `-0055`, `-0061`, `-0071`, `-0077`, `-0087`, `-0093`), reported
+- **Closed by the G-42 golden fix (G-Q4):** `expsim_g` wave 4c, 8 cases (`-0039`, `-0045`, `-0055`, `-0061`, `-0071`, `-0077`, `-0087`, `-0093`), reported
   2026-11-11: each fails one `pfe_99` point at a late date of a long payer, by 3e-5 to 1e-4 relative, where the 99%
   quantile sits on the flat top of the deflated value `f(x)`. An independent 40-digit mpmath check of `-0039` at
   t = 17 (critical point of `f` by `findroot`, both crossings of `f = y` by bisection) gives `P(f > y) = 0.01000000000008`
   at this build's 291,331.928, and `0.01234` at the golden 291,322.038 (fmax 291,350.886). So this build looks right
   and the golden quantile root looks like it misses part of the region above `y` near the top. Everything else in
   these cases, and the other 94 cases, pass.
+  The regenerated goldens agree with this build: 102 of 102 (`program/STAGE_I_CARRY.md` item 3).
+- Silent choice, closed by G-9 (unchanged): the Q3b ladder is a hand-written adjoint of the G-18 scheme, not a tape;
+  the cost-ratio gate (5 or less) is reported but not judged under sanitizers. Measured 2.33 in WSL on 2026-11-12;
+  the test writes the ratio to `QF_G9_RECORD` (R6-16).
+- Silent choice, closed by G-38 (G-J1): negative `start_years` in `xva.exposure.swap_ee_hw` is `E_DOMAIN`, after `side`.
+
+## Stage I
+
+- C-I1, minimum-variance sign at rounding level: **closed by I-44** (`E_NOT_POSITIVE_DEFINITE` only below
+  `-1e-12 S_00`, otherwise the hedged variance is clamped to 0).
+- C-I2, lot counts beyond `2^53`: **closed by I-49**.
+- Silent choice (I-48, open for the R6 hedge-at-size ruling, review finding 7): the sign-state solver flips the
+  worst sign whose subgradient test fails by more than `1e-10` times the gradient scale; a binding margin is accepted
+  within `1e-9 max(1, limit)`; there is no iteration cap (a repeated sign state is `E_NO_CONVERGENCE`, never reached
+  in tests). The review reports other builds using 1e-9 and 1e-12 kink tolerances and caps; I-48 asks for one. This
+  build will adopt whatever single tolerance and cap the ruling fixes.
+- Silent choice: symmetric eigenproblems in the hedge pages use cyclic Jacobi, at most 100 sweeps, stopping when the
+  off-diagonal mass is below `1e-34` of the total (I-3 makes rank decisions method-independent).
+- Silent choice: integer ties follow I-7 exactly (1e-12 relative, then smallest `sum |n|`, then lexicographic).
