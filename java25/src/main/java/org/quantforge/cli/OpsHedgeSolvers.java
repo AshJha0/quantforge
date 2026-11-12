@@ -13,8 +13,8 @@ import org.quantforge.hedging.LeastSquaresHedge;
  * Stage I wave 1: the hedge solvers ({@code 08-hedging/hedge-solvers.md}). Inputs are read first (E_SCHEMA), then the
  * size limits of ruling I-4 are raised, then the finite rule F-2, then each operation's own checks.
  */
-final class OpsHedgeI {
-    private OpsHedgeI() {}
+final class OpsHedgeSolvers {
+    private OpsHedgeSolvers() {}
 
     private static final int MAX_FACTORS = 1_000;
     private static final int MAX_INSTRUMENTS = 200;
@@ -29,13 +29,13 @@ final class OpsHedgeI {
     private enum Rounding { NEAREST, NONE }
 
     static void register(Map<String, Function<In, Out>> table) {
-        table.put("hedge.qp.solve", OpsHedgeI::qp);
-        table.put("hedge.integer.solve", OpsHedgeI::integer);
-        table.put("hedge.minvar.ratio", OpsHedgeI::minVariance);
-        table.put("hedge.greeks.neutralise", OpsHedgeI::greeks);
-        table.put("hedge.beta.futures", OpsHedgeI::beta);
-        table.put("hedge.residual.report", OpsHedgeI::residual);
-        table.put("hedge.frontier.solve", OpsHedgeI::frontier);
+        table.put("hedge.qp.solve", OpsHedgeSolvers::qp);
+        table.put("hedge.integer.solve", OpsHedgeSolvers::integer);
+        table.put("hedge.minvar.ratio", OpsHedgeSolvers::minVariance);
+        table.put("hedge.greeks.neutralise", OpsHedgeSolvers::greeks);
+        table.put("hedge.beta.futures", OpsHedgeSolvers::beta);
+        table.put("hedge.residual.report", OpsHedgeSolvers::residual);
+        table.put("hedge.frontier.solve", OpsHedgeSolvers::frontier);
     }
 
     private static int width(double[][] m) {

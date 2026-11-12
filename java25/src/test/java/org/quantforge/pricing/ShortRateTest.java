@@ -250,7 +250,8 @@ class ShortRateTest {
 
     /**
      * G-9 performance record on the inputs of {@code aadladder_g-0001}: median of 21 timed runs after 5 warm-ups
-     * of one price and of price plus ladder, same thread. Printed, not asserted (timing is machine-dependent).
+     * of one price and of price plus ladder, same thread. The ratio is printed for the record and asserted at the spec's
+     * bound, median(b) / median(a) <= 5 (aad-core.md, G-9); the Actions runner result is the one that counts.
      */
     @Test
     void aadCostRatioG9() {
@@ -281,5 +282,6 @@ class ShortRateTest {
         assertTrue(Double.isFinite(sink));
         System.out.printf("G-9 aadladder_g-0001: price %.3f ms, price+ladder %.3f ms, ratio %.3f%n", tp[10] / 1e6,
                 tl[10] / 1e6, tl[10] / tp[10]);
+        assertTrue(tl[10] / tp[10] <= 5.0, "G-9 cost ratio " + tl[10] / tp[10] + " exceeds 5");
     }
 }

@@ -14,8 +14,8 @@ import org.quantforge.risk.FrtbGirr;
 import org.quantforge.risk.PortfolioRisk;
 
 /** Stage F slices F3 and F4: book sensitivities, curve risk, VaR/ES, backtests, FRTB. Inputs read before the gate. */
-final class OpsRiskF {
-    private OpsRiskF() {}
+final class OpsMarketRisk {
+    private OpsMarketRisk() {}
 
     private enum SwapSide { PAY, RECEIVE }
 

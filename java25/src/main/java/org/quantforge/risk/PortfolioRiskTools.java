@@ -8,8 +8,8 @@ import org.quantforge.core.QfError;
  * Stage F carry-over tools: F3 sensitivities (f3-sensitivities.md, ruling G-47) and F4 portfolio-risk tools
  * (portfolio-risk-tools.md, ruling G-46). Every one is a closed form on its inputs.
  */
-public final class RiskToolsB {
-    private RiskToolsB() {}
+public final class PortfolioRiskTools {
+    private PortfolioRiskTools() {}
 
     private static QfError domain(String key, String why) {
         return new QfError("E_DOMAIN", why, key);

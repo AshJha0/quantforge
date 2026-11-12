@@ -13,11 +13,11 @@ import org.quantforge.core.QfError;
 import org.quantforge.risk.FrtbGirr;
 import org.quantforge.risk.FrtbSbm;
 import org.quantforge.risk.FrtbVegaCurvature;
-import org.quantforge.risk.RiskToolsB;
+import org.quantforge.risk.PortfolioRiskTools;
 
 /** Stage F carry-over wave 2b: FRTB FX, equity, CSR and commodity delta; F3 sensitivities; F4 tools. */
-final class OpsWave2b {
-    private OpsWave2b() {}
+final class OpsFrtbSensitivities {
+    private OpsFrtbSensitivities() {}
 
     private static final int MAX = 100_000;
 
@@ -101,8 +101,8 @@ final class OpsWave2b {
             return frtbOut(FrtbSbm.commodity(col(r, 0), r.bucket(), col(r, 1), col(r, 2), r.s()));
         });
 
-        table.put("risk.frtb.vega", OpsWave2b::vega);
-        table.put("risk.frtb.curvature", OpsWave2b::curvature);
+        table.put("risk.frtb.vega", OpsFrtbSensitivities::vega);
+        table.put("risk.frtb.curvature", OpsFrtbSensitivities::curvature);
 
         table.put("risk.sens.inflation01", in -> {
             double n = in.real("notional");
@@ -120,9 +120,9 @@ final class OpsWave2b {
             if (!(p > 0.0)) {
                 throw domain("discount_factor");
             }
-            double pv = RiskToolsB.zcisPv(n, years, k, z, p);
-            return Operations.out("pv", pv, "inflation01", RiskToolsB.inflation01(n, years, z, p),
-                    "inflation01_bump", RiskToolsB.zcisPv(n, years, k, z + 1e-4, p) - pv);
+            double pv = PortfolioRiskTools.zcisPv(n, years, k, z, p);
+            return Operations.out("pv", pv, "inflation01", PortfolioRiskTools.inflation01(n, years, z, p),
+                    "inflation01_bump", PortfolioRiskTools.zcisPv(n, years, k, z + 1e-4, p) - pv);
         });
         table.put("risk.sens.dividend_borrow", in -> {
             double s = in.real("spot");
@@ -149,7 +149,7 @@ final class OpsWave2b {
             if (!type.equals("CALL") && !type.equals("PUT")) {
                 throw input("option_type");
             }
-            double[] pv = RiskToolsB.bsmYield(type.equals("CALL"), s, k, t, r, q + b, v);
+            double[] pv = PortfolioRiskTools.bsmYield(type.equals("CALL"), s, k, t, r, q + b, v);
             return Operations.out("price", pv[0], "dividend01", pv[1] * 1e-4, "borrow01", pv[1] * 1e-4);
         });
         table.put("risk.sens.correlation", in -> {
@@ -179,7 +179,7 @@ final class OpsWave2b {
             if (!(t > 0.0)) {
                 throw domain("expiry_years");
             }
-            double[] m = RiskToolsB.margrabe(q1 * s1 * Math.exp(-y1 * t), q2 * s2 * Math.exp(-y2 * t), v1, v2, rho, t);
+            double[] m = PortfolioRiskTools.margrabe(q1 * s1 * Math.exp(-y1 * t), q2 * s2 * Math.exp(-y2 * t), v1, v2, rho, t);
             return Operations.out("price", m[0], "correlation01", m[1], "spread_vol", m[2]);
         });
 
@@ -200,7 +200,7 @@ final class OpsWave2b {
             if (!(loss > 0.0)) {
                 throw domain("target_loss");
             }
-            double k = RiskToolsB.reverseScale(d, delta, gamma, loss);
+            double k = PortfolioRiskTools.reverseScale(d, delta, gamma, loss);
             double[] shocks = new double[d.length];
             double pnl = 0.0;
             for (int i = 0; i < d.length; i++) {
@@ -255,7 +255,7 @@ final class OpsWave2b {
             if (x.length == 0) {
                 throw domain("exposures");
             }
-            double[] w = RiskToolsB.weights(x);
+            double[] w = PortfolioRiskTools.weights(x);
             if (n < 1 || n > x.length) {
                 throw input("top_n");
             }
@@ -264,7 +264,7 @@ final class OpsWave2b {
                 hhi += v * v;
             }
             return Operations.out("hhi", hhi, "effective_number", 1.0 / hhi, "top_n_share",
-                    RiskToolsB.topShare(w, (int) n), "weights", w);
+                    PortfolioRiskTools.topShare(w, (int) n), "weights", w);
         });
         table.put("risk.var.liquidity_adjusted", in -> {
             double var = in.real("var");
@@ -305,7 +305,7 @@ final class OpsWave2b {
             if (h < 1) {
                 throw domain("horizon_days");
             }
-            double ratio = RiskToolsB.varianceRatio(rho, h);
+            double ratio = PortfolioRiskTools.varianceRatio(rho, h);
             double sq = sigma * Math.sqrt((double) h);
             return Operations.out("vol", sigma * Math.sqrt(h * ratio), "sqrt_rule_vol", sq, "variance_ratio", ratio);
         });
