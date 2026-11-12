@@ -15,7 +15,7 @@ class PreregHashes(unittest.TestCase):
     def test_every_signed_file_matches_its_recorded_hashes(self):
         readme = body_sha((D / "README.md").read_bytes())
         files = sorted(D.glob("R3-*.md"))
-        self.assertEqual(len(files), 6)
+        self.assertEqual(len(files), 9)
         for f in files:
             b = f.read_bytes()
             head = b[:b.index(MARK)].decode()
@@ -25,6 +25,9 @@ class PreregHashes(unittest.TestCase):
             if "amendment" in f.name:
                 self.assertEqual(hashlib.sha256((D / m.group(1)).read_bytes()).hexdigest(), m.group(2), f.name)
                 self.assertIn("Prior knowledge", b.decode())
+            if "amendment-2" in f.name:
+                m = re.search(r"`DEVIATION-2026-11-12.md` \(whole file\): `([0-9a-f]{64})`", head)
+                self.assertEqual(hashlib.sha256((D / "DEVIATION-2026-11-12.md").read_bytes()).hexdigest(), m.group(1), f.name)
 
 
 import json  # noqa: E402
