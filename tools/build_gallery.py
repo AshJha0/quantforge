@@ -1345,11 +1345,13 @@ def check():
     d = json.loads((DATA / f"{gallery_real.SLUG}.json").read_text(encoding="utf-8"))
     all_data[gallery_real.SLUG] = d
     compare(d["reference"], gallery_real.run("python", d["inputs"], batch), gallery_real.SLUG, bad)
-    d = json.loads((DATA / f"{gallery_pnl.SLUG}.json").read_text(encoding="utf-8"))
-    all_data[gallery_pnl.SLUG] = d
-    now = gallery_pnl.run("python", d["inputs"])  # P&L in USD at the risk tolerance; calibration at the curve tolerance
-    compare(d["reference"]["explain"], now["explain"], gallery_pnl.SLUG + "/risk/explain", bad)
-    compare(d["reference"]["calibration"], now["calibration"], gallery_pnl.SLUG + "/calibration", bad)
+    path = DATA / f"{gallery_pnl.SLUG}.json"
+    if path.is_file():  # withdrawn in R6 (holdout-dated moves) until ten forward moves exist
+        d = json.loads(path.read_text(encoding="utf-8"))
+        all_data[gallery_pnl.SLUG] = d
+        now = gallery_pnl.run("python", d["inputs"])  # P&L in USD at the risk tolerance; calibration at the curve tolerance
+        compare(d["reference"]["explain"], now["explain"], gallery_pnl.SLUG + "/risk/explain", bad)
+        compare(d["reference"]["calibration"], now["calibration"], gallery_pnl.SLUG + "/calibration", bad)
     for name, text in render_all(all_data).items():
         path = OUT / name
         if not path.is_file() or path.read_text(encoding="utf-8") != text:
