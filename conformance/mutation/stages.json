@@ -313,7 +313,7 @@
         "module": "hedge_cross",
         "suite": "hedge*_i",
         "java": "org.quantforge.hedging.CrossAssetHedge",
-        "cpp": "cpp26/src/core/hedging_credit_correlation.cpp",
+        "cpp": "cpp26/src/core/hedging_cross_asset.cpp",
         "python": "quantforge_core.cross_asset_hedge*",
         "rust": "**/hedge_crossasset.rs"
       },
@@ -321,7 +321,7 @@
         "module": "hedge_credit_corr",
         "suite": "hedge*_i",
         "java": "org.quantforge.hedging.C*Hedge",
-        "cpp": "cpp26/src/core/hedging_cross_asset.cpp",
+        "cpp": "cpp26/src/core/hedging_credit_correlation.cpp",
         "python": "quantforge_core.credit_correlation_hedges*",
         "rust": "**/hedge_cross.rs"
       },
