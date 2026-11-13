@@ -143,3 +143,21 @@ fn traffic_light_zones_and_plus_factor() {
     assert_eq!(traffic_light(0, 0, 0.99).unwrap_err().code, "E_DOMAIN");
     assert_eq!(traffic_light(10, -1, 0.99).unwrap_err().code, "E_DOMAIN");
 }
+
+#[test]
+fn filtered_lambda_zero_rejected_without_zero_returns() {
+    // No zero return, so only the lambda check can reject lambda = 0.
+    let r = [0.01, -0.02, 0.015, -0.03];
+    assert_eq!(filtered_historical(&r, 1.0, 0.0, 0.9).unwrap_err().code, "E_DOMAIN");
+}
+
+#[test]
+fn monte_carlo_size_checks_and_pinned_path() {
+    let cov = vec![vec![4.0, 1.2], vec![1.2, 1.0]];
+    let mean = [0.3, -0.1];
+    assert_eq!(monte_carlo(&mean, &cov, &[1.0], 10, 1, 0.95).unwrap_err().code, "E_INPUT");
+    // Seed 7 is a contract (same seed, same numbers across releases): pin one path so a sign
+    // flip of the correlated shock, which leaves the distribution unchanged, is still seen.
+    let v = monte_carlo(&mean, &cov, &[1.0, 2.0], 1, 7, 0.5).unwrap();
+    assert!((v.var - -0.844901256880429).abs() < 1e-12, "{v:?}");
+}
