@@ -33,8 +33,8 @@ Without `--ots`, only the first two checks run (offline, standard library only).
 
 An attacker who rewrites the log can also rewrite the anchor JSON files, which is why the `.ots` proofs matter: a changed JSON no longer matches its proof, and a proof cannot be backdated.
 
-## Signed commits on `forward-log`: not enabled
+## Signed commits on `forward-log` (from 2026-11-13)
 
-GitHub signs commits made through its own web flows, not those pushed by `GITHUB_TOKEN`. A free route that needs no owner-held key is Sigstore keyless signing with `gitsign` (OIDC identity from the workflow, `id-token: write`). It was not wired in because it cannot be exercised before the first scheduled run, and the OpenTimestamps anchors already give the acceptance property. If wanted later, the owner needs to create nothing: a follow-up adds `gitsign` to the recorder and `gitsign verify` to this guide. A GPG or SSH signing key would need an owner-held secret and is not used.
+GitHub does not sign commits pushed with `GITHUB_TOKEN`, so the recorder signs them itself. Since 2026-11-13 each forward-log commit is signed with the owner's SSH signing key: the private key is the Actions secret `FORWARD_LOG_SIGNING_KEY`, the public key is registered on the owner's GitHub account as a signing key, and the committer is the owner's GitHub no-reply address, so GitHub shows the commits as Verified (`.github/workflows/recorder.yml`, step "Push rows"; `docs/developer-guides/recorder-actions.md`). Commits before that date are unsigned; for them, and as an independent check for all of them, the trust comes from the `.ots` proofs. Keyless Sigstore signing (`gitsign`) was the alternative; the owner chose a held key on 2026-11-13.
 
-The annotated tags are unsigned for the same reason; they are a convenience marker, and the trust comes from the `.ots` proofs.
+The annotated tags are unsigned; they are a convenience marker, and the trust comes from the `.ots` proofs.

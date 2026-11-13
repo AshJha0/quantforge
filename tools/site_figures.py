@@ -36,7 +36,7 @@ def roadmap_stages(root=ROOT):
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
         if len(cells) < 2 or cells[0] in ("Stage", "") or set(cells[0]) <= set("-: "):
             continue
-        m = re.match(r"([A-Z](?: to [A-Z])?)\s*(.*)", cells[0])
+        m = re.match(r"([A-Z][0-9]*(?:(?:, | to )[A-Z][0-9]*)*)\s*(.*)", cells[0])  # "B", "R6", "H, J, K"
         rows.append((m.group(1), m.group(2) or "", re.sub(r"`([^`]*)`", r"\1", cells[1])))
     if not rows:
         raise ValueError("ROADMAP.md: no rows in the Stage status table")
