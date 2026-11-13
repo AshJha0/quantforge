@@ -367,3 +367,14 @@ exit status is a major version, and all four implementations and the runner move
 | policy | New tolerance class `per_unit` (absolute 1e-10, relative 1e-8) for rates, spreads, vols and ratios (R6-10.1, R6-10.2) | `conformance/tolerances/policy.yaml` |
 
 Later R6 waves append rows here (see `program/R6_HANDOVER.md`).
+
+## Stage J operations (target contract 1.13.0)
+
+Stage J wave 1 adds operations and no error code (ruling J-1). `stage-j-rulings-w1.md` and `stage-j-rulings.md` are normative. Operations are added to the table as each wave lands.
+
+| Prefix | Spec | Slice |
+|---|---|---|
+| `research.backtest.run` | `11-research/backtester.md` | wave 1 |
+| `research.cv.purged_kfold`, `research.cv.cpcv_paths` | `11-research/purged-cv.md` | wave 1 |
+| `research.regime.viterbi` | `11-research/regimes.md` | wave 1 |
+| `research.stats.psr`, `research.stats.dsr`, `research.stats.pbo`, `research.stats.power` | `11-research/research-statistics.md` | wave 1 |
