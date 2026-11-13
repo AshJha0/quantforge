@@ -14,7 +14,7 @@ A patch release on top of v0.8.2. CLI contract unchanged (1.12.0); 39 new error 
 ### Added
 
 - **Rust mutant kill tests** for `var.rs` and `hedge.rs` (`rust/crates/quantforge-core/tests/var_mutants.rs`, `hedge_mutants.rs`), with notes on the equivalent mutants in `program/J0_EQUIVALENT_MUTANTS.md` (stage J item J-0). Rust kill tests: hedge.rs 82.7%, var.rs >=94% (hedge_solvers in v0.9.0).
-- **Stage J wave 1 specification documents**, status *specified, not implemented*: `specifications/11-research/` (backtester, purged CV, regimes, research statistics), `specifications/stage-j-rulings-w1.md`, `program/STAGE_J_HANDOVER.md` and the generator `oracle/python/gen_stage_j_w1.py`. No build implements these operations; their goldens and CLI contract entries land with the wave 1 code in v0.9.0.
+- **Stage J wave 1 specification documents**, status *specified, not implemented*: `specifications/11-research/` (backtester, purged CV, regimes, research statistics), `specifications/stage-j-rulings-w1.md`, `program/STAGE_J_HANDOVER.md` and the generator `oracle/python/gen_stage_j_w1.py`. No build implements these operations; their 99 golden cases (63 value-checked, 36 error) and CLI contract entries land with the wave 1 code in v0.9.0.
 - **J-11 design** for the Q6-02 calibration test redesign (`program/J11_Q6_02_DESIGN.md`).
 
 ### Known issues

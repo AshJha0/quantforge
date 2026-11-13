@@ -18,18 +18,18 @@ Stage J (v0.9): research and backtesting (plan section 4, row J; 11.3; 12.5 Q7, 
 
 Read with every slice: the four spec pages below; `specifications/stage-j-rulings-w1.md` J-1 to J-19; `specifications/cli-contract.md` (block "Stage J operations"); `specifications/name-map.json` (regenerated: 284 operations).
 
-### Suites (97 cases)
+### Suites (99 cases)
 
 | Suite | Spec | Operations | Cases (value, error) |
 |---|---|---|---|
 | `backtest_j` | `11-research/backtester.md` | `research.backtest.run` | 23 (14, 9) |
 | `purgedcv_j` | `11-research/purged-cv.md` | `research.cv.purged_kfold`, `research.cv.cpcv_paths` | 23 (15, 8) |
 | `regime_j` | `11-research/regimes.md` | `research.regime.viterbi` | 16 (10, 6) |
-| `rstats_j` | `11-research/research-statistics.md` | `research.stats.dsr`, `.psr`, `.power`, `.pbo` | 35 (22, 13) |
+| `rstats_j` | `11-research/research-statistics.md` | `research.stats.dsr`, `.psr`, `.power`, `.pbo` | 37 (24, 13) |
 
-Expected totals after wave 1 on top of main `3cca7da` (before the J-0b fuzz goldens): `TOTALS: 15174 value 7502 error 5158 invariance 2514`. `tools/check_case_total.py` reads the last `TOTALS:` line of `program/R6_HANDOVER.md`; this branch does not edit that file because branch `stage-j-fuzz` appends to it. **Coordinator, at merge:** append one combined line (this wave's +97 / +61 / +36 / +0 on top of whatever `stage-j-fuzz` states) to `program/R6_HANDOVER.md`, then run the gate.
+Expected totals after wave 1 on top of main `3cca7da` (before the J-0b fuzz goldens): `TOTALS: 15176 value 7504 error 5158 invariance 2514`. `tools/check_case_total.py` reads the last `TOTALS:` line of `program/R6_HANDOVER.md`; this branch does not edit that file because branch `stage-j-fuzz` appends to it. **Coordinator, at merge:** append one combined line (this wave's +99 / +63 / +36 / +0 on top of whatever `stage-j-fuzz` states) to `program/R6_HANDOVER.md`, then run the gate.
 
-Gates run on this branch: `oracle/python/check_error_cases.py` (0 schema mismatches), `tools/gen_name_map.py --check` (clean), `tools/check_golden_copies.py` (0 stale), `tools/check_tolerance_units.py` (0 unexplained); `tools/check_case_total.py` counts 15174 / 7502 / 5158 / 2514 with 0 duplicate ids (fails only on the missing handover line above).
+Gates run on this branch: `oracle/python/check_error_cases.py` (0 schema mismatches), `tools/gen_name_map.py --check` (clean), `tools/check_golden_copies.py` (0 stale), `tools/check_tolerance_units.py` (0 unexplained); `tools/check_case_total.py` counts 15176 / 7504 / 5158 / 2514 with 0 duplicate ids (fails only on the missing handover line above).
 
 ### Build notes
 
@@ -50,7 +50,7 @@ Gates run on this branch: `oracle/python/check_error_cases.py` (0 schema mismatc
 
 ### Outside-check status (J-19)
 
-Hand or textbook value cases: `backtest_j-0001`, `-0002` (ten-trade hand table), `purgedcv_j-0001` (hand), `purgedcv_j` CPCV `N = 6, k = 2` (15 splits, 5 paths), `regime_j-0001` (textbook example, 0.01512), `rstats_j-0001` (DSR worked example, recalled printed digits 0.1132 and 0.9004), `rstats_j-0017` to `-0020` (prereg MDS table), `rstats_j-0025` (PBO hand). Brute-force (independent method) on four further Viterbi cases. No outside **library** oracle in wave 1, so the R6-13 outside share is 0 library cases of 97; report it as such. J-1 stays open until [BLdP14] and [BBLdPZ17] are opened and their printed examples recorded (the PBO paper's example is not yet a golden).
+Hand or textbook value cases: `backtest_j-0001`, `-0002` (ten-trade hand table), `purgedcv_j-0001` (hand), `purgedcv_j` CPCV `N = 6, k = 2` (15 splits, 5 paths), `regime_j-0001` (textbook example, 0.01512), `rstats_j-0001`, `-0036`, `-0037` (DSR numerical example, paper read: printed 0.1132, 0.9004, 0.9505, 0.9505), `rstats_j-0017` to `-0020` (prereg MDS table), `rstats_j-0025` (PBO hand). Brute-force (independent method) on four further Viterbi cases. No outside **library** oracle in wave 1, so the R6-13 outside share is 0 library cases of 99; report it as such. J-1 source check closed 2026-11-13: both papers read; DSR digits match; [BBLdPZ17] prints no fully specified example, so PBO keeps the hand golden `rstats_j-0025`.
 
 ### Model inventory
 
