@@ -19,7 +19,7 @@ A patch release on top of v0.8.2. CLI contract unchanged (1.12.0); 39 new error 
 
 ### Known issues
 
-- **Rust mutation gate:** `mutation-report` samples Rust mutants and may be red until the `hedge_solvers.rs` kill tests land in v0.9.0. It is not a required check.
+- **Mutation gate red on this release (not a required check):** the fuzz fixes touched the GARCH code, so `mutation-report` sampled `garch_varswap_vix` and `garch_vix`: Python killed 5/12 and 8/12, C++ 10/12 each. The Python GARCH tests were already this weak; kill tests for both modules are scheduled in stage J (v0.9.0), as is the Rust `hedge_solvers.rs` work.
 
 ## 0.8.2: R6 follow-ups (2026-11-13)
 
