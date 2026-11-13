@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.8.2: R6 follow-ups (2026-11-13)
+
+A patch release on top of v0.8.1: one model fix, CI gate fixes, tests and documentation (PRs #36 and #37). No golden case, CLI contract (1.12.0) or output changed; 15,077 golden cases (7,441 value-checked, 5,122 error, 2,514 invariance) as in 0.8.1.
+
+### Fixed
+
+- **Java: CIR bond option hung on an overflowed volatility.** `rates.shortrate.zcb_option` with CIR and sigma 5e297 looped for minutes in Java; Rust, C++ and Python returned `E_NON_FINITE` at once (ruling R6-8). The guard was never ported to `ShortRate.chi2Cdf`; now it is, and an all-zero Poisson series stops. Found by fuzzing `main` at the v0.8.1 tag (run 43383840115); unit test added, stage G conformance 589 of 589 unchanged.
+- **Mutation map:** `conformance/mutation/stages.json` pointed the C++ `hedge_cross` and `hedge_credit_corr` modules at each other's source files, so C++ `hedge_cross` was scored on the wrong file.
+- **Microbenchmark gate (G2):** `benchmarks/micro/baseline.json` is now recorded from a `main` run on the Actions runner (run 43383844750), and `tools/bench_gate.py` gates only the languages a job measured (each CI job benchmarks one language); a missing benchmark inside a measured language still fails. Bench green on `main`.
+- **Site:** the home page stage table read one letter per stage, so it showed "R | 6" and "H | , J, K"; it now reads `R6` and `H, J, K`.
+
+### Added
+
+- Unit tests aimed at the mutation survivors of PRs #35 and #36: Python `test_hedge_solvers.py` (49 tests), Rust tests in `hedge.rs`, `hedge_solvers.rs`, `var.rs` and `xva.rs`, C++ `test_mutant_kills_hedging.cpp`. Python, C++ and Java now meet the mutation target; Rust does not (Known issues).
+- **Signed forward-log rows.** From 2026-11-13 the recorder signs each `forward-log` commit with the owner's SSH signing key (Actions secret `FORWARD_LOG_SIGNING_KEY`); GitHub shows them as Verified (first: `9a4d40b`). Earlier rows rest on the OpenTimestamps anchors (`docs/developer-guides/forward-log-anchors.md`).
+
+### Known issues (carried to stage J)
+
+- **Rust mutation gate below target:** `hedge_solvers`, `hedge` and `var` at about 70 to 75% killed against 80%; each pull request run samples 12 new mutants and needs 12 of 12. Stage J item J-0; `mutation-report` is not a required check until then.
+- **Fuzz on `main` finds three input faults** (run 43390662426): a GARCH forecast with a horizon of 2^31 times out in Rust and C++, Python's GARCH estimate times out on fuzzed returns, and Java's basket moment crashes on a ragged correlation matrix instead of returning `E_INPUT`. Stage J item J-0b.
+- **G-42b** (ORE re-test of simulated exposure) not run: no Actions job runs ORE. Stage J.
+
 ## 0.8.1: R6 evidence repair (2026-11-13)
 
 Released 2026-11-13, tag `v0.8.1` on `ba043c7` (PR #35). Main CI green on all ten push workflows at that commit.
