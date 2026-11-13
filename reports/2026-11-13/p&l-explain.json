@@ -1,0 +1,150 @@
+{
+ "as_of": "2026-11-13",
+ "batch_command": {
+  "rust": "--batch"
+ },
+ "checks": [
+  {
+   "check": "OIS 2Y RECEIVE explained share >= 95%",
+   "detail": "100.0% of 2 days, 0 errors",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "OIS 10Y RECEIVE explained share >= 95%",
+   "detail": "100.0% of 2 days, 0 errors",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "OIS 30Y PAY explained share >= 95%",
+   "detail": "100.0% of 2 days, 0 errors",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "Bond 4.25% 2035 explained share >= 95%",
+   "detail": "100.0% of 2 days, 0 errors",
+   "level": "fail",
+   "ok": true
+  }
+ ],
+ "impl": "rust",
+ "label": "Real moves of a proxy curve; synthetic product terms. USD proxy curve: Treasury par yields bootstrapped with SOFR OIS conventions. Not a SOFR swap curve.",
+ "pairs": 2,
+ "summary": {
+  "Bond 4.25% 2035": {
+   "days": 2,
+   "errors": 0,
+   "explained": 2,
+   "ks": 0.5,
+   "p50": 0.005915700086960593,
+   "p95": 0.005915700086960593,
+   "p99": 0.005915700086960593,
+   "share": 1.0,
+   "spearman": NaN,
+   "worst": [
+    {
+     "end": "2026-11-12",
+     "full_pnl": -82881.50862118043,
+     "largest_move_bp": 16.0,
+     "start": "2026-11-10",
+     "unexplained": 490.3021477577422
+    },
+    {
+     "end": "2026-11-13",
+     "full_pnl": -29242.92259327136,
+     "largest_move_bp": 5.0,
+     "start": "2026-11-12",
+     "unexplained": 38.83284791223923
+    }
+   ]
+  },
+  "OIS 10Y RECEIVE": {
+   "days": 2,
+   "errors": 0,
+   "explained": 2,
+   "ks": 0.5,
+   "p50": 0.006416607330929309,
+   "p95": 0.006416607330929309,
+   "p99": 0.006416607330929309,
+   "share": 1.0,
+   "spearman": NaN,
+   "worst": [
+    {
+     "end": "2026-11-12",
+     "full_pnl": -93539.73367277723,
+     "largest_move_bp": 16.0,
+     "start": "2026-11-10",
+     "unexplained": 600.2077408179175
+    },
+    {
+     "end": "2026-11-13",
+     "full_pnl": -38906.49062316564,
+     "largest_move_bp": 5.0,
+     "start": "2026-11-12",
+     "unexplained": 69.4116635585815
+    }
+   ]
+  },
+  "OIS 2Y RECEIVE": {
+   "days": 2,
+   "errors": 0,
+   "explained": 2,
+   "ks": 0.5,
+   "p50": 0.0016991557703823791,
+   "p95": 0.0016991557703823791,
+   "p99": 0.0016991557703823791,
+   "share": 1.0,
+   "spearman": NaN,
+   "worst": [
+    {
+     "end": "2026-11-12",
+     "full_pnl": -61435.21173153435,
+     "largest_move_bp": 16.0,
+     "start": "2026-11-10",
+     "unexplained": 104.38799451829982
+    },
+    {
+     "end": "2026-11-13",
+     "full_pnl": -9447.29146514535,
+     "largest_move_bp": 5.0,
+     "start": "2026-11-12",
+     "unexplained": 1.8297679378210887
+    }
+   ]
+  },
+  "OIS 30Y PAY": {
+   "days": 2,
+   "errors": 0,
+   "explained": 2,
+   "ks": 0.5,
+   "p50": 0.01036407213751041,
+   "p95": 0.01036407213751041,
+   "p99": 0.01036407213751041,
+   "share": 1.0,
+   "spearman": NaN,
+   "worst": [
+    {
+     "end": "2026-11-12",
+     "full_pnl": 59120.698426822215,
+     "largest_move_bp": 16.0,
+     "start": "2026-11-10",
+     "unexplained": -612.7311833155836
+    },
+    {
+     "end": "2026-11-13",
+     "full_pnl": 29422.011201908903,
+     "largest_move_bp": 5.0,
+     "start": "2026-11-12",
+     "unexplained": -134.24626896219706
+    }
+   ]
+  }
+ },
+ "threshold": "5% max(|full|, gross first-order P&L) + 1e-8 notional; a project choice, not FRTB PLA",
+ "workflow": "P&L explain",
+ "years": [
+  2026
+ ]
+}

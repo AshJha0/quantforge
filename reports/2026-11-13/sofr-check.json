@@ -1,0 +1,41 @@
+{
+ "as_of": "2026-11-13",
+ "averages": [],
+ "batch_command": {
+  "rust": "--batch"
+ },
+ "checks": [
+  {
+   "check": "SOFR level",
+   "detail": "2026-11-12: 0.039",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "SOFR day change",
+   "detail": "0.0001 vs 0.01",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "SOFR day change (warn)",
+   "detail": "0.0001 vs 0.0025",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "Index step 2026-11-12",
+   "detail": "diff -2.17e-07",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "Index step 2026-11-13",
+   "detail": "diff 1.95e-07",
+   "level": "warn",
+   "ok": true
+  }
+ ],
+ "workflow": "SOFR check",
+ "worst_abs_diff": 0.0
+}
