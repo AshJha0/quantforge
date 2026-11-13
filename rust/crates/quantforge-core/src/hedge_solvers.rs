@@ -2140,4 +2140,91 @@ mod r6_cap_tests {
         assert_eq!(ri.unwrap_err().code, "E_NO_CONVERGENCE");
         assert!(qp_solve(&q).is_ok());
     }
+
+    fn plain<'a>(a: &'a Matrix, b: &'a [f64], w: &'a [f64]) -> QpProblem<'a> {
+        QpProblem {
+            a,
+            b,
+            weights: w,
+            ridge: 0.0,
+            eq_matrix: None,
+            eq_rhs: None,
+            lower: None,
+            upper: None,
+            singular: Singular::Error,
+            costs: Costs::default(),
+        }
+    }
+
+    /// R6-6.1 as amended in wave 3B: the cap is `10 (n + p) + 100`, and a planted cap wins.
+    #[test]
+    fn iteration_cap_formula() {
+        PLANTED_CAP.with(|c| c.set(None));
+        set_cap(3, 2);
+        assert_eq!(iteration_cap(), 150);
+        set_cap(0, 0);
+        assert_eq!(iteration_cap(), 100);
+        set_cap(4, 0);
+        assert_eq!(iteration_cap(), 140);
+        PLANTED_CAP.with(|c| c.set(Some(7)));
+        set_cap(3, 2);
+        let planted = iteration_cap();
+        PLANTED_CAP.with(|c| c.set(None));
+        assert_eq!(planted, 7);
+    }
+
+    /// The Jacobi scaling is `Some` only for a well-formed problem with positive weights.
+    #[test]
+    fn jacobi_scaling_needs_a_valid_problem() {
+        let a: Matrix = vec![vec![2.0, 0.0], vec![0.0, 3.0], vec![1.0, 1.0]];
+        let b = [1.0, 1.0, 1.0];
+        let w = [1.0, 1.0, 1.0];
+        assert!(jacobi_for(&plain(&a, &b, &w)).is_some_and(|d| d.len() == 2));
+        let w0 = [1.0, 0.0, 1.0];
+        assert!(jacobi_for(&plain(&a, &b, &w0)).is_none());
+        let wn = [1.0, -1.0, 1.0];
+        assert!(jacobi_for(&plain(&a, &b, &wn)).is_none());
+        let short = [1.0, 1.0];
+        assert!(jacobi_for(&plain(&a, &short, &w)).is_none());
+        assert!(jacobi_for(&plain(&a, &b, &short)).is_none());
+        let ragged: Matrix = vec![vec![2.0, 0.0], vec![0.0], vec![1.0, 1.0]];
+        assert!(jacobi_for(&plain(&ragged, &b, &w)).is_none());
+        let mut ridged = plain(&a, &b, &w);
+        ridged.ridge = 0.1;
+        assert!(jacobi_for(&ridged).is_none());
+    }
+
+    /// The singularity test of `select_solve` is relative to the spectral scale: a problem
+    /// whose smallest eigenvalue is tiny next to a large largest eigenvalue is singular.
+    #[test]
+    fn select_singular_is_relative_to_scale() {
+        let a: Matrix = vec![vec![1e3, 1e3], vec![1e3, 1e3 + 1e-3]];
+        let b = [1.0, 1.0];
+        let w = [1.0, 1.0];
+        assert_eq!(
+            select_solve(&plain(&a, &b, &w), 1, false).unwrap_err().code,
+            "E_SINGULAR"
+        );
+        let good: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let sel = select_solve(&plain(&good, &b, &w), 2, false);
+        assert!(sel.is_ok(), "{sel:?}");
+        assert_eq!(
+            select_solve(&plain(&good, &b, &w), 3, false)
+                .unwrap_err()
+                .code,
+            "E_INPUT"
+        );
+        assert_eq!(
+            select_solve(&plain(&good, &b, &w), 0, false)
+                .unwrap_err()
+                .code,
+            "E_INPUT"
+        );
+        assert_eq!(
+            select_solve(&plain(&good, &b, &w), 1, true)
+                .unwrap_err()
+                .code,
+            "E_INPUT"
+        );
+    }
 }
