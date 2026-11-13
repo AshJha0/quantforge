@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased (0.9.0)
+
+- **J-0, Rust mutation gap (in progress).** Value tests for `hedge.rs` (`tests/hedge_mutants.rs`, checked against a brute-force sign-pattern reference) and `var.rs` (`tests/var_mutants.rs`, Python reference values); full cargo-mutants runs: `hedge.rs` 82.7% (86 caught, 18 missed, all 18 path-only and listed in `program/J0_EQUIVALENT_MUTANTS.md`), `var.rs` above 90%; `hedge_solvers.rs` still being measured.
+
 ## 0.8.2: R6 follow-ups (2026-11-13)
 
 A patch release on top of v0.8.1: one model fix, CI gate fixes, tests and documentation (PRs #36 and #37). No golden case, CLI contract (1.12.0) or output changed; 15,077 golden cases (7,441 value-checked, 5,122 error, 2,514 invariance) as in 0.8.1.

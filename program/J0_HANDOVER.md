@@ -17,22 +17,26 @@ build cannot find the file. Fix used: symlink `/tmp/specifications` to the archi
   `~/j0-h1-<module>/mutants.out/{caught,missed,unviable,timeout}.txt`.
 - Rate measured: ~1.3 mutants/min (unit suite ~37 s, many mutants 2-3 min). hedge_solvers needs ~12 h.
 
-## Per-module results
-| module | caught | missed | unviable | timeout | kill % |
-|---|---|---|---|---|---|
-| var.rs | pending (h1) | | | | |
-| hedge.rs | pending (h1) | | | | |
-| hedge_solvers.rs | pending; aborted baseline sample: 11 caught / 1 missed of 12 | | | | |
+## Per-module results (2026-11-13 ~20:45 UTC)
+| module | caught | missed | kill % | source |
+|---|---|---|---|---|
+| hedge.rs | 86 | 18 (all equivalent, path-only) | 82.7 | h1 full run (76/28) + verify run on 21e7d4d+tests: 11 of the 28 killed, `polish -> None` newly missed (flaky in h1) |
+| var.rs | h2 partial 195 | 11 | >=94 | h2 (57308ac) still running; verify run killed 73 and 151; later tests target 127, 167 `==`, 229/230/233 (not yet re-verified); 4 equivalent |
+| hedge_solvers.rs | pending | | | h2 starts after var; ETA 07:00-11:00 UTC 2026-11-14 |
 
-First miss seen: hedge_solvers.rs:92 `replace || with && in Costs::any`.
+Equivalent mutants: program/J0_EQUIVALENT_MUTANTS.md (var 4, hedge 18).
 
-## Done
-- tests/var_mutants.rs: 7 value tests for every public fn in var.rs, reference values from an
-  independent Python computation of the textbook formulas (pass in WSL).
+## Verify tooling (WSL, does not disturb h2)
+- `git archive -o C:/Work/Claude/qf-wt/j0-run/v.tar HEAD`, put regex in `j0-run/re-<module>.txt`,
+  launch `cmd /c C:\Work\Claude\qf-wt\j0-runlaunch.cmd <module>` via WMI (Invoke-CimMethod Win32_Process Create).
+  Runs `vmut.sh`: -j 2, TMPDIR=~/j0tmp-v, log ~/j0v-<module>.log, results ~/j0-v-<module>/mutants.out/.
+- `vcheck.sh` (copy to ~/vcheck.sh): fmt --check, clippy -D warnings, cargo test --release on v.tar.
+  All green at this head except `bermudan_aad::g9_ladder_cost_ratio_at_most_five`, a timing ratio
+  that fails only under load from the h2 run (passed earlier the same evening).
 
 ## Left
-1. Read h1 missed.txt per module; add value tests for misses (hedge_solvers: Costs::any first).
-2. Note equivalent mutants (none classified yet).
-3. Re-run until each module >= 80 %; only then add CHANGELOG Unreleased/0.9.0 line and the v0.8.1
-   known-issue note that the Rust mutation gap is closed.
-4. CI: mutation-stage.yml uses golden_mutants.py (copies whole repo, so unaffected).
+1. var: when h2 var finishes, run a verify run on its remaining missed lines (re-var.txt) at this head.
+2. hedge_solvers: take ~/j0-h2-hedge_solvers/mutants.out/missed.txt (Costs::any `||`->`&&` at line 92 first),
+   add value tests, verify, document equivalents.
+3. When all three >= 80 %: change the CHANGELOG Unreleased line from "in progress" to final numbers and add
+   the v0.8.1 known-issue note that the Rust mutation gap closed in v0.9.0. Not done yet.
