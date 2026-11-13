@@ -46,6 +46,7 @@ Bounds that come from a table or a definition, not from work, keep their own cod
 | `core.mc.gbm_european` | `paths` x `steps` | 1,000,000 | Normals drawn. At this size `stderr` is already about 0.014 on the spec's example |
 | `core.pde.bs_european` | `space_steps` x `time_steps` | 10,000,000 | Grid updates. `J = 2000`, `M = 5000` is far past the accuracy needed |
 | `core.cos.european` | `terms` | 100,000 | Complex evaluations. The series converges far sooner |
+| `vol.garch.forecast` | `horizon` | 100,000 | Output size: one variance per step (ruling J-0b.1) |
 | `core.calendar.add_business_days` | `|days|` | 30,000 | More than the business days in 2000 to 2099 |
 | `core.ts.rolling` | `window` | 1,000 | Each window is computed afresh |
 | `core.ts.autocorrelation`, `ljung_box` | `max_lag` | 1,000 | Cost is `n` x `max_lag` |

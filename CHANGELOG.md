@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.8.3: fuzz fixes, Rust kill tests, stage J wave 1 spec documents (2026-11-13)
+
+A patch release on top of v0.8.2. CLI contract unchanged (1.12.0); 39 new error cases, so 15,116 golden cases (7,441 value-checked, 5,161 error, 2,514 invariance).
+
+### Fixed
+
+- **Fuzz findings from `main` run 43390662426 (seed 3), lane J-0b.** Rulings J-0b.1 to J-0b.3 (`specifications/stage-j-rulings.md`); 39 new error cases in `datasets/golden/stage_j/fuzzfix_j.json` (six for the fixes, 33 ragged-matrix probes; generator `oracle/python/gen_stage_j_fuzz.py`), passed by all four builds. Golden total 15,116 (7,441 value-checked, 5,161 error, 2,514 invariance).
+  - `vol.garch.forecast` with `horizon` 2^31 ran past the 20 s limit in Rust and C++ (and would have in Python). `horizon` above 100,000 is now `E_LIMIT` in every build, as Java already did (J-0b.1).
+  - `vol.garch.estimate` on finite returns whose squares overflow binary64 searched for 20 s in Python; it now returns `E_NON_FINITE` before any search in every build (R6-8.1, J-0b.2). Java returned `E_DOMAIN` and C++ `E_NO_CONVERGENCE` on that input; both now return `E_NON_FINITE`.
+  - Java `exotic.basket.moment` with a ragged `correlation` such as `[[1, 1], []]` crashed (exit 70); every row length is now checked first, so it is `E_INPUT` as in the other builds (J-0b.3).
+
+### Added
+
+- **Rust mutant kill tests** for `var.rs` and `hedge.rs` (`rust/crates/quantforge-core/tests/var_mutants.rs`, `hedge_mutants.rs`), with notes on the equivalent mutants in `program/J0_EQUIVALENT_MUTANTS.md` (stage J item J-0). Rust kill tests: hedge.rs 82.7%, var.rs >=94% (hedge_solvers in v0.9.0).
+- **Stage J wave 1 specification documents**, status *specified, not implemented*: `specifications/11-research/` (backtester, purged CV, regimes, research statistics), `specifications/stage-j-rulings-w1.md`, `program/STAGE_J_HANDOVER.md` and the generator `oracle/python/gen_stage_j_w1.py`. No build implements these operations; their 99 golden cases (63 value-checked, 36 error) and CLI contract entries land with the wave 1 code in v0.9.0.
+- **J-11 design** for the Q6-02 calibration test redesign (`program/J11_Q6_02_DESIGN.md`).
+
+### Known issues
+
+- **Mutation gate red on this release (not a required check):** the fuzz fixes touched the GARCH code, so `mutation-report` sampled `garch_varswap_vix` and `garch_vix`: Python killed 5/12 and 8/12, C++ 10/12 each. The Python GARCH tests were already this weak; kill tests for both modules are scheduled in stage J (v0.9.0), as is the Rust `hedge_solvers.rs` work.
+
 ## 0.8.2: R6 follow-ups (2026-11-13)
 
 A patch release on top of v0.8.1: one model fix, CI gate fixes, tests and documentation (PRs #36 and #37). No golden case, CLI contract (1.12.0) or output changed; 15,077 golden cases (7,441 value-checked, 5,122 error, 2,514 invariance) as in 0.8.1.

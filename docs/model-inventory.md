@@ -72,6 +72,10 @@ Stage E has its own index tables (ME-A1 to ME-A8, EB1 to EB12) under "Stage E mo
 | MI-5 | Dynamic delta-hedge backtest and hedge effectiveness (stage I wave 4b) | `08-hedging/dynamic-hedge-and-effectiveness.md` | I | Implemented | 5 of 17 (0 library object, 5 numpy or scipy primitive; D6, generated) |
 | MI-6 | Instrument selection (stage I wave 4c) | `08-hedging/instrument-selection.md` | I | Implemented | 10 of 10 (0 library object, 10 numpy or scipy primitive; D6, generated) |
 | MI-7 | Hedge slippage report (stage I wave 4d) | `08-hedging/hedge-slippage.md` | I | Implemented | 0 of 6 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MJ-1 | Backtester (stage J wave 1) | `11-research/backtester.md` | J | Specified, not implemented (code lands in v0.9.0) | none yet |
+| MJ-2 | Purged cross-validation (stage J wave 1) | `11-research/purged-cv.md` | J | Specified, not implemented (code lands in v0.9.0) | none yet |
+| MJ-3 | Regime labelling (stage J wave 1) | `11-research/regimes.md` | J | Specified, not implemented (code lands in v0.9.0) | none yet |
+| MJ-4 | Research statistics (stage J wave 1) | `11-research/research-statistics.md` | J | Specified, not implemented (code lands in v0.9.0) | none yet |
 
 Numerical engines in `01-core` (root finders, quadrature, PDE, Monte Carlo, COS, RNG, Sobol) are tools, not models. They are tested against analytic and library values in stage A.
 
@@ -785,3 +789,51 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.
+
+### MJ-1 Backtester (stage J wave 1)
+- **Purpose:** event loop, order and fill model, costs, P&L and attribution.
+- **Inputs:** as in the spec page.
+- **Limitations:** specified, not implemented: no build implements it in v0.8.3 and its goldens are not in this release.
+- **Validation:** none yet; oracle generator `oracle/python/gen_stage_j_w1.py`. **Review:** 2026-11-13.
+- **Tier:** 3.
+- **Challenger:** none yet (set when the wave 1 code lands).
+- **Monitoring thresholds:** none yet (not implemented).
+- **Data lineage hash:** none yet (goldens not shipped).
+- **Retirement trigger:** a superseding stage J ruling.
+- **Validation report:** `specifications/11-research/backtester.md`.
+
+### MJ-2 Purged cross-validation (stage J wave 1)
+- **Purpose:** purged and embargoed k-fold splits for time-ordered research data.
+- **Inputs:** as in the spec page.
+- **Limitations:** specified, not implemented: no build implements it in v0.8.3 and its goldens are not in this release.
+- **Validation:** none yet; oracle generator `oracle/python/gen_stage_j_w1.py`. **Review:** 2026-11-13.
+- **Tier:** 3.
+- **Challenger:** none yet (set when the wave 1 code lands).
+- **Monitoring thresholds:** none yet (not implemented).
+- **Data lineage hash:** none yet (goldens not shipped).
+- **Retirement trigger:** a superseding stage J ruling.
+- **Validation report:** `specifications/11-research/purged-cv.md`.
+
+### MJ-3 Regime labelling (stage J wave 1)
+- **Purpose:** descriptive regime labels (Viterbi path on a given hidden Markov model).
+- **Inputs:** as in the spec page.
+- **Limitations:** specified, not implemented: no build implements it in v0.8.3 and its goldens are not in this release.
+- **Validation:** none yet; oracle generator `oracle/python/gen_stage_j_w1.py`. **Review:** 2026-11-13.
+- **Tier:** 3.
+- **Challenger:** none yet (set when the wave 1 code lands).
+- **Monitoring thresholds:** none yet (not implemented).
+- **Data lineage hash:** none yet (goldens not shipped).
+- **Retirement trigger:** a superseding stage J ruling.
+- **Validation report:** `specifications/11-research/regimes.md`.
+
+### MJ-4 Research statistics (stage J wave 1)
+- **Purpose:** deflated Sharpe ratio, PBO and related research statistics.
+- **Inputs:** as in the spec page.
+- **Limitations:** specified, not implemented: no build implements it in v0.8.3 and its goldens are not in this release.
+- **Validation:** none yet; oracle generator `oracle/python/gen_stage_j_w1.py`. **Review:** 2026-11-13.
+- **Tier:** 3.
+- **Challenger:** none yet (set when the wave 1 code lands).
+- **Monitoring thresholds:** none yet (not implemented).
+- **Data lineage hash:** none yet (goldens not shipped).
+- **Retirement trigger:** a superseding stage J ruling.
+- **Validation report:** `specifications/11-research/research-statistics.md`.

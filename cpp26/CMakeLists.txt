@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(quantforge_cpp26 VERSION 0.8.2 LANGUAGES CXX)
+project(quantforge_cpp26 VERSION 0.8.3 LANGUAGES CXX)
 
 include(CTest)
 set(CMAKE_CXX_STANDARD 26)
@@ -121,7 +121,7 @@ if(BUILD_TESTING)
     GIT_TAG 08092139210881f01a34e60c5f2fd6afa0ea4024) # v3.16.1
   FetchContent_MakeAvailable(Catch2)
   add_executable(quantforge_core_tests
-    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_curves_money_fx.cpp tests/test_equity_vol.cpp tests/test_multicurve.cpp tests/test_bonds.cpp tests/test_xccy_credit_carry.cpp tests/test_rates_vol_commodity_mbs.cpp tests/test_cli_golden.cpp tests/test_risk.cpp tests/test_boundaries_pricing.cpp tests/test_boundaries_vol_credit.cpp tests/test_coverage.cpp tests/test_credit_options.cpp tests/test_limits.cpp tests/test_finite_rates.cpp tests/test_finite_vol.cpp tests/test_finite_numerics.cpp tests/test_cds_index.cpp tests/test_garch_vix_local_vol.cpp tests/test_curve_interp.cpp tests/test_joint_solve.cpp tests/test_book_sensitivity.cpp tests/test_var_frtb.cpp tests/test_book.cpp tests/test_mutant_kills_rates_vol.cpp tests/test_mutant_kills_survivors.cpp tests/test_short_rate_exotics_xva.cpp tests/test_hedging.cpp tests/test_mutant_kills_hedging.cpp tests/test_golden_replay.cpp tests/test_dispatch_paths.cpp)
+    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_curves_money_fx.cpp tests/test_equity_vol.cpp tests/test_multicurve.cpp tests/test_bonds.cpp tests/test_xccy_credit_carry.cpp tests/test_rates_vol_commodity_mbs.cpp tests/test_cli_golden.cpp tests/test_risk.cpp tests/test_boundaries_pricing.cpp tests/test_boundaries_vol_credit.cpp tests/test_coverage.cpp tests/test_credit_options.cpp tests/test_limits.cpp tests/test_finite_rates.cpp tests/test_finite_vol.cpp tests/test_finite_numerics.cpp tests/test_cds_index.cpp tests/test_garch_vix_local_vol.cpp tests/test_curve_interp.cpp tests/test_joint_solve.cpp tests/test_book_sensitivity.cpp tests/test_var_frtb.cpp tests/test_book.cpp tests/test_mutant_kills_rates_vol.cpp tests/test_mutant_kills_survivors.cpp tests/test_short_rate_exotics_xva.cpp tests/test_hedging.cpp tests/test_mutant_kills_hedging.cpp tests/test_golden_replay.cpp tests/test_dispatch_paths.cpp tests/test_stage_j_fuzzfix.cpp)
   target_link_libraries(quantforge_core_tests PRIVATE quantforge_cli_lib Catch2::Catch2WithMain)
   # The stage I example inputs and their goldens, read in place by tests/test_hedging.cpp.
   target_compile_definitions(quantforge_core_tests PRIVATE QF_REPO_DIR="${CMAKE_CURRENT_SOURCE_DIR}/..")
