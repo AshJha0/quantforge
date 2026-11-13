@@ -5,11 +5,17 @@
 
 Rulings J-0b.1 to J-0b.3 (specifications/stage-j-rulings.md). Each case is an error case whose code follows from the
 rulings alone, so no numerical oracle is involved. Standard library only; the returns are a fixed deterministic series.
+
+Cases 0007 onward are the J-0b.3 audit: every operation that reads a matrix, given a valid golden case's inputs with the
+first row of one matrix one entry short. All four languages already answer E_INPUT (row lengths are checked before any
+index access), so these cases pin that behaviour; no ruling changed.
 """
+import copy
 import json
 import math
 from pathlib import Path
 
+GOLDEN = Path(__file__).resolve().parents[2] / "datasets" / "golden"
 OUT = Path(__file__).resolve().parents[2] / "datasets" / "golden" / "stage_j" / "fuzzfix_j.json"
 
 
@@ -49,6 +55,59 @@ CASES = [
                                      "rate": 0.03, "option_type": "CALL"},
          "E_INPUT", ["basket"], "ragged correlation, a short first row (J-0b.3)"),
 ]
+
+# (golden file, source case, path to the matrix inside "inputs"): one per operation and matrix key.
+RAGGED = [
+    ("core/diff_linalg.json", "diff_linalg-0010", ["a"]),
+    ("core/diff_linalg.json", "diff_linalg-0012", ["a"]),
+    ("core/diff_linalg.json", "diff_linalg-0013", ["a"]),
+    ("r6/hedgeqp_large_r6.json", "hedgeqp_large_r6-0001", ["a"]),
+    ("r6/hedgeqp_large_r6.json", "hedgeqp_large_r6-0003", ["eq_matrix"]),
+    ("stage_b/hedge.json", "hedge-0001", ["a"]),
+    ("stage_c/smile.json", "smile-0045", ["total_variance"]),
+    ("stage_c/surface.json", "surface-0001", ["surface", "vols"]),
+    ("stage_c/surface.json", "surface-0003", ["surface", "vols"]),
+    ("stage_c/surface.json", "surface-0011", ["surface", "vols"]),
+    ("stage_e/exotic_e.json", "exotic_e-0115", ["correlation"]),
+    ("stage_e/surf_e.json", "surf_e-0024", ["total_variance"]),
+    ("stage_e_b/corr_e.json", "corr_e-0001", ["matrix"]),
+    ("stage_e_b/corr_e.json", "corr_e-0002", ["matrix"]),
+    ("stage_e_b/ratesvol_e.json", "ratesvol_e-0001", ["cube", "alpha"]),
+    ("stage_e_b/ratesvol_e.json", "ratesvol_e-0001", ["cube", "beta"]),
+    ("stage_e_b/ratesvol_e.json", "ratesvol_e-0001", ["cube", "rho"]),
+    ("stage_e_b/ratesvol_e.json", "ratesvol_e-0001", ["cube", "nu"]),
+    ("stage_f/e1_risk.json", "e1_risk-0372", ["covariance"]),
+    ("stage_f/risk_f3.json", "risk_f3-0010", ["changes"]),
+    ("stage_f/risk_f4b.json", "risk_f4b-0001", ["gamma"]),
+    ("stage_f/uc4_f.json", "uc4_f-0001", ["factor_returns"]),
+    ("stage_g/collexp_g.json", "collexp_g-0001", ["trades", 0, "values"]),
+    ("stage_g/collexp_g.json", "collexp_g-0002", ["trades", 1, "values"]),
+    ("stage_g/simm_g.json", "simm_g-0001", ["correlations"]),
+    ("stage_g/wwr_g.json", "wwr_g-0001", ["values"]),
+    ("stage_i/hedgefrontier_i.json", "hedgefrontier_i-0001", ["a"]),
+    ("stage_i/hedgeint_i.json", "hedgeint_i-0001", ["a"]),
+    ("stage_i/hedgemv5_i.json", "hedgemv5_i-0001", ["covariance"]),
+    ("stage_i/hedgemv5_i.json", "hedgemv5_i-0002", ["hedge_changes"]),
+    ("stage_i/hedgeres_i.json", "hedgeres_i-0001", ["a"]),
+    ("stage_i/hedgeres_i.json", "hedgeres_i-0001", ["covariance"]),
+    ("stage_i/hedgeselect_i.json", "hedgeselect_i-0001", ["a"]),
+]
+
+
+def ragged(k, file, source, path):
+    src = next(c for c in json.loads((GOLDEN / file).read_text(encoding="utf-8"))["cases"] if c["case_id"] == source)
+    inputs = copy.deepcopy(src["inputs"])
+    holder = inputs
+    for p in path[:-1]:
+        holder = holder[p]
+    m = holder[path[-1]]
+    holder[path[-1]] = [m[0][:-1], *m[1:]]
+    where = "/".join(map(str, path))
+    return case(k, src["operation"], inputs, "E_INPUT", ["ragged"],
+                f"{source} with the first row of {where} one entry short (J-0b.3 audit)")
+
+
+CASES += [ragged(7 + i, *r) for i, r in enumerate(RAGGED)]
 
 DOC = {"schema_version": "1.0", "suite": "fuzzfix_j", "spec": "specifications/stage-j-rulings.md",
        "spec_version": "1.0.0", "generator": "oracle/python/gen_stage_j_fuzz.py",
