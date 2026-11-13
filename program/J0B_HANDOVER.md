@@ -25,4 +25,12 @@ Rulings are in `specifications/stage-j-rulings.md` (new file); the limit row is 
 
 ## Left
 
-- Not checked: `check_error_cases.py` on stage_j; the site build; CHANGELOG case count for 0.9.0.
+- Nothing from the earlier 'not checked' list. Loose ends closed 2026-11-13 (commit fd5c967 and after): there is no `check_error_cases.py`; the error-case gates CI runs (`check_e1_coverage`, `quality_gate --check-register --check-specs --check-docs`, `check_case_total`, `case_figures --check`, `check_golden_copies`, `check_tolerance_units`, `check_hygiene`) all pass on 15,116. Docs job: `test_tools`, `check_quickstart`, `build_gallery --check`, `build_references --check`, `build_site` (363 pages, 0 broken links), `check_docs_status`, `check_links` (0 gone; 7 publisher 403s) pass. CHANGELOG 0.9.0 now states 39 cases and the 15,116 total.
+- WSL Rust/C++ re-check and fuzz (seeds 3 and 1113, 180 s each, CI budget): see RESULTS_WSL below.
+
+## RESULTS_WSL (2026-11-13, `git archive` of fd5c967, WSL, -j 4 beside the running cargo-mutants)
+
+- Rust: `cargo fmt --check` clean, clippy `--release --all-targets -D warnings` clean, `cargo test --release` all ok (0 failed).
+- C++: `-DQF_WERROR=ON` with ASan/UBSan/float-cast-overflow (fuzz.yml flags, Make generator since WSL has no ninja) built with no warnings.
+- Fuzz, 180 s per run (CI default), `--focus-config conformance/quality/stage_e.json`: Rust seed 3 29,600 sent / 0 findings, seed 1113 42,800 / 0; C++ seed 3 55,600 / 0, seed 1113 58,800 / 0.
+- J-0b is complete apart from the push and PR.
