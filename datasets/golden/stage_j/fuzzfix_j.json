@@ -1,0 +1,368 @@
+{
+ "schema_version": "1.0",
+ "suite": "fuzzfix_j",
+ "spec": "specifications/stage-j-rulings.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_j_fuzz.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "fuzzfix_j-0001",
+   "operation": "vol.garch.forecast",
+   "inputs": {
+    "omega": 5e-06,
+    "alpha": 0.12,
+    "beta": 0.82,
+    "next_variance": 0.0003,
+    "horizon": 2147483648,
+    "periods_per_year": 252.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "garch",
+    "limit",
+    "synthetic"
+   ],
+   "description": "horizon 2^31 is above the 100,000 limit (J-0b.1; fuzz garch_e-0020)"
+  },
+  {
+   "case_id": "fuzzfix_j-0002",
+   "operation": "vol.garch.forecast",
+   "inputs": {
+    "omega": 5e-06,
+    "alpha": 0.12,
+    "beta": 0.82,
+    "next_variance": 0.0003,
+    "horizon": 100001,
+    "periods_per_year": 252.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "garch",
+    "limit",
+    "synthetic"
+   ],
+   "description": "horizon one above the limit (J-0b.1)"
+  },
+  {
+   "case_id": "fuzzfix_j-0003",
+   "operation": "vol.garch.estimate",
+   "inputs": {
+    "returns": [
+     0.0029552021,
+     0.0090929743,
+     -0.0052983614,
+     -0.0077276449,
+     0.0072896904,
+     0.0058491719,
+     -0.0087969576,
+     -0.0035822928,
+     0.009720075,
+     0.0010775365,
+     -0.0099977443,
+     0.0014987721,
+     0.0096115272,
+     -0.0039755568,
+     -0.00858707,
+     0.0061883502,
+     0.0069924003,
+     -0.0079902148,
+     -0.0049334099,
+     0.0092615002,
+     0.0025468233,
+     -0.0099177885,
+     8.8816e-06,
+     0.0099154999,
+     -0.0025639967,
+     -0.0092547861,
+     0.0049488532,
+     0.0079795212,
+     -0.0070050879,
+     -0.0061743871,
+     0.0085961595,
+     0.0039592515,
+     -0.009616415,
+     -0.0014812072,
+     0.0099981058,
+     -0.0010951945,
+     -0.0097158862,
+     -2.6755826e+297,
+     0.0087884967,
+     -0.0058635703,
+     -0.0072775192,
+     0.0077389068,
+     0.0052832881,
+     -0.009100352,
+     -0.0029382276,
+     0.0098575009,
+     0.0003980582,
+     -0.0099600761,
+     0.0021685437,
+     0.0094012663,
+     -0.0045911465,
+     -0.0082181784,
+     0.0067088806,
+     0.0064893737,
+     -0.0083811208,
+     -0.0043296512,
+     0.0094968242,
+     0.0018824242,
+     -0.0099819042,
+     0.0006898026,
+     0.0098041496,
+     -0.003216224,
+     -0.0089753641,
+     0.0055290765,
+     0.007550582,
+     -0.0074747784,
+     -0.0056244139,
+     0.0089241279,
+     0.0033247644,
+     -0.0097808831,
+     -0.0008043385,
+     0.0099881522,
+     -0.0017694983,
+     -0.009532172,
+     0.0042258341,
+     0.0084432211,
+     -0.0064015592,
+     -0.0067936098,
+     0.0081521976,
+     0.0046928782,
+     -0.0093615007,
+     -0.0022805226,
+     0.0099491662,
+     -0.000283268,
+     -0.0098761712,
+     0.0028282486,
+     0.0091473627,
+     -0.0051854232,
+     -0.0078111362,
+     0.007198267,
+     0.0059562221,
+     -0.0087331198,
+     -0.0037057933,
+     0.0096880619,
+     0.0012092864,
+     -0.0099996817,
+     0.0013675215,
+     0.0096472865,
+     -0.003853521,
+     -0.0086542766,
+     0.0060836328,
+     0.0070865914,
+     -0.0079097693,
+     -0.0050483309,
+     0.0092106686,
+     0.0026748431,
+     -0.0098999462,
+     -0.0001237359,
+     0.0099318316,
+     -0.0024355877,
+     -0.0093042075,
+     0.0048331795,
+     0.0080587503,
+     -0.0069098308,
+     -0.006278163,
+     0.0085276442,
+     0.004080683,
+     -0.0095791913,
+     -0.0016122309,
+     0.0099946455
+    ],
+    "initial_variance": "SAMPLE",
+    "distribution": "STUDENT_T",
+    "demean": false
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NON_FINITE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "garch",
+    "synthetic"
+   ],
+   "description": "a finite return whose square overflows: E_NON_FINITE before any search (R6-8.1, J-0b.2; fuzz garch_f-0010)"
+  },
+  {
+   "case_id": "fuzzfix_j-0004",
+   "operation": "vol.garch.estimate",
+   "inputs": {
+    "returns": [
+     0.0029552021,
+     0.0090929743,
+     -0.0052983614,
+     -0.0077276449,
+     0.0072896904,
+     -2.6755826e+297,
+     -0.0087969576,
+     -0.0035822928,
+     0.009720075,
+     0.0010775365,
+     -0.0099977443,
+     0.0014987721,
+     0.0096115272,
+     -0.0039755568,
+     -0.00858707,
+     0.0061883502,
+     0.0069924003,
+     -0.0079902148,
+     -0.0049334099,
+     0.0092615002,
+     0.0025468233,
+     -0.0099177885,
+     8.8816e-06,
+     0.0099154999,
+     -0.0025639967,
+     -0.0092547861,
+     0.0049488532,
+     0.0079795212,
+     -0.0070050879,
+     -0.0061743871,
+     0.0085961595,
+     0.0039592515,
+     -0.009616415,
+     -0.0014812072,
+     0.0099981058,
+     -0.0010951945,
+     -0.0097158862,
+     0.0035988714,
+     0.0087884967,
+     -0.0058635703
+    ],
+    "initial_variance": 0.0001,
+    "distribution": "NORMAL",
+    "demean": true
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NON_FINITE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "garch",
+    "synthetic"
+   ],
+   "description": "as 0003 with a numeric initial variance and demeaning (J-0b.2)"
+  },
+  {
+   "case_id": "fuzzfix_j-0005",
+   "operation": "exotic.basket.moment",
+   "inputs": {
+    "forwards": [
+     100.0,
+     100.0
+    ],
+    "weights": [
+     0.5,
+     0.5
+    ],
+    "vols": [
+     0.2,
+     0.2
+    ],
+    "correlation": [
+     [
+      1.0,
+      1.0
+     ],
+     []
+    ],
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "basket",
+    "synthetic"
+   ],
+   "description": "ragged correlation, an empty second row (J-0b.3; fuzz e1_exotic-0211)"
+  },
+  {
+   "case_id": "fuzzfix_j-0006",
+   "operation": "exotic.basket.moment",
+   "inputs": {
+    "forwards": [
+     100.0,
+     100.0
+    ],
+    "weights": [
+     0.5,
+     0.5
+    ],
+    "vols": [
+     0.2,
+     0.2
+    ],
+    "correlation": [
+     [
+      1.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ],
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "basket",
+    "synthetic"
+   ],
+   "description": "ragged correlation, a short first row (J-0b.3)"
+  }
+ ]
+}

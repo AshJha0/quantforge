@@ -240,10 +240,13 @@ public final class GarchMle {
     /** {@code vol.garch.estimate}: the caller has checked the counts and the initial variance. */
     public static Estimate estimate(double[] r, double v0, boolean studentT, boolean demean) {
         Finite.check("r", r);
-        Finite.check("v0", v0);
         double mu = demean ? mean(r) : 0.0;
         double[] e = residuals(r, mu);
         double var = Garch.sampleVariance(e);
+        if (!Double.isFinite(var)) { // rulings R6-8.1, J-0b.2: the squares overflow binary64
+            throw new QfError("E_NON_FINITE", "the sample variance of the returns overflows", "returns");
+        }
+        Finite.check("v0", v0);
         if (!(var > 0.0)) {
             throw new QfError("E_DOMAIN", "returns are all zero");
         }

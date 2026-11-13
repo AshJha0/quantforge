@@ -417,6 +417,9 @@ GarchEstimate garch_estimate(const std::vector<double>& r, std::optional<double>
     for (double& x : e) x -= mu;
     const double v1 = start_variance(e, initial);
     const double var = sample_variance(e);
+    // Rulings R6-8.1, J-0b.2: finite returns whose squares overflow binary64.
+    if (!std::isfinite(var) || !std::isfinite(v1))
+        throw Error("E_NON_FINITE", "the sample variance of the returns overflows", "returns");
     const int k = t ? 4 : 3;
 
     Vec4 best{};
