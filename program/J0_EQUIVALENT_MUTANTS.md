@@ -30,3 +30,4 @@ not the returned hedge (verified against the brute-force reference in tests/hedg
 - `hedge.rs:138:18 replace % with / in solve_hedge`: same.
 - `hedge.rs:138:18 replace % with + in solve_hedge`: same.
 - `hedge.rs:138:38 replace == with != in solve_hedge`: same.
+- `var.rs:167:11 replace < with <= in floor_lr`: differs only at `lr == 1e-12` exactly, which no input produces.

@@ -197,3 +197,37 @@ fn monte_carlo_size_checks_and_pinned_path() {
     let v = monte_carlo(&mean, &cov, &[1.0, 2.0], 1, 7, 0.5).unwrap();
     assert!((v.var - -0.844901256880429).abs() < 1e-12, "{v:?}");
 }
+
+#[test]
+fn ragged_covariance_is_an_input_error() {
+    let mean = [0.3, -0.1];
+    let ragged = vec![vec![4.0], vec![1.2, 1.0]];
+    assert_eq!(
+        monte_carlo(&mean, &ragged, &[1.0, 2.0], 10, 1, 0.95)
+            .unwrap_err()
+            .code,
+        "E_INPUT"
+    );
+}
+
+#[test]
+fn rounding_noise_in_the_lr_is_floored_to_zero() {
+    // x / n == 1 - c exactly in exact arithmetic; in f64 the raw statistic is 2.8e-14.
+    assert_eq!(kupiec(250, 25, 0.9).unwrap(), (0.0, 1.0));
+}
+
+#[test]
+fn christoffersen_all_four_transitions() {
+    // Reference: independent Python evaluation of the textbook formulas.
+    let e: Vec<bool> = [0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0]
+        .iter()
+        .map(|v| *v == 1)
+        .collect();
+    let r = christoffersen(&e, 0.9).unwrap();
+    assert_eq!(r.transitions, [4, 3, 3, 3]);
+    assert!(close(r.lr_uc, 10.195362434840565, 1e-12), "{r:?}");
+    assert!(close(r.lr_ind, 0.06634794396296151, 1e-10), "{r:?}");
+    assert!(close(r.lr_cc, 10.261710378803526, 1e-12), "{r:?}");
+    assert!(close(r.p_ind, 0.7967303361691838, 1e-7), "{r:?}");
+    assert!(close(r.p_cc, 0.005911502856788296, 1e-10), "{r:?}");
+}
