@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased (0.9.0)
+## 0.8.3: fuzz fixes, Rust kill tests, stage J wave 1 spec documents (2026-11-13)
+
+A patch release on top of v0.8.2. CLI contract unchanged (1.12.0); 39 new error cases, so 15,116 golden cases (7,441 value-checked, 5,161 error, 2,514 invariance).
 
 ### Fixed
 
@@ -8,6 +10,16 @@
   - `vol.garch.forecast` with `horizon` 2^31 ran past the 20 s limit in Rust and C++ (and would have in Python). `horizon` above 100,000 is now `E_LIMIT` in every build, as Java already did (J-0b.1).
   - `vol.garch.estimate` on finite returns whose squares overflow binary64 searched for 20 s in Python; it now returns `E_NON_FINITE` before any search in every build (R6-8.1, J-0b.2). Java returned `E_DOMAIN` and C++ `E_NO_CONVERGENCE` on that input; both now return `E_NON_FINITE`.
   - Java `exotic.basket.moment` with a ragged `correlation` such as `[[1, 1], []]` crashed (exit 70); every row length is now checked first, so it is `E_INPUT` as in the other builds (J-0b.3).
+
+### Added
+
+- **Rust mutant kill tests** for `var.rs` and `hedge.rs` (`rust/crates/quantforge-core/tests/var_mutants.rs`, `hedge_mutants.rs`), with notes on the equivalent mutants (stage J item J-0).
+- **Stage J wave 1 specification documents**, status *specified, not implemented*: `specifications/11-research/` (backtester, purged CV, regimes, research statistics), `specifications/stage-j-rulings-w1.md`, `program/STAGE_J_HANDOVER.md` and the generator `oracle/python/gen_stage_j_w1.py`. No build implements these operations; their goldens and CLI contract entries land with the wave 1 code in v0.9.0.
+- **J-11 design** for the Q6-02 calibration test redesign (`program/J11_Q6_02_DESIGN.md`).
+
+### Known issues
+
+- **Rust mutation gate:** `mutation-report` samples Rust mutants and may be red until the `hedge_solvers.rs` kill tests land in v0.9.0. It is not a required check.
 
 ## 0.8.2: R6 follow-ups (2026-11-13)
 
