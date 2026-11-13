@@ -16,8 +16,13 @@ Rulings are in `specifications/stage-j-rulings.md` (new file); the limit row is 
 - Unit tests: Java `mvn -o test` green. Python `pytest -k "garch or limit or basket"` 70 passed. Rust `cargo test --release` all ok. C++ built with `-DQF_WERROR=ON`, and ctest passed.
 - Fuzz with seed 3 for 60 s: Java (9,800 cases) and Python (3,600) gave 0 findings. Rust and C++ were not fuzzed locally.
 
+## Follow-up (2026-11-13, commit after 9a839f8)
+
+- Ragged-matrix audit (J-0b.3). Every Java `anyMatrix` caller (23 sites, 33 operation and key pairs with a golden case) was probed in all four languages with three ragged shapes and a short extra row: 132 probes, all `E_INPUT` in Java, Python, Rust and C++. No code or ruling change was needed. One probe per pair (first row one entry short) is now a golden case: `fuzzfix_j` has 39 cases (0007-0039 built by `gen_stage_j_fuzz.py` from named source goldens).
+- Unit tests for J-0b.1..3 in each language: `python/tests/test_stage_j_fuzzfix.py`, `java25/.../cli/StageJFuzzFixTest.java`, `cpp26/tests/test_stage_j_fuzzfix.cpp` (added to CMake), module `stage_j_fuzzfix_tests` in `rust/crates/quantforge-cli/src/main.rs`.
+- Counts: 15,116 golden cases (error 5,161). `TOTALS:` line in `program/R6_HANDOVER.md`, README headline and `docs/case-figures.md` updated; `check_case_total`, `case_figures --check` and `check_docs_status` pass.
+- Results: Python full suite 2,005 passed, 2 skipped, mypy on tests clean; Java `mvn -o test` green; Rust `cargo test --release` ok, clippy `-D warnings` clean, rustfmt clean after one fix; C++ `-DQF_WERROR=ON` build and ctest green (WSL, `git archive`, TMPDIR moved off the full /tmp tmpfs). Conformance 39/39, 29/29, 17/17, 128/128, 17/17, 411/411 in all four.
+
 ## Left
 
-- No unit tests were added. The goldens are the regression check.
-- Not checked: the full Python suite, the docs gates (`check_case_total` or the case counts in README and site) and `check_error_cases.py` on stage_j.
-- Other Java `anyMatrix` users may read ragged rows the same way. Not audited.
+- Not checked: `check_error_cases.py` on stage_j; the site build; CHANGELOG case count for 0.9.0.

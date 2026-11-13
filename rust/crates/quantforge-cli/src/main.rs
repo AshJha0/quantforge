@@ -753,6 +753,12 @@ mod stage_j_fuzzfix_tests {
         assert_eq!(code("exotic.basket.moment", r#"{"forwards":[100.0,100.0],"weights":[0.5,0.5],"vols":[0.2,0.2],"correlation":[[1.0,1.0],[]],"strike":100.0,"expiry_years":1.0,"rate":0.03,"option_type":"CALL"}"#).as_deref(), Some("E_INPUT"));
         assert_eq!(code("exotic.basket.moment", r#"{"forwards":[100.0,100.0],"weights":[0.5,0.5],"vols":[0.2,0.2],"correlation":[[1.0],[0.0,1.0]],"strike":100.0,"expiry_years":1.0,"rate":0.03,"option_type":"CALL"}"#).as_deref(), Some("E_INPUT"));
         assert_eq!(code("exotic.basket.moment", r#"{"forwards":[100.0,100.0],"weights":[0.5,0.5],"vols":[0.2,0.2],"correlation":[[1.0,0.0],[0.0,1.0,0.0]],"strike":100.0,"expiry_years":1.0,"rate":0.03,"option_type":"CALL"}"#).as_deref(), Some("E_INPUT"));
-        assert_eq!(code("vol.garch.forecast", r#"{"omega":5e-06,"alpha":0.12,"beta":0.82,"next_variance":0.0003,"horizon":100000,"periods_per_year":252.0}"#), None);
+        assert_eq!(
+            code(
+                "vol.garch.forecast",
+                r#"{"omega":5e-06,"alpha":0.12,"beta":0.82,"next_variance":0.0003,"horizon":100000,"periods_per_year":252.0}"#
+            ),
+            None
+        );
     }
 }
