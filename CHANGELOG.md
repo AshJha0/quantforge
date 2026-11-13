@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- **Fuzz findings from `main` run 43390662426 (seed 3), lane J-0b.** Rulings J-0b.1 to J-0b.3 (`specifications/stage-j-rulings.md`); six new error cases in `datasets/golden/stage_j/fuzzfix_j.json` (generator `oracle/python/gen_stage_j_fuzz.py`), passed by all four builds.
+- **Fuzz findings from `main` run 43390662426 (seed 3), lane J-0b.** Rulings J-0b.1 to J-0b.3 (`specifications/stage-j-rulings.md`); 39 new error cases in `datasets/golden/stage_j/fuzzfix_j.json` (six for the fixes, 33 ragged-matrix probes; generator `oracle/python/gen_stage_j_fuzz.py`), passed by all four builds. Golden total 15,116 (7,441 value-checked, 5,161 error, 2,514 invariance).
   - `vol.garch.forecast` with `horizon` 2^31 ran past the 20 s limit in Rust and C++ (and would have in Python). `horizon` above 100,000 is now `E_LIMIT` in every build, as Java already did (J-0b.1).
   - `vol.garch.estimate` on finite returns whose squares overflow binary64 searched for 20 s in Python; it now returns `E_NON_FINITE` before any search in every build (R6-8.1, J-0b.2). Java returned `E_DOMAIN` and C++ `E_NO_CONVERGENCE` on that input; both now return `E_NON_FINITE`.
   - Java `exotic.basket.moment` with a ragged `correlation` such as `[[1, 1], []]` crashed (exit 70); every row length is now checked first, so it is `E_INPUT` as in the other builds (J-0b.3).
