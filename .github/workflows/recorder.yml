@@ -49,10 +49,23 @@ jobs:
         continue-on-error: true
         run: python3 code/tools/recorder/gap_monitor.py gaps --log log/actions/log.jsonl --holidays code/tools/recorder/holidays.txt --studies code/tools/recorder/studies.json --out log/actions/gaps.md
       - name: Push rows
+        env:
+          # Owner's SSH signing key (registered on the AshJha0 account as a signing key, 2026-11-13). Signed commits
+          # show as Verified and tie each row to its date; without the secret (forks) the rows are pushed unsigned.
+          SIGNING_KEY: ${{ secrets.FORWARD_LOG_SIGNING_KEY }}
         run: |
           cd log
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$SIGNING_KEY" ]; then
+            key="$RUNNER_TEMP/fl_sign"; (umask 077; printf '%s\n' "$SIGNING_KEY" > "$key")
+            git config user.name "AshJha0"
+            git config user.email "99271665+AshJha0@users.noreply.github.com"
+            git config gpg.format ssh
+            git config user.signingkey "$key"
+            git config commit.gpgsign true
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          fi
           git add -A
           git diff --cached --quiet && exit 0
           git commit -q -m "recorder: $(date -u +%Y-%m-%dT%H:%MZ) (main ${GITHUB_SHA::7})"

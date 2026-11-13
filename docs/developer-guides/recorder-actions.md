@@ -49,3 +49,7 @@ Rows are matched by series and UTC date of `event_time`.
 | neither | Both failed that day | A real gap. Note it in the study's data section. |
 
 A day counts as recorded if either log has a successful row for it. That is why `gaps` accepts several `--log` files. Studies that need the bytes take them from the local raw store. For a day only Actions saw, the hash is known but the bytes are not, and the study must say so.
+
+## Signed rows (from 2026-11-13)
+
+Each forward-log commit is signed with the owner's SSH signing key, stored as the Actions secret `FORWARD_LOG_SIGNING_KEY` and registered on the owner's GitHub account as a signing key. GitHub shows those commits as Verified. Commits before 2026-11-13 are unsigned; their dates rest on the OpenTimestamps anchors on branch `forward-log-anchors`. A fork without the secret pushes unsigned rows, so the recorder never fails for want of the key.
