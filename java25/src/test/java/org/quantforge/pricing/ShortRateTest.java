@@ -293,4 +293,15 @@ class ShortRateTest {
         org.junit.jupiter.api.Assumptions.assumeFalse(instrumented, "G-9 bound not asserted under a coverage agent");
         assertTrue(tl[10] / tp[10] <= 5.0, "G-9 cost ratio " + tl[10] / tp[10] + " exceeds 5");
     }
+
+    /** R6-8, fuzz finding on main 2026-11-13: an overflowed parameter returns NaN at once instead of looping. */
+    @Test
+    void chi2CdfOverflowedParameterIsNaNAtOnce() {
+        long t0 = System.nanoTime();
+        assertTrue(Double.isNaN(ShortRate.chi2Cdf(Double.NaN, 1.0, 2.0)));
+        assertTrue(Double.isNaN(ShortRate.chi2Cdf(1.0, 1.0, Double.POSITIVE_INFINITY)));
+        assertTrue(Double.isNaN(ShortRate.chi2Cdf(1.0, Double.POSITIVE_INFINITY, 2.0)));
+        assertTrue(System.nanoTime() - t0 < 1_000_000_000L, "chi2Cdf must not loop on non-finite input");
+        assertEquals(ShortRate.chi2Cdf(3.0, 2.0, 0.0), 1.0 - Math.exp(-1.5), 1e-14);
+    }
 }

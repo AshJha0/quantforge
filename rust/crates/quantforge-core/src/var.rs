@@ -296,6 +296,37 @@ mod tests {
     use super::*;
 
     #[test]
+    fn monte_carlo_shape_errors() {
+        let cov = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let m = [0.0, 0.0];
+        let code = |r: Result<VarEs>| r.unwrap_err().code;
+        assert_eq!(
+            code(monte_carlo(&m, &cov, &[1.0, 1.0, 1.0], 10, 1, 0.99)),
+            "E_INPUT"
+        );
+        assert_eq!(code(monte_carlo(&m, &cov, &[1.0], 10, 1, 0.99)), "E_INPUT");
+        assert_eq!(code(monte_carlo(&[], &[], &[], 10, 1, 0.99)), "E_INPUT");
+        assert_eq!(
+            code(monte_carlo(&[0.0], &cov, &[1.0], 10, 1, 0.99)),
+            "E_INPUT"
+        );
+        let ragged = vec![vec![1.0, 0.0], vec![0.0]];
+        assert_eq!(
+            code(monte_carlo(&m, &ragged, &[1.0, 1.0], 10, 1, 0.99)),
+            "E_INPUT"
+        );
+        assert_eq!(
+            code(monte_carlo(&m, &cov, &[1.0, 1.0], 0, 1, 0.99)),
+            "E_DOMAIN"
+        );
+        assert_eq!(
+            code(monte_carlo(&m, &cov, &[1.0, 1.0], 10, 1, 1.0)),
+            "E_DOMAIN"
+        );
+        assert!(monte_carlo(&m, &cov, &[1.0, 1.0], 10, 1, 0.99).is_ok());
+    }
+
+    #[test]
     fn third_largest_of_250_at_99() {
         let pnl: Vec<f64> = (0..250).map(|i| -f64::from(i)).collect();
         let r = historical(&pnl, 0.99).unwrap();

@@ -1,5 +1,64 @@
 {
- "_note": "Empty until the first CI run on github-ubuntu-24.04: download the bench-results-* artifacts into one folder and run tools/bench_gate.py --current DIR --write-baseline --machine github-ubuntu-24.04. Local laptop numbers are not stored: they were measured under heavy load.",
- "machine": "unset",
- "results": {}
+ "machine": "github-ubuntu-24.04",
+ "results": {
+  "cpp": {
+   "bootstrap": {
+    "allocs_per_op": 2171.0,
+    "ns_per_op": 134817.1114969136
+   },
+   "implied_vol": {
+    "allocs_per_op": 0.0,
+    "ns_per_op": 10.382153380778155
+   },
+   "swap_pv": {
+    "allocs_per_op": 122.0,
+    "ns_per_op": 4125.285809776781
+   }
+  },
+  "java": {
+   "bootstrap": {
+    "alloc_bytes_per_op": 67072.73870895803,
+    "allocs_per_op": null,
+    "ns_per_op": 104851.82328698582
+   },
+   "implied_vol": {
+    "alloc_bytes_per_op": 0.006925579154873185,
+    "allocs_per_op": null,
+    "ns_per_op": 990.9367173486265
+   },
+   "swap_pv": {
+    "alloc_bytes_per_op": 2216.0156699072395,
+    "allocs_per_op": null,
+    "ns_per_op": 2223.2723855097624
+   }
+  },
+  "python": {
+   "bootstrap": {
+    "allocs_per_op": 10.08,
+    "ns_per_op": 3039845.4999982505
+   },
+   "implied_vol": {
+    "allocs_per_op": 1.56,
+    "ns_per_op": 12363.00000329038
+   },
+   "swap_pv": {
+    "allocs_per_op": 4.76,
+    "ns_per_op": 86271.9999972228
+   }
+  },
+  "rust": {
+   "bootstrap": {
+    "allocs_per_op": 1386,
+    "ns_per_op": 147368.17473649536
+   },
+   "implied_vol": {
+    "allocs_per_op": 0,
+    "ns_per_op": 454.6395322477217
+   },
+   "swap_pv": {
+    "allocs_per_op": 81,
+    "ns_per_op": 10115.566575804776
+   }
+  }
+ }
 }

@@ -382,15 +382,22 @@ public final class ShortRate {
         if (mu == 0.0) {
             return gammaP(s0, x / 2.0);
         }
-        int j0 = (int) Math.floor(mu);
-        double w0 = Math.exp(logPoisson(j0, mu));
         double half = x / 2.0;
+        if (!Double.isFinite(mu) || !Double.isFinite(half) || !Double.isFinite(s0)) {
+            // R6-8: an overflowed parameter yields NaN for the caller's E_NON_FINITE guard, at once.
+            return Double.NaN;
+        }
+        int j0 = (int) Math.floor(Math.min(mu, 1e9));
+        double w0 = Math.exp(logPoisson(j0, mu));
+        if (!Double.isFinite(w0)) {
+            return Double.NaN;
+        }
         double sum = 0.0;
         double w = w0;
         for (int j = j0; j < j0 + 1_000_000; j++) {
             double term = w * gammaP(s0 + j, half);
             sum += term;
-            if (j > mu + 10.0 && term < 1e-17 * sum) {
+            if (j > mu + 10.0 && term <= 1e-17 * sum) {
                 break;
             }
             w *= mu / (j + 1);
@@ -400,7 +407,7 @@ public final class ShortRate {
             w *= (j + 1) / mu;
             double term = w * gammaP(s0 + j, half);
             sum += term;
-            if (term < 1e-17 * sum) {
+            if (term <= 1e-17 * sum) {
                 break;
             }
         }

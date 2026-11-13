@@ -44,6 +44,10 @@ def compare(current, baseline, machine, time_ratio=1.5, alloc_ratio=1.10):
     timed = baseline.get("machine") == machine
     fails, rows = [], []
     for lang, benches in sorted(baseline.get("results", {}).items()):
+        # Each CI job benchmarks one language: gate the languages this run measured. A missing
+        # benchmark inside a measured language still fails.
+        if current and lang not in current:
+            continue
         for bid, b in sorted(benches.items()):
             c = current.get(lang, {}).get(bid)
             if c is None:

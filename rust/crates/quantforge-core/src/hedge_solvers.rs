@@ -2140,4 +2140,182 @@ mod r6_cap_tests {
         assert_eq!(ri.unwrap_err().code, "E_NO_CONVERGENCE");
         assert!(qp_solve(&q).is_ok());
     }
+
+    fn plain<'a>(a: &'a Matrix, b: &'a [f64], w: &'a [f64]) -> QpProblem<'a> {
+        QpProblem {
+            a,
+            b,
+            weights: w,
+            ridge: 0.0,
+            eq_matrix: None,
+            eq_rhs: None,
+            lower: None,
+            upper: None,
+            singular: Singular::Error,
+            costs: Costs::default(),
+        }
+    }
+
+    /// R6-6.1 as amended in wave 3B: the cap is `10 (n + p) + 100`, and a planted cap wins.
+    #[test]
+    fn iteration_cap_formula() {
+        PLANTED_CAP.with(|c| c.set(None));
+        set_cap(3, 2);
+        assert_eq!(iteration_cap(), 150);
+        set_cap(0, 0);
+        assert_eq!(iteration_cap(), 100);
+        set_cap(4, 0);
+        assert_eq!(iteration_cap(), 140);
+        PLANTED_CAP.with(|c| c.set(Some(7)));
+        set_cap(3, 2);
+        let planted = iteration_cap();
+        PLANTED_CAP.with(|c| c.set(None));
+        assert_eq!(planted, 7);
+    }
+
+    /// The Jacobi scaling is `Some` only for a well-formed problem with positive weights.
+    #[test]
+    fn jacobi_scaling_needs_a_valid_problem() {
+        let a: Matrix = vec![vec![2.0, 0.0], vec![0.0, 3.0], vec![1.0, 1.0]];
+        let b = [1.0, 1.0, 1.0];
+        let w = [1.0, 1.0, 1.0];
+        assert!(jacobi_for(&plain(&a, &b, &w)).is_some_and(|d| d.len() == 2));
+        let w0 = [1.0, 0.0, 1.0];
+        assert!(jacobi_for(&plain(&a, &b, &w0)).is_none());
+        let wn = [1.0, -1.0, 1.0];
+        assert!(jacobi_for(&plain(&a, &b, &wn)).is_none());
+        let short = [1.0, 1.0];
+        assert!(jacobi_for(&plain(&a, &short, &w)).is_none());
+        assert!(jacobi_for(&plain(&a, &b, &short)).is_none());
+        let ragged: Matrix = vec![vec![2.0, 0.0], vec![0.0], vec![1.0, 1.0]];
+        assert!(jacobi_for(&plain(&ragged, &b, &w)).is_none());
+        let mut ridged = plain(&a, &b, &w);
+        ridged.ridge = 0.1;
+        assert!(jacobi_for(&ridged).is_none());
+    }
+
+    /// The singularity test of `select_solve` is relative to the spectral scale: a problem
+    /// whose smallest eigenvalue is tiny next to a large largest eigenvalue is singular.
+    #[test]
+    fn select_singular_is_relative_to_scale() {
+        let a: Matrix = vec![vec![1e3, 1e3], vec![1e3, 1e3 + 1e-3]];
+        let b = [1.0, 1.0];
+        let w = [1.0, 1.0];
+        assert_eq!(
+            select_solve(&plain(&a, &b, &w), 1, false).unwrap_err().code,
+            "E_SINGULAR"
+        );
+        let good: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let sel = select_solve(&plain(&good, &b, &w), 2, false);
+        assert!(sel.is_ok(), "{sel:?}");
+        assert_eq!(
+            select_solve(&plain(&good, &b, &w), 3, false)
+                .unwrap_err()
+                .code,
+            "E_INPUT"
+        );
+        assert_eq!(
+            select_solve(&plain(&good, &b, &w), 0, false)
+                .unwrap_err()
+                .code,
+            "E_INPUT"
+        );
+        assert_eq!(
+            select_solve(&plain(&good, &b, &w), 1, true)
+                .unwrap_err()
+                .code,
+            "E_INPUT"
+        );
+    }
+}
+
+/// PR #36 mutation run: behaviours the sampled survivors showed were not pinned.
+#[cfg(test)]
+mod r6_followup_tests {
+    use super::*;
+
+    fn plain<'a>(a: &'a Matrix, b: &'a [f64], w: &'a [f64]) -> QpProblem<'a> {
+        QpProblem {
+            a,
+            b,
+            weights: w,
+            ridge: 0.0,
+            eq_matrix: None,
+            eq_rhs: None,
+            lower: None,
+            upper: None,
+            singular: Singular::Error,
+            costs: Costs::default(),
+        }
+    }
+
+    /// The Jacobi diagonal includes the impact term scaled by the cost weight:
+    /// `h = sum_i w_i a_ij^2 + cost_weight impact_j`, here 1 + 2 * 3 = 7.
+    #[test]
+    fn jacobi_includes_weighted_impact() {
+        let a = vec![vec![1.0]];
+        let impact = [3.0];
+        let mut p = plain(&a, &[1.0], &[1.0]);
+        p.costs = Costs {
+            impact: Some(&impact),
+            cost_weight: Some(2.0),
+            ..Costs::default()
+        };
+        let d = jacobi_for(&p).expect("valid problem");
+        assert!((d[0] - 1.0 / 7.0f64.sqrt()).abs() < 1e-15, "{}", d[0]);
+    }
+
+    /// Fully determined by the equalities (dim 0): a point below a lower bound is infeasible,
+    /// and one exactly on it is accepted.
+    #[test]
+    fn determined_point_outside_lower_bound_is_infeasible() {
+        let a = vec![vec![1.0]];
+        let eq = vec![vec![1.0]];
+        let lower_out = [Some(3.0)];
+        let mut p = plain(&a, &[0.0], &[1.0]);
+        p.eq_matrix = Some(&eq);
+        p.eq_rhs = Some(&[2.0]);
+        p.lower = Some(&lower_out);
+        assert_eq!(qp_solve(&p).unwrap_err().code, "E_INFEASIBLE");
+        let lower_on = [Some(2.0)];
+        p.lower = Some(&lower_on);
+        assert!((qp_solve(&p).expect("on the bound").x[0] - 2.0).abs() < 1e-12);
+    }
+
+    /// Upper lot bounds alone (no lower bounds) are a valid integer problem.
+    #[test]
+    fn integer_upper_lots_only() {
+        let a = vec![vec![1.0]];
+        let hi = [Some(5)];
+        let r = integer_solve(&IntegerProblem {
+            a: &a,
+            b: &[3.0],
+            weights: &[1.0],
+            ridge: 0.0,
+            lot_sizes: &[1.0],
+            lower_lots: None,
+            upper_lots: Some(&hi),
+        })
+        .expect("solvable");
+        assert_eq!(r.lots, vec![-3]);
+    }
+
+    /// Each shape error is caught on its own: b of the wrong length, and a covariance with the
+    /// wrong number of rows whose rows are the right length.
+    #[test]
+    fn residual_report_shape_errors_each_alone() {
+        let a = vec![vec![1.0], vec![1.0]];
+        let s2 = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        assert_eq!(
+            residual_report(&a, &[1.0], &[1.0], &s2).unwrap_err().code,
+            "E_INPUT"
+        );
+        let s_short = vec![vec![1.0, 0.0]];
+        assert_eq!(
+            residual_report(&a, &[1.0, 1.0], &[1.0], &s_short)
+                .unwrap_err()
+                .code,
+            "E_INPUT"
+        );
+    }
 }

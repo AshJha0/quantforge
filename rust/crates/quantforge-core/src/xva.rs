@@ -414,6 +414,65 @@ mod tests {
     use super::*;
 
     #[test]
+    fn collateral_input_checks_each_field() {
+        let t = [0.0, 1.0];
+        let ok = Csa {
+            threshold_receive: 1.0,
+            threshold_post: 1.0,
+            mta: 0.5,
+            mpor_steps: 1,
+            independent_amount: -2.0,
+        };
+        assert!(check_collateral_inputs(&t, 0.95, &[&ok]).is_ok());
+        let bad = [
+            Csa {
+                threshold_receive: -0.1,
+                ..ok
+            },
+            Csa {
+                threshold_post: -0.1,
+                ..ok
+            },
+            Csa { mta: -0.1, ..ok },
+            Csa {
+                mpor_steps: -1,
+                ..ok
+            },
+        ];
+        for c in &bad {
+            assert_eq!(
+                check_collateral_inputs(&t, 0.95, &[&ok, c])
+                    .unwrap_err()
+                    .code,
+                "E_DOMAIN"
+            );
+        }
+        let nan = Csa {
+            mta: f64::NAN,
+            ..ok
+        };
+        assert_eq!(
+            check_collateral_inputs(&t, 0.95, &[&nan]).unwrap_err().code,
+            "E_DOMAIN"
+        );
+        assert_eq!(
+            check_collateral_inputs(&t, 0.0, &[&ok]).unwrap_err().code,
+            "E_DOMAIN"
+        );
+        assert!(check_collateral_inputs(&t, 1.0, &[&ok]).is_ok());
+        assert_eq!(
+            check_collateral_inputs(&[0.0], 0.5, &[]).unwrap_err().code,
+            "E_INPUT"
+        );
+        assert_eq!(
+            check_collateral_inputs(&[1.0, 1.0], 0.5, &[])
+                .unwrap_err()
+                .code,
+            "E_INPUT"
+        );
+    }
+
+    #[test]
     fn zero_threshold_no_lag_gives_zero_exposure() {
         let t = [0.0, 0.5, 1.0];
         let paths = vec![vec![0.0, 3.0, -2.0], vec![0.0, -1.0, 4.0]];
