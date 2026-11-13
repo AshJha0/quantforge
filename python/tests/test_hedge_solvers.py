@@ -2,6 +2,7 @@
 
 Hand cases for each check and output, the property tests the handover names (KKT, integer
 optimality, the minimum-variance R^2, Euler contributions), and second checks against SciPy."""
+import builtins
 import itertools
 import math
 from typing import Any
@@ -655,3 +656,210 @@ def test_cli_limit_comes_before_the_finite_rule() -> None:
     assert cli_code("hedge.beta.futures", {"portfolio_value": 1.0, "portfolio_beta": math.inf,
                                            "target_beta": 0.0, "futures_price": 1.0,
                                            "multiplier": 1.0}) == "E_DOMAIN"
+
+
+# --- The full error contract (code, field, message) and branches the hand cases above leave
+# open: phase 1 with several equalities, bounds kept by every frontier point, the R6-6.1 caps.
+AE = [[1.0, 0.5], [0.3, 1.2], [0.4, 0.9]]
+BE = [-2.0, 1.5, -0.7]
+WE = [1.0, 2.0, 0.5]
+COV3 = [[1.0, 0.1, 0.0], [0.1, 2.0, 0.2], [0.0, 0.2, 1.5]]
+
+
+def caught(f: Any, *args: Any, **kwargs: Any) -> QfError:
+    with pytest.raises(QfError) as info:
+        f(*args, **kwargs)
+    return info.value
+
+
+ERRORS = [
+    # (function, args, kwargs, code, field, message)
+    (hs.qp_solve, ([], [], []), {}, "E_INPUT", "a",
+     "a must be a non-empty matrix with rows of one length"),
+    (hs.qp_solve, ([[1.0, 2.0], [1.0]], [0.0, 0.0], [1.0, 1.0]), {}, "E_INPUT", "a",
+     "a must be a non-empty matrix with rows of one length"),
+    (hs.qp_solve, (AE, [1.0], WE), {}, "E_INPUT", "b", "b must have one entry per row of a"),
+    (hs.qp_solve, (AE, BE, [1.0]), {}, "E_INPUT", "weights",
+     "weights must have one entry per row of a"),
+    (hs.qp_solve, (AE, BE, WE), {"eq_matrix": [[1.0, 1.0]]}, "E_INPUT", "eq_matrix",
+     "eq_matrix and eq_rhs go together"),
+    (hs.qp_solve, (AE, BE, WE), {"eq_matrix": [], "eq_rhs": []}, "E_INPUT", "eq_matrix",
+     "an empty eq_matrix: leave out both keys"),
+    (hs.qp_solve, (AE, BE, WE), {"eq_matrix": [[1.0]], "eq_rhs": [1.0]}, "E_INPUT", "eq_matrix",
+     "eq_matrix rows must have one entry per instrument"),
+    (hs.qp_solve, (AE, BE, WE), {"eq_matrix": [[1.0, 1.0]], "eq_rhs": [1.0, 2.0]}, "E_INPUT",
+     "eq_rhs", "eq_rhs must have one entry per row of eq_matrix"),
+    (hs.qp_solve, (AE, BE, WE), {"lower": [0.0]}, "E_INPUT", "lower",
+     "lower must have one entry per instrument"),
+    (hs.qp_solve, (AE, BE, WE), {"upper": [0.0, 1.0, 2.0]}, "E_INPUT", "upper",
+     "upper must have one entry per instrument"),
+    (hs.qp_solve, (AE, BE, WE), {"lower": [0.0, None], "singular": "MIN_NORM"}, "E_INPUT",
+     "singular", "MIN_NORM takes no bounds (ruling I-5)"),
+    (hs.qp_solve, (AE, BE, WE), {"lower": [1.0, None], "upper": [0.0, None]}, "E_DOMAIN", "lower",
+     "a lower bound is above its upper bound"),
+    (hs.qp_solve, (AE, BE, WE), {"eq_matrix": [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]],
+                              "eq_rhs": [1.0, 1.0, 2.0]}, "E_SINGULAR", "eq_matrix",
+     "more equalities than instruments"),
+    (hs.qp_solve, (AE, BE, WE), {"eq_matrix": [[1.0, 1.0], [2.0, 2.0]], "eq_rhs": [1.0, 2.0]},
+     "E_SINGULAR", "eq_matrix", "the equality rows are dependent"),
+    (hs.qp_solve, (AE, BE, WE), {"half_spreads": [0.1]}, "E_INPUT", "half_spreads",
+     "half_spreads must have one entry per instrument"),
+    (hs.qp_solve, (AE, BE, WE), {"impact": [0.1]}, "E_INPUT", "impact",
+     "impact must have one entry per instrument"),
+    (hs.qp_solve, (AE, BE, WE), {"margin_rates": [0.1, 0.1]}, "E_INPUT", "margin_rates",
+     "margin_rates and margin_limit go together"),
+    (hs.qp_solve, (AE, BE, WE), {"impact": [0.1, 0.1], "singular": "MIN_NORM"}, "E_INPUT",
+     "singular", "MIN_NORM takes no cost or margin input"),
+    (hs.qp_solve, (AE, BE, WE), {"half_spreads": [0.1, -0.1]}, "E_DOMAIN", "half_spreads",
+     "half_spreads must not be negative"),
+    (hs.qp_solve, (AE, BE, WE), {"impact": [0.1, 0.1], "cost_weight": -1.0}, "E_DOMAIN",
+     "cost_weight", "cost_weight must not be negative"),
+    (hs.qp_solve, (AE, BE, WE), {"margin_rates": [0.1, 0.1], "margin_limit": -1.0}, "E_DOMAIN",
+     "margin_limit", "margin_limit must not be negative"),
+    (hs.frontier_solve, (AE, BE, WE, [0.0, 1.0]), {"impact": [0.1, 0.1], "cost_weight": 1.0},
+     "E_INPUT", "cost_weight", "give cost_weights, not cost_weight"),
+    (hs.frontier_solve, (AE, BE, WE, [1.0, 1.0]), {"impact": [0.1, 0.1]}, "E_INPUT",
+     "cost_weights", "cost_weights must be non-empty and increasing"),
+    (hs.frontier_solve, (AE, BE, WE, []), {"impact": [0.1, 0.1]}, "E_INPUT", "cost_weights",
+     "cost_weights must be non-empty and increasing"),
+    (hs.frontier_solve, (AE, BE, WE, [0.0, 1.0]), {}, "E_INPUT", "half_spreads",
+     "a frontier needs half_spreads or impact"),
+    (hs.residual_report, ([], [], [], []), {}, "E_INPUT", "a",
+     "a must be a non-empty matrix with rows of one length"),
+    (hs.residual_report, (AE, [1.0], [0.0, 0.0], COV3), {}, "E_INPUT", "b",
+     "b must have one entry per row of a"),
+    (hs.residual_report, (AE, BE, [0.0], COV3), {}, "E_INPUT", "x",
+     "x must have one entry per column of a"),
+    (hs.residual_report, (AE, BE, [0.0, 0.0], [[1.0]]), {}, "E_INPUT", "covariance",
+     "covariance must be m x m"),
+    (hs.residual_report, (AE, BE, [0.0, 0.0], [[1.0, 0.5, 0.0], [0.0, 1.0, 0.0],
+                                              [0.0, 0.0, 1.0]]), {}, "E_INPUT", "covariance",
+     "covariance is not symmetric"),
+    (hs.residual_report, (AE, BE, [0.0, 0.0], [[1.0, 2.0, 0.0], [2.0, 1.0, 0.0],
+                                              [0.0, 0.0, 1.0]]), {},
+     "E_NOT_POSITIVE_DEFINITE", "covariance", "the covariance has a negative eigenvalue"),
+    (hs.minvar_ratio, (), {}, "E_INPUT", "covariance",
+     "give either covariance or the two series"),
+    (hs.minvar_ratio, (), {"exposure_changes": [1.0, 2.0, 3.0]}, "E_INPUT", "hedge_changes",
+     "exposure_changes and hedge_changes go together"),
+    (hs.minvar_ratio, (), {"exposure_changes": [1.0, 2.0, 3.0], "hedge_changes": []},
+     "E_INPUT", "hedge_changes", "at least one hedge series is needed"),
+    (hs.minvar_ratio, (), {"exposure_changes": [1.0, 2.0, 3.0], "hedge_changes": [[1.0, 2.0]]},
+     "E_INPUT", "hedge_changes", "the series differ in length"),
+    (hs.minvar_ratio, (), {"exposure_changes": [1.0, 2.0], "hedge_changes": [[1.0, 2.0]]},
+     "E_INPUT", "exposure_changes", "at least k + 2 observations are needed"),
+    (hs.minvar_ratio, (), {"covariance": [[1.0]]}, "E_INPUT", "covariance",
+     "covariance must be square and at least 2 x 2"),
+    (hs.minvar_ratio, (), {"covariance": [[0.0, 0.0], [0.0, 1.0]]}, "E_DOMAIN", "covariance",
+     "the position has no variance to hedge"),
+    (hs.minvar_ratio, (), {"covariance": [[1.0, 0.0], [0.0, -1.0]]},
+     "E_NOT_POSITIVE_DEFINITE", "covariance", "a hedge variance is negative"),
+    (hs.minvar_ratio, (), {"covariance": [[1.0, 0.0], [0.0, 0.0]]}, "E_SINGULAR",
+     "covariance", "the hedge instruments are dependent"),
+    (hs.beta_futures, (0.0, 1.0, 0.0, 100.0, 10.0), {}, "E_DOMAIN", "portfolio_value",
+     "portfolio_value must be positive"),
+    (hs.beta_futures, (1.0, 1.0, 0.0, 0.0, 10.0), {}, "E_DOMAIN", "futures_price",
+     "futures_price must be positive"),
+    (hs.beta_futures, (1.0, 1.0, 0.0, 100.0, 0.0), {}, "E_DOMAIN", "multiplier",
+     "multiplier must be positive"),
+]
+
+
+@pytest.mark.parametrize(("f", "args", "kwargs", "err", "field", "message"), ERRORS)
+def test_error_contract(f: Any, args: tuple[Any, ...], kwargs: dict[str, Any], err: str,
+                        field: str, message: str) -> None:
+    e = caught(f, *args, **kwargs)
+    assert (e.code, e.field, e.message, str(e)) == (err, field, message, message)
+
+
+def test_phase_one_with_two_equalities_and_bounds() -> None:
+    """Two equalities, finite ranges and a one-sided bound: phase 1 must start from a basis of
+    one artificial per equality row, and the point it returns must be feasible."""
+    e_mat = np.array([[1.0, 1.0, 1.0], [1.0, -1.0, 2.0]])
+    e_rhs = np.array([1.0, 0.5])
+    lower: list[float | None] = [0.0, 0.0, None]
+    upper: list[float | None] = [1.0, 1.0, 0.4]
+    x = hs._phase_one(e_mat, e_rhs, lower, upper)
+    assert x is not None
+    np.testing.assert_allclose(e_mat @ x, e_rhs, atol=1e-12)
+    assert 0.0 <= x[0] <= 1.0 and 0.0 <= x[1] <= 1.0 and x[2] <= 0.4 + 1e-12
+    # The same rows with a right-hand side the box cannot reach: no feasible point.
+    assert hs._phase_one(e_mat, np.array([5.0, 0.5]), lower, upper) is None
+
+
+def test_phase_one_lower_bounds_only() -> None:
+    """No finite range, so no slack rows: each equality row starts on its own artificial and the
+    unique point x = (0.5, 0.5) must come back exactly."""
+    e_mat = np.array([[1.0, 1.0], [1.0, -1.0]])
+    x = hs._phase_one(e_mat, np.array([1.0, 0.0]), [0.0, 0.0], [None, None])
+    assert x is not None
+    np.testing.assert_allclose(x, [0.5, 0.5], atol=1e-12)
+    free = hs._phase_one(np.array([[1.0, 2.0, 0.0], [0.0, 1.0, 1.0], [1.0, 0.0, 1.0]]),
+                         np.array([3.0, 2.0, 2.0]), [None, 0.0, None], [None, None, 5.0])
+    assert free is not None
+    np.testing.assert_allclose(free, [1.0, 1.0, 1.0], atol=1e-12)
+
+
+def test_phase_one_three_equalities_exact_point() -> None:
+    """Three equalities in three unknowns with bounds: the only point is the solve of E x = e."""
+    e_mat = np.array([[2.0, 1.0, 0.0], [0.0, 1.0, 3.0], [1.0, 0.0, 1.0]])
+    want = np.array([0.25, 0.5, 0.75])
+    x = hs._phase_one(e_mat, e_mat @ want, [0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
+    assert x is not None
+    np.testing.assert_allclose(x, want, atol=1e-12)
+
+
+def test_qp_with_two_equalities_and_bounds_is_feasible() -> None:
+    out = hs.qp_solve(AE + [[0.2, 0.1]], BE + [0.3], WE + [1.0], ridge=0.1,
+                      eq_matrix=[[1.0, 1.0], [1.0, -1.0]], eq_rhs=[1.0, 0.2],
+                      lower=[0.0, 0.0], upper=[1.0, 1.0])
+    np.testing.assert_allclose(out["x"], [0.6, 0.4], atol=1e-12)
+
+
+def test_frontier_points_keep_the_upper_bound() -> None:
+    """The unbounded optimum is above the upper bound, so every frontier point sits on it."""
+    free = hs.qp_solve(AE, BE, WE, impact=[0.0, 0.0])
+    assert free["x"][0] > 0.5
+    out = hs.frontier_solve(AE, BE, WE, [0.0, 0.5, 1.0], impact=[0.01, 0.01], upper=[0.5, None])
+    for point in out["points"]:
+        assert point["x"][0] <= 0.5 + 1e-12
+    assert out["points"][0]["x"][0] == pytest.approx(0.5, abs=1e-12)
+    # Each point matches the single costed solve with the same weight and bound.
+    for point in out["points"]:
+        one = hs.qp_solve(AE, BE, WE, impact=[0.01, 0.01], cost_weight=point["cost_weight"],
+                          upper=[0.5, None])
+        assert point["x"] == pytest.approx(one["x"], abs=1e-12)
+
+
+def test_frontier_points_keep_the_lower_bound() -> None:
+    free = hs.qp_solve(AE, BE, WE, impact=[0.0, 0.0])
+    floor = free["x"][1] + 0.5
+    out = hs.frontier_solve(AE, BE, WE, [0.0, 2.0], half_spreads=[0.01, 0.01],
+                            lower=[None, floor])
+    for point in out["points"]:
+        assert point["x"][1] >= floor - 1e-12
+
+
+def test_active_set_iteration_cap(monkeypatch: pytest.MonkeyPatch) -> None:
+    """With the R6-6.1 cap at zero iterations, a bounded solve reports E_NO_CONVERGENCE."""
+    monkeypatch.setattr(hs, "_ITER_SLOPE", 0)
+    monkeypatch.setattr(hs, "_ITER_BASE", 0)
+    e = caught(hs.qp_solve, AE, BE, WE, lower=[0.0, 0.0], upper=[0.5, 0.5])
+    assert (e.code, e.field, e.message) == ("E_NO_CONVERGENCE", None,
+                                            "the active-set search did not settle")
+
+
+def test_phase_one_iteration_cap(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Phase 1 caps its pivots at 50 (rows + columns) + 100; a loop that never gets to pivot
+    must say so instead of returning an unchecked point. The cap is the only range of 100 or
+    more in phase 1, so only that loop is emptied here."""
+    real = builtins.range
+
+    def capped(*args: int) -> range:
+        return real(0) if len(args) == 1 and args[0] >= 100 else real(*args)
+
+    monkeypatch.setattr(hs, "range", capped, raising=False)
+    e_mat = np.array([[1.0, 1.0], [1.0, -1.0]])
+    e = caught(hs._phase_one, e_mat, np.array([1.0, 0.0]), [0.0, 0.0], [1.0, 1.0])
+    assert (e.code, e.field, e.message) == ("E_NO_CONVERGENCE", None,
+                                            "the feasibility search did not settle")
