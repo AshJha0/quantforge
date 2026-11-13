@@ -48,7 +48,7 @@
   "from": "2026-11-07",
   "expected": 4,
   "missing": [],
-  "unchanged_run": 3
+  "unchanged_run": 2
  },
  {
   "series": "recorder/eurostat-hicp",
