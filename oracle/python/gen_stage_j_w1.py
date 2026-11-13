@@ -431,8 +431,8 @@ def build():
     bl = {"sr": 2.5 / math.sqrt(250), "n_obs": 1250, "skew": -3.0, "kurtosis": 10.0, "n_trials": 100, "sr_variance": 0.5 / 250}
     o = dsr_ref(bl)
     assert round(o["sr0"], 4) == 0.1132 and round(o["dsr"], 4) == 0.9004
-    mk(s, OPD, dsr_ref, bl, cls=PU, desc="Bailey and Lopez de Prado (2014) worked example: SR0 0.1132, DSR 0.9004",
-       verified=("textbook-recalled", "reference-computed"))
+    mk(s, OPD, dsr_ref, bl, cls=PU, desc="Bailey and Lopez de Prado (2014) numerical example, pp. 9-10: SR0 0.1132, DSR 0.9004 (paper read)",
+       verified=("textbook", "reference-computed"))
     for N in (1, 2, 10, 1000):
         mk(s, OPD, dsr_ref, dict(bl, n_trials=N), cls=PU, desc=f"{N} trials")
     mk(s, OPD, dsr_ref, {"sr": 0.05, "n_obs": 2520, "n_trials": 24, "sr_variance": 0.0004}, cls=PU, desc="normal returns by default (skew 0, kurtosis 3)")
@@ -468,6 +468,11 @@ def build():
                         ("one strategy", {"performance": [[1.0], [2.0], [3.0], [4.0]]}, "E_INPUT"),
                         ("zero dispersion under SHARPE", {"metric": "SHARPE"}, "E_DOMAIN"), ("S above 16", {"n_partitions": 18}, "E_LIMIT")]:
         mk(s, OPO, pbo_ref, dict(hp, **ch), code=code, desc=d)
+    # J-1 source check (paper read): appended last so earlier case ids keep their numbers
+    for ch, d in (({"n_trials": 46}, "BLdP14 p. 10: N = 46 gives DSR 0.9505"),
+                  ({"n_trials": 88, "skew": 0.0, "kurtosis": 3.0}, "BLdP14 p. 10: normal returns, N = 88 gives DSR 0.9505")):
+        assert round(dsr_ref(dict(bl, **ch))["dsr"], 4) == 0.9505
+        mk(s, OPD, dsr_ref, dict(bl, **ch), cls=PU, desc=d, verified=("textbook", "reference-computed"))
     return suites
 
 

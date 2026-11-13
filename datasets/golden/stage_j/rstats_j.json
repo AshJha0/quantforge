@@ -27,14 +27,14 @@
    },
    "tolerance_class": "per_unit",
    "verified_by": [
-    "textbook-recalled",
+    "textbook",
     "reference-computed"
    ],
    "tags": [
     "research",
     "synthetic"
    ],
-   "description": "Bailey and Lopez de Prado (2014) worked example: SR0 0.1132, DSR 0.9004"
+   "description": "Bailey and Lopez de Prado (2014) numerical example, pp. 9-10: SR0 0.1132, DSR 0.9004 (paper read)"
   },
   {
    "case_id": "rstats_j-0002",
@@ -3522,6 +3522,66 @@
     "research"
    ],
    "description": "S above 16"
+  },
+  {
+   "case_id": "rstats_j-0036",
+   "operation": "research.stats.dsr",
+   "inputs": {
+    "sr": 0.15811388300841897,
+    "n_obs": 1250,
+    "skew": -3.0,
+    "kurtosis": 10.0,
+    "n_trials": 46,
+    "sr_variance": 0.002
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "sr0": 0.10036237061765359,
+     "z": 1.6497377469570305,
+     "dsr": 0.9505017068755786
+    }
+   },
+   "tolerance_class": "per_unit",
+   "verified_by": [
+    "textbook",
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "synthetic"
+   ],
+   "description": "BLdP14 p. 10: N = 46 gives DSR 0.9505"
+  },
+  {
+   "case_id": "rstats_j-0037",
+   "operation": "research.stats.dsr",
+   "inputs": {
+    "sr": 0.15811388300841897,
+    "n_obs": 1250,
+    "skew": 0.0,
+    "kurtosis": 3.0,
+    "n_trials": 88,
+    "sr_variance": 0.002
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "sr0": 0.11114576178358415,
+     "z": 1.6496313122925026,
+     "dsr": 0.9504908166760142
+    }
+   },
+   "tolerance_class": "per_unit",
+   "verified_by": [
+    "textbook",
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "synthetic"
+   ],
+   "description": "BLdP14 p. 10: normal returns, N = 88 gives DSR 0.9505"
   }
  ]
 }
