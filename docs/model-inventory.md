@@ -626,7 +626,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 ### MG-9 Portfolio exposure under Hull-White, ORE-checked (G5c)
 - **Purpose:** discounted EE, ENE, PFE 95/99, EPE and CVA of netting sets of swaps at common reset dates, by exact one-factor integration.
 - **Inputs:** curve, `a`, `sigma`; swaps of the set; exposure times; quantiles; hazard and recovery.
-- **Limitations:** common annual resets only; no collateral; PFE is a quantile of the discounted exposure under the LGM measure; 16 of 96 value cases do not meet the registered ORE check (G-42; stage share 71.7% of value-checked cases under the tight rule D6, `oracle/OUTSIDE_SHARES.md`), G-42b carried to stage I (G-52).
+- **Limitations:** common annual resets only; no collateral; PFE is a quantile of the discounted exposure under the LGM measure; 16 of 96 value cases do not meet the registered ORE check (G-42; stage share 71.7% of value-checked cases under the tight rule D6, `oracle/OUTSIDE_SHARES.md`), G-42b carried to stage I, then to stage J (not run at v0.8.1) (G-52).
 - **Validation:** 40-digit and binary64 quadrature, self-check P = q at each PFE; ORE 1.8.17 within 3 MC SE (80 of 102, `oracle/ore/ORE_CHECK_4C.json`). **Review:** 2026-11-11.
 - **Tier:** 1.
 - **Challenger:** ORE 1.8.17 simulation (LGM), and the wave 4a Jamshidian EE for single swaps.
