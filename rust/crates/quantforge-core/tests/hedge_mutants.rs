@@ -3,6 +3,7 @@
 //! the one that satisfies the first-order conditions is the unique minimiser of the
 //! strictly convex objective. This shares no code with the coordinate-descent solver.
 #![allow(clippy::unwrap_used)] // tests may unwrap (G9)
+#![allow(clippy::needless_range_loop)] // index form mirrors the textbook elimination
 use quantforge_core::hedge::{solve_hedge, spread_cost};
 use quantforge_core::linalg::Matrix;
 
@@ -30,7 +31,7 @@ fn gauss(mut a: Vec<Vec<f64>>, mut b: Vec<f64>) -> Vec<f64> {
     x
 }
 
-/// Minimiser of sum_r w_r (b_r + (A x)_r)^2 + lambda sum_i costs_i |x_i|, by enumeration.
+/// Minimiser of `sum_r w_r (b_r + (A x)_r)^2 + lambda sum_i costs_i |x_i|`, by enumeration.
 fn reference(a: &Matrix, b: &[f64], w: &[f64], costs: &[f64], lambda: f64) -> Vec<f64> {
     let n = costs.len();
     let q: Vec<Vec<f64>> = (0..n)
@@ -79,7 +80,12 @@ fn check(a: &Matrix, b: &[f64], w: &[f64], costs: &[f64], lambda: f64) -> Vec<f6
     let h = solve_hedge(a, b, w, costs, lambda).unwrap();
     assert_eq!(h.x.len(), want.len());
     for (g, e) in h.x.iter().zip(&want) {
-        assert!((g - e).abs() <= 1e-9 * (1.0 + e.abs()), "x {:?} vs {:?}", h.x, want);
+        assert!(
+            (g - e).abs() <= 1e-9 * (1.0 + e.abs()),
+            "x {:?} vs {:?}",
+            h.x,
+            want
+        );
         assert_eq!(*e == 0.0, *g == 0.0, "support {:?} vs {:?}", h.x, want);
     }
     let mut fit = 0.0;
@@ -121,7 +127,7 @@ fn unconstrained_and_costly_hedges_match_enumeration() {
 fn mixed_signs_and_a_zero_leg() {
     let (a, b, w) = five();
     let x = check(&a, &b, &w, &[1.0, 1.0, 1.0], 2.5);
-    assert!(x.iter().any(|v| *v == 0.0) || x.iter().any(|v| *v < 0.0));
+    assert!(x.contains(&0.0) || x.iter().any(|v| *v < 0.0));
     // Mixed signs on purpose: flip the target so legs go both ways.
     let b2 = vec![2.0, -1.5, 0.7, 0.9, -1.1];
     for lambda in [0.5, 1.5, 3.0] {

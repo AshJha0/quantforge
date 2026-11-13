@@ -1,10 +1,9 @@
-//! Value tests for var.rs (the VaR backtest family), written to kill cargo-mutants mutants.
+//! Value tests for `var.rs` (the `VaR` backtest family), written to kill cargo-mutants mutants.
 //! Reference values were computed independently in Python (statistics.NormalDist, math.comb)
-//! from the textbook formulas; see program/J0_HANDOVER.md.
+//! from the textbook formulas; see `program/J0_HANDOVER.md`.
 
 use quantforge_core::var::{
-    christoffersen, filtered_historical, historical, kupiec, monte_carlo, parametric,
-    traffic_light,
+    christoffersen, filtered_historical, historical, kupiec, monte_carlo, parametric, traffic_light,
 };
 
 fn close(a: f64, b: f64, tol: f64) -> bool {
@@ -19,7 +18,10 @@ fn historical_values_and_domain() {
     assert_eq!((r.var, r.es, r.tail_count), (3.0, 4.5, 2));
     // c=0.75: w=2.5 -> (5+4+0.5*3)/2.5 = 4.2, tail 3; k=ceil(7.5)=8 -> 3
     let r = historical(&pnl, 0.75).unwrap();
-    assert!(close(r.es, 4.2, 1e-12) && r.tail_count == 3 && r.var == 3.0, "{r:?}");
+    assert!(
+        close(r.es, 4.2, 1e-12) && r.tail_count == 3 && r.var == 3.0,
+        "{r:?}"
+    );
     // single scenario: w=1-c<1, m=0 = n-1-m index path
     let r = historical(&[-7.0], 0.9).unwrap();
     assert_eq!(r.var, 7.0);
@@ -32,18 +34,34 @@ fn historical_values_and_domain() {
 
 #[test]
 fn filtered_historical_matches_reference() {
-    let r = [0.01, -0.02, 0.015, -0.03, 0.005, 0.02, -0.01, 0.0, -0.025, 0.012];
+    let r = [
+        0.01, -0.02, 0.015, -0.03, 0.005, 0.02, -0.01, 0.0, -0.025, 0.012,
+    ];
     let (v, next) = filtered_historical(&r, 1e6, 0.94, 0.9).unwrap();
     assert!(close(next, 0.017029654309905516, 1e-12), "{next}");
     assert!(close(v.var, 25509.445147505245, 1e-10), "{v:?}");
     assert!(close(v.es, 30325.91769219701, 1e-10), "{v:?}");
     assert_eq!(v.tail_count, 1);
     for bad in [0.0, 1.0, -0.5] {
-        assert_eq!(filtered_historical(&r, 1.0, bad, 0.9).unwrap_err().code, "E_DOMAIN");
+        assert_eq!(
+            filtered_historical(&r, 1.0, bad, 0.9).unwrap_err().code,
+            "E_DOMAIN"
+        );
     }
-    assert_eq!(filtered_historical(&[], 1.0, 0.9, 0.9).unwrap_err().code, "E_INPUT");
-    assert_eq!(filtered_historical(&[0.0, 0.0], 1.0, 0.9, 0.9).unwrap_err().code, "E_DOMAIN");
-    assert_eq!(filtered_historical(&r, 1.0, 0.9, 0.2).unwrap_err().code, "E_DOMAIN");
+    assert_eq!(
+        filtered_historical(&[], 1.0, 0.9, 0.9).unwrap_err().code,
+        "E_INPUT"
+    );
+    assert_eq!(
+        filtered_historical(&[0.0, 0.0], 1.0, 0.9, 0.9)
+            .unwrap_err()
+            .code,
+        "E_DOMAIN"
+    );
+    assert_eq!(
+        filtered_historical(&r, 1.0, 0.9, 0.2).unwrap_err().code,
+        "E_DOMAIN"
+    );
 }
 
 #[test]
@@ -75,7 +93,10 @@ fn monte_carlo_converges_to_analytic() {
     assert_eq!(v2, v3);
     assert_ne!(v2, v4);
     let asym = vec![vec![4.0, 1.2], vec![1.0, 1.0]];
-    assert_eq!(monte_carlo(&mean, &asym, &w, 10, 1, 0.95).unwrap_err().code, "E_DOMAIN");
+    assert_eq!(
+        monte_carlo(&mean, &asym, &w, 10, 1, 0.95).unwrap_err().code,
+        "E_DOMAIN"
+    );
     assert!(monte_carlo(&mean, &cov, &w, 1, 1, 0.95).is_ok());
 }
 
@@ -113,7 +134,10 @@ fn christoffersen_matches_reference() {
     assert_eq!((c.lr_ind, c.p_ind), (0.0, 1.0));
     assert!(c.lr_uc > 0.0);
     assert_eq!(christoffersen(&[true], 0.95).unwrap_err().code, "E_INPUT");
-    assert_eq!(christoffersen(&[true, false], 0.2).unwrap_err().code, "E_DOMAIN");
+    assert_eq!(
+        christoffersen(&[true, false], 0.2).unwrap_err().code,
+        "E_DOMAIN"
+    );
 }
 
 #[test]
@@ -138,7 +162,11 @@ fn traffic_light_zones_and_plus_factor() {
     assert_eq!((z, p), ("GREEN", None));
     assert_eq!(traffic_light(251, 0, 0.99).unwrap().2, None);
     assert_eq!(traffic_light(250, 0, 0.98).unwrap().2, None);
-    assert!(close(traffic_light(250, 0, 0.99).unwrap().0, 0.99_f64.powi(250), 1e-12));
+    assert!(close(
+        traffic_light(250, 0, 0.99).unwrap().0,
+        0.99_f64.powi(250),
+        1e-12
+    ));
     assert!(traffic_light(10, 50, 0.99).unwrap().0 <= 1.0);
     assert_eq!(traffic_light(0, 0, 0.99).unwrap_err().code, "E_DOMAIN");
     assert_eq!(traffic_light(10, -1, 0.99).unwrap_err().code, "E_DOMAIN");
@@ -148,14 +176,22 @@ fn traffic_light_zones_and_plus_factor() {
 fn filtered_lambda_zero_rejected_without_zero_returns() {
     // No zero return, so only the lambda check can reject lambda = 0.
     let r = [0.01, -0.02, 0.015, -0.03];
-    assert_eq!(filtered_historical(&r, 1.0, 0.0, 0.9).unwrap_err().code, "E_DOMAIN");
+    assert_eq!(
+        filtered_historical(&r, 1.0, 0.0, 0.9).unwrap_err().code,
+        "E_DOMAIN"
+    );
 }
 
 #[test]
 fn monte_carlo_size_checks_and_pinned_path() {
     let cov = vec![vec![4.0, 1.2], vec![1.2, 1.0]];
     let mean = [0.3, -0.1];
-    assert_eq!(monte_carlo(&mean, &cov, &[1.0], 10, 1, 0.95).unwrap_err().code, "E_INPUT");
+    assert_eq!(
+        monte_carlo(&mean, &cov, &[1.0], 10, 1, 0.95)
+            .unwrap_err()
+            .code,
+        "E_INPUT"
+    );
     // Seed 7 is a contract (same seed, same numbers across releases): pin one path so a sign
     // flip of the correlated shock, which leaves the distribution unchanged, is still seen.
     let v = monte_carlo(&mean, &cov, &[1.0, 2.0], 1, 7, 0.5).unwrap();
