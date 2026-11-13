@@ -233,6 +233,7 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
         r, "space_steps", "time_steps", 10_000_000
     ),
     "core.cos.european": _caps(terms=100_000),
+    "vol.garch.forecast": _caps(horizon=100_000),  # ruling J-0b.1
     "core.calendar.add_business_days": _add_business_days,
     "core.ts.rolling": _caps(window=1000),
     "core.ts.autocorrelation": _LAGS,

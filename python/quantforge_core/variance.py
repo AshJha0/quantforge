@@ -273,8 +273,10 @@ def garch_estimate(returns: Floats, initial: str | float, distribution: str,
     _check_initial_text(initial)
     mu = ordered_sum(returns) / len(returns) if demean else 0.0
     e = [r - mu for r in returns]
-    sigma2 = _initial_variance(e, initial)
     sample = ordered_sum(r * r for r in e) / len(e)
+    if not math.isfinite(sample):  # rulings R6-8.1, J-0b.2: the squares overflow binary64
+        raise QfError("E_NON_FINITE", "the sample variance of the returns overflows", "returns")
+    sigma2 = _initial_variance(e, initial)
     if sample <= 0:
         raise _domain("the returns are all zero", "returns")
 
