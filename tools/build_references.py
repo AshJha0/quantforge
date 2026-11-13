@@ -4,8 +4,11 @@
     python tools/build_references.py           # write docs/references.md
     python tools/build_references.py --check   # fail if the committed page differs from the specs
 
-Inputs are the "## Sources" section of every spec under specifications/ (bullets) and the source tables in
-specifications/stage-e-sources.md. Each entry is copied as the spec writes it, status words included
+Inputs are the sources of every spec under specifications/, in either format the specs use: a "## Sources"
+section (bullets), or a paragraph line that starts "Sources" and ends with a colon, followed by bullets (the stage
+G and I specs); and the source tables in specifications/stage-e-sources.md. `--check` also fails if a spec has
+sources and the page does not cite that spec (R6-17: the old builder read only the heading form, missed 21 specs,
+and its check still passed). Each entry is copied as the spec writes it, status words included
 ("not opened", "licensed", "Read"), so this page never says more than the specs do. Identical entries cited
 by several specs are merged, and each entry links to every spec that cites it. DOIs, arXiv ids and bare URLs
 become links; nothing is looked up. tools/check_links.py checks the links' HTTP status.
@@ -28,14 +31,34 @@ PAYWALL = re.compile(r"licen[cs]ed|paywall", re.I)
 NOT_OPENED = re.compile(r"not opened", re.I)
 
 
+SOURCES_PARA = re.compile(r"^(?:\*\*)?Sources\b[^:]*:(?:\*\*)?\s*(.*)$")
+SOURCES_HEAD = re.compile(r"^#{2,3} (?:[\w ]+ )?sources\b", re.I)
+
+
 def section(text, head="## Sources"):
-    out, inside = [], False
+    """Source lines of a spec, in any of the forms the specs use: a "## Sources" (or "## Stage F sources",
+    "### Sources (this section)") section; a "Sources ...:" paragraph line followed by bullets; or a one-line
+    "Sources (pointers): [A] ...; [B] ..." paragraph, split at each "; [" into bullets."""
+    out, inside, para = [], False, False
     for line in text.splitlines():
-        if line.startswith("## "):
-            inside = line.strip() == head
+        if line.startswith("#"):
+            inside, para = bool(SOURCES_HEAD.match(line.strip())), False
             continue
         if inside:
             out.append(line)
+            continue
+        m = SOURCES_PARA.match(line.strip())
+        if m and not m.group(1).startswith("`"):
+            if m.group(1):
+                body = re.split(r"\.\s+Outside:", m.group(1))[0]
+                out += ["- " + part for part in re.split(r";\s*(?=\[)", body)]
+            else:
+                para = True
+        elif para:
+            if line.startswith("- ") or (line.startswith("  ") and line.strip()):
+                out.append(line)
+            else:
+                para = False
     return out
 
 
@@ -75,12 +98,14 @@ def strip_tag(entry):
     return re.sub(r"^\[[A-Z]?\d+[a-z]?\]\s*", "", entry).strip()
 
 
-def collect():
+def collect(specs=None):
+    specs = specs or SPECS
+    root = specs.parent
     found = {}  # (topic, entry) -> set of spec paths
-    for path in sorted(SPECS.rglob("*.md")):
-        rel = path.relative_to(ROOT).as_posix()
+    for path in sorted(specs.rglob("*.md")):
+        rel = path.relative_to(root).as_posix()
         text = path.read_text(encoding="utf-8")
-        parts = path.relative_to(SPECS).parts
+        parts = path.relative_to(specs).parts
         topic = parts[0] if len(parts) > 1 else ""
         entries = [strip_tag(b) for b in bullets(section(text))]
         if path.name == "stage-e-sources.md":
@@ -125,13 +150,23 @@ def render(found):
     return "\n".join(out)
 
 
+def missing_specs(found, page):
+    """Specs that have sources but are not cited on the page."""
+    cited = {s for used in found.values() for s in used}
+    return sorted(s for s in cited if f"(../{s})" not in page)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--check", action="store_true")
     a = ap.parse_args()
     text = render(collect())
     if a.check:
-        ok = OUT.is_file() and OUT.read_text(encoding="utf-8") == text
+        have = OUT.read_text(encoding="utf-8") if OUT.is_file() else ""
+        lacking = missing_specs(collect(), have)
+        for s in lacking:
+            print(f"references: {s} has sources that docs/references.md lacks")
+        ok = have == text and not lacking
         print("references: up to date" if ok else "references: docs/references.md differs; run python tools/build_references.py")
         return 0 if ok else 1
     OUT.write_text(text, encoding="utf-8", newline="\n")

@@ -133,6 +133,7 @@ public final class HedgeRatios {
         for (int i = 1; i <= k; i++) {
             maxDiag = Math.max(maxDiag, s[i][i]);
         }
+        scaledPivotCheck(s, k); // ruling R6-11.7
         double[][] l = new double[k][k]; // Cholesky of S_hh with the pivot test of check 3
         for (int j = 0; j < k; j++) {
             double d = s[j + 1][j + 1];
@@ -233,7 +234,7 @@ public final class HedgeRatios {
     public record GreekHedge(double[] quantities, double[] before, double[] after) {}
 
     /** Per-unit delta, gamma and vega of one instrument. */
-    static double[] greeks(Market mk, Position p) {
+    public static double[] greeks(Market mk, Position p) {
         if (p.instrument() == Instrument.UNDERLYING) {
             return new double[] {1.0, 0.0, 0.0};
         }
@@ -434,5 +435,45 @@ public final class HedgeRatios {
             after += contrib[i];
         }
         return new Residual(r, before, after, Math.sqrt(Math.max(after, 0.0)), 1.0 - after / before, contrib);
+    }
+
+    /**
+     * Ruling R6-11.7 (with R6-6.2): Cholesky of the correlation form of the hedge block {@code S_hh}, lower triangle.
+     * A negative pivot is {@code E_NOT_POSITIVE_DEFINITE}; a pivot in {@code [0, 1e-12]} is {@code E_SINGULAR}. A
+     * pivot at or below -1e-12 is indefinite; one of absolute size below 1e-12 is singular (ruling on J-R6-1).
+     */
+    private static void scaledPivotCheck(double[][] s, int k) {
+        double[] d = new double[k];
+        for (int i = 0; i < k; i++) {
+            double v = s[i + 1][i + 1];
+            if (!(v > 0.0)) {
+                if (v < 0.0) {
+                    throw new QfError("E_NOT_POSITIVE_DEFINITE", "a hedge variance is negative", "covariance");
+                }
+                throw new QfError("E_SINGULAR", "the hedge covariance block is singular", "covariance");
+            }
+            d[i] = 1.0 / Math.sqrt(v);
+        }
+        double[][] l = new double[k][k];
+        for (int j = 0; j < k; j++) {
+            double p = 1.0;
+            for (int q = 0; q < j; q++) {
+                p -= l[j][q] * l[j][q];
+            }
+            if (p <= -1e-12) {
+                throw new QfError("E_NOT_POSITIVE_DEFINITE", "the hedge covariance block is indefinite", "covariance");
+            }
+            if (p <= 1e-12) {
+                throw new QfError("E_SINGULAR", "the hedge covariance block is singular", "covariance");
+            }
+            l[j][j] = Math.sqrt(p);
+            for (int i = j + 1; i < k; i++) {
+                double v = s[i + 1][j + 1] * d[i] * d[j];
+                for (int q = 0; q < j; q++) {
+                    v -= l[i][q] * l[j][q];
+                }
+                l[i][j] = v / l[j][j];
+            }
+        }
     }
 }

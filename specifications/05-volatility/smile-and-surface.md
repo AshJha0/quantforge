@@ -41,7 +41,7 @@ Gatheral density function: `g = (1 - k w'/(2w))^2 - (w'^2/4)(1/w + 1/4) + w''/2`
 
 `vol.ssvi.evaluate`. Inputs: `rho`, `eta`, `gamma`, `thetas`, `log_moneyness`. Outputs: `total_variance`, one row per theta; `butterfly_free`; `calendar_free`.
 
-- `butterfly_free`: at every theta, `theta phi (1+|rho|) < 4` and `theta phi^2 (1+|rho|) <= 4`.
+- `butterfly_free`: at every theta, `theta phi (1+|rho|) < 4` and `theta phi^2 (1+|rho|) <= 4`. These are Gatheral and Jacquier's **sufficient** conditions, not necessary ones (R6-25): `butterfly_free = true` proves the slice free of butterfly arbitrage, but `false` can be a false alarm, a slice that is in fact arbitrage-free. Check the density (`vol.svi.evaluate` `g`) before acting on a `false`.
 - `calendar_free`: at every theta, `rho^2 (1-gamma)/(1+theta) <= 1 + sqrt(1-rho^2)`. This is the Gatheral-Jacquier bound with the power-law derivative `d(theta phi)/d theta = phi (1-gamma)/(1+theta)`. The lower bound holds by `gamma <= 1`.
 
 `vol.ssvi.calibrate`. Inputs: `thetas`, `log_moneyness`, `total_variance` (rows per theta). Outputs: `rho`, `eta`, `gamma`, `rmse`. Unweighted. Fewer than 3 points in all, or ragged rows: `E_INPUT`.

@@ -1,0 +1,96 @@
+{
+ "schema_version": "1.0",
+ "suite": "basis_r6",
+ "spec": "specifications/04-pricing/bonds.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_r6_w2.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "basis_r6-0001",
+   "operation": "bond.futures.basis",
+   "inputs": {
+    "futures_price": 110.34375,
+    "settlement": "2026-11-09",
+    "delivery": "2027-03-01",
+    "repo_rate": 0.0385,
+    "bonds": [
+     {
+      "maturity": "2033-11-15",
+      "coupon": 0.0425,
+      "frequency": 2,
+      "clean_price": 100.60264911007368,
+      "conversion_factor": 0.9069
+     },
+     {
+      "maturity": "2034-02-15",
+      "coupon": 0.04,
+      "frequency": 2,
+      "clean_price": 99.03127767714382,
+      "conversion_factor": 0.8902
+     },
+     {
+      "maturity": "2033-08-15",
+      "coupon": 0.0375,
+      "frequency": 2,
+      "clean_price": 97.59876142659282,
+      "conversion_factor": 0.8841
+     },
+     {
+      "maturity": "2034-05-15",
+      "coupon": 0.045,
+      "frequency": 2,
+      "clean_price": 102.14226014996066,
+      "conversion_factor": 0.9153
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "bonds": [
+      {
+       "invoice": 101.31522201312154,
+       "gross_basis": 0.5319022350736873,
+       "net_basis": 0.4236633533701024,
+       "implied_repo": 0.024969816019018265
+      },
+      {
+       "invoice": 98.38270238259668,
+       "gross_basis": 0.8032714271438266,
+       "net_basis": 0.7777347142220918,
+       "implied_repo": 0.013430201070297357
+      },
+      {
+       "invoice": 97.69993699930939,
+       "gross_basis": 0.043852051592821795,
+       "net_basis": 0.07688893673316954,
+       "implied_repo": 0.03598431253630581
+      },
+      {
+       "invoice": 102.31531393301105,
+       "gross_basis": 1.1446257749606588,
+       "net_basis": 0.9775788911805847,
+       "implied_repo": 0.0077510470181699565
+      }
+     ],
+     "ctd": 2
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic",
+    "brentq forward identity"
+   ],
+   "tags": [
+    "r6",
+    "bond-futures",
+    "ctd"
+   ],
+   "description": "F = 110.34375 (CTD fair less 2/32): implied repos 0.7751%, 1.3430%, 2.4970%, 3.5984% against repo 3.85% (R6-7.2)",
+   "output_classes": {
+    "ctd": "date_and_convention"
+   }
+  }
+ ]
+}

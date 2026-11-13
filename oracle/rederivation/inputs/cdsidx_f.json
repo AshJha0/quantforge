@@ -1,0 +1,1568 @@
+[
+ {
+  "case_id": "cdsidx_f-0001",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 0.0055,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0002",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 0.0055,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0003",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 0.0055,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.0
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0004",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 0.0055,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.0
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0005",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 0.0065,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0006",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 0.0065,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0007",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 0.008,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0008",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 0.008,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0009",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2026-12-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.009,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 0.005,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.5
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0010",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2026-12-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.009,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 0.005,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.5
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0011",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2026-12-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.009,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 0.005,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.0
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0012",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2026-12-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.009,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 0.005,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.0
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0013",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2026-12-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.009,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 0.0058,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.5
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0014",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2026-12-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.009,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 0.0058,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.5
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0015",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.055,
+   "recovery": 0.3,
+   "type": "PAYER",
+   "strike": 0.03,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0016",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.055,
+   "recovery": 0.3,
+   "type": "RECEIVER",
+   "strike": 0.03,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0017",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.055,
+   "recovery": 0.3,
+   "type": "PAYER",
+   "strike": 0.03,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.0
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0018",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.055,
+   "recovery": 0.3,
+   "type": "RECEIVER",
+   "strike": 0.03,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.0
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0019",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.055,
+   "recovery": 0.3,
+   "type": "PAYER",
+   "strike": 0.0385,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0020",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.055,
+   "recovery": 0.3,
+   "type": "RECEIVER",
+   "strike": 0.0385,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0021",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.055,
+   "recovery": 0.3,
+   "type": "PAYER",
+   "strike": 0.045,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0022",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.055,
+   "recovery": 0.3,
+   "type": "RECEIVER",
+   "strike": 0.045,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0023",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-05-19",
+   "maturity": "2031-12-20",
+   "rate": 0.035,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "PAYER",
+   "strike": 0.045,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.7
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0024",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-05-19",
+   "maturity": "2031-12-20",
+   "rate": 0.035,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "RECEIVER",
+   "strike": 0.045,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.7
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0025",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-05-19",
+   "maturity": "2031-12-20",
+   "rate": 0.035,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "PAYER",
+   "strike": 0.045,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.0
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0026",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-05-19",
+   "maturity": "2031-12-20",
+   "rate": 0.035,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "RECEIVER",
+   "strike": 0.045,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.0
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0027",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-05-19",
+   "maturity": "2031-12-20",
+   "rate": 0.035,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "PAYER",
+   "strike": 0.06,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.7
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0028",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-05-19",
+   "maturity": "2031-12-20",
+   "rate": 0.035,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "RECEIVER",
+   "strike": 0.06,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.7
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0029",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-08-18",
+   "maturity": "2032-06-20",
+   "rate": 0.022,
+   "hazard_rate": 0.012,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 0.006,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.4
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0030",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-08-18",
+   "maturity": "2032-06-20",
+   "rate": 0.022,
+   "hazard_rate": 0.012,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 0.006,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.4
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0031",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-08-18",
+   "maturity": "2032-06-20",
+   "rate": 0.022,
+   "hazard_rate": 0.012,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 0.006,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.0
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0032",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-08-18",
+   "maturity": "2032-06-20",
+   "rate": 0.022,
+   "hazard_rate": 0.012,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 0.006,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.0
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0033",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-08-18",
+   "maturity": "2032-06-20",
+   "rate": 0.022,
+   "hazard_rate": 0.012,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 0.0075,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.4
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0034",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-08-18",
+   "maturity": "2032-06-20",
+   "rate": 0.022,
+   "hazard_rate": 0.012,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 0.0075,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.4
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0046",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 0.012,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0047",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 0.012,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0048",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 0.015,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0049",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 0.015,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0050",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 0.02,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0051",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.0105,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 0.02,
+   "coupon": 0.01,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0052",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.055,
+   "recovery": 0.3,
+   "type": "PAYER",
+   "strike": 0.055,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0053",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.055,
+   "recovery": 0.3,
+   "type": "RECEIVER",
+   "strike": 0.055,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0054",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.055,
+   "recovery": 0.3,
+   "type": "PAYER",
+   "strike": 0.07,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0055",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.055,
+   "recovery": 0.3,
+   "type": "RECEIVER",
+   "strike": 0.07,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0056",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 1e-10,
+   "recovery": 0.4,
+   "type": "PAYER",
+   "strike": 1e-08,
+   "coupon": 0.0,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0057",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-02-17",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 1e-10,
+   "recovery": 0.4,
+   "type": "RECEIVER",
+   "strike": 1e-08,
+   "coupon": 0.0,
+   "notional": 10000000.0,
+   "vol": 0.45
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0058",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2026-12-09",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "PAYER",
+   "strike": 0.05,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0059",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2026-12-09",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "RECEIVER",
+   "strike": 0.05,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0060",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-05-10",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "PAYER",
+   "strike": 0.05,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0061",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-05-10",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "RECEIVER",
+   "strike": 0.05,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0062",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-11-09",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "PAYER",
+   "strike": 0.05,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0063",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2027-11-09",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "RECEIVER",
+   "strike": 0.05,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0064",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2028-11-09",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "PAYER",
+   "strike": 0.05,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ },
+ {
+  "case_id": "cdsidx_f-0065",
+  "operation": "credit.cdsindex.option_price",
+  "inputs": {
+   "as_of": "2026-11-09",
+   "expiry": "2028-11-09",
+   "maturity": "2031-12-20",
+   "rate": 0.037,
+   "hazard_rate": 0.08,
+   "recovery": 0.3,
+   "type": "RECEIVER",
+   "strike": 0.05,
+   "coupon": 0.05,
+   "notional": 10000000.0,
+   "vol": 0.6
+  },
+  "output_names": [
+   "adjusted_forward",
+   "adjusted_strike",
+   "exercise_upfront",
+   "forward_spread",
+   "front_end_protection",
+   "price",
+   "risky_annuity",
+   "strike_annuity",
+   "strike_hazard"
+  ],
+  "tolerance_class": "root_finding"
+ }
+]

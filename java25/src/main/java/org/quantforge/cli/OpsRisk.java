@@ -126,9 +126,10 @@ final class OpsRisk {
             List<Ois.Quote> quotes = OpsLinear.quotes(in);
             Curve.Interpolation interp = in.choice("interpolation", Curve.Interpolation.class);
             double bump = bumpBp(in);
+            Curve.Shape shape = OpsLinear.shape(in);
             in.gate();
             CurveRisk.checkBump(bump);
-            CurveRisk.Jacobian j = CurveRisk.jacobian(c, asOf, quotes, interp, bump);
+            CurveRisk.Jacobian j = CurveRisk.jacobian(c, asOf, quotes, interp, bump, shape);
             List<String> dates = new ArrayList<>();
             for (LocalDate d : j.pillarDates()) {
                 dates.add(d.toString());

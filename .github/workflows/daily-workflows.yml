@@ -18,6 +18,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   run:
+    name: daily-workflows-run
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:

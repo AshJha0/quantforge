@@ -15,7 +15,8 @@ Sources:
 
 - Check order for every operation: `E_PARSE`, `E_SCHEMA`, `E_LIMIT` (sizes in ruling I-4), the finite rule F-2 (`E_DOMAIN`), then the operation's own checks in the order listed below. F-3 (negative zero) holds.
 - Matrices are lists of rows. `null` is legal only inside `lower`, `upper`, `lower_lots`, `upper_lots` (ruling I-12).
-- Every rank or singularity decision uses one relative threshold, `1e-12` (ruling I-3). Builds may use any rank-revealing method (SVD, pivoted QR, symmetric eigenvalues, Cholesky pivots); the goldens keep every decision at least a factor 1e3 away from the threshold, so all of them agree.
+- Every rank or singularity decision uses one relative threshold, `1e-12` (ruling I-3), **applied after scaling** (ruling R6-6.2, amending I-3): a symmetric matrix `M` (`H`, a covariance) is tested as `D M D` with `D_jj = 1/sqrt(M_jj)` (a zero or negative diagonal entry is itself singular); an equality matrix `E` is tested with each row scaled to unit Euclidean norm and its columns scaled by the same `D` as `H`; the reduced Hessian is `Z^T (D H D) Z` with `Z` a basis of the null space of `E D`, compared with the largest eigenvalue of `D H D`. Scaling never changes the solution, only the decision, so a regular problem in mixed units (basis points against currency, weights from 1e-3 to 1e3) is no longer refused (`r6/hedgescale_r6`).
+- Iteration caps and the kink tolerance (ruling R6-6.1): a position is at its kink when `|x_j| <= 1e-11 max(1, max_k |x_k|)`; any active-set or sign-state loop of `hedge.qp.solve` stops after `10 (n + p) + 100` iterations (`p` constraints of the problem as stated; rows a build adds for its own reformulation, such as `2 n` sign rows, do not count: R6-28.5), and `hedge.integer.solve` after 1,000,000 lattice points or nodes, with `E_NO_CONVERGENCE`. Builds may use any rank-revealing method (SVD, pivoted QR, symmetric eigenvalues, Cholesky pivots); the goldens keep every decision at least a factor 1e3 away from the threshold, so all of them agree.
 - New error code `E_INFEASIBLE` (contract 1.11.0, ruling I-1): no point satisfies the constraints.
 
 ## `hedge.qp.solve` (HEDGE-05 constrained least squares; HEDGE-04 multi-instrument)
@@ -204,3 +205,15 @@ Mutants caught by the goldens (generator log): bounds ignored (the free solution
 ## Amendments after the builds
 
 Rulings I-41 (fixed key sets on `hedge.greeks.neutralise` instruments), I-42 (an unknown target is `E_SCHEMA`), I-44 (`hedge.minvar.ratio` check 4 has a tolerance of `1e-12 S_00`; a hedged variance inside it is returned as 0), I-45 (what the size limits count), I-46 (feasibility tolerance up to 1e-9, amending I-14), I-48 (no method-dependent `E_LIMIT`) and I-49 (`E_LIMIT` for lot counts above `2^52`) amend this page; `stage-i-rulings.md` is normative. Cases `hedgegreeks_i-0020`, `-0021`, `hedgemv_i-0018` and `hedgeint_i-0019` pin them.
+
+## R6 amendments (rulings `r6-rulings.md` R6-6.1, R6-6.2, R6-11)
+
+- Scaling before every singularity decision (R6-6.2); kink tolerance, iteration caps and `E_NO_CONVERGENCE` (R6-6.1).
+- Feasibility tolerance is exactly `1e-9` relative (R6-11.3). An answer is accepted when its KKT residual is at most `1e-10 max(1, max|g|)` after the exact re-solve on its state (R6-11.4).
+- Integer and selection ties: within `1e-12 max(best, f(0))` (R6-11.5).
+- `hedge.select.solve`: `max_instruments` outside `1..n` is `E_INPUT`, before the subset-count `E_LIMIT` (R6-11.6).
+- `hedge.minvar.ratio`: a negative pivot is `E_NOT_POSITIVE_DEFINITE`; a pivot at or below `1e-12` of the scaled form is `E_SINGULAR`; the lower triangle is used (R6-11.7).
+- `hedge.beta.futures`: `((target_beta - beta) * V) / (F * m)` in that order, then round half away from zero; `V <= 0` stays `E_DOMAIN` by design (R6-11.12).
+- `eq_matrix: []` is `E_INPUT`; dependent but consistent equality rows are `E_SINGULAR` (R6-11.13, item 14).
+- `hedge.residual.report`: `b^T S b <= 0` is an exact sign test, by design (item 15).
+- An unknown `instrument` string is `E_SCHEMA` (R6-11.18).

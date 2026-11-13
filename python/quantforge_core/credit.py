@@ -65,8 +65,6 @@ def periods(trade_date: date, mat: date) -> list[Period]:
         end = e if last else _weekday(e)
         alpha = ((end - start).days + (1 if last else 0)) / 360
         out.append(Period(start, end, _weekday(e), alpha))
-    if any(p.start == trade_date for p in out) or any(p.payment == trade_date for p in out):
-        raise QfError("E_INPUT", "the trade date is on a coupon date", "trade_date")
     return out
 
 

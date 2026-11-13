@@ -551,7 +551,7 @@ Each file below is one case document copied verbatim from the named golden case,
 rust/target/release/quantforge run < examples/hedge_greeks_i.json
 ```
 
-All four builds answer every stage I operation: each passed 14,935 of 14,935 golden cases on the integration tree (2026-11-11, observed). Each language has a smoke test that runs every file below through its CLI and checks `status: ok` and the golden values.
+All four builds answer every stage I operation: each passed 14,935 of 14,935 golden cases (7,413 value-checked, 5,008 error, 1,257 invariance and 1,257 `any` base cases) on the integration tree (2026-11-11, observed). Each language has a smoke test that runs every file below through its CLI and checks `status: ok` and the golden values.
 
 | Task | File | Operation | From golden |
 |---|---|---|---|

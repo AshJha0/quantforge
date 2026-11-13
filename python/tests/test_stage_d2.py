@@ -184,7 +184,8 @@ def test_ndf_checks_and_fixing() -> None:
 def test_cds_dates() -> None:
     assert credit.maturity(AS_OF, "5Y") == date(2031, 12, 20)
     assert credit.maturity(date(2026, 3, 19), "6M") == date(2026, 6, 20)
-    assert _code_of(credit.periods, date(2026, 12, 21), date(2031, 12, 20)) == "E_INPUT"
+    # R6-7.3: a trade date on an adjusted IMM coupon date is priced, not E_INPUT.
+    assert credit.periods(date(2026, 12, 21), date(2031, 12, 20))
 
 
 def test_cds_bootstrap_reprices_and_flat_hazard_identity() -> None:

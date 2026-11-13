@@ -38,7 +38,7 @@ x = call("xva.exposure.portfolio_hw", {"curve": curve, "mean_reversion": 0.03, "
                                        "exposure_times": dates, "pfe_quantiles": [0.95],
                                        "hazard_rate": 0.02, "recovery": 0.4})
 print("  t    discounted EE   discounted ENE   PFE 95%")
-for t, ee, ene, pfe in zip(dates, x["discounted_ee"], x["discounted_ene"], x["pfe_95"]):
+for t, ee, ene, pfe in zip(dates, x["discounted_ee"], x["discounted_ene"], x["deflated_pfe_95"]):
     print(f"{t:4.1f} {ee:15.2f} {ene:16.2f} {pfe:10.2f}")
 print(f"EPE {x['epe']:.2f}  CVA {x['cva']:.2f}")
 
@@ -134,7 +134,7 @@ Each prints the eleven lines of step 1.
 
 ## For practitioners
 
-- **Discounted PFE.** `pfe_95` is a quantile of the discounted exposure under the model's measure, the quantity ORE's exposure cube holds. Many systems report PFE undiscounted, in future money; the two differ by roughly a discount factor.
+- **Discounted PFE.** `deflated_pfe_95` (ruling R6-5.6) is a quantile of the discounted exposure under the model's measure, the quantity ORE's exposure cube holds. Many systems report PFE undiscounted, in future money; the two differ by roughly a discount factor.
 - **Exposure dates.** `xva.exposure.portfolio_hw` measures only at reset dates, where the floating leg is at par. Exposure between payments, including the spike just before a payment, is not on this grid.
 - **Outside check.** The exposures are checked against ORE 1.8.17 by Monte Carlo: 80 of the 96 value cases fall within the registered statistical rule, and the 16 that do not fail on one ill-conditioned check each (spec, "Outside share").
 - **Unilateral CVA.** Setting our own hazard to 0 removes the first-to-default weight `S_b` from the formula. With both hazards positive the operation also returns DVA and the funding terms.

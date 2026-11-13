@@ -66,7 +66,9 @@ def main():
     ap.add_argument("--data")
     a = ap.parse_args()
     today = dt.date.today()
-    start = (today - dt.timedelta(days=400)).isoformat()
+    # R6-19: no download or report of R3 holdout-period data. Fixings from the forward start only; an average or
+    # fallback period is checked only once its whole window lies on or after the forward start.
+    start = max((today - dt.timedelta(days=400)).isoformat(), c.FORWARD_START)
     sofr_url = c.SOURCES["nyfed-sofr"]["url"].split("?")[0] + f"?startDate={start}&endDate={today.isoformat()}"
     fixings = sorted((x["effectiveDate"], x["percentRate"] / 100) for x in json.loads(load("nyfed-sofr-400d.json", sofr_url, a.data))["refRates"])
     avgs = sorted(json.loads(load("nyfed-sofrai.json", AVG_URL.format(start=start, end=today.isoformat()), a.data))["refRates"],
@@ -77,11 +79,14 @@ def main():
     tol = sanity.BANDS["sofr_average"]["abs_diff_fail"]
 
     pubs = avgs[-a.days:]
-    cases, meta = [], []
+    cases, meta, skipped = [], [], []
     for p in pubs:
         T = p["effectiveDate"]
         before = [f for f in fixings if f[0] < T]
         for n in WINDOWS:
+            if (dt.date.fromisoformat(T) - dt.timedelta(days=n)).isoformat() < c.FORWARD_START:
+                skipped.append((T, n))
+                continue
             cid = f"avg{n}-{T}"
             cases.append(window_case(cid, T, n, before))
             meta.append((cid, T, n, p[f"average{n}day"] / 100))
@@ -94,9 +99,11 @@ def main():
                                      [f for f in fixings if f[0] < cur["effectiveDate"]]))
     # Fallback: 3M period ending at the latest fixing date.
     end = fixings[-1][0]
-    fb_start = next(d for d, _ in fixings if d >= (dt.date.fromisoformat(end) - dt.timedelta(days=91)).isoformat())
-    cases.append(c.case("fallback", "rates.fallback.rate", {"ibor": "USD-LIBOR-3M", "start": fb_start, "end": end,
-                        "fixings": [{"date": d, "rate": x} for d, x in fixings]}))
+    fb_from = (dt.date.fromisoformat(end) - dt.timedelta(days=91)).isoformat()
+    fb_start = next((d for d, _ in fixings if d >= fb_from), None) if fb_from >= c.FORWARD_START else None
+    if fb_start:
+        cases.append(c.case("fallback", "rates.fallback.rate", {"ibor": "USD-LIBOR-3M", "start": fb_start, "end": end,
+                            "fixings": [{"date": d, "rate": x} for d, x in fixings]}))
     res = c.batch(cases, a.impl)
 
     r.h("Published averages against the library")
@@ -113,6 +120,9 @@ def main():
         worst = max(worst, abs(diff))
         r.check(f"{n}-day average {T}", "fail", abs(diff) <= tol, f"diff {diff:.2e}")
         rows.append((T, n, f"{pub * 100:.5f}", f"{mine * 100:.7f}", f"{diff:.2e}", cases[[x['case_id'] for x in cases].index(cid)]["operation"]))
+    if skipped:
+        r.p(f"{len(skipped)} average(s) skipped: the window starts before the forward start {c.FORWARD_START}, inside an R3 "
+            "holdout (research/preregs/DEVIATION-2026-11-12.md).")
     r.table(["Date", "Window (d)", "Published (%)", "Library (%)", "Diff (decimal)", "Operation"], rows)
     r.data["averages"] = [dict(zip(["date", "window", "published_pct", "library_pct", "diff", "operation"], x)) for x in rows]
     r.data["worst_abs_diff"] = worst
@@ -132,8 +142,11 @@ def main():
     r.table(["From", "To", "Index-implied (%)", "Library (%)", "Diff"], irows)
 
     r.h("USD-LIBOR-3M fallback")
-    o = res["fallback"]
-    r.check("fallback computed", "fail", o["status"] == "ok", o.get("error", {}).get("message", "ok"))
+    if not fb_start:
+        r.p(f"Skipped: a 3M period ending {end} starts before the forward start {c.FORWARD_START} (R6-19).")
+    o = res.get("fallback", {"status": "skipped"})
+    if fb_start:
+        r.check("fallback computed", "fail", o["status"] == "ok", o.get("error", {}).get("message", "ok"))
     if o["status"] == "ok":
         out = o["outputs"]
         r.check("ISDA 3M spread adjustment", "fail", abs(out["spread_adjustment"] - ISDA_3M_SPREAD) < 1e-12, f"{out['spread_adjustment']}")

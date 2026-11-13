@@ -1,0 +1,388 @@
+[
+ {
+  "case_id": "frtb_f2c-0001",
+  "operation": "risk.frtb.vega",
+  "inputs": {
+   "risk_class": "GIRR",
+   "sensitivities": [
+    {
+     "bucket": "EUR",
+     "option_maturity": 1.0,
+     "underlying_maturity": 5.0,
+     "vega": 1000000.0
+    },
+    {
+     "bucket": "EUR",
+     "option_maturity": 5.0,
+     "underlying_maturity": 10.0,
+     "vega": -600000.0
+    },
+    {
+     "bucket": "USD",
+     "option_maturity": 1.0,
+     "underlying_maturity": 5.0,
+     "vega": 800000.0
+    }
+   ]
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f2c-0002",
+  "operation": "risk.frtb.vega",
+  "inputs": {
+   "risk_class": "EQUITY",
+   "sensitivities": [
+    {
+     "bucket": 5,
+     "name": "A",
+     "option_maturity": 0.5,
+     "vega": 1000000.0
+    },
+    {
+     "bucket": 5,
+     "name": "A",
+     "option_maturity": 1.0,
+     "vega": -500000.0
+    },
+    {
+     "bucket": 9,
+     "name": "S",
+     "option_maturity": 1.0,
+     "vega": 300000.0
+    },
+    {
+     "bucket": 11,
+     "name": "O1",
+     "option_maturity": 1.0,
+     "vega": 200000.0
+    },
+    {
+     "bucket": 11,
+     "name": "O2",
+     "option_maturity": 1.0,
+     "vega": -200000.0
+    }
+   ]
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f2c-0003",
+  "operation": "risk.frtb.vega",
+  "inputs": {
+   "risk_class": "CSR_NONSEC",
+   "sensitivities": [
+    {
+     "bucket": 3,
+     "name": "A",
+     "option_maturity": 1.0,
+     "vega": 1000000.0
+    },
+    {
+     "bucket": 3,
+     "name": "B",
+     "option_maturity": 3.0,
+     "vega": 400000.0
+    },
+    {
+     "bucket": 11,
+     "name": "H",
+     "option_maturity": 1.0,
+     "vega": -300000.0
+    }
+   ]
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f2c-0004",
+  "operation": "risk.frtb.vega",
+  "inputs": {
+   "risk_class": "COMMODITY",
+   "sensitivities": [
+    {
+     "bucket": 2,
+     "name": "BRENT",
+     "option_maturity": 1.0,
+     "vega": 1000000.0
+    },
+    {
+     "bucket": 2,
+     "name": "WTI",
+     "option_maturity": 1.0,
+     "vega": -900000.0
+    },
+    {
+     "bucket": 7,
+     "name": "GOLD",
+     "option_maturity": 0.5,
+     "vega": 400000.0
+    }
+   ]
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f2c-0005",
+  "operation": "risk.frtb.vega",
+  "inputs": {
+   "risk_class": "FX",
+   "sensitivities": [
+    {
+     "bucket": "EURUSD",
+     "option_maturity": 0.5,
+     "vega": 1000000.0
+    },
+    {
+     "bucket": "EURUSD",
+     "option_maturity": 3.0,
+     "vega": 1000000.0
+    },
+    {
+     "bucket": "USDJPY",
+     "option_maturity": 1.0,
+     "vega": -500000.0
+    }
+   ]
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f2c-0006",
+  "operation": "risk.frtb.vega",
+  "inputs": {
+   "risk_class": "FX",
+   "sensitivities": [
+    {
+     "bucket": "EURUSD",
+     "option_maturity": 1.0,
+     "vega": 1000000.0
+    }
+   ]
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f2c-0010",
+  "operation": "risk.frtb.curvature",
+  "inputs": {
+   "risk_class": "EQUITY",
+   "factors": [
+    {
+     "bucket": 5,
+     "name": "A",
+     "cvr_up": -3.0,
+     "cvr_down": 0.0
+    }
+   ]
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f2c-0011",
+  "operation": "risk.frtb.curvature",
+  "inputs": {
+   "risk_class": "EQUITY",
+   "factors": [
+    {
+     "bucket": 5,
+     "name": "A",
+     "cvr_up": -300000.0,
+     "cvr_down": -200000.0
+    },
+    {
+     "bucket": 5,
+     "name": "B",
+     "cvr_up": -100000.0,
+     "cvr_down": 400000.0
+    },
+    {
+     "bucket": 1,
+     "name": "C",
+     "cvr_up": 200000.0,
+     "cvr_down": -100000.0
+    }
+   ]
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f2c-0012",
+  "operation": "risk.frtb.curvature",
+  "inputs": {
+   "risk_class": "GIRR",
+   "factors": [
+    {
+     "bucket": "EUR",
+     "cvr_up": 500000.0,
+     "cvr_down": 300000.0
+    },
+    {
+     "bucket": "USD",
+     "cvr_up": -200000.0,
+     "cvr_down": 400000.0
+    }
+   ]
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f2c-0013",
+  "operation": "risk.frtb.curvature",
+  "inputs": {
+   "risk_class": "CSR_NONSEC",
+   "factors": [
+    {
+     "bucket": 3,
+     "name": "A",
+     "cvr_up": 100000.0,
+     "cvr_down": 200000.0
+    },
+    {
+     "bucket": 3,
+     "name": "B",
+     "cvr_up": 100000.0,
+     "cvr_down": -50000.0
+    },
+    {
+     "bucket": 16,
+     "name": "O",
+     "cvr_up": 300000.0,
+     "cvr_down": -100000.0
+    }
+   ]
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f2c-0014",
+  "operation": "risk.frtb.curvature",
+  "inputs": {
+   "risk_class": "COMMODITY",
+   "factors": [
+    {
+     "bucket": 2,
+     "name": "BRENT",
+     "cvr_up": 200000.0,
+     "cvr_down": 200000.0
+    },
+    {
+     "bucket": 2,
+     "name": "WTI",
+     "cvr_up": 100000.0,
+     "cvr_down": 100000.0
+    }
+   ]
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f2c-0015",
+  "operation": "risk.frtb.curvature",
+  "inputs": {
+   "risk_class": "FX",
+   "fx_scalar": true,
+   "factors": [
+    {
+     "bucket": "EURJPY",
+     "cvr_up": 300000.0,
+     "cvr_down": 150000.0
+    },
+    {
+     "bucket": "EURGBP",
+     "cvr_up": -60000.0,
+     "cvr_down": 90000.0
+    }
+   ]
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ },
+ {
+  "case_id": "frtb_f2c-0016",
+  "operation": "risk.frtb.curvature",
+  "inputs": {
+   "risk_class": "EQUITY",
+   "factors": [
+    {
+     "bucket": 11,
+     "name": "O1",
+     "cvr_up": 100000.0,
+     "cvr_down": -40000.0
+    },
+    {
+     "bucket": 11,
+     "name": "O2",
+     "cvr_up": -50000.0,
+     "cvr_down": 70000.0
+    }
+   ]
+  },
+  "output_names": [
+   "binding_scenario",
+   "capital",
+   "scenarios"
+  ],
+  "tolerance_class": "simple_analytic"
+ }
+]

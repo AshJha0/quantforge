@@ -89,7 +89,37 @@ def parse_bls_v1(raw, fields=None):
     return out
 
 
-PARSERS = {"treasury_csv": parse_treasury_csv, "bls_v1": parse_bls_v1}
+def parse_nyfed_json(raw, fields=None):
+    """NY Fed markets API rates JSON to {"YYYY-MM-DD|field": value}, default field percentRate (R6-21: SOFR, TGCR and
+    BGCR kept as observations, so R3-02's inputs can be rebuilt from the log)."""
+    out = {}
+    for r in json.loads(raw.decode("utf-8"))["refRates"]:
+        for f in fields or ["percentRate"]:
+            v = r.get(f)
+            if v not in (None, ""):
+                out[f"{r['effectiveDate']}|{f}"] = float(v)
+    if not out:
+        raise ValueError("parsed no values: the feed format may have changed")
+    return out
+
+
+PARSERS = {"treasury_csv": parse_treasury_csv, "bls_v1": parse_bls_v1, "nyfed_json": parse_nyfed_json}
+
+
+def forward_start(studies_path):
+    """R6-19: first observation date the log may carry: the earliest study start in studies.json, or None."""
+    if not Path(studies_path).exists():
+        return None
+    starts = [st["start"] for st in json.loads(Path(studies_path).read_text(encoding="utf-8"))["studies"] if st.get("start")]
+    return min(starts) if starts else None
+
+
+def keep_forward(parsed, start):
+    """Drop observations dated before the forward start, so no R3 holdout-period value enters the log
+    (research/preregs/DEVIATION-2026-11-12.md). A monthly key YYYY-MM is kept from the forward start's month on."""
+    if not start:
+        return parsed
+    return {k: v for k, v in parsed.items() if k.split("|")[0] >= start[:len(k.split("|")[0])]}
 
 
 def state_hash(state):
@@ -128,6 +158,7 @@ def main():
     sources_sha = hashlib.sha256(Path(a.sources).read_bytes()).hexdigest()
     failed = 0
     today = {}
+    fwd = forward_start(a.studies)
     for s in load_sources(a.sources):
         if not s["enabled"]:
             continue
@@ -143,7 +174,7 @@ def main():
             value = {"kind": "recording", "url": url, "sha256": digest, "bytes": len(raw), "licence": s["licence"]}
             today[s["id"]] = digest
             if s.get("parse"):
-                parsed = PARSERS[s["parse"]["format"]](raw, s["parse"].get("fields"))
+                parsed = keep_forward(PARSERS[s["parse"]["format"]](raw, s["parse"].get("fields")), fwd)
                 old = replay(a.log, s["id"])
                 changed = {k: v for k, v in sorted(parsed.items()) if old.get(k) != v}
                 for k in sorted(changed):

@@ -1,0 +1,1036 @@
+{
+ "rule": "per case; a case passes only if every compared output is within its stated tolerance",
+ "suites": {
+  "bermudan_g": {
+   "library": "QuantLib 1.44 FdHullWhiteSwaptionEngine (Crank-Nicolson/Douglas 800x801 and 1600x1601; implicit Euler at the golden grid as the error yardstick)",
+   "cases": [
+    {
+     "case_id": "bermudan_g-0001",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 34186.61150798533,
+       "ql_golden_grid_implicit": 34195.0441921877,
+       "ql_fine": 34218.30144751215,
+       "ql_finer": 34218.31324599669,
+       "gap": -31.689939526819217,
+       "tolerance": 69.84134803847273,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "bermudan_g-0002",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 22729.56370830422,
+       "ql_golden_grid_implicit": 22736.559716544452,
+       "ql_fine": 22757.286716373834,
+       "ql_finer": 22757.326948939415,
+       "gap": -27.72300806961357,
+       "tolerance": 62.32442674859663,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "bermudan_g-0003",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 14542.495180991787,
+       "ql_golden_grid_implicit": 14539.253002896883,
+       "ql_fine": 14552.892399212293,
+       "ql_finer": 14552.90524191303,
+       "gap": -10.397218220505238,
+       "tolerance": 40.971259543619794,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "bermudan_g-0004",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 14016.497089701521,
+       "ql_golden_grid_implicit": 14017.652534727664,
+       "ql_fine": 14027.436354764926,
+       "ql_finer": 14027.452796355776,
+       "gap": -10.9392650634054,
+       "tolerance": 29.414801381425438,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "bermudan_g-0005",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 22289.71053721013,
+       "ql_golden_grid_implicit": 22287.766147418806,
+       "ql_fine": 22305.404651464967,
+       "ql_finer": 22305.44272256242,
+       "gap": -15.694114254838496,
+       "tolerance": 53.05201514137973,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "bermudan_g-0006",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 33870.81685964206,
+       "ql_golden_grid_implicit": 33884.32089972016,
+       "ql_fine": 33906.01302603996,
+       "ql_finer": 33906.03063132193,
+       "gap": -35.196166397901834,
+       "tolerance": 65.16306562218547,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "bermudan_g-0007",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 14263.641965708257,
+       "ql_golden_grid_implicit": 14263.2362458223,
+       "ql_fine": 14287.526532877066,
+       "ql_finer": 14287.540353649782,
+       "gap": -23.884567168808644,
+       "tolerance": 72.92658712441128,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "bermudan_g-0008",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 20987.97165018019,
+       "ql_golden_grid_implicit": 20986.839317787613,
+       "ql_fine": 21007.217888971812,
+       "ql_finer": 21007.224165044845,
+       "gap": -19.24623879162391,
+       "tolerance": 61.1755297433454,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "bermudan_g-0009",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 19173.113919655796,
+       "ql_golden_grid_implicit": 19170.969619934905,
+       "ql_fine": 19197.791548272537,
+       "ql_finer": 19197.850311008904,
+       "gap": -24.67762861674055,
+       "tolerance": 80.66124633591546,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "bermudan_g-0010",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 21473.859586482726,
+       "ql_golden_grid_implicit": 21560.247194304793,
+       "ql_fine": 21726.155211240508,
+       "ql_finer": 21726.1647880656,
+       "gap": -252.2956247577822,
+       "tolerance": 497.774255142002,
+       "pass": true
+      }
+     ],
+     "pass": true
+    }
+   ]
+  },
+  "aadladder_g": {
+   "library": "QuantLib 1.44 FdHullWhiteSwaptionEngine, central bump-and-revalue for every gradient entry",
+   "cases": [
+    {
+     "case_id": "aadladder_g-0001",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 22697.809654563578,
+       "ql_golden_grid_implicit": 22715.957429837992,
+       "ql_fine": 22757.286716373834,
+       "ql_finer": 22757.326948939415,
+       "gap": -59.47706181025569,
+       "tolerance": 124.13125511392376,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_mean_reversion",
+       "golden": -52528.10050842526,
+       "ql_golden_grid_implicit": -53510.34569575859,
+       "ql_fine": -53427.900900060195,
+       "ql_finer": -53452.669025427895,
+       "gap": 899.8003916349335,
+       "tolerance": 321.6912912987882,
+       "pass": false
+      },
+      {
+       "output": "d_price_d_sigma",
+       "golden": 2269594.6079778266,
+       "ql_golden_grid_implicit": 2272931.2295638006,
+       "ql_fine": 2276901.8346225494,
+       "ql_finer": 2277003.141822024,
+       "gap": -7307.226644722745,
+       "tolerance": 12218.006369277473,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[0]",
+       "golden": 127.29305716006148,
+       "ql_golden_grid_implicit": -687.7195974084316,
+       "ql_fine": -126.91754272964317,
+       "ql_finer": 0.13343378668650985,
+       "gap": 254.21059988970467,
+       "tolerance": 2063.5592208784115,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[1]",
+       "golden": 191964.24101976422,
+       "ql_golden_grid_implicit": 222097.14804012037,
+       "ql_fine": 222345.77891686058,
+       "ql_finer": 222803.49542597833,
+       "gap": -30381.537897096365,
+       "tolerance": 2119.234121814878,
+       "pass": false
+      },
+      {
+       "output": "d_price_d_discount_factors[2]",
+       "golden": 173815.83322504009,
+       "ql_golden_grid_implicit": 160034.04100774787,
+       "ql_fine": 157111.54861855903,
+       "ql_finer": 157136.5804920788,
+       "gap": 16704.28460648106,
+       "tolerance": 8842.74660395906,
+       "pass": false
+      },
+      {
+       "output": "d_price_d_discount_factors[3]",
+       "golden": 147510.2115088347,
+       "ql_golden_grid_implicit": 134806.94468307775,
+       "ql_fine": 135629.5626501378,
+       "ql_finer": 135535.10120800638,
+       "gap": 11880.648858696892,
+       "tolerance": 2751.3857377860127,
+       "pass": false
+      },
+      {
+       "output": "d_price_d_discount_factors[4]",
+       "golden": -233481.50369345793,
+       "ql_golden_grid_implicit": -234788.72320993105,
+       "ql_fine": -233673.29687607707,
+       "ql_finer": -233992.31820076238,
+       "gap": 191.79318261914887,
+       "tolerance": 4303.576457121546,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[5]",
+       "golden": -343472.6318262545,
+       "ql_golden_grid_implicit": -348040.14318433474,
+       "ql_fine": -347325.3841330006,
+       "ql_finer": -347547.99048278073,
+       "gap": 3852.7523067461443,
+       "tolerance": 2812.4396759744886,
+       "pass": false
+      },
+      {
+       "output": "d_price_d_discount_factors[6]",
+       "golden": 0.0,
+       "ql_golden_grid_implicit": 0.0,
+       "ql_fine": 0.0,
+       "ql_finer": 0.0,
+       "gap": 0.0,
+       "tolerance": 1.0000000000000002,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[7]",
+       "golden": 0.0,
+       "ql_golden_grid_implicit": 0.0,
+       "ql_fine": 0.0,
+       "ql_finer": 0.0,
+       "gap": 0.0,
+       "tolerance": 1.0000000000000002,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[8]",
+       "golden": 0.0,
+       "ql_golden_grid_implicit": 0.0,
+       "ql_fine": 0.0,
+       "ql_finer": 0.0,
+       "gap": 0.0,
+       "tolerance": 1.0000000000000002,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[9]",
+       "golden": 0.0,
+       "ql_golden_grid_implicit": 0.0,
+       "ql_fine": 0.0,
+       "ql_finer": 0.0,
+       "gap": 0.0,
+       "tolerance": 1.0000000000000002,
+       "pass": true
+      }
+     ],
+     "pass": false
+    },
+    {
+     "case_id": "aadladder_g-0002",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 14530.6397544942,
+       "ql_golden_grid_implicit": 14525.186427977114,
+       "ql_fine": 14552.892399212293,
+       "ql_finer": 14552.90524191303,
+       "gap": -22.252644718093507,
+       "tolerance": 83.17097244749957,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_mean_reversion",
+       "golden": -51414.55607905905,
+       "ql_golden_grid_implicit": -51205.60774594196,
+       "ql_fine": -51561.403059567965,
+       "ql_finer": -51521.175230773224,
+       "gap": 146.84698050891166,
+       "tolerance": 1188.120841818314,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_sigma",
+       "golden": 2132091.2093621395,
+       "ql_golden_grid_implicit": 2123174.885374283,
+       "ql_fine": 2134834.7884992105,
+       "ql_finer": 2134263.286708574,
+       "gap": -2743.579137071036,
+       "tolerance": 36696.34683790205,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[0]",
+       "golden": 81.57482088869519,
+       "ql_golden_grid_implicit": -467.78076011833036,
+       "ql_fine": -89.77216748462524,
+       "ql_finer": -4.250685378792696,
+       "gap": 171.34698837332041,
+       "tolerance": 1390.5903057934338,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[1]",
+       "golden": 87159.13738192833,
+       "ql_golden_grid_implicit": 99227.19542009872,
+       "ql_fine": 99304.37454931962,
+       "ql_finer": 98926.09051894397,
+       "gap": -12145.237167391286,
+       "tolerance": 1366.4766379270243,
+       "pass": false
+      },
+      {
+       "output": "d_price_d_discount_factors[2]",
+       "golden": 142000.07656277038,
+       "ql_golden_grid_implicit": 126189.72432483133,
+       "ql_fine": 131356.7990773663,
+       "ql_finer": 131233.09283037088,
+       "gap": 10643.277485404076,
+       "tolerance": 15872.484998667756,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[3]",
+       "golden": 155222.40724830705,
+       "ql_golden_grid_implicit": 147612.54099903454,
+       "ql_fine": 146789.67758391082,
+       "ql_finer": 146993.57857534778,
+       "gap": 8432.729664396233,
+       "tolerance": 3080.4484420893104,
+       "pass": false
+      },
+      {
+       "output": "d_price_d_discount_factors[4]",
+       "golden": -153708.52716090213,
+       "ql_golden_grid_implicit": -142725.0799124522,
+       "ql_fine": -146638.53245565406,
+       "ql_finer": -146306.322948476,
+       "gap": -7069.994705248071,
+       "tolerance": 12737.139859666879,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[5]",
+       "golden": -278537.8743307765,
+       "ql_golden_grid_implicit": -277241.5406379878,
+       "ql_fine": -278687.87293300556,
+       "ql_finer": -278707.9682793774,
+       "gap": 149.9986022290541,
+       "tolerance": 4399.561462043132,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[6]",
+       "golden": 0.0,
+       "ql_golden_grid_implicit": 0.0,
+       "ql_fine": 0.0,
+       "ql_finer": 0.0,
+       "gap": 0.0,
+       "tolerance": 1.0000000000000002,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[7]",
+       "golden": 0.0,
+       "ql_golden_grid_implicit": 0.0,
+       "ql_fine": 0.0,
+       "ql_finer": 0.0,
+       "gap": 0.0,
+       "tolerance": 1.0000000000000002,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[8]",
+       "golden": 0.0,
+       "ql_golden_grid_implicit": 0.0,
+       "ql_fine": 0.0,
+       "ql_finer": 0.0,
+       "gap": 0.0,
+       "tolerance": 1.0000000000000002,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[9]",
+       "golden": 0.0,
+       "ql_golden_grid_implicit": 0.0,
+       "ql_fine": 0.0,
+       "ql_finer": 0.0,
+       "gap": 0.0,
+       "tolerance": 1.0000000000000002,
+       "pass": true
+      }
+     ],
+     "pass": false
+    },
+    {
+     "case_id": "aadladder_g-0003",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 14012.653089249206,
+       "ql_golden_grid_implicit": 14006.646897926332,
+       "ql_fine": 14027.436354764926,
+       "ql_finer": 14027.452796355776,
+       "gap": -14.783265515719904,
+       "tolerance": 62.43170794142099,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_mean_reversion",
+       "golden": -51282.950747554416,
+       "ql_golden_grid_implicit": -50315.456003299914,
+       "ql_fine": -50687.79622787588,
+       "ql_finer": -50676.30289732733,
+       "gap": -595.1545196785373,
+       "tolerance": 1151.5519483242801,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_sigma",
+       "golden": 2085099.9585081805,
+       "ql_golden_grid_implicit": 2067709.9699444624,
+       "ql_fine": 2077505.3326275155,
+       "ql_finer": 2077368.2928543165,
+       "gap": 7594.625880664913,
+       "tolerance": 29799.29246871492,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[0]",
+       "golden": 78.76602360886467,
+       "ql_golden_grid_implicit": -451.0315020525013,
+       "ql_fine": -86.06062601757003,
+       "ql_finer": -3.862740413751453,
+       "gap": 164.8266496264347,
+       "tolerance": 1341.506363682273,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[1]",
+       "golden": -88799.57739265116,
+       "ql_golden_grid_implicit": -89924.98640418489,
+       "ql_fine": -92887.23707504687,
+       "ql_finer": -92599.11799290421,
+       "gap": 4087.659682395708,
+       "tolerance": 9751.198058591293,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[2]",
+       "golden": -146742.28622846652,
+       "ql_golden_grid_implicit": -126401.84332758508,
+       "ql_fine": -128912.6064220909,
+       "ql_finer": -129417.43776354997,
+       "gap": -17829.679806375614,
+       "tolerance": 9046.930050180885,
+       "pass": false
+      },
+      {
+       "output": "d_price_d_discount_factors[3]",
+       "golden": -124678.88720156101,
+       "ql_golden_grid_implicit": -137124.49434115115,
+       "ql_fine": -135632.9361169628,
+       "ql_finer": -135226.35893423285,
+       "gap": 10954.0489154018,
+       "tolerance": 5694.530899642101,
+       "pass": false
+      },
+      {
+       "output": "d_price_d_discount_factors[4]",
+       "golden": 158329.92284774798,
+       "ql_golden_grid_implicit": 156847.32217050623,
+       "ql_fine": 159201.2316423279,
+       "ql_finer": 158943.36010205734,
+       "gap": -871.3087945799343,
+       "tolerance": 7835.501366199602,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[5]",
+       "golden": 283212.4412177211,
+       "ql_golden_grid_implicit": 276383.07824508956,
+       "ql_fine": 278592.4703712226,
+       "ql_finer": 278597.4878624984,
+       "gap": 4619.9708464985015,
+       "tolerance": 6643.512064667675,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[6]",
+       "golden": 0.0,
+       "ql_golden_grid_implicit": 0.0,
+       "ql_fine": 0.0,
+       "ql_finer": 0.0,
+       "gap": 0.0,
+       "tolerance": 1.0000000000000002,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[7]",
+       "golden": 0.0,
+       "ql_golden_grid_implicit": 0.0,
+       "ql_fine": 0.0,
+       "ql_finer": 0.0,
+       "gap": 0.0,
+       "tolerance": 1.0000000000000002,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[8]",
+       "golden": 0.0,
+       "ql_golden_grid_implicit": 0.0,
+       "ql_fine": 0.0,
+       "ql_finer": 0.0,
+       "gap": 0.0,
+       "tolerance": 1.0000000000000002,
+       "pass": true
+      },
+      {
+       "output": "d_price_d_discount_factors[9]",
+       "golden": 0.0,
+       "ql_golden_grid_implicit": 0.0,
+       "ql_fine": 0.0,
+       "ql_finer": 0.0,
+       "gap": 0.0,
+       "tolerance": 1.0000000000000002,
+       "pass": true
+      }
+     ],
+     "pass": false
+    }
+   ]
+  },
+  "callable_g": {
+   "library": "QuantLib 1.44 TreeCallableFixedRateBondEngine (2000 and 4000 steps)",
+   "cases": [
+    {
+     "case_id": "callable_g-0001",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 90.38100696077336,
+       "ql_tree_2000": 90.37032265354239,
+       "ql_tree_4000": 90.37054278486619,
+       "e_grid_straight_limit": 0.00931783315607504,
+       "gap": 0.010464175907173967,
+       "tolerance": 0.028704274446587054,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "callable_g-0002",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 91.02062511154713,
+       "ql_tree_2000": 91.01119730973627,
+       "ql_tree_4000": 91.01076585101009,
+       "e_grid_straight_limit": 0.00931783315607504,
+       "gap": 0.009859260537041337,
+       "tolerance": 0.029338896271885993,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "callable_g-0003",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 99.03284827488655,
+       "ql_tree_2000": 99.02296775393927,
+       "ql_tree_4000": 99.02275622906377,
+       "e_grid_straight_limit": 0.00931783315607504,
+       "gap": 0.010092045822773343,
+       "tolerance": 0.02868710694298842,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "callable_g-0004",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 100.68658722283783,
+       "ql_tree_2000": 100.67730630373217,
+       "ql_tree_4000": 100.6774493725428,
+       "e_grid_straight_limit": 0.00931783315607504,
+       "gap": 0.009137850295033445,
+       "tolerance": 0.028483392487336886,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "callable_g-0005",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 105.1753692403312,
+       "ql_tree_2000": 105.16959882849501,
+       "ql_tree_4000": 105.16976622564607,
+       "e_grid_straight_limit": 0.00931783315607504,
+       "gap": 0.005603014685121366,
+       "tolerance": 0.028560866290644984,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "callable_g-0006",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 108.72301801206505,
+       "ql_tree_2000": 108.71586138940667,
+       "ql_tree_4000": 108.71621131182638,
+       "e_grid_straight_limit": 0.00931783315607504,
+       "gap": 0.006806700238669805,
+       "tolerance": 0.029111989745384145,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "callable_g-0007",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 104.48531341086765,
+       "ql_tree_2000": 104.47599557771156,
+       "ql_tree_4000": 104.4759955777114,
+       "e_grid_straight_limit": 0.00931783315607504,
+       "gap": 0.00931783315624557,
+       "tolerance": 0.028057984782104944,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "callable_g-0008",
+     "checks": [
+      {
+       "output": "price",
+       "golden": 102.35669281802285,
+       "ql_tree_2000": 102.34564694434206,
+       "ql_tree_4000": 102.34711093790207,
+       "e_grid_straight_limit": 0.00931783315607504,
+       "gap": 0.009581880120776987,
+       "tolerance": 0.03244783684106925,
+       "pass": true
+      }
+     ],
+     "pass": true
+    }
+   ]
+  },
+  "hwcal_g": {
+   "library": "scipy minimize_scalar (bounded Brent) on QuantLib 1.44 HullWhite discountBondOption (Jamshidian)",
+   "cases": [
+    {
+     "case_id": "hwcal_g-0001",
+     "checks": [
+      {
+       "output": "sigma",
+       "golden": 0.011504087642907404,
+       "outside": 0.011504087643300919,
+       "gap": -3.935150816314348e-13,
+       "tolerance": 2.300817528660184e-10,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[0]",
+       "golden": 0.027204944319867745,
+       "outside": 0.02720494432079777,
+       "gap": -9.300234193876378e-13,
+       "tolerance": 2.7214944319867745e-09,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[1]",
+       "golden": 0.033372964272704135,
+       "outside": 0.03337296427384478,
+       "gap": -1.1406431354998858e-12,
+       "tolerance": 3.338296427270413e-09,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[2]",
+       "golden": 0.03495166696435742,
+       "outside": 0.034951666965551735,
+       "gap": -1.1943154798466082e-12,
+       "tolerance": 3.4961666964357417e-09,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[3]",
+       "golden": 0.030869713936937007,
+       "outside": 0.030869713937991986,
+       "gap": -1.0549790208091991e-12,
+       "tolerance": 3.0879713936937004e-09,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[4]",
+       "golden": 0.021068798111838906,
+       "outside": 0.021068798112559368,
+       "gap": -7.204618845957356e-13,
+       "tolerance": 2.1078798111838904e-09,
+       "pass": true
+      },
+      {
+       "output": "rmse",
+       "golden": 0.00038546085196799616,
+       "outside": 0.00038546085196799795,
+       "gap": -1.7889335846010823e-18,
+       "tolerance": 3.8546085196799616e-10,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "hwcal_g-0002",
+     "checks": [
+      {
+       "output": "sigma",
+       "golden": 0.009029826067099338,
+       "outside": 0.009029826067082651,
+       "gap": 1.6686305115420907e-14,
+       "tolerance": 1.8059652134165302e-10,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[0]",
+       "golden": 0.011858065064074825,
+       "outside": 0.011858065064052847,
+       "gap": 2.197721171715017e-14,
+       "tolerance": 1.1868065064074826e-09,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[1]",
+       "golden": 0.014219835789495712,
+       "outside": 0.014219835789469441,
+       "gap": 2.6270652320192767e-14,
+       "tolerance": 1.4229835789495712e-09,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[2]",
+       "golden": 0.01469075990327388,
+       "outside": 0.014690759903246713,
+       "gap": 2.7167504357272776e-14,
+       "tolerance": 1.470075990327388e-09,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[3]",
+       "golden": 0.012982250521960077,
+       "outside": 0.012982250521936141,
+       "gap": 2.3935714521527984e-14,
+       "tolerance": 1.2992250521960077e-09,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[4]",
+       "golden": 0.009183122278206836,
+       "outside": 0.00918312227818993,
+       "gap": 1.6906614996869962e-14,
+       "tolerance": 9.193122278206836e-10,
+       "pass": true
+      },
+      {
+       "output": "rmse",
+       "golden": 0.00025407477341409283,
+       "outside": 0.00025407477341407364,
+       "gap": 1.919037845299343e-17,
+       "tolerance": 2.5407477341409284e-10,
+       "pass": true
+      }
+     ],
+     "pass": true
+    },
+    {
+     "case_id": "hwcal_g-0003",
+     "checks": [
+      {
+       "output": "sigma",
+       "golden": 0.007,
+       "outside": 0.006999999979311558,
+       "gap": 2.06884422787601e-11,
+       "tolerance": 1.3999999958623116e-10,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[0]",
+       "golden": 0.01985073524739449,
+       "outside": 0.019850735188745635,
+       "gap": 5.864885660455954e-11,
+       "tolerance": 1.986073524739449e-09,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[1]",
+       "golden": 0.02443189856035179,
+       "outside": 0.02443189848817594,
+       "gap": 7.217584863106197e-11,
+       "tolerance": 2.4441898560351788e-09,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[2]",
+       "golden": 0.025650082377603373,
+       "outside": 0.02565008230183731,
+       "gap": 7.576606356196613e-11,
+       "tolerance": 2.5660082377603373e-09,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[3]",
+       "golden": 0.02270500529047743,
+       "outside": 0.022705005223401967,
+       "gap": 6.707546323925229e-11,
+       "tolerance": 2.271500529047743e-09,
+       "pass": true
+      },
+      {
+       "output": "fitted_prices[4]",
+       "golden": 0.015477765965868926,
+       "outside": 0.015477765920133679,
+       "gap": 4.573524718665123e-11,
+       "tolerance": 1.5487765965868926e-09,
+       "pass": true
+      },
+      {
+       "output": "rmse",
+       "golden": 8.656950326778717e-19,
+       "outside": 6.477710759152559e-11,
+       "gap": -6.477710672583056e-11,
+       "tolerance": 1e-09,
+       "pass": true
+      }
+     ],
+     "pass": true
+    }
+   ]
+  },
+  "barrier_g": {
+   "library": "QuantLib 1.44 MCPRBarrierEngine, one step per monitoring date, no bridge, 200000 antithetic paths, seed 20261112; tolerance 3 SE",
+   "cases": [
+    {
+     "case_id": "barrier_g-0001",
+     "pass": true,
+     "checks": [
+      {
+       "output": "price",
+       "golden": 8.519039784448328,
+       "ql_mc": 8.524172474538034,
+       "se": 0.023207068304298657,
+       "gap": -0.00513269008970596,
+       "z": -0.22116925853815106,
+       "tolerance": 0.06962120491289597,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "barrier_g-0002",
+     "pass": true,
+     "checks": [
+      {
+       "output": "price",
+       "golden": 8.92328326237682,
+       "ql_mc": 8.93956792532888,
+       "se": 0.02320421142096241,
+       "gap": -0.016284662952060103,
+       "z": -0.7017977321715286,
+       "tolerance": 0.06961263426288723,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "barrier_g-0003",
+     "pass": true,
+     "checks": [
+      {
+       "output": "price",
+       "golden": 9.574007779309731,
+       "ql_mc": 9.57515733878724,
+       "se": 0.022950782237952466,
+       "gap": -0.0011495594775094986,
+       "z": -0.05008803035952885,
+       "tolerance": 0.0688523467138574,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "barrier_g-0016",
+     "pass": true,
+     "checks": [
+      {
+       "output": "price",
+       "golden": 7.634396406932201,
+       "ql_mc": 7.626306402949237,
+       "se": 0.013290563603623242,
+       "gap": 0.008090003982963445,
+       "z": 0.6087028529593709,
+       "tolerance": 0.03987169081086973,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "barrier_g-0017",
+     "pass": true,
+     "checks": [
+      {
+       "output": "price",
+       "golden": 7.743785962617812,
+       "ql_mc": 7.7531590838327205,
+       "se": 0.013165878990558365,
+       "gap": -0.009373121214908409,
+       "z": -0.7119252137764707,
+       "tolerance": 0.0394976369716751,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "barrier_g-0018",
+     "pass": true,
+     "checks": [
+      {
+       "output": "price",
+       "golden": 7.910398023260196,
+       "ql_mc": 7.908693509805047,
+       "se": 0.012926187468578675,
+       "gap": 0.0017045134551496588,
+       "z": 0.1318651349667515,
+       "tolerance": 0.038778562405736024,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "barrier_g-0026",
+     "pass": true,
+     "checks": [
+      {
+       "output": "price",
+       "golden": 8.138810547624576,
+       "ql_analytic": 8.138810547624583,
+       "gap": -7.105427357601002e-15,
+       "tolerance": 8.148810547624584e-10,
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "barrier_g-0027",
+     "pass": true,
+     "checks": [
+      {
+       "output": "price",
+       "golden": 8.138810547624576,
+       "ql_analytic": 8.138810547624583,
+       "gap": -7.105427357601002e-15,
+       "tolerance": 8.148810547624584e-10,
+       "pass": true
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

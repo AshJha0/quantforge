@@ -23102,6 +23102,10 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "curve tolerance on notional"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_rate": "per_unit"
    }
   },
   {
@@ -23236,6 +23240,10 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "curve tolerance on notional"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_rate": "per_unit"
    }
   },
   {
@@ -23370,6 +23378,10 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "curve tolerance on notional"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_rate": "per_unit"
    }
   },
   {
@@ -23504,6 +23516,10 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "curve tolerance on notional"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_rate": "per_unit"
    }
   },
   {
@@ -23638,6 +23654,10 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "curve tolerance on notional"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_rate": "per_unit"
    }
   },
   {
@@ -23772,6 +23792,10 @@
     "absolute": 0.02,
     "relative": 1e-09,
     "reason": "curve tolerance on notional"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_rate": "per_unit"
    }
   },
   {
@@ -23852,6 +23876,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -23932,6 +23959,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -24012,6 +24042,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -24092,6 +24125,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -24172,6 +24208,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -24252,6 +24291,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -24332,6 +24374,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -24412,6 +24457,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -24492,6 +24540,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -24572,6 +24623,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -24652,6 +24706,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -24732,6 +24789,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -24812,6 +24872,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -24892,6 +24955,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -24972,6 +25038,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -25052,6 +25121,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -25132,6 +25204,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -25212,6 +25287,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -25292,6 +25370,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   },
   {
@@ -25372,6 +25453,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   },
+   "output_classes": {
+    "par_spread": "per_unit"
    }
   }
  ]

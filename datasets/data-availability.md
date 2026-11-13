@@ -28,7 +28,7 @@ Rechecked as text on 2026-11-07, for stage D. "Recorded" means the daily recorde
 
 | Item | Status | Data | Notes |
 |---|---|---|---|
-| Overnight compounding (SOFR) | Real, gallery evidence | NY Fed SOFR, recorded | `examples/real_sofr_compound_2026_10.json`: real fixings, source and fetch date in the example's gallery label |
+| Overnight compounding (SOFR) | Real, gallery evidence | NY Fed SOFR, recorded | `examples/real_sofr_compound_2022_10.json`: real fixings, source and fetch date in the example's gallery label |
 | Repo general collateral rates | Real, recorded | NY Fed TGCR and BGCR | No method page uses them yet |
 | Special repo, per-security repo | Method test, no free source | None | SOFR filters specials out; no per-issue series found |
 | OIS curves from quotes (SOFR, ESTR, SONIA) | Method test, no free source | None | ESTR fixings and SONIA are recorded; quotes are not free |

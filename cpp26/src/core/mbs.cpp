@@ -29,6 +29,11 @@ MbsCashflows mbs_cashflows(const MbsPool& p) {
     if (!(p.balance > 0.0)) throw Error("E_DOMAIN", "wac and balance must be positive", "pool");
     if (!p.psa && !(p.rate_or_speed >= 0.0 && p.rate_or_speed < 1.0)) throw Error("E_DOMAIN", "rate must be in [0, 1)", "pool");
     if (p.psa && !(p.rate_or_speed >= 0.0)) throw Error("E_DOMAIN", "speed is negative", "pool");
+    // R6-7.1: a PSA speed whose monthly CPR reaches 1 has no SMM; checked for every month before any cash flow.
+    if (p.psa)
+        for (long long k = 1; k <= p.wam; ++k)
+            if (!(std::min(double(p.age + k) / 30.0, 1.0) * 0.06 * p.rate_or_speed / 100.0 < 1.0))
+                throw Error("E_DOMAIN", "a PSA monthly CPR reaches 1", "pool");
     MbsCashflows out{{}, {}, {}, {}, 0.0};
     const double r = p.wac / 12.0;
     double b = p.balance;

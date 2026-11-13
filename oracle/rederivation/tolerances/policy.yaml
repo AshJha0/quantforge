@@ -1,0 +1,90 @@
+# There is no global default: every conformance case must name one of these classes.
+# Comparison for absolute/relative classes: |a - e| <= absolute + relative * max(|a|, |e|).
+# Each class gives its reason, as ADR-0007 asks.
+# Each class in money on a 10m notional (bp of DV01, price ticks): money.md, written by money_table.py.
+classes:
+  date_and_convention:
+    # Dates, booleans, integers, strings, flags. Nothing to round.
+    exact: true
+  bit_exact:
+    # Integer generators and exactly representable results (rng.md, sobol.md).
+    # Reals are compared as binary64 values, with no tolerance.
+    exact: true
+  simple_analytic:
+    # A few operations on well-conditioned values.
+    absolute: 1.0e-12
+    relative: 1.0e-10
+  per_unit:
+    # R6 ruling R6-10.2 (review finding 14): rates, spreads, vols, ratios and per-unit factors never inherit a money
+    # tolerance. Measured on the v0.8.0 Python, Rust and C++ builds: every flagged output within 1e-15 relative.
+    absolute: 1.0e-10
+    relative: 1.0e-8
+  interpolation:
+    # A solve or several chained operations; rounding grows with knot count.
+    absolute: 1.0e-10
+    relative: 1.0e-8
+  root_finding:
+    # Default x_tol is 1e-12; allows for different iteration paths.
+    absolute: 1.0e-10
+    relative: 1.0e-10
+  quadrature:
+    # Fixed recipes agree to rounding. Adaptive cases set tolerance_limit from their tol.
+    absolute: 1.0e-11
+    relative: 1.0e-10
+  statistics:
+    # Stable sums over short series. The ill-conditioned 1e9-offset case stays inside this.
+    absolute: 1.0e-11
+    relative: 1.0e-10
+  likelihood_sum:
+    # Stage E spec B (garch.md): a log-likelihood summed over hundreds of terms. Each ln may differ in its last bit across libms.
+    absolute: 1.0e-9
+    relative: 1.0e-10
+  jacobian:
+    # Stage F (joint-solve-and-funding.md, Q4): d unknown / d quote by the implicit function theorem. A build may form dR/dx by
+    # central differences (about 1e-9 relative); the inverse carries it at the system's condition number.
+    absolute: 1.0e-9
+    relative: 1.0e-6
+  jacobian_piecewise:
+    # Stage F (joint_f-0001, R5 audit, ruling F-40): the IFT Jacobian of a system with a monotone convex curve, which is
+    # piecewise in its data. dR/dx is itself a difference quotient near region boundaries, and stencils that pass the
+    # kink checks still differ by about 2e-8 between builds (Rust, measured). A kink-straddling error is 5e-4 or more,
+    # so this bound keeps three orders of margin on both sides.
+    absolute: 1.0e-7
+    relative: 1.0e-5
+  standard_error:
+    # Stage F (garch.md R8, ruling F-13): sqrt of the diagonal of an inverted Hessian. Builds may form the Hessian by
+    # central differences of an analytic score (error about 1e-9 relative); the inverse amplifies it by the condition number.
+    absolute: 1.0e-15
+    relative: 1.0e-5
+  aad_sensitivity:
+    # Stage F (book-sensitivities.md, Q3a, T row): dPV/dquote per unit notional and per unit quote, by AAD (Rust reference)
+    # or by the IFT chain rule. Bound fixed by the T row before the stage started.
+    absolute: 1.0e-10
+    relative: 1.0e-8
+  ift_jacobian:
+    # Stage F (book-sensitivities.md, Q3a, T row): d zero rate / d quote on a sequential log-linear build. Tighter than
+    # `jacobian` because dR/dx is analytic on this build; the absolute term makes structural zeros pass only near 0.
+    absolute: 1.0e-11
+    relative: 1.0e-9
+  numerical_scheme:
+    # The same grid recipe in another language: rounding through hundreds of tridiagonal solves.
+    absolute: 1.0e-8
+    relative: 1.0e-8
+  fourier:
+    # The same series; complex exp and log differ in the last bits over hundreds of terms.
+    absolute: 1.0e-9
+    relative: 1.0e-9
+  common_rng:
+    # Same draws (rng.md). Normals differ by a few ulps through log; means of many paths keep that small.
+    absolute: 1.0e-9
+    relative: 1.0e-9
+  calibration:
+    # Judged on repricing of the input quotes, not on fitted parameters,
+    # because languages may use different proven solvers.
+    judged_on: repricing_error
+    per_case_target_required: true
+  monte_carlo:
+    # Against the true value: |a - e| <= z * reported stderr, z set per check (4 in stage A).
+    # With common draws fixed by specifications/01-core/rng.md, class common_rng applies as well.
+    method: "confidence interval against the oracle value"
+    common_rng_spec: "specifications/01-core/rng.md"

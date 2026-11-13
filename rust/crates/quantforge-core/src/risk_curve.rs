@@ -401,11 +401,10 @@ pub fn jacobian(
             zeros(&bootstrap(&p, &q)?)
         };
         let (up, down) = (at(h)?, at(-h)?);
+        // No upper-triangle mask (review finding 3): a globally solved interpolation lets a
+        // pillar depend on later quotes; for the local methods those entries come out exactly 0.
         for (i, row) in jac.iter_mut().enumerate() {
-            // A pillar depends only on quotes up to its own: above the diagonal is exactly 0.
-            if j <= i {
-                row[j] = (up[i] - down[i]) / (2.0 * h);
-            }
+            row[j] = (up[i] - down[i]) / (2.0 * h);
         }
     }
     Ok(Jacobian {
@@ -685,5 +684,66 @@ mod tests {
         assert_eq!(e.code, "E_INPUT");
         let e = pnl_explain(&sofr, as_of, m, &quotes(0.0), &other, &b, 0.0).unwrap_err();
         assert_eq!(e.code, "E_DOMAIN");
+    }
+
+    /// Review finding 3: the Jacobian of a globally solved interpolation has non-zero entries
+    /// above the diagonal; each column must match a central difference of the zero rates.
+    #[test]
+    fn jacobian_matches_central_difference_for_non_local_methods() {
+        let sofr = crate::conventions::overnight("SOFR").unwrap();
+        let as_of = Date::new(2026, 11, 6);
+        let rates = [0.030, 0.034, 0.041, 0.038, 0.045];
+        let tenors = [(1, 'Y'), (2, 'Y'), (3, 'Y'), (5, 'Y'), (10, 'Y')];
+        let qs = |j: usize, s: f64| -> Vec<OisQuote> {
+            (0..5)
+                .map(|k| {
+                    let r = rates[k] + if k == j { s } else { 0.0 };
+                    OisQuote {
+                        tenor: tenors[k],
+                        bid: r,
+                        ask: r,
+                    }
+                })
+                .collect()
+        };
+        let h = 1.0 * BP;
+        for m in [
+            Interpolation::LogLinearDf,
+            Interpolation::MonotoneConvex,
+            Interpolation::MonotonicLogCubic,
+            Interpolation::TensionSpline(2.0),
+        ] {
+            let jac = jacobian(&sofr, as_of, &qs(9, 0.0), m, 1.0)
+                .unwrap()
+                .jacobian;
+            let mut upper = 0.0_f64;
+            for j in 0..5 {
+                let up = jacobian(&sofr, as_of, &qs(j, h), m, 1.0)
+                    .unwrap()
+                    .zero_rates;
+                let dn = jacobian(&sofr, as_of, &qs(j, -h), m, 1.0)
+                    .unwrap()
+                    .zero_rates;
+                for i in 0..5 {
+                    let want = (up[i] - dn[i]) / (2.0 * h);
+                    assert!(
+                        (jac[i][j] - want).abs() < 1e-9,
+                        "{m:?} [{i}][{j}] {} vs {want}",
+                        jac[i][j]
+                    );
+                    if j > i {
+                        upper = upper.max(want.abs());
+                    }
+                }
+            }
+            if m == Interpolation::LogLinearDf {
+                assert_eq!(upper, 0.0);
+            } else {
+                assert!(
+                    upper > 1e-6,
+                    "{m:?}: expected non-zero upper entries, max {upper}"
+                );
+            }
+        }
     }
 }

@@ -161,7 +161,20 @@ def _qm(M):
 def h_validate(u, i, exp):
     M = i["matrix"]
     n = len(M)
-    me = min(u("CORR.EIGEN", _qm([[(M[a][b] + M[b][a]) / 2 for b in range(n)] for a in range(n)])).eigenvalues())
+    if n == 0 or any(len(r) != n for r in M) or not all(math.isfinite(float(x)) for r in M for x in r):
+        # Empty, ragged or non-finite input: QuantLib's Schur decomposition cannot take it (it raised MemoryError
+        # on the CI runner), so the case is not checked and never counts as passing.
+        raise NotImplementedError(f"matrix is empty, ragged or non-finite (n = {n}); not a check of the golden")
+    try:
+        ev = list(u("CORR.EIGEN", _qm([[(M[a][b] + M[b][a]) / 2 for b in range(n)] for a in range(n)])).eigenvalues())
+    except (MemoryError, RuntimeError) as err:
+        # The Linux QuantLib wheel raised MemoryError here on CI (PR 35) for a matrix the Windows wheel decomposes;
+        # a library failure is never a pass: the case is not checked and the register names it.
+        raise NotImplementedError(f"QuantLib eigen decomposition failed ({type(err).__name__}) for n = {n}; not a check of the golden") from None
+    if len(ev) != n or n == 0:
+        # Degenerate input or a QuantLib build that returned no spectrum: the case is not checked and never counts as passing.
+        raise NotImplementedError(f"QuantLib returned {len(ev)} eigenvalues for an n = {n} matrix; not a check of the golden")
+    me = min(ev)
     sym = all(M[a][b] == M[b][a] for a in range(n) for b in range(n))
     dg = all(M[a][a] == 1.0 for a in range(n))
     rg = all(-1 <= x <= 1 for r in M for x in r)

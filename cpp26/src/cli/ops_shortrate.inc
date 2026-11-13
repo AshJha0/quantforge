@@ -406,10 +406,11 @@ void op_xva_portfolio_hw(const In& in, Out& out) {
     out.key_reals("discounted_ee", e.discounted_ee);
     out.key_reals("discounted_ene", e.discounted_ene);
     for (std::size_t i = 0; i < qs.size(); ++i) {
+        // R6-5.1, R6-5.6: quantiles of the numeraire-deflated exposure, so named deflated_pfe_<100 q>.
         const double pct = qs[i] * 100;
         char name[32];
-        if (std::fabs(pct - std::round(pct)) < 1e-9) std::snprintf(name, sizeof name, "pfe_%d", static_cast<int>(std::lround(pct)));
-        else std::snprintf(name, sizeof name, "pfe_%g", pct);
+        if (std::fabs(pct - std::round(pct)) < 1e-9) std::snprintf(name, sizeof name, "deflated_pfe_%d", static_cast<int>(std::lround(pct)));
+        else std::snprintf(name, sizeof name, "deflated_pfe_%g", pct);
         out.key_reals(name, e.pfe[i]);
     }
     out.key_real("epe", e.epe);

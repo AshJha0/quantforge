@@ -16,6 +16,11 @@
         Also gates line coverage over the whole library of that language against
         conformance/quality/floors.json (plan 12.2 G6, the per-language fail_under).
 
+    python tools/quality_gate.py --coverage REPORT --lang LANG --per-file
+        R6-26 (owner 2026-11-12): every library source file of that language, in every stage, at least
+        PER_FILE_MIN (90%) line coverage, except files in conformance/quality/coverage_allow.json (each with a
+        reason). Before R6 the per-module gate read stage_e.json only, so stages A to D and F to I were ungated.
+
     python tools/quality_gate.py --check-dsr --trials N [--ledger research/trials.csv] [--expect-family 24]
         Research gate (plan 13.1 R6). A deflated Sharpe ratio for an R3 study must be computed with at
         least the family trial count, which is the number of rows in the trial ledger. Exit 1 if N is
@@ -196,6 +201,28 @@ LIBRARY = {"python": ("quantforge_*/*.py", "python/quantforge_*/*.py"), "java": 
            "rust": ("rust/crates/*/src/*",), "cpp": ("cpp26/src/*", "cpp26/include/*")}
 
 
+PER_FILE_MIN = 0.90
+ALLOW = ROOT / "conformance" / "quality" / "coverage_allow.json"
+
+
+def per_file_gate(lang, rows, allow, minimum=PER_FILE_MIN):
+    """R6-26: (report lines, failures) for every library file of one language below `minimum`."""
+    allowed = {norm(e["path"]): e["reason"] for e in allow.get(lang, []) if e.get("reason", "").strip()}
+    out, fails = [], []
+    for f, c, t in sorted(rows):
+        if not t or not any(matches(f, g) for g in LIBRARY[lang]):
+            continue
+        path = norm(f) if lang != "python" or norm(f).startswith("python/") else "python/" + norm(f)
+        if c / t >= minimum:
+            continue
+        if path in allowed:
+            out.append(f"allowed {path}: {c}/{t} lines, {c / t:.1%} ({allowed[path]})")
+        else:
+            fails.append(path)
+            out.append(f"BELOW {path}: {c}/{t} lines, {c / t:.1%} (minimum {minimum:.0%})")
+    return out, fails
+
+
 def floor_gate(lang, rows, floor):
     """Line coverage over every library file of one language against its floor. Returns (line, ok)."""
     sel = [(f, c, t) for f, c, t in rows if any(matches(f, g) for g in LIBRARY[lang])]
@@ -237,6 +264,8 @@ def main(argv=None):
     ap.add_argument("--ledger", default=str(LEDGER))
     ap.add_argument("--expect-family", type=int)
     ap.add_argument("--floor", action="store_true", help="also gate whole-language coverage on floors.json")
+    ap.add_argument("--per-file", action="store_true", help="also gate every library file at 90%% (R6-26)")
+    ap.add_argument("--allow", default=str(ALLOW))
     ap.add_argument("--check-register", action="store_true")
     ap.add_argument("--check-specs", action="store_true")
     ap.add_argument("--check-docs", action="store_true", help="curve status table and release wording (tools/check_docs_status.py)")
@@ -280,11 +309,18 @@ def main(argv=None):
     if a.floor:
         line, floor_ok = floor_gate(a.lang, rows, json.loads(FLOORS.read_text(encoding="utf-8"))[a.lang])
         print(line)
+    pf_fails = []
+    if a.per_file:
+        allow = json.loads(Path(a.allow).read_text(encoding="utf-8")) if Path(a.allow).is_file() else {}
+        pf_out, pf_fails = per_file_gate(a.lang, rows, allow)
+        for line in pf_out:
+            print(line)
+        print(f"{a.lang}: per-file gate at {PER_FILE_MIN:.0%}: {len(pf_fails)} file(s) below")
     out, fails = gate(cfg, a.lang, rows)
     for line in out:
         print(line)
     print(f"{a.lang}: {len(out)} modules gated at {cfg['coverage_min']:.0%}; {len(fails)} below" if out else f"{a.lang}: no filled modules yet, nothing gated")
-    return 1 if fails or not floor_ok else 0
+    return 1 if fails or pf_fails or not floor_ok else 0
 
 
 if __name__ == "__main__":

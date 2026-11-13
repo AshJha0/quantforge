@@ -58,7 +58,7 @@ def test_unknown_command_exits_64_with_empty_stdout() -> None:
 
 def test_version_and_operations() -> None:
     version = json.loads(call("version").stdout)
-    assert version["contract_version"] == "1.11.0"  # ruling I-51
+    assert version["contract_version"] == "1.12.0"  # ruling R6-0.1
     assert version["language"] == "python"
     names = json.loads(call("operations").stdout)
     assert names == sorted(OPERATIONS)

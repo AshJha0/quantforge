@@ -13,7 +13,7 @@ fn class(name: &str) -> Option<Option<(f64, f64)>> {
     Some(match name {
         "date_and_convention" | "bit_exact" => None,
         "simple_analytic" => Some((1e-12, 1e-10)),
-        "interpolation" | "aad_sensitivity" => Some((1e-10, 1e-8)),
+        "interpolation" | "aad_sensitivity" | "per_unit" => Some((1e-10, 1e-8)),
         "root_finding" => Some((1e-10, 1e-10)),
         "quadrature" | "statistics" => Some((1e-11, 1e-10)),
         "numerical_scheme" => Some((1e-8, 1e-8)),
@@ -244,6 +244,11 @@ fn judge(case: &Json, res: &Json, peers: &std::collections::HashMap<String, Json
 }
 
 fn replay(stage: &str) {
+    replay_only(stage, &[], 40);
+}
+
+/// Replays the files of `stage` whose names start with one of `prefixes` (all files if empty).
+fn replay_only(stage: &str, prefixes: &[&str], min_cases: usize) {
     let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../../datasets/golden")
         .join(stage);
@@ -251,6 +256,10 @@ fn replay(stage: &str) {
         .unwrap()
         .map(|e| e.unwrap().path())
         .filter(|p| p.extension().is_some_and(|x| x == "json"))
+        .filter(|p| {
+            let name = p.file_name().and_then(|n| n.to_str()).unwrap_or("");
+            prefixes.is_empty() || prefixes.iter().any(|x| name.starts_with(x))
+        })
         .collect();
     files.sort();
     let (mut seen, mut failures) = (0, Vec::new());
@@ -272,7 +281,7 @@ fn replay(stage: &str) {
             }
         }
     }
-    assert!(seen >= 40, "{stage}: only {seen} cases found");
+    assert!(seen >= min_cases, "{stage}: only {seen} cases found");
     assert!(failures.is_empty(), "{stage}: {failures:#?}");
 }
 
@@ -329,6 +338,13 @@ fn stage_g_e1_goldens() {
 #[test]
 fn stage_i_goldens() {
     replay("stage_i");
+}
+
+/// The R6 hedge goldens (audit, Jacobi scaling, use case 6, and the e1 error and edge cases), which put the hedge
+/// adapters under `cargo test`. The other R6 files (n = 200 QP, barrier MC) are too slow for a debug build and run in the external runner.
+#[test]
+fn r6_hedge_goldens() {
+    replay_only("r6", &["e1", "hedgeaudit", "hedgescale", "uc6"], 60);
 }
 
 /// The stage I tutorial inputs under `examples/` (handover follow-up to waves 1 to 4d): each

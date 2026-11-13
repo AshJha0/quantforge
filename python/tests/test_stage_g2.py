@@ -3,6 +3,7 @@
 with the G-9 cost ratio, xVA limits, F3/F4/FRTB identities). Goldens run in test_conformance.py."""
 import itertools
 import math
+import os
 import statistics
 import time
 from typing import Any
@@ -130,6 +131,11 @@ def test_ladder_cost_ratio_report() -> None:
 
     ratio = median(ladder) / median(one_price)
     print(f"G-9 ladder cost ratio: {ratio:.2f}")
+    # R6-16: record the measured ratio; CI sets QF_G9_OUT and keeps the file as evidence.
+    out = os.environ.get("QF_G9_OUT")
+    if out:
+        with open(out, "a", encoding="utf-8") as f:
+            f.write(f"python G-9 ladder/price ratio {ratio:.4f} (bound 5)\n")
     assert ratio <= 5
 
 
@@ -239,7 +245,7 @@ def test_portfolio_single_swap_reproduces_wave_4a_and_pfe_order() -> None:
     for x, y in zip(ee, ref, strict=True):
         assert x == pytest.approx(y, rel=1e-10)
     assert out["cva"] == pytest.approx(wave4a["cva"], rel=1e-10)
-    p95, p99 = out["pfe_95"], out["pfe_99"]
+    p95, p99 = out["deflated_pfe_95"], out["deflated_pfe_99"]
     assert isinstance(p95, list) and isinstance(p99, list)
     assert all(b >= a >= 0 for a, b in zip(p95, p99, strict=True))
 
@@ -251,4 +257,4 @@ def test_portfolio_offsetting_swaps_have_no_exposure() -> None:
     out = portfolio_exposure.portfolio_hw(
         TIMES, DFS, 0.05, 0.01, [(1e6, 0.03, "PAY", 0.0, pay), (1e6, 0.03, "RECEIVE", 0.0, pay)],
         [1.0, 2.0], [0.95], 0.02, 0.4)
-    assert out["discounted_ee"] == [0.0, 0.0] and out["pfe_95"] == [0.0, 0.0]
+    assert out["discounted_ee"] == [0.0, 0.0] and out["deflated_pfe_95"] == [0.0, 0.0]

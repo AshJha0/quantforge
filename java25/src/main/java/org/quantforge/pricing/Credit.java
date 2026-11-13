@@ -97,6 +97,20 @@ public final class Credit {
          * @param shift one hazard shift per section
          * @return the shifted curve
          */
+        /** The flat hazard of each section, from the log survival at its end. */
+        public double[] hazards() {
+            double[] h = new double[lnQ.length];
+            double prev = 0.0;
+            double tPrev = 0.0;
+            for (int k = 0; k < h.length; k++) {
+                double tk = t(dates[k]);
+                h[k] = -(lnQ[k] - prev) / (tk - tPrev);
+                prev = lnQ[k];
+                tPrev = tk;
+            }
+            return h;
+        }
+
         public Hazard shifted(double[] shift) {
             double[] l = new double[lnQ.length];
             double acc = 0.0;
@@ -173,9 +187,7 @@ public final class Credit {
         for (int i = 1; i < raw.size(); i++) {
             boolean last = i == raw.size() - 1;
             LocalDate s = nextWeekday(raw.get(i - 1));
-            if (s.equals(t)) {
-                throw new QfError("E_INPUT", "trade date is on a coupon date (ruling D19)", "trade_date");
-            }
+            // A trade date on an adjusted coupon date is priced: the first period starts at T (ruling R6-7.3).
             LocalDate e = last ? raw.get(i) : nextWeekday(raw.get(i));
             long days = ChronoUnit.DAYS.between(s, e) + (last ? 1 : 0);
             out.add(new Period(s, e, nextWeekday(raw.get(i)), days / 360.0));

@@ -3,6 +3,7 @@
 import hashlib
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -193,6 +194,37 @@ class Recorder(unittest.TestCase):
             r = subprocess.run([sys.executable, str(gap), "recheck", "--log", str(bad)], capture_output=True, text=True)
             self.assertEqual(r.returncode, 1)
 
+    def test_observations_before_the_forward_start_are_not_logged(self):
+        """R6-19: with a study starting 2026-11-06, the 2026-11-04 and -05 bill values and every CPI month before
+        2026-11 stay out of the log."""
+        fx = ROOT / "tools/recorder/fixtures"
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            cfg = [self.source((fx / "treasury-bill-rates.csv").as_uri(), id="bill", parse={"format": "treasury_csv", "fields": ["13 WEEKS COUPON EQUIVALENT"]}),
+                   self.source((fx / "bls-cpi-v1.json").as_uri(), id="cpi", parse={"format": "bls_v1"})]
+            (d / "s.json").write_text(json.dumps({"sources": cfg}))
+            (d / "st.json").write_text(json.dumps({"studies": [{"id": "S1", "inputs": ["bill"], "status": "x", "start": "2026-11-06"}]}))
+            log = d / "log.jsonl"
+            p = subprocess.run([sys.executable, str(RECORD), "--sources", str(d / "s.json"), "--studies", str(d / "st.json"),
+                                "--data", str(d / "data"), "--log", str(log)], capture_output=True, text=True)
+            self.assertEqual(p.returncode, 0, p.stderr)
+            obs = {r["series_id"]: r["value"]["payload"]["observations"] for r in (e["record"] for e in fl.read(log)) if r["series_id"].startswith("recorder/")}
+            self.assertEqual(sorted(obs["recorder/bill"]), ["2026-11-06|13 WEEKS COUPON EQUIVALENT"])
+            self.assertEqual(obs["recorder/cpi"], {})
+
+    def test_nyfed_rates_are_parsed_and_rebuilt_from_the_log(self):
+        """R6-21: SOFR observations are kept in the log, so R3-02's input for a past day comes from the log alone."""
+        fx = ROOT / "tools/recorder/fixtures/nyfed-sofr.json"
+        with tempfile.TemporaryDirectory() as d:
+            p, log = self.run_with(d, [self.source(fx.as_uri(), id="sofr", parse={"format": "nyfed_json", "fields": ["percentRate"]})])
+            self.assertEqual(p.returncode, 0, p.stderr)
+            spec = importlib.util.spec_from_file_location("record", RECORD)
+            rec = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(rec)
+            state = rec.replay(log, "sofr")
+            want = {f"{r['effectiveDate']}|percentRate": float(r["percentRate"]) for r in json.loads(fx.read_text())["refRates"]}
+            self.assertEqual(state, want)
+
     def test_bad_feed_is_a_failure_row(self):
         with tempfile.TemporaryDirectory() as d:
             src = Path(d) / "x.csv"
@@ -288,6 +320,20 @@ class GapMonitor(unittest.TestCase):
             self.assertNotIn("2026-11-11", r.stdout.split("Missing")[1].split("Recent")[0])
             r = self.run_gap("gaps", "--log", str(log), "--holidays", str(hol), "--until", "2026-11-12", "--recent", "1")
             self.assertEqual(r.returncode, 0)
+
+    def test_known_gap_fails_once_then_is_only_listed(self):
+        """R6-21, planted fault: a new gap fails the run; the next run, which finds it in the previous --out .json,
+        lists it and passes; a further new gap fails again."""
+        with tempfile.TemporaryDirectory() as d:
+            log, out = Path(d) / "a.jsonl", Path(d) / "gaps.md"
+            self.write(log, ["2026-11-09", "2026-11-11", "2026-11-12"])  # Tue 10 missing
+            args = ("gaps", "--log", str(log), "--until", "2026-11-12", "--recent", "3", "--out", str(out))
+            self.assertEqual(self.run_gap(*args).returncode, 1)
+            r = self.run_gap(*args)
+            self.assertEqual(r.returncode, 0, r.stdout)
+            self.assertIn("2026-11-10", r.stdout)
+            r = self.run_gap("gaps", "--log", str(log), "--until", "2026-11-13", "--recent", "3", "--out", str(out))
+            self.assertEqual(r.returncode, 1)  # Fri 13 is new
 
     def test_prereg_inputs_and_study_rows_fail_on_any_missing_day(self):
         with tempfile.TemporaryDirectory() as d:
@@ -787,6 +833,28 @@ class ForwardLogAnchor(unittest.TestCase):
             fl.append(p, "a", "2026-02-01T00:00:00Z", 9.0)
             self.assertEqual(anchor.check_anchors(p, Path(d) / "an"), 1)
 
+    def test_prereg_edit_to_body_and_header_together_is_caught(self):
+        """R6-22, planted fault: rewrite a copied prereg's body and recompute its header hash, so the header check in
+        research/test_preregs.py would pass; the anchor still catches it. A new prereg file is allowed."""
+        import shutil
+        with tempfile.TemporaryDirectory() as d:
+            pre = Path(d) / "preregs"
+            shutil.copytree(ROOT / "research/preregs", pre)
+            p = self._log(d, 2)
+            anchor.make(p, Path(d) / "an", "t1", preregs_dir=pre)
+            self.assertGreaterEqual(anchor.check_preregs(Path(d) / "an", pre), 10)
+            (pre / "R3-04-new.md").write_text("new prereg\n", encoding="utf-8")
+            anchor.check_preregs(Path(d) / "an", pre)
+            f = pre / "R3-01-treasury-fly.md"
+            b = f.read_bytes()
+            mark = b"<!-- body -->\n"
+            head, body = b.split(mark, 1)
+            new_body = body.replace(b"2013-01-02", b"2014-01-02")
+            old_h, new_h = hashlib.sha256(body).hexdigest().encode(), hashlib.sha256(new_body).hexdigest().encode()
+            f.write_bytes(head.replace(old_h, new_h) + mark + new_body)
+            with self.assertRaises(ValueError):
+                anchor.check_preregs(Path(d) / "an", pre)
+
     def test_full_rewrite_with_recomputed_hashes_is_caught(self):
         with tempfile.TemporaryDirectory() as d:
             p = self._log(d, 5)
@@ -951,7 +1019,8 @@ class DoctorAndQuickstart(unittest.TestCase):
         for page in check_tutorial.PAGES:
             text = page.read_text(encoding="utf-8")
             runs, expected = check_tutorial.blocks(text)
-            self.assertEqual(set(runs), {"python", "rust", "java", "cpp"}, page.name)
+            only = re.search(r"<!-- tutorial:only (\w+) -->", text)
+            self.assertEqual(set(runs), {only.group(1)} if only else {"python", "rust", "java", "cpp"}, page.name)
             self.assertGreaterEqual(len(expected), 4, page.name)
             self.assertEqual(check_tutorial.sources(text), [], page.name)  # listings equal their scripts
         first = check_tutorial.PAGES[0]

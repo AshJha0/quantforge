@@ -112,6 +112,13 @@ public final class CmdtyMbs {
         if (p.psa() ? !(p.rate() >= 0.0) : !(p.rate() >= 0.0 && p.rate() < 1.0)) {
             throw new QfError("E_DOMAIN", "prepayment rate or speed out of range", "pool");
         }
+        if (p.psa()) { // ruling R6-7.1: a PSA speed that reaches CPR 1 in any month is outside the model
+            for (long k = 1; k <= p.wam(); k++) {
+                if (Math.min((p.age() + k) / 30.0, 1.0) * 0.06 * p.rate() / 100.0 >= 1.0) {
+                    throw new QfError("E_DOMAIN", "PSA speed gives a monthly CPR of 1 or more", "pool");
+                }
+            }
+        }
         int n = (int) p.wam();
         double r = p.wac() / 12.0;
         double[] b = new double[n];

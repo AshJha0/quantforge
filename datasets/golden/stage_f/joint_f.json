@@ -2196,7 +2196,10 @@
       ]
      ]
     }
-   ]
+   ],
+   "tolerance_limit": {
+    "per_unit_ruling": "R6-10.3"
+   }
   },
   {
    "case_id": "joint_f-0002",
@@ -3564,8 +3567,8 @@
    ],
    "description": "SOFR + term, monotonic log cubic; max residual 5.7e-16",
    "output_classes": {
-    "jacobian": "jacobian",
-    "turn_sensitivity": "jacobian"
+    "jacobian": "jacobian_piecewise",
+    "turn_sensitivity": "jacobian_piecewise"
    },
    "extra_checks": [
     {
@@ -3766,7 +3769,10 @@
       ]
      ]
     }
-   ]
+   ],
+   "tolerance_limit": {
+    "per_unit_ruling": "R6-10.4"
+   }
   },
   {
    "case_id": "joint_f-0005",

@@ -332,7 +332,7 @@ def main():
         for c in json.loads(p.read_text(encoding="utf-8"))["cases"]:
             check(c)
             n += 1
-    note(f"invariants: {n} golden cases checked, none breaks a stated invariant")
+    note(f"invariants: {n} golden cases checked (value-checked and error cases alike), none breaks a stated invariant")
     counts, m = {}, 0
     for p in sorted((GOLDEN.parent / "stage_b").glob("*.json")):
         for c in json.loads(p.read_text(encoding="utf-8"))["cases"]:

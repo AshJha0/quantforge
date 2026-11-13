@@ -153,6 +153,16 @@ SIMM IR delta margin 452205.34 (CR 1.0)
 - **Concentration.** The net sensitivity is 1,000 − 500 + 2,500 + 4,000 − 1,200 + 300 = 6,100, far below the threshold of 1e9, so the concentration factor CR is 1.0.
 - **Margin** 452,205.34. Bounds as a check: the weighted sensitivities are 109,000, −52,500, 225,000, 284,000, −79,200 and 19,800. With all correlations 1 and all signs alike the margin would be their absolute sum, 769,500; with no correlation it would be the root of the sum of squares, about 390,600. Positive correlations among mostly same-signed positions put it in between.
 
+**Grid convergence (R6-27).** Plain idea: the ladder is the derivative of the discrete scheme at the case's grid, not of the converged model, and on a coarse grid the two differ far more for the curve entries than for the price. Formal statement: each entry is the change in price per absolute change of one input discount factor, taken on the case grid (`specifications/06-risk/aad-core.md`, G-9). Worked example, recomputed by central differences with a 1e-6 bump from the oracle's scheme (`program/R6_HANDOVER.md`, "aadladder_g gradient disagreement"):
+
+| Grid (points / steps a year) | Ladder entries |
+|---|---|
+| 101 / 50 (default, golden `aadladder_g`) | 127, 191,964, 173,816, 147,510, -233,482, -343,473 |
+| 401 / 200 | 127, 220,895, 163,851, 132,970, -236,617, -347,516 |
+| 801 / 400 | 127, 225,712, 158,174, 131,838, -234,410, -347,771 |
+
+At the default grid the discount-factor entries are 15% to 18% from the converged values while the price is 0.24% away. Golden `aadladder_r6` (`aadladder_g-0002`'s inputs at 501 / 250) is within 0.99% of 801 / 400 on every entry. Convergence is not monotone: no single grid meets 2% for all three cases (`oracle/R6_LADDER_GRIDS.json`, `oracle/R6_LADDER_GRIDS_EXTRA.json`). **The ladder is not for hedging at the default grid.** The real fix is stage K item K-8.
+
 ## The formal statement, checked against the specs
 
 **AAD ladder** (`specifications/06-risk/aad-core.md`, rulings G-9, G-35). `V(theta)` is the reference lattice-scheme price of `rates.shortrate.bermudan_swaption` (ruling G-18); the ladder is `dV/dtheta` over the discount factors `P_1..P_m`, `a` and `sigma`, the derivative of the *discrete scheme* (including the tridiagonal solve and the exercise `max` on its active branch), not of the continuous model. Times are year fractions, given directly; the curve is given as pillar times and discount factors. The golden is a Richardson-extrapolated central difference with relative bumps 1e-4 and 5e-5, cross-checked with a second pair; tolerance `1e-10 + 1e-8 |ref|` per unit notional. The idea of AAD for Greeks is from Giles and Glasserman, "Smoking adjoints", *Risk*, January 2006, and Griewank and Walther, *Evaluating Derivatives*, 2nd ed., chapter 3; the spec marks both "not opened".

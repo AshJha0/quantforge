@@ -122,8 +122,8 @@ def golden(inp):
     ee = [r[0] for r in rows]
     epe = sum(e * (ts[i + 1] - ts[i]) for i, e in enumerate(ee)) / ts[-1]
     cva = sum((1 - REC) * e * (math.exp(-HAZ * ts[i]) - math.exp(-HAZ * ts[i + 1])) for i, e in enumerate(ee))
-    return {"discounted_ee": ee, "discounted_ene": [r[1] for r in rows], "pfe_95": [r[2][0] for r in rows],
-            "pfe_99": [r[2][1] for r in rows], "epe": epe, "cva": cva}
+    return {"discounted_ee": ee, "discounted_ene": [r[1] for r in rows], "deflated_pfe_95": [r[2][0] for r in rows],
+            "deflated_pfe_99": [r[2][1] for r in rows], "epe": epe, "cva": cva}
 
 
 def main():

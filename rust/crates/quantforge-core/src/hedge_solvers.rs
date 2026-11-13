@@ -11,6 +11,28 @@ use crate::stats::{normal_cdf, normal_pdf};
 /// The one relative threshold of ruling I-3.
 const THRESHOLD: f64 = 1e-12;
 
+/// Ruling R6-6.1: integer search effort bound (lattice points or branch-and-bound nodes).
+const INTEGER_NODE_CAP: usize = 1_000_000;
+
+thread_local! {
+    /// Ruling R6-6.1: the active-set and sign-state iteration cap of the current solve,
+    /// `10 n + 100` for `n` instruments; set by `qp_solve`. Tests may plant a smaller one.
+    static ITERATION_CAP: std::cell::Cell<usize> = const { std::cell::Cell::new(usize::MAX) };
+    static PLANTED_CAP: std::cell::Cell<Option<usize>> = const { std::cell::Cell::new(None) };
+}
+
+/// `10 (n + p) + 100`, `n` instruments and `p` constraints (R6-6.1 as amended in wave 3B).
+fn set_cap(n: usize, p: usize) {
+    let cap = PLANTED_CAP
+        .with(std::cell::Cell::get)
+        .unwrap_or(10 * (n + p) + 100);
+    ITERATION_CAP.with(|c| c.set(cap));
+}
+
+fn iteration_cap() -> usize {
+    ITERATION_CAP.with(std::cell::Cell::get)
+}
+
 /// Relative regularisation of the split problem that finds the sign state of the wave 4a
 /// problem. Only the sign state is taken from it; the answer is re-solved exactly.
 const SPLIT_DELTA: f64 = 1e-6;
@@ -221,14 +243,12 @@ struct Constraint {
 
 /// For the active set `N` (columns `normals`): `B = G^{-1} N` and `M^{-1}`, `M = N^T B`.
 fn active_factors(
-    ginv: &Matrix,
+    gn: &[Vec<f64>],
     cons: &[Constraint],
     active: &[usize],
 ) -> Result<(Matrix, Matrix)> {
-    let b: Matrix = active
-        .iter()
-        .map(|&j| mat_vec(ginv, &cons[j].normal))
-        .collect();
+    // `gn[j] = G^{-1} n_j`, computed once per solve.
+    let b: Matrix = active.iter().map(|&j| gn[j].clone()).collect();
     let q = active.len();
     let m: Matrix = (0..q)
         .map(|i| {
@@ -246,13 +266,48 @@ fn active_factors(
 }
 
 fn general_inverse(m: &Matrix) -> Result<Matrix> {
+    // One elimination with every unit column as right-hand side: the same arithmetic per column
+    // as `linalg::solve`, so the same bits, at O(q^3) instead of O(q^4) (R6-6.3 timing).
     let q = m.len();
+    let largest = m.iter().flatten().fold(0.0f64, |a, v| a.max(v.abs()));
+    let limit = 1e-14 * largest;
+    let mut a = m.clone();
+    let mut x: Matrix = (0..q)
+        .map(|i| (0..q).map(|j| f64::from(u8::from(i == j))).collect())
+        .collect();
+    for k in 0..q {
+        let mut p = k;
+        for i in k + 1..q {
+            if a[i][k].abs() > a[p][k].abs() {
+                p = i;
+            }
+        }
+        if a[p][k].abs() <= limit {
+            return fail("E_SINGULAR", "matrix is singular to working precision");
+        }
+        a.swap(k, p);
+        x.swap(k, p);
+        let (top, rest) = a.split_at_mut(k + 1);
+        let (xtop, xrest) = x.split_at_mut(k + 1);
+        let (pivot, xp) = (&top[k], &xtop[k]);
+        for (row, xr) in rest.iter_mut().zip(xrest.iter_mut()) {
+            let factor = row[k] / pivot[k];
+            for j in k..q {
+                row[j] -= factor * pivot[j];
+            }
+            for j in 0..q {
+                xr[j] -= factor * xp[j];
+            }
+        }
+    }
     let mut inv = vec![vec![0.0; q]; q];
-    for j in 0..q {
-        let e: Vec<f64> = (0..q).map(|i| f64::from(u8::from(i == j))).collect();
-        let col = solve(m, &e)?;
-        for i in 0..q {
-            inv[i][j] = col[i];
+    for c in 0..q {
+        for i in (0..q).rev() {
+            let mut s = x[i][c];
+            for j in i + 1..q {
+                s -= a[i][j] * inv[j][c];
+            }
+            inv[i][c] = s / a[i][i];
         }
     }
     Ok(inv)
@@ -276,7 +331,8 @@ fn dual_active_set(
     let mut y: Vec<f64> = mat_vec(&ginv, lin).iter().map(|v| -v).collect();
     let mut active: Vec<usize> = Vec::new();
     let mut u: Vec<f64> = Vec::new();
-    let limit = 50 * (cons.len() + g.len() + 1);
+    let gcols: Vec<Vec<f64>> = cons.iter().map(|c| mat_vec(&ginv, &c.normal)).collect();
+    let limit = iteration_cap();
     for _ in 0..limit {
         let slack = |y: &[f64], j: usize| dot(&cons[j].normal, y) - cons[j].rhs;
         let p = (0..cons.len())
@@ -286,7 +342,7 @@ fn dual_active_set(
             .min_by(|x, z| x.1.total_cmp(&z.1))
             .map(|(j, _)| j);
         let Some(p) = p else {
-            let (b, minv) = active_factors(&ginv, cons, &active)?;
+            let (b, minv) = active_factors(&gcols, cons, &active)?;
             // KKT on the active set: lambda = M^{-1} (d + B^T lin), y = B lambda - G^{-1} lin.
             let rhs: Vec<f64> = active
                 .iter()
@@ -309,7 +365,7 @@ fn dual_active_set(
         let normal = &cons[p].normal;
         let gn = dot(normal, &mat_vec(&ginv, normal));
         loop {
-            let (b, minv) = active_factors(&ginv, cons, &active)?;
+            let (b, minv) = active_factors(&gcols, cons, &active)?;
             let bt_n: Vec<f64> = b.iter().map(|bi| dot(bi, normal)).collect();
             let r = mat_vec(&minv, &bt_n);
             let mut z = mat_vec(&ginv, normal);
@@ -441,6 +497,64 @@ fn reduced(h: &Matrix, c: &[f64], xp: &[f64], z_rows: &Matrix) -> (Matrix, Vec<f
         .map(|j| (0..n).map(|l| z_rows[l][j] * hxp[l]).sum())
         .collect();
     (g, lin)
+}
+
+/// Ruling R6-6.2: the Jacobi scaling `D_jj = 1/sqrt(H_jj)` (1 where `H_jj <= 0`).
+fn jacobi(h: &Matrix) -> Vec<f64> {
+    h.iter()
+        .enumerate()
+        .map(|(j, row)| {
+            if row[j] > 0.0 {
+                1.0 / row[j].sqrt()
+            } else {
+                1.0
+            }
+        })
+        .collect()
+}
+
+/// Ruling R6-6.2: `D M D`.
+fn scaled(m: &Matrix, d: &[f64]) -> Matrix {
+    m.iter()
+        .enumerate()
+        .map(|(i, row)| {
+            row.iter()
+                .enumerate()
+                .map(|(j, v)| d[i] * v * d[j])
+                .collect()
+        })
+        .collect()
+}
+
+/// Ruling R6-6.2: equality rows `E D`, each at unit norm.
+fn scaled_rows(e: &[Vec<f64>], d: &[f64]) -> Vec<Vec<f64>> {
+    e.iter()
+        .map(|r| {
+            let v: Vec<f64> = r.iter().zip(d).map(|(a, b)| a * b).collect();
+            let norm = v.iter().map(|x| x * x).sum::<f64>().sqrt();
+            if norm > 0.0 {
+                v.iter().map(|x| x / norm).collect()
+            } else {
+                v
+            }
+        })
+        .collect()
+}
+
+/// Ruling R6-6.2: rank of `Z^T (D H D) Z`, `Z` spanning the null space of the scaled
+/// equalities, against `1e-12` times the largest eigenvalue of `D H D`.
+fn scaled_reduced_rank(h: &Matrix, e: &[Vec<f64>]) -> Result<usize> {
+    let n = h.len();
+    let d = jacobi(h);
+    let hs = scaled(h, &d);
+    let es = scaled_rows(e, &d);
+    let (_, z) = null_space(&es, &vec![0.0; es.len()], n);
+    let (g, _) = reduced(&hs, &vec![0.0; n], &vec![0.0; n], &z);
+    if g.is_empty() {
+        return Ok(0);
+    }
+    let limit = THRESHOLD * spectral_scale(&eigen_symmetric(&hs)?);
+    Ok(eigen_symmetric(&g)?.iter().filter(|v| **v > limit).count())
 }
 
 /// Minimises `y^T G y + 2 lin^T y` over `x = xp + Z y` subject to `ineqs` (in `x`). Returns
@@ -598,7 +712,9 @@ fn nonsmooth_minimiser(
     let x0: Vec<f64> = (0..n).map(|j| split[j] - split[n + j]).collect();
     let sign: Vec<f64> = (0..n)
         .map(|j| {
-            if split[j] == 0.0 && split[n + j] == 0.0 {
+            // R6-6.1: at the kink when |x_j| <= 1e-11 max(1, max_k |x_k|).
+            let big = x0.iter().fold(1.0_f64, |m, v| m.max(v.abs()));
+            if (split[j] == 0.0 && split[n + j] == 0.0) || x0[j].abs() <= 1e-11 * big {
                 0.0
             } else if x0[j] >= 0.0 {
                 1.0
@@ -615,7 +731,8 @@ fn nonsmooth_minimiser(
     // released towards its descent direction; one pinned at 0 by its sign row is fixed at 0.
     // Each change lowers the objective, and the loop ends at a point that meets the KKT
     // conditions of the non-smooth problem, exactly where the split answer is only near.
-    for _ in 0..2 * n + 4 {
+    let mut converged = false;
+    for _ in 0..iteration_cap() {
         let c3: Vec<f64> = (0..n).map(|j| c[j] + sign[j] * spread[j] / 2.0).collect();
         let mut rows = bound_rows(lower, upper);
         let mut plus = vec![0; n];
@@ -660,8 +777,15 @@ fn nonsmooth_minimiser(
         }
         last = x;
         if !changed {
+            converged = true;
             break;
         }
+    }
+    if !converged {
+        return fail(
+            "E_NO_CONVERGENCE",
+            "sign-state iteration limit reached (R6-6.1)",
+        );
     }
     Ok(Some(last))
 }
@@ -722,8 +846,113 @@ fn check_costs(c: &Costs, n: usize, min_norm: bool) -> Result<()> {
 /// (equality rank, reduced Hessian under `ERROR`), `E_INFEASIBLE`.
 pub fn qp_solve(p: &QpProblem) -> Result<QpSolution> {
     check_finite(p)?;
+    // R6-6.2: solve in Jacobi-scaled variables x = D y (D_jj = 1/sqrt(H_jj)), which leaves the
+    // solution unchanged and keeps mixed-unit problems away from false E_SINGULAR. A scalar
+    // ridge is not invariant under column scaling, so a ridged problem is solved as given.
+    if let Some(d) = jacobi_for(p) {
+        let a: Matrix =
+            p.a.iter()
+                .map(|r| r.iter().zip(&d).map(|(v, s)| v * s).collect())
+                .collect();
+        let e: Option<Matrix> = p.eq_matrix.map(|e| {
+            e.iter()
+                .map(|r| r.iter().zip(&d).map(|(v, s)| v * s).collect())
+                .collect()
+        });
+        let sb = |b: Option<&[Option<f64>]>| -> Option<Vec<Option<f64>>> {
+            b.map(|b| b.iter().zip(&d).map(|(v, s)| v.map(|v| v / s)).collect())
+        };
+        let (lo, hi) = (sb(p.lower), sb(p.upper));
+        let mul = |v: Option<&[f64]>, pow: i32| -> Option<Vec<f64>> {
+            v.map(|v| v.iter().zip(&d).map(|(x, s)| x * s.powi(pow)).collect())
+        };
+        let hs = mul(p.costs.half_spreads, 1);
+        let im = mul(p.costs.impact, 2);
+        let mr = mul(p.costs.margin_rates, 1);
+        let q = QpProblem {
+            a: &a,
+            eq_matrix: e.as_ref(),
+            lower: lo.as_deref(),
+            upper: hi.as_deref(),
+            costs: Costs {
+                half_spreads: hs.as_deref(),
+                impact: im.as_deref(),
+                margin_rates: mr.as_deref(),
+                ..p.costs
+            },
+            ..p.clone()
+        };
+        let mut r = qp_solve_unscaled(&q)?;
+        for (x, s) in r.x.iter_mut().zip(&d) {
+            *x *= s;
+        }
+        // Undoing the scaling can put a position at an active bound one ulp outside it; the
+        // scaled answer met the scaled bound, so clamp to the caller's bound exactly.
+        for (j, x) in r.x.iter_mut().enumerate() {
+            if let Some(l) = p.lower.and_then(|b| b[j]) {
+                *x = x.max(l);
+            }
+            if let Some(u) = p.upper.and_then(|b| b[j]) {
+                *x = x.min(u);
+            }
+        }
+        // half_spreads |x| and impact x^2 are invariant; recompute in the caller's units.
+        return Ok(r);
+    }
+    qp_solve_unscaled(p)
+}
+
+/// The Jacobi scaling of `hedge.qp.solve` when every shape is valid, no ridge, and every
+/// diagonal of `H` is positive; `None` otherwise (the unscaled path then reports any error).
+fn jacobi_for(p: &QpProblem) -> Option<Vec<f64>> {
+    let n = p.a.first()?.len();
+    let ok = |v: Option<&[f64]>| v.is_none_or(|v| v.len() == n);
+    let okb = |v: Option<&[Option<f64>]>| v.is_none_or(|v| v.len() == n);
+    if p.ridge != 0.0
+        || p.singular != Singular::Error
+        || n == 0
+        || p.a.iter().any(|r| r.len() != n)
+        || p.b.len() != p.a.len()
+        || p.weights.len() != p.a.len()
+        || p.weights.iter().any(|w| *w <= 0.0)
+        || !ok(p.costs.half_spreads)
+        || !ok(p.costs.impact)
+        || !ok(p.costs.margin_rates)
+        || !okb(p.lower)
+        || !okb(p.upper)
+        || p.eq_matrix.is_some_and(|e| e.iter().any(|r| r.len() != n))
+    {
+        return None;
+    }
+    let cw = p.costs.cost_weight.unwrap_or(1.0);
+    let d: Vec<f64> = (0..n)
+        .map(|j| {
+            let h: f64 =
+                p.a.iter()
+                    .zip(p.weights)
+                    .map(|(r, w)| w * r[j] * r[j])
+                    .sum::<f64>()
+                    + p.costs.impact.map_or(0.0, |v| cw * v[j]);
+            1.0 / h.sqrt()
+        })
+        .collect();
+    d.iter().all(|v| v.is_finite() && *v > 0.0).then_some(d)
+}
+
+fn qp_solve_unscaled(p: &QpProblem) -> Result<QpSolution> {
+    check_finite(p)?;
     let (_, n) = check_system(p.a, p.b, p.weights)?;
+    let bounds = |b: Option<&[Option<f64>]>| b.map_or(0, |b| b.iter().flatten().count());
+    set_cap(
+        n,
+        p.eq_matrix.map_or(0, Vec::len)
+            + bounds(p.lower)
+            + bounds(p.upper)
+            + usize::from(p.costs.margin_limit.is_some()),
+    );
     let (e, rhs): (&[Vec<f64>], &[f64]) = match (p.eq_matrix, p.eq_rhs) {
+        // R6-11.13: an empty eq_matrix is E_INPUT; no equalities means both keys absent.
+        (Some(e), _) if e.is_empty() => return fail("E_INPUT", "eq_matrix is empty"),
         (Some(e), Some(r)) => (e, r),
         (None, None) => (&[], &[]),
         _ => return fail("E_INPUT", "eq_matrix and eq_rhs go together"),
@@ -764,7 +993,10 @@ pub fn qp_solve(p: &QpProblem) -> Result<QpSolution> {
         return fail("E_SINGULAR", "more equalities than instruments");
     }
     if k > 0 {
-        let et: Matrix = (0..n).map(|i| (0..k).map(|j| e[j][i]).collect()).collect();
+        // R6-6.2: the rank decision runs on the scaled rows `E D`.
+        let (h0, _) = normal_equations(p.a, p.b, p.weights, p.ridge);
+        let es = scaled_rows(e, &jacobi(&h0));
+        let et: Matrix = (0..n).map(|i| (0..k).map(|j| es[j][i]).collect()).collect();
         let sv = singular_values(&et);
         let largest = sv.iter().fold(0.0f64, |m, v| m.max(*v));
         if sv.iter().any(|v| *v <= THRESHOLD * largest) {
@@ -789,7 +1021,12 @@ pub fn qp_solve(p: &QpProblem) -> Result<QpSolution> {
     } else {
         eigen_pairs(&g)?
     };
-    let rank = values.iter().filter(|v| **v > limit).count();
+    // R6-6.2: the singularity decision (and the reported rank) on the Jacobi-scaled form.
+    let rank = if dim == 0 {
+        0
+    } else {
+        scaled_reduced_rank(&h, e)?
+    };
     let margin = costs.margin_rates.zip(costs.margin_limit);
     let kinks = Kinks {
         spread: half_spreads.iter().map(|s| cost_weight * s).collect(),
@@ -942,6 +1179,9 @@ struct LotSearch<'a> {
     ridge: f64,
     lot_sizes: &'a [f64],
     best: Option<(f64, Vec<i64>)>,
+    /// Branch-and-bound nodes visited, against `node_cap` (R6-6.1).
+    nodes: usize,
+    node_cap: usize,
 }
 
 impl LotSearch<'_> {
@@ -977,6 +1217,13 @@ impl LotSearch<'_> {
     /// Branch and bound on the box `[lower, upper]`, pruned by the continuous relaxation.
     #[allow(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
     fn branch(&mut self, lower: &mut [Option<f64>], upper: &mut [Option<f64>]) -> Result<()> {
+        self.nodes += 1;
+        if self.nodes > self.node_cap {
+            return fail(
+                "E_NO_CONVERGENCE",
+                "integer search node limit reached (R6-6.1)",
+            );
+        }
         let Some(y) = bounded_minimiser(&self.g, &self.lin, &self.eye, &self.zero, lower, upper)?
         else {
             return Ok(());
@@ -1033,6 +1280,8 @@ pub fn integer_solve(p: &IntegerProblem) -> Result<IntegerSolution> {
     finite("ridge", &p.ridge)?;
     finite("lot_sizes", &p.lot_sizes)?;
     let (_, n) = check_system(p.a, p.b, p.weights)?;
+    let lots = |b: Option<&[Option<i64>]>| b.map_or(0, |b| b.iter().flatten().count());
+    set_cap(n, lots(p.lower_lots) + lots(p.upper_lots));
     let none = vec![None; n];
     let lower = p.lower_lots.unwrap_or(&none);
     let upper = p.upper_lots.unwrap_or(&none);
@@ -1061,7 +1310,8 @@ pub fn integer_solve(p: &IntegerProblem) -> Result<IntegerSolution> {
         .map(|i| (0..n).map(|j| s[i] * h[i][j] * s[j]).collect())
         .collect();
     let lin: Vec<f64> = (0..n).map(|i| s[i] * c[i]).collect();
-    let eig = eigen_symmetric(&g)?;
+    // R6-6.2: the strict-convexity decision on the Jacobi-scaled form.
+    let eig = eigen_symmetric(&scaled(&g, &jacobi(&g)))?;
     if eig[0] <= THRESHOLD * spectral_scale(&eig) {
         return fail(
             "E_SINGULAR",
@@ -1084,6 +1334,10 @@ pub fn integer_solve(p: &IntegerProblem) -> Result<IntegerSolution> {
         ridge: p.ridge,
         lot_sizes: s,
         best: None,
+        nodes: 0,
+        node_cap: PLANTED_CAP
+            .with(std::cell::Cell::get)
+            .unwrap_or(INTEGER_NODE_CAP),
     };
     let Some(relaxed) =
         bounded_minimiser(&search.g, &search.lin, &search.eye, &search.zero, &lo, &hi)?
@@ -1205,8 +1459,41 @@ pub fn minvar_ratio(input: MinVarInput) -> Result<MinVar> {
         return fail("E_DOMAIN", "the exposure has no variance");
     }
     let k = s.len() - 1;
-    // Cholesky of S_hh without pivoting; a pivot at or below the threshold is singular.
-    let scale = (1..=k).fold(0.0f64, |m, i| m.max(s[i][i]));
+    // R6-11.7 / R6-6.2: decide on the correlation form D S_hh D (lower triangle): a negative
+    // pivot is E_NOT_POSITIVE_DEFINITE, a pivot in [0, 1e-12] is E_SINGULAR.
+    for i in 1..=k {
+        if s[i][i] < 0.0 {
+            return fail("E_NOT_POSITIVE_DEFINITE", "a hedge variance is negative");
+        }
+        if s[i][i] == 0.0 {
+            return fail("E_SINGULAR", "the hedge instruments are not independent");
+        }
+    }
+    let d: Vec<f64> = (1..=k).map(|i| 1.0 / s[i][i].sqrt()).collect();
+    let mut lc = vec![vec![0.0; k]; k];
+    for i in 0..k {
+        for j in 0..=i {
+            let v =
+                s[i + 1][j + 1] * d[i] * d[j] - (0..j).map(|q| lc[i][q] * lc[j][q]).sum::<f64>();
+            if i == j {
+                // R6 wave 3B: at or below -1e-12 indefinite; absolute size below 1e-12 singular.
+                if v <= -THRESHOLD {
+                    return fail(
+                        "E_NOT_POSITIVE_DEFINITE",
+                        "the hedge block is not positive definite",
+                    );
+                }
+                if v.abs() < THRESHOLD {
+                    return fail("E_SINGULAR", "the hedge instruments are not independent");
+                }
+                lc[i][i] = v.sqrt();
+            } else {
+                lc[i][j] = v / lc[j][j];
+            }
+        }
+    }
+    // Cholesky of S_hh without pivoting, for the solve.
+    let scale = 0.0;
     let mut l = vec![vec![0.0; k]; k];
     for i in 0..k {
         for j in 0..=i {
@@ -1672,4 +1959,185 @@ pub fn select_solve(p: &QpProblem, max_instruments: i64, extra_keys: bool) -> Re
         residual,
         objective,
     })
+}
+
+/// One listed hedge of use case 6: the instrument, contracts per lot and the half-spread per
+/// unit.
+#[derive(Debug, Clone, Copy)]
+pub struct LotHedge {
+    pub leg: Leg,
+    pub lot_size: f64,
+    pub half_spread: f64,
+}
+
+/// Outputs of `usecase.option_hedge_lots`; Greeks as `[delta, gamma, vega]`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct OptionHedgeLots {
+    pub before: [f64; 3],
+    pub after: [f64; 3],
+    pub lots: Vec<i64>,
+    pub hedge_cost: f64,
+    pub rounding_cost: f64,
+}
+
+/// `usecase.option_hedge_lots` (use case 6, ruling R6-11.20): book Greeks, per-lot hedge
+/// Greeks, weights `1 / max(1, |b_t|)^2`, the integer search with lot bounds `+-max_lots`.
+#[allow(clippy::cast_precision_loss)]
+pub fn option_hedge_lots(
+    market: &GreekMarket,
+    portfolio: &[(Leg, f64)],
+    hedges: &[LotHedge],
+    targets: &[Greek],
+    max_lots: i64,
+) -> Result<OptionHedgeLots> {
+    finite("spot", &market.spot)?;
+    finite("rate", &market.rate)?;
+    finite("dividend_yield", &market.dividend_yield)?;
+    finite("volatility", &market.volatility)?;
+    for (leg, q) in portfolio {
+        finite("portfolio", &[leg.strike, leg.expiry, Some(*q)])?;
+    }
+    for h in hedges {
+        finite(
+            "hedges",
+            &[
+                h.leg.strike,
+                h.leg.expiry,
+                Some(h.lot_size),
+                Some(h.half_spread),
+            ],
+        )?;
+    }
+    if hedges.is_empty() {
+        return fail("E_INPUT", "hedges is empty");
+    }
+    if targets.is_empty() || (1..targets.len()).any(|i| targets[..i].contains(&targets[i])) {
+        return fail("E_INPUT", "targets must be a non-empty set");
+    }
+    let book: Vec<(GreekInstrument, f64)> = portfolio
+        .iter()
+        .map(|(leg, q)| Ok((leg.instrument()?, *q)))
+        .collect::<Result<_>>()?;
+    let insts: Vec<GreekInstrument> = hedges
+        .iter()
+        .map(|h| h.leg.instrument())
+        .collect::<Result<_>>()?;
+    if hedges
+        .iter()
+        .any(|h| h.lot_size <= 0.0 || h.half_spread < 0.0)
+        || max_lots < 1
+    {
+        return fail(
+            "E_DOMAIN",
+            "lot_size must be positive, half_spread non-negative, max_lots at least 1",
+        );
+    }
+    if market.spot <= 0.0 || market.volatility <= 0.0 {
+        return fail("E_DOMAIN", "spot and volatility must be positive");
+    }
+    for inst in book.iter().map(|p| &p.0).chain(&insts) {
+        check_instrument(inst)?;
+    }
+    let mut before = [0.0; 3];
+    for (inst, q) in &book {
+        let g = unit_greeks(market, inst);
+        for k in 0..3 {
+            before[k] += q * g[k];
+        }
+    }
+    let per_lot: Vec<[f64; 3]> = insts
+        .iter()
+        .zip(hedges)
+        .map(|(inst, h)| unit_greeks(market, inst).map(|g| h.lot_size * g))
+        .collect();
+    let a: Matrix = targets
+        .iter()
+        .map(|t| per_lot.iter().map(|g| g[greek_index(*t)]).collect())
+        .collect();
+    let b: Vec<f64> = targets.iter().map(|t| before[greek_index(*t)]).collect();
+    let w: Vec<f64> = b.iter().map(|v| 1.0 / v.abs().max(1.0).powi(2)).collect();
+    let n = hedges.len();
+    let ones = vec![1.0; n];
+    let lo = vec![Some(-max_lots); n];
+    let hi = vec![Some(max_lots); n];
+    let r = integer_solve(&IntegerProblem {
+        a: &a,
+        b: &b,
+        weights: &w,
+        ridge: 0.0,
+        lot_sizes: &ones,
+        lower_lots: Some(&lo),
+        upper_lots: Some(&hi),
+    })?;
+    let mut after = before;
+    for (g, l) in per_lot.iter().zip(&r.lots) {
+        for k in 0..3 {
+            after[k] += *l as f64 * g[k];
+        }
+    }
+    let hedge_cost = r
+        .lots
+        .iter()
+        .zip(hedges)
+        .map(|(l, h)| l.unsigned_abs() as f64 * h.lot_size * h.half_spread)
+        .sum();
+    Ok(OptionHedgeLots {
+        before,
+        after,
+        lots: r.lots,
+        hedge_cost,
+        rounding_cost: r.rounding_cost,
+    })
+}
+
+#[cfg(test)]
+mod r6_cap_tests {
+    use super::*;
+
+    /// R6-6.1 property: a planted cap of 1 makes the cost QP and the integer search stop with
+    /// `E_NO_CONVERGENCE`.
+    #[test]
+    fn planted_cap_of_one_is_no_convergence() {
+        let a: Matrix = vec![
+            vec![1.0, 0.3, 0.2],
+            vec![0.1, 1.0, 0.4],
+            vec![0.2, 0.1, 1.0],
+            vec![0.5, 0.5, 0.5],
+        ];
+        let b = [1.0, -2.0, 0.5, 0.7];
+        let w = [1.0; 4];
+        PLANTED_CAP.with(|c| c.set(Some(1)));
+        let spreads = [0.3, 0.3, 0.3];
+        let q = QpProblem {
+            a: &a,
+            b: &b,
+            weights: &w,
+            ridge: 0.0,
+            eq_matrix: None,
+            eq_rhs: None,
+            lower: None,
+            upper: None,
+            singular: Singular::Error,
+            costs: Costs {
+                half_spreads: Some(&spreads),
+                ..Costs::default()
+            },
+        };
+        let r = qp_solve(&q);
+        let lots = [0.01, 0.01, 0.01];
+        let ip = IntegerProblem {
+            a: &a,
+            b: &b,
+            weights: &w,
+            ridge: 0.0,
+            lot_sizes: &lots,
+            lower_lots: None,
+            upper_lots: None,
+        };
+        let ri = integer_solve(&ip);
+        PLANTED_CAP.with(|c| c.set(None));
+        assert_eq!(r.unwrap_err().code, "E_NO_CONVERGENCE");
+        assert_eq!(ri.unwrap_err().code, "E_NO_CONVERGENCE");
+        assert!(qp_solve(&q).is_ok());
+    }
 }

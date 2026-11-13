@@ -209,6 +209,8 @@ def _select_subsets(raw: Raw) -> None:
     if not isinstance(rows, list) or not isinstance(k, int) or isinstance(k, bool):
         return
     n = max((len(r) for r in rows if isinstance(r, list)), default=0)
+    if not 1 <= k <= n:  # R6-11.6: E_INPUT in the core comes first
+        return
     if sum(math.comb(n, j) for j in range(1, min(k, n) + 1)) > 100_000:
         raise _over("max_instruments", 100_000)
 

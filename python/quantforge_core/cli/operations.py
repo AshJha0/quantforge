@@ -12,11 +12,11 @@ from . import (  # noqa: F401 - imported to register their verbs
     ops_fx,
     ops_hedging,
     ops_inflation,
+    ops_lmm_xva_frtb,
     ops_mbs,
     ops_rates,
     ops_risk,
     ops_shortrate,
-    ops_stage_g2,
     ops_usecases,
     ops_vol,
 )

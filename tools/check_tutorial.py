@@ -10,6 +10,7 @@ a bash block through bash, both from the repository root. The last lines of its 
 block marked <!-- tutorial:expect -->. Every language prints the same lines, so one expected block serves
 all four. A python block marked <!-- tutorial:source PATH --> is not run: it must equal the file at PATH
 (relative to the repository root), so a page that shows a script cannot drift from the script it runs.
+A page marked <!-- tutorial:only LANG --> (a research method with a tool in one language) is skipped for the others.
 Exit 0 when every page matches, 1 otherwise. Standard library only.
 """
 import argparse
@@ -60,6 +61,11 @@ def check(lang, page):
     if stale:
         print(f"{page.name}: the listing of {', '.join(stale)} differs from the file", file=sys.stderr)
         return 1
+    only = re.search(r"<!-- tutorial:only (\w+) -->", text)
+    if only and only.group(1) != lang:
+        # A research-method page whose tool exists in one language only (R6-24, tutorial 22) says so on the page.
+        print(f"{page.name}: {lang}: skipped, the page runs in {only.group(1)} only")
+        return 0
     if lang not in runs:
         print(f"{page.name}: no block marked tutorial:run {lang}", file=sys.stderr)
         return 1

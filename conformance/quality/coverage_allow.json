@@ -1,0 +1,17 @@
+{
+  "_note": "R6-26: library source files allowed below the 90% per-file line-coverage gate (tools/quality_gate.py --per-file). One entry per file, with a reason; an entry without a reason does not count. Keep this list short; the owner's instruction allows the entry-point files only.",
+  "python": [],
+  "java": [],
+  "rust": [
+    {
+      "path": "rust/crates/quantforge-cli/src/main.rs",
+      "reason": "CLI entry point: the uncovered lines are the process main (argv, stdin/stdout loop, exit codes), run as a subprocess by the conformance runner and the tutorials, which cargo llvm-cov does not instrument; run_case itself is covered by the golden replay tests."
+    }
+  ],
+  "cpp": [
+    {
+      "path": "cpp26/src/cli/main.cpp",
+      "reason": "CLI entry point (process main: argv, stdin/stdout envelope). ctest links the library, not this file; the file is exercised as a subprocess by the conformance runner and the tutorials on every PR, which gcov does not see."
+    }
+  ]
+}

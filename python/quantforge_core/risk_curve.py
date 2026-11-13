@@ -178,14 +178,16 @@ def key_rate(data: CurveData, mode: str, key_dates: Sequence[date] | None, produ
 
 
 def jacobian(as_of: date, convention: str, quotes: Sequence[Quote], interpolation: str,
-             bump_bp: float) -> dict[str, object]:
+             bump_bp: float, tension: float | None = None,
+             step_end: date | None = None) -> dict[str, object]:
     if not 0 < bump_bp <= 100:
         raise QfError("E_DOMAIN", "bump_bp must be in (0, 100]", "bump_bp")
     n, h = len(quotes), bump_bp * BP
 
     def zeros(shifts: Sequence[float]) -> tuple[CurveData, list[float]]:
         moved = [Quote(q.tenor, q.mid + s) for q, s in zip(quotes, shifts, strict=True)]
-        data = ois.bootstrap(convention, as_of, moved, interpolation)[0]
+        data = ois.bootstrap(convention, as_of, moved, interpolation, tension=tension,
+                             step_end=step_end)[0]
         return data, [-math.log(v) / ((d - as_of).days / 365)
                       for d, v in zip(data.dates, data.discount_factors, strict=True)]
 
@@ -194,8 +196,9 @@ def jacobian(as_of: date, convention: str, quotes: Sequence[Quote], interpolatio
     for j in range(n):
         up = zeros([h if k == j else 0.0 for k in range(n)])[1]
         down = zeros([-h if k == j else 0.0 for k in range(n)])[1]
-        columns.append([(u - d) / (2 * h) if i >= j else 0.0
-                        for i, (u, d) in enumerate(zip(up, down, strict=True))])
+        # No triangular mask (R6 finding 3): non-local interpolations couple later
+        # quotes into earlier pillars; for local ones the difference is exactly zero.
+        columns.append([(u - d) / (2 * h) for u, d in zip(up, down, strict=True)])
     matrix = [[columns[j][i] for j in range(n)] for i in range(n)]
     return {"pillar_dates": [d.isoformat() for d in data.dates], "zero_rates": z0,
             "jacobian": matrix}

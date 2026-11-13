@@ -51,6 +51,9 @@ struct QpResult {
 /// Checks in the spec's order: E_INPUT, E_DOMAIN, E_SINGULAR, E_INFEASIBLE.
 QpResult solve_qp(const QpProblem& p);
 namespace detail {
+/// R6-6.1 effort caps. A test may lower every cap to prove the E_NO_CONVERGENCE path (0 keeps the ruled values).
+inline thread_local long long effort_cap_override = 0;
+inline long long effort_cap(long long ruled) { return effort_cap_override > 0 ? effort_cap_override : ruled; }
 /// Test oracle for the wave 4a solve (ruling I-48): every closed sign orthant of at most 20 open-sign
 /// instruments, one QP each. Not used by the operation.
 QpResult solve_qp_by_orthants(const QpProblem& p);
@@ -102,6 +105,19 @@ struct GreekHedge {
 };
 GreekHedge neutralise(const Market& m, const std::vector<Position>& book, const std::vector<Position>& hedges,
                       const std::vector<Greek>& targets);
+
+/// usecase.option_hedge_lots (use case 6, R6-11.20): integer lots of listed hedges against the book Greeks.
+struct LotHedge {
+    Position position;
+    double lot_size = 0.0, half_spread = 0.0;
+};
+struct LotHedgeResult {
+    Greeks before, after;
+    std::vector<long long> lots;
+    double hedge_cost = 0.0, rounding_cost = 0.0;
+};
+LotHedgeResult option_hedge_lots(const Market& m, const std::vector<Position>& book, const std::vector<LotHedge>& hedges,
+                                 const std::vector<Greek>& targets, long long max_lots);
 
 enum class Rounding { Nearest, None };
 struct BetaHedge {

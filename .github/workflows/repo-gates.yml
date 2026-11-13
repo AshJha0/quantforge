@@ -18,6 +18,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   gates:
+    name: repo-gates
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -26,9 +27,34 @@ jobs:
           persist-credentials: false
           fetch-tags: true  # the docs check reads release tags
       - run: python3 tools/check_hygiene.py
+      - name: unique job names and required-check list (R6-15)
+        run: python3 tools/check_job_names.py
+      - name: E9 fixed-seed Monte Carlo hash (R6-15)
+        run: python3 tools/check_mc_hash.py --self-test
+      - name: per-file coverage gate self-test (R6-26)
+        run: python3 tools/test_coverage_gate.py
+      - name: mutation stages map every stage (R6-14)
+        run: python3 conformance/mutation/check_stages.py && python3 conformance/mutation/test_gates.py
+      - name: golden case figures by class (R6-12)
+        run: python3 tools/case_figures.py --check
+      - name: references page lists every spec source (R6-17)
+        run: python3 tools/build_references.py --check && python3 tools/test_build_references.py
       - run: python3 tools/quality_gate.py --check-register --check-specs --check-docs
       - name: ignores (G9)
         run: |
           for p in python/quantforge.egg-info/PKG-INFO python/.hypothesis/examples python/.benchmarks/x; do
             git check-ignore -q "$p" || { echo "::error::$p is not ignored"; exit 1; }
           done
+
+  preregs:
+    name: research-preregs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: fetch forward-log (the holdout scan reads origin/forward-log; without it the log part is skipped)
+        run: git fetch --no-tags --depth=1 origin forward-log:refs/remotes/origin/forward-log
+      - name: preregs, amendments and holdout scan (R6-19)
+        run: python3 research/test_preregs.py

@@ -133,9 +133,9 @@
   "operations": [
    "credit.cds.bootstrap"
   ],
-  "cases": 5,
+  "cases": 6,
   "by_source": {
-   "credit.cds.bootstrap: independent-replay, quantlib-1.44-isda-cds-engine": 5
+   "credit.cds.bootstrap: independent-replay, quantlib-1.44-isda-cds-engine": 6
   }
  }
 }

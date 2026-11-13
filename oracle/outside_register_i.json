@@ -7,7 +7,7 @@
  "hedgeint_i": {
   "counted": 0,
   "total": 19,
-  "rule": "no outside library solves integer least squares; uncounted (exact rational enumeration is the oracle)"
+  "rule": "no outside library solves integer least squares in the free set used; uncounted (the oracle's exact rational enumeration is not an outside check; R6-25)"
  },
  "hedgemv_i": {
   "counted": 9,
@@ -86,7 +86,7 @@
  "hedgeslip_i": {
   "counted": 0,
   "total": 12,
-  "rule": "no outside library computes implementation shortfall; exact rational arithmetic, uncounted"
+  "rule": "no outside library computes implementation shortfall; the oracle itself computes in exact rational arithmetic, which is the oracle, not an outside check: uncounted (R6-25)"
  },
  "hedgebtcost_i": {
   "counted": 5,

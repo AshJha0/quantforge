@@ -2,14 +2,12 @@ name: Coverage by stage
 # Per-language floor over the whole library (plan 12.2 G6, conformance/quality/floors.json) on every run, and the
 # line-coverage gate on the current stage's new modules (85%, conformance/quality/stage_e.json), per language.
 # Every language runs, since the floor always applies; modules still TODO in the config are skipped by the
-# module gate. Weekly, manual, and on pull requests that touch library code or the gate.
+# module gate. R6-26: every library file of every stage at 90% (--per-file, allow-list
+# conformance/quality/coverage_allow.json). Weekly, manual and on every pull request (required checks).
 on:
   schedule:
     - cron: '23 4 * * 3'
-  pull_request:
-    paths: ['cpp26/src/**', 'cpp26/include/**', 'java25/src/**', 'python/quantforge_core/**', 'python/tests/**',
-            'rust/crates/**', 'conformance/quality/**', 'tools/quality_gate.py', 'tools/governance_gate.py',
-            '.github/workflows/coverage-stage.yml']
+  pull_request:  # every PR: the coverage-stage-* jobs are required checks (R6-26, D7)
   workflow_dispatch:
 permissions:
   contents: read
@@ -20,6 +18,7 @@ env:
   CONFIG: conformance/quality/stage_e.json
 jobs:
   plan:
+    name: coverage-stage-plan
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
@@ -42,6 +41,7 @@ jobs:
               print(f"{lang}={'true' if on else 'false'}")
           PY
   java:
+    name: coverage-stage-java
     needs: plan
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -56,8 +56,9 @@ jobs:
           cache: maven
       - run: mvn -B -Pcoverage verify
         working-directory: java25
-      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang java --coverage java25/target/site/jacoco/jacoco.xml --floor
+      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang java --coverage java25/target/site/jacoco/jacoco.xml --floor --per-file
   cpp:
+    name: coverage-stage-cpp
     needs: plan
     runs-on: ubuntu-24.04
     container: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
@@ -72,8 +73,9 @@ jobs:
       - run: cmake --build build --parallel
       - run: ctest --test-dir build --output-on-failure
       - run: gcovr --root . --filter 'cpp26/src/' --cobertura coverage.xml build
-      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang cpp --coverage coverage.xml --floor
+      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang cpp --coverage coverage.xml --floor --per-file
   python:
+    name: coverage-stage-python
     needs: plan
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -85,8 +87,9 @@ jobs:
       - run: uv sync --locked --project python
       - run: uv run coverage run -m pytest -q && uv run coverage json -o coverage.json
         working-directory: python
-      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang python --coverage python/coverage.json --floor
+      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang python --coverage python/coverage.json --floor --per-file
   rust:
+    name: coverage-stage-rust
     needs: plan
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -99,4 +102,4 @@ jobs:
       - run: cargo install cargo-llvm-cov --version 0.6.16 --locked
       - run: cargo llvm-cov --workspace --lcov --output-path lcov.info
         working-directory: rust
-      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang rust --coverage rust/lcov.info --floor
+      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang rust --coverage rust/lcov.info --floor --per-file

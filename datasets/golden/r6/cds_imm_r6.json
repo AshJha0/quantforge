@@ -1,0 +1,726 @@
+{
+ "schema_version": "1.0",
+ "suite": "cds_imm_r6",
+ "spec": "specifications/04-pricing/credit.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_r6_w2.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "cds_imm_r6-0001",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2026-12-21",
+    "discount": {
+     "as_of": "2026-12-21",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-12-21",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.0045
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.006
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.009
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.012
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.0135
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.015
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9962549909270567
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9899587627812985
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9551785099673002
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.9013720971899637
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8477225487583118
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7664714098007159
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "r6",
+    "isda-cds",
+    "imm-trade-date"
+   ],
+   "description": "trade date 2026-12-21 on an adjusted coupon date (R6-7.3, was E_INPUT under D19)",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "curve solve; spreads reprice below 1e-13"
+   }
+  },
+  {
+   "case_id": "cds_imm_r6-0002",
+   "operation": "credit.cds.price",
+   "inputs": {
+    "trade_date": "2026-12-21",
+    "discount": {
+     "as_of": "2026-12-21",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-12-21",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-12-21",
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9962549909270567
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9899587627812985
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9551785099673002
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.9013720971899637
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8477225487583118
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7664714098007159
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "trade": {
+     "maturity": "2031-12-20",
+     "coupon": 0.01,
+     "notional": 10000000.0,
+     "side": "BUY_PROTECTION"
+    },
+    "payout": "STANDARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 88076.236167993,
+     "upfront": 0.008810447334996162,
+     "accrued": 2.777777777777778e-05,
+     "par_spread": 0.011999999986944445,
+     "protection_leg": 0.0528457419882669,
+     "rpv01": 4.406588724656273
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "r6",
+    "isda-cds",
+    "imm-trade-date"
+   ],
+   "description": "5Y from 2026-12-21: accrued one day (start = T, step-in T + 1)",
+   "output_classes": {
+    "par_spread": "per_unit",
+    "accrued": "per_unit",
+    "rpv01": "per_unit",
+    "upfront": "per_unit",
+    "protection_leg": "per_unit"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "ISDA replay against QuantLib within 1e-9 per unit"
+   }
+  },
+  {
+   "case_id": "cds_imm_r6-0003",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2027-03-22",
+    "discount": {
+     "as_of": "2027-03-22",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2047-03-22",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.0045
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.006
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.009
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.012
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.0135
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.015
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9943566814866918
+      },
+      {
+       "date": "2028-06-20",
+       "survival": 0.9874172612938193
+      },
+      {
+       "date": "2030-06-20",
+       "survival": 0.9514050892650608
+      },
+      {
+       "date": "2032-06-20",
+       "survival": 0.8962969031630785
+      },
+      {
+       "date": "2034-06-20",
+       "survival": 0.842187496669828
+      },
+      {
+       "date": "2037-06-20",
+       "survival": 0.7605752165959002
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "r6",
+    "isda-cds",
+    "imm-trade-date"
+   ],
+   "description": "trade date 2027-03-22 on an adjusted coupon date (R6-7.3, was E_INPUT under D19)",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "curve solve; spreads reprice below 1e-13"
+   }
+  },
+  {
+   "case_id": "cds_imm_r6-0004",
+   "operation": "credit.cds.price",
+   "inputs": {
+    "trade_date": "2027-03-22",
+    "discount": {
+     "as_of": "2027-03-22",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2047-03-22",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2027-03-22",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9943566814866918
+      },
+      {
+       "date": "2028-06-20",
+       "survival": 0.9874172612938193
+      },
+      {
+       "date": "2030-06-20",
+       "survival": 0.9514050892650608
+      },
+      {
+       "date": "2032-06-20",
+       "survival": 0.8962969031630785
+      },
+      {
+       "date": "2034-06-20",
+       "survival": 0.842187496669828
+      },
+      {
+       "date": "2037-06-20",
+       "survival": 0.7605752165959002
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "trade": {
+     "maturity": "2032-06-20",
+     "coupon": 0.01,
+     "notional": 10000000.0,
+     "side": "BUY_PROTECTION"
+    },
+    "payout": "STANDARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 91960.02011790751,
+     "upfront": 0.009198950243839354,
+     "accrued": 2.777777777777778e-05,
+     "par_spread": 0.012000000000000002,
+     "protection_leg": 0.0551760120707445,
+     "rpv01": 4.600777893404888
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "r6",
+    "isda-cds",
+    "imm-trade-date"
+   ],
+   "description": "5Y from 2027-03-22: accrued one day (start = T, step-in T + 1)",
+   "output_classes": {
+    "par_spread": "per_unit",
+    "accrued": "per_unit",
+    "rpv01": "per_unit",
+    "upfront": "per_unit",
+    "protection_leg": "per_unit"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "ISDA replay against QuantLib within 1e-9 per unit"
+   }
+  },
+  {
+   "case_id": "cds_imm_r6-0005",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2027-06-21",
+    "discount": {
+     "as_of": "2027-06-21",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2047-06-21",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.0045
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.006
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.009
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.012
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.0135
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.015
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9962342379039847
+      },
+      {
+       "date": "2028-06-20",
+       "survival": 0.989931281082762
+      },
+      {
+       "date": "2030-06-20",
+       "survival": 0.9551771207725038
+      },
+      {
+       "date": "2032-06-20",
+       "survival": 0.9013193480049309
+      },
+      {
+       "date": "2034-06-20",
+       "survival": 0.8477183483099291
+      },
+      {
+       "date": "2037-06-20",
+       "survival": 0.7664674362362506
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "r6",
+    "isda-cds",
+    "imm-trade-date"
+   ],
+   "description": "trade date 2027-06-21 on an adjusted coupon date (R6-7.3, was E_INPUT under D19)",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "curve solve; spreads reprice below 1e-13"
+   }
+  },
+  {
+   "case_id": "cds_imm_r6-0006",
+   "operation": "credit.cds.price",
+   "inputs": {
+    "trade_date": "2027-06-21",
+    "discount": {
+     "as_of": "2027-06-21",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2047-06-21",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2027-06-21",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9962342379039847
+      },
+      {
+       "date": "2028-06-20",
+       "survival": 0.989931281082762
+      },
+      {
+       "date": "2030-06-20",
+       "survival": 0.9551771207725038
+      },
+      {
+       "date": "2032-06-20",
+       "survival": 0.9013193480049309
+      },
+      {
+       "date": "2034-06-20",
+       "survival": 0.8477183483099291
+      },
+      {
+       "date": "2037-06-20",
+       "survival": 0.7664674362362506
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "trade": {
+     "maturity": "2032-06-20",
+     "coupon": 0.01,
+     "notional": 10000000.0,
+     "side": "BUY_PROTECTION"
+    },
+    "payout": "STANDARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 88118.14863978008,
+     "upfront": 0.008814639925885893,
+     "accrued": 2.777777777777778e-05,
+     "par_spread": 0.012000000000000002,
+     "protection_leg": 0.05287088918386802,
+     "rpv01": 4.408684319498515
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "r6",
+    "isda-cds",
+    "imm-trade-date"
+   ],
+   "description": "5Y from 2027-06-21: accrued one day (start = T, step-in T + 1)",
+   "output_classes": {
+    "par_spread": "per_unit",
+    "accrued": "per_unit",
+    "rpv01": "per_unit",
+    "upfront": "per_unit",
+    "protection_leg": "per_unit"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "ISDA replay against QuantLib within 1e-9 per unit"
+   }
+  },
+  {
+   "case_id": "cds_imm_r6-0007",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2027-09-20",
+    "discount": {
+     "as_of": "2027-09-20",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2047-09-20",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.0045
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.006
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.009
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.012
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.0135
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.015
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2028-06-20",
+       "survival": 0.9943361689130927
+      },
+      {
+       "date": "2028-12-20",
+       "survival": 0.9873897616210651
+      },
+      {
+       "date": "2030-12-20",
+       "survival": 0.9513637631970085
+      },
+      {
+       "date": "2032-12-20",
+       "survival": 0.8962413737747554
+      },
+      {
+       "date": "2034-12-20",
+       "survival": 0.8421268759849635
+      },
+      {
+       "date": "2037-12-20",
+       "survival": 0.7605101499967294
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "r6",
+    "isda-cds",
+    "imm-trade-date"
+   ],
+   "description": "trade date 2027-09-20 on an adjusted coupon date (R6-7.3, was E_INPUT under D19)",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "curve solve; spreads reprice below 1e-13"
+   }
+  },
+  {
+   "case_id": "cds_imm_r6-0008",
+   "operation": "credit.cds.price",
+   "inputs": {
+    "trade_date": "2027-09-20",
+    "discount": {
+     "as_of": "2027-09-20",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2047-09-20",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2027-09-20",
+     "pillars": [
+      {
+       "date": "2028-06-20",
+       "survival": 0.9943361689130927
+      },
+      {
+       "date": "2028-12-20",
+       "survival": 0.9873897616210651
+      },
+      {
+       "date": "2030-12-20",
+       "survival": 0.9513637631970085
+      },
+      {
+       "date": "2032-12-20",
+       "survival": 0.8962413737747554
+      },
+      {
+       "date": "2034-12-20",
+       "survival": 0.8421268759849635
+      },
+      {
+       "date": "2037-12-20",
+       "survival": 0.7605101499967294
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "trade": {
+     "maturity": "2032-12-20",
+     "coupon": 0.01,
+     "notional": 10000000.0,
+     "side": "BUY_PROTECTION"
+    },
+    "payout": "STANDARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 92002.14821367375,
+     "upfront": 0.00920316440403989,
+     "accrued": 2.777777777777778e-05,
+     "par_spread": 0.012000000000000002,
+     "protection_leg": 0.05520128892820423,
+     "rpv01": 4.6028842981931986
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "r6",
+    "isda-cds",
+    "imm-trade-date"
+   ],
+   "description": "5Y from 2027-09-20: accrued one day (start = T, step-in T + 1)",
+   "output_classes": {
+    "par_spread": "per_unit",
+    "accrued": "per_unit",
+    "rpv01": "per_unit",
+    "upfront": "per_unit",
+    "protection_leg": "per_unit"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "ISDA replay against QuantLib within 1e-9 per unit"
+   }
+  }
+ ]
+}

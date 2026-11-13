@@ -24,7 +24,7 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Bond and sovereign fits](bond-fit.md) | Implemented, not Validated | D | 2 golden cases |
 | [Repo and special repo](repo.md) | Implemented, not Validated | D | 4 golden cases |
 | [Cross-currency](cross-currency.md) | Implemented, not Validated | D | 1 golden case |
-| [Credit and ISDA CDS](cds.md) | Implemented, not Validated | D | 5 golden cases |
+| [Credit and ISDA CDS](cds.md) | Implemented, not Validated | D | 6 golden cases |
 | [Dividend and borrow](dividend-borrow.md) | Implemented, not Validated | D | 4 golden cases |
 | [Inflation, with seasonality](inflation.md) | Implemented, not Validated | D | 2 golden cases |
 | [Caps and swaptions](caps-swaptions.md) | Implemented, not Validated | D | 22 golden cases |
@@ -44,8 +44,6 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 ## Real data
 
 [US Treasury curve with sanity bands](real-usd-treasury.md): a page built from real public data, snapshot of 2026-11-06. The same bands run daily in workflow (a).
-
-[P&L explain and calibration stability](pnl-explain.md): full revaluation against key-rate explain over real daily Treasury moves, and day-to-day calibration diagnostics. Runs daily in `tools/workflows/keyrate_explain.py`.
 
 [Calibration stability](calib-stability.md): seven calibrations under seeded noise in four languages, synthetic inputs. [Rich/cheap screen](rich-cheap.md): workflow (b), blocked on data until a price source is cleared.
 

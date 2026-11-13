@@ -401,4 +401,29 @@ def curvature(risk_class: str, factors: Sequence[tuple[object, str | None, float
     return {"scenarios": scenarios, "capital": values[binding], "binding_scenario": binding}
 
 
+SBM_CLASSES = ("GIRR", "CSR_NONSEC", "EQ", "COMM", "FX")
+SBM_MEASURES = ("DELTA", "VEGA", "CURVATURE")
+SBM_SCENARIOS = ("high", "medium", "low")
+
+
+def sbm_total(components: Sequence[tuple[str, str, Sequence[float]]]) -> dict[str, object]:
+    """`risk.frtb.sbm_total` (ruling R6-4.1, MAR21.7): add every component within one
+    scenario, then take the largest scenario. Each component is (class, measure,
+    (high, medium, low))."""
+    if not components:
+        raise QfError("E_INPUT", "components is empty", "components")
+    for k, (_, _, charges) in enumerate(components):
+        if any(c < 0 for c in charges):
+            raise QfError("E_DOMAIN", "a scenario charge is below 0", f"components/{k}/scenarios")
+    seen: set[tuple[str, str]] = set()
+    for k, (cls, measure, _) in enumerate(components):
+        if (cls, measure) in seen:
+            raise QfError("E_INPUT", "the same risk_class and measure twice", f"components/{k}")
+        seen.add((cls, measure))
+    totals = [math.fsum(c[2][s] for c in components) for s in range(3)]
+    best = max(range(3), key=lambda s: (totals[s], -s))
+    return {"scenario_totals": dict(zip(SBM_SCENARIOS, totals, strict=True)),
+            "capital": totals[best], "binding_scenario": SBM_SCENARIOS[best],
+            "sum_of_component_capitals": math.fsum(max(c[2]) for c in components)}
+
 guard(globals())

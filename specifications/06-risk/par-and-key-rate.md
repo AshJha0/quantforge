@@ -68,14 +68,14 @@ In both modes the buckets sum to `zero_dv01` to first order; the goldens show a 
 
 How the bootstrapped zero rates move with the par quotes.
 
-Inputs: `as_of`, `convention`, `quotes`, `interpolation`, `bump_bp`; the scheme is always central.
+Inputs: `as_of`, `convention`, `quotes`, `interpolation`, `bump_bp`; the scheme is always central. With `TENSION_SPLINE` or `HYBRID`, `tension` and `step_end` are required exactly as in `rates.ois.bootstrap` (`02-curves/curve-framework.md`, same checks and codes), and every bumped curve is built with them (ruling R6-1.2).
 
 **Basis (ruling R2-A8).** Rows are continuously compounded zero rates on ACT/365F curve time, `z_i = -ln D(p_i) / t_i` at pillar `i` (pillars as `rates.ois.bootstrap`). Columns are the par quotes as decimal rates on their own day counts. Neither is a simply compounded or annually compounded zero, and the matrix changes if either basis changes.
 
 Outputs:
 - `pillar_dates`;
 - `zero_rates`;
-- `jacobian`: a matrix with rows for pillars and columns for quotes, `J[i][j] = (z_i(q + h e_j) - z_i(q - h e_j)) / (2 h)`, dimensionless (bp of zero per bp of quote). It is lower triangular in exact arithmetic, because a pillar depends only on quotes up to its own. Entries above the diagonal are exactly 0.
+- `jacobian`: a matrix with rows for pillars and columns for quotes, `J[i][j] = (z_i(q + h e_j) - z_i(q - h e_j)) / (2 h)`, dimensionless (bp of zero per bp of quote). Every entry is computed; no entry is set to 0 (ruling R6-1.1, closing R5 audit addendum A1). With the local methods `LOG_LINEAR_DF` and `LINEAR_ZERO` the matrix is lower triangular in exact arithmetic, because a pillar depends only on quotes up to its own, and entries above the diagonal come out at rounding level (below 1e-9). With `MONOTONE_CONVEX`, `MONOTONIC_LOG_CUBIC`, `TENSION_SPLINE` and `HYBRID` the curve is solved globally, so a later quote moves earlier pillars and entries above the diagonal are not zero (up to about 0.03 bp per bp on the golden SOFR curve). Until v0.8.0 the builds zeroed them, which was wrong for those four methods (review finding 3). **Known limit (ruling R6-1.3):** the output is the 1 bp difference quotient, not the derivative. Under `MONOTONE_CONVEX` and `HYBRID` some zero rates are strongly curved in a neighbouring quote (the method's regions sit close by), and there the 1 bp quotient differs from the derivative by up to 1.5e-3 bp per bp (SOFR 20Y against the 15Y quote: -0.2376 at 1 bp, -0.2360 at 0.01 bp). For hedging with bumps of 1 bp or more the quotient is the right number; a user who needs the local derivative should use a smaller `bump_bp` (0.1 bp brings the gap below 5e-5).
 
 **Par from zero.** With `PILLAR` key rates on the bootstrapped curve, `par_buckets[j] ~ sum_i key_rates[i] J[i][j]` to first order, by the chain rule. The oracle checks this on every product (gap below 1e-3 of `par_dv01`). It is the Jacobian test of plan 11.2.1, not an output. It does not hold for `TRIANGULAR` buckets, because a triangular zero shift moves the curve between pillars differently from a pillar bump.
 
@@ -85,6 +85,6 @@ Outputs:
 
 ## Acceptance
 
-Tolerance is class `interpolation` with per-case limits. Par risk and the Jacobian are differences of curve solves, so a build must stop its solve below 1e-13 in rate (as `rates-sensitivities.md`). Limits: risk within `1e-8 x notional` absolute plus 1e-7 relative; Jacobian entries within 1e-6 absolute. Key-rate risk needs no solve: `1e-9 x notional` absolute plus 1e-9 relative.
+Tolerance is class `interpolation` with per-case limits. Par risk and the Jacobian are differences of curve solves, so a build must stop its solve below 1e-13 in rate (as `rates-sensitivities.md`). Limits: risk within `1e-8 x notional` absolute plus 1e-7 relative; Jacobian entries within 1e-6 absolute in `risk_r2`, and within 1e-8 absolute plus 1e-6 relative in `r6/jacobian_r6` (ruling R6-1.3). Every `jacobian_r6` golden is also checked by the oracle against a Richardson extrapolation of central differences at `h` and `h/2`: within 1e-9 absolute plus 1e-7 relative of the derivative. Key-rate risk needs no solve: `1e-9 x notional` absolute plus 1e-9 relative.
 
 Outside oracle: QuantLib rebuilds the curve from its own `OISRateHelper` quotes after each bump (`SimpleQuote`), and revalues with `MakeOIS` or `DiscountingBondEngine`. `TRIANGULAR` bumps use QuantLib's `PiecewiseZeroSpreadedTermStructure`, whose linear spread between dates with flat ends is the triangle above; `PILLAR` bumps rebuild a QuantLib `DiscountCurve` with the bumped node. Every golden in `risk_r2` is checked this way unless its tags say otherwise.

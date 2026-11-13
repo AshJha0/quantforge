@@ -151,7 +151,7 @@ Each prints the eight lines of step 1, digit for digit, the error code included.
 
 ## For practitioners
 
-- **Weights are a choice.** `weights` say how much each residual risk matters. Equal weights on key-rate DV01s treat a 2-year and a 30-year basis point alike; weighting by the variance of each key rate's moves turns the objective into a variance, which is what `hedge.minvar.ratio` minimises directly.
+- **Weights are a choice.** `weights` say how much each residual risk matters. Equal weights on key-rate DV01s treat a 2-year and a 30-year basis point alike; diagonal weights (one number per key rate) ignore how key rates move together, so the weighted sum of squares is not the hedged position's variance unless the key-rate moves are uncorrelated. The variance itself needs the full covariance, `r^T S r`, which is what `hedge.minvar.ratio` minimises and `hedge.residual.report` reports (review finding 19).
 - **Ridge.** A small `ridge` stops the solver from taking large offsetting positions in nearly collinear instruments. It also biases the hedge; report it with the result.
 - **Bounds are where the cost of a mandate shows.** The rise in the objective when a bound becomes active is the risk you keep because of the bound. Compare the bounded and unbounded objectives before arguing about a limit.
 - **Integer lots matter for small books.** On a book worth thousands of contracts the rounding cost is negligible; on a book worth two it decides the hedge, as here.

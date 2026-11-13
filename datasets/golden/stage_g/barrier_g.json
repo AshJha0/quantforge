@@ -31,7 +31,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "closed-form-bgk"
+    "closed-form-bgk",
+    "exact-date-mc-4m (R6-2.2)"
    ],
    "tags": [
     "barrier",
@@ -66,7 +67,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "closed-form-bgk"
+    "closed-form-bgk",
+    "exact-date-mc-4m (R6-2.2)"
    ],
    "tags": [
     "barrier",
@@ -101,7 +103,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "closed-form-bgk"
+    "closed-form-bgk",
+    "exact-date-mc-4m (R6-2.2)"
    ],
    "tags": [
     "barrier",
@@ -129,22 +132,22 @@
     "monitoring_per_year": 252
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 0.11854255973496208
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "DOWN_OUT PUT H=90.0 m=252"
+   "description": "DOWN_OUT PUT H=90.0 m=252: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0005",
@@ -164,22 +167,22 @@
     "monitoring_per_year": 52
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 0.16628355221930136
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "DOWN_OUT PUT H=90.0 m=52"
+   "description": "DOWN_OUT PUT H=90.0 m=52: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0006",
@@ -199,22 +202,22 @@
     "monitoring_per_year": 12
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 0.2962325772073129
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "DOWN_OUT PUT H=90.0 m=12"
+   "description": "DOWN_OUT PUT H=90.0 m=12: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0007",
@@ -234,22 +237,22 @@
     "monitoring_per_year": 252
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 2.604722143609795
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "DOWN_IN CALL H=90.0 m=252"
+   "description": "DOWN_IN CALL H=90.0 m=252: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0008",
@@ -269,22 +272,22 @@
     "monitoring_per_year": 52
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 2.2004786656813025
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "DOWN_IN CALL H=90.0 m=52"
+   "description": "DOWN_IN CALL H=90.0 m=52: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0009",
@@ -304,22 +307,22 @@
     "monitoring_per_year": 12
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 1.5497541487483915
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "DOWN_IN CALL H=90.0 m=12"
+   "description": "DOWN_IN CALL H=90.0 m=12: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0010",
@@ -339,22 +342,22 @@
     "monitoring_per_year": 252
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 8.108294487719043
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "DOWN_IN PUT H=90.0 m=252"
+   "description": "DOWN_IN PUT H=90.0 m=252: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0011",
@@ -374,22 +377,22 @@
     "monitoring_per_year": 52
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 8.060553495234704
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "DOWN_IN PUT H=90.0 m=52"
+   "description": "DOWN_IN PUT H=90.0 m=52: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0012",
@@ -409,22 +412,22 @@
     "monitoring_per_year": 12
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 7.930604470246692
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "DOWN_IN PUT H=90.0 m=12"
+   "description": "DOWN_IN PUT H=90.0 m=12: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0013",
@@ -444,22 +447,22 @@
     "monitoring_per_year": 252
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 0.7944317792999485
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "UP_OUT CALL H=120.0 m=252"
+   "description": "UP_OUT CALL H=120.0 m=252: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0014",
@@ -479,22 +482,22 @@
     "monitoring_per_year": 52
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 0.9569402634639435
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "UP_OUT CALL H=120.0 m=52"
+   "description": "UP_OUT CALL H=120.0 m=52: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0015",
@@ -514,22 +517,22 @@
     "monitoring_per_year": 12
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 1.330857497991616
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "UP_OUT CALL H=120.0 m=12"
+   "description": "UP_OUT CALL H=120.0 m=12: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0016",
@@ -556,7 +559,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "closed-form-bgk"
+    "closed-form-bgk",
+    "exact-date-mc-4m (R6-2.2)"
    ],
    "tags": [
     "barrier",
@@ -591,7 +595,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "closed-form-bgk"
+    "closed-form-bgk",
+    "exact-date-mc-4m (R6-2.2)"
    ],
    "tags": [
     "barrier",
@@ -626,7 +631,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "closed-form-bgk"
+    "closed-form-bgk",
+    "exact-date-mc-4m (R6-2.2)"
    ],
    "tags": [
     "barrier",
@@ -654,22 +660,22 @@
     "monitoring_per_year": 252
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 10.329330148758174
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "UP_IN CALL H=120.0 m=252"
+   "description": "UP_IN CALL H=120.0 m=252: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0020",
@@ -689,22 +695,22 @@
     "monitoring_per_year": 52
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 10.16682166459418
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "UP_IN CALL H=120.0 m=52"
+   "description": "UP_IN CALL H=120.0 m=52: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0021",
@@ -724,22 +730,22 @@
     "monitoring_per_year": 12
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 9.792904430066507
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "UP_IN CALL H=120.0 m=12"
+   "description": "UP_IN CALL H=120.0 m=12: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0022",
@@ -759,22 +765,22 @@
     "monitoring_per_year": 252
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 0.5924406405218043
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "UP_IN PUT H=120.0 m=252"
+   "description": "UP_IN PUT H=120.0 m=252: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0023",
@@ -794,22 +800,22 @@
     "monitoring_per_year": 52
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 0.48305108483619286
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "UP_IN PUT H=120.0 m=52"
+   "description": "UP_IN PUT H=120.0 m=52: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0024",
@@ -829,22 +835,22 @@
     "monitoring_per_year": 12
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 0.31643902419380865
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "UP_IN PUT H=120.0 m=12"
+   "description": "UP_IN PUT H=120.0 m=12: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0025",
@@ -864,22 +870,22 @@
     "monitoring_per_year": 252
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 8.013512440343366
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "DOWN_OUT CALL H=95.0 m=252"
+   "description": "DOWN_OUT CALL H=95.0 m=252: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0026",
@@ -1134,7 +1140,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "closed-form-bgk"
+    "closed-form-bgk",
+    "exact-date-mc-4m (R6-2.2)"
    ],
    "tags": [
     "barrier",
@@ -1163,23 +1170,23 @@
     "monitoring_per_year": 3
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 1.2352789329982103
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
     "m3",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "DOWN_OUT PUT T=0.5 m=3: n=2, dt=T/n"
+   "description": "DOWN_OUT PUT T=0.5 m=3: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0035",
@@ -1199,23 +1206,23 @@
     "monitoring_per_year": 10
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 1.7523203499409656
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
     "m3",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "UP_OUT CALL T=0.75 m=10: n=8, dt=T/n"
+   "description": "UP_OUT CALL T=0.75 m=10: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0036",
@@ -1235,23 +1242,23 @@
     "monitoring_per_year": 52
    },
    "expected": {
-    "status": "ok",
-    "outputs": {
-     "price": 1.785202360944129
-    }
+    "status": "error",
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "simple_analytic",
+   "tolerance_class": "date_and_convention",
    "verified_by": [
-    "closed-form-bgk"
+    "hand"
    ],
    "tags": [
     "barrier",
     "r9",
     "discrete",
     "m3",
+    "r6-envelope",
+    "invalid",
     "synthetic"
    ],
-   "description": "UP_IN PUT T=1.5 m=52: n=78, dt=T/n"
+   "description": "UP_IN PUT T=1.5 m=52: outside the BGK envelope (R6-2.1)"
   },
   {
    "case_id": "barrier_g-0037",

@@ -15,7 +15,8 @@ verified against the hashes written at the time.
 
 gaps: for each recorder series, lists business days (Monday to Friday, minus any dates in --holidays) that have no
 successful recording in any of the given logs. Exit 1 if a gap falls in the last --recent business days (default 3),
-so a scheduled run fails loudly; older gaps are reported but cannot be fixed by rerunning.
+so a scheduled run fails loudly, but only the first time the gap is seen: a gap already listed in the previous
+--out .json is reported and does not fail again (R6-21). Older gaps are reported but cannot be fixed by rerunning.
 
 reconcile: compares two logs (the Actions log and the local backup log) by (series, UTC date). Each pair is
 "both", "first only" or "second only"; for "both" it says whether any sha256 matched. Differing hashes on one day
@@ -82,6 +83,12 @@ def gaps(a):
     holidays = load_holidays(a.holidays)
     until = date.fromisoformat(a.until) if a.until else date.today()
     report, recent_bad = [], []
+    # R6-21: a gap already listed by the previous run (the --out .json being replaced) is old news; it is still
+    # reported, but only a new gap, or any gap in a prereg input or study row, fails the run.
+    known = set()
+    prev = Path(a.out).with_suffix(".json") if a.out else None
+    if prev and prev.exists():
+        known = {f"{r['series']} {d}" for r in json.loads(prev.read_text(encoding="utf-8")) for d in r["missing"]}
     for series in sorted(data):
         days = data[series]
         start = date.fromisoformat(a.since) if a.since else min(days)
@@ -109,13 +116,15 @@ def gaps(a):
         required_bad = sorted(set(required_bad))
         md += ["", "Prereg inputs and study rows missing on a business day (any age fails): "
                + (", ".join(required_bad[:50]) + (" ..." if len(required_bad) > 50 else "") if required_bad else "none")]
-    md += ["", f"Recent gaps (last {a.recent} business days): {', '.join(recent_bad) or 'none'}", ""]
+    new_bad = [g for g in recent_bad if g not in known]
+    md += ["", f"Recent gaps (last {a.recent} business days): {', '.join(recent_bad) or 'none'}",
+           f"New since the previous run (these fail): {', '.join(new_bad) or 'none'}", ""]
     text = "\n".join(md)
     if a.out:
         Path(a.out).write_text(text, encoding="utf-8")
         Path(a.out).with_suffix(".json").write_text(json.dumps(report, indent=1) + "\n", encoding="utf-8")
     print(text)
-    return 1 if recent_bad or required_bad else 0
+    return 1 if new_bad or required_bad else 0
 
 
 def stale_run(days, expected):

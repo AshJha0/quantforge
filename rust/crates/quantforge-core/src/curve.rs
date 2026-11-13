@@ -210,7 +210,7 @@ impl Curve {
         )
     }
 
-    fn is_stage_f(&self) -> bool {
+    fn is_smooth(&self) -> bool {
         match self.interpolation {
             Interpolation::LogLinearDf | Interpolation::LinearZero => false,
             Interpolation::Hybrid(_) => self.step + 1 < self.times.len(),
@@ -226,7 +226,7 @@ impl Curve {
         }
         let t = curve_time(self.as_of, d);
         let n = self.times.len() - 1;
-        if self.is_stage_f() {
+        if self.is_smooth() {
             return Ok(self.smooth(t.min(self.times[n])).1);
         }
         if t >= self.times[n] || self.interpolation != Interpolation::LinearZero {
@@ -254,7 +254,7 @@ impl Curve {
         if t == 0.0 {
             return 1.0;
         }
-        if self.is_stage_f() {
+        if self.is_smooth() {
             if t >= self.times[n] {
                 let f = self.smooth(self.times[n]).1;
                 return (self.logs[n] - f * (t - self.times[n])).exp();

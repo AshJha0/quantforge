@@ -129,7 +129,13 @@ def h_fhs(i):
     L = np.sort(-pnl)
     n = len(L)
     k = math.ceil(n * i["confidence"])
-    return {"var": float(L[k - 1]), "es": float(np.mean(L[k - 1:])), "tail_count": n - k + 1, "sigma_next": math.sqrt(nxt)}
+    # ES (R6-3.1, amends F-31): Acerbi-Tasche with a fractional tail weight, written from the paper's form with n alpha
+    X = np.sort(pnl)
+    na = n * (1.0 - i["confidence"])
+    m = int(np.floor(na + 1e-9))
+    frac = max(na - m, 0.0)
+    es = -(np.sum(X[:m]) + (frac * X[m] if m < n and frac > 1e-9 else 0.0)) / na
+    return {"var": float(L[k - 1]), "es": float(es), "tail_count": int(np.ceil(na - 1e-9)), "sigma_next": math.sqrt(nxt)}
 
 
 def main():

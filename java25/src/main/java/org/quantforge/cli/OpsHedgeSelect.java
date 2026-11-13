@@ -45,6 +45,11 @@ final class OpsHedgeSelect {
         }
         in.limit(width > InstrumentSelection.MAX_INSTRUMENTS, "a");
         in.limit(a.length > 1_000, "a");
+        // Ruling R6-11.6: max_instruments outside 1..n is E_INPUT, ahead of the subset-count E_LIMIT.
+        if (width > 0 && (k < 1 || k > width)) {
+            in.gate();
+            throw new org.quantforge.core.QfError("E_INPUT", "max_instruments outside 1..n", "max_instruments");
+        }
         in.limit(InstrumentSelection.candidateSubsets(width, k) > InstrumentSelection.MAX_SUBSETS, "max_instruments");
         in.gate();
         InstrumentSelection.Selection s = InstrumentSelection.select(a, b, w, ridge, lower, upper, k, extra);

@@ -34,10 +34,10 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 
 ## Oracle evidence and limits
 
-5 golden cases with status ok in `datasets/golden/stage_d` for `credit.cds.bootstrap`, by `verified_by`:
+6 golden cases with status ok in `datasets/golden/stage_d` for `credit.cds.bootstrap`, by `verified_by`:
 
 | Operation: sources | Cases |
 |---|---|
-| credit.cds.bootstrap: independent-replay, quantlib-1.44-isda-cds-engine | 5 |
+| credit.cds.bootstrap: independent-replay, quantlib-1.44-isda-cds-engine | 6 |
 
 Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the specs are in `specifications/`.

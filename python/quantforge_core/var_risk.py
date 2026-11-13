@@ -18,12 +18,18 @@ def _confidence(c: float) -> None:
 
 
 def _tail(losses: Sequence[float], c: float) -> dict[str, object]:
-    """Ruling F-31: k = ceil(n c), VaR the k-th smallest loss, ES the mean from k up."""
+    """Ruling F-31: k = ceil(n c), VaR the k-th smallest loss. Ruling R6-3.1: ES over a tail
+    of weight w = n - n c, the m = floor(w) largest losses in full and L(m+1) with w - m."""
     ordered = sorted(losses)
     n = len(ordered)
     k = math.ceil(n * c)
-    tail = ordered[k - 1:]
-    return {"var": ordered[k - 1], "es": math.fsum(tail) / len(tail), "tail_count": len(tail)}
+    w = n - n * c
+    down = ordered[::-1]
+    if w <= 0:
+        return {"var": ordered[k - 1], "es": down[0], "tail_count": 1}
+    m = math.floor(w)
+    parts = down[:m] + ([(w - m) * down[m]] if m < n and w > m else [])
+    return {"var": ordered[k - 1], "es": math.fsum(parts) / w, "tail_count": math.ceil(w)}
 
 
 def historical(pnl: Sequence[float], c: float) -> dict[str, object]:

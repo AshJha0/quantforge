@@ -52,6 +52,6 @@ struct ZeroJacobian {
     std::vector<std::vector<double>> jacobian;  // rows: pillars, columns: quotes
 };
 ZeroJacobian zero_jacobian(const RateConvention& c, Date as_of, const std::vector<OisQuote>& quotes,
-                           CurveInterpolation interpolation, double bump_bp);
+                           CurveInterpolation interpolation, double bump_bp, const CurveShape& shape = {});
 
 }  // namespace quantforge

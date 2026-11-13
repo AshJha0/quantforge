@@ -70,6 +70,9 @@ def main():
         work = Path(tmp)
         shutil.copytree(ROOT / "cpp26", work / "cpp26", ignore=shutil.ignore_patterns("build*"))
         shutil.copytree(ROOT / "specifications", work / "specifications")
+        # The unit tests read goldens and example inputs in place through QF_REPO_DIR (the parent of cpp26).
+        shutil.copytree(ROOT / "datasets" / "golden", work / "datasets" / "golden")
+        shutil.copytree(ROOT / "examples", work / "examples")
         build = work / "cpp26" / "build"
         conf = ["cmake", "-S", str(work / "cpp26"), "-B", str(build), "-G", "Ninja", f"-DBUILD_TESTING={'ON' if a.unit else 'OFF'}",
                 f"-DCMAKE_CXX_COMPILER={a.compiler}"]
@@ -79,8 +82,10 @@ def main():
         check = [sys.executable, str(ROOT / "conformance" / "runner" / "runner.py"), "--impl", "cpp",
                  "--config", str(config), "--suite", a.suite, "--report", str(work / "report")]
         unit = [str(build / "quantforge_core_tests")]
-        if quiet(conf) or quiet(make) or quiet(check) or (a.unit and quiet(unit)):
-            print("the unmutated build does not pass", file=sys.stderr)
+        steps = [("configure", conf), ("build", make), ("golden cases", check)] + ([("unit tests", unit)] if a.unit else [])
+        failed = next((name for name, cmd in steps if quiet(cmd)), None)
+        if failed:
+            print(f"the unmutated build does not pass ({failed})", file=sys.stderr)
             return 2
         target = work / a.file
         original = target.read_text(encoding="utf-8")
