@@ -1,11 +1,11 @@
 {
   "note": "Release facts for the site home (tools/site_home.html). A release edits this file only: tools/build_site.py fills {{name}} placeholders from here, and counts the rest (version from python/pyproject.toml unless set here, golden cases, suite files and stage E cases and operations from datasets/golden, recorder sources from tools/recorder/sources.json). The build fails on an unknown or unfilled placeholder.",
-  "release": "v0.8.1, R6 evidence repair",
-  "released": "2026-11-13",
+  "release": "v0.8.2, R6 follow-ups (fuzz and CI fixes)",
+  "released": "2026-11-13 (v0.8.1 and v0.8.2)",
   "implemented_stages": "A to G and I",
   "languages": "Java 25, C++26, Python 3.15, Rust 2024",
   "domains": "12",
   "stages": "11 stages, A to K",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "outside_share": "Outside-library share of value-checked cases under the tight rule: stage I 66.7%, G 81.4%, F 84.4% with an independent re-derivation (53.0% libraries alone); every stage meets the 60% floor (<a href=\"oracle/OUTSIDE_SHARES.html\">per stage, with the old all-case shares</a>)."
 }
