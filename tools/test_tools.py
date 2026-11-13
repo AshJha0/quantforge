@@ -1057,6 +1057,10 @@ class StageFInfra(unittest.TestCase):
         leaky = {"py": {"implied_vol": {"ns_per_op": 25000.0, "allocs_per_op": 5.0}}}
         self.assertIn("allocs", bg.compare(leaky, base, "m")[1][0])
         self.assertEqual(bg.compare({}, base, "m")[1], ["py implied_vol: no result"])
+        # A per-language job gates only its own language, but a missing benchmark in it still fails.
+        two = {"machine": "m", "results": {**clean, "rs": {"swap_pv": {"ns_per_op": 9000.0}}}}
+        self.assertEqual(bg.compare(clean, two, "m")[1], [])
+        self.assertEqual(bg.compare({"py": {}}, two, "m")[1], ["py implied_vol: no result"])
 
     def test_mutation_plan(self):
         pm = load("plan_matrix", "conformance/mutation/plan_matrix.py")

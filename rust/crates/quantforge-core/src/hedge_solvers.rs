@@ -2228,3 +2228,94 @@ mod r6_cap_tests {
         );
     }
 }
+
+/// PR #36 mutation run: behaviours the sampled survivors showed were not pinned.
+#[cfg(test)]
+mod r6_followup_tests {
+    use super::*;
+
+    fn plain<'a>(a: &'a Matrix, b: &'a [f64], w: &'a [f64]) -> QpProblem<'a> {
+        QpProblem {
+            a,
+            b,
+            weights: w,
+            ridge: 0.0,
+            eq_matrix: None,
+            eq_rhs: None,
+            lower: None,
+            upper: None,
+            singular: Singular::Error,
+            costs: Costs::default(),
+        }
+    }
+
+    /// The Jacobi diagonal includes the impact term scaled by the cost weight:
+    /// `h = sum_i w_i a_ij^2 + cost_weight impact_j`, here 1 + 2 * 3 = 7.
+    #[test]
+    fn jacobi_includes_weighted_impact() {
+        let a = vec![vec![1.0]];
+        let impact = [3.0];
+        let mut p = plain(&a, &[1.0], &[1.0]);
+        p.costs = Costs {
+            impact: Some(&impact),
+            cost_weight: Some(2.0),
+            ..Costs::default()
+        };
+        let d = jacobi_for(&p).expect("valid problem");
+        assert!((d[0] - 1.0 / 7.0f64.sqrt()).abs() < 1e-15, "{}", d[0]);
+    }
+
+    /// Fully determined by the equalities (dim 0): a point below a lower bound is infeasible,
+    /// and one exactly on it is accepted.
+    #[test]
+    fn determined_point_outside_lower_bound_is_infeasible() {
+        let a = vec![vec![1.0]];
+        let eq = vec![vec![1.0]];
+        let lower_out = [Some(3.0)];
+        let mut p = plain(&a, &[0.0], &[1.0]);
+        p.eq_matrix = Some(&eq);
+        p.eq_rhs = Some(&[2.0]);
+        p.lower = Some(&lower_out);
+        assert_eq!(qp_solve(&p).unwrap_err().code, "E_INFEASIBLE");
+        let lower_on = [Some(2.0)];
+        p.lower = Some(&lower_on);
+        assert!((qp_solve(&p).expect("on the bound").x[0] - 2.0).abs() < 1e-12);
+    }
+
+    /// Upper lot bounds alone (no lower bounds) are a valid integer problem.
+    #[test]
+    fn integer_upper_lots_only() {
+        let a = vec![vec![1.0]];
+        let hi = [Some(5)];
+        let r = integer_solve(&IntegerProblem {
+            a: &a,
+            b: &[3.0],
+            weights: &[1.0],
+            ridge: 0.0,
+            lot_sizes: &[1.0],
+            lower_lots: None,
+            upper_lots: Some(&hi),
+        })
+        .expect("solvable");
+        assert_eq!(r.lots, vec![-3]);
+    }
+
+    /// Each shape error is caught on its own: b of the wrong length, and a covariance with the
+    /// wrong number of rows whose rows are the right length.
+    #[test]
+    fn residual_report_shape_errors_each_alone() {
+        let a = vec![vec![1.0], vec![1.0]];
+        let s2 = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        assert_eq!(
+            residual_report(&a, &[1.0], &[1.0], &s2).unwrap_err().code,
+            "E_INPUT"
+        );
+        let s_short = vec![vec![1.0, 0.0]];
+        assert_eq!(
+            residual_report(&a, &[1.0, 1.0], &[1.0], &s_short)
+                .unwrap_err()
+                .code,
+            "E_INPUT"
+        );
+    }
+}

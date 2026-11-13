@@ -332,6 +332,10 @@ mod tests {
         assert!(conditions_hold(&q, &[-2.0], &[0.5], &[1.5]));
         assert!(conditions_hold(&q, &[2.0], &[0.5], &[-1.5]));
         assert!(!conditions_hold(&q, &[-2.0], &[0.5], &[2.5]));
+        // The tolerance grows with scale = 1 + max|c|: with c = -1000 a residual of about 1e-7
+        // is inside 1e-9 * 1001.
+        assert!(conditions_hold(&q, &[-1000.0], &[0.0], &[1000.0 + 1e-7]));
+        assert!(!conditions_hold(&q, &[-1000.0], &[0.0], &[1000.0 + 1e-5]));
     }
 
     #[test]
