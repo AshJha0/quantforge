@@ -5477,6 +5477,145 @@
     "folds"
    ]
   },
+  "research.estimate.black_litterman": {
+   "spec": "specifications/07-portfolio/estimation.md",
+   "rust": "quantforge::research::estimate_black_litterman",
+   "python": "quantforge.research.estimate_black_litterman",
+   "java": "Research.estimateBlackLitterman",
+   "cpp": "qf::research::estimate_black_litterman",
+   "inputs": {
+    "covariance": {
+     "java": "covariance"
+    },
+    "pick": {
+     "java": "pick"
+    },
+    "prior_returns": {
+     "java": "priorReturns"
+    },
+    "tau": {
+     "java": "tau"
+    },
+    "view_covariance": {
+     "java": "viewCovariance"
+    },
+    "views": {
+     "java": "views"
+    }
+   },
+   "outputs": [
+    "posterior_covariance",
+    "posterior_returns",
+    "predictive_covariance"
+   ]
+  },
+  "research.estimate.ledoit_wolf": {
+   "spec": "specifications/07-portfolio/estimation.md",
+   "rust": "quantforge::research::estimate_ledoit_wolf",
+   "python": "quantforge.research.estimate_ledoit_wolf",
+   "java": "Research.estimateLedoitWolf",
+   "cpp": "qf::research::estimate_ledoit_wolf",
+   "inputs": {
+    "returns": {
+     "java": "returns"
+    }
+   },
+   "outputs": [
+    "covariance",
+    "mu",
+    "shrinkage"
+   ]
+  },
+  "research.portfolio.mean_variance": {
+   "spec": "specifications/07-portfolio/optimisation.md",
+   "rust": "quantforge::research::portfolio_mean_variance",
+   "python": "quantforge.research.portfolio_mean_variance",
+   "java": "Research.portfolioMeanVariance",
+   "cpp": "qf::research::portfolio_mean_variance",
+   "inputs": {
+    "covariance": {
+     "java": "covariance"
+    },
+    "expected_returns": {
+     "java": "expectedReturns"
+    },
+    "lower": {
+     "java": "lower"
+    },
+    "risk_aversion": {
+     "java": "riskAversion"
+    },
+    "upper": {
+     "java": "upper"
+    }
+   },
+   "outputs": [
+    "at_bound",
+    "expected_return",
+    "objective",
+    "volatility",
+    "weights"
+   ]
+  },
+  "research.portfolio.risk_parity": {
+   "spec": "specifications/07-portfolio/optimisation.md",
+   "rust": "quantforge::research::portfolio_risk_parity",
+   "python": "quantforge.research.portfolio_risk_parity",
+   "java": "Research.portfolioRiskParity",
+   "cpp": "qf::research::portfolio_risk_parity",
+   "inputs": {
+    "budgets": {
+     "java": "budgets"
+    },
+    "covariance": {
+     "java": "covariance"
+    }
+   },
+   "outputs": [
+    "contributions",
+    "volatility",
+    "weights"
+   ]
+  },
+  "research.regime.baum_welch": {
+   "spec": "specifications/11-research/baum-welch.md",
+   "rust": "quantforge::research::regime_baum_welch",
+   "python": "quantforge.research.regime_baum_welch",
+   "java": "Research.regimeBaumWelch",
+   "cpp": "qf::research::regime_baum_welch",
+   "inputs": {
+    "initial": {
+     "java": "initial"
+    },
+    "max_iterations": {
+     "java": "maxIterations"
+    },
+    "means": {
+     "java": "means"
+    },
+    "observations": {
+     "java": "observations"
+    },
+    "sds": {
+     "java": "sds"
+    },
+    "tolerance": {
+     "java": "tolerance"
+    },
+    "transition": {
+     "java": "transition"
+    }
+   },
+   "outputs": [
+    "converged",
+    "initial",
+    "iterations",
+    "log_likelihood",
+    "means",
+    "sds",
+    "transition"
+   ]
+  },
   "research.regime.viterbi": {
    "spec": "specifications/11-research/regimes.md",
    "rust": "quantforge::research::regime_viterbi",
@@ -5643,6 +5782,32 @@
     "transitions"
    ]
   },
+  "risk.backtest.es_z2": {
+   "spec": "specifications/06-risk/es-backtest.md",
+   "rust": "quantforge::risk::backtest_es_z2",
+   "python": "quantforge.risk.backtest_es_z2",
+   "java": "Risk.backtestEsZ2",
+   "cpp": "qf::risk::backtest_es_z2",
+   "inputs": {
+    "alpha": {
+     "java": "alpha"
+    },
+    "es": {
+     "java": "es"
+    },
+    "losses": {
+     "java": "losses"
+    },
+    "var": {
+     "java": "var"
+    }
+   },
+   "outputs": [
+    "exceptions",
+    "expected_exceptions",
+    "z2"
+   ]
+  },
   "risk.backtest.kupiec": {
    "spec": "specifications/06-risk/var-es-and-backtests.md",
    "rust": "quantforge::risk::backtest_kupiec",
@@ -5758,6 +5923,27 @@
     "hhi",
     "top_n_share",
     "weights"
+   ]
+  },
+  "risk.contrib.euler": {
+   "spec": "specifications/07-portfolio/optimisation.md",
+   "rust": "quantforge::risk::contrib_euler",
+   "python": "quantforge.risk.contrib_euler",
+   "java": "Risk.contribEuler",
+   "cpp": "qf::risk::contrib_euler",
+   "inputs": {
+    "covariance": {
+     "java": "covariance"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "contributions",
+    "marginal",
+    "shares",
+    "volatility"
    ]
   },
   "risk.corr.dispersion": {

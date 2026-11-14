@@ -378,3 +378,9 @@ Stage J wave 1 adds operations and no error code (ruling J-1). `stage-j-rulings-
 | `research.cv.purged_kfold`, `research.cv.cpcv_paths` | `11-research/purged-cv.md` | wave 1 |
 | `research.regime.viterbi` | `11-research/regimes.md` | wave 1 |
 | `research.stats.psr`, `research.stats.dsr`, `research.stats.pbo`, `research.stats.power` | `11-research/research-statistics.md` | wave 1 |
+| `research.portfolio.mean_variance`, `research.portfolio.risk_parity`, `risk.contrib.euler` | `07-portfolio/optimisation.md` | wave 2 (specified) |
+| `research.estimate.ledoit_wolf`, `research.estimate.black_litterman` | `07-portfolio/estimation.md` | wave 2 (specified) |
+| `risk.backtest.es_z2` | `06-risk/es-backtest.md` | wave 2 (specified) |
+| `research.regime.baum_welch` | `11-research/baum-welch.md` | wave 2 (specified) |
+
+Wave 2 (rulings `stage-j-rulings-w2.md` J-W2-1 to J-W2-15) adds no error code and targets contract 1.14.0. The version moves to 1.14.0 in one coordinator commit when all four builds pass wave 2 (J-W2-1); until then builds report 1.13.0 and answer `E_UNSUPPORTED_OPERATION` for the wave 2 operations. The wave 2 page limits (J-W2-14) replace the general per-array limit as J-20 does for wave 1.
