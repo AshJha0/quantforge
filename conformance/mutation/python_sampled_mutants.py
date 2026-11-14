@@ -44,7 +44,19 @@ PROFILES = {
                      "tests/test_properties.py"],
         "keyword": "credit or cds or hazard or survival or e8 or Credit or mutants or kills",
     },
+    "variance": {
+        "modules": ["quantforge_core/variance.py"],
+        "full": ["tests/test_variance_kills.py", "tests/test_stage_e.py"],
+        "filtered": ["tests/test_mutants_e.py", "tests/test_mutation_e.py",
+                     "tests/test_stage_j_fuzzfix.py"],
+        "keyword": "garch or vix or varswap or variance or Garch or Vix or kills or goldens",
+    },
 }
+# Screening profile: the variance profile without the two slow `vol.garch.estimate` golden suites
+# and the slow estimate test. Use it to find survivors fast; score with `variance`.
+PROFILES["variance_fast"] = {**PROFILES["variance"], "keyword": (
+    "(" + PROFILES["variance"]["keyword"] + ") and not garch_f and not e1_vol_1"
+    " and not test_garch_estimate_matches_golden")}
 SWAP_BIN = {ast.Add: ast.Sub, ast.Sub: ast.Add, ast.Mult: ast.Div, ast.Div: ast.Mult,
             ast.Pow: ast.Mult, ast.FloorDiv: ast.Div, ast.Mod: ast.Div}
 SWAP_CMP = {ast.Lt: ast.LtE, ast.LtE: ast.Lt, ast.Gt: ast.GtE, ast.GtE: ast.Gt, ast.Eq: ast.NotEq,
