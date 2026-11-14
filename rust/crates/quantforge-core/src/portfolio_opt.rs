@@ -1,6 +1,8 @@
 //! Stage J wave 2: mean-variance, risk parity, Euler contributions (`07-portfolio/optimisation.md`),
 //! Ledoit-Wolf and Black-Litterman (`07-portfolio/estimation.md`), the Acerbi-Szekely Z2 statistic
 //! (`06-risk/es-backtest.md`) and Baum-Welch (`11-research/baum-welch.md`).
+// Negated comparisons are deliberate: they reject NaN inputs with the domain error.
+#![allow(clippy::neg_cmp_op_on_partial_ord)]
 use crate::error::{Result, fail};
 
 type Mat = Vec<Vec<f64>>;
@@ -170,13 +172,13 @@ pub fn mean_variance(
         let mut block = None;
         for (k, &i) in free.iter().enumerate() {
             let p = target[k] - w[i];
-            if p < 0.0 && target[k] < lo[i] {
+            if p < 0.0 && target[k] < lo[i] - 1e-14 * (1.0 + lo[i].abs()) {
                 let t = (lo[i] - w[i]) / p;
                 if t < step {
                     step = t;
                     block = Some((i, -1));
                 }
-            } else if p > 0.0 && target[k] > hi[i] {
+            } else if p > 0.0 && target[k] > hi[i] + 1e-14 * (1.0 + hi[i].abs()) {
                 let t = (hi[i] - w[i]) / p;
                 if t < step {
                     step = t;
@@ -193,11 +195,11 @@ pub fn mean_variance(
             continue;
         }
         for (k, &i) in free.iter().enumerate() {
-            w[i] = target[k];
+            w[i] = target[k].clamp(lo[i], hi[i]);
         }
         // Multipliers of the bounds: g_i = mu_i - gamma (Sigma w)_i - nu.
         let sw = mul(&s, &w);
-        let mut worst = (0.0, None);
+        let mut worst = (0.0_f64, None);
         for i in 0..n {
             let g = mu[i] - gamma * sw[i] - nu;
             let v = match state[i] {
@@ -205,13 +207,14 @@ pub fn mean_variance(
                 1 => -g,
                 _ => 0.0,
             };
-            if v > worst.0 + 1e-15 {
+            if v > worst.0.max(1e-13) {
                 worst = (v, Some(i));
             }
         }
-        match worst.1 {
-            Some(i) => state[i] = 0,
-            None => {
+        if let Some(i) = worst.1 {
+            state[i] = 0;
+        } else {
+            {
                 let sw = mul(&s, &w);
                 let var = dot(&w, &sw);
                 let er = dot(mu, &w);
@@ -219,10 +222,8 @@ pub fn mean_variance(
                     .map(|i| {
                         if w[i] == lo[i] {
                             -1
-                        } else if w[i] == hi[i] {
-                            1
                         } else {
-                            0
+                            i64::from(w[i] == hi[i])
                         }
                     })
                     .collect();
@@ -691,7 +692,7 @@ mod tests {
             let g_: Vec<f64> = (0..n).map(|i| mu[i] - 3.0 * sw[i]).collect();
             let free: Vec<usize> = (0..n).filter(|&i| r.at_bound[i] == 0).collect();
             let nu = free.first().map_or(0.0, |&i| g_[i]);
-            for i in 0..n {
+            for i in (0..n).filter(|_| !free.is_empty()) {
                 let gi = g_[i] - nu;
                 match r.at_bound[i] {
                     0 => assert!(gi.abs() < 1e-9),

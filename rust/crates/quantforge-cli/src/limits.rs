@@ -251,12 +251,12 @@ fn vol_and_exotic_above(op: &str, i: &Json) -> bool {
 fn raised_array_keys(op: &str) -> &'static [&'static str] {
     match op {
         "risk.var.historical" => &["pnl"],
-        "risk.var.filtered_historical" => &["returns"],
+        // research.estimate.ledoit_wolf: ruling J-W2-14
+        "risk.var.filtered_historical" | "research.estimate.ledoit_wolf" => &["returns"],
         "risk.backtest.christoffersen" => &["exceptions"],
         "book.lifecycle.apply" => &["events"],
         "research.backtest.run" => &["prices", "targets"],
         "research.cv.purged_kfold" => &["t0", "t1"],
-        "research.estimate.ledoit_wolf" => &["returns"], // ruling J-W2-14
         "research.regime.baum_welch" => &["observations"],
         "risk.backtest.es_z2" => &["losses", "var", "es"],
         "research.stats.pbo" => &["performance"], // ruling J-20: rows judged by J-15's cell cap
