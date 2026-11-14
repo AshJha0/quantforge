@@ -64,6 +64,7 @@
 #include "quantforge/core/shortrate.hpp"
 #include "quantforge/core/lmm.hpp"
 #include "quantforge/core/hedging.hpp"
+#include "quantforge/core/research.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {
@@ -314,6 +315,7 @@ struct Entry {
 #include "ops_xva.inc"
 #include "ops_sensitivity_portfolio.inc"
 #include "ops_frtb_sbm.inc"
+#include "ops_research.inc"
 
 // Every verb this build runs. The operations command, and dispatch, are generated from this list alone.
 constexpr std::span<const Entry> registry[] = {
@@ -343,6 +345,7 @@ constexpr std::span<const Entry> registry[] = {
     reserve_ops,
     risk_gb_ops,
     frtb_gb_ops,
+    research_ops,
 };
 
 // Built on first use, never at static initialisation, so no order between translation units matters.
@@ -435,7 +438,9 @@ CaseResult run_case(string_view text) {
         first_non_finite.reset();
         Handler handler = nullptr;
         const Value& inputs = check_envelope(parsed, handler);
-        const bool big = oversized(inputs);
+        // Ruling J-20: the wave 1 research verbs carry their own page limits in place of the general array limit.
+        const bool research = parsed.value.find("operation")->text.starts_with("research.");
+        const bool big = !research && oversized(inputs);
         Out out;
         out.values.begin_object();
         out.diagnostics.begin_object();
