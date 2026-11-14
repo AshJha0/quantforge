@@ -85,6 +85,10 @@ def _eqp(sigma: Matrix, mu: Sequence[float], gamma: float, w: Sequence[float],
          free: Sequence[int], fixed: Sequence[int]) -> tuple[list[float], float]:
     """Optimum over the free set with the fixed weights held: weights of the free set and nu."""
     target = 1.0 - math.fsum(w[i] for i in fixed)
+    if len(free) == 1:  # the budget fixes the weight; no solve, so no rounding past a bound
+        i = free[0]
+        full = [target if j == i else w[j] for j in range(len(w))]
+        return [target], mu[i] - gamma * _dot(sigma[i], full)
     c = [mu[i] - gamma * sum(sigma[i][j] * w[j] for j in fixed) for i in free]
     low = _cholesky([[sigma[i][j] for j in free] for i in free], "covariance")
     a = _chol_solve(low, c)
@@ -154,7 +158,8 @@ def portfolio_mean_variance(expected_returns: Sequence[float], covariance: Matri
             continue
         for t, i in zip(target, free, strict=True):
             w[i] = t
-        worst, which = 0.0, -1
+        scale = max(abs(x) for x in mu) + gamma * max(abs(x) for r in sigma for x in r)
+        worst, which = 1e-14 * scale, -1
         for i in fixed:
             if lo[i] == up[i]:
                 continue
