@@ -209,6 +209,14 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 | PSR | Probabilistic Sharpe ratio: the probability that the true Sharpe ratio exceeds a benchmark, allowing for sample length, skew and kurtosis (Bailey and López de Prado 2012) |
 | DSR | Deflated Sharpe ratio: the PSR against the best Sharpe ratio expected by chance from the number of trials run (Bailey and López de Prado 2014) |
 | PBO | Probability of backtest overfitting: how often the configuration best in-sample ranks below the median out of sample (Bailey, Borwein, López de Prado and Zhu 2017) |
+| Mean-variance optimisation | Choosing fully invested weights within bounds to maximise expected return minus `gamma/2` times variance (Markowitz 1952; `07-portfolio/optimisation.md`, J-W2-2) |
+| `at_bound` | Per-asset output of mean-variance: `-1` at the lower bound, `+1` at the upper bound, `0` free (J-W2-4) |
+| Risk parity | Long-only weights whose risk contributions are proportional to chosen budgets, equal by default; expected returns are not used (Maillard, Roncalli and Teiletche 2010; J-W2-5) |
+| Euler risk contribution | An asset's weight times the derivative of portfolio volatility with respect to that weight; the contributions add up exactly to the volatility (Tasche 1999; `risk.contrib.euler`) |
+| Ledoit-Wolf shrinkage | A weighted average of the sample covariance and a multiple of the identity, with the weight `delta` estimated from the data (Ledoit and Wolf 2004; J-W2-7) |
+| Black-Litterman | Moving prior expected returns towards investor views, each weighted by its uncertainty against the prior's (Black and Litterman 1992; J-W2-8) |
+| Z2 statistic | The Acerbi-Szekely expected-shortfall backtest: one minus the sum of losses beyond VaR, each over `T alpha ES_t`; about 0 for a correct model, negative when ES is understated (Acerbi and Szekely 2014; J-W2-10) |
+| Baum-Welch | The EM algorithm for a hidden Markov model: estimate state probabilities (E-step), re-estimate the parameters from them (M-step), repeat until the log-likelihood gain is below a tolerance (Rabiner 1989; `11-research/baum-welch.md`) |
 
 ## Tutorial terms
 
