@@ -22,3 +22,7 @@ Every open choice in `R3_NOTES.md` is closed for all three studies (R3-01 items 
 | 10 | minor | Code citation without commit; NY Fed timing without source | `r3_power.py` at 09c596f; NY Fed page named; human check "none" recorded |
 
 After the fixes no finding remains open. Signed as amendment 4 under the owner's delegation.
+
+## Note after signing (runner build, 2026-11-14)
+
+`price_from_yield` quotes `dirty` per 100 of face. Amendment 4 defines `D` as the DV01 "per unit notional", so the runner uses `modified_duration x (dirty / 100) / 10^4`; the defined quantity governs the formula's shorthand. No value was computed on study data when this was found.
