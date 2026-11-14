@@ -36,9 +36,13 @@ and `identity_hedges_return_full_length_answers` (cases B, B') in tests/hedge_mu
   273:23/280:20/281:30 general_inverse, 340:39 dual_active_set.
 
 ## hedge_solvers.rs (J-0 var lane, round 2)
-Killed by `empty_rows_are_rejected_even_with_rows_present`: 163:15 (check_system `||` -> `&&`).
-Killed by `integer_sized_bound_violation_is_still_enforced`: 340:39 `/` -> `%` (an integer violation
-mod scale 1 becomes -0 and the bound is skipped).
+Scoped re-run ~/j0-v5-hs (and a manual mutant check) showed both new tests pass under their target
+mutants, so neither is killed:
+- 163:15 (check_system `||` -> `&&`): with one row and no columns a later check still returns
+  E_INPUT, so the error status is unchanged. Equivalent on observed behaviour for `qp_solve`; not
+  proven for `integer_solve` or `select_solve`.
+- 340:39 `/` -> `%`: the bound in the test is not handled through `dual_active_set` (a 1-variable
+  bound does not reach the scaled-slack path). Still open; needs a general inequality (margin limit).
 
 Equivalent (reason):
 - `hedge_solvers.rs:189:36 replace > with ==/</>= in householder_qr` and `189:44 delete -`: the sign
