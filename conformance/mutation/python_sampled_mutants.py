@@ -56,7 +56,7 @@ PROFILES = {
 # and the slow estimate test. Use it to find survivors fast; score with `variance`.
 PROFILES["variance_fast"] = {**PROFILES["variance"], "keyword": (
     "(" + PROFILES["variance"]["keyword"] + ") and not garch_f and not e1_vol_1"
-    " and not test_garch_estimate_matches_golden")}
+    " and not test_garch_estimate_matches_golden and not estimate_properties")}
 SWAP_BIN = {ast.Add: ast.Sub, ast.Sub: ast.Add, ast.Mult: ast.Div, ast.Div: ast.Mult,
             ast.Pow: ast.Mult, ast.FloorDiv: ast.Div, ast.Mod: ast.Div}
 SWAP_CMP = {ast.Lt: ast.LtE, ast.LtE: ast.Lt, ast.Gt: ast.GtE, ast.GtE: ast.Gt, ast.Eq: ast.NotEq,

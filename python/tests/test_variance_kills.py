@@ -377,3 +377,64 @@ def test_nelder_mead_finds_a_known_minimum() -> None:
     x, val = v._nelder_mead(f, [0.0, 0.0], 0.5, 2000)
     assert x == pytest.approx([1.0, -3.0], abs=1e-6)
     assert val == pytest.approx(5.0, abs=1e-12)
+
+
+# --- garch_estimate properties (slow: two 2000-return fits, shared by the tests below) -----------
+def _estimate_case(case_id: str) -> tuple[list[float], dict[str, Any], dict[str, Any]]:
+    cases = json.loads((ROOT / "datasets" / "golden" / "stage_f" / "garch_f.json")
+                       .read_text("utf-8"))["cases"]
+    case = next(c for c in cases if c["case_id"] == case_id)
+    i = case["inputs"]
+    out = v.garch_estimate(i["returns"], i["initial_variance"], i["distribution"], i["demean"])
+    return i["returns"], i, out
+
+
+@pytest.fixture(scope="module", params=["garch_f-0011", "garch_f-0012"])
+def estimate(request: pytest.FixtureRequest) -> tuple[list[float], dict[str, Any], dict[str, Any]]:
+    return _estimate_case(request.param)
+
+
+def test_estimate_properties(estimate: tuple[list[float], dict[str, Any], dict[str, Any]]) -> None:
+    returns, i, out = estimate
+    student = i["distribution"] == "STUDENT_T"
+    nu = out["degrees_of_freedom"]
+    assert (nu is not None) == student
+    mu = sum(returns) / len(returns)
+    assert out["mean"] == pytest.approx(mu, rel=1e-12)
+    assert out["persistence"] == out["alpha"] + out["beta"]
+    # The reported loglik is the likelihood at the reported parameters.
+    ll = v.garch_loglik_t(returns, out["omega"], out["alpha"], out["beta"], "SAMPLE",
+                          i["distribution"], nu, mu)[0]
+    assert out["loglik"] == pytest.approx(ll, rel=1e-12)
+    # First-order condition: an interior maximum has a zero score (relative to the scale).
+    e = [r - mu for r in returns]
+    s0 = sum(x * x for x in e) / len(e)
+    theta = [out["omega"], out["alpha"], out["beta"]] + ([nu] if student else [])
+    grad = v._score(e, theta, s0, student)[1]
+    scale = [s0, 1.0, 1.0, 1.0]
+    assert max(abs(g) * s for g, s in zip(grad, scale, strict=False)) < 1e-6 * len(e)
+    # Standard errors: sqrt of the diagonal of the inverse observed information, with the Hessian
+    # from an independent central difference of the log-likelihood itself.
+    import numpy as np
+
+    n = len(theta)
+    h = np.zeros((n, n))
+    for a in range(n):
+        for b in range(n):
+            da, db = 1e-4 * theta[a], 1e-4 * theta[b]
+
+            def ll_at(sa: float, sb: float, a: int = a, b: int = b, da: float = da,
+                      db: float = db) -> float:
+                t = list(theta)
+                t[a] += sa * da
+                t[b] += sb * db
+                return v._score(e, t, s0, student)[0]
+
+            h[a, b] = (ll_at(1, 1) - ll_at(1, -1) - ll_at(-1, 1) + ll_at(-1, -1)) / (4 * da * db)
+    se = np.sqrt(np.diag(np.linalg.inv(-h)))
+    keys = ["omega", "alpha", "beta", "degrees_of_freedom"]
+    for j, k in enumerate(keys):
+        if j < n:
+            assert out["std_errors"][k] == pytest.approx(float(se[j]), rel=2e-3)
+        else:
+            assert out["std_errors"][k] is None
