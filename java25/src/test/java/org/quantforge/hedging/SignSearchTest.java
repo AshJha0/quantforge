@@ -181,6 +181,12 @@ class SignSearchTest {
         assertTrue(zeros > 0, "the costs leave some instrument at exactly 0, so the kink test is exercised");
     }
 
+    /** CI sample -81646: impact plus an infeasible start orthant; phase 1 once over-weighted impact by weight / cw. */
+    @org.junit.jupiter.api.Test
+    void phaseOneWithImpactFindsTheFeasibleOrthant() {
+        signSearchAgreesWithTheEnumerationOracle(-81646L);
+    }
+
     @Property(tries = 150)
     void signSearchAgreesWithTheEnumerationOracle(@ForAll long seed) {
         Random rnd = new Random(seed);

@@ -553,7 +553,14 @@ public final class LeastSquaresHedge {
                 // Phase 1: the least-margin point, as the minimiser of the smooth part plus a dominant margin cost.
                 double weight = 1e12 * Math.max(1.0, free.f());
                 double[] mr = ct.rates();
-                CostTerms phase1 = new CostTerms(weight, mr, ct.impact(), null, null);
+                // The impact term lives in the reduced Hessian with the caller's weight ct.cw(); objective() adds
+                // cw * impact * x^2, so scale impact here to keep phase 1's reported objective equal to the problem
+                // the orthant solver minimises (an unscaled impact made f wrong by the factor weight / cw).
+                double[] imp1 = new double[n];
+                for (int j = 0; j < n; j++) {
+                    imp1[j] = ct.impact()[j] * (ct.cw() / weight);
+                }
+                CostTerms phase1 = new CostTerms(weight, mr, imp1, null, null);
                 double[] x1 = signSearch(rd, lo, hi, signsOf(free.x(), lo, hi, phase1), phase1, a, b, w, ridge).x();
                 double margin = 0.0;
                 for (int j = 0; j < n; j++) {
