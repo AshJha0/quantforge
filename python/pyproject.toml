@@ -17,7 +17,7 @@ dev = ["scipy>=1.13", "pytest>=8", "hypothesis>=6", "ruff>=0.6", "mypy>=1.10", "
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["quantforge_core*"]
+include = ["quantforge_core*", "quantforge_research*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

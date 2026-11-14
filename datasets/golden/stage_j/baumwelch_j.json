@@ -1,0 +1,1320 @@
+{
+ "schema_version": "1.0",
+ "suite": "baumwelch_j",
+ "spec": "specifications/11-research/baum-welch.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_j_w2.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "baumwelch_j-0001",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "observations": [
+     0.5,
+     -1.0,
+     2.0,
+     0.25,
+     1.5,
+     -0.75
+    ],
+    "initial": [
+     1.0
+    ],
+    "transition": [
+     [
+      1.0
+     ]
+    ],
+    "means": [
+     0.0
+    ],
+    "sds": [
+     1.0
+    ],
+    "tolerance": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "initial": [
+      1.0
+     ],
+     "transition": [
+      [
+       1.0
+      ]
+     ],
+     "means": [
+      0.4166666666666667
+     ],
+     "sds": [
+      1.0865337342004415
+     ],
+     "log_likelihood": -9.01158661165082,
+     "iterations": 2,
+     "converged": true
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "synthetic"
+   ],
+   "description": "hand: one state converges to the sample mean and population sd in one step, stops at iteration 2",
+   "output_classes": {
+    "iterations": "date_and_convention",
+    "converged": "date_and_convention",
+    "log_likelihood": "likelihood_sum"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "plan 12.10 A4: fitted parameters within 1e-9 relative across languages (ruling J-W2-9)"
+   }
+  },
+  {
+   "case_id": "baumwelch_j-0002",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "initial": [
+     0.5,
+     0.5
+    ],
+    "transition": [
+     [
+      0.8,
+      0.2
+     ],
+     [
+      0.2,
+      0.8
+     ]
+    ],
+    "means": [
+     -0.5,
+     1.5
+    ],
+    "sds": [
+     1.0,
+     1.0
+    ],
+    "observations": [
+     1.498222,
+     0.266253,
+     1.86271,
+     -0.783473,
+     -0.601229,
+     -0.418985,
+     -1.650954,
+     -0.054497,
+     -1.286466,
+     -1.104221,
+     -0.921977,
+     -0.739732,
+     -0.557489,
+     -0.375244,
+     1.221213,
+     -0.010757,
+     0.171487,
+     1.767945,
+     -0.878238,
+     0.71822,
+     0.900464,
+     -0.331505,
+     -0.149261,
+     -1.381231,
+     0.215226,
+     2.596207,
+     -1.373069,
+     -1.099701,
+     -0.826336,
+     -0.55297,
+     -0.279603,
+     2.115083,
+     2.38845,
+     2.661817,
+     5.056502,
+     1.087227,
+     3.481913,
+     3.755279,
+     1.907326,
+     2.180692,
+     2.45406,
+     2.727426,
+     3.000791,
+     3.274157,
+     1.426204,
+     1.699568,
+     6.215577,
+     4.367623,
+     4.640988,
+     2.793034,
+     -0.70328,
+     0.893178,
+     -0.338792,
+     -0.156548,
+     0.025698,
+     -1.206273,
+     -1.02403,
+     -0.841784,
+     -0.659541,
+     -0.477298
+    ],
+    "tolerance": 1.29e-07
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "initial": [
+      7.9357622024869745e-28,
+      1.0
+     ],
+     "transition": [
+      [
+       0.9328660391696962,
+       0.06713396083030379
+      ],
+      [
+       0.14573752615404661,
+       0.8542624738459534
+      ]
+     ],
+     "means": [
+      -0.4071983679316511,
+      2.7272604649142966
+     ],
+     "sds": [
+      0.7495715574047683,
+      1.3624331205819107
+     ],
+     "log_likelihood": -97.0482693625069,
+     "iterations": 28,
+     "converged": true
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "synthetic"
+   ],
+   "description": "A4 start values, two states, 60 observations, blocks of 25",
+   "output_classes": {
+    "iterations": "date_and_convention",
+    "converged": "date_and_convention",
+    "log_likelihood": "likelihood_sum"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "plan 12.10 A4: fitted parameters within 1e-9 relative across languages (ruling J-W2-9)"
+   }
+  },
+  {
+   "case_id": "baumwelch_j-0003",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "initial": [
+     0.5,
+     0.5
+    ],
+    "transition": [
+     [
+      0.8,
+      0.2
+     ],
+     [
+      0.2,
+      0.8
+     ]
+    ],
+    "means": [
+     -0.5,
+     1.5
+    ],
+    "sds": [
+     1.0,
+     1.0
+    ],
+    "observations": [
+     1.498222,
+     0.266253,
+     1.86271,
+     -0.783473,
+     -0.601229,
+     -0.418985,
+     -1.650954,
+     -0.054497,
+     -1.286466,
+     -1.104221,
+     -0.921977,
+     -0.739732,
+     -0.557489,
+     -0.375244,
+     1.221213,
+     -0.010757,
+     0.171487,
+     1.767945,
+     -0.878238,
+     0.71822,
+     0.900464,
+     -0.331505,
+     -0.149261,
+     -1.381231,
+     0.215226,
+     2.596207,
+     -1.373069,
+     -1.099701,
+     -0.826336,
+     -0.55297,
+     -0.279603,
+     2.115083,
+     2.38845,
+     2.661817,
+     5.056502,
+     1.087227,
+     3.481913,
+     3.755279,
+     1.907326,
+     2.180692,
+     2.45406,
+     2.727426,
+     3.000791,
+     3.274157,
+     1.426204,
+     1.699568,
+     6.215577,
+     4.367623,
+     4.640988,
+     2.793034,
+     -0.70328,
+     0.893178,
+     -0.338792,
+     -0.156548,
+     0.025698,
+     -1.206273,
+     -1.02403,
+     -0.841784,
+     -0.659541,
+     -0.477298
+    ],
+    "tolerance": 1.29e-07,
+    "max_iterations": 5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "initial": [
+      5.628933311438907e-07,
+      0.9999994371066688
+     ],
+     "transition": [
+      [
+       0.9214825821214221,
+       0.07851741787857795
+      ],
+      [
+       0.15657098025447994,
+       0.8434290197455201
+      ]
+     ],
+     "means": [
+      -0.4356136016277398,
+      2.6846266925507165
+     ],
+     "sds": [
+      0.7156030524551575,
+      1.3756435363474024
+     ],
+     "log_likelihood": -97.08628786649724,
+     "iterations": 5,
+     "converged": false
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "synthetic"
+   ],
+   "description": "stopped at 5 iterations: not converged",
+   "output_classes": {
+    "iterations": "date_and_convention",
+    "converged": "date_and_convention",
+    "log_likelihood": "likelihood_sum"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "plan 12.10 A4: fitted parameters within 1e-9 relative across languages (ruling J-W2-9)"
+   }
+  },
+  {
+   "case_id": "baumwelch_j-0004",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "initial": [
+     0.5,
+     0.5
+    ],
+    "transition": [
+     [
+      0.8,
+      0.2
+     ],
+     [
+      0.2,
+      0.8
+     ]
+    ],
+    "means": [
+     -0.5,
+     1.5
+    ],
+    "sds": [
+     1.0,
+     1.0
+    ],
+    "observations": [
+     -0.375244,
+     1.221213,
+     -0.010757,
+     0.171487,
+     1.767945,
+     -0.878238,
+     0.71822,
+     0.900464,
+     -0.331505,
+     -0.149261,
+     -1.381231,
+     0.215226,
+     0.397471,
+     -2.248713,
+     -2.066467,
+     -1.884224,
+     -1.70198,
+     -1.519735,
+     0.076722,
+     0.258967,
+     0.441211,
+     2.037668,
+     -0.608516,
+     0.987942,
+     1.170186,
+     1.907326,
+     2.180692,
+     2.45406,
+     2.727426,
+     3.000791,
+     3.274157,
+     1.426204,
+     1.699568,
+     6.215577,
+     4.367623,
+     4.640988,
+     2.793034,
+     0.94508,
+     3.339767,
+     1.491812,
+     1.765178,
+     2.038547,
+     0.190591,
+     0.463955,
+     0.737323,
+     1.010688,
+     1.284053,
+     1.557423,
+     -0.290533,
+     -0.017166,
+     1.665893,
+     0.433924,
+     0.616169,
+     0.798411,
+     -0.433558,
+     1.162901,
+     1.345144,
+     0.113175,
+     0.295419,
+     0.477663,
+     -2.168519,
+     -0.572061,
+     -0.389817,
+     -1.621786,
+     -1.439543,
+     -1.257299,
+     -1.075055,
+     0.521403,
+     -0.710566,
+     -0.528322,
+     -0.346079,
+     -1.578047,
+     0.01841,
+     0.200654,
+     0.382898,
+     2.847714,
+     3.12108,
+     1.273126,
+     3.667812,
+     3.941179,
+     2.093224,
+     2.366591,
+     2.639958,
+     2.913323,
+     3.18669,
+     3.460055,
+     1.6121,
+     1.885467,
+     4.280153,
+     2.4322,
+     2.705567,
+     2.978933,
+     1.130979,
+     3.525665,
+     1.677711,
+     1.951077,
+     2.224443,
+     0.37649,
+     0.649855,
+     0.923221
+    ],
+    "tolerance": 1.27e-07
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "initial": [
+      1.0,
+      2.0696916140520854e-33
+     ],
+     "transition": [
+      [
+       0.9647134716829684,
+       0.03528652831703162
+      ],
+      [
+       0.04701811427317821,
+       0.9529818857268217
+      ]
+     ],
+     "means": [
+      -0.0023034146722953467,
+      2.599033901692133
+     ],
+     "sds": [
+      1.0581152089762493,
+      1.1237019025863146
+     ],
+     "log_likelihood": -161.70593536405573,
+     "iterations": 15,
+     "converged": true
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "synthetic"
+   ],
+   "description": "A4 start values, two states, 100 observations, blocks of 25",
+   "output_classes": {
+    "iterations": "date_and_convention",
+    "converged": "date_and_convention",
+    "log_likelihood": "likelihood_sum"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "plan 12.10 A4: fitted parameters within 1e-9 relative across languages (ruling J-W2-9)"
+   }
+  },
+  {
+   "case_id": "baumwelch_j-0005",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "initial": [
+     0.5,
+     0.5
+    ],
+    "transition": [
+     [
+      0.8,
+      0.2
+     ],
+     [
+      0.2,
+      0.8
+     ]
+    ],
+    "means": [
+     -0.5,
+     1.5
+    ],
+    "sds": [
+     1.0,
+     1.0
+    ],
+    "observations": [
+     -2.248713,
+     -2.066467,
+     -1.884224,
+     -1.70198,
+     -1.519735,
+     0.076722,
+     0.258967,
+     0.441211,
+     2.037668,
+     -0.608516,
+     0.987942,
+     1.170186,
+     -0.061783,
+     0.120461,
+     0.302707,
+     0.484951,
+     0.667194,
+     0.849438,
+     -0.382531,
+     -0.200288,
+     2.810385,
+     1.578415,
+     1.760658,
+     0.52869,
+     -0.70328,
+     3.339767,
+     1.491812,
+     1.765178,
+     2.038547,
+     0.190591,
+     0.463955,
+     0.737323,
+     1.010688,
+     1.284053,
+     1.557423,
+     -0.290533,
+     -0.017166,
+     4.49884,
+     2.650886,
+     2.924253,
+     3.197617,
+     1.349664,
+     3.744351,
+     4.017716,
+     2.169763,
+     2.443129,
+     2.716495,
+     -1.252779,
+     1.141909,
+     1.415274,
+     -1.621786,
+     -1.439543,
+     -1.257299,
+     -1.075055,
+     0.521403,
+     -0.710566,
+     -0.528322,
+     -0.346079,
+     -1.578047,
+     0.01841,
+     0.200654,
+     0.382898,
+     0.565142,
+     0.747386,
+     -0.484582,
+     1.111875,
+     1.294119,
+     0.062149,
+     0.244394,
+     0.426639,
+     0.608882,
+     0.791127,
+     0.97337,
+     -0.2586,
+     -0.076356,
+     4.280153,
+     2.4322,
+     2.705567,
+     2.978933,
+     1.130979,
+     3.525665,
+     1.677711,
+     1.951077,
+     2.224443,
+     0.37649,
+     0.649855,
+     0.923221,
+     3.317907,
+     3.591275,
+     3.86464,
+     2.016686,
+     2.290053,
+     4.68474,
+     0.715463,
+     0.98883,
+     1.262196,
+     -0.585759,
+     1.808928,
+     -0.039025,
+     0.234341,
+     -0.994862,
+     -0.812618,
+     -0.630374,
+     -0.44813,
+     1.148328,
+     -0.083642,
+     0.098603,
+     1.695059,
+     -0.951122,
+     0.645335,
+     -0.586634,
+     -0.404389,
+     -0.222145,
+     -1.454115,
+     0.142342,
+     0.324586,
+     -0.907383,
+     -0.725139,
+     -0.542895,
+     -0.36065,
+     -0.178407,
+     1.418052,
+     0.186082,
+     0.368326,
+     1.964783,
+     0.977901,
+     3.372587,
+     3.645954,
+     1.797999,
+     4.192686,
+     2.344732,
+     2.618098,
+     0.770144,
+     3.164831,
+     1.316875,
+     1.590243,
+     6.106248,
+     2.136973,
+     4.531661,
+     2.683707,
+     0.835754,
+     3.230441,
+     -0.738835,
+     1.655853,
+     1.929218,
+     0.081264,
+     2.475951,
+     0.627996,
+     0.901362,
+     -0.946591
+    ],
+    "tolerance": 9.36e-08
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "initial": [
+      1.0,
+      2.7426234412895303e-91
+     ],
+     "transition": [
+      [
+       0.9467959559731549,
+       0.053204044026845074
+      ],
+      [
+       0.0697434699821006,
+       0.9302565300178994
+      ]
+     ],
+     "means": [
+      0.029790652676710706,
+      2.2353484760930242
+     ],
+     "sds": [
+      0.9627176598345742,
+      1.374284931137851
+     ],
+     "log_likelihood": -250.02568128169648,
+     "iterations": 39,
+     "converged": true
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "synthetic"
+   ],
+   "description": "A4 start values, two states, 150 observations, blocks of 25",
+   "output_classes": {
+    "iterations": "date_and_convention",
+    "converged": "date_and_convention",
+    "log_likelihood": "likelihood_sum"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "plan 12.10 A4: fitted parameters within 1e-9 relative across languages (ruling J-W2-9)"
+   }
+  },
+  {
+   "case_id": "baumwelch_j-0006",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "observations": [
+     -1.982137,
+     -2.160222,
+     -2.338309,
+     -1.716395,
+     -1.894481,
+     -2.072567,
+     -2.250653,
+     -1.628739,
+     -1.806825,
+     -1.98491,
+     -2.162997,
+     -2.341083,
+     -1.719169,
+     -1.897255,
+     -2.875341,
+     -2.253427,
+     -3.231513,
+     -2.609599,
+     -1.987685,
+     -2.965772,
+     -0.343857,
+     -0.521944,
+     0.099971,
+     -0.078115,
+     0.543798,
+     0.365713,
+     0.187626,
+     0.80954,
+     -0.168546,
+     0.453368,
+     1.075282,
+     0.097196,
+     0.71911,
+     0.541024,
+     0.362938,
+     0.984852,
+     0.006766,
+     -0.17132,
+     -0.349406,
+     -0.527492,
+     2.094422,
+     1.916336,
+     1.73825,
+     1.560164,
+     2.182078,
+     2.003992,
+     1.825906,
+     2.44782,
+     1.469734,
+     2.091648,
+     1.913562,
+     1.735476,
+     2.35739,
+     2.179304,
+     2.001217,
+     1.823132,
+     2.445045,
+     2.26696,
+     2.088874,
+     2.710787
+    ],
+    "initial": [
+     0.4,
+     0.3,
+     0.3
+    ],
+    "transition": [
+     [
+      0.9,
+      0.05,
+      0.05
+     ],
+     [
+      0.05,
+      0.9,
+      0.05
+     ],
+     [
+      0.05,
+      0.05,
+      0.9
+     ]
+    ],
+    "means": [
+     -1.5,
+     0.2,
+     1.5
+    ],
+    "sds": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "tolerance": 5.02e-09
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "initial": [
+      1.0,
+      9.20338299132218e-55,
+      3.8452109083584934e-204
+     ],
+     "transition": [
+      [
+       0.9500004147947737,
+       0.049999585205226266,
+       4.876473454138664e-46
+      ],
+      [
+       4.638192783330833e-21,
+       0.9500000782484119,
+       0.04999992175158809
+      ],
+      [
+       6.334364532753295e-44,
+       4.0010240051571866e-15,
+       0.999999999999996
+      ]
+     ],
+     "means": [
+      -2.19393860401404,
+      0.2043483864089387,
+      2.0426043406309367
+     ],
+     "sds": [
+      0.42470778260340747,
+      0.470812754311075,
+      0.3038300983835796
+     ],
+     "log_likelihood": -37.05480472506236,
+     "iterations": 5,
+     "converged": true
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "synthetic"
+   ],
+   "description": "three states, 60 observations",
+   "output_classes": {
+    "iterations": "date_and_convention",
+    "converged": "date_and_convention",
+    "log_likelihood": "likelihood_sum"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "plan 12.10 A4: fitted parameters within 1e-9 relative across languages (ruling J-W2-9)"
+   }
+  },
+  {
+   "case_id": "baumwelch_j-0007",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "initial": [
+     0.5,
+     0.5
+    ],
+    "transition": [
+     [
+      0.8,
+      0.1
+     ],
+     [
+      0.2,
+      0.8
+     ]
+    ],
+    "means": [
+     -0.5,
+     1.5
+    ],
+    "sds": [
+     1.0,
+     1.0
+    ],
+    "observations": [
+     0.1,
+     0.4,
+     -0.2,
+     1.9,
+     2.2
+    ],
+    "tolerance": 1e-10
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "rows do not sum to 1"
+  },
+  {
+   "case_id": "baumwelch_j-0008",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "initial": [
+     0.5,
+     0.5
+    ],
+    "transition": [
+     [
+      0.8,
+      0.2
+     ],
+     [
+      0.2,
+      0.8
+     ]
+    ],
+    "means": [
+     -0.5,
+     1.5
+    ],
+    "sds": [
+     1.0,
+     0.0
+    ],
+    "observations": [
+     0.1,
+     0.4,
+     -0.2,
+     1.9,
+     2.2
+    ],
+    "tolerance": 1e-10
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "sd zero"
+  },
+  {
+   "case_id": "baumwelch_j-0009",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "initial": [
+     0.5,
+     0.5
+    ],
+    "transition": [
+     [
+      0.8,
+      0.2
+     ],
+     [
+      0.2,
+      0.8
+     ]
+    ],
+    "means": [
+     -0.5,
+     1.5
+    ],
+    "sds": [
+     1.0,
+     1.0
+    ],
+    "observations": [
+     0.1
+    ],
+    "tolerance": 1e-10
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "one observation"
+  },
+  {
+   "case_id": "baumwelch_j-0010",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "initial": [
+     0.5,
+     0.5
+    ],
+    "transition": [
+     [
+      0.8,
+      0.2
+     ],
+     [
+      0.2,
+      0.8
+     ]
+    ],
+    "means": [
+     -0.5,
+     1.5
+    ],
+    "sds": [
+     1.0,
+     1.0
+    ],
+    "observations": [
+     0.1,
+     0.4,
+     -0.2,
+     1.9,
+     2.2
+    ],
+    "tolerance": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "tolerance zero"
+  },
+  {
+   "case_id": "baumwelch_j-0011",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "initial": [
+     0.5,
+     0.5
+    ],
+    "transition": [
+     [
+      0.8,
+      0.2
+     ],
+     [
+      0.2,
+      0.8
+     ]
+    ],
+    "means": [
+     -0.5,
+     1.5
+    ],
+    "sds": [
+     1.0,
+     1.0
+    ],
+    "observations": [
+     0.1,
+     0.4,
+     -0.2,
+     1.9,
+     2.2
+    ],
+    "tolerance": 1e-10,
+    "max_iterations": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "max iterations zero"
+  },
+  {
+   "case_id": "baumwelch_j-0012",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "initial": [
+     0.5,
+     0.5
+    ],
+    "transition": [
+     [
+      0.8,
+      0.2
+     ],
+     [
+      0.2,
+      0.8
+     ]
+    ],
+    "means": [
+     -0.5,
+     1.5
+    ],
+    "sds": [
+     1.0,
+     1.0
+    ],
+    "observations": [
+     0.1,
+     0.4,
+     -0.2,
+     1.9,
+     2.2
+    ],
+    "tolerance": 1e-10,
+    "max_iterations": 10001
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "max iterations above 10,000"
+  },
+  {
+   "case_id": "baumwelch_j-0013",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "initial": [
+     0.5,
+     0.5
+    ],
+    "transition": [
+     [
+      0.8,
+      0.2
+     ],
+     [
+      0.2,
+      0.8
+     ]
+    ],
+    "means": [
+     0.0
+    ],
+    "sds": [
+     1.0,
+     1.0
+    ],
+    "observations": [
+     0.1,
+     0.4,
+     -0.2,
+     1.9,
+     2.2
+    ],
+    "tolerance": 1e-10
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "means length"
+  },
+  {
+   "case_id": "baumwelch_j-0014",
+   "operation": "research.regime.baum_welch",
+   "inputs": {
+    "initial": [
+     0.5,
+     0.5
+    ],
+    "transition": [
+     [
+      0.8,
+      0.2
+     ],
+     [
+      0.2,
+      0.8
+     ]
+    ],
+    "means": [
+     -0.5,
+     1.5
+    ],
+    "sds": [
+     1.0,
+     1.0
+    ],
+    "observations": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "tolerance": 1e-10
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "collapse: constant series"
+  }
+ ]
+}
