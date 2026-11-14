@@ -40,3 +40,34 @@ not the returned hedge (verified against the brute-force reference in tests/hedg
   `hedge_solvers.rs:91:13` and `:92:13 replace || with && in Costs<'_>::any`.
 - Not yet targeted (partial h3 missed list): 163:15 check_system, 189:36/189:44/193:16 householder_qr,
   273:23/280:20/281:30 general_inverse, 340:39 dual_active_set.
+
+## hedge_solvers.rs (J-0 var lane, round 2)
+Killed by `empty_rows_are_rejected_even_with_rows_present`: 163:15 (check_system `||` -> `&&`).
+Killed by `integer_sized_bound_violation_is_still_enforced`: 340:39 `/` -> `%` (an integer violation
+mod scale 1 becomes -0 and the bound is skipped).
+
+Equivalent (reason):
+- `hedge_solvers.rs:189:36 replace > with ==/</>= in householder_qr` and `189:44 delete -`: the sign
+  of `alpha` only picks which of the two valid reflectors `x +- |x| e1` is used; Q and R change sign
+  per column, and the null-space basis consumer (line 456) gives the same projector. Differences are
+  rounding only, inside test tolerances.
+- `193:16 replace -= with +=`: same, `v = x + alpha e1` is the other valid reflector.
+- `280:20 replace + with * in general_inverse`: the pivot search then also compares row `k` with
+  itself; `>` is false, so `p` is unchanged.
+- `281:30 replace > with >= / == in general_inverse`: the input is the active-set Gram matrix
+  `B^T G^-1 B`, symmetric positive definite, so every diagonal pivot is positive and the pivot
+  choice changes rounding only; `==` cannot hit a zero pivot.
+- `307:24 replace + with * in general_inverse`: adds `a[i][i] * inv[i][c]` while `inv[i][c]` is
+  still 0.
+- `340:39 replace / with * in dual_active_set`: the scaled slack only orders violated constraints
+  (and both forms flag the same sign); the method ends at the unique KKT point whatever the order,
+  except at `|slack| ~ 1e-12`, below test tolerance.
+- `341:33 replace < with <=`: differs only at slack exactly `-1e-12`.
+- `380:24 replace > with >=`: `ri == 0` gives `u/0 = +inf` (or NaN), never `< t1`.
+- `380:43 replace < with <=`: tie in the dual step ratio; a different index is dropped at an exact
+  tie, and the final active set is re-solved, giving the same KKT point.
+- `386:28 replace > with >=`: differs only at `zn == dependence * gn` exactly.
+
+Not killed, not shown equivalent (needs a crafted near-singular active set; left open):
+- `273:23 replace * with / in general_inverse` (singularity limit `1e-14 * largest`).
+- `380:38 replace / with % and * in dual_active_set` (dual step length t1).
