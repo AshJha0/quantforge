@@ -41,6 +41,29 @@ fn operation_above(op: &str, i: &Json) -> bool {
         // Stage J wave 1 (J-5, J-9, J-12, J-15).
         "research.cv.cpcv_paths" => above(i, "n_groups", 64),
         "research.regime.viterbi" => len(i, "initial").is_some_and(|k| k > 32),
+        // Stage J wave 2 (J-W2-14).
+        "research.portfolio.mean_variance" => len(i, "expected_returns").is_some_and(|n| n > 500),
+        "research.portfolio.risk_parity" => len(i, "covariance").is_some_and(|n| n > 500),
+        "risk.contrib.euler" => len(i, "weights").is_some_and(|n| n > 500),
+        "research.estimate.black_litterman" => {
+            len(i, "prior_returns").is_some_and(|n| n > 500)
+                || len(i, "views").is_some_and(|n| n > 500)
+        }
+        "research.estimate.ledoit_wolf" => {
+            let cols = i
+                .get("returns")
+                .and_then(Json::as_array)
+                .and_then(|a| a.first())
+                .and_then(Json::as_array)
+                .map(|r| r.len() as i128);
+            cols.is_some_and(|n| n > 500) || product_above(len(i, "returns"), cols, 10_000_000)
+        }
+        "research.regime.baum_welch" => {
+            let k = len(i, "initial");
+            k.is_some_and(|k| k > 16)
+                || above(i, "max_iterations", 10_000)
+                || product_above(len(i, "observations"), k, 10_000_000)
+        }
         "research.stats.pbo" => {
             let rows = len(i, "performance");
             let cols = i
@@ -228,11 +251,14 @@ fn vol_and_exotic_above(op: &str, i: &Json) -> bool {
 fn raised_array_keys(op: &str) -> &'static [&'static str] {
     match op {
         "risk.var.historical" => &["pnl"],
-        "risk.var.filtered_historical" => &["returns"],
+        // research.estimate.ledoit_wolf: ruling J-W2-14
+        "risk.var.filtered_historical" | "research.estimate.ledoit_wolf" => &["returns"],
         "risk.backtest.christoffersen" => &["exceptions"],
         "book.lifecycle.apply" => &["events"],
         "research.backtest.run" => &["prices", "targets"],
         "research.cv.purged_kfold" => &["t0", "t1"],
+        "research.regime.baum_welch" => &["observations"],
+        "risk.backtest.es_z2" => &["losses", "var", "es"],
         "research.stats.pbo" => &["performance"], // ruling J-20: rows judged by J-15's cell cap
         _ => &[],
     }

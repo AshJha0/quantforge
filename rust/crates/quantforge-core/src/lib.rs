@@ -62,6 +62,7 @@ pub mod mc;
 pub mod mc_greeks;
 pub mod ois;
 pub mod pde;
+pub mod portfolio_opt;
 pub mod projection;
 pub mod rates_overnight;
 pub mod rates_vol;
