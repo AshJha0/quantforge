@@ -21,7 +21,7 @@
         PER_FILE_MIN (90%) line coverage, except files in conformance/quality/coverage_allow.json (each with a
         reason). Before R6 the per-module gate read stage_e.json only, so stages A to D and F to I were ungated.
 
-    python tools/quality_gate.py --check-dsr --trials N [--ledger research/trials.csv] [--expect-family 24]
+    python tools/quality_gate.py --check-dsr --trials N [--ledger research/trials.csv] [--family R3] [--expect-family 24]
         Research gate (plan 13.1 R6). A deflated Sharpe ratio for an R3 study must be computed with at
         least the family trial count, which is the number of rows in the trial ledger. Exit 1 if N is
         smaller, if the ledger has duplicate trial ids, or if its row count differs from --expect-family.
@@ -176,9 +176,14 @@ def gate(cfg, lang, rows):
 
 # ---- research: DSR trial count against the ledger ----------------------------------------------
 
-def read_ledger(path=LEDGER):
+def read_ledger(path=LEDGER, family=None):
+    """Ledger rows; with ``family`` (a study prefix such as ``R3`` or ``Q6``) only that hypothesis family.
+
+    The ledger holds several independent families (R3 signal studies, Q6 calibration method tests). A DSR
+    deflates over the trials of its own family, so the count is taken per family, never over the whole file."""
     with open(path, encoding="utf-8", newline="") as f:
-        return list(csv.DictReader(f))
+        rows = list(csv.DictReader(f))
+    return rows if family is None else [r for r in rows if r["study"].split("-")[0] == family]
 
 
 def check_dsr_trials(rows, n_used, expect_family=None):
@@ -262,6 +267,7 @@ def main(argv=None):
     ap.add_argument("--check-dsr", action="store_true")
     ap.add_argument("--trials", type=int)
     ap.add_argument("--ledger", default=str(LEDGER))
+    ap.add_argument("--family", help="study prefix of the hypothesis family, e.g. R3")
     ap.add_argument("--expect-family", type=int)
     ap.add_argument("--floor", action="store_true", help="also gate whole-language coverage on floors.json")
     ap.add_argument("--per-file", action="store_true", help="also gate every library file at 90%% (R6-26)")
@@ -288,7 +294,7 @@ def main(argv=None):
     if a.check_dsr:
         if a.trials is None:
             ap.error("--check-dsr needs --trials")
-        bad = check_dsr_trials(read_ledger(a.ledger), a.trials, a.expect_family)
+        bad = check_dsr_trials(read_ledger(a.ledger, a.family), a.trials, a.expect_family)
         for b in bad:
             print("BAD", b)
         print(f"dsr trial count {a.trials}: {'rejected' if bad else 'ok'}")
