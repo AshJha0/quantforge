@@ -38,6 +38,21 @@ fn product_above(a: Option<i128>, b: Option<i128>, max: i128) -> bool {
 fn operation_above(op: &str, i: &Json) -> bool {
     let draws = i128::from(10_000_000);
     match op {
+        // Stage J wave 1 (J-5, J-9, J-12, J-15).
+        "research.cv.cpcv_paths" => above(i, "n_groups", 64),
+        "research.regime.viterbi" => len(i, "initial").is_some_and(|k| k > 32),
+        "research.stats.pbo" => {
+            let rows = len(i, "performance");
+            let cols = i
+                .get("performance")
+                .and_then(Json::as_array)
+                .and_then(|a| a.first())
+                .and_then(Json::as_array)
+                .map(|r| r.len() as i128);
+            above(i, "n_partitions", 16)
+                || cols.is_some_and(|n| n > 10_000)
+                || product_above(rows, cols, 10_000_000)
+        }
         "core.integrate.trapezoid" | "core.integrate.simpson" => above(i, "n", 10_000_000),
         "core.integrate.adaptive_simpson" => above(i, "max_depth", 60),
         "core.integrate.gauss_kronrod" => above(i, "max_intervals", 10_000),
@@ -216,6 +231,8 @@ fn raised_array_keys(op: &str) -> &'static [&'static str] {
         "risk.var.filtered_historical" => &["returns"],
         "risk.backtest.christoffersen" => &["exceptions"],
         "book.lifecycle.apply" => &["events"],
+        "research.backtest.run" => &["prices", "targets"],
+        "research.cv.purged_kfold" => &["t0", "t1"],
         _ => &[],
     }
 }
