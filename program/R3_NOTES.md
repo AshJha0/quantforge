@@ -70,3 +70,7 @@ Amendment 4 item 1 fixes the leg DV01 as `price_from_yield` (`quantforge_core.bo
 Why R3-02 and R3-03 were not frozen and run although they could be: condition (1) is Holm across all three studies, so no holdout verdict can be complete without R3-01, and R3-01 needs an amendment first. Running two one-shot holdouts now would mean the R3-01 amendment is signed after two holdout outcomes are known. Stopping all three keeps the amendment clean; resuming R3-02/R3-03 costs minutes (freeze, log line, run).
 
 Stated overlap: R3-03's in-sample years 2013-2015 are R3-01 holdout years of the nominal 5Y and 10Y yields. The loader never gives R3-03 the 2Y column, so the R3-01 fly cannot be formed from it; no R3-01 quantity was computed.
+
+### R3-01 in-sample after amendment 5 (2026-11-14)
+
+5,755 aligned business days (1990-01-02 to 2012-12-31); common sample 5,256 daily returns (from the first full 500-day window). In-sample net Sharpe at 1x: T01 -0.71, T02 -0.34, T03 -0.61, T04 -0.47, T05 -0.07, T06 -0.10, T07 0.02, T08 0.05; all negative at 2x. Selected T08 (L 500, k 1.5). PBO 0.151 (below 0.5, not exploratory). R3-02 and R3-03 in-sample results unchanged by the re-run.
