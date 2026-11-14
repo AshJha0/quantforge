@@ -15,7 +15,7 @@ class PreregHashes(unittest.TestCase):
     def test_every_signed_file_matches_its_recorded_hashes(self):
         readme = body_sha((D / "README.md").read_bytes())
         files = sorted(D.glob("R3-*.md"))
-        self.assertEqual(len(files), 12)
+        self.assertEqual(len(files), 15)
         for f in files:
             b = f.read_bytes()
             head = b[:b.index(MARK)].decode()
@@ -25,11 +25,12 @@ class PreregHashes(unittest.TestCase):
             if "amendment" in f.name:
                 self.assertEqual(hashlib.sha256((D / m.group(1)).read_bytes()).hexdigest(), m.group(2), f.name)
                 self.assertIn("Prior knowledge", b.decode())
-            if "amendment-3" in f.name:
-                for n in (f"{f.name[:5]}-amendment-1.md", f"{f.name[:5]}-amendment-2.md", "DEVIATION-2026-11-12-recorder-rule.md"):
+            if "amendment-3" in f.name or "amendment-4" in f.name:
+                extra = (f"{f.name[:5]}-amendment-3.md",) if "amendment-4" in f.name else ()
+                for n in (f"{f.name[:5]}-amendment-1.md", f"{f.name[:5]}-amendment-2.md", "DEVIATION-2026-11-12-recorder-rule.md", *extra):
                     m = re.search(rf"`{re.escape(n)}` \(whole file\): `([0-9a-f]{{64}})`", head)
                     self.assertEqual(hashlib.sha256((D / n).read_bytes()).hexdigest(), m.group(1), f.name)
-            if "amendment-2" in f.name or "amendment-3" in f.name:
+            if any(f"amendment-{i}" in f.name for i in (2, 3, 4)):
                 m = re.search(r"`DEVIATION-2026-11-12.md` \(whole file\): `([0-9a-f]{64})`", head)
                 self.assertEqual(hashlib.sha256((D / "DEVIATION-2026-11-12.md").read_bytes()).hexdigest(), m.group(1), f.name)
 
