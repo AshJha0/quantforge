@@ -263,6 +263,29 @@ def build(entries: list[Entry], runs: dict[str, dict[str, str]], mode: str, done
     return out
 
 
+def judgement(rows: Iterable[Entry], holidays: set[str], need: int = 250) -> dict[str, dict[str, Any]]:
+    """Amendment 7 Change 1: counted days per study (US business days with a companion row whose position is
+    defined) and the judgement date, the counted day on which the count reaches `need`. Reads no return."""
+    days: dict[str, set[date]] = {}
+    for e in rows:
+        rec = e["record"]
+        st = rec["series_id"].split("/", 1)[1]
+        if rec["value"]["payload"].get("position") is None:
+            continue
+        x = row_date(e)
+        if x.weekday() < 5 and x.isoformat() not in holidays:
+            days.setdefault(st, set()).add(x)
+    out: dict[str, dict[str, Any]] = {}
+    for st in STUDIES:
+        ds = sorted(days.get(st, set()))
+        out[st] = {"counted_days": len(ds), "judgement_date": ds[need - 1].isoformat() if len(ds) >= need else None}
+    return out
+
+
+def load_holidays(path: Path = ROOT / "tools" / "recorder" / "holidays.txt") -> set[str]:
+    return {x.strip() for x in path.read_text(encoding="utf-8").splitlines() if x.strip() and not x.startswith("#")}
+
+
 def existing(path: Path) -> tuple[set[str], bool]:
     """Rows already in the companion file: the forward-log hashes they fill, and whether any is back-filled."""
     rows = fl.read(path)
@@ -316,15 +339,20 @@ def read_log(text: str) -> list[Entry]:
 
 def run(mode: str, log_text: str, log_ref: str, log_commit: str, data: Path | None,
         out: Path = OUT, runs_csv: Path = RUNS, fit_path: Path = FIT, g: Callable[..., str] = git,
-        now: str | None = None) -> dict[str, int]:
+        now: str | None = None, also_done: tuple[Path, ...] = ()) -> dict[str, int]:
     runs = run_lines(RUN_LOG.read_text(encoding="utf-8"))
     check_pins(runs, AMENDMENT.read_text(encoding="utf-8"))
     guarded = [Path(__file__), HERE / "r3_runner.py", HERE / "r3_in_sample.py", HERE / "r3_data.py", PARAMS,
-               out, runs_csv, fit_path, RUN_LOG]
+               out, runs_csv, fit_path, RUN_LOG, *also_done]
+    guarded = [p for p in guarded if p.resolve().is_relative_to(ROOT)]  # files on forward-log are outside
     if not clean(guarded, g):
         raise Refused("uncommitted changes to the writer, runner, params or companion files")
     commit = g("rev-parse", "HEAD").strip()
     done, any_back = existing(out)
+    for extra in also_done:  # amendment 7 Change 2: one companion row per study row across both files
+        more, back2 = existing(extra)
+        done |= more
+        any_back = any_back or back2
     if mode == "backfill":
         if any_back:
             raise Refused("back-fill already done (rule 4: once)")
@@ -362,13 +390,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--log", help="forward-log file; default: actions/log.jsonl at --log-ref")
     ap.add_argument("--log-ref", default="origin/forward-log")
     ap.add_argument("--data", type=Path, help="directory holding the R3 in-sample files (backfill only)")
+    ap.add_argument("--out", type=Path, default=OUT, help="companion file (amendment 7: actions/signals.jsonl)")
+    ap.add_argument("--runs", type=Path, default=RUNS, help="run log (amendment 7: actions/signals_runs.csv)")
+    ap.add_argument("--also-done", type=Path, action="append", default=[],
+                    help="other companion files whose filled rows are skipped")
     a = ap.parse_args(argv)
     if a.log:
         text, ref, cm = Path(a.log).read_text(encoding="utf-8"), a.log, ""
     else:
         text, ref, cm = git("show", f"{a.log_ref}:actions/log.jsonl"), a.log_ref, git("rev-parse", a.log_ref).strip()
     try:
-        counts = run(a.mode, text, ref, cm, a.data)
+        counts = run(a.mode, text, ref, cm, a.data, out=a.out, runs_csv=a.runs, also_done=tuple(a.also_done))
     except Refused as e:
         print(f"refused: {e}", file=sys.stderr)
         return 2

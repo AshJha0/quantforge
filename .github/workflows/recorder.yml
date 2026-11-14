@@ -42,7 +42,19 @@ jobs:
         id: record
         continue-on-error: true # a failed source is logged as a failure row, and the gap monitor judges it
         run: python3 code/tools/recorder/record.py --data "$RUNNER_TEMP/raw" --log log/actions/log.jsonl
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: Study signals
+        # R3 amendments 6 and 7: one companion row per new study/<id> row, written to actions/signals.jsonl on this
+        # branch by research/r3_forward.py daily, from the clean main checkout (its commit holds the holdout run
+        # lines). Rows already filled by the back-fill on main are skipped. Signals and positions only, no P&L.
+        id: signals
+        continue-on-error: true
+        run: |
+          uv sync --locked --no-dev --project code/python
+          code/python/.venv/bin/python code/research/r3_forward.py daily --log log/actions/log.jsonl             --out log/actions/signals.jsonl --runs log/actions/signals_runs.csv             --also-done code/research/r3/forward_signals.jsonl
       - run: python3 code/tools/forward-log/forward_log.py verify --log log/actions/log.jsonl
+      - run: python3 code/tools/forward-log/forward_log.py verify --log log/actions/signals.jsonl
+        if: hashFiles('log/actions/signals.jsonl') != ''
       - run: python3 code/tools/recorder/gap_monitor.py recheck --log log/actions/log.jsonl
       - name: Gap report
         id: gaps
@@ -108,12 +120,12 @@ jobs:
         # visible as a red run and names the failed steps (plan 12.1 G5).
         if: always()
         env:
-          OUTCOMES: record=${{ steps.record.outcome }} gaps=${{ steps.gaps.outcome }} anchor=${{ steps.anchor.outcome }}
+          OUTCOMES: record=${{ steps.record.outcome }} signals=${{ steps.signals.outcome }} gaps=${{ steps.gaps.outcome }} anchor=${{ steps.anchor.outcome }}
         run: |
           failed=""
           for kv in $OUTCOMES; do if [ "${kv#*=}" = failure ]; then failed="$failed ${kv%%=*}"; fi; done
           if [ -n "$failed" ]; then
-            echo "::error::soft steps failed:$failed (record: a source failed, see actions/log.jsonl; gaps: missing business days or a prereg input or study row, see actions/gaps.md on branch forward-log)"
+            echo "::error::soft steps failed:$failed (record: a source failed, see actions/log.jsonl; signals: the R3 forward writer refused or failed, see the step log; gaps: missing business days or a prereg input or study row, see actions/gaps.md on branch forward-log)"
             exit 1
           fi
           echo "all soft steps passed or were skipped ($OUTCOMES)"

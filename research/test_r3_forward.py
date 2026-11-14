@@ -164,6 +164,20 @@ class Rows(unittest.TestCase):
             w.check_pins({k: v for k, v in RUNS.items() if k != "R3-03"}, amend)
 
 
+class Judgement(unittest.TestCase):
+    def test_counts_defined_positions_on_business_days_only(self) -> None:
+        def row(st: str, et: str, pos: float | None) -> dict[str, Any]:
+            return {"record": {"series_id": f"study/{st}", "event_time": et, "value": {"payload": {"position": pos}}}}
+        rows = [row("R3-03", "2026-11-12T21:00:00Z", 0.0), row("R3-03", "2026-11-12T23:00:00Z", None),
+                row("R3-03", "2026-11-13T21:00:00Z", -1.0), row("R3-03", "2026-11-14T03:00:00Z", -1.0),  # Saturday
+                row("R3-03", "2026-11-26T21:00:00Z", 1.0),  # holiday
+                row("R3-01", "2026-11-13T21:00:00Z", None)]
+        j = w.judgement(rows, {"2026-11-26"}, need=2)
+        self.assertEqual(j["R3-03"], {"counted_days": 2, "judgement_date": "2026-11-13"})
+        self.assertEqual(j["R3-01"], {"counted_days": 0, "judgement_date": None})
+        self.assertIn("2026-11-26", w.load_holidays())
+
+
 def entry(et: str, kt: str, pay: dict[str, Any], commit: str = "good") -> dict[str, Any]:
     return {"record": {"series_id": "study/R3-03", "event_time": et, "knowledge_time": kt,
                        "value": {"commit": commit, "payload": pay}}}

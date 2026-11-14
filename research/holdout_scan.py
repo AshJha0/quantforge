@@ -188,6 +188,11 @@ def signal_scan_all(log_ref: str = "origin/forward-log") -> list[tuple[str, str]
         log = subprocess.run(["git", "show", f"{log_ref}:actions/log.jsonl"], cwd=ROOT, capture_output=True,
                              check=True).stdout.decode()
         bad += signal_check([json.loads(x) for x in log.splitlines() if x.strip()], runs, where="forward-log")
+        sig = subprocess.run(["git", "show", f"{log_ref}:actions/signals.jsonl"], cwd=ROOT, capture_output=True,
+                             check=False)
+        if sig.returncode == 0:  # amendment 7 Change 2: daily companion rows on forward-log
+            rows = [json.loads(x) for x in sig.stdout.decode().splitlines() if x.strip()]
+            bad += signal_check(rows, runs, where="forward-log:actions/signals.jsonl")
     return bad
 
 
