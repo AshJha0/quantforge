@@ -2,8 +2,8 @@
 the backtester, purged k-fold and CPCV counts, Viterbi regime labels, and the research
 statistics PSR, DSR, PBO by CSCV and the Sharpe power calculation."""
 import math
-from collections.abc import Sequence
-from itertools import accumulate, combinations
+from collections.abc import Iterable, Sequence
+from itertools import accumulate, combinations, pairwise
 from typing import Any
 
 from .errors import QfError
@@ -51,7 +51,7 @@ def _vector(prices: Sequence[float], q: Sequence[float], spread: float, commissi
             fixed: float, m: float) -> tuple[list[float], ...]:
     """The same quantities as whole arrays: shift, difference, element-wise product, cumsum."""
     before = [0.0, *q[:-1]]
-    moves = [0.0] + [b - a for a, b in zip(prices, prices[1:], strict=False)]
+    moves = [0.0] + [b - a for a, b in pairwise(prices)]
     trades = [a - b for a, b in zip(q, before, strict=True)]
     gross = [h * dp * m for h, dp in zip(before, moves, strict=True)]
     spreads = [abs(d) * p * spread * m for d, p in zip(trades, prices, strict=True)]
@@ -61,7 +61,7 @@ def _vector(prices: Sequence[float], q: Sequence[float], spread: float, commissi
     return trades, gross, spreads, comms, fixeds, net, list(accumulate(net))
 
 
-def _z(values: Sequence[float]) -> list[float]:
+def _z(values: Iterable[float]) -> list[float]:
     return [v + 0.0 for v in values]  # F-3: no negative zero in the outputs
 
 
@@ -115,7 +115,7 @@ def cv_purged_kfold(t0: Sequence[float], t1: Sequence[float], n_splits: int,
         raise QfError("E_INPUT", "t0 and t1 differ in length", "t1")
     if not 2 <= n_splits <= n:
         raise QfError("E_INPUT", "n_splits must lie in [2, n]", "n_splits")
-    if any(b < a for a, b in zip(t0, t0[1:], strict=False)):
+    if any(b < a for a, b in pairwise(t0)):
         raise QfError("E_INPUT", "t0 must be non-decreasing", "t0")
     if any(e < s for s, e in zip(t0, t1, strict=True)):
         raise QfError("E_DOMAIN", "a label ends before it starts", "t1")

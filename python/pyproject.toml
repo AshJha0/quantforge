@@ -90,6 +90,7 @@ module = [
     "test_properties",
     "test_r1",
     "test_r2",
+    "test_research_j",
     "test_slippage",
     "test_stage_b",
     "test_stage_c",
