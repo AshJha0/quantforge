@@ -130,8 +130,17 @@ def _baum_welch_sizes(raw: Raw) -> None:
     for key in ("initial", "means", "sds", "transition"):
         _caps_list(key, 16)(raw)
     _rows_cols("transition", 16, 16)(raw)
-    obs, initial = raw.get("observations"), raw.get("initial")
-    if isinstance(obs, list) and isinstance(initial, list) and len(obs) * len(initial) > 10_000_000:
+    # Ruling J-W2-18: K is the longest of initial, means, sds and the rows or row widths of transition.
+    k = 0
+    for key in ("initial", "means", "sds", "transition"):
+        value = raw.get(key)
+        if isinstance(value, list):
+            k = max(k, len(value))
+            if key == "transition":
+                k = max([k, *(len(r) for r in value if isinstance(r, list))])
+    obs = raw.get("observations")
+    if isinstance(obs, list) and len(obs) * k > 10_000_000:
+
         raise _over("observations", 10_000_000)
 
 

@@ -13,6 +13,8 @@ from .research import _check_probabilities
 Matrix = Sequence[Sequence[float]]
 SYMMETRY_TOLERANCE = 1e-12
 BUDGET_TOLERANCE = 1e-12
+MULTIPLIER_TOLERANCE = 1e-13
+
 _SQRT_2PI = math.sqrt(2.0 * math.pi)
 
 
@@ -128,38 +130,30 @@ def portfolio_mean_variance(expected_returns: Sequence[float], covariance: Matri
     for _ in range(50 * n + 100):
         free = [i for i in range(n) if state[i] == 0]
         fixed = [i for i in range(n) if state[i] != 0]
-        if not free:
-            h = [mu[i] - gamma * _dot(sigma[i], w) for i in range(n)]
-            cands = [i for i in range(n) if lo[i] < up[i]]
-            if not cands:
-                break
-            low_set = [i for i in cands if state[i] < 0]
-            pick = (max(low_set, key=lambda i: (h[i], -i)) if low_set
-                    else min(cands, key=lambda i: (h[i], i)))
-            state[pick] = 0
+        if not free:  # ruling J-W2-20: free the last asset; the budget fixes its weight
+            state[n - 1] = 0
             continue
         target, nu = _eqp(sigma, mu, gamma, w, free, fixed)
         step = [t - w[i] for t, i in zip(target, free, strict=True)]
         alpha, block = 1.0, -1
-        for p, i in zip(step, free, strict=True):
-            if p < 0 and lo[i] - w[i] > alpha * p:
-                alpha, block = (lo[i] - w[i]) / p, i
-            elif p > 0 and up[i] - w[i] < alpha * p:
-                alpha, block = (up[i] - w[i]) / p, i
+        for p, t, i in zip(step, target, free, strict=True):  # ruling J-W2-21: 1e-14 (1 + |bound|)
+            if p < 0 and t < lo[i] - 1e-14 * (1 + abs(lo[i])) and lo[i] - w[i] > alpha * p:
+                alpha, block = max(0.0, (lo[i] - w[i]) / p), i
+            elif p > 0 and t > up[i] + 1e-14 * (1 + abs(up[i])) and up[i] - w[i] < alpha * p:
+                alpha, block = max(0.0, (up[i] - w[i]) / p), i
         if block >= 0:
             for p, i in zip(step, free, strict=True):
                 w[i] += alpha * p
             w[block] = lo[block] if w[block] - lo[block] <= up[block] - w[block] else up[block]
             state[block] = -1 if w[block] == lo[block] else 1
             for i in free:  # weights pushed onto a bound by rounding join the working set
-                if state[i] == 0 and (w[i] <= lo[i] or w[i] >= up[i]):
-                    w[i] = lo[i] if w[i] <= lo[i] else up[i]
+                if state[i] == 0 and (w[i] < lo[i] or w[i] > up[i]):
+                    w[i] = lo[i] if w[i] < lo[i] else up[i]
                     state[i] = -1 if w[i] == lo[i] else 1
             continue
         for t, i in zip(target, free, strict=True):
-            w[i] = t
-        scale = max(abs(x) for x in mu) + gamma * max(abs(x) for r in sigma for x in r)
-        worst, which = 1e-14 * scale, -1
+            w[i] = min(max(t, lo[i]), up[i])
+        worst, which = MULTIPLIER_TOLERANCE, -1  # ruling J-W2-21
         for i in fixed:
             if lo[i] == up[i]:
                 continue
@@ -195,7 +189,7 @@ def portfolio_risk_parity(covariance: Matrix,
     if any(not x > 0 for x in raw):
         raise QfError("E_DOMAIN", "every budget must be positive", "budgets")
     total = math.fsum(raw)
-    if abs(total - 1.0) > BUDGET_TOLERANCE:
+    if budgets is not None and abs(total - 1.0) > BUDGET_TOLERANCE:  # ruling J-W2-19
         raise QfError("E_DOMAIN", "budgets must sum to 1", "budgets")
     b = [x / total for x in raw]
     sigma = _symmetric(covariance, "covariance")
