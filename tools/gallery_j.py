@@ -199,7 +199,7 @@ Read the two probabilities together: the PSR asks whether the winner beats zero,
 
 ## The winner chosen inside purged folds
 
-{FOLDS} contiguous folds over the {ref['n_obs']} bars. Each observation's label is its bar's P&L, window `[i, i + 1]`, so the purge drops the neighbour on each side of a test block, and an embargo of {EMBARGO:g} drops {ref['embargo_count']} more after it. In each fold the rule with the best training Sharpe is picked and scored on the test block.
+{FOLDS} contiguous folds over the {ref['n_obs']} bars. Each observation's label is its bar's P&L, window `[i, i + 1]`, so the purge drops the neighbour on each side of a test block, and an embargo of {EMBARGO:g} drops the {ref['embargo_count']} indices after it, the first of which the purge has already dropped. In each fold the rule with the best training Sharpe is picked and scored on the test block.
 
 {table(['Test bars', 'Training size', 'Rule picked', 'Training Sharpe', 'Test Sharpe', 'Test rank'], frows)}
 

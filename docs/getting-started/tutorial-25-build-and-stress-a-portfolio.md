@@ -157,7 +157,7 @@ Risk parity [Spinu13, Roncalli13]: long-only weights with `w_i (Sigma w)_i / (w'
 
 Euler contributions [Tas99]: `sigma = sqrt(w' Sigma w)`, marginal `(Sigma w) / sigma`, contribution `w_i (Sigma w)_i / sigma`, share `contribution / sigma`. Because `sigma(c w) = c sigma(w)`, Euler's theorem makes the contributions add up to `sigma` exactly.
 
-The checks behind the goldens (`optim_j`, `estim_j`): an exact KKT certificate for every mean-variance case and agreement with scipy SLSQP; every bound pattern enumerated for `N <= 4`; Ledoit-Wolf and Black-Litterman each computed in two algebraic forms that must agree in exact arithmetic (ruling J-W2-15). A run of scikit-learn's `ledoit_wolf` on the `estim_j` cases is still open.
+The checks behind the goldens (`optim_j`, `estim_j`): an exact KKT certificate for every mean-variance case and agreement with scipy SLSQP; every bound pattern enumerated for `N <= 4`; Ledoit-Wolf and Black-Litterman each computed in two algebraic forms that must agree in exact arithmetic (ruling J-W2-15). Outside libraries then reproduced 33 of the 35 value-checked `optim_j` cases (mean-variance with DAQP 0.11.2, risk parity with cvxpy 1.9.3 and Clarabel 0.11.1, Euler with autograd 1.9.1) and all 19 value-checked `estim_j` cases (scikit-learn 1.9.1 `LedoitWolf`, PyPortfolioOpt 1.6.0 Black-Litterman), rulings J-W2-16 and J-W2-23. The two misses, `optim_j-0029` and `-0030`, are risk-parity cases where Clarabel stops at 2.9e-10 and 2.8e-8, short of the golden's tolerance; a 50-digit closed form for the two assets confirms both goldens. Per case in `oracle/OUTSIDE_J.json`.
 
 ## Step 2: the same in Rust, Java and C++
 
