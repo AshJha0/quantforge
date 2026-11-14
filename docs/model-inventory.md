@@ -794,7 +794,7 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 - **Purpose:** event loop, order and fill model, costs, P&L and attribution.
 - **Inputs:** as in the spec page.
 - **Limitations:** research tool, tier 3; descriptive results only, no claim of out-of-sample profit; page limits replace the general array limit (ruling J-20); see the spec page for the rest.
-- **Validation:** oracle `oracle/python/gen_stage_j_w1.py`; vectorbt 1.2.1 `Portfolio.from_orders` outside check on 14 of 14 value cases (`oracle/OUTSIDE_J.json`); operations `research.backtest.run` pass 15,215 of 15,215 conformance cases in all four languages with the rest of the suite (`program/R6_HANDOVER.md`). **Review:** 2026-11-14.
+- **Validation:** oracle `oracle/python/gen_stage_j_w1.py`; vectorbt 1.2.1 `Portfolio.from_orders` outside check on 14 of 14 value cases (`oracle/OUTSIDE_J.json`); operations `research.backtest.run` pass 15,215 of 15,215 conformance cases (value-checked, error and invariance cases counted together) in all four languages with the rest of the suite (`program/R6_HANDOVER.md`). **Review:** 2026-11-14.
 - **Tier:** 3.
 - **Challenger:** the Python oracle against each of the three ported builds (Rust, Java, C++).
 - **Monitoring thresholds:** a P&L identity break (cash plus marked position minus costs) above 1e-9 of gross notional.
@@ -806,7 +806,7 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 - **Purpose:** purged and embargoed k-fold splits for time-ordered research data.
 - **Inputs:** as in the spec page.
 - **Limitations:** research tool, tier 3; descriptive results only, no claim of out-of-sample profit; page limits replace the general array limit (ruling J-20); see the spec page for the rest.
-- **Validation:** oracle `oracle/python/gen_stage_j_w1.py`; timeseriescv 0.2, scikit-learn 1.9.1 `KFold` and skfolio 1.12.12 outside checks on 12 of 15 value cases (`oracle/OUTSIDE_J.json`); operations `research.cv.purged_kfold`, `research.cv.cpcv_paths` pass 15,215 of 15,215 conformance cases in all four languages with the rest of the suite (`program/R6_HANDOVER.md`). **Review:** 2026-11-14.
+- **Validation:** oracle `oracle/python/gen_stage_j_w1.py`; timeseriescv 0.2, scikit-learn 1.9.1 `KFold` and skfolio 1.12.12 outside checks on 12 of 15 value cases (`oracle/OUTSIDE_J.json`); operations `research.cv.purged_kfold`, `research.cv.cpcv_paths` pass 15,215 of 15,215 conformance cases (value-checked, error and invariance cases counted together) in all four languages with the rest of the suite (`program/R6_HANDOVER.md`). **Review:** 2026-11-14.
 - **Tier:** 3.
 - **Challenger:** the Python oracle against each of the three ported builds (Rust, Java, C++).
 - **Monitoring thresholds:** any test index that overlaps a training label interval.
@@ -818,7 +818,7 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 - **Purpose:** descriptive regime labels (Viterbi path on a given hidden Markov model).
 - **Inputs:** as in the spec page.
 - **Limitations:** research tool, tier 3; descriptive results only, no claim of out-of-sample profit; page limits replace the general array limit (ruling J-20); see the spec page for the rest.
-- **Validation:** oracle `oracle/python/gen_stage_j_w1.py`; brute-force path enumeration on 5 cases; hmmlearn 0.3.3 Viterbi decode outside check on 10 of 10 value cases (`oracle/OUTSIDE_J.json`); operations `research.regime.viterbi` pass 15,215 of 15,215 conformance cases in all four languages with the rest of the suite (`program/R6_HANDOVER.md`). **Review:** 2026-11-14.
+- **Validation:** oracle `oracle/python/gen_stage_j_w1.py`; brute-force path enumeration on 5 cases; hmmlearn 0.3.3 Viterbi decode outside check on 10 of 10 value cases (`oracle/OUTSIDE_J.json`); operations `research.regime.viterbi` pass 15,215 of 15,215 conformance cases (value-checked, error and invariance cases counted together) in all four languages with the rest of the suite (`program/R6_HANDOVER.md`). **Review:** 2026-11-14.
 - **Tier:** 3.
 - **Challenger:** the Python oracle against each of the three ported builds (Rust, Java, C++).
 - **Monitoring thresholds:** a path whose log-likelihood is below the brute-force best on any monitored model.
@@ -830,7 +830,7 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 - **Purpose:** deflated Sharpe ratio, PBO and related research statistics.
 - **Inputs:** as in the spec page.
 - **Limitations:** research tool, tier 3; descriptive results only, no claim of out-of-sample profit; page limits replace the general array limit (ruling J-20); see the spec page for the rest.
-- **Validation:** oracle `oracle/python/gen_stage_j_w1.py`; textbook and hand cases; statsmodels 0.15.0 `NormalIndPower` outside check on the 5 power cases; DSR, PSR and PBO have no library check yet (5 of 24 value cases, `oracle/OUTSIDE_J.json`); operations `research.stats.dsr`, `.psr`, `.power`, `.pbo` pass 15,215 of 15,215 conformance cases in all four languages with the rest of the suite (`program/R6_HANDOVER.md`). **Review:** 2026-11-14.
+- **Validation:** oracle `oracle/python/gen_stage_j_w1.py`; textbook and hand cases; statsmodels 0.15.0 `NormalIndPower` outside check on the 5 power cases; DSR, PSR and PBO have no library check yet (5 of 24 value cases, `oracle/OUTSIDE_J.json`); operations `research.stats.dsr`, `.psr`, `.power`, `.pbo` pass 15,215 of 15,215 conformance cases (value-checked, error and invariance cases counted together) in all four languages with the rest of the suite (`program/R6_HANDOVER.md`). **Review:** 2026-11-14.
 - **Tier:** 3.
 - **Challenger:** the Python oracle against each of the three ported builds (Rust, Java, C++).
 - **Monitoring thresholds:** a PBO or DSR that moves by more than its stated tolerance when the inputs are permuted.
