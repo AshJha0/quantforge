@@ -944,7 +944,11 @@ fn margin_held_zero_uses_the_product_of_multiplier_and_rate() {
         ..Costs::default()
     };
     let s = qp_solve(&p).unwrap();
-    assert!((s.x[0] - 1.0).abs() < 1e-12 && s.x[1].abs() < 1e-12, "{:?}", s.x);
+    assert!(
+        (s.x[0] - 1.0).abs() < 1e-12 && s.x[1].abs() < 1e-12,
+        "{:?}",
+        s.x
+    );
 }
 
 #[test]
