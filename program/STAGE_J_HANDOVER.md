@@ -57,3 +57,48 @@ Rows to add at the stage J docs pass: MI-J1 backtester, MI-J2 purged CV, MI-J3 V
 ### Not in wave 1
 
 Walk-forward and the trial registry stay in the Python research package (`quantforge_research`), not CLI operations. A6 feature store and A8 template section belong to the research lane.
+
+## WAVE 2 READY (2026-11-14): optimisation, estimation, ES backtest, Baum-Welch
+
+Read with every slice: the spec pages below; `specifications/stage-j-rulings-w2.md` J-W2-1 to J-W2-15; `specifications/cli-contract.md` (block "Stage J operations", wave 2 rows); `specifications/name-map.json` (regenerated: 291 operations). Gap analysis and what stays out of wave 2: `program/STAGE_J_GAP.md`.
+
+### Suites (96 cases)
+
+| Suite | Spec | Operations | Cases (value, error) |
+|---|---|---|---|
+| `optim_j` | `07-portfolio/optimisation.md` | `research.portfolio.mean_variance`, `research.portfolio.risk_parity`, `risk.contrib.euler` | 49 (35, 14) |
+| `estim_j` | `07-portfolio/estimation.md` | `research.estimate.ledoit_wolf`, `research.estimate.black_litterman` | 21 (15, 6) |
+| `esbt_j` | `06-risk/es-backtest.md` | `risk.backtest.es_z2` | 12 (7, 5) |
+| `baumwelch_j` | `11-research/baum-welch.md` | `research.regime.baum_welch` | 14 (6, 8) |
+
+`program/R6_HANDOVER.md` now ends `TOTALS: 15311 value 7567 error 5230 invariance 2514` (wave 1 plus these 96). Gates run on this branch: `tools/check_case_total.py` (matches, 0 duplicate ids), `tools/gen_name_map.py --check` (clean), `tools/check_golden_copies.py` (0 stale), `tools/check_tolerance_units.py` (0 unexplained), `oracle/python/check_error_cases.py stage_j` (0 mismatches), `tools/governance_gate.py` (clean; the two numerical pages carry Convergence sections). Contract: builds keep reporting 1.13.0 until all four pass wave 2; the coordinator then moves the reported version and the runner to 1.14.0 in one commit (J-W2-1).
+
+### Build notes
+
+- Mean-variance: any exact QP method; a primal active set from a feasible start is the suggested one. Set bound weights to the bound exactly (`at_bound` is compared exactly). Check order: shapes, then `gamma`, bounds, feasibility, symmetry, Cholesky.
+- Risk parity: Newton on `Sigma y = b / y`, step halving to keep `y > 0`, normalise `w = y / sum y`. Budgets are used as `b / sum b`.
+- Euler: covariance need not be definite; only `w' Sigma w <= 0` fails.
+- Ledoit-Wolf: divisor `T`, demeaned columns, `delta = 0` when `b^2 = 0`. Use the direct sum for `bbar^2`.
+- Black-Litterman: Cholesky solve with `P tau Sigma P' + Omega`; never invert `Sigma`.
+- Z2: losses positive, exception strict (`L > VaR`), `exceptions` an Integer.
+- Baum-Welch: follow the page's iteration order exactly (E-step at start; then M-step, E-step, gain test). Output the parameters of the **last E-step**, not one more M-step. Sum over ascending indices. Each golden's `tolerance` is an input chosen with a `1e-11` margin (J-W2-12), so no build-specific stop handling is needed. Parameters compare at `1e-12` absolute plus `1e-9` relative.
+
+### Property tests (each language, own data)
+
+- Mean-variance KKT residual below `1e-9`; wide bounds equal the closed form; loosening a binding bound never lowers the objective.
+- Risk-parity shares equal `b / sum b` to `1e-10` (J-5); Euler contributions sum to volatility to `1e-10` (J-8).
+- Ledoit-Wolf `0 <= delta <= 1`; Black-Litterman update form equals precision form to `1e-10` (J-6); large `Omega` returns the prior.
+- Z2 = 1 with no exceptions; scale invariance.
+- Baum-Welch: log-likelihood non-decreasing (to `1e-9` relative); `K = 1` stops at iteration 2 with sample mean and population sd; two runs give identical bytes (12.10 A4); state permutation equivariance.
+
+### Outside-check status
+
+Hand cases: `optim_j-0001` (w1 = 17/26), `optim_j-0029` (risk parity 0.6 / 0.4), `optim_j-0041` (Euler), `estim_j-0001` (Ledoit-Wolf), `estim_j-0012` (Black-Litterman 0.075), `esbt_j-0001` (Z2 = -1.8), `baumwelch_j-0001` (one state). Independent methods: exact KKT certificate for all 21 mean-variance cases, plus bound-pattern enumeration for `N <= 4`; two algebraic forms for every Ledoit-Wolf and Black-Litterman case; log-space forward pass for every Baum-Welch log-likelihood. scipy SLSQP agrees with the exact mean-variance weights within 1.82e-8 (the generator prints the figure); this falls just short of the J-5 target of 1e-8 because SLSQP's precision is limited, not because the goldens are wrong (they are exact KKT points). **Open for the oracle lane** (J-W2-15): an outside QP at tight tolerance (cvxopt or OSQP) on the 20 J-5 problems, scikit-learn `ledoit_wolf` on `estim_j` (J-6, oracle only), hmmlearn on `baumwelch_j`. None of these libraries is in the oracle environment as of 2026-11-14.
+
+### Done here in the research package (no other language)
+
+`python/quantforge_research/`: `cv.walk_forward` (A1), `trials.trial_count` and `trials.register` (Q7, J-13), `snooping.reality_check` (J-4, stationary bootstrap). Tests in `python/tests/test_quantforge_research.py` (8 tests; the size test runs 200 simulated null sets and takes about 80 s). `pyproject.toml` now packages `quantforge_research*`.
+
+### Not in wave 2
+
+A3 drift detectors (the prereg `research/prereg/A3-drift.md` must be frozen before any code, 12.10), Markov-switching AR(1), the A4 T = 5,000 recovery run, the ES size study, the Ken French study, section 12 methods, the feature store, the A8 gate and wave 3 (shock library, held-out-strike backtest): research and docs lanes, listed with reasons in `program/STAGE_J_GAP.md`.
