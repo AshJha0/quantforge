@@ -1,0 +1,2 @@
+utc,mode,script,script_sha256,commit,forward_log_ref,forward_log_commit,forward_log_head,rows_r3_01,rows_r3_02,rows_r3_03
+2026-11-14T15:29:34Z,backfill,research/r3_forward.py,e118ed819f0c9dfa56674e3f511c785a7c13e024c852cde28b994daae674d73b,1f26ddcee2b68d982383962c48fc6fb2855f3480,origin/forward-log,e13896ba0c3838f1fec7cb97b202fe9515f12cc0,2025e69f4723e40ab0cd707a3a9d95835386f19e2d2d0ce813a867631dcdcb44,11,11,11
