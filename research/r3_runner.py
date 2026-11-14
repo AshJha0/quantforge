@@ -148,6 +148,13 @@ def par_dv01(y: float, years: int, on: date) -> float:
     return float(r["modified_duration"] * r["dirty"] / 100 / 1e4)  # dirty is quoted per 100 face
 
 
+def par_dv01_closed(y: float, years: int) -> float:
+    """R3-01 amendment 5: DV01 per unit notional per bp of a semi-annual par bond settled on a coupon date."""
+    if y == 0:
+        return years / 1e4
+    return (1 - (1 + y / 2) ** (-2 * years)) / y / 1e4
+
+
 def zscore(x: Arr, window: int) -> Arr:
     z = np.full(len(x), np.nan)
     for t in range(window - 1, len(x)):

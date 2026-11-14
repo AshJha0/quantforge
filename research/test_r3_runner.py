@@ -142,3 +142,11 @@ class Seasonal(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ClosedDv01(unittest.TestCase):
+    def test_matches_library_on_coupon_date_and_zero_limit(self):
+        for y, n in ((0.03, 2), (0.045, 5), (0.06, 10)):
+            self.assertAlmostEqual(r.par_dv01_closed(y, n) / r.par_dv01(y, n, date(2010, 6, 15)), 1.0, places=9)
+        self.assertEqual(r.par_dv01_closed(0.0, 5), 5e-4)
+        self.assertAlmostEqual(r.par_dv01_closed(1e-9, 5), 5e-4, places=10)

@@ -37,8 +37,8 @@ def aligned(series: dict[str, d.Series], cols: Sequence[tuple[str, str]]) -> tup
 def r301_inputs(series: dict[str, d.Series]) -> tuple[list[date], Arr, Arr, Arr]:
     days, y = aligned(series, [(d.NOMINAL, "2 YR"), (d.NOMINAL, "5 YR"), (d.NOMINAL, "10 YR")])
     fly = (2 * y[:, 1] - y[:, 0] - y[:, 2]) * 100.0
-    dv = np.array([[r.par_dv01(y[i, j] / 100, n, x) for j, n in enumerate((2, 5, 10))]
-                   for i, x in enumerate(days)])
+    dv = np.array([[r.par_dv01_closed(y[i, j] / 100, n) for j, n in enumerate((2, 5, 10))]
+                   for i in range(len(days))])
     gross = 1 / dv[:, 0] + 2 / dv[:, 1] + 1 / dv[:, 2]
     return days, fly, gross, y
 
