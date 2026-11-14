@@ -1,0 +1,36 @@
+{
+ "label": "post-hoc, report-only (amendment 4 R3-02 item 8, C9); no verdict effect",
+ "params": {
+  "funding": "SOFR",
+  "L": 60,
+  "k": 2.0
+ },
+ "as_run": {
+  "in_sample": {
+   "n": 52,
+   "months_in_position": 5,
+   "mean_net_1x": -4.4335658690205e-05,
+   "sharpe_net_1x": -0.5094
+  },
+  "holdout": {
+   "n": 46,
+   "months_in_position": 7,
+   "mean_net_1x": -1.7507055763519707e-05,
+   "sharpe_net_1x": -1.0876
+  }
+ },
+ "dummy_controlled": {
+  "in_sample": {
+   "n": 52,
+   "months_in_position": 5,
+   "mean_net_1x": -4.6191336624596327e-05,
+   "sharpe_net_1x": -0.5308
+  },
+  "holdout": {
+   "n": 46,
+   "months_in_position": 7,
+   "mean_net_1x": -1.747682591750199e-05,
+   "sharpe_net_1x": -1.087
+  }
+ }
+}
