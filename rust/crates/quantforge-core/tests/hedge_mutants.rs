@@ -183,3 +183,74 @@ fn spread_cost_allows_zero_half_spreads() {
         "E_DOMAIN"
     );
 }
+
+/// Audit case A (`program/J0_EQUIVALENT_AUDIT.md`): near-collinear columns where descent alone
+/// does not converge in time; the exact-support polish at sweep 63 is what succeeds. The answer
+/// is checked against the brute-force enumeration.
+#[test]
+fn polish_is_needed_on_near_collinear_columns() {
+    let a: Matrix = vec![
+        vec![
+            0.06452333649029651,
+            0.42367816317235063,
+            0.4236560454811379,
+            0.42364098535829753,
+        ],
+        vec![
+            0.2152159902079146,
+            0.21521075185620386,
+            0.14812324400176635,
+            0.1480935238690613,
+        ],
+        vec![
+            0.11760969739417759,
+            0.11760514338479665,
+            -0.3067217067624666,
+            -0.306761385865427,
+        ],
+        vec![
+            0.24936890745714102,
+            -0.34829343966111903,
+            -0.42467215863102337,
+            -0.4247066591314843,
+        ],
+        vec![
+            0.39511830312956386,
+            0.3115634021783298,
+            0.3115422984456242,
+            0.3115354464695181,
+        ],
+    ];
+    let b = [
+        0.47846487040675223,
+        -0.17730671622319183,
+        0.2750276985583118,
+        -0.30931612482738524,
+        0.12307859374017927,
+    ];
+    let w = [
+        0.5066255997901173,
+        0.929824446642092,
+        0.2847009500015133,
+        0.274103313367548,
+        0.11666851217794064,
+    ];
+    check(
+        &a,
+        &b,
+        &w,
+        &[0.16754907601671443, 0.0, 0.0, 0.0],
+        0.007895753744258438,
+    );
+}
+
+/// Audit cases B and B': identity, lambda 0, so x = -b exactly on two legs; a polish
+/// candidate of the wrong length must never be accepted.
+#[test]
+fn identity_hedges_return_full_length_answers() {
+    let a: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+    for b in [[-1.0, 5.0], [1.0, 5.0]] {
+        let x = check(&a, &b, &[1.0, 1.0], &[0.0, 0.0], 0.0);
+        assert_eq!(x.len(), 2);
+    }
+}

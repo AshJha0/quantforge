@@ -759,3 +759,22 @@ fn costs_any_is_true_when_any_single_input_is_given() {
         assert!(c.any(), "{c:?}");
     }
 }
+
+#[test]
+fn empty_rows_are_rejected_even_with_rows_present() {
+    // Check 1: n == 0 alone is an input error (one row, no columns).
+    let a: Matrix = vec![vec![]];
+    assert_eq!(code(qp_solve(&problem(&a, &[1.0], &[1.0]))), "E_INPUT");
+}
+
+#[test]
+fn integer_sized_bound_violation_is_still_enforced() {
+    // min (x + 3)^2 subject to x >= 0 (the hedge offsets b, so b = 3 gives x = -3 unconstrained): the unconstrained minimiser -3 violates the bound by an
+    // exact multiple of the constraint scale (1), and the answer is the bound, x = 0.
+    let a: Matrix = vec![vec![1.0]];
+    let lower = [Some(0.0)];
+    let mut p = problem(&a, &[3.0], &[1.0]);
+    p.lower = Some(&lower);
+    let s = qp_solve(&p).unwrap();
+    assert!(s.x[0].abs() < 1e-12, "{s:?}");
+}
