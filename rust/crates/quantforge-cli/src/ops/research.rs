@@ -3,6 +3,7 @@ use super::{Outcome, plain};
 use crate::input::Inputs;
 use quantforge_core::error::{Result, fail};
 use quantforge_core::json::{Json, obj};
+use quantforge_core::portfolio_opt as po;
 use quantforge_core::research::{self, Costs, Engine, Metric};
 
 super::registry! {
@@ -27,6 +28,47 @@ super::registry! {
             plain(obj([("n_splits", s.into()), ("n_paths", p.into())]))
         },
         "research.regime.viterbi" => viterbi(i),
+        "research.regime.baum_welch" => baum_welch(i),
+        "research.portfolio.mean_variance" => {
+            let (mu, s) = (i.reals("expected_returns")?, i.matrix("covariance")?);
+            let g = i.f64("risk_aversion")?;
+            let read = |k: &str| i.opt(k).map(|_| i.reals(k)).transpose();
+            let (lo, hi) = (read("lower")?, read("upper")?);
+            i.gate()?;
+            let r = po::mean_variance(&mu, &s, g, lo.as_deref(), hi.as_deref())?;
+            plain(obj([
+                ("weights", r.weights.into()),
+                ("expected_return", r.expected_return.into()),
+                ("volatility", r.volatility.into()),
+                ("objective", r.objective.into()),
+                ("at_bound", r.at_bound.into()),
+            ]))
+        },
+        "research.portfolio.risk_parity" => {
+            let s = i.matrix("covariance")?;
+            let b = i.opt("budgets").map(|_| i.reals("budgets")).transpose()?;
+            i.gate()?;
+            let (w, v, c) = po::risk_parity(&s, b.as_deref())?;
+            plain(obj([("weights", w.into()), ("volatility", v.into()), ("contributions", c.into())]))
+        },
+        "research.estimate.ledoit_wolf" => {
+            let x = i.matrix("returns")?;
+            i.gate()?;
+            let (c, d, m) = po::ledoit_wolf(&x)?;
+            plain(obj([("covariance", c.into()), ("shrinkage", d.into()), ("mu", m.into())]))
+        },
+        "research.estimate.black_litterman" => {
+            let (s, pi) = (i.matrix("covariance")?, i.reals("prior_returns")?);
+            let (p, q) = (i.matrix("pick")?, i.reals("views")?);
+            let (om, tau) = (i.matrix("view_covariance")?, i.f64("tau")?);
+            i.gate()?;
+            let (m, pc, pr) = po::black_litterman(&s, &pi, &p, &q, &om, tau)?;
+            plain(obj([
+                ("posterior_returns", m.into()),
+                ("posterior_covariance", pc.into()),
+                ("predictive_covariance", pr.into()),
+            ]))
+        },
         "research.stats.psr" => {
             let (sr, n) = (i.f64("sr")?, i.int("n_obs")?);
             let (s, k, b) = (i.f64_or("skew", 0.0)?, i.f64_or("kurtosis", 3.0)?, i.f64_or("sr_benchmark", 0.0)?);
@@ -124,5 +166,28 @@ fn viterbi(i: &Inputs) -> Result<Outcome> {
     plain(obj([
         ("states", states.into()),
         ("log_probability", lp.into()),
+    ]))
+}
+
+fn baum_welch(i: &Inputs) -> Result<Outcome> {
+    let y = i.reals("observations")?;
+    let start = po::Hmm {
+        initial: i.reals("initial")?,
+        transition: i.matrix("transition")?,
+        means: i.reals("means")?,
+        sds: i.reals("sds")?,
+    };
+    let tol = i.f64_or("tolerance", 1e-10)?;
+    let max = i.int_or("max_iterations", 1000)?;
+    i.gate()?;
+    let r = po::baum_welch(&y, start, tol, max)?;
+    plain(obj([
+        ("initial", r.params.initial.into()),
+        ("transition", r.params.transition.into()),
+        ("means", r.params.means.into()),
+        ("sds", r.params.sds.into()),
+        ("log_likelihood", r.log_likelihood.into()),
+        ("iterations", r.iterations.into()),
+        ("converged", r.converged.into()),
     ]))
 }
