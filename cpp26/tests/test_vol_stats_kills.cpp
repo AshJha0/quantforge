@@ -448,3 +448,32 @@ TEST_CASE("vol_stats kills: garch estimate matches the Python port (normal, deme
     CHECK(near_rel(t.se_beta, 0.038016075717752618, 1e-10));
     CHECK(near_rel(*t.se_degrees_of_freedom, 0.84495523274253437, 1e-10));
 }
+
+namespace {
+// Seeded white noise of variance 1e-4 (alpha = beta = 0), the same LCG and Box-Muller as above, without drift.
+std::vector<double> noise(unsigned long long seed, std::size_t n) {
+    unsigned long long s = seed;
+    const auto u = [&] {
+        s = s * 6364136223846793005ULL + 1442695040888963407ULL;
+        return (double((s >> 11) & ((1ULL << 53) - 1)) + 0.5) / 9007199254740992.0;
+    };
+    std::vector<double> r;
+    for (std::size_t i = 0; i < n; ++i) {
+        const double a = u();
+        r.push_back(0.01 * std::sqrt(-2 * std::log(a)) * std::cos(6.283185307179586 * u()));
+    }
+    return r;
+}
+}  // namespace
+
+// No interior maximum on white noise (ruling F-11). The series were found by instrumenting the interior check:
+// in the first the Newton polish stops without converging while every bound holds; in the second every bound
+// holds and the polish converges, but -H is not positive definite (the Cholesky test fails). Both must refuse.
+TEST_CASE("vol_stats kills: garch estimate refuses a non-interior maximum") {
+    CHECK(code_of([] { garch_estimate(noise(4, 300), std::nullopt, GarchDistribution::Normal, false); }) ==
+          "E_NO_CONVERGENCE");
+    CHECK(code_of([] { garch_estimate(noise(4, 100), std::nullopt, GarchDistribution::Normal, false); }) ==
+          "E_NO_CONVERGENCE");
+    CHECK(code_of([] { garch_estimate(noise(2, 100), std::nullopt, GarchDistribution::StudentT, false); }) ==
+          "E_NO_CONVERGENCE");
+}
