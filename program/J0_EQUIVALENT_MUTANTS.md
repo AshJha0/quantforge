@@ -34,3 +34,9 @@ not the returned hedge (verified against the brute-force reference in tests/hedg
 - `var.rs:34:19 replace - with + in order_statistic`: dead branch; `w = n - n c <= 0` needs `c >= 1`, which `check_confidence` rejects (`c in [0.5, 1)`), and no `n < 5000` rounds `n - n c` to 0 even at the largest `c < 1`.
 - `var.rs:34:19 replace - with / in order_statistic`: same dead branch.
 - `var.rs:38:14 replace < with <= in order_statistic`: `m == n` needs `w >= n`, i.e. `c <= 0`; rejected by `check_confidence`.
+
+## hedge_solvers.rs targeted in J-0 var lane (check against final h3)
+- Killed by `tests/hedge_solvers.rs::costs_any_is_true_when_any_single_input_is_given`:
+  `hedge_solvers.rs:91:13` and `:92:13 replace || with && in Costs<'_>::any`.
+- Not yet targeted (partial h3 missed list): 163:15 check_system, 189:36/189:44/193:16 householder_qr,
+  273:23/280:20/281:30 general_inverse, 340:39 dual_active_set.
