@@ -542,7 +542,7 @@ def build():
     o = euler_ref(eh)
     assert o["volatility"] == 0.1 and o["contributions"] == [0.1, 0.0]
     mk(s, OPE, euler_ref, eh, desc="hand: one risky asset carries all the risk (vol 0.1, contributions 0.1 and 0)", verified=("hand", "reference-computed"))
-    mk(s, OPE, euler_ref, {"weights": [1.0, -0.5], "covariance": rh["covariance"]}, desc="long-short: a hedge leg has negative contribution")
+    mk(s, OPE, euler_ref, {"weights": [1.0, -0.5], "covariance": rh["covariance"]}, desc="long-short: the short hedge leg has a positive contribution (negative weight times negative marginal)")
     for i in range(4):
         n = 4 + 3 * i
         mk(s, OPE, euler_ref, {"weights": det(4000 + i, n, -1, 1), "covariance": rand_cov(4100 + i, n)}, desc=f"{n} assets, signed weights")
