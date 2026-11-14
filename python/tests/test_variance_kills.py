@@ -635,3 +635,16 @@ def test_estimate_is_scale_equivariant() -> None:
     assert big["beta"] == pytest.approx(small["beta"], rel=1e-6)
     assert big["loglik"] == pytest.approx(
         small["loglik"] - 400 * math.log(1e4), rel=1e-9)  # type: ignore[operator]
+
+
+@pytest.mark.parametrize(("n", "seed", "df", "expected"), [
+    (120, 7, 4, -116.54250545385293),
+    (300, 1, None, -389.6476421536659),
+])
+def test_fit_reaches_the_reference_optimum(n: int, seed: int, df: int | None,
+                                           expected: float) -> None:
+    # Lines 161 and 176: the start map and the beta map steer the multi-start search. Expected
+    # values are independent: scipy Nelder-Mead on `garch_loglik` over (omega, alpha, beta) from
+    # 15 starts, xatol 1e-12 (J-0 audit follow-up, 2026-11-14). The fit must reach that optimum.
+    got = v.garch_fit(_garch_series(n, seed, df=df), "SAMPLE")
+    assert got == pytest.approx(expected, rel=1e-11)
