@@ -207,6 +207,35 @@ TEST_CASE("vol_stats kills: variance swap fair strike value and edges") {
               in.call_strikes = {100.0};
               in.vols = {{100.0, 0.2}};
           }) == "none");
+    // spot = 0 with strikes around it: the spot check fires (field "spot"), not the later extension check.
+    {
+        VarSwapInputs in = vs_base();
+        in.spot = 0.0;
+        in.put_strikes = {-1.0, 0.0};
+        in.call_strikes = {0.0, 1.0};
+        in.vols = {{-1.0, 0.2}, {0.0, 0.2}, {1.0, 0.2}};
+        std::string field = "none";
+        try {
+            varswap_fair_strike(in);
+        } catch (const Error& e) {
+            field = e.field();
+        }
+        CHECK(field == "spot");
+    }
+    // Zero rates and far out-of-the-money strikes with a tiny vol: every option is worth exactly 0 in binary64 and
+    // the drift term is exactly 0, so the fair variance is exactly 0, which ruling E-B36 allows (only below 0 fails).
+    {
+        VarSwapInputs in = vs_base();
+        in.rate = 0.0;
+        in.dividend_yield = 0.0;
+        in.put_strikes = {50.0};
+        in.call_strikes = {150.0};
+        in.vols = {{50.0, 0.001}, {150.0, 0.001}};
+        const VarSwapFair z = varswap_fair_strike(in);
+        CHECK(z.fair_variance == 0.0);
+        CHECK(z.fair_vol == 0.0);
+        CHECK(near_rel(z.pv, -1000.0 * 0.04));
+    }
     // Ruling E-B36: a replicated variance below 0 (inputs from the Python kill tests).
     CHECK(err([](VarSwapInputs& in) {
               in.as_of = day(2026, 1, 1);
