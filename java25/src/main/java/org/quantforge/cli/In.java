@@ -44,10 +44,12 @@ final class In {
         }
     }
 
-    /** Ruling J-20: true for the operations whose page limits replace the general per-array limit. */
+    /** Rulings J-20 and J-W2-14: true for the operations whose page limits replace the general per-array limit. */
     static boolean pageLimited(String operation) {
         return operation.startsWith("research.backtest.") || operation.startsWith("research.cv.")
-                || operation.startsWith("research.regime.") || operation.startsWith("research.stats.");
+                || operation.startsWith("research.regime.") || operation.startsWith("research.stats.")
+                || operation.startsWith("research.portfolio.") || operation.startsWith("research.estimate.")
+                || operation.equals("risk.contrib.euler") || operation.equals("risk.backtest.es_z2");
     }
 
     private void scanArrays(Object v) {

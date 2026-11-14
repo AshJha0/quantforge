@@ -59,6 +59,7 @@ final class OpsResearch {
             return o;
         });
         table.put("research.stats.pbo", OpsResearch::pbo);
+        OpsResearchW2.register(table);
     }
 
     private static Out backtest(In in) {
