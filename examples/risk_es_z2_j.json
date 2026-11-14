@@ -1,0 +1,1 @@
+{"schema_version":"1.0","case_id":"example-risk-es-z2-j","operation":"risk.backtest.es_z2","inputs":{"losses":[1.0,3.0,0.5,4.0],"var":[2.0,2.0,2.0,2.0],"es":[2.5,2.5,2.5,2.5],"alpha":0.25}}

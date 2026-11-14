@@ -256,3 +256,44 @@ flowchart TB
 ```
 
 `n_splits = C(N, k)` and `n_paths = k C(N, k) / N`, an integer because `k C(N, k) = N C(N-1, k-1)` (`research.cv.cpcv_paths`; López de Prado 2018, section 12.4). The operation returns the counts; assigning splits to paths is left to the research package.
+
+### Portfolio pipeline
+
+```mermaid
+flowchart LR
+  accTitle: Stage J wave 2 portfolio pipeline, from returns to a tested risk model
+  accDescr: Returns go into Ledoit-Wolf, which gives a shrunk covariance. The covariance and market weights give the prior returns, which Black-Litterman moves towards the investor's views. Mean-variance takes the posterior returns, the covariance and the weight limits and gives weights; risk parity takes the covariance and risk budgets instead and ignores expected returns. Euler contributions split either portfolio's volatility by asset. After the portfolio has been held, its realised losses and the model's VaR and ES forecasts go into the Z2 backtest, and a Baum-Welch fit describes the calm and turbulent regimes of the same period.
+  R[returns T x N] --> LW[research.estimate.ledoit_wolf: shrunk Sigma]
+  LW --> PI[prior pi = delta Sigma w_mkt, caller]
+  PI --> BL[research.estimate.black_litterman: views P, q, Omega]
+  BL --> MV[research.portfolio.mean_variance: weights within limits]
+  LW --> MV
+  LW --> RP[research.portfolio.risk_parity: weights from risk budgets]
+  MV --> EU[risk.contrib.euler: volatility by asset]
+  RP --> EU
+  EU --> H[hold, record losses and VaR, ES forecasts]
+  H --> Z2[risk.backtest.es_z2: tail size tested]
+  H --> BW[research.regime.baum_welch: regimes of the period]
+```
+
+Estimate, optimise, look at where the risk sits, then test the risk model on what happened. Every arrow is an input the caller passes; no operation calls another, so each step can be replaced or checked on its own. The prior `pi` is computed by the caller, as in [Tutorial 25](../getting-started/tutorial-25-build-and-stress-a-portfolio.md); the Z2 and Baum-Welch steps are in [Tutorial 26](../getting-started/tutorial-26-test-es-and-fit-regimes.md). Specs: `07-portfolio/estimation.md`, `07-portfolio/optimisation.md`, `06-risk/es-backtest.md`, `11-research/baum-welch.md` (rulings J-W2-1 to J-W2-15).
+
+### Baum-Welch: the EM loop and its stop rule
+
+```mermaid
+flowchart TB
+  accTitle: Baum-Welch iteration and stop rule for a Gaussian hidden Markov model
+  accDescr: The run starts with an E-step at the start values, which gives the first log-likelihood. Each iteration is an M-step, which re-estimates the initial probabilities, the transition matrix and each state's mean and standard deviation from the state probabilities, followed by an E-step at the new parameters, which gives new state probabilities and a new log-likelihood. If the gain over the previous log-likelihood is below the tolerance, the run stops as converged. Otherwise, if the iteration count has reached the maximum, it stops as not converged. Otherwise it repeats. A zero scale factor, a zero denominator or a non-positive variance stops the run with E_DOMAIN.
+  S[start values: initial, transition, means, sds] --> E0[E-step: scaled forward-backward, L_0]
+  E0 --> M[M-step: pi, A, means, sds from gamma and xi]
+  M --> E[E-step at new parameters: gamma, xi, L_k]
+  E --> G{gain L_k - L_k-1 below tolerance?}
+  G -- yes --> C[stop: converged true, parameters and L_k of this E-step]
+  G -- no --> K{k = max_iterations?}
+  K -- yes --> N[stop: converged false]
+  K -- no --> M
+  M -. zero denominator or variance at or below 0 .-> X[E_DOMAIN]
+  E -. scale c_t = 0 .-> X
+```
+
+One iteration is an M-step followed by an E-step, and the outputs are the parameters and log-likelihood of the last E-step (ruling J-W2-11). The likelihood never falls [Rab89, DLR77], so gains shrink towards zero; each golden's tolerance sits at least `1e-11` from every gain it tests, so all four builds stop at the same iteration (J-W2-12). In Tutorial 26 a two-state fit on 24 returns stops after iteration 7 with tolerance `1e-6`, and after iteration 3, not converged, with `max_iterations` 3.

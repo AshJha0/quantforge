@@ -578,7 +578,7 @@ The same backtest with costs: add `"half_spread"` to the inputs of `hedge_backte
 
 ## Stage J recipes
 
-Stage J wave 1 (target v0.9.0, not yet released) adds research tools. Each file below copies the inputs of the named golden case verbatim, so its expected outputs are that case's `expected.outputs` in `datasets/golden/stage_j/`. All four builds pass every stage J case (15,215 of 15,215 in each language, `program/R6_HANDOVER.md`). The outputs quoted here are from the Python build on 2026-11-14.
+Stage J wave 1 (target v0.9.0, not yet released) adds research tools; wave 2 recipes follow the wave 1 ones. Each file below copies the inputs of the named golden case verbatim, so its expected outputs are that case's `expected.outputs` in `datasets/golden/stage_j/`. All four builds pass every stage J case (15,215 of 15,215 in each language, `program/R6_HANDOVER.md`). The outputs quoted here are from the Python build on 2026-11-14.
 
 | Task | File | Operation | From golden |
 |---|---|---|---|
@@ -654,3 +654,89 @@ uv run --project python quantforge run < examples/research_pbo_j.json
 Worked example. Rows `[1, 0], [1, 0], [0, 2], [0, 2]`, two blocks, metric `MEAN`. Whichever block trains, its winner is last on the other: rank 1 of 2, `omega = 1/3`, logit `log(1/2)`. Output `"pbo":1.0`, `"logits":[-0.6931471805599454,-0.6931471805599454]`, `"n_combinations":2`. [Tutorial 24](docs/getting-started/tutorial-24-is-the-sharpe-real.md) works a three-strategy example by hand, and the gallery page [Research workflow](docs/curves/research-workflow.md) runs all of these on twelve rules.
 
 To check a whole suite: `python conformance/runner/runner.py --impl python --suite backtest_j` (or `purgedcv_j`, `regime_j`, `rstats_j`).
+
+### Stage J wave 2: portfolio construction, estimation, ES backtest, Baum-Welch
+
+Wave 2 adds seven operations (rulings J-W2-1 to J-W2-15 in `specifications/stage-j-rulings-w2.md`). They are implemented in Python and Java on branch `stage-j`; the Rust and C++ builds are in progress, and until all four pass, the reported contract stays 1.13.0 and a build without them answers `E_UNSUPPORTED_OPERATION` for these names. As above, each file copies the inputs of the named golden case verbatim, and the outputs quoted are from the Python build on 2026-11-14. [Tutorial 25](docs/getting-started/tutorial-25-build-and-stress-a-portfolio.md) and [Tutorial 26](docs/getting-started/tutorial-26-test-es-and-fit-regimes.md) work through them on hand-sized data.
+
+| Task | File | Operation | From golden |
+|---|---|---|---|
+| Shrink a sample covariance matrix | `estimate_ledoit_wolf_j.json` | `research.estimate.ledoit_wolf` | `estim_j-0005` |
+| Move prior returns towards a view | `estimate_black_litterman_j.json` | `research.estimate.black_litterman` | `estim_j-0013` |
+| Mean-variance weights with bounds | `portfolio_mean_variance_j.json` | `research.portfolio.mean_variance` | `optim_j-0018` |
+| Risk-parity weights with budgets | `portfolio_risk_parity_j.json` | `research.portfolio.risk_parity` | `optim_j-0030` |
+| Split a portfolio's volatility by asset | `risk_contrib_euler_j.json` | `risk.contrib.euler` | `optim_j-0042` |
+| Backtest an ES forecast | `risk_es_z2_j.json` | `risk.backtest.es_z2` | `esbt_j-0001` |
+| Fit a Gaussian hidden Markov model | `research_baum_welch_j.json` | `research.regime.baum_welch` | `baumwelch_j-0002` |
+
+### Shrink a covariance matrix
+
+Plain idea: a sample covariance from a short history is noisy, so pull it towards a multiple of the identity, by an amount estimated from the same data. Formally (`specifications/07-portfolio/estimation.md`, ruling J-W2-7; Ledoit and Wolf 2004): with demeaned rows `x_t` and `S = (1/T) sum x_t x_t'`, `m = tr S / N`, `d^2 = ||S - m I||^2 / N`, `b^2 = min((1/T^2) sum_t ||x_t x_t' - S||^2 / N, d^2)`, `delta = b^2 / d^2`, and the output is `delta m I + (1 - delta) S`.
+
+```bash
+uv run --project python quantforge run < examples/estimate_ledoit_wolf_j.json
+```
+
+Worked example. 55 rows of 5 assets. Output `"shrinkage":0.8218538203751234` and `"mu":0.00030956198250274385`. The sample covariance of assets 1 and 2 (divisor 55) is 9.0666e-6; times `1 - delta = 0.17815` it is the output's 1.6152e-6. With 55 rows for 15 distinct entries the estimator keeps only 18 % of the sample.
+
+### Black-Litterman posterior returns
+
+Plain idea: start from prior expected returns and move them towards your views, by as much as the views' stated uncertainty allows against the prior's. Formally (`estimation.md`, J-W2-8; Black and Litterman 1992, He and Litterman 1999): `posterior = pi + tau Sigma P' (P tau Sigma P' + Omega)^-1 (q - P pi)`; `posterior_covariance` is the uncertainty of the mean, and `predictive_covariance = Sigma + posterior_covariance`.
+
+```bash
+uv run --project python quantforge run < examples/estimate_black_litterman_j.json
+```
+
+Worked example. Three assets, one view: minus asset 2 minus asset 3 (`P = [0, -1, -1]`) returns 0.037219, with `Omega = 0.001` and `tau = 0.025`. The prior says `P pi = -0.13245`, and the prior's variance of that combination is `tau P Sigma P' = 0.0033059`. The posterior is the precision-weighted average, `(0.001 x (-0.13245) + 0.0033059 x 0.037219) / 0.0043059 = -0.0021851`, and the output `"posterior_returns":[0.01704927512990971,0.013861721897407628,-0.011676651876796222]` gives `-(0.0138617 - 0.0116767) = -0.0021851`.
+
+### Mean-variance with bounds
+
+Plain idea: the weights that best trade expected return against variance, fully invested, each between a lower and an upper bound. Formally (`specifications/07-portfolio/optimisation.md`, J-W2-2 to J-W2-4; Markowitz 1952): maximise `mu'w - (gamma/2) w' Sigma w` with `sum w = 1` and `lower <= w <= upper`; `at_bound` is `-1`, `0` or `+1` per asset.
+
+```bash
+uv run --project python quantforge run < examples/portfolio_mean_variance_j.json
+```
+
+Worked example. Three assets, `gamma = 1`, each weight between 0 and 0.55. Output `"weights":[0.55,0.0,0.44999999999999996]`, `"at_bound":[1,-1,0]`, `"expected_return":0.05931675`, `"volatility":0.11535876646358524`. Asset 1 (expected return 0.0719) is capped, asset 2 (0.0051) is at zero, and asset 3 takes the remaining 0.45. Check: `0.55 x 0.07191 + 0.45 x 0.043925 = 0.05931675`.
+
+### Risk parity with budgets
+
+Plain idea: long-only weights such that each asset's share of the portfolio's risk equals its budget. Formally (`optimisation.md`, J-W2-5; Maillard, Roncalli and Teiletche 2010, Spinu 2013): `w_i (Sigma w)_i / (w' Sigma w) = b_i`, solved through `Sigma y = b / y`, `w = y / sum y`.
+
+```bash
+uv run --project python quantforge run < examples/portfolio_risk_parity_j.json
+```
+
+Worked example. Volatilities 20 % and 30 %, covariance 0.018 (correlation 0.3), budgets 70/30. Output `"weights":[0.7230564379018464,0.27694356209815363]`, `"volatility":0.18714718941762643`, `"contributions":[0.13100303259233914,0.05614415682528729]`. Shares: `0.131003 / 0.187147 = 0.7000` and `0.056144 / 0.187147 = 0.3000`. With equal budgets the weights would be `(0.6, 0.4)` for any correlation (`optim_j-0029`).
+
+### Euler risk contributions
+
+Plain idea: split a portfolio's volatility into one piece per asset so that the pieces add up exactly to the total. Formally (`optimisation.md`, J-W2-6; Tasche 1999): `sigma = sqrt(w' Sigma w)`, marginal `(Sigma w) / sigma`, contribution `w_i` times marginal, share contribution over `sigma`. Weights may be negative.
+
+```bash
+uv run --project python quantforge run < examples/risk_contrib_euler_j.json
+```
+
+Worked example. Long 1 of asset 1, short 0.5 of asset 2, the covariance of the previous recipe. `Sigma w = (0.04 - 0.009, 0.018 - 0.045) = (0.031, -0.027)`, `w' Sigma w = 0.031 + 0.0135 = 0.0445`, `sigma = 0.21095`. Output `"contributions":[0.14695409357339295,0.06399613752389692]`, adding up to 0.21095, and `"shares":[0.6966292134831461,0.3033707865168539]`. The short leg adds risk: its weight and its marginal are both negative, so its contribution is positive. It would reduce risk only if `(Sigma w)_2 = cov_12 - 0.045` were positive, which needs a correlation above `0.045 / (0.2 x 0.3) = 0.75`.
+
+### Backtest an ES forecast with Z2
+
+Plain idea: compare the size of the losses beyond VaR with the expected shortfall the model forecast for those days; 0 means right on average, negative means ES was too small. Formally (`specifications/06-risk/es-backtest.md`, J-W2-10; Acerbi and Szekely 2014): losses are positive, an exception is `L_t > VaR_t` (strict), and `Z2 = 1 - sum_t L_t 1{L_t > VaR_t} / (T alpha ES_t)`.
+
+```bash
+uv run --project python quantforge run < examples/risk_es_z2_j.json
+```
+
+Worked example. Losses 1, 3, 0.5, 4, VaR 2, ES 2.5, `alpha = 0.25`, so `T alpha = 1`. Exceptions at 3 and 4: `Z2 = 1 - (3 + 4) / 2.5 = -1.8`. Output `"z2":-1.7999999999999998`, `"exceptions":2`, `"expected_exceptions":1.0`: twice the expected count, and larger losses than the ES said.
+
+### Fit a two-state regime model
+
+Plain idea: estimate the parameters of a hidden Markov model (how sticky each state is, and the mean and spread of returns in each) from the returns alone, by EM. Formally (`specifications/11-research/baum-welch.md`, J-W2-9, J-W2-11 to J-W2-13; Rabiner 1989): a scaled forward-backward E-step, the M-step of the re-estimation formulas, and a stop after the first iteration whose log-likelihood gain is below `tolerance`, or after `max_iterations` with `converged` false.
+
+```bash
+uv run --project python quantforge run < examples/research_baum_welch_j.json
+```
+
+Worked example. 60 observations in blocks of 25, start means -0.5 and 1.5, standard deviations 1, tolerance 1.29e-7. Output: `"iterations":28`, `"converged":true`, `"log_likelihood":-97.04826936250689`, `"means":[-0.4071983679316511,2.7272604649142966]`, `"sds":[0.7495715574047682,1.3624331205819107]`, and staying probabilities 0.9329 and 0.8543 on the diagonal of `"transition"`. The first state's initial probability, `7.9e-28`, is its posterior given the whole series at the first observation, 1.498, which the model places in the second state. Pass the fitted parameters to `research.regime.viterbi` for labels, as Tutorial 26 does.
+
+To check a whole suite: `python conformance/runner/runner.py --impl python --suite optim_j` (or `estim_j`, `esbt_j`, `baumwelch_j`).

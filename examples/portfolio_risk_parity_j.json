@@ -1,0 +1,1 @@
+{"schema_version":"1.0","case_id":"example-portfolio-risk-parity-j","operation":"research.portfolio.risk_parity","inputs":{"covariance":[[0.04,0.018],[0.018,0.09]],"budgets":[0.7,0.3]}}

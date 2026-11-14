@@ -8,6 +8,7 @@ Sources:
 - [Mar52] H. Markowitz, "Portfolio selection", *Journal of Finance* 7(1), 1952, 77-91 (not opened in this session). Evidence class: paper, recalled.
 - [NW06] J. Nocedal, S. J. Wright, *Numerical Optimization*, 2nd ed., Springer, 2006, chapter 16 (KKT conditions and active-set methods for convex QP) (not opened). Evidence class: textbook, recalled; the generator verifies the KKT conditions of every golden in exact arithmetic.
 - [Spinu13] F. Spinu, "An algorithm for computing risk parity weights", SSRN 2297383, 2013 (the system `Sigma y = b / y`, Newton's method, existence and uniqueness) (not opened). Evidence class: paper, recalled.
+- [MRT10] S. Maillard, T. Roncalli, J. Teiletche, "The properties of equally weighted risk contribution portfolios", *Journal of Portfolio Management* 36(4), 2010, 60-70 (equal risk contributions; the portfolio's volatility lies between the minimum-variance and the equally weighted portfolio's) (not opened in this session). Evidence class: paper, recalled.
 - [Roncalli13] T. Roncalli, *Introduction to Risk Parity and Budgeting*, CRC Press, 2013, chapter 2 (risk budgeting; two-asset result `w_i` proportional to `1/sigma_i`) (not opened). Evidence class: textbook, recalled; the two-asset result is re-derived below by hand.
 - [Tas99] D. Tasche, "Risk contributions and performance measurement", working paper, TU Munich, 1999 (Euler allocation) (not opened). Evidence class: paper, recalled; the identity `sum w_i d sigma / d w_i = sigma` is Euler's theorem for a function homogeneous of degree 1.
 
