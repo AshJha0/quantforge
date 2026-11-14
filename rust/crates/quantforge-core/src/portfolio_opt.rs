@@ -139,8 +139,8 @@ pub fn mean_variance(
     for _ in 0..(50 * n + 100) {
         let free: Vec<usize> = (0..n).filter(|&i| state[i] == 0).collect();
         if free.is_empty() {
-            // The budget pins every weight; free one so the multiplier is defined.
-            state[0] = 0;
+            // Ruling J-W2-20: free the last asset; the budget fixes its weight and nu.
+            state[n - 1] = 0;
             continue;
         }
         let fixed_sum: f64 = (0..n).filter(|&i| state[i] != 0).map(|i| w[i]).sum();
@@ -202,7 +202,10 @@ pub fn mean_variance(
         let mut worst = (0.0_f64, None);
         for i in 0..n {
             let g = mu[i] - gamma * sw[i] - nu;
+            // Ruling J-W2-21: a fixed weight (lower = upper) never leaves the working set.
             let v = match state[i] {
+                _ if lo[i] == hi[i] => 0.0,
+
                 -1 => g,
                 1 => -g,
                 _ => 0.0,
@@ -254,7 +257,8 @@ pub fn risk_parity(
         return fail("E_DOMAIN", "budgets must be positive");
     }
     let total: f64 = b0.iter().sum();
-    if !((total - 1.0).abs() <= 1e-12) {
+    // Ruling J-W2-19: only supplied budgets are sum-tested.
+    if budgets.is_some() && !((total - 1.0).abs() <= 1e-12) {
         return fail("E_DOMAIN", "budgets must sum to 1");
     }
     let s = symmetric(sigma)?;
@@ -895,5 +899,47 @@ mod tests {
         assert!(
             (r.params.means[0] - m).abs() < 1e-12 && (r.params.sds[0] - v.sqrt()).abs() < 1e-12
         );
+    }
+
+    #[test]
+    fn j_w2_19_default_budgets_are_not_sum_tested() {
+        let s: Mat = (0..7)
+            .map(|i| (0..7).map(|j| if i == j { 1.0 } else { 0.1 }).collect())
+            .collect();
+        let (w, _, _) = risk_parity(&s, None).unwrap();
+        assert!(w.iter().all(|x| (x - 1.0 / 7.0).abs() < 1e-10));
+    }
+
+    #[test]
+    fn j_w2_20_all_weights_at_bound_start() {
+        let s = vec![
+            vec![0.04, 0.01, 0.0],
+            vec![0.01, 0.09, 0.02],
+            vec![0.0, 0.02, 0.16],
+        ];
+        let r = mean_variance(&[0.3, 0.1, 0.2], &s, 2.0, Some(&[0.2, 0.3, 0.5]), None).unwrap();
+        assert_eq!(r.weights, vec![0.2, 0.3, 0.5]);
+        assert_eq!(r.at_bound, vec![-1, -1, -1]);
+    }
+
+    #[test]
+    fn j_w2_21_degenerate_problem_terminates() {
+        let eye2 = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let r = mean_variance(&[0.1, 0.1], &eye2, 1.0, None, Some(&[0.5, 0.5])).unwrap();
+        assert_eq!(r.weights, vec![0.5, 0.5]);
+        let eye3 = vec![
+            vec![1.0, 0.0, 0.0],
+            vec![0.0, 1.0, 0.0],
+            vec![0.0, 0.0, 1.0],
+        ];
+        let r = mean_variance(
+            &[0.1, 0.9, 0.1],
+            &eye3,
+            1.0,
+            Some(&[0.0, 0.3, 0.0]),
+            Some(&[1.0, 0.3, 1.0]),
+        )
+        .unwrap();
+        assert_eq!((r.weights[1], r.at_bound[1]), (0.3, -1));
     }
 }

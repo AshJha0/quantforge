@@ -150,20 +150,12 @@ public final class Allocation {
         double[] w = feasibleStart(lo, hi);
         // state: 0 free, -1 at lower, +1 at upper
         int[] state = new int[n];
-        int freeIdx = -1;
         for (int i = 0; i < n; i++) {
             if (w[i] == lo[i]) {
                 state[i] = -1;
             } else if (w[i] == hi[i]) {
                 state[i] = 1;
-            } else {
-                freeIdx = i;
             }
-        }
-        if (freeIdx < 0) {
-            // all at bounds: one index stays free so the budget multiplier is defined
-            freeIdx = n - 1;
-            state[freeIdx] = 0;
         }
         for (int iter = 0; iter < 50 * n + 100; iter++) {
             int nf = 0;
@@ -171,6 +163,11 @@ public final class Allocation {
                 if (v == 0) {
                     nf++;
                 }
+            }
+            if (nf == 0) {
+                // Ruling J-W2-20: free the last asset; the budget fixes its weight and nu.
+                state[n - 1] = 0;
+                nf = 1;
             }
             int[] f = new int[nf];
             for (int i = 0, k = 0; i < n; i++) {
@@ -214,14 +211,15 @@ public final class Allocation {
             for (int a = 0; a < nf; a++) {
                 int i = f[a];
                 double p = target[a] - w[i];
-                if (p < 0 && target[a] < lo[i]) {
+                // Ruling J-W2-21: a target blocks only beyond 1e-14 (1 + |bound|).
+                if (p < 0 && target[a] < lo[i] - 1e-14 * (1 + Math.abs(lo[i]))) {
                     double t = (lo[i] - w[i]) / p;
                     if (t < alpha) {
                         alpha = t;
                         block = i;
                         blockSide = -1;
                     }
-                } else if (p > 0 && target[a] > hi[i]) {
+                } else if (p > 0 && target[a] > hi[i] + 1e-14 * (1 + Math.abs(hi[i]))) {
                     double t = (hi[i] - w[i]) / p;
                     if (t < alpha) {
                         alpha = t;
@@ -236,22 +234,19 @@ public final class Allocation {
                 }
                 w[block] = blockSide < 0 ? lo[block] : hi[block];
                 state[block] = blockSide;
-                if (nf == 1) {
-                    // cannot happen for a feasible budget; guard against a loop
-                    break;
-                }
                 continue;
             }
             for (int a = 0; a < nf; a++) {
-                w[f[a]] = target[a];
+                w[f[a]] = Math.min(Math.max(target[a], lo[f[a]]), hi[f[a]]);
             }
             double[] sw = mul(s, w);
             int worst = -1;
-            double worstG = 0;
+            double worstG = 1e-13; // ruling J-W2-21
             for (int i = 0; i < n; i++) {
-                if (state[i] == 0) {
+                if (state[i] == 0 || lo[i] == hi[i]) {
                     continue;
                 }
+
                 double g = mu[i] - gamma * sw[i] - nu;
                 double viol = state[i] < 0 ? g : -g;
                 if (viol > worstG) {

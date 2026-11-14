@@ -130,13 +130,12 @@ final class OpsResearchW2 {
 
     private static Out ledoitWolf(In in) {
         double[][] r = in.anyMatrix("returns");
-        long cells = 0;
-        boolean wide = false;
+        int widest = 0;
         for (double[] row : r) {
-            cells += row.length;
-            wide |= row.length > ASSETS;
+            widest = Math.max(widest, row.length);
         }
-        in.limit(r.length > ROWS || cells > CELLS || wide, "returns");
+        // Ruling J-W2-22: columns are the longest row; cells are rows times that width.
+        in.limit(r.length > ROWS || widest > ASSETS || In.productOver(r.length, widest, CELLS), "returns");
         in.gate();
         Allocation.LedoitWolf lw = Allocation.ledoitWolf(r);
         return Operations.out("covariance", rows(lw.covariance()), "shrinkage", lw.shrinkage(), "mu", lw.mu());
@@ -195,13 +194,18 @@ final class OpsResearchW2 {
         double[] sd = in.reals("sds");
         double tol = in.real("tolerance", 1e-10);
         long maxIter = in.integer("max_iterations", 1000);
-        int k = pi.length;
-        in.limit(k > 16 || a.length > 16 || mu.length > 16 || sd.length > 16, "initial");
+        // Ruling J-W2-18: K is the longest of initial, means, sds and the rows or row widths of transition.
+        int k = Math.max(Math.max(pi.length, a.length), Math.max(mu.length, sd.length));
+        for (double[] row : a) {
+            k = Math.max(k, row.length);
+        }
+        in.limit(k > 16, "initial");
+
         in.limit(maxIter > 10_000, "max_iterations");
         in.limit(y.length > ROWS, "observations");
         in.limit(In.productOver(y.length, k, CELLS), "observations");
         in.gate();
-        if (y.length < 2 || k < 1 || maxIter < 1 || !Allocation.square(a, k) || mu.length != k || sd.length != k) {
+        if (y.length < 2 || k < 1 || pi.length != k || maxIter < 1 || !Allocation.square(a, k) || mu.length != k || sd.length != k) {
             throw input("observations (T >= 2), K x K transition, K means and sds, max_iterations >= 1 required");
         }
         Allocation.BaumWelch r = Allocation.baumWelch(y, pi, a, mu, sd, tol, (int) maxIter);

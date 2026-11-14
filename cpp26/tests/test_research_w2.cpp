@@ -288,3 +288,61 @@ TEST_CASE("Baum-Welch: monotone likelihood, K = 1, bit reproducible, permutation
     CHECK_THROWS_AS(rs::baum_welch({1, 1, 1}, {0.5, 0.5}, {{0.5, 0.5}, {0.5, 0.5}}, {0, 2}, {1, 1}, 1e-10, 10),
                     quantforge::Error);
 }
+
+// ---- rulings J-W2-17 to J-W2-22 (specifications/stage-j-rulings-w2.md) ----
+namespace {
+std::string w2_run(const std::string& op, const std::string& inputs) {
+    return quantforge::cli::run_case(R"({"schema_version":"1.0","case_id":"c","operation":")" + op +
+                                     R"(","inputs":)" + inputs + "}")
+        .json;
+}
+bool w2_limit(const std::string& r) { return r.find("\"code\":\"E_LIMIT\"") != std::string::npos; }
+std::string w2_row(int n) {
+    std::string s = "[0.0";
+    for (int i = 1; i < n; ++i) s += ",0.0";
+    return s + "]";
+}
+}  // namespace
+
+TEST_CASE("J-W2-17 a ragged matrix counts by its longest row") {
+    CHECK(w2_limit(w2_run("research.portfolio.mean_variance",
+                          R"({"expected_returns":[0.1,0.1,0.1],"covariance":[[1,0,0],)" + w2_row(501) +
+                              R"(,[0,0,1]],"risk_aversion":1.0})")));
+}
+
+TEST_CASE("J-W2-18 K is the longest Baum-Welch state input") {
+    const std::string base = R"({"observations":[0.1,0.2],"initial":[0.5,0.5],"sds":[1.0,1.0],)";
+    CHECK(w2_limit(w2_run("research.regime.baum_welch",
+                          base + R"("transition":[[0.5,0.5],[0.5,0.5]],"means":)" + w2_row(17) + "}")));
+    CHECK(w2_limit(w2_run("research.regime.baum_welch",
+                          base + R"("transition":[[0.5,0.5],)" + w2_row(17) + R"(],"means":[0.0,1.0]})")));
+}
+
+TEST_CASE("J-W2-19 default budgets are not sum-tested") {
+    Mat s(7, Vec(7, 0.1));
+    for (std::size_t i = 0; i < 7; ++i) s[i][i] = 1.0;
+    for (const double w : rs::risk_parity(s, {}).weights) CHECK(std::fabs(w - 1.0 / 7) < 1e-10);
+}
+
+TEST_CASE("J-W2-20 every weight at a bound in the start") {
+    const Mat s{{0.04, 0.01, 0.0}, {0.01, 0.09, 0.02}, {0.0, 0.02, 0.16}};
+    const auto r = rs::mean_variance({0.3, 0.1, 0.2}, s, 2.0, {0.2, 0.3, 0.5}, {});
+    CHECK(r.weights == Vec{0.2, 0.3, 0.5});
+    CHECK(r.at_bound == std::vector<long long>{-1, -1, -1});
+}
+
+TEST_CASE("J-W2-21 degenerate problems terminate") {
+    const auto r = rs::mean_variance({0.1, 0.1}, {{1, 0}, {0, 1}}, 1.0, {}, {0.5, 0.5});
+    CHECK(r.weights == Vec{0.5, 0.5});
+    const auto f = rs::mean_variance({0.1, 0.9, 0.1}, {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, 1.0, {0, 0.3, 0}, {1, 0.3, 1});
+    CHECK(f.weights[1] == 0.3);
+    CHECK(f.at_bound[1] == -1);
+}
+
+TEST_CASE("J-W2-22 Ledoit-Wolf sizes") {
+    CHECK(w2_limit(w2_run("research.estimate.ledoit_wolf", R"({"returns":[[0,0],)" + w2_row(501) + "]}")));
+    CHECK_FALSE(w2_limit(w2_run("research.estimate.ledoit_wolf", R"({"returns":[[0,0],)" + w2_row(500) + "]}")));
+    std::string rows = "[0.0]";
+    for (int i = 1; i < 20001; ++i) rows += ",[0.0]";
+    CHECK(w2_limit(w2_run("research.estimate.ledoit_wolf", R"({"returns":[)" + rows + "," + w2_row(500) + "]}")));
+}
