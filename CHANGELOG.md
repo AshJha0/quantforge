@@ -20,6 +20,7 @@ CLI contract 1.13.0 (ruling J-1, no new error code); 284 operations in the name 
 
 ### Changed
 
+- **G-42b ORE re-test job** (`.github/workflows/ore-g42b.yml`, job `ore-retest-g42b`, path-filtered and manual, not a required check): installs ORE 1.8.17.0 (free Python wheel, Modified BSD) with `--require-hashes` from `oracle/ore/requirements-ore.txt`, runs the six registered runs (`oracle/ore/run_g42b.py`, one at a time), counts them with `gen_stage_g_w4c.py countb` and uploads `ORE_CHECK_4C_B.json`. The count is a recorded result, not a gate.
 - The four `specifications/11-research/` wave 1 pages move from *Specified* to *Implemented*.
 
 ## 0.8.3: fuzz fixes, Rust kill tests, stage J wave 1 spec documents (2026-11-13)
@@ -64,7 +65,7 @@ A patch release on top of v0.8.1: one model fix, CI gate fixes, tests and docume
 
 - **Rust mutation gate below target:** `hedge_solvers`, `hedge` and `var` at about 70 to 75% killed against 80%; each pull request run samples 12 new mutants and needs 12 of 12. Stage J item J-0; `mutation-report` is not a required check until then.
 - **Fuzz on `main` finds three input faults** (run 43390662426): a GARCH forecast with a horizon of 2^31 times out in Rust and C++, Python's GARCH estimate times out on fuzzed returns, and Java's basket moment crashes on a ragged correlation matrix instead of returning `E_INPUT`. Stage J item J-0b.
-- **G-42b** (ORE re-test of simulated exposure) not run: no Actions job runs ORE. Stage J.
+- **G-42b** (ORE re-test of simulated exposure): the job `ore-retest-g42b` (`.github/workflows/ore-g42b.yml`) now exists but has not yet run in CI; the count is recorded when it does. Stage J.
 
 ## 0.8.1: R6 evidence repair (2026-11-13)
 
