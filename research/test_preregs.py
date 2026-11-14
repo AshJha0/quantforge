@@ -15,7 +15,7 @@ class PreregHashes(unittest.TestCase):
     def test_every_signed_file_matches_its_recorded_hashes(self):
         readme = body_sha((D / "README.md").read_bytes())
         files = sorted(D.glob("R3-*.md"))
-        self.assertEqual(len(files), 19)
+        self.assertEqual(len(files), 22)
         for f in files:
             b = f.read_bytes()
             head = b[:b.index(MARK)].decode()
@@ -25,15 +25,21 @@ class PreregHashes(unittest.TestCase):
             if "amendment" in f.name:
                 self.assertEqual(hashlib.sha256((D / m.group(1)).read_bytes()).hexdigest(), m.group(2), f.name)
                 self.assertIn("Prior knowledge", b.decode())
-            if any(f"amendment-{i}" in f.name for i in (3, 4, 5, 6)):
+            if any(f"amendment-{i}" in f.name for i in (3, 4, 5, 6, 7)):
                 extra = {"amendment-4": ("-amendment-3.md",), "amendment-5": ("-amendment-3.md", "-amendment-4.md"),
                          "amendment-6": ("-amendment-3.md", "-amendment-4.md")
+                         + (("-amendment-5.md",) if (D / f"{f.name[:5]}-amendment-5.md").exists() else ()),
+                         "amendment-7": ("-amendment-3.md", "-amendment-4.md", "-amendment-6.md")
                          + (("-amendment-5.md",) if (D / f"{f.name[:5]}-amendment-5.md").exists() else ())}
                 extra = tuple(f"{f.name[:5]}{e}" for k, v in extra.items() if k in f.name for e in v)
                 for n in (f"{f.name[:5]}-amendment-1.md", f"{f.name[:5]}-amendment-2.md", "DEVIATION-2026-11-12-recorder-rule.md", *extra):
                     m = re.search(rf"`{re.escape(n)}` \(whole file\): `([0-9a-f]{{64}})`", head)
                     self.assertEqual(hashlib.sha256((D / n).read_bytes()).hexdigest(), m.group(1), f.name)
-            if any(f"amendment-{i}" in f.name for i in (2, 3, 4, 5, 6)):
+            if any(f"amendment-{i}" in f.name for i in (2, 3, 4, 5, 6, 7)):
+                if "amendment-7" in f.name:
+                    for rel in ("holdout_runs.csv", "r3/forward_signals.jsonl"):
+                        m = re.search(rf"`research/{re.escape(rel)}` \(whole file\): `([0-9a-f]{{64}})`", head)
+                        self.assertEqual(hashlib.sha256((D.parent / rel).read_bytes()).hexdigest(), m.group(1), rel)
                 if "amendment-6" in f.name:
                     for rel in ("holdout_runs.csv", "r3_runner.py", "r3_in_sample.py", "r3_data.py"):
                         m = re.search(rf"`research/{re.escape(rel)}` \(whole file\): `([0-9a-f]{{64}})`", head)
