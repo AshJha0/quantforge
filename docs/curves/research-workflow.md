@@ -2,7 +2,7 @@
 
 <p class="note">Status: Implemented, not Validated. Validation is self-assessment until the human review at the end of the project. Data: synthetic. These are constructed inputs, not market data, and nothing is traded.</p>
 
-Generated on 2026-11-14 from commit `76847d1`, by Java 0.8.3 (JDK 25.0.5+8-LTS), C++ 0.8.3 (GCC 16.2.0), Python 0.8.3 (CPython 3.15.2), Rust 0.8.3 (rustc 1.99.1), on one Windows machine.
+Generated on 2026-11-14 from commit `784ab37`, by Java 0.8.3 (JDK 25.0.5+8-LTS), C++ 0.8.3 (GCC 16.2.0), Python 0.8.3 (CPython 3.15.2), Rust 0.8.3 (rustc 1.99.1), on one Windows machine.
 
 <p class="note">A teaching example, not a trading claim. The prices are a seeded random walk with no drift, so no rule on this page has an edge: whatever looks good here is luck, and the point of the page is to show the statistics saying so.</p>
 
