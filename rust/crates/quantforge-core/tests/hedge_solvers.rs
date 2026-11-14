@@ -928,3 +928,29 @@ fn dual_step_drops_the_constraint_with_the_smallest_ratio() {
     let v = kkt_violation(&h, &c, &s.x, &lower, &upper, false);
     assert!(v < 1e-8, "KKT residual {v}: {s:?}");
 }
+
+#[test]
+fn margin_held_zero_uses_the_product_of_multiplier_and_rate() {
+    // min (x1 - 3)^2 + (x2 - 16)^2 subject to |x1| + 10 |x2| <= 1. Margin spent on x1 is cheaper:
+    // x = (1, 0) with margin multiplier mu = 4 (full scale). At x2 = 0 the push is 2 * 16 = 32,
+    // inside the kink room mu * m2 = 40, so x2 stays at 0. A room of mu + m2 = 14 would release
+    // x2 and leave the sign-state loop cycling (mutant hedge_solvers.rs:769 `*` -> `+`).
+    let a: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+    let (b, w, m) = ([-3.0, -16.0], [1.0, 1.0], [1.0, 10.0]);
+    let mut p = problem(&a, &b, &w);
+    p.costs = Costs {
+        margin_rates: Some(&m),
+        margin_limit: Some(1.0),
+        ..Costs::default()
+    };
+    let s = qp_solve(&p).unwrap();
+    assert!((s.x[0] - 1.0).abs() < 1e-12 && s.x[1].abs() < 1e-12, "{:?}", s.x);
+}
+
+#[test]
+fn beta_futures_rejects_each_non_positive_input_alone() {
+    // Each of the three positivity conditions fails the call on its own (`||`, not `&&`).
+    for (v, f, m) in [(-1.0, 100.0, 50.0), (1e6, 0.0, 50.0), (1e6, 100.0, -50.0)] {
+        assert_eq!(code(beta_futures(v, 1.0, 0.0, f, m, false)), "E_DOMAIN");
+    }
+}
