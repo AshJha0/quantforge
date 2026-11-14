@@ -1,4 +1,4 @@
-"""Stage J wave 1 outside-library checks (J-19, R6-13 outside share). Reads the committed goldens; never writes them.
+"""Stage J outside-library checks, waves 1 and 2 (J-19, J-W2-15, R6-13 outside share). Reads the committed goldens; never writes them.
 
 Each check runs a well-known open-source library on the golden's inputs and compares every compared output at the
 golden's own tolerance class (conformance/tolerances/policy.yaml: simple_analytic 1e-12 abs + 1e-10 rel, per_unit
@@ -16,9 +16,19 @@ Libraries (separate venv, not the uv oracle env; pinned in requirements-outside-
   skfolio       CombinatorialPurgedCV n_splits and n_test_paths
   statsmodels   NormalIndPower(ratio=0) one-sample power solver (mds, years_required)
   vectorbt      Portfolio.from_orders, target amounts, per-order fees and fixed fees (backtester)
+Wave 2 (J-W2-15, ruling J-W2-16; program/WAVE2_ORACLE_NOTES.md):
+  daqp          dual active-set QP for mean-variance (PyPortfolioOpt max_quadratic_utility on Clarabel as a second
+                solver, reported per case, not counted)
+  cvxpy+clarabel  risk parity as min 1/2 y'Sy - b'log y (exponential cone), w = y / sum y
+  autograd      Euler marginal risk as the derivative of sigma(w)
+  scikit-learn  LedoitWolf (same scaled-identity estimator and 1/T convention as J-W2-7)
+  PyPortfolioOpt  BlackLittermanModel bl_returns, bl_cov
+  hmmlearn      GaussianHMM.fit (Baum-Welch) from the given start values, its own stop rule
+  esbt_j        no free library computes the Acerbi-Szekely Z2; not counted
 
     python -m venv <venv outside the repo> && <venv>/Scripts/pip install -r requirements-outside-j.txt
     cd oracle/python && <venv>/Scripts/python -W ignore outside_j.py      writes oracle/OUTSIDE_J.json
+    ... outside_j.py --wave 2      runs wave 2 only; the other wave's suites are kept from the committed file
 """
 import importlib.metadata as md
 import json

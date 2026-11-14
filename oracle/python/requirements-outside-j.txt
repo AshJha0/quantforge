@@ -9,3 +9,10 @@ skfolio==1.12.12
 statsmodels==0.15.0
 timeseriescv==0.2
 vectorbt==1.2.1
+# Wave 2 (optim_j, estim_j, baumwelch_j; ruling J-W2-16)
+autograd==1.9.1
+clarabel==0.11.1
+cvxpy==1.9.3
+daqp==0.11.2
+packaging==26.3
+pyportfolioopt==1.6.0
