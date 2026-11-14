@@ -287,6 +287,22 @@ TEST_CASE("vol_stats kills: VIX term variance and index values") {
     CHECK(c.strikes_used == std::vector<double>{90, 95, 100, 105, 110});
 }
 
+// K* selection (ruling F-15), values from Python variance.vix_term_variance. First: the smallest |C - P| sits at the
+// lowest strike (index 0), so K* = 100 and F = 106. Second: |C - P| ties at 95 and 100; the lower strike wins.
+TEST_CASE("vol_stats kills: VIX K* at the first strike and on a tie") {
+    const std::vector<VixQuote> a{{100, 8, 8, 2, 2}, {105, 10, 10, 0.5, 0.5}, {110, 1, 1, 10, 10}, {115, 0.5, 0.5, 15, 15}};
+    const VixTermResult x = vix_term_variance({30000, 0.0, a});
+    CHECK(x.forward == 106.0);
+    CHECK(x.k0 == 105.0);
+    CHECK(near_rel(x.variance, 0.137982613150808, 1e-12));
+    const std::vector<VixQuote> b{{85, 15, 15, 0.4, 0.4}, {90, 10.6, 10.6, 0.8, 0.8}, {95, 6, 6, 5.5, 5.5},
+                                  {100, 3, 3, 3.5, 3.5},  {105, 1, 1, 6.4, 6.4},      {110, 0.3, 0.3, 10.6, 10.6}};
+    const VixTermResult y = vix_term_variance({30000, 0.0, b});
+    CHECK(y.forward == 95.5);
+    CHECK(y.k0 == 95.0);
+    CHECK(near_rel(y.variance, 0.21093626593692416, 1e-12));
+}
+
 TEST_CASE("vol_stats kills: VIX checks on their edges") {
     const auto term = [](long long m, std::vector<VixQuote> s) { return code_of([&] { vix_term_variance({m, 0.02, s}); }); };
     CHECK(term(0, strip1()) == "E_INPUT");
