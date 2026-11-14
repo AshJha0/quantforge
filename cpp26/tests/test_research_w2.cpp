@@ -90,7 +90,19 @@ TEST_CASE("mean-variance: KKT residual, closed form with wide bounds, loosening 
         int nf = 0;
         for (std::size_t i = 0; i < n; ++i)
             if (r.at_bound[i] == 0) nu += mu[i] - gamma * sw[i], ++nf;
-        if (nf > 0) nu /= nf;
+        if (nf > 0) {
+            nu /= nf;
+        } else {
+            // Every weight on a bound: any nu in [max over lower of r_i, min over upper of r_i] certifies the point.
+            double lo = -1e300, hi = 1e300;
+            for (std::size_t i = 0; i < n; ++i) {
+                const double ri = mu[i] - gamma * sw[i];
+                if (r.at_bound[i] == -1) lo = std::max(lo, ri);
+                else hi = std::min(hi, ri);
+            }
+            CHECK(lo <= hi + 1e-9);
+            nu = lo > -1e300 ? lo : hi;
+        }
         double sum = 0;
         for (std::size_t i = 0; i < n; ++i) {
             sum += r.weights[i];
