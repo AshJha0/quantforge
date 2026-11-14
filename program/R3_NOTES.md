@@ -77,4 +77,4 @@ Stated overlap: R3-03's in-sample years 2013-2015 are R3-01 holdout years of the
 
 ## Holdout run, 2026-11-14: done
 
-Freeze `faadaa4`, run log `22d0c92`, one run each. All three fail; Holm rejects none. Results: `research/r3/RESULTS.md`. Open: R3-02's bootstrap SE is NaN (mostly-flat trial), stated there; R3-02 dummy-controlled check not computed (reported-only). Forward-log back-fill (amendment 3 rules 3-5) not done in this lane.
+Freeze `faadaa4`, run log `22d0c92`, one run each. All three fail; Holm rejects none. Results: `research/r3/RESULTS.md`. Open: R3-02's bootstrap SE is NaN (mostly-flat trial), stated there; R3-02 dummy-controlled check done post-hoc, report-only (RESULTS.md). Forward-log back-fill (amendment 3 rules 3-5) due but blocked: rule 4 names the run-line script, which has no writer and is hash-pinned; needs a new amendment.

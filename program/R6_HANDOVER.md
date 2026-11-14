@@ -278,3 +278,7 @@ TOTALS: 15116 value 7441 error 5161 invariance 2514
 Stage J wave 1 (2026-11-14) adds backtester, purged CV, regime and research statistics goldens, 99 cases (63 value, 36 error), contract 1.13.0.
 
 TOTALS: 15215 value 7504 error 5197 invariance 2514
+
+Stage J wave 2 spec (2026-11-14) adds optimisation, estimation, ES backtest and Baum-Welch goldens, 96 cases (63 value, 33 error), target contract 1.14.0 (ruling J-W2-1). Branch stage-j-w2spec; if branch stage-j-fuzz lands first, the coordinator restates this line on top of its total.
+
+TOTALS: 15311 value 7567 error 5230 invariance 2514

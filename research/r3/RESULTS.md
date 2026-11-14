@@ -23,9 +23,26 @@ Family: 24 ledger trials, 21 distinct strategies run, deflation at N = 24 (E[max
 ## Notes, stated after the run
 
 - **R3-02 bootstrap SE is NaN.** The selected trial is flat in most holdout months; some of the 10,000 circular block resamples (seed 20261114, `boot_sharpe` exactly as amendment 4 C5 pins it) have zero variance, so the SE, `p` and `p2` are undefined. The holdout Sharpe is negative (-1.09) and `SR0 > 0`, so `p > 0.5` for every positive SE: condition (1) fails whatever the SE, and conditions (2) and (3) fail independently. The study was not re-run.
-- **Holm ordering.** `research/r3/holdout.json` orders the NaN p of R3-02 arbitrarily, so its `holm_level` fields for R3-01 and R3-02 are not meaningful. Reading R3-02's p as above 0.5, the order is R3-03 (0.849, level 0.0167), then R3-01 and R3-02; the smallest p is far above its level, so Holm rejects nothing, and every Holm-adjusted p is 1.0 either way.
-- **Reported only** (never deciding). R3-01: correlation of holdout daily returns with in-sample PC scores 0.13 (PC1), -0.06 (PC2), 0.20 (PC3); with the carry proxy -0.01. R3-03: with the roll-down proxy -0.09, with 12-month momentum 0.04. R3-02's dummy-controlled check was not computed in this lane.
+- **Holm ordering (post-hoc erratum, 2026-11-14).** `research/r3/holdout.json` sorts R3-02's NaN p arbitrarily, so its `holm_level` fields for R3-01 and R3-02 mean nothing; the file is a frozen output and is not edited. R3-02's p is above 0.5 for any SE, and R3-03's is 0.849, so the family's smallest p is above 0.5 against a first Holm level of 0.05/3 = 0.0167: Holm stops at step 1 and rejects nothing under any order, and every Holm-adjusted p is 1.0. Verdicts unchanged. Detail: `research/DEVIATION-2026-11-14-holm-display.md`.
+- **Reported only** (never deciding). R3-01: correlation of holdout daily returns with in-sample PC scores 0.13 (PC1), -0.06 (PC2), 0.20 (PC3); with the carry proxy -0.01. R3-03: with the roll-down proxy -0.09, with 12-month momentum 0.04. R3-02's dummy-controlled check: see below.
 - R3-03's CPI arm is not run (amendment 4 item 1), final.
+
+## R3-02 dummy-controlled check (post-hoc, report-only)
+
+*Plain idea.* Funding rates jump at month ends, quarter ends and year ends, when banks shrink their balance sheets for reporting dates. If the bill-against-funding signal were only picking up those dates, removing them should change the result a lot.
+
+*Formal statement* (amendment 4, R3-02 item 8; C9 makes it reported only). The frozen trial (SOFR, `L` 60, `k` 2.0) is recomputed with every month-end business day (each quarter end and year end is also a month end) removed from the funding inputs: the trailing mean `r_t` averages the last 20 fixings that are not month-end days, and in the realised funding `F` a removed day's fixing is replaced by the last kept fixing, so its calendar days still accrue ("accrual kept"; this reading of the phrase is ours, stated here). Bill rates, entry dates, costs and windows are unchanged. Computed on 2026-11-14, after the holdout run, by `research/r3_02_dummy.py`, reading holdout files only through the same guard; raw output `research/r3/dummy_check.json`. It decides nothing.
+
+| | in-sample (52 months, 5 in position) | holdout (46 months, 7 in position) |
+|---|---|---|
+| as run, net Sharpe 1x (plain monthly, no bootstrap) | -0.51 | -1.09 |
+| month ends removed | -0.53 | -1.09 |
+
+*Worked reading.* The trial trades in the same months either way and the holdout mean return moves from -1.751e-5 to -1.748e-5 per month: the loss does not come from reporting-date spikes. The in-sample figure here (-0.51) differs from the selection Sharpe (-0.56) because it uses every in-sample exit, not the common sample of C4.
+
+## Forward-log back-fill (amendment 3 rule 4): due, not done
+
+Amendment 3 makes the back-fill due once a study's line is in `research/holdout_runs.csv`; all three lines are dated 2026-11-14, so rows from the forward log's start to 2026-11-13 are now due. It is not done, because its own rules cannot yet be followed: rule 4 requires the back-fill to be written "by the same script", the one named in the run line (`research/r3_runner.py`, SHA-256 `f45ce97f…`), and that script has no forward-log writer and cannot be changed without breaking its logged hash; rule 5 also requires a `holdout_scan.py` check to exist before the first non-null signal row. No study row has been touched. The back-fill needs a new signed amendment naming a back-fill script (and its hash), plus the rule-5 scan check; until then every `study/R3-0*` row stays `"signal": null`.
 
 ## Honest ceiling
 
