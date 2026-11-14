@@ -127,7 +127,7 @@ Power: `mds = (Phi^{-1}(1 - alpha) + Phi^{-1}(power)) / sqrt(years)`, `years_req
 
 PBO by CSCV [BBLdPZ17]: split `T` rows into `S` blocks; for each of the `C(S, S/2)` choices of training blocks, take the best strategy in training, its relative rank out of sample `omega = r / (N + 1)` (average ranks on ties), and the logit `log(omega / (1 - omega))`; `PBO` is the share of logits at or below zero.
 
-The checks behind the goldens: the DSR example is from the paper, read 2026-11-13; the Viterbi example is checked by hand and brute force, and hmmlearn 0.3.3 reproduces all 10 `regime_j` cases; statsmodels reproduces 5 power cases. PSR, DSR and PBO have no free outside library and stay hand and paper checked (ruling J-19a).
+The checks behind the goldens: the DSR example is from the paper, read 2026-11-13; the Viterbi example is checked by hand and brute force, and hmmlearn 0.3.3 reproduces all 10 value-checked `regime_j` cases (the other 6 of the 16 are error cases); statsmodels reproduces 5 power cases. PSR, DSR and PBO have no free outside library and stay hand and paper checked (ruling J-19a).
 
 ## Step 2: the same in Rust, Java and C++
 

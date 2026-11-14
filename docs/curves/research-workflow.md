@@ -63,7 +63,7 @@ Read the two probabilities together: the PSR asks whether the winner beats zero,
 
 ## The winner chosen inside purged folds
 
-5 contiguous folds over the 400 bars. Each observation's label is its bar's P&L, window `[i, i + 1]`, so the purge drops the neighbour on each side of a test block, and an embargo of 0.01 drops 4 more after it. In each fold the rule with the best training Sharpe is picked and scored on the test block.
+5 contiguous folds over the 400 bars. Each observation's label is its bar's P&L, window `[i, i + 1]`, so the purge drops the neighbour on each side of a test block, and an embargo of 0.01 drops the 4 indices after it, the first of which the purge has already dropped. In each fold the rule with the best training Sharpe is picked and scored on the test block.
 
 | Test bars | Training size | Rule picked | Training Sharpe | Test Sharpe | Test rank |
 |---|---|---|---|---|---|

@@ -124,7 +124,7 @@ Backtest, for `t = 0 .. T-1` with `q_{-1} = 0` and multiplier `m`: position `q_t
 
 Purged k-fold, observations `i = 0 .. n-1` with label windows `[t0_i, t1_i]`: folds are contiguous, the first `n mod k` of them one longer. For a test block `[a, b)` the span is `[lo, hi] = [t0_a, max t1_i]` over the block; a training observation `j` is purged when `t0_j <= hi` and `t1_j >= lo` (touching counts); the embargo drops indices `b .. b + h - 1` with `h = floor(embargo_pct n)` (J-8). CPCV: `n_splits = C(N, k)`, `n_paths = k C(N, k) / N`, always an integer because `k C(N, k) = N C(N-1, k-1)` [LdP18, section 12.4].
 
-The checks behind the goldens: the ten-trade example and the purged-CV example are hand calculations in the spec; outside libraries reproduce all 14 `backtest_j` cases (vectorbt 1.2.1) and 12 of 15 `purgedcv_j` cases (timeseriescv, scikit-learn, skfolio), ruling J-19a.
+The checks behind the goldens: the ten-trade example and the purged-CV example are hand calculations in the spec; outside libraries reproduce all 14 value-checked `backtest_j` cases (vectorbt 1.2.1; the other 9 of the 23 are error cases) and 12 of the 15 value-checked `purgedcv_j` cases (timeseriescv, scikit-learn, skfolio), ruling J-19a.
 
 ## Step 2: the same in Rust, Java and C++
 

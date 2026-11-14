@@ -44,7 +44,7 @@ uv run --project python python examples/tutorials/t4_credit.py          # Python
 python examples/tutorials/t4_credit.py rust/target/release/quantforge   # Rust, Java or C++
 ```
 
-To check a page yourself, as CI does: `python tools/check_tutorial.py --lang rust` (all pages) or add `--page docs/getting-started/tutorial-4-credit.md`. Pages 2 to 21 use the builds that page 1 makes, so check page 1 first in a fresh clone.
+To check a page yourself, as CI does: `python tools/check_tutorial.py --lang rust` (all pages) or add `--page docs/getting-started/tutorial-4-credit.md`. Pages 2 to 26 use the builds that page 1 makes, so check page 1 first in a fresh clone.
 
 Scripts that send several cases at once and read their diagnostics, as in Tutorials 8 to 16, use `runner` from the same helper, the batch form of `connect`. Tutorial 1 is the first exception: to show what the library looks like from Python, its page calls the `quantforge_core` package directly, and a standard-library script, `examples/tutorial_swap.py`, sends the same three operations to the Rust, Java or C++ `batch` command. The hedging tutorials, 17 to 21, follow tutorial 1's form (ruling I-52): the page's Python block imports the `quantforge_core` modules, and `examples/tutorial_hedge_17.py` to `tutorial_hedge_21.py` send the same cases, built from the `examples/hedge_*_i.json` inputs, to the other builds. CI runs every page in each language it marks; Tutorial 22, a Python research tool, runs in Python only.
 
