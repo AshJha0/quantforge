@@ -9,27 +9,21 @@ Mutants that no test can kill because the mutated program behaves identically. O
 
 ## hedge.rs
 The objective is strictly convex (full-rank Q checked first), and `solve_hedge` only returns after
-`conditions_hold` verifies the first-order conditions of the unique minimiser to 1e-9. `polish` and
-the sweep schedule are accelerators: the mutants below change the path or the stopping sweep but
+`conditions_hold` verifies the first-order conditions of the unique minimiser to 1e-9. The sweep
+schedule details below change the path or the stopping sweep but
 not the returned hedge (verified against the brute-force reference in tests/hedge_mutants.rs).
-- `hedge.rs:56:5 replace polish with None`: descent alone reaches `moved == 0` at the same minimiser.
-- `hedge.rs:56:5 replace polish with Some(vec![1.0])`: candidate fails `conditions_hold`, descent continues.
-- `hedge.rs:56:5 replace polish with Some(vec![-1.0])`: same as above.
-- `hedge.rs:56:61 replace != with == in polish`: wrong support gives a rejected candidate; descent continues.
-- `hedge.rs:66:25 replace - with + in polish`: wrong right-hand side gives a rejected candidate.
-- `hedge.rs:66:25 replace - with / in polish`: same.
-- `hedge.rs:66:19 delete - in polish`: same.
-- `hedge.rs:66:34 replace * with + in polish`: same.
-- `hedge.rs:66:34 replace * with / in polish`: same.
-- `hedge.rs:71:23 replace != with == in polish`: returns None for good candidates; descent finishes.
+- `hedge.rs:66:34 replace * with / in polish`: `signum` is +-1, so `pen / sg == pen * sg` bit for bit (audit AGREE).
 - `hedge.rs:128:29 replace > with >= in solve_hedge`: at `rest == pen` both branches give 0.
 - `hedge.rs:130:28 replace < with <= in solve_hedge`: at `rest == -pen` both branches give 0.
 - `hedge.rs:135:34 replace - with + in solve_hedge`: changes only the stopping measure; final check unchanged.
-- `hedge.rs:138:29 replace || with && in solve_hedge`: polish runs less often; descent still converges.
 - `hedge.rs:138:23 replace == with != in solve_hedge`: polish runs at other sweeps; same minimiser.
-- `hedge.rs:138:18 replace % with / in solve_hedge`: same.
-- `hedge.rs:138:18 replace % with + in solve_hedge`: same.
-- `hedge.rs:138:38 replace == with != in solve_hedge`: same.
+- `hedge.rs:138:18 replace % with / in solve_hedge`: polish still runs at sweeps 4032-4095 and at `moved == 0`; same output, slower (audit AGREE).
+- `hedge.rs:138:38 replace == with != in solve_hedge`: polish at every moving sweep; same output (audit AGREE).
+
+Withdrawn after the independent audit (program/J0_EQUIVALENT_AUDIT.md): 56:5 (None, Some(vec![1.0]),
+Some(vec![-1.0])), 56:61, 66:25 (x2), 66:19, 66:34 `+`, 71:23, 138:29, 138:18 `+`. `polish` is not only
+an accelerator; these are now targeted by `polish_is_needed_on_near_collinear_columns` (audit case A)
+and `identity_hedges_return_full_length_answers` (cases B, B') in tests/hedge_mutants.rs.
 - `var.rs:167:11 replace < with <= in floor_lr`: differs only at `lr == 1e-12` exactly, which no input produces.
 - `var.rs:34:19 replace - with + in order_statistic`: dead branch; `w = n - n c <= 0` needs `c >= 1`, which `check_confidence` rejects (`c in [0.5, 1)`), and no `n < 5000` rounds `n - n c` to 0 even at the largest `c < 1`.
 - `var.rs:34:19 replace - with / in order_statistic`: same dead branch.
