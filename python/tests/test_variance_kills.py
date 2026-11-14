@@ -438,3 +438,98 @@ def test_estimate_properties(estimate: tuple[list[float], dict[str, Any], dict[s
             assert out["std_errors"][k] == pytest.approx(float(se[j]), rel=2e-3)
         else:
             assert out["std_errors"][k] is None
+
+
+# --- Nelder-Mead against an independent reference -------------------------------------------------
+def _reference_nm(f: Callable[[list[float]], float], start: list[float], step: float,
+                  iterations: int) -> tuple[list[float], float, int]:
+    """Textbook Nelder-Mead (reflection 1, expansion 2, contraction 1/2, shrink 1/2; Lagarias et
+    al. 1998 acceptance rules), written separately from the module and with the same rounding
+    order (c + t (w - c)) so paths agree to the bit. Also returns the evaluation count."""
+    calls = 0
+
+    def g(x: list[float]) -> float:
+        nonlocal calls
+        calls += 1
+        return f(x)
+
+    n = len(start)
+    pts = [list(start)]
+    for i in range(n):
+        p = list(start)
+        p[i] += step
+        pts.append(p)
+    vals = [g(p) for p in pts]
+    for _ in range(iterations):
+        pairs = sorted(zip(vals, range(n + 1), strict=True))
+        pts = [pts[k] for _, k in pairs]
+        vals = [val for val, _ in pairs]
+        lo, second, hi = vals[0], vals[n - 1], vals[n]
+        if hi - lo <= 1e-14 * (1 + abs(lo)):
+            break
+        c = [sum(p[j] for p in pts[:n]) / n for j in range(n)]
+        w = pts[n]
+        xr = [c[j] - (w[j] - c[j]) for j in range(n)]
+        fr = g(xr)
+        if fr < lo:
+            xe = [c[j] - 2 * (w[j] - c[j]) for j in range(n)]
+            fe = g(xe)
+            pts[n], vals[n] = (xe, fe) if fe < fr else (xr, fr)
+        elif fr < second:
+            pts[n], vals[n] = xr, fr
+        else:
+            if fr < hi:  # outside contraction
+                xc = [c[j] - 0.5 * (w[j] - c[j]) for j in range(n)]
+            else:  # inside contraction
+                xc = [c[j] + 0.5 * (w[j] - c[j]) for j in range(n)]
+            fc = g(xc)
+            if fc < min(fr, hi):
+                pts[n], vals[n] = xc, fc
+            else:
+                pts = [pts[0]] + [[a + 0.5 * (b - a) for a, b in zip(pts[0], p, strict=True)]
+                                  for p in pts[1:]]
+                vals = [vals[0]] + [g(p) for p in pts[1:]]
+    k = min(range(n + 1), key=vals.__getitem__)
+    return pts[k], vals[k], calls
+
+
+def _rosen(p: list[float]) -> float:
+    return 100 * (p[1] - p[0] ** 2) ** 2 + (1 - p[0]) ** 2
+
+
+def _ridge(p: list[float]) -> float:
+    return abs(p[0] - 0.3) + 4 * abs(p[1] + 0.2) + 0.5 * abs(p[2])
+
+
+def _bowl(p: list[float]) -> float:
+    return (p[0] - 1) ** 2 + 5
+
+
+@pytest.mark.parametrize("iterations", [1, 2, 3, 5, 8, 13, 40, 400, 5000])
+@pytest.mark.parametrize(("f", "start", "step"), [
+    (_rosen, [-1.2, 1.0], 0.5), (_ridge, [1.0, 1.0, 1.0], 0.7), (_bowl, [4.0], 0.5)])
+def test_nelder_mead_matches_reference(f: Callable[[list[float]], float], start: list[float],
+                                       step: float, iterations: int) -> None:
+    count = 0
+
+    def counted(x: list[float]) -> float:
+        nonlocal count
+        count += 1
+        return f(x)
+
+    x, val = v._nelder_mead(counted, start, step, iterations)
+    rx, rval, rcount = _reference_nm(f, start, step, iterations)
+    assert x == pytest.approx(rx, rel=1e-12, abs=1e-15)
+    assert val == pytest.approx(rval, rel=1e-12, abs=1e-15)
+    assert count == rcount
+
+
+def test_minimum_sizes_are_accepted() -> None:
+    # The lower bounds are inclusive: 1 minute, 30 returns for the fit (spec minimums).
+    assert v.vix_term_variance(1, 0.0, STRIP)[1] == 100.0
+    assert math.isfinite(v.garch_fit(R30, "SAMPLE"))
+    for returns, dist in ((R30, "NORMAL"), (R30 * 4, "STUDENT_T")):
+        try:
+            v.garch_estimate(returns, "SAMPLE", dist, False)
+        except QfError as err:  # these toy series may have no interior maximum
+            assert err.code == "E_NO_CONVERGENCE"
