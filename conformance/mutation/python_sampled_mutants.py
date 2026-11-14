@@ -184,10 +184,16 @@ def main() -> None:
     ap.add_argument("--python", default=sys.executable)
     ap.add_argument("--list", action="store_true", help="print the sampled mutants and stop")
     ap.add_argument("--out", type=Path, default=None, help="write per-mutant results as JSON")
+    ap.add_argument("--retry", type=Path, default=None,
+                    help="rerun only the survivors listed in an earlier --out file")
     args = ap.parse_args()
     profile = PROFILES[args.profile]
     src = REPO / "python"
     every, chosen = sample(src, profile["modules"], args.sample, args.seed)
+    if args.retry:
+        prior = json.loads(args.retry.read_text(encoding="utf-8"))
+        keep = {(r["module"], r["node"], r["kind"]) for r in prior if r["status"] == "survived"}
+        chosen = [c for c in chosen if c in keep]
     print(f"sites {len(every)} sample {len(chosen)} seed {args.seed}", flush=True)
     if args.list:
         for mod, idx, kind in chosen:
