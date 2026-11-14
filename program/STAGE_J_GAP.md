@@ -8,11 +8,11 @@ Columns: **Kind** is `CLI` (a contract operation, built in Python, Rust, Java an
 
 | # | Item | Plan reference | Kind | Size | Call |
 |---|---|---|---|---|---|
-| G1 | Mean-variance optimiser with budget and box constraints | row J; 12.5; 14.6 J-5 | CLI | 3 | **v0.9.0, wave 2.** Specified: `portfolio.opt.mean_variance` |
-| G2 | Risk parity (risk budgets) | row J; J-5 | CLI | 2 | **v0.9.0, wave 2.** Specified: `portfolio.opt.risk_parity` |
+| G1 | Mean-variance optimiser with budget and box constraints | row J; 12.5; 14.6 J-5 | CLI | 3 | **v0.9.0, wave 2.** Specified: `research.portfolio.mean_variance` |
+| G2 | Risk parity (risk budgets) | row J; J-5 | CLI | 2 | **v0.9.0, wave 2.** Specified: `research.portfolio.risk_parity` |
 | G3 | Euler risk contributions | 14.5; J-8 | CLI | 0.5 | **v0.9.0, wave 2.** Specified: `risk.contrib.euler` |
-| G4 | Ledoit-Wolf shrinkage | row J (Bayesian estimation); J-6 | CLI | 1 | **v0.9.0, wave 2.** Specified: `portfolio.est.ledoit_wolf`. The scikit-learn check of J-6 is oracle-only and still to run (no scikit-learn in the oracle environment on 2026-11-14) |
-| G5 | Black-Litterman posterior | row J; J-6 | CLI | 1 | **v0.9.0, wave 2.** Specified: `portfolio.est.black_litterman` |
+| G4 | Ledoit-Wolf shrinkage | row J (Bayesian estimation); J-6 | CLI | 1 | **v0.9.0, wave 2.** Specified: `research.estimate.ledoit_wolf`. The scikit-learn check of J-6 is oracle-only and still to run (no scikit-learn in the oracle environment on 2026-11-14) |
+| G5 | Black-Litterman posterior | row J; J-6 | CLI | 1 | **v0.9.0, wave 2.** Specified: `research.estimate.black_litterman` |
 | G6 | Acerbi-Szekely ES backtest statistic | 14.5; J-8 | CLI | 1 | **v0.9.0, wave 2.** Specified: `risk.backtest.es_z2`. The size study (2,000 simulated paths, within 3 SE of nominal) is a research script, G13 |
 | G7 | Baum-Welch for a Gaussian HMM | 12.5 A4; 12.10 A4 | CLI | 3 | **v0.9.0, wave 2.** Specified: `research.regime.baum_welch`. 12.10 asks for parameters equal across languages to 1e-9, which only a ported operation can show. The T = 5,000 recovery run is a research script, G12 |
 | G8 | Markov-switching AR(1) | 12.5 A4; 12.10 | Py | 3 | **Defer within v0.9.0 to the research lane, not wave 2.** 12.10 asks for the same tolerances "on its own frozen parameters", which needs frozen parameters first; descriptive only, no trading use. If the research lane has not frozen them by the J tag, defer to H with the reason recorded |
