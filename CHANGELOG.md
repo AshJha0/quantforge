@@ -2,7 +2,8 @@
 
 ## Unreleased (0.9.0): stage J wave 1, research tools
 
-- **R3 studies run once on their holdouts: all three null.** R3-01 amendment 5 (closed-form par DV01; the library calendar starts in 2000), loader with provenance log (`research/r3_data.py`), in-sample runs, freeze `faadaa4`, run log committed first, one run each. Holdout net Sharpe: R3-01 -0.61 (DSR 0.0001), R3-02 -1.09 (exploratory; bootstrap SE undefined), R3-03 0.33 (DSR 0.15); Holm rejects none. Results and the honest ceiling: `research/r3/RESULTS.md`.
+- **R3 studies run once on their holdouts: all three null.** R3-01 amendment 5 (closed-form par DV01; the library calendar starts in 2000), loader with provenance log (`research/r3_data.py`), in-sample runs, freeze `faadaa4`, run log committed first, one run each. Holdout net Sharpe: R3-01 -0.61 (DSR 0.0001), R3-02 -1.09 (exploratory; bootstrap SE undefined), R3-03 0.33 (DSR 0.15); Holm rejects none. Pass-rule power was 13 % to 15 % at the MDS, so the nulls are weak evidence. Results and the honest ceiling: `research/r3/RESULTS.md`.
+- **R3 follow-ups, post-hoc and report-only.** R3-02 dummy-controlled check (`research/r3_02_dummy.py`): removing month-end funding days leaves the holdout Sharpe at -1.09. Erratum on the `holm_level` display fields of `holdout.json` (`research/DEVIATION-2026-11-14-holm-display.md`; verdicts unchanged). Full textbook citations for R3-01 amendment 5 in `program/R3_A5_REVIEW.md` and `docs/references.md`. Forward-log back-fill (amendment 3 rule 4) is due but needs a new amendment naming the script.
 
 CLI contract 1.13.0 (ruling J-1, no new error code); 284 operations in the name map; 15,215 golden cases (7,504 value-checked, 5,197 error, 2,514 invariance), 99 of them new in the four wave 1 suites. Each of the four builds passes 15,215 of 15,215 (`program/R6_HANDOVER.md`, TOTALS line; observed on one Windows machine through the neutral runner).
 

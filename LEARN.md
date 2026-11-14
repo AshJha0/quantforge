@@ -555,6 +555,8 @@ Why it matters. A strategy's backtest is the evidence most research rests on, an
 
 **Worked example.** At 5 % and 80 % power, `z_sum = 2.4865`. One year detects only an annual Sharpe of 2.49, five years 1.11, and 13.83 years 0.6686, the 0.67 of the R3-01 preregistration (`rstats_j-0017`). Detecting 0.5 needs 24.73 years. Outside check: statsmodels 0.15.0 reproduces 5 of the `rstats_j` power cases (J-19a). Serial correlation makes the true minimum larger; the preregistrations report a simulated power beside the formula.
 
+**What this meant for R3.** The full pass rule (deflated Sharpe, 2x costs, every third positive) is stricter than the bare test, so its simulated pass probability at the MDS was only 12.6 % to 15.2 %. All three studies failed on the holdout (`research/r3/RESULTS.md`). With power that low, a fail mostly tells you the in-sample choice did not carry over; it cannot show that no edge near the MDS exists. Plan the sample length before the study, not after.
+
 ### Regimes, as description
 
 **Plain idea.** A hidden Markov model says the market moves between a few states, calm and turbulent for example, each with its own return distribution. The Viterbi algorithm finds the single most likely sequence of states for the returns observed.
