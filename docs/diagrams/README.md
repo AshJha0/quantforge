@@ -1,6 +1,6 @@
 # Diagrams
 
-Mermaid, which GitHub draws directly. Per-domain flows are added with each domain's specs.
+Mermaid, which GitHub draws directly and the site draws in its light or dark theme. The stage J diagrams carry a title and a description for screen readers (`accTitle`, `accDescr`), and the paragraph under it says the same in words. Per-domain flows are added with each domain's specs.
 
 ## System
 
@@ -178,3 +178,81 @@ flowchart LR
 ```
 
 Every hedge that builds a risk matrix passes it to one constrained least-squares solve; the frontier and instrument selection call that solve repeatedly. The checks run in a fixed order, so a bad problem returns the same error code in every build (rulings I-3, I-14). Costs are solved by sign state (long, short or held at zero), with no cap below 200 instruments in the method (I-48), though at v0.8.0 no golden was larger than 6 by 4 (R6-6 adds n = 50 and 200) and exact answers at a switch point (I-54). Specs: `08-hedging/hedge-solvers.md`, `credit-and-correlation-hedges.md`, `cross-asset-hedge.md`, `hedge-costs-and-frontier.md`, `instrument-selection.md`, `dynamic-hedge-and-effectiveness.md`, `hedge-slippage.md`.
+
+## Stage J: research tools
+
+```mermaid
+flowchart LR
+  accTitle: Stage J research flow
+  accDescr: Prices and targets go into the backtester; its per-bar net P&L feeds the probabilistic and deflated Sharpe ratios and, for many trials together, the PBO; purged cross-validation chooses which bars train and which test; the trial registry supplies the number of trials; regime labels describe the sample.
+  PR[prices, targets] --> BT[research.backtest.run]
+  BT -->|per-bar net P&L| PSR[research.stats.psr]
+  REG[trial registry research/trials.csv] -->|N, variance of Sharpe| DSR[research.stats.dsr]
+  BT -->|best trial| DSR
+  BT -->|P&L of every trial| PBO[research.stats.pbo]
+  CV[research.cv.purged_kfold] -->|train and test bars| BT
+  CP[research.cv.cpcv_paths] -->|splits, paths| CV
+  PW[research.stats.power] -->|minimum detectable Sharpe| REG
+  RET[returns] --> VIT[research.regime.viterbi]
+```
+
+A study fixes its power and trial count first, backtests each trial with costs and a lag, and reports DSR and PBO beside the Sharpe ratio (plan 11.3). Regime labels describe the sample and never feed a signal (spec limitation). Specs: `11-research/backtester.md`, `purged-cv.md`, `regimes.md`, `research-statistics.md`. Worked through in [Tutorial 23](../getting-started/tutorial-23-backtest-honestly.md), [Tutorial 24](../getting-started/tutorial-24-is-the-sharpe-real.md) and the gallery page [Research workflow](../curves/research-workflow.md).
+
+### Backtest timing: signal at t, trade at t + lag, P&L on the bar after
+
+```mermaid
+sequenceDiagram
+  accTitle: Backtest event loop timing with lag 1
+  accDescr: The strategy decides a target at the close of bar t using data up to that close. With lag 1 the backtester trades to that target at the close of bar t plus 1, paying spread, commission and a fixed fee. The price move over bar t plus 2 is earned by the position held after that trade. With lag 0 the trade would happen at the same close as the decision, which is only allowed for the look-ahead canary.
+  participant S as Strategy
+  participant B as Backtester
+  participant L as P&L ledger
+  Note over S,L: close of bar t
+  S->>B: target[t], from data up to p_t
+  Note over S,L: close of bar t+1 (lag 1)
+  B->>B: q_{t+1} = target[t], trade d = q_{t+1} - q_t at p_{t+1}
+  B->>L: cost = abs(d) p (half_spread_bps / 10^4) + abs(d) commission + fixed
+  Note over S,L: close of bar t+2
+  B->>L: gross = q_{t+1} (p_{t+2} - p_{t+1})
+  L->>L: net = gross - cost, equity += net
+```
+
+The position that earns a bar's move is the one held before that bar's trade (ruling J-2). A rule computed from `p_t` and traded at `p_t` (lag 0) earns moves it could not have known; the canary in Tutorial 23 makes 21 at lag 0 and loses 10 at lag 1 on the same twelve prices.
+
+### Purged k-fold with an embargo
+
+```mermaid
+flowchart LR
+  accTitle: Purged k-fold split with an embargo, fold 1 of 3
+  accDescr: Ten observations, each label covering three bars. The middle fold tests observations 4 to 6, whose labels span times 4 to 8. Observations 2 and 3 before the block and 7 and 8 after it have labels that overlap that span and are purged. A 30 percent embargo removes observations 7, 8 and 9 after the block. Only observations 0 and 1 remain for training.
+  subgraph before[before the test block]
+    O0[0 train] --- O1[1 train] --- O2[2 purged] --- O3[3 purged]
+  end
+  subgraph test[test block, labels span t = 4 to 8]
+    O4[4 test] --- O5[5 test] --- O6[6 test]
+  end
+  subgraph after[after the test block]
+    O7[7 purged and embargoed] --- O8[8 purged and embargoed] --- O9[9 embargoed]
+  end
+  before --> test --> after
+```
+
+Purging works on both sides of the block and removes any training row whose label window `[t0, t1]` touches the test span; the embargo, `floor(embargo_pct n)` rows, works only after it, where serial correlation carries information forward (rulings J-7, J-8). Numbers from Tutorial 23, `t1 = t0 + 2`, embargo 0.3.
+
+### Combinatorial purged CV: splits to paths
+
+```mermaid
+flowchart TB
+  accTitle: Combinatorial purged cross-validation with N = 6 groups and k = 2 test groups
+  accDescr: Six groups G1 to G6. Every choice of two test groups is a split, fifteen in all. Each group is a test group in five splits. Taking one test result for each group from different splits builds a complete backtest path; there are 2 times 15 divided by 6, which is 5 paths.
+  D[data in N = 6 contiguous groups G1 .. G6] --> S[C 6, 2 = 15 splits, each tests 2 groups and trains on 4, purged]
+  S --> C[each group is tested in 5 of the 15 splits]
+  C --> P1[path 1: G1 .. G6 each from a different split]
+  C --> P2[path 2]
+  C --> P3[path 3]
+  C --> P4[path 4]
+  C --> P5[path 5]
+  P1 & P2 & P3 & P4 & P5 --> R[5 out-of-sample Sharpe ratios, not one]
+```
+
+`n_splits = C(N, k)` and `n_paths = k C(N, k) / N`, an integer because `k C(N, k) = N C(N-1, k-1)` (`research.cv.cpcv_paths`; López de Prado 2018, section 12.4). The operation returns the counts; assigning splits to paths is left to the research package.
