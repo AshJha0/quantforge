@@ -32,7 +32,8 @@ MARKERS = {
     "R3-03": r"home\.treasury\.gov|us-treasury-par-yields|us-treasury-real-yields|daily_treasury_real|bls\.gov|bls-cpi|CUUR0000SA0",
 }
 DATE = re.compile(r"(?<![\d-])(\d{4}-\d{2}(?:-\d{2})?)(?![\d-])")
-SKIP = ("research/preregs/", "program/", "CHANGELOG.md", "ROADMAP.md")  # prose about the studies, not data
+# Prose about the studies, and the R3 download log (URLs, request ranges and hashes; no observed value).
+SKIP = ("research/preregs/", "program/", "CHANGELOG.md", "ROADMAP.md", "research/r3/data_log.csv")
 
 
 def windows():
