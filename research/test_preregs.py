@@ -126,6 +126,20 @@ class HoldoutObservations(unittest.TestCase):
         self.assertFalse(covered("forward-log:reports/2026-11-12/p&l-explain.json", rs))  # another report
         self.assertEqual(unlisted([("forward-log:reports/2026-11-12/sofr-check.json",), ("docs/x.md",)]), ["docs/x.md"])
 
+class ForwardSignals(unittest.TestCase):
+    """Amendment 3 rule 5 (amendment 6 Change 5): no study row may carry a signal or position written before the
+    study's holdout run, from a tree without its run line, or dated before the run without the back-fill marks."""
+
+    def test_no_early_or_unmarked_signal(self):
+        self.assertEqual(holdout_scan.signal_scan_all(), [])
+
+    def test_planted_early_signal_is_caught(self):
+        row = {"record": {"series_id": "study/R3-01", "event_time": "2026-11-12T21:00:00Z",
+                          "knowledge_time": "2026-11-12T21:00:00Z", "value": {"commit": "nope", "payload": {"signal": 0.1}}}}
+        bad = holdout_scan.signal_check([row], {"R3-01": "2026-11-14"}, show=lambda c: None)
+        self.assertEqual([b[1][0] for b in bad], ["b", "c", "d"])
+
+
 
 class Q6Prereg(unittest.TestCase):
     def test_q6_churn_bound_matches_its_recorded_hash(self):
