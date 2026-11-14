@@ -54,7 +54,7 @@ def load_rederivation():
     doc = json.loads(p.read_text(encoding="utf-8"))
     return {c["case_id"]: c["operation"] for c in doc["cases"] if c["pass"]}, doc.get("source", "independent re-derivation")
 
-STAGE_DIRS = {"D": ["stage_d"], "E": ["stage_e", "stage_e_b"], "F": ["stage_f"], "G": ["stage_g"], "I": ["stage_i"]}
+STAGE_DIRS = {"D": ["stage_d"], "E": ["stage_e", "stage_e_b"], "F": ["stage_f"], "G": ["stage_g"], "I": ["stage_i"], "J": ["stage_j"]}
 
 # Stage F convention rows naming a numpy or scipy primitive. Kupiec (SCIPY.BINOM) and Christoffersen (SCIPY.CHI2)
 # cases rebuild the spec's likelihood-ratio formula around a distribution call: reimplementation (review finding 6).
@@ -180,10 +180,32 @@ def load_percase_g():
             for s, v in doc["suites"].items() if s in PERCASE_G_CLASS}
 
 
+def load_percase_j():
+    """{case_id: (class, library)} for stage J from oracle/OUTSIDE_J.json (oracle/python/outside_j.py; ruling J-19a).
+
+    Each case carries its own class; a case counts only if it and every compared output passed."""
+    p = ORACLE / "OUTSIDE_J.json"
+    if not p.is_file():
+        return {}
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    return {c["case_id"]: (c["class"], v["library"]) for v in doc["suites"].values() for c in v["cases"]
+            if c["pass"] and all(x["pass"] for x in c["checks"]) and c.get("class") in COUNTED}
+
+
 def stage_report(stage, problems):
     """Rows (suite, operation, class, sweep, library, value-checked)."""
     suites = golden_suites(stage)
     rows = []  # (suite, operation, class, sweep, library)
+    if stage == "J":
+        reg = load_percase_j()
+        known = {cid for s in suites.values() for cid, _, _ in s}
+        for cid in sorted(set(reg) - known):
+            problems.append(f"stage J: outside case {cid} is not in the goldens")
+        for suite, cases in suites.items():
+            for cid, op, st in cases:
+                cls, lib = reg.get(cid, ("none", ""))
+                rows.append((suite, op, cls, is_sweep(stage, suite), lib, st == "ok"))
+        return rows
     if stage in ("D", "E", "F"):
         reg = load_case_registers(stage)
         known = {cid for s in suites.values() for cid, _, _ in s}
