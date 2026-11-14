@@ -15,7 +15,7 @@ class PreregHashes(unittest.TestCase):
     def test_every_signed_file_matches_its_recorded_hashes(self):
         readme = body_sha((D / "README.md").read_bytes())
         files = sorted(D.glob("R3-*.md"))
-        self.assertEqual(len(files), 9)
+        self.assertEqual(len(files), 12)
         for f in files:
             b = f.read_bytes()
             head = b[:b.index(MARK)].decode()
@@ -25,7 +25,11 @@ class PreregHashes(unittest.TestCase):
             if "amendment" in f.name:
                 self.assertEqual(hashlib.sha256((D / m.group(1)).read_bytes()).hexdigest(), m.group(2), f.name)
                 self.assertIn("Prior knowledge", b.decode())
-            if "amendment-2" in f.name:
+            if "amendment-3" in f.name:
+                for n in (f"{f.name[:5]}-amendment-1.md", f"{f.name[:5]}-amendment-2.md", "DEVIATION-2026-11-12-recorder-rule.md"):
+                    m = re.search(rf"`{re.escape(n)}` \(whole file\): `([0-9a-f]{{64}})`", head)
+                    self.assertEqual(hashlib.sha256((D / n).read_bytes()).hexdigest(), m.group(1), f.name)
+            if "amendment-2" in f.name or "amendment-3" in f.name:
                 m = re.search(r"`DEVIATION-2026-11-12.md` \(whole file\): `([0-9a-f]{64})`", head)
                 self.assertEqual(hashlib.sha256((D / "DEVIATION-2026-11-12.md").read_bytes()).hexdigest(), m.group(1), f.name)
 
@@ -109,6 +113,16 @@ class Q6Prereg(unittest.TestCase):
     def test_q6_churn_bound_matches_its_recorded_hash(self):
         b = (D / "Q6-01-churn-bound.md").read_bytes()
         self.assertIn(body_sha(b), b[:b.index(MARK)].decode())
+
+    def test_q6_02_matches_its_recorded_hashes(self):
+        b = (D / "Q6-02-robust-shape-penalty.md").read_bytes()
+        head = b[:b.index(MARK)].decode()
+        self.assertIn(body_sha(b), head)
+        m = re.search(r"`Q6-01-churn-bound.md` \(whole file\): `([0-9a-f]{64})`", head)
+        self.assertEqual(hashlib.sha256((D / "Q6-01-churn-bound.md").read_bytes()).hexdigest(), m.group(1))
+        for name in ("q6_02_method_test.py", "q6_method_test.py"):
+            m = re.search(rf"`{name}` \(whole file\): `([0-9a-f]{{64}})`", head)
+            self.assertEqual(hashlib.sha256((D.parent / "q6" / name).read_bytes()).hexdigest(), m.group(1), name)
 
 if __name__ == "__main__":
     unittest.main()
