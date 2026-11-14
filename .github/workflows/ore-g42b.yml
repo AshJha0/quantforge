@@ -1,0 +1,62 @@
+name: ORE re-test (G-42b)
+# Ruling G-42b (specifications/stage-g-rulings.md): the six wave 4c ORE runs with new seeds (20261211 to 20261216, 5,000
+# samples) counted against the expsim_g goldens by check_case_b in oracle/python/gen_stage_g_w4c.py. Carried over since
+# v0.7.0 because no job ran ORE. ORE 1.8.17.0 is the Open Source Risk Engine Python wheel from PyPI (free, Modified BSD),
+# installed with --require-hashes from oracle/ore/requirements-ore.txt. Oracle only: nothing in a build reads it.
+# Path-filtered and also manual; not a required check. The count is a recorded result (as G-42 was), not a gate:
+# the job fails only if ORE errors or fewer than the 96 value cases are evaluated.
+on:
+  push:
+    branches: [main]
+    paths: ['oracle/ore/**', 'oracle/python/gen_stage_g_w4c.py', 'datasets/golden/stage_g/expsim_g*', '.github/workflows/ore-g42b.yml']
+  pull_request:
+    paths: ['oracle/ore/**', 'oracle/python/gen_stage_g_w4c.py', 'datasets/golden/stage_g/expsim_g*', '.github/workflows/ore-g42b.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  ore-g42b:
+    name: ore-retest-g42b
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+          cache-dependency-glob: oracle/python/uv.lock
+      - name: Install ORE 1.8.17.0 (Python 3.12 wheel, hashes checked)
+        run: |
+          uv venv --python 3.12 "$RUNNER_TEMP/ore-venv"
+          uv pip install --python "$RUNNER_TEMP/ore-venv/bin/python" --require-hashes -r oracle/ore/requirements-ore.txt
+      - name: Run the six G-42b cases, one at a time
+        run: |
+          "$RUNNER_TEMP/ore-venv/bin/python" -I oracle/ore/run_g42b.py --work "$RUNNER_TEMP/g42b"
+      - name: Count against the goldens (ruling G-42b)
+        run: uv run --frozen python -W ignore gen_stage_g_w4c.py countb | tee "$RUNNER_TEMP/countb.txt"
+        working-directory: oracle/python
+        shell: bash
+      - name: Summary and completeness
+        run: |
+          python3 - <<'EOF'
+          import json, os
+          d = json.load(open("oracle/ore/ORE_CHECK_4C_B.json"))
+          line = f"G-42b: {d['counted']} of {d['value_cases']} value cases counted (eps_p {d['eps_p']:.4e}, seeds {d['seeds'][0]} to {d['seeds'][-1]}, {d['samples']} samples)"
+          print(line)
+          open(os.environ["GITHUB_STEP_SUMMARY"], "a").write(line + "\n")
+          assert d["value_cases"] == 96 and len(d["cases"]) == 96, "expected 96 evaluated value cases"
+          EOF
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: ore-g42b-results
+          path: |
+            oracle/ore/ORE_CHECK_4C_B.json
+            oracle/ore/runb*/Output/log.txt
+          if-no-files-found: warn
+          retention-days: 90

@@ -54,6 +54,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0 # check (d) runs git show <writing commit>:research/holdout_runs.csv; a shallow clone lacks it
       - name: fetch forward-log (the holdout scan reads origin/forward-log; without it the log part is skipped)
         run: git fetch --no-tags --depth=1 origin forward-log:refs/remotes/origin/forward-log
       - name: preregs, amendments and holdout scan (R6-19)

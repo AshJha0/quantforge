@@ -231,3 +231,17 @@ fn christoffersen_all_four_transitions() {
     assert!(close(r.p_ind, 0.7967303361691838, 1e-7), "{r:?}");
     assert!(close(r.p_cc, 0.005911502856788296, 1e-10), "{r:?}");
 }
+
+#[test]
+fn traffic_light_exact_boundaries() {
+    // One observation is valid (observations < 1 rejects only 0): P(X <= 0) = 1 - p = c.
+    let (cdf, zone, plus) = traffic_light(1, 0, 0.5).unwrap();
+    assert!(close(cdf, 0.5, 1e-12) && zone == "GREEN" && plus.is_none());
+    // Zone bounds are half-open (Basel table: green below 95 %, red at or above 99.99 %).
+    // With n = 1, x = 0 the cumulative probability is exactly c, so c = 0.95 lands on
+    // the green/yellow edge and c = 0.9999 on the yellow/red edge.
+    let (cdf, zone, _) = traffic_light(1, 0, 0.95).unwrap();
+    assert_eq!((cdf, zone), (0.95, "YELLOW"));
+    let (cdf, zone, _) = traffic_light(1, 0, 0.9999).unwrap();
+    assert_eq!((cdf, zone), (0.9999, "RED"));
+}

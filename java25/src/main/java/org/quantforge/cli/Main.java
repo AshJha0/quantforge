@@ -23,7 +23,7 @@ import org.quantforge.core.QfError;
 public final class Main {
     private Main() {}
 
-    private static final String CONTRACT = "1.12.0";
+    private static final String CONTRACT = "1.14.0"; // ruling J-W2-1; was 1.13.0 (J-1)
     private static final String VERSION = "0.8.3"; // keep equal to <version> in java25/pom.xml
     private static final int MAX_CASE_DEPTH = 80;
     private static final Set<String> ENVELOPE = Set.of("schema_version", "case_id", "operation", "inputs");
@@ -175,7 +175,8 @@ public final class Main {
                 throw new QfError("E_SCHEMA", "case is not an object");
             }
             Function<In, Operations.Out> op = checkEnvelope(envelope);
-            Operations.Out result = apply(op, new In((Map<?, ?>) envelope.get("inputs")));
+            Operations.Out result = apply(op, new In((Map<?, ?>) envelope.get("inputs"),
+                    !In.pageLimited((String) envelope.get("operation"))));
             if (!finite(result.outputs())) {
                 throw new QfError("E_NON_FINITE", "a result is NaN or infinite");
             }

@@ -285,6 +285,12 @@ def check_case(gold, inp, samples):
     return all(abs(r[2]) <= zc for r in zs), worst, len(zs)
 
 
+def golden_keys(gold):
+    """W4C_GOLDEN_RAW.json (regenerated in 966b173) stores pfe_95/pfe_99; the golden schema names them
+    deflated_pfe_95/deflated_pfe_99. Return the outputs under the schema names."""
+    return {("deflated_" + k if k in ("pfe_95", "pfe_99") else k): v for k, v in gold.items()}
+
+
 def write_suite():
     sys.path.insert(0, str(HERE))
     from qf_oracle import common
@@ -295,6 +301,7 @@ def write_suite():
     report, n_out = [], 0
     params = [(a, sg) for a, sg, _ in cases()]
     for name, a, sg, inp, gold in raw:
+        gold = golden_keys(gold)
         r = params.index((a, sg))
         if r not in runs:
             runs[r] = ore_samples(r)
@@ -444,6 +451,7 @@ def count_b():
     params = [(a, sg) for a, sg, _ in cases()]
     cache, rep, n = {}, [], 0
     for name, a, sg, inp, gold in raw:
+        gold = golden_keys(gold)
         r = params.index((a, sg))
         if r not in cache:
             vals = defaultdict(lambda: defaultdict(dict))

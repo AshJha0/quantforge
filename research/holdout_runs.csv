@@ -1,0 +1,4 @@
+study,utc_date,script,script_sha256,commit
+R3-01,2026-11-14,research/r3_runner.py,f45ce97f6142fa067f12f89fc30537b210dce3eaa1500bb2f1cbd43bfa293916,faadaa40d980cf0cfd48125c8533c18b21b5ed5f
+R3-02,2026-11-14,research/r3_runner.py,f45ce97f6142fa067f12f89fc30537b210dce3eaa1500bb2f1cbd43bfa293916,faadaa40d980cf0cfd48125c8533c18b21b5ed5f
+R3-03,2026-11-14,research/r3_runner.py,f45ce97f6142fa067f12f89fc30537b210dce3eaa1500bb2f1cbd43bfa293916,faadaa40d980cf0cfd48125c8533c18b21b5ed5f

@@ -1,0 +1,14 @@
+{
+ "study": "R3-02",
+ "selected": "R3-02-T02",
+ "params": {
+  "funding": "SOFR",
+  "L": 60,
+  "k": 2.0
+ },
+ "in_sample_sharpe_net_1x": -0.561787,
+ "in_sample_pbo": null,
+ "label": "exploratory: PBO not computable",
+ "runner_sha256": "f45ce97f6142fa067f12f89fc30537b210dce3eaa1500bb2f1cbd43bfa293916",
+ "amendments": "1-4 (R3-01: 1-5)"
+}

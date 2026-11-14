@@ -6,6 +6,9 @@ Oracle packages were read from installed metadata on 2026-11-06; `oracle/python/
 
 | Tool or data | Version | Licence | How checked |
 |---|---|---|---|
+| hmmlearn, timeseriescv, scikit-learn, skfolio, statsmodels (stage J outside checks, separate venv) | 0.3.3, 0.2, 1.9.1, 1.12.12, 0.15.0 | BSD, MIT, BSD-3-Clause, BSD-3-Clause, BSD-3-Clause | Installed metadata 2026-11-14; pinned in `oracle/python/requirements-outside-j.txt` |
+| cvxpy, Clarabel, DAQP, PyPortfolioOpt, autograd (stage J wave 2 outside checks, separate venv; cvxpy pulls OSQP, SCS, HiGHS) | 1.9.3, 0.11.1, 0.11.2, 1.6.0, 1.9.1 (OSQP 1.1.3, SCS 3.3.1, highspy 1.16.0) | Apache-2.0, Apache-2.0, MIT, MIT, MIT (Apache-2.0, MIT, MIT) | Installed metadata 2026-11-14; pinned in `oracle/python/requirements-outside-j.txt`. Test-only |
+| vectorbt (stage J backtester check, separate venv) | 1.2.1 | Apache-2.0 with the Commons Clause (no right to sell the software) | Licence file in the wheel read 2026-11-14. Test-only: produces check values, never linked into, shipped with or sold with an implementation |
 | QuantLib (Python wheel) | 1.44 | BSD-3-Clause | Installed metadata |
 | OpenGamma Strata | 2.12.78 | Apache-2.0 | Licence file in the jar. `oracle/strata/out/` holds its computed output, not its code |
 | mpmath | 1.4.1 | BSD-3-Clause | Installed metadata |

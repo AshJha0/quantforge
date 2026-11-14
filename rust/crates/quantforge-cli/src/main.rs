@@ -8,6 +8,10 @@ mod golden_replay;
 mod input;
 mod limits;
 mod ops;
+#[cfg(test)]
+mod ops_j_tests;
+#[cfg(test)]
+mod rulings_j_tests;
 
 use input::Inputs;
 use ops::{dispatch, operations};
@@ -16,7 +20,7 @@ use quantforge_core::json::{Flags, Json, nesting_exceeds, obj, parse};
 use std::io::{BufRead, Read, Write};
 use std::process::ExitCode;
 
-const CONTRACT: &str = "1.12.0";
+const CONTRACT: &str = "1.14.0"; // ruling J-W2-1; was 1.13.0 (J-1)
 const SCHEMA: &str = "1.0";
 const MAX_CASE_NESTING: usize = 80;
 

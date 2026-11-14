@@ -1055,7 +1055,7 @@
    ]
   },
   "core.mc.gbm_european": {
-   "spec": "specifications/01-core/limits.md",
+   "spec": "specifications/01-core/monte-carlo.md",
    "rust": "quantforge::core::mc_gbm_european",
    "python": "quantforge.core.mc_gbm_european",
    "java": "Core.mcGbmEuropean",
@@ -1104,7 +1104,7 @@
    ]
   },
   "core.pde.bs_european": {
-   "spec": "specifications/01-core/limits.md",
+   "spec": "specifications/01-core/pde.md",
    "rust": "quantforge::core::pde_bs_european",
    "python": "quantforge.core.pde_bs_european",
    "java": "Core.pdeBsEuropean",
@@ -1350,7 +1350,7 @@
    ]
   },
   "core.sobol.points": {
-   "spec": "specifications/01-core/limits.md",
+   "spec": "specifications/01-core/monte-carlo.md",
    "rust": "quantforge::core::sobol_points",
    "python": "quantforge.core.sobol_points",
    "java": "Core.sobolPoints",
@@ -1668,7 +1668,7 @@
    ]
   },
   "core.ts.autocorrelation": {
-   "spec": "specifications/01-core/limits.md",
+   "spec": "specifications/01-core/statistics-and-time-series.md",
    "rust": "quantforge::core::ts_autocorrelation",
    "python": "quantforge.core.ts_autocorrelation",
    "java": "Core.tsAutocorrelation",
@@ -1780,7 +1780,7 @@
    ]
   },
   "core.ts.rolling": {
-   "spec": "specifications/01-core/limits.md",
+   "spec": "specifications/01-core/statistics-and-time-series.md",
    "rust": "quantforge::core::ts_rolling",
    "python": "quantforge.core.ts_rolling",
    "java": "Core.tsRolling",
@@ -5384,6 +5384,380 @@
     "repo_rate"
    ]
   },
+  "research.backtest.run": {
+   "spec": "specifications/11-research/backtester.md",
+   "rust": "quantforge::research::backtest_run",
+   "python": "quantforge.research.backtest_run",
+   "java": "Research.backtestRun",
+   "cpp": "qf::research::backtest_run",
+   "inputs": {
+    "commission_per_unit": {
+     "java": "commissionPerUnit"
+    },
+    "engine": {
+     "java": "engine"
+    },
+    "fixed_per_trade": {
+     "java": "fixedPerTrade"
+    },
+    "half_spread_bps": {
+     "java": "halfSpreadBps"
+    },
+    "lag": {
+     "java": "lag"
+    },
+    "multiplier": {
+     "java": "multiplier"
+    },
+    "prices": {
+     "java": "prices"
+    },
+    "targets": {
+     "java": "targets"
+    }
+   },
+   "outputs": [
+    "cost",
+    "equity",
+    "max_drawdown",
+    "pnl_gross",
+    "pnl_net",
+    "positions",
+    "total_commission",
+    "total_fixed_cost",
+    "total_gross",
+    "total_net",
+    "total_spread_cost",
+    "trade_count",
+    "trades",
+    "turnover"
+   ]
+  },
+  "research.cv.cpcv_paths": {
+   "spec": "specifications/11-research/purged-cv.md",
+   "rust": "quantforge::research::cv_cpcv_paths",
+   "python": "quantforge.research.cv_cpcv_paths",
+   "java": "Research.cvCpcvPaths",
+   "cpp": "qf::research::cv_cpcv_paths",
+   "inputs": {
+    "n_groups": {
+     "java": "nGroups"
+    },
+    "n_test_groups": {
+     "java": "nTestGroups"
+    }
+   },
+   "outputs": [
+    "n_paths",
+    "n_splits"
+   ]
+  },
+  "research.cv.purged_kfold": {
+   "spec": "specifications/11-research/purged-cv.md",
+   "rust": "quantforge::research::cv_purged_kfold",
+   "python": "quantforge.research.cv_purged_kfold",
+   "java": "Research.cvPurgedKfold",
+   "cpp": "qf::research::cv_purged_kfold",
+   "inputs": {
+    "embargo_pct": {
+     "java": "embargoPct"
+    },
+    "n_splits": {
+     "java": "nSplits"
+    },
+    "t0": {
+     "java": "t0"
+    },
+    "t1": {
+     "java": "t1"
+    }
+   },
+   "outputs": [
+    "embargo_count",
+    "folds"
+   ]
+  },
+  "research.estimate.black_litterman": {
+   "spec": "specifications/07-portfolio/estimation.md",
+   "rust": "quantforge::research::estimate_black_litterman",
+   "python": "quantforge.research.estimate_black_litterman",
+   "java": "Research.estimateBlackLitterman",
+   "cpp": "qf::research::estimate_black_litterman",
+   "inputs": {
+    "covariance": {
+     "java": "covariance"
+    },
+    "pick": {
+     "java": "pick"
+    },
+    "prior_returns": {
+     "java": "priorReturns"
+    },
+    "tau": {
+     "java": "tau"
+    },
+    "view_covariance": {
+     "java": "viewCovariance"
+    },
+    "views": {
+     "java": "views"
+    }
+   },
+   "outputs": [
+    "posterior_covariance",
+    "posterior_returns",
+    "predictive_covariance"
+   ]
+  },
+  "research.estimate.ledoit_wolf": {
+   "spec": "specifications/07-portfolio/estimation.md",
+   "rust": "quantforge::research::estimate_ledoit_wolf",
+   "python": "quantforge.research.estimate_ledoit_wolf",
+   "java": "Research.estimateLedoitWolf",
+   "cpp": "qf::research::estimate_ledoit_wolf",
+   "inputs": {
+    "returns": {
+     "java": "returns"
+    }
+   },
+   "outputs": [
+    "covariance",
+    "mu",
+    "shrinkage"
+   ]
+  },
+  "research.portfolio.mean_variance": {
+   "spec": "specifications/07-portfolio/optimisation.md",
+   "rust": "quantforge::research::portfolio_mean_variance",
+   "python": "quantforge.research.portfolio_mean_variance",
+   "java": "Research.portfolioMeanVariance",
+   "cpp": "qf::research::portfolio_mean_variance",
+   "inputs": {
+    "covariance": {
+     "java": "covariance"
+    },
+    "expected_returns": {
+     "java": "expectedReturns"
+    },
+    "lower": {
+     "java": "lower"
+    },
+    "risk_aversion": {
+     "java": "riskAversion"
+    },
+    "upper": {
+     "java": "upper"
+    }
+   },
+   "outputs": [
+    "at_bound",
+    "expected_return",
+    "objective",
+    "volatility",
+    "weights"
+   ]
+  },
+  "research.portfolio.risk_parity": {
+   "spec": "specifications/07-portfolio/optimisation.md",
+   "rust": "quantforge::research::portfolio_risk_parity",
+   "python": "quantforge.research.portfolio_risk_parity",
+   "java": "Research.portfolioRiskParity",
+   "cpp": "qf::research::portfolio_risk_parity",
+   "inputs": {
+    "budgets": {
+     "java": "budgets"
+    },
+    "covariance": {
+     "java": "covariance"
+    }
+   },
+   "outputs": [
+    "contributions",
+    "volatility",
+    "weights"
+   ]
+  },
+  "research.regime.baum_welch": {
+   "spec": "specifications/11-research/baum-welch.md",
+   "rust": "quantforge::research::regime_baum_welch",
+   "python": "quantforge.research.regime_baum_welch",
+   "java": "Research.regimeBaumWelch",
+   "cpp": "qf::research::regime_baum_welch",
+   "inputs": {
+    "initial": {
+     "java": "initial"
+    },
+    "max_iterations": {
+     "java": "maxIterations"
+    },
+    "means": {
+     "java": "means"
+    },
+    "observations": {
+     "java": "observations"
+    },
+    "sds": {
+     "java": "sds"
+    },
+    "tolerance": {
+     "java": "tolerance"
+    },
+    "transition": {
+     "java": "transition"
+    }
+   },
+   "outputs": [
+    "converged",
+    "initial",
+    "iterations",
+    "log_likelihood",
+    "means",
+    "sds",
+    "transition"
+   ]
+  },
+  "research.regime.viterbi": {
+   "spec": "specifications/11-research/regimes.md",
+   "rust": "quantforge::research::regime_viterbi",
+   "python": "quantforge.research.regime_viterbi",
+   "java": "Research.regimeViterbi",
+   "cpp": "qf::research::regime_viterbi",
+   "inputs": {
+    "emission": {
+     "java": "emission"
+    },
+    "initial": {
+     "java": "initial"
+    },
+    "means": {
+     "java": "means"
+    },
+    "observations": {
+     "java": "observations"
+    },
+    "sds": {
+     "java": "sds"
+    },
+    "transition": {
+     "java": "transition"
+    }
+   },
+   "outputs": [
+    "log_probability",
+    "states"
+   ]
+  },
+  "research.stats.dsr": {
+   "spec": "specifications/11-research/research-statistics.md",
+   "rust": "quantforge::research::stats_dsr",
+   "python": "quantforge.research.stats_dsr",
+   "java": "Research.statsDsr",
+   "cpp": "qf::research::stats_dsr",
+   "inputs": {
+    "kurtosis": {
+     "java": "kurtosis"
+    },
+    "n_obs": {
+     "java": "nObs"
+    },
+    "n_trials": {
+     "java": "nTrials"
+    },
+    "skew": {
+     "java": "skew"
+    },
+    "sr": {
+     "java": "sr"
+    },
+    "sr_variance": {
+     "java": "srVariance"
+    }
+   },
+   "outputs": [
+    "dsr",
+    "sr0",
+    "z"
+   ]
+  },
+  "research.stats.pbo": {
+   "spec": "specifications/11-research/research-statistics.md",
+   "rust": "quantforge::research::stats_pbo",
+   "python": "quantforge.research.stats_pbo",
+   "java": "Research.statsPbo",
+   "cpp": "qf::research::stats_pbo",
+   "inputs": {
+    "metric": {
+     "java": "metric"
+    },
+    "n_partitions": {
+     "java": "nPartitions"
+    },
+    "performance": {
+     "java": "performance"
+    }
+   },
+   "outputs": [
+    "logits",
+    "n_combinations",
+    "pbo"
+   ]
+  },
+  "research.stats.power": {
+   "spec": "specifications/11-research/research-statistics.md",
+   "rust": "quantforge::research::stats_power",
+   "python": "quantforge.research.stats_power",
+   "java": "Research.statsPower",
+   "cpp": "qf::research::stats_power",
+   "inputs": {
+    "alpha": {
+     "java": "alpha"
+    },
+    "power": {
+     "java": "power"
+    },
+    "sr_target": {
+     "java": "srTarget"
+    },
+    "years": {
+     "java": "years"
+    }
+   },
+   "outputs": [
+    "mds",
+    "se_at_target",
+    "se_at_zero",
+    "years_required",
+    "z_sum"
+   ]
+  },
+  "research.stats.psr": {
+   "spec": "specifications/11-research/research-statistics.md",
+   "rust": "quantforge::research::stats_psr",
+   "python": "quantforge.research.stats_psr",
+   "java": "Research.statsPsr",
+   "cpp": "qf::research::stats_psr",
+   "inputs": {
+    "kurtosis": {
+     "java": "kurtosis"
+    },
+    "n_obs": {
+     "java": "nObs"
+    },
+    "skew": {
+     "java": "skew"
+    },
+    "sr": {
+     "java": "sr"
+    },
+    "sr_benchmark": {
+     "java": "srBenchmark"
+    }
+   },
+   "outputs": [
+    "psr",
+    "z"
+   ]
+  },
   "risk.backtest.christoffersen": {
    "spec": "specifications/06-risk/var-es-and-backtests.md",
    "rust": "quantforge::risk::backtest_christoffersen",
@@ -5406,6 +5780,32 @@
     "p_ind",
     "p_uc",
     "transitions"
+   ]
+  },
+  "risk.backtest.es_z2": {
+   "spec": "specifications/06-risk/es-backtest.md",
+   "rust": "quantforge::risk::backtest_es_z2",
+   "python": "quantforge.risk.backtest_es_z2",
+   "java": "Risk.backtestEsZ2",
+   "cpp": "qf::risk::backtest_es_z2",
+   "inputs": {
+    "alpha": {
+     "java": "alpha"
+    },
+    "es": {
+     "java": "es"
+    },
+    "losses": {
+     "java": "losses"
+    },
+    "var": {
+     "java": "var"
+    }
+   },
+   "outputs": [
+    "exceptions",
+    "expected_exceptions",
+    "z2"
    ]
   },
   "risk.backtest.kupiec": {
@@ -5523,6 +5923,27 @@
     "hhi",
     "top_n_share",
     "weights"
+   ]
+  },
+  "risk.contrib.euler": {
+   "spec": "specifications/07-portfolio/optimisation.md",
+   "rust": "quantforge::risk::contrib_euler",
+   "python": "quantforge.risk.contrib_euler",
+   "java": "Risk.contribEuler",
+   "cpp": "qf::risk::contrib_euler",
+   "inputs": {
+    "covariance": {
+     "java": "covariance"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "contributions",
+    "marginal",
+    "shares",
+    "volatility"
    ]
   },
   "risk.corr.dispersion": {
@@ -6024,7 +6445,7 @@
    ]
   },
   "risk.ois.dv01": {
-   "spec": "specifications/01-core/limits.md",
+   "spec": "specifications/04-pricing/use-cases.md",
    "rust": "quantforge::risk::ois_dv01",
    "python": "quantforge.risk.ois_dv01",
    "java": "Risk.oisDv01",

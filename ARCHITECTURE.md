@@ -121,3 +121,23 @@ Built in all four languages, with 443 golden cases in 21 suites; each build pass
 - **Reuse of earlier domains:** credit hedges reuse the `credit.cds.price` legs (domain 04), and cross-asset hedges reprice rather than use Greeks, so the risk is a half-difference of prices on a rebuilt curve (I-15, I-21).
 - **Errors:** a new code, `E_INFEASIBLE`, for constraints no point satisfies (`specifications/cli-contract.md`); the contract is 1.11.0, which `conformance/runner/runner.py` requires (I-51). `hedge.select.solve` returns `E_LIMIT` above 100,000 candidate subsets (I-53).
 - **Tutorials** for stage I import `quantforge_core` modules, as tutorial 1 does; `quantforge.hedge.*` in the name map is a logical name (I-52).
+
+### Stage J wave 1: research tools (target v0.9.0, unreleased)
+
+Built in all four languages on branch `stage-j`; each build passes 15,215 of 15,215 golden cases (7,504 value-checked, 5,197 error, 2,514 invariance), 99 of them in the four wave 1 suites (`program/R6_HANDOVER.md`, TOTALS line; `docs/case-figures.md`). What changes in the structure:
+
+- **Research (domain 11)** gets its first CLI operations, in a new `research` module per language (`python/quantforge_core/research.py`, `rust/crates/quantforge-core/src/research.rs`, `java25/src/main/java/org/quantforge/research/Research.java`, `cpp26/src/core/research.cpp`) with a thin CLI handler beside it. The module depends on nothing above domain 01: a backtest takes prices and target positions, not a pricer, so studies built on it stay outside the four builds (`specifications/11-research/`).
+- **Operations:** `research.backtest.run`, `research.cv.purged_kfold`, `research.cv.cpcv_paths`, `research.regime.viterbi`, `research.stats.psr`, `.dsr`, `.pbo`, `.power`; 284 operations in the generated name map.
+- **Contract:** 1.13.0, no new error code (J-1). These operations carry their own page limits in place of the general 100,000-element array limit (J-20).
+- **Outside checks:** vectorbt, timeseriescv, scikit-learn, skfolio, hmmlearn and statsmodels check 41 of the 63 value cases (65.1%, J-19a, `oracle/OUTSIDE_SHARES.md`).
+
+### Stage J wave 2: portfolio construction and risk-model tests (target v0.9.0, implemented, not released)
+
+Built in all four languages on branch `stage-j`. 100 new golden cases (67 value-checked, 33 error) in `optim_j`, `estim_j`, `esbt_j` and `baumwelch_j` bring the total to 15,315 (`docs/case-figures.md`); every build passes all 100 (2026-11-14, observed through the neutral runner). What changes in the structure:
+
+- **Portfolio (domain 07)** gets optimisation and estimation operations, beside a second module per language for the wave (`python/quantforge_core/research_w2.py`, `java25/src/main/java/org/quantforge/research/Allocation.java`, CLI handler `OpsResearchW2.java`). Like wave 1, it depends on nothing above domain 01: it takes expected returns, a covariance and weights as numbers, never a pricer or a market-data object, and no operation calls another. The pipeline is drawn in [`docs/diagrams/README.md`](docs/diagrams/README.md#portfolio-pipeline).
+- **Operations:** `research.portfolio.mean_variance`, `research.portfolio.risk_parity`, `risk.contrib.euler`, `research.estimate.ledoit_wolf`, `research.estimate.black_litterman`, `risk.backtest.es_z2`, `research.regime.baum_welch`; 291 operations in the generated name map.
+- **Shared linear algebra:** the symmetry test (`1e-12 max|S|`) and the positive-definiteness test (a Cholesky factorisation with every pivot positive) are fixed by ruling J-W2-3, so every build refuses the same matrices with `E_DOMAIN`. Mean-variance has a unique optimum, and goldens keep a `1e-6` strict-complementarity margin, so `at_bound` is the same for any correct solver (J-W2-4); the method (active set recommended) is free.
+- **Determinism of an iterative fit:** Baum-Welch's iteration and stop rule are fixed (J-W2-11), and each golden's tolerance is chosen so every stop test is decided by at least `1e-11`, so every build stops at the same iteration (J-W2-12).
+- **Contract:** 1.14.0, no new error code (J-W2-1); every build reports it and the runner expects it. Page limits replace the general array limit (J-W2-14).
+- **Outside checks:** none yet. The generator's exact KKT certificates, scipy SLSQP agreement and pairs of independent algebraic forms are internal checks; scikit-learn, hmmlearn and an outside QP solver are open (J-W2-15).

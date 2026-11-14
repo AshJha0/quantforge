@@ -1,0 +1,1 @@
+{"schema_version":"1.0","case_id":"example-research-purged-kfold-j","operation":"research.cv.purged_kfold","inputs":{"t0":[0,1,2,3,4,5,6,7,8,9],"t1":[2,3,4,5,6,7,8,9,10,11],"n_splits":3,"embargo_pct":0.0}}

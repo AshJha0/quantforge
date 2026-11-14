@@ -26,6 +26,17 @@ fn len(inputs: &Json, k: &str) -> Option<i128> {
         .map(|a| a.len() as i128)
 }
 
+/// Ruling J-W2-17: the size of an input is its length or, for a matrix, its longest row.
+fn widest(inputs: &Json, keys: &[&str]) -> i128 {
+    keys.iter()
+        .filter_map(|k| inputs.get(k).and_then(Json::as_array))
+        .flat_map(|a| {
+            std::iter::once(a.len()).chain(a.iter().filter_map(|r| r.as_array().map(<[Json]>::len)))
+        })
+        .max()
+        .map_or(0, |n| n as i128)
+}
+
 fn above(inputs: &Json, k: &str, max: i128) -> bool {
     int(inputs, k).is_some_and(|v| v > max)
 }
@@ -38,6 +49,57 @@ fn product_above(a: Option<i128>, b: Option<i128>, max: i128) -> bool {
 fn operation_above(op: &str, i: &Json) -> bool {
     let draws = i128::from(10_000_000);
     match op {
+        // Stage J wave 1 (J-5, J-9, J-12, J-15).
+        "research.cv.cpcv_paths" => above(i, "n_groups", 64),
+        "research.regime.viterbi" => len(i, "initial").is_some_and(|k| k > 32),
+        // Stage J wave 2 (J-W2-14).
+        "research.portfolio.mean_variance" => {
+            widest(i, &["expected_returns", "covariance", "lower", "upper"]) > 500
+        }
+        "research.portfolio.risk_parity" => widest(i, &["covariance", "budgets"]) > 500,
+        "risk.contrib.euler" => widest(i, &["weights", "covariance"]) > 500,
+        "research.estimate.black_litterman" => {
+            widest(
+                i,
+                &[
+                    "covariance",
+                    "prior_returns",
+                    "pick",
+                    "views",
+                    "view_covariance",
+                ],
+            ) > 500
+        }
+        "research.estimate.ledoit_wolf" => {
+            // Ruling J-W2-22: columns are the longest row; cells are rows times that width.
+            let cols = i.get("returns").and_then(Json::as_array).map(|a| {
+                a.iter()
+                    .filter_map(|r| r.as_array().map(<[Json]>::len))
+                    .max()
+                    .unwrap_or(0) as i128
+            });
+            cols.is_some_and(|n| n > 500) || product_above(len(i, "returns"), cols, 10_000_000)
+        }
+        "research.regime.baum_welch" => {
+            // Ruling J-W2-18: K is the longest of the four state inputs.
+            let k = widest(i, &["initial", "means", "sds", "transition"]);
+            k > 16
+                || above(i, "max_iterations", 10_000)
+                || product_above(len(i, "observations"), Some(k), 10_000_000)
+        }
+
+        "research.stats.pbo" => {
+            let rows = len(i, "performance");
+            let cols = i
+                .get("performance")
+                .and_then(Json::as_array)
+                .and_then(|a| a.first())
+                .and_then(Json::as_array)
+                .map(|r| r.len() as i128);
+            above(i, "n_partitions", 16)
+                || cols.is_some_and(|n| n > 10_000)
+                || product_above(rows, cols, 10_000_000)
+        }
         "core.integrate.trapezoid" | "core.integrate.simpson" => above(i, "n", 10_000_000),
         "core.integrate.adaptive_simpson" => above(i, "max_depth", 60),
         "core.integrate.gauss_kronrod" => above(i, "max_intervals", 10_000),
@@ -213,9 +275,15 @@ fn vol_and_exotic_above(op: &str, i: &Json) -> bool {
 fn raised_array_keys(op: &str) -> &'static [&'static str] {
     match op {
         "risk.var.historical" => &["pnl"],
-        "risk.var.filtered_historical" => &["returns"],
+        // research.estimate.ledoit_wolf: ruling J-W2-14
+        "risk.var.filtered_historical" | "research.estimate.ledoit_wolf" => &["returns"],
         "risk.backtest.christoffersen" => &["exceptions"],
         "book.lifecycle.apply" => &["events"],
+        "research.backtest.run" => &["prices", "targets"],
+        "research.cv.purged_kfold" => &["t0", "t1"],
+        "research.regime.baum_welch" => &["observations"],
+        "risk.backtest.es_z2" => &["losses", "var", "es"],
+        "research.stats.pbo" => &["performance"], // ruling J-20: rows judged by J-15's cell cap
         _ => &[],
     }
 }
@@ -223,13 +291,19 @@ fn raised_array_keys(op: &str) -> &'static [&'static str] {
 /// The generic array rule, with the F-42 raised lists judged at 1,000,000 instead.
 fn too_long_with_raised(op: &str, i: &Json) -> bool {
     let raised = raised_array_keys(op);
+    // Ruling J-20: PBO rows are bounded by the 10,000,000-cell page limit, not 1,000,000.
+    let cap = if op == "research.stats.pbo" {
+        10_000_000
+    } else {
+        1_000_000
+    };
     let Json::Obj(keys) = i else {
         return too_long(i);
     };
     keys.iter().any(|(k, v)| {
         if raised.contains(&k.as_str()) {
             return match v {
-                Json::Arr(a) => a.len() > 1_000_000 || a.iter().any(too_long),
+                Json::Arr(a) => a.len() > cap || a.iter().any(too_long),
                 _ => false,
             };
         }
@@ -365,4 +439,56 @@ pub fn check(op: &str, inputs: &Json) -> Option<QfError> {
         || operation_above(op, inputs)
         || vol_and_exotic_above(op, inputs))
     .then(|| err("E_LIMIT", "an input is above its limit"))
+}
+
+#[cfg(test)]
+mod wave2_ruling_tests {
+    use super::operation_above;
+    use quantforge_core::json::parse;
+
+    fn over(op: &str, text: &str) -> bool {
+        operation_above(op, &parse(text).unwrap().0)
+    }
+
+    fn row(n: usize) -> String {
+        format!("[{}]", vec!["0.0"; n].join(","))
+    }
+
+    #[test]
+    fn j_w2_17_ragged_matrix_width_counts() {
+        let cov = format!("[[1,0,0],{},[0,0,1]]", row(501));
+        let text = format!(r#"{{"expected_returns":[0.1,0.1,0.1],"covariance":{cov}}}"#);
+        assert!(over("research.portfolio.mean_variance", &text));
+        let ok = r#"{"expected_returns":[0.1,0.1,0.1],"covariance":[[1,0,0],[0,1,0],[0,0,1]]}"#;
+        assert!(!over("research.portfolio.mean_variance", ok));
+        let pick = format!(r#"{{"pick":[{}]}}"#, row(501));
+        assert!(over("research.estimate.black_litterman", &pick));
+    }
+
+    #[test]
+    fn j_w2_18_k_is_the_longest_input() {
+        let means = format!(r#"{{"initial":[0.5,0.5],"means":{}}}"#, row(17));
+        assert!(over("research.regime.baum_welch", &means));
+        let tr = format!(
+            r#"{{"initial":[0.5,0.5],"transition":[[0.5,0.5],{}]}}"#,
+            row(17)
+        );
+        assert!(over("research.regime.baum_welch", &tr));
+        assert!(!over(
+            "research.regime.baum_welch",
+            r#"{"initial":[0.5,0.5],"means":[0,1]}"#
+        ));
+    }
+
+    #[test]
+    fn j_w2_22_ledoit_wolf_sizes() {
+        let wide = format!(r#"{{"returns":[[0,0],{}]}}"#, row(501));
+        assert!(over("research.estimate.ledoit_wolf", &wide));
+        let fine = format!(r#"{{"returns":[[0,0],{}]}}"#, row(500));
+        assert!(!over("research.estimate.ledoit_wolf", &fine));
+        let mut rows = vec!["[0]".to_string(); 20_001];
+        rows.push(row(500));
+        let cells = format!(r#"{{"returns":[{}]}}"#, rows.join(","));
+        assert!(over("research.estimate.ledoit_wolf", &cells));
+    }
 }

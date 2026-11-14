@@ -197,6 +197,27 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 | Sign-state active-set method | A solve of the cost problem that fixes each instrument's sign (long, short or zero), solves that smooth problem exactly, and changes a sign only where the subgradient test fails; it replaced enumeration of every sign state in Java and C++ (ruling I-48) |
 | Outside-oracle share | The fraction of a stage's golden cases, error cases included in the denominator, that an independent library reproduces within the case tolerance; the floor is 60% (rule 11.2.5, ruling I-2) |
 
+## Stage J terms
+
+| Term | Meaning |
+|---|---|
+| Execution lag | Bars between a strategy's decision and the close at which the backtester holds the new position; `lag = 0` is allowed only to show look-ahead (`11-research/backtester.md`, J-2) |
+| Purging | Dropping a training row whose label span overlaps the test fold's time span, so the model cannot learn the test answer (`11-research/purged-cv.md`) |
+| Embargo | Dropping a further fraction of rows just after each test fold, against serial correlation that outlasts the label span |
+| CPCV | Combinatorial purged cross-validation: split into `N` groups, test on every choice of `k`, and recombine the test groups into backtest paths (`research.cv.cpcv_paths`) |
+| Viterbi path | The single most likely sequence of hidden states of a given hidden Markov model; used here only to label regimes, not to forecast (`11-research/regimes.md`) |
+| PSR | Probabilistic Sharpe ratio: the probability that the true Sharpe ratio exceeds a benchmark, allowing for sample length, skew and kurtosis (Bailey and López de Prado 2012) |
+| DSR | Deflated Sharpe ratio: the PSR against the best Sharpe ratio expected by chance from the number of trials run (Bailey and López de Prado 2014) |
+| PBO | Probability of backtest overfitting: how often the configuration best in-sample ranks below the median out of sample (Bailey, Borwein, López de Prado and Zhu 2017) |
+| Mean-variance optimisation | Choosing fully invested weights within bounds to maximise expected return minus `gamma/2` times variance (Markowitz 1952; `07-portfolio/optimisation.md`, J-W2-2) |
+| `at_bound` | Per-asset output of mean-variance: `-1` at the lower bound, `+1` at the upper bound, `0` free (J-W2-4) |
+| Risk parity | Long-only weights whose risk contributions are proportional to chosen budgets, equal by default; expected returns are not used (Maillard, Roncalli and Teiletche 2010; J-W2-5) |
+| Euler risk contribution | An asset's weight times the derivative of portfolio volatility with respect to that weight; the contributions add up exactly to the volatility (Tasche 1999; `risk.contrib.euler`) |
+| Ledoit-Wolf shrinkage | A weighted average of the sample covariance and a multiple of the identity, with the weight `delta` estimated from the data (Ledoit and Wolf 2004; J-W2-7) |
+| Black-Litterman | Moving prior expected returns towards investor views, each weighted by its uncertainty against the prior's (Black and Litterman 1992; J-W2-8) |
+| Z2 statistic | The Acerbi-Szekely expected-shortfall backtest: one minus the sum of losses beyond VaR, each over `T alpha ES_t`; about 0 for a correct model, negative when ES is understated (Acerbi and Szekely 2014; J-W2-10) |
+| Baum-Welch | The EM algorithm for a hidden Markov model: estimate state probabilities (E-step), re-estimate the parameters from them (M-step), repeat until the log-likelihood gain is below a tolerance (Rabiner 1989; `11-research/baum-welch.md`) |
+
 ## Tutorial terms
 
 Terms the [tutorials](docs/getting-started/README.md) use that the stage sections above do not define.

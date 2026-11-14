@@ -1,7 +1,7 @@
 # CLI contract
 
-Version 1.12.0 (R6, v0.8.1; the blocks below give the minor versions each stage added). `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
-From R6 (ruling R6-0.1) a build reports `contract_version` `1.12.0` (stage I: `1.11.0`, ruling I-51), and the runner stops on any other value. Before stage I every build reported `1.0.0`; nothing in 1.1.0 to 1.11.0 breaks the wire format.
+Version 1.14.0 (stage J wave 2, v0.9.0; the blocks below give the minor versions each stage added). `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
+From stage J wave 2 (ruling J-W2-1) a build reports `contract_version` `1.14.0` (stage J wave 1: `1.13.0`, ruling J-1; R6: `1.12.0`, ruling R6-0.1; stage I: `1.11.0`, ruling I-51), and the runner stops on any other value. Before stage I every build reported `1.0.0`; nothing in 1.1.0 to 1.14.0 breaks the wire format.
  Applies identically to the Java, C++, Python and Rust implementations.
 
 The idea: every implementation is a black box that reads a case and writes a result. The neutral
@@ -18,7 +18,7 @@ to start it from `conformance/runner/implementations.json`.
 | `quantforge run` | Read one case JSON document from stdin to end of file. Write one result JSON document to stdout. |
 | `quantforge batch` | Read JSON Lines from stdin, one case per line. Write one result per line to stdout, in the same order, flushing after each line. |
 | `quantforge --batch` | Exactly the same as `quantforge batch` (1.6.0). Both spellings must work. |
-| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.12.0", "toolchain":...}`. |
+| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.14.0", "toolchain":...}`. |
 | `quantforge operations` | Write a JSON array of the operation names this build supports, sorted. |
 
 `batch` exists because a JVM start per case would dominate run time. `run` and `batch` must give
@@ -367,3 +367,20 @@ exit status is a major version, and all four implementations and the runner move
 | policy | New tolerance class `per_unit` (absolute 1e-10, relative 1e-8) for rates, spreads, vols and ratios (R6-10.1, R6-10.2) | `conformance/tolerances/policy.yaml` |
 
 Later R6 waves append rows here (see `program/R6_HANDOVER.md`).
+
+## Stage J operations (contract 1.13.0)
+
+Stage J wave 1 adds operations and no error code (ruling J-1). `stage-j-rulings-w1.md` and `stage-j-rulings.md` are normative. Operations are added to the table as each wave lands. Wave 1 is implemented in all four builds. For these operations the page limits of ruling J-20 (bars 1,000,000; observations 1,000,000; Viterbi steps 100,000; statistics cells 10,000,000) replace the general per-array limit of 100,000 elements.
+
+| Prefix | Spec | Slice |
+|---|---|---|
+| `research.backtest.run` | `11-research/backtester.md` | wave 1 |
+| `research.cv.purged_kfold`, `research.cv.cpcv_paths` | `11-research/purged-cv.md` | wave 1 |
+| `research.regime.viterbi` | `11-research/regimes.md` | wave 1 |
+| `research.stats.psr`, `research.stats.dsr`, `research.stats.pbo`, `research.stats.power` | `11-research/research-statistics.md` | wave 1 |
+| `research.portfolio.mean_variance`, `research.portfolio.risk_parity`, `risk.contrib.euler` | `07-portfolio/optimisation.md` | wave 2 (specified) |
+| `research.estimate.ledoit_wolf`, `research.estimate.black_litterman` | `07-portfolio/estimation.md` | wave 2 (specified) |
+| `risk.backtest.es_z2` | `06-risk/es-backtest.md` | wave 2 (specified) |
+| `research.regime.baum_welch` | `11-research/baum-welch.md` | wave 2 (specified) |
+
+Wave 2 (rulings `stage-j-rulings-w2.md` J-W2-1 to J-W2-15) adds no error code and raises the contract to 1.14.0 (J-W2-1); all four builds implement the wave 2 operations and report 1.14.0. The wave 2 page limits (J-W2-14) replace the general per-array limit as J-20 does for wave 1.

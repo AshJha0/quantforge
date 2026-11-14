@@ -115,6 +115,35 @@ def _all(*checks: Callable[[Raw], None]) -> Callable[[Raw], None]:
     return check
 
 
+def _w2_returns_cells(raw: Raw) -> None:
+    """Ruling J-W2-14: at most 10,000,000 cells of returns."""
+    rows = raw.get("returns")
+    if isinstance(rows, list):
+        cols = max((len(r) for r in rows if isinstance(r, list)), default=0)
+        if len(rows) * cols > 10_000_000:
+            raise _over("returns", 10_000_000)
+
+
+def _baum_welch_sizes(raw: Raw) -> None:
+    """Ruling J-W2-14: 16 states, 10,000 iterations, T K at most 10,000,000."""
+    _cap(raw, "max_iterations", 10_000)
+    for key in ("initial", "means", "sds", "transition"):
+        _caps_list(key, 16)(raw)
+    _rows_cols("transition", 16, 16)(raw)
+    # Ruling J-W2-18: K is the longest of initial, means, sds and the rows or row widths of transition.
+    k = 0
+    for key in ("initial", "means", "sds", "transition"):
+        value = raw.get(key)
+        if isinstance(value, list):
+            k = max(k, len(value))
+            if key == "transition":
+                k = max([k, *(len(r) for r in value if isinstance(r, list))])
+    obs = raw.get("observations")
+    if isinstance(obs, list) and len(obs) * k > 10_000_000:
+
+        raise _over("observations", 10_000_000)
+
+
 _RNG = _caps(count=MAX_ARRAY, skip=MAX_SKIP)
 _ROOT = _caps(max_iter=100_000)
 _POINTS = _caps(n=10_000_000)
@@ -202,6 +231,18 @@ def _slippage_sizes(raw: Raw) -> None:
 
 
 
+def _pbo_sizes(raw: Raw) -> None:
+    """Ruling J-15: at most 16 partitions, 10,000 strategies and 10,000,000 cells."""
+    _cap(raw, "n_partitions", 16)
+    rows = raw.get("performance")
+    if isinstance(rows, list):
+        cols = max((len(r) for r in rows if isinstance(r, list)), default=0)
+        if cols > 10_000:
+            raise _over("performance", 10_000)
+        if len(rows) * cols > 10_000_000:
+            raise _over("performance", 10_000_000)
+
+
 def _select_subsets(raw: Raw) -> None:
     """Ruling I-53: at most 100,000 candidate subsets, sum over k = 1..min(K, n) of C(n, k),
     with n the columns of `a` and K = max_instruments."""
@@ -277,6 +318,14 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     # is the generic array cap.
     "hedge.select.solve": _all(_rows_cols("a", _I_FACTORS, 20), _select_subsets),
     "hedge.slippage.report": _slippage_sizes,
+    # Stage J wave 1 (rulings J-5, J-9, J-12, J-15).
+    "research.cv.cpcv_paths": _caps(n_groups=64),
+    "research.regime.viterbi": _all(_caps_list("initial", 32), _caps_list("means", 32),
+                                    _caps_list("sds", 32), _rows_cols("transition", 32, 32)),
+    "research.stats.pbo": _pbo_sizes,
+    # Stage J wave 2 (ruling J-W2-14); array lengths are in STAGE_F_ARRAYS.
+    "research.estimate.ledoit_wolf": _w2_returns_cells,
+    "research.regime.baum_welch": _baum_welch_sizes,
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")
@@ -293,6 +342,22 @@ SURFACE_GRIDS = {"vol.svi.surface_check": "log_moneyness", "vol.svi.fit_surface"
 # keys are exempt from the generic MAX_ARRAY. "#rows"/"#cols" name the shape of a matrix key.
 STAGE_F_ARRAYS: dict[str, dict[str, int]] = {
     "risk.book.ois_sensitivity": {"swaps": 10_000},
+    # Stage J wave 1 (rulings J-5, J-9, J-12, J-15).
+    "research.backtest.run": {"prices": 1_000_000, "targets": 1_000_000},
+    "research.cv.purged_kfold": {"t0": 1_000_000, "t1": 1_000_000},
+    "research.stats.pbo": {"performance": 10_000_000},
+    # Stage J wave 2 (ruling J-W2-14): assets and views 500, series 1,000,000.
+    "research.portfolio.mean_variance": {"expected_returns": 500, "covariance": 500,
+                                         "covariance#cols": 500, "lower": 500, "upper": 500},
+    "research.portfolio.risk_parity": {"covariance": 500, "covariance#cols": 500,
+                                       "budgets": 500},
+    "risk.contrib.euler": {"weights": 500, "covariance": 500, "covariance#cols": 500},
+    "research.estimate.ledoit_wolf": {"returns": 1_000_000, "returns#cols": 500},
+    "research.estimate.black_litterman": {
+        "covariance": 500, "covariance#cols": 500, "prior_returns": 500, "pick": 500,
+        "pick#cols": 500, "views": 500, "view_covariance": 500, "view_covariance#cols": 500},
+    "risk.backtest.es_z2": {"losses": 1_000_000, "var": 1_000_000, "es": 1_000_000},
+    "research.regime.baum_welch": {"observations": 1_000_000},
     "risk.curve.pca": {"changes": 100_000, "changes#cols": 200},
     "risk.var.historical": {"pnl": 1_000_000},
     "risk.var.filtered_historical": {"returns": 1_000_000},

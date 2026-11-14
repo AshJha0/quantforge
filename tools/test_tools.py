@@ -891,17 +891,20 @@ class ResearchDsrGate(unittest.TestCase):
         cls.qg = load("quality_gate", "tools/quality_gate.py")
 
     def test_ledger_has_the_24_r3_trials(self):
-        rows = self.qg.read_ledger()
+        rows = self.qg.read_ledger(family="R3")
         self.assertEqual(len(rows), 24)
         per = {s: sum(r["study"] == s for r in rows) for s in ("R3-01", "R3-02", "R3-03")}
         self.assertEqual(per, {"R3-01": 8, "R3-02": 12, "R3-03": 4})
         self.assertEqual(self.qg.check_dsr_trials(rows, 24, expect_family=24), [])
 
     def test_dsr_with_fewer_trials_than_the_ledger_is_rejected(self):
-        rows = self.qg.read_ledger()
+        rows = self.qg.read_ledger(family="R3")
         self.assertTrue(self.qg.check_dsr_trials(rows, 8))  # the per-study count is not enough
-        self.assertEqual(self.qg.main(["--check-dsr", "--trials", "12"]), 1)
-        self.assertEqual(self.qg.main(["--check-dsr", "--trials", "24", "--expect-family", "24"]), 0)
+        self.assertEqual(self.qg.main(["--check-dsr", "--trials", "12", "--family", "R3"]), 1)
+        self.assertEqual(self.qg.main(["--check-dsr", "--trials", "24", "--family", "R3", "--expect-family", "24"]), 0)
+        # Q6 calibration trials are a separate family: they neither join nor shrink the R3 count.
+        self.assertEqual(len(self.qg.read_ledger(family="Q6")), 3)
+        self.assertEqual(self.qg.main(["--check-dsr", "--trials", "24", "--expect-family", "24"]), 1)  # whole file is not a family
         self.assertTrue(self.qg.check_dsr_trials(rows + rows[:1], 30))  # duplicate id
 
 

@@ -1,5 +1,47 @@
 # Changelog
 
+## Unreleased (0.9.0): stage J, research tools (wave 1) and portfolio construction (wave 2)
+
+- **R3 studies run once on their holdouts: all three null.** R3-01 amendment 5 (closed-form par DV01; the library calendar starts in 2000), loader with provenance log (`research/r3_data.py`), in-sample runs, freeze `faadaa4`, run log committed first, one run each. Holdout net Sharpe: R3-01 -0.61 (DSR 0.0001), R3-02 -1.09 (exploratory; bootstrap SE undefined), R3-03 0.33 (DSR 0.15); Holm rejects none. Pass-rule power was 13 % to 15 % at the MDS, so the nulls are weak evidence. Results and the honest ceiling: `research/r3/RESULTS.md`.
+- **R3 follow-ups, post-hoc and report-only.** R3-02 dummy-controlled check (`research/r3_02_dummy.py`): removing month-end funding days leaves the holdout Sharpe at -1.09. Erratum on the `holm_level` display fields of `holdout.json` (`research/DEVIATION-2026-11-14-holm-display.md`; verdicts unchanged). Full textbook citations for R3-01 amendment 5 in `program/R3_A5_REVIEW.md` and `docs/references.md`. Forward-log back-fill (amendment 3 rule 4) is due but needs a new amendment naming the script.
+
+CLI contract 1.14.0 (wave 1 raised it to 1.13.0, ruling J-1; wave 2 to 1.14.0, ruling J-W2-1; no new error code); 291 operations in the name map; 15,315 golden cases (7,571 value-checked, 5,230 error, 2,514 invariance), 99 new in the four wave 1 suites and 100 in the four wave 2 suites. Each of the four builds passes 15,315 of 15,315 (2026-11-14, observed on one Windows machine through the neutral runner). Outside-library share for stage J: 99 of 130 value cases (76.1 %, `oracle/OUTSIDE_SHARES.md`).
+
+### Added
+
+- **Stage J wave 1 in Python, Rust, Java and C++** (`specifications/11-research/`, rulings J-1 to J-19 in `specifications/stage-j-rulings-w1.md`):
+  - `research.backtest.run`: event-driven backtester with an execution lag, spread, commission and fixed costs, per-bar P&L and cost attribution (suite `backtest_j`).
+  - `research.cv.purged_kfold` and `research.cv.cpcv_paths`: purged and embargoed k-fold splits, and the split and path counts of combinatorial purged CV (suite `purgedcv_j`).
+  - `research.regime.viterbi`: the most likely state path of a given hidden Markov model, for descriptive regime labels (suite `regime_j`).
+  - `research.stats.psr`, `.dsr`, `.pbo`, `.power`: probabilistic and deflated Sharpe ratios, probability of backtest overfitting and the sample size for a target power (suite `rstats_j`).
+- **Rulings J-20 to J-23 and J-19a.** J-20: page limits (bars and observations 1,000,000, Viterbi steps 100,000, statistics cells 10,000,000) replace the general 100,000-element array limit for these operations. J-21: `alpha` or `power` outside (0, 1) is `E_DOMAIN`. J-22: an empty Viterbi input is `E_INPUT`. J-23: the zero-dispersion check of J-17 runs per block and strategy. J-19a: outside checks for wave 1.
+- **Outside checks for stage J**: vectorbt 1.2.1, timeseriescv 0.2, scikit-learn 1.9.1, skfolio 1.12.12, hmmlearn 0.3.3 and statsmodels 0.15.0 check 41 of the 63 value cases (65.1%, above the 60% floor); DSR, PSR and PBO have no library check (`oracle/OUTSIDE_SHARES.md`, `oracle/OUTSIDE_J.json`).
+- **Stage J wave 2** (rulings J-W2-1 to J-W2-23 in `specifications/stage-j-rulings-w2.md`; 100 new golden cases, 67 value-checked and 33 error, so 15,315 in all: 7,571 value-checked, 5,230 error, 2,514 invariance; 291 operations in the name map). Implemented in all four languages; contract 1.14.0 (J-W2-1). Rulings J-W2-17 to J-W2-22 settle the doubts the build lanes met (ragged-matrix limits, Baum-Welch `K`, default budgets, the all-at-bound start and active-set tolerances, Ledoit-Wolf sizes); four Ledoit-Wolf goldens with interior shrinkage are checked by scikit-learn (J-W2-23). All four builds pass all 100 (2026-11-14, observed through the neutral runner):
+  - `research.portfolio.mean_variance`, `research.portfolio.risk_parity`, `risk.contrib.euler`: mean-variance with bounds and `at_bound`, risk parity with budgets, Euler risk contributions (`specifications/07-portfolio/optimisation.md`, suite `optim_j`).
+  - `research.estimate.ledoit_wolf`, `research.estimate.black_litterman`: scaled-identity shrinkage and the Black-Litterman posterior (`07-portfolio/estimation.md`, suite `estim_j`).
+  - `risk.backtest.es_z2`: the Acerbi-Szekely Z2 expected-shortfall backtest (`06-risk/es-backtest.md`, suite `esbt_j`).
+  - `research.regime.baum_welch`: Baum-Welch for a Gaussian hidden Markov model, with a fixed iteration and stop rule (`11-research/baum-welch.md`, suite `baumwelch_j`).
+  - Outside checks (J-W2-16, J-W2-23): 58 of the 67 value cases, by DAQP, PyPortfolioOpt, cvxpy with Clarabel, autograd, scikit-learn and hmmlearn; the seven `esbt_j` value cases have no free Z2 library.
+- **Docs for wave 2**: tutorials 25 (build and stress a portfolio) and 26 (test your ES model and fit regimes), with scripts `examples/tutorials/t25_portfolio.py` and `t26_es_regimes.py` (Python output on the pages; the Rust, Java and C++ runs follow the builds); seven COOKBOOK recipes with example inputs copied from the goldens; six LEARN sections; diagrams of the portfolio pipeline and the Baum-Welch loop; glossary terms; model inventory MJ-5 to MJ-8; Maillard, Roncalli and Teiletche (2010) added to the optimisation spec's sources and to `docs/references.md`.
+- **J-11, Q6-02 calibration redesign: PASS.** Prereg signed before the run, fresh seed 20261113, runner refuses a second run; inside share 87.2 % against the 80 % bar (`research/q6/q6_02_output.json`, review `program/J11_REVIEW.md`). Q6-01 stays published as failed.
+- **R3 amendments 4 to 8, signed** under the owner's delegation, each with a second read (`program/R3_A4_REVIEW.md` to `R3_A8_REVIEW.md`): 4 closes the open choices before any run; 5 fixes the closed-form par DV01; 6 adds the forward-log signal writer and rule-5 check (`research/r3_forward.py`); 7 counts defined-position days in the forward judgement and writes daily rows from the recorder; 8 says a study short of 250 counted days by 2027-11-05 is not judged. The forward-log back-fill ran once under amendments 3 and 6 (33 companion rows, run logged).
+- **J-0, Rust mutation kill tests** for `hedge.rs` (97 of 104 caught after the scoped re-run; the rest equivalent, `program/J0_EQUIVALENT_MUTANTS.md`), `var.rs` (94 % or more) and `hedge_solvers.rs` (new kill tests; the full mutant run is not finished, so its rate is partial). Python `test_variance_kills.py`. **J-0c, C++** `vol_stats.cpp`: 443 killed, 87 survived (83.6 %), a lower bound because the survivors are not all audited (`program/J0C_CPP_EQUIVALENT_MUTANTS.md`).
+- **Docs**: model inventory entries MJ-1 to MJ-4 with golden hashes; stage J recipes in `COOKBOOK.md` with two example inputs (`examples/research_backtest_j.json`, `examples/research_purged_kfold_j.json`); stage J glossary terms; research flow diagram (`docs/diagrams/README.md`).
+
+### Known gaps
+
+- `hedge_solvers.rs` mutation result is partial (run not finished); `var.rs` re-verify of the last targeted lines is pending.
+- The C++ J-0c kill rate (83.6 %) is a lower bound.
+- Tutorials 25 and 26 are checked by `tools/check_tutorial.py` in Python, Java and C++ (2026-11-14); the Rust check is not run yet, because Application Control on the development machine blocks a freshly built Windows binary.
+- The pa11y accessibility check runs in CI only, not on the development machine.
+- The G-42b ORE re-test job has not run yet; its first run is on the stage J pull request.
+- R3 results are null with low power (13 % to 15 %); they are weak evidence either way.
+
+### Changed
+
+- **G-42b ORE re-test job** (`.github/workflows/ore-g42b.yml`, job `ore-retest-g42b`, path-filtered and manual, not a required check): installs ORE 1.8.17.0 (free Python wheel, Modified BSD) with `--require-hashes` from `oracle/ore/requirements-ore.txt`, runs the six registered runs (`oracle/ore/run_g42b.py`, one at a time), counts them with `gen_stage_g_w4c.py countb` and uploads `ORE_CHECK_4C_B.json`. The count is a recorded result, not a gate.
+- The four `specifications/11-research/` wave 1 pages move from *Specified* to *Implemented*.
+
 ## 0.8.3: fuzz fixes, Rust kill tests, stage J wave 1 spec documents (2026-11-13)
 
 A patch release on top of v0.8.2. CLI contract unchanged (1.12.0); 39 new error cases, so 15,116 golden cases (7,441 value-checked, 5,161 error, 2,514 invariance).
@@ -16,6 +58,7 @@ A patch release on top of v0.8.2. CLI contract unchanged (1.12.0); 39 new error 
 - **Rust mutant kill tests** for `var.rs` and `hedge.rs` (`rust/crates/quantforge-core/tests/var_mutants.rs`, `hedge_mutants.rs`), with notes on the equivalent mutants in `program/J0_EQUIVALENT_MUTANTS.md` (stage J item J-0). Rust kill tests: hedge.rs 82.7%, var.rs >=94% (hedge_solvers in v0.9.0).
 - **Stage J wave 1 specification documents**, status *specified, not implemented*: `specifications/11-research/` (backtester, purged CV, regimes, research statistics), `specifications/stage-j-rulings-w1.md`, `program/STAGE_J_HANDOVER.md` and the generator `oracle/python/gen_stage_j_w1.py`. No build implements these operations; their 99 golden cases (63 value-checked, 36 error) and CLI contract entries land with the wave 1 code in v0.9.0.
 - **J-11 design** for the Q6-02 calibration test redesign (`program/J11_Q6_02_DESIGN.md`).
+- **J-11: Q6-02 signed, run once, passed** (synthetic quotes, seed 20261113): independent review `program/J11_REVIEW.md` (fit-term units fixed before signing), prereg `research/preregs/Q6-02-robust-shape-penalty.md`, runner `research/q6/q6_02_method_test.py` with a hash guard, output `research/q6/q6_02_output.json`: 87.4% inside the spread, churn median 0.98 and 95th percentile 1.56, 48 of 48 days arbitrage-free; selected penalty 0. Amendment 3 for R3-01, R3-02, R3-03 signed: forward-log study rows withhold the signal until the study's J-2 holdout run is logged in `research/holdout_runs.csv`.
 
 ### Known issues
 
@@ -41,7 +84,7 @@ A patch release on top of v0.8.1: one model fix, CI gate fixes, tests and docume
 
 - **Rust mutation gate below target:** `hedge_solvers`, `hedge` and `var` at about 70 to 75% killed against 80%; each pull request run samples 12 new mutants and needs 12 of 12. Stage J item J-0; `mutation-report` is not a required check until then.
 - **Fuzz on `main` finds three input faults** (run 43390662426): a GARCH forecast with a horizon of 2^31 times out in Rust and C++, Python's GARCH estimate times out on fuzzed returns, and Java's basket moment crashes on a ragged correlation matrix instead of returning `E_INPUT`. Stage J item J-0b.
-- **G-42b** (ORE re-test of simulated exposure) not run: no Actions job runs ORE. Stage J.
+- **G-42b** (ORE re-test of simulated exposure): the job `ore-retest-g42b` (`.github/workflows/ore-g42b.yml`) now exists but has not yet run in CI; the count is recorded when it does. Stage J.
 
 ## 0.8.1: R6 evidence repair (2026-11-13)
 

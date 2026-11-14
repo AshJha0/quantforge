@@ -19,7 +19,7 @@ CORE_MODULES = (
     "compounding", "conventions", "correlation", "cos", "credit", "credit_correlation_hedges", "credit_options", "cross_asset_hedge", "csa",
     "curve_fits", "curves", "data_checks", "daycount", "dynamic_hedge", "equity", "equity_curves", "exotics",
     "futures", "fx", "fx_smile", "hedge_solvers", "hedging", "heston", "inflation", "integrate", "interp", "joint", "linalg", "book_risk", "var_risk", "book",
-    "mbs", "money", "monte_carlo", "ois", "overnight", "pde", "projection", "rates_vol",
+    "mbs", "money", "monte_carlo", "ois", "overnight", "pde", "projection", "rates_vol", "research", "research_w2",
     "risk_curve", "rng", "roots", "sabr", "schedules", "shortrate", "slippage", "mc_greeks", "lmm", "xva", "risk_tools", "aad_ladder", "frtb", "portfolio_exposure", "sensitivities", "smile", "snapshot",
     "sobol", "stats", "steps", "store", "timezones", "usecases", "variance", "vol_usecase", "xccy",
 )

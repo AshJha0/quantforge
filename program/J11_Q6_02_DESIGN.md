@@ -1,7 +1,5 @@
 # J-11 design: Q6-02 (redesigned calibration method test) and study rows carrying the daily signal
 
-**Status: design, not implemented (lands in v0.9.0).**
-
 Written 2026-11-13 by the stage J spec lane. Status: **design, not a prereg**. Nothing here is signed; the two drafts in the appendices are for the signer (signing delegated by the owner to Claude, as for Q6-01 and the R3 amendments). No synthetic quote of the new seed has been drawn and no fit has been run while writing this note.
 
 Inputs read: `research/preregs/Q6-01-churn-bound.md` (signed 2026-11-11), `research/q6/q6_output.json` and the docstring of `research/q6/q6_method_test.py` (the published Q6-01 run), `research/preregs/README.md`, `R3-0{1,2,3}` preregs (signal lines only) and their amendments 2, `DEVIATION-2026-11-12.md`, `DEVIATION-2026-11-12-recorder-rule.md`, `tools/recorder/record.py` (study rows), plan 14.6 J-11.

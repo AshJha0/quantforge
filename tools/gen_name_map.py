@@ -43,11 +43,15 @@ def golden_ops():
 
 
 def spec_ops():
-    found = {}
+    """First page naming each operation; the limits table (01-core/limits.md) only as a last
+    resort, since a limits row is not an operation's spec page."""
+    found, limits = {}, {}
     for p in sorted((ROOT / "specifications").rglob("*.md")):
+        rel = p.relative_to(ROOT).as_posix()
+        target = limits if rel == "specifications/01-core/limits.md" else found
         for m in OP.finditer(p.read_text(encoding="utf-8")):
-            found.setdefault(m.group(1), p.relative_to(ROOT).as_posix())
-    return found
+            target.setdefault(m.group(1), rel)
+    return {**limits, **found}
 
 
 def build():

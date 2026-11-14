@@ -44,7 +44,19 @@ PROFILES = {
                      "tests/test_properties.py"],
         "keyword": "credit or cds or hazard or survival or e8 or Credit or mutants or kills",
     },
+    "variance": {
+        "modules": ["quantforge_core/variance.py"],
+        "full": ["tests/test_variance_kills.py", "tests/test_stage_e.py"],
+        "filtered": ["tests/test_mutants_e.py", "tests/test_mutation_e.py",
+                     "tests/test_stage_j_fuzzfix.py"],
+        "keyword": "garch or vix or varswap or variance or Garch or Vix or kills or goldens",
+    },
 }
+# Screening profile: the variance profile without the two slow `vol.garch.estimate` golden suites
+# and the slow estimate test. Use it to find survivors fast; score with `variance`.
+PROFILES["variance_fast"] = {**PROFILES["variance"], "keyword": (
+    "(" + PROFILES["variance"]["keyword"] + ") and not garch_f and not e1_vol_1"
+    " and not test_garch_estimate_matches_golden and not estimate_properties")}
 SWAP_BIN = {ast.Add: ast.Sub, ast.Sub: ast.Add, ast.Mult: ast.Div, ast.Div: ast.Mult,
             ast.Pow: ast.Mult, ast.FloorDiv: ast.Div, ast.Mod: ast.Div}
 SWAP_CMP = {ast.Lt: ast.LtE, ast.LtE: ast.Lt, ast.Gt: ast.GtE, ast.GtE: ast.Gt, ast.Eq: ast.NotEq,
@@ -172,10 +184,16 @@ def main() -> None:
     ap.add_argument("--python", default=sys.executable)
     ap.add_argument("--list", action="store_true", help="print the sampled mutants and stop")
     ap.add_argument("--out", type=Path, default=None, help="write per-mutant results as JSON")
+    ap.add_argument("--retry", type=Path, default=None,
+                    help="rerun only the survivors listed in an earlier --out file")
     args = ap.parse_args()
     profile = PROFILES[args.profile]
     src = REPO / "python"
     every, chosen = sample(src, profile["modules"], args.sample, args.seed)
+    if args.retry:
+        prior = json.loads(args.retry.read_text(encoding="utf-8"))
+        keep = {(r["module"], r["node"], r["kind"]) for r in prior if r["status"] == "survived"}
+        chosen = [c for c in chosen if c in keep]
     print(f"sites {len(every)} sample {len(chosen)} seed {args.seed}", flush=True)
     if args.list:
         for mod, idx, kind in chosen:

@@ -62,6 +62,14 @@ result: FAIL
 - **The penalty scale.** Every non-zero `lambda` in the prereg grid costs fit quality fast: at `lambda = 0.1` only 62% of selection quotes are inside the spread. The prereg's penalty divides churn by 0.001 (0.1 vol point), which makes it large next to the quote term. A future prereg could use a smaller grid; this one cannot be changed.
 - **Against the truth.** The fit is 0.20 vol points from the true surface on average over the grid: close, because the model family contains the truth. Real quotes give no such check.
 
+## Q6-02: the redesign (plan J-11)
+
+Q6-01 stays failed. Q6-02 is a new test, preregistered before any draw (`research/preregs/Q6-02-robust-shape-penalty.md`, review `program/J11_REVIEW.md`) and run once on a fresh seed, 20261113, with `python research/q6/q6_02_method_test.py`, which refuses to run unless the signed prereg and the frozen code match their hashes.
+
+- **What changed.** The fit term is quadratic inside the spread and linear outside it, so the 2% outlier quotes no longer pull the surface. The penalty counts only shape change net of the at-the-money move, scaled by the quote-noise standard error of each grid node. Grid `lambda` in {0, 1, 3}.
+- **Result: passes** (`research/q6/q6_02_output.json`). 87.4% of test quotes inside the spread (bound 80%), churn median 0.98 and 95th percentile 1.56, no arbitrage on 48 of 48 test days, 0.07 vol points from the truth.
+- **Read it carefully.** The selected `lambda` was 0, so the pass comes from the robust fit term, not from the penalty; the penalty was evaluated on the selection sample only. One seed and a model family that contains the truth, as before.
+
 ## Limits
 
 - One noise model, one seed, one model family that contains the truth: a method test shows the procedure works where it should; it says nothing about real quotes.

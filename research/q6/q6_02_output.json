@@ -1,0 +1,39 @@
+{
+ "label": "Synthetic quotes from a known SSVI surface; a method test, not a calibration to real option quotes (Q6-02).",
+ "prereg": "Q6-02",
+ "seed": 20261113,
+ "days": 60,
+ "selection_days": 12,
+ "trials": [
+  {
+   "lambda": 0,
+   "median_R": 1.1334962343121908,
+   "p95_R": 1.2068895252822625,
+   "inside_share": 0.8722222222222222
+  },
+  {
+   "lambda": 1,
+   "median_R": 1.0904601467816704,
+   "p95_R": 1.165423771013935,
+   "inside_share": 0.8644444444444445
+  },
+  {
+   "lambda": 3,
+   "median_R": 1.0194863746943705,
+   "p95_R": 1.1115558737340998,
+   "inside_share": 0.8344444444444444
+  }
+ ],
+ "chosen_lambda": 0,
+ "test_median_R": 0.9754601983768114,
+ "test_p95_R": 1.5611630992614065,
+ "churn_bound_met": true,
+ "test_inside_share": 0.8736111111111111,
+ "fit_quality_met": true,
+ "calendar_free_days": 48,
+ "butterfly_free_days": 48,
+ "test_days": 48,
+ "rms_error_to_truth_on_grid_vol": 0.00072269239945067,
+ "result": "PASS",
+ "freeze_commit": "72e780c13dea14cf066b0f98d732e9a2df4dcf00"
+}

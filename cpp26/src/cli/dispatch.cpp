@@ -64,6 +64,7 @@
 #include "quantforge/core/shortrate.hpp"
 #include "quantforge/core/lmm.hpp"
 #include "quantforge/core/hedging.hpp"
+#include "quantforge/core/research.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {
@@ -314,6 +315,7 @@ struct Entry {
 #include "ops_xva.inc"
 #include "ops_sensitivity_portfolio.inc"
 #include "ops_frtb_sbm.inc"
+#include "ops_research.inc"
 
 // Every verb this build runs. The operations command, and dispatch, are generated from this list alone.
 constexpr std::span<const Entry> registry[] = {
@@ -343,6 +345,7 @@ constexpr std::span<const Entry> registry[] = {
     reserve_ops,
     risk_gb_ops,
     frtb_gb_ops,
+    research_ops,
 };
 
 // Built on first use, never at static initialisation, so no order between translation units matters.
@@ -435,7 +438,11 @@ CaseResult run_case(string_view text) {
         first_non_finite.reset();
         Handler handler = nullptr;
         const Value& inputs = check_envelope(parsed, handler);
-        const bool big = oversized(inputs);
+        // Rulings J-20, J-W2-14: the stage J verbs carry their own page limits in place of the general array limit.
+        const string& op_name = parsed.value.find("operation")->text;
+        const bool research =
+            op_name.starts_with("research.") || op_name == "risk.contrib.euler" || op_name == "risk.backtest.es_z2";
+        const bool big = !research && oversized(inputs);
         Out out;
         out.values.begin_object();
         out.diagnostics.begin_object();
@@ -474,7 +481,7 @@ string version_json() {
     w.key("implementation_version");
     w.string(QF_VERSION);
     w.key("contract_version");
-    w.string("1.12.0");  // ruling R6-0.1
+    w.string("1.14.0");  // ruling J-W2-1; was 1.13.0 (J-1)
     w.key("toolchain");
     #if defined(__clang__)
     w.string("Clang " __clang_version__);

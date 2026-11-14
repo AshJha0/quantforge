@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import net.jqwik.api.Example;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import org.quantforge.core.LinearAlgebra;
@@ -136,9 +137,30 @@ class HedgeSolversPropertyTest {
                 null, true);
         int k = p.eq() == null ? 0 : p.eq().length;
         assertEquals(unique.x().length - k, mn.rank());
-        for (int j = 0; j < unique.x().length; j++) {
-            assertEquals(unique.x()[j], mn.x()[j], 1e-9 * Math.max(1.0, Math.abs(unique.x()[j])));
+        // The two paths factor different matrices, so they agree only to rounding times the conditioning
+        // of the normal matrix H = A^T W A + ridge I: tolerance max(1e-9, 1e-13 kappa(H)), relative.
+        int n = unique.x().length;
+        double[][] h = new double[n][n];
+        for (int i = 0; i < p.a().length; i++) {
+            for (int r = 0; r < n; r++) {
+                for (int c = 0; c < n; c++) {
+                    h[r][c] += p.w()[i] * p.a()[i][r] * p.a()[i][c];
+                }
+            }
         }
+        for (int r = 0; r < n; r++) {
+            h[r][r] += p.ridge();
+        }
+        double[] sv = LinearAlgebra.singularValues(h);
+        double rel = Math.max(1e-9, 1e-13 * sv[0] / sv[n - 1]);
+        for (int j = 0; j < n; j++) {
+            assertEquals(unique.x()[j], mn.x()[j], rel * Math.max(1.0, Math.abs(unique.x()[j])));
+        }
+    }
+
+    @Example
+    void minNormMatchesOnTheIllConditionedCiSample() {
+        minNormEqualsUniqueSolutionOnRegularProblems(-21114480911142L); // CI 2026-11-14: differed by 1.1e-9 relative
     }
 
     @Property(tries = 150)

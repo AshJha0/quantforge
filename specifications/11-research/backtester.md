@@ -1,6 +1,6 @@
 # Backtester: event loop, order and fill model, costs, P&L and attribution
 
-Spec version 1.0.0. Status: specified, not implemented (wave 1 code lands in v0.9.0; no build implements these operations and their goldens are not in this release). Rulings: `stage-j-rulings-w1.md` J-1 to J-6. Suite in `datasets/golden/stage_j/`: `backtest_j`, written by `oracle/python/gen_stage_j_w1.py`. Plan items Q7 and J-3 (plan 12.5, 14.6).
+Spec version 1.0.0. Status: Implemented (stage J, wave 1) in Python, Rust, Java and C++ (wave 1 contract 1.13.0, now 1.14.0); every build passes all its cases (15,315 of 15,315, 2026-11-14). Rulings: `stage-j-rulings-w1.md` J-1 to J-6. Suite in `datasets/golden/stage_j/`: `backtest_j`, written by `oracle/python/gen_stage_j_w1.py`. Plan items Q7 and J-3 (plan 12.5, 14.6).
 
 **Plain idea.** A strategy says, at the close of each bar, how many units it wants to hold. The backtester holds that target from a later close (the execution lag), pays costs on every change, and books the price move on what it held over each bar. Every number it reports is a sum of per-bar numbers, so the P&L explain closes exactly.
 
@@ -13,7 +13,7 @@ Sources:
 
 - Check order: `E_PARSE`, `E_SCHEMA` (an `engine` value not listed), `E_LIMIT` (bars, J-5), the finite rule F-2 (`E_DOMAIN`), then the checks below. F-3 (negative zero) holds.
 - Time is the bar index `t = 0 .. T-1`. Prices are closes. No calendar is used; bar spacing is the caller's.
-- Determinism: the outputs are sums and products of the inputs in a fixed order; there is no randomness and nothing to converge (a single pass over the bars).
+- Determinism: the outputs are sums and products of the inputs in a fixed order; there is no randomness and no iteration.
 
 ## `research.backtest.run`
 
@@ -67,6 +67,17 @@ Prices 100, 101, 99.5, 102, 103, 101.5, 100, 104, 105.5, 103, 106, 107; targets 
 - Attribution identity to 1e-12 relative of the largest term.
 - Look-ahead canary (Q7, ruling J-2): a target equal to `sign(p_{t+1} - p_t)` has a large positive gross P&L at `lag = 0` shifted by one bar and none at `lag = 1` on a driftless random walk; the test asserts the canary is detected.
 - Zero costs give `pnl_net = pnl_gross`; doubling every cost input doubles `total_*_cost` exactly.
+
+## Convergence and limit cases
+
+The backtester has no iterative or sampled method: each output is a finite sum of products of the inputs in a fixed order, so there is no order of convergence to assert. The table states the limit cases the goldens and property tests hold instead.
+
+| Case | Asserted result |
+|---|---|
+| `EVENT` against `VECTOR` on the same inputs | equal to 1e-10 (property test, each language) |
+| All costs 0 | net P&L equals gross P&L exactly |
+| Constant price series | gross P&L 0 for any position path |
+| `lag = 0` with a look-ahead canary signal | canary detected; absent at `lag = 1` (Q7) |
 
 ## Limitations
 

@@ -6,6 +6,7 @@
     python tools/build_gallery.py --refresh-real  # also fetches a new real-data snapshot (gallery_real.py)
     python tools/build_gallery.py --evidence-only # recounts golden evidence after golden-only changes; no CLI runs
     python tools/build_gallery.py --stage-e-only  # runs only the stage E pages, keeping other committed data
+    python tools/build_gallery.py --stage-j-only  # runs only the stage J research workflow page
 
 Commands come from conformance/runner/implementations.json, so the CLIs must be built first. This
 file holds no financial logic: it sends cases, stores what comes back and draws it. Its only sums
@@ -37,6 +38,7 @@ import gallery_r2  # noqa: E402
 import gallery_e  # noqa: E402
 import gallery_f  # noqa: E402
 import gallery_i  # noqa: E402
+import gallery_j  # noqa: E402
 
 OUT = ROOT / "docs" / "curves"
 DATA = OUT / "data"
@@ -690,6 +692,11 @@ def index_page(all_data):
         rows.append([f"[Hedging against trading costs]({gallery_i.SLUG}.md)", "Implemented, not Validated", "I",
                      f"{sum(r['cases'] for r in e['suites'][:2])} golden cases for `hedge.qp.solve` with costs and `hedge.frontier.solve`, "
                      f"{sum(r['outside'] for r in e['suites'][:2])} reproduced by an outside library"])
+    if gallery_j.SLUG in all_data:
+        e = all_data[gallery_j.SLUG]["evidence"]
+        rows.append([f"[Research workflow: backtest to PBO]({gallery_j.SLUG}.md)", "Implemented, not Validated", "J",
+                     f"{sum(r['cases'] for r in e['suites'])} golden cases for the backtest, purged CV and research statistics, "
+                     f"{sum(r['outside'] for r in e['suites'])} reproduced by an outside library; synthetic prices, a teaching example"])
     rows += [[name, status, stage, ev] for name, status, stage, ev in PLANNED]
     real = ""
     if gallery_real.SLUG in all_data:
@@ -738,6 +745,8 @@ def render_all(all_data):
         pages[f"{gallery_f.SLUG}.md"] = gallery_f.page(all_data[gallery_f.SLUG], table, gallery_e.lines, status_block, LANGS)
     if gallery_i.SLUG in all_data:
         pages[f"{gallery_i.SLUG}.md"] = gallery_i.page(all_data[gallery_i.SLUG], table, gallery_e.lines, status_block)
+    if gallery_j.SLUG in all_data:
+        pages[f"{gallery_j.SLUG}.md"] = gallery_j.page(all_data[gallery_j.SLUG], table, gallery_e.lines, status_block)
     if gallery_real.SLUG in all_data:
         d = all_data[gallery_real.SLUG]
         versions = ", ".join(f"{NAMES[k]} {v['implementation_version']}" for k, v in d["meta"]["cli"].items())
@@ -1105,7 +1114,8 @@ def generate_pnl(meta, refresh):
 def committed_slugs():
     return list(CURVES) + list(VOLS) + [s for s, spec in STAGE_D.items() if is_live(spec) and (DATA / f"{s}.json").is_file()] \
         + [s for s, spec in gallery_e.STAGE_E.items() if gallery_e.is_live(spec) and (DATA / f"{s}.json").is_file()]         + ([gallery_f.SLUG] if (DATA / f"{gallery_f.SLUG}.json").is_file() else []) \
-        + ([gallery_i.SLUG] if (DATA / f"{gallery_i.SLUG}.json").is_file() else [])
+        + ([gallery_i.SLUG] if (DATA / f"{gallery_i.SLUG}.json").is_file() else []) \
+        + ([gallery_j.SLUG] if (DATA / f"{gallery_j.SLUG}.json").is_file() else [])
 
 
 def refresh_evidence():
@@ -1176,12 +1186,31 @@ def generate_i(meta, all_data):
     (DATA / f"{gallery_i.SLUG}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
 
 
-def generate(refresh_real=False, real_only=False, stage_e_only=False, stage_f_only=False, stage_i_only=False):
+def generate_j(meta, all_data):
+    results = {lang: gallery_j.run(lang, batch, read_example) for lang in LANGS}
+    d = {"meta": {**meta, "example_hashes": {gallery_j.EXAMPLE: example_hash(gallery_j.EXAMPLE)}},
+         "inputs": read_example(gallery_j.EXAMPLE)["inputs"], "reference": results["python"],
+         "agreement": gallery_j.agreement(results, LANGS), "evidence": gallery_j.evidence()}
+    all_data[gallery_j.SLUG] = d
+    (DATA / f"{gallery_j.SLUG}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
+
+
+def generate(refresh_real=False, real_only=False, stage_e_only=False, stage_f_only=False, stage_i_only=False, stage_j_only=False):
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
     meta = {"commit": commit, "date": dt.date.today().isoformat(), "reference_language": "python", "tolerance": TOL,
             "data": "synthetic", "cli": {lang: json.loads(call(lang, "version")) for lang in LANGS}}
     DATA.mkdir(parents=True, exist_ok=True)
     all_data = {}
+    if stage_j_only:  # keep every other page's committed data; run the stage J page and re-render
+        all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs() if s != gallery_j.SLUG}
+        for extra in (gallery_real.SLUG, gallery_pnl.SLUG):
+            if (DATA / f"{extra}.json").is_file():
+                all_data[extra] = json.loads((DATA / f"{extra}.json").read_text(encoding="utf-8"))
+        generate_j(meta, all_data)
+        for name, text in render_all(all_data).items():
+            (OUT / name).write_text(text, encoding="utf-8", newline="\n")
+        print(f"stage J page written to {OUT}")
+        return 0
     if stage_i_only:  # keep every other page's committed data; run the stage I page and re-render
         all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs() if s != gallery_i.SLUG}
         for extra in (gallery_real.SLUG, gallery_pnl.SLUG):
@@ -1254,6 +1283,7 @@ def generate(refresh_real=False, real_only=False, stage_e_only=False, stage_f_on
     generate_e(meta, all_data)
     generate_f(meta, all_data)
     generate_i(meta, all_data)
+    generate_j(meta, all_data)
     for name, text in render_all(all_data).items():
         (OUT / name).write_text(text, encoding="utf-8", newline="\n")
     print(f"{len(all_data)} pages of data, {len(all_data) + 1} pages written to {OUT}")
@@ -1342,6 +1372,15 @@ def check():
         compare(d["reference"], gallery_i.run("python", batch, read_example), gallery_i.SLUG, bad)
         if d["evidence"] != gallery_i.evidence():
             bad.append(f"{gallery_i.SLUG}: golden evidence changed")
+    path = DATA / f"{gallery_j.SLUG}.json"
+    if path.is_file():
+        d = json.loads(path.read_text(encoding="utf-8"))
+        all_data[gallery_j.SLUG] = d
+        if d["meta"]["example_hashes"].get(gallery_j.EXAMPLE) != example_hash(gallery_j.EXAMPLE):
+            bad.append(f"{gallery_j.SLUG}: {gallery_j.EXAMPLE} changed")
+        compare(d["reference"], gallery_j.run("python", batch, read_example), gallery_j.SLUG, bad)
+        if d["evidence"] != gallery_j.evidence():
+            bad.append(f"{gallery_j.SLUG}: golden evidence changed")
     d = json.loads((DATA / f"{gallery_real.SLUG}.json").read_text(encoding="utf-8"))
     all_data[gallery_real.SLUG] = d
     compare(d["reference"], gallery_real.run("python", d["inputs"], batch), gallery_real.SLUG, bad)
@@ -1371,10 +1410,11 @@ def main():
     ap.add_argument("--stage-e-only", action="store_true", help="run only the stage E pages; keep other committed data")
     ap.add_argument("--stage-f-only", action="store_true", help="run only the stage F page; keep other committed data")
     ap.add_argument("--stage-i-only", action="store_true", help="run only the stage I page; keep other committed data")
+    ap.add_argument("--stage-j-only", action="store_true", help="run only the stage J page; keep other committed data")
     a = ap.parse_args()
     if a.evidence_only:
         return refresh_evidence()
-    return check() if a.check else generate(a.refresh_real, a.real_only, a.stage_e_only, a.stage_f_only, a.stage_i_only)
+    return check() if a.check else generate(a.refresh_real, a.real_only, a.stage_e_only, a.stage_f_only, a.stage_i_only, a.stage_j_only)
 
 
 if __name__ == "__main__":
