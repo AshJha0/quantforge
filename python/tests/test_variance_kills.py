@@ -552,7 +552,7 @@ def test_minimum_sizes_are_accepted() -> None:
     # The lower bounds are inclusive: 1 minute, 30 returns for the fit (spec minimums).
     assert v.vix_term_variance(1, 0.0, STRIP)[1] == 100.0
     assert math.isfinite(v.garch_fit(R30, "SAMPLE"))
-    for returns, dist in ((R30, "NORMAL"), (R30 * 4, "STUDENT_T")):
+    for returns, dist in ((R30, "NORMAL"), ((R30 * 4)[:100], "STUDENT_T")):
         try:
             v.garch_estimate(returns, "SAMPLE", dist, False)
         except QfError as err:  # these toy series may have no interior maximum
