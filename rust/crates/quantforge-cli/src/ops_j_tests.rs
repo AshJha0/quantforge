@@ -216,3 +216,17 @@ fn risk_wave2_ops_and_their_errors() {
     );
     err("risk.backtest.es_z2", &format!("{{{base}}}"), "E_SCHEMA");
 }
+
+/// Kills `half_spread < 0.0` -> `== 0.0` in `option_hedge_lots`: a negative half-spread is a
+/// domain error and zero is allowed (CI mutation sample, 2026-11-14).
+#[test]
+fn option_hedge_lots_rejects_a_negative_half_spread_and_accepts_zero() {
+    let base = r#"{"spot":100.0,"rate":0.03,"dividend_yield":0.01,"volatility":0.22,"portfolio":[{"instrument":"CALL","strike":105.0,"expiry_years":0.5,"quantity":-1500.0}],"hedges":[{"instrument":"UNDERLYING","lot_size":100.0,"half_spread":HS}],"targets":["DELTA"],"max_lots":1000}"#;
+    err(
+        "usecase.option_hedge_lots",
+        &base.replace("HS", "-0.01"),
+        "E_DOMAIN",
+    );
+    let (good, r) = run("usecase.option_hedge_lots", &base.replace("HS", "0.0"));
+    assert!(good, "{}", r.to_text());
+}
