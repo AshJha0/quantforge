@@ -1,0 +1,11 @@
+# Stage J outside checks (oracle/python/outside_j.py). Separate venv; not part of uv.lock.
+hmmlearn==0.3.3
+numba==0.68.1
+numpy==2.5.4
+pandas==3.1.1
+scikit-learn==1.9.1
+scipy==1.18.1
+skfolio==1.12.12
+statsmodels==0.15.0
+timeseriescv==0.2
+vectorbt==1.2.1
