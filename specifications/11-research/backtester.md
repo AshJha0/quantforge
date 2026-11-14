@@ -1,6 +1,6 @@
 # Backtester: event loop, order and fill model, costs, P&L and attribution
 
-Spec version 1.0.0. Status: Specified (stage J, wave 1). Rulings: `stage-j-rulings-w1.md` J-1 to J-6. Suite in `datasets/golden/stage_j/`: `backtest_j`, written by `oracle/python/gen_stage_j_w1.py`. Plan items Q7 and J-3 (plan 12.5, 14.6).
+Spec version 1.0.0. Status: Implemented (stage J, wave 1) in Python, Rust, Java and C++ at CLI contract 1.13.0; every build passes all its cases (`program/R6_HANDOVER.md`, TOTALS 15,215). Rulings: `stage-j-rulings-w1.md` J-1 to J-6. Suite in `datasets/golden/stage_j/`: `backtest_j`, written by `oracle/python/gen_stage_j_w1.py`. Plan items Q7 and J-3 (plan 12.5, 14.6).
 
 **Plain idea.** A strategy says, at the close of each bar, how many units it wants to hold. The backtester holds that target from a later close (the execution lag), pays costs on every change, and books the price move on what it held over each bar. Every number it reports is a sum of per-bar numbers, so the P&L explain closes exactly.
 

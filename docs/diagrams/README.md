@@ -33,6 +33,18 @@ flowchart TD
   D11 --> D12[12 Platform]
 ```
 
+Domain 11 has CLI operations from stage J wave 1 (backtester, purged CV, Viterbi regimes, research statistics). Its `research` module in each build uses only domain 01; the arrows from 07 and 10 are where studies will take their inputs, not code dependencies.
+
+```mermaid
+flowchart LR
+  In[prices, targets, labels, returns] --> BT[research.backtest.run]
+  In --> CV[research.cv.purged_kfold / cpcv_paths]
+  In --> VT[research.regime.viterbi]
+  BT -->|returns| ST[research.stats.psr / dsr / pbo / power]
+  CV -->|fold returns| ST
+  ST --> Rep[study report]
+```
+
 ## Data flow
 
 ```mermaid

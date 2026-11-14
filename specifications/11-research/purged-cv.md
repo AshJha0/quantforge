@@ -1,6 +1,6 @@
 # Purged and embargoed k-fold cross-validation; combinatorial purged CV counts
 
-Spec version 1.0.0. Status: Specified (stage J, wave 1). Rulings: `stage-j-rulings-w1.md` J-7 to J-9. Suite: `datasets/golden/stage_j/purgedcv_j`, written by `oracle/python/gen_stage_j_w1.py`. Plan item A1 (plan 12.5).
+Spec version 1.0.0. Status: Implemented (stage J, wave 1) in Python, Rust, Java and C++ at CLI contract 1.13.0; every build passes all its cases (`program/R6_HANDOVER.md`, TOTALS 15,215). Rulings: `stage-j-rulings-w1.md` J-7 to J-9. Suite: `datasets/golden/stage_j/purgedcv_j`, written by `oracle/python/gen_stage_j_w1.py`. Plan item A1 (plan 12.5).
 
 **Plain idea.** In finance a label (for example a 5-day forward return) spans time. Plain k-fold lets a training label overlap the test period, so the model learns the answer. Purging drops every training observation whose label window overlaps the test window; the embargo also drops a few observations right after the test block, because serial correlation leaks information forward.
 

@@ -197,6 +197,19 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 | Sign-state active-set method | A solve of the cost problem that fixes each instrument's sign (long, short or zero), solves that smooth problem exactly, and changes a sign only where the subgradient test fails; it replaced enumeration of every sign state in Java and C++ (ruling I-48) |
 | Outside-oracle share | The fraction of a stage's golden cases, error cases included in the denominator, that an independent library reproduces within the case tolerance; the floor is 60% (rule 11.2.5, ruling I-2) |
 
+## Stage J terms
+
+| Term | Meaning |
+|---|---|
+| Execution lag | Bars between a strategy's decision and the close at which the backtester holds the new position; `lag = 0` is allowed only to show look-ahead (`11-research/backtester.md`, J-2) |
+| Purging | Dropping a training row whose label span overlaps the test fold's time span, so the model cannot learn the test answer (`11-research/purged-cv.md`) |
+| Embargo | Dropping a further fraction of rows just after each test fold, against serial correlation that outlasts the label span |
+| CPCV | Combinatorial purged cross-validation: split into `N` groups, test on every choice of `k`, and recombine the test groups into backtest paths (`research.cv.cpcv_paths`) |
+| Viterbi path | The single most likely sequence of hidden states of a given hidden Markov model; used here only to label regimes, not to forecast (`11-research/regimes.md`) |
+| PSR | Probabilistic Sharpe ratio: the probability that the true Sharpe ratio exceeds a benchmark, allowing for sample length, skew and kurtosis (Bailey and López de Prado 2012) |
+| DSR | Deflated Sharpe ratio: the PSR against the best Sharpe ratio expected by chance from the number of trials run (Bailey and López de Prado 2014) |
+| PBO | Probability of backtest overfitting: how often the configuration best in-sample ranks below the median out of sample (Bailey, Borwein, López de Prado and Zhu 2017) |
+
 ## Tutorial terms
 
 Terms the [tutorials](docs/getting-started/README.md) use that the stage sections above do not define.

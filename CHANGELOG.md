@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased (0.9.0): stage J wave 1, research tools
+
+CLI contract 1.13.0 (ruling J-1, no new error code); 284 operations in the name map; 15,215 golden cases (7,504 value-checked, 5,197 error, 2,514 invariance), 99 of them new in the four wave 1 suites. Each of the four builds passes 15,215 of 15,215 (`program/R6_HANDOVER.md`, TOTALS line; observed on one Windows machine through the neutral runner).
+
+### Added
+
+- **Stage J wave 1 in Python, Rust, Java and C++** (`specifications/11-research/`, rulings J-1 to J-19 in `specifications/stage-j-rulings-w1.md`):
+  - `research.backtest.run`: event-driven backtester with an execution lag, spread, commission and fixed costs, per-bar P&L and cost attribution (suite `backtest_j`).
+  - `research.cv.purged_kfold` and `research.cv.cpcv_paths`: purged and embargoed k-fold splits, and the split and path counts of combinatorial purged CV (suite `purgedcv_j`).
+  - `research.regime.viterbi`: the most likely state path of a given hidden Markov model, for descriptive regime labels (suite `regime_j`).
+  - `research.stats.psr`, `.dsr`, `.pbo`, `.power`: probabilistic and deflated Sharpe ratios, probability of backtest overfitting and the sample size for a target power (suite `rstats_j`).
+- **Rulings J-20 to J-23 and J-19a.** J-20: page limits (bars and observations 1,000,000, Viterbi steps 100,000, statistics cells 10,000,000) replace the general 100,000-element array limit for these operations. J-21: `alpha` or `power` outside (0, 1) is `E_DOMAIN`. J-22: an empty Viterbi input is `E_INPUT`. J-23: the zero-dispersion check of J-17 runs per block and strategy. J-19a: outside checks for wave 1.
+- **Outside checks for stage J**: vectorbt 1.2.1, timeseriescv 0.2, scikit-learn 1.9.1, skfolio 1.12.12, hmmlearn 0.3.3 and statsmodels 0.15.0 check 41 of the 63 value cases (65.1%, above the 60% floor); DSR, PSR and PBO have no library check (`oracle/OUTSIDE_SHARES.md`, `oracle/OUTSIDE_J.json`).
+- **Docs**: model inventory entries MJ-1 to MJ-4 with golden hashes; stage J recipes in `COOKBOOK.md` with two example inputs (`examples/research_backtest_j.json`, `examples/research_purged_kfold_j.json`); stage J glossary terms; research flow diagram (`docs/diagrams/README.md`).
+
+### Changed
+
+- The four `specifications/11-research/` wave 1 pages move from *Specified* to *Implemented*.
+
 ## 0.8.3: fuzz fixes, Rust kill tests, stage J wave 1 spec documents (2026-11-13)
 
 A patch release on top of v0.8.2. CLI contract unchanged (1.12.0); 39 new error cases, so 15,116 golden cases (7,441 value-checked, 5,161 error, 2,514 invariance).

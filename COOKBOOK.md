@@ -575,3 +575,38 @@ All four builds answer every stage I operation: each passed 14,935 of 14,935 gol
 The frontier of `hedge_frontier_i.json`, and a sweep through the switch point of golden `hedgecost_i-0023`, are drawn from all four CLIs on the gallery page [Hedging against trading costs](docs/curves/hedging-costs.md).
 
 The same backtest with costs: add `"half_spread"` to the inputs of `hedge_backtest_i.json` as in golden `hedgebtcost_i-0001`. To check a whole suite: `python conformance/runner/runner.py --impl python --suite hedgeqp_i`.
+
+## Stage J recipes
+
+Stage J wave 1 (target v0.9.0, not yet released) adds research tools. Each file below copies the inputs of the named golden case verbatim, so its expected outputs are that case's `expected.outputs` in `datasets/golden/stage_j/`. All four builds pass every stage J case (15,215 of 15,215 in each language, `program/R6_HANDOVER.md`). The outputs quoted here are from the Python build on 2026-11-14.
+
+| Task | File | Operation | From golden |
+|---|---|---|---|
+| Backtest a position path with a two-bar lag and three kinds of cost | `research_backtest_j.json` | `research.backtest.run` | `backtest_j-0004` |
+| Purged 3-fold split of ten overlapping labels | `research_purged_kfold_j.json` | `research.cv.purged_kfold` | `purgedcv_j-0002` |
+
+### Backtest with costs
+
+Plain idea: you say what position you want at each bar; the backtester holds it `lag` bars later, charges for each change and adds up the P&L. Formally (`specifications/11-research/backtester.md`, rulings J-2 to J-6): the held position is `q_t = target_{t-lag}`, the trade is `q_t - q_{t-1}`, gross P&L is `q_{t-1} (p_t - p_{t-1})`, and the cost of a trade of size `d` at price `p` is `|d| p half_spread_bps / 10^4 + |d| commission_per_unit + fixed_per_trade`.
+
+```bash
+uv run --project python quantforge run < examples/research_backtest_j.json
+```
+
+Worked example. Prices start 100, 101, 99.5; the lag is 2, so the first target (1 unit) is held from bar 2 and bought at 99.5. Its cost is 99.5 x 5 / 10,000 + 0.01 + 1 = 1.05975, the third entry of `cost`. Over the 12 bars there are 9 trades, gross P&L 30.5, spread 1.03425, commission 0.2 and fixed cost 9.0, so `total_net` is 20.26575; `max_drawdown` is 1.18 and `turnover` 2,068.5.
+
+### Purged k-fold split
+
+Plain idea: when each label covers a span of time, a training row whose span overlaps the test fold leaks the answer, so it is dropped (purged), and an embargo can drop a few rows after the fold as well. Formally (`specifications/11-research/purged-cv.md`, rulings J-7 to J-9; López de Prado 2018, ch. 7): row `i` covers `[t0_i, t1_i]`; for a test fold with times from `min t0` to `max t1`, a training row is kept only if its span does not overlap that window and it is not in the embargo.
+
+```bash
+uv run --project python quantforge run < examples/research_purged_kfold_j.json
+```
+
+Worked example. Ten rows, row `i` covering `[i, i + 2]`, three folds, no embargo. The first test fold is rows 0 to 3, covering times 0 to 5. Rows 4 (`[4, 6]`) and 5 (`[5, 7]`) overlap it and are purged, so the training set is rows 6 to 9:
+
+```json
+{"folds":[{"test":[0,1,2,3],"train":[6,7,8,9]},{"test":[4,5,6],"train":[0,1,9]},{"test":[7,8,9],"train":[0,1,2,3,4]}],"embargo_count":0}
+```
+
+To check a whole suite: `python conformance/runner/runner.py --impl python --suite backtest_j`.

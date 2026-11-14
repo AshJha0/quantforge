@@ -1,7 +1,7 @@
 # CLI contract
 
-Version 1.12.0 (R6, v0.8.1; the blocks below give the minor versions each stage added). `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
-From R6 (ruling R6-0.1) a build reports `contract_version` `1.12.0` (stage I: `1.11.0`, ruling I-51), and the runner stops on any other value. Before stage I every build reported `1.0.0`; nothing in 1.1.0 to 1.11.0 breaks the wire format.
+Version 1.13.0 (stage J wave 1, v0.9.0; the blocks below give the minor versions each stage added). `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
+From stage J (ruling J-1) a build reports `contract_version` `1.13.0` (R6: `1.12.0`, ruling R6-0.1; stage I: `1.11.0`, ruling I-51), and the runner stops on any other value. Before stage I every build reported `1.0.0`; nothing in 1.1.0 to 1.13.0 breaks the wire format.
  Applies identically to the Java, C++, Python and Rust implementations.
 
 The idea: every implementation is a black box that reads a case and writes a result. The neutral
@@ -18,7 +18,7 @@ to start it from `conformance/runner/implementations.json`.
 | `quantforge run` | Read one case JSON document from stdin to end of file. Write one result JSON document to stdout. |
 | `quantforge batch` | Read JSON Lines from stdin, one case per line. Write one result per line to stdout, in the same order, flushing after each line. |
 | `quantforge --batch` | Exactly the same as `quantforge batch` (1.6.0). Both spellings must work. |
-| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.12.0", "toolchain":...}`. |
+| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.13.0", "toolchain":...}`. |
 | `quantforge operations` | Write a JSON array of the operation names this build supports, sorted. |
 
 `batch` exists because a JVM start per case would dominate run time. `run` and `batch` must give
@@ -368,9 +368,9 @@ exit status is a major version, and all four implementations and the runner move
 
 Later R6 waves append rows here (see `program/R6_HANDOVER.md`).
 
-## Stage J operations (target contract 1.13.0)
+## Stage J operations (contract 1.13.0)
 
-Stage J wave 1 adds operations and no error code (ruling J-1). `stage-j-rulings-w1.md` and `stage-j-rulings.md` are normative. Operations are added to the table as each wave lands.
+Stage J wave 1 adds operations and no error code (ruling J-1). `stage-j-rulings-w1.md` and `stage-j-rulings.md` are normative. Operations are added to the table as each wave lands. Wave 1 is implemented in all four builds. For these operations the page limits of ruling J-20 (bars 1,000,000; observations 1,000,000; Viterbi steps 100,000; statistics cells 10,000,000) replace the general per-array limit of 100,000 elements.
 
 | Prefix | Spec | Slice |
 |---|---|---|

@@ -1,6 +1,6 @@
 # Research statistics: probabilistic and deflated Sharpe ratio, PBO by CSCV, power
 
-Spec version 1.0.0. Status: Specified (stage J, wave 1). Rulings: `stage-j-rulings-w1.md` J-13 to J-18. Suite: `datasets/golden/stage_j/rstats_j`, written by `oracle/python/gen_stage_j_w1.py`. Plan 11.3 (every study reports DSR and PBO), Q7, J-1.
+Spec version 1.0.0. Status: Implemented (stage J, wave 1) in Python, Rust, Java and C++ at CLI contract 1.13.0; every build passes all its cases (`program/R6_HANDOVER.md`, TOTALS 15,215). Rulings: `stage-j-rulings-w1.md` J-13 to J-18. Suite: `datasets/golden/stage_j/rstats_j`, written by `oracle/python/gen_stage_j_w1.py`. Plan 11.3 (every study reports DSR and PBO), Q7, J-1.
 
 **Plain idea.** A backtest Sharpe ratio is an estimate, and the best of many tried strategies is biased upward. The probabilistic Sharpe ratio (PSR) is the probability that the true Sharpe exceeds a benchmark, allowing for sample length, skew and fat tails. The deflated Sharpe ratio (DSR) is the PSR against the Sharpe the best of `N` useless strategies would show by luck. PBO asks a different question: how often does the in-sample winner rank in the bottom half out of sample? The power calculation says how large a Sharpe a study can detect at all.
 
