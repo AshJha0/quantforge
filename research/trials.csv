@@ -23,3 +23,6 @@ R3-03,R3-03-T01,lambda=0;source=own_breakeven
 R3-03,R3-03-T02,lambda=0;source=cpi_nsa_factors
 R3-03,R3-03-T03,lambda=0.5;source=own_breakeven
 R3-03,R3-03-T04,lambda=0.5;source=cpi_nsa_factors
+Q6-02,Q6-02-T01,lambda=0
+Q6-02,Q6-02-T02,lambda=1
+Q6-02,Q6-02-T03,lambda=3
