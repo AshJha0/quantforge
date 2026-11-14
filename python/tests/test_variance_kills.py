@@ -640,6 +640,7 @@ def test_estimate_is_scale_equivariant() -> None:
 @pytest.mark.parametrize(("n", "seed", "df", "expected"), [
     (120, 7, 4, -116.54250545385293),
     (300, 1, None, -389.6476421536659),
+    (150, 5, 3, -161.0634970215938),
 ])
 def test_fit_reaches_the_reference_optimum(n: int, seed: int, df: int | None,
                                            expected: float) -> None:
