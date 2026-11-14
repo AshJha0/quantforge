@@ -270,3 +270,7 @@ TOTALS: 15077 value 7441 error 5122 invariance 2514
 Traffic light keeps the 1996 plus factors, vintage now stated (R6-28.1); equity vega 77.78% (R6-28.2); ties to high, medium, low (R6-28.3); sqrt 2 covers inflation and basis (R6-28.4); `p` excludes a build's own sign rows (R6-28.5). Oracle2 findings: `risk_f4-0019`..`0024` stale arch cache (R6-28.6), `garch_f-0009` arch stops above 1e-8 (R6-28.7), `cdsidx_f-0056`/`0057` re-derivation cancels in `1 - exp` (R6-28.8): all goldens right; fixes are in oracle2's tools. `risk_f4-0087`..`0095` disagreements come from the re-derivation using the FRTB table. Builds: only advice to use `expm1` for `front_end_protection`.
 
 WAVE 4 READY 13a93f9 (aadladder_r6, 1 value case at 501/250; languages: no behaviour change, pass it at 1e-10 abs / 1e-8 rel; totals 15,077)
+
+Stage J lane J-0b (2026-11-13) adds `stage_j/fuzzfix_j.json`, 39 error cases.
+
+TOTALS: 15116 value 7441 error 5161 invariance 2514

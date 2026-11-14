@@ -439,6 +439,7 @@ void op_garch_forecast(const In& in, Out& out) {
     const double next = in.real("next_variance");
     const long long h = in.integer("horizon");
     const double ppy = in.real("periods_per_year");
+    limit_if(h > 100000, "horizon");  // ruling J-0b.1
     in.ready();
     const GarchForecast f = garch_forecast(omega, alpha, beta, next, h, ppy);
     out.key_reals("variances", f.variances);

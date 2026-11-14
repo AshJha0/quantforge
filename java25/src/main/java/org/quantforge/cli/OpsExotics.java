@@ -186,8 +186,13 @@ final class OpsExotics {
             if (n == 0 || w.length != n || v.length != n || rho.length != n) {
                 throw new QfError("E_INPUT", "forwards, weights, vols and correlation must match", "forwards");
             }
+            for (double[] row : rho) { // every row before any symmetry read (ruling J-0b.3)
+                if (row.length != n) {
+                    throw new QfError("E_INPUT", "correlation must be square with a unit diagonal", "correlation");
+                }
+            }
             for (int i = 0; i < n; i++) {
-                if (rho[i].length != n || rho[i][i] != 1.0) {
+                if (rho[i][i] != 1.0) {
                     throw new QfError("E_INPUT", "correlation must be square with a unit diagonal", "correlation");
                 }
                 for (int j = 0; j < n; j++) {

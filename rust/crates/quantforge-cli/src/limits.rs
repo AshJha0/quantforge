@@ -63,6 +63,7 @@ fn operation_above(op: &str, i: &Json) -> bool {
             product_above(int(i, "space_steps"), int(i, "time_steps"), 10_000_000)
         }
         "core.cos.european" => above(i, "terms", 100_000),
+        "vol.garch.forecast" => above(i, "horizon", 100_000), // ruling J-0b.1
         "vol.svi.surface_check" => {
             len(i, "slices").is_some_and(|n| n > 100)
                 || len(i, "log_moneyness").is_some_and(|n| n > 10_000)
