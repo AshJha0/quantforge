@@ -1,0 +1,1 @@
+{"schema_version":"1.0","case_id":"example-portfolio-mean-variance-j","operation":"research.portfolio.mean_variance","inputs":{"expected_returns":[0.07191,0.005088,0.043925],"covariance":[[0.021809,-0.00171,-0.003328],[-0.00171,0.034802,-0.011237],[-0.003328,-0.011237,0.041273]],"risk_aversion":1.0,"lower":[0.0,0.0,0.0],"upper":[0.55,0.55,0.55]}}

@@ -1,0 +1,1 @@
+{"schema_version":"1.0","case_id":"example-estimate-black-litterman-j","operation":"research.estimate.black_litterman","inputs":{"covariance":[[0.041204,-0.015905,0.006862],[-0.015905,0.055181,0.021655],[0.006862,0.021655,0.033744]],"prior_returns":[0.008141,0.089553,0.042897],"pick":[[0.0,-1.0,-1.0]],"views":[0.037219],"view_covariance":[[0.001]],"tau":0.025}}

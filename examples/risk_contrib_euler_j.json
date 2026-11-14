@@ -1,0 +1,1 @@
+{"schema_version":"1.0","case_id":"example-risk-contrib-euler-j","operation":"risk.contrib.euler","inputs":{"weights":[1.0,-0.5],"covariance":[[0.04,0.018],[0.018,0.09]]}}
