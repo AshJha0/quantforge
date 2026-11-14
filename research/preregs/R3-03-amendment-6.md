@@ -1,7 +1,7 @@
 # R3-03 amendment 6: Breakeven seasonality, forward-log writer and rule-5 scan check
 
 Status: **signed**. Signed by Claude (stage J amendment 6 lane; signing delegated by the owner, 2026-11-07, decision relayed by the stage J coordinator) on 2026-11-14. Second read: `program/R3_A6_REVIEW.md` (a separate Claude subagent; human check: none).
-- SHA-256 of the body below the marker line: `1df6d75ff5ebd5fd20ca66ac68c23af0a40d8a9c0f15d5b989a678964db66416`
+- SHA-256 of the body below the marker line: `eaab2ad5ecd08c42da6ffe5001acaf843734533dfb6bea7261612b5c7d092767`
 - SHA-256 of the amended prereg `R3-03-breakeven-seasonality.md` (whole file): `de1c6d5b5dab03924e8f0f48346976e678d687252fa6a61acc84892a41494dd2`
 - SHA-256 of `R3-03-amendment-1.md` (whole file): `ed0cfc25451ee635720677b8282ee61daefeda2c06fa7d364b275c6d663f3d7a`
 - SHA-256 of `R3-03-amendment-2.md` (whole file): `715ef7d0d7724d54b8c809fe0e0ffcfc3dab394f466cccfbe46d9f8e51da7db1`

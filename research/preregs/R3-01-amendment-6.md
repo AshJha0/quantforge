@@ -1,7 +1,7 @@
 # R3-01 amendment 6: US Treasury curve butterfly mean reversion, forward-log writer and rule-5 scan check
 
 Status: **signed**. Signed by Claude (stage J amendment 6 lane; signing delegated by the owner, 2026-11-07, decision relayed by the stage J coordinator) on 2026-11-14. Second read: `program/R3_A6_REVIEW.md` (a separate Claude subagent; human check: none).
-- SHA-256 of the body below the marker line: `1df6d75ff5ebd5fd20ca66ac68c23af0a40d8a9c0f15d5b989a678964db66416`
+- SHA-256 of the body below the marker line: `eaab2ad5ecd08c42da6ffe5001acaf843734533dfb6bea7261612b5c7d092767`
 - SHA-256 of the amended prereg `R3-01-treasury-fly.md` (whole file): `57e047579bf2952fad7f1a15197ca1a702fe994d8c77c32f3652105bdd7d7a3e`
 - SHA-256 of `R3-01-amendment-1.md` (whole file): `a0b92234f172fe8fc0a846d0378d059a5315230213288cf813a5e767d6a9a77b`
 - SHA-256 of `R3-01-amendment-2.md` (whole file): `feb357708a5614be55217500934968fd3dc075338f6475e719ba559d69632f6e`

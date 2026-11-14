@@ -1,7 +1,7 @@
 # R3-02 amendment 6: Bill minus repo spread, forward-log writer and rule-5 scan check
 
 Status: **signed**. Signed by Claude (stage J amendment 6 lane; signing delegated by the owner, 2026-11-07, decision relayed by the stage J coordinator) on 2026-11-14. Second read: `program/R3_A6_REVIEW.md` (a separate Claude subagent; human check: none).
-- SHA-256 of the body below the marker line: `1df6d75ff5ebd5fd20ca66ac68c23af0a40d8a9c0f15d5b989a678964db66416`
+- SHA-256 of the body below the marker line: `eaab2ad5ecd08c42da6ffe5001acaf843734533dfb6bea7261612b5c7d092767`
 - SHA-256 of the amended prereg `R3-02-bill-repo-spread.md` (whole file): `9e920456b64b57c6c31a94a7b7fc6952990d8db04e932e36aff524010176d7a2`
 - SHA-256 of `R3-02-amendment-1.md` (whole file): `f68517805830f94f2a30b3cadcd9c31c26add6c4254f27db29621070daf7cc61`
 - SHA-256 of `R3-02-amendment-2.md` (whole file): `612ddd47e08b525cc53dded14a57d7a88ea7bf88bd168dbec853a05025ba5ba1`
