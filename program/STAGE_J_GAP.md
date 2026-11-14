@@ -32,7 +32,7 @@ Columns: **Kind** is `CLI` (a contract operation, built in Python, Rust, Java an
 | G22 | AI-assistance section checked by `quality_gate` | 12.5 A8 | Py (tool) | 0.5 | v0.9.0 research lane. `research/TEMPLATE.md` section 7 exists; `tools/quality_gate.py` does not check it yet (grep 2026-11-14). 14.10 rule 1: the check counts only after a run shows it failing on a report with the section removed |
 | G23 | Signals, features, performance metrics, regime views, signal and RV screens, simulation harness | row J | Py | 3 | Partly covered (backtester metrics, Viterbi labels). The rest is research-package scope; ship what the R3 and section 12 examples use, list the remainder as known issues at the J tag |
 | G24 | Survivorship statement | 12.5 Q7 | docs | 0.2 | v0.9.0 docs lane: one paragraph in `11-research/backtester.md` Limitations and the study template |
-| G25 | Day-60 forward check, about 2027-02-05 | J-9 | Py | 0.2 | **Not before its date.** Recorded as a pipeline check only; if the J tag is earlier, the tag lists it as pending with the date |
+| G25 | Day-60 forward check, about 2027-02-05 | J-9 | Py | 0.2 | **Not before its date.** Recorded as a pipeline check only; if the J tag is earlier, the release notes list it as not yet due, with the date |
 | G26 | Stage evidence close-out | J-10; 14.10 rules 1-6 | process | 3 | v0.9.0 coordinator: outside share per operation (wave 2 included), fresh mutation run, different-model audit, E1 goldens, tutorials, CHANGELOG with evidence paths |
 | G27 | Model inventory rows MI-J1 to MI-J4, plus wave 2 rows | handover | docs | 0.3 | v0.9.0 docs pass |
 

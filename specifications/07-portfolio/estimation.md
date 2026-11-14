@@ -35,6 +35,18 @@ Worked example (`estim_j-0012`): one asset, `Sigma = 0.04`, `tau = 0.05` (prior 
 - Ledoit-Wolf: `0 <= delta <= 1`; the output is symmetric positive definite whenever `delta > 0`; invariant to adding a constant to a column.
 - Black-Litterman: as `Omega` grows (all entries times `c`, `c` large) the posterior tends to the prior; with `Omega -> 0` and `P = I` it tends to `q`; the update and precision forms agree to `1e-10` (J-6).
 
+## Convergence and limit cases
+
+Both operations are closed forms with no iteration (the word "optimiser" above refers to the downstream user of the covariance), so no convergence order is asserted. The limits they must reach are:
+
+| Case | Asserted result |
+|---|---|
+| Ledoit-Wolf, `d^2 = 0` (sample covariance already a multiple of `I`, includes `N = 1`) | `delta = 0`, output equals `S` (`estim_j-0001`) |
+| Ledoit-Wolf, `bbar^2 >= d^2` | `delta = 1`, output equals `m I` |
+| Black-Litterman, `Omega` scaled by `c -> infinity` | posterior returns tend to `pi` (property test) |
+| Black-Litterman, `P = I`, `Omega -> 0` | posterior returns tend to `q` (property test) |
+| Black-Litterman update form against precision form | equal to `1e-10` (J-6) |
+
 ## Limitations
 
 Only the scaled-identity Ledoit-Wolf target (no constant-correlation or single-factor target, no nonlinear shrinkage). Black-Litterman takes the prior as an input; the reverse optimisation `pi = delta Sigma w_mkt` and the choice of `tau` and `Omega` are the caller's, and the J-6 acceptance treats the closed form only.
