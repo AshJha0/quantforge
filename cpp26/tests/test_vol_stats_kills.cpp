@@ -1,0 +1,296 @@
+// Lane J-0c: value-asserting kill tests for src/core/vol_stats.cpp (mutation cells garch_varswap_vix and garch_vix).
+// Expected values come from the Python implementation (python/quantforge_core/variance.py, an independent port of
+// the same specs) or from closed forms worked by hand; where a test pins current C++ output instead, it says so.
+// Each boundary check sits exactly on the edge, so a `<` / `<=` swap flips the outcome. Equivalent survivors are
+// listed in program/J0C_CPP_EQUIVALENT_MUTANTS.md. No namespace-scope static objects.
+#include <catch2/catch_test_macros.hpp>
+#include <chrono>
+#include <cmath>
+#include <optional>
+#include <string>
+#include <vector>
+
+#include "quantforge/core/error.hpp"
+#include "quantforge/core/vol_stats.hpp"
+
+using namespace quantforge;
+
+namespace {
+std::string code_of(auto&& f) {
+    try {
+        f();
+    } catch (const Error& e) {
+        return e.code();
+    }
+    return "none";
+}
+bool near_rel(double a, double b, double tol = 1e-13) { return std::fabs(a - b) <= tol * std::fabs(b); }
+bool near_all(const std::vector<double>& a, const std::vector<double>& b, double tol = 1e-13) {
+    if (a.size() != b.size()) return false;
+    for (std::size_t i = 0; i < a.size(); ++i)
+        if (!near_rel(a[i], b[i], tol)) return false;
+    return true;
+}
+Date day(int y, unsigned m, unsigned d) { return Date{std::chrono::year{y} / m / d}; }
+const std::vector<double>& r3() {
+    static const std::vector<double> r{0.1, -0.2, 0.05};
+    return r;
+}
+}  // namespace
+
+TEST_CASE("vol_stats kills: stage E garch loglik hand values") {
+    // Python variance.garch_loglik([0.1, -0.2, 0.05], 0.01, 0.1, 0.8, initial).
+    const GarchLoglik a = garch_loglik(r3(), 0.01, 0.1, 0.8, 0.02);
+    CHECK(near_rel(a.loglik, 1.6470068298597322));
+    CHECK(near_all(a.variances, {0.02, 0.027, 0.0356}));
+    CHECK(near_rel(a.next_variance, 0.03873));
+    const GarchLoglik s = garch_loglik(r3(), 0.01, 0.1, 0.8, std::nullopt);  // SAMPLE = mean of squares 0.0175
+    CHECK(near_rel(s.loglik, 1.678619712055633));
+    CHECK(near_all(s.variances, {0.0175, 0.025, 0.034}));
+    CHECK(near_rel(s.next_variance, 0.03745));
+}
+
+TEST_CASE("vol_stats kills: stage E garch loglik checks on their edges") {
+    const auto ll = [](std::vector<double> r, double o, double a, double b, std::optional<double> v) {
+        return code_of([&] { garch_loglik(r, o, a, b, v); });
+    };
+    CHECK(ll({0.1}, 0.01, 0.1, 0.8, 0.02) == "E_INPUT");
+    CHECK(ll({0.1, 0.2}, 0.01, 0.1, 0.8, 0.02) == "none");
+    CHECK(ll(r3(), 0.01, 0.1, 0.8, 0.0) == "E_DOMAIN");
+    CHECK(ll(r3(), 0.01, 0.1, 0.8, 1e-300) == "none");
+    CHECK(ll({0.0, 0.0}, 0.01, 0.1, 0.8, std::nullopt) == "E_DOMAIN");
+    CHECK(ll(r3(), 0.0, 0.1, 0.8, 0.02) == "E_DOMAIN");
+    CHECK(ll(r3(), 1e-300, 0.1, 0.8, 0.02) == "none");
+    CHECK(ll(r3(), 0.01, 0.0, 0.0, 0.02) == "none");
+    CHECK(ll(r3(), 0.01, -1e-300, 0.8, 0.02) == "E_DOMAIN");
+    CHECK(ll(r3(), 0.01, 0.1, -1e-300, 0.02) == "E_DOMAIN");
+    // alpha = beta = 0: every variance after the first is omega (closed form).
+    const GarchLoglik z = garch_loglik(r3(), 0.01, 0.0, 0.0, 0.02);
+    CHECK(near_all(z.variances, {0.02, 0.01, 0.01}));
+}
+
+TEST_CASE("vol_stats kills: stage F garch loglik with a mean and Student-t") {
+    GarchLaw t;
+    t.distribution = GarchDistribution::StudentT;
+    t.degrees_of_freedom = 5.0;
+    t.mean = 0.01;
+    // Python variance.garch_loglik_t(r, 0.01, 0.1, 0.8, initial, "STUDENT_T", 5.0, 0.01).
+    const GarchLoglik a = garch_loglik(r3(), 0.01, 0.1, 0.8, 0.02, t);
+    CHECK(near_rel(a.loglik, 1.5543075740725536));
+    CHECK(near_all(a.variances, {0.02, 0.02681, 0.035858}));
+    CHECK(near_rel(a.next_variance, 0.0388464));
+    const GarchLoglik s = garch_loglik(r3(), 0.01, 0.1, 0.8, std::nullopt, t);
+    CHECK(near_rel(s.loglik, 1.5479134020778096));
+    CHECK(near_all(s.variances, {0.017933333333333336, 0.025156666666666667, 0.034535333333333335}));
+    CHECK(near_rel(s.next_variance, 0.03778826666666667));
+    GarchLaw n;
+    n.mean = 0.01;
+    const GarchLoglik m = garch_loglik(r3(), 0.01, 0.1, 0.8, std::nullopt, n);
+    CHECK(near_rel(m.loglik, 1.6524254493045563));
+    CHECK(near_rel(m.next_variance, 0.03778826666666667));
+    // Edges: nu = 2 is out, just above is in; too few returns; missing nu.
+    GarchLaw e = t;
+    e.degrees_of_freedom = 2.0;
+    CHECK(code_of([&] { garch_loglik(r3(), 0.01, 0.1, 0.8, 0.02, e); }) == "E_DOMAIN");
+    e.degrees_of_freedom = 2.000001;
+    CHECK(code_of([&] { garch_loglik(r3(), 0.01, 0.1, 0.8, 0.02, e); }) == "none");
+    CHECK(code_of([&] { garch_loglik({0.1}, 0.01, 0.1, 0.8, 0.02, t); }) == "E_INPUT");
+    CHECK(code_of([&] { garch_loglik({0.1, 0.2}, 0.01, 0.1, 0.8, 0.02, t); }) == "none");
+    CHECK(code_of([&] { garch_loglik(r3(), 0.0, 0.1, 0.8, 0.02, t); }) == "E_DOMAIN");
+    CHECK(code_of([&] { garch_loglik(r3(), 0.01, 0.0, 0.0, 0.02, t); }) == "none");
+    // A constant series equal to the mean demeans to zeros: the SAMPLE start is zero.
+    CHECK(code_of([&] { garch_loglik({0.01, 0.01}, 0.01, 0.1, 0.8, std::nullopt, n); }) == "E_DOMAIN");
+}
+
+TEST_CASE("vol_stats kills: garch forecast closed form and edges") {
+    // long-run 0.01 / (1 - 0.9) = 0.1; v_k = 0.1 + 0.9^(k-1) (0.2 - 0.1).
+    const GarchForecast f = garch_forecast(0.01, 0.1, 0.8, 0.2, 3, 252.0);
+    CHECK(near_all(f.variances, {0.2, 0.19, 0.181}));
+    CHECK(near_rel(f.total_variance, 0.571));
+    CHECK(near_rel(f.long_run_variance, 0.1));
+    CHECK(near_rel(f.annualized_vol, std::sqrt(0.571 * 252.0 / 3.0)));
+    const auto fc = [](double o, double a, double b, double v, long long h, double p) {
+        return code_of([&] { garch_forecast(o, a, b, v, h, p); });
+    };
+    CHECK(fc(0.01, 0.1, 0.8, 0.2, 0, 252) == "E_INPUT");
+    CHECK(fc(0.01, 0.1, 0.8, 0.2, 1, 252) == "none");
+    CHECK(fc(0.01, 0.1, 0.8, 0.2, 1, 0.0) == "E_INPUT");
+    CHECK(fc(0.01, 0.1, 0.8, 0.2, 1, 1e-300) == "none");
+    CHECK(fc(0.01, 0.1, 0.8, 0.0, 1, 252) == "E_DOMAIN");
+    CHECK(fc(0.01, 0.1, 0.8, 1e-300, 1, 252) == "none");
+    CHECK(fc(0.0, 0.1, 0.8, 0.2, 1, 252) == "E_DOMAIN");
+    CHECK(fc(0.01, 0.25, 0.75, 0.2, 1, 252) == "E_DOMAIN");
+    CHECK(fc(0.01, 0.0, 0.0, 0.2, 1, 252) == "none");
+    // h = 1 with alpha + beta = 0: one variance, the next variance.
+    const GarchForecast g = garch_forecast(0.01, 0.0, 0.0, 0.2, 1, 4.0);
+    CHECK(near_all(g.variances, {0.2}));
+    CHECK(near_rel(g.annualized_vol, std::sqrt(0.8)));
+}
+
+TEST_CASE("vol_stats kills: garch fit and estimate edges") {
+    std::vector<double> r(29, 0.01);
+    for (std::size_t i = 0; i < r.size(); i += 2) r[i] = -0.012;
+    CHECK(code_of([&] { garch_fit(r, std::nullopt); }) == "E_INPUT");
+    CHECK(code_of([&] { garch_estimate(r, std::nullopt, GarchDistribution::Normal, false); }) == "E_INPUT");
+    r.resize(99, 0.01);
+    CHECK(code_of([&] { garch_estimate(r, std::nullopt, GarchDistribution::StudentT, false); }) == "E_INPUT");
+}
+
+TEST_CASE("vol_stats kills: realized variance hand values and edges") {
+    // Sum of squared log returns ln(101/100), ln(99.5/101), ln(102/99.5), times 252 / 3.
+    const VarSwapRealized v = varswap_realized({100, 101, 99.5, 102}, 252.0, 0.04, 10000.0);
+    const double a = std::log(1.01), b = std::log(99.5 / 101), c = std::log(102 / 99.5);
+    CHECK(near_rel(v.realized_variance, 84.0 * (a * a + b * b + c * c)));
+    CHECK(near_rel(v.realized_variance, 0.0788498979464715, 1e-12));  // Python variance.varswap_realized
+    CHECK(near_rel(v.realized_vol, 0.28080223992424186, 1e-12));
+    CHECK(near_rel(v.payoff, 388.498979464715, 1e-12));
+    CHECK(code_of([] { varswap_realized({100}, 252, 0.04, 1); }) == "E_INPUT");
+    CHECK(code_of([] { varswap_realized({100, 100}, 252, 0.04, 1); }) == "none");
+    CHECK(code_of([] { varswap_realized({100, 0}, 252, 0.04, 1); }) == "E_DOMAIN");
+    CHECK(code_of([] { varswap_realized({1e-300, 1}, 252, 0.04, 1); }) == "none");
+}
+
+namespace {
+VarSwapInputs vs_base() {
+    return {day(2026, 1, 1), day(2026, 7, 2), 100.0, 0.03, 0.01, {80.0, 90.0, 100.0}, {100.0, 115.0, 105.0},
+            {{80.0, 0.3}, {90.0, 0.25}, {100.0, 0.2}, {105.0, 0.19}, {115.0, 0.18}}, 5.0, 0.04, 1000.0};
+}
+}  // namespace
+
+TEST_CASE("vol_stats kills: variance swap fair strike value and edges") {
+    // Python variance.varswap_fair_strike on the same inputs (unsorted call strikes on purpose).
+    const VarSwapFair f = varswap_fair_strike(vs_base());
+    CHECK(near_rel(f.fair_variance, 0.048211383289539216, 1e-12));
+    CHECK(near_rel(f.fair_vol, 0.21957090720206812, 1e-12));
+    CHECK(near_rel(f.pv, 8.089464156083652, 1e-11));
+    const auto err = [](auto edit) {
+        VarSwapInputs in = vs_base();
+        edit(in);
+        return code_of([&] { varswap_fair_strike(in); });
+    };
+    CHECK(err([](VarSwapInputs& in) { in.maturity = in.as_of; }) == "E_INPUT");
+    CHECK(err([](VarSwapInputs& in) { in.maturity = in.as_of + std::chrono::days{1}; }) == "none");
+    CHECK(err([](VarSwapInputs& in) { in.put_strikes = {}; }) == "E_INPUT");
+    CHECK(err([](VarSwapInputs& in) { in.call_strikes = {}; }) == "E_INPUT");
+    CHECK(err([](VarSwapInputs& in) { in.put_strikes = {80, 80, 90, 100}; }) == "E_INPUT");
+    CHECK(err([](VarSwapInputs& in) { in.call_strikes = {100, 105, 115, 105}; }) == "E_INPUT");
+    CHECK(err([](VarSwapInputs& in) { in.put_strikes = {80, 90, 100, 105}; }) == "E_INPUT");
+    CHECK(err([](VarSwapInputs& in) { in.call_strikes = {90, 100, 105, 115}; }) == "E_INPUT");
+    CHECK(err([](VarSwapInputs& in) { in.vols.pop_back(); }) == "E_INPUT");
+    CHECK(err([](VarSwapInputs& in) { in.vols.push_back({115.0, 0.18}); }) == "E_INPUT");
+    CHECK(err([](VarSwapInputs& in) { in.vols.back().strike = 120.0; }) == "E_INPUT");
+    CHECK(err([](VarSwapInputs& in) { in.vols[2].vol = 0.0; }) == "E_DOMAIN");
+    CHECK(err([](VarSwapInputs& in) { in.vols[2].vol = 1e-3; }) == "none");
+    CHECK(err([](VarSwapInputs& in) { in.extension_step = 0.0; }) == "E_DOMAIN");
+    CHECK(err([](VarSwapInputs& in) { in.extension_step = 80.0; }) == "E_DOMAIN");
+    CHECK(err([](VarSwapInputs& in) { in.extension_step = 79.0; }) == "none");
+    // A put at spot and a call at spot are both allowed (the base already has them); spot at the edge strike.
+    CHECK(err([](VarSwapInputs& in) {
+              in.spot = 100.0;
+              in.put_strikes = {100.0};
+              in.call_strikes = {100.0};
+              in.vols = {{100.0, 0.2}};
+          }) == "none");
+    // Ruling E-B36: a replicated variance below 0 (inputs from the Python kill tests).
+    CHECK(err([](VarSwapInputs& in) {
+              in.as_of = day(2026, 1, 1);
+              in.maturity = day(2027, 1, 1);
+              in.rate = 0.5;
+              in.dividend_yield = 0.0;
+              in.put_strikes = {99.0, 100.0};
+              in.call_strikes = {100.0, 101.0};
+              in.vols = {{99.0, 0.01}, {100.0, 0.01}, {101.0, 0.01}};
+              in.extension_step = 0.5;
+          }) == "E_DOMAIN");
+}
+
+namespace {
+std::vector<VixQuote> strip1() {
+    return {{80, 20.5, 21.0, 0.1, 0.2}, {90, 11, 11.4, 0.6, 0.8},  {95, 6.8, 7.0, 1.4, 1.6},  {100, 3.3, 3.5, 3.0, 3.2},
+            {105, 1.1, 1.3, 6.0, 6.4},  {110, 0.3, 0.5, 10.2, 10.6}, {120, 0.05, 0.1, 20, 20.5}};
+}
+std::vector<VixQuote> strip2() {
+    std::vector<VixQuote> s = strip1();
+    for (auto& q : s) q = {q.strike, *q.call_bid + 0.2, *q.call_bid + 0.4, *q.put_bid + 0.1, *q.put_bid + 0.3};
+    return s;
+}
+}  // namespace
+
+TEST_CASE("vol_stats kills: VIX term variance and index values") {
+    // Python variance.vix_term_variance / vix_index on the same strips.
+    const VixTermResult a = vix_term_variance({30000, 0.02, strip1()});
+    CHECK(near_rel(a.forward, 100.30034266129914));
+    CHECK(a.k0 == 100.0);
+    CHECK(near_rel(a.variance, 0.1465740821871549, 1e-12));
+    CHECK(near_rel(a.t, 30000.0 / 525600.0));
+    CHECK(a.strikes_used == std::vector<double>{80, 90, 95, 100, 105, 110, 120});
+    const VixTermResult b = vix_term_variance({50000, 0.025, strip2()});
+    CHECK(near_rel(b.forward, 100.40095242585657));
+    CHECK(near_rel(b.variance, 0.10616637647601626, 1e-12));
+    const VixIndex x = vix_index({30000, 0.02, strip1()}, {50000, 0.025, strip2()});
+    CHECK(near_rel(x.index, 34.01574411488363, 1e-12));
+    CHECK(near_rel(x.near_variance, a.variance));
+    CHECK(near_rel(x.next_variance, b.variance));
+    // Forward between strikes (K0 = 95), one zero put bid skipped, two zero call bids end the calls.
+    const std::vector<VixQuote> s3{{85, 15, 15.2, 0, 0.05},    {90, 10.6, 10.8, 0.6, 0.8}, {95, 6.2, 6.4, 1.6, 1.8},
+                                   {100, 2.9, 3.1, 3.3, 3.5},  {105, 0.9, 1.1, 6.4, 6.6},  {110, 0.2, 0.3, 10.6, 10.8},
+                                   {115, 0, 0.05, 15, 15.2},   {120, 0, 0.05, 20, 20.2},   {125, 0.01, 0.05, 25, 25.2}};
+    const VixTermResult c = vix_term_variance({40000, 0.01, s3});
+    CHECK(near_rel(c.forward, 99.59969547013272));
+    CHECK(c.k0 == 95.0);
+    CHECK(near_rel(c.variance, 0.09293721843209246, 1e-12));
+    CHECK(c.strikes_used == std::vector<double>{90, 95, 100, 105, 110});
+}
+
+TEST_CASE("vol_stats kills: VIX checks on their edges") {
+    const auto term = [](long long m, std::vector<VixQuote> s) { return code_of([&] { vix_term_variance({m, 0.02, s}); }); };
+    CHECK(term(0, strip1()) == "E_INPUT");
+    CHECK(term(1, strip1()) == "none");
+    std::vector<VixQuote> s = strip1();
+    s.resize(2);
+    CHECK(term(30000, s) == "E_INPUT");
+    s = {{90, 11, 11.4, 0.6, 0.8}, {100, 3.3, 3.5, 3.0, 3.2}, {110, 0.3, 0.5, 10.2, 10.6}};
+    CHECK(term(30000, s) == "none");
+    s = strip1();
+    s[2].strike = 90;
+    CHECK(term(30000, s) == "E_INPUT");
+    s = strip1();
+    s[1].put_bid = 0.8;  // bid equal to ask is allowed
+    s[1].call_bid = 11.4;
+    CHECK(term(30000, s) == "none");
+    s[1].put_bid = 0.81;
+    CHECK(term(30000, s) == "E_INPUT");
+    s = strip1();
+    s[1].call_bid = 11.41;
+    CHECK(term(30000, s) == "E_INPUT");
+    s = strip1();
+    s[0].put_bid = 0.0;  // zero quote is allowed
+    CHECK(term(30000, s) == "none");
+    s[0].put_bid = -0.01;
+    CHECK(term(30000, s) == "E_DOMAIN");
+    s = strip1();
+    s[6].call_ask = -0.01;
+    s[6].call_bid = -0.02;
+    CHECK(term(30000, s) == "E_DOMAIN");
+    // Every out-of-the-money put / call excluded.
+    s = strip1();
+    for (std::size_t i = 0; i < 3; ++i) s[i].put_bid = std::nullopt;
+    CHECK(term(30000, s) == "E_INPUT");
+    s = strip1();
+    for (std::size_t i = 4; i < 7; ++i) s[i].call_bid = std::nullopt;
+    CHECK(term(30000, s) == "E_INPUT");
+    // vix_index: the bracket edges, n1 = 30 days and n2 = 30 days are both allowed.
+    const auto idx = [](long long n1, long long n2) {
+        return code_of([&] { vix_index({n1, 0.02, strip1()}, {n2, 0.025, strip2()}); });
+    };
+    CHECK(idx(43200, 50000) == "none");
+    CHECK(idx(43201, 50000) == "E_INPUT");
+    CHECK(idx(30000, 43200) == "none");
+    CHECK(idx(30000, 43199) == "E_INPUT");
+    CHECK(idx(43200, 43200) == "E_INPUT");
+    // n1 = n2 = 30 days would divide by zero; n1 at 30 days uses the near term only (weight on next is 0).
+    const VixIndex x = vix_index({43200, 0.02, strip1()}, {50000, 0.025, strip2()});
+    CHECK(near_rel(x.index, 100.0 * std::sqrt(x.near_variance)));
+    const VixIndex y = vix_index({30000, 0.02, strip1()}, {43200, 0.025, strip2()});
+    CHECK(near_rel(y.index, 100.0 * std::sqrt(y.next_variance)));
+}
