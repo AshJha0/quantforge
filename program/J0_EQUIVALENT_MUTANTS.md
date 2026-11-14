@@ -69,3 +69,7 @@ Equivalent (reason):
 Not killed, not shown equivalent (needs a crafted near-singular active set; left open):
 - `273:23 replace * with / in general_inverse` (singularity limit `1e-14 * largest`).
 - `380:38 replace / with % and * in dual_active_set` (dual step length t1).
+
+hedge.rs scoped re-runs (~/j0-v6-hedge, ~/j0-v7-hedge, ~/j0-v8-hedge, -j 1): all 13 polish/schedule mutants
+at 56:5, 56:61, 66:25, 66:19, 66:34 `+`, 71:23, 138:29, 138:18 `+` caught. hedge.rs now 97/104 viable
+killed (93.3%); the 7 remaining are the audit-AGREE equivalents above.
