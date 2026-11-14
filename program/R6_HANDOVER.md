@@ -282,3 +282,7 @@ TOTALS: 15215 value 7504 error 5197 invariance 2514
 Stage J wave 2 spec (2026-11-14) adds optimisation, estimation, ES backtest and Baum-Welch goldens, 96 cases (63 value, 33 error), target contract 1.14.0 (ruling J-W2-1). Branch stage-j-w2spec; if branch stage-j-fuzz lands first, the coordinator restates this line on top of its total.
 
 TOTALS: 15311 value 7567 error 5230 invariance 2514
+
+Stage J wave 2 fixes (2026-11-14) add four Ledoit-Wolf goldens with interior shrinkage (`estim_j-0022` to `-0025`, 4 value), each checked by scikit-learn `LedoitWolf`; contract 1.14.0 (J-W2-1), rulings J-W2-17 to J-W2-22.
+
+TOTALS: 15315 value 7571 error 5230 invariance 2514

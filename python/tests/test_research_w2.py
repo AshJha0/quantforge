@@ -5,6 +5,7 @@ import itertools
 import math
 import random
 import struct
+from typing import Any
 
 import pytest
 from hypothesis import given, settings
@@ -179,7 +180,7 @@ def _hmm_data(rng: random.Random, t: int) -> list[float]:
     return out
 
 
-def _bytes(r: dict) -> bytes:
+def _bytes(r: dict[str, Any]) -> bytes:
     flat = [*r["initial"], *(x for row in r["transition"] for x in row), *r["means"], *r["sds"],
             r["log_likelihood"]]
     return struct.pack(f"<{len(flat)}d", *flat)
@@ -225,3 +226,62 @@ def test_infeasible_bounds_and_indefinite_covariance_are_domain():
     with pytest.raises(QfError) as e:
         portfolio_mean_variance([0.1, 0.1], [[1.0, 2.0], [2.0, 1.0]], 1.0)
     assert e.value.code == "E_DOMAIN"
+
+
+# --- Rulings J-W2-17 to J-W2-22 (program/WAVE2_*_NOTES.md doubts) -----------------------------
+
+def _limit_code(op: str, raw: dict[str, object]) -> str | None:
+    from quantforge_core.cli.limits import check_limits
+    try:
+        check_limits(op, raw)
+    except QfError as e:
+        return e.code
+    return None
+
+
+def test_j_w2_17_ragged_matrix_width_counts() -> None:
+    cov = [[1.0, 0.0, 0.0], [0.0] * 501, [0.0, 0.0, 1.0]]
+    raw = {"expected_returns": [0.1, 0.1, 0.1], "covariance": cov, "risk_aversion": 1.0}
+    assert _limit_code("research.portfolio.mean_variance", raw) == "E_LIMIT"
+    raw["covariance"] = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+    assert _limit_code("research.portfolio.mean_variance", raw) is None
+
+
+def test_j_w2_18_k_is_the_longest_input() -> None:
+    raw = {"observations": [0.1, 0.2], "initial": [0.5, 0.5], "transition": [[0.5, 0.5], [0.5, 0.5]],
+           "means": [0.0] * 17, "sds": [1.0, 1.0]}
+    assert _limit_code("research.regime.baum_welch", raw) == "E_LIMIT"
+    raw["means"] = [0.0, 1.0]
+    raw["transition"] = [[0.5, 0.5], [0.5] * 17]
+    assert _limit_code("research.regime.baum_welch", raw) == "E_LIMIT"
+
+
+def test_j_w2_19_default_budgets_are_not_sum_tested() -> None:
+    cov = [[1.0 if i == j else 0.1 for j in range(7)] for i in range(7)]
+    r = portfolio_risk_parity(cov)
+    assert all(s == pytest.approx(1 / 7, abs=1e-10) for s in r["weights"])
+
+
+def test_j_w2_20_all_weights_at_bound_start() -> None:
+    cov = [[0.04, 0.01, 0.0], [0.01, 0.09, 0.02], [0.0, 0.02, 0.16]]
+    r = portfolio_mean_variance([0.3, 0.1, 0.2], cov, 2.0, lower=[0.2, 0.3, 0.5])
+    assert r["weights"] == [0.2, 0.3, 0.5]
+    assert r["at_bound"] == [-1, -1, -1]
+
+
+def test_j_w2_21_degenerate_problem_terminates() -> None:
+    # Equal means, identity covariance: both weights sit on their upper bound with zero multiplier.
+    r = portfolio_mean_variance([0.1, 0.1], [[1.0, 0.0], [0.0, 1.0]], 1.0, upper=[0.5, 0.5])
+    assert r["weights"] == [0.5, 0.5]
+    # A fixed weight (lower = upper) never leaves the working set.
+    r = portfolio_mean_variance([0.1, 0.9, 0.1], [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+                                1.0, lower=[0.0, 0.3, 0.0], upper=[1.0, 0.3, 1.0])
+    assert r["weights"][1] == 0.3 and r["at_bound"][1] == -1
+
+
+def test_j_w2_22_ledoit_wolf_sizes() -> None:
+    assert _limit_code("research.estimate.ledoit_wolf", {"returns": [[0.0] * 501] * 2}) == "E_LIMIT"
+    assert _limit_code("research.estimate.ledoit_wolf",
+                       {"returns": [[0.0, 0.0], [0.0] * 500]}) is None
+    rows = [[0.0]] * 20_001 + [[0.0] * 500]
+    assert _limit_code("research.estimate.ledoit_wolf", {"returns": rows}) == "E_LIMIT"

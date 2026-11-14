@@ -1,16 +1,17 @@
 """Rulings J-20 to J-22 (specifications/stage-j-rulings-w1.md) through the CLI entry point."""
 
 import json
+from typing import Any
 
 from quantforge_core.cli.main import run_case
 
 
-def _run(operation: str, inputs: dict) -> dict:
+def _run(operation: str, inputs: dict[str, Any]) -> dict[str, Any]:
     doc = {"schema_version": "1.0", "case_id": "c", "operation": operation, "inputs": inputs}
     return run_case(json.dumps(doc))
 
 
-def _backtest(n: int) -> dict:
+def _backtest(n: int) -> dict[str, Any]:
     return _run("research.backtest.run", {"prices": [100.0] * n, "targets": [0.0] * n})
 
 

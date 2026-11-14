@@ -122,20 +122,17 @@ MeanVariance mean_variance(const Vec& mu, const Mat& sigma_in, double gamma, Vec
     Vec w = lower;
     std::vector<int> state(n, -1);  // -1 at lower, +1 at upper, 0 free (working set = nonzero)
     double rest = 1 - sl;
-    std::size_t free_one = n - 1;
     for (std::size_t i = 0; i < n; ++i) {
         const double room = upper[i] - lower[i];
         if (rest > room) {
             w[i] = upper[i];
-            state[i] = 1;
             rest -= room;
         } else {
             w[i] = lower[i] + rest;
-            free_one = i;
             break;
         }
     }
-    state[free_one] = 0;
+    for (std::size_t i = 0; i < n; ++i) state[i] = w[i] == lower[i] ? -1 : (w[i] == upper[i] ? 1 : 0);
 
     const std::size_t max_iter = 50 * n + 100;
     bool solved = false;
@@ -144,6 +141,10 @@ MeanVariance mean_variance(const Vec& mu, const Mat& sigma_in, double gamma, Vec
         std::vector<std::size_t> f;
         for (std::size_t i = 0; i < n; ++i)
             if (state[i] == 0) f.push_back(i);
+        if (f.empty()) {  // J-W2-20: free the last asset; the budget fixes its weight and nu
+            state[n - 1] = 0;
+            f.push_back(n - 1);
+        }
         const std::size_t m = f.size();
         Mat sff(m, Vec(m));
         Vec rhs(m), ones(m, 1.0);
@@ -177,22 +178,23 @@ MeanVariance mean_variance(const Vec& mu, const Mat& sigma_in, double gamma, Vec
         int block_side = 0;
         for (std::size_t a = 0; a < m; ++a) {
             const std::size_t i = f[a];
-            if (p[a] < 0 && target[a] < lower[i]) {
+            // J-W2-21: a target blocks only beyond 1e-14 (1 + |bound|).
+            if (p[a] < 0 && target[a] < lower[i] - 1e-14 * (1 + std::fabs(lower[i]))) {
                 const double t = (lower[i] - w[i]) / p[a];
                 if (t < step) step = t, block = i, block_side = -1;
-            } else if (p[a] > 0 && target[a] > upper[i]) {
+            } else if (p[a] > 0 && target[a] > upper[i] + 1e-14 * (1 + std::fabs(upper[i]))) {
                 const double t = (upper[i] - w[i]) / p[a];
                 if (t < step) step = t, block = i, block_side = 1;
             }
         }
         if (block == n) {
-            for (std::size_t a = 0; a < m; ++a) w[f[a]] = target[a];
+            for (std::size_t a = 0; a < m; ++a) w[f[a]] = std::clamp(target[a], lower[f[a]], upper[f[a]]);
             // Multipliers of the working set: g_i = mu_i - gamma (Sigma w)_i - nu.
             const Vec sw = mul(sigma, w);
             std::size_t worst = n;
-            double worst_v = 0;
+            double worst_v = 1e-13;  // J-W2-21; a fixed weight (lower = upper) never leaves
             for (std::size_t i = 0; i < n; ++i) {
-                if (state[i] == 0) continue;
+                if (state[i] == 0 || lower[i] == upper[i]) continue;
                 const double g = mu[i] - gamma * sw[i] - nu;
                 const double viol = state[i] < 0 ? g : -g;  // positive = wrong sign
                 if (viol > worst_v) worst_v = viol, worst = i;
@@ -225,6 +227,7 @@ RiskParity risk_parity(const Mat& sigma_in, Vec b) {
     const std::size_t n = sigma_in.size();
     if (n < 1) input("covariance is empty", "covariance");
     square(sigma_in, n, "covariance");
+    const bool supplied = !b.empty();
     if (b.empty()) b.assign(n, 1.0 / static_cast<double>(n));
     if (b.size() != n) input("budgets must have length N", "budgets");
     double sb = 0;
@@ -232,7 +235,8 @@ RiskParity risk_parity(const Mat& sigma_in, Vec b) {
         if (!(v > 0)) domain("budgets must be positive", "budgets");
         sb += v;
     }
-    if (std::fabs(sb - 1) > 1e-12) domain("budgets must sum to 1", "budgets");
+    if (supplied && std::fabs(sb - 1) > 1e-12) domain("budgets must sum to 1", "budgets");  // J-W2-19
+
     const Mat sigma = symmetric(sigma_in, "covariance");
     (void)cholesky(sigma, "covariance");
     for (double& v : b) v /= sb;

@@ -3905,7 +3905,7 @@
     "research",
     "synthetic"
    ],
-   "description": "long-short: a hedge leg has negative contribution"
+   "description": "long-short: the short hedge leg has a positive contribution (negative weight times negative marginal)"
   },
   {
    "case_id": "optim_j-0043",

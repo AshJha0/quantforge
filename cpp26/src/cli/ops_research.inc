@@ -232,12 +232,12 @@ void op_risk_contrib_euler(const In& in, Out& out) {
 
 void op_research_ledoit_wolf(const In& in, Out& out) {
     const Matrix x = in.matrix("returns");
-    std::size_t widest = 0, total = 0;
-    for (const Vec& r : x) {
-        widest = std::max(widest, r.size());
-        total += r.size();
-    }
-    limit_if(x.size() > 1000000 || total > 10000000 || widest > 500, "returns");
+    std::size_t widest = 0;
+    for (const Vec& r : x) widest = std::max(widest, r.size());
+    // J-W2-22: columns are the longest row; cells are rows times that width.
+    limit_if(x.size() > 1000000 || widest > 500 ||
+                 product_above(static_cast<long long>(x.size()), static_cast<long long>(widest), 10000000),
+             "returns");
     in.ready();
     const research::LedoitWolf r = research::ledoit_wolf(x);
     key_matrix(out, "covariance", r.covariance);
@@ -283,8 +283,11 @@ void op_research_baum_welch(const In& in, Out& out) {
     const Vec means = in.reals("means"), sds = in.reals("sds");
     const double tol = in.real("tolerance", 1e-10);
     const long long max_it = in.integer("max_iterations", 1000);
-    const std::size_t k = initial.size();
-    limit_if(k > 16 || transition.size() > 16 || means.size() > 16 || sds.size() > 16, "initial");
+    // J-W2-18: K is the longest of initial, means, sds and the rows or row widths of transition.
+    std::size_t k = std::max({initial.size(), transition.size(), means.size(), sds.size()});
+    for (const Vec& r : transition) k = std::max(k, r.size());
+    limit_if(k > 16, "initial");
+
     limit_if(max_it > 10000, "max_iterations");
     limit_if(y.size() > 1000000, "observations");
     limit_if(product_above(static_cast<long long>(y.size()), static_cast<long long>(k), 10000000), "observations");

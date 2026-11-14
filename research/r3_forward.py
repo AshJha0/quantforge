@@ -263,22 +263,39 @@ def build(entries: list[Entry], runs: dict[str, dict[str, str]], mode: str, done
     return out
 
 
-def judgement(rows: Iterable[Entry], holidays: set[str], need: int = 250) -> dict[str, dict[str, Any]]:
+CUTOFF = date(2027, 11, 5)  # amendment 8 Change 1
+
+
+def judgement(rows: Iterable[Entry], holidays: set[str], need: int = 250, as_of: date | None = None,
+              cutoff: date = CUTOFF) -> dict[str, dict[str, Any]]:
     """Amendment 7 Change 1: counted days per study (US business days with a companion row whose position is
-    defined) and the judgement date, the counted day on which the count reaches `need`. Reads no return."""
+    defined) and the judgement date, the counted day on which the count reaches `need`. Amendment 8: only rows
+    dated on or before `cutoff` and written by its end count; `status` is `judged on <date>`, `not yet judged`
+    (before the cut-off) or `not judged: insufficient data`. Reads no return."""
+    written = cutoff.isoformat() + "T23:59:59Z"
     days: dict[str, set[date]] = {}
     for e in rows:
         rec = e["record"]
         st = rec["series_id"].split("/", 1)[1]
         if rec["value"]["payload"].get("position") is None:
             continue
+        kt = rec.get("knowledge_time")
+        if kt is not None and kt > written:
+            continue
         x = row_date(e)
-        if x.weekday() < 5 and x.isoformat() not in holidays:
+        if x <= cutoff and x.weekday() < 5 and x.isoformat() not in holidays:
             days.setdefault(st, set()).add(x)
     out: dict[str, dict[str, Any]] = {}
     for st in STUDIES:
         ds = sorted(days.get(st, set()))
-        out[st] = {"counted_days": len(ds), "judgement_date": ds[need - 1].isoformat() if len(ds) >= need else None}
+        jd = ds[need - 1].isoformat() if len(ds) >= need else None
+        if jd is not None:
+            status = f"judged on {jd}"
+        elif as_of is None or as_of <= cutoff:
+            status = "not yet judged"
+        else:
+            status = "not judged: insufficient data"
+        out[st] = {"counted_days": len(ds), "judgement_date": jd, "status": status}
     return out
 
 
