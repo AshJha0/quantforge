@@ -1,10 +1,10 @@
 # Tutorials
 
-Twenty-one guided tutorials, each 10 to 15 minutes, that walk through what QuantForge already does. Each one starts from small synthetic data you can follow by hand, runs it in Python first, then sends the same operations to the Rust, Java and C++ builds, which print the same digits. Every number on every page is real output, and CI runs each page in all four languages and fails if a printed line differs (`.github/workflows/tutorial.yml`, `tools/check_tutorial.py`).
+Twenty-four guided tutorials, each 10 to 15 minutes, that walk through what QuantForge already does. Each one starts from small synthetic data you can follow by hand, runs it in Python first, then sends the same operations to the Rust, Java and C++ builds, which print the same digits. Every number on every page is real output, and CI runs each page in all four languages and fails if a printed line differs (`.github/workflows/tutorial.yml`, `tools/check_tutorial.py`).
 
 Each tutorial explains its results in the same order: the plain idea, the formal statement from the spec, then a worked example with a check you can do in your head. Each ends with notes for practitioners, common mistakes, what you just did, and references.
 
-Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the four command-line programs the others use. After that the order is free, except that Tutorial 6 introduces the Hull-White model that Tutorials 5 and 7 also use, and Tutorial 21 reruns the backtest of Tutorial 17 with costs.
+Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the four command-line programs the others use. After that the order is free, except that Tutorial 6 introduces the Hull-White model that Tutorials 5 and 7 also use, and Tutorial 21 reruns the backtest of Tutorial 17 with costs, and Tutorial 24 follows on from Tutorial 23.
 
 | Tutorial | What you do | Operations | Stage |
 |---|---|---|---|
@@ -30,10 +30,12 @@ Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the f
 | [20. One hedge for equity and rates](tutorial-20-cross-asset.md) | An equity book's equity and key-rate risks hedged together, and the best two instruments out of three | `hedge.crossasset.solve`, `hedge.select.solve` | I |
 | [21. What a hedge costs](tutorial-21-hedge-costs.md) | Spread, impact and margin in a hedge, the risk-against-cost frontier, a backtest with costs, slippage | `hedge.qp.solve`, `hedge.frontier.solve`, `hedge.backtest.delta`, `hedge.slippage.report` | I |
 | [22. A calibration method test](tutorial-22-q6-method-test.md) | Q6 on synthetic noisy quotes: arbitrage check, churn bound, fit quality; a labelled method test, not real quotes | `research/q6/q6_method_test.py` (Python research tool) | R6 |
+| [23. Backtest honestly](tutorial-23-backtest-honestly.md) | One strategy through both backtest engines, cost attribution, the look-ahead canary, purged k-fold with an embargo, CPCV counts | `research.backtest.run`, `research.cv.purged_kfold`, `research.cv.cpcv_paths` | J |
+| [24. Is the Sharpe real?](tutorial-24-is-the-sharpe-real.md) | Regime labels by Viterbi, PSR, the deflated Sharpe ratio of Bailey and Lopez de Prado, the minimum detectable Sharpe, PBO by hand | `research.regime.viterbi`, `research.stats.psr`, `research.stats.dsr`, `research.stats.power`, `research.stats.pbo` | J |
 
 ## How the scripts work
 
-Tutorials 2 to 16 each run one script in `examples/tutorials/`. Tutorials 17 to 21 (stage I, hedging) instead show a short Python script on the page, calling `quantforge_core` directly, and a standard-library script per page, `examples/tutorial_hedge_17.py` to `examples/tutorial_hedge_21.py`, that sends the same cases to the Rust, Java or C++ build. The script calls operations by their names in `specifications/name-map.json` through one helper, `examples/tutorials/qf.py`: with no argument it uses the Python package in the same process, and with a command line it sends each case to that build's `batch` command (`specifications/cli-contract.md`). So one script, unchanged, drives all four implementations, and the page shows it in full; CI checks that the listing on the page equals the file.
+Tutorials 2 to 16, 23 and 24 each run one script in `examples/tutorials/`. Tutorials 17 to 21 (stage I, hedging) instead show a short Python script on the page, calling `quantforge_core` directly, and a standard-library script per page, `examples/tutorial_hedge_17.py` to `examples/tutorial_hedge_21.py`, that sends the same cases to the Rust, Java or C++ build. The script calls operations by their names in `specifications/name-map.json` through one helper, `examples/tutorials/qf.py`: with no argument it uses the Python package in the same process, and with a command line it sends each case to that build's `batch` command (`specifications/cli-contract.md`). So one script, unchanged, drives all four implementations, and the page shows it in full; CI checks that the listing on the page equals the file.
 
 ```bash
 uv run --project python python examples/tutorials/t4_credit.py          # Python
@@ -42,7 +44,7 @@ python examples/tutorials/t4_credit.py rust/target/release/quantforge   # Rust, 
 
 To check a page yourself, as CI does: `python tools/check_tutorial.py --lang rust` (all pages) or add `--page docs/getting-started/tutorial-4-credit.md`. Pages 2 to 21 use the builds that page 1 makes, so check page 1 first in a fresh clone.
 
-Scripts that send several cases at once and read their diagnostics, as in Tutorials 8 to 16, use `runner` from the same helper, the batch form of `connect`. Tutorial 1 is the first exception: to show what the library looks like from Python, its page calls the `quantforge_core` package directly, and a standard-library script, `examples/tutorial_swap.py`, sends the same three operations to the Rust, Java or C++ `batch` command. The hedging tutorials, 17 to 21, follow tutorial 1's form (ruling I-52): the page's Python block imports the `quantforge_core` modules, and `examples/tutorial_hedge_17.py` to `tutorial_hedge_21.py` send the same cases, built from the `examples/hedge_*_i.json` inputs, to the other builds. CI runs all twenty-one pages in all four languages.
+Scripts that send several cases at once and read their diagnostics, as in Tutorials 8 to 16, use `runner` from the same helper, the batch form of `connect`. Tutorial 1 is the first exception: to show what the library looks like from Python, its page calls the `quantforge_core` package directly, and a standard-library script, `examples/tutorial_swap.py`, sends the same three operations to the Rust, Java or C++ `batch` command. The hedging tutorials, 17 to 21, follow tutorial 1's form (ruling I-52): the page's Python block imports the `quantforge_core` modules, and `examples/tutorial_hedge_17.py` to `tutorial_hedge_21.py` send the same cases, built from the `examples/hedge_*_i.json` inputs, to the other builds. CI runs every page in each language it marks; Tutorial 22, a Python research tool, runs in Python only.
 
 ## Where to go next
 
