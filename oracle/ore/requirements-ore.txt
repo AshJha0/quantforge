@@ -1,0 +1,5 @@
+# ORE 1.8.17.0 Python wheel (Modified BSD, free, PyPI). Hashes are the sha256 of the cp312 wheels published on PyPI
+# (checked 2026-11-14); installed with --require-hashes by .github/workflows/ore-g42b.yml and oracle/ore/run_g42b.py.
+open-source-risk-engine==1.8.17.0 \
+    --hash=sha256:e9a6d9cfe974c759fe9e9db9afe6a5cd4f82b9de83ec15f92ca68f4945e3d122 \
+    --hash=sha256:c34ca87410350c1454f9e356057a77527d68fd2c8097d86674ec3a1d058d0708
