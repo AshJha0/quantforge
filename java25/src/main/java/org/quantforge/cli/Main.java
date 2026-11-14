@@ -175,7 +175,8 @@ public final class Main {
                 throw new QfError("E_SCHEMA", "case is not an object");
             }
             Function<In, Operations.Out> op = checkEnvelope(envelope);
-            Operations.Out result = apply(op, new In((Map<?, ?>) envelope.get("inputs")));
+            Operations.Out result = apply(op, new In((Map<?, ?>) envelope.get("inputs"),
+                    !In.pageLimited((String) envelope.get("operation"))));
             if (!finite(result.outputs())) {
                 throw new QfError("E_NON_FINITE", "a result is NaN or infinite");
             }

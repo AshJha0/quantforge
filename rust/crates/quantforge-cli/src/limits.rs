@@ -233,6 +233,7 @@ fn raised_array_keys(op: &str) -> &'static [&'static str] {
         "book.lifecycle.apply" => &["events"],
         "research.backtest.run" => &["prices", "targets"],
         "research.cv.purged_kfold" => &["t0", "t1"],
+        "research.stats.pbo" => &["performance"], // ruling J-20: rows judged by J-15's cell cap
         _ => &[],
     }
 }
@@ -240,13 +241,19 @@ fn raised_array_keys(op: &str) -> &'static [&'static str] {
 /// The generic array rule, with the F-42 raised lists judged at 1,000,000 instead.
 fn too_long_with_raised(op: &str, i: &Json) -> bool {
     let raised = raised_array_keys(op);
+    // Ruling J-20: PBO rows are bounded by the 10,000,000-cell page limit, not 1,000,000.
+    let cap = if op == "research.stats.pbo" {
+        10_000_000
+    } else {
+        1_000_000
+    };
     let Json::Obj(keys) = i else {
         return too_long(i);
     };
     keys.iter().any(|(k, v)| {
         if raised.contains(&k.as_str()) {
             return match v {
-                Json::Arr(a) => a.len() > 1_000_000 || a.iter().any(too_long),
+                Json::Arr(a) => a.len() > cap || a.iter().any(too_long),
                 _ => false,
             };
         }

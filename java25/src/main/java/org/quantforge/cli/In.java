@@ -30,8 +30,24 @@ final class In {
 
     /** Wraps a case's inputs and notes any array over the general limit, used by the operation or not. */
     In(Map<?, ?> values) {
+        this(values, true);
+    }
+
+    /**
+     * Wraps a case's inputs. With {@code generalLimit} false the per-array limit is skipped: ruling J-20, the
+     * wave 1 operations check their own page limits instead.
+     */
+    In(Map<?, ?> values, boolean generalLimit) {
         this(values, new QfError[2]);
-        scanArrays(values);
+        if (generalLimit) {
+            scanArrays(values);
+        }
+    }
+
+    /** Ruling J-20: true for the operations whose page limits replace the general per-array limit. */
+    static boolean pageLimited(String operation) {
+        return operation.startsWith("research.backtest.") || operation.startsWith("research.cv.")
+                || operation.startsWith("research.regime.") || operation.startsWith("research.stats.");
     }
 
     private void scanArrays(Object v) {

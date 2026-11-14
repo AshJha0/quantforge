@@ -8,6 +8,8 @@ mod golden_replay;
 mod input;
 mod limits;
 mod ops;
+#[cfg(test)]
+mod rulings_j_tests;
 
 use input::Inputs;
 use ops::{dispatch, operations};
