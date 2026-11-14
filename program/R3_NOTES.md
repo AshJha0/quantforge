@@ -78,3 +78,7 @@ Stated overlap: R3-03's in-sample years 2013-2015 are R3-01 holdout years of the
 ## Holdout run, 2026-11-14: done
 
 Freeze `faadaa4`, run log `22d0c92`, one run each. All three fail; Holm rejects none. Results: `research/r3/RESULTS.md`. Open: R3-02's bootstrap SE is NaN (mostly-flat trial), stated there; R3-02 dummy-controlled check done post-hoc, report-only (RESULTS.md). Forward-log back-fill (amendment 3 rules 3-5) due but blocked: rule 4 names the run-line script, which has no writer and is hash-pinned; needs a new amendment.
+
+## Forward-log back-fill, 2026-11-14 (amendment 6): done
+
+Amendment 6 (shared, signed 08cda6f; second read `program/R3_A6_REVIEW.md`) names the writer `research/r3_forward.py` and the rule-5 check `holdout_scan.signal_check` (run by `test_preregs.py`). Back-fill run once from 1f26ddc on `origin/forward-log` e13896b (log head 2025e69f): 33 companion rows in `research/r3/forward_signals.jsonl` (30 back-filled, 3 rule-3 rows dated 2026-11-14), run line in `research/r3/forward_runs.csv`, R3-03 fit in `research/r3/forward_fit.json`. R3-01 and R3-02 all null (218 of 500 recorded days; 0 of 60 spread values); R3-03 November forecast -10.31 bp, position -1. No verdict or frozen output changed. Documented in `docs/developer-guides/recorder-actions.md` ("Study signals: companion rows"). Open: owner decision on how null-signal days count toward the 250-day forward judgement (R3-01 window full about December 2027); `daily` mode not yet wired into the recorder job.

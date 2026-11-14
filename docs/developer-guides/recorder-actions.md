@@ -53,3 +53,7 @@ A day counts as recorded if either log has a successful row for it. That is why 
 ## Signed rows (from 2026-11-13)
 
 Each forward-log commit is signed with the owner's SSH signing key, stored as the Actions secret `FORWARD_LOG_SIGNING_KEY` and registered on the owner's GitHub account as a signing key. GitHub shows those commits as Verified. Commits before 2026-11-13 are unsigned; their dates rest on the OpenTimestamps anchors on branch `forward-log-anchors`. A fork without the secret pushes unsigned rows, so the recorder never fails for want of the key.
+
+## Study signals: companion rows (R3 amendment 6, from 2026-11-14)
+
+The recorder's `study/<id>` rows on `forward-log` always keep `"signal": null` and `"position": null`; the log is never edited. Once a study's holdout run is logged in `research/holdout_runs.csv`, its signal fields go in companion rows in `research/r3/forward_signals.jsonl` (same chained format), one per forward-log study row, written by `research/r3_forward.py` (`backfill` once, then `daily`, run by hand until wired into the job). Each companion row names the row it fills by hash, uses only the recorded inputs that row had (R3-03: the frozen in-sample month means in `research/r3/forward_fit.json`), and carries no P&L. Every writer run is logged in `research/r3/forward_runs.csv`. `research/test_preregs.py` runs the rule-5 check (`holdout_scan.py --signals`). Rules: `research/preregs/R3-01-amendment-3.md` and `-amendment-6.md`.

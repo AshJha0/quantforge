@@ -15,7 +15,7 @@ class PreregHashes(unittest.TestCase):
     def test_every_signed_file_matches_its_recorded_hashes(self):
         readme = body_sha((D / "README.md").read_bytes())
         files = sorted(D.glob("R3-*.md"))
-        self.assertEqual(len(files), 16)
+        self.assertEqual(len(files), 19)
         for f in files:
             b = f.read_bytes()
             head = b[:b.index(MARK)].decode()
@@ -25,13 +25,19 @@ class PreregHashes(unittest.TestCase):
             if "amendment" in f.name:
                 self.assertEqual(hashlib.sha256((D / m.group(1)).read_bytes()).hexdigest(), m.group(2), f.name)
                 self.assertIn("Prior knowledge", b.decode())
-            if any(f"amendment-{i}" in f.name for i in (3, 4, 5)):
-                extra = {"amendment-4": ("-amendment-3.md",), "amendment-5": ("-amendment-3.md", "-amendment-4.md")}
+            if any(f"amendment-{i}" in f.name for i in (3, 4, 5, 6)):
+                extra = {"amendment-4": ("-amendment-3.md",), "amendment-5": ("-amendment-3.md", "-amendment-4.md"),
+                         "amendment-6": ("-amendment-3.md", "-amendment-4.md")
+                         + (("-amendment-5.md",) if (D / f"{f.name[:5]}-amendment-5.md").exists() else ())}
                 extra = tuple(f"{f.name[:5]}{e}" for k, v in extra.items() if k in f.name for e in v)
                 for n in (f"{f.name[:5]}-amendment-1.md", f"{f.name[:5]}-amendment-2.md", "DEVIATION-2026-11-12-recorder-rule.md", *extra):
                     m = re.search(rf"`{re.escape(n)}` \(whole file\): `([0-9a-f]{{64}})`", head)
                     self.assertEqual(hashlib.sha256((D / n).read_bytes()).hexdigest(), m.group(1), f.name)
-            if any(f"amendment-{i}" in f.name for i in (2, 3, 4, 5)):
+            if any(f"amendment-{i}" in f.name for i in (2, 3, 4, 5, 6)):
+                if "amendment-6" in f.name:
+                    for rel in ("holdout_runs.csv", "r3_runner.py", "r3_in_sample.py", "r3_data.py"):
+                        m = re.search(rf"`research/{re.escape(rel)}` \(whole file\): `([0-9a-f]{{64}})`", head)
+                        self.assertEqual(hashlib.sha256((D.parent / rel).read_bytes()).hexdigest(), m.group(1), rel)
                 m = re.search(r"`DEVIATION-2026-11-12.md` \(whole file\): `([0-9a-f]{64})`", head)
                 self.assertEqual(hashlib.sha256((D / "DEVIATION-2026-11-12.md").read_bytes()).hexdigest(), m.group(1), f.name)
 
@@ -119,6 +125,20 @@ class HoldoutObservations(unittest.TestCase):
         self.assertFalse(covered("forward-log:reports/2027-05-03/sofr-check.json", rs))  # after it
         self.assertFalse(covered("forward-log:reports/2026-11-12/p&l-explain.json", rs))  # another report
         self.assertEqual(unlisted([("forward-log:reports/2026-11-12/sofr-check.json",), ("docs/x.md",)]), ["docs/x.md"])
+
+class ForwardSignals(unittest.TestCase):
+    """Amendment 3 rule 5 (amendment 6 Change 5): no study row may carry a signal or position written before the
+    study's holdout run, from a tree without its run line, or dated before the run without the back-fill marks."""
+
+    def test_no_early_or_unmarked_signal(self):
+        self.assertEqual(holdout_scan.signal_scan_all(), [])
+
+    def test_planted_early_signal_is_caught(self):
+        row = {"record": {"series_id": "study/R3-01", "event_time": "2026-11-12T21:00:00Z",
+                          "knowledge_time": "2026-11-12T21:00:00Z", "value": {"commit": "nope", "payload": {"signal": 0.1}}}}
+        bad = holdout_scan.signal_check([row], {"R3-01": "2026-11-14"}, show=lambda c: None)
+        self.assertEqual([b[1][0] for b in bad], ["b", "c", "d"])
+
 
 
 class Q6Prereg(unittest.TestCase):
