@@ -403,5 +403,9 @@ fn stage_i_examples() {
 /// Stage J wave 1 research goldens (backtester, purged CV, Viterbi, research statistics).
 #[test]
 fn stage_j_w1_goldens() {
-    replay_only("stage_j", &["backtest_j", "purgedcv_j", "regime_j", "rstats_j"], 99);
+    replay_only(
+        "stage_j",
+        &["backtest_j", "purgedcv_j", "regime_j", "rstats_j"],
+        99,
+    );
 }

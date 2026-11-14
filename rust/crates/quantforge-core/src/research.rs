@@ -86,7 +86,7 @@ pub fn backtest(
                 };
                 let sk = dk.abs() * prices[k] * hs * m;
                 let ck = dk.abs() * c.commission_per_unit;
-                let fk = if dk != 0.0 { c.fixed_per_trade } else { 0.0 };
+                let fk = if dk == 0.0 { 0.0 } else { c.fixed_per_trade };
                 for (vec, x) in v.iter_mut().zip([qk, dk, gk, sk, ck, fk]) {
                     vec.push(x);
                 }
@@ -120,7 +120,7 @@ pub fn backtest(
             let cm = d.iter().map(|x| x.abs() * c.commission_per_unit).collect();
             let f = d
                 .iter()
-                .map(|&x| if x != 0.0 { c.fixed_per_trade } else { 0.0 })
+                .map(|&x| if x == 0.0 { 0.0 } else { c.fixed_per_trade })
                 .collect();
             (q, d, g, s, cm, f)
         }
@@ -190,9 +190,7 @@ pub fn purged_kfold(
         let lo = t0[a];
         let hi = t1[a..b].iter().copied().fold(f64::NEG_INFINITY, f64::max);
         let train = (0..n)
-            .filter(|&j| {
-                !(a..b).contains(&j) && !(b..b + h).contains(&j) && !(t0[j] <= hi && t1[j] >= lo)
-            })
+            .filter(|&j| !(a..b + h).contains(&j) && (t0[j] > hi || t1[j] < lo))
             .collect();
         folds.push(Fold {
             test: (a..b).collect(),
@@ -332,7 +330,7 @@ pub fn regime_viterbi(
 
 // ---------------------------------------------------------------- statistics
 
-pub const EULER_GAMMA: f64 = 0.577_215_664_901_532_9;
+pub const EULER_GAMMA: f64 = std::f64::consts::EULER_GAMMA;
 
 /// `(z, Phi(z))` of the PSR against `benchmark`.
 pub fn psr(sr: f64, n_obs: i64, skew: f64, kurtosis: f64, benchmark: f64) -> Result<(f64, f64)> {
@@ -452,7 +450,7 @@ pub fn pbo(perf: &[Vec<f64>], s: i64, m: Metric) -> Result<(f64, Vec<f64>)> {
         || perf.iter().any(|r| r.len() != n)
         || s < 2
         || s % 2 != 0
-        || t % (s as usize) != 0
+        || !t.is_multiple_of(s as usize)
         || t / (s as usize) < 2
     {
         return fail(
@@ -464,7 +462,7 @@ pub fn pbo(perf: &[Vec<f64>], s: i64, m: Metric) -> Result<(f64, Vec<f64>)> {
     let rows = t / s;
     let col = |idx: &[usize], j: usize| -> Vec<f64> {
         idx.iter()
-            .flat_map(|&b| (b * rows..(b + 1) * rows).map(move |r| r))
+            .flat_map(|&b| b * rows..(b + 1) * rows)
             .map(|r| perf[r][j])
             .collect()
     };
@@ -678,7 +676,7 @@ mod tests {
     #[test]
     fn viterbi_equals_brute_force() {
         let mut g = Lcg(9);
-        let mut row = |g: &mut Lcg, k: usize| {
+        let row = |g: &mut Lcg, k: usize| {
             let v: Vec<f64> = (0..k).map(|_| 0.05 + g.next()).collect();
             let s: f64 = v.iter().sum();
             v.into_iter().map(|x| x / s).collect::<Vec<f64>>()
