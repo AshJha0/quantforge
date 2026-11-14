@@ -1,4 +1,4 @@
-"""Stage J wave 1 outside-library checks (J-19, R6-13 outside share). Reads the committed goldens; never writes them.
+"""Stage J outside-library checks, waves 1 and 2 (J-19, J-W2-15, R6-13 outside share). Reads the committed goldens; never writes them.
 
 Each check runs a well-known open-source library on the golden's inputs and compares every compared output at the
 golden's own tolerance class (conformance/tolerances/policy.yaml: simple_analytic 1e-12 abs + 1e-10 rel, per_unit
@@ -16,9 +16,19 @@ Libraries (separate venv, not the uv oracle env; pinned in requirements-outside-
   skfolio       CombinatorialPurgedCV n_splits and n_test_paths
   statsmodels   NormalIndPower(ratio=0) one-sample power solver (mds, years_required)
   vectorbt      Portfolio.from_orders, target amounts, per-order fees and fixed fees (backtester)
+Wave 2 (J-W2-15, ruling J-W2-16; program/WAVE2_ORACLE_NOTES.md):
+  daqp          dual active-set QP for mean-variance (PyPortfolioOpt max_quadratic_utility on Clarabel as a second
+                solver, reported per case, not counted)
+  cvxpy+clarabel  risk parity as min 1/2 y'Sy - b'log y (exponential cone), w = y / sum y
+  autograd      Euler marginal risk as the derivative of sigma(w)
+  scikit-learn  LedoitWolf (same scaled-identity estimator and 1/T convention as J-W2-7)
+  PyPortfolioOpt  BlackLittermanModel bl_returns, bl_cov
+  hmmlearn      GaussianHMM.fit (Baum-Welch) from the given start values, its own stop rule
+  esbt_j        no free library computes the Acerbi-Szekely Z2; not counted
 
     python -m venv <venv outside the repo> && <venv>/Scripts/pip install -r requirements-outside-j.txt
     cd oracle/python && <venv>/Scripts/python -W ignore outside_j.py      writes oracle/OUTSIDE_J.json
+    ... outside_j.py --wave 2      runs wave 2 only; the other wave's suites are kept from the committed file
 """
 import importlib.metadata as md
 import json
@@ -32,7 +42,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 GOLD = ROOT / "datasets" / "golden" / "stage_j"
 OUT = ROOT / "oracle" / "OUTSIDE_J.json"
-TOL = {"simple_analytic": (1e-12, 1e-10), "per_unit": (1e-10, 1e-8), "date_and_convention": None}
+TOL = {"simple_analytic": (1e-12, 1e-10), "per_unit": (1e-10, 1e-8), "root_finding": (1e-10, 1e-10),
+       "likelihood_sum": (1e-9, 1e-10), "date_and_convention": None}
 
 
 def ver(p):
@@ -51,6 +62,11 @@ def cls(case, out):
 def check(case, out, outside, via="library"):
     g = case["expected"]["outputs"][out]
     t = TOL[cls(case, out)]
+    lim = case.get("tolerance_limit")
+    if lim and out not in case.get("output_classes", {}) and t is not None:
+        # As conformance/runner/runner.py: a per-case tolerance_limit replaces the base class for outputs without
+        # their own class (baumwelch_j parameters, J-W2-9).
+        t = (lim.get("absolute", t[0]), lim.get("relative", t[1]))
     if t is None:
         ok = json.loads(json.dumps(g)) == json.loads(json.dumps(outside))
         return {"output": out, "golden": g, "outside": outside, "tolerance": "exact", "via": via, "pass": bool(ok)}
@@ -59,7 +75,8 @@ def check(case, out, outside, via="library"):
         return {"output": out, "golden": g, "outside": outside, "tolerance": "shape", "via": via, "pass": False}
     tol = t[0] + t[1] * np.abs(ga)
     gap = np.abs(ga - oa)
-    return {"output": out, "golden": g if ga.size > 1 else float(ga[0]), "outside": oa.tolist() if ga.size > 1 else float(oa[0]),
+    sc = ga.size == 1 and np.ndim(g) <= 1  # scalars and length-1 lists print as numbers (wave 1 form); matrices stay nested
+    return {"output": out, "golden": float(ga.ravel()[0]) if sc else g, "outside": float(oa.ravel()[0]) if sc else oa.tolist(),
             "max_gap": float(gap.max()), "tolerance": f"{t[0]:g} abs + {t[1]:g} rel", "via": via,
             "pass": bool((gap <= tol).all())}
 
@@ -268,11 +285,191 @@ def backtest():
             "cases": rows}
 
 
-def main():
+# ================================================================ wave 2 (J-W2-15, ruling J-W2-16)
+def _at_bound(w, lo, up, eps=1e-9):
+    return [1 if abs(x - u) <= eps else (-1 if abs(x - l) <= eps else 0) for x, l, u in zip(w, lo, up)]
+
+
+# ---------------------------------------------------------------- optim_j: DAQP, PyPortfolioOpt/Clarabel, cvxpy, autograd
+def optim():
+    import cvxpy as cp
+    import daqp
+    import autograd.numpy as anp
+    from autograd import grad
+    from pypfopt import EfficientFrontier
+
+    rows, skipped = [], []
+    for c in load("optim_j"):
+        i, op = c["inputs"], c["operation"]
+        S = np.asarray(i["covariance"], float)
+        n = len(S)
+        if op == "research.portfolio.mean_variance":
+            mu, g = np.asarray(i["expected_returns"], float), i["risk_aversion"]
+            lo = np.asarray(i.get("lower", [0.0] * n), float)
+            up = np.asarray(i.get("upper", [1.0] * n), float)
+            # DAQP (dual active-set QP; the final working set is solved by factorisation, so the answer is exact to
+            # rounding): min 1/2 w'(g S)w - mu'w subject to sum w = 1 and lo <= w <= up.
+            H = np.ascontiguousarray(g * S)
+            A = np.ones((1, n))
+            bu = np.concatenate([up, [1.0]])
+            bl = np.concatenate([lo, [1.0]])
+            sense = np.concatenate([np.zeros(n), [5]]).astype(np.int32)  # 5: equality constraint
+            w, _, flag, _ = daqp.solve(H, -mu, A, bu, bl, sense)
+            if flag != 1:
+                raise RuntimeError(f"DAQP exit flag {flag} on {c['case_id']}")
+            w = np.asarray(w, float)
+            ret, var = float(mu @ w), float(w @ S @ w)
+            chk = [check(c, "weights", w.tolist()), check(c, "expected_return", ret, via="arithmetic"),
+                   check(c, "volatility", math.sqrt(var), via="arithmetic"),
+                   check(c, "objective", ret - g / 2 * var, via="arithmetic"),
+                   check(c, "at_bound", _at_bound(w, lo, up), via="arithmetic")]
+            e = entry(c, chk)
+            # PyPortfolioOpt max_quadratic_utility on Clarabel at tight tolerance: a second solver, reported only.
+            ef = EfficientFrontier(mu, S, weight_bounds=list(zip(lo.tolist(), up.tolist())), solver="CLARABEL",
+                                   solver_options={"tol_gap_abs": 1e-14, "tol_gap_rel": 1e-14, "tol_feas": 1e-14,
+                                                   "max_iter": 500})
+            wp = np.asarray(list(ef.max_quadratic_utility(risk_aversion=g).values()), float)
+            e["second_solver"] = {"library": f"{ver('pyportfolioopt')} max_quadratic_utility on {ver('clarabel')}",
+                                  "max_gap_weights": float(np.abs(wp - np.asarray(c["expected"]["outputs"]["weights"])).max())}
+            rows.append(e)
+        elif op == "research.portfolio.risk_parity":
+            b = np.asarray(i.get("budgets", [1.0 / n] * n), float)
+            # A different formulation from the spec's Newton on S y = b/y: minimise the convex 1/2 y'Sy - b'log y
+            # (an exponential-cone program) with Clarabel through cvxpy; w = y / sum y.
+            y = cp.Variable(n)
+            L = np.linalg.cholesky(S)
+            prob = cp.Problem(cp.Minimize(0.5 * cp.sum_squares(L.T @ y) - b @ cp.log(y)))
+            prob.solve(solver="CLARABEL", tol_gap_abs=1e-14, tol_gap_rel=1e-14, tol_feas=1e-14, max_iter=500)
+            w = np.asarray(y.value, float) / float(np.sum(y.value))
+            vol = math.sqrt(float(w @ S @ w))
+            rc = w * (S @ w) / vol
+            e = entry(c, [check(c, "weights", w.tolist()), check(c, "volatility", vol, via="arithmetic"),
+                          check(c, "contributions", rc.tolist(), via="arithmetic")])
+            # Clarabel cannot certify 1e-14 and usually reports optimal_inaccurate; the case counts only on agreement
+            # at root_finding (1e-10). The settings are fixed for every case, not tuned per case.
+            e["solver_status"] = prob.status
+            rows.append(e)
+        else:  # risk.contrib.euler
+            w = np.asarray(i["weights"], float)
+            sig = lambda x: anp.sqrt(anp.dot(x, anp.dot(S, x)))
+            m = np.asarray(grad(sig)(w), float)  # autograd derivative of sigma(w), not the closed form (S w)/sigma
+            vol = float(sig(w))
+            rows.append(entry(c, [check(c, "volatility", vol, via="arithmetic"), check(c, "marginal", m.tolist()),
+                                  check(c, "contributions", (w * m).tolist(), via="arithmetic"),
+                                  check(c, "shares", (w * m / vol).tolist(), via="arithmetic")]))
+    return {"library": f"mean_variance: {ver('daqp')} dual active-set QP (PyPortfolioOpt on Clarabel reported as a second "
+                       f"solver); risk_parity: {ver('cvxpy')} with {ver('clarabel')} on min 1/2 y'Sy - b'log y; euler: "
+                       f"{ver('autograd')} gradient of sigma(w); expected return, volatility, objective, at_bound (within "
+                       "1e-9 of a bound), contributions and shares are arithmetic", "cases": rows, "not_checked": skipped}
+
+
+# ---------------------------------------------------------------- estim_j: scikit-learn LedoitWolf, PyPortfolioOpt BL
+def estim():
+    from pypfopt.black_litterman import BlackLittermanModel
+    from sklearn.covariance import LedoitWolf
+
+    rows = []
+    for c in load("estim_j"):
+        i = c["inputs"]
+        if c["operation"] == "research.estimate.ledoit_wolf":
+            X = np.asarray(i["returns"], float)
+            lw = LedoitWolf(assume_centered=False, store_precision=False).fit(X)
+            cov = lw.covariance_
+            rows.append(entry(c, [check(c, "covariance", cov.tolist()), check(c, "shrinkage", float(lw.shrinkage_)),
+                                  check(c, "mu", float(np.trace(cov) / X.shape[1]), via="arithmetic")]))
+        else:
+            S = np.asarray(i["covariance"], float)
+            bl = BlackLittermanModel(pd.DataFrame(S), pi=np.asarray(i["prior_returns"], float),
+                                     P=np.asarray(i["pick"], float), Q=np.asarray(i["views"], float),
+                                     omega=np.asarray(i["view_covariance"], float), tau=i["tau"])
+            post = np.asarray(bl.bl_returns(), float).ravel()
+            pred = np.asarray(bl.bl_cov(), float)
+            rows.append(entry(c, [check(c, "posterior_returns", post.tolist()),
+                                  check(c, "posterior_covariance", (pred - S).tolist(), via="arithmetic"),
+                                  check(c, "predictive_covariance", pred.tolist())]))
+    return {"library": f"{ver('scikit-learn')} LedoitWolf(assume_centered=False) covariance_ and shrinkage_ (mu = trace/N "
+                       f"of the library covariance, arithmetic); {ver('pyportfolioopt')} BlackLittermanModel bl_returns "
+                       "and bl_cov (posterior_covariance = bl_cov - Sigma, arithmetic)", "cases": rows}
+
+
+# ---------------------------------------------------------------- esbt_j: no library
+def esbt():
+    why = ("no pip-installable free library computes the Acerbi-Szekely Z2 statistic (the MATLAB Risk Toolbox is "
+           "commercial; the AS14_test class of the Realized_Risk_Measures project is GitHub-only, with an unread licence); "
+           "[AS14] prints critical values, not a worked example on data. Not counted (D6)")
+    return {"library": None, "cases": [], "not_checked": [{"case_id": c["case_id"], "reason": why} for c in load("esbt_j")]}
+
+
+# ---------------------------------------------------------------- baumwelch_j: hmmlearn GaussianHMM.fit
+def baumwelch():
+    from hmmlearn import hmm
+
+    def model(i, n_iter, tol):
+        m = hmm.GaussianHMM(n_components=len(i["means"]), covariance_type="diag", n_iter=n_iter, tol=tol,
+                            init_params="", params="stmc", implementation="scaling", min_covar=0.0,
+                            covars_prior=0.0, covars_weight=1.0, means_prior=0.0, means_weight=0.0,
+                            startprob_prior=1.0, transmat_prior=1.0)
+        m.startprob_ = np.asarray(i["initial"], float)
+        m.transmat_ = np.asarray(i["transition"], float)
+        m.means_ = np.asarray(i["means"], float).reshape(-1, 1)
+        m.covars_ = (np.asarray(i["sds"], float) ** 2).reshape(-1, 1)
+        m.n_features = 1
+        return m
+
+    rows = []
+    for c in load("baumwelch_j"):
+        i = c["inputs"]
+        X = np.asarray(i["observations"], float).reshape(-1, 1)
+        tol, mx = i.get("tolerance", 1e-10), i.get("max_iterations", 1000)
+        # hmmlearn's own stop rule (ConvergenceMonitor): E-step at theta_j gives L_j, then an M-step; stop when
+        # L_j - L_{j-1} < tol or after n_iter rounds. Its returned parameters are one M-step past its last E-step.
+        # So the spec's k (first j >= 1 with gain < tol, J-W2-11) is len(history) - 1 when the library stops on
+        # the gain, else max_iterations; theta_k is taken from a second run with n_iter = k and the stop test off
+        # (every earlier gain is >= tol by the first run), and L_k is the library's score(X) at theta_k.
+        m = model(i, mx + 1, tol)
+        m.fit(X)
+        h = list(m.monitor_.history)
+        if len(h) >= 2 and h[-1] - h[-2] < tol:
+            k, conv = len(h) - 1, True
+        else:
+            k, conv = mx, False
+        mk = model(i, k, -np.inf)
+        mk.fit(X)
+        chk = [check(c, "initial", mk.startprob_.tolist()), check(c, "transition", mk.transmat_.tolist()),
+               check(c, "means", mk.means_.ravel().tolist()),
+               check(c, "sds", np.sqrt(mk.covars_.ravel()).tolist(), via="arithmetic"),
+               check(c, "log_likelihood", float(mk.score(X))),
+               check(c, "iterations", int(k), via="arithmetic"), check(c, "converged", bool(conv), via="arithmetic")]
+        e = entry(c, chk)
+        e["library_last_gains"] = [h[j] - h[j - 1] for j in range(max(1, len(h) - 3), len(h))]
+        rows.append(e)
+    return {"library": f"{ver('hmmlearn')} GaussianHMM(diag, implementation='scaling', init_params='', min_covar=0, "
+                       "covars_prior=0, means_weight=0, flat Dirichlet priors).fit, stop index from the library's "
+                       "ConvergenceMonitor history; theta_k by a re-run with n_iter = k; log_likelihood = score(X); "
+                       "sds = sqrt(covars_), iterations and converged read off the history (arithmetic)", "cases": rows}
+
+
+WAVES = {1: ("regime_j", "purgedcv_j", "rstats_j", "backtest_j"), 2: ("optim_j", "estim_j", "esbt_j", "baumwelch_j")}
+
+
+def main(argv=None):
+    import argparse
+    ap = argparse.ArgumentParser(description="stage J outside-library checks")
+    ap.add_argument("--wave", type=int, choices=sorted(WAVES), action="append",
+                    help="run only these waves (default all); suites of other waves are kept from the committed file")
+    a = ap.parse_args(argv)
+    fns = {"regime_j": regime, "purgedcv_j": purgedcv, "rstats_j": rstats, "backtest_j": backtest,
+           "optim_j": optim, "estim_j": estim, "esbt_j": esbt, "baumwelch_j": baumwelch}
+    run = [s for w in (a.wave or sorted(WAVES)) for s in WAVES[w]]
+    old = json.loads(OUT.read_text(encoding="utf-8"))["suites"] if OUT.is_file() else {}
     suites = {}
-    for name, fn in (("regime_j", regime), ("purgedcv_j", purgedcv), ("rstats_j", rstats), ("backtest_j", backtest)):
+    for name in [s for w in sorted(WAVES) for s in WAVES[w]]:
+        if name not in run:
+            if name in old:
+                suites[name] = old[name]
+            continue
         try:
-            suites[name] = fn()
+            suites[name] = fns[name]()
         except ImportError as exc:
             suites[name] = {"library": None, "cases": [], "error": f"library not installed: {exc}"}
     for s in suites.values():
@@ -285,7 +482,7 @@ def main():
            "summary": {"counted": sum(s["counted"] for s in suites.values()), "value_checked_cases": value,
                        "all_cases": total},
            "suites": suites}
-    OUT.write_text(json.dumps(doc, indent=1) + "\n", encoding="utf-8")
+    OUT.write_text(json.dumps(doc, indent=1) + "\n", encoding="utf-8", newline="\n")
     for k, s in suites.items():
         print(k, s["counted"], "of", len(load(k)), "failed:", s["failed"], s.get("error", ""))
     print(doc["summary"])
