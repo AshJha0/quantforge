@@ -584,6 +584,10 @@ Stage J wave 1 (target v0.9.0, not yet released) adds research tools. Each file 
 |---|---|---|---|
 | Backtest a position path with a two-bar lag and three kinds of cost | `research_backtest_j.json` | `research.backtest.run` | `backtest_j-0004` |
 | Purged 3-fold split of ten overlapping labels | `research_purged_kfold_j.json` | `research.cv.purged_kfold` | `purgedcv_j-0002` |
+| Label hidden regimes with a Viterbi path | `research_viterbi_j.json` | `research.regime.viterbi` | `regime_j-0001` |
+| Deflated Sharpe ratio for a set of trials | `research_dsr_j.json` | `research.stats.dsr` | `rstats_j-0001` |
+| Minimum detectable Sharpe for a sample length | `research_power_j.json` | `research.stats.power` | `rstats_j-0017` |
+| Probability of backtest overfitting from a strategy matrix | `research_pbo_j.json` | `research.stats.pbo` | `rstats_j-0025` |
 
 ### Backtest with costs
 
@@ -609,4 +613,44 @@ Worked example. Ten rows, row `i` covering `[i, i + 2]`, three folds, no embargo
 {"folds":[{"test":[0,1,2,3],"train":[6,7,8,9]},{"test":[4,5,6],"train":[0,1,9]},{"test":[7,8,9],"train":[0,1,2,3,4]}],"embargo_count":0}
 ```
 
-To check a whole suite: `python conformance/runner/runner.py --impl python --suite backtest_j`.
+### Regime labels
+
+Plain idea: given a model of how a market moves between a few hidden states and what each state looks like, find the single most likely sequence of states. Formally (`specifications/11-research/regimes.md`, rulings J-10 to J-12; Rabiner 1989): `delta_t(j) = max_i (delta_{t-1}(i) + log A_ij) + log e_t(j)` in logs, with back-pointers, ties to the lowest state. Give either an `emission` matrix (`T x K`) or `observations` with Gaussian `means` and `sds`.
+
+```bash
+uv run --project python quantforge run < examples/research_viterbi_j.json
+```
+
+Worked example. The textbook two-state model: Healthy (0) or Fever (1), observations normal, cold, dizzy. Output `"states":[0,0,1]` and `"log_probability":-4.19173690823075`, and `exp(-4.19174) = 0.01512 = 0.6 x 0.5 x 0.7 x 0.4 x 0.3 x 0.6`. The path is smoothed over the whole sample: never feed it to a signal at time `t`.
+
+### Deflated Sharpe ratio for a trial set
+
+Plain idea: the best of many strategies looks good by luck. The DSR is the probability that the true Sharpe beats what the best of `N` useless trials would show. Formally (`research-statistics.md`, J-13; Bailey and López de Prado 2014): `SR0 = sqrt(V) ((1 - gamma) Phi^{-1}(1 - 1/N) + gamma Phi^{-1}(1 - 1/(N e)))`, then the PSR against `SR0`. Sharpe ratios are per period; `sr_variance` is the variance of the trials' per-period Sharpe ratios; `kurtosis` is not excess.
+
+```bash
+uv run --project python quantforge run < examples/research_dsr_j.json
+```
+
+Worked example, the paper's: annual Sharpe 2.5 over 1,250 days (`sr` 2.5 / sqrt(250) = 0.15811), skew -3, kurtosis 10, 100 trials with `sr_variance` 0.5 / 250 = 0.002. Output `"sr0":0.11317200186513214`, `"dsr":0.9003968344493904`: the printed 0.1132 and 0.9004, not significant at 5 %. With `"n_trials":1000` the same run gives `sr0` 0.14557 and `dsr` 0.63991. Pass the trial count from `research/trials.csv`, never a smaller one.
+
+### Minimum detectable Sharpe
+
+Plain idea: a short sample cannot tell a modest Sharpe from zero. Formally (`research-statistics.md`; Lo 2002): `z_sum = Phi^{-1}(1 - alpha) + Phi^{-1}(power)`, `mds = z_sum / sqrt(years)` for an annual Sharpe, one-sided, iid. Add `sr_target` to get `years_required = (z_sum / sr_target)^2`.
+
+```bash
+uv run --project python quantforge run < examples/research_power_j.json
+```
+
+Worked example. 13.83 years at 5 % and 80 % power: `"z_sum":2.486474860524386` (1.6449 + 0.8416), `"mds":0.6686101767665223`, the 0.67 of the R3-01 preregistration. Serial correlation makes the true figure larger; the preregistrations report a simulated power beside it.
+
+### PBO from a strategy matrix
+
+Plain idea: split the history into blocks, pick the best strategy on half of them and see where it ranks on the other half; PBO is how often it lands in the bottom half. Formally (`research-statistics.md`, J-15 to J-17; Bailey, Borwein, López de Prado and Zhu 2017): `performance` is `T x N` (rows periods, columns strategies), `n_partitions` `S` is even and divides `T`; for each of `C(S, S/2)` splits the logit of the winner's relative test rank `r / (N + 1)`; PBO is the share of logits at or below zero.
+
+```bash
+uv run --project python quantforge run < examples/research_pbo_j.json
+```
+
+Worked example. Rows `[1, 0], [1, 0], [0, 2], [0, 2]`, two blocks, metric `MEAN`. Whichever block trains, its winner is last on the other: rank 1 of 2, `omega = 1/3`, logit `log(1/2)`. Output `"pbo":1.0`, `"logits":[-0.6931471805599454,-0.6931471805599454]`, `"n_combinations":2`. [Tutorial 24](docs/getting-started/tutorial-24-is-the-sharpe-real.md) works a three-strategy example by hand, and the gallery page [Research workflow](docs/curves/research-workflow.md) runs all of these on twelve rules.
+
+To check a whole suite: `python conformance/runner/runner.py --impl python --suite backtest_j` (or `purgedcv_j`, `regime_j`, `rstats_j`).

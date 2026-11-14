@@ -8,7 +8,7 @@ QuantForge has four equal implementations of the same maths, in Java, C++, Pytho
 
 Two ways in:
 
-- **New to quantitative finance, or to this project.** Work through the [tutorials](docs/getting-started/README.md), starting with [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md): quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Tutorials 2 to 16 go on, 10 to 15 minutes each, to bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk and the LIBOR market model, with every number checked in all four languages. Tutorials 17 to 21 cover stage I, hedging: Greek and dynamic delta hedges, minimum-variance and constrained hedges, credit and correlation hedges, a cross-asset hedge with instrument selection, and what a hedge costs. Then read the topics below in order.
+- **New to quantitative finance, or to this project.** Work through the [tutorials](docs/getting-started/README.md), starting with [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md): quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Tutorials 2 to 16 go on, 10 to 15 minutes each, to bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk and the LIBOR market model, with every number checked in all four languages. Tutorials 17 to 21 cover stage I, hedging: Greek and dynamic delta hedges, minimum-variance and constrained hedges, credit and correlation hedges, a cross-asset hedge with instrument selection, and what a hedge costs. Tutorials 23 and 24 cover stage J research tools: an honest backtest with purged cross-validation, and whether a Sharpe ratio is real. Then read the topics below in order.
 - **Practitioner.** Jump to a topic. Each worked example names its golden case, so you can rerun it as `COOKBOOK.md` shows and check the number yourself.
 
 **What the tests check.** 7,504 value-checked golden cases, where each build must return the oracle's numbers within a stated tolerance; 5,197 error cases, which check only that a bad input is refused with the right code; and 2,514 invariance cases (1,257 pairs), which check that two related inputs get the same answer. Counts are generated in [`docs/case-figures.md`](docs/case-figures.md). Outside-library shares per stage, under the tight rule D6, are in [`oracle/OUTSIDE_SHARES.md`](oracle/OUTSIDE_SHARES.md).
@@ -27,6 +27,8 @@ Each result below is real output from the CLIs, on the date each section gives. 
 | [Validation and evidence](#validation-and-evidence) | What a pass means, tolerances in money, what an outside library does not check |
 | [Stage F: curves, portfolio risk and the book](#stage-f-curves-portfolio-risk-and-the-book) | Interpolation, joint solve, AAD, VaR and backtests, FRTB GIRR, book |
 | [Stage G: rates models and xVA](#stage-g-rates-models-and-xva) | Short-rate models, swaptions and Bermudans, LMM, MC Greeks, exposure, CVA, DVA and FVA |
+| [Stage I: hedging](#stage-i-hedging) | Least-squares and QP hedges, costs and switch points, backtests and effectiveness |
+| [Stage J: backtest overfitting and research statistics](#stage-j-backtest-overfitting-and-research-statistics) | Lag and look-ahead, purged CV, PSR, DSR, PBO, power, regimes |
 
 ## Foundations
 
@@ -496,6 +498,77 @@ Tutorials 17 to 21 work through this section with real outputs in all four langu
 - **Q6 (calibration on real noisy quotes) is blocked** by the data terms of the candidate sources; only its preregistration exists (`research/preregs/Q6-01-churn-bound.md`).
 - **The hedges are calculations.** Nothing is traded, and costs, impact and margin are inputs, not estimates from a market.
 - **Tested on one machine.** The 14,935-case runs were on one Windows machine; CI on the stage I pull request is the cross-platform check.
+
+## Stage J: backtest overfitting and research statistics
+
+Stage J wave 1 (target v0.9.0, not yet released) is specified in `specifications/11-research/` (rulings J-1 to J-23 and J-19a in `specifications/stage-j-rulings-w1.md`) and pinned by the suites `backtest_j`, `purgedcv_j`, `regime_j` and `rstats_j` in `datasets/golden/stage_j/`. All four builds pass every case (15,215 of 15,215 in each language at CLI contract 1.13.0, `program/R6_HANDOVER.md`). The numbers below were printed by all four builds on 2026-11-14 unless a paragraph says otherwise. Every input is synthetic except the DSR example, which is the paper's own.
+
+[Tutorial 23](docs/getting-started/tutorial-23-backtest-honestly.md) and [Tutorial 24](docs/getting-started/tutorial-24-is-the-sharpe-real.md) work through this section on hand-sized data, the [Cookbook](COOKBOOK.md#stage-j-recipes) has one recipe per operation, and the gallery page [Research workflow](docs/curves/research-workflow.md) runs the whole chain on twelve rules.
+
+Why it matters. A strategy's backtest is the evidence most research rests on, and it is easy to make it say more than it can. The three usual ways are look-ahead (using data from after the decision), free trading, and selection (reporting the best of many tries as if it were the only one). The first two are mechanics; the third is statistics, and it is the one that survives careful coding.
+
+### A backtest that cannot see the future
+
+**Plain idea.** At each close the strategy names the position it wants, using only data up to that close. The backtester holds that position from a later close, pays for every change, and books each bar's price move on the position held before that bar's trade. If a strategy's result collapses when its trades are delayed by one bar, it was probably using information it could not have had.
+
+**Formal statement.** For `t = 0 .. T-1`, `q_t = targets[t - lag]` (0 before `lag`), `d_t = q_t - q_{t-1}`, gross `g_t = q_{t-1} (p_t - p_{t-1}) m`, cost `k_t = |d_t| p_t (half_spread_bps / 10^4) m + |d_t| commission_per_unit + fixed_per_trade 1[d_t != 0]`, net `n_t = g_t - k_t` (`backtester.md`, J-2 to J-6). Gross minus the three cost totals equals net as an identity, and the `EVENT` and `VECTOR` engines must agree to 1e-10 (J-3). `lag = 0` is legal only so that a look-ahead canary can be built and caught (J-2) [LdP18, ch. 11].
+
+**Worked example.** `backtest_j-0001`: twelve prices from 100 to 107, ten trades, lag 1, half-spread 5 bp, commission 0.01 a unit, fixed fee 1 a trade. Gross P&L 6.5; costs 1.13975 + 0.22 + 10; net -4.85975, the same in both engines. The canary, `+1` if the next close is higher else `-1`, makes 21 at lag 0 (the sum of all eleven absolute moves) and loses 10 at lag 1. Outside check: vectorbt 1.2.1 reproduces all 14 `backtest_j` cases (J-19a).
+
+### Cross-validation when labels overlap
+
+**Plain idea.** A label such as "the return over the next five days" spans time. In ordinary k-fold, a training label can share days with a test label, and a model learns the test answer from it. Purging drops those training rows. Because returns are serially correlated, an embargo also drops a few rows just after each test block.
+
+**Formal statement.** Contiguous folds, the first `n mod k` one row longer (J-7). For a test block `[a, b)` with span `[lo, hi] = [t0_a, max t1_i]`, training row `j` is purged when `t0_j <= hi` and `t1_j >= lo`; the embargo drops rows `b .. b + h - 1`, `h = floor(embargo_pct n)` (J-8). Combinatorial purged CV with `N` groups and `k` test groups has `C(N, k)` splits and `k C(N, k) / N` complete backtest paths [LdP18, sections 7.4 and 12.4].
+
+**Worked example.** `purgedcv_j-0001`: ten rows, row `i` covering `[i, i + 2]`, three folds. The first test block, rows 0 to 3, spans times 0 to 5, so rows 4 and 5 are purged and training is rows 6 to 9; plain k-fold would have trained on 4 to 9. A 30 % embargo (3 rows) also drops row 6. CPCV with `N = 6`, `k = 2` gives 15 splits and 5 paths. Outside checks: timeseriescv 0.2, scikit-learn 1.9.1 and skfolio 1.12.12 reproduce 12 of 15 `purgedcv_j` cases (J-19a; timeseriescv's end-of-data purge defect is recorded in `program/WAVE1_ORACLE_NOTES.md`).
+
+### Is the Sharpe ratio above zero? The PSR
+
+**Plain idea.** A Sharpe ratio measured on a year of data has a wide error band, wider still when returns are skewed or fat-tailed. The probabilistic Sharpe ratio turns the estimate into a probability that the true Sharpe is above a benchmark.
+
+**Formal statement.** With the per-period Sharpe `SR`, `T` observations, skew `g3` and non-excess kurtosis `g4`: `v = 1 - g3 SR + (g4 - 1)/4 SR^2`, `z = (SR - SR*) sqrt(T - 1) / sqrt(v)`, `PSR = Phi(z)`; `v <= 0` is `E_DOMAIN` (J-14) [BLdP12].
+
+**Worked example.** An annual Sharpe of 1.0 from 252 daily returns is a daily Sharpe of 0.0630. With normal returns, `z = 0.9970` and PSR = 0.8406; with skew -1 and kurtosis 6, PSR = 0.8329. A full year at Sharpe 1 does not reach the 0.95 of a one-sided 5 % test.
+
+### Is it above luck? The deflated Sharpe ratio
+
+**Plain idea.** Try enough useless strategies and the best of them will show a good Sharpe ratio. The deflated Sharpe ratio raises the benchmark of the PSR to the Sharpe the best of `N` useless trials is expected to show, given how much their Sharpe ratios vary.
+
+**Formal statement.** `SR0 = sqrt(V) ((1 - gamma) Phi^{-1}(1 - 1/N) + gamma Phi^{-1}(1 - 1/(N e)))`, with `V` the variance of the trials' per-period Sharpe ratios and `gamma` the Euler-Mascheroni constant; `DSR = PSR` with `SR* = SR0`; `N = 1` gives `SR0 = 0` (J-13) [BLdP14]. `N` is the count logged in `research/trials.csv` before results are seen.
+
+**Worked example.** The paper's own (`rstats_j-0001`; [BLdP14] pp. 9-10, read 2026-11-13): annual Sharpe 2.5 over 1,250 days, skew -3, kurtosis 10, 100 trials, variance of annual Sharpe 0.5. `SR0` = 0.1132 a day against an observed 0.1581, and DSR = 0.9004, not significant at 5 %; with 46 trials, 0.9505. Both match the printed values to four digits; with 1,000 trials the same Sharpe gives 0.6399 (Python build). On the gallery page, the best of twelve rules on a driftless random walk has an annual Sharpe of 1.043 and PSR 0.9061, but DSR 0.5491: luck, correctly flagged. DSR and PSR have no free outside library; the check is the paper (J-19a).
+
+### How often does the winner fail out of sample? PBO
+
+**Plain idea.** Split the history into blocks. For every way of choosing half the blocks, pick the strategy that did best on them and rank it on the other half. If the in-sample winner keeps landing in the bottom half, the selection is overfitting.
+
+**Formal statement.** Combinatorially symmetric cross-validation: `T x N` performance, `S` contiguous blocks, `C(S, S/2)` splits in lexicographic order; for each, the training winner `n*` (lowest index on ties), its average test rank `r`, `omega = r / (N + 1)`, logit `lambda = log(omega / (1 - omega))`; `PBO = #{lambda <= 0} / C(S, S/2)` (J-15 to J-17) [BBLdPZ17, section 2].
+
+**Worked example.** `rstats_j-0025`: rows `[1, 0], [1, 0], [0, 2], [0, 2]`, two blocks, mean metric. Each block's winner is last on the other block, `omega = 1/3`, both logits `log(1/2) = -0.6931`, PBO = 1. In Tutorial 24, eight periods of three strategies give PBO 5/6 = 0.8333. On the gallery page's driftless prices, PBO = 0.4571 over 70 splits: near one half, which is what noise gives. The paper prints no fully specified example, so the hand cases are the goldens and no outside library counts (J-19).
+
+### Could the study have found it? Power
+
+**Plain idea.** Before running a study, ask how large a Sharpe ratio its sample could tell apart from zero. Below that size a real edge and no edge look the same.
+
+**Formal statement.** `z_sum = Phi^{-1}(1 - alpha) + Phi^{-1}(power)`, `mds = z_sum / sqrt(years)` (annual, one-sided, iid), `years_required = (z_sum / SR_target)^2`, `se_at_target = sqrt((1 + SR^2/2)/years)` [Lo02].
+
+**Worked example.** At 5 % and 80 % power, `z_sum = 2.4865`. One year detects only an annual Sharpe of 2.49, five years 1.11, and 13.83 years 0.6686, the 0.67 of the R3-01 preregistration (`rstats_j-0017`). Detecting 0.5 needs 24.73 years. Outside check: statsmodels 0.15.0 reproduces 5 of the `rstats_j` power cases (J-19a). Serial correlation makes the true minimum larger; the preregistrations report a simulated power beside the formula.
+
+### Regimes, as description
+
+**Plain idea.** A hidden Markov model says the market moves between a few states, calm and turbulent for example, each with its own return distribution. The Viterbi algorithm finds the single most likely sequence of states for the returns observed.
+
+**Formal statement.** `delta_t(j) = max_i (delta_{t-1}(i) + log A_ij) + log e_t(j)` with back-pointers, ties to the smallest index (J-11), Gaussian or given emissions (J-10) [Rab89, section III.B].
+
+**Worked example.** `regime_j-0001`, the textbook Healthy and Fever model: path 0, 0, 1 with probability 0.01512. In Tutorial 24, twelve returns with standard deviation 0.5 or 2 label the four large moves turbulent: `000011110000`. hmmlearn 0.3.3 reproduces all 10 `regime_j` cases. The labels are smoothed over the whole sample, so using them as a signal is look-ahead.
+
+### What stage J's evidence does and does not show
+
+- **Outside oracle: 41 of 63 value-checked wave 1 cases (65.1 %),** from `oracle/OUTSIDE_J.json` (J-19a). PSR, DSR and PBO have no free library; DSR is checked against the paper's printed example, PBO by hand.
+- **The operations are tools, not results.** No stage J study result is claimed here; the gallery page is a teaching example on synthetic prices.
+- **The iid formulas are optimistic.** PSR, DSR and the power formula assume independent returns; studies add block-bootstrap intervals and simulated power.
+- **Tested on one machine.** The 15,215-case runs were on one Windows machine; CI on the stage J pull request is the cross-platform check.
 
 ## Appendix: stage history
 
