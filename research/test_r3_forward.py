@@ -173,9 +173,25 @@ class Judgement(unittest.TestCase):
                 row("R3-03", "2026-11-26T21:00:00Z", 1.0),  # holiday
                 row("R3-01", "2026-11-13T21:00:00Z", None)]
         j = w.judgement(rows, {"2026-11-26"}, need=2)
-        self.assertEqual(j["R3-03"], {"counted_days": 2, "judgement_date": "2026-11-13"})
-        self.assertEqual(j["R3-01"], {"counted_days": 0, "judgement_date": None})
+        self.assertEqual(j["R3-03"], {"counted_days": 2, "judgement_date": "2026-11-13",
+                                     "status": "judged on 2026-11-13"})
+        self.assertEqual(j["R3-01"], {"counted_days": 0, "judgement_date": None, "status": "not yet judged"})
         self.assertIn("2026-11-26", w.load_holidays())
+
+    def test_amendment_8_cutoff(self) -> None:
+        def row(et: str, kt: str) -> dict[str, Any]:
+            return {"record": {"series_id": "study/R3-03", "event_time": et, "knowledge_time": kt,
+                               "value": {"payload": {"position": 1.0}}}}
+        on_time = [row("2027-11-04T21:00:00Z", "2027-11-04T21:05:00Z"),
+                   row("2027-11-05T21:00:00Z", "2027-11-05T21:05:00Z")]
+        late = [row("2027-11-08T21:00:00Z", "2027-11-08T21:05:00Z"),  # dated after the cut-off
+                row("2027-11-03T21:00:00Z", "2027-11-09T00:00:00Z")]  # back-filled after the cut-off
+        j = w.judgement(on_time, set(), need=2, as_of=date(2027, 12, 1))["R3-03"]
+        self.assertEqual(j["status"], "judged on 2027-11-05")
+        j = w.judgement(on_time[:1] + late, set(), need=2, as_of=date(2027, 12, 1))["R3-03"]
+        self.assertEqual((j["counted_days"], j["status"]), (1, "not judged: insufficient data"))
+        j = w.judgement(on_time[:1], set(), need=2, as_of=date(2027, 11, 5))["R3-03"]
+        self.assertEqual(j["status"], "not yet judged")
 
 
 def entry(et: str, kt: str, pay: dict[str, Any], commit: str = "good") -> dict[str, Any]:
