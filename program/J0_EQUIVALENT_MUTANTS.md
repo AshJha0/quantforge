@@ -73,3 +73,19 @@ Not killed, not shown equivalent (needs a crafted near-singular active set; left
 hedge.rs scoped re-runs (~/j0-v6-hedge, ~/j0-v7-hedge, ~/j0-v8-hedge, -j 1): all 13 polish/schedule mutants
 at 56:5, 56:61, 66:25, 66:19, 66:34 `+`, 71:23, 138:29, 138:18 `+` caught. hedge.rs now 97/104 viable
 killed (93.3%); the 7 remaining are the audit-AGREE equivalents above.
+
+## hedge_solvers.rs independent audit (branch stage-j-hs-audit, 2026-11-14)
+Each kill confirmed by hand-applying the mutant and running `cargo test --test hedge_solvers` (Windows).
+Several "equivalent" claims above were wrong: the scaled qp path (Jacobi scaling plus the final
+bound clamp) hid them; a nonzero ridge keeps the solve unscaled.
+- KILLED 163:15 `check_system_names_the_shape_error_for_one_row_without_columns` (message asserted).
+- KILLED 340:39 `%` `bound_violated_by_an_exact_multiple_of_its_scale_is_enforced_on_the_unscaled_path`.
+- KILLED 340:39 `*` (claimed equivalent: FALSE) `bound_almost_parallel_to_an_equality_is_enforced` (scale 1e-7).
+- KILLED 341:33 `<=` (claimed equivalent: FALSE, exact tie is reachable) `violation_exactly_at_the_threshold_is_not_enforced`.
+- KILLED 273:23 `/` `active_set_on_a_stiff_unscaled_problem_is_not_singular` (Gram ~1e-16).
+- KILLED 189:36 `<` and `==`, 189:44, 193:16 (claimed equivalent: FALSE, cancellation in v) `equality_almost_along_an_axis_keeps_its_null_space`.
+- KILLED 380:38 `*` and `%` `dual_step_drops_the_constraint_with_the_smallest_ratio` (seeded search case).
+- AGREE equivalent: 189:36 `>=` (only m == 0: v = +-norm, no cancellation; confirmed surviving), 280:20, 307:24.
+- AGREE up to rounding, not proven: 281:30 `>=`/`==` (pivot choice on an SPD Gram matrix; extreme conditioning could move E_SINGULAR).
+- PLAUSIBLE, not proven: 380:24 `>=` (needs r_i == 0 exactly with u_i < 0 from rounding), 380:43 `<=`
+  (exact ratio tie; y unique, multipliers may differ in degenerate sets), 386:28 `>=` (exact zn == 1e-12 gn).

@@ -778,3 +778,153 @@ fn integer_sized_bound_violation_is_still_enforced() {
     let s = qp_solve(&p).unwrap();
     assert!(s.x[0].abs() < 1e-12, "{s:?}");
 }
+
+// ---- J-0 hs-audit: kill tests for mutants the scoped run left open (2026-11-14) ----
+
+#[test]
+fn check_system_names_the_shape_error_for_one_row_without_columns() {
+    // check_system 163:15 (`||` -> `&&`): one row and no columns must fail in check 1 itself,
+    // not in a later check with another message; integer_solve has no later shape check that
+    // catches n == 0 with matching lot lists.
+    let a: Matrix = vec![vec![]];
+    let e = qp_solve(&problem(&a, &[1.0], &[1.0])).unwrap_err();
+    assert_eq!(
+        (e.code, e.message.as_str()),
+        (
+            "E_INPUT",
+            "a must be a non-empty matrix with rows of one length"
+        )
+    );
+    let e = integer_solve(&lots_problem(&a, &[1.0], &[1.0], &[])).unwrap_err();
+    assert_eq!(
+        (e.code, e.message.as_str()),
+        (
+            "E_INPUT",
+            "a must be a non-empty matrix with rows of one length"
+        )
+    );
+}
+
+#[test]
+fn bound_violated_by_an_exact_multiple_of_its_scale_is_enforced_on_the_unscaled_path() {
+    // dual_active_set 340:39 (`/` -> `%`): a ridge keeps the solve unscaled (no final clamp).
+    // H = 2, c = 6, so x = -3 unconstrained; slack -3 is an exact multiple of the scale 1 and
+    // `-3 % 1 == -0` would hide the violation.
+    let a: Matrix = vec![vec![1.0]];
+    let lower = [Some(0.0)];
+    let mut p = problem(&a, &[6.0], &[1.0]);
+    p.ridge = 1.0;
+    p.lower = Some(&lower);
+    assert_eq!(qp_solve(&p).unwrap().x, vec![0.0]);
+}
+
+#[test]
+fn bound_almost_parallel_to_an_equality_is_enforced() {
+    // dual_active_set 340:39 (`/` -> `*`): with x0 + 1e-7 x1 = 0 the bound x0 >= 0 has a
+    // projected normal of norm 1e-7, so its scale is 1e-7. Unconstrained on the equality,
+    // x1 ~ 0.5 and x0 ~ -5e-8: slack / scale ~ -0.5 (violated), slack * scale ~ -5e-15 (not).
+    let a: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+    let e = vec![vec![1.0, 1e-7]];
+    let lower = [Some(0.0), None];
+    let mut p = problem(&a, &[0.0, -0.5], &[1.0, 1.0]);
+    p.ridge = 1e-3;
+    p.eq_matrix = Some(&e);
+    p.eq_rhs = Some(&[0.0]);
+    p.lower = Some(&lower);
+    let s = qp_solve(&p).unwrap();
+    assert!(s.x[0] >= 0.0, "{s:?}");
+}
+
+#[test]
+fn violation_exactly_at_the_threshold_is_not_enforced() {
+    // dual_active_set 341:33 (`<` -> `<=`): H = 2, c = 2e-12 gives x = -1e-12 exactly, slack
+    // over scale exactly -THRESHOLD; the strict test leaves the bound inactive (x unchanged).
+    let a: Matrix = vec![vec![1.0]];
+    let lower = [Some(0.0)];
+    let mut p = problem(&a, &[2e-12], &[1.0]);
+    p.ridge = 1.0;
+    p.lower = Some(&lower);
+    assert_eq!(qp_solve(&p).unwrap().x, vec![-1e-12]);
+}
+
+#[test]
+fn active_set_on_a_stiff_unscaled_problem_is_not_singular() {
+    // general_inverse 273:23 (`1e-14 * largest` -> `/`): H = 1e16 + 1 (ridge keeps it unscaled),
+    // so the active-set Gram matrix is ~1e-16; a limit of 1e-14 / 1e-16 = 100 would call it
+    // singular. x = -1 unconstrained, the bound holds it at 0.
+    let a: Matrix = vec![vec![1e8]];
+    let lower = [Some(0.0)];
+    let mut p = problem(&a, &[1e8], &[1.0]);
+    p.ridge = 1.0;
+    p.lower = Some(&lower);
+    assert_eq!(qp_solve(&p).unwrap().x, vec![0.0]);
+}
+
+#[test]
+fn equality_almost_along_an_axis_keeps_its_null_space() {
+    // householder_qr 189:36 / 189:44 / 193:16: a reflector built as x - sign(x0) |x| e1
+    // cancels when x is almost +-|x| e1; for (+-1, 1e-8) it leaves v = (0, 1e-8), a reflector
+    // that does not zero the column, and the null space is then off by 1e-8. With x1 ~ 1e6 the
+    // equality would miss by 1e-2.
+    for s in [1.0, -1.0] {
+        let a: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let e = vec![vec![s, 1e-8]];
+        let p = QpProblem {
+            eq_matrix: Some(&e),
+            eq_rhs: Some(&[0.0]),
+            ..problem(&a, &[0.0, -1e6], &[1.0, 1.0])
+        };
+        let x = qp_solve(&p).unwrap().x;
+        assert!((s * x[0] + 1e-8 * x[1]).abs() < 1e-9, "{s}: {x:?}");
+        assert!((x[0] + s * 1e-2).abs() < 1e-6, "{s}: {x:?}");
+    }
+}
+
+#[test]
+fn dual_step_drops_the_constraint_with_the_smallest_ratio() {
+    // dual_active_set 380:38 (`u / r < t1` -> `u * r` or `u % r`): the drop test must compare
+    // ratios. Found by a seeded search (box bounds, ridge 0.01 keeps the solve unscaled, so no
+    // final clamp hides an error): with products the step overshoots and the answer is a
+    // corner with KKT residual 0.12.
+    let a: Matrix = vec![
+        vec![
+            -0.339_357_646_379_478_5,
+            -0.074_194_689_193_166_41,
+            -1.797_542_653_192_188_3,
+        ],
+        vec![
+            0.103_699_644_733_219_46,
+            1.712_960_260_968_014_6,
+            1.231_046_582_155_376_9,
+        ],
+        vec![
+            -0.921_126_400_769_898_3,
+            -1.936_492_988_291_374_8,
+            1.180_100_057_902_588_4,
+        ],
+        vec![
+            0.332_704_307_172_170_03,
+            -1.029_228_118_995_017_6,
+            -0.438_789_860_284_495_07,
+        ],
+    ];
+    let b = [
+        -3.938_971_148_748_277_3,
+        -0.330_648_934_104_705_86,
+        4.555_863_855_195_139,
+        3.019_259_704_991_169_4,
+    ];
+    let w = [1.0; 4];
+    let bw = 0.364_602_731_721_537_2;
+    let lower = [Some(-bw); 3];
+    let upper = [Some(bw); 3];
+    let mut p = problem(&a, &b, &w);
+    p.ridge = 0.01;
+    p.lower = Some(&lower);
+    p.upper = Some(&upper);
+    let s = qp_solve(&p).unwrap();
+    assert!(s.x.iter().all(|x| x.abs() <= bw), "{s:?}");
+    let (h, c) = normal(&a, &b, &w, 0.01);
+    let v = kkt_violation(&h, &c, &s.x, &lower, &upper, false);
+    assert!(v < 1e-8, "KKT residual {v}: {s:?}");
+}
