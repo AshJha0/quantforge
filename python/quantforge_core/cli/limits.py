@@ -115,6 +115,26 @@ def _all(*checks: Callable[[Raw], None]) -> Callable[[Raw], None]:
     return check
 
 
+def _w2_returns_cells(raw: Raw) -> None:
+    """Ruling J-W2-14: at most 10,000,000 cells of returns."""
+    rows = raw.get("returns")
+    if isinstance(rows, list):
+        cols = max((len(r) for r in rows if isinstance(r, list)), default=0)
+        if len(rows) * cols > 10_000_000:
+            raise _over("returns", 10_000_000)
+
+
+def _baum_welch_sizes(raw: Raw) -> None:
+    """Ruling J-W2-14: 16 states, 10,000 iterations, T K at most 10,000,000."""
+    _cap(raw, "max_iterations", 10_000)
+    for key in ("initial", "means", "sds", "transition"):
+        _caps_list(key, 16)(raw)
+    _rows_cols("transition", 16, 16)(raw)
+    obs, initial = raw.get("observations"), raw.get("initial")
+    if isinstance(obs, list) and isinstance(initial, list) and len(obs) * len(initial) > 10_000_000:
+        raise _over("observations", 10_000_000)
+
+
 _RNG = _caps(count=MAX_ARRAY, skip=MAX_SKIP)
 _ROOT = _caps(max_iter=100_000)
 _POINTS = _caps(n=10_000_000)
@@ -294,6 +314,9 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "research.regime.viterbi": _all(_caps_list("initial", 32), _caps_list("means", 32),
                                     _caps_list("sds", 32), _rows_cols("transition", 32, 32)),
     "research.stats.pbo": _pbo_sizes,
+    # Stage J wave 2 (ruling J-W2-14); array lengths are in STAGE_F_ARRAYS.
+    "research.estimate.ledoit_wolf": _w2_returns_cells,
+    "research.regime.baum_welch": _baum_welch_sizes,
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")
@@ -314,6 +337,18 @@ STAGE_F_ARRAYS: dict[str, dict[str, int]] = {
     "research.backtest.run": {"prices": 1_000_000, "targets": 1_000_000},
     "research.cv.purged_kfold": {"t0": 1_000_000, "t1": 1_000_000},
     "research.stats.pbo": {"performance": 10_000_000},
+    # Stage J wave 2 (ruling J-W2-14): assets and views 500, series 1,000,000.
+    "research.portfolio.mean_variance": {"expected_returns": 500, "covariance": 500,
+                                         "covariance#cols": 500, "lower": 500, "upper": 500},
+    "research.portfolio.risk_parity": {"covariance": 500, "covariance#cols": 500,
+                                       "budgets": 500},
+    "risk.contrib.euler": {"weights": 500, "covariance": 500, "covariance#cols": 500},
+    "research.estimate.ledoit_wolf": {"returns": 1_000_000, "returns#cols": 500},
+    "research.estimate.black_litterman": {
+        "covariance": 500, "covariance#cols": 500, "prior_returns": 500, "pick": 500,
+        "pick#cols": 500, "views": 500, "view_covariance": 500, "view_covariance#cols": 500},
+    "risk.backtest.es_z2": {"losses": 1_000_000, "var": 1_000_000, "es": 1_000_000},
+    "research.regime.baum_welch": {"observations": 1_000_000},
     "risk.curve.pca": {"changes": 100_000, "changes#cols": 200},
     "risk.var.historical": {"pnl": 1_000_000},
     "risk.var.filtered_historical": {"returns": 1_000_000},
