@@ -727,3 +727,35 @@ proptest! {
         prop_assert!((total - r.variance_after).abs() <= 1e-12 * r.variance_after.abs().max(1e-300) + 1e-15);
     }
 }
+
+#[test]
+fn costs_any_is_true_when_any_single_input_is_given() {
+    // I-27: `any` is an OR over the five optional inputs; each alone must switch it on.
+    let v = [1.0];
+    let none = Costs::default();
+    assert!(!none.any());
+    for c in [
+        Costs {
+            half_spreads: Some(&v),
+            ..none
+        },
+        Costs {
+            impact: Some(&v),
+            ..none
+        },
+        Costs {
+            cost_weight: Some(1.0),
+            ..none
+        },
+        Costs {
+            margin_rates: Some(&v),
+            ..none
+        },
+        Costs {
+            margin_limit: Some(1.0),
+            ..none
+        },
+    ] {
+        assert!(c.any(), "{c:?}");
+    }
+}

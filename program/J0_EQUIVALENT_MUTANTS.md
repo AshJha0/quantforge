@@ -31,3 +31,6 @@ not the returned hedge (verified against the brute-force reference in tests/hedg
 - `hedge.rs:138:18 replace % with + in solve_hedge`: same.
 - `hedge.rs:138:38 replace == with != in solve_hedge`: same.
 - `var.rs:167:11 replace < with <= in floor_lr`: differs only at `lr == 1e-12` exactly, which no input produces.
+- `var.rs:34:19 replace - with + in order_statistic`: dead branch; `w = n - n c <= 0` needs `c >= 1`, which `check_confidence` rejects (`c in [0.5, 1)`), and no `n < 5000` rounds `n - n c` to 0 even at the largest `c < 1`.
+- `var.rs:34:19 replace - with / in order_statistic`: same dead branch.
+- `var.rs:38:14 replace < with <= in order_statistic`: `m == n` needs `w >= n`, i.e. `c <= 0`; rejected by `check_confidence`.
