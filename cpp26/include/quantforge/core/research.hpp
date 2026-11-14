@@ -89,4 +89,65 @@ struct Pbo {
 void check_pbo_shape(const std::vector<std::vector<double>>& perf, long long s);
 Pbo pbo(const std::vector<std::vector<double>>& perf, long long s, Metric metric);
 
+
+// ---- stage J wave 2 (rulings J-W2-1 to J-W2-15): optimisation.md, estimation.md, es-backtest.md, baum-welch.md ----
+using Matrix2 = std::vector<std::vector<double>>;
+
+struct MeanVariance {
+    std::vector<double> weights;
+    double expected_return, volatility, objective;
+    std::vector<long long> at_bound;
+};
+/// Empty lower/upper mean the defaults 0 and 1.
+MeanVariance mean_variance(const std::vector<double>& mu, const Matrix2& sigma, double gamma,
+                           std::vector<double> lower, std::vector<double> upper);
+
+struct RiskParity {
+    std::vector<double> weights;
+    double volatility;
+    std::vector<double> contributions;
+};
+/// Empty budgets mean 1/N each.
+RiskParity risk_parity(const Matrix2& sigma, std::vector<double> budgets);
+
+struct Euler {
+    double volatility;
+    std::vector<double> marginal, contributions, shares;
+};
+Euler euler(const std::vector<double>& w, const Matrix2& sigma);
+
+struct LedoitWolf {
+    Matrix2 covariance;
+    double shrinkage, mu;
+};
+LedoitWolf ledoit_wolf(const Matrix2& returns);
+
+struct BlackLitterman {
+    std::vector<double> posterior_returns;
+    Matrix2 posterior_covariance, predictive_covariance;
+};
+BlackLitterman black_litterman(const Matrix2& sigma, const std::vector<double>& pi, const Matrix2& pick,
+                               const std::vector<double>& q, const Matrix2& omega, double tau);
+
+struct EsZ2 {
+    double z2;
+    long long exceptions;
+    double expected_exceptions;
+};
+EsZ2 es_z2(const std::vector<double>& losses, const std::vector<double>& var, const std::vector<double>& es,
+           double alpha);
+
+struct BaumWelch {
+    std::vector<double> initial;
+    Matrix2 transition;
+    std::vector<double> means, sds;
+    double log_likelihood;
+    long long iterations;
+    bool converged;
+    std::vector<double> trace;  // log-likelihood L_0 .. L_k (for property tests)
+};
+BaumWelch baum_welch(const std::vector<double>& y, const std::vector<double>& initial, const Matrix2& transition,
+                     const std::vector<double>& means, const std::vector<double>& sds, double tolerance,
+                     long long max_iterations);
+
 }  // namespace quantforge::research

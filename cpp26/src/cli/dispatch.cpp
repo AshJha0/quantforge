@@ -438,8 +438,10 @@ CaseResult run_case(string_view text) {
         first_non_finite.reset();
         Handler handler = nullptr;
         const Value& inputs = check_envelope(parsed, handler);
-        // Ruling J-20: the wave 1 research verbs carry their own page limits in place of the general array limit.
-        const bool research = parsed.value.find("operation")->text.starts_with("research.");
+        // Rulings J-20, J-W2-14: the stage J verbs carry their own page limits in place of the general array limit.
+        const string& op_name = parsed.value.find("operation")->text;
+        const bool research =
+            op_name.starts_with("research.") || op_name == "risk.contrib.euler" || op_name == "risk.backtest.es_z2";
         const bool big = !research && oversized(inputs);
         Out out;
         out.values.begin_object();

@@ -161,6 +161,146 @@ void op_research_pbo(const In& in, Out& out) {
     out.values.integer(r.n_combinations);
 }
 
+// ---- stage J wave 2 (rulings J-W2-1 to J-W2-15); page limits J-W2-14 replace the general array limit ----
+
+void key_matrix(Out& out, string_view k, const Matrix& m) {
+    out.values.key(k);
+    out.values.begin_array();
+    for (const Vec& r : m) {
+        out.values.begin_array();
+        for (const double x : r) out.values.real(x);
+        out.values.end_array();
+    }
+    out.values.end_array();
+}
+
+// Assets or views: at most 500 rows, each at most 500 wide (J-W2-14).
+void limit_square(const Matrix& m, string_view key) {
+    bool above = m.size() > 500;
+    for (const Vec& r : m) above = above || r.size() > 500;
+    limit_if(above, key);
+}
+
+void op_research_mean_variance(const In& in, Out& out) {
+    const Vec mu = in.reals("expected_returns");
+    const Matrix sigma = in.matrix("covariance");
+    const double gamma = in.real("risk_aversion");
+    const bool has_lower = in.find("lower") != nullptr, has_upper = in.find("upper") != nullptr;
+    const Vec lower = has_lower ? in.reals("lower") : Vec{};
+    const Vec upper = has_upper ? in.reals("upper") : Vec{};
+    limit_if(mu.size() > 500, "expected_returns");
+    limit_square(sigma, "covariance");
+    limit_if(lower.size() > 500 || upper.size() > 500, "lower");
+    in.ready();
+    const std::size_t n = mu.size();
+    if ((has_lower && lower.size() != n) || (has_upper && upper.size() != n))
+        throw Error("E_INPUT", "bounds must have length N", has_lower && lower.size() != n ? "lower" : "upper");
+    const research::MeanVariance r = research::mean_variance(mu, sigma, gamma, lower, upper);
+    out.key_reals("weights", r.weights);
+    out.key_real("expected_return", r.expected_return);
+    out.key_real("volatility", r.volatility);
+    out.key_real("objective", r.objective);
+    key_integers(out, "at_bound", r.at_bound);
+}
+
+void op_research_risk_parity(const In& in, Out& out) {
+    const Matrix sigma = in.matrix("covariance");
+    const bool has_b = in.find("budgets") != nullptr;
+    const Vec b = has_b ? in.reals("budgets") : Vec{};
+    limit_square(sigma, "covariance");
+    limit_if(b.size() > 500, "budgets");
+    in.ready();
+    if (has_b && b.size() != sigma.size()) throw Error("E_INPUT", "budgets must have length N", "budgets");
+    const research::RiskParity r = research::risk_parity(sigma, b);
+    out.key_reals("weights", r.weights);
+    out.key_real("volatility", r.volatility);
+    out.key_reals("contributions", r.contributions);
+}
+
+void op_risk_contrib_euler(const In& in, Out& out) {
+    const Vec w = in.reals("weights");
+    const Matrix sigma = in.matrix("covariance");
+    limit_if(w.size() > 500, "weights");
+    limit_square(sigma, "covariance");
+    in.ready();
+    const research::Euler r = research::euler(w, sigma);
+    out.key_real("volatility", r.volatility);
+    out.key_reals("marginal", r.marginal);
+    out.key_reals("contributions", r.contributions);
+    out.key_reals("shares", r.shares);
+}
+
+void op_research_ledoit_wolf(const In& in, Out& out) {
+    const Matrix x = in.matrix("returns");
+    std::size_t widest = 0, total = 0;
+    for (const Vec& r : x) {
+        widest = std::max(widest, r.size());
+        total += r.size();
+    }
+    limit_if(x.size() > 1000000 || total > 10000000 || widest > 500, "returns");
+    in.ready();
+    const research::LedoitWolf r = research::ledoit_wolf(x);
+    key_matrix(out, "covariance", r.covariance);
+    out.key_real("shrinkage", r.shrinkage);
+    out.key_real("mu", r.mu);
+}
+
+void op_research_black_litterman(const In& in, Out& out) {
+    const Matrix sigma = in.matrix("covariance");
+    const Vec pi = in.reals("prior_returns");
+    const Matrix pick = in.matrix("pick");
+    const Vec q = in.reals("views");
+    const Matrix omega = in.matrix("view_covariance");
+    const double tau = in.real("tau");
+    limit_square(sigma, "covariance");
+    limit_square(pick, "pick");
+    limit_square(omega, "view_covariance");
+    limit_if(pi.size() > 500, "prior_returns");
+    limit_if(q.size() > 500, "views");
+    in.ready();
+    const research::BlackLitterman r = research::black_litterman(sigma, pi, pick, q, omega, tau);
+    out.key_reals("posterior_returns", r.posterior_returns);
+    key_matrix(out, "posterior_covariance", r.posterior_covariance);
+    key_matrix(out, "predictive_covariance", r.predictive_covariance);
+}
+
+void op_risk_backtest_es_z2(const In& in, Out& out) {
+    const Vec l = in.reals("losses"), v = in.reals("var"), e = in.reals("es");
+    const double alpha = in.real("alpha");
+    limit_if(l.size() > 1000000 || v.size() > 1000000 || e.size() > 1000000, "losses");
+    in.ready();
+    const research::EsZ2 r = research::es_z2(l, v, e, alpha);
+    out.key_real("z2", r.z2);
+    out.values.key("exceptions");
+    out.values.integer(r.exceptions);
+    out.key_real("expected_exceptions", r.expected_exceptions);
+}
+
+void op_research_baum_welch(const In& in, Out& out) {
+    const Vec y = in.reals("observations");
+    const Vec initial = in.reals("initial");
+    const Matrix transition = in.matrix("transition");
+    const Vec means = in.reals("means"), sds = in.reals("sds");
+    const double tol = in.real("tolerance", 1e-10);
+    const long long max_it = in.integer("max_iterations", 1000);
+    const std::size_t k = initial.size();
+    limit_if(k > 16 || transition.size() > 16 || means.size() > 16 || sds.size() > 16, "initial");
+    limit_if(max_it > 10000, "max_iterations");
+    limit_if(y.size() > 1000000, "observations");
+    limit_if(product_above(static_cast<long long>(y.size()), static_cast<long long>(k), 10000000), "observations");
+    in.ready();
+    const research::BaumWelch r = research::baum_welch(y, initial, transition, means, sds, tol, max_it);
+    out.key_reals("initial", r.initial);
+    key_matrix(out, "transition", r.transition);
+    out.key_reals("means", r.means);
+    out.key_reals("sds", r.sds);
+    out.key_real("log_likelihood", r.log_likelihood);
+    out.values.key("iterations");
+    out.values.integer(r.iterations);
+    out.values.key("converged");
+    out.values.boolean(r.converged);
+}
+
 constexpr Entry research_ops[] = {
     {"research.backtest.run", op_research_backtest},
     {"research.cv.purged_kfold", op_research_purged_kfold},
@@ -170,4 +310,11 @@ constexpr Entry research_ops[] = {
     {"research.stats.dsr", op_research_dsr},
     {"research.stats.power", op_research_power},
     {"research.stats.pbo", op_research_pbo},
+    {"research.portfolio.mean_variance", op_research_mean_variance},
+    {"research.portfolio.risk_parity", op_research_risk_parity},
+    {"risk.contrib.euler", op_risk_contrib_euler},
+    {"research.estimate.ledoit_wolf", op_research_ledoit_wolf},
+    {"research.estimate.black_litterman", op_research_black_litterman},
+    {"risk.backtest.es_z2", op_risk_backtest_es_z2},
+    {"research.regime.baum_welch", op_research_baum_welch},
 };
