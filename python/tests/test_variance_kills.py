@@ -80,6 +80,13 @@ def _vs(**kw: Any) -> tuple[float, float, float]:
     return v.varswap_fair_strike(**{**VS, **kw})
 
 
+def _golden_inputs(case_id: str) -> dict[str, Any]:
+    cases = json.loads((ROOT / "datasets" / "golden" / "stage_f" / "garch_f.json")
+                       .read_text("utf-8"))["cases"]
+    inputs: dict[str, Any] = next(c for c in cases if c["case_id"] == case_id)["inputs"]
+    return inputs
+
+
 def _nulls(q: v.Quote) -> v.Quote:
     return Q(q.strike, None, q.call_ask, q.put_bid, q.put_ask)
 
@@ -153,6 +160,13 @@ ERRORS: list[tuple[Callable[[], object], str, str, str]] = [
      "E_DOMAIN", "extension_step", "extension_step must be positive"),
     (lambda: _vs(extension_step=90.0), "E_DOMAIN", "extension_step",
      "the lowest put strike less the extension step is not positive"),
+    (lambda: _vs(rate=0.5, put_strikes=[99.0, 100.0], call_strikes=[100.0, 101.0],
+                 vols=[(99.0, 0.01), (100.0, 0.01), (101.0, 0.01)], extension_step=0.5),
+     "E_DOMAIN", "vols", "the replicated variance is negative"),
+    (lambda: Q(1.0, None, 1.0, 1.0, 1.0).call, "E_INPUT", "strip", "a null quote is used"),
+    (lambda: Q(1.0, 1.0, 1.0, 1.0, None).put, "E_INPUT", "strip", "a null quote is used"),
+    (lambda: v.garch_estimate(_golden_inputs("garch_f-0017")["returns"], "SAMPLE", "NORMAL", False),
+     "E_NO_CONVERGENCE", "returns", "no interior maximum"),
     (lambda: v.varswap_realized([100.0], 252.0, 0.04, 1.0),
      "E_INPUT", "prices", "at least 2 prices are needed"),
     (lambda: v.varswap_realized([100.0, 0.0], 252.0, 0.04, 1.0),
