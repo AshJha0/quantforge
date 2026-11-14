@@ -70,6 +70,7 @@ module = [
     "test_core",
     "test_credit_correlation_hedges",
     "test_credit_kills",
+    "test_variance_kills",
     "test_curve_interp_f",
     "test_dynamic_hedge_selection",
     "test_examples_stage_i",

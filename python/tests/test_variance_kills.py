@@ -10,6 +10,7 @@ targeted checks for survivors the goldens cannot see. Equivalent survivors are l
 program/J0C_EQUIVALENT_MUTANTS.md.
 """
 import importlib.util
+import itertools
 import json
 import math
 from collections.abc import Callable
@@ -66,11 +67,11 @@ def test_variance_goldens(suite: str) -> None:
 Q = v.Quote
 R30 = [0.01 * ((-1) ** i) * (1 + (i % 5) / 10) for i in range(30)]
 D0, D1 = date(2026, 1, 1), date(2027, 1, 1)
-VS: dict[str, Any] = dict(
-    as_of=D0, maturity=D1, spot=100.0, rate=0.0, dividend_yield=0.0,
-    put_strikes=[90.0, 100.0], call_strikes=[100.0, 110.0],
-    vols=[(90.0, 0.2), (100.0, 0.2), (110.0, 0.2)], extension_step=5.0,
-    variance_strike=0.04, variance_notional=1.0)
+VS: dict[str, Any] = {
+    "as_of": D0, "maturity": D1, "spot": 100.0, "rate": 0.0, "dividend_yield": 0.0,
+    "put_strikes": [90.0, 100.0], "call_strikes": [100.0, 110.0],
+    "vols": [(90.0, 0.2), (100.0, 0.2), (110.0, 0.2)], "extension_step": 5.0,
+    "variance_strike": 0.04, "variance_notional": 1.0}
 STRIP = [Q(90.0, 11.0, 11.2, 0.4, 0.6), Q(95.0, 6.5, 6.7, 1.3, 1.5), Q(100.0, 3.0, 3.2, 3.0, 3.2),
          Q(105.0, 1.0, 1.2, 6.0, 6.2), Q(110.0, 0.3, 0.5, 10.3, 10.5)]
 
@@ -288,7 +289,7 @@ def test_boundaries_are_accepted() -> None:
 
 def test_realized_closed_form() -> None:
     prices = [100.0, 101.0, 99.0, 102.0]
-    sq = sum(math.log(b / a) ** 2 for a, b in zip(prices, prices[1:], strict=False))
+    sq = sum(math.log(b / a) ** 2 for a, b in itertools.pairwise(prices))
     var, vol, pay = v.varswap_realized(prices, 252.0, 0.04, 1e4)
     assert var == pytest.approx(252.0 / 3 * sq, rel=1e-14)
     assert vol == pytest.approx(math.sqrt(252.0 / 3 * sq), rel=1e-14)
