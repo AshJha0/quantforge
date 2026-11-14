@@ -18,3 +18,12 @@ Closed-form par DV01 `(1 - (1 + y/2)^(-2n)) / y / 10^4` against `price_from_yiel
 | 6 | minor | Textbook citations by chapter name, no number | Kept by name: the signer could not verify chapter numbers without the books; stated here |
 
 Verdict: no blockers. Signed as amendment 5 after fixes 3-5.
+
+## Addendum (2026-11-14, after signing): full citations for finding 6
+
+Amendment 5 is signed and is not edited. These are the full citations its chapter names refer to. The books were not opened; the chapter numbers and titles below are recalled and must be confirmed against a copy before anyone relies on them.
+
+- Tuckman, B. and Serrat, A., *Fixed Income Securities: Tools for Today's Markets*, 3rd ed., Wiley, 2011. "The chapter on DV01, duration and convexity" is chapter 4, "DV01, Duration, and Convexity". "The chapter on curve trades" (amendment 4, R3-01 item 1) is chapter 6, "Empirical Approaches to Risk Metrics and Hedging", where the 50:50 butterfly is set against regression weights.
+- Fabozzi, F. J., *Bond Markets, Analysis, and Strategies*, 8th ed., Pearson, 2013. "The chapter on measuring interest-rate risk" is chapter 4, "Bond Price Volatility" (edition chosen as the one recalled; numbering differs between editions).
+
+Both are listed in `specifications/11-research/research-statistics.md` (sources `[TS11]`, `[Fab13]`) and so in `docs/references.md`, marked not opened.
