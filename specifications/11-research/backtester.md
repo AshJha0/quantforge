@@ -68,6 +68,17 @@ Prices 100, 101, 99.5, 102, 103, 101.5, 100, 104, 105.5, 103, 106, 107; targets 
 - Look-ahead canary (Q7, ruling J-2): a target equal to `sign(p_{t+1} - p_t)` has a large positive gross P&L at `lag = 0` shifted by one bar and none at `lag = 1` on a driftless random walk; the test asserts the canary is detected.
 - Zero costs give `pnl_net = pnl_gross`; doubling every cost input doubles `total_*_cost` exactly.
 
+## Convergence and limit cases
+
+The backtester has no iterative or sampled method: each output is a finite sum of products of the inputs in a fixed order, so there is no order of convergence to assert. The table states the limit cases the goldens and property tests hold instead.
+
+| Case | Asserted result |
+|---|---|
+| `EVENT` against `VECTOR` on the same inputs | equal to 1e-10 (property test, each language) |
+| All costs 0 | net P&L equals gross P&L exactly |
+| Constant price series | gross P&L 0 for any position path |
+| `lag = 0` with a look-ahead canary signal | canary detected; absent at `lag = 1` (Q7) |
+
 ## Limitations
 
 One instrument per call; a portfolio is the sum of calls. No partial fills, market impact, borrow cost, financing or dividends (stage H adds impact and queue fills). No survivorship issue arises inside the operation; the study that feeds it must state its universe (Q7 survivorship statement).
