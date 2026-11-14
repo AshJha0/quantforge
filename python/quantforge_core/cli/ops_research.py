@@ -1,4 +1,4 @@
-"""Stage J wave 1 research verbs (specifications/11-research/, rulings J-1 to J-19)."""
+"""Stage J research verbs (wave 1 and wave 2) (specifications/11-research/, rulings J-1 to J-19)."""
 from typing import Any
 
 from .inputs import Inputs
@@ -62,3 +62,52 @@ def research_stats_power(i: Inputs) -> Any:
 def research_stats_pbo(i: Inputs) -> Any:
     metric = i.enum("metric", _METRICS) if i.has("metric") else "SHARPE"
     return core.research.stats_pbo(i.matrix("performance"), i.integer("n_partitions"), metric)
+
+
+# --- Stage J wave 2 (rulings J-W2-1 to J-W2-15) --------------------------------------------------
+
+def _opt_reals(i: Inputs, key: str) -> list[float] | None:
+    return i.reals(key) if i.has(key) else None
+
+
+@op("research.portfolio.mean_variance")
+def research_portfolio_mean_variance(i: Inputs) -> Any:
+    return core.research_w2.portfolio_mean_variance(
+        i.reals("expected_returns"), i.matrix("covariance"), i.real("risk_aversion"),
+        _opt_reals(i, "lower"), _opt_reals(i, "upper"))
+
+
+@op("research.portfolio.risk_parity")
+def research_portfolio_risk_parity(i: Inputs) -> Any:
+    return core.research_w2.portfolio_risk_parity(i.matrix("covariance"),
+                                                  _opt_reals(i, "budgets"))
+
+
+@op("risk.contrib.euler")
+def risk_contrib_euler(i: Inputs) -> Any:
+    return core.research_w2.contrib_euler(i.reals("weights"), i.matrix("covariance"))
+
+
+@op("research.estimate.ledoit_wolf")
+def research_estimate_ledoit_wolf(i: Inputs) -> Any:
+    return core.research_w2.estimate_ledoit_wolf(i.matrix("returns"))
+
+
+@op("research.estimate.black_litterman")
+def research_estimate_black_litterman(i: Inputs) -> Any:
+    return core.research_w2.estimate_black_litterman(
+        i.matrix("covariance"), i.reals("prior_returns"), i.matrix("pick"), i.reals("views"),
+        i.matrix("view_covariance"), i.real("tau"))
+
+
+@op("risk.backtest.es_z2")
+def risk_backtest_es_z2(i: Inputs) -> Any:
+    return core.research_w2.backtest_es_z2(i.reals("losses"), i.reals("var"), i.reals("es"),
+                                           i.real("alpha"))
+
+
+@op("research.regime.baum_welch")
+def research_regime_baum_welch(i: Inputs) -> Any:
+    return core.research_w2.regime_baum_welch(
+        i.reals("observations"), i.reals("initial"), i.matrix("transition"), i.reals("means"),
+        i.reals("sds"), i.opt_real("tolerance", 1e-10), i.opt_integer("max_iterations", 1000))
