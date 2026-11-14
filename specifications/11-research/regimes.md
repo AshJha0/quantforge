@@ -1,6 +1,6 @@
 # Regime labelling: Viterbi path of a hidden Markov model
 
-Spec version 1.0.0. Status: Implemented (stage J, wave 1) in Python, Rust, Java and C++ at CLI contract 1.13.0; every build passes all its cases (`program/R6_HANDOVER.md`, TOTALS 15,215). Rulings: `stage-j-rulings-w1.md` J-10 to J-12. Suite: `datasets/golden/stage_j/regime_j`, written by `oracle/python/gen_stage_j_w1.py`. Plan item A4 (plan 12.5; "Viterbi ported with goldens; descriptive only"). Baum-Welch estimation stays in the Python research package (wave 2 or later) and is not a CLI operation in wave 1.
+Spec version 1.0.0. Status: Implemented (stage J, wave 1) in Python, Rust, Java and C++ (wave 1 contract 1.13.0, now 1.14.0); every build passes all its cases (15,315 of 15,315, 2026-11-14). Rulings: `stage-j-rulings-w1.md` J-10 to J-12. Suite: `datasets/golden/stage_j/regime_j`, written by `oracle/python/gen_stage_j_w1.py`. Plan item A4 (plan 12.5; "Viterbi ported with goldens; descriptive only"). Baum-Welch estimation stays in the Python research package (wave 2 or later) and is not a CLI operation in wave 1.
 
 **Plain idea.** Given a model of how the market switches between a few states (for example calm and turbulent) and how returns look in each, the Viterbi algorithm finds the single most likely sequence of states for the observed returns. The labels are descriptive: they say which regime the model thinks each day was in, not a forecast.
 

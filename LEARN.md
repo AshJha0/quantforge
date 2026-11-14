@@ -501,7 +501,7 @@ Tutorials 17 to 21 work through this section with real outputs in all four langu
 
 ## Stage J: backtest overfitting and research statistics
 
-Stage J wave 1 (target v0.9.0, not yet released) is specified in `specifications/11-research/` (rulings J-1 to J-23 and J-19a in `specifications/stage-j-rulings-w1.md`) and pinned by the suites `backtest_j`, `purgedcv_j`, `regime_j` and `rstats_j` in `datasets/golden/stage_j/`. All four builds pass every case (15,215 of 15,215 in each language at CLI contract 1.13.0, `program/R6_HANDOVER.md`). The numbers below were printed by all four builds on 2026-11-14 unless a paragraph says otherwise. Every input is synthetic except the DSR example, which is the paper's own.
+Stage J wave 1 (target v0.9.0, not yet released) is specified in `specifications/11-research/` (rulings J-1 to J-23 and J-19a in `specifications/stage-j-rulings-w1.md`) and pinned by the suites `backtest_j`, `purgedcv_j`, `regime_j` and `rstats_j` in `datasets/golden/stage_j/`. All four builds pass every case (15,215 of 15,215 at contract 1.13.0 after wave 1; 15,315 of 15,315 at contract 1.14.0 after wave 2, 2026-11-14). The numbers below were printed by all four builds on 2026-11-14 unless a paragraph says otherwise. Every input is synthetic except the DSR example, which is the paper's own.
 
 [Tutorial 23](docs/getting-started/tutorial-23-backtest-honestly.md) and [Tutorial 24](docs/getting-started/tutorial-24-is-the-sharpe-real.md) work through this section on hand-sized data, the [Cookbook](COOKBOOK.md#stage-j-recipes) has one recipe per operation, and the gallery page [Research workflow](docs/curves/research-workflow.md) runs the whole chain on twelve rules.
 
@@ -567,7 +567,7 @@ Why it matters. A strategy's backtest is the evidence most research rests on, an
 
 ### Wave 2: building a portfolio and testing a risk model
 
-Wave 2 (rulings J-W2-1 to J-W2-15 in `specifications/stage-j-rulings-w2.md`, suites `optim_j`, `estim_j`, `esbt_j` and `baumwelch_j`) adds the tools a portfolio study needs once it has returns: estimate, optimise, see where the risk sits, and test the risk model afterwards. The seven operations are implemented in Python and Java on branch `stage-j`; Rust and C++ are in progress. The numbers in the next six sections were printed by the Python build on 2026-11-14. [Tutorial 25](docs/getting-started/tutorial-25-build-and-stress-a-portfolio.md) and [Tutorial 26](docs/getting-started/tutorial-26-test-es-and-fit-regimes.md) work through them, and the [diagrams page](docs/diagrams/README.md#portfolio-pipeline) draws the pipeline.
+Wave 2 (rulings J-W2-1 to J-W2-15 in `specifications/stage-j-rulings-w2.md`, suites `optim_j`, `estim_j`, `esbt_j` and `baumwelch_j`) adds the tools a portfolio study needs once it has returns: estimate, optimise, see where the risk sits, and test the risk model afterwards. The seven operations are implemented in all four languages on branch `stage-j` at contract 1.14.0. The numbers in the next six sections were printed by the Python build on 2026-11-14. [Tutorial 25](docs/getting-started/tutorial-25-build-and-stress-a-portfolio.md) and [Tutorial 26](docs/getting-started/tutorial-26-test-es-and-fit-regimes.md) work through them, and the [diagrams page](docs/diagrams/README.md#portfolio-pipeline) draws the pipeline.
 
 ### Mean-variance: return against risk, with limits
 
@@ -620,10 +620,10 @@ Wave 2 (rulings J-W2-1 to J-W2-15 in `specifications/stage-j-rulings-w2.md`, sui
 ### What stage J's evidence does and does not show
 
 - **Outside oracle: 41 of 63 value-checked wave 1 cases (65.1 %),** from `oracle/OUTSIDE_J.json` (J-19a). PSR, DSR and PBO have no free library; DSR is checked against the paper's printed example, PBO by hand.
-- **Wave 2 has no outside-library check yet.** Its 63 value cases (96 with the error cases) are checked by hand cases, exact KKT certificates, scipy SLSQP agreement and pairs of independent algebraic forms inside the generator; scikit-learn, hmmlearn and an outside QP solver are open items for the oracle lane (J-W2-15). Wave 2 runs only in Python and Java so far.
+- **Wave 2 outside checks: 58 of 67 value cases** (rulings J-W2-16 and J-W2-23; scikit-learn, hmmlearn and an outside QP solver), so stage J as a whole is 99 of 130 (76.1 %, `oracle/OUTSIDE_SHARES.md`). The rest are checked by hand cases, exact KKT certificates, scipy SLSQP agreement and pairs of independent algebraic forms inside the generator.
 - **The operations are tools, not results.** No stage J study result is claimed here; the gallery page is a teaching example on synthetic prices.
 - **The iid formulas are optimistic.** PSR, DSR and the power formula assume independent returns; studies add block-bootstrap intervals and simulated power.
-- **Tested on one machine.** The 15,215-case wave 1 runs were on one Windows machine; CI on the stage J pull request is the cross-platform check.
+- **Tested on one machine.** The 15,215-case wave 1 runs and the 15,315-case wave 2 runs were on one Windows machine; CI on the stage J pull request is the cross-platform check.
 
 ## Appendix: stage history
 

@@ -1,6 +1,6 @@
 # Regime estimation: Baum-Welch for a Gaussian hidden Markov model
 
-Spec version 1.0.0. Status: Specified (stage J, wave 2); not yet implemented in any build. Target CLI contract 1.14.0 (ruling J-W2-1). Rulings: `stage-j-rulings-w2.md` J-W2-9, J-W2-11 to J-W2-14. Suite: `datasets/golden/stage_j/baumwelch_j`, written by `oracle/python/gen_stage_j_w2.py`. Plan 12.5 A4 and 12.10 A4 (recovery, bit-reproducibility, parameters within 1e-9 relative across languages). Companion of `regimes.md` (Viterbi labels with fixed parameters).
+Spec version 1.0.0. Status: Implemented (stage J, wave 2) in Python, Rust, Java and C++; every build passes all its cases (15,315 of 15,315, 2026-11-14). CLI contract 1.14.0 (ruling J-W2-1). Rulings: `stage-j-rulings-w2.md` J-W2-9, J-W2-11 to J-W2-14. Suite: `datasets/golden/stage_j/baumwelch_j`, written by `oracle/python/gen_stage_j_w2.py`. Plan 12.5 A4 and 12.10 A4 (recovery, bit-reproducibility, parameters within 1e-9 relative across languages). Companion of `regimes.md` (Viterbi labels with fixed parameters).
 
 **Plain idea.** Viterbi labels days with a model whose parameters are known. Baum-Welch estimates those parameters (how sticky each regime is, and the mean and spread of returns in each) from the returns alone. It is the EM algorithm: guess the parameters, work out how likely each day is to be in each regime, re-estimate the parameters from those weights, and repeat until the likelihood stops improving. Results are descriptive; nothing here is a forecast.
 

@@ -1,6 +1,6 @@
 # Expected-shortfall backtest: the Acerbi-Szekely Z2 statistic
 
-Spec version 1.0.0. Status: Specified (stage J, wave 2); not yet implemented in any build. Target CLI contract 1.14.0 (ruling J-W2-1). Rulings: `stage-j-rulings-w2.md` J-W2-10, J-W2-14. Suite: `datasets/golden/stage_j/esbt_j`, written by `oracle/python/gen_stage_j_w2.py`. Plan 14.5 ("expected-shortfall backtest (Acerbi-Szekely)"), 14.6 J-8. Companion of `var-es-and-backtests.md` (VaR exception tests).
+Spec version 1.0.0. Status: Implemented (stage J, wave 2) in Python, Rust, Java and C++; every build passes all its cases (15,315 of 15,315, 2026-11-14). CLI contract 1.14.0 (ruling J-W2-1). Rulings: `stage-j-rulings-w2.md` J-W2-10, J-W2-14. Suite: `datasets/golden/stage_j/esbt_j`, written by `oracle/python/gen_stage_j_w2.py`. Plan 14.5 ("expected-shortfall backtest (Acerbi-Szekely)"), 14.6 J-8. Companion of `var-es-and-backtests.md` (VaR exception tests).
 
 **Plain idea.** A VaR backtest counts how often losses beat VaR. That says nothing about how large those losses were, which is what expected shortfall (ES) claims to measure. Z2 compares the size of the exceedances with what the model's ES said they should average: about 0 when the model is right, clearly negative when ES was too small.
 

@@ -131,7 +131,7 @@ Built in all four languages on branch `stage-j`; each build passes 15,215 of 15,
 - **Contract:** 1.13.0, no new error code (J-1). These operations carry their own page limits in place of the general 100,000-element array limit (J-20).
 - **Outside checks:** vectorbt, timeseriescv, scikit-learn, skfolio, hmmlearn and statsmodels check 41 of the 63 value cases (65.1%, J-19a, `oracle/OUTSIDE_SHARES.md`).
 
-### Stage J wave 2: portfolio construction and risk-model tests (target v0.9.0, in progress)
+### Stage J wave 2: portfolio construction and risk-model tests (target v0.9.0, implemented, not released)
 
 Built in all four languages on branch `stage-j`. 100 new golden cases (67 value-checked, 33 error) in `optim_j`, `estim_j`, `esbt_j` and `baumwelch_j` bring the total to 15,315 (`docs/case-figures.md`); every build passes all 100 (2026-11-14, observed through the neutral runner). What changes in the structure:
 

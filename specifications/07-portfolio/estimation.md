@@ -1,6 +1,6 @@
 # Covariance and return estimation: Ledoit-Wolf shrinkage, Black-Litterman
 
-Spec version 1.0.0. Status: Specified (stage J, wave 2); not yet implemented in any build. Target CLI contract 1.14.0 (ruling J-W2-1). Rulings: `stage-j-rulings-w2.md` J-W2-3, J-W2-7, J-W2-8, J-W2-14. Suite: `datasets/golden/stage_j/estim_j`, written by `oracle/python/gen_stage_j_w2.py`. Plan row J ("Bayesian estimation"), 14.6 J-6.
+Spec version 1.0.0. Status: Implemented (stage J, wave 2) in Python, Rust, Java and C++; every build passes all its cases (15,315 of 15,315, 2026-11-14). CLI contract 1.14.0 (ruling J-W2-1). Rulings: `stage-j-rulings-w2.md` J-W2-3, J-W2-7, J-W2-8, J-W2-14. Suite: `datasets/golden/stage_j/estim_j`, written by `oracle/python/gen_stage_j_w2.py`. Plan row J ("Bayesian estimation"), 14.6 J-6.
 
 **Plain idea.** A sample covariance matrix from a short history is noisy, and an optimiser leans on exactly the noisiest entries. Ledoit-Wolf pulls it towards a multiple of the identity by an amount estimated from the data. Black-Litterman starts from a prior for expected returns (usually the returns that make the market portfolio optimal) and moves it towards an investor's views by as much as their stated confidence allows. Both are closed forms; neither is iterative.
 

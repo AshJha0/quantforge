@@ -1,6 +1,6 @@
 # Portfolio optimisation: mean-variance, risk parity, Euler risk contributions
 
-Spec version 1.0.0. Status: Specified (stage J, wave 2); not yet implemented in any build. Target CLI contract 1.14.0 (ruling J-W2-1). Rulings: `stage-j-rulings-w2.md` J-W2-2 to J-W2-6, J-W2-14. Suite: `datasets/golden/stage_j/optim_j`, written by `oracle/python/gen_stage_j_w2.py`. Plan row J ("mean-variance, risk parity, factor optimisation"), 14.5 (Euler contributions), 14.6 J-5 and J-8.
+Spec version 1.0.0. Status: Implemented (stage J, wave 2) in Python, Rust, Java and C++; every build passes all its cases (15,315 of 15,315, 2026-11-14). CLI contract 1.14.0 (ruling J-W2-1). Rulings: `stage-j-rulings-w2.md` J-W2-2 to J-W2-6, J-W2-14. Suite: `datasets/golden/stage_j/optim_j`, written by `oracle/python/gen_stage_j_w2.py`. Plan row J ("mean-variance, risk parity, factor optimisation"), 14.5 (Euler contributions), 14.6 J-5 and J-8.
 
 **Plain idea.** Mean-variance picks the weights that trade expected return against variance, with a budget and per-asset bounds. Risk parity ignores expected returns and picks weights so that each asset adds a chosen share of the total risk. Euler contributions split a portfolio's volatility into one piece per asset that adds up exactly to the total, which is what both of the others are judged by.
 
