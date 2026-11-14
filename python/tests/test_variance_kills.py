@@ -189,6 +189,11 @@ ERRORS: list[tuple[Callable[[], object], str, str, str]] = [
                                             Q(105.0, 0.0, 0.1, 55.0, 55.2),
                                             Q(110.0, 0.0, 0.1, 60.0, 60.2)]),
      "E_INPUT", "strip", "no strike is at or below the forward"),
+    (lambda: v.vix_term_variance(100, 0.0, [Q(90.0, 11.0, 11.2, 0.4, 0.6),
+                                            Q(95.0, 6.9, 7.1, 0.9, 1.1),
+                                            Q(100.0, 3.0, 3.2, None, 3.2),
+                                            Q(105.0, 1.0, 1.2, 6.0, 6.2)]),
+     "E_INPUT", "strip", "the K0 call or put has a null quote"),
     (lambda: v.vix_term_variance(100, 0.0, STRIP[2:]), "E_INPUT", "strip",
      "no out-of-the-money put or no out-of-the-money call is selected"),
     (lambda: v.vix_index((43300, 0.0, STRIP), (50000, 0.0, STRIP)),
@@ -547,3 +552,17 @@ def test_minimum_sizes_are_accepted() -> None:
             v.garch_estimate(returns, "SAMPLE", dist, False)
         except QfError as err:  # these toy series may have no interior maximum
             assert err.code == "E_NO_CONVERGENCE"
+
+
+def test_more_boundaries() -> None:
+    # NORMAL ignores a stray degrees_of_freedom; nu just above 2 and spot = 1 are accepted.
+    r = [0.01, -0.02, 0.015]
+    normal = v.garch_loglik(r, 1e-5, 0.1, 0.8, 1e-4)[0]
+    assert v.garch_loglik_t(r, 1e-5, 0.1, 0.8, 1e-4, "NORMAL", 5.0, 0.0)[0] == normal
+    assert math.isfinite(v.garch_loglik_t(r, 1e-5, 0.1, 0.8, 1e-4, "STUDENT_T", 2.5, 0.0)[0])
+    fair = _vs(spot=1.0, put_strikes=[0.9, 1.0], call_strikes=[1.0, 1.1],
+               vols=[(0.9, 0.2), (1.0, 0.2), (1.1, 0.2)], extension_step=0.05)[0]
+    assert fair > 0
+    # The lowest put less the step may be any positive number, here exactly 1.
+    assert _vs(put_strikes=[2.0, 100.0], vols=[(2.0, 0.2), (100.0, 0.2), (110.0, 0.2)],
+               extension_step=1.0)[0] > 0
