@@ -74,3 +74,7 @@ Stated overlap: R3-03's in-sample years 2013-2015 are R3-01 holdout years of the
 ### R3-01 in-sample after amendment 5 (2026-11-14)
 
 5,755 aligned business days (1990-01-02 to 2012-12-31); common sample 5,256 daily returns (from the first full 500-day window). In-sample net Sharpe at 1x: T01 -0.71, T02 -0.34, T03 -0.61, T04 -0.47, T05 -0.07, T06 -0.10, T07 0.02, T08 0.05; all negative at 2x. Selected T08 (L 500, k 1.5). PBO 0.151 (below 0.5, not exploratory). R3-02 and R3-03 in-sample results unchanged by the re-run.
+
+## Holdout run, 2026-11-14: done
+
+Freeze `faadaa4`, run log `22d0c92`, one run each. All three fail; Holm rejects none. Results: `research/r3/RESULTS.md`. Open: R3-02's bootstrap SE is NaN (mostly-flat trial), stated there; R3-02 dummy-controlled check not computed (reported-only). Forward-log back-fill (amendment 3 rules 3-5) not done in this lane.

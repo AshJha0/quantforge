@@ -58,7 +58,7 @@ Before stage E, R1 works on how far the existing results can be trusted. It adds
 | Targets and mutation | [Targets](benchmarks/targets.md) written before measuring; per-stage mutation report | Measured (C++ stage D mutation 82.5%, measured in R2); Python T1 and T4 and Java T1 missed |
 | Coverage | Unit-test line coverage: C++ 94.2%, Java 97.3%, Python 97.2%, Rust 96.5% | Measured |
 | Citations | A `## Sources` section in 50 specs (`program/R1_CITATION_FINDINGS.md`) | Done. The citations lane reports 10 sources opened and confirmed, 2 partly confirmed and 16 unreachable; licensed sources are still not opened |
-| R3 preregistrations | Three studies in `research/preregs/` | Signed by Claude under the owner's delegation; holdout unread |
+| R3 preregistrations | Three studies in `research/preregs/` | Signed by Claude under the owner's delegation; holdout run once 2026-11-14: all three null (`research/r3/RESULTS.md`) |
 
 Open at the end of R1: Python fuzz runs at about 2,760 random inputs a minute against the 50,000 target.
 

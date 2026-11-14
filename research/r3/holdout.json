@@ -1,0 +1,83 @@
+{
+ "R3-01": {
+  "sr": -0.6148,
+  "se": 0.34475,
+  "sr0": 0.682535,
+  "p": 0.999916,
+  "p2": 0.962733,
+  "thirds_positive": false,
+  "n": 3459,
+  "dsr": 8.4e-05,
+  "sharpe_net_2x": -1.151743,
+  "mean_net_1x": -6.199199276847303e-06,
+  "reported_correlations": {
+   "pc1": 0.125,
+   "pc2": -0.0644,
+   "pc3": 0.198,
+   "carry": -0.0077
+  },
+  "trial": "R3-01-T08",
+  "holm_level": 0.016667,
+  "holm_adjusted_p": 1.0,
+  "cond1_holm_rejects": false,
+  "cond2_positive_at_2x": false,
+  "cond3_thirds": false,
+  "pass": false,
+  "secondary": "not below"
+ },
+ "R3-02": {
+  "sr": -1.087556,
+  "se": NaN,
+  "sr0": NaN,
+  "p": NaN,
+  "p2": NaN,
+  "thirds_positive": false,
+  "n": 46,
+  "dsr": NaN,
+  "sharpe_net_2x": -1.188417,
+  "mean_net_1x": -1.7507055763519707e-05,
+  "first_exit": "2023-01-03",
+  "last_exit": "2026-10-01",
+  "dummy_controlled_check": "not computed in this lane (reported-only; amendment 4 item 8)",
+  "trial": "R3-02-T02",
+  "holm_level": 0.025,
+  "holm_adjusted_p": 1.0,
+  "cond1_holm_rejects": false,
+  "cond2_positive_at_2x": false,
+  "cond3_thirds": false,
+  "pass": false,
+  "secondary": "not below",
+  "label": "exploratory (in-sample PBO not computable, amendment 4 C8)"
+ },
+ "R3-03": {
+  "sr": 0.334393,
+  "se": 0.35338,
+  "sr0": 0.699621,
+  "p": 0.849322,
+  "p2": 0.172005,
+  "thirds_positive": true,
+  "n": 130,
+  "dsr": 0.150678,
+  "sharpe_net_2x": 0.065743,
+  "mean_net_1x": 0.0003570494702098127,
+  "reported_correlations": {
+   "rolldown": -0.0892,
+   "momentum_12m": 0.0363
+  },
+  "trial": "R3-03-T01",
+  "holm_level": 0.05,
+  "holm_adjusted_p": 1.0,
+  "cond1_holm_rejects": false,
+  "cond2_positive_at_2x": true,
+  "cond3_thirds": true,
+  "pass": false,
+  "secondary": "not below",
+  "cpi_arm": "not run (T02, T04; amendment 4 item 1)"
+ },
+ "family": {
+  "N": 24,
+  "distinct_strategies_run": 21,
+  "freeze_commit": "faadaa40d980cf0cfd48125c8533c18b21b5ed5f",
+  "runner_sha256": "f45ce97f6142fa067f12f89fc30537b210dce3eaa1500bb2f1cbd43bfa293916"
+ }
+}

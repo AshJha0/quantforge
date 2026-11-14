@@ -2,6 +2,8 @@
 
 ## Unreleased (0.9.0): stage J wave 1, research tools
 
+- **R3 studies run once on their holdouts: all three null.** R3-01 amendment 5 (closed-form par DV01; the library calendar starts in 2000), loader with provenance log (`research/r3_data.py`), in-sample runs, freeze `faadaa4`, run log committed first, one run each. Holdout net Sharpe: R3-01 -0.61 (DSR 0.0001), R3-02 -1.09 (exploratory; bootstrap SE undefined), R3-03 0.33 (DSR 0.15); Holm rejects none. Results and the honest ceiling: `research/r3/RESULTS.md`.
+
 CLI contract 1.13.0 (ruling J-1, no new error code); 284 operations in the name map; 15,215 golden cases (7,504 value-checked, 5,197 error, 2,514 invariance), 99 of them new in the four wave 1 suites. Each of the four builds passes 15,215 of 15,215 (`program/R6_HANDOVER.md`, TOTALS line; observed on one Windows machine through the neutral runner).
 
 ### Added
