@@ -32,7 +32,7 @@ CLI contract 1.14.0 (wave 1 raised it to 1.13.0, ruling J-1; wave 2 to 1.14.0, r
 
 - `hedge_solvers.rs` mutation result is partial (run not finished); `var.rs` re-verify of the last targeted lines is pending.
 - The C++ J-0c kill rate (83.6 %) is a lower bound.
-- Tutorials 25 and 26 are verified in Python only; the Rust, Java and C++ runs are next.
+- Tutorials 25 and 26 are checked by `tools/check_tutorial.py` in Python, Java and C++ (2026-11-14); the Rust check is not run yet, because Application Control on the development machine blocks a freshly built Windows binary.
 - The pa11y accessibility check runs in CI only, not on the development machine.
 - The G-42b ORE re-test job has not run yet; its first run is on the stage J pull request.
 - R3 results are null with low power (13 % to 15 %); they are weak evidence either way.
