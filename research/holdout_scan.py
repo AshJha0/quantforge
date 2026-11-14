@@ -32,8 +32,18 @@ MARKERS = {
     "R3-03": r"home\.treasury\.gov|us-treasury-par-yields|us-treasury-real-yields|daily_treasury_real|bls\.gov|bls-cpi|CUUR0000SA0",
 }
 DATE = re.compile(r"(?<![\d-])(\d{4}-\d{2}(?:-\d{2})?)(?![\d-])")
-# Prose about the studies, and the R3 download log (URLs, request ranges and hashes; no observed value).
-SKIP = ("research/preregs/", "program/", "CHANGELOG.md", "ROADMAP.md", "research/r3/data_log.csv")
+SKIP = ("research/preregs/", "program/", "CHANGELOG.md", "ROADMAP.md")  # prose about the studies, not data
+# The R3 download log: its `url` (request ranges) and `sha256` columns carry no observed value and are blanked
+# before the scan; every other column of it is scanned as usual.
+DATA_LOG = "research/r3/data_log.csv"
+BLANKED = ("url", "sha256")
+
+
+def strip_log_columns(text):
+    import csv
+    import io
+    rows = list(csv.DictReader(io.StringIO(text)))
+    return "\n".join(",".join("" if k in BLANKED else (v or "") for k, v in r.items()) for r in rows)
 
 
 def windows():
@@ -111,7 +121,7 @@ def scan_all(log_ref="origin/forward-log"):
     w = windows()
     hits = []
     for p, t in tracked():
-        hits += scan_text(p, t, w)
+        hits += scan_text(p, strip_log_columns(t) if p == DATA_LOG else t, w)
     have = subprocess.run(["git", "rev-parse", "--verify", "-q", log_ref], cwd=ROOT, capture_output=True).returncode == 0
     if have:
         log = subprocess.run(["git", "show", f"{log_ref}:actions/log.jsonl"], cwd=ROOT, capture_output=True, check=True).stdout.decode()

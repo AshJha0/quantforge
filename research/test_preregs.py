@@ -99,6 +99,16 @@ class HoldoutObservations(unittest.TestCase):
         self.assertEqual(unlisted(bad), ["docs/x.md"])
         self.assertEqual(good, [])
 
+    def test_data_log_blanks_only_url_and_hash(self):
+        head = "name,window,url,utc_retrieved,sha256\n"
+        name = "R3-01_daily_treasury_yield_curve_2012.csv,in,"
+        ok = head + name + "https://home.treasury.gov/x?startDate=2018-04-02,2026-11-14T10:00:00Z,ab\n"
+        bad = head + name + "https://home.treasury.gov/x,2015-06-01T10:00:00Z,ab\n"
+        self.assertEqual(holdout_scan.scan_text("l", holdout_scan.strip_log_columns(ok)), [])
+        self.assertEqual(holdout_scan.scan_text("l", holdout_scan.strip_log_columns(bad))[0][1], "R3-01")
+        # the same row in any other file is not blanked and is caught
+        self.assertTrue(holdout_scan.scan_text("docs/z.csv", ok))
+
     def test_recorder_rule_covers_only_its_files_and_dates(self):
         rs = rules()
         self.assertEqual(len(rs), 2)
