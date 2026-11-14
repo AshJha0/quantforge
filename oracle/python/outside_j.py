@@ -333,8 +333,12 @@ def optim():
             w = np.asarray(y.value, float) / float(np.sum(y.value))
             vol = math.sqrt(float(w @ S @ w))
             rc = w * (S @ w) / vol
-            rows.append(entry(c, [check(c, "weights", w.tolist()), check(c, "volatility", vol, via="arithmetic"),
-                                  check(c, "contributions", rc.tolist(), via="arithmetic")]))
+            e = entry(c, [check(c, "weights", w.tolist()), check(c, "volatility", vol, via="arithmetic"),
+                          check(c, "contributions", rc.tolist(), via="arithmetic")])
+            # Clarabel cannot certify 1e-14 and usually reports optimal_inaccurate; the case counts only on agreement
+            # at root_finding (1e-10). The settings are fixed for every case, not tuned per case.
+            e["solver_status"] = prob.status
+            rows.append(e)
         else:  # risk.contrib.euler
             w = np.asarray(i["weights"], float)
             sig = lambda x: anp.sqrt(anp.dot(x, anp.dot(S, x)))
