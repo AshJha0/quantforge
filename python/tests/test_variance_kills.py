@@ -578,3 +578,60 @@ def test_price_of_one_and_frozen_quote() -> None:
     assert v.varswap_realized([1.0, math.e], 1.0, 0.0, 1.0)[0] == pytest.approx(1.0, rel=1e-15)
     with pytest.raises(AttributeError):
         STRIP[0].strike = 1.0  # type: ignore[misc]
+
+
+# --- J-0 audit follow-up: survivors once listed as equivalent ---------------------------------
+def _garch_series(n: int, seed: int, scale: float = 1.0, df: int | None = None) -> list[float]:
+    """A GARCH(1,1) path (omega 0.05, alpha 0.1, beta 0.85), Student-t shocks when df is set."""
+    import random
+
+    rng = random.Random(seed)
+    s2, out = 0.05 / (1 - 0.1 - 0.85), []
+    for _ in range(n):
+        z = rng.gauss(0, 1)
+        if df:
+            chi = sum(rng.gauss(0, 1) ** 2 for _ in range(df)) / df
+            z = z / math.sqrt(chi) * math.sqrt((df - 2) / df)
+        r = math.sqrt(s2) * z
+        out.append(r * scale)
+        s2 = 0.05 + 0.1 * r * r + 0.85 * s2
+    return out
+
+
+def test_fit_overflowing_squares_has_no_finite_likelihood() -> None:
+    # Line 185 is reachable: the squares of 1e200 overflow, so every start is infinite.
+    with pytest.raises(QfError) as err:
+        v.garch_fit([1e200] * 30, "SAMPLE")
+    assert err.value.code == "E_NO_CONVERGENCE"
+    assert err.value.message == "the GARCH fit found no finite likelihood"
+
+
+def test_zero_fair_variance_is_allowed() -> None:
+    # Line 422: both options are so far out of the money that they price exactly 0, the forward
+    # term is 0 (rate = dividend = 0), so fair = 0.0 exactly. Zero is not negative.
+    got = _vs(put_strikes=[1.0], call_strikes=[1e6], vols=[(1.0, 0.01), (1e6, 0.01)],
+              extension_step=0.5, variance_strike=0.0)
+    assert got == (0.0, 0.0, 0.0)
+
+
+def test_zero_bracket_variance_is_allowed() -> None:
+    # Line 559: a strip whose term variance is exactly 0.0 (found by an ulp scan in the J-0
+    # audit), near term at exactly 30 days so the next term has weight 0. bracket = 0.0.
+    strip = [Q(99.0, 10.00001, 10.00001, 1e-5, 1e-5), Q(100.0, 1.601, 1.601, 0.001, 0.001),
+             Q(102.0, 0.04083039237832999, 0.04083039237832999, 5.0, 5.0)]
+    assert v.vix_term_variance(43200, 0.0, strip)[2] == 0.0
+    assert v.vix_index((43200, 0.0, strip), (86400, 0.0, strip)) == (0.0, 0.0, 0.0)
+
+
+def test_estimate_is_scale_equivariant() -> None:
+    # Line 339: the Newton stop test is relative to `sample` for omega. Independent check: the
+    # GARCH MLE is scale-equivariant, so returns times 1e4 give omega times 1e8, the same alpha
+    # and beta, and a log-likelihood lower by n ln(1e4).
+    base = _garch_series(400, 3)
+    small = v.garch_estimate(base, "SAMPLE", "NORMAL", True)
+    big = v.garch_estimate([r * 1e4 for r in base], "SAMPLE", "NORMAL", True)
+    assert big["omega"] == pytest.approx(small["omega"] * 1e8, rel=1e-6)  # type: ignore[operator]
+    assert big["alpha"] == pytest.approx(small["alpha"], rel=1e-6)
+    assert big["beta"] == pytest.approx(small["beta"], rel=1e-6)
+    assert big["loglik"] == pytest.approx(
+        small["loglik"] - 400 * math.log(1e4), rel=1e-9)  # type: ignore[operator]
