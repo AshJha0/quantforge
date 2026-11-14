@@ -53,3 +53,20 @@ Data is not the blocker. The open choices are.
 A signed amendment 4 per study (or one shared text, as amendment 3), fixing each item above before any in-sample run, plus a study runner that refuses dates past the in-sample end without the freeze commit hash (common rules). Then: in-sample run and PBO, freeze commit, `holdout_runs.csv` line committed, one holdout run per study, Holm across the three. Owner or delegated signer decides; this lane does not sign.
 
 When: as soon as amendment 4 is signed; each study then takes about one session (fetch, in-sample, freeze, holdout). The forward log keeps `"signal": null` until each J-2 run date (am. 3 rule 2).
+
+## Run lane, 2026-11-14 (branch `stage-j-r3run`): stopped before step 3
+
+Done: deviation note for the amendment 4 DV01 wording (`research/DEVIATION-2026-11-14-a4-dv01-wording.md`); loader `research/r3_data.py` (100 public files fetched once, logged with URL, UTC time and SHA-256 in `research/r3/data_log.csv`; holdout files hashed, never parsed; parsing them goes through `r3_runner.holdout_guard`); in-sample runs `research/r3_in_sample.py`, results `research/r3/in_sample.json`. No freeze commit, no `holdout_runs.csv` line, no holdout value parsed.
+
+### R3-01: stopped, a choice is open
+
+Amendment 4 item 1 fixes the leg DV01 as `price_from_yield` (`quantforge_core.bonds`) of a par bond settled on each date. `quantforge_core` calendars cover 2000 to 2099 only (`calendars.MIN_YEAR = 2000`), so `price_from_yield` refuses every date in 1990-1999 (`E_DATE_RANGE`: "0 months from 1992-01-02 leaves the calendar's years"). The in-sample window is 1990-01-02 to 2012-12-31. Options, none chosen here: (a) closed-form par-bond DV01 for the whole sample (at a coupon date a par bond's price is 1 and its modified duration has a closed form; the same number the library gives where it can price), (b) widen the library's calendar range, (c) start the in-sample at 2000 (changes the window; not allowed by the prereg). It needs a signed amendment 5 before any R3-01 statistic is computed.
+
+### R3-02 and R3-03: in-sample done, held before freeze on purpose
+
+- R3-02: 1,188 aligned business days (bill 13-week CE, SOFR, TGCR, BGCR); common sample 43 monthly returns (exits 2019-06-03 to 2022-12-01). Every trial has a negative in-sample net Sharpe; the best is T02 (SOFR, L 60, k 2.0), -0.56 (4 non-zero months of 43). PBO: not computable (a CSCV block has zero standard deviation; mostly-flat trials), so the study is labelled exploratory (C8).
+- R3-03: 156 month ends, 155 in-sample returns; T01 (= T03) net Sharpe 0.44 at 1x, 0.36 at 2x (an in-sample fit, as amendment 4 item 5 states); T02/T04 not run; PBO not applicable. The 5Y-pair business days equal the 5Y+10Y-pair days in-sample (3,254 each), so including the 10Y robustness pair in C10's "every input" changes nothing.
+
+Why R3-02 and R3-03 were not frozen and run although they could be: condition (1) is Holm across all three studies, so no holdout verdict can be complete without R3-01, and R3-01 needs an amendment first. Running two one-shot holdouts now would mean the R3-01 amendment is signed after two holdout outcomes are known. Stopping all three keeps the amendment clean; resuming R3-02/R3-03 costs minutes (freeze, log line, run).
+
+Stated overlap: R3-03's in-sample years 2013-2015 are R3-01 holdout years of the nominal 5Y and 10Y yields. The loader never gives R3-03 the 2Y column, so the R3-01 fly cannot be formed from it; no R3-01 quantity was computed.

@@ -1,0 +1,158 @@
+{
+ "R3-01": {
+  "stopped": "quantforge_core QfError: 0 months from 1992-01-02 leaves the calendar's years"
+ },
+ "R3-02": {
+  "business_days": 1188,
+  "first_day": "2018-04-02",
+  "last_day": "2022-12-30",
+  "common_sample_months": 43,
+  "first_exit": "2019-06-03",
+  "last_exit": "2022-12-01",
+  "trials": [
+   {
+    "trial": "R3-02-T01",
+    "funding": "SOFR",
+    "L": 60,
+    "k": 1.0,
+    "sharpe_net_1x": -0.903934,
+    "n": 43,
+    "nonzero": 20,
+    "sharpe_net_2x": -1.030158
+   },
+   {
+    "trial": "R3-02-T02",
+    "funding": "SOFR",
+    "L": 60,
+    "k": 2.0,
+    "sharpe_net_1x": -0.561787,
+    "n": 43,
+    "nonzero": 4,
+    "sharpe_net_2x": -0.582093
+   },
+   {
+    "trial": "R3-02-T03",
+    "funding": "SOFR",
+    "L": 250,
+    "k": 1.0,
+    "sharpe_net_1x": -1.450538,
+    "n": 43,
+    "nonzero": 20,
+    "sharpe_net_2x": -1.534922
+   },
+   {
+    "trial": "R3-02-T04",
+    "funding": "SOFR",
+    "L": 250,
+    "k": 2.0,
+    "sharpe_net_1x": -1.07696,
+    "n": 43,
+    "nonzero": 6,
+    "sharpe_net_2x": -1.132191
+   },
+   {
+    "trial": "R3-02-T05",
+    "funding": "TGCR",
+    "L": 60,
+    "k": 1.0,
+    "sharpe_net_1x": -0.928472,
+    "n": 43,
+    "nonzero": 20,
+    "sharpe_net_2x": -1.052659
+   },
+   {
+    "trial": "R3-02-T06",
+    "funding": "TGCR",
+    "L": 60,
+    "k": 2.0,
+    "sharpe_net_1x": -0.569129,
+    "n": 43,
+    "nonzero": 4,
+    "sharpe_net_2x": -0.589162
+   },
+   {
+    "trial": "R3-02-T07",
+    "funding": "TGCR",
+    "L": 250,
+    "k": 1.0,
+    "sharpe_net_1x": -1.555442,
+    "n": 43,
+    "nonzero": 23,
+    "sharpe_net_2x": -1.655929
+   },
+   {
+    "trial": "R3-02-T08",
+    "funding": "TGCR",
+    "L": 250,
+    "k": 2.0,
+    "sharpe_net_1x": -1.09398,
+    "n": 43,
+    "nonzero": 6,
+    "sharpe_net_2x": -1.145126
+   },
+   {
+    "trial": "R3-02-T09",
+    "funding": "BGCR",
+    "L": 60,
+    "k": 1.0,
+    "sharpe_net_1x": -0.928553,
+    "n": 43,
+    "nonzero": 20,
+    "sharpe_net_2x": -1.052749
+   },
+   {
+    "trial": "R3-02-T10",
+    "funding": "BGCR",
+    "L": 60,
+    "k": 2.0,
+    "sharpe_net_1x": -0.569129,
+    "n": 43,
+    "nonzero": 4,
+    "sharpe_net_2x": -0.589162
+   },
+   {
+    "trial": "R3-02-T11",
+    "funding": "BGCR",
+    "L": 250,
+    "k": 1.0,
+    "sharpe_net_1x": -1.555597,
+    "n": 43,
+    "nonzero": 23,
+    "sharpe_net_2x": -1.656077
+   },
+   {
+    "trial": "R3-02-T12",
+    "funding": "BGCR",
+    "L": 250,
+    "k": 2.0,
+    "sharpe_net_1x": -1.09398,
+    "n": 43,
+    "nonzero": 6,
+    "sharpe_net_2x": -1.145126
+   }
+  ],
+  "pbo": null,
+  "selected": "R3-02-T02"
+ },
+ "R3-03": {
+  "month_ends": 156,
+  "first_month_end": "2003-01-31",
+  "last_month_end": "2015-12-31",
+  "trials": [
+   {
+    "trial": "R3-03-T01 (= T03)",
+    "sharpe_net_1x": 0.443177,
+    "n": 155,
+    "nonzero": 155,
+    "sharpe_net_2x": 0.361052
+   }
+  ],
+  "not_run": [
+   "R3-03-T02",
+   "R3-03-T04"
+  ],
+  "selected": "R3-03-T01",
+  "pbo": null,
+  "pbo_note": "not applicable: one distinct trial (amendment 4 C8)"
+ }
+}
