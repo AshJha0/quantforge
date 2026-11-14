@@ -648,3 +648,30 @@ def test_fit_reaches_the_reference_optimum(n: int, seed: int, df: int | None,
     # 15 starts, xatol 1e-12 (J-0 audit follow-up, 2026-11-14). The fit must reach that optimum.
     got = v.garch_fit(_garch_series(n, seed, df=df), "SAMPLE")
     assert got == pytest.approx(expected, rel=1e-11)
+
+
+@pytest.mark.parametrize(("n", "seed", "scale", "df", "dist", "demean", "expected"), [
+    (400, 2, 1.0, None, "NORMAL", False,
+     (0.0599267705898633, 0.07776585249457289, 0.8631607506434537, None, -567.2913052519141)),
+    (400, 5, 1e-3, None, "NORMAL", True,
+     (3.1569470544083495e-08, 0.0764464765984754, 0.8971215508179281, None, 2165.321304346979)),
+    (600, 4, 1.0, 5, "STUDENT_T", True,
+     (0.14725931171122297, 0.16042488842740876, 0.6933883509638681, 5.116785025899286,
+      -788.8653065537608)),
+    (600, 8, 1.0, 30, "STUDENT_T", False,
+     (0.21509788346067585, 0.06853208993157327, 0.677832848284892, 16.645171942881394,
+      -794.7791031876749)),
+])
+def test_estimate_pinned_workloads(n: int, seed: int, scale: float, df: int | None, dist: str,
+                                   demean: bool, expected: tuple[Any, ...]) -> None:
+    # The interior guard (lines 327, 328), the Hessian (323) and the Newton update (341, 349)
+    # change the status or the estimate on these series, including a small-scale one (returns
+    # times 1e-3) where the omega bound 1e-6 * sample matters. The expected values are PINNED
+    # current output (2026-11-14), not independent; tolerances sit above optimiser noise.
+    got = v.garch_estimate(_garch_series(n, seed, scale, df), "SAMPLE", dist, demean)
+    keys = ("omega", "alpha", "beta", "degrees_of_freedom", "loglik")
+    for key, want in zip(keys, expected, strict=True):
+        if want is None:
+            assert got[key] is None
+        else:
+            assert got[key] == pytest.approx(want, rel=1e-9 if key == "loglik" else 1e-6), key
