@@ -9,6 +9,8 @@ mod input;
 mod limits;
 mod ops;
 #[cfg(test)]
+mod ops_j_tests;
+#[cfg(test)]
 mod rulings_j_tests;
 
 use input::Inputs;
