@@ -274,3 +274,7 @@ WAVE 4 READY 13a93f9 (aadladder_r6, 1 value case at 501/250; languages: no behav
 Stage J lane J-0b (2026-11-13) adds `stage_j/fuzzfix_j.json`, 39 error cases.
 
 TOTALS: 15116 value 7441 error 5161 invariance 2514
+
+Stage J wave 1 (2026-11-14) adds backtester, purged CV, regime and research statistics goldens, 99 cases (63 value, 36 error), contract 1.13.0.
+
+TOTALS: 15215 value 7504 error 5197 invariance 2514
