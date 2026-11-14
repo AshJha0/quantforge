@@ -578,3 +578,101 @@ def test_price_of_one_and_frozen_quote() -> None:
     assert v.varswap_realized([1.0, math.e], 1.0, 0.0, 1.0)[0] == pytest.approx(1.0, rel=1e-15)
     with pytest.raises(AttributeError):
         STRIP[0].strike = 1.0  # type: ignore[misc]
+
+
+# --- J-0 audit follow-up: survivors once listed as equivalent ---------------------------------
+def _garch_series(n: int, seed: int, scale: float = 1.0, df: int | None = None) -> list[float]:
+    """A GARCH(1,1) path (omega 0.05, alpha 0.1, beta 0.85), Student-t shocks when df is set."""
+    import random
+
+    rng = random.Random(seed)
+    s2, out = 0.05 / (1 - 0.1 - 0.85), []
+    for _ in range(n):
+        z = rng.gauss(0, 1)
+        if df:
+            chi = sum(rng.gauss(0, 1) ** 2 for _ in range(df)) / df
+            z = z / math.sqrt(chi) * math.sqrt((df - 2) / df)
+        r = math.sqrt(s2) * z
+        out.append(r * scale)
+        s2 = 0.05 + 0.1 * r * r + 0.85 * s2
+    return out
+
+
+def test_fit_overflowing_squares_has_no_finite_likelihood() -> None:
+    # Line 185 is reachable: the squares of 1e200 overflow, so every start is infinite.
+    with pytest.raises(QfError) as err:
+        v.garch_fit([1e200] * 30, "SAMPLE")
+    assert err.value.code == "E_NO_CONVERGENCE"
+    assert err.value.message == "the GARCH fit found no finite likelihood"
+
+
+def test_zero_fair_variance_is_allowed() -> None:
+    # Line 422: both options are so far out of the money that they price exactly 0, the forward
+    # term is 0 (rate = dividend = 0), so fair = 0.0 exactly. Zero is not negative.
+    got = _vs(put_strikes=[1.0], call_strikes=[1e6], vols=[(1.0, 0.01), (1e6, 0.01)],
+              extension_step=0.5, variance_strike=0.0)
+    assert got == (0.0, 0.0, 0.0)
+
+
+def test_zero_bracket_variance_is_allowed() -> None:
+    # Line 559: a strip whose term variance is exactly 0.0 (found by an ulp scan in the J-0
+    # audit), near term at exactly 30 days so the next term has weight 0. bracket = 0.0.
+    strip = [Q(99.0, 10.00001, 10.00001, 1e-5, 1e-5), Q(100.0, 1.601, 1.601, 0.001, 0.001),
+             Q(102.0, 0.04083039237832999, 0.04083039237832999, 5.0, 5.0)]
+    assert v.vix_term_variance(43200, 0.0, strip)[2] == 0.0
+    assert v.vix_index((43200, 0.0, strip), (86400, 0.0, strip)) == (0.0, 0.0, 0.0)
+
+
+def test_estimate_is_scale_equivariant() -> None:
+    # Line 339: the Newton stop test is relative to `sample` for omega. Independent check: the
+    # GARCH MLE is scale-equivariant, so returns times 1e4 give omega times 1e8, the same alpha
+    # and beta, and a log-likelihood lower by n ln(1e4).
+    base = _garch_series(400, 3)
+    small = v.garch_estimate(base, "SAMPLE", "NORMAL", True)
+    big = v.garch_estimate([r * 1e4 for r in base], "SAMPLE", "NORMAL", True)
+    assert big["omega"] == pytest.approx(small["omega"] * 1e8, rel=1e-6)  # type: ignore[operator]
+    assert big["alpha"] == pytest.approx(small["alpha"], rel=1e-6)
+    assert big["beta"] == pytest.approx(small["beta"], rel=1e-6)
+    assert big["loglik"] == pytest.approx(
+        small["loglik"] - 400 * math.log(1e4), rel=1e-9)  # type: ignore[operator]
+
+
+@pytest.mark.parametrize(("n", "seed", "df", "expected"), [
+    (120, 7, 4, -116.54250545385293),
+    (300, 1, None, -389.6476421536659),
+    (150, 5, 3, -161.0634970215938),
+])
+def test_fit_reaches_the_reference_optimum(n: int, seed: int, df: int | None,
+                                           expected: float) -> None:
+    # Lines 161 and 176: the start map and the beta map steer the multi-start search. Expected
+    # values are independent: scipy Nelder-Mead on `garch_loglik` over (omega, alpha, beta) from
+    # 15 starts, xatol 1e-12 (J-0 audit follow-up, 2026-11-14). The fit must reach that optimum.
+    got = v.garch_fit(_garch_series(n, seed, df=df), "SAMPLE")
+    assert got == pytest.approx(expected, rel=1e-11)
+
+
+@pytest.mark.parametrize(("n", "seed", "scale", "df", "dist", "demean", "expected"), [
+    (400, 2, 1.0, None, "NORMAL", False,
+     (0.0599267705898633, 0.07776585249457289, 0.8631607506434537, None, -567.2913052519141)),
+    (400, 5, 1e-3, None, "NORMAL", True,
+     (3.1569470544083495e-08, 0.0764464765984754, 0.8971215508179281, None, 2165.321304346979)),
+    (600, 4, 1.0, 5, "STUDENT_T", True,
+     (0.14725931171122297, 0.16042488842740876, 0.6933883509638681, 5.116785025899286,
+      -788.8653065537608)),
+    (600, 8, 1.0, 30, "STUDENT_T", False,
+     (0.21509788346067585, 0.06853208993157327, 0.677832848284892, 16.645171942881394,
+      -794.7791031876749)),
+])
+def test_estimate_pinned_workloads(n: int, seed: int, scale: float, df: int | None, dist: str,
+                                   demean: bool, expected: tuple[Any, ...]) -> None:
+    # The interior guard (lines 327, 328), the Hessian (323) and the Newton update (341, 349)
+    # change the status or the estimate on these series, including a small-scale one (returns
+    # times 1e-3) where the omega bound 1e-6 * sample matters. The expected values are PINNED
+    # current output (2026-11-14), not independent; tolerances sit above optimiser noise.
+    got = v.garch_estimate(_garch_series(n, seed, scale, df), "SAMPLE", dist, demean)
+    keys = ("omega", "alpha", "beta", "degrees_of_freedom", "loglik")
+    for key, want in zip(keys, expected, strict=True):
+        if want is None:
+            assert got[key] is None
+        else:
+            assert got[key] == pytest.approx(want, rel=1e-9 if key == "loglik" else 1e-6), key
