@@ -71,7 +71,7 @@ Read with every slice: the spec pages below; `specifications/stage-j-rulings-w2.
 | `esbt_j` | `06-risk/es-backtest.md` | `risk.backtest.es_z2` | 12 (7, 5) |
 | `baumwelch_j` | `11-research/baum-welch.md` | `research.regime.baum_welch` | 14 (6, 8) |
 
-`program/R6_HANDOVER.md` now ends `TOTALS: 15311 value 7567 error 5230 invariance 2514` (wave 1 plus these 96). Gates run on this branch: `tools/check_case_total.py` (matches, 0 duplicate ids), `tools/gen_name_map.py --check` (clean), `tools/check_golden_copies.py` (0 stale), `tools/check_tolerance_units.py` (0 unexplained), `oracle/python/check_error_cases.py stage_j` (0 mismatches), `tools/governance_gate.py` (clean; the two numerical pages carry Convergence sections). Contract: all four builds and the runner now use 1.14.0 (J-W2-1).
+`program/R6_HANDOVER.md` now ends `TOTALS: 15315 value 7571 error 5230 invariance 2514` (wave 1 plus these 96 and four interior-shrinkage Ledoit-Wolf goldens, J-W2-23). Gates run on this branch: `tools/check_case_total.py` (matches, 0 duplicate ids), `tools/gen_name_map.py --check` (clean), `tools/check_golden_copies.py` (0 stale), `tools/check_tolerance_units.py` (0 unexplained), `oracle/python/check_error_cases.py stage_j` (0 mismatches), `tools/governance_gate.py` (clean; the two numerical pages carry Convergence sections). Contract: all four builds and the runner now use 1.14.0 (J-W2-1).
 
 ### Build notes
 

@@ -98,3 +98,7 @@ full load. It is the obvious next candidate if the two cases are to be counted.
 ## Draft ruling row (for `specifications/stage-j-rulings-w2.md`)
 
 | J-W2-16 | Outside check, wave 2 (amends J-W2-15) | Outside libraries now check 54 of the 63 value-checked wave 2 goldens (54 of 96 with error cases), all `library-primitive`: `optim_j` 33/35 (mean-variance 21/21 DAQP 0.11.2 dual active-set QP, worst weight gap 1.5e-15, PyPortfolioOpt 1.6.0 on Clarabel 0.11.1 reported as a second solver at 2.1e-12; risk parity 6/8 cvxpy 1.9.3 with Clarabel 0.11.1 on `min 1/2 y'Sy - b'log y`; Euler 6/6 autograd 1.9.1); `estim_j` 15/15 (Ledoit-Wolf 9/9 scikit-learn 1.9.1 `LedoitWolf`, same estimator and `1/T` convention; Black-Litterman 6/6 PyPortfolioOpt 1.6.0); `baumwelch_j` 6/6 hmmlearn 0.3.3 `GaussianHMM.fit` with ML settings, same start values and stop rule, `theta_k` by a re-run with `n_iter = k`; `esbt_j` 0/7 (no free Z2 library, no published worked example). `optim_j-0029`, `-0030` miss `root_finding` by Clarabel's accuracy floor (2.9e-10, 2.8e-8); a 50-digit two-asset closed form confirms both goldens. Per case in `oracle/OUTSIDE_J.json`; notes in `program/WAVE2_ORACLE_NOTES.md`. Stage J value share 95 of 126 = 75.4 % (`tools/outside_shares.py`) |
+
+Update (2026-11-14, ruling J-W2-23): four interior-shrinkage Ledoit-Wolf goldens (`estim_j-0022` to `-0025`) added and
+checked by scikit-learn `LedoitWolf`. Ledoit-Wolf 13/13, wave 2 58 of 67 value-checked (86.6 %), stage J 99 of 130
+(76.1 %). The table above is the state before that addition.

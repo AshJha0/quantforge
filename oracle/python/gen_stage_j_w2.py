@@ -581,6 +581,17 @@ def build():
     for d, ch, code in [("tau zero", {"tau": 0.0}, "E_DOMAIN"), ("view covariance not PD", {"view_covariance": [[0.0]]}, "E_DOMAIN"),
                         ("pick width", {"pick": [[1.0, 0.0]]}, "E_INPUT"), ("no views", {"pick": [], "views": [], "view_covariance": []}, "E_INPUT")]:
         mk(s, OPB, bl_ref, dict(bh, **ch), code=code, desc=d)
+    # Interior shrinkage (0 < delta < 1): one common factor, unequal column scales, so S is far from m I.
+    for i in range(4):
+        T, n = 12 + 6 * i, 3 + i
+        f = det(8000 + i, T, -0.02, 0.02)
+        beta = det(8100 + i, n, 0.5, 1.5)
+        sc = [round(0.5 + 1.5 * j / (n - 1), 6) for j in range(n)]
+        X = [[round(sc[j] * (beta[j] * f[t] + e), 6) for j, e in enumerate(det(8200 + 37 * i + t, n, -0.01, 0.01))] for t in range(T)]
+        delta = lw_ref({"returns": X})["shrinkage"]
+        assert 0 < delta < 1, delta
+        mk(s, OPL, lw_ref, {"returns": X}, desc=f"one factor, unequal scales: interior shrinkage {delta:.4f}, T={T}, N={n}",
+           verified=("two-forms", "reference-computed"))
 
     # ---- ES backtest
     s = Suite("esbt_j", SPEC_ES, G); suites.append(s)

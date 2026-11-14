@@ -133,7 +133,7 @@ Built in all four languages on branch `stage-j`; each build passes 15,215 of 15,
 
 ### Stage J wave 2: portfolio construction and risk-model tests (target v0.9.0, in progress)
 
-Built in Python and Java on branch `stage-j`; Rust and C++ are in progress. 96 new golden cases (63 value-checked, 33 error) in `optim_j`, `estim_j`, `esbt_j` and `baumwelch_j` bring the total to 15,311 (`docs/case-figures.md`); the Python build passes all 96 (2026-11-14, observed). What changes in the structure:
+Built in all four languages on branch `stage-j`. 100 new golden cases (67 value-checked, 33 error) in `optim_j`, `estim_j`, `esbt_j` and `baumwelch_j` bring the total to 15,315 (`docs/case-figures.md`); every build passes all 100 (2026-11-14, observed through the neutral runner). What changes in the structure:
 
 - **Portfolio (domain 07)** gets optimisation and estimation operations, beside a second module per language for the wave (`python/quantforge_core/research_w2.py`, `java25/src/main/java/org/quantforge/research/Allocation.java`, CLI handler `OpsResearchW2.java`). Like wave 1, it depends on nothing above domain 01: it takes expected returns, a covariance and weights as numbers, never a pricer or a market-data object, and no operation calls another. The pipeline is drawn in [`docs/diagrams/README.md`](docs/diagrams/README.md#portfolio-pipeline).
 - **Operations:** `research.portfolio.mean_variance`, `research.portfolio.risk_parity`, `risk.contrib.euler`, `research.estimate.ledoit_wolf`, `research.estimate.black_litterman`, `risk.backtest.es_z2`, `research.regime.baum_welch`; 291 operations in the generated name map.
