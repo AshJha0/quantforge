@@ -5,6 +5,7 @@ import itertools
 import math
 import random
 import struct
+from typing import Any
 
 import pytest
 from hypothesis import given, settings
@@ -179,7 +180,7 @@ def _hmm_data(rng: random.Random, t: int) -> list[float]:
     return out
 
 
-def _bytes(r: dict) -> bytes:
+def _bytes(r: dict[str, Any]) -> bytes:
     flat = [*r["initial"], *(x for row in r["transition"] for x in row), *r["means"], *r["sds"],
             r["log_likelihood"]]
     return struct.pack(f"<{len(flat)}d", *flat)
