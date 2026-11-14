@@ -1055,7 +1055,7 @@
    ]
   },
   "core.mc.gbm_european": {
-   "spec": "specifications/01-core/limits.md",
+   "spec": "specifications/01-core/monte-carlo.md",
    "rust": "quantforge::core::mc_gbm_european",
    "python": "quantforge.core.mc_gbm_european",
    "java": "Core.mcGbmEuropean",
@@ -1104,7 +1104,7 @@
    ]
   },
   "core.pde.bs_european": {
-   "spec": "specifications/01-core/limits.md",
+   "spec": "specifications/01-core/pde.md",
    "rust": "quantforge::core::pde_bs_european",
    "python": "quantforge.core.pde_bs_european",
    "java": "Core.pdeBsEuropean",
@@ -1350,7 +1350,7 @@
    ]
   },
   "core.sobol.points": {
-   "spec": "specifications/01-core/limits.md",
+   "spec": "specifications/01-core/monte-carlo.md",
    "rust": "quantforge::core::sobol_points",
    "python": "quantforge.core.sobol_points",
    "java": "Core.sobolPoints",
@@ -1668,7 +1668,7 @@
    ]
   },
   "core.ts.autocorrelation": {
-   "spec": "specifications/01-core/limits.md",
+   "spec": "specifications/01-core/statistics-and-time-series.md",
    "rust": "quantforge::core::ts_autocorrelation",
    "python": "quantforge.core.ts_autocorrelation",
    "java": "Core.tsAutocorrelation",
@@ -1780,7 +1780,7 @@
    ]
   },
   "core.ts.rolling": {
-   "spec": "specifications/01-core/limits.md",
+   "spec": "specifications/01-core/statistics-and-time-series.md",
    "rust": "quantforge::core::ts_rolling",
    "python": "quantforge.core.ts_rolling",
    "java": "Core.tsRolling",
@@ -6259,7 +6259,7 @@
    ]
   },
   "risk.ois.dv01": {
-   "spec": "specifications/01-core/limits.md",
+   "spec": "specifications/04-pricing/use-cases.md",
    "rust": "quantforge::risk::ois_dv01",
    "python": "quantforge.risk.ois_dv01",
    "java": "Risk.oisDv01",
