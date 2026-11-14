@@ -294,3 +294,85 @@ TEST_CASE("vol_stats kills: VIX checks on their edges") {
     const VixIndex y = vix_index({30000, 0.02, strip1()}, {43200, 0.025, strip2()});
     CHECK(near_rel(y.index, 100.0 * std::sqrt(y.next_variance)));
 }
+
+namespace {
+// GARCH(1,1) series with a small drift; tnu > 0 gives unit-variance Student-t shocks (normal over a chi-square
+// of tnu normals). The same generator, ported to Python, produced the expected values below.
+std::vector<double> drift_series(std::size_t n, double omega, double alpha, double beta, int tnu) {
+    unsigned long long s = 20261109ULL;
+    const auto u = [&] {
+        s = s * 6364136223846793005ULL + 1442695040888963407ULL;
+        return (double((s >> 11) & ((1ULL << 53) - 1)) + 0.5) / 9007199254740992.0;
+    };
+    const auto normal = [&] {
+        const double a = u();
+        return std::sqrt(-2 * std::log(a)) * std::cos(6.283185307179586 * u());
+    };
+    std::vector<double> r;
+    double v = omega / (1 - alpha - beta);
+    for (std::size_t i = 0; i < n; ++i) {
+        double z = normal();
+        if (tnu > 0) {
+            double c = 0.0;
+            for (int k = 0; k < tnu; ++k) {
+                const double g = normal();
+                c += g * g;
+            }
+            z = z / std::sqrt(c / tnu) * std::sqrt(double(tnu - 2) / tnu);
+        }
+        const double x = std::sqrt(v) * z + 0.0005;
+        r.push_back(x);
+        v = omega + alpha * x * x + beta * v;
+    }
+    return r;
+}
+}  // namespace
+
+// Expected values: Python variance.garch_estimate / garch_fit (numpy Newton polish, independent code) on the same
+// series. The Hessian enters only the standard errors, so tight SE checks catch Hessian mistakes the optimum hides.
+TEST_CASE("vol_stats kills: garch estimate matches the Python port (normal, demeaned, Student-t)") {
+    const std::vector<double> r = drift_series(400, 4e-6, 0.09, 0.88, 0);
+    const GarchEstimate n = garch_estimate(r, std::nullopt, GarchDistribution::Normal, false);
+    CHECK(n.mean == 0.0);
+    CHECK(!n.degrees_of_freedom);
+    CHECK(!n.se_degrees_of_freedom);
+    CHECK(near_rel(n.loglik, 1237.3228085353899, 1e-12));
+    CHECK(near_rel(n.omega, 2.2292615401870416e-06, 1e-7));
+    CHECK(near_rel(n.alpha, 0.06421067097221594, 1e-7));
+    CHECK(near_rel(n.beta, 0.918761657499621, 1e-8));
+    CHECK(near_rel(n.persistence, 0.982972328471837, 1e-9));
+    CHECK(near_rel(n.se_omega, 2.0638335248984268e-06, 1e-6));
+    CHECK(near_rel(n.se_alpha, 0.027626849984451255, 1e-6));
+    CHECK(near_rel(n.se_beta, 0.03429697920374729, 1e-6));
+    const GarchFit f = garch_fit(r, std::nullopt);
+    CHECK(near_rel(f.loglik, 1237.322808535388, 1e-12));
+    CHECK(near_rel(f.alpha, n.alpha, 1e-4));
+    CHECK(near_rel(f.beta, n.beta, 1e-5));
+    CHECK(near_rel(f.omega, n.omega, 1e-3));
+
+    const GarchEstimate d = garch_estimate(r, std::nullopt, GarchDistribution::Normal, true);
+    CHECK(near_rel(d.mean, 5.634039574622141e-05, 1e-10));
+    CHECK(near_rel(d.loglik, 1237.3297452674035, 1e-12));
+    CHECK(near_rel(d.omega, 2.222491200182798e-06, 1e-7));
+    CHECK(near_rel(d.alpha, 0.06408065279847223, 1e-7));
+    CHECK(near_rel(d.beta, 0.918933013522448, 1e-8));
+    CHECK(near_rel(d.se_omega, 2.057700663129261e-06, 1e-6));
+    CHECK(near_rel(d.se_alpha, 0.027553812969650038, 1e-6));
+    CHECK(near_rel(d.se_beta, 0.03419803808601487, 1e-6));
+
+    const std::vector<double> rt = drift_series(600, 4e-6, 0.09, 0.88, 5);
+    const GarchEstimate t = garch_estimate(rt, std::nullopt, GarchDistribution::StudentT, true);
+    REQUIRE(t.degrees_of_freedom);
+    REQUIRE(t.se_degrees_of_freedom);
+    CHECK(near_rel(t.mean, 0.00043997302795551233, 1e-10));
+    CHECK(near_rel(t.loglik, 1892.1801728152418, 1e-12));
+    CHECK(near_rel(t.omega, 6.072258446177342e-06, 1e-7));
+    CHECK(near_rel(t.alpha, 0.12715829418286145, 1e-7));
+    CHECK(near_rel(t.beta, 0.836524756701035, 1e-8));
+    CHECK(near_rel(*t.degrees_of_freedom, 4.676842808716924, 1e-7));
+    CHECK(near_rel(t.persistence, 0.9636830508838965, 1e-9));
+    CHECK(near_rel(t.se_omega, 2.5470433962715344e-06, 1e-6));
+    CHECK(near_rel(t.se_alpha, 0.03597271427776877, 1e-6));
+    CHECK(near_rel(t.se_beta, 0.038016074998593746, 1e-6));
+    CHECK(near_rel(*t.se_degrees_of_freedom, 0.8449552316472203, 1e-6));
+}
