@@ -241,3 +241,28 @@ TEST_CASE("research verbs through the CLI: limits and enum checks") {
     CHECK(run("research.regime.viterbi", R"({"initial":[1],"transition":[[1]]})").find("E_INPUT") != std::string::npos);
     CHECK(run("research.stats.power", R"({"years":4,"sr_target":0.5})").find("years_required") != std::string::npos);
 }
+
+TEST_CASE("rulings J-20 to J-23") {
+    const auto run = [](const std::string& op, const std::string& in) {
+        return quantforge::cli::run_case(R"({"schema_version":"1.0","case_id":"c","operation":")" + op + R"(","inputs":)" + in + "}").json;
+    };
+    const auto ones = [](std::size_t n, const char* v) {
+        std::string s = "[";
+        for (std::size_t i = 0; i < n; ++i) s += (i ? "," : "") + std::string(v);
+        return s + "]";
+    };
+    // J-20: 100,001 bars is a valid run (page limit 1,000,000, not the general 100,000).
+    const std::string p = ones(100001, "1");
+    CHECK(run("research.backtest.run", R"({"prices":)" + p + R"(,"targets":)" + p + "}").find(R"("status":"ok")") != std::string::npos);
+    CHECK(run("research.cv.purged_kfold", R"({"t0":)" + p + R"(,"t1":)" + p + R"(,"n_splits":2})").find(R"("status":"ok")") != std::string::npos);
+    CHECK(run("research.regime.viterbi", R"({"initial":[1],"transition":[[1]],"observations":)" + p + R"(,"means":[0],"sds":[1]})").find("E_LIMIT") != std::string::npos);
+    // J-21
+    CHECK(run("research.stats.power", R"({"years":4,"alpha":0,"power":0.8})").find("E_DOMAIN") != std::string::npos);
+    CHECK(run("research.stats.power", R"({"years":4,"alpha":0.05,"power":1})").find("E_DOMAIN") != std::string::npos);
+    // J-22
+    CHECK(run("research.regime.viterbi", R"({"initial":[1],"transition":[[1]],"emission":[]})").find("E_INPUT") != std::string::npos);
+    CHECK(run("research.regime.viterbi", R"({"initial":[1],"transition":[[1]],"observations":[],"means":[0],"sds":[1]})").find("E_INPUT") != std::string::npos);
+    // J-23: strategy 1 is flat in block 0 only; the combined samples are not flat, the block check still fires.
+    CHECK(run("research.stats.pbo", R"({"performance":[[1,5],[2,5],[3,1],[4,2]],"n_partitions":2})").find("E_DOMAIN") != std::string::npos);
+    CHECK(run("research.stats.pbo", R"({"performance":[[1,5],[2,6],[3,1],[4,2]],"n_partitions":2})").find(R"("status":"ok")") != std::string::npos);
+}

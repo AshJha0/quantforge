@@ -438,7 +438,9 @@ CaseResult run_case(string_view text) {
         first_non_finite.reset();
         Handler handler = nullptr;
         const Value& inputs = check_envelope(parsed, handler);
-        const bool big = oversized(inputs);
+        // Ruling J-20: the wave 1 research verbs carry their own page limits in place of the general array limit.
+        const bool research = parsed.value.find("operation")->text.starts_with("research.");
+        const bool big = !research && oversized(inputs);
         Out out;
         out.values.begin_object();
         out.diagnostics.begin_object();
