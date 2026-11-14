@@ -520,13 +520,18 @@ def _ridge(p: list[float]) -> float:
     return abs(p[0] - 0.3) + 4 * abs(p[1] + 0.2) + 0.5 * abs(p[2])
 
 
+def _cone(p: list[float]) -> float:
+    # Square-root cusps make contractions fail, so this path exercises the shrink step.
+    return math.sqrt(abs(p[0])) + math.sqrt(abs(p[1] - 0.1))
+
+
 def _bowl(p: list[float]) -> float:
     return (p[0] - 1) ** 2 + 5
 
 
 @pytest.mark.parametrize("iterations", [1, 2, 3, 5, 8, 13, 40, 400, 5000])
 @pytest.mark.parametrize(("f", "start", "step"), [
-    (_rosen, [-1.2, 1.0], 0.5), (_ridge, [1.0, 1.0, 1.0], 0.7), (_bowl, [4.0], 0.5)])
+    (_rosen, [-1.2, 1.0], 0.5), (_ridge, [1.0, 1.0, 1.0], 0.7), (_bowl, [4.0], 0.5), (_cone, [0.7, 0.9], 0.6)])
 def test_nelder_mead_matches_reference(f: Callable[[list[float]], float], start: list[float],
                                        step: float, iterations: int) -> None:
     count = 0
@@ -566,3 +571,10 @@ def test_more_boundaries() -> None:
     # The lowest put less the step may be any positive number, here exactly 1.
     assert _vs(put_strikes=[2.0, 100.0], vols=[(2.0, 0.2), (100.0, 0.2), (110.0, 0.2)],
                extension_step=1.0)[0] > 0
+
+
+def test_price_of_one_and_frozen_quote() -> None:
+    # A price of exactly 1 is positive and allowed; Quote is immutable (a frozen dataclass).
+    assert v.varswap_realized([1.0, math.e], 1.0, 0.0, 1.0)[0] == pytest.approx(1.0, rel=1e-15)
+    with pytest.raises(AttributeError):
+        STRIP[0].strike = 1.0  # type: ignore[misc]
