@@ -31,6 +31,7 @@ bool near_all(const std::vector<double>& a, const std::vector<double>& b, double
         if (!near_rel(a[i], b[i], tol)) return false;
     return true;
 }
+std::vector<double> drift_series(std::size_t n, double omega, double alpha, double beta, int tnu);
 Date day(int y, unsigned m, unsigned d) { return Date{std::chrono::year{y} / m / d}; }
 const std::vector<double>& r3() {
     static const std::vector<double> r{0.1, -0.2, 0.05};
@@ -120,6 +121,14 @@ TEST_CASE("vol_stats kills: garch forecast closed form and edges") {
     CHECK(fc(0.01, 0.1, 0.8, 1e-300, 1, 252) == "none");
     CHECK(fc(0.0, 0.1, 0.8, 0.2, 1, 252) == "E_DOMAIN");
     CHECK(fc(0.01, 0.25, 0.75, 0.2, 1, 252) == "E_DOMAIN");
+    // Message text pinned as a regression (current wording; the operators inside it are mutation sites).
+    std::string msg;
+    try {
+        garch_forecast(0.01, 0.25, 0.75, 0.2, 1, 252);
+    } catch (const Error& e) {
+        msg = e.what();
+    }
+    CHECK(msg == "alpha + beta >= 1 has no long-run variance");
     CHECK(fc(0.01, 0.0, 0.0, 0.2, 1, 252) == "none");
     // h = 1 with alpha + beta = 0: one variance, the next variance.
     const GarchForecast g = garch_forecast(0.01, 0.0, 0.0, 0.2, 1, 4.0);
@@ -134,6 +143,13 @@ TEST_CASE("vol_stats kills: garch fit and estimate edges") {
     CHECK(code_of([&] { garch_estimate(r, std::nullopt, GarchDistribution::Normal, false); }) == "E_INPUT");
     r.resize(99, 0.01);
     CHECK(code_of([&] { garch_estimate(r, std::nullopt, GarchDistribution::StudentT, false); }) == "E_INPUT");
+    // Exactly 30 (normal) and 100 (Student-t) returns pass the size checks; whether the fit then converges on
+    // such short series is not the point here, only that the size check does not refuse them.
+    const std::vector<double> s30(drift_series(30, 4e-6, 0.09, 0.88, 0));
+    CHECK(code_of([&] { garch_fit(s30, std::nullopt); }) != "E_INPUT");
+    CHECK(code_of([&] { garch_estimate(s30, std::nullopt, GarchDistribution::Normal, false); }) != "E_INPUT");
+    const std::vector<double> s100(drift_series(100, 4e-6, 0.09, 0.88, 5));
+    CHECK(code_of([&] { garch_estimate(s100, std::nullopt, GarchDistribution::StudentT, false); }) != "E_INPUT");
 }
 
 TEST_CASE("vol_stats kills: realized variance hand values and edges") {
@@ -337,13 +353,17 @@ TEST_CASE("vol_stats kills: garch estimate matches the Python port (normal, deme
     CHECK(!n.degrees_of_freedom);
     CHECK(!n.se_degrees_of_freedom);
     CHECK(near_rel(n.loglik, 1237.3228085353899, 1e-12));
-    CHECK(near_rel(n.omega, 2.2292615401870416e-06, 1e-7));
-    CHECK(near_rel(n.alpha, 0.06421067097221594, 1e-7));
-    CHECK(near_rel(n.beta, 0.918761657499621, 1e-8));
-    CHECK(near_rel(n.persistence, 0.982972328471837, 1e-9));
+    CHECK(near_rel(n.omega, 2.2292615401870416e-06, 1e-11));
+    CHECK(near_rel(n.alpha, 0.06421067097221594, 1e-11));
+    CHECK(near_rel(n.beta, 0.918761657499621, 1e-11));
+    CHECK(near_rel(n.persistence, 0.982972328471837, 1e-11));
     CHECK(near_rel(n.se_omega, 2.0638335248984268e-06, 1e-6));
     CHECK(near_rel(n.se_alpha, 0.027626849984451255, 1e-6));
     CHECK(near_rel(n.se_beta, 0.03429697920374729, 1e-6));
+    // The Python port's errors agree to about 1e-7 only; the current C++ errors are pinned tighter as a regression.
+    CHECK(near_rel(n.se_omega, 2.0638337245331577e-06, 1e-10));
+    CHECK(near_rel(n.se_alpha, 0.02762685396158699, 1e-10));
+    CHECK(near_rel(n.se_beta, 0.034296986055181937, 1e-10));
     const GarchFit f = garch_fit(r, std::nullopt);
     CHECK(near_rel(f.loglik, 1237.322808535388, 1e-12));
     CHECK(near_rel(f.alpha, n.alpha, 1e-4));
@@ -353,12 +373,15 @@ TEST_CASE("vol_stats kills: garch estimate matches the Python port (normal, deme
     const GarchEstimate d = garch_estimate(r, std::nullopt, GarchDistribution::Normal, true);
     CHECK(near_rel(d.mean, 5.634039574622141e-05, 1e-10));
     CHECK(near_rel(d.loglik, 1237.3297452674035, 1e-12));
-    CHECK(near_rel(d.omega, 2.222491200182798e-06, 1e-7));
-    CHECK(near_rel(d.alpha, 0.06408065279847223, 1e-7));
-    CHECK(near_rel(d.beta, 0.918933013522448, 1e-8));
+    CHECK(near_rel(d.omega, 2.222491200182798e-06, 1e-11));
+    CHECK(near_rel(d.alpha, 0.06408065279847223, 1e-11));
+    CHECK(near_rel(d.beta, 0.918933013522448, 1e-11));
     CHECK(near_rel(d.se_omega, 2.057700663129261e-06, 1e-6));
     CHECK(near_rel(d.se_alpha, 0.027553812969650038, 1e-6));
     CHECK(near_rel(d.se_beta, 0.03419803808601487, 1e-6));
+    CHECK(near_rel(d.se_omega, 2.057700862274042e-06, 1e-10));  // regression pins, as above
+    CHECK(near_rel(d.se_alpha, 0.027553816944223014, 1e-10));
+    CHECK(near_rel(d.se_beta, 0.034198044931252718, 1e-10));
 
     const std::vector<double> rt = drift_series(600, 4e-6, 0.09, 0.88, 5);
     const GarchEstimate t = garch_estimate(rt, std::nullopt, GarchDistribution::StudentT, true);
@@ -366,13 +389,17 @@ TEST_CASE("vol_stats kills: garch estimate matches the Python port (normal, deme
     REQUIRE(t.se_degrees_of_freedom);
     CHECK(near_rel(t.mean, 0.00043997302795551233, 1e-10));
     CHECK(near_rel(t.loglik, 1892.1801728152418, 1e-12));
-    CHECK(near_rel(t.omega, 6.072258446177342e-06, 1e-7));
-    CHECK(near_rel(t.alpha, 0.12715829418286145, 1e-7));
-    CHECK(near_rel(t.beta, 0.836524756701035, 1e-8));
-    CHECK(near_rel(*t.degrees_of_freedom, 4.676842808716924, 1e-7));
-    CHECK(near_rel(t.persistence, 0.9636830508838965, 1e-9));
+    CHECK(near_rel(t.omega, 6.072258446177342e-06, 1e-11));
+    CHECK(near_rel(t.alpha, 0.12715829418286145, 1e-11));
+    CHECK(near_rel(t.beta, 0.836524756701035, 1e-11));
+    CHECK(near_rel(*t.degrees_of_freedom, 4.676842808716924, 1e-11));
+    CHECK(near_rel(t.persistence, 0.9636830508838965, 1e-11));
     CHECK(near_rel(t.se_omega, 2.5470433962715344e-06, 1e-6));
     CHECK(near_rel(t.se_alpha, 0.03597271427776877, 1e-6));
     CHECK(near_rel(t.se_beta, 0.038016074998593746, 1e-6));
     CHECK(near_rel(*t.se_degrees_of_freedom, 0.8449552316472203, 1e-6));
+    CHECK(near_rel(t.se_omega, 2.5470434252059736e-06, 1e-10));  // regression pins, as above
+    CHECK(near_rel(t.se_alpha, 0.035972714683759073, 1e-10));
+    CHECK(near_rel(t.se_beta, 0.038016075717752618, 1e-10));
+    CHECK(near_rel(*t.se_degrees_of_freedom, 0.84495523274253437, 1e-10));
 }
