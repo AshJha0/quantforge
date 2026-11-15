@@ -22,6 +22,7 @@ mod risk;
 mod riskcarry;
 mod riskw2;
 mod shortrate;
+mod termcurve;
 mod usecase;
 mod vol;
 mod xva;
@@ -74,15 +75,18 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("core", core::NAMES, core::dispatch),
     ("credit", credit::NAMES, credit::dispatch),
     ("eq", eq::NAMES, eq::dispatch),
+    ("eq", termcurve::eq::NAMES, termcurve::eq::dispatch),
     ("exotic", exotic::NAMES, exotic::dispatch),
     ("fx", fx::NAMES, fx::dispatch),
     ("hedge", hedge::NAMES, hedge::dispatch),
     ("infl", infl::NAMES, infl::dispatch),
+    ("liq", termcurve::liq::NAMES, termcurve::liq::dispatch),
     ("mbs", mbs::NAMES, mbs::dispatch),
     ("rates", rates::NAMES, rates::dispatch),
     ("rates", shortrate::NAMES, shortrate::dispatch),
     ("rates", lmm::NAMES, lmm::dispatch),
     ("repo", repo::NAMES, repo::dispatch),
+    ("repo", termcurve::repo::NAMES, termcurve::repo::dispatch),
     ("research", research::NAMES, research::dispatch),
     ("risk", risk::NAMES, risk::dispatch),
     ("risk", mcgreeks::NAMES, mcgreeks::dispatch),

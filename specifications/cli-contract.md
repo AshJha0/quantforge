@@ -1,7 +1,7 @@
 # CLI contract
 
-Version 1.14.0 (stage J wave 2, v0.9.0; the blocks below give the minor versions each stage added). `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
-From stage J wave 2 (ruling J-W2-1) a build reports `contract_version` `1.14.0` (stage J wave 1: `1.13.0`, ruling J-1; R6: `1.12.0`, ruling R6-0.1; stage I: `1.11.0`, ruling I-51), and the runner stops on any other value. Before stage I every build reported `1.0.0`; nothing in 1.1.0 to 1.14.0 breaks the wire format.
+Version 1.15.0 (stage J curves lane, v0.9.0; the blocks below give the minor versions each stage added). `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
+From the stage J curves lane (ruling J-C-1) a build reports `contract_version` `1.15.0` (stage J wave 2: `1.14.0`, ruling J-W2-1; stage J wave 1: `1.13.0`, ruling J-1; R6: `1.12.0`, ruling R6-0.1; stage I: `1.11.0`, ruling I-51), and the runner stops on any other value. Before stage I every build reported `1.0.0`; nothing in 1.1.0 to 1.15.0 breaks the wire format.
  Applies identically to the Java, C++, Python and Rust implementations.
 
 The idea: every implementation is a black box that reads a case and writes a result. The neutral
@@ -18,7 +18,7 @@ to start it from `conformance/runner/implementations.json`.
 | `quantforge run` | Read one case JSON document from stdin to end of file. Write one result JSON document to stdout. |
 | `quantforge batch` | Read JSON Lines from stdin, one case per line. Write one result per line to stdout, in the same order, flushing after each line. |
 | `quantforge --batch` | Exactly the same as `quantforge batch` (1.6.0). Both spellings must work. |
-| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.14.0", "toolchain":...}`. |
+| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.15.0", "toolchain":...}`. |
 | `quantforge operations` | Write a JSON array of the operation names this build supports, sorted. |
 
 `batch` exists because a JVM start per case would dominate run time. `run` and `batch` must give
@@ -384,3 +384,12 @@ Stage J wave 1 adds operations and no error code (ruling J-1). `stage-j-rulings-
 | `research.regime.baum_welch` | `11-research/baum-welch.md` | wave 2 (specified) |
 
 Wave 2 (rulings `stage-j-rulings-w2.md` J-W2-1 to J-W2-15) adds no error code and raises the contract to 1.14.0 (J-W2-1); all four builds implement the wave 2 operations and report 1.14.0. The wave 2 page limits (J-W2-14) replace the general per-array limit as J-20 does for wave 1.
+
+### Stage J curves lane (contract 1.15.0)
+
+Rulings `stage-j-rulings-curves.md` J-C-1 to J-C-9. No new error code; the general per-array limit applies. Implemented in all four builds. These rows take precedence over the `repo.*` and `eq.forward.*` rows above for the names they list.
+
+| Prefix | Spec | Slice |
+|---|---|---|
+| `repo.term.curve`, `eq.forward.term_financed` | `02-curves/financing-term-structure.md` | curves lane |
+| `liq.curve.cost` | `10-execution/liquidity-curve.md` | curves lane |

@@ -2370,6 +2370,52 @@
     "outside_spread"
    ]
   },
+  "eq.forward.term_financed": {
+   "spec": "specifications/02-curves/financing-term-structure.md",
+   "rust": "quantforge::eq::forward_term_financed",
+   "python": "quantforge.eq.forward_term_financed",
+   "java": "Eq.forwardTermFinanced",
+   "cpp": "qf::eq::forward_term_financed",
+   "inputs": {
+    "borrow_fees": {
+     "java": "borrowFees"
+    },
+    "borrow_times": {
+     "java": "borrowTimes"
+    },
+    "dividend_amounts": {
+     "java": "dividendAmounts"
+    },
+    "dividend_times": {
+     "java": "dividendTimes"
+    },
+    "funding_times": {
+     "java": "fundingTimes"
+    },
+    "funding_zero_rates": {
+     "java": "fundingZeroRates"
+    },
+    "maturity_years": {
+     "java": "maturityYears"
+    },
+    "quote_times": {
+     "java": "quoteTimes"
+    },
+    "repo_rates": {
+     "java": "repoRates"
+    },
+    "spot": {
+     "java": "spot"
+    }
+   },
+   "outputs": [
+    "carry",
+    "carry_factor",
+    "financing_df",
+    "forward",
+    "pv_dividends"
+   ]
+  },
   "eq.futures.basis": {
    "spec": "specifications/02-curves/equity-curves.md",
    "rust": "quantforge::eq::futures_basis",
@@ -4056,6 +4102,47 @@
     "pv"
    ]
   },
+  "liq.curve.cost": {
+   "spec": "specifications/10-execution/liquidity-curve.md",
+   "rust": "quantforge::liq::curve_cost",
+   "python": "quantforge.liq.curve_cost",
+   "java": "Liq.curveCost",
+   "cpp": "qf::liq::curve_cost",
+   "inputs": {
+    "coefficient": {
+     "java": "coefficient"
+    },
+    "daily_vol": {
+     "java": "dailyVol"
+    },
+    "daily_volume": {
+     "java": "dailyVolume"
+    },
+    "exponent": {
+     "java": "exponent"
+    },
+    "half_spread_bps": {
+     "java": "halfSpreadBps"
+    },
+    "horizons_days": {
+     "java": "horizonsDays"
+    },
+    "risk_multiplier": {
+     "java": "riskMultiplier"
+    },
+    "sizes": {
+     "java": "sizes"
+    }
+   },
+   "outputs": [
+    "impact",
+    "min_cost",
+    "optimal_horizon",
+    "spread_cost",
+    "timing_risk",
+    "total_cost"
+   ]
+  },
   "mbs.cashflows": {
    "spec": "specifications/04-pricing/mbs.md",
    "rust": "quantforge::mbs::cashflows_",
@@ -4479,7 +4566,7 @@
    ]
   },
   "rates.funding.curve": {
-   "spec": "specifications/02-curves/joint-solve-and-funding.md",
+   "spec": "specifications/02-curves/financing-term-structure.md",
    "rust": "quantforge::rates::funding_curve",
    "python": "quantforge.rates.funding_curve",
    "java": "Rates.fundingCurve",
@@ -5382,6 +5469,44 @@
    },
    "outputs": [
     "repo_rate"
+   ]
+  },
+  "repo.term.curve": {
+   "spec": "specifications/02-curves/financing-term-structure.md",
+   "rust": "quantforge::repo::term_curve",
+   "python": "quantforge.repo.term_curve",
+   "java": "Repo.termCurve",
+   "cpp": "qf::repo::term_curve",
+   "inputs": {
+    "borrow_fees": {
+     "java": "borrowFees"
+    },
+    "borrow_times": {
+     "java": "borrowTimes"
+    },
+    "funding_times": {
+     "java": "fundingTimes"
+    },
+    "funding_zero_rates": {
+     "java": "fundingZeroRates"
+    },
+    "query_times": {
+     "java": "queryTimes"
+    },
+    "quote_times": {
+     "java": "quoteTimes"
+    },
+    "repo_rates": {
+     "java": "repoRates"
+    }
+   },
+   "outputs": [
+    "borrow_fee",
+    "financing_df",
+    "financing_rate",
+    "forward_financing",
+    "pillar_spreads",
+    "spread"
    ]
   },
   "research.backtest.run": {
