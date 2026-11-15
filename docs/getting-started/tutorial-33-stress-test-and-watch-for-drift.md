@@ -1,4 +1,4 @@
-# Tutorial 27: stress a curve with history and watch for drift (stub)
+# Tutorial 33: stress a curve with history and watch for drift (stub)
 
 Status: **stub** (stage J wave 3, 2026-11-15). The operations exist in the Python build only; the runnable page, with Rust, Java and C++ blocks and real output, comes with the wave 3 language lanes. Nothing on this page is checked by `tools/check_tutorial.py` yet.
 

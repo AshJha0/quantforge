@@ -90,7 +90,7 @@ Library-checked value cases: `interpbt_j` 13 of 16 (scipy `CubicSpline` natural,
 
 ### Not done in this lane
 
-Rust, Java, C++ ports; contract bump; outside-share registers (`oracle/python/outside_j.py`, `tools/outside_shares.py`) not updated for wave 3; LEARN/COOKBOOK sections; tutorial 27 is a stub; different-model audit.
+Rust, Java, C++ ports; contract bump; outside-share registers (`oracle/python/outside_j.py`, `tools/outside_shares.py`) not updated for wave 3; LEARN/COOKBOOK sections; Tutorial 33 is a stub; different-model audit.
 
 ## WAVE 2 READY (2026-11-14): optimisation, estimation, ES backtest, Baum-Welch
 
