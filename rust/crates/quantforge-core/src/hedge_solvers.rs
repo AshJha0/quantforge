@@ -2193,6 +2193,66 @@ mod r6_cap_tests {
         assert_eq!(planted, 7);
     }
 
+    /// `hedge.qp.solve` sets the cap from `p` = equality rows + finite lower bounds + finite
+    /// upper bounds + 1 for a margin row: n = 3, 1 row, 2 lower, 3 upper, margin gives
+    /// `10 (3 + 1 + 2 + 3 + 1) + 100 = 200`.
+    #[test]
+    fn qp_cap_counts_every_constraint() {
+        PLANTED_CAP.with(|c| c.set(None));
+        let a: Matrix = vec![
+            vec![1.0, 0.0, 0.0],
+            vec![0.0, 1.0, 0.0],
+            vec![0.0, 0.0, 1.0],
+        ];
+        let (b, w) = ([1.0, -2.0, 0.5], [1.0; 3]);
+        let e = vec![vec![1.0, 1.0, 1.0]];
+        let lo = [Some(-10.0), Some(-10.0), None];
+        let hi = [Some(10.0), Some(10.0), Some(10.0)];
+        let rates = [0.1, 0.1, 0.1];
+        let q = QpProblem {
+            eq_matrix: Some(&e),
+            eq_rhs: Some(&[0.5]),
+            lower: Some(&lo),
+            upper: Some(&hi),
+            costs: Costs {
+                margin_rates: Some(&rates),
+                margin_limit: Some(100.0),
+                ..Costs::default()
+            },
+            ..plain(&a, &b, &w)
+        };
+        let r = qp_solve(&q);
+        assert!(r.is_ok(), "{r:?}");
+        assert_eq!(iteration_cap(), 200);
+    }
+
+    /// The split stage only seeds the sign state, but a correct seed needs a single pass of
+    /// the sign-state loop. `A = [[1, 1], [0, 1]]`, `b = (1, 3)`: `H = [[1, 1], [1, 2]]`,
+    /// `c = A^T b = (1, 4)`, unconstrained `x = -H^-1 c = (2, -3)`, so with small spreads 0.1
+    /// (soft threshold moves x by under 0.2) `x1 > 0` although `c1 > 0`: the coupling through
+    /// `H12` sets its sign. The split problem with the full `H` finds signs `(+, -)` and the
+    /// first orthant solve meets KKT, so a planted cap of `PASSES` = 3 iterations (the smallest that passes, the dual active-set solves count against it too) is enough. A
+    /// split that ignored the coupling would seed `(-, -)` and need two more passes.
+    #[test]
+    fn split_seed_is_right_first_time() {
+        const PASSES: usize = 3;
+        let a: Matrix = vec![vec![1.0, 1.0], vec![0.0, 1.0]];
+        let (b, w) = ([1.0, 3.0], [1.0, 1.0]);
+        let spreads = [0.1, 0.1];
+        let q = QpProblem {
+            costs: Costs {
+                half_spreads: Some(&spreads),
+                ..Costs::default()
+            },
+            ..plain(&a, &b, &w)
+        };
+        PLANTED_CAP.with(|c| c.set(Some(PASSES)));
+        let r = qp_solve(&q);
+        PLANTED_CAP.with(|c| c.set(None));
+        let x = r.unwrap().x;
+        assert!(x[0] > 1.5 && x[1] < -2.5, "{x:?}");
+    }
+
     /// The Jacobi scaling is `Some` only for a well-formed problem with positive weights.
     #[test]
     fn jacobi_scaling_needs_a_valid_problem() {
