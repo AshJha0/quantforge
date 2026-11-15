@@ -21,3 +21,6 @@ Scanner blind spot, recorded: `research/holdout_scan.py` matches ISO dates only,
 - `research/interp_backtest/results.json` | R3-01 | S | aggregate LOO errors over 2008 to 2022 rows
 - `research/interp_backtest/RESULTS.md` | R3-01 | S | same, prose
 - `specifications/06-risk/scenario-stress.md` | R3-01, R3-03 | S | window dates and holdout dates in prose
+- `specifications/stage-j-rulings-w3.md` | R3-01 | S | shock-library window dates in ruling text (J-W3-6)
+- `docs/question-bank/01-foundations-numerics.md` | R3-02 | S | calendar worked examples (day counts, holidays, schedules); synthetic dates, no market observations
+- `docs/question-bank/03-curves-multicurve.md` | R3-02 | S | calendar and fixing dates in worked examples; synthetic rates, no market observations
