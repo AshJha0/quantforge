@@ -84,7 +84,9 @@ Backtest vector_engine(const BacktestInput& in) {
     const double m = in.multiplier, hs = in.half_spread_bps / 1e4;
     Vec q(n, 0.0), q_prev(n, 0.0), dp(n, 0.0);
     for (std::size_t t = lag; t < n; ++t) q[t] = in.targets[t - lag];
-    for (std::size_t t = 1; t < n; ++t) q_prev[t] = q[t - 1];
+    // q_prev[t] = q[t - 1], computed from the targets rather than by copying q: GCC 16 at -O3 turns the copy loop into a
+    // memcpy and warns (-Warray-bounds) on an n == 0 path that backtest() already refuses (n >= 2 there).
+    for (std::size_t t = lag + 1; t < n; ++t) q_prev[t] = in.targets[t - 1 - lag];
     for (std::size_t t = 1; t < n; ++t) dp[t] = p[t] - p[t - 1];
     Vec d(n), g(n), s(n), c(n), f(n), k(n), net(n), eq(n);
     for (std::size_t t = 0; t < n; ++t) d[t] = q[t] - q_prev[t];
