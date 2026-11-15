@@ -1416,7 +1416,14 @@ fn sample_covariance(series: &[&[f64]]) -> Matrix {
     let t = series[0].len();
     let means: Vec<f64> = series
         .iter()
-        .map(|s| s.iter().sum::<f64>() / t as f64)
+        // A constant series has sample variance exactly 0 (ruling J-I.4): its mean is its value.
+        .map(|s| {
+            if s.iter().all(|&v| v == s[0]) {
+                s[0]
+            } else {
+                s.iter().sum::<f64>() / t as f64
+            }
+        })
         .collect();
     let n = series.len();
     let mut out = vec![vec![0.0; n]; n];

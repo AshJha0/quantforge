@@ -2,7 +2,9 @@
 
 Spec: specifications/08-hedging/hedge-solvers.md; ruling specifications/stage-j-rulings.md J-I.1 (applies R6-6.2).
 Also J-I.2 (suite hedgesign_j: an equality forcing a coordinate under the kink tolerance; the enumeration carries
-the equality multipliers) and J-I.3 (suite selectcost_j: selection refuses cost and margin inputs).
+the equality multipliers), J-I.3 (suite selectcost_j: selection refuses cost and margin inputs) and J-I.4 (suite
+minvarconst_j: a constant series in `hedge.minvar.ratio` has sample variance exactly 0; hand check: every deviation
+from the mean of a constant series is 0, so its variance and every covariance with it are 0).
 
 Python's primal active-set step dropped a reduced direction whose squared singular value was at or below 1e-12
 times the largest eigenvalue of H, in the caller's units. A 1e-7 exposure against a unit one fell below that cut,
@@ -169,6 +171,19 @@ SELECT_ERRORS = [
 ]
 
 
+MV_SPEC = "specifications/08-hedging/hedge-solvers.md"
+# J-I.4: constant series. Three copies of 0.95 sum to 2.8499999999999996, so fsum / 3 is 0.9499999999999998 and the
+# rounded variance (1.2e-32) passed check 3, which then returned a hedge built from rounding (Hypothesis found it).
+MV_ERRORS = [
+    ("constant hedge series (0.95 three times): S_hh = 0, check 3", "E_SINGULAR",
+     {"exposure_changes": [0.0, 0.1, 0.2], "hedge_changes": [[0.95, 0.95, 0.95]]}),
+    ("constant second hedge series of two (0.7 five times): S_hh singular, check 3", "E_SINGULAR",
+     {"exposure_changes": [0.3, -0.1, 0.2, 0.5, -0.4], "hedge_changes": [[0.1, 0.4, -0.2, 0.3, 0.0], [0.7] * 5]}),
+    ("constant exposure series (0.95 three times): S_00 = 0, check 2", "E_DOMAIN",
+     {"exposure_changes": [0.95, 0.95, 0.95], "hedge_changes": [[0.0, 0.1, 0.2]]}),
+]
+
+
 def build():
     s = Suite("hedgecut_j", SPEC, G)
     for desc, inp in CASES:
@@ -184,7 +199,11 @@ def build():
     for desc, inp in SELECT_ERRORS:
         u.add("hedge.select.solve", inp, error="E_INPUT", verified=("ruling J-I.3",),
               tags=("stage_j", "hedge", "selection", "error", "synthetic"), description=desc)
-    return [s, t, u]
+    v = Suite("minvarconst_j", MV_SPEC, G)
+    for desc, code, inp in MV_ERRORS:
+        v.add("hedge.minvar.ratio", inp, error=code, verified=("hand", "ruling J-I.4"),
+              tags=("stage_j", "hedge", "minvar", "error", "synthetic"), description=desc)
+    return [s, t, u, v]
 
 
 def main():
@@ -193,7 +212,7 @@ def main():
     for s in build():
         s.write()
     common.GOLDEN = keep
-    note("stage J qp cut: 4 + 2 value-checked cases, 3 error cases")
+    note("stage J qp cut: 4 + 2 value-checked cases, 3 + 3 error cases")
 
 
 if __name__ == "__main__":

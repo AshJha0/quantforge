@@ -958,7 +958,9 @@ def _symmetric(s: Matrix, key: str) -> None:
 
 def _sample_covariance(series: Sequence[Floats]) -> list[list[float]]:
     count = len(series[0])
-    means = [math.fsum(s) / count for s in series]
+    # A constant series has sample variance exactly 0 (ruling J-I.4): its mean is its value, not
+    # fsum / count, whose rounding would leave a variance of order 1e-33 that passes check 3.
+    means = [s[0] if all(v == s[0] for v in s) else math.fsum(s) / count for s in series]
     centred = [[v - mu for v in s] for s, mu in zip(series, means)]
     return [[math.fsum(p * q for p, q in zip(u, w)) / (count - 1) for w in centred]
             for u in centred]

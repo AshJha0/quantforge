@@ -1050,8 +1050,13 @@ Matrix sample_covariance(const Vec& exposure, const Matrix& hedge_series) {
     for (const Vec& s : hedge_series) series.push_back(&s);
     Vec mean(k + 1, 0.0);
     for (std::size_t i = 0; i <= k; ++i) {
-        for (const double v : *series[i]) mean[i] += v;
-        mean[i] /= double(t);
+        bool constant = true;
+        for (const double v : *series[i]) {
+            mean[i] += v;
+            constant = constant && v == (*series[i])[0];
+        }
+        // A constant series has sample variance exactly 0 (ruling J-I.4): its mean is its value.
+        mean[i] = constant ? (*series[i])[0] : mean[i] / double(t);
     }
     Matrix s(k + 1, Vec(k + 1, 0.0));
     for (std::size_t i = 0; i <= k; ++i)
