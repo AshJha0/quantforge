@@ -89,3 +89,42 @@ bound clamp) hid them; a nonzero ridge keeps the solve unscaled.
 - AGREE up to rounding, not proven: 281:30 `>=`/`==` (pivot choice on an SPD Gram matrix; extreme conditioning could move E_SINGULAR).
 - PLAUSIBLE, not proven: 380:24 `>=` (needs r_i == 0 exactly with u_i < 0 from rounding), 380:43 `<=`
   (exact ratio tie; y unique, multipliers may differ in degenerate sets), 386:28 `>=` (exact zn == 1e-12 gn).
+
+## hedge_solvers.rs targeted re-score, branch j2-rustkill (2026-11-15)
+Survivors after 377834e (22) audited by hand. Killed by new tests in `tests/hedge_solvers.rs`:
+- 880:17 delete `margin_rates` (scaled path) `binding_margin_on_the_scaled_path_uses_the_caller_units`.
+- 1930:17, 1931:17 delete `lower` / `upper` in select_solve `selection_passes_each_subset_its_own_bounds`.
+- 702:27 `*` -> `+` (split margin row has `2 + n` entries) `margin_spent_by_an_equality_alone_is_infeasible_with_three_instruments`.
+- 684:20 `+` -> `-` (split bound row on `p_{n-j}`) `upper_bound_of_a_later_instrument_holds_in_the_split_stage`.
+
+Equivalent, with reasoning:
+- 1518:31 `+` -> `*` in minvar_ratio: the back-substitution sum then starts at `q = i`, adding
+  `l[i][i] * hedge[i]` while `hedge[i]` is still its initial 0. TRUE equivalent.
+- 557:51 `>` -> `>=` in scaled_reduced_rank: `D H D` has unit diagonal, so its largest eigenvalue
+  is at least 1 and the limit `1e-12 * scale` is positive; the mutant differs only when a reduced
+  eigenvalue equals the limit bit for bit. Equivalent up to an exact float tie (not constructible
+  through the Jacobi eigen solver). The R6-6.2 rank-cut fix on stage-j2 may move this line.
+- 1932:17 delete `costs` in select_solve: by contract (doc comment, I-33, instrument-selection.md)
+  `p` carries no costs, so `p.costs` is `Costs::default()` and the field is the same. Equivalent
+  under the precondition. Note: select_solve does not itself reject costs; a caller passing
+  them would get them silently ignored (correct code) or a shape error (mutant).
+- Split-stage mutants of nonsmooth_minimiser that change only the split objective, not its
+  constraints: 661:29 `+` and `/` (delta), 666:69 delete `-`, 667:26 `*`->`+`, 673:48 `-`->`/`,
+  673:55 `+`->`-` and `*`, 673:66 `%`->`/`, 673:71 `/`->`%` and `*`, and the sign rule 717:57
+  `||`->`&&`, 717:81 `*`->`/`. Reasoning: the split only seeds the sign state. Its constraints are
+  intact, so its point x0 is feasible and lies in the orthant of the seeded signs; every later
+  sign change either releases a zero (the orthant grows) or fixes at 0 a coordinate already 0, so
+  every orthant solve stays feasible and the `return Ok(Some(last))` fallback is never taken. The
+  loop stops only when the subgradient test holds at every zero, i.e. at a KKT point, and the
+  reduced Hessian is definite (rank check), so that point is the unique minimiser. A wrong seed
+  costs only extra iterations against the cap `10 (n + p) + 100`. Equivalent in output except
+  (a) at the iteration cap, (b) an extreme `delta` (661 `/` with a huge spectral scale) where the
+  split's dependence test may misfire, and (c) for 717:57/81, coordinates with
+  `0 < |x0_j| <= 1e-11 max|x0|` forced nonzero by an equality: correct code fixes them at 0, the
+  orthant can then be infeasible and the inexact split point is returned. (c) is a possible
+  accuracy issue in the correct code, not a test gap; noted, not fixed (tests + docs only).
+  Only a planted-cap unit test inside src (iteration count as the observable) could separate them.
+- 380:43 `<` -> `<=`: unchanged from the audit above (exact ratio tie, plausible equivalent).
+
+Full n2 run (main a148d0e) survivors 460:45, 461:24, 507:23, 508:21 are caught on this branch by
+377834e (targeted run r2); its other survivors are the audit entries above.

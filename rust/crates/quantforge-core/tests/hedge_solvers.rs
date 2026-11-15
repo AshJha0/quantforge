@@ -5,7 +5,7 @@ use proptest::prelude::*;
 use quantforge_core::hedge_solvers::{
     Costs, Greek, GreekInstrument, GreekMarket, IntegerProblem, Leg, LegKind, LotHedge,
     MinVarInput, QpProblem, Singular, beta_futures, greeks_neutralise, integer_solve, minvar_ratio,
-    option_hedge_lots, qp_solve, residual_report, unit_greeks,
+    option_hedge_lots, qp_solve, residual_report, select_solve, unit_greeks,
 };
 use quantforge_core::linalg::{Matrix, solve};
 
@@ -1187,4 +1187,83 @@ fn option_hedge_lots_neutralises_delta_with_whole_lots() {
         )),
         "E_DOMAIN"
     );
+}
+
+#[test]
+fn binding_margin_on_the_scaled_path_uses_the_caller_units() {
+    // min (2x - 2)^2 subject to |x| <= 0.5 (rate 1). No ridge and H = 4, so the solve runs in
+    // Jacobi-scaled y = 2x, where the rate becomes 1/2. The answer is the margin edge x = 0.5;
+    // applying the unscaled rate to y would give |y| <= 0.5, that is x = 0.25.
+    let a: Matrix = vec![vec![2.0]];
+    let (b, w, m) = ([-2.0], [1.0], [1.0]);
+    let mut p = problem(&a, &b, &w);
+    p.costs = Costs {
+        margin_rates: Some(&m),
+        margin_limit: Some(0.5),
+        ..Costs::default()
+    };
+    let s = qp_solve(&p).unwrap();
+    assert!((s.x[0] - 0.5).abs() < 1e-12, "{:?}", s.x);
+}
+
+#[test]
+fn selection_passes_each_subset_its_own_bounds() {
+    // min (x1 - 3)^2 + (x2 - 1)^2 with x1 in [-10, 2], at most one instrument. {0} alone sits at
+    // its bound x1 = 2 (objective 1 + 1 = 2); {1} alone gives x2 = 1 (objective 9). The bounds of
+    // a one-column subset have one entry: the full two-entry lists are a shape error there.
+    let a: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+    let (b, w) = ([-3.0, -1.0], [1.0, 1.0]);
+    let (lo, hi) = ([Some(-10.0), None], [Some(2.0), None]);
+    let mut p = problem(&a, &b, &w);
+    p.lower = Some(&lo);
+    p.upper = Some(&hi);
+    let s = select_solve(&p, 1, false).unwrap();
+    assert_eq!(s.selected, vec![0]);
+    assert!((s.x[0] - 2.0).abs() < 1e-12 && s.x[1] == 0.0, "{:?}", s.x);
+}
+
+#[test]
+fn margin_spent_by_an_equality_alone_is_infeasible_with_three_instruments() {
+    // x3 = -2 is forced, but |x1| + |x2| + |x3| <= 1. The split stage must count the short part
+    // of every instrument in the margin row (2n entries); dropping the last one would accept
+    // the split point and return it although it breaks the margin.
+    let a: Matrix = vec![
+        vec![1.0, 0.0, 0.0],
+        vec![0.0, 1.0, 0.0],
+        vec![0.0, 0.0, 1.0],
+    ];
+    let (b, w, m) = ([0.0, 0.0, 0.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]);
+    let e: Matrix = vec![vec![0.0, 0.0, 1.0]];
+    let rhs = [-2.0];
+    let mut p = problem(&a, &b, &w);
+    p.eq_matrix = Some(&e);
+    p.eq_rhs = Some(&rhs);
+    p.costs = Costs {
+        margin_rates: Some(&m),
+        margin_limit: Some(1.0),
+        ..Costs::default()
+    };
+    assert_eq!(code(qp_solve(&p)), "E_INFEASIBLE");
+}
+
+#[test]
+fn upper_bound_of_a_later_instrument_holds_in_the_split_stage() {
+    // x2 = 0 is forced but x2 <= -1, with a spread so the cost path runs: infeasible. The split
+    // row of bound j must read x_j = p_j - n_j; for j = 1 of n = 2 a row on p_1 alone would be
+    // met by p_2 = n_2 = 1 and the split point returned.
+    let a: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+    let (b, w, hs) = ([-1.0, 0.0], [1.0, 1.0], [0.1, 0.1]);
+    let e: Matrix = vec![vec![0.0, 1.0]];
+    let rhs = [0.0];
+    let hi = [None, Some(-1.0)];
+    let mut p = problem(&a, &b, &w);
+    p.eq_matrix = Some(&e);
+    p.eq_rhs = Some(&rhs);
+    p.upper = Some(&hi);
+    p.costs = Costs {
+        half_spreads: Some(&hs),
+        cost_weight: Some(1.0),
+        ..Costs::default()
+    };
+    assert_eq!(code(qp_solve(&p)), "E_INFEASIBLE");
 }
