@@ -231,3 +231,42 @@ Equivalent, with reasoning (1):
 No survivor showed a bug in correct code (every guard already returns `E_INPUT` / `E_SINGULAR` as the
 spec says), so no Python/Java/C++ change or golden was needed. Out of scope: the run also missed the
 extra `1952:17 delete field costs ... in select_solve`, which is not one of the 17.
+
+## hedge_solvers.rs: the 67 undocumented survivors after the PR #41 final score, branch j2-rustkill5 (2026-11-15)
+
+Targeted cargo-mutants run (two `--in-place` shards in WSL from fresh copies with `specifications/`,
+`g9_ladder_cost_ratio_at_most_five` skipped as before) over every mutant at the 54 listed positions
+(118 mutants, siblings included). New tests: `tests/hedge_greeks.rs` (Black-Scholes-Merton delta,
+gamma, vega with r = 0.03, q = 0.01 against mpmath), `tests/hedge_solvers_late.rs` (integer
+rounding_cost, relative tie, 2^52 edge, convexity scale, guards; minvar Series covariance, k + 2
+observations, badly scaled 3-hedge solve, block decisions, tiny hedge variance, symmetry band, I-44
+band; determined-point tolerances) and the planted node-cap test `lot_search_cap_tests` in src.
+Result: 54 of the 67 killed, 13 still survive.
+
+Equivalent, with reasoning (4):
+- sample_covariance 1433:40 and 1433:68 `-` -> `+`: `sum_k (x_ik + m_i)(x_jk - m_j)` =
+  `sum_k (x_ik - m_i)(x_jk - m_j) + 2 m_i sum_k (x_jk - m_j)`, and the last sum is 0 by definition of
+  the mean (also for the constant-series rule, where every deviation is 0). Same value up to rounding.
+- LotSearch::offer 1218:42 `<` -> `<=`: the tuples `(size, lots)` are equal only when the same lot
+  vector is offered again; replacing the incumbent by an identical vector changes nothing.
+- LotSearch::offer 1220:23 `<` -> `<=`: reached only when `|f - b| > 1e-12 max(f, b) >= 0`, so `f != b`
+  and `<=` equals `<`.
+
+Exact-tie survivors, plausible but NOT proven equivalent (7, counted open):
+1047:72 `>=` (zero spreads take the kink path with zero kinks), 1055:19 `>=` (eigenvalue exactly at the
+limit), 1245:22 `>=` (bound exactly `b (1 + 1e-9)`; only the node count can change), 1253:33 `>=`
+(fraction exactly 1e-9), 1405:42 `>=` (asymmetry exactly 1e-12 x largest), 1505:28 `<=` (pivot exactly
+1e-12), 1546:23 `<=` (hedged variance exactly -1e-12 S_00).
+
+Open, killable with more work (2): integer_solve 1296:35 `+` -> `*` (iteration cap count; needs a
+planted-free cap read as in `qp_cap_counts_every_constraint`), minvar_ratio 1510:30 `/` -> `*`
+(correlation-form off-diagonal; needs a k >= 3 block whose third pivot crosses 1e-12 only with the
+right `lc[j][j]`).
+
+Review note, minvar_ratio `let scale = 0.0;` (PR-head line 1515): the unscaled Cholesky guard is
+`v <= THRESHOLD * scale`, i.e. `v <= 0`. It is not a bug in output: the correlation-form pre-check has
+already rejected any block whose scaled pivot is below 1e-12, so the guard only protects `sqrt` and
+the division against rounding. But the expression reads as a relative threshold and is not one; it is
+a leftover. Suggest `v <= 0.0` with a comment, in all languages, in a later change (not done here).
+
+No test showed a bug in correct code; no other language or golden changed.

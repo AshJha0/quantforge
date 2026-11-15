@@ -2399,3 +2399,44 @@ mod r6_followup_tests {
         );
     }
 }
+
+#[cfg(test)]
+mod lot_search_cap_tests {
+    use super::*;
+
+    /// Integer search with a planted node cap on A = I, b = [-2.3, -2.4] (lot 1, r = x + b), whose
+    /// relaxed optimum is y = (2.3, 2.4). Hand trace of the branch and bound:
+    /// node 1 y = (2.3, 2.4), branch x2 (farthest), 0.4 <= 0.5 so down first;
+    /// node 2 x2 <= 2: y = (2.3, 2), branch x1 down first;
+    /// node 3 x1 <= 2: (2, 2) integer, f = 0.09 + 0.16 = 0.25, incumbent;
+    /// node 4 x1 >= 3: (3, 2), bound 0.49 + 0.16 = 0.65 > 0.25, pruned;
+    /// node 5 x2 >= 3: y = (2.3, 3), bound 0.09 + 0.36 = 0.45 > 0.25, pruned.
+    /// Five nodes: cap 5 succeeds with lots [2, 2], cap 4 fails.
+    /// Visiting the far side first or not pruning node 5 both need 7 nodes.
+    fn solve_with_cap(cap: usize) -> Result<IntegerSolution> {
+        let a: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let b = [-2.3, -2.4];
+        let w = [1.0, 1.0];
+        let lots = [1.0, 1.0];
+        let p = IntegerProblem {
+            a: &a,
+            b: &b,
+            weights: &w,
+            ridge: 0.0,
+            lot_sizes: &lots,
+            lower_lots: None,
+            upper_lots: None,
+        };
+        PLANTED_CAP.with(|c| c.set(Some(cap)));
+        let r = integer_solve(&p);
+        PLANTED_CAP.with(|c| c.set(None));
+        r
+    }
+
+    #[test]
+    fn node_cap_is_exactly_the_hand_traced_count() {
+        assert_eq!(solve_with_cap(5).unwrap().lots, vec![2, 2]);
+        assert_eq!(solve_with_cap(4).unwrap_err().code, "E_NO_CONVERGENCE");
+        assert_eq!(solve_with_cap(2).unwrap_err().code, "E_NO_CONVERGENCE");
+    }
+}
