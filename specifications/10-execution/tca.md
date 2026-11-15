@@ -1,6 +1,6 @@
 # Transaction cost analysis: implementation shortfall (DRAFT)
 
-Spec version 0.1.0 (DRAFT, stage H wave 1). Status: Specified, not implemented. Rulings H-2, H-8, H-9. Plan items 14.7 H-3 (decomposition sums to 1e-10), 15.1 "TCA".
+Spec version 0.1.0 (DRAFT, stage H wave 1). Status: Specified, not implemented. Rulings HR-2, HR-8, HR-9. Plan items 14.7 H-3 (decomposition sums to 1e-10), 15.1 "TCA".
 
 Sources:
 - [Per88] A. Perold, "The implementation shortfall: paper versus reality", *J. Portfolio Management* 14(3) (1988) 4-9. Paper-portfolio definition. Not free; recalled. Evidence class: paper, recalled.
@@ -9,7 +9,7 @@ Sources:
 
 ## `exec.tca.shortfall`
 Inputs `side` (s = +1 BUY, -1 SELL), `decision_price` P_d, `arrival_price` P_0, `end_price` P_c, `order_quantity` X, `fills` list of (q_i, p_i), `fees`; optional `benchmark_vwap`. Q = sum q_i.
-- delay = `s Q (P_0 - P_d)` (executed quantity, H-8)
+- delay = `s Q (P_0 - P_d)` (executed quantity, HR-8)
 - execution = `s sum q_i (p_i - P_0)`
 - opportunity = `s (X - Q)(P_c - P_d)`
 - total = delay + execution + opportunity + fees; `total_bps` = total / (X P_d) x 1e4
