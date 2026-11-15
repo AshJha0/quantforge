@@ -1,0 +1,1 @@
+{"schema_version":"1.0","case_id":"example-risk-scenario-replay-j","operation":"risk.scenario.replay","inputs":{"base_tenors":[2.0,10.0],"base_yields":[4.0,4.2],"shock_tenors":[1.0,5.0,30.0],"shock_bp":[10.0,50.0,20.0],"dv01":[1000.0,2000.0]}}

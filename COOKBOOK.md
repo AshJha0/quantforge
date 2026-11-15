@@ -740,3 +740,49 @@ uv run --project python quantforge run < examples/research_baum_welch_j.json
 Worked example. 60 observations in blocks of 25, start means -0.5 and 1.5, standard deviations 1, tolerance 1.29e-7. Output: `"iterations":28`, `"converged":true`, `"log_likelihood":-97.04826936250689`, `"means":[-0.4071983679316511,2.7272604649142966]`, `"sds":[0.7495715574047682,1.3624331205819107]`, and staying probabilities 0.9329 and 0.8543 on the diagonal of `"transition"`. The first state's initial probability, `7.9e-28`, is its posterior given the whole series at the first observation, 1.498, which the model places in the second state. Pass the fitted parameters to `research.regime.viterbi` for labels, as Tutorial 26 does.
 
 To check a whole suite: `python conformance/runner/runner.py --impl python --suite optim_j` (or `estim_j`, `esbt_j`, `baumwelch_j`).
+
+### Stage J wave 3: stress scenarios, interpolation backtests, drift detectors
+
+Tutorial 33 runs all eight operations together; the recipes below are one call each.
+
+### Replay a curve shock on a book
+
+Plain idea: move each tenor of today's curve by the shock, interpolated onto the book's tenors, and price the move with DV01s. Formally (`specifications/06-risk/scenario-stress.md`, J-W3-4, J-W3-5): `applied_bp = scale x` linear interpolation of the shock in tenor, flat outside the shock's tenors; `shocked = yield + applied_bp / 100`; `pnl = -sum dv01 x applied_bp`.
+
+```bash
+uv run --project python quantforge run < examples/risk_scenario_replay_j.json
+```
+
+Worked example. Shock 10, 50, 20 bp at 1Y, 5Y, 30Y; the 2Y point is a quarter of the way from 1Y to 5Y, so `10 + 0.25 x 40 = 20` bp; the 10Y point is a fifth of the way from 5Y to 30Y, `50 - 0.2 x 30 = 44` bp. Output `"applied_bp":[20.0,44.0]`, `"shocked_yields":[4.2,4.640000000000001]`, and with DV01s 1,000 and 2,000 per bp `"pnl":-108000.0`. For a real crisis, take `shock_tenors` and `shift_bp` from `datasets/scenarios/us_treasury_shocks.json`, or measure them with `risk.scenario.historical_shock`.
+
+### Leave one knot out
+
+Plain idea: hide each inner knot, rebuild with the same method, and record the miss. Formally (`specifications/11-research/interp-backtest.md`, J-W3-8): `e_i = f_{-i}(x_i) - y_i` for each inner `i`, with the max absolute error and the RMSE.
+
+```bash
+uv run --project python quantforge run < examples/research_interp_loo_j.json
+```
+
+Worked example. Knots `(1, 3.0), (2, 3.4), (3, 3.6), (5, 4.0)`, `linear`. Hiding 2 rebuilds `3.0 + 0.5 x 0.6 = 3.3`, error -0.1; hiding 3 rebuilds `3.4 + 0.6 / 3 = 3.6`, error 0. Output `"errors":[-0.10000000000000009,0.0]`, `"max_abs_error":0.10000000000000009`, `"rmse":0.07071067811865482`. For an option smile use `research.backtest.surface_holdout`, which interpolates total variance across strike.
+
+### Detect a mean shift with CUSUM
+
+Plain idea: add up how far each value sits above (and below) the in-control mean, less an allowance `k`, and alarm when the running total passes `h`. Formally (`specifications/11-research/drift-detectors.md`, J-W3-10): `S+_t = max(0, S+_{t-1} + z_t - k)` on `z = (x - mu0) / sigma`, the mirror for `S-`, alarm when either is strictly above `h`, then both restart.
+
+```bash
+uv run --project python quantforge run < examples/research_drift_cusum_j.json
+```
+
+Worked example. `x = 0, 0.2, -0.1, 1.4, 1.6, 1.5, 1.7`, `k = 0.5`, `h = 2`. `S+` stays 0 for three steps, then 0.9, 2.0 (not above 2: the test is strict), 3.0: alarm at index 5, restart, then 1.2. Output `"alarms":[5]`, `"directions":[1]`, `"s_plus":1.2`, `"s_minus":0.0`. `research.drift.page_hinkley` is the same idea measured against the running mean instead of a fixed `mu0`.
+
+### Compare two windows with KS
+
+Plain idea: the largest vertical gap between the two empirical distribution functions, and the chance of a gap that large if both windows came from the same continuous distribution. Formally (J-W3-13): `D = max |F_n - G_m|`; the p-value counts the lattice paths with `|i m - j n| < D n m` exactly.
+
+```bash
+uv run --project python quantforge run < examples/research_drift_ks_j.json
+```
+
+Worked example. `a = 1, 2, 3, 4`, `b = 3.5, 5, 6, 7`. At `x = 3` three quarters of `a` and none of `b` lie at or below: `D = 0.75`. Of the `C(8, 4) = 70` orderings, 16 give a gap at least that large, so `p = 16 / 70`. Output `"statistic":0.75`, `"p_value":0.22857142857142856`, `"reject":false`: four points each are too few to tell. For binned shares use `research.drift.psi`.
+
+To check a whole suite: `python conformance/runner/runner.py --impl python --suite scen_j` (or `interpbt_j`, `drift_j`).

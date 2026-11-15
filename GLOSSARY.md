@@ -217,6 +217,13 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 | Black-Litterman | Moving prior expected returns towards investor views, each weighted by its uncertainty against the prior's (Black and Litterman 1992; J-W2-8) |
 | Z2 statistic | The Acerbi-Szekely expected-shortfall backtest: one minus the sum of losses beyond VaR, each over `T alpha ES_t`; about 0 for a correct model, negative when ES is understated (Acerbi and Szekely 2014; J-W2-10) |
 | Baum-Welch | The EM algorithm for a hidden Markov model: estimate state probabilities (E-step), re-estimate the parameters from them (M-step), repeat until the log-likelihood gain is below a tolerance (Rabiner 1989; `11-research/baum-welch.md`) |
+| Historical shock | The per-tenor move of a yield curve between two dates of a stored history, in basis points, replayed on today's curve (`06-risk/scenario-stress.md`, J-W3-2) |
+| Leave-one-out backtest | Hiding each inner knot of an interpolation, rebuilding from the rest and recording the miss (`11-research/interp-backtest.md`, J-W3-8) |
+| CUSUM | Cumulative sum control chart: running sums of standardised deviations less an allowance `k`, with an alarm above `h` (Page 1954; J-W3-10) |
+| Page-Hinkley test | A CUSUM-type test against the running mean: alarm when the cumulative deviation rises more than `lambda` above its minimum (J-W3-11) |
+| ARL0 | Average run length in control: the mean number of steps to a false alarm when nothing has changed; ARL1 is the mean delay after a change |
+| PSI | Population stability index: `sum (a - e) ln(a / e)` over binned shares of a test and a reference sample; 0.25 is a common alarm level (J-W3-12) |
+| Two-sample KS test | Kolmogorov-Smirnov: the largest gap between two empirical distribution functions, with an exact p-value for small samples (J-W3-13) |
 
 ## Tutorial terms
 
