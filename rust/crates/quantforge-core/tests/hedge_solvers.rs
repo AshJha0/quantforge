@@ -3,9 +3,9 @@
 #![allow(clippy::unwrap_used)] // tests may unwrap (G9)
 use proptest::prelude::*;
 use quantforge_core::hedge_solvers::{
-    Costs, Greek, GreekInstrument, GreekMarket, IntegerProblem, Leg, LegKind, MinVarInput,
-    QpProblem, Singular, beta_futures, greeks_neutralise, integer_solve, minvar_ratio, qp_solve,
-    residual_report, unit_greeks,
+    Costs, Greek, GreekInstrument, GreekMarket, IntegerProblem, Leg, LegKind, LotHedge,
+    MinVarInput, QpProblem, Singular, beta_futures, greeks_neutralise, integer_solve, minvar_ratio,
+    option_hedge_lots, qp_solve, residual_report, unit_greeks,
 };
 use quantforge_core::linalg::{Matrix, solve};
 
@@ -957,4 +957,234 @@ fn beta_futures_rejects_each_non_positive_input_alone() {
     for (v, f, m) in [(-1.0, 100.0, 50.0), (1e6, 0.0, 50.0), (1e6, 100.0, -50.0)] {
         assert_eq!(code(beta_futures(v, 1.0, 0.0, f, m, false)), "E_DOMAIN");
     }
+}
+
+// ---- Lane J-2 (rustkill): survivors of the partial cargo-mutants run on hedge_solvers.rs ----
+// Expected values are derived by hand from the optimality conditions, not pinned from output.
+
+/// `min sum 4 (x_j + b_j)^2 + 0.5 x_j^2 + 0.1 |x_j|` with A = I: setting the derivative
+/// `8 (x + b) + x + 0.1 s` to zero gives `x_j = (-8 b_j - 0.1 s) / 9`, and 0 when
+/// `|8 b_j| <= 0.1`. Weights 4 and the impact make the Jacobi scale `1 / sqrt(4.5)`, not 1.
+fn kinked_problem_check(lower: &[Option<f64>], upper: &[Option<f64>], e: &Matrix, rhs: &[f64]) {
+    let a: Matrix = (0..4)
+        .map(|i| (0..4).map(|j| f64::from(u8::from(i == j))).collect())
+        .collect();
+    let b = [0.3, -1.0, -0.01, 1.0];
+    let w = [4.0; 4];
+    let hs = [0.1; 4];
+    let im = [0.5; 4];
+    let mut p = problem(&a, &b, &w);
+    p.eq_matrix = Some(e);
+    p.eq_rhs = Some(rhs);
+    p.lower = Some(lower);
+    p.upper = Some(upper);
+    p.costs.half_spreads = Some(&hs);
+    p.costs.impact = Some(&im);
+    let s = qp_solve(&p).unwrap();
+    // x0 fixed by the equality; x1 = 7.9 / 9; x2 at the kink (|8 b2| = 0.08); x3 = -7.9 / 9.
+    let want = [-1.0, 7.9 / 9.0, 0.0, -7.9 / 9.0];
+    for (x, w) in s.x.iter().zip(want) {
+        assert!((x - w).abs() <= 1e-12, "{:?}", s.x);
+    }
+    assert_eq!(
+        s.x[2], 0.0,
+        "a coordinate at the kink is exactly zero: {:?}",
+        s.x
+    );
+}
+
+#[test]
+fn kinked_solve_with_signs_fixed_by_bounds_and_an_equality_is_exact() {
+    // nonsmooth_minimiser split stage (661-722), and qp_solve 877-879 (the scaled problem must
+    // carry the scaled costs: dropping them changes the answer when D != 1): the split problem only proposes the sign
+    // state. Each nonzero coordinate here has a bound or equality that makes the wrong sign
+    // infeasible, so a wrong proposal ends in the "no feasible sign state" return of the
+    // inexact split answer (error ~1e-6 from the delta regulariser), or in E_INFEASIBLE.
+    let e = vec![vec![1.0, 0.0, 0.0, 0.0]];
+    kinked_problem_check(
+        &[None, Some(0.5), None, None],
+        &[None, None, None, Some(-0.5)],
+        &e,
+        &[-1.0],
+    );
+}
+
+#[test]
+fn ridged_mixed_unit_columns_are_full_rank() {
+    // jacobi 507:23 (`>` -> `<`) and 508:21 (`/` -> `*`): a ridge keeps qp_solve on the
+    // unscaled path, where only `jacobi` puts H = diag(1e12, 0.25) on a common scale. Unscaled,
+    // the small eigenvalue is 2.5e-13 of the large one (below 1e-12): false E_SINGULAR. (A
+    // wider ratio would trip the 1e-14 pivot limit of the unscaled active-set inverse.)
+    let a: Matrix = vec![vec![1e6, 0.0], vec![0.0, 0.5]];
+    let mut p = problem(&a, &[-2e6, 1.5], &[1.0, 1.0]);
+    p.ridge = 1e-300;
+    let s = qp_solve(&p).unwrap();
+    assert_eq!(s.rank, 2);
+    // x_j = -b_j / a_jj (the ridge is far below rounding).
+    assert!(
+        (s.x[0] - 2.0).abs() <= 1e-12 && (s.x[1] + 3.0).abs() <= 1e-12,
+        "{s:?}"
+    );
+}
+
+#[test]
+fn equality_rows_of_very_different_norms_are_independent() {
+    // scaled_rows 534:43 (`x * x` -> `x + x`, `x / x`), 535:21 (`>` -> `<`, `==`), 536:36
+    // (`/` -> `*`): the rank test of the equalities runs on unit-norm rows. Unnormalised (or
+    // with a NaN norm, which skips the normalisation) the rows -1e13 e0 and e1 have singular
+    // values 1e13 and 1: ratio 1e-13, a false "dependent rows" E_SINGULAR.
+    let a: Matrix = (0..3)
+        .map(|i| (0..3).map(|j| f64::from(u8::from(i == j))).collect())
+        .collect();
+    let e = vec![vec![-1e13, 0.0, 0.0], vec![0.0, 1.0, 0.0]];
+    let mut p = problem(&a, &[0.0, 0.0, -4.0], &[1.0; 3]);
+    p.eq_matrix = Some(&e);
+    p.eq_rhs = Some(&[-1e13, 2.0]);
+    let s = qp_solve(&p).unwrap();
+    // x0 = 1 and x1 = 2 from the equalities; x2 = -b2 = 4.
+    for (x, w) in s.x.iter().zip([1.0, 2.0, 4.0]) {
+        assert!((x - w).abs() <= 1e-12, "{s:?}");
+    }
+}
+
+#[test]
+fn equality_rows_after_jacobi_scaling_are_independent() {
+    // scaled_rows 533:62 (`a * b` -> `a / b`): with H = diag(1e14, 1, 1) (D = diag(1e-7, 1, 1))
+    // the rows (1e7, 1, 0) and (1e7, -1, 0) become (1, 1, 0) and (1, -1, 0) under E D, which are
+    // orthogonal. Under E / D they are (1e14, +-1, 0): nearly parallel, singular-value ratio
+    // ~1e-14, a false E_SINGULAR. The ridge keeps the solve unscaled, so only this D acts.
+    let a: Matrix = vec![
+        vec![1e7, 0.0, 0.0],
+        vec![0.0, 1.0, 0.0],
+        vec![0.0, 0.0, 1.0],
+    ];
+    let e = vec![vec![1e7, 1.0, 0.0], vec![1e7, -1.0, 0.0]];
+    let mut p = problem(&a, &[0.0, 0.0, -5.0], &[1.0; 3]);
+    p.ridge = 1e-300;
+    p.eq_matrix = Some(&e);
+    p.eq_rhs = Some(&[1e7 + 2.0, 1e7 - 2.0]);
+    let s = qp_solve(&p).unwrap();
+    // The equalities give x0 = 1, x1 = 2; x2 = 5.
+    let want = [1.0, 2.0, 5.0];
+    for (x, w) in s.x.iter().zip(want) {
+        assert!((x - w).abs() <= 1e-9, "{s:?}");
+    }
+}
+
+#[test]
+fn a_zero_equality_row_is_dependent() {
+    // scaled_rows 535:21 (`>` -> `>=`): a zero row normalised by its zero norm becomes NaN, and
+    // a NaN singular value passes the `<=` rank test; the zero row must give E_SINGULAR.
+    let a: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+    let e = vec![vec![1.0, 0.0], vec![0.0, 0.0]];
+    let mut p = problem(&a, &[0.0, 0.0], &[1.0, 1.0]);
+    p.eq_matrix = Some(&e);
+    p.eq_rhs = Some(&[1.0, 0.0]);
+    assert_eq!(code(qp_solve(&p)), "E_SINGULAR");
+}
+
+#[test]
+fn reduced_rank_limit_scales_with_the_largest_eigenvalue() {
+    // scaled_reduced_rank 556:27 (`THRESHOLD * scale` -> `/`): two columns at angle theta with
+    // 1 - cos theta = 1e-12. The scaled H has eigenvalues 2 - 1e-12 and 1e-12, below the limit
+    // 1e-12 * (2 - 1e-12), so E_SINGULAR. Divided, the limit is 5e-13 and the problem passes.
+    let theta = (2.0e-12f64).sqrt();
+    let a: Matrix = vec![vec![1.0, theta.cos()], vec![0.0, theta.sin()]];
+    let p = problem(&a, &[1.0, 1.0], &[1.0, 1.0]);
+    assert_eq!(code(qp_solve(&p)), "E_SINGULAR");
+}
+
+#[test]
+fn non_orthogonal_equalities_give_the_minimum_norm_point() {
+    // null_space 460:45 (`*` -> `/`) and 461:24 (`-` -> `+`): with two non-orthogonal rows the
+    // forward substitution uses R[0][1] != 0. min |x|^2 with x0 + x1 = 1, x1 + x2 = 1 is
+    // E^T (E E^T)^{-1} (1, 1) = (1/3, 2/3, 1/3).
+    let a: Matrix = (0..3)
+        .map(|i| (0..3).map(|j| f64::from(u8::from(i == j))).collect())
+        .collect();
+    let e = vec![vec![1.0, 1.0, 0.0], vec![0.0, 1.0, 1.0]];
+    let mut p = problem(&a, &[0.0; 3], &[1.0; 3]);
+    p.ridge = 1.0; // unscaled path; objective 2 |x|^2, same minimiser
+    p.eq_matrix = Some(&e);
+    p.eq_rhs = Some(&[1.0, 1.0]);
+    let s = qp_solve(&p).unwrap();
+    let want = [1.0 / 3.0, 2.0 / 3.0, 1.0 / 3.0];
+    for (x, w) in s.x.iter().zip(want) {
+        assert!((x - w).abs() <= 1e-14, "{s:?}");
+    }
+}
+
+#[test]
+fn tiny_violation_of_a_bound_with_a_tiny_projected_normal_is_enforced() {
+    // minimise_with_multipliers 599:29 (`norm * max(|rhs|, 1)` -> `+`): x0 + 1e-7 x1 = 0 gives
+    // the bound x0 >= 0 a projected normal of norm 1e-7. Unconstrained, x1 ~ 1e-8 and
+    // x0 ~ -1e-15: slack / (1e-7) ~ -1e-8 is a violation; slack / (1e-7 + 1) ~ -1e-15 is not.
+    // With the bound, x0 = 0 and then x1 = 0 exactly.
+    let a: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+    let e = vec![vec![1.0, 1e-7]];
+    let lower = [Some(0.0), None];
+    let mut p = problem(&a, &[0.0, -1e-8], &[1.0, 1.0]);
+    p.ridge = 1e-3;
+    p.eq_matrix = Some(&e);
+    p.eq_rhs = Some(&[0.0]);
+    p.lower = Some(&lower);
+    let s = qp_solve(&p).unwrap();
+    assert_eq!(s.x[0], 0.0, "{s:?}");
+    assert!(s.x[1].abs() <= 1e-22, "{s:?}");
+}
+
+#[test]
+fn bound_violation_within_relative_tolerance_of_a_large_bound_is_left() {
+    // minimise_with_multipliers 599:29 (`norm * max(|rhs|, 1)` -> `norm / max(|rhs|, 1)`): the
+    // bound x >= 1e8 at x = 1e8 - 1e-6 has slack / scale = -1e-6 / 1e8 = -1e-14, inside the
+    // 1e-12 tolerance, so it stays inactive and x is the unconstrained minimiser. Divided, the
+    // scale is 1e-8, the slack ratio -100, and the bound is snapped to exactly 1e8.
+    let a: Matrix = vec![vec![1.0]];
+    let target = 1e8 - 1e-6;
+    let lower = [Some(1e8)];
+    let b = [-target];
+    let mut p = problem(&a, &b, &[1.0]);
+    p.ridge = 1e-300;
+    p.lower = Some(&lower);
+    let s = qp_solve(&p).unwrap();
+    assert_eq!(s.x, vec![target]);
+}
+
+#[test]
+fn option_hedge_lots_neutralises_delta_with_whole_lots() {
+    // option_hedge_lots 2027:29 (`lot_size <= 0` -> `>`): a valid call must not be E_DOMAIN.
+    // Book: 1000 units of the underlying (delta 1000). Hedge: the underlying in lots of 100, no
+    // spread. Delta-neutral is exactly -10 lots, after-delta 0.
+    let hedges = [LotHedge {
+        leg: UNDERLYING,
+        lot_size: 100.0,
+        half_spread: 0.0,
+    }];
+    let r = option_hedge_lots(
+        &MARKET,
+        &[(UNDERLYING, 1000.0)],
+        &hedges,
+        &[Greek::Delta],
+        50,
+    )
+    .unwrap();
+    assert_eq!(r.lots, vec![-10]);
+    assert!(
+        (r.before[0] - 1000.0).abs() <= 1e-9 && r.after[0].abs() <= 1e-9,
+        "{r:?}"
+    );
+    let zero = [LotHedge {
+        lot_size: 0.0,
+        ..hedges[0]
+    }];
+    assert_eq!(
+        code(option_hedge_lots(
+            &MARKET,
+            &[(UNDERLYING, 1000.0)],
+            &zero,
+            &[Greek::Delta],
+            50
+        )),
+        "E_DOMAIN"
+    );
 }
