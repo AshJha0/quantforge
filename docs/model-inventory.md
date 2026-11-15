@@ -80,6 +80,8 @@ Stage E has its own index tables (ME-A1 to ME-A8, EB1 to EB12) under "Stage E mo
 | MJ-6 | Covariance and return estimation (stage J wave 2) | `07-portfolio/estimation.md` | J | Specified (wave 2); built in Python and Java, Rust and C++ pending | 0 library checks (J-W2-15) |
 | MJ-7 | Expected-shortfall backtest Z2 (stage J wave 2) | `06-risk/es-backtest.md` | J | Specified (wave 2); built in Python and Java, Rust and C++ pending | 0 library checks (J-W2-15) |
 | MJ-8 | Baum-Welch regime estimation (stage J wave 2) | `11-research/baum-welch.md` | J | Specified (wave 2); built in Python and Java, Rust and C++ pending | 0 library checks (J-W2-15) |
+| MJ-9 | Financing term structure (stage J curves lane) | `02-curves/financing-term-structure.md` | J | Implemented (v0.9.0, four languages) | 0 library checks; 5 hand cases (J-C-9) |
+| MJ-10 | Liquidity cost curve (stage J curves lane) | `10-execution/liquidity-curve.md` | J | Implemented (v0.9.0, four languages) | 0 library checks; 2 hand cases (J-C-9) |
 
 Numerical engines in `01-core` (root finders, quadrature, PDE, Monte Carlo, COS, RNG, Sobol) are tools, not models. They are tested against analytic and library values in stage A.
 
@@ -889,3 +891,27 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 - **Data lineage hash:** sha256 c50b9b94932f0d24e397b866f2efe461f68488318820bda3f2e09bee5c0d4385 (`baumwelch_j`).
 - **Retirement trigger:** a superseding stage J ruling.
 - **Validation report:** `specifications/11-research/baum-welch.md`.
+
+### MJ-9 Financing term structure (stage J curves lane)
+- **Purpose:** term repo spread and stock borrow curves over the funding curve, and the equity forward that carries on them (`repo.term.curve`, `eq.forward.term_financed`).
+- **Inputs:** funding zero rates, simple term repo quotes, term-average borrow fees, query times or a forward's spot, maturity and dividends.
+- **Limitations:** one year-fraction axis, no extrapolation, no collateral classes; extends ruling D22 without changing the stage D operations (J-C-2); see the spec page.
+- **Validation:** oracle `oracle/python/gen_stage_j_curves.py` (mpmath, 50 digits); 5 hand cases; no outside library or published example (J-C-9); suite `termfin_j` passes 33 of 33 in all four languages (2026-11-15, contract 1.15.0, local). **Review:** 2026-11-15.
+- **Tier:** 2.
+- **Challenger:** the Python oracle against each of the four builds; the D22 flat-case reduction property test in each language.
+- **Monitoring thresholds:** a quote that does not round-trip to 1e-13.
+- **Data lineage hash:** sha256 2407b175b6da0cd2d6b9dab585015e002e6f318a632f4c1a0faf477809e86eeb (`termfin_j`).
+- **Retirement trigger:** a superseding ruling.
+- **Validation report:** `specifications/02-curves/financing-term-structure.md`.
+
+### MJ-10 Liquidity cost curve (stage J curves lane)
+- **Purpose:** cost per unit by order size and liquidation horizon: half spread, square-root impact, timing risk, optimal horizon (`liq.curve.cost`).
+- **Inputs:** half spread, daily volume and volatility, impact coefficient and exponent, risk multiplier, sizes, horizons.
+- **Limitations:** assumed parameters, not calibrated; even trading only; no permanent impact or resilience; FRTB liquidity horizons not built (J-C-6).
+- **Validation:** oracle `oracle/python/gen_stage_j_curves.py`; 2 hand cases; no outside library (J-C-9); suite `liqcurve_j` passes 18 of 18 in all four languages (2026-11-15, contract 1.15.0, local). **Review:** 2026-11-15.
+- **Tier:** 3.
+- **Challenger:** the Python oracle against each of the four builds; the optimum-is-a-minimum property test in each language.
+- **Monitoring thresholds:** the one-day, exponent 1/2 impact differing from stage H `exec.impact.sqrt`.
+- **Data lineage hash:** sha256 97453653a9c27a1f1a0c4c3044cad141549911e87ffde2091a7c55e55bde5ee6 (`liqcurve_j`).
+- **Retirement trigger:** calibration in stage H item H-1, or a superseding ruling.
+- **Validation report:** `specifications/10-execution/liquidity-curve.md`.
