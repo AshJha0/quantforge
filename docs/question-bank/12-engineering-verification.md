@@ -78,7 +78,7 @@ The value-checked count leads the headline on purpose (Q12.7).
 
 Because a build that answered every case with an error code would pass every error case and no value-checked case. Error cases test that bad inputs are refused with the right code, which matters, but they say nothing about whether the numbers are right.
 
-The split is uneven by stage: `stage_f` has 472 value-checked cases against 3,462 error cases and 1,063 invariance pairs, because it added the finite-input rules, which are tested mostly by error cases. A total of 15,463 would overstate the numeric evidence.
+The split is uneven by stage: `stage_f` has 472 value-checked cases against 3,462 error cases and 1,063 invariance pairs, because it added the finite-input rules, which are tested mostly by error cases. A total of 15,514 would overstate the numeric evidence.
 
 The same reasoning moved the outside-check floor (R6-13, owner decision D6): the 60% floor is measured over value-checked cases only, with error and invariance cases a separate evidence class outside the denominator. The old all-case share is shown beside the new one so the change is visible.
 
