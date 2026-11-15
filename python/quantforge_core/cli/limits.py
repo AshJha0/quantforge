@@ -124,6 +124,13 @@ def _w2_returns_cells(raw: Raw) -> None:
             raise _over("returns", 10_000_000)
 
 
+def _ks_cells(raw: Raw) -> None:
+    """Ruling J-W3-14: n m at most 4,000,000 (the exact p-value walks an n by m lattice)."""
+    a, b = raw.get("a"), raw.get("b")
+    if isinstance(a, list) and isinstance(b, list) and len(a) * len(b) > 4_000_000:
+        raise _over("b", 4_000_000)
+
+
 def _baum_welch_sizes(raw: Raw) -> None:
     """Ruling J-W2-14: 16 states, 10,000 iterations, T K at most 10,000,000."""
     _cap(raw, "max_iterations", 10_000)
@@ -326,6 +333,9 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     # Stage J wave 2 (ruling J-W2-14); array lengths are in STAGE_F_ARRAYS.
     "research.estimate.ledoit_wolf": _w2_returns_cells,
     "research.regime.baum_welch": _baum_welch_sizes,
+    # Stage J wave 3 (ruling J-W3-14); array lengths are in STAGE_F_ARRAYS.
+    "research.drift.psi": _caps(bins=1_000),
+    "research.drift.ks": _ks_cells,
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")
@@ -358,6 +368,18 @@ STAGE_F_ARRAYS: dict[str, dict[str, int]] = {
         "pick#cols": 500, "views": 500, "view_covariance": 500, "view_covariance#cols": 500},
     "risk.backtest.es_z2": {"losses": 1_000_000, "var": 1_000_000, "es": 1_000_000},
     "research.regime.baum_welch": {"observations": 1_000_000},
+    # Stage J wave 3 (ruling J-W3-14).
+    "risk.scenario.historical_shock": {"dates": 100_000, "tenors": 100, "yields": 100_000,
+                                       "yields#cols": 100},
+    "risk.scenario.replay": {"base_tenors": 100, "base_yields": 100, "shock_tenors": 100,
+                             "shock_bp": 100, "dv01": 100},
+    "research.backtest.interp_loo": {"x": 10_000, "y": 10_000},
+    "research.backtest.surface_holdout": {"expiries": 1_000, "strikes": 1_000, "vols": 1_000,
+                                          "vols#cols": 1_000, "holdout": 1_000},
+    "research.drift.cusum": {"x": 10_000_000},
+    "research.drift.page_hinkley": {"x": 10_000_000},
+    "research.drift.psi": {"reference": 1_000_000, "test": 1_000_000},
+    "research.drift.ks": {"a": 1_000_000, "b": 1_000_000},
     "risk.curve.pca": {"changes": 100_000, "changes#cols": 200},
     "risk.var.historical": {"pnl": 1_000_000},
     "risk.var.filtered_historical": {"returns": 1_000_000},

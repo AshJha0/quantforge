@@ -13,8 +13,8 @@ import csv
 import hashlib
 import io
 import json
-import sys
 import subprocess
+import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
 
