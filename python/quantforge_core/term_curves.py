@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from .errors import QfError
+from .finite import guard
 
 
 def _increasing_positive(ts: Sequence[float]) -> bool:
@@ -172,3 +173,6 @@ def liquidity_cost(half_spread_bps: float, daily_volume: float, daily_vol: float
             cs.append(sp + a * h ** (-exponent) + b * math.sqrt(h))
         out["optimal_horizon"], out["min_cost"] = hs, cs
     return out
+
+
+guard(globals())
