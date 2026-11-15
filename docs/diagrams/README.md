@@ -365,7 +365,33 @@ xychart-beta
 
 A middle test block loses about `h` rows on each side to purging, so with 100 rows in five folds a 20-bar horizon leaves 40 training rows of 80. Plain k-fold would keep all 80 and let 160 overlapping labels leak across the five folds ([Tutorial 31](../getting-started/tutorial-31-leakage-and-purging.md); rulings J-7 to J-9).
 
-<!-- TODO(stage J wave 3): diagrams for the shock library, the held-out-strike and leave-one-out backtests and A3 drift go here; the wave 3 lane draws them. -->
+### Historical shock replay: from a stored move to book P&L
+
+```mermaid
+flowchart LR
+  accTitle: How a stored historical shock becomes book P&L
+  accDescr: A shock of 10, 50 and 20 basis points at 1, 5 and 30 years is interpolated linearly in tenor onto the book tenors 2 and 10 years, giving 20 and 44 basis points. The shocked yields are the old yields plus the applied move over 100. With DV01s of 1,000 and 2,000 per basis point the P&L is minus 1,000 times 20 minus 2,000 times 44, which is minus 108,000.
+  S["shock: 1Y 10 bp, 5Y 50 bp, 30Y 20 bp"] --> I["linear in tenor, flat outside (J-W3-4)"]
+  I --> A["applied: 2Y 20 bp, 10Y 44 bp"]
+  A --> Y["shocked yields = yield + applied / 100"]
+  A --> P["pnl = -(1,000 x 20 + 2,000 x 44) = -108,000"]
+```
+
+The worked example of `risk.scenario.replay` (`examples/risk_scenario_replay_j.json`, `06-risk/scenario-stress.md`). Tutorial 33 replays the 2008, 2013, 2020 and 2022 Treasury moves from the shock library the same way.
+
+### Drift detectors on a mean shift: CUSUM against Page-Hinkley
+
+```mermaid
+xychart-beta
+  accTitle: Alarm days of CUSUM and Page-Hinkley after a shift at day 60, Tutorial 33
+  accDescr: A ten-day pattern with mean 0 shifts up by 1.5 at day 60. CUSUM with k 0.5 and h 5 alarms on days 64, 70, 76, 82 and 88, five alarms. Page-Hinkley with delta 0.5 and lambda 5 alarms once, on day 64.
+  title "Tutorial 33: alarms after a +1.5 shift at day 60"
+  x-axis "detector" ["CUSUM", "Page-Hinkley"]
+  y-axis "alarms by day 89" 0 --> 6
+  bar [5, 1]
+```
+
+Both alarm first on day 64, a delay of four days. CUSUM measures against a fixed `mu0`, so after each restart the shift is still there and it alarms every six days (64, 70, 76, 82, 88); Page-Hinkley measures against its own running mean, which absorbs the new level after the restart (J-W3-10, J-W3-11; [Tutorial 33](../getting-started/tutorial-33-stress-test-and-watch-for-drift.md)). Count the first alarm after a break, not the alarms.
 ### Term financing: from quotes to an equity forward
 
 ```mermaid

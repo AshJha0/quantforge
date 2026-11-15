@@ -29,7 +29,7 @@ fn bounded_solve_keeps_a_small_column() {
         };
         let s = qp_solve(&p).unwrap();
         assert!((s.x[0] + 1e7).abs() <= 1e-12 * 1e7, "{:?}", s.x);
-        assert!(s.x[1] == 0.0);
+        assert_eq!(s.x[1], 0.0);
         assert!(s.objective.abs() <= 1e-12);
     }
 }

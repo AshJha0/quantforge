@@ -42,7 +42,7 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Hedging against trading costs](hedging-costs.md) | Implemented, not Validated | I | 33 golden cases for `hedge.qp.solve` with costs and `hedge.frontier.solve`, 15 reproduced by an outside library |
 | [Research workflow: backtest to PBO](research-workflow.md) | Implemented, not Validated | J | 83 golden cases for the backtest, purged CV and research statistics, 31 reproduced by an outside library; synthetic prices, a teaching example |
 
-<!-- TODO(stage J wave 3): wave 3 pages (shock library, held-out-strike and leave-one-out backtests, A3 drift) are the wave 3 lane's; it adds their rows here. -->
+Stage J wave 3 (historical scenario stress, interpolation backtests, drift detectors) has no gallery page: those operations take a curve, a smile or a series rather than build a curve, so they are worked through in [Tutorial 33](../getting-started/tutorial-33-stress-test-and-watch-for-drift.md) instead.
 
 ## Real data
 

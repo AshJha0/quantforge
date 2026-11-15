@@ -723,7 +723,7 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 
 {table(['Curve', 'Status', 'Stage', 'Evidence'], rows)}
 
-<!-- TODO(stage J wave 3): wave 3 pages (shock library, held-out-strike and leave-one-out backtests, A3 drift) are the wave 3 lane's; it adds their rows here. -->
+Stage J wave 3 (historical scenario stress, interpolation backtests, drift detectors) has no gallery page: those operations take a curve, a smile or a series rather than build a curve, so they are worked through in [Tutorial 33](../getting-started/tutorial-33-stress-test-and-watch-for-drift.md) instead.
 {real}
 ## How the gallery is built
 

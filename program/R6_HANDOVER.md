@@ -287,20 +287,14 @@ Stage J wave 2 fixes (2026-11-14) add four Ledoit-Wolf goldens with interior shr
 
 TOTALS: 15315 value 7571 error 5230 invariance 2514
 
-Stage J wave 3 (2026-11-15) adds scenario stress, interpolation-backtest and drift-detector goldens (`scen_j` 23, `interpbt_j` 25, `drift_j` 35), 83 cases (55 value, 28 error), target contract 1.15.0 (ruling J-W3-1; Python only so far, runner still 1.14.0).
-
-TOTALS: 15398 value 7626 error 5258 invariance 2514
+Stage J wave 3 (2026-11-15) adds scenario stress, interpolation-backtest and drift-detector goldens (`scen_j` 23, `interpbt_j` 25, `drift_j` 35), 83 cases (55 value, 28 error), contract 1.15.0 (ruling J-W3-1), now in all four builds.
 
 Stage J wave 3 audit fix (2026-11-15) adds `drift_j-0036` (KS, n = m = 250, p about 4e-16, pure relative limit 1e-9): 1 value case.
 
-TOTALS: 15399 value 7627 error 5258 invariance 2514
-
 Stage J wave 3 fuzz fix (2026-11-15) adds `fuzzfix_j-0040` to `-0043` (ruling J-W3-17: `risk.backtest.traffic_light` `observations` above 1,000,000 is `E_LIMIT`; Rust now rejects `exceptions > observations`): 4 error cases. Java KS `ratio` now exactly rounded (no DECIMAL128 step).
 
-TOTALS: 15403 value 7627 error 5262 invariance 2514
+Stage J curves lane (2026-11-15) adds `termfin_j` (33: 13 value, 20 error) and `liqcurve_j` (18: 7 value, 11 error); contract 1.15.0 (J-C-1).
 
-Stage J curves lane (2026-11-15) adds `termfin_j` (33: 13 value, 20 error) and `liqcurve_j` (18: 7 value, 11 error); contract 1.15.0 (J-C-1). Coordinator: if the wave 3 lane also appended a line, merge into one combined line.
-
-Stage J integration (2026-11-15) merges wave 3 into the curves lane and the hedge rank-cut fix (`hedgecut_j`, 4 value cases, J-I.1); contract 1.15.0 for both lanes (J-C-1, J-W3-1); 302 operations.
+Stage J integration (2026-11-15) merges wave 3 (88 cases: 56 value, 32 error) into the curves lane (51: 20 value, 31 error) and the hedge rank-cut fix (`hedgecut_j`, 4 value, ruling J-I.1) on 15,315 (the wave 3 lines above were on a branch without the curves lane, so their own TOTALS lines are dropped); one contract number 1.15.0 for both lanes (J-C-1, J-W3-1); 302 operations in the name map.
 
 TOTALS: 15458 value 7651 error 5293 invariance 2514
