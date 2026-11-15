@@ -297,3 +297,73 @@ flowchart TB
 ```
 
 One iteration is an M-step followed by an E-step, and the outputs are the parameters and log-likelihood of the last E-step (ruling J-W2-11). The likelihood never falls [Rab89, DLR77], so gains shrink towards zero; each golden's tolerance sits at least `1e-11` from every gain it tests, so all four builds stop at the same iteration (J-W2-12). In Tutorial 26 a two-state fit on 24 returns stops after iteration 7 with tolerance `1e-6`, and after iteration 3, not converged, with `max_iterations` 3.
+
+### A study's order of work: power and trials before results
+
+```mermaid
+flowchart TB
+  accTitle: The order in which a stage J study uses the research tools
+  accDescr: A study first runs the power calculation to find the minimum detectable Sharpe for its sample length and decides whether that is small enough to be worth running. It registers every trial in the trial registry before seeing results. Each trial is backtested with costs and a lag, inside purged cross-validation. The best trial's Sharpe ratio goes to the PSR, and with the number of trials and their Sharpe variance to the DSR. The matrix of every trial's performance goes to PBO. The holdout is run once, after the freeze, and the result is reported with power, DSR and PBO beside it, whatever it is.
+  P[research.stats.power: MDS for the sample length] --> D{MDS small enough to be worth running?}
+  D -- no --> STOP[do not run; say why]
+  D -- yes --> REG[register every trial: research/trials.csv]
+  REG --> CV[research.cv.purged_kfold: train and test bars]
+  CV --> BT[research.backtest.run per trial: costs, lag]
+  BT --> PSR[research.stats.psr: best trial against 0]
+  BT --> DSR[research.stats.dsr: best trial against SR0 of N trials]
+  REG -->|N, variance of Sharpe| DSR
+  BT --> PBO[research.stats.pbo: every trial's performance]
+  PSR & DSR & PBO --> F[freeze code and choices]
+  F --> HO[run the holdout once, log the run first]
+  HO --> REP[report Sharpe with power, DSR and PBO, null or not]
+```
+
+The arrows run one way: nothing computed from the holdout goes back into the choices. This is the order the R3 studies followed (freeze `faadaa4`, run log committed first, one run each; `research/r3/RESULTS.md`), and it is why their null results can be reported at all. [Tutorial 30](../getting-started/tutorial-30-trials-and-power.md) does the power and trial arithmetic; [Tutorial 31](../getting-started/tutorial-31-leakage-and-purging.md) the purging.
+
+### Net P&L against the half spread: the break-even point
+
+```mermaid
+xychart-beta
+  accTitle: Net P&L against half spread, Tutorial 27
+  accDescr: Net P&L falls in a straight line from 452.43 at 0 bp to 405.91 at 5, 359.38 at 10, 266.32 at 20 and 0 at the break-even half spread of 48.62 bp.
+  title "Tutorial 27: net P&L of one rule against the half spread"
+  x-axis "half spread (bp)" [0, 5, 10, 20, 48.62]
+  y-axis "net P&L" 0 --> 500
+  line [452.43, 405.91, 359.38, 266.32, 0]
+```
+
+Spread cost is turnover times the half spread over `10^4`, and nothing else in `research.backtest.run` depends on it, so net P&L is a straight line with slope `-turnover / 10^4` (here -9.31 per basis point) and the break-even half spread follows from one costless run: `(461.73 - 9.30) / 9.3056 = 48.62` bp. The points are the printed output of [Tutorial 27](../getting-started/tutorial-27-what-costs-do-to-a-backtest.md); the x-axis is categorical, so the spacing is not to scale.
+
+### Black-Litterman view confidence: one view, five variances
+
+```mermaid
+flowchart LR
+  accTitle: How the variance of one Black-Litterman view sets the posterior
+  accDescr: The prior spread between assets 1 and 2 is 0.038 and the view says 0.08. The prior's variance along the view is 0.0019. The view's weight c is 0.0019 divided by 0.0019 plus Omega. Omega of 1e-8 gives c close to 1 and a posterior spread of 0.08; Omega 0.0002 gives c 0.905 and 0.076; Omega 0.0019 gives c one half and 0.059; Omega 0.019 gives c 0.091 and 0.0418; Omega 1 gives c close to 0 and 0.0381.
+  PR[prior spread P pi = 0.038] --> C["c = 0.0019 / (0.0019 + Omega)"]
+  V[view q = 0.08, variance Omega] --> C
+  C --> O1["Omega 1e-8: c = 1.000, spread 0.0800"]
+  C --> O2["Omega 0.0002: c = 0.905, spread 0.0760"]
+  C --> O3["Omega 0.0019: c = 0.500, spread 0.0590"]
+  C --> O4["Omega 0.019: c = 0.091, spread 0.0418"]
+  C --> O5["Omega 1: c = 0.002, spread 0.0381"]
+```
+
+The posterior spread is `0.038 + c x 0.042` in every case ([Tutorial 29](../getting-started/tutorial-29-view-confidence.md)); only `Omega / tau` matters for the mean (ruling J-W2-8, `07-portfolio/estimation.md`).
+
+### Purging cost against label horizon
+
+```mermaid
+xychart-beta
+  accTitle: Training rows kept against label horizon, Tutorial 31
+  accDescr: In a middle fold of 100 rows split five ways, purging keeps 80 training rows for a horizon of 0 bars, 70 for 5 bars and 40 for 20 bars.
+  title "Tutorial 31: training rows kept in a middle fold, 100 rows, 5 folds"
+  x-axis "label horizon (bars)" [0, 5, 20]
+  y-axis "training rows kept" 0 --> 80
+  bar [80, 70, 40]
+```
+
+A middle test block loses about `h` rows on each side to purging, so with 100 rows in five folds a 20-bar horizon leaves 40 training rows of 80. Plain k-fold would keep all 80 and let 160 overlapping labels leak across the five folds ([Tutorial 31](../getting-started/tutorial-31-leakage-and-purging.md); rulings J-7 to J-9).
+
+<!-- TODO(stage J wave 3): diagrams for the shock library, the held-out-strike and leave-one-out backtests and A3 drift go here; the wave 3 lane draws them. -->
+<!-- TODO(curves lane): diagrams for the financing term structure and the liquidity curve go here; the curves lane draws them. -->

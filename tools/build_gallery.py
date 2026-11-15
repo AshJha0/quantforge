@@ -721,6 +721,9 @@ Generated on {any_d['meta']['date']} from commit `{any_d['meta']['commit']}`.
 An outside library in `verified_by` means QuantLib or Strata. The other cases have hand or replay sources, which can share a misreading with the spec. Each page gives the breakdown. The papers and standards behind each curve are cited in its spec and collected in [References](../references.md).
 
 {table(['Curve', 'Status', 'Stage', 'Evidence'], rows)}
+
+<!-- TODO(curves lane): the financing term structure and liquidity curve rows above, and their pages, are the curves lane's; it replaces the two planned rows (in PLANNED in tools/build_gallery.py) when its spec lands. -->
+<!-- TODO(stage J wave 3): wave 3 pages (shock library, held-out-strike and leave-one-out backtests, A3 drift) are the wave 3 lane's; it adds their rows here. -->
 {real}
 ## How the gallery is built
 

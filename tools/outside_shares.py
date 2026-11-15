@@ -265,9 +265,9 @@ def share(rows):
     c = Counter(r[2] for r in rows)
     k = sum(c[x] for x in COUNTED)
     kr = k + c[REDERIVED]
-    return {"cases": n, **{x: c[x] for x in CLASSES}, "counted": k, "share": round(k / n, 4) if n else None,
+    return {"cases": n, **{x: c[x] for x in CLASSES}, "counted": k, "share": round(k / n, 6) if n else None,
             "rederived_book_spec_only": sum(1 for r in rows if r[2] == REDERIVED and r[1].startswith("book.")),
-            "counted_with_rederivation": kr, "share_with_rederivation": round(kr / n, 4) if n else None}
+            "counted_with_rederivation": kr, "share_with_rederivation": round(kr / n, 6) if n else None}
 
 
 def build(problems):

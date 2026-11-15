@@ -588,6 +588,8 @@ Stage J wave 1 (target v0.9.0, not yet released) adds research tools; wave 2 rec
 | Deflated Sharpe ratio for a set of trials | `research_dsr_j.json` | `research.stats.dsr` | `rstats_j-0001` |
 | Minimum detectable Sharpe for a sample length | `research_power_j.json` | `research.stats.power` | `rstats_j-0017` |
 | Probability of backtest overfitting from a strategy matrix | `research_pbo_j.json` | `research.stats.pbo` | `rstats_j-0025` |
+| Count CPCV splits and backtest paths | `research_cpcv_paths_j.json` | `research.cv.cpcv_paths` | `purgedcv_j-0017` |
+| Probabilistic Sharpe ratio against a benchmark | `research_psr_j.json` | `research.stats.psr` | `rstats_j-0013` |
 
 ### Backtest with costs
 
@@ -653,11 +655,31 @@ uv run --project python quantforge run < examples/research_pbo_j.json
 
 Worked example. Rows `[1, 0], [1, 0], [0, 2], [0, 2]`, two blocks, metric `MEAN`. Whichever block trains, its winner is last on the other: rank 1 of 2, `omega = 1/3`, logit `log(1/2)`. Output `"pbo":1.0`, `"logits":[-0.6931471805599454,-0.6931471805599454]`, `"n_combinations":2`. [Tutorial 24](docs/getting-started/tutorial-24-is-the-sharpe-real.md) works a three-strategy example by hand, and the gallery page [Research workflow](docs/curves/research-workflow.md) runs all of these on twelve rules.
 
+### Count CPCV splits and paths
+
+Plain idea: combinatorial purged cross-validation cuts the history into `N` groups and tests on every choice of `k` of them; the test groups recombine into several complete backtest paths, which gives a distribution of out-of-sample results instead of one. Formally (`specifications/11-research/purged-cv.md`; López de Prado 2018, section 12.4): `n_splits = C(N, k)`, and each group is tested in `C(N - 1, k - 1)` splits, so `n_paths = k/N C(N, k)`.
+
+```bash
+uv run --project python quantforge run < examples/research_cpcv_paths_j.json
+```
+
+Worked example. `N = 6`, `k = 2`: `C(6, 2) = 15` splits and `2/6 x 15 = 5` paths. Output `"n_splits":15,"n_paths":5`. [Tutorial 31](docs/getting-started/tutorial-31-leakage-and-purging.md) tabulates `N` = 6, 8, 10 against `k` = 1, 2, 3.
+
+### Probabilistic Sharpe ratio
+
+Plain idea: the probability that the true Sharpe ratio is above a benchmark, given how long the sample is and how skewed and fat-tailed the returns are. Formally (`research-statistics.md`, J-14; Bailey and López de Prado 2012): with `v = 1 - skew sr + (kurtosis - 1)/4 sr^2`, `z = (sr - sr_benchmark) sqrt(T - 1) / sqrt(v)` and `psr = Phi(z)`; `sr` per period, `kurtosis` not excess; `v <= 0` is `E_DOMAIN`.
+
+```bash
+uv run --project python quantforge run < examples/research_psr_j.json
+```
+
+Worked example. Daily Sharpe 0.1 over 500 days, skew -0.5, kurtosis 5, benchmark 0: `v = 1 + 0.05 + 0.01 = 1.06`, `z = 0.1 x sqrt(499) / sqrt(1.06) = 2.1697`. Output `"z":2.169688265583635,"psr":0.9849847651995092`. With skew 0 and kurtosis 3 the same Sharpe gives `z = 2.2283`: negative skew costs evidence. [Tutorial 30](docs/getting-started/tutorial-30-trials-and-power.md) shows PSR rising with sample length.
+
 To check a whole suite: `python conformance/runner/runner.py --impl python --suite backtest_j` (or `purgedcv_j`, `regime_j`, `rstats_j`).
 
 ### Stage J wave 2: portfolio construction, estimation, ES backtest, Baum-Welch
 
-Wave 2 adds seven operations (rulings J-W2-1 to J-W2-23 in `specifications/stage-j-rulings-w2.md`). All four builds implement them on branch `stage-j`, at CLI contract 1.14.0. As above, each file copies the inputs of the named golden case verbatim, and the outputs quoted are from the Python build on 2026-11-14. [Tutorial 25](docs/getting-started/tutorial-25-build-and-stress-a-portfolio.md) and [Tutorial 26](docs/getting-started/tutorial-26-test-es-and-fit-regimes.md) work through them on hand-sized data.
+Wave 2 adds seven operations (rulings J-W2-1 to J-W2-23 in `specifications/stage-j-rulings-w2.md`). All four builds implement them, at CLI contract 1.14.0 (merged to `main` in PR #40, unreleased, target v0.9.0). As above, each file copies the inputs of the named golden case verbatim, and the outputs quoted are from the Python build on 2026-11-14. [Tutorial 25](docs/getting-started/tutorial-25-build-and-stress-a-portfolio.md) and [Tutorial 26](docs/getting-started/tutorial-26-test-es-and-fit-regimes.md) work through them on hand-sized data.
 
 | Task | File | Operation | From golden |
 |---|---|---|---|
@@ -740,3 +762,34 @@ uv run --project python quantforge run < examples/research_baum_welch_j.json
 Worked example. 60 observations in blocks of 25, start means -0.5 and 1.5, standard deviations 1, tolerance 1.29e-7. Output: `"iterations":28`, `"converged":true`, `"log_likelihood":-97.04826936250689`, `"means":[-0.4071983679316511,2.7272604649142966]`, `"sds":[0.7495715574047682,1.3624331205819107]`, and staying probabilities 0.9329 and 0.8543 on the diagonal of `"transition"`. The first state's initial probability, `7.9e-28`, is its posterior given the whole series at the first observation, 1.498, which the model places in the second state. Pass the fitted parameters to `research.regime.viterbi` for labels, as Tutorial 26 does.
 
 To check a whole suite: `python conformance/runner/runner.py --impl python --suite optim_j` (or `estim_j`, `esbt_j`, `baumwelch_j`).
+
+### Stage J research questions, one recipe each
+
+These recipes answer a question with several calls rather than one, so each points at the tutorial script that does it; every script runs on any build (`python examples/tutorials/<script> rust/target/release/quantforge`, or the Java or C++ command line) and prints the same lines. The numbers are those scripts' printed output (2026-11-15, all four builds).
+
+| Question | Script | Operations | Tutorial |
+|---|---|---|---|
+| At what spread does my backtest earn nothing? | `t27_costs.py` | `research.backtest.run` | [27](docs/getting-started/tutorial-27-what-costs-do-to-a-backtest.md) |
+| What does a long-only rule cost me? | `t28_frontier.py` | `research.portfolio.mean_variance`, `risk.contrib.euler` | [28](docs/getting-started/tutorial-28-efficient-frontier.md) |
+| How strong should my view be? | `t29_view_confidence.py` | `research.estimate.black_litterman` | [29](docs/getting-started/tutorial-29-view-confidence.md) |
+| How many trials can my Sharpe survive, and how long must I wait? | `t30_trials_and_power.py` | `research.stats.dsr`, `.psr`, `.power` | [30](docs/getting-started/tutorial-30-trials-and-power.md) |
+| How much training data does purging cost? | `t31_purging.py` | `research.cv.purged_kfold`, `research.cv.cpcv_paths` | [31](docs/getting-started/tutorial-31-leakage-and-purging.md) |
+| Does shrinkage help at my sample length? | `t32_shrinkage_and_length.py` | `research.estimate.ledoit_wolf`, `research.portfolio.risk_parity` | [32](docs/getting-started/tutorial-32-shrinkage-and-sample-length.md) |
+
+#### Break-even half spread
+
+Plain idea: spread cost grows in a straight line with the half spread, so the half spread at which net P&L is zero follows from one costless run. Formally (`backtester.md`): `total_spread_cost = turnover x half_spread_bps / 10^4`, so `b* = (total_gross - total_commission - total_fixed_cost) / (turnover x 10^-4)`, read from a run with `half_spread_bps` 0. Worked example (Tutorial 27): gross 461.73, commission 9.30, turnover 93,055.8 give `b* = 48.62` bp, and a run at that half spread prints net 0.000000.
+
+#### Price a constraint in return
+
+Plain idea: run mean-variance with and without the constraint at the same risk aversion and compare certainty-equivalent returns `mu'w - (gamma/2) sigma^2`. Worked example (Tutorial 28): at `gamma = 1`, free 0.0823 and long-only 0.0627, so the rule costs 195.5 bp a year; at `gamma = 5` neither portfolio holds a short and the cost is zero.
+
+#### Choose a view's variance from a confidence
+
+Plain idea: for one view, the posterior moves a fraction `c = tau P Sigma P' / (tau P Sigma P' + Omega)` of the way from the prior to the view, so choose `c` and set `Omega = tau P Sigma P' (1 - c) / c`. Worked example (Tutorial 29): `tau P Sigma P' = 0.0019`; `Omega = 0.0019` gives `c = 1/2` and a posterior spread of 0.0590, half-way from 0.038 to 0.08. Only `Omega / tau` affects the posterior mean.
+
+#### Years needed to detect a Sharpe ratio
+
+Plain idea: `years_required = (z_sum / SR)^2`, with `z_sum = 2.4865` at 5 % and 80 % power. Send `{"years": 1, "sr_target": 1.0}` to `research.stats.power`: 6.18 years for an annual Sharpe of 1, 24.73 for 0.5 (Tutorial 30).
+
+<!-- TODO(stage J wave 3): wave 3 recipes (shock library, held-out-strike and leave-one-out backtests, A3 drift) go here; the wave 3 lane writes them. -->

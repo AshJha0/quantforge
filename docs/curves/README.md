@@ -42,6 +42,9 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | Financing term structures | Partly done | D | Repo financing is done (`repo.forward`, `repo.implied_rate` and the implied financing spread; see the repo row). Ruling D22 keeps borrow and financing as flat rates over the funding curve; financing term structures are not yet scheduled |
 | Liquidity curves | Planned | H | None yet |
 
+<!-- TODO(curves lane): the financing term structure and liquidity curve rows above, and their pages, are the curves lane's; it replaces the two planned rows (in PLANNED in tools/build_gallery.py) when its spec lands. -->
+<!-- TODO(stage J wave 3): wave 3 pages (shock library, held-out-strike and leave-one-out backtests, A3 drift) are the wave 3 lane's; it adds their rows here. -->
+
 ## Real data
 
 [US Treasury curve with sanity bands](real-usd-treasury.md): a page built from real public data, snapshot of 2026-11-06. The same bands run daily in workflow (a).
