@@ -4,6 +4,9 @@
 //! binary fractions where possible), or, for the KS exit-mass fallback, from an independent
 //! closed form: two fully separated samples give `p = 2 / C(n + m, n)`.
 
+#![allow(clippy::unwrap_used)] // tests may unwrap (G9)
+#![allow(clippy::assert_is_empty)] // `assert!(alarms.is_empty())` reads as the spec: no alarm
+
 use quantforge_core::dates::Date;
 use quantforge_core::error::Result;
 use quantforge_core::interp::Method;
