@@ -657,7 +657,7 @@ To check a whole suite: `python conformance/runner/runner.py --impl python --sui
 
 ### Stage J wave 2: portfolio construction, estimation, ES backtest, Baum-Welch
 
-Wave 2 adds seven operations (rulings J-W2-1 to J-W2-23 in `specifications/stage-j-rulings-w2.md`). All four builds implement them on branch `stage-j`, at CLI contract 1.14.0. As above, each file copies the inputs of the named golden case verbatim, and the outputs quoted are from the Python build on 2026-11-14. [Tutorial 25](docs/getting-started/tutorial-25-build-and-stress-a-portfolio.md) and [Tutorial 26](docs/getting-started/tutorial-26-test-es-and-fit-regimes.md) work through them on hand-sized data.
+Wave 2 adds seven operations (rulings J-W2-1 to J-W2-23 in `specifications/stage-j-rulings-w2.md`). All four builds implement them, at CLI contract 1.14.0 (merged to `main` in PR #40, unreleased, target v0.9.0). As above, each file copies the inputs of the named golden case verbatim, and the outputs quoted are from the Python build on 2026-11-14. [Tutorial 25](docs/getting-started/tutorial-25-build-and-stress-a-portfolio.md) and [Tutorial 26](docs/getting-started/tutorial-26-test-es-and-fit-regimes.md) work through them on hand-sized data.
 
 | Task | File | Operation | From golden |
 |---|---|---|---|

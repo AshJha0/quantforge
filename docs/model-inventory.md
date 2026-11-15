@@ -845,8 +845,8 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 ### MJ-5 Portfolio optimisation (stage J wave 2)
 - **Purpose:** mean-variance, risk parity and Euler risk contributions.
 - **Inputs:** as in the spec page.
-- **Limitations:** research tool, tier 3; built in Python and Java on branch `stage-j`, Rust and C++ pending (J-W2-1); see the spec page.
-- **Validation:** oracle `oracle/python/gen_stage_j_w2.py`; exact KKT certificate per mean-variance case; scipy SLSQP agreement within 1.8e-8 (an outside QP to 1e-8 is still open, J-W2-15). **Review:** 2026-11-14.
+- **Limitations:** research tool, tier 3; built in Python, Rust, Java and C++ and merged to `main` (PR #40, 2026-11-14), each build passing every golden case of its suite; see the spec page.
+- **Validation:** oracle `oracle/python/gen_stage_j_w2.py`; exact KKT certificate per mean-variance case; scipy SLSQP agreement within 1.8e-8; outside checks since J-W2-16: DAQP 0.11.2 (mean-variance), cvxpy 1.9.3 with Clarabel 0.11.1 (risk parity, 33 of 35 `optim_j` value cases with the two misses explained in Tutorial 25), autograd 1.9.1 (Euler); per case in `oracle/OUTSIDE_J.json`. **Review:** 2026-11-14.
 - **Tier:** 3.
 - **Challenger:** the Python oracle against each build once built.
 - **Monitoring thresholds:** KKT residual above 1e-9 or risk-parity shares off budget by more than 1e-10.
@@ -857,8 +857,8 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 ### MJ-6 Covariance and return estimation (stage J wave 2)
 - **Purpose:** Ledoit-Wolf shrinkage and the Black-Litterman posterior.
 - **Inputs:** as in the spec page.
-- **Limitations:** research tool, tier 3; built in Python and Java on branch `stage-j`, Rust and C++ pending (J-W2-1); see the spec page.
-- **Validation:** oracle `oracle/python/gen_stage_j_w2.py`; two algebraic forms equal in exact arithmetic for both estimators; scikit-learn check open (J-6, J-W2-15). **Review:** 2026-11-14.
+- **Limitations:** research tool, tier 3; built in Python, Rust, Java and C++ and merged to `main` (PR #40, 2026-11-14), each build passing every golden case of its suite; see the spec page.
+- **Validation:** oracle `oracle/python/gen_stage_j_w2.py`; two algebraic forms equal in exact arithmetic for both estimators; outside checks since J-W2-16 and J-W2-23: scikit-learn 1.9.1 `LedoitWolf` and PyPortfolioOpt 1.6.0 Black-Litterman reproduce all 19 value-checked `estim_j` cases (`oracle/OUTSIDE_J.json`). **Review:** 2026-11-14.
 - **Tier:** 3.
 - **Challenger:** the Python oracle against each build once built.
 - **Monitoring thresholds:** shrinkage outside [0, 1] or a non-symmetric output.
@@ -869,7 +869,7 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 ### MJ-7 Expected-shortfall backtest Z2 (stage J wave 2)
 - **Purpose:** the Acerbi-Szekely Z2 statistic.
 - **Inputs:** as in the spec page.
-- **Limitations:** research tool, tier 3; built in Python and Java on branch `stage-j`, Rust and C++ pending (J-W2-1); see the spec page.
+- **Limitations:** research tool, tier 3; built in Python, Rust, Java and C++ and merged to `main` (PR #40, 2026-11-14), each build passing every golden case of its suite; see the spec page.
 - **Validation:** oracle `oracle/python/gen_stage_j_w2.py`; hand case; size study (J-8) is research-lane gap G13. **Review:** 2026-11-14.
 - **Tier:** 3.
 - **Challenger:** the Python oracle against each build once built.
@@ -881,8 +881,8 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 ### MJ-8 Baum-Welch regime estimation (stage J wave 2)
 - **Purpose:** Gaussian HMM parameters by EM.
 - **Inputs:** as in the spec page.
-- **Limitations:** research tool, tier 3; built in Python and Java on branch `stage-j`, Rust and C++ pending (J-W2-1); see the spec page.
-- **Validation:** oracle `oracle/python/gen_stage_j_w2.py`; one-state closed form; log-space forward pass re-checks every log-likelihood; hmmlearn check open (J-W2-15). **Review:** 2026-11-14.
+- **Limitations:** research tool, tier 3; built in Python, Rust, Java and C++ and merged to `main` (PR #40, 2026-11-14), each build passing every golden case of its suite; see the spec page.
+- **Validation:** oracle `oracle/python/gen_stage_j_w2.py`; one-state closed form; log-space forward pass re-checks every log-likelihood; hmmlearn 0.3.3 checks the `baumwelch_j` value cases it can reproduce (J-W2-16; per case in `oracle/OUTSIDE_J.json`). **Review:** 2026-11-14.
 - **Tier:** 3.
 - **Challenger:** the Python oracle against each build once built.
 - **Monitoring thresholds:** a log-likelihood decrease above 1e-9 relative between iterations.
