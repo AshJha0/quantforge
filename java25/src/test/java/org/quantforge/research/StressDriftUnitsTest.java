@@ -352,6 +352,82 @@ class StressDriftUnitsTest {
     }
 
     @Test
+    void nonFiniteInputsNameTheirField() {
+        double n = Double.NaN;
+        double[] t = {1, 2};
+        double[] bad = {1, n};
+        String d = "E_DOMAIN";
+        List<LocalDate> ds = List.of(D1, D2);
+        err(d, "tenors", () -> StressDrift.historicalShock(ds, bad, new double[][] {{1, 2}, {1, 2}}, D1, D2));
+        err(d, "yields", () -> StressDrift.historicalShock(ds, t, new double[][] {{1, 2}, {1, n}}, D1, D2));
+        err(d, "base_tenors", () -> StressDrift.replay(bad, t, t, t, 1, null));
+        err(d, "base_yields", () -> StressDrift.replay(t, bad, t, t, 1, null));
+        err(d, "shock_tenors", () -> StressDrift.replay(t, t, bad, t, 1, null));
+        err(d, "shock_bp", () -> StressDrift.replay(t, t, t, bad, 1, null));
+        err(d, "scale", () -> StressDrift.replay(t, t, t, t, n, null));
+        err(d, "dv01", () -> StressDrift.replay(t, t, t, t, 1, bad));
+        Interpolation.Method l = Interpolation.Method.LINEAR;
+        err(d, "x", () -> StressDrift.interpLoo(l, new double[] {0, 1, n}, new double[] {0, 1, 2}));
+        err(d, "y", () -> StressDrift.interpLoo(l, new double[] {0, 1, 2}, new double[] {0, 1, n}));
+        double[] k = {1, 2, 3};
+        double[][] v = {{0.2, 0.2, 0.2}};
+        err(d, "expiries", () -> StressDrift.surfaceHoldout(l, new double[] {n}, k, v, new long[] {1}));
+        err(d, "strikes", () -> StressDrift.surfaceHoldout(l, new double[] {1}, new double[] {1, 2, n}, v, new long[] {1}));
+        err(d, "vols", () -> StressDrift.surfaceHoldout(l, new double[] {1}, k, new double[][] {{0.2, n, 0.2}},
+                new long[] {1}));
+        double[] one = {1};
+        err(d, "x", () -> StressDrift.cusum(new double[] {n}, 0.5, 4, 0, 1, true));
+        err(d, "k", () -> StressDrift.cusum(one, n, 4, 0, 1, true));
+        err(d, "h", () -> StressDrift.cusum(one, 0.5, n, 0, 1, true));
+        err(d, "mu0", () -> StressDrift.cusum(one, 0.5, 4, n, 1, true));
+        err(d, "sigma", () -> StressDrift.cusum(one, 0.5, 4, 0, n, true));
+        err(d, "x", () -> StressDrift.pageHinkley(new double[] {n}, 0, 1, "up", true));
+        err(d, "delta", () -> StressDrift.pageHinkley(one, n, 1, "up", true));
+        err(d, "lambda", () -> StressDrift.pageHinkley(one, 0, n, "up", true));
+        double[] ref = oneToTen();
+        double[] refBad = ref.clone();
+        refBad[0] = n;
+        err(d, "reference", () -> StressDrift.psi(refBad, ref, 2, 0.1));
+        err(d, "test", () -> StressDrift.psi(ref, refBad, 2, 0.1));
+        err(d, "threshold", () -> StressDrift.psi(ref, ref, 2, n));
+        err(d, "a", () -> StressDrift.ks(new double[] {n}, one, 0.5));
+        err(d, "b", () -> StressDrift.ks(one, new double[] {n}, 0.5));
+        err(d, "level", () -> StressDrift.ks(one, one, n));
+    }
+
+    @Test
+    void boundaryCases() {
+        // CUSUM downward equality at h: z=-4.5, sm=4 not > 4.
+        assertEquals(0, StressDrift.cusum(new double[] {-4.5}, 0.5, 4.0, 0.0, 1.0, true).alarms().length);
+        // PH up-down equality: x {0,-8}: mean -4, dn = 4, not > 4 for lambda 4.
+        assertEquals(0, StressDrift.pageHinkley(new double[] {0, -8}, 0.0, 4.0, "down", true).alarms().length);
+        // replay at the first shock knot and between: t=1 exactly (flat branch) and 1.0 left boundary.
+        StressDrift.Replay r = StressDrift.replay(new double[] {1, 4}, new double[] {0, 0}, new double[] {1, 2, 4},
+                new double[] {6, 10, 30}, 1.0, null);
+        assertArrayEquals(new double[] {6, 30}, r.appliedBp());
+        // historical shock where end is the last date and start the first of four.
+        LocalDate d4 = LocalDate.of(2024, 1, 5);
+        StressDrift.Shock s = StressDrift.historicalShock(List.of(D1, D2, D3, d4), new double[] {1},
+                new double[][] {{1}, {2}, {3}, {5}}, D1, d4);
+        assertArrayEquals(new double[] {400}, s.shiftBp());
+        // ks: d just above the max reachable |im-jn| -> every path counts, p 0.
+        assertEquals(0.0, StressDrift.ksP(2, 2, 5));
+        assertEquals(1.0, StressDrift.ksP(2, 2, 1));
+        // n=1,m=1: d=1 -> no path keeps |i-j|<1 after the first step -> p 1; d=2 -> p 0.
+        assertEquals(1.0, StressDrift.ksP(1, 1, 1));
+        assertEquals(0.0, StressDrift.ksP(1, 1, 2));
+        // surface: holdout index m-2 is allowed.
+        StressDrift.surfaceHoldout(Interpolation.Method.LINEAR, new double[] {1}, new double[] {1, 2, 3, 4},
+                new double[][] {{0.2, 0.2, 0.2, 0.2}}, new long[] {2});
+        // loo for LINEAR with n=3 uses 2 knots: allowed (minKnots 2); MONOTONE_PCHIP too.
+        assertEquals(1, StressDrift.interpLoo(Interpolation.Method.MONOTONE_PCHIP, new double[] {0, 1, 2},
+                new double[] {0, 1, 2}).errors().length);
+        // psi with n not divisible: bins 3, n 4: edges r[ceil(4/3)-1]=r[1], r[ceil(8/3)-1]=r[2].
+        assertArrayEquals(new double[] {0.5, 0.25, 0.25},
+                StressDrift.psi(new double[] {1, 2, 3, 4}, new double[] {1, 2, 3, 4}, 3, 0.1).referenceShares());
+    }
+
+    @Test
     void ratioRounding() {
         BigInteger one = BigInteger.ONE;
         BigInteger three = BigInteger.valueOf(3);
