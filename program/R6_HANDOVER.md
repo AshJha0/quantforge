@@ -290,3 +290,7 @@ TOTALS: 15315 value 7571 error 5230 invariance 2514
 Stage J wave 3 (2026-11-15) adds scenario stress, interpolation-backtest and drift-detector goldens (`scen_j` 23, `interpbt_j` 25, `drift_j` 35), 83 cases (55 value, 28 error), target contract 1.15.0 (ruling J-W3-1; Python only so far, runner still 1.14.0).
 
 TOTALS: 15398 value 7626 error 5258 invariance 2514
+
+Stage J wave 3 audit fix (2026-11-15) adds `drift_j-0036` (KS, n = m = 250, p about 4e-16, pure relative limit 1e-9): 1 value case.
+
+TOTALS: 15399 value 7627 error 5258 invariance 2514

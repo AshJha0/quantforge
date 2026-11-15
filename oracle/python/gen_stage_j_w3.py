@@ -443,6 +443,12 @@ def build():
             ("ks empty", OK, ks_ref, {"a": [], "b": [1.0]}, "E_INPUT"),
             ("ks level 1", OK, ks_ref, {"a": [1.0], "b": [2.0], "level": 1.0}, "E_DOMAIN")]:
         mk(s, op, ref, inp, code=code, desc=d)
+    # Audit 2026-11-15: C(500, 250) is far past 128 bits, so Rust and C++ leave the exact count for the probability
+    # walk; a large D makes p tiny, and a pure relative limit makes any cancellation in the walk visible.
+    big = {"a": gauss(9800, 250, 9), "b": [round(v + 1.0, 9) for v in gauss(9801, 250, 9)]}
+    mk(s, OK, ks_ref, big, cls=ST, desc="n = m = 250, shift 1.0: tiny p beyond 128-bit counts (relative limit)",
+       verified=("library-object",), oc=ks_oc)
+    s.cases[-1]["tolerance_limit"] = {"absolute": 0.0, "relative": 1e-9}
     return suites
 
 

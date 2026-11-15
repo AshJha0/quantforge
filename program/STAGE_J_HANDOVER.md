@@ -68,7 +68,7 @@ Owner decision 2026-11-15: Option C, all in v0.9.0. Branch `j2-wave3` (from main
 |---|---|---|
 | `scen_j` | `risk.scenario.historical_shock`, `risk.scenario.replay` | 23 (13, 10) |
 | `interpbt_j` | `research.backtest.interp_loo`, `research.backtest.surface_holdout` | 25 (16, 9) |
-| `drift_j` | `research.drift.cusum`, `.page_hinkley`, `.psi`, `.ks` | 35 (26, 9) |
+| `drift_j` | `research.drift.cusum`, `.page_hinkley`, `.psi`, `.ks` | 36 (27, 9) (`drift_j-0036` added by the audit fix) |
 
 `program/R6_HANDOVER.md` ends `TOTALS: 15398 value 7626 error 5258 invariance 2514`. Python passes 83/83 through the runner. Contract: target 1.15.0 (J-W3-1); **not bumped yet** (runner, stub and four CLIs still 1.14.0) so Rust, Java and C++ conformance stays green on this branch; bump in one commit when the three language lanes land.
 
@@ -95,6 +95,11 @@ Library-checked value cases: `interpbt_j` 13 of 16 (scipy `CubicSpline` natural,
 - Outside share (R6-13), recounted 2026-11-15 after audit: wave 3 **31 of 55 value cases (56 %)**, below the 60 % floor: `scen_j` 8 (replay, numpy interp), `interpbt_j` 16, `drift_j` 7 (KS). Not counted: historical shock (pandas date lookup plus arithmetic), PSI (quantile/searchsorted/rel_entr re-implementation), CUSUM and Page-Hinkley (no library with the conventions; REDERIVE_OPS does not list them). The `interpbt_j` checks re-run the same scipy/numpy calls that generated the goldens: library-object goldens, not a second independent check. Stage J total 130 of 185 (70.3 %). Regenerated with system Python (numpy 2.4.6, scipy 1.17.1), not the pinned outside venv (numpy 2.5.4, scipy 1.18.1), which was not found on this machine.
 - A3: DR-A3-1 sets Page-Hinkley `lambda = 5` (was 50) from the Siegmund calibration (owner authorised the maintainer on 2026-11-15 to decide on their behalf, session instruction, recorded in DR-A3-1); prereg still unsigned. Runner fix: `research/a3/a3_drift_study.py` line 78 had a SyntaxError (the DR-A3-1 comment swallowed the closing `))`); fixed, py_compile clean, `pytest research/a3` 2 passed. Prereg prior analysis now discloses an off-study-seed check (seed 777); PSI/KS settings deliberately unchanged.
 - Docs: tutorial 33 (renumbered from 27; docs lane owns 27-32), LEARN and COOKBOOK wave 3 sections, glossary rows, model inventory MJ-9 to MJ-11.
+
+### Audit fixes (2026-11-15)
+
+- KS beyond 128 bits: Rust and C++ fallback walk now sums exit mass (the old `1 - stay` form cancelled tiny p to 0); J-W3-13 wording narrowed honestly; new golden `drift_j-0036` (n = m = 250, p about 4e-16, relative limit 1e-9). TOTALS now 15399. Java `StressDriftTest` (10 tests, incl. the BigInteger path at C(160, 80)).
+- Outside-share recount, A3 runner fix and wording: see the sections above.
 
 ### Not done in this lane
 

@@ -301,27 +301,32 @@ double ks_p_count(long long n, long long m, long long d) {
     return static_cast<double>(total - row[static_cast<std::size_t>(m)]) / static_cast<double>(total);
 }
 
+// Fallback walk: sums the probability mass that steps outside the band (not 1 - stay), so tiny p-values keep a
+// small relative error instead of cancelling to zero.
 double ks_p_walk(long long n, long long m, long long d) {
     if (d <= 0) return 1.0;
     const auto inside = [&](long long i, long long j) { return std::llabs(i * m - j * n) < d; };
+    double out = 0.0;
     Vec row(static_cast<std::size_t>(m) + 1, 0.0);
     row[0] = 1.0;
     for (long long i = 0; i <= n; ++i) {
         Vec next(static_cast<std::size_t>(m) + 1, 0.0);
         for (long long j = 0; j <= m; ++j) {
-            if (!inside(i, j)) {
-                row[j] = 0.0;
-                continue;
-            }
+            const double r = row[static_cast<std::size_t>(j)];
             const auto left = static_cast<double>(n - i + m - j);
-            if (left == 0.0) continue;
-            if (i < n) next[j] += row[j] * static_cast<double>(n - i) / left;
-            if (j < m) row[j + 1] += row[j] * static_cast<double>(m - j) / left;
+            if (r == 0.0 || left == 0.0) continue;
+            if (i < n) {
+                const double q = r * static_cast<double>(n - i) / left;
+                (inside(i + 1, j) ? next[static_cast<std::size_t>(j)] : out) += q;
+            }
+            if (j < m) {
+                const double q = r * static_cast<double>(m - j) / left;
+                (inside(i, j + 1) ? row[static_cast<std::size_t>(j) + 1] : out) += q;
+            }
         }
-        if (i == n) return 1.0 - row[static_cast<std::size_t>(m)];
         row = std::move(next);
     }
-    return 1.0;
+    return std::min(out, 1.0);
 }
 
 Ks ks(const Vec& a, const Vec& b, double level) {

@@ -488,7 +488,7 @@ fn binom_u128(n: u128, k: u128) -> Option<u128> {
 
 /// `P(D' n m >= d)` under the continuous null by counting lattice paths with `|i m - j n| < d`.
 /// Counts in 128 bits while `C(n + m, n)` fits (every golden); otherwise the same walk on path
-/// probabilities in binary64 (checked fallback; not used by any golden).
+/// exit probabilities in binary64 (relative error, not exact; golden drift_j-0036 uses it).
 fn ks_p(n: usize, m: usize, d: i128) -> f64 {
     if d <= 0 {
         return 1.0;
@@ -511,35 +511,45 @@ fn ks_p(n: usize, m: usize, d: i128) -> f64 {
     ks_p_walk(n, m, d)
 }
 
-/// The fallback: probability that a uniform random path reaches `(i, j)` inside the band.
+/// The fallback: a uniform random path walks the lattice; the mass that steps onto a point outside the
+/// band is summed. Summing the exit mass (not `1 - stay`) keeps tiny p-values to a relative error of a
+/// few ulps per step instead of cancelling to zero.
 fn ks_p_walk(n: usize, m: usize, d: i128) -> f64 {
+    if d <= 0 {
+        return 1.0;
+    }
     let inside = |i: usize, j: usize| (i as i128 * m as i128 - j as i128 * n as i128).abs() < d;
+    let mut out = 0.0f64;
     let mut row = vec![0.0f64; m + 1];
     row[0] = 1.0;
     for i in 0..=n {
         let mut next = vec![0.0f64; m + 1];
         for j in 0..=m {
-            if !inside(i, j) {
-                row[j] = 0.0;
-                continue;
-            }
+            let r = row[j];
             let left = (n - i + m - j) as f64;
-            if left == 0.0 {
+            if r == 0.0 || left == 0.0 {
                 continue;
             }
             if i < n {
-                next[j] += row[j] * (n - i) as f64 / left;
+                let q = r * (n - i) as f64 / left;
+                if inside(i + 1, j) {
+                    next[j] += q;
+                } else {
+                    out += q;
+                }
             }
             if j < m {
-                row[j + 1] += row[j] * (m - j) as f64 / left;
+                let q = r * (m - j) as f64 / left;
+                if inside(i, j + 1) {
+                    row[j + 1] += q;
+                } else {
+                    out += q;
+                }
             }
-        }
-        if i == n {
-            return 1.0 - row[m];
         }
         row = next;
     }
-    1.0
+    out.min(1.0)
 }
 
 /// J-W3-13: two-sample KS statistic and exact two-sided p-value.
