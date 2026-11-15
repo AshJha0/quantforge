@@ -119,9 +119,9 @@ def _data(method: str, **kw: object) -> CurveData:
         dates,
         tuple(math.exp(x) for x in XS[1:]),
         (),
-        kw.get("tension"),
-        kw.get("step_end"),
-    )  # type: ignore[arg-type]
+        kw.get("tension"),  # type: ignore[arg-type]
+        kw.get("step_end"),  # type: ignore[arg-type]
+    )
 
 
 def test_option_checks() -> None:
