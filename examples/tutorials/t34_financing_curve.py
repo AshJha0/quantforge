@@ -1,10 +1,10 @@
-"""Tutorial 27: build a term repo and stock borrow curve over the funding curve, read forward
+"""Tutorial 34: build a term repo and stock borrow curve over the funding curve, read forward
 financing rates from it, and price an equity forward that carries on it.
 
-  uv run --project python python examples/tutorials/t27_financing_curve.py         # Python
-  python examples/tutorials/t27_financing_curve.py rust/target/release/quantforge  # or any other build
+  uv run --project python python examples/tutorials/t34_financing_curve.py         # Python
+  python examples/tutorials/t34_financing_curve.py rust/target/release/quantforge  # or any other build
 
-It sends the cases of docs/getting-started/tutorial-27-financing-term-structure.md through
+It sends the cases of docs/getting-started/tutorial-34-financing-term-structure.md through
 examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
 """
 import math

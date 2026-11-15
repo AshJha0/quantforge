@@ -740,3 +740,39 @@ uv run --project python quantforge run < examples/research_baum_welch_j.json
 Worked example. 60 observations in blocks of 25, start means -0.5 and 1.5, standard deviations 1, tolerance 1.29e-7. Output: `"iterations":28`, `"converged":true`, `"log_likelihood":-97.04826936250689`, `"means":[-0.4071983679316511,2.7272604649142966]`, `"sds":[0.7495715574047682,1.3624331205819107]`, and staying probabilities 0.9329 and 0.8543 on the diagonal of `"transition"`. The first state's initial probability, `7.9e-28`, is its posterior given the whole series at the first observation, 1.498, which the model places in the second state. Pass the fitted parameters to `research.regime.viterbi` for labels, as Tutorial 26 does.
 
 To check a whole suite: `python conformance/runner/runner.py --impl python --suite optim_j` (or `estim_j`, `esbt_j`, `baumwelch_j`).
+
+### Stage J curves lane: financing term structure and liquidity curve
+
+Three operations (rulings J-C-1 to J-C-9 in `specifications/stage-j-rulings-curves.md`, contract 1.15.0), in all four builds. Outputs quoted are from the Python build on 2026-11-15. [Tutorial 34](docs/getting-started/tutorial-34-financing-term-structure.md) and [Tutorial 35](docs/getting-started/tutorial-35-liquidity-curve.md) work through them.
+
+### Build a term repo and borrow curve
+
+Plain idea: each term repo quote fixes one point of the financing spread over the funding curve; borrow quotes do the same for the stock-loan fee. Formally (`specifications/02-curves/financing-term-structure.md`, J-C-2 to J-C-4): `S(T_i) = ln(1 + R_i T_i) - Z(T_i) T_i`, linear between pillars, no extrapolation.
+
+```bash
+uv run --project python quantforge run < examples/repo_term_curve_j.json
+```
+
+Worked example. Four repo quotes 4.25 % to 4.40 % at 1, 3, 6 and 12 months over a funding curve of 4.0 % to 4.2 %: `"pillar_spreads"` 24.25, 27.71, 20.34 and 15.59 bp; at 0.5 years `"financing_rate"` 0.0435, the quote. With one flat quote and one flat fee the curve reproduces ruling D22.
+
+### Price an equity forward on term financing
+
+Plain idea: the forward is spot carried on secured financing, less the borrow fee, less dividends carried the same way. Formally (J-C-5): `F = (S_0 - sum_{0 < t_i <= T} A_i C(t_i)) / C(T)`, `C(t) = exp(-Z(t) t - S(t) + B(t))`.
+
+```bash
+uv run --project python quantforge run < examples/eq_forward_term_financed_j.json
+```
+
+Worked example. Spot 50, nine months, dividends 0.3 and 0.35 inside the horizon (0.4 at 0.9 years is not): `"forward"` 50.793899, `"pv_dividends"` 0.643404.
+
+### Read a liquidity cost curve
+
+Plain idea: half spread plus square-root impact plus timing risk, by size and horizon, and the cheapest horizon per size. Formally (`specifications/10-execution/liquidity-curve.md`, J-C-6 to J-C-8): `c(Q, h) = s + Y sigma (Q/(V h))^delta + z sigma sqrt(h/3)`.
+
+```bash
+uv run --project python quantforge run < examples/liq_curve_cost_j.json
+```
+
+Worked example. 5 bp half spread, `sigma` 2 %, `V` 10 million, `z = 1.645`: for 1,000,000 shares `"optimal_horizon"` 0.3330 days and `"min_cost"` 0.0224 (224 bp). Parameters are assumed, not calibrated.
+
+To check the suites: `python conformance/runner/runner.py --impl python --suite termfin_j` (or `liqcurve_j`).

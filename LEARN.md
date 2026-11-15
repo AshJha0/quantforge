@@ -617,6 +617,24 @@ Wave 2 (rulings J-W2-1 to J-W2-23 in `specifications/stage-j-rulings-w2.md`, sui
 
 **Worked example.** One state on 24 returns stops at iteration 2 with the sample mean 0.1083 and the population standard deviation 1.3675. Two states, tolerance `1e-6`, stop after iteration 7 with standard deviations 0.317 and 2.173 and nearly equal means, staying probabilities 0.8354 and 0.7582 (average spells of 6.1 and 4.1 days), and a log-likelihood of -31.8744 against -41.5653 for one state. Viterbi with the fitted parameters labels the two turbulent spells, `000011110000000011110000` (Tutorial 26). Outside check: the oracle recomputes every log-likelihood with an independent log-space forward pass (J-W2-15), and hmmlearn 0.3.3 `GaussianHMM.fit` with the same start values and stop rule reproduces all 6 value-checked `baumwelch_j` goldens (J-W2-16).
 
+### Financing and liquidity curves (curves lane)
+
+Two curve families the curves page listed as missing, added in v0.9.0 by the curves lane (rulings J-C-1 to J-C-9 in `specifications/stage-j-rulings-curves.md`, suites `termfin_j` and `liqcurve_j`, contract 1.15.0). Implemented in all four languages; the numbers below were printed by the Python build on 2026-11-15 and by the Rust, Java and C++ builds through Tutorials 34 and 35 the same day.
+
+**Plain idea, financing.** Secured financing costs a different rate at each term, and so does borrowing a stock. Each term repo quote fixes one point of the spread over the funding curve; between quotes the forward spread is flat. Stage D's ruling D22 kept these flat; J-C-2 extends it without changing the stage D operations.
+
+**Formal statement.** `S(T_i) = ln(1 + R_i T_i) - Z(T_i) T_i`, linear in `t` between `(0, 0)` and the pillars; `P_f(t) = exp(-Z(t) t - S(t))`; borrow `B(T_j) = b_j T_j`, never falling; forward `F = (S_0 - sum A_i C(t_i)) / C(T)` with `C(t) = P_f(t) e^(B(t))` (`02-curves/financing-term-structure.md`).
+
+**Worked example.** Flat 4 % funding and one 5 % one-year term repo: `S(1) = ln 1.05 - 0.04 = 0.0087901642`; spot 100 then has a one-year forward of exactly 105.
+
+**Plain idea, liquidity.** Selling `Q` units over `h` days costs half the spread, an impact that grows with participation `Q/(V h)`, and timing risk that grows with `h`. The curve gives all three for every size and horizon and the horizon where their sum is smallest.
+
+**Formal statement.** `c(Q, h) = s + Y sigma (Q/(V h))^delta + z sigma sqrt(h/3)` [TLD11, AFTHL05, AC00]; `h* = (2 delta a / b)^(1/(delta + 1/2))` with `a = Y sigma (Q/V)^delta`, `b = z sigma / sqrt 3` (`10-execution/liquidity-curve.md`). Stage H reuses it: at one day and `delta = 1/2` the impact is its draft `exec.impact.sqrt`.
+
+**Worked example.** `sigma` 2 %, `V` 10 million, 100,000 shares in one day: impact `0.02 x sqrt(0.01) = 20` bp. For 1,000,000 shares at `z = 1.645` the optimum is 0.3330 days at 224.21 bp.
+
+**Evidence.** Seven hand cases; the rest reference-computed in mpmath. No free library or published worked example covers either curve, so both are self-assessed (J-C-9).
+
 ### What stage J's evidence does and does not show
 
 - **Outside oracle: 41 of 63 value-checked wave 1 cases (65.1 %),** from `oracle/OUTSIDE_J.json` (J-19a). PSR, DSR and PBO have no free library; DSR is checked against the paper's printed example, PBO by hand.

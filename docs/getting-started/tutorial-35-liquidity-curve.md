@@ -1,4 +1,4 @@
-# Tutorial 28: price liquidity: a cost curve by order size and horizon
+# Tutorial 35: price liquidity: a cost curve by order size and horizon
 
 The plain idea: selling a position costs more than the screen price. You cross half the bid-ask spread, and your own selling pushes the price; the push grows with the size of the order and with the speed at which you trade it. Trading slowly cuts the push but leaves you exposed to the market for longer. A liquidity curve puts numbers on both sides of that trade-off for every size and horizon, and finds the horizon where the total is smallest.
 
@@ -14,17 +14,17 @@ Terms, defined here. **Participation** is the fraction of a day's volume you tra
 
 ## Step 1: Python
 
-The script `examples/tutorials/t28_liquidity_curve.py`, in full (CI checks this listing equals the file):
+The script `examples/tutorials/t35_liquidity_curve.py`, in full (CI checks this listing equals the file):
 
-<!-- tutorial:source examples/tutorials/t28_liquidity_curve.py -->
+<!-- tutorial:source examples/tutorials/t35_liquidity_curve.py -->
 ```python
-"""Tutorial 28: a liquidity cost curve by order size and liquidation horizon: half spread,
+"""Tutorial 35: a liquidity cost curve by order size and liquidation horizon: half spread,
 square-root impact, timing risk and the cost-minimising horizon.
 
-  uv run --project python python examples/tutorials/t28_liquidity_curve.py         # Python
-  python examples/tutorials/t28_liquidity_curve.py rust/target/release/quantforge  # or any other build
+  uv run --project python python examples/tutorials/t35_liquidity_curve.py         # Python
+  python examples/tutorials/t35_liquidity_curve.py rust/target/release/quantforge  # or any other build
 
-It sends the cases of docs/getting-started/tutorial-28-liquidity-curve.md through
+It sends the cases of docs/getting-started/tutorial-35-liquidity-curve.md through
 examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
 """
 import sys
@@ -72,7 +72,7 @@ Run it:
 
 <!-- tutorial:run python -->
 ```bash
-uv run --project python python examples/tutorials/t28_liquidity_curve.py
+uv run --project python python examples/tutorials/t35_liquidity_curve.py
 ```
 
 Real output, 2026-11-15, Windows 11 (Python build):
@@ -109,14 +109,14 @@ Stage H reuses this curve: at one day and `delta = 1/2` the impact equals its dr
 
 ## Step 2: the same in Rust, Java and C++
 
-`examples/tutorials/t28_liquidity_curve.py` sends the same cases (three `liq.curve.cost` with timing risk and one without) to whichever CLI you name and prints the same lines.
+`examples/tutorials/t35_liquidity_curve.py` sends the same cases (three `liq.curve.cost` with timing risk and one without) to whichever CLI you name and prints the same lines.
 
 Rust:
 
 <!-- tutorial:run rust -->
 ```bash
 (cd rust && cargo build --release -p quantforge-cli)
-python examples/tutorials/t28_liquidity_curve.py rust/target/release/quantforge
+python examples/tutorials/t35_liquidity_curve.py rust/target/release/quantforge
 ```
 
 Java 25 and Maven:
@@ -124,7 +124,7 @@ Java 25 and Maven:
 <!-- tutorial:run java -->
 ```bash
 (cd java25 && mvn -B -q -DskipTests package)
-python examples/tutorials/t28_liquidity_curve.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorials/t35_liquidity_curve.py java -jar java25/target/quantforge-cli.jar
 ```
 
 C++26 (GCC 16 or Clang 23, CMake and Ninja):
@@ -132,7 +132,7 @@ C++26 (GCC 16 or Clang 23, CMake and Ninja):
 <!-- tutorial:run cpp -->
 ```bash
 cmake -S cpp26 -B cpp26/build -G Ninja -DBUILD_TESTING=OFF && cmake --build cpp26/build
-python examples/tutorials/t28_liquidity_curve.py cpp26/build/quantforge
+python examples/tutorials/t35_liquidity_curve.py cpp26/build/quantforge
 ```
 
 Each is to print the 10 lines of step 1, digit for digit. The full check is `python conformance/runner/runner.py --impl rust --suite liqcurve_j`.

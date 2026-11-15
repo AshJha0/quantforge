@@ -1,10 +1,10 @@
-"""Tutorial 28: a liquidity cost curve by order size and liquidation horizon: half spread,
+"""Tutorial 35: a liquidity cost curve by order size and liquidation horizon: half spread,
 square-root impact, timing risk and the cost-minimising horizon.
 
-  uv run --project python python examples/tutorials/t28_liquidity_curve.py         # Python
-  python examples/tutorials/t28_liquidity_curve.py rust/target/release/quantforge  # or any other build
+  uv run --project python python examples/tutorials/t35_liquidity_curve.py         # Python
+  python examples/tutorials/t35_liquidity_curve.py rust/target/release/quantforge  # or any other build
 
-It sends the cases of docs/getting-started/tutorial-28-liquidity-curve.md through
+It sends the cases of docs/getting-started/tutorial-35-liquidity-curve.md through
 examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
 """
 import sys

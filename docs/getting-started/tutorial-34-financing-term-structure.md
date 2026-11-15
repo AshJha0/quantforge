@@ -1,4 +1,4 @@
-# Tutorial 27: build a financing term structure: term repo, stock borrow and the forward they imply
+# Tutorial 34: build a financing term structure: term repo, stock borrow and the forward they imply
 
 The plain idea: a desk pays one rate for its own unsecured money (the funding curve) and another for money secured on the asset it holds (repo). Locking repo in for three months costs a different rate from rolling it overnight, so secured financing has a term structure of its own. So does the fee a stock lender earns. This page builds both from quotes, as a spread over the funding curve, reads term and forward financing rates off them, and prices an equity forward that carries on them. With one flat spread and one flat fee it gives back the stage D formula exactly.
 
@@ -14,17 +14,17 @@ Terms, defined here. A **term repo rate** `R` for `[0, T]` is simple: one unit b
 
 ## Step 1: Python
 
-The script `examples/tutorials/t27_financing_curve.py`, in full (CI checks this listing equals the file):
+The script `examples/tutorials/t34_financing_curve.py`, in full (CI checks this listing equals the file):
 
-<!-- tutorial:source examples/tutorials/t27_financing_curve.py -->
+<!-- tutorial:source examples/tutorials/t34_financing_curve.py -->
 ```python
-"""Tutorial 27: build a term repo and stock borrow curve over the funding curve, read forward
+"""Tutorial 34: build a term repo and stock borrow curve over the funding curve, read forward
 financing rates from it, and price an equity forward that carries on it.
 
-  uv run --project python python examples/tutorials/t27_financing_curve.py         # Python
-  python examples/tutorials/t27_financing_curve.py rust/target/release/quantforge  # or any other build
+  uv run --project python python examples/tutorials/t34_financing_curve.py         # Python
+  python examples/tutorials/t34_financing_curve.py rust/target/release/quantforge  # or any other build
 
-It sends the cases of docs/getting-started/tutorial-27-financing-term-structure.md through
+It sends the cases of docs/getting-started/tutorial-34-financing-term-structure.md through
 examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
 """
 import math
@@ -89,7 +89,7 @@ Run it:
 
 <!-- tutorial:run python -->
 ```bash
-uv run --project python python examples/tutorials/t27_financing_curve.py
+uv run --project python python examples/tutorials/t34_financing_curve.py
 ```
 
 Real output, 2026-11-15, Windows 11 (Python build):
@@ -126,14 +126,14 @@ The checks behind the goldens (`termfin_j`): five hand cases (this page's one-qu
 
 ## Step 2: the same in Rust, Java and C++
 
-`examples/tutorials/t27_financing_curve.py` sends the same cases (two `repo.term.curve`, four `eq.forward.term_financed`) to whichever CLI you name and prints the same lines.
+`examples/tutorials/t34_financing_curve.py` sends the same cases (two `repo.term.curve`, four `eq.forward.term_financed`) to whichever CLI you name and prints the same lines.
 
 Rust:
 
 <!-- tutorial:run rust -->
 ```bash
 (cd rust && cargo build --release -p quantforge-cli)
-python examples/tutorials/t27_financing_curve.py rust/target/release/quantforge
+python examples/tutorials/t34_financing_curve.py rust/target/release/quantforge
 ```
 
 Java 25 and Maven:
@@ -141,7 +141,7 @@ Java 25 and Maven:
 <!-- tutorial:run java -->
 ```bash
 (cd java25 && mvn -B -q -DskipTests package)
-python examples/tutorials/t27_financing_curve.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorials/t34_financing_curve.py java -jar java25/target/quantforge-cli.jar
 ```
 
 C++26 (GCC 16 or Clang 23, CMake and Ninja):
@@ -149,7 +149,7 @@ C++26 (GCC 16 or Clang 23, CMake and Ninja):
 <!-- tutorial:run cpp -->
 ```bash
 cmake -S cpp26 -B cpp26/build -G Ninja -DBUILD_TESTING=OFF && cmake --build cpp26/build
-python examples/tutorials/t27_financing_curve.py cpp26/build/quantforge
+python examples/tutorials/t34_financing_curve.py cpp26/build/quantforge
 ```
 
 Each is to print the 9 lines of step 1, digit for digit. The full check is `python conformance/runner/runner.py --impl rust --suite termfin_j`.
