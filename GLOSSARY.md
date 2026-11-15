@@ -217,6 +217,12 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 | Black-Litterman | Moving prior expected returns towards investor views, each weighted by its uncertainty against the prior's (Black and Litterman 1992; J-W2-8) |
 | Z2 statistic | The Acerbi-Szekely expected-shortfall backtest: one minus the sum of losses beyond VaR, each over `T alpha ES_t`; about 0 for a correct model, negative when ES is understated (Acerbi and Szekely 2014; J-W2-10) |
 | Baum-Welch | The EM algorithm for a hidden Markov model: estimate state probabilities (E-step), re-estimate the parameters from them (M-step), repeat until the log-likelihood gain is below a tolerance (Rabiner 1989; `11-research/baum-welch.md`) |
+| Term repo rate | A simple money-market rate for financing secured on a named asset over a fixed term `[0, T]`: one unit borrowed returns `1 + R T` (`repo.term.curve`, `02-curves/financing-term-structure.md`) |
+| Financing spread curve | The cumulative spread `S(t)` of secured financing over the funding curve, one pillar per term repo quote, linear between pillars (flat forward spreads); extends ruling D22 (J-C-2, J-C-3) |
+| Borrow fee curve | The term structure of the fee a stock lender earns, from term-average fees; the cumulative fee must not fall, so forward fees are never negative (J-C-4) |
+| Liquidity cost curve | Cost per unit of liquidating an order evenly over a horizon: half spread plus impact `Y sigma (Q/(V h))^delta` plus timing risk `z sigma sqrt(h/3)` (`liq.curve.cost`, `10-execution/liquidity-curve.md`) |
+| Square-root law | Market impact proportional to volatility times the square root of order size over daily volume, with a coefficient of order one (Toth et al. 2011) |
+| Optimal liquidation horizon | The horizon that minimises impact plus timing risk on the liquidity cost curve, in closed form `(2 delta a / b)^(1/(delta + 1/2))` (J-C-8) |
 
 ## Tutorial terms
 

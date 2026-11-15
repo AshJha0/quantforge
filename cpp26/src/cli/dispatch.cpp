@@ -65,6 +65,7 @@
 #include "quantforge/core/lmm.hpp"
 #include "quantforge/core/hedging.hpp"
 #include "quantforge/core/research.hpp"
+#include "quantforge/core/term_curves.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {
@@ -316,6 +317,7 @@ struct Entry {
 #include "ops_sensitivity_portfolio.inc"
 #include "ops_frtb_sbm.inc"
 #include "ops_research.inc"
+#include "ops_term_curves.inc"
 
 // Every verb this build runs. The operations command, and dispatch, are generated from this list alone.
 constexpr std::span<const Entry> registry[] = {
@@ -346,6 +348,7 @@ constexpr std::span<const Entry> registry[] = {
     risk_gb_ops,
     frtb_gb_ops,
     research_ops,
+    term_curve_ops,
 };
 
 // Built on first use, never at static initialisation, so no order between translation units matters.
