@@ -5,6 +5,15 @@ mutmut (which needs `fork` and so does not run on Windows). It is module-scoped 
 run takes about an hour on the reference laptop instead of the full mutmut run that timed out
 under WSL.
 
+## Before a mutmut job: valid mutant syntax
+
+mutmut 3.8.1 aborts the whole run if one mutant of a file is not valid Python. It does this when
+it removes the `not` from a wrapped `if (not ...)` guard and drops the outer parentheses (fixed in
+`shortrate.swaption`). `mutmut_syntax_check.py` runs mutmut's own generator over every module and
+compiles the output. On 2026-11-15 all 115 `quantforge_core` files passed (345 s in WSL); the
+pre-fix `shortrate.py` fails it. It is too slow for the unit tests, so run it by hand after a
+reformat or a new long boolean guard (usage in the script's docstring).
+
 ## How it works
 
 - Mutation sites are every AST node of the profile's modules that one of the operators applies to,
