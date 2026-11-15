@@ -382,5 +382,10 @@ Stage J wave 1 adds operations and no error code (ruling J-1). `stage-j-rulings-
 | `research.estimate.ledoit_wolf`, `research.estimate.black_litterman` | `07-portfolio/estimation.md` | wave 2 (specified) |
 | `risk.backtest.es_z2` | `06-risk/es-backtest.md` | wave 2 (specified) |
 | `research.regime.baum_welch` | `11-research/baum-welch.md` | wave 2 (specified) |
+| `risk.scenario.historical_shock`, `risk.scenario.replay` | `06-risk/scenario-stress.md` | wave 3 (specified; Python) |
+| `research.backtest.interp_loo`, `research.backtest.surface_holdout` | `11-research/interp-backtest.md` | wave 3 (specified; Python) |
+| `research.drift.cusum`, `research.drift.page_hinkley`, `research.drift.psi`, `research.drift.ks` | `11-research/drift-detectors.md` | wave 3 (specified; Python) |
 
 Wave 2 (rulings `stage-j-rulings-w2.md` J-W2-1 to J-W2-15) adds no error code and raises the contract to 1.14.0 (J-W2-1); all four builds implement the wave 2 operations and report 1.14.0. The wave 2 page limits (J-W2-14) replace the general per-array limit as J-20 does for wave 1.
+
+Wave 3 (rulings `stage-j-rulings-w3.md` J-W3-1 to J-W3-16) adds no error code; target contract 1.15.0 (J-W3-1), bumped in one commit when all four builds implement wave 3. Until then the Python build implements wave 3 and still reports 1.14.0. Page limits J-W3-14.

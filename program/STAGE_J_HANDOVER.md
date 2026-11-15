@@ -58,6 +58,40 @@ Rows to add at the stage J docs pass: MI-J1 backtester, MI-J2 purged CV, MI-J3 V
 
 Walk-forward and the trial registry stay in the Python research package (`quantforge_research`), not CLI operations. A6 feature store and A8 template section belong to the research lane.
 
+## WAVE 3 SPEC + PYTHON READY (2026-11-15): scenario stress (G18), interpolation backtests, drift detectors (A3)
+
+Owner decision 2026-11-15: Option C, all in v0.9.0. Branch `j2-wave3` (from main a148d0e), not pushed. Read: `specifications/stage-j-rulings-w3.md` J-W3-1 to J-W3-16; spec pages `06-risk/scenario-stress.md`, `11-research/interp-backtest.md`, `11-research/drift-detectors.md`; `specifications/cli-contract.md` (wave 3 rows); `specifications/name-map.json` (regenerated: 299 operations).
+
+### Suites (83 cases, generator `oracle/python/gen_stage_j_w3.py`)
+
+| Suite | Operations | Cases (value, error) |
+|---|---|---|
+| `scen_j` | `risk.scenario.historical_shock`, `risk.scenario.replay` | 23 (13, 10) |
+| `interpbt_j` | `research.backtest.interp_loo`, `research.backtest.surface_holdout` | 25 (16, 9) |
+| `drift_j` | `research.drift.cusum`, `.page_hinkley`, `.psi`, `.ks` | 35 (26, 9) |
+
+`program/R6_HANDOVER.md` ends `TOTALS: 15398 value 7626 error 5258 invariance 2514`. Python passes 83/83 through the runner. Contract: target 1.15.0 (J-W3-1); **not bumped yet** (runner, stub and four CLIs still 1.14.0) so Rust, Java and C++ conformance stays green on this branch; bump in one commit when the three language lanes land.
+
+### Build notes (for the Rust, Java and C++ lanes)
+
+- Scenarios: `shift_bp = 100 (end - start)` in binary64; a missing date is `E_DOMAIN`, order errors `E_DATE_ORDER`. Replay interpolates linearly in tenor, flat outside; `pnl` only when `dv01` is given.
+- LOO: rebuild the interpolant without knot `i` using the `core.interp.evaluate` code path; end knots are never left out. Surface: interpolate `w = sigma^2 T` in `k`, back to vol.
+- CUSUM: strict `> h`, restart both sums after an alarm. Page-Hinkley: running mean at each step (J-W3-11 as corrected), restart counters after an alarm. PSI: edges `r[ceil(j n / B) - 1]` (0-based), bins right-closed, floor 1e-4 without renormalising. KS: `D n m` as an integer, exact lattice count in big integers (or 128-bit plus a checked fallback); p-value is one final division.
+
+### Outside-check status (R6-13 floor NOT met)
+
+Library-checked value cases: `interpbt_j` 13 of 16 (scipy `CubicSpline` natural, `PchipInterpolator`, numpy `interp`; log-linear by mpmath and the hand case do not count), `drift_j` 6 of 26 (scipy `ks_2samp(method="exact")`, max gap 1.1e-16; CUSUM, Page-Hinkley, PSI are Fraction re-implementations, no free library with these conventions), `scen_j` 0 of 13 (exact Fraction arithmetic; the four real-data rows are checked against Fed H.15, an outside check of the data, not of a library). Wave 3: **19 of 55 value cases = 35 %**, below the 60 % floor. Options for the coordinator: river `PageHinkley`/`ADWIN` or `ruptures` for drift if conventions can be matched, independent re-derivation class where no library exists; or report the shortfall to the owner.
+
+### Research results
+
+- Interpolation backtests (pass rules committed in c41f629 before any run): **B1 FAIL** (cubic natural, leave-one-strike-out 0.370 vol pts > 0.25 at the ATM strike, T = 0.25; design b 0.355 <= 0.50); **B2 PASS** (pchip on Treasury par, pooled 3M-10Y median 2.62 bp <= 3, 95th 14.19 bp <= 15). `research/interp_backtest/RESULTS.md`.
+- A3: prereg `research/preregs/A3-drift.md` is an **unsigned draft**; runner `research/a3/a3_drift_study.py` refuses until signed. The prereg predicts Page-Hinkley fails the delay rule with the plan's `lambda = 50` (about 100 steps): an owner decision before signing.
+- J-8 scenario acceptance: H.15 match on all 88 start/end values (worst gap 0.0000 pp); goldens recompute the shifts and the replay.
+
+### Not done in this lane
+
+Rust, Java, C++ ports; contract bump; outside-share registers (`oracle/python/outside_j.py`, `tools/outside_shares.py`) not updated for wave 3; LEARN/COOKBOOK sections; tutorial 27 is a stub; different-model audit.
+
 ## WAVE 2 READY (2026-11-14): optimisation, estimation, ES backtest, Baum-Welch
 
 Read with every slice: the spec pages below; `specifications/stage-j-rulings-w2.md` J-W2-1 to J-W2-15; `specifications/cli-contract.md` (block "Stage J operations", wave 2 rows); `specifications/name-map.json` (regenerated: 291 operations). Gap analysis and what stays out of wave 2: `program/STAGE_J_GAP.md`.
