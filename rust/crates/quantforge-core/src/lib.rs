@@ -67,6 +67,7 @@ pub mod projection;
 pub mod rates_overnight;
 pub mod rates_vol;
 pub mod research;
+pub mod research_w3;
 pub mod risk;
 pub mod risk_carry;
 pub mod risk_curve;

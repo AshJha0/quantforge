@@ -80,6 +80,22 @@ fn operation_above(op: &str, i: &Json) -> bool {
             });
             cols.is_some_and(|n| n > 500) || product_above(len(i, "returns"), cols, 10_000_000)
         }
+        // Stage J wave 3 (J-W3-14).
+        "risk.scenario.historical_shock" => {
+            len(i, "tenors").is_some_and(|n| n > 100) || widest(i, &["yields"]) > 100_000
+                || i.get("yields").and_then(Json::as_array).is_some_and(|rows| {
+                    rows.iter().any(|r| r.as_array().is_some_and(|c| c.len() > 100))
+                })
+        }
+        "risk.scenario.replay" => ["base_tenors", "base_yields", "shock_tenors", "shock_bp", "dv01"]
+            .iter()
+            .any(|k| len(i, k).is_some_and(|n| n > 100)),
+        "research.backtest.interp_loo" => widest(i, &["x", "y"]) > 10_000,
+        "research.backtest.surface_holdout" => {
+            widest(i, &["expiries", "strikes", "vols", "holdout"]) > 1_000
+        }
+        "research.drift.psi" => above(i, "bins", 1_000),
+        "research.drift.ks" => product_above(len(i, "a"), len(i, "b"), 4_000_000),
         "research.regime.baum_welch" => {
             // Ruling J-W2-18: K is the longest of the four state inputs.
             let k = widest(i, &["initial", "means", "sds", "transition"]);
@@ -283,6 +299,10 @@ fn raised_array_keys(op: &str) -> &'static [&'static str] {
         "research.cv.purged_kfold" => &["t0", "t1"],
         "research.regime.baum_welch" => &["observations"],
         "risk.backtest.es_z2" => &["losses", "var", "es"],
+        // Stage J wave 3 (J-W3-14): drift series (CUSUM and Page-Hinkley at 10,000,000).
+        "research.drift.cusum" | "research.drift.page_hinkley" => &["x"],
+        "research.drift.psi" => &["reference", "test"],
+        "research.drift.ks" => &["a", "b"],
         "research.stats.pbo" => &["performance"], // ruling J-20: rows judged by J-15's cell cap
         _ => &[],
     }
@@ -292,7 +312,10 @@ fn raised_array_keys(op: &str) -> &'static [&'static str] {
 fn too_long_with_raised(op: &str, i: &Json) -> bool {
     let raised = raised_array_keys(op);
     // Ruling J-20: PBO rows are bounded by the 10,000,000-cell page limit, not 1,000,000.
-    let cap = if op == "research.stats.pbo" {
+    let cap = if matches!(
+        op,
+        "research.stats.pbo" | "research.drift.cusum" | "research.drift.page_hinkley"
+    ) {
         10_000_000
     } else {
         1_000_000
