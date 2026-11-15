@@ -366,4 +366,34 @@ xychart-beta
 A middle test block loses about `h` rows on each side to purging, so with 100 rows in five folds a 20-bar horizon leaves 40 training rows of 80. Plain k-fold would keep all 80 and let 160 overlapping labels leak across the five folds ([Tutorial 31](../getting-started/tutorial-31-leakage-and-purging.md); rulings J-7 to J-9).
 
 <!-- TODO(stage J wave 3): diagrams for the shock library, the held-out-strike and leave-one-out backtests and A3 drift go here; the wave 3 lane draws them. -->
-<!-- TODO(curves lane): diagrams for the financing term structure and the liquidity curve go here; the curves lane draws them. -->
+### Term financing: from quotes to an equity forward
+
+```mermaid
+flowchart LR
+  accTitle: How term repo and borrow quotes become an equity forward
+  accDescr: Each term repo quote and the funding curve give one pillar of the financing spread S. Borrow quotes give the cumulative fee B. The carry factor C of t is exp of minus Z t minus S plus B, and the forward is spot less dividends carried by C, divided by C at the horizon.
+  Q["term repo quotes R_i at T_i"] --> S["S(T_i) = ln(1 + R_i T_i) - Z(T_i) T_i, linear between pillars"]
+  Z["funding curve Z(t)"] --> S
+  B["borrow quotes b_j"] --> BF["B(T_j) = b_j T_j, never falling"]
+  S --> C["C(t) = exp(-Z(t) t - S(t) + B(t))"]
+  BF --> C
+  C --> F["F = (S_0 - sum A_i C(t_i)) / C(T)"]
+```
+
+Flat 4 % funding and one 5 % one-year repo give `S(1) = ln 1.05 - 0.04 = 0.00879`, and spot 100 carries to exactly 105 ([Tutorial 34](../getting-started/tutorial-34-financing-term-structure.md), ruling J-C-5).
+
+### Liquidity cost: impact against timing risk
+
+```mermaid
+flowchart LR
+  accTitle: The three parts of the liquidity cost curve and the optimal horizon
+  accDescr: Cost per unit is the half spread plus impact, which falls as the horizon h grows, plus timing risk, which rises with h. Their sum has a minimum at h star equal to two delta a over b, to the power one over delta plus one half.
+  H[horizon h days] --> I["impact a h^-delta, a = Y sigma (Q/V)^delta"]
+  H --> T["timing risk b sqrt h, b = z sigma / sqrt 3"]
+  I --> C["c(Q, h) = s + a h^-delta + b sqrt h"]
+  T --> C
+  SP[half spread s] --> C
+  C --> HS["h* = (2 delta a / b)^(1/(delta + 1/2))"]
+```
+
+For 1,000,000 shares against a 10 million daily volume, `sigma` 2 %, `z = 1.645`, the cheapest horizon is 0.3330 days at 224 bp ([Tutorial 35](../getting-started/tutorial-35-liquidity-curve.md), ruling J-C-8).

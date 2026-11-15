@@ -84,6 +84,7 @@ pub mod stats;
 pub mod store;
 pub mod surface;
 pub mod svi;
+pub mod term_curves;
 pub mod time;
 pub mod ts;
 pub mod units;

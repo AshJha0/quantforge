@@ -239,7 +239,12 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 | Q6-02 | The redesigned calibration method test on synthetic quotes: signed before the run, run once on seed 20261113, passed with 87.4 % of fitted vols inside the spread against 80 % (`research/q6/q6_02_output.json`) |
 | Mutation kill test | A unit test written to make a specific surviving code mutant fail; stage J item J-0 adds them for Rust `hedge.rs`, `var.rs` and `hedge_solvers.rs` (`program/J0_EQUIVALENT_MUTANTS.md`) |
 <!-- TODO(stage J wave 3): glossary terms for the shock library, held-out-strike and leave-one-out backtests and A3 drift go here; the wave 3 lane adds them. -->
-<!-- TODO(curves lane): glossary terms for the financing term structure and the liquidity curve go here; the curves lane adds them. -->
+| Term repo rate | A simple money-market rate for financing secured on a named asset over a fixed term `[0, T]`: one unit borrowed returns `1 + R T` (`repo.term.curve`, `02-curves/financing-term-structure.md`) |
+| Financing spread curve | The cumulative spread `S(t)` of secured financing over the funding curve, one pillar per term repo quote, linear between pillars (flat forward spreads); extends ruling D22 (J-C-2, J-C-3) |
+| Borrow fee curve | The term structure of the fee a stock lender earns, from term-average fees; the cumulative fee must not fall, so forward fees are never negative (J-C-4) |
+| Liquidity cost curve | Cost per unit of liquidating an order evenly over a horizon: half spread plus impact `Y sigma (Q/(V h))^delta` plus timing risk `z sigma sqrt(h/3)` (`liq.curve.cost`, `10-execution/liquidity-curve.md`) |
+| Square-root law | Market impact proportional to volatility times the square root of order size over daily volume, with a coefficient of order one (Toth et al. 2011) |
+| Optimal liquidation horizon | The horizon that minimises impact plus timing risk on the liquidity cost curve, in closed form `(2 delta a / b)^(1/(delta + 1/2))` (J-C-8) |
 
 ## Tutorial terms
 

@@ -3,7 +3,7 @@
 Local run over every one of the 533 sites the operator set of `conformance/mutation/cpp_mutants.py` finds in
 `cpp26/src/core/vol_stats.cpp` (3 do not build), judged by the vol_stats unit tests (including
 `tests/test_vol_stats_kills.cpp`) and the vol golden suites; a lower bound on the `--unit` run, which uses every
-suite and every unit test. Result: 443 killed, 87 survived (83.6 %, Wilson 95 % lower bound 80.2 %). One line per surviving mutant, as
+suite and every unit test. Result at J-0c: 443 killed, 87 survived (83.6 %, Wilson 95 % lower bound 80.2 %); after the J-2 audit below, 450 killed, 80 survived (84.9 %, Wilson 95 % lower bound 81.6 %). One line per surviving mutant, as
 `line:column operator`, with the reason it cannot change a reported value. "Path only" means the mutant changes the
 route an optimiser takes, but the run still reaches the same maximum (pinned by the estimate and fit checks to about
 1e-12) or the same refusal.

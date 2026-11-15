@@ -36,12 +36,23 @@ std::string j2_outcome(const std::vector<double>& r, GarchDistribution d) {
 }  // namespace
 
 TEST_CASE("garch estimate refuses boundary maxima on i.i.d. returns", "[j2][vol_stats]") {
-    // Seeds 1..12, n = 200. "R" = E_NO_CONVERGENCE (no interior maximum), "." = an estimate is returned.
-    const std::string normal = "R.RRR.RR...R", student = "RR.RR.RRRRRR";
-    for (unsigned long long seed = 1; seed <= 12; ++seed) {
-        const std::vector<double> r = j2_iid_returns(200, seed);
-        INFO("seed " << seed);
-        CHECK(j2_outcome(r, GarchDistribution::Normal) == (normal[seed - 1] == 'R' ? "E_NO_CONVERGENCE" : "none"));
-        CHECK(j2_outcome(r, GarchDistribution::StudentT) == (student[seed - 1] == 'R' ? "E_NO_CONVERGENCE" : "none"));
+    // n = 200. "R" = E_NO_CONVERGENCE (no interior maximum), "." = an estimate is returned, "-" = not pinned.
+    // The returns go through libm log and cos, which may differ by an ulp between glibc, MinGW and MSVC, so only
+    // seeds whose outcome is stable are pinned. Stability was checked (2026-11-15, g++ 15 on glibc) by re-running each
+    // seed 24 times with every return moved by up to 4 ulps: every Normal outcome below and every Student-t refusal
+    // kept its outcome in 24 of 24; Student-t seeds 3 and 6 (estimates whose Newton stop flips on 2 and 15 of 24
+    // perturbations) are left unpinned, and seeds 24 and 38 (stable Student-t estimates, smallest of alpha, beta and
+    // 1 - alpha - beta at least 0.04) take their place. Every Normal estimate pinned has that margin at least 0.006,
+    // far above the 1e-6 interior tolerance. The kills come from the refusals, all of which are kept.
+    struct Pin { unsigned long long seed; char normal, student; };
+    const std::vector<Pin> pins = {{1, 'R', 'R'},  {2, '.', 'R'},  {3, 'R', '-'},  {4, 'R', 'R'},  {5, 'R', 'R'},
+                                   {6, '.', '-'},  {7, 'R', 'R'},  {8, 'R', 'R'},  {9, '.', 'R'},  {10, '.', 'R'},
+                                   {11, '.', 'R'}, {12, 'R', 'R'}, {24, '.', '.'}, {38, '.', '.'}};
+    const auto expect = [](char c) { return std::string(c == 'R' ? "E_NO_CONVERGENCE" : "none"); };
+    for (const Pin& p : pins) {
+        const std::vector<double> r = j2_iid_returns(200, p.seed);
+        INFO("seed " << p.seed);
+        CHECK(j2_outcome(r, GarchDistribution::Normal) == expect(p.normal));
+        if (p.student != '-') CHECK(j2_outcome(r, GarchDistribution::StudentT) == expect(p.student));
     }
 }

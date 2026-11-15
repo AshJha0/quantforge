@@ -252,12 +252,7 @@ CURVES = {
 # Stage D curves are in STAGE_D below, each with a planned page.
 # Each row: name, status, stage, evidence. A Planned row must not name an operation that exists in
 # specifications/name-map.json; tools/test_tools.py and quality_gate check this against the README table.
-PLANNED = [
-    ("Financing term structures", "Partly done", "D",
-     "Repo financing is done (`repo.forward`, `repo.implied_rate` and the implied financing spread; see the repo row). "
-     "Ruling D22 keeps borrow and financing as flat rates over the funding curve; financing term structures are not yet scheduled"),
-    ("Liquidity curves", "Planned", "H", "None yet"),
-]
+PLANNED = []
 
 # Stage D curves. Each gets a page: a planned page until `cli` names a CLI operation and a renderer
 # is registered for its `kind`, then the renderer's page. Text here is plain description, no numbers.
@@ -285,6 +280,12 @@ STAGE_D = {
                       "shows": "A sector or rating curve built as the weighted average of constituent CDS spread curves, times a rating multiplier (`scale`, 1 for the sector itself), then bootstrapped to survival probabilities with the ISDA rules (`specifications/04-pricing/credit.md`). The constituents and weights are synthetic."},
     "funding": {"kind": "stage-d", "stage": "F", "golden": "stage_f", "title": "Funding curve", "short": "Funding curve", "cli": "rates.funding.curve", "examples": {"rates.funding.curve": "funding_curve_f.json"},
                 "shows": "Unsecured funding: the OIS curve times a spread factor, `D_f(t) = D_ois(t) exp(-integral of s)`, with the spread `s` piecewise flat between the dates of simple ACT/360 funding quotes. It discounts uncollateralised cash flows and feeds FVA (`specifications/02-curves/joint-solve-and-funding.md`)."},
+    "financing-term": {"kind": "stage-d", "stage": "J", "golden": "stage_j", "title": "Financing term structures: term repo spread and stock borrow", "short": "Financing term structures", "cli": "repo.term.curve",
+                       "examples": {"repo.term.curve": "repo_term_curve_j.json", "eq.forward.term_financed": "eq_forward_term_financed_j.json"},
+                       "shows": "Secured financing and stock borrow as term structures over the funding curve: each simple term repo quote fixes one pillar of the cumulative spread `S(T) = ln(1 + R T) - Z(T) T`, borrow fees fix the cumulative fee `B(T)`, both linear between pillars (flat forwards), and the equity forward carries on `C(t) = exp(-Z(t) t - S(t) + B(t))` (`specifications/02-curves/financing-term-structure.md`, rulings J-C-2 to J-C-5, which extend D22). The charts show the term spread and the term and forward financing rates read on a 0.04-year grid."},
+    "liquidity": {"kind": "stage-d", "stage": "J", "golden": "stage_j", "title": "Liquidity cost curve", "short": "Liquidity curves", "cli": "liq.curve.cost",
+                  "examples": {"liq.curve.cost": "liq_curve_cost_j.json"},
+                  "shows": "Cost per unit of liquidating `Q` units evenly over `h` days: half spread, square-root impact `Y sigma (Q/(V h))^delta` and timing risk `z sigma sqrt(h/3)`, with the closed-form cost-minimising horizon per size (`specifications/10-execution/liquidity-curve.md`, rulings J-C-6 to J-C-8). Stage H reuses it: at one day and `delta = 1/2` the impact equals the draft `exec.impact.sqrt`. Assumed parameters, not a calibration. The tables give the impact and total-cost matrices (row per size, column per horizon); the chart shows timing risk by horizon, and the optimal horizon and minimum cost by size."},
     "mbs": {"kind": "stage-d", "title": "MBS prepayment and valuation curves", "short": "MBS", "cli": "mbs.cashflows", "examples": {"mbs.cashflows": "mbs_cashflows_d.json"},
             "shows": "Prepayment speeds by month and the resulting cash flows."},
 }
@@ -722,7 +723,6 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 
 {table(['Curve', 'Status', 'Stage', 'Evidence'], rows)}
 
-<!-- TODO(curves lane): the financing term structure and liquidity curve rows above, and their pages, are the curves lane's; it replaces the two planned rows (in PLANNED in tools/build_gallery.py) when its spec lands. -->
 <!-- TODO(stage J wave 3): wave 3 pages (shock library, held-out-strike and leave-one-out backtests, A3 drift) are the wave 3 lane's; it adds their rows here. -->
 {real}
 ## How the gallery is built
@@ -1293,6 +1293,29 @@ def generate(refresh_real=False, real_only=False, stage_e_only=False, stage_f_on
     return 0
 
 
+def generate_slugs(slugs):
+    """Runs only the named STAGE_D pages (all four CLIs), keeps every other page's committed data, re-renders."""
+    commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+    meta = {"commit": commit, "date": dt.date.today().isoformat(), "reference_language": "python", "tolerance": TOL,
+            "data": "synthetic", "cli": {lang: json.loads(call(lang, "version")) for lang in LANGS}}
+    all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs() if s not in slugs}
+    for extra in (gallery_real.SLUG, gallery_pnl.SLUG):
+        if (DATA / f"{extra}.json").is_file():
+            all_data[extra] = json.loads((DATA / f"{extra}.json").read_text(encoding="utf-8"))
+    for slug in slugs:
+        spec = STAGE_D[slug]
+        results = {lang: d_run(lang, spec) for lang in LANGS}
+        d = {"meta": {**meta, "example_hashes": {v: example_hash(v) for v in spec["examples"].values()}},
+             "inputs": {op: read_example(f)["inputs"] for op, f in spec["examples"].items()},
+             "reference": results["python"], "agreement": vol_agreement(results), "evidence": golden_d(spec["examples"], spec.get("golden", "stage_d"))}
+        all_data[slug] = d
+        (DATA / f"{slug}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
+    for name, text in render_all(all_data).items():
+        (OUT / name).write_text(text, encoding="utf-8", newline="\n")
+    print(f"pages {', '.join(slugs)} written to {OUT}")
+    return 0
+
+
 def compare(a, b, path, bad):
     if isinstance(a, dict) and isinstance(b, dict):
         if a.keys() != b.keys():
@@ -1414,9 +1437,12 @@ def main():
     ap.add_argument("--stage-f-only", action="store_true", help="run only the stage F page; keep other committed data")
     ap.add_argument("--stage-i-only", action="store_true", help="run only the stage I page; keep other committed data")
     ap.add_argument("--stage-j-only", action="store_true", help="run only the stage J page; keep other committed data")
+    ap.add_argument("--slugs", nargs="+", help="run only these stage D style pages; keep other committed data")
     a = ap.parse_args()
     if a.evidence_only:
         return refresh_evidence()
+    if a.slugs:
+        return generate_slugs(a.slugs)
     return check() if a.check else generate(a.refresh_real, a.real_only, a.stage_e_only, a.stage_f_only, a.stage_i_only, a.stage_j_only)
 
 

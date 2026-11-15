@@ -60,6 +60,7 @@ final class OpsResearch {
         });
         table.put("research.stats.pbo", OpsResearch::pbo);
         OpsResearchW2.register(table);
+        OpsTermCurves.register(table);
     }
 
     private static Out backtest(In in) {

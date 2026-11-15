@@ -8,7 +8,7 @@ How to read the marks:
 - **Paywalled** marks an entry the spec calls licensed: a person with access must confirm section or equation numbers.
 - DOI and arXiv links are formed from the identifiers the specs give. `tools/check_links.py` checks their HTTP status; run it by hand, as it needs the network (see `tools/README.md`).
 
-327 entries: 254 marked Not opened, 16 marked Paywalled (the spec calls them licensed or paywalled). Built by `python tools/build_references.py` from `specifications/`; CI fails if this page is out of date.
+334 entries: 254 marked Not opened, 16 marked Paywalled (the spec calls them licensed or paywalled). Built by `python tools/build_references.py` from `specifications/`; CI fails if this page is out of date.
 
 ## Core: dates, calendars, numerics
 
@@ -72,6 +72,9 @@ How to read the marks:
 
 ## Curves
 
+- [Choudhry10] M. Choudhry, *The Repo Handbook*, 2nd ed., Butterworth-Heinemann 2010: term repo as a simple money-market rate; specials below GC. Evidence class: book, recalled; definitions only. Cited by [`02-curves/financing-term-structure.md`](../specifications/02-curves/financing-term-structure.md).
+- [Hagan-West06] P. Hagan, G. West, "Interpolation methods for curve construction", *Applied Mathematical Finance* 13(2) 2006, 89-129. Raw (flat-forward) interpolation. Evidence class: paper, read for stage F (`interpolation-methods`); applied here to a spread. Cited by [`02-curves/financing-term-structure.md`](../specifications/02-curves/financing-term-structure.md).
+- [Piterbarg10] V. Piterbarg, "Funding beyond discounting: collateral agreements and derivatives pricing", *Risk* February 2010. Secured and unsecured rates as separate curves. Evidence class: paper, recalled. Cited by [`02-curves/financing-term-structure.md`](../specifications/02-curves/financing-term-structure.md).
 - **Not opened.** Ametrano and Bianchetti (2013), as `ois-curves.md`: multiple-curve bootstrapping and the joint solve. Cited by [`02-curves/joint-solve-and-funding.md`](../specifications/02-curves/joint-solve-and-funding.md).
 - **Not opened.** Ametrano, F. M. and Bianchetti, M., "Everything you always wanted to know about multiple interest rate curve bootstrapping but were afraid to ask", SSRN 2219548, 2013. Cited by [`02-curves/ois-curves.md`](../specifications/02-curves/ois-curves.md).
 - **Not opened.** Ametrano, F. M. and Bianchetti, M., SSRN 2219548, 2013 (multi-curve projection and tenor basis). Cited by [`02-curves/projection-and-fra.md`](../specifications/02-curves/projection-and-fra.md).
@@ -116,6 +119,7 @@ How to read the marks:
 - **Not opened.** Piterbarg (2010), as `csa-and-basis.md`. Cited by [`02-curves/joint-solve-and-funding.md`](../specifications/02-curves/joint-solve-and-funding.md).
 - **Not opened.** Piterbarg, V., "Funding beyond discounting: collateral agreements and derivatives pricing", *Risk*, February 2010, 97-102. Cited by [`02-curves/csa-and-basis.md`](../specifications/02-curves/csa-and-basis.md).
 - QuantLib 1.44 source at tag v1.44, `ql/math/interpolations/convexmonotoneinterpolation.hpp`, `cubicinterpolation.hpp` and `loginterpolation.hpp` (read 2026-11-09): the branch rules and the Hyman filter above; behaviour also checked through the Python wheel. Cited by [`02-curves/curve-framework.md`](../specifications/02-curves/curve-framework.md).
+- Ruling D22 (`stage-d-rulings.md`) and `equity-curves.md` for the flat form this page extends. Cited by [`02-curves/financing-term-structure.md`](../specifications/02-curves/financing-term-structure.md).
 - **Not opened.** Schweikert, D. G., "An interpolation curve using a spline in tension", *Journal of Mathematics and Physics* 45, 1966, 312-317. Cited by [`02-curves/curve-framework.md`](../specifications/02-curves/curve-framework.md).
 - **Not opened.** UK Debt Management Office, *Formulae for calculating gilt prices from yields* (index-linked gilts, 3-month lag). Cited by [`02-curves/inflation.md`](../specifications/02-curves/inflation.md).
 - **Not opened.** US Treasury, 31 CFR Part 356, Appendix B (index ratio and reference CPI for TIPS: three-month lag, daily interpolation). Cited by [`02-curves/inflation.md`](../specifications/02-curves/inflation.md).
@@ -319,6 +323,12 @@ How to read the marks:
 - **Not opened.** Press, W. H., Teukolsky, S. A., Vetterling, W. T. and Flannery, B. P., *Numerical Recipes: The Art of Scientific Computing*, 3rd ed., Cambridge University Press, 2007, chapter 15 (weighted linear least squares, normal equations). Cited by [`08-hedging/stage-b-hedges.md`](../specifications/08-hedging/stage-b-hedges.md).
 - **Not opened.** R. Kissell, *The Science of Algorithmic Trading and Portfolio Management*, Academic Press, 2014, chapter 3 (cost decomposition: execution and opportunity cost) (not opened). Cited by [`08-hedging/hedge-slippage.md`](../specifications/08-hedging/hedge-slippage.md).
 - **Not opened.** W. Margrabe, "The value of an option to exchange one asset for another", *Journal of Finance* 33(1), 1978, 177-186 (not opened; the formula is the one already used by `risk.sens.correlation`, `06-risk/f3-sensitivities.md`). Cited by [`08-hedging/credit-and-correlation-hedges.md`](../specifications/08-hedging/credit-and-correlation-hedges.md).
+
+## Execution
+
+- [AC00] R. Almgren, N. Chriss, "Optimal execution of portfolio transactions", *Journal of Risk* 3(2) 2000, 5-39 (free preprint). Variance of the linear trajectory, continuous limit `sigma^2 X^2 T / 3`. Evidence class: paper, recalled; checked here by integrating `sigma^2 x(t)^2` with `x(t) = X (1 - t/T)` over `[0, T]`, which gives `sigma^2 X^2 T / 3`. Cited by [`10-execution/liquidity-curve.md`](../specifications/10-execution/liquidity-curve.md).
+- [AFTHL05] R. Almgren, C. Thum, E. Hauptmann, H. Li, "Direct estimation of equity market impact", *Risk* July 2005, 57-62 (free preprint). Temporary impact a power of the trading rate, exponent near 3/5. Evidence class: paper, recalled. Cited by [`10-execution/liquidity-curve.md`](../specifications/10-execution/liquidity-curve.md).
+- [TLD11] B. Toth, Y. Lemperiere, C. Deremble, J. de Lataillade, J. Kockelkoren, J.-P. Bouchaud, "Anomalous price impact and the critical nature of liquidity in financial markets", *Physical Review X* 1 (2011) 021006, open access. `I = Y sigma sqrt(Q/V)`, `Y` of order one. Evidence class: paper, recalled (the stage H draft records the same form; equation number not verified). Cited by [`10-execution/liquidity-curve.md`](../specifications/10-execution/liquidity-curve.md).
 
 ## Research
 

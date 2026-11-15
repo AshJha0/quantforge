@@ -1,0 +1,51 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-synthetic-eq-forward-term-financed-j",
+ "operation": "eq.forward.term_financed",
+ "inputs": {
+  "funding_times": [
+   0.25,
+   0.5,
+   1.0,
+   2.0
+  ],
+  "funding_zero_rates": [
+   0.04,
+   0.041,
+   0.0415,
+   0.042
+  ],
+  "quote_times": [
+   0.08333333333333333,
+   0.25,
+   0.5,
+   1.0
+  ],
+  "repo_rates": [
+   0.0425,
+   0.043,
+   0.0435,
+   0.044
+  ],
+  "borrow_times": [
+   0.25,
+   1.0
+  ],
+  "borrow_fees": [
+   0.003,
+   0.005
+  ],
+  "spot": 50.0,
+  "maturity_years": 0.75,
+  "dividend_times": [
+   0.1,
+   0.4,
+   0.9
+  ],
+  "dividend_amounts": [
+   0.3,
+   0.35,
+   0.4
+  ]
+ }
+}

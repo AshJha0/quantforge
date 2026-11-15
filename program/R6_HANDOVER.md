@@ -286,3 +286,7 @@ TOTALS: 15311 value 7567 error 5230 invariance 2514
 Stage J wave 2 fixes (2026-11-14) add four Ledoit-Wolf goldens with interior shrinkage (`estim_j-0022` to `-0025`, 4 value), each checked by scikit-learn `LedoitWolf`; contract 1.14.0 (J-W2-1), rulings J-W2-17 to J-W2-22.
 
 TOTALS: 15315 value 7571 error 5230 invariance 2514
+
+Stage J curves lane (2026-11-15) adds `termfin_j` (33: 13 value, 20 error) and `liqcurve_j` (18: 7 value, 11 error); contract 1.15.0 (J-C-1). Coordinator: if the wave 3 lane also appended a line, merge into one combined line.
+
+TOTALS: 15366 value 7591 error 5261 invariance 2514
