@@ -185,3 +185,49 @@ Equivalent, with reasoning (2):
   same cap bounds the split's active-set iterations (n + 1 or more) and the sign loop (1 versus 3).
 
 Open: 0. No survivor showed a bug in correct code, so no Python/Java/C++ check was needed.
+
+## hedge_solvers.rs: the 17 undocumented survivors of the PR #41 re-score, branch j2-rustkill3 (2026-11-15)
+
+Source: `HS_RESCORE_PRHEAD.md` (stage-j2 line numbers). Verified by a targeted `cargo mutants
+--in-place --profile release` run on a fresh copy (16 caught, 1 missed). New tests are in
+`tests/hedge_solvers_guards.rs`, plus two unit tests in `r6_cap_tests`.
+
+Killed (16 of the 17):
+- jacobi_for 925:9 `||` -> `&&` (the mutant makes `singular != Error` need `n == 0` as well, so MIN_NORM
+  gets solved in Jacobi-scaled variables): `min_norm_is_the_minimum_norm_in_the_callers_units`. For
+  `A = [1 2]` the minimum-norm answer is `(0.2, 0.4)`, but the scaled one is `(0.5, 0.25)`.
+- jacobi_for 931:9, 932:9, 933:9, 934:9, 935:9 `||` -> `&&` and 935:65 `!=` -> `==`: a cost list, a bound
+  list or an equality row that is too long, with everything else valid. The scaled path `zip`s each
+  list with `d`, which truncates it to `n`, so the mutant returns a silent answer where the correct code
+  gives `E_INPUT`. A short impact list makes the mutant panic on an index instead. Tests:
+  `too_long_cost_lists_are_e_input`, `too_short_impact_is_e_input`,
+  `bounds_of_the_wrong_length_are_e_input`, `equality_shapes_are_e_input`.
+- qp_solve_unscaled 961:13, 962:13 `+` -> `*` in `set_cap`: `qp_cap_counts_every_constraint` reads the
+  cap after a solve with 1 equality row, 2 lower bounds, 3 upper bounds and a margin row: `10 (3 + 7) + 100
+  = 200`. A planted cap could not kill these, because a planted cap replaces the formula.
+- 967:25 guard -> false: `empty_equality_matrix_is_e_input` (R6-11.13).
+- 972:39, 981:25 `||` -> `&&`: `equality_shapes_are_e_input` (eq_rhs too long or empty for one valid
+  row) and `bounds_of_the_wrong_length_are_e_input` (lower alone too long or too short).
+- 1014:46 `*` -> `/`: `nearly_dependent_equality_rows_are_e_singular`. With rows `(1, 0)` and
+  `(1, 1.5e-12)` the singular values are `sqrt 2` and `1.06e-12`. That is below `1e-12 sqrt 2` but above
+  `1e-12 / sqrt 2`.
+- 1028:27 `*` -> `/`: `min_norm_drops_eigenvalues_below_the_relative_threshold`. H has eigenvalues `2e8`
+  and `5e-5`. The correct code drops the small pair and gets `x = (1, 1)`; keeping it moves x by about 141.
+- nonsmooth_minimiser 780:29 `>` -> `>=` (written down as an equivalent exact tie in the j2-rustkill2
+  section; it is reachable after all): `release_rule_is_strict_at_an_exact_tie`. With `A = [1]`, `b = 1`
+  and half spread `1.999999999996`, the sum `room + 1e-12 * 2 == 1.0 == |nu|` is exact in binary64. The
+  correct answer is exactly `0.0`; the mutant releases the coordinate to `-2e-12`.
+- nonsmooth_minimiser 667:44 `+` -> `*` (also written down as equivalent in j2-rustkill2):
+  `split_seed_is_right_first_time`. Here `A = [[1, 1], [0, 1]]`, `b = (1, 3)`, so `x = (2, -3)` with
+  `c1 > 0`. A planted cap of 3 is the smallest at which the correct code passes. The decoupled split seeds
+  `(-, -)`, needs more sign passes, and returns `E_NO_CONVERGENCE`. So a planted cap can isolate it, as
+  long as the cap is set just above what the correct code needs. That corrects the j2-rustkill2 entry.
+
+Equivalent, with reasoning (1):
+- qp_solve_unscaled 1007:10 `k > 0` -> `k >= 0`: with `k = 0` the rank check builds `et` as `n` rows of
+  0 columns. `linalg::singular_values` returns one value per column, so it returns an empty vector, and
+  `any(..)` is false. No error is raised, and the check has no side effect.
+
+No survivor showed a bug in correct code (every guard already returns `E_INPUT` / `E_SINGULAR` as the
+spec says), so no Python/Java/C++ change or golden was needed. Out of scope: the run also missed the
+extra `1952:17 delete field costs ... in select_solve`, which is not one of the 17.
