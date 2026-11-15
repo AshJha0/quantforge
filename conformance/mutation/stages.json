@@ -246,7 +246,7 @@
         "suite": "*",
         "java": "org.quantforge.core.Interpolation",
         "cpp": "cpp26/src/core/interp.cpp",
-        "python": "quantforge_core.interp",
+        "python": "quantforge_core.interp*",
         "rust": "**/interp.rs"
       }
     ],
