@@ -217,6 +217,29 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 | Black-Litterman | Moving prior expected returns towards investor views, each weighted by its uncertainty against the prior's (Black and Litterman 1992; J-W2-8) |
 | Z2 statistic | The Acerbi-Szekely expected-shortfall backtest: one minus the sum of losses beyond VaR, each over `T alpha ES_t`; about 0 for a correct model, negative when ES is understated (Acerbi and Szekely 2014; J-W2-10) |
 | Baum-Welch | The EM algorithm for a hidden Markov model: estimate state probabilities (E-step), re-estimate the parameters from them (M-step), repeat until the log-likelihood gain is below a tolerance (Rabiner 1989; `11-research/baum-welch.md`) |
+| Half spread | Half the bid-offer gap, in basis points of price; the backtester charges `abs(d) p half_spread_bps / 10^4` per trade (`11-research/backtester.md`) |
+| Turnover | The money value traded over a backtest, `sum_t abs(d_t) p_t m`; spread cost is turnover times the half spread (`research.backtest.run`) |
+| Break-even spread | The half spread at which a backtest's net P&L is zero; because spread cost is linear in the half spread it follows from one run (Tutorial 27) |
+| Look-ahead canary | A deliberately wrong backtest with `lag = 0` that shows how much a rule gains from seeing the close it trades at (Tutorial 23, J-2) |
+| Trial | One strategy configuration tried during research, kept or not; counted in `research/trials.csv` and passed as `n_trials` to the DSR |
+| SR0 | The Sharpe ratio the best of `N` worthless trials is expected to show; the DSR's benchmark (Bailey and López de Prado 2014; J-13) |
+| Minimum detectable Sharpe (MDS) | The smallest annual Sharpe a study of a given length detects with the chosen power at the chosen `alpha`, `z_sum / sqrt(years)`, iid (Lo 2002; `research.stats.power`) |
+| Power | The probability that a test detects an effect of a given size; the R3 studies had a pass probability of 13 % to 15 % at their MDS (`research/r3/RESULTS.md`) |
+| Holm correction | A step-down rule for testing several hypotheses at once that keeps the chance of any false rejection at `alpha`; used across the R3 studies (`research/preregs/R3-01-amendment-1.md`, display erratum `research/DEVIATION-2026-11-14-holm-display.md`) |
+| Label horizon | The time between a label's decision `t0` and the moment it is known `t1`; longer horizons mean more purging (Tutorial 31) |
+| Leakage | Information from the test period reaching the training data, here through training labels whose windows overlap the test span |
+| Efficient frontier | The expected return and volatility of the mean-variance portfolio at each risk aversion; without bounds its return is linear in `1/gamma` (Tutorial 28) |
+| Certainty-equivalent return | `mu'w - (gamma/2) w' Sigma w`: the riskless return an investor with risk aversion `gamma` would accept instead of the portfolio; used to price a constraint |
+| Minimum-variance portfolio | The fully invested portfolio with the lowest volatility; each asset's Euler risk share equals its weight there |
+| Binding constraint | A bound the optimum sits on, so that removing it would change the answer; `at_bound` reports which bounds bind |
+| Market-implied prior | The expected returns `pi = delta Sigma w_mkt` that make the market weights optimal; the starting point of Black-Litterman |
+| View confidence | For one Black-Litterman view, the fraction `c = tau P Sigma P' / (tau P Sigma P' + Omega)` of the gap between prior and view that the posterior closes (Tutorial 29) |
+| Shrinkage target | What Ledoit-Wolf pulls the sample covariance towards; in QuantForge a multiple of the identity only (J-W2-7) |
+| Risk budget | The share of portfolio risk each asset should carry in risk parity; budgets must sum to 1 (J-W2-5) |
+| Q6-02 | The redesigned calibration method test on synthetic quotes: signed before the run, run once on seed 20261113, passed with 87.4 % of fitted vols inside the spread against 80 % (`research/q6/q6_02_output.json`) |
+| Mutation kill test | A unit test written to make a specific surviving code mutant fail; stage J item J-0 adds them for Rust `hedge.rs`, `var.rs` and `hedge_solvers.rs` (`program/J0_EQUIVALENT_MUTANTS.md`) |
+<!-- TODO(stage J wave 3): glossary terms for the shock library, held-out-strike and leave-one-out backtests and A3 drift go here; the wave 3 lane adds them. -->
+<!-- TODO(curves lane): glossary terms for the financing term structure and the liquidity curve go here; the curves lane adds them. -->
 
 ## Tutorial terms
 
