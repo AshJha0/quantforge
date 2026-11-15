@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "python"))
-from quantforge_core import research_w3  # noqa: E402
+from quantforge_core import research_w3
 
 HERE = Path(__file__).resolve().parent
 RAW = ROOT / "datasets" / "scenarios" / "raw"
