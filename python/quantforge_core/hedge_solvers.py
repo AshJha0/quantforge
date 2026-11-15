@@ -473,11 +473,16 @@ class _CostQp:
         if z.shape[1]:
             bs = self.big_b[:, free]
             r = bs @ x_p + self.d + self.big_b[:, fixed] @ x[fixed]
-            u, s, vt = np.linalg.svd(bs @ z, full_matrices=False)
-            keep = s * s > self.cut_sq
-            lz = vt[keep] @ (z.T @ lin[free])
+            # R6-6.2: the rank cut is taken after Jacobi scaling of the reduced matrix, as in
+            # _Qp._step; an unscaled cut drops a direction that is only small in caller units.
+            m = bs @ z
+            col = np.linalg.norm(m, axis=0)
+            col[col == 0.0] = 1.0
+            u, s, vt = np.linalg.svd(m / col, full_matrices=False)
+            keep = s * s > THRESHOLD * float(s[0]) ** 2 if s.size else s > 0
+            lz = vt[keep] @ ((z.T @ lin[free]) / col)
             y = -vt[keep].T @ ((u[:, keep].T @ r) / s[keep] + lz / (2 * s[keep] ** 2))
-            out[free] = x_p + z @ y
+            out[free] = x_p + z @ (y / col)
         else:
             out[free] = x_p
         return out

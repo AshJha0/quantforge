@@ -244,6 +244,18 @@ def test_bounded_solve_keeps_a_small_column() -> None:
     assert out["objective"] == pytest.approx(0.0, abs=1e-12)
 
 
+def test_costed_bounded_solve_keeps_a_small_column() -> None:
+    # The costed (orthant) active set had the same unscaled cut as the plain one: with a spread on
+    # x[1] and x[1] fixed at 0 it returned [0, 0], objective 1 (golden hedgecut_j-0002, J-I.1).
+    out = hs.qp_solve([[1e-7, 0.0], [0.0, 1.0]], [1.0, 0.0], [1.0, 1.0],
+                      lower=[None, 0.0], upper=[None, 0.0], half_spreads=[0.0, 0.1])
+    assert out["x"] == pytest.approx([-1e7, 0.0], rel=1e-12)
+    assert out["objective"] == pytest.approx(0.0, abs=1e-12)
+    out = hs.qp_solve([[1e-7, 0.0], [0.0, 1.0]], [1.0, 0.0], [1.0, 1.0],
+                      lower=[None, -1.0], upper=[None, 1.0], half_spreads=[1e-9, 0.1])
+    assert out["x"] == pytest.approx([-9.95e6, 0.0], rel=1e-9)
+
+
 bounded = st.one_of(st.none(), st.floats(-2.0, 2.0))
 
 
