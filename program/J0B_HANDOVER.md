@@ -34,3 +34,7 @@ Rulings are in `specifications/stage-j-rulings.md` (new file); the limit row is 
 - C++: `-DQF_WERROR=ON` with ASan/UBSan/float-cast-overflow (fuzz.yml flags, Make generator since WSL has no ninja) built with no warnings.
 - Fuzz, 180 s per run (CI default), `--focus-config conformance/quality/stage_e.json`: Rust seed 3 29,600 sent / 0 findings, seed 1113 42,800 / 0; C++ seed 3 55,600 / 0, seed 1113 58,800 / 0.
 - J-0b is complete apart from the push and PR.
+
+## Correction (2026-11-15)
+
+Line 28 above says CI runs `check_e1_coverage`. It did not: no workflow called `tools/check_e1_coverage.py` until 2026-11-15, when stage J-2 added it as a step of the `repo-gates` job in `.github/workflows/repo-gates.yml`. The local run recorded above did pass; only the CI claim was wrong.
