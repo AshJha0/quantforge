@@ -4,6 +4,7 @@ Spec: specifications/05-volatility/heston-family.md, rulings E-A12 to E-A14 in
 specifications/stage-e-rulings.md. Prices use Lewis's single integral with the reference recipe:
 Gauss-Legendre, 256 nodes on u in [0, 200]. The SLV scheme follows the spec step by step.
 """
+
 import cmath
 import math
 from collections.abc import Callable, Sequence
@@ -128,8 +129,9 @@ def _nodes(t: float) -> tuple[list[float], list[float]]:
     return [half * (x + 1) for x in xs], [half * w for w in ws]
 
 
-def _lewis(phi: Cf, spot: float, strikes: Floats, t: float, r: float, q: float,
-           call: bool) -> list[float]:
+def _lewis(
+    phi: Cf, spot: float, strikes: Floats, t: float, r: float, q: float, call: bool
+) -> list[float]:
     forward = spot * math.exp((r - q) * t)
     discount = math.exp(-r * t)
     us, ws = _nodes(t)
@@ -137,22 +139,33 @@ def _lewis(phi: Cf, spot: float, strikes: Floats, t: float, r: float, q: float,
     prices = []
     for strike in strikes:
         k = math.log(forward / strike)
-        integral = ordered_sum(w * (cmath.exp(1j * u * k) * p).real / (u * u + 0.25)
-                               for u, w, p in zip(us, ws, shifted, strict=True))
+        integral = ordered_sum(
+            w * (cmath.exp(1j * u * k) * p).real / (u * u + 0.25)
+            for u, w, p in zip(us, ws, shifted, strict=True)
+        )
         price = discount * (forward - math.sqrt(forward * strike) / math.pi * integral)
         prices.append(price if call else price - discount * (forward - strike))
     return prices
 
 
-def heston_price(spot: float, strikes: Floats, t: float, r: float, q: float, h: Heston,
-                 option_type: str) -> list[float]:
+def heston_price(
+    spot: float, strikes: Floats, t: float, r: float, q: float, h: Heston, option_type: str
+) -> list[float]:
     _check_common(spot, strikes, t)
     check_heston(h)
     return _lewis(heston_phi(h, t), spot, strikes, t, r, q, option_type == "CALL")
 
 
-def bates_price(spot: float, strikes: Floats, t: float, r: float, q: float, h: Heston,
-                j: Jumps, option_type: str) -> list[float]:
+def bates_price(
+    spot: float,
+    strikes: Floats,
+    t: float,
+    r: float,
+    q: float,
+    h: Heston,
+    j: Jumps,
+    option_type: str,
+) -> list[float]:
     _check_common(spot, strikes, t)
     check_heston(h)
     _check_jumps(j)
@@ -167,8 +180,16 @@ def _bs(phi: float, s: float, k: float, t: float, r: float, q: float, v: float) 
     return math.exp(-r * t) * phi * (forward * big_n(phi * d1) - k * big_n(phi * (d1 - root)))
 
 
-def merton_price(spot: float, strikes: Floats, t: float, r: float, q: float, vol: float,
-                 j: Jumps, option_type: str) -> list[float]:
+def merton_price(
+    spot: float,
+    strikes: Floats,
+    t: float,
+    r: float,
+    q: float,
+    vol: float,
+    j: Jumps,
+    option_type: str,
+) -> list[float]:
     _check_common(spot, strikes, t)
     if not vol > 0:
         raise _domain("vol must be above 0", "vol")
@@ -179,17 +200,24 @@ def merton_price(spot: float, strikes: Floats, t: float, r: float, q: float, vol
     terms = []  # (weight, r_n, v_n)
     weight, total = math.exp(-rate), 0.0
     for n in range(200):
-        terms.append((weight, r - j.intensity * kbar + n * math.log1p(kbar) / t,
-                      math.sqrt(vol * vol + n * j.log_jump_vol**2 / t)))
+        terms.append(
+            (
+                weight,
+                r - j.intensity * kbar + n * math.log1p(kbar) / t,
+                math.sqrt(vol * vol + n * j.log_jump_vol**2 / t),
+            )
+        )
         total += weight
         if total >= 1 - 1e-16:
             break
         weight *= rate / (n + 1)
-    return [ordered_sum(w * _bs(phi, spot, k, t, rn, q, vn) for w, rn, vn in terms)
-            for k in strikes]
+    return [
+        ordered_sum(w * _bs(phi, spot, k, t, rn, q, vn) for w, rn, vn in terms) for k in strikes
+    ]
 
 
 # --- SLV leverage ---
+
 
 @dataclass(frozen=True)
 class Grid:
@@ -201,8 +229,9 @@ class Grid:
     v_max: float
 
 
-def _rows(mu: Floats, s: Floats, h: float, dt: float,
-          no_flux: bool) -> tuple[list[float], list[float], list[float]]:
+def _rows(
+    mu: Floats, s: Floats, h: float, dt: float, no_flux: bool
+) -> tuple[list[float], list[float], list[float]]:
     """(lower, diag, upper) of I - dt A on one line, as the spec's operator rows."""
     n = len(mu)
     faces = [mu[0], *((mu[k - 1] + mu[k]) / 2 for k in range(1, n)), mu[-1]]
@@ -222,8 +251,15 @@ def _rows(mu: Floats, s: Floats, h: float, dt: float,
     return lower, diag, upper
 
 
-def slv_leverage(spot: float, t: float, r: float, q: float, h: Heston,
-                 slices: Sequence[arb_surface.Slice], grid: Grid) -> dict[str, object]:
+def slv_leverage(
+    spot: float,
+    t: float,
+    r: float,
+    q: float,
+    h: Heston,
+    slices: Sequence[arb_surface.Slice],
+    grid: Grid,
+) -> dict[str, object]:
     # Ruling E-A37: every E_INPUT rule first, then E_DOMAIN, each in input order.
     arb_surface.check_slices_input(slices)
     if grid.nx < 5 or grid.nv < 5 or grid.nt < 2:
@@ -255,8 +291,10 @@ def slv_leverage(spot: float, t: float, r: float, q: float, h: Heston,
         e = [ordered_sum(v * x for v, x in zip(vs, row, strict=True)) for row in p]
         eps = 1e-10 * max(m)
         ebar = ordered_sum(e) / ordered_sum(m)
-        return [math.sqrt(local_vol(time, x) ** 2 / ((ei + eps * ebar) / (mi + eps)))
-                for x, mi, ei in zip(xs, m, e, strict=True)]
+        return [
+            math.sqrt(local_vol(time, x) ** 2 / ((ei + eps * ebar) / (mi + eps)))
+            for x, mi, ei in zip(xs, m, e, strict=True)
+        ]
 
     # Start density at t_1 = dt.
     l0sq = local_vol(dt, log_spot + (r - q) * dt) ** 2 / h.v0
@@ -269,8 +307,16 @@ def slv_leverage(spot: float, t: float, r: float, q: float, h: Heston,
     p = []
     for x in xs:
         zx = (x - mean_x) / sx
-        p.append([norm * math.exp(-(zx * zx - 2 * h.rho * zx * ((v - mean_v) / sv)
-                                    + ((v - mean_v) / sv) ** 2) / (2 * one)) for v in vs])
+        p.append(
+            [
+                norm
+                * math.exp(
+                    -(zx * zx - 2 * h.rho * zx * ((v - mean_v) / sv) + ((v - mean_v) / sv) ** 2)
+                    / (2 * one)
+                )
+                for v in vs
+            ]
+        )
     scale = ordered_sum(ordered_sum(row) for row in p) * dx * dv
     p = [[x / scale for x in row] for row in p]
 
@@ -284,8 +330,9 @@ def slv_leverage(spot: float, t: float, r: float, q: float, h: Heston,
         star = [row[:] for row in p]
         for i in range(1, nx - 1):
             for j in range(1, nv - 1):
-                star[i][j] = p[i][j] + dt * (f[i + 1][j + 1] - f[i + 1][j - 1] - f[i - 1][j + 1]
-                                             + f[i - 1][j - 1]) / (4 * dx * dv)
+                star[i][j] = p[i][j] + dt * (
+                    f[i + 1][j + 1] - f[i + 1][j - 1] - f[i - 1][j + 1] + f[i - 1][j - 1]
+                ) / (4 * dx * dv)
         # 2. x, implicit for each j, Dirichlet ends
         lsq = [x * x for x in lev]
         for j in range(nv):

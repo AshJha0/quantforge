@@ -1,4 +1,5 @@
 """Stage F Q1 properties (curve-framework.md, "Locality and smoothness", "Convergence")."""
+
 import itertools
 import math
 from datetime import date, timedelta
@@ -11,13 +12,26 @@ from quantforge_core.errors import QfError
 
 AS_OF = date(2026, 11, 9)
 TS = [0.0, 0.1, 0.25, 0.5, 1.0, 2.0, 3.0, 5.0, 7.0, 10.0, 15.0, 20.0, 30.0]
-RATES = [0.043, 0.0425, 0.0412, 0.039, 0.0365, 0.0355, 0.0352, 0.0356, 0.0364, 0.0376, 0.038,
-         0.0368]
+RATES = [
+    0.043,
+    0.0425,
+    0.0412,
+    0.039,
+    0.0365,
+    0.0355,
+    0.0352,
+    0.0356,
+    0.0364,
+    0.0376,
+    0.038,
+    0.0368,
+]
 XS = [0.0, *(-r * t for r, t in zip(RATES, TS[1:], strict=True))]
 
 
-def _make(method: str, xs: list[float] = XS, tension: float = 0.5, k: int = 3
-          ) -> curve_interp.Interpolator:
+def _make(
+    method: str, xs: list[float] = XS, tension: float = 0.5, k: int = 3
+) -> curve_interp.Interpolator:
     return curve_interp.make(method, TS, xs, tension, k)
 
 
@@ -99,8 +113,15 @@ def test_tension_limits() -> None:
 
 def _data(method: str, **kw: object) -> CurveData:
     dates = tuple(AS_OF + timedelta(days=round(t * 365)) for t in TS[1:])
-    return CurveData(AS_OF, method, dates, tuple(math.exp(x) for x in XS[1:]), (),
-                     kw.get("tension"), kw.get("step_end"))  # type: ignore[arg-type]
+    return CurveData(
+        AS_OF,
+        method,
+        dates,
+        tuple(math.exp(x) for x in XS[1:]),
+        (),
+        kw.get("tension"),
+        kw.get("step_end"),
+    )  # type: ignore[arg-type]
 
 
 def test_option_checks() -> None:
@@ -118,9 +139,10 @@ def test_option_checks() -> None:
 def test_tension_small_z_against_series() -> None:
     """Ruling F-35: below z = 1e-3 the coefficients match their Taylor series."""
     from quantforge_core.curve_interp import TensionSpline, chm, shm
+
     for x in (1e-7, 1e-4, 1e-3, 0.3, 0.7):
-        assert abs(shm(x) - (x ** 3 / 6 + x ** 5 / 120 + x ** 7 / 5040)) <= 1e-15 * x ** 3 + x ** 9
-        assert abs(chm(x) - (x * x / 2 + x ** 4 / 24 + x ** 6 / 720)) <= 1e-15 * x * x + x ** 8
+        assert abs(shm(x) - (x**3 / 6 + x**5 / 120 + x**7 / 5040)) <= 1e-15 * x**3 + x**9
+        assert abs(chm(x) - (x * x / 2 + x**4 / 24 + x**6 / 720)) <= 1e-15 * x * x + x**8
     sigma, h = 1e-3, 0.5  # z = 5e-4
     z = sigma * h
     f = TensionSpline([0.0, h, 2 * h], [0.0, -0.02, -0.035], sigma)
@@ -130,6 +152,6 @@ def test_tension_small_z_against_series() -> None:
     expected = ((-0.035 + 0.02) / h - (-0.02) / h) / (2 * beta)
     assert abs(f.big_m[1] - expected) < 1e-12 * abs(expected)
     for u in (0.0, 0.1, 0.25, 0.5):
-        series = (u / h) * (u * u - h * h) / 6 * (1 + sigma ** 2 * (3 * u * u - 7 * h * h) / 60)
+        series = (u / h) * (u * u - h * h) / 6 * (1 + sigma**2 * (3 * u * u - 7 * h * h) / 60)
         assert abs(f._r(u, h)[0] - series) <= 1e-15 + 1e-12 * abs(series)
     assert alpha > 0

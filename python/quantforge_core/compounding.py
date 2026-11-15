@@ -1,4 +1,5 @@
 """Discount factors and rate conversion (specifications/01-core/compounding.md)."""
+
 import math
 from dataclasses import dataclass
 

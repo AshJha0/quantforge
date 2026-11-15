@@ -1,4 +1,5 @@
 """Interpolation (specifications/01-core/interpolation.md)."""
+
 import itertools
 import math
 from bisect import bisect_left, bisect_right
@@ -10,8 +11,13 @@ from .numeric import thomas
 
 Floats = Sequence[float]
 MIN_KNOTS = {
-    "linear": 2, "log_linear": 2, "cubic_natural": 3, "cubic_clamped": 2,
-    "cubic_not_a_knot": 4, "monotone_pchip": 2, "tension": 3,
+    "linear": 2,
+    "log_linear": 2,
+    "cubic_natural": 3,
+    "cubic_clamped": 2,
+    "cubic_not_a_knot": 4,
+    "monotone_pchip": 2,
+    "tension": 3,
 }
 
 
@@ -94,9 +100,7 @@ def _pchip_slopes(x: Floats, y: Floats) -> list[float]:
     return m
 
 
-def _hermite(
-    x: Floats, y: Floats, m: Floats, at: Floats
-) -> tuple[list[float], list[float]]:
+def _hermite(x: Floats, y: Floats, m: Floats, at: Floats) -> tuple[list[float], list[float]]:
     values, derivatives = [], []
     for t in at:
         i = _interval(x, t)

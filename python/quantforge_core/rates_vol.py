@@ -4,6 +4,7 @@ Spec: specifications/05-volatility/rates-vol-cube.md, rulings E-B8 to E-B13 in
 specifications/stage-e-rulings-b.md. Caps and swaptions are D7's (caps_swaptions.py); the smile is the
 stage C Hagan expansion (sabr.py).
 """
+
 import itertools
 from collections.abc import Callable, Sequence
 
@@ -32,6 +33,7 @@ def _increasing(values: Sequence[float]) -> bool:
 
 # --- SABR cube ---
 
+
 def _locate(nodes: Sequence[float], x: float, field: str) -> tuple[int, float]:
     """(i, weight) with nodes[i] <= x <= nodes[i + 1]; a single node needs x on it."""
     if not nodes[0] <= x <= nodes[-1]:
@@ -44,19 +46,33 @@ def _locate(nodes: Sequence[float], x: float, field: str) -> tuple[int, float]:
 
 def _bilinear(m: Matrix, i: int, u: float, j: int, v: float) -> float:
     i1, j1 = min(i + 1, len(m) - 1), min(j + 1, len(m[0]) - 1)
-    return ((1 - u) * (1 - v) * m[i][j] + (1 - u) * v * m[i][j1]
-            + u * (1 - v) * m[i1][j] + u * v * m[i1][j1])
+    return (
+        (1 - u) * (1 - v) * m[i][j]
+        + (1 - u) * v * m[i][j1]
+        + u * (1 - v) * m[i1][j]
+        + u * v * m[i1][j1]
+    )
 
 
 def price_cube(
-    discount: CurveData, proj: CurveData, expiries_months: Sequence[int],
-    tenors_months: Sequence[int], params: dict[str, Matrix], kind: str, expiry_months: int,
-    tenor_months: int, strike: float, notional: float,
+    discount: CurveData,
+    proj: CurveData,
+    expiries_months: Sequence[int],
+    tenors_months: Sequence[int],
+    params: dict[str, Matrix],
+    kind: str,
+    expiry_months: int,
+    tenor_months: int,
+    strike: float,
+    notional: float,
 ) -> dict[str, object]:
     d, p = curves.build(discount), curves.build(proj)
     rows, cols = len(expiries_months), len(tenors_months)
-    if rows == 0 or cols == 0 or any(
-            len(m) != rows or any(len(r) != cols for r in m) for m in params.values()):
+    if (
+        rows == 0
+        or cols == 0
+        or any(len(m) != rows or any(len(r) != cols for r in m) for m in params.values())
+    ):
         raise _input("each parameter must be expiries x tenors", "cube")
     if not _increasing(expiries_months) or not _increasing(tenors_months):
         raise _input("node months must be strictly increasing", "cube")
@@ -70,8 +86,9 @@ def price_cube(
     t = d.time(s)
     i, u = _locate(node_times, t, "expiry_months")
     j, v = _locate(node_tenors, tenor_months / 12, "tenor_months")
-    alpha, beta, rho, nu = (_bilinear(params[k], i, u, j, v)
-                            for k in ("alpha", "beta", "rho", "nu"))
+    alpha, beta, rho, nu = (
+        _bilinear(params[k], i, u, j, v) for k in ("alpha", "beta", "rho", "nu")
+    )
     fixed = projection._fixed_periods(INDEX, s, tenor_months)
     floating = projection._float_periods(INDEX, s, tenor_months)
     annuity, leg = projection._swap_legs(INDEX, fixed, floating, d, p)
@@ -92,19 +109,31 @@ def price_cube(
         raise _domain("the forward rate is not above 0", "strike")
     vol = sabr._hagan(sabr.Sabr(forward, t, alpha, beta, rho, nu), strike)
     price = notional * annuity * _option(black.BLACK_76, kind == "PAYER", forward, strike, vol, t)
-    return {"price": price, "forward_rate": forward, "annuity": annuity, "vol": vol,
-            "sabr": {"alpha": alpha, "beta": beta, "rho": rho, "nu": nu}}
+    return {
+        "price": price,
+        "forward_rate": forward,
+        "annuity": annuity,
+        "vol": vol,
+        "sabr": {"alpha": alpha, "beta": beta, "rho": rho, "nu": nu},
+    }
 
 
 # --- Caplet stripping ---
+
 
 def _solve(f: Callable[[float], float], low: float, high: float) -> float:
     return roots.brent(f, low, high, x_tol=1e-15, max_iter=500).root
 
 
 def cap_strip(
-    discount: CurveData, proj: CurveData, model: str, start_months: int, strike: float,
-    tenors: Sequence[int], flat_vols: Sequence[float], notional: float,
+    discount: CurveData,
+    proj: CurveData,
+    model: str,
+    start_months: int,
+    strike: float,
+    tenors: Sequence[int],
+    flat_vols: Sequence[float],
+    notional: float,
 ) -> tuple[list[float], list[float]]:
     d, p = curves.build(discount), curves.build(proj)
     if not tenors or any(m % 3 for m in tenors):
@@ -121,11 +150,14 @@ def cap_strip(
     start = projection._plus_months(INDEX, projection._spot(INDEX, d.as_of), start_months)
     ps = projection._float_periods(INDEX, start, tenors[-1])
     alphas = [daycount.year_fraction("ACT_360", x.start, x.end) for x in ps]
-    forwards = [(p.discount(x.start) / p.discount(x.end) - 1) / a
-                for x, a in zip(ps, alphas, strict=True)]
+    forwards = [
+        (p.discount(x.start) / p.discount(x.end) - 1) / a for x, a in zip(ps, alphas, strict=True)
+    ]
     _check_black(model, strike, forwards)
-    terms = [(notional * a * d.discount(x.end), f, d.time(x.start))
-             for x, a, f in zip(ps, alphas, forwards, strict=True)]
+    terms = [
+        (notional * a * d.discount(x.end), f, d.time(x.start))
+        for x, a, f in zip(ps, alphas, forwards, strict=True)
+    ]
 
     def caplet(n: int, vol: float) -> float:
         scale, f, t = terms[n]
@@ -143,24 +175,28 @@ def cap_strip(
         # The caplets fixed by shorter caps are summed once; the new ones are added on in order.
         known = ordered_sum(caplet(c, vols[c]) for c in range(first))
 
-        def gap(v: float, first: int = first, n: int = n, target: float = target,
-                known: float = known) -> float:
+        def gap(
+            v: float, first: int = first, n: int = n, target: float = target, known: float = known
+        ) -> float:
             total = known
             for c in range(first, n):
                 total += caplet(c, v)
             return total - target
 
         if gap(low) >= 0:
-            raise QfError("E_ARBITRAGE", "a caplet segment needs a vol at or below zero",
-                          "flat_vols")
+            raise QfError(
+                "E_ARBITRAGE", "a caplet segment needs a vol at or below zero", "flat_vols"
+            )
         if gap(high) < 0:
-            raise QfError("E_DOMAIN", "a caplet segment needs a vol above the search bound",
-                          "flat_vols")
+            raise QfError(
+                "E_DOMAIN", "a caplet segment needs a vol above the search bound", "flat_vols"
+            )
         vols += [_solve(gap, low, high)] * (n - first)
     return vols, targets
 
 
 # --- Bond futures options ---
+
 
 def _futures_option(kind: str, f: float, k: float, t: float, df: float) -> Option:
     if t <= 0:
@@ -174,14 +210,23 @@ def _futures_option(kind: str, f: float, k: float, t: float, df: float) -> Optio
     return Option(black.BLACK_76, kind, k, t, f, discount_factor=df)
 
 
-def bondfut_price(kind: str, f: float, k: float, t: float, df: float, vol: float,
-                  contract_size: float) -> tuple[float, float]:
+def bondfut_price(
+    kind: str, f: float, k: float, t: float, df: float, vol: float, contract_size: float
+) -> tuple[float, float]:
     price = black.price(_futures_option(kind, f, k, t, df), vol)
     return price, price * contract_size / 100
 
 
-def bondfut_implied(kind: str, f: float, k: float, t: float, df: float, premium: float,
-                    ctd_yield: float, duration: float) -> tuple[float, float]:
+def bondfut_implied(
+    kind: str,
+    f: float,
+    k: float,
+    t: float,
+    df: float,
+    premium: float,
+    ctd_yield: float,
+    duration: float,
+) -> tuple[float, float]:
     o = _futures_option(kind, f, k, t, df)
     intrinsic = df * max(o.phi * (f - k), 0.0)
     bound = df * (f if kind == "CALL" else k)
@@ -206,26 +251,41 @@ def bondfut_implied(kind: str, f: float, k: float, t: float, df: float, premium:
 
 # --- Inflation caps ---
 
+
 def _inflation_option(model: str, kind: str, f: float, k: float, vol: float, t: float) -> float:
     return black.price(Option(model, "CALL" if kind == "CAP" else "PUT", k, t, f), vol)
 
 
-def yoy_price(model: str, kind: str, strike: float, notional: float,
-              periods: Sequence[tuple[float, float, float, float, float]]
-              ) -> tuple[list[float], float]:
+def yoy_price(
+    model: str,
+    kind: str,
+    strike: float,
+    notional: float,
+    periods: Sequence[tuple[float, float, float, float, float]],
+) -> tuple[list[float], float]:
     if not periods:
         raise _input("periods is empty", "periods")
     if model == black.BLACK_76 and (strike <= 0 or any(p[2] <= 0 for p in periods)):
         raise _domain("BLACK_76 needs a positive strike and forwards", "strike")
     if any(p[3] <= 0 for p in periods):
         raise _domain("an expiry_years is not above 0", "periods")
-    caplets = [notional * accrual * _inflation_option(model, kind, f, strike, vol, t) * df
-               for accrual, df, f, t, vol in periods]
+    caplets = [
+        notional * accrual * _inflation_option(model, kind, f, strike, vol, t) * df
+        for accrual, df, f, t, vol in periods
+    ]
     return caplets, ordered_sum(caplets)
 
 
-def zc_price(model: str, kind: str, forward_ratio: float, years: float, strike: float,
-             df: float, vol: float, notional: float) -> tuple[float, float]:
+def zc_price(
+    model: str,
+    kind: str,
+    forward_ratio: float,
+    years: float,
+    strike: float,
+    df: float,
+    vol: float,
+    notional: float,
+) -> tuple[float, float]:
     if model == black.BLACK_76 and forward_ratio <= 0:
         raise _domain("BLACK_76 needs a positive forward", "forward_index_ratio")
     if 1 + strike <= 0:  # SPEC_QUESTIONS E-Q8: (1 + K)^T needs 1 + K above 0

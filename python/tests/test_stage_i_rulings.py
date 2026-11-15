@@ -1,5 +1,6 @@
 """Rulings after the stage I builds (specifications/stage-i-rulings.md I-41 to I-50): one test
 per behaviour the Python lane changed or confirmed."""
+
 import math
 from typing import Any
 
@@ -12,10 +13,16 @@ from quantforge_core.cli.registry import execute
 from quantforge_core.errors import QfError
 
 GREEKS: dict[str, Any] = {
-    "spot": 100.0, "rate": 0.03, "dividend_yield": 0.01, "volatility": 0.25,
-    "portfolio": [{"instrument": "CALL", "strike": 100.0, "expiry_years": 0.5,
-                   "quantity": -1000.0}],
-    "hedges": [{"instrument": "UNDERLYING"}], "targets": ["DELTA"]}
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "volatility": 0.25,
+    "portfolio": [
+        {"instrument": "CALL", "strike": 100.0, "expiry_years": 0.5, "quantity": -1000.0}
+    ],
+    "hedges": [{"instrument": "UNDERLYING"}],
+    "targets": ["DELTA"],
+}
 
 
 def cli_code(operation: str, inputs: dict[str, Any]) -> str:
@@ -24,21 +31,33 @@ def cli_code(operation: str, inputs: dict[str, Any]) -> str:
     return caught.value.code
 
 
-@pytest.mark.parametrize("change", [
-    {"hedges": [{"instrument": "UNDERLYING", "quantity": 5.0}]},
-    {"hedges": [{"instrument": "UNDERLYING", "notional": 1.0}]},
-    {"portfolio": [{"instrument": "CALL", "strike": 100.0, "expiry_years": 0.5}]},
-])
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"hedges": [{"instrument": "UNDERLYING", "quantity": 5.0}]},
+        {"hedges": [{"instrument": "UNDERLYING", "notional": 1.0}]},
+        {"portfolio": [{"instrument": "CALL", "strike": 100.0, "expiry_years": 0.5}]},
+    ],
+)
 def test_i41_greek_instruments_have_fixed_keys(change: dict[str, Any]) -> None:
     assert cli_code("hedge.greeks.neutralise", {**GREEKS, **change}) == "E_INPUT"
 
 
 def test_i42_unknown_targets_are_schema_errors() -> None:
     assert cli_code("hedge.greeks.neutralise", {**GREEKS, "targets": ["RHO"]}) == "E_SCHEMA"
-    corr = {"spot1": 100.0, "spot2": 95.0, "rate": 0.03, "yield1": 0.01, "yield2": 0.02,
-            "vol1": 0.25, "vol2": 0.2, "correlation": 0.6,
-            "book": [{"instrument": "UNDERLYING_1", "quantity": 1.0}],
-            "hedges": [{"instrument": "UNDERLYING_1"}], "targets": ["THETA"]}
+    corr = {
+        "spot1": 100.0,
+        "spot2": 95.0,
+        "rate": 0.03,
+        "yield1": 0.01,
+        "yield2": 0.02,
+        "vol1": 0.25,
+        "vol2": 0.2,
+        "correlation": 0.6,
+        "book": [{"instrument": "UNDERLYING_1", "quantity": 1.0}],
+        "hedges": [{"instrument": "UNDERLYING_1"}],
+        "targets": ["THETA"],
+    }
     assert cli_code("hedge.correlation.neutralise", corr) == "E_SCHEMA"
 
 
@@ -71,45 +90,78 @@ def test_i44_rounding_below_zero_is_a_perfect_hedge() -> None:
 
 
 def test_i45_lot_sizes_longer_than_the_columns_is_e_input() -> None:
-    inputs = {"a": [[1.0, 0.0], [0.0, 1.0]], "b": [1.0, -1.0], "weights": [1.0, 1.0],
-              "lot_sizes": [1.0] * 13}
+    inputs = {
+        "a": [[1.0, 0.0], [0.0, 1.0]],
+        "b": [1.0, -1.0],
+        "weights": [1.0, 1.0],
+        "lot_sizes": [1.0] * 13,
+    }
     assert cli_code("hedge.integer.solve", inputs) == "E_INPUT"
-    assert cli_code("hedge.integer.solve", {**inputs, "a": [[1.0] * 13], "b": [1.0],
-                                            "weights": [1.0]}) == "E_LIMIT"
+    assert (
+        cli_code("hedge.integer.solve", {**inputs, "a": [[1.0] * 13], "b": [1.0], "weights": [1.0]})
+        == "E_LIMIT"
+    )
 
 
-@pytest.mark.parametrize(("operation", "inputs"), [
-    ("hedge.qp.solve", {"a": [[1.0]], "b": [1.0], "weights": [1.0], "ridge": None}),
-    ("hedge.beta.futures", {"portfolio_value": 1.0, "portfolio_beta": 0.0, "target_beta": 1.0,
-                            "futures_price": 1.0, "multiplier": 1.0, "rounding": None}),
-    ("hedge.backtest.delta", {"option": {"type": "CALL", "strike": 1.0, "expiry_years": 1.0,
-                                         "note": None}, "quantity": 1.0}),
-])
-def test_i47_null_optional_keys_are_schema_errors(operation: str,
-                                                  inputs: dict[str, Any]) -> None:
+@pytest.mark.parametrize(
+    ("operation", "inputs"),
+    [
+        ("hedge.qp.solve", {"a": [[1.0]], "b": [1.0], "weights": [1.0], "ridge": None}),
+        (
+            "hedge.beta.futures",
+            {
+                "portfolio_value": 1.0,
+                "portfolio_beta": 0.0,
+                "target_beta": 1.0,
+                "futures_price": 1.0,
+                "multiplier": 1.0,
+                "rounding": None,
+            },
+        ),
+        (
+            "hedge.backtest.delta",
+            {
+                "option": {"type": "CALL", "strike": 1.0, "expiry_years": 1.0, "note": None},
+                "quantity": 1.0,
+            },
+        ),
+    ],
+)
+def test_i47_null_optional_keys_are_schema_errors(operation: str, inputs: dict[str, Any]) -> None:
     assert cli_code(operation, inputs) == "E_SCHEMA"
 
 
 def test_i47_null_stays_legal_inside_bounds() -> None:
-    out = execute("hedge.qp.solve", {"a": [[1.0]], "b": [1.0], "weights": [1.0],
-                                     "lower": [None], "upper": [None]})
+    out = execute(
+        "hedge.qp.solve",
+        {"a": [[1.0]], "b": [1.0], "weights": [1.0], "lower": [None], "upper": [None]},
+    )
     assert out["x"] == [-1.0]
 
 
 def test_i49_lot_counts_beyond_two_to_the_52_are_e_limit() -> None:
     with pytest.raises(QfError) as caught:
-        hs.integer_solve([[1.0]], [-(2.0 ** 60)], [1.0], [1.0])
+        hs.integer_solve([[1.0]], [-(2.0**60)], [1.0], [1.0])
     assert caught.value.code == "E_LIMIT"
-    assert hs.integer_solve([[1.0]], [-(2.0 ** 40)], [1.0], [1.0])["lots"] == [2 ** 40]
+    assert hs.integer_solve([[1.0]], [-(2.0**40)], [1.0], [1.0])["lots"] == [2**40]
 
 
 def test_i50_one_order_keeps_the_general_array_limit() -> None:
     fill = {"quantity": 1.0, "price": 1.0}
-    order = {"quantity": 2e5, "decision_price": 1.0, "final_price": 1.0, "half_spread": 0.0,
-             "impact": 0.0, "fills": [fill] * 100_001}
+    order = {
+        "quantity": 2e5,
+        "decision_price": 1.0,
+        "final_price": 1.0,
+        "half_spread": 0.0,
+        "impact": 0.0,
+        "fills": [fill] * 100_001,
+    }
     assert cli_code("hedge.slippage.report", {"orders": [order]}) == "E_LIMIT"
-    assert math.isfinite(execute("hedge.slippage.report", {
-        "orders": [{**order, "fills": [fill] * 10}]})["total"]["shortfall"])
+    assert math.isfinite(
+        execute("hedge.slippage.report", {"orders": [{**order, "fills": [fill] * 10}]})["total"][
+            "shortfall"
+        ]
+    )
 
 
 def test_i53_selection_limits_the_number_of_subsets() -> None:
@@ -119,7 +171,8 @@ def test_i53_selection_limits_the_number_of_subsets() -> None:
     # 21 instruments is the I-35 limit, also before the rule checks.
     wide = {"a": [[1.0] * 21], "b": [1.0], "weights": [1.0], "max_instruments": 1}
     assert cli_code("hedge.select.solve", wide) == "E_LIMIT"
-    small = execute("hedge.select.solve", {"a": [r[:6] for r in a[:6]], "b": [-1.0] * 6,
-                                           "weights": [1.0] * 6, "max_instruments": 6})
+    small = execute(
+        "hedge.select.solve",
+        {"a": [r[:6] for r in a[:6]], "b": [-1.0] * 6, "weights": [1.0] * 6, "max_instruments": 6},
+    )
     assert len(small["selected"]) <= 6
-

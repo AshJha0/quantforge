@@ -5,6 +5,7 @@ N untimed calls, divided by N, measured with the cyclic GC disabled. CPython has
 cheap gross-allocation counter, so this counts blocks a call leaves alive (caches, interned
 objects, results kept by the caller), not every temporary it allocates and frees.
 """
+
 import gc
 import json
 import os

@@ -1,4 +1,5 @@
 """Regularised and outlier-robust curve fits (specifications/03-calibration/curve-fits.md)."""
+
 import itertools
 import math
 from collections.abc import Sequence
@@ -10,8 +11,11 @@ from .numeric import ordered_sum
 
 
 def smooth(
-    knots: Sequence[float], maturities: Sequence[float], zero_rates: Sequence[float],
-    lam: float, weights: Sequence[float] | None = None,
+    knots: Sequence[float],
+    maturities: Sequence[float],
+    zero_rates: Sequence[float],
+    lam: float,
+    weights: Sequence[float] | None = None,
 ) -> tuple[list[float], list[float], float]:
     """Returns (forwards, fitted, objective)."""
     w = list(weights) if weights is not None else [1.0] * len(maturities)
@@ -25,17 +29,20 @@ def smooth(
         raise QfError("E_INPUT", "a maturity is past the last knot", "maturities")
     n = len(knots)
     edges = [0.0, *knots]
-    rows = [[max(0.0, min(m, edges[k + 1]) - edges[k]) / m for k in range(n)]
-            for m in maturities]
-    a = [[ordered_sum(wj * r[p] * r[q] for wj, r in zip(w, rows, strict=True))
-          for q in range(n)] for p in range(n)]
+    rows = [[max(0.0, min(m, edges[k + 1]) - edges[k]) / m for k in range(n)] for m in maturities]
+    a = [
+        [ordered_sum(wj * r[p] * r[q] for wj, r in zip(w, rows, strict=True)) for q in range(n)]
+        for p in range(n)
+    ]
     for k in range(n - 1):
         a[k][k] += lam
         a[k + 1][k + 1] += lam
         a[k][k + 1] -= lam
         a[k + 1][k] -= lam
-    rhs = [ordered_sum(wj * r[p] * y for wj, r, y in zip(w, rows, zero_rates, strict=True))
-           for p in range(n)]
+    rhs = [
+        ordered_sum(wj * r[p] * y for wj, r, y in zip(w, rows, zero_rates, strict=True))
+        for p in range(n)
+    ]
     f = linalg.lu_solve(a, rhs)
     fitted = [ordered_sum(c * x for c, x in zip(r, f, strict=True)) for r in rows]
     objective = ordered_sum(
@@ -67,16 +74,23 @@ def robust(
     ys = list(zero_rates)
 
     def weighted(w: Sequence[float], shift: Sequence[float]) -> list[float]:
-        a = [[ordered_sum(wj * x[p] * x[q] for wj, x in zip(w, xs, strict=True))
-              for q in range(3)] for p in range(3)]
-        b = [ordered_sum(wj * x[p] * y - s * x[p] for wj, x, y, s in zip(w, xs, ys, shift,
-                                                                          strict=True))
-             for p in range(3)]
+        a = [
+            [ordered_sum(wj * x[p] * x[q] for wj, x in zip(w, xs, strict=True)) for q in range(3)]
+            for p in range(3)
+        ]
+        b = [
+            ordered_sum(
+                wj * x[p] * y - s * x[p] for wj, x, y, s in zip(w, xs, ys, shift, strict=True)
+            )
+            for p in range(3)
+        ]
         return linalg.lu_solve(a, b)
 
     def residuals(beta: Sequence[float]) -> list[float]:
-        return [ordered_sum(b * v for b, v in zip(beta, x, strict=True)) - y
-                for x, y in zip(xs, ys, strict=True)]
+        return [
+            ordered_sum(b * v for b, v in zip(beta, x, strict=True)) - y
+            for x, y in zip(xs, ys, strict=True)
+        ]
 
     zero = [0.0] * len(ys)
     beta = weighted([1.0] * len(ys), zero)
@@ -92,9 +106,10 @@ def robust(
             exact = weighted([1.0 if s == 0 else 0.0 for s in new], [s * delta for s in new])
         except QfError:
             exact = None
-        if exact is not None and [
-            0 if abs(v) <= delta else (1 if v > 0 else -1) for v in residuals(exact)
-        ] == new:
+        if (
+            exact is not None
+            and [0 if abs(v) <= delta else (1 if v > 0 else -1) for v in residuals(exact)] == new
+        ):
             beta = exact
             continue
         # Not consistent: take IRLS steps instead, which descend monotonically.
@@ -106,8 +121,9 @@ def robust(
         raise QfError("E_NO_CONVERGENCE", "the Huber fit did not settle")
     r = residuals(beta)
     outliers = [j for j, v in enumerate(r) if abs(v) > delta]
-    objective = ordered_sum(v * v / 2 if abs(v) <= delta else delta * abs(v) - delta * delta / 2
-                            for v in r)
+    objective = ordered_sum(
+        v * v / 2 if abs(v) <= delta else delta * abs(v) - delta * delta / 2 for v in r
+    )
     return beta, r, outliers, objective
 
 

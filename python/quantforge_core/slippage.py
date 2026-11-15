@@ -1,5 +1,6 @@
 """Hedge slippage: implementation shortfall against the cost model
 (specifications/08-hedging/hedge-slippage.md, rulings I-36 to I-38)."""
+
 import math
 from collections.abc import Sequence
 from typing import Any
@@ -40,12 +41,17 @@ def slippage_report(orders: Sequence[Order]) -> dict[str, Any]:
         execution = math.fsum(q * (p - decision) for q, p in fills)
         opportunity = (quantity - filled) * (final - decision)
         model = spread * abs(filled) + impact * filled * filled
-        rows.append({
-            "filled_quantity": filled + 0.0,
-            "average_price": math.fsum(q * p for q, p in fills) / filled if fills else None,
-            "execution_cost": execution + 0.0, "opportunity_cost": opportunity + 0.0,
-            "shortfall": execution + opportunity + 0.0, "model_cost": model + 0.0,
-            "slippage": execution - model + 0.0})
+        rows.append(
+            {
+                "filled_quantity": filled + 0.0,
+                "average_price": math.fsum(q * p for q, p in fills) / filled if fills else None,
+                "execution_cost": execution + 0.0,
+                "opportunity_cost": opportunity + 0.0,
+                "shortfall": execution + opportunity + 0.0,
+                "model_cost": model + 0.0,
+                "slippage": execution - model + 0.0,
+            }
+        )
         for k in TOTALS:
             sums[k].append(rows[-1][k])
     total = {k: math.fsum(v) + 0.0 for k, v in sums.items()}

@@ -5,11 +5,19 @@ ascending, every train index earlier than every test index. `gap` observations b
 labels that span `gap` bars (`specifications/11-research/purged-cv.md`). An expanding window keeps all history; a
 rolling one keeps the last `train_size` observations.
 """
+
 from __future__ import annotations
 
 
-def walk_forward(n: int, train_size: int, test_size: int, *, step: int | None = None, gap: int = 0,
-                 expanding: bool = False) -> list[tuple[list[int], list[int]]]:
+def walk_forward(
+    n: int,
+    train_size: int,
+    test_size: int,
+    *,
+    step: int | None = None,
+    gap: int = 0,
+    expanding: bool = False,
+) -> list[tuple[list[int], list[int]]]:
     if min(n, train_size, test_size) < 1 or gap < 0:
         raise ValueError("n, train_size and test_size must be at least 1 and gap non-negative")
     step = test_size if step is None else step

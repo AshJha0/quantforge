@@ -1,6 +1,7 @@
 """Stage J curves lane (rulings J-C-1 to J-C-9): the financing term structure over the funding
 curve (02-curves/financing-term-structure.md) and the liquidity cost curve
 (10-execution/liquidity-curve.md)."""
+
 import itertools
 import math
 from collections.abc import Callable, Sequence
@@ -54,16 +55,30 @@ class FinancingCurve:
         return math.exp(-self.zt(t) - self.s(t))
 
 
-def build_financing_curve(funding_times: Sequence[float], funding_zero_rates: Sequence[float],
-                          quote_times: Sequence[float], repo_rates: Sequence[float],
-                          borrow_times: Sequence[float], borrow_fees: Sequence[float]) -> FinancingCurve:
+def build_financing_curve(
+    funding_times: Sequence[float],
+    funding_zero_rates: Sequence[float],
+    quote_times: Sequence[float],
+    repo_rates: Sequence[float],
+    borrow_times: Sequence[float],
+    borrow_fees: Sequence[float],
+) -> FinancingCurve:
     """Bootstraps `S(T_i) = ln(1 + R_i T_i) - Z(T_i) T_i` (J-C-2) and `B(T_i) = b_i T_i` (J-C-4)."""
-    if (len(funding_times) != len(funding_zero_rates) or len(quote_times) != len(repo_rates)
-            or len(borrow_times) != len(borrow_fees) or not funding_times or not quote_times):
-        raise QfError("E_INPUT", "curve arrays must pair up; funding and quotes non-empty",
-                      "quote_times")
-    for key, ts in (("funding_times", funding_times), ("quote_times", quote_times),
-                    ("borrow_times", borrow_times)):
+    if (
+        len(funding_times) != len(funding_zero_rates)
+        or len(quote_times) != len(repo_rates)
+        or len(borrow_times) != len(borrow_fees)
+        or not funding_times
+        or not quote_times
+    ):
+        raise QfError(
+            "E_INPUT", "curve arrays must pair up; funding and quotes non-empty", "quote_times"
+        )
+    for key, ts in (
+        ("funding_times", funding_times),
+        ("quote_times", quote_times),
+        ("borrow_times", borrow_times),
+    ):
         if not _increasing_positive(ts):
             raise QfError("E_INPUT", "times must be positive and strictly increasing", key)
     if any(1.0 + r * t <= 0 for r, t in zip(repo_rates, quote_times, strict=True)):
@@ -75,8 +90,10 @@ def build_financing_curve(funding_times: Sequence[float], funding_zero_rates: Se
         raise QfError("E_DOMAIN", "cumulative borrow fee must not fall", "borrow_fees")
     fcum = [z * t for z, t in zip(funding_zero_rates, funding_times, strict=True)]
     ft = list(funding_times)
-    scum = [math.log1p(r * t) - _lin(ft, fcum, t)
-            if t <= ft[-1] else math.nan for r, t in zip(repo_rates, quote_times, strict=True)]
+    scum = [
+        math.log1p(r * t) - _lin(ft, fcum, t) if t <= ft[-1] else math.nan
+        for r, t in zip(repo_rates, quote_times, strict=True)
+    ]
     if any(math.isnan(x) for x in scum):
         raise QfError("E_DOMAIN", "a quote lies beyond the funding curve", "quote_times")
     return FinancingCurve(ft, fcum, list(quote_times), scum, list(borrow_times), bcum)
@@ -85,7 +102,9 @@ def build_financing_curve(funding_times: Sequence[float], funding_zero_rates: Se
 def term_curve(curve: FinancingCurve, query_times: Sequence[float]) -> dict[str, Any]:
     """`repo.term.curve` (J-C-2, J-C-3)."""
     if not query_times or not _increasing_positive(query_times):
-        raise QfError("E_INPUT", "query_times must be non-empty, positive, increasing", "query_times")
+        raise QfError(
+            "E_INPUT", "query_times must be non-empty, positive, increasing", "query_times"
+        )
     if query_times[-1] > curve.cover:
         raise QfError("E_DOMAIN", "query beyond the curve's coverage", "query_times")
     pf = [curve.financing_df(t) for t in query_times]
@@ -104,9 +123,13 @@ def term_curve(curve: FinancingCurve, query_times: Sequence[float]) -> dict[str,
     }
 
 
-def forward_term_financed(curve: FinancingCurve, spot: float, maturity: float,
-                          dividend_times: Sequence[float],
-                          dividend_amounts: Sequence[float]) -> dict[str, Any]:
+def forward_term_financed(
+    curve: FinancingCurve,
+    spot: float,
+    maturity: float,
+    dividend_times: Sequence[float],
+    dividend_amounts: Sequence[float],
+) -> dict[str, Any]:
     """`eq.forward.term_financed`: `F = (S - sum A_i C(t_i)) / C(T)`,
     `C(t) = exp(-Z(t) t - S(t) + B(t))` (J-C-5)."""
     if len(dividend_times) != len(dividend_amounts):
@@ -131,34 +154,56 @@ def forward_term_financed(curve: FinancingCurve, spot: float, maturity: float,
     fwd = (spot - pv) / c
     if fwd <= 0:
         raise QfError("E_DOMAIN", "forward is not positive", "dividend_amounts")
-    return {"forward": fwd, "carry": fwd - spot, "carry_factor": c,
-            "financing_df": curve.financing_df(maturity), "pv_dividends": pv}
+    return {
+        "forward": fwd,
+        "carry": fwd - spot,
+        "carry_factor": c,
+        "financing_df": curve.financing_df(maturity),
+        "pv_dividends": pv,
+    }
 
 
-def liquidity_cost(half_spread_bps: float, daily_volume: float, daily_vol: float,
-                   coefficient: float, exponent: float, risk_multiplier: float,
-                   sizes: Sequence[float], horizons: Sequence[float]) -> dict[str, Any]:
+def liquidity_cost(
+    half_spread_bps: float,
+    daily_volume: float,
+    daily_vol: float,
+    coefficient: float,
+    exponent: float,
+    risk_multiplier: float,
+    sizes: Sequence[float],
+    horizons: Sequence[float],
+) -> dict[str, Any]:
     """`liq.curve.cost` (J-C-6 to J-C-8): `c(Q, h) = s + Y sigma (Q / (V h))^delta
     + z sigma sqrt(h / 3)`, with the closed-form optimal horizon."""
     if not sizes or not horizons:
         raise QfError("E_INPUT", "sizes and horizons_days must be non-empty", "sizes")
     checks: list[tuple[bool, str]] = [
-        (half_spread_bps < 0, "half_spread_bps"), (daily_volume <= 0, "daily_volume"),
-        (daily_vol < 0, "daily_vol"), (coefficient < 0, "coefficient"),
-        (risk_multiplier < 0, "risk_multiplier"), (not 0 < exponent <= 1, "exponent"),
-        (any(q < 0 for q in sizes), "sizes"), (any(h <= 0 for h in horizons), "horizons_days")]
+        (half_spread_bps < 0, "half_spread_bps"),
+        (daily_volume <= 0, "daily_volume"),
+        (daily_vol < 0, "daily_vol"),
+        (coefficient < 0, "coefficient"),
+        (risk_multiplier < 0, "risk_multiplier"),
+        (not 0 < exponent <= 1, "exponent"),
+        (any(q < 0 for q in sizes), "sizes"),
+        (any(h <= 0 for h in horizons), "horizons_days"),
+    ]
     for bad, key in checks:
         if bad:
             raise QfError("E_DOMAIN", f"{key} out of domain", key)
     sp = half_spread_bps / 10000.0
-    imp: Callable[[float, float], float] = (
-        lambda q, h: coefficient * daily_vol * (q / (daily_volume * h)) ** exponent)
+    imp: Callable[[float, float], float] = lambda q, h: (
+        coefficient * daily_vol * (q / (daily_volume * h)) ** exponent
+    )
     risk = [risk_multiplier * daily_vol * math.sqrt(h / 3.0) for h in horizons]
     impact = [[imp(q, h) for h in horizons] for q in sizes]
     out: dict[str, Any] = {
-        "spread_cost": sp, "impact": impact, "timing_risk": risk,
+        "spread_cost": sp,
+        "impact": impact,
+        "timing_risk": risk,
         "total_cost": [[sp + row[j] + risk[j] for j in range(len(horizons))] for row in impact],
-        "optimal_horizon": None, "min_cost": None}
+        "optimal_horizon": None,
+        "min_cost": None,
+    }
     b = risk_multiplier * daily_vol / math.sqrt(3.0)
     if b > 0 and coefficient > 0:
         hs, cs = [], []

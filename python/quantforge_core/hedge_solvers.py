@@ -9,6 +9,7 @@ and `d = [W^(1/2) b; 0]`, `f(x) = |B x + d|^2` and `H = B^T B`. Working on `B` (
 accurate. The singularity rule I-3 (an eigenvalue of `Z^T H Z` at most `1e-12` times the largest
 eigenvalue of `H`) is applied to squared singular values, which are those eigenvalues.
 """
+
 import itertools
 import math
 from collections.abc import Sequence
@@ -33,7 +34,9 @@ def _cap(n: int, problem: object) -> int:
     margin limit of the problem."""
     e_mat = getattr(problem, "e_mat", None)
     p = 0 if e_mat is None else int(e_mat.shape[0])
-    p += sum(v is not None for v in (*getattr(problem, "lower", ()), *getattr(problem, "upper", ())))
+    p += sum(
+        v is not None for v in (*getattr(problem, "lower", ()), *getattr(problem, "upper", ()))
+    )
     p += int(math.isfinite(getattr(problem, "limit", math.inf)))
     return _ITER_SLOPE * (n + p) + _ITER_BASE
 
@@ -79,12 +82,14 @@ def _root_form(a: Matrix, b: Floats, weights: Floats, ridge: float) -> tuple[NDA
     return big_b, d
 
 
-def _objective(a: Matrix, b: Floats, weights: Floats, ridge: float,
-               x: Floats) -> tuple[list[float], float]:
+def _objective(
+    a: Matrix, b: Floats, weights: Floats, ridge: float, x: Floats
+) -> tuple[list[float], float]:
     """(residual A x + b, f(x)) in correctly rounded sums."""
     residual = [math.fsum([*(row[j] * x[j] for j in range(len(x))), v]) for row, v in zip(a, b)]
     value = math.fsum(w * r * r for w, r in zip(weights, residual)) + ridge * math.fsum(
-        v * v for v in x)
+        v * v for v in x
+    )
     return residual, value
 
 
@@ -99,8 +104,9 @@ def _lstsq_min_norm(m: NDArray, r: NDArray, cut_sq: float) -> tuple[NDArray, int
     return y, int(keep.sum())
 
 
-def _scaled_form(big_b: NDArray, e_mat: NDArray,
-                 e_rhs: NDArray) -> tuple[NDArray, NDArray, NDArray, NDArray] | None:
+def _scaled_form(
+    big_b: NDArray, e_mat: NDArray, e_rhs: NDArray
+) -> tuple[NDArray, NDArray, NDArray, NDArray] | None:
     """Ruling R6-6.2: Jacobi scaling `D_jj = 1/sqrt(H_jj)` (H = B^T B), equality rows at unit
     norm, then the I-3 test on `Z^T D H D Z` against the largest eigenvalue of `D H D`.
     Returns (D, B D, x~_p, Z) or None when singular."""
@@ -179,9 +185,12 @@ def _phase_one(e_mat: NDArray, e_rhs: NDArray, lower: Bounds, upper: Bounds) -> 
         tab[r, n_struct + n_slack + r] = 1.0
     # Phase-1 cost: sum of the artificials, expressed in the non-basic columns.
     tab[-1, :] = -tab[:k, :].sum(axis=0)
-    tab[-1, n_struct + n_slack:n_cols] = 0.0
-    scale = max(1.0, float(np.abs(tab[:rows, -1]).max(initial=0.0)),
-                float(np.abs(tab[:rows, :n_cols]).max(initial=0.0)))
+    tab[-1, n_struct + n_slack : n_cols] = 0.0
+    scale = max(
+        1.0,
+        float(np.abs(tab[:rows, -1]).max(initial=0.0)),
+        float(np.abs(tab[:rows, :n_cols]).max(initial=0.0)),
+    )
     tol = 1e-11 * scale
     for _ in range(50 * (rows + n_cols) + 100):
         entering = next((c for c in range(n_cols) if tab[-1, c] < -tol), None)
@@ -219,8 +228,16 @@ def _phase_one(e_mat: NDArray, e_rhs: NDArray, lower: Bounds, upper: Bounds) -> 
 class _Qp:
     """One bound- and equality-constrained least-squares problem in square-root form."""
 
-    def __init__(self, big_b: NDArray, d: NDArray, e_mat: NDArray, e_rhs: NDArray,
-                 lower: Bounds, upper: Bounds, e_cut: float):
+    def __init__(
+        self,
+        big_b: NDArray,
+        d: NDArray,
+        e_mat: NDArray,
+        e_rhs: NDArray,
+        lower: Bounds,
+        upper: Bounds,
+        e_cut: float,
+    ):
         self.big_b, self.d, self.e_mat, self.e_rhs = big_b, d, e_mat, e_rhs
         self.lower, self.upper = lower, upper
         self.e_cut = e_cut
@@ -319,8 +336,12 @@ class _Qp:
             x = target
             g = self.multipliers(x, free, work)
             # R6-11.4: multiplier signs are judged against max(1, max|g|), never a tiny gradient.
-            scale = max(1.0, grad_scale, float(np.abs(g).max(initial=0.0)),
-                        float(np.abs(2.0 * (self.big_b.T @ (self.big_b @ x))).max(initial=0.0)))
+            scale = max(
+                1.0,
+                grad_scale,
+                float(np.abs(g).max(initial=0.0)),
+                float(np.abs(2.0 * (self.big_b.T @ (self.big_b @ x))).max(initial=0.0)),
+            )
             worst, drop = -1e-11 * scale, -1
             for j, s in work.items():
                 mu = g[j] if s == "L" else -g[j] if s == "U" else math.inf
@@ -343,7 +364,7 @@ def _simplex(a_eq: NDArray, b_eq: NDArray, cost: NDArray) -> NDArray | None:
     tab[:rows, -1] = b_eq
     negative = b_eq < 0
     tab[:rows][negative] *= -1.0
-    tab[:rows, cols:cols + rows] = np.eye(rows)
+    tab[:rows, cols : cols + rows] = np.eye(rows)
     basis = list(range(cols, cols + rows))
     scale = max(1.0, float(np.abs(tab[:rows]).max(initial=0.0)))
     tol = 1e-11 * scale
@@ -372,7 +393,7 @@ def _simplex(a_eq: NDArray, b_eq: NDArray, cost: NDArray) -> NDArray | None:
         raise QfError("E_NO_CONVERGENCE", "the margin search did not settle")
 
     tab[-1, :] = -tab[:rows].sum(axis=0)
-    tab[-1, cols:cols + rows] = 0.0
+    tab[-1, cols : cols + rows] = 0.0
     run(cols + rows)
     if -tab[-1, -1] > 1e-9 * scale:
         return None
@@ -394,19 +415,21 @@ def _simplex(a_eq: NDArray, b_eq: NDArray, cost: NDArray) -> NDArray | None:
     return z
 
 
-def _least_margin(e_mat: NDArray, e_rhs: NDArray, lower: Bounds, upper: Bounds,
-                  rates: NDArray) -> NDArray | None:
+def _least_margin(
+    e_mat: NDArray, e_rhs: NDArray, lower: Bounds, upper: Bounds, rates: NDArray
+) -> NDArray | None:
     """The point of least margin sum m_j |x_j| with E x = e inside the bounds, or None.
     Variables x = p - q with p, q >= 0; each finite bound is a row with a slack."""
     k, n = e_mat.shape
     rows: list[NDArray] = []
     rhs: list[float] = []
     bound_rows = [(j, v, 1.0) for j, v in enumerate(upper) if v is not None] + [
-        (j, v, -1.0) for j, v in enumerate(lower) if v is not None]
+        (j, v, -1.0) for j, v in enumerate(lower) if v is not None
+    ]
     cols = 2 * n + len(bound_rows)
     for r in range(k):
         row = np.zeros(cols)
-        row[:n], row[n:2 * n] = e_mat[r], -e_mat[r]
+        row[:n], row[n : 2 * n] = e_mat[r], -e_mat[r]
         rows.append(row)
         rhs.append(float(e_rhs[r]))
     for s, (j, v, sign) in enumerate(bound_rows):  # x_j + t = u, or x_j - t = l
@@ -420,7 +443,7 @@ def _least_margin(e_mat: NDArray, e_rhs: NDArray, lower: Bounds, upper: Bounds,
     z = _simplex(np.vstack(rows), np.asarray(rhs), cost)
     if z is None:
         return None
-    return z[:n] - z[n:2 * n]
+    return z[:n] - z[n : 2 * n]
 
 
 class _CostQp:
@@ -432,9 +455,18 @@ class _CostQp:
     method. At a position sitting at 0, the subgradient test either confirms the optimum or flips
     that instrument's orthant; a flip lowers the objective strictly, so the search ends."""
 
-    def __init__(self, big_b: NDArray, d: NDArray, e_mat: NDArray, e_rhs: NDArray,
-                 lower: Bounds, upper: Bounds, spread: NDArray,
-                 rates: NDArray | None, limit: float):
+    def __init__(
+        self,
+        big_b: NDArray,
+        d: NDArray,
+        e_mat: NDArray,
+        e_rhs: NDArray,
+        lower: Bounds,
+        upper: Bounds,
+        spread: NDArray,
+        rates: NDArray | None,
+        limit: float,
+    ):
         self.big_b, self.d, self.e_mat, self.e_rhs = big_b, d, e_mat, e_rhs
         self.lower, self.upper = lower, upper
         self.spread = spread
@@ -502,8 +534,11 @@ class _CostQp:
             elif high is not None and x[j] >= high:
                 work[j], x[j] = "U", high
         margin_on = margin and float(a_row @ x) >= self.limit
-        scale0 = max(float(np.abs(2.0 * (self.big_b.T @ self.d)).max(initial=0.0)),
-                     float(np.abs(lin).max(initial=0.0)), 1e-300)
+        scale0 = max(
+            float(np.abs(2.0 * (self.big_b.T @ self.d)).max(initial=0.0)),
+            float(np.abs(lin).max(initial=0.0)),
+            1e-300,
+        )
         k = self.e_mat.shape[0]
         for _ in range(_cap(self.n, self)):
             free = [j for j in range(self.n) if j not in work]
@@ -537,8 +572,11 @@ class _CostQp:
             x = target
             g = 2.0 * (self.big_b.T @ (self.big_b @ x + self.d)) + lin
             full = np.vstack([self.e_mat] + ([a_row[None, :]] if margin_on else []))
-            mults = (np.linalg.lstsq(full[:, free].T, -g[free], rcond=None)[0]
-                     if free and len(full) else np.zeros(len(full)))
+            mults = (
+                np.linalg.lstsq(full[:, free].T, -g[free], rcond=None)[0]
+                if free and len(full)
+                else np.zeros(len(full))
+            )
             r = g + full.T @ mults if len(full) else g
             mu = float(mults[k]) if margin_on else 0.0
             scale = max(scale0, float(np.abs(g).max(initial=0.0)))
@@ -571,8 +609,9 @@ class _CostQp:
                 signs.append(-1)
         for _ in range(_cap(self.n, self)):
             x, smooth, mu = self._orthant(x, signs)
-            scale = max(float(np.abs(smooth).max(initial=0.0)),
-                        float(self.spread.max(initial=0.0)), 1e-300)
+            scale = max(
+                float(np.abs(smooth).max(initial=0.0)), float(self.spread.max(initial=0.0)), 1e-300
+            )
             worst, flip = 1e-11 * scale, -1
             for j in range(self.n):
                 if not self.kinked[j] or x[j] != 0.0:
@@ -593,9 +632,18 @@ class _CostQp:
         raise QfError("E_NO_CONVERGENCE", "the sign search did not settle")
 
 
-def _qp_core(a: Matrix, b: Floats, weights: Floats, ridge: float, eq_matrix: Matrix | None,
-             eq_rhs: Floats | None, lower: Bounds | None, upper: Bounds | None,
-             singular: str, costs: Costs | None = None) -> dict[str, Any]:
+def _qp_core(
+    a: Matrix,
+    b: Floats,
+    weights: Floats,
+    ridge: float,
+    eq_matrix: Matrix | None,
+    eq_rhs: Floats | None,
+    lower: Bounds | None,
+    upper: Bounds | None,
+    singular: str,
+    costs: Costs | None = None,
+) -> dict[str, Any]:
     _, n = _shape(a, b, weights)
     if (eq_matrix is None) != (eq_rhs is None):
         raise QfError("E_INPUT", "eq_matrix and eq_rhs go together", "eq_matrix")
@@ -660,7 +708,8 @@ def _qp_core(a: Matrix, b: Floats, weights: Floats, ridge: float, eq_matrix: Mat
         y, _ = _lstsq_min_norm(bs @ zs, bs @ xs_p + d, 0.0)
         x = col * (xs_p + zs @ y)
         if k and np.abs(e_mat @ x - e_rhs).max() > 1e-9 * max(
-                1.0, float(np.abs(e_rhs).max()), float((np.abs(e_mat) @ np.abs(x)).max())):
+            1.0, float(np.abs(e_rhs).max()), float((np.abs(e_mat) @ np.abs(x)).max())
+        ):
             # Column norms many decades apart lose the scaled null space in rounding, and
             # x = D x~ then misses the equalities. The decision above stands (unique minimiser);
             # solve it again in the caller's units, where the equalities hold by construction.
@@ -684,8 +733,7 @@ def _qp_core(a: Matrix, b: Floats, weights: Floats, ridge: float, eq_matrix: Mat
         x = qp.active_set(start)
     xs = _zs(x)
     residual, value = _objective(a, b, weights, ridge, xs)
-    out: dict[str, Any] = {"x": xs, "residual": _zs(residual), "objective": _z(value),
-                           "rank": rank}
+    out: dict[str, Any] = {"x": xs, "residual": _zs(residual), "objective": _z(value), "rank": rank}
     if costs is not None:
         cost = costs.cost(xs)
         out["risk"] = out["objective"]
@@ -696,17 +744,25 @@ def _qp_core(a: Matrix, b: Floats, weights: Floats, ridge: float, eq_matrix: Mat
     return out
 
 
-def _costed(costs: Costs, big_b: NDArray, d: NDArray, e_mat: NDArray, e_rhs: NDArray,
-            lo: Bounds, hi: Bounds, n: int) -> NDArray:
+def _costed(
+    costs: Costs,
+    big_b: NDArray,
+    d: NDArray,
+    e_mat: NDArray,
+    e_rhs: NDArray,
+    lo: Bounds,
+    hi: Bounds,
+    n: int,
+) -> NDArray:
     """The wave 4a solve: a feasible start of least margin, then the orthant search."""
     spread = costs.cost_weight * np.asarray(costs.half_spreads or [0.0] * n, dtype=float)
-    rates = (np.asarray(costs.margin_rates, dtype=float) if costs.margin_rates is not None
-             else None)
+    rates = np.asarray(costs.margin_rates, dtype=float) if costs.margin_rates is not None else None
     limit = costs.margin_limit if costs.margin_limit is not None else math.inf
     if rates is not None:
         start = _least_margin(e_mat, e_rhs, lo, hi, rates)
         if start is None or math.fsum(abs(float(m * v)) for m, v in zip(rates, start)) > (
-                limit * (1 + 1e-9) + 1e-12):
+            limit * (1 + 1e-9) + 1e-12
+        ):
             raise QfError("E_INFEASIBLE", "no position meets the constraints and the margin limit")
     elif e_mat.shape[0]:
         start = _phase_one(e_mat, e_rhs, lo, hi)
@@ -720,37 +776,52 @@ def _costed(costs: Costs, big_b: NDArray, d: NDArray, e_mat: NDArray, e_rhs: NDA
             start[j] = max(start[j], low)
         if high is not None:
             start[j] = min(start[j], high)
-    return _CostQp(big_b, d, e_mat, e_rhs, lo, hi, spread, rates,
-                   limit).solve(start)
+    return _CostQp(big_b, d, e_mat, e_rhs, lo, hi, spread, rates, limit).solve(start)
 
 
 class Costs:
     """The wave 4a optional inputs of `hedge.qp.solve` (rulings I-24 to I-27)."""
 
-    def __init__(self, half_spreads: Floats | None = None, impact: Floats | None = None,
-                 cost_weight: float | None = None, margin_rates: Floats | None = None,
-                 margin_limit: float | None = None):
+    def __init__(
+        self,
+        half_spreads: Floats | None = None,
+        impact: Floats | None = None,
+        cost_weight: float | None = None,
+        margin_rates: Floats | None = None,
+        margin_limit: float | None = None,
+    ):
         self.half_spreads, self.impact = half_spreads, impact
         self.cost_weight = 1.0 if cost_weight is None else cost_weight
         self.margin_rates, self.margin_limit = margin_rates, margin_limit
 
     def given(self) -> bool:
         """True when any wave 4a input is present (ruling I-27)."""
-        return any(v is not None for v in (self.half_spreads, self.impact, self.margin_rates,
-                                           self.margin_limit)) or self.cost_weight != 1.0
+        return (
+            any(
+                v is not None
+                for v in (self.half_spreads, self.impact, self.margin_rates, self.margin_limit)
+            )
+            or self.cost_weight != 1.0
+        )
 
     def check(self, n: int, singular: str) -> None:
         """Ruling I-25: lengths and the margin pair, MIN_NORM, then signs."""
-        for key, v in (("half_spreads", self.half_spreads), ("impact", self.impact),
-                       ("margin_rates", self.margin_rates)):
+        for key, v in (
+            ("half_spreads", self.half_spreads),
+            ("impact", self.impact),
+            ("margin_rates", self.margin_rates),
+        ):
             if v is not None and len(v) != n:
                 raise QfError("E_INPUT", f"{key} must have one entry per instrument", key)
         if (self.margin_rates is None) != (self.margin_limit is None):
             raise QfError("E_INPUT", "margin_rates and margin_limit go together", "margin_rates")
         if singular == "MIN_NORM":
             raise QfError("E_INPUT", "MIN_NORM takes no cost or margin input", "singular")
-        for key, v in (("half_spreads", self.half_spreads), ("impact", self.impact),
-                       ("margin_rates", self.margin_rates)):
+        for key, v in (
+            ("half_spreads", self.half_spreads),
+            ("impact", self.impact),
+            ("margin_rates", self.margin_rates),
+        ):
             if v is not None and any(e < 0 for e in v):
                 raise QfError("E_DOMAIN", f"{key} must not be negative", key)
         if self.cost_weight < 0:
@@ -770,13 +841,22 @@ class Costs:
         return math.fsum(h * abs(v) + i * v * v for h, i, v in zip(spreads, impact, x))
 
 
-def qp_solve(a: Matrix, b: Floats, weights: Floats, ridge: float = 0.0,
-             eq_matrix: Matrix | None = None, eq_rhs: Floats | None = None,
-             lower: Bounds | None = None, upper: Bounds | None = None,
-             singular: str = "ERROR", half_spreads: Floats | None = None,
-             impact: Floats | None = None, cost_weight: float | None = None,
-             margin_rates: Floats | None = None,
-             margin_limit: float | None = None) -> dict[str, Any]:
+def qp_solve(
+    a: Matrix,
+    b: Floats,
+    weights: Floats,
+    ridge: float = 0.0,
+    eq_matrix: Matrix | None = None,
+    eq_rhs: Floats | None = None,
+    lower: Bounds | None = None,
+    upper: Bounds | None = None,
+    singular: str = "ERROR",
+    half_spreads: Floats | None = None,
+    impact: Floats | None = None,
+    cost_weight: float | None = None,
+    margin_rates: Floats | None = None,
+    margin_limit: float | None = None,
+) -> dict[str, Any]:
     """`hedge.qp.solve`: minimise sum w_i (A x + b)_i^2 + ridge |x|^2 subject to E x = e and
     lower <= x <= upper (a None bound is absent). `singular` is "ERROR" or "MIN_NORM" (I-5).
 
@@ -792,13 +872,23 @@ def qp_solve(a: Matrix, b: Floats, weights: Floats, ridge: float = 0.0,
     return _qp_core(a, b, weights, ridge, eq_matrix, eq_rhs, lower, upper, singular, costs)
 
 
-def frontier_solve(a: Matrix, b: Floats, weights: Floats, cost_weights: Floats,
-                   ridge: float = 0.0, eq_matrix: Matrix | None = None,
-                   eq_rhs: Floats | None = None, lower: Bounds | None = None,
-                   upper: Bounds | None = None, singular: str = "ERROR",
-                   half_spreads: Floats | None = None, impact: Floats | None = None,
-                   margin_rates: Floats | None = None, margin_limit: float | None = None,
-                   cost_weight: float | None = None) -> dict[str, Any]:
+def frontier_solve(
+    a: Matrix,
+    b: Floats,
+    weights: Floats,
+    cost_weights: Floats,
+    ridge: float = 0.0,
+    eq_matrix: Matrix | None = None,
+    eq_rhs: Floats | None = None,
+    lower: Bounds | None = None,
+    upper: Bounds | None = None,
+    singular: str = "ERROR",
+    half_spreads: Floats | None = None,
+    impact: Floats | None = None,
+    margin_rates: Floats | None = None,
+    margin_limit: float | None = None,
+    cost_weight: float | None = None,
+) -> dict[str, Any]:
     """`hedge.frontier.solve`: the costed `hedge.qp.solve` once per cost weight, in order; the
     first error stops it. Returns {points: [{cost_weight, x, risk, cost}]}."""
     if cost_weight is not None:
@@ -811,8 +901,9 @@ def frontier_solve(a: Matrix, b: Floats, weights: Floats, cost_weights: Floats,
     for weight in cost_weights:
         costs = Costs(half_spreads, impact, weight, margin_rates, margin_limit)
         out = _qp_core(a, b, weights, ridge, eq_matrix, eq_rhs, lower, upper, singular, costs)
-        points.append({"cost_weight": _z(weight), "x": out["x"], "risk": out["risk"],
-                       "cost": out["cost"]})
+        points.append(
+            {"cost_weight": _z(weight), "x": out["x"], "risk": out["risk"], "cost": out["cost"]}
+        )
     return {"points": points}
 
 
@@ -821,8 +912,9 @@ def _round_half_away(v: float) -> int:
     return int(math.copysign(whole + (1 if abs(v) - whole >= 0.5 else 0), v))
 
 
-def _integer_search(r: NDArray, n0: NDArray, box: list[tuple[int | None, int | None]],
-                    incumbent: list[int]) -> list[list[int]]:
+def _integer_search(
+    r: NDArray, n0: NDArray, box: list[tuple[int | None, int | None]], incumbent: list[int]
+) -> list[list[int]]:
     """Every integer point of the box with |R (n - n0)|^2 at most the incumbent's distance (plus a
     relative slack), by Fincke-Pohst enumeration on the upper-triangular R [FP85]."""
     dim = len(n0)
@@ -871,9 +963,15 @@ def _integer_search(r: NDArray, n0: NDArray, box: list[tuple[int | None, int | N
     return [p for t, p in found if t <= bound()]
 
 
-def integer_solve(a: Matrix, b: Floats, weights: Floats, lot_sizes: Floats, ridge: float = 0.0,
-                  lower_lots: Sequence[int | None] | None = None,
-                  upper_lots: Sequence[int | None] | None = None) -> dict[str, Any]:
+def integer_solve(
+    a: Matrix,
+    b: Floats,
+    weights: Floats,
+    lot_sizes: Floats,
+    ridge: float = 0.0,
+    lower_lots: Sequence[int | None] | None = None,
+    upper_lots: Sequence[int | None] | None = None,
+) -> dict[str, Any]:
     """`hedge.integer.solve`: x_j = lot_sizes_j n_j with n integer, minimising the
     `hedge.qp.solve` objective within optional lot bounds. Ties follow ruling I-7.
 
@@ -898,11 +996,18 @@ def integer_solve(a: Matrix, b: Floats, weights: Floats, lot_sizes: Floats, ridg
     if int((s * s > THRESHOLD * s[0] ** 2).sum()) < n:
         raise QfError("E_SINGULAR", "the hedge in lot units has no unique solution", "a")
 
-    relaxed_out = _qp_core(a, b, weights, ridge, None, None,
-                           [None if v is None else v * lot_sizes[j] for j, v in enumerate(lo)],
-                           [None if v is None else v * lot_sizes[j] for j, v in enumerate(hi)],
-                           "ERROR")
-    if any(abs(v / s_j) > 2.0 ** 52 for v, s_j in zip(relaxed_out["x"], lot_sizes)):
+    relaxed_out = _qp_core(
+        a,
+        b,
+        weights,
+        ridge,
+        None,
+        None,
+        [None if v is None else v * lot_sizes[j] for j, v in enumerate(lo)],
+        [None if v is None else v * lot_sizes[j] for j, v in enumerate(hi)],
+        "ERROR",
+    )
+    if any(abs(v / s_j) > 2.0**52 for v, s_j in zip(relaxed_out["x"], lot_sizes)):
         raise QfError("E_LIMIT", "a lot count is beyond 2^52 (ruling I-49)", "lot_sizes")
     q, r = np.linalg.qr(lots_b)
     n0 = np.linalg.solve(r, -(q.T @ d))
@@ -942,9 +1047,14 @@ def integer_solve(a: Matrix, b: Floats, weights: Floats, lot_sizes: Floats, ridg
     x = [lot_sizes[j] * lots[j] for j in range(n)]
     residual, objective = _objective(a, b, weights, ridge, x)
     relaxed = relaxed_out["objective"]
-    return {"lots": [int(v) for v in lots], "x": _zs(x), "residual": _zs(residual),
-            "objective": _z(objective), "continuous_objective": _z(relaxed),
-            "rounding_cost": _z(objective - relaxed)}
+    return {
+        "lots": [int(v) for v in lots],
+        "x": _zs(x),
+        "residual": _zs(residual),
+        "objective": _z(objective),
+        "continuous_objective": _z(relaxed),
+        "rounding_cost": _z(objective - relaxed),
+    }
 
 
 def _symmetric(s: Matrix, key: str) -> None:
@@ -962,12 +1072,16 @@ def _sample_covariance(series: Sequence[Floats]) -> list[list[float]]:
     # fsum / count, whose rounding would leave a variance of order 1e-33 that passes check 3.
     means = [s[0] if all(v == s[0] for v in s) else math.fsum(s) / count for s in series]
     centred = [[v - mu for v in s] for s, mu in zip(series, means)]
-    return [[math.fsum(p * q for p, q in zip(u, w)) / (count - 1) for w in centred]
-            for u in centred]
+    return [
+        [math.fsum(p * q for p, q in zip(u, w)) / (count - 1) for w in centred] for u in centred
+    ]
 
 
-def minvar_ratio(covariance: Matrix | None = None, exposure_changes: Floats | None = None,
-                 hedge_changes: Matrix | None = None) -> dict[str, Any]:
+def minvar_ratio(
+    covariance: Matrix | None = None,
+    exposure_changes: Floats | None = None,
+    hedge_changes: Matrix | None = None,
+) -> dict[str, Any]:
     """`hedge.minvar.ratio`: units held of each hedge instrument, `-S_hh^{-1} S_he`, from a
     covariance (index 0 the position) or from series with divisor T - 1 (I-8).
 
@@ -977,8 +1091,9 @@ def minvar_ratio(covariance: Matrix | None = None, exposure_changes: Floats | No
         raise QfError("E_INPUT", "give either covariance or the two series", "covariance")
     if covariance is None:
         if exposure_changes is None or hedge_changes is None:
-            raise QfError("E_INPUT", "exposure_changes and hedge_changes go together",
-                          "hedge_changes")
+            raise QfError(
+                "E_INPUT", "exposure_changes and hedge_changes go together", "hedge_changes"
+            )
         k, count = len(hedge_changes), len(exposure_changes)
         if k < 1:
             raise QfError("E_INPUT", "at least one hedge series is needed", "hedge_changes")
@@ -1010,14 +1125,17 @@ def minvar_ratio(covariance: Matrix | None = None, exposure_changes: Floats | No
     for j in range(k):
         pivot = s_hh[j][j] * scale[j] ** 2 - math.fsum(low[j][p] ** 2 for p in range(j))
         if pivot <= -THRESHOLD:  # R6-11.7 as amended
-            raise QfError("E_NOT_POSITIVE_DEFINITE", "the hedge covariance is indefinite",
-                          "covariance")
+            raise QfError(
+                "E_NOT_POSITIVE_DEFINITE", "the hedge covariance is indefinite", "covariance"
+            )
         if abs(pivot) < THRESHOLD:
             raise QfError("E_SINGULAR", "the hedge instruments are dependent", "covariance")
         low[j][j] = math.sqrt(pivot)
         for i in range(j + 1, k):
-            low[i][j] = (s_hh[i][j] * scale[i] * scale[j]
-                         - math.fsum(low[i][p] * low[j][p] for p in range(j))) / low[j][j]
+            low[i][j] = (
+                s_hh[i][j] * scale[i] * scale[j]
+                - math.fsum(low[i][p] * low[j][p] for p in range(j))
+            ) / low[j][j]
     fwd = [0.0] * k
     for i in range(k):
         fwd[i] = (-s_he[i] * scale[i] - math.fsum(low[i][p] * fwd[p] for p in range(i))) / low[i][i]
@@ -1030,15 +1148,26 @@ def minvar_ratio(covariance: Matrix | None = None, exposure_changes: Floats | No
     if after < -THRESHOLD * before:
         raise QfError("E_NOT_POSITIVE_DEFINITE", "the hedged variance is negative", "covariance")
     after = max(after, 0.0)  # ruling I-44: rounding of a perfect hedge
-    return {"hedge": _zs(hedge), "variance_before": _z(before), "variance_after": _z(after),
-            "effectiveness": _z(1 - after / before)}
+    return {
+        "hedge": _zs(hedge),
+        "variance_before": _z(before),
+        "variance_after": _z(after),
+        "effectiveness": _z(1 - after / before),
+    }
 
 
 GREEKS = ("DELTA", "GAMMA", "VEGA")
 
 
-def _unit_greeks(spot: float, rate: float, dividend: float, vol: float, kind: str,
-                 strike: float | None, expiry: float | None) -> tuple[float, float, float]:
+def _unit_greeks(
+    spot: float,
+    rate: float,
+    dividend: float,
+    vol: float,
+    kind: str,
+    strike: float | None,
+    expiry: float | None,
+) -> tuple[float, float, float]:
     """(delta, gamma, vega) of one unit under Black-Scholes-Merton; vega per unit volatility."""
     if kind == "UNDERLYING" or strike is None or expiry is None:
         return 1.0, 0.0, 0.0
@@ -1056,10 +1185,16 @@ def _unit_greeks(spot: float, rate: float, dividend: float, vol: float, kind: st
 Instrument = tuple[str, float | None, float | None]  # (kind, strike, expiry_years)
 
 
-def greeks_neutralise(spot: float, rate: float, dividend_yield: float, volatility: float,
-                      portfolio: Sequence[tuple[str, float | None, float | None, float | None]],
-                      hedges: Sequence[Instrument], targets: Sequence[str],
-                      unexpected: Sequence[str] = ()) -> dict[str, Any]:
+def greeks_neutralise(
+    spot: float,
+    rate: float,
+    dividend_yield: float,
+    volatility: float,
+    portfolio: Sequence[tuple[str, float | None, float | None, float | None]],
+    hedges: Sequence[Instrument],
+    targets: Sequence[str],
+    unexpected: Sequence[str] = (),
+) -> dict[str, Any]:
     """`hedge.greeks.neutralise`: quantities of the hedges that set the targeted Greeks of the
     book to zero (I-9). Positions are (kind, strike, expiry_years, quantity). `unexpected`
     names keys outside an instrument's fixed set; those, and a missing portfolio `quantity`, are
@@ -1067,11 +1202,11 @@ def greeks_neutralise(spot: float, rate: float, dividend_yield: float, volatilit
 
     Returns {quantities, greeks_before, greeks_after}."""
     if unexpected:
-        raise QfError("E_INPUT", f"{unexpected[0]} is not a key of a Greek instrument (I-41)",
-                      unexpected[0])
+        raise QfError(
+            "E_INPUT", f"{unexpected[0]} is not a key of a Greek instrument (I-41)", unexpected[0]
+        )
     if any(q is None for *_, q in portfolio):
-        raise QfError("E_INPUT", "a portfolio position needs a quantity (ruling I-41)",
-                      "quantity")
+        raise QfError("E_INPUT", "a portfolio position needs a quantity (ruling I-41)", "quantity")
     every: list[Instrument] = [(kind, k, t) for kind, k, t, _ in portfolio] + list(hedges)
     for kind, strike, expiry in every:
         if kind == "UNDERLYING" and (strike is not None or expiry is not None):
@@ -1106,19 +1241,31 @@ def greeks_neutralise(spot: float, rate: float, dividend_yield: float, volatilit
     if s[-1] <= THRESHOLD * s[0]:
         raise QfError("E_SINGULAR", "the hedges cannot set the targets independently", "hedges")
     quantities = np.linalg.solve(g, -np.array([before[c] for c in rows]))
-    after = [math.fsum([before[c], *(float(quantities[j]) * per_hedge[j][c]
-                                     for j in range(len(hedges)))]) for c in range(3)]
+    after = [
+        math.fsum(
+            [before[c], *(float(quantities[j]) * per_hedge[j][c] for j in range(len(hedges)))]
+        )
+        for c in range(3)
+    ]
 
     def named(v: Sequence[float]) -> dict[str, float]:
         return {"delta": _z(v[0]), "gamma": _z(v[1]), "vega": _z(v[2])}
 
-    return {"quantities": _zs(quantities), "greeks_before": named(before),
-            "greeks_after": named(after)}
+    return {
+        "quantities": _zs(quantities),
+        "greeks_before": named(before),
+        "greeks_after": named(after),
+    }
 
 
-def beta_futures(portfolio_value: float, portfolio_beta: float, target_beta: float,
-                 futures_price: float, multiplier: float,
-                 rounding: str = "NEAREST") -> dict[str, float]:
+def beta_futures(
+    portfolio_value: float,
+    portfolio_beta: float,
+    target_beta: float,
+    futures_price: float,
+    multiplier: float,
+    rounding: str = "NEAREST",
+) -> dict[str, float]:
     """`hedge.beta.futures`: futures contracts that move the portfolio beta to the target
     [H18 ch. 3]; positive is long. NEAREST rounds half away from zero (I-10)."""
     if portfolio_value <= 0:
@@ -1149,8 +1296,9 @@ def residual_report(a: Matrix, b: Floats, x: Floats, covariance: Matrix) -> dict
     _symmetric(covariance, "covariance")
     eig = np.linalg.eigvalsh(np.asarray(covariance, dtype=float))
     if eig[0] < -THRESHOLD * float(np.abs(eig).max()):
-        raise QfError("E_NOT_POSITIVE_DEFINITE", "the covariance has a negative eigenvalue",
-                      "covariance")
+        raise QfError(
+            "E_NOT_POSITIVE_DEFINITE", "the covariance has a negative eigenvalue", "covariance"
+        )
 
     def quad(v: Floats) -> tuple[list[float], float]:
         sv = [math.fsum(row[j] * v[j] for j in range(m)) for row in covariance]
@@ -1161,15 +1309,26 @@ def residual_report(a: Matrix, b: Floats, x: Floats, covariance: Matrix) -> dict
         raise QfError("E_DOMAIN", "nothing to hedge: b^T S b is not positive", "b")
     residual = [math.fsum([*(row[j] * x[j] for j in range(n)), v]) for row, v in zip(a, b)]
     s_r, after = quad(residual)
-    return {"residual": _zs(residual), "variance_before": _z(before),
-            "variance_after": _z(after), "volatility_after": math.sqrt(max(after, 0.0)),
-            "effectiveness": _z(1 - after / before),
-            "contributions": _zs(r * v for r, v in zip(residual, s_r))}
+    return {
+        "residual": _zs(residual),
+        "variance_before": _z(before),
+        "variance_after": _z(after),
+        "volatility_after": math.sqrt(max(after, 0.0)),
+        "effectiveness": _z(1 - after / before),
+        "contributions": _zs(r * v for r, v in zip(residual, s_r)),
+    }
 
 
-def select_solve(a: Matrix, b: Floats, weights: Floats, max_instruments: int,
-                 ridge: float = 0.0, lower: Bounds | None = None, upper: Bounds | None = None,
-                 extra_inputs: Sequence[str] = ()) -> dict[str, Any]:
+def select_solve(
+    a: Matrix,
+    b: Floats,
+    weights: Floats,
+    max_instruments: int,
+    ridge: float = 0.0,
+    lower: Bounds | None = None,
+    upper: Bounds | None = None,
+    extra_inputs: Sequence[str] = (),
+) -> dict[str, Any]:
     """`hedge.select.solve`: the subset of at most `max_instruments` hedge instruments with the
     least `hedge.qp.solve` objective, the others held at 0 (rulings I-33, I-34). Every subset is
     solved; ties within 1e-12 relative go to the smaller subset, then the lexicographically
@@ -1188,8 +1347,9 @@ def select_solve(a: Matrix, b: Floats, weights: Floats, max_instruments: int,
     if not 1 <= max_instruments <= n:
         raise QfError("E_INPUT", "max_instruments must be between 1 and n", "max_instruments")
     if extra_inputs:
-        raise QfError("E_INPUT", f"selection takes no {extra_inputs[0]} (ruling I-33)",
-                      extra_inputs[0])
+        raise QfError(
+            "E_INPUT", f"selection takes no {extra_inputs[0]} (ruling I-33)", extra_inputs[0]
+        )
     if any((p is not None and p > 0) or (q is not None and q < 0) for p, q in zip(lo, hi)):
         raise QfError("E_DOMAIN", "every bound must admit 0 (ruling I-33)", "lower")
     big_b, _ = _root_form(a, b, weights, ridge)
@@ -1201,8 +1361,17 @@ def select_solve(a: Matrix, b: Floats, weights: Floats, max_instruments: int,
     for size in range(1, max_instruments + 1):
         for subset in itertools.combinations(range(n), size):
             cols = [[row[j] for j in subset] for row in a]
-            out = _qp_core(cols, b, weights, ridge, None, None, [lo[j] for j in subset],
-                           [hi[j] for j in subset], "ERROR")
+            out = _qp_core(
+                cols,
+                b,
+                weights,
+                ridge,
+                None,
+                None,
+                [lo[j] for j in subset],
+                [hi[j] for j in subset],
+                "ERROR",
+            )
             scored.append((out["objective"], subset, out["x"]))
     best = min(v for v, _, _ in scored)
     tied = [t for t in scored if t[0] - best <= THRESHOLD * abs(best)]
@@ -1211,29 +1380,35 @@ def select_solve(a: Matrix, b: Floats, weights: Floats, max_instruments: int,
     for j, v in zip(chosen, part):
         x[j] = v
     residual, objective = _objective(a, b, weights, ridge, x)
-    return {"selected": list(chosen), "x": x, "residual": _zs(residual),
-            "objective": _z(objective)}
+    return {"selected": list(chosen), "x": x, "residual": _zs(residual), "objective": _z(objective)}
 
 
-def option_hedge_lots(spot: float, rate: float, dividend_yield: float, volatility: float,
-                      portfolio: Sequence[tuple[str, float | None, float | None, float | None]],
-                      hedges: Sequence[tuple[str, float | None, float | None, float, float]],
-                      targets: Sequence[str], max_lots: int,
-                      unexpected: Sequence[str] = ()) -> dict[str, Any]:
+def option_hedge_lots(
+    spot: float,
+    rate: float,
+    dividend_yield: float,
+    volatility: float,
+    portfolio: Sequence[tuple[str, float | None, float | None, float | None]],
+    hedges: Sequence[tuple[str, float | None, float | None, float, float]],
+    targets: Sequence[str],
+    max_lots: int,
+    unexpected: Sequence[str] = (),
+) -> dict[str, Any]:
     """`usecase.option_hedge_lots` (use case 6, ruling R6-11.20): the book's Greeks hedged in
     whole lots by `hedge.integer.solve` with weights `1 / max(1, |b_t|)^2`."""
     if unexpected:
-        raise QfError("E_INPUT", f"{unexpected[0]} is not a key of a Greek instrument (I-41)",
-                      unexpected[0])
+        raise QfError(
+            "E_INPUT", f"{unexpected[0]} is not a key of a Greek instrument (I-41)", unexpected[0]
+        )
     if not hedges:
         raise QfError("E_INPUT", "no hedge instruments", "hedges")
     if not targets or len(set(targets)) != len(targets):
         raise QfError("E_INPUT", "targets must be a non-empty set", "targets")
     if any(q is None for *_, q in portfolio):
-        raise QfError("E_INPUT", "a portfolio position needs a quantity (ruling I-41)",
-                      "quantity")
-    every: list[Instrument] = ([(kind, k, t) for kind, k, t, _ in portfolio]
-                               + [(kind, k, t) for kind, k, t, _, _ in hedges])
+        raise QfError("E_INPUT", "a portfolio position needs a quantity (ruling I-41)", "quantity")
+    every: list[Instrument] = [(kind, k, t) for kind, k, t, _ in portfolio] + [
+        (kind, k, t) for kind, k, t, _, _ in hedges
+    ]
     for kind, strike, expiry in every:
         if kind == "UNDERLYING" and (strike is not None or expiry is not None):
             raise QfError("E_INPUT", "the underlying has no strike or expiry", "portfolio")
@@ -1259,25 +1434,35 @@ def option_hedge_lots(spot: float, rate: float, dividend_yield: float, volatilit
     def greeks(kind: str, strike: float | None, expiry: float | None) -> tuple[float, ...]:
         return _unit_greeks(spot, rate, dividend_yield, volatility, kind, strike, expiry)
 
-    before = [math.fsum((q or 0.0) * greeks(kind, k, t)[c] for kind, k, t, q in portfolio)
-              for c in range(3)]
+    before = [
+        math.fsum((q or 0.0) * greeks(kind, k, t)[c] for kind, k, t, q in portfolio)
+        for c in range(3)
+    ]
     per_lot = [[h[3] * g for g in greeks(h[0], h[1], h[2])] for h in hedges]
     rows = [GREEKS.index(t) for t in targets]
     a = [[per_lot[j][c] for j in range(len(hedges))] for c in rows]
     b = [before[c] for c in rows]
     weights = [1.0 / max(1.0, abs(v)) ** 2 for v in b]
-    solved = integer_solve(a, b, weights, [1.0] * len(hedges), 0.0,
-                           [-max_lots] * len(hedges), [max_lots] * len(hedges))
+    solved = integer_solve(
+        a, b, weights, [1.0] * len(hedges), 0.0, [-max_lots] * len(hedges), [max_lots] * len(hedges)
+    )
     lots = solved["lots"]
-    after = [math.fsum([before[c], *(lots[j] * per_lot[j][c] for j in range(len(hedges)))])
-             for c in range(3)]
+    after = [
+        math.fsum([before[c], *(lots[j] * per_lot[j][c] for j in range(len(hedges)))])
+        for c in range(3)
+    ]
     cost = math.fsum(abs(lots[j]) * h[3] * h[4] for j, h in enumerate(hedges))
 
     def named(v: Sequence[float]) -> dict[str, float]:
         return {"delta": _z(v[0]), "gamma": _z(v[1]), "vega": _z(v[2])}
 
-    return {"greeks_before": named(before), "lots": lots, "greeks_after": named(after),
-            "hedge_cost": _z(cost), "rounding_cost": solved["rounding_cost"]}
+    return {
+        "greeks_before": named(before),
+        "lots": lots,
+        "greeks_after": named(after),
+        "hedge_cost": _z(cost),
+        "rounding_cost": solved["rounding_cost"],
+    }
 
 
 guard(globals())

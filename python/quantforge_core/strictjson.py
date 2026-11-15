@@ -1,4 +1,5 @@
 """JSON reading with the contract's rules: no NaN, no duplicate keys, overflow reported."""
+
 import json
 import math
 import re

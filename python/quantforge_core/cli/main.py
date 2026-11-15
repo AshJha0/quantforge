@@ -1,4 +1,5 @@
 """Commands, envelope handling and exit codes (specifications/cli-contract.md)."""
+
 import json
 import math
 import re
@@ -24,7 +25,10 @@ def _error(case_id: str, code: str, message: str, field: str | None = None) -> d
     if field is not None:
         error["field"] = field
     return {
-        "schema_version": SCHEMA_VERSION, "case_id": case_id, "status": "error", "error": error,
+        "schema_version": SCHEMA_VERSION,
+        "case_id": case_id,
+        "status": "error",
+        "error": error,
         "diagnostics": {},
     }
 
@@ -74,7 +78,9 @@ def run_case(text: str) -> dict[str, Any]:
         from .operations import OPERATIONS, execute  # lazy: `version` needs none of it
 
         if document["operation"] not in OPERATIONS:
-            raise QfError("E_UNSUPPORTED_OPERATION", f"{document['operation']} is not in this build")
+            raise QfError(
+                "E_UNSUPPORTED_OPERATION", f"{document['operation']} is not in this build"
+            )
         result = execute(document["operation"], document["inputs"])
     except QfError as e:
         return _error(case_id, e.code, e.message, e.field)
@@ -85,8 +91,11 @@ def run_case(text: str) -> dict[str, Any]:
     if not _all_finite(outputs):
         return _error(case_id, "E_NON_FINITE", "a result would not be finite")
     return {
-        "schema_version": SCHEMA_VERSION, "case_id": case_id, "status": "ok",
-        "outputs": outputs, "diagnostics": diagnostics,
+        "schema_version": SCHEMA_VERSION,
+        "case_id": case_id,
+        "status": "ok",
+        "outputs": outputs,
+        "diagnostics": diagnostics,
     }
 
 
@@ -177,7 +186,10 @@ def main() -> int:
         args = ["batch", *args[1:]]
     timings = len(args) == 2 and args[0] in _TIMED and args[1] == "--timings"
     if not timings and (len(args) != 1 or args[0] not in COMMANDS):
-        print("usage: quantforge run|batch|--batch [--timings] | version | operations", file=sys.stderr)
+        print(
+            "usage: quantforge run|batch|--batch [--timings] | version | operations",
+            file=sys.stderr,
+        )
         return 64
     try:
         if timings:

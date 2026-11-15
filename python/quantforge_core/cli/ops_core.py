@@ -1,4 +1,5 @@
 """Handlers for the core verbs: dates, calendars, compounding, RNG, roots, integration, interpolation, linear algebra, statistics, time series, PDE, Monte Carlo, COS, data checks, the store, time zones, units and conventions."""
+
 from collections.abc import Callable
 from datetime import date
 from typing import Any
@@ -102,7 +103,11 @@ def _year_fraction(i: Inputs) -> Result:
 
 @op("core.calendar.is_business_day")
 def _is_business_day(i: Inputs) -> Result:
-    return {"is_business_day": calendars.is_business_day(i.enum("calendar", calendars.CALENDARS), i.date("date"))}
+    return {
+        "is_business_day": calendars.is_business_day(
+            i.enum("calendar", calendars.CALENDARS), i.date("date")
+        )
+    }
 
 
 @op("core.calendar.holidays")
@@ -113,34 +118,47 @@ def _holidays(i: Inputs) -> Result:
 
 @op("core.calendar.adjust")
 def _adjust(i: Inputs) -> Result:
-    d = calendars.adjust(i.enum("calendar", calendars.CALENDARS), i.date("date"), i.enum("convention", calendars.CONVENTIONS))
+    d = calendars.adjust(
+        i.enum("calendar", calendars.CALENDARS),
+        i.date("date"),
+        i.enum("convention", calendars.CONVENTIONS),
+    )
     return {"date": _iso(d)}
 
 
 @op("core.calendar.add_business_days")
 def _add_business_days(i: Inputs) -> Result:
-    d = calendars.add_business_days(i.enum("calendar", calendars.CALENDARS), i.date("date"), i.integer("days"))
+    d = calendars.add_business_days(
+        i.enum("calendar", calendars.CALENDARS), i.date("date"), i.integer("days")
+    )
     return {"date": _iso(d)}
 
 
 @op("core.calendar.business_days_between")
 def _business_days_between(i: Inputs) -> Result:
-    n = calendars.business_days_between(i.enum("calendar", calendars.CALENDARS), i.date("start"), i.date("end"))
+    n = calendars.business_days_between(
+        i.enum("calendar", calendars.CALENDARS), i.date("start"), i.date("end")
+    )
     return {"count": n}
 
 
 @op("core.calendar.add_tenor")
 def _add_tenor(i: Inputs) -> Result:
     d = calendars.add_tenor(
-        i.enum("calendar", calendars.CALENDARS), i.date("date"), _tenor(i),
-        i.enum("convention", calendars.CONVENTIONS), i.boolean("end_of_month"),
+        i.enum("calendar", calendars.CALENDARS),
+        i.date("date"),
+        _tenor(i),
+        i.enum("convention", calendars.CONVENTIONS),
+        i.boolean("end_of_month"),
     )
     return {"date": _iso(d)}
 
 
 def _compounding(i: Inputs) -> compounding_module.Compounding:
     kind = i.string("compounding")
-    c = compounding_module.Compounding(kind, i.opt_integer("frequency") if kind == "PERIODIC" else None)
+    c = compounding_module.Compounding(
+        kind, i.opt_integer("frequency") if kind == "PERIODIC" else None
+    )
     c.validate()
     return c
 
@@ -217,7 +235,9 @@ def _sobol_points(i: Inputs) -> Result:
 
 def _root_result(r: roots_module.RootResult) -> Result:
     diagnostics = {
-        "iterations": r.iterations, "residual": r.residual, "termination": r.termination,
+        "iterations": r.iterations,
+        "residual": r.residual,
+        "termination": r.termination,
     }
     return {"root": r.root}, diagnostics
 
@@ -356,8 +376,11 @@ def _covariance(i: Inputs) -> Result:
 def _ols(i: Inputs) -> Result:
     fit = stats.ols(i.reals("x"), i.reals("y"))
     return {
-        "alpha": fit.alpha, "beta": fit.beta, "r_squared": fit.r_squared,
-        "se_alpha": fit.se_alpha, "se_beta": fit.se_beta,
+        "alpha": fit.alpha,
+        "beta": fit.beta,
+        "r_squared": fit.r_squared,
+        "se_alpha": fit.se_alpha,
+        "se_beta": fit.se_beta,
     }
 
 
@@ -411,9 +434,17 @@ def _forward_fill(i: Inputs) -> Result:
 @op("core.pde.bs_european")
 def _pde(i: Inputs) -> Result:
     r = pde.bs_european(
-        i.enum("option", OPTIONS), i.real("spot"), i.real("strike"), i.real("r"), i.real("q"),
-        i.real("sigma"), i.real("t"), i.integer("space_steps"), i.integer("time_steps"),
-        i.opt_real("width", 6.0), i.opt_integer("rannacher_steps", 2),
+        i.enum("option", OPTIONS),
+        i.real("spot"),
+        i.real("strike"),
+        i.real("r"),
+        i.real("q"),
+        i.real("sigma"),
+        i.real("t"),
+        i.integer("space_steps"),
+        i.integer("time_steps"),
+        i.opt_real("width", 6.0),
+        i.opt_integer("rannacher_steps", 2),
     )
     return {"price": r.price, "delta": r.delta, "gamma": r.gamma}, {"grid_h": r.grid_h}
 
@@ -425,8 +456,17 @@ def _monte_carlo(i: Inputs) -> Result:
     if not 0 <= stream <= 1023:
         raise QfError("E_SCHEMA", "stream must be 0 to 1023", "stream")
     price, stderr = monte_carlo.gbm_european(
-        option, i.real("spot"), i.real("strike"), i.real("r"), i.real("q"), i.real("sigma"),
-        i.real("t"), i.integer("paths"), i.opt_integer("steps", 1), i.u64("seed"), stream,
+        option,
+        i.real("spot"),
+        i.real("strike"),
+        i.real("r"),
+        i.real("q"),
+        i.real("sigma"),
+        i.real("t"),
+        i.integer("paths"),
+        i.opt_integer("steps", 1),
+        i.u64("seed"),
+        stream,
         i.enum("method", monte_carlo.METHODS),
     )
     return {"price": price, "stderr": stderr}
@@ -436,14 +476,23 @@ def _cos_model(m: Inputs) -> cos_module.BlackScholes | cos_module.Heston:
     name = m.enum("name", ("BLACK_SCHOLES", "HESTON"))
     if name == "BLACK_SCHOLES":
         return cos_module.BlackScholes(m.real("sigma"))
-    return cos_module.Heston(m.real("v0"), m.real("kappa"), m.real("theta"), m.real("sigma"), m.real("rho"))
+    return cos_module.Heston(
+        m.real("v0"), m.real("kappa"), m.real("theta"), m.real("sigma"), m.real("rho")
+    )
 
 
 @op("core.cos.european")
 def _cos(i: Inputs) -> Result:
     price, a, b = cos.european(
-        i.enum("option", OPTIONS), i.real("spot"), i.real("strike"), i.real("r"), i.real("q"),
-        i.real("t"), _cos_model(i.object("model")), i.integer("terms"), i.real("truncation"),
+        i.enum("option", OPTIONS),
+        i.real("spot"),
+        i.real("strike"),
+        i.real("r"),
+        i.real("q"),
+        i.real("t"),
+        _cos_model(i.object("model")),
+        i.integer("terms"),
+        i.real("truncation"),
     )
     return {"price": price}, {"a": a, "b": b}
 
@@ -456,8 +505,11 @@ def _quote(raw: Any) -> data_checks_module.Quote:
         if key not in raw:
             raise QfError("E_SCHEMA", f"a quote has no {key}", "quotes")
     return data_checks_module.Quote(
-        q.string("instrument_id"), parse_instant(raw.get("event_time"), "event_time"),
-        q.opt_real("bid"), q.opt_real("ask"), q.enum("quote_status", ("FIRM", "INDICATIVE")),
+        q.string("instrument_id"),
+        parse_instant(raw.get("event_time"), "event_time"),
+        q.opt_real("bid"),
+        q.opt_real("ask"),
+        q.enum("quote_status", ("FIRM", "INDICATIVE")),
     )
 
 
@@ -484,6 +536,7 @@ def _any_value(value: Any) -> Any:
     """Ruling F-38: an F-1 token at the top level of an any-JSON value is read as a Real (and
     refused by the finite rule); nested inside it, it stays a string."""
     from .inputs import TOKENS, real_value
+
     if isinstance(value, str) and value in TOKENS:
         return real_value(value, "records.value")
     return value
@@ -499,8 +552,13 @@ def _record(raw: Any) -> store_module.Record:
     if sequence < 1 or not series_id or has_lone_surrogate(raw):
         raise QfError("E_SCHEMA", "bad sequence, series_id or string in a record", "records")
     return store_module.Record(
-        sequence, series_id, r.instant("event_time"), r.instant("knowledge_time"),
-        _any_value(raw["value"]), r.opt_boolean("deleted", False), raw,
+        sequence,
+        series_id,
+        r.instant("event_time"),
+        r.instant("knowledge_time"),
+        _any_value(raw["value"]),
+        r.opt_boolean("deleted", False),
+        raw,
     )
 
 
@@ -555,12 +613,20 @@ def _chain(i: Inputs) -> Result:
 
 @op("core.time.utc_offset")
 def _utc_offset(i: Inputs) -> Result:
-    return {"offset_seconds": timezones.utc_offset(i.enum("zone", timezones.ZONES), i.instant("instant"))}
+    return {
+        "offset_seconds": timezones.utc_offset(
+            i.enum("zone", timezones.ZONES), i.instant("instant")
+        )
+    }
 
 
 @op("core.time.to_local")
 def _to_local(i: Inputs) -> Result:
-    return {"local": format_seconds(timezones.to_local(i.enum("zone", timezones.ZONES), i.instant("instant")))}
+    return {
+        "local": format_seconds(
+            timezones.to_local(i.enum("zone", timezones.ZONES), i.instant("instant"))
+        )
+    }
 
 
 def _overlap(i: Inputs) -> str | None:
@@ -576,7 +642,10 @@ def _to_instant(i: Inputs) -> Result:
 @op("core.time.business_date")
 def _business_date(i: Inputs) -> Result:
     d = timezones.business_date(
-        i.instant("instant"), i.enum("zone", timezones.ZONES), i.cutoff("cutoff"), i.enum("calendar", calendars.CALENDARS)
+        i.instant("instant"),
+        i.enum("zone", timezones.ZONES),
+        i.cutoff("cutoff"),
+        i.enum("calendar", calendars.CALENDARS),
     )
     return {"date": _iso(d)}
 
@@ -600,8 +669,9 @@ def _money(m: Inputs) -> tuple[str, str]:
 @op("core.units.convert")
 def convert(i: Inputs) -> Any:
     units = tuple(money.UNITS)
-    return {"value": core.money.convert(
-        i.real("value"), i.enum("from", units), i.enum("to", units))}
+    return {
+        "value": core.money.convert(i.real("value"), i.enum("from", units), i.enum("to", units))
+    }
 
 
 @op("core.units.add_money")

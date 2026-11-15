@@ -1,4 +1,5 @@
 """COS Fourier pricing (specifications/01-core/cos.md)."""
+
 import cmath
 import math
 from collections.abc import Callable
@@ -73,8 +74,15 @@ def _total_variance(model: BlackScholes | Heston, t: float) -> float:
 
 
 def european(
-    option: str, spot: float, strike: float, r: float, q: float, t: float,
-    model: BlackScholes | Heston, terms: int, truncation: float,
+    option: str,
+    spot: float,
+    strike: float,
+    r: float,
+    q: float,
+    t: float,
+    model: BlackScholes | Heston,
+    terms: int,
+    truncation: float,
 ) -> tuple[float, float, float]:
     """Returns (price, a, b)."""
     if spot <= 0 or strike <= 0 or t <= 0 or truncation <= 0:

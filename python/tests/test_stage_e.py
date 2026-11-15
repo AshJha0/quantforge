@@ -1,5 +1,6 @@
 """Stage E unit tests: E1 (arb-free surfaces, local and forward vol) and E7 (GARCH, variance swaps,
 VIX). Values come from the worked examples in the specs; the goldens run in test_conformance.py."""
+
 import json
 import math
 from datetime import date
@@ -14,8 +15,11 @@ from quantforge_core.errors import QfError
 from quantforge_core.smile import Svi
 
 SVI = Svi(0.02, 0.1, -0.4, 0.02, 0.2)
-SLICES = [arb_surface.Slice(0.25, SVI), arb_surface.Slice(1.0, Svi(0.035, 0.11, -0.35, 0.03, 0.25)),
-          arb_surface.Slice(2.0, Svi(0.06, 0.12, -0.3, 0.04, 0.3))]
+SLICES = [
+    arb_surface.Slice(0.25, SVI),
+    arb_surface.Slice(1.0, Svi(0.035, 0.11, -0.35, 0.03, 0.25)),
+    arb_surface.Slice(2.0, Svi(0.06, 0.12, -0.3, 0.04, 0.3)),
+]
 
 
 def code(f, *args, **kwargs):
@@ -25,11 +29,15 @@ def code(f, *args, **kwargs):
 
 
 def run(operation, inputs):
-    return run_case(json.dumps({"schema_version": "1.0", "case_id": "t", "operation": operation,
-                                "inputs": inputs}))
+    return run_case(
+        json.dumps(
+            {"schema_version": "1.0", "case_id": "t", "operation": operation, "inputs": inputs}
+        )
+    )
 
 
 # --- E7 GARCH ---
+
 
 def test_garch_worked_example() -> None:
     loglik, variances, nxt = vmod.garch_loglik([0.01, -0.02], 1e-5, 0.1, 0.8, "SAMPLE")
@@ -65,6 +73,7 @@ def test_garch_forecast() -> None:
 
 def _series(n, seed=3):
     import random
+
     rng = random.Random(seed)
     s2, out = 1e-4, []
     for _ in range(n):
@@ -86,12 +95,21 @@ def test_garch_fit_beats_neighbours() -> None:
 
 # --- E7 variance swaps ---
 
+
 def _fair(**over):
-    args: dict[str, Any] = {"as_of": date(2026, 11, 6), "maturity": date(2027, 11, 6), "spot": 100.0, "rate": 0.04,
-                "dividend_yield": 0.0, "put_strikes": [80.0, 90.0, 100.0],
-                "call_strikes": [100.0, 110.0, 120.0],
-                "vols": [(k, 0.2) for k in (80.0, 90.0, 100.0, 110.0, 120.0)], "extension_step": 10.0,
-                "variance_strike": 0.04, "variance_notional": 1e6}
+    args: dict[str, Any] = {
+        "as_of": date(2026, 11, 6),
+        "maturity": date(2027, 11, 6),
+        "spot": 100.0,
+        "rate": 0.04,
+        "dividend_yield": 0.0,
+        "put_strikes": [80.0, 90.0, 100.0],
+        "call_strikes": [100.0, 110.0, 120.0],
+        "vols": [(k, 0.2) for k in (80.0, 90.0, 100.0, 110.0, 120.0)],
+        "extension_step": 10.0,
+        "variance_strike": 0.04,
+        "variance_notional": 1e6,
+    }
     args.update(over)
     return vmod.varswap_fair_strike(**args)
 
@@ -119,8 +137,9 @@ def test_varswap_fair_strike_and_errors() -> None:
 
 
 def test_varswap_realized_worked_example() -> None:
-    variance, _vol, payoff = vmod.varswap_realized([100, 101, 99.5, 100.25, 102, 101.5], 252,
-                                                    0.04, 1e6)
+    variance, _vol, payoff = vmod.varswap_realized(
+        [100, 101, 99.5, 100.25, 102, 101.5], 252, 0.04, 1e6
+    )
     assert variance == pytest.approx(0.035427394095297673, rel=1e-12)
     assert payoff == pytest.approx(-4572.605904702326, rel=1e-10)
     assert code(vmod.varswap_realized, [100.0], 252, 0.04, 1e6) == "E_INPUT"
@@ -129,9 +148,13 @@ def test_varswap_realized_worked_example() -> None:
 
 # --- E7 VIX ---
 
-STRIP = [vmod.Quote(90, 10.5, 11.5, 0.5, 0.7), vmod.Quote(95, 6.0, 6.6, 1.4, 1.6),
-         vmod.Quote(100, 2.9, 3.1, 2.9, 3.3), vmod.Quote(105, 1.0, 1.2, 5.8, 6.6),
-         vmod.Quote(110, 0.3, 0.5, 10.0, 11.0)]
+STRIP = [
+    vmod.Quote(90, 10.5, 11.5, 0.5, 0.7),
+    vmod.Quote(95, 6.0, 6.6, 1.4, 1.6),
+    vmod.Quote(100, 2.9, 3.1, 2.9, 3.3),
+    vmod.Quote(105, 1.0, 1.2, 5.8, 6.6),
+    vmod.Quote(110, 0.3, 0.5, 10.0, 11.0),
+]
 
 
 def test_vix_worked_example() -> None:
@@ -142,9 +165,16 @@ def test_vix_worked_example() -> None:
 
 
 def test_vix_zero_bids_skip_and_stop() -> None:
-    strip = [vmod.Quote(k, max(100 - k, 0) + 1, max(100 - k, 0) + 1.2, 0.0 if k in (80, 70) else
-                          max(k - 100, 0) + 1, max(k - 100, 0) + 1.2)
-             for k in (60, 70, 80, 90, 100, 110, 120)]
+    strip = [
+        vmod.Quote(
+            k,
+            max(100 - k, 0) + 1,
+            max(100 - k, 0) + 1.2,
+            0.0 if k in (80, 70) else max(k - 100, 0) + 1,
+            max(k - 100, 0) + 1.2,
+        )
+        for k in (60, 70, 80, 90, 100, 110, 120)
+    ]
     used = vmod.vix_term_variance(43200, 0.01, strip)[3]
     assert used == [90, 100, 110, 120]
     strip[3] = vmod.Quote(90, 11, 11.2, 0.0, 0.2)  # 90 zero too: second zero at 80 stops
@@ -171,22 +201,29 @@ def test_vix_index() -> None:
 
 # --- E1 surfaces ---
 
+
 def test_surface_check_clean_and_flags() -> None:
     ks = [-0.6, -0.2, 0.0, 0.2, 0.6]
     assert arb_surface.surface_check(SLICES, ks, True)["arbitrage_free"] is True
     vogt = Svi(-0.0410, 0.1331, 0.3060, 0.3586, 0.4153)
-    report: dict[str, Any] = arb_surface.surface_check([arb_surface.Slice(1.0, vogt)], [-0.2, 0.0, 0.4, 0.8, 0.9], False)
+    report: dict[str, Any] = arb_surface.surface_check(
+        [arb_surface.Slice(1.0, vogt)], [-0.2, 0.0, 0.4, 0.8, 0.9], False
+    )
     assert report["butterfly_violations"]
-    assert code(arb_surface.surface_check, [arb_surface.Slice(1.0, vogt)], [0.0, 0.8], True) \
+    assert (
+        code(arb_surface.surface_check, [arb_surface.Slice(1.0, vogt)], [0.0, 0.8], True)
         == "E_ARBITRAGE"
+    )
     steep = [arb_surface.Slice(1.0, Svi(0.04, 2.5, 0.0, 0.0, 0.1))]
     wings: Any = arb_surface.surface_check(steep, [0.0], False)["wing_violations"]
     assert [w["kind"] for w in wings] == ["LEE", "LEE"]
     low = [SLICES[1], arb_surface.Slice(2.0, Svi(0.01, 0.05, -0.35, 0.03, 0.25))]
     report2: dict[str, Any] = arb_surface.surface_check(low, [0.0], False)
     assert report2["calendar_violations"] and len(report2["wing_violations"]) == 2
-    tie = [arb_surface.Slice(1.0, Svi(0.04, 0.5, 0.0, 0.0, 0.25)),
-           arb_surface.Slice(2.0, Svi(0.0390625, 0.5, 0.0, 0.0, 0.5))]
+    tie = [
+        arb_surface.Slice(1.0, Svi(0.04, 0.5, 0.0, 0.0, 0.25)),
+        arb_surface.Slice(2.0, Svi(0.0390625, 0.5, 0.0, 0.0, 0.5)),
+    ]
     tie_report: dict[str, Any] = arb_surface.surface_check(tie, [5.0], False)
     sides = [w["side"] for w in tie_report["wing_violations"]]
     assert sides == ["LEFT", "RIGHT"]
@@ -197,7 +234,9 @@ def test_slices_and_grid_errors() -> None:
     assert code(f, [], [0.0], False) == "E_INPUT"
     assert code(f, SLICES[::-1], [0.0], False) == "E_INPUT"
     assert code(f, [arb_surface.Slice(0.0, SVI)], [0.0], False) == "E_DOMAIN"
-    assert code(f, [arb_surface.Slice(1.0, Svi(0.02, 0.1, 1.0, 0.0, 0.2))], [0.0], False) == "E_DOMAIN"
+    assert (
+        code(f, [arb_surface.Slice(1.0, Svi(0.02, 0.1, 1.0, 0.0, 0.2))], [0.0], False) == "E_DOMAIN"
+    )
     assert code(f, SLICES, [], False) == "E_INPUT"
     assert code(f, SLICES, [0.1, 0.0], False) == "E_INPUT"
 
@@ -224,6 +263,7 @@ def test_fit_surface_recovers_truth() -> None:
 
 
 # --- E1 local and forward vol ---
+
 
 def test_dupire_flat_vol_is_flat() -> None:
     flat = [arb_surface.Slice(1.0, Svi(0.04, 0.0, 0.0, 0.0, 0.1))]
@@ -253,18 +293,24 @@ def test_smile_dynamics_delta_matches_bump() -> None:
     for option in ("CALL", "PUT"):
         sticky = arb_surface.smile_dynamics(*args, "STICKY_DELTA", option)
         h = 1e-4
-        up = arb_surface.smile_dynamics(SVI, 0.5, 100.0 + h, 100.0, 0.03, 0.01, args[6],
-                                   "STICKY_DELTA", option)["prices_base"]
-        down = arb_surface.smile_dynamics(SVI, 0.5, 100.0 - h, 100.0, 0.03, 0.01, args[6],
-                                     "STICKY_DELTA", option)["prices_base"]
+        up = arb_surface.smile_dynamics(
+            SVI, 0.5, 100.0 + h, 100.0, 0.03, 0.01, args[6], "STICKY_DELTA", option
+        )["prices_base"]
+        down = arb_surface.smile_dynamics(
+            SVI, 0.5, 100.0 - h, 100.0, 0.03, 0.01, args[6], "STICKY_DELTA", option
+        )["prices_base"]
         bumps = [(u - d) / (2 * h) for u, d in zip(up, down, strict=True)]
         assert sticky["deltas"] == pytest.approx(bumps, rel=1e-6)
     still = arb_surface.smile_dynamics(*args, "STICKY_STRIKE", "CALL")
     assert still["vols_base"] == still["vols_shifted"]
     f = arb_surface.smile_dynamics
     assert code(f, SVI, 0.5, 100.0, 103.0, 0.0, 0.0, [], "STICKY_STRIKE", "CALL") == "E_INPUT"
-    for bad in ((0.0, 100.0, 103.0, [100.0]), (0.5, 0.0, 103.0, [100.0]),
-                (0.5, 100.0, 0.0, [100.0]), (0.5, 100.0, 103.0, [0.0])):
+    for bad in (
+        (0.0, 100.0, 103.0, [100.0]),
+        (0.5, 0.0, 103.0, [100.0]),
+        (0.5, 100.0, 0.0, [100.0]),
+        (0.5, 100.0, 103.0, [0.0]),
+    ):
         t, s, s1, ks = bad
         assert code(f, SVI, t, s, s1, 0.0, 0.0, ks, "STICKY_STRIKE", "CALL") == "E_DOMAIN"
 
@@ -280,73 +326,189 @@ def test_vol_of_vol() -> None:
 
 # --- CLI wiring, schema and limits ---
 
+
 def test_cli_schema_and_limits() -> None:
-    r = run("vol.garch.loglik", {"returns": [0.01, 0.02], "omega": 1e-5, "alpha": 0.1,
-                                 "beta": 0.8, "initial_variance": [1]})
+    r = run(
+        "vol.garch.loglik",
+        {
+            "returns": [0.01, 0.02],
+            "omega": 1e-5,
+            "alpha": 0.1,
+            "beta": 0.8,
+            "initial_variance": [1],
+        },
+    )
     assert r["error"]["code"] == "E_SCHEMA"
-    r = run("vol.varswap.realized", {"prices": [100.0] * 150, "periods_per_year": 252,
-                                     "variance_strike": 0.04, "variance_notional": 1.0})
+    r = run(
+        "vol.varswap.realized",
+        {
+            "prices": [100.0] * 150,
+            "periods_per_year": 252,
+            "variance_strike": 0.04,
+            "variance_notional": 1.0,
+        },
+    )
     assert r["status"] == "ok"  # stage E spec B arrays are not under the stage C cap of 100
     svi = {"a": 0.02, "b": 0.1, "rho": -0.4, "m": 0.02, "sigma": 0.2}
-    r = run("vol.svi.surface_check", {"slices": [{"expiry_years": 1.0, "svi": svi}],
-                                      "log_moneyness": [i / 1000 for i in range(500)],
-                                      "reject": False})
+    r = run(
+        "vol.svi.surface_check",
+        {
+            "slices": [{"expiry_years": 1.0, "svi": svi}],
+            "log_moneyness": [i / 1000 for i in range(500)],
+            "reject": False,
+        },
+    )
     assert r["status"] == "ok"
-    r = run("vol.svi.surface_check", {"slices": [{"expiry_years": 1.0, "svi": svi}],
-                                      "log_moneyness": [0.0] * 10_001, "reject": False})
+    r = run(
+        "vol.svi.surface_check",
+        {
+            "slices": [{"expiry_years": 1.0, "svi": svi}],
+            "log_moneyness": [0.0] * 10_001,
+            "reject": False,
+        },
+    )
     assert r["error"]["code"] == "E_LIMIT"
-    r = run("vol.local.dupire", {"slices": [{"expiry_years": 1.0 + i, "svi": svi}
-                                            for i in range(101)],
-                                 "points": [{"expiry_years": 1.0, "log_moneyness": 0.0}]})
+    r = run(
+        "vol.local.dupire",
+        {
+            "slices": [{"expiry_years": 1.0 + i, "svi": svi} for i in range(101)],
+            "points": [{"expiry_years": 1.0, "log_moneyness": 0.0}],
+        },
+    )
     assert r["error"]["code"] == "E_LIMIT"
 
 
-@pytest.mark.parametrize("operation,inputs,key", [
-    ("vol.ssvi.to_svi", {"rho": -0.7, "eta": 1.2, "gamma": 0.4, "theta": 0.04}, "svi"),
-    ("vol.forward.vol", {"expiry_years": [1.0, 2.0], "vols": [0.2, 0.21]}, "forward_vols"),
-    ("vol.volofvol.measure", {"vols": [0.2, 0.21, 0.2], "periods_per_year": 252,
-                              "method": "LOG"}, "vol_of_vol"),
-    ("vol.smile.dynamics", {"svi": {"a": 0.02, "b": 0.1, "rho": -0.4, "m": 0.02, "sigma": 0.2},
-                            "expiry_years": 0.5, "spot": 100.0, "spot_shifted": 103.0,
-                            "rate": 0.03, "dividend_yield": 0.01, "strikes": [100.0],
-                            "rule": "STICKY_DELTA", "option_type": "PUT"}, "deltas"),
-    ("vol.garch.forecast", {"omega": 1e-5, "alpha": 0.1, "beta": 0.8, "next_variance": 2e-4,
-                            "horizon": 3, "periods_per_year": 252}, "annualized_vol"),
-])
+@pytest.mark.parametrize(
+    "operation,inputs,key",
+    [
+        ("vol.ssvi.to_svi", {"rho": -0.7, "eta": 1.2, "gamma": 0.4, "theta": 0.04}, "svi"),
+        ("vol.forward.vol", {"expiry_years": [1.0, 2.0], "vols": [0.2, 0.21]}, "forward_vols"),
+        (
+            "vol.volofvol.measure",
+            {"vols": [0.2, 0.21, 0.2], "periods_per_year": 252, "method": "LOG"},
+            "vol_of_vol",
+        ),
+        (
+            "vol.smile.dynamics",
+            {
+                "svi": {"a": 0.02, "b": 0.1, "rho": -0.4, "m": 0.02, "sigma": 0.2},
+                "expiry_years": 0.5,
+                "spot": 100.0,
+                "spot_shifted": 103.0,
+                "rate": 0.03,
+                "dividend_yield": 0.01,
+                "strikes": [100.0],
+                "rule": "STICKY_DELTA",
+                "option_type": "PUT",
+            },
+            "deltas",
+        ),
+        (
+            "vol.garch.forecast",
+            {
+                "omega": 1e-5,
+                "alpha": 0.1,
+                "beta": 0.8,
+                "next_variance": 2e-4,
+                "horizon": 3,
+                "periods_per_year": 252,
+            },
+            "annualized_vol",
+        ),
+    ],
+)
 def test_cli_operations(operation, inputs, key) -> None:
     r = run(operation, inputs)
     assert r["status"] == "ok" and key in r["outputs"]
 
 
 _SVI_JSON = {"a": 0.02, "b": 0.1, "rho": -0.4, "m": 0.02, "sigma": 0.2}
-_STRIP_JSON = [dict(zip(("strike", "call_bid", "call_ask", "put_bid", "put_ask"),
-                        (q.strike, q.call_bid, q.call_ask, q.put_bid, q.put_ask))) for q in STRIP]
+_STRIP_JSON = [
+    dict(
+        zip(
+            ("strike", "call_bid", "call_ask", "put_bid", "put_ask"),
+            (q.strike, q.call_bid, q.call_ask, q.put_bid, q.put_ask),
+        )
+    )
+    for q in STRIP
+]
 
 
-@pytest.mark.parametrize("operation,inputs,key", [
-    ("vol.garch.loglik", {"returns": [0.01, -0.02], "omega": 1e-5, "alpha": 0.1, "beta": 0.8,
-                          "initial_variance": "SAMPLE"}, "loglik"),
-    ("vol.garch.fit", {"returns": _series(60), "initial_variance": 1e-4}, "loglik"),
-    ("vol.varswap.fair_strike", {"as_of": "2026-11-06", "maturity": "2027-11-06", "spot": 100.0,
-                                 "rate": 0.04, "dividend_yield": 0.01, "put_strikes": [90.0, 100.0],
-                                 "call_strikes": [100.0, 110.0],
-                                 "vols": [{"strike": k, "vol": 0.2} for k in (90.0, 100.0, 110.0)],
-                                 "extension_step": 10.0, "variance_strike": 0.04,
-                                 "variance_notional": 1e6}, "fair_vol"),
-    ("vol.varswap.realized", {"prices": [100.0, 101.0, 99.0], "periods_per_year": 252,
-                              "variance_strike": 0.04, "variance_notional": 1e6}, "payoff"),
-    ("vol.vix.term_variance", {"minutes_to_expiry": 43200, "rate": 0.0, "strip": _STRIP_JSON},
-     "strikes_used"),
-    ("vol.vix.index", {"near": {"minutes_to_expiry": 40000, "rate": 0.0, "strip": _STRIP_JSON},
-                       "next": {"minutes_to_expiry": 50000, "rate": 0.0, "strip": _STRIP_JSON}},
-     "index"),
-    ("vol.svi.fit_surface", {"expiry_years": [1.0], "log_moneyness": [-0.4, -0.2, 0.0, 0.2, 0.4],
-                             "total_variance": [[SVI.total_variance(k)
-                                                 for k in (-0.4, -0.2, 0.0, 0.2, 0.4)]],
-                             "reject": False}, "slices"),
-    ("vol.local.dupire", {"slices": [{"expiry_years": 1.0, "svi": _SVI_JSON}],
-                          "points": [{"expiry_years": 0.5, "log_moneyness": 0.0}]}, "local_vol"),
-])
+@pytest.mark.parametrize(
+    "operation,inputs,key",
+    [
+        (
+            "vol.garch.loglik",
+            {
+                "returns": [0.01, -0.02],
+                "omega": 1e-5,
+                "alpha": 0.1,
+                "beta": 0.8,
+                "initial_variance": "SAMPLE",
+            },
+            "loglik",
+        ),
+        ("vol.garch.fit", {"returns": _series(60), "initial_variance": 1e-4}, "loglik"),
+        (
+            "vol.varswap.fair_strike",
+            {
+                "as_of": "2026-11-06",
+                "maturity": "2027-11-06",
+                "spot": 100.0,
+                "rate": 0.04,
+                "dividend_yield": 0.01,
+                "put_strikes": [90.0, 100.0],
+                "call_strikes": [100.0, 110.0],
+                "vols": [{"strike": k, "vol": 0.2} for k in (90.0, 100.0, 110.0)],
+                "extension_step": 10.0,
+                "variance_strike": 0.04,
+                "variance_notional": 1e6,
+            },
+            "fair_vol",
+        ),
+        (
+            "vol.varswap.realized",
+            {
+                "prices": [100.0, 101.0, 99.0],
+                "periods_per_year": 252,
+                "variance_strike": 0.04,
+                "variance_notional": 1e6,
+            },
+            "payoff",
+        ),
+        (
+            "vol.vix.term_variance",
+            {"minutes_to_expiry": 43200, "rate": 0.0, "strip": _STRIP_JSON},
+            "strikes_used",
+        ),
+        (
+            "vol.vix.index",
+            {
+                "near": {"minutes_to_expiry": 40000, "rate": 0.0, "strip": _STRIP_JSON},
+                "next": {"minutes_to_expiry": 50000, "rate": 0.0, "strip": _STRIP_JSON},
+            },
+            "index",
+        ),
+        (
+            "vol.svi.fit_surface",
+            {
+                "expiry_years": [1.0],
+                "log_moneyness": [-0.4, -0.2, 0.0, 0.2, 0.4],
+                "total_variance": [[SVI.total_variance(k) for k in (-0.4, -0.2, 0.0, 0.2, 0.4)]],
+                "reject": False,
+            },
+            "slices",
+        ),
+        (
+            "vol.local.dupire",
+            {
+                "slices": [{"expiry_years": 1.0, "svi": _SVI_JSON}],
+                "points": [{"expiry_years": 0.5, "log_moneyness": 0.0}],
+            },
+            "local_vol",
+        ),
+    ],
+)
 def test_cli_more_operations(operation, inputs, key) -> None:
     r = run(operation, inputs)
     assert r["status"] == "ok" and key in r["outputs"], r

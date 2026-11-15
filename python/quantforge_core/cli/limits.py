@@ -1,4 +1,5 @@
 """Input limits (specifications/01-core/limits.md). Runs after every E_SCHEMA check has passed."""
+
 import math
 from collections.abc import Callable, Mapping
 from typing import Any
@@ -96,6 +97,7 @@ def _hedge(raw: Raw) -> None:
 
 def _rows_cols(key: str, rows: int, cols: int) -> Callable[[Raw], None]:
     """A matrix input of at most `rows` rows of at most `cols` entries."""
+
     def check(raw: Raw) -> None:
         value = raw.get(key)
         if isinstance(value, list):
@@ -147,7 +149,6 @@ def _baum_welch_sizes(raw: Raw) -> None:
                 k = max([k, *(len(r) for r in value if isinstance(r, list))])
     obs = raw.get("observations")
     if isinstance(obs, list) and len(obs) * k > 10_000_000:
-
         raise _over("observations", 10_000_000)
 
 
@@ -155,6 +156,7 @@ _RNG = _caps(count=MAX_ARRAY, skip=MAX_SKIP)
 _ROOT = _caps(max_iter=100_000)
 _POINTS = _caps(n=10_000_000)
 _LAGS = _caps(max_lag=1000)
+
 
 def _caps_list(key: str, limit: int) -> Callable[[Raw], None]:
     def check(raw: Raw) -> None:
@@ -203,15 +205,21 @@ def _slv_grid(raw: Raw) -> None:
 # Ruling I-4: factors 1,000, instruments 200, equality rows 200, integer instruments 12, series
 # 100,000 (the generic array cap), portfolio positions 1,000, Greek hedge instruments 3.
 _I_FACTORS, _I_INSTRUMENTS = 1000, 200
-_HEDGE_QP = _all(_rows_cols("a", _I_FACTORS, _I_INSTRUMENTS),
-                 _rows_cols("eq_matrix", _I_INSTRUMENTS, _I_INSTRUMENTS))
+_HEDGE_QP = _all(
+    _rows_cols("a", _I_FACTORS, _I_INSTRUMENTS),
+    _rows_cols("eq_matrix", _I_INSTRUMENTS, _I_INSTRUMENTS),
+)
 _HEDGE_INTEGER = _rows_cols("a", _I_FACTORS, 12)  # instruments are columns of a (I-45)
-_HEDGE_MINVAR = _all(_rows_cols("covariance", _I_INSTRUMENTS + 1, _I_INSTRUMENTS + 1),
-                     _rows_cols("hedge_changes", _I_INSTRUMENTS, MAX_ARRAY))
+_HEDGE_MINVAR = _all(
+    _rows_cols("covariance", _I_INSTRUMENTS + 1, _I_INSTRUMENTS + 1),
+    _rows_cols("hedge_changes", _I_INSTRUMENTS, MAX_ARRAY),
+)
 _HEDGE_GREEKS = _all(_caps_list("portfolio", 1000), _caps_list("hedges", 3))
 # Ruling I-19: credit book 1,000 trades and 50 hedges; correlation book 1,000 and 5 hedges.
 _HEDGE_CREDIT = _all(_caps_list("book", 1000), _caps_list("hedges", 50))
 _HEDGE_CORRELATION = _all(_caps_list("book", 1000), _caps_list("hedges", 5))
+
+
 # Ruling I-23: cross-asset book 1,000 positions, hedges 200, curve pillars 100.
 def _crossasset_curve(raw: Raw) -> None:
     curve = raw.get("curve")
@@ -221,8 +229,9 @@ def _crossasset_curve(raw: Raw) -> None:
 
 
 _HEDGE_CROSSASSET = _all(_caps_list("book", 1000), _caps_list("hedges", 200), _crossasset_curve)
-_HEDGE_RESIDUAL = _all(_rows_cols("a", _I_FACTORS, _I_INSTRUMENTS),
-                       _rows_cols("covariance", _I_FACTORS, _I_FACTORS))
+_HEDGE_RESIDUAL = _all(
+    _rows_cols("a", _I_FACTORS, _I_INSTRUMENTS), _rows_cols("covariance", _I_FACTORS, _I_FACTORS)
+)
 
 
 def _slippage_sizes(raw: Raw) -> None:
@@ -231,11 +240,13 @@ def _slippage_sizes(raw: Raw) -> None:
     if isinstance(orders, list):
         if len(orders) > 10_000:
             raise _over("orders", 10_000)
-        fills = sum(len(o["fills"]) for o in orders
-                    if isinstance(o, dict) and isinstance(o.get("fills"), list))
+        fills = sum(
+            len(o["fills"])
+            for o in orders
+            if isinstance(o, dict) and isinstance(o.get("fills"), list)
+        )
         if fills > 1_000_000:
             raise _over("fills", 1_000_000)
-
 
 
 def _pbo_sizes(raw: Raw) -> None:
@@ -277,9 +288,7 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "core.rng.set_state_next_u64": _RNG,
     "core.sobol.points": _sobol,
     "core.mc.gbm_european": lambda r: _cap_product(r, "paths", "steps", 1_000_000, 1),
-    "core.pde.bs_european": lambda r: _cap_product(
-        r, "space_steps", "time_steps", 10_000_000
-    ),
+    "core.pde.bs_european": lambda r: _cap_product(r, "space_steps", "time_steps", 10_000_000),
     "core.cos.european": _caps(terms=100_000),
     "vol.garch.forecast": _caps(horizon=100_000),  # ruling J-0b.1
     "risk.backtest.traffic_light": _caps(observations=1_000_000),  # ruling J-W3-17
@@ -328,8 +337,12 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "hedge.slippage.report": _slippage_sizes,
     # Stage J wave 1 (rulings J-5, J-9, J-12, J-15).
     "research.cv.cpcv_paths": _caps(n_groups=64),
-    "research.regime.viterbi": _all(_caps_list("initial", 32), _caps_list("means", 32),
-                                    _caps_list("sds", 32), _rows_cols("transition", 32, 32)),
+    "research.regime.viterbi": _all(
+        _caps_list("initial", 32),
+        _caps_list("means", 32),
+        _caps_list("sds", 32),
+        _rows_cols("transition", 32, 32),
+    ),
     "research.stats.pbo": _pbo_sizes,
     # Stage J wave 2 (ruling J-W2-14); array lengths are in STAGE_F_ARRAYS.
     "research.estimate.ledoit_wolf": _w2_returns_cells,
@@ -345,8 +358,11 @@ OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")
 SERIES_PREFIXES = ("vol.garch.", "vol.varswap.", "vol.vix.")
 # Stage E spec A, E1: slices at most 100, grids and points at most 10,000 (arb-free-surfaces.md,
 # local-and-forward-vol.md), in place of the stage C cap.
-SURFACE_GRIDS = {"vol.svi.surface_check": "log_moneyness", "vol.svi.fit_surface": "log_moneyness",
-                   "vol.local.dupire": "points"}
+SURFACE_GRIDS = {
+    "vol.svi.surface_check": "log_moneyness",
+    "vol.svi.fit_surface": "log_moneyness",
+    "vol.local.dupire": "points",
+}
 
 
 # Ruling F-42: stage F sizes. key -> limit on that array's length, wherever the key appears; these
@@ -358,25 +374,50 @@ STAGE_F_ARRAYS: dict[str, dict[str, int]] = {
     "research.cv.purged_kfold": {"t0": 1_000_000, "t1": 1_000_000},
     "research.stats.pbo": {"performance": 10_000_000},
     # Stage J wave 2 (ruling J-W2-14): assets and views 500, series 1,000,000.
-    "research.portfolio.mean_variance": {"expected_returns": 500, "covariance": 500,
-                                         "covariance#cols": 500, "lower": 500, "upper": 500},
-    "research.portfolio.risk_parity": {"covariance": 500, "covariance#cols": 500,
-                                       "budgets": 500},
+    "research.portfolio.mean_variance": {
+        "expected_returns": 500,
+        "covariance": 500,
+        "covariance#cols": 500,
+        "lower": 500,
+        "upper": 500,
+    },
+    "research.portfolio.risk_parity": {"covariance": 500, "covariance#cols": 500, "budgets": 500},
     "risk.contrib.euler": {"weights": 500, "covariance": 500, "covariance#cols": 500},
     "research.estimate.ledoit_wolf": {"returns": 1_000_000, "returns#cols": 500},
     "research.estimate.black_litterman": {
-        "covariance": 500, "covariance#cols": 500, "prior_returns": 500, "pick": 500,
-        "pick#cols": 500, "views": 500, "view_covariance": 500, "view_covariance#cols": 500},
+        "covariance": 500,
+        "covariance#cols": 500,
+        "prior_returns": 500,
+        "pick": 500,
+        "pick#cols": 500,
+        "views": 500,
+        "view_covariance": 500,
+        "view_covariance#cols": 500,
+    },
     "risk.backtest.es_z2": {"losses": 1_000_000, "var": 1_000_000, "es": 1_000_000},
     "research.regime.baum_welch": {"observations": 1_000_000},
     # Stage J wave 3 (ruling J-W3-14).
-    "risk.scenario.historical_shock": {"dates": 100_000, "tenors": 100, "yields": 100_000,
-                                       "yields#cols": 100},
-    "risk.scenario.replay": {"base_tenors": 100, "base_yields": 100, "shock_tenors": 100,
-                             "shock_bp": 100, "dv01": 100},
+    "risk.scenario.historical_shock": {
+        "dates": 100_000,
+        "tenors": 100,
+        "yields": 100_000,
+        "yields#cols": 100,
+    },
+    "risk.scenario.replay": {
+        "base_tenors": 100,
+        "base_yields": 100,
+        "shock_tenors": 100,
+        "shock_bp": 100,
+        "dv01": 100,
+    },
     "research.backtest.interp_loo": {"x": 10_000, "y": 10_000},
-    "research.backtest.surface_holdout": {"expiries": 1_000, "strikes": 1_000, "vols": 1_000,
-                                          "vols#cols": 1_000, "holdout": 1_000},
+    "research.backtest.surface_holdout": {
+        "expiries": 1_000,
+        "strikes": 1_000,
+        "vols": 1_000,
+        "vols#cols": 1_000,
+        "holdout": 1_000,
+    },
     "research.drift.cusum": {"x": 10_000_000},
     "research.drift.page_hinkley": {"x": 10_000_000},
     "research.drift.psi": {"reference": 1_000_000, "test": 1_000_000},
@@ -389,20 +430,38 @@ STAGE_F_ARRAYS: dict[str, dict[str, int]] = {
     "risk.frtb.girr_delta": {"sensitivities": 100_000},
     "book.lifecycle.apply": {"events": 1_000_000, "positions": 100_000},
     "book.marks.resolve": {"instruments": 100_000, "quotes": 1_000_000},
-    "usecase.factor_attribution": {"portfolio_returns": 100_000, "factor_returns": 100_000,
-                                   "factor_names": 50, "factor_returns#cols": 50},
+    "usecase.factor_attribution": {
+        "portfolio_returns": 100_000,
+        "factor_returns": 100_000,
+        "factor_names": 50,
+        "factor_returns#cols": 50,
+    },
 }
 
 
 # Stage G sizes (ruling G-6 and the operation specs): curve pillars, payment, exposure and
 # period times 10,000 each, wherever the key appears.
-_G_TIMES = {"times": 10_000, "discount_factors": 10_000, "payment_times": 10_000,
-            "period_times": 10_000, "swaptions": 10_000}
-for _name in ("rates.shortrate.zcb", "rates.shortrate.zcb_option", "rates.shortrate.swaption",
-              "rates.shortrate.capfloor", "rates.shortrate.hw_calibrate",
-              "rates.shortrate.bermudan_swaption", "rates.shortrate.callable_bond",
-              "rates.shortrate.bermudan_ladder", "rates.lmm.capfloor",
-              "rates.lmm.swaption_rebonato", "rates.g2pp.zcb", "rates.g2pp.zcb_option"):
+_G_TIMES = {
+    "times": 10_000,
+    "discount_factors": 10_000,
+    "payment_times": 10_000,
+    "period_times": 10_000,
+    "swaptions": 10_000,
+}
+for _name in (
+    "rates.shortrate.zcb",
+    "rates.shortrate.zcb_option",
+    "rates.shortrate.swaption",
+    "rates.shortrate.capfloor",
+    "rates.shortrate.hw_calibrate",
+    "rates.shortrate.bermudan_swaption",
+    "rates.shortrate.callable_bond",
+    "rates.shortrate.bermudan_ladder",
+    "rates.lmm.capfloor",
+    "rates.lmm.swaption_rebonato",
+    "rates.g2pp.zcb",
+    "rates.g2pp.zcb_option",
+):
     STAGE_F_ARRAYS[_name] = dict(_G_TIMES)
 STAGE_F_ARRAYS["xva.exposure.swap_ee_hw"] = {**_G_TIMES, "exposure_times": 10_000}
 STAGE_F_ARRAYS["xva.exposure.portfolio_hw"] = {**_G_TIMES, "exposure_times": 10_000}
@@ -417,8 +476,11 @@ def _check_stage_f(raw: Raw, limits: Mapping[str, int]) -> None:
                 if isinstance(value, list) and key in limits and len(value) > limits[key]:
                     raise _over(key, limits[key])
                 cols = limits.get(f"{key}#cols")
-                if cols is not None and isinstance(value, list) and any(
-                        isinstance(r, list) and len(r) > cols for r in value):
+                if (
+                    cols is not None
+                    and isinstance(value, list)
+                    and any(isinstance(r, list) and len(r) > cols for r in value)
+                ):
                     raise _over(key, cols)
                 if isinstance(value, (list, dict)):
                     stack.append(value)
@@ -490,9 +552,12 @@ def check_limits(operation: str, raw: Raw) -> None:
     grid = SURFACE_GRIDS.get(operation)
     if grid is not None:
         _check_surface_grid(raw, grid)
-    options = (operation.startswith(OPTION_PREFIXES) and grid is None
-               and operation != "vol.volofvol.measure"  # ruling E-A35: 10,000
-               and not operation.startswith(SERIES_PREFIXES))
+    options = (
+        operation.startswith(OPTION_PREFIXES)
+        and grid is None
+        and operation != "vol.volofvol.measure"  # ruling E-A35: 10,000
+        and not operation.startswith(SERIES_PREFIXES)
+    )
     if options or operation == "usecase.vol_surface":
         _check_option_arrays(raw)
     specific = _BY_OPERATION.get(operation)

@@ -8,6 +8,7 @@ specifications/06-risk/xva-exposure.md; rulings G-1 to G-21 in specifications/st
 Times are year fractions. Every model exposes its bond as `P(t, T; r) = A exp(-B r)`, so the
 Jamshidian decomposition, the caps and the swap exposure are written once over a `_Model`.
 """
+
 import bisect
 import itertools
 import math
@@ -82,9 +83,13 @@ def _gauss_variance(a: float, sigma: float, tau: float) -> float:
     integral of G2++ and of the Vasicek `A`; equal to `-sigma^2 tau^3 Q(a tau)`."""
     u = a * tau
     if u < _SERIES_BELOW:
-        return -sigma * sigma * tau ** 3 * _q_series(u)
-    return sigma * sigma / (a * a) * (tau + 2 / a * math.exp(-u) - math.exp(-2 * u) / (2 * a)
-                                      - 1.5 / a)
+        return -sigma * sigma * tau**3 * _q_series(u)
+    return (
+        sigma
+        * sigma
+        / (a * a)
+        * (tau + 2 / a * math.exp(-u) - math.exp(-2 * u) / (2 * a) - 1.5 / a)
+    )
 
 
 def _cross_term(a: float, b: float, tau: float) -> float:
@@ -162,8 +167,9 @@ class Model:
             em1 = math.expm1(gamma * tau)
             den = (gamma + a) * em1 + 2 * gamma
             big_b = 2 * em1 / den
-            ln_a = 2 * a * self.b / (sig * sig) * (
-                math.log(2 * gamma / den) + (a + gamma) * tau / 2)
+            ln_a = (
+                2 * a * self.b / (sig * sig) * (math.log(2 * gamma / den) + (a + gamma) * tau / 2)
+            )
             return ln_a, big_b
         big_b = b_factor(a, tau)
         if self.kind == "VASICEK":
@@ -171,15 +177,19 @@ class Model:
             if u < _SERIES_BELOW:
                 # ln A = b (B - tau) - sigma^2/(2 a^2) (B - tau + a B^2 / 2); the second bracket
                 # is a^2 tau^3 Q(u).
-                ln_a = self.b * _b_minus_tau(a, tau) - sig * sig * tau ** 3 * _q_series(u) / 2
+                ln_a = self.b * _b_minus_tau(a, tau) - sig * sig * tau**3 * _q_series(u) / 2
             else:
-                ln_a = ((big_b - tau) * (a * a * self.b - sig * sig / 2) / (a * a)
-                        - sig * sig * big_b * big_b / (4 * a))
+                ln_a = (big_b - tau) * (a * a * self.b - sig * sig / 2) / (
+                    a * a
+                ) - sig * sig * big_b * big_b / (4 * a)
             return ln_a, big_b
         curve = self.curve
         assert curve is not None
-        ln_a = (math.log(curve.discount(s) / curve.discount(t)) + big_b * curve.forward(t)
-                + sig * sig / (4 * a) * math.expm1(-2 * a * t) * big_b * big_b)
+        ln_a = (
+            math.log(curve.discount(s) / curve.discount(t))
+            + big_b * curve.forward(t)
+            + sig * sig / (4 * a) * math.expm1(-2 * a * t) * big_b * big_b
+        )
         return ln_a, big_b
 
     def bond(self, t: float, s: float, r: float) -> float:
@@ -212,13 +222,16 @@ class Model:
         dof = 4 * a * self.b / (sig * sig)
         egt = math.exp(gamma * t)
         x1, x2 = rho + psi + big_b, rho + psi
-        return (ps * ncx2_cdf(2 * rbar * x1, dof, 2 * rho * rho * r * egt / x1)
-                - k * pt * ncx2_cdf(2 * rbar * x2, dof, 2 * rho * rho * r * egt / x2))
+        return ps * ncx2_cdf(2 * rbar * x1, dof, 2 * rho * rho * r * egt / x1) - k * pt * ncx2_cdf(
+            2 * rbar * x2, dof, 2 * rho * rho * r * egt / x2
+        )
 
 
 def gaussian_sigma_p(a: float, sigma: float, expiry: float, maturity: float) -> float:
     """Bond-option volatility of Vasicek and Hull-White."""
-    return sigma * b_factor(a, maturity - expiry) * math.sqrt(-math.expm1(-2 * a * expiry) / (2 * a))
+    return (
+        sigma * b_factor(a, maturity - expiry) * math.sqrt(-math.expm1(-2 * a * expiry) / (2 * a))
+    )
 
 
 def gaussian_call(ps: float, pt: float, k: float, sp: float) -> float:
@@ -226,8 +239,9 @@ def gaussian_call(ps: float, pt: float, k: float, sp: float) -> float:
     return ps * big_n(h) - k * pt * big_n(h - sp)
 
 
-def make_model(kind: str, a: float, sigma: float, b: float | None, curve: Curve | None,
-               r0: float | None) -> Model:
+def make_model(
+    kind: str, a: float, sigma: float, b: float | None, curve: Curve | None, r0: float | None
+) -> Model:
     """Checks model, `a`, `sigma`, the CIR rules and the curve, in the spec order (curve already
     built by `make_curve`, so its rules ran when the caller made it)."""
     if kind not in MODELS:
@@ -241,9 +255,16 @@ def make_model(kind: str, a: float, sigma: float, b: float | None, curve: Curve 
     return Model(kind, a, sigma, b or 0.0, curve, r0 or 0.0)
 
 
-def build_model(kind: str, a: float, sigma: float, b: float | None, times: Floats | None,
-                discount_factors: Floats | None, r0: float | None,
-                rate_given_to_hull_white: bool = False) -> Model:
+def build_model(
+    kind: str,
+    a: float,
+    sigma: float,
+    b: float | None,
+    times: Floats | None,
+    discount_factors: Floats | None,
+    r0: float | None,
+    rate_given_to_hull_white: bool = False,
+) -> Model:
     """The model of a case, checked in the spec order: model, `a` and `sigma`, the CIR rules, the
     curve, then the G-5 rule (`short_rate` given to a Hull-White option is E_INPUT)."""
     if kind not in MODELS:
@@ -257,8 +278,9 @@ def build_model(kind: str, a: float, sigma: float, b: float | None, times: Float
     return make_model(kind, a, sigma, b, curve, r0)
 
 
-def curve_model(times: Floats, discount_factors: Floats, a: float, sigma: float,
-                rate_given: bool = False) -> Model:
+def curve_model(
+    times: Floats, discount_factors: Floats, a: float, sigma: float, rate_given: bool = False
+) -> Model:
     """A Hull-White model of the operations that take only a curve."""
     return build_model("HULL_WHITE", a, sigma, None, times, discount_factors, None, rate_given)
 
@@ -284,8 +306,7 @@ def _stirling_tail(s: float) -> float:
     """`lnGamma(s) - ((s - 1/2) ln s - s + ln(2 pi)/2)` for `s >= 10`."""
     inv = 1.0 / s
     inv2 = inv * inv
-    return inv * (1 / 12 - inv2 * (1 / 360 - inv2 * (1 / 1260 - inv2 * (1 / 1680
-                                                                           - inv2 / 1188))))
+    return inv * (1 / 12 - inv2 * (1 / 360 - inv2 * (1 / 1260 - inv2 * (1 / 1680 - inv2 / 1188))))
 
 
 def _log_front(s: float, x: float) -> float:
@@ -294,7 +315,7 @@ def _log_front(s: float, x: float) -> float:
     ln(2 pi)/2 - stirling_tail(s)`, `d = (x - s)/s`, keeps its digits (G-32)."""
     if s < 10:
         return s * math.log(x) - x - math.lgamma(s)
-    return (s * _log1pmx((x - s) / s) + 0.5 * math.log(s / (2 * math.pi)) - _stirling_tail(s))
+    return s * _log1pmx((x - s) / s) + 0.5 * math.log(s / (2 * math.pi)) - _stirling_tail(s)
 
 
 def _log_poisson(j: int, mu: float) -> float:
@@ -400,13 +421,17 @@ def _option_type(option_type: str) -> bool:
     return option_type == "CALL"
 
 
-def zcb_option(model: Model, option_type: str, strike: float, expiry: float, maturity: float,
-               notional: float) -> dict[str, float]:
+def zcb_option(
+    model: Model, option_type: str, strike: float, expiry: float, maturity: float, notional: float
+) -> dict[str, float]:
     """`rates.shortrate.zcb_option`: European option on a zero-coupon bond."""
     _option_dates(strike, expiry, maturity)
     call = _option_type(option_type)
-    return {"price": notional * model.option(call, strike, expiry, maturity),
-            "bond_price_expiry": model.p0(expiry), "bond_price_maturity": model.p0(maturity)}
+    return {
+        "price": notional * model.option(call, strike, expiry, maturity),
+        "bond_price_expiry": model.p0(expiry),
+        "bond_price_maturity": model.p0(maturity),
+    }
 
 
 # --- Jamshidian swaption ------------------------------------------------------------------------
@@ -416,8 +441,9 @@ def _swap_times(expiry: float, payment_times: Floats) -> None:
     if not expiry > 0:
         raise _domain("expiry_years must be above 0", "expiry_years")
     if not payment_times or not _increasing(payment_times) or not payment_times[0] > expiry:
-        raise _input("payment_times must be strictly increasing and start after expiry",
-                     "payment_times")
+        raise _input(
+            "payment_times must be strictly increasing and start after expiry", "payment_times"
+        )
 
 
 def _swaption_type(kind: str) -> bool:
@@ -434,8 +460,10 @@ def _critical_rate(model: Model, t0: float, times: Floats, coupons: Floats) -> f
 
     def g(r: float) -> tuple[float, float]:
         terms = [c * math.exp(la - bb * r) for c, (la, bb) in zip(coupons, factors, strict=True)]
-        return (ordered_sum(terms) - 1.0,
-                -ordered_sum(term * bb for term, (_, bb) in zip(terms, factors, strict=True)))
+        return (
+            ordered_sum(terms) - 1.0,
+            -ordered_sum(term * bb for term, (_, bb) in zip(terms, factors, strict=True)),
+        )
 
     lo, hi = -1.0, 1.0
     if not (g(lo)[0] > 0 > g(hi)[0]):
@@ -458,34 +486,47 @@ def _critical_rate(model: Model, t0: float, times: Floats, coupons: Floats) -> f
     return r
 
 
-def _jamshidian(model: Model, payer: bool, t0: float, times: Floats, k: float,
-                notional: float) -> float:
+def _jamshidian(
+    model: Model, payer: bool, t0: float, times: Floats, k: float, notional: float
+) -> float:
     taus = [times[0] - t0, *(b - a for a, b in itertools.pairwise(times))]
     coupons = [k * tau for tau in taus]
     coupons[-1] += 1.0
     r_star = _critical_rate(model, t0, times, coupons)
-    legs = [c * model.option(not payer, model.bond(t0, t, r_star), t0, t)
-            for c, t in zip(coupons, times, strict=True)]
+    legs = [
+        c * model.option(not payer, model.bond(t0, t, r_star), t0, t)
+        for c, t in zip(coupons, times, strict=True)
+    ]
     return notional * ordered_sum(legs)
 
 
-def swaption(model: Model, expiry: float, payment_times: Floats, fixed_rate: float,
-             swaption_type: str, notional: float) -> dict[str, float]:
+def swaption(
+    model: Model,
+    expiry: float,
+    payment_times: Floats,
+    fixed_rate: float,
+    swaption_type: str,
+    notional: float,
+) -> dict[str, float]:
     """`rates.shortrate.swaption`: European swaption by Jamshidian's decomposition."""
     _swap_times(expiry, payment_times)
     payer = _swaption_type(swaption_type)
-    if not 1 + fixed_rate * (payment_times[-1] - (payment_times[-2] if len(payment_times) > 1
-                                                  else expiry)) > 0:
+    if (
+        not 1
+        + fixed_rate
+        * (payment_times[-1] - (payment_times[-2] if len(payment_times) > 1 else expiry))
+        > 0
+    ):
         raise _domain("1 + K tau_n must be above 0", "fixed_rate")
     if model.kind == "CIR":
-        taus = [payment_times[0] - expiry,
-                *(b - a for a, b in itertools.pairwise(payment_times))]
-        at_zero = ordered_sum(fixed_rate * tau * model.bond(expiry, t, 0.0)
-                              for tau, t in zip(taus, payment_times, strict=True))
+        taus = [payment_times[0] - expiry, *(b - a for a, b in itertools.pairwise(payment_times))]
+        at_zero = ordered_sum(
+            fixed_rate * tau * model.bond(expiry, t, 0.0)
+            for tau, t in zip(taus, payment_times, strict=True)
+        )
         if at_zero + model.bond(expiry, payment_times[-1], 0.0) < 1.0:
             raise _domain("CIR has no non-negative critical rate", "fixed_rate")
-    taus = [payment_times[0] - expiry,
-            *(b - a for a, b in itertools.pairwise(payment_times))]
+    taus = [payment_times[0] - expiry, *(b - a for a, b in itertools.pairwise(payment_times))]
     level = ordered_sum(tau * model.p0(t) for tau, t in zip(taus, payment_times, strict=True))
     forward = (model.p0(expiry) - model.p0(payment_times[-1])) / level
     price = _jamshidian(model, payer, expiry, payment_times, fixed_rate, notional)
@@ -495,8 +536,9 @@ def swaption(model: Model, expiry: float, payment_times: Floats, fixed_rate: flo
 # --- caps and floors ----------------------------------------------------------------------------
 
 
-def capfloor(model: Model, period_times: Floats, strike: float, cap_floor: str,
-             notional: float) -> dict[str, float | list[float]]:
+def capfloor(
+    model: Model, period_times: Floats, strike: float, cap_floor: str, notional: float
+) -> dict[str, float | list[float]]:
     """`rates.shortrate.capfloor`: caplets as bond puts, floorlets as bond calls (G-19)."""
     if len(period_times) < 2 or not _increasing(period_times):
         raise _input("period_times needs at least two strictly increasing times", "period_times")
@@ -508,9 +550,10 @@ def capfloor(model: Model, period_times: Floats, strike: float, cap_floor: str,
     if cap_floor not in ("CAP", "FLOOR"):
         raise _input(f"{cap_floor} is not CAP or FLOOR", "cap_floor")
     call = cap_floor == "FLOOR"
-    lets = [notional * (1 + strike * tau)
-            * model.option(call, 1 / (1 + strike * tau), start, end)
-            for tau, start, end in zip(taus, period_times, period_times[1:], strict=False)]
+    lets = [
+        notional * (1 + strike * tau) * model.option(call, 1 / (1 + strike * tau), start, end)
+        for tau, start, end in zip(taus, period_times, period_times[1:], strict=False)
+    ]
     return {"price": ordered_sum(lets), "caplet_prices": lets}
 
 
@@ -528,8 +571,9 @@ class Quote:
     target: float
 
 
-def make_quote(expiry: float, payment_times: Floats, fixed_rate: float, swaption_type: str,
-               target: float) -> Quote:
+def make_quote(
+    expiry: float, payment_times: Floats, fixed_rate: float, swaption_type: str, target: float
+) -> Quote:
     _swap_times(expiry, payment_times)
     payer = _swaption_type(swaption_type)
     if not target >= 0:
@@ -540,8 +584,9 @@ def make_quote(expiry: float, payment_times: Floats, fixed_rate: float, swaption
 RawQuote = tuple[float, Sequence[float], float, str, float]
 
 
-def hw_calibrate(times: Floats, discount_factors: Floats, a: float,
-                 strip: Sequence[RawQuote]) -> dict[str, float | list[float]]:
+def hw_calibrate(
+    times: Floats, discount_factors: Floats, a: float, strip: Sequence[RawQuote]
+) -> dict[str, float | list[float]]:
     """`rates.shortrate.hw_calibrate`: least-squares `sigma` on `[1e-4, 1]` with `a` fixed (G-17).
     A log scan brackets the minimum; bisection on `F'` then runs to a relative width of 1e-13."""
     _positive(mean_reversion=a)
@@ -552,8 +597,9 @@ def hw_calibrate(times: Floats, discount_factors: Floats, a: float,
 
     def prices(sigma: float) -> list[float]:
         m = Model("HULL_WHITE", a, sigma, curve=curve)
-        return [_jamshidian(m, q.payer, q.expiry, q.payment_times, q.fixed_rate, 1.0)
-                for q in quotes]
+        return [
+            _jamshidian(m, q.payer, q.expiry, q.payment_times, q.fixed_rate, 1.0) for q in quotes
+        ]
 
     def objective(sigma: float) -> float:
         return ordered_sum((p - q.target) ** 2 for p, q in zip(prices(sigma), quotes, strict=True))
@@ -574,12 +620,13 @@ def hw_calibrate(times: Floats, discount_factors: Floats, a: float,
     lo_end, hi_end, count = 1e-4, 1.0, 161
     grid = [lo_end * (hi_end / lo_end) ** (j / (count - 1)) for j in range(count)]
     grid[-1] = hi_end
+
     def scanned(sigma: float) -> float:
         # Far from the minimum a large sigma can overflow the bond formula; that point is then
         # simply not the minimum.
         try:
             return objective(sigma)
-        except (OverflowError, ZeroDivisionError, ValueError, QfError):
+        except OverflowError, ZeroDivisionError, ValueError, QfError:
             return math.inf
 
     values = [scanned(s) for s in grid]
@@ -638,9 +685,13 @@ def _hw_alpha(model: Model, t: float) -> float:
     return curve.forward(t) + sig * sig / (2 * a * a) * math.expm1(-a * t) ** 2
 
 
-def _backward(model: Model, grid: Grid, knots: Floats,
-              start: list[float], at_knot: Callable[[int, float, list[float], list[float]], None]
-              ) -> float:
+def _backward(
+    model: Model,
+    grid: Grid,
+    knots: Floats,
+    start: list[float],
+    at_knot: Callable[[int, float, list[float], list[float]], None],
+) -> float:
     """Runs the G-18 scheme from `knots[-1]` to 0 and returns `V` at the centre node.
 
     `start` is `V` at the last knot. `at_knot(k, t, xs, v)` changes `v` in place on arrival at each
@@ -684,8 +735,9 @@ def _backward(model: Model, grid: Grid, knots: Floats,
     return v[nx // 2]
 
 
-def _thomas(lower: list[float], diag: list[float], upper: list[float],
-            rhs: list[float]) -> list[float]:
+def _thomas(
+    lower: list[float], diag: list[float], upper: list[float], rhs: list[float]
+) -> list[float]:
     n = len(diag)
     c = [0.0] * n
     d = [0.0] * n
@@ -702,8 +754,9 @@ def _thomas(lower: list[float], diag: list[float], upper: list[float],
     return x
 
 
-def _exercise_values(model: Model, t: float, xs: Floats, times: Floats, k: float,
-                     phi: float) -> list[float]:
+def _exercise_values(
+    model: Model, t: float, xs: Floats, times: Floats, k: float, phi: float
+) -> list[float]:
     """Per unit notional, `phi (1 - P(t, Tn) - K sum tau_j P(t, Tj))` over the payments after `t`."""
     after = [s for s in times if s > t]
     taus = [after[0] - t, *(b - a for a, b in itertools.pairwise(after))]
@@ -718,22 +771,35 @@ def _exercise_values(model: Model, t: float, xs: Floats, times: Floats, k: float
     return out
 
 
-def check_bermudan(start: float, payment_times: Floats, swaption_type: str,
-                   exercise_times: Floats) -> bool:
+def check_bermudan(
+    start: float, payment_times: Floats, swaption_type: str, exercise_times: Floats
+) -> bool:
     """The swap and exercise checks of the Bermudan operations; True for a payer."""
     _swap_times(start, payment_times)
     payer = _swaption_type(swaption_type)
     resets = {start, *payment_times[:-1]}
-    if (not exercise_times or not _increasing(exercise_times)
-            or any(t not in resets for t in exercise_times)):
-        raise _input("exercise_times must be strictly increasing reset dates before the last "
-                     "payment", "exercise_times")
+    if (
+        not exercise_times
+        or not _increasing(exercise_times)
+        or any(t not in resets for t in exercise_times)
+    ):
+        raise _input(
+            "exercise_times must be strictly increasing reset dates before the last payment",
+            "exercise_times",
+        )
     return payer
 
 
-def bermudan_swaption(model: Model, start: float, payment_times: Floats, fixed_rate: float,
-                      swaption_type: str, notional: float, exercise_times: Floats,
-                      grid: Grid) -> dict[str, float]:
+def bermudan_swaption(
+    model: Model,
+    start: float,
+    payment_times: Floats,
+    fixed_rate: float,
+    swaption_type: str,
+    notional: float,
+    exercise_times: Floats,
+    grid: Grid,
+) -> dict[str, float]:
     """`rates.shortrate.bermudan_swaption` on the pinned reference scheme (G-18)."""
     payer = check_bermudan(start, payment_times, swaption_type, exercise_times)
     phi = 1.0 if payer else -1.0
@@ -755,16 +821,23 @@ def bermudan_swaption(model: Model, start: float, payment_times: Floats, fixed_r
     return {"price": notional * _backward(model, grid, knots, v0, exercise)}
 
 
-def callable_bond(model: Model, payment_times: Floats, coupon_rate: float, notional: float,
-                  call_times: Floats, call_price: float, grid: Grid) -> dict[str, float]:
+def callable_bond(
+    model: Model,
+    payment_times: Floats,
+    coupon_rate: float,
+    notional: float,
+    call_times: Floats,
+    call_price: float,
+    grid: Grid,
+) -> dict[str, float]:
     """`rates.shortrate.callable_bond`: issuer-callable bond on the G-18 scheme (G-21)."""
     if not payment_times or not _increasing(payment_times) or not payment_times[0] > 0:
-        raise _input("payment_times must be strictly increasing and start above 0",
-                     "payment_times")
+        raise _input("payment_times must be strictly increasing and start above 0", "payment_times")
     earlier = set(payment_times[:-1])
     if not _increasing(call_times) or any(t not in earlier for t in call_times):
-        raise _input("call_times must be strictly increasing payment times before the last",
-                     "call_times")
+        raise _input(
+            "call_times must be strictly increasing payment times before the last", "call_times"
+        )
     if not call_price > 0:
         raise _domain("call_price must be above 0", "call_price")
     taus = [payment_times[0], *(b - a for a, b in itertools.pairwise(payment_times))]
@@ -784,25 +857,36 @@ def callable_bond(model: Model, payment_times: Floats, coupon_rate: float, notio
 # --- closed-form swap exposure under Hull-White (G-16) ------------------------------------------
 
 
-def swap_ee_hw(model: Model, start: float, payment_times: Floats, fixed_rate: float, side: str,
-               notional: float, exposure_times: Floats, hazard_rate: float | None,
-               recovery: float | None) -> dict[str, float | list[float]]:
+def swap_ee_hw(
+    model: Model,
+    start: float,
+    payment_times: Floats,
+    fixed_rate: float,
+    side: str,
+    notional: float,
+    exposure_times: Floats,
+    hazard_rate: float | None,
+    recovery: float | None,
+) -> dict[str, float | list[float]]:
     """`xva.exposure.swap_ee_hw`: discounted EE at reset dates and an optional bucketed CVA."""
     if side not in ("PAY", "RECEIVE"):
         raise _input(f"{side} is not PAY or RECEIVE", "side")
     if start < 0:
         raise _domain("start_years must be >= 0", "start_years")
     if not payment_times or not _increasing(payment_times) or not payment_times[0] > start:
-        raise _input("payment_times must be strictly increasing and start after start_years",
-                     "payment_times")
+        raise _input(
+            "payment_times must be strictly increasing and start after start_years", "payment_times"
+        )
     if not exposure_times:
         raise _input("exposure_times needs at least one time", "exposure_times")
     if any(not t > 0 for t in exposure_times):
         raise _domain("exposure times must be above 0", "exposure_times")
     resets = {start, *payment_times[:-1]}
     if not _increasing(exposure_times) or any(t not in resets for t in exposure_times):
-        raise _input("exposure_times must be strictly increasing reset dates before the last "
-                     "payment", "exposure_times")
+        raise _input(
+            "exposure_times must be strictly increasing reset dates before the last payment",
+            "exposure_times",
+        )
     if (hazard_rate is None) != (recovery is None):
         raise _input("hazard_rate and recovery go together", "hazard_rate")
     if hazard_rate is not None and recovery is not None:
@@ -811,8 +895,10 @@ def swap_ee_hw(model: Model, start: float, payment_times: Floats, fixed_rate: fl
         if not 0 <= recovery < 1:
             raise _domain("recovery must be in [0, 1)", "recovery")
     payer = side == "PAY"
-    ee = [_jamshidian(model, payer, t, [s for s in payment_times if s > t], fixed_rate, notional)
-          for t in exposure_times]
+    ee = [
+        _jamshidian(model, payer, t, [s for s in payment_times if s > t], fixed_rate, notional)
+        for t in exposure_times
+    ]
     out: dict[str, float | list[float]] = {"discounted_ee": ee}
     if hazard_rate is not None and recovery is not None:
         prev = 0.0
@@ -838,8 +924,11 @@ class G2:
 
     def v(self, tau: float) -> float:
         cross = 2 * self.rho * self.sigma * self.eta * _cross_term(self.a, self.b, tau)
-        return (_gauss_variance(self.a, self.sigma, tau) + _gauss_variance(self.b, self.eta, tau)
-                + cross)
+        return (
+            _gauss_variance(self.a, self.sigma, tau)
+            + _gauss_variance(self.b, self.eta, tau)
+            + cross
+        )
 
 
 def make_g2(curve: Curve, a: float, sigma: float, b: float, eta: float, rho: float) -> G2:
@@ -862,23 +951,29 @@ def g2pp_zcb(model: G2, x: float, y: float, t: float, maturity: float) -> dict[s
         raise _domain("maturity_years must be above t_years", "maturity_years")
     c = model.curve
     tau = maturity - t
-    ln_p = (math.log(c.discount(maturity) / c.discount(t))
-            + 0.5 * (model.v(tau) - model.v(maturity) + model.v(t))
-            - b_factor(model.a, tau) * x - b_factor(model.b, tau) * y)
+    ln_p = (
+        math.log(c.discount(maturity) / c.discount(t))
+        + 0.5 * (model.v(tau) - model.v(maturity) + model.v(t))
+        - b_factor(model.a, tau) * x
+        - b_factor(model.b, tau) * y
+    )
     return {"discount_factor": math.exp(ln_p), "zero_rate": -ln_p / tau}
 
 
-def g2pp_zcb_option(model: G2, option_type: str, strike: float, expiry: float, maturity: float,
-                    notional: float) -> dict[str, float]:
+def g2pp_zcb_option(
+    model: G2, option_type: str, strike: float, expiry: float, maturity: float, notional: float
+) -> dict[str, float]:
     """`rates.g2pp.zcb_option`: Gaussian bond option with the G2++ variance."""
     _option_dates(strike, expiry, maturity)
     call = _option_type(option_type)
     a, b, s, e, rho = model.a, model.b, model.sigma, model.eta, model.rho
     d = maturity - expiry
     ba, bb = b_factor(a, d), b_factor(b, d)
-    var = (s * s / 2 * ba * ba * -math.expm1(-2 * a * expiry) / a
-           + e * e / 2 * bb * bb * -math.expm1(-2 * b * expiry) / b
-           + 2 * rho * s * e * ba * bb * -math.expm1(-(a + b) * expiry) / (a + b))
+    var = (
+        s * s / 2 * ba * ba * -math.expm1(-2 * a * expiry) / a
+        + e * e / 2 * bb * bb * -math.expm1(-2 * b * expiry) / b
+        + 2 * rho * s * e * ba * bb * -math.expm1(-(a + b) * expiry) / (a + b)
+    )
     pt, ps = model.curve.discount(expiry), model.curve.discount(maturity)
     c = gaussian_call(ps, pt, strike, math.sqrt(var))
     price = c if call else c - ps + strike * pt

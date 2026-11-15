@@ -1,5 +1,6 @@
 """Boundary tests for bonds.py aimed at mutants that survived the stage D mutation sample
 (dates_around, _root_decreasing, z_spread, _repo_setup)."""
+
 import math
 from datetime import date
 
@@ -10,8 +11,12 @@ from quantforge_core.curves import CurveData
 from quantforge_core.errors import QfError
 
 BOND = bonds.Bond(date(2030, 6, 15), 0.05, 2)
-FLAT = CurveData(date(2026, 6, 15), "LOG_LINEAR_DF", (date(2027, 6, 15), date(2036, 6, 15)),
-                 (math.exp(-0.04 * 365 / 365), math.exp(-0.04 * 3653 / 365)))
+FLAT = CurveData(
+    date(2026, 6, 15),
+    "LOG_LINEAR_DF",
+    (date(2027, 6, 15), date(2036, 6, 15)),
+    (math.exp(-0.04 * 365 / 365), math.exp(-0.04 * 3653 / 365)),
+)
 
 
 def test_dates_around_settlement_on_a_coupon_date() -> None:
@@ -28,9 +33,13 @@ def test_dates_around_between_coupons() -> None:
 
 def test_dates_around_quarterly_and_annual() -> None:
     assert bonds.dates_around(date(2030, 6, 15), 4, date(2030, 1, 1)) == (
-        date(2029, 12, 15), [date(2030, 3, 15), date(2030, 6, 15)])
+        date(2029, 12, 15),
+        [date(2030, 3, 15), date(2030, 6, 15)],
+    )
     assert bonds.dates_around(date(2030, 6, 15), 1, date(2029, 6, 16)) == (
-        date(2029, 6, 15), [date(2030, 6, 15)])
+        date(2029, 6, 15),
+        [date(2030, 6, 15)],
+    )
 
 
 @pytest.mark.parametrize("settlement", [date(2030, 6, 15), date(2030, 7, 1)])

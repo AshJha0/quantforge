@@ -1,6 +1,7 @@
 """Handlers for the stage G rates verbs: short-rate models, G2++, the products on them, and the
 closed-form swap exposure. A handler reads every input first; the first call through `core` ends
 the E_SCHEMA stage."""
+
 from typing import Any
 
 from ..errors import QfError
@@ -47,8 +48,13 @@ def _zcb(i: Inputs) -> Any:
 
 
 def _option_args(i: Inputs) -> tuple[str, float, float, float, float]:
-    return (i.string("option_type"), i.real("strike"), i.real("expiry_years"),
-            i.real("maturity_years"), i.real("notional"))
+    return (
+        i.string("option_type"),
+        i.real("strike"),
+        i.real("expiry_years"),
+        i.real("maturity_years"),
+        i.real("notional"),
+    )
 
 
 @op("rates.shortrate.zcb_option")
@@ -91,8 +97,15 @@ def _hw_calibrate(i: Inputs) -> Any:
         if not isinstance(item, dict):
             raise QfError("E_SCHEMA", f"swaptions/{k}: not an object", f"swaptions/{k}")
         q = Inputs(item, f"swaptions/{k}.")
-        strip.append((q.real("expiry_years"), q.reals("payment_times"), q.real("fixed_rate"),
-                      q.string("swaption_type"), q.real("target_price")))
+        strip.append(
+            (
+                q.real("expiry_years"),
+                q.reals("payment_times"),
+                q.real("fixed_rate"),
+                q.string("swaption_type"),
+                q.real("target_price"),
+            )
+        )
     return core.shortrate.hw_calibrate(times, dfs, a, strip)
 
 
@@ -108,15 +121,21 @@ def _bermudan(i: Inputs) -> Any:
     kind, notional = i.string("swaption_type"), i.real("notional")
     exercise, grid = i.reals("exercise_times"), _grid(i)
     model = core.shortrate.curve_model(*hw)
-    return core.shortrate.bermudan_swaption(model, t0, times, k, kind, notional, exercise,
-                                            core.shortrate.make_grid(*grid))
+    return core.shortrate.bermudan_swaption(
+        model, t0, times, k, kind, notional, exercise, core.shortrate.make_grid(*grid)
+    )
 
 
 @op("rates.shortrate.callable_bond")
 def _callable(i: Inputs) -> Any:
     hw = _hw(i)
-    args = (i.reals("payment_times"), i.real("coupon_rate"), i.real("notional"),
-            i.reals("call_times"), i.real("call_price"))
+    args = (
+        i.reals("payment_times"),
+        i.real("coupon_rate"),
+        i.real("notional"),
+        i.reals("call_times"),
+        i.real("call_price"),
+    )
     grid = _grid(i)
     model = core.shortrate.curve_model(*hw)
     return core.shortrate.callable_bond(model, *args, core.shortrate.make_grid(*grid))
@@ -126,8 +145,13 @@ def _callable(i: Inputs) -> Any:
 def _exposure(i: Inputs) -> Any:
     hw = _hw(i)
     t0, times, k = _swap(i, "start_years")
-    args = (i.string("side"), i.real("notional"), i.reals("exposure_times"),
-            i.opt_real("hazard_rate"), i.opt_real("recovery"))
+    args = (
+        i.string("side"),
+        i.real("notional"),
+        i.reals("exposure_times"),
+        i.opt_real("hazard_rate"),
+        i.opt_real("recovery"),
+    )
     model = core.shortrate.curve_model(*hw)
     return core.shortrate.swap_ee_hw(model, t0, times, k, *args)
 
@@ -162,8 +186,18 @@ def _g2_option(i: Inputs) -> Any:
 
 @op("risk.mc.greeks")
 def _mc_greeks(i: Inputs) -> Any:
-    args = (i.real("spot"), i.real("strike"), i.real("expiry_years"), i.real("rate"),
-            i.real("dividend_yield"), i.real("vol"), i.string("payoff"), i.string("method"),
-            i.integer("paths"), i.u64("seed"), i.opt_real("smoothing_width"),
-            i.opt_real("bump_relative"))
+    args = (
+        i.real("spot"),
+        i.real("strike"),
+        i.real("expiry_years"),
+        i.real("rate"),
+        i.real("dividend_yield"),
+        i.real("vol"),
+        i.string("payoff"),
+        i.string("method"),
+        i.integer("paths"),
+        i.u64("seed"),
+        i.opt_real("smoothing_width"),
+        i.opt_real("bump_relative"),
+    )
     return core.mc_greeks.greeks(*args)

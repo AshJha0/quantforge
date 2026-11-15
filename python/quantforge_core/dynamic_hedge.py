@@ -1,5 +1,6 @@
 """Dynamic delta-hedge backtest and hedge effectiveness
 (specifications/08-hedging/dynamic-hedge-and-effectiveness.md, rulings I-29 to I-32)."""
+
 import itertools
 import math
 from collections.abc import Sequence
@@ -42,13 +43,17 @@ def effectiveness(item_changes: Floats, hedge_changes: Floats) -> dict[str, floa
         raise QfError("E_DOMAIN", "the hedge has no variance", "hedge_changes")
     cov = math.fsum(p * q for p, q in zip(dx, dy)) / n1
     var_sum = math.fsum(v * v for v in dsum) / n1
-    return {"dollar_offset": -math.fsum(y) / total + 0.0, "regression_slope": cov / var_x + 0.0,
-            "regression_r2": cov * cov / (var_x * var_y), "variance_reduction":
-            1 - var_sum / var_x + 0.0}
+    return {
+        "dollar_offset": -math.fsum(y) / total + 0.0,
+        "regression_slope": cov / var_x + 0.0,
+        "regression_r2": cov * cov / (var_x * var_y),
+        "variance_reduction": 1 - var_sum / var_x + 0.0,
+    }
 
 
-def _value_delta(kind: str, spot: float, strike: float, tau: float, rate: float, q: float,
-                 vol: float) -> tuple[float, float]:
+def _value_delta(
+    kind: str, spot: float, strike: float, tau: float, rate: float, q: float, vol: float
+) -> tuple[float, float]:
     """Black-Scholes-Merton (value, delta); at tau = 0 the payoff (delta unused)."""
     if tau <= 0:
         payoff = spot - strike if kind == "CALL" else strike - spot
@@ -62,10 +67,19 @@ def _value_delta(kind: str, spot: float, strike: float, tau: float, rate: float,
     return strike * df * _cdf(-d2) - spot * carry * _cdf(-d1), -carry * _cdf(-d1)
 
 
-def backtest_delta(option_type: str, strike: float, expiry_years: float, quantity: float,
-                   rate: float, dividend_yield: float, hedge_volatility: float,
-                   times: Floats, spots: Floats, half_spread: float | None = None,
-                   impact: float | None = None) -> dict[str, Any]:
+def backtest_delta(
+    option_type: str,
+    strike: float,
+    expiry_years: float,
+    quantity: float,
+    rate: float,
+    dividend_yield: float,
+    hedge_volatility: float,
+    times: Floats,
+    spots: Floats,
+    half_spread: float | None = None,
+    impact: float | None = None,
+) -> dict[str, Any]:
     """`hedge.backtest.delta`: replays a self-financing delta hedge of `quantity` European
     options along a given path (I-29) and reports the effectiveness of the hedge leg. With
     `half_spread` or `impact`, every share trade costs `half_spread |dq| + impact dq^2`, paid
@@ -86,8 +100,11 @@ def backtest_delta(option_type: str, strike: float, expiry_years: float, quantit
         raise QfError("E_INPUT", "the path ends after expiry", "times")
     if any(s <= 0 for s in spots):
         raise QfError("E_DOMAIN", "spots must be positive", "spots")
-    for name, v in (("strike", strike), ("expiry_years", expiry_years),
-                    ("hedge_volatility", hedge_volatility)):
+    for name, v in (
+        ("strike", strike),
+        ("expiry_years", expiry_years),
+        ("hedge_volatility", hedge_volatility),
+    ):
         if v <= 0:
             raise QfError("E_DOMAIN", f"{name} must be positive", name)
     for name, amount in (("half_spread", half_spread), ("impact", impact)):
@@ -101,8 +118,12 @@ def backtest_delta(option_type: str, strike: float, expiry_years: float, quantit
         paid.append(c)
         return c
 
-    marks = [_value_delta(option_type, s, strike, expiry_years - t, rate, dividend_yield,
-                          hedge_volatility) for t, s in zip(times, spots)]
+    marks = [
+        _value_delta(
+            option_type, s, strike, expiry_years - t, rate, dividend_yield, hedge_volatility
+        )
+        for t, s in zip(times, spots)
+    ]
     values = [v for v, _ in marks]
     shares = [-quantity * marks[i][1] for i in range(m - 1)]
     cash = -quantity * values[0] - shares[0] * spots[0]
@@ -118,9 +139,13 @@ def backtest_delta(option_type: str, strike: float, expiry_years: float, quantit
     item = [quantity * (values[i + 1] - values[i]) for i in range(m - 1)]
     hedge = [(portfolio[i + 1] - portfolio[i]) - item[i] for i in range(m - 1)]
     stats = effectiveness(item, hedge)
-    out: dict[str, Any] = {"option_values": values, "shares": [v + 0.0 for v in shares],
-           "portfolio_values": [v + 0.0 for v in portfolio], "final_pnl": portfolio[-1] + 0.0,
-           **stats}
+    out: dict[str, Any] = {
+        "option_values": values,
+        "shares": [v + 0.0 for v in shares],
+        "portfolio_values": [v + 0.0 for v in portfolio],
+        "final_pnl": portfolio[-1] + 0.0,
+        **stats,
+    }
     if half_spread is not None or impact is not None:
         out["trading_cost"] = math.fsum(paid) + 0.0
     return out

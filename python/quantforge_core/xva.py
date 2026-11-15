@@ -4,6 +4,7 @@ margin, Hull-White wrong-way risk, and the model-reserve dispersion statistic.
 Specifications: specifications/06-risk/xva-framework.md (rulings G-40 to G-44) and
 specifications/06-risk/model-reserve.md (ruling G-36).
 """
+
 import itertools
 import math
 from collections.abc import Mapping, Sequence
@@ -42,8 +43,11 @@ class Csa:
 
 def _collateral(values: Floats, csa: Csa) -> list[float]:
     def target(v: float) -> float:
-        return (max(v - csa.threshold_receive, 0.0) - max(-v - csa.threshold_post, 0.0)
-                + csa.independent_amount)
+        return (
+            max(v - csa.threshold_receive, 0.0)
+            - max(-v - csa.threshold_post, 0.0)
+            + csa.independent_amount
+        )
 
     calls = [target(values[0])]
     for v in values[1:]:
@@ -53,8 +57,12 @@ def _collateral(values: Floats, csa: Csa) -> list[float]:
     return [calls[max(i - lag, 0)] for i in range(len(values))]
 
 
-def collateralised(times: Floats, trades: Sequence[tuple[str, Sequence[Floats]]],
-                   csa: Mapping[str, Csa], pfe_quantile: float) -> dict[str, object]:
+def collateralised(
+    times: Floats,
+    trades: Sequence[tuple[str, Sequence[Floats]]],
+    csa: Mapping[str, Csa],
+    pfe_quantile: float,
+) -> dict[str, object]:
     """`xva.exposure.collateralised`: EE, ENE, PFE, EPE and effective EPE per netting set."""
     if len(times) < 2 or not _increasing(times):
         raise _input("times needs at least two increasing times", "times")
@@ -68,14 +76,18 @@ def collateralised(times: Floats, trades: Sequence[tuple[str, Sequence[Floats]]]
         if name in sets:
             if len(sets[name]) != len(paths):
                 raise _input("trades of one set need the same number of paths", "trades")
-            sets[name] = [[a + b for a, b in zip(x, y, strict=True)]
-                          for x, y in zip(sets[name], paths, strict=True)]
+            sets[name] = [
+                [a + b for a, b in zip(x, y, strict=True)]
+                for x, y in zip(sets[name], paths, strict=True)
+            ]
         else:
             sets[name] = [list(p) for p in paths]
     for name, c in csa.items():
-        for key, value in (("threshold_receive", c.threshold_receive),
-                           ("threshold_post", c.threshold_post),
-                           ("minimum_transfer_amount", c.minimum_transfer_amount)):
+        for key, value in (
+            ("threshold_receive", c.threshold_receive),
+            ("threshold_post", c.threshold_post),
+            ("minimum_transfer_amount", c.minimum_transfer_amount),
+        ):
             if not value >= 0:
                 raise _domain(f"{key} must be >= 0", f"csa.{name}.{key}")
         if c.mpor_steps < 0:
@@ -105,8 +117,14 @@ def collateralised(times: Floats, trades: Sequence[tuple[str, Sequence[Floats]]]
         eee = [ee[0]]
         for v in ee[1:]:
             eee.append(max(eee[-1], v))
-        eff = (ordered_sum(eee[i] * (times[i] - times[i - 1]) for i in year)
-               / (times[year[-1]] - times[0])) if year else eee[0]
+        eff = (
+            (
+                ordered_sum(eee[i] * (times[i] - times[i - 1]) for i in year)
+                / (times[year[-1]] - times[0])
+            )
+            if year
+            else eee[0]
+        )
         out[name] = {"ee": ee, "ene": ene, "pfe": pfe, "epe": epe, "effective_epe": eff}
         total = [a + b for a, b in zip(total, ee, strict=True)]
     return {"netting_sets": out, "total_ee": total}
@@ -128,10 +146,21 @@ def _check_name(n: Name, key: str) -> None:
         raise _domain("recovery must be in [0, 1)", f"{key}.recovery")
 
 
-def adjustments(times: Floats, dfs: Floats, ee: Floats, ene: Floats, cpty: Name, own: Name,
-                borrow_spread: float, lend_spread: float, exclude_overlap: bool,
-                im: Floats | None, im_spread: float | None, capital: Floats | None,
-                hurdle_rate: float | None) -> dict[str, float]:
+def adjustments(
+    times: Floats,
+    dfs: Floats,
+    ee: Floats,
+    ene: Floats,
+    cpty: Name,
+    own: Name,
+    borrow_spread: float,
+    lend_spread: float,
+    exclude_overlap: bool,
+    im: Floats | None,
+    im_spread: float | None,
+    capital: Floats | None,
+    hurdle_rate: float | None,
+) -> dict[str, float]:
     """`xva.adjustments.value`: CVA, DVA, FCA, FBA, FVA and the optional MVA and KVA."""
     n = len(times)
     if n < 1 or not _increasing(times) or not times[0] > 0:
@@ -161,16 +190,23 @@ def adjustments(times: Floats, dfs: Floats, ee: Floats, ene: Floats, cpty: Name,
         return math.exp(-own.hazard_rate * t)
 
     def funding(profile: Floats) -> float:
-        return ordered_sum(d * x * sc(p) * sb(p) * (t - p)
-                           for d, x, t, p in zip(dfs, profile, times, prev, strict=True))
+        return ordered_sum(
+            d * x * sc(p) * sb(p) * (t - p)
+            for d, x, t, p in zip(dfs, profile, times, prev, strict=True)
+        )
 
     cva = (1 - cpty.recovery) * ordered_sum(
-        d * e * (sc(p) - sc(t)) * sb(p) for d, e, t, p in zip(dfs, ee, times, prev, strict=True))
+        d * e * (sc(p) - sc(t)) * sb(p) for d, e, t, p in zip(dfs, ee, times, prev, strict=True)
+    )
     dva = (1 - own.recovery) * ordered_sum(
         d * abs(e) * (sb(p) - sb(t)) * sc(p)
-        for d, e, t, p in zip(dfs, ene, times, prev, strict=True))
-    s_l = (max(lend_spread - own.hazard_rate * (1 - own.recovery), 0.0) if exclude_overlap
-           else lend_spread)
+        for d, e, t, p in zip(dfs, ene, times, prev, strict=True)
+    )
+    s_l = (
+        max(lend_spread - own.hazard_rate * (1 - own.recovery), 0.0)
+        if exclude_overlap
+        else lend_spread
+    )
     fca = borrow_spread * funding(ee)
     fba = s_l * funding([abs(e) for e in ene])
     out = {"cva": cva, "dva": dva, "fca": fca, "fba": fba, "fva": fca - fba}
@@ -184,12 +220,17 @@ def adjustments(times: Floats, dfs: Floats, ee: Floats, ene: Floats, cpty: Name,
 # --- SIMM-style IR delta (G-43) -------------------------------------------------------------------
 
 
-def simm_ir_delta(sensitivities: Floats, risk_weights: Floats,
-                  correlations: Sequence[Floats], threshold: float) -> dict[str, object]:
+def simm_ir_delta(
+    sensitivities: Floats, risk_weights: Floats, correlations: Sequence[Floats], threshold: float
+) -> dict[str, object]:
     """`xva.simm.ir_delta`: weighted sensitivities, concentration factor and margin."""
     n = len(sensitivities)
-    if (n < 1 or len(risk_weights) != n or len(correlations) != n
-            or any(len(r) != n for r in correlations)):
+    if (
+        n < 1
+        or len(risk_weights) != n
+        or len(correlations) != n
+        or any(len(r) != n for r in correlations)
+    ):
         raise _input("sensitivities, risk_weights and correlations must match", "sensitivities")
     if not threshold > 0:
         raise _domain("concentration_threshold must be above 0", "concentration_threshold")
@@ -199,17 +240,27 @@ def simm_ir_delta(sensitivities: Floats, risk_weights: Floats,
         raise _domain("correlations must be in [-1, 1]", "correlations")
     cr = max(1.0, math.sqrt(abs(ordered_sum(sensitivities)) / threshold))
     ws = [w * s * cr for w, s in zip(risk_weights, sensitivities, strict=True)]
-    total = ordered_sum((1.0 if k == m else correlations[k][m]) * ws[k] * ws[m]
-                        for k in range(n) for m in range(n))
-    return {"weighted_sensitivities": ws, "concentration_factor": cr,
-            "margin": math.sqrt(max(0.0, total))}
+    total = ordered_sum(
+        (1.0 if k == m else correlations[k][m]) * ws[k] * ws[m] for k in range(n) for m in range(n)
+    )
+    return {
+        "weighted_sensitivities": ws,
+        "concentration_factor": cr,
+        "margin": math.sqrt(max(0.0, total)),
+    }
 
 
 # --- wrong-way risk (G-44) ------------------------------------------------------------------------
 
 
-def wwr_cva(times: Floats, values: Sequence[Floats], dfs: Floats, hazard_rate: float,
-            recovery: float, b: float) -> dict[str, object]:
+def wwr_cva(
+    times: Floats,
+    values: Sequence[Floats],
+    dfs: Floats,
+    hazard_rate: float,
+    recovery: float,
+    b: float,
+) -> dict[str, object]:
     """`xva.xva.wwr.cva_hw`: Hull-White (2012) hazard `exp(a_i + b V)`, `a_i` fitted per bucket so
     the path-mean survival equals `exp(-h t_i)`."""
     n = len(times)
@@ -230,12 +281,19 @@ def wwr_cva(times: Floats, values: Sequence[Floats], dfs: Floats, hazard_rate: f
         target = math.exp(-hazard_rate * t)
         vs = [p[i] for p in values]
 
-        def g(a: float, vs: list[float] = vs, dt: float = dt, target: float = target,
-              surv: list[float] = surv) -> tuple[float, float]:
+        def g(
+            a: float,
+            vs: list[float] = vs,
+            dt: float = dt,
+            target: float = target,
+            surv: list[float] = surv,
+        ) -> tuple[float, float]:
             terms = [s * math.exp(-math.exp(a + b * v) * dt) for s, v in zip(surv, vs, strict=True)]
             hz = [math.exp(a + b * v) * dt for v in vs]
-            return (ordered_sum(terms) / count - target,
-                    -ordered_sum(x * h for x, h in zip(terms, hz, strict=True)) / count)
+            return (
+                ordered_sum(terms) / count - target,
+                -ordered_sum(x * h for x, h in zip(terms, hz, strict=True)) / count,
+            )
 
         a = math.log(hazard_rate)
         lo, hi = -math.inf, math.inf
@@ -247,16 +305,21 @@ def wwr_cva(times: Floats, values: Sequence[Floats], dfs: Floats, hazard_rate: f
                 hi = a
             step = a - f / df if df < 0 else math.nan
             if not lo < step < hi:
-                step = (lo + hi) / 2 if math.isfinite(lo) and math.isfinite(hi) else (
-                    a + 1.0 if f > 0 else a - 1.0)
+                step = (
+                    (lo + hi) / 2
+                    if math.isfinite(lo) and math.isfinite(hi)
+                    else (a + 1.0 if f > 0 else a - 1.0)
+                )
             if abs(step - a) <= 1e-15 * max(1.0, abs(a)):
                 a = step
                 break
             a = step
         new = [s * math.exp(-math.exp(a + b * v) * dt) for s, v in zip(surv, vs, strict=True)]
-        buckets.append(dfs[i] * ordered_sum(max(v, 0.0) * (s0 - s1)
-                                            for v, s0, s1 in zip(vs, surv, new, strict=True))
-                       / count)
+        buckets.append(
+            dfs[i]
+            * ordered_sum(max(v, 0.0) * (s0 - s1) for v, s0, s1 in zip(vs, surv, new, strict=True))
+            / count
+        )
         surv = new
         a_out.append(a)
         prev = t
@@ -279,9 +342,14 @@ def dispersion(prices: Mapping[str, float], reference: str) -> dict[str, object]
     devs = [abs(prices[k] - ref) for k in names]
     reserve = max(devs)
     worst = names[devs.index(reserve)]
-    return {"mean": ordered_sum(values) / len(values), "range": spread, "half_range": spread / 2,
-            "reserve": reserve, "worst_model": worst,
-            "relative_reserve": None if ref == 0 else reserve / abs(ref)}
+    return {
+        "mean": ordered_sum(values) / len(values),
+        "range": spread,
+        "half_range": spread / 2,
+        "reserve": reserve,
+        "worst_model": worst,
+        "relative_reserve": None if ref == 0 else reserve / abs(ref),
+    }
 
 
 guard(globals())

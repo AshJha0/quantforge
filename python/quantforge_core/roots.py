@@ -1,4 +1,5 @@
 """Root finders (specifications/01-core/root-finders.md)."""
+
 import math
 from collections.abc import Callable
 from dataclasses import dataclass

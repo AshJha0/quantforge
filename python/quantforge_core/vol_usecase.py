@@ -1,5 +1,6 @@
 """Use case 3: from option quotes to an SVI surface and a priced target
 (specifications/04-pricing/use-cases.md)."""
+
 import itertools
 import math
 from collections.abc import Sequence
@@ -15,8 +16,11 @@ from .finite import guard
 
 
 def vol_surface(
-    as_of: date, funding: CurveData, slices: Sequence[tuple[date, Sequence[ParityQuote]]],
-    k_grid: Sequence[float], target: tuple[str, float, date, float, str],
+    as_of: date,
+    funding: CurveData,
+    slices: Sequence[tuple[date, Sequence[ParityQuote]]],
+    k_grid: Sequence[float],
+    target: tuple[str, float, date, float, str],
 ) -> dict[str, Any]:
     if not slices or not k_grid or not all(quotes for _, quotes in slices):
         raise QfError("E_INPUT", "slices, k_grid and quotes must not be empty", "slices")
@@ -62,8 +66,13 @@ def vol_surface(
     signed = quantity if side == "BUY" else -quantity
     pv, delta, vega = black76_position(option_type, f, strike, discounts[index], t, vol, signed)
     return {
-        "forwards": forwards, "svi_rmse": rmses, "arbitrage_free": check["arbitrage_free"],
-        "vol": vol, "pv": pv, "delta": delta, "vega": vega,
+        "forwards": forwards,
+        "svi_rmse": rmses,
+        "arbitrage_free": check["arbitrage_free"],
+        "vol": vol,
+        "pv": pv,
+        "delta": delta,
+        "vega": vega,
     }
 
 

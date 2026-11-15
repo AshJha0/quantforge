@@ -1,4 +1,5 @@
 """Equity spot, dividends and forward (specifications/02-curves/equity-forward.md)."""
+
 import itertools
 import math
 from collections.abc import Sequence
@@ -35,7 +36,11 @@ def _domain(message: str, field: str | None = None) -> QfError:
 
 
 def outright(
-    spot: float, as_of: date, expiry: date, funding: CurveData, borrow: CurveData | None,
+    spot: float,
+    as_of: date,
+    expiry: date,
+    funding: CurveData,
+    borrow: CurveData | None,
     dividends: Sequence[tuple[date, float]],
 ) -> ForwardResult:
     if spot <= 0:
@@ -67,7 +72,10 @@ def outright(
 
 
 def flat(
-    spot: float, rate: float, borrow: float, expiry_years: float,
+    spot: float,
+    rate: float,
+    borrow: float,
+    expiry_years: float,
     dividends: Sequence[tuple[float, float]],
 ) -> float:
     if spot <= 0:
@@ -121,7 +129,8 @@ def parity(
         raise _domain("the fitted forward is not positive", "quotes")
     residual = max(abs(y - d * (f - k)) for k, y in zip(ks, ys, strict=True))
     outside = [
-        q.strike for q in quotes
+        q.strike
+        for q in quotes
         if not q.call_bid - q.put_ask <= d * (f - q.strike) <= q.call_ask - q.put_bid
     ]
     return f, d, residual, outside

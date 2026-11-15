@@ -5,6 +5,7 @@ Specifications: specifications/06-risk/frtb-sa-fx-equity.md (rulings G-48, G-49)
 specifications/06-risk/frtb-sa-vega-curvature.md (ruling G-51); aggregation MAR21.4 and the three
 correlation scenarios MAR21.6 as specifications/06-risk/frtb-sa-girr.md.
 """
+
 import math
 from collections.abc import Callable, Hashable, Sequence
 
@@ -18,12 +19,42 @@ Gamma = Callable[[str, str], float]
 CLASSES = ("GIRR", "CSR_NONSEC", "EQUITY", "COMMODITY", "FX")
 
 # MAR21.77 Table 10 (spot weights; repo weights are 1% of these)
-_EQ_RW = {1: 0.55, 2: 0.60, 3: 0.45, 4: 0.55, 5: 0.30, 6: 0.35, 7: 0.40, 8: 0.50, 9: 0.70,
-          10: 0.50, 11: 0.70, 12: 0.15, 13: 0.25}
+_EQ_RW = {
+    1: 0.55,
+    2: 0.60,
+    3: 0.45,
+    4: 0.55,
+    5: 0.30,
+    6: 0.35,
+    7: 0.40,
+    8: 0.50,
+    9: 0.70,
+    10: 0.50,
+    11: 0.70,
+    12: 0.15,
+    13: 0.25,
+}
 # MAR21.53 Table 4
-_CSR_RW = {1: 0.005, 2: 0.010, 3: 0.050, 4: 0.030, 5: 0.030, 6: 0.020, 7: 0.015, 8: 0.025,
-           9: 0.020, 10: 0.040, 11: 0.120, 12: 0.070, 13: 0.085, 14: 0.055, 15: 0.050,
-           16: 0.120, 17: 0.015, 18: 0.050}
+_CSR_RW = {
+    1: 0.005,
+    2: 0.010,
+    3: 0.050,
+    4: 0.030,
+    5: 0.030,
+    6: 0.020,
+    7: 0.015,
+    8: 0.025,
+    9: 0.020,
+    10: 0.040,
+    11: 0.120,
+    12: 0.070,
+    13: 0.085,
+    14: 0.055,
+    15: 0.050,
+    16: 0.120,
+    17: 0.015,
+    18: 0.050,
+}
 _CSR_TENORS = ("0.5Y", "1Y", "3Y", "5Y", "10Y")
 # MAR21.57 Table 5, sectors 1/9 .. 7/15 as 1..7, then 8, 16, 17, 18 (upper triangle)
 _SECTORS = (1, 2, 3, 4, 5, 6, 7, 8, 16, 17, 18)
@@ -40,10 +71,32 @@ _TABLE5 = {
     17: (75,),
 }
 # MAR21.82 Table 11 and MAR21.83 Table 12
-_CMD_RW = {1: 0.30, 2: 0.35, 3: 0.60, 4: 0.80, 5: 0.40, 6: 0.45, 7: 0.20, 8: 0.35, 9: 0.25,
-           10: 0.35, 11: 0.50}
-_CMD_RHO = {1: 0.55, 2: 0.95, 3: 0.40, 4: 0.80, 5: 0.60, 6: 0.65, 7: 0.55, 8: 0.45, 9: 0.15,
-            10: 0.40, 11: 0.15}
+_CMD_RW = {
+    1: 0.30,
+    2: 0.35,
+    3: 0.60,
+    4: 0.80,
+    5: 0.40,
+    6: 0.45,
+    7: 0.20,
+    8: 0.35,
+    9: 0.25,
+    10: 0.35,
+    11: 0.50,
+}
+_CMD_RHO = {
+    1: 0.55,
+    2: 0.95,
+    3: 0.40,
+    4: 0.80,
+    5: 0.60,
+    6: 0.65,
+    7: 0.55,
+    8: 0.45,
+    9: 0.15,
+    10: 0.40,
+    11: 0.15,
+}
 
 
 def _input(message: str, field: str) -> QfError:
@@ -112,8 +165,13 @@ def _net(items: Sequence[tuple[Factor, float]]) -> list[tuple[Factor, float]]:
     return list(out.items())
 
 
-def aggregate(buckets: dict[str, list[tuple[Factor, float]]], rho: Rho, gamma: Gamma,
-              simple: frozenset[str] = frozenset(), measure: str = "delta") -> dict[str, object]:
+def aggregate(
+    buckets: dict[str, list[tuple[Factor, float]]],
+    rho: Rho,
+    gamma: Gamma,
+    simple: frozenset[str] = frozenset(),
+    measure: str = "delta",
+) -> dict[str, object]:
     """Weighted sensitivities per bucket to capital under the three scenarios. Buckets in
     `simple` (other sector) take `K = sum |net WS|` with no correlation."""
     order = sorted(buckets, key=bucket_key)
@@ -151,9 +209,13 @@ def aggregate(buckets: dict[str, list[tuple[Factor, float]]], rho: Rho, gamma: G
             value = under(used)
         values[sc] = math.sqrt(max(0.0, value))
         scenarios[sc] = {
-            "buckets": [{"bucket": c, "k": k, "s": s, "s_used": u}
-                        for c, k, s, u in zip(order, ks, ss, used, strict=True)],
-            measure: values[sc], "alternative_used": alternative}
+            "buckets": [
+                {"bucket": c, "k": k, "s": s, "s_used": u}
+                for c, k, s, u in zip(order, ks, ss, used, strict=True)
+            ],
+            measure: values[sc],
+            "alternative_used": alternative,
+        }
     binding = max(_SCENARIOS, key=lambda sc: (values[sc], -_SCENARIOS.index(sc)))
     return {"scenarios": scenarios, "capital": values[binding], "binding_scenario": binding}
 
@@ -161,8 +223,9 @@ def aggregate(buckets: dict[str, list[tuple[Factor, float]]], rho: Rho, gamma: G
 # --- delta ---------------------------------------------------------------------------------------
 
 
-def fx_delta(sensitivities: Sequence[tuple[str, float]],
-             specified: Sequence[str]) -> dict[str, object]:
+def fx_delta(
+    sensitivities: Sequence[tuple[str, float]], specified: Sequence[str]
+) -> dict[str, object]:
     """FX delta: RW 15% (over sqrt 2 for a specified pair), one factor per bucket, gamma 60%."""
     if not sensitivities:
         raise _input("no sensitivities", "sensitivities")
@@ -171,7 +234,8 @@ def fx_delta(sensitivities: Sequence[tuple[str, float]],
         raise _input("a pair appears twice", "sensitivities")
     listed = set(specified)
     buckets: dict[str, list[tuple[Factor, float]]] = {
-        p: [((p,), (0.15 / math.sqrt(2) if p in listed else 0.15) * s)] for p, s in sensitivities}
+        p: [((p,), (0.15 / math.sqrt(2) if p in listed else 0.15) * s)] for p, s in sensitivities
+    }
     return aggregate(buckets, lambda b, f, g: 1.0, lambda b, c: 0.6)
 
 
@@ -228,8 +292,7 @@ def csr_delta(sensitivities: Sequence[tuple[str, int, str, str, float]]) -> dict
     return aggregate(buckets, rho, _csr_gamma, frozenset({"16"}))
 
 
-def commodity_delta(sensitivities: Sequence[tuple[str, int, str, str, float]]
-                    ) -> dict[str, object]:
+def commodity_delta(sensitivities: Sequence[tuple[str, int, str, str, float]]) -> dict[str, object]:
     """Commodity delta (MAR21.82 to 21.85)."""
     if not sensitivities:
         raise _input("no sensitivities", "sensitivities")
@@ -279,13 +342,19 @@ def _name_rho(risk_class: str, bucket: str, a: Hashable, b: Hashable) -> float:
 
 
 def _gamma(risk_class: str) -> Gamma:
-    return {"GIRR": lambda b, c: 0.5, "FX": lambda b, c: 0.6, "EQUITY": _eq_gamma,
-            "CSR_NONSEC": _csr_gamma, "COMMODITY": _cmd_gamma}[risk_class]
+    return {
+        "GIRR": lambda b, c: 0.5,
+        "FX": lambda b, c: 0.6,
+        "EQUITY": _eq_gamma,
+        "CSR_NONSEC": _csr_gamma,
+        "COMMODITY": _cmd_gamma,
+    }[risk_class]
 
 
 def _simple(risk_class: str) -> frozenset[str]:
     return {"EQUITY": frozenset({"11"}), "CSR_NONSEC": frozenset({"16"})}.get(
-        risk_class, frozenset())
+        risk_class, frozenset()
+    )
 
 
 def _check_class(risk_class: str) -> None:
@@ -293,9 +362,9 @@ def _check_class(risk_class: str) -> None:
         raise _input(f"{risk_class} is not a risk class of this slice", "risk_class")
 
 
-def vega(risk_class: str, sensitivities: Sequence[tuple[object, str | None, float,
-                                                         float | None, float]]
-         ) -> dict[str, object]:
+def vega(
+    risk_class: str, sensitivities: Sequence[tuple[object, str | None, float, float | None, float]]
+) -> dict[str, object]:
     """`risk.frtb.vega`: rows (bucket, name, option_maturity, underlying_maturity, vega)."""
     _check_class(risk_class)
     if not sensitivities:
@@ -313,10 +382,12 @@ def vega(risk_class: str, sensitivities: Sequence[tuple[object, str | None, floa
         if not t > 0:
             raise QfError("E_DOMAIN", "option_maturity must be above 0", "option_maturity")
         if u is not None and not u > 0:
-            raise QfError("E_DOMAIN", "underlying_maturity must be above 0",
-                          "underlying_maturity")
-        rw = 0.7778 if (risk_class == "EQUITY" and int(label) in (1, 2, 3, 4, 5, 6, 7, 8, 12,
-                                                                    13)) else 1.0
+            raise QfError("E_DOMAIN", "underlying_maturity must be above 0", "underlying_maturity")
+        rw = (
+            0.7778
+            if (risk_class == "EQUITY" and int(label) in (1, 2, 3, 4, 5, 6, 7, 8, 12, 13))
+            else 1.0
+        )
         buckets.setdefault(label, []).append(((name, t, u), rw * vr))
     buckets = {b: _net(items) for b, items in buckets.items()}
     a = 0.01
@@ -336,8 +407,9 @@ def _psi(x: float, y: float) -> float:
     return 0.0 if x < 0 and y < 0 else 1.0
 
 
-def curvature(risk_class: str, factors: Sequence[tuple[object, str | None, float, float]],
-              fx_scalar: bool) -> dict[str, object]:
+def curvature(
+    risk_class: str, factors: Sequence[tuple[object, str | None, float, float]], fx_scalar: bool
+) -> dict[str, object]:
     """`risk.frtb.curvature`: rows (bucket, name, cvr_up, cvr_down) (MAR21.5, 21.98 to 21.101)."""
     _check_class(risk_class)
     if fx_scalar and risk_class != "FX":
@@ -394,9 +466,13 @@ def curvature(risk_class: str, factors: Sequence[tuple[object, str | None, float
                     g = gamma(order[b], order[c])
                     total += _scaled(g * g, sc) * ss[b] * ss[c] * _psi(ss[b], ss[c])
         values[sc] = math.sqrt(max(0.0, total))
-        scenarios[sc] = {"buckets": [{"bucket": b, "k": k, "s": s, "selected": x}
-                                     for b, k, s, x in zip(order, ks, ss, sel, strict=True)],
-                         "curvature": values[sc]}
+        scenarios[sc] = {
+            "buckets": [
+                {"bucket": b, "k": k, "s": s, "selected": x}
+                for b, k, s, x in zip(order, ks, ss, sel, strict=True)
+            ],
+            "curvature": values[sc],
+        }
     binding = max(_SCENARIOS, key=lambda sc: (values[sc], -_SCENARIOS.index(sc)))
     return {"scenarios": scenarios, "capital": values[binding], "binding_scenario": binding}
 
@@ -422,8 +498,12 @@ def sbm_total(components: Sequence[tuple[str, str, Sequence[float]]]) -> dict[st
         seen.add((cls, measure))
     totals = [math.fsum(c[2][s] for c in components) for s in range(3)]
     best = max(range(3), key=lambda s: (totals[s], -s))
-    return {"scenario_totals": dict(zip(SBM_SCENARIOS, totals, strict=True)),
-            "capital": totals[best], "binding_scenario": SBM_SCENARIOS[best],
-            "sum_of_component_capitals": math.fsum(max(c[2]) for c in components)}
+    return {
+        "scenario_totals": dict(zip(SBM_SCENARIOS, totals, strict=True)),
+        "capital": totals[best],
+        "binding_scenario": SBM_SCENARIOS[best],
+        "sum_of_component_capitals": math.fsum(max(c[2]) for c in components),
+    }
+
 
 guard(globals())

@@ -1,6 +1,7 @@
 """Stage J curves lane property tests (rulings J-C-1 to J-C-9): quote round trip, forward and
 spot consistency, flat-rate reduction to ruling D22, liquidity-curve monotonicity and the
 closed-form optimal horizon."""
+
 import itertools
 import math
 

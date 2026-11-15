@@ -3,6 +3,7 @@
 Spec: specifications/04-pricing/exotics.md, rulings E-A19 to E-A23 in
 specifications/stage-e-rulings.md. Prices are per unit of underlying; b = r - q is the carry.
 """
+
 import itertools
 import math
 from collections.abc import Callable, Sequence
@@ -38,12 +39,22 @@ def gbs(phi: float, s: float, k: float, t: float, r: float, b: float, v: float) 
     root = v * math.sqrt(t)
     d1 = (math.log(s / k) + (b + v * v / 2) * t) / root
     d2 = d1 - root
-    return phi * (s * math.exp((b - r) * t) * big_n(phi * d1) - k * math.exp(-r * t)
-                  * big_n(phi * d2))
+    return phi * (
+        s * math.exp((b - r) * t) * big_n(phi * d1) - k * math.exp(-r * t) * big_n(phi * d2)
+    )
 
 
-def digital(s: float, k: float, t: float, r: float, q: float, v: float, option_type: str,
-            payoff: str, cash: float) -> float:
+def digital(
+    s: float,
+    k: float,
+    t: float,
+    r: float,
+    q: float,
+    v: float,
+    option_type: str,
+    payoff: str,
+    cash: float,
+) -> float:
     _positive(spot=s, strike=k, expiry_years=t, vol=v, cash=cash)
     phi, root = _phi(option_type), v * math.sqrt(t)
     d1 = (math.log(s / k) + (r - q + v * v / 2) * t) / root
@@ -55,9 +66,20 @@ def digital(s: float, k: float, t: float, r: float, q: float, v: float, option_t
 BGK_BETA = 0.5826  # ruling G-7: pinned, not -zeta(1/2)/sqrt(2 pi)
 
 
-def barrier(s: float, k: float, t: float, r: float, q: float, v: float, option_type: str,
-            h: float, rebate: float, barrier_type: str, monitoring: str | None = None,
-            monitoring_per_year: int | None = None) -> float:
+def barrier(
+    s: float,
+    k: float,
+    t: float,
+    r: float,
+    q: float,
+    v: float,
+    option_type: str,
+    h: float,
+    rebate: float,
+    barrier_type: str,
+    monitoring: str | None = None,
+    monitoring_per_year: int | None = None,
+) -> float:
     """Continuous-barrier closed form; with `DISCRETE` monitoring, the Broadie-Glasserman-Kou
     shift `H exp(+-beta v sqrt(1/m))` away from spot (stage G, R9). The domain rule uses the
     unshifted barrier (G-8)."""
@@ -74,10 +96,10 @@ def barrier(s: float, k: float, t: float, r: float, q: float, v: float, option_t
         if n < 1:
             raise _domain("the barrier is never observed (n = 0)", "monitoring_per_year")
         # R6-2.1: BGK only for regular knock-outs away from the barrier, with no rebate.
-        regular = ((barrier_type == "DOWN_OUT" and option_type == "CALL" and h <= k)
-                   or (barrier_type == "UP_OUT" and option_type == "PUT" and h >= k))
-        if (not regular or rebate != 0
-                or abs(math.log(s / h)) < 1.25 * v * math.sqrt(t / n)):
+        regular = (barrier_type == "DOWN_OUT" and option_type == "CALL" and h <= k) or (
+            barrier_type == "UP_OUT" and option_type == "PUT" and h >= k
+        )
+        if not regular or rebate != 0 or abs(math.log(s / h)) < 1.25 * v * math.sqrt(t / n):
             raise _domain("outside the discrete-monitoring (BGK) envelope", "monitoring")
         shift = math.exp(BGK_BETA * v * math.sqrt(t / n))
         h = h / shift if down else h * shift
@@ -96,13 +118,21 @@ def barrier(s: float, k: float, t: float, r: float, q: float, v: float, option_t
         return phi * s * carry * big_n(phi * x) - phi * k * disc * big_n(phi * x - phi * sd)
 
     def cd(y: float) -> float:
-        return (float(phi * s * carry * ratio ** (2 * (mu + 1)) * big_n(eta * y)
-                - phi * k * disc * ratio ** (2 * mu) * big_n(eta * y - eta * sd)))
+        return float(
+            phi * s * carry * ratio ** (2 * (mu + 1)) * big_n(eta * y)
+            - phi * k * disc * ratio ** (2 * mu) * big_n(eta * y - eta * sd)
+        )
 
     a, bb, c, d = ab(x1), ab(x2), cd(y1), cd(y2)
-    e = rebate * disc * (big_n(eta * x2 - eta * sd) - ratio ** (2 * mu) * big_n(eta * y2 - eta * sd))
-    f = rebate * (ratio ** (mu + lam) * big_n(eta * z)
-                  + ratio ** (mu - lam) * big_n(eta * z - 2 * eta * lam * sd))
+    e = (
+        rebate
+        * disc
+        * (big_n(eta * x2 - eta * sd) - ratio ** (2 * mu) * big_n(eta * y2 - eta * sd))
+    )
+    f = rebate * (
+        ratio ** (mu + lam) * big_n(eta * z)
+        + ratio ** (mu - lam) * big_n(eta * z - 2 * eta * lam * sd)
+    )
     above = k > h
     table = {
         ("DOWN_IN", 1.0): (c + e, a - bb + d + e),
@@ -133,8 +163,17 @@ def _monitoring(monitoring: str | None, per_year: int | None) -> bool:
     return False
 
 
-def asian_geometric(s: float, k: float, t: float, r: float, q: float, v: float,
-                    option_type: str, averaging: str, fixings: Floats) -> float:
+def asian_geometric(
+    s: float,
+    k: float,
+    t: float,
+    r: float,
+    q: float,
+    v: float,
+    option_type: str,
+    averaging: str,
+    fixings: Floats,
+) -> float:
     _positive(spot=s, strike=k, expiry_years=t, vol=v)
     phi, b = _phi(option_type), r - q
     if averaging == "CONTINUOUS":
@@ -154,8 +193,9 @@ def asian_geometric(s: float, k: float, t: float, r: float, q: float, v: float,
     return math.exp(-r * t) * phi * (mean * big_n(phi * d1) - k * big_n(phi * d2))
 
 
-def lookback(s: float, t: float, r: float, q: float, v: float, option_type: str,
-             extreme: float) -> float:
+def lookback(
+    s: float, t: float, r: float, q: float, v: float, option_type: str, extreme: float
+) -> float:
     _positive(spot=s, expiry_years=t, vol=v)
     call = option_type == "CALL"
     if (call and not 0 < extreme <= s) or (not call and extreme < s):
@@ -171,14 +211,30 @@ def lookback(s: float, t: float, r: float, q: float, v: float, option_type: str,
     shift = 2 * b * math.sqrt(t) / v
     carry, disc = math.exp((b - r) * t), math.exp(-r * t)
     if call:
-        return (float(s * carry * big_n(x1) - extreme * disc * big_n(x2)
-                + s * disc * half * (power * big_n(-x1 + shift) - math.exp(b * t) * big_n(-x1))))
-    return (float(-s * carry * big_n(-x1) + extreme * disc * big_n(-x2)
-            + s * disc * half * (-power * big_n(x1 - shift) + math.exp(b * t) * big_n(x1))))
+        return float(
+            s * carry * big_n(x1)
+            - extreme * disc * big_n(x2)
+            + s * disc * half * (power * big_n(-x1 + shift) - math.exp(b * t) * big_n(-x1))
+        )
+    return float(
+        -s * carry * big_n(-x1)
+        + extreme * disc * big_n(-x2)
+        + s * disc * half * (-power * big_n(x1 - shift) + math.exp(b * t) * big_n(x1))
+    )
 
 
-def quanto(s: float, k: float, t: float, rd: float, rf: float, q: float, v: float,
-           fx_vol: float, rho: float, option_type: str) -> float:
+def quanto(
+    s: float,
+    k: float,
+    t: float,
+    rd: float,
+    rf: float,
+    q: float,
+    v: float,
+    fx_vol: float,
+    rho: float,
+    option_type: str,
+) -> float:
     _positive(spot=s, strike=k, expiry_years=t, vol=v, fx_vol=fx_vol)
     if not -1 <= rho <= 1:
         raise _domain("correlation must be in [-1, 1]", "correlation")
@@ -193,12 +249,17 @@ def chooser(s: float, k: float, t: float, r: float, q: float, v: float, choose: 
     d = (math.log(s / k) + (b + v * v / 2) * t) / (v * math.sqrt(t))
     y = (math.log(s / k) + b * t + v * v * choose / 2) / (v * math.sqrt(choose))
     carry, disc = s * math.exp((b - r) * t), k * math.exp(-r * t)
-    return (carry * big_n(d) - disc * big_n(d - v * math.sqrt(t)) - carry * big_n(-y)
-            + disc * big_n(-y + v * math.sqrt(choose)))
+    return (
+        carry * big_n(d)
+        - disc * big_n(d - v * math.sqrt(t))
+        - carry * big_n(-y)
+        + disc * big_n(-y + v * math.sqrt(choose))
+    )
 
 
-def kirk(f1: float, f2: float, k: float, t: float, r: float, v1: float, v2: float,
-         rho: float) -> float:
+def kirk(
+    f1: float, f2: float, k: float, t: float, r: float, v1: float, v2: float, rho: float
+) -> float:
     _positive(forward_1=f1, forward_2=f2)
     if not f2 + k > 0:
         raise _domain("forward_2 + strike must be above 0", "strike")
@@ -211,16 +272,32 @@ def kirk(f1: float, f2: float, k: float, t: float, r: float, v1: float, v2: floa
     return math.exp(-r * t) * (f1 * big_n(d1) - (f2 + k) * big_n(d1 - sv * math.sqrt(t)))
 
 
-def basket(forwards: Floats, weights: Floats, vols: Floats, corr: Sequence[Floats], k: float,
-           t: float, r: float, option_type: str) -> dict[str, float]:
+def basket(
+    forwards: Floats,
+    weights: Floats,
+    vols: Floats,
+    corr: Sequence[Floats],
+    k: float,
+    t: float,
+    r: float,
+    option_type: str,
+) -> dict[str, float]:
     n = len(forwards)
     if n == 0 or len(weights) != n or len(vols) != n:
         raise _input("forwards, weights and vols must have one length", "weights")
-    if len(corr) != n or any(len(row) != n for row in corr) or any(
+    if (
+        len(corr) != n
+        or any(len(row) != n for row in corr)
+        or any(
             corr[i][j] != corr[j][i] or not -1 <= corr[i][j] <= 1
-            for i in range(n) for j in range(n)) or any(corr[i][i] != 1 for i in range(n)):
-        raise _input("correlation must be square, symmetric, unit diagonal, in [-1, 1]",
-                     "correlation")
+            for i in range(n)
+            for j in range(n)
+        )
+        or any(corr[i][i] != 1 for i in range(n))
+    ):
+        raise _input(
+            "correlation must be square, symmetric, unit diagonal, in [-1, 1]", "correlation"
+        )
     if any(f <= 0 for f in forwards):
         raise _domain("a forward is not above 0", "forwards")
     if any(w < 0 for w in weights) or not any(w > 0 for w in weights):
@@ -229,9 +306,15 @@ def basket(forwards: Floats, weights: Floats, vols: Floats, corr: Sequence[Float
         raise _domain("a vol is not above 0", "vols")
     _positive(strike=k, expiry_years=t)
     m1 = ordered_sum(w * f for w, f in zip(weights, forwards, strict=True))
-    m2 = ordered_sum(weights[i] * weights[j] * forwards[i] * forwards[j]
-                     * math.exp(corr[i][j] * vols[i] * vols[j] * t)
-                     for i in range(n) for j in range(n))
+    m2 = ordered_sum(
+        weights[i]
+        * weights[j]
+        * forwards[i]
+        * forwards[j]
+        * math.exp(corr[i][j] * vols[i] * vols[j] * t)
+        for i in range(n)
+        for j in range(n)
+    )
     vb = math.sqrt(math.log(m2 / (m1 * m1)) / t)
     price = gbs(_phi(option_type), m1, k, t, r, 0.0, vb)
     return {"price": price, "basket_forward": m1, "basket_vol": vb}
@@ -239,8 +322,10 @@ def basket(forwards: Floats, weights: Floats, vols: Floats, corr: Sequence[Float
 
 # --- American ---
 
-def crr(s: float, k: float, t: float, r: float, q: float, v: float, option_type: str,
-        steps: int) -> dict[str, float]:
+
+def crr(
+    s: float, k: float, t: float, r: float, q: float, v: float, option_type: str, steps: int
+) -> dict[str, float]:
     _positive(spot=s, strike=k, expiry_years=t, vol=v)
     if steps < 1:
         raise _input("steps must be at least 1", "steps")
@@ -259,10 +344,15 @@ def crr(s: float, k: float, t: float, r: float, q: float, v: float, option_type:
     european = american[:]
     for i in range(steps - 1, -1, -1):
         european = [disc * (p * european[j] + (1 - p) * european[j + 1]) for j in range(i + 1)]
-        american = [max(disc * (p * american[j] + (1 - p) * american[j + 1]), payoff(i, j))
-                    for j in range(i + 1)]
-    return {"american": american[0], "european": european[0],
-            "early_exercise_premium": american[0] - european[0]}
+        american = [
+            max(disc * (p * american[j] + (1 - p) * american[j + 1]), payoff(i, j))
+            for j in range(i + 1)
+        ]
+    return {
+        "american": american[0],
+        "european": european[0],
+        "early_exercise_premium": american[0] - european[0],
+    }
 
 
 def _solve(f: Callable[[float], float], low: float, high: float) -> float:
@@ -314,8 +404,19 @@ def baw(s: float, k: float, t: float, r: float, q: float, v: float, option_type:
     return float(gbs(-1.0, s, k, t, r, b, v) + a1 * (s / star) ** q1)
 
 
-def fd(s: float, k: float, t: float, r: float, q: float, v: float, option_type: str,
-       exercise: str, nx: int, nt: int, width: float) -> dict[str, float]:
+def fd(
+    s: float,
+    k: float,
+    t: float,
+    r: float,
+    q: float,
+    v: float,
+    option_type: str,
+    exercise: str,
+    nx: int,
+    nt: int,
+    width: float,
+) -> dict[str, float]:
     _positive(spot=s, strike=k, expiry_years=t, vol=v)
     if nx < 5 or nx % 2 == 0:
         raise _input("nx must be odd and at least 5", "grid")
@@ -344,8 +445,10 @@ def fd(s: float, k: float, t: float, r: float, q: float, v: float, option_type: 
             rhs[0], rhs[-1] = payoff[0], payoff[-1]
         else:
             tau = (n + 1) * dt
-            rhs[0], rhs[-1] = (max(phi * (x * math.exp(-q * tau) - k * math.exp(-r * tau)), 0.0)
-                               for x in (spots[0], spots[-1]))
+            rhs[0], rhs[-1] = (
+                max(phi * (x * math.exp(-q * tau) - k * math.exp(-r * tau)), 0.0)
+                for x in (spots[0], spots[-1])
+            )
         values = thomas(lower, diag, upper, rhs)
         if american:
             values = [max(x, p) for x, p in zip(values, payoff, strict=True)]

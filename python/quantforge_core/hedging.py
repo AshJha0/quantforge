@@ -3,6 +3,7 @@
 min |A x + b|_W^2 + lambda sum c_i |x_i|. With G = A^T W A and h = A^T W b, coordinate descent finds
 the sign pattern, and one linear solve on that pattern then gives x exactly.
 """
+
 import math
 from collections.abc import Sequence
 
@@ -21,7 +22,10 @@ def _soft(v: float, limit: float) -> float:
 
 
 def _exact_on_pattern(
-    g: Sequence[Sequence[float]], h: Sequence[float], penalty: Sequence[float], x: list[float],
+    g: Sequence[Sequence[float]],
+    h: Sequence[float],
+    penalty: Sequence[float],
+    x: list[float],
 ) -> list[float] | None:
     """Solves on the current support and signs. None if the conditions fail there."""
     n = len(x)
@@ -48,8 +52,12 @@ def solve(
     rows = len(a)
     n = len(a[0]) if rows else 0
     if (
-        rows == 0 or n == 0 or any(len(r) != n for r in a)
-        or len(b) != rows or len(weights) != rows or len(costs) != n
+        rows == 0
+        or n == 0
+        or any(len(r) != n for r in a)
+        or len(b) != rows
+        or len(weights) != rows
+        or len(costs) != n
     ):
         raise QfError("E_INPUT", "a, b, weights and costs do not fit together")
     if any(w <= 0 for w in weights):
@@ -84,8 +92,7 @@ def solve(
             raise QfError("E_NO_CONVERGENCE", "the hedge solve did not settle")
 
     residual = [
-        ordered_sum(row[j] * exact[j] for j in range(n)) + v
-        for row, v in zip(a, b, strict=True)
+        ordered_sum(row[j] * exact[j] for j in range(n)) + v for row, v in zip(a, b, strict=True)
     ]
     objective = ordered_sum(
         w * r * r for w, r in zip(weights, residual, strict=True)

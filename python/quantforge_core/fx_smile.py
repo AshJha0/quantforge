@@ -4,6 +4,7 @@ ATM, risk reversal and strangle quotes.
 Spec: specifications/05-volatility/fx-smile.md, rulings E-A9 to E-A11 in
 specifications/stage-e-rulings.md. Strikes from delta are solved in x = ln(K/F).
 """
+
 import math
 from collections.abc import Callable
 
@@ -51,8 +52,16 @@ def _phi(option_type: str) -> float:
     return 1.0 if option_type == "CALL" else -1.0
 
 
-def option_price(spot: float, strike: float, t: float, rd: float, rf: float, vol: float,
-                 option_type: str, notional: float) -> dict[str, float]:
+def option_price(
+    spot: float,
+    strike: float,
+    t: float,
+    rd: float,
+    rf: float,
+    vol: float,
+    option_type: str,
+    notional: float,
+) -> dict[str, float]:
     _positive(spot=spot, strike=strike, expiry_years=t, vol=vol, notional=notional)
     m, phi = _Market(spot, t, rd, rf, vol), _phi(option_type)
     d1 = m.d1(strike)
@@ -60,15 +69,18 @@ def option_price(spot: float, strike: float, t: float, rd: float, rf: float, vol
     unit = phi * m.dd * (m.forward * big_n(phi * d1) - strike * big_n(phi * d2))
     density = small_n(d1)
     return {
-        "price": notional * unit, "premium_pct_foreign": unit / spot, "forward": m.forward,
+        "price": notional * unit,
+        "premium_pct_foreign": unit / spot,
+        "forward": m.forward,
         "delta": notional * phi * m.df * big_n(phi * d1),
         "gamma": notional * m.df * density / (spot * m.root),
         "vega": notional * spot * m.df * density * math.sqrt(t),
     }
 
 
-def delta_from_strike(spot: float, strike: float, t: float, rd: float, rf: float, vol: float,
-                      option_type: str) -> dict[str, float]:
+def delta_from_strike(
+    spot: float, strike: float, t: float, rd: float, rf: float, vol: float, option_type: str
+) -> dict[str, float]:
     _positive(spot=spot, strike=strike, expiry_years=t, vol=vol)
     m, phi = _Market(spot, t, rd, rf, vol), _phi(option_type)
     return {kind: m.delta(kind, phi, strike) for kind in DELTA_TYPES}
@@ -90,6 +102,7 @@ def _bracket_up(f: Callable[[float], float], start: float) -> float:
 
 def _pa_call_peak(m: _Market) -> float:
     """x* = ln(K*/F), where v sqrt T N(d2) = n(d2); left of it the PA call delta rises."""
+
     def h(d2: float) -> float:
         return m.root * big_n(d2) - small_n(d2)
 
@@ -103,8 +116,16 @@ def _pa_call_peak(m: _Market) -> float:
     return -m.root * d2 - m.root * m.root / 2
 
 
-def delta_to_strike(spot: float, t: float, rd: float, rf: float, vol: float, option_type: str,
-                    delta: float, delta_type: str) -> float:
+def delta_to_strike(
+    spot: float,
+    t: float,
+    rd: float,
+    rf: float,
+    vol: float,
+    option_type: str,
+    delta: float,
+    delta_type: str,
+) -> float:
     _positive(spot=spot, expiry_years=t, vol=vol)
     m, phi = _Market(spot, t, rd, rf, vol), _phi(option_type)
     if not phi * delta > 0:
@@ -135,8 +156,9 @@ def delta_to_strike(spot: float, t: float, rd: float, rf: float, vol: float, opt
     return m.forward * math.exp(_brent(gap, low, high))
 
 
-def atm_strike(spot: float, t: float, rd: float, rf: float, vol: float, atm_type: str,
-               delta_type: str) -> float:
+def atm_strike(
+    spot: float, t: float, rd: float, rf: float, vol: float, atm_type: str, delta_type: str
+) -> float:
     _positive(spot=spot, expiry_years=t, vol=vol)
     m = _Market(spot, t, rd, rf, vol)
     if atm_type == "SPOT":
@@ -147,9 +169,18 @@ def atm_strike(spot: float, t: float, rd: float, rf: float, vol: float, atm_type
     return m.forward * math.exp(-half if delta_type.endswith("_PA") else half)
 
 
-def smile_from_quotes(spot: float, t: float, rd: float, rf: float, atm_vol: float, rr: float,
-                      bf: float, delta: float, delta_type: str,
-                      atm_type: str) -> dict[str, float]:
+def smile_from_quotes(
+    spot: float,
+    t: float,
+    rd: float,
+    rf: float,
+    atm_vol: float,
+    rr: float,
+    bf: float,
+    delta: float,
+    delta_type: str,
+    atm_type: str,
+) -> dict[str, float]:
     _positive(spot=spot, expiry_years=t, atm_vol=atm_vol)
     if not 0 < delta < 0.5:
         raise _domain("delta must be in (0, 0.5)", "delta")
@@ -160,7 +191,8 @@ def smile_from_quotes(spot: float, t: float, rd: float, rf: float, atm_vol: floa
         raise _domain("put_vol is not above 0", "bf")
     return {
         "atm_strike": atm_strike(spot, t, rd, rf, atm_vol, atm_type, delta_type),
-        "call_vol": call_vol, "put_vol": put_vol,
+        "call_vol": call_vol,
+        "put_vol": put_vol,
         "call_strike": delta_to_strike(spot, t, rd, rf, call_vol, "CALL", delta, delta_type),
         "put_strike": delta_to_strike(spot, t, rd, rf, put_vol, "PUT", -delta, delta_type),
     }

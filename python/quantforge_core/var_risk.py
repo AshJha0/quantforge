@@ -1,5 +1,6 @@
 """Value at risk, expected shortfall and backtests
 (specifications/06-risk/var-es-and-backtests.md, rulings F-31 and F-32)."""
+
 import itertools
 import math
 from collections.abc import Sequence
@@ -39,8 +40,9 @@ def historical(pnl: Sequence[float], c: float) -> dict[str, object]:
     return _tail([-v for v in pnl], c)
 
 
-def filtered_historical(returns: Sequence[float], position: float, lam: float,
-                        c: float) -> dict[str, object]:
+def filtered_historical(
+    returns: Sequence[float], position: float, lam: float, c: float
+) -> dict[str, object]:
     _confidence(c)
     if not returns:
         raise QfError("E_INPUT", "no returns", "returns")
@@ -70,8 +72,14 @@ def parametric(mean: float, std: float, c: float) -> dict[str, object]:
     return {"var": -mean + std * z, "es": -mean + std * _phi(z) / (1 - c)}
 
 
-def monte_carlo(mean: Sequence[float], covariance: Sequence[Sequence[float]],
-                weights: Sequence[float], paths: int, seed: int, c: float) -> dict[str, object]:
+def monte_carlo(
+    mean: Sequence[float],
+    covariance: Sequence[Sequence[float]],
+    weights: Sequence[float],
+    paths: int,
+    seed: int,
+    c: float,
+) -> dict[str, object]:
     _confidence(c)
     n = len(mean)
     if n == 0 or len(weights) != n or len(covariance) != n or any(len(r) != n for r in covariance):
@@ -86,15 +94,18 @@ def monte_carlo(mean: Sequence[float], covariance: Sequence[Sequence[float]],
             s = covariance[i][j] - sum(lower[i][k] * lower[j][k] for k in range(j))
             if i == j:
                 if not s > 0:
-                    raise QfError("E_NOT_POSITIVE_DEFINITE", "covariance is not positive definite",
-                                  "covariance")
+                    raise QfError(
+                        "E_NOT_POSITIVE_DEFINITE",
+                        "covariance is not positive definite",
+                        "covariance",
+                    )
                 lower[i][i] = math.sqrt(s)
             else:
                 lower[i][j] = s / lower[j][j]
     z = rng.normals(seed, 0, paths * n)
     losses = []
     for p in range(paths):
-        draw = z[p * n:(p + 1) * n]
+        draw = z[p * n : (p + 1) * n]
         pnl = 0.0
         for i in range(n):
             r = mean[i] + sum(lower[i][k] * draw[k] for k in range(i + 1))
@@ -109,8 +120,9 @@ def _xlogy(x: float, y: float) -> float:
 
 def _lr_uc(n: int, x: int, c: float) -> float:
     p, p_hat = 1 - c, x / n
-    lr = (-2 * (_xlogy(n - x, 1 - p) + _xlogy(x, p))
-          + 2 * (_xlogy(n - x, 1 - p_hat) + _xlogy(x, p_hat)))
+    lr = -2 * (_xlogy(n - x, 1 - p) + _xlogy(x, p)) + 2 * (
+        _xlogy(n - x, 1 - p_hat) + _xlogy(x, p_hat)
+    )
     return 0.0 if lr < LR_ZERO else lr
 
 
@@ -143,15 +155,26 @@ def christoffersen(exceptions: Sequence[bool], c: float) -> dict[str, object]:
     pi01 = n01 / (n00 + n01) if n00 + n01 else 0.0
     pi11 = n11 / (n10 + n11) if n10 + n11 else 0.0
     pi = (n01 + n11) / (n - 1)
-    lr_ind = -2 * (_xlogy(n00 + n10, 1 - pi) + _xlogy(n01 + n11, pi)
-                   - _xlogy(n00, 1 - pi01) - _xlogy(n01, pi01)
-                   - _xlogy(n10, 1 - pi11) - _xlogy(n11, pi11))
+    lr_ind = -2 * (
+        _xlogy(n00 + n10, 1 - pi)
+        + _xlogy(n01 + n11, pi)
+        - _xlogy(n00, 1 - pi01)
+        - _xlogy(n01, pi01)
+        - _xlogy(n10, 1 - pi11)
+        - _xlogy(n11, pi11)
+    )
     if lr_ind < LR_ZERO:
         lr_ind = 0.0
     lr_cc = lr_uc + lr_ind
-    return {"lr_uc": lr_uc, "lr_ind": lr_ind, "lr_cc": lr_cc,
-            "p_uc": _chi2_sf(lr_uc, 1), "p_ind": _chi2_sf(lr_ind, 1), "p_cc": _chi2_sf(lr_cc, 2),
-            "transitions": counts}
+    return {
+        "lr_uc": lr_uc,
+        "lr_ind": lr_ind,
+        "lr_cc": lr_cc,
+        "p_uc": _chi2_sf(lr_uc, 1),
+        "p_ind": _chi2_sf(lr_ind, 1),
+        "p_cc": _chi2_sf(lr_cc, 2),
+        "transitions": counts,
+    }
 
 
 def traffic_light(n: int, x: int, c: float) -> dict[str, object]:
@@ -162,8 +185,12 @@ def traffic_light(n: int, x: int, c: float) -> dict[str, object]:
         raise QfError("E_DOMAIN", "exceptions must be in [0, observations]", "exceptions")
     p = 1 - c
     lp, lq = math.log(p), math.log1p(-p)
-    terms = [math.exp(math.lgamma(n + 1) - math.lgamma(k + 1) - math.lgamma(n - k + 1)
-                      + k * lp + (n - k) * lq) for k in range(x + 1)]
+    terms = [
+        math.exp(
+            math.lgamma(n + 1) - math.lgamma(k + 1) - math.lgamma(n - k + 1) + k * lp + (n - k) * lq
+        )
+        for k in range(x + 1)
+    ]
     cumulative = min(math.fsum(terms), 1.0)
     zone = "GREEN" if cumulative < 0.95 else "YELLOW" if cumulative < 0.9999 else "RED"
     plus: float | None = None
@@ -172,9 +199,18 @@ def traffic_light(n: int, x: int, c: float) -> dict[str, object]:
     return {"cumulative_probability": cumulative, "zone": zone, "plus_factor": plus}
 
 
-
-TENORS = {"0.25Y": 0.25, "0.5Y": 0.5, "1Y": 1.0, "2Y": 2.0, "3Y": 3.0, "5Y": 5.0, "10Y": 10.0,
-          "15Y": 15.0, "20Y": 20.0, "30Y": 30.0}
+TENORS = {
+    "0.25Y": 0.25,
+    "0.5Y": 0.5,
+    "1Y": 1.0,
+    "2Y": 2.0,
+    "3Y": 3.0,
+    "5Y": 5.0,
+    "10Y": 10.0,
+    "15Y": 15.0,
+    "20Y": 20.0,
+    "30Y": 30.0,
+}
 GIRR_FACTORS = (*TENORS, "INFLATION", "XCCY_BASIS")
 _WEIGHT = {0.25: 0.017, 0.5: 0.017, 1.0: 0.016, 2.0: 0.013, 3.0: 0.012}
 _REDUCED = ("EUR", "USD", "GBP", "AUD", "JPY", "SEK", "CAD")
@@ -209,8 +245,9 @@ def _scaled(x: float, scenario: str) -> float:
     return x
 
 
-def girr_delta(sensitivities: Sequence[tuple[str, str, str, float]], reduction: bool,
-               reporting: str | None) -> dict[str, object]:
+def girr_delta(
+    sensitivities: Sequence[tuple[str, str, str, float]], reduction: bool, reporting: str | None
+) -> dict[str, object]:
     """sensitivities: (currency, curve, risk_factor, sensitivity)."""
     if not sensitivities:
         raise QfError("E_INPUT", "no sensitivities", "sensitivities")
@@ -258,9 +295,13 @@ def girr_delta(sensitivities: Sequence[tuple[str, str, str, float]], reduction: 
         delta = math.sqrt(max(0.0, value))
         deltas[sc] = delta
         scenarios[sc] = {
-            "buckets": [{"currency": c, "k": k, "s": s, "s_used": u}
-                        for c, k, s, u in zip(order, ks, ss, used, strict=True)],
-            "delta": delta, "alternative_used": alternative}
+            "buckets": [
+                {"currency": c, "k": k, "s": s, "s_used": u}
+                for c, k, s, u in zip(order, ks, ss, used, strict=True)
+            ],
+            "delta": delta,
+            "alternative_used": alternative,
+        }
     binding = max(_SCENARIOS, key=lambda sc: (deltas[sc], -_SCENARIOS.index(sc)))
     return {"scenarios": scenarios, "capital": deltas[binding], "binding_scenario": binding}
 

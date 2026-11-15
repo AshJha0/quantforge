@@ -1,5 +1,6 @@
 """Joint multi-curve solve, calibrated turns, futures-fitted meeting steps, funding curve
 (specifications/02-curves/joint-solve-and-funding.md, rulings F-24 to F-27)."""
+
 import itertools
 import math
 from collections.abc import Callable, Sequence
@@ -18,8 +19,10 @@ TOLERANCE = 1e-13
 _H = 1e-7
 _CURVE_TYPES = ("OIS", "OIS_STEPS", "PROJECTION", "XCCY")
 _ALLOWED = {
-    "OIS": ("OIS", "FUTURE"), "OIS_STEPS": ("OIS", "FUTURE"),
-    "PROJECTION": ("DEPOSIT", "FRA", "SWAP"), "XCCY": ("XCCY",),
+    "OIS": ("OIS", "FUTURE"),
+    "OIS_STEPS": ("OIS", "FUTURE"),
+    "PROJECTION": ("DEPOSIT", "FRA", "SWAP"),
+    "XCCY": ("XCCY",),
 }
 
 
@@ -95,8 +98,9 @@ def _check_increasing(as_of: date, dates: Sequence[date], key: str) -> None:
         raise QfError("E_INPUT", f"{key} must be increasing and after as_of", key)
 
 
-def _check_structure(as_of: date, specs: Sequence[CurveSpec],
-                     instruments: Sequence[InstrumentSpec]) -> None:
+def _check_structure(
+    as_of: date, specs: Sequence[CurveSpec], instruments: Sequence[InstrumentSpec]
+) -> None:
     seen: dict[str, CurveSpec] = {}
     for c in specs:
         if c.type not in _CURVE_TYPES:
@@ -104,8 +108,9 @@ def _check_structure(as_of: date, specs: Sequence[CurveSpec],
         refs = {"PROJECTION": [c.discount], "XCCY": [c.domestic, c.foreign_projection]}
         for ref in refs.get(c.type, []):
             if ref not in seen or seen[ref].type not in ("OIS", "OIS_STEPS"):
-                raise QfError("E_INPUT", f"{c.name} names {ref}, not an earlier OIS curve",
-                              "curves")
+                raise QfError(
+                    "E_INPUT", f"{c.name} names {ref}, not an earlier OIS curve", "curves"
+                )
         if c.name in seen:
             raise QfError("E_INPUT", f"duplicate curve name {c.name}", "curves")
         seen[c.name] = c
@@ -124,18 +129,17 @@ def _check_structure(as_of: date, specs: Sequence[CurveSpec],
         mine = [i for i in instruments if i.curve == c.name]
         turns = sum(1 for i in mine if i.turn)
         if turns != len(c.turns):
-            raise QfError("E_INPUT", f"{c.name} needs one turn instrument per turn",
-                          "instruments")
+            raise QfError("E_INPUT", f"{c.name} needs one turn instrument per turn", "instruments")
         if c.type == "OIS_STEPS" and len(mine) != 1 + len(c.step_dates) + len(c.turns):
-            raise QfError("E_INPUT", f"{c.name} needs 1 + steps + turns instruments",
-                          "instruments")
+            raise QfError("E_INPUT", f"{c.name} needs 1 + steps + turns instruments", "instruments")
         if c.type == "OIS_STEPS" and not c.step_dates:
             raise QfError("E_INPUT", "no step dates", "step_dates")
 
 
 def _jumps(c: CurveSpec, turn_logs: Sequence[float]) -> Jumps:
-    merged = sorted([*c.jumps, *((d, math.exp(x)) for d, x in zip(c.turns, turn_logs,
-                                                                   strict=True))])
+    merged = sorted(
+        [*c.jumps, *((d, math.exp(x)) for d, x in zip(c.turns, turn_logs, strict=True))]
+    )
     return tuple(merged)
 
 
@@ -167,8 +171,9 @@ def _ois_instrument(as_of: date, c: CurveSpec, inst: InstrumentSpec) -> _Instrum
     return _Instrument(inst, simple, rate - bias, 0.01 * math.exp(-z), [s, e], e)
 
 
-def _blocks(as_of: date, specs: Sequence[CurveSpec],
-            instruments: Sequence[InstrumentSpec]) -> list[_Block]:
+def _blocks(
+    as_of: date, specs: Sequence[CurveSpec], instruments: Sequence[InstrumentSpec]
+) -> list[_Block]:
     blocks: list[_Block] = []
     offset = 0
     for c in specs:
@@ -177,12 +182,21 @@ def _blocks(as_of: date, specs: Sequence[CurveSpec],
         if c.type in ("OIS", "OIS_STEPS"):
             b.instruments = [_ois_instrument(as_of, c, i) for i in mine]
         elif c.type == "PROJECTION":
-            quotes = [projection.ProjectionQuote(
-                i.type, i.start_months if i.type == "FRA" else i.months, i.rate) for i in mine]
+            quotes = [
+                projection.ProjectionQuote(
+                    i.type, i.start_months if i.type == "FRA" else i.months, i.rate
+                )
+                for i in mine
+            ]
             pillars, terms, dates = projection.term_models(c.index, as_of, quotes)
             for i, p, m, ds in zip(mine, pillars, terms, dates, strict=True):
-                def model(cs: dict[str, Any], m: projection.TermModel = m,
-                          own: str = c.name, disc: str = c.discount) -> float:
+
+                def model(
+                    cs: dict[str, Any],
+                    m: projection.TermModel = m,
+                    own: str = c.name,
+                    disc: str = c.discount,
+                ) -> float:
                     return m(cs[own], cs[disc])
 
                 b.instruments.append(_Instrument(i, model, i.rate, -1.0, ds, p))
@@ -191,16 +205,26 @@ def _blocks(as_of: date, specs: Sequence[CurveSpec],
             if c.start < as_of:
                 raise QfError("E_OUT_OF_RANGE", "start is before the curve date", "start")
             for i in mine:
-                ends = xccy.schedule((c.domestic_convention, c.foreign_convention), c.start,
-                                     i.months)
+                ends = xccy.schedule(
+                    (c.domestic_convention, c.foreign_convention), c.start, i.months
+                )
 
-                def leg(cs: dict[str, Any], ends: list[date] = ends, spread: float = i.spread,
-                        own: str = c.name, fp: str = c.foreign_projection,
-                        start: date = c.start) -> float:
+                def leg(
+                    cs: dict[str, Any],
+                    ends: list[date] = ends,
+                    spread: float = i.spread,
+                    own: str = c.name,
+                    fp: str = c.foreign_projection,
+                    start: date = c.start,
+                ) -> float:
                     return xccy.leg(1.0, start, ends, cs[fp], cs[own], spread)
 
-                def slope(cs: dict[str, Any], ends: list[date] = ends, own: str = c.name,
-                          start: date = c.start) -> float:
+                def slope(
+                    cs: dict[str, Any],
+                    ends: list[date] = ends,
+                    own: str = c.name,
+                    start: date = c.start,
+                ) -> float:
                     """d L_foreign / d spread: the spread annuity on ACT/360."""
                     d = cs[own]
                     total = 0.0
@@ -208,16 +232,17 @@ def _blocks(as_of: date, specs: Sequence[CurveSpec],
                         total += (e - s).days / 360 * d.discount(e)
                     return total
 
-                b.instruments.append(_Instrument(i, leg, 0.0, 0.0, [c.start, *ends], ends[-1],
-                                                 slope))
+                b.instruments.append(
+                    _Instrument(i, leg, 0.0, 0.0, [c.start, *ends], ends[-1], slope)
+                )
         if c.type == "OIS_STEPS":
             b.labels = [f"{c.name}:base", *(f"{c.name}:step:{d}" for d in c.step_dates)]
         else:
-            b.pillars = [x.pillar for x in b.instruments if not x.spec.turn
-                         and x.pillar is not None]
+            b.pillars = [
+                x.pillar for x in b.instruments if not x.spec.turn and x.pillar is not None
+            ]
             if any(q <= p for p, q in itertools.pairwise([as_of, *b.pillars])):
-                raise QfError("E_INPUT", f"{c.name}: pillars are not increasing",
-                              "instruments")
+                raise QfError("E_INPUT", f"{c.name}: pillars are not increasing", "instruments")
             curves.check_options(c.interpolation, c.tension, c.step_end, b.pillars)
             b.labels = [f"{c.name}:pillar:{d}" for d in b.pillars]
         b.labels += [f"{c.name}:turn:{d}" for d in c.turns]
@@ -232,32 +257,40 @@ def _blocks(as_of: date, specs: Sequence[CurveSpec],
 
 def _curve(as_of: date, b: _Block, x: Sequence[float]) -> Any:
     c = b.spec
-    own = x[b.offset:b.offset + b.size]
-    turns = own[len(own) - len(c.turns):] if c.turns else []
+    own = x[b.offset : b.offset + b.size]
+    turns = own[len(own) - len(c.turns) :] if c.turns else []
     jumps = _jumps(c, turns)
     if c.type == "OIS_STEPS":
         m = len(c.step_dates)
-        return StepCurve(as_of, own[0], list(zip(c.step_dates, own[1:m + 1], strict=True)),
-                         jumps)
+        return StepCurve(as_of, own[0], list(zip(c.step_dates, own[1 : m + 1], strict=True)), jumps)
     n = len(b.pillars)
-    return Curve(CurveData(as_of, c.interpolation, tuple(b.pillars),
-                           tuple(math.exp(v) for v in own[:n]), jumps, c.tension, c.step_end))
+    return Curve(
+        CurveData(
+            as_of,
+            c.interpolation,
+            tuple(b.pillars),
+            tuple(math.exp(v) for v in own[:n]),
+            jumps,
+            c.tension,
+            c.step_end,
+        )
+    )
 
 
-def _residuals(as_of: date, blocks: Sequence[_Block], x: Sequence[float],
-               upto: int | None = None) -> list[float]:
+def _residuals(
+    as_of: date, blocks: Sequence[_Block], x: Sequence[float], upto: int | None = None
+) -> list[float]:
     """Residuals of blocks 0..upto (all by default), in block order."""
     cs: dict[str, Any] = {}
     out: list[float] = []
     last = len(blocks) - 1 if upto is None else upto
-    for b in blocks[:last + 1]:
+    for b in blocks[: last + 1]:
         cs[b.spec.name] = _curve(as_of, b, x)
         out += [i.model(cs) - i.target for i in b.instruments]
     return out
 
 
-def _start(as_of: date, blocks: Sequence[_Block], x: list[float],
-           only: int | None = None) -> None:
+def _start(as_of: date, blocks: Sequence[_Block], x: list[float], only: int | None = None) -> None:
     """Flat curves at the first quote, steps at base_rate, turn factors 1."""
     for k, b in enumerate(blocks):
         if only is not None and k != only:
@@ -281,8 +314,9 @@ def _start(as_of: date, blocks: Sequence[_Block], x: list[float],
             x[b.offset + b.size - len(c.turns) + kk] = 0.0
 
 
-def _central(as_of: date, blocks: Sequence[_Block], x: list[float], k: int, j: int,
-             h: float) -> list[float]:
+def _central(
+    as_of: date, blocks: Sequence[_Block], x: list[float], k: int, j: int, h: float
+) -> list[float]:
     b = blocks[k]
     keep = x[j]
     x[j] = keep + h
@@ -293,8 +327,9 @@ def _central(as_of: date, blocks: Sequence[_Block], x: list[float], k: int, j: i
     return [(up[i] - down[i]) / (2 * h) for i in range(b.offset, b.offset + b.size)]
 
 
-def _column(as_of: date, blocks: Sequence[_Block], x: list[float], k: int, j: int,
-            adaptive: bool) -> list[float]:
+def _column(
+    as_of: date, blocks: Sequence[_Block], x: list[float], k: int, j: int, adaptive: bool
+) -> list[float]:
     """d residuals(block k) / d x[j]. Newton uses one central difference at _H. The IFT
     Jacobian uses Richardson on central differences, on a stencil that shrinks until two
     estimates agree: a piecewise interpolation (monotone convex) has kinks in its data, and a
@@ -319,8 +354,14 @@ def _column(as_of: date, blocks: Sequence[_Block], x: list[float], k: int, j: in
     return best
 
 
-def _block_jacobian(as_of: date, blocks: Sequence[_Block], x: list[float], k: int,
-                    cols: range, adaptive: bool = False) -> list[list[float]]:
+def _block_jacobian(
+    as_of: date,
+    blocks: Sequence[_Block],
+    x: list[float],
+    k: int,
+    cols: range,
+    adaptive: bool = False,
+) -> list[list[float]]:
     """d residuals(block k) / d x[cols]."""
     size = blocks[k].size
     out = [[0.0] * len(cols) for _ in range(size)]
@@ -350,7 +391,7 @@ def _solve_block(as_of: date, blocks: Sequence[_Block], x: list[float], k: int) 
     cols = range(b.offset, b.offset + b.size)
 
     def own(v: list[float]) -> list[float]:
-        return _residuals(as_of, blocks, v, k)[b.offset:]
+        return _residuals(as_of, blocks, v, k)[b.offset :]
 
     r = own(x)
     for _ in range(50):  # ruling F-40
@@ -367,7 +408,7 @@ def _solve_block(as_of: date, blocks: Sequence[_Block], x: list[float], k: int) 
                 trial[j] += scale * step[jj]
             try:
                 r_new = own(trial)
-            except (OverflowError, ValueError, ZeroDivisionError):
+            except OverflowError, ValueError, ZeroDivisionError:
                 r_new = [math.inf]
             if max(abs(v) for v in r_new) < size or scale < 1e-6:
                 break
@@ -388,8 +429,9 @@ class JointResult:
     max_error: float
 
 
-def joint_solve(as_of: date, specs: Sequence[CurveSpec],
-                instruments: Sequence[InstrumentSpec]) -> JointResult:
+def joint_solve(
+    as_of: date, specs: Sequence[CurveSpec], instruments: Sequence[InstrumentSpec]
+) -> JointResult:
     _check_structure(as_of, specs, instruments)
     blocks = _blocks(as_of, specs, instruments)
     n = sum(b.size for b in blocks)
@@ -409,10 +451,9 @@ def joint_solve(as_of: date, specs: Sequence[CurveSpec],
     for k, b in enumerate(blocks):
         for kk in range(k + 1):
             c = blocks[kk]
-            sub = _block_jacobian(as_of, blocks, x, k, range(c.offset, c.offset + c.size),
-                                  True)
+            sub = _block_jacobian(as_of, blocks, x, k, range(c.offset, c.offset + c.size), True)
             for ii in range(b.size):
-                full[b.offset + ii][c.offset:c.offset + c.size] = sub[ii]
+                full[b.offset + ii][c.offset : c.offset + c.size] = sub[ii]
     rows = [i for b in blocks for i in b.instruments]  # residual row order
     for b in blocks:  # ruling F-26: a turn moves only instruments that span it
         if b.spec.type != "OIS_STEPS":
@@ -452,9 +493,9 @@ def joint_solve(as_of: date, specs: Sequence[CurveSpec],
                 rhs.append(-(rows[r].d_quote if r == r0 else 0.0) - acc)
             if k > block_of[r0] and all(v == 0.0 for v in rhs):
                 continue
-            a = [row[b.offset:b.offset + b.size] for row in full[b.offset:b.offset + b.size]]
+            a = [row[b.offset : b.offset + b.size] for row in full[b.offset : b.offset + b.size]]
             sol = linalg.lu_solve(a, rhs)
-            col[b.offset:b.offset + b.size] = sol
+            col[b.offset : b.offset + b.size] = sol
         for i in range(n):
             jac[i][q] = col[i]
 
@@ -473,16 +514,23 @@ def outputs(as_of: date, result: JointResult) -> dict[str, Any]:
     x = result.x
     for b in result.blocks:
         c = b.spec
-        own = x[b.offset:b.offset + b.size]
+        own = x[b.offset : b.offset + b.size]
         if c.type == "OIS_STEPS":
             m = len(c.step_dates)
-            out_curves.append({"name": c.name, "base_rate": own[0],
-                               "step_rates": list(own[1:m + 1])})
+            out_curves.append(
+                {"name": c.name, "base_rate": own[0], "step_rates": list(own[1 : m + 1])}
+            )
         else:
-            out_curves.append({"name": c.name, "pillars": [
-                {"date": d.isoformat(), "discount_factor": math.exp(v)}
-                for d, v in zip(b.pillars, own, strict=False)]})
-        for d, v in zip(c.turns, own[len(own) - len(c.turns):], strict=True):
+            out_curves.append(
+                {
+                    "name": c.name,
+                    "pillars": [
+                        {"date": d.isoformat(), "discount_factor": math.exp(v)}
+                        for d, v in zip(b.pillars, own, strict=False)
+                    ],
+                }
+            )
+        for d, v in zip(c.turns, own[len(own) - len(c.turns) :], strict=True):
             turns.append({"curve": c.name, "date": d.isoformat(), "factor": math.exp(v)})
     labels = [label for b in result.blocks for label in b.labels]
     return {
@@ -493,9 +541,9 @@ def outputs(as_of: date, result: JointResult) -> dict[str, Any]:
     }
 
 
-def funding_curve(discount: CurveData, quotes: Sequence[tuple[date, float]],
-                  dates: Sequence[date]) -> tuple[list[float], list[tuple[date, float]],
-                                                  list[float]]:
+def funding_curve(
+    discount: CurveData, quotes: Sequence[tuple[date, float]], dates: Sequence[date]
+) -> tuple[list[float], list[tuple[date, float]], list[float]]:
     """Returns (spreads, pillars, discount factors at dates)."""
     curve = curves.build(discount)
     as_of = discount.as_of

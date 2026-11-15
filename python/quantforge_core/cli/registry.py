@@ -3,6 +3,7 @@
 
 Reading inputs is the E_SCHEMA stage, and the first call into the core ends it. So each core
 module is reached through a gate, which applies limits.md at exactly that point."""
+
 from collections.abc import Callable
 from importlib import import_module
 from types import FunctionType, ModuleType, SimpleNamespace
@@ -15,18 +16,89 @@ from .limits import check_limits
 Handler = Callable[[Inputs], Any]
 REGISTRY: dict[str, Handler] = {}
 CORE_MODULES = (
-    "arb_surface", "black", "bonds", "calendars", "calibration", "caps_swaptions", "commodity",
-    "compounding", "conventions", "correlation", "cos", "credit", "credit_correlation_hedges", "credit_options", "cross_asset_hedge", "csa",
-    "curve_fits", "curves", "data_checks", "daycount", "dynamic_hedge", "equity", "equity_curves", "exotics",
-    "futures", "fx", "fx_smile", "hedge_solvers", "hedging", "heston", "inflation", "integrate", "interp", "joint", "linalg", "book_risk", "var_risk", "book",
-    "mbs", "money", "monte_carlo", "ois", "overnight", "pde", "projection", "rates_vol", "research", "research_w2", "research_w3", "drift",
-    "risk_curve", "rng", "roots", "sabr", "schedules", "shortrate", "slippage", "mc_greeks", "lmm", "xva", "risk_tools", "aad_ladder", "frtb", "portfolio_exposure", "sensitivities", "smile", "snapshot",
-    "sobol", "stats", "steps", "store", "term_curves", "timezones", "usecases", "variance", "vol_usecase", "xccy",
+    "arb_surface",
+    "black",
+    "bonds",
+    "calendars",
+    "calibration",
+    "caps_swaptions",
+    "commodity",
+    "compounding",
+    "conventions",
+    "correlation",
+    "cos",
+    "credit",
+    "credit_correlation_hedges",
+    "credit_options",
+    "cross_asset_hedge",
+    "csa",
+    "curve_fits",
+    "curves",
+    "data_checks",
+    "daycount",
+    "dynamic_hedge",
+    "equity",
+    "equity_curves",
+    "exotics",
+    "futures",
+    "fx",
+    "fx_smile",
+    "hedge_solvers",
+    "hedging",
+    "heston",
+    "inflation",
+    "integrate",
+    "interp",
+    "joint",
+    "linalg",
+    "book_risk",
+    "var_risk",
+    "book",
+    "mbs",
+    "money",
+    "monte_carlo",
+    "ois",
+    "overnight",
+    "pde",
+    "projection",
+    "rates_vol",
+    "research",
+    "research_w2",
+    "research_w3",
+    "drift",
+    "risk_curve",
+    "rng",
+    "roots",
+    "sabr",
+    "schedules",
+    "shortrate",
+    "slippage",
+    "mc_greeks",
+    "lmm",
+    "xva",
+    "risk_tools",
+    "aad_ladder",
+    "frtb",
+    "portfolio_exposure",
+    "sensitivities",
+    "smile",
+    "snapshot",
+    "sobol",
+    "stats",
+    "steps",
+    "store",
+    "term_curves",
+    "timezones",
+    "usecases",
+    "variance",
+    "vol_usecase",
+    "xccy",
 )
 
 
 def op(name: str) -> Callable[[Handler], Handler]:
     """Registers a handler for one verb; a verb registered twice is a bug."""
+
     def register(f: Handler) -> Handler:
         if name in REGISTRY:
             raise RuntimeError(f"{name} is registered twice")

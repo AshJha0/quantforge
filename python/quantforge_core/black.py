@@ -1,5 +1,6 @@
 """Black-Scholes, Black-76, Bachelier, and their Greeks (specifications/05-volatility/black-models.md,
 specifications/06-risk/vol-greeks.md)."""
+
 import math
 from dataclasses import dataclass, replace
 from functools import lru_cache
@@ -171,9 +172,14 @@ def greeks(o: Option, vol: float) -> dict[str, float]:
         n = small_n(x)
         vega = d * root_t * n
         return {
-            "price": value, "delta": d * phi * big_n(phi * x), "gamma": d * n / (v * root_t),
-            "vega": vega, "theta": -d * v * n / (2 * root_t), "rho": -t * value,
-            "vanna": -d * n * x / v, "volga": d * root_t * n * x * x / v,
+            "price": value,
+            "delta": d * phi * big_n(phi * x),
+            "gamma": d * n / (v * root_t),
+            "vega": vega,
+            "theta": -d * v * n / (2 * root_t),
+            "rho": -t * value,
+            "vanna": -d * n * x / v,
+            "volga": d * root_t * n * x * x / v,
         }
     d1 = _d1(f, k, v, t)
     d2 = d1 - v * root_t
@@ -183,18 +189,27 @@ def greeks(o: Option, vol: float) -> dict[str, float]:
         big_q = math.exp(-q * t)
         vega = s * big_q * n * root_t
         return {
-            "price": value, "delta": big_q * phi * big_n(phi * d1),
-            "gamma": big_q * n / (s * v * root_t), "vega": vega,
-            "theta": -s * big_q * n * v / (2 * root_t) - phi * r * k * d * big_n(phi * d2)
+            "price": value,
+            "delta": big_q * phi * big_n(phi * d1),
+            "gamma": big_q * n / (s * v * root_t),
+            "vega": vega,
+            "theta": -s * big_q * n * v / (2 * root_t)
+            - phi * r * k * d * big_n(phi * d2)
             + phi * q * s * big_q * big_n(phi * d1),
-            "rho": phi * k * t * d * big_n(phi * d2), "vanna": -big_q * n * d2 / v,
+            "rho": phi * k * t * d * big_n(phi * d2),
+            "vanna": -big_q * n * d2 / v,
             "volga": vega * d1 * d2 / v,
         }
     vega = d * f * n * root_t
     return {
-        "price": value, "delta": d * phi * big_n(phi * d1), "gamma": d * n / (f * v * root_t),
-        "vega": vega, "theta": -d * f * n * v / (2 * root_t), "rho": -t * value,
-        "vanna": -d * n * d2 / v, "volga": vega * d1 * d2 / v,
+        "price": value,
+        "delta": d * phi * big_n(phi * d1),
+        "gamma": d * n / (f * v * root_t),
+        "vega": vega,
+        "theta": -d * f * n * v / (2 * root_t),
+        "rho": -t * value,
+        "vanna": -d * n * d2 / v,
+        "volga": vega * d1 * d2 / v,
     }
 
 
@@ -220,15 +235,19 @@ def bump_greeks(o: Option, vol: float) -> dict[str, float]:
         "gamma": (s_up - 2 * mid + s_down) / (hu * hu),
         "vega": (w_up - w_down) / (2 * hv),
         "volga": (w_up - 2 * mid + w_down) / (hv * hv),
-        "vanna": (
-            _value(up, v_up) - _value(up, v_down) - _value(down, v_up) + _value(down, v_down)
-        ) / (4 * hu * hv),
+        "vanna": (_value(up, v_up) - _value(up, v_down) - _value(down, v_up) + _value(down, v_down))
+        / (4 * hu * hv),
     }
 
 
 def black76_position(
-    option_type: str, forward: float, strike: float, discount: float, expiry_years: float,
-    vol: float, signed_quantity: float,
+    option_type: str,
+    forward: float,
+    strike: float,
+    discount: float,
+    expiry_years: float,
+    vol: float,
+    signed_quantity: float,
 ) -> tuple[float, float, float]:
     """PV, delta against the forward, and vega of a signed position. Needs T, vol above 0."""
     phi = 1.0 if option_type == "CALL" else -1.0

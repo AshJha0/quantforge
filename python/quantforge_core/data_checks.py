@@ -1,4 +1,5 @@
 """Market-data checks (specifications/01-core/data-checks.md)."""
+
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
@@ -44,8 +45,7 @@ def _check_one(
             flags.append("MISSING_ASK")
         if non_positive:
             flags.append("NON_POSITIVE")
-        return {"instrument_id": q.instrument_id, "quote_status": "MISSING",
-                "quality_flags": flags}
+        return {"instrument_id": q.instrument_id, "quote_status": "MISSING", "quality_flags": flags}
 
     crossed = q.bid > q.ask
     stale = as_of - q.event_time > stale_after
@@ -58,7 +58,9 @@ def _check_one(
     if stale:
         flags.append("STALE")
     if (
-        max_spread is not None and not crossed and mid != 0
+        max_spread is not None
+        and not crossed
+        and mid != 0
         and (q.ask - q.bid) / abs(mid) > max_spread
     ):
         flags.append("WIDE_SPREAD")
@@ -104,8 +106,13 @@ def check_quotes(
     }
     return [
         _check_one(
-            q, as_of, stale_after_seconds, max_relative_spread, positive_only,
-            outlier_threshold, spreads,
+            q,
+            as_of,
+            stale_after_seconds,
+            max_relative_spread,
+            positive_only,
+            outlier_threshold,
+            spreads,
         )
         for q in quotes
     ]

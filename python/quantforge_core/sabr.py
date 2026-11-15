@@ -1,5 +1,6 @@
 """SABR: Hagan expansion, density check, calibration, arbitrage-free recipe
 (specifications/05-volatility/sabr.md)."""
+
 import itertools
 import math
 from collections.abc import Sequence
@@ -79,9 +80,7 @@ def hagan(p: Sabr, strikes: Floats) -> list[float]:
 
 
 def _call(p: Sabr, strike: float) -> float:
-    o = Option(
-        BLACK_76, "CALL", strike + p.shift, p.expiry_years, p.forward + p.shift
-    )
+    o = Option(BLACK_76, "CALL", strike + p.shift, p.expiry_years, p.forward + p.shift)
     return _value(o, _hagan(p, strike))
 
 
@@ -94,9 +93,7 @@ def density(
     if any(k + p.shift - h_strike <= 0 for k in strikes):
         raise _domain("a strike less h_strike is not above 0", "h_strike")
     h = h_strike
-    values = [
-        (_call(p, k + h) - 2 * _call(p, k) + _call(p, k - h)) / (h * h) for k in strikes
-    ]
+    values = [(_call(p, k + h) - 2 * _call(p, k) + _call(p, k - h)) / (h * h) for k in strikes]
     low = min(values)
     negative = low < -1e-9
     if negative and on_negative == "REJECT":
@@ -105,7 +102,12 @@ def density(
 
 
 def calibrate(
-    forward: float, expiry_years: float, beta: float, shift: float, strikes: Floats, vols: Floats,
+    forward: float,
+    expiry_years: float,
+    beta: float,
+    shift: float,
+    strikes: Floats,
+    vols: Floats,
     weights: Floats | None,
 ) -> tuple[float, float, float, float]:
     if len(strikes) != len(vols) or (weights is not None and len(weights) != len(strikes)):
@@ -130,14 +132,18 @@ def calibrate(
 
     def residual(x: np.ndarray) -> np.ndarray:
         p = model(x)
-        return cast("np.ndarray", root_weight * (np.array([_hagan(p, k) for k in strikes]) - target))
+        return cast(
+            "np.ndarray", root_weight * (np.array([_hagan(p, k) for k in strikes]) - target)
+        )
 
     f = forward + shift
     nearest = min(range(len(strikes)), key=lambda i: abs(strikes[i] - forward))
     alpha = vols[nearest] * f ** (1 - beta)
     starts = [
         np.array((math.log(alpha * a), math.atanh(r), math.log(n)))
-        for a in (1.0, 0.7) for r in (-0.6, -0.1, 0.4) for n in (0.1, 0.5, 1.5)
+        for a in (1.0, 0.7)
+        for r in (-0.6, -0.1, 0.4)
+        for n in (0.1, 0.5, 1.5)
     ]
     best = best_of(residual, starts)
     if best is None:
@@ -208,8 +214,11 @@ def arbfree(
         else:
             vols.append(implied(Option(BLACK_76, "CALL", x, p.expiry_years, f0), value))
     return {
-        "call_prices": calls, "vols": vols, "mass": float(qa.sum()) * h + p_left + p_right,
-        "mean": float((u * qa).sum()) * h + u_max * p_right, "absorbed": p_left,
+        "call_prices": calls,
+        "vols": vols,
+        "mass": float(qa.sum()) * h + p_left + p_right,
+        "mean": float((u * qa).sum()) * h + u_max * p_right,
+        "absorbed": p_left,
         "min_density": float(qa.min()),
     }
 

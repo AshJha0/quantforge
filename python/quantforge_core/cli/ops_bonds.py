@@ -1,4 +1,5 @@
 """Handlers for the bonds verbs. A handler reads every input first; the first call through `core`, the gated core modules, ends the E_SCHEMA stage."""
+
 from typing import Any
 
 from ..bonds import CONTRACTS
@@ -42,12 +43,20 @@ def _bond_asw(i: Inputs) -> Any:
 @op("bond.frn.price")
 def _frn(i: Inputs) -> Any:
     from ..bonds import FREQUENCIES
+
     frequency = i.integer("frequency")
     if frequency not in FREQUENCIES:
         raise QfError("E_SCHEMA", "frequency must be 1, 2 or 4", "frequency")
-    args = (i.date("settlement"), i.date("maturity"), frequency, i.real("current_rate"),
-            i.real("margin"), i.real("discount_margin"), _curve(i, "discount"),
-            _curve(i, "projection"))
+    args = (
+        i.date("settlement"),
+        i.date("maturity"),
+        frequency,
+        i.real("current_rate"),
+        i.real("margin"),
+        i.real("discount_margin"),
+        _curve(i, "discount"),
+        _curve(i, "projection"),
+    )
     return core.bonds.frn_price(*args)
 
 
@@ -55,15 +64,26 @@ def _frn(i: Inputs) -> Any:
 def _repo_forward(i: Inputs) -> Any:
     _present(i, "gc_rate")
     gc = i.real("gc_rate") if i.has("gc_rate") else None
-    args = (_bond(i.object("bond")), i.date("start"), i.date("end"), i.real("clean_price"),
-            i.real("repo_rate"), gc)
+    args = (
+        _bond(i.object("bond")),
+        i.date("start"),
+        i.date("end"),
+        i.real("clean_price"),
+        i.real("repo_rate"),
+        gc,
+    )
     return core.bonds.repo_forward(*args)
 
 
 @op("repo.implied_rate")
 def _repo_implied(i: Inputs) -> Any:
-    args = (_bond(i.object("bond")), i.date("start"), i.date("end"), i.real("clean_price"),
-            i.real("forward_clean"))
+    args = (
+        _bond(i.object("bond")),
+        i.date("start"),
+        i.date("end"),
+        i.real("clean_price"),
+        i.real("forward_clean"),
+    )
     return {"repo_rate": core.bonds.repo_implied(*args)}
 
 
@@ -77,10 +97,16 @@ def _conversion(i: Inputs) -> Any:
 
 @op("bond.futures.basis")
 def _futures_basis(i: Inputs) -> Any:
-    bonds = [(_bond(b), b.real("clean_price"), b.real("conversion_factor"))
-             for b in _objects(i, "bonds")]
-    args = (i.real("futures_price"), i.date("settlement"), i.date("delivery"),
-            i.real("repo_rate"), bonds)
+    bonds = [
+        (_bond(b), b.real("clean_price"), b.real("conversion_factor")) for b in _objects(i, "bonds")
+    ]
+    args = (
+        i.real("futures_price"),
+        i.date("settlement"),
+        i.date("delivery"),
+        i.real("repo_rate"),
+        bonds,
+    )
     rows, ctd = core.bonds.futures_basis(*args)
     return {"bonds": rows, "ctd": ctd}
 
@@ -90,6 +116,7 @@ def _bond_fit(i: Inputs) -> Any:
     _not_null(i, "weights")
     bonds = [(_bond(b), b.real("dirty_price")) for b in _objects(i, "bonds")]
     weights = i.reals("weights") if i.has("weights") else None
-    betas, residuals = core.bonds.fit_nelson_siegel(i.date("settlement"), i.real("tau"), bonds,
-                                                 weights)
+    betas, residuals = core.bonds.fit_nelson_siegel(
+        i.date("settlement"), i.real("tau"), bonds, weights
+    )
     return {"betas": betas, "residuals": residuals}

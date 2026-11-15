@@ -1,4 +1,5 @@
 """Meeting-date step curves and their fit (specifications/02-curves/meeting-steps.md)."""
+
 import itertools
 import math
 from collections.abc import Callable, Sequence
@@ -17,8 +18,9 @@ Jumps = tuple[tuple[date, float], ...]
 class StepCurve:
     """Flat instantaneous forward between steps, with jumps. Has the `discount` the OIS legs use."""
 
-    def __init__(self, as_of: date, base_rate: float, steps: Sequence[tuple[date, float]],
-                 jumps: Jumps):
+    def __init__(
+        self, as_of: date, base_rate: float, steps: Sequence[tuple[date, float]], jumps: Jumps
+    ):
         self.as_of, self.base_rate, self.steps, self.jumps = as_of, base_rate, list(steps), jumps
 
     def forward(self, d: date) -> float:
@@ -51,7 +53,10 @@ def _check_step_dates(as_of: date, dates: Sequence[date]) -> None:
 
 
 def step_curve(
-    as_of: date, base_rate: float, steps: Sequence[tuple[date, float]], jumps: Jumps,
+    as_of: date,
+    base_rate: float,
+    steps: Sequence[tuple[date, float]],
+    jumps: Jumps,
     dates: Sequence[date],
 ) -> tuple[list[float], list[float]]:
     _check_step_dates(as_of, [d for d, _ in steps])
@@ -64,7 +69,10 @@ def step_curve(
 
 
 def fit_steps(
-    convention: str, as_of: date, step_dates: Sequence[date], quotes: Sequence[Quote],
+    convention: str,
+    as_of: date,
+    step_dates: Sequence[date],
+    quotes: Sequence[Quote],
     jumps: Jumps,
 ) -> tuple[float, list[float], float]:
     """Returns (base_rate, step_rates, max_repricing_error)."""
@@ -85,16 +93,20 @@ def fit_steps(
     curves.check_jumps(as_of, jumps)
     rates: list[float] = []
     for j, (ps, q) in enumerate(zip(swaps, quotes, strict=True)):
+
         def error(x: float, ps: list[Period] = ps, q: Quote = q, j: int = j) -> float:
             values = [*rates, x]
-            curve = StepCurve(as_of, values[0], list(zip(step_dates[:j], values[1:],
-                                                         strict=True)), jumps)
+            curve = StepCurve(
+                as_of, values[0], list(zip(step_dates[:j], values[1:], strict=True)), jumps
+            )
             return ois.par_rate(convention, ps, curve) - q.mid
 
         rates.append(_solve(error, rates[-1] if rates else q.mid))
     final = StepCurve(as_of, rates[0], list(zip(step_dates, rates[1:], strict=True)), jumps)
-    worst = max(abs(ois.par_rate(convention, ps, final) - q.mid)
-                for ps, q in zip(swaps, quotes, strict=True))
+    worst = max(
+        abs(ois.par_rate(convention, ps, final) - q.mid)
+        for ps, q in zip(swaps, quotes, strict=True)
+    )
     curves.check_solved(worst)
     return rates[0], rates[1:], worst
 

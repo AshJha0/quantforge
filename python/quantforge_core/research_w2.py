@@ -2,6 +2,7 @@
 Euler risk contributions (07-portfolio/optimisation.md), Ledoit-Wolf and Black-Litterman
 (07-portfolio/estimation.md), the Acerbi-Szekely Z2 statistic (06-risk/es-backtest.md) and
 Baum-Welch for a Gaussian hidden Markov model (11-research/baum-welch.md)."""
+
 import math
 from collections.abc import Sequence
 from typing import Any
@@ -19,6 +20,7 @@ _SQRT_2PI = math.sqrt(2.0 * math.pi)
 
 
 # --- Shared linear algebra (J-W2-3) ------------------------------------------------------------
+
 
 def _square(a: Matrix, n: int, field: str) -> None:
     if len(a) != n or any(len(r) != n for r in a):
@@ -71,6 +73,7 @@ def _dot(a: Sequence[float], b: Sequence[float]) -> float:
 
 # --- Mean-variance (J-W2-2, J-W2-4) ------------------------------------------------------------
 
+
 def _feasible_start(lower: Sequence[float], upper: Sequence[float]) -> list[float]:
     w = list(lower)
     rest = 1.0 - math.fsum(lower)
@@ -83,8 +86,14 @@ def _feasible_start(lower: Sequence[float], upper: Sequence[float]) -> list[floa
     return w
 
 
-def _eqp(sigma: Matrix, mu: Sequence[float], gamma: float, w: Sequence[float],
-         free: Sequence[int], fixed: Sequence[int]) -> tuple[list[float], float]:
+def _eqp(
+    sigma: Matrix,
+    mu: Sequence[float],
+    gamma: float,
+    w: Sequence[float],
+    free: Sequence[int],
+    fixed: Sequence[int],
+) -> tuple[list[float], float]:
     """Optimum over the free set with the fixed weights held: weights of the free set and nu."""
     target = 1.0 - math.fsum(w[i] for i in fixed)
     if len(free) == 1:  # the budget fixes the weight; no solve, so no rounding past a bound
@@ -99,9 +108,13 @@ def _eqp(sigma: Matrix, mu: Sequence[float], gamma: float, w: Sequence[float],
     return [(x - nu * y) / gamma for x, y in zip(a, e, strict=True)], nu
 
 
-def portfolio_mean_variance(expected_returns: Sequence[float], covariance: Matrix,
-                            risk_aversion: float, lower: Sequence[float] | None = None,
-                            upper: Sequence[float] | None = None) -> dict[str, Any]:
+def portfolio_mean_variance(
+    expected_returns: Sequence[float],
+    covariance: Matrix,
+    risk_aversion: float,
+    lower: Sequence[float] | None = None,
+    upper: Sequence[float] | None = None,
+) -> dict[str, Any]:
     """`research.portfolio.mean_variance`: primal active set from a feasible start [NW06, 16.5]."""
     n = len(expected_returns)
     if n < 1:
@@ -170,14 +183,21 @@ def portfolio_mean_variance(expected_returns: Sequence[float], covariance: Matri
     var = _dot(w, sw)
     ret = _dot(mu, w)
     at_bound = [-1 if w[i] == lo[i] else (1 if w[i] == up[i] else 0) for i in range(n)]
-    return {"weights": w, "expected_return": ret, "volatility": math.sqrt(var),
-            "objective": ret - 0.5 * gamma * var, "at_bound": at_bound}
+    return {
+        "weights": w,
+        "expected_return": ret,
+        "volatility": math.sqrt(var),
+        "objective": ret - 0.5 * gamma * var,
+        "at_bound": at_bound,
+    }
 
 
 # --- Risk parity (J-W2-5) ---------------------------------------------------------------------
 
-def portfolio_risk_parity(covariance: Matrix,
-                          budgets: Sequence[float] | None = None) -> dict[str, Any]:
+
+def portfolio_risk_parity(
+    covariance: Matrix, budgets: Sequence[float] | None = None
+) -> dict[str, Any]:
     """`research.portfolio.risk_parity`: Newton on `Sigma y = b / y` [Spinu13], `w = y / sum y`."""
     n = len(covariance)
     if n < 1:
@@ -200,8 +220,10 @@ def portfolio_risk_parity(covariance: Matrix,
         f = [s - bi / yi for s, bi, yi in zip(_matvec(sigma, y), b, y, strict=True)]
         if math.sqrt(_dot(f, f)) < 1e-14 * bnorm:
             break
-        jac = [[sigma[i][j] + (b[i] / (y[i] * y[i]) if i == j else 0.0) for j in range(n)]
-               for i in range(n)]
+        jac = [
+            [sigma[i][j] + (b[i] / (y[i] * y[i]) if i == j else 0.0) for j in range(n)]
+            for i in range(n)
+        ]
         d = _chol_solve(_cholesky(jac, "covariance"), f)
         t = 1.0
         while any(yi - t * di <= 0 for yi, di in zip(y, d, strict=True)):
@@ -213,11 +235,15 @@ def portfolio_risk_parity(covariance: Matrix,
     w = [yi / s for yi in y]
     sw = _matvec(sigma, w)
     vol = math.sqrt(_dot(w, sw))
-    return {"weights": w, "volatility": vol,
-            "contributions": [wi * x / vol for wi, x in zip(w, sw, strict=True)]}
+    return {
+        "weights": w,
+        "volatility": vol,
+        "contributions": [wi * x / vol for wi, x in zip(w, sw, strict=True)],
+    }
 
 
 # --- Euler contributions (J-W2-6) -------------------------------------------------------------
+
 
 def contrib_euler(weights: Sequence[float], covariance: Matrix) -> dict[str, Any]:
     """`risk.contrib.euler`: marginal, contribution and share of volatility per asset [Tas99]."""
@@ -233,11 +259,16 @@ def contrib_euler(weights: Sequence[float], covariance: Matrix) -> dict[str, Any
     vol = math.sqrt(var)
     marginal = [x / vol for x in sw]
     contributions = [w * m for w, m in zip(weights, marginal, strict=True)]
-    return {"volatility": vol, "marginal": marginal, "contributions": contributions,
-            "shares": [c / vol for c in contributions]}
+    return {
+        "volatility": vol,
+        "marginal": marginal,
+        "contributions": contributions,
+        "shares": [c / vol for c in contributions],
+    }
 
 
 # --- Ledoit-Wolf (J-W2-7) ---------------------------------------------------------------------
+
 
 def estimate_ledoit_wolf(returns: Matrix) -> dict[str, Any]:
     """`research.estimate.ledoit_wolf`: shrinkage towards `m I` [LW04], divisor `T`."""
@@ -258,16 +289,23 @@ def estimate_ledoit_wolf(returns: Matrix) -> dict[str, Any]:
     bbar2 = acc / (t * t) / n
     b2 = min(bbar2, d2)
     delta = 0.0 if b2 == 0 else b2 / d2
-    cov = [[(1 - delta) * s[i][j] + (delta * m if i == j else 0.0) for j in range(n)]
-           for i in range(n)]
+    cov = [
+        [(1 - delta) * s[i][j] + (delta * m if i == j else 0.0) for j in range(n)] for i in range(n)
+    ]
     return {"covariance": cov, "shrinkage": delta, "mu": m}
 
 
 # --- Black-Litterman (J-W2-8) -----------------------------------------------------------------
 
-def estimate_black_litterman(covariance: Matrix, prior_returns: Sequence[float], pick: Matrix,
-                             views: Sequence[float], view_covariance: Matrix,
-                             tau: float) -> dict[str, Any]:
+
+def estimate_black_litterman(
+    covariance: Matrix,
+    prior_returns: Sequence[float],
+    pick: Matrix,
+    views: Sequence[float],
+    view_covariance: Matrix,
+    tau: float,
+) -> dict[str, Any]:
     """`research.estimate.black_litterman`: [HL99] update form, K x K Cholesky solve only."""
     n, k = len(prior_returns), len(views)
     if n < 1:
@@ -292,8 +330,10 @@ def estimate_black_litterman(covariance: Matrix, prior_returns: Sequence[float],
     z = _chol_solve(low, resid)
     post = [prior_returns[i] + sum(bt[a][i] * z[a] for a in range(k)) for i in range(n)]
     cols = [_chol_solve(low, [bt[a][j] for a in range(k)]) for j in range(n)]
-    pc = [[ts[i][j] - sum(bt[a][i] * cols[j][a] for a in range(k)) for j in range(n)]
-          for i in range(n)]
+    pc = [
+        [ts[i][j] - sum(bt[a][i] * cols[j][a] for a in range(k)) for j in range(n)]
+        for i in range(n)
+    ]
     pc = [[pc[min(i, j)][max(i, j)] for j in range(n)] for i in range(n)]
     pred = [[sigma[i][j] + pc[i][j] for j in range(n)] for i in range(n)]
     return {"posterior_returns": post, "posterior_covariance": pc, "predictive_covariance": pred}
@@ -301,13 +341,16 @@ def estimate_black_litterman(covariance: Matrix, prior_returns: Sequence[float],
 
 # --- Acerbi-Szekely Z2 (J-W2-10) --------------------------------------------------------------
 
-def backtest_es_z2(losses: Sequence[float], var: Sequence[float], es: Sequence[float],
-                   alpha: float) -> dict[str, Any]:
+
+def backtest_es_z2(
+    losses: Sequence[float], var: Sequence[float], es: Sequence[float], alpha: float
+) -> dict[str, Any]:
     """`risk.backtest.es_z2`: `Z2 = 1 - sum L_t 1{L_t > VaR_t} / (T alpha ES_t)` [AS14]."""
     t = len(losses)
     if t < 1 or len(var) != t or len(es) != t:
-        raise QfError("E_INPUT", "losses, var and es must be non-empty and of equal length",
-                      "losses")
+        raise QfError(
+            "E_INPUT", "losses, var and es must be non-empty and of equal length", "losses"
+        )
     if not 0 < alpha < 1:
         raise QfError("E_DOMAIN", "alpha must lie in (0, 1)", "alpha")
     if any(not e > 0 for e in es):
@@ -323,12 +366,16 @@ def backtest_es_z2(losses: Sequence[float], var: Sequence[float], es: Sequence[f
 
 # --- Baum-Welch (J-W2-9, J-W2-11 to J-W2-13) --------------------------------------------------
 
-def _e_step(y: Sequence[float], pi: Sequence[float], a: Matrix, mu: Sequence[float],
-            sd: Sequence[float]) -> tuple[float, list[list[float]], list[list[float]]]:
+
+def _e_step(
+    y: Sequence[float], pi: Sequence[float], a: Matrix, mu: Sequence[float], sd: Sequence[float]
+) -> tuple[float, list[list[float]], list[list[float]]]:
     """Scaled forward-backward [Rab89, III.A]: log-likelihood, gamma (T x K), sum_t xi (K x K)."""
     t_len, k = len(y), len(pi)
-    dens = [[math.exp(-0.5 * ((v - mu[j]) / sd[j]) ** 2) / (sd[j] * _SQRT_2PI)
-             for j in range(k)] for v in y]
+    dens = [
+        [math.exp(-0.5 * ((v - mu[j]) / sd[j]) ** 2) / (sd[j] * _SQRT_2PI) for j in range(k)]
+        for v in y
+    ]
     alpha: list[list[float]] = []
     scale: list[float] = []
     prev: list[float] = []
@@ -339,8 +386,9 @@ def _e_step(y: Sequence[float], pi: Sequence[float], a: Matrix, mu: Sequence[flo
             hat = [sum(prev[i] * a[i][j] for i in range(k)) * dens[t][j] for j in range(k)]
         c = sum(hat)
         if not c > 0:
-            raise QfError("E_DOMAIN", "an observation has zero density under every state",
-                          "observations")
+            raise QfError(
+                "E_DOMAIN", "an observation has zero density under every state", "observations"
+            )
         prev = [h / c for h in hat]
         alpha.append(prev)
         scale.append(c)
@@ -358,8 +406,9 @@ def _e_step(y: Sequence[float], pi: Sequence[float], a: Matrix, mu: Sequence[flo
     return sum(math.log(c) for c in scale), gamma, xi
 
 
-def _m_step(y: Sequence[float], gamma: Matrix,
-            xi: Matrix) -> tuple[list[float], list[list[float]], list[float], list[float]]:
+def _m_step(
+    y: Sequence[float], gamma: Matrix, xi: Matrix
+) -> tuple[list[float], list[list[float]], list[float], list[float]]:
     """Re-estimation [Rab89, eqs. 40a-40c] with the new means in the variance."""
     t_len, k = len(y), len(gamma[0])
     pi = list(gamma[0])
@@ -381,9 +430,15 @@ def _m_step(y: Sequence[float], gamma: Matrix,
     return pi, a, mu, sd
 
 
-def regime_baum_welch(observations: Sequence[float], initial: Sequence[float],
-                      transition: Matrix, means: Sequence[float], sds: Sequence[float],
-                      tolerance: float = 1e-10, max_iterations: int = 1000) -> dict[str, Any]:
+def regime_baum_welch(
+    observations: Sequence[float],
+    initial: Sequence[float],
+    transition: Matrix,
+    means: Sequence[float],
+    sds: Sequence[float],
+    tolerance: float = 1e-10,
+    max_iterations: int = 1000,
+) -> dict[str, Any]:
     """`research.regime.baum_welch`: EM from the start values, iteration as ruling J-W2-11."""
     k, t_len = len(initial), len(observations)
     if k < 1 or len(transition) != k or any(len(r) != k for r in transition):
@@ -411,8 +466,15 @@ def regime_baum_welch(observations: Sequence[float], initial: Sequence[float],
         if gain < tolerance:
             converged = True
             break
-    return {"initial": pi, "transition": a, "means": mu, "sds": sd, "log_likelihood": loglik,
-            "iterations": iterations, "converged": converged}
+    return {
+        "initial": pi,
+        "transition": a,
+        "means": mu,
+        "sds": sd,
+        "log_likelihood": loglik,
+        "iterations": iterations,
+        "converged": converged,
+    }
 
 
 guard(globals())

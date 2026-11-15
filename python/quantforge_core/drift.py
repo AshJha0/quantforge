@@ -1,5 +1,6 @@
 """Drift detectors (A3; rulings J-W3-10 to J-W3-13; 11-research/drift-detectors.md):
 two-sided CUSUM, Page-Hinkley, the population stability index and the two-sample KS test."""
+
 import math
 from collections.abc import Sequence
 from fractions import Fraction
@@ -16,8 +17,9 @@ def _nonempty(x: Sequence[float], field: str) -> None:
         raise QfError("E_INPUT", f"{field} must not be empty", field)
 
 
-def cusum(x: Sequence[float], k: float, h: float, mu0: float = 0.0, sigma: float = 1.0,
-          reset: bool = True) -> dict[str, Any]:
+def cusum(
+    x: Sequence[float], k: float, h: float, mu0: float = 0.0, sigma: float = 1.0, reset: bool = True
+) -> dict[str, Any]:
     """J-W3-10: tabular two-sided CUSUM on z = (x - mu0) / sigma; alarm when a sum exceeds h."""
     _nonempty(x, "x")
     if not k > 0 or not h > 0 or not sigma > 0:
@@ -38,8 +40,9 @@ def cusum(x: Sequence[float], k: float, h: float, mu0: float = 0.0, sigma: float
     return {"alarms": alarms, "directions": directions, "s_plus": sp, "s_minus": sm}
 
 
-def page_hinkley(x: Sequence[float], delta: float, lam: float, direction: str = "both",
-                 reset: bool = True) -> dict[str, Any]:
+def page_hinkley(
+    x: Sequence[float], delta: float, lam: float, direction: str = "both", reset: bool = True
+) -> dict[str, Any]:
     """J-W3-11: m_t = sum_{s<=t} (x_s - xbar_s - delta) from the last restart, xbar_s the running mean
     at step s; alarm when m_t - min m > lambda. The down-test is the same on -x."""
     _nonempty(x, "x")
@@ -69,8 +72,9 @@ def page_hinkley(x: Sequence[float], delta: float, lam: float, direction: str = 
     return {"alarms": alarms, "directions": directions}
 
 
-def psi(reference: Sequence[float], test: Sequence[float], bins: int = 10,
-        threshold: float = 0.25) -> dict[str, Any]:
+def psi(
+    reference: Sequence[float], test: Sequence[float], bins: int = 10, threshold: float = 0.25
+) -> dict[str, Any]:
     """J-W3-12: bins at the reference's type-1 quantiles, shares floored at 1e-4."""
     if bins < 2:
         raise QfError("E_INPUT", "bins must be at least 2", "bins")

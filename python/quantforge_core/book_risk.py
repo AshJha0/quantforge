@@ -1,5 +1,6 @@
 """Book sensitivities by the IFT chain rule, curve PCA, cross gamma, jump to default
 (specifications/06-risk/book-sensitivities.md, rulings F-29 and F-30)."""
+
 import math
 from bisect import bisect_right
 from collections.abc import Sequence
@@ -63,12 +64,20 @@ def _log_weights(curve: Curve, d: date) -> Gradient:
 
 
 def _numeric_weights(curve: Curve, d: date) -> Gradient:
-    data = CurveData(curve.as_of, curve.interpolation, curve.dates,
-                     tuple(math.exp(x) * curve.jump(p) for x, p in zip(curve.logs[1:], curve.dates,
-                                                                       strict=True)),
-                     curve.jumps, curve.tension, curve.step_end)
+    data = CurveData(
+        curve.as_of,
+        curve.interpolation,
+        curve.dates,
+        tuple(
+            math.exp(x) * curve.jump(p) for x, p in zip(curve.logs[1:], curve.dates, strict=True)
+        ),
+        curve.jumps,
+        curve.tension,
+        curve.step_end,
+    )
     out: Gradient = {}
     for k in range(len(curve.dates)):
+
         def at(h: float, k: int = k) -> float:
             f = list(data.discount_factors)
             f[k] *= math.exp(h)
@@ -80,8 +89,9 @@ def _numeric_weights(curve: Curve, d: date) -> Gradient:
     return out
 
 
-def _legs(convention: str, ps: Sequence[Period], curve: Curve
-          ) -> tuple[float, float, Gradient, Gradient]:
+def _legs(
+    convention: str, ps: Sequence[Period], curve: Curve
+) -> tuple[float, float, Gradient, Gradient]:
     """(A, F, dA/dx, dF/dx) for the legs of ois-curves.md."""
     alphas = ois._alphas(convention, ps)
     cache: dict[date, tuple[float, Gradient]] = {}
@@ -136,8 +146,13 @@ def _inverse(a: list[list[float]]) -> list[list[float]]:
     return [[cols[j][i] for j in range(n)] for i in range(n)]
 
 
-def ois_sensitivity(as_of: date, convention: str, quotes: Sequence[Quote], interpolation: str,
-                    swaps: Sequence[BookSwap]) -> dict[str, object]:
+def ois_sensitivity(
+    as_of: date,
+    convention: str,
+    quotes: Sequence[Quote],
+    interpolation: str,
+    swaps: Sequence[BookSwap],
+) -> dict[str, object]:
     if interpolation not in ("LOG_LINEAR_DF", "LINEAR_ZERO"):  # ruling F-41
         raise QfError("E_INPUT", "the book needs a sequential build", "interpolation")
     if not swaps:
@@ -173,8 +188,9 @@ def ois_sensitivity(as_of: date, convention: str, quotes: Sequence[Quote], inter
             row.append(acc)
         sens.append(row)
     times = [(p - as_of).days / 365 for p in data.dates]
-    zero = [[-dx_dq[i][j] / times[i] if dx_dq[i][j] != 0.0 else 0.0 for j in range(n)]
-            for i in range(n)]
+    zero = [
+        [-dx_dq[i][j] / times[i] if dx_dq[i][j] != 0.0 else 0.0 for j in range(n)] for i in range(n)
+    ]
     labels = [q.tenor for q in quotes]
     book = [0.0] * n
     for row in sens:
@@ -185,8 +201,11 @@ def ois_sensitivity(as_of: date, convention: str, quotes: Sequence[Quote], inter
         "book_pv": sum(pvs),
         "quote_sensitivity": {"swaps": [s.id for s in swaps], "quotes": labels, "matrix": sens},
         "book_sensitivity": book,
-        "zero_jacobian": {"pillars": [d.isoformat() for d in data.dates], "quotes": labels,
-                          "matrix": zero},
+        "zero_jacobian": {
+            "pillars": [d.isoformat() for d in data.dates],
+            "quotes": labels,
+            "matrix": zero,
+        },
     }
 
 
@@ -213,8 +232,7 @@ def pca(changes: Sequence[Sequence[float]], components: int) -> dict[str, object
     upto = min(components + 1, width)
     for i in range(upto - 1):
         if abs(lam[i] - lam[i + 1]) < 1e-6 * lam[0]:
-            raise QfError("E_DOMAIN", "repeated eigenvalue: loadings are not unique",
-                          "components")
+            raise QfError("E_DOMAIN", "repeated eigenvalue: loadings are not unique", "components")
     loadings = []
     for i in range(components):
         v = [float(c) for c in vectors[:, i]]
@@ -223,8 +241,11 @@ def pca(changes: Sequence[Sequence[float]], components: int) -> dict[str, object
             v = [-c for c in v]
         loadings.append(v)
     total = sum(lam)
-    return {"eigenvalues": lam, "loadings": loadings,
-            "explained_ratio": [lam[i] / total for i in range(components)]}
+    return {
+        "eigenvalues": lam,
+        "loadings": loadings,
+        "explained_ratio": [lam[i] / total for i in range(components)],
+    }
 
 
 def cross_gamma(data: CurveData, trade: ois.OisTrade, bump_bp: float) -> dict[str, object]:
@@ -275,7 +296,7 @@ def cross_gamma(data: CurveData, trade: ois.OisTrade, bump_bp: float) -> dict[st
                     total += c * sinh2(h * gi)
                 else:
                     total += c * (sinh2(h * (gi + gj)) - sinh2(h * (gi - gj))) / 4
-            gamma[i][j] = gamma[j][i] = scale * total / bump_bp ** 2
+            gamma[i][j] = gamma[j][i] = scale * total / bump_bp**2
     return {"value": v0, "cross_gamma": gamma}
 
 
@@ -292,9 +313,13 @@ def jtd(positions: Sequence[tuple[str, str, float, float, float]]) -> dict[str, 
             raise QfError("E_DOMAIN", "notional must not be negative", "positions")
         if not 0 <= recovery <= 1:
             raise QfError("E_DOMAIN", "recovery must be in [0, 1]", "positions")
-        after = (recovery * notional if kind == "BOND" else
-                 (1 - recovery) * notional if kind == "CDS_PROTECTION_BUYER" else
-                 -(1 - recovery) * notional)
+        after = (
+            recovery * notional
+            if kind == "BOND"
+            else (1 - recovery) * notional
+            if kind == "CDS_PROTECTION_BUYER"
+            else -(1 - recovery) * notional
+        )
         out.append(after - market)
     return {"jtd": out, "total": sum(out)}
 

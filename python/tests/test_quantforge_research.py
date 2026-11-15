@@ -1,4 +1,5 @@
 """Tests for the research package: walk-forward, trial registry, Reality Check (gap items G10, G11, G14)."""
+
 import numpy as np
 import pytest
 
@@ -15,7 +16,9 @@ def test_walk_forward_rolling_by_hand():
 def test_walk_forward_gap_expanding_and_order():
     s = walk_forward(20, 5, 3, gap=2, expanding=True, step=4)
     for tr, te in s:
-        assert tr[0] == 0 and max(tr) + 2 < min(te)  # gap observations dropped between train and test
+        assert tr[0] == 0 and max(tr) + 2 < min(
+            te
+        )  # gap observations dropped between train and test
     assert [te[0] for _, te in s] == [7, 11, 15]
 
 

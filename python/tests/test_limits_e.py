@@ -1,6 +1,7 @@
 """Q5a: limit-case and convergence-order checks for the stage E numerical methods that have no
 outside source (plan section 12.1). Rust, Java and C++ carry the same checks; the SLV
 calibration round trip on a Heston surface runs here only (it needs a Monte Carlo harness)."""
+
 import itertools
 import math
 from typing import Any
@@ -23,8 +24,15 @@ def _slv_gap(nx, nv, nt):
     """Largest |L - 1| within 0.3 of ln(spot) for a flat 20% surface and Heston with
     v0 = theta = 0.04 and vanishing vol of vol: SLV then reduces to Heston with L = 1."""
     flat = [arb_surface.Slice(1.0, Svi(0.04, 0.0, 0.0, 0.0, 0.1))]
-    out: dict[str, Any] = hm.slv_leverage(100.0, 1.0, 0.0, 0.0, hm.Heston(0.04, 2.0, 0.04, 0.01, -0.7), flat,
-                          hm.Grid(nx, nv, nt, X0 - 1.0, X0 + 1.0, 0.25))
+    out: dict[str, Any] = hm.slv_leverage(
+        100.0,
+        1.0,
+        0.0,
+        0.0,
+        hm.Heston(0.04, 2.0, 0.04, 0.01, -0.7),
+        flat,
+        hm.Grid(nx, nv, nt, X0 - 1.0, X0 + 1.0, 0.25),
+    )
     assert abs(out["mass"] - 1.0) < 1e-3
     return max(abs(lev - 1) for x, lev in zip(out["x"], out["leverage"]) if abs(x - X0) < 0.3)
 
@@ -51,8 +59,10 @@ def test_fd_american_put_zero_rate_is_european() -> None:
 
 def test_crank_nicolson_second_order() -> None:
     exact = ex.gbs(1, 100, 105, 1, 0.03, 0.02, 0.2)
-    errs = [pde.bs_european("CALL", 100, 105, 0.03, 0.01, 0.2, 1, j, j // 2).price - exact
-            for j in (100, 200, 400)]
+    errs = [
+        pde.bs_european("CALL", 100, 105, 0.03, 0.01, 0.2, 1, j, j // 2).price - exact
+        for j in (100, 200, 400)
+    ]
     assert all(1.8 <= p <= 2.2 for p in _order(errs))
 
 
@@ -61,6 +71,7 @@ def test_fd_reference_scheme_orders():
 
     def fd(nx, nt):
         return ex.fd(100, 100, 1, 0.05, 0.0, 0.2, "PUT", "EUROPEAN", nx, nt, 5.0)["price"]
+
     # Space: halve dx and quarter dt, so the O(dt) term keeps pace with O(dx^2).
     space = [fd(nx, nt) - exact for nx, nt in ((51, 25), (101, 100), (201, 400))]
     assert all(1.8 <= p <= 2.2 for p in _order(space))
@@ -71,8 +82,9 @@ def test_fd_reference_scheme_orders():
 
 def test_crr_first_order() -> None:
     exact = ex.gbs(-1, 100, 100, 1, 0.05, 0.05, 0.2)
-    errs = [ex.crr(100, 100, 1, 0.05, 0.0, 0.2, "PUT", n)["european"] - exact
-            for n in (100, 200, 400)]
+    errs = [
+        ex.crr(100, 100, 1, 0.05, 0.0, 0.2, "PUT", n)["european"] - exact for n in (100, 200, 400)
+    ]
     assert all(0.8 <= p <= 1.2 for p in _order(errs))
 
 
@@ -92,15 +104,26 @@ def test_slv_calibrated_to_heston_surface_has_unit_leverage_and_reprices() -> No
     expiries = [0.125 * n for n in range(1, 11)]  # to 1.25, so t = 1 is interpolated
     ks = [-0.4 + 0.1 * i for i in range(9)]
     strikes = [100.0 * math.exp(k) for k in ks]
-    rows = [[_implied(p, k, t) ** 2 * t
-             for p, k in zip(hm.heston_price(100.0, strikes, t, 0.0, 0.0, h, "CALL"), strikes)]
-            for t in expiries]
+    rows = [
+        [
+            _implied(p, k, t) ** 2 * t
+            for p, k in zip(hm.heston_price(100.0, strikes, t, 0.0, 0.0, h, "CALL"), strikes)
+        ]
+        for t in expiries
+    ]
     slices, _, _ = arb_surface.fit_surface(expiries, ks, rows, False)
     times = (0.125, 0.25, 0.5, 0.75, 1.0)
     levs, xs = [], None
     for t in times:
-        out = hm.slv_leverage(100.0, t, 0.0, 0.0, h, slices,
-                              hm.Grid(81, 80, max(2, round(24 * t)), X0 - 0.8, X0 + 0.8, 0.3))
+        out = hm.slv_leverage(
+            100.0,
+            t,
+            0.0,
+            0.0,
+            h,
+            slices,
+            hm.Grid(81, 80, max(2, round(24 * t)), X0 - 0.8, X0 + 0.8, 0.3),
+        )
         xs = np.array(out["x"])
         levs.append(np.array(out["leverage"]))
         if t >= 0.5:  # at short expiries the start-density width (2 dx) dominates

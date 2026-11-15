@@ -1,5 +1,6 @@
 """Stage E, E6 unit tests: worked examples from 06-risk/correlation.md. The goldens run in
 test_conformance.py."""
+
 import json
 import math
 
@@ -57,18 +58,36 @@ def test_implied_and_dispersion_examples() -> None:
     assert code(f, [0.5, 0.5], [0.25, 0.3], 0.24, [0.28, 0.35], 0.0, 1e5) == "E_DOMAIN"
 
 
-@pytest.mark.parametrize("operation,inputs,key", [
-    ("risk.corr.validate", {"matrix": HIGHAM}, "psd"),
-    ("risk.corr.nearest", {"matrix": HIGHAM}, "frobenius_distance"),
-    ("risk.corr.implied", {"weights": [0.5, 0.5], "vols": [0.2, 0.3], "index_vol": 0.22},
-     "correlation"),
-    ("risk.corr.dispersion", {"weights": [0.5, 0.5], "vol_strikes": [0.25, 0.3],
-                              "index_vol_strike": 0.24, "realized_vols": [0.28, 0.35],
-                              "index_realized_vol": 0.22, "vega_notional": 1e5}, "pnl"),
-])
+@pytest.mark.parametrize(
+    "operation,inputs,key",
+    [
+        ("risk.corr.validate", {"matrix": HIGHAM}, "psd"),
+        ("risk.corr.nearest", {"matrix": HIGHAM}, "frobenius_distance"),
+        (
+            "risk.corr.implied",
+            {"weights": [0.5, 0.5], "vols": [0.2, 0.3], "index_vol": 0.22},
+            "correlation",
+        ),
+        (
+            "risk.corr.dispersion",
+            {
+                "weights": [0.5, 0.5],
+                "vol_strikes": [0.25, 0.3],
+                "index_vol_strike": 0.24,
+                "realized_vols": [0.28, 0.35],
+                "index_realized_vol": 0.22,
+                "vega_notional": 1e5,
+            },
+            "pnl",
+        ),
+    ],
+)
 def test_cli(operation, inputs, key) -> None:
-    r = run_case(json.dumps({"schema_version": "1.0", "case_id": "t", "operation": operation,
-                             "inputs": inputs}))
+    r = run_case(
+        json.dumps(
+            {"schema_version": "1.0", "case_id": "t", "operation": operation, "inputs": inputs}
+        )
+    )
     assert r["status"] == "ok" and key in r["outputs"], r
 
 

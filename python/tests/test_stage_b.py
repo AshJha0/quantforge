@@ -1,4 +1,5 @@
 """Checks from the stage B specs, beyond the golden files."""
+
 from datetime import date
 from typing import Any
 
@@ -17,8 +18,9 @@ QUOTES = [
 
 
 @pytest.mark.parametrize("convention", ["SONIA", "SOFR"])
-@pytest.mark.parametrize("interpolation", [m for m in curves.INTERPOLATIONS
-                                           if m not in ("TENSION_SPLINE", "HYBRID")])
+@pytest.mark.parametrize(
+    "interpolation", [m for m in curves.INTERPOLATIONS if m not in ("TENSION_SPLINE", "HYBRID")]
+)
 def test_both_solves_agree_and_reprice(convention, interpolation) -> None:
     a, error_a = ois.bootstrap(convention, AS_OF, QUOTES, interpolation, "SEQUENTIAL")
     b, error_b = ois.bootstrap(convention, AS_OF, QUOTES, interpolation, "GLOBAL")
@@ -55,9 +57,7 @@ def test_money_rounds_half_to_even_and_has_no_negative_zero() -> None:
 
 
 def test_stub_is_first_and_start_is_kept() -> None:
-    periods = schedules.generate(
-        date(2026, 1, 15), date(2027, 6, 15), 12, "GBLO", False, 0
-    )
+    periods = schedules.generate(date(2026, 1, 15), date(2027, 6, 15), 12, "GBLO", False, 0)
     assert periods[0].start == date(2026, 1, 15)
     assert len(periods) == 2
 
@@ -85,8 +85,9 @@ def test_hedge_first_order_conditions(lam) -> None:
 def test_bounded_fit_stops_on_the_bound() -> None:
     x = [0.0, 1.0, 2.0, 3.0]
     y = [1.0, 3.0, 5.0, 7.0]
-    result = fit("LINEAR", x, y, [0.0, 0.0], "LEVENBERG_MARQUARDT",
-                 lower=[-10.0, -10.0], upper=[10.0, 1.5])
+    result = fit(
+        "LINEAR", x, y, [0.0, 0.0], "LEVENBERG_MARQUARDT", lower=[-10.0, -10.0], upper=[10.0, 1.5]
+    )
     assert result.parameters[1] == 1.5
 
 
@@ -102,15 +103,18 @@ def test_non_finite_start_stops_at_once() -> None:
     assert e.value.code == "E_NON_FINITE"
 
 
-@pytest.mark.parametrize(("kwargs", "code", "field"), [
-    ({"prior": [0.0]}, "E_INPUT", "prior"),
-    ({"lower": [0.0], "upper": [1.0, 1.0]}, "E_INPUT", None),
-    ({"lower": [2.0, 0.0], "upper": [1.0, 1.0]}, "E_INPUT", None),
-    ({"max_iter": 0}, "E_INPUT", "max_iter"),
-    ({"weights": [1.0, -1.0, 1.0]}, "E_DOMAIN", "weights"),
-    ({"weights": [1.0]}, "E_INPUT", "weights"),
-    ({"regularisation": -1e-9}, "E_DOMAIN", "regularisation"),
-])
+@pytest.mark.parametrize(
+    ("kwargs", "code", "field"),
+    [
+        ({"prior": [0.0]}, "E_INPUT", "prior"),
+        ({"lower": [0.0], "upper": [1.0, 1.0]}, "E_INPUT", None),
+        ({"lower": [2.0, 0.0], "upper": [1.0, 1.0]}, "E_INPUT", None),
+        ({"max_iter": 0}, "E_INPUT", "max_iter"),
+        ({"weights": [1.0, -1.0, 1.0]}, "E_DOMAIN", "weights"),
+        ({"weights": [1.0]}, "E_INPUT", "weights"),
+        ({"regularisation": -1e-9}, "E_DOMAIN", "regularisation"),
+    ],
+)
 def test_fit_rejects_bad_inputs(kwargs: dict[str, Any], code: str, field: str | None) -> None:
     with pytest.raises(QfError) as e:
         fit("LINEAR", [1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [0.0, 0.0], "LEVENBERG_MARQUARDT", **kwargs)

@@ -1,5 +1,6 @@
 """Stage J wave 3 property tests (spec pages 06-risk/scenario-stress.md, 11-research/interp-backtest.md,
 11-research/drift-detectors.md): replay linearity, LOO invariances, detector null behaviour, KS symmetry."""
+
 import math
 import random
 from datetime import date
@@ -23,7 +24,9 @@ finite = st.floats(-50, 50, allow_nan=False)
 
 @given(st.lists(finite, min_size=5, max_size=5), st.floats(0.1, 5))
 @settings(max_examples=50, deadline=None)
-def test_replay_scales_linearly_and_zero_shock_is_identity(shock: list[float], scale: float) -> None:
+def test_replay_scales_linearly_and_zero_shock_is_identity(
+    shock: list[float], scale: float
+) -> None:
     base = [4.0, 4.1, 4.2, 4.3, 4.4]
     dv = [1.0, -2.0, 3.0, 0.5, 10.0]
     one = scenario_replay(TEN, base, TEN, shock, 1.0, dv)
@@ -66,12 +69,16 @@ def test_detectors_null_behaviour() -> None:
     assert drift.psi(r, r)["psi"] == 0.0
 
 
-@given(st.lists(st.floats(-5, 5, allow_nan=False), min_size=1, max_size=15),
-       st.lists(st.floats(-5, 5, allow_nan=False), min_size=1, max_size=15))
+@given(
+    st.lists(st.floats(-5, 5, allow_nan=False), min_size=1, max_size=15),
+    st.lists(st.floats(-5, 5, allow_nan=False), min_size=1, max_size=15),
+)
 @settings(max_examples=60, deadline=None)
 def test_ks_symmetric_and_bounded(a: list[float], b: list[float]) -> None:
     x, y = drift.ks(a, b), drift.ks(b, a)
-    assert x["statistic"] == y["statistic"] and x["p_value"] == pytest.approx(y["p_value"], abs=1e-15)
+    assert x["statistic"] == y["statistic"] and x["p_value"] == pytest.approx(
+        y["p_value"], abs=1e-15
+    )
     assert 0.0 <= x["p_value"] <= 1.0
     assert drift.ks(a, a)["p_value"] == 1.0
 
@@ -84,5 +91,9 @@ def test_ks_equal_size_matches_alternating_formula() -> None:
     b = [rng.gauss(0.8, 1) for _ in range(n)]
     out = drift.ks(a, b)
     k = round(out["statistic"] * n)
-    p = 2 * sum((-1) ** (j + 1) * math.comb(2 * n, n - j * k) for j in range(1, n // k + 1)) / math.comb(2 * n, n)
+    p = (
+        2
+        * sum((-1) ** (j + 1) * math.comb(2 * n, n - j * k) for j in range(1, n // k + 1))
+        / math.comb(2 * n, n)
+    )
     assert out["p_value"] == pytest.approx(p, rel=1e-13)

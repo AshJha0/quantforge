@@ -1,4 +1,5 @@
 """ISDA CDS, index CDS and composite curves (specifications/04-pricing/credit.md)."""
+
 import itertools
 import math
 from bisect import bisect_right
@@ -103,8 +104,10 @@ def check_hazard(as_of: date, dates: Sequence[date], survival: Sequence[float]) 
 def _series(x: float) -> tuple[float, float]:
     """((1 - e^-x)/x, (1 - e^-x (1 + x))/x^2), with a Taylor series near 0."""
     if abs(x) < 1e-4:
-        return (1 - x / 2 + x * x / 6 - x ** 3 / 24 + x ** 4 / 120,
-                0.5 - x / 3 + x * x / 8 - x ** 3 / 30 + x ** 4 / 144)
+        return (
+            1 - x / 2 + x * x / 6 - x**3 / 24 + x**4 / 120,
+            0.5 - x / 3 + x * x / 8 - x**3 / 30 + x**4 / 144,
+        )
     e = math.exp(-x)
     return (1 - e) / x, (1 - e * (1 + x)) / (x * x)
 
@@ -136,8 +139,10 @@ class Model:
         return out
 
     def protection(self, mat: date) -> float:
-        return ordered_sum(h * qp0 * span * _series(k * span)[0]
-                           for _, span, h, k, qp0 in self.pieces(self.t0, mat))
+        return ordered_sum(
+            h * qp0 * span * _series(k * span)[0]
+            for _, span, h, k, qp0 in self.pieces(self.t0, mat)
+        )
 
     def rpv01(self, ps: Sequence[Period]) -> float:
         total = []
@@ -150,7 +155,8 @@ class Model:
             aod = ordered_sum(
                 h * qp0 * ((t0 - tacc) * span * a + span * span * b)
                 for t0, span, h, k, qp0 in self.pieces(s, obs)
-                for a, b in (_series(k * span),))
+                for a, b in (_series(k * span),)
+            )
             total.append(365 / 360 * aod)
         return ordered_sum(total)
 
@@ -193,8 +199,15 @@ def _price(model: Model, mat: date, coupon: float, lgd: float) -> Price:
 
 
 def price(
-    trade_date: date, discount: CurveData, hazard: Hazard, recovery: float, mat: date,
-    coupon: float, notional: float, side: str, payout: str,
+    trade_date: date,
+    discount: CurveData,
+    hazard: Hazard,
+    recovery: float,
+    mat: date,
+    coupon: float,
+    notional: float,
+    side: str,
+    payout: str,
 ) -> dict[str, float]:
     model = Model(trade_date, curves.build(discount), hazard)
     _check_as_of(trade_date, discount.as_of, hazard.as_of)
@@ -203,12 +216,21 @@ def price(
     r = _price(model, mat, coupon, 1.0 if payout == "DIGITAL" else 1 - recovery)
     sign = 1 if side == "BUY_PROTECTION" else -1
     pv = sign * notional * (r.protection_leg - coupon * r.rpv01 + r.accrued * r.pcs)
-    return {"protection_leg": r.protection_leg, "rpv01": r.rpv01, "accrued": r.accrued,
-            "par_spread": r.par_spread, "upfront": r.upfront, "pv": pv}
+    return {
+        "protection_leg": r.protection_leg,
+        "rpv01": r.rpv01,
+        "accrued": r.accrued,
+        "par_spread": r.par_spread,
+        "upfront": r.upfront,
+        "pv": pv,
+    }
 
 
 def bootstrap(
-    trade_date: date, discount: CurveData, recovery: float, quotes: Sequence[tuple[str, float]],
+    trade_date: date,
+    discount: CurveData,
+    recovery: float,
+    quotes: Sequence[tuple[str, float]],
 ) -> list[tuple[date, float]]:
     disc = curves.build(discount)
     _check_as_of(trade_date, discount.as_of)
@@ -223,10 +245,10 @@ def bootstrap(
     periods(trade_date, mats[-1])
     logs: list[float] = []
     for j, (mat, (_, spread)) in enumerate(zip(mats, quotes, strict=True)):
+
         def gap(x: float, j: int = j, mat: date = mat, spread: float = spread) -> float:
-            h = Hazard(trade_date, mats[:j + 1], [math.exp(v) for v in [*logs, x]])
-            return _price(Model(trade_date, disc, h), mat, spread, 1 - recovery).par_spread \
-                - spread
+            h = Hazard(trade_date, mats[: j + 1], [math.exp(v) for v in [*logs, x]])
+            return _price(Model(trade_date, disc, h), mat, spread, 1 - recovery).par_spread - spread
 
         t = (mat - trade_date).days / 365
         guess = -spread / (1 - recovery) * t
@@ -234,7 +256,7 @@ def bootstrap(
         for _ in range(60):
             if gap(low) > 0 > gap(high):
                 break
-            low -= (high - low)
+            low -= high - low
         else:
             raise QfError("E_NO_CONVERGENCE", "the hazard solve found no bracket")
         logs.append(roots.brent(gap, low, high, x_tol=1e-16, max_iter=1000).root)
@@ -242,8 +264,12 @@ def bootstrap(
 
 
 def index_intrinsic(
-    trade_date: date, discount: CurveData, names: Sequence[tuple[Hazard, float, float]],
-    mat: date, coupon: float, quoted: float,
+    trade_date: date,
+    discount: CurveData,
+    names: Sequence[tuple[Hazard, float, float]],
+    mat: date,
+    coupon: float,
+    quoted: float,
 ) -> tuple[list[float], float, float]:
     disc = curves.build(discount)
     if not names:
@@ -264,8 +290,11 @@ def index_intrinsic(
 
 
 def composite(
-    trade_date: date, discount: CurveData, recovery: float,
-    constituents: Sequence[tuple[Sequence[tuple[str, float]], float]], scale: float,
+    trade_date: date,
+    discount: CurveData,
+    recovery: float,
+    constituents: Sequence[tuple[Sequence[tuple[str, float]], float]],
+    scale: float,
 ) -> tuple[list[float], list[tuple[date, float]]]:
     curves.build(discount)
     _check_as_of(trade_date, discount.as_of)
@@ -279,8 +308,10 @@ def composite(
     total_w = ordered_sum(w for _, w in constituents)
     if total_w <= 0 or any(w < 0 for _, w in constituents):
         raise QfError("E_DOMAIN", "weights must be non-negative and sum above 0", "constituents")
-    spreads = [scale * ordered_sum(qs[j][1] * w for qs, w in constituents) / total_w
-               for j in range(len(tenors))]
+    spreads = [
+        scale * ordered_sum(qs[j][1] * w for qs, w in constituents) / total_w
+        for j in range(len(tenors))
+    ]
     pillars = bootstrap(trade_date, discount, recovery, list(zip(tenors, spreads, strict=True)))
     return spreads, pillars
 
