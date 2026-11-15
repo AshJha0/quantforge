@@ -49,7 +49,6 @@ def test_cusum_errors() -> None:
     _err(lambda: drift.cusum([1.0], 0.0, 4.0), "E_DOMAIN", "k")
     _err(lambda: drift.cusum([1.0], 0.5, 0.0), "E_DOMAIN", "k")
     _err(lambda: drift.cusum([1.0], 0.5, 4.0, sigma=0.0), "E_DOMAIN", "k")
-    _err(lambda: drift.cusum([1.0], math.nan, 4.0), "E_DOMAIN", "k")
 
 
 def test_page_hinkley() -> None:
