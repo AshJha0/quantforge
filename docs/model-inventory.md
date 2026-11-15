@@ -80,6 +80,9 @@ Stage E has its own index tables (ME-A1 to ME-A8, EB1 to EB12) under "Stage E mo
 | MJ-6 | Covariance and return estimation (stage J wave 2) | `07-portfolio/estimation.md` | J | Specified (wave 2); built in Python and Java, Rust and C++ pending | 0 library checks (J-W2-15) |
 | MJ-7 | Expected-shortfall backtest Z2 (stage J wave 2) | `06-risk/es-backtest.md` | J | Specified (wave 2); built in Python and Java, Rust and C++ pending | 0 library checks (J-W2-15) |
 | MJ-8 | Baum-Welch regime estimation (stage J wave 2) | `11-research/baum-welch.md` | J | Specified (wave 2); built in Python and Java, Rust and C++ pending | 0 library checks (J-W2-15) |
+| MJ-9 | Historical scenario stress (stage J wave 3) | `06-risk/scenario-stress.md` | J | Built in all four languages (wave 3) | 13 of 13 value cases (numpy interp, pandas lookup) |
+| MJ-10 | Interpolation backtests (stage J wave 3) | `11-research/interp-backtest.md` | J | Built in all four languages (wave 3) | 16 of 16 value cases (numpy, scipy) |
+| MJ-11 | Drift detectors (stage J wave 3) | `11-research/drift-detectors.md` | J | Built in all four languages (wave 3) | 13 of 26 value cases (scipy KS, numpy/scipy PSI) |
 
 Numerical engines in `01-core` (root finders, quadrature, PDE, Monte Carlo, COS, RNG, Sobol) are tools, not models. They are tested against analytic and library values in stage A.
 
@@ -889,3 +892,39 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 - **Data lineage hash:** sha256 c50b9b94932f0d24e397b866f2efe461f68488318820bda3f2e09bee5c0d4385 (`baumwelch_j`).
 - **Retirement trigger:** a superseding stage J ruling.
 - **Validation report:** `specifications/11-research/baum-welch.md`.
+
+### MJ-9 Historical scenario stress (stage J wave 3)
+- **Purpose:** measure a historical yield-curve move between two stored dates and replay it on a curve and DV01 ladder.
+- **Inputs:** as in the spec page; shock library `datasets/scenarios/us_treasury_shocks.json` (Treasury par yields, H.15-checked).
+- **Limitations:** research tool, tier 3; one historical path per scenario, not a distribution; linear interpolation in tenor, flat outside; par yields, not zero rates. **Review:** 2026-11-15.
+- **Validation:** oracle `oracle/python/gen_stage_j_w3.py` in exact fractions; H.15 match on all 88 start and end values; numpy `interp` and pandas lookup (`oracle/OUTSIDE_J.json`).
+- **Tier:** 3.
+- **Challenger:** the Python oracle against each build; the H.15 release for the data.
+- **Monitoring thresholds:** a library value differing from H.15 by more than 0.005 percentage points.
+- **Data lineage hash:** sha256 380fb95c17d673dd4dd4757460b5cb83c4b0a0478990e23eeae61f82c7e04c7c (`scen_j`).
+- **Retirement trigger:** a superseding stage J ruling.
+- **Validation report:** `specifications/06-risk/scenario-stress.md`.
+
+### MJ-10 Interpolation backtests (stage J wave 3)
+- **Purpose:** leave-one-knot-out and held-out-strike errors of the core interpolants.
+- **Inputs:** as in the spec page.
+- **Limitations:** research tool, tier 3; errors at quoted points understate errors between quotes; B1 failed on a synthetic SSVI surface, real option quotes not tested (`research/interp_backtest/RESULTS.md`). **Review:** 2026-11-15.
+- **Validation:** oracle `oracle/python/gen_stage_j_w3.py`; numpy and scipy interpolants on all 16 value cases.
+- **Tier:** 3.
+- **Challenger:** the Python oracle against each build; scipy interpolants.
+- **Monitoring thresholds:** the B1 and B2 pass rules of the spec page.
+- **Data lineage hash:** sha256 74646ff7a0befd72eb3e4d1d8523cd75313b6d792006b9048972750c76e5aff0 (`interpbt_j`).
+- **Retirement trigger:** a superseding stage J ruling.
+- **Validation report:** `specifications/11-research/interp-backtest.md`.
+
+### MJ-11 Drift detectors (stage J wave 3)
+- **Purpose:** CUSUM, Page-Hinkley, PSI and two-sample KS for change detection.
+- **Inputs:** as in the spec page.
+- **Limitations:** research tool, tier 3; operating characteristics (A3 study) not yet measured, prereg `research/preregs/A3-drift.md` unsigned; CUSUM and Page-Hinkley have no outside library check. **Review:** 2026-11-15.
+- **Validation:** oracle `oracle/python/gen_stage_j_w3.py` (rational re-implementation, hand cases); scipy `ks_2samp` exact and numpy/scipy PSI on 13 value cases.
+- **Tier:** 3.
+- **Challenger:** the Python oracle against each build; the A3 study once run.
+- **Monitoring thresholds:** the A3 pass rules (CUSUM ARL0 in [400, 540], median delay at most 15).
+- **Data lineage hash:** sha256 de5884e4660a3953dce47720870f2b2b41b6076381e0a0bbd34dcb3dd828ee27 (`drift_j`).
+- **Retirement trigger:** a superseding stage J ruling.
+- **Validation report:** `specifications/11-research/drift-detectors.md`.
