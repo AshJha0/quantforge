@@ -2920,8 +2920,8 @@
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 130,
     "share_with_rederivation": 0.613208,
-    "all_cases_share": 0.336788,
-    "error_and_invariance_cases": 174
+    "all_cases_share": 0.297483,
+    "error_and_invariance_cases": 225
    },
    "with_sweeps": {
     "cases": 212,
@@ -2935,8 +2935,8 @@
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 130,
     "share_with_rederivation": 0.613208,
-    "all_cases_share": 0.336788,
-    "error_and_invariance_cases": 174
+    "all_cases_share": 0.297483,
+    "error_and_invariance_cases": 225
    },
    "sweeps": null,
    "libraries": {
@@ -3011,7 +3011,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 7
+     "error_and_invariance_cases": 9
     },
     "exotic.basket.moment": {
      "cases": 0,
@@ -3071,7 +3071,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": null,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 2
+     "error_and_invariance_cases": 5
     },
     "hedge.qp.solve": {
      "cases": 6,
@@ -3146,7 +3146,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 11
+     "error_and_invariance_cases": 13
     },
     "rates.swaption.price_cube": {
      "cases": 0,
@@ -3176,7 +3176,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 13
+     "error_and_invariance_cases": 15
     },
     "research.backtest.interp_loo": {
      "cases": 10,
@@ -3190,8 +3190,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 10,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.714286,
-     "error_and_invariance_cases": 4
+     "all_cases_share": 0.625,
+     "error_and_invariance_cases": 6
     },
     "research.backtest.run": {
      "cases": 14,
@@ -3205,8 +3205,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 14,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.608696,
-     "error_and_invariance_cases": 9
+     "all_cases_share": 0.56,
+     "error_and_invariance_cases": 11
     },
     "research.backtest.surface_holdout": {
      "cases": 6,
@@ -3220,8 +3220,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.545455,
-     "error_and_invariance_cases": 5
+     "all_cases_share": 0.461538,
+     "error_and_invariance_cases": 7
     },
     "research.cv.cpcv_paths": {
      "cases": 5,
@@ -3250,8 +3250,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 8,
      "share_with_rederivation": 0.8,
-     "all_cases_share": 0.5,
-     "error_and_invariance_cases": 6
+     "all_cases_share": 0.470588,
+     "error_and_invariance_cases": 7
     },
     "research.drift.cusum": {
      "cases": 7,
@@ -3266,7 +3266,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 3
+     "error_and_invariance_cases": 5
     },
     "research.drift.ks": {
      "cases": 8,
@@ -3280,8 +3280,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 7,
      "share_with_rederivation": 0.875,
-     "all_cases_share": 0.7,
-     "error_and_invariance_cases": 2
+     "all_cases_share": 0.583333,
+     "error_and_invariance_cases": 4
     },
     "research.drift.page_hinkley": {
      "cases": 6,
@@ -3296,7 +3296,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 2
+     "error_and_invariance_cases": 4
     },
     "research.drift.psi": {
      "cases": 6,
@@ -3311,7 +3311,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 2
+     "error_and_invariance_cases": 4
     },
     "research.estimate.black_litterman": {
      "cases": 6,
@@ -3325,8 +3325,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.6,
-     "error_and_invariance_cases": 4
+     "all_cases_share": 0.5,
+     "error_and_invariance_cases": 6
     },
     "research.estimate.ledoit_wolf": {
      "cases": 13,
@@ -3340,8 +3340,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 13,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.866667,
-     "error_and_invariance_cases": 2
+     "all_cases_share": 0.764706,
+     "error_and_invariance_cases": 4
     },
     "research.portfolio.mean_variance": {
      "cases": 21,
@@ -3355,8 +3355,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 21,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.75,
-     "error_and_invariance_cases": 7
+     "all_cases_share": 0.7,
+     "error_and_invariance_cases": 9
     },
     "research.portfolio.risk_parity": {
      "cases": 8,
@@ -3370,8 +3370,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
      "share_with_rederivation": 0.75,
-     "all_cases_share": 0.5,
-     "error_and_invariance_cases": 4
+     "all_cases_share": 0.428571,
+     "error_and_invariance_cases": 6
     },
     "research.regime.baum_welch": {
      "cases": 6,
@@ -3385,8 +3385,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.428571,
-     "error_and_invariance_cases": 8
+     "all_cases_share": 0.375,
+     "error_and_invariance_cases": 10
     },
     "research.regime.viterbi": {
      "cases": 10,
@@ -3400,8 +3400,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 10,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.625,
-     "error_and_invariance_cases": 6
+     "all_cases_share": 0.555556,
+     "error_and_invariance_cases": 8
     },
     "research.stats.dsr": {
      "cases": 9,
@@ -3416,7 +3416,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 5
+     "error_and_invariance_cases": 7
     },
     "research.stats.pbo": {
      "cases": 6,
@@ -3431,7 +3431,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 5
+     "error_and_invariance_cases": 7
     },
     "research.stats.power": {
      "cases": 5,
@@ -3445,8 +3445,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 5,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.625,
-     "error_and_invariance_cases": 3
+     "all_cases_share": 0.555556,
+     "error_and_invariance_cases": 4
     },
     "research.stats.psr": {
      "cases": 4,
@@ -3461,7 +3461,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 0
+     "error_and_invariance_cases": 2
     },
     "risk.backtest.es_z2": {
      "cases": 7,
@@ -3476,7 +3476,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 5
+     "error_and_invariance_cases": 7
     },
     "risk.backtest.traffic_light": {
      "cases": 0,
@@ -3505,8 +3505,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.666667,
-     "error_and_invariance_cases": 3
+     "all_cases_share": 0.545455,
+     "error_and_invariance_cases": 5
     },
     "risk.corr.nearest": {
      "cases": 0,
@@ -3566,7 +3566,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 6
+     "error_and_invariance_cases": 8
     },
     "risk.scenario.replay": {
      "cases": 8,
@@ -3580,8 +3580,8 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 8,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.666667,
-     "error_and_invariance_cases": 4
+     "all_cases_share": 0.571429,
+     "error_and_invariance_cases": 6
     },
     "risk.stress.reverse": {
      "cases": 0,

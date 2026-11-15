@@ -301,4 +301,4 @@ TOTALS: 15458 value 7651 error 5293 invariance 2514
 
 After J-I.2 and J-I.3 (`hedgesign_j` 2 value, `selectcost_j` 3 error; 2026-11-15):
 
-TOTALS: 15463 value 7653 error 5296 invariance 2514
+TOTALS: 15514 value 7653 error 5347 invariance 2514
