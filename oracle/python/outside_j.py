@@ -458,26 +458,23 @@ def scen():
     """risk.scenario.replay: numpy.interp (linear, flat outside the end tenors: the J-W3-4 convention) on the
     shock curve; shocked yields and P&L are arithmetic on its output. historical_shock: pandas date-indexed lookup
     (DataFrame.loc) of the two rows; shifts, level and slope are arithmetic on the looked-up rows."""
-    rows = []
+    rows, skipped = [], []
     for c in load("scen_j"):
         i = c["inputs"]
+        if c["operation"] == "risk.scenario.historical_shock":
+            # A pandas date lookup plus subtraction is not an outside check of the method (audit 2026-11-15).
+            skipped.append({"case_id": c["case_id"], "reason": "date lookup plus arithmetic; no library computes the "
+                            "method, so a pandas re-implementation is not counted"})
+            continue
         if c["operation"] == "risk.scenario.replay":
             a = i.get("scale", 1.0) * np.interp(i["base_tenors"], i["shock_tenors"], i["shock_bp"])
             chk = [check(c, "applied_bp", a.tolist()),
                    check(c, "shocked_yields", (np.asarray(i["base_yields"]) + a / 100.0).tolist(), via="arithmetic")]
             if "dv01" in i:
                 chk.append(check(c, "pnl", float(-np.dot(i["dv01"], a)), via="arithmetic"))
-        else:
-            df = pd.DataFrame(i["yields"], index=pd.to_datetime(i["dates"]), columns=i["tenors"])
-            y0, y1 = df.loc[pd.Timestamp(i["start_date"])], df.loc[pd.Timestamp(i["end_date"])]
-            sh = (y1 - y0) * 100.0
-            chk = [check(c, "start_yields", y0.tolist()), check(c, "end_yields", y1.tolist()),
-                   check(c, "shift_bp", sh.tolist(), via="arithmetic"),
-                   check(c, "level_bp", float(sh.mean()), via="arithmetic"),
-                   check(c, "slope_bp", float(sh.iloc[-1] - sh.iloc[0]), via="arithmetic")]
         rows.append(entry(c, chk))
-    return {"library": f"{ver('numpy')} interp (replay); {ver('pandas')} DataFrame.loc date lookup (historical_shock); "
-                       "the rest is arithmetic (library-primitive)", "cases": rows}
+    return {"library": f"{ver('numpy')} interp (replay); the rest is arithmetic (library-primitive); "
+                       "historical_shock not counted", "cases": rows, "not_checked": skipped}
 
 
 def _interp(method, x, y, at):
@@ -517,14 +514,16 @@ def interpbt():
                 check(c, "rmse", float(np.sqrt(np.mean(flat ** 2))), via="arithmetic")]
         rows.append(entry(c, chk))
     return {"library": f"{ver('numpy')} interp; {ver('scipy')} CubicSpline natural, PchipInterpolator "
-                       "(library-primitive)", "cases": rows}
+                       "(library-primitive)", "cases": rows,
+            "note": "the interpbt_j goldens were generated with the same scipy/numpy interpolant calls, so this is a "
+                    "library-object golden re-run, not a second independent check"}
 
 
 def drift():
     """KS: scipy.stats.ks_2samp(method="exact") statistic and p-value. PSI: numpy.quantile(method="inverted_cdf")
     edges (the type-1 quantile of J-W3-12), numpy.searchsorted(side="left") right-closed bins, scipy.special.rel_entr
     for the two KL terms; the 1e-4 floor and the sum are arithmetic. CUSUM and Page-Hinkley are not counted."""
-    from scipy import special, stats
+    from scipy import stats
     why = {"research.drift.cusum": "no free library implements the tabular two-sided CUSUM on z = (x - mu0) / sigma "
                                    "with restart (detecta.detect_cusum works on first differences); not counted",
            "research.drift.page_hinkley": "river 0.27 PageHinkley differs in convention: its running minimum starts at "
@@ -538,24 +537,16 @@ def drift():
             chk = [check(c, "statistic", float(r.statistic)), check(c, "p_value", float(r.pvalue)),
                    check(c, "reject", bool(r.pvalue <= i.get("level", 0.05)), via="arithmetic")]
         elif op == "research.drift.psi":
-            b = i.get("bins", 10)
-            ref = np.asarray(i["reference"], float)
-            edges = np.quantile(ref, np.arange(1, b) / b, method="inverted_cdf")
-
-            def sh(v, edges=edges, b=b):
-                cnt = np.bincount(np.searchsorted(edges, np.asarray(v, float), side="left"), minlength=b)
-                return np.maximum(cnt / len(v), 1e-4)
-            rs, ts = sh(ref), sh(i["test"])
-            v = float(np.sum(special.rel_entr(ts, rs) + special.rel_entr(rs, ts)))
-            chk = [check(c, "reference_shares", rs.tolist()), check(c, "test_shares", ts.tolist()),
-                   check(c, "psi", v, via="arithmetic"),
-                   check(c, "alarm", bool(v > i.get("threshold", 0.25)), via="arithmetic")]
+            # numpy quantile/searchsorted plus rel_entr re-implements the PSI convention; not a library check
+            # of PSI (audit 2026-11-15), so not counted.
+            skipped.append({"case_id": c["case_id"], "reason": "no library computes PSI with these conventions; the "
+                            "quantile/searchsorted/rel_entr version is a re-implementation, not counted"})
+            continue
         else:
             skipped.append({"case_id": c["case_id"], "reason": why[op]})
             continue
         rows.append(entry(c, chk))
-    return {"library": f"{ver('scipy')} stats.ks_2samp exact, special.rel_entr; {ver('numpy')} quantile "
-                       "inverted_cdf, searchsorted", "cases": rows, "not_checked": skipped}
+    return {"library": f"{ver('scipy')} stats.ks_2samp exact (PSI, CUSUM, Page-Hinkley not counted)", "cases": rows, "not_checked": skipped}
 
 
 WAVES = {1: ("regime_j", "purgedcv_j", "rstats_j", "backtest_j"), 2: ("optim_j", "estim_j", "esbt_j", "baumwelch_j"),

@@ -1,7 +1,7 @@
 {
  "rule": "per case; a case counts only if every compared output is within the golden's own tolerance class from the named library (R6-13; arithmetic outputs make the case library-primitive)",
  "summary": {
-  "counted": 141,
+  "counted": 130,
   "value_checked_cases": 185,
   "all_cases": 282
  },
@@ -17614,202 +17614,8 @@
    "failed": []
   },
   "scen_j": {
-   "library": "numpy 2.5.4 interp (replay); pandas 3.1.1 DataFrame.loc date lookup (historical_shock); the rest is arithmetic (library-primitive)",
+   "library": "numpy 2.4.6 interp (replay); the rest is arithmetic (library-primitive); historical_shock not counted",
    "cases": [
-    {
-     "case_id": "scen_j-0001",
-     "class": "library-primitive",
-     "checks": [
-      {
-       "output": "start_yields",
-       "golden": [
-        1.43,
-        1.56
-       ],
-       "outside": [
-        1.43,
-        1.56
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "end_yields",
-       "golden": [
-        0.46,
-        0.54
-       ],
-       "outside": [
-        0.46,
-        0.54
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "shift_bp",
-       "golden": [
-        -96.99999999999999,
-        -102.0
-       ],
-       "outside": [
-        -97.0,
-        -102.0
-       ],
-       "max_gap": 1.4210854715202004e-14,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "level_bp",
-       "golden": -99.5,
-       "outside": -99.5,
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "slope_bp",
-       "golden": -5.00000000000001,
-       "outside": -5.0,
-       "max_gap": 9.769962616701378e-15,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      }
-     ],
-     "pass": true
-    },
-    {
-     "case_id": "scen_j-0002",
-     "class": "library-primitive",
-     "checks": [
-      {
-       "output": "start_yields",
-       "golden": [
-        1.37,
-        1.49,
-        1.84,
-        2.02,
-        2.23,
-        2.45,
-        2.97,
-        3.32,
-        3.74,
-        4.36,
-        4.32
-       ],
-       "outside": [
-        1.37,
-        1.49,
-        1.84,
-        2.02,
-        2.23,
-        2.45,
-        2.97,
-        3.32,
-        3.74,
-        4.36,
-        4.32
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "end_yields",
-       "golden": [
-        0.11,
-        0.11,
-        0.27,
-        0.37,
-        0.76,
-        1.0,
-        1.55,
-        1.87,
-        2.25,
-        3.05,
-        2.69
-       ],
-       "outside": [
-        0.11,
-        0.11,
-        0.27,
-        0.37,
-        0.76,
-        1.0,
-        1.55,
-        1.87,
-        2.25,
-        3.05,
-        2.69
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "shift_bp",
-       "golden": [
-        -126.00000000000001,
-        -138.0,
-        -157.0,
-        -165.0,
-        -147.0,
-        -145.00000000000003,
-        -142.00000000000003,
-        -144.99999999999997,
-        -149.00000000000003,
-        -131.00000000000006,
-        -163.00000000000003
-       ],
-       "outside": [
-        -126.0,
-        -138.0,
-        -157.0,
-        -165.0,
-        -147.0,
-        -145.00000000000003,
-        -142.00000000000003,
-        -144.99999999999997,
-        -149.00000000000003,
-        -131.00000000000006,
-        -163.00000000000003
-       ],
-       "max_gap": 1.4210854715202004e-14,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "level_bp",
-       "golden": -146.1818181818182,
-       "outside": -146.1818181818182,
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "slope_bp",
-       "golden": -37.00000000000002,
-       "outside": -37.00000000000003,
-       "max_gap": 7.105427357601002e-15,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      }
-     ],
-     "pass": true
-    },
     {
      "case_id": "scen_j-0003",
      "class": "library-primitive",
@@ -17876,130 +17682,6 @@
         2.69
        ],
        "max_gap": 1.1102230246251565e-16,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      }
-     ],
-     "pass": true
-    },
-    {
-     "case_id": "scen_j-0004",
-     "class": "library-primitive",
-     "checks": [
-      {
-       "output": "start_yields",
-       "golden": [
-        0.03,
-        0.06,
-        0.08,
-        0.11,
-        0.2,
-        0.3,
-        0.65,
-        1.07,
-        1.66,
-        2.44,
-        2.83
-       ],
-       "outside": [
-        0.03,
-        0.06,
-        0.08,
-        0.11,
-        0.2,
-        0.3,
-        0.65,
-        1.07,
-        1.66,
-        2.44,
-        2.83
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "end_yields",
-       "golden": [
-        0.03,
-        0.02,
-        0.06,
-        0.16,
-        0.52,
-        0.97,
-        1.85,
-        2.45,
-        2.98,
-        3.64,
-        3.88
-       ],
-       "outside": [
-        0.03,
-        0.02,
-        0.06,
-        0.16,
-        0.52,
-        0.97,
-        1.85,
-        2.45,
-        2.98,
-        3.64,
-        3.88
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "shift_bp",
-       "golden": [
-        0.0,
-        -3.9999999999999996,
-        -2.0000000000000004,
-        5.0,
-        32.0,
-        67.0,
-        120.0,
-        138.0,
-        132.0,
-        120.00000000000001,
-        104.99999999999999
-       ],
-       "outside": [
-        0.0,
-        -3.9999999999999996,
-        -2.0000000000000004,
-        5.0,
-        32.0,
-        67.0,
-        120.00000000000001,
-        138.0,
-        132.0,
-        120.00000000000001,
-        104.99999999999999
-       ],
-       "max_gap": 1.4210854715202004e-14,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "level_bp",
-       "golden": 64.81818181818183,
-       "outside": 64.81818181818181,
-       "max_gap": 1.4210854715202004e-14,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "slope_bp",
-       "golden": 104.99999999999999,
-       "outside": 104.99999999999999,
-       "max_gap": 0.0,
        "tolerance": "1e-12 abs + 1e-10 rel",
        "via": "arithmetic",
        "pass": true
@@ -18081,130 +17763,6 @@
      "pass": true
     },
     {
-     "case_id": "scen_j-0006",
-     "class": "library-primitive",
-     "checks": [
-      {
-       "output": "start_yields",
-       "golden": [
-        1.61,
-        1.58,
-        1.56,
-        1.47,
-        1.42,
-        1.39,
-        1.41,
-        1.5,
-        1.56,
-        1.86,
-        2.01
-       ],
-       "outside": [
-        1.61,
-        1.58,
-        1.56,
-        1.47,
-        1.42,
-        1.39,
-        1.41,
-        1.5,
-        1.56,
-        1.86,
-        2.01
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "end_yields",
-       "golden": [
-        0.57,
-        0.33,
-        0.27,
-        0.31,
-        0.38,
-        0.4,
-        0.46,
-        0.56,
-        0.54,
-        0.87,
-        0.99
-       ],
-       "outside": [
-        0.57,
-        0.33,
-        0.27,
-        0.31,
-        0.38,
-        0.4,
-        0.46,
-        0.56,
-        0.54,
-        0.87,
-        0.99
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "shift_bp",
-       "golden": [
-        -104.00000000000001,
-        -125.0,
-        -129.0,
-        -116.0,
-        -103.99999999999999,
-        -98.99999999999999,
-        -94.99999999999999,
-        -94.0,
-        -102.0,
-        -99.00000000000001,
-        -101.99999999999999
-       ],
-       "outside": [
-        -104.0,
-        -125.0,
-        -129.0,
-        -115.99999999999999,
-        -104.0,
-        -98.99999999999999,
-        -95.0,
-        -94.0,
-        -102.0,
-        -99.00000000000001,
-        -101.99999999999999
-       ],
-       "max_gap": 1.4210854715202004e-14,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "level_bp",
-       "golden": -106.27272727272727,
-       "outside": -106.27272727272727,
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "slope_bp",
-       "golden": 2.000000000000035,
-       "outside": 2.000000000000014,
-       "max_gap": 2.0872192862952943e-14,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      }
-     ],
-     "pass": true
-    },
-    {
      "case_id": "scen_j-0007",
      "class": "library-primitive",
      "checks": [
@@ -18270,130 +17828,6 @@
         0.99
        ],
        "max_gap": 1.1102230246251565e-16,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      }
-     ],
-     "pass": true
-    },
-    {
-     "case_id": "scen_j-0008",
-     "class": "library-primitive",
-     "checks": [
-      {
-       "output": "start_yields",
-       "golden": [
-        0.06,
-        0.06,
-        0.19,
-        0.39,
-        0.73,
-        0.97,
-        1.26,
-        1.44,
-        1.52,
-        1.94,
-        1.9
-       ],
-       "outside": [
-        0.06,
-        0.06,
-        0.19,
-        0.39,
-        0.73,
-        0.97,
-        1.26,
-        1.44,
-        1.52,
-        1.94,
-        1.9
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "end_yields",
-       "golden": [
-        3.55,
-        4.09,
-        4.43,
-        4.58,
-        4.49,
-        4.52,
-        4.34,
-        4.28,
-        4.21,
-        4.54,
-        4.33
-       ],
-       "outside": [
-        3.55,
-        4.09,
-        4.43,
-        4.58,
-        4.49,
-        4.52,
-        4.34,
-        4.28,
-        4.21,
-        4.54,
-        4.33
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "shift_bp",
-       "golden": [
-        349.0,
-        403.0,
-        423.99999999999994,
-        419.0,
-        376.0,
-        354.99999999999994,
-        308.0,
-        284.00000000000006,
-        269.0,
-        260.0,
-        243.00000000000003
-       ],
-       "outside": [
-        349.0,
-        403.0,
-        423.99999999999994,
-        419.00000000000006,
-        376.0,
-        355.0,
-        308.0,
-        284.00000000000006,
-        269.0,
-        260.0,
-        243.00000000000003
-       ],
-       "max_gap": 5.684341886080802e-14,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "level_bp",
-       "golden": 335.45454545454544,
-       "outside": 335.45454545454544,
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "slope_bp",
-       "golden": -105.99999999999997,
-       "outside": -105.99999999999997,
-       "max_gap": 0.0,
        "tolerance": "1e-12 abs + 1e-10 rel",
        "via": "arithmetic",
        "pass": true
@@ -18666,11 +18100,33 @@
      "pass": true
     }
    ],
-   "counted": 13,
+   "not_checked": [
+    {
+     "case_id": "scen_j-0001",
+     "reason": "date lookup plus arithmetic; no library computes the method, so a pandas re-implementation is not counted"
+    },
+    {
+     "case_id": "scen_j-0002",
+     "reason": "date lookup plus arithmetic; no library computes the method, so a pandas re-implementation is not counted"
+    },
+    {
+     "case_id": "scen_j-0004",
+     "reason": "date lookup plus arithmetic; no library computes the method, so a pandas re-implementation is not counted"
+    },
+    {
+     "case_id": "scen_j-0006",
+     "reason": "date lookup plus arithmetic; no library computes the method, so a pandas re-implementation is not counted"
+    },
+    {
+     "case_id": "scen_j-0008",
+     "reason": "date lookup plus arithmetic; no library computes the method, so a pandas re-implementation is not counted"
+    }
+   ],
+   "counted": 8,
    "failed": []
   },
   "interpbt_j": {
-   "library": "numpy 2.5.4 interp; scipy 1.18.1 CubicSpline natural, PchipInterpolator (library-primitive)",
+   "library": "numpy 2.4.6 interp; scipy 1.17.1 CubicSpline natural, PchipInterpolator (library-primitive)",
    "cases": [
     {
      "case_id": "interpbt_j-0001",
@@ -19619,484 +19075,13 @@
      "pass": true
     }
    ],
+   "note": "the interpbt_j goldens were generated with the same scipy/numpy interpolant calls, so this is a library-object golden re-run, not a second independent check",
    "counted": 16,
    "failed": []
   },
   "drift_j": {
-   "library": "scipy 1.18.1 stats.ks_2samp exact, special.rel_entr; numpy 2.5.4 quantile inverted_cdf, searchsorted",
+   "library": "scipy 1.17.1 stats.ks_2samp exact (PSI, CUSUM, Page-Hinkley not counted)",
    "cases": [
-    {
-     "case_id": "drift_j-0014",
-     "class": "library-primitive",
-     "checks": [
-      {
-       "output": "reference_shares",
-       "golden": [
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1
-       ],
-       "outside": [
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "test_shares",
-       "golden": [
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1
-       ],
-       "outside": [
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "psi",
-       "golden": 0.0,
-       "outside": 0.0,
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "alarm",
-       "golden": false,
-       "outside": false,
-       "tolerance": "exact",
-       "via": "arithmetic",
-       "pass": true
-      }
-     ],
-     "pass": true
-    },
-    {
-     "case_id": "drift_j-0015",
-     "class": "library-primitive",
-     "checks": [
-      {
-       "output": "reference_shares",
-       "golden": [
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1
-       ],
-       "outside": [
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "test_shares",
-       "golden": [
-        0.10666666666666667,
-        0.12333333333333334,
-        0.08666666666666667,
-        0.15333333333333332,
-        0.09333333333333334,
-        0.056666666666666664,
-        0.1,
-        0.1,
-        0.08333333333333333,
-        0.09666666666666666
-       ],
-       "outside": [
-        0.10666666666666667,
-        0.12333333333333334,
-        0.08666666666666667,
-        0.15333333333333332,
-        0.09333333333333334,
-        0.056666666666666664,
-        0.1,
-        0.1,
-        0.08333333333333333,
-        0.09666666666666666
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "psi",
-       "golden": 0.05825305312813307,
-       "outside": 0.05825305312813307,
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "alarm",
-       "golden": false,
-       "outside": false,
-       "tolerance": "exact",
-       "via": "arithmetic",
-       "pass": true
-      }
-     ],
-     "pass": true
-    },
-    {
-     "case_id": "drift_j-0016",
-     "class": "library-primitive",
-     "checks": [
-      {
-       "output": "reference_shares",
-       "golden": [
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1
-       ],
-       "outside": [
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "test_shares",
-       "golden": [
-        0.17,
-        0.11,
-        0.07333333333333333,
-        0.07666666666666666,
-        0.05333333333333334,
-        0.03333333333333333,
-        0.08666666666666667,
-        0.12333333333333334,
-        0.07,
-        0.20333333333333334
-       ],
-       "outside": [
-        0.17,
-        0.11,
-        0.07333333333333333,
-        0.07666666666666666,
-        0.05333333333333334,
-        0.03333333333333333,
-        0.08666666666666667,
-        0.12333333333333334,
-        0.07,
-        0.20333333333333334
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "psi",
-       "golden": 0.2459784831609578,
-       "outside": 0.24597848316095777,
-       "max_gap": 2.7755575615628914e-17,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "alarm",
-       "golden": false,
-       "outside": false,
-       "tolerance": "exact",
-       "via": "arithmetic",
-       "pass": true
-      }
-     ],
-     "pass": true
-    },
-    {
-     "case_id": "drift_j-0017",
-     "class": "library-primitive",
-     "checks": [
-      {
-       "output": "reference_shares",
-       "golden": [
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1
-       ],
-       "outside": [
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1,
-        0.1
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "test_shares",
-       "golden": [
-        0.3,
-        0.07666666666666666,
-        0.03666666666666667,
-        0.06333333333333334,
-        0.043333333333333335,
-        0.023333333333333334,
-        0.06666666666666667,
-        0.06333333333333334,
-        0.06333333333333334,
-        0.2633333333333333
-       ],
-       "outside": [
-        0.3,
-        0.07666666666666666,
-        0.03666666666666667,
-        0.06333333333333334,
-        0.043333333333333335,
-        0.023333333333333334,
-        0.06666666666666667,
-        0.06333333333333334,
-        0.06333333333333334,
-        0.2633333333333333
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "psi",
-       "golden": 0.6703305791429203,
-       "outside": 0.6703305791429202,
-       "max_gap": 1.1102230246251565e-16,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "alarm",
-       "golden": true,
-       "outside": true,
-       "tolerance": "exact",
-       "via": "arithmetic",
-       "pass": true
-      }
-     ],
-     "pass": true
-    },
-    {
-     "case_id": "drift_j-0018",
-     "class": "library-primitive",
-     "checks": [
-      {
-       "output": "reference_shares",
-       "golden": [
-        0.2,
-        0.2,
-        0.2,
-        0.2,
-        0.2
-       ],
-       "outside": [
-        0.2,
-        0.2,
-        0.2,
-        0.2,
-        0.2
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "test_shares",
-       "golden": [
-        0.35,
-        0.325,
-        0.325,
-        0.0001,
-        0.0001
-       ],
-       "outside": [
-        0.35,
-        0.325,
-        0.325,
-        0.0001,
-        0.0001
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "psi",
-       "golden": 3.244160125460663,
-       "outside": 3.244160125460663,
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "alarm",
-       "golden": true,
-       "outside": true,
-       "tolerance": "exact",
-       "via": "arithmetic",
-       "pass": true
-      }
-     ],
-     "pass": true
-    },
-    {
-     "case_id": "drift_j-0019",
-     "class": "library-primitive",
-     "checks": [
-      {
-       "output": "reference_shares",
-       "golden": [
-        0.25,
-        0.25,
-        0.25,
-        0.25
-       ],
-       "outside": [
-        0.25,
-        0.25,
-        0.25,
-        0.25
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "test_shares",
-       "golden": [
-        0.2,
-        0.25,
-        0.25,
-        0.3
-       ],
-       "outside": [
-        0.2,
-        0.25,
-        0.25,
-        0.3
-       ],
-       "max_gap": 0.0,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "library",
-       "pass": true
-      },
-      {
-       "output": "psi",
-       "golden": 0.020273255405408218,
-       "outside": 0.02027325540540821,
-       "max_gap": 6.938893903907228e-18,
-       "tolerance": "1e-12 abs + 1e-10 rel",
-       "via": "arithmetic",
-       "pass": true
-      },
-      {
-       "output": "alarm",
-       "golden": true,
-       "outside": true,
-       "tolerance": "exact",
-       "via": "arithmetic",
-       "pass": true
-      }
-     ],
-     "pass": true
-    },
     {
      "case_id": "drift_j-0020",
      "class": "library-primitive",
@@ -20137,8 +19122,8 @@
       {
        "output": "statistic",
        "golden": 0.2,
-       "outside": 0.20000000000000007,
-       "max_gap": 5.551115123125783e-17,
+       "outside": 0.2,
+       "max_gap": 0.0,
        "tolerance": "1e-11 abs + 1e-10 rel",
        "via": "library",
        "pass": true
@@ -20236,8 +19221,8 @@
       {
        "output": "statistic",
        "golden": 0.25555555555555554,
-       "outside": 0.2555555555555555,
-       "max_gap": 5.551115123125783e-17,
+       "outside": 0.25555555555555554,
+       "max_gap": 0.0,
        "tolerance": "1e-11 abs + 1e-10 rel",
        "via": "library",
        "pass": true
@@ -20302,8 +19287,8 @@
       {
        "output": "statistic",
        "golden": 0.3333333333333333,
-       "outside": 0.33333333333333337,
-       "max_gap": 5.551115123125783e-17,
+       "outside": 0.3333333333333333,
+       "max_gap": 0.0,
        "tolerance": "1e-11 abs + 1e-10 rel",
        "via": "library",
        "pass": true
@@ -20381,9 +19366,33 @@
     {
      "case_id": "drift_j-0013",
      "reason": "river 0.27 PageHinkley differs in convention: its running minimum starts at +inf (J-W3-11 includes the restart value 0), it has a min_instances gate and reports no direction; not matched honestly, not counted"
+    },
+    {
+     "case_id": "drift_j-0014",
+     "reason": "no library computes PSI with these conventions; the quantile/searchsorted/rel_entr version is a re-implementation, not counted"
+    },
+    {
+     "case_id": "drift_j-0015",
+     "reason": "no library computes PSI with these conventions; the quantile/searchsorted/rel_entr version is a re-implementation, not counted"
+    },
+    {
+     "case_id": "drift_j-0016",
+     "reason": "no library computes PSI with these conventions; the quantile/searchsorted/rel_entr version is a re-implementation, not counted"
+    },
+    {
+     "case_id": "drift_j-0017",
+     "reason": "no library computes PSI with these conventions; the quantile/searchsorted/rel_entr version is a re-implementation, not counted"
+    },
+    {
+     "case_id": "drift_j-0018",
+     "reason": "no library computes PSI with these conventions; the quantile/searchsorted/rel_entr version is a re-implementation, not counted"
+    },
+    {
+     "case_id": "drift_j-0019",
+     "reason": "no library computes PSI with these conventions; the quantile/searchsorted/rel_entr version is a re-implementation, not counted"
     }
    ],
-   "counted": 13,
+   "counted": 7,
    "failed": []
   }
  }
