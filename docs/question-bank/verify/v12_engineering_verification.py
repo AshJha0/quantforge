@@ -67,8 +67,8 @@ sec = cli.split("## Error codes", 1)[1].split("## Value encoding", 1)[0]
 codes = re.findall(r"^\| `(E_[A-Z_]+)` \|", sec, re.M)
 has(f"The contract's error table lists {len(codes)} codes")
 assert codes[0] == "E_PARSE" and codes[-1] == "E_INFEASIBLE"
-assert '"contract_version":"1.14.0"' in cli
-has("`contract_version` 1.14.0")
+assert '"contract_version":"1.15.0"' in cli
+has("`contract_version` 1.15.0")
 
 # Q12.11: rulings files at the top of specifications/
 rul = sorted(p.name for p in (REPO / "specifications").glob("*rulings*.md"))
@@ -113,8 +113,8 @@ n_i, obj_i, prim_i = share["I"]
 has(f"Stage I: {prim_i} of {n_i} value cases are `library-primitive`, a library-only share of {(obj_i + prim_i) / n_i:.1%}")
 n_j, obj_j, prim_j = share["J"]
 has(f"Stage J: {obj_j} `library-object` plus {prim_j} `library-primitive` = {obj_j + prim_j} of {n_j}, "
-    f"which is {(obj_j + prim_j) / n_j:.4f}; the generated table prints it as 76.1%")
-assert "| J | 130 | 14 | 85 | 0 | 0 | 31 | 76.1% |" in osh
+    f"which is {(obj_j + prim_j) / n_j:.4f}; the generated table prints it as {(obj_j + prim_j) / n_j:.1%}")
+assert f"| J | {n_j} | {obj_j} | {prim_j} | 0 | 0 | {n_j - obj_j - prim_j} | {(obj_j + prim_j) / n_j:.1%} |" in osh
 assert (obj_i + prim_i) / n_i >= 0.6 and (obj_j + prim_j) / n_j >= 0.6
 assert "**Floor: 60% of the stage's value-checked cases.**" in osh
 

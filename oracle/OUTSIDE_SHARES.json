@@ -2909,34 +2909,34 @@
   },
   "J": {
    "without_sweeps": {
-    "cases": 130,
+    "cases": 150,
     "library-object": 14,
     "library-primitive": 85,
     "independent-rederivation": 0,
     "reimplementation": 0,
-    "none": 31,
+    "none": 51,
     "counted": 99,
-    "share": 0.761538,
+    "share": 0.66,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 99,
-    "share_with_rederivation": 0.761538,
-    "all_cases_share": 0.415966,
-    "error_and_invariance_cases": 108
+    "share_with_rederivation": 0.66,
+    "all_cases_share": 0.342561,
+    "error_and_invariance_cases": 139
    },
    "with_sweeps": {
-    "cases": 130,
+    "cases": 150,
     "library-object": 14,
     "library-primitive": 85,
     "independent-rederivation": 0,
     "reimplementation": 0,
-    "none": 31,
+    "none": 51,
     "counted": 99,
-    "share": 0.761538,
+    "share": 0.66,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 99,
-    "share_with_rederivation": 0.761538,
-    "all_cases_share": 0.415966,
-    "error_and_invariance_cases": 108
+    "share_with_rederivation": 0.66,
+    "all_cases_share": 0.342561,
+    "error_and_invariance_cases": 139
    },
    "sweeps": null,
    "libraries": {
@@ -2994,6 +2994,21 @@
      "share_with_rederivation": null,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 1
+    },
+    "eq.forward.term_financed": {
+     "cases": 5,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 0,
+     "reimplementation": 0,
+     "none": 5,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 0,
+     "share_with_rederivation": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 7
     },
     "exotic.basket.moment": {
      "cases": 0,
@@ -3115,6 +3130,21 @@
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 1
     },
+    "liq.curve.cost": {
+     "cases": 7,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 0,
+     "reimplementation": 0,
+     "none": 7,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 0,
+     "share_with_rederivation": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 11
+    },
     "rates.swaption.price_cube": {
      "cases": 0,
      "library-object": 0,
@@ -3129,6 +3159,21 @@
      "share_with_rederivation": null,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 4
+    },
+    "repo.term.curve": {
+     "cases": 8,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 0,
+     "reimplementation": 0,
+     "none": 8,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 0,
+     "share_with_rederivation": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 13
     },
     "research.backtest.run": {
      "cases": 14,
