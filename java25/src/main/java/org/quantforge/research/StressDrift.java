@@ -529,10 +529,35 @@ public final class StressDrift {
         return ratio(total.subtract(row[m]), total);
     }
 
-    /** Correctly rounded a / b for 0 <= a <= b, like Python's float(Fraction(a, b)). */
+    /**
+     * Correctly rounded a / b for a >= 0, b > 0, like Python's float(Fraction(a, b)): an exact integer
+     * division at the target ulp plus one guard bit, then round half to even on the guard bit and the
+     * remainder (sticky). Subnormal results keep fewer bits; no intermediate decimal rounding.
+     */
     static double ratio(BigInteger a, BigInteger b) {
-        return new java.math.BigDecimal(a).divide(new java.math.BigDecimal(b), java.math.MathContext.DECIMAL128)
-                .doubleValue();
+        if (a.signum() == 0) {
+            return 0.0;
+        }
+        // e = floor(log2(a / b)).
+        int e = a.bitLength() - b.bitLength();
+        BigInteger lhs = e < 0 ? a.shiftLeft(-e) : a;
+        BigInteger rhs = e > 0 ? b.shiftLeft(e) : b;
+        if (lhs.compareTo(rhs) < 0) {
+            e--;
+        }
+        int u = Math.max(e - 52, -1074); // exponent of the result's ulp
+        int shift = 1 - u; // one guard bit below the ulp
+        BigInteger num = shift >= 0 ? a.shiftLeft(shift) : a;
+        BigInteger den = shift >= 0 ? b : b.shiftLeft(-shift);
+        BigInteger[] qr = num.divideAndRemainder(den);
+        BigInteger q2 = qr[0];
+        boolean guard = q2.testBit(0);
+        boolean sticky = qr[1].signum() != 0;
+        BigInteger q = q2.shiftRight(1);
+        if (guard && (sticky || q.testBit(0))) {
+            q = q.add(BigInteger.ONE);
+        }
+        return Math.scalb(q.doubleValue(), u); // q <= 2^53: exact, and so is the scaling
     }
 
     public record Ks(double statistic, double pValue, boolean reject) {}

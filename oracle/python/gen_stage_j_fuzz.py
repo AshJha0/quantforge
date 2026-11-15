@@ -109,6 +109,19 @@ def ragged(k, file, source, path):
 
 CASES += [ragged(7 + i, *r) for i, r in enumerate(RAGGED)]
 
+# J-W3-17: risk.backtest.traffic_light counts (fuzz seed from risk_f4-0086; Rust looped 2^53 times).
+_TL = "risk.backtest.traffic_light"
+CASES += [
+    case(40, _TL, {"observations": 250, "exceptions": 2 ** 53, "confidence": 0.99},
+         "E_DOMAIN", ["backtest", "domain"], "exceptions 2^53 above observations 250 (J-W3-17; fuzz risk_f4-0086)"),
+    case(41, _TL, {"observations": 2 ** 53, "exceptions": 2 ** 53, "confidence": 0.99},
+         "E_LIMIT", ["backtest", "limit"], "observations 2^53 above the 1,000,000 limit (J-W3-17)"),
+    case(42, _TL, {"observations": 1_000_001, "exceptions": 0, "confidence": 0.99},
+         "E_LIMIT", ["backtest", "limit"], "observations one above the limit (J-W3-17)"),
+    case(43, _TL, {"observations": 1_000_001, "exceptions": 2_000_000, "confidence": 0.99},
+         "E_LIMIT", ["backtest", "limit"], "limit before the domain check: E_LIMIT, not E_DOMAIN (J-W3-17)"),
+]
+
 DOC = {"schema_version": "1.0", "suite": "fuzzfix_j", "spec": "specifications/stage-j-rulings.md",
        "spec_version": "1.0.0", "generator": "oracle/python/gen_stage_j_fuzz.py",
        "reviewer": "none: self-assessment until the end-of-project human review", "cases": CASES}

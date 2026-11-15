@@ -134,4 +134,21 @@ class StressDriftTest {
         assertThrows(QfError.class, () -> StressDrift.interpLoo(Interpolation.Method.LINEAR,
                 new double[] {0, 2, 1}, new double[] {0, 0, 0}));
     }
+
+    @Test
+    void ksRatioIsCorrectlyRoundedAtHalfway() {
+        java.math.BigInteger two = java.math.BigInteger.TWO;
+        java.math.BigInteger mid = two.pow(53).add(java.math.BigInteger.ONE); // (2^53 + 1) / 2^54: a tie
+        java.math.BigInteger den = two.pow(254);
+        java.math.BigInteger tie = mid.shiftLeft(200);
+        double up = Math.nextUp(0.5);
+        assertEquals(0.5, StressDrift.ratio(tie, den)); // tie to even
+        assertEquals(up, StressDrift.ratio(tie.add(java.math.BigInteger.ONE), den)); // 2^-254 above the tie
+        assertEquals(0.5, StressDrift.ratio(tie.subtract(java.math.BigInteger.ONE), den));
+        assertEquals(1.0 / 3.0, StressDrift.ratio(java.math.BigInteger.ONE, java.math.BigInteger.valueOf(3)));
+        assertEquals(1.0, StressDrift.ratio(den, den));
+        assertEquals(Double.MIN_VALUE, StressDrift.ratio(java.math.BigInteger.ONE, two.pow(1074)));
+        assertEquals(0.0, StressDrift.ratio(java.math.BigInteger.ONE, two.pow(1075))); // tie to even (zero)
+        assertEquals(Double.MIN_VALUE, StressDrift.ratio(java.math.BigInteger.ONE, two.pow(1075).subtract(java.math.BigInteger.ONE)));
+    }
 }

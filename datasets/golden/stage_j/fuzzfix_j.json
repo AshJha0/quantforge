@@ -13120,6 +13120,106 @@
     "synthetic"
    ],
    "description": "hedgeselect_i-0001 with the first row of a one entry short (J-0b.3 audit)"
+  },
+  {
+   "case_id": "fuzzfix_j-0040",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 9007199254740992,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "backtest",
+    "domain",
+    "synthetic"
+   ],
+   "description": "exceptions 2^53 above observations 250 (J-W3-17; fuzz risk_f4-0086)"
+  },
+  {
+   "case_id": "fuzzfix_j-0041",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 9007199254740992,
+    "exceptions": 9007199254740992,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "backtest",
+    "limit",
+    "synthetic"
+   ],
+   "description": "observations 2^53 above the 1,000,000 limit (J-W3-17)"
+  },
+  {
+   "case_id": "fuzzfix_j-0042",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 1000001,
+    "exceptions": 0,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "backtest",
+    "limit",
+    "synthetic"
+   ],
+   "description": "observations one above the limit (J-W3-17)"
+  },
+  {
+   "case_id": "fuzzfix_j-0043",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 1000001,
+    "exceptions": 2000000,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "backtest",
+    "limit",
+    "synthetic"
+   ],
+   "description": "limit before the domain check: E_LIMIT, not E_DOMAIN (J-W3-17)"
   }
  ]
 }

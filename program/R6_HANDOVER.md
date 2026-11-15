@@ -294,3 +294,7 @@ TOTALS: 15398 value 7626 error 5258 invariance 2514
 Stage J wave 3 audit fix (2026-11-15) adds `drift_j-0036` (KS, n = m = 250, p about 4e-16, pure relative limit 1e-9): 1 value case.
 
 TOTALS: 15399 value 7627 error 5258 invariance 2514
+
+Stage J wave 3 fuzz fix (2026-11-15) adds `fuzzfix_j-0040` to `-0043` (ruling J-W3-17: `risk.backtest.traffic_light` `observations` above 1,000,000 is `E_LIMIT`; Rust now rejects `exceptions > observations`): 4 error cases. Java KS `ratio` now exactly rounded (no DECIMAL128 step).
+
+TOTALS: 15403 value 7627 error 5262 invariance 2514

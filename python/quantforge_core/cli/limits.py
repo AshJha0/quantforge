@@ -282,6 +282,7 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     ),
     "core.cos.european": _caps(terms=100_000),
     "vol.garch.forecast": _caps(horizon=100_000),  # ruling J-0b.1
+    "risk.backtest.traffic_light": _caps(observations=1_000_000),  # ruling J-W3-17
     "core.calendar.add_business_days": _add_business_days,
     "core.ts.rolling": _caps(window=1000),
     "core.ts.autocorrelation": _LAGS,
