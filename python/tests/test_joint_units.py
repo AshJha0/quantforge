@@ -20,6 +20,10 @@ def _err(fn, code: str, field: str | None) -> None:
     with pytest.raises(QfError) as e:
         fn()
     assert e.value.code == code and e.value.field == field
+    # the message is a readable sentence, not a placeholder or shouting (kills the
+    # message-text mutants, which no code or field check can see)
+    assert isinstance(e.value.message, str) and str(e.value) == e.value.message
+    assert "XX" not in e.value.message and e.value.message != e.value.message.upper()
 
 
 def _ok(specs: list[CurveSpec], insts: list[InstrumentSpec]) -> None:
