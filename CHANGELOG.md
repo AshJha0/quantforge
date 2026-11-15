@@ -44,7 +44,7 @@ CLI contract 1.15.0 (wave 1 raised it to 1.13.0, ruling J-1; wave 2 to 1.14.0, r
 - **Docs for wave 2**: tutorials 25 (build and stress a portfolio) and 26 (test your ES model and fit regimes), with scripts `examples/tutorials/t25_portfolio.py` and `t26_es_regimes.py` (CI runs both pages in all four languages; green on `main` at `a148d0e`); seven COOKBOOK recipes with example inputs copied from the goldens; six LEARN sections; diagrams of the portfolio pipeline and the Baum-Welch loop; glossary terms; model inventory MJ-5 to MJ-8; Maillard, Roncalli and Teiletche (2010) added to the optimisation spec's sources and to `docs/references.md`.
 - **J-11, Q6-02 calibration redesign: PASS** (shipped in 0.8.3; listed here because it is a stage J item). Prereg signed before the run, fresh seed 20261113, runner refuses a second run; inside share 87.4 % (`test_inside_share` 0.8736; an earlier draft of this entry said 87.2 %) against the 80 % bar (`research/q6/q6_02_output.json`, review `program/J11_REVIEW.md`). Q6-01 stays published as failed.
 - **R3 amendments 4 to 8, signed** under the owner's delegation, each with a second read (`program/R3_A4_REVIEW.md` to `R3_A8_REVIEW.md`): 4 closes the open choices before any run; 5 fixes the closed-form par DV01; 6 adds the forward-log signal writer and rule-5 check (`research/r3_forward.py`); 7 counts defined-position days in the forward judgement and writes daily rows from the recorder; 8 says a study short of 250 counted days by 2027-11-05 is not judged. The forward-log back-fill ran once under amendments 3 and 6 (33 companion rows, run logged).
-- **J-0, Rust mutation kill tests** for `hedge.rs` (97 of 104 caught after the scoped re-run; the rest equivalent, `program/J0_EQUIVALENT_MUTANTS.md`), `var.rs` (94 % or more) and `hedge_solvers.rs` (new kill tests; the full mutant run is not finished, so its rate is partial). Python `test_variance_kills.py`. **J-0c, C++** `vol_stats.cpp`: 443 killed, 87 survived (83.6 %), a lower bound because the survivors are not all audited (`program/J0C_CPP_EQUIVALENT_MUTANTS.md`).
+- **J-0, Rust mutation kill tests** for `hedge.rs` (97 of 104 caught after the scoped re-run; the rest equivalent, `program/J0_EQUIVALENT_MUTANTS.md`), `var.rs` (94 % or more) and `hedge_solvers.rs` (new kill tests; full run 908 of 990 viable mutants killed, 91.7 %, Wilson 95 % lower bound 89.8 %). Python `test_variance_kills.py`. **J-0c, C++** `vol_stats.cpp`: 443 killed, 87 survived (83.6 %), a lower bound because the survivors are not all audited (`program/J0C_CPP_EQUIVALENT_MUTANTS.md`).
 - **Docs**: model inventory entries MJ-1 to MJ-4 with golden hashes; stage J recipes in `COOKBOOK.md` with two example inputs (`examples/research_backtest_j.json`, `examples/research_purged_kfold_j.json`); stage J glossary terms; research flow diagram (`docs/diagrams/README.md`).
 
 - **Outside-share rounding (docs lane, 2026-11-15)**: `tools/outside_shares.py` stored each share rounded to four places and then printed it to one decimal, a double rounding: stage J's 99 of 130 (76.15 %) printed as 76.1 % and stage I's 266 of 318 (83.65 %) as 83.7 %. Shares are now stored to six places; the regenerated `oracle/OUTSIDE_SHARES.md` reads 76.2 % and 83.6 %, and the docs follow. Released notes keep their published figures.
@@ -52,11 +52,40 @@ CLI contract 1.15.0 (wave 1 raised it to 1.13.0, ruling J-1; wave 2 to 1.14.0, r
 
 ### Known gaps
 
-- `hedge_solvers.rs` mutation result is partial (run not finished); `var.rs` re-verify of the last targeted lines is pending.
+- `hedge_solvers.rs`: `hedge_solvers.rs` (Rust): a full cargo-mutants run on the `main` snapshot `a148d0e` found 1007 mutants (766 caught, 221 missed, 3 timeouts, 17 unviable). The 221 survivors were mapped to the PR head by code text (each accepted only if the line text was identical and the mutant exists in `cargo mutants --list` there) and re-run at the PR head in three shards; 139 more were caught. Counting timeouts as killed and leaving unviable mutants out (repo convention): **908 of 990 viable mutants killed, 91.7%, Wilson 95% lower bound 89.8%**. Mutants caught on `main` were not re-run at the PR head; the PR changes source only inside `#[cfg(test)]`, so a caught mutant cannot become a survivor. 15 survivors are documented as equivalent in `program/J0_EQUIVALENT_MUTANTS.md`; several of those are only plausible or not proven (`dual_active_set` 380:24, 380:43 and 386:28, and the `general_inverse` 281:30 pair), so treat them as self-assessed. 67 further survivors, all after line 1040 of the file, were undocumented when this was measured, and are being addressed by more kill tests in this PR: {{HS_LATE_RESULT}}
+- **Python module mutation gaps (pre-existing).** When the ruff reformat touched every Python module, the PR mutation sample drew 12 mutants from each (2026-11-15). These modules scored below 80%:
+
+| Module | Score | Killed | Survived |
+|---|---|---|---|
+| `frtb` | 50.0% | 6 | 6 |
+| `roots` | 50.0% | 6 | 6 |
+| `hedge_cross` | 50.0% | 6 | 6 |
+| `garch_varswap_vix` | 58.3% | 7 | 5 |
+| `book` | 58.3% | 7 | 5 |
+| `lmm` | 58.3% | 7 | 5 |
+| `bonds` | 66.7% | 8 | 4 |
+| `equity_d` | 66.7% | 8 | 4 |
+| `misc_d` | 66.7% | 8 | 4 |
+| `fx_smile` | 66.7% | 8 | 4 |
+| `garch_vix` | 66.7% | 8 | 4 |
+| `shortrate` | 66.7% | 8 | 4 |
+| `xva` | 66.7% | 8 | 4 |
+| `hedge_select_slip` | 66.7% | 8 | 4 |
+| `curve_fits` | 75.0% | 9 | 3 |
+| `misc_d_mbs` | 75.0% | 9 | 3 |
+| `surfaces_local_vol` | 75.0% | 9 | 3 |
+| `exotics` | 75.0% | 9 | 3 |
+| `correlation` | 75.0% | 9 | 3 |
+| `credit_options` | 75.0% | 9 | 3 |
+| `var_backtest` | 75.0% | 9 | 3 |
+| `compounding` | 75.0% | 9 | 3 |
+
+Stage J did not change these modules apart from formatting. A 12-mutant sample is noisy (about 25 points either way), so each score is a rough indicator, not a measurement; `joint_curves`, `frtb`, `lmm`, `bermudan_aad` and `xva` have no unit tests mapped (only goldens). Kill tests are scheduled as stage H task H-0. Separately, the `interp` CI sample left 2 survivors that have not been analysed (open).
+- `var.rs` re-verify of the last targeted lines is pending.
 - The C++ J-0c kill rate (83.6 %) is a lower bound.
 - Tutorials 25 and 26 were first checked locally in Python, Java and C++ only (Application Control blocked a fresh Rust binary); `tutorial.yml` has since run every page, Rust included, green on `main` at `a148d0e` (2026-11-14).
 - Fuzzing has not run on `main` since the 0.8.3 fixes; the last runs (2026-11-13) predate them.
-- The `mutation-report` job on the stage J pull request was red on Rust `hedge_solvers` alone (10 of 12 sampled mutants killed; pooled 83.1 %).
+- The `mutation-report` job on the stage J pull request was red on Rust `hedge_solvers` alone with the old 12-mutant sample (10 of 12 killed; pooled 83.1 %); the cause was the sample size (see Changed), and the full run above gives 91.7 %.
 - The pa11y accessibility check runs in CI only, not on the development machine.
 - The G-42b ORE re-test job passed on the stage J pull request and on `main` (2026-11-14); its uploaded count has not been reviewed or copied into the repo.
 - R3 results are null with low power (13 % to 15 %); they are weak evidence either way.
