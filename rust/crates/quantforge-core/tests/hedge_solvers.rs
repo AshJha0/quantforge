@@ -1268,7 +1268,6 @@ fn upper_bound_of_a_later_instrument_holds_in_the_split_stage() {
     assert_eq!(code(qp_solve(&p)), "E_INFEASIBLE");
 }
 
-
 /// J-I.2: an equality forcing `x_0 = 1e-9` while `x_1` is near 1000 put `x_0` under the R6-6.1
 /// kink tolerance (`1e-11 * 1000`), so the first orthant fixed it at 0 and had no feasible point;
 /// the split point (`x_0 = 1.004e-9`, off the equality, `x_1 = 999.949`) came back. The exact

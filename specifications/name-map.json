@@ -3840,14 +3840,26 @@
     "b": {
      "java": "b"
     },
+    "cost_weight": {
+     "java": "costWeight"
+    },
     "eq_matrix": {
      "java": "eqMatrix"
     },
     "eq_rhs": {
      "java": "eqRhs"
     },
+    "half_spreads": {
+     "java": "halfSpreads"
+    },
     "lower": {
      "java": "lower"
+    },
+    "margin_limit": {
+     "java": "marginLimit"
+    },
+    "margin_rates": {
+     "java": "marginRates"
     },
     "max_instruments": {
      "java": "maxInstruments"

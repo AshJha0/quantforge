@@ -726,9 +726,8 @@ fn nonsmooth_minimiser(
     // J-I.2: coordinates the kink tolerance put at 0 although the split left them nonzero. If
     // that orthant has no feasible point (an equality forcing a tiny nonzero x_j), they are
     // released to the split's sign and the orthant solved again, instead of returning the split.
-    let mut tolerance_zeros: Vec<usize> = (0..n)
-        .filter(|&j| sign[j] == 0.0 && x0[j] != 0.0)
-        .collect();
+    let mut tolerance_zeros: Vec<usize> =
+        (0..n).filter(|&j| sign[j] == 0.0 && x0[j] != 0.0).collect();
     let (xp, z) = null_space(e, rhs, n);
     let mut sign = sign;
     let mut last = x0;
