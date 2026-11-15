@@ -234,6 +234,16 @@ def test_feasible_tight_box_is_not_infeasible() -> None:
     assert out["x"] == pytest.approx([1.0, 1.0], abs=1e-14)
 
 
+def test_bounded_solve_keeps_a_small_column() -> None:
+    # Found by test_property_qp_kkt_bounds_and_equalities (seed 1): with a bound present the
+    # active-set step cut ranks unscaled, so a 1e-7 column fell below 1e-12 of the largest
+    # eigenvalue and x[0] stayed at 0 (objective 1). R6-6.2 scales before every rank decision.
+    out = hs.qp_solve([[1e-7, 0.0], [0.0, 1.0]], [1.0, 0.0], [1.0, 1.0],
+                      lower=[None, 0.0], upper=[None, 0.0])
+    assert out["x"] == pytest.approx([-1e7, 0.0], rel=1e-12)
+    assert out["objective"] == pytest.approx(0.0, abs=1e-12)
+
+
 bounded = st.one_of(st.none(), st.floats(-2.0, 2.0))
 
 

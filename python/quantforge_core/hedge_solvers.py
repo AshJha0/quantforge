@@ -238,8 +238,18 @@ class _Qp:
         rhs = self.e_rhs - self.e_mat[:, fixed] @ x[fixed]
         x_p, z = _equality_split(self.e_mat[:, free], rhs, self.e_cut)
         bs = self.big_b[:, free]
-        y, _ = _lstsq_min_norm(bs @ z, bs @ x_p + r0, self.cut_sq)
-        out[free] = x_p + z @ y
+        # R6-6.2: the rank cut is applied after Jacobi scaling of the reduced problem. An unscaled
+        # cut (1e-12 of the largest eigenvalue of H) dropped a direction whose column was small in
+        # the caller's units (a 1e-7 exposure against a unit one), so a problem the scaled ERROR
+        # test had certified unique was solved as if that instrument did not exist. Scaling
+        # changes only the decision, never a full-rank solution.
+        m = bs @ z
+        col = np.linalg.norm(m, axis=0)
+        col[col == 0.0] = 1.0
+        ms = m / col
+        top = float(np.linalg.svd(ms, compute_uv=False)[0]) if ms.size else 0.0
+        y, _ = _lstsq_min_norm(ms, bs @ x_p + r0, THRESHOLD * top * top)
+        out[free] = x_p + z @ (y / col)
         return out
 
     def multipliers(self, x: NDArray, free: list[int], work: dict[int, str]) -> NDArray:
