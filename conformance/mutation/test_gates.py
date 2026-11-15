@@ -7,7 +7,8 @@ Each check shows the gate failing on a planted fault and passing on the real con
   1. every stage in stages.json plans a non-empty matrix; a planted empty stage F makes plan_matrix exit 1;
   2. check_stages.py passes on the committed file and fails on an empty stage and on a target naming no file;
   3. stage_report --gate fails a 17/20 module (85%, Wilson lower bound 64%) and passes a 39/40 module;
-  4. a countersigned reason clears a listed module; an unsigned one does not.
+  4. a countersigned reason clears a listed module; an unsigned one does not;
+  5. semantic_changes drops formatting/comment-only edits and keeps real, new and unknown changes.
 """
 import contextlib
 import io
@@ -20,6 +21,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import check_stages  # noqa: E402
 import plan_matrix  # noqa: E402
+import semantic_changes  # noqa: E402
 import stage_report  # noqa: E402
 
 FAILS = []
@@ -40,6 +42,38 @@ def result(tmp, lang, module, killed, survived):
     s = {"mutants": killed + survived, "sampled": killed + survived, "sample_either_killed": killed,
          "sample_unit_killed": killed, "sample_golden_killed": 0, "unit_verdicts": {}}
     (tmp / f"{lang}--{module}.json").write_text(json.dumps({"summary": s}), encoding="utf-8")
+
+
+def semantic_checks():
+    py0 = "def f(a,b):\n    return a+b  # sum\n"
+    py_fmt = "def f(a, b):\n\n    # sum of the two\n    return a + b\n"
+    py_real = "def f(a, b):\n    return a - b\n"
+    rs0 = "fn f(a: f64) -> f64 { a * 2.0 } // twice\n"
+    rs_cmt = "/* doubled */\nfn f(a: f64) -> f64 {\n    a * 2.0\n}\n"
+    rs_real = "fn f(a: f64) -> f64 { a * 3.0 }\n"
+    rs_str = 'fn f() -> &str { "a // b" }\n'
+    rs_str2 = 'fn f() -> &str { "a // c" }\n'
+    files = {
+        ("B", "fmt.py"): py0, ("H", "fmt.py"): py_fmt,
+        ("B", "real.py"): py0, ("H", "real.py"): py_real,
+        ("B", "cmt.rs"): rs0, ("H", "cmt.rs"): rs_cmt,
+        ("B", "real.rs"): rs0, ("H", "real.rs"): rs_real,
+        ("B", "str.rs"): rs_str, ("H", "str.rs"): rs_str2,
+        ("H", "new.rs"): rs0,
+        ("B", "bad.py"): py0, ("H", "bad.py"): "def f(:\n",
+        ("B", "x.toml"): "a = 1\n", ("H", "x.toml"): "a  = 1\n",
+    }
+    kept = set(semantic_changes.filter_paths([p for (r, p) in files if r == "H"], "B", "H",
+                                             lambda r, p: files.get((r, p))))
+    check("formatting-only Python change: not selected", "fmt.py" not in kept)
+    check("real Python change: selected", "real.py" in kept)
+    check("comment-only Rust change: not selected", "cmt.rs" not in kept)
+    check("real Rust change: selected", "real.rs" in kept)
+    check("comment marker inside a string literal: change selected", "str.rs" in kept)
+    check("new file: selected", "new.rs" in kept)
+    check("unparsable Python: selected", "bad.py" in kept)
+    check("unknown extension: selected", "x.toml" in kept)
+    check("unclosed block comment: tokenizer refuses", semantic_changes.c_tokens("a /* b") is None)
 
 
 def main():
@@ -81,6 +115,7 @@ def main():
         empty = tmp / "empty"
         empty.mkdir()
         check("no results at all: gate fails", quiet(stage_report.main, ["--stage", "T", "--stages", str(sp), "--results", str(empty), "--gate"]) == 1)
+    semantic_checks()
     lo, hi = stage_report.wilson(17, 20)
     check("Wilson 17/20 is 64% to 95%", round(lo, 2) == 0.64 and round(hi, 2) == 0.95)
     print(f"{len(FAILS)} failure(s)")

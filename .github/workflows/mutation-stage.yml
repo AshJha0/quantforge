@@ -65,7 +65,9 @@ jobs:
               # shellcheck disable=SC2086  # word splitting of the space-separated list is intended
               printf '%s\n' $PATHS > changed.txt
             else
-              git diff --name-only "$BASE...$HEAD_SHA" > changed.txt
+              # Real code changes only: formatting/comment-only edits do not pull a module in (semantic_changes.py).
+              git diff --name-only "$BASE...$HEAD_SHA" > touched.txt
+              python3 conformance/mutation/semantic_changes.py "$(git merge-base "$BASE" "$HEAD_SHA")" "$HEAD_SHA" --in touched.txt > changed.txt
             fi
             python3 conformance/mutation/plan_matrix.py --changed changed.txt --stages-out pr-stages.json >> "$GITHUB_OUTPUT"
           else

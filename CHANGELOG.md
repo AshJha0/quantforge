@@ -65,6 +65,7 @@ CLI contract 1.15.0 (wave 1 raised it to 1.13.0, ruling J-1; wave 2 to 1.14.0, r
 
 - **G-42b ORE re-test job** (`.github/workflows/ore-g42b.yml`, job `ore-retest-g42b`, path-filtered and manual, not a required check): installs ORE 1.8.17.0 (free Python wheel, Modified BSD) with `--require-hashes` from `oracle/ore/requirements-ore.txt`, runs the six registered runs (`oracle/ore/run_g42b.py`, one at a time), counts them with `gen_stage_g_w4c.py countb` and uploads `ORE_CHECK_4C_B.json`. The count is a recorded result, not a gate.
 - The four `specifications/11-research/` wave 1 pages move from *Specified* to *Implemented*.
+- **PR mutation sample picks modules by real code change, not by file touched.** `conformance/mutation/semantic_changes.py` filters the changed-file list in `mutation-stage.yml` before `plan_matrix.py --changed`: a Python file whose `ast.dump` is unchanged, or a Rust, C++ or Java file whose token stream without whitespace and comments is unchanged, no longer pulls its module into `mutation-report`. New, deleted, unparsable and other files still count as changed. On this branch the ruff format commit no longer selects every Python module: 376 touched files become 232, and the PR sample drops from 39 modules to 10. Tests in `conformance/mutation/test_gates.py`.
 
 ## 0.8.3: fuzz fixes, Rust kill tests, stage J wave 1 spec documents (2026-11-13)
 

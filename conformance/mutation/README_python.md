@@ -51,3 +51,14 @@ later rewording. `test_credit_kills.py` pins codes and fields instead. Mutants t
 iteration cap or a bracket growth factor are equivalent on every input the specs allow (the solve
 converges long before the cap, and any bracket that contains the root gives the same root to the
 solver tolerance); each is listed with its reason in the module docstring of `test_credit_kills.py`.
+
+## Which modules a pull request samples
+
+The PR mode of `mutation-stage.yml` lists the files the pull request touches, then passes them
+through `semantic_changes.py BASE HEAD --in touched.txt` before `plan_matrix.py --changed`. A
+file is dropped when base and head are the same code: for Python, `ast.dump(ast.parse(src))` is
+equal (whitespace, comments and line breaks do not count; docstrings do); for Rust, C++ and Java,
+the token stream with whitespace and comments removed is equal (string literals kept whole). So a
+formatting-only commit such as `ruff format` does not pull every module into `mutation-report`.
+The filter is conservative: new, deleted or renamed files, other extensions, parse errors and git
+errors all count as changed. `test_gates.py` covers it.
