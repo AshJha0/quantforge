@@ -511,12 +511,10 @@ def swaption(
     """`rates.shortrate.swaption`: European swaption by Jamshidian's decomposition."""
     _swap_times(expiry, payment_times)
     payer = _swaption_type(swaption_type)
-    if (
-        not 1
-        + fixed_rate
-        * (payment_times[-1] - (payment_times[-2] if len(payment_times) > 1 else expiry))
-        > 0
-    ):
+    # Kept on one line: mutmut 3.8.1 drops the parentheses of a wrapped `if (not ...)` when it
+    # mutates the `not` away, which leaves invalid syntax and no mutants for the whole run.
+    last_tau = payment_times[-1] - (payment_times[-2] if len(payment_times) > 1 else expiry)
+    if not 1 + fixed_rate * last_tau > 0:
         raise _domain("1 + K tau_n must be above 0", "fixed_rate")
     if model.kind == "CIR":
         taus = [payment_times[0] - expiry, *(b - a for a, b in itertools.pairwise(payment_times))]
