@@ -85,7 +85,7 @@ Library-checked value cases: `interpbt_j` 13 of 16 (scipy `CubicSpline` natural,
 ### Research results
 
 - Interpolation backtests (pass rules committed in c41f629 before any run): **B1 FAIL** (cubic natural, leave-one-strike-out 0.370 vol pts > 0.25 at the ATM strike, T = 0.25; design b 0.355 <= 0.50); **B2 PASS** (pchip on Treasury par, pooled 3M-10Y median 2.62 bp <= 3, 95th 14.19 bp <= 15). `research/interp_backtest/RESULTS.md`.
-- A3: prereg `research/preregs/A3-drift.md` is an **unsigned draft**; runner `research/a3/a3_drift_study.py` refuses until signed. The prereg predicts Page-Hinkley fails the delay rule with the plan's `lambda = 50` (about 100 steps): an owner decision before signing.
+- A3: prereg `research/preregs/A3-drift.md` is an **unsigned draft**; runner `research/a3/a3_drift_study.py` refuses until signed. The prereg predicts Page-Hinkley fails the delay rule with the plan's `lambda = 50` (about 100 steps); the owner authorised the maintainer on 2026-11-15 to decide on their behalf (session instruction), and DR-A3-1 records that decision (`lambda = 5`).
 - J-8 scenario acceptance: H.15 match on all 88 start/end values (worst gap 0.0000 pp); goldens recompute the shifts and the replay.
 
 ### Wave 3 language lanes (2026-11-15, same branch)
@@ -93,7 +93,7 @@ Library-checked value cases: `interpbt_j` 13 of 16 (scipy `CubicSpline` natural,
 - Ports: Rust `quantforge-core/src/research_w3.rs` + `quantforge-cli/src/ops/w3.rs`; Java `research/StressDrift.java` + `cli/OpsResearchW3.java`; C++ `src/core/research_w3.cpp` + `src/cli/ops_research_w3.inc` (+ `tests/test_research_w3.cpp`). Each carries its own Shewchuk `fsum` to match Python's `math.fsum`; KS counts in 128 bits (Rust, C++; probability-walk fallback, unit-tested against the count) or BigInteger (Java). Limits J-W3-14 in each CLI.
 - Conformance: 83/83 wave 3 in each language; contract **1.15.0** (J-W3-1) in runner, stub and the four CLIs; full runs Rust 15,398/15,398 and C++ 15,398/15,398 (WSL), Java 15,398/15,398 (Windows). Rust and C++ binaries are blocked by Windows Application Control on this machine, so they were built and run in WSL from a file copy of the worktree.
 - Outside share (R6-13): wave 3 now 42 of 55 value cases (76 %) in `oracle/OUTSIDE_J.json`; 5 of these (historical shock: pandas lookup plus arithmetic) are weak, 37 of 55 (67 %) without them. CUSUM and Page-Hinkley: no library with the conventions (river's PageHinkley differs), not counted; independent re-derivation is not counted for them because REDERIVE_OPS (owner decision 2026-11-12) does not list them.
-- A3: DR-A3-1 sets Page-Hinkley `lambda = 5` (was 50) from the Siegmund calibration; prereg still unsigned.
+- A3: DR-A3-1 sets Page-Hinkley `lambda = 5` (was 50) from the Siegmund calibration (owner authorised the maintainer on 2026-11-15 to decide on their behalf, session instruction, recorded in DR-A3-1); prereg still unsigned. Runner fix: `research/a3/a3_drift_study.py` line 78 had a SyntaxError (the DR-A3-1 comment swallowed the closing `))`); fixed, py_compile clean, `pytest research/a3` 2 passed. Prereg prior analysis now discloses an off-study-seed check (seed 777); PSI/KS settings deliberately unchanged.
 - Docs: tutorial 33 (renumbered from 27; docs lane owns 27-32), LEARN and COOKBOOK wave 3 sections, glossary rows, model inventory MJ-9 to MJ-11.
 
 ### Not done in this lane

@@ -75,7 +75,7 @@ def study(seed_null: int = 20261109, seed_break: int = 20261110, paths: int = 20
     out: dict[str, Any] = {"paths": paths, "cusum": {"arl0": arl0, "arl0_se": statistics.stdev(run) / math.sqrt(paths),
                                                      "arl0_censored": censored}}
     out["cusum"].update(delay_summary(*delays(mean_break, lambda x: drift.cusum(x, 0.5, 5.0))))
-    out["page_hinkley"] = delay_summary(*delays(mean_break, lambda x: drift.page_hinkley(x, 0.5, 5.0)  # DR-A3-1: lambda 5, not 50))
+    out["page_hinkley"] = delay_summary(*delays(mean_break, lambda x: drift.page_hinkley(x, 0.5, 5.0)))  # DR-A3-1: lambda 5, not 50
 
     def psi_any(x: np.ndarray) -> bool:
         ref = x[:250].tolist()
