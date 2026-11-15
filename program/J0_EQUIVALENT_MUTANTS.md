@@ -147,3 +147,41 @@ property, and later mutants then replay that case. Also, on clean source the see
 `hedge_cross::long_exchange_has_negative_correlation01_and_vanillas_none` (`r.before[4] < 0.0`,
 tests/hedge_cross.rs:332): a real pre-existing property failure, found by chance. It made
 unrelated mutants (1518:31, 1930-1932) look caught in run r4. Delete regression files between runs.
+
+## hedge_solvers.rs class D survivors of the full run (triage D1-D8), branch j2-rustkill2 (2026-11-15)
+The 28 unexplained survivors of the full n2 run on main (`HS_FULLRUN_TRIAGE.md`, class D). Line
+numbers below are this branch's (main 767-773 is 778-784 here, main 828/830 is 840/842). New tests
+in `tests/hedge_solvers_signs.rs`, expected values derived by hand (soft thresholds on `A = I`
+problems, a rational 2x2 KKT solve for the coupled case). Verified in WSL on an rsync copy,
+`cargo mutants --in-place` (so sequential; `-j` is refused with `--in-place`), regression files
+removed, test binary `hedge_solvers_signs` only: 29 mutants (both 717:44 variants), 27 caught.
+
+Killed (26 of the 28):
+- D8 840:59, 842:45 `<` -> `<=`: `zero_costs_and_zero_margin_budget_are_accepted`.
+- D3 684:34, 695:22 delete `-`: `lower_and_upper_bounds_bind_in_the_split_stage` (a wrong split
+  bound row seeds an orthant with no feasible point, or makes the split infeasible).
+- D4 702:45 `%` -> `/`: `split_margin_row_uses_each_instruments_rate` (equality plus margin; the
+  mixed-rate split seeds `(-, +)`, which is infeasible, and the split point would come back).
+- D2 673:43 delete `-` and D5 712:48, 712:58, 717:26, 717:49, 717:44 (`-` and `*`):
+  `tiny_coordinates_keep_the_split_sign` and the release tests. The J-I.2 argument (seed only)
+  misses one observable: the release window `1e-12 (1 + |nu|)` is wider than the kink tolerance
+  `1e-11 max(1, max|x|)` when the room is large, so a coordinate of size `5e-11` with room 100 is
+  kept by a correct sign seed but stays at exactly 0 if seeded at 0. The seed is not only speed.
+- D6 778:40 (`+`, `/`), 779:38, 780:29 `==`, 780:36, 780:48 (`+`, `/`), 780:55 (`-`, `*`), 781:31:
+  `zero_coordinate_release_rule` (release of a `1e-9` coordinate seeded at 0, both signs, and a
+  `1.5e-12` coordinate inside the window that must stay exactly 0).
+- D7 784:35, 784:28, 784:52 (`==`, `<`, `>=`): `pinned_coordinate_is_fixed_then_released` (coupled
+  H, no kink on `x_2`: the split's `delta` shift seeds `x_2 < 0`, the orthant pins it at 0, the
+  rule fixes it and the zero test releases it to `1e-8`).
+
+Equivalent, with reasoning (2):
+- 780:29 `>` -> `>=`: differs only when `|nu| == room + 1e-12 (1 + |nu|)` bit for bit. Exact float
+  tie; equivalent in practice.
+- 667:44 `+` -> `*` (split Hessian `diag(h_jj delta)`, no coupling): seed only, constraints intact,
+  so the loop still ends at the unique KKT point (argument of the earlier split-stage entry). The
+  window observable above does not reach it: a window-sized coordinate survives in correct code only
+  when the split is accurate below `1e-11`, i.e. negligible coupling, and then the decoupled seed
+  has the same signs. Only the iteration count differs; a planted cap cannot isolate it because the
+  same cap bounds the split's active-set iterations (n + 1 or more) and the sign loop (1 versus 3).
+
+Open: 0. No survivor showed a bug in correct code, so no Python/Java/C++ check was needed.
