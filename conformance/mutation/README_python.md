@@ -62,3 +62,14 @@ the token stream with whitespace and comments removed is equal (string literals 
 formatting-only commit such as `ruff format` does not pull every module into `mutation-report`.
 The filter is conservative: new, deleted or renamed files, other extensions, parse errors and git
 errors all count as changed. `test_gates.py` covers it.
+
+## Pull-request sample size
+
+A pull request samples the same 40 mutants per module as the weekly run. Until 0.9.0 it sampled 12, and
+that could not pass a good module: the gate needs a point estimate of at least 80% and a 95% Wilson
+lower bound of at least 65%, and with 12 mutants even 11 killed out of 12 has a lower bound of 0.646. So
+one survivor failed the module, and a module that really kills 90% of its mutants passed only 28% of
+the time. With 40 mutants up to 8 survivors pass; the pass probability is 0.98 at a true 90% kill rate
+and 0.93 at 87%. `test_gates.py` reads the PR value from `mutation-stage.yml` and fails if the sample
+allows fewer than 3 survivors or passes a 90% module less than 90% of the time. Rust modules keep the
+two shards (`plan_matrix.RUST_SHARDS`) and the 120-minute job limit the weekly run already uses.

@@ -8,11 +8,16 @@ Each check shows the gate failing on a planted fault and passing on the real con
   2. check_stages.py passes on the committed file and fails on an empty stage and on a target naming no file;
   3. stage_report --gate fails a 17/20 module (85%, Wilson lower bound 64%) and passes a 39/40 module;
   4. a countersigned reason clears a listed module; an unsigned one does not;
-  5. semantic_changes drops formatting/comment-only edits and keeps real, new and unknown changes.
+  5. semantic_changes drops formatting/comment-only edits and keeps real, new and unknown changes;
+  6. the pull-request sample in mutation-stage.yml is large enough to pass a good module: at least 3
+     survivors allowed per module and a pass probability of at least 0.9 at a true 90% kill rate (a
+     12-mutant sample allowed none and passed a 90% module 28% of the time).
 """
 import contextlib
 import io
 import json
+import math
+import re
 import sys
 import tempfile
 from pathlib import Path
@@ -76,6 +81,25 @@ def semantic_checks():
     check("unclosed block comment: tokenizer refuses", semantic_changes.c_tokens("a /* b") is None)
 
 
+def pr_sample_checks():
+    wf = (HERE.parents[1] / ".github" / "workflows" / "mutation-stage.yml").read_text(encoding="utf-8")
+    m = re.search(r"MAX:\s*\$\{\{\s*github\.event_name == 'pull_request' && '(\d+)'", wf)
+    check("PR MAX found in mutation-stage.yml", m is not None)
+    if m is None:
+        return
+    n = int(m.group(1))
+    target = min(v for v in json.loads((HERE / "stages.json").read_text(encoding="utf-8"))["target"].values() if v is not None)
+
+    def passes(k):  # the stage_report gate for k killed out of n scored
+        return k / n >= target and stage_report.wilson(k, n)[0] >= stage_report.LOWER_BOUND
+
+    allowed = max((n - k for k in range(n + 1) if passes(k)), default=-1)
+    p90 = sum(math.comb(n, k) * 0.9 ** k * 0.1 ** (n - k) for k in range(n + 1) if passes(k))
+    check(f"PR sample n={n} >= MIN_FOR_GATE={stage_report.MIN_FOR_GATE}", n >= stage_report.MIN_FOR_GATE)
+    check(f"PR sample n={n} allows >= 3 survivors (allows {allowed})", allowed >= 3)
+    check(f"PR sample n={n} passes a 90% module with probability >= 0.9 ({p90:.3f})", p90 >= 0.9)
+
+
 def main():
     cfg = json.loads((HERE / "stages.json").read_text(encoding="utf-8"))
     with tempfile.TemporaryDirectory() as d:
@@ -116,6 +140,7 @@ def main():
         empty.mkdir()
         check("no results at all: gate fails", quiet(stage_report.main, ["--stage", "T", "--stages", str(sp), "--results", str(empty), "--gate"]) == 1)
     semantic_checks()
+    pr_sample_checks()
     lo, hi = stage_report.wilson(17, 20)
     check("Wilson 17/20 is 64% to 95%", round(lo, 2) == 0.64 and round(hi, 2) == 0.95)
     print(f"{len(FAILS)} failure(s)")
