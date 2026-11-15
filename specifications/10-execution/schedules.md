@@ -7,7 +7,7 @@ Spec version 0.1.0 (DRAFT, stage H wave 1). Status: Specified, not implemented. 
 Sources:
 - [Kis13] R. Kissell, *The Science of Algorithmic Trading and Portfolio Management*, Academic Press, 2013 (VWAP and POV definitions). Not free; chapter and pages NOT verified. Evidence class: textbook, recalled.
 - [BL98] D. Bertsimas, A. Lo, "Optimal control of execution costs", *J. Financial Markets* 1 (1998) 1-50 (equal slicing optimal under linear permanent impact without risk aversion). Page of the result NOT verified. Evidence class: paper, recalled.
-- Hand calculation for every golden below (integer arithmetic). Evidence class: hand calculation.
+- Hand calculation for every golden below (integer arithmetic), then Blind re-derivation (DR-H2, 2026-11-15, second lane, mpmath 40 digits, inputs only; STAGE_H_BLIND_REDERIVATION.md): sched_h-0001..0008 MATCH (sched_h-0007 raised E_DOMAIN for p = 1 as specified). Evidence class: hand calculation plus blind re-derivation (outside check per DR-H2). [Kis13] and [BL98] were not read.
 
 ## `exec.schedule.twap`
 Inputs `quantity` X (> 0), `n_buckets` N (1 to 100,000), `mode` `UNITS` or `CONTINUOUS`. Output `slices` (length N). UNITS: `floor(X/N)` each, remainder `X mod N` one unit to slices 0, 1, ... (HR-3). X <= 0, or non-integer X in UNITS: `E_INPUT`.
@@ -16,7 +16,7 @@ Inputs `quantity` X (> 0), `n_buckets` N (1 to 100,000), `mode` `UNITS` or `CONT
 Inputs `quantity`, `profile` (length N, non-negative; normalised internally), `mode`. Slice i = `X w_i / sum w`; UNITS by largest remainder (HR-3). All-zero profile: `E_DOMAIN`.
 
 ## `exec.schedule.pov`
-Inputs `quantity`, `participation` p in (0, 1) (HR-4), `market_volume` (outside volume per bucket). Child i = `min(remaining, p v_i / (1 - p))`, floored in UNITS. Outputs `slices`, `filled`, `residual` (may be > 0; never an error).
+Inputs `quantity`, `participation` p in (0, 1) (HR-4, confirmed by DR-H4: participation is of total market volume including own fills), `market_volume` (outside volume per bucket). Child i = `min(remaining, p v_i / (1 - p))`, floored in UNITS. Outputs `slices`, `filled`, `residual` (may be > 0; never an error).
 
 ## Golden cases
 

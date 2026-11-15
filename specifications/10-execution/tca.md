@@ -5,7 +5,7 @@ Spec version 0.1.0 (DRAFT, stage H wave 1). Status: Specified, not implemented. 
 Sources:
 - [Per88] A. Perold, "The implementation shortfall: paper versus reality", *J. Portfolio Management* 14(3) (1988) 4-9. Paper-portfolio definition. Not free; recalled. Evidence class: paper, recalled.
 - [Kis13] as in `schedules.md` (delay, trading and opportunity split). Pages NOT verified.
-- Hand calculation for goldens.
+- Hand calculation for goldens, then Blind re-derivation (DR-H2, 2026-11-15, second lane, mpmath 40 digits, inputs only; STAGE_H_BLIND_REDERIVATION.md): tca_h-0001..0003 MATCH (outside-checked per DR-H2). Perold [Per88] and Kissell [Kis13] are not free and were not read.
 
 ## `exec.tca.shortfall`
 Inputs `side` (s = +1 BUY, -1 SELL), `decision_price` P_d, `arrival_price` P_0, `end_price` P_c, `order_quantity` X, `fills` list of (q_i, p_i), `fees`; optional `benchmark_vwap`. Q = sum q_i.
@@ -27,4 +27,4 @@ Errors: Q > X: `E_INPUT`; a price <= 0: `E_DOMAIN`.
 Components sum to total to 1e-10 relative; a full fill has opportunity 0.
 
 ## Limitations
-Delay on executed quantity is a ruling choice (open question O-3). Attribution of execution cost into impact and spread needs the mid path and is wave 2.
+Delay is charged on the executed quantity and the unexecuted part is reported separately as opportunity cost (HR-8, confirmed by DR-H3, Perold decomposition); a full-order delay (Kissell variant) is not offered. Attribution of execution cost into impact and spread needs the mid path and is wave 2.
