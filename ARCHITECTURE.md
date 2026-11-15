@@ -129,7 +129,7 @@ Built in all four languages and merged to `main` with wave 2 (PR #40, `a148d0e`,
 - **Research (domain 11)** gets its first CLI operations, in a new `research` module per language (`python/quantforge_core/research.py`, `rust/crates/quantforge-core/src/research.rs`, `java25/src/main/java/org/quantforge/research/Research.java`, `cpp26/src/core/research.cpp`) with a thin CLI handler beside it. The module depends on nothing above domain 01: a backtest takes prices and target positions, not a pricer, so studies built on it stay outside the four builds (`specifications/11-research/`).
 - **Operations:** `research.backtest.run`, `research.cv.purged_kfold`, `research.cv.cpcv_paths`, `research.regime.viterbi`, `research.stats.psr`, `.dsr`, `.pbo`, `.power`; 284 operations in the generated name map after wave 1 (291 after wave 2).
 - **Contract:** 1.13.0 at wave 1, no new error code (J-1); 1.14.0 after wave 2. These operations carry their own page limits in place of the general 100,000-element array limit (J-20).
-- **Outside checks:** vectorbt, timeseriescv, scikit-learn, skfolio, hmmlearn and statsmodels check 41 of the 63 value cases (65.1%, J-19a, `oracle/OUTSIDE_SHARES.md`); with wave 2, 99 of the 130 stage J value cases (76.1%).
+- **Outside checks:** vectorbt, timeseriescv, scikit-learn, skfolio, hmmlearn and statsmodels check 41 of the 63 value cases (65.1%, J-19a, `oracle/OUTSIDE_SHARES.md`); with wave 2, 99 of the 130 stage J value cases (76.2%).
 
 ### Stage J wave 2: portfolio construction and risk-model tests (target v0.9.0, implemented, not released)
 

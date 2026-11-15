@@ -11,11 +11,11 @@
     "reimplementation": 0,
     "none": 101,
     "counted": 420,
-    "share": 0.8061,
+    "share": 0.806142,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 420,
-    "share_with_rederivation": 0.8061,
-    "all_cases_share": 0.6422,
+    "share_with_rederivation": 0.806142,
+    "all_cases_share": 0.642202,
     "error_and_invariance_cases": 133
    },
    "with_sweeps": {
@@ -26,11 +26,11 @@
     "reimplementation": 0,
     "none": 101,
     "counted": 420,
-    "share": 0.8061,
+    "share": 0.806142,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 420,
-    "share_with_rederivation": 0.8061,
-    "all_cases_share": 0.6422,
+    "share_with_rederivation": 0.806142,
+    "all_cases_share": 0.642202,
     "error_and_invariance_cases": 133
    },
    "sweeps": null,
@@ -126,7 +126,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 110,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.9735,
+     "all_cases_share": 0.973451,
      "error_and_invariance_cases": 3
     },
     "bond.spread.asset_swap": {
@@ -156,7 +156,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 70,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.9859,
+     "all_cases_share": 0.985915,
      "error_and_invariance_cases": 1
     },
     "bond.yield.from_price": {
@@ -171,7 +171,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 36,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.973,
+     "all_cases_share": 0.972973,
      "error_and_invariance_cases": 1
     },
     "calib.curve.robust": {
@@ -287,10 +287,10 @@
      "reimplementation": 0,
      "none": 1,
      "counted": 5,
-     "share": 0.8333,
+     "share": 0.833333,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 5,
-     "share_with_rederivation": 0.8333,
+     "share_with_rederivation": 0.833333,
      "all_cases_share": 0.5,
      "error_and_invariance_cases": 4
     },
@@ -306,7 +306,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 25,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.7812,
+     "all_cases_share": 0.78125,
      "error_and_invariance_cases": 7
     },
     "credit.curve.composite": {
@@ -471,7 +471,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 1,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.1667,
+     "all_cases_share": 0.166667,
      "error_and_invariance_cases": 5
     },
     "fx.xccy.pv": {
@@ -606,7 +606,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 12,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.6316,
+     "all_cases_share": 0.631579,
      "error_and_invariance_cases": 7
     },
     "rates.csa.discount": {
@@ -696,7 +696,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 10,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.7143,
+     "all_cases_share": 0.714286,
      "error_and_invariance_cases": 4
     },
     "rates.ois.compound_dated": {
@@ -711,7 +711,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 71,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.8765,
+     "all_cases_share": 0.876543,
      "error_and_invariance_cases": 10
     },
     "rates.ois.fit_steps": {
@@ -771,7 +771,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 10,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.7692,
+     "all_cases_share": 0.769231,
      "error_and_invariance_cases": 3
     },
     "repo.forward": {
@@ -786,7 +786,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 4,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.6667,
+     "all_cases_share": 0.666667,
      "error_and_invariance_cases": 2
     },
     "repo.implied_rate": {
@@ -831,11 +831,11 @@
     "reimplementation": 0,
     "none": 153,
     "counted": 557,
-    "share": 0.7845,
+    "share": 0.784507,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 557,
-    "share_with_rederivation": 0.7845,
-    "all_cases_share": 0.6223,
+    "share_with_rederivation": 0.784507,
+    "all_cases_share": 0.622346,
     "error_and_invariance_cases": 185
    },
    "with_sweeps": {
@@ -846,11 +846,11 @@
     "reimplementation": 0,
     "none": 153,
     "counted": 557,
-    "share": 0.7845,
+    "share": 0.784507,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 557,
-    "share_with_rederivation": 0.7845,
-    "all_cases_share": 0.6223,
+    "share_with_rederivation": 0.784507,
+    "all_cases_share": 0.622346,
     "error_and_invariance_cases": 185
    },
    "sweeps": null,
@@ -871,7 +871,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 60,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.9677,
+     "all_cases_share": 0.967742,
      "error_and_invariance_cases": 2
     },
     "credit.cdsoption.price": {
@@ -886,7 +886,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 108,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.9474,
+     "all_cases_share": 0.947368,
      "error_and_invariance_cases": 6
     },
     "credit.copula.joint_default": {
@@ -946,7 +946,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 12,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.8571,
+     "all_cases_share": 0.857143,
      "error_and_invariance_cases": 2
     },
     "exotic.american.crr": {
@@ -1006,7 +1006,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 54,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.9474,
+     "all_cases_share": 0.947368,
      "error_and_invariance_cases": 3
     },
     "exotic.basket.moment": {
@@ -1036,7 +1036,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.8571,
+     "all_cases_share": 0.857143,
      "error_and_invariance_cases": 1
     },
     "exotic.digital.price": {
@@ -1051,7 +1051,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 16,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.8889,
+     "all_cases_share": 0.888889,
      "error_and_invariance_cases": 2
     },
     "exotic.lookback.floating": {
@@ -1081,7 +1081,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.8571,
+     "all_cases_share": 0.857143,
      "error_and_invariance_cases": 1
     },
     "exotic.spread.kirk": {
@@ -1141,7 +1141,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 64,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.9412,
+     "all_cases_share": 0.941176,
      "error_and_invariance_cases": 4
     },
     "fx.option.price": {
@@ -1156,7 +1156,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 12,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.7059,
+     "all_cases_share": 0.705882,
      "error_and_invariance_cases": 5
     },
     "fx.smile.from_quotes": {
@@ -1186,7 +1186,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 5,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.8333,
+     "all_cases_share": 0.833333,
      "error_and_invariance_cases": 1
     },
     "infl.cap.zc_price": {
@@ -1246,7 +1246,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 8,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.5333,
+     "all_cases_share": 0.533333,
      "error_and_invariance_cases": 7
     },
     "rates.swaption.price_cube": {
@@ -1302,11 +1302,11 @@
      "reimplementation": 0,
      "none": 5,
      "counted": 10,
-     "share": 0.6667,
+     "share": 0.666667,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 10,
-     "share_with_rederivation": 0.6667,
-     "all_cases_share": 0.5556,
+     "share_with_rederivation": 0.666667,
+     "all_cases_share": 0.555556,
      "error_and_invariance_cases": 3
     },
     "risk.corr.validate": {
@@ -1321,7 +1321,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 15,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.8824,
+     "all_cases_share": 0.882353,
      "error_and_invariance_cases": 2
     },
     "vol.bates.price": {
@@ -1347,10 +1347,10 @@
      "reimplementation": 0,
      "none": 1,
      "counted": 6,
-     "share": 0.8571,
+     "share": 0.857143,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
-     "share_with_rederivation": 0.8571,
+     "share_with_rederivation": 0.857143,
      "all_cases_share": 0.4,
      "error_and_invariance_cases": 8
     },
@@ -1426,7 +1426,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 18,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.6923,
+     "all_cases_share": 0.692308,
      "error_and_invariance_cases": 8
     },
     "vol.local.dupire": {
@@ -1621,11 +1621,11 @@
     "reimplementation": 9,
     "none": 56,
     "counted": 221,
-    "share": 0.53,
+    "share": 0.529976,
     "rederived_book_spec_only": 23,
     "counted_with_rederivation": 352,
-    "share_with_rederivation": 0.8441,
-    "all_cases_share": 0.421,
+    "share_with_rederivation": 0.844125,
+    "all_cases_share": 0.420952,
     "error_and_invariance_cases": 108
    },
    "with_sweeps": {
@@ -1636,11 +1636,11 @@
     "reimplementation": 9,
     "none": 111,
     "counted": 221,
-    "share": 0.4682,
+    "share": 0.46822,
     "rederived_book_spec_only": 23,
     "counted_with_rederivation": 352,
-    "share_with_rederivation": 0.7458,
-    "all_cases_share": 0.0365,
+    "share_with_rederivation": 0.745763,
+    "all_cases_share": 0.036469,
     "error_and_invariance_cases": 5588
    },
    "sweeps": {
@@ -1724,11 +1724,11 @@
      "reimplementation": 0,
      "none": 11,
      "counted": 36,
-     "share": 0.766,
+     "share": 0.765957,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 36,
-     "share_with_rederivation": 0.766,
-     "all_cases_share": 0.6792,
+     "share_with_rederivation": 0.765957,
+     "all_cases_share": 0.679245,
      "error_and_invariance_cases": 6
     },
     "rates.curve.joint_solve": {
@@ -1743,7 +1743,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 2,
      "share_with_rederivation": 0.5,
-     "all_cases_share": 0.2222,
+     "all_cases_share": 0.222222,
      "error_and_invariance_cases": 5
     },
     "rates.funding.curve": {
@@ -1769,11 +1769,11 @@
      "reimplementation": 0,
      "none": 2,
      "counted": 31,
-     "share": 0.9394,
+     "share": 0.939394,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 31,
-     "share_with_rederivation": 0.9394,
-     "all_cases_share": 0.9394,
+     "share_with_rederivation": 0.939394,
+     "all_cases_share": 0.939394,
      "error_and_invariance_cases": 0
     },
     "risk.backtest.christoffersen": {
@@ -1788,7 +1788,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 17,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.9444,
+     "all_cases_share": 0.944444,
      "error_and_invariance_cases": 1
     },
     "risk.backtest.kupiec": {
@@ -1803,7 +1803,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 20,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.9091,
+     "all_cases_share": 0.909091,
      "error_and_invariance_cases": 2
     },
     "risk.backtest.traffic_light": {
@@ -1878,7 +1878,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.8571,
+     "all_cases_share": 0.857143,
      "error_and_invariance_cases": 1
     },
     "risk.curve.pca": {
@@ -2028,7 +2028,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 4,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.6667,
+     "all_cases_share": 0.666667,
      "error_and_invariance_cases": 2
     },
     "risk.sens.dividend_borrow": {
@@ -2043,7 +2043,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 5,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.7143,
+     "all_cases_share": 0.714286,
      "error_and_invariance_cases": 2
     },
     "risk.sens.inflation01": {
@@ -2073,7 +2073,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 4,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.6667,
+     "all_cases_share": 0.666667,
      "error_and_invariance_cases": 2
     },
     "risk.var.filtered_historical": {
@@ -2088,7 +2088,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.8571,
+     "all_cases_share": 0.857143,
      "error_and_invariance_cases": 1
     },
     "risk.var.historical": {
@@ -2103,7 +2103,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 20,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.8696,
+     "all_cases_share": 0.869565,
      "error_and_invariance_cases": 3
     },
     "risk.var.liquidity_adjusted": {
@@ -2148,7 +2148,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 10,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.9091,
+     "all_cases_share": 0.909091,
      "error_and_invariance_cases": 1
     },
     "risk.vol.horizon": {
@@ -2163,7 +2163,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 4,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.6667,
+     "all_cases_share": 0.666667,
      "error_and_invariance_cases": 2
     },
     "usecase.factor_attribution": {
@@ -2178,7 +2178,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 24,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.8889,
+     "all_cases_share": 0.888889,
      "error_and_invariance_cases": 3
     },
     "vol.garch.estimate": {
@@ -2193,7 +2193,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 3,
      "share_with_rederivation": 0.75,
-     "all_cases_share": 0.3333,
+     "all_cases_share": 0.333333,
      "error_and_invariance_cases": 5
     },
     "vol.garch.loglik": {
@@ -2268,11 +2268,11 @@
     "reimplementation": 6,
     "none": 76,
     "counted": 359,
-    "share": 0.8141,
+    "share": 0.814059,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 359,
-    "share_with_rederivation": 0.8141,
-    "all_cases_share": 0.6095,
+    "share_with_rederivation": 0.814059,
+    "all_cases_share": 0.609508,
     "error_and_invariance_cases": 148
    },
    "with_sweeps": {
@@ -2283,11 +2283,11 @@
     "reimplementation": 6,
     "none": 76,
     "counted": 359,
-    "share": 0.8141,
+    "share": 0.814059,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 359,
-    "share_with_rederivation": 0.8141,
-    "all_cases_share": 0.6095,
+    "share_with_rederivation": 0.814059,
+    "all_cases_share": 0.609508,
     "error_and_invariance_cases": 148
    },
    "sweeps": null,
@@ -2314,11 +2314,11 @@
      "reimplementation": 0,
      "none": 1,
      "counted": 8,
-     "share": 0.8889,
+     "share": 0.888889,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 8,
-     "share_with_rederivation": 0.8889,
-     "all_cases_share": 0.2105,
+     "share_with_rederivation": 0.888889,
+     "all_cases_share": 0.210526,
      "error_and_invariance_cases": 29
     },
     "rates.g2pp.zcb": {
@@ -2333,7 +2333,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 14,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.7368,
+     "all_cases_share": 0.736842,
      "error_and_invariance_cases": 5
     },
     "rates.g2pp.zcb_option": {
@@ -2344,10 +2344,10 @@
      "reimplementation": 0,
      "none": 2,
      "counted": 21,
-     "share": 0.913,
+     "share": 0.913043,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 21,
-     "share_with_rederivation": 0.913,
+     "share_with_rederivation": 0.913043,
      "all_cases_share": 0.84,
      "error_and_invariance_cases": 2
     },
@@ -2363,7 +2363,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 17,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.6538,
+     "all_cases_share": 0.653846,
      "error_and_invariance_cases": 9
     },
     "rates.lmm.swaption_rebonato": {
@@ -2378,7 +2378,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 36,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.8571,
+     "all_cases_share": 0.857143,
      "error_and_invariance_cases": 6
     },
     "rates.shortrate.bermudan_ladder": {
@@ -2408,7 +2408,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 10,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.5882,
+     "all_cases_share": 0.588235,
      "error_and_invariance_cases": 7
     },
     "rates.shortrate.callable_bond": {
@@ -2423,7 +2423,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 8,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.6154,
+     "all_cases_share": 0.615385,
      "error_and_invariance_cases": 5
     },
     "rates.shortrate.capfloor": {
@@ -2438,7 +2438,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 36,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.878,
+     "all_cases_share": 0.878049,
      "error_and_invariance_cases": 5
     },
     "rates.shortrate.hw_calibrate": {
@@ -2464,11 +2464,11 @@
      "reimplementation": 0,
      "none": 7,
      "counted": 64,
-     "share": 0.9014,
+     "share": 0.901408,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 64,
-     "share_with_rederivation": 0.9014,
-     "all_cases_share": 0.7711,
+     "share_with_rederivation": 0.901408,
+     "all_cases_share": 0.771084,
      "error_and_invariance_cases": 12
     },
     "rates.shortrate.zcb": {
@@ -2483,7 +2483,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 38,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.7755,
+     "all_cases_share": 0.77551,
      "error_and_invariance_cases": 11
     },
     "rates.shortrate.zcb_option": {
@@ -2494,11 +2494,11 @@
      "reimplementation": 0,
      "none": 4,
      "counted": 24,
-     "share": 0.8571,
+     "share": 0.857143,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 24,
-     "share_with_rederivation": 0.8571,
-     "all_cases_share": 0.7273,
+     "share_with_rederivation": 0.857143,
+     "all_cases_share": 0.727273,
      "error_and_invariance_cases": 5
     },
     "risk.mc.greeks": {
@@ -2569,11 +2569,11 @@
      "reimplementation": 0,
      "none": 16,
      "counted": 80,
-     "share": 0.8333,
+     "share": 0.833333,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 80,
-     "share_with_rederivation": 0.8333,
-     "all_cases_share": 0.7843,
+     "share_with_rederivation": 0.833333,
+     "all_cases_share": 0.784314,
      "error_and_invariance_cases": 6
     },
     "xva.exposure.swap_ee_hw": {
@@ -2633,11 +2633,11 @@
     "reimplementation": 12,
     "none": 39,
     "counted": 102,
-    "share": 0.6667,
+    "share": 0.666667,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 102,
-    "share_with_rederivation": 0.6667,
-    "all_cases_share": 0.3669,
+    "share_with_rederivation": 0.666667,
+    "all_cases_share": 0.366906,
     "error_and_invariance_cases": 125
    },
    "with_sweeps": {
@@ -2648,11 +2648,11 @@
     "reimplementation": 12,
     "none": 40,
     "counted": 266,
-    "share": 0.8365,
+    "share": 0.836478,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 266,
-    "share_with_rederivation": 0.8365,
-    "all_cases_share": 0.6005,
+    "share_with_rederivation": 0.836478,
+    "all_cases_share": 0.600451,
     "error_and_invariance_cases": 125
    },
    "sweeps": {
@@ -2663,11 +2663,11 @@
     "reimplementation": 0,
     "none": 1,
     "counted": 164,
-    "share": 0.9939,
+    "share": 0.993939,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 164,
-    "share_with_rederivation": 0.9939,
-    "all_cases_share": 0.9939,
+    "share_with_rederivation": 0.993939,
+    "all_cases_share": 0.993939,
     "error_and_invariance_cases": 0
    },
    "libraries": {
@@ -2751,7 +2751,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 10,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.5263,
+     "all_cases_share": 0.526316,
      "error_and_invariance_cases": 9
     },
     "hedge.crossasset.solve": {
@@ -2766,7 +2766,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 9,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.5294,
+     "all_cases_share": 0.529412,
      "error_and_invariance_cases": 8
     },
     "hedge.effectiveness": {
@@ -2811,7 +2811,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 10,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.4762,
+     "all_cases_share": 0.47619,
      "error_and_invariance_cases": 11
     },
     "hedge.integer.solve": {
@@ -2852,11 +2852,11 @@
      "reimplementation": 0,
      "none": 3,
      "counted": 38,
-     "share": 0.9268,
+     "share": 0.926829,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 38,
-     "share_with_rederivation": 0.9268,
-     "all_cases_share": 0.5672,
+     "share_with_rederivation": 0.926829,
+     "all_cases_share": 0.567164,
      "error_and_invariance_cases": 26
     },
     "hedge.residual.report": {
@@ -2886,7 +2886,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 10,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.5556,
+     "all_cases_share": 0.555556,
      "error_and_invariance_cases": 8
     },
     "hedge.slippage.report": {
@@ -2916,11 +2916,11 @@
     "reimplementation": 0,
     "none": 31,
     "counted": 99,
-    "share": 0.7615,
+    "share": 0.761538,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 99,
-    "share_with_rederivation": 0.7615,
-    "all_cases_share": 0.416,
+    "share_with_rederivation": 0.761538,
+    "all_cases_share": 0.415966,
     "error_and_invariance_cases": 108
    },
    "with_sweeps": {
@@ -2931,11 +2931,11 @@
     "reimplementation": 0,
     "none": 31,
     "counted": 99,
-    "share": 0.7615,
+    "share": 0.761538,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 99,
-    "share_with_rederivation": 0.7615,
-    "all_cases_share": 0.416,
+    "share_with_rederivation": 0.761538,
+    "all_cases_share": 0.415966,
     "error_and_invariance_cases": 108
    },
    "sweeps": null,
@@ -3142,7 +3142,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 14,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.6087,
+     "all_cases_share": 0.608696,
      "error_and_invariance_cases": 9
     },
     "research.cv.cpcv_paths": {
@@ -3157,7 +3157,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 4,
      "share_with_rederivation": 0.8,
-     "all_cases_share": 0.5714,
+     "all_cases_share": 0.571429,
      "error_and_invariance_cases": 2
     },
     "research.cv.purged_kfold": {
@@ -3202,7 +3202,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 13,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.8667,
+     "all_cases_share": 0.866667,
      "error_and_invariance_cases": 2
     },
     "research.portfolio.mean_variance": {
@@ -3247,7 +3247,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.4286,
+     "all_cases_share": 0.428571,
      "error_and_invariance_cases": 8
     },
     "research.regime.viterbi": {
@@ -3352,7 +3352,7 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
      "share_with_rederivation": 1.0,
-     "all_cases_share": 0.6667,
+     "all_cases_share": 0.666667,
      "error_and_invariance_cases": 3
     },
     "risk.corr.nearest": {

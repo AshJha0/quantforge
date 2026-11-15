@@ -10,7 +10,7 @@ Formal statement. Let `V(theta)` be the G-18 reference scheme price (`rates.shor
 
 Inputs: exactly those of `rates.shortrate.bermudan_swaption`, with its errors and limits (G-31).
 
-Outputs (ruling R6-27; each is a derivative of the **discrete scheme at the case's grid**, not a model sensitivity):
+Outputs (R6 plan row R6-27, plan section 14.1, not a numbered entry in `specifications/r6-rulings.md`; grid evidence in `oracle/R6_LADDER_GRIDS.json` and `program/R6_HANDOVER.md`, wave 4; each is a derivative of the **discrete scheme at the case's grid**, not a model sensitivity):
 - `price`: the G-18 scheme price at the case grid.
 - `d_price_d_discount_factors` (one per curve pillar, in order): the scheme price's derivative per unit absolute change of each input discount factor.
 - `d_price_d_mean_reversion`, `d_price_d_sigma`: the scheme price's derivative per unit change of `a` and of `sigma`.
