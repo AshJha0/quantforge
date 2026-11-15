@@ -8,6 +8,7 @@ from typing import Any
 
 from . import interp
 from .errors import QfError
+from .finite import guard
 
 Matrix = Sequence[Sequence[float]]
 LOO_METHODS = ("linear", "log_linear", "cubic_natural", "monotone_pchip")
@@ -115,3 +116,6 @@ def backtest_surface_holdout(method: str, expiries: Sequence[float], strikes: Se
         errors.append([math.sqrt(v / t) - row[h] for v, h in zip(fit, holdout, strict=True)])
     mx, rmse = _summary([e for r in errors for e in r])
     return {"errors": errors, "max_abs_error": mx, "rmse": rmse}
+
+
+guard(globals())

@@ -6,6 +6,7 @@ from fractions import Fraction
 from typing import Any
 
 from .errors import QfError
+from .finite import guard
 
 PSI_FLOOR = 1e-4
 
@@ -143,3 +144,6 @@ def ks(a: Sequence[float], b: Sequence[float], level: float = 0.05) -> dict[str,
     d = _ks_d_scaled(a, b)
     p = _ks_p(n, m, d)
     return {"statistic": d / (n * m), "p_value": p, "reject": p <= level}
+
+
+guard(globals())
