@@ -88,9 +88,17 @@ Library-checked value cases: `interpbt_j` 13 of 16 (scipy `CubicSpline` natural,
 - A3: prereg `research/preregs/A3-drift.md` is an **unsigned draft**; runner `research/a3/a3_drift_study.py` refuses until signed. The prereg predicts Page-Hinkley fails the delay rule with the plan's `lambda = 50` (about 100 steps): an owner decision before signing.
 - J-8 scenario acceptance: H.15 match on all 88 start/end values (worst gap 0.0000 pp); goldens recompute the shifts and the replay.
 
+### Wave 3 language lanes (2026-11-15, same branch)
+
+- Ports: Rust `quantforge-core/src/research_w3.rs` + `quantforge-cli/src/ops/w3.rs`; Java `research/StressDrift.java` + `cli/OpsResearchW3.java`; C++ `src/core/research_w3.cpp` + `src/cli/ops_research_w3.inc` (+ `tests/test_research_w3.cpp`). Each carries its own Shewchuk `fsum` to match Python's `math.fsum`; KS counts in 128 bits (Rust, C++; probability-walk fallback, unit-tested against the count) or BigInteger (Java). Limits J-W3-14 in each CLI.
+- Conformance: 83/83 wave 3 in each language; contract **1.15.0** (J-W3-1) in runner, stub and the four CLIs; full runs Rust 15,398/15,398 and C++ 15,398/15,398 (WSL), Java 15,398/15,398 (Windows). Rust and C++ binaries are blocked by Windows Application Control on this machine, so they were built and run in WSL from a file copy of the worktree.
+- Outside share (R6-13): wave 3 now 42 of 55 value cases (76 %) in `oracle/OUTSIDE_J.json`; 5 of these (historical shock: pandas lookup plus arithmetic) are weak, 37 of 55 (67 %) without them. CUSUM and Page-Hinkley: no library with the conventions (river's PageHinkley differs), not counted; independent re-derivation is not counted for them because REDERIVE_OPS (owner decision 2026-11-12) does not list them.
+- A3: DR-A3-1 sets Page-Hinkley `lambda = 5` (was 50) from the Siegmund calibration; prereg still unsigned.
+- Docs: tutorial 33 (renumbered from 27; docs lane owns 27-32), LEARN and COOKBOOK wave 3 sections, glossary rows, model inventory MJ-9 to MJ-11.
+
 ### Not done in this lane
 
-Rust, Java, C++ ports; contract bump; outside-share registers (`oracle/python/outside_j.py`, `tools/outside_shares.py`) not updated for wave 3; LEARN/COOKBOOK sections; Tutorial 33 is a stub; different-model audit.
+Different-model audit; Rust/C++ property tests beyond the unit tests added; CI on the pushed branch.
 
 ## WAVE 2 READY (2026-11-14): optimisation, estimation, ES backtest, Baum-Welch
 

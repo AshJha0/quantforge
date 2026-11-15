@@ -82,14 +82,24 @@ fn operation_above(op: &str, i: &Json) -> bool {
         }
         // Stage J wave 3 (J-W3-14).
         "risk.scenario.historical_shock" => {
-            len(i, "tenors").is_some_and(|n| n > 100) || widest(i, &["yields"]) > 100_000
-                || i.get("yields").and_then(Json::as_array).is_some_and(|rows| {
-                    rows.iter().any(|r| r.as_array().is_some_and(|c| c.len() > 100))
-                })
+            len(i, "tenors").is_some_and(|n| n > 100)
+                || widest(i, &["yields"]) > 100_000
+                || i.get("yields")
+                    .and_then(Json::as_array)
+                    .is_some_and(|rows| {
+                        rows.iter()
+                            .any(|r| r.as_array().is_some_and(|c| c.len() > 100))
+                    })
         }
-        "risk.scenario.replay" => ["base_tenors", "base_yields", "shock_tenors", "shock_bp", "dv01"]
-            .iter()
-            .any(|k| len(i, k).is_some_and(|n| n > 100)),
+        "risk.scenario.replay" => [
+            "base_tenors",
+            "base_yields",
+            "shock_tenors",
+            "shock_bp",
+            "dv01",
+        ]
+        .iter()
+        .any(|k| len(i, k).is_some_and(|n| n > 100)),
         "research.backtest.interp_loo" => widest(i, &["x", "y"]) > 10_000,
         "research.backtest.surface_holdout" => {
             widest(i, &["expiries", "strikes", "vols", "holdout"]) > 1_000

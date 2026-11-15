@@ -8,6 +8,7 @@ use quantforge_core::json::{Json, obj};
 use quantforge_core::research_w3 as w3;
 
 pub(super) mod risk {
+    #[allow(clippy::wildcard_imports)]
     use super::*;
     crate::ops::registry! {
     (op, i)
@@ -35,12 +36,19 @@ fn replay(i: &Inputs) -> Result<Outcome> {
     let dv01 = i.opt("dv01").map(|_| i.reals("dv01")).transpose()?;
     i.gate()?;
     let r = w3::replay(&bt, &by, &st, &sb, scale, dv01.as_deref())?;
-    let mut fields: Vec<(&str, Json)> =
-        vec![("applied_bp", r.applied_bp.into()), ("shocked_yields", r.shocked_yields.into())];
+    let mut fields: Vec<(&str, Json)> = vec![
+        ("applied_bp", r.applied_bp.into()),
+        ("shocked_yields", r.shocked_yields.into()),
+    ];
     if let Some(p) = r.pnl {
         fields.push(("pnl", p.into()));
     }
-    plain(Json::Obj(fields.into_iter().map(|(k, v)| (k.to_string(), v)).collect()))
+    plain(Json::Obj(
+        fields
+            .into_iter()
+            .map(|(k, v)| (k.to_string(), v))
+            .collect(),
+    ))
 }
 
 fn method(i: &Inputs, surface: bool) -> Result<Method> {
@@ -54,12 +62,18 @@ fn method(i: &Inputs, surface: bool) -> Result<Method> {
 }
 
 fn alarms(a: w3::Alarms, extra: Vec<(&'static str, Json)>) -> Result<Outcome> {
-    let mut f: Vec<(&str, Json)> = vec![("alarms", a.alarms.into()), ("directions", a.directions.into())];
+    let mut f: Vec<(&str, Json)> = vec![
+        ("alarms", a.alarms.into()),
+        ("directions", a.directions.into()),
+    ];
     f.extend(extra);
-    plain(Json::Obj(f.into_iter().map(|(k, v)| (k.to_string(), v)).collect()))
+    plain(Json::Obj(
+        f.into_iter().map(|(k, v)| (k.to_string(), v)).collect(),
+    ))
 }
 
 pub(super) mod research {
+    #[allow(clippy::wildcard_imports)]
     use super::*;
     crate::ops::registry! {
     (op, i)

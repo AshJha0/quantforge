@@ -1,6 +1,8 @@
 //! Stage J wave 3 (rulings J-W3-1 to J-W3-14): the scenario stress engine
 //! (`06-risk/scenario-stress.md`), the interpolation backtests (`11-research/interp-backtest.md`)
 //! and the drift detectors (`11-research/drift-detectors.md`).
+// `!(x > 0.0)` reads as the spec states the domain rule (and is false for NaN, which E1 has already refused).
+#![allow(clippy::neg_cmp_op_on_partial_ord)]
 
 use crate::dates::Date;
 use crate::error::{Result, fail, finite};
@@ -12,7 +14,10 @@ fn increasing(x: &[f64]) -> bool {
 
 fn tenors(t: &[f64], field: &str) -> Result<()> {
     if t.iter().any(|v| !(*v > 0.0)) || !increasing(t) {
-        return fail("E_DOMAIN", format!("{field} must be positive and strictly increasing"));
+        return fail(
+            "E_DOMAIN",
+            format!("{field} must be positive and strictly increasing"),
+        );
     }
     Ok(())
 }
@@ -50,13 +55,13 @@ pub fn fsum(v: impl IntoIterator<Item = f64>) -> f64 {
         }
     }
     // Half-even correction when the remaining partials push the result past a tie.
-    if let Some(&next) = p.last() {
-        if (lo < 0.0 && next < 0.0) || (lo > 0.0 && next > 0.0) {
-            let y = lo * 2.0;
-            let x = hi + y;
-            if y == x - hi {
-                hi = x;
-            }
+    if let Some(&next) = p.last()
+        && ((lo < 0.0 && next < 0.0) || (lo > 0.0 && next > 0.0))
+    {
+        let y = lo * 2.0;
+        let x = hi + y;
+        if y == x - hi {
+            hi = x;
         }
     }
     hi
@@ -83,7 +88,10 @@ pub fn historical_shock(
     finite("tenors", tenor)?;
     finite("yields", yields)?;
     let n = tenor.len();
-    if dates.is_empty() || n == 0 || yields.len() != dates.len() || yields.iter().any(|r| r.len() != n)
+    if dates.is_empty()
+        || n == 0
+        || yields.len() != dates.len()
+        || yields.iter().any(|r| r.len() != n)
     {
         return fail("E_INPUT", "need one row per date and one column per tenor");
     }
@@ -103,7 +111,13 @@ pub fn historical_shock(
     let shift: Vec<f64> = y0.iter().zip(&y1).map(|(p, q)| 100.0 * (q - p)).collect();
     let level = fsum(shift.iter().copied()) / n as f64;
     let slope = shift[n - 1] - shift[0];
-    Ok(Shock { start_yields: y0, end_yields: y1, shift_bp: shift, level_bp: level, slope_bp: slope })
+    Ok(Shock {
+        start_yields: y0,
+        end_yields: y1,
+        shift_bp: shift,
+        level_bp: level,
+        slope_bp: slope,
+    })
 }
 
 fn flat_linear(x: &[f64], y: &[f64], t: f64) -> f64 {
@@ -151,11 +165,21 @@ pub fn replay(
     }
     tenors(base_tenors, "base_tenors")?;
     tenors(shock_tenors, "shock_tenors")?;
-    let applied: Vec<f64> =
-        base_tenors.iter().map(|t| scale * flat_linear(shock_tenors, shock_bp, *t)).collect();
-    let shocked = base_yields.iter().zip(&applied).map(|(y, a)| y + a / 100.0).collect();
+    let applied: Vec<f64> = base_tenors
+        .iter()
+        .map(|t| scale * flat_linear(shock_tenors, shock_bp, *t))
+        .collect();
+    let shocked = base_yields
+        .iter()
+        .zip(&applied)
+        .map(|(y, a)| y + a / 100.0)
+        .collect();
     let pnl = dv01.map(|d| -fsum(d.iter().zip(&applied).map(|(d, a)| d * a)));
-    Ok(Replay { applied_bp: applied, shocked_yields: shocked, pnl })
+    Ok(Replay {
+        applied_bp: applied,
+        shocked_yields: shocked,
+        pnl,
+    })
 }
 
 // --- Interpolation backtests (J-W3-8, J-W3-9) ----------------------------------------------
@@ -185,19 +209,36 @@ pub fn interp_loo(method: Method, x: &[f64], y: &[f64]) -> Result<Backtest<Vec<f
     finite("y", y)?;
     let n = x.len();
     if y.len() != n || n < 3 || n - 1 < min_knots(method) {
-        return fail("E_INPUT", "need equal lengths, n >= 3 and n - 1 at the method's minimum knots");
+        return fail(
+            "E_INPUT",
+            "need equal lengths, n >= 3 and n - 1 at the method's minimum knots",
+        );
     }
     if !increasing(x) {
         return fail("E_INPUT", "knots must be strictly increasing");
     }
     let mut errors = Vec::with_capacity(n - 2);
     for i in 1..n - 1 {
-        let xs: Vec<f64> = x.iter().enumerate().filter(|(j, _)| *j != i).map(|(_, v)| *v).collect();
-        let ys: Vec<f64> = y.iter().enumerate().filter(|(j, _)| *j != i).map(|(_, v)| *v).collect();
+        let xs: Vec<f64> = x
+            .iter()
+            .enumerate()
+            .filter(|(j, _)| *j != i)
+            .map(|(_, v)| *v)
+            .collect();
+        let ys: Vec<f64> = y
+            .iter()
+            .enumerate()
+            .filter(|(j, _)| *j != i)
+            .map(|(_, v)| *v)
+            .collect();
         errors.push(interp::evaluate(method, &xs, &ys, &[x[i]])?.values[0] - y[i]);
     }
     let (max_abs_error, rmse) = summary(&errors);
-    Ok(Backtest { errors, max_abs_error, rmse })
+    Ok(Backtest {
+        errors,
+        max_abs_error,
+        rmse,
+    })
 }
 
 pub fn surface_holdout(
@@ -212,7 +253,10 @@ pub fn surface_holdout(
     finite("vols", vols)?;
     let m = strikes.len();
     if expiries.is_empty() || vols.len() != expiries.len() || vols.iter().any(|r| r.len() != m) {
-        return fail("E_INPUT", "vols must have one row per expiry and one column per strike");
+        return fail(
+            "E_INPUT",
+            "vols must have one row per expiry and one column per strike",
+        );
     }
     if !increasing(strikes) {
         return fail("E_INPUT", "strikes must be strictly increasing");
@@ -221,7 +265,10 @@ pub fn surface_holdout(
         || holdout.iter().any(|h| !(*h > 0 && *h < m as i64 - 1))
         || holdout.windows(2).any(|w| w[1] <= w[0])
     {
-        return fail("E_INPUT", "holdout must be distinct sorted interior strike indices");
+        return fail(
+            "E_INPUT",
+            "holdout must be distinct sorted interior strike indices",
+        );
     }
     let held: Vec<usize> = holdout.iter().map(|h| *h as usize).collect();
     let kept: Vec<usize> = (0..m).filter(|j| !held.contains(j)).collect();
@@ -243,11 +290,20 @@ pub fn surface_holdout(
         if fit.iter().any(|v| !(*v > 0.0)) {
             return fail("E_DOMAIN", "interpolated total variance is not positive");
         }
-        errors.push(fit.iter().zip(&held).map(|(v, h)| (v / t).sqrt() - row[*h]).collect::<Vec<_>>());
+        errors.push(
+            fit.iter()
+                .zip(&held)
+                .map(|(v, h)| (v / t).sqrt() - row[*h])
+                .collect::<Vec<_>>(),
+        );
     }
     let flat: Vec<f64> = errors.iter().flatten().copied().collect();
     let (max_abs_error, rmse) = summary(&flat);
-    Ok(Backtest { errors, max_abs_error, rmse })
+    Ok(Backtest {
+        errors,
+        max_abs_error,
+        rmse,
+    })
 }
 
 // --- Drift detectors (J-W3-10 to J-W3-13) ---------------------------------------------------
@@ -259,7 +315,14 @@ pub struct Alarms {
 }
 
 /// J-W3-10: tabular two-sided CUSUM on `z = (x - mu0) / sigma`; alarm when a sum exceeds `h`.
-pub fn cusum(x: &[f64], k: f64, h: f64, mu0: f64, sigma: f64, reset: bool) -> Result<(Alarms, f64, f64)> {
+pub fn cusum(
+    x: &[f64],
+    k: f64,
+    h: f64,
+    mu0: f64,
+    sigma: f64,
+    reset: bool,
+) -> Result<(Alarms, f64, f64)> {
     finite("x", x)?;
     finite("k", &(k, h))?;
     finite("mu0", &(mu0, sigma))?;
@@ -270,7 +333,10 @@ pub fn cusum(x: &[f64], k: f64, h: f64, mu0: f64, sigma: f64, reset: bool) -> Re
         return fail("E_DOMAIN", "k, h and sigma must be positive");
     }
     let (mut sp, mut sm) = (0.0_f64, 0.0_f64);
-    let mut a = Alarms { alarms: vec![], directions: vec![] };
+    let mut a = Alarms {
+        alarms: vec![],
+        directions: vec![],
+    };
     for (t, v) in x.iter().enumerate() {
         let z = (v - mu0) / sigma;
         sp = 0.0_f64.max(sp + z - k);
@@ -296,7 +362,13 @@ pub enum Direction {
 }
 
 /// J-W3-11 (as corrected): running mean at each step, restart every counter after an alarm.
-pub fn page_hinkley(x: &[f64], delta: f64, lambda: f64, dir: Direction, reset: bool) -> Result<Alarms> {
+pub fn page_hinkley(
+    x: &[f64],
+    delta: f64,
+    lambda: f64,
+    dir: Direction,
+    reset: bool,
+) -> Result<Alarms> {
     finite("x", x)?;
     finite("delta", &(delta, lambda))?;
     if x.is_empty() {
@@ -305,7 +377,10 @@ pub fn page_hinkley(x: &[f64], delta: f64, lambda: f64, dir: Direction, reset: b
     if !(delta >= 0.0) || !(lambda > 0.0) {
         return fail("E_DOMAIN", "delta must be >= 0 and lambda > 0");
     }
-    let mut a = Alarms { alarms: vec![], directions: vec![] };
+    let mut a = Alarms {
+        alarms: vec![],
+        directions: vec![],
+    };
     let (mut n, mut total, mut up, mut up_min, mut dn, mut dn_min) = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     for (t, v) in x.iter().enumerate() {
         n += 1.0;
@@ -349,7 +424,10 @@ pub fn psi(reference: &[f64], test: &[f64], bins: i64, threshold: f64) -> Result
     }
     let b = bins as usize;
     if reference.len() < b || test.len() < b {
-        return fail("E_INPUT", "reference and test need at least bins values each");
+        return fail(
+            "E_INPUT",
+            "reference and test need at least bins values each",
+        );
     }
     if !(threshold > 0.0) {
         return fail("E_DOMAIN", "threshold must be positive");
@@ -363,11 +441,18 @@ pub fn psi(reference: &[f64], test: &[f64], bins: i64, threshold: f64) -> Result
         for v in s {
             c[edges.partition_point(|e| *e < *v)] += 1;
         }
-        c.iter().map(|k| (*k as f64 / s.len() as f64).max(PSI_FLOOR)).collect()
+        c.iter()
+            .map(|k| (*k as f64 / s.len() as f64).max(PSI_FLOOR))
+            .collect()
     };
     let (rs, ts) = (shares(reference), shares(test));
     let value = fsum(ts.iter().zip(&rs).map(|(a, e)| (a - e) * (a / e).ln()));
-    Ok(Psi { psi: value, reference_shares: rs, test_shares: ts, alarm: value > threshold })
+    Ok(Psi {
+        psi: value,
+        reference_shares: rs,
+        test_shares: ts,
+        alarm: value > threshold,
+    })
 }
 
 /// `D n m` as an integer: max `|i m - j n|` over the merged order, ties stepped together.
@@ -481,13 +566,16 @@ mod tests {
     #[test]
     fn cusum_hand_case() {
         let (a, sp, sm) = cusum(&[0.0, 3.0, 3.0], 0.5, 4.0, 0.0, 1.0, true).unwrap();
-        assert_eq!((a.alarms, a.directions, sp, sm), (vec![2], vec![1], 0.0, 0.0));
+        assert_eq!(
+            (a.alarms, a.directions, sp, sm),
+            (vec![2], vec![1], 0.0, 0.0)
+        );
     }
 
     #[test]
     fn page_hinkley_constant_series_never_alarms() {
         let a = page_hinkley(&[1.0; 50], 0.0, 1.0, Direction::Both, true).unwrap();
-        assert!(a.alarms.is_empty());
+        assert_eq!(a.alarms, Vec::<i64>::new());
     }
 
     #[test]
@@ -516,8 +604,15 @@ mod tests {
 
     #[test]
     fn replay_flat_outside() {
-        let r = replay(&[0.5, 1.0, 40.0], &[1.0, 1.0, 1.0], &[1.0, 10.0], &[10.0, 20.0], 1.0, Some(&[1.0, 1.0, 1.0]))
-            .unwrap();
+        let r = replay(
+            &[0.5, 1.0, 40.0],
+            &[1.0, 1.0, 1.0],
+            &[1.0, 10.0],
+            &[10.0, 20.0],
+            1.0,
+            Some(&[1.0, 1.0, 1.0]),
+        )
+        .unwrap();
         assert_eq!(r.applied_bp, vec![10.0, 10.0, 20.0]);
         assert_eq!(r.pnl, Some(-40.0));
     }
