@@ -298,3 +298,7 @@ Stage J curves lane (2026-11-15) adds `termfin_j` (33: 13 value, 20 error) and `
 Stage J integration (2026-11-15) merges wave 3 (88 cases: 56 value, 32 error) into the curves lane (51: 20 value, 31 error) and the hedge rank-cut fix (`hedgecut_j`, 4 value, ruling J-I.1) on 15,315 (the wave 3 lines above were on a branch without the curves lane, so their own TOTALS lines are dropped); one contract number 1.15.0 for both lanes (J-C-1, J-W3-1); 302 operations in the name map.
 
 TOTALS: 15458 value 7651 error 5293 invariance 2514
+
+After J-I.2 and J-I.3 (`hedgesign_j` 2 value, `selectcost_j` 3 error; 2026-11-15):
+
+TOTALS: 15463 value 7653 error 5296 invariance 2514

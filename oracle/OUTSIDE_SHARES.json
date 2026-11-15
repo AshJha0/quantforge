@@ -2909,34 +2909,34 @@
   },
   "J": {
    "without_sweeps": {
-    "cases": 210,
+    "cases": 212,
     "library-object": 14,
     "library-primitive": 116,
     "independent-rederivation": 0,
     "reimplementation": 0,
-    "none": 80,
+    "none": 82,
     "counted": 130,
-    "share": 0.619048,
+    "share": 0.613208,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 130,
-    "share_with_rederivation": 0.619048,
-    "all_cases_share": 0.341207,
-    "error_and_invariance_cases": 171
+    "share_with_rederivation": 0.613208,
+    "all_cases_share": 0.336788,
+    "error_and_invariance_cases": 174
    },
    "with_sweeps": {
-    "cases": 210,
+    "cases": 212,
     "library-object": 14,
     "library-primitive": 116,
     "independent-rederivation": 0,
     "reimplementation": 0,
-    "none": 80,
+    "none": 82,
     "counted": 130,
-    "share": 0.619048,
+    "share": 0.613208,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 130,
-    "share_with_rederivation": 0.619048,
-    "all_cases_share": 0.341207,
-    "error_and_invariance_cases": 171
+    "share_with_rederivation": 0.613208,
+    "all_cases_share": 0.336788,
+    "error_and_invariance_cases": 174
    },
    "sweeps": null,
    "libraries": {
@@ -3074,12 +3074,12 @@
      "error_and_invariance_cases": 2
     },
     "hedge.qp.solve": {
-     "cases": 4,
+     "cases": 6,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 0,
      "reimplementation": 0,
-     "none": 4,
+     "none": 6,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
@@ -3116,7 +3116,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": null,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 1
+     "error_and_invariance_cases": 4
     },
     "hedge.solve": {
      "cases": 0,

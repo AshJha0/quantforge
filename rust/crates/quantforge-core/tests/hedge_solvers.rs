@@ -1267,3 +1267,44 @@ fn upper_bound_of_a_later_instrument_holds_in_the_split_stage() {
     };
     assert_eq!(code(qp_solve(&p)), "E_INFEASIBLE");
 }
+
+
+/// J-I.2: an equality forcing `x_0 = 1e-9` while `x_1` is near 1000 put `x_0` under the R6-6.1
+/// kink tolerance (`1e-11 * 1000`), so the first orthant fixed it at 0 and had no feasible point;
+/// the split point (`x_0 = 1.004e-9`, off the equality, `x_1 = 999.949`) came back. The exact
+/// answer is `x = (1e-9, 999.95)` (golden `hedgesign_j-0001`).
+#[test]
+fn tolerance_zero_forced_nonzero_by_an_equality_is_released() {
+    let a: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+    let (w, hs) = (vec![1.0, 1.0], [0.1, 0.1]);
+    let e: Matrix = vec![vec![1.0, 0.0]];
+    for (b1, r, x1) in [(-1000.0, 1e-9, 999.95), (1000.0, -1e-9, -999.95)] {
+        let b = vec![-1.0, b1];
+        let rhs = [r];
+        let mut p = problem(&a, &b, &w);
+        p.eq_matrix = Some(&e);
+        p.eq_rhs = Some(&rhs);
+        p.costs.half_spreads = Some(&hs);
+        let s = qp_solve(&p).unwrap();
+        assert_eq!(s.x[0], r);
+        assert!((s.x[1] - x1).abs() <= 1e-12 * x1.abs(), "{:?}", s.x);
+    }
+}
+
+/// J-I.3: costs or margin in the problem are refused by `select_solve`, not dropped.
+#[test]
+fn selection_refuses_costs_and_margin() {
+    let a: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+    let (b, w) = (vec![-1.0, -1.0], vec![1.0, 1.0]);
+    let hs = [0.1, 0.1];
+    let mut p = problem(&a, &b, &w);
+    assert!(select_solve(&p, 1, false).is_ok());
+    p.costs.half_spreads = Some(&hs);
+    assert_eq!(code(select_solve(&p, 1, false)), "E_INPUT");
+    let mut q = problem(&a, &b, &w);
+    q.costs.cost_weight = Some(1.0);
+    assert_eq!(code(select_solve(&q, 1, false)), "E_INPUT");
+    let mut m = problem(&a, &b, &w);
+    (m.costs.margin_rates, m.costs.margin_limit) = (Some(&hs[..]), Some(1.0));
+    assert_eq!(code(select_solve(&m, 1, false)), "E_INPUT");
+}

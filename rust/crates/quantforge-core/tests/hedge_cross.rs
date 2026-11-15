@@ -195,6 +195,36 @@ fn exchange(expiry: f64) -> CorrLeg {
     }
 }
 
+/// Margrabe `d1` of the unit exchange option in `exchange(expiry)` (quantities 1).
+fn exchange_d1(m: &CorrMarket, t: f64) -> f64 {
+    let s = (m.vol1 * m.vol1 + m.vol2 * m.vol2 - 2.0 * m.correlation * m.vol1 * m.vol2).sqrt();
+    let f = (m.spot1 * (-m.yield1 * t).exp()) / (m.spot2 * (-m.yield2 * t).exp());
+    (f.ln() + s * s * t / 2.0) / (s * t.sqrt())
+}
+
+/// Regression (J-2 Rust mutation lane): spot1 = 126.276, rho = 0.9425 gives a spread volatility of
+/// 2.5 % and d1 near 115, so phi(d1) underflows and correlation01 is exactly zero (not positive):
+/// the code is right, the earlier strict property was not.
+#[test]
+fn deep_in_the_money_exchange_correlation01_underflows_to_zero() {
+    let m = CorrMarket {
+        spot1: 126.276,
+        spot2: 50.0,
+        vol1: 0.0662,
+        vol2: 0.05,
+        correlation: 0.9425,
+        ..MARKET
+    };
+    assert!(exchange_d1(&m, 0.1) > 100.0);
+    let u = [underlying(CorrKind::Underlying1)];
+    let r = correlation_hedge(&m, &[(exchange(0.1), 1.0)], &u, &[CorrTarget::Delta1]).unwrap();
+    assert_eq!(r.before[4], 0.0);
+    // Away from the underflow the sign is strict.
+    let near = CorrMarket { spot1: 52.0, ..m };
+    let r = correlation_hedge(&near, &[(exchange(0.1), 1.0)], &u, &[CorrTarget::Delta1]).unwrap();
+    assert!(r.before[4] < 0.0);
+}
+
 fn vanilla(kind: CorrKind, strike: f64, expiry: f64) -> CorrLeg {
     CorrLeg {
         kind,
@@ -329,7 +359,13 @@ proptest! {
         let delta = [CorrTarget::Delta1];
         let u = [underlying(CorrKind::Underlying1)];
         let r = correlation_hedge(&m, &[(exchange(expiry), 1.0)], &u, &delta).unwrap();
-        prop_assert!(r.before[4] < 0.0);
+        // correlation01 = -f1 phi(d1) sqrt(t) v1 v2 / s * 0.01 is negative in exact arithmetic, but
+        // phi(d1) underflows to 0 once |d1| > ~38.6 (deep in or out of the money, small spread
+        // volatility), and the Greek is then -0.0. Strict only where phi(d1) is a normal double.
+        prop_assert!(r.before[4] <= 0.0);
+        if exchange_d1(&m, expiry).abs() < 37.0 {
+            prop_assert!(r.before[4] < 0.0);
+        }
         for kind in [CorrKind::Call1, CorrKind::Put1, CorrKind::Call2, CorrKind::Put2] {
             let r = correlation_hedge(&m, &[(vanilla(kind, strike, expiry), 1.0)], &u, &delta).unwrap();
             prop_assert_eq!(r.before[4], 0.0);

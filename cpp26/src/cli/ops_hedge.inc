@@ -584,7 +584,10 @@ void op_hedge_select_solve(const In& in, Out& out) {
     p.lower = bounds_of(in, "lower");
     p.upper = bounds_of(in, "upper");
     const long long k = in.integer("max_instruments");
-    const bool forbidden = present(in, "eq_matrix") || present(in, "eq_rhs") || present(in, "singular");  // I-47
+    // I-47; J-I.3: the cost and margin inputs are refused too (selection would drop them silently).
+    const bool forbidden = present(in, "eq_matrix") || present(in, "eq_rhs") || present(in, "singular") ||
+                           present(in, "half_spreads") || present(in, "impact") || present(in, "cost_weight") ||
+                           present(in, "margin_rates") || present(in, "margin_limit");
     limit_if(p.a.size() > max_factors, "a");
     limit_if(widest_row(p.a) > 20, "a");  // ruling I-35
     if (k < 1 || k > (long long)widest_row(p.a))  // R6-11.6, before the I-53 subset count

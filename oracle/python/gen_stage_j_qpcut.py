@@ -1,6 +1,8 @@
 """Stage J integration lane: the active-set rank cut of `hedge.qp.solve` is taken after Jacobi scaling.
 
 Spec: specifications/08-hedging/hedge-solvers.md; ruling specifications/stage-j-rulings.md J-I.1 (applies R6-6.2).
+Also J-I.2 (suite hedgesign_j: an equality forcing a coordinate under the kink tolerance; the enumeration carries
+the equality multipliers) and J-I.3 (suite selectcost_j: selection refuses cost and margin inputs).
 
 Python's primal active-set step dropped a reduced direction whose squared singular value was at or below 1e-12
 times the largest eigenvalue of H, in the caller's units. A 1e-7 exposure against a unit one fell below that cut,
@@ -56,6 +58,9 @@ def reference(inp):
     hi = [None if x is None else Fr(x) for x in inp.get("upper", [None] * n)]
     h = [[2 * sum(w[i] * a[i][j] * a[i][k] for i in range(len(b))) for k in range(n)] for j in range(n)]
     g = [2 * sum(w[i] * a[i][j] * b[i] for i in range(len(b))) for j in range(n)]
+    e = [[Fr(x) for x in row] for row in inp.get("eq_matrix", [])]
+    er = [Fr(x) for x in inp.get("eq_rhs", [])]
+    p = len(e)
     found = []
     for pat in itertools.product("LUZPN", repeat=n):
         x, ok, free = [None] * n, True, []
@@ -78,15 +83,22 @@ def reference(inp):
             continue
         sign = {j: (-1 if pat[j] == "N" else 1 if hs[j] > 0 else 0) for j in free}
         fixed = [j for j in range(n) if j not in free]
-        if free:
-            m = [[h[j][k] for k in free] for j in free]
+        lam = [Fr(0)] * p
+        if free or p:
+            # Stationarity of the free instruments with the equality multipliers (J-I.2):
+            # [H_FF E_F^T; E_F 0] [x_F; lam] = [-(g_F + H_FX x_X + hs_F s_F); r - E_X x_X].
+            m = [[h[j][k] for k in free] + [e[i][j] for i in range(p)] for j in free]
+            m += [[e[i][k] for k in free] + [Fr(0)] * p for i in range(p)]
             v = [-(g[j] + sum(h[j][k] * x[k] for k in fixed) + hs[j] * sign[j]) for j in free]
+            v += [er[i] - sum(e[i][k] * x[k] for k in fixed) for i in range(p)]
             y = solve(m, v)
             if y is None:
                 continue
             for j, val in zip(free, y):
                 x[j] = val
-        grad = [g[j] + sum(h[j][k] * x[k] for k in range(n)) for j in range(n)]
+            lam = y[len(free):]
+        grad = [g[j] + sum(h[j][k] * x[k] for k in range(n)) + sum(e[i][j] * lam[i] for i in range(p))
+                for j in range(n)]
 
         for j in range(n):
             ok &= (lo[j] is None or x[j] >= lo[j]) and (hi[j] is None or x[j] <= hi[j])
@@ -109,7 +121,8 @@ def reference(inp):
     r = [sum(a[i][j] * x[j] for j in range(n)) + b[i] for i in range(len(b))]
     risk = sum(w[i] * r[i] * r[i] for i in range(len(b)))
     cost = sum(hs[j] * abs(x[j]) for j in range(n))
-    out = {"x": [float(v) for v in x], "residual": [float(v) for v in r], "objective": float(risk + cost), "rank": n}
+    out = {"x": [float(v) for v in x], "residual": [float(v) for v in r], "objective": float(risk + cost),
+           "rank": n - p}
     if "half_spreads" in inp:
         out["risk"], out["cost"] = float(risk), float(cost)
     return out
@@ -132,13 +145,46 @@ CASES = [
 ]
 
 
+SIGN_LIMIT = {"absolute": 1e-12, "relative": 1e-11,
+              "reason": "J-I.2: x_0 = 1e-9 is set by an equality; the split point was 4e-12 off it"}
+SIGN_CASES = [
+    (("equality x_0 = 1e-9 with x_1 near 1000: x_0 is under the R6-6.1 kink tolerance 1e-11 * 1000, so the first "
+      "orthant fixed it at 0 and had no feasible point; Rust returned the split point (x_0 = 1.004e-9, "
+      "x_1 = 999.949). Exact x = (1e-9, 999.95) (J-I.2)"),
+     {"a": [[1.0, 0.0], [0.0, 1.0]], "b": [-1.0, -1000.0], "weights": [1.0, 1.0],
+      "eq_matrix": [[1.0, 0.0]], "eq_rhs": [1e-9], "half_spreads": [0.1, 0.1]}),
+    ("mirror of the previous case with a bound: x_0 = -1e-9 forced, x_1 = -999.95 inside its box (J-I.2)",
+     {"a": [[1.0, 0.0], [0.0, 1.0]], "b": [-1.0, 1000.0], "weights": [1.0, 1.0],
+      "eq_matrix": [[1.0, 0.0]], "eq_rhs": [-1e-9], "half_spreads": [0.1, 0.1],
+      "lower": [None, -2000.0], "upper": [None, 2000.0]}),
+]
+SELECT_SPEC = "specifications/08-hedging/instrument-selection.md"
+SELECT_BASE = {"a": [[1.0, 0.0], [0.0, 1.0]], "b": [-1.0, -1.0], "weights": [1.0, 1.0], "max_instruments": 1}
+SELECT_ERRORS = [
+    ("half_spreads given to selection: E_INPUT, not silently dropped (J-I.3, as I-33)",
+     dict(SELECT_BASE, half_spreads=[0.1, 0.1])),
+    ("margin_rates and margin_limit given to selection: E_INPUT (J-I.3)",
+     dict(SELECT_BASE, margin_rates=[1.0, 1.0], margin_limit=1.0)),
+    ("cost_weight alone given to selection: E_INPUT (J-I.3)", dict(SELECT_BASE, cost_weight=1.0)),
+]
+
+
 def build():
     s = Suite("hedgecut_j", SPEC, G)
     for desc, inp in CASES:
         s.add(OP, inp, outputs=reference(inp), cls="root_finding", verified=("fractions KKT enumeration",),
               tags=("stage_j", "hedge", "qp", "scaling", "synthetic"), output_classes={"rank": "date_and_convention"},
               limit=LIMIT, description=desc)
-    return [s]
+    t = Suite("hedgesign_j", SPEC, G)
+    for desc, inp in SIGN_CASES:
+        t.add(OP, inp, outputs=reference(inp), cls="root_finding", verified=("fractions KKT enumeration",),
+              tags=("stage_j", "hedge", "qp", "costs", "synthetic"), output_classes={"rank": "date_and_convention"},
+              limit=SIGN_LIMIT, description=desc)
+    u = Suite("selectcost_j", SELECT_SPEC, G)
+    for desc, inp in SELECT_ERRORS:
+        u.add("hedge.select.solve", inp, error="E_INPUT", verified=("ruling J-I.3",),
+              tags=("stage_j", "hedge", "selection", "error", "synthetic"), description=desc)
+    return [s, t, u]
 
 
 def main():
@@ -147,7 +193,7 @@ def main():
     for s in build():
         s.write()
     common.GOLDEN = keep
-    note("stage J qp cut: 4 value-checked cases")
+    note("stage J qp cut: 4 + 2 value-checked cases, 3 error cases")
 
 
 if __name__ == "__main__":

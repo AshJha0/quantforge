@@ -12,13 +12,13 @@ Sources:
 
 ### Inputs
 
-`a`, `b`, `weights`, `ridge`, `lower`, `upper` as `hedge.qp.solve`; `max_instruments` `K` (Integer). No `eq_matrix`, `eq_rhs` or `singular` (I-33).
+`a`, `b`, `weights`, `ridge`, `lower`, `upper` as `hedge.qp.solve`; `max_instruments` `K` (Integer). No `eq_matrix`, `eq_rhs` or `singular` (I-33), and no `half_spreads`, `impact`, `cost_weight`, `margin_rates` or `margin_limit` (J-I.3).
 
 ### Checks, in order
 
 1. `E_LIMIT`: more than 20 instruments (I-35).
 2. Finite rule; then `hedge.qp.solve` checks 1 to 3 (shapes `E_INPUT`, domain `E_DOMAIN`).
-3. `K` outside `1..n`; any of `eq_matrix`, `eq_rhs`, `singular` present: `E_INPUT`.
+3. `K` outside `1..n`; any of `eq_matrix`, `eq_rhs`, `singular` present, or any cost or margin input (J-I.3): `E_INPUT`.
 4. A bound that excludes 0 (`lower_j > 0` or `upper_j < 0`): `E_DOMAIN`. An instrument left out sits at 0, which must be feasible.
 5. The full problem's `H = A^T W A + ridge I` singular by I-3: `E_SINGULAR`. Every subset of a regular problem is then regular.
 

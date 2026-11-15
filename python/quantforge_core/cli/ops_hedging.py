@@ -259,7 +259,8 @@ def hedge_select_solve(i: Inputs) -> Any:
     _no_nulls(i.raw)
     a, b, weights, ridge = _least_squares(i)
     lower, upper = _opt_bounds(i, "lower"), _opt_bounds(i, "upper")
-    extra = [k for k in ("eq_matrix", "eq_rhs", "singular") if i.has(k)]
+    extra = [k for k in ("eq_matrix", "eq_rhs", "singular", "half_spreads", "impact", "cost_weight",
+                         "margin_rates", "margin_limit") if i.has(k)]  # I-33, J-I.3
     return core.hedge_solvers.select_solve(a, b, weights, i.integer("max_instruments"), ridge,
                                            lower, upper, extra)
 

@@ -254,7 +254,8 @@ struct SelectResult {
     double objective = 0.0;
 };
 /// hedge.select.solve: the best subset of at most max_instruments columns (I-34). forbidden_keys: eq_matrix,
-/// eq_rhs or singular was given (E_INPUT, I-33).
+/// eq_rhs, singular or a cost or margin input was given (E_INPUT, I-33, J-I.3); cost or margin fields set in p
+/// are E_INPUT too (J-I.3).
 SelectResult select_instruments(const QpProblem& p, long long max_instruments, bool forbidden_keys);
 
 // ---- wave 4d: hedge slippage (08-hedging/hedge-slippage.md, I-36 to I-38) ----

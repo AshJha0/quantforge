@@ -723,6 +723,12 @@ fn nonsmooth_minimiser(
             }
         })
         .collect();
+    // J-I.2: coordinates the kink tolerance put at 0 although the split left them nonzero. If
+    // that orthant has no feasible point (an equality forcing a tiny nonzero x_j), they are
+    // released to the split's sign and the orthant solved again, instead of returning the split.
+    let mut tolerance_zeros: Vec<usize> = (0..n)
+        .filter(|&j| sign[j] == 0.0 && x0[j] != 0.0)
+        .collect();
     let (xp, z) = null_space(e, rhs, n);
     let mut sign = sign;
     let mut last = x0;
@@ -756,6 +762,12 @@ fn nonsmooth_minimiser(
         let (g, lin) = reduced(h, &c3, &xp, &z);
         let Some((x, mult)) = minimise_with_multipliers(&g, &lin, &z, &xp, &rows, THRESHOLD)?
         else {
+            if !tolerance_zeros.is_empty() {
+                for j in tolerance_zeros.drain(..) {
+                    sign[j] = last[j].signum();
+                }
+                continue;
+            }
             // A sign state with no feasible point: keep the best answer so far.
             return Ok(Some(last));
         };
@@ -775,6 +787,7 @@ fn nonsmooth_minimiser(
                 changed = true;
             }
         }
+        tolerance_zeros.clear();
         last = x;
         if !changed {
             converged = true;
@@ -1871,11 +1884,11 @@ fn next_subset(s: &mut [usize], n: usize) -> bool {
 /// `hedge.select.solve`: the best hedge with at most `max_instruments` of the instruments
 /// (ruling I-34), by `hedge.qp.solve` on every subset of size 1 to `K`. `p` carries no
 /// equalities, singular policy or costs; `extra_keys` says that the input named one of
-/// `eq_matrix`, `eq_rhs` or `singular` (I-33).
+/// `eq_matrix`, `eq_rhs`, `singular` or a cost or margin key (I-33, J-I.3).
 ///
 /// # Errors
 /// `E_DOMAIN` for a non-finite input; `hedge.qp.solve` checks 1 to 3; `E_INPUT` (`K` outside
-/// `1..n`, an extra key); `E_DOMAIN` (a bound that excludes 0); `E_SINGULAR` (the full
+/// `1..n`, an extra key, any cost or margin field set in `p`, J-I.3); `E_DOMAIN` (a bound that excludes 0); `E_SINGULAR` (the full
 /// problem).
 pub fn select_solve(p: &QpProblem, max_instruments: i64, extra_keys: bool) -> Result<Selection> {
     check_finite(p)?;
@@ -1899,10 +1912,11 @@ pub fn select_solve(p: &QpProblem, max_instruments: i64, extra_keys: bool) -> Re
         );
     }
     let k = usize::try_from(max_instruments).unwrap_or(0);
-    if k < 1 || k > n || extra_keys {
+    // J-I.3: costs or margin in `p` are refused like the I-33 keys, not silently dropped.
+    if k < 1 || k > n || extra_keys || p.costs.any() {
         return fail(
             "E_INPUT",
-            "max_instruments in 1..n; no equalities or singular policy (ruling I-33)",
+            "max_instruments in 1..n; no equalities, singular policy, costs or margin (I-33, J-I.3)",
         );
     }
     if lower.iter().any(|l| l.is_some_and(|l| l > 0.0))

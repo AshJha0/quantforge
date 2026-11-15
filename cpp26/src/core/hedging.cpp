@@ -1330,6 +1330,9 @@ SelectResult select_instruments(const QpProblem& p, long long max_instruments, b
     // Check 3, 4 and 5.
     input_if(max_instruments < 1 || max_instruments > (long long)n, "max_instruments", "must be in 1..n");
     input_if(forbidden_keys, "eq_matrix", "selection takes no eq_matrix, eq_rhs or singular (I-33)");
+    // J-I.3: a problem carrying cost or margin terms is refused, not solved without them.
+    input_if(p.half_spreads || p.impact || p.cost_weight || p.margin_rates || p.margin_limit, "half_spreads",
+             "selection takes no cost or margin inputs (J-I.3)");
     for (std::size_t j = 0; j < n; ++j) {
         domain_if(!lower.empty() && lower[j] && *lower[j] > 0.0, "lower", "a bound excludes 0 (I-33)");
         domain_if(!upper.empty() && upper[j] && *upper[j] < 0.0, "upper", "a bound excludes 0 (I-33)");

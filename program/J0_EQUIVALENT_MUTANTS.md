@@ -110,11 +110,11 @@ Equivalent, with reasoning:
 - 557:51 `>` -> `>=` in scaled_reduced_rank: `D H D` has unit diagonal, so its largest eigenvalue
   is at least 1 and the limit `1e-12 * scale` is positive; the mutant differs only when a reduced
   eigenvalue equals the limit bit for bit. Equivalent up to an exact float tie (not constructible
-  through the Jacobi eigen solver). The R6-6.2 rank-cut fix on stage-j2 may move this line.
+  through the Jacobi eigen solver). Checked after the merge with stage-j2: still line 557, column 51.
 - 1932:17 delete `costs` in select_solve (confirmed surviving, r5): by contract (doc comment, I-33, instrument-selection.md)
   `p` carries no costs, so `p.costs` is `Costs::default()` and the field is the same. Equivalent
-  under the precondition. Note: select_solve does not itself reject costs; a caller passing
-  them would get them silently ignored (correct code) or a shape error (mutant).
+  under the precondition. Superseded by J-I.3: select_solve now refuses a `p` with costs
+  (`E_INPUT`), so a caller can no longer pass them; the mutant stays equivalent on every accepted input.
 - Split-stage mutants of nonsmooth_minimiser that change only the split objective, not its
   constraints: 661:29 `+` and `/` (delta), 666:69 delete `-`, 667:26 `*`->`+`, 673:55 `*`,
   673:71 `/`->`%` and `*`, and the sign rule 717:57
@@ -128,8 +128,11 @@ Equivalent, with reasoning:
   (a) at the iteration cap, (b) an extreme `delta` (661 `/` with a huge spectral scale) where the
   split's dependence test may misfire, and (c) for 717:57/81, coordinates with
   `0 < |x0_j| <= 1e-11 max|x0|` forced nonzero by an equality: correct code fixes them at 0, the
-  orthant can then be infeasible and the inexact split point is returned. (c) is a possible
-  accuracy issue in the correct code, not a test gap; noted, not fixed (tests + docs only).
+  orthant can then be infeasible and the inexact split point is returned. (c) was a real
+  accuracy bug in the correct code: fixed by J-I.2 (such coordinates are released to the split's
+  sign and the orthant re-solved; golden `hedgesign_j`, test
+  `tolerance_zero_forced_nonzero_by_an_equality_is_released`). With the fix the fallback is
+  reached only when no orthant is feasible, so 717:57/81 are equivalent in output apart from (a).
   Only a planted-cap unit test inside src (iteration count as the observable) could separate
   them, as `planted_cap_of_one_is_no_convergence` already does for 673:55 `-`; that needs a
   src change, outside this lane's tests-and-docs scope.

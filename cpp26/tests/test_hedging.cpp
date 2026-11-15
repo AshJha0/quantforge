@@ -969,6 +969,14 @@ TEST_CASE("I4c selection: K = n gives the QP answer; the best objective never ri
     CHECK(hg::select_instruments(s, 1, false).selected == std::vector<long long>{0});
     CHECK(i_error([&] { hg::select_instruments(s, 3, false); }) == "E_INPUT");
     CHECK(i_error([&] { hg::select_instruments(s, 1, true); }) == "E_INPUT");
+    {  // J-I.3: cost or margin fields in the problem are refused, not dropped.
+        hg::QpProblem c = s;
+        c.half_spreads = hg::Vec{0.1, 0.1};
+        CHECK(i_error([&] { hg::select_instruments(c, 1, false); }) == "E_INPUT");
+        c = s;
+        c.margin_limit = 1.0;
+        CHECK(i_error([&] { hg::select_instruments(c, 1, false); }) == "E_INPUT");
+    }
     s.lower = std::vector<hg::Bound>{0.5, std::nullopt};
     CHECK(i_error([&] { hg::select_instruments(s, 1, false); }) == "E_DOMAIN");
 }
