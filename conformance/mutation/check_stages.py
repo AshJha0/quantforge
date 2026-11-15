@@ -17,7 +17,7 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 from plan_matrix import LANGS, target_glob  # noqa: E402
 
-REQUIRED_STAGES = ("A", "D", "E", "F", "G", "I")
+REQUIRED_STAGES = ("A", "D", "E", "F", "G", "I", "J")
 
 
 def files_under(prefix):
