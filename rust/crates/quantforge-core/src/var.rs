@@ -255,10 +255,10 @@ pub fn traffic_light(
     c: f64,
 ) -> Result<(f64, &'static str, Option<f64>)> {
     check_confidence(c)?;
-    if observations < 1 || exceptions < 0 {
+    if observations < 1 || exceptions < 0 || exceptions > observations {
         return fail(
             "E_DOMAIN",
-            "observations must be positive and exceptions not negative",
+            "need observations >= 1 and 0 <= exceptions <= observations",
         );
     }
     let (n, p) = (observations, 1.0 - c);

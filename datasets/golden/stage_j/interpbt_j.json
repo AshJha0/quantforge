@@ -1,0 +1,1540 @@
+{
+ "schema_version": "1.0",
+ "suite": "interpbt_j",
+ "spec": "specifications/11-research/interp-backtest.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_j_w3.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "interpbt_j-0001",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "linear",
+    "x": [
+     0.0,
+     1.0,
+     2.0
+    ],
+    "y": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      -1.0
+     ],
+     "max_abs_error": 1.0,
+     "rmse": 1.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "hand",
+    "reference-computed"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "hand: linear, hidden peak, error -1"
+  },
+  {
+   "case_id": "interpbt_j-0002",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "linear",
+    "x": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "y": [
+     1.61,
+     1.58,
+     1.56,
+     1.47,
+     1.42,
+     1.39,
+     1.41,
+     1.5,
+     1.56,
+     1.86,
+     2.01
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      0.010000000000000009,
+      -0.016666666666666607,
+      0.043333333333333446,
+      0.010000000000000009,
+      0.026666666666666616,
+      0.03499999999999992,
+      -0.030000000000000027,
+      0.023076923076922995,
+      -0.07500000000000018
+     ],
+     "max_abs_error": 0.07500000000000018,
+     "rmse": 0.0355108919837983
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "library-object"
+   ],
+   "tags": [
+    "research",
+    "real-data"
+   ],
+   "description": "linear: Treasury par curve 2020-02-19"
+  },
+  {
+   "case_id": "interpbt_j-0003",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "linear",
+    "x": [
+     0.287796,
+     2.804993,
+     4.343265,
+     4.917889,
+     5.156712,
+     5.248748,
+     6.529073,
+     6.969624,
+     7.106352,
+     7.22087,
+     8.356585,
+     9.05786
+    ],
+    "y": [
+     2.312619,
+     2.610779,
+     1.501683,
+     1.51283,
+     1.612769,
+     1.6653,
+     2.896325,
+     3.330749,
+     3.443938,
+     3.528277,
+     3.71199,
+     3.264526
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      -0.8015014548088024,
+      0.30974562774883374,
+      0.06732483856354499,
+      0.010117981402954168,
+      0.033549382651503645,
+      0.008062529214772685,
+      -0.016512635195460312,
+      -0.005694319949371973,
+      -0.059786153501787176,
+      -0.34677647174726056
+     ],
+     "max_abs_error": 0.8015014548088024,
+     "rmse": 0.29467030844112235
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "library-object"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "linear: 12 irregular knots on a smooth curve"
+  },
+  {
+   "case_id": "interpbt_j-0004",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "log_linear",
+    "x": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "y": [
+     1.61,
+     1.58,
+     1.56,
+     1.47,
+     1.42,
+     1.39,
+     1.41,
+     1.5,
+     1.56,
+     1.86,
+     2.01
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      0.009810514567407669,
+      -0.017552102468521458,
+      0.04186326133887053,
+      0.009440449966349629,
+      0.026658811182892483,
+      0.03395290781936522,
+      -0.031813227770412844,
+      0.01634077477674123,
+      -0.08923745239515535
+     ],
+     "max_abs_error": 0.08923745239515535,
+     "rmse": 0.038516799649512115
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "real-data"
+   ],
+   "description": "log_linear: Treasury par curve 2020-02-19"
+  },
+  {
+   "case_id": "interpbt_j-0005",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "log_linear",
+    "x": [
+     0.329094,
+     0.816143,
+     1.383654,
+     1.719393,
+     2.070881,
+     2.071325,
+     3.277971,
+     3.534308,
+     6.639332,
+     7.349586,
+     7.873862,
+     9.132356
+    ],
+    "y": [
+     2.356095,
+     2.810123,
+     3.120905,
+     3.160919,
+     3.08463,
+     3.084461,
+     2.191841,
+     1.970732,
+     3.012599,
+     3.610425,
+     3.787189,
+     3.201508
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      -0.1273799446111834,
+      -0.09521877317742078,
+      -0.05778883484647457,
+      -7.37146874314476e-05,
+      -0.0002186602106499791,
+      -0.060190477591893554,
+      0.2749228025943866,
+      0.2130047126068857,
+      -0.17393989720803882,
+      -0.30216091527719513
+     ],
+     "max_abs_error": 0.30216091527719513,
+     "rmse": 0.16576025544965442
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "log_linear: 12 irregular knots on a smooth curve"
+  },
+  {
+   "case_id": "interpbt_j-0006",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "cubic_natural",
+    "x": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "y": [
+     1.61,
+     1.58,
+     1.56,
+     1.47,
+     1.42,
+     1.39,
+     1.41,
+     1.5,
+     1.56,
+     1.86,
+     2.01
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      0.012780637112585147,
+      -0.022654822234295713,
+      0.048295886956788214,
+      -0.042733226554955595,
+      0.023732554030793995,
+      0.0035029679336158193,
+      -0.03199601795021789,
+      0.06365875732156301,
+      -0.11466306814854033
+     ],
+     "max_abs_error": 0.11466306814854033,
+     "rmse": 0.05124506876548413
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "library-object"
+   ],
+   "tags": [
+    "research",
+    "real-data"
+   ],
+   "description": "cubic_natural: Treasury par curve 2020-02-19"
+  },
+  {
+   "case_id": "interpbt_j-0007",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "cubic_natural",
+    "x": [
+     0.679109,
+     1.520296,
+     1.594336,
+     1.688229,
+     2.091631,
+     3.170801,
+     4.817504,
+     5.093285,
+     5.509232,
+     6.063412,
+     7.188258,
+     7.930414
+    ],
+    "y": [
+     2.696011,
+     3.150755,
+     3.159157,
+     3.161936,
+     3.076567,
+     2.287876,
+     1.48727,
+     1.580997,
+     1.851955,
+     2.388333,
+     3.505296,
+     3.790122
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      -0.0017166737807090549,
+      0.0004788712967656039,
+      -0.00017512432997879301,
+      -0.010124767918866517,
+      0.03634163611977348,
+      0.014830268687996861,
+      -0.001939920733015077,
+      0.002080251220424323,
+      0.011757908554979934,
+      -0.1999859515579483
+     ],
+     "max_abs_error": 0.1999859515579483,
+     "rmse": 0.06464293405892563
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "library-object"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "cubic_natural: 12 irregular knots on a smooth curve"
+  },
+  {
+   "case_id": "interpbt_j-0008",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "monotone_pchip",
+    "x": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "y": [
+     1.61,
+     1.58,
+     1.56,
+     1.47,
+     1.42,
+     1.39,
+     1.41,
+     1.5,
+     1.56,
+     1.86,
+     2.01
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      0.01256166484118304,
+      -0.022632605021985608,
+      0.039780793251577684,
+      -0.008749999999999813,
+      0.024155374887082193,
+      0.023507462686567226,
+      -0.04152,
+      0.04305894307122182,
+      -0.08449990865911605
+     ],
+     "max_abs_error": 0.08449990865911605,
+     "rmse": 0.039698033431692106
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "library-object"
+   ],
+   "tags": [
+    "research",
+    "real-data"
+   ],
+   "description": "monotone_pchip: Treasury par curve 2020-02-19"
+  },
+  {
+   "case_id": "interpbt_j-0009",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "monotone_pchip",
+    "x": [
+     1.336768,
+     1.911903,
+     4.129114,
+     5.459928,
+     5.660956,
+     6.217916,
+     6.342586,
+     7.289021,
+     8.360775,
+     8.893902,
+     9.206853,
+     9.586319
+    ],
+    "y": [
+     3.106417,
+     3.133575,
+     1.578248,
+     1.812629,
+     1.983247,
+     2.556569,
+     2.693624,
+     3.573512,
+     3.710383,
+     3.395679,
+     3.136889,
+     2.797793
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      -0.5710355659649013,
+      0.6524960650477831,
+      0.08122292515247453,
+      -0.04796197329148777,
+      0.009517747688245759,
+      -0.005258248731592641,
+      -0.21172205451201664,
+      -0.21278829226192553,
+      0.016041185722149187,
+      0.016310870933117894
+     ],
+     "max_abs_error": 0.6524960650477831,
+     "rmse": 0.29180077681413386
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "library-object"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "monotone_pchip: 12 irregular knots on a smooth curve"
+  },
+  {
+   "case_id": "interpbt_j-0010",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "cubic_natural",
+    "x": [
+     0.0,
+     1.0,
+     2.0,
+     3.0
+    ],
+    "y": [
+     1.0,
+     3.0,
+     5.0,
+     7.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      0.0,
+      0.0
+     ],
+     "max_abs_error": 0.0,
+     "rmse": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "library-object"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "linear data: zero error under the natural spline"
+  },
+  {
+   "case_id": "interpbt_j-0011",
+   "operation": "research.backtest.surface_holdout",
+   "inputs": {
+    "method": "linear",
+    "expiries": [
+     0.25,
+     0.5,
+     1.0,
+     2.0
+    ],
+    "strikes": [
+     -0.4,
+     -0.3,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.3,
+     0.4
+    ],
+    "vols": [
+     [
+      0.3759539397,
+      0.3376695082,
+      0.2951544076,
+      0.247676602,
+      0.2,
+      0.184104312,
+      0.2019541083,
+      0.2257754648,
+      0.2491401726
+     ],
+     [
+      0.3301340934,
+      0.3001089102,
+      0.2675915775,
+      0.2328924952,
+      0.2,
+      0.1835403298,
+      0.1895552931,
+      0.2045249402,
+      0.2213298789
+     ],
+     [
+      0.2938457398,
+      0.270985353,
+      0.2469550197,
+      0.2224344896,
+      0.2,
+      0.1857329122,
+      0.1839944622,
+      0.190849575,
+      0.2012881587
+     ],
+     [
+      0.2656841673,
+      0.2489521484,
+      0.231903237,
+      0.2151361011,
+      0.2,
+      0.1888057596,
+      0.1836457103,
+      0.1843163435,
+      0.1888661165
+     ]
+    ],
+    "holdout": [
+     1,
+     3,
+     5,
+     7
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      [
+       0.00030792381407557246,
+       0.004430641376412109,
+       0.0168751171205547,
+       0.0010022760195146363
+      ],
+      [
+       0.0003854923884495376,
+       0.00333329969647031,
+       0.011307314710046479,
+       0.0015310284542900954
+      ],
+      [
+       0.0004295513011793872,
+       0.0022728553567541443,
+       0.006431030984286323,
+       0.001985697905534073
+      ],
+      [
+       0.00041423674941482025,
+       0.0014038621066540524,
+       0.0031913066687213054,
+       0.0019578587844052975
+      ]
+     ],
+     "max_abs_error": 0.0168751171205547,
+     "rmse": 0.005666624061775176
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "library-object"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "linear: SSVI test surface (B1 design b), alternate strikes held out"
+  },
+  {
+   "case_id": "interpbt_j-0012",
+   "operation": "research.backtest.surface_holdout",
+   "inputs": {
+    "method": "linear",
+    "expiries": [
+     0.25,
+     0.5,
+     1.0,
+     2.0
+    ],
+    "strikes": [
+     -0.4,
+     -0.3,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.3,
+     0.4
+    ],
+    "vols": [
+     [
+      0.3759539397,
+      0.3376695082,
+      0.2951544076,
+      0.247676602,
+      0.2,
+      0.184104312,
+      0.2019541083,
+      0.2257754648,
+      0.2491401726
+     ],
+     [
+      0.3301340934,
+      0.3001089102,
+      0.2675915775,
+      0.2328924952,
+      0.2,
+      0.1835403298,
+      0.1895552931,
+      0.2045249402,
+      0.2213298789
+     ],
+     [
+      0.2938457398,
+      0.270985353,
+      0.2469550197,
+      0.2224344896,
+      0.2,
+      0.1857329122,
+      0.1839944622,
+      0.190849575,
+      0.2012881587
+     ],
+     [
+      0.2656841673,
+      0.2489521484,
+      0.231903237,
+      0.2151361011,
+      0.2,
+      0.1888057596,
+      0.1836457103,
+      0.1843163435,
+      0.1888661165
+     ]
+    ],
+    "holdout": [
+     4
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      [
+       0.018217892111599937
+      ],
+      [
+       0.009673516429203333
+      ],
+      [
+       0.004907072642582805
+      ],
+      [
+       0.0023995514503952764
+      ]
+     ],
+     "max_abs_error": 0.018217892111599937,
+     "rmse": 0.010668947021363456
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "library-object"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "linear: SSVI test surface, ATM strike held out"
+  },
+  {
+   "case_id": "interpbt_j-0013",
+   "operation": "research.backtest.surface_holdout",
+   "inputs": {
+    "method": "cubic_natural",
+    "expiries": [
+     0.25,
+     0.5,
+     1.0,
+     2.0
+    ],
+    "strikes": [
+     -0.4,
+     -0.3,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.3,
+     0.4
+    ],
+    "vols": [
+     [
+      0.3759539397,
+      0.3376695082,
+      0.2951544076,
+      0.247676602,
+      0.2,
+      0.184104312,
+      0.2019541083,
+      0.2257754648,
+      0.2491401726
+     ],
+     [
+      0.3301340934,
+      0.3001089102,
+      0.2675915775,
+      0.2328924952,
+      0.2,
+      0.1835403298,
+      0.1895552931,
+      0.2045249402,
+      0.2213298789
+     ],
+     [
+      0.2938457398,
+      0.270985353,
+      0.2469550197,
+      0.2224344896,
+      0.2,
+      0.1857329122,
+      0.1839944622,
+      0.190849575,
+      0.2012881587
+     ],
+     [
+      0.2656841673,
+      0.2489521484,
+      0.231903237,
+      0.2151361011,
+      0.2,
+      0.1888057596,
+      0.1836457103,
+      0.1843163435,
+      0.1888661165
+     ]
+    ],
+    "holdout": [
+     1,
+     3,
+     5,
+     7
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      [
+       0.0009459983830720775,
+       -0.003551647574796729,
+       0.0034490829969089087,
+       -0.0008210820601370072
+      ],
+      [
+       0.0004562505259562144,
+       -0.0015739248017479224,
+       0.0024906534058151963,
+       -0.000962027619944128
+      ],
+      [
+       0.00019478722524035597,
+       -0.0005423353515504048,
+       0.0010255594683860059,
+       -0.00041042699574075914
+      ],
+      [
+       9.65248019764442e-05,
+       -0.00012815325248058396,
+       0.000179056882605777,
+       0.00021888742075398815
+      ]
+     ],
+     "max_abs_error": 0.003551647574796729,
+     "rmse": 0.001531986530235826
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "library-object"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "cubic_natural: SSVI test surface (B1 design b), alternate strikes held out"
+  },
+  {
+   "case_id": "interpbt_j-0014",
+   "operation": "research.backtest.surface_holdout",
+   "inputs": {
+    "method": "cubic_natural",
+    "expiries": [
+     0.25,
+     0.5,
+     1.0,
+     2.0
+    ],
+    "strikes": [
+     -0.4,
+     -0.3,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.3,
+     0.4
+    ],
+    "vols": [
+     [
+      0.3759539397,
+      0.3376695082,
+      0.2951544076,
+      0.247676602,
+      0.2,
+      0.184104312,
+      0.2019541083,
+      0.2257754648,
+      0.2491401726
+     ],
+     [
+      0.3301340934,
+      0.3001089102,
+      0.2675915775,
+      0.2328924952,
+      0.2,
+      0.1835403298,
+      0.1895552931,
+      0.2045249402,
+      0.2213298789
+     ],
+     [
+      0.2938457398,
+      0.270985353,
+      0.2469550197,
+      0.2224344896,
+      0.2,
+      0.1857329122,
+      0.1839944622,
+      0.190849575,
+      0.2012881587
+     ],
+     [
+      0.2656841673,
+      0.2489521484,
+      0.231903237,
+      0.2151361011,
+      0.2,
+      0.1888057596,
+      0.1836457103,
+      0.1843163435,
+      0.1888661165
+     ]
+    ],
+    "holdout": [
+     4
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      [
+       0.0037044280947210184
+      ],
+      [
+       0.0009542463864400386
+      ],
+      [
+       0.00016985483206807817
+      ],
+      [
+       2.2188880871021333e-05
+      ]
+     ],
+     "max_abs_error": 0.0037044280947210184,
+     "rmse": 0.0019145963468446456
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "library-object"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "cubic_natural: SSVI test surface, ATM strike held out"
+  },
+  {
+   "case_id": "interpbt_j-0015",
+   "operation": "research.backtest.surface_holdout",
+   "inputs": {
+    "method": "monotone_pchip",
+    "expiries": [
+     0.25,
+     0.5,
+     1.0,
+     2.0
+    ],
+    "strikes": [
+     -0.4,
+     -0.3,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.3,
+     0.4
+    ],
+    "vols": [
+     [
+      0.3759539397,
+      0.3376695082,
+      0.2951544076,
+      0.247676602,
+      0.2,
+      0.184104312,
+      0.2019541083,
+      0.2257754648,
+      0.2491401726
+     ],
+     [
+      0.3301340934,
+      0.3001089102,
+      0.2675915775,
+      0.2328924952,
+      0.2,
+      0.1835403298,
+      0.1895552931,
+      0.2045249402,
+      0.2213298789
+     ],
+     [
+      0.2938457398,
+      0.270985353,
+      0.2469550197,
+      0.2224344896,
+      0.2,
+      0.1857329122,
+      0.1839944622,
+      0.190849575,
+      0.2012881587
+     ],
+     [
+      0.2656841673,
+      0.2489521484,
+      0.231903237,
+      0.2151361011,
+      0.2,
+      0.1888057596,
+      0.1836457103,
+      0.1843163435,
+      0.1888661165
+     ]
+    ],
+    "holdout": [
+     1,
+     3,
+     5,
+     7
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      [
+       -0.0010555810976594637,
+       -0.00839560404914183,
+       0.016403427916157648,
+       -0.007428020210507591
+      ],
+      [
+       -0.0008692259349351583,
+       -0.003933392399465857,
+       0.008980897590203152,
+       -0.005133822328590332
+      ],
+      [
+       -0.0006266900577505119,
+       -0.0015022668650444826,
+       0.003313422617563705,
+       -0.0022971685569588285
+      ],
+      [
+       -0.0003840391423126921,
+       -0.00048672930232276923,
+       0.0003636852164302373,
+       -9.995826170505762e-06
+      ]
+     ],
+     "max_abs_error": 0.016403427916157648,
+     "rmse": 0.005801455585061695
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "library-object"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "monotone_pchip: SSVI test surface (B1 design b), alternate strikes held out"
+  },
+  {
+   "case_id": "interpbt_j-0016",
+   "operation": "research.backtest.surface_holdout",
+   "inputs": {
+    "method": "monotone_pchip",
+    "expiries": [
+     0.25,
+     0.5,
+     1.0,
+     2.0
+    ],
+    "strikes": [
+     -0.4,
+     -0.3,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.3,
+     0.4
+    ],
+    "vols": [
+     [
+      0.3759539397,
+      0.3376695082,
+      0.2951544076,
+      0.247676602,
+      0.2,
+      0.184104312,
+      0.2019541083,
+      0.2257754648,
+      0.2491401726
+     ],
+     [
+      0.3301340934,
+      0.3001089102,
+      0.2675915775,
+      0.2328924952,
+      0.2,
+      0.1835403298,
+      0.1895552931,
+      0.2045249402,
+      0.2213298789
+     ],
+     [
+      0.2938457398,
+      0.270985353,
+      0.2469550197,
+      0.2224344896,
+      0.2,
+      0.1857329122,
+      0.1839944622,
+      0.190849575,
+      0.2012881587
+     ],
+     [
+      0.2656841673,
+      0.2489521484,
+      0.231903237,
+      0.2151361011,
+      0.2,
+      0.1888057596,
+      0.1836457103,
+      0.1843163435,
+      0.1888661165
+     ]
+    ],
+    "holdout": [
+     4
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "errors": [
+      [
+       0.0073262997418263864
+      ],
+      [
+       0.0015945037175975896
+      ],
+      [
+       -0.00016441066556496797
+      ],
+      [
+       0.00012768432455675938
+      ]
+     ],
+     "max_abs_error": 0.0073262997418263864,
+     "rmse": 0.0037503481227149746
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "library-object"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "monotone_pchip: SSVI test surface, ATM strike held out"
+  },
+  {
+   "case_id": "interpbt_j-0017",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "cubic_natural",
+    "x": [
+     0.0,
+     1.0,
+     2.0
+    ],
+    "y": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "too few knots for cubic"
+  },
+  {
+   "case_id": "interpbt_j-0018",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "linear",
+    "x": [
+     0.0,
+     2.0,
+     1.0
+    ],
+    "y": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "knots not increasing"
+  },
+  {
+   "case_id": "interpbt_j-0019",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "log_linear",
+    "x": [
+     0.0,
+     1.0,
+     2.0
+    ],
+    "y": [
+     0.0,
+     1.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "log_linear with zero"
+  },
+  {
+   "case_id": "interpbt_j-0020",
+   "operation": "research.backtest.interp_loo",
+   "inputs": {
+    "method": "linear",
+    "x": [
+     0.0,
+     1.0,
+     2.0
+    ],
+    "y": [
+     0.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "length mismatch"
+  },
+  {
+   "case_id": "interpbt_j-0021",
+   "operation": "research.backtest.surface_holdout",
+   "inputs": {
+    "method": "linear",
+    "expiries": [
+     1.0
+    ],
+    "strikes": [
+     -0.1,
+     0.0,
+     0.1
+    ],
+    "vols": [
+     [
+      0.2,
+      0.19,
+      0.2
+     ]
+    ],
+    "holdout": [
+     0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "holdout at an end"
+  },
+  {
+   "case_id": "interpbt_j-0022",
+   "operation": "research.backtest.surface_holdout",
+   "inputs": {
+    "method": "linear",
+    "expiries": [
+     1.0
+    ],
+    "strikes": [
+     -0.2,
+     -0.1,
+     0.0,
+     0.1
+    ],
+    "vols": [
+     [
+      0.2,
+      0.2,
+      0.19,
+      0.2
+     ]
+    ],
+    "holdout": [
+     2,
+     1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "holdout not sorted"
+  },
+  {
+   "case_id": "interpbt_j-0023",
+   "operation": "research.backtest.surface_holdout",
+   "inputs": {
+    "method": "linear",
+    "expiries": [
+     0.0
+    ],
+    "strikes": [
+     -0.1,
+     0.0,
+     0.1
+    ],
+    "vols": [
+     [
+      0.2,
+      0.19,
+      0.2
+     ]
+    ],
+    "holdout": [
+     1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "expiry zero"
+  },
+  {
+   "case_id": "interpbt_j-0024",
+   "operation": "research.backtest.surface_holdout",
+   "inputs": {
+    "method": "linear",
+    "expiries": [
+     1.0
+    ],
+    "strikes": [
+     -0.1,
+     0.0,
+     0.1
+    ],
+    "vols": [
+     [
+      0.2,
+      0.0,
+      0.2
+     ]
+    ],
+    "holdout": [
+     1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "vol zero"
+  },
+  {
+   "case_id": "interpbt_j-0025",
+   "operation": "research.backtest.surface_holdout",
+   "inputs": {
+    "method": "linear",
+    "expiries": [
+     1.0
+    ],
+    "strikes": [
+     -0.1,
+     0.0,
+     0.1
+    ],
+    "vols": [
+     [
+      0.2,
+      0.2
+     ]
+    ],
+    "holdout": [
+     1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "vols row length"
+  }
+ ]
+}

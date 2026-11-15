@@ -220,10 +220,9 @@ class _Qp:
     """One bound- and equality-constrained least-squares problem in square-root form."""
 
     def __init__(self, big_b: NDArray, d: NDArray, e_mat: NDArray, e_rhs: NDArray,
-                 lower: Bounds, upper: Bounds, h_largest_sq: float, e_cut: float):
+                 lower: Bounds, upper: Bounds, e_cut: float):
         self.big_b, self.d, self.e_mat, self.e_rhs = big_b, d, e_mat, e_rhs
         self.lower, self.upper = lower, upper
-        self.cut_sq = THRESHOLD * h_largest_sq
         self.e_cut = e_cut
         self.n = big_b.shape[1]
 
@@ -434,11 +433,10 @@ class _CostQp:
     that instrument's orthant; a flip lowers the objective strictly, so the search ends."""
 
     def __init__(self, big_b: NDArray, d: NDArray, e_mat: NDArray, e_rhs: NDArray,
-                 lower: Bounds, upper: Bounds, h_largest_sq: float, spread: NDArray,
+                 lower: Bounds, upper: Bounds, spread: NDArray,
                  rates: NDArray | None, limit: float):
         self.big_b, self.d, self.e_mat, self.e_rhs = big_b, d, e_mat, e_rhs
         self.lower, self.upper = lower, upper
-        self.cut_sq = THRESHOLD * h_largest_sq
         self.spread = spread
         self.n = big_b.shape[1]
         self.rates = rates if rates is not None else np.zeros(self.n)
@@ -654,9 +652,9 @@ def _qp_core(a: Matrix, b: Floats, weights: Floats, ridge: float, eq_matrix: Mat
     elif k < n:
         sz = np.linalg.svd(big_b @ z, compute_uv=False)
         rank = int((sz * sz > cut_sq).sum())
-    qp = _Qp(big_b, d, e_mat, e_rhs, lo, hi, h_largest_sq, e_cut)
+    qp = _Qp(big_b, d, e_mat, e_rhs, lo, hi, e_cut)
     if costs is not None and costs.kinked():
-        x = _costed(costs, big_b, d, e_mat, e_rhs, lo, hi, h_largest_sq, n)
+        x = _costed(costs, big_b, d, e_mat, e_rhs, lo, hi, n)
     elif not bounded and scaled is not None:
         col, bs, xs_p, zs = scaled  # R6-6.2: solve in the scaled variables, x = D x~
         y, _ = _lstsq_min_norm(bs @ zs, bs @ xs_p + d, 0.0)
@@ -699,7 +697,7 @@ def _qp_core(a: Matrix, b: Floats, weights: Floats, ridge: float, eq_matrix: Mat
 
 
 def _costed(costs: Costs, big_b: NDArray, d: NDArray, e_mat: NDArray, e_rhs: NDArray,
-            lo: Bounds, hi: Bounds, h_largest_sq: float, n: int) -> NDArray:
+            lo: Bounds, hi: Bounds, n: int) -> NDArray:
     """The wave 4a solve: a feasible start of least margin, then the orthant search."""
     spread = costs.cost_weight * np.asarray(costs.half_spreads or [0.0] * n, dtype=float)
     rates = (np.asarray(costs.margin_rates, dtype=float) if costs.margin_rates is not None
@@ -722,7 +720,7 @@ def _costed(costs: Costs, big_b: NDArray, d: NDArray, e_mat: NDArray, e_rhs: NDA
             start[j] = max(start[j], low)
         if high is not None:
             start[j] = min(start[j], high)
-    return _CostQp(big_b, d, e_mat, e_rhs, lo, hi, h_largest_sq, spread, rates,
+    return _CostQp(big_b, d, e_mat, e_rhs, lo, hi, spread, rates,
                    limit).solve(start)
 
 

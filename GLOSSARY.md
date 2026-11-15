@@ -238,7 +238,13 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 | Risk budget | The share of portfolio risk each asset should carry in risk parity; budgets must sum to 1 (J-W2-5) |
 | Q6-02 | The redesigned calibration method test on synthetic quotes: signed before the run, run once on seed 20261113, passed with 87.4 % of fitted vols inside the spread against 80 % (`research/q6/q6_02_output.json`) |
 | Mutation kill test | A unit test written to make a specific surviving code mutant fail; stage J item J-0 adds them for Rust `hedge.rs`, `var.rs` and `hedge_solvers.rs` (`program/J0_EQUIVALENT_MUTANTS.md`) |
-<!-- TODO(stage J wave 3): glossary terms for the shock library, held-out-strike and leave-one-out backtests and A3 drift go here; the wave 3 lane adds them. -->
+| Historical shock | The per-tenor move of a yield curve between two dates of a stored history, in basis points, replayed on today's curve (`06-risk/scenario-stress.md`, J-W3-2) |
+| Leave-one-out backtest | Hiding each inner knot of an interpolation, rebuilding from the rest and recording the miss (`11-research/interp-backtest.md`, J-W3-8) |
+| CUSUM | Cumulative sum control chart: running sums of standardised deviations less an allowance `k`, with an alarm above `h` (Page 1954; J-W3-10) |
+| Page-Hinkley test | A CUSUM-type test against the running mean: alarm when the cumulative deviation rises more than `lambda` above its minimum (J-W3-11) |
+| ARL0 | Average run length in control: the mean number of steps to a false alarm when nothing has changed; ARL1 is the mean delay after a change |
+| PSI | Population stability index: `sum (a - e) ln(a / e)` over binned shares of a test and a reference sample; 0.25 is a common alarm level (J-W3-12) |
+| Two-sample KS test | Kolmogorov-Smirnov: the largest gap between two empirical distribution functions, with an exact p-value for small samples (J-W3-13) |
 | Term repo rate | A simple money-market rate for financing secured on a named asset over a fixed term `[0, T]`: one unit borrowed returns `1 + R T` (`repo.term.curve`, `02-curves/financing-term-structure.md`) |
 | Financing spread curve | The cumulative spread `S(t)` of secured financing over the funding curve, one pillar per term repo quote, linear between pillars (flat forward spreads); extends ruling D22 (J-C-2, J-C-3) |
 | Borrow fee curve | The term structure of the fee a stock lender earns, from term-average fees; the cumulative fee must not fall, so forward fees are never negative (J-C-4) |

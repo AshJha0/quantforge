@@ -40,10 +40,9 @@ Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the f
 | [30. Trials and power](tutorial-30-trials-and-power.md) | The deflated Sharpe ratio from 1 to 1,000 trials, PSR against sample length, minimum detectable Sharpe and years required | `research.stats.dsr`, `research.stats.psr`, `research.stats.power` | J |
 | [31. Leakage and purging](tutorial-31-leakage-and-purging.md) | Training sizes against label horizon and embargo, leakage counted (zero purged, 160 plain), CPCV splits and paths | `research.cv.purged_kfold`, `research.cv.cpcv_paths` | J |
 | [32. Shrinkage and sample length](tutorial-32-shrinkage-and-sample-length.md) | Ledoit-Wolf on 10 to 1,000 simulated months, when it helps the matrix and when the portfolio, true risk shares of a ten-month risk budget | `research.estimate.ledoit_wolf`, `research.portfolio.risk_parity`, `risk.contrib.euler` | J |
+| [33. Stress a curve with history and watch for drift](tutorial-33-stress-test-and-watch-for-drift.md) | The 2008, 2013, 2020 and 2022 Treasury shocks replayed on one curve, leave-one-out and held-out-strike backtests, four drift detectors | `risk.scenario.historical_shock`, `risk.scenario.replay`, `research.backtest.interp_loo`, `research.backtest.surface_holdout`, `research.drift.*` | J |
 | [34. Build a financing term structure](tutorial-34-financing-term-structure.md) | Term repo spreads over the funding curve checked by hand, flat forward financing rates, a stock borrow curve, an equity forward that carries on both, the flat stage D case | `repo.term.curve`, `eq.forward.term_financed` | J |
 | [35. Price liquidity](tutorial-35-liquidity-curve.md) | Square-root impact checked by hand, a cost curve over seven horizons, the cost-minimising horizon by size, a 3/5 impact exponent | `liq.curve.cost` | J |
-
-<!-- TODO(stage J wave 3): tutorials for the shock library, the held-out-strike and leave-one-out backtests and A3 drift go here (Tutorial 33 sits between 32 and 34); the wave 3 lane writes them. -->
 
 ## How the scripts work
 

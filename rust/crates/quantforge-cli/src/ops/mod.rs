@@ -25,6 +25,7 @@ mod shortrate;
 mod termcurve;
 mod usecase;
 mod vol;
+mod w3;
 mod xva;
 
 use crate::input::Inputs;
@@ -88,10 +89,12 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("repo", repo::NAMES, repo::dispatch),
     ("repo", termcurve::repo::NAMES, termcurve::repo::dispatch),
     ("research", research::NAMES, research::dispatch),
+    ("research", w3::research::NAMES, w3::research::dispatch),
     ("risk", risk::NAMES, risk::dispatch),
     ("risk", mcgreeks::NAMES, mcgreeks::dispatch),
     ("risk", riskcarry::NAMES, riskcarry::dispatch),
     ("risk", riskw2::NAMES, riskw2::dispatch),
+    ("risk", w3::risk::NAMES, w3::risk::dispatch),
     ("usecase", usecase::NAMES, usecase::dispatch),
     ("vol", vol::NAMES, vol::dispatch),
     ("xva", xva::NAMES, xva::dispatch),

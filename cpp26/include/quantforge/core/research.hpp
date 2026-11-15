@@ -150,4 +150,59 @@ BaumWelch baum_welch(const std::vector<double>& y, const std::vector<double>& in
                      const std::vector<double>& means, const std::vector<double>& sds, double tolerance,
                      long long max_iterations);
 
+// ---- stage J wave 3 (rulings J-W3-1 to J-W3-14): scenario-stress.md, interp-backtest.md, drift-detectors.md ----
+struct Shock {
+    std::vector<double> start_yields, end_yields, shift_bp;
+    double level_bp, slope_bp;
+};
+/// Dates are day numbers (days since 1970-01-01), strictly increasing.
+Shock historical_shock(const std::vector<long long>& dates, const std::vector<double>& tenors, const Matrix2& yields,
+                       long long start, long long end);
+
+struct Replay {
+    std::vector<double> applied_bp, shocked_yields;
+    std::optional<double> pnl;
+};
+/// An empty optional dv01 means no P&L.
+Replay replay(const std::vector<double>& base_tenors, const std::vector<double>& base_yields,
+              const std::vector<double>& shock_tenors, const std::vector<double>& shock_bp, double scale,
+              const std::optional<std::vector<double>>& dv01);
+
+/// method: 0 linear, 1 log_linear, 2 cubic_natural, 3 monotone_pchip.
+struct LooBacktest {
+    std::vector<double> errors;
+    double max_abs_error, rmse;
+};
+LooBacktest interp_loo(int method, const std::vector<double>& x, const std::vector<double>& y);
+struct SurfaceBacktest {
+    Matrix2 errors;
+    double max_abs_error, rmse;
+};
+SurfaceBacktest surface_holdout(int method, const std::vector<double>& expiries, const std::vector<double>& strikes,
+                                const Matrix2& vols, const std::vector<long long>& holdout);
+
+struct Alarms {
+    std::vector<long long> alarms, directions;
+    double s_plus = 0, s_minus = 0;
+};
+Alarms cusum(const std::vector<double>& x, double k, double h, double mu0, double sigma, bool reset);
+/// direction: +1 up, -1 down, 0 both.
+Alarms page_hinkley(const std::vector<double>& x, double delta, double lambda, int direction, bool reset);
+struct Psi {
+    double psi;
+    std::vector<double> reference_shares, test_shares;
+    bool alarm;
+};
+Psi psi(const std::vector<double>& reference, const std::vector<double>& test, long long bins, double threshold);
+struct Ks {
+    double statistic, p_value;
+    bool reject;
+};
+Ks ks(const std::vector<double>& a, const std::vector<double>& b, double level);
+/// Exposed for the unit tests: the 128-bit lattice count and the binary64 probability walk.
+double ks_p_count(long long n, long long m, long long d);
+double ks_p_walk(long long n, long long m, long long d);
+/// Correctly rounded sum (Python math.fsum) for finite inputs.
+double fsum(const std::vector<double>& v);
+
 }  // namespace quantforge::research

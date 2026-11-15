@@ -1,4 +1,4 @@
-"""Stage J outside-library checks, waves 1 and 2 (J-19, J-W2-15, R6-13 outside share). Reads the committed goldens; never writes them.
+"""Stage J outside-library checks, waves 1 to 3 (J-19, J-W2-15, R6-13 outside share). Reads the committed goldens; never writes them.
 
 Each check runs a well-known open-source library on the golden's inputs and compares every compared output at the
 golden's own tolerance class (conformance/tolerances/policy.yaml: simple_analytic 1e-12 abs + 1e-10 rel, per_unit
@@ -25,6 +25,9 @@ Wave 2 (J-W2-15, ruling J-W2-16; program/WAVE2_ORACLE_NOTES.md):
   PyPortfolioOpt  BlackLittermanModel bl_returns, bl_cov
   hmmlearn      GaussianHMM.fit (Baum-Welch) from the given start values, its own stop rule
   esbt_j        no free library computes the Acerbi-Szekely Z2; not counted
+Wave 3 (R6-13): numpy interp, pandas loc (scen_j); numpy interp, scipy CubicSpline/Pchip (interpbt_j);
+  scipy ks_2samp exact, numpy quantile inverted_cdf + scipy rel_entr (drift_j KS, PSI). CUSUM and
+  Page-Hinkley have no library with the same conventions; not counted.
 
     python -m venv <venv outside the repo> && <venv>/Scripts/pip install -r requirements-outside-j.txt
     cd oracle/python && <venv>/Scripts/python -W ignore outside_j.py      writes oracle/OUTSIDE_J.json
@@ -43,7 +46,8 @@ ROOT = HERE.parents[1]
 GOLD = ROOT / "datasets" / "golden" / "stage_j"
 OUT = ROOT / "oracle" / "OUTSIDE_J.json"
 TOL = {"simple_analytic": (1e-12, 1e-10), "per_unit": (1e-10, 1e-8), "root_finding": (1e-10, 1e-10),
-       "likelihood_sum": (1e-9, 1e-10), "date_and_convention": None}
+       "likelihood_sum": (1e-9, 1e-10), "interpolation": (1e-10, 1e-8), "statistics": (1e-11, 1e-10),
+       "date_and_convention": None}
 
 
 def ver(p):
@@ -449,7 +453,104 @@ def baumwelch():
                        "sds = sqrt(covars_), iterations and converged read off the history (arithmetic)", "cases": rows}
 
 
-WAVES = {1: ("regime_j", "purgedcv_j", "rstats_j", "backtest_j"), 2: ("optim_j", "estim_j", "esbt_j", "baumwelch_j")}
+# ---------------------------------------------------------------- wave 3 (R6-13 floor; program/STAGE_J_HANDOVER.md)
+def scen():
+    """risk.scenario.replay: numpy.interp (linear, flat outside the end tenors: the J-W3-4 convention) on the
+    shock curve; shocked yields and P&L are arithmetic on its output. historical_shock: pandas date-indexed lookup
+    (DataFrame.loc) of the two rows; shifts, level and slope are arithmetic on the looked-up rows."""
+    rows, skipped = [], []
+    for c in load("scen_j"):
+        i = c["inputs"]
+        if c["operation"] == "risk.scenario.historical_shock":
+            # A pandas date lookup plus subtraction is not an outside check of the method (audit 2026-11-15).
+            skipped.append({"case_id": c["case_id"], "reason": "date lookup plus arithmetic; no library computes the "
+                            "method, so a pandas re-implementation is not counted"})
+            continue
+        if c["operation"] == "risk.scenario.replay":
+            a = i.get("scale", 1.0) * np.interp(i["base_tenors"], i["shock_tenors"], i["shock_bp"])
+            chk = [check(c, "applied_bp", a.tolist()),
+                   check(c, "shocked_yields", (np.asarray(i["base_yields"]) + a / 100.0).tolist(), via="arithmetic")]
+            if "dv01" in i:
+                chk.append(check(c, "pnl", float(-np.dot(i["dv01"], a)), via="arithmetic"))
+        rows.append(entry(c, chk))
+    return {"library": f"{ver('numpy')} interp (replay); the rest is arithmetic (library-primitive); "
+                       "historical_shock not counted", "cases": rows, "not_checked": skipped}
+
+
+def _interp(method, x, y, at):
+    from scipy import interpolate
+    if method == "linear":
+        return np.interp(at, x, y)
+    if method == "log_linear":
+        return np.exp(np.interp(at, x, np.log(y)))
+    if method == "cubic_natural":
+        return interpolate.CubicSpline(x, y, bc_type="natural")(at)
+    return interpolate.PchipInterpolator(x, y)(at)
+
+
+def interpbt():
+    """Leave-one-out and held-out strikes rebuilt with numpy.interp (linear; log_linear as exp of interp on log y),
+    scipy CubicSpline(bc_type="natural") and PchipInterpolator; errors, max and RMSE are arithmetic."""
+    rows = []
+    for c in load("interpbt_j"):
+        i = c["inputs"]
+        if c["operation"] == "research.backtest.interp_loo":
+            x, y = np.asarray(i["x"], float), np.asarray(i["y"], float)
+            e = np.array([_interp(i["method"], np.delete(x, k), np.delete(y, k), [x[k]])[0] - y[k]
+                          for k in range(1, len(x) - 1)])
+            flat = e
+            chk = [check(c, "errors", e.tolist(), via="arithmetic")]
+        else:
+            k, h = np.asarray(i["strikes"], float), list(i["holdout"])
+            keep = [j for j in range(len(k)) if j not in h]
+            e = []
+            for t, row in zip(i["expiries"], i["vols"], strict=True):
+                row = np.asarray(row, float)
+                w = _interp(i["method"], k[keep], row[keep] ** 2 * t, k[h])
+                e.append((np.sqrt(w / t) - row[h]).tolist())
+            flat = np.asarray(e).ravel()
+            chk = [check(c, "errors", e, via="arithmetic")]
+        chk += [check(c, "max_abs_error", float(np.abs(flat).max()), via="arithmetic"),
+                check(c, "rmse", float(np.sqrt(np.mean(flat ** 2))), via="arithmetic")]
+        rows.append(entry(c, chk))
+    return {"library": f"{ver('numpy')} interp; {ver('scipy')} CubicSpline natural, PchipInterpolator "
+                       "(library-primitive)", "cases": rows,
+            "note": "the interpbt_j goldens were generated with the same scipy/numpy interpolant calls, so this is a "
+                    "library-object golden re-run, not a second independent check"}
+
+
+def drift():
+    """KS: scipy.stats.ks_2samp(method="exact") statistic and p-value. PSI: numpy.quantile(method="inverted_cdf")
+    edges (the type-1 quantile of J-W3-12), numpy.searchsorted(side="left") right-closed bins, scipy.special.rel_entr
+    for the two KL terms; the 1e-4 floor and the sum are arithmetic. CUSUM and Page-Hinkley are not counted."""
+    from scipy import stats
+    why = {"research.drift.cusum": "no free library implements the tabular two-sided CUSUM on z = (x - mu0) / sigma "
+                                   "with restart (detecta.detect_cusum works on first differences); not counted",
+           "research.drift.page_hinkley": "river 0.27 PageHinkley differs in convention: its running minimum starts at "
+                                          "+inf (J-W3-11 includes the restart value 0), it has a min_instances gate and "
+                                          "reports no direction; not matched honestly, not counted"}
+    rows, skipped = [], []
+    for c in load("drift_j"):
+        i, op = c["inputs"], c["operation"]
+        if op == "research.drift.ks":
+            r = stats.ks_2samp(i["a"], i["b"], method="exact")
+            chk = [check(c, "statistic", float(r.statistic)), check(c, "p_value", float(r.pvalue)),
+                   check(c, "reject", bool(r.pvalue <= i.get("level", 0.05)), via="arithmetic")]
+        elif op == "research.drift.psi":
+            # numpy quantile/searchsorted plus rel_entr re-implements the PSI convention; not a library check
+            # of PSI (audit 2026-11-15), so not counted.
+            skipped.append({"case_id": c["case_id"], "reason": "no library computes PSI with these conventions; the "
+                            "quantile/searchsorted/rel_entr version is a re-implementation, not counted"})
+            continue
+        else:
+            skipped.append({"case_id": c["case_id"], "reason": why[op]})
+            continue
+        rows.append(entry(c, chk))
+    return {"library": f"{ver('scipy')} stats.ks_2samp exact (PSI, CUSUM, Page-Hinkley not counted)", "cases": rows, "not_checked": skipped}
+
+
+WAVES = {1: ("regime_j", "purgedcv_j", "rstats_j", "backtest_j"), 2: ("optim_j", "estim_j", "esbt_j", "baumwelch_j"),
+         3: ("scen_j", "interpbt_j", "drift_j")}
 
 
 def main(argv=None):
@@ -459,7 +560,8 @@ def main(argv=None):
                     help="run only these waves (default all); suites of other waves are kept from the committed file")
     a = ap.parse_args(argv)
     fns = {"regime_j": regime, "purgedcv_j": purgedcv, "rstats_j": rstats, "backtest_j": backtest,
-           "optim_j": optim, "estim_j": estim, "esbt_j": esbt, "baumwelch_j": baumwelch}
+           "optim_j": optim, "estim_j": estim, "esbt_j": esbt, "baumwelch_j": baumwelch,
+           "scen_j": scen, "interpbt_j": interpbt, "drift_j": drift}
     run = [s for w in (a.wave or sorted(WAVES)) for s in WAVES[w]]
     old = json.loads(OUT.read_text(encoding="utf-8"))["suites"] if OUT.is_file() else {}
     suites = {}

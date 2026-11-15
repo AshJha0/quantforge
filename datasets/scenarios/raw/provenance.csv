@@ -1,0 +1,17 @@
+name,url,utc_retrieved,sha256
+ust_2008.csv,https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2008/all?type=daily_treasury_yield_curve&field_tdr_date_value=2008&page&_format=csv,2026-11-15T08:02:37Z,686db01584dd45f67addc243ee0c42339d491171a0e947c8f88ecac78ee0e9ea
+ust_2013.csv,https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2013/all?type=daily_treasury_yield_curve&field_tdr_date_value=2013&page&_format=csv,2026-11-15T08:02:56Z,1e1a98426d9274afcc68467962f9238104db775b8765e48f45ac7488b33ff338
+ust_2020.csv,https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2020/all?type=daily_treasury_yield_curve&field_tdr_date_value=2020&page&_format=csv,2026-11-15T08:03:14Z,edcf1c8be9622f3cd92eb7de1847aefc3977e2118e2ff9af67f46614a5c306a7
+ust_2021.csv,https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2021/all?type=daily_treasury_yield_curve&field_tdr_date_value=2021&page&_format=csv,2026-11-15T08:03:33Z,1be57e49c63a99f6002431a1030c8fbe539b71066c3eaf14f9f58ddc34492cea
+ust_2022.csv,https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2022/all?type=daily_treasury_yield_curve&field_tdr_date_value=2022&page&_format=csv,2026-11-15T08:03:52Z,c33cb2758e5e34c2c23b7ab759d18681091860f3f9e5960112859f64f31cd814
+fred_DGS1MO.csv,https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS1MO&cosd=2008-09-01&coed=2022-10-31,2026-11-15T08:03:54Z,50eaf72a2662a98be824dc86d33c0659a5f8983b1b9a0fbb73c6bd13848db0b7
+fred_DGS3MO.csv,https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS3MO&cosd=2008-09-01&coed=2022-10-31,2026-11-15T08:03:55Z,510267808d9bf5b3185dc657a02d013dbeeacdb7e100b388a8f9007e75f103ec
+fred_DGS6MO.csv,https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS6MO&cosd=2008-09-01&coed=2022-10-31,2026-11-15T08:03:57Z,a9ece863d4eb860ff33a25b6f0a3719dd97c463b246f84de113c18ae58dce7f4
+fred_DGS1.csv,https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS1&cosd=2008-09-01&coed=2022-10-31,2026-11-15T08:03:58Z,4c5969ec51dad660de5c31ce8b4a09448d07ce8ca2cf6e377918a72acbe8cfb7
+fred_DGS2.csv,https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS2&cosd=2008-09-01&coed=2022-10-31,2026-11-15T08:03:59Z,3f6f5401ee5fe74112c50839a09b2e6f86cd28d79af3801d9f172096c2d650da
+fred_DGS3.csv,https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS3&cosd=2008-09-01&coed=2022-10-31,2026-11-15T08:04:01Z,785d512f3e2dc0b9f47f62dd0e8fe79f5b59c8b0382ae2b4e3ca83fbce8d2b5f
+fred_DGS5.csv,https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS5&cosd=2008-09-01&coed=2022-10-31,2026-11-15T08:04:02Z,51f8df3529defca6b0f66344fd90e9b7cec8e17c00b9defc9d56395ddbc6dd00
+fred_DGS7.csv,https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS7&cosd=2008-09-01&coed=2022-10-31,2026-11-15T08:04:03Z,4bc47a277522cc53df188e8a6850e62ad39992b7caae89ad0d104ed04925f8cd
+fred_DGS10.csv,https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10&cosd=2008-09-01&coed=2022-10-31,2026-11-15T08:04:03Z,e450d15e32b31b599e0fa1cbb244423dbebcad85809871d5889689660cbfc4fb
+fred_DGS20.csv,https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS20&cosd=2008-09-01&coed=2022-10-31,2026-11-15T08:04:04Z,b66581365cf9bfe5c209489c449100f4b51dbb8252496ab71b1e2aa10b1d64b7
+fred_DGS30.csv,https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS30&cosd=2008-09-01&coed=2022-10-31,2026-11-15T08:04:05Z,2b6ab5bfaccd0cc6e2ef827140e9adbeeea2b5e76bc0ce21215d5dbd87b2134d
