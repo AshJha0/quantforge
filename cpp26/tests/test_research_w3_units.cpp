@@ -274,7 +274,7 @@ TEST_CASE("w3u ks: ties, unequal sizes, levels and errors", "[research][w3u]") {
 
 TEST_CASE("w3u ks exact count and the 128-bit overflow fallback against closed forms", "[research][w3u]") {
     // d = n m (complete separation): p = 2 / C(n + m, n), from log-gamma.
-    const auto extreme = [](long long n, long long m) {
+    const auto extreme = [](double n, double m) {
         return 2.0 * std::exp(std::lgamma(n + 1.0) + std::lgamma(m + 1.0) - std::lgamma(n + m + 1.0));
     };
     // C(120, 60) ~ 9.7e34 fits 128 bits: the exact count path.
