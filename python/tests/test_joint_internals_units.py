@@ -109,7 +109,11 @@ def test_check_conditioned_is_silent_on_a_singular_matrix() -> None:
     # the check reports through QfError only: numpy's divide and invalid warnings are suppressed
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        for a in ([[1.0, 2.0], [2.0, 4.0]], [[0.0, 0.0], [0.0, 0.0]], [[math.nan, 0.0], [0.0, 1.0]]):
+        for a in (
+            [[1.0, 2.0], [2.0, 4.0]],
+            [[0.0, 0.0], [0.0, 0.0]],
+            [[math.nan, 0.0], [0.0, 1.0]],
+        ):
             _err(lambda a=a: joint._check_conditioned(a), "E_NO_CONVERGENCE", "instruments")
 
 
@@ -297,7 +301,10 @@ def _reprice_all(specs: list[CurveSpec], insts: list[InstrumentSpec], r: Any) ->
         jumps = tuple((d, turns[(c.name, d.isoformat())]) for d in c.turns)
         if c.type == "OIS_STEPS":
             built[c.name] = StepCurve(
-                AS_OF, oc["base_rate"], list(zip(c.step_dates, oc["step_rates"], strict=True)), jumps
+                AS_OF,
+                oc["base_rate"],
+                list(zip(c.step_dates, oc["step_rates"], strict=True)),
+                jumps,
             )
         else:
             built[c.name] = curves.Curve(
@@ -352,8 +359,15 @@ def test_four_curve_jacobian_columns_match_bump_and_resolve(qid: str) -> None:
 
     def bumped(sign: float) -> list[float]:
         moved = [
-            InstrumentSpec(i.id, i.curve, i.type, tenor=i.tenor, months=i.months,
-                           rate=i.rate + (sign * h if i.id == qid else 0.0), spread=i.spread)
+            InstrumentSpec(
+                i.id,
+                i.curve,
+                i.type,
+                tenor=i.tenor,
+                months=i.months,
+                rate=i.rate + (sign * h if i.id == qid else 0.0),
+                spread=i.spread,
+            )
             for i in insts
         ]
         return joint.joint_solve(AS_OF, specs, moved).x
@@ -395,8 +409,14 @@ def test_pillar_curve_options_reach_the_curve(
     interpolation: str, tension: float | None, step_end: date | None
 ) -> None:
     specs = [
-        CurveSpec("S", "OIS", convention="SOFR", interpolation=interpolation, tension=tension,
-                  step_end=step_end)
+        CurveSpec(
+            "S",
+            "OIS",
+            convention="SOFR",
+            interpolation=interpolation,
+            tension=tension,
+            step_end=step_end,
+        )
     ]
     insts = [
         InstrumentSpec("S6", "S", "OIS", tenor="6M", rate=0.041),
@@ -452,7 +472,10 @@ def test_two_turns_on_a_step_curve_have_their_own_columns() -> None:
 
     def par(tenor: str, l1: float, l2: float) -> float:
         sc = StepCurve(
-            AS_OF, c["base_rate"], [(STEP, c["step_rates"][0])], ((t1, math.exp(l1)), (t2, math.exp(l2)))
+            AS_OF,
+            c["base_rate"],
+            [(STEP, c["step_rates"][0])],
+            ((t1, math.exp(l1)), (t2, math.exp(l2))),
         )
         return ois.par_rate("ESTR", ois.periods("ESTR", AS_OF, tenor), sc)
 
@@ -478,12 +501,18 @@ def test_funding_curve_three_quotes_extrapolate_with_the_last_spread() -> None:
     e1, e2, e3 = date(2026, 10, 5), date(2028, 1, 5), date(2030, 1, 7)
     quotes = [(e1, 0.05), (e2, -0.002), (e3, 0.055)]
     curve = curves.build(DISC)
-    logs = [math.log(curve.discount(e)) + math.log(1 + r * (e - AS_OF).days / 360) for e, r in quotes]
+    logs = [
+        math.log(curve.discount(e)) + math.log(1 + r * (e - AS_OF).days / 360) for e, r in quotes
+    ]
     ts = [(e - AS_OF).days / 365 for e, _ in quotes]
     spreads, pillars, dfs = joint.funding_curve(DISC, quotes, [date(2032, 1, 5)])
     assert ts[0] != 1.0
     assert spreads == pytest.approx(
-        [logs[0] / ts[0], (logs[1] - logs[0]) / (ts[1] - ts[0]), (logs[2] - logs[1]) / (ts[2] - ts[1])],
+        [
+            logs[0] / ts[0],
+            (logs[1] - logs[0]) / (ts[1] - ts[0]),
+            (logs[2] - logs[1]) / (ts[2] - ts[1]),
+        ],
         rel=1e-13,
     )
     assert spreads[1] != spreads[2]
@@ -582,8 +611,14 @@ def test_two_turn_step_curve_jacobian_matches_bump_and_resolve() -> None:
 
     def insts(bump: str, h: float) -> list[InstrumentSpec]:
         return [
-            InstrumentSpec(q, "E", "OIS", tenor=tenors[q], rate=rates[q] + (h if q == bump else 0.0),
-                           turn=q in ("E6M", "E2Y"))
+            InstrumentSpec(
+                q,
+                "E",
+                "OIS",
+                tenor=tenors[q],
+                rate=rates[q] + (h if q == bump else 0.0),
+                turn=q in ("E6M", "E2Y"),
+            )
             for q in rates
         ]
 
@@ -610,4 +645,3 @@ def test_start_resets_every_turn_of_a_two_turn_curve() -> None:
     x = [9.0] * 4
     joint._start(AS_OF, blocks, x)
     assert x == [0.020, 0.020, 0.0, 0.0]
-

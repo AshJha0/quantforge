@@ -66,8 +66,11 @@ def _message(fn: Callable[[], object], code: str, field: str) -> str:
 
 
 def test_sample_initial_variance_of_zero_returns_message() -> None:
-    msg = _message(lambda: v.garch_loglik([0.0, 0.0, 0.0], 1e-6, 0.1, 0.8, "SAMPLE"),
-                   "E_DOMAIN", "initial_variance")
+    msg = _message(
+        lambda: v.garch_loglik([0.0, 0.0, 0.0], 1e-6, 0.1, 0.8, "SAMPLE"),
+        "E_DOMAIN",
+        "initial_variance",
+    )
     assert msg == "SAMPLE initial variance is zero"
 
 
@@ -85,7 +88,10 @@ def test_student_t_without_degrees_of_freedom_message() -> None:
 
 
 def _reference(
-    f: Callable[[list[float]], float], start: list[float], step: float, iterations: int,
+    f: Callable[[list[float]], float],
+    start: list[float],
+    step: float,
+    iterations: int,
     seen: set[str],
 ) -> tuple[list[float], float]:
     n = len(start)
@@ -130,7 +136,9 @@ def _reference(
                 seen.add(kind)
             else:
                 b = pts[0]
-                pts = [b] + [[bj + 0.5 * (pj - bj) for bj, pj in zip(b, p, strict=True)] for p in pts[1:]]
+                pts = [b] + [
+                    [bj + 0.5 * (pj - bj) for bj, pj in zip(b, p, strict=True)] for p in pts[1:]
+                ]
                 fs = [fs[0]] + [f(p) for p in pts[1:]]
                 seen.add("shrink")
     k = min(range(n + 1), key=lambda i: fs[i])
@@ -142,7 +150,9 @@ def _rosenbrock(x: list[float]) -> float:
 
 
 def _skewed(x: list[float]) -> float:
-    return (x[0] - 1) ** 2 + 3 * (x[1] + 0.5) ** 2 + 0.9 * (x[0] - 1) * (x[1] + 0.5) + (x[2] - 2) ** 4
+    return (
+        (x[0] - 1) ** 2 + 3 * (x[1] + 0.5) ** 2 + 0.9 * (x[0] - 1) * (x[1] + 0.5) + (x[2] - 2) ** 4
+    )
 
 
 def _kinked(x: list[float]) -> float:
@@ -167,7 +177,7 @@ CASES = [
 def test_nelder_mead_matches_the_textbook_iterate_by_iterate(case: int) -> None:
     f, start, step = CASES[case]
     seen: set[str] = set()
-    for iterations in range(0, 120):
+    for iterations in range(120):
         got = v._nelder_mead(f, list(start), step, iterations)
         want = _reference(f, list(start), step, iterations, seen)
         assert got == want, iterations
@@ -182,7 +192,13 @@ def test_nelder_mead_reference_runs_every_branch() -> None:
                 f, list(start), step, iterations, seen
             )
     assert seen == {
-        "expand", "reflect after expansion fails", "reflect", "outside", "inside", "shrink", "stop"
+        "expand",
+        "reflect after expansion fails",
+        "reflect",
+        "outside",
+        "inside",
+        "shrink",
+        "stop",
     }
 
 
