@@ -125,7 +125,7 @@ def test_garch_estimate_normal_matches_scipy_and_observed_information() -> None:
     assert out["mean"] == 0.0 and out["degrees_of_freedom"] is None
     se = np.sqrt(np.diag(np.linalg.inv(-_hessian(theta, np.asarray(RETURNS), s0))))
     std = out["std_errors"]
-    assert [std["omega"], std["alpha"], std["beta"]] == pytest.approx(list(se), rel=1e-3)
+    assert [std["omega"], std["alpha"], std["beta"]] == pytest.approx(list(se), rel=1e-3, abs=0)
     assert std["degrees_of_freedom"] is None
 
 
@@ -133,7 +133,7 @@ def test_garch_estimate_demean_subtracts_the_sample_mean() -> None:
     shifted = [x + 0.3 for x in RETURNS]
     out: Any = v.garch_estimate(shifted, "SAMPLE", "NORMAL", True)
     mu = math.fsum(shifted) / len(shifted)
-    assert out["mean"] == pytest.approx(mu, rel=1e-14)
+    assert out["mean"] == pytest.approx(mu, rel=1e-14, abs=0)
     # demeaned data is the original data shifted by 0.3 - mu (a tiny constant)
     e = np.asarray([x - mu for x in shifted])
     s0 = float(np.mean(e * e))
@@ -153,7 +153,7 @@ def test_garch_estimate_student_t() -> None:
     theta = [out["omega"], out["alpha"], out["beta"], out["degrees_of_freedom"]]
     # the log-likelihood is the t density sum, written here from the closed form
     ll = v.garch_loglik_t(r, theta[0], theta[1], theta[2], s0, "STUDENT_T", theta[3], 0.0)[0]
-    assert out["loglik"] == pytest.approx(ll, rel=1e-12)
+    assert out["loglik"] == pytest.approx(ll, rel=1e-12, abs=0)
     # an interior maximum: nudging any parameter lowers the likelihood
     for j in range(4):
         for d in (1.01, 0.99):
@@ -197,13 +197,16 @@ def _bs(kind: str, k: float, t: float, s: float, r: float, q: float, vol: float)
 
 
 AS_OF, MAT = date(2025, 1, 2), date(2026, 1, 2)  # 365 days, t = 1
+# 182 days: t = 182/365 is not 1, so 2/t and 2*t (and r*t and r/t) give different numbers
+MAT_H = date(2025, 7, 3)
+T_H = 182 / 365
 
 
 def test_varswap_one_put_one_call_by_hand() -> None:
-    s, r, q, t, step = 100.0, 0.03, 0.01, 1.0, 10.0
+    s, r, q, t, step = 100.0, 0.03, 0.01, T_H, 10.0
     vols = [(90.0, 0.25), (110.0, 0.2)]
     fair, vol, value = v.varswap_fair_strike(
-        AS_OF, MAT, s, r, q, [90.0], [110.0], vols, step, 0.04, 1000.0
+        AS_OF, MAT_H, s, r, q, [90.0], [110.0], vols, step, 0.04, 1000.0
     )
 
     def f(k: float) -> float:  # the log-contract payoff, (2/T)((K - S)/S - ln(K/S))
@@ -216,16 +219,16 @@ def test_varswap_one_put_one_call_by_hand() -> None:
     )
     fwd = s * math.exp((r - q) * t)
     want = 2 / t * ((r - q) * t - (fwd / s - 1)) + strip / math.exp(-r * t)
-    assert fair == pytest.approx(want, rel=1e-12)
-    assert vol == pytest.approx(math.sqrt(want), rel=1e-12)
-    assert value == pytest.approx(1000.0 * math.exp(-r * t) * (want - 0.04), rel=1e-12)
+    assert fair == pytest.approx(want, rel=1e-12, abs=0)
+    assert vol == pytest.approx(math.sqrt(want), rel=1e-12, abs=0)
+    assert value == pytest.approx(1000.0 * math.exp(-r * t) * (want - 0.04), rel=1e-12, abs=0)
 
 
 def test_varswap_two_strikes_per_side_uses_slope_differences() -> None:
-    s, t = 100.0, 1.0
+    s, t = 100.0, T_H
     puts, calls = [95.0, 85.0], [105.0, 115.0]
     vols = [(k, 0.2) for k in (*puts, *calls)]
-    fair = v.varswap_fair_strike(AS_OF, MAT, s, 0.0, 0.0, puts, calls, vols, 10.0, 0.0, 1.0)[0]
+    fair = v.varswap_fair_strike(AS_OF, MAT_H, s, 0.0, 0.0, puts, calls, vols, 10.0, 0.0, 1.0)[0]
 
     def f(k: float) -> float:
         return 2 / t * ((k - s) / s - math.log(k / s))
@@ -237,7 +240,7 @@ def test_varswap_two_strikes_per_side_uses_slope_differences() -> None:
         return sum(w * _bs(kind, k, t, s, 0.0, 0.0, 0.2) for w, k in zip(weights, ks))
 
     want = leg([105.0, 115.0], 125.0, "CALL") + leg([95.0, 85.0], 75.0, "PUT")
-    assert fair == pytest.approx(want, rel=1e-12)
+    assert fair == pytest.approx(want, rel=1e-12, abs=0)
 
 
 def test_varswap_dense_flat_smile_tends_to_sigma_squared() -> None:
@@ -247,7 +250,7 @@ def test_varswap_dense_flat_smile_tends_to_sigma_squared() -> None:
     calls = [s + 0.5 * i for i in range(1, 800)]
     vols = [(k, sig) for k in (*puts, *calls)]
     fair = v.varswap_fair_strike(AS_OF, MAT, s, 0.02, 0.0, puts, calls, vols, 0.5, 0.0, 1.0)[0]
-    assert fair == pytest.approx(sig * sig, rel=2e-3)
+    assert fair == pytest.approx(sig * sig, rel=2e-3, abs=0)
 
 
 def test_varswap_errors() -> None:
@@ -309,7 +312,7 @@ def test_varswap_errors() -> None:
     want = abs(f(120) - f(110)) / 10 * _bs("CALL", 110, tt, 100, 0, 0, 0.2) + abs(
         f(80) - f(90)
     ) / 10 * _bs("PUT", 90, tt, 100, 0, 0, 0.2)
-    assert one[0] == pytest.approx(want, rel=1e-9)
+    assert one[0] == pytest.approx(want, rel=1e-9, abs=0)
 
 
 # --- VIX --------------------------------------------------------------------------------------
@@ -345,9 +348,9 @@ def _hand_variance(minutes: int, rate: float) -> tuple[float, float]:
 def test_vix_term_variance_by_hand() -> None:
     fwd, k0, var, ks = v.vix_term_variance(30000, 0.04, STRIP)
     want_f, want_v = _hand_variance(30000, 0.04)
-    assert fwd == pytest.approx(want_f, rel=1e-15)
+    assert fwd == pytest.approx(want_f, rel=1e-15, abs=0)
     assert k0 == 100.0 and ks == [90.0, 95.0, 100.0, 105.0, 110.0]
-    assert var == pytest.approx(want_v, rel=1e-13)
+    assert var == pytest.approx(want_v, rel=1e-13, abs=0)
     # order of the strip does not matter
     assert v.vix_term_variance(30000, 0.04, list(reversed(STRIP)))[2] == var
 
@@ -365,11 +368,11 @@ def test_vix_uneven_gaps_and_zero_bids() -> None:
     ]
     t = 30000 / 525600
     fwd, k0, var, ks = v.vix_term_variance(30000, 0.0, strip)
-    assert fwd == pytest.approx(100.2, rel=1e-15) and k0 == 100.0
+    assert fwd == pytest.approx(100.2, rel=1e-15, abs=0) and k0 == 100.0
     assert ks == [70.0, 90.0, 100.0, 102.0]
     pieces = [(70.0, 20.0, 0.2), (90.0, 15.0, 0.5), (100.0, 6.0, 4.1), (102.0, 2.0, 3.0)]
     total = sum(gap / (k * k) * p for k, gap, p in pieces)
-    assert var == pytest.approx(2 / t * total - 1 / t * (100.2 / 100 - 1) ** 2, rel=1e-13)
+    assert var == pytest.approx(2 / t * total - 1 / t * (100.2 / 100 - 1) ** 2, rel=1e-13, abs=0)
 
 
 def test_vix_null_quotes() -> None:
@@ -384,7 +387,7 @@ def test_vix_null_quotes() -> None:
     assert k0 == 100.0 and ks == [90.0, 100.0, 105.0]
     t = 30000 / 525600
     total = 10 / 8100 * 0.5 + 7.5 / 10000 * 4.1 + 5 / 11025 * 2.0
-    assert var == pytest.approx(2 / t * total - 1 / t * (fwd / 100 - 1) ** 2, rel=1e-13)
+    assert var == pytest.approx(2 / t * total - 1 / t * (fwd / 100 - 1) ** 2, rel=1e-13, abs=0)
     # a null quote that is used raises
     q = v.Quote(1.0, None, 1.0, 1.0, 1.0)
     _err(lambda: q.call, "E_INPUT", "strip")
@@ -430,10 +433,10 @@ def test_vix_index_interpolates_to_30_days() -> None:
     n1, n2 = 30000, 50000
     vix, v1, v2 = v.vix_index((n1, 0.04, STRIP), (n2, 0.05, STRIP))
     w1, w2 = _hand_variance(n1, 0.04)[1], _hand_variance(n2, 0.05)[1]
-    assert (v1, v2) == pytest.approx((w1, w2), rel=1e-13)
+    assert (v1, v2) == pytest.approx((w1, w2), rel=1e-13, abs=0)
     t1, t2 = n1 / 525600, n2 / 525600
     mix = t1 * w1 * (n2 - 43200) / (n2 - n1) + t2 * w2 * (43200 - n1) / (n2 - n1)
-    assert vix == pytest.approx(100 * math.sqrt(mix * 525600 / 43200), rel=1e-13)
+    assert vix == pytest.approx(100 * math.sqrt(mix * 525600 / 43200), rel=1e-13, abs=0)
     # at exactly 30 days the near term is the index
     at = v.vix_index((43200, 0.04, STRIP), (50000, 0.05, STRIP))[0]
     assert at == pytest.approx(100 * math.sqrt(_hand_variance(43200, 0.04)[1]), rel=1e-13)
@@ -455,3 +458,128 @@ def test_vix_index_errors() -> None:
     ]
     assert v.vix_term_variance(30000, 0.0, wide)[2] < 0
     _err(lambda: v.vix_index((30000, 0.0, wide), (50000, 0.0, wide)), "E_DOMAIN", "near")
+
+
+def test_varswap_boundaries_and_sign_of_fair() -> None:
+    # spot = 0 is not positive (checked after the strike-side checks, so strikes straddle 0)
+    _err(
+        lambda: v.varswap_fair_strike(
+            AS_OF, MAT_H, 0.0, 0.0, 0.0, [-1.0], [1.0], [(-1.0, 0.2), (1.0, 0.2)], 0.5, 0.0, 1.0
+        ),
+        "E_DOMAIN",
+        "spot",
+    )
+    # a spot and a lowest put minus step below 1 are still valid (the bounds are 0, not 1)
+    small = v.varswap_fair_strike(
+        AS_OF, MAT_H, 0.5, 0.0, 0.0, [0.45], [0.55], [(0.45, 0.2), (0.55, 0.2)], 0.05, 0.0, 1.0
+    )
+    # the replication is scale free: K/S, prices / S, so spot 0.5 gives the spot 100 answer
+    big = v.varswap_fair_strike(
+        AS_OF, MAT_H, 100.0, 0.0, 0.0, [90.0], [110.0], [(90.0, 0.2), (110.0, 0.2)], 10.0, 0.0, 1.0
+    )
+    assert small[0] == pytest.approx(big[0], rel=1e-12, abs=0)
+    # vols so small that both options are worth exactly 0 (d1 ~ -500): the strip is 0, and with
+    # r = q = 0 the fair variance is exactly 0, which is allowed (only fair < 0 is refused)
+    zero = v.varswap_fair_strike(
+        AS_OF,
+        MAT_H,
+        100.0,
+        0.0,
+        0.0,
+        [90.0],
+        [110.0],
+        [(90.0, 1e-4), (110.0, 1e-4)],
+        10.0,
+        0.0,
+        2.0,
+    )
+    assert zero == (0.0, 0.0, -0.0) or zero == (0.0, 0.0, 0.0)
+    # with r > q the carry term 2/T (rT - (e^{rT} - 1)) ~ -r^2 T is negative and the strip is 0
+    _err(
+        lambda: v.varswap_fair_strike(
+            AS_OF,
+            MAT_H,
+            100.0,
+            0.05,
+            0.0,
+            [90.0],
+            [110.0],
+            [(90.0, 1e-4), (110.0, 1e-4)],
+            10.0,
+            0.0,
+            1.0,
+        ),
+        "E_DOMAIN",
+        "vols",
+    )
+
+
+def test_vix_first_zero_bid_next_to_k0_is_skipped() -> None:
+    # Cboe: a zero bid is skipped, two consecutive zeros stop. The first strike below K0 has a
+    # zero bid, the next one does not: the walk must go on and keep 90.
+    strip = [
+        _quote(90.0, 10.6, 0.5),
+        _quote(95.0, 6.4, 0.0, half=0.0),
+        _quote(100.0, 4.2, 4.0),
+        _quote(105.0, 2.0, 7.1),
+        _quote(110.0, 0.75, 10.9),
+    ]
+    ks = v.vix_term_variance(30000, 0.0, strip)[3]
+    assert ks == [90.0, 100.0, 105.0, 110.0]
+
+
+def test_vix_half_null_series_are_removed_before_the_walk() -> None:
+    # ruling F-15: a put with a bid but no ask is a null series, not a usable put
+    strip = [
+        _quote(90.0, 10.6, 0.5),
+        v.Quote(95.0, 6.35, 6.45, 1.45, None),
+        _quote(100.0, 4.2, 4.0),
+        v.Quote(105.0, 1.95, None, 7.05, 7.15),
+        _quote(110.0, 0.75, 10.9),
+    ]
+    ks = v.vix_term_variance(30000, 0.0, strip)[3]
+    assert ks == [90.0, 100.0, 110.0]
+
+
+def test_vix_k0_with_one_null_side_is_refused_by_its_own_check() -> None:
+    strip = [
+        _quote(90.0, 10.6, 0.5),
+        _quote(100.0, 4.2, 4.0),
+        _quote(100.1, None, 4.0),  # F = 100.2 makes 100.1 K0; its call is null
+        _quote(110.0, 0.75, 10.9),
+    ]
+    with pytest.raises(QfError) as e:
+        v.vix_term_variance(30000, 0.0, strip)
+    assert e.value.message == "the K0 call or put has a null quote"
+
+
+def test_garch_fit_without_a_finite_likelihood() -> None:
+    # r^2 = 1e400 overflows binary64 at every parameter point, so every objective value is inf
+    _err(lambda: v.garch_fit([1e200, -1e200] * 15, 1.0), "E_NO_CONVERGENCE", None)
+
+
+def test_loglik_t_normal_ignores_degrees_of_freedom() -> None:
+    # the t density is used only for STUDENT_T; NORMAL with a nu given is the Gaussian sum
+    r = [0.1, -0.2, 0.3]
+    t1, s0 = 0.01 + 0.1 * 0.01 + 0.8 * (0.14 / 3), 0.14 / 3
+    s = [s0, t1, 0.01 + 0.1 * 0.04 + 0.8 * t1]
+    want = -0.5 * sum(math.log(2 * math.pi) + math.log(si) + x * x / si for x, si in zip(r, s))
+    got = v.garch_loglik_t(r, 0.01, 0.1, 0.8, "SAMPLE", "NORMAL", 5.0, 0.0)[0]
+    assert got == pytest.approx(want, rel=1e-14, abs=0)
+
+
+def test_student_estimate_accepts_exactly_100_returns() -> None:
+    r = _simulate(100, 0.05, 0.12, 0.8, seed=3)
+    try:
+        v.garch_estimate(r, "SAMPLE", "STUDENT_T", False)
+    except QfError as e:  # a short sample may have no interior maximum, but it is long enough
+        assert e.code != "E_INPUT"
+
+
+def test_varswap_realized_prices_below_one() -> None:
+    # prices need only be positive: 0.5 -> 0.6 -> 0.45, variance = 252/2 (ln 1.2^2 + ln 0.75^2)
+    var, vol, value = v.varswap_realized([0.5, 0.6, 0.45], 252.0, 0.04, 10.0)
+    want = 252.0 / 2 * (math.log(1.2) ** 2 + math.log(0.75) ** 2)
+    assert var == pytest.approx(want, rel=1e-14, abs=0)
+    assert vol == pytest.approx(math.sqrt(want), rel=1e-14, abs=0)
+    assert value == pytest.approx(10.0 * (want - 0.04), rel=1e-14, abs=0)
