@@ -146,7 +146,7 @@ def test_costs_given_kinked_and_cost() -> None:
         {"margin_rates": [0.0]},
         {"margin_limit": 0.0},
     ):
-        assert hs.Costs(**kw).given(), kw  # type: ignore[arg-type]
+        assert hs.Costs(**kw).given(), kw
     assert hs.Costs(half_spreads=[0.1], cost_weight=1.0).kinked()
     assert not hs.Costs(half_spreads=[0.1], cost_weight=0.0).kinked()
     assert not hs.Costs(half_spreads=[0.0, 0.0]).kinked()
@@ -915,3 +915,177 @@ def test_option_hedge_lots_against_brute_force(case: int) -> None:
     assert out["rounding_cost"] == pytest.approx(want["rounding"], rel=1e-7, abs=1e-12)
     if case == 1:
         assert out["lots"] == [6]
+
+
+# --------------------------------------------------------------------------------------------
+# The linear-programming helpers: simplex, phase 1, least margin
+
+
+def test_simplex_phase_two_moves_to_the_cheaper_vertex() -> None:
+    # min 2 z1 + z2, z1 + z2 = 3, z >= 0: phase 1 (Bland) enters z1 first; phase 2 must swap to z2.
+    z = hs._simplex(np.array([[1.0, 1.0]]), np.array([3.0]), np.array([2.0, 1.0]))
+    assert z is not None and z.tolist() == [0.0, 3.0]
+    z = hs._simplex(np.array([[1.0, 1.0]]), np.array([3.0]), np.array([1.0, 2.0]))
+    assert z is not None and z.tolist() == [3.0, 0.0]
+    # A negative right-hand side is flipped before the artificials start at b.
+    z = hs._simplex(np.array([[-1.0, -1.0]]), np.array([-3.0]), np.array([2.0, 1.0]))
+    assert z is not None and z.tolist() == [0.0, 3.0]
+
+
+def test_simplex_degenerate_artificials_and_redundant_rows() -> None:
+    cost = np.array([2.0, 1.0])
+    z = hs._simplex(np.array([[1.0, 1.0], [2.0, 2.0]]), np.array([3.0, 6.0]), cost)
+    assert z is not None and z.tolist() == [0.0, 3.0]
+    z = hs._simplex(np.array([[1.0, 1.0], [0.0, 0.0]]), np.array([3.0, 0.0]), cost)
+    assert z is not None and z.tolist() == [0.0, 3.0]
+    z = hs._simplex(np.array([[0.0, 0.0], [1.0, 1.0]]), np.array([0.0, 3.0]), cost)
+    assert z is not None and z.tolist() == [0.0, 3.0]
+
+
+def test_simplex_infeasible_and_unbounded() -> None:
+    assert hs._simplex(np.array([[1.0, 1.0]]), np.array([-1.0]), np.array([1.0, 1.0])) is None
+    assert hs._simplex(np.array([[1.0], [1.0]]), np.array([1.0, 2.0]), np.array([1.0])) is None
+    assert err(hs._simplex, np.array([[1.0, -1.0]]), np.array([1.0]), np.array([-1.0, 0.0])) == (
+        "E_NO_CONVERGENCE",
+        "the margin search is unbounded",
+        None,
+    )
+
+
+@pytest.mark.parametrize("seed", range(6))
+def test_simplex_matches_scipy_on_random_bounded_programs(seed: int) -> None:
+    from scipy.optimize import linprog
+
+    rng = np.random.default_rng(seed)
+    a = rng.normal(size=(3, 7))
+    b = a @ rng.uniform(0.0, 2.0, size=7)  # feasible by construction
+    if seed % 2:  # some negative right-hand sides
+        a[b > 0] *= -1.0
+        b = -np.abs(b)
+    cost = rng.uniform(0.5, 3.0, size=7)
+    want = linprog(cost, A_eq=a, b_eq=b, bounds=(0, None), method="highs")
+    z = hs._simplex(a, b, cost)
+    assert want.status == 0 and z is not None
+    assert float(cost @ z) == pytest.approx(want.fun, rel=1e-10)
+    assert z == pytest.approx(want.x, abs=1e-9)
+    assert np.abs(a @ z - b).max() < 1e-10 and z.min() >= 0.0
+
+
+def test_phase_one_handles_every_kind_of_bound() -> None:
+    # E = I fixes the point, so each column form is used: u - s, p - q, l + s, l + s with s + t = u - l.
+    lower = [None, None, 0.0, -1.0]
+    upper = [1.0, None, None, 2.0]
+    x = hs._phase_one(np.eye(4), np.array([-2.0, -4.0, 0.5, 1.25]), lower, upper)
+    assert x is not None and x.tolist() == [-2.0, -4.0, 0.5, 1.25]
+    x = hs._phase_one(np.eye(2), np.array([3.0, 0.75]), [None, 0.25], [None, 0.75])
+    assert x is not None and x.tolist() == [3.0, 0.75]
+
+
+def test_phase_one_finds_a_feasible_point_or_none() -> None:
+    e = np.array([[1.0, 2.0, -1.0], [0.5, -1.0, 1.0]])
+    rhs = np.array([1.5, -0.25])
+    lower = [-1.0, 0.0, None]
+    upper = [1.0, None, 3.0]
+    x = hs._phase_one(e, rhs, lower, upper)
+    assert x is not None
+    assert np.abs(e @ x - rhs).max() < 1e-14
+    assert -1.0 <= x[0] <= 1.0 and x[1] >= 0.0 and x[2] <= 3.0
+    assert hs._phase_one(np.array([[1.0, 1.0]]), np.array([3.0]), [0.0, 0.0], [1.0, 1.0]) is None
+    assert (
+        hs._phase_one(np.array([[1.0, -1.0]]), np.array([-0.5]), [0.0, None], [None, 0.0]) is None
+    )
+
+
+def test_phase_one_infeasibility_is_judged_relative_to_the_data_scale() -> None:
+    # 100 x = 100 + 1e-8 with x <= 1 misses by 1e-8: well inside 1e-9 of the data scale (100).
+    x = hs._phase_one(np.array([[100.0]]), np.array([100.0 + 1e-8]), [0.0], [1.0])
+    assert x is not None and x.tolist() == [1.0]
+    assert hs._phase_one(np.array([[100.0]]), np.array([100.0 + 1e-6]), [0.0], [1.0]) is None
+
+
+def test_least_margin_points() -> None:
+    e = np.array([[1.0, 1.0]])
+    rates = np.array([1.0, 3.0])
+    # min |x1| + 3 |x2| with x1 + x2 = 3: x1 = 3 unless a bound stops it.
+    got = hs._least_margin(e, np.array([3.0]), [None, None], [None, None], rates)
+    assert got is not None and got.tolist() == [3.0, 0.0]
+    got = hs._least_margin(e, np.array([3.0]), [None, None], [2.0, None], rates)
+    assert got is not None and got.tolist() == [2.0, 1.0]
+    got = hs._least_margin(e, np.array([3.0]), [None, 1.5], [2.0, None], rates)
+    assert got is not None and got.tolist() == [1.5, 1.5]
+    got = hs._least_margin(e, np.array([-3.0]), [-2.0, None], [None, None], rates)
+    assert got is not None and got.tolist() == [-2.0, -1.0]
+    # Bounds alone: the point nearest 0 in each box.
+    no_rows = np.zeros((0, 3))
+    got = hs._least_margin(no_rows, np.zeros(0), [1.0, None, -4.0], [2.0, -0.5, None], np.ones(3))
+    assert got is not None and got.tolist() == [1.0, -0.5, 0.0]
+    got = hs._least_margin(np.zeros((0, 2)), np.zeros(0), [None, None], [None, None], np.ones(2))
+    assert got is not None and got.tolist() == [0.0, 0.0]
+    assert hs._least_margin(e, np.array([3.0]), [None, None], [1.0, 1.0], rates) is None
+
+
+# --------------------------------------------------------------------------------------------
+# Integer search
+
+
+def test_integer_search_returns_the_points_within_the_incumbent_radius() -> None:
+    free: list[tuple[int | None, int | None]] = [(None, None)] * 2
+    r = np.array([[2.0, 1.0], [0.0, 1.0]])
+    # |R (n - n0)|^2 at (0, 0) is 0.4 and at the incumbent (0, -1) 1.6; only (0, 0) survives.
+    assert hs._integer_search(r, np.array([0.4, -0.6]), free, [0, -1]) == [[0, 0]]
+    # A tie at 0.25: both points come back, in enumeration order.
+    assert hs._integer_search(np.eye(2), np.array([0.5, 0.0]), free, [0, 0]) == [[0, 0], [1, 0]]
+    # n0 on the lattice: radius 0, the point itself.
+    assert hs._integer_search(np.eye(2), np.array([1.0, 2.0]), free, [1, 2]) == [[1, 2]]
+    # The box clips the ellipse.
+    box: list[tuple[int | None, int | None]] = [(1, None), (None, None)]
+    assert hs._integer_search(np.eye(2), np.array([0.2, 0.0]), box, [1, 0]) == [[1, 0]]
+
+
+def test_integer_search_node_limit() -> None:
+    # One dimension, R = 1e-7, incumbent far away: exactly 1,000,000 values are visited in the
+    # box [0, 999999], which is allowed (the radius shrinks to 0 at v = 0 but every value of the
+    # first sweep is still visited); one more value is E_NO_CONVERGENCE.
+    r = np.array([[1e-7]])
+    assert hs._integer_search(r, np.array([0.0]), [(0, 999_999)], [999_999]) == [[0]]
+    assert err(hs._integer_search, r, np.array([0.0]), [(0, 1_000_000)], [1_000_000]) == (
+        "E_NO_CONVERGENCE",
+        "the integer search is too large",
+        None,
+    )
+
+
+# --------------------------------------------------------------------------------------------
+# qp_solve thresholds and paths
+
+
+def test_qp_equality_dependence_threshold_is_relative_and_inclusive() -> None:
+    a = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
+    edge = err(hs.qp_solve, a, B2, W2, eq_matrix=[[1.0, 0.0], [0.0, 1e-12]], eq_rhs=[1.0, 0.0])
+    assert edge[0] == "E_SINGULAR"
+    out = hs.qp_solve(a, B2, W2, eq_matrix=[[1e6, 0.0], [0.0, 1e-5]], eq_rhs=[1e6, 2e-5])
+    assert out["x"] == pytest.approx([1.0, 2.0], rel=1e-9)
+    big = err(hs.qp_solve, a, B2, W2, eq_matrix=[[1e6, 0.0], [0.0, 1e-7]], eq_rhs=[1.0, 0.0])
+    assert big[0] == "E_SINGULAR"
+
+
+def test_min_norm_rank_cut_is_relative_to_the_largest_squared_singular_value() -> None:
+    # Columns with singular values 1e3 and s: kept when s^2 > 1e-12 * 1e6 = 1e-6.
+    for s, rank in ((1e-2, 2), (1e-4, 1), (2e-3, 2), (5e-4, 1)):
+        out = hs.qp_solve([[1e3, 0.0], [0.0, s]], [-1e3, -s], [1.0, 1.0], singular="MIN_NORM")
+        assert out["rank"] == rank, s
+        assert out["x"] == pytest.approx([1.0, 1.0 if rank == 2 else 0.0], rel=1e-12)
+
+
+def test_scaled_solve_falls_back_to_caller_units_when_the_equalities_drift() -> None:
+    # Column norms 1e5 and 1e-8: x = D x~ misses sum x = 1 in rounding, so the solve is repeated
+    # unscaled. Oracle: eliminate x1 = 1 - x0 - x2 and solve the 2-column least squares.
+    a = np.array([[1e5, 1e-8, 2e5], [3e5, -2e-8, 1e5], [-1e5, 1e-8, 1e5], [2e5, 3e-8, -1e5]])
+    b = np.array([1.0, -0.5, 0.25, 2.0])
+    out = hs.qp_solve(a.tolist(), b.tolist(), [1.0] * 4, eq_matrix=[[1.0, 1.0, 1.0]], eq_rhs=[1.0])
+    red = a[:, [0, 2]] - a[:, [1]]
+    y = np.linalg.lstsq(red, -(b + a[:, 1]), rcond=None)[0]
+    want = [y[0], 1.0 - y[0] - y[1], y[1]]
+    assert out["x"] == pytest.approx(want, rel=1e-9)
+    assert abs(sum(out["x"]) - 1.0) <= 1e-15
+    assert out["rank"] == 2
