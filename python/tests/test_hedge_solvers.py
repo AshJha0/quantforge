@@ -364,7 +364,36 @@ def test_property_min_norm_equals_the_unique_solution(n: int, data: st.DataObjec
         raise
     least = hs.qp_solve(a, b, w, singular="MIN_NORM")
     assert least["rank"] == unique["rank"] == n
-    assert np.allclose(least["x"], unique["x"], rtol=1e-9, atol=1e-9)
+    assert_same_least_squares_solution(a, unique, least)
+
+
+def assert_same_least_squares_solution(a: Any, unique: Any, least: Any) -> None:
+    """ERROR solves the column-scaled problem, MIN_NORM the unscaled one, so the two agree only
+    to the least-squares perturbation bound [GV13 5.3.8]: a backward-stable solve moves x by
+    about eps (kappa |x| + kappa^2 |r| / |A|), where r = A x + b is the residual at the optimum.
+    The kappa^2 term matters when the residual is not small, so a fixed 1e-9 is not a bound."""
+    m = np.asarray(a, dtype=float)
+    kappa = float(np.linalg.cond(m))
+    top = float(np.linalg.norm(m, 2))
+    x = np.asarray(unique["x"], dtype=float)
+    r = float(np.linalg.norm(unique["residual"]))
+    eps = np.finfo(float).eps
+    bound = 64 * eps * (kappa * float(np.linalg.norm(x)) + kappa * kappa * r / top)
+    assert float(np.linalg.norm(np.asarray(least["x"]) - x)) <= bound
+
+
+def test_min_norm_agrees_within_the_least_squares_bound_with_a_large_residual() -> None:
+    # Found by the property above (hypothesis kept it in mutmut's example database, so every
+    # mutmut stats run replayed it): b sits in a zero row, so the residual is 1 while x = 0, and
+    # kappa ~ 4e4 makes the kappa^2 |r| term about 1e-7, far above a fixed 1e-9.
+    a = [[0.0, 0.0], [1.2396667442731475, 1.0], [0.0, 6.103515625e-05], [0.0, 0.0]]
+    b = [1.0, 0.0, 0.0, 0.0]
+    w = [1.0] * 4
+    unique = hs.qp_solve(a, b, w)
+    least = hs.qp_solve(a, b, w, singular="MIN_NORM")
+    assert unique["x"] == [0.0, 0.0]  # rows 2 and 3 force x = 0 exactly
+    assert least["rank"] == unique["rank"] == 2
+    assert_same_least_squares_solution(a, unique, least)
 
 
 # ----- hedge.integer.solve -----
