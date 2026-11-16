@@ -1547,3 +1547,190 @@ def test_iteration_caps_raise_no_convergence(monkeypatch: pytest.MonkeyPatch) ->
         "the active-set search did not settle",
         None,
     )
+
+
+# --------------------------------------------------------------------------------------------
+# Degenerate small problems (integer data, positions on bounds, kinks at 0), each checked
+# against the SLSQP oracle above. Found by a mutation-guided search; the expected values come
+# from the oracle, not from the code under test.
+
+DEGENERATE: list[tuple[Any, Any, dict[str, Any]]] = [
+    (  # unit weights, bounds on two of three, two equalities
+        [[-2.0, 1.0, -1.0], [2.0, 2.0, -1.0], [0.0, 0.0, 0.0], [2.0, 1.0, 1.0]],
+        [1.0, -2.0, 1.0, -1.0],
+        {
+            "lower": [None, None, -2.0],
+            "upper": [0.0, None, None],
+            "eq_matrix": [[-1.0, 0.0, 1.0], [0.0, -1.0, 0.0]],
+            "eq_rhs": [-1.0, 1.0],
+        },
+    ),
+    (  # a fixed position (lower == upper == 0) and a ridge
+        [[1.0, -1.0, -1.0], [2.0, 0.0, 0.0]],
+        [0.0, 1.0],
+        {
+            "lower": [0.0, 0.0, None],
+            "upper": [0.0, 3.0, None],
+            "eq_matrix": [[1.0, 1.0, 0.0], [1.0, 0.0, 0.0]],
+            "eq_rhs": [1.0, 0.0],
+            "ridge": 0.5,
+        },
+    ),
+    (  # a spread of 0 on one instrument (not kinked), two equalities, ridge
+        [[2.0, 2.0, 0.0], [2.0, -1.0, -1.0], [0.0, -1.0, -2.0], [1.0, 0.0, 2.0]],
+        [-2.0, -2.0, 1.0, 1.0],
+        {
+            "eq_matrix": [[-1.0, 1.0, 1.0], [0.0, 0.0, -1.0]],
+            "eq_rhs": [1.0, -1.0],
+            "half_spreads": [0.0, 1.0, 2.0],
+            "ridge": 0.5,
+        },
+    ),
+    (  # margin on a position pinned at 1 by its bounds
+        [[-2.0, 0.0], [2.0, 0.0], [0.0, 2.0]],
+        [1.0, -2.0, 1.0],
+        {
+            "lower": [1.0, None],
+            "upper": [1.0, None],
+            "margin_rates": [1.0, 0.0],
+            "margin_limit": 3.0,
+        },
+    ),
+    (  # margin, an equality and mixed bounds; the optimum is a vertex
+        [[2.0, 2.0, -1.0], [2.0, -1.0, -1.0], [0.0, 0.0, 2.0], [-2.0, 0.0, 1.0]],
+        [0.0, 3.0, 2.0, -2.0],
+        {
+            "lower": [None, -1.0, 0.0],
+            "upper": [1.0, 2.0, None],
+            "eq_matrix": [[1.0, -1.0, 0.0]],
+            "eq_rhs": [-2.0],
+            "margin_rates": [1.0, 1.0, 1.0],
+            "margin_limit": 3.0,
+        },
+    ),
+    (  # one residual row, an upper bound below 0 and an equality: a negative start
+        [[1.0, 2.0]],
+        [3.0],
+        {
+            "upper": [-1.0, None],
+            "eq_matrix": [[-1.0, -1.0]],
+            "eq_rhs": [2.0],
+            "margin_rates": [2.0, 2.0],
+            "margin_limit": 5.0,
+        },
+    ),
+    (  # spreads with an equality pair, an upper bound below 0 and a box
+        [[2.0, 1.0, 2.0], [-2.0, 2.0, 2.0], [1.0, 2.0, 1.0], [2.0, 2.0, 0.0]],
+        [2.0, 3.0, -1.0, -3.0],
+        {
+            "lower": [None, None, 0.0],
+            "upper": [None, -1.0, 2.0],
+            "eq_matrix": [[-1.0, 0.0, -1.0], [-1.0, -1.0, 1.0]],
+            "eq_rhs": [1.0, 2.0],
+            "half_spreads": [1.0, 0.0, 1.0],
+        },
+    ),
+    (  # a position that must leave 0 for the negative side ([0, 2] -> free below 0 too)
+        [[0.0, 0.0, -2.0], [0.0, 0.0, 1.0], [0.0, -2.0, -2.0], [0.0, 1.0, 2.0]],
+        [2.0, 1.0, -3.0, 2.0],
+        {
+            "lower": [0.0, 0.0, None],
+            "upper": [None, 3.0, 2.0],
+            "half_spreads": [2.0, 2.0, 2.0],
+            "ridge": 0.5,
+        },
+    ),
+]
+
+
+@pytest.mark.parametrize("case", range(len(DEGENERATE)))
+def test_degenerate_small_problems_match_the_oracle(case: int) -> None:
+    a, b, kw = DEGENERATE[case]
+    w = [1.0] * len(b)
+    out = hs.qp_solve(a, b, w, **kw)
+    want, best = costed_oracle(
+        a,
+        b,
+        w,
+        kw.get("ridge", 0.0),
+        kw.get("eq_matrix"),
+        kw.get("eq_rhs"),
+        kw.get("lower"),
+        kw.get("upper"),
+        kw.get("half_spreads"),
+        None,
+        1.0,
+        kw.get("margin_rates"),
+        kw.get("margin_limit"),
+    )
+    assert out["objective"] == pytest.approx(best, rel=1e-8, abs=1e-9)
+    assert out["x"] == pytest.approx(want.tolist(), abs=1e-5)
+
+
+def test_phase_one_on_a_pair_of_rows_with_mixed_bounds() -> None:
+    e = np.array([[-2.0, 2.0, 1.0], [-2.0, -2.0, 0.0]])
+    rhs = np.array([0.0, 8.0])
+    lower = [-3.0, -4.0, -1.0]
+    upper = [0.0, -1.0, None]
+    x = hs._phase_one(e, rhs, lower, upper)
+    assert x is not None
+    assert np.abs(e @ x - rhs).max() < 1e-14
+    assert all(lo <= v for lo, v in zip(lower, x))
+    assert x[0] <= 0.0 and x[1] <= -1.0
+
+
+@pytest.mark.parametrize(
+    "a, b, cost",
+    [
+        ([[-1.0, 1.0, 1.0], [-2.0, -1.0, -2.0]], [2.0, -2.0], [0.0, 3.0, 0.0]),
+        (
+            [[2.0, 2.0, 1.0, 2.0, 1.0], [-1.0, 2.0, 1.0, 1.0, 2.0], [2.0, 2.0, 1.0, 2.0, 1.0]],
+            [2.0, 4.0, 2.0],
+            [-1.0, 0.0, -1.0, -1.0, 3.0],
+        ),
+        ([[0.0, 0.0], [-1.0, -1.0], [-2.0, 0.0], [0.0, 0.0]], [0.0, -2.0, 0.0, 0.0], [0.0, -1.0]),
+    ],
+)
+def test_simplex_degenerate_programs_match_scipy(a: Any, b: Any, cost: Any) -> None:
+    from scipy.optimize import linprog
+
+    want = linprog(cost, A_eq=a, b_eq=b, bounds=(0, None), method="highs")
+    z = hs._simplex(np.asarray(a), np.asarray(b), np.asarray(cost))
+    assert want.status == 0 and z is not None
+    assert float(np.asarray(cost) @ z) == pytest.approx(want.fun, abs=1e-12)
+    assert np.abs(np.asarray(a) @ z - b).max() < 1e-12 and z.min() >= 0.0
+
+
+def test_integer_solve_output_keys_and_values() -> None:
+    # Two instruments, lot sizes 2 and 0.5; the lot vector is checked against brute force.
+    import itertools
+
+    a = [[0.3, -0.3], [-0.9, -0.5], [-1.0, 0.1]]
+    b = [4.0, -1.5, -1.9]
+    lots_sz = [2.0, 0.5]
+    out = hs.integer_solve(a, b, [1.0, 1.0, 1.0], lots_sz, 0.0, [-2, None], [None, None])
+    assert list(out) == [
+        "lots",
+        "x",
+        "residual",
+        "objective",
+        "continuous_objective",
+        "rounding_cost",
+    ]
+
+    def f(n: Any) -> float:
+        x = np.array([lots_sz[0] * n[0], lots_sz[1] * n[1]])
+        r = np.asarray(a) @ x + b
+        return float(r @ r)
+
+    best = min(itertools.product(range(-2, 30), range(-60, 60)), key=f)
+    assert out["lots"] == list(best)
+    assert out["x"] == [lots_sz[0] * best[0], lots_sz[1] * best[1]]
+    r = np.asarray(a) @ np.asarray(out["x"]) + b
+    assert out["residual"] == pytest.approx(r.tolist(), abs=1e-15)
+    assert out["objective"] == pytest.approx(f(best), rel=1e-14)
+    cont = lsq_linear(
+        np.asarray(a), -np.asarray(b), bounds=([-4.0, -np.inf], [np.inf, np.inf]), tol=1e-15
+    )
+    assert out["continuous_objective"] == pytest.approx(2 * cont.cost, rel=1e-9)
+    assert out["rounding_cost"] == pytest.approx(f(best) - 2 * cont.cost, rel=1e-7)
