@@ -261,6 +261,10 @@ TEST_CASE("w3u ks: ties, unequal sizes, levels and errors", "[research][w3u]") {
     REQUIRE(rs::ks_p_count(3, 3, 0) == 1.0);
     REQUIRE(rs::ks_p_walk(3, 3, 0) == 1.0);
     REQUIRE(rs::ks_p_walk(3, 3, -1) == 1.0);
+    // d <= 0 is the guard, not the walk: with n = m = 0 there is no step to take, so a walk would sum no mass and
+    // give 0; the guard gives p = 1 (D = 0 can never be exceeded with probability below 1).
+    REQUIRE(rs::ks_p_walk(0, 0, 0) == 1.0);
+    REQUIRE(rs::ks_p_walk(0, 0, -1) == 1.0);
     // n = m = 1, d = 1: both paths leave |i - j| < 1 at once: p = 1.
     REQUIRE(rs::ks_p_count(1, 1, 1) == 1.0);
     // n = 2, m = 1, d = 2 (out when |i - 2j| >= 2): aab passes (2, 0), baa passes (0, 1), aba stays in: p = 2/3.

@@ -153,3 +153,46 @@ TEST_CASE("hsu integer ties: the smallest total lots wins over the lexicographic
     p.b = {-0.5};
     REQUIRE(hg::solve_integer(p).lots == std::vector<long long>{0});
 }
+
+TEST_CASE("hsu integer ties of equal total lots go to the lexicographically smallest", "[hedging][hsu]") {
+    // Two instruments, lot 1, one row A = (1, 1), b = -1, ridge 1/4: f(n) = (n0 + n1 - 1)^2 + (n0^2 + n1^2) / 4.
+    // (1, 0) and (0, 1): residual 0, f = 1/4 each (exact in binary). (0, 0): f = 1. (1, 1): 1 + 1/2. Any other
+    // integer point has n0 + n1 != 1 (f >= 1) or n0^2 + n1^2 >= 5 (f >= 5/4). So two candidates tie at 1/4, both of
+    // total lots 1; I-7 then takes the lexicographically smaller, (0, 1), whatever order the search finds them in.
+    hg::IntegerProblem p;
+    p.a = {{1.0, 1.0}};
+    p.b = {-1.0};
+    p.weights = {1.0};
+    p.ridge = 0.25;
+    p.lot_sizes = {1.0, 1.0};
+    const hg::IntegerResult r = hg::solve_integer(p);
+    REQUIRE(r.lots == std::vector<long long>{0, 1});
+    REQUIRE(r.objective == 0.25);
+    // The mirror b = 1: (-1, 0) and (0, -1) tie at 1/4; (-1, 0) is the lexicographically smaller.
+    p.b = {1.0};
+    const hg::IntegerResult m = hg::solve_integer(p);
+    REQUIRE(m.lots == std::vector<long long>{-1, 0});
+    REQUIRE(m.objective == 0.25);
+}
+
+TEST_CASE("hsu orthant oracle: equalities that fix x are checked against the margin row", "[hedging][hsu]") {
+    // n = 1, the equality x = 2 fixes x (k = n), margin rate 1. The margin is 1 * |2| = 2.
+    // Limit 1: the orthant x >= 0 has row -x >= -1, broken at x = 2; the orthant x <= 0 excludes x = 2 by its bound.
+    // No orthant is feasible: E_INFEASIBLE. Limit 3: margin 2 <= 3, x = 2 is the answer.
+    hg::QpProblem p;
+    p.a = {{1.0}};
+    p.b = {0.0};
+    p.weights = {1.0};
+    p.eq_matrix = quantforge::Matrix{{1.0}};
+    p.eq_rhs = hg::Vec{2.0};
+    p.margin_rates = hg::Vec{1.0};
+    p.margin_limit = 1.0;
+    REQUIRE(code_of([&] { hg::detail::solve_qp_by_orthants(p); }) == "E_INFEASIBLE");
+    REQUIRE(code_of([&] { hg::solve_qp(p); }) == "E_INFEASIBLE");
+    // Limit 2 is exactly the margin: feasible (the row holds with equality).
+    p.margin_limit = 2.0;
+    REQUIRE(hg::detail::solve_qp_by_orthants(p).x == hg::Vec{2.0});
+    p.margin_limit = 3.0;
+    REQUIRE(hg::detail::solve_qp_by_orthants(p).x == hg::Vec{2.0});
+    REQUIRE(hg::solve_qp(p).x == hg::Vec{2.0});
+}
