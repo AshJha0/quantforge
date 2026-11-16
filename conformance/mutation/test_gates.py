@@ -100,6 +100,20 @@ def pr_sample_checks():
     check(f"PR sample n={n} passes a 90% module with probability >= 0.9 ({p90:.3f})", p90 >= 0.9)
 
 
+def cpp_site_checks():
+    """cpp_mutants.sites mutates code only: never a trailing // comment, but '//' inside a literal is code."""
+    import cpp_mutants
+
+    def shown(src):
+        return [cpp_mutants.apply(src, s)[1] for s in cpp_mutants.sites(src)]
+
+    check("trailing comment not mutated", shown("x = a + b;  // a - b < c\n") == ["x = a - b;  // a - b < c"])
+    check("comment-only line skipped", shown("  // a + b\n") == [])
+    check("'//' in a string literal is code", len(shown('s = "a//b" + t;  // x * y\n')) == 1)
+    check("escaped quote does not end the literal", len(shown('s = "\\"//" + t;\n')) == 1)
+    check("'/' operator still mutated", shown("y = a / b;\n") == ["y = a * b;"])
+
+
 def main():
     cfg = json.loads((HERE / "stages.json").read_text(encoding="utf-8"))
     with tempfile.TemporaryDirectory() as d:
@@ -141,6 +155,7 @@ def main():
         check("no results at all: gate fails", quiet(stage_report.main, ["--stage", "T", "--stages", str(sp), "--results", str(empty), "--gate"]) == 1)
     semantic_checks()
     pr_sample_checks()
+    cpp_site_checks()
     lo, hi = stage_report.wilson(17, 20)
     check("Wilson 17/20 is 64% to 95%", round(lo, 2) == 0.64 and round(hi, 2) == 0.95)
     print(f"{len(FAILS)} failure(s)")

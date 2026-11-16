@@ -26,13 +26,37 @@ SWAPS = [(r" \+ ", " - "), (r" - ", " + "), (r" \* ", " / "), (r" / ", " * "), (
          (r" && ", " || "), (r" \|\| ", " && ")]
 
 
+def code_end(line):
+    """Index where a trailing // comment starts (outside string and char literals), else len(line).
+
+    A swap inside a comment cannot change behaviour, so it is not a mutant: counting it would make
+    a survivor that no test can kill.
+    """
+    quote = None
+    i = 0
+    while i < len(line):
+        c = line[i]
+        if quote:
+            if c == "\\":
+                i += 1
+            elif c == quote:
+                quote = None
+        elif c in "\"'":
+            quote = c
+        elif line.startswith("//", i):
+            return i
+        i += 1
+    return len(line)
+
+
 def sites(text):
     found = []
     for at, line in enumerate(text.splitlines(keepends=True)):
         if line.lstrip().startswith(("//", "#", "*")):
             continue
+        code = line[:code_end(line)]
         for pattern, new in SWAPS:
-            for m in re.finditer(pattern, line):
+            for m in re.finditer(pattern, code):
                 found.append((at, m.start(), m.end(), new))
     return found
 
