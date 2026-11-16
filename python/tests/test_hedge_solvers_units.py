@@ -1089,3 +1089,368 @@ def test_scaled_solve_falls_back_to_caller_units_when_the_equalities_drift() -> 
     assert out["x"] == pytest.approx(want, rel=1e-9)
     assert abs(sum(out["x"]) - 1.0) <= 1e-15
     assert out["rank"] == 2
+
+
+# --------------------------------------------------------------------------------------------
+# Constrained and costed solves against an independent optimiser
+
+
+def costed_oracle(
+    a: Any,
+    b: Any,
+    w: Any,
+    ridge: float,
+    e: Any,
+    rhs: Any,
+    lower: Any,
+    upper: Any,
+    spreads: Any,
+    impact: Any,
+    cw: float,
+    rates: Any,
+    limit: Any,
+) -> tuple[np.ndarray, float]:
+    """The same problem in split variables x = p - q, p, q >= 0 (smooth), solved by SLSQP."""
+    from scipy import optimize
+
+    minimize: Any = optimize.minimize  # scipy's overloads do not model the dict constraints
+    a, b, w = (np.asarray(v, dtype=float) for v in (a, b, w))
+    n = a.shape[1]
+    h = np.zeros(n) if spreads is None else np.asarray(spreads, dtype=float)
+    imp = np.zeros(n) if impact is None else np.asarray(impact, dtype=float)
+
+    def f(z: Any) -> float:
+        x = z[:n] - z[n:]
+        r = a @ x + b
+        return float(w @ (r * r) + ridge * x @ x + cw * (h @ (z[:n] + z[n:]) + imp @ (x * x)))
+
+    def grad(z: Any) -> Any:
+        x = z[:n] - z[n:]
+        gx = 2 * a.T @ (w * (a @ x + b)) + 2 * ridge * x + 2 * cw * imp * x
+        return np.concatenate([gx + cw * h, -gx + cw * h])
+
+    cons: list[dict[str, Any]] = []
+    if e is not None:
+        em, ev = np.asarray(e, dtype=float), np.asarray(rhs, dtype=float)
+        cons.append(
+            {
+                "type": "eq",
+                "fun": lambda z: em @ (z[:n] - z[n:]) - ev,
+                "jac": lambda z: np.hstack([em, -em]),
+            }
+        )
+    for j in range(n):
+        if lower is not None and lower[j] is not None:
+            cons.append({"type": "ineq", "fun": lambda z, j=j: z[j] - z[n + j] - lower[j]})
+        if upper is not None and upper[j] is not None:
+            cons.append({"type": "ineq", "fun": lambda z, j=j: upper[j] - z[j] + z[n + j]})
+    if rates is not None:
+        mr = np.asarray(rates, dtype=float)
+        cons.append(
+            {
+                "type": "ineq",
+                "fun": lambda z: limit - mr @ (z[:n] + z[n:]),
+                "jac": lambda z: -np.concatenate([mr, mr]),
+            }
+        )
+    best: Any = None
+    for start in (np.zeros(2 * n), np.full(2 * n, 0.5), np.ones(2 * n)):
+        res = minimize(
+            f,
+            start,
+            jac=grad,
+            bounds=[(0, None)] * (2 * n),
+            constraints=cons,
+            method="SLSQP",
+            options={"ftol": 1e-16, "maxiter": 2000},
+        )
+        if best is None or (res.success and res.fun < best.fun):
+            best = res
+    x = best.x[:n] - best.x[n:]
+    return x, float(best.fun)
+
+
+def costed_problem(seed: int) -> dict[str, Any]:
+    rng = np.random.default_rng(100 + seed)
+    n, m = 3, 5
+    kw: dict[str, Any] = {
+        "a": rng.normal(size=(m, n)).tolist(),
+        "b": (2.0 * rng.normal(size=m)).tolist(),
+        "weights": rng.uniform(0.5, 2.0, size=m).tolist(),
+        "ridge": 0.0 if seed % 3 else 0.1,
+        "half_spreads": rng.uniform(0.0, 1.5, size=n).tolist(),
+    }
+    if seed % 4 == 1:
+        kw["impact"] = rng.uniform(0.0, 0.5, size=n).tolist()
+        kw["cost_weight"] = 0.7
+    x0 = 0.3 * rng.normal(size=n)
+    if seed % 2:
+        e = rng.normal(size=(1, n))
+        kw["eq_matrix"], kw["eq_rhs"] = e.tolist(), (e @ x0).tolist()
+    if seed % 3 == 2:
+        kw["lower"] = [float(x0[0]) - 0.4, None, float(x0[2]) - 2.0]
+        kw["upper"] = [None, float(x0[1]) + 0.3, float(x0[2]) + 0.2]
+    if seed % 4 in (2, 3):
+        rates = rng.uniform(0.5, 2.0, size=n)
+        kw["margin_rates"] = rates.tolist()
+        kw["margin_limit"] = float(rates @ np.abs(x0)) + 0.4
+    return kw
+
+
+@pytest.mark.parametrize("seed", range(16))
+def test_costed_qp_matches_an_independent_optimiser(seed: int) -> None:
+    kw = costed_problem(seed)
+    out = hs.qp_solve(**kw)
+    cw = kw.get("cost_weight", 1.0)
+    want, best = costed_oracle(
+        kw["a"],
+        kw["b"],
+        kw["weights"],
+        kw["ridge"],
+        kw.get("eq_matrix"),
+        kw.get("eq_rhs"),
+        kw.get("lower"),
+        kw.get("upper"),
+        kw.get("half_spreads"),
+        kw.get("impact"),
+        cw,
+        kw.get("margin_rates"),
+        kw.get("margin_limit"),
+    )
+    x = np.asarray(out["x"])
+    # Feasible, at least as good as the optimiser, and the same (unique) minimiser.
+    if "eq_matrix" in kw:
+        assert np.abs(np.asarray(kw["eq_matrix"]) @ x - kw["eq_rhs"]).max() < 1e-12
+    for j in range(3):
+        lo = kw.get("lower", [None] * 3)[j]
+        hi = kw.get("upper", [None] * 3)[j]
+        assert lo is None or x[j] >= lo - 1e-15
+        assert hi is None or x[j] <= hi + 1e-15
+    if "margin_rates" in kw:
+        assert out["margin"] <= kw["margin_limit"] * (1 + 1e-12)
+        assert out["margin"] == pytest.approx(
+            sum(r * abs(v) for r, v in zip(kw["margin_rates"], x)), rel=1e-14
+        )
+    assert out["objective"] <= best + 1e-9 * max(1.0, abs(best))
+    assert out["objective"] == pytest.approx(best, rel=1e-8, abs=1e-10)
+    assert x == pytest.approx(want, abs=2e-5)
+    # The reported parts add up.
+    cost = sum(h * abs(v) for h, v in zip(kw["half_spreads"], x)) + sum(
+        i * v * v for i, v in zip(kw.get("impact", [0.0] * 3), x)
+    )
+    assert out["cost"] == pytest.approx(cost, rel=1e-13, abs=1e-15)
+    assert out["objective"] == pytest.approx(out["risk"] + cw * out["cost"], rel=1e-14)
+
+
+@pytest.mark.parametrize("seed", range(10))
+def test_bounded_equality_qp_matches_an_independent_optimiser(seed: int) -> None:
+    rng = np.random.default_rng(300 + seed)
+    n = 4
+    a = rng.normal(size=(6, n))
+    b = 3.0 * rng.normal(size=6)
+    w = rng.uniform(0.5, 2.0, size=6)
+    x0 = 0.2 * rng.normal(size=n)
+    k = seed % 3
+    e = rng.normal(size=(k, n)) if k else None
+    lower = [float(x0[j]) - 0.3 if j % 2 == 0 else None for j in range(n)]
+    upper = [float(x0[j]) + 0.25 if j != 2 else None for j in range(n)]
+    kw: dict[str, Any] = {"lower": lower, "upper": upper}
+    if e is not None:
+        kw["eq_matrix"], kw["eq_rhs"] = e.tolist(), (e @ x0).tolist()
+    out = hs.qp_solve(a.tolist(), b.tolist(), w.tolist(), **kw)
+    want, best = costed_oracle(
+        a,
+        b,
+        w,
+        0.0,
+        kw.get("eq_matrix"),
+        kw.get("eq_rhs"),
+        lower,
+        upper,
+        None,
+        None,
+        1.0,
+        None,
+        None,
+    )
+    assert out["objective"] <= best + 1e-9 * max(1.0, best)
+    assert out["x"] == pytest.approx(want.tolist(), abs=2e-5)
+    assert out["rank"] == n - k
+
+
+def test_every_position_on_a_bound_with_one_equality() -> None:
+    # The unconstrained optimum (5, -5) is outside the box; x0 + x1 = 1 then leaves only the
+    # corner (1, 0), with both positions on bounds and no free variable (the interval rule).
+    out = hs.qp_solve(
+        [[1.0, 0.0], [0.0, 1.0]],
+        [-5.0, 5.0],
+        [1.0, 1.0],
+        eq_matrix=[[1.0, 1.0]],
+        eq_rhs=[1.0],
+        lower=[0.0, 0.0],
+        upper=[1.0, 1.0],
+    )
+    assert out["x"] == [1.0, 0.0]
+    assert out["residual"] == [-4.0, 5.0] and out["objective"] == 41.0
+    # Mirrored: the equality has a negative coefficient, so the multiplier interval flips.
+    out = hs.qp_solve(
+        [[1.0, 0.0], [0.0, 1.0]],
+        [-5.0, 5.0],
+        [1.0, 1.0],
+        eq_matrix=[[1.0, -1.0]],
+        eq_rhs=[1.0],
+        lower=[0.0, 0.0],
+        upper=[1.0, 1.0],
+    )
+    assert out["x"] == [1.0, 0.0]
+    # A fixed position (lower == upper) and one at a bound.
+    out = hs.qp_solve(
+        [[1.0, 0.0], [0.0, 1.0]],
+        [-5.0, 5.0],
+        [1.0, 1.0],
+        eq_matrix=[[1.0, 2.0]],
+        eq_rhs=[0.5],
+        lower=[0.5, -1.0],
+        upper=[0.5, 1.0],
+    )
+    assert out["x"] == [0.5, 0.0]
+
+
+def test_every_position_on_a_bound_with_two_equalities() -> None:
+    a = np.eye(3)
+    b = np.array([-4.0, 4.0, -4.0])
+    e = [[1.0, 1.0, 0.0], [0.0, 1.0, 1.0]]
+    # x = (1, 0, 1) meets both rows; the objective pulls x0 and x2 up and x1 down, all at bounds.
+    out = hs.qp_solve(
+        a.tolist(),
+        b.tolist(),
+        [1.0] * 3,
+        eq_matrix=e,
+        eq_rhs=[1.0, 1.0],
+        lower=[0.0, 0.0, 0.0],
+        upper=[1.0, 1.0, 1.0],
+    )
+    assert out["x"] == pytest.approx([1.0, 0.0, 1.0], abs=1e-15)
+
+
+def test_costed_margin_feasibility_tolerance() -> None:
+    a = [[1.0, 0.0], [0.0, 1.0]]
+    b = [-1.0, -1.0]
+    # x0 is fixed at 1 by the equality; margin 1 * |1| = 1 meets a limit of exactly 1.
+    out = hs.qp_solve(
+        a,
+        b,
+        [1.0, 1.0],
+        eq_matrix=[[1.0, 0.0]],
+        eq_rhs=[1.0],
+        margin_rates=[1.0, 0.0],
+        margin_limit=1.0,
+    )
+    assert out["x"] == pytest.approx([1.0, 1.0], abs=1e-15) and out["margin"] <= 1.0
+    # 1e-12 against a zero limit is inside the absolute allowance; 1e-11 is not.
+    out = hs.qp_solve(
+        a,
+        b,
+        [1.0, 1.0],
+        eq_matrix=[[1.0, 0.0]],
+        eq_rhs=[1e-12],
+        margin_rates=[1.0, 0.0],
+        margin_limit=0.0,
+    )
+    # The equality and the margin row disagree by 1e-12, inside the allowance: the solve settles
+    # between them (both rows are working rows), so x0 is only pinned to [0, 1e-12].
+    assert 0.0 <= out["x"][0] <= 1e-12
+    assert err(
+        hs.qp_solve,
+        a,
+        b,
+        [1.0, 1.0],
+        eq_matrix=[[1.0, 0.0]],
+        eq_rhs=[1e-11],
+        margin_rates=[1.0, 0.0],
+        margin_limit=0.0,
+    ) == ("E_INFEASIBLE", "no position meets the constraints and the margin limit", None)
+    assert err(
+        hs.qp_solve,
+        a,
+        b,
+        [1.0, 1.0],
+        eq_matrix=[[1.0, 0.0]],
+        eq_rhs=[1.0],
+        margin_rates=[1.0, 0.0],
+        margin_limit=0.99,
+    ) == ("E_INFEASIBLE", "no position meets the constraints and the margin limit", None)
+    assert err(
+        hs.qp_solve,
+        a,
+        b,
+        [1.0, 1.0],
+        eq_matrix=[[1.0, 1.0]],
+        eq_rhs=[3.0],
+        lower=[None, None],
+        upper=[1.0, 1.0],
+        half_spreads=[0.1, 0.1],
+    ) == ("E_INFEASIBLE", "no position meets the equalities and the bounds", None)
+    assert err(
+        hs.qp_solve, a, b, [1.0, 1.0], eq_matrix=[[1.0, 1.0]], eq_rhs=[3.0], upper=[1.0, 1.0]
+    ) == ("E_INFEASIBLE", "no position meets the equalities and the bounds", None)
+
+
+def test_costed_start_respects_bounds_and_equalities() -> None:
+    # Spread costs with an equality and bounds, no margin: the phase-1 start, clamped to the box.
+    a = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
+    out = hs.qp_solve(
+        a,
+        [-2.0, 1.0, 0.0],
+        [1.0, 1.0, 1.0],
+        eq_matrix=[[1.0, 1.0]],
+        eq_rhs=[1.0],
+        lower=[-3.0, -3.0],
+        upper=[3.0, 0.5],
+        half_spreads=[0.2, 0.2],
+    )
+    want, _ = costed_oracle(
+        a,
+        [-2.0, 1.0, 0.0],
+        [1.0] * 3,
+        0.0,
+        [[1.0, 1.0]],
+        [1.0],
+        [-3.0, -3.0],
+        [3.0, 0.5],
+        [0.2, 0.2],
+        None,
+        1.0,
+        None,
+        None,
+    )
+    assert out["x"] == pytest.approx(want.tolist(), abs=1e-6)
+    # Bounds only, spreads large enough to keep a position at 0.
+    out = hs.qp_solve(
+        a, [-2.0, 0.1, 0.0], [1.0] * 3, lower=[0.5, -1.0], upper=[4.0, 1.0], half_spreads=[0.1, 5.0]
+    )
+    assert out["x"][1] == 0.0
+    assert out["x"][0] == pytest.approx((4.0 - 0.1) / 4.0, rel=1e-14)  # f = (x - 2)^2 + x^2 + 0.1 x
+
+
+def test_sign_search_flips_a_position_through_zero() -> None:
+    # f = (x + b)^2 + 0.5 |x|: x = -b - 0.25 sign(x) when |b| > 0.25, else 0. A start at 0 with an
+    # upper bound of 0 begins in the negative orthant, a lower bound of 0 in the positive one.
+    out = hs.qp_solve([[1.0]], [-3.0], [1.0], half_spreads=[0.5])
+    assert out["x"] == [2.75]
+    out = hs.qp_solve([[1.0]], [3.0], [1.0], half_spreads=[0.5])
+    assert out["x"] == [-2.75]
+    out = hs.qp_solve([[1.0]], [-3.0], [1.0], upper=[0.0], half_spreads=[0.5])
+    assert out["x"] == [0.0]
+    out = hs.qp_solve([[1.0]], [3.0], [1.0], lower=[0.0], half_spreads=[0.5])
+    assert out["x"] == [0.0]
+    out = hs.qp_solve([[1.0]], [3.0], [1.0], upper=[0.0], half_spreads=[0.5])
+    assert out["x"] == [-2.75]
+    out = hs.qp_solve([[1.0]], [-0.2], [1.0], half_spreads=[0.5])
+    assert out["x"] == [0.0]
+    # With a margin the allowance at 0 includes mu * rate.
+    out = hs.qp_solve(
+        [[1.0, 0.0], [0.0, 1.0]], [-3.0, 2.0], [1.0, 1.0], margin_rates=[1.0, 1.0], margin_limit=1.0
+    )
+    # min (x0 - 3)^2 + (x1 + 2)^2 s.t. |x0| + |x1| <= 1: x0 - x1 direction, x = (1, 0).
+    assert out["x"] == pytest.approx([1.0, 0.0], abs=1e-15) and out["margin"] == pytest.approx(1.0)
