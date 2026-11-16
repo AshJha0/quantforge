@@ -196,3 +196,19 @@ TEST_CASE("hsu orthant oracle: equalities that fix x are checked against the mar
     REQUIRE(hg::detail::solve_qp_by_orthants(p).x == hg::Vec{2.0});
     REQUIRE(hg::solve_qp(p).x == hg::Vec{2.0});
 }
+
+TEST_CASE("hsu integer ties: a lighter candidate beats a heavier lexicographically smaller one found later", "[hedging][hsu]") {
+    // Two instruments, lot 1, rows (1, 1) and (1, -1), b = (0, 1), weights 1, ridge 0: with s = n0 + n1 and
+    // d = n0 - n1 (same parity), f = s^2 + (d + 1)^2. f < 1 needs s = 0 and d = -1, of different parity: impossible.
+    // f = 1 exactly at (0, 0) and (-1, 1) (s = 0, d = 0 or -2) and at (-1, 0) and (0, 1) (s = -1 or 1, d = -1).
+    // I-7: smallest sum |n| first, so (0, 0) (sum 0) wins over (-1, 1) (sum 2), although (-1, 1) < (0, 0)
+    // lexicographically, and over the two of sum 1.
+    hg::IntegerProblem p;
+    p.a = {{1.0, 1.0}, {1.0, -1.0}};
+    p.b = {0.0, 1.0};
+    p.weights = {1.0, 1.0};
+    p.lot_sizes = {1.0, 1.0};
+    const hg::IntegerResult r = hg::solve_integer(p);
+    REQUIRE(r.lots == std::vector<long long>{0, 0});
+    REQUIRE(r.objective == 1.0);
+}
