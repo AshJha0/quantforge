@@ -330,3 +330,57 @@ TEST_CASE("hsu residual report symmetry is relative to the largest entry", "[hed
     // An all-zero covariance is symmetric (0 > 0 is false); it fails later, on b' S b = 0.
     REQUIRE(code_of([&] { hg::residual_report(a, b, x, {{0.0, 0.0}, {0.0, 0.0}}); }) == "E_DOMAIN");
 }
+
+TEST_CASE("hsu sample covariance centres each series on its own mean", "[hedging][hsu]") {
+    // x = (1, 2, 4, 7), mean 3.5; y = (0, 1, 1, 2), mean 1. Deviations (-2.5, -1.5, 0.5, 3.5) and (-1, 0, 0, 1):
+    // S_xx = 21 / 3 = 7, S_xy = 6 / 3 = 2, S_yy = 2 / 3 (divisor T - 1 = 3, I-8).
+    const quantforge::Matrix s = hg::sample_covariance({1.0, 2.0, 4.0, 7.0}, {{0.0, 1.0, 1.0, 2.0}});
+    REQUIRE(s[0][0] == 7.0);
+    REQUIRE(s[0][1] == 2.0);
+    REQUIRE(s[1][0] == 2.0);
+    REQUIRE(s[1][1] == 2.0 / 3.0);
+}
+
+TEST_CASE("hsu min variance symmetry is relative to the largest entry; a zero hedge is +0", "[hedging][hsu]") {
+    // |1 - (1 + 1e-9)| = 1e-9 <= 1e-12 * 1e6: accepted. Hedge = -S_he / S_hh = -(1 + 1e-9) (S_he from row 1).
+    const hg::MinVarResult r = hg::min_variance({{1e6, 1.0}, {1.0 + 1e-9, 1.0}});
+    REQUIRE(std::fabs(r.hedge[0] + (1.0 + 1e-9)) <= 1e-15);
+    REQUIRE(code_of([] { hg::min_variance({{1.0, 1.0}, {1.0 + 1e-9, 1.0}}); }) == "E_INPUT");
+    // Uncorrelated hedge: h = 0, reported as +0.0, not -0.0.
+    const hg::MinVarResult z = hg::min_variance({{2.0, 0.0}, {0.0, 1.0}});
+    REQUIRE(z.hedge[0] == 0.0);
+    REQUIRE(!std::signbit(z.hedge[0]));
+    REQUIRE(z.variance_after == 2.0);
+}
+
+TEST_CASE("hsu equalities that fix x at 0 meet a margin limit of exactly 0", "[hedging][hsu]") {
+    // k = n, x = 0 fixed; margin 1 * |0| = 0 <= 0. The margin row check is 0 - (-0) < -1e-12 * 0: false.
+    hg::QpProblem p;
+    p.a = {{1.0}};
+    p.b = {-1.0};
+    p.weights = {1.0};
+    p.eq_matrix = quantforge::Matrix{{1.0}};
+    p.eq_rhs = hg::Vec{0.0};
+    p.margin_rates = hg::Vec{1.0};
+    p.margin_limit = 0.0;
+    REQUIRE(hg::solve_qp(p).x == hg::Vec{0.0});
+    REQUIRE(hg::detail::solve_qp_by_orthants(p).x == hg::Vec{0.0});
+}
+
+TEST_CASE("hsu orthant oracle: a position fixed by equal bounds is not an empty orthant", "[hedging][hsu]") {
+    // A = I, b = (-1, -1), spreads 0.1 each. x0 is fixed at 0.5 by lower = upper = 0.5 (its orthant is x0 >= 0,
+    // bound 0.5 <= 0.5, not empty). x1 minimises (x1 - 1)^2 + 0.1 |x1|: x1 = 1 - 0.05 = 0.95.
+    hg::QpProblem p;
+    p.a = {{1.0, 0.0}, {0.0, 1.0}};
+    p.b = {-1.0, -1.0};
+    p.weights = {1.0, 1.0};
+    p.half_spreads = hg::Vec{0.1, 0.1};
+    p.lower = std::vector<hg::Bound>{0.5, std::nullopt};
+    p.upper = std::vector<hg::Bound>{0.5, std::nullopt};
+    const hg::QpResult o = hg::detail::solve_qp_by_orthants(p);
+    REQUIRE(o.x[0] == 0.5);
+    REQUIRE(std::fabs(o.x[1] - 0.95) <= 1e-14);
+    const hg::QpResult r = hg::solve_qp(p);
+    REQUIRE(r.x[0] == 0.5);
+    REQUIRE(std::fabs(r.x[1] - 0.95) <= 1e-14);
+}
