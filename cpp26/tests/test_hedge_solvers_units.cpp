@@ -384,3 +384,22 @@ TEST_CASE("hsu orthant oracle: a position fixed by equal bounds is not an empty 
     REQUIRE(r.x[0] == 0.5);
     REQUIRE(std::fabs(r.x[1] - 0.95) <= 1e-14);
 }
+
+TEST_CASE("hsu sign search flips a position when a tiny margin rate makes the margin bind", "[hedging][hsu]") {
+    // min (x0 - 3)^2 + (x1 + 2)^2 with x0 + x1 = 1 and |x0| + 1e-8 |x1| <= 1/2. The smooth minimiser (3, -2) puts
+    // x1 in the negative orthant, where x0 = 1 - x1 >= 1 breaks the margin, so x1 must flip to x1 > 0. On x1 > 0
+    // the objective falls with x0 up to 3, so the margin binds: x0 + 1e-8 (1 - x0) = 1/2,
+    // x0 = (1/2 - 1e-8) / (1 - 1e-8), x1 = 1 - x0.
+    hg::QpProblem p;
+    p.a = {{1.0, 0.0}, {0.0, 1.0}};
+    p.b = {-3.0, 2.0};
+    p.weights = {1.0, 1.0};
+    p.eq_matrix = quantforge::Matrix{{1.0, 1.0}};
+    p.eq_rhs = hg::Vec{1.0};
+    p.margin_rates = hg::Vec{1.0, 1e-8};
+    p.margin_limit = 0.5;
+    const double x0 = (0.5 - 1e-8) / (1.0 - 1e-8);
+    const hg::QpResult r = hg::solve_qp(p);
+    REQUIRE(std::fabs(r.x[0] - x0) <= 1e-14);
+    REQUIRE(std::fabs(r.x[1] - (1.0 - x0)) <= 1e-14);
+}
