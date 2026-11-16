@@ -663,12 +663,14 @@ public final class LeastSquaresHedge {
         }
         double[][] cons = new double[count][];
         double[] rhs = new double[count];
+        double[] size = new double[count]; // the magnitude that cancels in rhs: its rounding scale
         int[] which = new int[count];
         int at = 0;
         for (int j = 0; j < n; j++) {
             if (lo[j] > Double.NEGATIVE_INFINITY) {
                 cons[at] = z[j].clone();
                 rhs[at] = lo[j] - xp[j];
+                size[at] = Math.max(1.0, Math.abs(lo[j]) + Math.abs(xp[j]));
                 which[at++] = j + 1;
             }
             if (hi[j] < Double.POSITIVE_INFINITY) {
@@ -677,20 +679,26 @@ public final class LeastSquaresHedge {
                     cons[at][t] = -z[j][t];
                 }
                 rhs[at] = xp[j] - hi[j];
+                size[at] = Math.max(1.0, Math.abs(hi[j]) + Math.abs(xp[j]));
                 which[at++] = -(j + 1);
             }
         }
         if (row != null) {
             cons[at] = new double[r];
+            double terms = Math.abs(limit);
+            for (int j = 0; j < n; j++) {
+                terms += Math.abs(row[j] * xp[j]);
+            }
             for (int t = 0; t < r; t++) {
                 for (int j = 0; j < n; j++) {
                     cons[at][t] -= row[j] * z[j][t];
                 }
             }
             rhs[at] = Dense.dot(row, xp) - limit;
+            size[at] = Math.max(1.0, terms);
             which[at++] = 0;
         }
-        DualActiveSet.Result res = DualActiveSet.solve(hr, gr, cons, rhs);
+        DualActiveSet.Result res = DualActiveSet.solve(hr, gr, cons, rhs, size);
         for (int i = 0; i < count; i++) {
             if (which[i] > 0) {
                 muLo[which[i] - 1] = res.multipliers()[i];

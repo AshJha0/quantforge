@@ -225,6 +225,49 @@ def _phase_one(e_mat: NDArray, e_rhs: NDArray, lower: Bounds, upper: Bounds) -> 
     return x
 
 
+def _rank(rows: NDArray, cols: list[int], cut: float) -> int:
+    """The rank of rows[:, cols]: singular values at or below `cut` count as zero."""
+    if rows.shape[0] == 0 or not cols:
+        return 0
+    return int((np.linalg.svd(rows[:, cols], compute_uv=False) > cut).sum())
+
+
+def _independent_bounds(
+    rows: NDArray, work: dict[int, str], active: list[tuple[int, str]], cut: float
+) -> None:
+    """Add to `work` each bound in `active` (index order) whose row e_j is independent of the
+    working rows: the general rows `rows` and the bounds already in `work`.
+
+    Why: at a degenerate vertex more constraints are active than the dimension allows (a single
+    feasible point is the extreme case). The primal active-set method [NW06 sec. 16.5] needs a
+    linearly independent working set; with a dependent one the multipliers are not unique, the
+    least-squares choice can show a negative bound multiplier at the optimum, and dropping it gives
+    a zero step that re-adds it, forever (E_NO_CONVERGENCE). The rows {rows, e_j : j in W} are
+    independent exactly when rows[:, free] keeps the rank of rows over the non-fixed columns, so
+    that is the test. An active bound left out still holds: the ratio test blocks at it with a
+    zero step, and a constraint added by the ratio test is always independent of the working set
+    (p lies in its null space and the blocking row has a_i^T p != 0)."""
+    n = rows.shape[1]
+    target = _rank(rows, [j for j in range(n) if work.get(j) != "F"], cut)
+    for j, side in active:
+        free = [c for c in range(n) if c not in work and c != j]
+        if _rank(rows, free, cut) == target:
+            work[j] = side
+
+
+def _null_step(x_free: NDArray, x_p: NDArray, z: NDArray, y: NDArray) -> NDArray:
+    """The target x_p + z y, reached from the feasible x_free by a step in the null space of the
+    working rows: x_free + z z^T (x_p + z y - x_free) = x_free + z (z^T (x_p - x_free) + y).
+
+    x_free already meets the working rows, so the exact step lies in that null space; the part
+    outside it is only the rounding of x_p. Kept, that part can be a step of 1e-17 against a bound
+    with zero slack, which the ratio test turns into a zero-length block that adds a dependent
+    bound to the working set and cycles. With no null space (z empty) the step is exactly zero."""
+    if z.shape[1] == 0:
+        return x_free.copy()
+    return x_free + z @ (z.T @ (x_p - x_free) + y)
+
+
 class _Qp:
     """One bound- and equality-constrained least-squares problem in square-root form."""
 
@@ -265,7 +308,7 @@ class _Qp:
         ms = m / col
         top = float(np.linalg.svd(ms, compute_uv=False)[0]) if ms.size else 0.0
         y, _ = _lstsq_min_norm(ms, bs @ x_p + r0, THRESHOLD * top * top)
-        out[free] = x_p + z @ (y / col)
+        out[free] = _null_step(x[free], x_p, z, y / col)
         return out
 
     def multipliers(self, x: NDArray, free: list[int], work: dict[int, str]) -> NDArray:
@@ -302,16 +345,18 @@ class _Qp:
         """Primal active-set method [NW06 ch. 16] from a feasible x."""
         lower, upper, n = self.lower, self.upper, self.n
         work: dict[int, str] = {}
+        active: list[tuple[int, str]] = []
         for j in range(n):
             if lower[j] is not None and lower[j] == upper[j]:
                 work[j] = "F"
+                x[j] = lower[j]
             elif lower[j] is not None and x[j] <= lower[j]:
-                work[j] = "L"
+                active.append((j, "L"))
+                x[j] = lower[j]
             elif upper[j] is not None and x[j] >= upper[j]:
-                work[j] = "U"
-        for j, side in work.items():
-            bound = lower[j] if side in "FL" else upper[j]
-            x[j] = bound
+                active.append((j, "U"))
+                x[j] = upper[j]
+        _independent_bounds(self.e_mat, work, active, self.e_cut)
         grad_scale = float(np.abs(2.0 * (self.big_b.T @ self.d)).max(initial=0.0))
         for _ in range(_cap(n, self)):
             free = [j for j in range(n) if j not in work]
@@ -512,9 +557,7 @@ class _CostQp:
             keep = s * s > THRESHOLD * float(s[0]) ** 2 if s.size else s > 0
             lz = vt[keep] @ ((z.T @ lin[free]) / col)
             y = -vt[keep].T @ ((u[:, keep].T @ r) / s[keep] + lz / (2 * s[keep] ** 2))
-            out[free] = x_p + z @ (y / col)
-        else:
-            out[free] = x_p
+            out[free] = _null_step(x[free], x_p, z, y / col)
         return out
 
     def _orthant(self, x: NDArray, signs: list[int]) -> tuple[NDArray, NDArray, float]:
@@ -525,15 +568,29 @@ class _CostQp:
         lin, a_row = self.spread * sign, self.rates * sign
         margin = math.isfinite(self.limit)
         work: dict[int, str] = {}
+        active: list[tuple[int, str]] = []
         for j in range(self.n):
             low, high = lo[j], hi[j]
             if low is not None and low == high:
                 work[j], x[j] = "F", low
             elif low is not None and x[j] <= low:
-                work[j], x[j] = "L", low
+                active.append((j, "L"))
+                x[j] = low
             elif high is not None and x[j] >= high:
-                work[j], x[j] = "U", high
-        margin_on = margin and float(a_row @ x) >= self.limit
+                active.append((j, "U"))
+                x[j] = high
+        # The working set must be linearly independent (see _independent_bounds). A tight margin
+        # row joins it only when it is independent of the equalities over the non-fixed columns;
+        # a dependent one is constant on E x = e, so it cannot be crossed. Then the bounds.
+        nonfixed = [j for j in range(self.n) if j not in work]
+        both = np.vstack([self.e_mat, a_row[None, :]])
+        cut = THRESHOLD * float(np.linalg.svd(both, compute_uv=False)[0])
+        margin_on = (
+            margin
+            and float(a_row @ x) >= self.limit
+            and _rank(both, nonfixed, cut) > _rank(self.e_mat, nonfixed, cut)
+        )
+        _independent_bounds(both if margin_on else self.e_mat, work, active, cut)
         scale0 = max(
             float(np.abs(2.0 * (self.big_b.T @ self.d)).max(initial=0.0)),
             float(np.abs(lin).max(initial=0.0)),
