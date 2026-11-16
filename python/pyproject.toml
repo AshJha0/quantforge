@@ -50,7 +50,8 @@ tests_dir = ["tests/test_core.py", "tests/test_cli.py", "tests/test_stage_b.py",
              "tests/test_research_w3_units.py", "tests/test_term_curves_units.py",
              "tests/test_drift_units.py", "tests/test_garch_units.py",
              "tests/test_correlation_units.py", "tests/test_g2pp_units.py",
-             "tests/test_joint_units.py", "tests/test_variance_more_units.py"]
+             "tests/test_joint_units.py", "tests/test_variance_more_units.py",
+             "tests/test_joint_solve_units.py"]
 pytest_add_cli_args = ["--deselect=tests/test_core.py::test_sobol_table_equals_the_spec_data"]
 do_not_mutate = ["quantforge_core/_sobol_data.py", "quantforge_core/_legendre_1024.py"]
 
@@ -82,6 +83,7 @@ module = [
     "test_correlation_units",
     "test_g2pp_units",
     "test_joint_units",
+    "test_joint_solve_units",
     "test_term_curves_units",
     "test_credit_correlation_hedges",
     "test_credit_kills",
