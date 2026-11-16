@@ -239,7 +239,14 @@ struct Constraint {
     normal: Vec<f64>,
     rhs: f64,
     scale: f64,
+    /// The magnitude of the terms that cancel in `rhs` (a bound row: `max(1, |bound| + |x_p,j|)`),
+    /// the scale of its rounding error; used only to judge an infeasibility certificate.
+    size: f64,
 }
+
+/// An infeasibility certificate at or below this fraction of its rounding scale is rounding:
+/// the 1e-9 of the Python phase-one feasibility test.
+const CERTIFICATE: f64 = 1e-9;
 
 /// For the active set `N` (columns `normals`): `B = G^{-1} N` and `M^{-1}`, `M = N^T B`.
 fn active_factors(
@@ -333,10 +340,12 @@ fn dual_active_set(
     let mut u: Vec<f64> = Vec::new();
     let gcols: Vec<Vec<f64>> = cons.iter().map(|c| mat_vec(&ginv, &c.normal)).collect();
     let limit = iteration_cap();
+    // Constraints judged implied by the current active set; cleared whenever it changes.
+    let mut implied = vec![false; cons.len()];
     for _ in 0..limit {
         let slack = |y: &[f64], j: usize| dot(&cons[j].normal, y) - cons[j].rhs;
         let p = (0..cons.len())
-            .filter(|j| !active.contains(j))
+            .filter(|&j| !active.contains(&j) && !implied[j])
             .map(|j| (j, slack(&y, j) / cons[j].scale))
             .filter(|&(_, s)| s < -THRESHOLD)
             .min_by(|x, z| x.1.total_cmp(&z.1))
@@ -390,8 +399,28 @@ fn dual_active_set(
             };
             let t = t1.min(t2);
             if t == f64::INFINITY {
-                return Ok(None);
+                // Goldfarb-Idnani's certificate: n_p = sum_k r_k n_k with every r_k <= 0, so
+                // every feasible y' has n_p . y' <= sum_k r_k d_k, and no feasible point exists
+                // exactly when gap = d_p - sum_k r_k d_k > 0. At a degenerate vertex (a feasible
+                // set that is one point, a margin tight at a vertex) the true gap is 0 and rounding
+                // makes it 1e-16 either way, so it is judged against the rounding scale of the rows
+                // it combines. Below that the constraint holds, to rounding, wherever the active
+                // ones do: it is skipped until the active set changes. A dependent row can only
+                // appear before any step on this pick (a drop removes a row with r_k > 0, which
+                // leaves n_p outside the smaller span), so `up` is 0 and `u` needs no change.
+                let mut gap = cons[p].rhs;
+                let mut tol = cons[p].size;
+                for (ri, &j) in r.iter().zip(&active) {
+                    gap -= ri * cons[j].rhs;
+                    tol += ri.abs() * cons[j].size;
+                }
+                if gap > CERTIFICATE * tol {
+                    return Ok(None);
+                }
+                implied[p] = true;
+                break;
             }
+            implied.fill(false); // the active set changes below
             if t2.is_finite() {
                 for (v, w) in y.iter_mut().zip(&z) {
                     *v += t * w;
@@ -594,9 +623,11 @@ fn minimise_with_multipliers(
                 })
                 .collect();
             let norm = dot(&normal, &normal).sqrt().max(f64::MIN_POSITIVE);
+            let terms: f64 = q.normal.iter().zip(xp).map(|(a, p)| (a * p).abs()).sum();
             Constraint {
                 rhs: q.rhs - dot(&q.normal, xp),
                 scale: norm * q.rhs.abs().max(1.0),
+                size: (q.rhs.abs() + terms).max(1.0),
                 normal,
             }
         })

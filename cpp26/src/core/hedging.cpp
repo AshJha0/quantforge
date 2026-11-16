@@ -226,8 +226,12 @@ Vec project(const Matrix& z, const Vec& v) {
 class DualActiveSet {
 public:
     // own_rows: rows the caller added for its own reformulation (R6-28.5: not counted in the cap's p).
-    DualActiveSet(const Matrix& g, const Vec& g0, const Matrix& normals, const Vec& rhs, std::size_t own_rows = 0)
-        : n_(g.size()), own_rows_(own_rows), normals_(normals), rhs_(rhs), j_(n_, Vec(n_, 0.0)), r_(n_, Vec(n_, 0.0)) {
+    // size[i]: the magnitude of the terms that cancel in rhs[i] (a bound row: max(1, |bound| + |x_p,j|)), the scale of
+    // its rounding error; used only to judge an infeasibility certificate.
+    DualActiveSet(const Matrix& g, const Vec& g0, const Matrix& normals, const Vec& rhs, const Vec& size,
+                  std::size_t own_rows = 0)
+        : n_(g.size()), own_rows_(own_rows), normals_(normals), rhs_(rhs), size_(size), j_(n_, Vec(n_, 0.0)),
+          r_(n_, Vec(n_, 0.0)) {
         const Matrix l = cholesky_lower(g);
         // J = L^{-T}: column c of J solves L^T j = e_c.
         for (std::size_t c = 0; c < n_; ++c) {
@@ -246,12 +250,13 @@ public:
     bool solve() {
         const auto max_steps = std::size_t(detail::effort_cap(10 * (long long)(n_ + normals_.size() - own_rows_) + 100));  // R6-6.1, J-R6-5, R6-28.5
         std::vector<char> in_active(normals_.size(), 0);
+        std::vector<char> implied(normals_.size(), 0);  // judged implied by the current active set; cleared on change
         for (std::size_t step = 0; step < max_steps;) {
             // Step 1: the most violated constraint not yet active.
             std::size_t p = normals_.size();
             double worst = 0.0;
             for (std::size_t i = 0; i < normals_.size(); ++i) {
-                if (in_active[i]) continue;
+                if (in_active[i] || implied[i]) continue;
                 const double s = slack(i);
                 if (s < -tolerance(i) && s < worst) {
                     worst = s;
@@ -282,8 +287,28 @@ public:
                     }
                 const bool step_in_primal = d2 > 1e-24 * dall;
                 const double t2 = step_in_primal ? -sp / d2 : inf;  // n_p . z = |d2|^2
-                if (t1 == inf && t2 == inf) return false;           // no feasible point
-                if (t2 == inf) {                                     // dual step only
+                if (t1 == inf && t2 == inf) {
+                    // Goldfarb-Idnani's certificate: n_p = sum_k r_k n_k with every r_k <= 0, so every feasible y'
+                    // has n_p . y' <= sum_k r_k d_k, and no feasible point exists exactly when
+                    // gap = d_p - sum_k r_k d_k > 0. At a degenerate vertex (a feasible set that is one point, a
+                    // margin tight at a vertex) the true gap is 0 and the rounding of the d's makes it 1e-16 either
+                    // way, while the slack test of step 1 is relative to |d_p| + |n_p . y|, which can itself be
+                    // 1e-16 there. So the gap is judged against the rounding scale of the rows it combines (1e-9,
+                    // the feasibility tolerance of the Python phase one). Below that it is rounding: the constraint
+                    // holds to within it wherever the active ones do, so it is skipped until the active set
+                    // changes. A dependent row can only appear before any step on this pick (a drop removes a row
+                    // with r_k > 0, which leaves n_p outside the smaller span), so up is 0 and u needs no change.
+                    double gap = rhs_[p], tol = size_[p];
+                    for (std::size_t k = 0; k < iq(); ++k) {
+                        gap -= r[k] * rhs_[active_[k]];
+                        tol += std::fabs(r[k]) * size_[active_[k]];
+                    }
+                    if (gap > certificate * tol) return false;  // no feasible point
+                    implied[p] = 1;
+                    break;
+                }
+                std::ranges::fill(implied, 0);  // the active set changes below
+                if (t2 == inf) {                // dual step only
                     for (std::size_t k = 0; k < iq(); ++k) u_[k] -= t1 * r[k];
                     up += t1;
                     in_active[active_[drop]] = 0;
@@ -390,9 +415,11 @@ private:
         }
     }
 
+    static constexpr double certificate = 1e-9;
     std::size_t n_, own_rows_;
     const Matrix& normals_;
     const Vec& rhs_;
+    const Vec& size_;
     Matrix j_, r_;
     Vec y_, u_;
     std::vector<std::size_t> active_;
@@ -442,25 +469,28 @@ Vec bounded_minimiser(const Matrix& reduced, const Vec& g0, const NullSpace& ns,
         return x;
     }
     Matrix normals;
-    Vec rhs;
+    Vec rhs, size;  // size: the magnitude that cancels in rhs, its rounding scale
     for (const BoundRow& b : rows) {
         const double sign = b.lower ? 1.0 : -1.0;
         Vec row(r);
         for (std::size_t c = 0; c < r; ++c) row[c] = sign * ns.z[b.index][c];
         normals.push_back(std::move(row));
         rhs.push_back(sign * (b.bound - ns.xp[b.index]));
+        size.push_back(std::max(1.0, std::fabs(b.bound) + std::fabs(ns.xp[b.index])));
     }
     if (general) {
         Vec row(r, 0.0);
-        double at_xp = 0.0;
+        double at_xp = 0.0, terms = std::fabs(general_rhs);
         for (std::size_t j = 0; j < n; ++j) {
             at_xp += (*general)[j] * ns.xp[j];
+            terms += std::fabs((*general)[j] * ns.xp[j]);
             for (std::size_t c = 0; c < r; ++c) row[c] += (*general)[j] * ns.z[j][c];
         }
         normals.push_back(std::move(row));
         rhs.push_back(general_rhs - at_xp);
+        size.push_back(std::max(1.0, terms));
     }
-    DualActiveSet qp(reduced, g0, normals, rhs, std::min(own_rows, normals.size()));
+    DualActiveSet qp(reduced, g0, normals, rhs, size, std::min(own_rows, normals.size()));
     if (!qp.solve()) throw Error("E_INFEASIBLE", "no point satisfies the equalities and the bounds");
     for (std::size_t j = 0; j < n; ++j)
         for (std::size_t c = 0; c < r; ++c) x[j] += ns.z[j][c] * qp.y()[c];

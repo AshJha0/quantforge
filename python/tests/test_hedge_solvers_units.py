@@ -1766,3 +1766,180 @@ def test_strikes_below_one_are_valid() -> None:
     assert out["quantities"] == pytest.approx([-want], rel=1e-12)
     lots = hs.option_hedge_lots(*m, book, [("CALL", 0.5, 1.0, 1.0, 0.0)], ["DELTA"], 20)
     assert lots["lots"] == [-10]
+
+
+# --------------------------------------------------------------------------------------------
+# Degenerate but feasible problems (v0.9.0 kill-round failures and their neighbours)
+#
+# Each feasible set below is a single point, or a margin tight at a vertex, so more constraints
+# are active than the dimension allows. Before the fix the active-set methods held a dependent
+# working set and cycled (E_NO_CONVERGENCE). Answers are worked by hand in the comments.
+
+I2 = [[1.0, 0.0], [0.0, 1.0]]
+I3 = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+C1 = {
+    "a": [[1.0, 0.0, -1.0], [-1.0, 2.0, -1.0], [1.0, 1.0, 2.0]],
+    "b": [-1.0, -1.0, -3.0],
+    "weights": [1.0, 1.0, 1.0],
+    "eq_matrix": [[-1.0, 0.0, 1.0], [-1.0, -1.0, 0.0]],
+    "eq_rhs": [-2.0, -1.0],
+}
+
+
+def test_degenerate_single_point_from_equalities_and_bounds() -> None:
+    # -x0 + x2 = -2, -x0 - x1 = -1 leave the line (t, 1 - t, t - 2); x0 >= 1, x1 >= 0 and
+    # x2 <= -1 meet only at t = 1. A x + b = (1, -1, -4), so the objective is 18.
+    out = hs.qp_solve(**C1, lower=[1.0, 0.0, -2.0], upper=[None, 1.0, -1.0])
+    assert out["x"] == pytest.approx([1.0, 0.0, -1.0], abs=1e-12)
+    assert out["objective"] == pytest.approx(18.0, rel=1e-12)
+    assert out["rank"] == 1
+
+
+def test_degenerate_single_point_infeasible_neighbour_still_raises() -> None:
+    # Lowering the x2 cap by 1e-6 removes the only point.
+    got = err(hs.qp_solve, **C1, lower=[1.0, 0.0, -2.0], upper=[None, 1.0, -1.000001])
+    assert got == ("E_INFEASIBLE", "no position meets the equalities and the bounds", None)
+
+
+def test_degenerate_margin_tight_at_the_only_feasible_point() -> None:
+    # x0 + x1 = 1 and |x0| + 4 |x1| <= 1: on the line the margin is |t| + 4 |1 - t| >= 1 with
+    # equality only at t = 1, so x = (1, 0), objective 1 and margin 1.
+    out = hs.qp_solve(
+        I2,
+        [0.0, 0.0],
+        [1.0, 1.0],
+        eq_matrix=[[1.0, 1.0]],
+        eq_rhs=[1.0],
+        margin_rates=[1.0, 4.0],
+        margin_limit=1.0,
+    )
+    assert out["x"] == pytest.approx([1.0, 0.0], abs=1e-12)
+    assert out["objective"] == pytest.approx(1.0, rel=1e-12)
+    assert out["margin"] == pytest.approx(1.0, rel=1e-12)
+    # With half spreads 0.5 the cost is 0.5 |x0| = 0.5 at the same point.
+    out = hs.qp_solve(
+        I2,
+        [0.0, 0.0],
+        [1.0, 1.0],
+        eq_matrix=[[1.0, 1.0]],
+        eq_rhs=[1.0],
+        half_spreads=[0.5, 0.5],
+        margin_rates=[1.0, 4.0],
+        margin_limit=1.0,
+    )
+    assert out["x"] == pytest.approx([1.0, 0.0], abs=1e-12)
+    assert (out["risk"], out["cost"]) == pytest.approx((1.0, 0.5), rel=1e-12)
+    assert out["objective"] == pytest.approx(1.5, rel=1e-12)
+
+
+def test_degenerate_margin_infeasible_neighbour_still_raises() -> None:
+    got = err(
+        hs.qp_solve,
+        I2,
+        [0.0, 0.0],
+        [1.0, 1.0],
+        eq_matrix=[[1.0, 1.0]],
+        eq_rhs=[1.0],
+        margin_rates=[1.0, 4.0],
+        margin_limit=0.999999,
+    )
+    assert got == ("E_INFEASIBLE", "no position meets the constraints and the margin limit", None)
+
+
+def test_degenerate_costed_two_equalities_and_a_margin() -> None:
+    # -x0 - x1 + x2 = 1 and x1 = 0 leave x = (t, 0, 1 + t), margin |t| <= 1, and
+    # f(t) = (t + 4)^2 + (1 - 4t)^2 + 2 (t + 1)^2 + |t|. For t < 0, f'(t) = 38 t + 3 = 0 at
+    # t = -3/38; risk 27151/1444, cost 3/38, objective 27265/1444.
+    out = hs.qp_solve(
+        [[-1.0, 1.0, 2.0], [-2.0, -2.0, -2.0], [-2.0, -1.0, 1.0], [1.0, -1.0, 0.0]],
+        [2.0, 3.0, -2.0, 1.0],
+        [1.0] * 4,
+        eq_matrix=[[-1.0, -1.0, 1.0], [0.0, 1.0, 0.0]],
+        eq_rhs=[1.0, 0.0],
+        half_spreads=[1.0, 1.0, 0.0],
+        margin_rates=[1.0, 2.0, 0.0],
+        margin_limit=1.0,
+    )
+    assert out["x"] == pytest.approx([-3 / 38, 0.0, 35 / 38], abs=1e-12)
+    assert out["cost"] == pytest.approx(3 / 38, rel=1e-12)
+    assert out["risk"] == pytest.approx(27151 / 1444, rel=1e-12)
+    assert out["objective"] == pytest.approx(27265 / 1444, rel=1e-12)
+    assert out["margin"] == pytest.approx(3 / 38, rel=1e-12)
+
+
+def test_degenerate_equality_repeats_a_fixed_bound() -> None:
+    # x0 = 1 is both an equality and lower = upper = 1; x1 is free and goes to 0.
+    out = hs.qp_solve(
+        I2,
+        [0.0, 0.0],
+        [1.0, 1.0],
+        eq_matrix=[[1.0, 0.0]],
+        eq_rhs=[1.0],
+        lower=[1.0, None],
+        upper=[1.0, None],
+    )
+    assert out["x"] == pytest.approx([1.0, 0.0], abs=1e-12)
+    assert out["objective"] == pytest.approx(1.0, rel=1e-12)
+
+
+def test_degenerate_every_bound_fixed() -> None:
+    out = hs.qp_solve(I2, [1.0, 1.0], [1.0, 1.0], lower=[0.5, -2.0], upper=[0.5, -2.0])
+    assert out["x"] == [0.5, -2.0]
+    assert out["objective"] == pytest.approx(1.5**2 + 1.0, rel=1e-12)
+
+
+@pytest.mark.parametrize(
+    ("eq_matrix", "eq_rhs"),
+    [([[1.0, 1.0, 1.0]], [3.0]), ([[1.0, 1.0, 1.0], [1.0, -1.0, 0.0]], [3.0, 0.0])],
+)
+def test_degenerate_single_vertex_of_the_box(
+    eq_matrix: list[list[float]], eq_rhs: list[float]
+) -> None:
+    # sum x = 3 with x <= 1 is met only at (1, 1, 1); the equality is redundant with the bounds
+    # there, and the second equality (x0 = x1) is redundant too.
+    out = hs.qp_solve(
+        I3, [0.0] * 3, [1.0] * 3, eq_matrix=eq_matrix, eq_rhs=eq_rhs, upper=[1.0, 1.0, 1.0]
+    )
+    assert out["x"] == pytest.approx([1.0, 1.0, 1.0], abs=1e-12)
+    assert out["objective"] == pytest.approx(3.0, rel=1e-12)
+
+
+def test_degenerate_box_vertex_infeasible_neighbour_still_raises() -> None:
+    got = err(
+        hs.qp_solve,
+        I2,
+        [0.0, 0.0],
+        [1.0, 1.0],
+        eq_matrix=[[1.0, 1.0]],
+        eq_rhs=[2.000001],
+        upper=[1.0, 1.0],
+    )
+    assert got == ("E_INFEASIBLE", "no position meets the equalities and the bounds", None)
+
+
+def test_independent_bounds_keeps_the_working_set_independent() -> None:
+    # Two equalities in three variables leave one free direction, so at most one of three
+    # active bounds can join; the first independent one in index order does.
+    e = np.array([[-1.0, 0.0, 1.0], [-1.0, -1.0, 0.0]])
+    work: dict[int, str] = {}
+    hs._independent_bounds(e, work, [(0, "L"), (1, "L"), (2, "U")], 1e-12)
+    assert work == {0: "L"}
+    # No rows: every active bound is independent.
+    work = {}
+    hs._independent_bounds(np.zeros((0, 2)), work, [(0, "L"), (1, "U")], 0.0)
+    assert work == {0: "L", 1: "U"}
+    # A fixed variable counts as held already: x0 fixed and x0 + x1 = 1 leave nothing free.
+    work = {0: "F"}
+    hs._independent_bounds(np.array([[1.0, 1.0]]), work, [(1, "L")], 1e-12)
+    assert work == {0: "F"}
+
+
+def test_null_step_drops_the_rounding_outside_the_null_space() -> None:
+    # No null space: the step is exactly zero whatever x_p says.
+    x = np.array([1.0, 0.0])
+    got = hs._null_step(x, np.array([1.0 - 2e-16, -5e-17]), np.zeros((2, 0)), np.zeros(0))
+    assert got.tolist() == [1.0, 0.0]
+    # Null space along (1, -1)/sqrt 2: only that component of the target move is kept.
+    z = np.array([[1.0], [-1.0]]) / math.sqrt(2.0)
+    got = hs._null_step(x, np.array([1.0, 1.0]), z, np.array([math.sqrt(2.0)]))
+    assert got == pytest.approx([1.5, -0.5], abs=1e-15)
