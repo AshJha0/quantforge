@@ -1454,3 +1454,96 @@ def test_sign_search_flips_a_position_through_zero() -> None:
     )
     # min (x0 - 3)^2 + (x1 + 2)^2 s.t. |x0| + |x1| <= 1: x0 - x1 direction, x = (1, 0).
     assert out["x"] == pytest.approx([1.0, 0.0], abs=1e-15) and out["margin"] == pytest.approx(1.0)
+
+
+# --------------------------------------------------------------------------------------------
+# Active-set internals: multipliers and the iteration caps
+
+
+def qp_of(big_b: Any, d: Any, e: Any) -> Any:
+    n = len(big_b[0])
+    e_arr = np.asarray(e, dtype=float).reshape(len(e), n)
+    return hs._Qp(
+        np.asarray(big_b, dtype=float),
+        np.asarray(d, dtype=float),
+        e_arr,
+        np.zeros(len(e)),
+        [None] * n,
+        [None] * n,
+        0.0,
+    )
+
+
+def test_multipliers_without_equalities_are_the_gradient() -> None:
+    # g = 2 B^T (B x + d) with B = I, d = (-5, 5), x = (1, 0): g = 2 (-4, 5).
+    q = qp_of([[1.0, 0.0], [0.0, 1.0]], [-5.0, 5.0], [])
+    assert q.multipliers(np.array([1.0, 0.0]), [], {0: "U", 1: "L"}).tolist() == [-8.0, 10.0]
+
+
+def test_multipliers_one_equality_no_free_position_takes_the_interval_midpoint() -> None:
+    q = qp_of([[1.0, 0.0], [0.0, 1.0]], [-5.0, 5.0], [[1.0, 1.0]])
+    x = np.array([1.0, 0.0])  # g = (-8, 10)
+    # j = 0 at an upper bound, coefficient +1: -g0 - lambda >= 0, lambda <= 8 (an upper end).
+    # j = 1 at a lower bound, coefficient +1: g1 + lambda >= 0, lambda >= -10 (a lower end).
+    # lambda = (-10 + 8) / 2 = -1, and g + lambda (1, 1) = (-9, 9).
+    assert q.multipliers(x, [], {0: "U", 1: "L"}).tolist() == [-9.0, 9.0]
+    # Only lower ends: lambda is the largest of them; only upper ends: the smallest.
+    assert q.multipliers(x, [], {0: "L", 1: "L"}).tolist() == [0.0, 18.0]  # lambda = max(8, -10)
+    assert q.multipliers(x, [], {0: "U", 1: "U"}).tolist() == [-18.0, 0.0]  # lambda = min(8, -10)
+    # A fixed position or a zero coefficient gives no end: lambda = 0 with neither.
+    assert q.multipliers(x, [], {0: "F", 1: "F"}).tolist() == [-8.0, 10.0]
+    q0 = qp_of([[1.0, 0.0], [0.0, 1.0]], [-5.0, 5.0], [[0.0, 2.0]])
+    # j = 0 has coefficient 0 and is skipped; j = 1 (L, +2): 10 + 2 lambda >= 0, lambda >= -5.
+    assert q0.multipliers(x, [], {0: "U", 1: "L"}).tolist() == [-8.0, 0.0]
+    # Skipping a fixed position must not stop the scan: j = 1 still contributes.
+    assert q.multipliers(x, [], {0: "F", 1: "L"}).tolist() == [-18.0, 0.0]
+
+
+def test_multipliers_negative_coefficient_swaps_the_interval_ends() -> None:
+    q = qp_of([[1.0, 0.0], [0.0, 1.0]], [-5.0, 5.0], [[-2.0, 1.0]])
+    x = np.array([1.0, 0.0])  # g = (-8, 10)
+    # j = 0 (U, -2): -(g0 - 2 lambda) >= 0, lambda >= -4: a lower end at -g0 / coef = -4.
+    # j = 1 (U, +1): -(g1 + lambda) >= 0, lambda <= -10: an upper end.
+    # Midpoint -7: g + (-7) (-2, 1) = (6, 3).
+    assert q.multipliers(x, [], {0: "U", 1: "U"}).tolist() == [6.0, 3.0]
+
+
+def test_multipliers_with_free_positions_fit_lambda_on_them() -> None:
+    q = qp_of(
+        [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]], [-1.0, 2.0, 3.0], [[1.0, 1.0, 2.0]]
+    )
+    x = np.array([0.0, 0.0, 0.0])  # g = (-2, 4, 6)
+    # Free {1}: lambda = -4 makes g1 + lambda = 0; then g = (-6, 0, -2).
+    assert q.multipliers(x, [1], {0: "L", 2: "U"}).tolist() == [-6.0, 0.0, -2.0]
+    # Free {1, 2}: least squares of (1, 2) lambda = -(4, 6): lambda = -16 / 5.
+    got = q.multipliers(x, [1, 2], {0: "L"})
+    assert got == pytest.approx([-2.0 - 3.2, 4.0 - 3.2, 6.0 - 6.4], abs=1e-14)
+
+
+def test_multipliers_two_equalities_no_free_position_least_squares() -> None:
+    q = qp_of([[1.0, 0.0], [0.0, 1.0]], [-5.0, 5.0], [[1.0, 0.0], [0.0, 1.0]])
+    # E = I: lambda = -g exactly, every multiplier 0.
+    assert q.multipliers(np.array([1.0, 0.0]), [], {0: "U", 1: "L"}).tolist() == [0.0, 0.0]
+
+
+def test_iteration_caps_raise_no_convergence(monkeypatch: pytest.MonkeyPatch) -> None:
+    # R6-6.1 caps the loops at 10 (n + p) + 100; with the cap forced to 0 each loop must report.
+    monkeypatch.setattr(hs, "_cap", lambda n, problem: 0)
+    assert err(hs.qp_solve, A2, B2, W2, lower=[0.0, 0.0]) == (
+        "E_NO_CONVERGENCE",
+        "the active-set search did not settle",
+        None,
+    )
+    assert err(hs.qp_solve, A2, B2, W2, half_spreads=[0.1, 0.1]) == (
+        "E_NO_CONVERGENCE",
+        "the sign search did not settle",
+        None,
+    )
+    # The sign loop gets one pass, the orthant solve inside it none.
+    caps = iter([1, 0])
+    monkeypatch.setattr(hs, "_cap", lambda n, problem: next(caps))
+    assert err(hs.qp_solve, A2, B2, W2, half_spreads=[0.1, 0.1]) == (
+        "E_NO_CONVERGENCE",
+        "the active-set search did not settle",
+        None,
+    )
