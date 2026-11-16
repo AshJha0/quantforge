@@ -706,3 +706,46 @@ def test_swap_ee_hw_errors() -> None:
     # start 0 with an exposure at the first payment's reset is fine
     ok = sr.swap_ee_hw(m, 0.0, [0.5, 1.0], 0.03, "PAY", 1.0, [0.5], 0.0, 0.0)
     assert isinstance(ok["discounted_ee"], list) and ok["cva"] == 0.0
+
+
+def test_bermudan_and_callable_errors() -> None:
+    m = hw_model()
+    g = sr.make_grid(21, 10, 5.0)
+    t = [2.0, 2.5, 3.0]
+
+    def berm(start: float, times: list[float], kind: str, ex: list[float]) -> Any:
+        return lambda: sr.bermudan_swaption(m, start, times, 0.03, kind, 1.0, ex, g)
+
+    _err(berm(0.0, t, "PAYER", [2.0]), "E_DOMAIN", "expiry_years")
+    _err(berm(1.5, [1.5, 2.0], "PAYER", [1.5]), "E_INPUT", "payment_times")
+    _err(berm(1.5, t, "CAP", [1.5]), "E_INPUT", "swaption_type")
+    _err(berm(1.5, t, "PAYER", []), "E_INPUT", "exercise_times")
+    _err(berm(1.5, t, "PAYER", [2.0, 1.5]), "E_INPUT", "exercise_times")
+    _err(berm(1.5, t, "PAYER", [1.5, 1.5]), "E_INPUT", "exercise_times")
+    _err(berm(1.5, t, "PAYER", [1.7]), "E_INPUT", "exercise_times")
+    _err(berm(1.5, t, "PAYER", [3.0]), "E_INPUT", "exercise_times")  # the last payment
+    assert sr.check_bermudan(1.5, t, "PAYER", [1.5, 2.0, 2.5]) is True
+    assert sr.check_bermudan(1.5, t, "RECEIVER", [2.5]) is False
+
+    def bond(times: list[float], calls: list[float], price: float) -> Any:
+        return lambda: sr.callable_bond(m, times, 0.04, 1.0, calls, price, g)
+
+    _err(bond([], [], 1.0), "E_INPUT", "payment_times")
+    _err(bond([0.0, 1.0], [], 1.0), "E_INPUT", "payment_times")
+    _err(bond([2.0, 1.0], [], 1.0), "E_INPUT", "payment_times")
+    _err(bond([1.0, 2.0, 3.0], [2.0, 1.0], 1.0), "E_INPUT", "call_times")
+    _err(bond([1.0, 2.0, 3.0], [3.0], 1.0), "E_INPUT", "call_times")
+    _err(bond([1.0, 2.0, 3.0], [1.5], 1.0), "E_INPUT", "call_times")
+    _err(bond([1.0, 2.0, 3.0], [2.0], 0.0), "E_DOMAIN", "call_price")
+    _err(bond([1.0, 2.0, 3.0], [1.5], 0.0), "E_INPUT", "call_times")
+
+
+def test_callable_bond_called_at_par_with_zero_vol_limit() -> None:
+    # With a call at every coupon date and a call price of par plus nothing, a bond whose coupon
+    # is far above every forward is called at the first call date: its value is the coupons up
+    # to that date plus the call price, discounted on the curve (hand calculation).
+    m = sr.curve_model(HW_T, HW_DF, HW_A, 1e-4)
+    times, c = [1.0, 2.0, 3.0, 4.0], 0.2
+    got = sr.callable_bond(m, times, c, 100.0, [1.0, 2.0, 3.0], 1.0, sr.make_grid(101, 200, 6.0))
+    want = 100 * (c * loglin(1.0) + loglin(1.0))
+    assert got["price"] == pytest.approx(want, rel=2e-4, abs=0)
