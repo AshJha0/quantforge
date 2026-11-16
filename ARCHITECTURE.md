@@ -122,7 +122,7 @@ Built in all four languages, with 443 golden cases in 21 suites; each build pass
 - **Errors:** a new code, `E_INFEASIBLE`, for constraints no point satisfies (`specifications/cli-contract.md`); the contract is 1.11.0, which `conformance/runner/runner.py` requires (I-51). `hedge.select.solve` returns `E_LIMIT` above 100,000 candidate subsets (I-53).
 - **Tutorials** for stage I import `quantforge_core` modules, as tutorial 1 does; `quantforge.hedge.*` in the name map is a logical name (I-52).
 
-### Stage J wave 1: research tools (target v0.9.0, unreleased)
+### Stage J wave 1: research tools (v0.9.0)
 
 Built in all four languages and merged to `main` with wave 2 (PR #40, `a148d0e`, 2026-11-14). After wave 1 each build passed 15,215 of 15,215 golden cases (7,504 value-checked, 5,197 error, 2,514 invariance), 99 of them in the four wave 1 suites; after wave 2 the total is 15,315 (`docs/case-figures.md`, checked by `tools/check_case_total.py`). What changes in the structure:
 
@@ -131,7 +131,7 @@ Built in all four languages and merged to `main` with wave 2 (PR #40, `a148d0e`,
 - **Contract:** 1.13.0 at wave 1, no new error code (J-1); 1.14.0 after wave 2. These operations carry their own page limits in place of the general 100,000-element array limit (J-20).
 - **Outside checks:** vectorbt, timeseriescv, scikit-learn, skfolio, hmmlearn and statsmodels check 41 of the 63 value cases (65.1%, J-19a, `oracle/OUTSIDE_SHARES.md`); with wave 2, 99 of the 130 stage J value cases (76.2%).
 
-### Stage J wave 2: portfolio construction and risk-model tests (target v0.9.0, implemented, not released)
+### Stage J wave 2: portfolio construction and risk-model tests (v0.9.0)
 
 Built in all four languages and merged to `main` (PR #40). 100 new golden cases (67 value-checked, 33 error) in `optim_j`, `estim_j`, `esbt_j` and `baumwelch_j` bring the total to 15,315 (`docs/case-figures.md`); every build passes all 100 (2026-11-14, observed through the neutral runner). What changes in the structure:
 
@@ -142,7 +142,7 @@ Built in all four languages and merged to `main` (PR #40). 100 new golden cases 
 - **Contract:** 1.14.0, no new error code (J-W2-1); every build reports it and the runner expects it. Page limits replace the general array limit (J-W2-14).
 - **Outside checks:** 58 of the 67 value cases (J-W2-16, J-W2-23): mean-variance by DAQP, risk parity by cvxpy with Clarabel, Euler by autograd, Ledoit-Wolf by scikit-learn, Black-Litterman by PyPortfolioOpt, Baum-Welch by hmmlearn; the seven `esbt_j` value cases have no free Z2 library (`oracle/OUTSIDE_J.json`). Before those, the generator's exact KKT certificates, scipy SLSQP agreement and pairs of independent algebraic forms were the internal checks (J-W2-15).
 
-### Stage J wave 3 and the curves lane (target v0.9.0, implemented, not released)
+### Stage J wave 3 and the curves lane (v0.9.0)
 
 Built in all four languages on branch `stage-j2` (2026-11-15). Wave 3 adds 88 golden cases (56 value-checked, 32 error; `scen_j`, `interpbt_j`, `drift_j` and four `fuzzfix_j` cases), the curves lane 51 (20 value-checked, 31 error; `termfin_j`, `liqcurve_j`) and the hedge rank-cut fix 4 (`hedgecut_j`, J-I.1) and the hedge sign-state and selection fixes 5 (`hedgesign_j`, `selectcost_j`, J-I.2 and J-I.3), the minimum-variance constant-series fix 3 error cases (`minvarconst_j`, J-I.4) and the E1 completion 48 error cases (`e1_j`: a non-finite input for each of 25 wave 3, curves and stage J operations that had none), for 15,514 in all (`docs/case-figures.md`). On the merged tree (2026-11-15, observed through the neutral runner) every build passes all 15,514. What changes in the structure:
 

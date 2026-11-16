@@ -578,7 +578,7 @@ The same backtest with costs: add `"half_spread"` to the inputs of `hedge_backte
 
 ## Stage J recipes
 
-Stage J wave 1 (target v0.9.0, not yet released) adds research tools; wave 2 recipes follow the wave 1 ones. Each file below copies the inputs of the named golden case verbatim, so its expected outputs are that case's `expected.outputs` in `datasets/golden/stage_j/`. All four builds pass every stage J case (15,514 of 15,514 in each language at contract 1.15.0, 2026-11-15). The outputs quoted here are from the Python build on 2026-11-14.
+Stage J wave 1 (released in v0.9.0) adds research tools; wave 2 recipes follow the wave 1 ones. Each file below copies the inputs of the named golden case verbatim, so its expected outputs are that case's `expected.outputs` in `datasets/golden/stage_j/`. All four builds pass every stage J case (15,514 of 15,514 in each language at contract 1.15.0, 2026-11-15). The outputs quoted here are from the Python build on 2026-11-14.
 
 | Task | File | Operation | From golden |
 |---|---|---|---|
@@ -679,7 +679,7 @@ To check a whole suite: `python conformance/runner/runner.py --impl python --sui
 
 ### Stage J wave 2: portfolio construction, estimation, ES backtest, Baum-Welch
 
-Wave 2 adds seven operations (rulings J-W2-1 to J-W2-23 in `specifications/stage-j-rulings-w2.md`). All four builds implement them, at CLI contract 1.14.0 (merged to `main` in PR #40, unreleased, target v0.9.0). As above, each file copies the inputs of the named golden case verbatim, and the outputs quoted are from the Python build on 2026-11-14. [Tutorial 25](docs/getting-started/tutorial-25-build-and-stress-a-portfolio.md) and [Tutorial 26](docs/getting-started/tutorial-26-test-es-and-fit-regimes.md) work through them on hand-sized data.
+Wave 2 adds seven operations (rulings J-W2-1 to J-W2-23 in `specifications/stage-j-rulings-w2.md`). All four builds implement them, at CLI contract 1.14.0 (merged in PR #40, released in v0.9.0). As above, each file copies the inputs of the named golden case verbatim, and the outputs quoted are from the Python build on 2026-11-14. [Tutorial 25](docs/getting-started/tutorial-25-build-and-stress-a-portfolio.md) and [Tutorial 26](docs/getting-started/tutorial-26-test-es-and-fit-regimes.md) work through them on hand-sized data.
 
 | Task | File | Operation | From golden |
 |---|---|---|---|
