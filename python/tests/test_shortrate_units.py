@@ -822,3 +822,53 @@ def test_capfloor_strike_rule_is_k_times_tau() -> None:
     assert got == pytest.approx(want, rel=1e-11, abs=0)
     rule = "1 + K tau must be above 0 in every period"
     _msg(lambda: sr.capfloor(m, [0.5, 1.0], -2.0, "CAP", 1.0), "E_DOMAIN", "strike", rule)
+
+
+def _strip(sigma: float, bump: float) -> list[Any]:
+    strip: list[Any] = []
+    for expiry, times, k in ((1.0, [1.5, 2.0, 2.5, 3.0], 0.025), (2.0, [3.0, 4.0, 5.0], 0.03)):
+        for payer in (True, False):
+            target = hw_swaption(HW_A, sigma, expiry, times, k, payer) + bump * len(strip)
+            strip.append((expiry, times, k, "PAYER" if payer else "RECEIVER", target))
+    return strip
+
+
+def test_hw_calibrate_least_squares_optimum() -> None:
+    # targets off the model by 0, 2e-4, 4e-4, 6e-4: no sigma fits, so the answer is the
+    # least-squares optimum, checked against the objective rebuilt from B&M closed forms
+    strip = _strip(0.011, 2e-4)
+    out = sr.hw_calibrate(HW_T, HW_DF, HW_A, strip)
+    sig = out["sigma"]
+    assert isinstance(sig, float)
+
+    def objective(s: float) -> float:
+        return math.fsum(
+            (hw_swaption(HW_A, s, q[0], q[1], q[2], q[3] == "PAYER") - q[4]) ** 2 for q in strip
+        )
+
+    f0 = objective(sig)
+    for step in (1e-3, 1e-5):
+        assert f0 <= objective(sig * (1 + step)) and f0 <= objective(sig * (1 - step))
+
+    # the optimum's first-order condition: F'(sigma) = 0, with F' a central difference of the
+    # objective above and its root found by brentq
+    def slope(s: float) -> float:
+        return (objective(s * (1 + 1e-6)) - objective(s * (1 - 1e-6))) / (2e-6 * s)
+
+    assert sig == pytest.approx(brentq(slope, 0.009, 0.014, xtol=1e-15), rel=1e-8, abs=0)
+    fitted = out["fitted_prices"]
+    assert isinstance(fitted, list)
+    for f, q in zip(fitted, strip):
+        assert f == pytest.approx(
+            hw_swaption(HW_A, sig, q[0], q[1], q[2], q[3] == "PAYER"), rel=1e-10
+        )
+    # rmse = sqrt(sum (fitted - target)^2 / n)
+    rmse = math.sqrt(sum((f - q[4]) ** 2 for f, q in zip(fitted, strip)) / 4)
+    assert out["rmse"] == pytest.approx(rmse, rel=1e-12, abs=0)
+
+
+def test_hw_calibrate_minimum_at_the_end() -> None:
+    # every target 0: the objective falls as sigma falls, so its minimum is the end 1e-4
+    strip = [(q[0], q[1], q[2], q[3], 0.0) for q in _strip(0.011, 0.0)]
+    why = "the minimum is at an end of [1e-4, 1]"
+    _msg(lambda: sr.hw_calibrate(HW_T, HW_DF, HW_A, strip), "E_NO_CONVERGENCE", "sigma", why)
