@@ -303,3 +303,43 @@ TEST_CASE("w3u fsum exact rounding cases", "[research][w3u]") {
     REQUIRE(rs::fsum({1.0, -1.1102230246251565e-16, -1e-30}) == 0.99999999999999989);
     REQUIRE(rs::fsum({-3.0, 1.0, 2.5}) == 0.5);
 }
+
+TEST_CASE("w3u fsum half-way correction with a same-sign or opposite-sign tail", "[research][w3u]") {
+    // All values are exact powers of two, so each expected sum is derived by hand from round-half-even.
+    const double u53 = std::ldexp(1.0, -53), u52 = std::ldexp(1.0, -52), u54 = std::ldexp(1.0, -54);
+    const double t106 = std::ldexp(1.0, -106), t110 = std::ldexp(1.0, -110);
+    // 1 + 2^-53 is a tie (rounds to 1); a positive tail 2^-106 puts the true sum above the midpoint: 1 + 2^-52.
+    REQUIRE(rs::fsum({1.0, u53, t106}) == 1.0 + u52);
+    REQUIRE(rs::fsum({-1.0, -u53, -t106}) == -(1.0 + u52));
+    // An opposite-sign tail puts it below the midpoint: the tie must not move, 1.0.
+    REQUIRE(rs::fsum({1.0, u53, -t106}) == 1.0);
+    // Below 1 the ulp is 2^-53: 1 - 2^-54 is a tie (rounds to 1). A negative tail moves it down to 1 - 2^-53,
+    // a positive tail keeps it at 1.
+    REQUIRE(rs::fsum({1.0, -u54, -t110}) == 1.0 - u53);
+    REQUIRE(rs::fsum({1.0, -u54, t110}) == 1.0);
+}
+
+TEST_CASE("w3u drift detectors: downward statistic exactly at the threshold does not alarm", "[research][w3u]") {
+    // cusum: z = -4.5, s- = 4.5 - 0.5 = 4 = h exactly: no alarm (strict >).
+    const rs::Alarms c = rs::cusum({-4.5}, 0.5, 4, 0, 1, true);
+    REQUIRE(c.alarms.empty());
+    REQUIRE(c.s_minus == 4.0);
+    REQUIRE(rs::cusum({-4.6}, 0.5, 4, 0, 1, true).directions == LL{-1});
+    // page_hinkley x = (0, -2): t = 1, mean -1, dn = 0 + (-1 - (-2)) = 1 exactly; up = -1.
+    REQUIRE(rs::page_hinkley({0, -2}, 0, 1, 0, false).alarms.empty());
+    REQUIRE(rs::page_hinkley({0, -2}, 0, 1, -1, false).alarms.empty());
+    const rs::Alarms p = rs::page_hinkley({0, -2}, 0, 0.5, 0, false);
+    REQUIRE(p.alarms == LL{1});
+    REQUIRE(p.directions == LL{-1});
+}
+
+TEST_CASE("w3u ks exact count with a band wider than every path", "[research][w3u]") {
+    // d > n m: every lattice path stays inside |i m - j n| < d, so P(D >= d) = 0 (the top row of the count
+    // must carry its path through row[m]).
+    REQUIRE(rs::ks_p_count(1, 1, 2) == 0.0);
+    REQUIRE(rs::ks_p_count(1, 3, 4) == 0.0);
+    // n = 1, m = 3, d = 3: of the C(4, 1) = 4 paths, the ones stepping i at j = 0 or j = 3 touch
+    // |3i - j| = 3: p = 2 / 4.
+    REQUIRE(rs::ks_p_count(1, 3, 3) == 0.5);
+    REQUIRE(rs::ks_p_walk(1, 3, 3) == 0.5);
+}
