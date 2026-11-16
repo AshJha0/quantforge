@@ -749,3 +749,76 @@ def test_callable_bond_called_at_par_with_zero_vol_limit() -> None:
     got = sr.callable_bond(m, times, c, 100.0, [1.0, 2.0, 3.0], 1.0, sr.make_grid(101, 200, 6.0))
     want = 100 * (c * loglin(1.0) + loglin(1.0))
     assert got["price"] == pytest.approx(want, rel=2e-4, abs=0)
+
+
+def _msg(fn: Any, code: str, field: str, message: str) -> None:
+    """Like _err, and the message too where two checks share a code and a field."""
+    with pytest.raises(QfError) as e:
+        fn()
+    assert (e.value.code, e.value.field, e.value.message) == (code, field, message)
+
+
+def test_swaption_strike_rules_by_message() -> None:
+    m = sr.make_model("VASICEK", A, SIG, B, None, R0)
+    rule = "1 + K tau_n must be above 0"
+    none = "no critical rate in [-1, 1]"
+    # one period of 0.5: K = -2 gives 1 + K tau = 0 exactly, refused by the strike rule
+    _msg(lambda: sr.swaption(m, 1.0, [1.5], -2.0, "PAYER", 1.0), "E_DOMAIN", "fixed_rate", rule)
+    # two periods, tau_n = 2.0 - 1.5 = 0.5 (not T_n - T_0 = 1): K = -1.2 passes the strike rule
+    # (1 - 0.6 > 0) and fails at the critical rate (-0.6 P1 + 0.4 P2 < 1 for every r in [-1, 1])
+    _msg(
+        lambda: sr.swaption(m, 1.0, [1.5, 2.0], -1.2, "PAYER", 1.0), "E_DOMAIN", "fixed_rate", none
+    )
+    # K = -0.6, tau = 0.5: 1 + K tau = 0.7 > 0 and a root exists, so it prices
+    got = sr.swaption(m, 1.0, [1.5], -0.6, "RECEIVER", 1.0)["price"]
+    want = _jamshidian_direct(A, B, SIG, R0, 1.0, [1.5], -0.6, False)
+    assert got == pytest.approx(want, rel=1e-10, abs=0)
+
+
+def test_cir_swaption_critical_rate_rule_and_parity() -> None:
+    sig = 0.1
+    m = sr.make_model("CIR", A, sig, B, None, R0)
+    t0, times = 1.0, [1.3, 2.0, 3.0]  # unequal periods
+    taus = [0.3, 0.7, 1.0]
+
+    def p(t: float, s: float, r: float) -> float:
+        la, lb = cir_ab(A, B, sig, s - t)
+        return math.exp(la - lb * r)
+
+    # sum K tau_i P(T0, Ti; 0) + P(T0, Tn; 0) >= 1 is needed for r* >= 0 (CIR rates are >= 0):
+    # the boundary strike is the swap rate at r = 0, K* = (1 - P_n) / sum tau_i P_i
+    k_star = (1 - p(t0, 3.0, 0.0)) / sum(tau * p(t0, s, 0.0) for tau, s in zip(taus, times))
+    why = "CIR has no non-negative critical rate"
+    _msg(
+        lambda: sr.swaption(m, t0, times, k_star - 1e-6, "PAYER", 1.0),
+        "E_DOMAIN",
+        "fixed_rate",
+        why,
+    )
+    sr.swaption(m, t0, times, k_star + 1e-6, "PAYER", 1.0)  # just above: allowed
+    # payer - receiver = P(0, T0) - P(0, Tn) - K sum tau_i P(0, Ti), the forward swap
+    k = 0.04
+    pay = sr.swaption(m, t0, times, k, "PAYER", 1.0)["price"]
+    rec = sr.swaption(m, t0, times, k, "RECEIVER", 1.0)["price"]
+    p0 = [p(0.0, s, R0) for s in times]
+    swap = p(0.0, t0, R0) - p0[-1] - k * sum(tau * q for tau, q in zip(taus, p0))
+    assert pay - rec == pytest.approx(swap, rel=1e-9, abs=1e-14)
+
+
+def test_cir_bond_option_at_a_later_expiry() -> None:
+    m = sr.make_model("CIR", A, 0.1, B, None, R0)
+    for k in (0.88, 0.93):  # expiry 2 so that gamma * t and gamma / t differ
+        want = cir_call(A, B, 0.1, R0, k, 2.0, 4.5)
+        got = sr.zcb_option(m, "CALL", k, 2.0, 4.5, 1.0)["price"]
+        assert got == pytest.approx(want, rel=1e-10, abs=0)
+
+
+def test_capfloor_strike_rule_is_k_times_tau() -> None:
+    m = sr.make_model("VASICEK", A, SIG, B, None, R0)
+    # K = -0.6, tau = 0.5: 1 + K tau = 0.7 > 0 is allowed (K / tau would be -1.2)
+    got = sr.capfloor(m, [0.5, 1.0], -0.6, "FLOOR", 1.0)["price"]
+    kb = 1 / 0.7
+    want = 0.7 * gauss_call(_vas_p0(0.5), _vas_p0(1.0), kb, gauss_sp(A, SIG, 0.5, 1.0))
+    assert got == pytest.approx(want, rel=1e-11, abs=0)
+    rule = "1 + K tau must be above 0 in every period"
+    _msg(lambda: sr.capfloor(m, [0.5, 1.0], -2.0, "CAP", 1.0), "E_DOMAIN", "strike", rule)
