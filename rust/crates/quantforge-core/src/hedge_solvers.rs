@@ -2507,7 +2507,11 @@ mod degenerate_tests {
     }
 
     fn c1(x2_cap: f64) -> Result<QpSolution> {
-        let a = vec![vec![1.0, 0.0, -1.0], vec![-1.0, 2.0, -1.0], vec![1.0, 1.0, 2.0]];
+        let a = vec![
+            vec![1.0, 0.0, -1.0],
+            vec![-1.0, 2.0, -1.0],
+            vec![1.0, 1.0, 2.0],
+        ];
         let eq = vec![vec![-1.0, 0.0, 1.0], vec![-1.0, -1.0, 0.0]];
         let lo = [Some(1.0), Some(0.0), Some(-2.0)];
         let hi = [None, Some(1.0), Some(x2_cap)];
