@@ -322,10 +322,10 @@ fn determined_point_tolerance_is_relative_to_bound() {
     );
 }
 
-/// I-44: a hedged variance between -1e-12 S_00 and 0 is rounding of a perfect hedge and comes
+/// I-44: a hedged variance between -1e-12 `S_00` and 0 is rounding of a perfect hedge and comes
 /// back as 0. S = [[1e6 - 1e-7, 1e3], [1e3, 1]]: hedge = -1e3 and hedged variance
 /// (1e6 - 1e-7) - 1e6 = -1e-7 (up to one ulp of 1e6), inside -1e-12 * 1e6 = -1e-6.
-/// With S_00 = 1e6 - 1e-5 the hedged variance -1e-5 is beyond the band: not positive definite.
+/// With `S_00` = 1e6 - 1e-5 the hedged variance -1e-5 is beyond the band: not positive definite.
 #[test]
 fn minvar_negative_hedged_variance_band_is_relative() {
     let s = |v: f64| -> Matrix { vec![vec![v, 1e3], vec![1e3, 1.0]] };
