@@ -1755,3 +1755,14 @@ def test_select_tie_goes_to_the_smaller_subset_then_the_first_indices() -> None:
     # Bounds limit each instrument; the better single instrument is then 1.
     out = hs.select_solve(a, [-1.0, -2.0, 0.0], [1.0, 1.0, 1.0], 1, upper=[None, 1.5, None])
     assert out["selected"] == [1] and out["x"] == [0.0, 1.5, 0.0] and out["objective"] == 1.25
+
+
+def test_strikes_below_one_are_valid() -> None:
+    # The domain rule is strike > 0, not strike > 1: a strike of 0.5 on a spot of 0.5 is an at-the-money option.
+    m = (0.5, 0.0, 0.0, 0.2)
+    book = [("CALL", 0.5, 1.0, 10.0)]
+    out = hs.greeks_neutralise(*m, book, [("UNDERLYING", None, None)], ["DELTA"])
+    want = 10.0 * bs_greeks(0.5, 0.0, 0.0, 0.2, "CALL", 0.5, 1.0)[0]
+    assert out["quantities"] == pytest.approx([-want], rel=1e-12)
+    lots = hs.option_hedge_lots(*m, book, [("CALL", 0.5, 1.0, 1.0, 0.0)], ["DELTA"], 20)
+    assert lots["lots"] == [-10]
