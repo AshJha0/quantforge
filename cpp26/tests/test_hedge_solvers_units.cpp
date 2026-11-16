@@ -403,3 +403,114 @@ TEST_CASE("hsu sign search flips a position when a tiny margin rate makes the ma
     REQUIRE(std::fabs(r.x[0] - x0) <= 1e-14);
     REQUIRE(std::fabs(r.x[1] - (1.0 - x0)) <= 1e-14);
 }
+
+// ---- Degenerate but feasible problems (v0.9.0 kill-round failures and their neighbours) ----
+// Each feasible set is one point, or the margin is tight at a vertex, so more constraints are active than the
+// dimension allows. C++ refused the margin case with E_INFEASIBLE: Goldfarb-Idnani's certificate fired on a 1e-16
+// rounding gap. Answers are worked by hand; the same cases are in the Python, Java and Rust unit tests.
+namespace {
+hg::QpProblem degenerate(Matrix a, hg::Vec b) {
+    hg::QpProblem p;
+    p.weights = hg::Vec(a.size(), 1.0);
+    p.a = std::move(a);
+    p.b = std::move(b);
+    return p;
+}
+hg::QpProblem c1_problem(double x2_cap) {
+    hg::QpProblem p = degenerate({{1, 0, -1}, {-1, 2, -1}, {1, 1, 2}}, {-1, -1, -3});
+    p.eq_matrix = Matrix{{-1, 0, 1}, {-1, -1, 0}};
+    p.eq_rhs = hg::Vec{-2, -1};
+    p.lower = std::vector<hg::Bound>{1.0, 0.0, -2.0};
+    p.upper = std::vector<hg::Bound>{std::nullopt, 1.0, x2_cap};
+    return p;
+}
+hg::QpProblem margin_problem(double limit) {
+    hg::QpProblem p = degenerate({{1, 0}, {0, 1}}, {0, 0});
+    p.eq_matrix = Matrix{{1, 1}};
+    p.eq_rhs = hg::Vec{1};
+    p.margin_rates = hg::Vec{1, 4};
+    p.margin_limit = limit;
+    return p;
+}
+void require_x(const hg::QpResult& r, const hg::Vec& want) {
+    REQUIRE(r.x.size() == want.size());
+    for (std::size_t j = 0; j < want.size(); ++j) REQUIRE(std::fabs(r.x[j] - want[j]) <= 1e-12);
+}
+bool near(double got, double want, double rel = 1e-12) { return std::fabs(got - want) <= rel * std::fabs(want); }
+}  // namespace
+
+TEST_CASE("hsu degenerate: equalities and bounds leave one point", "[hedging][hsu][degenerate]") {
+    // The equalities leave (t, 1 - t, t - 2); x0 >= 1, x1 >= 0, x2 <= -1 meet only at t = 1. A x + b = (1, -1, -4).
+    const hg::QpResult r = hg::solve_qp(c1_problem(-1.0));
+    require_x(r, {1, 0, -1});
+    REQUIRE(near(r.objective, 18.0));
+    REQUIRE(r.rank == 1);
+    REQUIRE(code_of([] { hg::solve_qp(c1_problem(-1.000001)); }) == "E_INFEASIBLE");
+}
+
+TEST_CASE("hsu degenerate: margin tight at the only feasible point", "[hedging][hsu][degenerate]") {
+    // x0 + x1 = 1 and |x0| + 4 |x1| <= 1 meet only at (1, 0).
+    const hg::QpResult r = hg::solve_qp(margin_problem(1.0));
+    require_x(r, {1, 0});
+    REQUIRE(near(r.objective, 1.0));
+    REQUIRE(near(r.margin, 1.0));
+    hg::QpProblem c = margin_problem(1.0);
+    c.half_spreads = hg::Vec{0.5, 0.5};
+    const hg::QpResult rc = hg::solve_qp(c);
+    require_x(rc, {1, 0});
+    REQUIRE(near(rc.risk, 1.0));
+    REQUIRE(near(rc.cost, 0.5));
+    REQUIRE(near(rc.objective, 1.5));
+    REQUIRE(code_of([] { hg::solve_qp(margin_problem(0.999999)); }) == "E_INFEASIBLE");
+}
+
+TEST_CASE("hsu degenerate: costed problem with two equalities and a margin", "[hedging][hsu][degenerate]") {
+    // x = (t, 0, 1 + t), f(t) = (t + 4)^2 + (1 - 4t)^2 + 2 (t + 1)^2 + |t|, minimised at t = -3/38.
+    hg::QpProblem p = degenerate({{-1, 1, 2}, {-2, -2, -2}, {-2, -1, 1}, {1, -1, 0}}, {2, 3, -2, 1});
+    p.eq_matrix = Matrix{{-1, -1, 1}, {0, 1, 0}};
+    p.eq_rhs = hg::Vec{1, 0};
+    p.half_spreads = hg::Vec{1, 1, 0};
+    p.margin_rates = hg::Vec{1, 2, 0};
+    p.margin_limit = 1.0;
+    const hg::QpResult r = hg::solve_qp(p);
+    require_x(r, {-3.0 / 38, 0, 35.0 / 38});
+    REQUIRE(near(r.cost, 3.0 / 38));
+    REQUIRE(near(r.risk, 27151.0 / 1444, 1e-11));
+    REQUIRE(near(r.objective, 27265.0 / 1444, 1e-11));
+    REQUIRE(near(r.margin, 3.0 / 38));
+}
+
+TEST_CASE("hsu degenerate: an equality repeats a fixed bound; every bound fixed", "[hedging][hsu][degenerate]") {
+    hg::QpProblem p = degenerate({{1, 0}, {0, 1}}, {0, 0});
+    p.eq_matrix = Matrix{{1, 0}};
+    p.eq_rhs = hg::Vec{1};
+    p.lower = std::vector<hg::Bound>{1.0, std::nullopt};
+    p.upper = std::vector<hg::Bound>{1.0, std::nullopt};
+    const hg::QpResult r = hg::solve_qp(p);
+    require_x(r, {1, 0});
+    REQUIRE(near(r.objective, 1.0));
+    hg::QpProblem f = degenerate({{1, 0}, {0, 1}}, {1, 1});
+    f.lower = std::vector<hg::Bound>{0.5, -2.0};
+    f.upper = std::vector<hg::Bound>{0.5, -2.0};
+    const hg::QpResult rf = hg::solve_qp(f);
+    REQUIRE(rf.x == hg::Vec{0.5, -2.0});
+    REQUIRE(near(rf.objective, 3.25));
+}
+
+TEST_CASE("hsu degenerate: a single vertex of the box, with redundant equalities", "[hedging][hsu][degenerate]") {
+    // sum x = 3 with x <= 1 is met only at (1, 1, 1); x0 = x1 is redundant there too.
+    for (const bool second : {false, true}) {
+        hg::QpProblem p = degenerate({{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {0, 0, 0});
+        p.eq_matrix = second ? Matrix{{1, 1, 1}, {1, -1, 0}} : Matrix{{1, 1, 1}};
+        p.eq_rhs = second ? hg::Vec{3, 0} : hg::Vec{3};
+        p.upper = std::vector<hg::Bound>{1.0, 1.0, 1.0};
+        const hg::QpResult r = hg::solve_qp(p);
+        require_x(r, {1, 1, 1});
+        REQUIRE(near(r.objective, 3.0));
+    }
+    hg::QpProblem bad = degenerate({{1, 0}, {0, 1}}, {0, 0});
+    bad.eq_matrix = Matrix{{1, 1}};
+    bad.eq_rhs = hg::Vec{2.000001};
+    bad.upper = std::vector<hg::Bound>{1.0, 1.0};
+    REQUIRE(code_of([&] { hg::solve_qp(bad); }) == "E_INFEASIBLE");
+}

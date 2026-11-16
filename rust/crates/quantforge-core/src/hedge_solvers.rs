@@ -2471,3 +2471,173 @@ mod lot_search_cap_tests {
         assert_eq!(solve_with_cap(2).unwrap_err().code, "E_NO_CONVERGENCE");
     }
 }
+
+/// Degenerate but feasible problems (v0.9.0 kill-round failures and their neighbours): the
+/// feasible set is one point, or the margin is tight at a vertex, so more constraints are active
+/// than the dimension allows. Answers are worked by hand; the same cases are in the Python, Java
+/// and C++ unit tests.
+#[cfg(test)]
+mod degenerate_tests {
+    use super::*;
+
+    fn problem<'a>(a: &'a Matrix, b: &'a [f64], w: &'a [f64]) -> QpProblem<'a> {
+        QpProblem {
+            a,
+            b,
+            weights: w,
+            ridge: 0.0,
+            eq_matrix: None,
+            eq_rhs: None,
+            lower: None,
+            upper: None,
+            singular: Singular::Error,
+            costs: Costs::default(),
+        }
+    }
+
+    fn assert_x(got: &[f64], want: &[f64]) {
+        assert_eq!(got.len(), want.len());
+        for (g, w) in got.iter().zip(want) {
+            assert!((g - w).abs() <= 1e-12, "{got:?} vs {want:?}");
+        }
+    }
+
+    fn assert_rel(got: f64, want: f64, rel: f64) {
+        assert!((got - want).abs() <= rel * want.abs(), "{got} vs {want}");
+    }
+
+    fn c1(x2_cap: f64) -> Result<QpSolution> {
+        let a = vec![vec![1.0, 0.0, -1.0], vec![-1.0, 2.0, -1.0], vec![1.0, 1.0, 2.0]];
+        let eq = vec![vec![-1.0, 0.0, 1.0], vec![-1.0, -1.0, 0.0]];
+        let lo = [Some(1.0), Some(0.0), Some(-2.0)];
+        let hi = [None, Some(1.0), Some(x2_cap)];
+        let mut p = problem(&a, &[-1.0, -1.0, -3.0], &[1.0; 3]);
+        p.eq_matrix = Some(&eq);
+        p.eq_rhs = Some(&[-2.0, -1.0]);
+        p.lower = Some(&lo);
+        p.upper = Some(&hi);
+        qp_solve(&p)
+    }
+
+    /// The equalities leave (t, 1 - t, t - 2); x0 >= 1, x1 >= 0, x2 <= -1 meet only at t = 1,
+    /// where A x + b = (1, -1, -4).
+    #[test]
+    fn equalities_and_bounds_leave_one_point() {
+        let s = c1(-1.0).expect("feasible");
+        assert_x(&s.x, &[1.0, 0.0, -1.0]);
+        assert_rel(s.objective, 18.0, 1e-12);
+        assert_eq!(s.rank, 1);
+        assert_eq!(c1(-1.000_001).unwrap_err().code, "E_INFEASIBLE");
+    }
+
+    fn margin(limit: f64, spreads: Option<&[f64]>) -> Result<QpSolution> {
+        let a = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let eq = vec![vec![1.0, 1.0]];
+        let mut p = problem(&a, &[0.0, 0.0], &[1.0, 1.0]);
+        p.eq_matrix = Some(&eq);
+        p.eq_rhs = Some(&[1.0]);
+        p.costs = Costs {
+            half_spreads: spreads,
+            margin_rates: Some(&[1.0, 4.0]),
+            margin_limit: Some(limit),
+            ..Costs::default()
+        };
+        qp_solve(&p)
+    }
+
+    /// x0 + x1 = 1 and |x0| + 4 |x1| <= 1 meet only at (1, 0).
+    #[test]
+    fn margin_tight_at_the_only_feasible_point() {
+        let s = margin(1.0, None).expect("feasible");
+        assert_x(&s.x, &[1.0, 0.0]);
+        assert_rel(s.objective, 1.0, 1e-12);
+        assert_rel(s.margin.expect("margin"), 1.0, 1e-12);
+        let c = margin(1.0, Some(&[0.5, 0.5])).expect("feasible");
+        assert_x(&c.x, &[1.0, 0.0]);
+        assert_rel(c.risk.expect("risk"), 1.0, 1e-12);
+        assert_rel(c.cost.expect("cost"), 0.5, 1e-12);
+        assert_rel(c.objective, 1.5, 1e-12);
+        assert_eq!(margin(0.999_999, None).unwrap_err().code, "E_INFEASIBLE");
+    }
+
+    /// x = (t, 0, 1 + t), f(t) = (t + 4)^2 + (1 - 4t)^2 + 2 (t + 1)^2 + |t|, minimised at
+    /// t = -3/38.
+    #[test]
+    fn costed_two_equalities_and_a_margin() {
+        let a = vec![
+            vec![-1.0, 1.0, 2.0],
+            vec![-2.0, -2.0, -2.0],
+            vec![-2.0, -1.0, 1.0],
+            vec![1.0, -1.0, 0.0],
+        ];
+        let eq = vec![vec![-1.0, -1.0, 1.0], vec![0.0, 1.0, 0.0]];
+        let mut p = problem(&a, &[2.0, 3.0, -2.0, 1.0], &[1.0; 4]);
+        p.eq_matrix = Some(&eq);
+        p.eq_rhs = Some(&[1.0, 0.0]);
+        p.costs = Costs {
+            half_spreads: Some(&[1.0, 1.0, 0.0]),
+            margin_rates: Some(&[1.0, 2.0, 0.0]),
+            margin_limit: Some(1.0),
+            ..Costs::default()
+        };
+        let s = qp_solve(&p).expect("feasible");
+        assert_x(&s.x, &[-3.0 / 38.0, 0.0, 35.0 / 38.0]);
+        assert_rel(s.cost.expect("cost"), 3.0 / 38.0, 1e-12);
+        assert_rel(s.risk.expect("risk"), 27151.0 / 1444.0, 1e-11);
+        assert_rel(s.objective, 27265.0 / 1444.0, 1e-11);
+        assert_rel(s.margin.expect("margin"), 3.0 / 38.0, 1e-12);
+    }
+
+    #[test]
+    fn equality_repeats_a_fixed_bound_and_every_bound_fixed() {
+        let a = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let eq = vec![vec![1.0, 0.0]];
+        let lo = [Some(1.0), None];
+        let hi = [Some(1.0), None];
+        let mut p = problem(&a, &[0.0, 0.0], &[1.0, 1.0]);
+        p.eq_matrix = Some(&eq);
+        p.eq_rhs = Some(&[1.0]);
+        p.lower = Some(&lo);
+        p.upper = Some(&hi);
+        let s = qp_solve(&p).expect("feasible");
+        assert_x(&s.x, &[1.0, 0.0]);
+        assert_rel(s.objective, 1.0, 1e-12);
+        let fixed = [Some(0.5), Some(-2.0)];
+        let mut f = problem(&a, &[1.0, 1.0], &[1.0, 1.0]);
+        f.lower = Some(&fixed);
+        f.upper = Some(&fixed);
+        let s = qp_solve(&f).expect("feasible");
+        assert_eq!(s.x, vec![0.5, -2.0]);
+        assert_rel(s.objective, 3.25, 1e-12);
+    }
+
+    /// sum x = 3 with x <= 1 is met only at (1, 1, 1); x0 = x1 is redundant there too.
+    #[test]
+    fn single_vertex_of_the_box_with_redundant_equalities() {
+        let a = vec![
+            vec![1.0, 0.0, 0.0],
+            vec![0.0, 1.0, 0.0],
+            vec![0.0, 0.0, 1.0],
+        ];
+        let hi = [Some(1.0); 3];
+        let one = vec![vec![1.0, 1.0, 1.0]];
+        let two = vec![vec![1.0, 1.0, 1.0], vec![1.0, -1.0, 0.0]];
+        for (eq, rhs) in [(&one, &[3.0][..]), (&two, &[3.0, 0.0][..])] {
+            let mut p = problem(&a, &[0.0; 3], &[1.0; 3]);
+            p.eq_matrix = Some(eq);
+            p.eq_rhs = Some(rhs);
+            p.upper = Some(&hi);
+            let s = qp_solve(&p).expect("feasible");
+            assert_x(&s.x, &[1.0, 1.0, 1.0]);
+            assert_rel(s.objective, 3.0, 1e-12);
+        }
+        let a2 = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let eq = vec![vec![1.0, 1.0]];
+        let hi2 = [Some(1.0), Some(1.0)];
+        let mut bad = problem(&a2, &[0.0, 0.0], &[1.0, 1.0]);
+        bad.eq_matrix = Some(&eq);
+        bad.eq_rhs = Some(&[2.000_001]);
+        bad.upper = Some(&hi2);
+        assert_eq!(qp_solve(&bad).unwrap_err().code, "E_INFEASIBLE");
+    }
+}
