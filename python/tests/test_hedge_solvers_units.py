@@ -1734,3 +1734,24 @@ def test_integer_solve_output_keys_and_values() -> None:
     )
     assert out["continuous_objective"] == pytest.approx(2 * cont.cost, rel=1e-9)
     assert out["rounding_cost"] == pytest.approx(f(best) - 2 * cont.cost, rel=1e-7)
+
+
+def test_integer_tie_tolerance_is_relative_to_the_objective() -> None:
+    # A = 1000, lot 1, b = -(500 + d): f(0) = (500 + d)^2 and f(1) = (500 - d)^2 differ by 2000 d. With d = 1e-11
+    # that is 2e-8, inside 1e-12 * 2.5e5: a tie (I-7), so the lighter n = 0 wins although n = 1 is lower.
+    assert hs.integer_solve([[1000.0]], [-(500.0 + 1e-11)], [1.0], [1.0])["lots"] == [0]
+    assert hs.integer_solve([[1000.0]], [-(500.0 + 1e-9)], [1.0], [1.0])["lots"] == [1]
+
+
+def test_select_tie_goes_to_the_smaller_subset_then_the_first_indices() -> None:
+    # A = I (3 x 3) with b = (-1, -1, 0): instrument 2 does nothing, so {0, 1} and {0, 1, 2} tie at 0; the
+    # smaller subset wins. {0} and {1} tie at 1 for max 1; the lexicographically first wins.
+    a = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+    out = hs.select_solve(a, [-1.0, -1.0, 0.0], [1.0, 1.0, 1.0], 3)
+    assert out["selected"] == [0, 1] and out["x"] == [1.0, 1.0, 0.0] and out["objective"] == 0.0
+    one = hs.select_solve(a, [-1.0, -1.0, 0.0], [1.0, 1.0, 1.0], 1)
+    assert one["selected"] == [0] and one["x"] == [1.0, 0.0, 0.0] and one["objective"] == 1.0
+    assert one["residual"] == [0.0, -1.0, 0.0]
+    # Bounds limit each instrument; the better single instrument is then 1.
+    out = hs.select_solve(a, [-1.0, -2.0, 0.0], [1.0, 1.0, 1.0], 1, upper=[None, 1.5, None])
+    assert out["selected"] == [1] and out["x"] == [0.0, 1.5, 0.0] and out["objective"] == 1.25
