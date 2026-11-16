@@ -455,6 +455,11 @@ def test_critical_rate_solves_the_bond_sum() -> None:
     _err(lambda: sr._critical_rate(m, 1.0, times, [0.0, 0.0, 0.1]), "E_DOMAIN", "fixed_rate")
     # sum c_i P(T0, Ti; 1) > 1: no sign change either
     _err(lambda: sr._critical_rate(m, 1.0, times, [5.0, 5.0, 6.0]), "E_DOMAIN", "fixed_rate")
+    # a root above 1 is outside the bracket [-1, 1] and refused, though a root exists
+    big = [0.8, 0.8, 1.8]
+    root = brentq(lambda r: _bond_sum(big, times, r) - 1, -1, 3, xtol=1e-15)
+    assert 1 < root < 2
+    _err(lambda: sr._critical_rate(m, 1.0, times, big), "E_DOMAIN", "fixed_rate")
 
 
 # --- caps and floors ---------------------------------------------------------------------------
