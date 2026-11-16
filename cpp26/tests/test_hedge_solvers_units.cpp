@@ -78,3 +78,78 @@ TEST_CASE("hsu residual report: a zero residual contributes +0, not -0", "[hedgi
     REQUIRE(r.variance_after == 2.0);
     REQUIRE(r.effectiveness == 0.0);
 }
+
+TEST_CASE("hsu option strike exactly 0 is refused", "[hedging][hsu]") {
+    const hg::Market m{100.0, 0.0, 0.0, 0.2};
+    const auto with_strike = [](double k) {
+        hg::Position p;
+        p.instrument = hg::Instrument::Call;
+        p.strike = k;
+        p.expiry_years = 1.0;
+        p.quantity = 1.0;
+        return p;
+    };
+    hg::Position under;
+    under.quantity = 1.0;
+    REQUIRE(code_of([&] { hg::neutralise(m, {with_strike(0.0)}, {under}, {hg::Greek::Delta}); }) == "E_DOMAIN");
+    REQUIRE(code_of([&] { hg::neutralise(m, {with_strike(100.0)}, {under}, {hg::Greek::Delta}); }) == "ok");
+}
+
+TEST_CASE("hsu near-singular hedge judged on the scaled form against the largest scaled eigenvalue", "[hedging][hsu]") {
+    // A = [[1, 1], [0, e]]: H = A'A = [[1, 1], [1, 1 + e^2]]. Jacobi-scaled, H is a correlation matrix with
+    // rho = 1 / sqrt(1 + e^2) ~ 1 - e^2 / 2, eigenvalues 1 - rho ~ e^2 / 2 and 1 + rho ~ 2. The reduced form is all
+    // of it (no equalities), so the test is e^2 / 2 > 1e-12 * 2.
+    const auto solve_with = [](double e2) {
+        hg::QpProblem p;
+        p.a = {{1.0, 1.0}, {0.0, std::sqrt(e2)}};
+        p.b = {1.0, 1.0};
+        p.weights = {1.0, 1.0};
+        return code_of([&] { hg::solve_qp(p); });
+    };
+    REQUIRE(solve_with(2e-12) == "E_SINGULAR");  // smallest 1e-12 < 2e-12 (and > 5e-13: the factor matters)
+    REQUIRE(solve_with(2e-11) == "ok");          // smallest 1e-11 > 2e-12
+}
+
+TEST_CASE("hsu margin limit: tolerance is relative to the limit, small and large limits", "[hedging][hsu]") {
+    // One instrument, A = 1, b = -1.1e-6: the free minimiser of (b + x)^2 is x = 1.1e-6, margin |x| = 1.1e-6 above
+    // the limit 1e-6 by 1e-7, far beyond any 1e-12 relative tolerance, so the limit binds: x = 1e-6.
+    hg::QpProblem p;
+    p.a = {{1.0}};
+    p.b = {-1.1e-6};
+    p.weights = {1.0};
+    p.margin_rates = hg::Vec{1.0};
+    p.margin_limit = 1e-6;
+    const hg::QpResult r = hg::solve_qp(p);
+    REQUIRE(std::fabs(r.x[0] - 1e-6) <= 1e-15);
+    // k = n: the equality fixes x = 1000 + 1e-7 against limit 1000. The I-46 tolerance 1e-9 * max(1, 1000) = 1e-6
+    // covers the 1e-7 excess, so it is feasible and x is the fixed point.
+    hg::QpProblem f;
+    f.a = {{1.0}};
+    f.b = {0.0};
+    f.weights = {1.0};
+    f.eq_matrix = quantforge::Matrix{{1.0}};
+    f.eq_rhs = hg::Vec{1000.0000001};
+    f.margin_rates = hg::Vec{1.0};
+    f.margin_limit = 1000.0;
+    const hg::QpResult rf = hg::solve_qp(f);
+    REQUIRE(std::fabs(rf.x[0] - 1000.0000001) <= 1e-9);
+    // An excess of 1e-5 is beyond the tolerance.
+    f.eq_rhs = hg::Vec{1000.00001};
+    REQUIRE(code_of([&] { hg::solve_qp(f); }) == "E_INFEASIBLE");
+}
+
+TEST_CASE("hsu integer ties: the smallest total lots wins over the lexicographically smaller", "[hedging][hsu]") {
+    // One instrument, lot 1, A = 1, b = 0.5: (0.5 + n)^2 is 0.25 at n = 0 and at n = -1 (an exact tie in binary).
+    // I-7: smallest sum |n| first, so n = 0 (sum 0) beats n = -1 (sum 1) although (-1) < (0) lexicographically.
+    hg::IntegerProblem p;
+    p.a = {{1.0}};
+    p.b = {0.5};
+    p.weights = {1.0};
+    p.lot_sizes = {1.0};
+    const hg::IntegerResult r = hg::solve_integer(p);
+    REQUIRE(r.lots == std::vector<long long>{0});
+    REQUIRE(r.objective == 0.25);
+    // The mirror b = -0.5: n = 0 and n = 1 tie; n = 0 is both lighter and lexicographically smaller.
+    p.b = {-0.5};
+    REQUIRE(hg::solve_integer(p).lots == std::vector<long long>{0});
+}
