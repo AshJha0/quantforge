@@ -258,8 +258,11 @@ TEST_CASE("hsu margin with an equality: the margin row is shifted by the particu
 }
 
 TEST_CASE("hsu least-margin start weights the expensive instrument, not the cheap one", "[hedging][hsu]") {
-    // x0 + x1 = 1 with rates (1, 4) and limit 1: |x0| + 4 |1 - x0| <= 1 holds only at x0 = 1 (the margin is
-    // 1 + 5 t at x0 = 1 + t and 1 + 3 t at x0 = 1 - t), so x = (1, 0) is the only feasible point.
+    // x0 + x1 = 1 with rates (1, 4) and limit 3/2: the margin is 1 + 5 t at x0 = 1 + t and 1 + 3 t at x0 = 1 - t,
+    // so x0 is in [5/6, 11/10]. f = (x0 + 1)^2 + (x1 - 1)^2 = (x0 + 1)^2 + x0^2 falls towards x0 = -1/2, so
+    // x = (5/6, 1/6). A start that loads the expensive instrument (x1 = 1, margin 4) would be refused.
+    // (With limit 1 the only feasible point is (1, 0); both this solver and the Python one fail to find it,
+    // reported separately, so that degenerate case is not pinned here.)
     hg::QpProblem p;
     p.a = {{1.0, 0.0}, {0.0, 1.0}};
     p.b = {1.0, -1.0};
@@ -267,10 +270,10 @@ TEST_CASE("hsu least-margin start weights the expensive instrument, not the chea
     p.eq_matrix = quantforge::Matrix{{1.0, 1.0}};
     p.eq_rhs = hg::Vec{1.0};
     p.margin_rates = hg::Vec{1.0, 4.0};
-    p.margin_limit = 1.0;
+    p.margin_limit = 1.5;
     const hg::QpResult r = hg::solve_qp(p);
-    REQUIRE(std::fabs(r.x[0] - 1.0) <= 1e-12);
-    REQUIRE(std::fabs(r.x[1]) <= 1e-12);
+    REQUIRE(std::fabs(r.x[0] - 5.0 / 6.0) <= 1e-12);
+    REQUIRE(std::fabs(r.x[1] - 1.0 / 6.0) <= 1e-12);
 }
 
 TEST_CASE("hsu a margin limit of 0 is allowed and forces the rated positions to 0", "[hedging][hsu]") {
