@@ -872,3 +872,49 @@ def test_hw_calibrate_minimum_at_the_end() -> None:
     strip = [(q[0], q[1], q[2], q[3], 0.0) for q in _strip(0.011, 0.0)]
     why = "the minimum is at an end of [1e-4, 1]"
     _msg(lambda: sr.hw_calibrate(HW_T, HW_DF, HW_A, strip), "E_NO_CONVERGENCE", "sigma", why)
+
+
+def test_grid_boundary_rows_on_a_narrow_grid() -> None:
+    # At width 2 the linear-extrapolation rows at both ends of the grid carry weight, and the
+    # scheme still reprices the bullet bond (coupons plus face on the curve) to about 2e-6.
+    # Unequal periods so that each coupon uses its own tau and the step count per period differs.
+    m = hw_model()
+    times, c = [0.5, 1.0, 2.0, 3.5], 0.04
+    taus = [0.5, 0.5, 1.0, 1.5]
+    bullet = sum(c * tau * loglin(t) for tau, t in zip(taus, times)) + loglin(3.5)
+    got = sr.callable_bond(m, times, c, 1.0, [], 1.0, sr.make_grid(81, 400, 2.0))["price"]
+    assert got == pytest.approx(bullet, rel=2e-5, abs=0)
+    swap = [2.0, 2.5, 3.0, 3.5, 4.0]
+    want = hw_swaption(HW_A, HW_SIG, 1.5, swap, 0.03, True)
+    grid = sr.make_grid(81, 400, 2.0)
+    berm = sr.bermudan_swaption(m, 1.5, swap, 0.03, "PAYER", 1.0, [1.5], grid)["price"]
+    assert berm == pytest.approx(want, rel=1e-3, abs=0)
+
+
+def test_build_model_order_and_messages() -> None:
+    # a and sigma are checked before the curve (spec order)
+    _err(
+        lambda: sr.build_model("HULL_WHITE", 0.0, SIG, None, None, None, None),
+        "E_DOMAIN",
+        "mean_reversion",
+    )
+    _err(lambda: sr.build_model("HULL_WHITE", A, 0.0, None, None, None, None), "E_DOMAIN", "sigma")
+    hw = "short_rate is not an input of this Hull-White operation"
+    _msg(lambda: sr.curve_model([1.0], [0.9], A, SIG, True), "E_INPUT", "short_rate", hw)
+    _msg(
+        lambda: sr.make_model("CIR", A, SIG, None, None, R0),
+        "E_DOMAIN",
+        "long_term_mean",
+        "CIR needs long_term_mean above 0",
+    )
+    _msg(
+        lambda: sr.make_model("CIR", A, SIG, B, None, -0.01),
+        "E_DOMAIN",
+        "short_rate",
+        "CIR needs short_rate >= 0",
+    )
+    # a Vasicek model has no curve: its bonds today come from r0 (B&M 3.8)
+    m = sr.build_model("VASICEK", A, SIG, B, None, None, R0)
+    assert m.curve is None
+    assert m.p0(2.0) == pytest.approx(_vas_p0(2.0), rel=1e-13, abs=0)
+    assert m.p0(0.0) == 1.0 and m.p0(-1.0) == 1.0
