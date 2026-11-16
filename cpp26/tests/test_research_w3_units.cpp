@@ -343,3 +343,19 @@ TEST_CASE("w3u ks exact count with a band wider than every path", "[research][w3
     REQUIRE(rs::ks_p_count(1, 3, 3) == 0.5);
     REQUIRE(rs::ks_p_walk(1, 3, 3) == 0.5);
 }
+
+TEST_CASE("w3u psi accepts exactly bins values; identical samples give psi 0", "[research][w3u]") {
+    // reference = test = (1, 2), bins 2: one edge at r[ceil(2/2) - 1] = 1, shares (1/2, 1/2) in both, every term
+    // (s - s) log(s / s) = 0, so psi = 0 and no alarm.
+    const rs::Psi p = rs::psi({1.0, 2.0}, {1.0, 2.0}, 2, 0.1);
+    REQUIRE(p.psi == 0.0);
+    REQUIRE_FALSE(p.alarm);
+    REQUIRE(p.reference_shares == Vec{0.5, 0.5});
+    REQUIRE(code_of([] { rs::psi({1.0}, {1.0, 2.0}, 2, 0.1); }) == "E_INPUT:reference");
+}
+
+TEST_CASE("w3u ks p at d = 0 is 1", "[research][w3u]") {
+    // D >= 0 always, so P(D >= 0) = 1 for every n, m.
+    REQUIRE(rs::ks_p_walk(3, 7, 0) == 1.0);
+    REQUIRE(rs::ks_p_count(3, 7, 0) == 1.0);
+}
