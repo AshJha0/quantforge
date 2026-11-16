@@ -359,3 +359,10 @@ TEST_CASE("w3u ks p at d = 0 is 1", "[research][w3u]") {
     REQUIRE(rs::ks_p_walk(3, 7, 0) == 1.0);
     REQUIRE(rs::ks_p_count(3, 7, 0) == 1.0);
 }
+
+TEST_CASE("w3u page-hinkley: upward rise exactly lambda does not alarm", "[research][w3u]") {
+    // x = (0, 2): t = 1, mean 1, up = 0 + (2 - 1) = 1 exactly, up_min 0; dn = -1. Rise 1 = lambda: no alarm.
+    REQUIRE(rs::page_hinkley({0, 2}, 0, 1, 0, false).alarms.empty());
+    REQUIRE(rs::page_hinkley({0, 2}, 0, 1, 1, false).alarms.empty());
+    REQUIRE(rs::page_hinkley({0, 2}, 0, 0.5, 1, false).directions == LL{1});
+}
