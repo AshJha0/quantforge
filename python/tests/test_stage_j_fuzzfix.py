@@ -124,7 +124,7 @@ def _caplets(inputs: str) -> list[float]:
         )
     )
     assert r["status"] == "ok", r
-    return r["outputs"]["caplet_prices"]
+    return [float(v) for v in r["outputs"]["caplet_prices"]]
 
 
 def test_jw3_21_cir_cap_at_a_tiny_first_time() -> None:
