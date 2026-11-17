@@ -1,5 +1,14 @@
 # Changelog
 
+## Next: validation evidence pack, round 2 (2026-11-18)
+
+No curve changes status.
+
+- Ruling C18 (owner): a dividend with `ex_date = as_of` is ignored in `eq.forward.outright`, because `spot` on `as_of` is already ex-dividend; QuantLib's engine differs by convention on `equity_forward-0012`. The spec says what `spot` means.
+- ESTR real-data round trip: par OIS rates priced by QuantLib on the ECB euro area AAA government curve (Svensson parameters), rebuilt by `rates.ois.bootstrap`; passes the stated 0.5 bp at every pillar (`docs/validation/data/real-data.json`).
+- Outside checks: funding curve 3 of 3 with QuantLib curve objects (`outside_f.py`, row FUND.RATIO); financing term structures 13 of 13 with QuantLib interpolation plus arithmetic (`outside_j.py` wave 4, library-primitive); liquidity curve checked numerically by scipy `brentq` on all 7 cases but not counted (no library computes the curve). Stage F share 53.0% to 53.7%, stage J 61.3% to 67.5%. Only `verified_by` changed in the goldens.
+- Checklists keep everything below a marker line (sign-off, AI review sections) on rebuild; the gallery reads a signed verdict and sets the row's status from it, and only from it. `docs/validation/HOW-TO-REVIEW.md` keeps the review steps for later: owner decision, reviews run at the end of stage K or after.
+
 ## Next: validation evidence pack for the curves (2026-11-17)
 
 No curve changes status: every gallery row stays at Implemented, not Validated, until a named human reviewer signs its checklist.

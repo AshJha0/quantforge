@@ -4800,7 +4800,8 @@
    "tolerance_class": "interpolation",
    "verified_by": [
     "analytic",
-    "independent-replay"
+    "independent-replay",
+    "quantlib-1.44-funding"
    ],
    "tags": [
     "funding",
@@ -4989,7 +4990,8 @@
    "tolerance_class": "interpolation",
    "verified_by": [
     "analytic",
-    "independent-replay"
+    "independent-replay",
+    "quantlib-1.44-funding"
    ],
    "tags": [
     "funding",
@@ -5074,7 +5076,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "analytic"
+    "analytic",
+    "quantlib-1.44-funding"
    ],
    "tags": [
     "funding",

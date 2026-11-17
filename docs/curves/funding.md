@@ -46,7 +46,7 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 
 | Operation: sources | Cases |
 |---|---|
-| rates.funding.curve: analytic | 1 |
-| rates.funding.curve: analytic, independent-replay | 2 |
+| rates.funding.curve: analytic, independent-replay, quantlib-1.44-funding | 2 |
+| rates.funding.curve: analytic, quantlib-1.44-funding | 1 |
 
 Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the specs are in `specifications/`.

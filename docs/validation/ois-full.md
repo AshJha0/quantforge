@@ -37,11 +37,13 @@ Limits: one input per operation, synthetic unless labelled real; charts plot out
 - `SONIA` (Bank of England fitted OIS spot curve (latest-yield-curve-data.zip), as of 2026-11-16, 10 tenors, par rates by QuantLib 1.44 MakeOIS): **pass** at the stated 0.5 bp on all 10 pillars (0.5 bp: pass, 0.1 bp: fail, 0.01 bp: fail). Between pillars within 5 bp: no (information only).
 - `SONIA-EVERY-YEAR` (Bank of England fitted OIS spot curve (latest-yield-curve-data.zip), as of 2026-11-16, 29 tenors, par rates by QuantLib 1.44 MakeOIS): **pass** at the stated 0.5 bp on all 29 pillars (0.5 bp: pass, 0.1 bp: pass, 0.01 bp: pass). Between pillars within 5 bp: yes (information only).
 - Method (derived): with a pillar every year SONIA's coupon dates sit on pillars (no spot or payment lag), and the round trip closes to rounding. The standard set's residual comes from coupon dates between sparse pillars. BoE values are Bank copyright for internal use, so only pass or fail is published (tools/workflows/boe_curves.py).
-- ESTR: not run in this pack. Free data exists (ECB euro area yield curves, Svensson parameters); the same round trip would apply.
+- `ESTR` (ECB euro area AAA government curve (Svensson parameters, ECB Data Portal), as of 2026-11-16, 11 tenors, par rates by QuantLib 1.44 MakeOIS): **pass** at the stated 0.5 bp on all 11 pillars (0.5 bp: pass, 0.1 bp: fail, 0.01 bp: fail). Between pillars within 5 bp: no (information only).
+- `ESTR-EVERY-YEAR` (ECB euro area AAA government curve (Svensson parameters, ECB Data Portal), as of 2026-11-16, 34 tenors, par rates by QuantLib 1.44 MakeOIS): **pass** at the stated 0.5 bp on all 34 pillars (0.5 bp: pass, 0.1 bp: fail, 0.01 bp: fail). Between pillars within 5 bp: yes (information only).
+- Method (derived): the ECB curve is the euro area AAA government curve (Svensson parameters, ECB Data Portal; reproduces the published 1Y and 10Y spot rates to 1e-10 %), not an ESTR curve, so this tests the bootstrap on a real curve shape, not ESTR levels. As for SOFR, the two-day stub from as_of to spot has no quote; with short tenors in the every-year set its effect lands on the 1M pillar, which is why that set is closer to the 0.5 bp tolerance than the standard set.
 
 ## Open questions for the reviewer
 
-- ESTR real-data round trip not run (open).
+- The ESTR every-year set passes the stated 0.5 bp with a thin margin (worst pillar 1M). Accept, or ask for a front-end pillar check against published ESTR fixings?
 
 ## What to check
 
@@ -51,6 +53,8 @@ Limits: one input per operation, synthetic unless labelled real; charts plot out
 - [ ] Outside checks: the library object really computes the same quantity
 - [ ] Real data: result and stated method differences accepted, or absence of free data accepted
 - [ ] Open questions answered
+
+<!-- Hand-filled below this line: the generator keeps it. Sign-off and any AI review sections go here. -->
 
 ## Reviewer sign-off
 

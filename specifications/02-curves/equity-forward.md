@@ -22,7 +22,7 @@ With flat rates this is `F = S e^{(r-b)T} - sum A_i e^{(r-b)(T-t_i)}`. **Dividen
 
 Check case: `S = 100`, `r = 0.04`, `b = 0.05`, one dividend of 2 at `t = 0.5`, `T = 1`. True `F = 97.0149584`. The wrong form gives `97.0640923`. A date cannot be half a day, so the golden case for these exact numbers uses `eq.forward.flat`, below.
 
-A dividend `{ex_date, amount}` is cash paid on its ex-date. Dividends with `ex_date <= as_of` or `ex_date > expiry` are ignored. A dividend on `expiry` counts: the buyer at expiry does not get it. Spot settles on `as_of`; there is no spot lag in stage C.
+A dividend `{ex_date, amount}` is cash paid on its ex-date. Dividends with `ex_date <= as_of` or `ex_date > expiry` are ignored. A dividend on `expiry` counts: the buyer at expiry does not get it. Spot settles on `as_of`; there is no spot lag in stage C. `spot` is a price observed on `as_of` after the ex-date open, so on an ex-date it is already ex-dividend; only the ex-date matters, not the record or payment date (ruling C18).
 
 ## Operations
 

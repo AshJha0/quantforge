@@ -54,6 +54,8 @@ The tension spline and the hybrid have no outside library (`oracle/OUTSIDE_GAPS_
 - [ ] Real data: result and stated method differences accepted, or absence of free data accepted
 - [ ] Open questions answered
 
+<!-- Hand-filled below this line: the generator keeps it. Sign-off and any AI review sections go here. -->
+
 ## Reviewer sign-off
 
 Only a named human reviewer's sign-off moves the status row to Validated (ROADMAP.md). An AI review may be attached below it, labelled as such; it is not the sign-off.

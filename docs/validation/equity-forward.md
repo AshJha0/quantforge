@@ -46,7 +46,7 @@ Synthetic inputs, not market data.
 
 ## Open questions for the reviewer
 
-- **Disagreement for ruling** (`equity_forward-0012`): the spec ignores a dividend with `ex_date <= as_of` (`specifications/02-curves/equity-forward.md`); QuantLib's `AnalyticDividendEuropeanEngine` counts one dated on the evaluation date. With that dividend removed, QuantLib agrees on all four outputs. The golden was not changed. Is the spec's rule (ex on as_of means already ex) the one the reviewer accepts?
+- **Settled by ruling C18 (owner, 2026-11-18), for the reviewer to confirm** (`equity_forward-0012`): the spec ignores a dividend with `ex_date <= as_of` (`specifications/02-curves/equity-forward.md`); QuantLib's `AnalyticDividendEuropeanEngine` counts one dated on the evaluation date. With that dividend removed, QuantLib agrees on all four outputs. The golden was not changed. Is the spec's rule (ex on as_of means already ex) the one the reviewer accepts?
 - `equity_forward-0014` (expiry on as_of) has no outside check: there is no option for the engine to price.
 
 ## What to check
@@ -57,6 +57,8 @@ Synthetic inputs, not market data.
 - [ ] Outside checks: the library object really computes the same quantity
 - [ ] Real data: result and stated method differences accepted, or absence of free data accepted
 - [ ] Open questions answered
+
+<!-- Hand-filled below this line: the generator keeps it. Sign-off and any AI review sections go here. -->
 
 ## Reviewer sign-off
 

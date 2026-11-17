@@ -278,8 +278,8 @@
   ],
   "cases": 3,
   "by_source": {
-   "rates.funding.curve: analytic, independent-replay": 2,
-   "rates.funding.curve: analytic": 1
+   "rates.funding.curve: analytic, independent-replay, quantlib-1.44-funding": 2,
+   "rates.funding.curve: analytic, quantlib-1.44-funding": 1
   }
  }
 }

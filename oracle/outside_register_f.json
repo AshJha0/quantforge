@@ -861,6 +861,36 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "joint_f-0009",
+   "operation": "rates.funding.curve",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FUND.RATIO"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "joint_f-0010",
+   "operation": "rates.funding.curve",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FUND.RATIO"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "joint_f-0011",
+   "operation": "rates.funding.curve",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FUND.RATIO"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "risk_f3-0010",
    "operation": "risk.curve.pca",
    "library": "QuantLib",
