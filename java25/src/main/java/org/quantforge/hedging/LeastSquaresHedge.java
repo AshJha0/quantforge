@@ -995,7 +995,7 @@ public final class LeastSquaresHedge {
                 throw new QfError("E_LIMIT", "a relaxed lot count is above 2^52", "lot_sizes");
             }
         }
-        double contObj = objective(residual(al, b, nc), weights, 0.0, nc) + ridgeTerm(ridge, lotSizes, nc);
+        double contObj = refineRelaxed(al, b, weights, ridge, lotSizes, hl, lo, hi, actLo, actHi, nc);
         Search s = new Search(al, b, weights, ridge, lotSizes, hl, cl, lo, hi);
         long[] start = new long[n];
         for (int j = 0; j < n; j++) {
@@ -1010,6 +1010,83 @@ public final class LeastSquaresHedge {
         double[] res = residual(a, b, x);
         double obj = objective(res, weights, ridge, x);
         return new IntegerSolution(s.best.clone(), x, res, obj, contObj, Math.max(0.0, obj - contObj));
+    }
+
+    /**
+     * Fixed-precision iterative refinement of the relaxed solution on its free coordinates; returns {@code f(nc)} and
+     * updates {@code nc} in place. The active-set solve works on the normal equations {@code H_L}, whose condition
+     * number is that of {@code A L} squared, so its forward error along a weak direction {@code v} is about
+     * {@code u kappa(H_L) |nc|} and costs {@code lambda_min |delta|^2} in {@code f}: 3.1e-6 against a true minimum of
+     * 0 on {@code HedgeSolversPropertyTest#integerLotsOnTheCiSample}, above the integer optimum, which is impossible.
+     * Each step takes the gradient from the residual {@code A_L nc + b} computed directly (error {@code u |A_L| |nc|},
+     * not squared) and solves {@code H_F delta = -g_F}; the error contracts by about {@code u kappa(D H_F D)} per step,
+     * below 1 whenever check 3 passes ({@code kappa <= 1e12}). A step is kept only while it lowers {@code f} and stays
+     * inside the bounds, so the result is never worse than the active-set answer; the loop ends at the first step
+     * that does not lower {@code f} (normally the second or third), and the cap of 64 steps is only a guard.
+     */
+    private static double refineRelaxed(double[][] al, double[] b, double[] w, double ridge, double[] lotSizes,
+            double[][] hl, double[] lo, double[] hi, boolean[] actLo, boolean[] actHi, double[] nc) {
+        int n = nc.length;
+        int[] free = new int[n];
+        int nf = 0;
+        for (int j = 0; j < n; j++) {
+            if (!actLo[j] && !actHi[j]) {
+                free[nf++] = j;
+            }
+        }
+        double best = objective(residual(al, b, nc), w, 0.0, nc) + ridgeTerm(ridge, lotSizes, nc);
+        if (nf == 0) {
+            return best;
+        }
+        double[][] hf = new double[nf][nf];
+        for (int p = 0; p < nf; p++) {
+            for (int q = 0; q < nf; q++) {
+                hf[p][q] = hl[free[p]][free[q]];
+            }
+        }
+        double[][] l = Dense.cholesky(hf);
+        for (int iter = 0; iter < 64; iter++) {
+            double[] res = residual(al, b, nc);
+            double[] g = new double[nf];
+            for (int p = 0; p < nf; p++) {
+                int j = free[p];
+                double s = ridge * lotSizes[j] * lotSizes[j] * nc[j];
+                for (int i = 0; i < res.length; i++) {
+                    s += al[i][j] * w[i] * res[i];
+                }
+                g[p] = -s;
+            }
+            double[] t = new double[nf]; // L L' delta = -g
+            for (int p = 0; p < nf; p++) {
+                double s = g[p];
+                for (int k = 0; k < p; k++) {
+                    s -= l[p][k] * t[k];
+                }
+                t[p] = s / l[p][p];
+            }
+            for (int p = nf - 1; p >= 0; p--) {
+                double s = t[p];
+                for (int k = p + 1; k < nf; k++) {
+                    s -= l[k][p] * t[k];
+                }
+                t[p] = s / l[p][p];
+            }
+            double[] trial = nc.clone();
+            for (int p = 0; p < nf; p++) {
+                int j = free[p];
+                trial[j] += t[p];
+                if (trial[j] < lo[j] || trial[j] > hi[j]) {
+                    return best;
+                }
+            }
+            double f = objective(residual(al, b, trial), w, 0.0, trial) + ridgeTerm(ridge, lotSizes, trial);
+            if (!(f < best)) {
+                return best;
+            }
+            best = f;
+            System.arraycopy(trial, 0, nc, 0, n);
+        }
+        return best;
     }
 
     private static double ridgeTerm(double ridge, double[] lotSizes, double[] lots) {

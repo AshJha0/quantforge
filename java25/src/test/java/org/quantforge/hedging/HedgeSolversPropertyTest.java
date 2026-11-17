@@ -163,6 +163,11 @@ class HedgeSolversPropertyTest {
         minNormEqualsUniqueSolutionOnRegularProblems(-21114480911142L); // CI 2026-11-14: differed by 1.1e-9 relative
     }
 
+    @Example
+    void integerLotsOnTheCiSample() {
+        integerLotsBeatEveryNeighbourAndTheRelaxation(-11115467L); // PR #45 CI 2026-11-17
+    }
+
     @Property(tries = 150)
     void integerLotsBeatEveryNeighbourAndTheRelaxation(@ForAll long seed) {
         Random rnd = new Random(seed);
