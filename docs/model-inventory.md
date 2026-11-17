@@ -35,6 +35,7 @@ Each model below gets one entry, the "page" the plan asks for. Outside-checked s
 | M21 | Vol Greeks | `06-risk/vol-greeks.md` | C | Implemented | stage C only |
 | M22 | Least-squares calibration | `03-calibration/least-squares.md` | B | Implemented | known truth only |
 | M23 | Linear-cost hedge solver | `08-hedging/stage-b-hedges.md` | B | Implemented | none |
+| M24 | Coupon schedule generation | `02-curves/schedules.md` | B | Implemented | none recorded |
 
 Stage E has its own index tables (ME-A1 to ME-A8, EB1 to EB12) under "Stage E models". Stages F, G and I, with fields taken from each entry below (outside-checked counts as the entry's Validation line states them, "see entry" where it gives none):
 
@@ -226,6 +227,18 @@ Each entry gives: purpose; inputs; known limitations; validation status; use res
 - **Purpose:** minimise residual risk plus linear trading cost.
 - **Limitations:** linear costs only, no impact, no integer lot sizes.
 - **Validation:** optimality conditions only. **Review:** 2026-11-07.
+
+### M24 Coupon schedule generation
+- **Purpose:** regular coupon periods with one short first stub, business-day adjusted, with payment dates (`rates.schedule.generate`).
+- **Inputs:** start and end dates, frequency in months, calendar, end-of-month flag, payment lag.
+- **Limitations:** short first stub only; long stubs and ex-dividend periods are stage D; `MODIFIED_FOLLOWING` only.
+- **Validation:** oracle `oracle/python/gen_stage_b.py`; suites `schedule` (7 cases) and `schedule_deep` (48 cases). The spec's acceptance is exact agreement with QuantLib `Schedule` (backward generation), but no outside-check record for these suites was found in `oracle/` on 2026-11-17, so none is counted. **Review:** 2026-11-17.
+- **Tier:** 2.
+- **Challenger:** the Python oracle against each of the three ported builds (Rust, Java, C++).
+- **Monitoring thresholds:** any period date differing from the oracle (exact match required).
+- **Data lineage hash:** sha256 77c6d2bdd6ec6430efc8f591b6ae70a1bea18a1c5e0699e2f13616fbd912d4f5 (`schedule`); sha256 a48de7508e7b29803800ac149acecc45546cf173a33534b75cdca88feee5e247 (`schedule_deep`).
+- **Retirement trigger:** the stage D long-stub schedule superseding this operation, or a superseding ruling.
+- **Validation report:** `specifications/02-curves/schedules.md`.
 
 ## Stage E models (E1 to E8)
 
