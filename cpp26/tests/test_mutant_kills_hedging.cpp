@@ -146,3 +146,114 @@ TEST_CASE("minimum variance: a hedged variance of exactly -1e-12 S_00 reads as 0
     const double further = std::nextafter(she, 2.0);
     CHECK(catch_error([&] { hg::min_variance({{s00, further}, {further, 1.0}}); }).code == "E_NOT_POSITIVE_DEFINITE");
 }
+
+TEST_CASE("sample covariance: k + 1 observations are one too few, and the message says k + 2", "[mutants]") {
+    // One hedge series (k = 1): 3 observations is the least allowed; 2 is refused with the spec's wording.
+    REQUIRE(hg::sample_covariance({0.1, 0.3, 0.2}, {{0.1, 0.2, 0.4}}).size() == 2);
+    const Caught c = catch_error([] { hg::sample_covariance({0.1, 0.3}, {{0.1, 0.2}}); });
+    CHECK(c.code == "E_INPUT");
+    CHECK(c.field == "exposure_changes");
+    CHECK(c.message == "exposure_changes: needs at least k + 2 observations");
+}
+
+// ---- j2 seed 7/11/54 survivors (2026-11-17). Expected values by hand; the simplex ones also from a line-by-line
+// Python port of detail::simplex (orig and mutant run side by side). ----
+
+TEST_CASE("sample covariance: a constant series has variance exactly 0 even when sum / t rounds (J-I.4)", "[mutants]") {
+    // 0.1 + 0.1 + 0.1 = 0.30000000000000004 and / 3 = 0.10000000000000002, so the sum-based mean leaves deviations of
+    // -1.4e-17. The constant-series rule takes the value itself as the mean (kills `v == first` -> `v != first`).
+    const Matrix cov = hg::sample_covariance({0.1, 0.1, 0.1}, {{0.1, 0.2, 0.4}});
+    REQUIRE(cov.size() == 2);
+    CHECK(cov[0][0] == 0.0);
+    CHECK(cov[0][1] == 0.0);
+    CHECK(cov[1][0] == 0.0);
+}
+
+TEST_CASE("beta futures: no negative zero in contracts or contracts held (F-3)", "[mutants]") {
+    // contracts = (0.997 - 1) * 100 / 10 = -0.03; std::round gives -0.0, and the + 0.0 must make it +0.0.
+    const hg::BetaHedge held = hg::beta_futures(100.0, 1.0, 0.997, 10.0, 1.0, hg::Rounding::Nearest);
+    CHECK(held.contracts_held == 0.0);
+    CHECK_FALSE(std::signbit(held.contracts_held));
+    // target -0.0, beta +0.0: (-0) - (+0) = -0, times and over positives stays -0 until the + 0.0.
+    const hg::BetaHedge zero = hg::beta_futures(100.0, 0.0, -0.0, 10.0, 1.0, hg::Rounding::None);
+    CHECK(zero.contracts == 0.0);
+    CHECK_FALSE(std::signbit(zero.contracts));
+    CHECK_FALSE(std::signbit(zero.contracts_held));
+}
+
+TEST_CASE("jacobi eigen: an off-diagonal below 1e-34 of the squared norm stops before any rotation", "[mutants]") {
+    // total = 1e20 + 4e20 + 2e-16, off = 1e-16 <= 1e-34 * total: no sweep, vectors stay exactly the identity.
+    // Kills `total += x / x` (total = 4) and `off <= .. && off == 0.0` (needs off == 0): both rotate by t ~ 1e-18.
+    const hg::Eigen ev = hg::jacobi_eigen({{1e10, 1e-8}, {1e-8, 2e10}});
+    REQUIRE(ev.values.size() == 2);
+    CHECK(ev.values[0] == 1e10);
+    CHECK(ev.values[1] == 2e10);
+    CHECK(ev.vectors[0][0] == 1.0);
+    CHECK(ev.vectors[0][1] == 0.0);
+    CHECK(ev.vectors[1][0] == 0.0);
+    CHECK(ev.vectors[1][1] == 1.0);
+}
+
+TEST_CASE("select: smallest eigenvalue 1e-12 against 1e-12 times the largest (about 2) is singular", "[mutants]") {
+    // a = [1 1], ridge 1e-12: the scaled H has eigenvalues r / (1 + r) ~ 1e-12 and ~2. The threshold is
+    // 1e-12 * 2 = 2e-12, so E_SINGULAR; `singular_threshold / largest` (5e-13) would accept it.
+    hg::QpProblem prob;
+    prob.a = {{1.0, 1.0}};
+    prob.b = {1.0};
+    prob.weights = {1.0};
+    prob.ridge = 1e-12;
+    const Caught got = catch_error([&] { hg::select_instruments(prob, 1, false); });
+    CHECK(got.code == "E_SINGULAR");
+    CHECK(got.field == "a");
+}
+
+TEST_CASE("qp: a bound broken by less than its 1e-12 relative tolerance is not made active", "[mutants]") {
+    // min (x - 1)^2 with x <= 1 - 2^-46: slack -1.4e-14 against a tolerance of 1e-12 * (|rhs| + |n y|) ~ 2e-12, so
+    // the unconstrained minimiser x = 1 is returned. `s < -tol || s < worst` would activate the bound (x = 1 - 2^-46).
+    const double cap = 1.0 - std::ldexp(1.0, -46);
+    hg::QpProblem prob;
+    prob.a = {{1.0}};
+    prob.b = {-1.0};
+    prob.weights = {1.0};
+    prob.upper = std::vector<hg::Bound>{cap};
+    const hg::QpResult res = hg::solve_qp(prob);
+    REQUIRE(res.x.size() == 1);
+    CHECK(res.x[0] == 1.0);
+}
+
+TEST_CASE("qp: an infeasibility gap of 2e-6 on bounds near 1e6 is rounding, judged on |bound| + |x_p|", "[mutants]") {
+    // x0 + x1 = 2e6 (x_p = (1e6, 1e6)), x0, x1 >= 1e6 + 1e-6. The Goldfarb-Idnani certificate gap is 2e-6 against
+    // 1e-9 * (size_0 + size_1), size = max(1, |bound| + |x_p|) ~ 2e6, so 4e-3: not a certificate, the solve returns.
+    // With size = max(1, |bound| - |x_p|) = 1 the threshold is 2e-9 and the mutant throws E_INFEASIBLE.
+    const double lo = 1e6 + 1e-6;
+    hg::QpProblem prob;
+    prob.a = {{1.0, 0.0}, {0.0, 1.0}};
+    prob.b = {-1e6, -1e6};
+    prob.weights = {1.0, 1.0};
+    prob.eq_matrix = Matrix{{1.0, 1.0}};
+    prob.eq_rhs = hg::Vec{2e6};
+    prob.lower = std::vector<hg::Bound>{lo, lo};
+    CHECK(catch_error([&] { hg::solve_qp(prob); }).code == "ok");
+}
+
+TEST_CASE("simplex: a column entry below 1e-11 times the tableau scale is not a pivot", "[mutants]") {
+    // 1e-9 z0 + 1e4 z1 = 1e4, minimise -z0. scale = 1e4, tol = 1e-7: z0's phase-one cost -1e-9 and its entry 1e-13
+    // after the z1 pivot are both below tol, so phase two finds no ratio row: E_NO_CONVERGENCE (unbounded).
+    // With tol = 1e-11 / scale = 1e-15 the mutant pivots on 1e-9 and returns z0 = 1e13.
+    const Caught got = catch_error([] { (void)hg::detail::simplex({{1e-9, 1e4}}, {1e4}, {-1.0, 0.0}); });
+    CHECK(got.code == "E_NO_CONVERGENCE");
+}
+
+TEST_CASE("simplex: a ratio tie goes to the row whose basic column is smaller (Bland)", "[mutants]") {
+    // Two optimal vertices, cost 1 each; Bland's tie-break reaches (0, 2, 0, 3). Taking the later tied row
+    // (`ratio <= best_ratio`) ends at (0, 0, 1, 1). Traced with a Python port of the tableau.
+    const std::optional<hg::Vec> z =
+        hg::detail::simplex({{2.0, 1.0, 2.0, 0.0}, {0.0, -1.0, 0.0, 1.0}, {1.0, -1.0, 0.0, 1.0}}, {2.0, 1.0, 1.0},
+                            {1.0, 2.0, 2.0, -1.0});
+    REQUIRE(z.has_value());
+    REQUIRE(z->size() == 4);
+    CHECK(std::fabs((*z)[0]) < 1e-12);
+    CHECK(std::fabs((*z)[1] - 2.0) < 1e-12);
+    CHECK(std::fabs((*z)[2]) < 1e-12);
+    CHECK(std::fabs((*z)[3] - 3.0) < 1e-12);
+}
