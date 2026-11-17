@@ -20,7 +20,7 @@ Status: Implemented, not Validated (stage C). Evidence line from the project's s
 5. Golden cases: recompute any case you can from its inputs with the spec's formulas. Report any number you get differently, with your working.
 6. Outside-library and real-data evidence: does the check really test the same quantity? Is anything claimed beyond what it shows?
 7. Anything that looks wrong, inconsistent or missing.
-8. **Disagreement for ruling** (`equity_forward-0012`): the spec ignores a dividend with `ex_date <= as_of` (`specifications/02-curves/equity-forward.md`); QuantLib's `AnalyticDividendEuropeanEngine` counts one dated on the evaluation date. With that dividend removed, QuantLib agrees on all four outputs. The golden was not changed. Is the spec's rule (ex on as_of means already ex) the one the reviewer accepts?
+8. **Settled by ruling C18 (owner, 2026-11-18), for the reviewer to confirm** (`equity_forward-0012`): the spec ignores a dividend with `ex_date <= as_of` (`specifications/02-curves/equity-forward.md`); QuantLib's `AnalyticDividendEuropeanEngine` counts one dated on the evaluation date. With that dividend removed, QuantLib agrees on all four outputs. The golden was not changed. Is the spec's rule (ex on as_of means already ex) the one the reviewer accepts?
 9. `equity_forward-0014` (expiry on as_of) has no outside check: there is no option for the engine to price.
 
 ## Spec
@@ -51,7 +51,7 @@ With flat rates this is `F = S e^{(r-b)T} - sum A_i e^{(r-b)(T-t_i)}`. **Dividen
 
 Check case: `S = 100`, `r = 0.04`, `b = 0.05`, one dividend of 2 at `t = 0.5`, `T = 1`. True `F = 97.0149584`. The wrong form gives `97.0640923`. A date cannot be half a day, so the golden case for these exact numbers uses `eq.forward.flat`, below.
 
-A dividend `{ex_date, amount}` is cash paid on its ex-date. Dividends with `ex_date <= as_of` or `ex_date > expiry` are ignored. A dividend on `expiry` counts: the buyer at expiry does not get it. Spot settles on `as_of`; there is no spot lag in stage C.
+A dividend `{ex_date, amount}` is cash paid on its ex-date. Dividends with `ex_date <= as_of` or `ex_date > expiry` are ignored. A dividend on `expiry` counts: the buyer at expiry does not get it. Spot settles on `as_of`; there is no spot lag in stage C. `spot` is a price observed on `as_of` after the ex-date open, so on an ex-date it is already ex-dividend; only the ex-date matters, not the record or payment date (ruling C18).
 
 ## Operations
 
@@ -124,4 +124,4 @@ Synthetic inputs, not market data.
 
 ## Rulings that name this curve's operations
 
-None found by operation name.
+- (stage-c-rulings.md) | C18 | Dividend with `ex_date = as_of` in `eq.forward.outright` (owner, 2026-11-18, validation evidence pack) | Ignored, as the spec already says (`ex_date <= as_of`). `spot` is a price observed on `as_of` after the ex-date open, so it is already ex-dividend; counting the dividend would subtract it twice. Only the ex-date matters, not the record or payment date. QuantLib's `AnalyticDividendEuropeanEngine` counts a dividend dated on the evaluation date (its spot is taken as cum-dividend), so it differs on `equity_forward-0012` by convention; with that dividend removed it agrees on every output (`oracle/OUTSIDE_VALIDATION.json`). A caller holding a cum-dividend price on the ex-date must adjust it first. The human reviewer still confirms this on the curve's checklist |

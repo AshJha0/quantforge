@@ -40,6 +40,9 @@ SONIA_RD = [rd("SONIA"), rd("SONIA-EVERY-YEAR"),
             "Method (derived): with a pillar every year SONIA's coupon dates sit on pillars (no spot or payment lag), and the round trip closes to rounding. The standard set's residual comes from coupon dates between sparse pillars. "
             "BoE values are Bank copyright for internal use, so only pass or fail is published (tools/workflows/boe_curves.py)."]
 
+ESTR_RD = [rd("ESTR"), rd("ESTR-EVERY-YEAR"),
+           "Method (derived): the ECB curve is the euro area AAA government curve (Svensson parameters, ECB Data Portal; reproduces the published 1Y and 10Y spot rates to 1e-10 %), not an ESTR curve, so this tests the bootstrap on a real curve shape, not ESTR levels. "
+           "As for SOFR, the two-day stub from as_of to spot has no quote; with short tenors in the every-year set its effect lands on the 1M pillar, which is why that set is closer to the 0.5 bp tolerance than the standard set."]
 NOTES = {
     "sonia-ois": {"real": SONIA_RD, "open": ["One of 18 cases (`rulings_b`) has replay only; confirm it needs no outside check."]},
     "sofr-ois": {"real": SOFR_RD, "open": ["No free SOFR swap quotes exist, so level checks against a SOFR market curve stay open."]},
@@ -49,7 +52,7 @@ NOTES = {
     "gbpusd-fx-forward": {"before": "0 of 11", "real": [NO_FREE.format(what="FX forward points")],
                           "open": ["QuantLib's `FxForward` uses the same spot-normalised forward as the spec (both cite covered interest parity); it is an outside implementation of the same formula, not an independent model."]},
     "equity-forward": {"before": "0 of 4", "real": [NO_FREE.format(what="dividend or borrow history")],
-                       "open": ["**Disagreement for ruling** (`equity_forward-0012`): the spec ignores a dividend with `ex_date <= as_of` (`specifications/02-curves/equity-forward.md`); QuantLib's `AnalyticDividendEuropeanEngine` counts one dated on the evaluation date. With that dividend removed, QuantLib agrees on all four outputs. The golden was not changed. Is the spec's rule (ex on as_of means already ex) the one the reviewer accepts?",
+                       "open": ["**Settled by ruling C18 (owner, 2026-11-18), for the reviewer to confirm** (`equity_forward-0012`): the spec ignores a dividend with `ex_date <= as_of` (`specifications/02-curves/equity-forward.md`); QuantLib's `AnalyticDividendEuropeanEngine` counts one dated on the evaluation date. With that dividend removed, QuantLib agrees on all four outputs. The golden was not changed. Is the spec's rule (ex on as_of means already ex) the one the reviewer accepts?",
                                 "`equity_forward-0014` (expiry on as_of) has no outside check: there is no option for the engine to price."]},
     "svi-smile": {"before": "1 of 2", "real": [NO_FREE.format(what="option quotes or vol surfaces")],
                   "open": ["`g` and `min_g` on the counterexample are checked by central differences on QuantLib's variance at 1e-6, not at the case's own tolerance; QuantLib has no Durrleman `g`."]},
@@ -58,8 +61,8 @@ NOTES = {
                               "`butterfly_free` and `calendar_free` are sufficient conditions on the parameters (G-J 2014 Theorem 4.2, Corollary 4.1), recomputed as arithmetic: no library checks them. A surface can fail them and still be free of arbitrage."]},
     "sabr": {"real": [NO_FREE.format(what="option quotes or vol surfaces")],
              "open": ["Arbitrage-free SABR at `nu > 0` has no tight outside source (oracle README)."]},
-    "ois-full": {"real": SOFR_RD + SONIA_RD + ["ESTR: not run in this pack. Free data exists (ECB euro area yield curves, Svensson parameters); the same round trip would apply."],
-                 "open": ["ESTR real-data round trip not run (open)."]},
+    "ois-full": {"real": SOFR_RD + SONIA_RD + ESTR_RD,
+                 "open": ["The ESTR every-year set passes the stated 0.5 bp with a thin margin (worst pillar 1M). Accept, or ask for a front-end pillar check against published ESTR fixings?"]},
     "bond-fit": {"real": ["Not run in this pack. Free data exists (US Treasury par yields; Fed GSW parameters), but a Nelson-Siegel fit against a Svensson fit to different bonds is a method comparison with no tight tolerance to state up front."],
                  "open": ["Agree a tolerance for a Nelson-Siegel fit to published Treasury yields before running it."]},
     "repo": {"real": [NO_FREE.format(what="general or special repo rates by term")]},
@@ -71,12 +74,13 @@ NOTES = {
     "caps-swaptions": {"real": [NO_FREE.format(what="cap or swaption volatilities")]},
     "commodities": {"real": [NO_FREE.format(what="commodity forward curves")]},
     "sector-rating": {"real": [NO_FREE.format(what="CDS spreads by sector or rating")]},
-    "funding": {"real": [NO_FREE.format(what="funding spreads")],
-                "open": ["No outside library builds this curve; QuantLib's spreaded term structures could check the spread arithmetic (library-primitive at best). Not done in this pack."]},
-    "financing-term": {"real": [NO_FREE.format(what="term repo or stock borrow quotes")],
-                       "open": ["No outside library builds this curve. `eq.forward.term_financed` could be checked with QuantLib's dividend engine as `eq.forward.outright` now is. Not done in this pack."]},
+    "funding": {"before": "0 of 3", "real": [NO_FREE.format(what="funding spreads")],
+                "open": ["QuantLib has no funding-curve object. Round 2 (2026-11-18) builds it from QuantLib objects: the OIS `DiscountCurve`, `InterestRate(rate, Actual360, Simple)` for the funding discount factors, and a log-linear ratio curve P_f / D_ois whose continuous forwards are the spreads (`oracle/python/outside_f.py`, row FUND.RATIO, classed library-object by `tools/outside_shares.py`). All 3 cases agree at their own tolerance. The decomposition follows the spec's own formula, so this checks the arithmetic and the conventions (ACT/360 simple quotes, piecewise-flat spread, last spread held), not an independent model. Accept?"]},
+    "financing-term": {"before": "0 of 13", "real": [NO_FREE.format(what="term repo or stock borrow quotes")],
+                       "open": ["No library builds this curve. Round 2 (2026-11-18) reads the cumulative funding, spread and fee with QuantLib `LinearInterpolation` and the repo discount factors with `InterestRate(Simple)`; every output is arithmetic on those (`oracle/python/outside_j.py` wave 4, class library-primitive, the class numpy interp earned for scenario replay). All 13 cases agree. It is a check of the interpolation rule and the arithmetic, not an independent model.",
+                                "The time inputs are year fractions, not dates, so QuantLib's date-based dividend engine could not price `eq.forward.term_financed` directly without rounding the times."]},
     "liquidity": {"real": ["No official liquidity curve exists to reconcile against. The recorder keeps free crypto order-book snapshots (tools/recorder), which could feed a method test but not a reconciliation."],
-                  "open": ["The square-root impact law has no library implementation with the same conventions."]},
+                  "open": ["The square-root impact law has no library implementation with the same conventions. Round 2 (2026-11-18) finds the optimal horizon numerically (scipy `brentq` on dc/dh, not the closed form): it agrees on `optimal_horizon` and `min_cost` for all 7 cases, but the other outputs are the spec's arithmetic, so the check is recorded and NOT counted (`oracle/OUTSIDE_J.json`, `liqcurve_j` not_checked), as for scenario historical shocks. The outside share stays 0 of 7; is a hand or published-example check enough for this curve?"]},
     "mbs": {"real": [NO_FREE.format(what="MBS pool factors")]},
     "vol-surface": {"real": [NO_FREE.format(what="option quotes or vol surfaces")]},
     "local-vol": {"real": [NO_FREE.format(what="option quotes or vol surfaces")]},
@@ -88,6 +92,10 @@ NOTES = {
     "research-workflow": {"real": ["Not applicable: synthetic prices, a teaching example."]},
 }
 
+
+# Everything from this line down in a checklist is hand-filled (sign-off, AI review sections) and is kept on rebuild;
+# --check compares only the part above it.
+MARK = "<!-- Hand-filled below this line: the generator keeps it. Sign-off and any AI review sections go here. -->"
 
 RULINGS = {"B": ["stage-b-rulings.md"], "C": ["stage-c-rulings.md"], "D": ["stage-d-rulings.md", "r1-rulings.md"],
            "E": ["stage-e-rulings.md", "stage-e-rulings-b.md"], "F": ["stage-f-rulings.md"], "I": ["stage-i-rulings.md"],
@@ -174,7 +182,7 @@ def page(r):
           "- [ ] Outside checks: the library object really computes the same quantity",
           "- [ ] Real data: result and stated method differences accepted, or absence of free data accepted",
           "- [ ] Open questions answered",
-          "", "## Reviewer sign-off", "",
+          "", MARK, "", "## Reviewer sign-off", "",
           "Only a named human reviewer's sign-off moves the status row to Validated (ROADMAP.md). An AI review may be attached below it, labelled as such; it is not the sign-off.", "",
           "| Field | Entry |", "|---|---|", "| Reviewer name | |", "| Date | |",
           "| Verdict (Validated / Validated with conditions / Not validated) | |", "| Conditions or findings | |", ""]
@@ -280,11 +288,36 @@ A second opinion on each curve from an outside AI model (for example ChatGPT or 
 1. Open a new conversation for each curve and paste one file from this folder, whole. Each file is self-contained and kept to about 30,000 characters: spec text, rulings that name the curve's operations, golden cases with inputs and expected outputs (a subset when there are many, with the total stated), the outside-library and real-data results, known limits and the questions.
 2. The reviewer must quote the spec line or the number it questions, and say "cannot check" rather than guess.
 3. Findings come back as one table: curve, claim, issue, severity, evidence.
-4. File the answer in that curve's checklist (`docs/validation/<curve>.md`) under a section headed "AI review (model, date)", naming the model and version. Check each finding against the repository before acting on it: a model can be confidently wrong.
+4. File the answer in that curve's checklist (`docs/validation/<curve>.md`), anywhere below the line `<!-- Hand-filled below this line ... -->`, under a section headed "AI review (model, date)", naming the model and version. The generator keeps everything below that line. Check each finding against the repository before acting on it: a model can be confidently wrong.
 5. The AI review never counts as the sign-off. Only a named human reviewer's verdict moves a row to Validated.
 
 The files are generated by `tools/validation/build_checklists.py` from the specs, rulings, goldens and gallery data, and contain nothing beyond what that evidence shows. Where a spec is too long it is truncated, and the file says so.
 """
+
+
+def split_hand(path):
+    """(generated part, hand part) of a checklist. The hand part starts at MARK and is kept on every rebuild."""
+    if not path.exists():
+        return None, None
+    t = path.read_text(encoding="utf-8")
+    i = t.find(MARK)
+    return (t, None) if i < 0 else (t[:i], t[i:])
+
+
+def verdict(slug, root=None):
+    """The signed verdict of docs/validation/<slug>.md, or None while the name, date or verdict is blank."""
+    _, hand = split_hand((Path(root) if root else OUT) / f"{slug}.md")
+    if not hand:
+        return None
+    f = {}
+    for line in hand.splitlines():
+        m = re.match(r"\| (Reviewer name|Date|Verdict)[^|]* \| (.*?) \|$", line)
+        if m:
+            f[m.group(1)] = m.group(2).strip()
+    v = f.get("Verdict", "")
+    if v in ("Validated", "Validated with conditions", "Not validated") and f.get("Reviewer name") and re.fullmatch(r"\d{4}-\d\d-\d\d", f.get("Date", "")):
+        return {"reviewer": f["Reviewer name"], "date": f["Date"], "verdict": v}
+    return None
 
 
 def main():
@@ -299,11 +332,13 @@ def main():
         return 1
     for r in rs:
         p, t = OUT / f"{r['slug']}.md", page(r)
+        gen, hand = split_hand(p)
+        cut = t.find(MARK)
         if a.check:
-            if not p.exists() or p.read_text(encoding="utf-8") != t:
+            if gen != t[:cut]:
                 bad.append(r["slug"])
         else:
-            p.write_text(t, encoding="utf-8", newline="\n")
+            p.write_text(t[:cut] + (hand if hand else t[cut:]), encoding="utf-8", newline="\n")
     AI.mkdir(exist_ok=True)
     for r in rs:
         p, t = AI / f"{r['slug']}.md", ai_page(r)

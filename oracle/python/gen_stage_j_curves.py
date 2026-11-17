@@ -171,6 +171,8 @@ def mk(suite, op, ref, inp, code=None, desc=None, verified=("reference-computed"
     try:
         out = ref(inp)
         assert code is None, f"{suite.name}: expected {code}, got a value ({desc})"
+        if op in ("repo.term.curve", "eq.forward.term_financed"):  # QuantLib LinearInterpolation check in outside_j.py wave 4 (validation evidence pack)
+            verified = tuple(verified) + ("quantlib-1.44-interp",)
         suite.add(op, inp, outputs=out, cls=SA, verified=verified, tags=("curves", "synthetic") + tuple(tags),
                   description=desc)
     except QfErr as e:

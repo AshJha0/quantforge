@@ -20,7 +20,7 @@ Status: Implemented, not Validated (stage J). Evidence line from the project's s
 5. Golden cases: recompute any case you can from its inputs with the spec's formulas. Report any number you get differently, with your working.
 6. Outside-library and real-data evidence: does the check really test the same quantity? Is anything claimed beyond what it shows?
 7. Anything that looks wrong, inconsistent or missing.
-8. The square-root impact law has no library implementation with the same conventions.
+8. The square-root impact law has no library implementation with the same conventions. Round 2 (2026-11-18) finds the optimal horizon numerically (scipy `brentq` on dc/dh, not the closed form): it agrees on `optimal_horizon` and `min_cost` for all 7 cases, but the other outputs are the spec's arithmetic, so the check is recorded and NOT counted (`oracle/OUTSIDE_J.json`, `liqcurve_j` not_checked), as for scenario historical shocks. The outside share stays 0 of 7; is a hand or published-example check enough for this curve?
 
 ## Spec
 
