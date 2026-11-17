@@ -122,4 +122,22 @@ class DegenerateFeasibleTest {
         assertEquals("E_INFEASIBLE", code(() -> solve(I2, new double[] {0, 0}, new double[][] {{1, 1}},
                 new double[] {2.000001}, null, new double[] {1, 1}, null)));
     }
+
+    @Test
+    void dependentRowAtADegenerateVertexDoesNotHideTheX2SignFlip() {
+        // x0 >= 1 and 0.5 x0 + 0.5 |x1| <= 0.5 force x0 = 1, x1 = 0, where x1 >= 0 is -2 (margin) - (x0 >= 1): a row
+        // dependent on the active set. A rounding-size back-solved coefficient (1e-18) taken as a blocking row dropped
+        // the x2 sign row (C++ commit badcf1be). With x0 = 1, x1 = 0, f(x2) = 75.25 + 38 x2 + 44 x2^2 + |x2|, so
+        // x2 = -37/88 and f = 75.25 - 37^2 / 176. Same case in the Python, C++ and Rust unit tests.
+        double[][] a = {{3, 2, -2}, {-2, 7, 2}, {3, -1, 6}, {1, 0, 0}};
+        double[] b = {-1, -3, 2.5, 3};
+        Solution s = solve(a, b, null, null, new double[] {1, -1, -INF}, new double[] {2, INF, INF},
+                margin(new double[] {0, 0.75, 1}, new double[] {0.5, 0.5, 0}, 0.5));
+        double x2 = -37.0 / 88.0;
+        double objective = 75.25 - 37.0 * 37.0 / 176.0;
+        assertEquals(1.0, s.x()[0], 1e-12);
+        assertEquals(0.0, s.x()[1], 1e-12);
+        assertEquals(x2, s.x()[2], Math.abs(x2) * 1e-12);
+        assertEquals(objective, s.objective(), objective * 1e-12);
+    }
 }

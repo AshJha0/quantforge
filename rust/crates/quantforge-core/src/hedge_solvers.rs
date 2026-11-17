@@ -383,16 +383,29 @@ fn dual_active_set(
                     *v -= ri * w;
                 }
             }
+            let zn = dot(&z, normal);
+            let step_in_primal = zn > dependence * gn;
+            // n_p in the span of the active rows (no primal step): r are the coefficients of
+            // n_p = sum_k r_k n_k, found by solving with M, so each carries a rounding error of
+            // order eps cond(M) max|r|. An r_k that small is 0, not a blocking row: taken as
+            // positive, it makes a dual step of u_k / r_k (1e17 at a degenerate vertex) that drops
+            // a genuine active row and leaves the multipliers of the dependent rows at 1e17 and of
+            // the dropped row, re-added, at 0. The cut is the I-3 threshold, 1e-12 of the largest
+            // |r|. With a primal step the test stays r_k > 0.
+            let r_cut = if step_in_primal {
+                0.0
+            } else {
+                r.iter().fold(0.0_f64, |m, ri| m.max(1e-12 * ri.abs()))
+            };
             let mut t1 = f64::INFINITY;
             let mut drop = None;
             for (i, ri) in r.iter().enumerate() {
-                if *ri > 0.0 && u[i] / ri < t1 {
+                if *ri > r_cut && u[i] / ri < t1 {
                     t1 = u[i] / ri;
                     drop = Some(i);
                 }
             }
-            let zn = dot(&z, normal);
-            let t2 = if zn > dependence * gn {
+            let t2 = if step_in_primal {
                 -(dot(normal, &y) - cons[p].rhs) / zn
             } else {
                 f64::INFINITY

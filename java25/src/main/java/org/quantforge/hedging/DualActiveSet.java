@@ -85,15 +85,27 @@ final class DualActiveSet {
                     }
                 }
                 double[] rr = backSolve(r, dv, q);
+                boolean noPrimal = Math.sqrt(d2) <= ZERO_STEP * Math.sqrt(dAll);
+                // n_p in the span of the active rows (no primal step): rr are the coefficients of n_p = sum_k rr_k n_k,
+                // found by back-substitution in R, so each carries a rounding error of order eps cond(R) max|rr|. An
+                // rr_k that small is 0, not a blocking row: taken as positive, it makes a dual step of u_k / rr_k
+                // (1e17 at a degenerate vertex) that drops a genuine active row and leaves the multipliers of the
+                // dependent rows at 1e17 and of the dropped row, re-added, at 0. The cut is the I-3 threshold,
+                // 1e-12 of the largest |rr|. With a primal step the test stays rr_k > 0.
+                double rCut = 0.0;
+                if (noPrimal) {
+                    for (int k = 0; k < q; k++) {
+                        rCut = Math.max(rCut, 1e-12 * Math.abs(rr[k]));
+                    }
+                }
                 double t1 = Double.POSITIVE_INFINITY;
                 int drop = -1;
                 for (int k = 0; k < q; k++) {
-                    if (rr[k] > 0.0 && u[k] / rr[k] < t1) {
+                    if (rr[k] > rCut && u[k] / rr[k] < t1) {
                         t1 = u[k] / rr[k];
                         drop = k;
                     }
                 }
-                boolean noPrimal = Math.sqrt(d2) <= ZERO_STEP * Math.sqrt(dAll);
                 double t2 = noPrimal ? Double.POSITIVE_INFINITY : -(Dense.dot(np, y) - d[pick]) / Dense.dot(z, np);
                 if (noPrimal && drop < 0) {
                     // Goldfarb-Idnani's certificate: n_p = sum_k rr_k n_k with every rr_k <= 0, so every feasible y'
