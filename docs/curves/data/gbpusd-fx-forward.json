@@ -355,8 +355,8 @@
   "operation": "fx.forward.outright",
   "cases": 11,
   "by_source": {
-   "fx: hand": 3,
-   "fx_deep: hand": 8
+   "fx: hand, quantlib-1.44-fxforward": 3,
+   "fx_deep: hand, quantlib-1.44-fxforward": 8
   }
  },
  "implied_inputs": {

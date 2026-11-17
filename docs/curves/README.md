@@ -15,10 +15,10 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [SONIA OIS](sonia-ois.md) | Implemented, not Validated | B | 18 golden cases for `rates.ois.bootstrap`, 17 with an outside library in `verified_by` |
 | [SOFR OIS (minimal)](sofr-ois.md) | Implemented, not Validated | B | 16 golden cases for `rates.ois.bootstrap`, 16 with an outside library in `verified_by` |
 | [USD-TERM-3M projection](usd-term-3m.md) | Implemented, not Validated | B | 6 golden cases for `rates.projection.bootstrap`, 5 with an outside library in `verified_by` |
-| [GBPUSD FX forward](gbpusd-fx-forward.md) | Implemented, not Validated | B | 11 golden cases for `fx.forward.outright`, 0 with an outside library in `verified_by` |
-| [Equity forward, discrete dividends](equity-forward.md) | Implemented, not Validated | C | 4 golden cases for `eq.forward.outright`, 0 with an outside library in `verified_by` |
-| [SVI smile](svi-smile.md) | Implemented, not Validated | C | 2 golden cases for `vol.svi.evaluate`, 1 with an outside library in `verified_by` |
-| [SSVI surface](ssvi-surface.md) | Implemented, not Validated | C | 3 golden cases for `vol.ssvi.evaluate`, 0 with an outside library in `verified_by` |
+| [GBPUSD FX forward](gbpusd-fx-forward.md) | Implemented, not Validated | B | 11 golden cases for `fx.forward.outright`, 11 with an outside library in `verified_by` |
+| [Equity forward, discrete dividends](equity-forward.md) | Implemented, not Validated | C | 4 golden cases for `eq.forward.outright`, 2 with an outside library in `verified_by` |
+| [SVI smile](svi-smile.md) | Implemented, not Validated | C | 2 golden cases for `vol.svi.evaluate`, 2 with an outside library in `verified_by` |
+| [SSVI surface](ssvi-surface.md) | Implemented, not Validated | C | 3 golden cases for `vol.ssvi.evaluate`, 3 with an outside library in `verified_by` |
 | [SABR](sabr.md) | Implemented, not Validated | C | 32 golden cases for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`, 26 with an outside library in `verified_by` |
 | [Full SOFR, ESTR, SONIA OIS](ois-full.md) | Implemented, not Validated | D | 81 golden cases |
 | [Bond and sovereign fits](bond-fit.md) | Implemented, not Validated | D | 2 golden cases |
@@ -49,6 +49,8 @@ Stage J wave 3 (historical scenario stress, interpolation backtests, drift detec
 [US Treasury curve with sanity bands](real-usd-treasury.md): a page built from real public data, snapshot of 2026-11-06. The same bands run daily in workflow (a).
 
 [Calibration stability](calib-stability.md): seven calibrations under seeded noise in four languages, synthetic inputs. [Rich/cheap screen](rich-cheap.md): workflow (b), blocked on data until a price source is cleared.
+
+[Validation evidence pack](../validation/README.md): one reviewer checklist per row of the table above, the outside-library checks added for review, and a round trip of the SONIA and SOFR bootstraps against published fitted curves. No row moves to Validated without a named human reviewer's sign-off.
 
 ## How the gallery is built
 

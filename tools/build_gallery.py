@@ -241,7 +241,7 @@ CURVES = {
         "implied": "fx_curve_implied.json", "golden_operation": "fx.forward.outright", "spec": "fx.md",
         "idea": "A rate of 1.28 means 1 GBP costs 1.28 USD. Holding sterling for a year and holding dollars for a year must come to the same thing once the forward is fixed, so the forward follows from spot and the two discount curves.",
         "formula": "`F(T) = S A(T) / B(T)`, with `A(T) = D_base(T)/D_base(sp)`, `B(T) = D_quote(T)/D_quote(sp)` and `sp` the spot date. Points are `(F - S)/pip`, with a pip of 0.0001.",
-        "oracle": "Per `specifications/stage-b-rulings.md`, outright points are analytic formulas with no outside library. QuantLib checks the spot dates, implied ratios (`FxSwapRateHelper`), and forward PV and delta (`FxForward`, a different operation from the one charted here). Basis is analytic.",
+        "oracle": "Per `specifications/stage-b-rulings.md`, outright points are analytic formulas. Since the validation evidence pack (2026-11-17), all 11 value cases for the outright forward are also checked against QuantLib `FxForward.fairForwardRate` on the same curves, at each case's own tolerance (`oracle/python/outside_validation.py`, `oracle/OUTSIDE_VALIDATION.json`); points are arithmetic on that forward. QuantLib also checks the spot dates, implied ratios (`FxSwapRateHelper`), and forward PV and delta. Basis is analytic.",
         "limits": ["The value dates charted are plain quarterly dates from spot, some of which may not be business days. `fx.forward.outright` does not require one.",
                    "The input forward points are constructed to exercise the basis calculation. They have the opposite sign to the curve forwards, which is why the basis is near 75 bp. No market is implied.",
                    "Basis here is taken straight from quotes. A curve built from basis swaps is stage D."],
@@ -709,6 +709,9 @@ def index_page(all_data):
                      "over real daily Treasury moves, and day-to-day calibration diagnostics. Runs daily in `tools/workflows/keyrate_explain.py`.\n")
         real += (f"\n[Calibration stability]({gallery_r2.CALIB}.md): seven calibrations under seeded noise in four languages, synthetic inputs. "
                  f"[Rich/cheap screen]({gallery_r2.RICH}.md): workflow (b), blocked on data until a price source is cleared.\n")
+        real += ("\n[Validation evidence pack](../validation/README.md): one reviewer checklist per row of the table above, the "
+                 "outside-library checks added for review, and a round trip of the SONIA and SOFR bootstraps against published fitted "
+                 "curves. No row moves to Validated without a named human reviewer's sign-off.\n")
     return f"""# Curves
 
 A curve says what one unit paid on a future date is worth today, or what a rate or price is expected to be on that date. Pricing, risk and hedging all read from curves, so a mistake here reaches everything else. Formally, a discount curve is a function `D(t)` with `D(0) = 1`, stored as dated pillars plus a rule for the dates in between (`specifications/02-curves/curve-framework.md`).
@@ -775,7 +778,7 @@ VOLS = {
         "examples": {"main": "eq_forward_dividends.json"}, "golden": ["eq.forward.outright"], "spec": "smile-and-surface.md",
         "idea": "A forward price is what you would agree today to pay for a share on a later date. Holding the share until then costs funding and earns any dividends, and a borrow cost applies if the share is shorted, so the forward is spot adjusted for all three. A dividend paid before the expiry takes value out of the share, so it lowers the forward.",
         "formula": "The forward is spot less the present value of dividends paid on or before expiry, carried to expiry on the funding and borrow curves. The CLI returns the forward, the discount factor, the carry factor and the present value of the dividends.",
-        "oracle": "Per `specifications/05-volatility/stage-c-targets.md`, the forward is checked against a rolled route that steps between dividends one at a time, and against a plan check case. No outside library prices an equity forward here: the cases are hand and analytic.",
+        "oracle": "Per `specifications/05-volatility/stage-c-targets.md`, the forward is checked against a rolled route that steps between dividends one at a time, and against a plan check case. Since the validation evidence pack (2026-11-17), QuantLib's escrowed-dividend European engine checks two of the four outright cases through put-call parity (`oracle/OUTSIDE_VALIDATION.json`). It disagrees on the case with a dividend dated on `as_of`, which the spec ignores and QuantLib counts; that is a boundary convention for the reviewer (`docs/validation/equity-forward.md`), and no golden changed. The case with expiry on `as_of` has no option for the engine to price.",
         "limits": ["Each curve has one pillar, so funding and borrow rates are constant. Curve shape is not exercised.",
                    "Three dividends with fixed cash amounts. Dividend curves and forecasting are stage D.",
                    "The chart moves only the expiry. Spot, curves and dividends stay as in the input file."],
@@ -785,7 +788,7 @@ VOLS = {
         "spec": "smile-and-surface.md",
         "idea": "An implied volatility smile shows how the volatility that reproduces option prices changes with strike at one expiry. SVI is a five-number formula for total variance, volatility squared times time, as a function of log-moneyness `k = ln(K/F)`. This page evaluates one SVI smile and checks whether it admits a butterfly arbitrage, meaning a negative density.",
         "formula": "Total variance `w(k) = a + b (rho (k - m) + sqrt((k - m)^2 + sigma^2))`, implied volatility `sqrt(w / T)`. The butterfly condition is that the function `g(k)` stays non-negative.",
-        "oracle": "SVI evaluation is compared with QuantLib `SviSmileSection` and with a published counterexample, a smile that looks fine and still admits arbitrage. The measured gap to QuantLib is within 1e-12 (`specifications/05-volatility/stage-c-targets.md`).",
+        "oracle": "SVI evaluation is compared with QuantLib `SviSmileSection` and with a published counterexample, a smile that looks fine and still admits arbitrage; since the validation evidence pack (2026-11-17) the counterexample's total variance and vols are also checked with QuantLib, and its `g` by central differences on QuantLib's variance. The measured gap to QuantLib is within 1e-12 (`specifications/05-volatility/stage-c-targets.md`).",
         "limits": ["One expiry and one hand-chosen parameter set. Nothing here is fitted to quotes; the SVI fit has its own golden cases.",
                    "Log-moneyness is the horizontal axis, because the SVI input is log-moneyness and no forward is needed.",
                    "`butterfly_free` is a check at the grid points only, not a proof for all strikes."],
@@ -795,7 +798,7 @@ VOLS = {
         "spec": "smile-and-surface.md",
         "idea": "A surface is a smile at every expiry. SSVI builds one from three shape numbers and the at-the-money total variance `theta` of each expiry, with simple conditions for freedom from calendar and butterfly arbitrage.",
         "formula": "`w(k, theta) = theta / 2 * (1 + rho phi k + sqrt((phi k + rho)^2 + 1 - rho^2))`, with `phi` a decreasing function of `theta` set by `eta` and `gamma`. The CLI returns total variance for each `theta` and each log-moneyness, plus two flags.",
-        "oracle": "SSVI evaluation has analytic cases only, including the check that total variance at `k = 0` equals `theta` (1e-15). No outside library evaluates SSVI here (`specifications/05-volatility/stage-c-targets.md`).",
+        "oracle": "SSVI evaluation has analytic cases, including the check that total variance at `k = 0` equals `theta` (1e-15). No outside library has an SSVI object. Since the validation evidence pack (2026-11-17), each slice's total variance is checked with QuantLib `SviSmileSection` through the raw-SVI form of an SSVI slice (Gatheral and Jacquier 2014, Lemma 3.3); the two no-arbitrage flags are the spec's sufficient conditions on the parameters, recomputed as arithmetic (`oracle/OUTSIDE_VALIDATION.json`).",
         "limits": ["The grid is total variance against `theta`, because the SSVI operation takes `theta` and not calendar time. Expiry in years is not an input.",
                    "The flags are checks at the grid points. A wider grid could find a violation this one does not.",
                    "One parameter set, chosen by hand."],

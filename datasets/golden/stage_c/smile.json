@@ -910,7 +910,8 @@
    "tolerance_class": "interpolation",
    "verified_by": [
     "published-counterexample",
-    "analytic"
+    "analytic",
+    "quantlib-1.44"
    ],
    "tags": [
     "arbitrage",
@@ -1354,7 +1355,8 @@
    "tolerance_class": "interpolation",
    "verified_by": [
     "analytic",
-    "atm-equals-theta"
+    "atm-equals-theta",
+    "quantlib-1.44-svi-slices"
    ],
    "tags": [
     "synthetic"
@@ -1420,7 +1422,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "analytic"
+    "analytic",
+    "quantlib-1.44-svi-slices"
    ],
    "tags": [
     "arbitrage",
@@ -1487,7 +1490,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "analytic"
+    "analytic",
+    "quantlib-1.44-svi-slices"
    ],
    "tags": [
     "synthetic"

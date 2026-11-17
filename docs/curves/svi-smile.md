@@ -88,13 +88,13 @@ Each CLI built these numbers on its own, from the same input files. Agreement sh
 
 ## Oracle evidence and limits
 
-SVI evaluation is compared with QuantLib `SviSmileSection` and with a published counterexample, a smile that looks fine and still admits arbitrage. The measured gap to QuantLib is within 1e-12 (`specifications/05-volatility/stage-c-targets.md`).
+SVI evaluation is compared with QuantLib `SviSmileSection` and with a published counterexample, a smile that looks fine and still admits arbitrage; since the validation evidence pack (2026-11-17) the counterexample's total variance and vols are also checked with QuantLib, and its `g` by central differences on QuantLib's variance. The measured gap to QuantLib is within 1e-12 (`specifications/05-volatility/stage-c-targets.md`).
 
 Golden cases with an `ok` result for `vol.svi.evaluate`: 2, counted from `verified_by` in `datasets/golden/stage_c/`. All four builds passed them locally, which is self-assessment.
 
 | Verified by | Operation | Cases |
 |---|---|---|
-| published-counterexample, analytic | vol.svi.evaluate | 1 |
+| published-counterexample, analytic, quantlib-1.44 | vol.svi.evaluate | 1 |
 | quantlib-1.44, analytic | vol.svi.evaluate | 1 |
 
 Limits:

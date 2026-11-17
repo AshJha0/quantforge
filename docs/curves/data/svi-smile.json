@@ -237,7 +237,7 @@
   "cases": 2,
   "by_source": {
    "vol.svi.evaluate: quantlib-1.44, analytic": 1,
-   "vol.svi.evaluate: published-counterexample, analytic": 1
+   "vol.svi.evaluate: published-counterexample, analytic, quantlib-1.44": 1
   }
  }
 }

@@ -224,7 +224,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "hand"
+    "hand",
+    "quantlib-1.44-fxforward"
    ],
    "tags": [
     "synthetic"
@@ -364,7 +365,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "hand"
+    "hand",
+    "quantlib-1.44-fxforward"
    ],
    "tags": [
     "synthetic"
@@ -504,7 +506,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "hand"
+    "hand",
+    "quantlib-1.44-fxforward"
    ],
    "tags": [
     "synthetic"
