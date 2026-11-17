@@ -2,8 +2,11 @@
 // derived by hand in the comment next to it; none is copied from the program's output.
 // No namespace-scope static objects (static-init order has broken ASan before).
 #include <catch2/catch_test_macros.hpp>
+#include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <optional>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -554,4 +557,83 @@ TEST_CASE("hsu least margin: a repeated equality row leaves a degenerate artific
     using B = std::vector<hg::Bound>;
     require_point(hg::detail::least_margin({{1, 1}, {1, 1}}, {3, 3}, B{}, B{}, {1, 3}), {3, 0});
     require_point(hg::detail::least_margin({{1, 1}, {2, 2}}, {-3, -6}, B{}, B{}, {3, 1}), {0, -3});
+}
+
+// ---- Sign search at a degenerate vertex (dependent row in the dual active set) ----
+// The orthant (+, +, +) of this problem has x0 >= 1, the margin 0.5 x0 + 0.5 x1 <= 0.5 and the sign row x1 >= 0 all
+// active at (1, 0, 0): three rows through a point of a two-dimensional face, x1 >= 0 being -2 (margin) - (x0 >= 1).
+// Rounding left x1 at -1.1e-16, the dual active set picked up x1 >= 0 as violated, and the back-substituted
+// coefficient of the x2 sign row in that combination came out 1e-18 instead of 0: taken as a blocking row, a dual
+// step of 3.4e17 dropped the x2 sign row, the margin multiplier went to 6.8e17 and the x2 row came back with
+// multiplier 6e-15, so the sign test on x2 passed and the sign search stopped at (1, 0, 0), objective 75.25.
+TEST_CASE("hsu sign search: a dependent row at a degenerate vertex does not hide the x2 sign flip", "[hedging][hsu]") {
+    hg::QpProblem p;
+    p.a = {{3, 2, -2}, {-2, 7, 2}, {3, -1, 6}, {1, 0, 0}};
+    p.b = {-1, -3, 2.5, 3};
+    p.weights = {1, 1, 1, 1};
+    p.lower = std::vector<hg::Bound>{1.0, -1.0, std::nullopt};
+    p.upper = std::vector<hg::Bound>{2.0, std::nullopt, std::nullopt};
+    p.half_spreads = hg::Vec{0, 0.75, 1};
+    p.margin_rates = hg::Vec{0.5, 0.5, 0};
+    p.margin_limit = 0.5;
+    // x0 >= 1 and 0.5 x0 + 0.5 |x1| <= 0.5 force x0 = 1, x1 = 0. Then A x + b = (2, -5, 5.5, 4) + x2 (-2, 2, 6, 0), so
+    // f(x2) = 75.25 + 38 x2 + 44 x2^2 + |x2|. For x2 < 0, f' = 37 + 88 x2 = 0: x2 = -37/88 (f'(0+) = 39 > 0, so not
+    // x2 >= 0), and f = 75.25 - 37^2 / 176 = 67.4715909090909...
+    const double x2 = -37.0 / 88.0, objective = 75.25 - 37.0 * 37.0 / 176.0;
+    const hg::QpResult r = hg::solve_qp(p);
+    REQUIRE(r.x.size() == 3);
+    REQUIRE(near(r.x[0], 1.0));
+    REQUIRE(std::fabs(r.x[1]) <= 1e-12);
+    REQUIRE(near(r.x[2], x2));
+    REQUIRE(near(r.objective, objective));
+    const hg::QpResult o = hg::detail::solve_qp_by_orthants(p);
+    REQUIRE(near(o.objective, objective));
+}
+
+TEST_CASE("hsu sign search agrees with the orthant oracle on small integer costed, margined problems", "[hedging][hsu]") {
+    // Small integers make degenerate vertices (a margin tight where bounds and sign rows also meet) common, which
+    // smooth random data almost never hits. Draws use rng() % k only, so the sequence is the same on every library.
+    std::mt19937_64 rng(20261117);
+    auto pick = [&](std::int64_t lo, std::int64_t hi) { return double(lo + std::int64_t(rng() % std::uint64_t(hi - lo + 1))); };
+    int compared = 0;
+    for (int trial = 0; trial < 400; ++trial) {
+        const std::size_t n = 2 + std::size_t(rng() % 2), m = n + 1;
+        hg::QpProblem p;
+        p.weights = hg::Vec(m, 1.0);
+        p.a.assign(m, hg::Vec(n, 0.0));
+        p.b.assign(m, 0.0);
+        for (std::size_t i = 0; i < m; ++i) {
+            for (std::size_t j = 0; j < n; ++j) p.a[i][j] = pick(-3, 3);
+            p.b[i] = pick(-6, 6) / 2.0;
+        }
+        std::vector<hg::Bound> lo(n), up(n);
+        hg::Vec hs(n), rates(n);
+        for (std::size_t j = 0; j < n; ++j) {
+            const auto kind = rng() % 4;
+            if (kind == 1) lo[j] = pick(-1, 1);
+            if (kind == 2) up[j] = pick(-1, 1);
+            if (kind == 3) {
+                lo[j] = pick(-1, 0);
+                up[j] = *lo[j] + pick(0, 2);
+            }
+            hs[j] = pick(0, 4) / 4.0;
+            rates[j] = pick(0, 2) / 2.0;
+        }
+        p.lower = lo;
+        p.upper = up;
+        p.half_spreads = hs;
+        p.margin_rates = rates;
+        p.margin_limit = pick(0, 4) / 2.0;
+        std::string got_code = "ok", want_code = "ok";
+        hg::QpResult got, want;
+        try { got = hg::solve_qp(p); } catch (const Error& e) { got_code = e.code(); }
+        try { want = hg::detail::solve_qp_by_orthants(p); } catch (const Error& e) { want_code = e.code(); }
+        REQUIRE(got_code == want_code);
+        if (got_code != "ok") continue;
+        ++compared;
+        // Both are minimisers of one strictly convex problem: the objectives agree to rounding of the data scale.
+        const double scale = std::max(1.0, std::fabs(want.objective));
+        REQUIRE(std::fabs(got.objective - want.objective) <= 1e-9 * scale);
+    }
+    REQUIRE(compared >= 100);
 }

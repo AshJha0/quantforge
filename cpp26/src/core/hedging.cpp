@@ -278,14 +278,23 @@ public:
                     for (std::size_t i = 0; i < n_; ++i) z[i] += j_[i][c] * d[c];
                 }
                 const Vec r = r_solve(d);
+                const bool step_in_primal = d2 > 1e-24 * dall;
+                // n_p in the span of the active rows (no primal step): r are the coefficients of n_p = sum_k r_k n_k,
+                // found by back-substitution in R, so each carries a rounding error of order eps cond(R) max|r|. An
+                // r_k that small is 0, not a blocking row: taken as positive, it makes a dual step of u_k / r_k
+                // (1e17 at a degenerate vertex) that drops a genuine active row and leaves the multipliers of the
+                // dependent rows at 1e17 and of the dropped row, re-added, at 0. The cut is the I-3 threshold,
+                // 1e-12 of the largest |r|, the same 1e-12 as the norm test of step_in_primal.
+                double r_cut = 0.0;
+                if (!step_in_primal)
+                    for (std::size_t k = 0; k < iq(); ++k) r_cut = std::max(r_cut, 1e-12 * std::fabs(r[k]));
                 double t1 = inf;
                 std::size_t drop = 0;
                 for (std::size_t k = 0; k < iq(); ++k)
-                    if (r[k] > 0.0 && u_[k] / r[k] < t1) {
+                    if (r[k] > r_cut && u_[k] / r[k] < t1) {
                         t1 = u_[k] / r[k];
                         drop = k;
                     }
-                const bool step_in_primal = d2 > 1e-24 * dall;
                 const double t2 = step_in_primal ? -sp / d2 : inf;  // n_p . z = |d2|^2
                 if (t1 == inf && t2 == inf) {
                     // Goldfarb-Idnani's certificate: n_p = sum_k r_k n_k with every r_k <= 0, so every feasible y'
