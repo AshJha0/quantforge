@@ -136,6 +136,39 @@ pub fn mean_variance(
             left = 0.0;
         }
     }
+    // J-W3-19: with a bound near 2^53, `1 - sum lower` and `upper - lower` round, and the fill
+    // can miss the budget by far more than rounding (fuzz seed optim_j-0015: lower_0 = -2^53 left
+    // the start at sum 0.2375). The active set keeps `sum w` fixed, so it then never met the
+    // budget. One pass in index order moves the shortfall onto weights with room; it runs only
+    // beyond 1e-12, so ordinary starts are unchanged.
+    let mut gap = 1.0 - w.iter().sum::<f64>();
+    if gap.abs() > 1e-12 {
+        for i in 0..n {
+            if gap == 0.0 {
+                break;
+            }
+            let step = if gap > 0.0 {
+                (hi[i] - w[i]).min(gap)
+            } else {
+                (lo[i] - w[i]).max(gap)
+            };
+            w[i] = if step == hi[i] - w[i] {
+                hi[i]
+            } else if step == lo[i] - w[i] {
+                lo[i]
+            } else {
+                w[i] + step
+            };
+            gap -= step;
+        }
+        for i in 0..n {
+            state[i] = if w[i] == lo[i] {
+                -1
+            } else {
+                i8::from(w[i] == hi[i])
+            };
+        }
+    }
     for _ in 0..(50 * n + 100) {
         let free: Vec<usize> = (0..n).filter(|&i| state[i] == 0).collect();
         if free.is_empty() {
@@ -240,7 +273,7 @@ pub fn mean_variance(
             }
         }
     }
-    fail("E_CONVERGENCE", "the active-set method did not finish")
+    fail("E_NO_CONVERGENCE", "the active-set method did not finish")
 }
 
 /// Weights, volatility and contributions of long-only risk parity (J-W2-5).

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Stage J lane J-0b: golden cases for three fuzz findings (main run 43390662426, seed 3).
+"""Stage J lane J-0b: golden cases for three fuzz findings (main run 43390662426, seed 3), with later fuzz fixes
+(J-W3-17; J-W3-18 to J-W3-20 from main run 43858847696, seed 4; J-W3-21 from the J-W3-20 follow-up).
 
     cd oracle/python && uv run python gen_stage_j_fuzz.py
 
@@ -120,6 +121,68 @@ CASES += [
          "E_LIMIT", ["backtest", "limit"], "observations one above the limit (J-W3-17)"),
     case(43, _TL, {"observations": 1_000_001, "exceptions": 2_000_000, "confidence": 0.99},
          "E_LIMIT", ["backtest", "limit"], "limit before the domain check: E_LIMIT, not E_DOMAIN (J-W3-17)"),
+]
+
+# J-W3-18 to J-W3-20: fuzz run 43858847696 (seed 4, 2026-11-16).
+_HI = json.loads((GOLDEN / "stage_i" / "hedgeint_i.json").read_text(encoding="utf-8"))["cases"]
+_HINT = copy.deepcopy(next(c for c in _HI if c["case_id"] == "hedgeint_i-0010")["inputs"])
+_HINT["a"][0][1] = 9.5e299  # finite, but A' W A overflows
+_OPT = next(c for c in json.loads((GOLDEN / "stage_j" / "optim_j.json").read_text(encoding="utf-8"))["cases"]
+            if c["case_id"] == "optim_j-0015")
+_OPT_IN = copy.deepcopy(_OPT["inputs"])
+_OPT_IN["lower"][0] = -9007199254740992.0  # -2^53; the lower bound on asset 0 is not active in optim_j-0015
+_CF = {"model": "CIR", "mean_reversion": 0.25, "long_term_mean": 0.04, "sigma": 0.08, "short_rate": 0.03,
+       "period_times": [5e-324, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0], "strike": 0.03, "cap_floor": "CAP",
+       "notional": 1000000.0}
+CASES += [
+    case(44, "hedge.integer.solve", _HINT, "E_NON_FINITE", ["hedge", "overflow"],
+         "a finite matrix whose normal equations overflow: E_NON_FINITE before check 3 (J-W3-18; fuzz hedgeint_i-0010)"),
+    {**case(45, "research.portfolio.mean_variance", _OPT_IN, "", ["research"], ""),
+     "expected": copy.deepcopy(_OPT["expected"]), "tolerance_class": _OPT["tolerance_class"],
+     "output_classes": copy.deepcopy(_OPT["output_classes"]), "verified_by": list(_OPT["verified_by"]),
+     "tags": ["fuzz", "research", "synthetic"],
+     "description": "optim_j-0015 with lower_0 = -2^53 (inactive): the same answer; the start must meet the budget "
+                    "(J-W3-19; fuzz optim_j-0015)"},
+    case(46, "rates.shortrate.capfloor", _CF, "E_NON_FINITE", ["shortrate", "overflow"],
+         "CIR cap with t_0 = 5e-324: e^(gamma t_0) - 1 is 0, so rho is infinite (J-W3-20; fuzz capfloor)"),
+    case(47, "rates.shortrate.capfloor", {**_CF, "period_times": [1e-200, *_CF["period_times"][1:]]},
+         "E_NON_FINITE", ["shortrate", "overflow"], "CIR cap with t_0 = 1e-200: rho^2 overflows (J-W3-20)"),
+]
+
+# J-W3-21: the finite-but-huge noncentrality (t_0 = 1e-10, lambda about 1.9e11). The Chernoff bound puts both
+# noncentral chi-square CDFs of the first caplet below e^-7e8, so the call leg is 0, the first caplet is the bond-put
+# intrinsic N (P(0, t_0) - (1 + K tau_1) P(0, 2)) from the CIR bond formula (exact to rounding), and the first
+# floorlet is 0.
+# the later periods are ordinary CIR options (lambda below 300) and come from the Python build, checked against
+# scipy.special.chndtr (cephes) in the series; a convergence study over t_0 = 1e-2 to 1e-12 with scipy approaches the
+# same limit. J-W3-21 also makes a CDF the bound cannot settle with lambda/2 above 1e5 E_LIMIT (case 50).
+_CF10 = {**_CF, "period_times": [1e-10, *_CF["period_times"][1:]]}
+_CF_TOL = {"tolerance_class": "root_finding",
+           "tolerance_limit": {"absolute": 1e-06, "relative": 1e-09, "reason": "1e-12 per unit notional"},
+           "verified_by": ["reference-computed", "deterministic-limit", "scipy-chndtr"]}
+
+
+def _cf_ok(k, inputs, outputs, description):
+    return {**case(k, "rates.shortrate.capfloor", inputs, "", ["shortrate"], description),
+            "expected": {"status": "ok", "outputs": outputs}, **_CF_TOL,
+            "tags": ["fuzz", "shortrate", "capfloor", "cir", "synthetic"]}
+
+
+CASES += [
+    _cf_ok(48, _CF10, {"price": 47672.09456197169,
+                       "caplet_prices": [5790.068868782696, 7493.5615828008995, 8263.795835045452,
+                                         8628.616146460452, 8756.826919229117, 8739.225209653072]},
+           "CIR cap with t_0 = 1e-10 (lambda about 1.9e11): first caplet N (P(0, t_0) - (1 + K tau) P(0, 2)), "
+           "settled by the Chernoff bound (J-W3-21; C++ gave 3690.6, Python ran for more than a minute)"),
+    _cf_ok(49, {**_CF10, "cap_floor": "FLOOR"},
+           {"price": 14896.666168494941,
+            "caplet_prices": [0.0, 3074.246303823362, 3112.876138319504, 3028.8427129700394, 2905.770922895984,
+                              2774.9300904860515]},
+           "CIR floor with t_0 = 1e-10: first floorlet 0 to within e^-7e8 (J-W3-21)"),
+    case(50, "rates.shortrate.capfloor", {**_CF, "short_rate": 0.0263, "period_times": [1e-06, 2.0, 3.0]},
+         "E_LIMIT", ["shortrate", "limit"],
+         "CIR cap with t_0 = 1e-6 and r_0 near the critical rate: lambda/2 about 9e6 and the Chernoff bound "
+         "cannot settle the CDF, so E_LIMIT (J-W3-21)"),
 ]
 
 DOC = {"schema_version": "1.0", "suite": "fuzzfix_j", "spec": "specifications/stage-j-rulings.md",

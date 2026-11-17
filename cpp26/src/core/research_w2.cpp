@@ -132,6 +132,19 @@ MeanVariance mean_variance(const Vec& mu, const Mat& sigma_in, double gamma, Vec
             break;
         }
     }
+    // J-W3-19: with a bound near 2^53, 1 - sum lower and upper - lower round, and the fill can miss the budget by
+    // far more than rounding (fuzz seed optim_j-0015: lower_0 = -2^53 left the start at sum 0.2375). The active
+    // set keeps sum w fixed, so it then never met the budget. One pass in index order moves the shortfall onto
+    // weights with room; it runs only beyond 1e-12, so ordinary starts are unchanged.
+    double gap = 1;
+    for (const double v : w) gap -= v;
+    if (std::fabs(gap) > 1e-12) {
+        for (std::size_t i = 0; i < n && gap != 0; ++i) {
+            const double step = gap > 0 ? std::min(upper[i] - w[i], gap) : std::max(lower[i] - w[i], gap);
+            w[i] = step == upper[i] - w[i] ? upper[i] : (step == lower[i] - w[i] ? lower[i] : w[i] + step);
+            gap -= step;
+        }
+    }
     for (std::size_t i = 0; i < n; ++i) state[i] = w[i] == lower[i] ? -1 : (w[i] == upper[i] ? 1 : 0);
 
     const std::size_t max_iter = 50 * n + 100;
@@ -208,7 +221,7 @@ MeanVariance mean_variance(const Vec& mu, const Mat& sigma_in, double gamma, Vec
         for (std::size_t i = 0; i < n; ++i)
             if (state[i] != 0) w[i] = state[i] < 0 ? lower[i] : upper[i];
     }
-    if (!solved) domain("the active-set iteration did not finish", "covariance");
+    if (!solved) throw Error("E_NO_CONVERGENCE", "the active-set iteration did not finish", "covariance");
     (void)nu;
     MeanVariance out;
     const Vec sw = mul(sigma, w);

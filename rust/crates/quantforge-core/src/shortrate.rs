@@ -218,9 +218,23 @@ pub fn zcb_option(
             let rbar = (ln_a - strike.ln()) / bb;
             let k = 4.0 * a * b / s2;
             let num = 2.0 * rho * rho * r * (g * expiry).exp();
-            let chi = crate::stats::noncentral_chi2_cdf;
-            let c = ps * chi(2.0 * rbar * (rho + psi + bb), k, num / (rho + psi + bb))
-                - strike * pt * chi(2.0 * rbar * (rho + psi), k, num / (rho + psi));
+            // J-W3-21: a CDF the Chernoff test cannot settle with lambda/2 above 1e5 is E_LIMIT.
+            let chi = |x: f64, lambda: f64| -> Result<f64> {
+                if lambda.is_finite()
+                    && x.is_finite()
+                    && lambda / 2.0 > crate::stats::NCX2_MAX_HALF_LAMBDA
+                    && x > 0.0
+                    && crate::stats::noncentral_chi2_chernoff(x, k, lambda).is_none()
+                {
+                    return fail(
+                        "E_LIMIT",
+                        "the noncentral chi-square noncentrality is too large for the series (J-W3-21)",
+                    );
+                }
+                Ok(crate::stats::noncentral_chi2_cdf(x, k, lambda))
+            };
+            let c = ps * chi(2.0 * rbar * (rho + psi + bb), num / (rho + psi + bb))?
+                - strike * pt * chi(2.0 * rbar * (rho + psi), num / (rho + psi))?;
             let v = if call { c } else { c - ps + strike * pt };
             return Ok((notional * v, pt, ps));
         }

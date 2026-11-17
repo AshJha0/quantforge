@@ -613,7 +613,8 @@ fn minimise(
 }
 
 /// As `minimise`, with one KKT multiplier per inequality (0 when inactive), for the problem
-/// scaled as `x^T H x / 2 + c^T x`.
+/// scaled as `x^T H x / 2 + c^T x`, and whether each inequality is active.
+#[allow(clippy::type_complexity)]
 fn minimise_with_multipliers(
     g: &Matrix,
     lin: &[f64],
@@ -621,7 +622,7 @@ fn minimise_with_multipliers(
     xp: &[f64],
     ineqs: &[Ineq],
     dependence: f64,
-) -> Result<Option<(Vec<f64>, Vec<f64>)>> {
+) -> Result<Option<(Vec<f64>, Vec<f64>, Vec<bool>)>> {
     let dim = g.len();
     let cons: Vec<Constraint> = ineqs
         .iter()
@@ -654,13 +655,15 @@ fn minimise_with_multipliers(
         .map(|(row, p)| p + dot(row, &y))
         .collect();
     let mut multipliers = vec![0.0; ineqs.len()];
+    let mut is_active = vec![false; ineqs.len()];
     for (i, l) in active.into_iter().zip(lambda) {
         multipliers[i] = l;
+        is_active[i] = true;
         if let Some((j, v)) = ineqs[i].snap {
             x[j] = v;
         }
     }
-    Ok(Some((x, multipliers)))
+    Ok(Some((x, multipliers, is_active)))
 }
 
 /// Minimises `y^T G y + 2 lin^T y` with `x = xp + Z y` inside the bounds. Returns `x`, with
@@ -693,13 +696,15 @@ struct Kinks<'a> {
 /// A sign-state correction loop then checks the subgradient condition at every zero coordinate
 /// with the multipliers of the orthant solve and re-solves until it holds, so the answer meets
 /// the KKT conditions also at and next to a switch point between holding and not holding.
+/// Returns the minimiser with the face of its final orthant (`None` when the best answer so far
+/// is kept after a sign state with no feasible point).
 fn nonsmooth_minimiser(
     h: &Matrix,
     c: &[f64],
     (e, rhs): (&[Vec<f64>], &[f64]),
     (lower, upper): (&[Option<f64>], &[Option<f64>]),
     k: &Kinks,
-) -> Result<Option<Vec<f64>>> {
+) -> Result<Option<(Vec<f64>, Option<Face>)>> {
     let n = h.len();
     let spread = &k.spread;
     let delta = SPLIT_DELTA * spectral_scale(&eigen_symmetric(h)?).max(f64::MIN_POSITIVE);
@@ -781,6 +786,7 @@ fn nonsmooth_minimiser(
     // Each change lowers the objective, and the loop ends at a point that meets the KKT
     // conditions of the non-smooth problem, exactly where the split answer is only near.
     let mut converged = false;
+    let mut face = None;
     for _ in 0..iteration_cap() {
         let c3: Vec<f64> = (0..n).map(|j| c[j] + sign[j] * spread[j] / 2.0).collect();
         let mut rows = bound_rows(lower, upper);
@@ -803,7 +809,8 @@ fn nonsmooth_minimiser(
             rows.len() - 1
         });
         let (g, lin) = reduced(h, &c3, &xp, &z);
-        let Some((x, mult)) = minimise_with_multipliers(&g, &lin, &z, &xp, &rows, THRESHOLD)?
+        let Some((x, mult, active)) =
+            minimise_with_multipliers(&g, &lin, &z, &xp, &rows, THRESHOLD)?
         else {
             if !tolerance_zeros.is_empty() {
                 for j in tolerance_zeros.drain(..) {
@@ -812,7 +819,7 @@ fn nonsmooth_minimiser(
                 continue;
             }
             // A sign state with no feasible point: keep the best answer so far.
-            return Ok(Some(last));
+            return Ok(Some((last, None)));
         };
         let mu = margin_row.map_or(0.0, |i| mult[i]);
         let mut changed = false;
@@ -833,6 +840,33 @@ fn nonsmooth_minimiser(
         tolerance_zeros.clear();
         last = x;
         if !changed {
+            // The orthant's face for `refine_face`: coordinates an active bound or sign row snapped
+            // (and every kink coordinate) are fixed; the orthant's bounds carry the signs.
+            let mut fixed: Vec<bool> = sign.iter().map(|s| *s == 0.0).collect();
+            for (row, on) in rows.iter().zip(&active) {
+                if let (true, Some((j, _))) = (*on, row.snap) {
+                    fixed[j] = true;
+                }
+            }
+            let lo: Vec<f64> = (0..n)
+                .map(|j| {
+                    let l = lower[j].unwrap_or(f64::NEG_INFINITY);
+                    if sign[j] > 0.0 { l.max(0.0) } else { l }
+                })
+                .collect();
+            let hi: Vec<f64> = (0..n)
+                .map(|j| {
+                    let u = upper[j].unwrap_or(f64::INFINITY);
+                    if sign[j] < 0.0 { u.min(0.0) } else { u }
+                })
+                .collect();
+            face = Some(Face {
+                fixed,
+                lo,
+                hi,
+                sign: sign.clone(),
+                margin_active: margin_row.is_some_and(|i| active[i]),
+            });
             converged = true;
             break;
         }
@@ -843,7 +877,7 @@ fn nonsmooth_minimiser(
             "sign-state iteration limit reached (R6-6.1)",
         );
     }
-    Ok(Some(last))
+    Ok(Some((last, face)))
 }
 
 /// The finite rule F-2 on every input of `hedge.qp.solve`.
@@ -1123,17 +1157,77 @@ fn qp_solve_unscaled(p: &QpProblem) -> Result<QpSolution> {
         }
         xp
     } else {
+        let diag: Vec<f64> = impact.iter().map(|m| p.ridge + cost_weight * m).collect();
         let found = if nonsmooth {
-            nonsmooth_minimiser(&h, &c, (e, rhs), (lower, upper), &kinks)?
+            let found = nonsmooth_minimiser(&h, &c, (e, rhs), (lower, upper), &kinks)?;
+            found.map(|(mut x, face)| {
+                if let Some(f) = face {
+                    // The same normal-equations error on the final orthant, where f is smooth:
+                    // 2.3e-6 against an exact minimum of 8.7e-9 on ns2 spread-tiny (Java and C++).
+                    // Refine there: the spread is the linear term, an active margin row an equality.
+                    let lin: Vec<f64> = (0..n).map(|j| f.sign[j] * kinks.spread[j] / 2.0).collect();
+                    let row: Option<Vec<f64>> =
+                        margin.map(|(m, _)| (0..n).map(|j| m[j] * f.sign[j]).collect());
+                    let margin_row = row
+                        .as_deref()
+                        .zip(margin)
+                        .map(|(r, (_, l))| (r, l, f.margin_active));
+                    refine_face(
+                        p.a,
+                        p.b,
+                        p.weights,
+                        &diag,
+                        &lin,
+                        &h,
+                        (e, rhs),
+                        margin_row,
+                        (&f.fixed, &f.lo, &f.hi),
+                        &mut x,
+                    );
+                    for v in &mut x {
+                        *v += 0.0;
+                    }
+                }
+                x
+            })
         } else {
             let mut found = bounded_minimiser(&g, &lin, &z_rows, &xp, lower, upper)?;
+            if let Some(x) = found.as_mut()
+                && k > 0
+            {
+                // With equalities the same error enters through Z^T H Z: 2.5e-6 against an exact
+                // minimum of 0 on a near-singular free block with x_2 = 3 fixed by its row (ns2,
+                // Java and C++). Refine in the null space of E; active bounds were snapped exactly.
+                let fixed: Vec<bool> = (0..n)
+                    .map(|j| lower[j] == Some(x[j]) || upper[j] == Some(x[j]))
+                    .collect();
+                let lo: Vec<f64> = lower
+                    .iter()
+                    .map(|l| l.unwrap_or(f64::NEG_INFINITY))
+                    .collect();
+                let hi: Vec<f64> = upper.iter().map(|u| u.unwrap_or(f64::INFINITY)).collect();
+                refine_face(
+                    p.a,
+                    p.b,
+                    p.weights,
+                    &diag,
+                    &zeros,
+                    &h,
+                    (e, rhs),
+                    None,
+                    (&fixed, &lo, &hi),
+                    x,
+                );
+                for v in x.iter_mut() {
+                    *v += 0.0;
+                }
+            }
             if let Some(x) = found.as_mut()
                 && k == 0
             {
                 // The normal-equations error of the integer relaxation (`refine_relaxed`) again:
                 // 2.3e-6 against an exact minimum of 0 on the near-singular case of Java seed
                 // -11115467 with x bounds 10 times its lot bounds. Impact counts like a ridge.
-                let diag: Vec<f64> = impact.iter().map(|m| p.ridge + cost_weight * m).collect();
                 refine_relaxed(p.a, p.b, p.weights, &diag, &h, lower, upper, x);
                 for v in x.iter_mut() {
                     *v += 0.0;
@@ -1419,12 +1513,247 @@ fn refine_relaxed(
     best
 }
 
+/// The face a minimiser lies on: which coordinates an active bound, sign or kink row holds,
+/// the bounds of the orthant, its signs and whether the margin row is active.
+struct Face {
+    fixed: Vec<bool>,
+    lo: Vec<f64>,
+    hi: Vec<f64>,
+    sign: Vec<f64>,
+    margin_active: bool,
+}
+
+/// Removes from `v` its components along the orthonormal vectors `basis`, in two passes.
+fn project_out(v: &mut [f64], basis: &[Vec<f64>]) {
+    for _ in 0..2 {
+        for q in basis {
+            let s = dot(q, v);
+            for (vi, qi) in v.iter_mut().zip(q) {
+                *vi -= s * qi;
+            }
+        }
+    }
+}
+
+/// An orthonormal basis (one vector per entry, over the free coordinates) of the null space of
+/// the rows `c` restricted to `free`. The row space is orthonormalised first by modified
+/// Gram-Schmidt in two passes, dropping a row whose remainder is at most 1e-12 of its norm (a row
+/// on fixed coordinates only, or one the others imply). The complement is then built one vector
+/// at a time from the unit vector with the largest remainder after projecting out everything
+/// chosen so far: the squared remainders sum to the dimension still missing, so the largest is at
+/// least that over `nf` and the choice never degenerates.
+#[allow(clippy::float_cmp)]
+fn face_null_basis(c: &[Vec<f64>], free: &[usize]) -> Matrix {
+    let nf = free.len();
+    let mut basis: Matrix = Vec::new();
+    for full in c {
+        let mut v: Vec<f64> = free.iter().map(|&j| full[j]).collect();
+        let norm0 = dot(&v, &v).sqrt();
+        if norm0 == 0.0 {
+            continue;
+        }
+        project_out(&mut v, &basis);
+        let norm = dot(&v, &v).sqrt();
+        if norm > 1e-12 * norm0 {
+            for e in &mut v {
+                *e /= norm;
+            }
+            basis.push(v);
+        }
+    }
+    let missing = nf - basis.len();
+    let mut z: Matrix = Vec::new();
+    let mut used = vec![false; nf];
+    for _ in 0..missing {
+        let mut pick: Option<(usize, Vec<f64>, f64)> = None;
+        for (i, _) in used.iter().enumerate().filter(|(_, u)| !**u) {
+            let mut v = vec![0.0; nf];
+            v[i] = 1.0;
+            project_out(&mut v, &basis);
+            project_out(&mut v, &z);
+            let norm = dot(&v, &v).sqrt();
+            if pick.as_ref().is_none_or(|(_, _, best)| norm > *best) {
+                pick = Some((i, v, norm));
+            }
+        }
+        let Some((i, mut v, norm)) = pick else {
+            break;
+        };
+        for e in &mut v {
+            *e /= norm;
+        }
+        used[i] = true;
+        z.push(v);
+    }
+    z
+}
+
+/// Fixed-precision iterative refinement on one face: `refine_relaxed` with constraints, the same
+/// algorithm and guards as Java `refineFace` and C++ `refine_face`. The free coordinates (not
+/// `fixed`) move in the null space of the active rows: the equalities `eq`, and the margin row
+/// `(row, limit, active)` when active. On the face
+/// `f(x) = sum w_i r_i^2 + sum diag_j x_j^2 + 2 sum lin_j x_j` plus a constant (`diag = ridge +
+/// cost_weight impact`, `lin` the orthant's `spread_j s_j / 2`), `r = a x + b`, so its
+/// half-gradient is `g = a^T W r + diag x + lin`.
+///
+/// The active-set solve used the reduced normal equations `Z^T H Z`, whose condition number is
+/// that of `W^(1/2) a Z` squared, so its answer is off along a weak direction by about
+/// `u kappa(Z^T H Z) |x|`: 2.5e-6 in `f` against an exact minimum of 0 on the ns2 probe cases.
+/// Each step takes `g` from the residual computed directly (error `u |a| |x|`, not squared), uses
+/// an orthonormal basis `Z` of the null space of the active rows restricted to the free
+/// coordinates, and solves `(Z^T H_FF Z) t = -Z^T g_F`, `delta_F = Z t`; the error contracts by
+/// about `u kappa` per step. `C delta = 0` holds in exact arithmetic; in floating point a step is
+/// kept only while every active row's defect `|c . x - d|` stays within the larger of its defect
+/// at the start and the rounding of evaluating it (`2^-52 (sum |c_j x_j| + |d|)`), an inactive
+/// margin row stays at or below the larger of its limit and its value at the start, every free
+/// coordinate stays inside its bounds, and `f` falls. So the result is never worse than the
+/// active-set answer, and nothing changes when no step lowers `f`. The cap of 64 steps is only a
+/// guard; a failed Cholesky factor keeps `x`.
+#[allow(clippy::too_many_arguments, clippy::many_single_char_names)]
+fn refine_face(
+    a: &Matrix,
+    b: &[f64],
+    w: &[f64],
+    diag: &[f64],
+    lin: &[f64],
+    h: &Matrix,
+    (eq, eq_rhs): (&[Vec<f64>], &[f64]),
+    margin_row: Option<(&[f64], f64, bool)>,
+    face: (&[bool], &[f64], &[f64]),
+    x: &mut [f64],
+) {
+    let (fixed, lo, hi) = face;
+    let n = x.len();
+    let free: Vec<usize> = (0..n).filter(|&j| !fixed[j]).collect();
+    let nf = free.len();
+    if nf == 0 {
+        return;
+    }
+    let mut c: Matrix = eq.to_vec();
+    let mut d: Vec<f64> = eq_rhs.to_vec();
+    if let Some((row, limit, true)) = margin_row {
+        c.push(row.to_vec());
+        d.push(limit);
+    }
+    let defect: Vec<f64> = c
+        .iter()
+        .zip(&d)
+        .map(|(ci, di)| (dot(ci, x) - di).abs())
+        .collect();
+    let row_cap = match margin_row {
+        Some((row, limit, false)) => limit.max(dot(row, x)),
+        _ => 0.0,
+    };
+    let z = face_null_basis(&c, &free);
+    let dim = z.len();
+    if dim == 0 {
+        return;
+    }
+    // Z^T H_FF Z
+    let m: Matrix = (0..dim)
+        .map(|s| {
+            (0..dim)
+                .map(|t| {
+                    (0..nf)
+                        .map(|u| {
+                            z[s][u] * (0..nf).map(|v| h[free[u]][free[v]] * z[t][v]).sum::<f64>()
+                        })
+                        .sum::<f64>()
+                })
+                .collect()
+        })
+        .collect();
+    let Ok(l) = crate::linalg::cholesky(&m) else {
+        return;
+    };
+    let f_of = |v: &[f64]| {
+        objective_of(&residual_of(a, b, v), w, 0.0, v)
+            + (0..n)
+                .map(|j| diag[j] * v[j] * v[j] + 2.0 * lin[j] * v[j])
+                .sum::<f64>()
+    };
+    let mut best = f_of(x);
+    for _ in 0..64 {
+        let res = residual_of(a, b, x);
+        // t = -Z^T g_F, then L L^T t = -Z^T g_F in place.
+        let mut t = vec![0.0; dim];
+        for (u, &j) in free.iter().enumerate() {
+            let g = diag[j] * x[j]
+                + lin[j]
+                + (0..res.len()).map(|i| a[i][j] * w[i] * res[i]).sum::<f64>();
+            for (ts, zs) in t.iter_mut().zip(&z) {
+                *ts -= zs[u] * g;
+            }
+        }
+        for s in 0..dim {
+            let acc = t[s] - (0..s).map(|q| l[s][q] * t[q]).sum::<f64>();
+            t[s] = acc / l[s][s];
+        }
+        for s in (0..dim).rev() {
+            let acc = t[s] - (s + 1..dim).map(|q| l[q][s] * t[q]).sum::<f64>();
+            t[s] = acc / l[s][s];
+        }
+        let mut trial = x.to_vec();
+        for (u, &j) in free.iter().enumerate() {
+            trial[j] += (0..dim).map(|s| z[s][u] * t[s]).sum::<f64>();
+            if trial[j] < lo[j] || trial[j] > hi[j] {
+                return;
+            }
+        }
+        for ((ci, di), dfi) in c.iter().zip(&d).zip(&defect) {
+            let scale = di.abs()
+                + ci.iter()
+                    .zip(&trial)
+                    .map(|(cj, xj)| (cj * xj).abs())
+                    .sum::<f64>();
+            if (dot(ci, &trial) - di).abs() > dfi.max(f64::EPSILON * scale) {
+                return;
+            }
+        }
+        if let Some((row, _, false)) = margin_row
+            && dot(row, &trial) > row_cap
+        {
+            return;
+        }
+        let f = f_of(&trial);
+        if f.is_nan() || f >= best {
+            return;
+        }
+        best = f;
+        x.copy_from_slice(&trial);
+    }
+}
+
+/// Whether `L H L` and `L A' W b` (with `H = A' W A + ridge I`) are finite, formed from `A L`.
+fn lot_normal_equations_finite(p: &IntegerProblem) -> bool {
+    let n = p.lot_sizes.len();
+    let al: Vec<Vec<f64>> =
+        p.a.iter()
+            .map(|row| row.iter().zip(p.lot_sizes).map(|(x, l)| x * l).collect())
+            .collect();
+    (0..n).all(|i| {
+        let c: f64 = (0..al.len())
+            .map(|r| al[r][i] * p.weights[r] * p.b[r])
+            .sum();
+        c.is_finite()
+            && (0..n).all(|j| {
+                let mut h: f64 = (0..al.len())
+                    .map(|r| p.weights[r] * al[r][i] * al[r][j])
+                    .sum();
+                if i == j {
+                    h += p.ridge * p.lot_sizes[i] * p.lot_sizes[i];
+                }
+                h.is_finite()
+            })
+    })
+}
+
 /// `hedge.integer.solve`: the hedge objective over whole lots, `x_j = lot_sizes_j n_j`.
 ///
 /// # Errors
 /// `E_DOMAIN` for a non-finite input, then `E_INPUT` (shapes), `E_DOMAIN` (weights, ridge, lot
-/// sizes, crossed lot bounds) and `E_SINGULAR` (the problem in lot units is not strictly convex,
-/// ruling I-6).
+/// sizes, crossed lot bounds), `E_NON_FINITE` (the normal equations in lot units overflow,
+/// J-W3-18) and `E_SINGULAR` (the problem in lot units is not strictly convex, ruling I-6).
 #[allow(clippy::cast_precision_loss)]
 pub fn integer_solve(p: &IntegerProblem) -> Result<IntegerSolution> {
     finite("a", &p.a)?;
@@ -1463,6 +1792,12 @@ pub fn integer_solve(p: &IntegerProblem) -> Result<IntegerSolution> {
         .map(|i| (0..n).map(|j| s[i] * h[i][j] * s[j]).collect())
         .collect();
     let lin: Vec<f64> = (0..n).map(|i| s[i] * c[i]).collect();
+    // J-W3-18 (R6-8.1): L H L or L A' W b overflowing from finite inputs is E_NON_FINITE,
+    // before check 3. Formed from A L directly, as the other builds do, so a tiny lot size that
+    // brings a huge column back into range is not refused.
+    if !lot_normal_equations_finite(p) {
+        return fail("E_NON_FINITE", "the normal equations in lot units overflow");
+    }
     // R6-6.2: the strict-convexity decision on the Jacobi-scaled form.
     let eig = eigen_symmetric(&scaled(&g, &jacobi(&g)))?;
     if eig[0] <= THRESHOLD * spectral_scale(&eig) {

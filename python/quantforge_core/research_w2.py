@@ -83,6 +83,24 @@ def _feasible_start(lower: Sequence[float], upper: Sequence[float]) -> list[floa
         step = min(up - lo, rest)
         w[i] = up if step == up - lo else lo + step
         rest -= step
+    return _repair_budget(w, lower, upper)
+
+
+def _repair_budget(w: list[float], lower: Sequence[float], upper: Sequence[float]) -> list[float]:
+    """J-W3-19: with a bound near 2^53, `1 - sum lower` and `upper - lower` round, and the fill can
+    miss the budget by far more than rounding (fuzz seed `optim_j-0015`: lower_0 = -2^53 left the start
+    at sum 0.2375). The active set keeps `sum w` fixed, so it then never meets the budget. One pass in
+    index order moves the shortfall onto weights with room; it runs only beyond 1e-12, so ordinary
+    starts are unchanged."""
+    d = 1.0 - math.fsum(w)
+    if abs(d) <= 1e-12:
+        return w
+    for i, (lo, up) in enumerate(zip(lower, upper, strict=True)):
+        step = min(up - w[i], d) if d > 0 else max(lo - w[i], d)
+        w[i] = up if step == up - w[i] else (lo if step == lo - w[i] else w[i] + step)
+        d -= step
+        if d == 0:
+            break
     return w
 
 
@@ -178,7 +196,7 @@ def portfolio_mean_variance(
             break
         state[which] = 0
     else:  # pragma: no cover - finite under strict convexity
-        raise QfError("E_DOMAIN", "the active-set method did not terminate", "covariance")
+        raise QfError("E_NO_CONVERGENCE", "the active-set method did not terminate", "covariance")
     sw = _matvec(sigma, w)
     var = _dot(w, sw)
     ret = _dot(mu, w)

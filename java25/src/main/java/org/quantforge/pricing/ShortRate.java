@@ -368,6 +368,28 @@ public final class ShortRate {
         return -d + n * Math.log1p(d / n) - 0.5 * Math.log(2.0 * Math.PI * n) - corr;
     }
 
+    /** J-W3-21: above this lambda/2 a noncentral chi-square CDF the Chernoff test cannot settle is E_LIMIT. */
+    static final double NCX2_MAX_HALF_LAMBDA = 1e5;
+    /** J-W3-21: a tail whose Chernoff log bound is below this is under 5e-324, the smallest subnormal. */
+    static final double NCX2_LOG_NEGLIGIBLE = -750.0;
+
+    /**
+     * J-W3-21: 0 or 1 when the noncentral chi-square CDF at x is settled to within one subnormal, else NaN. For
+     * t &lt; 1/2, Markov's inequality on e^(tX) with the moment generating function (1 - 2t)^(-k/2) exp(lambda t /
+     * (1 - 2t)) bounds the lower tail (t &lt; 0) or the upper tail (t &gt; 0) by exp(f(t)), f(t) = -t x - (k/2)
+     * ln(1 - 2t) + lambda t / (1 - 2t) (Chernoff 1952). With u = 1/(1 - 2t) the minimum solves lambda u^2 + k u = x,
+     * so u = 2x / (k + sqrt(k^2 + 4 lambda x)) and f = (k/2) ln u - x (1 - 1/u)/2 + lambda (u - 1)/2; u &lt; 1 is the
+     * lower tail. Below f = -750 the tail is under e^-750, so 0 (lower) or 1 (upper) is the correctly rounded CDF.
+     */
+    static double chi2Chernoff(double x, double k, double lambda) {
+        double u = 2.0 * x / (k + Math.sqrt(k * k + 4.0 * lambda * x));
+        double f = 0.5 * k * Math.log(u) - 0.5 * x * (1.0 - 1.0 / u) + 0.5 * lambda * (u - 1.0);
+        if (!(f < NCX2_LOG_NEGLIGIBLE)) {
+            return Double.NaN;
+        }
+        return u < 1.0 ? 0.0 : 1.0;
+    }
+
     /**
      * Noncentral chi-square CDF with k degrees of freedom and noncentrality lambda: the Poisson series summed from
      * its mode with log weights, up then down, until terms fall below 1e-17 of the sum (ruling G-32). A
@@ -387,7 +409,15 @@ public final class ShortRate {
             // R6-8: an overflowed parameter yields NaN for the caller's E_NON_FINITE guard, at once.
             return Double.NaN;
         }
-        int j0 = (int) Math.floor(Math.min(mu, 1e9));
+        // J-W3-21: settled by the Chernoff bound (CIR at a tiny expiry, lambda near 1e11), else bounded series.
+        double decided = chi2Chernoff(x, k, lambda);
+        if (!Double.isNaN(decided)) {
+            return decided;
+        }
+        if (mu > NCX2_MAX_HALF_LAMBDA) {
+            throw new QfError("E_LIMIT", "the noncentral chi-square noncentrality is too large for the series (J-W3-21)");
+        }
+        int j0 = (int) Math.floor(mu);
         double w0 = Math.exp(logPoisson(j0, mu));
         if (!Double.isFinite(w0)) {
             return Double.NaN;

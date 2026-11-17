@@ -372,4 +372,49 @@ class HedgeSolversTest {
             assertEquals(-4522985.411300044, s.x()[1], 1e-10 * 82091364.70172344);
         }
     }
+
+    /** NEAR_A with its first column times 16 (so the 2x2 block stays regular after scaling) and a third column. */
+    private static final double[][] NEAR_A3 = {{16 * NEAR_A[0][0], NEAR_A[0][1], 0.5},
+        {16 * NEAR_A[1][0], NEAR_A[1][1], 0.375}};
+
+    private static void assertMinimum(double exact, LeastSquaresHedge.Solution s) {
+        double err = Math.abs(s.objective() - exact);
+        assertTrue(err <= 1e-10 || err <= 1e-10 * exact, () -> "objective " + s.objective() + " vs " + exact);
+    }
+
+    @Test
+    void nearSingularQpWithEqualitiesIsRefinedInTheNullSpace() {
+        // Probe suite ns2 (eq1-unit, eq1-active-bound): x_2 = 3 by its row leaves the near-singular 2x2 block free;
+        // the exact minimum is 0 (fractions KKT enumeration). Without refinement the objective was 2.5e-6.
+        double[][] eq = {{0, 0, 1}};
+        for (double[] lo : new double[][] {null, {Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, 3}}) {
+            LeastSquaresHedge.Solution s = qp(NEAR_A3, NEAR_B, NEAR_W, 0, eq, new double[] {3}, lo, null, false);
+            assertMinimum(0.0, s);
+            assertEquals(3.0, s.x()[2]);
+            assertEquals(-4619548.226743288, s.x()[0], 1e-9 * 4619548.226743288);
+        }
+    }
+
+    @Test
+    void nearSingularCostedPathIsRefinedOnItsFinalOrthant() {
+        // Probe suite ns2: exact minima by fractions KKT enumeration over faces and orthants. Before refinement each
+        // was 2.25e-6 or 2.5e-6 too high.
+        double[] w = NEAR_W;
+        assertMinimum(0.0, LeastSquaresHedge.solve(NEAR_A, NEAR_B, w, 0, null, null, null, null, false,
+                new LeastSquaresHedge.Costs(null, new double[] {0, 0}, 1.0, null, null)));
+        assertMinimum(8.661435011274932e-09, LeastSquaresHedge.solve(NEAR_A, NEAR_B, w, 0, null, null, null, null,
+                false, new LeastSquaresHedge.Costs(new double[] {1e-16, 1e-16}, null, 1.0, null, null)));
+        assertMinimum(0.0, LeastSquaresHedge.solve(NEAR_A, NEAR_B, w, 0, null, null, null, null, false,
+                new LeastSquaresHedge.Costs(null, null, 1.0, new double[] {1, 1}, 1e9)));
+        assertMinimum(8.691920544150821e-10, LeastSquaresHedge.solve(NEAR_A3, NEAR_B, w, 0, new double[][] {{0, 0, 1}},
+                new double[] {3}, null, null, false,
+                new LeastSquaresHedge.Costs(new double[] {1e-16, 1e-16, 1e-16}, null, 1.0, null, null)));
+        // A third instrument on its own factor row held at its kink 0 by a spread of 100.
+        double[][] a = {{NEAR_A3[0][0], NEAR_A3[0][1], 0}, {NEAR_A3[1][0], NEAR_A3[1][1], 0}, {0, 0, 1}};
+        LeastSquaresHedge.Solution s = LeastSquaresHedge.solve(a, new double[] {NEAR_B[0], NEAR_B[1], -0.5},
+                new double[] {w[0], w[1], 1}, 0, null, null, null, null, false,
+                new LeastSquaresHedge.Costs(new double[] {1e-16, 1e-16, 100}, null, 1.0, null, null));
+        assertMinimum(0.25000000096536956, s);
+        assertEquals(0.0, s.x()[2]);
+    }
 }

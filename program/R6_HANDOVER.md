@@ -302,3 +302,11 @@ TOTALS: 15458 value 7651 error 5293 invariance 2514
 After J-I.2 and J-I.3 (`hedgesign_j` 2 value, `selectcost_j` 3 error; 2026-11-15):
 
 TOTALS: 15514 value 7653 error 5347 invariance 2514
+
+After J-W3-18 to J-W3-20 (`fuzzfix_j-0044` to `-0047`: 1 value, 3 error; fuzz run 43858847696, 2026-11-17):
+
+TOTALS: 15518 value 7654 error 5350 invariance 2514
+
+After J-W3-21 (`fuzzfix_j-0048` to `-0050`: 2 value, 1 error; CIR noncentral chi-square at a tiny expiry, 2026-11-17):
+
+TOTALS: 15521 value 7656 error 5351 invariance 2514

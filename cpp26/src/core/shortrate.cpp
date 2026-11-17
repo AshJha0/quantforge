@@ -131,10 +131,36 @@ double gamma_pq(double s, double x, bool upper) {
 double ncx2_cdf(double x, double k, double lambda) { return ncx2_tail(x, k, lambda, false); }
 double ncx2_sf(double x, double k, double lambda) { return ncx2_tail(x, k, lambda, true); }
 
+// J-W3-21: 0 or 1 when the noncentral chi-square CDF at x is settled to within one subnormal, else nothing. For t < 1/2,
+// Markov's inequality on e^(tX) with the moment generating function (1 - 2t)^(-k/2) exp(lambda t / (1 - 2t)) bounds
+// the lower tail (t < 0) or the upper tail (t > 0) by exp(f(t)), f(t) = -t x - (k/2) ln(1 - 2t) + lambda t / (1 - 2t)
+// (Chernoff 1952). With u = 1/(1 - 2t) the minimum solves lambda u^2 + k u = x, so u = 2x / (k + sqrt(k^2 + 4 lambda x))
+// and f = (k/2) ln u - x (1 - 1/u)/2 + lambda (u - 1)/2; u < 1 is the lower tail. Below f = -750 the tail is under
+// e^-750 < 5e-324, so 0 (lower) or 1 (upper) is the correctly rounded CDF.
+std::optional<double> ncx2_chernoff(double x, double k, double lambda) {
+    const double u = 2 * x / (k + std::sqrt(k * k + 4 * lambda * x));
+    const double f = 0.5 * k * std::log(u) - 0.5 * x * (1 - 1 / u) + 0.5 * lambda * (u - 1);
+    if (!(f < kNcx2LogNegligible)) return std::nullopt;
+    return u < 1 ? 0.0 : 1.0;
+}
+
 // Poisson-weighted sum of central chi-square CDFs (upper: survival functions), started at the mode (G-32).
 double ncx2_tail(double x, double k, double lambda, bool upper) {
+    // R6-8.1, J-W3-20: an overflowed argument (CIR at an expiry so small that e^(gamma T) - 1 is 0 or rho^2 is
+    // infinite) is E_NON_FINITE. Without this guard floor(lambda/2) of inf or NaN was cast to long long (undefined)
+    // and the downward loop ran about 2^63 times.
+    if (!std::isfinite(x) || !std::isfinite(k) || !std::isfinite(lambda))
+        throw Error("E_NON_FINITE", "the noncentral chi-square has a non-finite parameter");
     if (!(x > 0)) return upper ? 1.0 : 0.0;
     const double mu = lambda / 2;
+    // J-W3-21: a CDF the Chernoff bound settles to within one subnormal is 0 or 1 at once (CIR at a tiny expiry has
+    // lambda near 1e11, and the series would need about 1e11 terms); one it cannot settle above lambda/2 = 1e5 is
+    // E_LIMIT, which bounds the series below.
+    if (mu > 0) {
+        if (const auto decided = ncx2_chernoff(x, k, lambda)) return upper ? 1.0 - *decided : *decided;
+        if (mu > kNcx2MaxHalfLambda)
+            throw Error("E_LIMIT", "the noncentral chi-square noncentrality is too large for the series (J-W3-21)");
+    }
     const long long mode = static_cast<long long>(std::floor(mu));
     const auto weight = [&](long long j) {
         const double dj = static_cast<double>(j);

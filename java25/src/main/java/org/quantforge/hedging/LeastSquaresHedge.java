@@ -336,8 +336,10 @@ public final class LeastSquaresHedge {
         if (costs != null) {
             Reduced rd = new Reduced(hr, z, xp, hxp, c, k);
             CostTerms ct = new CostTerms(cw, spreads, impact, rates, costs.marginLimit());
-            double[] x = enumerate ? costSearchByEnumeration(rd, lo, hi, ct, a, b, weights, ridge)
+            OrthantSolution best = enumerate ? costSearchByEnumeration(rd, lo, hi, ct, a, b, weights, ridge)
                     : costSearch(rd, lo, hi, ct, a, b, weights, ridge, eqMatrix, eqRhs);
+            double[] x = best.x().clone();
+            refineOnOrthant(best, ct, a, b, weights, ridge, h, eqMatrix, eqRhs, x);
             double[] res = residual(a, b, x);
             double risk = objective(res, weights, ridge, x);
             double cost = 0.0;
@@ -405,6 +407,18 @@ public final class LeastSquaresHedge {
             for (int j = 0; j < n; j++) {
                 x[j] += 0.0;
             }
+        } else if (!minNorm) {
+            // With equalities the same error enters through Z'HZ: 2.5e-6 against an exact minimum of 0 on a
+            // near-singular free block with x_2 = 3 fixed by its row (probe suite ns2). Refine in the null space of E.
+            boolean[] fixed = new boolean[n];
+            for (int j = 0; j < n; j++) {
+                fixed[j] = activeLo[j] || activeHi[j];
+            }
+            refineFace(a, b, weights, ridge, new double[n], 0.0, new double[n], h, eqMatrix, eqRhs, null, 0.0,
+                    false, fixed, lo, hi, x);
+            for (int j = 0; j < n; j++) {
+                x[j] += 0.0;
+            }
         }
         double[] res = residual(a, b, x);
         return new Solution(x, res, objective(res, weights, ridge, x), rank);
@@ -425,7 +439,8 @@ public final class LeastSquaresHedge {
      * One orthant's solution: {@code x}, the true objective, and the multipliers (in the solver's half-scaled units)
      * of each instrument's lower and upper bound and of the margin row.
      */
-    private record OrthantSolution(double[] x, double f, double[] muLo, double[] muHi, double muRow) {}
+    private record OrthantSolution(double[] x, double f, double[] muLo, double[] muHi, double muRow, int[] signs,
+            double[] lo, double[] hi, boolean[] actLo, boolean[] actHi, boolean rowActive) {}
 
     /**
      * Solves the strictly convex problem on the closed orthant {@code signs} ({@code +1}, {@code -1}, or 0 for an
@@ -462,10 +477,11 @@ public final class LeastSquaresHedge {
         double[] muLo = new double[n];
         double[] muHi = new double[n];
         double[] muRow = new double[1];
+        boolean[] actRow = new boolean[1];
         double[] y;
         try {
             y = boundedReduced(rd.hr(), gr, rd.z(), rd.xp(), l2, h2, actLo, actHi, row,
-                    ct.marginLimit() == null ? 0.0 : ct.marginLimit(), muLo, muHi, muRow);
+                    ct.marginLimit() == null ? 0.0 : ct.marginLimit(), muLo, muHi, muRow, actRow);
         } catch (QfError e) {
             if (e.code().equals("E_INFEASIBLE")) {
                 return null;
@@ -483,7 +499,8 @@ public final class LeastSquaresHedge {
             }
             x[j] = v + 0.0;
         }
-        return new OrthantSolution(x, trueObjective(x, ct, a, b, w, ridge), muLo, muHi, muRow[0]);
+        return new OrthantSolution(x, trueObjective(x, ct, a, b, w, ridge), muLo, muHi, muRow[0], signs.clone(), l2,
+                h2, actLo, actHi, actRow[0]);
     }
 
     private static double trueObjective(double[] x, CostTerms ct, double[][] a, double[] b, double[] w,
@@ -499,7 +516,7 @@ public final class LeastSquaresHedge {
      * Test oracle only: the best solution over every closed sign orthant of the instruments with an {@code |x|} term,
      * {@code 2^k} problems. {@link #costSearch} must return the same minimiser.
      */
-    private static double[] costSearchByEnumeration(Reduced rd, double[] lo, double[] hi, CostTerms ct, double[][] a,
+    private static OrthantSolution costSearchByEnumeration(Reduced rd, double[] lo, double[] hi, CostTerms ct, double[][] a,
             double[] b, double[] w, double ridge) {
         int n = lo.length;
         List<Integer> costly = new ArrayList<>();
@@ -522,7 +539,7 @@ public final class LeastSquaresHedge {
         if (best == null) {
             throw new QfError("E_INFEASIBLE", "no point satisfies the bounds, equalities and margin limit");
         }
-        return best.x();
+        return best;
     }
 
     /** The sign of a starting point, choosing a non-empty orthant for a coordinate at 0. */
@@ -549,7 +566,7 @@ public final class LeastSquaresHedge {
      * search starts from the orthant of the exact least-margin point ({@link #leastMargin}, an LP), and refuses
      * ({@code E_INFEASIBLE}) when even that point is above the limit by more than the I-46 tolerance.
      */
-    private static double[] costSearch(Reduced rd, double[] lo, double[] hi, CostTerms ct, double[][] a, double[] b,
+    private static OrthantSolution costSearch(Reduced rd, double[] lo, double[] hi, CostTerms ct, double[][] a, double[] b,
             double[] w, double ridge, double[][] eqMatrix, double[] eqRhs) {
         int n = lo.length;
         CostTerms smooth = new CostTerms(0.0, new double[n], ct.impact(), null, null);
@@ -577,7 +594,7 @@ public final class LeastSquaresHedge {
                 signs = signsOf(x1, lo, hi, ct);
             }
         }
-        return signSearch(rd, lo, hi, signs, ct, a, b, w, ridge).x();
+        return signSearch(rd, lo, hi, signs, ct, a, b, w, ridge);
     }
 
     /**
@@ -825,13 +842,13 @@ public final class LeastSquaresHedge {
     private static double[] boundedReduced(double[][] hr, double[] gr, double[][] z, double[] xp, double[] lo,
             double[] hi, boolean[] activeLo, boolean[] activeHi, double[] row, double limit) {
         return boundedReduced(hr, gr, z, xp, lo, hi, activeLo, activeHi, row, limit, new double[xp.length],
-                new double[xp.length], new double[1]);
+                new double[xp.length], new double[1], new boolean[1]);
     }
 
     /** As above, and writes each bound's and the row's multiplier (0 when inactive). */
     private static double[] boundedReduced(double[][] hr, double[] gr, double[][] z, double[] xp, double[] lo,
             double[] hi, boolean[] activeLo, boolean[] activeHi, double[] row, double limit, double[] muLo,
-            double[] muHi, double[] muRow) {
+            double[] muHi, double[] muRow, boolean[] activeRow) {
         int n = xp.length;
         int r = hr.length;
         int count = row == null ? 0 : 1;
@@ -895,6 +912,7 @@ public final class LeastSquaresHedge {
                 muHi[-which[i] - 1] = res.multipliers()[i];
             } else {
                 muRow[0] = res.multipliers()[i];
+                activeRow[0] = res.active()[i];
             }
             if (res.active()[i] && which[i] != 0) {
                 if (which[i] > 0) {
@@ -977,6 +995,21 @@ public final class LeastSquaresHedge {
         double[][] hl = Dense.gram(al, weights, 0.0, n);
         for (int j = 0; j < n; j++) {
             hl[j][j] += ridge * lotSizes[j] * lotSizes[j];
+        }
+        // J-W3-18 (R6-8.1): L H L or L A' W b overflowing from finite inputs is E_NON_FINITE, before check 3.
+        double[] wbl = new double[b.length];
+        for (int i = 0; i < b.length; i++) {
+            wbl[i] = weights[i] * b[i];
+        }
+        double[] linL = Dense.mulT(al, wbl, n);
+        for (int i = 0; i < n; i++) {
+            boolean ok = Double.isFinite(linL[i]);
+            for (int j = 0; j < n; j++) {
+                ok = ok && Double.isFinite(hl[i][j]);
+            }
+            if (!ok) {
+                throw new QfError("E_NON_FINITE", "the normal equations in lot units overflow", "a");
+            }
         }
         Dense.Eigen eh = Dense.eigen(Dense.jacobiScaled(hl)); // ruling R6-6.2
         double minEv = Double.POSITIVE_INFINITY;
@@ -1098,6 +1131,243 @@ public final class LeastSquaresHedge {
             System.arraycopy(trial, 0, nc, 0, n);
         }
         return best;
+    }
+
+    /**
+     * {@link #refineFace} on the final sign orthant of the costed path. On that orthant {@code |x_j| = s_j x_j}, so
+     * the objective is smooth: the spread adds the linear term {@code cw h_j s_j x_j}, the impact a diagonal, and an
+     * active margin row {@code sum m_j s_j x_j = limit} is one more equality. Instruments at an active bound of the
+     * orthant (including its kink at 0) stay where they are.
+     */
+    private static void refineOnOrthant(OrthantSolution o, CostTerms ct, double[][] a, double[] b, double[] w,
+            double ridge, double[][] h, double[][] eqMatrix, double[] eqRhs, double[] x) {
+        int n = x.length;
+        boolean[] fixed = new boolean[n];
+        double[] row = ct.rates() == null ? null : new double[n];
+        double[] lin = new double[n];
+        for (int j = 0; j < n; j++) {
+            fixed[j] = o.actLo()[j] || o.actHi()[j];
+            lin[j] = 0.5 * ct.cw() * ct.spreads()[j] * o.signs()[j];
+            if (row != null) {
+                row[j] = ct.rates()[j] * o.signs()[j];
+            }
+        }
+        double limit = ct.marginLimit() == null ? 0.0 : ct.marginLimit();
+        refineFace(a, b, w, ridge, ct.impact(), ct.cw(), lin, h, eqMatrix, eqRhs, row, limit, o.rowActive(), fixed,
+                o.lo(), o.hi(), x);
+        for (int j = 0; j < n; j++) {
+            x[j] += 0.0;
+        }
+    }
+
+    /**
+     * Fixed-precision iterative refinement on one face: {@link #refineRelaxed} with constraints. The free coordinates
+     * {@code F} (not {@code fixed}) move in the null space of the active rows: the equalities, and {@code row} when
+     * {@code rowActive}. On the face, {@code f(x) = sum w_i r_i^2 + sum (ridge + cw impact_j) x_j^2 + 2 sum lin_j x_j}
+     * plus a constant, with {@code r = A x + b}, so its half-gradient is {@code g = A' W r + (ridge + cw impact) x +
+     * lin}. The active-set solve used the reduced normal equations {@code Z'HZ}, whose condition number is that of
+     * {@code W^(1/2) A Z} squared, so its answer is off along a weak direction by about {@code u kappa(Z'HZ) |x|}:
+     * 2.5e-6 in {@code f} against an exact minimum of 0 on the ns2 probe cases. Each step takes {@code g} from the
+     * residual computed directly (error {@code u |A| |x|}, not squared), uses an orthonormal basis {@code Z} of the
+     * null space of the active rows restricted to {@code F}, and solves {@code (Z' H_FF Z) t = -Z' g_F},
+     * {@code delta_F = Z t}; the error contracts by about {@code u kappa} per step, as in {@code refineRelaxed}.
+     * {@code C delta = 0} holds in exact arithmetic; in floating point a step is kept only while every active row's
+     * defect {@code |c . x - d|} stays within the larger of its defect at the start and the rounding of evaluating it
+     * ({@code 2^-52 (sum |c_j x_j| + |d|)}), an inactive margin row stays at or below the larger of its limit and its
+     * value at the start, every free coordinate stays inside its bounds, and {@code f} falls. So the result is never
+     * worse than the active-set answer, and nothing changes when no step lowers {@code f}. The cap of 64 steps is
+     * only a guard; the loop normally ends at the second or third step.
+     */
+    static void refineFace(double[][] a, double[] b, double[] w, double ridge, double[] impact, double cw,
+            double[] lin, double[][] h, double[][] eq, double[] eqRhs, double[] row, double limit, boolean rowActive,
+            boolean[] fixed, double[] lo, double[] hi, double[] x) {
+        int n = x.length;
+        int[] free = new int[n];
+        int nf = 0;
+        for (int j = 0; j < n; j++) {
+            if (!fixed[j]) {
+                free[nf++] = j;
+            }
+        }
+        if (nf == 0) {
+            return;
+        }
+        int k = eq == null ? 0 : eq.length;
+        int p = k + (row != null && rowActive ? 1 : 0);
+        double[][] c = new double[p][];
+        double[] d = new double[p];
+        double[] defect = new double[p];
+        for (int i = 0; i < p; i++) {
+            c[i] = i < k ? eq[i] : row;
+            d[i] = i < k ? eqRhs[i] : limit;
+            defect[i] = Math.abs(Dense.dot(c[i], x) - d[i]);
+        }
+        double rowCap = row == null || rowActive ? 0.0 : Math.max(limit, Dense.dot(row, x));
+        double[][] z = nullBasis(c, free, nf);
+        int dim = z.length;
+        if (dim == 0) {
+            return;
+        }
+        double[][] m = new double[dim][dim]; // Z' H_FF Z
+        for (int s = 0; s < dim; s++) {
+            for (int t = 0; t < dim; t++) {
+                double acc = 0.0;
+                for (int u = 0; u < nf; u++) {
+                    double hz = 0.0;
+                    for (int v = 0; v < nf; v++) {
+                        hz += h[free[u]][free[v]] * z[t][v];
+                    }
+                    acc += z[s][u] * hz;
+                }
+                m[s][t] = acc;
+            }
+        }
+        double[][] l;
+        try {
+            l = Dense.cholesky(m);
+        } catch (QfError e) {
+            return; // not numerically positive definite: keep the active-set answer
+        }
+        double best = faceObjective(a, b, w, ridge, impact, cw, lin, x);
+        for (int iter = 0; iter < 64; iter++) {
+            double[] res = residual(a, b, x);
+            double[] t = new double[dim]; // -Z' g_F
+            for (int u = 0; u < nf; u++) {
+                int j = free[u];
+                double g = (ridge + cw * impact[j]) * x[j] + lin[j];
+                for (int i = 0; i < res.length; i++) {
+                    g += a[i][j] * w[i] * res[i];
+                }
+                for (int s = 0; s < dim; s++) {
+                    t[s] -= z[s][u] * g;
+                }
+            }
+            for (int s = 0; s < dim; s++) { // L L' t = -Z' g_F
+                double acc = t[s];
+                for (int q = 0; q < s; q++) {
+                    acc -= l[s][q] * t[q];
+                }
+                t[s] = acc / l[s][s];
+            }
+            for (int s = dim - 1; s >= 0; s--) {
+                double acc = t[s];
+                for (int q = s + 1; q < dim; q++) {
+                    acc -= l[q][s] * t[q];
+                }
+                t[s] = acc / l[s][s];
+            }
+            double[] trial = x.clone();
+            for (int u = 0; u < nf; u++) {
+                int j = free[u];
+                double delta = 0.0;
+                for (int s = 0; s < dim; s++) {
+                    delta += z[s][u] * t[s];
+                }
+                trial[j] += delta;
+                if (trial[j] < lo[j] || trial[j] > hi[j]) {
+                    return;
+                }
+            }
+            for (int i = 0; i < p; i++) {
+                double scale = Math.abs(d[i]);
+                for (int j = 0; j < n; j++) {
+                    scale += Math.abs(c[i][j] * trial[j]);
+                }
+                if (Math.abs(Dense.dot(c[i], trial) - d[i]) > Math.max(defect[i], Math.ulp(1.0) * scale)) {
+                    return;
+                }
+            }
+            if (row != null && !rowActive && Dense.dot(row, trial) > rowCap) {
+                return;
+            }
+            double f = faceObjective(a, b, w, ridge, impact, cw, lin, trial);
+            if (!(f < best)) {
+                return;
+            }
+            best = f;
+            System.arraycopy(trial, 0, x, 0, n);
+        }
+    }
+
+    /** {@code f} on the face up to a constant: {@code sum w r^2 + ridge |x|^2 + sum (cw impact x^2 + 2 lin x)}. */
+    private static double faceObjective(double[][] a, double[] b, double[] w, double ridge, double[] impact,
+            double cw, double[] lin, double[] x) {
+        double f = objective(residual(a, b, x), w, ridge, x);
+        for (int j = 0; j < x.length; j++) {
+            f += cw * impact[j] * x[j] * x[j] + 2.0 * lin[j] * x[j];
+        }
+        return f;
+    }
+
+    /**
+     * An orthonormal basis (row {@code s} is vector {@code s}, over the free coordinates) of the null space of the
+     * rows {@code c} restricted to {@code free}. The row space is orthonormalised first by modified Gram-Schmidt in
+     * two passes, dropping a row whose remainder is at most {@code RANK_TOL} of its norm (a row on fixed coordinates
+     * only, or one the others imply). The complement is then built one vector at a time from the unit vector with the
+     * largest remainder after projecting out everything chosen so far; the squared remainders sum to the dimension
+     * still missing, so the largest is at least that over {@code nf} and the choice never degenerates.
+     */
+    private static double[][] nullBasis(double[][] c, int[] free, int nf) {
+        List<double[]> basis = new ArrayList<>();
+        for (double[] full : c) {
+            double[] v = new double[nf];
+            for (int u = 0; u < nf; u++) {
+                v[u] = full[free[u]];
+            }
+            double norm0 = Math.sqrt(Dense.dot(v, v));
+            if (norm0 == 0.0) {
+                continue;
+            }
+            project(v, basis);
+            double norm = Math.sqrt(Dense.dot(v, v));
+            if (norm > Dense.RANK_TOL * norm0) {
+                for (int u = 0; u < nf; u++) {
+                    v[u] /= norm;
+                }
+                basis.add(v);
+            }
+        }
+        int missing = nf - basis.size();
+        List<double[]> z = new ArrayList<>();
+        boolean[] used = new boolean[nf];
+        for (int step = 0; step < missing; step++) {
+            double[] pick = null;
+            double pickNorm = -1.0;
+            int pickAt = -1;
+            for (int i = 0; i < nf; i++) {
+                if (used[i]) {
+                    continue;
+                }
+                double[] v = new double[nf];
+                v[i] = 1.0;
+                project(v, basis);
+                project(v, z);
+                double norm = Math.sqrt(Dense.dot(v, v));
+                if (norm > pickNorm) {
+                    pick = v;
+                    pickNorm = norm;
+                    pickAt = i;
+                }
+            }
+            for (int u = 0; u < nf; u++) {
+                pick[u] /= pickNorm;
+            }
+            used[pickAt] = true;
+            z.add(pick);
+        }
+        return z.toArray(new double[0][]);
+    }
+
+    /** Removes from {@code v} its components along the orthonormal vectors {@code basis}, in two passes. */
+    private static void project(double[] v, List<double[]> basis) {
+        for (int pass = 0; pass < 2; pass++) {
+            for (double[] q : basis) {
+                double s = Dense.dot(q, v);
+                for (int u = 0; u < v.length; u++) {
+                    v[u] -= s * q[u];
+                }
+            }
+        }
     }
 
     private static double ridgeTerm(double ridge, double[] lotSizes, double[] lots) {
