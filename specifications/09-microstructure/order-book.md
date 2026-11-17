@@ -9,23 +9,23 @@ Spec version 0.1.0 (DRAFT, stage H wave 1b). Status: Specified, not implemented.
 - [KR-BOOK] Kraken, "Book (Level 2)", WebSocket v2 API docs, https://docs.kraken.com/api/docs/websocket-v2/book, read 2026-11-17. Evidence class: venue documentation, read. Verified: subscribe `depth` is one of 10, 25, 100, 500, 1000 (default 10); messages carry `type` `snapshot` or `update`, `data[]` with `symbol`, `bids[]`, `asks[]` (`price`, `qty`), `checksum` (CRC32 of the top 10 bids and asks) and `timestamp` (RFC 3339); the page says one update message can change the same price level more than once, and that updates must be processed in order. **No sequence number is documented**; the channel has no `seq` field.
 - [KR-CRC] Kraken, "Book checksum (WebSocket v2)", https://docs.kraken.com/api/docs/guides/spot-ws-book-v2, read 2026-11-17. Evidence class: venue documentation, read. Verified: `qty` 0 removes the level; after each update the client truncates its book to the subscribed depth, because the venue sends no zero for levels that fall out of scope; the checksum covers the top 10 levels each side whatever the subscription depth, asks ascending then bids descending, each price and quantity with the decimal point and leading zeros removed, concatenated and passed to CRC32 as an unsigned 32-bit integer; worked example result 3310070434; prices and quantities must be parsed as decimal or string, not float; all level updates in a message are applied before the checksum is computed. Not stated: the CRC32 polynomial (the recorder uses `zlib.crc32`, the IEEE 802.3 variant, and its `ok` flag has been true on recorded data, so the variant is inferred, evidence class "inferred from our recordings"); what to do on a mismatch; what happens when a truncated level re-enters the top N.
 - [KR-L3] Kraken, "Orders (Level 3)", https://docs.kraken.com/api/docs/websocket-v2/level3, read 2026-11-17. Verified: the order-by-order channel "is authenticated", needing an API token. The plan forbids accounts and keys (11.4), so **QuantForge has no MBO feed**; MBO is specified only for the simulated venues (`10-execution/lit-matching.md`).
-- [REC] `tools/recorder/crypto_l2.py` on `main` at v0.9.0 (DEPTH 25, KEEP 20) and at commit 4d0c8142 on branch `hedge-followups-0918` (DEPTH 100, KEEP 100, owner 2026-11-17, not yet on `main`). Read 2026-11-17. Evidence class: our code, read.
+- [REC] `tools/recorder/crypto_l2.py` on `main` at v0.9.0 (DEPTH 25, KEEP 20) at commit 4d0c8142 (DEPTH 100, KEEP 100, owner 2026-11-17) and at commit 547e6690 (raw book messages under `<SYMBOL>-raw/`, disk guard), both on branch `hedge-followups-0918`, not yet on `main`. Read 2026-11-17. Evidence class: our code, read.
 
-## What the recording holds (important limit)
+## What the recording holds
 
-The recorder applies every websocket message to an in-memory book but **writes only a once-a-second top-N snapshot** (`k = "book"`), the trades as received, and a `gap` row per reconnect. Raw update messages are not stored. So on today's files:
+Two kinds of file, per symbol per UTC hour (recorder commit 547e6690 on `hedge-followups-0918`, docstring read 2026-11-17; ruling HR-11, owner decision 2026-11-17):
 
-- the H-2 "book equals the venue snapshot at every checkpoint" check cannot be run from recorded files, because there is no independent feed to rebuild from: the snapshot rows are the recorder's own book;
-- the `ok` flag is the only venue-side evidence: it says the recorder's book matched Kraken's checksum at the last update before the snapshot row.
+- `<SYMBOL>/`: once-a-second top-N snapshot rows (`k = "book"`, 20 levels before 2026-11-17 20:15 UTC, 100 after), trades as received, a `gap` row per reconnect. The snapshot rows are the recorder's own book, so on their own they are not an independent feed.
+- `<SYMBOL>-raw/`, **from 2026-11-17 20:29 UTC**: every book message as received, `{"t": local receive time, "k": "msg", "type": "snapshot" | "update", "bids", "asks" (the exact decimal strings Kraken sent), "checksum", "ts" (Kraken's timestamp, updates only), "ok"}`, plus a `gap` row on every reconnect. The recorder's `ok` is its own checksum result; the rebuild below ignores it and recomputes against `checksum`, so the check is independent of the recorder's book code.
 
-This spec therefore defines two inputs, and ruling HR-11 asks the owner to approve a recorder change (record raw messages) so that the full H-2 check and the H-9 replay are possible. Until then, H-2 runs in **form B** below and the report says so.
+Raw recording can stop on its own: the recorder's disk guard writes a `NO_RAW` marker and stops the raw files below 3 GB free disk, while the per-second files continue. A raw hour with a `NO_RAW` stop or a missing file is incomplete (HR-11).
 
-| Form | Input | Checkpoint | Availability |
+| Form | Input | Checkpoint | Applies to |
 |---|---|---|---|
-| A (target) | raw `book` messages (`snapshot`, `update`) as received, each with receive time and venue checksum, one file per symbol-hour | every message carrying a checksum: CRC32 of our top 10 against the venue's; every once-a-second recorder snapshot: full top-N equality | needs the HR-11 recorder change; days from the change onward |
-| B (now) | once-a-second snapshot rows | each row: our checksum of the row's top 10 recomputed and the `ok` flag counted; consecutive rows used only for a differenced stream (below) | all recorded days; 20 levels before 2026-11-17 20:15 UTC, 100 after |
+| A | raw messages from `<SYMBOL>-raw/` | every message: CRC32 of our top 10 against the venue's `checksum`; every per-second row of `<SYMBOL>/` for the same second: full top-N equality against our rebuilt book at the last message received before the row's `t` | days from 2026-11-17 20:29 UTC with complete raw hours; the **only** form for the full H-2 check and the H-9 replay |
+| B | per-second snapshot rows only | each row: our checksum of the row's top 10 recomputed and the `ok` flag counted; consecutive rows give a differenced stream (below) | days before 2026-11-17 20:29 UTC, and any later hour whose raw file is incomplete; reported separately, never pooled with form A |
 
-**Differenced stream (form B, for H-9 only).** Between consecutive snapshot rows, the set of level changes (new, changed, removed price levels, with a removal also implied for a price that left the top N) is a synthetic update message whose application to the earlier row must give the later row exactly. It is labelled "snapshot-differenced stream; not the venue's message sequence": it under-counts updates (many venue messages per second collapse into one) and cannot show intra-second crossing.
+**Differenced stream (form B, earlier days only; not used for H-9 now that raw data exists).** Between consecutive snapshot rows, the set of level changes (new, changed, removed price levels, with a removal also implied for a price that left the top N) is a synthetic update message whose application to the earlier row must give the later row exactly. It is labelled "snapshot-differenced stream; not the venue's message sequence": it under-counts updates (many venue messages per second collapse into one) and cannot show intra-second crossing.
 
 ## `micro.book.rebuild`
 
@@ -52,8 +52,8 @@ Errors: malformed message or non-decimal price `E_SCHEMA`; negative quantity, no
 ## H-2 acceptance (as fixed here, before any run)
 
 On every recorded day used for H-1 (at least 20 at the tag), per symbol:
-- Form A days: `checksum_failed == 0` and `checkpoint_failed == 0`; any failure is listed with its message index and the day fails.
-- Form B days: the recomputed checksum of every row's top 10 equals the result implied by its `ok` flag for rows with `ok = true`; the count of `ok = false` rows, crossed rows and gap rows is published per day. Pass means "the recorder's book agreed with the venue checksum on X% of seconds", with X stated, not "the book equals the venue".
+- Form A days (from 2026-11-17 20:29 UTC, complete raw hours): `checksum_failed == 0` and `checkpoint_failed == 0`; any failure is listed with its message index and the day fails. This is the H-2 result. The 20 days needed at the tag are counted in form A days only; if fewer than 20 complete form A days exist at the tag, the shortfall is stated, not filled with form B days.
+- Form B (days before 2026-11-17 20:29 UTC, and incomplete raw hours): the recomputed checksum of every row's top 10 equals the result implied by its `ok` flag for rows with `ok = true`; the count of `ok = false` rows, crossed rows and gap rows is published per day. Pass means "the recorder's book agreed with the venue checksum on X% of seconds", with X stated, not "the book equals the venue".
 - Crossed and locked counts are published; they are a property of the feed or of our rebuild, and form A separates the two (a crossed book with a passing checksum is the venue's).
 
 ## Limit cases
