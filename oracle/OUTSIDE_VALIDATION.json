@@ -1,0 +1,1114 @@
+{
+ "generator": "oracle/python/outside_validation.py",
+ "library": "QuantLib 1.44",
+ "operations": {
+  "fx.forward.outright": {
+   "cases": 11,
+   "passed": 11,
+   "entries": [
+    {
+     "case_id": "fx-0005",
+     "suite": "stage_b/fx.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-fxforward",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 1.2806695013877736,
+       "outside": 1.2806695013877736,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "points",
+       "golden": 6.695013877735523,
+       "outside": 6.695013877735523,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "fx-0006",
+     "suite": "stage_b/fx.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-fxforward",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 1.2825461006120924,
+       "outside": 1.2825461006120924,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "points",
+       "golden": 25.461006120923724,
+       "outside": 25.461006120923724,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "fx-0007",
+     "suite": "stage_b/fx.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-fxforward",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 1.292365496113428,
+       "outside": 1.292365496113428,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "points",
+       "golden": 123.65496113428075,
+       "outside": 123.65496113428075,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "fx_deep-0017",
+     "suite": "stage_b/fx_deep.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-fxforward",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 1.2802223065087013,
+       "outside": 1.2802223065087013,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "points",
+       "golden": 2.2230650870125324,
+       "outside": 2.2230650870125324,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "fx_deep-0019",
+     "suite": "stage_b/fx_deep.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-fxforward",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 1.2813212026869396,
+       "outside": 1.2813212026869396,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "points",
+       "golden": 13.212026869395821,
+       "outside": 13.212026869395821,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "fx_deep-0021",
+     "suite": "stage_b/fx_deep.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-fxforward",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 1.2850081009840248,
+       "outside": 1.2850081009840248,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "points",
+       "golden": 50.081009840248214,
+       "outside": 50.081009840248214,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "fx_deep-0023",
+     "suite": "stage_b/fx_deep.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-fxforward",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 1.305419814640692,
+       "outside": 1.305419814640692,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "points",
+       "golden": 254.1981464069187,
+       "outside": 254.1981464069187,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "fx_deep-0025",
+     "suite": "stage_b/fx_deep.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-fxforward",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 1.285486777380413,
+       "outside": 1.285486777380413,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "points",
+       "golden": 54.86777380413032,
+       "outside": 54.86777380413032,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "fx_deep-0027",
+     "suite": "stage_b/fx_deep.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-fxforward",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 1.3133000116478453,
+       "outside": 1.3133000116478453,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "points",
+       "golden": 333.0001164784524,
+       "outside": 333.0001164784524,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "fx_deep-0029",
+     "suite": "stage_b/fx_deep.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-fxforward",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 1.4190652750747466,
+       "outside": 1.4190652750747466,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "points",
+       "golden": 1390.6527507474652,
+       "outside": 1390.6527507474652,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "fx_deep-0031",
+     "suite": "stage_b/fx_deep.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-fxforward",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 2.149548925819805,
+       "outside": 2.149548925819805,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "points",
+       "golden": 8695.48925819805,
+       "outside": 8695.48925819805,
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    }
+   ]
+  },
+  "eq.forward.outright": {
+   "cases": 4,
+   "passed": 2,
+   "entries": [
+    {
+     "case_id": "equity_forward-0011",
+     "suite": "stage_c/equity_forward.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-dividend-engine",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 98.98177345393107,
+       "outside": 98.98177345393105,
+       "tolerance": {
+        "absolute": 1e-12,
+        "relative": 1e-10
+       },
+       "max_abs_diff": 1.4210854715202004e-14,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "discount_factor",
+       "golden": 0.9607894391523232,
+       "outside": 0.9607894391523232,
+       "tolerance": {
+        "absolute": 1e-12,
+        "relative": 1e-10
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "carry_factor",
+       "golden": 0.970445533548508,
+       "outside": 0.970445533548508,
+       "tolerance": {
+        "absolute": 1e-12,
+        "relative": 1e-10
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "pv_dividends",
+       "golden": 3.943580048922307,
+       "outside": 3.9435800489223283,
+       "tolerance": {
+        "absolute": 1e-12,
+        "relative": 1e-10
+       },
+       "max_abs_diff": 2.1316282072803006e-14,
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "equity_forward-0012",
+     "suite": "stage_c/equity_forward.json",
+     "covered": true,
+     "pass": false,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-dividend-engine",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 103.0454533953517,
+       "outside": 93.77136258977005,
+       "tolerance": {
+        "absolute": 1e-12,
+        "relative": 1e-10
+       },
+       "max_abs_diff": 9.27409080558165,
+       "via": "library",
+       "pass": false
+      },
+      {
+       "output": "discount_factor",
+       "golden": 0.9607894391523232,
+       "outside": 0.9607894391523232,
+       "tolerance": {
+        "absolute": 1e-12,
+        "relative": 1e-10
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "carry_factor",
+       "golden": 0.970445533548508,
+       "outside": 0.970445533548508,
+       "tolerance": {
+        "absolute": 1e-12,
+        "relative": 1e-10
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "pv_dividends",
+       "golden": 0.0,
+       "outside": 9.0,
+       "tolerance": {
+        "absolute": 1e-12,
+        "relative": 1e-10
+       },
+       "max_abs_diff": 9.0,
+       "via": "arithmetic",
+       "pass": false
+      }
+     ],
+     "known_difference": "boundary convention: the spec ignores a dividend with ex_date <= as_of (equity-forward.md line 25); QuantLib AnalyticDividendEuropeanEngine counts a dividend dated on the evaluation date. With the as_of dividend removed from the inputs, QuantLib agrees on all four outputs (probe below).",
+     "probe_without_as_of_dividend_pass": true
+    },
+    {
+     "case_id": "equity_forward-0013",
+     "suite": "stage_c/equity_forward.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-dividend-engine",
+     "outputs": [
+      {
+       "output": "forward",
+       "golden": 104.08107741923882,
+       "outside": 104.08107741923882,
+       "tolerance": {
+        "absolute": 1e-12,
+        "relative": 1e-10
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "discount_factor",
+       "golden": 0.9607894391523232,
+       "outside": 0.9607894391523232,
+       "tolerance": {
+        "absolute": 1e-12,
+        "relative": 1e-10
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "carry_factor",
+       "golden": 0.9607894391523232,
+       "outside": 0.9607894391523232,
+       "tolerance": {
+        "absolute": 1e-12,
+        "relative": 1e-10
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "pv_dividends",
+       "golden": 0.0,
+       "outside": 0.0,
+       "tolerance": {
+        "absolute": 1e-12,
+        "relative": 1e-10
+       },
+       "max_abs_diff": 0.0,
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "equity_forward-0014",
+     "suite": "stage_c/equity_forward.json",
+     "covered": false,
+     "reason": "expiry on as_of: no option to price, so the engine has nothing to check (F = S by the spec's own rule)"
+    }
+   ]
+  },
+  "vol.svi.evaluate": {
+   "cases": 2,
+   "passed": 2,
+   "entries": [
+    {
+     "case_id": "smile-0028",
+     "suite": "stage_c/smile.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44",
+     "outputs": [
+      {
+       "output": "total_variance",
+       "golden": [
+        0.1325864564823219,
+        0.10115784749034662,
+        0.0784042685075532,
+        0.058091247254758255,
+        0.04899929514050587,
+        0.04704,
+        0.05329087252259035,
+        0.06306407571795719,
+        0.07752991584360076
+       ],
+       "outside": [
+        0.1325864564823219,
+        0.10115784749034662,
+        0.07840426850755317,
+        0.05809124725475827,
+        0.04899929514050587,
+        0.04704,
+        0.05329087252259035,
+        0.06306407571795719,
+        0.07752991584360078
+       ],
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 2.7755575615628914e-17,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "implied_vol",
+       "golden": [
+        0.297306190632174,
+        0.25968936249597213,
+        0.22862526618545204,
+        0.19679303384479552,
+        0.180737922861632,
+        0.17708754896942924,
+        0.18848673255270135,
+        0.20504320799603384,
+        0.22734689477184533
+       ],
+       "outside": [
+        0.297306190632174,
+        0.25968936249597213,
+        0.22862526618545198,
+        0.19679303384479555,
+        0.180737922861632,
+        0.17708754896942924,
+        0.18848673255270135,
+        0.20504320799603384,
+        0.22734689477184533
+       ],
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 5.551115123125783e-17,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "g",
+       "golden": [
+        0.36713661487548577,
+        0.43531956289452356,
+        0.5621070238421383,
+        0.9395165933214249,
+        1.372275771715203,
+        1.2431295086934995,
+        0.7932665186296156,
+        0.6074557139283969,
+        0.49652076958101377
+       ],
+       "outside": [
+        0.3671366121175764,
+        0.4353195646936411,
+        0.5621070345675684,
+        0.9395166198378628,
+        1.3722757343616436,
+        1.243129528758268,
+        0.7932665350512262,
+        0.6074557165436741,
+        0.49652076846045
+       ],
+       "tolerance": {
+        "absolute": 1e-06,
+        "relative": 0.0
+       },
+       "max_abs_diff": 3.7353559356745336e-08,
+       "via": "arithmetic",
+       "pass": true
+      },
+      {
+       "output": "min_g",
+       "golden": 0.36713661487548577,
+       "outside": 0.3671366121175764,
+       "tolerance": {
+        "absolute": 1e-06,
+        "relative": 0.0
+       },
+       "max_abs_diff": 2.7579093453411474e-09,
+       "via": "arithmetic",
+       "pass": true
+      },
+      {
+       "output": "butterfly_free",
+       "golden": true,
+       "outside": true,
+       "tolerance": "exact",
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "smile-0029",
+     "suite": "stage_c/smile.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44",
+     "outputs": [
+      {
+       "output": "total_variance",
+       "golden": [
+        0.13678196112229782,
+        0.09275565217220644,
+        0.05097657169033439,
+        0.017426252555159116,
+        0.023151565612194815,
+        0.08682670975188522,
+        0.16715169988636883
+       ],
+       "outside": [
+        0.13678196112229782,
+        0.09275565217220644,
+        0.050976571690334385,
+        0.017426252555159113,
+        0.023151565612194815,
+        0.08682670975188522,
+        0.16715169988636883
+       ],
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 6.938893903907228e-18,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "implied_vol",
+       "golden": [
+        0.3698404536043858,
+        0.3045581260978049,
+        0.22577991870477407,
+        0.1320085321301586,
+        0.15215638538094553,
+        0.29466372316911565,
+        0.408841900844775
+       ],
+       "outside": [
+        0.3698404536043858,
+        0.3045581260978049,
+        0.22577991870477407,
+        0.1320085321301586,
+        0.15215638538094553,
+        0.29466372316911565,
+        0.408841900844775
+       ],
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 0.0,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "g",
+       "golden": [
+        0.2478306952583732,
+        0.2678703587364596,
+        0.3568535725377076,
+        1.0386497312817975,
+        0.06937921130082883,
+        -0.027741695904626246,
+        0.029123865658198626
+       ],
+       "outside": [
+        0.24783069838449623,
+        0.26787036102990514,
+        0.3568535734611645,
+        1.038649733435381,
+        0.0693792141343445,
+        -0.027741697146259972,
+        0.029123863250485937
+       ],
+       "tolerance": {
+        "absolute": 1e-06,
+        "relative": 0.0
+       },
+       "max_abs_diff": 3.1261230271084628e-09,
+       "via": "arithmetic",
+       "pass": true
+      },
+      {
+       "output": "min_g",
+       "golden": -0.027741695904626246,
+       "outside": -0.027741697146259972,
+       "tolerance": {
+        "absolute": 1e-06,
+        "relative": 0.0
+       },
+       "max_abs_diff": 1.241633726389857e-09,
+       "via": "arithmetic",
+       "pass": true
+      },
+      {
+       "output": "butterfly_free",
+       "golden": false,
+       "outside": false,
+       "tolerance": "exact",
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    }
+   ]
+  },
+  "vol.ssvi.evaluate": {
+   "cases": 3,
+   "passed": 3,
+   "entries": [
+    {
+     "case_id": "smile-0039",
+     "suite": "stage_c/smile.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-svi-slices",
+     "outputs": [
+      {
+       "output": "total_variance",
+       "golden": [
+        [
+         0.035335341190401444,
+         0.015335924789558916,
+         0.01,
+         0.00847359942420315,
+         0.015517706394966413
+        ],
+        [
+         0.08634531879296155,
+         0.04947710218262603,
+         0.04,
+         0.03449671467825325,
+         0.04051692282720563
+        ],
+        [
+         0.15399165093288086,
+         0.10317450974618779,
+         0.09,
+         0.0806558903106293,
+         0.07909848553173927
+        ],
+        [
+         0.23882764360494826,
+         0.1764967629457208,
+         0.16,
+         0.14711329876589196,
+         0.13492585785786426
+        ]
+       ],
+       "outside": [
+        [
+         0.03533534119040143,
+         0.015335924789558916,
+         0.009999999999999998,
+         0.00847359942420315,
+         0.015517706394966408
+        ],
+        [
+         0.08634531879296153,
+         0.049477102182626014,
+         0.04000000000000001,
+         0.03449671467825324,
+         0.04051692282720563
+        ],
+        [
+         0.15399165093288084,
+         0.10317450974618783,
+         0.09,
+         0.08065589031062928,
+         0.0790984855317393
+        ],
+        [
+         0.2388276436049482,
+         0.17649676294572086,
+         0.16000000000000003,
+         0.147113298765892,
+         0.13492585785786426
+        ]
+       ],
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 5.551115123125783e-17,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "butterfly_free",
+       "golden": true,
+       "outside": true,
+       "tolerance": "exact",
+       "via": "arithmetic",
+       "pass": true
+      },
+      {
+       "output": "calendar_free",
+       "golden": true,
+       "outside": true,
+       "tolerance": "exact",
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "smile-0040",
+     "suite": "stage_c/smile.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-svi-slices",
+     "outputs": [
+      {
+       "output": "total_variance",
+       "golden": [
+        [
+         0.11009457973309267,
+         0.03421624637084954,
+         0.01,
+         0.006522630471227271,
+         0.019523984850000814
+        ],
+        [
+         0.23481085812372463,
+         0.08629856555023963,
+         0.04,
+         0.020424390875725288,
+         0.04228017343178713
+        ],
+        [
+         0.3721116934838781,
+         0.15640105268909307,
+         0.09,
+         0.048995131883534444,
+         0.06884077333886807
+        ],
+        [
+         0.5206112540029885,
+         0.24446638261150724,
+         0.16,
+         0.09813614954471117,
+         0.1003613694105123
+        ]
+       ],
+       "outside": [
+        [
+         0.11009457973309267,
+         0.03421624637084955,
+         0.009999999999999998,
+         0.006522630471227274,
+         0.019523984850000817
+        ],
+        [
+         0.2348108581237246,
+         0.08629856555023967,
+         0.039999999999999994,
+         0.02042439087572528,
+         0.04228017343178713
+        ],
+        [
+         0.3721116934838782,
+         0.1564010526890931,
+         0.09,
+         0.04899513188353443,
+         0.06884077333886802
+        ],
+        [
+         0.5206112540029884,
+         0.24446638261150727,
+         0.15999999999999998,
+         0.09813614954471116,
+         0.10036136941051228
+        ]
+       ],
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 1.1102230246251565e-16,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "butterfly_free",
+       "golden": false,
+       "outside": false,
+       "tolerance": "exact",
+       "via": "arithmetic",
+       "pass": true
+      },
+      {
+       "output": "calendar_free",
+       "golden": true,
+       "outside": true,
+       "tolerance": "exact",
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    },
+    {
+     "case_id": "smile-0041",
+     "suite": "stage_c/smile.json",
+     "covered": true,
+     "pass": true,
+     "class": "library-primitive",
+     "tag": "quantlib-1.44-svi-slices",
+     "outputs": [
+      {
+       "output": "total_variance",
+       "golden": [
+        [
+         0.0354138126514911,
+         0.014013878188659974,
+         0.01,
+         0.014013878188659974,
+         0.0354138126514911
+        ],
+        [
+         0.056055512754639894,
+         0.04136000936329383,
+         0.04,
+         0.04136000936329383,
+         0.056055512754639894
+        ],
+        [
+         0.09908326913195982,
+         0.09062071897723664,
+         0.09,
+         0.09062071897723664,
+         0.09908326913195982
+        ],
+        [
+         0.16544003745317531,
+         0.160350793399941,
+         0.16,
+         0.160350793399941,
+         0.16544003745317531
+        ]
+       ],
+       "outside": [
+        [
+         0.03541381265149109,
+         0.014013878188659977,
+         0.010000000000000002,
+         0.014013878188659977,
+         0.03541381265149109
+        ],
+        [
+         0.056055512754639894,
+         0.04136000936329383,
+         0.04000000000000001,
+         0.04136000936329383,
+         0.056055512754639894
+        ],
+        [
+         0.09908326913195983,
+         0.09062071897723664,
+         0.09,
+         0.09062071897723664,
+         0.09908326913195983
+        ],
+        [
+         0.16544003745317531,
+         0.160350793399941,
+         0.16000000000000003,
+         0.160350793399941,
+         0.16544003745317531
+        ]
+       ],
+       "tolerance": {
+        "absolute": 1e-10,
+        "relative": 1e-08
+       },
+       "max_abs_diff": 2.7755575615628914e-17,
+       "via": "library",
+       "pass": true
+      },
+      {
+       "output": "butterfly_free",
+       "golden": true,
+       "outside": true,
+       "tolerance": "exact",
+       "via": "arithmetic",
+       "pass": true
+      },
+      {
+       "output": "calendar_free",
+       "golden": true,
+       "outside": true,
+       "tolerance": "exact",
+       "via": "arithmetic",
+       "pass": true
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

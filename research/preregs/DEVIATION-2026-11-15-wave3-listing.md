@@ -24,3 +24,4 @@ Scanner blind spot, recorded: `research/holdout_scan.py` matches ISO dates only,
 - `specifications/stage-j-rulings-w3.md` | R3-01 | S | shock-library window dates in ruling text (J-W3-6)
 - `docs/question-bank/01-foundations-numerics.md` | R3-02 | S | calendar worked examples (day counts, holidays, schedules); synthetic dates, no market observations
 - `docs/question-bank/03-curves-multicurve.md` | R3-02 | S | calendar and fixing dates in worked examples; synthetic rates, no market observations
+- `docs/validation/ai-review/ois-full.md` | R3-02 | S | Good Friday calendar dates in spec text copied into the AI review prompt (validation evidence pack, 2026-11-17); no market observation

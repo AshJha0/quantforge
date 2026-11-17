@@ -75,14 +75,15 @@ Each CLI built these numbers on its own, from the same input files. Agreement sh
 
 ## Oracle evidence and limits
 
-Per `specifications/05-volatility/stage-c-targets.md`, the forward is checked against a rolled route that steps between dividends one at a time, and against a plan check case. No outside library prices an equity forward here: the cases are hand and analytic.
+Per `specifications/05-volatility/stage-c-targets.md`, the forward is checked against a rolled route that steps between dividends one at a time, and against a plan check case. Since the validation evidence pack (2026-11-17), QuantLib's escrowed-dividend European engine checks two of the four outright cases through put-call parity (`oracle/OUTSIDE_VALIDATION.json`). It disagrees on the case with a dividend dated on `as_of`, which the spec ignores and QuantLib counts; that is a boundary convention for the reviewer (`docs/validation/equity-forward.md`), and no golden changed. The case with expiry on `as_of` has no option for the engine to price.
 
 Golden cases with an `ok` result for `eq.forward.outright`: 4, counted from `verified_by` in `datasets/golden/stage_c/`. All four builds passed them locally, which is self-assessment.
 
 | Verified by | Operation | Cases |
 |---|---|---|
-| analytic-rolled | eq.forward.outright | 1 |
-| hand | eq.forward.outright | 3 |
+| analytic-rolled, quantlib-1.44-dividend-engine | eq.forward.outright | 1 |
+| hand | eq.forward.outright | 2 |
+| hand, quantlib-1.44-dividend-engine | eq.forward.outright | 1 |
 
 Limits:
 

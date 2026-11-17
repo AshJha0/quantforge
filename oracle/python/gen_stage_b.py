@@ -343,7 +343,7 @@ def fx():
         return S1 * (gc.df(d) / gc.df(sp)) / (uc.df(d) / uc.df(sp))
     for T in (date(2027, 2, 10), date(2027, 11, 10), date(2031, 11, 10)):
         F = fwd(T)
-        s.add("fx.forward.outright", {**base, "value_date": str(T)}, {"forward": F, "points": (F - S0) / 1e-4}, cls=I, verified=["hand"], tags=[SYN])
+        s.add("fx.forward.outright", {**base, "value_date": str(T)}, {"forward": F, "points": (F - S0) / 1e-4}, cls=I, verified=["hand", "quantlib-1.44-fxforward"], tags=[SYN])  # tag: QuantLib check in outside_validation.py
     N = 1e6
     T = date(2027, 11, 10)
     for K, side in ((1.29, "BUY"), (1.27, "SELL")):

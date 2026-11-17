@@ -362,7 +362,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "analytic-rolled"
+    "analytic-rolled",
+    "quantlib-1.44-dividend-engine"
    ],
    "tags": [
     "dividend-on-expiry",
@@ -457,7 +458,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "hand"
+    "hand",
+    "quantlib-1.44-dividend-engine"
    ],
    "tags": [
     "synthetic"

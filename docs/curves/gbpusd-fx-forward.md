@@ -78,14 +78,14 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 
 ## Oracle evidence and limits
 
-Per `specifications/stage-b-rulings.md`, outright points are analytic formulas with no outside library. QuantLib checks the spot dates, implied ratios (`FxSwapRateHelper`), and forward PV and delta (`FxForward`, a different operation from the one charted here). Basis is analytic.
+Per `specifications/stage-b-rulings.md`, outright points are analytic formulas. Since the validation evidence pack (2026-11-17), all 11 value cases for the outright forward are also checked against QuantLib `FxForward.fairForwardRate` on the same curves, at each case's own tolerance (`oracle/python/outside_validation.py`, `oracle/OUTSIDE_VALIDATION.json`); points are arithmetic on that forward. QuantLib also checks the spot dates, implied ratios (`FxSwapRateHelper`), and forward PV and delta. Basis is analytic.
 
 Golden cases for `fx.forward.outright` with an `ok` result: 11, counted from `verified_by` in `datasets/golden/stage_b/`. All four builds passed them locally, which is self-assessment.
 
 | Suite | Verified by | Cases |
 |---|---|---|
-| fx | hand | 3 |
-| fx_deep | hand | 8 |
+| fx | hand, quantlib-1.44-fxforward | 3 |
+| fx_deep | hand, quantlib-1.44-fxforward | 8 |
 
 Limits:
 

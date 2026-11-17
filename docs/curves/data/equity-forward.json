@@ -277,8 +277,9 @@
   ],
   "cases": 4,
   "by_source": {
-   "eq.forward.outright: analytic-rolled": 1,
-   "eq.forward.outright: hand": 3
+   "eq.forward.outright: analytic-rolled, quantlib-1.44-dividend-engine": 1,
+   "eq.forward.outright: hand": 2,
+   "eq.forward.outright: hand, quantlib-1.44-dividend-engine": 1
   }
  }
 }
