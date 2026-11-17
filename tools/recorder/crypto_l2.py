@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Crypto L2 recorder (R6-23). Records a public order-book feed locally; nothing it writes goes into git.
 
-Source: Kraken spot websocket v2, public endpoint wss://ws.kraken.com/v2, channels `book` (depth 25) and `trade`.
+Source: Kraken spot websocket v2, public endpoint wss://ws.kraken.com/v2, channels `book` (depth 100) and `trade`.
 No account, key or card. Terms read 2026-11-12, see STAGE_H_DATA_SURVEY.md in the plan folder: use is for our own
 benefit, so raw data stays on this machine and only aggregates or derived statistics may be published, each labelled
 "crypto venue; not equities or rates".
 
 Output, one gzip JSON-lines file per symbol per UTC hour under --out (default C:/Work/Claude/qf-crypto-data/kraken):
-  {"t": "...Z", "k": "book", "bids": [[px, qty] x20], "asks": [[px, qty] x20], "ok": true}   once a second
+  {"t": "...Z", "k": "book", "bids": [[px, qty] x100], "asks": [[px, qty] x100], "ok": true}   once a second
   {"t": "...Z", "k": "trade", "d": [...raw trade objects...]}                              as received
   {"t": "...Z", "k": "gap", "why": "..."}                                                  on every reconnect
 "ok" is the result of Kraken's CRC32 book checksum on the top 10 levels at the last update.
@@ -27,8 +27,8 @@ from decimal import Decimal
 from pathlib import Path
 
 URL = "wss://ws.kraken.com/v2"
-DEPTH = 25   # Kraken offers 10, 25, 100, 500, 1000; 25 is the smallest that covers top 20
-KEEP = 20
+DEPTH = 100  # Kraken offers 10, 25, 100, 500, 1000; 100 covers walk-the-book cost curves for large orders (H-1(b)); owner 2026-11-17
+KEEP = 100
 
 
 def now():
