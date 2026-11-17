@@ -63,7 +63,7 @@ Start small: one file per run.
 | Language | Command | Notes |
 |---|---|---|
 | Java | `mvn -Pmutation test-compile org.pitest:pitest-maven:mutationCoverage -DtargetClasses=org.quantforge.core.Compounding` | From `java25/` |
-| C++ | `python conformance/mutation/cpp_mutants.py --file cpp26/src/core/compounding.cpp --max 10 --suite compounding` | Uses golden cases as the test. Mull is the option to try if this proves too coarse; it needs a matching LLVM |
+| C++ | `python conformance/mutation/cpp_mutants.py --file cpp26/src/core/compounding.cpp --max 10 --suite compounding` | Uses golden cases as the test. Mull is the option to try if this proves too coarse; it needs a matching LLVM. Prints one flushed line per mutant, so a long run (the full `hedging.cpp` run took about 2.5 hours) can be watched |
 | Python | `uv run --with mutmut==3.8.1 mutmut run 'quantforge_core.compounding*'` | From `python/`. Linux or WSL only. Uses `tests/test_core.py`, because mutmut's copy cannot see files outside `python/` |
 | Rust | `cargo mutants --in-place -p quantforge-core -f '**/compounding.rs'` | From `rust/`. `--in-place` is needed because the crate reads files outside `rust/`. It edits the tree while it runs, so use a clean checkout |
 
