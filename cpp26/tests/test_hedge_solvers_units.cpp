@@ -637,3 +637,51 @@ TEST_CASE("hsu sign search agrees with the orthant oracle on small integer coste
     }
     REQUIRE(compared >= 100);
 }
+
+// Java property seed -11115467 (PR #45 CI 2026-11-17): near-collinear columns, regular after R6-6.2 scaling. Square
+// and nonsingular, so the relaxed minimum is exactly 0 (exact rational arithmetic); the normal-equations solve alone
+// gave 3.1e-6, above the integer optimum. The integer objective is a sum of squared residuals of size 1e-3, each the
+// difference of terms of size 1e8 (ulp 1.5e-8), so it is good to about 1e-6 relative: that rounding is what is
+// left, not the solver.
+TEST_CASE("hsu near-singular relaxation is refined to its exact minimum", "[hedging][hsu]") {
+    const Matrix a = {{-0.04684068765297382, 0.85014589759939}, {0.06966430897729968, -1.2643959406278287}};
+    const hg::Vec b = {-18.480681166672692, -6.198617610506782}, w = {1.6701886487345696, 2.992546829483374};
+    hg::IntegerProblem ip;
+    ip.a = a;
+    ip.b = b;
+    ip.weights = w;
+    ip.lot_sizes = {10.0, 10.0};
+    ip.upper_lots = std::vector<std::optional<long long>>{3, 3};
+    const hg::IntegerResult r = hg::solve_integer(ip);
+    REQUIRE(r.lots == std::vector<long long>{-8208927, -452287});
+    REQUIRE(std::fabs(r.continuous_objective) <= 1e-12);
+    REQUIRE(std::fabs(r.objective - 1.5462392586798939e-06) <= 1e-6 * 1.5462392586798939e-06);
+    // hedge.qp.solve on the same data, x bounds 10 times the lot bounds: the exact minimiser
+    // (-82091364.70172344, -4522985.411300044) is inside them, so the minimum is 0 (2.3e-6 before refinement).
+    for (const bool bounded : {true, false}) {
+        hg::QpProblem p;
+        p.a = a;
+        p.b = b;
+        p.weights = w;
+        if (bounded) p.upper = std::vector<hg::Bound>{30.0, 30.0};
+        const hg::QpResult q = hg::solve_qp(p);
+        REQUIRE(q.objective >= 0.0);
+        REQUIRE(q.objective <= 1e-10);
+        REQUIRE(std::fabs(q.x[0] + 82091364.70172344) <= 1e-10 * 82091364.70172344);
+    }
+}
+
+// The integer ridge is on x = L n: in lot units it is ridge L_jj^2, so the relaxation is never above the integer
+// optimum (before the fix C++ put ridge on n and reported continuous_objective 18.81 above objective 16.69).
+TEST_CASE("hsu integer ridge is on positions, not lots", "[hedging][hsu]") {
+    hg::IntegerProblem ip;
+    ip.a = {{1, 0.3}, {0.2, 1}, {0.5, 0.5}};
+    ip.b = {-7.3, 4.1, 2.2};
+    ip.weights = {1, 2, 1};
+    ip.ridge = 0.05;
+    ip.lot_sizes = {2.5, 0.5};
+    const hg::IntegerResult r = hg::solve_integer(ip);
+    REQUIRE(r.lots == std::vector<long long>{3, -12});  // Python and Java agree
+    REQUIRE(std::fabs(r.objective - 16.195) <= 1e-12);
+    REQUIRE(r.continuous_objective <= r.objective);
+}

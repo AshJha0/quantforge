@@ -369,3 +369,88 @@ fn determined_point_exactly_on_tolerance_edge_is_feasible() {
         "Ok"
     );
 }
+
+// ---------------------------------------------------------------- refinement of the relaxation
+
+/// Java property seed -11115467 (PR #45 CI 2026-11-17): near-collinear columns, regular after
+/// the R6-6.2 scaling.
+fn near_singular() -> (Matrix, [f64; 2], [f64; 2]) {
+    (
+        vec![
+            vec![-0.04684068765297382, 0.85014589759939],
+            vec![0.06966430897729968, -1.2643959406278287],
+        ],
+        [-18.480681166672692, -6.198617610506782],
+        [1.6701886487345696, 2.992546829483374],
+    )
+}
+
+/// Square and nonsingular, so the relaxed minimum is exactly 0 (exact rational arithmetic); the
+/// normal-equations solve alone gave 3.3e-6, above the integer optimum. The integer objective is
+/// a sum of squared residuals of size 1e-3, each the difference of terms of size 1e8 (ulp
+/// 1.5e-8), so it is good to about 1e-6 relative: that rounding is what is left, not the solver.
+#[test]
+fn integer_near_singular_relaxation_is_refined() {
+    let (a, b, w) = near_singular();
+    let upper = [Some(3), Some(3)];
+    let mut p = int_problem(&a, &b, &w, &[10.0, 10.0]);
+    p.upper_lots = Some(&upper[..]);
+    let s = integer_solve(&p).unwrap();
+    assert_eq!(s.lots, vec![-8208927, -452287]);
+    assert!(
+        s.continuous_objective.abs() <= 1e-12,
+        "relaxed {}",
+        s.continuous_objective
+    );
+    let want = 1.5462392586798939e-06;
+    assert!(
+        (s.objective - want).abs() <= 1e-6 * want,
+        "objective {}",
+        s.objective
+    );
+}
+
+/// The same data in x with bounds 10 times the lot bounds (upper 30): the exact minimiser
+/// (-82091364.70172344, -4522985.411300044) is inside them, so the minimum is 0; the
+/// normal-equations solve alone left 2.3e-6 in C++ and Java.
+#[test]
+fn qp_near_singular_reaches_exact_minimum() {
+    let (a, b, w) = near_singular();
+    let upper = [Some(30.0), Some(30.0)];
+    for bounds in [Some(&upper[..]), None] {
+        let s = qp_solve(&QpProblem {
+            a: &a,
+            b: &b,
+            weights: &w,
+            ridge: 0.0,
+            eq_matrix: None,
+            eq_rhs: None,
+            lower: None,
+            upper: bounds,
+            singular: Singular::Error,
+            costs: Costs::default(),
+        })
+        .unwrap();
+        assert!(
+            (0.0..=1e-10).contains(&s.objective),
+            "objective {}",
+            s.objective
+        );
+        close(s.x[0], -82091364.70172344, 1e-10, "x0");
+    }
+}
+
+/// The integer ridge is on x = L n, so the relaxation can never be above the integer optimum;
+/// lots [3, -12], objective 16.195 as in Python, Java and C++.
+#[test]
+fn integer_ridge_is_on_positions() {
+    let a: Matrix = vec![vec![1.0, 0.3], vec![0.2, 1.0], vec![0.5, 0.5]];
+    let b = [-7.3, 4.1, 2.2];
+    let w = [1.0, 2.0, 1.0];
+    let mut p = int_problem(&a, &b, &w, &[2.5, 0.5]);
+    p.ridge = 0.05;
+    let s = integer_solve(&p).unwrap();
+    assert_eq!(s.lots, vec![3, -12]);
+    close(s.objective, 16.195, 1e-12, "objective");
+    assert!(s.continuous_objective <= s.objective);
+}

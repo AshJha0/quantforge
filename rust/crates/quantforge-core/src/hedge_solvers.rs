@@ -1126,7 +1126,20 @@ fn qp_solve_unscaled(p: &QpProblem) -> Result<QpSolution> {
         let found = if nonsmooth {
             nonsmooth_minimiser(&h, &c, (e, rhs), (lower, upper), &kinks)?
         } else {
-            bounded_minimiser(&g, &lin, &z_rows, &xp, lower, upper)?
+            let mut found = bounded_minimiser(&g, &lin, &z_rows, &xp, lower, upper)?;
+            if let Some(x) = found.as_mut()
+                && k == 0
+            {
+                // The normal-equations error of the integer relaxation (`refine_relaxed`) again:
+                // 2.3e-6 against an exact minimum of 0 on the near-singular case of Java seed
+                // -11115467 with x bounds 10 times its lot bounds. Impact counts like a ridge.
+                let diag: Vec<f64> = impact.iter().map(|m| p.ridge + cost_weight * m).collect();
+                refine_relaxed(p.a, p.b, p.weights, &diag, &h, lower, upper, x);
+                for v in x.iter_mut() {
+                    *v += 0.0;
+                }
+            }
+            found
         };
         match found {
             Some(x) => x,
@@ -1322,6 +1335,90 @@ impl LotSearch<'_> {
     }
 }
 
+/// Fixed-precision iterative refinement of a bounded minimiser on its free coordinates (those
+/// strictly inside their bounds); returns `f(v)` and updates `v` in place, with
+/// `f = sum_i w_i r_i^2 + sum_j diag_j v_j^2`, `r = al v + b` and `h = al^T W al + diag(diag)`.
+/// Same algorithm and guards as Java `refineRelaxed`.
+///
+/// `bounded_minimiser` works on the normal equations, whose condition number is that of `al`
+/// squared, so its forward error along a weak direction is about `u kappa(h) |v|` and costs
+/// `lambda_min |delta|^2` in `f`: 3.3e-6 against a true minimum of 0 on Java property seed
+/// -11115467, above the integer optimum, which is impossible. Each step takes the gradient from
+/// the residual computed directly (error `u |al| |v|`, not squared) and solves
+/// `h_F delta = -g_F`; the error contracts by about `u kappa(D h_F D)` per step, below 1 whenever
+/// the singularity check passes (`kappa <= 1e12`). A step is kept only while it lowers `f` and
+/// stays inside the bounds, so the result is never worse than the active-set answer; the loop
+/// ends at the first step that does not lower `f` (normally the second or third), and the cap of
+/// 64 steps is only a guard. A failed Cholesky factor (not expected after the check) keeps `v`.
+#[allow(clippy::too_many_arguments, clippy::float_cmp)]
+fn refine_relaxed(
+    al: &Matrix,
+    b: &[f64],
+    w: &[f64],
+    diag: &[f64],
+    h: &Matrix,
+    lower: &[Option<f64>],
+    upper: &[Option<f64>],
+    v: &mut [f64],
+) -> f64 {
+    let n = v.len();
+    let f_of = |v: &[f64]| {
+        objective_of(&residual_of(al, b, v), w, 0.0, v)
+            + (0..n).map(|j| diag[j] * v[j] * v[j]).sum::<f64>()
+    };
+    let mut best = f_of(v);
+    let free: Vec<usize> = (0..n)
+        .filter(|&j| lower[j] != Some(v[j]) && upper[j] != Some(v[j]))
+        .collect();
+    let nf = free.len();
+    if nf == 0 {
+        return best;
+    }
+    let hf: Matrix = free
+        .iter()
+        .map(|&p| free.iter().map(|&q| h[p][q]).collect())
+        .collect();
+    let Ok(l) = crate::linalg::cholesky(&hf) else {
+        return best;
+    };
+    for _ in 0..64 {
+        let res = residual_of(al, b, v);
+        // t = minus half the gradient of f on the free block, then L L^T delta = t in place.
+        let mut t: Vec<f64> = free
+            .iter()
+            .map(|&j| {
+                -(diag[j] * v[j]
+                    + (0..res.len())
+                        .map(|i| al[i][j] * w[i] * res[i])
+                        .sum::<f64>())
+            })
+            .collect();
+        for p in 0..nf {
+            let s = t[p] - (0..p).map(|k| l[p][k] * t[k]).sum::<f64>();
+            t[p] = s / l[p][p];
+        }
+        for p in (0..nf).rev() {
+            let s = t[p] - (p + 1..nf).map(|k| l[k][p] * t[k]).sum::<f64>();
+            t[p] = s / l[p][p];
+        }
+        let mut trial = v.to_vec();
+        for (p, &j) in free.iter().enumerate() {
+            trial[j] += t[p];
+            if lower[j].is_some_and(|lo| trial[j] < lo) || upper[j].is_some_and(|hi| trial[j] > hi)
+            {
+                return best;
+            }
+        }
+        let f = f_of(&trial);
+        if f.is_nan() || f >= best {
+            return best;
+        }
+        best = f;
+        v.copy_from_slice(&trial);
+    }
+    best
+}
+
 /// `hedge.integer.solve`: the hedge objective over whole lots, `x_j = lot_sizes_j n_j`.
 ///
 /// # Errors
@@ -1395,7 +1492,7 @@ pub fn integer_solve(p: &IntegerProblem) -> Result<IntegerSolution> {
             .with(std::cell::Cell::get)
             .unwrap_or(INTEGER_NODE_CAP),
     };
-    let Some(relaxed) =
+    let Some(mut relaxed) =
         bounded_minimiser(&search.g, &search.lin, &search.eye, &search.zero, &lo, &hi)?
     else {
         return fail("E_NO_CONVERGENCE", "a box of integers cannot be empty");
@@ -1406,7 +1503,21 @@ pub fn integer_solve(p: &IntegerProblem) -> Result<IntegerSolution> {
         e.field = Some("lot_sizes".to_string());
         return Err(e);
     }
-    let continuous_objective = search.value(&relaxed);
+    let al: Matrix =
+        p.a.iter()
+            .map(|row| row.iter().zip(s).map(|(v, s)| v * s).collect())
+            .collect();
+    let ridge_l: Vec<f64> = s.iter().map(|s| p.ridge * s * s).collect();
+    let continuous_objective = refine_relaxed(
+        &al,
+        p.b,
+        p.weights,
+        &ridge_l,
+        &search.g,
+        &lo,
+        &hi,
+        &mut relaxed,
+    );
     search.branch(&mut lo, &mut hi)?;
     let Some((objective, lots)) = search.best else {
         return fail("E_NO_CONVERGENCE", "the search found no integer point");

@@ -396,6 +396,16 @@ public final class LeastSquaresHedge {
             }
             x[j] = s + 0.0;
         }
+        if (k == 0 && !minNorm) {
+            // The same normal-equations error as the integer relaxation (refineRelaxed): 2.3e-6 against an exact
+            // minimum of 0 on the near-singular regular case of seed -11115467 with x bounds 10 times its lot bounds.
+            double[] ones = new double[n];
+            java.util.Arrays.fill(ones, 1.0);
+            refineRelaxed(a, b, weights, ridge, ones, h, lo, hi, activeLo, activeHi, x);
+            for (int j = 0; j < n; j++) {
+                x[j] += 0.0;
+            }
+        }
         double[] res = residual(a, b, x);
         return new Solution(x, res, objective(res, weights, ridge, x), rank);
     }
@@ -1023,6 +1033,7 @@ public final class LeastSquaresHedge {
      * below 1 whenever check 3 passes ({@code kappa <= 1e12}). A step is kept only while it lowers {@code f} and stays
      * inside the bounds, so the result is never worse than the active-set answer; the loop ends at the first step
      * that does not lower {@code f} (normally the second or third), and the cap of 64 steps is only a guard.
+     * {@code hedge.qp.solve} uses it too on its smooth path without equalities, with unit lot sizes ({@code x} itself).
      */
     private static double refineRelaxed(double[][] al, double[] b, double[] w, double ridge, double[] lotSizes,
             double[][] hl, double[] lo, double[] hi, boolean[] actLo, boolean[] actHi, double[] nc) {
