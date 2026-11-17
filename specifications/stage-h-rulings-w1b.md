@@ -24,7 +24,7 @@ DRAFT written 2026-11-17, after v0.9.0. Not normative until the stage H coordina
 | HR-28 | Peg rounding | Mid pegs round away from crossing (bid down, ask up to the tick) |
 | HR-29 | Determinism | Same event list gives byte-identical output in all four languages |
 | HR-30 | Fees | Signed per unit notional: taker fee charged, maker rebate paid; venue schedules are inputs, no real venue's fees claimed |
-| HR-31 | Outside checks for simulated venues | No public reference engine with published outputs; rule-level checks against venue documentation count as outside checks only with the owner's agreement. **Owner decision**: accept, or move lit/dark/SOR to a later point release per the section 15 gate rule |
+| HR-31 | Outside checks for simulated venues | **Decided by the owner 2026-11-17 (option C).** No public reference engine publishes outputs, so value cases of the lit engine, dark pool and router count as outside-checked by blind re-derivation under DR-H2 (a second lane computes from the inputs alone, without seeing ours), or by a real outside tool where one exists (`lifelines` Kaplan-Meier; Monte Carlo of the same model for the Laplace inversion). Venue documentation backs each rule (cited per case) but is not itself counted as an outside check. Lit, dark and SOR stay in stage H; the section 15 rule of 60% applies per item as usual |
 | HR-32 | Dark crossing price | Mid of the supplied lit book, on a half-tick grid; no crossing when the lit book is locked, crossed or one-sided |
 | HR-33 | Minimum quantity | Per fill, not cumulative |
 | HR-34 | Conditionals | Stylised: invitation, firm-up with probability p_firm after a delay, suspension on failure; no venue mechanics claimed |
@@ -34,3 +34,4 @@ DRAFT written 2026-11-17, after v0.9.0. Not normative until the stage H coordina
 | HR-38 | Integer sizes | Router outputs integer lots; continuous [CK] solution rounded by exhaustive search over the floor/ceiling neighbours |
 | HR-39 | Golden method | `SAMPLE_AVERAGE` on stated samples is the golden definition; stochastic approximation is property-tested against it |
 | HR-40 | Router scoring | Router vs best single venue reported with paired SE; a result, not a gate |
+| HR-41 | Recorded-row golden | **Decided by the owner 2026-11-17.** `ob_h-0009` leaves the goldens: a transformed row loses Kraken's checksum, and raw rows may not be published. The check against Kraken's real checksums becomes a local-only test on the recorded files, with counts published and rows not |

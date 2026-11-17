@@ -54,7 +54,7 @@ A Poisson order-flow simulator (`core.rng`, seed fixed per test) in the [CST10] 
 | lit_h-0008 | PEG_MID with spread 3 ticks | bid peg rounds down | HR-28 |
 | lit_h-0009 | market order on an empty side | no fill, remainder cancelled | hand |
 
-Outside checks: rule-level against venue documentation only (0003, 0004, 0006, 0007). No public reference engine with published outputs was found; the plan's 60% outside-check rule (section 15) is therefore at risk for this item and is put to the owner (HR-31).
+Outside checks (HR-31, decided): no public reference engine publishes outputs, so value cases are outside-checked by blind re-derivation under DR-H2, a second lane given the inputs and the rules of this page only. All nine cases go to that lane, so the plan's 60% rule is met only if at least six match. Venue documentation (0003, 0004, 0006, 0007) backs the rules and is cited, but is not counted as an outside check.
 
 ## Limitations
 One instrument, one engine, no auctions, no halts, no self-trade prevention, no latency between participants (event order is given). Simulated venue; not a real exchange.

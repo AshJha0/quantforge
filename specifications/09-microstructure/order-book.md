@@ -75,10 +75,12 @@ On every recorded day used for H-1 (at least 20 at the tag), per symbol:
 | ob_h-0006 | best bid = best ask, then bid > ask | `LOCKED`, then `CROSSED`, both counted, no error | HR-14 |
 | ob_h-0007 | delete of an absent price | counted, book unchanged | hand |
 | ob_h-0008 | gap row mid-stream | book cleared, `gaps = 1` | HR-15 |
-| ob_h-0009 | 5 recorder rows (anonymised: prices shifted, quantities scaled, only the transform published) with `ok = true` | recomputed checksum equal for all | OUTSIDE-CHECKED: Kraken's live checksum at recording time |
+| ob_h-0009 | moved out of the goldens (owner 2026-11-17, HR-41) | see the local test below | not a golden |
 | ob_h-0010 | price string "0.00012300" at 8 decimals | checksum component "12300" | [KR-CRC] formatting rule |
 
-Outside checks: 0001 and 0009 (venue checksum), 0010 (venue rule). Case 0009 needs a terms check: raw rows are not published (11.4), so the golden is a transformed, non-reversible derivative; if that is not allowed, it moves to a local-only test and the outside share is recomputed.
+Outside checks: 0001 (venue's printed checksum) and 0010 (venue formatting rule), 2 of the 9 golden cases; the rest are hand cases and go to a blind second lane (DR-H2) to reach the 60% rule.
+
+**Local-only test (not a golden; HR-41).** A recorded row's checksum cannot survive any transform (shifting prices or scaling quantities changes the string Kraken's CRC32 covers), and untransformed rows may not be published (11.4, terms read 2026-11-12). So the check against Kraken's real checksums runs only locally, on the recorded files: every form B row with `ok = true`, and every message of the 14-minute raw sample, must give our recomputed checksum equal to Kraken's. It runs before each stage H release; its counts are published, its rows are not.
 
 ## Limitations
 MBP only; Kraken's MBO channel needs a key and is out of scope. No sequence number, so a dropped websocket message is detected only by the checksum. Crypto venue; not equities or rates.

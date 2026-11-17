@@ -7,7 +7,7 @@ Spec version 0.1.0 (DRAFT, stage H wave 1b). Status: Specified, not implemented.
 ## Sources
 - [IEX-OT] IEX order types page (see `lit-matching.md`), read 2026-11-17: midpoint peg is non-displayed and pegged to the NBBO midpoint subject to the limit. Venue documentation.
 - [GKNV09] K. Ganchev, M. Kearns, Y. Nevmyvaka, J. W. Vaughan, "Censored exploration and the dark pool problem", Proc. UAI 2009, pp. 185-194; arXiv:1205.2646, PDF read 2026-11-17. Paper, read. Verified: section 2, at each step V^t units are split over K venues; venue i consumes r_i = min(s_i, v_i) with s_i drawn from an unknown P_i; r_i = v_i is a censored observation; T_i(s) = sum over s' >= s of P_i(s'); section 3, greedy one-unit-at-a-time allocation on estimated tails maximises expected units filled; estimates are "optimistic tail modifications" of the Kaplan-Meier estimator.
-- [CST10] R. Cont, S. Stoikov, R. Talreja, "A stochastic model for order book dynamics", *Operations Research* 58(3) (2010) (page range not checked: open question); free copy https://www.columbia.edu/~ww2040/orderbook.pdf read 2026-11-17 (preprint page numbers). Paper, read. Verified: section 2.2, limit orders at distance i arrive at rate lambda(i), market orders at rate mu, each order at level i cancels so the level cancels at rate theta(i) x; section 4.3, Proposition 5 gives the probability an order at the bid executes before the mid moves, via Laplace transforms (eqs. 13-14). Journal pages not checked against the publisher (preprint read).
+- [CST10] R. Cont, S. Stoikov, R. Talreja, "A stochastic model for order book dynamics", *Operations Research* 58(3) (2010) 549-563, DOI 10.1287/opre.1090.0780 (journal record from Crossref, read 2026-11-17); free copy https://www.columbia.edu/~ww2040/orderbook.pdf read 2026-11-17 (preprint page numbers). Paper, read. Verified: section 2.2, limit orders at distance i arrive at rate lambda(i), market orders at rate mu, each order at level i cancels so the level cancels at rate theta(i) x; section 4.3, Proposition 5 gives the probability an order at the bid executes before the mid moves, via Laplace transforms (eqs. 13-14). Journal pages not checked against the publisher (preprint read).
 - H. Zhu, "Do dark pools harm price discovery?", *RFS* 27(3) (2014): **not read** (MIT copy 404, SSRN 403 on 2026-11-17). Cited only as background in the README of this lane; no ruling rests on it.
 
 ## Pool model (operation `exec.sim.dark.run`)
@@ -36,6 +36,8 @@ Non-positive qty or min_qty > qty `E_DOMAIN`; `p_firm` outside [0, 1] `E_DOMAIN`
 | dark_h-0005 | Kaplan-Meier on a hand table of censored and direct observations | tail values | OUTSIDE-CHECKED: `lifelines` KaplanMeierFitter on the same data (plain KM before the optimistic modification) |
 | dark_h-0006 | [CST10] Prop. 5 at the paper's section 5 parameters | probability | OUTSIDE-CHECKED: the paper's printed table if one exists for Prop. 5; else Monte Carlo 10^6 paths within 3 SE |
 | dark_h-0007 | markout of a single fill against a given mid path | bp values | hand |
+
+Outside checks (HR-31): 0005 and 0006 by outside tools; 0001 to 0004 and 0007 by blind re-derivation (DR-H2). Rule citations do not count.
 
 ## Convergence and limit cases
 | Limit | Behaviour | Check |
