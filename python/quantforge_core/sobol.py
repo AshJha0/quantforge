@@ -1,4 +1,5 @@
 """Sobol points (specifications/01-core/sobol.md)."""
+
 from collections.abc import Iterator
 from functools import lru_cache
 

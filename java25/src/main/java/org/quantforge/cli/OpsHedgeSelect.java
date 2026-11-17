@@ -38,7 +38,10 @@ final class OpsHedgeSelect {
         double[] lower = bounds(in, "lower", Double.NEGATIVE_INFINITY);
         double[] upper = bounds(in, "upper", Double.POSITIVE_INFINITY);
         long k = in.integer("max_instruments");
-        boolean extra = in.hasKey("eq_matrix") || in.hasKey("eq_rhs") || in.hasKey("singular");
+        // I-33, and J-I.3: no cost or margin inputs either (selection would drop them silently).
+        boolean extra = in.hasKey("eq_matrix") || in.hasKey("eq_rhs") || in.hasKey("singular")
+                || in.hasKey("half_spreads") || in.hasKey("impact") || in.hasKey("cost_weight")
+                || in.hasKey("margin_rates") || in.hasKey("margin_limit");
         int width = 0;
         for (double[] row : a) {
             width = Math.max(width, row.length);

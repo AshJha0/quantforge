@@ -578,7 +578,7 @@ The same backtest with costs: add `"half_spread"` to the inputs of `hedge_backte
 
 ## Stage J recipes
 
-Stage J wave 1 (target v0.9.0, not yet released) adds research tools; wave 2 recipes follow the wave 1 ones. Each file below copies the inputs of the named golden case verbatim, so its expected outputs are that case's `expected.outputs` in `datasets/golden/stage_j/`. All four builds pass every stage J case (15,315 of 15,315 in each language at contract 1.14.0, 2026-11-14). The outputs quoted here are from the Python build on 2026-11-14.
+Stage J wave 1 (released in v0.9.0) adds research tools; wave 2 recipes follow the wave 1 ones. Each file below copies the inputs of the named golden case verbatim, so its expected outputs are that case's `expected.outputs` in `datasets/golden/stage_j/`. All four builds pass every stage J case (15,514 of 15,514 in each language at contract 1.15.0, 2026-11-15). The outputs quoted here are from the Python build on 2026-11-14.
 
 | Task | File | Operation | From golden |
 |---|---|---|---|
@@ -588,6 +588,8 @@ Stage J wave 1 (target v0.9.0, not yet released) adds research tools; wave 2 rec
 | Deflated Sharpe ratio for a set of trials | `research_dsr_j.json` | `research.stats.dsr` | `rstats_j-0001` |
 | Minimum detectable Sharpe for a sample length | `research_power_j.json` | `research.stats.power` | `rstats_j-0017` |
 | Probability of backtest overfitting from a strategy matrix | `research_pbo_j.json` | `research.stats.pbo` | `rstats_j-0025` |
+| Count CPCV splits and backtest paths | `research_cpcv_paths_j.json` | `research.cv.cpcv_paths` | `purgedcv_j-0017` |
+| Probabilistic Sharpe ratio against a benchmark | `research_psr_j.json` | `research.stats.psr` | `rstats_j-0013` |
 
 ### Backtest with costs
 
@@ -653,11 +655,31 @@ uv run --project python quantforge run < examples/research_pbo_j.json
 
 Worked example. Rows `[1, 0], [1, 0], [0, 2], [0, 2]`, two blocks, metric `MEAN`. Whichever block trains, its winner is last on the other: rank 1 of 2, `omega = 1/3`, logit `log(1/2)`. Output `"pbo":1.0`, `"logits":[-0.6931471805599454,-0.6931471805599454]`, `"n_combinations":2`. [Tutorial 24](docs/getting-started/tutorial-24-is-the-sharpe-real.md) works a three-strategy example by hand, and the gallery page [Research workflow](docs/curves/research-workflow.md) runs all of these on twelve rules.
 
+### Count CPCV splits and paths
+
+Plain idea: combinatorial purged cross-validation cuts the history into `N` groups and tests on every choice of `k` of them; the test groups recombine into several complete backtest paths, which gives a distribution of out-of-sample results instead of one. Formally (`specifications/11-research/purged-cv.md`; López de Prado 2018, section 12.4): `n_splits = C(N, k)`, and each group is tested in `C(N - 1, k - 1)` splits, so `n_paths = k/N C(N, k)`.
+
+```bash
+uv run --project python quantforge run < examples/research_cpcv_paths_j.json
+```
+
+Worked example. `N = 6`, `k = 2`: `C(6, 2) = 15` splits and `2/6 x 15 = 5` paths. Output `"n_splits":15,"n_paths":5`. [Tutorial 31](docs/getting-started/tutorial-31-leakage-and-purging.md) tabulates `N` = 6, 8, 10 against `k` = 1, 2, 3.
+
+### Probabilistic Sharpe ratio
+
+Plain idea: the probability that the true Sharpe ratio is above a benchmark, given how long the sample is and how skewed and fat-tailed the returns are. Formally (`research-statistics.md`, J-14; Bailey and López de Prado 2012): with `v = 1 - skew sr + (kurtosis - 1)/4 sr^2`, `z = (sr - sr_benchmark) sqrt(T - 1) / sqrt(v)` and `psr = Phi(z)`; `sr` per period, `kurtosis` not excess; `v <= 0` is `E_DOMAIN`.
+
+```bash
+uv run --project python quantforge run < examples/research_psr_j.json
+```
+
+Worked example. Daily Sharpe 0.1 over 500 days, skew -0.5, kurtosis 5, benchmark 0: `v = 1 + 0.05 + 0.01 = 1.06`, `z = 0.1 x sqrt(499) / sqrt(1.06) = 2.1697`. Output `"z":2.169688265583635,"psr":0.9849847651995092`. With skew 0 and kurtosis 3 the same Sharpe gives `z = 2.2283`: negative skew costs evidence. [Tutorial 30](docs/getting-started/tutorial-30-trials-and-power.md) shows PSR rising with sample length.
+
 To check a whole suite: `python conformance/runner/runner.py --impl python --suite backtest_j` (or `purgedcv_j`, `regime_j`, `rstats_j`).
 
 ### Stage J wave 2: portfolio construction, estimation, ES backtest, Baum-Welch
 
-Wave 2 adds seven operations (rulings J-W2-1 to J-W2-23 in `specifications/stage-j-rulings-w2.md`). All four builds implement them on branch `stage-j`, at CLI contract 1.14.0. As above, each file copies the inputs of the named golden case verbatim, and the outputs quoted are from the Python build on 2026-11-14. [Tutorial 25](docs/getting-started/tutorial-25-build-and-stress-a-portfolio.md) and [Tutorial 26](docs/getting-started/tutorial-26-test-es-and-fit-regimes.md) work through them on hand-sized data.
+Wave 2 adds seven operations (rulings J-W2-1 to J-W2-23 in `specifications/stage-j-rulings-w2.md`). All four builds implement them, at CLI contract 1.14.0 (merged in PR #40, released in v0.9.0). As above, each file copies the inputs of the named golden case verbatim, and the outputs quoted are from the Python build on 2026-11-14. [Tutorial 25](docs/getting-started/tutorial-25-build-and-stress-a-portfolio.md) and [Tutorial 26](docs/getting-started/tutorial-26-test-es-and-fit-regimes.md) work through them on hand-sized data.
 
 | Task | File | Operation | From golden |
 |---|---|---|---|
@@ -740,3 +762,114 @@ uv run --project python quantforge run < examples/research_baum_welch_j.json
 Worked example. 60 observations in blocks of 25, start means -0.5 and 1.5, standard deviations 1, tolerance 1.29e-7. Output: `"iterations":28`, `"converged":true`, `"log_likelihood":-97.04826936250689`, `"means":[-0.4071983679316511,2.7272604649142966]`, `"sds":[0.7495715574047682,1.3624331205819107]`, and staying probabilities 0.9329 and 0.8543 on the diagonal of `"transition"`. The first state's initial probability, `7.9e-28`, is its posterior given the whole series at the first observation, 1.498, which the model places in the second state. Pass the fitted parameters to `research.regime.viterbi` for labels, as Tutorial 26 does.
 
 To check a whole suite: `python conformance/runner/runner.py --impl python --suite optim_j` (or `estim_j`, `esbt_j`, `baumwelch_j`).
+
+### Stage J research questions, one recipe each
+
+These recipes answer a question with several calls rather than one, so each points at the tutorial script that does it; every script runs on any build (`python examples/tutorials/<script> rust/target/release/quantforge`, or the Java or C++ command line) and prints the same lines. The numbers are those scripts' printed output (2026-11-15, all four builds).
+
+| Question | Script | Operations | Tutorial |
+|---|---|---|---|
+| At what spread does my backtest earn nothing? | `t27_costs.py` | `research.backtest.run` | [27](docs/getting-started/tutorial-27-what-costs-do-to-a-backtest.md) |
+| What does a long-only rule cost me? | `t28_frontier.py` | `research.portfolio.mean_variance`, `risk.contrib.euler` | [28](docs/getting-started/tutorial-28-efficient-frontier.md) |
+| How strong should my view be? | `t29_view_confidence.py` | `research.estimate.black_litterman` | [29](docs/getting-started/tutorial-29-view-confidence.md) |
+| How many trials can my Sharpe survive, and how long must I wait? | `t30_trials_and_power.py` | `research.stats.dsr`, `.psr`, `.power` | [30](docs/getting-started/tutorial-30-trials-and-power.md) |
+| How much training data does purging cost? | `t31_purging.py` | `research.cv.purged_kfold`, `research.cv.cpcv_paths` | [31](docs/getting-started/tutorial-31-leakage-and-purging.md) |
+| Does shrinkage help at my sample length? | `t32_shrinkage_and_length.py` | `research.estimate.ledoit_wolf`, `research.portfolio.risk_parity` | [32](docs/getting-started/tutorial-32-shrinkage-and-sample-length.md) |
+
+#### Break-even half spread
+
+Plain idea: spread cost grows in a straight line with the half spread, so the half spread at which net P&L is zero follows from one costless run. Formally (`backtester.md`): `total_spread_cost = turnover x half_spread_bps / 10^4`, so `b* = (total_gross - total_commission - total_fixed_cost) / (turnover x 10^-4)`, read from a run with `half_spread_bps` 0. Worked example (Tutorial 27): gross 461.73, commission 9.30, turnover 93,055.8 give `b* = 48.62` bp, and a run at that half spread prints net 0.000000.
+
+#### Price a constraint in return
+
+Plain idea: run mean-variance with and without the constraint at the same risk aversion and compare certainty-equivalent returns `mu'w - (gamma/2) sigma^2`. Worked example (Tutorial 28): at `gamma = 1`, free 0.0823 and long-only 0.0627, so the rule costs 195.5 bp a year; at `gamma = 5` neither portfolio holds a short and the cost is zero.
+
+#### Choose a view's variance from a confidence
+
+Plain idea: for one view, the posterior moves a fraction `c = tau P Sigma P' / (tau P Sigma P' + Omega)` of the way from the prior to the view, so choose `c` and set `Omega = tau P Sigma P' (1 - c) / c`. Worked example (Tutorial 29): `tau P Sigma P' = 0.0019`; `Omega = 0.0019` gives `c = 1/2` and a posterior spread of 0.0590, half-way from 0.038 to 0.08. Only `Omega / tau` affects the posterior mean.
+
+#### Years needed to detect a Sharpe ratio
+
+Plain idea: `years_required = (z_sum / SR)^2`, with `z_sum = 2.4865` at 5 % and 80 % power. Send `{"years": 1, "sr_target": 1.0}` to `research.stats.power`: 6.18 years for an annual Sharpe of 1, 24.73 for 0.5 (Tutorial 30).
+
+### Stage J wave 3: stress scenarios, interpolation backtests, drift detectors
+
+Tutorial 33 runs all eight operations together; the recipes below are one call each.
+
+### Replay a curve shock on a book
+
+Plain idea: move each tenor of today's curve by the shock, interpolated onto the book's tenors, and price the move with DV01s. Formally (`specifications/06-risk/scenario-stress.md`, J-W3-4, J-W3-5): `applied_bp = scale x` linear interpolation of the shock in tenor, flat outside the shock's tenors; `shocked = yield + applied_bp / 100`; `pnl = -sum dv01 x applied_bp`.
+
+```bash
+uv run --project python quantforge run < examples/risk_scenario_replay_j.json
+```
+
+Worked example. Shock 10, 50, 20 bp at 1Y, 5Y, 30Y; the 2Y point is a quarter of the way from 1Y to 5Y, so `10 + 0.25 x 40 = 20` bp; the 10Y point is a fifth of the way from 5Y to 30Y, `50 - 0.2 x 30 = 44` bp. Output `"applied_bp":[20.0,44.0]`, `"shocked_yields":[4.2,4.640000000000001]`, and with DV01s 1,000 and 2,000 per bp `"pnl":-108000.0`. For a real crisis, take `shock_tenors` and `shift_bp` from `datasets/scenarios/us_treasury_shocks.json`, or measure them with `risk.scenario.historical_shock`.
+
+### Leave one knot out
+
+Plain idea: hide each inner knot, rebuild with the same method, and record the miss. Formally (`specifications/11-research/interp-backtest.md`, J-W3-8): `e_i = f_{-i}(x_i) - y_i` for each inner `i`, with the max absolute error and the RMSE.
+
+```bash
+uv run --project python quantforge run < examples/research_interp_loo_j.json
+```
+
+Worked example. Knots `(1, 3.0), (2, 3.4), (3, 3.6), (5, 4.0)`, `linear`. Hiding 2 rebuilds `3.0 + 0.5 x 0.6 = 3.3`, error -0.1; hiding 3 rebuilds `3.4 + 0.6 / 3 = 3.6`, error 0. Output `"errors":[-0.10000000000000009,0.0]`, `"max_abs_error":0.10000000000000009`, `"rmse":0.07071067811865482`. For an option smile use `research.backtest.surface_holdout`, which interpolates total variance across strike.
+
+### Detect a mean shift with CUSUM
+
+Plain idea: add up how far each value sits above (and below) the in-control mean, less an allowance `k`, and alarm when the running total passes `h`. Formally (`specifications/11-research/drift-detectors.md`, J-W3-10): `S+_t = max(0, S+_{t-1} + z_t - k)` on `z = (x - mu0) / sigma`, the mirror for `S-`, alarm when either is strictly above `h`, then both restart.
+
+```bash
+uv run --project python quantforge run < examples/research_drift_cusum_j.json
+```
+
+Worked example. `x = 0, 0.2, -0.1, 1.4, 1.6, 1.5, 1.7`, `k = 0.5`, `h = 2`. `S+` stays 0 for three steps, then 0.9, 2.0 (not above 2: the test is strict), 3.0: alarm at index 5, restart, then 1.2. Output `"alarms":[5]`, `"directions":[1]`, `"s_plus":1.2`, `"s_minus":0.0`. `research.drift.page_hinkley` is the same idea measured against the running mean instead of a fixed `mu0`.
+
+### Compare two windows with KS
+
+Plain idea: the largest vertical gap between the two empirical distribution functions, and the chance of a gap that large if both windows came from the same continuous distribution. Formally (J-W3-13): `D = max |F_n - G_m|`; the p-value counts the lattice paths with `|i m - j n| < D n m` exactly.
+
+```bash
+uv run --project python quantforge run < examples/research_drift_ks_j.json
+```
+
+Worked example. `a = 1, 2, 3, 4`, `b = 3.5, 5, 6, 7`. At `x = 3` three quarters of `a` and none of `b` lie at or below: `D = 0.75`. Of the `C(8, 4) = 70` orderings, 16 give a gap at least that large, so `p = 16 / 70`. Output `"statistic":0.75`, `"p_value":0.22857142857142856`, `"reject":false`: four points each are too few to tell. For binned shares use `research.drift.psi`.
+
+To check a whole suite: `python conformance/runner/runner.py --impl python --suite scen_j` (or `interpbt_j`, `drift_j`).
+
+### Stage J curves lane: financing term structure and liquidity curve
+
+Three operations (rulings J-C-1 to J-C-9 in `specifications/stage-j-rulings-curves.md`, contract 1.15.0), in all four builds. Outputs quoted are from the Python build on 2026-11-15. [Tutorial 34](docs/getting-started/tutorial-34-financing-term-structure.md) and [Tutorial 35](docs/getting-started/tutorial-35-liquidity-curve.md) work through them.
+
+### Build a term repo and borrow curve
+
+Plain idea: each term repo quote fixes one point of the financing spread over the funding curve; borrow quotes do the same for the stock-loan fee. Formally (`specifications/02-curves/financing-term-structure.md`, J-C-2 to J-C-4): `S(T_i) = ln(1 + R_i T_i) - Z(T_i) T_i`, linear between pillars, no extrapolation.
+
+```bash
+uv run --project python quantforge run < examples/repo_term_curve_j.json
+```
+
+Worked example. Four repo quotes 4.25 % to 4.40 % at 1, 3, 6 and 12 months over a funding curve of 4.0 % to 4.2 %: `"pillar_spreads"` 24.25, 27.71, 20.34 and 15.59 bp; at 0.5 years `"financing_rate"` 0.0435, the quote. With one flat quote and one flat fee the curve reproduces ruling D22.
+
+### Price an equity forward on term financing
+
+Plain idea: the forward is spot carried on secured financing, less the borrow fee, less dividends carried the same way. Formally (J-C-5): `F = (S_0 - sum_{0 < t_i <= T} A_i C(t_i)) / C(T)`, `C(t) = exp(-Z(t) t - S(t) + B(t))`.
+
+```bash
+uv run --project python quantforge run < examples/eq_forward_term_financed_j.json
+```
+
+Worked example. Spot 50, nine months, dividends 0.3 and 0.35 inside the horizon (0.4 at 0.9 years is not): `"forward"` 50.793899, `"pv_dividends"` 0.643404.
+
+### Read a liquidity cost curve
+
+Plain idea: half spread plus square-root impact plus timing risk, by size and horizon, and the cheapest horizon per size. Formally (`specifications/10-execution/liquidity-curve.md`, J-C-6 to J-C-8): `c(Q, h) = s + Y sigma (Q/(V h))^delta + z sigma sqrt(h/3)`.
+
+```bash
+uv run --project python quantforge run < examples/liq_curve_cost_j.json
+```
+
+Worked example. 5 bp half spread, `sigma` 2 %, `V` 10 million, `z = 1.645`: for 1,000,000 shares `"optimal_horizon"` 0.3330 days and `"min_cost"` 0.0224 (224 bp). Parameters are assumed, not calibrated.
+
+To check the suites: `python conformance/runner/runner.py --impl python --suite termfin_j` (or `liqcurve_j`).

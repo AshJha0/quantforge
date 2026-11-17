@@ -167,7 +167,8 @@ fn traffic_light_zones_and_plus_factor() {
         0.99_f64.powi(250),
         1e-12
     ));
-    assert!(traffic_light(10, 50, 0.99).unwrap().0 <= 1.0);
+    // J-W3-17: exceptions above observations is refused
+    assert_eq!(traffic_light(10, 50, 0.99).unwrap_err().code, "E_DOMAIN");
     assert_eq!(traffic_light(0, 0, 0.99).unwrap_err().code, "E_DOMAIN");
     assert_eq!(traffic_light(10, -1, 0.99).unwrap_err().code, "E_DOMAIN");
 }

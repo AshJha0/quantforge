@@ -51,6 +51,17 @@ class HedgeSolversTest {
     }
 
     @Test
+    void boundedSolveKeepsASmallColumn() {
+        // J-I.1 (golden hedgecut_j-0001): Python's active-set step cut ranks unscaled and returned (0, 0),
+        // objective 1. The dual active set has no rank cut; this pins the hand optimum x1 = -1e7, objective 0.
+        LeastSquaresHedge.Solution s = qp(new double[][] {{1e-7, 0}, {0, 1}}, new double[] {1, 0},
+                new double[] {1, 1}, 0, null, null, new double[] {-INF, 0}, new double[] {INF, 0}, false);
+        assertEquals(-1e7, s.x()[0], 1e-12 * 1e7);
+        assertEquals(0.0, s.x()[1], 0.0);
+        assertEquals(0.0, s.objective(), 1e-12);
+    }
+
+    @Test
     void equalitiesFixingEveryPositionGiveRankZero() {
         double[][] eq = {{1, 0}, {1, 1}};
         LeastSquaresHedge.Solution s = qp(A, B, W, 0, eq, new double[] {1, 3}, null, null, false);

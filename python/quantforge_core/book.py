@@ -1,5 +1,6 @@
 """Book: trade and position lifecycle, end-of-day marks
 (specifications/07-portfolio/book-lifecycle.md, ruling F-34)."""
+
 import itertools
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -67,8 +68,9 @@ class _Book:
             raise QfError("E_INPUT", f"{instrument} is closed", "events")
 
 
-def lifecycle_apply(positions: Sequence[tuple[str, float, float]],
-                    events: Sequence[Event]) -> dict[str, object]:
+def lifecycle_apply(
+    positions: Sequence[tuple[str, float, float]], events: Sequence[Event]
+) -> dict[str, object]:
     if any(b.date < a.date for a, b in itertools.pairwise(events)):
         raise QfError("E_INPUT", "events must be in date order", "events")
     book = _Book(positions)
@@ -90,12 +92,15 @@ def lifecycle_apply(positions: Sequence[tuple[str, float, float]],
             q = book.close(e.instrument, e.price)
             book.trade(e.to, q, e.to_price)
     return {
-        "positions": [{"instrument": k, "quantity": q, "average_cost": a}
-                      for k, (q, a) in sorted(book.held.items())],
+        "positions": [
+            {"instrument": k, "quantity": q, "average_cost": a}
+            for k, (q, a) in sorted(book.held.items())
+        ],
         "realized_pnl": [{"instrument": k, "pnl": v} for k, v in sorted(book.realized.items())],
         "total_realized": sum(v for _, v in sorted(book.realized.items())),
-        "fixings": [{"index": i, "date": d.isoformat(), "value": v}
-                    for (i, d), v in sorted(fixings.items())],
+        "fixings": [
+            {"index": i, "date": d.isoformat(), "value": v} for (i, d), v in sorted(fixings.items())
+        ],
     }
 
 
@@ -105,9 +110,14 @@ class Source:
     quotes: tuple[tuple[str, date, float], ...]
 
 
-def marks_resolve(as_of: date, instruments: Sequence[str], sources: Sequence[Source],
-                  max_age_days: int, ipv: Sequence[tuple[str, float]],
-                  ipv_threshold: float) -> dict[str, object]:
+def marks_resolve(
+    as_of: date,
+    instruments: Sequence[str],
+    sources: Sequence[Source],
+    max_age_days: int,
+    ipv: Sequence[tuple[str, float]],
+    ipv_threshold: float,
+) -> dict[str, object]:
     if len({s.name for s in sources}) != len(sources):
         raise QfError("E_INPUT", "source names must be unique", "sources")
     if max_age_days < 0:
@@ -131,8 +141,11 @@ def marks_resolve(as_of: date, instruments: Sequence[str], sources: Sequence[Sou
             for rank, s in enumerate(sources):
                 for i, d, p in s.quotes:
                     gap = (as_of - d).days
-                    if i == inst and 0 < gap <= max_age_days and (
-                            best is None or d > best[0] or (d == best[0] and rank < best[1])):
+                    if (
+                        i == inst
+                        and 0 < gap <= max_age_days
+                        and (best is None or d > best[0] or (d == best[0] and rank < best[1]))
+                    ):
                         best = (d, rank, p, s.name)
             if best is not None:
                 price, source, status, age = best[2], best[3], "STALE", (as_of - best[0]).days
@@ -141,13 +154,23 @@ def marks_resolve(as_of: date, instruments: Sequence[str], sources: Sequence[Sou
         if price is not None and inst in checks:
             diff = (price - checks[inst]) / checks[inst]
             breach = abs(diff) > ipv_threshold
-        marks.append({"instrument": inst, "price": price, "source": source, "status": status,
-                      "age_days": age, "ipv_diff": diff, "ipv_breach": breach})
+        marks.append(
+            {
+                "instrument": inst,
+                "price": price,
+                "source": source,
+                "status": status,
+                "age_days": age,
+                "ipv_diff": diff,
+                "ipv_breach": breach,
+            }
+        )
     return {"marks": marks}
 
 
-def factor_attribution(portfolio: Sequence[float], factors: Sequence[Sequence[float]],
-                       names: Sequence[str]) -> dict[str, object]:
+def factor_attribution(
+    portfolio: Sequence[float], factors: Sequence[Sequence[float]], names: Sequence[str]
+) -> dict[str, object]:
     """Use case 4 (04-pricing/use-cases.md): OLS with an intercept."""
     t = len(portfolio)
     k = len(names)
@@ -176,7 +199,7 @@ def factor_attribution(portfolio: Sequence[float], factors: Sequence[Sequence[fl
         "contributions": [b * float(m) for b, m in zip(betas, means, strict=True)],
         "mean_return": float(y.mean()),
         "r_squared": 1 - ssr / sst,
-        "residual_vol": vol2 ** 0.5,
+        "residual_vol": vol2**0.5,
         "beta_se": [float((vol2 * inv[i + 1, i + 1]) ** 0.5) for i in range(k)],
     }
 

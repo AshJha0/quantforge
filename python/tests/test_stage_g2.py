@@ -1,6 +1,7 @@
 """Stage G waves 3b to 4b and the stage F carry-over tools: property tests and acceptance runs
 (LMM parities and the G-26 simulated-caplet acceptance, the Q3b ladder against a Richardson bump
 with the G-9 cost ratio, xVA limits, F3/F4/FRTB identities). Goldens run in test_conformance.py."""
+
 import itertools
 import math
 import os
@@ -13,8 +14,18 @@ import pytest
 from quantforge_core import aad_ladder, frtb, lmm, risk_tools, shortrate, xva
 from quantforge_core.errors import QfError
 
-TIMES = [0.4986301369863014, 1.0, 2.0, 3.0, 5.002739726027397, 7.005479452054795,
-         10.005479452054795, 15.01095890410959, 20.013698630136986, 30.019178082191782]
+TIMES = [
+    0.4986301369863014,
+    1.0,
+    2.0,
+    3.0,
+    5.002739726027397,
+    7.005479452054795,
+    10.005479452054795,
+    15.01095890410959,
+    20.013698630136986,
+    30.019178082191782,
+]
 DFS = [0.98085, 0.9619, 0.9254, 0.8906, 0.8242, 0.762, 0.6787, 0.561, 0.467, 0.332]
 HUMP = (-0.06, 0.17, 0.54, 0.17)
 
@@ -28,8 +39,10 @@ def test_lmm_cap_minus_floor_is_the_swap() -> None:
     for k in (0.03, 0.05):
         cap = lmm.capfloor(TIMES, DFS, HUMP, periods, k, "CAP", 1.0)["price"]
         floor = lmm.capfloor(TIMES, DFS, HUMP, periods, k, "FLOOR", 1.0)["price"]
-        swap = sum(curve.discount(a) - (1 + k * (b - a)) * curve.discount(b)
-                   for a, b in itertools.pairwise(periods))
+        swap = sum(
+            curve.discount(a) - (1 + k * (b - a)) * curve.discount(b)
+            for a, b in itertools.pairwise(periods)
+        )
         assert isinstance(cap, float) and isinstance(floor, float)
         assert abs(cap - floor - swap) <= 1e-14
 
@@ -38,8 +51,9 @@ def test_lmm_flat_abcd_gives_d() -> None:
     out = lmm.capfloor(TIMES, DFS, (0.0, 0.0, 0.5, 0.2), [1.0, 2.0, 3.0], 0.04, "CAP", 1.0)
     vols = out["black_vols"]
     assert isinstance(vols, list) and all(abs(v - 0.2) <= 1e-14 for v in vols)
-    sw = lmm.swaption_rebonato(TIMES, DFS, (0.0, 0.0, 0.5, 0.2), 0.0, 1.0, [2.0, 3.0, 4.0], 0.04,
-                               "PAY", 1.0)
+    sw = lmm.swaption_rebonato(
+        TIMES, DFS, (0.0, 0.0, 0.5, 0.2), 0.0, 1.0, [2.0, 3.0, 4.0], 0.04, "PAY", 1.0
+    )
     assert abs(sw["black_vol"] - 0.2) <= 1e-14
 
 
@@ -59,8 +73,7 @@ def test_lmm_simulated_caplets_acceptance() -> None:
     year; every caplet within 3 SE of the closed form."""
     curve = shortrate.make_curve(TIMES, DFS)
     grid = [float(k) for k in range(8)]
-    sim = lmm.simulate_caplets(curve, lmm.make_abcd(*HUMP), 0.1, grid, 0.045, 100_000, 20,
-                               20261111)
+    sim = lmm.simulate_caplets(curve, lmm.make_abcd(*HUMP), 0.1, grid, 0.045, 100_000, 20, 20261111)
     closed = lmm.capfloor(TIMES, DFS, HUMP, grid[1:], 0.045, "CAP", 1.0)["caplet_prices"]
     assert isinstance(closed, list) and len(closed) == len(sim) == 6
     for (mean, se), exact in zip(sim, closed, strict=True):
@@ -73,8 +86,9 @@ def test_lmm_simulated_caplets_acceptance() -> None:
 def _berm(times: list[float], dfs: list[float], a: float, sigma: float) -> float:
     m = shortrate.curve_model(times, dfs, a, sigma)
     grid = shortrate.make_grid(41, 20, 6.0)
-    out = shortrate.bermudan_swaption(m, 1.0, [2.0, 3.0, 4.0, 5.0, 6.0], 0.039462, "PAYER", 1.0,
-                                      [1.0, 2.0, 3.0, 4.0, 5.0], grid)
+    out = shortrate.bermudan_swaption(
+        m, 1.0, [2.0, 3.0, 4.0, 5.0, 6.0], 0.039462, "PAYER", 1.0, [1.0, 2.0, 3.0, 4.0, 5.0], grid
+    )
     return out["price"]
 
 
@@ -88,8 +102,9 @@ def _richardson(f, x: float) -> float:
 def test_ladder_equals_bump_within_g9() -> None:
     a, sigma = 0.05, 0.01
     m = shortrate.curve_model(TIMES, DFS, a, sigma)
-    price, d_dfs, d_a, d_sigma = aad_ladder.ladder(m, 1.0, [2.0, 3.0, 4.0, 5.0, 6.0], 0.039462,
-                                                   True, [1.0, 2.0, 3.0, 4.0, 5.0], 41, 20, 6.0)
+    price, d_dfs, d_a, d_sigma = aad_ladder.ladder(
+        m, 1.0, [2.0, 3.0, 4.0, 5.0, 6.0], 0.039462, True, [1.0, 2.0, 3.0, 4.0, 5.0], 41, 20, 6.0
+    )
     assert price == pytest.approx(_berm(TIMES, DFS, a, sigma), rel=1e-12)
 
     def close(aad: float, ref: float) -> bool:
@@ -98,6 +113,7 @@ def test_ladder_equals_bump_within_g9() -> None:
     assert close(d_sigma, _richardson(lambda s: _berm(TIMES, DFS, a, s), sigma))
     assert close(d_a, _richardson(lambda x: _berm(TIMES, DFS, x, sigma), a))
     for j in (0, 1, 2, 4, 6):
+
         def bumped(v: float, j: int = j) -> float:
             dfs = list(DFS)
             dfs[j] = v
@@ -142,8 +158,12 @@ def test_ladder_cost_ratio_report() -> None:
 # --- xVA framework ---------------------------------------------------------------------------------
 
 
-PATHS = [[0.0, 3.0, 5.0, 2.0, -1.0], [0.0, -2.0, -4.0, -6.0, -3.0], [0.0, 1.0, 6.0, 9.0, 4.0],
-         [0.0, 0.5, -1.0, 2.5, 7.0]]
+PATHS = [
+    [0.0, 3.0, 5.0, 2.0, -1.0],
+    [0.0, -2.0, -4.0, -6.0, -3.0],
+    [0.0, 1.0, 6.0, 9.0, 4.0],
+    [0.0, 0.5, -1.0, 2.5, 7.0],
+]
 GRID = [0.0, 0.25, 0.5, 0.75, 1.0]
 
 
@@ -160,9 +180,21 @@ def test_total_ee_is_the_sum_over_sets_and_zero_csa_removes_exposure() -> None:
 
 
 def test_own_hazard_zero_gives_no_dva() -> None:
-    out = xva.adjustments([0.5, 1.0], [0.99, 0.98], [10.0, 12.0], [-5.0, -4.0],
-                          xva.Name(0.02, 0.4), xva.Name(0.0, 0.4), 0.01, 0.01, True,
-                          None, None, None, None)
+    out = xva.adjustments(
+        [0.5, 1.0],
+        [0.99, 0.98],
+        [10.0, 12.0],
+        [-5.0, -4.0],
+        xva.Name(0.02, 0.4),
+        xva.Name(0.0, 0.4),
+        0.01,
+        0.01,
+        True,
+        None,
+        None,
+        None,
+        None,
+    )
     assert out["dva"] == 0.0 and out["fba"] == pytest.approx(0.01 / 0.01 * out["fba"])
 
 
@@ -173,8 +205,10 @@ def test_wwr_without_dependence_is_the_independent_cva() -> None:
     out: dict[str, Any] = xva.wwr_cva(times, values, dfs, 0.03, 0.4, 0.0)
     ee = [sum(max(p[i], 0.0) for p in values) / 4 for i in range(4)]
     prev = [0.0, *times[:-1]]
-    indep = 0.6 * sum(d * e * (math.exp(-0.03 * p) - math.exp(-0.03 * t))
-                      for d, e, t, p in zip(dfs, ee, times, prev, strict=True))
+    indep = 0.6 * sum(
+        d * e * (math.exp(-0.03 * p) - math.exp(-0.03 * t))
+        for d, e, t, p in zip(dfs, ee, times, prev, strict=True)
+    )
     assert out["cva"] == pytest.approx(indep, rel=1e-13)
     wrong = xva.wwr_cva(times, values, dfs, 0.03, 0.4, 0.3)["cva"]
     right = xva.wwr_cva(times, values, dfs, 0.03, 0.4, -0.2)["cva"]
@@ -201,8 +235,9 @@ def test_reverse_stress_linear_limit_and_horizon_sqrt_rule() -> None:
 def test_f3_analytic_sensitivities_match_bumps() -> None:
     base = risk_tools.dividend_borrow(100, 100, 1, 0.03, 0.02, 0.005, 0.25, "PUT")
     up = risk_tools.dividend_borrow(100, 100, 1, 0.03, 0.02 + 1e-6, 0.005, 0.25, "PUT")
-    assert base["dividend01"] == pytest.approx((up["price"] - base["price"]) / 1e-6 * 1e-4,
-                                               rel=1e-4)
+    assert base["dividend01"] == pytest.approx(
+        (up["price"] - base["price"]) / 1e-6 * 1e-4, rel=1e-4
+    )
     args = (100.0, 95.0, 1.0, 1.0, 0.01, 0.02, 0.3, 0.25)
     c = risk_tools.correlation01(*args, 0.5, 1.0)
     hi = risk_tools.correlation01(*args, 0.5 + 1e-6, 1.0)["price"]
@@ -236,8 +271,17 @@ def test_portfolio_single_swap_reproduces_wave_4a_and_pfe_order() -> None:
     from quantforge_core import portfolio_exposure
 
     pay = [1.0, 2.0, 3.0, 4.0, 5.0]
-    out = portfolio_exposure.portfolio_hw(TIMES, DFS, 0.05, 0.01, [(1e7, 0.03, "PAY", 0.0, pay)],
-                                          [1.0, 2.0, 3.0, 4.0], [0.95, 0.99], 0.02, 0.4)
+    out = portfolio_exposure.portfolio_hw(
+        TIMES,
+        DFS,
+        0.05,
+        0.01,
+        [(1e7, 0.03, "PAY", 0.0, pay)],
+        [1.0, 2.0, 3.0, 4.0],
+        [0.95, 0.99],
+        0.02,
+        0.4,
+    )
     m = shortrate.curve_model(TIMES, DFS, 0.05, 0.01)
     wave4a = shortrate.swap_ee_hw(m, 0.0, pay, 0.03, "PAY", 1e7, [1.0, 2.0, 3.0, 4.0], 0.02, 0.4)
     ee, ref = out["discounted_ee"], wave4a["discounted_ee"]
@@ -255,6 +299,14 @@ def test_portfolio_offsetting_swaps_have_no_exposure() -> None:
 
     pay = [1.0, 2.0, 3.0]
     out = portfolio_exposure.portfolio_hw(
-        TIMES, DFS, 0.05, 0.01, [(1e6, 0.03, "PAY", 0.0, pay), (1e6, 0.03, "RECEIVE", 0.0, pay)],
-        [1.0, 2.0], [0.95], 0.02, 0.4)
+        TIMES,
+        DFS,
+        0.05,
+        0.01,
+        [(1e6, 0.03, "PAY", 0.0, pay), (1e6, 0.03, "RECEIVE", 0.0, pay)],
+        [1.0, 2.0],
+        [0.95],
+        0.02,
+        0.4,
+    )
     assert out["discounted_ee"] == [0.0, 0.0] and out["deflated_pfe_95"] == [0.0, 0.0]

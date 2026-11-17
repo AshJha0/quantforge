@@ -1,0 +1,166 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgesign_j",
+ "spec": "specifications/08-hedging/hedge-solvers.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_j_qpcut.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgesign_j-0001",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.0,
+     -1000.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      0.0
+     ]
+    ],
+    "eq_rhs": [
+     1e-09
+    ],
+    "half_spreads": [
+     0.1,
+     0.1
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1e-09,
+      999.95
+     ],
+     "residual": [
+      -0.999999999,
+      -0.05
+     ],
+     "objective": 100.99749999810001,
+     "rank": 1,
+     "risk": 1.002499998,
+     "cost": 99.9950000001
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "fractions KKT enumeration"
+   ],
+   "tags": [
+    "stage_j",
+    "hedge",
+    "qp",
+    "costs",
+    "synthetic"
+   ],
+   "description": "equality x_0 = 1e-9 with x_1 near 1000: x_0 is under the R6-6.1 kink tolerance 1e-11 * 1000, so the first orthant fixed it at 0 and had no feasible point; Rust returned the split point (x_0 = 1.004e-9, x_1 = 999.949). Exact x = (1e-9, 999.95) (J-I.2)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-11,
+    "reason": "J-I.2: x_0 = 1e-9 is set by an equality; the split point was 4e-12 off it"
+   }
+  },
+  {
+   "case_id": "hedgesign_j-0002",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.0,
+     1000.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      0.0
+     ]
+    ],
+    "eq_rhs": [
+     -1e-09
+    ],
+    "half_spreads": [
+     0.1,
+     0.1
+    ],
+    "lower": [
+     null,
+     -2000.0
+    ],
+    "upper": [
+     null,
+     2000.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -1e-09,
+      -999.95
+     ],
+     "residual": [
+      -1.000000001,
+      0.05
+     ],
+     "objective": 100.99750000210001,
+     "rank": 1,
+     "risk": 1.0025000020000001,
+     "cost": 99.9950000001
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "fractions KKT enumeration"
+   ],
+   "tags": [
+    "stage_j",
+    "hedge",
+    "qp",
+    "costs",
+    "synthetic"
+   ],
+   "description": "mirror of the previous case with a bound: x_0 = -1e-9 forced, x_1 = -999.95 inside its box (J-I.2)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-11,
+    "reason": "J-I.2: x_0 = 1e-9 is set by an equality; the split point was 4e-12 off it"
+   }
+  }
+ ]
+}

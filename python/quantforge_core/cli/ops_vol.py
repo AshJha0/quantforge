@@ -1,4 +1,5 @@
 """Handlers for the vol verbs. A handler reads every input first; the first call through `core`, the gated core modules, ends the E_SCHEMA stage."""
+
 from typing import Any
 
 from ..sabr import Sabr
@@ -46,36 +47,57 @@ def _equity_price(i: Inputs) -> Any:
     r = core.equity.outright(*args)
     g = core.black.equity_option(r, option_type, strike, vol, quantity, side)
     return {
-        "valuation": _valuation(g["pv"], currency, args[1], snapshot_id), "forward": r.forward,
-        "delta": g["delta"], "gamma": g["gamma"], "vega": g["vega"],
+        "valuation": _valuation(g["pv"], currency, args[1], snapshot_id),
+        "forward": r.forward,
+        "delta": g["delta"],
+        "gamma": g["gamma"],
+        "vega": g["vega"],
     }
 
 
 def _delta_args(i: Inputs) -> tuple[Any, ...]:
     _present(i, "scale")
-    return (i.enum("convention", ("FORWARD", "SPOT")),
-            i.real("scale") if i.has("scale") else None)
+    return (i.enum("convention", ("FORWARD", "SPOT")), i.real("scale") if i.has("scale") else None)
 
 
 @op("vol.delta.to_strike")
 def _to_strike(i: Inputs) -> Any:
-    args = (i.real("forward"), i.real("vol"), i.real("expiry_years"),
-            i.enum("option_type", OPTIONS), i.real("delta"), *_delta_args(i))
+    args = (
+        i.real("forward"),
+        i.real("vol"),
+        i.real("expiry_years"),
+        i.enum("option_type", OPTIONS),
+        i.real("delta"),
+        *_delta_args(i),
+    )
     return {"strike": core.smile.delta_to_strike(*args)}
 
 
 @op("vol.delta.from_strike")
 def _from_strike(i: Inputs) -> Any:
-    args = (i.real("forward"), i.real("vol"), i.real("expiry_years"),
-            i.enum("option_type", OPTIONS), i.real("strike"), *_delta_args(i))
+    args = (
+        i.real("forward"),
+        i.real("vol"),
+        i.real("expiry_years"),
+        i.enum("option_type", OPTIONS),
+        i.real("strike"),
+        *_delta_args(i),
+    )
     return {"delta": core.smile.delta_from_strike(*args)}
 
 
 @op("vol.smile.rr_bf")
 def _rr_bf(i: Inputs) -> Any:
-    args = (i.real("forward"), i.real("expiry_years"), i.real("atm_vol"),
-            i.enum("atm_convention", ("ATM_FORWARD", "DELTA_NEUTRAL")), i.real("rr"), i.real("bf"),
-            i.real("delta"), *_delta_args(i))
+    args = (
+        i.real("forward"),
+        i.real("expiry_years"),
+        i.real("atm_vol"),
+        i.enum("atm_convention", ("ATM_FORWARD", "DELTA_NEUTRAL")),
+        i.real("rr"),
+        i.real("bf"),
+        i.real("delta"),
+        *_delta_args(i),
+    )
     return core.smile.rr_bf(*args)
 
 
@@ -103,8 +125,13 @@ def _svi_calibrate(i: Inputs) -> Any:
 
 @op("vol.ssvi.evaluate")
 def _ssvi_evaluate(i: Inputs) -> Any:
-    args = (i.real("rho"), i.real("eta"), i.real("gamma"), i.reals("thetas"),
-            i.reals("log_moneyness"))
+    args = (
+        i.real("rho"),
+        i.real("eta"),
+        i.real("gamma"),
+        i.reals("thetas"),
+        i.reals("log_moneyness"),
+    )
     return core.smile.ssvi_evaluate(*args)
 
 
@@ -130,8 +157,15 @@ def _surface_check(i: Inputs) -> Any:
 
 
 def _sabr(i: Inputs) -> Sabr:
-    return Sabr(i.real("forward"), i.real("expiry_years"), i.real("alpha"), i.real("beta"),
-                i.real("rho"), i.real("nu"), _opt_shift(i))
+    return Sabr(
+        i.real("forward"),
+        i.real("expiry_years"),
+        i.real("alpha"),
+        i.real("beta"),
+        i.real("rho"),
+        i.real("nu"),
+        _opt_shift(i),
+    )
 
 
 @op("vol.sabr.hagan")
@@ -142,24 +176,40 @@ def _sabr_hagan(i: Inputs) -> Any:
 
 @op("vol.sabr.density")
 def _sabr_density(i: Inputs) -> Any:
-    args = (_sabr(i), i.reals("strikes"), i.real("h_strike"),
-            i.enum("on_negative", ("REPORT", "REJECT")))
+    args = (
+        _sabr(i),
+        i.reals("strikes"),
+        i.real("h_strike"),
+        i.enum("on_negative", ("REPORT", "REJECT")),
+    )
     values, low, negative = core.sabr.density(*args)
     return {"density": values, "min_density": low, "negative_density": negative}
 
 
 @op("vol.sabr.calibrate")
 def _sabr_calibrate(i: Inputs) -> Any:
-    args = (i.real("forward"), i.real("expiry_years"), i.real("beta"), _opt_shift(i),
-            i.reals("strikes"), i.reals("vols"), _opt_weights(i))
+    args = (
+        i.real("forward"),
+        i.real("expiry_years"),
+        i.real("beta"),
+        _opt_shift(i),
+        i.reals("strikes"),
+        i.reals("vols"),
+        _opt_weights(i),
+    )
     alpha, rho, nu, rmse = core.sabr.calibrate(*args)
     return {"alpha": alpha, "rho": rho, "nu": nu, "rmse": rmse}
 
 
 @op("vol.sabr.arbfree")
 def _sabr_arbfree(i: Inputs) -> Any:
-    args = (_sabr(i), i.integer("cells"), i.integer("cells_below"), i.integer("steps"),
-            i.reals("strikes"))
+    args = (
+        _sabr(i),
+        i.integer("cells"),
+        i.integer("cells_below"),
+        i.integer("steps"),
+        i.reals("strikes"),
+    )
     return core.sabr.arbfree(*args)
 
 
@@ -177,29 +227,45 @@ def _weights(i: Inputs) -> tuple[float, float, float]:
 
 @op("vol.garch.loglik")
 def _garch_loglik(i: Inputs) -> Any:
-    distribution = (i.enum("distribution", ("NORMAL", "STUDENT_T"))
-                    if i.raw.get("distribution") is not None else "NORMAL")
+    distribution = (
+        i.enum("distribution", ("NORMAL", "STUDENT_T"))
+        if i.raw.get("distribution") is not None
+        else "NORMAL"
+    )
     nu = i.opt_real("degrees_of_freedom") if distribution == "STUDENT_T" else None
-    args = (i.reals("returns"), *_weights(i), _initial_variance(i), distribution, nu,
-            i.opt_real("mean", 0.0))
+    args = (
+        i.reals("returns"),
+        *_weights(i),
+        _initial_variance(i),
+        distribution,
+        nu,
+        i.opt_real("mean", 0.0),
+    )
     loglik, variances, nxt = core.variance.garch_loglik_t(*args)
     return {"loglik": loglik, "variances": variances, "next_variance": nxt}
 
 
 @op("vol.garch.estimate")
 def _garch_estimate(i: Inputs) -> Any:
-    args = (i.reals("returns"), _initial_variance(i),
-            i.enum("distribution", ("NORMAL", "STUDENT_T")), i.boolean("demean"))
+    args = (
+        i.reals("returns"),
+        _initial_variance(i),
+        i.enum("distribution", ("NORMAL", "STUDENT_T")),
+        i.boolean("demean"),
+    )
     return core.variance.garch_estimate(*args)
 
 
 @op("vol.garch.forecast")
 def _garch_forecast(i: Inputs) -> Any:
-    args = (*_weights(i), i.real("next_variance"), i.integer("horizon"),
-            i.real("periods_per_year"))
+    args = (*_weights(i), i.real("next_variance"), i.integer("horizon"), i.real("periods_per_year"))
     variances, total, vol, long_run = core.variance.garch_forecast(*args)
-    return {"variances": variances, "total_variance": total, "annualized_vol": vol,
-            "long_run_variance": long_run}
+    return {
+        "variances": variances,
+        "total_variance": total,
+        "annualized_vol": vol,
+        "long_run_variance": long_run,
+    }
 
 
 @op("vol.garch.fit")
@@ -209,18 +275,31 @@ def _garch_fit(i: Inputs) -> Any:
 
 @op("vol.varswap.fair_strike")
 def _fair_strike(i: Inputs) -> Any:
-    args = (i.date("as_of"), i.date("maturity"), i.real("spot"), i.real("rate"),
-            i.real("dividend_yield"), i.reals("put_strikes"), i.reals("call_strikes"),
-            [(v.real("strike"), v.real("vol")) for v in _objects(i, "vols")],
-            i.real("extension_step"), i.real("variance_strike"), i.real("variance_notional"))
+    args = (
+        i.date("as_of"),
+        i.date("maturity"),
+        i.real("spot"),
+        i.real("rate"),
+        i.real("dividend_yield"),
+        i.reals("put_strikes"),
+        i.reals("call_strikes"),
+        [(v.real("strike"), v.real("vol")) for v in _objects(i, "vols")],
+        i.real("extension_step"),
+        i.real("variance_strike"),
+        i.real("variance_notional"),
+    )
     fair, vol, pv = core.variance.varswap_fair_strike(*args)
     return {"fair_variance": fair, "fair_vol": vol, "pv": pv}
 
 
 @op("vol.varswap.realized")
 def _realized(i: Inputs) -> Any:
-    args = (i.reals("prices"), i.real("periods_per_year"), i.real("variance_strike"),
-            i.real("variance_notional"))
+    args = (
+        i.reals("prices"),
+        i.real("periods_per_year"),
+        i.real("variance_strike"),
+        i.real("variance_notional"),
+    )
     variance, vol, payoff = core.variance.varswap_realized(*args)
     return {"realized_variance": variance, "realized_vol": vol, "payoff": payoff}
 
@@ -272,8 +351,12 @@ def _ssvi_to_svi(i: Inputs) -> Any:
 
 @op("vol.svi.fit_surface")
 def _fit_surface(i: Inputs) -> Any:
-    args = (i.reals("expiry_years"), i.reals("log_moneyness"), i.matrix("total_variance"),
-            i.boolean("reject"))
+    args = (
+        i.reals("expiry_years"),
+        i.reals("log_moneyness"),
+        i.matrix("total_variance"),
+        i.boolean("reject"),
+    )
     slices, rmse, report = core.arb_surface.fit_surface(*args)
     fitted = [{"expiry_years": s.expiry_years, "svi": _svi_out(s.svi)} for s in slices]
     return {"slices": fitted, "rmse": rmse, **report}
@@ -293,9 +376,17 @@ def _forward_vol(i: Inputs) -> Any:
 
 @op("vol.smile.dynamics")
 def _smile_dynamics(i: Inputs) -> Any:
-    args = (_svi(i), i.real("expiry_years"), i.real("spot"), i.real("spot_shifted"),
-            i.real("rate"), i.real("dividend_yield"), i.reals("strikes"),
-            i.enum("rule", ("STICKY_STRIKE", "STICKY_DELTA")), i.enum("option_type", ("CALL", "PUT")))
+    args = (
+        _svi(i),
+        i.real("expiry_years"),
+        i.real("spot"),
+        i.real("spot_shifted"),
+        i.real("rate"),
+        i.real("dividend_yield"),
+        i.reals("strikes"),
+        i.enum("rule", ("STICKY_STRIKE", "STICKY_DELTA")),
+        i.enum("option_type", ("CALL", "PUT")),
+    )
     return core.arb_surface.smile_dynamics(*args)
 
 
@@ -321,8 +412,13 @@ def _jumps(i: Inputs) -> Any:
 
 
 def _common(i: Inputs) -> tuple[float, list[float], float, float, float]:
-    return (i.real("spot"), i.reals("strikes"), i.real("expiry_years"), i.real("rate"),
-            i.real("dividend_yield"))
+    return (
+        i.real("spot"),
+        i.reals("strikes"),
+        i.real("expiry_years"),
+        i.real("rate"),
+        i.real("dividend_yield"),
+    )
 
 
 @op("vol.heston.price")
@@ -354,8 +450,21 @@ def _slv(i: Inputs) -> Any:
     from ..heston import Grid
 
     g = i.object("grid")
-    grid = Grid(g.integer("nx"), g.integer("nv"), g.integer("nt"), g.real("x_min"),
-                g.real("x_max"), g.real("v_max"))
-    args = (i.real("spot"), i.real("expiry_years"), i.real("rate"), i.real("dividend_yield"),
-            _heston(i), _slices(i), grid)
+    grid = Grid(
+        g.integer("nx"),
+        g.integer("nv"),
+        g.integer("nt"),
+        g.real("x_min"),
+        g.real("x_max"),
+        g.real("v_max"),
+    )
+    args = (
+        i.real("spot"),
+        i.real("expiry_years"),
+        i.real("rate"),
+        i.real("dividend_yield"),
+        _heston(i),
+        _slices(i),
+        grid,
+    )
     return core.heston.slv_leverage(*args)

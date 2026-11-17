@@ -4,6 +4,7 @@
 ratio of a study uses N = the number of distinct trial ids logged for it, never a smaller number. `register` appends a
 trial before it is run, so the count cannot be lowered after the fact.
 """
+
 from __future__ import annotations
 
 import csv

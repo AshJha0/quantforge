@@ -10,15 +10,23 @@ Operations with no Real input anywhere in their goldens are exempt (they cannot 
 written to conformance/E1_EXEMPT.json and checked by tools/check_e1_coverage.py.
 
     cd oracle/python && uv run python -W ignore gen_r6_e1.py
+    cd oracle/python && uv run python -W ignore gen_r6_e1.py J   # stage J: e1_j for operations still uncovered
+
+Mode J writes datasets/golden/stage_j/e1_j.json for the operations that e1_r6 and every other golden leave uncovered
+(stage J waves 1 to 3 and the curves operations), so the e1_r6 case ids stay as they are. It does not rewrite
+conformance/E1_EXEMPT.json beyond adding newly exempt operations (no Real input in any golden).
 """
 import copy
 import json
+import sys
 from pathlib import Path
 
 from qf_oracle import common
 from qf_oracle.common import Suite, note
 
 G = "oracle/python/gen_r6_e1.py"
+STAGE_J = "J" in sys.argv[1:]
+SUITE, OUT_DIR = ("e1_j", "stage_j") if STAGE_J else ("e1_r6", "r6")
 ROOT = Path(__file__).resolve().parents[2]
 NF = {"NaN", "Infinity", "-Infinity"}
 
@@ -54,7 +62,7 @@ def main():
     ops = sorted(json.loads((ROOT / "specifications" / "name-map.json").read_text(encoding="utf-8"))["operations"])
     first, covered, any_real = {}, set(), {}
     for p in sorted((ROOT / "datasets" / "golden").rglob("*.json")):
-        if p.parent.name == "r6" and p.stem == "e1_r6":
+        if p.parent.name == OUT_DIR and p.stem == SUITE:
             continue
         for c in json.loads(p.read_text(encoding="utf-8")).get("cases", []):
             op = c["operation"]
@@ -63,7 +71,7 @@ def main():
             if c["expected"]["status"] == "ok" and op not in first and "limit" not in c["case_id"] and "limit" not in c.get("tags", []):
                 first[op] = c
             any_real[op] = any_real.get(op, False) or any(True for _ in real_paths(c["inputs"]))
-    s = Suite("e1_r6", "specifications/stage-f-rulings.md", G)
+    s = Suite(SUITE, "specifications/stage-f-rulings.md", G)
     exempt = {}
     for op in ops:
         if op in covered:
@@ -85,9 +93,17 @@ def main():
             if len(paths) == 1:
                 break
     keep = common.GOLDEN
-    common.GOLDEN = keep.parent / "r6"
+    common.GOLDEN = keep.parent / OUT_DIR
     s.write()
     common.GOLDEN = keep
+    if STAGE_J:
+        known = json.loads((ROOT / "conformance" / "E1_EXEMPT.json").read_text(encoding="utf-8"))
+        assert set(known) <= set(exempt), f"an exempt operation gained a Real input: {sorted(set(known) - set(exempt))}"
+        (ROOT / "conformance" / "E1_EXEMPT.json").write_text(json.dumps(exempt, indent=1, sort_keys=True) + "\n",
+                                                             encoding="utf-8", newline="\n")
+        note(f"exempt: {len(exempt)} operations, new {sorted(set(exempt) - set(known))}")
+        note(f"{SUITE}: {len(s.cases)} cases for {len({c['operation'] for c in s.cases})} operations")
+        return
     (ROOT / "conformance" / "E1_EXEMPT.json").write_text(json.dumps(exempt, indent=1, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
     note(f"e1_r6: {len(s.cases)} cases for {len({c['operation'] for c in s.cases})} operations; {len(exempt)} exempt")
 

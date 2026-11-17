@@ -1,4 +1,5 @@
 """Dense linear algebra (specifications/01-core/differentiation-and-linalg.md)."""
+
 import math
 from collections.abc import Sequence
 

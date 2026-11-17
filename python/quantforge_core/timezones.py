@@ -3,6 +3,7 @@
 Instants and local times are whole seconds since 1970-01-01T00:00:00, the first in UTC and the
 second on the local clock. The rules are written here, not read from a timezone database.
 """
+
 from datetime import date, timedelta
 
 from . import _cal, calendars
@@ -16,8 +17,11 @@ DAY = 86400
 _EPOCH = date(1970, 1, 1).toordinal()
 _SUNDAY = 6
 _STANDARD = {
-    "UTC": 0, "Europe/London": 0, "Europe/Berlin": HOUR,
-    "America/New_York": -5 * HOUR, "Asia/Tokyo": 9 * HOUR,
+    "UTC": 0,
+    "Europe/London": 0,
+    "Europe/Berlin": HOUR,
+    "America/New_York": -5 * HOUR,
+    "Asia/Tokyo": 9 * HOUR,
 }
 
 

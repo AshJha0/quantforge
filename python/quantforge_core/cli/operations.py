@@ -1,5 +1,6 @@
 """The operation table. Importing the handler modules registers every verb (registry.py); the
 table is REGISTRY itself, so it cannot drift from the handlers."""
+
 from . import (  # noqa: F401 - imported to register their verbs
     ops_bonds,
     ops_book,
@@ -18,6 +19,7 @@ from . import (  # noqa: F401 - imported to register their verbs
     ops_research,
     ops_risk,
     ops_shortrate,
+    ops_term_curves,
     ops_usecases,
     ops_vol,
 )

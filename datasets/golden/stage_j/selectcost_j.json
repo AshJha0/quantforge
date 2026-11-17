@@ -1,0 +1,143 @@
+{
+ "schema_version": "1.0",
+ "suite": "selectcost_j",
+ "spec": "specifications/08-hedging/instrument-selection.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_j_qpcut.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "selectcost_j-0001",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.0,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "max_instruments": 1,
+    "half_spreads": [
+     0.1,
+     0.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "ruling J-I.3"
+   ],
+   "tags": [
+    "stage_j",
+    "hedge",
+    "selection",
+    "error",
+    "synthetic"
+   ],
+   "description": "half_spreads given to selection: E_INPUT, not silently dropped (J-I.3, as I-33)"
+  },
+  {
+   "case_id": "selectcost_j-0002",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.0,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "max_instruments": 1,
+    "margin_rates": [
+     1.0,
+     1.0
+    ],
+    "margin_limit": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "ruling J-I.3"
+   ],
+   "tags": [
+    "stage_j",
+    "hedge",
+    "selection",
+    "error",
+    "synthetic"
+   ],
+   "description": "margin_rates and margin_limit given to selection: E_INPUT (J-I.3)"
+  },
+  {
+   "case_id": "selectcost_j-0003",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.0,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "max_instruments": 1,
+    "cost_weight": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "ruling J-I.3"
+   ],
+   "tags": [
+    "stage_j",
+    "hedge",
+    "selection",
+    "error",
+    "synthetic"
+   ],
+   "description": "cost_weight alone given to selection: E_INPUT (J-I.3)"
+  }
+ ]
+}

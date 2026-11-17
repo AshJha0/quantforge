@@ -1,0 +1,219 @@
+"""Stage J integration lane: the active-set rank cut of `hedge.qp.solve` is taken after Jacobi scaling.
+
+Spec: specifications/08-hedging/hedge-solvers.md; ruling specifications/stage-j-rulings.md J-I.1 (applies R6-6.2).
+Also J-I.2 (suite hedgesign_j: an equality forcing a coordinate under the kink tolerance; the enumeration carries
+the equality multipliers), J-I.3 (suite selectcost_j: selection refuses cost and margin inputs) and J-I.4 (suite
+minvarconst_j: a constant series in `hedge.minvar.ratio` has sample variance exactly 0; hand check: every deviation
+from the mean of a constant series is 0, so its variance and every covariance with it are 0).
+
+Python's primal active-set step dropped a reduced direction whose squared singular value was at or below 1e-12
+times the largest eigenvalue of H, in the caller's units. A 1e-7 exposure against a unit one fell below that cut,
+so with any bound present the instrument was treated as absent (x = [0, 0], objective 1, true optimum 0). Java,
+C++ and Rust (dual active set on a positive definite, or pre-scaled, Hessian) already returned the true optimum.
+
+Independent oracle: exact rational arithmetic (fractions) on the binary64 inputs. Every pattern of the KKT
+conditions is enumerated (each instrument at its lower bound, at its upper bound, at the kink 0, or free on one
+side of it); the stationarity system of each pattern is solved exactly and the pattern is kept only when every
+primal and subgradient condition holds. H is positive definite and the cost convex, so the KKT point is the unique
+minimiser; the generator asserts that every surviving pattern gives the same x. Hand check for case 1:
+(1e-7 x1 + 1)^2 + x2^2 with x2 = 0 is zero at x1 = -1e7.
+
+    cd oracle/python && uv run python -W ignore gen_stage_j_qpcut.py
+"""
+import itertools
+from fractions import Fraction as Fr
+
+from qf_oracle import common
+from qf_oracle.common import Suite, note
+
+G = "oracle/python/gen_stage_j_qpcut.py"
+FOLDER = "stage_j"
+SPEC = "specifications/08-hedging/hedge-solvers.md"
+OP = "hedge.qp.solve"
+LIMIT = {"absolute": 1e-10, "relative": 1e-9,
+         "reason": "J-I.1 / R6-6.2: positions near 1e7 against unit ones; relative, as r6/hedgescale_r6"}
+
+
+def solve(m, v):
+    """Exact Gauss-Jordan; None when singular."""
+    n = len(v)
+    a = [row[:] + [v[i]] for i, row in enumerate(m)]
+    for c in range(n):
+        p = next((r for r in range(c, n) if a[r][c] != 0), None)
+        if p is None:
+            return None
+        a[c], a[p] = a[p], a[c]
+        for r in range(n):
+            if r != c and a[r][c] != 0:
+                f = a[r][c] / a[c][c]
+                a[r] = [x - f * y for x, y in zip(a[r], a[c])]
+    return [a[i][n] / a[i][i] for i in range(n)]
+
+
+def reference(inp):
+    a = [[Fr(x) for x in row] for row in inp["a"]]
+    b = [Fr(x) for x in inp["b"]]
+    w = [Fr(x) for x in inp["weights"]]
+    n = len(a[0])
+    hs = [Fr(x) for x in inp.get("half_spreads", [0.0] * n)]
+    lo = [None if x is None else Fr(x) for x in inp.get("lower", [None] * n)]
+    hi = [None if x is None else Fr(x) for x in inp.get("upper", [None] * n)]
+    h = [[2 * sum(w[i] * a[i][j] * a[i][k] for i in range(len(b))) for k in range(n)] for j in range(n)]
+    g = [2 * sum(w[i] * a[i][j] * b[i] for i in range(len(b))) for j in range(n)]
+    e = [[Fr(x) for x in row] for row in inp.get("eq_matrix", [])]
+    er = [Fr(x) for x in inp.get("eq_rhs", [])]
+    p = len(e)
+    found = []
+    for pat in itertools.product("LUZPN", repeat=n):
+        x, ok, free = [None] * n, True, []
+        for j, s in enumerate(pat):
+            if s == "L":
+                ok &= lo[j] is not None
+                x[j] = lo[j]
+            elif s == "U":
+                ok &= hi[j] is not None
+                x[j] = hi[j]
+            elif s == "Z":
+                ok &= hs[j] > 0
+                x[j] = Fr(0)
+            elif s == "N":
+                ok &= hs[j] > 0  # a smooth instrument is free once, as "P"
+                free.append(j)
+            else:
+                free.append(j)
+        if not ok:
+            continue
+        sign = {j: (-1 if pat[j] == "N" else 1 if hs[j] > 0 else 0) for j in free}
+        fixed = [j for j in range(n) if j not in free]
+        lam = [Fr(0)] * p
+        if free or p:
+            # Stationarity of the free instruments with the equality multipliers (J-I.2):
+            # [H_FF E_F^T; E_F 0] [x_F; lam] = [-(g_F + H_FX x_X + hs_F s_F); r - E_X x_X].
+            m = [[h[j][k] for k in free] + [e[i][j] for i in range(p)] for j in free]
+            m += [[e[i][k] for k in free] + [Fr(0)] * p for i in range(p)]
+            v = [-(g[j] + sum(h[j][k] * x[k] for k in fixed) + hs[j] * sign[j]) for j in free]
+            v += [er[i] - sum(e[i][k] * x[k] for k in fixed) for i in range(p)]
+            y = solve(m, v)
+            if y is None:
+                continue
+            for j, val in zip(free, y):
+                x[j] = val
+            lam = y[len(free):]
+        grad = [g[j] + sum(h[j][k] * x[k] for k in range(n)) + sum(e[i][j] * lam[i] for i in range(p))
+                for j in range(n)]
+
+        for j in range(n):
+            ok &= (lo[j] is None or x[j] >= lo[j]) and (hi[j] is None or x[j] <= hi[j])
+            if not ok:
+                break
+            s = pat[j]
+            if s in "PN" and hs[j] > 0:
+                ok &= (x[j] >= 0) if s == "P" else (x[j] <= 0)
+            elif s in "LU" and not (lo[j] is not None and hi[j] is not None and lo[j] == hi[j]):
+                up = grad[j] + (hs[j] if x[j] >= 0 else -hs[j])    # right derivative
+                down = grad[j] + (hs[j] if x[j] > 0 else -hs[j])   # left derivative
+                ok &= up >= 0 if s == "L" else down <= 0
+            elif s == "Z":
+                ok &= abs(grad[j]) <= hs[j]
+        if ok:
+            found.append(x)
+    assert found, "no KKT point"
+    assert all(f == found[0] for f in found), "KKT point not unique"
+    x = found[0]
+    r = [sum(a[i][j] * x[j] for j in range(n)) + b[i] for i in range(len(b))]
+    risk = sum(w[i] * r[i] * r[i] for i in range(len(b)))
+    cost = sum(hs[j] * abs(x[j]) for j in range(n))
+    out = {"x": [float(v) for v in x], "residual": [float(v) for v in r], "objective": float(risk + cost),
+           "rank": n - p}
+    if "half_spreads" in inp:
+        out["risk"], out["cost"] = float(risk), float(cost)
+    return out
+
+
+CASES = [
+    (("a = diag(1e-7, 1), x2 fixed at 0 by its bounds: x1 = -1e7, objective 0. The unscaled active-set cut "
+      "(1e-12 of the largest eigenvalue of H) dropped x1 and gave [0, 0], objective 1 (J-I.1, R6-6.2)"),
+     {"a": [[1e-7, 0.0], [0.0, 1.0]], "b": [1.0, 0.0], "weights": [1.0, 1.0],
+      "lower": [None, 0.0], "upper": [None, 0.0]}),
+    ("as case 1 with a half spread on x2: the costed (orthant) active set had the same unscaled cut (J-I.1)",
+     {"a": [[1e-7, 0.0], [0.0, 1.0]], "b": [1.0, 0.0], "weights": [1.0, 1.0],
+      "lower": [None, 0.0], "upper": [None, 0.0], "half_spreads": [0.0, 0.1]}),
+    ("half spread 1e-9 on the small column: the kink stops x1 at -9.95e6 (residual 0.005); x2 at the kink (J-I.1)",
+     {"a": [[1e-7, 0.0], [0.0, 1.0]], "b": [1.0, 0.0], "weights": [1.0, 1.0],
+      "lower": [None, -1.0], "upper": [None, 1.0], "half_spreads": [1e-9, 0.1]}),
+    ("box on both instruments, none active at the optimum x = [-1e7, -0.5] (J-I.1)",
+     {"a": [[1e-7, 0.0], [0.0, 1.0]], "b": [1.0, 0.5], "weights": [1.0, 1.0],
+      "lower": [-2e7, -1.0], "upper": [None, 1.0]}),
+]
+
+
+SIGN_LIMIT = {"absolute": 1e-12, "relative": 1e-11,
+              "reason": "J-I.2: x_0 = 1e-9 is set by an equality; the split point was 4e-12 off it"}
+SIGN_CASES = [
+    (("equality x_0 = 1e-9 with x_1 near 1000: x_0 is under the R6-6.1 kink tolerance 1e-11 * 1000, so the first "
+      "orthant fixed it at 0 and had no feasible point; Rust returned the split point (x_0 = 1.004e-9, "
+      "x_1 = 999.949). Exact x = (1e-9, 999.95) (J-I.2)"),
+     {"a": [[1.0, 0.0], [0.0, 1.0]], "b": [-1.0, -1000.0], "weights": [1.0, 1.0],
+      "eq_matrix": [[1.0, 0.0]], "eq_rhs": [1e-9], "half_spreads": [0.1, 0.1]}),
+    ("mirror of the previous case with a bound: x_0 = -1e-9 forced, x_1 = -999.95 inside its box (J-I.2)",
+     {"a": [[1.0, 0.0], [0.0, 1.0]], "b": [-1.0, 1000.0], "weights": [1.0, 1.0],
+      "eq_matrix": [[1.0, 0.0]], "eq_rhs": [-1e-9], "half_spreads": [0.1, 0.1],
+      "lower": [None, -2000.0], "upper": [None, 2000.0]}),
+]
+SELECT_SPEC = "specifications/08-hedging/instrument-selection.md"
+SELECT_BASE = {"a": [[1.0, 0.0], [0.0, 1.0]], "b": [-1.0, -1.0], "weights": [1.0, 1.0], "max_instruments": 1}
+SELECT_ERRORS = [
+    ("half_spreads given to selection: E_INPUT, not silently dropped (J-I.3, as I-33)",
+     dict(SELECT_BASE, half_spreads=[0.1, 0.1])),
+    ("margin_rates and margin_limit given to selection: E_INPUT (J-I.3)",
+     dict(SELECT_BASE, margin_rates=[1.0, 1.0], margin_limit=1.0)),
+    ("cost_weight alone given to selection: E_INPUT (J-I.3)", dict(SELECT_BASE, cost_weight=1.0)),
+]
+
+
+MV_SPEC = "specifications/08-hedging/hedge-solvers.md"
+# J-I.4: constant series. Three copies of 0.95 sum to 2.8499999999999996, so fsum / 3 is 0.9499999999999998 and the
+# rounded variance (1.2e-32) passed check 3, which then returned a hedge built from rounding (Hypothesis found it).
+MV_ERRORS = [
+    ("constant hedge series (0.95 three times): S_hh = 0, check 3", "E_SINGULAR",
+     {"exposure_changes": [0.0, 0.1, 0.2], "hedge_changes": [[0.95, 0.95, 0.95]]}),
+    ("constant second hedge series of two (0.7 five times): S_hh singular, check 3", "E_SINGULAR",
+     {"exposure_changes": [0.3, -0.1, 0.2, 0.5, -0.4], "hedge_changes": [[0.1, 0.4, -0.2, 0.3, 0.0], [0.7] * 5]}),
+    ("constant exposure series (0.95 three times): S_00 = 0, check 2", "E_DOMAIN",
+     {"exposure_changes": [0.95, 0.95, 0.95], "hedge_changes": [[0.0, 0.1, 0.2]]}),
+]
+
+
+def build():
+    s = Suite("hedgecut_j", SPEC, G)
+    for desc, inp in CASES:
+        s.add(OP, inp, outputs=reference(inp), cls="root_finding", verified=("fractions KKT enumeration",),
+              tags=("stage_j", "hedge", "qp", "scaling", "synthetic"), output_classes={"rank": "date_and_convention"},
+              limit=LIMIT, description=desc)
+    t = Suite("hedgesign_j", SPEC, G)
+    for desc, inp in SIGN_CASES:
+        t.add(OP, inp, outputs=reference(inp), cls="root_finding", verified=("fractions KKT enumeration",),
+              tags=("stage_j", "hedge", "qp", "costs", "synthetic"), output_classes={"rank": "date_and_convention"},
+              limit=SIGN_LIMIT, description=desc)
+    u = Suite("selectcost_j", SELECT_SPEC, G)
+    for desc, inp in SELECT_ERRORS:
+        u.add("hedge.select.solve", inp, error="E_INPUT", verified=("ruling J-I.3",),
+              tags=("stage_j", "hedge", "selection", "error", "synthetic"), description=desc)
+    v = Suite("minvarconst_j", MV_SPEC, G)
+    for desc, code, inp in MV_ERRORS:
+        v.add("hedge.minvar.ratio", inp, error=code, verified=("hand", "ruling J-I.4"),
+              tags=("stage_j", "hedge", "minvar", "error", "synthetic"), description=desc)
+    return [s, t, u, v]
+
+
+def main():
+    keep = common.GOLDEN
+    common.GOLDEN = keep.parent / FOLDER
+    for s in build():
+        s.write()
+    common.GOLDEN = keep
+    note("stage J qp cut: 4 + 2 value-checked cases, 3 + 3 error cases")
+
+
+if __name__ == "__main__":
+    main()

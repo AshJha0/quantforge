@@ -1,5 +1,6 @@
 """R10 / ruling F-17: continuity of w and implied vol at slice expiries, the stated local-vol jump,
 and smoothness inside an interval, on this build's own outputs (local-and-forward-vol.md)."""
+
 import itertools
 import math
 
@@ -18,7 +19,7 @@ KS = (-0.4, 0.0, 0.3)
 
 
 def _w(p: Svi, k: float) -> float:
-    return p.a + p.b * (p.rho * (k - p.m) + math.sqrt((k - p.m) ** 2 + p.sigma ** 2))
+    return p.a + p.b * (p.rho * (k - p.m) + math.sqrt((k - p.m) ** 2 + p.sigma**2))
 
 
 def _point(slices, t, k):

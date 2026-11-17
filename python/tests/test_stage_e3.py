@@ -1,5 +1,6 @@
 """Stage E, E3 FX smile unit tests: identities from fx-smile.md. The goldens run in
 test_conformance.py."""
+
 import math
 
 import pytest
@@ -32,9 +33,16 @@ def test_price_parity_and_greeks() -> None:
     assert call["vega"] == pytest.approx((up - down) / (2 * h), rel=1e-6)
 
 
-@pytest.mark.parametrize("bad", [(0.0, 1.1, 0.25, 0.075, 1.0), (1.0, 0.0, 0.25, 0.075, 1.0),
-                                 (1.0, 1.1, 0.0, 0.075, 1.0), (1.0, 1.1, 0.25, 0.0, 1.0),
-                                 (1.0, 1.1, 0.25, 0.075, 0.0)])
+@pytest.mark.parametrize(
+    "bad",
+    [
+        (0.0, 1.1, 0.25, 0.075, 1.0),
+        (1.0, 0.0, 0.25, 0.075, 1.0),
+        (1.0, 1.1, 0.0, 0.075, 1.0),
+        (1.0, 1.1, 0.25, 0.0, 1.0),
+        (1.0, 1.1, 0.25, 0.075, 0.0),
+    ],
+)
 def test_price_domain(bad) -> None:
     s, k, t, v, n = bad
     assert code(fx.option_price, s, k, t, 0.0, 0.0, v, "CALL", n) == "E_DOMAIN"
@@ -62,8 +70,10 @@ def test_pa_call_upper_root_and_maximum() -> None:
     delta = m.delta("FORWARD_PA", 1.0, low_strike)
     upper = fx.delta_to_strike(s, t, rd, rf, 0.16, "CALL", delta, "FORWARD_PA")
     assert upper > peak and m.delta("FORWARD_PA", 1.0, upper) == pytest.approx(delta)
-    assert code(fx.delta_to_strike, s, t, rd, rf, 0.16, "CALL", top * 1.0001,
-                "FORWARD_PA") == "E_DOMAIN"
+    assert (
+        code(fx.delta_to_strike, s, t, rd, rf, 0.16, "CALL", top * 1.0001, "FORWARD_PA")
+        == "E_DOMAIN"
+    )
 
 
 def test_to_strike_ranges() -> None:
@@ -108,20 +118,48 @@ def test_smile_from_quotes() -> None:
 _M = {"spot": 1.085, "expiry_years": 0.25, "domestic_rate": 0.043, "foreign_rate": 0.031}
 
 
-@pytest.mark.parametrize("operation,extra,key", [
-    ("fx.option.price", {"strike": 1.1, "vol": 0.075, "option_type": "PUT", "notional": 1e6},
-     "price"),
-    ("fx.delta.from_strike", {"strike": 1.1, "vol": 0.075, "option_type": "CALL"}, "deltas"),
-    ("fx.delta.to_strike", {"vol": 0.075, "option_type": "CALL", "delta": 0.25,
-                            "delta_type": "SPOT_PA"}, "strike"),
-    ("fx.atm.strike", {"vol": 0.075, "atm_type": "DNS", "delta_type": "FORWARD"}, "strike"),
-    ("fx.smile.from_quotes", {"atm_vol": 0.075, "rr": -0.0045, "bf": 0.002, "delta": 0.25,
-                              "delta_type": "FORWARD", "atm_type": "FORWARD"}, "call_strike"),
-])
+@pytest.mark.parametrize(
+    "operation,extra,key",
+    [
+        (
+            "fx.option.price",
+            {"strike": 1.1, "vol": 0.075, "option_type": "PUT", "notional": 1e6},
+            "price",
+        ),
+        ("fx.delta.from_strike", {"strike": 1.1, "vol": 0.075, "option_type": "CALL"}, "deltas"),
+        (
+            "fx.delta.to_strike",
+            {"vol": 0.075, "option_type": "CALL", "delta": 0.25, "delta_type": "SPOT_PA"},
+            "strike",
+        ),
+        ("fx.atm.strike", {"vol": 0.075, "atm_type": "DNS", "delta_type": "FORWARD"}, "strike"),
+        (
+            "fx.smile.from_quotes",
+            {
+                "atm_vol": 0.075,
+                "rr": -0.0045,
+                "bf": 0.002,
+                "delta": 0.25,
+                "delta_type": "FORWARD",
+                "atm_type": "FORWARD",
+            },
+            "call_strike",
+        ),
+    ],
+)
 def test_cli(operation, extra, key) -> None:
     import json
 
     from quantforge_core.cli.main import run_case
-    r = run_case(json.dumps({"schema_version": "1.0", "case_id": "t", "operation": operation,
-                             "inputs": {**_M, **extra}}))
+
+    r = run_case(
+        json.dumps(
+            {
+                "schema_version": "1.0",
+                "case_id": "t",
+                "operation": operation,
+                "inputs": {**_M, **extra},
+            }
+        )
+    )
     assert r["status"] == "ok" and key in r["outputs"], r

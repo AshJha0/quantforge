@@ -1,5 +1,6 @@
 """The two `calendar` functions the core uses. The stdlib module imports `locale`, which costs a
 noticeable share of CLI start-up, and batch fuzzing starts a process per chunk."""
+
 from datetime import date
 
 _DAYS = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)

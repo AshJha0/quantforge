@@ -1,0 +1,126 @@
+{
+ "schema_version": "1.0",
+ "suite": "minvarconst_j",
+ "spec": "specifications/08-hedging/hedge-solvers.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_j_qpcut.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "minvarconst_j-0001",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "exposure_changes": [
+     0.0,
+     0.1,
+     0.2
+    ],
+    "hedge_changes": [
+     [
+      0.95,
+      0.95,
+      0.95
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "ruling J-I.4"
+   ],
+   "tags": [
+    "stage_j",
+    "hedge",
+    "minvar",
+    "error",
+    "synthetic"
+   ],
+   "description": "constant hedge series (0.95 three times): S_hh = 0, check 3"
+  },
+  {
+   "case_id": "minvarconst_j-0002",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "exposure_changes": [
+     0.3,
+     -0.1,
+     0.2,
+     0.5,
+     -0.4
+    ],
+    "hedge_changes": [
+     [
+      0.1,
+      0.4,
+      -0.2,
+      0.3,
+      0.0
+     ],
+     [
+      0.7,
+      0.7,
+      0.7,
+      0.7,
+      0.7
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "ruling J-I.4"
+   ],
+   "tags": [
+    "stage_j",
+    "hedge",
+    "minvar",
+    "error",
+    "synthetic"
+   ],
+   "description": "constant second hedge series of two (0.7 five times): S_hh singular, check 3"
+  },
+  {
+   "case_id": "minvarconst_j-0003",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "exposure_changes": [
+     0.95,
+     0.95,
+     0.95
+    ],
+    "hedge_changes": [
+     [
+      0.0,
+      0.1,
+      0.2
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "ruling J-I.4"
+   ],
+   "tags": [
+    "stage_j",
+    "hedge",
+    "minvar",
+    "error",
+    "synthetic"
+   ],
+   "description": "constant exposure series (0.95 three times): S_00 = 0, check 2"
+  }
+ ]
+}

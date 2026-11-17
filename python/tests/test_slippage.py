@@ -1,4 +1,5 @@
 """Stage I wave 4d: hedge slippage (08-hedging/hedge-slippage.md, rulings I-36 to I-38)."""
+
 from typing import Any
 
 import pytest
@@ -43,30 +44,34 @@ def test_property_identities_and_totals(raw: list[tuple[bool, list[Any], int]]) 
     for buy, f, extra in raw:
         sign = 1.0 if buy else -1.0
         size = sum(q for q, _ in f) + extra + 1
-        orders.append((sign * size, 100.0, 101.0, 0.01, 1e-4,
-                       [(sign * q, p / 100) for q, p in f]))
+        orders.append((sign * size, 100.0, 101.0, 0.01, 1e-4, [(sign * q, p / 100) for q, p in f]))
     out = slippage_report(orders)
     for row in out["orders"]:
         assert row["shortfall"] == pytest.approx(
-            row["execution_cost"] + row["opportunity_cost"], rel=1e-12, abs=1e-9)
+            row["execution_cost"] + row["opportunity_cost"], rel=1e-12, abs=1e-9
+        )
         assert row["slippage"] == pytest.approx(
-            row["execution_cost"] - row["model_cost"], rel=1e-12, abs=1e-9)
+            row["execution_cost"] - row["model_cost"], rel=1e-12, abs=1e-9
+        )
     for key, value in out["total"].items():
         assert value == pytest.approx(sum(r[key] for r in out["orders"]), rel=1e-12, abs=1e-9)
 
 
-@pytest.mark.parametrize(("orders", "expected"), [
-    ([], "E_INPUT"),
-    ([(0.0, 100.0, 100.0, 0.0, 0.0, [])], "E_INPUT"),
-    ([(100.0, 100.0, 100.0, 0.0, 0.0, [(-10.0, 100.0)])], "E_INPUT"),
-    ([(100.0, 100.0, 100.0, 0.0, 0.0, [(0.0, 100.0)])], "E_INPUT"),
-    ([(100.0, 100.0, 100.0, 0.0, 0.0, [(60.0, 100.0), (50.0, 100.0)])], "E_INPUT"),
-    ([(100.0, 0.0, 100.0, 0.0, 0.0, [])], "E_DOMAIN"),
-    ([(100.0, 100.0, -1.0, 0.0, 0.0, [])], "E_DOMAIN"),
-    ([(100.0, 100.0, 100.0, 0.0, 0.0, [(10.0, 0.0)])], "E_DOMAIN"),
-    ([(100.0, 100.0, 100.0, -0.1, 0.0, [])], "E_DOMAIN"),
-    ([(100.0, 100.0, 100.0, 0.0, -0.1, [])], "E_DOMAIN"),
-])
+@pytest.mark.parametrize(
+    ("orders", "expected"),
+    [
+        ([], "E_INPUT"),
+        ([(0.0, 100.0, 100.0, 0.0, 0.0, [])], "E_INPUT"),
+        ([(100.0, 100.0, 100.0, 0.0, 0.0, [(-10.0, 100.0)])], "E_INPUT"),
+        ([(100.0, 100.0, 100.0, 0.0, 0.0, [(0.0, 100.0)])], "E_INPUT"),
+        ([(100.0, 100.0, 100.0, 0.0, 0.0, [(60.0, 100.0), (50.0, 100.0)])], "E_INPUT"),
+        ([(100.0, 0.0, 100.0, 0.0, 0.0, [])], "E_DOMAIN"),
+        ([(100.0, 100.0, -1.0, 0.0, 0.0, [])], "E_DOMAIN"),
+        ([(100.0, 100.0, 100.0, 0.0, 0.0, [(10.0, 0.0)])], "E_DOMAIN"),
+        ([(100.0, 100.0, 100.0, -0.1, 0.0, [])], "E_DOMAIN"),
+        ([(100.0, 100.0, 100.0, 0.0, -0.1, [])], "E_DOMAIN"),
+    ],
+)
 def test_slippage_checks(orders: list[Any], expected: str) -> None:
     with pytest.raises(QfError) as caught:
         slippage_report(orders)
@@ -77,13 +82,20 @@ def test_slippage_cli_null_average_and_limits() -> None:
     from quantforge_core.cli import operations  # noqa: F401 - registers the verbs
     from quantforge_core.cli.registry import execute
 
-    order = {"quantity": 10.0, "decision_price": 5.0, "final_price": 6.0, "half_spread": 0.0,
-             "impact": 0.0, "fills": []}
+    order = {
+        "quantity": 10.0,
+        "decision_price": 5.0,
+        "final_price": 6.0,
+        "half_spread": 0.0,
+        "impact": 0.0,
+        "fills": [],
+    }
     out = execute("hedge.slippage.report", {"orders": [order]})
     assert out["orders"][0]["average_price"] is None
-    for inputs, expected in (({"orders": [order] * 10_001}, "E_LIMIT"),
-                             ({"orders": [{**order, "fills": [{"quantity": 1.0}]}]},
-                              "E_SCHEMA")):
+    for inputs, expected in (
+        ({"orders": [order] * 10_001}, "E_LIMIT"),
+        ({"orders": [{**order, "fills": [{"quantity": 1.0}]}]}, "E_SCHEMA"),
+    ):
         with pytest.raises(QfError) as caught:
             execute("hedge.slippage.report", inputs)
         assert caught.value.code == expected

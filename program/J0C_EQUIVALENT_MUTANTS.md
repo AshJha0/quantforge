@@ -67,3 +67,5 @@ mutant is reachable in principle and is left alive on purpose; the reason is giv
 - 418 `"PUT"` -> `"XXPUTXX"`: equivalent (`black` treats any type other than `"CALL"` as a put).
 - 422 `fair < 0` -> `<= 0`; 559 `bracket < 0` -> `<= 0`: NOT equivalent; an exactly zero variance is reachable (options pricing to 0.0; an ulp-scanned VIX strip). Now killed by `test_zero_fair_variance_is_allowed` and `test_zero_bracket_variance_is_allowed`.
 - 536 `len(ks) == 1` -> `== 2`; 537 `gap = 0.0` -> `1.0`: equivalent. The branch is unreachable: E-B15 requires at least one put and one call, so `ks` always has at least 3 strikes.
+
+Note (2026-11-15): the whole `python/` tree was reformatted with `ruff format` in the v0.9.0 PR. Python line numbers in this file, `program/J0_EQUIVALENT_AUDIT.md` and the R6 handovers refer to the code before that commit (`main` at `a148d0e`); the formatting commit is listed in `.git-blame-ignore-revs`.

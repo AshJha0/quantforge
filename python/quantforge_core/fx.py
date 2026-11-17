@@ -1,4 +1,5 @@
 """FX spot, forwards, swaps and quote-driven basis (specifications/02-curves/fx.md)."""
+
 import itertools
 import math
 from collections.abc import Sequence
@@ -84,8 +85,7 @@ class _Built:
     def leg(self, notional: float, strike: float, t: date, sign: int) -> tuple[float, float]:
         f = self.forward(t)
         d = self.quote.discount(t)
-        return (sign * notional * (f - strike) * d,
-                sign * notional * (f / self.market.spot) * d)
+        return (sign * notional * (f - strike) * d, sign * notional * (f / self.market.spot) * d)
 
 
 def _sign(side: str) -> int:

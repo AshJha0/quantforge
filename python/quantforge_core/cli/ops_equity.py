@@ -1,4 +1,5 @@
 """Handlers for the equity verbs. A handler reads every input first; the first call through `core`, the gated core modules, ends the E_SCHEMA stage."""
+
 from typing import Any
 
 from .inputs import Inputs
@@ -10,8 +11,10 @@ from .registry import core, op
 def _outright(i: Inputs) -> Any:
     r = core.equity.outright(*_forward_args(i))
     return {
-        "forward": r.forward, "discount_factor": r.discount_factor,
-        "carry_factor": r.carry_factor, "pv_dividends": r.pv_dividends,
+        "forward": r.forward,
+        "discount_factor": r.discount_factor,
+        "carry_factor": r.carry_factor,
+        "pv_dividends": r.pv_dividends,
     }
 
 
@@ -31,7 +34,10 @@ def _parity(i: Inputs) -> Any:
     d = i.real("discount_factor") if i.has("discount_factor") else None
     f, d, residual, outside = core.equity.parity(quotes, d)
     return {
-        "forward": f, "discount_factor": d, "max_residual": residual, "outside_spread": outside,
+        "forward": f,
+        "discount_factor": d,
+        "max_residual": residual,
+        "outside_spread": outside,
     }
 
 
@@ -55,16 +61,25 @@ def _borrow_implied(i: Inputs) -> Any:
 
 @op("eq.futures.basis")
 def _eq_futures_basis(i: Inputs) -> Any:
-    args = (i.real("spot"), _curve(i, "funding"), i.real("borrow_rate"),
-            i.real("financing_spread"), _divs(i), i.date("expiry"), i.real("futures_price"))
+    args = (
+        i.real("spot"),
+        _curve(i, "funding"),
+        i.real("borrow_rate"),
+        i.real("financing_spread"),
+        _divs(i),
+        i.date("expiry"),
+        i.real("futures_price"),
+    )
     fair, basis, implied = core.equity_curves.futures_basis(*args)
     return {"fair_price": fair, "basis": basis, "implied_financing_spread": implied}
 
 
 @op("eq.index.dividends")
 def _index_divs(i: Inputs) -> Any:
-    cons = [(c.string("id"), c.real("shares"), c.real("price"), _divs(c))
-            for c in _objects(i, "constituents")]
+    cons = [
+        (c.string("id"), c.real("shares"), c.real("price"), _divs(c))
+        for c in _objects(i, "constituents")
+    ]
     periods = [(p.date("start"), p.date("end")) for p in _objects(i, "periods")]
     args = (i.real("divisor"), cons, periods, i.reals("implied_period_points"))
     return core.equity_curves.index_dividends(*args)
@@ -81,8 +96,12 @@ def _rebalance(i: Inputs) -> Any:
     return {"level": level, "new_divisor": divisor, "weights": weights}
 
 
-_ACTION_KEYS = {"SPLIT": ("ratio",), "REVERSE_SPLIT": ("ratio",),
-                "RIGHTS": ("new_per_old", "subscription_price"), "SPECIAL_DIVIDEND": ("amount",)}
+_ACTION_KEYS = {
+    "SPLIT": ("ratio",),
+    "REVERSE_SPLIT": ("ratio",),
+    "RIGHTS": ("new_per_old", "subscription_price"),
+    "SPECIAL_DIVIDEND": ("amount",),
+}
 
 
 @op("eq.corporate_action.adjust")
@@ -98,8 +117,18 @@ def _trs(i: Inputs) -> Any:
     _present(i, "current_rate")
     t = i.object("trade")
     current = i.real("current_rate") if i.has("current_rate") else None
-    args = (i.real("spot"), _curve(i, "funding"), i.real("borrow_rate"), _divs(i),
-            t.date("start"), t.date("end"), t.real("initial_price"), t.real("shares"),
-            t.real("spread"), t.enum("side", ("RECEIVE_EQUITY", "PAY_EQUITY")), current)
+    args = (
+        i.real("spot"),
+        _curve(i, "funding"),
+        i.real("borrow_rate"),
+        _divs(i),
+        t.date("start"),
+        t.date("end"),
+        t.real("initial_price"),
+        t.real("shares"),
+        t.real("spread"),
+        t.enum("side", ("RECEIVE_EQUITY", "PAY_EQUITY")),
+        current,
+    )
     equity, funding_leg, value = core.equity_curves.trs_pv(*args)
     return {"equity_leg": equity, "funding_leg": funding_leg, "pv": value}

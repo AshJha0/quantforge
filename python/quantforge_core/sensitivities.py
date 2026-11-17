@@ -1,4 +1,5 @@
 """Rates sensitivities, by bump and rebuild (specifications/06-risk/rates-sensitivities.md)."""
+
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -43,8 +44,10 @@ def _bump_curves(
 
     n = len(quotes)
     keys = [
-        (rebuilt([BP if k == j else 0.0 for k in range(n)]),
-         rebuilt([-BP if k == j else 0.0 for k in range(n)]))
+        (
+            rebuilt([BP if k == j else 0.0 for k in range(n)]),
+            rebuilt([-BP if k == j else 0.0 for k in range(n)]),
+        )
         for j in range(n)
     ]
     return BumpedCurves((rebuilt([BP] * n), rebuilt([-BP] * n)), keys)

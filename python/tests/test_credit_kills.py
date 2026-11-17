@@ -8,6 +8,7 @@ goldens cannot see: error codes and fields, the coupon-date roll, bracket growth
 caps. Mutants that change only an error message's wording are not killed on purpose; the
 reasons are listed in conformance/mutation/README_python.md.
 """
+
 import importlib.util
 import json
 import math
@@ -19,14 +20,23 @@ import pytest
 from quantforge_core.cli.main import run_case
 
 ROOT = next(p for p in Path(__file__).resolve().parents if (p / "datasets" / "golden").is_dir())
-SUITES = ["stage_d/credit_d", "stage_d/outside_d", "stage_d/rulings2_d", "stage_d/rulings_d",
-          "stage_d/rulings_r1", "stage_e_b/creditopt_e", "stage_e_b/rulings_e_b",
-          "stage_f/cdsidx_f", "stage_f/e1_credit"]
+SUITES = [
+    "stage_d/credit_d",
+    "stage_d/outside_d",
+    "stage_d/rulings2_d",
+    "stage_d/rulings_d",
+    "stage_d/rulings_r1",
+    "stage_e_b/creditopt_e",
+    "stage_e_b/rulings_e_b",
+    "stage_f/cdsidx_f",
+    "stage_f/e1_credit",
+]
 
 
 def _runner():
     spec = importlib.util.spec_from_file_location(
-        "qf_runner_kills", ROOT / "conformance" / "runner" / "runner.py")
+        "qf_runner_kills", ROOT / "conformance" / "runner" / "runner.py"
+    )
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -44,8 +54,12 @@ def test_credit_goldens(suite: str) -> None:
     for case in cases:
         if not case["operation"].startswith("credit."):
             continue
-        doc = {"schema_version": "1.0", "case_id": case["case_id"],
-               "operation": case["operation"], "inputs": case["inputs"]}
+        doc = {
+            "schema_version": "1.0",
+            "case_id": case["case_id"],
+            "operation": case["operation"],
+            "inputs": case["inputs"],
+        }
         result = json.loads(json.dumps(run_case(json.dumps(doc))))
         results[case["case_id"]] = result
         status, messages = RUNNER.judge(case, result, CLASSES, results)
@@ -64,16 +78,32 @@ def test_credit_goldens(suite: str) -> None:
 # - error message wording (for example "recovery must be in [0, 1)"): the contract fixes code and
 #   field, which the tests below pin, not the text.
 
-DISCOUNT = {"as_of": "2026-11-06", "interpolation": "LOG_LINEAR_DF",
-            "pillars": [{"date": "2046-11-06", "discount_factor": 0.458161174870904}]}
-HAZARD = {"as_of": "2026-11-06", "pillars": [
-    {"date": "2027-06-20", "survival": 0.9953278717430543},
-    {"date": "2031-12-20", "survival": 0.8988961248330224},
-    {"date": "2036-12-20", "survival": 0.7635674704223004}]}
+DISCOUNT = {
+    "as_of": "2026-11-06",
+    "interpolation": "LOG_LINEAR_DF",
+    "pillars": [{"date": "2046-11-06", "discount_factor": 0.458161174870904}],
+}
+HAZARD = {
+    "as_of": "2026-11-06",
+    "pillars": [
+        {"date": "2027-06-20", "survival": 0.9953278717430543},
+        {"date": "2031-12-20", "survival": 0.8988961248330224},
+        {"date": "2036-12-20", "survival": 0.7635674704223004},
+    ],
+}
 TRADE = {"maturity": "2031-12-20", "coupon": 0.01}
-OPTION = {"as_of": "2026-11-06", "expiry": "2027-03-20", "maturity": "2032-03-20", "rate": 0.035,
-          "hazard_rate": 0.02, "recovery": 0.4, "type": "PAYER", "strike": 0.012,
-          "notional": 10000000.0, "knock_out": True}
+OPTION = {
+    "as_of": "2026-11-06",
+    "expiry": "2027-03-20",
+    "maturity": "2032-03-20",
+    "rate": 0.035,
+    "hazard_rate": 0.02,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.012,
+    "notional": 10000000.0,
+    "knock_out": True,
+}
 
 
 def _run(operation: str, inputs: dict[str, Any]) -> dict[str, Any]:
@@ -90,26 +120,43 @@ def _error(operation: str, inputs: dict[str, Any]) -> tuple[str, str | None]:
 
 def test_bootstrap_equal_maturities_are_input_errors() -> None:
     quotes = [{"tenor": "1Y", "spread": 0.006}, {"tenor": "1Y", "spread": 0.007}]
-    assert _error("credit.cds.bootstrap", {"trade_date": "2026-11-06", "discount": DISCOUNT,
-                                           "recovery": 0.4, "quotes": quotes}) == (
-        "E_INPUT", "quotes")
+    assert _error(
+        "credit.cds.bootstrap",
+        {"trade_date": "2026-11-06", "discount": DISCOUNT, "recovery": 0.4, "quotes": quotes},
+    ) == ("E_INPUT", "quotes")
 
 
 def test_zero_total_weights_are_domain_errors_with_their_fields() -> None:
     quotes = [{"tenor": "1Y", "spread": 0.006}, {"tenor": "3Y", "spread": 0.009}]
-    comp = {"trade_date": "2026-11-06", "discount": DISCOUNT, "recovery": 0.4, "scale": 1.0,
-            "constituents": [{"quotes": quotes, "weight": 0.0}, {"quotes": quotes, "weight": 0.0}]}
+    comp = {
+        "trade_date": "2026-11-06",
+        "discount": DISCOUNT,
+        "recovery": 0.4,
+        "scale": 1.0,
+        "constituents": [{"quotes": quotes, "weight": 0.0}, {"quotes": quotes, "weight": 0.0}],
+    }
     assert _error("credit.curve.composite", comp) == ("E_DOMAIN", "constituents")
     names = [{"hazard": HAZARD, "recovery": 0.4, "weight": 0.0}] * 2
-    idx = {"trade_date": "2026-11-06", "discount": DISCOUNT, "names": names,
-           "trade": TRADE, "quoted_upfront": 0.0}
+    idx = {
+        "trade_date": "2026-11-06",
+        "discount": DISCOUNT,
+        "names": names,
+        "trade": TRADE,
+        "quoted_upfront": 0.0,
+    }
     assert _error("credit.index.intrinsic", idx) == ("E_DOMAIN", "names")
 
 
 def test_sell_protection_is_the_negative_of_buy() -> None:
     trade = {"maturity": "2031-12-20", "coupon": 0.01, "notional": 1e7, "side": "BUY_PROTECTION"}
-    base = {"trade_date": "2026-11-06", "discount": DISCOUNT, "hazard": HAZARD, "recovery": 0.4,
-            "trade": trade, "payout": "STANDARD"}
+    base = {
+        "trade_date": "2026-11-06",
+        "discount": DISCOUNT,
+        "hazard": HAZARD,
+        "recovery": 0.4,
+        "trade": trade,
+        "payout": "STANDARD",
+    }
     buy = _run("credit.cds.price", base)["outputs"]["pv"]
     sell = _run("credit.cds.price", {**base, "trade": {**trade, "side": "SELL_PROTECTION"}})
     assert sell["outputs"]["pv"] == -buy and buy != 0
@@ -119,7 +166,9 @@ def test_implied_vol_premium_at_and_near_the_cap() -> None:
     priced = _run("credit.cdsoption.price", {**OPTION, "vol": 0.5})["outputs"]
     cap = OPTION["notional"] * priced["risky_annuity"] * priced["forward_spread"]
     assert _error("credit.cdsoption.implied_vol", {**OPTION, "premium": cap}) == (
-        "E_DOMAIN", "premium")
+        "E_DOMAIN",
+        "premium",
+    )
     # Below the cap a root always exists before vol 1e6 (Black at 1e6 rounds to the cap), so the
     # E_NO_CONVERGENCE branch is unreachable and its code-string mutant is equivalent.
     near = _run("credit.cdsoption.implied_vol", {**OPTION, "premium": cap * (1 - 1e-12)})
@@ -127,9 +176,19 @@ def test_implied_vol_premium_at_and_near_the_cap() -> None:
 
 
 def test_index_option_without_default_risk_has_no_adjusted_forward() -> None:
-    inputs = {"as_of": "2026-11-09", "expiry": "2027-02-17", "maturity": "2031-12-20",
-              "rate": 0.037, "hazard_rate": 0.0, "recovery": 0.4, "type": "PAYER",
-              "strike": 0.0055, "coupon": 0.01, "notional": 1e7, "vol": 0.45}
+    inputs = {
+        "as_of": "2026-11-09",
+        "expiry": "2027-02-17",
+        "maturity": "2031-12-20",
+        "rate": 0.037,
+        "hazard_rate": 0.0,
+        "recovery": 0.4,
+        "type": "PAYER",
+        "strike": 0.0055,
+        "coupon": 0.01,
+        "notional": 1e7,
+        "vol": 0.45,
+    }
     assert _error("credit.cdsindex.option_price", inputs) == ("E_DOMAIN", "hazard_rate")
 
 

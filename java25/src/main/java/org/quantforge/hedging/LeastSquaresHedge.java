@@ -337,7 +337,7 @@ public final class LeastSquaresHedge {
             Reduced rd = new Reduced(hr, z, xp, hxp, c, k);
             CostTerms ct = new CostTerms(cw, spreads, impact, rates, costs.marginLimit());
             double[] x = enumerate ? costSearchByEnumeration(rd, lo, hi, ct, a, b, weights, ridge)
-                    : costSearch(rd, lo, hi, ct, a, b, weights, ridge);
+                    : costSearch(rd, lo, hi, ct, a, b, weights, ridge, eqMatrix, eqRhs);
             double[] res = residual(a, b, x);
             double risk = objective(res, weights, ridge, x);
             double cost = 0.0;
@@ -535,11 +535,12 @@ public final class LeastSquaresHedge {
      * point is the unique minimiser. A step that flips several signs and does not lower the objective is retried
      * with the single worst one; the objective falls at every accepted step, so no orthant is visited twice.
      *
-     * <p>With a margin limit, the start must be a feasible orthant: a phase 1 minimises the smooth part plus a
-     * heavily weighted margin, and refuses ({@code E_INFEASIBLE}) when even that point is above the limit.
+     * <p>With a margin limit, the start must be a feasible orthant: when the unconstrained start breaks the limit, the
+     * search starts from the orthant of the exact least-margin point ({@link #leastMargin}, an LP), and refuses
+     * ({@code E_INFEASIBLE}) when even that point is above the limit by more than the I-46 tolerance.
      */
     private static double[] costSearch(Reduced rd, double[] lo, double[] hi, CostTerms ct, double[][] a, double[] b,
-            double[] w, double ridge) {
+            double[] w, double ridge, double[][] eqMatrix, double[] eqRhs) {
         int n = lo.length;
         CostTerms smooth = new CostTerms(0.0, new double[n], ct.impact(), null, null);
         OrthantSolution free = orthant(rd, lo, hi, new int[n], smooth, a, b, w, ridge);
@@ -550,29 +551,207 @@ public final class LeastSquaresHedge {
         if (ct.rates() != null) {
             OrthantSolution start = orthant(rd, lo, hi, signs, ct, a, b, w, ridge);
             if (start == null) {
-                // Phase 1: the least-margin point, as the minimiser of the smooth part plus a dominant margin cost.
-                double weight = 1e12 * Math.max(1.0, free.f());
+                // Phase 1: the exact least-margin point (same test as Python _costed and C++ least_margin). A margin
+                // penalty is only O(1/penalty) exact and refused a limit equal to the least margin.
                 double[] mr = ct.rates();
-                // The impact term lives in the reduced Hessian with the caller's weight ct.cw(); objective() adds
-                // cw * impact * x^2, so scale impact here to keep phase 1's reported objective equal to the problem
-                // the orthant solver minimises (an unscaled impact made f wrong by the factor weight / cw).
-                double[] imp1 = new double[n];
-                for (int j = 0; j < n; j++) {
-                    imp1[j] = ct.impact()[j] * (ct.cw() / weight);
-                }
-                CostTerms phase1 = new CostTerms(weight, mr, imp1, null, null);
-                double[] x1 = signSearch(rd, lo, hi, signsOf(free.x(), lo, hi, phase1), phase1, a, b, w, ridge).x();
+                double[] x1 = leastMargin(eqMatrix, eqRhs, lo, hi, mr);
                 double margin = 0.0;
-                for (int j = 0; j < n; j++) {
-                    margin += mr[j] * Math.abs(x1[j]);
+                if (x1 != null) {
+                    for (int j = 0; j < n; j++) {
+                        margin += mr[j] * Math.abs(x1[j]);
+                    }
                 }
-                if (margin > ct.marginLimit() + 1e-9 * Math.max(1.0, ct.marginLimit())) {
+                if (x1 == null || margin > ct.marginLimit() * (1.0 + 1e-9) + 1e-12) {
                     throw new QfError("E_INFEASIBLE", "no point meets the margin limit");
                 }
                 signs = signsOf(x1, lo, hi, ct);
             }
         }
         return signSearch(rd, lo, hi, signs, ct, a, b, w, ridge).x();
+    }
+
+    /**
+     * The point of least margin {@code sum m_j |x_j|} with {@code E x = e} inside the bounds, or null when no point is
+     * feasible: an LP in {@code x = u - v}, {@code u, v >= 0}, each finite bound a row with a slack (upper bounds
+     * first, then lower). A port of Python {@code hedge_solvers._least_margin} and C++ {@code least_margin}.
+     */
+    static double[] leastMargin(double[][] eqMatrix, double[] eqRhs, double[] lo, double[] hi, double[] rates) {
+        int n = rates.length;
+        List<double[]> boundRows = new ArrayList<>(); // {j, value, sign}
+        for (int j = 0; j < n; j++) {
+            if (hi[j] < Double.POSITIVE_INFINITY) {
+                boundRows.add(new double[] {j, hi[j], 1.0});
+            }
+        }
+        for (int j = 0; j < n; j++) {
+            if (lo[j] > Double.NEGATIVE_INFINITY) {
+                boundRows.add(new double[] {j, lo[j], -1.0});
+            }
+        }
+        int cols = 2 * n + boundRows.size();
+        int k = eqMatrix == null ? 0 : eqMatrix.length;
+        int rows = k + boundRows.size();
+        if (rows == 0) {
+            return new double[n];
+        }
+        double[][] m = new double[rows][cols];
+        double[] rhs = new double[rows];
+        for (int r = 0; r < k; r++) {
+            for (int j = 0; j < n; j++) {
+                m[r][j] = eqMatrix[r][j];
+                m[r][n + j] = -eqMatrix[r][j];
+            }
+            rhs[r] = eqRhs[r];
+        }
+        for (int s = 0; s < boundRows.size(); s++) { // x_j + t = u, or x_j - t = l
+            double[] br = boundRows.get(s);
+            int j = (int) br[0];
+            m[k + s][j] = 1.0;
+            m[k + s][n + j] = -1.0;
+            m[k + s][2 * n + s] = br[2];
+            rhs[k + s] = br[1];
+        }
+        double[] cost = new double[cols];
+        for (int j = 0; j < n; j++) {
+            cost[j] = rates[j];
+            cost[n + j] = rates[j];
+        }
+        double[] z = simplex(m, rhs, cost);
+        if (z == null) {
+            return null;
+        }
+        double[] x = new double[n];
+        for (int j = 0; j < n; j++) {
+            x[j] = z[j] - z[n + j];
+        }
+        return x;
+    }
+
+    /**
+     * {@code argmin cost . z} subject to {@code a z = b}, {@code z >= 0}, or null when no {@code z} is feasible.
+     * Two-phase dense tableau simplex with Bland's rule; a port of Python {@code hedge_solvers._simplex} and C++
+     * {@code simplex} (same pivots, same tolerances).
+     */
+    static double[] simplex(double[][] a, double[] b, double[] cost) {
+        int rows = a.length;
+        int cols = cost.length;
+        int width = cols + rows + 1;
+        double[][] tab = new double[rows + 1][width];
+        double scale = 1.0;
+        for (int r = 0; r < rows; r++) {
+            double sign = b[r] < 0.0 ? -1.0 : 1.0;
+            for (int c = 0; c < cols; c++) {
+                tab[r][c] = sign * a[r][c];
+            }
+            tab[r][width - 1] = sign * b[r];
+            tab[r][cols + r] = 1.0;
+            for (int c = 0; c < width; c++) {
+                scale = Math.max(scale, Math.abs(tab[r][c]));
+            }
+        }
+        int[] basis = new int[rows];
+        for (int r = 0; r < rows; r++) {
+            basis[r] = cols + r;
+        }
+        double tol = 1e-11 * scale;
+        for (int c = 0; c < width; c++) {
+            double s = 0.0;
+            for (int r = 0; r < rows; r++) {
+                s += tab[r][c];
+            }
+            tab[rows][c] = c >= cols && c < cols + rows ? 0.0 : -s;
+        }
+        simplexRun(tab, basis, cols + rows, tol);
+        if (-tab[rows][width - 1] > 1e-9 * scale) {
+            return null;
+        }
+        for (int r = 0; r < rows; r++) { // move degenerate artificials out where a structural pivot exists
+            if (basis[r] < cols) {
+                continue;
+            }
+            for (int c = 0; c < cols; c++) {
+                if (Math.abs(tab[r][c]) > tol) {
+                    simplexPivot(tab, basis, r, c);
+                    break;
+                }
+            }
+        }
+        java.util.Arrays.fill(tab[rows], 0.0);
+        System.arraycopy(cost, 0, tab[rows], 0, cols);
+        for (int r = 0; r < rows; r++) {
+            int c = basis[r];
+            if (c >= cols || tab[rows][c] == 0.0) {
+                continue;
+            }
+            double f = tab[rows][c];
+            for (int q = 0; q < width; q++) {
+                tab[rows][q] -= f * tab[r][q];
+            }
+        }
+        simplexRun(tab, basis, cols, tol); // artificials never re-enter
+        double[] z = new double[cols];
+        for (int r = 0; r < rows; r++) {
+            if (basis[r] < cols) {
+                z[basis[r]] = tab[r][width - 1];
+            }
+        }
+        return z;
+    }
+
+    /** One simplex pivot on row {@code r}, column {@code c}; the last tableau row is the objective. */
+    private static void simplexPivot(double[][] tab, int[] basis, int r, int c) {
+        int rows = basis.length;
+        int width = tab[0].length;
+        double d = tab[r][c];
+        for (int q = 0; q < width; q++) {
+            tab[r][q] /= d;
+        }
+        for (int o = 0; o <= rows; o++) {
+            if (o == r || tab[o][c] == 0.0) {
+                continue;
+            }
+            double f = tab[o][c];
+            for (int q = 0; q < width; q++) {
+                tab[o][q] -= f * tab[r][q];
+            }
+        }
+        basis[r] = c;
+    }
+
+    /** Bland's-rule iterations over the first {@code allowed} columns until no reduced cost is below {@code -tol}. */
+    private static void simplexRun(double[][] tab, int[] basis, int allowed, double tol) {
+        int rows = basis.length;
+        int width = tab[0].length;
+        int structural = width - 1 - rows;
+        for (int it = 0; it < 50 * (rows + structural) + 100; it++) {
+            int entering = allowed;
+            for (int c = 0; c < allowed; c++) {
+                if (tab[rows][c] < -tol) {
+                    entering = c;
+                    break;
+                }
+            }
+            if (entering == allowed) {
+                return;
+            }
+            int best = rows;
+            double bestRatio = 0.0;
+            for (int r = 0; r < rows; r++) {
+                if (tab[r][entering] <= tol) {
+                    continue;
+                }
+                double ratio = tab[r][width - 1] / tab[r][entering];
+                if (best == rows || ratio < bestRatio || (ratio == bestRatio && basis[r] < basis[best])) {
+                    best = r;
+                    bestRatio = ratio;
+                }
+            }
+            if (best == rows) {
+                throw new QfError("E_NO_CONVERGENCE", "the margin search is unbounded");
+            }
+            simplexPivot(tab, basis, best, entering);
+        }
+        throw new QfError("E_NO_CONVERGENCE", "the margin search did not settle");
     }
 
     private static OrthantSolution signSearch(Reduced rd, double[] lo, double[] hi, int[] start, CostTerms ct,
@@ -663,12 +842,14 @@ public final class LeastSquaresHedge {
         }
         double[][] cons = new double[count][];
         double[] rhs = new double[count];
+        double[] size = new double[count]; // the magnitude that cancels in rhs: its rounding scale
         int[] which = new int[count];
         int at = 0;
         for (int j = 0; j < n; j++) {
             if (lo[j] > Double.NEGATIVE_INFINITY) {
                 cons[at] = z[j].clone();
                 rhs[at] = lo[j] - xp[j];
+                size[at] = Math.max(1.0, Math.abs(lo[j]) + Math.abs(xp[j]));
                 which[at++] = j + 1;
             }
             if (hi[j] < Double.POSITIVE_INFINITY) {
@@ -677,20 +858,26 @@ public final class LeastSquaresHedge {
                     cons[at][t] = -z[j][t];
                 }
                 rhs[at] = xp[j] - hi[j];
+                size[at] = Math.max(1.0, Math.abs(hi[j]) + Math.abs(xp[j]));
                 which[at++] = -(j + 1);
             }
         }
         if (row != null) {
             cons[at] = new double[r];
+            double terms = Math.abs(limit);
+            for (int j = 0; j < n; j++) {
+                terms += Math.abs(row[j] * xp[j]);
+            }
             for (int t = 0; t < r; t++) {
                 for (int j = 0; j < n; j++) {
                     cons[at][t] -= row[j] * z[j][t];
                 }
             }
             rhs[at] = Dense.dot(row, xp) - limit;
+            size[at] = Math.max(1.0, terms);
             which[at++] = 0;
         }
-        DualActiveSet.Result res = DualActiveSet.solve(hr, gr, cons, rhs);
+        DualActiveSet.Result res = DualActiveSet.solve(hr, gr, cons, rhs, size);
         for (int i = 0; i < count; i++) {
             if (which[i] > 0) {
                 muLo[which[i] - 1] = res.multipliers()[i];

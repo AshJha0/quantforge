@@ -1,4 +1,5 @@
 """Input readers shared by the handlers of several domains."""
+
 from datetime import date
 from typing import Any
 
@@ -74,21 +75,30 @@ def _quotes(i: Inputs) -> list[Quote]:
 def _ois_trade(i: Inputs) -> OisTrade:
     t = i.object("trade")
     return OisTrade(
-        t.enum("convention", conventions.OVERNIGHT), _tenor(t), t.real("fixed_rate"),
-        t.real("notional"), t.enum("side", ("PAY", "RECEIVE")),
+        t.enum("convention", conventions.OVERNIGHT),
+        _tenor(t),
+        t.real("fixed_rate"),
+        t.real("notional"),
+        t.enum("side", ("PAY", "RECEIVE")),
     )
 
 
 def _market(i: Inputs) -> FxMarket:
     return FxMarket(
-        i.enum("pair", conventions.PAIRS), i.real("spot"), i.date("as_of"),
-        _curve(i, "base_curve"), _curve(i, "quote_curve"), i.opt_string("snapshot_id"),
+        i.enum("pair", conventions.PAIRS),
+        i.real("spot"),
+        i.date("as_of"),
+        _curve(i, "base_curve"),
+        _curve(i, "quote_curve"),
+        i.opt_string("snapshot_id"),
     )
 
 
 def _forward_trade(t: Inputs) -> FxForward:
     return FxForward(
-        t.real("notional_base"), t.real("strike"), t.date("value_date"),
+        t.real("notional_base"),
+        t.real("strike"),
+        t.date("value_date"),
         t.enum("side", ("BUY", "SELL")),
     )
 
@@ -124,15 +134,24 @@ def _forward_args(i: Inputs) -> tuple[Any, ...]:
     borrow = _curve(i, "borrow_curve") if i.has("borrow_curve") else None
     dividends = [(d.date("ex_date"), d.real("amount")) for d in _objects(i, "dividends")]
     return (
-        i.real("spot"), i.date("as_of"), i.date("expiry"), _curve(i, "funding_curve"), borrow,
+        i.real("spot"),
+        i.date("as_of"),
+        i.date("expiry"),
+        _curve(i, "funding_curve"),
+        borrow,
         dividends,
     )
 
 
 def _parity_quotes(i: Inputs) -> list[ParityQuote]:
     return [
-        ParityQuote(q.real("strike"), q.real("call_bid"), q.real("call_ask"), q.real("put_bid"),
-                    q.real("put_ask"))
+        ParityQuote(
+            q.real("strike"),
+            q.real("call_bid"),
+            q.real("call_ask"),
+            q.real("put_bid"),
+            q.real("put_ask"),
+        )
         for q in _objects(i, "quotes")
     ]
 
@@ -153,12 +172,13 @@ def _option(i: Inputs) -> Option:
     if foreign:
         raise _schema(min(foreign), f"not an input of {model}")
     common = (
-        model, i.enum("option_type", OPTIONS), i.real("strike"), i.real("expiry_years"),
+        model,
+        i.enum("option_type", OPTIONS),
+        i.real("strike"),
+        i.real("expiry_years"),
     )
     if model == BLACK_SCHOLES:
-        return Option(
-            *common, i.real("spot"), rate=i.real("rate"), dividend_yield=i.real("yield")
-        )
+        return Option(*common, i.real("spot"), rate=i.real("rate"), dividend_yield=i.real("yield"))
     shift = _opt_shift(i) if model == BLACK_76 else 0.0
     return Option(
         *common, i.real("forward"), discount_factor=i.real("discount_factor"), shift=shift
@@ -167,8 +187,12 @@ def _option(i: Inputs) -> Option:
 
 def _valuation(pv: float, currency: str, as_of: Any, snapshot_id: str | None) -> dict[str, Any]:
     return {
-        "pv": pv, "currency": currency, "model": "BLACK_76_EQUITY", "data_version": snapshot_id,
-        "conventions": "EQUITY_FORWARD", "as_of": as_of.isoformat(),
+        "pv": pv,
+        "currency": currency,
+        "model": "BLACK_76_EQUITY",
+        "data_version": snapshot_id,
+        "conventions": "EQUITY_FORWARD",
+        "as_of": as_of.isoformat(),
     }
 
 
@@ -187,6 +211,7 @@ def _convention(i: Inputs, key: str, allowed: tuple[str, ...]) -> str:
 
 def _bond(b: Inputs) -> Any:
     from ..bonds import FREQUENCIES, Bond
+
     frequency = b.integer("frequency")
     if frequency not in FREQUENCIES:
         raise QfError("E_SCHEMA", "frequency must be 1, 2 or 4", "frequency")
@@ -195,6 +220,7 @@ def _bond(b: Inputs) -> Any:
 
 def _month(i: Inputs, key: str) -> tuple[int, int]:
     import re
+
     text = i.string(key)
     m = re.fullmatch(r"(\d{4})-(\d{2})", text)
     if m is None or not 1 <= int(m[2]) <= 12 or int(m[1]) < 1:

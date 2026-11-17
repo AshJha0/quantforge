@@ -1,5 +1,6 @@
 """Overnight compounding by date, and IBOR fallbacks
 (specifications/02-curves/overnight-compounding.md)."""
+
 from collections.abc import Sequence
 from datetime import date, timedelta
 
@@ -50,7 +51,11 @@ def _business_days(cal: str, start: date, end: date, sofr: bool = False) -> list
 
 
 def compound_dated(
-    convention: str, start: date, end: date, method: str, shift_days: int,
+    convention: str,
+    start: date,
+    end: date,
+    method: str,
+    shift_days: int,
     fixings: Sequence[tuple[date, float]],
 ) -> tuple[float, float, float]:
     """Returns (compounded_rate, accrual, interest)."""
@@ -62,8 +67,7 @@ def compound_dated(
     cal, k, sofr = c["calendar"], shift_days, convention == "SOFR"
     ds = _business_days(cal, start, end, sofr)
     n = len(ds) - 1
-    if (k < 0 or (method == "NONE" and k != 0)
-            or (method == "LOCKOUT" and not 1 <= k <= n - 1)):
+    if k < 0 or (method == "NONE" and k != 0) or (method == "LOCKOUT" and not 1 <= k <= n - 1):
         raise QfError("E_INPUT", "shift_days is out of range for the method", "shift_days")
     if not (_is_fixing_day(cal, sofr, start) and _is_fixing_day(cal, sofr, end)):
         raise QfError("E_INPUT", "start and end must be business days", "start")

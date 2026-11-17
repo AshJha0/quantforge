@@ -1,4 +1,5 @@
 """E1: NaN and infinity at every public numeric input are E_DOMAIN; -0.0 is a number like 0.0."""
+
 import importlib
 import inspect
 import math
@@ -28,8 +29,11 @@ def _core_modules():
 def _public_functions():
     for module in _core_modules():
         for name, f in vars(module).items():
-            if (not name.startswith("_") and inspect.isfunction(f)
-                    and getattr(f, "__module__", None) == module.__name__):
+            if (
+                not name.startswith("_")
+                and inspect.isfunction(f)
+                and getattr(f, "__module__", None) == module.__name__
+            ):
                 yield module.__name__, name, f
 
 
@@ -47,8 +51,11 @@ def test_every_public_function_is_guarded(module, name, f) -> None:
 
 @pytest.mark.parametrize(("module", "name", "f"), PUBLIC, ids=[f"{m}.{n}" for m, n, _ in PUBLIC])
 def test_each_input_rejects_nan_and_infinity_first(module, name, f) -> None:
-    params = [p for p in inspect.signature(f).parameters.values()
-              if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)]
+    params = [
+        p
+        for p in inspect.signature(f).parameters.values()
+        if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)
+    ]
     for k, p in enumerate(params):
         for bad in BAD:
             args: list[object] = [None] * len(params)
@@ -90,7 +97,8 @@ def test_nested_values_are_walked() -> None:
 def test_negative_zero_is_a_number() -> None:
     option = black.Option(black.BLACK_SCHOLES, "CALL", 100.0, 1.0, 100.0, 0.0, -0.0)
     assert black.price(option, 0.2) == black.price(
-        black.Option(black.BLACK_SCHOLES, "CALL", 100.0, 1.0, 100.0, 0.0, 0.0), 0.2)
+        black.Option(black.BLACK_SCHOLES, "CALL", 100.0, 1.0, 100.0, 0.0, 0.0), 0.2
+    )
 
 
 @pytest.mark.parametrize("bad", BAD)
@@ -111,8 +119,11 @@ def test_keyword_inputs_and_var_positional():
     g = namespace["f"]
     assert namespace["_private"] is f
     assert g(1.0, 2.0, k=3.0) == 1.0
-    for call, field in ((lambda: g(math.nan), "a"), (lambda: g(1.0, math.inf), "rest"),
-                        (lambda: g(1.0, k=-math.inf), "k")):
+    for call, field in (
+        (lambda: g(math.nan), "a"),
+        (lambda: g(1.0, math.inf), "rest"),
+        (lambda: g(1.0, k=-math.inf), "k"),
+    ):
         with pytest.raises(QfError) as e:
             call()
         assert (e.value.code, e.value.field) == ("E_DOMAIN", field)
@@ -149,4 +160,3 @@ def test_flag_cleared_after_an_error() -> None:
     with pytest.raises(QfError) as e:
         namespace["boom"](math.nan)
     assert e.value.code == "E_DOMAIN"
-

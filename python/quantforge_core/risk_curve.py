@@ -1,5 +1,6 @@
 """Par and key-rate risk, the bootstrap Jacobian and P&L explain, by bump and revalue
 (specifications/06-risk/par-and-key-rate.md, specifications/06-risk/pnl-explain.md)."""
+
 import math
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, replace
@@ -85,14 +86,26 @@ def _risk(value: Callable[[float], float], v0: float, bump_bp: float, scheme: st
     return (up - value(-bump_bp)) / (2 * bump_bp)
 
 
-def _rebuild(convention: str, as_of: date, quotes: Sequence[Quote], interpolation: str,
-             shifts: Sequence[float]) -> Curve:
+def _rebuild(
+    convention: str,
+    as_of: date,
+    quotes: Sequence[Quote],
+    interpolation: str,
+    shifts: Sequence[float],
+) -> Curve:
     moved = [Quote(q.tenor, q.mid + s) for q, s in zip(quotes, shifts, strict=True)]
     return curves.build(ois.bootstrap(convention, as_of, moved, interpolation)[0])
 
 
-def _par(price: Pricer, convention: str, as_of: date, quotes: Sequence[Quote],
-         interpolation: str, bump_bp: float, scheme: str) -> tuple[float, float, list[float]]:
+def _par(
+    price: Pricer,
+    convention: str,
+    as_of: date,
+    quotes: Sequence[Quote],
+    interpolation: str,
+    bump_bp: float,
+    scheme: str,
+) -> tuple[float, float, list[float]]:
     v0 = price(_rebuild(convention, as_of, quotes, interpolation, [0.0] * len(quotes)))
     n = len(quotes)
 
@@ -100,6 +113,7 @@ def _par(price: Pricer, convention: str, as_of: date, quotes: Sequence[Quote],
         def value(s: float) -> float:
             shifts = [s * BP if only is None or k == only else 0.0 for k in range(n)]
             return price(_rebuild(convention, as_of, quotes, interpolation, shifts))
+
         return value
 
     parallel = _risk(moved(None), v0, bump_bp, scheme)
@@ -107,8 +121,15 @@ def _par(price: Pricer, convention: str, as_of: date, quotes: Sequence[Quote],
     return v0, parallel, buckets
 
 
-def par(as_of: date, convention: str, quotes: Sequence[Quote], interpolation: str,
-        product: Product, bump_bp: float, scheme: str) -> dict[str, object]:
+def par(
+    as_of: date,
+    convention: str,
+    quotes: Sequence[Quote],
+    interpolation: str,
+    product: Product,
+    bump_bp: float,
+    scheme: str,
+) -> dict[str, object]:
     check_bump(bump_bp, product)
     _check_convention(product, convention)
     ois._check_quotes(convention, as_of, quotes)
@@ -135,8 +156,14 @@ def _triangle(keys: Sequence[float], i: int) -> Callable[[float], float]:
     return w
 
 
-def key_rate(data: CurveData, mode: str, key_dates: Sequence[date] | None, product: Product,
-             bump_bp: float, scheme: str) -> dict[str, object]:
+def key_rate(
+    data: CurveData,
+    mode: str,
+    key_dates: Sequence[date] | None,
+    product: Product,
+    bump_bp: float,
+    scheme: str,
+) -> dict[str, object]:
     check_bump(bump_bp, product)
     if mode == "TRIANGULAR":
         if not key_dates:
@@ -144,8 +171,9 @@ def key_rate(data: CurveData, mode: str, key_dates: Sequence[date] | None, produ
         previous = data.as_of
         for d in key_dates:
             if d <= previous:
-                raise QfError("E_INPUT", "key dates must be increasing and after as_of",
-                              "key_dates")
+                raise QfError(
+                    "E_INPUT", "key dates must be increasing and after as_of", "key_dates"
+                )
             previous = d
     elif key_dates is not None:
         raise QfError("E_INPUT", "PILLAR takes no key dates", "key_dates")
@@ -162,6 +190,7 @@ def key_rate(data: CurveData, mode: str, key_dates: Sequence[date] | None, produ
             factors = list(data.discount_factors)
             factors[i] = factors[i] * math.exp(-s * BP * t)
             return price(curves.build(replace(data, discount_factors=tuple(factors))))
+
         return value
 
     if mode == "TRIANGULAR":
@@ -177,19 +206,28 @@ def key_rate(data: CurveData, mode: str, key_dates: Sequence[date] | None, produ
     }
 
 
-def jacobian(as_of: date, convention: str, quotes: Sequence[Quote], interpolation: str,
-             bump_bp: float, tension: float | None = None,
-             step_end: date | None = None) -> dict[str, object]:
+def jacobian(
+    as_of: date,
+    convention: str,
+    quotes: Sequence[Quote],
+    interpolation: str,
+    bump_bp: float,
+    tension: float | None = None,
+    step_end: date | None = None,
+) -> dict[str, object]:
     if not 0 < bump_bp <= 100:
         raise QfError("E_DOMAIN", "bump_bp must be in (0, 100]", "bump_bp")
     n, h = len(quotes), bump_bp * BP
 
     def zeros(shifts: Sequence[float]) -> tuple[CurveData, list[float]]:
         moved = [Quote(q.tenor, q.mid + s) for q, s in zip(quotes, shifts, strict=True)]
-        data = ois.bootstrap(convention, as_of, moved, interpolation, tension=tension,
-                             step_end=step_end)[0]
-        return data, [-math.log(v) / ((d - as_of).days / 365)
-                      for d, v in zip(data.dates, data.discount_factors, strict=True)]
+        data = ois.bootstrap(
+            convention, as_of, moved, interpolation, tension=tension, step_end=step_end
+        )[0]
+        return data, [
+            -math.log(v) / ((d - as_of).days / 365)
+            for d, v in zip(data.dates, data.discount_factors, strict=True)
+        ]
 
     data, z0 = zeros([0.0] * n)
     columns = []
@@ -200,12 +238,22 @@ def jacobian(as_of: date, convention: str, quotes: Sequence[Quote], interpolatio
         # quotes into earlier pillars; for local ones the difference is exactly zero.
         columns.append([(u - d) / (2 * h) for u, d in zip(up, down, strict=True)])
     matrix = [[columns[j][i] for j in range(n)] for i in range(n)]
-    return {"pillar_dates": [d.isoformat() for d in data.dates], "zero_rates": z0,
-            "jacobian": matrix}
+    return {
+        "pillar_dates": [d.isoformat() for d in data.dates],
+        "zero_rates": z0,
+        "jacobian": matrix,
+    }
 
 
-def pnl_explain(as_of: date, convention: str, interpolation: str, start: Sequence[Quote],
-                end: Sequence[Quote], product: Product, bump_bp: float) -> dict[str, object]:
+def pnl_explain(
+    as_of: date,
+    convention: str,
+    interpolation: str,
+    start: Sequence[Quote],
+    end: Sequence[Quote],
+    product: Product,
+    bump_bp: float,
+) -> dict[str, object]:
     check_bump(bump_bp, product)
     _check_convention(product, convention)
     ois._check_quotes(convention, as_of, start)
@@ -222,9 +270,15 @@ def pnl_explain(as_of: date, convention: str, interpolation: str, start: Sequenc
     threshold = 0.05 * max(abs(full), gross) + 1e-8 * product.size
     unexplained = full - risk
     return {
-        "value_start": v0, "value_end": v1, "full_pnl": full, "par_buckets": buckets,
-        "risk_pnl": risk, "unexplained": unexplained, "gross_risk_pnl": gross,
-        "threshold": threshold, "explained": abs(unexplained) <= threshold,
+        "value_start": v0,
+        "value_end": v1,
+        "full_pnl": full,
+        "par_buckets": buckets,
+        "risk_pnl": risk,
+        "unexplained": unexplained,
+        "gross_risk_pnl": gross,
+        "threshold": threshold,
+        "explained": abs(unexplained) <= threshold,
     }
 
 

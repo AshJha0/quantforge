@@ -226,8 +226,12 @@ Vec project(const Matrix& z, const Vec& v) {
 class DualActiveSet {
 public:
     // own_rows: rows the caller added for its own reformulation (R6-28.5: not counted in the cap's p).
-    DualActiveSet(const Matrix& g, const Vec& g0, const Matrix& normals, const Vec& rhs, std::size_t own_rows = 0)
-        : n_(g.size()), own_rows_(own_rows), normals_(normals), rhs_(rhs), j_(n_, Vec(n_, 0.0)), r_(n_, Vec(n_, 0.0)) {
+    // size[i]: the magnitude of the terms that cancel in rhs[i] (a bound row: max(1, |bound| + |x_p,j|)), the scale of
+    // its rounding error; used only to judge an infeasibility certificate.
+    DualActiveSet(const Matrix& g, const Vec& g0, const Matrix& normals, const Vec& rhs, const Vec& size,
+                  std::size_t own_rows = 0)
+        : n_(g.size()), own_rows_(own_rows), normals_(normals), rhs_(rhs), size_(size), j_(n_, Vec(n_, 0.0)),
+          r_(n_, Vec(n_, 0.0)) {
         const Matrix l = cholesky_lower(g);
         // J = L^{-T}: column c of J solves L^T j = e_c.
         for (std::size_t c = 0; c < n_; ++c) {
@@ -246,12 +250,13 @@ public:
     bool solve() {
         const auto max_steps = std::size_t(detail::effort_cap(10 * (long long)(n_ + normals_.size() - own_rows_) + 100));  // R6-6.1, J-R6-5, R6-28.5
         std::vector<char> in_active(normals_.size(), 0);
+        std::vector<char> implied(normals_.size(), 0);  // judged implied by the current active set; cleared on change
         for (std::size_t step = 0; step < max_steps;) {
             // Step 1: the most violated constraint not yet active.
             std::size_t p = normals_.size();
             double worst = 0.0;
             for (std::size_t i = 0; i < normals_.size(); ++i) {
-                if (in_active[i]) continue;
+                if (in_active[i] || implied[i]) continue;
                 const double s = slack(i);
                 if (s < -tolerance(i) && s < worst) {
                     worst = s;
@@ -273,17 +278,46 @@ public:
                     for (std::size_t i = 0; i < n_; ++i) z[i] += j_[i][c] * d[c];
                 }
                 const Vec r = r_solve(d);
+                const bool step_in_primal = d2 > 1e-24 * dall;
+                // n_p in the span of the active rows (no primal step): r are the coefficients of n_p = sum_k r_k n_k,
+                // found by back-substitution in R, so each carries a rounding error of order eps cond(R) max|r|. An
+                // r_k that small is 0, not a blocking row: taken as positive, it makes a dual step of u_k / r_k
+                // (1e17 at a degenerate vertex) that drops a genuine active row and leaves the multipliers of the
+                // dependent rows at 1e17 and of the dropped row, re-added, at 0. The cut is the I-3 threshold,
+                // 1e-12 of the largest |r|, the same 1e-12 as the norm test of step_in_primal.
+                double r_cut = 0.0;
+                if (!step_in_primal)
+                    for (std::size_t k = 0; k < iq(); ++k) r_cut = std::max(r_cut, 1e-12 * std::fabs(r[k]));
                 double t1 = inf;
                 std::size_t drop = 0;
                 for (std::size_t k = 0; k < iq(); ++k)
-                    if (r[k] > 0.0 && u_[k] / r[k] < t1) {
+                    if (r[k] > r_cut && u_[k] / r[k] < t1) {
                         t1 = u_[k] / r[k];
                         drop = k;
                     }
-                const bool step_in_primal = d2 > 1e-24 * dall;
                 const double t2 = step_in_primal ? -sp / d2 : inf;  // n_p . z = |d2|^2
-                if (t1 == inf && t2 == inf) return false;           // no feasible point
-                if (t2 == inf) {                                     // dual step only
+                if (t1 == inf && t2 == inf) {
+                    // Goldfarb-Idnani's certificate: n_p = sum_k r_k n_k with every r_k <= 0, so every feasible y'
+                    // has n_p . y' <= sum_k r_k d_k, and no feasible point exists exactly when
+                    // gap = d_p - sum_k r_k d_k > 0. At a degenerate vertex (a feasible set that is one point, a
+                    // margin tight at a vertex) the true gap is 0 and the rounding of the d's makes it 1e-16 either
+                    // way, while the slack test of step 1 is relative to |d_p| + |n_p . y|, which can itself be
+                    // 1e-16 there. So the gap is judged against the rounding scale of the rows it combines (1e-9,
+                    // the feasibility tolerance of the Python phase one). Below that it is rounding: the constraint
+                    // holds to within it wherever the active ones do, so it is skipped until the active set
+                    // changes. A dependent row can only appear before any step on this pick (a drop removes a row
+                    // with r_k > 0, which leaves n_p outside the smaller span), so up is 0 and u needs no change.
+                    double gap = rhs_[p], tol = size_[p];
+                    for (std::size_t k = 0; k < iq(); ++k) {
+                        gap -= r[k] * rhs_[active_[k]];
+                        tol += std::fabs(r[k]) * size_[active_[k]];
+                    }
+                    if (gap > certificate * tol) return false;  // no feasible point
+                    implied[p] = 1;
+                    break;
+                }
+                std::ranges::fill(implied, 0);  // the active set changes below
+                if (t2 == inf) {                // dual step only
                     for (std::size_t k = 0; k < iq(); ++k) u_[k] -= t1 * r[k];
                     up += t1;
                     in_active[active_[drop]] = 0;
@@ -390,9 +424,11 @@ private:
         }
     }
 
+    static constexpr double certificate = 1e-9;
     std::size_t n_, own_rows_;
     const Matrix& normals_;
     const Vec& rhs_;
+    const Vec& size_;
     Matrix j_, r_;
     Vec y_, u_;
     std::vector<std::size_t> active_;
@@ -442,25 +478,28 @@ Vec bounded_minimiser(const Matrix& reduced, const Vec& g0, const NullSpace& ns,
         return x;
     }
     Matrix normals;
-    Vec rhs;
+    Vec rhs, size;  // size: the magnitude that cancels in rhs, its rounding scale
     for (const BoundRow& b : rows) {
         const double sign = b.lower ? 1.0 : -1.0;
         Vec row(r);
         for (std::size_t c = 0; c < r; ++c) row[c] = sign * ns.z[b.index][c];
         normals.push_back(std::move(row));
         rhs.push_back(sign * (b.bound - ns.xp[b.index]));
+        size.push_back(std::max(1.0, std::fabs(b.bound) + std::fabs(ns.xp[b.index])));
     }
     if (general) {
         Vec row(r, 0.0);
-        double at_xp = 0.0;
+        double at_xp = 0.0, terms = std::fabs(general_rhs);
         for (std::size_t j = 0; j < n; ++j) {
             at_xp += (*general)[j] * ns.xp[j];
+            terms += std::fabs((*general)[j] * ns.xp[j]);
             for (std::size_t c = 0; c < r; ++c) row[c] += (*general)[j] * ns.z[j][c];
         }
         normals.push_back(std::move(row));
         rhs.push_back(general_rhs - at_xp);
+        size.push_back(std::max(1.0, terms));
     }
-    DualActiveSet qp(reduced, g0, normals, rhs, std::min(own_rows, normals.size()));
+    DualActiveSet qp(reduced, g0, normals, rhs, size, std::min(own_rows, normals.size()));
     if (!qp.solve()) throw Error("E_INFEASIBLE", "no point satisfies the equalities and the bounds");
     for (std::size_t j = 0; j < n; ++j)
         for (std::size_t c = 0; c < r; ++c) x[j] += ns.z[j][c] * qp.y()[c];
@@ -550,6 +589,130 @@ double margin_used(const QpProblem& p, const Vec& x) {
     return m;
 }
 
+}  // namespace
+
+namespace detail {
+
+// argmin cost z subject to a z = b, z >= 0, or nullopt when no z is feasible. Two-phase dense tableau simplex with
+// Bland's rule; a port of Python hedge_solvers._simplex (same pivots, same tolerances) for the margin start.
+std::optional<Vec> simplex(const Matrix& a, const Vec& b, const Vec& cost) {
+    const std::size_t rows = a.size(), cols = cost.size(), width = cols + rows + 1;
+    Matrix tab(rows + 1, Vec(width, 0.0));
+    double scale = 1.0;
+    for (std::size_t r = 0; r < rows; ++r) {
+        const double sign = b[r] < 0.0 ? -1.0 : 1.0;
+        for (std::size_t c = 0; c < cols; ++c) tab[r][c] = sign * a[r][c];
+        tab[r][width - 1] = sign * b[r];
+        tab[r][cols + r] = 1.0;
+        for (std::size_t c = 0; c < width; ++c) scale = std::max(scale, std::fabs(tab[r][c]));
+    }
+    std::vector<std::size_t> basis(rows);
+    std::iota(basis.begin(), basis.end(), cols);
+    const double tol = 1e-11 * scale;
+    auto pivot = [&](std::size_t r, std::size_t c) {
+        const double d = tab[r][c];
+        for (double& v : tab[r]) v /= d;
+        for (std::size_t o = 0; o <= rows; ++o) {
+            if (o == r || tab[o][c] == 0.0) continue;
+            const double f = tab[o][c];
+            for (std::size_t k = 0; k < width; ++k) tab[o][k] -= f * tab[r][k];
+        }
+        basis[r] = c;
+    };
+    auto run = [&](std::size_t allowed) {
+        for (std::size_t it = 0; it < 50 * (rows + cols) + 100; ++it) {
+            std::size_t entering = allowed;
+            for (std::size_t c = 0; c < allowed; ++c)
+                if (tab[rows][c] < -tol) { entering = c; break; }
+            if (entering == allowed) return;
+            std::size_t best = rows;
+            double best_ratio = 0.0;
+            for (std::size_t r = 0; r < rows; ++r) {
+                if (tab[r][entering] <= tol) continue;
+                const double ratio = tab[r][width - 1] / tab[r][entering];
+                if (best == rows || ratio < best_ratio || (ratio == best_ratio && basis[r] < basis[best])) {
+                    best = r;
+                    best_ratio = ratio;
+                }
+            }
+            if (best == rows) throw Error("E_NO_CONVERGENCE", "the margin search is unbounded");
+            pivot(best, entering);
+        }
+        throw Error("E_NO_CONVERGENCE", "the margin search did not settle");
+    };
+    for (std::size_t c = 0; c < width; ++c) {
+        double s = 0.0;
+        for (std::size_t r = 0; r < rows; ++r) s += tab[r][c];
+        tab[rows][c] = c >= cols && c < cols + rows ? 0.0 : -s;
+    }
+    run(cols + rows);
+    if (-tab[rows][width - 1] > 1e-9 * scale) return std::nullopt;
+    for (std::size_t r = 0; r < rows; ++r) {  // move degenerate artificials out where a structural pivot exists
+        if (basis[r] < cols) continue;
+        for (std::size_t c = 0; c < cols; ++c)
+            if (std::fabs(tab[r][c]) > tol) { pivot(r, c); break; }
+    }
+    std::ranges::fill(tab[rows], 0.0);
+    for (std::size_t c = 0; c < cols; ++c) tab[rows][c] = cost[c];
+    for (std::size_t r = 0; r < rows; ++r) {
+        const std::size_t c = basis[r];
+        if (c >= cols || tab[rows][c] == 0.0) continue;
+        const double f = tab[rows][c];
+        for (std::size_t k = 0; k < width; ++k) tab[rows][k] -= f * tab[r][k];
+    }
+    run(cols);  // artificials never re-enter
+    Vec z(cols, 0.0);
+    for (std::size_t r = 0; r < rows; ++r)
+        if (basis[r] < cols) z[basis[r]] = tab[r][width - 1];
+    return z;
+}
+
+// The point of least margin sum m_j |x_j| with E x = e inside the bounds, or nullopt: an LP in x = u - v, u, v >= 0,
+// each finite bound a row with a slack (Python hedge_solvers._least_margin). Exact, unlike a margin penalty, whose
+// O(1/penalty) error is the size of the I-46 tolerance and refused a limit equal to the least margin.
+std::optional<Vec> least_margin(const Matrix& eq, const Vec& eq_rhs, const std::vector<Bound>& lower,
+                                const std::vector<Bound>& upper, const Vec& rates) {
+    const std::size_t n = rates.size();
+    struct LpBoundRow { std::size_t j; double v, sign; };
+    std::vector<LpBoundRow> bound_rows;
+    for (std::size_t j = 0; j < upper.size(); ++j)
+        if (upper[j]) bound_rows.push_back({j, *upper[j], 1.0});
+    for (std::size_t j = 0; j < lower.size(); ++j)
+        if (lower[j]) bound_rows.push_back({j, *lower[j], -1.0});
+    const std::size_t cols = 2 * n + bound_rows.size();
+    Matrix rows;
+    Vec rhs;
+    for (std::size_t r = 0; r < eq.size(); ++r) {
+        Vec row(cols, 0.0);
+        for (std::size_t j = 0; j < n; ++j) {
+            row[j] = eq[r][j];
+            row[n + j] = -eq[r][j];
+        }
+        rows.push_back(std::move(row));
+        rhs.push_back(eq_rhs[r]);
+    }
+    for (std::size_t s = 0; s < bound_rows.size(); ++s) {  // x_j + t = u, or x_j - t = l
+        Vec row(cols, 0.0);
+        row[bound_rows[s].j] = 1.0;
+        row[n + bound_rows[s].j] = -1.0;
+        row[2 * n + s] = bound_rows[s].sign;
+        rows.push_back(std::move(row));
+        rhs.push_back(bound_rows[s].v);
+    }
+    if (rows.empty()) return Vec(n, 0.0);
+    Vec cost(cols, 0.0);
+    for (std::size_t j = 0; j < n; ++j) cost[j] = cost[n + j] = rates[j];
+    const std::optional<Vec> z = simplex(rows, rhs, cost);
+    if (!z) return std::nullopt;
+    Vec x(n);
+    for (std::size_t j = 0; j < n; ++j) x[j] = (*z)[j] - (*z)[n + j];
+    return x;
+}
+
+}  // namespace detail
+
+namespace {
+
 // Wave 4a with a spread or margin term, by sign states (ruling I-48). f = x'Hx + 2c'x + 2 sum k_j |x_j|, with
 // k = cost_weight half_spreads / 2, and optionally sum m_j |x_j| <= limit. A sign state fixes s_j = +1 or -1 for
 // each instrument whose sign is open; in its closed orthant |x_j| = s_j x_j, so f is a smooth strictly convex QP
@@ -563,7 +726,7 @@ class SignStates {
 public:
     SignStates(const QpProblem& p, const Normal& q, const Matrix& reduced, const NullSpace& ns,
                const std::vector<Bound>& lower, const std::vector<Bound>& upper, double cost_weight)
-        : q_(q), reduced_(reduced), ns_(ns), lower_(lower), upper_(upper), n_(q.c.size()), k_(n_, 0.0), m_(n_, 0.0),
+        : p_(p), q_(q), reduced_(reduced), ns_(ns), lower_(lower), upper_(upper), n_(q.c.size()), k_(n_, 0.0), m_(n_, 0.0),
           sign_(n_, 0) {
         if (p.half_spreads)
             for (std::size_t j = 0; j < n_; ++j) k_[j] = 0.5 * cost_weight * (*p.half_spreads)[j];
@@ -584,21 +747,14 @@ public:
         if (reduced_.empty()) return fixed();
         Vec x = run(k_, false, std::nullopt);
         if (!margined_ || margin(x) <= limit_ + 1e-12 * (limit_ + margin(x))) return x;
-        // The margin binds. Start from the orthant of a margin-minimising point: the problem with a margin
-        // penalty far above every gradient. Its margin is the least possible to O(1/penalty); above the limit by
-        // more than the I-46 tolerance, no point is feasible.
-        double scale = 1.0, least = std::numeric_limits<double>::infinity();
-        for (std::size_t j = 0; j < n_; ++j) {
-            scale = std::max(scale, std::fabs(q_.c[j]) + std::fabs(dot(q_.h[j], x)));
-            if (m_[j] > 0.0) least = std::min(least, m_[j]);
-        }
-        Vec heavy = k_;
-        for (std::size_t j = 0; j < n_; ++j) heavy[j] += 1e9 * scale / least * m_[j];
-        const Vec start = run(heavy, false, std::nullopt);
-        if (margin(start) > limit_ + 1e-9 * std::max(1.0, limit_))
+        // The margin binds. Start from the orthant of the exact least-margin point (an LP); above the limit by
+        // more than the I-46 tolerance, no point is feasible. Same test as Python _costed.
+        const std::optional<Vec> start = detail::least_margin(p_.eq_matrix.value_or(Matrix{}), p_.eq_rhs.value_or(Vec{}),
+                                                              lower_, upper_, m_);
+        if (!start || margin(*start) > limit_ * (1.0 + 1e-9) + 1e-12)
             throw Error("E_INFEASIBLE", "no point satisfies the equalities, the bounds and the margin limit");
         std::vector<int> from = sign_;
-        for (const std::size_t j : free_) from[j] = start[j] < 0.0 ? -1 : 1;
+        for (const std::size_t j : free_) from[j] = (*start)[j] < 0.0 ? -1 : 1;
         return run(k_, true, from);
     }
 
@@ -689,6 +845,7 @@ private:
         return g;
     }
 
+    const QpProblem& p_;
     const Normal& q_;
     const Matrix& reduced_;
     const NullSpace& ns_;
@@ -1050,8 +1207,13 @@ Matrix sample_covariance(const Vec& exposure, const Matrix& hedge_series) {
     for (const Vec& s : hedge_series) series.push_back(&s);
     Vec mean(k + 1, 0.0);
     for (std::size_t i = 0; i <= k; ++i) {
-        for (const double v : *series[i]) mean[i] += v;
-        mean[i] /= double(t);
+        bool constant = true;
+        for (const double v : *series[i]) {
+            mean[i] += v;
+            constant = constant && v == (*series[i])[0];
+        }
+        // A constant series has sample variance exactly 0 (ruling J-I.4): its mean is its value.
+        mean[i] = constant ? (*series[i])[0] : mean[i] / double(t);
     }
     Matrix s(k + 1, Vec(k + 1, 0.0));
     for (std::size_t i = 0; i <= k; ++i)
@@ -1330,6 +1492,9 @@ SelectResult select_instruments(const QpProblem& p, long long max_instruments, b
     // Check 3, 4 and 5.
     input_if(max_instruments < 1 || max_instruments > (long long)n, "max_instruments", "must be in 1..n");
     input_if(forbidden_keys, "eq_matrix", "selection takes no eq_matrix, eq_rhs or singular (I-33)");
+    // J-I.3: a problem carrying cost or margin terms is refused, not solved without them.
+    input_if(p.half_spreads || p.impact || p.cost_weight || p.margin_rates || p.margin_limit, "half_spreads",
+             "selection takes no cost or margin inputs (J-I.3)");
     for (std::size_t j = 0; j < n; ++j) {
         domain_if(!lower.empty() && lower[j] && *lower[j] > 0.0, "lower", "a bound excludes 0 (I-33)");
         domain_if(!upper.empty() && upper[j] && *upper[j] < 0.0, "upper", "a bound excludes 0 (I-33)");

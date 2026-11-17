@@ -137,4 +137,11 @@ void replay(const std::string& suite) {
 TEST_CASE("stage F book lifecycle goldens: every event type, marks and their errors") { replay("stage_f/book_f"); }
 TEST_CASE("stage F3 book sensitivity goldens: PV, quote sensitivity and zero Jacobian") { replay("stage_f/risk_f3"); }
 TEST_CASE("stage F use case 4 goldens") { replay("stage_f/uc4_f"); }
+// Stage J wave 3 and curves lane: puts ops_research_w3.inc, ops_term_curves.inc and the core
+// files behind them under ctest, and so under the per-file coverage gate.
+TEST_CASE("stage J scenario stress goldens") { replay("stage_j/scen_j"); }
+TEST_CASE("stage J interpolation backtest goldens") { replay("stage_j/interpbt_j"); }
+TEST_CASE("stage J drift detector goldens") { replay("stage_j/drift_j"); }
+TEST_CASE("stage J term financing goldens") { replay("stage_j/termfin_j"); }
+TEST_CASE("stage J liquidity curve goldens") { replay("stage_j/liqcurve_j"); }
 #endif

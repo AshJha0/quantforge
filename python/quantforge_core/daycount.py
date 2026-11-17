@@ -1,4 +1,5 @@
 """Year fractions (specifications/01-core/daycount.md)."""
+
 from datetime import date
 
 from . import _cal, calendars
@@ -8,11 +9,22 @@ from .finite import guard
 FREQUENCIES = (1, 2, 3, 4, 6, 12)
 _SIMPLE = {"ACT_360": 360.0, "ACT_365F": 365.0, "ACT_364": 364.0, "ACT_365_25": 365.25}
 _THIRTY = (
-    "THIRTY_360_BOND", "THIRTY_360_US", "THIRTY_E_360", "THIRTY_E_360_ISDA", "THIRTY_E_PLUS_360",
+    "THIRTY_360_BOND",
+    "THIRTY_360_US",
+    "THIRTY_E_360",
+    "THIRTY_E_360_ISDA",
+    "THIRTY_E_PLUS_360",
 )
 CONVENTIONS = (
-    *_SIMPLE, *_THIRTY, "NL_365", "ONE_ONE", "BUS_252",
-    "ACT_365L", "ACT_ACT_ISDA", "ACT_ACT_ICMA", "ACT_ACT_AFB",
+    *_SIMPLE,
+    *_THIRTY,
+    "NL_365",
+    "ONE_ONE",
+    "BUS_252",
+    "ACT_365L",
+    "ACT_ACT_ISDA",
+    "ACT_ACT_ICMA",
+    "ACT_ACT_AFB",
 )
 
 
@@ -23,9 +35,7 @@ def _year_days(y: int) -> int:
 def _feb29_closed_open(low: date, high: date) -> int:
     """29 Februaries d with low <= d < high."""
     return sum(
-        1
-        for y in range(low.year, high.year + 1)
-        if _cal.isleap(y) and low <= date(y, 2, 29) < high
+        1 for y in range(low.year, high.year + 1) if _cal.isleap(y) and low <= date(y, 2, 29) < high
     )
 
 
@@ -158,7 +168,8 @@ def year_fraction(
         raise QfError("E_DATE_ORDER", "end is before start", "end")
     if convention == "ACT_ACT_ICMA" and (
         required(ref_end, "ref_end") <= required(ref_start, "ref_start")
-        or start < required(ref_start, "ref_start") or end > required(ref_end, "ref_end")
+        or start < required(ref_start, "ref_start")
+        or end > required(ref_end, "ref_end")
     ):
         raise QfError("E_INPUT", "the accrual must lie inside the reference period")
 

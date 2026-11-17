@@ -197,7 +197,9 @@ final class OpsMarketRisk {
         table.put("risk.backtest.traffic_light", in -> {
             long n = in.integer("observations");
             long x = in.integer("exceptions");
-            double c = in.gate(in.real("confidence"));
+            double c = in.real("confidence");
+            in.limit(n > 1_000_000, "observations"); // ruling J-W3-17
+            in.gate();
             PortfolioRisk.TrafficLight t = PortfolioRisk.trafficLight(n, x, c);
             return Operations.out("cumulative_probability", t.cumulative(), "zone", t.zone(),
                     "plus_factor", t.plusFactor());

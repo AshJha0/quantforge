@@ -9,9 +9,10 @@ QuantForge has four equal implementations of the same maths, in Java, C++, Pytho
 Two ways in:
 
 - **New to quantitative finance, or to this project.** Work through the [tutorials](docs/getting-started/README.md), starting with [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md): quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Tutorials 2 to 16 go on, 10 to 15 minutes each, to bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk and the LIBOR market model, with every number checked in all four languages. Tutorials 17 to 21 cover stage I, hedging: Greek and dynamic delta hedges, minimum-variance and constrained hedges, credit and correlation hedges, a cross-asset hedge with instrument selection, and what a hedge costs. Tutorials 23 and 24 cover stage J research tools: an honest backtest with purged cross-validation, and whether a Sharpe ratio is real. Then read the topics below in order.
+- **Test yourself.** The [question bank](docs/question-bank/README.md) has 371 questions with worked answers, at foundation, practitioner and advanced level, across all the topics below.
 - **Practitioner.** Jump to a topic. Each worked example names its golden case, so you can rerun it as `COOKBOOK.md` shows and check the number yourself.
 
-**What the tests check.** 7,571 value-checked golden cases, where each build must return the oracle's numbers within a stated tolerance; 5,230 error cases, which check only that a bad input is refused with the right code; and 2,514 invariance cases (1,257 pairs), which check that two related inputs get the same answer. Counts are generated in [`docs/case-figures.md`](docs/case-figures.md). Outside-library shares per stage, under the tight rule D6, are in [`oracle/OUTSIDE_SHARES.md`](oracle/OUTSIDE_SHARES.md).
+**What the tests check.** 7,653 value-checked golden cases, where each build must return the oracle's numbers within a stated tolerance; 5,347 error cases, which check only that a bad input is refused with the right code; and 2,514 invariance cases (1,257 pairs), which check that two related inputs get the same answer. Counts are generated in [`docs/case-figures.md`](docs/case-figures.md). Outside-library shares per stage, under the tight rule D6, are in [`oracle/OUTSIDE_SHARES.md`](oracle/OUTSIDE_SHARES.md).
 
 Sources: every model and convention cites its papers, books and standards in the sources list of its spec. [References](docs/references.md) collects them all by topic, with each one's status (read, not opened, or paywalled) and the specs that rely on it.
 
@@ -493,7 +494,7 @@ Tutorials 17 to 21 work through this section with real outputs in all four langu
 **Worked example.** `hedgeeff_i-0001`: a close hedge gives a dollar offset of 0.9712, a slope of -0.9924, `R^2` 0.9964 and a variance reduction of 0.9964 (computed at 50 digits; outside check numpy 2.5 `polyfit`, `corrcoef` and `var`). A perfect offset would give 1, -1, 1 and 1.
 
 ### What stage I's evidence does and does not show
-- **Outside oracle: 102 of 153 value-checked cases (66.7%) under the tight rule D6, from a per-case register, without the wave 5 cases (83.7% with them); 36.7% under the old all-case count; v0.8.0 published 62.8%.** Every stage I counted case is a numpy or scipy primitive check; none uses a library pricing object (`oracle/OUTSIDE_SHARES.md`). Wave 5 (ruling I-55) added 165 value cases from seeded draws, checked against QuantLib, numpy and scipy; draws were rejected only by rules fixed before any outside check (3 in all), never for disagreeing. Error cases are in the denominator and never count, and integer lots, beta futures, residual reports and slippage still have no outside library that solves a different way (`program/STAGE_I_HANDOVER.md`, "WAVE 5 READY").
+- **Outside oracle: 102 of 153 value-checked cases (66.7%) under the tight rule D6, from a per-case register, without the wave 5 cases (83.6% with them); 36.7% under the old all-case count; v0.8.0 published 62.8%.** Every stage I counted case is a numpy or scipy primitive check; none uses a library pricing object (`oracle/OUTSIDE_SHARES.md`). Wave 5 (ruling I-55) added 165 value cases from seeded draws, checked against QuantLib, numpy and scipy; draws were rejected only by rules fixed before any outside check (3 in all), never for disagreeing. Error cases are in the denominator and never count, and integer lots, beta futures, residual reports and slippage still have no outside library that solves a different way (`program/STAGE_I_HANDOVER.md`, "WAVE 5 READY").
 - **Q6-01, the synthetic method test, failed** (78.4% inside the spread against 80%); kept as published. Q6-02 (prereg signed 2026-11-14, robust Huber-type fit and shape-only penalty, fresh seed 20261113, run once) **passed** on synthetic quotes: 87.4% of test quotes inside the spread, churn median 0.98 and 95th percentile 1.56, no arbitrage on 48 of 48 test days; the selected penalty was 0, so the pass comes from the robust fit, not the penalty (`research/q6/q6_02_output.json`). Real quotes: not done (tutorial 22).
 - **Q6 (calibration on real noisy quotes) is blocked** by the data terms of the candidate sources; only its preregistration exists (`research/preregs/Q6-01-churn-bound.md`).
 - **The hedges are calculations.** Nothing is traded, and costs, impact and margin are inputs, not estimates from a market.
@@ -501,9 +502,9 @@ Tutorials 17 to 21 work through this section with real outputs in all four langu
 
 ## Stage J: backtest overfitting and research statistics
 
-Stage J wave 1 (target v0.9.0, not yet released) is specified in `specifications/11-research/` (rulings J-1 to J-23 and J-19a in `specifications/stage-j-rulings-w1.md`) and pinned by the suites `backtest_j`, `purgedcv_j`, `regime_j` and `rstats_j` in `datasets/golden/stage_j/`. All four builds pass every case (15,215 of 15,215 at contract 1.13.0 after wave 1; 15,315 of 15,315 at contract 1.14.0 after wave 2, 2026-11-14). The numbers below were printed by all four builds on 2026-11-14 unless a paragraph says otherwise. Every input is synthetic except the DSR example, which is the paper's own.
+Stage J wave 1 (released in v0.9.0) is specified in `specifications/11-research/` (rulings J-1 to J-23 and J-19a in `specifications/stage-j-rulings-w1.md`) and pinned by the suites `backtest_j`, `purgedcv_j`, `regime_j` and `rstats_j` in `datasets/golden/stage_j/`. All four builds pass every case (15,215 of 15,215 at contract 1.13.0 after wave 1; 15,315 of 15,315 at contract 1.14.0 after wave 2, 2026-11-14). The numbers below were printed by all four builds on 2026-11-14 unless a paragraph says otherwise. Every input is synthetic except the DSR example, which is the paper's own.
 
-[Tutorial 23](docs/getting-started/tutorial-23-backtest-honestly.md) and [Tutorial 24](docs/getting-started/tutorial-24-is-the-sharpe-real.md) work through this section on hand-sized data, the [Cookbook](COOKBOOK.md#stage-j-recipes) has one recipe per operation, and the gallery page [Research workflow](docs/curves/research-workflow.md) runs the whole chain on twelve rules.
+[Tutorial 23](docs/getting-started/tutorial-23-backtest-honestly.md) and [Tutorial 24](docs/getting-started/tutorial-24-is-the-sharpe-real.md) work through this section on hand-sized data, Tutorials 27 to 32 take the tools further (see [Using the tools](#using-the-tools-four-questions-every-study-meets)), the [Cookbook](COOKBOOK.md#stage-j-recipes) has one recipe per operation, and the gallery page [Research workflow](docs/curves/research-workflow.md) runs the whole chain on twelve rules.
 
 Why it matters. A strategy's backtest is the evidence most research rests on, and it is easy to make it say more than it can. The three usual ways are look-ahead (using data from after the decision), free trading, and selection (reporting the best of many tries as if it were the only one). The first two are mechanics; the third is statistics, and it is the one that survives careful coding.
 
@@ -567,7 +568,7 @@ Why it matters. A strategy's backtest is the evidence most research rests on, an
 
 ### Wave 2: building a portfolio and testing a risk model
 
-Wave 2 (rulings J-W2-1 to J-W2-23 in `specifications/stage-j-rulings-w2.md`, suites `optim_j`, `estim_j`, `esbt_j` and `baumwelch_j`) adds the tools a portfolio study needs once it has returns: estimate, optimise, see where the risk sits, and test the risk model afterwards. The seven operations are implemented in all four languages on branch `stage-j` at contract 1.14.0. The numbers in the next six sections were printed by the Python build on 2026-11-14; those that Tutorials 25 and 26 print were printed digit for digit by the Rust, Java and C++ builds too, the same day. [Tutorial 25](docs/getting-started/tutorial-25-build-and-stress-a-portfolio.md) and [Tutorial 26](docs/getting-started/tutorial-26-test-es-and-fit-regimes.md) work through them, and the [diagrams page](docs/diagrams/README.md#portfolio-pipeline) draws the pipeline.
+Wave 2 (rulings J-W2-1 to J-W2-23 in `specifications/stage-j-rulings-w2.md`, suites `optim_j`, `estim_j`, `esbt_j` and `baumwelch_j`) adds the tools a portfolio study needs once it has returns: estimate, optimise, see where the risk sits, and test the risk model afterwards. The seven operations are implemented in all four languages at contract 1.14.0 and merged to `main` (PR #40, 2026-11-14; released in v0.9.0). The numbers in the next six sections were printed by the Python build on 2026-11-14; those that Tutorials 25 and 26 print were printed digit for digit by the Rust, Java and C++ builds too, the same day. [Tutorial 25](docs/getting-started/tutorial-25-build-and-stress-a-portfolio.md) and [Tutorial 26](docs/getting-started/tutorial-26-test-es-and-fit-regimes.md) work through them, and the [diagrams page](docs/diagrams/README.md#portfolio-pipeline) draws the pipeline.
 
 ### Mean-variance: return against risk, with limits
 
@@ -617,13 +618,92 @@ Wave 2 (rulings J-W2-1 to J-W2-23 in `specifications/stage-j-rulings-w2.md`, sui
 
 **Worked example.** One state on 24 returns stops at iteration 2 with the sample mean 0.1083 and the population standard deviation 1.3675. Two states, tolerance `1e-6`, stop after iteration 7 with standard deviations 0.317 and 2.173 and nearly equal means, staying probabilities 0.8354 and 0.7582 (average spells of 6.1 and 4.1 days), and a log-likelihood of -31.8744 against -41.5653 for one state. Viterbi with the fitted parameters labels the two turbulent spells, `000011110000000011110000` (Tutorial 26). Outside check: the oracle recomputes every log-likelihood with an independent log-space forward pass (J-W2-15), and hmmlearn 0.3.3 `GaussianHMM.fit` with the same start values and stop rule reproduces all 6 value-checked `baumwelch_j` goldens (J-W2-16).
 
+### Using the tools: four questions every study meets
+
+The sections above define each operation. The four below put them to work on questions a study has to answer before anyone should believe it. Each is worked through on synthetic data, digit for digit in all four builds, in Tutorials 27 to 32; the numbers here are from those pages (2026-11-15).
+
+#### What do costs do to a backtest?
+
+**Plain idea.** A rule that trades often must earn more per trade. The quickest robustness check is the half spread at which the strategy earns nothing.
+
+**Formal statement.** In `research.backtest.run` the spread cost is `sum_t |d_t| p_t m half_spread_bps / 10^4 = turnover x half_spread_bps / 10^4`, and nothing else depends on the half spread, so net P&L is linear in it and the break-even is `b* = (total_gross - total_commission - total_fixed_cost) / (turnover x 10^-4)` (`11-research/backtester.md`). Fills are in full at the close plus or minus the half spread, with no impact (J-1), so real costs are higher.
+
+**Worked example.** A five-bar trend rule on 250 synthetic closes with a built-in cycle: gross 461.73, 47 trades, turnover 93,055.8, commission 9.30, so `b* = 48.62` bp, and a run at that half spread prints net 0.000000. One more bar of execution lag cuts the gross by 37 % (171.94), about what 18.5 bp of spread would cost; a ten-bar rule trades 19 times and ends with a similar net ([Tutorial 27](docs/getting-started/tutorial-27-what-costs-do-to-a-backtest.md)).
+
+#### What does a portfolio constraint cost?
+
+**Plain idea.** Compare the best portfolio with and without the constraint at the same risk aversion, in the investor's own currency: certainty-equivalent return, expected return less the charge for variance.
+
+**Formal statement.** `CE(w) = mu'w - (gamma/2) w' Sigma w`, the mean-variance objective itself; the cost of a constraint is `CE(w_free) - CE(w_constrained) >= 0`, zero exactly when the constraint does not bind at the free optimum. Without bounds `w(gamma) = w_mv + z / gamma`, so the frontier's expected return is linear in `1/gamma` [Mar52].
+
+**Worked example.** Four assets, volatilities 20 % to 5 %: at `gamma = 1` the free portfolio has CE 0.0823 and long-only 0.0627, a cost of 195.5 bp a year; from `gamma = 5` the free optimum holds no shorts and the cost is zero. Near minimum variance each asset's Euler risk share is close to its weight, as `Sigma w = lambda 1` makes it exactly at the minimum ([Tutorial 28](docs/getting-started/tutorial-28-efficient-frontier.md)).
+
+#### How strong is a view?
+
+**Plain idea.** For one Black-Litterman view the posterior moves a fixed fraction of the way from the prior to the view, and that fraction is set by the view's variance against the prior's.
+
+**Formal statement.** With `s^2 = tau P Sigma P'`, the posterior value of `P mu` is `P pi + c (q - P pi)` with `c = s^2 / (s^2 + Omega)`; the mean depends on `tau` and `Omega` only through `Omega / tau`, while `posterior_covariance` scales with `tau` (`07-portfolio/estimation.md`, J-W2-8) [BL92, HL99].
+
+**Worked example.** Tutorial 25's spread view, `s^2 = 0.0019`: `Omega` = 1e-8, 0.0002, 0.0019, 0.019 and 1 give spreads 0.0800, 0.0760, 0.0590, 0.0418 and 0.0381, each equal to `0.038 + c x 0.042` to four digits. Doubling `tau` and `Omega` together leaves the posterior returns unchanged to six digits ([Tutorial 29](docs/getting-started/tutorial-29-view-confidence.md)).
+
+#### How many trials can a Sharpe ratio survive, and does shrinkage help?
+
+**Plain idea.** The deflated Sharpe ratio falls as the number of trials grows, slowly but without limit; the minimum detectable Sharpe falls only with the square root of the sample length. And Ledoit-Wolf, the usual fix for a short covariance history, trades noise for bias towards its target, so it does not always help.
+
+**Formal statement.** `SR0 = sqrt(V) ((1 - gamma_E) Phi^-1(1 - 1/N) + gamma_E Phi^-1(1 - 1/(N e)))` grows roughly as `sqrt(2 ln N)`; `mds = z_sum / sqrt(years)` (J-13, `research-statistics.md`) [BLdP14, Lo02]. Ledoit-Wolf minimises expected squared error under its own assumptions [LW04]; on one sample, or with a target far from the truth, it can lose.
+
+**Worked example.** An annual Sharpe of 1.0 over three years, skew -0.5, kurtosis 5: DSR 0.9555 for one trial (equal to the PSR), 0.6413 for 10, 0.3259 for 100, 0.1429 for 1,000; detecting a Sharpe of 1.0 at 5 % and 80 % power takes 6.18 years ([Tutorial 30](docs/getting-started/tutorial-30-trials-and-power.md)). Purged five-fold CV with 20-bar labels keeps 40 of 100 training rows in the middle folds and lets none leak, against 160 leaking labels in plain k-fold ([Tutorial 31](docs/getting-started/tutorial-31-leakage-and-purging.md)). For five assets with volatilities 6 to 2 and correlation 0.5, Ledoit-Wolf's shrinkage falls from 0.30 at 10 months to 0.006 at 1,000; it brought the estimate closer to the truth at only one of four lengths on that seed, yet halved the risk-parity weight error at 30 months ([Tutorial 32](docs/getting-started/tutorial-32-shrinkage-and-sample-length.md)). One seed is one draw, not a result.
+
+### Stress testing with history: the shock library
+
+**Plain idea.** Take a crisis you remember, measure how far each point of the yield curve moved between two dates, and apply the same moves to today's curve and book. The answer is not a probability; it is "this is what that day would cost us now".
+
+**Formal statement.** `shift_bp_j = 100 (y_j(end) - y_j(start))` for each tenor `j`, in binary64, from stored par yields in percent; level is the mean shift and slope the last tenor's shift minus the first's (J-W3-2, J-W3-3). Replay interpolates the shift linearly in tenor onto the book's tenors, holds it flat outside the shock's own tenors, scales it, adds `applied_bp / 100` to the yields and, given DV01s, reports `pnl = -sum_j dv01_j applied_bp_j` (J-W3-4, J-W3-5; `06-risk/scenario-stress.md`). The library `datasets/scenarios/us_treasury_shocks.json` holds four named moves (2008, 2013, 2020, 2022) from Treasury par yield files with source URL, retrieval time and SHA-256, and every start and end value matches the Fed's H.15 release (worst gap 0.0000 percentage points).
+
+**Worked example.** The 2013 taper tantrum (1 May to 5 September): 2Y +32 bp, 10Y +132 bp, level 64.82 bp, slope 105 bp, a steepener. A book long 1,200 per bp at 2Y and 3,500 at 10Y gains 697,900 in the 2008 move and loses 1,392,700 in the 2022 one (Tutorial 33). Outside check: numpy `interp` reproduces every replay golden, and a pandas date lookup every historical-shock golden (`oracle/OUTSIDE_J.json`).
+
+### Backtesting an interpolation
+
+**Plain idea.** Hide a quoted point, rebuild the curve or smile from the others, and see how far the rebuilt value lands from the quote. Repeat for every inner point; the errors say how much to trust the curve between quotes.
+
+**Formal statement.** Leave-one-out: for each inner knot `i`, `e_i = f_{-i}(x_i) - y_i` with `f_{-i}` the same `core.interp.evaluate` method on the other knots; end knots are never left out (J-W3-8). Surface hold-out: per expiry, interpolate total variance `w = sigma^2 T` across the kept strikes and compare `sqrt(w / T)` with the held-out vols (J-W3-9; `11-research/interp-backtest.md`). Outputs are the errors, their maximum absolute value and their RMSE.
+
+**Worked example.** Knots `(1, 3.0), (2, 3.4), (3, 3.6), (5, 4.0)` with `linear`: hiding `x = 2` rebuilds 3.3, error -0.1; hiding `x = 3` rebuilds 3.6 exactly. The two research backtests, rules committed before the run: B1 (cubic spline on an SSVI smile) **fails**, 0.370 vol points at the 3-month ATM strike against a limit of 0.25; B2 (pchip on Treasury par, 3M to 10Y) passes narrowly, median 2.62 bp and 95th percentile 14.19 bp (`research/interp_backtest/RESULTS.md`). Outside check: numpy `interp` and scipy `CubicSpline` and `PchipInterpolator` reproduce all 16 value goldens.
+
+### Watching for drift: CUSUM, Page-Hinkley, PSI and KS
+
+**Plain idea.** A model is fitted on yesterday's data. A drift detector watches the new data and raises an alarm when it no longer looks like the old: CUSUM and Page-Hinkley add up small deviations of the mean until they are too large to be chance; PSI and KS compare the whole distribution of two windows.
+
+**Formal statement.** CUSUM on `z = (x - mu0) / sigma`: `S+_t = max(0, S+_{t-1} + z_t - k)`, `S-_t` the mirror, alarm when either is strictly above `h`, both restart (J-W3-10) [PAGE54]. Page-Hinkley: `m_t = sum (x_s - xbar_s - delta)` with `xbar_s` the running mean since the last restart, alarm when `m_t - min(0, m_1, ..., m_t) > lambda` (J-W3-11). PSI `= sum_b (a_b - e_b) ln(a_b / e_b)` with bins at the reference's type-1 quantiles, right-closed, shares floored at `1e-4` (J-W3-12). Two-sample KS: `D = max |F_n - G_m|` and the exact p-value by counting lattice paths in big integers (J-W3-13; `11-research/drift-detectors.md`). Siegmund's approximation gives CUSUM with `k = 0.5`, `h = 5` an in-control average run length of about 469 steps two-sided and about 10.3 steps after a one-sigma shift [SIEG85].
+
+**Worked example.** A fixed ten-day pattern with mean 0, then the same plus 1.5 from day 60: CUSUM (`k = 0.5`, `h = 5`) alarms on day 64 and again every six days while the shift lasts; Page-Hinkley (`delta = 0.5`, `lambda = 5`) alarms once on day 64, because after its restart the running mean absorbs the new level; PSI on five bins is 7.37 and KS gives `D = 0.9`, `p = 5.8e-13` (Tutorial 33). The A3 study (prereg `research/preregs/A3-drift.md`, unsigned at the time of writing) measures these operating characteristics on 2,000 simulated paths; its Page-Hinkley `lambda` was changed from the plan's 50 to 5 before any draw, from the analytic calibration only (decision record DR-A3-1), because 50 was predicted to take about 100 steps against a 15-step limit. Outside check: scipy `ks_2samp(method="exact")` reproduces 7 KS goldens and numpy/scipy quantiles, binning and `rel_entr` 6 PSI goldens; no free library implements CUSUM or Page-Hinkley with these conventions (river's Page-Hinkley starts its minimum at infinity and has a warm-up gate), so those 13 value goldens are hand and rational re-implementation checks only.
+
+### Financing and liquidity curves (curves lane)
+
+Two curve families the curves page listed as missing, added in v0.9.0 by the curves lane (rulings J-C-1 to J-C-9 in `specifications/stage-j-rulings-curves.md`, suites `termfin_j` and `liqcurve_j`, contract 1.15.0). Implemented in all four languages; the numbers below were printed by the Python build on 2026-11-15 and by the Rust, Java and C++ builds through Tutorials 34 and 35 the same day.
+
+**Plain idea, financing.** Secured financing costs a different rate at each term, and so does borrowing a stock. Each term repo quote fixes one point of the spread over the funding curve; between quotes the forward spread is flat. Stage D's ruling D22 kept these flat; J-C-2 extends it without changing the stage D operations.
+
+**Formal statement.** `S(T_i) = ln(1 + R_i T_i) - Z(T_i) T_i`, linear in `t` between `(0, 0)` and the pillars; `P_f(t) = exp(-Z(t) t - S(t))`; borrow `B(T_j) = b_j T_j`, never falling; forward `F = (S_0 - sum A_i C(t_i)) / C(T)` with `C(t) = P_f(t) e^(B(t))` (`02-curves/financing-term-structure.md`).
+
+**Worked example.** Flat 4 % funding and one 5 % one-year term repo: `S(1) = ln 1.05 - 0.04 = 0.0087901642`; spot 100 then has a one-year forward of exactly 105.
+
+**Plain idea, liquidity.** Selling `Q` units over `h` days costs half the spread, an impact that grows with participation `Q/(V h)`, and timing risk that grows with `h`. The curve gives all three for every size and horizon and the horizon where their sum is smallest.
+
+**Formal statement.** `c(Q, h) = s + Y sigma (Q/(V h))^delta + z sigma sqrt(h/3)` [TLD11, AFTHL05, AC00]; `h* = (2 delta a / b)^(1/(delta + 1/2))` with `a = Y sigma (Q/V)^delta`, `b = z sigma / sqrt 3` (`10-execution/liquidity-curve.md`). Stage H reuses it: at one day and `delta = 1/2` the impact is its draft `exec.impact.sqrt`.
+
+**Worked example.** `sigma` 2 %, `V` 10 million, 100,000 shares in one day: impact `0.02 x sqrt(0.01) = 20` bp. For 1,000,000 shares at `z = 1.645` the optimum is 0.3330 days at 224.21 bp.
+
+**Evidence.** Seven hand cases; the rest reference-computed in mpmath. No free library or published worked example covers either curve, so both are self-assessed (J-C-9).
+
 ### What stage J's evidence does and does not show
 
 - **Outside oracle: 41 of 63 value-checked wave 1 cases (65.1 %),** from `oracle/OUTSIDE_J.json` (J-19a). PSR, DSR and PBO have no free library; DSR is checked against the paper's printed example, PBO by hand.
-- **Wave 2 outside checks: 58 of 67 value cases** (rulings J-W2-16 and J-W2-23: DAQP, cvxpy with Clarabel, autograd, scikit-learn, PyPortfolioOpt and hmmlearn; `esbt_j` has none), so stage J as a whole is 99 of 130 (76.1 %, `oracle/OUTSIDE_SHARES.md`). The rest are checked by hand cases, exact KKT certificates, scipy SLSQP agreement and pairs of independent algebraic forms inside the generator.
-- **The operations are tools, not results.** No stage J study result is claimed here; the gallery page is a teaching example on synthetic prices.
+- **Wave 2 outside checks: 58 of 67 value cases** (rulings J-W2-16 and J-W2-23: DAQP, cvxpy with Clarabel, autograd, scikit-learn, PyPortfolioOpt and hmmlearn; `esbt_j` has none). The rest are checked by hand cases, exact KKT certificates, scipy SLSQP agreement and pairs of independent algebraic forms inside the generator.
+- **Wave 3 outside checks: 31 of 56 value cases** (`oracle/OUTSIDE_J.json`): numpy `interp` on the eight replay cases, numpy and scipy interpolants on all 16 interpolation-backtest cases (a re-run of the calls that generated those goldens, so a weak second check), and scipy `ks_2samp` exact on seven of the eight KS cases. The five historical-shock cases (a date lookup plus arithmetic), PSI, CUSUM and Page-Hinkley are not counted. The curves lane adds 20 value cases and the hedge rank-cut fix 4 and the sign-state fix 2 (J-I.2), none with an outside check (J-C-9), so stage J as a whole is 130 of 212 value cases (61.3 %, `oracle/OUTSIDE_SHARES.md`), above the 60 % floor.
+- **The operations are tools, not results.** The gallery page and Tutorials 23 to 32 are teaching examples on synthetic data. The one set of study results in stage J, the three R3 holdout runs, is null with a pass probability of 13 % to 15 % at the minimum detectable Sharpe, so it is weak evidence either way (`research/r3/RESULTS.md`).
 - **The iid formulas are optimistic.** PSR, DSR and the power formula assume independent returns; studies add block-bootstrap intervals and simulated power.
-- **Tested on one machine.** The 15,215-case wave 1 runs and the 15,315-case wave 2 runs were on one Windows machine; CI on the stage J pull request is the cross-platform check.
+- **Tested on one machine, then in CI.** The 15,215-case wave 1 runs and the 15,315-case wave 2 runs were on one Windows machine. The cross-platform workflow passed on the stage J pull request (2026-11-14), and all eleven push workflows passed on `main` at `a148d0e`, including the tutorial check in all four languages (observed with `gh run list`, 2026-11-15).
 
 ## Appendix: stage history
 

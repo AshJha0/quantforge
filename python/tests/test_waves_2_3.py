@@ -1,4 +1,5 @@
 """Stage F waves 2 and 3: limit cases from the specs."""
+
 from datetime import date
 from typing import Any
 
@@ -6,13 +7,16 @@ from quantforge_core import book, book_risk, var_risk
 from quantforge_core.ois import Quote
 
 AS_OF = date(2026, 11, 10)
-QUOTES = [Quote(t, r) for t, r in (("1M", 0.043), ("1Y", 0.039), ("2Y", 0.0365), ("5Y", 0.0352),
-                                   ("10Y", 0.0364))]
+QUOTES = [
+    Quote(t, r)
+    for t, r in (("1M", 0.043), ("1Y", 0.039), ("2Y", 0.0365), ("5Y", 0.0352), ("10Y", 0.0364))
+]
 
 
 def test_par_payer_limit() -> None:
     """A payer at par: pv 0, d pv / d own quote = its annuity (book-sensitivities.md)."""
     from quantforge_core import curves, ois
+
     data, _ = ois.bootstrap("SOFR", AS_OF, QUOTES, "LOG_LINEAR_DF")
     curve = curves.build(data)
     ps = ois.periods("SOFR", AS_OF, "5Y")
@@ -26,8 +30,9 @@ def test_par_payer_limit() -> None:
 
 
 def test_zero_jacobian_upper_triangle_exact() -> None:
-    out = book_risk.ois_sensitivity(AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF",
-                                    [book_risk.BookSwap("A", 3, 0.04, "RECEIVE")])
+    out = book_risk.ois_sensitivity(
+        AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", [book_risk.BookSwap("A", 3, 0.04, "RECEIVE")]
+    )
     m = out["zero_jacobian"]["matrix"]  # type: ignore[index]
     assert all(m[i][j] == 0.0 for i in range(len(m)) for j in range(i + 1, len(m)))
 
@@ -52,8 +57,10 @@ def test_girr_one_tenor() -> None:
 
 
 def test_reversal_opens_at_trade_price() -> None:
-    events = [book.Event(AS_OF, "TRADE", "X", 10.0, 100.0),
-              book.Event(AS_OF, "TRADE", "X", -15.0, 104.0)]
+    events = [
+        book.Event(AS_OF, "TRADE", "X", 10.0, 100.0),
+        book.Event(AS_OF, "TRADE", "X", -15.0, 104.0),
+    ]
     out = book.lifecycle_apply([], events)
     assert out["positions"] == [{"instrument": "X", "quantity": -5.0, "average_cost": 104.0}]
     assert out["total_realized"] == 40.0
@@ -73,8 +80,14 @@ def test_tokens_only_in_real_fields() -> None:
 
     from quantforge_core.cli.operations import execute
     from quantforge_core.errors import QfError
-    position = {"id": "NaN", "kind": "BOND", "notional": 100.0, "recovery": 0.4,
-                "market_value": 90.0}
+
+    position = {
+        "id": "NaN",
+        "kind": "BOND",
+        "notional": 100.0,
+        "recovery": 0.4,
+        "market_value": 90.0,
+    }
     assert execute("risk.credit.jtd", {"positions": [position]})["total"] == -50.0
     with pytest.raises(QfError) as e:
         execute("risk.credit.jtd", {"positions": [dict(position, notional="Infinity")]})

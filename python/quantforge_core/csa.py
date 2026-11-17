@@ -1,5 +1,6 @@
 """CSA discounting, OIS index basis and the joint bootstrap
 (specifications/02-curves/csa-and-basis.md)."""
+
 import math
 from collections.abc import Sequence
 from datetime import date
@@ -15,9 +16,7 @@ from .projection import ProjectionQuote
 Fx = tuple[float, Sequence[tuple[date, float]]] | None
 
 
-def discount(
-    data: CurveData, spread: float, fx: Fx, dates: Sequence[date]
-) -> list[float]:
+def discount(data: CurveData, spread: float, fx: Fx, dates: Sequence[date]) -> list[float]:
     curve = curves.build(data)
     forwards: dict[date, float] = {}
     if fx is not None:
@@ -57,17 +56,25 @@ def ois_spread(
 
 
 def joint_bootstrap(
-    convention: str, index: str, as_of: date, ois_quotes: Sequence[Quote],
-    term_quotes: Sequence[ProjectionQuote], interpolation: str, method: str,
-    tension: float | None = None, step_end: date | None = None,
+    convention: str,
+    index: str,
+    as_of: date,
+    ois_quotes: Sequence[Quote],
+    term_quotes: Sequence[ProjectionQuote],
+    interpolation: str,
+    method: str,
+    tension: float | None = None,
+    step_end: date | None = None,
 ) -> tuple[CurveData, CurveData, float]:
     """Block triangular: the OIS block is solved first, then the term block on it (ruling D9)."""
     if not ois_quotes or not term_quotes:
         raise QfError("E_INPUT", "both quote lists need quotes", "ois_quotes")
-    disc, e1 = ois.bootstrap(convention, as_of, ois_quotes, interpolation, method, (),
-                             tension, step_end)
-    proj, e2 = projection.bootstrap(disc, index, as_of, term_quotes, interpolation,
-                                    tension, step_end)
+    disc, e1 = ois.bootstrap(
+        convention, as_of, ois_quotes, interpolation, method, (), tension, step_end
+    )
+    proj, e2 = projection.bootstrap(
+        disc, index, as_of, term_quotes, interpolation, tension, step_end
+    )
     return disc, proj, max(e1, e2)
 
 

@@ -1,4 +1,5 @@
 """Holiday calendars and business-day rules (specifications/01-core/calendars.md)."""
+
 import re
 from datetime import date, timedelta
 from functools import lru_cache
@@ -80,8 +81,12 @@ def _gblo(y: int) -> set[date]:
         date(y, 12, xmas_days[1]),
     }
     one_offs = (
-        date(2002, 6, 3), date(2011, 4, 29), date(2012, 6, 5),
-        date(2022, 6, 3), date(2022, 9, 19), date(2023, 5, 8),
+        date(2002, 6, 3),
+        date(2011, 4, 29),
+        date(2012, 6, 5),
+        date(2022, 6, 3),
+        date(2022, 9, 19),
+        date(2023, 5, 8),
     )
     return days | {d for d in one_offs if d.year == y}
 
@@ -89,8 +94,12 @@ def _gblo(y: int) -> set[date]:
 def _euta(y: int) -> set[date]:
     easter = easter_sunday(y)
     days = {
-        date(y, 1, 1), easter - 2 * _DAY, easter + _DAY,
-        date(y, 5, 1), date(y, 12, 25), date(y, 12, 26),
+        date(y, 1, 1),
+        easter - 2 * _DAY,
+        easter + _DAY,
+        date(y, 5, 1),
+        date(y, 12, 25),
+        date(y, 12, 26),
     }
     if y == 2001:
         days.add(date(2001, 12, 31))

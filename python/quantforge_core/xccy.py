@@ -1,4 +1,5 @@
 """Cross-currency basis and NDFs (specifications/02-curves/cross-currency.md)."""
+
 import itertools
 from collections.abc import Sequence
 from datetime import date, timedelta
@@ -33,8 +34,9 @@ def schedule(conventions: Sequence[str], start: date, months: int) -> list[date]
         raise QfError("E_INPUT", "start must be a business day on both calendars", "start")
     if not 0 < months <= 1200 or months % 3:
         raise QfError("E_INPUT", "months must be a positive multiple of 3", "months")
-    return [_mod_following(cals, schedules.add_months(start, 3 * k))
-            for k in range(1, months // 3 + 1)]
+    return [
+        _mod_following(cals, schedules.add_months(start, 3 * k)) for k in range(1, months // 3 + 1)
+    ]
 
 
 def _check_start(as_of: date, start: date) -> None:
@@ -42,18 +44,25 @@ def _check_start(as_of: date, start: date) -> None:
         raise QfError("E_OUT_OF_RANGE", "start is before the curve date", "start")
 
 
-def leg(notional: float, start: date, ends: Sequence[date], p: Curve, d: Curve,
-        spread: float) -> float:
+def leg(
+    notional: float, start: date, ends: Sequence[date], p: Curve, d: Curve, spread: float
+) -> float:
     starts = [start, *ends[:-1]]
     coupons = ordered_sum(
         ((p.discount(s) / p.discount(e) - 1) + spread * (e - s).days / 360) * d.discount(e)
-        for s, e in zip(starts, ends, strict=True))
+        for s, e in zip(starts, ends, strict=True)
+    )
     return notional * (coupons + d.discount(ends[-1]) - d.discount(start))
 
 
 def bootstrap(
-    domestic: CurveData, foreign_projection: CurveData, dom_conv: str, for_conv: str,
-    start: date, quotes: Sequence[tuple[int, float]], interpolation: str,
+    domestic: CurveData,
+    foreign_projection: CurveData,
+    dom_conv: str,
+    for_conv: str,
+    start: date,
+    quotes: Sequence[tuple[int, float]],
+    interpolation: str,
 ) -> tuple[CurveData, float]:
     d = curves.build(domestic)
     p = curves.build(foreign_projection)
@@ -64,20 +73,29 @@ def bootstrap(
     if any(b[0] <= a[0] for a, b in itertools.pairwise(quotes)):
         raise QfError("E_INPUT", "months must be strictly increasing", "quotes")
     pillars = [ends[-1] for ends in tables]
+
     def model(ends: list[date], m: float) -> curves.Model:
         return lambda c: leg(1.0, start, ends, p, c, m)
 
     models = [model(ends, m) for ends, (_, m) in zip(tables, quotes, strict=True)]
     as_of = domestic.as_of
-    factors, error = curves.solve_pillars(as_of, interpolation, pillars, models,
-                                          [0.0] * len(quotes))
+    factors, error = curves.solve_pillars(
+        as_of, interpolation, pillars, models, [0.0] * len(quotes)
+    )
     curves.check_solved(error)
     return CurveData(as_of, interpolation, tuple(pillars), tuple(factors)), error
 
 
 def pv(
-    domestic: CurveData, foreign_projection: CurveData, foreign_discount: CurveData,
-    spot: float, start: date, months: int, notional: float, spread: float, side: str,
+    domestic: CurveData,
+    foreign_projection: CurveData,
+    foreign_discount: CurveData,
+    spot: float,
+    start: date,
+    months: int,
+    notional: float,
+    spread: float,
+    side: str,
 ) -> tuple[float, float, float]:
     """Returns (foreign_leg, domestic_leg, pv)."""
     dd, pf, df = (curves.build(x) for x in (domestic, foreign_projection, foreign_discount))
@@ -90,8 +108,15 @@ def pv(
 
 
 def ndf_pv(
-    usd: CurveData, offshore: CurveData, spot: float, fixing_date: date, payment: date,
-    strike: float, notional: float, side: str, fixing: float | None,
+    usd: CurveData,
+    offshore: CurveData,
+    spot: float,
+    fixing_date: date,
+    payment: date,
+    strike: float,
+    notional: float,
+    side: str,
+    fixing: float | None,
 ) -> tuple[float, float]:
     """Returns (pv, forward)."""
     u, o = curves.build(usd), curves.build(offshore)

@@ -1,0 +1,1 @@
+{"schema_version":"1.0","case_id":"example-research-psr-j","operation":"research.stats.psr","inputs":{"sr":0.1,"n_obs":500,"skew":-0.5,"kurtosis":5.0,"sr_benchmark":0.0}}

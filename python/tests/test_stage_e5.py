@@ -1,5 +1,6 @@
 """Stage E, E5 unit tests: identities from 04-pricing/exotics.md. The goldens run in
 test_conformance.py."""
+
 import json
 import math
 
@@ -49,8 +50,9 @@ def test_barrier_errors() -> None:
 
 def test_asian_geometric() -> None:
     cont = ex.asian_geometric(S, K, T, R, Q, V, "CALL", "CONTINUOUS", [])
-    fine = ex.asian_geometric(S, K, T, R, Q, V, "CALL", "DISCRETE",
-                              [i / 2000 for i in range(1, 2001)])
+    fine = ex.asian_geometric(
+        S, K, T, R, Q, V, "CALL", "DISCRETE", [i / 2000 for i in range(1, 2001)]
+    )
     assert fine == pytest.approx(cont, rel=2e-3) and cont < vanilla("CALL")
     one = ex.asian_geometric(S, K, T, R, Q, V, "PUT", "DISCRETE", [T])
     assert one == pytest.approx(vanilla("PUT"), abs=1e-12)
@@ -72,7 +74,8 @@ def test_lookback() -> None:
 
 def test_quanto_chooser_kirk_basket() -> None:
     assert ex.quanto(S, K, T, R, 0.03, Q, V, 0.1, 0.0, "CALL") == pytest.approx(
-        ex.gbs(1.0, S, K, T, R, 0.03 - Q, V))
+        ex.gbs(1.0, S, K, T, R, 0.03 - Q, V)
+    )
     assert code(ex.quanto, S, K, T, R, 0.03, Q, V, 0.1, 1.5, "CALL") == "E_DOMAIN"
     at_expiry = ex.chooser(S, K, T, R, Q, V, T)
     assert at_expiry == pytest.approx(vanilla("CALL") + vanilla("PUT"), abs=1e-12)
@@ -85,13 +88,16 @@ def test_quanto_chooser_kirk_basket() -> None:
     assert code(ex.kirk, 100.0, 95.0, 0.0, T, R, 0.3, 0.2, 1.5) == "E_DOMAIN"
     single = ex.basket([100.0], [1.0], [0.2], [[1.0]], 100.0, T, R, "CALL")
     assert single["basket_vol"] == pytest.approx(0.2)
-    pair = ex.basket([100.0, 50.0], [0.5, 1.0], [0.2, 0.3], [[1.0, 0.4], [0.4, 1.0]], 100.0, T,
-                     R, "PUT")
+    pair = ex.basket(
+        [100.0, 50.0], [0.5, 1.0], [0.2, 0.3], [[1.0, 0.4], [0.4, 1.0]], 100.0, T, R, "PUT"
+    )
     assert pair["basket_forward"] == 100.0 and pair["price"] > 0
     f = ex.basket
     assert code(f, [100.0], [1.0, 1.0], [0.2], [[1.0]], K, T, R, "CALL") == "E_INPUT"
-    assert code(f, [100.0, 50.0], [1, 1], [0.2, 0.2], [[1, 0.4], [0.3, 1]], K, T, R,
-                "CALL") == "E_INPUT"
+    assert (
+        code(f, [100.0, 50.0], [1, 1], [0.2, 0.2], [[1, 0.4], [0.3, 1]], K, T, R, "CALL")
+        == "E_INPUT"
+    )
     assert code(f, [100.0], [-1.0], [0.2], [[1.0]], K, T, R, "CALL") == "E_DOMAIN"
     assert code(f, [0.0], [1.0], [0.2], [[1.0]], K, T, R, "CALL") == "E_DOMAIN"
     assert code(f, [100.0], [1.0], [0.0], [[1.0]], K, T, R, "CALL") == "E_DOMAIN"
@@ -119,42 +125,110 @@ def test_american_crr_baw_fd_agree() -> None:
     assert code(ex.fd, S, K, T, R, Q, V, "PUT", "AMERICAN", 201, 10, 0.0) == "E_DOMAIN"
 
 
-COMMON = {"spot": S, "strike": K, "expiry_years": T, "rate": R, "dividend_yield": Q, "vol": V,
-          "option_type": "CALL"}
+COMMON = {
+    "spot": S,
+    "strike": K,
+    "expiry_years": T,
+    "rate": R,
+    "dividend_yield": Q,
+    "vol": V,
+    "option_type": "CALL",
+}
 
 
-@pytest.mark.parametrize("operation,extra", [
-    ("exotic.digital.price", {"payoff": "CASH_OR_NOTHING", "cash": 1.0}),
-    ("exotic.barrier.price", {"barrier": 80.0, "rebate": 0.0, "barrier_type": "DOWN_OUT"}),
-    ("exotic.asian.geometric", {"averaging": "CONTINUOUS", "fixing_years": []}),
-    ("exotic.chooser.price", {"choose_years": 0.5}),
-    ("exotic.american.crr", {"steps": 50}),
-    ("exotic.american.baw", {}),
-    ("exotic.american.fd", {"exercise": "AMERICAN", "grid": {"nx": 51, "nt": 20, "width": 4.0}}),
-])
+@pytest.mark.parametrize(
+    "operation,extra",
+    [
+        ("exotic.digital.price", {"payoff": "CASH_OR_NOTHING", "cash": 1.0}),
+        ("exotic.barrier.price", {"barrier": 80.0, "rebate": 0.0, "barrier_type": "DOWN_OUT"}),
+        ("exotic.asian.geometric", {"averaging": "CONTINUOUS", "fixing_years": []}),
+        ("exotic.chooser.price", {"choose_years": 0.5}),
+        ("exotic.american.crr", {"steps": 50}),
+        ("exotic.american.baw", {}),
+        (
+            "exotic.american.fd",
+            {"exercise": "AMERICAN", "grid": {"nx": 51, "nt": 20, "width": 4.0}},
+        ),
+    ],
+)
 def test_cli(operation, extra) -> None:
-    r = run_case(json.dumps({"schema_version": "1.0", "case_id": "t", "operation": operation,
-                             "inputs": {**COMMON, **extra}}))
+    r = run_case(
+        json.dumps(
+            {
+                "schema_version": "1.0",
+                "case_id": "t",
+                "operation": operation,
+                "inputs": {**COMMON, **extra},
+            }
+        )
+    )
     assert r["status"] == "ok", r
 
 
-@pytest.mark.parametrize("operation,inputs", [
-    ("exotic.lookback.floating", {"spot": S, "expiry_years": T, "rate": R, "dividend_yield": Q,
-                                  "vol": V, "option_type": "PUT", "running_extreme": 110.0}),
-    ("exotic.quanto.price", {"spot": S, "strike": K, "expiry_years": T, "domestic_rate": R,
-                             "foreign_rate": 0.03, "dividend_yield": Q, "vol": V, "fx_vol": 0.1,
-                             "correlation": 0.3, "option_type": "PUT"}),
-    ("exotic.spread.kirk", {"forward_1": 100.0, "forward_2": 95.0, "strike": 2.0,
-                            "expiry_years": T, "rate": R, "vol_1": 0.3, "vol_2": 0.2,
-                            "correlation": 0.5}),
-    ("exotic.basket.moment", {"forwards": [100.0, 50.0], "weights": [0.5, 1.0],
-                              "vols": [0.2, 0.3], "correlation": [[1.0, 0.4], [0.4, 1.0]],
-                              "strike": 100.0, "expiry_years": T, "rate": R,
-                              "option_type": "CALL"}),
-    ("exotic.american.crr", {**COMMON, "steps": 20_001}),
-])
+@pytest.mark.parametrize(
+    "operation,inputs",
+    [
+        (
+            "exotic.lookback.floating",
+            {
+                "spot": S,
+                "expiry_years": T,
+                "rate": R,
+                "dividend_yield": Q,
+                "vol": V,
+                "option_type": "PUT",
+                "running_extreme": 110.0,
+            },
+        ),
+        (
+            "exotic.quanto.price",
+            {
+                "spot": S,
+                "strike": K,
+                "expiry_years": T,
+                "domestic_rate": R,
+                "foreign_rate": 0.03,
+                "dividend_yield": Q,
+                "vol": V,
+                "fx_vol": 0.1,
+                "correlation": 0.3,
+                "option_type": "PUT",
+            },
+        ),
+        (
+            "exotic.spread.kirk",
+            {
+                "forward_1": 100.0,
+                "forward_2": 95.0,
+                "strike": 2.0,
+                "expiry_years": T,
+                "rate": R,
+                "vol_1": 0.3,
+                "vol_2": 0.2,
+                "correlation": 0.5,
+            },
+        ),
+        (
+            "exotic.basket.moment",
+            {
+                "forwards": [100.0, 50.0],
+                "weights": [0.5, 1.0],
+                "vols": [0.2, 0.3],
+                "correlation": [[1.0, 0.4], [0.4, 1.0]],
+                "strike": 100.0,
+                "expiry_years": T,
+                "rate": R,
+                "option_type": "CALL",
+            },
+        ),
+        ("exotic.american.crr", {**COMMON, "steps": 20_001}),
+    ],
+)
 def test_cli_other(operation, inputs) -> None:
-    r = run_case(json.dumps({"schema_version": "1.0", "case_id": "t", "operation": operation,
-                             "inputs": inputs}))
+    r = run_case(
+        json.dumps(
+            {"schema_version": "1.0", "case_id": "t", "operation": operation, "inputs": inputs}
+        )
+    )
     expected = "error" if inputs.get("steps") == 20_001 else "ok"
     assert r["status"] == expected, r

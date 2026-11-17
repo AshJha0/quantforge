@@ -1,4 +1,5 @@
 """Handlers for the usecases verbs. A handler reads every input first; the first call through `core`, the gated core modules, ends the E_SCHEMA stage."""
+
 from typing import Any
 
 from .. import curves
@@ -29,8 +30,13 @@ def fx_hedge(i: Inputs) -> Any:
 def rates_hedge(i: Inputs) -> Any:
     tenors = [_tenor(Inputs({"tenor": t})) for t in i.array("hedge_tenors")]
     return core.usecases.rates_hedge(
-        i.date("as_of"), _quotes(i), i.enum("interpolation", curves.INTERPOLATIONS),
-        _ois_trade(i), tenors, i.real("hedge_unit_notional"), i.real("half_spread_bp"),
+        i.date("as_of"),
+        _quotes(i),
+        i.enum("interpolation", curves.INTERPOLATIONS),
+        _ois_trade(i),
+        tenors,
+        i.real("hedge_unit_notional"),
+        i.real("half_spread_bp"),
     )
 
 
@@ -38,14 +44,22 @@ def rates_hedge(i: Inputs) -> Any:
 def _vol_surface(i: Inputs) -> Any:
     slices = [(s.date("expiry"), _parity_quotes(s)) for s in _objects(i, "slices")]
     t = i.object("target")
-    target = (t.enum("option_type", OPTIONS), t.real("strike"), t.date("expiry"),
-              t.real("quantity"), t.enum("side", ("BUY", "SELL")))
+    target = (
+        t.enum("option_type", OPTIONS),
+        t.real("strike"),
+        t.date("expiry"),
+        t.real("quantity"),
+        t.enum("side", ("BUY", "SELL")),
+    )
     as_of, curve = i.date("as_of"), _curve(i, "funding_curve")
     k_grid, currency = i.reals("k_grid"), i.string("currency")
     r = core.vol_usecase.vol_surface(as_of, curve, slices, k_grid, target)
     return {
-        "forwards": r["forwards"], "svi_rmse": r["svi_rmse"],
-        "arbitrage_free": r["arbitrage_free"], "vol": r["vol"],
-        "valuation": _valuation(r["pv"], currency, as_of, None), "delta": r["delta"],
+        "forwards": r["forwards"],
+        "svi_rmse": r["svi_rmse"],
+        "arbitrage_free": r["arbitrage_free"],
+        "vol": r["vol"],
+        "valuation": _valuation(r["pv"], currency, as_of, None),
+        "delta": r["delta"],
         "vega": r["vega"],
     }

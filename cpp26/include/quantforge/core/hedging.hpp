@@ -57,6 +57,12 @@ inline long long effort_cap(long long ruled) { return effort_cap_override > 0 ? 
 /// Test oracle for the wave 4a solve (ruling I-48): every closed sign orthant of at most 20 open-sign
 /// instruments, one QP each. Not used by the operation.
 QpResult solve_qp_by_orthants(const QpProblem& p);
+/// argmin cost z subject to a z = b, z >= 0 (two-phase tableau simplex, Bland's rule), or nullopt if infeasible.
+std::optional<Vec> simplex(const Matrix& a, const Vec& b, const Vec& cost);
+/// The point of least margin sum rates_j |x_j| with eq x = eq_rhs inside the bounds (empty bound vectors: none), or
+/// nullopt. The exact margin start of the wave 4a solve; exposed for the unit tests.
+std::optional<Vec> least_margin(const Matrix& eq, const Vec& eq_rhs, const std::vector<Bound>& lower,
+                                const std::vector<Bound>& upper, const Vec& rates);
 }  // namespace detail
 
 /// hedge.integer.solve: the same objective over x = lot_sizes * n, n integer within optional lot bounds.
@@ -254,7 +260,8 @@ struct SelectResult {
     double objective = 0.0;
 };
 /// hedge.select.solve: the best subset of at most max_instruments columns (I-34). forbidden_keys: eq_matrix,
-/// eq_rhs or singular was given (E_INPUT, I-33).
+/// eq_rhs, singular or a cost or margin input was given (E_INPUT, I-33, J-I.3); cost or margin fields set in p
+/// are E_INPUT too (J-I.3).
 SelectResult select_instruments(const QpProblem& p, long long max_instruments, bool forbidden_keys);
 
 // ---- wave 4d: hedge slippage (08-hedging/hedge-slippage.md, I-36 to I-38) ----

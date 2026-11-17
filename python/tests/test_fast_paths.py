@@ -1,4 +1,5 @@
 """The R2 speed-ups must give the same bits as the plain code they replace."""
+
 import random
 
 from quantforge_core import _cal, rng, strictjson
@@ -15,8 +16,14 @@ def _stepped(seed, stream, skip, count):
 
 
 def test_polynomial_advance_matches_stepping() -> None:
-    for seed, stream, skip in [(1, 0, 0), (7, 0, 511), (7, 0, 512), (7, 3, 0), (2**64 - 1, 1023, 9999),
-                               (42, 1, 70000)]:
+    for seed, stream, skip in [
+        (1, 0, 0),
+        (7, 0, 511),
+        (7, 0, 512),
+        (7, 3, 0),
+        (2**64 - 1, 1023, 9999),
+        (42, 1, 70000),
+    ]:
         assert rng.next_u64(seed, stream, 4, skip) == _stepped(seed, stream, skip, 4)
 
 
@@ -66,6 +73,7 @@ def test_int_parsing_and_overflow() -> None:
 
 def test_cal_shim_matches_stdlib() -> None:
     import calendar
+
     for y in (1900, 2000, 2023, 2024, 2100):
         assert _cal.isleap(y) == calendar.isleap(y)
         for m in range(1, 13):

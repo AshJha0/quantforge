@@ -7,6 +7,7 @@ outermost public call: calls between core functions are not checked again, becau
 values are the core's own (an intermediate infinity is still E_NON_FINITE at the output, as the
 CLI contract says). Over the CLI an input cannot be NaN or infinite, so results there do not change.
 """
+
 import functools
 import threading
 from collections.abc import Callable
@@ -38,7 +39,7 @@ def bad_field(value: Any) -> str | None:
                 return None
             if not hasattr(value, "_fields"):
                 return ""
-        except (TypeError, OverflowError):
+        except TypeError, OverflowError:
             pass
         names = getattr(value, "_fields", None) or ("",) * len(value)
         for name, item in zip(names, value, strict=True):
@@ -81,8 +82,10 @@ def _domain(name: str) -> QfError:
 def _wrap[**P, R](f: Callable[P, R]) -> Callable[P, R]:
     # From the code object rather than inspect.signature: inspect costs start-up on every process.
     code = f.__code__
-    positional = list(code.co_varnames[:code.co_argcount])
-    rest = code.co_varnames[code.co_argcount + code.co_kwonlyargcount] if code.co_flags & 4 else "args"
+    positional = list(code.co_varnames[: code.co_argcount])
+    rest = (
+        code.co_varnames[code.co_argcount + code.co_kwonlyargcount] if code.co_flags & 4 else "args"
+    )
 
     @functools.wraps(f)
     def checked(*args: P.args, **kwargs: P.kwargs) -> R:
@@ -109,7 +112,9 @@ def guard(namespace: dict[str, Any]) -> None:
     """Wraps every public function defined in the module whose globals are `namespace`."""
     module = namespace["__name__"]
     for name, value in list(namespace.items()):
-        if (not name.startswith("_") and isinstance(value, FunctionType)
-                and value.__module__ == module):
+        if (
+            not name.startswith("_")
+            and isinstance(value, FunctionType)
+            and value.__module__ == module
+        ):
             namespace[name] = _wrap(value)
-

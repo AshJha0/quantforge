@@ -16,3 +16,4 @@ cvxpy==1.9.3
 daqp==0.11.2
 packaging==26.3
 pyportfolioopt==1.6.0
+# Wave 3 (scen_j, interpbt_j, drift_j): numpy, scipy, pandas above; nothing new

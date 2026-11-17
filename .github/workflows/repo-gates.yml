@@ -39,6 +39,8 @@ jobs:
         run: python3 tools/case_figures.py --check
       - name: references page lists every spec source (R6-17)
         run: python3 tools/build_references.py --check && python3 tools/test_build_references.py
+      - name: E1 error-case coverage, every operation with a Real input has an E1 golden (J0B)
+        run: python3 tools/check_e1_coverage.py
       - run: python3 tools/quality_gate.py --check-register --check-specs --check-docs
       - name: ignores (G9)
         run: |

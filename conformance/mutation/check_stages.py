@@ -17,7 +17,7 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 from plan_matrix import LANGS, target_glob  # noqa: E402
 
-REQUIRED_STAGES = ("A", "D", "E", "F", "G", "I")
+REQUIRED_STAGES = ("A", "D", "E", "F", "G", "I", "J")
 
 
 def files_under(prefix):
@@ -42,6 +42,8 @@ def problems(cfg):
                 if not t:
                     continue
                 g = target_glob(lang, t)
+                if lang == "python" and not t.endswith("*"):  # mutmut keys are module.function names
+                    out.append(f"stage {st} module {m['module']} python: target {t!r} must end in '*'")
                 if lang == "python":  # a mutmut name glob: quantforge_core.credit.* covers credit.py
                     g = "python/" + t.rstrip("*").rstrip(".").replace(".", "/") + "*"
                 if not any(fnmatch.fnmatch(f, g) or fnmatch.fnmatch(f, "*/" + g.lstrip("*/")) for f in src):

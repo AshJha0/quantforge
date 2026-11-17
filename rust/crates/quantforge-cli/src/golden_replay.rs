@@ -340,6 +340,18 @@ fn stage_i_goldens() {
     replay("stage_i");
 }
 
+/// The stage J wave 3 (scenario stress, interpolation backtests, drift detectors) and curves lane
+/// (term financing, liquidity curve) goldens, which put `ops/w3.rs`, `ops/termcurve.rs` and the
+/// core modules behind them under `cargo test` and so under the per-file coverage gate.
+#[test]
+fn stage_j_w3_curves_goldens() {
+    replay_only(
+        "stage_j",
+        &["scen_j", "interpbt_j", "drift_j", "termfin_j", "liqcurve_j"],
+        40,
+    );
+}
+
 /// The R6 hedge goldens (audit, Jacobi scaling, use case 6, and the e1 error and edge cases), which put the hedge
 /// adapters under `cargo test`. The other R6 files (n = 200 QP, barrier MC) are too slow for a debug build and run in the external runner.
 #[test]

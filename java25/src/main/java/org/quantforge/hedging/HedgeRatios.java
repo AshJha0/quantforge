@@ -90,10 +90,13 @@ public final class HedgeRatios {
         double[] mean = new double[k + 1];
         for (int i = 0; i <= k; i++) {
             double s = 0.0;
+            boolean constant = true;
             for (double v : series[i]) {
                 s += v;
+                constant &= v == series[i][0];
             }
-            mean[i] = s / t;
+            // A constant series has sample variance exactly 0 (ruling J-I.4): its mean is its value.
+            mean[i] = constant ? series[i][0] : s / t;
         }
         double[][] cov = new double[k + 1][k + 1];
         for (int i = 0; i <= k; i++) {

@@ -1,5 +1,6 @@
 """Levenberg-Marquardt on a residual function, for the stage C smile fits. Only the end result is
 judged, so the path here is free. numpy only: scipy is a development dependency."""
+
 from collections.abc import Callable, Iterable
 
 lazy import numpy as np
@@ -13,7 +14,7 @@ def _safe(residual: Residual, x: np.ndarray) -> np.ndarray | None:
     with np.errstate(all="ignore"):
         try:
             r = residual(x)
-        except (ArithmeticError, ValueError):
+        except ArithmeticError, ValueError:
             return None
     return r if np.all(np.isfinite(r)) else None
 

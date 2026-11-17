@@ -1,4 +1,5 @@
 """Handlers for the rates verbs. A handler reads every input first; the first call through `core`, the gated core modules, ends the E_SCHEMA stage."""
+
 from typing import Any
 
 from .. import calendars, conventions, curves
@@ -31,14 +32,23 @@ def schedule(i: Inputs) -> Any:
     if frequency not in FREQUENCIES:
         raise QfError("E_SCHEMA", "frequency_months is not listed", "frequency_months")
     periods = core.schedules.generate(
-        start, end, frequency, i.enum("calendar", calendars.CALENDARS),
-        i.boolean("end_of_month"), i.integer("payment_lag"),
+        start,
+        end,
+        frequency,
+        i.enum("calendar", calendars.CALENDARS),
+        i.boolean("end_of_month"),
+        i.integer("payment_lag"),
     )
-    return {"periods": [
-        {"start": p.start.isoformat(), "end": p.end.isoformat(),
-         "payment": p.payment.isoformat()}
-        for p in periods
-    ]}
+    return {
+        "periods": [
+            {
+                "start": p.start.isoformat(),
+                "end": p.end.isoformat(),
+                "payment": p.payment.isoformat(),
+            }
+            for p in periods
+        ]
+    }
 
 
 @op("rates.curve.discount")
@@ -59,9 +69,13 @@ def curve_forward(i: Inputs) -> Any:
 @op("rates.ois.bootstrap")
 def bootstrap(i: Inputs) -> Any:
     data, error = core.ois.bootstrap(
-        i.enum("convention", conventions.OVERNIGHT), i.date("as_of"), _quotes(i),
+        i.enum("convention", conventions.OVERNIGHT),
+        i.date("as_of"),
+        _quotes(i),
         i.enum("interpolation", curves.INTERPOLATIONS),
-        i.enum("method", ("SEQUENTIAL", "GLOBAL")), jumps(i), *_options(i),
+        i.enum("method", ("SEQUENTIAL", "GLOBAL")),
+        jumps(i),
+        *_options(i),
     )
     return {"pillars": _pillars(data)}, {"max_repricing_error": error}
 
@@ -107,7 +121,9 @@ def index(i: Inputs) -> str:
 @op("rates.projection.bootstrap")
 def projection_bootstrap(i: Inputs) -> Any:
     data, error = core.projection.bootstrap(
-        _curve(i, "discount"), index(i), i.date("as_of"),
+        _curve(i, "discount"),
+        index(i),
+        i.date("as_of"),
         [projection_quote(q) for q in _objects(i, "quotes")],
         i.enum("interpolation", curves.INTERPOLATIONS),
     )
@@ -117,27 +133,42 @@ def projection_bootstrap(i: Inputs) -> Any:
 @op("rates.swap.pv")
 def swap_pv(i: Inputs) -> Any:
     t = i.object("trade")
-    trade = SwapTrade(index(t), t.integer("tenor_months"), t.real("fixed_rate"),
-                      t.real("notional"), t.enum("side", ("PAY", "RECEIVE")))
+    trade = SwapTrade(
+        index(t),
+        t.integer("tenor_months"),
+        t.real("fixed_rate"),
+        t.real("notional"),
+        t.enum("side", ("PAY", "RECEIVE")),
+    )
     value, par = core.projection.swap_pv(
-        _curve(i, "discount"), _curve(i, "projection"), trade, i.opt_string("snapshot_id"))
+        _curve(i, "discount"), _curve(i, "projection"), trade, i.opt_string("snapshot_id")
+    )
     return {"valuation": value, "par_rate": par}
 
 
 @op("rates.fra.pv")
 def fra_pv(i: Inputs) -> Any:
     t = i.object("trade")
-    trade = FraTrade(index(t), t.date("start"), t.real("fixed_rate"), t.real("notional"),
-                     t.enum("side", ("PAY", "RECEIVE")))
+    trade = FraTrade(
+        index(t),
+        t.date("start"),
+        t.real("fixed_rate"),
+        t.real("notional"),
+        t.enum("side", ("PAY", "RECEIVE")),
+    )
     value, rate = core.projection.fra_pv(
-        _curve(i, "discount"), _curve(i, "projection"), trade, i.opt_string("snapshot_id"))
+        _curve(i, "discount"), _curve(i, "projection"), trade, i.opt_string("snapshot_id")
+    )
     return {"valuation": value, "forward_rate": rate}
 
 
 @op("rates.basis.spread")
 def basis(i: Inputs) -> Any:
-    return {"spread": core.projection.basis_spread(
-        _curve(i, "discount"), _curve(i, "projection"), index(i), i.integer("tenor_months"))}
+    return {
+        "spread": core.projection.basis_spread(
+            _curve(i, "discount"), _curve(i, "projection"), index(i), i.integer("tenor_months")
+        )
+    }
 
 
 _BOOT = ("SEQUENTIAL", "GLOBAL")
@@ -149,8 +180,14 @@ def _fixings(i: Inputs) -> list[tuple[Any, float]]:
 
 @op("rates.ois.compound_dated")
 def _compound_dated(i: Inputs) -> Any:
-    args = (i.enum("convention", tuple(conventions.REGISTRY)), i.date("start"), i.date("end"),
-            i.enum("method", METHODS), i.integer("shift_days"), _fixings(i))
+    args = (
+        i.enum("convention", tuple(conventions.REGISTRY)),
+        i.date("start"),
+        i.date("end"),
+        i.enum("method", METHODS),
+        i.integer("shift_days"),
+        _fixings(i),
+    )
     rate, accrual, interest = core.overnight.compound_dated(*args)
     return {"compounded_rate": rate, "accrual": accrual, "interest": interest}
 
@@ -168,24 +205,39 @@ def _dated_rates(i: Inputs, key: str) -> list[tuple[Any, float]]:
 
 @op("rates.ois.step_curve")
 def _step_curve(i: Inputs) -> Any:
-    args = (i.date("as_of"), i.real("base_rate"), _dated_rates(i, "steps"),
-            jumps(i, required=True), i.dates("dates"))
+    args = (
+        i.date("as_of"),
+        i.real("base_rate"),
+        _dated_rates(i, "steps"),
+        jumps(i, required=True),
+        i.dates("dates"),
+    )
     factors, forwards = core.steps.step_curve(*args)
     return {"discount_factors": factors, "overnight_forwards": forwards}
 
 
 @op("rates.ois.fit_steps")
 def _fit_steps(i: Inputs) -> Any:
-    args = (_convention(i, "convention", conventions.OVERNIGHT), i.date("as_of"), i.dates("step_dates"),
-            _quotes(i), jumps(i, required=True))
+    args = (
+        _convention(i, "convention", conventions.OVERNIGHT),
+        i.date("as_of"),
+        i.dates("step_dates"),
+        _quotes(i),
+        jumps(i, required=True),
+    )
     base, rates, error = core.steps.fit_steps(*args)
     return {"base_rate": base, "step_rates": rates}, {"max_repricing_error": error}
 
 
 @op("rates.futures.convexity")
 def _convexity(i: Inputs) -> Any:
-    args = (i.real("price"), i.real("start_years"), i.real("end_years"), i.real("sigma"),
-            i.real("mean_reversion"))
+    args = (
+        i.real("price"),
+        i.real("start_years"),
+        i.real("end_years"),
+        i.real("sigma"),
+        i.real("mean_reversion"),
+    )
     rate, bias, forward = core.futures.convexity(*args)
     return {"futures_rate": rate, "convexity": bias, "forward_rate": forward}
 
@@ -196,34 +248,51 @@ def _csa(i: Inputs) -> Any:
     fx = None
     if i.has("fx"):
         f = i.object("fx")
-        fx = (f.real("spot"), [(p.date("date"), p.real("forward")) for p in _objects(f, "forwards")])
+        fx = (
+            f.real("spot"),
+            [(p.date("date"), p.real("forward")) for p in _objects(f, "forwards")],
+        )
     args = (_curve(i), i.real("collateral_spread"), fx, i.dates("dates"))
     return {"discount_factors": core.csa.discount(*args)}
 
 
 @op("rates.basis.ois_spread")
 def _ois_spread(i: Inputs) -> Any:
-    args = (_convention(i, "convention", conventions.OVERNIGHT), _tenor(i), _curve(i, "discount"),
-            _curve(i, "projection_a"), _curve(i, "projection_b"))
+    args = (
+        _convention(i, "convention", conventions.OVERNIGHT),
+        _tenor(i),
+        _curve(i, "discount"),
+        _curve(i, "projection_a"),
+        _curve(i, "projection_b"),
+    )
     return {"spread": core.csa.ois_spread(*args)}
 
 
 def _term_quote(q: Inputs) -> ProjectionQuote:
     kind = q.enum("type", ("DEPOSIT", "FRA", "SWAP"))
-    return ProjectionQuote(kind, q.integer("start_months" if kind == "FRA" else "months"),
-                           q.real("rate"))
+    return ProjectionQuote(
+        kind, q.integer("start_months" if kind == "FRA" else "months"), q.real("rate")
+    )
 
 
 @op("rates.curve.joint_bootstrap")
 def _joint(i: Inputs) -> Any:
     ois_quotes = _quotes(Inputs({"quotes": i.array("ois_quotes")}, "ois_"))
-    args = (_convention(i, "convention", conventions.OVERNIGHT), _convention(i, "index", conventions.TERM),
-            i.date("as_of"), ois_quotes, [_term_quote(q) for q in _objects(i, "term_quotes")],
-            i.enum("interpolation", curves.INTERPOLATIONS), i.enum("method", _BOOT),
-            *_options(i))
+    args = (
+        _convention(i, "convention", conventions.OVERNIGHT),
+        _convention(i, "index", conventions.TERM),
+        i.date("as_of"),
+        ois_quotes,
+        [_term_quote(q) for q in _objects(i, "term_quotes")],
+        i.enum("interpolation", curves.INTERPOLATIONS),
+        i.enum("method", _BOOT),
+        *_options(i),
+    )
     disc, proj, error = core.csa.joint_bootstrap(*args)
-    return ({"discount_pillars": _pillars(disc), "projection_pillars": _pillars(proj)},
-            {"max_repricing_error": error})
+    return (
+        {"discount_pillars": _pillars(disc), "projection_pillars": _pillars(proj)},
+        {"max_repricing_error": error},
+    )
 
 
 _MODELS = ("BLACK_76", "BACHELIER")
@@ -234,9 +303,17 @@ def _cap(i: Inputs) -> Any:
     t = i.object("trade")
     raw = i.raw.get("vol")
     vol: Any = i.reals("vol") if isinstance(raw, list) else i.real("vol")
-    args = (_curve(i, "discount"), _curve(i, "projection"), i.enum("model", _MODELS), vol,
-            t.enum("type", ("CAP", "FLOOR")), t.integer("start_months"), t.integer("tenor_months"),
-            t.real("strike"), t.real("notional"))
+    args = (
+        _curve(i, "discount"),
+        _curve(i, "projection"),
+        i.enum("model", _MODELS),
+        vol,
+        t.enum("type", ("CAP", "FLOOR")),
+        t.integer("start_months"),
+        t.integer("tenor_months"),
+        t.real("strike"),
+        t.real("notional"),
+    )
     caplets, price = core.caps_swaptions.cap_price(*args)
     return {"price": price, "caplets": caplets}
 
@@ -244,9 +321,17 @@ def _cap(i: Inputs) -> Any:
 @op("rates.swaption.price")
 def _swaption(i: Inputs) -> Any:
     t = i.object("trade")
-    args = (_curve(i, "discount"), _curve(i, "projection"), i.enum("model", _MODELS),
-            i.real("vol"), t.enum("type", ("PAYER", "RECEIVER")), t.integer("expiry_months"),
-            t.integer("tenor_months"), t.real("strike"), t.real("notional"))
+    args = (
+        _curve(i, "discount"),
+        _curve(i, "projection"),
+        i.enum("model", _MODELS),
+        i.real("vol"),
+        t.enum("type", ("PAYER", "RECEIVER")),
+        t.integer("expiry_months"),
+        t.integer("tenor_months"),
+        t.real("strike"),
+        t.real("notional"),
+    )
     price, forward, annuity = core.caps_swaptions.swaption_price(*args)
     return {"price": price, "forward_rate": forward, "annuity": annuity}
 
@@ -262,29 +347,49 @@ def _price_cube(i: Inputs) -> Any:
     c, t = i.object("cube"), i.object("trade")
     params = {k: c.matrix(k) for k in ("alpha", "beta", "rho", "nu")}
     months = [c.integer_list(k) for k in ("expiries_months", "tenors_months")]
-    args = (*_curves(i), *months, params, t.enum("type", ("PAYER", "RECEIVER")),
-            t.integer("expiry_months"), t.integer("tenor_months"), t.real("strike"),
-            t.real("notional"))
+    args = (
+        *_curves(i),
+        *months,
+        params,
+        t.enum("type", ("PAYER", "RECEIVER")),
+        t.integer("expiry_months"),
+        t.integer("tenor_months"),
+        t.real("strike"),
+        t.real("notional"),
+    )
     return core.rates_vol.price_cube(*args)
 
 
 @op("rates.cap.strip")
 def _cap_strip(i: Inputs) -> Any:
-    args = (*_curves(i), i.enum("model", _RATE_MODELS), i.integer("start_months"),
-            i.real("strike"), i.integer_list("cap_tenors_months"), i.reals("flat_vols"),
-            i.real("notional"))
+    args = (
+        *_curves(i),
+        i.enum("model", _RATE_MODELS),
+        i.integer("start_months"),
+        i.real("strike"),
+        i.integer_list("cap_tenors_months"),
+        i.reals("flat_vols"),
+        i.real("notional"),
+    )
     vols, prices = core.rates_vol.cap_strip(*args)
     return {"caplet_vols": vols, "cap_prices": prices}
 
 
 def _futures(i: Inputs) -> tuple[str, float, float, float, float]:
-    return (i.enum("type", _OPTION_TYPES), i.real("futures_price"), i.real("strike"),
-            i.real("expiry_years"), i.real("discount_factor"))
+    return (
+        i.enum("type", _OPTION_TYPES),
+        i.real("futures_price"),
+        i.real("strike"),
+        i.real("expiry_years"),
+        i.real("discount_factor"),
+    )
 
 
 @op("rates.bondfut.option_price")
 def _bondfut_price(i: Inputs) -> Any:
-    price, value = core.rates_vol.bondfut_price(*_futures(i), i.real("vol"), i.real("contract_size"))
+    price, value = core.rates_vol.bondfut_price(
+        *_futures(i), i.real("vol"), i.real("contract_size")
+    )
     return {"price": price, "contract_value": value}
 
 
@@ -315,7 +420,10 @@ def _joint_curve(c: Inputs) -> Any:
         spec.index = _convention(c, "index", conventions.TERM)
         spec.discount = c.string("discount")
     if kind == "XCCY":
-        spec.domestic, spec.foreign_projection = c.string("domestic"), c.string("foreign_projection")
+        spec.domestic, spec.foreign_projection = (
+            c.string("domestic"),
+            c.string("foreign_projection"),
+        )
         spec.domestic_convention = _convention(c, "domestic_convention", conventions.OVERNIGHT)
         spec.foreign_convention = _convention(c, "foreign_convention", conventions.OVERNIGHT)
         spec.start = c.date("start")
@@ -324,8 +432,9 @@ def _joint_curve(c: Inputs) -> Any:
 
 def _joint_instrument(q: Inputs) -> Any:
     kind = q.enum("type", _INSTRUMENT_KINDS)
-    spec = core.joint.InstrumentSpec(q.string("id"), q.string("curve"), kind,
-                                     q.opt_boolean("turn", False))
+    spec = core.joint.InstrumentSpec(
+        q.string("id"), q.string("curve"), kind, q.opt_boolean("turn", False)
+    )
     if kind == "OIS":
         spec.tenor, spec.rate = _tenor(q), q.real("rate")
     elif kind == "FUTURE":
@@ -354,6 +463,8 @@ def _funding(i: Inputs) -> Any:
     quotes = [(q.date("end"), q.real("rate")) for q in _objects(i, "quotes")]
     dates = i.dates("dates") if i.has("dates") else []
     spreads, pillars, factors = core.joint.funding_curve(_curve(i, "discount"), quotes, dates)
-    return {"spreads": spreads,
-            "pillars": [{"date": d.isoformat(), "discount_factor": v} for d, v in pillars],
-            "discount_factors": factors}
+    return {
+        "spreads": spreads,
+        "pillars": [{"date": d.isoformat(), "discount_factor": v} for d, v in pillars],
+        "discount_factors": factors,
+    }

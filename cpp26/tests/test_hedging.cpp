@@ -969,6 +969,14 @@ TEST_CASE("I4c selection: K = n gives the QP answer; the best objective never ri
     CHECK(hg::select_instruments(s, 1, false).selected == std::vector<long long>{0});
     CHECK(i_error([&] { hg::select_instruments(s, 3, false); }) == "E_INPUT");
     CHECK(i_error([&] { hg::select_instruments(s, 1, true); }) == "E_INPUT");
+    {  // J-I.3: cost or margin fields in the problem are refused, not dropped.
+        hg::QpProblem c = s;
+        c.half_spreads = hg::Vec{0.1, 0.1};
+        CHECK(i_error([&] { hg::select_instruments(c, 1, false); }) == "E_INPUT");
+        c = s;
+        c.margin_limit = 1.0;
+        CHECK(i_error([&] { hg::select_instruments(c, 1, false); }) == "E_INPUT");
+    }
     s.lower = std::vector<hg::Bound>{0.5, std::nullopt};
     CHECK(i_error([&] { hg::select_instruments(s, 1, false); }) == "E_DOMAIN");
 }
@@ -1203,4 +1211,22 @@ TEST_CASE("R6-11.20: use case 6 with the underlying alone hedges delta to the ne
     CHECK(j.find(R"("lots":[2])") != std::string::npos);
     CHECK(j.find(R"("hedge_cost":2)") != std::string::npos);
     CHECK(j.find(R"("greeks_after":{"delta":-37)") != std::string::npos);
+}
+
+TEST_CASE("J-I.1: a bounded solve keeps a 1e-7 column (hedgecut_j-0001, -0002)", "[r6]") {
+    // Python's active-set step cut ranks unscaled and returned x = (0, 0), objective 1. The dual active set
+    // here has no rank cut; this pins the true optimum x1 = -1e7 (hand value), with and without a spread.
+    for (const bool costed : {false, true}) {
+        hg::QpProblem qp;
+        qp.a = {{1e-7, 0}, {0, 1}};
+        qp.b = {1, 0};
+        qp.weights = {1, 1};
+        qp.lower = std::vector<hg::Bound>{std::nullopt, 0.0};
+        qp.upper = std::vector<hg::Bound>{std::nullopt, 0.0};
+        if (costed) qp.half_spreads = hg::Vec{0.0, 0.1};
+        const hg::QpResult r = hg::solve_qp(qp);
+        CHECK(std::fabs(r.x[0] + 1e7) <= 1e-12 * 1e7);
+        CHECK(r.x[1] == 0.0);
+        CHECK(std::fabs(r.objective) <= 1e-12);
+    }
 }

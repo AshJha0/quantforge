@@ -2370,6 +2370,52 @@
     "outside_spread"
    ]
   },
+  "eq.forward.term_financed": {
+   "spec": "specifications/02-curves/financing-term-structure.md",
+   "rust": "quantforge::eq::forward_term_financed",
+   "python": "quantforge.eq.forward_term_financed",
+   "java": "Eq.forwardTermFinanced",
+   "cpp": "qf::eq::forward_term_financed",
+   "inputs": {
+    "borrow_fees": {
+     "java": "borrowFees"
+    },
+    "borrow_times": {
+     "java": "borrowTimes"
+    },
+    "dividend_amounts": {
+     "java": "dividendAmounts"
+    },
+    "dividend_times": {
+     "java": "dividendTimes"
+    },
+    "funding_times": {
+     "java": "fundingTimes"
+    },
+    "funding_zero_rates": {
+     "java": "fundingZeroRates"
+    },
+    "maturity_years": {
+     "java": "maturityYears"
+    },
+    "quote_times": {
+     "java": "quoteTimes"
+    },
+    "repo_rates": {
+     "java": "repoRates"
+    },
+    "spot": {
+     "java": "spot"
+    }
+   },
+   "outputs": [
+    "carry",
+    "carry_factor",
+    "financing_df",
+    "forward",
+    "pv_dividends"
+   ]
+  },
   "eq.futures.basis": {
    "spec": "specifications/02-curves/equity-curves.md",
    "rust": "quantforge::eq::futures_basis",
@@ -3794,14 +3840,26 @@
     "b": {
      "java": "b"
     },
+    "cost_weight": {
+     "java": "costWeight"
+    },
     "eq_matrix": {
      "java": "eqMatrix"
     },
     "eq_rhs": {
      "java": "eqRhs"
     },
+    "half_spreads": {
+     "java": "halfSpreads"
+    },
     "lower": {
      "java": "lower"
+    },
+    "margin_limit": {
+     "java": "marginLimit"
+    },
+    "margin_rates": {
+     "java": "marginRates"
     },
     "max_instruments": {
      "java": "maxInstruments"
@@ -4054,6 +4112,47 @@
    "outputs": [
     "index_ratio",
     "pv"
+   ]
+  },
+  "liq.curve.cost": {
+   "spec": "specifications/10-execution/liquidity-curve.md",
+   "rust": "quantforge::liq::curve_cost",
+   "python": "quantforge.liq.curve_cost",
+   "java": "Liq.curveCost",
+   "cpp": "qf::liq::curve_cost",
+   "inputs": {
+    "coefficient": {
+     "java": "coefficient"
+    },
+    "daily_vol": {
+     "java": "dailyVol"
+    },
+    "daily_volume": {
+     "java": "dailyVolume"
+    },
+    "exponent": {
+     "java": "exponent"
+    },
+    "half_spread_bps": {
+     "java": "halfSpreadBps"
+    },
+    "horizons_days": {
+     "java": "horizonsDays"
+    },
+    "risk_multiplier": {
+     "java": "riskMultiplier"
+    },
+    "sizes": {
+     "java": "sizes"
+    }
+   },
+   "outputs": [
+    "impact",
+    "min_cost",
+    "optimal_horizon",
+    "spread_cost",
+    "timing_risk",
+    "total_cost"
    ]
   },
   "mbs.cashflows": {
@@ -4479,7 +4578,7 @@
    ]
   },
   "rates.funding.curve": {
-   "spec": "specifications/02-curves/joint-solve-and-funding.md",
+   "spec": "specifications/02-curves/financing-term-structure.md",
    "rust": "quantforge::rates::funding_curve",
    "python": "quantforge.rates.funding_curve",
    "java": "Rates.fundingCurve",
@@ -5384,6 +5483,67 @@
     "repo_rate"
    ]
   },
+  "repo.term.curve": {
+   "spec": "specifications/02-curves/financing-term-structure.md",
+   "rust": "quantforge::repo::term_curve",
+   "python": "quantforge.repo.term_curve",
+   "java": "Repo.termCurve",
+   "cpp": "qf::repo::term_curve",
+   "inputs": {
+    "borrow_fees": {
+     "java": "borrowFees"
+    },
+    "borrow_times": {
+     "java": "borrowTimes"
+    },
+    "funding_times": {
+     "java": "fundingTimes"
+    },
+    "funding_zero_rates": {
+     "java": "fundingZeroRates"
+    },
+    "query_times": {
+     "java": "queryTimes"
+    },
+    "quote_times": {
+     "java": "quoteTimes"
+    },
+    "repo_rates": {
+     "java": "repoRates"
+    }
+   },
+   "outputs": [
+    "borrow_fee",
+    "financing_df",
+    "financing_rate",
+    "forward_financing",
+    "pillar_spreads",
+    "spread"
+   ]
+  },
+  "research.backtest.interp_loo": {
+   "spec": "specifications/11-research/interp-backtest.md",
+   "rust": "quantforge::research::backtest_interp_loo",
+   "python": "quantforge.research.backtest_interp_loo",
+   "java": "Research.backtestInterpLoo",
+   "cpp": "qf::research::backtest_interp_loo",
+   "inputs": {
+    "method": {
+     "java": "method"
+    },
+    "x": {
+     "java": "x"
+    },
+    "y": {
+     "java": "y"
+    }
+   },
+   "outputs": [
+    "errors",
+    "max_abs_error",
+    "rmse"
+   ]
+  },
   "research.backtest.run": {
    "spec": "specifications/11-research/backtester.md",
    "rust": "quantforge::research::backtest_run",
@@ -5433,6 +5593,35 @@
     "turnover"
    ]
   },
+  "research.backtest.surface_holdout": {
+   "spec": "specifications/11-research/interp-backtest.md",
+   "rust": "quantforge::research::backtest_surface_holdout",
+   "python": "quantforge.research.backtest_surface_holdout",
+   "java": "Research.backtestSurfaceHoldout",
+   "cpp": "qf::research::backtest_surface_holdout",
+   "inputs": {
+    "expiries": {
+     "java": "expiries"
+    },
+    "holdout": {
+     "java": "holdout"
+    },
+    "method": {
+     "java": "method"
+    },
+    "strikes": {
+     "java": "strikes"
+    },
+    "vols": {
+     "java": "vols"
+    }
+   },
+   "outputs": [
+    "errors",
+    "max_abs_error",
+    "rmse"
+   ]
+  },
   "research.cv.cpcv_paths": {
    "spec": "specifications/11-research/purged-cv.md",
    "rust": "quantforge::research::cv_cpcv_paths",
@@ -5475,6 +5664,114 @@
    "outputs": [
     "embargo_count",
     "folds"
+   ]
+  },
+  "research.drift.cusum": {
+   "spec": "specifications/11-research/drift-detectors.md",
+   "rust": "quantforge::research::drift_cusum",
+   "python": "quantforge.research.drift_cusum",
+   "java": "Research.driftCusum",
+   "cpp": "qf::research::drift_cusum",
+   "inputs": {
+    "h": {
+     "java": "h"
+    },
+    "k": {
+     "java": "k"
+    },
+    "mu0": {
+     "java": "mu0"
+    },
+    "reset": {
+     "java": "reset"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "x": {
+     "java": "x"
+    }
+   },
+   "outputs": [
+    "alarms",
+    "directions",
+    "s_minus",
+    "s_plus"
+   ]
+  },
+  "research.drift.ks": {
+   "spec": "specifications/11-research/drift-detectors.md",
+   "rust": "quantforge::research::drift_ks",
+   "python": "quantforge.research.drift_ks",
+   "java": "Research.driftKs",
+   "cpp": "qf::research::drift_ks",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "level": {
+     "java": "level"
+    }
+   },
+   "outputs": [
+    "p_value",
+    "reject",
+    "statistic"
+   ]
+  },
+  "research.drift.page_hinkley": {
+   "spec": "specifications/11-research/drift-detectors.md",
+   "rust": "quantforge::research::drift_page_hinkley",
+   "python": "quantforge.research.drift_page_hinkley",
+   "java": "Research.driftPageHinkley",
+   "cpp": "qf::research::drift_page_hinkley",
+   "inputs": {
+    "delta": {
+     "java": "delta"
+    },
+    "direction": {
+     "java": "direction"
+    },
+    "lambda": {
+     "java": "lambda"
+    },
+    "x": {
+     "java": "x"
+    }
+   },
+   "outputs": [
+    "alarms",
+    "directions"
+   ]
+  },
+  "research.drift.psi": {
+   "spec": "specifications/11-research/drift-detectors.md",
+   "rust": "quantforge::research::drift_psi",
+   "python": "quantforge.research.drift_psi",
+   "java": "Research.driftPsi",
+   "cpp": "qf::research::drift_psi",
+   "inputs": {
+    "bins": {
+     "java": "bins"
+    },
+    "reference": {
+     "java": "reference"
+    },
+    "test": {
+     "java": "test"
+    },
+    "threshold": {
+     "java": "threshold"
+    }
+   },
+   "outputs": [
+    "alarm",
+    "psi",
+    "reference_shares",
+    "test_shares"
    ]
   },
   "research.estimate.black_litterman": {
@@ -6508,6 +6805,69 @@
     "unexplained",
     "value_end",
     "value_start"
+   ]
+  },
+  "risk.scenario.historical_shock": {
+   "spec": "specifications/06-risk/scenario-stress.md",
+   "rust": "quantforge::risk::scenario_historical_shock",
+   "python": "quantforge.risk.scenario_historical_shock",
+   "java": "Risk.scenarioHistoricalShock",
+   "cpp": "qf::risk::scenario_historical_shock",
+   "inputs": {
+    "dates": {
+     "java": "dates"
+    },
+    "end_date": {
+     "java": "endDate"
+    },
+    "start_date": {
+     "java": "startDate"
+    },
+    "tenors": {
+     "java": "tenors"
+    },
+    "yields": {
+     "java": "yields"
+    }
+   },
+   "outputs": [
+    "end_yields",
+    "level_bp",
+    "shift_bp",
+    "slope_bp",
+    "start_yields"
+   ]
+  },
+  "risk.scenario.replay": {
+   "spec": "specifications/06-risk/scenario-stress.md",
+   "rust": "quantforge::risk::scenario_replay",
+   "python": "quantforge.risk.scenario_replay",
+   "java": "Risk.scenarioReplay",
+   "cpp": "qf::risk::scenario_replay",
+   "inputs": {
+    "base_tenors": {
+     "java": "baseTenors"
+    },
+    "base_yields": {
+     "java": "baseYields"
+    },
+    "dv01": {
+     "java": "dv01"
+    },
+    "scale": {
+     "java": "scale"
+    },
+    "shock_bp": {
+     "java": "shockBp"
+    },
+    "shock_tenors": {
+     "java": "shockTenors"
+    }
+   },
+   "outputs": [
+    "applied_bp",
+    "pnl",
+    "shocked_yields"
    ]
   },
   "risk.sens.correlation": {

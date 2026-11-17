@@ -1,4 +1,5 @@
 """Projection curves, FRAs, swaps, basis (specifications/02-curves/projection-and-fra.md)."""
+
 import itertools
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
@@ -73,13 +74,15 @@ def _alpha(index: str, s: date, e: date) -> float:
 
 
 def _swap_legs(
-    index: str, fixed: Sequence[Period], floating: Sequence[Period], discount: Curve,
+    index: str,
+    fixed: Sequence[Period],
+    floating: Sequence[Period],
+    discount: Curve,
     projection: Curve,
 ) -> tuple[float, float]:
     day_count = REGISTRY[index]["fixed_day_count"]
     annuity = ordered_sum(
-        daycount.year_fraction(day_count, p.start, p.end) * discount.discount(p.end)
-        for p in fixed
+        daycount.year_fraction(day_count, p.start, p.end) * discount.discount(p.end) for p in fixed
     )
     leg = ordered_sum(
         (projection.discount(p.start) / projection.discount(p.end) - 1) * discount.discount(p.end)
@@ -92,7 +95,9 @@ TermModel = Callable[[Curve, Curve], float]
 
 
 def term_models(
-    index: str, as_of: date, quotes: Sequence[ProjectionQuote],
+    index: str,
+    as_of: date,
+    quotes: Sequence[ProjectionQuote],
 ) -> tuple[list[date], list[TermModel], list[list[date]]]:
     """For each quote: its pillar, its model rate as a function of (projection, discount), and
     the dates the model reads."""
@@ -114,22 +119,30 @@ def term_models(
             pillars.append(fixed[-1].end)
             dates.append(sorted({d for x in (*fixed, *floating) for d in (x.start, x.end)}))
 
-            def swap_rate(p: Curve, discount: Curve, fixed: list[Period] = fixed,
-                          floating: list[Period] = floating) -> float:
+            def swap_rate(
+                p: Curve,
+                discount: Curve,
+                fixed: list[Period] = fixed,
+                floating: list[Period] = floating,
+            ) -> float:
                 annuity, leg = _swap_legs(index, fixed, floating, discount, p)
                 return leg / annuity
 
             models.append(swap_rate)
         else:
             s = spot if q.kind == "DEPOSIT" else _plus_months(index, spot, q.months)
-            e = _plus_months(index, spot if q.kind == "DEPOSIT" else s,
-                             q.months if q.kind == "DEPOSIT" else REGISTRY[index]["months"])
+            e = _plus_months(
+                index,
+                spot if q.kind == "DEPOSIT" else s,
+                q.months if q.kind == "DEPOSIT" else REGISTRY[index]["months"],
+            )
             pillars.append(e)
             dates.append([s, e])
             alpha = _alpha(index, s, e)
 
-            def simple_rate(p: Curve, discount: Curve, s: date = s, e: date = e,
-                            alpha: float = alpha) -> float:
+            def simple_rate(
+                p: Curve, discount: Curve, s: date = s, e: date = e, alpha: float = alpha
+            ) -> float:
                 return (p.discount(s) / p.discount(e) - 1) / alpha
 
             models.append(simple_rate)
@@ -137,25 +150,33 @@ def term_models(
 
 
 def bootstrap(
-    discount_data: CurveData, index: str, as_of: date, quotes: Sequence[ProjectionQuote],
-    interpolation: str, tension: float | None = None, step_end: date | None = None,
+    discount_data: CurveData,
+    index: str,
+    as_of: date,
+    quotes: Sequence[ProjectionQuote],
+    interpolation: str,
+    tension: float | None = None,
+    step_end: date | None = None,
 ) -> tuple[CurveData, float]:
     discount = curves.build(discount_data)
     pillars, terms, _ = term_models(index, as_of, quotes)
-    models: list[curves.Model] = [
-        lambda p, m=m: m(p, discount) for m in terms]  # type: ignore[misc]
+    models: list[curves.Model] = [lambda p, m=m: m(p, discount) for m in terms]  # type: ignore[misc]
     if any(b <= a for a, b in itertools.pairwise(pillars)):
         raise QfError("E_INPUT", "quotes are not in pillar order", "quotes")
     targets = [q.rate for q in quotes]
-    factors, error = curves.solve_pillars(as_of, interpolation, pillars, models, targets,
-                                          (), tension, step_end)
+    factors, error = curves.solve_pillars(
+        as_of, interpolation, pillars, models, targets, (), tension, step_end
+    )
     curves.check_solved(error)
-    return CurveData(as_of, interpolation, tuple(pillars), tuple(factors), (), tension,
-                     step_end), error
+    return CurveData(
+        as_of, interpolation, tuple(pillars), tuple(factors), (), tension, step_end
+    ), error
 
 
 def swap_pv(
-    discount_data: CurveData, projection_data: CurveData, trade: SwapTrade,
+    discount_data: CurveData,
+    projection_data: CurveData,
+    trade: SwapTrade,
     snapshot_id: str | None = None,
 ) -> tuple[dict[str, object], float]:
     discount, projection = curves.build(discount_data), curves.build(projection_data)
@@ -167,13 +188,16 @@ def swap_pv(
     sign = 1 if trade.side == "PAY" else -1
     value = sign * trade.notional * (leg - trade.fixed_rate * annuity)
     currency = REGISTRY[trade.index]["currency"]
-    result = valuation(value, currency, "SWAP_DISCOUNTING", snapshot_id, trade.index,
-                       discount.as_of)
+    result = valuation(
+        value, currency, "SWAP_DISCOUNTING", snapshot_id, trade.index, discount.as_of
+    )
     return result, leg / annuity
 
 
 def fra_pv(
-    discount_data: CurveData, projection_data: CurveData, trade: FraTrade,
+    discount_data: CurveData,
+    projection_data: CurveData,
+    trade: FraTrade,
     snapshot_id: str | None = None,
 ) -> tuple[dict[str, object], float]:
     discount, projection = curves.build(discount_data), curves.build(projection_data)
@@ -183,7 +207,11 @@ def fra_pv(
     rate = (projection.discount(trade.start) / projection.discount(e) - 1) / alpha
     sign = 1 if trade.side == "PAY" else -1
     value = (
-        sign * trade.notional * alpha * (rate - trade.fixed_rate) / (1 + alpha * rate)
+        sign
+        * trade.notional
+        * alpha
+        * (rate - trade.fixed_rate)
+        / (1 + alpha * rate)
         * discount.discount(trade.start)
     )
     currency = REGISTRY[index]["currency"]
