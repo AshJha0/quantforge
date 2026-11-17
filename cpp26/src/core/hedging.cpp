@@ -660,8 +660,8 @@ std::optional<Vec> simplex(const Matrix& a, const Vec& b, const Vec& cost) {
 std::optional<Vec> least_margin(const QpProblem& p, const std::vector<Bound>& lower, const std::vector<Bound>& upper,
                                 const Vec& rates) {
     const std::size_t n = rates.size();
-    struct BoundRow { std::size_t j; double v, sign; };
-    std::vector<BoundRow> bound_rows;
+    struct LpBoundRow { std::size_t j; double v, sign; };
+    std::vector<LpBoundRow> bound_rows;
     for (std::size_t j = 0; j < upper.size(); ++j)
         if (upper[j]) bound_rows.push_back({j, *upper[j], 1.0});
     for (std::size_t j = 0; j < lower.size(); ++j)
