@@ -30,5 +30,15 @@ On the simulated multi-venue world (two lit engines from `lit-matching.md` with 
 | sor_h-0004 | K = 2 at [CK] section 4.2 numerical-example parameters | allocation near the paper's Figure 4 | OUTSIDE-CHECKED (figure-read tolerance, stated) if the parameters are fully given in the paper; else hand |
 | sor_h-0005 | one lit, one dark with hand tails | integer split | hand, exhaustive enumeration |
 
+## Convergence and limit cases
+| Limit | Behaviour | Check |
+|---|---|---|
+| `STOCHASTIC_APPROX` iterations | averaged iterate approaches the `SAMPLE_AVERAGE` optimum; cost gap reported at 10^3, 10^4, 10^5 iterations | property test: gap non-increasing in the reported sequence and below 1 SE of cost at 10^5 |
+| K = 1 | `SAMPLE_AVERAGE` equals Prop. 3 of [CK] | sor_h-0001 to 0003 |
+| lambda_u large | all market order (Prop. 3 (ii)) | sor_h-0002 |
+| lambda_u small, ample outflow | all limit (Prop. 3 (i)) | sor_h-0001 |
+| sample size | expected cost SE falls like 1/sqrt(samples) | SE reported with every cost |
+| integer rounding | exhaustive floor/ceiling search (HR-38) | sor_h-0005 enumeration |
+
 ## Limitations
 One-period model (place at 0, clean up at T) as in [CK]; no re-routing within the period; distributions are inputs, not estimated live. Simulated venues only; crypto venues are lit, single-venue in our data, and are not routed across.

@@ -37,5 +37,15 @@ Non-positive qty or min_qty > qty `E_DOMAIN`; `p_firm` outside [0, 1] `E_DOMAIN`
 | dark_h-0006 | [CST10] Prop. 5 at the paper's section 5 parameters | probability | OUTSIDE-CHECKED: the paper's printed table if one exists for Prop. 5; else Monte Carlo 10^6 paths within 3 SE |
 | dark_h-0007 | markout of a single fill against a given mid path | bp values | hand |
 
+## Convergence and limit cases
+| Limit | Behaviour | Check |
+|---|---|---|
+| Gaver-Stehfest terms (HR-35) | inversion error falls with terms until double-precision cancellation; 14 terms fixed | Prop. 5 value at 10, 12, 14, 16 terms published; 14-term value within 3 SE of 10^6-path Monte Carlo |
+| Monte Carlo paths | SE falls like 1/sqrt(paths) | SE reported with every MC value |
+| Kaplan-Meier with no censoring | equals the empirical tail | property test |
+| Kaplan-Meier with all observations censored above s | tail at s stays 1 (no evidence of a cap); optimistic modification as [GKNV09] | dark_h-0005 and a property test |
+| p_firm = 1 | conditionals behave as firm orders | dark_h-0004 |
+| min_qty = qty on both sides | crossing only on exact size match | property test |
+
 ## Limitations
 No real dark-pool data anywhere; the pool, its participants and leakage are simulated with planted parameters; no claim about any real venue. Midpoint taken from one lit book (no consolidated NBBO).

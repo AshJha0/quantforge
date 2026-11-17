@@ -39,5 +39,15 @@ P: X = 1e6, T = 5, N = 5 (tau = 1), sigma = 0.95, epsilon = 0.0625, eta = 2.5e-6
 ## Property tests
 Trades sum to X to 1e-12 relative; for lambda > 0 holdings lie strictly below linear; as tau -> 0, kappa tends to `sqrt(lambda sigma^2 / eta)` ([AC00] eq. (19), p. 15).
 
+## Convergence and limit cases
+| Limit | Behaviour | Check |
+|---|---|---|
+| lambda -> 0 | trajectory tends to the linear one; lambda = 0 returns it exactly, not by cancellation (HR-5) | ac_h-0001; property test at lambda = 1e-15 within 1e-9 relative of linear |
+| tau -> 0 (N large, T fixed) | kappa_tilde -> sqrt(lambda sigma^2 / eta), [AC00] eq. (19) | property test at N = 10, 100, 1000: error falls like tau |
+| y small in HR-6 | `log1p` form keeps kappa accurate where `acosh(1 + y)` loses digits | property test at y = 1e-14 against the series sqrt(2y) |
+| kappa T > 700 | sinh ratio in exponential form, no overflow (HR-6) | property test at kappa T = 1000: holdings finite, decreasing |
+| N = 1 | single trade, E as ac_h-0004 | ac_h-0004 |
+| eta_tilde <= 0 | `E_DOMAIN` | ac_h-0003 |
+
 ## Limitations
 Linear impact, arithmetic Brownian price, no drift, pre-committed schedule. Adaptive re-optimisation is wave 2.
