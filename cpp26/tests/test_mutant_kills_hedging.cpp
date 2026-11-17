@@ -670,14 +670,14 @@ TEST_CASE("minimum variance: a zero hedge variance after a nonzero pivot is sing
     CHECK(got.message.find("linearly dependent") != std::string::npos);
 }
 
-TEST_CASE("minimum variance: a scaled pivot of exactly 1e-12 is singular", "[mutants]") {
+TEST_CASE("minimum variance: a scaled pivot of exactly 1e-12 is not singular (strict <)", "[mutants]") {
     // Found by search in IEEE doubles: with S_11 = 1, S_12 = a, S_22 = s below, d = fl(s - fl(a * a)) and
-    // fl(d / s) == 1e-12 exactly, so `d / sjj <= singular_threshold` throws. Kills `<` (hedging.cpp:1242).
+    // fl(d / s) == 1e-12 exactly. The singular test is strict (`d / sjj < singular_threshold`), so this pivot is
+    // accepted. Kills `<=` (hedging.cpp:1242), which throws E_SINGULAR here.
     const double s = 0.9769962616701378, a = 0.9884312124114458;
     REQUIRE((s - a * a) / s == 1e-12);
     const Caught got = catch_error([&] { (void)hg::min_variance({{1.0, 0.0, 0.0}, {0.0, 1.0, a}, {0.0, a, s}}); });
-    CHECK(got.code == "E_SINGULAR");
-    CHECK(got.message.find("linearly dependent") != std::string::npos);
+    CHECK(got.code == "ok");
 }
 
 TEST_CASE("option hedge lots: a spot of exactly 0 is E_DOMAIN on spot", "[mutants]") {
@@ -837,4 +837,321 @@ TEST_CASE("costed qp: 101 sign flips fit inside 10 (n + p) + 100", "[mutants]") 
     CHECK(std::fabs(res.x[0]) < 1e-9);
     CHECK(std::fabs(res.x[1] + 9.895) < 1e-9);
     CHECK(std::fabs(res.x[n - 1] + 9.895) < 1e-9);
+}
+
+// ---- j2 round 3d (2026-11-17): the batch 4 survivors of the full hedging.cpp mutation run ----
+
+namespace {
+
+struct EffortCapGuard {  // restores the ruled R6-6.1 caps even when a REQUIRE throws
+    explicit EffortCapGuard(long long cap) { hg::detail::effort_cap_override = cap; }
+    ~EffortCapGuard() { hg::detail::effort_cap_override = 0; }
+    EffortCapGuard(const EffortCapGuard&) = delete;
+    EffortCapGuard& operator=(const EffortCapGuard&) = delete;
+};
+
+hg::QpProblem two_free_instruments() {
+    hg::QpProblem prob;
+    prob.a = {{1.0, 0.0}, {0.0, 1.0}};
+    prob.b = {-1.0, -1.0};
+    prob.weights = {1.0, 1.0};
+    return prob;
+}
+
+}  // namespace
+
+TEST_CASE("integer solve: a search of exactly 3 nodes fits a planted cap of 3", "[mutants]") {
+    // f(n) = (n + 0.5)^2 + 9 visits 3 nodes (the root and the leaves -1 and 0). The cap test is `++nodes > cap`, so
+    // a cap of 3 passes and 2 fails. Kills `>=` (hedging.cpp:1070), which fails at 3.
+    hg::IntegerProblem prob;
+    prob.a = {{1.0}, {0.0}};
+    prob.b = {0.5, 3.0};
+    prob.weights = {1.0, 1.0};
+    prob.lot_sizes = {1.0};
+    {
+        const EffortCapGuard cap(3);
+        CHECK(catch_error([&] { hg::solve_integer(prob); }).code == "ok");
+    }
+    {
+        const EffortCapGuard cap(2);
+        CHECK(catch_error([&] { hg::solve_integer(prob); }).code == "E_NO_CONVERGENCE");
+    }
+}
+
+TEST_CASE("integer solve: equal lower and upper lot bounds are allowed", "[mutants]") {
+    // lower_lots = upper_lots = 2: the box is one point. Kills `lo >= hi` (hedging.cpp:1126: E_DOMAIN).
+    hg::IntegerProblem prob;
+    prob.a = {{1.0}};
+    prob.b = {-0.4};
+    prob.weights = {1.0};
+    prob.lot_sizes = {1.0};
+    prob.lower_lots = std::vector<std::optional<long long>>{2};
+    prob.upper_lots = std::vector<std::optional<long long>>{2};
+    hg::IntegerResult res;
+    CHECK(catch_error([&] { res = hg::solve_integer(prob); }).code == "ok");
+    REQUIRE(res.lots.size() == 1);
+    CHECK(res.lots[0] == 2);
+}
+
+TEST_CASE("integer solve: smallest scaled eigenvalue 1e-12 against 1e-12 times the largest (about 2) is singular", "[mutants]") {
+    // As the select test: a = [1 1], ridge 1e-12, so the scaled H has eigenvalues ~1e-12 and ~2; threshold 2e-12.
+    // The lot box is the single point 0, so a mutant that passes the check finishes at once. Kills
+    // `singular_threshold / largest` (hedging.cpp:1134: 5e-13, no E_SINGULAR).
+    hg::IntegerProblem prob;
+    prob.a = {{1.0, 1.0}};
+    prob.b = {1.0};
+    prob.weights = {1.0};
+    prob.ridge = 1e-12;
+    prob.lot_sizes = {1.0, 1.0};
+    prob.lower_lots = std::vector<std::optional<long long>>{0, 0};
+    prob.upper_lots = std::vector<std::optional<long long>>{0, 0};
+    const Caught got = catch_error([&] { hg::solve_integer(prob); });
+    CHECK(got.code == "E_SINGULAR");
+    CHECK(got.field == "a");
+}
+
+TEST_CASE("integer solve: of two ties with equal sum |n|, the lexicographically smaller wins though found first", "[mutants]") {
+    // f = (n0 - 0.5)^2 + (n1 + 0.5)^2 + (n0 - n1 - 1)^2: (0, -1) and (1, 0) tie at 0.5 (by hand), both sum |n| = 1;
+    // (0, 0) and (1, -1) give 1.5. The search runs n1 ascending, so (0, -1) is found first; I-7 keeps it as the
+    // lexicographically smaller. Kills `weight(c) <= weight(pick)` (hedging.cpp:1177), which takes the later (1, 0).
+    hg::IntegerProblem prob;
+    prob.a = {{1.0, 0.0}, {0.0, 1.0}, {1.0, -1.0}};
+    prob.b = {-0.5, 0.5, -1.0};
+    prob.weights = {1.0, 1.0, 1.0};
+    prob.lot_sizes = {1.0, 1.0};
+    const hg::IntegerResult res = hg::solve_integer(prob);
+    CHECK(res.lots == std::vector<long long>{0, -1});
+    CHECK(res.objective == 0.5);
+}
+
+TEST_CASE("select: impact alone is a cost input (J-I.3)", "[mutants]") {
+    // Kills `p.impact && p.cost_weight` (hedging.cpp:1487), which lets impact without cost_weight through.
+    hg::QpProblem prob = two_free_instruments();
+    prob.impact = hg::Vec{0.1, 0.1};
+    const Caught got = catch_error([&] { (void)hg::select_instruments(prob, 1, false); });
+    CHECK(got.code == "E_INPUT");
+    CHECK(got.field == "half_spreads");
+}
+
+TEST_CASE("select: an upper bound of exactly 0 does not exclude 0 (I-33)", "[mutants]") {
+    // Kills `*upper[j] <= 0.0` (hedging.cpp:1491: E_DOMAIN on upper).
+    hg::QpProblem prob = two_free_instruments();
+    prob.b = {-1.0, 1.0};
+    prob.upper = std::vector<hg::Bound>{0.0, std::nullopt};
+    CHECK(catch_error([&] { (void)hg::select_instruments(prob, 1, false); }).code == "ok");
+}
+
+TEST_CASE("select: a subset 2e-7 behind the best is a tie at f(0) = 2e6 and the first subset is kept", "[mutants]") {
+    // b = (1000, 1000 + 1e-10): f({0}) = b1^2 is about 2e-7 above f({1}) = b0^2 = 1e6, inside 1e-12 * f(0) = 2e-6,
+    // so {0} (first) is selected. Kills `1e-12 / max(best, f0)` (hedging.cpp:1536: tie 5e-19, {1} selected).
+    hg::QpProblem prob = two_free_instruments();
+    prob.b = {1000.0, 1000.0 + 1e-10};
+    const hg::SelectResult res = hg::select_instruments(prob, 1, false);
+    CHECK(res.selected == std::vector<long long>{0});
+}
+
+TEST_CASE("qp: equalities that fix x below a lower bound are E_INFEASIBLE, also near 0", "[mutants]") {
+    // x = 0.5 fixed, x >= 1: gap -0.5. Kills `x + bound` (hedging.cpp:456: gap 1.5, accepted). x = 0 fixed,
+    // x >= 1e-13: gap -1e-13 against -1e-12 * 1e-13 (also kills `-1e-12 / (|bound| + |x|)` at hedging.cpp:457: -10).
+    for (const auto& [v, lo] : {std::pair{0.5, 1.0}, std::pair{0.0, 1e-13}}) {
+        hg::QpProblem prob;
+        prob.a = {{1.0}};
+        prob.b = {-1.0};
+        prob.weights = {1.0};
+        prob.eq_matrix = Matrix{{1.0}};
+        prob.eq_rhs = hg::Vec{v};
+        prob.lower = std::vector<hg::Bound>{lo};
+        CHECK(catch_error([&] { hg::solve_qp(prob); }).code == "E_INFEASIBLE");
+    }
+}
+
+TEST_CASE("orthant oracle: equalities that fix x = 1e-6 just above a margin limit are E_INFEASIBLE", "[mutants]") {
+    // x = 1e-6 fixed, margin |x| <= 1e-6 (1 - 1e-9): lhs - rhs = -1e-15 against -1e-12 * scale, scale = |rhs| + |x| =
+    // 2e-6. Both orthants fail (the - one breaks x <= 0). Kills `fabs(general / x)` (hedging.cpp:465: scale 1e6,
+    // threshold -1e-6, x accepted).
+    hg::QpProblem prob;
+    prob.a = {{1.0}};
+    prob.b = {-1e-6};
+    prob.weights = {1.0};
+    prob.eq_matrix = Matrix{{1.0}};
+    prob.eq_rhs = hg::Vec{1e-6};
+    prob.margin_rates = hg::Vec{1.0};
+    prob.margin_limit = 1e-6 * (1.0 - 1e-9);
+    CHECK(catch_error([&] { hg::detail::solve_qp_by_orthants(prob); }).code == "E_INFEASIBLE");
+}
+
+TEST_CASE("orthant oracle: a margin row in the span of the equalities is judged on |m_j x_p,j|", "[mutants]") {
+    // x0 = 5 and x1 + x2 = 0 fixed, x_p = (5, 0, 0); rates (1, 1, 1), limit 1. In orthant (+, +, +) the margin row is
+    // -(x0 + x1 + x2) >= -1, constant on the null space, so the certificate decides: gap 4 against 1e-9 * 6.
+    // No orthant is feasible. Kills `fabs(general / xp)` (hedging.cpp:486): |-1 / 0| = inf makes the row size
+    // infinite, the row is judged implied and a point breaking the limit is returned.
+    hg::QpProblem prob;
+    prob.a = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
+    prob.b = {-5.0, -1.0, 1.0};
+    prob.weights = {1.0, 1.0, 1.0};
+    prob.eq_matrix = Matrix{{1.0, 0.0, 0.0}, {0.0, 1.0, 1.0}};
+    prob.eq_rhs = hg::Vec{5.0, 0.0};
+    prob.margin_rates = hg::Vec{1.0, 1.0, 1.0};
+    prob.margin_limit = 1.0;
+    CHECK(catch_error([&] { hg::detail::solve_qp_by_orthants(prob); }).code == "E_INFEASIBLE");
+}
+
+TEST_CASE("simplex: a zero right-hand side keeps its row sign (+1)", "[mutants]") {
+    // Found by a seeded search over small integer LPs: with the reference row signs (only b < 0 flips) the pivots
+    // end on z = (2, 0, 2, 3) exactly. Kills `b[r] <= 0.0 ? -1 : 1` (hedging.cpp:594), whose other pivot order
+    // gives z2 = 2 - 2^-52.
+    const std::optional<hg::Vec> z =
+        hg::detail::simplex({{2.0, -2.0, -2.0, 0.0}, {-1.0, -2.0, -1.0, 1.0}, {-2.0, 0.0, 1.0, 0.0}}, {0.0, -1.0, -2.0},
+                            {-1.0, 1.0, -1.0, -1.0});
+    REQUIRE(z.has_value());
+    REQUIRE(z->size() == 4);
+    CHECK((*z)[0] == 2.0);
+    CHECK((*z)[1] == 0.0);
+    CHECK((*z)[2] == 2.0);
+    CHECK((*z)[3] == 3.0);
+}
+
+TEST_CASE("simplex: an artificial left basic with a phase-one residual 1e-10 is not pivoted on an artificial column", "[mutants]") {
+    // Rows z = 1 and z = 1 + 1e-10: phase one pivots z into row 0; row 1 keeps its artificial at level 1e-10
+    // (within 1e-9 scale) with entry -1 in column `cols`. The fix-up loop looks at structural columns only, so
+    // z = 1. Kills `c <= cols` (hedging.cpp:643), which pivots that artificial column in and moves 1e-10 into z.
+    const std::optional<hg::Vec> z = hg::detail::simplex({{1.0}, {1.0}}, {1.0, 1.0 + 1e-10}, {0.0});
+    REQUIRE(z.has_value());
+    REQUIRE(z->size() == 1);
+    CHECK((*z)[0] == 1.0);
+}
+
+TEST_CASE("simplex: a structural entry of exactly tol on a degenerate artificial row is not a pivot", "[mutants]") {
+    // Rows z0 = 1 and z0 + 1e-11 z1 = 1, cost -z1: after phase one row 1 keeps its artificial with z1 entry 1e-11 =
+    // tol (scale 1), not moved out (`> tol`). Phase two then has no row with a z1 entry above tol: unbounded,
+    // E_NO_CONVERGENCE. Kills `>= tol` (hedging.cpp:644), which pivots z1 in and returns a point.
+    const Caught got = catch_error([] { (void)hg::detail::simplex({{1.0, 0.0}, {1.0, 1e-11}}, {1.0, 1.0}, {0.0, -1.0}); });
+    CHECK(got.code == "E_NO_CONVERGENCE");
+    CHECK(got.message.find("unbounded") != std::string::npos);
+}
+
+TEST_CASE("costed qp: an unconstrained margin exactly at limit + 1e-12 (limit + margin) is returned as is", "[mutants]") {
+    // x = 3 unconstrained, rate 1, limit L = 2.999999999994 (found by search): fl(L + fl(1e-12 fl(L + 3))) == 3
+    // while the exact sum is below 3, so the first solve passes `<=` and returns 3. Kills `<` (hedging.cpp:740):
+    // the slack test of the binding path sees the excess and returns x = L.
+    hg::QpProblem prob;
+    prob.a = {{1.0}};
+    prob.b = {-3.0};
+    prob.weights = {1.0};
+    prob.margin_rates = hg::Vec{1.0};
+    prob.margin_limit = 2.999999999994;
+    const hg::QpResult res = hg::solve_qp(prob);
+    REQUIRE(res.x.size() == 1);
+    CHECK(res.x[0] == 3.0);
+}
+
+TEST_CASE("costed qp: equalities that fix a margin exactly limit + 1e-9 max(1, limit) are feasible", "[mutants]") {
+    // x = (1 + 1e-9, 0) fixed by E = I, rates (1, 0), limit 1: margin == limit + 1e-9 in doubles, and the test is
+    // `>`. Kills `>=` (hedging.cpp:762: E_INFEASIBLE).
+    const double v = 1.0 + 1e-9;
+    hg::QpProblem prob = two_free_instruments();
+    prob.b = {-v, -1.0};
+    prob.eq_matrix = Matrix{{1.0, 0.0}, {0.0, 1.0}};
+    prob.eq_rhs = hg::Vec{v, 0.0};
+    prob.margin_rates = hg::Vec{1.0, 0.0};
+    prob.margin_limit = 1.0;
+    hg::QpResult res;
+    CHECK(catch_error([&] { res = hg::solve_qp(prob); }).code == "ok");
+    REQUIRE(res.x.size() == 2);
+    CHECK(res.x[0] == v);
+}
+
+TEST_CASE("costed qp: 5 instruments with 4 equalities, both bounds and a margin row solve (cap 10 (n + p) + 100)", "[mutants]") {
+    // x0 = ... = x4 = t by four equalities, bounds [-10, 10], spreads 0.1, rates 1, limit 100 (slack). p = 4 + 10 + 1
+    // = 15. Kills `10 (n - p) + 100` (hedging.cpp:802: cap 0, E_NO_CONVERGENCE at the first iteration). By hand
+    // t = 3 - 0.05 = 2.95 (mean target 3, spread pull 0.1 / 2).
+    const std::size_t n = 5;
+    hg::QpProblem prob;
+    prob.a.assign(n, hg::Vec(n, 0.0));
+    for (std::size_t j = 0; j < n; ++j) prob.a[j][j] = 1.0;
+    prob.b = {-1.0, -2.0, -3.0, -4.0, -5.0};
+    prob.weights.assign(n, 1.0);
+    Matrix e(n - 1, hg::Vec(n, 0.0));
+    for (std::size_t i = 0; i + 1 < n; ++i) {
+        e[i][i] = 1.0;
+        e[i][i + 1] = -1.0;
+    }
+    prob.eq_matrix = e;
+    prob.eq_rhs = hg::Vec(n - 1, 0.0);
+    prob.lower = std::vector<hg::Bound>(n, -10.0);
+    prob.upper = std::vector<hg::Bound>(n, 10.0);
+    prob.half_spreads = hg::Vec(n, 0.1);
+    prob.margin_rates = hg::Vec(n, 1.0);
+    prob.margin_limit = 100.0;
+    hg::QpResult res;
+    CHECK(catch_error([&] { res = hg::solve_qp(prob); }).code == "ok");
+    REQUIRE(res.x.size() == n);
+    CHECK(std::fabs(res.x[0] - 2.95) < 1e-12);
+}
+
+TEST_CASE("costed qp: a planted cap of 2 stops two sign flips with the R6-6.1 message", "[mutants]") {
+    // Rows x0 - 10, x1 - x0 + 9.9, x2 - x1 - 0.1, spreads (1, 0.01, 0.01): x1 flips, then x2 (three sign states),
+    // each orthant needing at most one active-set step. Cap 2 lets the active set finish and stops the sign-state
+    // loop at iteration 2. Kills the message mutant "10 n - 100" (hedging.cpp:804).
+    hg::QpProblem prob;
+    prob.a = {{1.0, 0.0, 0.0}, {-1.0, 1.0, 0.0}, {0.0, -1.0, 1.0}};
+    prob.b = {-10.0, 9.9, -0.1};
+    prob.weights = {1.0, 1.0, 1.0};
+    prob.half_spreads = hg::Vec{1.0, 0.01, 0.01};
+    const EffortCapGuard cap(2);
+    const Caught got = catch_error([&] { hg::solve_qp(prob); });
+    CHECK(got.code == "E_NO_CONVERGENCE");
+    CHECK(got.message.find("the sign-state method passed 10 n + 100 iterations (R6-6.1)") != std::string::npos);
+}
+
+TEST_CASE("costed qp: a binding margin multiplier widens the flip tolerance (+ mu m)", "[mutants]") {
+    // x0 target 0.5 + 5e-8 with half spread 1 (k = 0.5): held at 0 in its + orthant with excess ~1e-7. x1 target 1e4,
+    // rate 1, limit 1: the margin binds with mu m1 ~ 1e4, so the scale is ~2e4 and 1e-7 is inside 1e-10 scale: x0 = 0.
+    // Kills `k - mu m` (hedging.cpp:811): scale ~1, the flip happens and x0 = -5e-8.
+    hg::QpProblem prob = two_free_instruments();
+    prob.b = {0.5 + 5e-8, -1e4};
+    prob.half_spreads = hg::Vec{1.0, 0.0};
+    prob.margin_rates = hg::Vec{0.0, 1.0};
+    prob.margin_limit = 1.0;
+    const hg::QpResult res = hg::solve_qp(prob);
+    REQUIRE(res.x.size() == 2);
+    CHECK(res.x[0] == 0.0);
+    CHECK(std::fabs(res.x[1] - 1.0) < 1e-12);
+}
+
+TEST_CASE("orthant oracle: the spread term is 0.5 * cost_weight * half_spread", "[mutants]") {
+    // min (x - 1)^2 + 2 * 0.4 |x| (cost_weight 2, half spread 0.4): x = 0.6, the same as the sign-state solve. Kills
+    // `0.5 / cost_weight` (hedging.cpp:886: x = 0.9).
+    hg::QpProblem prob;
+    prob.a = {{1.0}};
+    prob.b = {-1.0};
+    prob.weights = {1.0};
+    prob.half_spreads = hg::Vec{0.4};
+    prob.cost_weight = 2.0;
+    const hg::QpResult oracle = hg::detail::solve_qp_by_orthants(prob);
+    REQUIRE(oracle.x.size() == 1);
+    CHECK(std::fabs(oracle.x[0] - 0.6) < 1e-15);
+    CHECK(std::fabs(hg::solve_qp(prob).x[0] - 0.6) < 1e-15);
+}
+
+TEST_CASE("qp: an all-zero equality row is E_SINGULAR as linearly dependent", "[mutants]") {
+    // The row has norm 0, so its scaled row is 0 and its singular value 0 <= 1e-12 * 0. Kills `norm >= 0.0`
+    // (hedging.cpp:975: 0 / 0, NaN singular values pass and a later check fails with another message) and `<`
+    // (hedging.cpp:984: 0 < 0 is false).
+    hg::QpProblem prob = two_free_instruments();
+    prob.eq_matrix = Matrix{{0.0, 0.0}};
+    prob.eq_rhs = hg::Vec{0.0};
+    const Caught got = catch_error([&] { hg::solve_qp(prob); });
+    CHECK(got.code == "E_SINGULAR");
+    CHECK(got.field == "eq_matrix");
+    CHECK(got.message.find("linearly dependent") != std::string::npos);
+}
+
+TEST_CASE("qp: equality rows at angle 1.5e-12 are dependent against 1e-12 times the largest singular value", "[mutants]") {
+    // Rows (1, 0) and (1, 1.5e-12): singular values ~sqrt(2) and ~1.06e-12, threshold 1e-12 * sqrt(2). Kills
+    // `singular_threshold / sv.front()` (hedging.cpp:984: 7.1e-13, accepted).
+    hg::QpProblem prob = two_free_instruments();
+    prob.eq_matrix = Matrix{{1.0, 0.0}, {1.0, 1.5e-12}};
+    prob.eq_rhs = hg::Vec{1.0, 1.0};
+    CHECK(catch_error([&] { hg::solve_qp(prob); }).code == "E_SINGULAR");
 }
