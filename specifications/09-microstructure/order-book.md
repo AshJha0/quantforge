@@ -1,0 +1,86 @@
+# Order book rebuild from the Kraken L2 feed (DRAFT)
+
+Spec version 0.1.0 (DRAFT, stage H wave 1b). Status: Specified, not implemented. Rulings HR-11 to HR-17 (`stage-h-rulings-w1b.md`). Plan items 14.7 H-2 (book equals the venue snapshot at every checkpoint; crossed or gapped sequences detected and counted), 11.4 (depth 100 from 2026-11-17 20:15 UTC), 14.7 H-9(d) (the same check runs on the latency replay).
+
+**Plain idea.** Keep one price-to-quantity map per side. A snapshot replaces the book; an update sets a level's quantity, or removes it when the quantity is zero; after every message, drop the levels beyond the subscribed depth. At each checkpoint, compare our top levels with what the venue says the book is.
+
+## Sources
+
+- [KR-BOOK] Kraken, "Book (Level 2)", WebSocket v2 API docs, https://docs.kraken.com/api/docs/websocket-v2/book, read 2026-11-17. Evidence class: venue documentation, read. Verified: subscribe `depth` is one of 10, 25, 100, 500, 1000 (default 10); messages carry `type` `snapshot` or `update`, `data[]` with `symbol`, `bids[]`, `asks[]` (`price`, `qty`), `checksum` (CRC32 of the top 10 bids and asks) and `timestamp` (RFC 3339); the page says one update message can change the same price level more than once, and that updates must be processed in order. **No sequence number is documented**; the channel has no `seq` field.
+- [KR-CRC] Kraken, "Book checksum (WebSocket v2)", https://docs.kraken.com/api/docs/guides/spot-ws-book-v2, read 2026-11-17. Evidence class: venue documentation, read. Verified: `qty` 0 removes the level; after each update the client truncates its book to the subscribed depth, because the venue sends no zero for levels that fall out of scope; the checksum covers the top 10 levels each side whatever the subscription depth, asks ascending then bids descending, each price and quantity with the decimal point and leading zeros removed, concatenated and passed to CRC32 as an unsigned 32-bit integer; worked example result 3310070434; prices and quantities must be parsed as decimal or string, not float; all level updates in a message are applied before the checksum is computed. Not stated: the CRC32 polynomial (the recorder uses `zlib.crc32`, the IEEE 802.3 variant, and its `ok` flag has been true on recorded data, so the variant is inferred, evidence class "inferred from our recordings"); what to do on a mismatch; what happens when a truncated level re-enters the top N.
+- [KR-L3] Kraken, "Orders (Level 3)", https://docs.kraken.com/api/docs/websocket-v2/level3, read 2026-11-17. Verified: the order-by-order channel "is authenticated", needing an API token. The plan forbids accounts and keys (11.4), so **QuantForge has no MBO feed**; MBO is specified only for the simulated venues (`10-execution/lit-matching.md`).
+- [REC] `tools/recorder/crypto_l2.py` on `main` at v0.9.0 (DEPTH 25, KEEP 20) at commit 4d0c8142 (DEPTH 100, KEEP 100, owner 2026-11-17) and at commit 547e6690 (raw book messages under `<SYMBOL>-raw/`, disk guard), both on branch `hedge-followups-0918`, not yet on `main`. Read 2026-11-17. Evidence class: our code, read.
+
+## What the recording holds
+
+Two kinds of file, per symbol per UTC hour (recorder commit 547e6690 on `hedge-followups-0918`, docstring read 2026-11-17; ruling HR-11, owner decision 2026-11-17):
+
+- `<SYMBOL>/`: once-a-second top-N snapshot rows (`k = "book"`, 20 levels before 2026-11-17 20:15 UTC, 100 after), trades as received, a `gap` row per reconnect. The snapshot rows are the recorder's own book, so on their own they are not an independent feed.
+- `<SYMBOL>-raw/`: **one sample only, 2026-11-17 20:29 to 20:43 UTC** (about 14 minutes, both symbols, about 5.7 MB): every book message as received, `{"t": local receive time, "k": "msg", "type": "snapshot" | "update", "bids", "asks" (the exact decimal strings Kraken sent), "checksum", "ts" (Kraken's timestamp, updates only), "ok"}`, plus `gap` rows. Raw recording was then switched off for disk space (HR-11): about 0.5 GB a day against about 29 GB free. The recorder can still record raw; a `NO_RAW` file in the data folder switches it off, and that is how it is off now.
+
+So the per-second rows are the main evidence. They are the recorder's own book, not an independent feed: their venue-side evidence is the `ok` flag (the recorder's book matched Kraken's checksum at the last update before the row) and our recomputed checksum of each row's top 10.
+
+| Form | Input | Checkpoint | Applies to |
+|---|---|---|---|
+| B (the H-2 and H-9 form) | per-second 100-level snapshot rows | each row: our checksum of the row's top 10 recomputed and the `ok` flag counted; consecutive rows give a differenced stream (below) | every recorded day; 20 levels before 2026-11-17 20:15 UTC, 100 after |
+| A (demonstration only) | the 14-minute raw sample | every message: CRC32 of our top 10 against the venue's `checksum` (the recorder's `ok` is ignored, so the check is independent of the recorder's code); every per-second row in the same window: full top-N equality against our book at the last message received before the row's `t` | 2026-11-17 20:29 to 20:43 UTC only; labelled "form A demonstration, 14-minute sample"; never pooled with form B, and not an H-2 day |
+
+**Route to form A.** Re-enable raw recording (remove `NO_RAW`) with the data folder on a drive with room for about 0.5 GB a day per two symbols. Days recorded that way run in form A and become the H-2 result; this spec needs no other change for that.
+
+**Differenced stream (form B; the H-9 replay stream).** Between consecutive snapshot rows, the set of level changes (new, changed, removed price levels, with a removal also implied for a price that left the top N) is a synthetic update message whose application to the earlier row must give the later row exactly. It is labelled "snapshot-differenced stream; not the venue's message sequence": it under-counts updates (many venue messages per second collapse into one) and cannot show intra-second crossing.
+
+## `micro.book.rebuild`
+
+Inputs:
+- `messages`: list of `{"type": "snapshot" | "update", "bids": [[price, qty], ...], "asks": [...], "checksum": u32 | null, "t": RFC3339}`; prices and quantities as decimal strings (HR-12).
+- `depth`: one of 10, 25, 100, 500, 1000 (the subscribed depth, so the truncation rule is exact).
+- `price_decimals`, `qty_decimals`: the pair's precision from Kraken's public AssetPairs call, recorded with the day (needed for the checksum string).
+- `checkpoints`: optional list of `{"t": ..., "bids": [...], "asks": [...]}` snapshots to compare against (form A, recorder rows).
+
+Outputs:
+- `book`: final `bids` (descending), `asks` (ascending), each at most `depth` levels, decimal strings.
+- `stats`: `messages`, `snapshots`, `updates`, `level_changes`, `deletes_of_absent_level`, `truncated_levels`, `checksum_checked`, `checksum_failed`, `checkpoint_checked`, `checkpoint_failed`, `crossed`, `locked`, `gaps`, `resyncs`.
+- `events`: list of `{"i": message index, "kind": "CHECKSUM_FAIL" | "CHECKPOINT_FAIL" | "CROSSED" | "LOCKED" | "GAP" | "UPDATE_BEFORE_SNAPSHOT", "detail": ...}`, capped at 10,000 with a count of the rest.
+
+Algorithm (normative):
+1. `snapshot`: clear both sides, insert every non-zero level, truncate, then check.
+2. `update`: for each level in message order, `qty == 0` removes the price (a missing price counts in `deletes_of_absent_level` and is not an error; [KR-CRC] says nothing about it and the venue's truncation makes it legitimate), else sets the price's quantity (replace, not add). After all levels of the message: truncate each side to `depth` (count in `truncated_levels`), then check.
+3. Check, after the whole message: if `checksum` is present, compute it per [KR-CRC] on our top 10 and compare (HR-13); best bid >= best ask is `CROSSED`, equal is `LOCKED` (HR-14).
+4. `update` before any `snapshot`, or after a gap row, is `UPDATE_BEFORE_SNAPSHOT`: ignored and counted, until the next snapshot (HR-15).
+5. A `gap` row (reconnect) clears the book and counts in `gaps`; a checksum failure sets `resyncs += 1` only if the caller marks the next snapshot as a resubscribe. The rebuild never invents a recovery the venue does not document.
+
+Errors: malformed message or non-decimal price `E_SCHEMA`; negative quantity, non-positive price or `depth` not in the list `E_DOMAIN`; more than 50,000,000 messages `E_LIMIT` (HR-17). Checksum failures and crossed books are **reported, not errors**: a replay over a day must count them, not stop.
+
+## H-2 acceptance (as fixed here, before any run)
+
+On every recorded day used for H-1 (at least 20 at the tag), per symbol:
+- Form A demonstration (the 14-minute raw sample): `checksum_failed == 0` and `checkpoint_failed == 0`; any failure is listed with its message index. Published as a demonstration of the full check, not as an H-2 day. If raw recording is re-enabled (route above), complete raw days use this rule and replace form B as the H-2 result.
+- Form B (every recorded day; the H-2 result while raw recording is off): the recomputed checksum of every row's top 10 equals the result implied by its `ok` flag for rows with `ok = true`; the count of `ok = false` rows, crossed rows and gap rows is published per day. Pass means "the recorder's book agreed with the venue checksum on X% of seconds", with X stated, not "the book equals the venue".
+- Crossed and locked counts are published; they are a property of the feed or of our rebuild, and form A separates the two (a crossed book with a passing checksum is the venue's).
+
+## Limit cases
+- Depth 10 subscription: the checksum covers the whole book.
+- Days before 2026-11-17 20:15 UTC hold 20 levels; a 100-level replay uses only later days (11.4).
+- A level re-entering the top N after truncation arrives as an ordinary update; if the venue never resends it, our book has a hole below the top 10 that the checksum cannot see. Form A's once-a-second full top-N checkpoint is the only detector; the count of such mismatches below level 10 is published separately from top-10 failures.
+- Timestamps are the venue's; the recorder's receive time is kept for latency-free ordering checks only. Message order is file order; out-of-order timestamps are counted, not reordered.
+
+## Golden plan (no goldens yet)
+| Case | Content | Expected | Check |
+|---|---|---|---|
+| ob_h-0001 | [KR-CRC] worked example levels | checksum 3310070434 | OUTSIDE-CHECKED: venue's printed value |
+| ob_h-0002 | snapshot then update with `qty` 0 on a present level | level removed | hand |
+| ob_h-0003 | update inserting a 26th bid at depth 25 | worst bid dropped, `truncated_levels = 1` | hand, [KR-CRC] rule |
+| ob_h-0004 | same price twice in one update | last value wins | [KR-BOOK] statement |
+| ob_h-0005 | update before snapshot | ignored, counted | HR-15 |
+| ob_h-0006 | best bid = best ask, then bid > ask | `LOCKED`, then `CROSSED`, both counted, no error | HR-14 |
+| ob_h-0007 | delete of an absent price | counted, book unchanged | hand |
+| ob_h-0008 | gap row mid-stream | book cleared, `gaps = 1` | HR-15 |
+| ob_h-0009 | moved out of the goldens (owner 2026-11-17, HR-41) | see the local test below | not a golden |
+| ob_h-0010 | price string "0.00012300" at 8 decimals | checksum component "12300" | [KR-CRC] formatting rule |
+
+Outside checks: 0001 (venue's printed checksum) and 0010 (venue formatting rule), 2 of the 9 golden cases; the rest are hand cases and go to a blind second lane (DR-H2) to reach the 60% rule.
+
+**Local-only test (not a golden; HR-41).** A recorded row's checksum cannot survive any transform (shifting prices or scaling quantities changes the string Kraken's CRC32 covers), and untransformed rows may not be published (11.4, terms read 2026-11-12). So the check against Kraken's real checksums runs only locally, on the recorded files: every form B row with `ok = true`, and every message of the 14-minute raw sample, must give our recomputed checksum equal to Kraken's. It runs before each stage H release; its counts are published, its rows are not.
+
+## Limitations
+MBP only; Kraken's MBO channel needs a key and is out of scope. No sequence number, so a dropped websocket message is detected only by the checksum. Crypto venue; not equities or rates.

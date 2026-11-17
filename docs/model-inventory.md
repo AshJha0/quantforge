@@ -35,6 +35,7 @@ Each model below gets one entry, the "page" the plan asks for. Outside-checked s
 | M21 | Vol Greeks | `06-risk/vol-greeks.md` | C | Implemented | stage C only |
 | M22 | Least-squares calibration | `03-calibration/least-squares.md` | B | Implemented | known truth only |
 | M23 | Linear-cost hedge solver | `08-hedging/stage-b-hedges.md` | B | Implemented | none |
+| M24 | Coupon schedule generation | `02-curves/schedules.md` | B | Implemented | none recorded |
 
 Stage E has its own index tables (ME-A1 to ME-A8, EB1 to EB12) under "Stage E models". Stages F, G and I, with fields taken from each entry below (outside-checked counts as the entry's Validation line states them, "see entry" where it gives none):
 
@@ -226,6 +227,18 @@ Each entry gives: purpose; inputs; known limitations; validation status; use res
 - **Purpose:** minimise residual risk plus linear trading cost.
 - **Limitations:** linear costs only, no impact, no integer lot sizes.
 - **Validation:** optimality conditions only. **Review:** 2026-11-07.
+
+### M24 Coupon schedule generation
+- **Purpose:** regular coupon periods with one short first stub, business-day adjusted, with payment dates (`rates.schedule.generate`).
+- **Inputs:** start and end dates, frequency in months, calendar, end-of-month flag, payment lag.
+- **Limitations:** short first stub only; long stubs and ex-dividend periods are stage D; `MODIFIED_FOLLOWING` only.
+- **Validation:** oracle `oracle/python/gen_stage_b.py`; suites `schedule` (7 cases) and `schedule_deep` (48 cases). The spec's acceptance is exact agreement with QuantLib `Schedule` (backward generation), but no outside-check record for these suites was found in `oracle/` on 2026-11-17, so none is counted. **Review:** 2026-11-17.
+- **Tier:** 2.
+- **Challenger:** the Python oracle against each of the three ported builds (Rust, Java, C++).
+- **Monitoring thresholds:** any period date differing from the oracle (exact match required).
+- **Data lineage hash:** sha256 77c6d2bdd6ec6430efc8f591b6ae70a1bea18a1c5e0699e2f13616fbd912d4f5 (`schedule`); sha256 a48de7508e7b29803800ac149acecc45546cf173a33534b75cdca88feee5e247 (`schedule_deep`).
+- **Retirement trigger:** the stage D long-stub schedule superseding this operation, or a superseding ruling.
+- **Validation report:** `specifications/02-curves/schedules.md`.
 
 ## Stage E models (E1 to E8)
 
@@ -954,3 +967,127 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 - **Data lineage hash:** sha256 97453653a9c27a1f1a0c4c3044cad141549911e87ffde2091a7c55e55bde5ee6 (`liqcurve_j`).
 - **Retirement trigger:** calibration in stage H item H-1, or a superseding ruling.
 - **Validation report:** `specifications/10-execution/liquidity-curve.md`.
+
+## Stage H (specified, not implemented)
+
+Draft entries for the stage H specs on branch h-spec-w1b (2026-11-17). Status for every entry: Specified, not implemented; no goldens, no code. Each entry is re-dated when its operation lands.
+
+### MH-1 Order book rebuild (stage H wave 1b)
+- **Purpose:** MBP book rebuilt from the Kraken v2 L2 feed, checksum, crossed, locked and gap counting (`micro.book.rebuild`, H-2).
+- **Inputs:** as in the spec page.
+- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Tier:** 3.
+- **Challenger:** the venue's CRC32 checksum on every recorded message or row.
+- **Monitoring thresholds:** any checksum failure on a form B row with `ok = true`, or any form A failure.
+- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/09-microstructure/order-book.md`.
+
+### MH-2 Low-latency order book (stage H wave 1b)
+- **Purpose:** the same book as MH-1 built for speed; per-message latency, allocation-free hot path, CI regression gate (H-9).
+- **Inputs:** as in the spec page.
+- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Tier:** 3.
+- **Challenger:** MH-1 (Python reference) on the same stream, exact `top(100)` equality.
+- **Monitoring thresholds:** p99 above the CI threshold of HR-24, or any steady-state allocation in C++ or Rust.
+- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/09-microstructure/low-latency-book.md`.
+
+### MH-3 Simulated lit matching engine (stage H wave 1b)
+- **Purpose:** price-time matching with limit, market, IOC, FOK, iceberg, post-only and pegged orders (`exec.sim.lit.run`).
+- **Inputs:** as in the spec page.
+- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Tier:** 3.
+- **Challenger:** the Python oracle against each ported build; invariants (no crossed book, quantity conserved, FIFO).
+- **Monitoring thresholds:** any invariant break in the property tests.
+- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/lit-matching.md`.
+
+### MH-4 Simulated dark pool (stage H wave 1b)
+- **Purpose:** midpoint crossing, minimum quantity, conditionals, fill probability and markouts (`exec.sim.dark.run`).
+- **Inputs:** as in the spec page.
+- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Tier:** 3.
+- **Challenger:** Monte Carlo of the same model for the Laplace-inversion fill probability; lifelines for Kaplan-Meier.
+- **Monitoring thresholds:** planted leakage not recovered within 3 SE.
+- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/dark-pool.md`.
+
+### MH-5 Smart order router (stage H wave 1b)
+- **Purpose:** Cont-Kukanov split across simulated lit and dark venues (`exec.sor.allocate`), scored against single-venue routing.
+- **Inputs:** as in the spec page.
+- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Tier:** 3.
+- **Challenger:** `SAMPLE_AVERAGE` against `STOCHASTIC_APPROX` and Prop. 3 closed form.
+- **Monitoring thresholds:** router split outside 3 SE of the planted optimum.
+- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/smart-order-router.md`.
+
+### MH-6 Almgren-Chriss trajectory and frontier (stage H wave 1)
+- **Purpose:** optimal liquidation trajectory and efficient frontier (`exec.ac.trajectory`, `exec.ac.frontier`).
+- **Inputs:** as in the spec page.
+- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) and printed [AC00] figures.
+- **Monitoring thresholds:** trajectory or frontier off the closed form by more than 1e-12.
+- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/almgren-chriss.md`.
+
+### MH-7 Market impact (stage H wave 1)
+- **Purpose:** square-root and Obizhaeva-Wang transient impact (`exec.impact.sqrt`, `exec.impact.ow_optimal`).
+- **Inputs:** as in the spec page.
+- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Tier:** 3.
+- **Challenger:** printed paper figures and blind re-derivation.
+- **Monitoring thresholds:** calibrated exponent standard error not reported (H-1).
+- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/impact.md`.
+
+### MH-8 Execution schedules (stage H wave 1)
+- **Purpose:** TWAP, VWAP and POV schedules (`exec.schedule.*`).
+- **Inputs:** as in the spec page.
+- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Tier:** 3.
+- **Challenger:** hand cases and blind re-derivation.
+- **Monitoring thresholds:** slices not summing to the order (HR-3).
+- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/schedules.md`.
+
+### MH-9 Implementation shortfall TCA (stage H wave 1)
+- **Purpose:** Perold decomposition into delay, execution, opportunity and fees (`exec.tca.shortfall`).
+- **Inputs:** as in the spec page.
+- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Tier:** 3.
+- **Challenger:** hand cases and blind re-derivation.
+- **Monitoring thresholds:** decomposition not summing to the total to 1e-10.
+- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/tca.md`.
+
+### MH-10 Avellaneda-Stoikov quotes (stage H wave 1)
+- **Purpose:** inventory-aware market-making quotes (`micro.mm.as_quotes`).
+- **Inputs:** as in the spec page.
+- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Tier:** 3.
+- **Challenger:** [AS08] printed tables and blind re-derivation.
+- **Monitoring thresholds:** quotes off the closed form by more than 1e-10.
+- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/09-microstructure/avellaneda-stoikov.md`.
