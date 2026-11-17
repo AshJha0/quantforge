@@ -126,6 +126,10 @@ TEST_CASE("option hedge lots: half_spread 0 is allowed and costs nothing; negati
     CHECK(neg.message == "hedges: half_spread must be at least 0");
     CHECK(catch_error([&] { hg::option_hedge_lots(m, book, {{u, 0.0, 0.0}}, {hg::Greek::Delta}, 10); }).code == "E_DOMAIN");
     CHECK(catch_error([&] { hg::option_hedge_lots(m, book, {{u, 100.0, 0.0}}, {hg::Greek::Delta}, 0); }).field == "max_lots");
+    // max_lots = 1 is the smallest valid cap (kills `max_lots < 1` -> `<= 1`): one lot is allowed, not two.
+    const hg::LotHedgeResult one = hg::option_hedge_lots(m, book, {{u, 100.0, 0.0}}, {hg::Greek::Delta}, 1);
+    REQUIRE(one.lots.size() == 1);
+    CHECK(one.lots[0] == 1);
 }
 
 TEST_CASE("minimum variance: a hedged variance of exactly -1e-12 S_00 reads as 0 (I-44 boundary)", "[mutants]") {

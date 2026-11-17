@@ -514,3 +514,44 @@ TEST_CASE("hsu degenerate: a single vertex of the box, with redundant equalities
     bad.upper = std::vector<hg::Bound>{1.0, 1.0};
     REQUIRE(code_of([&] { hg::solve_qp(bad); }) == "E_INFEASIBLE");
 }
+
+namespace {
+// Exact comparison: the least-margin LP lands on vertices made of the data, as in Python's test_least_margin_points.
+void require_point(const std::optional<hg::Vec>& got, const hg::Vec& want) {
+    REQUIRE(got.has_value());
+    REQUIRE(got->size() == want.size());
+    for (std::size_t j = 0; j < want.size(); ++j) REQUIRE((*got)[j] == want[j]);
+}
+}  // namespace
+
+TEST_CASE("hsu least margin: the points of python test_least_margin_points", "[hedging][hsu][least_margin]") {
+    namespace d = hg::detail;
+    const hg::Matrix e{{1, 1}};
+    const hg::Vec rates{1, 3};
+    using B = std::vector<hg::Bound>;
+    // min |x0| + 3 |x1| with x0 + x1 = 3: x0 = 3 unless a bound stops it.
+    require_point(d::least_margin(e, {3}, B{{}, {}}, B{{}, {}}, rates), {3, 0});
+    require_point(d::least_margin(e, {3}, B{{}, {}}, B{2.0, {}}, rates), {2, 1});
+    require_point(d::least_margin(e, {3}, B{{}, 1.5}, B{2.0, {}}, rates), {1.5, 1.5});
+    require_point(d::least_margin(e, {-3}, B{-2.0, {}}, B{{}, {}}, rates), {-2, -1});
+    // Bounds alone: the point nearest 0 in each box; no rows at all: the origin.
+    require_point(d::least_margin({}, {}, B{1.0, {}, -4.0}, B{2.0, -0.5, {}}, {1, 1, 1}), {1, -0.5, 0});
+    require_point(d::least_margin({}, {}, B{{}, {}}, B{{}, {}}, {1, 1}), {0, 0});
+    REQUIRE_FALSE(d::least_margin(e, {3}, B{{}, {}}, B{1.0, 1.0}, rates).has_value());
+}
+
+TEST_CASE("hsu least margin: feasibility is judged at 1e-9 of the data scale", "[hedging][hsu][least_margin]") {
+    namespace d = hg::detail;
+    using B = std::vector<hg::Bound>;
+    // 100 x = 100 + 1e-8 with 0 <= x <= 1 misses by 1e-8, inside 1e-9 x 100; by 1e-6 it is infeasible.
+    const auto inside = d::least_margin({{100}}, {100 + 1e-8}, B{0.0}, B{1.0}, {1});
+    REQUIRE(inside.has_value());
+    REQUIRE(std::fabs((*inside)[0] - 1.0) <= 1e-9);
+    REQUIRE_FALSE(d::least_margin({{100}}, {100 + 1e-6}, B{0.0}, B{1.0}, {1}).has_value());
+}
+
+TEST_CASE("hsu least margin: a repeated equality row leaves a degenerate artificial", "[hedging][hsu][least_margin]") {
+    using B = std::vector<hg::Bound>;
+    require_point(hg::detail::least_margin({{1, 1}, {1, 1}}, {3, 3}, B{}, B{}, {1, 3}), {3, 0});
+    require_point(hg::detail::least_margin({{1, 1}, {2, 2}}, {-3, -6}, B{}, B{}, {3, 1}), {0, -3});
+}

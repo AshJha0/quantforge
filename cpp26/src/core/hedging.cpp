@@ -580,6 +580,10 @@ double margin_used(const QpProblem& p, const Vec& x) {
     return m;
 }
 
+}  // namespace
+
+namespace detail {
+
 // argmin cost z subject to a z = b, z >= 0, or nullopt when no z is feasible. Two-phase dense tableau simplex with
 // Bland's rule; a port of Python hedge_solvers._simplex (same pivots, same tolerances) for the margin start.
 std::optional<Vec> simplex(const Matrix& a, const Vec& b, const Vec& cost) {
@@ -657,8 +661,8 @@ std::optional<Vec> simplex(const Matrix& a, const Vec& b, const Vec& cost) {
 // The point of least margin sum m_j |x_j| with E x = e inside the bounds, or nullopt: an LP in x = u - v, u, v >= 0,
 // each finite bound a row with a slack (Python hedge_solvers._least_margin). Exact, unlike a margin penalty, whose
 // O(1/penalty) error is the size of the I-46 tolerance and refused a limit equal to the least margin.
-std::optional<Vec> least_margin(const QpProblem& p, const std::vector<Bound>& lower, const std::vector<Bound>& upper,
-                                const Vec& rates) {
+std::optional<Vec> least_margin(const Matrix& eq, const Vec& eq_rhs, const std::vector<Bound>& lower,
+                                const std::vector<Bound>& upper, const Vec& rates) {
     const std::size_t n = rates.size();
     struct LpBoundRow { std::size_t j; double v, sign; };
     std::vector<LpBoundRow> bound_rows;
@@ -669,16 +673,15 @@ std::optional<Vec> least_margin(const QpProblem& p, const std::vector<Bound>& lo
     const std::size_t cols = 2 * n + bound_rows.size();
     Matrix rows;
     Vec rhs;
-    if (p.eq_matrix)
-        for (std::size_t r = 0; r < p.eq_matrix->size(); ++r) {
-            Vec row(cols, 0.0);
-            for (std::size_t j = 0; j < n; ++j) {
-                row[j] = (*p.eq_matrix)[r][j];
-                row[n + j] = -(*p.eq_matrix)[r][j];
-            }
-            rows.push_back(std::move(row));
-            rhs.push_back((*p.eq_rhs)[r]);
+    for (std::size_t r = 0; r < eq.size(); ++r) {
+        Vec row(cols, 0.0);
+        for (std::size_t j = 0; j < n; ++j) {
+            row[j] = eq[r][j];
+            row[n + j] = -eq[r][j];
         }
+        rows.push_back(std::move(row));
+        rhs.push_back(eq_rhs[r]);
+    }
     for (std::size_t s = 0; s < bound_rows.size(); ++s) {  // x_j + t = u, or x_j - t = l
         Vec row(cols, 0.0);
         row[bound_rows[s].j] = 1.0;
@@ -696,6 +699,10 @@ std::optional<Vec> least_margin(const QpProblem& p, const std::vector<Bound>& lo
     for (std::size_t j = 0; j < n; ++j) x[j] = (*z)[j] - (*z)[n + j];
     return x;
 }
+
+}  // namespace detail
+
+namespace {
 
 // Wave 4a with a spread or margin term, by sign states (ruling I-48). f = x'Hx + 2c'x + 2 sum k_j |x_j|, with
 // k = cost_weight half_spreads / 2, and optionally sum m_j |x_j| <= limit. A sign state fixes s_j = +1 or -1 for
@@ -733,7 +740,8 @@ public:
         if (!margined_ || margin(x) <= limit_ + 1e-12 * (limit_ + margin(x))) return x;
         // The margin binds. Start from the orthant of the exact least-margin point (an LP); above the limit by
         // more than the I-46 tolerance, no point is feasible. Same test as Python _costed.
-        const std::optional<Vec> start = least_margin(p_, lower_, upper_, m_);
+        const std::optional<Vec> start = detail::least_margin(p_.eq_matrix.value_or(Matrix{}), p_.eq_rhs.value_or(Vec{}),
+                                                              lower_, upper_, m_);
         if (!start || margin(*start) > limit_ * (1.0 + 1e-9) + 1e-12)
             throw Error("E_INFEASIBLE", "no point satisfies the equalities, the bounds and the margin limit");
         std::vector<int> from = sign_;
