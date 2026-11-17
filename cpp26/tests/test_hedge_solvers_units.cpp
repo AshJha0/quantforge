@@ -526,7 +526,7 @@ void require_point(const std::optional<hg::Vec>& got, const hg::Vec& want) {
 
 TEST_CASE("hsu least margin: the points of python test_least_margin_points", "[hedging][hsu][least_margin]") {
     namespace d = hg::detail;
-    const hg::Matrix e{{1, 1}};
+    const quantforge::Matrix e{{1, 1}};
     const hg::Vec rates{1, 3};
     using B = std::vector<hg::Bound>;
     // min |x0| + 3 |x1| with x0 + x1 = 3: x0 = 3 unless a bound stops it.
