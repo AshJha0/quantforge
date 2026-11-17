@@ -60,7 +60,7 @@ TOL = {"simple_analytic": (1e-12, 1e-10), "per_unit": (1e-10, 1e-8), "interpolat
        "root_finding": (1e-10, 1e-10), "date_and_convention": None}
 # Disagreements that trace to a stated convention difference, not a value error. Recorded, never tagged, never
 # used to change a golden. Reported in docs/validation/equity-forward.md for the reviewer to rule on.
-KNOWN = {"equity_forward-0012": "boundary convention: the spec ignores a dividend with ex_date <= as_of "
+KNOWN = {"equity_forward-0012": "convention difference settled by ruling C18 (specifications/stage-c-rulings.md, owner 2026-11-18): boundary convention: the spec ignores a dividend with ex_date <= as_of "
          "(equity-forward.md line 25); QuantLib AnalyticDividendEuropeanEngine counts a dividend dated on the evaluation "
          "date. With the as_of dividend removed from the inputs, QuantLib agrees on all four outputs (probe below)."}
 GTOL = (1e-6, 0.0)  # central-difference g on library variance; truncation error about 1e-8 at step 1e-4

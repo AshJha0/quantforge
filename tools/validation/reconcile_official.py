@@ -43,6 +43,7 @@ ROOT = Path(__file__).resolve().parents[2]
 TOL_BP = 0.5
 TIERS_BP = (0.5, 0.1, 0.01)
 TENORS = {"SOFR": ["1Y", "2Y", "3Y", "4Y", "5Y", "7Y", "10Y", "15Y", "20Y", "25Y", "30Y"],
+          "ESTR": ["1Y", "2Y", "3Y", "4Y", "5Y", "7Y", "10Y", "15Y", "20Y", "25Y", "30Y"],
           "SONIA": ["1Y", "2Y", "3Y", "4Y", "5Y", "7Y", "10Y", "15Y", "20Y", "25Y", "30Y"]}
 # Second set: a pillar every year, so every annual coupon date lies on a pillar (apart from payment lag). This
 # separates the conventions (should agree to rounding) from the interpolation gap in the standard set.
@@ -65,6 +66,25 @@ def gsw(path):
         return (b0 + b1 * f1 + b2 * (f1 - math.exp(-a)) + b3 * (f2 - math.exp(-b))) / 100
     worst = max(abs(y(n) * 100 - float(v[f"SVENY{n:02d}"])) for n in range(1, 31) if v.get(f"SVENY{n:02d}", "NA") != "NA")
     return v["Date"], y, worst
+
+
+def ecb(folder):
+    """ECB euro area AAA government curve, Svensson parameters (ecb_BETA0.csv ... ecb_TAU2.csv, ECB Data Portal series
+    YC/B.U2.EUR.4F.G_N_A.SV_C_YM.<param>, csvdata): (iso date, years -> zero decimal, check against SR_1Y and SR_10Y)."""
+    def last(k):
+        rows = list(csv.DictReader(open(Path(folder) / f"ecb_{k}.csv", encoding="utf-8")))
+        return rows[-1]["TIME_PERIOD"], float(rows[-1]["OBS_VALUE"])
+    vals = {k: last(k) for k in ("BETA0", "BETA1", "BETA2", "BETA3", "TAU1", "TAU2")}
+    days = {d for d, _ in vals.values()}
+    assert len(days) == 1, days
+    b0, b1, b2, b3, t1, t2 = (vals[k][1] for k in ("BETA0", "BETA1", "BETA2", "BETA3", "TAU1", "TAU2"))
+
+    def y(tau):
+        a, b = tau / t1, tau / t2
+        f1, f2 = (1 - math.exp(-a)) / a, (1 - math.exp(-b)) / b
+        return (b0 + b1 * f1 + b2 * (f1 - math.exp(-a)) + b3 * (f2 - math.exp(-b))) / 100
+    worst = max(abs(y(n) * 100 - last(f"SR_{n}Y")[1]) for n in (1, 10))
+    return days.pop(), y, worst
 
 
 def boe(path):
@@ -97,6 +117,10 @@ def quotes(a):
     if a.gsw:
         d, y, worst = gsw(a.gsw)
         srcs["SOFR"] = (d, y, 30.0, {"source": "GSW (Fed staff fitted Treasury zero curve, feds200628.csv)", "param_check_max_pct": worst})
+    if a.ecb:
+        D.estr()  # adds ESTR conventions (spot lag 2, payment lag 2, ACT_360) to the shared table
+        d, y, worst = ecb(a.ecb)
+        srcs["ESTR"] = (d, y, 30.0, {"source": "ECB euro area AAA government curve (Svensson parameters, ECB Data Portal)", "param_check_max_pct": worst})
     if a.boe:
         d, y, top = boe(a.boe)
         srcs["SONIA"] = (d, y, top, {"source": "Bank of England fitted OIS spot curve (latest-yield-curve-data.zip)", "max_maturity_years": top})
@@ -183,6 +207,7 @@ def main():
     p1 = sp.add_parser("quotes")
     p1.add_argument("--gsw")
     p1.add_argument("--boe")
+    p1.add_argument("--ecb", help="folder with ecb_BETA0.csv ... ecb_TAU2.csv, ecb_SR_1Y.csv, ecb_SR_10Y.csv")
     p1.add_argument("--work", required=True)
     p2 = sp.add_parser("compare")
     p2.add_argument("--work", required=True)

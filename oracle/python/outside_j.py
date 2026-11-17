@@ -549,8 +549,98 @@ def drift():
     return {"library": f"{ver('scipy')} stats.ks_2samp exact (PSI, CUSUM, Page-Hinkley not counted)", "cases": rows, "not_checked": skipped}
 
 
+# ---------------------------------------------------------------- wave 4: curves lane (validation evidence pack, 2026-11-18)
+def _nullable(case, out, outside, via):
+    """A whole output that the spec sets to null: exact comparison of null, else the usual check."""
+    g = case["expected"]["outputs"][out]
+    if g is None or outside is None:
+        return {"output": out, "golden": g, "outside": outside, "tolerance": "exact (null)", "via": via, "pass": g is None and outside is None}
+    return check(case, out, outside, via=via)
+
+
+def termfin():
+    """repo.term.curve, eq.forward.term_financed: the cumulative quantities Z(t) t, S(t) and B(t) are read with
+    QuantLib LinearInterpolation on the knots (0, 0), (t_k, value) (J-C-3, J-C-4: linear in the cumulative quantity);
+    S(T_i) = ln(1 + R_i T_i) - Z(T_i) T_i is formed from QuantLib InterestRate(R_i, Simple).discountFactor and the
+    interpolated Z t. Every output is arithmetic on those library values, so cases are library-primitive, the class
+    numpy interp earned for scen_j replay."""
+    import QuantLib as ql
+    rows = []
+
+    def lin(xs, ys):
+        f = ql.LinearInterpolation([0.0] + list(xs), [0.0] + list(ys))
+        return lambda t: f(t, True)
+
+    for c in load("termfin_j"):
+        i = c["inputs"]
+        zt = lin(i["funding_times"], [z * t for z, t in zip(i["funding_zero_rates"], i["funding_times"])])
+        dc = ql.SimpleDayCounter()
+        pf_q = [ql.InterestRate(r, dc, ql.Simple, ql.Annual).discountFactor(T) for r, T in zip(i["repo_rates"], i["quote_times"])]
+        s_knots = [-math.log(p) - zt(T) for p, T in zip(pf_q, i["quote_times"])]
+        st = lin(i["quote_times"], s_knots)
+        bt = lin(i["borrow_times"], [b * t for b, t in zip(i["borrow_fees"], i["borrow_times"])]) if i["borrow_times"] else None
+        pf = lambda t: math.exp(-zt(t) - st(t))  # noqa: E731
+        A = "arithmetic"
+        if c["operation"] == "repo.term.curve":
+            q = i["query_times"]
+            prev = [0.0] + q[:-1]
+            chk = [check(c, "pillar_spreads", [s / T for s, T in zip(s_knots, i["quote_times"])], via=A),
+                   check(c, "spread", [st(t) / t for t in q], via=A),
+                   check(c, "financing_df", [pf(t) for t in q], via=A),
+                   check(c, "financing_rate", [(1 / pf(t) - 1) / t for t in q], via=A),
+                   check(c, "forward_financing", [((pf(u) if u > 0 else 1.0) / pf(t) - 1) / (t - u) for u, t in zip(prev, q)], via=A),
+                   _nullable(c, "borrow_fee", [bt(t) / t for t in q] if bt else None, A)]
+        else:
+            T = i["maturity_years"]
+            C = lambda t: pf(t) * (math.exp(bt(t)) if bt else 1.0)  # noqa: E731
+            pv = sum(a * C(t) for t, a in zip(i["dividend_times"], i["dividend_amounts"]) if 0 < t <= T)
+            F = (i["spot"] - pv) / C(T)
+            chk = [check(c, "forward", F, via=A), check(c, "carry", F - i["spot"], via=A), check(c, "carry_factor", C(T), via=A),
+                   check(c, "financing_df", pf(T), via=A), check(c, "pv_dividends", pv, via=A)]
+        rows.append(entry(c, chk))
+    return {"library": f"QuantLib {ql.__version__} LinearInterpolation and InterestRate; the rest is arithmetic (library-primitive)",
+            "cases": rows}
+
+
+def liqcurve():
+    """liq.curve.cost: no library computes this cost curve (J-C-9). The optimal horizon is found numerically by
+    scipy.optimize.brentq on dc/dh (not the closed form h*), and the other outputs are the spec's arithmetic, so the
+    check is recorded but NOT counted: the same ruling as scen_j historical_shock (a re-implementation around a
+    library call is not an outside check of the method)."""
+    from scipy.optimize import brentq
+    seen = []
+    for c in load("liqcurve_j"):
+        i = c["inputs"]
+        s, V, sig = i["half_spread_bps"] / 1e4, i["daily_volume"], i["daily_vol"]
+        Y, d, z = i.get("coefficient", 1.0), i.get("exponent", 0.5), i.get("risk_multiplier", 0.0)
+        b = z * sig / math.sqrt(3)
+        hs = []
+        for Q in i["sizes"]:
+            a = Y * sig * (Q / V) ** d
+            if b == 0 or Y == 0:
+                hs.append((None, None))
+            elif Q == 0:
+                hs.append((0.0, s))
+            else:
+                dc = lambda h: -d * a * h ** (-d - 1) + b / (2 * math.sqrt(h))  # noqa: E731
+                lo, hi = 1e-12, 1.0
+                while dc(hi) < 0:
+                    hi *= 2
+                h = brentq(dc, lo, hi, xtol=1e-300, rtol=1e-15, maxiter=500)
+                hs.append((h, s + a * h ** (-d) + b * math.sqrt(h)))
+        H = [x[0] for x in hs]
+        M = [x[1] for x in hs]
+        chk = [_nullable(c, "optimal_horizon", None if all(x is None for x in H) else H, "library"),
+               _nullable(c, "min_cost", None if all(x is None for x in M) else M, "arithmetic")]
+        seen.append({"case_id": c["case_id"], "reason": "not counted: no library computes the cost curve; scipy brentq "
+                     "on dc/dh agrees on optimal_horizon and min_cost" if all(k["pass"] for k in chk) else
+                     "not counted; brentq check DISAGREES: " + json.dumps([k for k in chk if not k["pass"]])})
+    from importlib.metadata import version as _v
+    return {"library": f"scipy {_v('scipy')} brentq (not counted)", "cases": [], "not_checked": seen}
+
+
 WAVES = {1: ("regime_j", "purgedcv_j", "rstats_j", "backtest_j"), 2: ("optim_j", "estim_j", "esbt_j", "baumwelch_j"),
-         3: ("scen_j", "interpbt_j", "drift_j")}
+         3: ("scen_j", "interpbt_j", "drift_j"), 4: ("termfin_j", "liqcurve_j")}
 
 
 def main(argv=None):
@@ -561,7 +651,7 @@ def main(argv=None):
     a = ap.parse_args(argv)
     fns = {"regime_j": regime, "purgedcv_j": purgedcv, "rstats_j": rstats, "backtest_j": backtest,
            "optim_j": optim, "estim_j": estim, "esbt_j": esbt, "baumwelch_j": baumwelch,
-           "scen_j": scen, "interpbt_j": interpbt, "drift_j": drift}
+           "scen_j": scen, "interpbt_j": interpbt, "drift_j": drift, "termfin_j": termfin, "liqcurve_j": liqcurve}
     run = [s for w in (a.wave or sorted(WAVES)) for s in WAVES[w]]
     old = json.loads(OUT.read_text(encoding="utf-8"))["suites"] if OUT.is_file() else {}
     suites = {}

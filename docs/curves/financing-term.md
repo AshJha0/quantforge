@@ -72,9 +72,9 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 
 | Operation: sources | Cases |
 |---|---|
-| eq.forward.term_financed: hand, reference-computed | 2 |
-| eq.forward.term_financed: reference-computed | 3 |
-| repo.term.curve: hand, reference-computed | 3 |
-| repo.term.curve: reference-computed | 5 |
+| eq.forward.term_financed: hand, reference-computed, quantlib-1.44-interp | 2 |
+| eq.forward.term_financed: reference-computed, quantlib-1.44-interp | 3 |
+| repo.term.curve: hand, reference-computed, quantlib-1.44-interp | 3 |
+| repo.term.curve: reference-computed, quantlib-1.44-interp | 5 |
 
 Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the specs are in `specifications/`.

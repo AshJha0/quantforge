@@ -43,6 +43,8 @@ ROWS = {
     "SCIPY.LSTSQ": ("04-pricing/use-cases.md use case 4 factor attribution", "scipy.linalg.lstsq on [1, F] (LAPACK gelsd); R^2, residual vol and standard errors from its residuals and numpy.linalg.inv of X'X"),
     "SCIPY.QUAD": ("02-curves/curve-framework.md discount factors of MONOTONE_CONVEX from its forward", "scipy.integrate.quad (QUADPACK qags) of QuantLib ConvexMonotoneInterpolation, per section, epsrel 1e-13"),
     "ARCH.GARCH": ("05-volatility/garch.md loglik, estimate; 06-risk/var-es-and-backtests.md FHS", "arch 7.2.0 (run under WSL): GARCH(1,0,1).compute_variance with backcast = (v0 - omega)/(alpha + beta) so that sigma2_1 = v0; Normal / StudentsT (standardised) loglikelihood; EWMAVariance(lam) with backcast = mean square; fits maximise that objective (scipy Nelder-Mead, Newton on a finite-difference Hessian); oracle/python/outside_garch_arch.py"),
+    "FUND.RATIO": ("02-curves/joint-solve-and-funding.md rates.funding.curve (validation evidence pack, 2026-11-18)",
+                   "OIS curve DiscountCurve(as_of + pillars, LogLinear, Actual365Fixed); funding P_f(end) = InterestRate(rate, Actual360, Simple).discountFactor(as_of, end); ratio curve DiscountCurve(as_of + ends, P_f / D_ois, LogLinear, Actual365Fixed) extrapolated (piecewise-flat spread, last one held); D_f = D_ois * ratio; spreads = ratio.forwardRate(t_{i-1}, t_i, Continuous)"),
     "CBOE.SAMPLE": ("05-volatility/vix-index.md Cboe sample", "Cboe Volatility Index Methodology v6.0, Appendix 3 printed values (F, K0, sigma^2, VIX)"),
 }
 LAGS = {"SOFR": (2, 2), "ESTR": (2, 2), "SONIA": (0, 0)}
@@ -219,6 +221,27 @@ def ql_joint(i, bump=None):
         cv.enableExtrapolation()
         built[c["name"]] = (cv, [h.pillarDate() for h in hs])
     return built
+
+
+def h_funding(i):
+    """rates.funding.curve from QuantLib curve objects (row FUND.RATIO)."""
+    cv = i["discount"]
+    if cv["interpolation"] != "LOG_LINEAR_DF":
+        raise NotImplementedError
+    as_of = D(cv["as_of"])
+    ql.Settings.instance().evaluationDate = Q(as_of)
+    ois = ql.DiscountCurve([Q(as_of)] + [Q(D(p["date"])) for p in cv["pillars"]], [1.0] + [p["discount_factor"] for p in cv["pillars"]], A365)
+    ois.enableExtrapolation()
+    ends = [D(q["end"]) for q in i["quotes"]]
+    pf = [ql.InterestRate(q["rate"], ql.Actual360(), ql.Simple, ql.Annual).discountFactor(Q(as_of), Q(e)) for q, e in zip(i["quotes"], ends)]
+    ratio = ql.DiscountCurve([Q(as_of)] + [Q(e) for e in ends], [1.0] + [v / ois.discount(Q(e)) for v, e in zip(pf, ends)], A365)
+    ratio.enableExtrapolation()
+    t = [0.0] + [A365.yearFraction(Q(as_of), Q(e)) for e in ends]
+    spreads = [ratio.forwardRate(t[k - 1], t[k], ql.Continuous, ql.NoFrequency).rate() for k in range(1, len(t))]
+    df = lambda d: ois.discount(Q(d)) * ratio.discount(Q(d))  # noqa: E731
+    out = {"spreads": spreads, "pillars": [{"date": str(e), "discount_factor": df(e)} for e in ends],
+           "discount_factors": [df(D(x)) for x in i.get("dates") or []]}
+    return out, {"FUND.RATIO"}
 
 
 def h_joint(i):
@@ -451,7 +474,7 @@ HANDLERS = {"risk.sens.dividend_borrow": h_divborrow, "risk.sens.correlation": h
             "risk.stress.reverse": h_reverse,
             "risk.curve.cross_gamma": h_cross_gamma, "usecase.factor_attribution": h_uc4, "risk.backtest.kupiec": h_kupiec, "risk.backtest.christoffersen": h_christ, "risk.backtest.traffic_light": h_traffic,
             "risk.var.parametric": h_param, "risk.var.historical": h_hist, "risk.curve.pca": h_pca,
-            "rates.ois.bootstrap": h_bootstrap, "rates.curve.inspect": h_inspect, "rates.curve.joint_solve": h_joint}
+            "rates.ois.bootstrap": h_bootstrap, "rates.curve.inspect": h_inspect, "rates.curve.joint_solve": h_joint, "rates.funding.curve": h_funding}
 
 
 _A = json.loads((ROOT / "oracle" / "outside_arch_f.json").read_text(encoding="utf-8")) if (ROOT / "oracle" / "outside_arch_f.json").exists() else {"cases": {}, "version": None}

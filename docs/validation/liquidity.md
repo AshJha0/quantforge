@@ -35,7 +35,7 @@ Limits: one input per operation, synthetic unless labelled real; charts plot out
 
 ## Open questions for the reviewer
 
-- The square-root impact law has no library implementation with the same conventions.
+- The square-root impact law has no library implementation with the same conventions. Round 2 (2026-11-18) finds the optimal horizon numerically (scipy `brentq` on dc/dh, not the closed form): it agrees on `optimal_horizon` and `min_cost` for all 7 cases, but the other outputs are the spec's arithmetic, so the check is recorded and NOT counted (`oracle/OUTSIDE_J.json`, `liqcurve_j` not_checked), as for scenario historical shocks. The outside share stays 0 of 7; is a hand or published-example check enough for this curve?
 
 ## What to check
 
@@ -45,6 +45,8 @@ Limits: one input per operation, synthetic unless labelled real; charts plot out
 - [ ] Outside checks: the library object really computes the same quantity
 - [ ] Real data: result and stated method differences accepted, or absence of free data accepted
 - [ ] Open questions answered
+
+<!-- Hand-filled below this line: the generator keeps it. Sign-off and any AI review sections go here. -->
 
 ## Reviewer sign-off
 

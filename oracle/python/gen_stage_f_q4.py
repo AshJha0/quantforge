@@ -404,13 +404,13 @@ def funding(s):
         for e, p, pv in zip(ends, Pf, out["pillars"]):
             assert abs(pv["discount_factor"] - p) < 1e-15
         s.add(op, {"discount": disc, "quotes": [{"end": e.isoformat(), "rate": r} for e, (_, r) in zip(ends, qs)], "dates": [d.isoformat() for d in dates]}, out, cls=I,
-              verified=["analytic", "independent-replay"], tags=["funding", "stage-f"], description=nm)
+              verified=["analytic", "independent-replay", "quantlib-1.44-funding"], tags=["funding", "stage-f"], description=nm)  # tag: QuantLib check in outside_f.py (FUND.RATIO)
     # limit: funding at the OIS simple rates gives spreads 0
     ends = [pil[1], pil[3], pil[5]]
     qs = [(e, (1 / oc.df(e) - 1) * 360 / (e - AS).days) for e in ends]
     s.add(op, {"discount": disc, "quotes": [{"end": e.isoformat(), "rate": r} for e, r in qs]},
           {"spreads": [0.0, 0.0, 0.0], "pillars": [{"date": e.isoformat(), "discount_factor": oc.df(e)} for e in ends], "discount_factors": []},
-          cls=I, verified=["analytic"], tags=["funding", "limit", "stage-f"], description="funding at the OIS simple rates: zero spreads")
+          cls=I, verified=["analytic", "quantlib-1.44-funding"], tags=["funding", "limit", "stage-f"], description="funding at the OIS simple rates: zero spreads")  # tag: QuantLib check in outside_f.py (FUND.RATIO)
     for d, q, code in (("no quotes", [], "E_INPUT"), ("ends not increasing", [{"end": "2027-11-09", "rate": .045}, {"end": "2027-05-09", "rate": .045}], "E_INPUT"),
                        ("1 + r alpha <= 0", [{"end": "2027-11-09", "rate": -1.5}], "E_DOMAIN")):
         s.add(op, {"discount": disc, "quotes": q}, error=code, cls=E, tags=["invalid", "stage-f"], description=d)

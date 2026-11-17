@@ -22,6 +22,7 @@ import hashlib
 import html
 import json
 import math
+import re
 import os
 import subprocess
 import sys
@@ -699,6 +700,14 @@ def index_page(all_data):
                      f"{sum(r['cases'] for r in e['suites'])} golden cases for the backtest, purged CV and research statistics, "
                      f"{sum(r['outside'] for r in e['suites'])} reproduced by an outside library; synthetic prices, a teaching example"])
     rows += [[name, status, stage, ev] for name, status, stage, ev in PLANNED]
+    # A signed checklist in docs/validation/ sets the status (docs/validation/README.md); nothing else does.
+    sys.path.insert(0, str(ROOT / "tools" / "validation"))
+    import build_checklists
+    for row in rows:
+        m = re.search(r"\]\(([\w-]+)\.md\)", row[0])
+        v = build_checklists.verdict(m.group(1)) if m else None
+        if v and v["verdict"] != "Not validated":
+            row[1] = f"{v['verdict']} ({v['reviewer']}, {v['date']}; [checklist](../validation/{m.group(1)}.md))"
     real = ""
     if gallery_real.SLUG in all_data:
         real = ("\n## Real data\n\n"

@@ -61,7 +61,7 @@ def curve_table_problems(text, ops):
             done = [o for o in named if o in ops]
             if done:
                 bad.append(f"curve row {name!r} is Planned but names implemented operation(s) {', '.join(done)}")
-        elif status.startswith("Implemented"):
+        elif status.startswith(("Implemented", "Validated")):
             missing = [o for o in named if o not in ops]
             if missing:
                 bad.append(f"curve row {name!r} is Implemented but {', '.join(missing)} is not in specifications/name-map.json")
@@ -84,7 +84,7 @@ def implemented_pages(readme, folder):
     pages = {"README.md": readme}
     for cells in table_rows(readme):
         m = re.match(r"\[[^\]]+\]\(([\w.-]+\.md)\)", cells[0])
-        if m and len(cells) > 1 and cells[1].startswith("Implemented") and (folder / m.group(1)).is_file():
+        if m and len(cells) > 1 and cells[1].startswith(("Implemented", "Validated")) and (folder / m.group(1)).is_file():
             pages[m.group(1)] = (folder / m.group(1)).read_text(encoding="utf-8")
     return pages
 

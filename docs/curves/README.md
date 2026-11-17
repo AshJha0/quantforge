@@ -30,8 +30,8 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Caps and swaptions](caps-swaptions.md) | Implemented, not Validated | D | 22 golden cases |
 | [Commodity forwards](commodities.md) | Implemented, not Validated | D | 4 golden cases |
 | [Sector and rating curves](sector-rating.md) | Implemented, not Validated | D | 2 golden cases for `credit.curve.composite`, 2 with an outside library in `verified_by` |
-| [Funding curve](funding.md) | Implemented, not Validated | F | 3 golden cases for `rates.funding.curve`, 0 with an outside library in `verified_by` |
-| [Financing term structures](financing-term.md) | Implemented, not Validated | J | 13 golden cases for `repo.term.curve`, `eq.forward.term_financed`, 0 with an outside library in `verified_by` |
+| [Funding curve](funding.md) | Implemented, not Validated | F | 3 golden cases for `rates.funding.curve`, 3 with an outside library in `verified_by` |
+| [Financing term structures](financing-term.md) | Implemented, not Validated | J | 13 golden cases for `repo.term.curve`, `eq.forward.term_financed`, 13 with an outside library in `verified_by` |
 | [Liquidity curves](liquidity.md) | Implemented, not Validated | J | 7 golden cases for `liq.curve.cost`, 0 with an outside library in `verified_by` |
 | [MBS](mbs.md) | Implemented, not Validated | D | 3 golden cases |
 | [Implied vol surface](vol-surface.md) | Implemented, not Validated | E | 2 golden cases |

@@ -501,7 +501,7 @@
        "pass": false
       }
      ],
-     "known_difference": "boundary convention: the spec ignores a dividend with ex_date <= as_of (equity-forward.md line 25); QuantLib AnalyticDividendEuropeanEngine counts a dividend dated on the evaluation date. With the as_of dividend removed from the inputs, QuantLib agrees on all four outputs (probe below).",
+     "known_difference": "convention difference settled by ruling C18 (specifications/stage-c-rulings.md, owner 2026-11-18): boundary convention: the spec ignores a dividend with ex_date <= as_of (equity-forward.md line 25); QuantLib AnalyticDividendEuropeanEngine counts a dividend dated on the evaluation date. With the as_of dividend removed from the inputs, QuantLib agrees on all four outputs (probe below).",
      "probe_without_as_of_dividend_pass": true
     },
     {
