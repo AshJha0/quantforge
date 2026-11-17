@@ -414,3 +414,93 @@ TEST_CASE("select: upper bounds without lower bounds (the pair check reads only 
     REQUIRE(res.selected.size() == 1);
     CHECK(res.selected[0] == 1);
 }
+
+// ---- j2 full-run batch 1 survivors (2026-11-17, round 3). Values by hand unless noted; the 288 case was traced
+// step by step in Python (same IEEE operations as DualActiveSet for this diagonal 2 x 2 case). ----
+
+TEST_CASE("qp: with Z = I an active upper bound is returned exactly (0.1, not 2 - 1.9)", "[mutants]") {
+    // min (x - 2)^2 with x <= 0.1: the dual step gives y = 2 + 1.9 * (-1) = 0.10000000000000009; Z = I, so the
+    // active bound is written back exactly. Kills `if (r != n)` (hedging.cpp:497), which keeps the rounded y.
+    hg::QpProblem prob;
+    prob.a = {{1.0}};
+    prob.b = {-2.0};
+    prob.weights = {1.0};
+    prob.upper = std::vector<hg::Bound>{0.1};
+    const hg::QpResult res = hg::solve_qp(prob);
+    REQUIRE(res.x.size() == 1);
+    CHECK(res.x[0] == 0.1);
+}
+
+TEST_CASE("orthant oracle: equalities that fix x within 1e-12 relative of the margin limit are feasible", "[mutants]") {
+    // x = 1 fixed by x = 1, margin |x| <= 1 - 1e-12. In the + orthant the margin row gives lhs - rhs = -1e-12
+    // against -1e-12 * scale, scale = |rhs| + |x| ~ 2: feasible, x = 1. Kills `< -1e-12 / scale` (hedging.cpp:467:
+    // -5e-13), which makes both orthants infeasible (the - orthant breaks x <= 0) and throws E_INFEASIBLE.
+    hg::QpProblem prob;
+    prob.a = {{1.0}};
+    prob.b = {-1.0};
+    prob.weights = {1.0};
+    prob.eq_matrix = Matrix{{1.0}};
+    prob.eq_rhs = hg::Vec{1.0};
+    prob.margin_rates = hg::Vec{1.0};
+    prob.margin_limit = 1.0 - 1e-12;
+    hg::QpResult res;
+    CHECK(catch_error([&] { res = hg::detail::solve_qp_by_orthants(prob); }).code == "ok");
+    REQUIRE(res.x.size() == 1);
+    CHECK(std::fabs(res.x[0] - 1.0) < 1e-12);
+}
+
+TEST_CASE("simplex: a phase-one residual of exactly 1e-9 times the scale is still feasible", "[mutants]") {
+    // z = 0 and z = 1e-9: phase one ends with artificial sum exactly 1e-9 (one pivot on row 0), scale = 1, and the
+    // test is `> 1e-9 * scale`: phase two returns z = 0. Kills `>= 1e-9 * scale` (hedging.cpp:640: nullopt).
+    const std::optional<hg::Vec> z = hg::detail::simplex({{1.0}, {1.0}}, {0.0, 1e-9}, {1.0});
+    REQUIRE(z.has_value());
+    REQUIRE(z->size() == 1);
+    CHECK((*z)[0] == 0.0);
+}
+
+TEST_CASE("costed qp: a margin row almost parallel to an active bound still takes its primal step", "[mutants]") {
+    // H = 1e10 I, smooth minimiser (0, 2), x0 >= 1, margin |x0| + 1e-6 |x1| <= 1 + 1e-6. With x0 >= 1 active the
+    // margin row's d = J'n is (-1e-5, 1e-11): d2 = 1e-22, dall = 1e-10. The original's 1e-24 * dall = 1e-34 takes
+    // the primal step to x = (1, 1); `d2 > 1e-24 / dall` (hedging.cpp:288, threshold 1e-14) judges the row
+    // dependent, finds no certificate (gap -1e-6), skips it as implied and returns (1, 2), above the limit.
+    hg::QpProblem prob;
+    prob.a = {{1e5, 0.0}, {0.0, 1e5}};
+    prob.b = {0.0, -2e5};
+    prob.weights = {1.0, 1.0};
+    prob.lower = std::vector<hg::Bound>{1.0, std::nullopt};
+    prob.margin_rates = hg::Vec{1.0, 1e-6};
+    prob.margin_limit = 1.0 + 1e-6;
+    const hg::QpResult res = hg::solve_qp(prob);
+    REQUIRE(res.x.size() == 2);
+    CHECK(std::fabs(res.x[0] - 1.0) < 1e-9);
+    CHECK(std::fabs(res.x[1] - 1.0) < 1e-6);
+    CHECK(res.margin <= 1.0 + 1e-6 + 1e-12);
+}
+
+TEST_CASE("minimum variance: an all-zero covariance is E_DOMAIN on the position, not E_INPUT (symmetry 0 > 0)", "[mutants]") {
+    // biggest = 0, so the symmetry test is 0 > 0 (false). Kills `>= singular_threshold * biggest`
+    // (hedging.cpp:1229), for which 0 >= 0 throws E_INPUT "not symmetric".
+    const Caught got = catch_error([] { (void)hg::min_variance({{0.0, 0.0}, {0.0, 0.0}}); });
+    CHECK(got.code == "E_DOMAIN");
+    CHECK(got.field == "covariance");
+}
+
+TEST_CASE("minimum variance: a hedge variance of 1e-7 is judged on d / S_jj = 1, not d * S_jj", "[mutants]") {
+    // cov = diag(1, 1e-7): the scaled pivot is 1 (well conditioned), hedge 0. Kills `d * sjj < singular_threshold`
+    // (hedging.cpp:1242: 1e-14 < 1e-12 throws E_SINGULAR).
+    hg::MinVarResult res;
+    CHECK(catch_error([&] { res = hg::min_variance({{1.0, 0.0}, {0.0, 1e-7}}); }).code == "ok");
+    REQUIRE(res.hedge.size() == 1);
+    CHECK(res.hedge[0] == 0.0);
+}
+
+TEST_CASE("neutralise: one hedge with delta 5e-12 is not singular (relative test, one singular value)", "[mutants]") {
+    // A call struck at 200 on spot 100, vol 0.2, 3 months: delta ~ 5.0e-12 (d1 = -6.81). With one singular value
+    // s the test is s <= 1e-12 s, false for s > 0. Kills `sv.back() <= singular_threshold / sv.front()`
+    // (hedging.cpp:1341), true when s^2 <= 1e-12.
+    const hg::Market m{100.0, 0.03, 0.0, 0.2};
+    const hg::Position u{hg::Instrument::Underlying, std::nullopt, std::nullopt, 1.0};
+    const hg::Position call{hg::Instrument::Call, 200.0, 0.25, 1.0};
+    const Caught got = catch_error([&] { (void)hg::neutralise(m, {u}, {call}, {hg::Greek::Delta}); });
+    CHECK(got.code == "ok");
+}
