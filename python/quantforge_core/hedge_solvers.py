@@ -1049,7 +1049,13 @@ def integer_solve(
 
     big_b, d = _root_form(a, b, weights, ridge)
     lots_b = big_b * np.asarray(lot_sizes, dtype=float)[None, :]
-    s = np.linalg.svd(lots_b, compute_uv=False)
+    # R6-6.2: the check-3 decision runs on the Jacobi-scaled form D (L H L) D, whose
+    # eigenvalues are the squared singular values of B L with unit-norm columns. Column
+    # norms are positive: a zero column is singular in either form.
+    norms = np.linalg.norm(lots_b, axis=0)
+    if not np.all(norms > 0.0):
+        raise QfError("E_SINGULAR", "the hedge in lot units has no unique solution", "a")
+    s = np.linalg.svd(lots_b / norms[None, :], compute_uv=False)
     if int((s * s > THRESHOLD * s[0] ** 2).sum()) < n:
         raise QfError("E_SINGULAR", "the hedge in lot units has no unique solution", "a")
 

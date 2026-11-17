@@ -925,6 +925,8 @@ Vec orthant_minimiser(const QpProblem& p, const Normal& q, const Matrix& reduced
 
 namespace {
 QpResult solve_qp_impl(const QpProblem& p, bool by_orthants);
+double refine_relaxed(const Matrix& al, const Vec& b, const Vec& w, const Vec& diag, const Matrix& h,
+                      const std::vector<double>& lo, const std::vector<double>& hi, Vec& nc);
 }  // namespace
 
 QpResult solve_qp(const QpProblem& p) { return solve_qp_impl(p, false); }
@@ -1030,6 +1032,18 @@ QpResult solve_qp_impl(const QpProblem& p, bool by_orthants) {
     } else if (!p.half_spreads && !p.margin_rates) {
         // Check 6 (feasibility) happens inside: E_INFEASIBLE when no point exists (I-14).
         x = bounded_minimiser(reduced, g0, ns, lower, upper);
+        if (!p.eq_matrix) {
+            // The normal-equations error of the integer relaxation (refine_relaxed) again: 2.3e-6 against an exact
+            // minimum of 0 on the near-singular case of Java seed -11115467 with x bounds 10 times its lot bounds.
+            std::vector<double> lo(n, -inf), hi(n, inf);
+            Vec diag(n, p.ridge);
+            for (std::size_t j = 0; j < n; ++j) {
+                if (!lower.empty() && lower[j]) lo[j] = *lower[j];
+                if (!upper.empty() && upper[j]) hi[j] = *upper[j];
+                if (p.impact) diag[j] += cost_weight * (*p.impact)[j];  // impact counts like a ridge (I-26)
+            }
+            refine_relaxed(p.a, p.b, p.weights, diag, q.h, lo, hi, x);
+        }
     } else {
         x = by_orthants ? orthant_minimiser(p, q, reduced, ns, lower, upper, cost_weight)
                         : SignStates(p, q, reduced, ns, lower, upper, cost_weight).solve();
@@ -1118,6 +1132,60 @@ private:
     long long nodes_ = 0;
 };
 
+// Fixed-precision iterative refinement of the relaxed solution on its free coordinates (those strictly inside
+// their bounds); returns f(nc) and updates nc in place. Same algorithm and guards as Java refineRelaxed; also
+// used by hedge.qp.solve on its smooth path without equalities (lot sizes 1, diag = ridge + impact).
+// bounded_minimiser works on the normal equations H_L = (A L)' W (A L) + ridge L^2, whose condition number is
+// that of A L squared, so its forward error along a weak direction v is about u kappa(H_L) |nc| and costs
+// lambda_min |delta|^2 in f: 3.1e-6 against a true minimum of 0 on Java property seed -11115467, above the
+// integer optimum, which is impossible. Each step takes the gradient from the residual A_L nc + b computed
+// directly (error u |A_L| |nc|, not squared) and solves H_F delta = -g_F; the error contracts by about
+// u kappa(D H_F D) per step, below 1 whenever check 3 passes (kappa <= 1e12). A step is kept only while it
+// lowers f and stays inside the bounds, so the result is never worse than the active-set answer; the loop ends
+// at the first step that does not lower f (normally the second or third), and the cap of 64 is only a guard.
+double refine_relaxed(const Matrix& al, const Vec& b, const Vec& w, const Vec& diag, const Matrix& h,
+                      const std::vector<double>& lo, const std::vector<double>& hi, Vec& nc) {
+    const std::size_t n = nc.size();
+    // f = sum_i w_i r_i^2 + sum_j diag_j nc_j^2, r = A_L nc + b; H = A_L' W A_L + diag(diag) is half its Hessian.
+    const auto f_of = [&](const Vec& v) {
+        double f = objective_of(residual_of(al, b, v), w, 0.0, v);
+        for (std::size_t j = 0; j < n; ++j) f += diag[j] * v[j] * v[j];
+        return f;
+    };
+    double best = f_of(nc);
+    std::vector<std::size_t> free;
+    for (std::size_t j = 0; j < n; ++j)
+        if (nc[j] != lo[j] && nc[j] != hi[j]) free.push_back(j);
+    const std::size_t nf = free.size();
+    if (nf == 0) return best;
+    Matrix hf(nf, Vec(nf, 0.0));
+    for (std::size_t s = 0; s < nf; ++s)
+        for (std::size_t t = 0; t < nf; ++t) hf[s][t] = h[free[s]][free[t]];
+    const Matrix l = cholesky_lower(hf);
+    for (int iter = 0; iter < 64; ++iter) {
+        const Vec res = residual_of(al, b, nc);
+        Vec g(nf, 0.0);  // minus half the gradient of f on the free block
+        for (std::size_t s = 0; s < nf; ++s) {
+            const std::size_t j = free[s];
+            double acc = diag[j] * nc[j];
+            for (std::size_t i = 0; i < res.size(); ++i) acc += al[i][j] * w[i] * res[i];
+            g[s] = -acc;
+        }
+        const Vec delta = cholesky_solve(l, g);
+        Vec trial = nc;
+        for (std::size_t s = 0; s < nf; ++s) {
+            const std::size_t j = free[s];
+            trial[j] += delta[s];
+            if (trial[j] < lo[j] || trial[j] > hi[j]) return best;
+        }
+        const double f = f_of(trial);
+        if (!(f < best)) return best;
+        best = f;
+        nc = trial;
+    }
+    return best;
+}
+
 }  // namespace
 
 IntegerResult solve_integer(const IntegerProblem& p) {
@@ -1138,16 +1206,19 @@ IntegerResult solve_integer(const IntegerProblem& p) {
     Matrix al = p.a;
     for (Vec& row : al)
         for (std::size_t j = 0; j < n; ++j) row[j] *= p.lot_sizes[j];
-    const Normal q = normal_equations(al, p.b, p.weights, p.ridge);
+    // The ridge is on x = L n, so in lot units it is ridge L_jj^2 on the diagonal (as in Java and Rust).
+    Normal q = normal_equations(al, p.b, p.weights, 0.0);
+    for (std::size_t j = 0; j < n; ++j) q.h[j][j] += p.ridge * p.lot_sizes[j] * p.lot_sizes[j];
     const Vec eig = jacobi_eigen(scaled(q.h, jacobi_scale(q.h))).values;  // R6-6.2
     if (eig.front() <= singular_threshold * largest_abs(eig))
         throw Error("E_SINGULAR", "the hedge in lot units has no unique minimiser", "a");
     // The continuous problem with the lot bounds as real bounds.
     const NullSpace free{Vec(n, 0.0), identity(n)};
-    const Vec relaxed = bounded_minimiser(q.h, q.c, free, lower, upper);
-    const Vec r_rel = residual_of(al, p.b, relaxed);
+    Vec relaxed = bounded_minimiser(q.h, q.c, free, lower, upper);
     IntegerResult out;
-    out.continuous_objective = objective_of(r_rel, p.weights, p.ridge, relaxed);
+    Vec ridge_l(n);
+    for (std::size_t j = 0; j < n; ++j) ridge_l[j] = p.ridge * p.lot_sizes[j] * p.lot_sizes[j];
+    out.continuous_objective = refine_relaxed(al, p.b, p.weights, ridge_l, q.h, lo, hi, relaxed);
     for (const double v : relaxed)  // I-49: beyond 2^52 the integers are not all representable
         if (std::fabs(v) > 4503599627370496.0) throw Error("E_LIMIT", "a lot count above 2^52", "lot_sizes");
     // Ellipsoid centre (the free minimiser) and Cholesky factor R = L^T.
@@ -1166,8 +1237,9 @@ IntegerResult solve_integer(const IntegerProblem& p) {
         for (std::size_t j = i; j < n; ++j) s += r[i][j] * (start[j] - centre[j]);
         distance += s * s;
     }
-    const Vec r_free = residual_of(al, p.b, centre);
-    const double scale = std::fabs(objective_of(r_free, p.weights, p.ridge, centre));
+    Vec x_centre(n);
+    for (std::size_t j = 0; j < n; ++j) x_centre[j] = p.lot_sizes[j] * centre[j];
+    const double scale = std::fabs(objective_of(residual_of(al, p.b, centre), p.weights, p.ridge, x_centre));
     const double radius = distance + 1e-9 * (distance + scale) + 1e-300;
     std::vector<Candidate> found = LatticeSearch(r, centre, lo, hi, radius, scale, p).run();
     // Ties (I-7, R6-11.5): within 1e-12 max(best, f(0)) of the best, then the smallest sum |n|, then lexicographic.

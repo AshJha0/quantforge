@@ -1412,3 +1412,18 @@ def test_phase_one_iteration_cap(monkeypatch: pytest.MonkeyPatch) -> None:
         None,
         "the feasibility search did not settle",
     )
+
+
+def test_integer_singularity_check_is_scaled() -> None:
+    # Java property seed -11115467 (PR #45 CI 2026-11-17): near-collinear columns. The
+    # unscaled eigenvalue ratio of L H L is 1.7e-14 but the Jacobi-scaled ratio is 1.4e-12,
+    # so ruling R6-6.2 makes the problem regular. Square and nonsingular, the relaxed
+    # minimum is exactly 0; lots and objective checked by exact rational arithmetic.
+    a = [[-0.04684068765297382, 0.85014589759939], [0.06966430897729968, -1.2643959406278287]]
+    b = [-18.480681166672692, -6.198617610506782]
+    w = [1.6701886487345696, 2.992546829483374]
+    out = hs.integer_solve(a, b, w, [10.0, 10.0], upper_lots=[3, 3])
+    assert out["lots"] == [-8208927, -452287]
+    assert out["objective"] == pytest.approx(1.5462392586798939e-06, rel=1e-6)
+    assert abs(out["continuous_objective"]) <= 1e-10
+    assert out["objective"] >= out["continuous_objective"]
