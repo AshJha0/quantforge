@@ -115,17 +115,25 @@ def main():
         original = target.read_text(encoding="utf-8")
         chosen = sites(original)
         random.Random(a.seed).shuffle(chosen)
-        for site in chosen[:a.max]:
+        todo = chosen[:a.max]
+        for i, site in enumerate(todo, 1):
             mutated, shown = apply(original, site)
             target.write_text(mutated, encoding="utf-8")
             if quiet(make):
                 no_build += 1
+                status = "no-build"
             elif quiet(check):
                 killed += 1
+                status = "killed-golden"
             elif a.unit and quiet(unit, timeout=900):
                 unit_killed += 1
+                status = "killed-unit"
             else:
                 survived.append(f"{a.file}:{site[0] + 1}: {shown}")
+                status = "SURVIVED"
+            # One line per mutant, flushed, so a long run (a full run is hours) can be watched and an
+            # interrupted one still leaves every result so far.
+            print(f"[{i}/{len(todo)}] {status} {a.file}:{site[0] + 1}: {shown}", flush=True)
     killed_total = killed + unit_killed
     print(f"mutants {min(len(chosen), a.max)} of {len(chosen)} sites: killed {killed_total} (golden {killed}, unit {unit_killed}), "
           f"did not build {no_build}, survived {len(survived)}, timed out {len(TIMED_OUT)}")
