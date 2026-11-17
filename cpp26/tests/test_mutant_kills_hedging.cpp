@@ -658,3 +658,183 @@ TEST_CASE("min norm: an eigenvalue 1e-8 below 1e-12 times the largest (1e6) is d
     CHECK(res.x[0] == 0.0);
     CHECK(res.x[1] == 0.0);
 }
+
+// ---- round 3c (2026-11-17) ----
+
+TEST_CASE("minimum variance: a zero hedge variance after a nonzero pivot is singular, not indefinite", "[mutants]") {
+    // Hedge block [[1, 1], [1, 0]]: the second pivot is d = 0 - 1 = -1 with S_jj = 0. The indefinite test is skipped
+    // (S_jj > 0 is false) and !(S_jj > 0) throws E_SINGULAR. Kills `sjj >= 0.0 && d / sjj <= ...` (hedging.cpp:1240:
+    // -1 / 0 = -inf, E_NOT_POSITIVE_DEFINITE).
+    const Caught got = catch_error([] { (void)hg::min_variance({{1.0, 0.0, 0.0}, {0.0, 1.0, 1.0}, {0.0, 1.0, 0.0}}); });
+    CHECK(got.code == "E_SINGULAR");
+    CHECK(got.message.find("linearly dependent") != std::string::npos);
+}
+
+TEST_CASE("minimum variance: a scaled pivot of exactly 1e-12 is singular", "[mutants]") {
+    // Found by search in IEEE doubles: with S_11 = 1, S_12 = a, S_22 = s below, d = fl(s - fl(a * a)) and
+    // fl(d / s) == 1e-12 exactly, so `d / sjj <= singular_threshold` throws. Kills `<` (hedging.cpp:1242).
+    const double s = 0.9769962616701378, a = 0.9884312124114458;
+    REQUIRE((s - a * a) / s == 1e-12);
+    const Caught got = catch_error([&] { (void)hg::min_variance({{1.0, 0.0, 0.0}, {0.0, 1.0, a}, {0.0, a, s}}); });
+    CHECK(got.code == "E_SINGULAR");
+    CHECK(got.message.find("linearly dependent") != std::string::npos);
+}
+
+TEST_CASE("option hedge lots: a spot of exactly 0 is E_DOMAIN on spot", "[mutants]") {
+    // Kills `m.spot < 0.0` (hedging.cpp:1364).
+    const hg::Market m{0.0, 0.03, 0.0, 0.2};
+    const hg::Position u{hg::Instrument::Underlying, std::nullopt, std::nullopt, 1.0};
+    const Caught got = catch_error([&] { (void)hg::option_hedge_lots(m, {u}, {{u, 1.0, 0.0}}, {hg::Greek::Delta}, 5); });
+    CHECK(got.code == "E_DOMAIN");
+    CHECK(got.field == "spot");
+}
+
+TEST_CASE("select: a zero column keeps the Jacobi scale 1 and is singular", "[mutants]") {
+    // H = diag(1, 0): D_11 stays 1 (H_11 > 0 is false), the scaled H has eigenvalue 0 and select throws E_SINGULAR on
+    // the full hedge. Kills `h[j][j] >= 0.0` (hedging.cpp:140): D_11 = 1 / sqrt(0) = inf turns the scaled H into
+    // NaN, the test NaN <= ... is false and select goes on.
+    hg::QpProblem prob;
+    prob.a = {{1.0, 0.0}, {0.0, 0.0}};
+    prob.b = {-1.0, -1.0};
+    prob.weights = {1.0, 1.0};
+    const Caught got = catch_error([&] { (void)hg::select_instruments(prob, 1, false); });
+    CHECK(got.code == "E_SINGULAR");
+    CHECK(got.message.find("the full hedge has no unique minimiser") != std::string::npos);
+}
+
+TEST_CASE("residual report: an eigenvalue -1e-12 against a largest 1e-3 is negative (threshold -1e-15)", "[mutants]") {
+    // cov = diag(1e-3, -1e-12): -1e-12 < -1e-12 * 1e-3 throws. Kills `-singular_threshold / largest` (hedging.cpp:1443:
+    // threshold -1e-9, no throw).
+    const Caught got = catch_error(
+        [] { (void)hg::residual_report({{1.0}, {1.0}}, {0.0, 0.0}, {1.0}, {{1e-3, 0.0}, {0.0, -1e-12}}); });
+    CHECK(got.code == "E_NOT_POSITIVE_DEFINITE");
+    CHECK(got.message.find("negative eigenvalue") != std::string::npos);
+}
+
+TEST_CASE("select: a bound pair lower = upper = 0 is allowed", "[mutants]") {
+    // Kills `*lower[j] >= *upper[j]` (hedging.cpp:1482), which calls an equal pair E_DOMAIN.
+    hg::QpProblem prob;
+    prob.a = {{1.0, 0.0}, {0.0, 1.0}};
+    prob.b = {-1.0, -1.0};
+    prob.weights = {1.0, 1.0};
+    prob.lower = std::vector<hg::Bound>{std::nullopt, 0.0};
+    prob.upper = std::vector<hg::Bound>{std::nullopt, 0.0};
+    CHECK(catch_error([&] { (void)hg::select_instruments(prob, 1, false); }).code == "ok");
+}
+
+TEST_CASE("select and qp: cost_weight alone counts as a cost input", "[mutants]") {
+    // Kills `p.cost_weight && p.margin_rates` in select_instruments (hedging.cpp:1487: not refused) and in solve_qp
+    // (hedging.cpp:949: costed false).
+    hg::QpProblem prob;
+    prob.a = {{1.0, 0.0}, {0.0, 1.0}};
+    prob.b = {-1.0, -1.0};
+    prob.weights = {1.0, 1.0};
+    prob.cost_weight = 1.0;
+    const Caught got = catch_error([&] { (void)hg::select_instruments(prob, 1, false); });
+    CHECK(got.field == "half_spreads");
+    CHECK(got.message.find("J-I.3") != std::string::npos);
+    const hg::QpResult res = hg::solve_qp(prob);
+    CHECK(res.costed);
+}
+
+TEST_CASE("jacobi eigen: theta above 1e150 uses t = 0.5 / theta", "[mutants]") {
+    // Pair (0, 1): theta = (1 - 0) / (2e-200) = 5e199, so t = 1e-200; the (1, 2) entry keeps the sweep going.
+    // Kills `0.5 * theta` (hedging.cpp:530): t = 2.5e199, t * t = inf, c = 0, s = NaN.
+    const hg::Eigen e = hg::jacobi_eigen({{0.0, 1e-200, 0.0}, {1e-200, 1.0, 1.0}, {0.0, 1.0, 1.0}});
+    REQUIRE(e.values.size() == 3);
+    for (const double v : e.values) CHECK(std::isfinite(v));
+    CHECK(std::fabs(e.values[0] + e.values[1] + e.values[2] - 2.0) < 1e-12);
+    for (const hg::Vec& row : e.vectors)
+        for (const double v : row) CHECK(std::isfinite(v));
+}
+
+TEST_CASE("simplex: one row and one column get iterations (cap 50 (1 + 1) + 100)", "[mutants]") {
+    // Kills `50 * (rows + cols) - 100` (hedging.cpp:614): 0 iterations, E_NO_CONVERGENCE at once.
+    std::optional<hg::Vec> z;
+    CHECK(catch_error([&] { z = hg::detail::simplex({{1.0}}, {1.0}, {1.0}); }).code == "ok");
+    REQUIRE(z.has_value());
+    CHECK((*z)[0] == 1.0);
+}
+
+TEST_CASE("simplex: a reduced cost of exactly -tol does not enter", "[mutants]") {
+    // z0 + z1 = 1, cost (0, -1e-11), scale 1 so tol = 1e-11: phase 1 makes z0 basic; column 1's reduced cost is
+    // -1e-11, and -1e-11 < -1e-11 is false, so z = (1, 0). Kills `<= -tol` (hedging.cpp:617: z = (0, 1)).
+    const std::optional<hg::Vec> z = hg::detail::simplex({{1.0, 1.0}}, {1.0}, {0.0, -1e-11});
+    REQUIRE(z.has_value());
+    CHECK((*z)[0] == 1.0);
+    CHECK((*z)[1] == 0.0);
+}
+
+TEST_CASE("simplex: the ratio test takes the least ratio, not a smaller basis index", "[mutants]") {
+    // Found by a Python port of the tableau: min 2 z0 + z1 subject to z1 + z2 = 1, 2 z0 + z2 = 3 is z = (1, 0, 1).
+    // Kills `ratio != best_ratio && basis[r] < basis[best]` (hedging.cpp:624), which pivots on a larger ratio and
+    // ends at (0, -2, 3).
+    const std::optional<hg::Vec> z = hg::detail::simplex({{0.0, 1.0, 1.0}, {2.0, 0.0, 1.0}}, {1.0, 3.0}, {2.0, 1.0, 0.0});
+    REQUIRE(z.has_value());
+    REQUIRE(z->size() == 3);
+    CHECK(std::fabs((*z)[0] - 1.0) < 1e-12);
+    CHECK(std::fabs((*z)[1]) < 1e-12);
+    CHECK(std::fabs((*z)[2] - 1.0) < 1e-12);
+}
+
+TEST_CASE("costed qp: a least-margin point above the limit is E_INFEASIBLE from the margin test", "[mutants]") {
+    // x0 >= 2 (sign fixed), margin rates (1, 0), limit 1: the least margin is 2 > 1, so solve throws at the margin
+    // test. Kills `!start && margin(*start) > ...` (hedging.cpp:745), which goes on to the orthant solve and fails
+    // there with another message.
+    hg::QpProblem prob;
+    prob.a = {{1.0, 0.0}, {0.0, 1.0}};
+    prob.b = {-3.0, -1.0};
+    prob.weights = {1.0, 1.0};
+    prob.lower = std::vector<hg::Bound>{2.0, std::nullopt};
+    prob.margin_rates = hg::Vec{1.0, 0.0};
+    prob.margin_limit = 1.0;
+    const Caught got = catch_error([&] { (void)hg::solve_qp(prob); });
+    CHECK(got.code == "E_INFEASIBLE");
+    CHECK(got.message.find("no point satisfies the equalities, the bounds and the margin limit") != std::string::npos);
+}
+
+TEST_CASE("costed qp: a sign flip is not hidden by a large c - Hx on a decoupled instrument", "[mutants]") {
+    // Rows x0 - 10, x1 - x0 + 9.9, x2 - 1e12; half spreads (1, 0.01, 0). The smooth start (10, 0.1, 1e12) is in
+    // orthant (+, +), where x1 is held at 0 with over about 0.2; the minimiser is x0 = 9.505, x1 = -0.39 (orthant
+    // (+, -), by hand). The scale uses |c + Hx|, about 1 (x2 has zero gradient). Kills `c - Hx` (hedging.cpp:811):
+    // 2e12 on x2, excess 200, no flip, x1 = 0.
+    hg::QpProblem prob;
+    prob.a = {{1.0, 0.0, 0.0}, {-1.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
+    prob.b = {-10.0, 9.9, -1e12};
+    prob.weights = {1.0, 1.0, 1.0};
+    prob.half_spreads = hg::Vec{1.0, 0.01, 0.0};
+    const hg::QpResult res = hg::solve_qp(prob);
+    REQUIRE(res.x.size() == 3);
+    CHECK(std::fabs(res.x[0] - 9.505) < 1e-9);
+    CHECK(std::fabs(res.x[1] + 0.39) < 1e-9);
+}
+
+TEST_CASE("costed qp: 101 sign flips fit inside 10 (n + p) + 100", "[mutants]") {
+    // x0 >= 0 with half spread 50, x1..x101 free with half spread 0.01; rows x0 - 10 and x_i - x0 + 9.9. The smooth
+    // start has every x_i = 0.1 (+), but each is held at 0 and flips: 101 flips, one per iteration. The minimiser,
+    // by hand: x0 = 0 (gradient 28.99 > 0 at the bound), x_i = -9.9 + 0.005. Kills `10 / (n + p) + 100`
+    // (hedging.cpp:802: cap 100, E_NO_CONVERGENCE).
+    const std::size_t flips = 101, n = flips + 1;
+    hg::QpProblem prob;
+    prob.a.assign(n, hg::Vec(n, 0.0));
+    prob.b.assign(n, 9.9);
+    prob.a[0][0] = 1.0;
+    prob.b[0] = -10.0;
+    for (std::size_t i = 1; i < n; ++i) {
+        prob.a[i][0] = -1.0;
+        prob.a[i][i] = 1.0;
+    }
+    prob.weights.assign(n, 1.0);
+    hg::Vec hs(n, 0.01);
+    hs[0] = 50.0;
+    prob.half_spreads = hs;
+    std::vector<hg::Bound> lower(n);
+    lower[0] = 0.0;
+    prob.lower = lower;
+    hg::QpResult res;
+    CHECK(catch_error([&] { res = hg::solve_qp(prob); }).code == "ok");
+    REQUIRE(res.x.size() == n);
+    CHECK(std::fabs(res.x[0]) < 1e-9);
+    CHECK(std::fabs(res.x[1] + 9.895) < 1e-9);
+    CHECK(std::fabs(res.x[n - 1] + 9.895) < 1e-9);
+}
