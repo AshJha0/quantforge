@@ -257,3 +257,160 @@ TEST_CASE("simplex: a ratio tie goes to the row whose basic column is smaller (B
     CHECK(std::fabs((*z)[2]) < 1e-12);
     CHECK(std::fabs((*z)[3] - 3.0) < 1e-12);
 }
+
+// ---- j2 seed 58/3/99 survivors (2026-11-17, round 2). The sign-state cases (813, 740) were traced with a Python
+// model of SignStates::run (exact orthant QPs, the same flip test); the others by hand, as noted. ----
+
+namespace {
+
+// f = |A x + b|^2 + 2e3 |x0| + 2e4 |x1| with H = A'A = [[2, 1], [1, 2]], c = A'b = (-496000.0000001, -1e6).
+// The smooth minimiser is (-2666.7, 501333.3), so the sign states start at (-, +). In that orthant x0 is held at 0
+// by its sign row, x1 = 495000, and the flip excess nu - 2 k0 is 1e-7 (gradient units of x'Hx/2 + c'x). The KKT
+// scale is max_j |c_j + (Hx)_j| + k_j = 2e4, so the original's threshold 1e-10 * scale = 2e-6 keeps x0 = 0, while
+// 1e-10 / scale = 5e-15 flips it and lands on x0 = 1e-7 / 1.5 = 6.7e-8.
+hg::QpProblem tolerance_window_problem() {
+    hg::QpProblem prob;
+    prob.a = {{1.0, 1.0}, {1.0, 0.0}, {0.0, 1.0}};
+    prob.b = {0.0, -496000.0000001, -1e6};
+    prob.weights = {1.0, 1.0, 1.0};
+    prob.half_spreads = hg::Vec{2e3, 2e4};
+    return prob;
+}
+
+}  // namespace
+
+TEST_CASE("costed qp: a sign-flip excess of 1e-7 is inside 1e-10 times the KKT scale (2e4), so x0 stays 0", "[mutants]") {
+    // Kills `excess = 1e-10 / scale` (hedging.cpp:813).
+    const hg::QpResult res = hg::solve_qp(tolerance_window_problem());
+    REQUIRE(res.x.size() == 2);
+    CHECK(res.x[0] == 0.0);
+    CHECK(std::fabs(res.x[1] - 495000.0) < 1e-6);
+}
+
+TEST_CASE("costed qp: an unconstrained point within 1e-12 relative of the margin limit is returned as is", "[mutants]") {
+    // Same problem with margin rates (0, 1) and limit 495000 - 1e-7: margin(x) = x1 ~ 495000 is within
+    // 1e-12 (limit + margin) ~ 9.9e-7 of the limit, so the first solve is returned (x0 = 0). Both hedging.cpp:740
+    // mutants, `1e-12 * (limit - margin)` (absorbed: the test reads margin <= limit) and `!margined_ && ...`, take
+    // the binding path instead; it starts from the least-margin point 0, signs (+, +), where x0 = 6.7e-8 is interior.
+    hg::QpProblem prob = tolerance_window_problem();
+    prob.margin_rates = hg::Vec{0.0, 1.0};
+    prob.margin_limit = 494999.9999999;
+    const hg::QpResult res = hg::solve_qp(prob);
+    REQUIRE(res.x.size() == 2);
+    CHECK(res.x[0] == 0.0);
+    CHECK(std::fabs(res.x[1] - 495000.0) < 1e-6);
+}
+
+TEST_CASE("orthant oracle: an instrument with half_spread 0 has no sign and no bound at 0", "[mutants]") {
+    // min (x0 + 1)^2 + (x1 - 1)^2 + 0.5 |x1|: x = (-1, 0.75). Kills `sign[j] >= 0` (hedging.cpp:883: clamps x0 to
+    // >= 0) and `hs / double(sign[j])` (hedging.cpp:886: 0 / 0 is NaN for the signless x0).
+    hg::QpProblem prob;
+    prob.a = {{1.0, 0.0}, {0.0, 1.0}};
+    prob.b = {1.0, -1.0};
+    prob.weights = {1.0, 1.0};
+    prob.half_spreads = hg::Vec{0.0, 0.5};
+    hg::QpResult res;
+    CHECK(catch_error([&] { res = hg::detail::solve_qp_by_orthants(prob); }).code == "ok");
+    REQUIRE(res.x.size() == 2);
+    CHECK(std::fabs(res.x[0] + 1.0) < 1e-12);
+    CHECK(std::fabs(res.x[1] - 0.75) < 1e-12);
+}
+
+TEST_CASE("orthant oracle: 21 zero half_spreads, or 21 lower bounds of exactly 0, open no sign (no E_LIMIT)", "[mutants]") {
+    // The oracle enumerates at most 20 open signs. A zero half_spread is no cost term (kills `hs >= 0.0`,
+    // hedging.cpp:864); a lower bound of exactly 0 fixes the sign at + (kills `*lower[j] > 0.0`, hedging.cpp:866).
+    // Either mutant opens all 21 signs and throws E_LIMIT.
+    const std::size_t n = 21;
+    hg::QpProblem prob;
+    prob.a.assign(n, hg::Vec(n, 0.0));
+    for (std::size_t j = 0; j < n; ++j) prob.a[j][j] = 1.0;
+    prob.b.assign(n, -1.0);
+    prob.weights.assign(n, 1.0);
+    prob.half_spreads = hg::Vec(n, 0.0);
+    hg::QpResult free_res;
+    CHECK(catch_error([&] { free_res = hg::detail::solve_qp_by_orthants(prob); }).code == "ok");
+    REQUIRE(free_res.x.size() == n);
+    CHECK(std::fabs(free_res.x[0] - 1.0) < 1e-12);
+    // (x - 1)^2 + |x| with x >= 0: x = 0.5.
+    prob.half_spreads = hg::Vec(n, 1.0);
+    prob.lower = std::vector<hg::Bound>(n, 0.0);
+    hg::QpResult bound_res;
+    CHECK(catch_error([&] { bound_res = hg::detail::solve_qp_by_orthants(prob); }).code == "ok");
+    REQUIRE(bound_res.x.size() == n);
+    CHECK(std::fabs(bound_res.x[n - 1] - 0.5) < 1e-12);
+}
+
+TEST_CASE("simplex: 101 phase-one pivots are within the 50 (rows + cols) + 100 cap", "[mutants]") {
+    // I z = 1 with 101 rows: Bland's rule brings in one structural column per pivot (each has phase-one reduced
+    // cost -1 until it enters), so phase one takes exactly 101 pivots. Kills `50 / (rows + cols) + 100` (100).
+    const std::size_t n = 101;
+    Matrix a(n, hg::Vec(n, 0.0));
+    for (std::size_t j = 0; j < n; ++j) a[j][j] = 1.0;
+    std::optional<hg::Vec> z;
+    CHECK(catch_error([&] { z = hg::detail::simplex(a, hg::Vec(n, 1.0), hg::Vec(n, 0.0)); }).code == "ok");
+    REQUIRE(z.has_value());
+    REQUIRE(z->size() == n);
+    CHECK((*z)[0] == 1.0);
+    CHECK((*z)[n - 1] == 1.0);
+}
+
+TEST_CASE("integer solve: a tie found second is kept, within 1e-9 (distance + scale) of the radius", "[mutants]") {
+    // f(n) = (n + 0.5)^2 + 9: n = -1 and n = 0 tie at 9.25. The search visits -1 first; the radius then stays
+    // 0.25 + 1e-9 * (0.25 + 9), so 0 is found too and wins the tie on sum |n| (I-7). With
+    // `1e-9 * (distance - scale)` the radius drops to 0.25 - 8.75e-9 and only -1 is found (hedging.cpp:1098).
+    hg::IntegerProblem prob;
+    prob.a = {{1.0}, {0.0}};
+    prob.b = {0.5, 3.0};
+    prob.weights = {1.0, 1.0};
+    prob.lot_sizes = {1.0};
+    const hg::IntegerResult res = hg::solve_integer(prob);
+    REQUIRE(res.lots.size() == 1);
+    CHECK(res.lots[0] == 0);
+    CHECK(res.objective == 9.25);
+}
+
+TEST_CASE("integer solve: a relaxed lot count of exactly 2^52 is allowed (I-49)", "[mutants]") {
+    // Kills `fabs(v) >= 2^52` (hedging.cpp:1143). min (n - 2^52)^2: the relaxed and integer answers are 2^52.
+    const double big = 4503599627370496.0;
+    hg::IntegerProblem prob;
+    prob.a = {{1.0}};
+    prob.b = {-big};
+    prob.weights = {1.0};
+    prob.lot_sizes = {1.0};
+    hg::IntegerResult res;
+    CHECK(catch_error([&] { res = hg::solve_integer(prob); }).code == "ok");
+    REQUIRE(res.lots.size() == 1);
+    CHECK(res.lots[0] == 4503599627370496LL);
+    CHECK(res.objective == 0.0);
+}
+
+TEST_CASE("sample covariance: deviations from an inexact mean near 1e8 give variance 7/3, not 3.82", "[mutants]") {
+    // Kills `(x + mean_i) * (y - mean_j)` (hedging.cpp:1213): the extra 2 mean sum(x - mean) term is 0 only in exact
+    // arithmetic; with the mean of (1e8, 1e8 + 1, 1e8 + 3) rounded it adds about 1.49 (Python, same IEEE operations).
+    const Matrix cov = hg::sample_covariance({1e8, 1e8 + 1.0, 1e8 + 3.0}, {{0.0, 1.0, 4.0}});
+    REQUIRE(cov.size() == 2);
+    CHECK(std::fabs(cov[0][0] - 7.0 / 3.0) < 1e-6);
+}
+
+TEST_CASE("neutralise: spot exactly 0 is E_DOMAIN on spot", "[mutants]") {
+    // Kills `m.spot < 0.0` (hedging.cpp:1320).
+    const hg::Market m{0.0, 0.03, 0.0, 0.2};
+    const hg::Position u{hg::Instrument::Underlying, std::nullopt, std::nullopt, 1.0};
+    const Caught got = catch_error([&] { (void)hg::neutralise(m, {u}, {u}, {hg::Greek::Delta}); });
+    CHECK(got.code == "E_DOMAIN");
+    CHECK(got.field == "spot");
+}
+
+TEST_CASE("select: upper bounds without lower bounds (the pair check reads only common indices)", "[mutants]") {
+    // Kills `j <= lower.size() && j < upper.size()` (hedging.cpp:1481): with no lower vector it reads lower[0] of an
+    // empty vector (a null dereference). min (x0 - 1)^2 + (x1 - 2)^2 with one instrument: x1 = 2 is chosen.
+    hg::QpProblem prob;
+    prob.a = {{1.0, 0.0}, {0.0, 1.0}};
+    prob.b = {-1.0, -2.0};
+    prob.weights = {1.0, 1.0};
+    prob.upper = std::vector<hg::Bound>{std::nullopt, 5.0};
+    hg::SelectResult res;
+    CHECK(catch_error([&] { res = hg::select_instruments(prob, 1, false); }).code == "ok");
+    REQUIRE(res.selected.size() == 1);
+    CHECK(res.selected[0] == 1);
+}
