@@ -106,13 +106,13 @@ def equity_forward():
     pv = 1.5 * C(d1) + 1.5 * C(d2) + C(d3)
     f = (100 - pv) / C(d3)
     assert abs(f - V.fwd_flat(100, .04, .01, 1, tdivs([(d1, 1.5), (d2, 1.5), (d3, 1.0)]))) < 1e-10
-    s.add(op, b0, {"forward": f, "discount_factor": curve_df(.04, d3), "carry_factor": C(d3), "pv_dividends": pv}, cls=A, verified=["analytic-rolled"], tags=["dividend-on-expiry"])
+    s.add(op, b0, {"forward": f, "discount_factor": curve_df(.04, d3), "carry_factor": C(d3), "pv_dividends": pv}, cls=A, verified=["analytic-rolled", "quantlib-1.44-dividend-engine"], tags=["dividend-on-expiry"])  # tag: QuantLib check in outside_validation.py
     caught("equity_forward", "dividend on expiry dropped", 1.0, atol(f))
     caught("equity_forward", "borrow ignored", abs(f - (100 - sum(a * curve_df(.04, d) for d, a in [(d1, 1.5), (d2, 1.5), (d3, 1.)])) / curve_df(.04, d3)), atol(f))
     caught("equity_forward", "ACT/360 time", abs(f - V.fwd_flat(100, .04, .01, 365 / 360, [(73 / 360, 1.5), (146 / 360, 1.5), (1.0139, 1.)])), atol(f))
     past = dict(b0, dividends=jdivs([(AS_OF, 9.0), (d3 + timedelta(1), 9.0)]))
     s.add(op, past, {"forward": 100 / C(d3), "discount_factor": curve_df(.04, d3), "carry_factor": C(d3), "pv_dividends": 0.0}, cls=A, verified=["hand"], tags=["boundary"], description="dividends on as_of and after expiry are ignored")
-    s.add(op, dict(b0, borrow_curve=None, dividends=[]), {"forward": 100 / curve_df(.04, d3), "discount_factor": curve_df(.04, d3), "carry_factor": curve_df(.04, d3), "pv_dividends": 0.0}, cls=A, verified=["hand"])
+    s.add(op, dict(b0, borrow_curve=None, dividends=[]), {"forward": 100 / curve_df(.04, d3), "discount_factor": curve_df(.04, d3), "carry_factor": curve_df(.04, d3), "pv_dividends": 0.0}, cls=A, verified=["hand", "quantlib-1.44-dividend-engine"])  # tag: QuantLib check in outside_validation.py
     s.add(op, dict(b0, expiry=str(AS_OF), dividends=[]), {"forward": 100.0, "discount_factor": 1.0, "carry_factor": 1.0, "pv_dividends": 0.0}, cls=A, verified=["hand"], tags=["boundary"])
     s.add(op, dict(b0, expiry=str(AS_OF - timedelta(1))), error="E_DATE_ORDER", cls=E, tags=["invalid"])
     s.add(op, dict(b0, borrow_curve=dict(flat(.01), as_of=str(AS_OF + timedelta(1)))), error="E_INPUT", cls=E, tags=["invalid"])
@@ -380,7 +380,7 @@ def smile():
     ga = [V.svi_g(Pav, k) for k in ka]
     assert min(ga) < -1e-3
     wa = [V.svi_w(Pav, k) for k in ka]
-    s.add(ev, dict(svi=Pa, log_moneyness=ka, expiry_years=1.0), {"total_variance": wa, "implied_vol": [math.sqrt(x) for x in wa], "g": ga, "min_g": min(ga), "butterfly_free": False}, cls=I, verified=["published-counterexample", "analytic"], tags=["arbitrage"], description="Vogt parameters from Gatheral-Jacquier 2014; g is negative")
+    s.add(ev, dict(svi=Pa, log_moneyness=ka, expiry_years=1.0), {"total_variance": wa, "implied_vol": [math.sqrt(x) for x in wa], "g": ga, "min_g": min(ga), "butterfly_free": False}, cls=I, verified=["published-counterexample", "analytic", QLV], tags=["arbitrage"], description="Vogt parameters from Gatheral-Jacquier 2014; g is negative")
     caught("smile", "SVI rho sign flipped", abs(V.svi_w(Pv, .4) - V.svi_w([.03, .12, .35, .02, .15], .4)), 1e-8)
     for bad in (dict(P, b=-.1), dict(P, rho=1.0), dict(P, sigma=0.0), dict(P, a=-1.0)):
         s.add(ev, dict(svi=bad, log_moneyness=ks, expiry_years=T), error="E_DOMAIN", cls=E, tags=["invalid"])
@@ -410,12 +410,12 @@ def smile():
         return dict(rho=rho, eta=eta, gamma=g, thetas=ths, log_moneyness=list(kk)), {"total_variance": rows, "butterfly_free": min(m1) > 0, "calendar_free": min(m2) >= 0}
     i1, o1 = ss(-.4, 1.0, .5)
     assert o1["butterfly_free"] and o1["calendar_free"] and all(abs(r[2] - th) < 1e-15 for r, th in zip(o1["total_variance"], ths))
-    s.add(op, i1, o1, cls=I, verified=["analytic", "atm-equals-theta"])
+    s.add(op, i1, o1, cls=I, verified=["analytic", "atm-equals-theta", QLV + "-svi-slices"])  # tag: QuantLib check in outside_validation.py
     i2, o2 = ss(-.7, 3.0, .5)
     assert not o2["butterfly_free"]
-    s.add(op, i2, o2, cls=I, verified=["analytic"], tags=["arbitrage"])
+    s.add(op, i2, o2, cls=I, verified=["analytic", QLV + "-svi-slices"], tags=["arbitrage"])
     i3, o3 = ss(0.0, .15, 1.0)
-    s.add(op, i3, o3, cls=I, verified=["analytic"])
+    s.add(op, i3, o3, cls=I, verified=["analytic", QLV + "-svi-slices"])
     caught("smile", "SSVI phi without the (1+theta) term", abs(V.ssvi_w(.4, .16, -.4, 1., .5) - .16 / 2 * (1 - .4 * (1 / .4) * .4 + math.sqrt((1 / .4 * .4 - .4) ** 2 + 1 - .16))), 1e-8)
     s.add(op, dict(i1, rho=1.0), error="E_DOMAIN", cls=E, tags=["invalid"])
     s.add(op, dict(i1, gamma=0.0), error="E_DOMAIN", cls=E, tags=["invalid"])

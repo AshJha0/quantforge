@@ -307,7 +307,7 @@ def fx():
         base = {"pair": "GBPUSD", "spot": S0, "as_of": str(AS_OF), "base_curve": jb, "quote_curve": ju}
         for T in (date(2026, 12, 10), date(2027, 5, 10), date(2028, 11, 10), date(2036, 11, 10)):
             F = S0 * (base_c.df(T) / base_c.df(sp)) / (uc.df(T) / uc.df(sp))
-            s.add("fx.forward.outright", {**base, "value_date": str(T)}, {"forward": F, "points": (F - S0) / 1e-4}, cls=I, verified=["hand"], tags=[SYN] + tag)
+            s.add("fx.forward.outright", {**base, "value_date": str(T)}, {"forward": F, "points": (F - S0) / 1e-4}, cls=I, verified=["hand", "quantlib-1.44-fxforward"], tags=[SYN] + tag)  # tag: QuantLib check in outside_validation.py
             K = 1.27
             pv = 1e6 * (F - K) * uc.df(T)
             qpv, qdl = b.ql_fx_forward(b.ql_curve(base_c), b.ql_curve(uc), S0, 1e6, K, T, "BUY")

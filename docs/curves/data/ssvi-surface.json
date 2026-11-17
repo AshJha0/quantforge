@@ -164,8 +164,8 @@
   ],
   "cases": 3,
   "by_source": {
-   "vol.ssvi.evaluate: analytic, atm-equals-theta": 1,
-   "vol.ssvi.evaluate: analytic": 2
+   "vol.ssvi.evaluate: analytic, atm-equals-theta, quantlib-1.44-svi-slices": 1,
+   "vol.ssvi.evaluate: analytic, quantlib-1.44-svi-slices": 2
   }
  }
 }

@@ -49,6 +49,10 @@ the human review at the end of the project.
 | Portfolio, hedging | I, J | Hand cases, optimality conditions | Planned |
 | Market making | H | None outside: method test only | By decision |
 
+## Validation evidence pack (2026-11-17)
+
+`python/outside_validation.py` checks stage B and C curve cases that had no outside library (FX outright forward, equity forward, SVI, SSVI) with QuantLib 1.44 on the goldens' own inputs and tolerances, and writes `OUTSIDE_VALIDATION.json`. It reads the goldens and changes only `verified_by` (`--apply`); a disagreement is reported, never fixed by editing a golden. The generators carry the same tags, so a regeneration keeps them. `--check` (standard library only) runs in CI. See `docs/validation/README.md`.
+
 ## ORE re-test (G-42b)
 
 `oracle/ore/` holds the inputs and summaries of the stage G wave 4c checks against the Open Source Risk Engine (ORE 1.8.17.0, Python wheel, Modified BSD; no ORE code is kept here). The six G-42b runs (`runb0..5`, seeds 20261211 to 20261216, 5,000 samples) run in CI as job `ore-retest-g42b` (`.github/workflows/ore-g42b.yml`, on changes under `oracle/ore/`, or by hand). The job installs the wheel from `oracle/ore/requirements-ore.txt` (Python 3.12, hashes checked), runs `oracle/ore/run_g42b.py`, and counts the 96 value cases with `uv run python -W ignore gen_stage_g_w4c.py countb` in `oracle/python`, which writes `oracle/ore/ORE_CHECK_4C_B.json` (uploaded as artefact `ore-g42b-results`). The tolerances are the ones registered in ruling G-42b (`check_case_b`); the count is a result, not a pass/fail gate.

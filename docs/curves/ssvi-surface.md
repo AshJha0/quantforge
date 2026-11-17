@@ -61,14 +61,14 @@ Each CLI built these numbers on its own, from the same input files. Agreement sh
 
 ## Oracle evidence and limits
 
-SSVI evaluation has analytic cases only, including the check that total variance at `k = 0` equals `theta` (1e-15). No outside library evaluates SSVI here (`specifications/05-volatility/stage-c-targets.md`).
+SSVI evaluation has analytic cases, including the check that total variance at `k = 0` equals `theta` (1e-15). No outside library has an SSVI object. Since the validation evidence pack (2026-11-17), each slice's total variance is checked with QuantLib `SviSmileSection` through the raw-SVI form of an SSVI slice (Gatheral and Jacquier 2014, Lemma 3.3); the two no-arbitrage flags are the spec's sufficient conditions on the parameters, recomputed as arithmetic (`oracle/OUTSIDE_VALIDATION.json`).
 
 Golden cases with an `ok` result for `vol.ssvi.evaluate`: 3, counted from `verified_by` in `datasets/golden/stage_c/`. All four builds passed them locally, which is self-assessment.
 
 | Verified by | Operation | Cases |
 |---|---|---|
-| analytic | vol.ssvi.evaluate | 2 |
-| analytic, atm-equals-theta | vol.ssvi.evaluate | 1 |
+| analytic, atm-equals-theta, quantlib-1.44-svi-slices | vol.ssvi.evaluate | 1 |
+| analytic, quantlib-1.44-svi-slices | vol.ssvi.evaluate | 2 |
 
 Limits:
 

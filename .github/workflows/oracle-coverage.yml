@@ -71,6 +71,8 @@ jobs:
         run: |
           python3 tools/test_outside_shares.py
           python3 tools/outside_shares.py --check
+          python3 oracle/python/outside_validation.py --check
+          python3 tools/validation/build_checklists.py --check
           cat oracle/OUTSIDE_SHARES.md >> "$GITHUB_STEP_SUMMARY"
       - name: Summary
         if: always()
