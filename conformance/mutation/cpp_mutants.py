@@ -88,6 +88,8 @@ def main():
     ap.add_argument("--compiler", default="g++")
     ap.add_argument("--out", help="write the counts and survivors to this JSON file")
     ap.add_argument("--unit", action="store_true", help="also run the unit tests on golden survivors")
+    ap.add_argument("--start", type=int, default=1,
+                    help="resume a run: skip mutants before this 1-based index (same --seed and file give the same order); the summary then counts only this part, so combine it with the earlier log")
     a = ap.parse_args()
     killed, unit_killed, no_build, survived = 0, 0, 0, []
     with tempfile.TemporaryDirectory(prefix="qf-mutants-") as tmp:
@@ -117,6 +119,8 @@ def main():
         random.Random(a.seed).shuffle(chosen)
         todo = chosen[:a.max]
         for i, site in enumerate(todo, 1):
+            if i < a.start:  # done by an earlier, interrupted run (its log has these lines)
+                continue
             mutated, shown = apply(original, site)
             target.write_text(mutated, encoding="utf-8")
             if quiet(make):
