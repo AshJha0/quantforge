@@ -48,14 +48,14 @@
         <dependency><groupId>org.openjdk.jmh</groupId><artifactId>jmh-generator-annprocess</artifactId><version>${jmh.version}</version><scope>provided</scope></dependency>
       </dependencies>
       <build><plugins>
-        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.7.0</version>
+        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.8.0</version>
           <executions><execution><id>jmh-sources</id><phase>generate-sources</phase><goals><goal>add-source</goal></goals>
             <configuration><sources><source>src/jmh/java</source></sources></configuration></execution></executions>
         </plugin>
         <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.16.0</version>
           <configuration><annotationProcessorPaths><path><groupId>org.openjdk.jmh</groupId><artifactId>jmh-generator-annprocess</artifactId><version>${jmh.version}</version></path></annotationProcessorPaths></configuration>
         </plugin>
-        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>exec-maven-plugin</artifactId><version>3.6.4</version>
+        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>exec-maven-plugin</artifactId><version>3.7.0</version>
           <executions><execution><id>bench</id><goals><goal>exec</goal></goals>
             <configuration><executable>java</executable>
               <arguments><argument>-Dqf.examples=${project.basedir}/../examples</argument><argument>-cp</argument><classpath/>
