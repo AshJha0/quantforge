@@ -7,7 +7,9 @@ param(
     [string]$DataDir = "C:\Work\Claude\qf-crypto-data\kraken",
     [string]$Log = "C:\Work\Claude\qf-crypto-data\watchdog.log",
     [string]$Task = "QF crypto L2",
-    [int]$StaleMinutes = 10
+    [int]$StaleMinutes = 10,
+    [int]$WarnFreeGB = 10,
+    [int]$StopRawFreeGB = 3
 )
 $ErrorActionPreference = "Stop"
 function Write-Log([string]$msg) {
@@ -20,8 +22,19 @@ try {
         Sort-Object LastWriteTime -Descending | Select-Object -First 1
     $ageMin = if ($latest) { ((Get-Date) - $latest.LastWriteTime).TotalMinutes } else { [double]::PositiveInfinity }
 
+    # Disk guard: raw book messages cost about 0.5 GB a day. Below $StopRawFreeGB free, create NO_RAW so the
+    # recorder (on its next start) keeps snapshots and trades but stops raw messages; restart it to apply.
+    $drive = (Get-Item $DataDir).PSDrive.Name
+    $freeGB = [math]::Round((Get-PSDrive $drive).Free / 1GB, 1)
+    $noRaw = Join-Path $DataDir "NO_RAW"
     $reason = $null
-    if ($procs.Count -eq 0) { $reason = "no recorder process" }
+    if ($freeGB -lt $StopRawFreeGB -and -not (Test-Path $noRaw)) {
+        New-Item -ItemType File -Path $noRaw | Out-Null
+        $reason = "disk ${freeGB} GB free: raw messages stopped (NO_RAW)"
+    }
+    elseif ($freeGB -lt $WarnFreeGB) { Write-Log "warning: disk ${freeGB} GB free" }
+    if ($reason) { }
+    elseif ($procs.Count -eq 0) { $reason = "no recorder process" }
     elseif ($ageMin -gt $StaleMinutes) { $reason = ("no write for {0:N1} min (latest {1})" -f $ageMin, $latest.Name) }
 
     if ($reason) {

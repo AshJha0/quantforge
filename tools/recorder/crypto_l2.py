@@ -10,6 +10,12 @@ Output, one gzip JSON-lines file per symbol per UTC hour under --out (default C:
   {"t": "...Z", "k": "book", "bids": [[px, qty] x100], "asks": [[px, qty] x100], "ok": true}   once a second
   {"t": "...Z", "k": "trade", "d": [...raw trade objects...]}                              as received
   {"t": "...Z", "k": "gap", "why": "..."}                                                  on every reconnect
+Raw book messages (owner 2026-11-17, ruling HR-11: needed for the message-by-message H-2 rebuild and the H-9 replay)
+go to a second file per symbol per hour under <SYMBOL>-raw/, every message as received, prices and quantities as the
+exact decimal strings Kraken sent:
+  {"t": "...Z", "k": "msg", "type": "snapshot"|"update", "bids": [...], "asks": [...], "checksum": n, "ts": "...", "ok": b}
+"t" is the local receive time, "ts" Kraken's own timestamp (updates only), "ok" whether our book matched Kraken's
+checksum after applying the message. A "gap" record is written here too on every reconnect.
 "ok" is the result of Kraken's CRC32 book checksum on the top 10 levels at the last update.
 
   python tools/recorder/crypto_l2.py [--symbols BTC/USD ETH/USD] [--out DIR] [--seconds N]
@@ -108,7 +114,15 @@ class Sink:
             self.fh.close()
 
 
-async def session(symbols, books, sinks):
+class NullSink:
+    def write(self, rec):
+        pass
+
+    def close(self):
+        pass
+
+
+async def session(symbols, books, sinks, raws):
     import websockets
     async with websockets.connect(URL, ping_interval=20, max_size=2**24) as ws:
         await ws.send(json.dumps({"method": "subscribe", "params": {"channel": "book", "symbol": symbols, "depth": DEPTH}}))
@@ -125,6 +139,9 @@ async def session(symbols, books, sinks):
                     b.apply("asks", d.get("asks", []))
                     bb, aa = b.top(10)
                     b.ok = checksum(bb, aa, *PRECISION[d["symbol"]]) == d.get("checksum")
+                    raws[d["symbol"]].write({"k": "msg", "type": m.get("type"), "bids": d.get("bids", []),
+                                             "asks": d.get("asks", []), "checksum": d.get("checksum"),
+                                             "ts": d.get("timestamp"), "ok": b.ok})
             elif ch == "trade":
                 by = {}
                 for d in m.get("data", []):
@@ -147,6 +164,9 @@ async def main_async(a):
     load_precision(a.symbols)
     books = {s: Book() for s in a.symbols}
     sinks = {s: Sink(a.out, s) for s in a.symbols}
+    # Raw messages are about 0.25 GB a day per symbol (2026-11-17). The watchdog creates NO_RAW in --out when the
+    # disk runs low; the recorder then keeps the per-second snapshots and trades but stops writing raw messages.
+    raws = {s: (NullSink() if (Path(a.out) / "NO_RAW").exists() else Sink(a.out, s + "-raw")) for s in a.symbols}
     tick = asyncio.create_task(ticker(books, sinks))
     end = time.time() + a.seconds if a.seconds else None
     backoff = 1
@@ -154,7 +174,7 @@ async def main_async(a):
         while end is None or time.time() < end:
             try:
                 left = None if end is None else max(1, end - time.time())
-                await asyncio.wait_for(session(a.symbols, books, sinks), timeout=left)
+                await asyncio.wait_for(session(a.symbols, books, sinks, raws), timeout=left)
                 why = "server closed"
             except asyncio.TimeoutError:
                 break
@@ -163,12 +183,13 @@ async def main_async(a):
             for s in a.symbols:
                 books[s].bids, books[s].asks, books[s].ok = {}, {}, False
                 sinks[s].write({"k": "gap", "why": why})
+                raws[s].write({"k": "gap", "why": why})
             print(f"{stamp(now())} reconnect after: {why}", flush=True)
             await asyncio.sleep(backoff)
             backoff = min(backoff * 2, 60)
     finally:
         tick.cancel()
-        for s in sinks.values():
+        for s in [*sinks.values(), *raws.values()]:
             s.close()
 
 
