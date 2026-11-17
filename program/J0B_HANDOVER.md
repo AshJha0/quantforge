@@ -8,7 +8,7 @@ Branch `stage-j-fuzz` (worktree `C:/Work/Claude/qf-wt/j0b`), from `main` 3cca7da
 | `vol.garch.estimate` timeout on fuzzed `garch_f-0010` (return -2.68e297, its square overflows) | J-0b.2: `E_NON_FINITE` before any search (R6-8.1) | was `E_DOMAIN`, fixed (`GarchMle.java`) | was a 20 s all-inf search, fixed (`variance.py`) | already `E_NON_FINITE` | was `E_NO_CONVERGENCE`, fixed (`vol_stats.cpp`) |
 | `exotic.basket.moment` ragged correlation crash (exit 70) | J-0b.3: every row length checked first, `E_INPUT` | fixed (`OpsExotics.java`) | already `E_INPUT` | already `E_INPUT` | already `E_INPUT` |
 
-Rulings are in `specifications/stage-j-rulings.md` (new file); the limit row is in `specifications/01-core/limits.md`; the CHANGELOG entry is under "Unreleased (0.9.0)". The new golden suite is `datasets/golden/stage_j/fuzzfix_j.json` (6 error cases at first, 39 after the follow-up below), written by `oracle/python/gen_stage_j_fuzz.py`.
+Rulings are in `specifications/stage-j-rulings.md` (new file); the limit row is in `specifications/01-core/limits.md`; the CHANGELOG entry is in the 0.9.0 section. The new golden suite is `datasets/golden/stage_j/fuzzfix_j.json` (6 error cases at first, 39 after the follow-up below), written by `oracle/python/gen_stage_j_fuzz.py`.
 
 ## Results
 
