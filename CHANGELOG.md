@@ -55,6 +55,8 @@ CLI contract 1.15.0 (wave 1 raised it to 1.13.0, ruling J-1; wave 2 to 1.14.0, r
 ### Fixed
 
 - **Degenerate feasible hedge QPs (all four builds).** `hedge.qp.solve` raised `E_NO_CONVERGENCE` (Python) or `E_INFEASIBLE` (Java, C++) on valid problems whose feasible set is one point or whose margin is tight at a vertex (the three kill-round cases in `docs/releases/v0.9.0.md`). Python's active-set methods now keep a linearly independent working set and step only in the null space of the working rows; the Goldfarb-Idnani builds (Java, C++, Rust) judge the infeasibility certificate against the rounding scale of the rows it combines (1e-9 relative). Regression tests in all four languages; genuinely infeasible neighbours still raise `E_INFEASIBLE`; no golden changed.
+- **Margin start (C++ and Java).** With a binding margin, C++ and Java found their starting orthant from a heavy margin penalty (1e9 in C++, 1e12 in Java), whose O(1/penalty) error matched the 1e-9 tolerance and gave C++ a false `E_INFEASIBLE` when the limit equalled the least margin. Both now solve the least-margin linear program exactly (two-phase simplex, Bland's rule; ports of Python's `_simplex` and `_least_margin`) and refuse only above `limit (1 + 1e-9) + 1e-12`, Python's test. Direct unit tests in both; no golden changed.
+- **Rust G-9 timing test.** `g9_ladder_cost_ratio_at_most_five` now interleaves the price and ladder runs, so both medians see the same machine load; timed in two blocks it read 5.4 under a parallel `cargo test` and passed alone.
 
 ### Known gaps
 
