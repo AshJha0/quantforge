@@ -16,16 +16,18 @@ Spec version 0.1.0 (DRAFT, stage H wave 1b). Status: Specified, not implemented.
 Two kinds of file, per symbol per UTC hour (recorder commit 547e6690 on `hedge-followups-0918`, docstring read 2026-11-17; ruling HR-11, owner decision 2026-11-17):
 
 - `<SYMBOL>/`: once-a-second top-N snapshot rows (`k = "book"`, 20 levels before 2026-11-17 20:15 UTC, 100 after), trades as received, a `gap` row per reconnect. The snapshot rows are the recorder's own book, so on their own they are not an independent feed.
-- `<SYMBOL>-raw/`, **from 2026-11-17 20:29 UTC**: every book message as received, `{"t": local receive time, "k": "msg", "type": "snapshot" | "update", "bids", "asks" (the exact decimal strings Kraken sent), "checksum", "ts" (Kraken's timestamp, updates only), "ok"}`, plus a `gap` row on every reconnect. The recorder's `ok` is its own checksum result; the rebuild below ignores it and recomputes against `checksum`, so the check is independent of the recorder's book code.
+- `<SYMBOL>-raw/`: **one sample only, 2026-11-17 20:29 to 20:43 UTC** (about 14 minutes, both symbols, about 5.7 MB): every book message as received, `{"t": local receive time, "k": "msg", "type": "snapshot" | "update", "bids", "asks" (the exact decimal strings Kraken sent), "checksum", "ts" (Kraken's timestamp, updates only), "ok"}`, plus `gap` rows. Raw recording was then switched off for disk space (HR-11): about 0.5 GB a day against about 29 GB free. The recorder can still record raw; a `NO_RAW` file in the data folder switches it off, and that is how it is off now.
 
-Raw recording can stop on its own: the recorder's disk guard writes a `NO_RAW` marker and stops the raw files below 3 GB free disk, while the per-second files continue. A raw hour with a `NO_RAW` stop or a missing file is incomplete (HR-11).
+So the per-second rows are the main evidence. They are the recorder's own book, not an independent feed: their venue-side evidence is the `ok` flag (the recorder's book matched Kraken's checksum at the last update before the row) and our recomputed checksum of each row's top 10.
 
 | Form | Input | Checkpoint | Applies to |
 |---|---|---|---|
-| A | raw messages from `<SYMBOL>-raw/` | every message: CRC32 of our top 10 against the venue's `checksum`; every per-second row of `<SYMBOL>/` for the same second: full top-N equality against our rebuilt book at the last message received before the row's `t` | days from 2026-11-17 20:29 UTC with complete raw hours; the **only** form for the full H-2 check and the H-9 replay |
-| B | per-second snapshot rows only | each row: our checksum of the row's top 10 recomputed and the `ok` flag counted; consecutive rows give a differenced stream (below) | days before 2026-11-17 20:29 UTC, and any later hour whose raw file is incomplete; reported separately, never pooled with form A |
+| B (the H-2 and H-9 form) | per-second 100-level snapshot rows | each row: our checksum of the row's top 10 recomputed and the `ok` flag counted; consecutive rows give a differenced stream (below) | every recorded day; 20 levels before 2026-11-17 20:15 UTC, 100 after |
+| A (demonstration only) | the 14-minute raw sample | every message: CRC32 of our top 10 against the venue's `checksum` (the recorder's `ok` is ignored, so the check is independent of the recorder's code); every per-second row in the same window: full top-N equality against our book at the last message received before the row's `t` | 2026-11-17 20:29 to 20:43 UTC only; labelled "form A demonstration, 14-minute sample"; never pooled with form B, and not an H-2 day |
 
-**Differenced stream (form B, earlier days only; not used for H-9 now that raw data exists).** Between consecutive snapshot rows, the set of level changes (new, changed, removed price levels, with a removal also implied for a price that left the top N) is a synthetic update message whose application to the earlier row must give the later row exactly. It is labelled "snapshot-differenced stream; not the venue's message sequence": it under-counts updates (many venue messages per second collapse into one) and cannot show intra-second crossing.
+**Route to form A.** Re-enable raw recording (remove `NO_RAW`) with the data folder on a drive with room for about 0.5 GB a day per two symbols. Days recorded that way run in form A and become the H-2 result; this spec needs no other change for that.
+
+**Differenced stream (form B; the H-9 replay stream).** Between consecutive snapshot rows, the set of level changes (new, changed, removed price levels, with a removal also implied for a price that left the top N) is a synthetic update message whose application to the earlier row must give the later row exactly. It is labelled "snapshot-differenced stream; not the venue's message sequence": it under-counts updates (many venue messages per second collapse into one) and cannot show intra-second crossing.
 
 ## `micro.book.rebuild`
 
@@ -52,8 +54,8 @@ Errors: malformed message or non-decimal price `E_SCHEMA`; negative quantity, no
 ## H-2 acceptance (as fixed here, before any run)
 
 On every recorded day used for H-1 (at least 20 at the tag), per symbol:
-- Form A days (from 2026-11-17 20:29 UTC, complete raw hours): `checksum_failed == 0` and `checkpoint_failed == 0`; any failure is listed with its message index and the day fails. This is the H-2 result. The 20 days needed at the tag are counted in form A days only; if fewer than 20 complete form A days exist at the tag, the shortfall is stated, not filled with form B days.
-- Form B (days before 2026-11-17 20:29 UTC, and incomplete raw hours): the recomputed checksum of every row's top 10 equals the result implied by its `ok` flag for rows with `ok = true`; the count of `ok = false` rows, crossed rows and gap rows is published per day. Pass means "the recorder's book agreed with the venue checksum on X% of seconds", with X stated, not "the book equals the venue".
+- Form A demonstration (the 14-minute raw sample): `checksum_failed == 0` and `checkpoint_failed == 0`; any failure is listed with its message index. Published as a demonstration of the full check, not as an H-2 day. If raw recording is re-enabled (route above), complete raw days use this rule and replace form B as the H-2 result.
+- Form B (every recorded day; the H-2 result while raw recording is off): the recomputed checksum of every row's top 10 equals the result implied by its `ok` flag for rows with `ok = true`; the count of `ok = false` rows, crossed rows and gap rows is published per day. Pass means "the recorder's book agreed with the venue checksum on X% of seconds", with X stated, not "the book equals the venue".
 - Crossed and locked counts are published; they are a property of the feed or of our rebuild, and form A separates the two (a crossed book with a passing checksum is the venue's).
 
 ## Limit cases
