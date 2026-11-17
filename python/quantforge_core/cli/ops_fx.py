@@ -1,4 +1,5 @@
 """Handlers for the fx verbs. A handler reads every input first; the first call through `core`, the gated core modules, ends the E_SCHEMA stage."""
+
 from typing import Any
 
 from .. import conventions, curves
@@ -47,8 +48,14 @@ def fx_pv(i: Inputs) -> Any:
 @op("fx.swap.pv")
 def fx_swap(i: Inputs) -> Any:
     t = i.object("trade")
-    trade = FxSwap(t.real("notional_base"), t.date("near_date"), t.real("near_rate"),
-                   t.date("far_date"), t.real("far_rate"), t.enum("far_side", ("BUY", "SELL")))
+    trade = FxSwap(
+        t.real("notional_base"),
+        t.date("near_date"),
+        t.real("near_rate"),
+        t.date("far_date"),
+        t.real("far_rate"),
+        t.enum("far_side", ("BUY", "SELL")),
+    )
     value, delta = core.fx.swap_pv(_market(i), trade)
     return {"valuation": value, "fx_delta": delta}
 
@@ -63,9 +70,15 @@ def fx_implied(i: Inputs) -> Any:
 @op("fx.xccy.bootstrap")
 def _xccy_bootstrap(i: Inputs) -> Any:
     quotes = [(q.integer("months"), q.real("spread")) for q in _objects(i, "quotes")]
-    args = (_curve(i, "domestic"), _curve(i, "foreign_projection"),
-            _convention(i, "domestic_convention", ("SOFR",)), _convention(i, "foreign_convention", ("ESTR",)),
-            i.date("start"), quotes, i.enum("interpolation", curves.INTERPOLATIONS))
+    args = (
+        _curve(i, "domestic"),
+        _curve(i, "foreign_projection"),
+        _convention(i, "domestic_convention", ("SOFR",)),
+        _convention(i, "foreign_convention", ("ESTR",)),
+        i.date("start"),
+        quotes,
+        i.enum("interpolation", curves.INTERPOLATIONS),
+    )
     data, error = core.xccy.bootstrap(*args)
     return {"pillars": _pillars(data)}, {"max_repricing_error": error}
 
@@ -73,10 +86,17 @@ def _xccy_bootstrap(i: Inputs) -> Any:
 @op("fx.xccy.pv")
 def _xccy_pv(i: Inputs) -> Any:
     t = i.object("trade")
-    args = (_curve(i, "domestic"), _curve(i, "foreign_projection"),
-            _curve(i, "foreign_discount"), i.real("spot"), t.date("start"), t.integer("months"),
-            t.real("foreign_notional"), t.real("spread"),
-            t.enum("side", ("RECEIVE_FOREIGN", "PAY_FOREIGN")))
+    args = (
+        _curve(i, "domestic"),
+        _curve(i, "foreign_projection"),
+        _curve(i, "foreign_discount"),
+        i.real("spot"),
+        t.date("start"),
+        t.integer("months"),
+        t.real("foreign_notional"),
+        t.real("spread"),
+        t.enum("side", ("RECEIVE_FOREIGN", "PAY_FOREIGN")),
+    )
     foreign, domestic, value = core.xccy.pv(*args)
     return {"pv": value, "foreign_leg": foreign, "domestic_leg": domestic}
 
@@ -86,9 +106,17 @@ def _ndf(i: Inputs) -> Any:
     _present(i, "fixing")
     t = i.object("trade")
     fixing = i.real("fixing") if i.has("fixing") else None
-    args = (_curve(i, "usd_curve"), _curve(i, "offshore_curve"), i.real("spot"),
-            t.date("fixing_date"), t.date("payment_date"), t.real("strike"),
-            t.real("usd_notional"), t.enum("side", ("BUY", "SELL")), fixing)
+    args = (
+        _curve(i, "usd_curve"),
+        _curve(i, "offshore_curve"),
+        i.real("spot"),
+        t.date("fixing_date"),
+        t.date("payment_date"),
+        t.real("strike"),
+        t.real("usd_notional"),
+        t.enum("side", ("BUY", "SELL")),
+        fixing,
+    )
     value, forward = core.xccy.ndf_pv(*args)
     return {"pv": value, "forward": forward}
 
@@ -106,8 +134,16 @@ def _delta_type(i: Inputs) -> str:
 @op("fx.option.price")
 def _fx_price(i: Inputs) -> Any:
     spot, t, rd, rf = _fx_market(i)
-    args = (spot, i.real("strike"), t, rd, rf, i.real("vol"), i.enum("option_type", _OPTION_TYPES),
-            i.real("notional"))
+    args = (
+        spot,
+        i.real("strike"),
+        t,
+        rd,
+        rf,
+        i.real("vol"),
+        i.enum("option_type", _OPTION_TYPES),
+        i.real("notional"),
+    )
     return core.fx_smile.option_price(*args)
 
 
@@ -120,8 +156,13 @@ def _fx_delta_from_strike(i: Inputs) -> Any:
 
 @op("fx.delta.to_strike")
 def _fx_delta_to_strike(i: Inputs) -> Any:
-    args = (*_fx_market(i), i.real("vol"), i.enum("option_type", _OPTION_TYPES), i.real("delta"),
-            _delta_type(i))
+    args = (
+        *_fx_market(i),
+        i.real("vol"),
+        i.enum("option_type", _OPTION_TYPES),
+        i.real("delta"),
+        _delta_type(i),
+    )
     return {"strike": core.fx_smile.delta_to_strike(*args)}
 
 
@@ -137,6 +178,13 @@ def _fx_atm_strike(i: Inputs) -> Any:
 def _fx_smile(i: Inputs) -> Any:
     from ..fx_smile import ATM_TYPES
 
-    args = (*_fx_market(i), i.real("atm_vol"), i.real("rr"), i.real("bf"), i.real("delta"),
-            _delta_type(i), i.enum("atm_type", ATM_TYPES))
+    args = (
+        *_fx_market(i),
+        i.real("atm_vol"),
+        i.real("rr"),
+        i.real("bf"),
+        i.real("delta"),
+        _delta_type(i),
+        i.enum("atm_type", ATM_TYPES),
+    )
     return core.fx_smile.smile_from_quotes(*args)

@@ -1,5 +1,6 @@
 """Caps, floors and swaptions on Black, shifted Black and Bachelier
 (specifications/05-volatility/caps-and-swaptions.md)."""
+
 from collections.abc import Sequence
 
 from . import black, curves, daycount, projection
@@ -10,6 +11,7 @@ from .finite import guard
 from .numeric import ordered_sum
 
 INDEX = "USD-TERM-3M"
+
 
 def _option(model: str, call: bool, f: float, k: float, vol: float, t: float) -> float:
     return black.price(Option(model, "CALL" if call else "PUT", k, t, f), vol)
@@ -26,8 +28,15 @@ def _check_tenor(months: int) -> None:
 
 
 def cap_price(
-    discount: CurveData, proj: CurveData, model: str, vol: float | Sequence[float], kind: str,
-    start_months: int, tenor_months: int, strike: float, notional: float,
+    discount: CurveData,
+    proj: CurveData,
+    model: str,
+    vol: float | Sequence[float],
+    kind: str,
+    start_months: int,
+    tenor_months: int,
+    strike: float,
+    notional: float,
 ) -> tuple[list[float], float]:
     d, p = curves.build(discount), curves.build(proj)
     if start_months < 1:
@@ -41,11 +50,14 @@ def cap_price(
     if any(v < 0 for v in vols):
         raise QfError("E_DOMAIN", "a vol is negative", "vol")
     alphas = [daycount.year_fraction("ACT_360", x.start, x.end) for x in ps]
-    forwards = [(p.discount(x.start) / p.discount(x.end) - 1) / a
-                for x, a in zip(ps, alphas, strict=True)]
+    forwards = [
+        (p.discount(x.start) / p.discount(x.end) - 1) / a for x, a in zip(ps, alphas, strict=True)
+    ]
     _check_black(model, strike, forwards)
     caplets = [
-        notional * a * d.discount(x.end)
+        notional
+        * a
+        * d.discount(x.end)
         * _option(model, kind == "CAP", f, strike, v, d.time(x.start))
         for x, a, f, v in zip(ps, alphas, forwards, vols, strict=True)
     ]
@@ -53,8 +65,15 @@ def cap_price(
 
 
 def swaption_price(
-    discount: CurveData, proj: CurveData, model: str, vol: float, kind: str,
-    expiry_months: int, tenor_months: int, strike: float, notional: float,
+    discount: CurveData,
+    proj: CurveData,
+    model: str,
+    vol: float,
+    kind: str,
+    expiry_months: int,
+    tenor_months: int,
+    strike: float,
+    notional: float,
 ) -> tuple[float, float, float]:
     d, p = curves.build(discount), curves.build(proj)
     if expiry_months < 1:

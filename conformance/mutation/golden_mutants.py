@@ -160,14 +160,17 @@ def score_rust(a, work):
 
 def python_mutants(project, target):
     uv = ["uv", "run", "--with", MUTMUT]
-    run(uv + ["mutmut", "run", target], cwd=project)
+    r = subprocess.run(uv + ["mutmut", "run", target], check=False, cwd=project, capture_output=True, text=True)
     rows = []
     for meta in sorted((project / "mutants").rglob("*.meta")):
         for name, code in json.loads(meta.read_text(encoding="utf-8"))["exit_code_by_key"].items():
             if fnmatch.fnmatchcase(name, target):
                 rows.append({"id": name, "unit": MUTMUT_VERDICT.get(code, f"mutmut code {code}")})
     if not rows:
-        raise SystemExit("mutmut produced no mutants for that target")
+        tail = "\n".join((r.stdout + r.stderr).splitlines()[-30:])
+        hint = "" if target.endswith("*") else f" (a python target is a mutant name glob; did you mean {target + '*'!r}?)"
+        raise SystemExit(f"mutmut produced no mutants for that target{hint}; mutmut exit {r.returncode}, "
+                         f"output tail:\n{tail}")
     return rows
 
 

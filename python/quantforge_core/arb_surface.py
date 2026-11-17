@@ -3,6 +3,7 @@
 Specs: specifications/05-volatility/arb-free-surfaces.md and local-and-forward-vol.md, with
 rulings E-A1 to E-A8 in specifications/stage-e-rulings.md. SVI itself is stage C (smile.py).
 """
+
 import itertools
 import math
 from collections.abc import Sequence
@@ -88,8 +89,11 @@ def _check(slices: Sequence[Slice], ks: Floats, reject: bool) -> dict[str, objec
             if _g(k, w, w1, w2) < 0:
                 butterfly.append({"expiry_index": j, "k_index": i})
         if previous is not None:
-            calendar += [{"expiry_index": j, "k_index": i}
-                         for i, (w, w0) in enumerate(zip(ws, previous, strict=True)) if w < w0]
+            calendar += [
+                {"expiry_index": j, "k_index": i}
+                for i, (w, w0) in enumerate(zip(ws, previous, strict=True))
+                if w < w0
+            ]
         previous = ws
         sides = _wings(s.svi)
         for side, (slope, _) in zip(("LEFT", "RIGHT"), sides, strict=True):
@@ -97,21 +101,27 @@ def _check(slices: Sequence[Slice], ks: Floats, reject: bool) -> dict[str, objec
                 wings.append({"expiry_index": j, "side": side, "kind": "LEE"})
         if j:
             before = _wings(slices[j - 1].svi)
-            for side, (slope, c), (slope0, c0) in zip(("LEFT", "RIGHT"), sides, before,
-                                                      strict=True):
+            for side, (slope, c), (slope0, c0) in zip(
+                ("LEFT", "RIGHT"), sides, before, strict=True
+            ):
                 if slope < slope0 or (slope == slope0 and c < c0):
                     wings.append({"expiry_index": j, "side": side, "kind": "CALENDAR"})
     free = not (butterfly or calendar or wings)
     if reject and not free:
         raise _arbitrage("the surface has arbitrage", "slices")
-    return {"butterfly_violations": butterfly, "calendar_violations": calendar,
-            "wing_violations": wings, "arbitrage_free": free}
+    return {
+        "butterfly_violations": butterfly,
+        "calendar_violations": calendar,
+        "wing_violations": wings,
+        "arbitrage_free": free,
+    }
 
 
 def _check_grid(ks: Floats) -> None:
     if not ks or not _increasing(ks):
-        raise _input("log_moneyness must be strictly increasing, with at least 1 point",
-                     "log_moneyness")
+        raise _input(
+            "log_moneyness must be strictly increasing, with at least 1 point", "log_moneyness"
+        )
 
 
 def surface_check(slices: Sequence[Slice], ks: Floats, reject: bool) -> dict[str, object]:
@@ -124,12 +134,18 @@ def ssvi_to_svi(rho: float, eta: float, gamma: float, theta: float) -> Svi:
     if abs(rho) >= 1 or eta <= 0 or not 0 < gamma <= 1 or theta <= 0:
         raise _domain("ssvi parameters are out of range")
     phi = eta * theta**-gamma * (1 + theta) ** (gamma - 1)
-    return Svi(theta * (1 - rho * rho) / 2, theta * phi / 2, rho, -rho / phi,
-               math.sqrt(1 - rho * rho) / phi)
+    return Svi(
+        theta * (1 - rho * rho) / 2,
+        theta * phi / 2,
+        rho,
+        -rho / phi,
+        math.sqrt(1 - rho * rho) / phi,
+    )
 
 
-def fit_surface(expiries: Floats, ks: Floats, rows: Sequence[Floats],
-                reject: bool) -> tuple[list[Slice], list[float], dict[str, object]]:
+def fit_surface(
+    expiries: Floats, ks: Floats, rows: Sequence[Floats], reject: bool
+) -> tuple[list[Slice], list[float], dict[str, object]]:
     if not expiries or not _increasing(expiries):
         raise _input("expiry_years must be strictly increasing", "expiry_years")
     if len(rows) != len(expiries):
@@ -159,8 +175,9 @@ def _surface(slices: Sequence[Slice], t: float, k: float) -> tuple[float, float,
     return w, w1, w2, (b[0] - a[0]) / (t1 - t0)
 
 
-def dupire(slices: Sequence[Slice],
-           points: Sequence[tuple[float, float]]) -> tuple[list[float], list[float], list[float]]:
+def dupire(
+    slices: Sequence[Slice], points: Sequence[tuple[float, float]]
+) -> tuple[list[float], list[float], list[float]]:
     check_slices(slices)
     if not points:
         raise _input("points is empty", "points")
@@ -192,7 +209,8 @@ def forward_vols(expiries: Floats, vols: Floats) -> list[float]:
     out = [vols[0]]
     for i in range(1, len(vols)):
         radicand = (vols[i] ** 2 * expiries[i] - vols[i - 1] ** 2 * expiries[i - 1]) / (
-            expiries[i] - expiries[i - 1])
+            expiries[i] - expiries[i - 1]
+        )
         if radicand < 0:
             raise _arbitrage("negative forward variance", "vols")
         out.append(math.sqrt(radicand))
@@ -207,8 +225,17 @@ def _black(phi: float, f: float, k: float, v: float, t: float, d: float) -> tupl
     return d * phi * (f * big_n(phi * d1) - k * big_n(phi * d2)), d1
 
 
-def smile_dynamics(p: Svi, t: float, spot: float, shifted: float, rate: float, q: float,
-                   strikes: Floats, rule: str, option_type: str) -> dict[str, list[float]]:
+def smile_dynamics(
+    p: Svi,
+    t: float,
+    spot: float,
+    shifted: float,
+    rate: float,
+    q: float,
+    strikes: Floats,
+    rule: str,
+    option_type: str,
+) -> dict[str, list[float]]:
     if not strikes:
         raise _input("strikes is empty", "strikes")
     _check_svi(p)
@@ -225,14 +252,21 @@ def smile_dynamics(p: Svi, t: float, spot: float, shifted: float, rate: float, q
     phi = 1.0 if option_type == "CALL" else -1.0
     carry = math.exp(-q * t)
     out: dict[str, list[float]] = {
-        "vols_base": [], "vols_shifted": [], "prices_base": [], "prices_shifted": [],
-        "deltas": []}
+        "vols_base": [],
+        "vols_shifted": [],
+        "prices_base": [],
+        "prices_shifted": [],
+        "deltas": [],
+    }
     for strike in strikes:
         k0 = math.log(strike / f0)
         w, w1, _ = _derivatives(p, k0)
         v0 = math.sqrt(w / t)
-        v1 = v0 if rule == "STICKY_STRIKE" else math.sqrt(p.total_variance(
-            math.log(strike / f1)) / t)
+        v1 = (
+            v0
+            if rule == "STICKY_STRIKE"
+            else math.sqrt(p.total_variance(math.log(strike / f1)) / t)
+        )
         price0, d1 = _black(phi, f0, strike, v0, t, d)
         price1, _ = _black(phi, f1, strike, v1, t, d)
         delta = carry * big_n(d1) if phi > 0 else -carry * big_n(-d1)

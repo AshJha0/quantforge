@@ -99,7 +99,7 @@ void op_backtest_traffic_light(const In& in, Out& out) {
     const long long x = in.integer("exceptions");
     const double c = in.real("confidence");
     in.ready();
-    limit_if(n > 100000000, "observations");
+    limit_if(n > 1000000, "observations");  // ruling J-W3-17
     const TrafficLight t = backtest_traffic_light(n, x, c);
     out.key_real("cumulative_probability", t.cumulative_probability);
     out.key_string("zone", t.zone == TrafficZone::Green ? "GREEN" : t.zone == TrafficZone::Yellow ? "YELLOW" : "RED");

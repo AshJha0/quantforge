@@ -2,6 +2,7 @@
 
 Hand cases for each check and output, the property tests the handover names (KKT, integer
 optimality, the minimum-variance R^2, Euler contributions), and second checks against SciPy."""
+
 import builtins
 import itertools
 import math
@@ -35,8 +36,17 @@ def cli_code(operation: str, inputs: dict[str, Any]) -> str:
     return caught.value.code
 
 
-def kkt_residual(a: Any, b: Any, w: Any, ridge: float, x: Any, e: Any = None, rhs: Any = None,
-                 lower: Any = None, upper: Any = None) -> float:
+def kkt_residual(
+    a: Any,
+    b: Any,
+    w: Any,
+    ridge: float,
+    x: Any,
+    e: Any = None,
+    rhs: Any = None,
+    lower: Any = None,
+    upper: Any = None,
+) -> float:
     """Largest KKT violation relative to the gradient scale (NW06 theorem 12.1)."""
     a, b, w, x = (np.asarray(v, dtype=float) for v in (a, b, w, x))
     n = len(x)
@@ -75,6 +85,7 @@ def kkt_residual(a: Any, b: Any, w: Any, ridge: float, x: Any, e: Any = None, rh
 
 # ----- hedge.qp.solve -----
 
+
 def test_unconstrained_qp_is_weighted_least_squares() -> None:
     out = hs.qp_solve(A3, B3, W3)
     root = np.sqrt(W3)
@@ -99,9 +110,13 @@ def test_bounds_agree_with_scipy_bvls() -> None:
     upper: list[float | None] = [1.0, None, -0.5]
     out = hs.qp_solve(A3, B3, W3, lower=lower, upper=upper)
     root = np.sqrt(W3)
-    ref = lsq_linear(np.asarray(A3) * root[:, None], -np.asarray(B3) * root,
-                     bounds=([0.0, -0.3, -np.inf], [1.0, np.inf, -0.5]), method="bvls",
-                     tol=1e-15).x
+    ref = lsq_linear(
+        np.asarray(A3) * root[:, None],
+        -np.asarray(B3) * root,
+        bounds=([0.0, -0.3, -np.inf], [1.0, np.inf, -0.5]),
+        method="bvls",
+        tol=1e-15,
+    ).x
     assert np.allclose(out["x"], ref, rtol=1e-9, atol=1e-12)
     assert kkt_residual(A3, B3, W3, 0.0, out["x"], lower=lower, upper=upper) < 1e-10
 
@@ -151,8 +166,9 @@ def test_min_norm_on_a_regular_problem_equals_the_unique_solution() -> None:
 
 def test_min_norm_with_an_equality_matches_the_pseudo_inverse() -> None:
     a = [[1.0, 1.0, 0.5], [0.5, 0.5, 1.0]]
-    out = hs.qp_solve(a, [-1.0, 0.3], [1.0, 1.0], eq_matrix=[[1.0, -1.0, 2.0]], eq_rhs=[0.4],
-                      singular="MIN_NORM")
+    out = hs.qp_solve(
+        a, [-1.0, 0.3], [1.0, 1.0], eq_matrix=[[1.0, -1.0, 2.0]], eq_rhs=[0.4], singular="MIN_NORM"
+    )
     # Every minimiser is x_p + Z y; the least-norm one is orthogonal to the free direction.
     x = np.asarray(out["x"])
     assert float(np.asarray([1.0, -1.0, 2.0]) @ x) == pytest.approx(0.4, abs=1e-14)
@@ -169,8 +185,9 @@ def test_ridge_regularises_duplicate_instruments() -> None:
 
 
 def test_duplicates_made_regular_by_an_equality() -> None:
-    out = hs.qp_solve([[1.0, 1.0], [0.5, 0.5]], [1.0, 1.0], [1.0, 1.0],
-                      eq_matrix=[[1.0, -1.0]], eq_rhs=[0.0])
+    out = hs.qp_solve(
+        [[1.0, 1.0], [0.5, 0.5]], [1.0, 1.0], [1.0, 1.0], eq_matrix=[[1.0, -1.0]], eq_rhs=[0.0]
+    )
     assert out["x"][0] == pytest.approx(out["x"][1], rel=1e-13)
     assert out["rank"] == 1
 
@@ -190,32 +207,45 @@ def test_already_hedged_book_and_negative_zero() -> None:
     assert out["objective"] == 0.0
 
 
-@pytest.mark.parametrize(("kwargs", "expected"), [
-    ({"b": [1.0]}, "E_INPUT"),
-    ({"a": [[1.0, 2.0], [1.0]]}, "E_INPUT"),
-    ({"a": []}, "E_INPUT"),
-    ({"weights": [1.0]}, "E_INPUT"),
-    ({"eq_matrix": [[1.0, 1.0]]}, "E_INPUT"),
-    ({"eq_matrix": [[1.0]], "eq_rhs": [0.0]}, "E_INPUT"),
-    ({"eq_matrix": [[1.0, 1.0]], "eq_rhs": [0.0, 1.0]}, "E_INPUT"),
-    ({"lower": [0.0]}, "E_INPUT"),
-    ({"upper": [0.0, 1.0, 2.0]}, "E_INPUT"),
-    ({"lower": [0.0, None], "singular": "MIN_NORM"}, "E_INPUT"),
-    ({"weights": [1.0, 0.0]}, "E_DOMAIN"),
-    ({"ridge": -1.0}, "E_DOMAIN"),
-    ({"lower": [1.0, None], "upper": [0.0, None]}, "E_DOMAIN"),
-    ({"eq_matrix": [[1.0, 1.0], [2.0, 2.0]], "eq_rhs": [0.0, 0.0]}, "E_SINGULAR"),
-    ({"eq_matrix": [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]], "eq_rhs": [0.0, 0.0, 0.0]},
-     "E_SINGULAR"),
-    ({"eq_matrix": [[1.0, 1.0]], "eq_rhs": [5.0], "upper": [1.0, 1.0]}, "E_INFEASIBLE"),
-    ({"eq_matrix": [[1.0, -1.0]], "eq_rhs": [3.0], "lower": [0.0, 0.0], "upper": [1.0, 1.0]},
-     "E_INFEASIBLE"),
-    ({"eq_matrix": [[1.0, 0.0]], "eq_rhs": [2.0], "lower": [1.0, None], "upper": [1.0, None]},
-     "E_INFEASIBLE"),
-])
+@pytest.mark.parametrize(
+    ("kwargs", "expected"),
+    [
+        ({"b": [1.0]}, "E_INPUT"),
+        ({"a": [[1.0, 2.0], [1.0]]}, "E_INPUT"),
+        ({"a": []}, "E_INPUT"),
+        ({"weights": [1.0]}, "E_INPUT"),
+        ({"eq_matrix": [[1.0, 1.0]]}, "E_INPUT"),
+        ({"eq_matrix": [[1.0]], "eq_rhs": [0.0]}, "E_INPUT"),
+        ({"eq_matrix": [[1.0, 1.0]], "eq_rhs": [0.0, 1.0]}, "E_INPUT"),
+        ({"lower": [0.0]}, "E_INPUT"),
+        ({"upper": [0.0, 1.0, 2.0]}, "E_INPUT"),
+        ({"lower": [0.0, None], "singular": "MIN_NORM"}, "E_INPUT"),
+        ({"weights": [1.0, 0.0]}, "E_DOMAIN"),
+        ({"ridge": -1.0}, "E_DOMAIN"),
+        ({"lower": [1.0, None], "upper": [0.0, None]}, "E_DOMAIN"),
+        ({"eq_matrix": [[1.0, 1.0], [2.0, 2.0]], "eq_rhs": [0.0, 0.0]}, "E_SINGULAR"),
+        (
+            {"eq_matrix": [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]], "eq_rhs": [0.0, 0.0, 0.0]},
+            "E_SINGULAR",
+        ),
+        ({"eq_matrix": [[1.0, 1.0]], "eq_rhs": [5.0], "upper": [1.0, 1.0]}, "E_INFEASIBLE"),
+        (
+            {"eq_matrix": [[1.0, -1.0]], "eq_rhs": [3.0], "lower": [0.0, 0.0], "upper": [1.0, 1.0]},
+            "E_INFEASIBLE",
+        ),
+        (
+            {
+                "eq_matrix": [[1.0, 0.0]],
+                "eq_rhs": [2.0],
+                "lower": [1.0, None],
+                "upper": [1.0, None],
+            },
+            "E_INFEASIBLE",
+        ),
+    ],
+)
 def test_qp_checks(kwargs: dict[str, Any], expected: str) -> None:
-    base: dict[str, Any] = {"a": [[1.0, 0.0], [0.0, 1.0]], "b": [1.0, -1.0],
-                            "weights": [1.0, 1.0]}
+    base: dict[str, Any] = {"a": [[1.0, 0.0], [0.0, 1.0]], "b": [1.0, -1.0], "weights": [1.0, 1.0]}
     base.update(kwargs)
     assert code(hs.qp_solve, **base) == expected
 
@@ -224,14 +254,65 @@ def test_qp_check_order() -> None:
     # A zero weight with a singular a is E_DOMAIN (hedgeqp_i-0044); singular and infeasible is
     # E_SINGULAR (I-14).
     assert code(hs.qp_solve, [[1.0, 1.0], [0.5, 0.5]], [1.0, 1.0], [0.0, 1.0]) == "E_DOMAIN"
-    assert code(hs.qp_solve, [[1.0, 1.0], [0.5, 0.5]], [1.0, 1.0], [1.0, 1.0],
-                eq_matrix=[[1.0, 1.0]], eq_rhs=[9.0], upper=[1.0, 1.0]) == "E_SINGULAR"
+    assert (
+        code(
+            hs.qp_solve,
+            [[1.0, 1.0], [0.5, 0.5]],
+            [1.0, 1.0],
+            [1.0, 1.0],
+            eq_matrix=[[1.0, 1.0]],
+            eq_rhs=[9.0],
+            upper=[1.0, 1.0],
+        )
+        == "E_SINGULAR"
+    )
 
 
 def test_feasible_tight_box_is_not_infeasible() -> None:
-    out = hs.qp_solve([[1.0, 0.0], [0.0, 1.0]], [1.0, -1.0], [1.0, 1.0],
-                      eq_matrix=[[1.0, 1.0]], eq_rhs=[2.0], upper=[1.0, 1.0])
+    out = hs.qp_solve(
+        [[1.0, 0.0], [0.0, 1.0]],
+        [1.0, -1.0],
+        [1.0, 1.0],
+        eq_matrix=[[1.0, 1.0]],
+        eq_rhs=[2.0],
+        upper=[1.0, 1.0],
+    )
     assert out["x"] == pytest.approx([1.0, 1.0], abs=1e-14)
+
+
+def test_bounded_solve_keeps_a_small_column() -> None:
+    # Found by test_property_qp_kkt_bounds_and_equalities (seed 1): with a bound present the
+    # active-set step cut ranks unscaled, so a 1e-7 column fell below 1e-12 of the largest
+    # eigenvalue and x[0] stayed at 0 (objective 1). R6-6.2 scales before every rank decision.
+    out = hs.qp_solve(
+        [[1e-7, 0.0], [0.0, 1.0]], [1.0, 0.0], [1.0, 1.0], lower=[None, 0.0], upper=[None, 0.0]
+    )
+    assert out["x"] == pytest.approx([-1e7, 0.0], rel=1e-12)
+    assert out["objective"] == pytest.approx(0.0, abs=1e-12)
+
+
+def test_costed_bounded_solve_keeps_a_small_column() -> None:
+    # The costed (orthant) active set had the same unscaled cut as the plain one: with a spread on
+    # x[1] and x[1] fixed at 0 it returned [0, 0], objective 1 (golden hedgecut_j-0002, J-I.1).
+    out = hs.qp_solve(
+        [[1e-7, 0.0], [0.0, 1.0]],
+        [1.0, 0.0],
+        [1.0, 1.0],
+        lower=[None, 0.0],
+        upper=[None, 0.0],
+        half_spreads=[0.0, 0.1],
+    )
+    assert out["x"] == pytest.approx([-1e7, 0.0], rel=1e-12)
+    assert out["objective"] == pytest.approx(0.0, abs=1e-12)
+    out = hs.qp_solve(
+        [[1e-7, 0.0], [0.0, 1.0]],
+        [1.0, 0.0],
+        [1.0, 1.0],
+        lower=[None, -1.0],
+        upper=[None, 1.0],
+        half_spreads=[1e-9, 0.1],
+    )
+    assert out["x"] == pytest.approx([-9.95e6, 0.0], rel=1e-9)
 
 
 bounded = st.one_of(st.none(), st.floats(-2.0, 2.0))
@@ -283,10 +364,40 @@ def test_property_min_norm_equals_the_unique_solution(n: int, data: st.DataObjec
         raise
     least = hs.qp_solve(a, b, w, singular="MIN_NORM")
     assert least["rank"] == unique["rank"] == n
-    assert np.allclose(least["x"], unique["x"], rtol=1e-9, atol=1e-9)
+    assert_same_least_squares_solution(a, unique, least)
+
+
+def assert_same_least_squares_solution(a: Any, unique: Any, least: Any) -> None:
+    """ERROR solves the column-scaled problem, MIN_NORM the unscaled one, so the two agree only
+    to the least-squares perturbation bound [GV13 5.3.8]: a backward-stable solve moves x by
+    about eps (kappa |x| + kappa^2 |r| / |A|), where r = A x + b is the residual at the optimum.
+    The kappa^2 term matters when the residual is not small, so a fixed 1e-9 is not a bound."""
+    m = np.asarray(a, dtype=float)
+    kappa = float(np.linalg.cond(m))
+    top = float(np.linalg.norm(m, 2))
+    x = np.asarray(unique["x"], dtype=float)
+    r = float(np.linalg.norm(unique["residual"]))
+    eps = np.finfo(float).eps
+    bound = 64 * eps * (kappa * float(np.linalg.norm(x)) + kappa * kappa * r / top)
+    assert float(np.linalg.norm(np.asarray(least["x"]) - x)) <= bound
+
+
+def test_min_norm_agrees_within_the_least_squares_bound_with_a_large_residual() -> None:
+    # Found by the property above (hypothesis kept it in mutmut's example database, so every
+    # mutmut stats run replayed it): b sits in a zero row, so the residual is 1 while x = 0, and
+    # kappa ~ 4e4 makes the kappa^2 |r| term about 1e-7, far above a fixed 1e-9.
+    a = [[0.0, 0.0], [1.2396667442731475, 1.0], [0.0, 6.103515625e-05], [0.0, 0.0]]
+    b = [1.0, 0.0, 0.0, 0.0]
+    w = [1.0] * 4
+    unique = hs.qp_solve(a, b, w)
+    least = hs.qp_solve(a, b, w, singular="MIN_NORM")
+    assert unique["x"] == [0.0, 0.0]  # rows 2 and 3 force x = 0 exactly
+    assert least["rank"] == unique["rank"] == 2
+    assert_same_least_squares_solution(a, unique, least)
 
 
 # ----- hedge.integer.solve -----
+
 
 def brute_force(a: Any, b: Any, w: Any, lots: Any, ridge: float, box: int) -> list[int]:
     best: tuple[float, int, tuple[int, ...]] | None = None
@@ -295,8 +406,11 @@ def brute_force(a: Any, b: Any, w: Any, lots: Any, ridge: float, box: int) -> li
         r = [math.fsum([*(row[j] * x[j] for j in range(len(x))), v]) for row, v in zip(a, b)]
         f = math.fsum(wi * ri * ri for wi, ri in zip(w, r)) + ridge * math.fsum(v * v for v in x)
         key = (f, sum(map(abs, n)), n)
-        if best is None or f < best[0] * (1 - 1e-12) or (
-                abs(f - best[0]) <= 1e-12 * abs(best[0]) and key[1:] < best[1:]):
+        if (
+            best is None
+            or f < best[0] * (1 - 1e-12)
+            or (abs(f - best[0]) <= 1e-12 * abs(best[0]) and key[1:] < best[1:])
+        ):
             best = key
     assert best is not None
     return list(best[2])
@@ -319,11 +433,23 @@ def test_integer_ties_follow_ruling_i7() -> None:
     # lexicographically smallest of {(0, 0), (0, 1), (-1, 0), (-1, 1)} by sum is (0, 0).
     out = hs.integer_solve([[1.0, 0.0], [0.0, 1.0]], [0.5, -0.5], [1.0, 1.0], [1.0, 1.0])
     assert out["lots"] == [0, 0]
-    out = hs.integer_solve([[1.0, 0.0], [0.0, 1.0]], [0.5, -0.5], [1.0, 1.0], [1.0, 1.0],
-                           lower_lots=[None, 1], upper_lots=[None, None])
+    out = hs.integer_solve(
+        [[1.0, 0.0], [0.0, 1.0]],
+        [0.5, -0.5],
+        [1.0, 1.0],
+        [1.0, 1.0],
+        lower_lots=[None, 1],
+        upper_lots=[None, None],
+    )
     assert out["lots"] == [0, 1]
-    out = hs.integer_solve([[1.0, 0.0], [0.0, 1.0]], [0.5, 0.5], [1.0, 1.0], [1.0, 1.0],
-                           lower_lots=[None, None], upper_lots=[-1, None])
+    out = hs.integer_solve(
+        [[1.0, 0.0], [0.0, 1.0]],
+        [0.5, 0.5],
+        [1.0, 1.0],
+        [1.0, 1.0],
+        lower_lots=[None, None],
+        upper_lots=[-1, None],
+    )
     assert out["lots"] == [-1, 0]
 
 
@@ -335,27 +461,35 @@ def test_integer_beats_rounding_on_a_correlated_problem() -> None:
 
 
 def test_integer_bounds_bind_and_relaxation_uses_them() -> None:
-    out = hs.integer_solve(A3, B3, W3, [0.1, 0.1, 0.1], lower_lots=[0, 0, None],
-                           upper_lots=[5, None, None])
+    out = hs.integer_solve(
+        A3, B3, W3, [0.1, 0.1, 0.1], lower_lots=[0, 0, None], upper_lots=[5, None, None]
+    )
     assert 0 <= out["lots"][0] <= 5 and out["lots"][1] >= 0
     relaxed = hs.qp_solve(A3, B3, W3, lower=[0.0, 0.0, None], upper=[0.5, None, None])
     assert out["continuous_objective"] == pytest.approx(relaxed["objective"], rel=1e-13)
 
 
-@pytest.mark.parametrize(("kwargs", "expected"), [
-    ({"lot_sizes": [1.0]}, "E_INPUT"),
-    ({"lower_lots": [0]}, "E_INPUT"),
-    ({"lot_sizes": [1.0, 0.0]}, "E_DOMAIN"),
-    ({"weights": [-1.0, 1.0]}, "E_DOMAIN"),
-    ({"ridge": -0.5}, "E_DOMAIN"),
-    ({"lower_lots": [2, None], "upper_lots": [1, None]}, "E_DOMAIN"),
-    ({"a": [[1.0, 1.0], [2.0, 2.0]]}, "E_SINGULAR"),
-    ({"a": [[1.0, 1.0]], "b": [1.0], "weights": [1.0]}, "E_SINGULAR"),
-    ({"a": [[1.0, 1.0], [2.0, 2.0]], "lower_lots": [0, 0], "upper_lots": [1, 1]}, "E_SINGULAR"),
-])
+@pytest.mark.parametrize(
+    ("kwargs", "expected"),
+    [
+        ({"lot_sizes": [1.0]}, "E_INPUT"),
+        ({"lower_lots": [0]}, "E_INPUT"),
+        ({"lot_sizes": [1.0, 0.0]}, "E_DOMAIN"),
+        ({"weights": [-1.0, 1.0]}, "E_DOMAIN"),
+        ({"ridge": -0.5}, "E_DOMAIN"),
+        ({"lower_lots": [2, None], "upper_lots": [1, None]}, "E_DOMAIN"),
+        ({"a": [[1.0, 1.0], [2.0, 2.0]]}, "E_SINGULAR"),
+        ({"a": [[1.0, 1.0]], "b": [1.0], "weights": [1.0]}, "E_SINGULAR"),
+        ({"a": [[1.0, 1.0], [2.0, 2.0]], "lower_lots": [0, 0], "upper_lots": [1, 1]}, "E_SINGULAR"),
+    ],
+)
 def test_integer_checks(kwargs: dict[str, Any], expected: str) -> None:
-    base: dict[str, Any] = {"a": [[1.0, 0.0], [0.0, 1.0]], "b": [1.0, -1.0],
-                            "weights": [1.0, 1.0], "lot_sizes": [1.0, 1.0]}
+    base: dict[str, Any] = {
+        "a": [[1.0, 0.0], [0.0, 1.0]],
+        "b": [1.0, -1.0],
+        "weights": [1.0, 1.0],
+        "lot_sizes": [1.0, 1.0],
+    }
     base.update(kwargs)
     assert code(hs.integer_solve, **base) == expected
 
@@ -385,6 +519,7 @@ def test_property_integer_optimal_against_neighbours(n: int, data: st.DataObject
 
 # ----- hedge.minvar.ratio -----
 
+
 def test_minvar_single_hedge_is_minus_hulls_ratio() -> None:
     sigma_s, sigma_f, rho = 0.2, 0.25, 0.8
     cov = [[sigma_s**2, rho * sigma_s * sigma_f], [rho * sigma_s * sigma_f, sigma_f**2]]
@@ -395,8 +530,9 @@ def test_minvar_single_hedge_is_minus_hulls_ratio() -> None:
 
 @settings(max_examples=40, deadline=None)
 @given(st.integers(1, 3), st.integers(0, 10), st.data())
-def test_property_minvar_effectiveness_is_ols_r_squared(k: int, extra: int,
-                                                        data: st.DataObject) -> None:
+def test_property_minvar_effectiveness_is_ols_r_squared(
+    k: int, extra: int, data: st.DataObject
+) -> None:
     t = k + 2 + extra
     grid = st.integers(-100, 100).map(lambda v: v / 100)
     hedges = [[data.draw(grid) for _ in range(t)] for _ in range(k)]
@@ -413,27 +549,30 @@ def test_property_minvar_effectiveness_is_ols_r_squared(k: int, extra: int,
     # R-squared is undefined for a constant exposure series (zero total sum of squares); numpy's
     # reference then turns rounding noise into a ratio, so the property only holds with variance.
     assume(float(np.sum((y - y.mean()) ** 2)) > 1e-12)
-    r2 = 1 -float(np.sum((y - fitted) ** 2)) / float(np.sum((y - y.mean()) ** 2))
+    r2 = 1 - float(np.sum((y - fitted) ** 2)) / float(np.sum((y - y.mean()) ** 2))
     assert out["effectiveness"] == pytest.approx(r2, abs=1e-8)
     assert np.allclose(out["hedge"], -coef[1:], rtol=1e-7, atol=1e-8)
 
 
-@pytest.mark.parametrize(("kwargs", "expected"), [
-    ({}, "E_INPUT"),
-    ({"covariance": [[1.0, 0.0], [0.0, 1.0]], "exposure_changes": [1.0, 2.0, 3.0]}, "E_INPUT"),
-    ({"exposure_changes": [1.0, 2.0, 3.0]}, "E_INPUT"),
-    ({"hedge_changes": [[1.0, 2.0, 3.0]]}, "E_INPUT"),
-    ({"covariance": [[1.0]]}, "E_INPUT"),
-    ({"covariance": [[1.0, 0.2], [0.2]]}, "E_INPUT"),
-    ({"covariance": [[1.0, 0.2], [0.3, 1.0]]}, "E_INPUT"),
-    ({"exposure_changes": [1.0, 2.0], "hedge_changes": [[1.0, 0.0]]}, "E_INPUT"),
-    ({"exposure_changes": [1.0, 2.0, 4.0], "hedge_changes": [[1.0, 0.0]]}, "E_INPUT"),
-    ({"exposure_changes": [1.0, 2.0, 4.0], "hedge_changes": []}, "E_INPUT"),
-    ({"covariance": [[0.0, 0.0], [0.0, 1.0]]}, "E_DOMAIN"),
-    ({"covariance": [[1.0, 0.0], [0.0, 0.0]]}, "E_SINGULAR"),
-    ({"covariance": [[1.0, 0.5, 0.5], [0.5, 1.0, 1.0], [0.5, 1.0, 1.0]]}, "E_SINGULAR"),
-    ({"covariance": [[1.0, 1.2], [1.2, 1.0]]}, "E_NOT_POSITIVE_DEFINITE"),
-])
+@pytest.mark.parametrize(
+    ("kwargs", "expected"),
+    [
+        ({}, "E_INPUT"),
+        ({"covariance": [[1.0, 0.0], [0.0, 1.0]], "exposure_changes": [1.0, 2.0, 3.0]}, "E_INPUT"),
+        ({"exposure_changes": [1.0, 2.0, 3.0]}, "E_INPUT"),
+        ({"hedge_changes": [[1.0, 2.0, 3.0]]}, "E_INPUT"),
+        ({"covariance": [[1.0]]}, "E_INPUT"),
+        ({"covariance": [[1.0, 0.2], [0.2]]}, "E_INPUT"),
+        ({"covariance": [[1.0, 0.2], [0.3, 1.0]]}, "E_INPUT"),
+        ({"exposure_changes": [1.0, 2.0], "hedge_changes": [[1.0, 0.0]]}, "E_INPUT"),
+        ({"exposure_changes": [1.0, 2.0, 4.0], "hedge_changes": [[1.0, 0.0]]}, "E_INPUT"),
+        ({"exposure_changes": [1.0, 2.0, 4.0], "hedge_changes": []}, "E_INPUT"),
+        ({"covariance": [[0.0, 0.0], [0.0, 1.0]]}, "E_DOMAIN"),
+        ({"covariance": [[1.0, 0.0], [0.0, 0.0]]}, "E_SINGULAR"),
+        ({"covariance": [[1.0, 0.5, 0.5], [0.5, 1.0, 1.0], [0.5, 1.0, 1.0]]}, "E_SINGULAR"),
+        ({"covariance": [[1.0, 1.2], [1.2, 1.0]]}, "E_NOT_POSITIVE_DEFINITE"),
+    ],
+)
 def test_minvar_checks(kwargs: dict[str, Any], expected: str) -> None:
     assert code(hs.minvar_ratio, **kwargs) == expected
 
@@ -456,9 +595,9 @@ def test_unit_greeks_against_finite_differences() -> None:
     h = 1e-3
     assert delta == pytest.approx((price(100 + h, 0.2) - price(100 - h, 0.2)) / (2 * h), rel=1e-8)
     assert gamma == pytest.approx(
-        (price(100 + h, 0.2) - 2 * price(100, 0.2) + price(100 - h, 0.2)) / h**2, rel=1e-5)
-    assert vega == pytest.approx((price(100, 0.2 + 1e-5) - price(100, 0.2 - 1e-5)) / 2e-5,
-                                 rel=1e-7)
+        (price(100 + h, 0.2) - 2 * price(100, 0.2) + price(100 - h, 0.2)) / h**2, rel=1e-5
+    )
+    assert vega == pytest.approx((price(100, 0.2 + 1e-5) - price(100, 0.2 - 1e-5)) / 2e-5, rel=1e-7)
     put = hs._unit_greeks(100.0, 0.03, 0.01, 0.2, "PUT", 105.0, 0.75)
     assert put[0] == pytest.approx(delta - math.exp(-0.01 * 0.75), rel=1e-13)
     assert put[1:] == (gamma, vega)
@@ -480,37 +619,48 @@ def test_target_order_does_not_change_the_answer() -> None:
     assert one["greeks_after"]["delta"] == pytest.approx(two["greeks_after"]["delta"], rel=1e-12)
 
 
-@pytest.mark.parametrize(("change", "expected"), [
-    ({"targets": ["DELTA"]}, "E_INPUT"),
-    ({"targets": ["DELTA", "DELTA"]}, "E_INPUT"),
-    ({"hedges": [], "targets": []}, "E_INPUT"),
-    ({"portfolio": [("UNDERLYING", 100.0, None, 1.0)]}, "E_INPUT"),
-    ({"portfolio": [("CALL", 100.0, None, 1.0)]}, "E_INPUT"),
-    ({"volatility": 0.0}, "E_DOMAIN"),
-    ({"spot": -1.0}, "E_DOMAIN"),
-    ({"portfolio": [("CALL", -100.0, 1.0, 1.0)]}, "E_DOMAIN"),
-    ({"portfolio": [("PUT", 100.0, 0.0, 1.0)]}, "E_DOMAIN"),
-    ({"hedges": [("UNDERLYING", None, None), ("UNDERLYING", None, None)]}, "E_SINGULAR"),
-    ({"hedges": [("CALL", 105.0, 0.25), ("CALL", 105.0, 0.25)]}, "E_SINGULAR"),
-])
+@pytest.mark.parametrize(
+    ("change", "expected"),
+    [
+        ({"targets": ["DELTA"]}, "E_INPUT"),
+        ({"targets": ["DELTA", "DELTA"]}, "E_INPUT"),
+        ({"hedges": [], "targets": []}, "E_INPUT"),
+        ({"portfolio": [("UNDERLYING", 100.0, None, 1.0)]}, "E_INPUT"),
+        ({"portfolio": [("CALL", 100.0, None, 1.0)]}, "E_INPUT"),
+        ({"volatility": 0.0}, "E_DOMAIN"),
+        ({"spot": -1.0}, "E_DOMAIN"),
+        ({"portfolio": [("CALL", -100.0, 1.0, 1.0)]}, "E_DOMAIN"),
+        ({"portfolio": [("PUT", 100.0, 0.0, 1.0)]}, "E_DOMAIN"),
+        ({"hedges": [("UNDERLYING", None, None), ("UNDERLYING", None, None)]}, "E_SINGULAR"),
+        ({"hedges": [("CALL", 105.0, 0.25), ("CALL", 105.0, 0.25)]}, "E_SINGULAR"),
+    ],
+)
 def test_greeks_checks(change: dict[str, Any], expected: str) -> None:
-    args: dict[str, Any] = {"spot": 100.0, "rate": 0.03, "dividend_yield": 0.01,
-                            "volatility": 0.25, "portfolio": BOOK,
-                            "hedges": [("UNDERLYING", None, None), ("CALL", 105.0, 0.25)],
-                            "targets": ["DELTA", "GAMMA"]}
+    args: dict[str, Any] = {
+        "spot": 100.0,
+        "rate": 0.03,
+        "dividend_yield": 0.01,
+        "volatility": 0.25,
+        "portfolio": BOOK,
+        "hedges": [("UNDERLYING", None, None), ("CALL", 105.0, 0.25)],
+        "targets": ["DELTA", "GAMMA"],
+    }
     args.update(change)
     assert code(hs.greeks_neutralise, **args) == expected
 
 
 # ----- hedge.beta.futures -----
 
+
 def test_hulls_thirty_contracts() -> None:
     out = hs.beta_futures(5_050_000, 1.5, 0.0, 1010.0, 250.0)
     assert out == {"contracts": -30.0, "contracts_held": -30.0, "beta_after": 0.0}
 
 
-@pytest.mark.parametrize(("value", "held"), [(2.5, 3.0), (-2.5, -3.0), (2.4999, 2.0),
-                                             (-0.4, 0.0), (0.5, 1.0), (-7.6, -8.0)])
+@pytest.mark.parametrize(
+    ("value", "held"),
+    [(2.5, 3.0), (-2.5, -3.0), (2.4999, 2.0), (-0.4, 0.0), (0.5, 1.0), (-7.6, -8.0)],
+)
 def test_beta_rounds_half_away_from_zero(value: float, held: float) -> None:
     # contracts = (target - beta) V / (F m) with V = F m = 1 and beta = 0.
     out = hs.beta_futures(1.0, 0.0, value, 1.0, 1.0)
@@ -519,11 +669,17 @@ def test_beta_rounds_half_away_from_zero(value: float, held: float) -> None:
     assert hs.beta_futures(1.0, 0.0, value, 1.0, 1.0, "NONE")["contracts_held"] == value
 
 
-@pytest.mark.parametrize("bad", [{"portfolio_value": 0.0}, {"futures_price": 0.0},
-                                 {"multiplier": -250.0}])
+@pytest.mark.parametrize(
+    "bad", [{"portfolio_value": 0.0}, {"futures_price": 0.0}, {"multiplier": -250.0}]
+)
 def test_beta_checks(bad: dict[str, float]) -> None:
-    args = {"portfolio_value": 1e6, "portfolio_beta": 1.2, "target_beta": 0.5,
-            "futures_price": 4000.0, "multiplier": 50.0}
+    args = {
+        "portfolio_value": 1e6,
+        "portfolio_beta": 1.2,
+        "target_beta": 0.5,
+        "futures_price": 4000.0,
+        "multiplier": 50.0,
+    }
     args.update(bad)
     assert code(hs.beta_futures, **args) == "E_DOMAIN"
 
@@ -542,7 +698,8 @@ def test_residual_report_values() -> None:
     assert out["variance_after"] == pytest.approx(float(r @ s @ r), rel=1e-13)
     assert out["volatility_after"] == pytest.approx(math.sqrt(out["variance_after"]), rel=1e-15)
     assert out["effectiveness"] == pytest.approx(
-        1 - out["variance_after"] / out["variance_before"], rel=1e-15)
+        1 - out["variance_after"] / out["variance_before"], rel=1e-15
+    )
 
 
 @settings(max_examples=50, deadline=None)
@@ -561,101 +718,233 @@ def test_property_contributions_sum_to_variance(m: int, n: int, data: st.DataObj
         assume(err.code != "E_DOMAIN")
         raise
     assert math.fsum(out["contributions"]) == pytest.approx(
-        out["variance_after"], rel=1e-12, abs=1e-15)
+        out["variance_after"], rel=1e-12, abs=1e-15
+    )
 
 
-@pytest.mark.parametrize(("change", "expected"), [
-    ({"x": [1.0]}, "E_INPUT"),
-    ({"b": [1.0]}, "E_INPUT"),
-    ({"a": [[1.0, 0.0], [1.0]]}, "E_INPUT"),
-    ({"covariance": [[1.0, 0.0], [0.1, 1.0]]}, "E_INPUT"),
-    ({"covariance": [[1.0]]}, "E_INPUT"),
-    ({"covariance": [[1.0, 0.0], [0.0, -1.0]]}, "E_NOT_POSITIVE_DEFINITE"),
-    ({"b": [0.0, 0.0]}, "E_DOMAIN"),
-])
+@pytest.mark.parametrize(
+    ("change", "expected"),
+    [
+        ({"x": [1.0]}, "E_INPUT"),
+        ({"b": [1.0]}, "E_INPUT"),
+        ({"a": [[1.0, 0.0], [1.0]]}, "E_INPUT"),
+        ({"covariance": [[1.0, 0.0], [0.1, 1.0]]}, "E_INPUT"),
+        ({"covariance": [[1.0]]}, "E_INPUT"),
+        ({"covariance": [[1.0, 0.0], [0.0, -1.0]]}, "E_NOT_POSITIVE_DEFINITE"),
+        ({"b": [0.0, 0.0]}, "E_DOMAIN"),
+    ],
+)
 def test_residual_checks(change: dict[str, Any], expected: str) -> None:
-    args: dict[str, Any] = {"a": [[1.0, 0.0], [0.0, 1.0]], "b": [1.0, -1.0], "x": [0.5, 0.5],
-                            "covariance": [[1.0, 0.0], [0.0, 1.0]]}
+    args: dict[str, Any] = {
+        "a": [[1.0, 0.0], [0.0, 1.0]],
+        "b": [1.0, -1.0],
+        "x": [0.5, 0.5],
+        "covariance": [[1.0, 0.0], [0.0, 1.0]],
+    }
     args.update(change)
     assert code(hs.residual_report, **args) == expected
 
 
 # ----- the CLI: schema, null bounds, limits, finite rule -----
 
+
 def test_cli_null_bounds_and_defaults() -> None:
-    out = execute("hedge.qp.solve", {"a": A3, "b": B3, "weights": W3,
-                                     "lower": [0.0, None, None], "upper": [None, None, None]})
+    out = execute(
+        "hedge.qp.solve",
+        {"a": A3, "b": B3, "weights": W3, "lower": [0.0, None, None], "upper": [None, None, None]},
+    )
     assert out["x"][0] >= 0
-    out = execute("hedge.integer.solve", {"a": [[1.0]], "b": [0.5], "weights": [1.0],
-                                          "lot_sizes": [1.0], "lower_lots": [None],
-                                          "upper_lots": [None]})
+    out = execute(
+        "hedge.integer.solve",
+        {
+            "a": [[1.0]],
+            "b": [0.5],
+            "weights": [1.0],
+            "lot_sizes": [1.0],
+            "lower_lots": [None],
+            "upper_lots": [None],
+        },
+    )
     assert out["lots"] == [0]
-    assert execute("hedge.beta.futures", {"portfolio_value": 1.0, "portfolio_beta": 0.0,
-                                          "target_beta": 2.5, "futures_price": 1.0,
-                                          "multiplier": 1.0})["contracts_held"] == 3.0
+    assert (
+        execute(
+            "hedge.beta.futures",
+            {
+                "portfolio_value": 1.0,
+                "portfolio_beta": 0.0,
+                "target_beta": 2.5,
+                "futures_price": 1.0,
+                "multiplier": 1.0,
+            },
+        )["contracts_held"]
+        == 3.0
+    )
 
 
 def test_cli_greeks_and_residual_and_minvar() -> None:
-    out = execute("hedge.greeks.neutralise", {
-        "spot": 100.0, "rate": 0.03, "dividend_yield": 0.01, "volatility": 0.25,
-        "portfolio": [{"instrument": "CALL", "strike": 100.0, "expiry_years": 0.5,
-                       "quantity": -1000.0}],
-        "hedges": [{"instrument": "UNDERLYING"}], "targets": ["DELTA"]})
+    out = execute(
+        "hedge.greeks.neutralise",
+        {
+            "spot": 100.0,
+            "rate": 0.03,
+            "dividend_yield": 0.01,
+            "volatility": 0.25,
+            "portfolio": [
+                {"instrument": "CALL", "strike": 100.0, "expiry_years": 0.5, "quantity": -1000.0}
+            ],
+            "hedges": [{"instrument": "UNDERLYING"}],
+            "targets": ["DELTA"],
+        },
+    )
     assert abs(out["greeks_after"]["delta"]) < 1e-9
-    out = execute("hedge.residual.report", {"a": [[1.0]], "b": [-1.0], "x": [1.0],
-                                            "covariance": [[1.0]]})
+    out = execute(
+        "hedge.residual.report", {"a": [[1.0]], "b": [-1.0], "x": [1.0], "covariance": [[1.0]]}
+    )
     assert out["effectiveness"] == 1.0
-    out = execute("hedge.minvar.ratio", {"exposure_changes": [1.0, 2.0, 4.0],
-                                         "hedge_changes": [[1.0, 2.0, 3.5]]})
+    out = execute(
+        "hedge.minvar.ratio",
+        {"exposure_changes": [1.0, 2.0, 4.0], "hedge_changes": [[1.0, 2.0, 3.5]]},
+    )
     assert out["effectiveness"] > 0.99
 
 
-@pytest.mark.parametrize(("operation", "inputs", "expected"), [
-    ("hedge.qp.solve", {"a": A3, "b": B3, "weights": W3, "lower": [0.0, None, "x"]}, "E_SCHEMA"),
-    ("hedge.qp.solve", {"a": A3, "b": [None, *B3[1:]], "weights": W3}, "E_SCHEMA"),
-    ("hedge.qp.solve", {"a": A3, "b": B3, "weights": W3, "singular": "PINV"}, "E_SCHEMA"),
-    ("hedge.integer.solve", {"a": [[1.0]], "b": [1.0], "weights": [1.0], "lot_sizes": [1.0],
-                             "lower_lots": [0.5]}, "E_SCHEMA"),
-    ("hedge.greeks.neutralise", {"spot": 100.0, "rate": 0.0, "dividend_yield": 0.0,
-                                 "volatility": 0.2, "portfolio": [1], "hedges": [],
-                                 "targets": []}, "E_SCHEMA"),
-    ("hedge.greeks.neutralise", {"spot": 100.0, "rate": 0.0, "dividend_yield": 0.0,
-                                 "volatility": 0.2, "portfolio": [], "hedges": [],
-                                 "targets": ["THETA"]}, "E_SCHEMA"),
-    ("hedge.beta.futures", {"portfolio_value": 1.0, "portfolio_beta": 0.0, "target_beta": 1.0,
-                            "futures_price": 1.0, "multiplier": 1.0, "rounding": "UP"},
-     "E_SCHEMA"),
-])
+@pytest.mark.parametrize(
+    ("operation", "inputs", "expected"),
+    [
+        (
+            "hedge.qp.solve",
+            {"a": A3, "b": B3, "weights": W3, "lower": [0.0, None, "x"]},
+            "E_SCHEMA",
+        ),
+        ("hedge.qp.solve", {"a": A3, "b": [None, *B3[1:]], "weights": W3}, "E_SCHEMA"),
+        ("hedge.qp.solve", {"a": A3, "b": B3, "weights": W3, "singular": "PINV"}, "E_SCHEMA"),
+        (
+            "hedge.integer.solve",
+            {"a": [[1.0]], "b": [1.0], "weights": [1.0], "lot_sizes": [1.0], "lower_lots": [0.5]},
+            "E_SCHEMA",
+        ),
+        (
+            "hedge.greeks.neutralise",
+            {
+                "spot": 100.0,
+                "rate": 0.0,
+                "dividend_yield": 0.0,
+                "volatility": 0.2,
+                "portfolio": [1],
+                "hedges": [],
+                "targets": [],
+            },
+            "E_SCHEMA",
+        ),
+        (
+            "hedge.greeks.neutralise",
+            {
+                "spot": 100.0,
+                "rate": 0.0,
+                "dividend_yield": 0.0,
+                "volatility": 0.2,
+                "portfolio": [],
+                "hedges": [],
+                "targets": ["THETA"],
+            },
+            "E_SCHEMA",
+        ),
+        (
+            "hedge.beta.futures",
+            {
+                "portfolio_value": 1.0,
+                "portfolio_beta": 0.0,
+                "target_beta": 1.0,
+                "futures_price": 1.0,
+                "multiplier": 1.0,
+                "rounding": "UP",
+            },
+            "E_SCHEMA",
+        ),
+    ],
+)
 def test_cli_schema(operation: str, inputs: dict[str, Any], expected: str) -> None:
     assert cli_code(operation, inputs) == expected
 
 
 def test_cli_limits_follow_ruling_i4() -> None:
     wide = [[1.0] * 13]
-    assert cli_code("hedge.integer.solve", {"a": wide, "b": [1.0], "weights": [1.0],
-                                            "lot_sizes": [1.0] * 13}) == "E_LIMIT"
-    assert cli_code("hedge.qp.solve", {"a": [[1.0] * 201], "b": [1.0],
-                                       "weights": [1.0]}) == "E_LIMIT"
-    assert cli_code("hedge.qp.solve", {"a": [[1.0]] * 1001, "b": [1.0] * 1001,
-                                       "weights": [1.0] * 1001}) == "E_LIMIT"
-    assert cli_code("hedge.qp.solve", {"a": [[1.0]], "b": [1.0], "weights": [1.0],
-                                       "eq_matrix": [[1.0]] * 201,
-                                       "eq_rhs": [0.0] * 201}) == "E_LIMIT"
+    assert (
+        cli_code(
+            "hedge.integer.solve",
+            {"a": wide, "b": [1.0], "weights": [1.0], "lot_sizes": [1.0] * 13},
+        )
+        == "E_LIMIT"
+    )
+    assert (
+        cli_code("hedge.qp.solve", {"a": [[1.0] * 201], "b": [1.0], "weights": [1.0]}) == "E_LIMIT"
+    )
+    assert (
+        cli_code(
+            "hedge.qp.solve", {"a": [[1.0]] * 1001, "b": [1.0] * 1001, "weights": [1.0] * 1001}
+        )
+        == "E_LIMIT"
+    )
+    assert (
+        cli_code(
+            "hedge.qp.solve",
+            {
+                "a": [[1.0]],
+                "b": [1.0],
+                "weights": [1.0],
+                "eq_matrix": [[1.0]] * 201,
+                "eq_rhs": [0.0] * 201,
+            },
+        )
+        == "E_LIMIT"
+    )
     hedge = {"instrument": "UNDERLYING"}
-    assert cli_code("hedge.greeks.neutralise", {
-        "spot": 100.0, "rate": 0.0, "dividend_yield": 0.0, "volatility": 0.2, "portfolio": [],
-        "hedges": [hedge] * 4, "targets": ["DELTA"] * 4}) == "E_LIMIT"
-    assert cli_code("hedge.residual.report", {"a": [[1.0]], "b": [1.0], "x": [1.0],
-                                              "covariance": [[1.0] * 1001] * 1001}) == "E_LIMIT"
+    assert (
+        cli_code(
+            "hedge.greeks.neutralise",
+            {
+                "spot": 100.0,
+                "rate": 0.0,
+                "dividend_yield": 0.0,
+                "volatility": 0.2,
+                "portfolio": [],
+                "hedges": [hedge] * 4,
+                "targets": ["DELTA"] * 4,
+            },
+        )
+        == "E_LIMIT"
+    )
+    assert (
+        cli_code(
+            "hedge.residual.report",
+            {"a": [[1.0]], "b": [1.0], "x": [1.0], "covariance": [[1.0] * 1001] * 1001},
+        )
+        == "E_LIMIT"
+    )
     assert cli_code("hedge.minvar.ratio", {"covariance": [[1.0] * 202] * 202}) == "E_LIMIT"
 
 
 def test_cli_limit_comes_before_the_finite_rule() -> None:
-    assert cli_code("hedge.integer.solve", {"a": [[math.nan] * 13], "b": [1.0], "weights": [1.0],
-                                            "lot_sizes": [1.0] * 13}) == "E_LIMIT"
-    assert cli_code("hedge.beta.futures", {"portfolio_value": 1.0, "portfolio_beta": math.inf,
-                                           "target_beta": 0.0, "futures_price": 1.0,
-                                           "multiplier": 1.0}) == "E_DOMAIN"
+    assert (
+        cli_code(
+            "hedge.integer.solve",
+            {"a": [[math.nan] * 13], "b": [1.0], "weights": [1.0], "lot_sizes": [1.0] * 13},
+        )
+        == "E_LIMIT"
+    )
+    assert (
+        cli_code(
+            "hedge.beta.futures",
+            {
+                "portfolio_value": 1.0,
+                "portfolio_beta": math.inf,
+                "target_beta": 0.0,
+                "futures_price": 1.0,
+                "multiplier": 1.0,
+            },
+        )
+        == "E_DOMAIN"
+    )
 
 
 # --- The full error contract (code, field, message) and branches the hand cases above leave
@@ -674,100 +963,343 @@ def caught(f: Any, *args: Any, **kwargs: Any) -> QfError:
 
 ERRORS = [
     # (function, args, kwargs, code, field, message)
-    (hs.qp_solve, ([], [], []), {}, "E_INPUT", "a",
-     "a must be a non-empty matrix with rows of one length"),
-    (hs.qp_solve, ([[1.0, 2.0], [1.0]], [0.0, 0.0], [1.0, 1.0]), {}, "E_INPUT", "a",
-     "a must be a non-empty matrix with rows of one length"),
+    (
+        hs.qp_solve,
+        ([], [], []),
+        {},
+        "E_INPUT",
+        "a",
+        "a must be a non-empty matrix with rows of one length",
+    ),
+    (
+        hs.qp_solve,
+        ([[1.0, 2.0], [1.0]], [0.0, 0.0], [1.0, 1.0]),
+        {},
+        "E_INPUT",
+        "a",
+        "a must be a non-empty matrix with rows of one length",
+    ),
     (hs.qp_solve, (AE, [1.0], WE), {}, "E_INPUT", "b", "b must have one entry per row of a"),
-    (hs.qp_solve, (AE, BE, [1.0]), {}, "E_INPUT", "weights",
-     "weights must have one entry per row of a"),
-    (hs.qp_solve, (AE, BE, WE), {"eq_matrix": [[1.0, 1.0]]}, "E_INPUT", "eq_matrix",
-     "eq_matrix and eq_rhs go together"),
-    (hs.qp_solve, (AE, BE, WE), {"eq_matrix": [], "eq_rhs": []}, "E_INPUT", "eq_matrix",
-     "an empty eq_matrix: leave out both keys"),
-    (hs.qp_solve, (AE, BE, WE), {"eq_matrix": [[1.0]], "eq_rhs": [1.0]}, "E_INPUT", "eq_matrix",
-     "eq_matrix rows must have one entry per instrument"),
-    (hs.qp_solve, (AE, BE, WE), {"eq_matrix": [[1.0, 1.0]], "eq_rhs": [1.0, 2.0]}, "E_INPUT",
-     "eq_rhs", "eq_rhs must have one entry per row of eq_matrix"),
-    (hs.qp_solve, (AE, BE, WE), {"lower": [0.0]}, "E_INPUT", "lower",
-     "lower must have one entry per instrument"),
-    (hs.qp_solve, (AE, BE, WE), {"upper": [0.0, 1.0, 2.0]}, "E_INPUT", "upper",
-     "upper must have one entry per instrument"),
-    (hs.qp_solve, (AE, BE, WE), {"lower": [0.0, None], "singular": "MIN_NORM"}, "E_INPUT",
-     "singular", "MIN_NORM takes no bounds (ruling I-5)"),
-    (hs.qp_solve, (AE, BE, WE), {"lower": [1.0, None], "upper": [0.0, None]}, "E_DOMAIN", "lower",
-     "a lower bound is above its upper bound"),
-    (hs.qp_solve, (AE, BE, WE), {"eq_matrix": [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]],
-                              "eq_rhs": [1.0, 1.0, 2.0]}, "E_SINGULAR", "eq_matrix",
-     "more equalities than instruments"),
-    (hs.qp_solve, (AE, BE, WE), {"eq_matrix": [[1.0, 1.0], [2.0, 2.0]], "eq_rhs": [1.0, 2.0]},
-     "E_SINGULAR", "eq_matrix", "the equality rows are dependent"),
-    (hs.qp_solve, (AE, BE, WE), {"half_spreads": [0.1]}, "E_INPUT", "half_spreads",
-     "half_spreads must have one entry per instrument"),
-    (hs.qp_solve, (AE, BE, WE), {"impact": [0.1]}, "E_INPUT", "impact",
-     "impact must have one entry per instrument"),
-    (hs.qp_solve, (AE, BE, WE), {"margin_rates": [0.1, 0.1]}, "E_INPUT", "margin_rates",
-     "margin_rates and margin_limit go together"),
-    (hs.qp_solve, (AE, BE, WE), {"impact": [0.1, 0.1], "singular": "MIN_NORM"}, "E_INPUT",
-     "singular", "MIN_NORM takes no cost or margin input"),
-    (hs.qp_solve, (AE, BE, WE), {"half_spreads": [0.1, -0.1]}, "E_DOMAIN", "half_spreads",
-     "half_spreads must not be negative"),
-    (hs.qp_solve, (AE, BE, WE), {"impact": [0.1, 0.1], "cost_weight": -1.0}, "E_DOMAIN",
-     "cost_weight", "cost_weight must not be negative"),
-    (hs.qp_solve, (AE, BE, WE), {"margin_rates": [0.1, 0.1], "margin_limit": -1.0}, "E_DOMAIN",
-     "margin_limit", "margin_limit must not be negative"),
-    (hs.frontier_solve, (AE, BE, WE, [0.0, 1.0]), {"impact": [0.1, 0.1], "cost_weight": 1.0},
-     "E_INPUT", "cost_weight", "give cost_weights, not cost_weight"),
-    (hs.frontier_solve, (AE, BE, WE, [1.0, 1.0]), {"impact": [0.1, 0.1]}, "E_INPUT",
-     "cost_weights", "cost_weights must be non-empty and increasing"),
-    (hs.frontier_solve, (AE, BE, WE, []), {"impact": [0.1, 0.1]}, "E_INPUT", "cost_weights",
-     "cost_weights must be non-empty and increasing"),
-    (hs.frontier_solve, (AE, BE, WE, [0.0, 1.0]), {}, "E_INPUT", "half_spreads",
-     "a frontier needs half_spreads or impact"),
-    (hs.residual_report, ([], [], [], []), {}, "E_INPUT", "a",
-     "a must be a non-empty matrix with rows of one length"),
-    (hs.residual_report, (AE, [1.0], [0.0, 0.0], COV3), {}, "E_INPUT", "b",
-     "b must have one entry per row of a"),
-    (hs.residual_report, (AE, BE, [0.0], COV3), {}, "E_INPUT", "x",
-     "x must have one entry per column of a"),
-    (hs.residual_report, (AE, BE, [0.0, 0.0], [[1.0]]), {}, "E_INPUT", "covariance",
-     "covariance must be m x m"),
-    (hs.residual_report, (AE, BE, [0.0, 0.0], [[1.0, 0.5, 0.0], [0.0, 1.0, 0.0],
-                                              [0.0, 0.0, 1.0]]), {}, "E_INPUT", "covariance",
-     "covariance is not symmetric"),
-    (hs.residual_report, (AE, BE, [0.0, 0.0], [[1.0, 2.0, 0.0], [2.0, 1.0, 0.0],
-                                              [0.0, 0.0, 1.0]]), {},
-     "E_NOT_POSITIVE_DEFINITE", "covariance", "the covariance has a negative eigenvalue"),
-    (hs.minvar_ratio, (), {}, "E_INPUT", "covariance",
-     "give either covariance or the two series"),
-    (hs.minvar_ratio, (), {"exposure_changes": [1.0, 2.0, 3.0]}, "E_INPUT", "hedge_changes",
-     "exposure_changes and hedge_changes go together"),
-    (hs.minvar_ratio, (), {"exposure_changes": [1.0, 2.0, 3.0], "hedge_changes": []},
-     "E_INPUT", "hedge_changes", "at least one hedge series is needed"),
-    (hs.minvar_ratio, (), {"exposure_changes": [1.0, 2.0, 3.0], "hedge_changes": [[1.0, 2.0]]},
-     "E_INPUT", "hedge_changes", "the series differ in length"),
-    (hs.minvar_ratio, (), {"exposure_changes": [1.0, 2.0], "hedge_changes": [[1.0, 2.0]]},
-     "E_INPUT", "exposure_changes", "at least k + 2 observations are needed"),
-    (hs.minvar_ratio, (), {"covariance": [[1.0]]}, "E_INPUT", "covariance",
-     "covariance must be square and at least 2 x 2"),
-    (hs.minvar_ratio, (), {"covariance": [[0.0, 0.0], [0.0, 1.0]]}, "E_DOMAIN", "covariance",
-     "the position has no variance to hedge"),
-    (hs.minvar_ratio, (), {"covariance": [[1.0, 0.0], [0.0, -1.0]]},
-     "E_NOT_POSITIVE_DEFINITE", "covariance", "a hedge variance is negative"),
-    (hs.minvar_ratio, (), {"covariance": [[1.0, 0.0], [0.0, 0.0]]}, "E_SINGULAR",
-     "covariance", "the hedge instruments are dependent"),
-    (hs.beta_futures, (0.0, 1.0, 0.0, 100.0, 10.0), {}, "E_DOMAIN", "portfolio_value",
-     "portfolio_value must be positive"),
-    (hs.beta_futures, (1.0, 1.0, 0.0, 0.0, 10.0), {}, "E_DOMAIN", "futures_price",
-     "futures_price must be positive"),
-    (hs.beta_futures, (1.0, 1.0, 0.0, 100.0, 0.0), {}, "E_DOMAIN", "multiplier",
-     "multiplier must be positive"),
+    (
+        hs.qp_solve,
+        (AE, BE, [1.0]),
+        {},
+        "E_INPUT",
+        "weights",
+        "weights must have one entry per row of a",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"eq_matrix": [[1.0, 1.0]]},
+        "E_INPUT",
+        "eq_matrix",
+        "eq_matrix and eq_rhs go together",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"eq_matrix": [], "eq_rhs": []},
+        "E_INPUT",
+        "eq_matrix",
+        "an empty eq_matrix: leave out both keys",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"eq_matrix": [[1.0]], "eq_rhs": [1.0]},
+        "E_INPUT",
+        "eq_matrix",
+        "eq_matrix rows must have one entry per instrument",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"eq_matrix": [[1.0, 1.0]], "eq_rhs": [1.0, 2.0]},
+        "E_INPUT",
+        "eq_rhs",
+        "eq_rhs must have one entry per row of eq_matrix",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"lower": [0.0]},
+        "E_INPUT",
+        "lower",
+        "lower must have one entry per instrument",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"upper": [0.0, 1.0, 2.0]},
+        "E_INPUT",
+        "upper",
+        "upper must have one entry per instrument",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"lower": [0.0, None], "singular": "MIN_NORM"},
+        "E_INPUT",
+        "singular",
+        "MIN_NORM takes no bounds (ruling I-5)",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"lower": [1.0, None], "upper": [0.0, None]},
+        "E_DOMAIN",
+        "lower",
+        "a lower bound is above its upper bound",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"eq_matrix": [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]], "eq_rhs": [1.0, 1.0, 2.0]},
+        "E_SINGULAR",
+        "eq_matrix",
+        "more equalities than instruments",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"eq_matrix": [[1.0, 1.0], [2.0, 2.0]], "eq_rhs": [1.0, 2.0]},
+        "E_SINGULAR",
+        "eq_matrix",
+        "the equality rows are dependent",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"half_spreads": [0.1]},
+        "E_INPUT",
+        "half_spreads",
+        "half_spreads must have one entry per instrument",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"impact": [0.1]},
+        "E_INPUT",
+        "impact",
+        "impact must have one entry per instrument",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"margin_rates": [0.1, 0.1]},
+        "E_INPUT",
+        "margin_rates",
+        "margin_rates and margin_limit go together",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"impact": [0.1, 0.1], "singular": "MIN_NORM"},
+        "E_INPUT",
+        "singular",
+        "MIN_NORM takes no cost or margin input",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"half_spreads": [0.1, -0.1]},
+        "E_DOMAIN",
+        "half_spreads",
+        "half_spreads must not be negative",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"impact": [0.1, 0.1], "cost_weight": -1.0},
+        "E_DOMAIN",
+        "cost_weight",
+        "cost_weight must not be negative",
+    ),
+    (
+        hs.qp_solve,
+        (AE, BE, WE),
+        {"margin_rates": [0.1, 0.1], "margin_limit": -1.0},
+        "E_DOMAIN",
+        "margin_limit",
+        "margin_limit must not be negative",
+    ),
+    (
+        hs.frontier_solve,
+        (AE, BE, WE, [0.0, 1.0]),
+        {"impact": [0.1, 0.1], "cost_weight": 1.0},
+        "E_INPUT",
+        "cost_weight",
+        "give cost_weights, not cost_weight",
+    ),
+    (
+        hs.frontier_solve,
+        (AE, BE, WE, [1.0, 1.0]),
+        {"impact": [0.1, 0.1]},
+        "E_INPUT",
+        "cost_weights",
+        "cost_weights must be non-empty and increasing",
+    ),
+    (
+        hs.frontier_solve,
+        (AE, BE, WE, []),
+        {"impact": [0.1, 0.1]},
+        "E_INPUT",
+        "cost_weights",
+        "cost_weights must be non-empty and increasing",
+    ),
+    (
+        hs.frontier_solve,
+        (AE, BE, WE, [0.0, 1.0]),
+        {},
+        "E_INPUT",
+        "half_spreads",
+        "a frontier needs half_spreads or impact",
+    ),
+    (
+        hs.residual_report,
+        ([], [], [], []),
+        {},
+        "E_INPUT",
+        "a",
+        "a must be a non-empty matrix with rows of one length",
+    ),
+    (
+        hs.residual_report,
+        (AE, [1.0], [0.0, 0.0], COV3),
+        {},
+        "E_INPUT",
+        "b",
+        "b must have one entry per row of a",
+    ),
+    (
+        hs.residual_report,
+        (AE, BE, [0.0], COV3),
+        {},
+        "E_INPUT",
+        "x",
+        "x must have one entry per column of a",
+    ),
+    (
+        hs.residual_report,
+        (AE, BE, [0.0, 0.0], [[1.0]]),
+        {},
+        "E_INPUT",
+        "covariance",
+        "covariance must be m x m",
+    ),
+    (
+        hs.residual_report,
+        (AE, BE, [0.0, 0.0], [[1.0, 0.5, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
+        {},
+        "E_INPUT",
+        "covariance",
+        "covariance is not symmetric",
+    ),
+    (
+        hs.residual_report,
+        (AE, BE, [0.0, 0.0], [[1.0, 2.0, 0.0], [2.0, 1.0, 0.0], [0.0, 0.0, 1.0]]),
+        {},
+        "E_NOT_POSITIVE_DEFINITE",
+        "covariance",
+        "the covariance has a negative eigenvalue",
+    ),
+    (hs.minvar_ratio, (), {}, "E_INPUT", "covariance", "give either covariance or the two series"),
+    (
+        hs.minvar_ratio,
+        (),
+        {"exposure_changes": [1.0, 2.0, 3.0]},
+        "E_INPUT",
+        "hedge_changes",
+        "exposure_changes and hedge_changes go together",
+    ),
+    (
+        hs.minvar_ratio,
+        (),
+        {"exposure_changes": [1.0, 2.0, 3.0], "hedge_changes": []},
+        "E_INPUT",
+        "hedge_changes",
+        "at least one hedge series is needed",
+    ),
+    (
+        hs.minvar_ratio,
+        (),
+        {"exposure_changes": [1.0, 2.0, 3.0], "hedge_changes": [[1.0, 2.0]]},
+        "E_INPUT",
+        "hedge_changes",
+        "the series differ in length",
+    ),
+    (
+        hs.minvar_ratio,
+        (),
+        {"exposure_changes": [1.0, 2.0], "hedge_changes": [[1.0, 2.0]]},
+        "E_INPUT",
+        "exposure_changes",
+        "at least k + 2 observations are needed",
+    ),
+    (
+        hs.minvar_ratio,
+        (),
+        {"covariance": [[1.0]]},
+        "E_INPUT",
+        "covariance",
+        "covariance must be square and at least 2 x 2",
+    ),
+    (
+        hs.minvar_ratio,
+        (),
+        {"covariance": [[0.0, 0.0], [0.0, 1.0]]},
+        "E_DOMAIN",
+        "covariance",
+        "the position has no variance to hedge",
+    ),
+    (
+        hs.minvar_ratio,
+        (),
+        {"covariance": [[1.0, 0.0], [0.0, -1.0]]},
+        "E_NOT_POSITIVE_DEFINITE",
+        "covariance",
+        "a hedge variance is negative",
+    ),
+    (
+        hs.minvar_ratio,
+        (),
+        {"covariance": [[1.0, 0.0], [0.0, 0.0]]},
+        "E_SINGULAR",
+        "covariance",
+        "the hedge instruments are dependent",
+    ),
+    (
+        hs.beta_futures,
+        (0.0, 1.0, 0.0, 100.0, 10.0),
+        {},
+        "E_DOMAIN",
+        "portfolio_value",
+        "portfolio_value must be positive",
+    ),
+    (
+        hs.beta_futures,
+        (1.0, 1.0, 0.0, 0.0, 10.0),
+        {},
+        "E_DOMAIN",
+        "futures_price",
+        "futures_price must be positive",
+    ),
+    (
+        hs.beta_futures,
+        (1.0, 1.0, 0.0, 100.0, 0.0),
+        {},
+        "E_DOMAIN",
+        "multiplier",
+        "multiplier must be positive",
+    ),
 ]
 
 
 @pytest.mark.parametrize(("f", "args", "kwargs", "err", "field", "message"), ERRORS)
-def test_error_contract(f: Any, args: tuple[Any, ...], kwargs: dict[str, Any], err: str,
-                        field: str, message: str) -> None:
+def test_error_contract(
+    f: Any, args: tuple[Any, ...], kwargs: dict[str, Any], err: str, field: str, message: str
+) -> None:
     e = caught(f, *args, **kwargs)
     assert (e.code, e.field, e.message, str(e)) == (err, field, message, message)
 
@@ -794,8 +1326,12 @@ def test_phase_one_lower_bounds_only() -> None:
     x = hs._phase_one(e_mat, np.array([1.0, 0.0]), [0.0, 0.0], [None, None])
     assert x is not None
     np.testing.assert_allclose(x, [0.5, 0.5], atol=1e-12)
-    free = hs._phase_one(np.array([[1.0, 2.0, 0.0], [0.0, 1.0, 1.0], [1.0, 0.0, 1.0]]),
-                         np.array([3.0, 2.0, 2.0]), [None, 0.0, None], [None, None, 5.0])
+    free = hs._phase_one(
+        np.array([[1.0, 2.0, 0.0], [0.0, 1.0, 1.0], [1.0, 0.0, 1.0]]),
+        np.array([3.0, 2.0, 2.0]),
+        [None, 0.0, None],
+        [None, None, 5.0],
+    )
     assert free is not None
     np.testing.assert_allclose(free, [1.0, 1.0, 1.0], atol=1e-12)
 
@@ -810,9 +1346,16 @@ def test_phase_one_three_equalities_exact_point() -> None:
 
 
 def test_qp_with_two_equalities_and_bounds_is_feasible() -> None:
-    out = hs.qp_solve(AE + [[0.2, 0.1]], BE + [0.3], WE + [1.0], ridge=0.1,
-                      eq_matrix=[[1.0, 1.0], [1.0, -1.0]], eq_rhs=[1.0, 0.2],
-                      lower=[0.0, 0.0], upper=[1.0, 1.0])
+    out = hs.qp_solve(
+        AE + [[0.2, 0.1]],
+        BE + [0.3],
+        WE + [1.0],
+        ridge=0.1,
+        eq_matrix=[[1.0, 1.0], [1.0, -1.0]],
+        eq_rhs=[1.0, 0.2],
+        lower=[0.0, 0.0],
+        upper=[1.0, 1.0],
+    )
     np.testing.assert_allclose(out["x"], [0.6, 0.4], atol=1e-12)
 
 
@@ -826,16 +1369,16 @@ def test_frontier_points_keep_the_upper_bound() -> None:
     assert out["points"][0]["x"][0] == pytest.approx(0.5, abs=1e-12)
     # Each point matches the single costed solve with the same weight and bound.
     for point in out["points"]:
-        one = hs.qp_solve(AE, BE, WE, impact=[0.01, 0.01], cost_weight=point["cost_weight"],
-                          upper=[0.5, None])
+        one = hs.qp_solve(
+            AE, BE, WE, impact=[0.01, 0.01], cost_weight=point["cost_weight"], upper=[0.5, None]
+        )
         assert point["x"] == pytest.approx(one["x"], abs=1e-12)
 
 
 def test_frontier_points_keep_the_lower_bound() -> None:
     free = hs.qp_solve(AE, BE, WE, impact=[0.0, 0.0])
     floor = free["x"][1] + 0.5
-    out = hs.frontier_solve(AE, BE, WE, [0.0, 2.0], half_spreads=[0.01, 0.01],
-                            lower=[None, floor])
+    out = hs.frontier_solve(AE, BE, WE, [0.0, 2.0], half_spreads=[0.01, 0.01], lower=[None, floor])
     for point in out["points"]:
         assert point["x"][1] >= floor - 1e-12
 
@@ -845,8 +1388,11 @@ def test_active_set_iteration_cap(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(hs, "_ITER_SLOPE", 0)
     monkeypatch.setattr(hs, "_ITER_BASE", 0)
     e = caught(hs.qp_solve, AE, BE, WE, lower=[0.0, 0.0], upper=[0.5, 0.5])
-    assert (e.code, e.field, e.message) == ("E_NO_CONVERGENCE", None,
-                                            "the active-set search did not settle")
+    assert (e.code, e.field, e.message) == (
+        "E_NO_CONVERGENCE",
+        None,
+        "the active-set search did not settle",
+    )
 
 
 def test_phase_one_iteration_cap(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -861,5 +1407,23 @@ def test_phase_one_iteration_cap(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(hs, "range", capped, raising=False)
     e_mat = np.array([[1.0, 1.0], [1.0, -1.0]])
     e = caught(hs._phase_one, e_mat, np.array([1.0, 0.0]), [0.0, 0.0], [1.0, 1.0])
-    assert (e.code, e.field, e.message) == ("E_NO_CONVERGENCE", None,
-                                            "the feasibility search did not settle")
+    assert (e.code, e.field, e.message) == (
+        "E_NO_CONVERGENCE",
+        None,
+        "the feasibility search did not settle",
+    )
+
+
+def test_integer_singularity_check_is_scaled() -> None:
+    # Java property seed -11115467 (PR #45 CI 2026-11-17): near-collinear columns. The
+    # unscaled eigenvalue ratio of L H L is 1.7e-14 but the Jacobi-scaled ratio is 1.4e-12,
+    # so ruling R6-6.2 makes the problem regular. Square and nonsingular, the relaxed
+    # minimum is exactly 0; lots and objective checked by exact rational arithmetic.
+    a = [[-0.04684068765297382, 0.85014589759939], [0.06966430897729968, -1.2643959406278287]]
+    b = [-18.480681166672692, -6.198617610506782]
+    w = [1.6701886487345696, 2.992546829483374]
+    out = hs.integer_solve(a, b, w, [10.0, 10.0], upper_lots=[3, 3])
+    assert out["lots"] == [-8208927, -452287]
+    assert out["objective"] == pytest.approx(1.5462392586798939e-06, rel=1e-6)
+    assert abs(out["continuous_objective"]) <= 1e-10
+    assert out["objective"] >= out["continuous_objective"]

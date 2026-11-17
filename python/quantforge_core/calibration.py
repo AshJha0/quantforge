@@ -3,6 +3,7 @@
 All three methods work on one stacked residual vector, whose squares sum to the objective:
 sqrt(w_i) (m_i - y_i), then sqrt(lambda) (p - prior).
 """
+
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -41,8 +42,9 @@ def _model(name: str, x: float, p: Floats) -> float:
 
 
 class _Problem:
-    def __init__(self, model: str, x: Floats, y: Floats, weights: Floats, lam: float,
-                 prior: Floats) -> None:
+    def __init__(
+        self, model: str, x: Floats, y: Floats, weights: Floats, lam: float, prior: Floats
+    ) -> None:
         self.model, self.x, self.y = model, x, y
         self.root_w = [math.sqrt(w) for w in weights]
         self.root_lam = math.sqrt(lam)
@@ -66,7 +68,7 @@ class _Problem:
         """A point where the model cannot be evaluated counts as infinitely bad."""
         try:
             value = math.fsum(r * r for r in self.residuals(p))
-        except (ArithmeticError, ValueError):
+        except ArithmeticError, ValueError:
             return math.inf
         return value if math.isfinite(value) else math.inf
 
@@ -91,8 +93,8 @@ class _Problem:
         columns = []
         for j, v in enumerate(p):
             h = 1e-6 * (1 + abs(v))
-            up = self.residuals([*p[:j], v + h, *p[j + 1:]])
-            down = self.residuals([*p[:j], v - h, *p[j + 1:]])
+            up = self.residuals([*p[:j], v + h, *p[j + 1 :]])
+            down = self.residuals([*p[:j], v - h, *p[j + 1 :]])
             columns.append([(a - b) / (2 * h) for a, b in zip(up, down, strict=True)])
         return [list(row) for row in zip(*columns, strict=True)]
 
@@ -158,7 +160,8 @@ def _levenberg_marquardt(
         jtj, jtr = _normal(problem.jacobian(p), problem.residuals(p))
         # A variable on a bound that the gradient pushes outwards takes no part in the step.
         free = [
-            i for i in range(n)
+            i
+            for i in range(n)
             if not ((p[i] <= lower[i] and jtr[i] > 0) or (p[i] >= upper[i] and jtr[i] < 0))
         ]
         if 2 * _norm([jtr[i] for i in free]) <= _GRADIENT_TOL:
@@ -253,16 +256,24 @@ def _bfgs(problem: _Problem, start: Floats, max_iter: int) -> tuple[list[float],
             yhy = math.fsum(u * v for u, v in zip(y, hy, strict=True))
             for i in range(n):
                 for j in range(n):
-                    h[i][j] += (
-                        (1 + yhy / sy) * s[i] * s[j] / sy - (hy[i] * s[j] + s[i] * hy[j]) / sy
-                    )
+                    h[i][j] += (1 + yhy / sy) * s[i] * s[j] / sy - (
+                        hy[i] * s[j] + s[i] * hy[j]
+                    ) / sy
     raise _no_convergence(max_iter)
 
 
 def fit(
-    model: str, x: Floats, y: Floats, start: Floats, method: str,
-    weights: Floats | None = None, regularisation: float = 0.0, prior: Floats | None = None,
-    lower: Floats | None = None, upper: Floats | None = None, max_iter: int = 1000,
+    model: str,
+    x: Floats,
+    y: Floats,
+    start: Floats,
+    method: str,
+    weights: Floats | None = None,
+    regularisation: float = 0.0,
+    prior: Floats | None = None,
+    lower: Floats | None = None,
+    upper: Floats | None = None,
+    max_iter: int = 1000,
 ) -> Fit:
     n = PARAMETERS[model]
     if len(x) != len(y):
@@ -282,8 +293,10 @@ def fit(
         raise QfError("E_INPUT", "bounds have the wrong length")
     if max_iter < 1:
         raise QfError("E_INPUT", "need max_iter >= 1", "max_iter")
-    if lower is not None and upper is not None and any(
-        lo > hi for lo, hi in zip(lower, upper, strict=True)
+    if (
+        lower is not None
+        and upper is not None
+        and any(lo > hi for lo, hi in zip(lower, upper, strict=True))
     ):
         raise QfError("E_INPUT", "lower is above upper")
     if weights is not None and any(w < 0 for w in weights):
@@ -292,7 +305,11 @@ def fit(
         raise QfError("E_DOMAIN", "regularisation must not be negative", "regularisation")
 
     problem = _Problem(
-        model, x, y, weights if weights is not None else [1.0] * len(x), regularisation,
+        model,
+        x,
+        y,
+        weights if weights is not None else [1.0] * len(x),
+        regularisation,
         prior if prior is not None else [0.0] * n,
     )
     box_low = lower if lower is not None else [-math.inf] * n
@@ -305,9 +322,7 @@ def fit(
     elif method == "BFGS":
         p, iterations, status = _bfgs(problem, start, max_iter)
     else:
-        p, iterations, status = _levenberg_marquardt(
-            problem, start, max_iter, box_low, box_high
-        )
+        p, iterations, status = _levenberg_marquardt(problem, start, max_iter, box_low, box_high)
     return Fit(p, problem.objective(p), iterations, status, problem.raw(p))
 
 

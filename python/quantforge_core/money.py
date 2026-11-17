@@ -2,6 +2,7 @@
 
 Amounts are held as integers in units of 1e-8, so no binary rounding can reach them.
 """
+
 import re
 
 from .errors import QfError

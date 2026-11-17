@@ -1,4 +1,5 @@
 """Commodity forward curves and storage carry (specifications/02-curves/commodity.md)."""
+
 import itertools
 import math
 from collections.abc import Sequence
@@ -11,7 +12,8 @@ from .finite import guard
 
 
 def commodity_forwards(
-    quotes: Sequence[tuple[int, float]], seasonality: Sequence[float] | None,
+    quotes: Sequence[tuple[int, float]],
+    seasonality: Sequence[float] | None,
     months: Sequence[int],
 ) -> list[float]:
     if not quotes or any(b <= a for (a, _), (b, _) in itertools.pairwise(quotes)):
@@ -40,11 +42,14 @@ def commodity_forwards(
 
 
 def storage_carry(
-    funding: CurveData, forwards: Sequence[tuple[date, float]], u: float,
+    funding: CurveData,
+    forwards: Sequence[tuple[date, float]],
+    u: float,
 ) -> tuple[list[float], list[float], list[bool]]:
     c = curves.build(funding)
     if len(forwards) < 2 or any(
-            b <= a for a, b in itertools.pairwise([c.as_of, *(d for d, _ in forwards)])):
+        b <= a for a, b in itertools.pairwise([c.as_of, *(d for d, _ in forwards)])
+    ):
         raise QfError("E_INPUT", "need two or more forwards, increasing after as_of", "forwards")
     if u < 0:
         raise QfError("E_DOMAIN", "storage_cost must not be negative", "storage_cost")

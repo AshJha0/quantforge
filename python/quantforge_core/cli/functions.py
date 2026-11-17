@@ -1,4 +1,5 @@
 """The test function registry (specifications/01-core/test-functions.md). CLI layer only."""
+
 import math
 from collections.abc import Callable
 

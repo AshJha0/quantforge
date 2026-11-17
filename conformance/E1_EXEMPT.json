@@ -20,5 +20,6 @@
  "core.units.add_money": "no Real input in any golden: a non-finite value cannot be sent",
  "core.units.round_money": "no Real input in any golden: a non-finite value cannot be sent",
  "fx.spot_date": "no Real input in any golden: a non-finite value cannot be sent",
- "rates.schedule.generate": "no Real input in any golden: a non-finite value cannot be sent"
+ "rates.schedule.generate": "no Real input in any golden: a non-finite value cannot be sent",
+ "research.cv.cpcv_paths": "no Real input in any golden: a non-finite value cannot be sent"
 }

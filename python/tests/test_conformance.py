@@ -1,4 +1,5 @@
 """Runs every golden case in process, judged by the neutral runner's own comparison."""
+
 import importlib.util
 import json
 from pathlib import Path

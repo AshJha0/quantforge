@@ -1,4 +1,5 @@
 """Monte Carlo for a European option under GBM (specifications/01-core/monte-carlo.md)."""
+
 import math
 from collections.abc import Iterator, Sequence
 
@@ -18,7 +19,7 @@ def _draws(method: str, paths: int, steps: int, seed: int, stream: int) -> Itera
     else:
         draws = Xoshiro256.seeded(seed, stream).normals(paths * steps)  # path-major order
         for k in range(0, paths * steps, steps):
-            yield draws[k:k + steps]
+            yield draws[k : k + steps]
 
 
 def _mean_and_stderr(samples: Sequence[float]) -> tuple[float, float]:
@@ -29,8 +30,18 @@ def _mean_and_stderr(samples: Sequence[float]) -> tuple[float, float]:
 
 
 def gbm_european(
-    option: str, spot: float, strike: float, r: float, q: float, sigma: float, t: float,
-    paths: int, steps: int, seed: int, stream: int, method: str,
+    option: str,
+    spot: float,
+    strike: float,
+    r: float,
+    q: float,
+    sigma: float,
+    t: float,
+    paths: int,
+    steps: int,
+    seed: int,
+    stream: int,
+    method: str,
 ) -> tuple[float, float]:
     """Returns (price, stderr)."""
     if spot <= 0 or strike <= 0 or sigma <= 0 or t <= 0:

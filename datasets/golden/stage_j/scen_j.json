@@ -1,0 +1,1598 @@
+{
+ "schema_version": "1.0",
+ "suite": "scen_j",
+ "spec": "specifications/06-risk/scenario-stress.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_j_w3.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "scen_j-0001",
+   "operation": "risk.scenario.historical_shock",
+   "inputs": {
+    "dates": [
+     "2020-02-19",
+     "2020-03-09"
+    ],
+    "tenors": [
+     2.0,
+     10.0
+    ],
+    "yields": [
+     [
+      1.43,
+      1.56
+     ],
+     [
+      0.46,
+      0.54
+     ]
+    ],
+    "start_date": "2020-02-19",
+    "end_date": "2020-03-09"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "start_yields": [
+      1.43,
+      1.56
+     ],
+     "end_yields": [
+      0.46,
+      0.54
+     ],
+     "shift_bp": [
+      -96.99999999999999,
+      -102.0
+     ],
+     "level_bp": -99.5,
+     "slope_bp": -5.00000000000001
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "reference-computed"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "hand: 2Y -97 bp, 10Y -102 bp, level -99.5, slope -5"
+  },
+  {
+   "case_id": "scen_j-0002",
+   "operation": "risk.scenario.historical_shock",
+   "inputs": {
+    "dates": [
+     "2008-09-12",
+     "2008-09-15",
+     "2008-09-16",
+     "2008-12-31"
+    ],
+    "tenors": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "yields": [
+     [
+      1.37,
+      1.49,
+      1.84,
+      2.02,
+      2.23,
+      2.45,
+      2.97,
+      3.32,
+      3.74,
+      4.36,
+      4.32
+     ],
+     [
+      0.36,
+      1.02,
+      1.55,
+      1.66,
+      1.78,
+      2.01,
+      2.59,
+      2.99,
+      3.47,
+      4.14,
+      4.12
+     ],
+     [
+      0.23,
+      0.84,
+      1.52,
+      1.72,
+      1.89,
+      2.12,
+      2.64,
+      3.02,
+      3.48,
+      4.12,
+      4.08
+     ],
+     [
+      0.11,
+      0.11,
+      0.27,
+      0.37,
+      0.76,
+      1.0,
+      1.55,
+      1.87,
+      2.25,
+      3.05,
+      2.69
+     ]
+    ],
+    "start_date": "2008-09-12",
+    "end_date": "2008-12-31"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "start_yields": [
+      1.37,
+      1.49,
+      1.84,
+      2.02,
+      2.23,
+      2.45,
+      2.97,
+      3.32,
+      3.74,
+      4.36,
+      4.32
+     ],
+     "end_yields": [
+      0.11,
+      0.11,
+      0.27,
+      0.37,
+      0.76,
+      1.0,
+      1.55,
+      1.87,
+      2.25,
+      3.05,
+      2.69
+     ],
+     "shift_bp": [
+      -126.00000000000001,
+      -138.0,
+      -157.0,
+      -165.0,
+      -147.0,
+      -145.00000000000003,
+      -142.00000000000003,
+      -144.99999999999997,
+      -149.00000000000003,
+      -131.00000000000006,
+      -163.00000000000003
+     ],
+     "level_bp": -146.1818181818182,
+     "slope_bp": -37.00000000000002
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "published-data",
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "real-data"
+   ],
+   "description": "library window gfc_2008: real Treasury par rows 2008-09-12 to 2008-12-31 (values checked against H.15, J-W3-7)"
+  },
+  {
+   "case_id": "scen_j-0003",
+   "operation": "risk.scenario.replay",
+   "inputs": {
+    "base_tenors": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "base_yields": [
+     1.37,
+     1.49,
+     1.84,
+     2.02,
+     2.23,
+     2.45,
+     2.97,
+     3.32,
+     3.74,
+     4.36,
+     4.32
+    ],
+    "shock_tenors": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "shock_bp": [
+     -126.00000000000001,
+     -138.0,
+     -157.0,
+     -165.0,
+     -147.0,
+     -145.00000000000003,
+     -142.00000000000003,
+     -144.99999999999997,
+     -149.00000000000003,
+     -131.00000000000006,
+     -163.00000000000003
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "applied_bp": [
+      -126.00000000000001,
+      -138.0,
+      -157.0,
+      -165.0,
+      -147.0,
+      -145.00000000000003,
+      -142.00000000000003,
+      -144.99999999999997,
+      -149.00000000000003,
+      -131.00000000000006,
+      -163.00000000000003
+     ],
+     "shocked_yields": [
+      0.10999999999999996,
+      0.10999999999999999,
+      0.2700000000000001,
+      0.37,
+      0.76,
+      0.9999999999999999,
+      1.5499999999999998,
+      1.87,
+      2.25,
+      3.05,
+      2.69
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "real-data"
+   ],
+   "description": "replay of gfc_2008 on its own start curve returns the end curve (J-W3-7 part 3)"
+  },
+  {
+   "case_id": "scen_j-0004",
+   "operation": "risk.scenario.historical_shock",
+   "inputs": {
+    "dates": [
+     "2013-05-01",
+     "2013-05-02",
+     "2013-05-03",
+     "2013-09-05"
+    ],
+    "tenors": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "yields": [
+     [
+      0.03,
+      0.06,
+      0.08,
+      0.11,
+      0.2,
+      0.3,
+      0.65,
+      1.07,
+      1.66,
+      2.44,
+      2.83
+     ],
+     [
+      0.02,
+      0.05,
+      0.08,
+      0.11,
+      0.2,
+      0.3,
+      0.65,
+      1.07,
+      1.66,
+      2.44,
+      2.82
+     ],
+     [
+      0.02,
+      0.05,
+      0.08,
+      0.11,
+      0.22,
+      0.34,
+      0.73,
+      1.17,
+      1.78,
+      2.58,
+      2.96
+     ],
+     [
+      0.03,
+      0.02,
+      0.06,
+      0.16,
+      0.52,
+      0.97,
+      1.85,
+      2.45,
+      2.98,
+      3.64,
+      3.88
+     ]
+    ],
+    "start_date": "2013-05-01",
+    "end_date": "2013-09-05"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "start_yields": [
+      0.03,
+      0.06,
+      0.08,
+      0.11,
+      0.2,
+      0.3,
+      0.65,
+      1.07,
+      1.66,
+      2.44,
+      2.83
+     ],
+     "end_yields": [
+      0.03,
+      0.02,
+      0.06,
+      0.16,
+      0.52,
+      0.97,
+      1.85,
+      2.45,
+      2.98,
+      3.64,
+      3.88
+     ],
+     "shift_bp": [
+      0.0,
+      -3.9999999999999996,
+      -2.0000000000000004,
+      5.0,
+      32.0,
+      67.0,
+      120.0,
+      138.0,
+      132.0,
+      120.00000000000001,
+      104.99999999999999
+     ],
+     "level_bp": 64.81818181818183,
+     "slope_bp": 104.99999999999999
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "published-data",
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "real-data"
+   ],
+   "description": "library window taper_2013: real Treasury par rows 2013-05-01 to 2013-09-05 (values checked against H.15, J-W3-7)"
+  },
+  {
+   "case_id": "scen_j-0005",
+   "operation": "risk.scenario.replay",
+   "inputs": {
+    "base_tenors": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "base_yields": [
+     0.03,
+     0.06,
+     0.08,
+     0.11,
+     0.2,
+     0.3,
+     0.65,
+     1.07,
+     1.66,
+     2.44,
+     2.83
+    ],
+    "shock_tenors": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "shock_bp": [
+     0.0,
+     -3.9999999999999996,
+     -2.0000000000000004,
+     5.0,
+     32.0,
+     67.0,
+     120.0,
+     138.0,
+     132.0,
+     120.00000000000001,
+     104.99999999999999
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "applied_bp": [
+      0.0,
+      -3.9999999999999996,
+      -2.0000000000000004,
+      5.0,
+      32.0,
+      67.0,
+      120.0,
+      138.0,
+      132.0,
+      120.00000000000001,
+      104.99999999999999
+     ],
+     "shocked_yields": [
+      0.03,
+      0.020000000000000004,
+      0.06,
+      0.16,
+      0.52,
+      0.97,
+      1.85,
+      2.45,
+      2.98,
+      3.64,
+      3.88
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "real-data"
+   ],
+   "description": "replay of taper_2013 on its own start curve returns the end curve (J-W3-7 part 3)"
+  },
+  {
+   "case_id": "scen_j-0006",
+   "operation": "risk.scenario.historical_shock",
+   "inputs": {
+    "dates": [
+     "2020-02-19",
+     "2020-02-20",
+     "2020-02-21",
+     "2020-03-09"
+    ],
+    "tenors": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "yields": [
+     [
+      1.61,
+      1.58,
+      1.56,
+      1.47,
+      1.42,
+      1.39,
+      1.41,
+      1.5,
+      1.56,
+      1.86,
+      2.01
+     ],
+     [
+      1.61,
+      1.58,
+      1.55,
+      1.46,
+      1.39,
+      1.35,
+      1.37,
+      1.45,
+      1.52,
+      1.81,
+      1.97
+     ],
+     [
+      1.6,
+      1.56,
+      1.53,
+      1.43,
+      1.34,
+      1.3,
+      1.3,
+      1.39,
+      1.46,
+      1.75,
+      1.9
+     ],
+     [
+      0.57,
+      0.33,
+      0.27,
+      0.31,
+      0.38,
+      0.4,
+      0.46,
+      0.56,
+      0.54,
+      0.87,
+      0.99
+     ]
+    ],
+    "start_date": "2020-02-19",
+    "end_date": "2020-03-09"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "start_yields": [
+      1.61,
+      1.58,
+      1.56,
+      1.47,
+      1.42,
+      1.39,
+      1.41,
+      1.5,
+      1.56,
+      1.86,
+      2.01
+     ],
+     "end_yields": [
+      0.57,
+      0.33,
+      0.27,
+      0.31,
+      0.38,
+      0.4,
+      0.46,
+      0.56,
+      0.54,
+      0.87,
+      0.99
+     ],
+     "shift_bp": [
+      -104.00000000000001,
+      -125.0,
+      -129.0,
+      -116.0,
+      -103.99999999999999,
+      -98.99999999999999,
+      -94.99999999999999,
+      -94.0,
+      -102.0,
+      -99.00000000000001,
+      -101.99999999999999
+     ],
+     "level_bp": -106.27272727272727,
+     "slope_bp": 2.000000000000035
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "published-data",
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "real-data"
+   ],
+   "description": "library window covid_2020: real Treasury par rows 2020-02-19 to 2020-03-09 (values checked against H.15, J-W3-7)"
+  },
+  {
+   "case_id": "scen_j-0007",
+   "operation": "risk.scenario.replay",
+   "inputs": {
+    "base_tenors": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "base_yields": [
+     1.61,
+     1.58,
+     1.56,
+     1.47,
+     1.42,
+     1.39,
+     1.41,
+     1.5,
+     1.56,
+     1.86,
+     2.01
+    ],
+    "shock_tenors": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "shock_bp": [
+     -104.00000000000001,
+     -125.0,
+     -129.0,
+     -116.0,
+     -103.99999999999999,
+     -98.99999999999999,
+     -94.99999999999999,
+     -94.0,
+     -102.0,
+     -99.00000000000001,
+     -101.99999999999999
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "applied_bp": [
+      -104.00000000000001,
+      -125.0,
+      -129.0,
+      -116.0,
+      -103.99999999999999,
+      -98.99999999999999,
+      -94.99999999999999,
+      -94.0,
+      -102.0,
+      -99.00000000000001,
+      -101.99999999999999
+     ],
+     "shocked_yields": [
+      0.57,
+      0.33000000000000007,
+      0.2700000000000001,
+      0.31,
+      0.38000000000000006,
+      0.4,
+      0.4600000000000001,
+      0.56,
+      0.54,
+      0.87,
+      0.9899999999999999
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "real-data"
+   ],
+   "description": "replay of covid_2020 on its own start curve returns the end curve (J-W3-7 part 3)"
+  },
+  {
+   "case_id": "scen_j-0008",
+   "operation": "risk.scenario.historical_shock",
+   "inputs": {
+    "dates": [
+     "2021-12-31",
+     "2022-01-03",
+     "2022-01-04",
+     "2022-10-21"
+    ],
+    "tenors": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "yields": [
+     [
+      0.06,
+      0.06,
+      0.19,
+      0.39,
+      0.73,
+      0.97,
+      1.26,
+      1.44,
+      1.52,
+      1.94,
+      1.9
+     ],
+     [
+      0.05,
+      0.08,
+      0.22,
+      0.4,
+      0.78,
+      1.04,
+      1.37,
+      1.55,
+      1.63,
+      2.05,
+      2.01
+     ],
+     [
+      0.06,
+      0.08,
+      0.22,
+      0.38,
+      0.77,
+      1.02,
+      1.37,
+      1.57,
+      1.66,
+      2.1,
+      2.07
+     ],
+     [
+      3.55,
+      4.09,
+      4.43,
+      4.58,
+      4.49,
+      4.52,
+      4.34,
+      4.28,
+      4.21,
+      4.54,
+      4.33
+     ]
+    ],
+    "start_date": "2021-12-31",
+    "end_date": "2022-10-21"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "start_yields": [
+      0.06,
+      0.06,
+      0.19,
+      0.39,
+      0.73,
+      0.97,
+      1.26,
+      1.44,
+      1.52,
+      1.94,
+      1.9
+     ],
+     "end_yields": [
+      3.55,
+      4.09,
+      4.43,
+      4.58,
+      4.49,
+      4.52,
+      4.34,
+      4.28,
+      4.21,
+      4.54,
+      4.33
+     ],
+     "shift_bp": [
+      349.0,
+      403.0,
+      423.99999999999994,
+      419.0,
+      376.0,
+      354.99999999999994,
+      308.0,
+      284.00000000000006,
+      269.0,
+      260.0,
+      243.00000000000003
+     ],
+     "level_bp": 335.45454545454544,
+     "slope_bp": -105.99999999999997
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "published-data",
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "real-data"
+   ],
+   "description": "library window hikes_2022: real Treasury par rows 2021-12-31 to 2022-10-21 (values checked against H.15, J-W3-7)"
+  },
+  {
+   "case_id": "scen_j-0009",
+   "operation": "risk.scenario.replay",
+   "inputs": {
+    "base_tenors": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "base_yields": [
+     0.06,
+     0.06,
+     0.19,
+     0.39,
+     0.73,
+     0.97,
+     1.26,
+     1.44,
+     1.52,
+     1.94,
+     1.9
+    ],
+    "shock_tenors": [
+     0.08333333333333333,
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0,
+     20.0,
+     30.0
+    ],
+    "shock_bp": [
+     349.0,
+     403.0,
+     423.99999999999994,
+     419.0,
+     376.0,
+     354.99999999999994,
+     308.0,
+     284.00000000000006,
+     269.0,
+     260.0,
+     243.00000000000003
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "applied_bp": [
+      349.0,
+      403.0,
+      423.99999999999994,
+      419.0,
+      376.0,
+      354.99999999999994,
+      308.0,
+      284.00000000000006,
+      269.0,
+      260.0,
+      243.00000000000003
+     ],
+     "shocked_yields": [
+      3.55,
+      4.09,
+      4.43,
+      4.58,
+      4.49,
+      4.52,
+      4.34,
+      4.28,
+      4.21,
+      4.54,
+      4.33
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research",
+    "real-data"
+   ],
+   "description": "replay of hikes_2022 on its own start curve returns the end curve (J-W3-7 part 3)"
+  },
+  {
+   "case_id": "scen_j-0010",
+   "operation": "risk.scenario.historical_shock",
+   "inputs": {
+    "dates": [
+     "2020-02-19",
+     "2020-03-09"
+    ],
+    "tenors": [
+     2.0,
+     10.0
+    ],
+    "yields": [
+     [
+      1.43,
+      1.56
+     ],
+     [
+      0.46,
+      0.54
+     ]
+    ],
+    "start_date": "2020-02-20",
+    "end_date": "2020-03-09"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "start date missing"
+  },
+  {
+   "case_id": "scen_j-0011",
+   "operation": "risk.scenario.historical_shock",
+   "inputs": {
+    "dates": [
+     "2020-02-19",
+     "2020-03-09"
+    ],
+    "tenors": [
+     2.0,
+     10.0
+    ],
+    "yields": [
+     [
+      1.43,
+      1.56
+     ],
+     [
+      0.46,
+      0.54
+     ]
+    ],
+    "start_date": "2020-03-09",
+    "end_date": "2020-02-19"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DATE_ORDER"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "end before start"
+  },
+  {
+   "case_id": "scen_j-0012",
+   "operation": "risk.scenario.historical_shock",
+   "inputs": {
+    "dates": [
+     "2020-03-09",
+     "2020-02-19"
+    ],
+    "tenors": [
+     2.0,
+     10.0
+    ],
+    "yields": [
+     [
+      1.43,
+      1.56
+     ],
+     [
+      0.46,
+      0.54
+     ]
+    ],
+    "start_date": "2020-02-19",
+    "end_date": "2020-03-09"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DATE_ORDER"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "dates not increasing"
+  },
+  {
+   "case_id": "scen_j-0013",
+   "operation": "risk.scenario.historical_shock",
+   "inputs": {
+    "dates": [
+     "2020-02-19",
+     "2020-03-09"
+    ],
+    "tenors": [
+     2.0,
+     10.0
+    ],
+    "yields": [
+     [
+      1.43
+     ],
+     [
+      0.46,
+      0.54
+     ]
+    ],
+    "start_date": "2020-02-19",
+    "end_date": "2020-03-09"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "row length"
+  },
+  {
+   "case_id": "scen_j-0014",
+   "operation": "risk.scenario.historical_shock",
+   "inputs": {
+    "dates": [
+     "2020-02-19",
+     "2020-03-09"
+    ],
+    "tenors": [
+     10.0,
+     2.0
+    ],
+    "yields": [
+     [
+      1.43,
+      1.56
+     ],
+     [
+      0.46,
+      0.54
+     ]
+    ],
+    "start_date": "2020-02-19",
+    "end_date": "2020-03-09"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "tenors not increasing"
+  },
+  {
+   "case_id": "scen_j-0015",
+   "operation": "risk.scenario.historical_shock",
+   "inputs": {
+    "dates": [],
+    "tenors": [
+     2.0,
+     10.0
+    ],
+    "yields": [],
+    "start_date": "2020-02-19",
+    "end_date": "2020-03-09"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "empty"
+  },
+  {
+   "case_id": "scen_j-0016",
+   "operation": "risk.scenario.replay",
+   "inputs": {
+    "base_tenors": [
+     1.0,
+     5.0,
+     10.0
+    ],
+    "base_yields": [
+     4.0,
+     4.2,
+     4.5
+    ],
+    "shock_tenors": [
+     2.0,
+     10.0
+    ],
+    "shock_bp": [
+     -100.0,
+     -50.0
+    ],
+    "dv01": [
+     0.0,
+     0.0,
+     1000.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "applied_bp": [
+      -100.0,
+      -81.25,
+      -50.0
+     ],
+     "shocked_yields": [
+      3.0,
+      3.3875,
+      4.0
+     ],
+     "pnl": 50000.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "reference-computed"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "hand: applied (-100, -81.25, -50), P&L +50,000"
+  },
+  {
+   "case_id": "scen_j-0017",
+   "operation": "risk.scenario.replay",
+   "inputs": {
+    "base_tenors": [
+     1.0,
+     5.0,
+     10.0
+    ],
+    "base_yields": [
+     4.0,
+     4.2,
+     4.5
+    ],
+    "shock_tenors": [
+     2.0,
+     10.0
+    ],
+    "shock_bp": [
+     -100.0,
+     -50.0
+    ],
+    "dv01": [
+     0.0,
+     0.0,
+     1000.0
+    ],
+    "scale": 0.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "applied_bp": [
+      -50.0,
+      -40.625,
+      -25.0
+     ],
+     "shocked_yields": [
+      3.5,
+      3.79375,
+      4.25
+     ],
+     "pnl": 25000.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "scale 0.5 halves the shock and the P&L"
+  },
+  {
+   "case_id": "scen_j-0018",
+   "operation": "risk.scenario.replay",
+   "inputs": {
+    "base_tenors": [
+     1.0,
+     5.0,
+     10.0
+    ],
+    "base_yields": [
+     4.0,
+     4.2,
+     4.5
+    ],
+    "shock_tenors": [
+     2.0,
+     10.0
+    ],
+    "shock_bp": [
+     -100.0,
+     -50.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "applied_bp": [
+      -100.0,
+      -81.25,
+      -50.0
+     ],
+     "shocked_yields": [
+      3.0,
+      3.3875,
+      4.0
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "no dv01: no pnl output"
+  },
+  {
+   "case_id": "scen_j-0019",
+   "operation": "risk.scenario.replay",
+   "inputs": {
+    "base_tenors": [
+     0.25,
+     15.0,
+     40.0
+    ],
+    "base_yields": [
+     4.0,
+     4.2,
+     4.5
+    ],
+    "shock_tenors": [
+     2.0,
+     10.0
+    ],
+    "shock_bp": [
+     -100.0,
+     -50.0
+    ],
+    "dv01": [
+     10.0,
+     -20.0,
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "applied_bp": [
+      -100.0,
+      -50.0,
+      -50.0
+     ],
+     "shocked_yields": [
+      3.0,
+      3.7,
+      4.0
+     ],
+     "pnl": 250.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "research"
+   ],
+   "description": "flat extrapolation both ends, mixed dv01 signs"
+  },
+  {
+   "case_id": "scen_j-0020",
+   "operation": "risk.scenario.replay",
+   "inputs": {
+    "base_tenors": [
+     1.0,
+     5.0,
+     10.0
+    ],
+    "base_yields": [
+     4.0,
+     4.2,
+     4.5
+    ],
+    "shock_tenors": [
+     2.0,
+     10.0
+    ],
+    "shock_bp": [
+     -100.0,
+     -50.0
+    ],
+    "dv01": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "dv01 length"
+  },
+  {
+   "case_id": "scen_j-0021",
+   "operation": "risk.scenario.replay",
+   "inputs": {
+    "base_tenors": [
+     1.0,
+     5.0,
+     10.0
+    ],
+    "base_yields": [
+     4.0,
+     4.2,
+     4.5
+    ],
+    "shock_tenors": [
+     2.0,
+     10.0
+    ],
+    "shock_bp": [
+     1.0
+    ],
+    "dv01": [
+     0.0,
+     0.0,
+     1000.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "shock length"
+  },
+  {
+   "case_id": "scen_j-0022",
+   "operation": "risk.scenario.replay",
+   "inputs": {
+    "base_tenors": [
+     0.0,
+     5.0,
+     10.0
+    ],
+    "base_yields": [
+     4.0,
+     4.2,
+     4.5
+    ],
+    "shock_tenors": [
+     2.0,
+     10.0
+    ],
+    "shock_bp": [
+     -100.0,
+     -50.0
+    ],
+    "dv01": [
+     0.0,
+     0.0,
+     1000.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "base tenors not positive"
+  },
+  {
+   "case_id": "scen_j-0023",
+   "operation": "risk.scenario.replay",
+   "inputs": {
+    "base_tenors": [
+     1.0,
+     5.0,
+     10.0
+    ],
+    "base_yields": [
+     4.0,
+     4.2,
+     4.5
+    ],
+    "shock_tenors": [
+     10.0,
+     2.0
+    ],
+    "shock_bp": [
+     -100.0,
+     -50.0
+    ],
+    "dv01": [
+     0.0,
+     0.0,
+     1000.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "research"
+   ],
+   "description": "shock tenors not increasing"
+  }
+ ]
+}

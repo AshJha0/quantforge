@@ -5,6 +5,7 @@ Each instrument's risk per unit is found by repricing: `EQ01` from spot times 1.
 `KR01_k` from pillar k's zero rate moved by +-1bp with the curve rebuilt (I-21). The hedge is then
 the wave 1 weighted least-squares solve (`hedge_solvers`) on that risk matrix.
 """
+
 import itertools
 import math
 from collections.abc import Mapping, Sequence
@@ -14,9 +15,13 @@ from .errors import QfError
 from .finite import guard
 from .hedge_solvers import _qp_core
 
-KEYS = {"CALL": {"strike", "expiry_years"}, "PUT": {"strike", "expiry_years"},
-        "FORWARD": {"strike", "expiry_years"}, "ZCB": {"expiry_years", "notional"},
-        "UNDERLYING": set()}
+KEYS = {
+    "CALL": {"strike", "expiry_years"},
+    "PUT": {"strike", "expiry_years"},
+    "FORWARD": {"strike", "expiry_years"},
+    "ZCB": {"expiry_years", "notional"},
+    "UNDERLYING": set(),
+}
 Position = tuple[str, Mapping[str, float]]  # (instrument, its numeric keys)
 _BP = 1e-4
 
@@ -33,12 +38,20 @@ def _zero(times: Sequence[float], rates: Sequence[float], t: float) -> float:
         if t <= times[k]:
             u = (t - times[k - 1]) / (times[k] - times[k - 1])
             return rates[k - 1] + u * (rates[k] - rates[k - 1])
-    raise QfError("E_INPUT", "a maturity is after the last curve pillar (ruling I-20)",
-                  "expiry_years")
+    raise QfError(
+        "E_INPUT", "a maturity is after the last curve pillar (ruling I-20)", "expiry_years"
+    )
 
 
-def _value(kind: str, keys: Mapping[str, float], spot: float, q: float, vol: float,
-           times: Sequence[float], rates: Sequence[float]) -> float:
+def _value(
+    kind: str,
+    keys: Mapping[str, float],
+    spot: float,
+    q: float,
+    vol: float,
+    times: Sequence[float],
+    rates: Sequence[float],
+) -> float:
     if kind == "UNDERLYING":
         return spot
     t = keys["expiry_years"]
@@ -57,9 +70,17 @@ def _value(kind: str, keys: Mapping[str, float], spot: float, q: float, vol: flo
     return strike * df * _cdf(-d2) - forward_spot * _cdf(-d1)
 
 
-def _risks(kind: str, keys: Mapping[str, float], spot: float, q: float, vol: float,
-           times: Sequence[float], rates: Sequence[float]) -> list[float]:
+def _risks(
+    kind: str,
+    keys: Mapping[str, float],
+    spot: float,
+    q: float,
+    vol: float,
+    times: Sequence[float],
+    rates: Sequence[float],
+) -> list[float]:
     """[EQ01, KR01_1 .. KR01_P] per unit (I-21)."""
+
     def value(s: float, z: Sequence[float]) -> float:
         return _value(kind, keys, s, q, vol, times, z)
 
@@ -72,10 +93,17 @@ def _risks(kind: str, keys: Mapping[str, float], spot: float, q: float, vol: flo
     return out
 
 
-def crossasset_solve(spot: float, dividend_yield: float, volatility: float,
-                     times: Sequence[float], zero_rates: Sequence[float],
-                     book: Sequence[Position], hedges: Sequence[Position],
-                     weights: Sequence[float], ridge: float = 0.0) -> dict[str, Any]:
+def crossasset_solve(
+    spot: float,
+    dividend_yield: float,
+    volatility: float,
+    times: Sequence[float],
+    zero_rates: Sequence[float],
+    book: Sequence[Position],
+    hedges: Sequence[Position],
+    weights: Sequence[float],
+    ridge: float = 0.0,
+) -> dict[str, Any]:
     """`hedge.crossasset.solve`: positions in the hedges minimising the weighted residual of the
     equity and key-rate risks together. Book positions carry a `quantity` key.
 
@@ -88,8 +116,11 @@ def crossasset_solve(spot: float, dividend_yield: float, volatility: float,
         for kind, keys in items:
             expected = KEYS[kind] | ({"quantity"} if held else set())
             if set(keys) != expected:
-                raise QfError("E_INPUT", f"{kind} takes exactly {sorted(expected)}",
-                              "book" if held else "hedges")
+                raise QfError(
+                    "E_INPUT",
+                    f"{kind} takes exactly {sorted(expected)}",
+                    "book" if held else "hedges",
+                )
     if not book:
         raise QfError("E_INPUT", "the book is empty", "book")
     if not hedges:
@@ -97,8 +128,9 @@ def crossasset_solve(spot: float, dividend_yield: float, volatility: float,
     if len(weights) != 1 + len(times):
         raise QfError("E_INPUT", "one weight per risk factor (1 + pillars)", "weights")
     if any(k.get("expiry_years", 0.0) > times[-1] for _, k in (*book, *hedges)):
-        raise QfError("E_INPUT", "a maturity is after the last curve pillar (ruling I-20)",
-                      "expiry_years")
+        raise QfError(
+            "E_INPUT", "a maturity is after the last curve pillar (ruling I-20)", "expiry_years"
+        )
     if spot <= 0:
         raise QfError("E_DOMAIN", "spot must be positive", "spot")
     if volatility <= 0:
@@ -121,8 +153,12 @@ def crossasset_solve(spot: float, dividend_yield: float, volatility: float,
     columns = [risk(kind, keys) for kind, keys in hedges]
     a = [[c[f] for c in columns] for f in range(size)]
     out = _qp_core(a, book_risk, weights, ridge, None, None, None, None, "ERROR")
-    return {"positions": out["x"], "book_risk": [v + 0.0 for v in book_risk],
-            "residual_risk": out["residual"], "objective": out["objective"]}
+    return {
+        "positions": out["x"],
+        "book_risk": [v + 0.0 for v in book_risk],
+        "residual_risk": out["residual"],
+        "objective": out["objective"],
+    }
 
 
 guard(globals())

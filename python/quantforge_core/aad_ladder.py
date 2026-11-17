@@ -9,6 +9,7 @@ tridiagonal solves, the `max` through its active branch, and the chain rule into
 
 Specification: specifications/06-risk/aad-core.md; rulings G-9, G-18, G-35.
 """
+
 import bisect
 import itertools
 import math
@@ -72,7 +73,7 @@ def _bar_forward(curve: Curve, t: float, bar: float, adj: _Adj) -> None:
 
 def _alpha(m: Model, t: float) -> float:
     assert m.curve is not None
-    return m.curve.forward(t) + m.sigma ** 2 / (2 * m.a ** 2) * math.expm1(-m.a * t) ** 2
+    return m.curve.forward(t) + m.sigma**2 / (2 * m.a**2) * math.expm1(-m.a * t) ** 2
 
 
 def _bar_alpha(m: Model, t: float, bar: float, adj: _Adj) -> None:
@@ -83,7 +84,7 @@ def _bar_alpha(m: Model, t: float, bar: float, adj: _Adj) -> None:
     e = math.expm1(-a * t)
     _bar_forward(m.curve, t, bar, adj)
     adj.sigma += bar * s * e * e / (a * a)
-    adj.a += bar * s * s / 2 * (2 * e * (-t * math.exp(-a * t)) / (a * a) - 2 * e * e / a ** 3)
+    adj.a += bar * s * s / 2 * (2 * e * (-t * math.exp(-a * t)) / (a * a) - 2 * e * e / a**3)
 
 
 @dataclass(frozen=True)
@@ -111,12 +112,14 @@ def _exercise(m: Model, t: float, xs: Floats, times: Floats, k: float, phi: floa
         for tau, p in zip(taus, bonds, strict=True):
             fixed += tau * p
         values.append(phi * (1 - bonds[-1] - k * fixed))
-    return _Exercise(t, after, taus, tuple(f[0] for f in factors), tuple(f[1] for f in factors),
-                     tuple(values))
+    return _Exercise(
+        t, after, taus, tuple(f[0] for f in factors), tuple(f[1] for f in factors), tuple(values)
+    )
 
 
-def _bar_exercise(m: Model, ex: _Exercise, xs: Floats, bars: Floats, k: float, phi: float,
-                  adj: _Adj) -> None:
+def _bar_exercise(
+    m: Model, ex: _Exercise, xs: Floats, bars: Floats, k: float, phi: float, adj: _Adj
+) -> None:
     """Adjoint of the exercise values at the nodes with nonzero `bars`."""
     assert m.curve is not None
     a, s, t = m.a, m.sigma, ex.t
@@ -152,8 +155,14 @@ def _bar_exercise(m: Model, ex: _Exercise, xs: Floats, bars: Floats, k: float, p
         _bar_log_discount(m.curve, t, -la, adj)
         bar_f += la * big_b
         adj.sigma += la * s / (2 * a) * e2 * big_b * big_b
-        adj.a += la * s * s * big_b * big_b * (-2 * t * math.exp(-2 * a * t) / (4 * a)
-                                               - e2 / (4 * a * a))
+        adj.a += (
+            la
+            * s
+            * s
+            * big_b
+            * big_b
+            * (-2 * t * math.exp(-2 * a * t) / (4 * a) - e2 / (4 * a * a))
+        )
         bar_bb = bar_b[j] + la * (f_t + s * s / (2 * a) * e2 * big_b)
         adj.a += bar_bb * (tau * math.exp(-a * tau) - big_b) / a
     _bar_forward(m.curve, t, bar_f, adj)
@@ -206,9 +215,17 @@ class _Step:
     inner: list[float]
 
 
-def ladder(m: Model, start: float, payment_times: Floats, k: float, payer: bool,
-           exercise_times: Floats, nx: int, steps_per_year: int, width: float
-           ) -> tuple[float, list[float], float, float]:
+def ladder(
+    m: Model,
+    start: float,
+    payment_times: Floats,
+    k: float,
+    payer: bool,
+    exercise_times: Floats,
+    nx: int,
+    steps_per_year: int,
+    width: float,
+) -> tuple[float, list[float], float, float]:
     """Price per unit notional and its derivatives: per curve pillar, `a`, `sigma`."""
     assert m.curve is not None
     a, sig = m.a, m.sigma
@@ -303,15 +320,22 @@ def ladder(m: Model, start: float, payment_times: Floats, k: float, payer: bool,
         adj.a += dt * (math.sumprod(bu, inner_x) - math.sumprod(bl, inner_x)) / (2 * dx)
         scale_sum += dt * math.sumprod(bd, inner_x)
         _bar_alpha(m, st.t, dt * s_d, adj)
-    _bar_exercise(m, last, xs, [b if e > 0 else 0.0 for b, e in zip(bar_v, last.values,
-                                                                      strict=True)],
-                  k, phi, adj)
+    _bar_exercise(
+        m,
+        last,
+        xs,
+        [b if e > 0 else 0.0 for b, e in zip(bar_v, last.values, strict=True)],
+        k,
+        phi,
+        adj,
+    )
     # diff = sigma^2/(2 dx^2)
     adj.sigma += bar_diff * sig / (dx * dx)
-    adj.dx -= bar_diff * sig * sig / (dx ** 3)
+    adj.dx -= bar_diff * sig * sig / (dx**3)
     # xs = sx (width (-1 + 2 i/(nx-1))) and dx = sx (2 width/(nx-1)): both proportional to sx
-    bar_sx = (math.fsum(b * x for b, x in zip(adj.xs, xs, strict=True)) + scale_sum
-              + adj.dx * dx) / sx
+    bar_sx = (
+        math.fsum(b * x for b, x in zip(adj.xs, xs, strict=True)) + scale_sum + adj.dx * dx
+    ) / sx
     adj.sigma += bar_sx * sx / sig
     dg = (t_m * math.exp(-2 * a * t_m) - g) / a
     adj.a += bar_sx * sig / (2 * math.sqrt(g)) * dg
@@ -320,19 +344,43 @@ def ladder(m: Model, start: float, payment_times: Floats, k: float, payer: bool,
     return price, bar_dfs, adj.a, adj.sigma
 
 
-def bermudan_ladder(times: Floats, dfs: Floats, a: float, sigma: float, rate_given: bool,
-                    start: float, payment_times: Floats, fixed_rate: float, swaption_type: str,
-                    notional: float, exercise_times: Floats, nx: int, steps_per_year: int,
-                    width: float) -> dict[str, object]:
+def bermudan_ladder(
+    times: Floats,
+    dfs: Floats,
+    a: float,
+    sigma: float,
+    rate_given: bool,
+    start: float,
+    payment_times: Floats,
+    fixed_rate: float,
+    swaption_type: str,
+    notional: float,
+    exercise_times: Floats,
+    nx: int,
+    steps_per_year: int,
+    width: float,
+) -> dict[str, object]:
     """`rates.shortrate.bermudan_ladder`: the Bermudan price and its full ladder."""
     model = curve_model(times, dfs, a, sigma, rate_given)
     grid = make_grid(nx, steps_per_year, width)
     payer = check_bermudan(start, payment_times, swaption_type, exercise_times)
-    price, d_dfs, d_a, d_sigma = ladder(model, start, payment_times, fixed_rate, payer,
-                                        exercise_times, grid.nx, grid.steps_per_year, grid.width)
-    return {"price": notional * price,
-            "d_price_d_discount_factors": [notional * d for d in d_dfs],
-            "d_price_d_mean_reversion": notional * d_a, "d_price_d_sigma": notional * d_sigma}
+    price, d_dfs, d_a, d_sigma = ladder(
+        model,
+        start,
+        payment_times,
+        fixed_rate,
+        payer,
+        exercise_times,
+        grid.nx,
+        grid.steps_per_year,
+        grid.width,
+    )
+    return {
+        "price": notional * price,
+        "d_price_d_discount_factors": [notional * d for d in d_dfs],
+        "d_price_d_mean_reversion": notional * d_a,
+        "d_price_d_sigma": notional * d_sigma,
+    }
 
 
 guard(globals())

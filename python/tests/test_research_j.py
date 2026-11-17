@@ -1,6 +1,7 @@
 """Stage J wave 1 property tests (program/STAGE_J_HANDOVER.md, "Property tests"): the two
 backtest engines agree, attribution closes, the look-ahead canary is caught; purged folds never
 leak; Viterbi equals brute force; DSR and PSR move the right way; PBO is a probability."""
+
 import itertools
 import math
 import random
@@ -41,8 +42,10 @@ def test_event_equals_vector_and_attribution_closes(t, seed, lag):
             assert all(_close(a, b, 1e-10) for a, b in zip(value, other, strict=True)), key
         else:
             assert _close(value, other, 1e-10), key
-    parts = [event[k] for k in ("total_gross", "total_spread_cost", "total_commission",
-                                "total_fixed_cost")]
+    parts = [
+        event[k]
+        for k in ("total_gross", "total_spread_cost", "total_commission", "total_fixed_cost")
+    ]
     identity = parts[0] - parts[1] - parts[2] - parts[3]
     assert abs(identity - event["total_net"]) <= 1e-12 * max(1.0, *map(abs, parts))
 
@@ -97,8 +100,11 @@ def test_purged_folds_never_overlap_and_reduce_to_kfold(n, seed):
 
 
 @settings(max_examples=300, deadline=None)
-@given(st.integers(min_value=1, max_value=3), st.integers(min_value=1, max_value=6),
-       st.integers(min_value=0, max_value=10**6))
+@given(
+    st.integers(min_value=1, max_value=3),
+    st.integers(min_value=1, max_value=6),
+    st.integers(min_value=0, max_value=10**6),
+)
 def test_viterbi_equals_brute_force(k, t, seed):
     rng = random.Random(seed)
 
@@ -118,19 +124,21 @@ def test_viterbi_equals_brute_force(k, t, seed):
 
     best = max(itertools.product(range(k), repeat=t), key=score)
     assert math.isclose(result["log_probability"], score(best), rel_tol=1e-12, abs_tol=1e-12)
-    assert math.isclose(score(tuple(result["states"])), score(best), rel_tol=1e-12,
-                        abs_tol=1e-12)
+    assert math.isclose(score(tuple(result["states"])), score(best), rel_tol=1e-12, abs_tol=1e-12)
 
 
 def test_viterbi_ties_take_smallest_index():
-    result = research.regime_viterbi([0.5, 0.5], [[0.5, 0.5], [0.5, 0.5]],
-                                     [[1.0, 1.0], [1.0, 1.0]])
+    result = research.regime_viterbi([0.5, 0.5], [[0.5, 0.5], [0.5, 0.5]], [[1.0, 1.0], [1.0, 1.0]])
     assert result["states"] == [0, 0]
 
 
 @SETTINGS
-@given(st.floats(min_value=0.01, max_value=0.3), st.integers(min_value=10, max_value=5000),
-       st.integers(min_value=2, max_value=1000), st.floats(min_value=1e-4, max_value=0.01))
+@given(
+    st.floats(min_value=0.01, max_value=0.3),
+    st.integers(min_value=10, max_value=5000),
+    st.integers(min_value=2, max_value=1000),
+    st.floats(min_value=1e-4, max_value=0.01),
+)
 def test_dsr_decreases_in_trials_and_variance(sr, n_obs, n_trials, var):
     base = research.stats_dsr(sr, n_obs, n_trials, var)["dsr"]
     assert research.stats_dsr(sr, n_obs, n_trials + 1, var)["dsr"] <= base
@@ -144,8 +152,11 @@ def test_psr_at_benchmark_is_half(sr, n_obs):
 
 
 @SETTINGS
-@given(st.integers(min_value=2, max_value=6), st.sampled_from([2, 4, 6]),
-       st.integers(min_value=0, max_value=10**6))
+@given(
+    st.integers(min_value=2, max_value=6),
+    st.sampled_from([2, 4, 6]),
+    st.integers(min_value=0, max_value=10**6),
+)
 def test_pbo_is_a_probability_and_zero_under_domination(n, s, seed):
     rng = random.Random(seed)
     rows = [[rng.gauss(0, 1) for _ in range(n)] for _ in range(3 * s)]

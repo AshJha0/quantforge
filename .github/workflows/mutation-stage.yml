@@ -1,7 +1,9 @@
 name: Mutation by stage
 # Per-stage mutation report (plan 11.5.6) and the core-maths mutation gate (plan 12.2 G6, 13.2 E10).
 #  - Pull requests: incremental. Only modules (from any stage in conformance/mutation/stages.json) whose
-#    target file the PR changes, with a small sample per module, gated at 80%. A PR touching no mapped
+#    target file the PR changes, with the same MAX=40 sample per module and the same gate. A 12-mutant PR
+#    sample allowed no survivors at all under the 65% Wilson bound (11/12 has lower bound 0.646), so a module
+#    killing 90% passed only 28% of the time; 40 mutants allow up to 8 survivors (test_gates.py checks this). A PR touching no mapped
 #    module runs the plan job alone (seconds).
 #  - Weekly: every module of every stage (stage ALL, R6-14) in all four languages, a fresh seeded sample of
 #    MAX=40 mutants per module (seed = the run number, printed in the report), gated on a point estimate of
@@ -40,7 +42,7 @@ concurrency:
 env:
   STAGE: ${{ (github.event_name == 'pull_request' || inputs.paths) && 'PR' || inputs.stage || 'ALL' }}
   SEED: ${{ inputs.seed || github.run_number }}
-  MAX: ${{ github.event_name == 'pull_request' && '12' || inputs.max || '40' }}
+  MAX: ${{ github.event_name == 'pull_request' && '40' || inputs.max || '40' }}  # PR value checked by test_gates.pr_sample_checks
 jobs:
   plan:
     name: mutation-plan
@@ -65,7 +67,9 @@ jobs:
               # shellcheck disable=SC2086  # word splitting of the space-separated list is intended
               printf '%s\n' $PATHS > changed.txt
             else
-              git diff --name-only "$BASE...$HEAD_SHA" > changed.txt
+              # Real code changes only: formatting/comment-only edits do not pull a module in (semantic_changes.py).
+              git diff --name-only "$BASE...$HEAD_SHA" > touched.txt
+              python3 conformance/mutation/semantic_changes.py "$(git merge-base "$BASE" "$HEAD_SHA")" "$HEAD_SHA" --in touched.txt > changed.txt
             fi
             python3 conformance/mutation/plan_matrix.py --changed changed.txt --stages-out pr-stages.json >> "$GITHUB_OUTPUT"
           else

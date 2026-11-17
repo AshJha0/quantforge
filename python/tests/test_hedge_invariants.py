@@ -1,6 +1,7 @@
 """Invariants of the stage I hedge solvers (08-hedging/hedge-solvers.md and
 hedge-costs-and-frontier.md): scale and permutation invariance, the subgradient optimality test
 of the costed QP, and integer lots never beating the relaxed problem."""
+
 import math
 from typing import Any
 
@@ -20,9 +21,11 @@ positive = st.integers(1, 30).map(lambda v: v / 10)
 def problems(draw: st.DrawFn, max_n: int = 4) -> dict[str, Any]:
     n = draw(st.integers(1, max_n))
     m = draw(st.integers(n, n + 3))
-    return {"a": [[draw(unit) for _ in range(n)] for _ in range(m)],
-            "b": [draw(unit) for _ in range(m)],
-            "weights": [draw(positive) for _ in range(m)]}
+    return {
+        "a": [[draw(unit) for _ in range(n)] for _ in range(m)],
+        "b": [draw(unit) for _ in range(m)],
+        "weights": [draw(positive) for _ in range(m)],
+    }
 
 
 def solve(**kwargs: Any) -> dict[str, Any]:
@@ -63,25 +66,28 @@ def test_instrument_units_rescale_positions(p: dict[str, Any], data: st.DataObje
 
 @settings(max_examples=60, deadline=None)
 @given(problems(), st.data())
-def test_permutations_of_instruments_and_factors(p: dict[str, Any],
-                                                 data: st.DataObject) -> None:
+def test_permutations_of_instruments_and_factors(p: dict[str, Any], data: st.DataObject) -> None:
     n, m = len(p["a"][0]), len(p["a"])
     cols = data.draw(st.permutations(range(n)))
     rows = data.draw(st.permutations(range(m)))
     lower = [data.draw(st.one_of(st.none(), unit)) for _ in range(n)]
     upper = [None if lo is None else lo + 1.0 for lo in lower]
     one = solve(**p, lower=lower, upper=upper, half_spreads=[0.05] * n)
-    two = solve(a=[[p["a"][r][c] for c in cols] for r in rows], b=[p["b"][r] for r in rows],
-                weights=[p["weights"][r] for r in rows], lower=[lower[c] for c in cols],
-                upper=[upper[c] for c in cols], half_spreads=[0.05] * n)
+    two = solve(
+        a=[[p["a"][r][c] for c in cols] for r in rows],
+        b=[p["b"][r] for r in rows],
+        weights=[p["weights"][r] for r in rows],
+        lower=[lower[c] for c in cols],
+        upper=[upper[c] for c in cols],
+        half_spreads=[0.05] * n,
+    )
     assert np.allclose(two["x"], [one["x"][c] for c in cols], rtol=1e-9, atol=1e-11)
     assert two["objective"] == pytest.approx(one["objective"], rel=1e-10, abs=1e-12)
 
 
 @settings(max_examples=60, deadline=None)
 @given(problems(), st.data())
-def test_costed_qp_meets_the_subgradient_conditions(p: dict[str, Any],
-                                                    data: st.DataObject) -> None:
+def test_costed_qp_meets_the_subgradient_conditions(p: dict[str, Any], data: st.DataObject) -> None:
     """At the answer: g_j + c_j sign(x_j) = 0 where x_j != 0, |g_j| <= c_j where x_j = 0
     (no bounds, no margin), with g the gradient of the smooth part [spec, Solution]."""
     n = len(p["a"][0])
@@ -100,23 +106,30 @@ def test_costed_qp_meets_the_subgradient_conditions(p: dict[str, Any],
 
 @settings(max_examples=40, deadline=None)
 @given(problems(max_n=3), st.data())
-def test_integer_lots_never_beat_the_bounded_relaxation(p: dict[str, Any],
-                                                        data: st.DataObject) -> None:
+def test_integer_lots_never_beat_the_bounded_relaxation(
+    p: dict[str, Any], data: st.DataObject
+) -> None:
     n = len(p["a"][0])
     lots = [data.draw(st.sampled_from([0.5, 1.0, 3.0])) for _ in range(n)]
     lower = [data.draw(st.one_of(st.none(), st.integers(-3, 0))) for _ in range(n)]
     upper = [data.draw(st.one_of(st.none(), st.integers(0, 3))) for _ in range(n)]
     big = {**p, "b": [10 * v for v in p["b"]]}
     try:
-        out = hs.integer_solve(**big, lot_sizes=lots, ridge=0.01, lower_lots=lower,
-                               upper_lots=upper)
+        out = hs.integer_solve(
+            **big, lot_sizes=lots, ridge=0.01, lower_lots=lower, upper_lots=upper
+        )
     except QfError as err:
         assume(err.code != "E_SINGULAR")
         raise
-    relaxed = hs.qp_solve(**big, ridge=0.01,
-                          lower=[None if v is None else v * s for v, s in zip(lower, lots)],
-                          upper=[None if v is None else v * s for v, s in zip(upper, lots)])
+    relaxed = hs.qp_solve(
+        **big,
+        ridge=0.01,
+        lower=[None if v is None else v * s for v, s in zip(lower, lots)],
+        upper=[None if v is None else v * s for v, s in zip(upper, lots)],
+    )
     assert out["continuous_objective"] == pytest.approx(relaxed["objective"], rel=1e-12)
     assert out["objective"] >= relaxed["objective"] * (1 - 1e-12) - 1e-12
-    assert all((lo is None or v >= lo) and (hi is None or v <= hi)
-               for v, lo, hi in zip(out["lots"], lower, upper))
+    assert all(
+        (lo is None or v >= lo) and (hi is None or v <= hi)
+        for v, lo, hi in zip(out["lots"], lower, upper)
+    )

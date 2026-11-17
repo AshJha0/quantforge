@@ -22,8 +22,10 @@ mod risk;
 mod riskcarry;
 mod riskw2;
 mod shortrate;
+mod termcurve;
 mod usecase;
 mod vol;
+mod w3;
 mod xva;
 
 use crate::input::Inputs;
@@ -74,20 +76,25 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("core", core::NAMES, core::dispatch),
     ("credit", credit::NAMES, credit::dispatch),
     ("eq", eq::NAMES, eq::dispatch),
+    ("eq", termcurve::eq::NAMES, termcurve::eq::dispatch),
     ("exotic", exotic::NAMES, exotic::dispatch),
     ("fx", fx::NAMES, fx::dispatch),
     ("hedge", hedge::NAMES, hedge::dispatch),
     ("infl", infl::NAMES, infl::dispatch),
+    ("liq", termcurve::liq::NAMES, termcurve::liq::dispatch),
     ("mbs", mbs::NAMES, mbs::dispatch),
     ("rates", rates::NAMES, rates::dispatch),
     ("rates", shortrate::NAMES, shortrate::dispatch),
     ("rates", lmm::NAMES, lmm::dispatch),
     ("repo", repo::NAMES, repo::dispatch),
+    ("repo", termcurve::repo::NAMES, termcurve::repo::dispatch),
     ("research", research::NAMES, research::dispatch),
+    ("research", w3::research::NAMES, w3::research::dispatch),
     ("risk", risk::NAMES, risk::dispatch),
     ("risk", mcgreeks::NAMES, mcgreeks::dispatch),
     ("risk", riskcarry::NAMES, riskcarry::dispatch),
     ("risk", riskw2::NAMES, riskw2::dispatch),
+    ("risk", w3::risk::NAMES, w3::risk::dispatch),
     ("usecase", usecase::NAMES, usecase::dispatch),
     ("vol", vol::NAMES, vol::dispatch),
     ("xva", xva::NAMES, xva::dispatch),

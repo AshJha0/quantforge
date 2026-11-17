@@ -1,4 +1,5 @@
 """Finite-difference Black-Scholes (specifications/01-core/pde.md)."""
+
 import math
 from dataclasses import dataclass
 
@@ -28,8 +29,17 @@ def _cell_average(call: bool, x: float, h: float, strike: float, k: float) -> fl
 
 
 def bs_european(
-    option: str, spot: float, strike: float, r: float, q: float, sigma: float, t: float,
-    space_steps: int, time_steps: int, width: float = 6.0, rannacher_steps: int = 2,
+    option: str,
+    spot: float,
+    strike: float,
+    r: float,
+    q: float,
+    sigma: float,
+    t: float,
+    space_steps: int,
+    time_steps: int,
+    width: float = 6.0,
+    rannacher_steps: int = 2,
 ) -> PdeResult:
     big_j, big_m, big_r = space_steps, time_steps, rannacher_steps
     if spot <= 0 or strike <= 0 or sigma <= 0 or t <= 0 or width <= 0:

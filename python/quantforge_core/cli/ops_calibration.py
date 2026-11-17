@@ -1,4 +1,5 @@
 """Handlers for the calibration verbs. A handler reads every input first; the first call through `core`, the gated core modules, ends the E_SCHEMA stage."""
+
 from typing import Any
 
 from .. import conventions, curves
@@ -20,32 +21,48 @@ def fit(i: Inputs) -> Any:
     report = i.opt_boolean("report_parameters", True)
     optional = {k: i.reals(k) for k in ("weights", "prior", "lower", "upper") if i.has(k)}
     result = core.calibration.fit(
-        model, *_data(i, model), i.reals("start"), i.enum("method", METHODS),
+        model,
+        *_data(i, model),
+        i.reals("start"),
+        i.enum("method", METHODS),
         regularisation=i.opt_real("regularisation", 0.0),
-        max_iter=i.opt_integer("max_iter", 1000), **optional,
+        max_iter=i.opt_integer("max_iter", 1000),
+        **optional,
     )
     outputs = {"objective": result.objective}
     if report:
         outputs["parameters"] = result.parameters
-    return outputs, {"iterations": result.iterations, "status": result.status,
-                     "residuals": result.residuals}
+    return outputs, {
+        "iterations": result.iterations,
+        "status": result.status,
+        "residuals": result.residuals,
+    }
 
 
 @op("calib.check_bid_ask")
 def bid_ask(i: Inputs) -> Any:
-    return {"breaches": core.calibration.check_bid_ask(
-        i.reals("fitted"), i.reals("bid"), i.reals("ask"))}
+    return {
+        "breaches": core.calibration.check_bid_ask(
+            i.reals("fitted"), i.reals("bid"), i.reals("ask")
+        )
+    }
 
 
 @op("calib.curve_report")
 def curve_report(i: Inputs) -> Any:
     quotes = _quotes(i)
     jacobian, condition, error = core.calibration.curve_report(
-        i.enum("convention", conventions.OVERNIGHT), i.date("as_of"), quotes,
+        i.enum("convention", conventions.OVERNIGHT),
+        i.date("as_of"),
+        quotes,
         i.enum("interpolation", curves.INTERPOLATIONS),
     )
-    diagnostics = {"inputs": [q.tenor for q in quotes], "status": "OK",
-                   "max_repricing_error": error, "tolerance_breaches": []}
+    diagnostics = {
+        "inputs": [q.tenor for q in quotes],
+        "status": "OK",
+        "max_repricing_error": error,
+        "tolerance_breaches": [],
+    }
     return {"jacobian": jacobian, "condition_number": condition}, diagnostics
 
 
@@ -53,8 +70,13 @@ def curve_report(i: Inputs) -> Any:
 def _smooth(i: Inputs) -> Any:
     _not_null(i, "weights")
     weights = i.reals("weights") if i.has("weights") else None
-    args = (i.reals("knots"), i.reals("maturities"), i.reals("zero_rates"), i.real("lambda"),
-            weights)
+    args = (
+        i.reals("knots"),
+        i.reals("maturities"),
+        i.reals("zero_rates"),
+        i.real("lambda"),
+        weights,
+    )
     forwards, fitted, objective = core.curve_fits.smooth(*args)
     return {"forwards": forwards, "fitted": fitted, "objective": objective}
 

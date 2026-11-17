@@ -15,6 +15,11 @@ final class DualActiveSet {
     private static final double ZERO_STEP = 1e-10;
     /** Relative slack before a constraint counts as violated. */
     private static final double VIOLATION = 1e-12;
+    /**
+     * Relative size of an infeasibility certificate below which it is rounding: the 1e-9 of the equality-fixed
+     * feasibility test in {@code LeastSquaresHedge} and of the Python phase-one test.
+     */
+    private static final double CERTIFICATE = 1e-9;
 
     /**
      * The minimiser; for each constraint, whether it is in the final active set and its multiplier (0 when inactive),
@@ -23,11 +28,13 @@ final class DualActiveSet {
     record Result(double[] y, boolean[] active, double[] multipliers) {}
 
     /**
-     * Solves the programme. {@code g} must be symmetric positive definite.
+     * Solves the programme. {@code g} must be symmetric positive definite. {@code size[i]} is the magnitude of the
+     * terms that cancel in {@code d[i]} (for a bound row {@code max(1, |bound| + |x_p,j|)}): the scale of its
+     * rounding error, used only to judge an infeasibility certificate.
      *
      * @throws QfError {@code E_INFEASIBLE} when no {@code y} satisfies the constraints
      */
-    static Result solve(double[][] g, double[] a, double[][] c, double[] d) {
+    static Result solve(double[][] g, double[] a, double[][] c, double[] d, double[] size) {
         int n = g.length;
         int p = c.length;
         double[][] l = Dense.cholesky(g);
@@ -50,9 +57,10 @@ final class DualActiveSet {
         int[] act = new int[n];
         double[] u = new double[n];
         boolean[] isActive = new boolean[p];
+        boolean[] implied = new boolean[p]; // judged implied by the current active set; cleared when it changes
         int q = 0;
         for (int iter = 0; iter < LeastSquaresHedge.iterationCap(n + p); iter++) { // R6-6.1: 10 (n + p) + 100
-            int pick = mostViolated(c, d, y, isActive);
+            int pick = mostViolated(c, d, y, isActive, implied);
             if (pick < 0) {
                 double[] lambda = new double[p];
                 for (int k = 0; k < q; k++) {
@@ -77,18 +85,50 @@ final class DualActiveSet {
                     }
                 }
                 double[] rr = backSolve(r, dv, q);
+                boolean noPrimal = Math.sqrt(d2) <= ZERO_STEP * Math.sqrt(dAll);
+                // n_p in the span of the active rows (no primal step): rr are the coefficients of n_p = sum_k rr_k n_k,
+                // found by back-substitution in R, so each carries a rounding error of order eps cond(R) max|rr|. An
+                // rr_k that small is 0, not a blocking row: taken as positive, it makes a dual step of u_k / rr_k
+                // (1e17 at a degenerate vertex) that drops a genuine active row and leaves the multipliers of the
+                // dependent rows at 1e17 and of the dropped row, re-added, at 0. The cut is the I-3 threshold,
+                // 1e-12 of the largest |rr|. With a primal step the test stays rr_k > 0.
+                double rCut = 0.0;
+                if (noPrimal) {
+                    for (int k = 0; k < q; k++) {
+                        rCut = Math.max(rCut, 1e-12 * Math.abs(rr[k]));
+                    }
+                }
                 double t1 = Double.POSITIVE_INFINITY;
                 int drop = -1;
                 for (int k = 0; k < q; k++) {
-                    if (rr[k] > 0.0 && u[k] / rr[k] < t1) {
+                    if (rr[k] > rCut && u[k] / rr[k] < t1) {
                         t1 = u[k] / rr[k];
                         drop = k;
                     }
                 }
-                boolean noPrimal = Math.sqrt(d2) <= ZERO_STEP * Math.sqrt(dAll);
                 double t2 = noPrimal ? Double.POSITIVE_INFINITY : -(Dense.dot(np, y) - d[pick]) / Dense.dot(z, np);
                 if (noPrimal && drop < 0) {
-                    throw new QfError("E_INFEASIBLE", "no point satisfies the bounds and equalities");
+                    // Goldfarb-Idnani's certificate: n_p = sum_k rr_k n_k with every rr_k <= 0, so every feasible y'
+                    // has n_p . y' <= sum_k rr_k d_k, and the constraint is infeasible exactly when
+                    // gap = d_p - sum_k rr_k d_k > 0. At a degenerate vertex (a feasible set that is one point, a
+                    // margin tight at a vertex) the true gap is 0 and the rounding of the d's makes it 1e-16 either
+                    // way, while the slack test in mostViolated is relative to |d_p| + |n_p . y|, which can itself
+                    // be 1e-16 there. So the gap is judged against the rounding scale of the rows it combines.
+                    // Below that it is rounding: the constraint holds to within it wherever the active ones do, so
+                    // it is skipped until the active set changes. A dependent row can only appear before any step
+                    // on this pick (a drop removes a row with rr_k > 0, which leaves n_p outside the smaller span),
+                    // so uplus is 0 here and the multipliers need no change.
+                    double gap = d[pick];
+                    double tol = size[pick];
+                    for (int k = 0; k < q; k++) {
+                        gap -= rr[k] * d[act[k]];
+                        tol += Math.abs(rr[k]) * size[act[k]];
+                    }
+                    if (gap > CERTIFICATE * tol) {
+                        throw new QfError("E_INFEASIBLE", "no point satisfies the bounds and equalities");
+                    }
+                    implied[pick] = true;
+                    break;
                 }
                 double t = Math.min(t1, t2);
                 if (!noPrimal) {
@@ -100,6 +140,7 @@ final class DualActiveSet {
                     u[k] -= t * rr[k];
                 }
                 uplus += t;
+                java.util.Arrays.fill(implied, false); // the active set changes below
                 if (!noPrimal && t2 <= t1) {
                     addColumn(j, r, dv, q);
                     act[q] = pick;
@@ -116,11 +157,11 @@ final class DualActiveSet {
         throw new QfError("E_NO_CONVERGENCE", "active-set iterations exhausted");
     }
 
-    private static int mostViolated(double[][] c, double[] d, double[] y, boolean[] isActive) {
+    private static int mostViolated(double[][] c, double[] d, double[] y, boolean[] isActive, boolean[] implied) {
         int pick = -1;
         double worst = 0.0;
         for (int i = 0; i < c.length; i++) {
-            if (isActive[i]) {
+            if (isActive[i] || implied[i]) {
                 continue;
             }
             double s = Dense.dot(c[i], y) - d[i];

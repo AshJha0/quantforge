@@ -1,4 +1,5 @@
 """Handlers for book.* and usecase.factor_attribution (stage F, slice F5)."""
+
 from typing import Any
 
 from ..errors import QfError
@@ -9,6 +10,7 @@ from .registry import core, op
 
 def _event(e: Inputs) -> Any:
     from ..book import EVENT_TYPES, Event
+
     kind = e.enum("type", EVENT_TYPES)
     d = e.date("date")
     if kind == "TRADE":
@@ -19,31 +21,51 @@ def _event(e: Inputs) -> Any:
         return Event(d, kind, e.string("instrument"), price=e.real("settlement_price"))
     if kind == "DEFAULT":
         return Event(d, kind, e.string("instrument"), price=e.real("recovery_price"))
-    return Event(d, kind, e.string("from"), price=e.real("from_price"), to=e.string("to"),
-                 to_price=e.real("to_price"))
+    return Event(
+        d,
+        kind,
+        e.string("from"),
+        price=e.real("from_price"),
+        to=e.string("to"),
+        to_price=e.real("to_price"),
+    )
 
 
 @op("book.lifecycle.apply")
 def _lifecycle(i: Inputs) -> Any:
-    positions = [(p.string("instrument"), p.real("quantity"), p.real("average_cost"))
-                 for p in _objects(i, "positions")]
+    positions = [
+        (p.string("instrument"), p.real("quantity"), p.real("average_cost"))
+        for p in _objects(i, "positions")
+    ]
     return core.book.lifecycle_apply(positions, [_event(e) for e in _objects(i, "events")])
 
 
 @op("book.marks.resolve")
 def _marks(i: Inputs) -> Any:
     from ..book import Source
+
     names = i.array("instruments")
     if any(not isinstance(n, str) for n in names):
         raise QfError("E_SCHEMA", "instruments must be strings", "instruments")
-    sources = [Source(s.string("name"), tuple(
-        (q.string("instrument"), q.date("date"), q.real("price")) for q in _objects(s, "quotes")))
-        for s in _objects(i, "sources")]
-    ipv = [(p.string("instrument"), p.real("price")) for p in _objects(i, "ipv")] \
-        if i.has("ipv") else []
+    sources = [
+        Source(
+            s.string("name"),
+            tuple(
+                (q.string("instrument"), q.date("date"), q.real("price"))
+                for q in _objects(s, "quotes")
+            ),
+        )
+        for s in _objects(i, "sources")
+    ]
+    ipv = (
+        [(p.string("instrument"), p.real("price")) for p in _objects(i, "ipv")]
+        if i.has("ipv")
+        else []
+    )
     threshold = i.real("ipv_threshold") if i.has("ipv_threshold") else 0.0
-    return core.book.marks_resolve(i.date("as_of"), names, sources, i.integer("max_age_days"),
-                                   ipv, threshold)
+    return core.book.marks_resolve(
+        i.date("as_of"), names, sources, i.integer("max_age_days"), ipv, threshold
+    )
 
 
 @op("usecase.factor_attribution")

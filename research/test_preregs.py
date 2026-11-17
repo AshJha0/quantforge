@@ -58,11 +58,15 @@ sys.path.insert(0, str(D.parent))
 import holdout_scan  # noqa: E402
 
 NOTE = D / "DEVIATION-2026-11-12.md"
+WAVE3_NOTE = D / "DEVIATION-2026-11-15-wave3-listing.md"
 
 
 def listed():
     """Locations listed in the deviation note: the first backticked field of each list line."""
-    return set(re.findall(r"^- `([^`]+)` \|", NOTE.read_text(encoding="utf-8"), re.M))
+    found = set(re.findall(r"^- `([^`]+)` \|", NOTE.read_text(encoding="utf-8"), re.M))
+    # Stage J wave 3 listing (after the R3 holdouts were run on 2026-11-14); the signed note is not edited.
+    found |= set(re.findall(r"^- `([^`]+)` \|", WAVE3_NOTE.read_text(encoding="utf-8"), re.M))
+    return found
 
 
 RULE_NOTE = D / "DEVIATION-2026-11-12-recorder-rule.md"

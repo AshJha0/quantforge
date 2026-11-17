@@ -3,6 +3,7 @@
 Specs: specifications/05-volatility/garch.md, variance-swaps.md, vix-index.md, with rulings E-B1 to
 E-B7 in specifications/stage-e-rulings-b.md. Each function applies its checks in spec order.
 """
+
 import itertools
 import math
 from collections.abc import Callable, Sequence
@@ -29,6 +30,7 @@ def _domain(message: str, field: str | None = None) -> QfError:
 
 # --- GARCH(1,1) -------------------------------------------------------------------------------
 
+
 def _initial_variance(returns: Floats, initial: str | float) -> float:
     if isinstance(initial, str):
         value = ordered_sum(r * r for r in returns) / len(returns)
@@ -54,8 +56,9 @@ def _check_weights(omega: float, alpha: float, beta: float) -> None:
         raise _domain("beta must not be negative", "beta")
 
 
-def _recursion(returns: Floats, omega: float, alpha: float, beta: float,
-               sigma2: float) -> tuple[float, list[float], float]:
+def _recursion(
+    returns: Floats, omega: float, alpha: float, beta: float, sigma2: float
+) -> tuple[float, list[float], float]:
     """(loglik, sigma2_1..sigma2_n, sigma2_{n+1}): every term from t = 1, with ln(2 pi)."""
     variances = []
     total = 0.0
@@ -66,8 +69,9 @@ def _recursion(returns: Floats, omega: float, alpha: float, beta: float,
     return -0.5 * total, variances, sigma2
 
 
-def garch_loglik(returns: Floats, omega: float, alpha: float, beta: float,
-                 initial: str | float) -> tuple[float, list[float], float]:
+def garch_loglik(
+    returns: Floats, omega: float, alpha: float, beta: float, initial: str | float
+) -> tuple[float, list[float], float]:
     if len(returns) < 2:
         raise _input("at least 2 returns are needed", "returns")
     _check_initial_text(initial)
@@ -75,8 +79,14 @@ def garch_loglik(returns: Floats, omega: float, alpha: float, beta: float,
     return _recursion(returns, omega, alpha, beta, _initial_variance(returns, initial))
 
 
-def garch_forecast(omega: float, alpha: float, beta: float, next_variance: float, horizon: int,
-                   periods_per_year: float) -> tuple[list[float], float, float, float]:
+def garch_forecast(
+    omega: float,
+    alpha: float,
+    beta: float,
+    next_variance: float,
+    horizon: int,
+    periods_per_year: float,
+) -> tuple[list[float], float, float, float]:
     if horizon < 1:
         raise _input("horizon must be at least 1", "horizon")
     if periods_per_year <= 0:
@@ -97,12 +107,14 @@ def garch_forecast(omega: float, alpha: float, beta: float, next_variance: float
     return variances, total, math.sqrt(total * periods_per_year / horizon), long_run
 
 
-def _nelder_mead(f: Callable[[list[float]], float], start: list[float], step: float,
-                 iterations: int) -> tuple[list[float], float]:
+def _nelder_mead(
+    f: Callable[[list[float]], float], start: list[float], step: float, iterations: int
+) -> tuple[list[float], float]:
     """Minimises f. Standard coefficients; only the end point is used."""
     n = len(start)
-    simplex = [start] + [[x + (step if i == j else 0.0) for j, x in enumerate(start)]
-                         for i in range(n)]
+    simplex = [start] + [
+        [x + (step if i == j else 0.0) for j, x in enumerate(start)] for i in range(n)
+    ]
     values = [f(x) for x in simplex]
     for _ in range(iterations):
         order = sorted(range(n + 1), key=values.__getitem__)
@@ -111,8 +123,9 @@ def _nelder_mead(f: Callable[[list[float]], float], start: list[float], step: fl
             break
         centre = [sum(x[j] for x in simplex[:-1]) / n for j in range(n)]
 
-        def toward(c: float, centre: list[float] = centre,
-                   worst: list[float] = simplex[-1]) -> list[float]:
+        def toward(
+            c: float, centre: list[float] = centre, worst: list[float] = simplex[-1]
+        ) -> list[float]:
             return [m + c * (w - m) for m, w in zip(centre, worst, strict=True)]
 
         reflected = toward(-1.0)
@@ -130,8 +143,9 @@ def _nelder_mead(f: Callable[[list[float]], float], start: list[float], step: fl
                 simplex[-1], values[-1] = contracted, fc
             else:
                 best = simplex[0]
-                simplex = [best] + [[b + 0.5 * (x - b) for b, x in zip(best, s, strict=True)]
-                                    for s in simplex[1:]]
+                simplex = [best] + [
+                    [b + 0.5 * (x - b) for b, x in zip(best, s, strict=True)] for s in simplex[1:]
+                ]
                 values = [values[0]] + [f(x) for x in simplex[1:]]
     i = min(range(n + 1), key=values.__getitem__)
     return simplex[i], values[i]
@@ -166,7 +180,7 @@ def garch_fit(returns: Floats, initial: str | float) -> float:
             if not (omega > 0 and math.isfinite(omega)):
                 return math.inf
             value = -_recursion(returns, omega, alpha, beta, sigma2)[0]
-        except (OverflowError, ValueError, ZeroDivisionError):
+        except OverflowError, ValueError, ZeroDivisionError:
             return math.inf
         return value if math.isfinite(value) else math.inf
 
@@ -207,14 +221,14 @@ def _t_constant(nu: float) -> float:
     return math.lgamma((nu + 1) / 2) - math.lgamma(nu / 2) - 0.5 * math.log(math.pi * (nu - 2))
 
 
-def _score(e: Floats, theta: Sequence[float], sigma2: float,
-           student: bool) -> tuple[float, list[float]]:
+def _score(
+    e: Floats, theta: Sequence[float], sigma2: float, student: bool
+) -> tuple[float, list[float]]:
     """(loglik, gradient) in (omega, alpha, beta[, nu]), by the recursion's derivatives."""
     omega, alpha, beta = theta[0], theta[1], theta[2]
     nu = theta[3] if student else 0.0
     c = _t_constant(nu) if student else 0.0
-    dc = (0.5 * _digamma((nu + 1) / 2) - 0.5 * _digamma(nu / 2) - 0.5 / (nu - 2)
-          if student else 0.0)
+    dc = 0.5 * _digamma((nu + 1) / 2) - 0.5 * _digamma(nu / 2) - 0.5 / (nu - 2) if student else 0.0
     s, ds = sigma2, [0.0, 0.0, 0.0]
     total, grad = 0.0, [0.0] * (4 if student else 3)
     for r in e:
@@ -243,9 +257,16 @@ def _check_distribution(distribution: str, nu: float | None) -> None:
             raise _domain("degrees_of_freedom must be above 2", "degrees_of_freedom")
 
 
-def garch_loglik_t(returns: Floats, omega: float, alpha: float, beta: float,
-                   initial: str | float, distribution: str, nu: float | None,
-                   mean: float) -> tuple[float, list[float], float]:
+def garch_loglik_t(
+    returns: Floats,
+    omega: float,
+    alpha: float,
+    beta: float,
+    initial: str | float,
+    distribution: str,
+    nu: float | None,
+    mean: float,
+) -> tuple[float, list[float], float]:
     """vol.garch.loglik with the stage F options: the recursion on e_t = r_t - mean."""
     if len(returns) < 2:
         raise _input("at least 2 returns are needed", "returns")
@@ -260,8 +281,9 @@ def garch_loglik_t(returns: Floats, omega: float, alpha: float, beta: float,
     return loglik, variances, nxt
 
 
-def garch_estimate(returns: Floats, initial: str | float, distribution: str,
-                   demean: bool) -> dict[str, object]:
+def garch_estimate(
+    returns: Floats, initial: str | float, distribution: str, demean: bool
+) -> dict[str, object]:
     """Interior MLE, Newton-polished, with observed-information standard errors (F-11 to F-14)."""
     import numpy as np
 
@@ -291,7 +313,7 @@ def garch_estimate(returns: Floats, initial: str | float, distribution: str,
     def objective(x: list[float]) -> float:
         try:
             value = -_score(e, params(x), sigma2, student)[0]
-        except (OverflowError, ValueError, ZeroDivisionError):
+        except OverflowError, ValueError, ZeroDivisionError:
             return math.inf
         return value if math.isfinite(value) else math.inf
 
@@ -336,28 +358,36 @@ def garch_estimate(returns: Floats, initial: str | float, distribution: str,
                 raise fail()
             grad = np.array(_score(e, theta, sigma2, student)[1])
             step = np.linalg.solve(hessian(theta), grad).tolist()
-            rel = max(abs(b) / max(abs(a), s)
-                      for a, b, s in zip(theta, step, scale[:n], strict=True))
+            rel = max(
+                abs(b) / max(abs(a), s) for a, b, s in zip(theta, step, scale[:n], strict=True)
+            )
             theta = [a - b for a, b in zip(theta, step, strict=True)]
             if rel < 1e-12:
                 break
         else:
             raise fail()
         h = hessian(theta)
-    except (np.linalg.LinAlgError, OverflowError, ValueError, ZeroDivisionError):
+    except np.linalg.LinAlgError, OverflowError, ValueError, ZeroDivisionError:
         raise fail() from None
     if not interior(theta) or not bool(np.all(np.linalg.eigvalsh(h) < 0)):
         raise fail()
     errors = np.sqrt(np.diag(np.linalg.inv(-h))).tolist()
     keys = ["omega", "alpha", "beta", "degrees_of_freedom"]
     std = {k: (float(errors[j]) if j < n else None) for j, k in enumerate(keys)}
-    return {"omega": theta[0], "alpha": theta[1], "beta": theta[2],
-            "degrees_of_freedom": theta[3] if student else None, "mean": mu,
-            "loglik": _score(e, theta, sigma2, student)[0], "std_errors": std,
-            "persistence": theta[1] + theta[2]}
+    return {
+        "omega": theta[0],
+        "alpha": theta[1],
+        "beta": theta[2],
+        "degrees_of_freedom": theta[3] if student else None,
+        "mean": mu,
+        "loglik": _score(e, theta, sigma2, student)[0],
+        "std_errors": std,
+        "persistence": theta[1] + theta[2],
+    }
 
 
 # --- Variance swaps ---------------------------------------------------------------------------
+
 
 def _f(k: float, s0: float, t: float) -> float:
     return (2 / t) * ((k - s0) / s0 - math.log(k / s0))
@@ -375,9 +405,17 @@ def _weights(strikes: Floats, extra: float, s0: float, t: float) -> list[float]:
 
 
 def varswap_fair_strike(
-    as_of: date, maturity: date, spot: float, rate: float, dividend_yield: float,
-    put_strikes: Floats, call_strikes: Floats, vols: Sequence[tuple[float, float]],
-    extension_step: float, variance_strike: float, variance_notional: float,
+    as_of: date,
+    maturity: date,
+    spot: float,
+    rate: float,
+    dividend_yield: float,
+    put_strikes: Floats,
+    call_strikes: Floats,
+    vols: Sequence[tuple[float, float]],
+    extension_step: float,
+    variance_strike: float,
+    variance_notional: float,
 ) -> tuple[float, float, float]:
     if maturity <= as_of:
         raise _input("maturity must be after as_of", "maturity")
@@ -400,8 +438,9 @@ def varswap_fair_strike(
     if extension_step <= 0:
         raise _domain("extension_step must be positive", "extension_step")
     if min(put_strikes) - extension_step <= 0:
-        raise _domain("the lowest put strike less the extension step is not positive",
-                      "extension_step")
+        raise _domain(
+            "the lowest put strike less the extension step is not positive", "extension_step"
+        )
     t = (maturity - as_of).days / 365
     vol_of = dict(vols)
     puts = sorted(put_strikes, reverse=True)
@@ -415,7 +454,8 @@ def varswap_fair_strike(
         return total
 
     strip = leg(calls, calls[-1] + extension_step, "CALL") + leg(
-        puts, puts[-1] - extension_step, "PUT")
+        puts, puts[-1] - extension_step, "PUT"
+    )
     discount = math.exp(-rate * t)
     forward = spot * math.exp((rate - dividend_yield) * t)
     fair = (2 / t) * ((rate - dividend_yield) * t - (forward / spot - 1)) + strip / discount
@@ -424,8 +464,9 @@ def varswap_fair_strike(
     return fair, math.sqrt(fair), variance_notional * discount * (fair - variance_strike)
 
 
-def varswap_realized(prices: Floats, periods_per_year: float, variance_strike: float,
-                     variance_notional: float) -> tuple[float, float, float]:
+def varswap_realized(
+    prices: Floats, periods_per_year: float, variance_strike: float, variance_notional: float
+) -> tuple[float, float, float]:
     if len(prices) < 2:
         raise _input("at least 2 prices are needed", "prices")
     if any(p <= 0 for p in prices):
@@ -437,6 +478,7 @@ def varswap_realized(prices: Floats, periods_per_year: float, variance_strike: f
 
 
 # --- VIX --------------------------------------------------------------------------------------
+
 
 @dataclass(frozen=True)
 class Quote:
@@ -490,8 +532,9 @@ def _side(quotes: Sequence[Quote], bid: Callable[[Quote], float | None]) -> list
     return used
 
 
-def vix_term_variance(minutes: int, rate: float,
-                      strip: Sequence[Quote]) -> tuple[float, float, float, list[float]]:
+def vix_term_variance(
+    minutes: int, rate: float, strip: Sequence[Quote]
+) -> tuple[float, float, float, list[float]]:
     if minutes < 1:
         raise _input("minutes_to_expiry must be at least 1", "minutes_to_expiry")
     strikes = [q.strike for q in strip]
@@ -499,13 +542,15 @@ def vix_term_variance(minutes: int, rate: float,
         raise _input("at least 3 strikes are needed", "strip")
     if len(set(strikes)) != len(strikes):
         raise _input("a strike is repeated", "strip")
+
     def crossed(b: float | None, a: float | None) -> bool:
         return b is not None and a is not None and b > a
 
     if any(crossed(q.call_bid, q.call_ask) or crossed(q.put_bid, q.put_ask) for q in strip):
         raise _input("a bid is above its ask", "strip")
-    values = [v for q in strip for v in (q.call_bid, q.call_ask, q.put_bid, q.put_ask)
-              if v is not None]
+    values = [
+        v for q in strip for v in (q.call_bid, q.call_ask, q.put_bid, q.put_ask) if v is not None
+    ]
     if any(v < 0 for v in values):
         raise _domain("a quote is negative", "strip")
     t = minutes / MINUTES_PER_YEAR
@@ -523,8 +568,8 @@ def vix_term_variance(minutes: int, rate: float,
     if k0.null_call or k0.null_put:
         raise _input("the K0 call or put has a null quote", "strip")
     i0 = ordered.index(k0)
-    puts = _side(ordered[i0 - 1::-1] if i0 else [], lambda q: None if q.null_put else q.put_bid)
-    calls = _side(ordered[i0 + 1:], lambda q: None if q.null_call else q.call_bid)
+    puts = _side(ordered[i0 - 1 :: -1] if i0 else [], lambda q: None if q.null_put else q.put_bid)
+    calls = _side(ordered[i0 + 1 :], lambda q: None if q.null_call else q.call_bid)
     if not puts or not calls:  # ruling E-B15, Cboe methodology 3(a)(iii)
         raise _input("no out-of-the-money put or no out-of-the-money call is selected", "strip")
     chosen = [(q.strike, q.put) for q in reversed(puts)]
@@ -546,16 +591,16 @@ def vix_term_variance(minutes: int, rate: float,
     return forward, k0.strike, variance, ks
 
 
-def vix_index(near: tuple[int, float, Sequence[Quote]],
-              next_: tuple[int, float, Sequence[Quote]]) -> tuple[float, float, float]:
+def vix_index(
+    near: tuple[int, float, Sequence[Quote]], next_: tuple[int, float, Sequence[Quote]]
+) -> tuple[float, float, float]:
     n1, n2 = near[0], next_[0]
     if not (n1 < n2 and n1 <= MINUTES_30D <= n2):  # ruling E-B34: the bracket first
         raise _input("the terms must bracket 30 days with near before next", "near")
     v1 = vix_term_variance(*near)[2]
     v2 = vix_term_variance(*next_)[2]
     t1, t2 = n1 / MINUTES_PER_YEAR, n2 / MINUTES_PER_YEAR
-    bracket = (t1 * v1 * (n2 - MINUTES_30D) / (n2 - n1)
-               + t2 * v2 * (MINUTES_30D - n1) / (n2 - n1))
+    bracket = t1 * v1 * (n2 - MINUTES_30D) / (n2 - n1) + t2 * v2 * (MINUTES_30D - n1) / (n2 - n1)
     if bracket < 0:
         raise _domain("the interpolated variance is negative", "near")
     return 100 * math.sqrt(bracket * MINUTES_PER_YEAR / MINUTES_30D), v1, v2

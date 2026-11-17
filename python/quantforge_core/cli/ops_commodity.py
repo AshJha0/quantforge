@@ -1,4 +1,5 @@
 """Handlers for the commodity verbs. A handler reads every input first; the first call through `core`, the gated core modules, ends the E_SCHEMA stage."""
+
 from typing import Any
 
 from .inputs import Inputs
@@ -18,6 +19,7 @@ def _cmdty_forward(i: Inputs) -> Any:
 @op("cmdty.storage.carry")
 def _storage(i: Inputs) -> Any:
     forwards = [(f.date("date"), f.real("price")) for f in _objects(i, "forwards")]
-    ys, values, flags = core.commodity.storage_carry(_curve(i, "funding"), forwards,
-                                                 i.real("storage_cost"))
+    ys, values, flags = core.commodity.storage_carry(
+        _curve(i, "funding"), forwards, i.real("storage_cost")
+    )
     return {"convenience_yields": ys, "carry_values": values, "arbitrage": flags}

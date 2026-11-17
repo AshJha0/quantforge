@@ -3,6 +3,7 @@
 The builtin sum() compensates float rounding since Python 3.12. The contract asks for plain sums in
 array order, so float sums here go through ordered_sum.
 """
+
 from collections.abc import Iterable, Sequence
 
 from .finite import guard

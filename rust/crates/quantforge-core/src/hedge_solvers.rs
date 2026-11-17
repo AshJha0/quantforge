@@ -239,7 +239,14 @@ struct Constraint {
     normal: Vec<f64>,
     rhs: f64,
     scale: f64,
+    /// The magnitude of the terms that cancel in `rhs` (a bound row: `max(1, |bound| + |x_p,j|)`),
+    /// the scale of its rounding error; used only to judge an infeasibility certificate.
+    size: f64,
 }
+
+/// An infeasibility certificate at or below this fraction of its rounding scale is rounding:
+/// the 1e-9 of the Python phase-one feasibility test.
+const CERTIFICATE: f64 = 1e-9;
 
 /// For the active set `N` (columns `normals`): `B = G^{-1} N` and `M^{-1}`, `M = N^T B`.
 fn active_factors(
@@ -333,10 +340,12 @@ fn dual_active_set(
     let mut u: Vec<f64> = Vec::new();
     let gcols: Vec<Vec<f64>> = cons.iter().map(|c| mat_vec(&ginv, &c.normal)).collect();
     let limit = iteration_cap();
+    // Constraints judged implied by the current active set; cleared whenever it changes.
+    let mut implied = vec![false; cons.len()];
     for _ in 0..limit {
         let slack = |y: &[f64], j: usize| dot(&cons[j].normal, y) - cons[j].rhs;
         let p = (0..cons.len())
-            .filter(|j| !active.contains(j))
+            .filter(|&j| !active.contains(&j) && !implied[j])
             .map(|j| (j, slack(&y, j) / cons[j].scale))
             .filter(|&(_, s)| s < -THRESHOLD)
             .min_by(|x, z| x.1.total_cmp(&z.1))
@@ -374,24 +383,57 @@ fn dual_active_set(
                     *v -= ri * w;
                 }
             }
+            let zn = dot(&z, normal);
+            let step_in_primal = zn > dependence * gn;
+            // n_p in the span of the active rows (no primal step): r are the coefficients of
+            // n_p = sum_k r_k n_k, found by solving with M, so each carries a rounding error of
+            // order eps cond(M) max|r|. An r_k that small is 0, not a blocking row: taken as
+            // positive, it makes a dual step of u_k / r_k (1e17 at a degenerate vertex) that drops
+            // a genuine active row and leaves the multipliers of the dependent rows at 1e17 and of
+            // the dropped row, re-added, at 0. The cut is the I-3 threshold, 1e-12 of the largest
+            // |r|. With a primal step the test stays r_k > 0.
+            let r_cut = if step_in_primal {
+                0.0
+            } else {
+                r.iter().fold(0.0_f64, |m, ri| m.max(1e-12 * ri.abs()))
+            };
             let mut t1 = f64::INFINITY;
             let mut drop = None;
             for (i, ri) in r.iter().enumerate() {
-                if *ri > 0.0 && u[i] / ri < t1 {
+                if *ri > r_cut && u[i] / ri < t1 {
                     t1 = u[i] / ri;
                     drop = Some(i);
                 }
             }
-            let zn = dot(&z, normal);
-            let t2 = if zn > dependence * gn {
+            let t2 = if step_in_primal {
                 -(dot(normal, &y) - cons[p].rhs) / zn
             } else {
                 f64::INFINITY
             };
             let t = t1.min(t2);
             if t == f64::INFINITY {
-                return Ok(None);
+                // Goldfarb-Idnani's certificate: n_p = sum_k r_k n_k with every r_k <= 0, so
+                // every feasible y' has n_p . y' <= sum_k r_k d_k, and no feasible point exists
+                // exactly when gap = d_p - sum_k r_k d_k > 0. At a degenerate vertex (a feasible
+                // set that is one point, a margin tight at a vertex) the true gap is 0 and rounding
+                // makes it 1e-16 either way, so it is judged against the rounding scale of the rows
+                // it combines. Below that the constraint holds, to rounding, wherever the active
+                // ones do: it is skipped until the active set changes. A dependent row can only
+                // appear before any step on this pick (a drop removes a row with r_k > 0, which
+                // leaves n_p outside the smaller span), so `up` is 0 and `u` needs no change.
+                let mut gap = cons[p].rhs;
+                let mut tol = cons[p].size;
+                for (ri, &j) in r.iter().zip(&active) {
+                    gap -= ri * cons[j].rhs;
+                    tol += ri.abs() * cons[j].size;
+                }
+                if gap > CERTIFICATE * tol {
+                    return Ok(None);
+                }
+                implied[p] = true;
+                break;
             }
+            implied.fill(false); // the active set changes below
             if t2.is_finite() {
                 for (v, w) in y.iter_mut().zip(&z) {
                     *v += t * w;
@@ -594,9 +636,11 @@ fn minimise_with_multipliers(
                 })
                 .collect();
             let norm = dot(&normal, &normal).sqrt().max(f64::MIN_POSITIVE);
+            let terms: f64 = q.normal.iter().zip(xp).map(|(a, p)| (a * p).abs()).sum();
             Constraint {
                 rhs: q.rhs - dot(&q.normal, xp),
                 scale: norm * q.rhs.abs().max(1.0),
+                size: (q.rhs.abs() + terms).max(1.0),
                 normal,
             }
         })
@@ -723,6 +767,11 @@ fn nonsmooth_minimiser(
             }
         })
         .collect();
+    // J-I.2: coordinates the kink tolerance put at 0 although the split left them nonzero. If
+    // that orthant has no feasible point (an equality forcing a tiny nonzero x_j), they are
+    // released to the split's sign and the orthant solved again, instead of returning the split.
+    let mut tolerance_zeros: Vec<usize> =
+        (0..n).filter(|&j| sign[j] == 0.0 && x0[j] != 0.0).collect();
     let (xp, z) = null_space(e, rhs, n);
     let mut sign = sign;
     let mut last = x0;
@@ -756,6 +805,12 @@ fn nonsmooth_minimiser(
         let (g, lin) = reduced(h, &c3, &xp, &z);
         let Some((x, mult)) = minimise_with_multipliers(&g, &lin, &z, &xp, &rows, THRESHOLD)?
         else {
+            if !tolerance_zeros.is_empty() {
+                for j in tolerance_zeros.drain(..) {
+                    sign[j] = last[j].signum();
+                }
+                continue;
+            }
             // A sign state with no feasible point: keep the best answer so far.
             return Ok(Some(last));
         };
@@ -775,6 +830,7 @@ fn nonsmooth_minimiser(
                 changed = true;
             }
         }
+        tolerance_zeros.clear();
         last = x;
         if !changed {
             converged = true;
@@ -1070,7 +1126,20 @@ fn qp_solve_unscaled(p: &QpProblem) -> Result<QpSolution> {
         let found = if nonsmooth {
             nonsmooth_minimiser(&h, &c, (e, rhs), (lower, upper), &kinks)?
         } else {
-            bounded_minimiser(&g, &lin, &z_rows, &xp, lower, upper)?
+            let mut found = bounded_minimiser(&g, &lin, &z_rows, &xp, lower, upper)?;
+            if let Some(x) = found.as_mut()
+                && k == 0
+            {
+                // The normal-equations error of the integer relaxation (`refine_relaxed`) again:
+                // 2.3e-6 against an exact minimum of 0 on the near-singular case of Java seed
+                // -11115467 with x bounds 10 times its lot bounds. Impact counts like a ridge.
+                let diag: Vec<f64> = impact.iter().map(|m| p.ridge + cost_weight * m).collect();
+                refine_relaxed(p.a, p.b, p.weights, &diag, &h, lower, upper, x);
+                for v in x.iter_mut() {
+                    *v += 0.0;
+                }
+            }
+            found
         };
         match found {
             Some(x) => x,
@@ -1266,6 +1335,90 @@ impl LotSearch<'_> {
     }
 }
 
+/// Fixed-precision iterative refinement of a bounded minimiser on its free coordinates (those
+/// strictly inside their bounds); returns `f(v)` and updates `v` in place, with
+/// `f = sum_i w_i r_i^2 + sum_j diag_j v_j^2`, `r = al v + b` and `h = al^T W al + diag(diag)`.
+/// Same algorithm and guards as Java `refineRelaxed`.
+///
+/// `bounded_minimiser` works on the normal equations, whose condition number is that of `al`
+/// squared, so its forward error along a weak direction is about `u kappa(h) |v|` and costs
+/// `lambda_min |delta|^2` in `f`: 3.3e-6 against a true minimum of 0 on Java property seed
+/// -11115467, above the integer optimum, which is impossible. Each step takes the gradient from
+/// the residual computed directly (error `u |al| |v|`, not squared) and solves
+/// `h_F delta = -g_F`; the error contracts by about `u kappa(D h_F D)` per step, below 1 whenever
+/// the singularity check passes (`kappa <= 1e12`). A step is kept only while it lowers `f` and
+/// stays inside the bounds, so the result is never worse than the active-set answer; the loop
+/// ends at the first step that does not lower `f` (normally the second or third), and the cap of
+/// 64 steps is only a guard. A failed Cholesky factor (not expected after the check) keeps `v`.
+#[allow(clippy::too_many_arguments, clippy::float_cmp)]
+fn refine_relaxed(
+    al: &Matrix,
+    b: &[f64],
+    w: &[f64],
+    diag: &[f64],
+    h: &Matrix,
+    lower: &[Option<f64>],
+    upper: &[Option<f64>],
+    v: &mut [f64],
+) -> f64 {
+    let n = v.len();
+    let f_of = |v: &[f64]| {
+        objective_of(&residual_of(al, b, v), w, 0.0, v)
+            + (0..n).map(|j| diag[j] * v[j] * v[j]).sum::<f64>()
+    };
+    let mut best = f_of(v);
+    let free: Vec<usize> = (0..n)
+        .filter(|&j| lower[j] != Some(v[j]) && upper[j] != Some(v[j]))
+        .collect();
+    let nf = free.len();
+    if nf == 0 {
+        return best;
+    }
+    let hf: Matrix = free
+        .iter()
+        .map(|&p| free.iter().map(|&q| h[p][q]).collect())
+        .collect();
+    let Ok(l) = crate::linalg::cholesky(&hf) else {
+        return best;
+    };
+    for _ in 0..64 {
+        let res = residual_of(al, b, v);
+        // t = minus half the gradient of f on the free block, then L L^T delta = t in place.
+        let mut t: Vec<f64> = free
+            .iter()
+            .map(|&j| {
+                -(diag[j] * v[j]
+                    + (0..res.len())
+                        .map(|i| al[i][j] * w[i] * res[i])
+                        .sum::<f64>())
+            })
+            .collect();
+        for p in 0..nf {
+            let s = t[p] - (0..p).map(|k| l[p][k] * t[k]).sum::<f64>();
+            t[p] = s / l[p][p];
+        }
+        for p in (0..nf).rev() {
+            let s = t[p] - (p + 1..nf).map(|k| l[k][p] * t[k]).sum::<f64>();
+            t[p] = s / l[p][p];
+        }
+        let mut trial = v.to_vec();
+        for (p, &j) in free.iter().enumerate() {
+            trial[j] += t[p];
+            if lower[j].is_some_and(|lo| trial[j] < lo) || upper[j].is_some_and(|hi| trial[j] > hi)
+            {
+                return best;
+            }
+        }
+        let f = f_of(&trial);
+        if f.is_nan() || f >= best {
+            return best;
+        }
+        best = f;
+        v.copy_from_slice(&trial);
+    }
+    best
+}
+
 /// `hedge.integer.solve`: the hedge objective over whole lots, `x_j = lot_sizes_j n_j`.
 ///
 /// # Errors
@@ -1339,7 +1492,7 @@ pub fn integer_solve(p: &IntegerProblem) -> Result<IntegerSolution> {
             .with(std::cell::Cell::get)
             .unwrap_or(INTEGER_NODE_CAP),
     };
-    let Some(relaxed) =
+    let Some(mut relaxed) =
         bounded_minimiser(&search.g, &search.lin, &search.eye, &search.zero, &lo, &hi)?
     else {
         return fail("E_NO_CONVERGENCE", "a box of integers cannot be empty");
@@ -1350,7 +1503,21 @@ pub fn integer_solve(p: &IntegerProblem) -> Result<IntegerSolution> {
         e.field = Some("lot_sizes".to_string());
         return Err(e);
     }
-    let continuous_objective = search.value(&relaxed);
+    let al: Matrix =
+        p.a.iter()
+            .map(|row| row.iter().zip(s).map(|(v, s)| v * s).collect())
+            .collect();
+    let ridge_l: Vec<f64> = s.iter().map(|s| p.ridge * s * s).collect();
+    let continuous_objective = refine_relaxed(
+        &al,
+        p.b,
+        p.weights,
+        &ridge_l,
+        &search.g,
+        &lo,
+        &hi,
+        &mut relaxed,
+    );
     search.branch(&mut lo, &mut hi)?;
     let Some((objective, lots)) = search.best else {
         return fail("E_NO_CONVERGENCE", "the search found no integer point");
@@ -1404,7 +1571,14 @@ fn sample_covariance(series: &[&[f64]]) -> Matrix {
     let t = series[0].len();
     let means: Vec<f64> = series
         .iter()
-        .map(|s| s.iter().sum::<f64>() / t as f64)
+        // A constant series has sample variance exactly 0 (ruling J-I.4): its mean is its value.
+        .map(|s| {
+            if s.iter().all(|&v| v == s[0]) {
+                s[0]
+            } else {
+                s.iter().sum::<f64>() / t as f64
+            }
+        })
         .collect();
     let n = series.len();
     let mut out = vec![vec![0.0; n]; n];
@@ -1871,11 +2045,11 @@ fn next_subset(s: &mut [usize], n: usize) -> bool {
 /// `hedge.select.solve`: the best hedge with at most `max_instruments` of the instruments
 /// (ruling I-34), by `hedge.qp.solve` on every subset of size 1 to `K`. `p` carries no
 /// equalities, singular policy or costs; `extra_keys` says that the input named one of
-/// `eq_matrix`, `eq_rhs` or `singular` (I-33).
+/// `eq_matrix`, `eq_rhs`, `singular` or a cost or margin key (I-33, J-I.3).
 ///
 /// # Errors
 /// `E_DOMAIN` for a non-finite input; `hedge.qp.solve` checks 1 to 3; `E_INPUT` (`K` outside
-/// `1..n`, an extra key); `E_DOMAIN` (a bound that excludes 0); `E_SINGULAR` (the full
+/// `1..n`, an extra key, any cost or margin field set in `p`, J-I.3); `E_DOMAIN` (a bound that excludes 0); `E_SINGULAR` (the full
 /// problem).
 pub fn select_solve(p: &QpProblem, max_instruments: i64, extra_keys: bool) -> Result<Selection> {
     check_finite(p)?;
@@ -1899,10 +2073,11 @@ pub fn select_solve(p: &QpProblem, max_instruments: i64, extra_keys: bool) -> Re
         );
     }
     let k = usize::try_from(max_instruments).unwrap_or(0);
-    if k < 1 || k > n || extra_keys {
+    // J-I.3: costs or margin in `p` are refused like the I-33 keys, not silently dropped.
+    if k < 1 || k > n || extra_keys || p.costs.any() {
         return fail(
             "E_INPUT",
-            "max_instruments in 1..n; no equalities or singular policy (ruling I-33)",
+            "max_instruments in 1..n; no equalities, singular policy, costs or margin (I-33, J-I.3)",
         );
     }
     if lower.iter().any(|l| l.is_some_and(|l| l > 0.0))
@@ -2173,6 +2348,66 @@ mod r6_cap_tests {
         assert_eq!(planted, 7);
     }
 
+    /// `hedge.qp.solve` sets the cap from `p` = equality rows + finite lower bounds + finite
+    /// upper bounds + 1 for a margin row: n = 3, 1 row, 2 lower, 3 upper, margin gives
+    /// `10 (3 + 1 + 2 + 3 + 1) + 100 = 200`.
+    #[test]
+    fn qp_cap_counts_every_constraint() {
+        PLANTED_CAP.with(|c| c.set(None));
+        let a: Matrix = vec![
+            vec![1.0, 0.0, 0.0],
+            vec![0.0, 1.0, 0.0],
+            vec![0.0, 0.0, 1.0],
+        ];
+        let (b, w) = ([1.0, -2.0, 0.5], [1.0; 3]);
+        let e = vec![vec![1.0, 1.0, 1.0]];
+        let lo = [Some(-10.0), Some(-10.0), None];
+        let hi = [Some(10.0), Some(10.0), Some(10.0)];
+        let rates = [0.1, 0.1, 0.1];
+        let q = QpProblem {
+            eq_matrix: Some(&e),
+            eq_rhs: Some(&[0.5]),
+            lower: Some(&lo),
+            upper: Some(&hi),
+            costs: Costs {
+                margin_rates: Some(&rates),
+                margin_limit: Some(100.0),
+                ..Costs::default()
+            },
+            ..plain(&a, &b, &w)
+        };
+        let r = qp_solve(&q);
+        assert!(r.is_ok(), "{r:?}");
+        assert_eq!(iteration_cap(), 200);
+    }
+
+    /// The split stage only seeds the sign state, but a correct seed needs a single pass of
+    /// the sign-state loop. `A = [[1, 1], [0, 1]]`, `b = (1, 3)`: `H = [[1, 1], [1, 2]]`,
+    /// `c = A^T b = (1, 4)`, unconstrained `x = -H^-1 c = (2, -3)`, so with small spreads 0.1
+    /// (soft threshold moves x by under 0.2) `x1 > 0` although `c1 > 0`: the coupling through
+    /// `H12` sets its sign. The split problem with the full `H` finds signs `(+, -)` and the
+    /// first orthant solve meets KKT, so a planted cap of `PASSES` = 3 iterations (the smallest that passes, the dual active-set solves count against it too) is enough. A
+    /// split that ignored the coupling would seed `(-, -)` and need two more passes.
+    #[test]
+    fn split_seed_is_right_first_time() {
+        const PASSES: usize = 3;
+        let a: Matrix = vec![vec![1.0, 1.0], vec![0.0, 1.0]];
+        let (b, w) = ([1.0, 3.0], [1.0, 1.0]);
+        let spreads = [0.1, 0.1];
+        let q = QpProblem {
+            costs: Costs {
+                half_spreads: Some(&spreads),
+                ..Costs::default()
+            },
+            ..plain(&a, &b, &w)
+        };
+        PLANTED_CAP.with(|c| c.set(Some(PASSES)));
+        let r = qp_solve(&q);
+        PLANTED_CAP.with(|c| c.set(None));
+        let x = r.unwrap().x;
+        assert!(x[0] > 1.5 && x[1] < -2.5, "{x:?}");
+    }
+
     /// The Jacobi scaling is `Some` only for a well-formed problem with positive weights.
     #[test]
     fn jacobi_scaling_needs_a_valid_problem() {
@@ -2317,5 +2552,220 @@ mod r6_followup_tests {
                 .code,
             "E_INPUT"
         );
+    }
+}
+
+#[cfg(test)]
+mod lot_search_cap_tests {
+    use super::*;
+
+    /// Integer search with a planted node cap on A = I, b = [-2.3, -2.4] (lot 1, r = x + b), whose
+    /// relaxed optimum is y = (2.3, 2.4). Hand trace of the branch and bound:
+    /// node 1 y = (2.3, 2.4), branch x2 (farthest), 0.4 <= 0.5 so down first;
+    /// node 2 x2 <= 2: y = (2.3, 2), branch x1 down first;
+    /// node 3 x1 <= 2: (2, 2) integer, f = 0.09 + 0.16 = 0.25, incumbent;
+    /// node 4 x1 >= 3: (3, 2), bound 0.49 + 0.16 = 0.65 > 0.25, pruned;
+    /// node 5 x2 >= 3: y = (2.3, 3), bound 0.09 + 0.36 = 0.45 > 0.25, pruned.
+    /// Five nodes: cap 5 succeeds with lots [2, 2], cap 4 fails.
+    /// Visiting the far side first or not pruning node 5 both need 7 nodes.
+    fn solve_with_cap(cap: usize) -> Result<IntegerSolution> {
+        let a: Matrix = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let b = [-2.3, -2.4];
+        let w = [1.0, 1.0];
+        let lots = [1.0, 1.0];
+        let p = IntegerProblem {
+            a: &a,
+            b: &b,
+            weights: &w,
+            ridge: 0.0,
+            lot_sizes: &lots,
+            lower_lots: None,
+            upper_lots: None,
+        };
+        PLANTED_CAP.with(|c| c.set(Some(cap)));
+        let r = integer_solve(&p);
+        PLANTED_CAP.with(|c| c.set(None));
+        r
+    }
+
+    #[test]
+    fn node_cap_is_exactly_the_hand_traced_count() {
+        assert_eq!(solve_with_cap(5).unwrap().lots, vec![2, 2]);
+        assert_eq!(solve_with_cap(4).unwrap_err().code, "E_NO_CONVERGENCE");
+        assert_eq!(solve_with_cap(2).unwrap_err().code, "E_NO_CONVERGENCE");
+    }
+}
+
+/// Degenerate but feasible problems (v0.9.0 kill-round failures and their neighbours): the
+/// feasible set is one point, or the margin is tight at a vertex, so more constraints are active
+/// than the dimension allows. Answers are worked by hand; the same cases are in the Python, Java
+/// and C++ unit tests.
+#[cfg(test)]
+mod degenerate_tests {
+    use super::*;
+
+    fn problem<'a>(a: &'a Matrix, b: &'a [f64], w: &'a [f64]) -> QpProblem<'a> {
+        QpProblem {
+            a,
+            b,
+            weights: w,
+            ridge: 0.0,
+            eq_matrix: None,
+            eq_rhs: None,
+            lower: None,
+            upper: None,
+            singular: Singular::Error,
+            costs: Costs::default(),
+        }
+    }
+
+    fn assert_x(got: &[f64], want: &[f64]) {
+        assert_eq!(got.len(), want.len());
+        for (g, w) in got.iter().zip(want) {
+            assert!((g - w).abs() <= 1e-12, "{got:?} vs {want:?}");
+        }
+    }
+
+    fn assert_rel(got: f64, want: f64, rel: f64) {
+        assert!((got - want).abs() <= rel * want.abs(), "{got} vs {want}");
+    }
+
+    fn c1(x2_cap: f64) -> Result<QpSolution> {
+        let a = vec![
+            vec![1.0, 0.0, -1.0],
+            vec![-1.0, 2.0, -1.0],
+            vec![1.0, 1.0, 2.0],
+        ];
+        let eq = vec![vec![-1.0, 0.0, 1.0], vec![-1.0, -1.0, 0.0]];
+        let lo = [Some(1.0), Some(0.0), Some(-2.0)];
+        let hi = [None, Some(1.0), Some(x2_cap)];
+        let mut p = problem(&a, &[-1.0, -1.0, -3.0], &[1.0; 3]);
+        p.eq_matrix = Some(&eq);
+        p.eq_rhs = Some(&[-2.0, -1.0]);
+        p.lower = Some(&lo);
+        p.upper = Some(&hi);
+        qp_solve(&p)
+    }
+
+    /// The equalities leave (t, 1 - t, t - 2); x0 >= 1, x1 >= 0, x2 <= -1 meet only at t = 1,
+    /// where A x + b = (1, -1, -4).
+    #[test]
+    fn equalities_and_bounds_leave_one_point() {
+        let s = c1(-1.0).expect("feasible");
+        assert_x(&s.x, &[1.0, 0.0, -1.0]);
+        assert_rel(s.objective, 18.0, 1e-12);
+        assert_eq!(s.rank, 1);
+        assert_eq!(c1(-1.000_001).unwrap_err().code, "E_INFEASIBLE");
+    }
+
+    fn margin(limit: f64, spreads: Option<&[f64]>) -> Result<QpSolution> {
+        let a = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let eq = vec![vec![1.0, 1.0]];
+        let mut p = problem(&a, &[0.0, 0.0], &[1.0, 1.0]);
+        p.eq_matrix = Some(&eq);
+        p.eq_rhs = Some(&[1.0]);
+        p.costs = Costs {
+            half_spreads: spreads,
+            margin_rates: Some(&[1.0, 4.0]),
+            margin_limit: Some(limit),
+            ..Costs::default()
+        };
+        qp_solve(&p)
+    }
+
+    /// x0 + x1 = 1 and |x0| + 4 |x1| <= 1 meet only at (1, 0).
+    #[test]
+    fn margin_tight_at_the_only_feasible_point() {
+        let s = margin(1.0, None).expect("feasible");
+        assert_x(&s.x, &[1.0, 0.0]);
+        assert_rel(s.objective, 1.0, 1e-12);
+        assert_rel(s.margin.expect("margin"), 1.0, 1e-12);
+        let c = margin(1.0, Some(&[0.5, 0.5])).expect("feasible");
+        assert_x(&c.x, &[1.0, 0.0]);
+        assert_rel(c.risk.expect("risk"), 1.0, 1e-12);
+        assert_rel(c.cost.expect("cost"), 0.5, 1e-12);
+        assert_rel(c.objective, 1.5, 1e-12);
+        assert_eq!(margin(0.999_999, None).unwrap_err().code, "E_INFEASIBLE");
+    }
+
+    /// x = (t, 0, 1 + t), f(t) = (t + 4)^2 + (1 - 4t)^2 + 2 (t + 1)^2 + |t|, minimised at
+    /// t = -3/38.
+    #[test]
+    fn costed_two_equalities_and_a_margin() {
+        let a = vec![
+            vec![-1.0, 1.0, 2.0],
+            vec![-2.0, -2.0, -2.0],
+            vec![-2.0, -1.0, 1.0],
+            vec![1.0, -1.0, 0.0],
+        ];
+        let eq = vec![vec![-1.0, -1.0, 1.0], vec![0.0, 1.0, 0.0]];
+        let mut p = problem(&a, &[2.0, 3.0, -2.0, 1.0], &[1.0; 4]);
+        p.eq_matrix = Some(&eq);
+        p.eq_rhs = Some(&[1.0, 0.0]);
+        p.costs = Costs {
+            half_spreads: Some(&[1.0, 1.0, 0.0]),
+            margin_rates: Some(&[1.0, 2.0, 0.0]),
+            margin_limit: Some(1.0),
+            ..Costs::default()
+        };
+        let s = qp_solve(&p).expect("feasible");
+        assert_x(&s.x, &[-3.0 / 38.0, 0.0, 35.0 / 38.0]);
+        assert_rel(s.cost.expect("cost"), 3.0 / 38.0, 1e-12);
+        assert_rel(s.risk.expect("risk"), 27151.0 / 1444.0, 1e-11);
+        assert_rel(s.objective, 27265.0 / 1444.0, 1e-11);
+        assert_rel(s.margin.expect("margin"), 3.0 / 38.0, 1e-12);
+    }
+
+    #[test]
+    fn equality_repeats_a_fixed_bound_and_every_bound_fixed() {
+        let a = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let eq = vec![vec![1.0, 0.0]];
+        let lo = [Some(1.0), None];
+        let hi = [Some(1.0), None];
+        let mut p = problem(&a, &[0.0, 0.0], &[1.0, 1.0]);
+        p.eq_matrix = Some(&eq);
+        p.eq_rhs = Some(&[1.0]);
+        p.lower = Some(&lo);
+        p.upper = Some(&hi);
+        let s = qp_solve(&p).expect("feasible");
+        assert_x(&s.x, &[1.0, 0.0]);
+        assert_rel(s.objective, 1.0, 1e-12);
+        let fixed = [Some(0.5), Some(-2.0)];
+        let mut f = problem(&a, &[1.0, 1.0], &[1.0, 1.0]);
+        f.lower = Some(&fixed);
+        f.upper = Some(&fixed);
+        let s = qp_solve(&f).expect("feasible");
+        assert_eq!(s.x, vec![0.5, -2.0]);
+        assert_rel(s.objective, 3.25, 1e-12);
+    }
+
+    /// sum x = 3 with x <= 1 is met only at (1, 1, 1); x0 = x1 is redundant there too.
+    #[test]
+    fn single_vertex_of_the_box_with_redundant_equalities() {
+        let a = vec![
+            vec![1.0, 0.0, 0.0],
+            vec![0.0, 1.0, 0.0],
+            vec![0.0, 0.0, 1.0],
+        ];
+        let hi = [Some(1.0); 3];
+        let one = vec![vec![1.0, 1.0, 1.0]];
+        let two = vec![vec![1.0, 1.0, 1.0], vec![1.0, -1.0, 0.0]];
+        for (eq, rhs) in [(&one, &[3.0][..]), (&two, &[3.0, 0.0][..])] {
+            let mut p = problem(&a, &[0.0; 3], &[1.0; 3]);
+            p.eq_matrix = Some(eq);
+            p.eq_rhs = Some(rhs);
+            p.upper = Some(&hi);
+            let s = qp_solve(&p).expect("feasible");
+            assert_x(&s.x, &[1.0, 1.0, 1.0]);
+            assert_rel(s.objective, 3.0, 1e-12);
+        }
+        let a2 = vec![vec![1.0, 0.0], vec![0.0, 1.0]];
+        let eq = vec![vec![1.0, 1.0]];
+        let hi2 = [Some(1.0), Some(1.0)];
+        let mut bad = problem(&a2, &[0.0, 0.0], &[1.0, 1.0]);
+        bad.eq_matrix = Some(&eq);
+        bad.eq_rhs = Some(&[2.000_001]);
+        bad.upper = Some(&hi2);
+        assert_eq!(qp_solve(&bad).unwrap_err().code, "E_INFEASIBLE");
     }
 }

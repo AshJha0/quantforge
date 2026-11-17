@@ -1,4 +1,5 @@
 """The discount curve object (specifications/02-curves/curve-framework.md)."""
+
 import math
 from bisect import bisect_right
 from collections.abc import Callable, Sequence
@@ -27,8 +28,9 @@ class CurveData:
     step_end: date | None = None
 
 
-def check_options(interpolation: str, tension: float | None, step_end: date | None,
-                  pillars: Sequence[date]) -> None:
+def check_options(
+    interpolation: str, tension: float | None, step_end: date | None, pillars: Sequence[date]
+) -> None:
     """Stage F curve keys: `tension` for TENSION_SPLINE, `step_end` (a pillar) for HYBRID."""
     if interpolation == "TENSION_SPLINE":
         if tension is None:
@@ -51,8 +53,13 @@ class Curve:
         self.jumps = data.jumps
         self.dates = data.dates
         self.times = [0.0, *(self.time(d) for d in data.dates)]
-        self.logs = [0.0, *(math.log(v / self.jump(d))
-                            for d, v in zip(data.dates, data.discount_factors, strict=True))]
+        self.logs = [
+            0.0,
+            *(
+                math.log(v / self.jump(d))
+                for d, v in zip(data.dates, data.discount_factors, strict=True)
+            ),
+        ]
         self.zeros = [0.0, *(-x / t for x, t in zip(self.logs[1:], self.times[1:], strict=True))]
         if data.dates:  # an empty curve is only the bare prefix of a curve solve
             self.zeros[0] = self.zeros[1]
@@ -62,20 +69,38 @@ class Curve:
         self.tension, self.step_end = data.tension, data.step_end
         if data.interpolation in curve_interp.NEW_METHODS and data.dates:
             k = data.dates.index(data.step_end) + 1 if data.step_end in data.dates else None
-            self._interp = curve_interp.make(data.interpolation, self.times, self.logs,
-                                             data.tension, k)
+            self._interp = curve_interp.make(
+                data.interpolation, self.times, self.logs, data.tension, k
+            )
 
     @classmethod
     def _extended(cls, prefix: Curve, d: date, factor: float) -> Curve:
         """The curve `prefix` with one more pillar (d, factor), computed element by element as
         __init__ would: the fixed pillars' times, logs and zeros are reused, not recomputed."""
         if prefix.interpolation in curve_interp.NEW_METHODS:
-            return cls(CurveData(prefix.as_of, prefix.interpolation, (*prefix.dates, d),
-                                 (*(math.exp(x) * prefix.jump(p)
-                                    for x, p in zip(prefix.logs[1:], prefix.dates, strict=True)),
-                                  factor), prefix.jumps, prefix.tension, prefix.step_end))
+            return cls(
+                CurveData(
+                    prefix.as_of,
+                    prefix.interpolation,
+                    (*prefix.dates, d),
+                    (
+                        *(
+                            math.exp(x) * prefix.jump(p)
+                            for x, p in zip(prefix.logs[1:], prefix.dates, strict=True)
+                        ),
+                        factor,
+                    ),
+                    prefix.jumps,
+                    prefix.tension,
+                    prefix.step_end,
+                )
+            )
         curve = cls.__new__(cls)
-        curve.as_of, curve.interpolation, curve.jumps = prefix.as_of, prefix.interpolation, prefix.jumps
+        curve.as_of, curve.interpolation, curve.jumps = (
+            prefix.as_of,
+            prefix.interpolation,
+            prefix.jumps,
+        )
         curve.dates = (*prefix.dates, d)
         t = curve.time(d)
         x = math.log(factor / curve.jump(d))
@@ -198,8 +223,9 @@ def discount(data: CurveData, dates: Sequence[date]) -> tuple[list[float], list[
     return factors, zeros
 
 
-def inspect(data: CurveData, dates: Sequence[date]
-            ) -> tuple[list[float], list[float | None], list[float]]:
+def inspect(
+    data: CurveData, dates: Sequence[date]
+) -> tuple[list[float], list[float | None], list[float]]:
     factors, zeros = discount(data, dates)
     curve = build(data)
     return factors, zeros, [curve.instantaneous_forward(d) for d in dates]
@@ -233,8 +259,17 @@ def solve_pillars(
     if interpolation in curve_interp.NEW_METHODS:
         check_options(interpolation, tension, step_end, pillars)
         start, _ = solve_pillars(as_of, "LOG_LINEAR_DF", pillars, models, targets, jumps)
-        return global_solve(as_of, interpolation, pillars, models, targets, jumps,
-                            tension, step_end, [math.log(v) for v in start])
+        return global_solve(
+            as_of,
+            interpolation,
+            pillars,
+            models,
+            targets,
+            jumps,
+            tension,
+            step_end,
+            [math.log(v) for v in start],
+        )
     logs: list[float] = []
 
     def curve_with(x: float, count: int) -> Curve:
@@ -245,37 +280,62 @@ def solve_pillars(
         stable: dict[date, float] = {}
         # The pillars before j are fixed while pillar j is solved, so their part of the curve is
         # built once here. With no fixed pillar the prefix is the bare curve date.
-        prefix = Curve(CurveData(as_of, interpolation, tuple(pillars[:j]),
-                                 tuple(math.exp(v) for v in logs), jumps))
+        prefix = Curve(
+            CurveData(
+                as_of, interpolation, tuple(pillars[:j]), tuple(math.exp(v) for v in logs), jumps
+            )
+        )
 
-        def error(x: float, model: Model = model, target: float = target, j: int = j,
-                  until: date = stable_until, memo: dict[date, float] = stable) -> float:
+        def error(
+            x: float,
+            model: Model = model,
+            target: float = target,
+            j: int = j,
+            until: date = stable_until,
+            memo: dict[date, float] = stable,
+        ) -> float:
             return model(curve_with(x, j + 1).share_stable(until, memo)) - target
 
         t = (pillars[j] - as_of).days / 365
         guess = logs[-1] - target * 0.1 if logs else -target * t
         logs.append(_solve(error, guess))
 
-    final = Curve(CurveData(as_of, interpolation, tuple(pillars),
-                            tuple(math.exp(v) for v in logs), jumps))
+    final = Curve(
+        CurveData(as_of, interpolation, tuple(pillars), tuple(math.exp(v) for v in logs), jumps)
+    )
     return [math.exp(v) for v in logs], repricing_error(final, models, targets)
 
 
 def global_solve(
-    as_of: date, interpolation: str, pillars: Sequence[date], models: Sequence[Model],
-    targets: Sequence[float], jumps: tuple[tuple[date, float], ...] = (),
-    tension: float | None = None, step_end: date | None = None,
+    as_of: date,
+    interpolation: str,
+    pillars: Sequence[date],
+    models: Sequence[Model],
+    targets: Sequence[float],
+    jumps: tuple[tuple[date, float], ...] = (),
+    tension: float | None = None,
+    step_end: date | None = None,
     start: Sequence[float] | None = None,
 ) -> tuple[list[float], float]:
     """Newton on all pillars together, on log discount factors, with a bumped Jacobian."""
     check_options(interpolation, tension, step_end, pillars)
     n = len(pillars)
-    xs = list(start) if start is not None else [
-        -q * (d - as_of).days / 365 for q, d in zip(targets, pillars, strict=True)]
+    xs = (
+        list(start)
+        if start is not None
+        else [-q * (d - as_of).days / 365 for q, d in zip(targets, pillars, strict=True)]
+    )
 
     def errors(x: Sequence[float]) -> list[float]:
-        data = CurveData(as_of, interpolation, tuple(pillars), tuple(math.exp(v) for v in x),
-                         jumps, tension, step_end)
+        data = CurveData(
+            as_of,
+            interpolation,
+            tuple(pillars),
+            tuple(math.exp(v) for v in x),
+            jumps,
+            tension,
+            step_end,
+        )
         curve = Curve(data)
         return [m(curve) - q for m, q in zip(models, targets, strict=True)]
 
@@ -286,8 +346,8 @@ def global_solve(
         jacobian = [[0.0] * n for _ in range(n)]
         h = 1e-7
         for j in range(n):
-            up = errors([*xs[:j], xs[j] + h, *xs[j + 1:]])
-            down = errors([*xs[:j], xs[j] - h, *xs[j + 1:]])
+            up = errors([*xs[:j], xs[j] + h, *xs[j + 1 :]])
+            down = errors([*xs[:j], xs[j] - h, *xs[j + 1 :]])
             for i in range(n):
                 jacobian[i][j] = (up[i] - down[i]) / (2 * h)
         step = linalg.lu_solve(jacobian, [-v for v in r])

@@ -1,4 +1,5 @@
 """Stage D wave 3 (D7 to D9): checks the golden suites do not make on their own."""
+
 import math
 from datetime import date
 from typing import Any
@@ -14,8 +15,9 @@ AS_OF = date(2026, 11, 6)
 
 def _flat(rate=0.035):
     ds = (date(2027, 11, 8), date(2031, 11, 6), date(2046, 11, 6))
-    return CurveData(AS_OF, "LOG_LINEAR_DF", ds,
-                     tuple(math.exp(-rate * (d - AS_OF).days / 365) for d in ds))
+    return CurveData(
+        AS_OF, "LOG_LINEAR_DF", ds, tuple(math.exp(-rate * (d - AS_OF).days / 365) for d in ds)
+    )
 
 
 def _code_of(f, *args):
@@ -26,6 +28,7 @@ def _code_of(f, *args):
 
 # D7
 
+
 @pytest.mark.parametrize("model,strike", [("BLACK_76", 0.035), ("BACHELIER", 0.035)])
 def test_cap_minus_floor_is_swaplet_sum(model, strike) -> None:
     args = (_flat(), _flat(0.036), model, 0.2 if model == "BLACK_76" else 0.008)
@@ -34,8 +37,12 @@ def test_cap_minus_floor_is_swaplet_sum(model, strike) -> None:
     zero = caps_swaptions.cap_price(*args[:3], 0.0, "CAP", 3, 12, strike, 1.0)[0]
     assert len(caps) == 4
     assert [c - f for c, f in zip(caps, floors, strict=True)] == pytest.approx(
-        [z - caps_swaptions.cap_price(*args[:3], 0.0, "FLOOR", 3, 12, strike, 1.0)[0][j]
-         for j, z in enumerate(zero)], abs=1e-15)
+        [
+            z - caps_swaptions.cap_price(*args[:3], 0.0, "FLOOR", 3, 12, strike, 1.0)[0][j]
+            for j, z in enumerate(zero)
+        ],
+        abs=1e-15,
+    )
     assert cap - floor == pytest.approx(sum(caps) - sum(floors))
 
 
@@ -46,22 +53,46 @@ def test_swaption_parity() -> None:
     assert payer - receiver == pytest.approx(a * (f - 0.035), abs=1e-15)
 
 
-@pytest.mark.parametrize("vol,start,strike,code", [
-    (0.2, 0, 0.03, "E_INPUT"), ([0.2, 0.2], 3, 0.03, "E_INPUT"),
-    (-0.1, 3, 0.03, "E_DOMAIN"), (0.2, 3, 0.0, "E_DOMAIN"),
-])
+@pytest.mark.parametrize(
+    "vol,start,strike,code",
+    [
+        (0.2, 0, 0.03, "E_INPUT"),
+        ([0.2, 0.2], 3, 0.03, "E_INPUT"),
+        (-0.1, 3, 0.03, "E_DOMAIN"),
+        (0.2, 3, 0.0, "E_DOMAIN"),
+    ],
+)
 def test_cap_checks(vol, start, strike, code) -> None:
-    assert _code_of(caps_swaptions.cap_price, _flat(), _flat(), "BLACK_76", vol, "CAP", start, 12,
-                    strike, 1.0) == code
+    assert (
+        _code_of(
+            caps_swaptions.cap_price,
+            _flat(),
+            _flat(),
+            "BLACK_76",
+            vol,
+            "CAP",
+            start,
+            12,
+            strike,
+            1.0,
+        )
+        == code
+    )
 
 
 def test_swaption_checks() -> None:
     args = (_flat(), _flat(), "BLACK_76")
-    assert _code_of(caps_swaptions.swaption_price, *args, 0.2, "PAYER", 0, 60, 0.03, 1.0) == "E_INPUT"
-    assert _code_of(caps_swaptions.swaption_price, *args, -0.2, "PAYER", 12, 60, 0.03,
-                    1.0) == "E_DOMAIN"
-    assert _code_of(caps_swaptions.swaption_price, *args, 0.2, "PAYER", 12, 60, -0.01,
-                    1.0) == "E_DOMAIN"
+    assert (
+        _code_of(caps_swaptions.swaption_price, *args, 0.2, "PAYER", 0, 60, 0.03, 1.0) == "E_INPUT"
+    )
+    assert (
+        _code_of(caps_swaptions.swaption_price, *args, -0.2, "PAYER", 12, 60, 0.03, 1.0)
+        == "E_DOMAIN"
+    )
+    assert (
+        _code_of(caps_swaptions.swaption_price, *args, 0.2, "PAYER", 12, 60, -0.01, 1.0)
+        == "E_DOMAIN"
+    )
 
 
 # D8
@@ -76,11 +107,17 @@ def test_commodity_quotes_reprice_with_seasonality() -> None:
     assert commodity.commodity_forwards([(100, 3.0)], None, [100]) == pytest.approx([3.0])
 
 
-@pytest.mark.parametrize("quotes,season,months,code", [
-    (Q[::-1], None, [101], "E_INPUT"), ([(100, 0.0), (101, 1.0)], None, [100], "E_DOMAIN"),
-    (Q, [0.0] * 6, [101], "E_INPUT"), (Q, None, [99], "E_OUT_OF_RANGE"),
-    (Q, None, [107], "E_OUT_OF_RANGE"), ([], None, [100], "E_INPUT"),
-])
+@pytest.mark.parametrize(
+    "quotes,season,months,code",
+    [
+        (Q[::-1], None, [101], "E_INPUT"),
+        ([(100, 0.0), (101, 1.0)], None, [100], "E_DOMAIN"),
+        (Q, [0.0] * 6, [101], "E_INPUT"),
+        (Q, None, [99], "E_OUT_OF_RANGE"),
+        (Q, None, [107], "E_OUT_OF_RANGE"),
+        ([], None, [100], "E_INPUT"),
+    ],
+)
 def test_commodity_checks(quotes, season, months, code) -> None:
     assert _code_of(commodity.commodity_forwards, quotes, season, months) == code
 
@@ -116,15 +153,18 @@ def test_mbs_par_price_at_coupon_yield_without_delay() -> None:
     assert price == pytest.approx(100, abs=1e-10) and 0 < duration < wal
 
 
-@pytest.mark.parametrize("pool,code", [
-    ((1e6, 0.06, 0.07, 60, 0, "PSA", 100.0), "E_INPUT"),
-    ((1e6, 0.06, 0.05, 0, 0, "PSA", 100.0), "E_INPUT"),
-    ((1e6, 0.06, 0.05, 60, -1, "PSA", 100.0), "E_INPUT"),
-    ((1e6, 0.0, 0.05, 60, 0, "PSA", 100.0), "E_DOMAIN"),
-    ((0.0, 0.06, 0.05, 60, 0, "PSA", 100.0), "E_DOMAIN"),
-    ((1e6, 0.06, 0.05, 60, 0, "CPR", 1.0), "E_DOMAIN"),
-    ((1e6, 0.06, 0.05, 60, 0, "PSA", -1.0), "E_DOMAIN"),
-])
+@pytest.mark.parametrize(
+    "pool,code",
+    [
+        ((1e6, 0.06, 0.07, 60, 0, "PSA", 100.0), "E_INPUT"),
+        ((1e6, 0.06, 0.05, 0, 0, "PSA", 100.0), "E_INPUT"),
+        ((1e6, 0.06, 0.05, 60, -1, "PSA", 100.0), "E_INPUT"),
+        ((1e6, 0.0, 0.05, 60, 0, "PSA", 100.0), "E_DOMAIN"),
+        ((0.0, 0.06, 0.05, 60, 0, "PSA", 100.0), "E_DOMAIN"),
+        ((1e6, 0.06, 0.05, 60, 0, "CPR", 1.0), "E_DOMAIN"),
+        ((1e6, 0.06, 0.05, 60, 0, "PSA", -1.0), "E_DOMAIN"),
+    ],
+)
 def test_mbs_checks(pool, code) -> None:
     assert _code_of(mbs.mbs_cashflows, pool) == code
 

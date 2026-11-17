@@ -31,6 +31,8 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Commodity forwards](commodities.md) | Implemented, not Validated | D | 4 golden cases |
 | [Sector and rating curves](sector-rating.md) | Implemented, not Validated | D | 2 golden cases for `credit.curve.composite`, 2 with an outside library in `verified_by` |
 | [Funding curve](funding.md) | Implemented, not Validated | F | 3 golden cases for `rates.funding.curve`, 0 with an outside library in `verified_by` |
+| [Financing term structures](financing-term.md) | Implemented, not Validated | J | 13 golden cases for `repo.term.curve`, `eq.forward.term_financed`, 0 with an outside library in `verified_by` |
+| [Liquidity curves](liquidity.md) | Implemented, not Validated | J | 7 golden cases for `liq.curve.cost`, 0 with an outside library in `verified_by` |
 | [MBS](mbs.md) | Implemented, not Validated | D | 3 golden cases |
 | [Implied vol surface](vol-surface.md) | Implemented, not Validated | E | 2 golden cases |
 | [Local volatility](local-vol.md) | Implemented, not Validated | E | 2 golden cases |
@@ -39,8 +41,8 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Five interpolation methods](interpolation-methods.md) | Implemented, not Validated | F | 47 golden cases for `rates.curve.inspect`, 36 reproduced by an outside library |
 | [Hedging against trading costs](hedging-costs.md) | Implemented, not Validated | I | 33 golden cases for `hedge.qp.solve` with costs and `hedge.frontier.solve`, 15 reproduced by an outside library |
 | [Research workflow: backtest to PBO](research-workflow.md) | Implemented, not Validated | J | 83 golden cases for the backtest, purged CV and research statistics, 31 reproduced by an outside library; synthetic prices, a teaching example |
-| Financing term structures | Partly done | D | Repo financing is done (`repo.forward`, `repo.implied_rate` and the implied financing spread; see the repo row). Ruling D22 keeps borrow and financing as flat rates over the funding curve; financing term structures are not yet scheduled |
-| Liquidity curves | Planned | H | None yet |
+
+Stage J wave 3 (historical scenario stress, interpolation backtests, drift detectors) has no gallery page: those operations take a curve, a smile or a series rather than build a curve, so they are worked through in [Tutorial 33](../getting-started/tutorial-33-stress-test-and-watch-for-drift.md) instead.
 
 ## Real data
 

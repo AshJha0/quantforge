@@ -1,4 +1,5 @@
 """Statistics and time series (specifications/01-core/statistics-and-time-series.md)."""
+
 import itertools
 import math
 from collections.abc import Sequence
@@ -51,8 +52,14 @@ def summary(x: Floats) -> dict[str, float | int | None]:
         skewness = m3 / m2**1.5
         kurtosis = m4 / (m2 * m2) - 3
     return {
-        "count": n, "mean": m, "variance": variance, "stdev": math.sqrt(variance),
-        "skewness": skewness, "excess_kurtosis": kurtosis, "min": min(x), "max": max(x),
+        "count": n,
+        "mean": m,
+        "variance": variance,
+        "stdev": math.sqrt(variance),
+        "skewness": skewness,
+        "excess_kurtosis": kurtosis,
+        "min": min(x),
+        "max": max(x),
     }
 
 
@@ -136,7 +143,7 @@ def rolling(x: Floats, window: int, statistic: str) -> list[float | None]:
         raise QfError("E_INPUT", "need 2 <= window <= n", "window")
     out: list[float | None] = [None] * (window - 1)
     for end in range(window, n + 1):
-        part = x[end - window:end]
+        part = x[end - window : end]
         if statistic == "MEAN":
             out.append(ordered_sum(part) / window)
         else:
@@ -165,8 +172,7 @@ def autocorrelation(x: Floats, max_lag: int) -> list[float]:
     if _constant(x):
         raise QfError("E_DOMAIN", "zero variance", "x")
     return [
-        ordered_sum(dev[t] * dev[t - k] for t in range(k, n)) / den
-        for k in range(1, max_lag + 1)
+        ordered_sum(dev[t] * dev[t - k] for t in range(k, n)) / den for k in range(1, max_lag + 1)
     ]
 
 

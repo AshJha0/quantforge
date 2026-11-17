@@ -2,6 +2,7 @@
 
 Instrument: OisTrade. Product model: periods. Market data: Curve. Pricing model: legs, ois_pv.
 """
+
 import itertools
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -49,8 +50,12 @@ def valuation(
     pv: float, currency: str, model: str, data_version: str | None, conventions: str, as_of: date
 ) -> dict[str, object]:
     return {
-        "pv": pv, "currency": currency, "model": model, "data_version": data_version,
-        "conventions": conventions, "as_of": as_of.isoformat(),
+        "pv": pv,
+        "currency": currency,
+        "model": model,
+        "data_version": data_version,
+        "conventions": conventions,
+        "as_of": as_of.isoformat(),
     }
 
 
@@ -76,7 +81,9 @@ def _alphas(convention: str, ps: Sequence[Period]) -> list[float]:
 
 
 def legs(
-    convention: str, ps: Sequence[Period], curve: Discounting,
+    convention: str,
+    ps: Sequence[Period],
+    curve: Discounting,
     alphas: Sequence[float] | None = None,
 ) -> tuple[float, float]:
     """Returns (annuity, floating), in the general form: never telescoped. `alphas`, the fixed
@@ -147,9 +154,14 @@ def _check_quotes(
 
 
 def bootstrap(
-    convention: str, as_of: date, quotes: Sequence[Quote], interpolation: str,
-    method: str = "SEQUENTIAL", jumps: tuple[tuple[date, float], ...] = (),
-    tension: float | None = None, step_end: date | None = None,
+    convention: str,
+    as_of: date,
+    quotes: Sequence[Quote],
+    interpolation: str,
+    method: str = "SEQUENTIAL",
+    jumps: tuple[tuple[date, float], ...] = (),
+    tension: float | None = None,
+    step_end: date | None = None,
 ) -> tuple[CurveData, float]:
     """Returns (curve, max_repricing_error)."""
     curves.check_jumps(as_of, jumps)
@@ -159,11 +171,11 @@ def bootstrap(
     # A stage F method is solved globally whatever the method (ruling F-21).
     local = method == "SEQUENTIAL" or interpolation in curve_interp.NEW_METHODS
     solve = curves.solve_pillars if local else curves.global_solve
-    factors, error = solve(as_of, interpolation, pillars, models, targets, jumps,
-                           tension, step_end)
+    factors, error = solve(as_of, interpolation, pillars, models, targets, jumps, tension, step_end)
     curves.check_solved(error)
-    return CurveData(as_of, interpolation, tuple(pillars), tuple(factors), jumps,
-                     tension, step_end), error
+    return CurveData(
+        as_of, interpolation, tuple(pillars), tuple(factors), jumps, tension, step_end
+    ), error
 
 
 def compound(rates: Sequence[float], days: Sequence[int], denominator: int) -> float:
@@ -190,8 +202,9 @@ def pv(
     ps = periods(trade.convention, curve.as_of, trade.tenor)
     value, par, annuity = trade_pv(trade, ps, curve)
     currency = REGISTRY[trade.convention]["currency"]
-    result = valuation(value, currency, "OIS_DISCOUNTING", snapshot_id, trade.convention,
-                       curve.as_of)
+    result = valuation(
+        value, currency, "OIS_DISCOUNTING", snapshot_id, trade.convention, curve.as_of
+    )
     return result, par, annuity
 
 

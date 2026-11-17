@@ -1,0 +1,856 @@
+{
+ "schema_version": "1.0",
+ "suite": "liqcurve_j",
+ "spec": "specifications/10-execution/liquidity-curve.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_j_curves.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "liqcurve_j-0001",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     100000.0,
+     400000.0
+    ],
+    "horizons_days": [
+     1.0,
+     4.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread_cost": 0.0005,
+     "impact": [
+      [
+       0.002,
+       0.001
+      ],
+      [
+       0.004,
+       0.002
+      ]
+     ],
+     "timing_risk": [
+      0.0,
+      0.0
+     ],
+     "total_cost": [
+      [
+       0.0025,
+       0.0015
+      ],
+      [
+       0.0045,
+       0.0025
+      ]
+     ],
+     "optimal_horizon": null,
+     "min_cost": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "reference-computed"
+   ],
+   "tags": [
+    "curves",
+    "synthetic"
+   ],
+   "description": "hand: impact 0.002 at Q=1e5, h=1 (stage H imp_h-0001); 0.004 at 4x Q; 0.001 at 4x h"
+  },
+  {
+   "case_id": "liqcurve_j-0002",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     100000.0
+    ],
+    "horizons_days": [
+     0.1,
+     1.0
+    ],
+    "risk_multiplier": 1.7320508075688772
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread_cost": 0.0005,
+     "impact": [
+      [
+       0.006324555320336759,
+       0.002
+      ]
+     ],
+     "timing_risk": [
+      0.006324555320336759,
+      0.02
+     ],
+     "total_cost": [
+      [
+       0.013149110640673518,
+       0.0225
+      ]
+     ],
+     "optimal_horizon": [
+      0.1
+     ],
+     "min_cost": [
+      0.013149110640673518
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "reference-computed"
+   ],
+   "tags": [
+    "curves",
+    "synthetic"
+   ],
+   "description": "hand: z = sqrt 3 gives b = sigma; h* = 2 delta a / b = 0.1 day"
+  },
+  {
+   "case_id": "liqcurve_j-0003",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     0.0,
+     10000.0,
+     100000.0,
+     1000000.0,
+     5000000.0
+    ],
+    "horizons_days": [
+     0.25,
+     0.5,
+     1,
+     2,
+     5,
+     10,
+     20
+    ],
+    "risk_multiplier": 1.645
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread_cost": 0.0005,
+     "impact": [
+      [
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0012649110640673518,
+       0.0008944271909999159,
+       0.0006324555320336759,
+       0.00044721359549995795,
+       0.000282842712474619,
+       0.0002,
+       0.0001414213562373095
+      ],
+      [
+       0.004,
+       0.00282842712474619,
+       0.002,
+       0.001414213562373095,
+       0.0008944271909999159,
+       0.0006324555320336759,
+       0.00044721359549995795
+      ],
+      [
+       0.012649110640673518,
+       0.00894427190999916,
+       0.006324555320336759,
+       0.00447213595499958,
+       0.00282842712474619,
+       0.002,
+       0.001414213562373095
+      ],
+      [
+       0.0282842712474619,
+       0.02,
+       0.01414213562373095,
+       0.01,
+       0.006324555320336759,
+       0.00447213595499958,
+       0.0031622776601683794
+      ]
+     ],
+     "timing_risk": [
+      0.009497411928169344,
+      0.013431368756261094,
+      0.01899482385633869,
+      0.02686273751252219,
+      0.042473717363408006,
+      0.06006690713973322,
+      0.08494743472681601
+     ],
+     "total_cost": [
+      [
+       0.009997411928169345,
+       0.013931368756261093,
+       0.01949482385633869,
+       0.027362737512522186,
+       0.04297371736340801,
+       0.06056690713973322,
+       0.08544743472681601
+      ],
+      [
+       0.011262322992236696,
+       0.01482579594726101,
+       0.020127279388372363,
+       0.027809951108022146,
+       0.043256560075882626,
+       0.06076690713973322,
+       0.08558885608305332
+      ],
+      [
+       0.013997411928169345,
+       0.016759795881007285,
+       0.021494823856338687,
+       0.028776951074895283,
+       0.04386814455440792,
+       0.06119936267176689,
+       0.08589464832231597
+      ],
+      [
+       0.02264652256884286,
+       0.02287564066626025,
+       0.02581937917667545,
+       0.031834873467521764,
+       0.045802144488154194,
+       0.06256690713973322,
+       0.0868616482891891
+      ],
+      [
+       0.03828168317563124,
+       0.03393136875626109,
+       0.03363695948006964,
+       0.037362737512522184,
+       0.049298272683744766,
+       0.0650390430947328,
+       0.0886097123869844
+      ]
+     ],
+     "optimal_horizon": [
+      0.0,
+      0.033296204103657516,
+      0.10529184240540287,
+      0.3329620410365751,
+      0.7445257576848565
+     ],
+     "min_cost": [
+      0.0005,
+      0.007432065039494839,
+      0.012827148528784324,
+      0.022421114413228763,
+      0.03327971172083256
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "curves",
+    "synthetic"
+   ],
+   "description": "grid with timing risk at z = 1.645"
+  },
+  {
+   "case_id": "liqcurve_j-0004",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     200000.0,
+     800000.0
+    ],
+    "horizons_days": [
+     1,
+     3,
+     10
+    ],
+    "exponent": 0.6,
+    "coefficient": 0.7,
+    "risk_multiplier": 2.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread_cost": 0.0005,
+     "impact": [
+      [
+       0.0013388934997060518,
+       0.0006925853171542942,
+       0.00033631484151480076
+      ],
+      [
+       0.00307596952125713,
+       0.0015911432290204748,
+       0.0007726486104182804
+      ]
+     ],
+     "timing_risk": [
+      0.023094010767585032,
+      0.04,
+      0.07302967433402215
+     ],
+     "total_cost": [
+      [
+       0.024932904267291084,
+       0.04119258531715429,
+       0.07386598917553695
+      ],
+      [
+       0.02666998028884216,
+       0.042091143229020474,
+       0.07430232294444043
+      ]
+     ],
+     "optimal_horizon": [
+      0.08864653018445377,
+      0.18882439416544636
+     ],
+     "min_cost": [
+      0.013105836480285135,
+      0.01889796755844958
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "curves",
+    "synthetic"
+   ],
+   "description": "Almgren et al. 3/5 exponent, Y = 0.7"
+  },
+  {
+   "case_id": "liqcurve_j-0005",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     100000.0
+    ],
+    "horizons_days": [
+     1,
+     2
+    ],
+    "exponent": 1.0,
+    "risk_multiplier": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread_cost": 0.0005,
+     "impact": [
+      [
+       0.0002,
+       0.0001
+      ]
+     ],
+     "timing_risk": [
+      0.011547005383792516,
+      0.016329931618554522
+     ],
+     "total_cost": [
+      [
+       0.012247005383792515,
+       0.016929931618554522
+      ]
+     ],
+     "optimal_horizon": [
+      0.10626585691826111
+     ],
+     "min_cost": [
+      0.006146216173286171
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "curves",
+    "synthetic"
+   ],
+   "description": "linear impact, delta = 1"
+  },
+  {
+   "case_id": "liqcurve_j-0006",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.0,
+    "sizes": [
+     100000.0,
+     400000.0
+    ],
+    "horizons_days": [
+     1.0,
+     4.0
+    ],
+    "risk_multiplier": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread_cost": 0.0005,
+     "impact": [
+      [
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0
+      ]
+     ],
+     "timing_risk": [
+      0.0,
+      0.0
+     ],
+     "total_cost": [
+      [
+       0.0005,
+       0.0005
+      ],
+      [
+       0.0005,
+       0.0005
+      ]
+     ],
+     "optimal_horizon": null,
+     "min_cost": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "curves",
+    "synthetic"
+   ],
+   "description": "zero volatility: no impact, no risk, optimum null"
+  },
+  {
+   "case_id": "liqcurve_j-0007",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     100000.0,
+     400000.0
+    ],
+    "horizons_days": [
+     1.0,
+     4.0
+    ],
+    "coefficient": 0.0,
+    "risk_multiplier": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread_cost": 0.0005,
+     "impact": [
+      [
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0
+      ]
+     ],
+     "timing_risk": [
+      0.011547005383792516,
+      0.023094010767585032
+     ],
+     "total_cost": [
+      [
+       0.012047005383792516,
+       0.023594010767585032
+      ],
+      [
+       0.012047005383792516,
+       0.023594010767585032
+      ]
+     ],
+     "optimal_horizon": null,
+     "min_cost": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "curves",
+    "synthetic"
+   ],
+   "description": "Y = 0: optimum null"
+  },
+  {
+   "case_id": "liqcurve_j-0008",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [],
+    "horizons_days": [
+     1.0,
+     4.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "curves"
+   ],
+   "description": "no sizes"
+  },
+  {
+   "case_id": "liqcurve_j-0009",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     100000.0,
+     400000.0
+    ],
+    "horizons_days": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "curves"
+   ],
+   "description": "no horizons"
+  },
+  {
+   "case_id": "liqcurve_j-0010",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 0.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     100000.0,
+     400000.0
+    ],
+    "horizons_days": [
+     1.0,
+     4.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "curves"
+   ],
+   "description": "volume zero"
+  },
+  {
+   "case_id": "liqcurve_j-0011",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": -0.01,
+    "sizes": [
+     100000.0,
+     400000.0
+    ],
+    "horizons_days": [
+     1.0,
+     4.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "curves"
+   ],
+   "description": "negative vol"
+  },
+  {
+   "case_id": "liqcurve_j-0012",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     -1.0
+    ],
+    "horizons_days": [
+     1.0,
+     4.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "curves"
+   ],
+   "description": "negative size"
+  },
+  {
+   "case_id": "liqcurve_j-0013",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     100000.0,
+     400000.0
+    ],
+    "horizons_days": [
+     0.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "curves"
+   ],
+   "description": "zero horizon"
+  },
+  {
+   "case_id": "liqcurve_j-0014",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     100000.0,
+     400000.0
+    ],
+    "horizons_days": [
+     1.0,
+     4.0
+    ],
+    "exponent": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "curves"
+   ],
+   "description": "exponent zero"
+  },
+  {
+   "case_id": "liqcurve_j-0015",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     100000.0,
+     400000.0
+    ],
+    "horizons_days": [
+     1.0,
+     4.0
+    ],
+    "exponent": 1.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "curves"
+   ],
+   "description": "exponent above one"
+  },
+  {
+   "case_id": "liqcurve_j-0016",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": -1.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     100000.0,
+     400000.0
+    ],
+    "horizons_days": [
+     1.0,
+     4.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "curves"
+   ],
+   "description": "negative half spread"
+  },
+  {
+   "case_id": "liqcurve_j-0017",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     100000.0,
+     400000.0
+    ],
+    "horizons_days": [
+     1.0,
+     4.0
+    ],
+    "risk_multiplier": -1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "curves"
+   ],
+   "description": "negative risk multiplier"
+  },
+  {
+   "case_id": "liqcurve_j-0018",
+   "operation": "liq.curve.cost",
+   "inputs": {
+    "half_spread_bps": 5.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "sizes": [
+     100000.0,
+     400000.0
+    ],
+    "horizons_days": [
+     1.0,
+     4.0
+    ],
+    "coefficient": -0.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "curves"
+   ],
+   "description": "negative coefficient"
+  }
+ ]
+}

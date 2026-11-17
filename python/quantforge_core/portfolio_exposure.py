@@ -11,6 +11,7 @@ expectation of `g` over an interval is then closed form,
 zeta))`, so EE, ENE and the PFE quantiles only need the zeros of `g` (or of `g - y`), found by a
 dense scan and Brent refinement.
 """
+
 import itertools
 import math
 from collections.abc import Callable, Sequence
@@ -50,15 +51,17 @@ class Swap:
         return (self.start, *self.payments)
 
 
-def make_swap(notional: float, fixed_rate: float, side: str, start: float,
-              payments: Floats) -> Swap:
+def make_swap(
+    notional: float, fixed_rate: float, side: str, start: float, payments: Floats
+) -> Swap:
     if side not in ("PAY", "RECEIVE"):
         raise _input(f"{side} is not PAY or RECEIVE", "side")
     if not start >= 0:
         raise _domain("start_years must be >= 0", "start_years")
     if not payments or not all(a < b for a, b in itertools.pairwise([start, *payments])):
-        raise _input("payment_times must be increasing and start after start_years",
-                     "payment_times")
+        raise _input(
+            "payment_times must be increasing and start after start_years", "payment_times"
+        )
     return Swap(notional, fixed_rate, side == "PAY", start, tuple(payments))
 
 
@@ -135,6 +138,7 @@ class _Profile:
         if self.value(cuts[-1], y) == 0:
             out.append(cuts[-1])
         return sorted(set(out))
+
     def _intervals(self, y: float, positive: bool) -> list[tuple[float, float]]:
         """Intervals where `g - y > 0` (positive) or `< 0`."""
         cuts = [-math.inf, *self.zeros(y), math.inf]
@@ -142,9 +146,17 @@ class _Profile:
         for lo, hi in itertools.pairwise(cuts):
             if lo == hi:
                 continue
-            mid = ((lo + hi) / 2 if math.isfinite(lo) and math.isfinite(hi)
-                   else (hi - self.sd if math.isfinite(hi) else
-                         lo + self.sd if math.isfinite(lo) else 0.0))
+            mid = (
+                (lo + hi) / 2
+                if math.isfinite(lo) and math.isfinite(hi)
+                else (
+                    hi - self.sd
+                    if math.isfinite(hi)
+                    else lo + self.sd
+                    if math.isfinite(lo)
+                    else 0.0
+                )
+            )
             v = self.value(mid, y)
             if (v > 0) == positive and v != 0:
                 out.append((lo, hi))
@@ -157,14 +169,16 @@ class _Profile:
             for ak, bk in zip(self.a, self.b, strict=True):
                 shift = bk * self.zeta
                 weight = float(ak) * math.exp(float(bk) ** 2 * self.zeta / 2)
-                total.append(weight * _interval_mass((lo + shift) / self.sd,
-                                                     (hi + shift) / self.sd))
+                total.append(
+                    weight * _interval_mass((lo + shift) / self.sd, (hi + shift) / self.sd)
+                )
         return ordered_sum(total)
 
     def probability_below(self, y: float) -> float:
         """`P(g <= y)`, as one minus the mass where `g > y`."""
-        above = ordered_sum(_interval_mass(lo / self.sd, hi / self.sd)
-                            for lo, hi in self._intervals(y, True))
+        above = ordered_sum(
+            _interval_mass(lo / self.sd, hi / self.sd) for lo, hi in self._intervals(y, True)
+        )
         return 1.0 - above
 
     def quantile_of_exposure(self, q: float) -> float:
@@ -205,7 +219,8 @@ def _profile(curve: Curve, a: float, sigma: float, swaps: Sequence[Swap], t: flo
             w = sw.fixed_rate * tau + (1.0 if j == len(rest) - 1 else 0.0)
             hs = h(s)
             coeffs[hs] = coeffs.get(hs, 0.0) - sign * w * curve.discount(s) * math.exp(
-                -hs * hs * zeta / 2)
+                -hs * hs * zeta / 2
+            )
     keys = sorted(k for k, v in coeffs.items() if v != 0)
     return _Profile([coeffs[k] for k in keys], keys, zeta)
 
@@ -215,10 +230,17 @@ def pfe_key(q: float) -> str:
     return "deflated_pfe_" + format((Decimal(repr(q)) * 100).normalize(), "f")
 
 
-def portfolio_hw(times: Floats, discount_factors: Floats, a: float, sigma: float,
-                 trades: Sequence[tuple[float, float, str, float, Floats]],
-                 exposure_times: Floats, quantiles: Floats, hazard_rate: float,
-                 recovery: float) -> dict[str, object]:
+def portfolio_hw(
+    times: Floats,
+    discount_factors: Floats,
+    a: float,
+    sigma: float,
+    trades: Sequence[tuple[float, float, str, float, Floats]],
+    exposure_times: Floats,
+    quantiles: Floats,
+    hazard_rate: float,
+    recovery: float,
+) -> dict[str, object]:
     """`xva.exposure.portfolio_hw`: discounted EE, ENE, PFE, EPE and CVA of a netting set."""
     model = curve_model(times, discount_factors, a, sigma)
     assert model.curve is not None
@@ -232,10 +254,15 @@ def portfolio_hw(times: Floats, discount_factors: Floats, a: float, sigma: float
             raise _input("the trades of a set must share their reset dates", "trades")
     last = max(sw.payments[-1] for sw in swaps)
     resets = {d for d in common if d < last}
-    if (not exposure_times or not all(x < y for x, y in itertools.pairwise(exposure_times))
-            or any(t not in resets for t in exposure_times)):
-        raise _input("exposure_times must be increasing reset dates before the last payment",
-                     "exposure_times")
+    if (
+        not exposure_times
+        or not all(x < y for x, y in itertools.pairwise(exposure_times))
+        or any(t not in resets for t in exposure_times)
+    ):
+        raise _input(
+            "exposure_times must be increasing reset dates before the last payment",
+            "exposure_times",
+        )
     if not quantiles or any(not 0 < q < 1 for q in quantiles):
         raise _domain("pfe_quantiles must lie in (0, 1)", "pfe_quantiles")
     if not hazard_rate >= 0:
@@ -251,11 +278,14 @@ def portfolio_hw(times: Floats, discount_factors: Floats, a: float, sigma: float
         for q in quantiles:
             pfe[q].append(prof.quantile_of_exposure(q))
     prev = [0.0, *exposure_times[:-1]]
-    epe = ordered_sum(e * (t - p) for e, t, p in zip(ee, exposure_times, prev, strict=True)) / (
-        exposure_times[-1])
+    epe = (
+        ordered_sum(e * (t - p) for e, t, p in zip(ee, exposure_times, prev, strict=True))
+        / (exposure_times[-1])
+    )
     cva = (1 - recovery) * ordered_sum(
         e * (math.exp(-hazard_rate * p) - math.exp(-hazard_rate * t))
-        for e, t, p in zip(ee, exposure_times, prev, strict=True))
+        for e, t, p in zip(ee, exposure_times, prev, strict=True)
+    )
     out: dict[str, object] = {"discounted_ee": ee, "discounted_ene": ene}
     for q in quantiles:
         out[pfe_key(q)] = pfe[q]

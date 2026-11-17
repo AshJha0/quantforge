@@ -486,7 +486,8 @@ class GalleryVol(unittest.TestCase):
     def test_stage_d_pages_are_live_from_real_runs(self):
         out = ROOT / "docs/curves"
         self.assertEqual(set(self.bg.STAGE_D), {"ois-full", "bond-fit", "repo", "cross-currency", "cds", "dividend-borrow",
-                                                "inflation", "caps-swaptions", "commodities", "mbs", "sector-rating", "funding"})
+                                                "inflation", "caps-swaptions", "commodities", "mbs", "sector-rating", "funding",
+                                                "financing-term", "liquidity"})
         index = (out / "README.md").read_text(encoding="utf-8")
         for slug, spec in self.bg.STAGE_D.items():
             self.assertTrue(self.bg.is_live(spec), slug)

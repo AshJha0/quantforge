@@ -4,6 +4,7 @@ Spec: specifications/04-pricing/credit-options-and-copulas.md, rulings E-B22 to 
 specifications/stage-e-rulings-b.md. Bivariate CDFs are integrals of the conditional form,
 by adaptive Gauss-Kronrod (integrate.py) to about 1e-14 relative.
 """
+
 import itertools
 import math
 from collections.abc import Callable
@@ -28,8 +29,10 @@ def _domain(message: str, field: str | None = None) -> QfError:
 
 # --- CDS options ---
 
-def _legs(as_of: date, expiry: date, maturity: date, rate: float,
-          hazard: float, recovery: float) -> tuple[float, float]:
+
+def _legs(
+    as_of: date, expiry: date, maturity: date, rate: float, hazard: float, recovery: float
+) -> tuple[float, float]:
     """(protection, risky annuity) per unit notional of the stylised forward CDS (E-B22), with
     times measured from `as_of` (from `expiry` itself gives the strike legs of ruling F-8)."""
     dates = [expiry]
@@ -52,13 +55,15 @@ def _legs(as_of: date, expiry: date, maturity: date, rate: float,
         mid = a + timedelta(days=(b - a).days // 2)
         lost = survival(a) - survival(b)
         protection += (1 - recovery) * discount(mid) * lost
-        annuity += ((b - a).days / 360 * discount(b) * survival(b)
-                    + (mid - a).days / 360 * discount(mid) * lost)
+        annuity += (b - a).days / 360 * discount(b) * survival(b) + (mid - a).days / 360 * discount(
+            mid
+        ) * lost
     return protection, annuity
 
 
-def _check_option(as_of: date, expiry: date, maturity: date, hazard: float, recovery: float,
-                  strike: float) -> None:
+def _check_option(
+    as_of: date, expiry: date, maturity: date, hazard: float, recovery: float, strike: float
+) -> None:
     if expiry <= as_of or maturity <= expiry:
         raise _input("need as_of < expiry < maturity", "expiry")
     if not 0 <= recovery < 1:
@@ -69,9 +74,17 @@ def _check_option(as_of: date, expiry: date, maturity: date, hazard: float, reco
         raise _domain("strike must be above 0", "strike")
 
 
-def _terms(as_of: date, expiry: date, maturity: date, rate: float, hazard: float,
-           recovery: float, kind: str, strike: float, notional: float
-           ) -> tuple[float, float, float, Option]:
+def _terms(
+    as_of: date,
+    expiry: date,
+    maturity: date,
+    rate: float,
+    hazard: float,
+    recovery: float,
+    kind: str,
+    strike: float,
+    notional: float,
+) -> tuple[float, float, float, Option]:
     protection, annuity = _legs(as_of, expiry, maturity, rate, hazard, recovery)
     forward = protection / annuity
     t = (expiry - as_of).days / 365
@@ -80,24 +93,41 @@ def _terms(as_of: date, expiry: date, maturity: date, rate: float, hazard: float
     return forward, annuity, front, option
 
 
-def cds_option_price(as_of: date, expiry: date, maturity: date, rate: float, hazard: float,
-                     recovery: float, kind: str, strike: float, notional: float, vol: float,
-                     knock_out: bool) -> dict[str, float]:
+def cds_option_price(
+    as_of: date,
+    expiry: date,
+    maturity: date,
+    rate: float,
+    hazard: float,
+    recovery: float,
+    kind: str,
+    strike: float,
+    notional: float,
+    vol: float,
+    knock_out: bool,
+) -> dict[str, float]:
     _check_option(as_of, expiry, maturity, hazard, recovery, strike)
     if vol < 0:
         raise _domain("vol must not be negative", "vol")
-    forward, annuity, front, option = _terms(as_of, expiry, maturity, rate, hazard, recovery,
-                                             kind, strike, notional)
+    forward, annuity, front, option = _terms(
+        as_of, expiry, maturity, rate, hazard, recovery, kind, strike, notional
+    )
     price = notional * annuity * black.price(option, vol)
     if kind == "PAYER" and not knock_out:
         price += front
-    return {"price": price, "forward_spread": forward, "risky_annuity": annuity,
-            "front_end_protection": front}
+    return {
+        "price": price,
+        "forward_spread": forward,
+        "risky_annuity": annuity,
+        "front_end_protection": front,
+    }
 
 
-def _strike_hazard(expiry: date, maturity: date, rate: float, recovery: float,
-                   strike: float) -> tuple[float, float]:
+def _strike_hazard(
+    expiry: date, maturity: date, rate: float, recovery: float, strike: float
+) -> tuple[float, float]:
     """(h_K, A_K): the flat hazard whose stylised spread from expiry is the strike (F-8)."""
+
     def spread(x: float) -> float:
         protection, annuity = _legs(expiry, expiry, maturity, rate, x, recovery)
         return protection / annuity
@@ -117,9 +147,19 @@ def _strike_hazard(expiry: date, maturity: date, rate: float, recovery: float,
     return h_k, _legs(expiry, expiry, maturity, rate, h_k, recovery)[1]
 
 
-def cds_index_option_price(as_of: date, expiry: date, maturity: date, rate: float,
-                           hazard: float, recovery: float, kind: str, strike: float,
-                           coupon: float, notional: float, vol: float) -> dict[str, float]:
+def cds_index_option_price(
+    as_of: date,
+    expiry: date,
+    maturity: date,
+    rate: float,
+    hazard: float,
+    recovery: float,
+    kind: str,
+    strike: float,
+    coupon: float,
+    notional: float,
+    vol: float,
+) -> dict[str, float]:
     """Pedersen's adjusted forward and strike in Black (rulings F-7 to F-10)."""
     _check_option(as_of, expiry, maturity, hazard, recovery, strike)
     if coupon < 0:
@@ -143,20 +183,38 @@ def cds_index_option_price(as_of: date, expiry: date, maturity: date, rate: floa
         raise _domain("the adjusted strike is not positive", "strike")
     option = Option(black.BLACK_76, "CALL" if kind == "PAYER" else "PUT", k_adj, t, f_adj)
     price = notional * annuity * black.price(option, vol)
-    return {"price": price, "forward_spread": forward, "adjusted_forward": f_adj,
-            "adjusted_strike": k_adj, "risky_annuity": annuity, "strike_annuity": a_k,
-            "strike_hazard": h_k, "exercise_upfront": notional * upfront,
-            "front_end_protection": notional * fep}
+    return {
+        "price": price,
+        "forward_spread": forward,
+        "adjusted_forward": f_adj,
+        "adjusted_strike": k_adj,
+        "risky_annuity": annuity,
+        "strike_annuity": a_k,
+        "strike_hazard": h_k,
+        "exercise_upfront": notional * upfront,
+        "front_end_protection": notional * fep,
+    }
 
 
-def cds_option_implied(as_of: date, expiry: date, maturity: date, rate: float, hazard: float,
-                       recovery: float, kind: str, strike: float, notional: float,
-                       premium: float, knock_out: bool) -> float:
+def cds_option_implied(
+    as_of: date,
+    expiry: date,
+    maturity: date,
+    rate: float,
+    hazard: float,
+    recovery: float,
+    kind: str,
+    strike: float,
+    notional: float,
+    premium: float,
+    knock_out: bool,
+) -> float:
     if not knock_out:  # ruling E-B40: before the dates
         raise _input("implied vol is defined for knock-out options only", "knock_out")
     _check_option(as_of, expiry, maturity, hazard, recovery, strike)
-    forward, annuity, _, option = _terms(as_of, expiry, maturity, rate, hazard, recovery, kind,
-                                         strike, notional)
+    forward, annuity, _, option = _terms(
+        as_of, expiry, maturity, rate, hazard, recovery, kind, strike, notional
+    )
     scale = notional * annuity
     floor = scale * max(option.phi * (forward - strike), 0.0)
     cap = scale * (forward if kind == "PAYER" else strike)
@@ -176,6 +234,7 @@ def cds_option_implied(as_of: date, expiry: date, maturity: date, rate: float, h
 
 # --- Univariate and bivariate distributions ---
 
+
 def _beta_fraction(a: float, b: float, x: float) -> float:
     """Continued fraction of the regularised incomplete beta (modified Lentz)."""
     tiny = 1e-300
@@ -183,8 +242,10 @@ def _beta_fraction(a: float, b: float, x: float) -> float:
     d = 1 / (d if abs(d) > tiny else tiny)
     h = d
     for m in range(1, 1000):
-        for num in (m * (b - m) * x / ((a + 2 * m - 1) * (a + 2 * m)),
-                    -(a + m) * (a + b + m) * x / ((a + 2 * m) * (a + 2 * m + 1))):
+        for num in (
+            m * (b - m) * x / ((a + 2 * m - 1) * (a + 2 * m)),
+            -(a + m) * (a + b + m) * x / ((a + 2 * m) * (a + 2 * m + 1)),
+        ):
             d = 1 + num * d
             d = 1 / (d if abs(d) > tiny else tiny)
             c = 1 + num / c if abs(1 + num / c) > tiny else tiny
@@ -199,8 +260,9 @@ def _incomplete_beta(a: float, b: float, x: float) -> float:
         return 0.0
     if x >= 1:
         return 1.0
-    front = math.exp(math.lgamma(a + b) - math.lgamma(a) - math.lgamma(b)
-                     + a * math.log(x) + b * math.log1p(-x))
+    front = math.exp(
+        math.lgamma(a + b) - math.lgamma(a) - math.lgamma(b) + a * math.log(x) + b * math.log1p(-x)
+    )
     if x < (a + 1) / (a + b + 2):
         return front * _beta_fraction(a, b, x) / a
     return 1 - front * _beta_fraction(b, a, 1 - x) / b
@@ -212,8 +274,12 @@ def t_cdf(x: float, nu: float) -> float:
 
 
 def t_pdf(x: float, nu: float) -> float:
-    log = (math.lgamma((nu + 1) / 2) - math.lgamma(nu / 2) - 0.5 * math.log(nu * math.pi)
-           - (nu + 1) / 2 * math.log1p(x * x / nu))
+    log = (
+        math.lgamma((nu + 1) / 2)
+        - math.lgamma(nu / 2)
+        - 0.5 * math.log(nu * math.pi)
+        - (nu + 1) / 2 * math.log1p(x * x / nu)
+    )
     return math.exp(log)
 
 
@@ -258,8 +324,9 @@ def bivariate_t(h: float, k: float, rho: float, nu: float) -> float:
     return _integral(f, 0.0, math.pi / 2)
 
 
-def joint_default(copula: str, probabilities: list[float], rho: float,
-                  nu: float | None) -> dict[str, float]:
+def joint_default(
+    copula: str, probabilities: list[float], rho: float, nu: float | None
+) -> dict[str, float]:
     if len(probabilities) != 2:
         raise _input("default_probabilities needs two values", "default_probabilities")
     if copula == "STUDENT_T" and nu is None:
@@ -282,6 +349,7 @@ def joint_default(copula: str, probabilities: list[float], rho: float,
 
 # --- Large homogeneous pool ---
 
+
 def _check_pool(p: float, rho: float, recovery: float) -> None:
     if not 0 < p < 1:
         raise _domain("default_probability must be in (0, 1)", "default_probability")
@@ -302,8 +370,9 @@ def _capped_mean(p: float, rho: float, k: float) -> float:
     return p - (bivariate_normal(c, m_star, math.sqrt(rho)) - k * big_n(m_star))
 
 
-def tranche_loss(p: float, rho: float, recovery: float, attachment: float,
-                 detachment: float) -> float:
+def tranche_loss(
+    p: float, rho: float, recovery: float, attachment: float, detachment: float
+) -> float:
     if detachment <= attachment or attachment < 0 or detachment > 1:
         raise _input("need 0 <= attachment < detachment <= 1", "attachment")
     _check_pool(p, rho, recovery)
@@ -321,8 +390,7 @@ def loss_cdf(p: float, rho: float, recovery: float, losses: list[float]) -> list
     if any(not 0 < x < scale for x in losses):
         raise _domain("a loss is outside (0, 1 - R)", "losses")
     c = n_inverse(p)
-    return [big_n((math.sqrt(1 - rho) * n_inverse(x / scale) - c) / math.sqrt(rho))
-            for x in losses]
+    return [big_n((math.sqrt(1 - rho) * n_inverse(x / scale) - c) / math.sqrt(rho)) for x in losses]
 
 
 guard(globals())

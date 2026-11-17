@@ -606,7 +606,19 @@ super::registry! {
             let ridge = ridge(i)?;
             let (lo, hi) = (opt_bounds(i, "lower")?, opt_bounds(i, "upper")?);
             let k = i.int("max_instruments")?;
-            let extra = ["eq_matrix", "eq_rhs", "singular"].iter().any(|k| i.0.get(k).is_some());
+            // I-33; J-I.3: the cost and margin inputs are refused too.
+            let extra = [
+                "eq_matrix",
+                "eq_rhs",
+                "singular",
+                "half_spreads",
+                "impact",
+                "cost_weight",
+                "margin_rates",
+                "margin_limit",
+            ]
+            .iter()
+            .any(|k| i.0.get(k).is_some());
             i.gate()?;
             let s = hs::select_solve(
                 &QpProblem {

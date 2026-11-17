@@ -1,5 +1,6 @@
 """Delta conventions, SVI, SSVI and the vol surface
 (specifications/05-volatility/smile-and-surface.md, surface risk in 06-risk/vol-greeks.md)."""
+
 import itertools
 import math
 from bisect import bisect_right
@@ -60,8 +61,13 @@ def _delta_common(forward: float, vol: float, expiry_years: float) -> None:
 
 
 def delta_to_strike(
-    forward: float, vol: float, expiry_years: float, option_type: str, delta: float,
-    convention: str, scale: float | None,
+    forward: float,
+    vol: float,
+    expiry_years: float,
+    option_type: str,
+    delta: float,
+    convention: str,
+    scale: float | None,
 ) -> float:
     s = _delta_scale(convention, scale)
     _delta_common(forward, vol, expiry_years)
@@ -75,8 +81,13 @@ def delta_to_strike(
 
 
 def delta_from_strike(
-    forward: float, vol: float, expiry_years: float, option_type: str, strike: float,
-    convention: str, scale: float | None,
+    forward: float,
+    vol: float,
+    expiry_years: float,
+    option_type: str,
+    strike: float,
+    convention: str,
+    scale: float | None,
 ) -> float:
     s = _delta_scale(convention, scale)
     _delta_common(forward, vol, expiry_years)
@@ -89,8 +100,15 @@ def delta_from_strike(
 
 
 def rr_bf(
-    forward: float, expiry_years: float, atm_vol: float, atm_convention: str, rr: float, bf: float,
-    delta: float, convention: str, scale: float | None,
+    forward: float,
+    expiry_years: float,
+    atm_vol: float,
+    atm_convention: str,
+    rr: float,
+    bf: float,
+    delta: float,
+    convention: str,
+    scale: float | None,
 ) -> dict[str, float]:
     _scale_matches(convention, scale)
     call_vol, put_vol = atm_vol + bf + rr / 2, atm_vol + bf - rr / 2
@@ -101,7 +119,9 @@ def rr_bf(
     if atm_convention == "DELTA_NEUTRAL":
         atm_strike = forward * math.exp(atm_vol * atm_vol * expiry_years / 2)
     return {
-        "atm_strike": atm_strike, "call_vol": call_vol, "put_vol": put_vol,
+        "atm_strike": atm_strike,
+        "call_vol": call_vol,
+        "put_vol": put_vol,
         "call_strike": delta_to_strike(
             forward, call_vol, expiry_years, "CALL", delta, convention, scale
         ),
@@ -152,7 +172,10 @@ def svi_evaluate(p: Svi, ks: Floats, expiry_years: float) -> dict[str, object]:
         gs.append(g)
     min_g = min(gs)
     return {
-        "total_variance": ws, "implied_vol": vols, "g": gs, "min_g": min_g,
+        "total_variance": ws,
+        "implied_vol": vols,
+        "g": gs,
+        "min_g": min_g,
         "butterfly_free": min_g >= 0,
     }
 
@@ -198,7 +221,10 @@ def svi_calibrate(ks: Floats, ws: Floats, weights: Floats | None) -> tuple[Svi, 
 
     def residual(x: np.ndarray) -> np.ndarray:
         a, b, rho, m, sigma = _svi_from(x)
-        return cast("np.ndarray", root_weight * (a + b * (rho * (k - m) + np.sqrt((k - m) ** 2 + sigma**2)) - w))
+        return cast(
+            "np.ndarray",
+            root_weight * (a + b * (rho * (k - m) + np.sqrt((k - m) ** 2 + sigma**2)) - w),
+        )
 
     best = best_of(residual, _svi_starts(k, w, root_weight))
     if best is None:
@@ -263,7 +289,9 @@ def ssvi_calibrate(
 
     starts = [
         np.array((math.atanh(r), math.log(e), g))
-        for r in (-0.7, -0.2, 0.3) for e in (0.3, 1.0, 3.0) for g in (-1.0, 0.0, 1.5)
+        for r in (-0.7, -0.2, 0.3)
+        for e in (0.3, 1.0, 3.0)
+        for g in (-1.0, 0.0, 1.5)
     ]
     best = best_of(residual, starts)
     if best is None:
@@ -314,7 +342,9 @@ def _query(s: Surface, t: float, k: float) -> float:
     return (1 - u) * _slice_w(s, j, k) + u * _slice_w(s, j + 1, k)
 
 
-def surface_query(s: Surface, points: Sequence[tuple[float, float]]) -> tuple[list[float], list[float]]:
+def surface_query(
+    s: Surface, points: Sequence[tuple[float, float]]
+) -> tuple[list[float], list[float]]:
     _not_empty(points=points)
     check_surface(s)
     if any(t <= 0 for t, _ in points):
@@ -341,9 +371,7 @@ def surface_check(s: Surface) -> dict[str, object]:
     strikes = [math.exp(k) for k in ks]
     for j, t in enumerate(ts):
         c = [_undiscounted_call(k, v, t) for k, v in zip(ks, s.vols[j], strict=True)]
-        slopes = [
-            (c[i + 1] - c[i]) / (strikes[i + 1] - strikes[i]) for i in range(len(ks) - 1)
-        ]
+        slopes = [(c[i + 1] - c[i]) / (strikes[i + 1] - strikes[i]) for i in range(len(ks) - 1)]
         for i, slope in enumerate(slopes):
             if slope < -1 - tol or slope > tol:
                 butterfly.append({"expiry_index": j, "k_index": i, "kind": "SLOPE"})
@@ -351,7 +379,8 @@ def surface_check(s: Surface) -> dict[str, object]:
             if slopes[i + 1] < slopes[i] - tol:
                 butterfly.append({"expiry_index": j, "k_index": i + 1, "kind": "CONVEXITY"})
     return {
-        "calendar_violations": calendar, "butterfly_violations": butterfly,
+        "calendar_violations": calendar,
+        "butterfly_violations": butterfly,
         "arbitrage_free": not calendar and not butterfly,
     }
 
@@ -408,8 +437,10 @@ def surface_vega(s: Surface, book: Sequence[Position]) -> dict[str, object]:
         for v in out:
             total += v
     return {
-        "pv": _book_pv(s, book), "bucket_vega": buckets,
-        "parallel_vega": (moved(h) - moved(-h)) / (2 * h), "bucket_sum": total,
+        "pv": _book_pv(s, book),
+        "bucket_vega": buckets,
+        "parallel_vega": (moved(h) - moved(-h)) / (2 * h),
+        "bucket_sum": total,
     }
 
 

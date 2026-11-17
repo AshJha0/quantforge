@@ -1,4 +1,5 @@
 """Rate futures convexity under Hull-White (specifications/02-curves/futures-convexity.md)."""
+
 import math
 
 from .errors import QfError

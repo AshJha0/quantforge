@@ -181,4 +181,40 @@ class HedgeCostsTest {
         assertEquals(21, LeastSquaresHedge.solve(new double[][] {many}, new double[] {1}, new double[] {1}, 1.0, null,
                 null, null, null, false, new Costs(many, null, 1, null, null)).x().length);
     }
+
+    private static Solution marginTight(double limit, double[] spreads) {
+        return LeastSquaresHedge.solve(new double[][] {{1, 0}, {0, 1}}, new double[] {0, 0}, new double[] {1, 1}, 0.0,
+                new double[][] {{1, 1}}, new double[] {1}, null, null, false,
+                new Costs(spreads, null, 1.0, new double[] {1, 4}, limit));
+    }
+
+    @org.junit.jupiter.api.Test
+    void marginTightAtTheOnlyFeasiblePoint() {
+        // x0 + x1 = 1 and |x0| + 4 |x1| <= 1 meet only at (1, 0); a margin penalty refused this limit.
+        assertArrayEquals(new double[] {1, 0}, marginTight(1.0, null).x(), 1e-12);
+        assertArrayEquals(new double[] {1, 0}, marginTight(1.0, new double[] {0.5, 0.5}).x(), 1e-12);
+        assertEquals("E_INFEASIBLE", code(() -> marginTight(0.999999, null)));
+    }
+
+    @org.junit.jupiter.api.Test
+    void leastMarginPoints() {
+        double inf = Double.POSITIVE_INFINITY;
+        double[][] e = {{1, 1}};
+        double[] rates = {1, 3};
+        double[] free = {-inf, -inf};
+        double[] up = {inf, inf};
+        // min |x1| + 3 |x2| with x1 + x2 = 3: x1 = 3 unless a bound stops it.
+        assertArrayEquals(new double[] {3, 0}, LeastSquaresHedge.leastMargin(e, new double[] {3}, free, up, rates));
+        assertArrayEquals(new double[] {2, 1},
+                LeastSquaresHedge.leastMargin(e, new double[] {3}, free, new double[] {2, inf}, rates));
+        assertArrayEquals(new double[] {1.5, 1.5}, LeastSquaresHedge.leastMargin(e, new double[] {3},
+                new double[] {-inf, 1.5}, new double[] {2, inf}, rates));
+        assertArrayEquals(new double[] {-2, -1}, LeastSquaresHedge.leastMargin(e, new double[] {-3},
+                new double[] {-2, -inf}, up, rates));
+        // Bounds alone: the point nearest 0 in each box.
+        assertArrayEquals(new double[] {1, -0.5, 0}, LeastSquaresHedge.leastMargin(null, null,
+                new double[] {1, -inf, -4}, new double[] {2, -0.5, inf}, new double[] {1, 1, 1}));
+        assertArrayEquals(new double[] {0, 0}, LeastSquaresHedge.leastMargin(null, null, free, up, new double[] {1, 1}));
+        assertNull(LeastSquaresHedge.leastMargin(e, new double[] {3}, free, new double[] {1, 1}, rates));
+    }
 }

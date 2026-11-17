@@ -11,6 +11,7 @@ geometric with mean 1/q). Neither opened in this session; evidence class: paper,
 checked in tests/test_quantforge_research.py. Not a CLI operation (gap G14): the bootstrap draws would need a shared
 random stream across four languages.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -26,13 +27,21 @@ def stationary_indices(n: int, q: float, rng: np.random.Generator) -> np.ndarray
     return idx
 
 
-def reality_check(strategy_returns: np.ndarray, benchmark_returns: np.ndarray, *, n_boot: int = 1000,
-                  mean_block: float = 10.0, seed: int = 0) -> dict[str, float]:
+def reality_check(
+    strategy_returns: np.ndarray,
+    benchmark_returns: np.ndarray,
+    *,
+    n_boot: int = 1000,
+    mean_block: float = 10.0,
+    seed: int = 0,
+) -> dict[str, float]:
     """strategy_returns: T x K; benchmark_returns: length T. Returns sqrt(T) times the best mean excess and its p-value."""
     X = np.asarray(strategy_returns, dtype=float)
     b = np.asarray(benchmark_returns, dtype=float)
     if X.ndim != 2 or b.shape != (X.shape[0],) or X.shape[0] < 2 or n_boot < 1 or mean_block < 1:
-        raise ValueError("strategy_returns must be T x K with T >= 2, benchmark length T, n_boot >= 1, mean_block >= 1")
+        raise ValueError(
+            "strategy_returns must be T x K with T >= 2, benchmark length T, n_boot >= 1, mean_block >= 1"
+        )
     f = X - b[:, None]
     T = f.shape[0]
     fbar = f.mean(axis=0)

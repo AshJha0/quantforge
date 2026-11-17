@@ -1,4 +1,5 @@
 """Regular schedules with a short first stub (specifications/02-curves/schedules.md)."""
+
 import itertools
 from dataclasses import dataclass
 from datetime import date
@@ -28,7 +29,11 @@ def add_months(d: date, months: int) -> date:
 
 
 def generate(
-    start: date, end: date, frequency_months: int, calendar: str, end_of_month: bool,
+    start: date,
+    end: date,
+    frequency_months: int,
+    calendar: str,
+    end_of_month: bool,
     payment_lag: int,
 ) -> list[Period]:
     if end <= start:
@@ -50,10 +55,7 @@ def generate(
             adjusted = calendars.adjust(calendar, d, _MF)
         if adjusted > dates[-1]:
             dates.append(adjusted)
-    return [
-        Period(s, e, _payment(calendar, e, payment_lag))
-        for s, e in itertools.pairwise(dates)
-    ]
+    return [Period(s, e, _payment(calendar, e, payment_lag)) for s, e in itertools.pairwise(dates)]
 
 
 def _payment(calendar: str, end: date, lag: int) -> date:

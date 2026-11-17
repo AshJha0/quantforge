@@ -107,3 +107,5 @@ Cases for rulings carry the `ruling` tag.
 | `fits_d` | SciPy `least_squares` (Huber) | Exact rationals; NumPy |
 
 The generator stops if a tolerance would let one of its 65 wrong conventions through. All stage D data is synthetic.
+
+Amendment (stage J curves lane, 2026-11-15): D22 is extended, not changed, by ruling J-C-2 in `stage-j-rulings-curves.md`: term structures of financing spread and stock borrow now exist as `repo.term.curve` and `eq.forward.term_financed`; the stage D operations keep the flat form.

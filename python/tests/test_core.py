@@ -1,4 +1,5 @@
 """Checks taken from the specs themselves, beyond the golden files."""
+
 import itertools
 import json
 import math
@@ -49,8 +50,13 @@ def black_scholes_call(s, k, r, q, sigma, t):
     [
         ("ACT_360", date(2024, 1, 1), date(2024, 7, 1), {}, 182 / 360),
         ("ACT_ACT_ISDA", date(2003, 11, 1), date(2004, 5, 1), {}, 61 / 365 + 121 / 366),
-        ("ACT_ACT_ICMA", date(2003, 11, 1), date(2004, 5, 1),
-         {"frequency": 2, "ref_start": date(2003, 11, 1), "ref_end": date(2004, 5, 1)}, 0.5),
+        (
+            "ACT_ACT_ICMA",
+            date(2003, 11, 1),
+            date(2004, 5, 1),
+            {"frequency": 2, "ref_start": date(2003, 11, 1), "ref_end": date(2004, 5, 1)},
+            0.5,
+        ),
         ("ACT_ACT_AFB", date(1994, 2, 10), date(1997, 6, 30), {}, 3 + 140 / 365),
         ("THIRTY_360_BOND", date(2024, 1, 31), date(2024, 3, 31), {}, 60 / 360),
         ("THIRTY_E_PLUS_360", date(2024, 1, 30), date(2024, 3, 31), {}, 61 / 360),
@@ -168,8 +174,13 @@ def test_root_targets(finder) -> None:
 
 
 def test_newton_stays_in_bracket() -> None:
-    r = roots.newton(lambda x: math.atan(1000 * (x - 0.3)),
-                     lambda x: 1000 / (1 + 1e6 * (x - 0.3) ** 2), 0.9, 0.0, 1.0)
+    r = roots.newton(
+        lambda x: math.atan(1000 * (x - 0.3)),
+        lambda x: 1000 / (1 + 1e6 * (x - 0.3) ** 2),
+        0.9,
+        0.0,
+        1.0,
+    )
     assert r.root == pytest.approx(0.3, abs=1e-10)
 
 
@@ -207,9 +218,11 @@ AT = [0.0, 0.3, 0.5, 1.1, 2.0, 3.3, 4.5]
     [
         ("cubic_natural", sp_interpolate.CubicSpline(X, Y, bc_type="natural"), {}),
         ("cubic_not_a_knot", sp_interpolate.CubicSpline(X, Y, bc_type="not-a-knot"), {}),
-        ("cubic_clamped",
-         sp_interpolate.CubicSpline(X, Y, bc_type=((1, np.asarray(0.5)), (1, np.asarray(-1.0)))),
-         {"slope_start": 0.5, "slope_end": -1.0}),
+        (
+            "cubic_clamped",
+            sp_interpolate.CubicSpline(X, Y, bc_type=((1, np.asarray(0.5)), (1, np.asarray(-1.0)))),
+            {"slope_start": 0.5, "slope_end": -1.0},
+        ),
     ],
 )
 def test_splines_against_scipy(method, reference, params) -> None:
@@ -304,9 +317,7 @@ def test_monte_carlo_targets() -> None:
 
 
 def test_cos_black_scholes_target() -> None:
-    price, _, _ = cos.european(
-        "CALL", 100, 100, 0.05, 0.02, 1, cos.BlackScholes(0.2), 256, 10.0
-    )
+    price, _, _ = cos.european("CALL", 100, 100, 0.05, 0.02, 1, cos.BlackScholes(0.2), 256, 10.0)
     assert price == pytest.approx(black_scholes_call(100, 100, 0.05, 0.02, 0.2, 1), abs=1e-10)
 
 

@@ -1,0 +1,290 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgecut_j",
+ "spec": "specifications/08-hedging/hedge-solvers.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_j_qpcut.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgecut_j-0001",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1e-07,
+      0.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ],
+    "b": [
+     1.0,
+     0.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "lower": [
+     null,
+     0.0
+    ],
+    "upper": [
+     null,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -10000000.0,
+      0.0
+     ],
+     "residual": [
+      0.0,
+      0.0
+     ],
+     "objective": 0.0,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "fractions KKT enumeration"
+   ],
+   "tags": [
+    "stage_j",
+    "hedge",
+    "qp",
+    "scaling",
+    "synthetic"
+   ],
+   "description": "a = diag(1e-7, 1), x2 fixed at 0 by its bounds: x1 = -1e7, objective 0. The unscaled active-set cut (1e-12 of the largest eigenvalue of H) dropped x1 and gave [0, 0], objective 1 (J-I.1, R6-6.2)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "J-I.1 / R6-6.2: positions near 1e7 against unit ones; relative, as r6/hedgescale_r6"
+   }
+  },
+  {
+   "case_id": "hedgecut_j-0002",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1e-07,
+      0.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ],
+    "b": [
+     1.0,
+     0.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "lower": [
+     null,
+     0.0
+    ],
+    "upper": [
+     null,
+     0.0
+    ],
+    "half_spreads": [
+     0.0,
+     0.1
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -10000000.0,
+      0.0
+     ],
+     "residual": [
+      0.0,
+      0.0
+     ],
+     "objective": 0.0,
+     "rank": 2,
+     "risk": 0.0,
+     "cost": 0.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "fractions KKT enumeration"
+   ],
+   "tags": [
+    "stage_j",
+    "hedge",
+    "qp",
+    "scaling",
+    "synthetic"
+   ],
+   "description": "as case 1 with a half spread on x2: the costed (orthant) active set had the same unscaled cut (J-I.1)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "J-I.1 / R6-6.2: positions near 1e7 against unit ones; relative, as r6/hedgescale_r6"
+   }
+  },
+  {
+   "case_id": "hedgecut_j-0003",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1e-07,
+      0.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ],
+    "b": [
+     1.0,
+     0.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "lower": [
+     null,
+     -1.0
+    ],
+    "upper": [
+     null,
+     1.0
+    ],
+    "half_spreads": [
+     1e-09,
+     0.1
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -9950000.0,
+      0.0
+     ],
+     "residual": [
+      0.005,
+      0.0
+     ],
+     "objective": 0.009975000000000001,
+     "rank": 2,
+     "risk": 2.5000000000000005e-05,
+     "cost": 0.00995
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "fractions KKT enumeration"
+   ],
+   "tags": [
+    "stage_j",
+    "hedge",
+    "qp",
+    "scaling",
+    "synthetic"
+   ],
+   "description": "half spread 1e-9 on the small column: the kink stops x1 at -9.95e6 (residual 0.005); x2 at the kink (J-I.1)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "J-I.1 / R6-6.2: positions near 1e7 against unit ones; relative, as r6/hedgescale_r6"
+   }
+  },
+  {
+   "case_id": "hedgecut_j-0004",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1e-07,
+      0.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ],
+    "b": [
+     1.0,
+     0.5
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "lower": [
+     -20000000.0,
+     -1.0
+    ],
+    "upper": [
+     null,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -10000000.0,
+      -0.5
+     ],
+     "residual": [
+      0.0,
+      0.0
+     ],
+     "objective": 0.0,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "fractions KKT enumeration"
+   ],
+   "tags": [
+    "stage_j",
+    "hedge",
+    "qp",
+    "scaling",
+    "synthetic"
+   ],
+   "description": "box on both instruments, none active at the optimum x = [-1e7, -0.5] (J-I.1)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "J-I.1 / R6-6.2: positions near 1e7 against unit ones; relative, as r6/hedgescale_r6"
+   }
+  }
+ ]
+}

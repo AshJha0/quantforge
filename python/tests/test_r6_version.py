@@ -1,4 +1,5 @@
 """R6-26: both branches of the package version lookup, checked against pyproject.toml."""
+
 import importlib
 import importlib.metadata
 import re
@@ -12,13 +13,17 @@ PYPROJECT = Path(__file__).resolve().parents[1] / "pyproject.toml"
 
 
 def _declared() -> str:
-    found = re.search(r'^version\s*=\s*"([^"]+)"', PYPROJECT.read_text(encoding="utf-8"), re.MULTILINE)
+    found = re.search(
+        r'^version\s*=\s*"([^"]+)"', PYPROJECT.read_text(encoding="utf-8"), re.MULTILINE
+    )
     assert found is not None
     return found.group(1)
 
 
 def test_installed_version_is_read_from_metadata(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(importlib.metadata, "version", lambda name: "9.9.9" if name == "quantforge-core" else "")
+    monkeypatch.setattr(
+        importlib.metadata, "version", lambda name: "9.9.9" if name == "quantforge-core" else ""
+    )
     assert importlib.reload(quantforge_core).__version__ == "9.9.9"
     monkeypatch.undo()
     importlib.reload(quantforge_core)

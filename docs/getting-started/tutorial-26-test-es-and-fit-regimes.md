@@ -159,7 +159,7 @@ cmake -S cpp26 -B cpp26/build -G Ninja -DBUILD_TESTING=OFF && cmake --build cpp2
 python examples/tutorials/t26_es_regimes.py cpp26/build/quantforge
 ```
 
-Each is to print the eleven lines of step 1, digit for digit; the Rust, Java and C++ runs of this page are checked by CI once the wave 2 builds are merged. The full checks are `python conformance/runner/runner.py --impl rust --suite esbt_j` and `--suite baumwelch_j`.
+Each is to print the eleven lines of step 1, digit for digit; CI checks this page in all four languages (`tutorial.yml`, green on `main` at a148d0e, 2026-11-14). The full checks are `python conformance/runner/runner.py --impl rust --suite esbt_j` and `--suite baumwelch_j`.
 
 ## For practitioners
 

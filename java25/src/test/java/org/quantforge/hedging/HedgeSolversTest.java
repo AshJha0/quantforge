@@ -3,6 +3,7 @@ package org.quantforge.hedging;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,17 @@ class HedgeSolversTest {
         LeastSquaresHedge.Solution fixed = qp(A, B, W, 0, null, null, new double[] {0.5, -INF},
                 new double[] {0.5, INF}, false);
         assertEquals(0.5, fixed.x()[0], 0.0);
+    }
+
+    @Test
+    void boundedSolveKeepsASmallColumn() {
+        // J-I.1 (golden hedgecut_j-0001): Python's active-set step cut ranks unscaled and returned (0, 0),
+        // objective 1. The dual active set has no rank cut; this pins the hand optimum x1 = -1e7, objective 0.
+        LeastSquaresHedge.Solution s = qp(new double[][] {{1e-7, 0}, {0, 1}}, new double[] {1, 0},
+                new double[] {1, 1}, 0, null, null, new double[] {-INF, 0}, new double[] {INF, 0}, false);
+        assertEquals(-1e7, s.x()[0], 1e-12 * 1e7);
+        assertEquals(0.0, s.x()[1], 0.0);
+        assertEquals(0.0, s.objective(), 1e-12);
     }
 
     @Test
@@ -329,5 +341,35 @@ class HedgeSolversTest {
         assertEquals("E_NOT_POSITIVE_DEFINITE", code(() -> HedgeRatios.residualReport(a, b, new double[] {1},
                 new double[][] {{1, 0}, {0, -1}})));
         assertEquals("E_DOMAIN", code(() -> HedgeRatios.residualReport(a, new double[] {0, 0}, new double[] {1}, s)));
+    }
+    /** Java property seed -11115467 (PR #45 CI 2026-11-17): near-collinear columns, regular after R6-6.2 scaling. */
+    private static final double[][] NEAR_A = {{-0.04684068765297382, 0.85014589759939},
+        {0.06966430897729968, -1.2643959406278287}};
+    private static final double[] NEAR_B = {-18.480681166672692, -6.198617610506782};
+    private static final double[] NEAR_W = {1.6701886487345696, 2.992546829483374};
+
+    @Test
+    void nearSingularRelaxationIsRefinedToItsExactMinimum() {
+        // Square and nonsingular, so the relaxed minimum is exactly 0 (exact rational arithmetic); the
+        // normal-equations solve alone gave 3.1e-6, above the integer optimum. The integer objective is a sum of
+        // squared residuals of size 1e-3, each the difference of terms of size 1e8, so it is good to about 1e-6
+        // relative only: rounding of those terms (ulp 1.5e-8) is what is left, not the solver.
+        LeastSquaresHedge.IntegerSolution s = LeastSquaresHedge.solveLots(NEAR_A, NEAR_B, NEAR_W, 0,
+                new double[] {10, 10}, null, new double[] {3, 3});
+        assertArrayEquals(new long[] {-8208927L, -452287L}, s.lots());
+        assertTrue(Math.abs(s.continuousObjective()) <= 1e-12, () -> "relaxed " + s.continuousObjective());
+        assertEquals(1.5462392586798939e-06, s.objective(), 1e-6 * 1.5462392586798939e-06);
+    }
+
+    @Test
+    void nearSingularQpReachesItsExactMinimum() {
+        // The same data in x with bounds 10 times the lot bounds: the exact minimiser (-82091364.70172344,
+        // -4522985.411300044) is inside them, so the minimum is 0; without refinement the objective was 2.3e-6.
+        for (double[] hi : new double[][] {{30, 30}, null}) {
+            LeastSquaresHedge.Solution s = qp(NEAR_A, NEAR_B, NEAR_W, 0, null, null, null, hi, false);
+            assertTrue(s.objective() >= 0.0 && s.objective() <= 1e-10, () -> "objective " + s.objective());
+            assertEquals(-82091364.70172344, s.x()[0], 1e-10 * 82091364.70172344);
+            assertEquals(-4522985.411300044, s.x()[1], 1e-10 * 82091364.70172344);
+        }
     }
 }

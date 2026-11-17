@@ -1,6 +1,7 @@
 """Stage J wave 2 property tests (program/STAGE_J_HANDOVER.md, "WAVE 2 READY", property tests):
 mean-variance KKT, closed form and bound monotonicity; risk-parity shares; Euler additivity;
 Ledoit-Wolf shrinkage range; Black-Litterman forms; Z2 invariances; Baum-Welch EM properties."""
+
 import itertools
 import math
 import random
@@ -29,8 +30,10 @@ sizes = st.integers(min_value=1, max_value=6)
 
 def _cov(rng: random.Random, n: int) -> list[list[float]]:
     a = [[rng.gauss(0, 0.2) for _ in range(n)] for _ in range(n)]
-    return [[sum(a[i][k] * a[j][k] for k in range(n)) + (0.01 if i == j else 0.0)
-             for j in range(n)] for i in range(n)]
+    return [
+        [sum(a[i][k] * a[j][k] for k in range(n)) + (0.01 if i == j else 0.0) for j in range(n)]
+        for i in range(n)
+    ]
 
 
 def _solve(a: list[list[float]], b: list[float]) -> list[float]:
@@ -145,10 +148,15 @@ def test_black_litterman_update_equals_precision_form(seed, n, k):
     # Precision form: [(tau S)^-1 + P' O^-1 P] x = (tau S)^-1 pi + P' O^-1 q.
     ts = [[tau * v for v in row] for row in sigma]
     inv_cols = [_solve(ts, [1.0 if i == j else 0.0 for i in range(n)]) for j in range(n)]
-    prec = [[inv_cols[j][i] + sum(p[a][i] * p[a][j] / om[a][a] for a in range(k))
-             for j in range(n)] for i in range(n)]
-    rhs = [sum(inv_cols[j][i] * pi[j] for j in range(n))
-           + sum(p[a][i] * q[a] / om[a][a] for a in range(k)) for i in range(n)]
+    prec = [
+        [inv_cols[j][i] + sum(p[a][i] * p[a][j] / om[a][a] for a in range(k)) for j in range(n)]
+        for i in range(n)
+    ]
+    rhs = [
+        sum(inv_cols[j][i] * pi[j] for j in range(n))
+        + sum(p[a][i] * q[a] / om[a][a] for a in range(k))
+        for i in range(n)
+    ]
     for x, y in zip(r["posterior_returns"], _solve(prec, rhs), strict=True):
         assert abs(x - y) < 1e-10 * max(1.0, abs(y)) or abs(x - y) < 1e-8
     big = estimate_black_litterman(sigma, pi, p, q, [[v * 1e12 for v in row] for row in om], tau)
@@ -181,8 +189,13 @@ def _hmm_data(rng: random.Random, t: int) -> list[float]:
 
 
 def _bytes(r: dict[str, Any]) -> bytes:
-    flat = [*r["initial"], *(x for row in r["transition"] for x in row), *r["means"], *r["sds"],
-            r["log_likelihood"]]
+    flat = [
+        *r["initial"],
+        *(x for row in r["transition"] for x in row),
+        *r["means"],
+        *r["sds"],
+        r["log_likelihood"],
+    ]
     return struct.pack(f"<{len(flat)}d", *flat)
 
 
@@ -195,8 +208,9 @@ def test_baum_welch_monotone_reproducible_and_permutation_equivariant(seed):
     lls = []
     for m in range(1, 8):
         try:
-            lls.append(regime_baum_welch(y, *start, tolerance=1e-300,
-                                         max_iterations=m)["log_likelihood"])
+            lls.append(
+                regime_baum_welch(y, *start, tolerance=1e-300, max_iterations=m)["log_likelihood"]
+            )
         except QfError:
             return
     for a, b in itertools.pairwise(lls):
@@ -230,8 +244,10 @@ def test_infeasible_bounds_and_indefinite_covariance_are_domain():
 
 # --- Rulings J-W2-17 to J-W2-22 (program/WAVE2_*_NOTES.md doubts) -----------------------------
 
+
 def _limit_code(op: str, raw: dict[str, object]) -> str | None:
     from quantforge_core.cli.limits import check_limits
+
     try:
         check_limits(op, raw)
     except QfError as e:
@@ -248,8 +264,13 @@ def test_j_w2_17_ragged_matrix_width_counts() -> None:
 
 
 def test_j_w2_18_k_is_the_longest_input() -> None:
-    raw = {"observations": [0.1, 0.2], "initial": [0.5, 0.5], "transition": [[0.5, 0.5], [0.5, 0.5]],
-           "means": [0.0] * 17, "sds": [1.0, 1.0]}
+    raw = {
+        "observations": [0.1, 0.2],
+        "initial": [0.5, 0.5],
+        "transition": [[0.5, 0.5], [0.5, 0.5]],
+        "means": [0.0] * 17,
+        "sds": [1.0, 1.0],
+    }
     assert _limit_code("research.regime.baum_welch", raw) == "E_LIMIT"
     raw["means"] = [0.0, 1.0]
     raw["transition"] = [[0.5, 0.5], [0.5] * 17]
@@ -274,14 +295,20 @@ def test_j_w2_21_degenerate_problem_terminates() -> None:
     r = portfolio_mean_variance([0.1, 0.1], [[1.0, 0.0], [0.0, 1.0]], 1.0, upper=[0.5, 0.5])
     assert r["weights"] == [0.5, 0.5]
     # A fixed weight (lower = upper) never leaves the working set.
-    r = portfolio_mean_variance([0.1, 0.9, 0.1], [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
-                                1.0, lower=[0.0, 0.3, 0.0], upper=[1.0, 0.3, 1.0])
+    r = portfolio_mean_variance(
+        [0.1, 0.9, 0.1],
+        [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+        1.0,
+        lower=[0.0, 0.3, 0.0],
+        upper=[1.0, 0.3, 1.0],
+    )
     assert r["weights"][1] == 0.3 and r["at_bound"][1] == -1
 
 
 def test_j_w2_22_ledoit_wolf_sizes() -> None:
     assert _limit_code("research.estimate.ledoit_wolf", {"returns": [[0.0] * 501] * 2}) == "E_LIMIT"
-    assert _limit_code("research.estimate.ledoit_wolf",
-                       {"returns": [[0.0, 0.0], [0.0] * 500]}) is None
+    assert (
+        _limit_code("research.estimate.ledoit_wolf", {"returns": [[0.0, 0.0], [0.0] * 500]}) is None
+    )
     rows = [[0.0]] * 20_001 + [[0.0] * 500]
     assert _limit_code("research.estimate.ledoit_wolf", {"returns": rows}) == "E_LIMIT"

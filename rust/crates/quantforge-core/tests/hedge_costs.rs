@@ -456,3 +456,43 @@ mod switch_points {
         }
     }
 }
+
+#[test]
+fn a_dependent_row_at_a_degenerate_vertex_does_not_hide_the_x2_sign_flip() {
+    // x0 >= 1 and 0.5 x0 + 0.5 |x1| <= 0.5 force x0 = 1, x1 = 0, where x1 >= 0 is -2 (margin)
+    // - (x0 >= 1): a row dependent on the active set. A rounding-size coefficient (1e-18) taken
+    // as a blocking row dropped the x2 sign row in C++ (commit badcf1be). With x0 = 1, x1 = 0,
+    // f(x2) = 75.25 + 38 x2 + 44 x2^2 + |x2|, so x2 = -37/88 and f = 75.25 - 37^2 / 176.
+    let a: Matrix = vec![
+        vec![3.0, 2.0, -2.0],
+        vec![-2.0, 7.0, 2.0],
+        vec![3.0, -1.0, 6.0],
+        vec![1.0, 0.0, 0.0],
+    ];
+    let b = [-1.0, -3.0, 2.5, 3.0];
+    let w = [1.0; 4];
+    let lower = [Some(1.0), Some(-1.0), None];
+    let upper = [Some(2.0), None, None];
+    let spreads = [0.0, 0.75, 1.0];
+    let rates = [0.5, 0.5, 0.0];
+    let costs = Costs {
+        half_spreads: Some(&spreads),
+        margin_rates: Some(&rates),
+        margin_limit: Some(0.5),
+        ..Costs::default()
+    };
+    let mut p = problem(&a, &b, &w, costs);
+    p.lower = Some(&lower);
+    p.upper = Some(&upper);
+    let s = qp_solve(&p).unwrap();
+    let x2 = -37.0 / 88.0;
+    let objective = 75.25 - 37.0 * 37.0 / 176.0;
+    assert!((s.x[0] - 1.0).abs() <= 1e-12, "{:?}", s.x);
+    assert!(s.x[1].abs() <= 1e-12, "{:?}", s.x);
+    assert!((s.x[2] - x2).abs() <= 1e-12 * x2.abs(), "{:?}", s.x);
+    assert!(
+        (s.objective - objective).abs() <= 1e-12 * objective,
+        "{}",
+        s.objective
+    );
+}

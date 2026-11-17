@@ -1,0 +1,943 @@
+{
+ "schema_version": "1.0",
+ "built_by": "datasets/scenarios/build_shock_library.py",
+ "units": {
+  "yields": "percent",
+  "shift_bp": "basis points",
+  "tenors": "years"
+ },
+ "source": "U.S. Department of the Treasury, Daily Treasury Par Yield Curve Rates (public domain)",
+ "outside_check": "Federal Reserve H.15 via FRED, tolerance 0.005 percentage points (J-W3-7)",
+ "h15_worst_gap": 0.0,
+ "scenarios": [
+  {
+   "name": "gfc_2008",
+   "description": "Lehman's last trading day to year end",
+   "start_date": "2008-09-12",
+   "end_date": "2008-12-31",
+   "tenor_labels": [
+    "1 Mo",
+    "3 Mo",
+    "6 Mo",
+    "1 Yr",
+    "2 Yr",
+    "3 Yr",
+    "5 Yr",
+    "7 Yr",
+    "10 Yr",
+    "20 Yr",
+    "30 Yr"
+   ],
+   "tenors": [
+    0.08333333333333333,
+    0.25,
+    0.5,
+    1.0,
+    2.0,
+    3.0,
+    5.0,
+    7.0,
+    10.0,
+    20.0,
+    30.0
+   ],
+   "dropped_tenors": [],
+   "start_yields": [
+    1.37,
+    1.49,
+    1.84,
+    2.02,
+    2.23,
+    2.45,
+    2.97,
+    3.32,
+    3.74,
+    4.36,
+    4.32
+   ],
+   "end_yields": [
+    0.11,
+    0.11,
+    0.27,
+    0.37,
+    0.76,
+    1.0,
+    1.55,
+    1.87,
+    2.25,
+    3.05,
+    2.69
+   ],
+   "shift_bp": [
+    -126.0,
+    -138.0,
+    -157.0,
+    -165.0,
+    -147.0,
+    -145.00000000000003,
+    -142.00000000000003,
+    -144.99999999999997,
+    -149.00000000000003,
+    -131.00000000000006,
+    -163.00000000000003
+   ],
+   "raw_files": {
+    "ust_2008.csv": "686db01584dd45f67addc243ee0c42339d491171a0e947c8f88ecac78ee0e9ea"
+   },
+   "h15_check": [
+    {
+     "tenor": "1 Mo",
+     "date": "2008-09-12",
+     "treasury": 1.37,
+     "h15": 1.37,
+     "pass": true
+    },
+    {
+     "tenor": "1 Mo",
+     "date": "2008-12-31",
+     "treasury": 0.11,
+     "h15": 0.11,
+     "pass": true
+    },
+    {
+     "tenor": "3 Mo",
+     "date": "2008-09-12",
+     "treasury": 1.49,
+     "h15": 1.49,
+     "pass": true
+    },
+    {
+     "tenor": "3 Mo",
+     "date": "2008-12-31",
+     "treasury": 0.11,
+     "h15": 0.11,
+     "pass": true
+    },
+    {
+     "tenor": "6 Mo",
+     "date": "2008-09-12",
+     "treasury": 1.84,
+     "h15": 1.84,
+     "pass": true
+    },
+    {
+     "tenor": "6 Mo",
+     "date": "2008-12-31",
+     "treasury": 0.27,
+     "h15": 0.27,
+     "pass": true
+    },
+    {
+     "tenor": "1 Yr",
+     "date": "2008-09-12",
+     "treasury": 2.02,
+     "h15": 2.02,
+     "pass": true
+    },
+    {
+     "tenor": "1 Yr",
+     "date": "2008-12-31",
+     "treasury": 0.37,
+     "h15": 0.37,
+     "pass": true
+    },
+    {
+     "tenor": "2 Yr",
+     "date": "2008-09-12",
+     "treasury": 2.23,
+     "h15": 2.23,
+     "pass": true
+    },
+    {
+     "tenor": "2 Yr",
+     "date": "2008-12-31",
+     "treasury": 0.76,
+     "h15": 0.76,
+     "pass": true
+    },
+    {
+     "tenor": "3 Yr",
+     "date": "2008-09-12",
+     "treasury": 2.45,
+     "h15": 2.45,
+     "pass": true
+    },
+    {
+     "tenor": "3 Yr",
+     "date": "2008-12-31",
+     "treasury": 1.0,
+     "h15": 1.0,
+     "pass": true
+    },
+    {
+     "tenor": "5 Yr",
+     "date": "2008-09-12",
+     "treasury": 2.97,
+     "h15": 2.97,
+     "pass": true
+    },
+    {
+     "tenor": "5 Yr",
+     "date": "2008-12-31",
+     "treasury": 1.55,
+     "h15": 1.55,
+     "pass": true
+    },
+    {
+     "tenor": "7 Yr",
+     "date": "2008-09-12",
+     "treasury": 3.32,
+     "h15": 3.32,
+     "pass": true
+    },
+    {
+     "tenor": "7 Yr",
+     "date": "2008-12-31",
+     "treasury": 1.87,
+     "h15": 1.87,
+     "pass": true
+    },
+    {
+     "tenor": "10 Yr",
+     "date": "2008-09-12",
+     "treasury": 3.74,
+     "h15": 3.74,
+     "pass": true
+    },
+    {
+     "tenor": "10 Yr",
+     "date": "2008-12-31",
+     "treasury": 2.25,
+     "h15": 2.25,
+     "pass": true
+    },
+    {
+     "tenor": "20 Yr",
+     "date": "2008-09-12",
+     "treasury": 4.36,
+     "h15": 4.36,
+     "pass": true
+    },
+    {
+     "tenor": "20 Yr",
+     "date": "2008-12-31",
+     "treasury": 3.05,
+     "h15": 3.05,
+     "pass": true
+    },
+    {
+     "tenor": "30 Yr",
+     "date": "2008-09-12",
+     "treasury": 4.32,
+     "h15": 4.32,
+     "pass": true
+    },
+    {
+     "tenor": "30 Yr",
+     "date": "2008-12-31",
+     "treasury": 2.69,
+     "h15": 2.69,
+     "pass": true
+    }
+   ],
+   "h15_pass": true
+  },
+  {
+   "name": "taper_2013",
+   "description": "taper tantrum",
+   "start_date": "2013-05-01",
+   "end_date": "2013-09-05",
+   "tenor_labels": [
+    "1 Mo",
+    "3 Mo",
+    "6 Mo",
+    "1 Yr",
+    "2 Yr",
+    "3 Yr",
+    "5 Yr",
+    "7 Yr",
+    "10 Yr",
+    "20 Yr",
+    "30 Yr"
+   ],
+   "tenors": [
+    0.08333333333333333,
+    0.25,
+    0.5,
+    1.0,
+    2.0,
+    3.0,
+    5.0,
+    7.0,
+    10.0,
+    20.0,
+    30.0
+   ],
+   "dropped_tenors": [],
+   "start_yields": [
+    0.03,
+    0.06,
+    0.08,
+    0.11,
+    0.2,
+    0.3,
+    0.65,
+    1.07,
+    1.66,
+    2.44,
+    2.83
+   ],
+   "end_yields": [
+    0.03,
+    0.02,
+    0.06,
+    0.16,
+    0.52,
+    0.97,
+    1.85,
+    2.45,
+    2.98,
+    3.64,
+    3.88
+   ],
+   "shift_bp": [
+    0.0,
+    -3.9999999999999996,
+    -2.0000000000000004,
+    5.0,
+    32.0,
+    67.0,
+    120.00000000000001,
+    138.0,
+    132.0,
+    120.00000000000001,
+    104.99999999999999
+   ],
+   "raw_files": {
+    "ust_2013.csv": "1e1a98426d9274afcc68467962f9238104db775b8765e48f45ac7488b33ff338"
+   },
+   "h15_check": [
+    {
+     "tenor": "1 Mo",
+     "date": "2013-05-01",
+     "treasury": 0.03,
+     "h15": 0.03,
+     "pass": true
+    },
+    {
+     "tenor": "1 Mo",
+     "date": "2013-09-05",
+     "treasury": 0.03,
+     "h15": 0.03,
+     "pass": true
+    },
+    {
+     "tenor": "3 Mo",
+     "date": "2013-05-01",
+     "treasury": 0.06,
+     "h15": 0.06,
+     "pass": true
+    },
+    {
+     "tenor": "3 Mo",
+     "date": "2013-09-05",
+     "treasury": 0.02,
+     "h15": 0.02,
+     "pass": true
+    },
+    {
+     "tenor": "6 Mo",
+     "date": "2013-05-01",
+     "treasury": 0.08,
+     "h15": 0.08,
+     "pass": true
+    },
+    {
+     "tenor": "6 Mo",
+     "date": "2013-09-05",
+     "treasury": 0.06,
+     "h15": 0.06,
+     "pass": true
+    },
+    {
+     "tenor": "1 Yr",
+     "date": "2013-05-01",
+     "treasury": 0.11,
+     "h15": 0.11,
+     "pass": true
+    },
+    {
+     "tenor": "1 Yr",
+     "date": "2013-09-05",
+     "treasury": 0.16,
+     "h15": 0.16,
+     "pass": true
+    },
+    {
+     "tenor": "2 Yr",
+     "date": "2013-05-01",
+     "treasury": 0.2,
+     "h15": 0.2,
+     "pass": true
+    },
+    {
+     "tenor": "2 Yr",
+     "date": "2013-09-05",
+     "treasury": 0.52,
+     "h15": 0.52,
+     "pass": true
+    },
+    {
+     "tenor": "3 Yr",
+     "date": "2013-05-01",
+     "treasury": 0.3,
+     "h15": 0.3,
+     "pass": true
+    },
+    {
+     "tenor": "3 Yr",
+     "date": "2013-09-05",
+     "treasury": 0.97,
+     "h15": 0.97,
+     "pass": true
+    },
+    {
+     "tenor": "5 Yr",
+     "date": "2013-05-01",
+     "treasury": 0.65,
+     "h15": 0.65,
+     "pass": true
+    },
+    {
+     "tenor": "5 Yr",
+     "date": "2013-09-05",
+     "treasury": 1.85,
+     "h15": 1.85,
+     "pass": true
+    },
+    {
+     "tenor": "7 Yr",
+     "date": "2013-05-01",
+     "treasury": 1.07,
+     "h15": 1.07,
+     "pass": true
+    },
+    {
+     "tenor": "7 Yr",
+     "date": "2013-09-05",
+     "treasury": 2.45,
+     "h15": 2.45,
+     "pass": true
+    },
+    {
+     "tenor": "10 Yr",
+     "date": "2013-05-01",
+     "treasury": 1.66,
+     "h15": 1.66,
+     "pass": true
+    },
+    {
+     "tenor": "10 Yr",
+     "date": "2013-09-05",
+     "treasury": 2.98,
+     "h15": 2.98,
+     "pass": true
+    },
+    {
+     "tenor": "20 Yr",
+     "date": "2013-05-01",
+     "treasury": 2.44,
+     "h15": 2.44,
+     "pass": true
+    },
+    {
+     "tenor": "20 Yr",
+     "date": "2013-09-05",
+     "treasury": 3.64,
+     "h15": 3.64,
+     "pass": true
+    },
+    {
+     "tenor": "30 Yr",
+     "date": "2013-05-01",
+     "treasury": 2.83,
+     "h15": 2.83,
+     "pass": true
+    },
+    {
+     "tenor": "30 Yr",
+     "date": "2013-09-05",
+     "treasury": 3.88,
+     "h15": 3.88,
+     "pass": true
+    }
+   ],
+   "h15_pass": true
+  },
+  {
+   "name": "covid_2020",
+   "description": "Covid rally",
+   "start_date": "2020-02-19",
+   "end_date": "2020-03-09",
+   "tenor_labels": [
+    "1 Mo",
+    "3 Mo",
+    "6 Mo",
+    "1 Yr",
+    "2 Yr",
+    "3 Yr",
+    "5 Yr",
+    "7 Yr",
+    "10 Yr",
+    "20 Yr",
+    "30 Yr"
+   ],
+   "tenors": [
+    0.08333333333333333,
+    0.25,
+    0.5,
+    1.0,
+    2.0,
+    3.0,
+    5.0,
+    7.0,
+    10.0,
+    20.0,
+    30.0
+   ],
+   "dropped_tenors": [],
+   "start_yields": [
+    1.61,
+    1.58,
+    1.56,
+    1.47,
+    1.42,
+    1.39,
+    1.41,
+    1.5,
+    1.56,
+    1.86,
+    2.01
+   ],
+   "end_yields": [
+    0.57,
+    0.33,
+    0.27,
+    0.31,
+    0.38,
+    0.4,
+    0.46,
+    0.56,
+    0.54,
+    0.87,
+    0.99
+   ],
+   "shift_bp": [
+    -104.0,
+    -125.0,
+    -129.0,
+    -115.99999999999999,
+    -104.0,
+    -98.99999999999999,
+    -95.0,
+    -94.0,
+    -102.0,
+    -99.00000000000001,
+    -101.99999999999999
+   ],
+   "raw_files": {
+    "ust_2020.csv": "edcf1c8be9622f3cd92eb7de1847aefc3977e2118e2ff9af67f46614a5c306a7"
+   },
+   "h15_check": [
+    {
+     "tenor": "1 Mo",
+     "date": "2020-02-19",
+     "treasury": 1.61,
+     "h15": 1.61,
+     "pass": true
+    },
+    {
+     "tenor": "1 Mo",
+     "date": "2020-03-09",
+     "treasury": 0.57,
+     "h15": 0.57,
+     "pass": true
+    },
+    {
+     "tenor": "3 Mo",
+     "date": "2020-02-19",
+     "treasury": 1.58,
+     "h15": 1.58,
+     "pass": true
+    },
+    {
+     "tenor": "3 Mo",
+     "date": "2020-03-09",
+     "treasury": 0.33,
+     "h15": 0.33,
+     "pass": true
+    },
+    {
+     "tenor": "6 Mo",
+     "date": "2020-02-19",
+     "treasury": 1.56,
+     "h15": 1.56,
+     "pass": true
+    },
+    {
+     "tenor": "6 Mo",
+     "date": "2020-03-09",
+     "treasury": 0.27,
+     "h15": 0.27,
+     "pass": true
+    },
+    {
+     "tenor": "1 Yr",
+     "date": "2020-02-19",
+     "treasury": 1.47,
+     "h15": 1.47,
+     "pass": true
+    },
+    {
+     "tenor": "1 Yr",
+     "date": "2020-03-09",
+     "treasury": 0.31,
+     "h15": 0.31,
+     "pass": true
+    },
+    {
+     "tenor": "2 Yr",
+     "date": "2020-02-19",
+     "treasury": 1.42,
+     "h15": 1.42,
+     "pass": true
+    },
+    {
+     "tenor": "2 Yr",
+     "date": "2020-03-09",
+     "treasury": 0.38,
+     "h15": 0.38,
+     "pass": true
+    },
+    {
+     "tenor": "3 Yr",
+     "date": "2020-02-19",
+     "treasury": 1.39,
+     "h15": 1.39,
+     "pass": true
+    },
+    {
+     "tenor": "3 Yr",
+     "date": "2020-03-09",
+     "treasury": 0.4,
+     "h15": 0.4,
+     "pass": true
+    },
+    {
+     "tenor": "5 Yr",
+     "date": "2020-02-19",
+     "treasury": 1.41,
+     "h15": 1.41,
+     "pass": true
+    },
+    {
+     "tenor": "5 Yr",
+     "date": "2020-03-09",
+     "treasury": 0.46,
+     "h15": 0.46,
+     "pass": true
+    },
+    {
+     "tenor": "7 Yr",
+     "date": "2020-02-19",
+     "treasury": 1.5,
+     "h15": 1.5,
+     "pass": true
+    },
+    {
+     "tenor": "7 Yr",
+     "date": "2020-03-09",
+     "treasury": 0.56,
+     "h15": 0.56,
+     "pass": true
+    },
+    {
+     "tenor": "10 Yr",
+     "date": "2020-02-19",
+     "treasury": 1.56,
+     "h15": 1.56,
+     "pass": true
+    },
+    {
+     "tenor": "10 Yr",
+     "date": "2020-03-09",
+     "treasury": 0.54,
+     "h15": 0.54,
+     "pass": true
+    },
+    {
+     "tenor": "20 Yr",
+     "date": "2020-02-19",
+     "treasury": 1.86,
+     "h15": 1.86,
+     "pass": true
+    },
+    {
+     "tenor": "20 Yr",
+     "date": "2020-03-09",
+     "treasury": 0.87,
+     "h15": 0.87,
+     "pass": true
+    },
+    {
+     "tenor": "30 Yr",
+     "date": "2020-02-19",
+     "treasury": 2.01,
+     "h15": 2.01,
+     "pass": true
+    },
+    {
+     "tenor": "30 Yr",
+     "date": "2020-03-09",
+     "treasury": 0.99,
+     "h15": 0.99,
+     "pass": true
+    }
+   ],
+   "h15_pass": true
+  },
+  {
+   "name": "hikes_2022",
+   "description": "2022 hiking cycle",
+   "start_date": "2021-12-31",
+   "end_date": "2022-10-21",
+   "tenor_labels": [
+    "1 Mo",
+    "3 Mo",
+    "6 Mo",
+    "1 Yr",
+    "2 Yr",
+    "3 Yr",
+    "5 Yr",
+    "7 Yr",
+    "10 Yr",
+    "20 Yr",
+    "30 Yr"
+   ],
+   "tenors": [
+    0.08333333333333333,
+    0.25,
+    0.5,
+    1.0,
+    2.0,
+    3.0,
+    5.0,
+    7.0,
+    10.0,
+    20.0,
+    30.0
+   ],
+   "dropped_tenors": [],
+   "start_yields": [
+    0.06,
+    0.06,
+    0.19,
+    0.39,
+    0.73,
+    0.97,
+    1.26,
+    1.44,
+    1.52,
+    1.94,
+    1.9
+   ],
+   "end_yields": [
+    3.55,
+    4.09,
+    4.43,
+    4.58,
+    4.49,
+    4.52,
+    4.34,
+    4.28,
+    4.21,
+    4.54,
+    4.33
+   ],
+   "shift_bp": [
+    349.0,
+    403.0,
+    423.99999999999994,
+    419.00000000000006,
+    376.0,
+    355.0,
+    308.0,
+    284.00000000000006,
+    269.0,
+    260.0,
+    243.00000000000003
+   ],
+   "raw_files": {
+    "ust_2021.csv": "1be57e49c63a99f6002431a1030c8fbe539b71066c3eaf14f9f58ddc34492cea",
+    "ust_2022.csv": "c33cb2758e5e34c2c23b7ab759d18681091860f3f9e5960112859f64f31cd814"
+   },
+   "h15_check": [
+    {
+     "tenor": "1 Mo",
+     "date": "2021-12-31",
+     "treasury": 0.06,
+     "h15": 0.06,
+     "pass": true
+    },
+    {
+     "tenor": "1 Mo",
+     "date": "2022-10-21",
+     "treasury": 3.55,
+     "h15": 3.55,
+     "pass": true
+    },
+    {
+     "tenor": "3 Mo",
+     "date": "2021-12-31",
+     "treasury": 0.06,
+     "h15": 0.06,
+     "pass": true
+    },
+    {
+     "tenor": "3 Mo",
+     "date": "2022-10-21",
+     "treasury": 4.09,
+     "h15": 4.09,
+     "pass": true
+    },
+    {
+     "tenor": "6 Mo",
+     "date": "2021-12-31",
+     "treasury": 0.19,
+     "h15": 0.19,
+     "pass": true
+    },
+    {
+     "tenor": "6 Mo",
+     "date": "2022-10-21",
+     "treasury": 4.43,
+     "h15": 4.43,
+     "pass": true
+    },
+    {
+     "tenor": "1 Yr",
+     "date": "2021-12-31",
+     "treasury": 0.39,
+     "h15": 0.39,
+     "pass": true
+    },
+    {
+     "tenor": "1 Yr",
+     "date": "2022-10-21",
+     "treasury": 4.58,
+     "h15": 4.58,
+     "pass": true
+    },
+    {
+     "tenor": "2 Yr",
+     "date": "2021-12-31",
+     "treasury": 0.73,
+     "h15": 0.73,
+     "pass": true
+    },
+    {
+     "tenor": "2 Yr",
+     "date": "2022-10-21",
+     "treasury": 4.49,
+     "h15": 4.49,
+     "pass": true
+    },
+    {
+     "tenor": "3 Yr",
+     "date": "2021-12-31",
+     "treasury": 0.97,
+     "h15": 0.97,
+     "pass": true
+    },
+    {
+     "tenor": "3 Yr",
+     "date": "2022-10-21",
+     "treasury": 4.52,
+     "h15": 4.52,
+     "pass": true
+    },
+    {
+     "tenor": "5 Yr",
+     "date": "2021-12-31",
+     "treasury": 1.26,
+     "h15": 1.26,
+     "pass": true
+    },
+    {
+     "tenor": "5 Yr",
+     "date": "2022-10-21",
+     "treasury": 4.34,
+     "h15": 4.34,
+     "pass": true
+    },
+    {
+     "tenor": "7 Yr",
+     "date": "2021-12-31",
+     "treasury": 1.44,
+     "h15": 1.44,
+     "pass": true
+    },
+    {
+     "tenor": "7 Yr",
+     "date": "2022-10-21",
+     "treasury": 4.28,
+     "h15": 4.28,
+     "pass": true
+    },
+    {
+     "tenor": "10 Yr",
+     "date": "2021-12-31",
+     "treasury": 1.52,
+     "h15": 1.52,
+     "pass": true
+    },
+    {
+     "tenor": "10 Yr",
+     "date": "2022-10-21",
+     "treasury": 4.21,
+     "h15": 4.21,
+     "pass": true
+    },
+    {
+     "tenor": "20 Yr",
+     "date": "2021-12-31",
+     "treasury": 1.94,
+     "h15": 1.94,
+     "pass": true
+    },
+    {
+     "tenor": "20 Yr",
+     "date": "2022-10-21",
+     "treasury": 4.54,
+     "h15": 4.54,
+     "pass": true
+    },
+    {
+     "tenor": "30 Yr",
+     "date": "2021-12-31",
+     "treasury": 1.9,
+     "h15": 1.9,
+     "pass": true
+    },
+    {
+     "tenor": "30 Yr",
+     "date": "2022-10-21",
+     "treasury": 4.33,
+     "h15": 4.33,
+     "pass": true
+    }
+   ],
+   "h15_pass": true
+  }
+ ]
+}

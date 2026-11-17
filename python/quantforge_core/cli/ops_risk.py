@@ -1,4 +1,5 @@
 """Handlers for the risk verbs. A handler reads every input first; the first call through `core`, the gated core modules, ends the E_SCHEMA stage."""
+
 from typing import Any
 
 from .. import conventions, curves
@@ -23,7 +24,9 @@ from .registry import core, op
 @op("risk.ois.dv01")
 def dv01(i: Inputs) -> Any:
     value, keys = core.sensitivities.dv01(
-        i.date("as_of"), _quotes(i), i.enum("interpolation", curves.INTERPOLATIONS),
+        i.date("as_of"),
+        _quotes(i),
+        i.enum("interpolation", curves.INTERPOLATIONS),
         _ois_trade(i),
     )
     return {"dv01": value, "key_rate": keys}
@@ -52,8 +55,14 @@ def _bump_greeks(i: Inputs) -> Any:
 def _surface_vega(i: Inputs) -> Any:
     s = _surface(i)
     book = [
-        Position(p.enum("option_type", OPTIONS), p.real("forward"), p.real("strike"),
-                 p.real("discount_factor"), p.real("expiry_years"), p.real("quantity"))
+        Position(
+            p.enum("option_type", OPTIONS),
+            p.real("forward"),
+            p.real("strike"),
+            p.real("discount_factor"),
+            p.real("expiry_years"),
+            p.real("quantity"),
+        )
         for p in _objects(i, "positions")
     ]
     return core.smile.surface_vega(s, book)
@@ -62,12 +71,17 @@ def _surface_vega(i: Inputs) -> Any:
 def _product(i: Inputs) -> Any:
     from ..risk_curve import Product
     from .readers import _ois_trade
+
     p = i.object("product")
     kind = p.enum("kind", ("OIS", "BOND"))
     if kind == "OIS":
         return Product("OIS", trade=_ois_trade(p))
-    return Product("BOND", bond=_bond(p.object("bond")), settlement=p.date("settlement"),
-                   notional=p.real("notional"))
+    return Product(
+        "BOND",
+        bond=_bond(p.object("bond")),
+        settlement=p.date("settlement"),
+        notional=p.real("notional"),
+    )
 
 
 def _bump(i: Inputs) -> float:
@@ -76,6 +90,7 @@ def _bump(i: Inputs) -> float:
 
 def _scheme(i: Inputs) -> str:
     from ..risk_curve import SCHEMES
+
     return i.enum("scheme", SCHEMES) if i.has("scheme") else "CENTRAL"
 
 
@@ -86,6 +101,7 @@ def _ois_inputs(i: Inputs) -> tuple[Any, ...]:
 def _quotes_at(i: Inputs, key: str) -> Any:
     from ..ois import Quote
     from .readers import _objects
+
     out = []
     for q in _objects(i, key):
         if q.has("rate"):
@@ -98,14 +114,22 @@ def _quotes_at(i: Inputs, key: str) -> Any:
 @op("risk.curve.par")
 def _risk_par(i: Inputs) -> Any:
     as_of, convention, quotes = _ois_inputs(i)
-    args = (as_of, convention, quotes, i.enum("interpolation", curves.INTERPOLATIONS),
-            _product(i), _bump(i), _scheme(i))
+    args = (
+        as_of,
+        convention,
+        quotes,
+        i.enum("interpolation", curves.INTERPOLATIONS),
+        _product(i),
+        _bump(i),
+        _scheme(i),
+    )
     return core.risk_curve.par(*args)
 
 
 @op("risk.curve.key_rate")
 def _risk_key_rate(i: Inputs) -> Any:
     from ..risk_curve import MODES
+
     mode = i.enum("mode", MODES)
     keys = i.dates("key_dates") if i.has("key_dates") else None
     args = (_curve(i), mode, keys, _product(i), _bump(i), _scheme(i))
@@ -124,8 +148,15 @@ def _risk_jacobian(i: Inputs) -> Any:
 def _pnl_explain(i: Inputs) -> Any:
     as_of, convention = i.date("as_of"), i.enum("convention", conventions.OVERNIGHT)
     start, end = _quotes_at(i, "quotes_start"), _quotes_at(i, "quotes_end")
-    args = (as_of, convention, i.enum("interpolation", curves.INTERPOLATIONS), start, end,
-            _product(i), _bump(i))
+    args = (
+        as_of,
+        convention,
+        i.enum("interpolation", curves.INTERPOLATIONS),
+        start,
+        end,
+        _product(i),
+        _bump(i),
+    )
     return core.risk_curve.pnl_explain(*args)
 
 
@@ -148,8 +179,14 @@ def _corr_implied(i: Inputs) -> Any:
 
 @op("risk.corr.dispersion")
 def _corr_dispersion(i: Inputs) -> Any:
-    args = (i.reals("weights"), i.reals("vol_strikes"), i.real("index_vol_strike"),
-            i.reals("realized_vols"), i.real("index_realized_vol"), i.real("vega_notional"))
+    args = (
+        i.reals("weights"),
+        i.reals("vol_strikes"),
+        i.real("index_vol_strike"),
+        i.reals("realized_vols"),
+        i.real("index_realized_vol"),
+        i.real("vega_notional"),
+    )
     return core.correlation.dispersion(*args)
 
 
@@ -157,11 +194,23 @@ def _corr_dispersion(i: Inputs) -> Any:
 def _book_ois_sensitivity(i: Inputs) -> Any:
     from ..book_risk import BookSwap
     from .readers import _quotes
-    swaps = [BookSwap(s.string("id"), s.integer("tenor_years"), s.real("fixed_rate"),
-                      s.enum("side", ("PAY", "RECEIVE"))) for s in _objects(i, "swaps")]
+
+    swaps = [
+        BookSwap(
+            s.string("id"),
+            s.integer("tenor_years"),
+            s.real("fixed_rate"),
+            s.enum("side", ("PAY", "RECEIVE")),
+        )
+        for s in _objects(i, "swaps")
+    ]
     return core.book_risk.ois_sensitivity(
-        i.date("as_of"), _convention(i, "convention", conventions.OVERNIGHT), _quotes(i),
-        i.enum("interpolation", curves.INTERPOLATIONS), swaps)
+        i.date("as_of"),
+        _convention(i, "convention", conventions.OVERNIGHT),
+        _quotes(i),
+        i.enum("interpolation", curves.INTERPOLATIONS),
+        swaps,
+    )
 
 
 @op("risk.curve.pca")
@@ -172,6 +221,7 @@ def _curve_pca(i: Inputs) -> Any:
 @op("risk.curve.cross_gamma")
 def _curve_cross_gamma(i: Inputs) -> Any:
     from ..risk_curve import Product
+
     data = _curve(i)
     p = i.object("product")
     p.enum("kind", ("OIS",))
@@ -186,8 +236,17 @@ def _curve_cross_gamma(i: Inputs) -> Any:
 @op("risk.credit.jtd")
 def _credit_jtd(i: Inputs) -> Any:
     from ..book_risk import JTD_KINDS
-    positions = [(p.string("id"), p.enum("kind", JTD_KINDS), p.real("notional"),
-                  p.real("recovery"), p.real("market_value")) for p in _objects(i, "positions")]
+
+    positions = [
+        (
+            p.string("id"),
+            p.enum("kind", JTD_KINDS),
+            p.real("notional"),
+            p.real("recovery"),
+            p.real("market_value"),
+        )
+        for p in _objects(i, "positions")
+    ]
     return core.book_risk.jtd(positions)
 
 
@@ -198,8 +257,9 @@ def _var_historical(i: Inputs) -> Any:
 
 @op("risk.var.filtered_historical")
 def _var_fhs(i: Inputs) -> Any:
-    return core.var_risk.filtered_historical(i.reals("returns"), i.real("position_value"),
-                                             i.real("lambda"), i.real("confidence"))
+    return core.var_risk.filtered_historical(
+        i.reals("returns"), i.real("position_value"), i.real("lambda"), i.real("confidence")
+    )
 
 
 @op("risk.var.parametric")
@@ -209,14 +269,21 @@ def _var_parametric(i: Inputs) -> Any:
 
 @op("risk.var.monte_carlo")
 def _var_mc(i: Inputs) -> Any:
-    return core.var_risk.monte_carlo(i.reals("mean"), i.matrix("covariance"), i.reals("weights"),
-                                     i.integer("paths"), i.u64("seed"), i.real("confidence"))
+    return core.var_risk.monte_carlo(
+        i.reals("mean"),
+        i.matrix("covariance"),
+        i.reals("weights"),
+        i.integer("paths"),
+        i.u64("seed"),
+        i.real("confidence"),
+    )
 
 
 @op("risk.backtest.kupiec")
 def _kupiec(i: Inputs) -> Any:
-    return core.var_risk.kupiec(i.integer("observations"), i.integer("exceptions"),
-                                i.real("confidence"))
+    return core.var_risk.kupiec(
+        i.integer("observations"), i.integer("exceptions"), i.real("confidence")
+    )
 
 
 @op("risk.backtest.christoffersen")
@@ -229,14 +296,26 @@ def _christoffersen(i: Inputs) -> Any:
 
 @op("risk.backtest.traffic_light")
 def _traffic_light(i: Inputs) -> Any:
-    return core.var_risk.traffic_light(i.integer("observations"), i.integer("exceptions"),
-                                       i.real("confidence"))
+    return core.var_risk.traffic_light(
+        i.integer("observations"), i.integer("exceptions"), i.real("confidence")
+    )
 
 
 @op("risk.frtb.girr_delta")
 def _girr_delta(i: Inputs) -> Any:
     from ..var_risk import GIRR_FACTORS
-    rows = [(s.string("currency"), s.string("curve"), s.enum("risk_factor", GIRR_FACTORS),
-             s.real("sensitivity")) for s in _objects(i, "sensitivities")]
-    return core.var_risk.girr_delta(rows, i.opt_boolean("specified_currency_reduction", False),
-                                    i.opt_string("reporting_currency"))
+
+    rows = [
+        (
+            s.string("currency"),
+            s.string("curve"),
+            s.enum("risk_factor", GIRR_FACTORS),
+            s.real("sensitivity"),
+        )
+        for s in _objects(i, "sensitivities")
+    ]
+    return core.var_risk.girr_delta(
+        rows,
+        i.opt_boolean("specified_currency_reduction", False),
+        i.opt_string("reporting_currency"),
+    )

@@ -1,4 +1,5 @@
 """Handlers for the mbs verbs. A handler reads every input first; the first call through `core`, the gated core modules, ends the E_SCHEMA stage."""
+
 from typing import Any
 
 from .inputs import Inputs
@@ -10,8 +11,15 @@ def _pool(i: Inputs) -> Any:
     pre = p.object("prepayment")
     model = pre.enum("model", ("CPR", "PSA"))
     speed = pre.real("rate" if model == "CPR" else "speed")
-    return (p.real("balance"), p.real("wac"), p.real("net_coupon"), p.integer("wam"),
-            p.integer("age"), model, speed)
+    return (
+        p.real("balance"),
+        p.real("wac"),
+        p.real("net_coupon"),
+        p.integer("wam"),
+        p.integer("age"),
+        model,
+        speed,
+    )
 
 
 @op("mbs.cashflows")

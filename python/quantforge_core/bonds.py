@@ -1,4 +1,5 @@
 """Bonds, repo and bond futures (specifications/04-pricing/bonds.md)."""
+
 import math
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
@@ -78,17 +79,23 @@ def _from_yield(fl: Flows, f: int, y: float) -> tuple[float, float, float, float
         raise QfError("E_DOMAIN", "1 + yield/frequency must be positive", "yield")
     v = 1 / (1 + y / f)
     terms = [(k + fl.w, cf) for k, cf in enumerate(fl.amounts)]
-    dirty = ordered_sum(cf * v ** e for e, cf in terms)
-    mac = ordered_sum(e / f * cf * v ** e for e, cf in terms) / dirty
-    conv = ordered_sum(e * (e + 1) / f ** 2 * cf * v ** (e + 2) for e, cf in terms) / dirty
+    dirty = ordered_sum(cf * v**e for e, cf in terms)
+    mac = ordered_sum(e / f * cf * v**e for e, cf in terms) / dirty
+    conv = ordered_sum(e * (e + 1) / f**2 * cf * v ** (e + 2) for e, cf in terms) / dirty
     return dirty, mac, mac * v, conv
 
 
 def price_from_yield(bond: Bond, settlement: date, y: float) -> dict[str, float]:
     fl = flows(bond, settlement)
     dirty, mac, mod, conv = _from_yield(fl, bond.frequency, y)
-    return {"dirty": dirty, "accrued": fl.accrued, "clean": dirty - fl.accrued,
-            "modified_duration": mod, "macaulay_duration": mac, "convexity": conv}
+    return {
+        "dirty": dirty,
+        "accrued": fl.accrued,
+        "clean": dirty - fl.accrued,
+        "modified_duration": mod,
+        "macaulay_duration": mac,
+        "convexity": conv,
+    }
 
 
 def _root_decreasing(f: Callable[[float], float], low: float, high: float) -> float:
@@ -126,8 +133,9 @@ def _curve_dirty(fl: Flows, curve: Curve, settlement: date, z: float) -> float:
     def ds(d: date) -> float:
         return curve.discount(d) * math.exp(-z * curve.time(d))
 
-    return ordered_sum(cf * ds(d) for d, cf in zip(fl.dates, fl.amounts, strict=True)) \
-        / ds(settlement)
+    return ordered_sum(cf * ds(d) for d, cf in zip(fl.dates, fl.amounts, strict=True)) / ds(
+        settlement
+    )
 
 
 def _curve_setup(bond: Bond, settlement: date, data: CurveData) -> tuple[Flows, Curve]:
@@ -172,15 +180,22 @@ def asset_swap(bond: Bond, settlement: date, data: CurveData, dirty: float) -> t
     ends.reverse()
     starts = [settlement, *ends[:-1]]
     ds = curve.discount(settlement)
-    annuity = ordered_sum((e - s).days / 360 * curve.discount(e) / ds
-                          for s, e in zip(starts, ends, strict=True))
+    annuity = ordered_sum(
+        (e - s).days / 360 * curve.discount(e) / ds for s, e in zip(starts, ends, strict=True)
+    )
     p_curve = _curve_dirty(fl, curve, settlement, 0.0)
     return annuity, (p_curve - dirty) / (100 * annuity)
 
 
 def frn_price(
-    settlement: date, maturity: date, frequency: int, current_rate: float, margin: float,
-    dm: float, discount_data: CurveData, projection_data: CurveData,
+    settlement: date,
+    maturity: date,
+    frequency: int,
+    current_rate: float,
+    margin: float,
+    dm: float,
+    discount_data: CurveData,
+    projection_data: CurveData,
 ) -> dict[str, float]:
     d, p = curves.build(discount_data), curves.build(projection_data)
     prev, ends = dates_around(maturity, frequency, settlement)
@@ -201,7 +216,9 @@ def frn_price(
     return {"dirty": dirty, "accrued": accrued, "clean": dirty - accrued}
 
 
-def _repo_setup(bond: Bond, start: date, end: date) -> tuple[float, float, list[tuple[date, float]]]:
+def _repo_setup(
+    bond: Bond, start: date, end: date
+) -> tuple[float, float, list[tuple[date, float]]]:
     if end <= start:
         raise QfError("E_DATE_ORDER", "end is not after start", "end")
     if end >= bond.maturity:
@@ -219,17 +236,21 @@ def repo_forward(
     dirty = clean + acc0
     days = (end - start).days
     fwd = dirty * (1 + r * days / 360) - ordered_sum(
-        c * (1 + r * (end - x).days / 360) for x, c in paid)
+        c * (1 + r * (end - x).days / 360) for x, c in paid
+    )
     return {
-        "dirty": dirty, "forward_dirty": fwd, "forward_clean": fwd - acc1,
+        "dirty": dirty,
+        "forward_dirty": fwd,
+        "forward_clean": fwd - acc1,
         "interest": dirty * r * days / 360,
         "special_spread": None if gc is None else gc - r,
         "specialness_value": None if gc is None else dirty * (gc - r) * days / 360,
     }
 
 
-def _implied(dirty: float, fwd_dirty: float, end: date, days: int,
-             paid: Sequence[tuple[date, float]]) -> float:
+def _implied(
+    dirty: float, fwd_dirty: float, end: date, days: int, paid: Sequence[tuple[date, float]]
+) -> float:
     top = fwd_dirty + ordered_sum(c for _, c in paid) - dirty
     bottom = dirty * days / 360 - ordered_sum(c * (end - x).days / 360 for x, c in paid)
     if bottom == 0:
@@ -242,13 +263,24 @@ def repo_implied(bond: Bond, start: date, end: date, clean: float, fwd_clean: fl
     return _implied(clean + acc0, fwd_clean + acc1, end, (end - start).days, paid)
 
 
-CONTRACTS = ("TWO_YEAR", "THREE_YEAR", "FIVE_YEAR", "TEN_YEAR", "ULTRA_TEN_YEAR", "BOND",
-             "ULTRA_BOND")
+CONTRACTS = (
+    "TWO_YEAR",
+    "THREE_YEAR",
+    "FIVE_YEAR",
+    "TEN_YEAR",
+    "ULTRA_TEN_YEAR",
+    "BOND",
+    "ULTRA_BOND",
+)
 _WHOLE_MONTHS = ("TWO_YEAR", "THREE_YEAR", "FIVE_YEAR")
 
 
 def conversion_factor(
-    bond: Bond, year: int, month: int, notional: float, contract: str = "TEN_YEAR",
+    bond: Bond,
+    year: int,
+    month: int,
+    notional: float,
+    contract: str = "TEN_YEAR",
 ) -> float:
     if notional != 0.06:
         raise QfError("E_INPUT", "notional_coupon must be 0.06", "notional_coupon")
@@ -277,7 +309,10 @@ def _num(v: float | None) -> float:
 
 
 def futures_basis(
-    price: float, settlement: date, delivery: date, r: float,
+    price: float,
+    settlement: date,
+    delivery: date,
+    r: float,
     bonds: Sequence[tuple[Bond, float, float]],
 ) -> tuple[list[dict[str, float]], int]:
     out = []
@@ -286,11 +321,16 @@ def futures_basis(
         acc0, acc1, paid = _repo_setup(bond, settlement, delivery)
         invoice = price * cf + acc1
         dirty = clean + acc0
-        out.append({
-            "invoice": invoice, "gross_basis": clean - price * cf,
-            "net_basis": _num(forward["forward_dirty"]) - invoice,
-            "implied_repo": _implied(dirty, invoice, delivery, (delivery - settlement).days, paid),
-        })
+        out.append(
+            {
+                "invoice": invoice,
+                "gross_basis": clean - price * cf,
+                "net_basis": _num(forward["forward_dirty"]) - invoice,
+                "implied_repo": _implied(
+                    dirty, invoice, delivery, (delivery - settlement).days, paid
+                ),
+            }
+        )
     if not out:
         raise QfError("E_INPUT", "no bonds", "bonds")
     ctd = max(range(len(out)), key=lambda j: out[j]["implied_repo"])
@@ -298,7 +338,9 @@ def futures_basis(
 
 
 def fit_nelson_siegel(
-    settlement: date, tau: float, bonds: Sequence[tuple[Bond, float]],
+    settlement: date,
+    tau: float,
+    bonds: Sequence[tuple[Bond, float]],
     weights: Sequence[float] | None,
 ) -> tuple[list[float], list[float]]:
     if weights is not None and len(weights) != len(bonds):
@@ -315,8 +357,9 @@ def fit_nelson_siegel(
     sets = []
     for bond, _ in bonds:
         fl = flows(bond, settlement)
-        sets.append([((d - settlement).days / 365, cf) for d, cf in zip(fl.dates, fl.amounts,
-                                                                       strict=True)])
+        sets.append(
+            [((d - settlement).days / 365, cf) for d, cf in zip(fl.dates, fl.amounts, strict=True)]
+        )
     market = [p for _, p in bonds]
 
     def model(beta: Sequence[float]) -> tuple[list[float], list[list[float]]]:
@@ -334,18 +377,23 @@ def fit_nelson_siegel(
         return values, jac
 
     def objective(beta: Sequence[float]) -> float:
-        return ordered_sum(wj * (m - y) ** 2
-                           for wj, m, y in zip(w, model(beta)[0], market, strict=True))
+        return ordered_sum(
+            wj * (m - y) ** 2 for wj, m, y in zip(w, model(beta)[0], market, strict=True)
+        )
 
     beta, lam = [0.03, 0.0, 0.0], 1e-3
     current = objective(beta)
     for _ in range(500):
         values, jac = model(beta)
         r = [m - y for m, y in zip(values, market, strict=True)]
-        a = [[ordered_sum(wj * g[p] * g[q] for wj, g in zip(w, jac, strict=True))
-              for q in range(3)] for p in range(3)]
-        grad = [ordered_sum(wj * g[p] * rj for wj, g, rj in zip(w, jac, r, strict=True))
-                for p in range(3)]
+        a = [
+            [ordered_sum(wj * g[p] * g[q] for wj, g in zip(w, jac, strict=True)) for q in range(3)]
+            for p in range(3)
+        ]
+        grad = [
+            ordered_sum(wj * g[p] * rj for wj, g, rj in zip(w, jac, r, strict=True))
+            for p in range(3)
+        ]
         improved = False
         for _ in range(60):
             damped = [[a[p][q] * (1 + lam if p == q else 1) for q in range(3)] for p in range(3)]

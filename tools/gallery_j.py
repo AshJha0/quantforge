@@ -157,7 +157,7 @@ def page(d, table, lines, status_block):
 
 ## What it is
 
-A research study tries several rules, keeps the best and reports its Sharpe ratio. This page walks one such study through the stage J operations: twelve rules backtested with costs, the winner's probabilistic and deflated Sharpe ratios, the winner chosen inside purged cross-validation folds and scored outside them, and the probability of backtest overfitting across all twelve. Stage J, target v0.9.0 (`specifications/11-research/`).
+A research study tries several rules, keeps the best and reports its Sharpe ratio. This page walks one such study through the stage J operations: twelve rules backtested with costs, the winner's probabilistic and deflated Sharpe ratios, the winner chosen inside purged cross-validation folds and scored outside them, and the probability of backtest overfitting across all twelve. Stage J, released in v0.9.0 (`specifications/11-research/`).
 
 Formally, the deflated Sharpe ratio is the probability that the true Sharpe exceeds the one the best of `N` useless trials would show, `SR0`, and PBO is the share of training and test splits in which the training winner ranks in the bottom half out of sample. [Tutorial 23](../getting-started/tutorial-23-backtest-honestly.md) and [Tutorial 24](../getting-started/tutorial-24-is-the-sharpe-real.md) explain each step on hand-sized data; [LEARN, stage J](../../LEARN.md#stage-j-backtest-overfitting-and-research-statistics) gives the derivations.
 

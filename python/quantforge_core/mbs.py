@@ -10,8 +10,13 @@ Flows = tuple[list[float], list[float], list[float], list[float], float]
 
 def mbs_cashflows(pool: Pool) -> dict[str, object]:
     bal, interest, sched, prepay, wal = _flows(pool)
-    return {"balance": bal, "interest": interest, "scheduled_principal": sched,
-            "prepayment": prepay, "wal": wal}
+    return {
+        "balance": bal,
+        "interest": interest,
+        "scheduled_principal": sched,
+        "prepayment": prepay,
+        "wal": wal,
+    }
 
 
 def _flows(pool: Pool) -> Flows:
@@ -24,8 +29,9 @@ def _flows(pool: Pool) -> Flows:
         raise QfError("E_INPUT", "net_coupon is above wac", "net_coupon")
     if balance <= 0 or (model == "CPR" and not 0 <= speed < 1) or (model == "PSA" and speed < 0):
         raise QfError("E_DOMAIN", "balance, rate or speed out of domain", "pool")
-    if model == "PSA" and any(min((age + k) / 30, 1) * 0.06 * speed / 100 >= 1
-                                for k in range(1, wam + 1)):  # ruling R6-7.1
+    if model == "PSA" and any(
+        min((age + k) / 30, 1) * 0.06 * speed / 100 >= 1 for k in range(1, wam + 1)
+    ):  # ruling R6-7.1
         raise QfError("E_DOMAIN", "PSA speed gives a monthly CPR of 100% or more", "pool")
     r = wac / 12
     b = balance
@@ -44,8 +50,12 @@ def _flows(pool: Pool) -> Flows:
         sched.append(sp)
         prepay.append(pp)
         b = b - sp - pp
-    wal = ordered_sum(k / 12 * (s + p) for k, (s, p) in enumerate(zip(sched, prepay, strict=True),
-                                                                   start=1)) / balance
+    wal = (
+        ordered_sum(
+            k / 12 * (s + p) for k, (s, p) in enumerate(zip(sched, prepay, strict=True), start=1)
+        )
+        / balance
+    )
     return bal, interest, sched, prepay, wal
 
 
@@ -59,7 +69,7 @@ def mbs_price(pool: Pool, y: float, delay_days: int) -> tuple[float, float, floa
     terms = []
     for k, (a, b, c) in enumerate(zip(ints, sched, pre, strict=True), start=1):
         t = k + delay_days / 30
-        terms.append((t, (a + b + c) * v ** t))
+        terms.append((t, (a + b + c) * v**t))
     pv = ordered_sum(x for _, x in terms)
     duration = ordered_sum(t / 12 * x * v for t, x in terms) / pv
     return 100 * pv / pool[0], duration, wal

@@ -4,6 +4,7 @@ caplet acceptance (ruling G-26) checks.
 
 Specification: specifications/04-pricing/lmm.md; rulings G-22, G-25, G-26.
 """
+
 import itertools
 import math
 from collections.abc import Sequence
@@ -65,8 +66,10 @@ def covariance(v: Abcd, ti: float, tj: float, u: float) -> float:
         return 0.0
     xs, ws = _legendre()
     half = u / 2
-    return half * ordered_sum(w * v.vol(ti - (half * x + half)) * v.vol(tj - (half * x + half))
-                              for x, w in zip(xs, ws, strict=True))
+    return half * ordered_sum(
+        w * v.vol(ti - (half * x + half)) * v.vol(tj - (half * x + half))
+        for x, w in zip(xs, ws, strict=True)
+    )
 
 
 def black(forward: float, strike: float, stdev: float, call: bool) -> float:
@@ -90,9 +93,15 @@ def _forwards(curve: Curve, times: Floats) -> list[float]:
     return out
 
 
-def capfloor(times: Floats, discount_factors: Floats, abcd: tuple[float, float, float, float],
-             period_times: Floats, strike: float, cap_floor: str,
-             notional: float) -> dict[str, float | list[float]]:
+def capfloor(
+    times: Floats,
+    discount_factors: Floats,
+    abcd: tuple[float, float, float, float],
+    period_times: Floats,
+    strike: float,
+    cap_floor: str,
+    notional: float,
+) -> dict[str, float | list[float]]:
     """`rates.lmm.capfloor`: Black caplets on the abcd variance to each fixing date."""
     curve = make_curve(times, discount_factors)
     vol = make_abcd(*abcd)
@@ -109,15 +118,28 @@ def capfloor(times: Floats, discount_factors: Floats, abcd: tuple[float, float, 
     for f, (s, t) in zip(fwds, itertools.pairwise(period_times), strict=True):
         sd = math.sqrt(covariance(vol, s, s, s))
         vols.append(sd / math.sqrt(s))
-        lets.append(notional * (t - s) * curve.discount(t) * black(f, strike, sd, cap_floor == "CAP"))
-    return {"price": ordered_sum(lets), "caplet_prices": lets, "forward_rates": fwds,
-            "black_vols": vols}
+        lets.append(
+            notional * (t - s) * curve.discount(t) * black(f, strike, sd, cap_floor == "CAP")
+        )
+    return {
+        "price": ordered_sum(lets),
+        "caplet_prices": lets,
+        "forward_rates": fwds,
+        "black_vols": vols,
+    }
 
 
-def swaption_rebonato(times: Floats, discount_factors: Floats,
-                      abcd: tuple[float, float, float, float], beta: float, expiry: float,
-                      payment_times: Floats, fixed_rate: float, side: str,
-                      notional: float) -> dict[str, float]:
+def swaption_rebonato(
+    times: Floats,
+    discount_factors: Floats,
+    abcd: tuple[float, float, float, float],
+    beta: float,
+    expiry: float,
+    payment_times: Floats,
+    fixed_rate: float,
+    side: str,
+    notional: float,
+) -> dict[str, float]:
     """`rates.lmm.swaption_rebonato`: Black on Rebonato's frozen-weight swap-rate volatility."""
     curve = make_curve(times, discount_factors)
     vol = make_abcd(*abcd)
@@ -139,23 +161,43 @@ def swaption_rebonato(times: Floats, discount_factors: Floats,
     rate = ordered_sum(wi * fi for wi, fi in zip(w, fwds, strict=True))
     fix = grid[:-1]
     var = ordered_sum(
-        w[i] * w[j] * fwds[i] * fwds[j] * math.exp(-beta * abs(fix[i] - fix[j]))
+        w[i]
+        * w[j]
+        * fwds[i]
+        * fwds[j]
+        * math.exp(-beta * abs(fix[i] - fix[j]))
         * covariance(vol, fix[i], fix[j], expiry)
-        for i in range(len(w)) for j in range(len(w))) / (rate * rate)
+        for i in range(len(w))
+        for j in range(len(w))
+    ) / (rate * rate)
     sd = math.sqrt(var)
     price = notional * level * black(rate, fixed_rate, sd, side == "PAY")
-    return {"price": price, "swap_rate": rate, "annuity": level, "black_vol": sd / math.sqrt(expiry)}
+    return {
+        "price": price,
+        "swap_rate": rate,
+        "annuity": level,
+        "black_vol": sd / math.sqrt(expiry),
+    }
 
 
-def simulate_caplets(curve: Curve, vol: Abcd, beta: float, grid: Floats, strike: float,
-                     paths: int, steps_per_year: int, seed: int) -> list[tuple[float, float]]:
+def simulate_caplets(
+    curve: Curve,
+    vol: Abcd,
+    beta: float,
+    grid: Floats,
+    strike: float,
+    paths: int,
+    steps_per_year: int,
+    seed: int,
+) -> list[tuple[float, float]]:
     """Terminal-measure LMM caplets (G-26): log-Euler, predictor-corrector drift, volatility at
     the step midpoint, fixings on step boundaries, Cholesky correlation. Returns, per caplet on
     `F_k` (fixing `grid[k]`, `k >= 1`), the price and its standard error per unit notional."""
     n = len(grid) - 1  # forwards F_0 .. F_(n-1), F_k on [grid[k], grid[k+1]]
     taus = np.array([grid[k + 1] - grid[k] for k in range(n)])
-    f0 = np.array([(curve.discount(grid[k]) / curve.discount(grid[k + 1]) - 1) / taus[k]
-                   for k in range(n)])
+    f0 = np.array(
+        [(curve.discount(grid[k]) / curve.discount(grid[k + 1]) - 1) / taus[k] for k in range(n)]
+    )
     fix = np.array(grid[:-1])
     rho = np.exp(-beta * np.abs(fix[:, None] - fix[None, :]))
     chol = np.linalg.cholesky(rho)
@@ -179,7 +221,7 @@ def simulate_caplets(curve: Curve, vol: Abcd, beta: float, grid: Floats, strike:
             x = taus * sig * f / (1 + taus * f)  # (paths, n)
             mu = np.zeros_like(f)
             for k in range(n):
-                later = rho[k, k + 1:] @ x[:, k + 1:].T if k + 1 < n else 0.0
+                later = rho[k, k + 1 :] @ x[:, k + 1 :].T if k + 1 < n else 0.0
                 mu[:, k] = -sig[k] * later
             return mu
 

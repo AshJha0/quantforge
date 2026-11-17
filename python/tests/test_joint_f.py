@@ -1,4 +1,5 @@
 """Stage F Q4 properties (joint-solve-and-funding.md): limit cases, structure, turns."""
+
 import json
 import math
 from datetime import date
@@ -69,9 +70,18 @@ def test_turn_factor_one_at_no_turn_par_rate() -> None:
     turn_inst = next(x for x in no_turn["instruments"] if x.get("turn"))
     no_turn["instruments"] = [x for x in no_turn["instruments"] if not x.get("turn")]
     flat = _solve(no_turn)["curves"][0]
-    curve = StepCurve(date(2026, 11, 9), flat["base_rate"],
-                            list(zip([date.fromisoformat(d) for d in inputs["curves"][0]["step_dates"]],
-                                     flat["step_rates"], strict=True)), ())
+    curve = StepCurve(
+        date(2026, 11, 9),
+        flat["base_rate"],
+        list(
+            zip(
+                [date.fromisoformat(d) for d in inputs["curves"][0]["step_dates"]],
+                flat["step_rates"],
+                strict=True,
+            )
+        ),
+        (),
+    )
     ps = ois.periods("SOFR", date(2026, 11, 9), turn_inst["tenor"])
     turn_inst_in = next(x for x in inputs["instruments"] if x.get("turn"))
     turn_inst_in["rate"] = ois.par_rate("SOFR", ps, curve)
@@ -82,15 +92,15 @@ def test_turn_factor_one_at_no_turn_par_rate() -> None:
 
 def test_funding_zero_spread_limit() -> None:
     as_of = date(2026, 11, 9)
-    disc = CurveData(as_of, "LOG_LINEAR_DF", (date(2027, 11, 9), date(2031, 11, 10)),
-                     (0.96, 0.84))
+    disc = CurveData(as_of, "LOG_LINEAR_DF", (date(2027, 11, 9), date(2031, 11, 10)), (0.96, 0.84))
     from quantforge_core import curves
+
     curve = curves.build(disc)
     ends = [date(2027, 2, 8), date(2029, 11, 9)]
     quotes = [(e, (1 / curve.discount(e) - 1) * 360 / (e - as_of).days) for e in ends]
     spreads, pillars, _ = joint.funding_curve(disc, quotes, [])
     assert all(abs(s) < 1e-15 for s in spreads)
-    for (e, v) in pillars:
+    for e, v in pillars:
         assert abs(v - curve.discount(e)) < 1e-15
 
 

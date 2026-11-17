@@ -1,6 +1,6 @@
 # Java 25 implementation
 
-Stages A to G (stage G released as v0.7.0) and stage I waves 1 to 5 (hedging, released as v0.8.0) of QuantForge, written
+Stages A to G (stage G released as v0.7.0) stage I waves 1 to 5 (hedging, released as v0.8.0) and stage J (research tools and portfolio construction, released as v0.9.0) of QuantForge, written
 from the specifications. It uses JDK 25
 final features only, and has no runtime dependencies; JUnit is for tests only.
 
@@ -23,7 +23,9 @@ Stage I adds the hedge solvers to `hedging`: `LeastSquaresHedge` (the constraine
 the null space of the equalities, and the integer-lot search by ellipsoid enumeration) and `HedgeRatios` (minimum
 variance, Greek neutralisation, beta futures, residual report), then `CreditHedge` (CDS hedges on the stage D ISDA
 legs), `CorrelationHedge` (Margrabe exchange options and vanillas) and `CrossAssetHedge` (equity and key rates).
-Wave 4 adds hedge costs and the frontier to `LeastSquaresHedge`, `DynamicHedge` (delta-hedge backtest and
+Wave 4 adds hedge costs and the frontier to `LeastSquaresHedge` (since v0.9.0 a binding margin starts from the exact
+least-margin point, a two-phase simplex ported from Python, instead of a 1e12 margin penalty, and degenerate
+vertices are no longer refused as infeasible; `docs/releases/v0.9.0.md`, "Margin start"), `DynamicHedge` (delta-hedge backtest and
 effectiveness), `InstrumentSelection` and `Slippage`. The `cli.OpsHedge*` classes map them to the `hedge.*` verbs.
 `SobolData.java` carries the direction numbers as code, because the CLI reads no file for its numbers.
 

@@ -297,3 +297,129 @@ flowchart TB
 ```
 
 One iteration is an M-step followed by an E-step, and the outputs are the parameters and log-likelihood of the last E-step (ruling J-W2-11). The likelihood never falls [Rab89, DLR77], so gains shrink towards zero; each golden's tolerance sits at least `1e-11` from every gain it tests, so all four builds stop at the same iteration (J-W2-12). In Tutorial 26 a two-state fit on 24 returns stops after iteration 7 with tolerance `1e-6`, and after iteration 3, not converged, with `max_iterations` 3.
+
+### A study's order of work: power and trials before results
+
+```mermaid
+flowchart TB
+  accTitle: The order in which a stage J study uses the research tools
+  accDescr: A study first runs the power calculation to find the minimum detectable Sharpe for its sample length and decides whether that is small enough to be worth running. It registers every trial in the trial registry before seeing results. Each trial is backtested with costs and a lag, inside purged cross-validation. The best trial's Sharpe ratio goes to the PSR, and with the number of trials and their Sharpe variance to the DSR. The matrix of every trial's performance goes to PBO. The holdout is run once, after the freeze, and the result is reported with power, DSR and PBO beside it, whatever it is.
+  P[research.stats.power: MDS for the sample length] --> D{MDS small enough to be worth running?}
+  D -- no --> STOP[do not run; say why]
+  D -- yes --> REG[register every trial: research/trials.csv]
+  REG --> CV[research.cv.purged_kfold: train and test bars]
+  CV --> BT[research.backtest.run per trial: costs, lag]
+  BT --> PSR[research.stats.psr: best trial against 0]
+  BT --> DSR[research.stats.dsr: best trial against SR0 of N trials]
+  REG -->|N, variance of Sharpe| DSR
+  BT --> PBO[research.stats.pbo: every trial's performance]
+  PSR & DSR & PBO --> F[freeze code and choices]
+  F --> HO[run the holdout once, log the run first]
+  HO --> REP[report Sharpe with power, DSR and PBO, null or not]
+```
+
+The arrows run one way: nothing computed from the holdout goes back into the choices. This is the order the R3 studies followed (freeze `faadaa4`, run log committed first, one run each; `research/r3/RESULTS.md`), and it is why their null results can be reported at all. [Tutorial 30](../getting-started/tutorial-30-trials-and-power.md) does the power and trial arithmetic; [Tutorial 31](../getting-started/tutorial-31-leakage-and-purging.md) the purging.
+
+### Net P&L against the half spread: the break-even point
+
+```mermaid
+xychart-beta
+  accTitle: Net P&L against half spread, Tutorial 27
+  accDescr: Net P&L falls in a straight line from 452.43 at 0 bp to 405.91 at 5, 359.38 at 10, 266.32 at 20 and 0 at the break-even half spread of 48.62 bp.
+  title "Tutorial 27: net P&L of one rule against the half spread"
+  x-axis "half spread (bp)" [0, 5, 10, 20, 48.62]
+  y-axis "net P&L" 0 --> 500
+  line [452.43, 405.91, 359.38, 266.32, 0]
+```
+
+Spread cost is turnover times the half spread over `10^4`, and nothing else in `research.backtest.run` depends on it, so net P&L is a straight line with slope `-turnover / 10^4` (here -9.31 per basis point) and the break-even half spread follows from one costless run: `(461.73 - 9.30) / 9.3056 = 48.62` bp. The points are the printed output of [Tutorial 27](../getting-started/tutorial-27-what-costs-do-to-a-backtest.md); the x-axis is categorical, so the spacing is not to scale.
+
+### Black-Litterman view confidence: one view, five variances
+
+```mermaid
+flowchart LR
+  accTitle: How the variance of one Black-Litterman view sets the posterior
+  accDescr: The prior spread between assets 1 and 2 is 0.038 and the view says 0.08. The prior's variance along the view is 0.0019. The view's weight c is 0.0019 divided by 0.0019 plus Omega. Omega of 1e-8 gives c close to 1 and a posterior spread of 0.08; Omega 0.0002 gives c 0.905 and 0.076; Omega 0.0019 gives c one half and 0.059; Omega 0.019 gives c 0.091 and 0.0418; Omega 1 gives c close to 0 and 0.0381.
+  PR[prior spread P pi = 0.038] --> C["c = 0.0019 / (0.0019 + Omega)"]
+  V[view q = 0.08, variance Omega] --> C
+  C --> O1["Omega 1e-8: c = 1.000, spread 0.0800"]
+  C --> O2["Omega 0.0002: c = 0.905, spread 0.0760"]
+  C --> O3["Omega 0.0019: c = 0.500, spread 0.0590"]
+  C --> O4["Omega 0.019: c = 0.091, spread 0.0418"]
+  C --> O5["Omega 1: c = 0.002, spread 0.0381"]
+```
+
+The posterior spread is `0.038 + c x 0.042` in every case ([Tutorial 29](../getting-started/tutorial-29-view-confidence.md)); only `Omega / tau` matters for the mean (ruling J-W2-8, `07-portfolio/estimation.md`).
+
+### Purging cost against label horizon
+
+```mermaid
+xychart-beta
+  accTitle: Training rows kept against label horizon, Tutorial 31
+  accDescr: In a middle fold of 100 rows split five ways, purging keeps 80 training rows for a horizon of 0 bars, 70 for 5 bars and 40 for 20 bars.
+  title "Tutorial 31: training rows kept in a middle fold, 100 rows, 5 folds"
+  x-axis "label horizon (bars)" [0, 5, 20]
+  y-axis "training rows kept" 0 --> 80
+  bar [80, 70, 40]
+```
+
+A middle test block loses about `h` rows on each side to purging, so with 100 rows in five folds a 20-bar horizon leaves 40 training rows of 80. Plain k-fold would keep all 80 and let 160 overlapping labels leak across the five folds ([Tutorial 31](../getting-started/tutorial-31-leakage-and-purging.md); rulings J-7 to J-9).
+
+### Historical shock replay: from a stored move to book P&L
+
+```mermaid
+flowchart LR
+  accTitle: How a stored historical shock becomes book P&L
+  accDescr: A shock of 10, 50 and 20 basis points at 1, 5 and 30 years is interpolated linearly in tenor onto the book tenors 2 and 10 years, giving 20 and 44 basis points. The shocked yields are the old yields plus the applied move over 100. With DV01s of 1,000 and 2,000 per basis point the P&L is minus 1,000 times 20 minus 2,000 times 44, which is minus 108,000.
+  S["shock: 1Y 10 bp, 5Y 50 bp, 30Y 20 bp"] --> I["linear in tenor, flat outside (J-W3-4)"]
+  I --> A["applied: 2Y 20 bp, 10Y 44 bp"]
+  A --> Y["shocked yields = yield + applied / 100"]
+  A --> P["pnl = -(1,000 x 20 + 2,000 x 44) = -108,000"]
+```
+
+The worked example of `risk.scenario.replay` (`examples/risk_scenario_replay_j.json`, `06-risk/scenario-stress.md`). Tutorial 33 replays the 2008, 2013, 2020 and 2022 Treasury moves from the shock library the same way.
+
+### Drift detectors on a mean shift: CUSUM against Page-Hinkley
+
+```mermaid
+xychart-beta
+  accTitle: Alarm days of CUSUM and Page-Hinkley after a shift at day 60, Tutorial 33
+  accDescr: A ten-day pattern with mean 0 shifts up by 1.5 at day 60. CUSUM with k 0.5 and h 5 alarms on days 64, 70, 76, 82 and 88, five alarms. Page-Hinkley with delta 0.5 and lambda 5 alarms once, on day 64.
+  title "Tutorial 33: alarms after a +1.5 shift at day 60"
+  x-axis "detector" ["CUSUM", "Page-Hinkley"]
+  y-axis "alarms by day 89" 0 --> 6
+  bar [5, 1]
+```
+
+Both alarm first on day 64, a delay of four days. CUSUM measures against a fixed `mu0`, so after each restart the shift is still there and it alarms every six days (64, 70, 76, 82, 88); Page-Hinkley measures against its own running mean, which absorbs the new level after the restart (J-W3-10, J-W3-11; [Tutorial 33](../getting-started/tutorial-33-stress-test-and-watch-for-drift.md)). Count the first alarm after a break, not the alarms.
+### Term financing: from quotes to an equity forward
+
+```mermaid
+flowchart LR
+  accTitle: How term repo and borrow quotes become an equity forward
+  accDescr: Each term repo quote and the funding curve give one pillar of the financing spread S. Borrow quotes give the cumulative fee B. The carry factor C of t is exp of minus Z t minus S plus B, and the forward is spot less dividends carried by C, divided by C at the horizon.
+  Q["term repo quotes R_i at T_i"] --> S["S(T_i) = ln(1 + R_i T_i) - Z(T_i) T_i, linear between pillars"]
+  Z["funding curve Z(t)"] --> S
+  B["borrow quotes b_j"] --> BF["B(T_j) = b_j T_j, never falling"]
+  S --> C["C(t) = exp(-Z(t) t - S(t) + B(t))"]
+  BF --> C
+  C --> F["F = (S_0 - sum A_i C(t_i)) / C(T)"]
+```
+
+Flat 4 % funding and one 5 % one-year repo give `S(1) = ln 1.05 - 0.04 = 0.00879`, and spot 100 carries to exactly 105 ([Tutorial 34](../getting-started/tutorial-34-financing-term-structure.md), ruling J-C-5).
+
+### Liquidity cost: impact against timing risk
+
+```mermaid
+flowchart LR
+  accTitle: The three parts of the liquidity cost curve and the optimal horizon
+  accDescr: Cost per unit is the half spread plus impact, which falls as the horizon h grows, plus timing risk, which rises with h. Their sum has a minimum at h star equal to two delta a over b, to the power one over delta plus one half.
+  H[horizon h days] --> I["impact a h^-delta, a = Y sigma (Q/V)^delta"]
+  H --> T["timing risk b sqrt h, b = z sigma / sqrt 3"]
+  I --> C["c(Q, h) = s + a h^-delta + b sqrt h"]
+  T --> C
+  SP[half spread s] --> C
+  C --> HS["h* = (2 delta a / b)^(1/(delta + 1/2))"]
+```
+
+For 1,000,000 shares against a 10 million daily volume, `sigma` 2 %, `z = 1.645`, the cheapest horizon is 0.3330 days at 224 bp ([Tutorial 35](../getting-started/tutorial-35-liquidity-curve.md), ruling J-C-8).

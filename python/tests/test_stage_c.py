@@ -1,4 +1,5 @@
 """Stage C checks that the golden suites do not make on their own."""
+
 import json
 import math
 from typing import Any
@@ -13,7 +14,10 @@ from quantforge_core.errors import QfError
 
 def _run(operation, inputs):
     document = {
-        "schema_version": "1.0", "case_id": "t", "operation": operation, "inputs": inputs,
+        "schema_version": "1.0",
+        "case_id": "t",
+        "operation": operation,
+        "inputs": inputs,
     }
     return run_case(json.dumps(document))
 
@@ -99,18 +103,40 @@ def test_density_reject_is_arbitrage_error() -> None:
     [
         (
             "vol.option.price",
-            {"model": "BLACK_76", "option_type": "CALL", "strike": 1.0, "expiry_years": 1.0,
-             "forward": 1.0, "discount_factor": 1.0, "vol": 0.2, "shift": None},
+            {
+                "model": "BLACK_76",
+                "option_type": "CALL",
+                "strike": 1.0,
+                "expiry_years": 1.0,
+                "forward": 1.0,
+                "discount_factor": 1.0,
+                "vol": 0.2,
+                "shift": None,
+            },
         ),
         (
             "vol.option.price",
-            {"model": "BACHELIER", "option_type": "CALL", "strike": 1.0, "expiry_years": 1.0,
-             "forward": 1.0, "discount_factor": 1.0, "vol": 0.2, "shift": 0.0},
+            {
+                "model": "BACHELIER",
+                "option_type": "CALL",
+                "strike": 1.0,
+                "expiry_years": 1.0,
+                "forward": 1.0,
+                "discount_factor": 1.0,
+                "vol": 0.2,
+                "shift": 0.0,
+            },
         ),
         (
             "vol.delta.to_strike",
-            {"forward": 100.0, "vol": 0.2, "expiry_years": 1.0, "option_type": "CALL",
-             "delta": 0.25, "convention": "FORWARD"},
+            {
+                "forward": 100.0,
+                "vol": 0.2,
+                "expiry_years": 1.0,
+                "option_type": "CALL",
+                "delta": 0.25,
+                "convention": "FORWARD",
+            },
         ),
         ("eq.forward.parity", {"quotes": []}),
     ],

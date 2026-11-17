@@ -1,4 +1,5 @@
 """Stage E quality pass: domain errors the earlier suites missed, plus identities checked by hand."""
+
 import itertools
 import math
 
@@ -54,14 +55,21 @@ def test_bond_future_implied_rejects_a_bad_yield_or_duration_after_the_premium_c
     good = ("CALL", 112.0, 110.0, 0.5, 0.98, 2.5)
     assert error_of(rates_vol.bondfut_implied, *good, 0.0, 7.0) == ("E_DOMAIN", "ctd_yield")
     assert error_of(rates_vol.bondfut_implied, *good, 0.04, 0.0) == (
-        "E_DOMAIN", "ctd_modified_duration")
+        "E_DOMAIN",
+        "ctd_modified_duration",
+    )
     # A premium below intrinsic is reported first, whatever the yield.
     assert error_of(rates_vol.bondfut_implied, "CALL", 112.0, 110.0, 0.5, 0.98, 1.0, 0.0, 0.0) == (
-        "E_DOMAIN", "premium")
+        "E_DOMAIN",
+        "premium",
+    )
 
 
 def test_forward_vols_reject_a_first_expiry_at_zero() -> None:
-    assert error_of(arb_surface.forward_vols, [0.0, 1.0], [0.2, 0.2]) == ("E_DOMAIN", "expiry_years")
+    assert error_of(arb_surface.forward_vols, [0.0, 1.0], [0.2, 0.2]) == (
+        "E_DOMAIN",
+        "expiry_years",
+    )
 
 
 def test_forward_vols_of_a_flat_term_structure_are_flat() -> None:

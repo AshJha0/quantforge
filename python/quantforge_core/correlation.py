@@ -3,6 +3,7 @@
 Spec: specifications/06-risk/correlation.md, rulings E-B18 to E-B21 in
 specifications/stage-e-rulings-b.md. NumPy is used for symmetric eigen-decompositions only.
 """
+
 from collections.abc import Sequence
 
 lazy import numpy as np
@@ -73,16 +74,18 @@ def nearest(m: Matrix) -> tuple[list[list[float]], float]:
         if change <= 1e-12 and float(np.linalg.eigvalsh(y)[0]) >= PSD_FLOOR:
             break
     else:
-        raise QfError("E_NO_CONVERGENCE", "the nearest correlation iteration did not settle",
-                      "matrix")
+        raise QfError(
+            "E_NO_CONVERGENCE", "the nearest correlation iteration did not settle", "matrix"
+        )
     return y.tolist(), float(np.sqrt(((y - target) ** 2).sum()))
 
 
 def _implied(weights: Sequence[float], vols: Sequence[float], index_vol: float) -> float:
     n = len(weights)
     own = ordered_sum(w * w * s * s for w, s in zip(weights, vols, strict=True))
-    cross = ordered_sum(weights[i] * weights[j] * vols[i] * vols[j]
-                        for i in range(n) for j in range(n) if i != j)
+    cross = ordered_sum(
+        weights[i] * weights[j] * vols[i] * vols[j] for i in range(n) for j in range(n) if i != j
+    )
     return (index_vol * index_vol - own) / cross
 
 
@@ -107,9 +110,14 @@ def implied(weights: Sequence[float], vols: Sequence[float], index_vol: float) -
     return _implied([w for w, _ in kept], [s for _, s in kept], index_vol)
 
 
-def dispersion(weights: Sequence[float], strikes: Sequence[float], index_strike: float,
-               realized: Sequence[float], index_realized: float,
-               vega_notional: float) -> dict[str, object]:
+def dispersion(
+    weights: Sequence[float],
+    strikes: Sequence[float],
+    index_strike: float,
+    realized: Sequence[float],
+    index_realized: float,
+    vega_notional: float,
+) -> dict[str, object]:
     _names(weights, strikes, realized)
     if any(k <= 0 for k in strikes) or index_strike <= 0:
         raise _domain("a vol strike is not above 0", "vol_strikes")
@@ -117,8 +125,7 @@ def dispersion(weights: Sequence[float], strikes: Sequence[float], index_strike:
         raise _domain("a realised vol is not above 0", "realized_vols")
     legs = [vega_notional * w / (2 * k) for w, k in zip(weights, strikes, strict=True)]
     index_leg = vega_notional / (2 * index_strike)
-    pnl = ordered_sum(n * (s * s - k * k) for n, s, k in zip(legs, realized, strikes,
-                                                              strict=True))
+    pnl = ordered_sum(n * (s * s - k * k) for n, s, k in zip(legs, realized, strikes, strict=True))
     pnl -= index_leg * (index_realized * index_realized - index_strike * index_strike)
     return {
         "pnl": pnl,

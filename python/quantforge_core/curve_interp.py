@@ -6,6 +6,7 @@ ln S_0 = 0, ln S_1, ..., ln S_n, and gives ln S(t) and the instantaneous forward
 f(t) = -d ln S/dt (right-hand at a node) for t >= 0, extrapolating beyond t_n with the flat
 forward f(t_n-) (ruling F-20).
 """
+
 import math
 from bisect import bisect_right
 from collections.abc import Sequence
@@ -99,7 +100,7 @@ class MonotoneConvex(Interpolator):
         if (g0 > 0 and -2 * g0 <= g1 <= -0.5 * g0) or (g0 < 0 and -0.5 * g0 <= g1 <= -2 * g0):
             a = 3 * f0 + 3 * f1 - 6 * y  # (b)
             b = -(4 * f0 + 2 * f1 - 6 * y)
-            return a * x * x + b * x + f0, a * x ** 3 / 3 + b * x * x / 2 + f0 * x
+            return a * x * x + b * x + f0, a * x**3 / 3 + b * x * x / 2 + f0 * x
         if (g0 < 0 and g1 > -2 * g0) or (g0 > 0 and g1 < -2 * g0):  # (c)
             eta = (g1 + 2 * g0) / (g1 - g0)
             if eta < 1:
@@ -107,7 +108,7 @@ class MonotoneConvex(Interpolator):
                 if x <= eta:
                     return base, base * x
                 w = (x - eta) / (1 - eta)
-                return base + (g1 - g0) * w * w, base * x + (g1 - g0) * (1 - eta) * w ** 3 / 3
+                return base + (g1 - g0) * w * w, base * x + (g1 - g0) * (1 - eta) * w**3 / 3
             return _rule_e(y, g0, g1, 1.0, x)
         if (g0 > 0 and 0 > g1 > -0.5 * g0) or (g0 < 0 and 0 < g1 < -0.5 * g0):  # (d)
             eta = 3 * g1 / (g1 - g0)
@@ -115,7 +116,7 @@ class MonotoneConvex(Interpolator):
                 base = y + g1
                 if x <= eta:
                     w = (eta - x) / eta
-                    return base + (g0 - g1) * w * w, base * x + (g0 - g1) * eta * (1 - w ** 3) / 3
+                    return base + (g0 - g1) * w * w, base * x + (g0 - g1) * eta * (1 - w**3) / 3
                 return base, base * x + (g0 - g1) * eta / 3
             return _rule_e(y, g0, g1, 0.0, x)
         s = g0 + g1  # (e)
@@ -139,14 +140,17 @@ def _rule_e(y: float, g0: float, g1: float, eta: float, x: float) -> tuple[float
         if eta == 0:  # only the point x = 0 (ruling F-19)
             return y + g0, 0.0
         w = (eta - x) / eta
-        return base + (g0 - big_a) * w * w, base * x + (g0 - big_a) * eta * (1 - w ** 3) / 3
+        return base + (g0 - big_a) * w * w, base * x + (g0 - big_a) * eta * (1 - w**3) / 3
     w = (x - eta) / (1 - eta)
-    return (base + (g1 - big_a) * w * w,
-            base * x + (g0 - big_a) * eta / 3 + (g1 - big_a) * (1 - eta) * w ** 3 / 3)
+    return (
+        base + (g1 - big_a) * w * w,
+        base * x + (g0 - big_a) * eta / 3 + (g1 - big_a) * (1 - eta) * w**3 / 3,
+    )
 
 
-def _tridiagonal(lower: Sequence[float], diag: Sequence[float], upper: Sequence[float],
-                 rhs: Sequence[float]) -> list[float]:
+def _tridiagonal(
+    lower: Sequence[float], diag: Sequence[float], upper: Sequence[float], rhs: Sequence[float]
+) -> list[float]:
     """Thomas algorithm; lower[0] and upper[-1] are unused."""
     n = len(diag)
     c, d = [0.0] * n, [0.0] * n
@@ -190,7 +194,9 @@ class MonotonicLogCubic(Interpolator):
             p = (s[i - 1] * h[i] + s[i] * h[i - 1]) / (h[i - 1] + h[i])
             cap = 3 * min(abs(s[i - 1]), abs(s[i]), abs(p))
             if i > 1 and (s[i - 1] - s[i - 2]) * (s[i] - s[i - 1]) > 0:
-                pd = (s[i - 1] * (2 * h[i - 1] + h[i - 2]) - s[i - 2] * h[i - 1]) / (h[i - 2] + h[i - 1])
+                pd = (s[i - 1] * (2 * h[i - 1] + h[i - 2]) - s[i - 2] * h[i - 1]) / (
+                    h[i - 2] + h[i - 1]
+                )
                 if p * pd > 0 and p * (s[i - 1] - s[i - 2]) > 0:
                     cap = max(cap, 1.5 * min(abs(p), abs(pd)))
             if i < n - 1 and (s[i] - s[i - 1]) * (s[i + 1] - s[i]) > 0:
@@ -286,8 +292,7 @@ class TensionSpline(Interpolator):
         e = math.exp(-sg * (h - u))
         sinh_ratio = e * _one_minus_exp(2 * sg * u) / den
         cosh_ratio = e * (1 + math.exp(-2 * sg * u)) / den
-        return ((sinh_ratio - u / h) / (sg * sg), (sg * cosh_ratio - 1 / h) / (sg * sg),
-                sinh_ratio)
+        return ((sinh_ratio - u / h) / (sg * sg), (sg * cosh_ratio - 1 / h) / (sg * sg), sinh_ratio)
 
     def _parts(self, i: int, t: float) -> tuple[float, float, float]:
         """(ln S, d ln S/dt, d2 ln S/dt2) inside interval i, t_i <= t <= t_{i+1}."""
@@ -319,7 +324,7 @@ class Hybrid(Interpolator):
     def __init__(self, ts: Sequence[float], xs: Sequence[float], k: int):
         super().__init__(ts, xs)
         self.k = k
-        self.steps = LogLinear(ts[:k + 1], xs[:k + 1])
+        self.steps = LogLinear(ts[: k + 1], xs[: k + 1])
         self.smooth = MonotoneConvex(ts[k:], xs[k:]) if k < self.n else None
         self.whole = LogLinear(ts, xs) if self.smooth is None else None
 
@@ -340,8 +345,13 @@ class Hybrid(Interpolator):
         return self.smooth.forward(t)
 
 
-def make(method: str, ts: Sequence[float], xs: Sequence[float], tension: float | None,
-         step_index: int | None) -> Interpolator:
+def make(
+    method: str,
+    ts: Sequence[float],
+    xs: Sequence[float],
+    tension: float | None,
+    step_index: int | None,
+) -> Interpolator:
     if method == "LOG_LINEAR_DF":
         return LogLinear(ts, xs)
     if method == "MONOTONE_CONVEX":

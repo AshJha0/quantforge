@@ -4,6 +4,7 @@ digital), likelihood ratio, and central bump with common draws.
 Specification: specifications/06-risk/mc-greeks.md; rulings G-10, G-10b and G-15. Draws are the
 `core.rng` stream 0 of `seed`, one AS 241 normal per path, path `i` the `i`-th normal.
 """
+
 import math
 from collections.abc import Callable, Sequence
 
@@ -39,8 +40,17 @@ def mean_and_se(values: Sequence[float]) -> tuple[float, float]:
     return mean, math.sqrt(var / n)
 
 
-def check(s: float, k: float, t: float, v: float, payoff: str, method: str, paths: int,
-          smoothing_width: float | None, bump_relative: float | None) -> None:
+def check(
+    s: float,
+    k: float,
+    t: float,
+    v: float,
+    payoff: str,
+    method: str,
+    paths: int,
+    smoothing_width: float | None,
+    bump_relative: float | None,
+) -> None:
     """The error checks of `risk.mc.greeks`, in the spec order (after F-2)."""
     if payoff not in PAYOFFS:
         raise _input(f"{payoff} is not a payoff", "payoff")
@@ -62,10 +72,19 @@ def check(s: float, k: float, t: float, v: float, payoff: str, method: str, path
         raise _domain("bump_relative must be in (0, 1)", "bump_relative")
 
 
-def per_path_terms(s: float, k: float, t: float, r: float, q: float, v: float, payoff: str,
-                   method: str, z: Sequence[float], smoothing_width: float | None = None,
-                   bump_relative: float | None = None
-                   ) -> tuple[list[float], list[float], list[float]]:
+def per_path_terms(
+    s: float,
+    k: float,
+    t: float,
+    r: float,
+    q: float,
+    v: float,
+    payoff: str,
+    method: str,
+    z: Sequence[float],
+    smoothing_width: float | None = None,
+    bump_relative: float | None = None,
+) -> tuple[list[float], list[float], list[float]]:
     """The per-path price, delta and vega terms of the spec's table."""
     f = _payoff(payoff, k)
     disc = math.exp(-r * t)
@@ -103,14 +122,26 @@ def per_path_terms(s: float, k: float, t: float, r: float, q: float, v: float, p
     return prices, deltas, vegas
 
 
-def greeks(s: float, k: float, t: float, r: float, q: float, v: float, payoff: str, method: str,
-           paths: int, seed: int, smoothing_width: float | None,
-           bump_relative: float | None) -> dict[str, float]:
+def greeks(
+    s: float,
+    k: float,
+    t: float,
+    r: float,
+    q: float,
+    v: float,
+    payoff: str,
+    method: str,
+    paths: int,
+    seed: int,
+    smoothing_width: float | None,
+    bump_relative: float | None,
+) -> dict[str, float]:
     """`risk.mc.greeks`: price, delta and vega with their standard errors."""
     check(s, k, t, v, payoff, method, paths, smoothing_width, bump_relative)
     z = normals(seed, 0, paths)
-    prices, deltas, vegas = per_path_terms(s, k, t, r, q, v, payoff, method, z, smoothing_width,
-                                           bump_relative)
+    prices, deltas, vegas = per_path_terms(
+        s, k, t, r, q, v, payoff, method, z, smoothing_width, bump_relative
+    )
     out: dict[str, float] = {}
     for name, values in (("price", prices), ("delta", deltas), ("vega", vegas)):
         out[name], out[f"{name}_se"] = mean_and_se(values)
