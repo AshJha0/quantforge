@@ -79,47 +79,53 @@ which runs no queries; JFR attributes no allocation to `FastBook`, so the 792 by
 measurement calls themselves. This is not proven here. GC log: two young pauses during file load and the
 correctness pass, none in any timed region.
 
-## HR-21 query batch timing (workload S, final code; C++/Rust WSL pinned, Java native Windows)
+## HR-21 query batch timing (workload S; C++/Rust WSL pinned, Java native Windows)
 
 HR-21: when the clock's own p50 is more than half the measured p50, batch timing is also reported and the report
-says which figure is the headline. Here the clock p50 (C++ 16 ns, Rust 17 ns, Java 100 ns) is close to or above
-every query's single-sample p50, so **batch timing is the headline for L5**. At every 1,000th measured message each
-query runs 1,000 times in a row and the total is divided by 1,000. Prices cycle (present prices over the side's
-levels; absent prices over best ask + 5 + j). So these are warm-cache, back-to-back figures. The single-sample p99
-includes one clock read and usually a cold cache line, and is kept alongside. This C++/Rust session began with WSL
-load average 3.6 from other lanes' jobs, even though the harness waited for load to fall below 0.7 before taking
-the lock. The absent-price loop runs past 1,024 ticks, so it also exercises the shared-slot fallback (163,843
-fallbacks per run, all from that loop).
+says which figure is the headline. Here the clock p50 (C++ 29 ns, Rust 30 ns in this session; Java 100 ns) is
+at or above every query's single-sample p50, so **batch timing is the headline for L5**. At every 1,000th
+measured message each query runs 1,000 times in a row and the total is divided by 1,000.
 
-| Row | Query | Target C++/Rust (Java) | C++ batch p50 / p99 | C++ single p99 | Rust batch p50 / p99 | Rust single p99 | Java batch p50 / p99 | Java single p99 |
-|---|---|---:|---:|---:|---:|---:|---:|---:|
-| L5 | best_bid | 50 (100) | 0 / 0 * | 26 | 0 / 0 * | 36 | 0 / 0 * | 200 |
-| L5 | best_ask | 50 (100) | 0 / 0 * | 28 | 0 / 0 * | 34 | 0 / 1 * | 200 |
-| L5 | qty_at present | 100 (200) | 2 / 3 | 103 | 2 / 4 | 91 | 8 / 26 | 300 |
-| L5 | qty_at absent | 100 (200) | 1 / 2 | 30 | 2 / 3 | 60 | 4 / 10 | 200 |
-| L5 | top(10) | 200 (400) | 4 / 7 | 59 | 9 / 17 | 59 | 23 / 58 | 300 |
-| L5 | top(100) | 1,000 (2,000) | 11 / 30 | 62 | 17 / 44 | 80 | 41 / 149 | 400 |
+**First batch harness, withdrawn.** The first version (`*_hr21.json`) gave "<1 ns" for best_bid/best_ask. That was
+a loop-invariant load the compiler hoisted, not a measurement, so it does not count toward any target.
 
-Median of 5 runs (ns). * Under 1 ns per call: the cached best is a field read, and the compiler or JIT very
-likely hoisted it out of the loop. These batch figures show only that the call costs less than a nanosecond;
-they are not a measurement of the query.
+**Corrected harness** (`*_hr21b.json`):
+- Every iteration takes its side or price from a precomputed array, indexed through the previous result. This
+  forms a dependency chain, so the figure is latency, not throughput.
+- Each iteration's result is fed into a sink: an empty `asm volatile` barrier with a memory clobber in C++,
+  `std::hint::black_box` on the book and on the accumulator in Rust, and in Java a separate method per loop
+  returning its accumulator (Blackhole-style).
+- Check: every per-call figure is now at least 1 ns, against a clock cost amortised to about 0.03 ns per call.
+  In C++ and Rust the barrier forces the cached best to be reloaded on every iteration. In Java the JIT can still
+  hoist a plain field load, and the JIT code was not inspected. Java best_* is therefore a lower bound.
 
-Verdict, with the batch headline: every L5 row is met in all three languages. On the single-sample figures,
-kept for comparison: C++ qty_at present p99 is 103 ns against 100, a miss by 3 ns. Rust met every single-sample
-L5 row in this session. Java best_* and qty_at present miss, but the Windows clock steps in 100 ns, so those
-single-sample figures cannot resolve the targets. In this session, update p50/p99/p99.9 were C++ 48/101/290 ns,
-Rust 52/103/244 ns and Java (batch) 122/315/506 ns, all met; allocations were 0 (C++, Rust), and Java had 0 GC
-events and 0 allocation samples in the book's classes.
+This session ran on a loaded machine: the WSL load average stayed near 2, because the wait for it to fall below
+0.7 timed out after 40 minutes, and the clock itself cost 29-30 ns against 15-17 ns earlier. The absent-price
+loop wraps at 512 ticks.
+
+| Row | Query | Target C++/Rust (Java) | C++ batch p50 / p99 | Rust batch p50 / p99 | Java batch p50 / p99 |
+|---|---|---:|---:|---:|---:|
+| L5 | best_bid | 50 (100) | 1 / 2 | 2 / 3 | 1 / 4 (lower bound) |
+| L5 | best_ask | 50 (100) | 1 / 2 | 2 / 3 | 1 / 4 (lower bound) |
+| L5 | qty_at present | 100 (200) | 14 / 49 | 13 / 54 | 13 / 47 |
+| L5 | qty_at absent | 100 (200) | 2 / 5 | 5 / 25 | 2 / 6 |
+| L5 | top(10) | 200 (400) | 11 / 51 | 27 / 109 | 26 / 80 |
+| L5 | top(100) | 1,000 (2,000) | 28 / 99 | 46 / 179 | 46 / 144 |
+
+Median of 5 runs (ns). With the batch headline every L5 row is met in all three languages. The single-sample
+figures from the previous session remain published alongside (C++ qty_at present p99 103 ns, a 3 ns miss on that
+basis). Java updates in this session (batch): p50 103 ns, p99 327, p99.9 1,978; the p99.9 range across runs was
+320 to 12,527 ns, so one run came within 30 ns of the 12.5 us target. 0 GC events.
 
 Before/after in brief, query p99 (ns), single sample unless marked batch:
 
-| Query | C++ first | C++ after cache/index | C++ HR-21 batch | Rust first | Rust after cache/index | Rust HR-21 batch |
+| Query | C++ first | C++ after cache/index | C++ HR-21 batch (corrected) | Rust first | Rust after cache/index | Rust HR-21 batch (corrected) |
 |---|---:|---:|---:|---:|---:|---:|
-| best_bid | 26 | 45 | <1 | 105 | 43 | <1 |
-| best_ask | 22 | 42 | <1 | 53 | 39 | <1 |
-| qty_at present | 120 | 197 | 3 | 99 | 130 | 4 |
+| best_bid | 26 | 45 | 2 | 105 | 43 | 3 |
+| best_ask | 22 | 42 | 2 | 53 | 39 | 3 |
+| qty_at present | 120 | 197 | 49 | 99 | 130 | 54 |
 
 The GitHub-runner record (the controlled machine) comes from the manual `lowlat-book` workflow, which runs the
 same three harnesses. It has not been dispatched yet, because the branch is not pushed.
 
-Raw output: `cpp_S_hr21.json`, `rust_S_hr21.json`, `java_S_hr21.json` (HR-21 session); `cpp_S.json`, `rust_S.json` (before), `cpp_S_after.json`, `rust_S_after.json`, `java_S.json`.
+Raw output: `cpp_S_hr21b.json`, `rust_S_hr21b.json`, `java_S_hr21b.json` (corrected HR-21); `*_hr21.json` (withdrawn batch figures); `cpp_S.json`, `rust_S.json` (before), `cpp_S_after.json`, `rust_S_after.json`, `java_S.json`.

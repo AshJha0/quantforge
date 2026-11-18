@@ -248,6 +248,7 @@ fn timed_run(msgs: &[Msg], levels: &[Level], qseed: u64) -> String {
     let mut qbatch: Vec<Hist> = (0..QUERIES.len()).map(|_| Hist::new()).collect();
     let mut pres = vec![Level::default(); DEPTH];
     let mut r = Xoshiro::seeded(qseed, 0);
+    let sides: Vec<bool> = (0..1024).map(|_| r.next_u64() & 1 == 1).collect();
     let mut buf = vec![Level::default(); DEPTH];
     let mut b = Book::new(DEPTH);
     for m in &msgs[..WARMUP] {
@@ -288,38 +289,48 @@ fn timed_run(msgs: &[Msg], levels: &[Level], qseed: u64) -> String {
             let a = Instant::now();
             black_box(b.top(bid, &mut buf[..100]));
             queries[5].record(ns(a));
-            // HR-21 batch timing: each query 1,000 times in a row, total divided by 1,000; prices cycle so no
-            // call repeats the previous one.
+            // HR-21 batch timing: each query 1,000 times in a row, total divided by 1,000. Each iteration's
+            // side/price comes from precomputed arrays indexed through the previous result (a dependency chain:
+            // latency, not throughput), and both the book reference and the accumulator pass `black_box`, so the
+            // call can be neither hoisted nor elided.
             let mut acc = 0i64;
+            let np = b.top(bid, &mut pres).max(1);
             let a = Instant::now();
             for _ in 0..1000 {
-                acc += black_box(&b).best_bid().map_or(0, |l| l.qty);
+                acc += black_box(&b).best_bid().map_or(0, |l| l.qty + (acc & 1));
+                acc = black_box(acc);
             }
             qbatch[0].record((ns(a) + 500) / 1000);
             let a = Instant::now();
             for _ in 0..1000 {
-                acc += black_box(&b).best_ask().map_or(0, |l| l.qty);
+                acc += black_box(&b).best_ask().map_or(0, |l| l.qty + (acc & 1));
+                acc = black_box(acc);
             }
             qbatch[1].record((ns(a) + 500) / 1000);
-            let np = b.top(bid, &mut pres).max(1);
             let a = Instant::now();
-            for j in 0..1000 {
-                acc += b.qty_at(bid, black_box(pres[j % np].px));
+            for j in 0..1000usize {
+                acc += black_box(&b).qty_at(bid, pres[(j + (acc & 1) as usize) % np].px);
+                acc = black_box(acc);
             }
             qbatch[2].record((ns(a) + 500) / 1000);
             let a = Instant::now();
             for j in 0..1000i64 {
-                acc += b.qty_at(true, black_box(absent + j));
+                acc += black_box(&b).qty_at(true, absent + (j & 511) + (acc & 1));
+                acc = black_box(acc);
             }
             qbatch[3].record((ns(a) + 500) / 1000);
             let a = Instant::now();
-            for _ in 0..1000 {
-                acc += black_box(&b).top(bid, &mut buf[..10]) as i64 + buf[0].qty;
+            for j in 0..1000usize {
+                let side = sides[(j + (acc & 1) as usize) & 1023];
+                acc += black_box(&b).top(side, &mut buf[..10]) as i64 + buf[0].qty;
+                acc = black_box(acc);
             }
             qbatch[4].record((ns(a) + 500) / 1000);
             let a = Instant::now();
-            for _ in 0..1000 {
-                acc += black_box(&b).top(bid, &mut buf[..100]) as i64 + buf[99].qty;
+            for j in 0..1000usize {
+                let side = sides[(j + (acc & 1) as usize) & 1023];
+                acc += black_box(&b).top(side, &mut buf[..100]) as i64 + buf[99].qty;
+                acc = black_box(acc);
             }
             qbatch[5].record((ns(a) + 500) / 1000);
             black_box(acc);

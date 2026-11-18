@@ -12,6 +12,7 @@
 // Allocation (H-9(b)): malloc/calloc/realloc are interposed on glibc (operator new goes through malloc), so every
 // heap allocation in the process is counted; elsewhere operator new is replaced.
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <bit>
 #include <cerrno>
@@ -314,8 +315,15 @@ struct RunResult {
 
 volatile std::int64_t g_sink;
 
+// DoNotOptimize-style barrier: the value must be materialised and memory may have changed.
+inline void keep(std::int64_t& v) { asm volatile("" : "+r"(v) : : "memory"); }
+
+// Precomputed side choices for the batch loops (filled once from core.rng).
+std::array<std::uint8_t, 1024> sides{};
+
 void timed_run(const Stream& st, RunResult& rr, std::uint64_t qseed) {
     quantforge::Xoshiro256 r(qseed, 0);
+    for (auto& x : sides) x = std::uint8_t(r.next() & 1);
     std::vector<ll::Level> buf(depth), pres(depth);
     {
         ll::Book b(depth);
@@ -354,27 +362,48 @@ void timed_run(const Stream& st, RunResult& rr, std::uint64_t qseed) {
                 a = now_ns();
                 g_sink = std::int64_t(b.top(bid, 100, buf.data()));
                 rr.queries[QTop100].record(now_ns() - a);
-                // HR-21 batch timing: each query 1,000 times in a row, total divided by 1,000. Prices cycle over
-                // the present levels (and over absent prices above the ask) so no call repeats the previous one.
+                // HR-21 batch timing: each query 1,000 times in a row, total divided by 1,000. To stop the compiler
+                // hoisting or eliding the call, every iteration's side and price come from precomputed arrays indexed
+                // through the previous result (a dependency chain, so the figure is latency, not throughput), and
+                // the accumulator passes an empty asm barrier with a memory clobber each iteration (DoNotOptimize).
                 std::int64_t acc = 0;
+                const std::size_t np = b.top(bid, depth, pres.data());  // untimed
+                const std::size_t npres = np ? np : 1;
                 a = now_ns();
-                for (int j = 0; j < 1000; ++j) acc += b.best_bid(q) ? q.qty : 0;
+                for (std::size_t j = 0; j < 1000; ++j) {
+                    acc += b.best_bid(q) ? q.qty + (acc & 1) : 0;
+                    keep(acc);
+                }
                 rr.qbatch[QBestBid].record((now_ns() - a + 500) / 1000);
                 a = now_ns();
-                for (int j = 0; j < 1000; ++j) acc += b.best_ask(q) ? q.qty : 0;
+                for (std::size_t j = 0; j < 1000; ++j) {
+                    acc += b.best_ask(q) ? q.qty + (acc & 1) : 0;
+                    keep(acc);
+                }
                 rr.qbatch[QBestAsk].record((now_ns() - a + 500) / 1000);
-                const std::size_t np = b.top(bid, depth, pres.data());  // untimed
                 a = now_ns();
-                for (std::size_t j = 0; j < 1000; ++j) acc += b.qty_at(bid, pres[j % (np ? np : 1)].px);
+                for (std::size_t j = 0; j < 1000; ++j) {
+                    acc += b.qty_at(bid, pres[(j + std::size_t(acc & 1)) % npres].px);
+                    keep(acc);
+                }
                 rr.qbatch[QQtyPresent].record((now_ns() - a + 500) / 1000);
                 a = now_ns();
-                for (std::int64_t j = 0; j < 1000; ++j) acc += b.qty_at(true, absent + j);
+                for (std::size_t j = 0; j < 1000; ++j) {
+                    acc += b.qty_at(true, absent + std::int64_t(j & 511) + (acc & 1));
+                    keep(acc);
+                }
                 rr.qbatch[QQtyAbsent].record((now_ns() - a + 500) / 1000);
                 a = now_ns();
-                for (int j = 0; j < 1000; ++j) acc += std::int64_t(b.top(bid, 10, buf.data())) + buf[0].qty;
+                for (std::size_t j = 0; j < 1000; ++j) {
+                    acc += std::int64_t(b.top(sides[(j + std::size_t(acc & 1)) & 1023] != 0, 10, buf.data())) + buf[0].qty;
+                    keep(acc);
+                }
                 rr.qbatch[QTop10].record((now_ns() - a + 500) / 1000);
                 a = now_ns();
-                for (int j = 0; j < 1000; ++j) acc += std::int64_t(b.top(bid, 100, buf.data())) + buf[99].qty;
+                for (std::size_t j = 0; j < 1000; ++j) {
+                    acc += std::int64_t(b.top(sides[(j + std::size_t(acc & 1)) & 1023] != 0, 100, buf.data())) + buf[99].qty;
+                    keep(acc);
+                }
                 rr.qbatch[QTop100].record((now_ns() - a + 500) / 1000);
                 g_sink = acc;
             }

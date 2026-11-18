@@ -190,6 +190,38 @@ public final class LowLatBook {
 
     static volatile long sink;
 
+    static long batchBest(FastBook b, boolean bid, long seed) {
+        long acc = seed;
+        for (int j = 0; j < 1000; j++) {
+            acc += bid ? (b.hasBestBid() ? b.bestBidQty() + (acc & 1) : 0) : (b.hasBestAsk() ? b.bestAskQty() + (acc & 1) : 0);
+        }
+        return acc;
+    }
+
+    static long batchQtyPresent(FastBook b, boolean bid, long[] ppx, int np, long seed) {
+        long acc = seed;
+        for (int j = 0; j < 1000; j++) {
+            acc += b.qtyAt(bid, ppx[(int) ((j + (acc & 1)) % np)]);
+        }
+        return acc;
+    }
+
+    static long batchQtyAbsent(FastBook b, long absent, long seed) {
+        long acc = seed;
+        for (int j = 0; j < 1000; j++) {
+            acc += b.qtyAt(true, absent + (j & 511) + (acc & 1));
+        }
+        return acc;
+    }
+
+    static long batchTop(FastBook b, boolean[] sides, int n, long[] px, long[] q, long seed) {
+        long acc = seed;
+        for (int j = 0; j < 1000; j++) {
+            acc += b.top(sides[(int) ((j + (acc & 1)) & 1023)], n, px, q) + q[n - 1];
+        }
+        return acc;
+    }
+
     static String timedRun(FastBook.Stream s, long qseed) {
         Hist all = new Hist();
         Hist[] kinds = new Hist[KINDS.length];
@@ -208,6 +240,10 @@ public final class LowLatBook {
         long[] ppx = new long[DEPTH];
         long[] pq = new long[DEPTH];
         Rng r = Rng.seeded(qseed, 0);
+        boolean[] sides = new boolean[1024];
+        for (int k = 0; k < sides.length; k++) {
+            sides[k] = (r.nextLong() & 1) != 0;
+        }
         long[] px = new long[DEPTH];
         long[] q = new long[DEPTH];
         FastBook b = new FastBook(DEPTH);
@@ -245,39 +281,29 @@ public final class LowLatBook {
                 a = System.nanoTime();
                 sink = b.top(bid, 100, px, q);
                 queries[5].record(System.nanoTime() - a);
-                // HR-21 batch timing: each query 1,000 times in a row, total divided by 1,000; prices cycle so
-                // no call repeats the previous one.
+                // HR-21 batch timing: each query 1,000 times in a row, total divided by 1,000. Each loop is its own
+                // method returning its accumulator (a Blackhole-style sink); each iteration's side/price comes from
+                // precomputed arrays indexed through the previous result (a dependency chain: latency, not
+                // throughput).
+                int np = Math.max(1, b.top(bid, DEPTH, ppx, pq));
                 long acc = 0;
                 a = System.nanoTime();
-                for (int j = 0; j < 1000; j++) {
-                    acc += b.hasBestBid() ? b.bestBidQty() : 0;
-                }
+                acc += batchBest(b, true, acc);
                 qbatch[0].record((System.nanoTime() - a + 500) / 1000);
                 a = System.nanoTime();
-                for (int j = 0; j < 1000; j++) {
-                    acc += b.hasBestAsk() ? b.bestAskQty() : 0;
-                }
+                acc += batchBest(b, false, acc);
                 qbatch[1].record((System.nanoTime() - a + 500) / 1000);
-                int np = Math.max(1, b.top(bid, DEPTH, ppx, pq));
                 a = System.nanoTime();
-                for (int j = 0; j < 1000; j++) {
-                    acc += b.qtyAt(bid, ppx[j % np]);
-                }
+                acc += batchQtyPresent(b, bid, ppx, np, acc);
                 qbatch[2].record((System.nanoTime() - a + 500) / 1000);
                 a = System.nanoTime();
-                for (int j = 0; j < 1000; j++) {
-                    acc += b.qtyAt(true, absent + j);
-                }
+                acc += batchQtyAbsent(b, absent, acc);
                 qbatch[3].record((System.nanoTime() - a + 500) / 1000);
                 a = System.nanoTime();
-                for (int j = 0; j < 1000; j++) {
-                    acc += b.top(bid, 10, px, q) + q[0];
-                }
+                acc += batchTop(b, sides, 10, px, q, acc);
                 qbatch[4].record((System.nanoTime() - a + 500) / 1000);
                 a = System.nanoTime();
-                for (int j = 0; j < 1000; j++) {
-                    acc += b.top(bid, 100, px, q) + q[99];
-                }
+                acc += batchTop(b, sides, 100, px, q, acc);
                 qbatch[5].record((System.nanoTime() - a + 500) / 1000);
                 sink = acc;
             }
