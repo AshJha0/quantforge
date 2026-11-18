@@ -964,7 +964,7 @@ print(paper.verify(open("ledger.jsonl", encoding="utf-8").read()))
 
 ### Estimate a book rate with its standard error (available from v0.10.0)
 
-<code>micro.est.arrival_rate</code>, <code>micro.est.cancel_rate</code>, <code>micro.est.resilience</code>, <code>micro.est.liquidity_decay</code>, <code>micro.est.adverse_selection</code>, <code>micro.est.regime_impact</code> and <code>micro.est.passive_vs_aggressive</code> each return the estimate and `se` (`specifications/09-microstructure/micro-estimators.md`). For 12 arrivals in 4 seconds:
+`micro.est.arrival_rate`, `micro.est.cancel_rate`, `micro.est.resilience`, `micro.est.liquidity_decay`, `micro.est.adverse_selection`, `micro.est.regime_impact` and `micro.est.passive_vs_aggressive` each return the estimate and `se` (`specifications/09-microstructure/micro-estimators.md`). For 12 arrivals in 4 seconds:
 
 ```json
 {"operation": "micro.est.arrival_rate", "inputs": {"count": 12, "window": 4}}
@@ -974,11 +974,11 @@ gives `lambda` 3, `se` 0.866025403784439 (`mest_h-0001`). See [Tutorial 45](docs
 
 ### Compare venues by markout and fill rate (available from v0.10.0)
 
-<code>exec.venue.analytics</code> takes `mids`, `fills`, `orders` and `horizons` and returns `fill_rates` and one `{venue, h, markout, markout_bps, toxicity}` row per venue and horizon (`specifications/10-execution/venue-analytics.md`). Report several horizons: in `venue_h-0001` and `0002` the two venues swap places between 5 and 10 seconds. See [Tutorial 46](docs/getting-started/tutorial-46-venue-analytics.md).
+`exec.venue.analytics` takes `mids`, `fills`, `orders` and `horizons` and returns `fill_rates` and one `{venue, h, markout, markout_bps, toxicity}` row per venue and horizon (`specifications/10-execution/venue-analytics.md`). Report several horizons: in `venue_h-0001` and `0002` the two venues swap places between 5 and 10 seconds. See [Tutorial 46](docs/getting-started/tutorial-46-venue-analytics.md).
 
 ### Schedule an adaptive order (available from v0.10.0)
 
-<code>exec.algo.arrival</code> (urgency `kappa`), <code>exec.algo.close</code> (auction cap and profile), <code>exec.algo.liquidity_seek</code> (share of in-limit depth), <code>exec.algo.pair</code> and <code>exec.algo.basket</code> (`specifications/10-execution/adaptive-algos.md`). For an arrival-price order of 1,000 over two buckets at `kappa = ln 2`:
+`exec.algo.arrival` (urgency `kappa`), `exec.algo.close` (auction cap and profile), `exec.algo.liquidity_seek` (share of in-limit depth), `exec.algo.pair` and `exec.algo.basket` (`specifications/10-execution/adaptive-algos.md`). For an arrival-price order of 1,000 over two buckets at `kappa = ln 2`:
 
 ```json
 {"operation": "exec.algo.arrival", "inputs": {"quantity": 1000, "n_buckets": 2, "urgency": 0.69314718055994531, "mode": "CONTINUOUS"}}
@@ -988,7 +988,7 @@ gives slices 600 and 400 (`alg_h-0002`). See [Tutorial 47](docs/getting-started/
 
 ### Estimate cost before trading and split it afterwards (available from v0.10.0)
 
-<code>exec.tca.pretrade</code> returns `expected_cost_bps` and, separately, `timing_risk_bps`; <code>exec.tca.attribution</code> returns delay, impact, spread, opportunity and fees summing to `total` (`specifications/10-execution/tca-pretrade.md`). `tcx_h-0006` reproduces the `tca_h-0001` total of 385 with the execution cost split into impact 60 and spread 40.
+`exec.tca.pretrade` returns `expected_cost_bps` and, separately, `timing_risk_bps`; `exec.tca.attribution` returns delay, impact, spread, opportunity and fees summing to `total` (`specifications/10-execution/tca-pretrade.md`). `tcx_h-0006` reproduces the `tca_h-0001` total of 385 with the execution cost split into impact 60 and spread 40.
 
 ### Read the low-latency book results (available from v0.10.0)
 
