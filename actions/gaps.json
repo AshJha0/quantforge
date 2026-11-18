@@ -55,7 +55,7 @@
   "from": "2026-11-07",
   "expected": 7,
   "missing": [],
-  "unchanged_run": 6
+  "unchanged_run": 5
  },
  {
   "series": "recorder/fiscaldata-treasury-auctions",
@@ -97,21 +97,21 @@
   "from": "2026-11-07",
   "expected": 7,
   "missing": [],
-  "unchanged_run": 6
+  "unchanged_run": 5
  },
  {
   "series": "recorder/ons-d7bt",
   "from": "2026-11-07",
   "expected": 7,
   "missing": [],
-  "unchanged_run": 6
+  "unchanged_run": 5
  },
  {
   "series": "recorder/ons-l522",
   "from": "2026-11-07",
   "expected": 7,
   "missing": [],
-  "unchanged_run": 6
+  "unchanged_run": 5
  },
  {
   "series": "recorder/us-treasury-bill-rates",
