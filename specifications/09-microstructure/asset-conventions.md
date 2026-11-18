@@ -67,6 +67,16 @@ Text `H-FF[q]`: handle `H`, `FF` = 32nds 00 to 31, optional third digit in quart
 ### 3.3 Yield and price (HR-92)
 Coupon bond on a coupon date, street convention: P = sum_{i=1..n} (100 c/f)/(1+y/f)^i + 100/(1+y/f)^n. Off coupon dates the existing `04-pricing` bond routines are reused (no new maths). Bill: P = 100 (1 - d days/360) [UST-BILL]. Yield from price: existing `core.solve` Brent, tolerance 1e-12.
 
+## Convergence and limit cases
+Only `micro.rates.bond_yield` is iterative: Brent (`core.solve`) on the bracket (-0.99 f, 10), absolute tolerance 1e-12 in the yield; no root in the bracket is `E_DOMAIN`. Its golden is compared within tolerance (class `root_finding`); every other operation here is exact decimal arithmetic.
+
+| Limit | Behaviour | Check |
+|---|---|---|
+| price = 100, coupon c | yield = c (par bond) | rtc_h-0011 |
+| yield from an exact price | returns the yield the price was built from, within 1e-12 | rtc_h-0012 against rtc_h-0008 |
+| price at or below 0 | `E_DOMAIN` before iterating | rtc_h error cases |
+| integer input beyond +-(2^53-1) | `E_LIMIT` (HR-116) | fxv_h-0015 to 0018, fut_h-0009, 0010 |
+
 ## How each plugs into existing modules
 | Module | Change |
 |---|---|

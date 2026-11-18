@@ -3799,34 +3799,34 @@
   },
   "H": {
    "without_sweeps": {
-    "cases": 126,
+    "cases": 128,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 93,
     "reimplementation": 0,
-    "none": 33,
+    "none": 35,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 93,
-    "share_with_rederivation": 0.738095,
+    "share_with_rederivation": 0.726562,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 101
+    "error_and_invariance_cases": 113
    },
    "with_sweeps": {
-    "cases": 126,
+    "cases": 128,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 93,
     "reimplementation": 0,
-    "none": 33,
+    "none": 35,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 93,
-    "share_with_rederivation": 0.738095,
+    "share_with_rederivation": 0.726562,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 101
+    "error_and_invariance_cases": 113
    },
    "sweeps": null,
    "libraries": {},
@@ -4010,7 +4010,7 @@
      "counted_with_rederivation": 1,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 0
+     "error_and_invariance_cases": 1
     },
     "exec.sim.fut.to_ticks": {
      "cases": 1,
@@ -4025,7 +4025,7 @@
      "counted_with_rederivation": 1,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 2
+     "error_and_invariance_cases": 3
     },
     "exec.sim.fut.variation": {
      "cases": 1,
@@ -4040,22 +4040,22 @@
      "counted_with_rederivation": 1,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 1
+     "error_and_invariance_cases": 4
     },
     "exec.sim.fx.request": {
-     "cases": 10,
+     "cases": 12,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 7,
      "reimplementation": 0,
-     "none": 3,
+     "none": 5,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 7,
-     "share_with_rederivation": 0.7,
+     "share_with_rederivation": 0.583333,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 3
+     "error_and_invariance_cases": 7
     },
     "exec.sim.fx.stream": {
      "cases": 2,
@@ -4190,7 +4190,7 @@
      "counted_with_rederivation": 1,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 0
+     "error_and_invariance_cases": 1
     },
     "micro.fx.pip_value": {
      "cases": 2,
@@ -4220,7 +4220,7 @@
      "counted_with_rederivation": 4,
      "share_with_rederivation": 0.8,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 1
+     "error_and_invariance_cases": 2
     },
     "micro.mm.as_quotes": {
      "cases": 6,
@@ -4310,7 +4310,7 @@
      "counted_with_rederivation": 4,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 3
+     "error_and_invariance_cases": 4
     },
     "micro.rates.tick_value": {
      "cases": 1,
@@ -4462,19 +4462,19 @@
      "meets_item_floor": true
     },
     "H-23": {
-     "cases": 19,
+     "cases": 21,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 15,
      "reimplementation": 0,
-     "none": 4,
+     "none": 6,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 15,
-     "share_with_rederivation": 0.789474,
+     "share_with_rederivation": 0.714286,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 4,
+     "error_and_invariance_cases": 8,
      "suites": [
       "fxc_h",
       "fxv_h"
@@ -4494,7 +4494,7 @@
      "counted_with_rederivation": 16,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 9,
+     "error_and_invariance_cases": 11,
      "suites": [
       "fut_h",
       "rtc_h"
