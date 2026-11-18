@@ -17,6 +17,10 @@ No raw market data is in this repository, so these notices apply to anyone who p
 
 The Python implementation depends on NumPy at run time (symmetric eigenvalues and condition numbers); NumPy is installed from PyPI, not vendored. NumPy is under the BSD-3-Clause licence (copyright NumPy Developers), with bundled parts under 0BSD, MIT, Zlib and CC0-1.0; its licence files ship inside the NumPy wheel. `oracle/LICENCES.md` records the version read.
 
+## threadpoolctl
+
+The Python hedge QP solve (`hedge.qp.solve`, `hedge.frontier`) holds the BLAS to one thread for the length of the solve with threadpoolctl (pinned 3.6.0, installed from PyPI, not vendored); plan 14.7 H-8. threadpoolctl is under the BSD-3-Clause licence (copyright 2019 Thomas Moreau and Olivier Grisel); its licence file ships inside the wheel.
+
 ## Joe-Kuo Sobol direction numbers
 
 The first 64 dimensions of `new-joe-kuo-6.21201` are stored in `specifications/01-core/data/sobol-joe-kuo-d6-64.json` and are compiled or copied into all four implementations (`cpp26/src/core/sobol.cpp`, `java25/.../SobolData.java`, `python/quantforge_core/_sobol_data.py`, `rust/crates/quantforge-core/src/sobol.rs`). The licence below was copied on 2026-11-06 from <https://web.maths.unsw.edu.au/~fkuo/sobol/licence>. A binary release must carry this file in its documentation.

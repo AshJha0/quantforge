@@ -45,6 +45,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 env:
+  # Account-free Central fallback for HTTP 429 (CI only; checksums fail on mismatch): java25/.mvn/ci-settings.xml
+  MAVEN_ARGS: --settings ${{ github.workspace }}/java25/.mvn/ci-settings.xml
   STAGE: ${{ (github.event_name == 'pull_request' || inputs.paths) && 'PR' || inputs.stage || 'ALL' }}
   SEED: ${{ inputs.seed || github.run_number }}
   MAX: ${{ github.event_name == 'pull_request' && '40' || inputs.max || '40' }}  # PR value checked by test_gates.pr_sample_checks
