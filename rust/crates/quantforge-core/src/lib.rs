@@ -37,6 +37,7 @@ pub mod decimal;
 pub mod equity;
 pub mod equity_carry;
 pub mod error;
+pub mod exec_api;
 pub mod execution;
 pub mod exotics;
 pub mod fast_book;

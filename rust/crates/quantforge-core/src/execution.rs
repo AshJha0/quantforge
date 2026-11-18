@@ -205,7 +205,7 @@ fn tau(p: &AcParams) -> f64 {
 
 /// The checks in the order of `almgren-chriss.md` (`eta_tilde`, sigma, T, then N), then the sign
 /// rules of HR-2. Returns `eta_tilde = eta - gamma tau / 2` (HR-5).
-fn ac_check(p: &AcParams) -> Result<f64> {
+pub(crate) fn ac_check(p: &AcParams) -> Result<f64> {
     if p.n_steps >= 1 && p.eta - p.gamma * tau(p) / 2.0 <= 0.0 {
         return fail(
             "E_DOMAIN",
