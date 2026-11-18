@@ -213,6 +213,24 @@ class PaperCliTest {
         assertTrue(p.contains("\"E_PARSE\""), p);
     }
 
+    /** HR-78: a repeated key at any level is PARSE; HR-77: out of the exact range is E_LIMIT, never rounded. */
+    @Test
+    void duplicateKeysAndExactRange() {
+        String line = Paper.verify(randomLedger(1, 5).text()).get("head").toString();
+        String text = randomLedger(1, 5).text();
+        assertEquals(true, Paper.verify(text).get("ok"), line);
+        String dupTop = text.replaceFirst("\\{", "{\"kind\":\"ORDER\",");
+        assertEquals("PARSE", Paper.verify(dupTop).get("reason"));
+        String dupBody = text.replaceFirst("\"body\":\\{", "\"body\":{\"x\":\"1\",\"x\":\"1\",");
+        assertEquals("PARSE", Paper.verify(dupBody).get("reason"));
+        String j = run("paper.book.apply_fill", "{\"fills\":[{\"side\":\"BUY\",\"quantity\":\"0.0000000000000000001\","
+                + "\"price\":\"1\"}]}");
+        assertTrue(j.contains("\"E_LIMIT\""), j);
+        String c = run("paper.book.apply_fill", "{\"fills\":[{\"side\":\"BUY\",\"quantity\":\"3\",\"price\":\"1\"},"
+                + "{\"side\":\"BUY\",\"quantity\":\"3\",\"price\":\"2\"},{\"side\":\"BUY\",\"quantity\":\"1\",\"price\":\"1\"}]}");
+        assertTrue(c.contains("\"avg_cost\":\"1.428571428571428571\""), c);
+    }
+
     @Test
     void goldenFilesPresent() throws IOException {
         try (Stream<Path> s = Files.list(Path.of("..", "datasets", "golden", "stage_h"))) {

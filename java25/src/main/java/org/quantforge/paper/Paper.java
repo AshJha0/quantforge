@@ -30,8 +30,8 @@ import org.quantforge.micro.Sor;
  * <p>Nothing here opens a socket or names an order-entry endpoint: no live order can be placed (HR-42). A
  * {@code mode} other than {@code "simulated"} is {@code E_UNSUPPORTED_OPERATION}.
  *
- * <p>Decimal arithmetic follows Python's default {@code decimal} context: every operation is rounded to 28
- * significant digits, half-even. Ledger bytes are those of Python
+ * <p>Decimal arithmetic is exact and range-checked (HR-77): out of range is E_LIMIT, never a rounded value; the
+ * only divisions are the average cost (half-even, 18 decimals), interest and borrow (half-even, 0.01) and the mid. Ledger bytes are those of Python
  * {@code json.dumps(sort_keys=True, separators=(",", ":"), ensure_ascii=True)} (HR-45).
  */
 public final class Paper {
@@ -50,8 +50,30 @@ public final class Paper {
     static final String TRADER = "PAPER";
     private static final String SYM = "S";
 
-    /** Python's default decimal context. */
-    static final MathContext MC = new MathContext(28, RoundingMode.HALF_EVEN);
+    /** The 200-digit context of the Python reference (HR-58): no in-range sum, difference or product rounds. */
+    static final MathContext MC = new MathContext(200, RoundingMode.HALF_EVEN);
+    static final int MAX_DIGITS = 36;
+    static final int MAX_SCALE = 36;
+    static final int MAX_INPUT_SCALE = 18;
+
+    /** HR-57/HR-77: {@code x} unchanged if in range (36 digits, {@code maxScale} decimals), else E_LIMIT; never rounded. */
+    static BigDecimal rng(BigDecimal x, String path, int maxScale) {
+        if (x.signum() == 0) {
+            return x;
+        }
+        BigDecimal n = x.stripTrailingZeros();
+        int scale = Math.max(n.scale(), 0);
+        int digits = n.scale() >= 0 ? n.precision() : n.precision() - n.scale();
+        if (digits > MAX_DIGITS || scale > maxScale) {
+            throw new QfError("E_LIMIT", path + ": decimal outside the exact range (36 digits, " + maxScale
+                    + " decimals; HR-57)", path);
+        }
+        return x;
+    }
+
+    static BigDecimal rng(BigDecimal x, String path) {
+        return rng(x, path, MAX_SCALE);
+    }
 
     // ------------------------------------------------------------------ decimals (HR-44)
 
@@ -79,34 +101,34 @@ public final class Paper {
     static BigDecimal dec(Object v, String name) {
         switch (v) {
             case BigDecimal b -> {
-                return b;
+                return rng(b, name);
             }
             case Boolean b -> throw new QfError("E_INPUT", name + " must be a decimal string", name);
             case Json.Number n -> {
                 if (!n.isIntegerForm()) {
                     throw new QfError("E_INPUT", name + " must be a decimal string", name);
                 }
-                return new BigDecimal(new BigInteger(n.text()));
+                return rng(new BigDecimal(new BigInteger(n.text())), name);
             }
             case Long l -> {
-                return BigDecimal.valueOf(l);
+                return rng(BigDecimal.valueOf(l), name);
             }
             case Integer l -> {
-                return BigDecimal.valueOf(l);
+                return rng(BigDecimal.valueOf(l), name);
             }
             case String s -> {
-                return parse(s, name);
+                return rng(parse(s, name), name);
             }
             case null, default -> throw new QfError("E_PARSE", name + " is not a decimal", name);
         }
     }
 
-    /** A decimal input over the CLI must be a JSON string (HR-12, HR-44). */
+    /** A decimal input over the CLI: a JSON string (HR-12, HR-44), at most 36 digits and 18 decimals (HR-77). */
     static BigDecimal dstr(Object v, String name) {
         if (!(v instanceof String s)) {
             throw new QfError("E_SCHEMA", name + " must be a decimal string", name);
         }
-        return parse(s, name);
+        return rng(rng(parse(s, name), name), name, MAX_INPUT_SCALE);
     }
 
     /** No exponent, no trailing zeros, "0" for zero (HR-12). */
@@ -532,20 +554,25 @@ public final class Paper {
             if (q.signum() <= 0 || p.signum() <= 0) {
                 throw new QfError("E_DOMAIN", "quantity and price must be positive", "quantity");
             }
-            cash = sub(cash, add(mul(mul(of(s), q), p), f));
-            fees = add(fees, f);
+            BigDecimal notional = rng(mul(q, p), "notional");
+            cash = rng(sub(cash, rng(add(mul(of(s), notional), f), "cash_flow")), "cash");
+            fees = rng(add(fees, f), "fees");
             Position pos = pos(symbol);
             if (pos.n.signum() == 0 || (pos.n.signum() > 0) == (s > 0)) {
                 BigDecimal absN = pos.n.abs(MC);
-                pos.c = div(add(mul(absN, pos.c), mul(q, p)), add(absN, q));
-                pos.n = add(pos.n, mul(of(s), q));
+                BigDecimal basis = rng(add(rng(mul(absN, pos.c), "basis"), notional), "basis");
+                // HR-77: the one division of the book, rounded half-even to 18 decimals
+                pos.c = rng(div(basis, rng(add(absN, q), "position")).setScale(MAX_INPUT_SCALE,
+                        RoundingMode.HALF_EVEN), "avg_cost");
+                pos.n = rng(add(pos.n, mul(of(s), q)), "position");
                 return;
             }
             BigDecimal absN = pos.n.abs(MC);
             BigDecimal closed = q.compareTo(absN) <= 0 ? q : absN;
             int sign = pos.n.signum() > 0 ? 1 : -1;
-            realised = add(realised, mul(mul(closed, sub(p, pos.c)), of(sign)));
-            pos.n = add(pos.n, mul(of(s), q));
+            realised = rng(add(realised, rng(mul(mul(closed, rng(sub(p, pos.c), "pnl")), of(sign)), "pnl")),
+                    "realised");
+            pos.n = rng(add(pos.n, mul(of(s), q)), "position");
             if (pos.n.signum() == 0) {
                 pos.c = BigDecimal.ZERO;
             } else if ((pos.n.signum() > 0) != (sign > 0)) {
@@ -557,10 +584,11 @@ public final class Paper {
             BigDecimal sum = BigDecimal.ZERO;
             for (var e : positions.entrySet()) {
                 if (e.getValue().n.signum() != 0) {
-                    sum = add(sum, mul(e.getValue().n, dec(mark(marks, e.getKey()), "marks." + e.getKey())));
+                    sum = add(sum, rng(mul(e.getValue().n, dec(mark(marks, e.getKey()), "marks." + e.getKey())),
+                            "market_value"));
                 }
             }
-            return add(cash, sum);
+            return rng(add(cash, sum), "nav");
         }
     }
 
@@ -583,7 +611,8 @@ public final class Paper {
         }
         BigDecimal r = cash.signum() >= 0 ? dec(cashRate, "cash_rate") : dec(debitRate, "debit_rate");
         BigDecimal d = of(days);
-        BigDecimal interest = div(mul(mul(cash, r), d), DAYS_PER_YEAR).setScale(2, RoundingMode.HALF_EVEN);
+        BigDecimal interest = div(rng(mul(mul(cash, r), d), "interest"), DAYS_PER_YEAR)
+                .setScale(2, RoundingMode.HALF_EVEN);
         BigDecimal smv = BigDecimal.ZERO;
         for (Object[] sp : shortsOpen) {
             BigDecimal n = dec(sp[0], "n");
@@ -591,9 +620,10 @@ public final class Paper {
                 smv = add(smv, mul(n.negate(MC), dec(sp[1], "close")));
             }
         }
-        BigDecimal borrow = div(mul(mul(smv, dec(borrowRate, "borrow_rate")), d), DAYS_PER_YEAR)
+        smv = rng(smv, "short_value");
+        BigDecimal borrow = div(rng(mul(mul(smv, dec(borrowRate, "borrow_rate")), d), "borrow"), DAYS_PER_YEAR)
                 .setScale(2, RoundingMode.HALF_EVEN).negate();
-        return new Financing(interest, borrow, add(interest, borrow));
+        return new Financing(interest, borrow, rng(add(interest, borrow), "financing"));
     }
 
     record DayFill(String symbol, Object side, BigDecimal quantity, BigDecimal price, BigDecimal fee) {}
@@ -645,7 +675,11 @@ public final class Paper {
             book.applyFill(f.symbol(), f.side(), f.quantity(), f.price(), f.fee());
         }
         book.cash = add(book.cash, fin.financing());
-        BigDecimal total = add(add(add(market, trading), fees), fin.financing());
+        market = rng(market, "market");
+        trading = rng(trading, "trading");
+        fees = rng(fees, "fees");
+        book.cash = rng(book.cash, "cash");
+        BigDecimal total = rng(add(add(add(market, trading), fees), fin.financing()), "total");
         BigDecimal nav1 = book.nav(marks);
         if (total.compareTo(sub(nav1, nav0)) != 0) {
             throw new IllegalStateException("explain residual " + sub(sub(nav1, nav0), total)); // HR-53: a defect
@@ -733,8 +767,9 @@ public final class Paper {
             BigInteger.valueOf(ordersToday).compareTo(pyInt(need(limits, "max_orders_per_day", "limits/"),
                     "max_orders_per_day")) >= 0,
             q.compareTo(dec(need(limits, "max_order_qty", "limits/"), "max_order_qty")) > 0,
-            limit != null && div(sub(limit, pRef).abs(MC), pRef).compareTo(band) > 0,
-            mul(q, pChk).compareTo(dec(need(limits, "max_notional", "limits/"), "max_notional")) > 0,
+            // cross-multiplied, so no division (HR-77)
+            limit != null && rng(sub(limit, pRef).abs(MC), "band").compareTo(rng(mul(band, pRef), "band")) > 0,
+            rng(mul(q, pChk), "notional").compareTo(dec(need(limits, "max_notional", "limits/"), "max_notional")) > 0,
             after.abs(MC).compareTo(dec(need(limits, "max_abs_position", "limits/"), "max_abs_position")) > 0,
             !truthy(allow) && after.signum() < 0,
             s > 0 && mul(q, pChk).compareTo(cash) > 0,
@@ -1316,9 +1351,7 @@ public final class Paper {
     /** {@code paper.session.run}: replays SUBMIT and CLOSE steps through one Session (A8: deterministic). */
     public static Map<String, Object> sessionCase(Object cash, Map<?, ?> limits, Map<?, ?> lit, List<?> script,
             Map<?, ?> dark) {
-        if (!(cash instanceof String)) {
-            throw new QfError("E_SCHEMA", "cash must be a decimal string", "cash");
-        }
+        dstr(cash, "cash");
         for (String k : List.of("tick_size", "lot_size", "fee_schedule")) {
             if (lit.get(k) == null) {
                 throw new QfError("E_SCHEMA", "lit/" + k + " is missing", "lit/" + k);
@@ -1343,6 +1376,11 @@ public final class Paper {
                 for (String key : List.of("order_id", "symbol", "side", "type", "quantity")) {
                     if (order.get(key) == null) {
                         throw new QfError("E_SCHEMA", w + "order/" + key + " is missing", w + "order/" + key);
+                    }
+                }
+                for (String key : List.of("quantity", "limit_price")) {
+                    if (order.get(key) != null) {
+                        dstr(order.get(key), w + "order/" + key);
                     }
                 }
                 if (order.get("symbol") instanceof String sym) {
@@ -1371,6 +1409,14 @@ public final class Paper {
                 String[] rn = {"cash_rate", "debit_rate", "borrow_rate"};
                 for (int i = 0; i < 3; i++) {
                     rates[i] = step.containsKey(rn[i]) ? step.get(rn[i]) : "0";
+                    dstr(rates[i], w + rn[i]);
+                }
+                for (String name : List.of("prev_marks", "marks")) {
+                    if (step.get(name) instanceof Map<?, ?> m) {
+                        for (var e : m.entrySet()) {
+                            dstr(e.getValue(), w + name + "/" + e.getKey());
+                        }
+                    }
                 }
                 Map<?, ?> pm = step.get("prev_marks") instanceof Map<?, ?> m ? m : Map.of();
                 Map<?, ?> mk = step.get("marks") instanceof Map<?, ?> m ? m : Map.of();
