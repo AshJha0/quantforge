@@ -426,7 +426,7 @@ For 1,000,000 shares against a 10 million daily volume, `sigma` 2 %, `z = 1.645`
 
 ## Stage H: execution and microstructure (planned, v0.10.0)
 
-The operations drawn here are specified (spec version 0.1.0, confirmed 2026-11-18) but not merged; the boxes name the operations as the specs fix them. Simulated parts are drawn with dashed borders; real recorded data with a solid border. Specs: `specifications/09-microstructure/` and `specifications/10-execution/`.
+The operations drawn here are implemented in all four languages from v0.10.0 (spec version 0.1.0, confirmed 2026-11-18); the boxes use the names the specs fix. Simulated parts are drawn with dashed borders; real recorded data with a solid border. Specs: `specifications/09-microstructure/` and `specifications/10-execution/`.
 
 ### Order lifecycle
 
@@ -559,7 +559,7 @@ flowchart TB
   class V sim
 ```
 
-Only the snapshot is real data, and it is read, never traded against. The ledger lives in the `forward-log` branch, not `main` (HR-46). The book, explain, checks and ledger are on `stage-h2`; the venue fill path is available from v0.10.0. Worked through in [Tutorial 44](../getting-started/tutorial-44-paper-trading.md). Spec: `10-execution/paper-trading.md`.
+Only the snapshot is real data, and it is read, never traded against. The ledger lives in the `forward-log` branch, not `main` (HR-46). The book, explain, checks, ledger and venue fill path are implemented in Python (`paper.py`, `paper_fills.py`); the `paper.*` CLI operations are Python only, Java, C++ and Rust ports pending in this PR. Worked through in [Tutorial 44](../getting-started/tutorial-44-paper-trading.md). Spec: `10-execution/paper-trading.md`.
 
 ### Order lifecycle in paper trading
 

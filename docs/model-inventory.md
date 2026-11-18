@@ -968,138 +968,198 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 - **Retirement trigger:** calibration in stage H item H-1, or a superseding ruling.
 - **Validation report:** `specifications/10-execution/liquidity-curve.md`.
 
-## Stage H (specified, not implemented)
+## Stage H (v0.10.0, not tagged)
 
-Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings HR-1 to HR-41; HR-42 to HR-55 for paper trading; HR-56 for wave 1 input rules). The wave 1 operations (MH-6 to MH-10, and use case 5) are implemented in all four languages on branch `stage-h` with a generated suite in `datasets/golden/stage_h/` (63 cases with `e1_h`, each build passes all, local, 2026-11-18); their outside check is a blind second-lane re-derivation or a printed paper figure (DR-H2), 23 of 29 value cases, no library. The wave 2 operations (book rebuild, lit matching, dark pool, router) are implemented in all four languages on branch `stage-h2` (round 2, 2026-11-18); stage H has 47 of 65 value cases outside-checked by DR-H2 re-derivation, none by a library (`oracle/OUTSIDE_SHARES.md`). Each entry is re-dated when its operation lands.
+Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings HR-1 to HR-41; HR-42 to HR-55 for paper trading; HR-56 for wave 1 input rules). The wave 1 operations (MH-6 to MH-10, and use case 5) are implemented in all four languages on branch `stage-h` with a generated suite in `datasets/golden/stage_h/` (63 cases with `e1_h`, each build passes all, local, 2026-11-18); their outside check is a blind second-lane re-derivation or a printed paper figure (DR-H2), 23 of 29 value cases, no library. The wave 2 operations (book rebuild, lit matching, dark pool, router) are implemented in all four languages on branch `stage-h2` (round 2, 2026-11-18); round 3 adds the estimators, venue analytics, adaptive algos, TCA and the `paper.*` operations (the last in Python only; Java, C++ and Rust ports pending in this PR). Stage H has 95 of 119 value cases (79.8%) outside-checked by DR-H2 blind re-derivation or printed paper figures, none by a library (`oracle/OUTSIDE_SHARES.md`). Each entry is re-dated when its operation lands.
 
 ### MH-1 Order book rebuild (stage H wave 1b)
 - **Purpose:** MBP book rebuilt from the Kraken v2 L2 feed, checksum, crossed, locked and gap counting (`micro.book.rebuild`, H-2).
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-18.
+- **Limitations:** spec confirmed 2026-11-18; implemented in all four languages; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** generated suite `ob_h`, passed by every build (observed, local, 2026-11-18); blind re-derivation (DR-H2), counts per plan item in `oracle/OUTSIDE_SHARES.md`. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** the venue's CRC32 checksum on every recorded message or row.
 - **Monitoring thresholds:** any checksum failure on a form B row with `ok = true`, or any form A failure.
-- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Data lineage hash:** sha256 9a269a85e55d99fd5f01e3791c232b558e3b6b0d302687d95ddf6505caeed2ad (`ob_h`, 17 cases) (2026-11-18).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/09-microstructure/order-book.md`.
 
 ### MH-2 Low-latency order book (stage H wave 1b)
 - **Purpose:** the same book as MH-1 built for speed; per-message latency, allocation-free hot path, CI regression gate (H-9).
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-18.
+- **Limitations:** spec confirmed 2026-11-18; implemented in all four languages; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** generated suite `ob_h`, passed by every build (observed, local, 2026-11-18); blind re-derivation (DR-H2), counts per plan item in `oracle/OUTSIDE_SHARES.md`. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** MH-1 (Python reference) on the same stream, exact `top(100)` equality.
 - **Monitoring thresholds:** p99 above the CI threshold of HR-24, or any steady-state allocation in C++ or Rust.
-- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Data lineage hash:** sha256 9a269a85e55d99fd5f01e3791c232b558e3b6b0d302687d95ddf6505caeed2ad (`ob_h`, 17 cases) (2026-11-18).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/09-microstructure/low-latency-book.md`.
 
 ### MH-3 Simulated lit matching engine (stage H wave 1b)
 - **Purpose:** price-time matching with limit, market, IOC, FOK, iceberg, post-only and pegged orders (`exec.sim.lit.run`).
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-18.
+- **Limitations:** spec confirmed 2026-11-18; implemented in all four languages; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** generated suite `lit_h`, passed by every build (observed, local, 2026-11-18); blind re-derivation (DR-H2), counts per plan item in `oracle/OUTSIDE_SHARES.md`. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** the Python oracle against each ported build; invariants (no crossed book, quantity conserved, FIFO).
 - **Monitoring thresholds:** any invariant break in the property tests.
-- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Data lineage hash:** sha256 9a14b16085baccbc95018550ce6b35ec1585ebaf5ad16810db3354574ed8d9a6 (`lit_h`, 20 cases) (2026-11-18).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/10-execution/lit-matching.md`.
 
 ### MH-4 Simulated dark pool (stage H wave 1b)
 - **Purpose:** midpoint crossing, minimum quantity, conditionals, fill probability and markouts (`exec.sim.dark.run`).
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-18.
+- **Limitations:** spec confirmed 2026-11-18; implemented in all four languages; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** generated suite `dark_h`, passed by every build (observed, local, 2026-11-18); blind re-derivation (DR-H2), counts per plan item in `oracle/OUTSIDE_SHARES.md`. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** Monte Carlo of the same model for the Laplace-inversion fill probability; lifelines for Kaplan-Meier.
 - **Monitoring thresholds:** planted leakage not recovered within 3 SE.
-- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Data lineage hash:** sha256 10292d4d34eb80313b639cf44d36a2237e15827481e19326b2e10505f2e7f228 (`dark_h`, 8 cases) (2026-11-18).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/10-execution/dark-pool.md`.
 
 ### MH-5 Smart order router (stage H wave 1b)
 - **Purpose:** Cont-Kukanov split across simulated lit and dark venues (`exec.sor.allocate`), scored against single-venue routing.
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-18.
+- **Limitations:** spec confirmed 2026-11-18; implemented in all four languages; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** generated suite `sor_h`, `sorx_h`, passed by every build (observed, local, 2026-11-18); blind re-derivation (DR-H2), counts per plan item in `oracle/OUTSIDE_SHARES.md`. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** `SAMPLE_AVERAGE` against `STOCHASTIC_APPROX` and Prop. 3 closed form.
 - **Monitoring thresholds:** router split outside 3 SE of the planted optimum.
-- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Data lineage hash:** sha256 ccaf2af583fa8147998539b039b49189d20b0d485477004ac0f1ae9897890132 (`sor_h`, 9 cases); sha256 67ee66847d2f62fe75dc5b489ddbf7b8d5689ad371d32fbe28ae3d8e5c6b8d00 (`sorx_h`, 2 cases) (2026-11-18).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/10-execution/smart-order-router.md`.
 
 ### MH-6 Almgren-Chriss trajectory and frontier (stage H wave 1)
 - **Purpose:** optimal liquidation trajectory and efficient frontier (`exec.ac.trajectory`, `exec.ac.frontier`).
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** golden values written in the spec, blind re-derived (DR-H2); no generated suite yet. **Review:** 2026-11-18.
+- **Limitations:** spec confirmed 2026-11-18; implemented in all four languages; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** golden values written in the spec, blind re-derived (DR-H2); generated suite `ac_h`, passed by every build (observed, local, 2026-11-18). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** blind re-derivation (DR-H2) and printed [AC00] figures.
 - **Monitoring thresholds:** trajectory or frontier off the closed form by more than 1e-12.
-- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Data lineage hash:** sha256 788f27b90a995537f547c0a3abe1783e75095db22ecaeade4e369dfdf0aac9b4 (`ac_h`, 10 cases) (2026-11-18).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/10-execution/almgren-chriss.md`.
 
 ### MH-7 Market impact (stage H wave 1)
 - **Purpose:** square-root and Obizhaeva-Wang transient impact (`exec.impact.sqrt`, `exec.impact.ow_optimal`).
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** golden values written in the spec, blind re-derived (DR-H2); no generated suite yet. **Review:** 2026-11-18.
+- **Limitations:** spec confirmed 2026-11-18; implemented in all four languages; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** golden values written in the spec, blind re-derived (DR-H2); generated suite `imp_h`, passed by every build (observed, local, 2026-11-18). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** printed paper figures and blind re-derivation.
 - **Monitoring thresholds:** calibrated exponent standard error not reported (H-1).
-- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Data lineage hash:** sha256 af5c20a676f01adf754c3870178be92f97db29e343f9f8aae05aafc5cf318c88 (`imp_h`, 9 cases) (2026-11-18).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/10-execution/impact.md`.
 
 ### MH-8 Execution schedules (stage H wave 1)
 - **Purpose:** TWAP, VWAP and POV schedules (`exec.schedule.*`).
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** golden values written in the spec, blind re-derived (DR-H2); no generated suite yet. **Review:** 2026-11-18.
+- **Limitations:** spec confirmed 2026-11-18; implemented in all four languages; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** golden values written in the spec, blind re-derived (DR-H2); generated suite `sched_h`, passed by every build (observed, local, 2026-11-18). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** hand cases and blind re-derivation.
 - **Monitoring thresholds:** slices not summing to the order (HR-3).
-- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Data lineage hash:** sha256 f08bdfdf4ef15ba7f454eb8078357da4856b34f09d3e7f26a44dbfc46ec2ea78 (`sched_h`, 13 cases) (2026-11-18).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/10-execution/schedules.md`.
 
 ### MH-9 Implementation shortfall TCA (stage H wave 1)
 - **Purpose:** Perold decomposition into delay, execution, opportunity and fees (`exec.tca.shortfall`).
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** golden values written in the spec, blind re-derived (DR-H2); no generated suite yet. **Review:** 2026-11-18.
+- **Limitations:** spec confirmed 2026-11-18; implemented in all four languages; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** golden values written in the spec, blind re-derived (DR-H2); generated suite `tca_h`, passed by every build (observed, local, 2026-11-18). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** hand cases and blind re-derivation.
 - **Monitoring thresholds:** decomposition not summing to the total to 1e-10.
-- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Data lineage hash:** sha256 ab5c8ce760fe7beb843b6395cfe7430e25a063a3e36edb37d9f99ba929f0f7ea (`tca_h`, 6 cases) (2026-11-18).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/10-execution/tca.md`.
 
 ### MH-10 Avellaneda-Stoikov quotes (stage H wave 1)
 - **Purpose:** inventory-aware market-making quotes (`micro.mm.as_quotes`).
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** golden values written in the spec, blind re-derived (DR-H2); no generated suite yet. **Review:** 2026-11-18.
+- **Limitations:** spec confirmed 2026-11-18; implemented in all four languages; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** golden values written in the spec, blind re-derived (DR-H2); generated suite `as_h`, passed by every build (observed, local, 2026-11-18). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** [AS08] printed tables and blind re-derivation.
 - **Monitoring thresholds:** quotes off the closed form by more than 1e-10.
-- **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
+- **Data lineage hash:** sha256 c664b079cad0301165975dbb75373a7b40afcc43cc2c2d3b69289c15477b1196 (`as_h`, 7 cases) (2026-11-18).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/09-microstructure/avellaneda-stoikov.md`.
 
 ### MH-11 Paper trading: ledger, book and pre-trade checks (stage H, H-21)
 - **Purpose:** a simulated paper book with a hash-chained append-only ledger, positions, cash, financing, daily P&L explain and pre-trade risk checks (`specifications/10-execution/paper-trading.md`).
 - **Inputs:** as in the spec page; decimal strings throughout (HR-44).
-- **Limitations:** simulated fills only; fill wiring to the lit, dark and router simulators (HR-47) and TCA per order (plan Q8k) not done; labelled "crypto venue; simulated"; never live orders (HR-42); the dashboard is stage K.
-- **Validation:** goldens `pt_h-0001` to `-0023` in the spec; the blind lane matched values on some and checked only the shape of others (SHAPE-ONLY is not an outside check). **Review:** 2026-11-18.
+- **Limitations:** Python only (`paper.py`, `paper_fills.py`, the `paper.*` CLI operations); Java, C++ and Rust ports pending in this PR; simulated fills only, from the lit, dark and router simulators (HR-47), with a TCA record per order; labelled "crypto venue; simulated"; never live orders (HR-42); the dashboard is stage K.
+- **Validation:** goldens `pt_h` (28) and `e1_hpt` (5), passed by the Python build; the blind lane matched values on some and checked only the shape of others (SHAPE-ONLY is not an outside check). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** `sha256sum` on the canonical bytes of `pt_h-0020`; blind re-derivation (DR-H2).
 - **Monitoring thresholds:** P&L explain residual not exactly zero (HR-53); a ledger record without the label fails `verify` (HR-43).
-- **Data lineage hash:** none yet (no generated golden suite).
+- **Data lineage hash:** sha256 f0e626c97db756d113c0807d749dce32b9593222d7f35c6219a9ea929be7dd12 (`pt_h`, 28 cases); sha256 fb91aafcd38d1cbdd3c80511200e462c351d0aaf614c401ed222d6f94421fdc8 (`e1_hpt`, 5 cases) (2026-11-18).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/10-execution/paper-trading.md`.
+
+### MH-12 Microstructure estimators (stage H round 3)
+- **Purpose:** arrival, cancel, resilience, liquidity decay, adverse selection, regime impact and passive-versus-aggressive estimators (`micro.est.*`, H-4b), in all four languages.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Inputs are synthetic or simulated; no claim on real markets.
+- **Validation:** generated suite `mest_h`, passed by every build (observed, local, 2026-11-18); blind re-derivation (DR-H2), counts in `oracle/OUTSIDE_SHARES.md`. **Review:** 2026-11-18.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation, 7 of 7 value cases (`program/STAGE_H_BLIND_MICRO.md`); planted-truth simulations (HR-71).
+- **Monitoring thresholds:** a planted parameter not recovered within 3 standard errors.
+- **Data lineage hash:** sha256 f01d89526ee09b2dd55f7f72f5c7d4b53ca25839595515214c9e3f3a83c99b9a (`mest_h`, 18 cases) (2026-11-18).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/09-microstructure/micro-estimators.md`.
+
+### MH-13 Venue analytics (stage H round 3)
+- **Purpose:** markouts, fill rates and toxicity per venue (`exec.venue.analytics`, H-16), in all four languages.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Inputs are synthetic or simulated; no claim on real markets.
+- **Validation:** generated suite `venue_h`, passed by every build (observed, local, 2026-11-18); blind re-derivation (DR-H2), counts in `oracle/OUTSIDE_SHARES.md`. **Review:** 2026-11-18.
+- **Tier:** 3.
+- **Challenger:** second, fresh blind re-derivation, 5 of 5 value cases (`program/STAGE_H_BLIND_MICRO.md`).
+- **Monitoring thresholds:** any golden differing from its exact value.
+- **Data lineage hash:** sha256 cbbb2292c02937117f4e2362968c3a9be40c2781fb714522e9496b950230c1ce (`venue_h`, 10 cases) (2026-11-18).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/venue-analytics.md`.
+
+### MH-14 Adaptive algorithms (stage H round 3)
+- **Purpose:** arrival price, close, liquidity seeking, pairs and baskets (`exec.algo.*`, H-14), in all four languages.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Inputs are synthetic or simulated; no claim on real markets.
+- **Validation:** generated suite `alg_h`, passed by every build (observed, local, 2026-11-18); blind re-derivation (DR-H2), counts in `oracle/OUTSIDE_SHARES.md`. **Review:** 2026-11-18.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation; all value cases agree (`program/STAGE_H_BLIND_EXEC.md`).
+- **Monitoring thresholds:** schedule identities broken by more than 1e-10.
+- **Data lineage hash:** sha256 2f590f8eae3cc2834bb456cbb808fb9c9dd562f16ee4eed16134a91732efd3ed (`alg_h`, 25 cases) (2026-11-18).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/adaptive-algos.md`.
+
+### MH-15 Pre-trade TCA and cost attribution (stage H round 3)
+- **Purpose:** `exec.tca.pretrade` and `exec.tca.attribution` (H-17), in all four languages.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Inputs are synthetic or simulated; no claim on real markets.
+- **Validation:** generated suite `tcx_h`, passed by every build (observed, local, 2026-11-18); blind re-derivation (DR-H2), counts in `oracle/OUTSIDE_SHARES.md`. **Review:** 2026-11-18.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation; all value cases agree (`program/STAGE_H_BLIND_EXEC.md`).
+- **Monitoring thresholds:** attribution not summing to the total within 1e-10.
+- **Data lineage hash:** sha256 28665d1672d6ce6af70627a0b0fa97330756ea929aadc82d5b99532dcd0681ee (`tcx_h`, 11 cases) (2026-11-18).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/tca-pretrade.md`.
+
+### MH-16 Library interfaces (R4) (stage H round 3)
+- **Purpose:** typed execution and microstructure layer (Python `exec_api`, Java validated records) stating thread safety per public type (H-5).
+- **Inputs:** as in the spec page.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Inputs are synthetic or simulated; no claim on real markets.
+- **Validation:** unit tests in Python and Java; first local p50/p99 timing (Windows laptop), not the acceptance machine. **Review:** 2026-11-18.
+- **Tier:** 3.
+- **Challenger:** none outside the project.
+- **Monitoring thresholds:** p99 above the target fixed before any timing.
+- **Data lineage hash:** none (no golden suite; the interfaces are checked by unit tests).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/library-interfaces.md`.

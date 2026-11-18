@@ -6,7 +6,7 @@ The plain idea: a large order sent to the market in one go moves the price again
 
 You will rebuild six golden schedules by hand, see where the leftover units go when an order does not divide evenly, and see why a POV order can end the day unfinished. Budget 10 minutes. All inputs are synthetic.
 
-<p class="note">Available from v0.10.0. The operations on this page are specified (spec version 0.1.0, confirmed 2026-11-18) but not merged in any language. Step 1 checks the spec's golden numbers with a plain-Python restatement of the formulas; step 2 shows the library call as it will run once the operations are merged, and is not run here. Every number on the page is a spec golden or simple arithmetic on one.</p>
+<p class="note">Available from v0.10.0. The operations on this page are implemented in all four languages (stage H wave 1; each build passes their goldens, observed, local, 2026-11-18). This page stays a hand check: step 1 checks the spec's golden numbers with a plain-Python restatement of the formulas, and step 2 shows the library call without running it. Every number on the page is a spec golden or simple arithmetic on one.</p>
 
 Terms, defined here. A **parent order** is the whole quantity `X`; a **child order** or **slice** is the part sent in one **bucket** (an interval of the trading day). **Participation** `p` is your share of all volume traded in a bucket, your own fills included (ruling HR-4, confirmed by DR-H4). **UNITS** mode returns whole units; **CONTINUOUS** mode returns real numbers.
 
@@ -85,15 +85,15 @@ From [`10-execution/schedules.md`](../../specifications/10-execution/schedules.m
 
 Evidence: hand calculation for every golden, then a blind re-derivation by a second lane that saw only the inputs (DR-H2, 2026-11-15): `sched_h-0001` to `0008` match. The textbook sources ([Kis13], [BL98]) were not read, so the definitions rest on the spec and the re-derivation, not on a book.
 
-## Step 2: the library call (available from v0.10.0, not run here)
+## Step 2: the library call (shown, not run here)
 
-Once merged, the same cases go through any of the four builds with the batch command, for example:
+The same cases go through any of the four builds with the batch command, for example:
 
 ```json
 {"operation": "exec.schedule.pov", "inputs": {"quantity": 1000, "participation": 0.2, "market_volume": [1000, 2000, 4000], "mode": "UNITS"}}
 ```
 
-The expected reply, from golden `sched_h-0005`, is `slices` `[250, 500, 250]` and `residual` 0. The conformance suite will be `sched_h`.
+The expected reply, from golden `sched_h-0005`, is `slices` `[250, 500, 250]` and `residual` 0. The conformance suite is `sched_h`.
 
 ## For practitioners
 

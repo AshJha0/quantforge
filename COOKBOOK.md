@@ -876,7 +876,7 @@ To check the suites: `python conformance/runner/runner.py --impl python --suite 
 
 ## Stage H recipes (available from v0.10.0)
 
-Stage H is specified (spec version 0.1.0, confirmed 2026-11-18) but not merged, so none of these commands runs yet and no output below was produced by a build. Each request copies the inputs of the named golden case, and the expected outputs are that case's values in the spec. Once merged, send a request with `quantforge batch` (one JSON object per line, as in [Batch mode](#batch-mode)). [Tutorials 36 to 40](docs/getting-started/README.md) check the same numbers today with a standard-library script.
+Stage H is implemented in all four languages from v0.10.0 (unreleased; spec version 0.1.0, confirmed 2026-11-18), except the `paper.*` operations, which are Python only (Java, C++ and Rust ports pending in this PR). Each request copies the inputs of the named golden case, and the expected outputs are that case's values in the spec, which every build reproduces in conformance. Send a request with `quantforge batch` (one JSON object per line, as in [Batch mode](#batch-mode)). [Tutorials 36 to 40](docs/getting-started/README.md) also check the same numbers by hand with a standard-library script.
 
 | Task | Operation | From golden | Expected |
 |---|---|---|---|
@@ -951,7 +951,7 @@ day = paper.end_of_day(book, fills, prev_marks, marks, days=1, cash_rate="0.0365
 print(day["market"], day["trading"], day["fees"], day["financing"], day["total"])
 ```
 
-`paper.pretrade_check(order, ref_price, position, cash, orders_today, limits)` returns `{accepted, reasons}` with reasons in the HR-49 order; `mode` other than `"simulated"` raises `E_UNSUPPORTED_OPERATION`. Golden numbers: [Tutorial 44](docs/getting-started/tutorial-44-paper-trading.md). Fills from the simulated venues (`quantforge_core.paper_fills.Session`) are available from v0.10.0.
+`paper.pretrade_check(order, ref_price, position, cash, orders_today, limits)` returns `{accepted, reasons}` with reasons in the HR-49 order; `mode` other than `"simulated"` raises `E_UNSUPPORTED_OPERATION`. Golden numbers: [Tutorial 44](docs/getting-started/tutorial-44-paper-trading.md). Fills from the simulated venues come from `quantforge_core.paper_fills.Session` (Python).
 
 ### Check a paper ledger has not been edited
 

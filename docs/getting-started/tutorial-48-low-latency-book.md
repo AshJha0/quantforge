@@ -6,7 +6,7 @@ The plain idea: a trading system's order book must apply each market-data messag
 
 You will compare the first recorded H-9 run against its targets. Budget 10 minutes. There is nothing to build: the figures are the run's recorded results.
 
-<p class="note">Available from v0.10.0 (unreleased). The low-latency books (<code>cpp26/include/quantforge/core/fast_book.hpp</code>, <code>rust/crates/quantforge-core/src/fast_book.rs</code>) and the benchmark are on a branch not yet merged. The figures below are copied from that branch's <code>benchmarks/results/h9/README.md</code> (2026-11-18): <strong>a laptop under WSL, not the acceptance machine</strong>; in-process, simulated feed; no network or venue latency. The targets are from <code>specifications/09-microstructure/low-latency-targets.md</code>, fixed before any timing run (HR-23).</p>
+<p class="note">Available from v0.10.0 (unreleased). The low-latency books (<code>cpp26/include/quantforge/core/fast_book.hpp</code>, <code>rust/crates/quantforge-core/src/fast_book.rs</code>) and the benchmark are in the repository. The figures below are copied from <code>benchmarks/results/h9/README.md</code> (2026-11-18): <strong>a laptop under WSL, not the acceptance machine</strong>; in-process, simulated feed; no network or venue latency. The targets are from <code>specifications/09-microstructure/low-latency-targets.md</code>, fixed before any timing run (HR-23).</p>
 
 Terms, defined here. **p99** is the 99th percentile: 1 % of samples were slower. **Workload S** is the synthetic stress stream: 10,000,000 messages from `core.rng` seed 20261117, 1,000,000 of warm-up and 9,000,000 timed. `qty_at` returns the depth at one price; `top(n)` copies the best `n` levels into a caller's buffer.
 
@@ -85,7 +85,7 @@ You read a latency table against targets fixed in advance, found three misses, a
 
 ## Try next
 
-- Once the branch is merged, open `benchmarks/results/h9/cpp_S.json` and find the p99 for delete messages alone.
+- Open `benchmarks/results/h9/cpp_S.json` and find the p99 for delete messages alone.
 
 ## References and further reading
 
