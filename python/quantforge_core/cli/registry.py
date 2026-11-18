@@ -75,6 +75,8 @@ CORE_MODULES = (
     "slippage",
     "mc_greeks",
     "lmm",
+    "lit_matching",
+    "order_book",
     "xva",
     "risk_tools",
     "aad_ladder",

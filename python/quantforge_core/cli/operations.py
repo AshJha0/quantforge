@@ -15,6 +15,7 @@ from . import (  # noqa: F401 - imported to register their verbs
     ops_inflation,
     ops_lmm_xva_frtb,
     ops_mbs,
+    ops_micro,
     ops_rates,
     ops_research,
     ops_risk,

@@ -400,3 +400,12 @@ Rulings `stage-j-rulings-curves.md` J-C-1 to J-C-9. No new error code; the gener
 ### Stage J wave 3 (contract 1.15.0)
 
 Rulings `stage-j-rulings-w3.md` J-W3-1 to J-W3-17. No new error code; page limits J-W3-14. Implemented in all four builds; the contract number 1.15.0 is shared with the curves lane (J-C-1, J-W3-1).
+
+## Stage H wave 2 operations
+
+No new error code. Prices, quantities and fees are decimal strings (HR-12); outputs are canonical JSON (HR-29). The specs' Errors lines give the page limits (`micro.book.rebuild` 50,000,000 messages, HR-17; `exec.sim.lit.run` 10,000,000 events), which replace the general per-array limit for those arrays. Goldens `datasets/golden/stage_h/ob_h.json` and `lit_h.json` (`oracle/python/gen_stage_h_w2.py`). Implemented in the Python build; the other builds are pending.
+
+| Prefix | Spec | Slice |
+|---|---|---|
+| `micro.book.rebuild` | `09-microstructure/order-book.md` | wave 2 (H-2) |
+| `exec.sim.lit.run` | `10-execution/lit-matching.md` | wave 2 (H-11); every output carries `label` "simulated venue; not a real exchange" |
