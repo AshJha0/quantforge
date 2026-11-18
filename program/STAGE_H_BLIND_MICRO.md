@@ -28,3 +28,4 @@ Process: `program/STAGE_H_BLIND_LANE.md` (DR-H2, HR-31).
 2. Error precedence was unstated; the blind notes flag it ("A case with both is untested"). New ruling HR-75 says `E_DOMAIN` is checked before `E_INPUT`, the order the blind lane also chose. That agreement is not evidence, because the case was untested. The new venue-analytics errors line cites HR-75, and golden venue_h-0008 was added.
 
 No spec golden value was wrong, and the blind lane made no value errors. No rerun.
+3. HR-75a (coordinator decision, 2026-11-18, after the implementation lane started) replaces HR-75 with the repo-wide order: structural `E_INPUT`, then `E_DOMAIN`. venue_h-0008 is now `E_INPUT`. mest_h-0006 is now `E_INPUT` (n = 2 is structural); its blind MATCH was under the old order and is no longer claimed, so the golden carries `hand` only.

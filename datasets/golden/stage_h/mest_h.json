@@ -1,0 +1,650 @@
+{
+ "schema_version": "1.0",
+ "suite": "mest_h",
+ "spec": "specifications/09-microstructure/micro-estimators.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_micro.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "mest_h-0001",
+   "operation": "micro.est.arrival_rate",
+   "inputs": {
+    "count": 12,
+    "window": 4.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lambda": 3.0,
+     "se": 0.8660254037844386
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH",
+    "mpmath 50 digits"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "mest_h-0001 from the spec table",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "mest_h-0002",
+   "operation": "micro.est.arrival_rate",
+   "inputs": {
+    "count": 12,
+    "window": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure",
+    "error"
+   ],
+   "description": "mest_h-0002 from the spec table"
+  },
+  {
+   "case_id": "mest_h-0003",
+   "operation": "micro.est.cancel_rate",
+   "inputs": {
+    "orders": [
+     {
+      "lifetime": 2.0,
+      "outcome": "CANCEL"
+     },
+     {
+      "lifetime": 3.0,
+      "outcome": "FILL"
+     },
+     {
+      "lifetime": 5.0,
+      "outcome": "CANCEL"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "theta": 0.2,
+     "se": 0.1414213562373095
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH",
+    "mpmath 50 digits"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "mest_h-0003 from the spec table",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "mest_h-0004",
+   "operation": "micro.est.cancel_rate",
+   "inputs": {
+    "orders": [
+     {
+      "lifetime": 3.0,
+      "outcome": "FILL"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure",
+    "error"
+   ],
+   "description": "mest_h-0004 from the spec table"
+  },
+  {
+   "case_id": "mest_h-0005",
+   "operation": "micro.est.resilience",
+   "inputs": {
+    "s_inf": 1.0,
+    "points": [
+     {
+      "t": 0.0,
+      "s": 5.0
+     },
+     {
+      "t": 1.0,
+      "s": 3.0
+     },
+     {
+      "t": 2.0,
+      "s": 2.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "kappa": 0.6931471805599453,
+     "se": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH",
+    "mpmath 50 digits"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "mest_h-0005 from the spec table",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "mest_h-0006",
+   "operation": "micro.est.resilience",
+   "inputs": {
+    "s_inf": 1.0,
+    "points": [
+     {
+      "t": 0.0,
+      "s": 5.0
+     },
+     {
+      "t": 1.0,
+      "s": 0.5
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure",
+    "error"
+   ],
+   "description": "mest_h-0006 from the spec table"
+  },
+  {
+   "case_id": "mest_h-0007",
+   "operation": "micro.est.liquidity_decay",
+   "inputs": {
+    "levels": [
+     {
+      "k": 0.0,
+      "depth": 800.0
+     },
+     {
+      "k": 1.0,
+      "depth": 400.0
+     },
+     {
+      "k": 2.0,
+      "depth": 200.0
+     },
+     {
+      "k": 3.0,
+      "depth": 100.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "alpha": 0.6931471805599453,
+     "se": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH",
+    "mpmath 50 digits"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "mest_h-0007 from the spec table",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "mest_h-0008",
+   "operation": "micro.est.adverse_selection",
+   "inputs": {
+    "x": [
+     1.0,
+     -1.0,
+     2.0
+    ],
+    "y": [
+     0.02,
+     -0.01,
+     0.05
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lambda_as": 0.021666666666666667,
+     "se": 0.0039086797998528575
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): SHAPE-ONLY, values identical",
+    "mpmath 50 digits"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "mest_h-0008 from the spec table",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "mest_h-0009",
+   "operation": "micro.est.regime_impact",
+   "inputs": {
+    "regimes": {
+     "calm": {
+      "x": [
+       1.0,
+       2.0
+      ],
+      "y": [
+       0.01,
+       0.02
+      ]
+     },
+     "stressed": {
+      "x": [
+       1.0,
+       -1.0,
+       1.0
+      ],
+      "y": [
+       0.05,
+       -0.03,
+       0.04
+      ]
+     }
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "regimes": {
+      "calm": {
+       "lambda_as": 0.01,
+       "se": 0.0
+      },
+      "stressed": {
+       "lambda_as": 0.04,
+       "se": 0.005773502691896258
+      }
+     },
+     "ratio": 4.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): SHAPE-ONLY, values identical",
+    "mpmath 50 digits"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "mest_h-0009 from the spec table",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "mest_h-0010",
+   "operation": "micro.est.passive_vs_aggressive",
+   "inputs": {
+    "passive": [
+     -1.0,
+     -0.5,
+     0.0
+    ],
+    "aggressive": [
+     1.0,
+     1.5,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 2.0,
+     "se": 0.408248290463863
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH",
+    "mpmath 50 digits"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "mest_h-0010 from the spec table",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "mest_h-0011",
+   "operation": "micro.est.passive_vs_aggressive",
+   "inputs": {
+    "passive": [
+     -1.0
+    ],
+    "aggressive": [
+     1.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure",
+    "error"
+   ],
+   "description": "mest_h-0011 from the spec table"
+  },
+  {
+   "case_id": "mest_h-0012",
+   "operation": "micro.est.arrival_rate",
+   "inputs": {
+    "count": 12,
+    "window": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN input (from mest_h-0001)"
+  },
+  {
+   "case_id": "mest_h-0013",
+   "operation": "micro.est.cancel_rate",
+   "inputs": {
+    "orders": [
+     {
+      "lifetime": "NaN",
+      "outcome": "CANCEL"
+     },
+     {
+      "lifetime": 3.0,
+      "outcome": "FILL"
+     },
+     {
+      "lifetime": 5.0,
+      "outcome": "CANCEL"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN input (from mest_h-0003)"
+  },
+  {
+   "case_id": "mest_h-0014",
+   "operation": "micro.est.resilience",
+   "inputs": {
+    "s_inf": 1.0,
+    "points": [
+     {
+      "t": 0.0,
+      "s": "NaN"
+     },
+     {
+      "t": 1.0,
+      "s": 3.0
+     },
+     {
+      "t": 2.0,
+      "s": 2.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN input (from mest_h-0005)"
+  },
+  {
+   "case_id": "mest_h-0015",
+   "operation": "micro.est.liquidity_decay",
+   "inputs": {
+    "levels": [
+     {
+      "k": 0.0,
+      "depth": "NaN"
+     },
+     {
+      "k": 1.0,
+      "depth": 400.0
+     },
+     {
+      "k": 2.0,
+      "depth": 200.0
+     },
+     {
+      "k": 3.0,
+      "depth": 100.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN input (from mest_h-0007)"
+  },
+  {
+   "case_id": "mest_h-0016",
+   "operation": "micro.est.adverse_selection",
+   "inputs": {
+    "x": [
+     "NaN",
+     -1.0,
+     2.0
+    ],
+    "y": [
+     0.02,
+     -0.01,
+     0.05
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN input (from mest_h-0008)"
+  },
+  {
+   "case_id": "mest_h-0017",
+   "operation": "micro.est.regime_impact",
+   "inputs": {
+    "regimes": {
+     "calm": {
+      "x": [
+       "NaN",
+       2.0
+      ],
+      "y": [
+       0.01,
+       0.02
+      ]
+     },
+     "stressed": {
+      "x": [
+       1.0,
+       -1.0,
+       1.0
+      ],
+      "y": [
+       0.05,
+       -0.03,
+       0.04
+      ]
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN input (from mest_h-0009)"
+  },
+  {
+   "case_id": "mest_h-0018",
+   "operation": "micro.est.passive_vs_aggressive",
+   "inputs": {
+    "passive": [
+     -1.0,
+     -0.5,
+     0.0
+    ],
+    "aggressive": [
+     "NaN",
+     1.5,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN input (from mest_h-0010)"
+  }
+ ]
+}

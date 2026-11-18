@@ -429,3 +429,18 @@ No new error code. Prices, quantities and fees are decimal strings (HR-12); outp
 | `exec.sim.dark.run` | `10-execution/dark-pool.md` | wave 2 (H-12); one run (`config`, `events`) or `scenarios`; every run carries `label` "simulated venue; not a real dark pool"; `events` up to 10,000,000 |
 | `exec.sim.dark.markouts` | `10-execution/dark-pool.md` (Adverse selection; name set by the H-12 lane, the spec names no verb) | wave 2 (H-12); each markout element carries `label` |
 | `exec.sor.allocate` | `10-execution/smart-order-router.md` | wave 2 (H-13); `method` default `SAMPLE_AVERAGE`; optional `ranking` (true adds the full ranking, grid at most 10^6 points) and `report_se` (adds `expected_cost_se` and `label` "simulated venues; router scored in simulation only"); `lit_samples` up to 1,000,000 |
+
+### Stage H wave 2: microstructure estimators (H-4b) and venue analytics (H-16)
+
+Rulings `stage-h-rulings-micro.md` HR-70 to HR-75a. No new error code. Unlike the other wave 2 operations, every number here is a JSON Real (the F-2 finite rule applies: a non-finite input is `E_DOMAIN`); `count` is an Integer. Outputs are binary64, compared to 1e-12 relative (1e-15 absolute at 0). Error order HR-75a: structural `E_INPUT`, then `E_DOMAIN`, then value-dependent `E_INPUT`. Goldens `datasets/golden/stage_h/mest_h.json` and `venue_h.json` (`oracle/python/gen_stage_h_micro.py`). Implemented in the Python build only; the Java, C++ and Rust builds answer `E_UNSUPPORTED_OPERATION`. The planted-truth simulations (HR-71) are Python tests, not operations.
+
+| Operation | Spec | Inputs | Outputs |
+|---|---|---|---|
+| `micro.est.arrival_rate` | `09-microstructure/micro-estimators.md` | `count` (Integer), `window` | `lambda`, `se` |
+| `micro.est.cancel_rate` | same | `orders` (array of `{lifetime, outcome}`, outcome `CANCEL` or `FILL`) | `theta`, `se` |
+| `micro.est.resilience` | same | `s_inf`, `points` (array of `{t, s}`) | `kappa`, `se` |
+| `micro.est.liquidity_decay` | same | `levels` (array of `{k, depth}`) | `alpha`, `se` |
+| `micro.est.adverse_selection` | same | `x`, `y` (equal-length arrays) | `lambda_as`, `se` |
+| `micro.est.regime_impact` | same | `regimes` (object, label to `{x, y}`; `calm` and `stressed` required) | `regimes` (label to `{lambda_as, se}`), `ratio` |
+| `micro.est.passive_vs_aggressive` | same | `passive`, `aggressive` (costs in bp) | `delta`, `se` |
+| `exec.venue.analytics` | `10-execution/venue-analytics.md` | `mids` (array of `{t, mid}`), `fills` (array of `{venue, side, quantity, price, t}`), `orders` (array of `{venue, sent, filled}`), `horizons` | `fill_rates` (venue to rate), `markouts` (array of `{venue, h, markout, markout_bps, toxicity}`, venues in code-point order, horizons in input order) |
