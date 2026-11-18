@@ -6,7 +6,7 @@ Version 1.0.0. Plan 11.2.6: governance in the style of SR 11-7, written before s
 
 **Use restriction for every model.** Research, education and conformance testing only. Do not use for trading, valuation of record, risk limits or regulatory capital. Nothing here is investment advice.
 
-Each model below gets one entry, the "page" the plan asks for. Outside-checked shares count stage D goldens by operation, from `oracle/outside_register.json` on 2026-11-07.
+Each model below gets one entry, the "page" the plan asks for. Outside-checked shares count stage D goldens by operation, from `oracle/outside_register.json` on 2026-11-07. The H-19 checks of 2026-11-18 are not in the index column yet: current stage D figures are in `oracle/OUTSIDE_SHARES.md` (451 of 521 value cases, 86.6%; 19 further H-19 agreements are spec-closed and counted as reimplementation, not as outside checks).
 
 ## Index
 
@@ -970,7 +970,7 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 
 ## Stage H (specified, not implemented)
 
-Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings HR-1 to HR-41). Status for every entry: Specified, not implemented; no code and no generated golden suite. The wave 1 specs (MH-6 to MH-10) already state their golden values, hand-derived and re-derived blind by a second lane (DR-H2, 2026-11-15), some also against figures printed in the papers; the wave 1b specs (MH-1 to MH-5) state a golden plan only. Each entry is re-dated when its operation lands.
+Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings HR-1 to HR-41; HR-42 to HR-55 for paper trading; HR-56 for wave 1 input rules). The wave 1 operations (MH-6 to MH-10, and use case 5) are implemented in all four languages on branch `stage-h` with a generated suite in `datasets/golden/stage_h/` (53 cases, each build 53 of 53, local, 2026-11-18); their outside check is a blind second-lane re-derivation or a printed paper figure (DR-H2), 21 of 29 value cases, no library. The wave 1b specs (MH-1 to MH-5) state a golden plan only and are not implemented. Each entry is re-dated when its operation lands.
 
 ### MH-1 Order book rebuild (stage H wave 1b)
 - **Purpose:** MBP book rebuilt from the Kraken v2 L2 feed, checksum, crossed, locked and gap counting (`micro.book.rebuild`, H-2).
@@ -1091,3 +1091,15 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Data lineage hash:** none yet (no golden suite; filled when the suite is generated).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/09-microstructure/avellaneda-stoikov.md`.
+
+### MH-11 Paper trading: ledger, book and pre-trade checks (stage H, H-21)
+- **Purpose:** a simulated paper book with a hash-chained append-only ledger, positions, cash, financing, daily P&L explain and pre-trade risk checks (`specifications/10-execution/paper-trading.md`).
+- **Inputs:** as in the spec page; decimal strings throughout (HR-44).
+- **Limitations:** simulated fills only; fill wiring to the lit, dark and router simulators (HR-47) and TCA per order (plan Q8k) not done; labelled "crypto venue; simulated"; never live orders (HR-42); the dashboard is stage K.
+- **Validation:** goldens `pt_h-0001` to `-0023` in the spec; the blind lane matched values on some and checked only the shape of others (SHAPE-ONLY is not an outside check). **Review:** 2026-11-18.
+- **Tier:** 3.
+- **Challenger:** `sha256sum` on the canonical bytes of `pt_h-0020`; blind re-derivation (DR-H2).
+- **Monitoring thresholds:** P&L explain residual not exactly zero (HR-53); a ledger record without the label fails `verify` (HR-43).
+- **Data lineage hash:** none yet (no generated golden suite).
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/paper-trading.md`.
