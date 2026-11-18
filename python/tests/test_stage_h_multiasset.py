@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
 from quantforge_core import multiasset as ma
 from quantforge_core.errors import QfError
 
@@ -73,9 +72,15 @@ def test_a3_rounding_never_more_aggressive() -> None:
         for _ in range(2000):
             p = Decimal(rng.randrange(1, 10**8)) / 10**5
             for side in ("BUY", "SELL"):
-                r = Decimal(ma.eq_round_price({"price": str(p), "side": side, "tick_tier": tier})["price"])
+                r = Decimal(
+                    ma.eq_round_price({"price": str(p), "side": side, "tick_tier": tier})["price"]
+                )
                 assert (r <= p) if side == "BUY" else (r >= p)
-                tick = Decimal("0.0001") if r < 1 else Decimal("0.005" if tier == "HALF_PENNY" else "0.01")
+                tick = (
+                    Decimal("0.0001")
+                    if r < 1
+                    else Decimal("0.005" if tier == "HALF_PENNY" else "0.01")
+                )
                 assert r % tick == 0 or r == 1
 
 
@@ -97,7 +102,9 @@ def test_a3_spot_date_good_and_at_least_t_plus_1() -> None:
         t = start + timedelta(days=rng.randrange(365))
         for pair in ("EURUSD", "USDJPY", "EURJPY", "USDCAD"):
             s = date.fromisoformat(
-                ma.fx_spot_date({"holidays": hol, "pair": pair, "trade_date": t.isoformat()})["spot_date"]
+                ma.fx_spot_date({"holidays": hol, "pair": pair, "trade_date": t.isoformat()})[
+                    "spot_date"
+                ]
             )
             assert s >= t + timedelta(days=1)
             for c in {pair[:3], pair[3:], "USD"}:
@@ -109,7 +116,9 @@ def test_a3_auction_volume_maximal() -> None:
     for _ in range(300):
         orders = [
             {
-                "limit": "MARKET" if rng.random() < 0.1 else f"{rng.randrange(990, 1011) / 100:.2f}",
+                "limit": "MARKET"
+                if rng.random() < 0.1
+                else f"{rng.randrange(990, 1011) / 100:.2f}",
                 "qty": rng.randrange(1, 500),
                 "side": rng.choice(("BUY", "SELL")),
             }
@@ -117,13 +126,27 @@ def test_a3_auction_volume_maximal() -> None:
         ]
         tie = rng.choice(("CBOE", "IEX"))
         out = ma.auction_uncross(
-            {"orders": orders, "phase": "OPEN", "ref_price": "10.00", "tick_size": "0.01", "tie_break": tie}
+            {
+                "orders": orders,
+                "phase": "OPEN",
+                "ref_price": "10.00",
+                "tick_size": "0.01",
+                "tie_break": tie,
+            }
         )
         best = 0
         for k in range(990, 1011):
             p = Decimal(k) / 100
-            b = sum(o["qty"] for o in orders if o["side"] == "BUY" and (o["limit"] == "MARKET" or Decimal(o["limit"]) >= p))
-            s = sum(o["qty"] for o in orders if o["side"] == "SELL" and (o["limit"] == "MARKET" or Decimal(o["limit"]) <= p))
+            b = sum(
+                o["qty"]
+                for o in orders
+                if o["side"] == "BUY" and (o["limit"] == "MARKET" or Decimal(o["limit"]) >= p)
+            )
+            s = sum(
+                o["qty"]
+                for o in orders
+                if o["side"] == "SELL" and (o["limit"] == "MARKET" or Decimal(o["limit"]) <= p)
+            )
             best = max(best, min(b, s))
         has_limit = any(o["limit"] != "MARKET" for o in orders)
         assert out["volume"] == (best if has_limit else 0)
@@ -140,7 +163,11 @@ def test_a3_auction_volume_maximal() -> None:
             o = _ids(orders)[fl["id"]]
             if o["limit"] != "MARKET":
                 lim = Decimal(o["limit"])
-                assert Decimal(fl["price"]) <= lim if o["side"] == "BUY" else Decimal(fl["price"]) >= lim
+                assert (
+                    Decimal(fl["price"]) <= lim
+                    if o["side"] == "BUY"
+                    else Decimal(fl["price"]) >= lim
+                )
 
 
 def _ids(orders: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
@@ -160,10 +187,42 @@ def _ids(orders: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
 
 def test_fut_run_reuses_lit_engine() -> None:
     ev = [
-        {"id": "S1", "op": "NEW", "price": "110-16", "qty": "3", "side": "SELL", "trader": "M", "type": "LIMIT"},
-        {"id": "B1", "op": "NEW", "price": "110-16", "qty": "3", "side": "BUY", "trader": "P", "type": "LIMIT"},
-        {"id": "S2", "op": "NEW", "price": "110-17+", "qty": "3", "side": "SELL", "trader": "P", "type": "LIMIT"},
-        {"id": "B2", "op": "NEW", "price": "110-17+", "qty": "3", "side": "BUY", "trader": "N", "type": "LIMIT"},
+        {
+            "id": "S1",
+            "op": "NEW",
+            "price": "110-16",
+            "qty": "3",
+            "side": "SELL",
+            "trader": "M",
+            "type": "LIMIT",
+        },
+        {
+            "id": "B1",
+            "op": "NEW",
+            "price": "110-16",
+            "qty": "3",
+            "side": "BUY",
+            "trader": "P",
+            "type": "LIMIT",
+        },
+        {
+            "id": "S2",
+            "op": "NEW",
+            "price": "110-17+",
+            "qty": "3",
+            "side": "SELL",
+            "trader": "P",
+            "type": "LIMIT",
+        },
+        {
+            "id": "B2",
+            "op": "NEW",
+            "price": "110-17+",
+            "qty": "3",
+            "side": "BUY",
+            "trader": "N",
+            "type": "LIMIT",
+        },
     ]
     out = ma.fut_run({"contract": {"symbol": "ZN"}, "events": ev, "fee_per_contract": "1.00"})
     assert out["label"] == ma.RATES_LABEL
@@ -175,15 +234,26 @@ def test_fut_run_reuses_lit_engine() -> None:
 
 
 def test_more_paths() -> None:
-    assert ma.eq_round_price({"price": "5", "side": "BUY", "data_source": "IEX"})["label"] == ma.IEX_LABEL
-    assert ma.eq_fee_check({"price": "20", "taker_fee": "0.01", "cap_check": False})["cap"] == "0.001"
-    assert ma.rates_bond_price({"coupon": "0", "frequency": 1, "periods": 1, "yield": "0"})["price"] == "100"
+    assert (
+        ma.eq_round_price({"price": "5", "side": "BUY", "data_source": "IEX"})["label"]
+        == ma.IEX_LABEL
+    )
+    assert (
+        ma.eq_fee_check({"price": "20", "taker_fee": "0.01", "cap_check": False})["cap"] == "0.001"
+    )
+    assert (
+        ma.rates_bond_price({"coupon": "0", "frequency": 1, "periods": 1, "yield": "0"})["price"]
+        == "100"
+    )
     assert ma.fut_variation(
         {"price": "110-00", "qty": 2, "settlements": ["110-01", "110-00"], "side": "SELL"}
-    )["variation_margin"] == ["-31.25", "31.25"]
-    assert ma.fx_spot_date({"pair": "USDCAD", "trade_date": "2026-11-25", "holidays": {"USD": ["2026-11-26"]}})[
-        "spot_date"
-    ] == "2026-11-27"
+    )["variation_margin"] == ["-62.5", "62.5"]
+    assert (
+        ma.fx_spot_date(
+            {"pair": "USDCAD", "trade_date": "2026-11-25", "holidays": {"USD": ["2026-11-26"]}}
+        )["spot_date"]
+        == "2026-11-27"
+    )
     for bad, code in (
         ({"price": "1", "side": "BUY", "tick_table": [["1", "0.01"]]}, "E_INPUT"),
         ({"price": "1", "side": "BUY", "tick_table": [["0", "0"]]}, "E_DOMAIN"),

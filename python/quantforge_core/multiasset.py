@@ -16,6 +16,7 @@ import re
 from collections.abc import Callable
 from datetime import date, timedelta
 from decimal import ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_EVEN, Decimal, localcontext
+from itertools import pairwise
 from typing import Any
 
 from . import lit_matching
@@ -176,7 +177,7 @@ def _tick_table(raw: dict[str, Any]) -> list[tuple[Decimal, Decimal]]:
         if not isinstance(r, list) or len(r) != 2:
             raise QfError("E_SCHEMA", f"tick_table/{k}: not a [floor, tick] pair", "tick_table")
         rows.append((input_dec(r[0], f"tick_table/{k}/0"), input_dec(r[1], f"tick_table/{k}/1")))
-    if not rows or rows[0][0] != 0 or any(a[0] >= b[0] for a, b in zip(rows, rows[1:])):
+    if not rows or rows[0][0] != 0 or any(a[0] >= b[0] for a, b in pairwise(rows)):
         raise QfError("E_INPUT", "tick_table: floors must start at 0 and increase", "tick_table")
     if any(t <= 0 for _, t in rows):
         raise QfError("E_DOMAIN", "tick_table: ticks must be positive", "tick_table")
@@ -242,9 +243,9 @@ def _add_good(d: date, n: int, ok: Callable[[date], bool]) -> date:
 
 
 ROUND_LOTS_CURRENT = (  # amended Reg NMS 242.600(b)(93), source check 2026-11-18 (retry)
-    (Decimal("250"), 100),
-    (Decimal("1000"), 40),
-    (Decimal("10000"), 10),
+    (Decimal(250), 100),
+    (Decimal(1000), 40),
+    (Decimal(10000), 10),
 )
 
 
@@ -272,7 +273,10 @@ def eq_settle_date(raw: dict[str, Any]) -> dict[str, Any]:
     hol = _dates(raw.get("holidays", []), "holidays")
     if not 0 <= lag <= 30:
         raise QfError("E_DOMAIN", "settle_lag outside 0..30", "settle_lag")
-    return {"label": label, "settle_date": _add_good(trade, lag, lambda d: _good(d, hol)).isoformat()}
+    return {
+        "label": label,
+        "settle_date": _add_good(trade, lag, lambda d: _good(d, hol)).isoformat(),
+    }
 
 
 # ------------------------------------------------------------------ equity auction (HR-84, HR-96, HR-101)
@@ -336,12 +340,12 @@ def auction_uncross(raw: dict[str, Any]) -> dict[str, Any]:
         n = int((hi - lo) / tick) + 1
         if n > MAX_CANDIDATES:
             raise QfError("E_LIMIT", "more than 1,000,000 candidate prices", "orders")
-        cands = []
+        cands: list[tuple[Decimal, int, int]] = []
         for i in range(n):
-            p = lo + i * tick
-            b = sum(x[3] for x in buys if x[2] is None or x[2] >= p)
-            s = sum(x[3] for x in sells if x[2] is None or x[2] <= p)
-            cands.append((p, min(b, s), b - s))
+            px = lo + i * tick
+            b = sum(x[3] for x in buys if x[2] is None or x[2] >= px)
+            s = sum(x[3] for x in sells if x[2] is None or x[2] <= px)
+            cands.append((px, min(b, s), b - s))
         vmax = max(v for _, v, _ in cands)
         if vmax > 0:
             keep = [c for c in cands if c[1] == vmax]
@@ -368,14 +372,21 @@ def auction_uncross(raw: dict[str, Any]) -> dict[str, Any]:
             q = min(qty, left)
             if q > 0:
                 assert price is not None
-                fills.append({"id": oid, "price": _at(price, places), "qty": q, "side": "B" if buy else "S"})
+                fills.append(
+                    {"id": oid, "price": _at(price, places), "qty": q, "side": "B" if buy else "S"}
+                )
                 left -= q
             if qty - q > 0:
                 if limit is None or on_close:
                     cancelled.append(oid)
                 else:
                     residual.append(
-                        {"id": oid, "limit": _at(limit, places), "qty": qty - q, "side": "B" if buy else "S"}
+                        {
+                            "id": oid,
+                            "limit": _at(limit, places),
+                            "qty": qty - q,
+                            "side": "B" if buy else "S",
+                        }
                     )
     return {
         "cancelled": cancelled,
@@ -512,7 +523,9 @@ def parse_32nds(text: Any, path: str = "text") -> Decimal:
     ff = int(m.group(2))
     if ff > 31:
         raise QfError("E_DOMAIN", f"{path}: 32nds above 31", path)
-    return check_range(Decimal(int(m.group(1))) + (ff + Decimal(_EIGHTHS[m.group(3)]) / 8) / 32, path)
+    return check_range(
+        Decimal(int(m.group(1))) + (ff + Decimal(_EIGHTHS[m.group(3)]) / 8) / 32, path
+    )
 
 
 def format_32nds(x: Decimal, resolution: int) -> str:
@@ -594,7 +607,7 @@ def rates_bill_price(raw: dict[str, Any]) -> dict[str, Any]:
     days = _int(raw, "days")
     if not 0 <= days <= 366:
         raise QfError("E_DOMAIN", "days outside 0..366", "days")
-    return {"label": RATES_LABEL, "price": _price9(_c(100 * (1 - d * days / 360)))}
+    return {"label": RATES_LABEL, "price": _price9(100 * (1 - d * days / 360))}
 
 
 def _fut_ticks(v: Any, tick: Decimal, path: str) -> int:
@@ -680,7 +693,11 @@ def fut_run(raw: dict[str, Any]) -> dict[str, Any]:
         e = dict(_obj(e, f"events/{k}"))
         if isinstance(e.get("price"), str):
             e["price"] = fmt(_fut_ticks(e["price"], tick, f"events/{k}/price") * tick)
-        if e.get("op") == "NEW" and isinstance(e.get("id"), str) and isinstance(e.get("trader"), str):
+        if (
+            e.get("op") == "NEW"
+            and isinstance(e.get("id"), str)
+            and isinstance(e.get("trader"), str)
+        ):
             trader[e["id"]] = e["trader"]
         mapped.append(e)
     zero = {"maker_rebate": "0", "taker_fee": "0"}
@@ -690,7 +707,9 @@ def fut_run(raw: dict[str, Any]) -> dict[str, Any]:
     cash: dict[str, Decimal] = {}
     fees: dict[str, Decimal] = {}
     last: Decimal | None = None
-    buyer: dict[str, bool] = {e["id"]: e.get("side") == "BUY" for e in mapped if e.get("op") == "NEW"}
+    buyer: dict[str, bool] = {
+        e["id"]: e.get("side") == "BUY" for e in mapped if e.get("op") == "NEW"
+    }
     for f in out["fills"]:
         p, q = Decimal(f["price"]), Decimal(f["qty"])
         last = p
