@@ -310,3 +310,7 @@ TOTALS: 15518 value 7654 error 5350 invariance 2514
 After J-W3-21 (`fuzzfix_j-0048` to `-0050`: 2 value, 1 error; CIR noncentral chi-square at a tiny expiry, 2026-11-17):
 
 TOTALS: 15521 value 7656 error 5351 invariance 2514
+
+Stage H wave 1 oracle lane (2026-11-18, `gen_stage_h_w1.py`, folder `stage_h`): `sched_h` 9, `ac_h` 7, `imp_h` 6, `tca_h` 5, `as_h` 7, `uc5_h` 8 (42: 27 value, 15 error).
+
+TOTALS: 15563 value 7683 error 5366 invariance 2514

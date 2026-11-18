@@ -21,6 +21,8 @@ Inputs `quantity` X, `horizon` T, `resilience` rho (> 0). Outputs `initial_block
 | imp_h-0002 | Q = 4e5, rest as 0001 | 0.004 | four times Q, twice the impact |
 | imp_h-0003 | X = 1,000, T = 1, rho = 8 | blocks 100 and 100, rate 800 | 1000/10; 8 x 1000/10 ([OW13] eq. (31)) |
 | imp_h-0004 | X = 100,000, T = 1, rho = 2.231 | blocks 23,635.0744504845 each, rate 52,729.8510990310 | [OW13] eq. (31) with the Fig. 2 parameters; 1e5 / 4.231; 2.231e5 / 4.231 (mpmath) |
+| imp_h-0005 | V = 0, rest as 0001 | `E_DOMAIN` | V <= 0; added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
+| imp_h-0006 | X = 1,000, T = 1, rho = 0 | `E_DOMAIN` | rho must be > 0; added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
 
 Property test: as rho -> 0 each block tends to X/2 (follows directly from [OW13] eq. (31)).
 

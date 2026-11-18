@@ -35,6 +35,8 @@ P: X = 1e6, T = 5, N = 5 (tau = 1), sigma = 0.95, epsilon = 0.0625, eta = 2.5e-6
 | ac_h-0003 | gamma = 2 eta / tau | `E_DOMAIN` | eta_tilde = 0 |
 | ac_h-0004 | P with N = 1 (so tau = T = 5), lambda = 1e-6 | holdings [1e6, 0]; E = 562,500 | E = 1/2 gamma X^2 + epsilon X + eta_tilde X^2 / T = 125,000 + 62,500 + 375,000. Here eta_tilde = eta - gamma tau / 2 depends on tau: with tau = 5, eta_tilde = 2.5e-6 - 2.5e-7 x 5 / 2 = 1.875e-6, not the 2.375e-6 of the P line (which holds for tau = 1); reusing 2.375e-6 would give 662,500. Lambda (1e-6) does not change the single-trade holdings or E; it only enters kappa (about 0.527 here), which is not asserted. Blind re-derived (DR-H2) |
 | ac_h-0005 | P, lambda = 1e-6 | kappa = 0.6070761632 (as ac_h-0002); kappa T = 3.0353808 | OUTSIDE-CHECKED against printed figures, [AC00] p. 24: "kappa about 0.6/day, so kappa T about 3". Agreement to the one significant figure printed; the paper's figure comes from approximation (19), sqrt(lambda sigma^2 / eta) = 0.6008, so the test tolerance is 0.05 on kappa and 0.25 on kappa T |
+| ac_h-0006 | `exec.ac.frontier`, P, lambdas [0, 5e-7, 1e-6, 2e-6] | E non-decreasing, V non-increasing; points 1 and 3 equal ac_h-0001, ac_h-0002 | added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
+| ac_h-0007 | P with N = 0 | `E_INPUT` | N < 1; added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
 
 ## Property tests
 Trades sum to X to 1e-12 relative; for lambda > 0 holdings lie strictly below linear; as tau -> 0, kappa tends to `sqrt(lambda sigma^2 / eta)` ([AC00] eq. (19), p. 15).
