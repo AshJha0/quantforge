@@ -17,6 +17,7 @@ mod lmm;
 mod mbs;
 mod mcgreeks;
 mod micro;
+mod paper;
 mod rates;
 mod repo;
 mod research;
@@ -92,6 +93,7 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("micro", execution::micro::NAMES, execution::micro::dispatch),
     ("micro", micro::rebuild::NAMES, micro::rebuild::dispatch),
     ("micro", micro::est::NAMES, micro::est::dispatch),
+    ("paper", paper::NAMES, paper::dispatch),
     ("rates", rates::NAMES, rates::dispatch),
     ("rates", shortrate::NAMES, shortrate::dispatch),
     ("rates", lmm::NAMES, lmm::dispatch),
