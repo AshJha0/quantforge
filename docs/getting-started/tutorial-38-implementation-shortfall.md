@@ -39,6 +39,7 @@ for case, side, fees in (("tca_h-0001", "BUY", 5.0), ("tca_h-0002", "SELL", 0.0)
     d, e, o, t, bp = shortfall(side, 100.0, 100.10, 101.0, 1000, fills, fees)
     tail = f"  ({bp:.1f} bp)" if side == "BUY" else ""
     print(f"{case} {side}: delay {d:.2f}  execution {e:.2f}  opportunity {o:.2f}  total {t:.2f}{tail}")
+    print(f"  parts sum to the total: {abs(d + e + o + fees - t) < 1e-10}")
 try:
     shortfall("BUY", 100.0, 100.10, 101.0, 1000, fills + [(400, 100.4)], 0.0)
 except ValueError as err:
@@ -50,7 +51,9 @@ Output (CI checks these lines):
 <!-- tutorial:expect -->
 ```text
 tca_h-0001 BUY: delay 80.00  execution 100.00  opportunity 200.00  total 385.00  (38.5 bp)
+  parts sum to the total: True
 tca_h-0002 SELL: delay -80.00  execution -100.00  opportunity -200.00  total -380.00
+  parts sum to the total: True
 tca_h-0003 overfill: E_INPUT: fills exceed the order
 ```
 
