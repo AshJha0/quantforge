@@ -188,7 +188,7 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 | CS01 | The change in value for a 1 bp move in credit spread, taken here as half the difference of two repricings with hazards bumped by `±1e-4/(1 − R)` (ruling I-15) |
 | Jump to default (JTD) | The loss or gain if the reference name defaults now: `(1 − R) − pv` per unit of bought protection (ruling I-16) |
 | Correlation01 | The change in value per 0.01 of correlation (ruling I-18) |
-| Market impact | A cost that grows with trade size, here quadratic in the traded amount (`hedge-costs-and-frontier.md`) |
+| Quadratic cost (stage I) | The hedge solver's impact charge, quadratic in the traded amount (`hedge-costs-and-frontier.md`); one of three impact forms, see Market impact under Stage H terms |
 | Risk-against-cost frontier | The hedges that minimise risk plus a cost weight times cost, traced over a list of weights (`hedge.frontier.solve`) |
 | Dollar offset | Minus the sum of the hedge's value changes over the sum of the hedged item's changes; 1 is a perfect offset, and it swings widely when the item's total change is small (`hedge.effectiveness`, `08-hedging/dynamic-hedge-and-effectiveness.md`) |
 | Implementation shortfall | Execution cost against the decision price plus the opportunity cost of the unfilled quantity, `(Q − q_f)(final_price − d)` (`hedge.slippage.report`, ruling I-36) |
@@ -251,6 +251,48 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 | Liquidity cost curve | Cost per unit of liquidating an order evenly over a horizon: half spread plus impact `Y sigma (Q/(V h))^delta` plus timing risk `z sigma sqrt(h/3)` (`liq.curve.cost`, `10-execution/liquidity-curve.md`) |
 | Square-root law | Market impact proportional to volatility times the square root of order size over daily volume, with a coefficient of order one (Toth et al. 2011) |
 | Optimal liquidation horizon | The horizon that minimises impact plus timing risk on the liquidity cost curve, in closed form `(2 delta a / b)^(1/(delta + 1/2))` (J-C-8) |
+
+## Stage H terms
+
+Stage H (v0.10.0, execution and microstructure) is specified but not merged; these terms are defined as its specs use them (`specifications/09-microstructure/`, `specifications/10-execution/`).
+
+| Term | Meaning |
+|---|---|
+| Market impact | The price move caused by your own trading. QuantForge has three forms: a quadratic cost in the traded amount (stage I hedge solver), the square-root law for the average move over an order (`exec.impact.sqrt`), and transient impact that decays as the book refills (`exec.impact.ow_optimal`). They answer different questions and are not interchangeable |
+| Temporary and permanent impact | Temporary impact affects only the trade that causes it and then fades; permanent impact shifts the price for all later trades (Almgren-Chriss `eta` and `gamma`) |
+| Square-root law (stage H) | `I = Y sigma sqrt(Q / V)`, [TLD11] eq. (1); `Y` is an input, labelled assumed (HR-10). See also the stage J entry |
+| Transient impact | Impact that decays over time after trading, as in Obizhaeva-Wang's block-shaped book with resilience |
+| Resilience | The rate `rho` at which the book refills after a trade (Obizhaeva-Wang); the optimal blocks are `X / (rho T + 2)` |
+| TWAP | Time-weighted average price schedule: equal slices per time bucket (`exec.schedule.twap`) |
+| VWAP | Volume-weighted average price schedule: slices in proportion to an expected volume profile, given as an input (`exec.schedule.vwap`) |
+| POV | Percentage-of-volume schedule: trade a fixed share `p` of all volume, own fills included, so the child is `p v / (1 - p)` against outside volume `v` (HR-4) |
+| Participation rate | Your share of total traded volume in a bucket, own fills included (DR-H4) |
+| Parent and child orders | The whole order to be worked, and the slices sent to the market |
+| Implementation shortfall (stage H) | Delay plus execution plus opportunity cost plus fees, against the decision price (`exec.tca.shortfall`, Perold split, HR-8). Same idea as the stage I entry, with the delay part added |
+| Decision price | The price when the decision to trade was made; the paper portfolio trades at it |
+| Arrival price | The price when the order reached the market |
+| Delay cost | `s Q (P_0 - P_d)`: the move between decision and arrival, on the filled quantity |
+| Opportunity cost | `s (X - Q)(P_c - P_d)`: the move on the part never filled |
+| Almgren-Chriss | Optimal execution with linear impact and a mean-variance objective; holdings decay like `sinh(kappa (T - t)) / sinh(kappa T)` ([AC00]) |
+| Risk aversion (execution) | `lambda` in `E + lambda V`; 0 gives the straight-line schedule |
+| Efficient frontier (execution) | Expected cost against variance of the optimal schedules over `lambda` (`exec.ac.frontier`) |
+| MBP and MBO | Market by price (quantity per price level) and market by order (each order in its queue). The recorded Kraken feed is MBP; MBO exists only in the simulated venues |
+| Price-time priority | Best price first, then earliest arrival at that price (FIFO) |
+| Queue position | How much quantity is ahead of an order at its price; it decides whether a passive order fills |
+| IOC and FOK | Immediate-or-cancel: fill what you can now, cancel the rest. Fill-or-kill: fill in full now or not at all |
+| Iceberg order | Shows part of its size; each refill joins the back of the queue (CME FIFO rule) |
+| Post-only | A limit order that must not trade on arrival; rejected if it would cross (HR-26) |
+| Pegged order | An order whose price follows a reference, the mid (PEG_MID) or the same-side best (PEG_PRIMARY) |
+| Midpoint cross | A dark-pool trade at the lit market's mid |
+| Minimum quantity | The smallest fill an order accepts, applied per fill (HR-33) |
+| Conditional order | A dark order that rests without commitment and must firm up when invited (HR-34) |
+| Smart order router | Splits an order across venues to minimise expected cost including fees, rebates and fill risk (`exec.sor.allocate`, Cont-Kukanov model) |
+| Markout | The move of the mid after a fill, signed so that positive is good for the trader, in bp at fixed horizons |
+| Fill rate | Filled quantity over submitted quantity |
+| Adverse selection | Fills that come more often just before the price moves against you; measured by markouts |
+| Toxicity | Informally, how much adverse selection a venue's flow carries |
+| Reservation price | The price at which a market maker is indifferent to one more unit, `s - q gamma sigma^2 (T - t)` ([AS08] eq. (29)) |
+| Book checksum | Kraken's CRC32 of the top 10 levels per side, used to check a rebuilt book against the venue |
 
 ## Tutorial terms
 

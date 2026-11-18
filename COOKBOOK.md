@@ -873,3 +873,67 @@ uv run --project python quantforge run < examples/liq_curve_cost_j.json
 Worked example. 5 bp half spread, `sigma` 2 %, `V` 10 million, `z = 1.645`: for 1,000,000 shares `"optimal_horizon"` 0.3330 days and `"min_cost"` 0.0224 (224 bp). Parameters are assumed, not calibrated.
 
 To check the suites: `python conformance/runner/runner.py --impl python --suite termfin_j` (or `liqcurve_j`).
+
+## Stage H recipes (available from v0.10.0)
+
+Stage H is specified (spec version 0.1.0, confirmed 2026-11-18) but not merged, so none of these commands runs yet and no output below was produced by a build. Each request copies the inputs of the named golden case, and the expected outputs are that case's values in the spec. Once merged, send a request with `quantforge batch` (one JSON object per line, as in [Batch mode](#batch-mode)). [Tutorials 36 to 40](docs/getting-started/README.md) check the same numbers today with a standard-library script.
+
+| Task | Operation | From golden | Expected |
+|---|---|---|---|
+| Schedule an order at 20 % of volume | `exec.schedule.pov` | `sched_h-0005` | slices `[250, 500, 250]`, residual 0 |
+| Almgren-Chriss trajectory for a given risk aversion | `exec.ac.trajectory` | `ac_h-0002` | `kappa` 0.6070761632, `expected_cost` 911,226.986 |
+| Shortfall decomposition of a fill list | `exec.tca.shortfall` | `tca_h-0001` | delay 80, execution 100, opportunity 200, total 385 (38.5 bp) |
+| Impact estimate for a size | `exec.impact.sqrt` | `imp_h-0001` | 0.002 |
+| Inventory-aware quotes | `micro.mm.as_quotes` | `as_h-0001` | reservation 99.2, bid 98.3546147886, ask 100.0453852114 |
+
+### Schedule an order
+
+Plain idea: cut the parent order into child slices. Formally (`specifications/10-execution/schedules.md`, HR-3, HR-4): POV child `i = min(remaining, p v_i / (1 - p))`, floored in whole units.
+
+```json
+{"operation": "exec.schedule.pov", "inputs": {"quantity": 1000, "participation": 0.2, "market_volume": [1000, 2000, 4000], "mode": "UNITS"}}
+```
+
+### Almgren-Chriss trajectory
+
+```json
+{"operation": "exec.ac.trajectory", "inputs": {"quantity": 1000000, "horizon": 5, "n_steps": 5, "sigma": 0.95, "epsilon": 0.0625, "eta": 2.5e-6, "gamma": 2.5e-7, "risk_aversion": 1e-6}}
+```
+
+For the frontier, send `exec.ac.frontier` with `risk_aversions` as a list; `E` must not fall and `V` must not rise along it.
+
+### Shortfall of a fill list
+
+```json
+{"operation": "exec.tca.shortfall", "inputs": {"side": "BUY", "decision_price": 100, "arrival_price": 100.10, "end_price": 101, "order_quantity": 1000, "fills": [[600, 100.20], [200, 100.30]], "fees": 5}}
+```
+
+### Impact for a size
+
+```json
+{"operation": "exec.impact.sqrt", "inputs": {"quantity": 100000, "daily_volume": 10000000, "daily_vol": 0.02, "coefficient": 1}}
+```
+
+`coefficient` is an assumption (HR-10); the default is 1.
+
+### Quotes for an inventory
+
+```json
+{"operation": "micro.mm.as_quotes", "inputs": {"mid": 100, "inventory": 2, "risk_aversion": 0.1, "sigma": 2, "time_left": 1, "k": 1.5}}
+```
+
+### Rebuild a book from a recorded file and check it
+
+`micro.book.rebuild` takes the recorded messages as decimal strings, the subscribed depth (100 for days from 2026-11-17 20:15 UTC) and the pair's decimals, and returns the final book with counts of checksum failures, crossed and locked books and gaps (`specifications/09-microstructure/order-book.md`). Checksum failures are counted, not errors. No golden values are fixed yet beyond the venue's own checksum example (`ob_h-0001`, planned). Results are labelled "crypto venue; not equities or rates".
+
+### Replay an order sequence through the engine
+
+`exec.sim.lit.run` takes `tick_size`, `lot_size`, a list of `NEW`, `CANCEL` and `MODIFY` events and a fee schedule, and returns fills, rejects, the final book and fees (`specifications/10-execution/lit-matching.md`). Output is labelled "simulated venue; not a real exchange". Goldens `lit_h-0001` to `0009` are planned, one per order type.
+
+### Run the router against single-venue routing
+
+`exec.sor.allocate` returns the market and limit split per venue (`specifications/10-execution/smart-order-router.md`). The comparison against single-venue routing runs on 10,000 simulated parent orders with seed 20261117 and is a simulated result only (HR-40). See [Simulators](docs/simulators/README.md).
+
+### Record and refresh the crypto feed
+
+`python tools/recorder/crypto_l2.py --symbols BTC/USD ETH/USD` records Kraken's public book at 100 levels and trades to local files, never to git. See [Recorded feeds](docs/data/recorded-feeds.md) for terms, depth by date and what may be published.

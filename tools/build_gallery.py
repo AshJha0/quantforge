@@ -253,7 +253,18 @@ CURVES = {
 # Stage D curves are in STAGE_D below, each with a planned page.
 # Each row: name, stage, evidence (a Planned row's evidence starts "Planned"). A Planned row must not name an operation that exists in
 # specifications/name-map.json; tools/test_tools.py and quality_gate check this against the README table.
-PLANNED = []
+# Stage H curves: hand-written pages from the spec goldens until the operations are merged in all four builds,
+# then generated like the others. Evidence starts "Planned" so tools/check_docs_status.py treats them as planned.
+PLANNED = [
+    ["[Almgren-Chriss efficient frontier](ac-frontier.md)", "H",
+     "Planned; specified, 5 golden cases for `exec.ac.trajectory` in the spec (1 against the paper's printed figure, 3 blind re-derived), available from v0.10.0"],
+    ["[Market impact curves: square-root and Obizhaeva-Wang](impact-curves.md)", "H",
+     "Planned; specified, 4 golden cases for `exec.impact.sqrt` and `exec.impact.ow_optimal` in the spec (all blind re-derived), available from v0.10.0"],
+    ["[Intraday volume profile (VWAP input)](volume-profile.md)", "H",
+     "Planned; specified, 3 golden cases for `exec.schedule.vwap` in the spec (blind re-derived), available from v0.10.0"],
+    ["[Walk-the-book cost curves (crypto venue, recorded)](walk-the-book.md)", "H",
+     "Planned; research item H-1(b), no result yet; crypto venue, not equities or rates; aggregates only"],
+]
 
 # Stage D curves. Each gets a page: a planned page until `cli` names a CLI operation and a renderer
 # is registered for its `kind`, then the renderer's page. Text here is plain description, no numbers.

@@ -970,13 +970,13 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 
 ## Stage H (specified, not implemented)
 
-Draft entries for the stage H specs on branch h-spec-w1b (2026-11-17). Status for every entry: Specified, not implemented; no goldens, no code. Each entry is re-dated when its operation lands.
+Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings HR-1 to HR-41). Status for every entry: Specified, not implemented; no code and no generated golden suite. The wave 1 specs (MH-6 to MH-10) already state their golden values, hand-derived and re-derived blind by a second lane (DR-H2, 2026-11-15), some also against figures printed in the papers; the wave 1b specs (MH-1 to MH-5) state a golden plan only. Each entry is re-dated when its operation lands.
 
 ### MH-1 Order book rebuild (stage H wave 1b)
 - **Purpose:** MBP book rebuilt from the Kraken v2 L2 feed, checksum, crossed, locked and gap counting (`micro.book.rebuild`, H-2).
 - **Inputs:** as in the spec page.
-- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** the venue's CRC32 checksum on every recorded message or row.
 - **Monitoring thresholds:** any checksum failure on a form B row with `ok = true`, or any form A failure.
@@ -987,8 +987,8 @@ Draft entries for the stage H specs on branch h-spec-w1b (2026-11-17). Status fo
 ### MH-2 Low-latency order book (stage H wave 1b)
 - **Purpose:** the same book as MH-1 built for speed; per-message latency, allocation-free hot path, CI regression gate (H-9).
 - **Inputs:** as in the spec page.
-- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** MH-1 (Python reference) on the same stream, exact `top(100)` equality.
 - **Monitoring thresholds:** p99 above the CI threshold of HR-24, or any steady-state allocation in C++ or Rust.
@@ -999,8 +999,8 @@ Draft entries for the stage H specs on branch h-spec-w1b (2026-11-17). Status fo
 ### MH-3 Simulated lit matching engine (stage H wave 1b)
 - **Purpose:** price-time matching with limit, market, IOC, FOK, iceberg, post-only and pegged orders (`exec.sim.lit.run`).
 - **Inputs:** as in the spec page.
-- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** the Python oracle against each ported build; invariants (no crossed book, quantity conserved, FIFO).
 - **Monitoring thresholds:** any invariant break in the property tests.
@@ -1011,8 +1011,8 @@ Draft entries for the stage H specs on branch h-spec-w1b (2026-11-17). Status fo
 ### MH-4 Simulated dark pool (stage H wave 1b)
 - **Purpose:** midpoint crossing, minimum quantity, conditionals, fill probability and markouts (`exec.sim.dark.run`).
 - **Inputs:** as in the spec page.
-- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** Monte Carlo of the same model for the Laplace-inversion fill probability; lifelines for Kaplan-Meier.
 - **Monitoring thresholds:** planted leakage not recovered within 3 SE.
@@ -1023,8 +1023,8 @@ Draft entries for the stage H specs on branch h-spec-w1b (2026-11-17). Status fo
 ### MH-5 Smart order router (stage H wave 1b)
 - **Purpose:** Cont-Kukanov split across simulated lit and dark venues (`exec.sor.allocate`), scored against single-venue routing.
 - **Inputs:** as in the spec page.
-- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** `SAMPLE_AVERAGE` against `STOCHASTIC_APPROX` and Prop. 3 closed form.
 - **Monitoring thresholds:** router split outside 3 SE of the planted optimum.
@@ -1035,8 +1035,8 @@ Draft entries for the stage H specs on branch h-spec-w1b (2026-11-17). Status fo
 ### MH-6 Almgren-Chriss trajectory and frontier (stage H wave 1)
 - **Purpose:** optimal liquidation trajectory and efficient frontier (`exec.ac.trajectory`, `exec.ac.frontier`).
 - **Inputs:** as in the spec page.
-- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** golden values written in the spec, blind re-derived (DR-H2); no generated suite yet. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** blind re-derivation (DR-H2) and printed [AC00] figures.
 - **Monitoring thresholds:** trajectory or frontier off the closed form by more than 1e-12.
@@ -1047,8 +1047,8 @@ Draft entries for the stage H specs on branch h-spec-w1b (2026-11-17). Status fo
 ### MH-7 Market impact (stage H wave 1)
 - **Purpose:** square-root and Obizhaeva-Wang transient impact (`exec.impact.sqrt`, `exec.impact.ow_optimal`).
 - **Inputs:** as in the spec page.
-- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** golden values written in the spec, blind re-derived (DR-H2); no generated suite yet. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** printed paper figures and blind re-derivation.
 - **Monitoring thresholds:** calibrated exponent standard error not reported (H-1).
@@ -1059,8 +1059,8 @@ Draft entries for the stage H specs on branch h-spec-w1b (2026-11-17). Status fo
 ### MH-8 Execution schedules (stage H wave 1)
 - **Purpose:** TWAP, VWAP and POV schedules (`exec.schedule.*`).
 - **Inputs:** as in the spec page.
-- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** golden values written in the spec, blind re-derived (DR-H2); no generated suite yet. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** hand cases and blind re-derivation.
 - **Monitoring thresholds:** slices not summing to the order (HR-3).
@@ -1071,8 +1071,8 @@ Draft entries for the stage H specs on branch h-spec-w1b (2026-11-17). Status fo
 ### MH-9 Implementation shortfall TCA (stage H wave 1)
 - **Purpose:** Perold decomposition into delay, execution, opportunity and fees (`exec.tca.shortfall`).
 - **Inputs:** as in the spec page.
-- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** golden values written in the spec, blind re-derived (DR-H2); no generated suite yet. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** hand cases and blind re-derivation.
 - **Monitoring thresholds:** decomposition not summing to the total to 1e-10.
@@ -1083,8 +1083,8 @@ Draft entries for the stage H specs on branch h-spec-w1b (2026-11-17). Status fo
 ### MH-10 Avellaneda-Stoikov quotes (stage H wave 1)
 - **Purpose:** inventory-aware market-making quotes (`micro.mm.as_quotes`).
 - **Inputs:** as in the spec page.
-- **Limitations:** draft spec only; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
-- **Validation:** none yet; golden plan in the spec page. **Review:** 2026-11-17.
+- **Limitations:** spec confirmed 2026-11-18; see the spec page. Real data is the Kraken crypto venue only (lit); simulated venues are labelled.
+- **Validation:** golden values written in the spec, blind re-derived (DR-H2); no generated suite yet. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** [AS08] printed tables and blind re-derivation.
 - **Monitoring thresholds:** quotes off the closed form by more than 1e-10.
