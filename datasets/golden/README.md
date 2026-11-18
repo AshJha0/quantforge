@@ -4,7 +4,7 @@ A golden case is a stored case with an expected result obtained without any of t
 
 Each file in `core/`, `stage_b/` and `stage_c/` holds `suite`, `spec`, `spec_version`, `generator`, `reviewer` and `cases`. Each case holds `case_id`, `operation`, `inputs`, `expected`, `tolerance_class`, `verified_by` and `tags`.
 
-`reviewer` says "none: self-assessment until the end-of-project human review", which is the true state of every file. `verified_by` names the sources that agreed. A case with only hand or replay sources can share a misreading with the spec, as `oracle/README.md` explains.
+`reviewer` says "none: self-assessment; no second review (owner decision 2026-11-18)", which is the true state of every file. `verified_by` names the sources that agreed. A case with only hand or replay sources can share a misreading with the spec, as `oracle/README.md` explains.
 
 Stage A has 22 suites and 4,394 cases (4,217 value-checked, 177 error). Stage B has 18 suites and 343 cases, so 40 suites and 4,737 cases (value-checked and error cases counted together) in all. Which stage B suites have an outside oracle is in `specifications/stage-b-rulings.md`.
 

@@ -4,7 +4,7 @@
  "spec": "specifications/cli-contract.md",
  "spec_version": "1.6.0",
  "generator": "hand-written from the batch section; behaviour of BT1-BT4 observed identical in all four v0.4 builds on 2026-11-07",
- "reviewer": "none: self-assessment until the end-of-project human review",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
  "segment_forms": {
   "text": "UTF-8 text, written as is",
   "hex": "raw bytes in hex",

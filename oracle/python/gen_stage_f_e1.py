@@ -171,7 +171,7 @@ def main():
                        for c in chunk]
             doc = {"schema_version": "1.0", "suite": suite, "spec": SPEC, "spec_version": "1.0.0",
                    "generator": "oracle/python/gen_stage_f_e1.py",
-                   "reviewer": "none: self-assessment until the end-of-project human review", "cases": ordered}
+                   "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)", "cases": ordered}
             text = json.dumps(doc, indent=1, ensure_ascii=True) + "\n"
             assert len(text.encode()) < 1_000_000, suite
             (OUT / f"{suite}.json").write_text(text, encoding="utf-8", newline="\n")
