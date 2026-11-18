@@ -115,6 +115,30 @@
   {
    "key": "quantforge_core.variance.x_vix_term_variance__mutmut_179",
    "row": "equivalents-python.md python/quantforge_core/variance.py:581-582"
+  },
+  {
+   "key": "quantforge_core.curve_fits.x_smooth__mutmut_104",
+   "row": "equivalents-python.md python/quantforge_core/curve_fits.py:34,43,78,92"
+  },
+  {
+   "key": "quantforge_core.curve_fits.x_smooth__mutmut_133",
+   "row": "equivalents-python.md python/quantforge_core/curve_fits.py:34,43,78,92"
+  },
+  {
+   "key": "quantforge_core.curve_fits.x_smooth__mutmut_137",
+   "row": "equivalents-python.md python/quantforge_core/curve_fits.py:34,43,78,92"
+  },
+  {
+   "key": "quantforge_core.curve_fits.x_robust__mutmut_56",
+   "row": "equivalents-python.md python/quantforge_core/curve_fits.py:34,43,78,92"
+  },
+  {
+   "key": "quantforge_core.curve_fits.x_robust__mutmut_97",
+   "row": "equivalents-python.md python/quantforge_core/curve_fits.py:34,43,78,92"
+  },
+  {
+   "key": "quantforge_core.curve_fits.x_robust__mutmut_180",
+   "row": "equivalents-python.md python/quantforge_core/curve_fits.py:119"
   }
  ]
 }
