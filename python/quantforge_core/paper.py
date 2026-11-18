@@ -2,7 +2,7 @@
 pre-trade checks (specifications/10-execution/paper-trading.md, proposed rulings HR-42 to HR-55).
 
 Nothing here talks to a network or a venue: no live order can be placed (HR-42). Fills come
-from the simulated venues; their wiring is not implemented yet (HR-47)."""
+from the simulated venues through `paper_fills.py` (HR-47)."""
 
 import hashlib
 import json
