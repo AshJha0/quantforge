@@ -15,11 +15,8 @@ from decimal import Decimal, localcontext
 from typing import Any
 
 from .errors import QfError
-<<<<<<< HEAD
-from .order_book import EXACT, check_range, input_dec
-=======
 from .finite import guard
->>>>>>> h-darksor
+from .order_book import EXACT, check_range, input_dec
 
 LABEL = "simulated venue; not a real exchange"
 MAX_EVENTS = 10_000_000
