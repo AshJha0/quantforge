@@ -27,9 +27,12 @@ import time
 from collections import Counter
 from pathlib import Path
 
+import skips  # same directory: proven-equivalent mutants to leave out
+
 ROOT = Path(__file__).resolve().parents[2]
 RUNNER = ROOT / "conformance" / "runner" / "runner.py"
 MUTMUT = "mutmut==3.8.1"
+SKIPPED = "skipped-equivalent"  # listed in skip-equivalents.json (skips.py)
 SKIP = shutil.ignore_patterns(".git", "target", "build", "build-*", ".venv", "mutants", "mutants.out*",
                               "__pycache__", "reports", "java25", "cpp26")
 # mutmut exit codes: 0 survived, 1 and 3 killed. Anything else (no tests, timeout) is kept by number.
@@ -131,7 +134,11 @@ def score_rust(a, work):
     if run(tests, cwd=rust):
         raise SystemExit("the unmutated unit tests do not pass")
     unit_limit = max(60.0, 5 * (time.monotonic() - start))
-    order = list(rows)
+    skip = skips.load("rust")
+    for r in rows:
+        if skips.rust_key(r["id"], repo) in skip:
+            r["unit"] = SKIPPED
+    order = [r for r in rows if r.get("unit") != SKIPPED]
     random.Random(a.seed).shuffle(order)
     k, n = a.shard
     order = order[k::n]  # shard k of n takes every n-th mutant of the shuffled order, and its share of MAX
@@ -195,7 +202,11 @@ def verdict(code):
 
 def sample(rows, a):
     """Unviable mutants never reach a test, so they are not worth a slot in the sample."""
-    live = [r for r in rows if r["unit"] != "unviable"]
+    skip = skips.load("python")
+    for r in rows:
+        if r["id"] in skip:
+            r["unit"] = SKIPPED
+    live = [r for r in rows if r["unit"] not in ("unviable", SKIPPED)]
     random.Random(a.seed).shuffle(live)
     return live[:a.max]
 
@@ -206,8 +217,9 @@ def summarise(a, rows):
     def caught(r, key):
         return r[key] in ("killed", "timeout")
 
-    unit_all = [r for r in rows if r["unit"] not in ("unviable", "not run")]
+    unit_all = [r for r in rows if r["unit"] not in ("unviable", "not run", SKIPPED)]
     both = {"mutants": len(rows), "unviable": sum(r["unit"] == "unviable" for r in rows),
+            "skipped_equivalent": sum(r["unit"] == SKIPPED for r in rows),
             "unit_killed_all": sum(caught(r, "unit") for r in unit_all), "sampled": len(done),
             "sample_unit_killed": sum(caught(r, "unit") for r in done),
             "sample_golden_killed": sum(caught(r, "golden") for r in done),

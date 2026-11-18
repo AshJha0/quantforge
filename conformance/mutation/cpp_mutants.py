@@ -20,6 +20,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import skips  # same directory: proven-equivalent mutants to leave out
+
 ROOT = Path(__file__).resolve().parents[2]
 SWAPS = [(r" \+ ", " - "), (r" - ", " + "), (r" \* ", " / "), (r" / ", " * "), (r" < ", " <= "),
          (r" <= ", " < "), (r" > ", " >= "), (r" >= ", " > "), (r" == ", " != "), (r" != ", " == "),
@@ -116,6 +118,13 @@ def main():
         target = work / a.file
         original = target.read_text(encoding="utf-8")
         chosen = sites(original)
+        skip = skips.load("cpp")
+        src_lines = original.splitlines()
+        before = len(chosen)
+        chosen = [c for c in chosen if skips.cpp_key(a.file, src_lines[c[0]], apply(original, c)[1]) not in skip]
+        skipped = before - len(chosen)
+        if skipped:
+            print(f"left out {skipped} proven-equivalent mutants (skip-equivalents.json)")
         random.Random(a.seed).shuffle(chosen)
         todo = chosen[:a.max]
         for i, site in enumerate(todo, 1):
@@ -144,7 +153,7 @@ def main():
     for row in survived:
         print("SURVIVED", row)
     if a.out:
-        Path(a.out).write_text(json.dumps({"summary": {"impl": "cpp", "target": a.file, "suite": a.suite, "seed": a.seed,
+        Path(a.out).write_text(json.dumps({"summary": {"impl": "cpp", "target": a.file, "suite": a.suite, "seed": a.seed, "skipped_equivalent": skipped,
                                                        "sites": len(chosen), "killed": killed_total, "golden_killed": killed,
                                                        "unit_killed": unit_killed, "unit": a.unit, "no_build": no_build, "timed_out": len(TIMED_OUT),
                                                        "survived": len(survived)}, "survivors": survived}, indent=1) + "\n",

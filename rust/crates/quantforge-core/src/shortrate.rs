@@ -1618,4 +1618,24 @@ mod tests {
         let e = callable_bond(&c, 0.05, 0.01, &bad, grid).unwrap_err();
         assert_eq!(e.code, "E_DOMAIN");
     }
+
+    #[test]
+    fn hw_fd_zero_coupon_bond_on_a_narrow_grid_matches_the_curve() {
+        // Hull-White fits the curve: the zero-coupon bond to 2 is P(0, 2) = 0.94 (a pillar). On a grid
+        // only one standard deviation wide (width 1, 11 nodes) the linear boundary rows
+        // V_0 = 2 V_1 - V_2 reach the centre within the 400 steps (diffusion about 4 cells of 5),
+        // so a wrong boundary row (di[1] -= 2 lo[1] adds about 0.075 damping per step at node 1)
+        // moves the price by far more than the scheme error, which is about 1e-5 here: implicit
+        // Euler discounting r^2 dt T / 2 = 4.5e-6 plus the O(B^2 dx^2) boundary extrapolation.
+        let c = curve();
+        let grid = FdGrid {
+            nx: 11,
+            steps_per_year: 200,
+            width: 1.0,
+        };
+        let terminal = |x: &[f64], _t: f64| -> Result<Vec<f64>> { Ok(vec![1.0; x.len()]) };
+        let mut knot = |_k: usize, _v: &mut [f64], _x: &[f64], _t: f64| -> Result<()> { Ok(()) };
+        let p = hw_fd(&c, 0.1, 0.01, &[2.0], grid, &terminal, &mut knot).unwrap();
+        close(p, 0.94, 2e-4);
+    }
 }

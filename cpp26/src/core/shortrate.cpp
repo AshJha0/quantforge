@@ -489,11 +489,14 @@ double callable_bond(const Params& p, const std::vector<double>& pay, double c, 
 namespace {
 // (tau - 2 B_a + B_2a) / a^2, the bracket of one G2++ variance term, with a series for small a tau.
 double g2_var_term(double a, double tau) {
+    // tau = 0: the bracket is exactly 0. The series below multiplies tau^k by a^(k-3), which overflows for large a.
+    if (tau == 0) return 0.0;
     const double x = a * tau;
     if (x < 0.1) {  // G-33
         // sum_{k>=3} (-1)^{k+1} tau^k / k! a^{k-3} (2^{k-1} - 2)
         double sum = 0.0, pw = tau * tau * tau / 6.0, two = 4.0;  // pw = tau^k a^{k-3} / k!, two = 2^{k-1}
         for (int k = 3; k < 80; ++k) {
+            if (pw == 0) break;  // tau^k underflowed: every later term is 0
             const double term = ((k % 2) ? 1.0 : -1.0) * pw * (two - 2.0);
             sum += term;
             if (std::fabs(term) < 1e-17 * std::fabs(sum)) break;
@@ -506,11 +509,15 @@ double g2_var_term(double a, double tau) {
 }
 // (tau - B_a - B_b + B_(a+b)) / (a b): series below max(a, b) tau = 0.1 (G-33), where the bracket is a b tau^3/3 + ...
 double g2_cross_term(double a, double b, double tau) {
+    // tau = 0: exactly 0. Without this the series below took 0 times an overflowed a^(k-2) sum (NaN for a, b above
+    // about 5.5e3, the sum over j having C(k-1, j) (a + b)^(k-2) growth).
+    if (tau == 0) return 0.0;
     if (std::max(a, b) * tau < 0.1) {
         // sum_{k>=3} (-1)^(k+1) tau^k / k! x [((a+b)^(k-1) - a^(k-1) - b^(k-1)) / (a b)],
         // the bracket being sum_{j=1}^{k-2} C(k-1, j) a^(j-1) b^(k-2-j).
         double sum = 0.0, tk = tau * tau * tau / 6.0;
         for (int k = 3; k < 80; ++k) {
+            if (tk == 0) break;  // tau^k / k! underflowed: every later term is 0 (and inner may overflow)
             double inner = 0.0, binom = static_cast<double>(k - 1);  // C(k-1, 1)
             for (int j = 1; j <= k - 2; ++j) {
                 inner += binom * std::pow(a, j - 1) * std::pow(b, k - 2 - j);
@@ -529,9 +536,23 @@ double g2_v(const G2& m, double tau) {
     return m.sigma * m.sigma * g2_var_term(m.a, tau) + m.eta * m.eta * g2_var_term(m.b, tau) +
            2 * m.rho * m.sigma * m.eta * g2_cross_term(m.a, m.b, tau);
 }
+// The model checks of rates.g2pp (Rust G2pp::check, Python make_g2, the CLI): positive a, sigma, b, eta and
+// rho strictly inside (-1, 1). A non-positive a or b would also run the series with growing terms.
+void g2_check(const G2& m) {
+    if (!(m.a > 0)) throw Error("E_DOMAIN", "a must be positive", "a");
+    if (!(m.sigma > 0)) throw Error("E_DOMAIN", "sigma must be positive", "sigma");
+    if (!(m.b > 0)) throw Error("E_DOMAIN", "b must be positive", "b");
+    if (!(m.eta > 0)) throw Error("E_DOMAIN", "eta must be positive", "eta");
+    if (!(m.rho > -1 && m.rho < 1)) throw Error("E_DOMAIN", "rho must lie strictly inside (-1, 1)", "rho");
+    if (!std::isfinite(m.a) || !std::isfinite(m.sigma) || !std::isfinite(m.b) || !std::isfinite(m.eta))
+        throw Error("E_NON_FINITE", "a G2++ parameter is not finite", "a");
+}
 }  // namespace
 
 double g2_bond(const G2& m, double t, double T, double x, double y) {
+    g2_check(m);
+    if (!(t >= 0)) throw Error("E_DOMAIN", "t_years is negative", "t_years");
+    if (!(T > t)) throw Error("E_DOMAIN", "maturity_years is not after t_years", "maturity_years");
     const double tau = T - t;
     const double lnp = m.curve.ln_p(T) - m.curve.ln_p(t) + 0.5 * (g2_v(m, tau) - g2_v(m, T) + g2_v(m, t)) -
                        b_factor(m.a, tau) * x - b_factor(m.b, tau) * y;
@@ -539,6 +560,9 @@ double g2_bond(const G2& m, double t, double T, double x, double y) {
 }
 
 double g2_bond_option(const G2& m, double T, double S, double K, bool call) {
+    g2_check(m);
+    if (!(T > 0 && S > T)) throw Error("E_DOMAIN", "need 0 < expiry_years < maturity_years", "expiry_years");
+    if (!(K > 0)) throw Error("E_DOMAIN", "strike must be positive", "strike");
     const double ba = b_factor(m.a, S - T), bb = b_factor(m.b, S - T);
     // sigma^2/(2a^3) (1 - e^{-a(S-T)})^2 (1 - e^{-2aT}) = sigma^2 B_a(S-T)^2 B_2a(T), and the same in b.
     const double v = m.sigma * m.sigma * ba * ba * b_factor(2 * m.a, T) +

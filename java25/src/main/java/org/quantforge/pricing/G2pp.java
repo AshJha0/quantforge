@@ -1,5 +1,7 @@
 package org.quantforge.pricing;
 
+import org.quantforge.core.QfError;
+
 /** Two-factor Gaussian G2++ bond prices and bond options (short-rate-models.md, ruling G-14). */
 public final class G2pp {
     private G2pp() {}
@@ -14,7 +16,27 @@ public final class G2pp {
      * @param eta volatility of the second factor
      * @param rho correlation of the two factors
      */
-    public record Params(ShortRate.Curve curve, double a, double sigma, double b, double eta, double rho) {}
+    public record Params(ShortRate.Curve curve, double a, double sigma, double b, double eta, double rho) {
+        /** The rates.g2pp model checks (Rust G2pp::check, Python make_g2, C++ g2_check). */
+        public Params {
+            positive(a, "a");
+            positive(sigma, "sigma");
+            positive(b, "b");
+            positive(eta, "eta");
+            if (!(rho > -1.0 && rho < 1.0)) {
+                throw new QfError("E_DOMAIN", "rho must lie strictly inside (-1, 1)", "rho");
+            }
+        }
+
+        private static void positive(double v, String field) {
+            if (!(v > 0.0)) {
+                throw new QfError("E_DOMAIN", field + " must be positive", field);
+            }
+            if (!Double.isFinite(v)) {
+                throw new QfError("E_NON_FINITE", field + " is not finite", field);
+            }
+        }
+    }
 
     private static final int TERMS = 30;
 
@@ -89,6 +111,12 @@ public final class G2pp {
      * @return the zero-coupon bond price
      */
     public static double zcb(Params p, double x, double y, double t, double maturity) {
+        if (!(t >= 0.0)) {
+            throw new QfError("E_DOMAIN", "t_years is negative", "t_years");
+        }
+        if (!(maturity > t)) {
+            throw new QfError("E_DOMAIN", "maturity_years is not after t_years", "maturity_years");
+        }
         double tau = maturity - t;
         double ln = 0.5 * (v(p, tau) - v(p, maturity) + v(p, t)) - bf(p.a(), tau) * x - bf(p.b(), tau) * y;
         return p.curve().df(maturity) / p.curve().df(t) * Math.exp(ln);
@@ -105,6 +133,12 @@ public final class G2pp {
      * @return the option price per unit face
      */
     public static double bondOption(Params p, boolean call, double k, double t, double s) {
+        if (!(t > 0.0 && s > t)) {
+            throw new QfError("E_DOMAIN", "need 0 < expiry_years < maturity_years", "expiry_years");
+        }
+        if (!(k > 0.0)) {
+            throw new QfError("E_DOMAIN", "strike must be positive", "strike");
+        }
         double u = s - t;
         double ba = bf(p.a(), u);
         double bb = bf(p.b(), u);

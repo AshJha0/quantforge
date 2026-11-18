@@ -34,6 +34,20 @@ sr::Curve flat_curve(double r) {
     return sr::Curve::from(t, d);
 }
 bool close_rel(double got, double want, double tol) { return std::fabs(got - want) <= tol * std::fabs(want); }
+std::string message_of(auto&& run) {
+    try {
+        run();
+    } catch (const Error& e) {
+        return e.what();
+    }
+    return "ok";
+}
+sr::Params vasicek() {
+    sr::Params v;
+    v.model = sr::Model::Vasicek;
+    v.a = 0.1, v.b = 0.03, v.sigma = 0.01, v.r0 = 0.03;
+    return v;
+}
 }  // namespace
 
 TEST_CASE("sru curve: interpolation, flat-forward extrapolation and the forward past the last knot", "[shortrate][sru]") {
@@ -159,7 +173,7 @@ TEST_CASE("sru G2++ bond: small-a series against 50-digit closed form, and t = 0
     CHECK(close_rel(sr::g2_bond(m, 1.0, 3.0, 0.01, -0.005), 0.93221096740151193848, 1e-13));
     // a = b = 9.99, tau = 0.01: a tau = 0.0999 takes the series with a small sum (3.3e-7), so the 1e-17 relative stop
     // matters; mpmath of the bracket definitions, sigma = 10 makes a 1e-7 relative error in V(tau) a 1.6e-12 bond error.
-    sr::G2 fast{9.99, 10.0, 9.99, 0.0, 0.0, flat_curve(0.03)};
+    sr::G2 fast{9.99, 10.0, 9.99, 1e-300, 0.0, flat_curve(0.03)};  // eta^2 underflows to 0: the one-factor value
     CHECK(close_rel(sr::g2_bond(fast, 1.0, 1.01, 0.0, 0.0), 0.99471988543079336655, 2e-14));
     // At t = 0 every V(0) bracket is 0 and V(T - 0) - V(T) = 0, so with x = y = 0 the bond is the curve discount
     // factor exactly; a = b = 5000 makes the tau = 0 series terms (0 times a^(k-3) 2^(k-1)) large but finite up to k = 79.
@@ -167,4 +181,70 @@ TEST_CASE("sru G2++ bond: small-a series against 50-digit closed form, and t = 0
     const double v = sr::g2_bond(big, 0.0, 2.0, 0.0, 0.0);
     CHECK(std::isfinite(v));
     CHECK(v == Approx(std::exp(-0.06)).epsilon(1e-14));
+}
+
+TEST_CASE("sru G2++ bond at tau = 0 and tiny t with mean reversion 1e4 (no 0 x overflow NaN)", "[shortrate][sru]") {
+    // a = b = 1e4 used to give NaN: the tau = 0 cross-term series took 0 times an overflowed (a + b)^(k-2) sum.
+    sr::G2 big{1e4, 0.01, 1e4, 0.01, 0.5, flat_curve(0.03)};
+    // t = 0: V(0) = 0 and V(T - 0) - V(T) = 0, so with x = y = 0 the bond is the curve discount factor e^{-0.06}.
+    const double at0 = sr::g2_bond(big, 0.0, 2.0, 0.0, 0.0);
+    REQUIRE(std::isfinite(at0));
+    CHECK(at0 == Approx(std::exp(-0.06)).epsilon(1e-15));
+    // t = 1e-200: tau^3 underflows inside the series (the term must stop, not be 0 x inf), V(t) < 1e-600 is 0, and
+    // 2 - 1e-200 == 2 in double, so P = P(0, 2) / P(0, 1e-200) = e^{-0.06} to rounding.
+    CHECK(sr::g2_bond(big, 1e-200, 2.0, 0.0, 0.0) == Approx(std::exp(-0.06)).epsilon(1e-15));
+    // Larger still: a = b = 1e6 at t = 0.
+    sr::G2 huge{1e6, 0.01, 1e6, 0.01, -0.3, flat_curve(0.03)};
+    CHECK(sr::g2_bond(huge, 0.0, 1.0, 0.0, 0.0) == Approx(std::exp(-0.03)).epsilon(1e-15));
+}
+
+TEST_CASE("sru G2++ parameter and date checks are E_DOMAIN", "[shortrate][sru]") {
+    const auto c = flat_curve(0.03);
+    // Reviewer case: a = -1 made a tau large negative and the series terms grow.
+    CHECK(code_of([&] { sr::g2_bond({-1.0, 0.01, 0.05, 0.008, 0.3, c}, 0.0, 60.0, 0.0, 0.0); }) == "E_DOMAIN");
+    CHECK(code_of([&] { sr::g2_bond({0.5, 0.0, 0.05, 0.008, 0.3, c}, 0.0, 2.0, 0.0, 0.0); }) == "E_DOMAIN");
+    CHECK(code_of([&] { sr::g2_bond({0.5, 0.01, 0.0, 0.008, 0.3, c}, 0.0, 2.0, 0.0, 0.0); }) == "E_DOMAIN");
+    CHECK(code_of([&] { sr::g2_bond({0.5, 0.01, 0.05, -0.008, 0.3, c}, 0.0, 2.0, 0.0, 0.0); }) == "E_DOMAIN");
+    CHECK(code_of([&] { sr::g2_bond({0.5, 0.01, 0.05, 0.008, 1.0, c}, 0.0, 2.0, 0.0, 0.0); }) == "E_DOMAIN");
+    CHECK(code_of([&] { sr::g2_bond({0.5, 0.01, 0.05, 0.008, -1.0, c}, 0.0, 2.0, 0.0, 0.0); }) == "E_DOMAIN");
+    const sr::G2 m{0.5, 0.01, 0.05, 0.008, 0.3, c};
+    CHECK(code_of([&] { sr::g2_bond(m, -0.1, 2.0, 0.0, 0.0); }) == "E_DOMAIN");
+    CHECK(code_of([&] { sr::g2_bond(m, 2.0, 2.0, 0.0, 0.0); }) == "E_DOMAIN");
+    CHECK(code_of([&] { sr::g2_bond(m, 2.0, 1.0, 0.0, 0.0); }) == "E_DOMAIN");
+    CHECK(code_of([&] { sr::g2_bond_option({0.5, 0.01, -1.0, 0.008, 0.3, c}, 1.0, 2.0, 0.9, true); }) == "E_DOMAIN");
+    CHECK(code_of([&] { sr::g2_bond_option(m, 0.0, 2.0, 0.9, true); }) == "E_DOMAIN");
+    CHECK(code_of([&] { sr::g2_bond_option(m, 2.0, 2.0, 0.9, true); }) == "E_DOMAIN");
+    CHECK(code_of([&] { sr::g2_bond_option(m, 1.0, 2.0, 0.0, true); }) == "E_DOMAIN");
+    CHECK(code_of([&] { sr::g2_bond(m, 0.0, 2.0, 0.0, 0.0); }) == "ok");
+}
+
+TEST_CASE("sru swaption guard 1 + K tau_n > 0 on both sides", "[shortrate][sru]") {
+    const sr::Params v = vasicek();
+    // tau_n = 2, K = 0.6: 1 + K tau_n = 2.2 > 0 is accepted. g(1) = 2.2 P(1, 3; r = 1) - 1 with B = 1.813,
+    // ln A = -0.0055 gives 2.2 x 0.162 - 1 < 0 and g(-1) > 0, so a critical rate exists: a price. (1 - K tau_n = -0.2.)
+    CHECK(code_of([&] { sr::swaption(v, 1.0, {3.0}, 0.6, true); }) == "ok");
+    // tau_n = 0.5, K = -0.6: 1 + K tau_n = 0.7 > 0 is accepted; g(-1) = 0.7 e^{0.4877 - 0.0004} - 1 = 0.14 > 0 and
+    // g(1) < 0, a price. (1 + K / tau_n = -0.2 would be refused.)
+    CHECK(code_of([&] { sr::swaption(v, 1.0, {1.5}, -0.6, true); }) == "ok");
+    // tau_n = 0.5, K = -2: 1 + K tau_n = 0 exactly is refused by this guard, not later by the critical-rate bracket
+    // (which would also say E_DOMAIN, so the message is checked).
+    const std::string msg = message_of([&] { sr::swaption(v, 1.0, {1.5}, -2.0, true); });
+    CHECK(msg.find("last accrual") != std::string::npos);
+    // tau_n = 2, K = -0.6: 1 + K tau_n = -0.2 is refused by the guard.
+    CHECK(message_of([&] { sr::swaption(v, 1.0, {3.0}, -0.6, true); }).find("last accrual") != std::string::npos);
+}
+
+TEST_CASE("sru swaption critical rate by Newton when the coupon derivative is tiny", "[shortrate][sru]") {
+    // One payment: Jamshidian is exact, payer = (1 + K tau) ZB put(1, S; X = 1 / (1 + K tau)) whatever r* is, as long
+    // as c P(r*) = 1. tau = 1e-3 makes g'(r) = -c B P about -1e-3: a Newton step v / d reaches r* (about 0.03) at once;
+    // a step v x d would move 1e-6 of the way per iteration and leave X off by B x 0.03 = 3e-5 relative, about three
+    // bond-option standard deviations (sigma B sqrt((1 - e^{-2a})/2a) = 9e-6).
+    sr::Params hw;
+    hw.model = sr::Model::HullWhite;
+    hw.a = 0.1, hw.sigma = 0.01;
+    hw.curve = flat_curve(0.03);
+    const double S = 1.001, K = 0.03, c = 1 + K * (S - 1.0);
+    const double want = c * sr::bond_option(hw, 1.0, S, 1.0 / c, false);
+    REQUIRE(want > 1e-7);
+    CHECK(sr::swaption(hw, 1.0, {S}, K, true).price == Approx(want).epsilon(1e-6));
 }

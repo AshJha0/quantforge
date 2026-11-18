@@ -97,12 +97,18 @@ def _cross_term(a: float, b: float, tau: float) -> float:
     if (a + b) * tau >= _SERIES_BELOW:
         return (tau - b_factor(a, tau) - b_factor(b, tau) + b_factor(a + b, tau)) / (a * b)
     # tau sum_{n>=2} (-tau)^n/(n+1)! ((a+b)^n - a^n - b^n) / (a b); the bracket over a b is the
-    # positive sum sum_{k=1}^{n-1} C(n, k) a^{k-1} b^{n-k-1}.
+    # positive sum sum_{k=1}^{n-1} C(n, k) a^{k-1} b^{n-k-1}. Written in xa = a tau, xb = b tau
+    # (both below 0.5 here) as tau^3 sum_n (-1)^n/(n+1)! sum_k C(n, k) xa^{k-1} xb^{n-k-1}, so no
+    # power of a or b alone is formed: a ** 38 overflowed (OverflowError) for a above about 1e8,
+    # even at tau = 0, where the answer is exactly 0.
+    if tau == 0:
+        return 0.0
+    xa, xb = a * tau, b * tau
     total = 0.0
     for n in range(2, _SERIES_TERMS):
-        inner = ordered_sum(math.comb(n, k) * a ** (k - 1) * b ** (n - k - 1) for k in range(1, n))
-        total += (-tau) ** n / math.factorial(n + 1) * inner
-    return tau * total
+        inner = ordered_sum(math.comb(n, k) * xa ** (k - 1) * xb ** (n - k - 1) for k in range(1, n))
+        total += (-1) ** n / math.factorial(n + 1) * inner
+    return tau**3 * total
 
 
 # --- the curve -----------------------------------------------------------------------------------
