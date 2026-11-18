@@ -20,6 +20,18 @@ if [ "$W" = micro ]; then
   sha256sum micro-estimators.blind.md venue-analytics.blind.md stage-h-rulings-micro.md > MANIFEST.sha256
   exit 0
 fi
+if [ "$W" = paper2 ]; then
+  # Third argument "paper2": H-21 blind packet 2, the pt_h value cases with no blind check yet (list in
+  # paper2_blind.py): stripped paper-trading.md (HR-77, HR-78 inside), the paper section of cli-contract.md, the
+  # H-21 rulings, and inputs-only JSON. Leak list: paper2_leaks.py, kept outside the packet.
+  awk -f "$D/wave2_extract.awk" "$R/specifications/10-execution/paper-trading.md" > "$P/paper-trading.blind.md"
+  cp "$R/specifications/stage-h-rulings-h21.md" "$P/"
+  PY=python3; "$PY" -c "" >/dev/null 2>&1 || PY=python
+  "$PY" -I "$D/paper2_blind.py" "$R" "$P"
+  cd "$P"
+  sha256sum paper-trading.blind.md paper-cli.blind.md stage-h-rulings-h21.md pt_h.inputs.json > MANIFEST.sha256
+  exit 0
+fi
 if [ "$W" = venue ]; then
   # Third argument "venue": H-16 venue analytics only (fresh blind derivation, output names fixed), with the
   # micro rulings and the exec rulings for HR-66, which HR-75 as amended cites. Leak list: venue_leaks.py, kept
