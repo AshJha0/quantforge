@@ -31,7 +31,7 @@ fills = [
 ]
 day1 = paper.end_of_day(book, fills, {}, {"BTC-USD": "105"})
 pos = book.pos("BTC-USD")
-print(f"pt_h-0001 cash {book.cash} position {pos.n} avg cost {pos.c} realised {book.realised} fees {book.fees}")
+print(f"pt_h-0001 cash {book.cash} position {pos.n} avg cost {pos.c.normalize():f} realised {book.realised.normalize():f} fees {book.fees}")
 print(f"pt_h-0002 market {day1['market']} trading {day1['trading']} fees {day1['fees']} total {day1['total']} NAV {day1['nav']}")
 day2 = paper.end_of_day(book, [], {"BTC-USD": "105"}, {"BTC-USD": "102"}, days=1, cash_rate="0.0365")
 print(f"pt_h-0003 financing {day2['financing']} market {day2['market']} total {day2['total']} cash {book.cash} NAV {day2['nav']}")
