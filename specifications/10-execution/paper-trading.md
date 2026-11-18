@@ -113,7 +113,7 @@ Common: symbol BTC-USD, USD cash precision 0.01.
 
 Golden output shapes (added 2026-11-18 as a fix after blind lane 2b, which had to invent them; no value changed). Canonical JSON, decimal strings with no exponent and no trailing zeros (HR-12, HR-44), so "-0.60" in pt_h-0006 is written "-0.6":
 - Book cases 0001, 0005: `{"position", "avg_cost", "realised", "fees", "cash"}`; 0005 has no starting cash and gives `cash_delta` instead of `cash`.
-- Day cases 0002 to 0004, 0006: `{"market", "trading", "fees", "financing", "cash_interest", "short_borrow", "total", "position", "cash_close", "nav_open", "nav_close"}` (`nav_open` omitted in 0006, where no price is given).
+- Day cases 0002 to 0004, 0006: `{"market", "trading", "fees", "financing", "cash_interest", "short_borrow", "total", "position", "cash_close", "nav_open", "nav_close"}` (`nav_open` and `nav_close` omitted in 0006, where no price is given).
 - Pre-trade 0010 to 0017: `{"accepted", "reasons"}` with reasons in check order; 0018: `{"error": "E_UNSUPPORTED_OPERATION"}`.
 - Ledger 0020: `{"canonical_bytes", "hash", "record"}`; 0021 to 0023: `{"verify": {"ok", "first_bad_seq", "reason", "records"}}`.
 
