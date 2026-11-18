@@ -8,6 +8,7 @@ mod cmdty;
 mod core;
 mod credit;
 mod eq;
+mod execution;
 mod exotic;
 mod fx;
 mod hedge;
@@ -77,12 +78,14 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("credit", credit::NAMES, credit::dispatch),
     ("eq", eq::NAMES, eq::dispatch),
     ("eq", termcurve::eq::NAMES, termcurve::eq::dispatch),
+    ("exec", execution::exec::NAMES, execution::exec::dispatch),
     ("exotic", exotic::NAMES, exotic::dispatch),
     ("fx", fx::NAMES, fx::dispatch),
     ("hedge", hedge::NAMES, hedge::dispatch),
     ("infl", infl::NAMES, infl::dispatch),
     ("liq", termcurve::liq::NAMES, termcurve::liq::dispatch),
     ("mbs", mbs::NAMES, mbs::dispatch),
+    ("micro", execution::micro::NAMES, execution::micro::dispatch),
     ("rates", rates::NAMES, rates::dispatch),
     ("rates", shortrate::NAMES, shortrate::dispatch),
     ("rates", lmm::NAMES, lmm::dispatch),
@@ -96,6 +99,11 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("risk", riskw2::NAMES, riskw2::dispatch),
     ("risk", w3::risk::NAMES, w3::risk::dispatch),
     ("usecase", usecase::NAMES, usecase::dispatch),
+    (
+        "usecase",
+        execution::usecase::NAMES,
+        execution::usecase::dispatch,
+    ),
     ("vol", vol::NAMES, vol::dispatch),
     ("xva", xva::NAMES, xva::dispatch),
 ];

@@ -9,6 +9,7 @@ from . import (  # noqa: F401 - imported to register their verbs
     ops_core,
     ops_credit,
     ops_equity,
+    ops_execution,
     ops_exotics,
     ops_fx,
     ops_hedging,
