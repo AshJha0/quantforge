@@ -44,7 +44,7 @@ Trades sum to X to 1e-12 relative; for lambda > 0 holdings lie strictly below li
 ## Convergence and limit cases
 | Limit | Behaviour | Check |
 |---|---|---|
-| lambda -> 0 | trajectory tends to the linear one; lambda = 0 returns it exactly, not by cancellation (HR-5) | ac_h-0001; property test at lambda = 1e-15 within 1e-9 relative of linear |
+| lambda -> 0 | trajectory tends to the linear one; lambda = 0 returns it exactly, not by cancellation (HR-5) | ac_h-0001; property test at lambda = 1e-15 on P within 2e-9 relative of linear. Derivation: x_k = X sinh(kappa (T - t_k)) / sinh(kappa T) = linear x (1 + kappa^2 ((T - t_k)^2 - T^2) / 6 + O(kappa^4)), so the model's own shift from linear is at most kappa^2 T^2 / 6; on P, y = lambda sigma^2 tau^2 / (2 eta_tilde) = 1.9e-10, kappa^2 about 2y = 3.8e-10, kappa^2 T^2 / 6 about 1.6e-9 (the earlier 1e-9 bound was below the model's own shift; corrected 2026-11-18) |
 | tau -> 0 (N large, T fixed) | kappa_tilde -> sqrt(lambda sigma^2 / eta), [AC00] eq. (19) | property test at N = 10, 100, 1000: error falls like tau |
 | y small in HR-6 | `log1p` form keeps kappa accurate where `acosh(1 + y)` loses digits | property test at y = 1e-14 against the series sqrt(2y) |
 | kappa T > 700 | sinh ratio in exponential form, no overflow (HR-6) | property test at kappa T = 1000: holdings finite, decreasing |
