@@ -9,10 +9,17 @@ or x moves by more than 1e-6 relative. `--profile CASE_ID` prints a cProfile of 
 from __future__ import annotations
 
 import argparse
+import os
 import json
 import sys
 import time
 from pathlib import Path
+
+# Before numpy loads: these solves factor many small matrices (at most 250 x 200), where a multi-threaded
+# BLAS spends more time waking threads than computing (local WSL, 12 threads: 25.5 s -> 4.4 s on case 0005).
+# One thread changes no ruling; answers stay within the golden tolerance class (checked below).
+for _var in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS"):
+    os.environ.setdefault(_var, "1")
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
@@ -40,6 +47,7 @@ def main() -> int:
         prof.runcall(execute, c["operation"], c["inputs"])
         pstats.Stats(prof).sort_stats("tottime").print_stats(25)
         return 0
+    execute(cases[1]["operation"], cases[1]["inputs"])  # warm-up: lazy imports, not the solve, are the first-call cost
     rows, failed = [], False
     for c in cases:
         n = len(c["inputs"]["a"][0])
@@ -49,7 +57,7 @@ def main() -> int:
             t0 = time.perf_counter()
             out = execute(c["operation"], c["inputs"])
             best = min(best, time.perf_counter() - t0)
-        err = max(abs(g - w) / max(1.0, abs(w)) for g, w in zip(out["x"], c["expected"]["x"]))
+        err = max(abs(g - w) / max(1.0, abs(w)) for g, w in zip(out["x"], c["expected"]["outputs"]["x"]))
         miss = best > TARGET_S[n]
         failed |= miss or err > 1e-6
         rows.append(f"| {c['case_id']} | {n} | {best:.3f} | {TARGET_S[n]:.0f} | {err:.1e} | {'MISS' if miss else 'ok'} |")

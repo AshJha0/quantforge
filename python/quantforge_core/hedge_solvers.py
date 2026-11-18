@@ -289,7 +289,8 @@ class _Qp:
     def subproblem(self, free: list[int], x: NDArray) -> NDArray:
         """The minimiser of f with the variables outside `free` held at their values in x and
         E x = e: the equality-constrained step of the active-set method."""
-        fixed = [j for j in range(self.n) if j not in set(free)]
+        free_set = set(free)  # built once: the set inside the comprehension was O(n^2)
+        fixed = [j for j in range(self.n) if j not in free_set]
         out = x.copy()
         if not free:
             return out
@@ -536,7 +537,8 @@ class _CostQp:
         out = x.copy()
         if not free:
             return out
-        fixed = [j for j in range(self.n) if j not in set(free)]
+        free_set = set(free)  # built once: the set inside the comprehension was O(n^2)
+        fixed = [j for j in range(self.n) if j not in free_set]
         mats = [self.e_mat[:, free]]
         rhs = [self.e_rhs - self.e_mat[:, fixed] @ x[fixed]]
         if row is not None:
