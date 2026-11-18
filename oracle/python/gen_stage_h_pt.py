@@ -32,6 +32,10 @@ SPEC = "specifications/10-execution/paper-trading.md"
 LABEL = "crypto venue; simulated"
 CEILING = "Paper trading on free data; simulated fills; no evidence of tradable profitability."
 Z64 = "0" * 64
+# Paper blind lane 2 (program/STAGE_H_BLIND_WAVE2B.md, "Blind lane 2"; paper2_compare.py; frozen SHA-256 8964eebc...).
+BLIND2 = "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md, blind lane 2; field by field by paper2_compare.py): MATCH"
+SESSION_NB = ["blind lane 2: MATCH but not blind (LIT child_id unspecified in the packet; it enters the hashes)"] * 2 + [
+    "blind lane 2: not blind (packet gap: router and dark simulator not in the packet; child_ids and hashes differ)"]
 BLIND = ("blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by "
          "program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH")
 VERDICT = {  # pt_compare.py verdicts for the cases that are not counted as blind-checked
@@ -282,7 +286,8 @@ def build():
             (*c30, "session: one LIT order filled across two levels, one rejected; ledger hashes recomputed"),
             (*c31, "session c30 then the daily close: TCA and EOD records, HR-53 identity"),
             (*c32, "SOR order: market child 1 lot, dark child 2 trimmed to 1 (HR-77 overfill trim)"))):
-        s.add("paper.session.run", inp, out, cls=CLS, verified=["hand", "outside: hashlib sha256 of the canonical bytes"],
+        s.add("paper.session.run", inp, out, cls=CLS,
+              verified=["hand", "outside: hashlib sha256 of the canonical bytes", SESSION_NB[k]],
               tags=["stage_h", "simulated", "paper", "session"], description=f"hand, not blind: {desc}")
         s.cases[-1]["case_id"] = f"pt_h-{30 + k:04d}"
     errs = [
@@ -316,8 +321,8 @@ def build():
          "average cost 5/3 rounded half-even to 18 decimals"),
     ]
     for cid, op, inp, out, desc in hr77:
-        s.add(op, inp, out, cls=CLS, verified=["hand"], tags=["stage_h", "paper", "exact"],
-              description=f"hand, not blind: HR-77 {desc}")
+        s.add(op, inp, out, cls=CLS, verified=["hand", BLIND2], tags=["stage_h", "paper", "exact"],
+              description=f"hand; blind lane 2 MATCH: HR-77 {desc}")
         s.cases[-1]["case_id"] = cid
     r0 = rec(0, TS, "ORDER", dict(ORDER_BODY), Z64)
     dup = canon(r0).replace('"kind":"ORDER"', '"kind":"ORDER","kind":"ORDER"', 1) + "\n"
@@ -334,8 +339,8 @@ def build():
         s.cases[-1]["case_id"] = f"pt_h-{52 + k:04d}"
     s.add("paper.ledger.verify", {"text": dup},
           {"ok": False, "records": 0, "first_bad_seq": 0, "reason": "PARSE", "head": None, "label": LABEL},
-          cls=CLS, verified=["hand"], tags=["stage_h", "paper", "ledger"],
-          description="hand, not blind: HR-78 a repeated key (same value) is PARSE, though last-wins would verify")
+          cls=CLS, verified=["hand", BLIND2], tags=["stage_h", "paper", "ledger"],
+          description="hand; blind lane 2 MATCH: HR-78 a repeated key (same value) is PARSE, though last-wins would verify")
     s.cases[-1]["case_id"] = "pt_h-0054"
     return s
 

@@ -44,3 +44,22 @@ Rule now in force: a shape-only match counts only after a field-by-field compari
 | pt_h-0023 | SHAPE MISMATCH: blind returns `hash` and `record` as well; not blind anyway | no |
 
 This replaces the SHAPE-ONLY rows for pt_h above: pt_h outside-checked by re-derivation is 14 of 19, not 16.
+
+## Blind lane 2: pt_h value cases with no blind check (2026-11-18, coordinator decision)
+
+Why: the cases added after the first lane (pt_h-0030 to 0032, 0050, 0051, 0054) were hand only, and H-21 had fallen to 14 of 24 value cases (58.3%), under the 60% item floor.
+
+- Packet: `wave2_make_packet.sh <stage-h3> <dir> paper2` (stripped `paper-trading.md` with HR-77 and HR-78, the paper section of `cli-contract.md`, `stage-h-rulings-h21.md`, inputs-only `pt_h.inputs.json`; passages naming a packet case's result removed by `paper2_blind.py`). Manifest copied to `stage_h_blind/paper2/packet_MANIFEST.sha256`. Leak list (`paper2_leaks.py`, outside the packet): 0 hard leaks. Building it found that the column-stripping awk split cells at escaped pipes and cut the HR-77 row; fixed before the packet was frozen (earlier packets had no escaped pipe, so they are unchanged).
+- Blind lane: a separate Sonnet context with the packet only. Frozen output `stage_h_blind/paper2/blind_results.json`, SHA-256 `8964eebcaba91aeab49db01887c16b389dd8eb770f0485d7d1186c6cb6636627` (checked by the script; copied unedited with `blind_ref.py`, `notes.md`, `blind_results.sha256`). 6 cases.
+- Compare: `python -I program/stage_h_blind_w2/paper2_compare.py .`, mapping committed before the first run (identity names; no `status` wrapper and key order are representation only; strings including decimals and hashes exact; JSON numbers at 1e-12 relative, 1e-15 absolute at 0). The first run crashed on pt_h-0054, where `records` is a count, not a list, in the not-blind check; that check was fixed (the mapping did not change) and the rerun of the script is the record.
+
+| Case | Compare | Counts as blind-checked |
+|---|---|---|
+| pt_h-0030 | MATCH | no: LIT `child_id` was not specified in the packet; the lane assumed the order id, and the child id enters each FILL record's hash, the next `prev` and `head`, so the assumption decided those fields |
+| pt_h-0031 | MATCH | no: same reason |
+| pt_h-0032 | VALUE MISMATCH: FILL `child_id` (golden `P1.M`, `P1.L0`; blind `P1-LIT`, `P1-DARK`) and the hashes, `prev` and `head` that follow from them; every other field (fills, fees, trim, cash, position) agrees | no: packet gap. The router (`exec.sor.allocate`) and the dark simulator were not in the packet, so the lane guessed the allocation and invented the child ids. Who was wrong: the lane, on child ids only, and only because the packet lacked the specs that name them; the golden follows `smart-order-router.md` |
+| pt_h-0050 | MATCH | yes |
+| pt_h-0051 | MATCH | yes |
+| pt_h-0054 | MATCH | yes |
+
+Result: H-21 is 17 of 24 value cases blind-checked (70.8%), above the 60% item floor. The goldens record this in `verified_by` (`oracle/python/gen_stage_h_pt.py`); no expected value changed. No rerun.

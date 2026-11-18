@@ -51,8 +51,9 @@ def agree(a, b):
 
 
 def lit_fill(outputs):
-    return any(r.get("kind") == "FILL" and r.get("body", {}).get("venue", "LIT") == "LIT"
-               for r in outputs.get("records", []) if isinstance(r, dict))
+    recs = outputs.get("records")  # an integer count in paper.ledger.verify (fixed after the first run crashed)
+    return isinstance(recs, list) and any(r.get("kind") == "FILL" and r.get("body", {}).get("venue", "LIT") == "LIT"
+                                          for r in recs if isinstance(r, dict))
 
 
 def compare(exp, b):

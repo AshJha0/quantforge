@@ -955,7 +955,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "outside: hashlib sha256 of the canonical bytes"
+    "outside: hashlib sha256 of the canonical bytes",
+    "blind lane 2: MATCH but not blind (LIT child_id unspecified in the packet; it enters the hashes)"
    ],
    "tags": [
     "stage_h",
@@ -1217,7 +1218,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "outside: hashlib sha256 of the canonical bytes"
+    "outside: hashlib sha256 of the canonical bytes",
+    "blind lane 2: MATCH but not blind (LIT child_id unspecified in the packet; it enters the hashes)"
    ],
    "tags": [
     "stage_h",
@@ -1393,7 +1395,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "outside: hashlib sha256 of the canonical bytes"
+    "outside: hashlib sha256 of the canonical bytes",
+    "blind lane 2: not blind (packet gap: router and dark simulator not in the packet; child_ids and hashes differ)"
    ],
    "tags": [
     "stage_h",
@@ -1732,14 +1735,15 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md, blind lane 2; field by field by paper2_compare.py): MATCH"
    ],
    "tags": [
     "stage_h",
     "paper",
     "exact"
    ],
-   "description": "hand, not blind: HR-77 exact cash at 31 digits (fails under 28-digit rounding)"
+   "description": "hand; blind lane 2 MATCH: HR-77 exact cash at 31 digits (fails under 28-digit rounding)"
   },
   {
    "case_id": "pt_h-0051",
@@ -1771,14 +1775,15 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md, blind lane 2; field by field by paper2_compare.py): MATCH"
    ],
    "tags": [
     "stage_h",
     "paper",
     "exact"
    ],
-   "description": "hand, not blind: HR-77 average cost 5/3 rounded half-even to 18 decimals"
+   "description": "hand; blind lane 2 MATCH: HR-77 average cost 5/3 rounded half-even to 18 decimals"
   },
   {
    "case_id": "pt_h-0052",
@@ -1855,14 +1860,15 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md, blind lane 2; field by field by paper2_compare.py): MATCH"
    ],
    "tags": [
     "stage_h",
     "paper",
     "ledger"
    ],
-   "description": "hand, not blind: HR-78 a repeated key (same value) is PARSE, though last-wins would verify"
+   "description": "hand; blind lane 2 MATCH: HR-78 a repeated key (same value) is PARSE, though last-wins would verify"
   }
  ]
 }
