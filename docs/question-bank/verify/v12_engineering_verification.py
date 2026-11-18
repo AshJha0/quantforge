@@ -67,8 +67,8 @@ sec = cli.split("## Error codes", 1)[1].split("## Value encoding", 1)[0]
 codes = re.findall(r"^\| `(E_[A-Z_]+)` \|", sec, re.M)
 has(f"The contract's error table lists {len(codes)} codes")
 assert codes[0] == "E_PARSE" and codes[-1] == "E_INFEASIBLE"
-assert '"contract_version":"1.15.0"' in cli
-has("`contract_version` 1.15.0")
+assert '"contract_version":"1.16.0"' in cli
+has("`contract_version` 1.16.0")
 
 # Q12.11: rulings files at the top of specifications/
 rul = sorted(p.name for p in (REPO / "specifications").glob("*rulings*.md"))

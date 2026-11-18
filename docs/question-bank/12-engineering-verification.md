@@ -285,7 +285,7 @@ Output is UTF-8 with no byte order mark. Negative zero may be written as `-0.0` 
 
 *Level: foundation. Evidence: spec. Source: [CLI contract](../../specifications/cli-contract.md)*
 
-Each implementation builds one executable called `quantforge`. Commands: `run` (one case on stdin, one result on stdout), `batch` and its alias `--batch` (JSON Lines in, one result per line out, in order), `version` (language, implementation version, `contract_version` 1.15.0, toolchain) and `operations` (the sorted operation names the build supports).
+Each implementation builds one executable called `quantforge`. Commands: `run` (one case on stdin, one result on stdout), `batch` and its alias `--batch` (JSON Lines in, one result per line out, in order), `version` (language, implementation version, `contract_version` 1.16.0, toolchain) and `operations` (the sorted operation names the build supports).
 
 Exit codes: 0 for an `ok` result from `run`, or a normally ended `batch`, `version` or `operations`; 2 for an `error` result from `run`; 64 for an unknown command or bad arguments, with empty stdout; 70 for an internal fault. Any other exit code, or a timeout, is a crash.
 

@@ -21,7 +21,7 @@ Stage H, microstructure and execution, on branch `stage-h`; not tagged. What is 
 
 ### Changed
 
-- **Contract number for stage H is 1.16.0 (DR-H8)**, not 1.15.0 as DR-H7 assumed: stage J shipped 1.15.0 in v0.9.0. The runner, stub and four `version` writers still report 1.15.0 on this branch and move in one commit when the last wave 1 language lane merges.
+- **Contract number for stage H is 1.16.0 (DR-H8)**, not 1.15.0 as DR-H7 assumed: stage J shipped 1.15.0 in v0.9.0. The runner, stub, the four `version` writers and the version tests moved to 1.16.0 in one commit.
 - `almgren-chriss.md`: the lambda = 1e-15 property bound is 2e-9 relative, with the derivation (the model's own shift from linear is kappa^2 T^2 / 6, about 1.6e-9 on parameter set P); the earlier 1e-9 was below it.
 - Site status: the implemented-stage list comes from ROADMAP and now names R6 (`tools/site_facts.json`).
 

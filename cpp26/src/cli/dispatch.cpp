@@ -490,7 +490,7 @@ string version_json() {
     w.key("implementation_version");
     w.string(QF_VERSION);
     w.key("contract_version");
-    w.string("1.15.0");  // rulings J-C-1 (curves lane) and J-W3-1 (wave 3); was 1.14.0 (J-W2-1)
+    w.string("1.16.0");  // stage H, ruling DR-H8; was 1.15.0 (J-C-1, J-W3-1)
     w.key("toolchain");
     #if defined(__clang__)
     w.string("Clang " __clang_version__);

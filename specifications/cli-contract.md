@@ -18,7 +18,7 @@ to start it from `conformance/runner/implementations.json`.
 | `quantforge run` | Read one case JSON document from stdin to end of file. Write one result JSON document to stdout. |
 | `quantforge batch` | Read JSON Lines from stdin, one case per line. Write one result per line to stdout, in the same order, flushing after each line. |
 | `quantforge --batch` | Exactly the same as `quantforge batch` (1.6.0). Both spellings must work. |
-| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.15.0", "toolchain":...}`. |
+| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.16.0", "toolchain":...}`. |
 | `quantforge operations` | Write a JSON array of the operation names this build supports, sorted. |
 
 `batch` exists because a JVM start per case would dominate run time. `run` and `batch` must give
