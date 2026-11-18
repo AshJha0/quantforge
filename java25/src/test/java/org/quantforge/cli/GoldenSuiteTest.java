@@ -99,13 +99,6 @@ class GoldenSuiteTest {
         };
     }
 
-    /** Suites whose expected outputs sit beside "status" rather than under "outputs" (alg_h, tcx_h). */
-    private static Map<?, ?> flat(Map<?, ?> expected) {
-        Map<Object, Object> m = new LinkedHashMap<>(expected);
-        m.remove("status");
-        return m;
-    }
-
     /** Rule F-3 statuses: "any" passes on a well-formed result; "same_as" compares with an earlier peer case. */
     static String judge(Map<?, ?> c, Map<?, ?> result, Map<String, Map<?, ?>> peers) {
         Map<?, ?> expected = map(c.get("expected"));
@@ -136,7 +129,7 @@ class GoldenSuiteTest {
         if (!"ok".equals(result.get("status"))) {
             return "unexpected " + result.get("error");
         }
-        Map<?, ?> want = expected.get("outputs") != null ? map(expected.get("outputs")) : flat(expected);
+        Map<?, ?> want = map(expected.get("outputs"));
         Map<?, ?> got = map(result.get("outputs"));
         if (!want.keySet().equals(got.keySet())) {
             return "keys " + got.keySet();
