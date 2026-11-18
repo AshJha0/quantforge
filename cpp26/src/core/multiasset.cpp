@@ -80,7 +80,10 @@ long long to_int(const Value* v, const string& path) {
     const char* b = v->text.data();
     const char* e = b + v->text.size();
     const auto [p, ec] = std::from_chars(b, e, r);
-    if (ec != std::errc{} || p != e) fail("E_DOMAIN", path, "integer outside the 64-bit range");
+    // HR-116: integer inputs within +-(2^53 - 1); outside (64-bit overflow included) is E_LIMIT.
+    constexpr long long int_max = (1LL << 53) - 1;
+    if (ec != std::errc{} || p != e || r > int_max || r < -int_max)
+        fail("E_LIMIT", path, "integer outside +-(2^53 - 1)");
     return r;
 }
 
@@ -866,17 +869,12 @@ void fx_request(const Value& raw, Writer& out) {
     D u, u_scaled;
     double uf = 0.0;
     if (drawn) {
-        const Value* sv = &need(raw, "seed");
-        if (sv->kind != Kind::Number || !sv->integral) fail("E_SCHEMA", "seed", "not an integer");
+        // HR-116: seed within 0..2^53 - 1, request_index within 0..2^32 - 1, outside E_LIMIT.
+        const long long seed = int_need(raw, "seed");
         const long long idx = int_need(raw, "request_index");
-        std::uint64_t seed = 0;
-        const char* sb = sv->text.data();
-        const char* se = sb + sv->text.size();
-        const auto [sp, sec] = std::from_chars(sb, se, seed);
-        if (idx < 0 || sv->text.front() == '-' || sec != std::errc{} || sp != se)
-            fail("E_SCHEMA", "request_index", "seed or request_index out of range");
-        if (idx > 2'147'483'647) fail("E_LIMIT", "request_index", "request_index above 2^31 - 1");
-        uf = Xoshiro256(seed, int(idx)).next_uniform();
+        if (seed < 0) fail("E_LIMIT", "seed", "seed below 0");
+        if (idx < 0 || idx > 4'294'967'295LL) fail("E_LIMIT", "request_index", "request_index outside 0..2^32 - 1");
+        uf = Xoshiro256(std::uint64_t(seed), idx).next_uniform();
         u_scaled = D::integer((long long)std::ldexp(uf, 53));
     } else {
         u = dec(raw, "u");

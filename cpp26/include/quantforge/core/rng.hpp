@@ -10,7 +10,7 @@ public:
     using State = std::array<std::uint64_t, 4>;
     explicit Xoshiro256(const State& s) : s_(s) {}
     /// Seeded state advanced by `stream` jumps.
-    Xoshiro256(std::uint64_t seed, int stream);
+    Xoshiro256(std::uint64_t seed, long long stream);  // stream 0..2^32 - 1 (HR-116)
     std::uint64_t next();
     void jump();
     double next_uniform();
