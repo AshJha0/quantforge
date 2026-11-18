@@ -5,6 +5,9 @@
 # columns) plus the rulings files, and a SHA-256 manifest.
 # Third argument "b" builds packet 2b instead: dark-pool, smart-order-router
 # and paper-trading (dark_h, sor_h, pt_h) with the H-21 rulings added.
+# Third argument "exec" builds the H-14/H-17 packet: adaptive-algos and
+# tca-pretrade (alg_h, tcx_h), inputs-only JSON, the rulings they cite, and
+# coordinator/LEAKS.tsv (not for the blind lane; fails on a leak).
 set -eu
 R="$1"; P="$2"; W="${3:-a}"; D="$(cd "$(dirname "$0")" && pwd)"
 mkdir -p "$P"
@@ -15,6 +18,15 @@ if [ "$W" = micro ]; then
   cp "$R/specifications/stage-h-rulings-micro.md" "$P/"
   cd "$P"
   sha256sum micro-estimators.blind.md venue-analytics.blind.md stage-h-rulings-micro.md > MANIFEST.sha256
+  exit 0
+fi
+if [ "$W" = exec ]; then
+  for f in adaptive-algos tca-pretrade tca schedules; do awk -f "$D/wave2_extract.awk" "$R/specifications/10-execution/$f.md" > "$P/$f.blind.md"; done
+  cp "$R/specifications/stage-h-rulings-w1.md" "$R/specifications/stage-h-rulings-h21.md" "$R/specifications/stage-h-rulings-w2-exec.md" "$P/"
+  PY=python3; "$PY" -c "" >/dev/null 2>&1 || PY=python
+  "$PY" -I "$D/wave2_exec_blind.py" "$R" "$P"
+  cd "$P"
+  sha256sum adaptive-algos.blind.md tca-pretrade.blind.md tca.blind.md schedules.blind.md stage-h-rulings-w1.md stage-h-rulings-h21.md stage-h-rulings-w2-exec.md alg_h.inputs.json tcx_h.inputs.json > MANIFEST.sha256
   exit 0
 fi
 if [ "$W" = b ]; then
