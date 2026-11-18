@@ -68,6 +68,7 @@
 #include "quantforge/core/term_curves.hpp"
 #include "quantforge/core/execution.hpp"
 #include "quantforge/core/microstructure.hpp"
+#include "quantforge/core/micro_est.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {
@@ -323,6 +324,7 @@ struct Entry {
 #include "ops_research_w3.inc"
 #include "ops_execution.inc"
 #include "ops_micro.inc"
+#include "ops_micro_est.inc"
 
 // Every verb this build runs. The operations command, and dispatch, are generated from this list alone.
 constexpr std::span<const Entry> registry[] = {
@@ -357,6 +359,7 @@ constexpr std::span<const Entry> registry[] = {
     research_w3_ops,
     execution_ops,
     micro_w2_ops,
+    micro_est_ops,
 };
 
 // Built on first use, never at static initialisation, so no order between translation units matters.
