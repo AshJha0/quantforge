@@ -61,6 +61,7 @@ class MultiAssetTest {
         FN.put("exec.sim.lit.run", i -> LitMatching.run((String) i.get("tick_size"), (String) i.get("lot_size"),
                 (List<?>) i.get("events"), (Map<?, ?>) i.get("fee_schedule"), i.get("session")));
         FN.put("exec.sor.allocate", Sor::allocate);
+        FN.put("exec.sim.dark.run", i -> DarkPool.run((Map<?, ?>) i.get("config"), (List<?>) i.get("events")));
     }
 
     private static Object canon(Object v) {
