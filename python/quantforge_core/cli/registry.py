@@ -76,6 +76,8 @@ CORE_MODULES = (
     "mc_greeks",
     "lmm",
     "lit_matching",
+    "dark_pool",
+    "sor",
     "order_book",
     "xva",
     "risk_tools",

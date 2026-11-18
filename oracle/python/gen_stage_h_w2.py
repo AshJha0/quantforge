@@ -8,6 +8,11 @@ lit_h-0001 were not blind (the source note prints the checksum; the case text hi
 As an extra independent check, every ob_h crc32 (and checksum_string, where emitted) is recomputed
 here with zlib from the expected book, per [KR-CRC]. Synthetic message lists only (HR-41).
 
+Also the simulated dark pool (dark_h, specifications/10-execution/dark-pool.md, H-12) and the smart
+order router (sor_h, specifications/10-execution/smart-order-router.md, H-13), from the same kind of
+table; blind record program/STAGE_H_BLIND_WAVE2B.md (dark_h-0003, sor_h-0001 and 0002 not blind).
+dark_h-0005/0006 and sor_h-0004 are outside-checked by tools and are not in these tables.
+
     cd oracle/python && uv run python -W ignore gen_stage_h_w2.py
 """
 import json
@@ -27,6 +32,11 @@ NOT_BLIND = {
     "lit_h-0001": ["hand"],
 }
 OPS = {"ob_h": "micro.book.rebuild", "lit_h": "exec.sim.lit.run"}
+SPEC_DARK = "specifications/10-execution/dark-pool.md"
+SPEC_SOR = "specifications/10-execution/smart-order-router.md"
+BLIND_2B = "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md)"
+NOT_BLIND_2B = {"dark_h-0003", "sor_h-0001", "sor_h-0002"}
+DARK_LABEL = "simulated venue; not a real dark pool"
 
 
 def table(rel):
@@ -37,7 +47,7 @@ def table(rel):
             continue
         if intable and line.startswith("|"):
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
-            if cells[0].startswith(("ob_h-", "lit_h-")):
+            if cells[0].startswith(("ob_h-", "lit_h-", "dark_h-", "sor_h-")):
                 rows.append((cells[0], json.loads(cells[1]), json.loads(cells[2])))
         elif intable:
             intable = False
@@ -84,7 +94,62 @@ def build():
             s.cases[-1]["case_id"] = cid  # spec ids (ob_h-0009 left the goldens, HR-41)
         add_errors(s, name)
         suites.append(s)
+    suites += build_w2b()
     return suites
+
+
+def dark_check(cid, exp):
+    runs = exp.get("scenarios", [exp])
+    for r in runs:
+        items = r["fills"] if "markouts_bp" in json.dumps(r) else [r]
+        for item in items:
+            assert item["label"] == DARK_LABEL, cid
+
+
+def build_w2b():
+    out = []
+    for name, spec in (("dark_h", SPEC_DARK), ("sor_h", SPEC_SOR)):
+        s = Suite(name, spec, G)
+        for cid, inp, exp in table(spec):
+            if name == "dark_h":
+                dark_check(cid, exp)
+                op = "exec.sim.dark.markouts" if "config" not in json.dumps(inp) else "exec.sim.dark.run"
+            else:
+                op = "exec.sor.allocate"
+                assert ("ranking" in exp) == (inp.get("ranking") is True), cid
+            blind = cid not in NOT_BLIND_2B
+            s.add(op, inp, exp, cls="date_and_convention",
+                  verified=["hand", BLIND_2B] if blind else ["hand"],
+                  tags=["stage_h", "simulated"],
+                  description=f"{cid} from the spec table" + ("" if blind else "; not blind"))
+            s.cases[-1]["case_id"] = cid
+        errs = {
+            "dark_h": [
+                ("p_firm above 1", {"config": dict(DCFG, p_firm="1.5"), "events": []}, "E_DOMAIN"),
+                ("min_qty above qty", {"config": DCFG, "events": [dict(DNEW, min_qty="200")]}, "E_DOMAIN"),
+                ("non-positive qty", {"config": DCFG, "events": [dict(DNEW, qty="0")]}, "E_DOMAIN"),
+            ],
+            "sor_h": [
+                ("S not positive", dict(SOR, S="0"), "E_DOMAIN"),
+                ("negative penalty", dict(SOR, lambda_u="-1"), "E_DOMAIN"),
+                ("empty sample", dict(SOR, lit_samples=[]), "E_INPUT"),
+            ],
+        }[name]
+        first = {"dark_h": 8, "sor_h": 7}[name]
+        for k, (desc, inp, code) in enumerate(errs):
+            s.add("exec.sim.dark.run" if name == "dark_h" else "exec.sor.allocate", inp, error=code,
+                  cls="date_and_convention", verified=["hand"], tags=["stage_h", "error"],
+                  description=f"hand: {desc}")
+            s.cases[-1]["case_id"] = f"{name}-{first + k:04d}"
+        out.append(s)
+    return out
+
+
+DCFG = {"firm_delay": 0, "lot_size": "1", "p_firm": "1", "penalty_events": 2, "seed": 20261118,
+        "tick_size": "0.01"}
+DNEW = {"id": "B1", "kind": "FIRM", "op": "NEW", "qty": "100", "side": "BUY"}
+SOR = {"S": "10", "f": "0.3", "h": "0.5", "lambda_o": "1", "lambda_u": "4", "theta": "0",
+       "lit_samples": [["0"], ["2"]], "venues": [{"Q": "2", "as": "0", "kind": "LIT", "r": "0.2"}]}
 
 
 def add_errors(s, name):
