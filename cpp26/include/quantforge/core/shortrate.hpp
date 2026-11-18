@@ -43,6 +43,12 @@ double bond_option(const Params& p, double T, double S, double K, bool call);
 
 double gamma_p(double s, double x);
 double gamma_pq(double s, double x, bool upper);
+/// J-W3-21: above this lambda/2 a noncentral chi-square CDF the Chernoff test cannot settle is E_LIMIT.
+inline constexpr double kNcx2MaxHalfLambda = 1e5;
+/// J-W3-21: a tail whose Chernoff log bound is below this is under 5e-324, the smallest subnormal.
+inline constexpr double kNcx2LogNegligible = -750.0;
+/// J-W3-21: 0 or 1 when the CDF at x is settled to within one subnormal by the Chernoff bound, else nothing.
+std::optional<double> ncx2_chernoff(double x, double k, double lambda);
 double ncx2_tail(double x, double k, double lambda, bool upper);
 double ncx2_sf(double x, double k, double lambda);
 double ncx2_cdf(double x, double k, double lambda);

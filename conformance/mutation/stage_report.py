@@ -90,12 +90,14 @@ def score_file(lang, path):
         basis = (f"unit or golden, golden {s.get('golden_killed', s['killed'])}, unit {s['unit_killed']}" if s.get("unit")
                  else "golden only")
         return s["killed"], s["survived"], (f"{basis}, {s['killed'] + s['survived'] + s['no_build']} of {s['sites']} sites, "
-                                            f"{s['no_build']} did not build, {s.get('timed_out', 0)} timed out")
+                                            f"{s['no_build']} did not build, {s.get('timed_out', 0)} timed out, "
+                                            f"{s.get('skipped_equivalent', 0)} proven equivalent left out, seed {s.get('seed', '?')}")
     note = ""
     if set(s.get("unit_verdicts", {})) == {"mutmut code 33"}:
         note = "; NO unit tests mapped (mutmut 33 on every mutant): golden only"
     return (s["sample_either_killed"], s["sampled"] - s["sample_either_killed"],
-            f"unit or golden, sample {s['sampled']} of {s['mutants']}; unit-only {s['sample_unit_killed']}, golden-only {s['sample_golden_killed']}{note}")
+            (f"unit or golden, sample {s['sampled']} of {s['mutants']}; unit-only {s['sample_unit_killed']}, "
+             f"golden-only {s['sample_golden_killed']}, {s.get('skipped_equivalent', 0)} proven equivalent left out{note}"))
 
 
 def pct(k, s):
@@ -151,7 +153,7 @@ def main(argv=None):
              f"Target: {target:.0%} per module and language with at least {MIN_FOR_GATE} scored mutants, and pooled." if target is not None else "No target set.",
              f"Pooled: **{pct(tk, ts)}** ({tk} killed, {ts} survived). Below target: {', '.join(below) or 'none'}. "
              f"Missing results: {len(missing)}.", "",
-             "Survivors have not been sorted into equivalent mutants and real gaps, so the score is a lower bound on test strength.", "",
+             "Mutants listed in skip-equivalents.json (proven Equivalent, second reviewer signed) are left out of the sample; other survivors have not been sorted, so the score is a lower bound on test strength.", "",
              f"Each module-language also needs a lower 95% Wilson bound of at least {LOWER_BOUND:.0%} (R6-14).", "",
              "| Module | Language | Score | Killed | Survived | 95% Wilson | Basis |", "|---|---|---|---:|---:|---|---|"]
     lines += ["| " + " | ".join(str(x) for x in r) + " |" for r in rows]

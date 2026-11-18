@@ -13220,6 +13220,437 @@
     "synthetic"
    ],
    "description": "limit before the domain check: E_LIMIT, not E_DOMAIN (J-W3-17)"
+  },
+  {
+   "case_id": "fuzzfix_j-0044",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      9.5e+299
+     ],
+     [
+      0.95,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.265,
+     -1.27
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NON_FINITE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "hedge",
+    "overflow",
+    "synthetic"
+   ],
+   "description": "a finite matrix whose normal equations overflow: E_NON_FINITE before check 3 (J-W3-18; fuzz hedgeint_i-0010)"
+  },
+  {
+   "case_id": "fuzzfix_j-0045",
+   "operation": "research.portfolio.mean_variance",
+   "inputs": {
+    "expected_returns": [
+     0.06771,
+     0.098313,
+     0.028432,
+     0.05484,
+     0.045746,
+     0.009556,
+     0.108223,
+     0.055019
+    ],
+    "covariance": [
+     [
+      0.048331,
+      0.004555,
+      -0.017935,
+      0.016324,
+      -0.006755,
+      0.004188,
+      0.012427,
+      -0.006854
+     ],
+     [
+      0.004555,
+      0.032681,
+      -0.003512,
+      -0.000217,
+      -0.010136,
+      0.022911,
+      0.013417,
+      -0.001925
+     ],
+     [
+      -0.017935,
+      -0.003512,
+      0.034533,
+      -0.005937,
+      0.014412,
+      -0.007383,
+      -0.004539,
+      0.001099
+     ],
+     [
+      0.016324,
+      -0.000217,
+      -0.005937,
+      0.036879,
+      0.00083,
+      -0.002874,
+      -0.011025,
+      -0.005214
+     ],
+     [
+      -0.006755,
+      -0.010136,
+      0.014412,
+      0.00083,
+      0.042148,
+      -0.007134,
+      -0.006968,
+      -0.002897
+     ],
+     [
+      0.004188,
+      0.022911,
+      -0.007383,
+      -0.002874,
+      -0.007134,
+      0.045017,
+      0.009949,
+      0.000445
+     ],
+     [
+      0.012427,
+      0.013417,
+      -0.004539,
+      -0.011025,
+      -0.006968,
+      0.009949,
+      0.055737,
+      -0.002087
+     ],
+     [
+      -0.006854,
+      -0.001925,
+      0.001099,
+      -0.005214,
+      -0.002897,
+      0.000445,
+      -0.002087,
+      0.030976
+     ]
+    ],
+    "risk_aversion": 3.0,
+    "lower": [
+     -9007199254740992.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "upper": [
+     0.2375,
+     0.2375,
+     0.2375,
+     0.2375,
+     0.2375,
+     0.2375,
+     0.2375,
+     0.2375
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "weights": [
+      0.062395242276264584,
+      0.2375,
+      0.0,
+      0.15528462876288496,
+      0.12016887532708206,
+      0.0,
+      0.2375,
+      0.18715125363376842
+     ],
+     "expected_return": 0.07758701109027148,
+     "volatility": 0.08523893205098124,
+     "objective": 0.06668849778448378,
+     "at_bound": [
+      0,
+      1,
+      -1,
+      0,
+      0,
+      -1,
+      1,
+      0
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "kkt-certificate",
+    "scipy-slsqp",
+    "reference-computed"
+   ],
+   "tags": [
+    "fuzz",
+    "research",
+    "synthetic"
+   ],
+   "description": "optim_j-0015 with lower_0 = -2^53 (inactive): the same answer; the start must meet the budget (J-W3-19; fuzz optim_j-0015)",
+   "output_classes": {
+    "at_bound": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "fuzzfix_j-0046",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     5e-324,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NON_FINITE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "shortrate",
+    "overflow",
+    "synthetic"
+   ],
+   "description": "CIR cap with t_0 = 5e-324: e^(gamma t_0) - 1 is 0, so rho is infinite (J-W3-20; fuzz capfloor)"
+  },
+  {
+   "case_id": "fuzzfix_j-0047",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     1e-200,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NON_FINITE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "shortrate",
+    "overflow",
+    "synthetic"
+   ],
+   "description": "CIR cap with t_0 = 1e-200: rho^2 overflows (J-W3-20)"
+  },
+  {
+   "case_id": "fuzzfix_j-0048",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     1e-10,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 47672.09456197169,
+     "caplet_prices": [
+      5790.068868782696,
+      7493.5615828008995,
+      8263.795835045452,
+      8628.616146460452,
+      8756.826919229117,
+      8739.225209653072
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "reference-computed",
+    "deterministic-limit",
+    "scipy-chndtr"
+   ],
+   "tags": [
+    "fuzz",
+    "shortrate",
+    "capfloor",
+    "cir",
+    "synthetic"
+   ],
+   "description": "CIR cap with t_0 = 1e-10 (lambda about 1.9e11): first caplet N (P(0, t_0) - (1 + K tau) P(0, 2)), settled by the Chernoff bound (J-W3-21; C++ gave 3690.6, Python ran for more than a minute)",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "fuzzfix_j-0049",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     1e-10,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14896.666168494941,
+     "caplet_prices": [
+      0.0,
+      3074.246303823362,
+      3112.876138319504,
+      3028.8427129700394,
+      2905.770922895984,
+      2774.9300904860515
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "reference-computed",
+    "deterministic-limit",
+    "scipy-chndtr"
+   ],
+   "tags": [
+    "fuzz",
+    "shortrate",
+    "capfloor",
+    "cir",
+    "synthetic"
+   ],
+   "description": "CIR floor with t_0 = 1e-10: first floorlet 0 to within e^-7e8 (J-W3-21)",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "fuzzfix_j-0050",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.0263,
+    "period_times": [
+     1e-06,
+     2.0,
+     3.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "shortrate",
+    "limit",
+    "synthetic"
+   ],
+   "description": "CIR cap with t_0 = 1e-6 and r_0 near the critical rate: lambda/2 about 9e6 and the Chernoff bound cannot settle the CDF, so E_LIMIT (J-W3-21)"
   }
  ]
 }

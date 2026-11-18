@@ -1,0 +1,120 @@
+{
+ "cpp": [
+  {
+   "key": "cpp26/src/core/multicurve.cpp \t for (std::size_t j = 0; j < n; ++j) s[j] = std::fabs(r[j]) <= delta ? 0 : (r[j] > 0.0 ? 1 : -1); \t for (std::size_t j = 0; j < n; ++j) s[j] = std::fabs(r[j]) <= delta ? 0 : (r[j] >= 0.0 ? 1 : -1);",
+   "row": "equivalents-cpp.md multicurve.cpp:385"
+  },
+  {
+   "key": "cpp26/src/core/shortrate.cpp \t if (mid <= lo || mid >= hi) break; \t if (mid <= lo && mid >= hi) break;",
+   "row": "equivalents-cpp.md shortrate.cpp:355"
+  },
+  {
+   "key": "cpp26/src/core/shortrate.cpp \t if (v > 0) \t if (v >= 0)",
+   "row": "equivalents-cpp.md shortrate.cpp:258"
+  },
+  {
+   "key": "cpp26/src/core/multicurve.cpp \t for (std::size_t j = 0; j < n; ++j) w[j] = std::fabs(r[j]) <= delta ? 1.0 : delta / std::fabs(r[j]); \t for (std::size_t j = 0; j < n; ++j) w[j] = std::fabs(r[j]) < delta ? 1.0 : delta / std::fabs(r[j]);",
+   "row": "equivalents-cpp.md multicurve.cpp:418"
+  }
+ ],
+ "rust": [
+  {
+   "key": "crates/quantforge-core/src/shortrate.rs \t replace * with + in hw_fd \t v[0] = 2.0 * v[1] - v[2];",
+   "row": "equivalents-rust.md rust/crates/quantforge-core/src/shortrate.rs:846"
+  },
+  {
+   "key": "crates/quantforge-core/src/shortrate.rs \t replace * with / in hw_fd \t v[0] = 2.0 * v[1] - v[2];",
+   "row": "equivalents-rust.md rust/crates/quantforge-core/src/shortrate.rs:846"
+  },
+  {
+   "key": "crates/quantforge-core/src/shortrate.rs \t replace * with + in hw_fd \t v[nx - 1] = 2.0 * v[nx - 2] - v[nx - 3];",
+   "row": "equivalents-rust.md rust/crates/quantforge-core/src/shortrate.rs:847"
+  },
+  {
+   "key": "crates/quantforge-core/src/shortrate.rs \t replace * with / in hw_fd \t v[nx - 1] = 2.0 * v[nx - 2] - v[nx - 3];",
+   "row": "equivalents-rust.md rust/crates/quantforge-core/src/shortrate.rs:847"
+  }
+ ],
+ "python": [
+  {
+   "key": "quantforge_core.variance.x_varswap_fair_strike__mutmut_124",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:451"
+  },
+  {
+   "key": "quantforge_core.variance.x_varswap_fair_strike__mutmut_133",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:451"
+  },
+  {
+   "key": "quantforge_core.variance.x_varswap_fair_strike__mutmut_171",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:457"
+  },
+  {
+   "key": "quantforge_core.variance.x_varswap_fair_strike__mutmut_178",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:457"
+  },
+  {
+   "key": "quantforge_core.variance.x_varswap_fair_strike__mutmut_179",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:457"
+  },
+  {
+   "key": "quantforge_core.variance.x__score__mutmut_9",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:229-231"
+  },
+  {
+   "key": "quantforge_core.variance.x__score__mutmut_14",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:229-231"
+  },
+  {
+   "key": "quantforge_core.variance.x__score__mutmut_36",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:229-231"
+  },
+  {
+   "key": "quantforge_core.variance.x_garch_estimate__mutmut_207",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:345,362,364"
+  },
+  {
+   "key": "quantforge_core.variance.x_garch_estimate__mutmut_210",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:345,362,364"
+  },
+  {
+   "key": "quantforge_core.variance.x_garch_estimate__mutmut_211",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:345,362,364"
+  },
+  {
+   "key": "quantforge_core.variance.x_garch_estimate__mutmut_294",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:345,362,364"
+  },
+  {
+   "key": "quantforge_core.variance.x_garch_estimate__mutmut_298",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:345,362,364"
+  },
+  {
+   "key": "quantforge_core.variance.x_garch_estimate__mutmut_299",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:345,362,364"
+  },
+  {
+   "key": "quantforge_core.variance.x_garch_estimate__mutmut_304",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:345,362,364"
+  },
+  {
+   "key": "quantforge_core.variance.x_garch_estimate__mutmut_307",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:345,362,364"
+  },
+  {
+   "key": "quantforge_core.variance.x_garch_estimate__mutmut_308",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:345,362,364"
+  },
+  {
+   "key": "quantforge_core.variance.x_vix_term_variance__mutmut_177",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:581-582"
+  },
+  {
+   "key": "quantforge_core.variance.x_vix_term_variance__mutmut_178",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:581-582"
+  },
+  {
+   "key": "quantforge_core.variance.x_vix_term_variance__mutmut_179",
+   "row": "equivalents-python.md python/quantforge_core/variance.py:581-582"
+  }
+ ]
+}

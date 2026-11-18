@@ -765,4 +765,55 @@ mod stage_j_fuzzfix_tests {
             None
         );
     }
+
+    /// J-W3-21: CIR at `t_0 = 1e-10` (noncentrality about 1.9e11); C++ gave 3690.6 for the first caplet.
+    #[test]
+    fn ruling_jw3_21_tiny_first_time() {
+        let cap = r#"{"model":"CIR","mean_reversion":0.25,"long_term_mean":0.04,"sigma":0.08,"short_rate":0.03,"period_times":[1e-10,2.0,3.0,4.0,5.0,6.0,7.0],"strike":0.03,"cap_floor":"CAP","notional":1000000.0}"#;
+        let first = |inputs: &str| -> f64 {
+            let text = format!(
+                r#"{{"schema_version":"1.0","case_id":"c","operation":"rates.shortrate.capfloor","inputs":{inputs}}}"#
+            );
+            run_case(text.as_bytes())
+                .0
+                .get("outputs")
+                .and_then(|o| o.get("caplet_prices"))
+                .and_then(Json::as_array)
+                .and_then(|a| a.first())
+                .and_then(Json::as_f64)
+                .expect("an ok result")
+        };
+        assert!((first(cap) - 5790.068868782696).abs() < 5790.07 * 1e-12);
+        assert_eq!(first(&cap.replace("\"CAP\"", "\"FLOOR\"")), 0.0);
+        let near = cap
+            .replace("\"short_rate\":0.03", "\"short_rate\":0.0263")
+            .replace("1e-10", "1e-06");
+        assert_eq!(
+            code("rates.shortrate.capfloor", &near).as_deref(),
+            Some("E_LIMIT")
+        );
+    }
+
+    /// J-W3-18 to J-W3-20: fuzz run 43858847696 (seed 4).
+    #[test]
+    fn rulings_jw3_seed4() {
+        assert_eq!(code("hedge.integer.solve", r#"{"a":[[1.0,9.5e+299],[0.95,1.0]],"b":[-1.265,-1.27],"weights":[1.0,1.0],"lot_sizes":[1.0,1.0]}"#).as_deref(), Some("E_NON_FINITE"));
+        assert_eq!(code("rates.shortrate.capfloor", r#"{"model":"CIR","mean_reversion":0.25,"long_term_mean":0.04,"sigma":0.08,"short_rate":0.03,"period_times":[5e-324,2.0,3.0,4.0,5.0,6.0,7.0],"strike":0.03,"cap_floor":"CAP","notional":1000000.0}"#).as_deref(), Some("E_NON_FINITE"));
+        assert_eq!(code("rates.shortrate.capfloor", r#"{"model":"CIR","mean_reversion":0.25,"long_term_mean":0.04,"sigma":0.08,"short_rate":0.03,"period_times":[1e-200,2.0,3.0,4.0,5.0,6.0,7.0],"strike":0.03,"cap_floor":"CAP","notional":1000000.0}"#).as_deref(), Some("E_NON_FINITE"));
+        let mv = r#"{"expected_returns":[0.06771,0.098313,0.028432,0.05484,0.045746,0.009556,0.108223,0.055019],"covariance":[[0.048331,0.004555,-0.017935,0.016324,-0.006755,0.004188,0.012427,-0.006854],[0.004555,0.032681,-0.003512,-0.000217,-0.010136,0.022911,0.013417,-0.001925],[-0.017935,-0.003512,0.034533,-0.005937,0.014412,-0.007383,-0.004539,0.001099],[0.016324,-0.000217,-0.005937,0.036879,0.00083,-0.002874,-0.011025,-0.005214],[-0.006755,-0.010136,0.014412,0.00083,0.042148,-0.007134,-0.006968,-0.002897],[0.004188,0.022911,-0.007383,-0.002874,-0.007134,0.045017,0.009949,0.000445],[0.012427,0.013417,-0.004539,-0.011025,-0.006968,0.009949,0.055737,-0.002087],[-0.006854,-0.001925,0.001099,-0.005214,-0.002897,0.000445,-0.002087,0.030976]],"risk_aversion":3.0,"lower":[-9007199254740992.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"upper":[0.2375,0.2375,0.2375,0.2375,0.2375,0.2375,0.2375,0.2375]}"#;
+        let text = format!(
+            r#"{{"schema_version":"1.0","case_id":"c","operation":"research.portfolio.mean_variance","inputs":{mv}}}"#
+        );
+        let r = run_case(text.as_bytes()).0;
+        let w: Vec<f64> = r
+            .get("outputs")
+            .and_then(|o| o.get("weights"))
+            .and_then(Json::as_array)
+            .expect("an ok result")
+            .iter()
+            .map(|v| v.as_f64().expect("a number"))
+            .collect();
+        assert!((w.iter().sum::<f64>() - 1.0).abs() < 1e-12);
+        assert!((w[0] - 0.062_395_242_276_264_584).abs() < 1e-12);
+    }
 }

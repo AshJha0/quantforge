@@ -304,4 +304,22 @@ class ShortRateTest {
         assertTrue(System.nanoTime() - t0 < 1_000_000_000L, "chi2Cdf must not loop on non-finite input");
         assertEquals(ShortRate.chi2Cdf(3.0, 2.0, 0.0), 1.0 - Math.exp(-1.5), 1e-14);
     }
+
+    /** J-W3-21: the Chernoff bound settles only tails below e^-750; an unsettled CDF above lambda/2 = 1e5 is E_LIMIT. */
+    @Test
+    void chi2ChernoffSettlesOnlyNegligibleTails() {
+        double lam = 1.87e11;
+        assertEquals(0.0, ShortRate.chi2Chernoff(0.877 * lam, 2.5, lam));
+        assertEquals(1.0, ShortRate.chi2Chernoff(1.2 * lam, 2.5, lam));
+        assertTrue(Double.isNaN(ShortRate.chi2Chernoff(lam, 2.5, lam)));
+        assertEquals(0.0, ShortRate.chi2Cdf(0.877 * lam, 2.5, lam));
+        double k = 2.5;
+        double l2 = 4220.0;
+        double sd = Math.sqrt(2.0 * (k + 2.0 * l2));
+        assertTrue(Double.isNaN(ShortRate.chi2Chernoff(k + l2 + 26.2 * sd, k, l2)));
+        assertTrue(Double.isNaN(ShortRate.chi2Chernoff(k + l2 - 26.2 * sd, k, l2)));
+        org.quantforge.core.QfError e = org.junit.jupiter.api.Assertions.assertThrows(
+                org.quantforge.core.QfError.class, () -> ShortRate.chi2Cdf(4e5 + 2.5, 2.5, 4e5));
+        assertEquals("E_LIMIT", e.code());
+    }
 }

@@ -97,12 +97,20 @@ def _cross_term(a: float, b: float, tau: float) -> float:
     if (a + b) * tau >= _SERIES_BELOW:
         return (tau - b_factor(a, tau) - b_factor(b, tau) + b_factor(a + b, tau)) / (a * b)
     # tau sum_{n>=2} (-tau)^n/(n+1)! ((a+b)^n - a^n - b^n) / (a b); the bracket over a b is the
-    # positive sum sum_{k=1}^{n-1} C(n, k) a^{k-1} b^{n-k-1}.
+    # positive sum sum_{k=1}^{n-1} C(n, k) a^{k-1} b^{n-k-1}. Written in xa = a tau, xb = b tau
+    # (both below 0.5 here) as tau^3 sum_n (-1)^n/(n+1)! sum_k C(n, k) xa^{k-1} xb^{n-k-1}, so no
+    # power of a or b alone is formed: a ** 38 overflowed (OverflowError) for a above about 1e8,
+    # even at tau = 0, where the answer is exactly 0.
+    if tau == 0:
+        return 0.0
+    xa, xb = a * tau, b * tau
     total = 0.0
     for n in range(2, _SERIES_TERMS):
-        inner = ordered_sum(math.comb(n, k) * a ** (k - 1) * b ** (n - k - 1) for k in range(1, n))
-        total += (-tau) ** n / math.factorial(n + 1) * inner
-    return tau * total
+        inner = ordered_sum(
+            math.comb(n, k) * xa ** (k - 1) * xb ** (n - k - 1) for k in range(1, n)
+        )
+        total += (-1) ** n / math.factorial(n + 1) * inner
+    return tau**3 * total
 
 
 # --- the curve -----------------------------------------------------------------------------------
@@ -360,6 +368,29 @@ def _gamma_p(s: float, x: float) -> float:
     return 1.0 - math.exp(log_front) * h
 
 
+NCX2_MAX_HALF_LAMBDA = 1e5
+"""J-W3-21: above this `lambda/2`, a CDF the Chernoff test cannot settle is `E_LIMIT`."""
+NCX2_LOG_NEGLIGIBLE = -750.0
+"""J-W3-21: a tail whose Chernoff log bound is below this is under 5e-324, the smallest subnormal."""
+
+
+def _ncx2_chernoff(x: float, k: float, lam: float) -> float | None:
+    """J-W3-21: 0 or 1 when the noncentral chi-square CDF at `x` is settled to within one
+    subnormal, else None. For `t < 1/2`, Markov's inequality on `e^(tX)` with the moment
+    generating function `(1 - 2t)^(-k/2) exp(lambda t / (1 - 2t))` bounds the lower tail
+    (`t < 0`) or the upper tail (`t > 0`) by `exp(f(t))`, `f(t) = -t x - (k/2) ln(1 - 2t) +
+    lambda t / (1 - 2t)` (Chernoff 1952). With `u = 1/(1 - 2t)` the minimum solves `lambda u^2 +
+    k u = x`, so `u = 2x / (k + sqrt(k^2 + 4 lambda x))` and `f = (k/2) ln u - x (1 - 1/u)/2 +
+    lambda (u - 1)/2`; `u < 1` is the lower tail. If `f < -750` the tail is below `e^-750`, so 0
+    (lower) or 1 (upper) is the correctly rounded CDF. This settles CIR options at tiny expiries,
+    where `lambda` reaches 1e11 and the series would need about 1e11 terms."""
+    u = 2 * x / (k + math.sqrt(k * k + 4 * lam * x))
+    f = 0.5 * k * math.log(u) - 0.5 * x * (1 - 1 / u) + 0.5 * lam * (u - 1)
+    if not f < NCX2_LOG_NEGLIGIBLE:
+        return None
+    return 0.0 if u < 1 else 1.0
+
+
 def ncx2_cdf(x: float, k: float, lam: float) -> float:
     """Noncentral chi-square CDF by the Poisson-weighted series of central CDFs, summed from the
     Poisson mode outward with log weights (G-32), so `exp(-lambda/2)` never underflows alone. A
@@ -369,6 +400,14 @@ def ncx2_cdf(x: float, k: float, lam: float) -> float:
     half = lam / 2
     if half <= 0:
         return _gamma_p(k / 2, x / 2)
+    decided = _ncx2_chernoff(x, k, lam)
+    if decided is not None:
+        return decided
+    if half > NCX2_MAX_HALF_LAMBDA:
+        raise QfError(
+            "E_LIMIT",
+            "the noncentral chi-square noncentrality is too large for the series (J-W3-21)",
+        )
     j0 = math.floor(half)
 
     def term(j: int) -> float:

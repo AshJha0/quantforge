@@ -685,3 +685,53 @@ TEST_CASE("hsu integer ridge is on positions, not lots", "[hedging][hsu]") {
     REQUIRE(std::fabs(r.objective - 16.195) <= 1e-12);
     REQUIRE(r.continuous_objective <= r.objective);
 }
+
+// Probe suite ns2 (2026-11-17): the near-singular data above with equalities and on the costed path. Exact minima by
+// fractions KKT enumeration over faces and orthants; before refine_face each objective was 2.25e-6 or 2.5e-6 too high.
+TEST_CASE("hsu near-singular equality and costed paths are refined", "[hedging][hsu]") {
+    const Matrix a2 = {{-0.04684068765297382, 0.85014589759939}, {0.06966430897729968, -1.2643959406278287}};
+    const hg::Vec b = {-18.480681166672692, -6.198617610506782}, w = {1.6701886487345696, 2.992546829483374};
+    // The first column times 16 keeps the free 2x2 block regular after R6-6.2 scaling.
+    const Matrix a3 = {{16 * a2[0][0], a2[0][1], 0.5}, {16 * a2[1][0], a2[1][1], 0.375}};
+    const auto near = [](double got, double exact) {
+        const double err = std::fabs(got - exact);
+        return err <= 1e-10 || err <= 1e-10 * exact;
+    };
+    for (const bool bounded : {false, true}) {  // x_2 = 3 by its row, and again with the bound x_2 >= 3 active
+        hg::QpProblem p;
+        p.a = a3;
+        p.b = b;
+        p.weights = w;
+        p.eq_matrix = Matrix{{0.0, 0.0, 1.0}};
+        p.eq_rhs = hg::Vec{3.0};
+        if (bounded) p.lower = std::vector<hg::Bound>{std::nullopt, std::nullopt, 3.0};
+        const hg::QpResult q = hg::solve_qp(p);
+        REQUIRE(near(q.objective, 0.0));
+        REQUIRE(q.x[2] == 3.0);
+    }
+    hg::QpProblem s;  // half spreads 1e-16: both instruments stay negative, so the final orthant is smooth
+    s.a = a2;
+    s.b = b;
+    s.weights = w;
+    s.half_spreads = hg::Vec{1e-16, 1e-16};
+    REQUIRE(near(hg::solve_qp(s).objective, 8.661435011274932e-09));
+    hg::QpProblem m = s;  // a margin that does not bind
+    m.half_spreads.reset();
+    m.margin_rates = hg::Vec{1.0, 1.0};
+    m.margin_limit = 1e9;
+    REQUIRE(near(hg::solve_qp(m).objective, 0.0));
+    hg::QpProblem e = s;  // spreads with an equality
+    e.a = a3;
+    e.half_spreads = hg::Vec{1e-16, 1e-16, 1e-16};
+    e.eq_matrix = Matrix{{0.0, 0.0, 1.0}};
+    e.eq_rhs = hg::Vec{3.0};
+    REQUIRE(near(hg::solve_qp(e).objective, 8.691920544150821e-10));
+    hg::QpProblem k;  // a third instrument on its own factor row held at its kink 0 by a spread of 100
+    k.a = {{a3[0][0], a3[0][1], 0.0}, {a3[1][0], a3[1][1], 0.0}, {0.0, 0.0, 1.0}};
+    k.b = {b[0], b[1], -0.5};
+    k.weights = {w[0], w[1], 1.0};
+    k.half_spreads = hg::Vec{1e-16, 1e-16, 100.0};
+    const hg::QpResult kr = hg::solve_qp(k);
+    REQUIRE(near(kr.objective, 0.25000000096536956));
+    REQUIRE(kr.x[2] == 0.0);
+}

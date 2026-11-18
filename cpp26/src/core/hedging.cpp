@@ -446,6 +446,8 @@ struct BoundRow {
 struct Multipliers {
     Vec lower, upper;
     double general = 0.0;
+    std::vector<char> lower_active, upper_active;  // the active rows (a multiplier may be 0 at a degenerate one)
+    bool general_active = false;
 };
 
 // Minimises the strictly convex quadratic y'Gy/2 + g'y over the bounds on x = xp + Z y and, when given, one
@@ -466,7 +468,7 @@ Vec bounded_minimiser(const Matrix& reduced, const Vec& g0, const NullSpace& ns,
             if (gap < -1e-12 * (std::fabs(b.bound) + std::fabs(x[b.index])))
                 throw Error("E_INFEASIBLE", "the equalities fix x outside the bounds");
         }
-        if (mult) *mult = Multipliers{Vec(n, 0.0), Vec(n, 0.0), 0.0};
+        if (mult) *mult = Multipliers{Vec(n, 0.0), Vec(n, 0.0), 0.0, std::vector<char>(n, 0), std::vector<char>(n, 0), false};
         if (general) {
             double lhs = 0.0, scale = std::fabs(general_rhs);
             for (std::size_t j = 0; j < n; ++j) {
@@ -507,11 +509,16 @@ Vec bounded_minimiser(const Matrix& reduced, const Vec& g0, const NullSpace& ns,
         for (const std::size_t i : qp.active())
             if (i < rows.size()) x[rows[i].index] = rows[i].bound;
     if (mult) {
-        *mult = Multipliers{Vec(n, 0.0), Vec(n, 0.0), 0.0};
+        *mult = Multipliers{Vec(n, 0.0), Vec(n, 0.0), 0.0, std::vector<char>(n, 0), std::vector<char>(n, 0), false};
         for (std::size_t a = 0; a < qp.active().size(); ++a) {
             const std::size_t i = qp.active()[a];
-            if (i == rows.size()) mult->general = qp.multipliers()[a];
-            else (rows[i].lower ? mult->lower : mult->upper)[rows[i].index] = qp.multipliers()[a];
+            if (i == rows.size()) {
+                mult->general = qp.multipliers()[a];
+                mult->general_active = true;
+            } else {
+                (rows[i].lower ? mult->lower : mult->upper)[rows[i].index] = qp.multipliers()[a];
+                (rows[i].lower ? mult->lower_active : mult->upper_active)[rows[i].index] = 1;
+            }
         }
     }
     return x;
@@ -713,6 +720,10 @@ std::optional<Vec> least_margin(const Matrix& eq, const Vec& eq_rhs, const std::
 
 namespace {
 
+void refine_face(const Matrix& a, const Vec& b, const Vec& w, const Vec& diag, const Vec& lin, const Matrix& h,
+                 const Matrix& eq, const Vec& eq_rhs, const Vec* row, double limit, bool row_active,
+                 const std::vector<char>& fixed, const std::vector<double>& lo, const std::vector<double>& hi, Vec& x);
+
 // Wave 4a with a spread or margin term, by sign states (ruling I-48). f = x'Hx + 2c'x + 2 sum k_j |x_j|, with
 // k = cost_weight half_spreads / 2, and optionally sum m_j |x_j| <= limit. A sign state fixes s_j = +1 or -1 for
 // each instrument whose sign is open; in its closed orthant |x_j| = s_j x_j, so f is a smooth strictly convex QP
@@ -831,12 +842,35 @@ private:
             if (worst == n_) {
                 for (const std::size_t j : free_)  // a coordinate held by its sign row is exactly 0
                     if ((sign_[j] > 0 ? mult.lower[j] : mult.upper[j]) > 0.0) x[j] = 0.0;
+                refine(k, with_margin, mult, x);
                 return x;
             }
             sign_[worst] = -sign_[worst];
             if (std::ranges::find(seen, sign_) != seen.end())
                 throw Error("E_NO_CONVERGENCE", "the sign-state method revisited a state");
         }
+    }
+
+    // refine_face on the final orthant, where |x_j| = s_j x_j and f is smooth: the spread is the linear term
+    // k_j s_j, the impact a diagonal, an active margin row sum m_j s_j x_j = limit one more equality. Instruments at an
+    // active bound of the orthant (its kink at 0 included) stay where they are.
+    void refine(const Vec& k, bool with_margin, const Multipliers& mult, Vec& x) const {
+        std::vector<double> lo(n_, -inf), hi(n_, inf);
+        std::vector<char> fixed(n_, 0);
+        Vec diag(n_, p_.ridge), lin(n_, 0.0), row(n_, 0.0);
+        const double cost_weight = p_.cost_weight.value_or(1.0);
+        for (std::size_t j = 0; j < n_; ++j) {
+            if (!lower_.empty() && lower_[j]) lo[j] = *lower_[j];
+            if (!upper_.empty() && upper_[j]) hi[j] = *upper_[j];
+            if (sign_[j] > 0) lo[j] = std::max(lo[j], 0.0);
+            if (sign_[j] < 0) hi[j] = std::min(hi[j], 0.0);
+            fixed[j] = mult.lower_active.empty() ? 0 : char(mult.lower_active[j] || mult.upper_active[j]);
+            if (p_.impact) diag[j] += cost_weight * (*p_.impact)[j];  // impact counts like a ridge (I-26)
+            lin[j] = k[j] * double(sign_[j]);
+            row[j] = m_[j] * double(sign_[j]);
+        }
+        refine_face(p_.a, p_.b, p_.weights, diag, lin, q_.h, p_.eq_matrix.value_or(Matrix{}), p_.eq_rhs.value_or(Vec{}),
+                    margined_ ? &row : nullptr, limit_, with_margin && mult.general_active, fixed, lo, hi, x);
     }
 
     Vec gradient_at_xp(const Vec& c) const {
@@ -1031,8 +1065,22 @@ QpResult solve_qp_impl(const QpProblem& p, bool by_orthants) {
         for (std::size_t j = 0; j < n; ++j) x[j] += dot(ns.z[j], y);
     } else if (!p.half_spreads && !p.margin_rates) {
         // Check 6 (feasibility) happens inside: E_INFEASIBLE when no point exists (I-14).
-        x = bounded_minimiser(reduced, g0, ns, lower, upper);
-        if (!p.eq_matrix) {
+        Multipliers mult;
+        x = bounded_minimiser(reduced, g0, ns, lower, upper, nullptr, 0.0, &mult);
+        if (p.eq_matrix) {
+            // With equalities the same error enters through Z'HZ: 2.5e-6 against an exact minimum of 0 on a
+            // near-singular free block with x_2 = 3 fixed by its row (probe suite ns2). Refine in the null space of E.
+            std::vector<double> lo(n, -inf), hi(n, inf);
+            std::vector<char> fixed(n, 0);
+            Vec diag(n, p.ridge);
+            for (std::size_t j = 0; j < n; ++j) {
+                if (!lower.empty() && lower[j]) lo[j] = *lower[j];
+                if (!upper.empty() && upper[j]) hi[j] = *upper[j];
+                if (p.impact) diag[j] += cost_weight * (*p.impact)[j];  // impact counts like a ridge (I-26)
+                fixed[j] = mult.lower_active.empty() ? 0 : char(mult.lower_active[j] || mult.upper_active[j]);
+            }
+            refine_face(p.a, p.b, p.weights, diag, Vec(n, 0.0), q.h, e, *p.eq_rhs, nullptr, 0.0, false, fixed, lo, hi, x);
+        } else {
             // The normal-equations error of the integer relaxation (refine_relaxed) again: 2.3e-6 against an exact
             // minimum of 0 on the near-singular case of Java seed -11115467 with x bounds 10 times its lot bounds.
             std::vector<double> lo(n, -inf), hi(n, inf);
@@ -1186,6 +1234,155 @@ double refine_relaxed(const Matrix& al, const Vec& b, const Vec& w, const Vec& d
     return best;
 }
 
+// Fixed-precision iterative refinement on one face: refine_relaxed with constraints, the same algorithm and guards
+// as Java refineFace and Rust refine_face. The free coordinates F (fixed[j] == 0) move in the null space of the
+// active rows: the equalities, and `row` when row_active. On the face f(x) = sum w_i r_i^2 + sum diag_j x_j^2 +
+// 2 sum lin_j x_j plus a constant (diag = ridge + cost_weight impact, lin = the orthant's k_j s_j), r = A x + b, so
+// its half-gradient is g = A' W r + diag x + lin. bounded_minimiser solved the reduced normal equations Z'HZ, whose
+// condition number is that of W^(1/2) A Z squared, so its answer is off along a weak direction by about
+// u kappa(Z'HZ) |x|: 2.5e-6 in f against an exact minimum of 0 on the ns2 probe cases. Each step takes g from the
+// residual computed directly (error u |A| |x|, not squared), uses an orthonormal basis Z of the null space of the
+// active rows restricted to F, and solves (Z' H_FF Z) t = -Z' g_F, delta_F = Z t; the error contracts by about
+// u kappa per step. C delta = 0 holds in exact arithmetic; in floating point a step is kept only while every
+// active row's defect |c . x - d| stays within the larger of its defect at the start and the rounding of evaluating
+// it (2^-52 (sum |c_j x_j| + |d|)), an inactive margin row stays at or below the larger of its limit and its value
+// at the start, every free coordinate stays inside its bounds, and f falls. So the result is never worse than the
+// active-set answer, and nothing changes when no step lowers f. The cap of 64 steps is only a guard.
+void refine_face(const Matrix& a, const Vec& b, const Vec& w, const Vec& diag, const Vec& lin, const Matrix& h,
+                 const Matrix& eq, const Vec& eq_rhs, const Vec* row, double limit, bool row_active,
+                 const std::vector<char>& fixed, const std::vector<double>& lo, const std::vector<double>& hi, Vec& x) {
+    const std::size_t n = x.size();
+    std::vector<std::size_t> free;
+    for (std::size_t j = 0; j < n; ++j)
+        if (!fixed[j]) free.push_back(j);
+    const std::size_t nf = free.size();
+    if (nf == 0) return;
+    Matrix c;
+    Vec d;
+    for (std::size_t i = 0; i < eq.size(); ++i) {
+        c.push_back(eq[i]);
+        d.push_back(eq_rhs[i]);
+    }
+    if (row && row_active) {
+        c.push_back(*row);
+        d.push_back(limit);
+    }
+    const std::size_t p = c.size();
+    Vec defect(p);
+    for (std::size_t i = 0; i < p; ++i) defect[i] = std::fabs(dot(c[i], x) - d[i]);
+    const double row_cap = !row || row_active ? 0.0 : std::max(limit, dot(*row, x));
+    // Orthonormal basis of the null space over F. The row space first, by modified Gram-Schmidt in two passes,
+    // dropping a row whose remainder is at most 1e-12 of its norm (a row on fixed coordinates only, or one the others
+    // imply). The complement then one vector at a time from the unit vector with the largest remainder after
+    // projecting out everything chosen so far: the squared remainders sum to the dimension still missing, so the
+    // largest is at least that over nf and the choice never degenerates.
+    const auto project_out = [](Vec& v, const Matrix& basis) {
+        for (int pass = 0; pass < 2; ++pass)
+            for (const Vec& q : basis) {
+                const double s = dot(q, v);
+                for (std::size_t u = 0; u < v.size(); ++u) v[u] -= s * q[u];
+            }
+    };
+    Matrix basis;
+    for (const Vec& full : c) {
+        Vec v(nf);
+        for (std::size_t u = 0; u < nf; ++u) v[u] = full[free[u]];
+        const double norm0 = std::sqrt(dot(v, v));
+        if (norm0 == 0.0) continue;
+        project_out(v, basis);
+        const double norm = std::sqrt(dot(v, v));
+        if (norm > 1e-12 * norm0) {
+            for (double& e : v) e /= norm;
+            basis.push_back(std::move(v));
+        }
+    }
+    const std::size_t missing = nf - basis.size();
+    Matrix z;
+    std::vector<char> used(nf, 0);
+    for (std::size_t step = 0; step < missing; ++step) {
+        Vec pick;
+        double pick_norm = -1.0;
+        std::size_t pick_at = 0;
+        for (std::size_t i = 0; i < nf; ++i) {
+            if (used[i]) continue;
+            Vec v(nf, 0.0);
+            v[i] = 1.0;
+            project_out(v, basis);
+            project_out(v, z);
+            const double norm = std::sqrt(dot(v, v));
+            if (norm > pick_norm) {
+                pick = std::move(v);
+                pick_norm = norm;
+                pick_at = i;
+            }
+        }
+        for (double& e : pick) e /= pick_norm;
+        used[pick_at] = 1;
+        z.push_back(std::move(pick));
+    }
+    const std::size_t dim = z.size();
+    if (dim == 0) return;
+    Matrix m(dim, Vec(dim, 0.0));  // Z' H_FF Z
+    for (std::size_t s = 0; s < dim; ++s)
+        for (std::size_t t = 0; t < dim; ++t) {
+            double acc = 0.0;
+            for (std::size_t u = 0; u < nf; ++u) {
+                double hz = 0.0;
+                for (std::size_t v = 0; v < nf; ++v) hz += h[free[u]][free[v]] * z[t][v];
+                acc += z[s][u] * hz;
+            }
+            m[s][t] = acc;
+        }
+    Matrix l(dim, Vec(dim, 0.0));
+    for (std::size_t j = 0; j < dim; ++j) {
+        double piv = m[j][j];
+        for (std::size_t k = 0; k < j; ++k) piv -= l[j][k] * l[j][k];
+        if (!(piv > 0.0)) return;  // not numerically positive definite: keep the active-set answer
+        l[j][j] = std::sqrt(piv);
+        for (std::size_t i = j + 1; i < dim; ++i) {
+            double s = m[i][j];
+            for (std::size_t k = 0; k < j; ++k) s -= l[i][k] * l[j][k];
+            l[i][j] = s / l[j][j];
+        }
+    }
+    const auto f_of = [&](const Vec& v) {
+        double f = objective_of(residual_of(a, b, v), w, 0.0, v);
+        for (std::size_t j = 0; j < n; ++j) f += diag[j] * v[j] * v[j] + 2.0 * lin[j] * v[j];
+        return f;
+    };
+    double best = f_of(x);
+    for (int iter = 0; iter < 64; ++iter) {
+        const Vec res = residual_of(a, b, x);
+        Vec t(dim, 0.0);  // -Z' g_F
+        for (std::size_t u = 0; u < nf; ++u) {
+            const std::size_t j = free[u];
+            double g = diag[j] * x[j] + lin[j];
+            for (std::size_t i = 0; i < res.size(); ++i) g += a[i][j] * w[i] * res[i];
+            for (std::size_t s = 0; s < dim; ++s) t[s] -= z[s][u] * g;
+        }
+        t = cholesky_solve(l, t);
+        Vec trial = x;
+        for (std::size_t u = 0; u < nf; ++u) {
+            const std::size_t j = free[u];
+            double delta = 0.0;
+            for (std::size_t s = 0; s < dim; ++s) delta += z[s][u] * t[s];
+            trial[j] += delta;
+            if (trial[j] < lo[j] || trial[j] > hi[j]) return;
+        }
+        for (std::size_t i = 0; i < p; ++i) {
+            double scale = std::fabs(d[i]);
+            for (std::size_t j = 0; j < n; ++j) scale += std::fabs(c[i][j] * trial[j]);
+            if (std::fabs(dot(c[i], trial) - d[i]) > std::max(defect[i], std::numeric_limits<double>::epsilon() * scale))
+                return;
+        }
+        if (row && !row_active && dot(*row, trial) > row_cap) return;
+        const double f = f_of(trial);
+        if (!(f < best)) return;
+        best = f;
+        x = trial;
+    }
+}
+
 }  // namespace
 
 IntegerResult solve_integer(const IntegerProblem& p) {
@@ -1209,6 +1406,13 @@ IntegerResult solve_integer(const IntegerProblem& p) {
     // The ridge is on x = L n, so in lot units it is ridge L_jj^2 on the diagonal (as in Java and Rust).
     Normal q = normal_equations(al, p.b, p.weights, 0.0);
     for (std::size_t j = 0; j < n; ++j) q.h[j][j] += p.ridge * p.lot_sizes[j] * p.lot_sizes[j];
+    // J-W3-18 (R6-8.1): L H L or L A' W b overflowing from finite inputs is E_NON_FINITE, before check 3. NaN
+    // entries used to pass check 3 and leave the lattice search with no candidate (a null pick below).
+    for (std::size_t i = 0; i < n; ++i) {
+        bool ok = std::isfinite(q.c[i]);
+        for (std::size_t j = 0; j < n; ++j) ok = ok && std::isfinite(q.h[i][j]);
+        if (!ok) throw Error("E_NON_FINITE", "the normal equations in lot units overflow", "a");
+    }
     const Vec eig = jacobi_eigen(scaled(q.h, jacobi_scale(q.h))).values;  // R6-6.2
     if (eig.front() <= singular_threshold * largest_abs(eig))
         throw Error("E_SINGULAR", "the hedge in lot units has no unique minimiser", "a");
@@ -1259,6 +1463,8 @@ IntegerResult solve_integer(const IntegerProblem& p) {
             (weight(c.lots) == weight(pick->lots) && c.lots < pick->lots))
             pick = &c;
     }
+    // Guard only: with finite normal equations the start point is always a candidate, so pick is never null.
+    if (!pick) throw Error("E_NON_FINITE", "no lattice point has a finite objective", "a");
     out.lots = pick->lots;
     out.x.resize(n);
     for (std::size_t j = 0; j < n; ++j) out.x[j] = p.lot_sizes[j] * double(out.lots[j]) + 0.0;

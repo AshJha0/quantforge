@@ -339,6 +339,31 @@ pub fn gamma_p(s: f64, x: f64) -> f64 {
     }
 }
 
+/// J-W3-21: above this `lambda/2` a noncentral chi-square CDF the Chernoff test cannot settle
+/// is `E_LIMIT` (the caller reports it; [`noncentral_chi2_cdf`] returns NaN).
+pub const NCX2_MAX_HALF_LAMBDA: f64 = 1e5;
+/// J-W3-21: a tail whose Chernoff log bound is below this is under 5e-324, the smallest subnormal.
+pub const NCX2_LOG_NEGLIGIBLE: f64 = -750.0;
+
+/// J-W3-21: `Some(0)` or `Some(1)` when the noncentral chi-square CDF at `x > 0` is settled to
+/// within one subnormal, else `None`. For `t < 1/2`, Markov's inequality on `e^(tX)` with the
+/// moment generating function `(1 - 2t)^(-k/2) exp(lambda t / (1 - 2t))` bounds the lower tail
+/// (`t < 0`) or the upper tail (`t > 0`) by `exp(f(t))`, `f(t) = -t x - (k/2) ln(1 - 2t) +
+/// lambda t / (1 - 2t)` (Chernoff 1952). With `u = 1/(1 - 2t)` the minimum solves `lambda u^2 +
+/// k u = x`, so `u = 2x / (k + sqrt(k^2 + 4 lambda x))` and `f = (k/2) ln u - x (1 - 1/u)/2 +
+/// lambda (u - 1)/2`; `u < 1` is the lower tail. Below `f = -750` the tail is under `e^-750`,
+/// so 0 (lower) or 1 (upper) is the correctly rounded CDF.
+#[must_use]
+pub fn noncentral_chi2_chernoff(x: f64, k: f64, lambda: f64) -> Option<f64> {
+    let u = 2.0 * x / (k + (k * k + 4.0 * lambda * x).sqrt());
+    let f = 0.5 * k * u.ln() - 0.5 * x * (1.0 - 1.0 / u) + 0.5 * lambda * (u - 1.0);
+    if f < NCX2_LOG_NEGLIGIBLE {
+        Some(if u < 1.0 { 0.0 } else { 1.0 })
+    } else {
+        None
+    }
+}
+
 /// Noncentral chi-square CDF `P(X <= x)` with `k > 0` degrees of freedom and noncentrality
 /// `lambda >= 0`, as the Poisson-weighted sum `sum_j e^{-lambda/2} (lambda/2)^j / j!
 /// P(k/2 + j, x/2)` (Johnson, Kotz and Balakrishnan, *Continuous Univariate Distributions*
@@ -356,10 +381,17 @@ pub fn noncentral_chi2_cdf(x: f64, k: f64, lambda: f64) -> f64 {
     if h == 0.0 {
         return gamma_p(s0, y);
     }
+    if let Some(decided) = noncentral_chi2_chernoff(x, k, lambda) {
+        return decided;
+    }
+    if h > NCX2_MAX_HALF_LAMBDA {
+        // J-W3-21: the caller reports E_LIMIT first; NaN here keeps the series bounded regardless.
+        return f64::NAN;
+    }
     // G-32: start at the Poisson mode with a log weight (exp(-lambda/2) alone underflows for
     // lambda/2 > 745), then recur the weights up and down.
     #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-    let j0 = h.floor().min(1e9) as u32;
+    let j0 = h.floor() as u32;
     let jf0 = f64::from(j0);
     let w0 = (-h + jf0 * h.ln() - crate::garch_estimate::lgamma(jf0 + 1.0)).exp();
     if !w0.is_finite() || !y.is_finite() || !s0.is_finite() {
@@ -393,6 +425,23 @@ pub fn noncentral_chi2_cdf(x: f64, k: f64, lambda: f64) -> f64 {
 #[cfg(test)]
 mod chi2_tests {
     use super::*;
+
+    #[test]
+    fn chernoff_settles_only_negligible_tails() {
+        // J-W3-21: CIR at t_0 = 1e-10 has lambda about 1.87e11; both tails are below e^-7e8.
+        let lam = 1.87e11;
+        assert_eq!(noncentral_chi2_chernoff(0.877 * lam, 2.5, lam), Some(0.0));
+        assert_eq!(noncentral_chi2_chernoff(1.2 * lam, 2.5, lam), Some(1.0));
+        assert_eq!(noncentral_chi2_chernoff(lam, 2.5, lam), None);
+        assert_eq!(noncentral_chi2_cdf(0.877 * lam, 2.5, lam), 0.0);
+        // The largest golden noncentrality (lambda/2 = 2,110, 26.2 standard deviations) stays on the series.
+        let (k, l2) = (2.5_f64, 4220.0_f64);
+        let sd = (2.0 * (k + 2.0 * l2)).sqrt();
+        assert_eq!(noncentral_chi2_chernoff(k + l2 + 26.2 * sd, k, l2), None);
+        assert_eq!(noncentral_chi2_chernoff(k + l2 - 26.2 * sd, k, l2), None);
+        // Unsettled above lambda/2 = 1e5: NaN here, E_LIMIT from the caller.
+        assert!(noncentral_chi2_cdf(4e5 + 2.5, 2.5, 4e5).is_nan());
+    }
 
     #[test]
     fn gamma_p_known_values() {

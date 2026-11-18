@@ -114,6 +114,75 @@ def cpp_site_checks():
     check("'/' operator still mutated", shown("y = a / b;\n") == ["y = a * b;"])
 
 
+def skip_and_seed_checks():
+    """skip-equivalents.json lists only signed Equivalent rows, and every key still names a real mutant;
+    content_seed.py is a function of the source content alone (owner decision 2026-11-18)."""
+    import content_seed
+    import cpp_mutants
+    import skips
+
+    root = HERE.parents[1]
+    SEP = chr(1)  # stands in for an escaped pipe inside a cell
+    NL, CR = bytes([10]), bytes([13])
+    data = json.loads(skips.SKIP_FILE.read_text(encoding="utf-8"))
+    check("skip-equivalents.json has only cpp, rust and python lists", set(data) <= {"cpp", "rust", "python"})
+    rows = {}
+    for lang in ("cpp", "rust", "python"):
+        for line in (HERE / f"equivalents-{lang}.md").read_text(encoding="utf-8").splitlines():
+            cells = [c.strip().replace(SEP, "|") for c in line.replace(chr(92) + "|", SEP).split("|")[1:-1]]
+            if len(cells) >= 6 and line.startswith("| "):
+                rows.setdefault(f"equivalents-{lang}.md {cells[0]}", []).append(cells)
+    for lang, entries in data.items():
+        keys = [e["key"] for e in entries]
+        check(f"{lang} skip keys are unique", len(keys) == len(set(keys)))
+        for e in entries:
+            name = "_" + e["key"].rsplit("_", 1)[-1] if lang == "python" else ""
+
+            def signed(c, name=name):
+                review = c[-1].lower()
+                return (c[3].startswith("Equivalent") and review != "" and "not equivalent" not in review
+                        and "reclassif" not in review and name in c[2])
+
+            ok = any(signed(c) for c in rows.get(e["row"], []))
+            check(f"skip {lang} {e['row']}: signed Equivalent row", ok)
+            if lang == "cpp":
+                file, before, after = e["key"].split(skips.SEP)
+                src = (root / file).read_text(encoding="utf-8")
+                live = {(src.splitlines()[s[0]].strip(), cpp_mutants.apply(src, s)[1]) for s in cpp_mutants.sites(src)}
+                check(f"skip cpp {e['row']}: key still names a mutant of the current source", (before, after) in live)
+            elif lang == "rust":
+                file, _desc, text = e["key"].split(skips.SEP)
+                lines = [x.strip() for x in (root / "rust" / file).read_text(encoding="utf-8").splitlines()]
+                check(f"skip rust {e['row']}: source line still present", text in lines)
+    with tempfile.TemporaryDirectory() as d:
+        r = Path(d)
+        (r / "cpp26").mkdir()
+        f = r / "cpp26" / "a.cpp"
+        f.write_bytes(b"int a = 1;" + NL)
+        s1 = content_seed.seed("cpp", "cpp26/a.cpp", r)
+        f.write_bytes(b"int a = 1;" + CR + NL)
+        check("content seed ignores CRLF", content_seed.seed("cpp", "cpp26/a.cpp", r) == s1)
+        f.write_bytes(b"int a = 2;" + NL)
+        check("content seed changes with the source", content_seed.seed("cpp", "cpp26/a.cpp", r) != s1)
+    check("content seed resolves the rust and python targets",
+          content_seed.files("rust", "**/shortrate.rs") != [] and content_seed.files("python", "quantforge_core.shortrate*") != [])
+
+
+def joint_pass_checks():
+    """A PR touching one shared file can pull in about 12 module-language cells (PR #50). Print the chance
+    that all pass at a given true kill rate, and require it to be reasonable at 90%."""
+    n = 40
+    target = 0.8
+
+    def p_cell(p):
+        return sum(math.comb(n, k) * p ** k * (1 - p) ** (n - k) for k in range(n + 1)
+                   if k / n >= target and stage_report.wilson(k, n)[0] >= stage_report.LOWER_BOUND)
+
+    for p in (0.85, 0.9):
+        print(f"info 12 cells at a true {p:.0%}: all pass with probability {p_cell(p) ** 12:.2f}")
+    check("12 cells at a true 90% all pass with probability >= 0.75", p_cell(0.9) ** 12 >= 0.75)
+
+
 def main():
     cfg = json.loads((HERE / "stages.json").read_text(encoding="utf-8"))
     with tempfile.TemporaryDirectory() as d:
@@ -156,6 +225,8 @@ def main():
     semantic_checks()
     pr_sample_checks()
     cpp_site_checks()
+    skip_and_seed_checks()
+    joint_pass_checks()
     lo, hi = stage_report.wilson(17, 20)
     check("Wilson 17/20 is 64% to 95%", round(lo, 2) == 0.64 and round(hi, 2) == 0.95)
     print(f"{len(FAILS)} failure(s)")

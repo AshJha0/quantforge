@@ -157,6 +157,7 @@ public final class Allocation {
                 state[i] = 1;
             }
         }
+        boolean converged = false;
         for (int iter = 0; iter < 50 * n + 100; iter++) {
             int nf = 0;
             for (int v : state) {
@@ -255,9 +256,13 @@ public final class Allocation {
                 }
             }
             if (worst < 0) {
+                converged = true;
                 break;
             }
             state[worst] = 0;
+        }
+        if (!converged) {
+            throw new QfError("E_NO_CONVERGENCE", "the active-set method did not terminate", "covariance");
         }
         long[] at = new long[n];
         for (int i = 0; i < n; i++) {
@@ -289,6 +294,31 @@ public final class Allocation {
                 w[i] = hi[i];
                 rest -= room;
             }
+        }
+        return repairBudget(w, lo, hi);
+    }
+
+    /**
+     * J-W3-19: with a bound near 2^53, {@code 1 - sum lo} and {@code hi - lo} round, and the fill can miss the budget
+     * by far more than rounding (fuzz seed optim_j-0015: lo_0 = -2^53 left the start at sum 0.2375). The active set
+     * keeps sum w fixed, so it then never meets the budget. One pass in index order moves the shortfall onto weights
+     * with room; it runs only beyond 1e-12, so ordinary starts are unchanged.
+     */
+    static double[] repairBudget(double[] w, double[] lo, double[] hi) {
+        double d = 1 - sum(w);
+        if (Math.abs(d) <= 1e-12) {
+            return w;
+        }
+        for (int i = 0; i < w.length && d != 0; i++) {
+            double step = d > 0 ? Math.min(hi[i] - w[i], d) : Math.max(lo[i] - w[i], d);
+            if (step == hi[i] - w[i]) {
+                w[i] = hi[i];
+            } else if (step == lo[i] - w[i]) {
+                w[i] = lo[i];
+            } else {
+                w[i] += step;
+            }
+            d -= step;
         }
         return w;
     }

@@ -12,6 +12,11 @@ name: Mutation by stage
 #  plan_matrix.py exits 1 when a full-stage run plans nothing: at v0.8.0 stage F planned an empty matrix and
 #  the run passed (review finding 5). check_stages.py and test_gates.py run in repo-gates.yml.
 #  - Manual with `paths`: planned as a pull request touching those files (for example one Rust module).
+#  - Seeds and skips (owner decision 2026-11-18): pull-request samples are seeded from the content of the
+#    mutated source (content_seed.py), so the same code always gets the same verdict, and every sampler
+#    leaves out the proven-equivalent mutants listed in skip-equivalents.json (signed Equivalent rows only;
+#    test_gates.py checks each entry). With a run-number seed, 12 module-language cells at a true kill rate
+#    of 85% all passed only 17% of the time, so code-touching PRs were red 9 runs in 10.
 on:
   pull_request:  # no paths filter: mutation-report is a required check (D7); a PR touching no mapped module
                  # plans nothing, and the skipped report counts as passing
@@ -104,6 +109,14 @@ jobs:
         with:
           persist-credentials: false
       - run: mkdir -p results
+      - name: Sample seed from the source content (pull requests)
+        # Same source, same sample: a re-run cannot redraw, and a kill round is not undone by the next
+        # push's draw (content_seed.py). A manual seed input still wins; the weekly sweep keeps the run number.
+        if: matrix.lang != 'java' && (github.event_name == 'pull_request' || inputs.paths != '') && inputs.seed == ''
+        run: echo "SAMPLE_SEED=$(python3 conformance/mutation/content_seed.py --lang "$LANG_" --target "$TARGET")" >> "$GITHUB_ENV"
+        env:
+          LANG_: ${{ matrix.lang }}
+      - run: echo "SAMPLE_SEED=${SAMPLE_SEED:-$SEED}" >> "$GITHUB_ENV"
       - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
         if: matrix.lang == 'java'
         with:
@@ -117,8 +130,8 @@ jobs:
         working-directory: java25
       - if: matrix.lang == 'cpp'
         run: |
-          docker run --rm -v "$PWD:/w" -w /w -e TARGET -e SUITE -e MAX -e SEED -e OUT gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b \
-            bash -c 'apt-get update -qq && apt-get install -y -qq cmake ninja-build python3 >/dev/null && python3 conformance/mutation/cpp_mutants.py --file "$TARGET" --suite "$SUITE" --max "$MAX" --seed "$SEED" --unit --out "$OUT.json"'
+          docker run --rm -v "$PWD:/w" -w /w -e TARGET -e SUITE -e MAX -e SAMPLE_SEED -e OUT gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b \
+            bash -c 'apt-get update -qq && apt-get install -y -qq cmake ninja-build python3 >/dev/null && python3 conformance/mutation/cpp_mutants.py --file "$TARGET" --suite "$SUITE" --max "$MAX" --seed "$SAMPLE_SEED" --unit --out "$OUT.json"'
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         if: matrix.lang == 'python'
       - if: matrix.lang == 'rust'
@@ -136,7 +149,7 @@ jobs:
           echo "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER=$RUNNER_TEMP/memcap" >> "$GITHUB_ENV"
           echo "QF_MUTANT_AS=8589934592" >> "$GITHUB_ENV"
       - if: matrix.lang == 'python' || matrix.lang == 'rust'
-        run: python3 conformance/mutation/golden_mutants.py --impl "${{ matrix.lang }}" --target "$TARGET" --suite "$SUITE" --max "$MAX" --seed "$SEED" --shard "$SHARD" --out "$OUT.json"
+        run: python3 conformance/mutation/golden_mutants.py --impl "${{ matrix.lang }}" --target "$TARGET" --suite "$SUITE" --max "$MAX" --seed "$SAMPLE_SEED" --shard "$SHARD" --out "$OUT.json"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
@@ -164,13 +177,15 @@ jobs:
       - name: Stage report
         env:
           GATE: ${{ (github.event_name != 'workflow_dispatch' || inputs.gate) && '--gate' || '' }}
+          SEED_INPUT: ${{ inputs.seed }}
         run: |
           STAGES=conformance/mutation/stages.json
           [ "$STAGE" = PR ] && STAGES=pr-stages.json
           # GATE is intentionally unquoted: empty means no flag.
           # shellcheck disable=SC2086
           python3 conformance/mutation/stage_report.py --stage "$STAGE" --stages "$STAGES" --results results --out mutation-report.md $GATE
-          echo "Sample seed: $SEED; mutants per module: $MAX" >> mutation-report.md
+          if [ "$STAGE" = PR ] && [ -z "$SEED_INPUT" ]; then SEED_NOTE="per module, from the source content (see Basis)"; else SEED_NOTE="$SEED"; fi
+          echo "Sample seed: $SEED_NOTE; mutants per module: $MAX; proven-equivalent mutants in skip-equivalents.json are left out" >> mutation-report.md
           cat mutation-report.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()

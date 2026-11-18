@@ -58,6 +58,21 @@ def test_cross_term() -> None:
     assert sr._cross_term(1e-6, 2e-6, 1.5) == pytest.approx(1.5**3 / 3, rel=1e-5)
 
 
+def test_cross_term_large_rates_at_tau_zero_and_tiny() -> None:
+    # tau = 0: the integral over an empty interval is exactly 0; a ** 38 used to overflow first.
+    assert sr._cross_term(1e9, 2e9, 0.0) == 0.0
+    assert sr._cross_term(1e4, 1e4, 0.0) == 0.0
+    # (a + b) tau = 3e-3 is on the series; the integrand B_a B_b ~ x^2 near 0, so the integral is
+    # tau^3/3 - (a+b) tau^4/8 + O(tau^5 (a+b)^2): 1e-36/3 (1 - 3 * 3e-3 / 8) to 1e-5 relative.
+    assert sr._cross_term(1e9, 2e9, 1e-12) == pytest.approx(1e-36 / 3 * (1 - 9e-3 / 8), rel=1e-5)
+    # G2++ bond at t = 0 with large mean reversion: V(0) = 0 and V(T - 0) - V(T) = 0, so P = P(0, T).
+    curve = sr.make_curve([1.0, 2.0], [math.exp(-0.03), math.exp(-0.06)])
+    big = sr.make_g2(curve, 1e9, 0.01, 2e9, 0.01, 0.5)
+    assert sr.g2pp_zcb(big, 0.0, 0.0, 0.0, 2.0)["discount_factor"] == pytest.approx(
+        math.exp(-0.06), rel=1e-14
+    )
+
+
 def test_curve() -> None:
     c = sr.make_curve([1.0, 2.0], [0.95, 0.9])
     assert c.discount(0.0) == 1.0

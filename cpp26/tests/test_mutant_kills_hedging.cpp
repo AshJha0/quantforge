@@ -1155,3 +1155,24 @@ TEST_CASE("qp: equality rows at angle 1.5e-12 are dependent against 1e-12 times 
     prob.eq_rhs = hg::Vec{1.0, 1.0};
     CHECK(catch_error([&] { hg::solve_qp(prob); }).code == "E_SINGULAR");
 }
+
+TEST_CASE("bounded qp: the dual ratio test drops the active row of least u_k / r_k", "[mutants]") {
+    // min |A x + b|^2 with x0 in [-0.5, 0.2], x1 in [-0.5, 0], x2 <= -0.5. The dual method adds x1 >= -0.5, then
+    // x2 <= -0.5, then x0 <= 0.2 with u = (2.844, 7.827) and r = (0.524, 0.559) on those two active rows: ratios
+    // 5.43 and 14.0, so x1 >= -0.5 leaves and the minimum is x = (0.2, 0, -0.5), objective 86.2661 (every active
+    // set enumerated). Kills `u_[k] * r[k] < t1` (hedging.cpp:294): the product 4.37 of the second row is below
+    // the first ratio, the row of ratio 14.0 is dropped, x1 >= -0.5 is kept with multiplier -1.48 and the answer
+    // is x1 = -0.5, objective 87.4566.
+    hg::QpProblem prob;
+    prob.a = {{-0.3, -0.3, 1.2}, {1.4, 0.5, -0.4}, {-1.3, -0.9, 0.9}};
+    prob.b = {-3.8, -8.4, -1.2};
+    prob.weights = {1.0, 1.0, 1.0};
+    prob.lower = std::vector<hg::Bound>{-0.5, -0.5, std::nullopt};
+    prob.upper = std::vector<hg::Bound>{0.2, 0.0, -0.5};
+    const hg::QpResult res = hg::solve_qp(prob);
+    REQUIRE(res.x.size() == 3);
+    CHECK(res.x[0] == 0.2);
+    CHECK(res.x[1] == 0.0);
+    CHECK(res.x[2] == -0.5);
+    CHECK(std::fabs(res.objective - 86.2661) < 1e-10);
+}

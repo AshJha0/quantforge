@@ -454,3 +454,114 @@ fn integer_ridge_is_on_positions() {
     close(s.objective, 16.195, 1e-12, "objective");
     assert!(s.continuous_objective <= s.objective);
 }
+
+/// Probe suite ns2 (2026-11-17): the near-singular data with equalities and on the costed path.
+/// Exact minima by fraction arithmetic over every face and orthant. Before `refine_face`, Java and
+/// C++ were 2.25e-6 or 2.5e-6 too high on each.
+#[test]
+fn qp_near_singular_equality_and_costed_paths_are_refined() {
+    let (a2, b, w) = near_singular();
+    // The first column times 16 keeps the free 2x2 block regular after the R6-6.2 scaling.
+    let a3: Matrix = vec![
+        vec![16.0 * a2[0][0], a2[0][1], 0.5],
+        vec![16.0 * a2[1][0], a2[1][1], 0.375],
+    ];
+    let near = |got: f64, want: f64, what: &str| {
+        let err = (got - want).abs();
+        assert!(
+            err <= 1e-10 || err <= 1e-10 * want,
+            "{what}: got {got}, want {want}"
+        );
+    };
+    let eq: Matrix = vec![vec![0.0, 0.0, 1.0]];
+    let lower = [None, None, Some(3.0)];
+    for bounds in [None, Some(&lower[..])] {
+        // x_2 = 3 by its row, and again with the bound x_2 >= 3 active.
+        let s = qp_solve(&QpProblem {
+            a: &a3,
+            b: &b,
+            weights: &w,
+            ridge: 0.0,
+            eq_matrix: Some(&eq),
+            eq_rhs: Some(&[3.0]),
+            lower: bounds,
+            upper: None,
+            singular: Singular::Error,
+            costs: Costs::default(),
+        })
+        .unwrap();
+        near(s.objective, 0.0, "equality");
+        assert_eq!(s.x[2], 3.0);
+    }
+    let costed = |a: &Matrix, b: &[f64], w: &[f64], eq: Option<&Matrix>, costs: Costs| {
+        qp_solve(&QpProblem {
+            a,
+            b,
+            weights: w,
+            ridge: 0.0,
+            eq_matrix: eq,
+            eq_rhs: eq.map(|_| &[3.0][..]),
+            lower: None,
+            upper: None,
+            singular: Singular::Error,
+            costs,
+        })
+        .unwrap()
+    };
+    let tiny = [1e-16, 1e-16];
+    let s = costed(
+        &a2,
+        &b,
+        &w,
+        None,
+        Costs {
+            half_spreads: Some(&tiny),
+            ..Costs::default()
+        },
+    );
+    near(s.objective, 8.661435011274932e-09, "spreads");
+    let rates = [1.0, 1.0];
+    let s = costed(
+        &a2,
+        &b,
+        &w,
+        None,
+        Costs {
+            margin_rates: Some(&rates),
+            margin_limit: Some(1e9),
+            ..Costs::default()
+        },
+    );
+    near(s.objective, 0.0, "slack margin");
+    let tiny3 = [1e-16, 1e-16, 1e-16];
+    let s = costed(
+        &a3,
+        &b,
+        &w,
+        Some(&eq),
+        Costs {
+            half_spreads: Some(&tiny3),
+            ..Costs::default()
+        },
+    );
+    near(s.objective, 8.691920544150821e-10, "spreads and equality");
+    // A third instrument on its own factor row held at its kink 0 by a spread of 100.
+    let ak: Matrix = vec![
+        vec![a3[0][0], a3[0][1], 0.0],
+        vec![a3[1][0], a3[1][1], 0.0],
+        vec![0.0, 0.0, 1.0],
+    ];
+    let spreads = [1e-16, 1e-16, 100.0];
+    let s = costed(
+        &ak,
+        &[b[0], b[1], -0.5],
+        &[w[0], w[1], 1.0],
+        None,
+        Costs {
+            half_spreads: Some(&spreads),
+            ..Costs::default()
+        },
+    );
+    near(s.objective, 0.25000000096536956, "kink");
+    assert_eq!(s.x[2], 0.0);
+}

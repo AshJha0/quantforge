@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Random;
+import net.jqwik.api.Example;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import org.quantforge.core.QfError;
@@ -43,6 +44,11 @@ class HedgeCostsTest {
             v[j] = scale * rnd.nextDouble();
         }
         return v;
+    }
+
+    @Example
+    void zeroCostWeightOnTheCiSample() {
+        zeroCostWeightGivesTheWaveOneAnswer(2692601416714692926L); // PR #47 CI 2026-11-17 (coverage-stage-java)
     }
 
     @Property(tries = 100)

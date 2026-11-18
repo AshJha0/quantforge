@@ -1020,6 +1020,24 @@ def _integer_search(
     return [p for t, p in found if t <= bound()]
 
 
+def _check_lot_normal_equations(
+    a: Sequence[Sequence[float]],
+    b: Sequence[float],
+    weights: Sequence[float],
+    ridge: float,
+    lot_sizes: Sequence[float],
+) -> None:
+    """J-W3-18 (R6-8.1): `L H L` or `L A' W b` overflowing from finite inputs is `E_NON_FINITE`,
+    decided before check 3 (fuzz seed `hedgeint_i-0010`, where `a` holds 9.5e299)."""
+    with np.errstate(over="ignore", invalid="ignore"):
+        al = np.asarray(a, dtype=float) * np.asarray(lot_sizes, dtype=float)[None, :]
+        w = np.asarray(weights, dtype=float)
+        hl = al.T @ (w[:, None] * al) + ridge * np.diag(np.asarray(lot_sizes, dtype=float) ** 2)
+        cl = al.T @ (w * np.asarray(b, dtype=float))
+    if not (np.all(np.isfinite(hl)) and np.all(np.isfinite(cl))):
+        raise QfError("E_NON_FINITE", "the normal equations in lot units overflow", "a")
+
+
 def integer_solve(
     a: Matrix,
     b: Floats,
@@ -1047,6 +1065,7 @@ def integer_solve(
     if any(p is not None and q is not None and p > q for p, q in zip(lo, hi)):
         raise QfError("E_DOMAIN", "a lower lot bound is above its upper bound", "lower_lots")
 
+    _check_lot_normal_equations(a, b, weights, ridge, lot_sizes)
     big_b, d = _root_form(a, b, weights, ridge)
     lots_b = big_b * np.asarray(lot_sizes, dtype=float)[None, :]
     # R6-6.2: the check-3 decision runs on the Jacobi-scaled form D (L H L) D, whose
