@@ -448,7 +448,117 @@ pub fn rebuild(
 
 #[cfg(test)]
 mod tests {
-    use super::crc32;
+    use super::*;
+    use crate::json::parse;
+
+    fn js(text: &str) -> Vec<Json> {
+        parse(text).unwrap().0.as_array().unwrap().to_vec()
+    }
+
+    fn run(msgs: &str, depth: i64, pd: i64, qd: i64, cps: Option<&str>, emit: bool) -> Result<Json> {
+        let c = cps.map(js);
+        rebuild(&js(msgs), depth, pd, qd, c.as_deref(), emit)
+    }
+
+    fn code(msgs: &str, depth: i64, pd: i64, qd: i64, cps: Option<&str>) -> &'static str {
+        run(msgs, depth, pd, qd, cps, false).unwrap_err().code
+    }
+
+    fn stat(out: &Json, k: &str) -> i64 {
+        out.get("stats").and_then(|s| s.get(k)).and_then(Json::as_int).unwrap()
+    }
+
+    fn snap(body: &str) -> String {
+        format!("[{{\"type\":\"snapshot\",{body}}}]")
+    }
+
+    #[test]
+    fn argument_and_schema_errors() {
+        assert_eq!(code("[]", 7, 1, 1, None), "E_DOMAIN");
+        assert_eq!(code("[]", 10, -1, 1, None), "E_DOMAIN");
+        assert_eq!(code("[]", 10, 19, 1, None), "E_DOMAIN");
+        assert_eq!(code("[]", 10, 1, -1, None), "E_DOMAIN");
+        assert_eq!(code("[]", 10, 1, 19, None), "E_DOMAIN");
+        assert_eq!(code("[1]", 10, 1, 1, None), "E_SCHEMA");
+        assert_eq!(code("[{\"type\":\"x\"}]", 10, 1, 1, None), "E_SCHEMA");
+        for body in [
+            "\"checksum\":-1",
+            "\"checksum\":1.5",
+            "\"checksum\":4294967296",
+            "\"checksum\":\"1\"",
+            "\"t\":5",
+            "\"t\":\"nope\"",
+            "\"bids\":3",
+            "\"bids\":[[\"1\"]]",
+            "\"bids\":[3]",
+            "\"bids\":[[1,\"1\"]]",
+            "\"bids\":[[\"1e3\",\"1\"]]",
+        ] {
+            assert_eq!(code(&snap(body), 10, 1, 1, None), "E_SCHEMA", "{body}");
+        }
+        assert_eq!(code(&snap("\"bids\":[[\"0\",\"1\"]]"), 10, 1, 1, None), "E_DOMAIN");
+        assert_eq!(code(&snap("\"asks\":[[\"1\",\"-1\"]]"), 10, 1, 1, None), "E_DOMAIN");
+        assert_eq!(code("[]", 10, 1, 1, Some("[1]")), "E_SCHEMA");
+        assert_eq!(code("[]", 10, 1, 1, Some("[{}]")), "E_SCHEMA");
+        // A price with more decimals than the pair precision fails the checksum component.
+        assert_eq!(code(&snap("\"asks\":[[\"1.25\",\"1\"]]"), 10, 1, 1, None), "E_DOMAIN");
+    }
+
+    #[test]
+    fn component_strips_point_and_leading_zeros() {
+        assert_eq!(component("12.3", 2).unwrap(), "1230");
+        assert_eq!(component("0.00", 2).unwrap(), "0");
+        assert_eq!(component("1.234", 2).unwrap_err().code, "E_DOMAIN");
+    }
+
+    #[test]
+    fn snapshot_updates_gap_resync_and_checksums() {
+        let s = "\"bids\":[[\"10.0\",\"1.0\"],[\"9.0\",\"0\"]],\"asks\":[[\"11.0\",\"2.0\"]]";
+        let first = run(&snap(s), 10, 1, 1, None, true).unwrap();
+        let text = first.get("checksum_string").and_then(Json::as_str).unwrap();
+        let good = crc32(text.as_bytes());
+        let msgs = format!(
+            "[{{\"type\":\"update\",\"bids\":[[\"1.0\",\"1.0\"]]}},             {{\"type\":\"snapshot\",{s},\"checksum\":{good}}},             {{\"type\":\"update\",\"bids\":[[\"9.5\",\"1.0\"],[\"8.0\",\"0\"]],\"asks\":[[\"11.0\",\"0\"]],\"checksum\":1}},             {{\"type\":\"snapshot\",\"resubscribe\":true,\"bids\":[[\"10.0\",\"1.0\"]],\"asks\":[[\"10.0\",\"1.0\"]]}},             {{\"type\":\"update\",\"asks\":[[\"9.0\",\"1.0\"]]}},             {{\"type\":\"gap\"}}]"
+        );
+        let out = run(&msgs, 10, 1, 1, None, false).unwrap();
+        assert_eq!(stat(&out, "messages"), 5);
+        assert_eq!(stat(&out, "snapshots"), 2);
+        assert_eq!(stat(&out, "updates"), 3);
+        assert_eq!(stat(&out, "deletes_of_absent_level"), 1);
+        assert_eq!(stat(&out, "checksum_checked"), 2);
+        assert_eq!(stat(&out, "checksum_failed"), 1);
+        assert_eq!(stat(&out, "resyncs"), 1);
+        assert_eq!(stat(&out, "locked"), 1);
+        assert_eq!(stat(&out, "crossed"), 1);
+        assert_eq!(stat(&out, "gaps"), 1);
+        assert!(out.get("checksum_string").is_none());
+    }
+
+    #[test]
+    fn truncates_to_depth() {
+        let lv: Vec<String> = (1..=12).map(|k| format!("[\"{k}.0\",\"1.0\"]")).collect();
+        let out = run(&snap(&format!("\"bids\":[{}]", lv.join(","))), 10, 1, 1, None, false).unwrap();
+        assert_eq!(stat(&out, "truncated_levels"), 2);
+        let bids = out.get("book").and_then(|b| b.get("bids")).and_then(Json::as_array).unwrap();
+        assert_eq!(bids.len(), 10);
+    }
+
+    #[test]
+    fn checkpoints_pass_and_fail() {
+        let msgs = "[{\"type\":\"snapshot\",\"t\":\"2026-01-01T00:00:00Z\",\"bids\":[[\"10.0\",\"1.0\"]],\"asks\":[[\"11.0\",\"1.0\"]]},            {\"type\":\"update\",\"t\":\"2026-01-01T00:00:10Z\",\"bids\":[[\"10.0\",\"2.0\"]]},            {\"type\":\"update\"}]";
+        let cps = "[{\"t\":\"2026-01-01T00:00:05Z\",\"bids\":[[\"10.0\",\"1.0\"]],\"asks\":[[\"11.0\",\"1.0\"]]},            {\"t\":\"2026-01-01T00:00:06Z\",\"bids\":[[\"10.0\",\"9.0\"]],\"asks\":[]},            {\"t\":\"2026-01-01T00:00:07Z\",\"bids\":[[\"10.0\",\"2.0\"],[\"9.0\",\"1.0\"]]},            {\"t\":\"2026-01-01T00:00:20Z\",\"bids\":[[\"10.0\",\"2.0\"]],\"asks\":[[\"11.0\",\"1.0\"]]}]";
+        let out = run(msgs, 10, 1, 1, Some(cps), false).unwrap();
+        assert_eq!(stat(&out, "checkpoint_checked"), 4);
+        assert_eq!(stat(&out, "checkpoint_failed"), 2);
+    }
+
+    #[test]
+    fn event_cap_counts_omitted() {
+        let gaps = vec!["{\"type\":\"gap\"}"; MAX_EVENTS + 3].join(",");
+        let out = run(&format!("[{gaps}]"), 25, 0, 0, Some("[]"), false).unwrap();
+        assert_eq!(out.get("events_omitted").and_then(Json::as_int), Some(3));
+        assert_eq!(out.get("events").and_then(Json::as_array).unwrap().len(), MAX_EVENTS);
+    }
 
     #[test]
     fn crc32_matches_zlib() {
