@@ -432,7 +432,7 @@ No new error code. Prices, quantities and fees are decimal strings (HR-12); outp
 
 ## Stage H multi-asset operations (H-22, H-23, H-24)
 
-Rulings `stage-h-rulings-multiasset.md` HR-80 to HR-103 and the 2026-11-18 rule-version rulings. No new error code; error order HR-66. Decimals are HR-12 decimal strings; every output carries `label` (HR-94). Goldens `datasets/golden/stage_h/auc_h.json`, `eqc_h.json`, `fxc_h.json`, `fxv_h.json`, `rtc_h.json`, `fut_h.json`, E1 cases `e1_h3.json` (`oracle/python/gen_stage_h_ma.py`). Implemented in the Python build only so far.
+Rulings `stage-h-rulings-multiasset.md` HR-80 to HR-103 and the 2026-11-18 rule-version rulings. No new error code; error order HR-66. Decimals are HR-12 decimal strings; every output carries `label` (HR-94). Goldens `datasets/golden/stage_h/auc_h.json`, `eqc_h.json`, `fxc_h.json`, `fxv_h.json`, `rtc_h.json`, `fut_h.json`, E1 cases `e1_h3.json` (`oracle/python/gen_stage_h_ma.py`). Implemented in the Python and Java builds so far.
 
 | Operation | Spec | Inputs | Outputs |
 |---|---|---|---|

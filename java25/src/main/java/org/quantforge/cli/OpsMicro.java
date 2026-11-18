@@ -9,6 +9,7 @@ import org.quantforge.cli.Operations.Out;
 import org.quantforge.core.QfError;
 import org.quantforge.micro.DarkPool;
 import org.quantforge.micro.LitMatching;
+import org.quantforge.micro.MultiAsset;
 import org.quantforge.micro.OrderBook;
 import org.quantforge.micro.Sor;
 
@@ -25,6 +26,34 @@ final class OpsMicro {
         table.put("exec.sim.dark.run", OpsMicro::darkRun);
         table.put("exec.sim.dark.markouts", OpsMicro::darkMarkouts);
         table.put("exec.sor.allocate", OpsMicro::sorAllocate);
+        multiAsset(table, "micro.eq.round_price", MultiAsset::eqRoundPrice);
+        multiAsset(table, "micro.eq.fee_check", MultiAsset::eqFeeCheck);
+        multiAsset(table, "micro.eq.round_lot", MultiAsset::eqRoundLot);
+        multiAsset(table, "micro.eq.settle_date", MultiAsset::eqSettleDate);
+        multiAsset(table, "exec.sim.auction.uncross", MultiAsset::auctionUncross);
+        multiAsset(table, "micro.fx.pip_value", MultiAsset::fxPipValue);
+        multiAsset(table, "micro.fx.spot_date", MultiAsset::fxSpotDate);
+        multiAsset(table, "exec.sim.fx.stream", MultiAsset::fxStream);
+        multiAsset(table, "exec.sim.fx.request", MultiAsset::fxRequest);
+        multiAsset(table, "micro.rates.parse_32nds", MultiAsset::ratesParse32nds);
+        multiAsset(table, "micro.rates.format_32nds", MultiAsset::ratesFormat32nds);
+        multiAsset(table, "micro.rates.tick_value", MultiAsset::ratesTickValue);
+        multiAsset(table, "micro.rates.bond_price", MultiAsset::ratesBondPrice);
+        multiAsset(table, "micro.rates.bill_price", MultiAsset::ratesBillPrice);
+        multiAsset(table, "exec.sim.fut.to_ticks", MultiAsset::futToTicks);
+        multiAsset(table, "exec.sim.fut.to_text", MultiAsset::futToText);
+        multiAsset(table, "exec.sim.fut.pnl", MultiAsset::futPnl);
+        multiAsset(table, "exec.sim.fut.variation", MultiAsset::futVariation);
+        multiAsset(table, "exec.sim.fut.run", MultiAsset::futRun);
+    }
+
+    /** Stage H multi-asset (H-22, H-23, H-24): the whole input object goes to {@link MultiAsset}. */
+    private static void multiAsset(Map<String, Function<In, Out>> table, String name,
+            Function<Map<?, ?>, Map<String, Object>> fn) {
+        table.put(name, in -> {
+            in.gate();
+            return new Out(fn.apply(in.raw()), Map.of());
+        });
     }
 
     private static List<?> array(In in, String key) {
