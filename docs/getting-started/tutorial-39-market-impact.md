@@ -6,7 +6,7 @@ The plain idea: buying moves the price up, and buying more moves it further, but
 
 You will compute square-root impact for two sizes and the Obizhaeva-Wang optimal blocks for two sets of inputs, one of them the paper's own Figure 2 parameters. Budget 10 minutes. The coefficient `Y` is assumed, not estimated.
 
-<p class="note">Available from v0.10.0. The operations on this page are specified (spec version 0.1.0, confirmed 2026-11-18) but not merged in any language. Step 1 checks the spec's golden numbers with a plain-Python restatement of the formulas; step 2 shows the library call as it will run once the operations are merged, and is not run here. Every number on the page is a spec golden or simple arithmetic on one.</p>
+<p class="note">Available from v0.10.0. The operations on this page are implemented in all four languages (stage H wave 1; each build passes their goldens, observed, local, 2026-11-18). This page stays a hand check: step 1 checks the spec's golden numbers with a plain-Python restatement of the formulas, and step 2 shows the library call without running it. Every number on the page is a spec golden or simple arithmetic on one.</p>
 
 Terms, defined here. **Impact** `I` is the average relative price change over a metaorder (a parent order worked over time), as a fraction of price. `V` is the daily volume and `sigma` the daily volatility, as a fraction. **Resilience** `rho` is the rate at which the book refills after a trade, per unit of time. **Temporary** impact fades; **permanent** impact stays.
 
@@ -68,7 +68,7 @@ From [`10-execution/impact.md`](../../specifications/10-execution/impact.md), ru
 
 Evidence: `imp_h-0001` to `0004` re-derived blind from the inputs only (DR-H2, 2026-11-15); 0001 to 0003 exact, 0004 within 8e-16 relative.
 
-## Step 2: the library call (available from v0.10.0, not run here)
+## Step 2: the library call (shown, not run here)
 
 ```json
 {"operation": "exec.impact.sqrt", "inputs": {"quantity": 100000, "daily_volume": 10000000, "daily_vol": 0.02, "coefficient": 1}}

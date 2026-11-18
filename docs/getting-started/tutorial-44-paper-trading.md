@@ -6,7 +6,7 @@ The plain idea: a paper book behaves like a real trading book except that nothin
 
 You will book two fills, explain two days of P&L, reject an order that breaks three limits, write one ledger record and catch a tampered copy of it. Budget 15 minutes.
 
-<p class="note">Available from v0.10.0 (unreleased). The ledger, book, daily explain and pre-trade checks are implemented in Python on branch <code>stage-h2</code> (<code>python/quantforge_core/paper.py</code>), and this page runs them. Paper trading is a Python application that calls the four-language library operations; it is not itself a library operation in the other three builds. Fills from the simulated lit, dark and routed venues (ruling HR-47) are on a branch not yet merged and are shown, not run, in step 2. Every number below is a golden from <code>specifications/10-execution/paper-trading.md</code>. Every output is labelled "crypto venue; simulated"; no live order can be placed.</p>
+<p class="note">Available from v0.10.0 (unreleased). The ledger, book, daily explain and pre-trade checks are implemented in Python (<code>python/quantforge_core/paper.py</code>), and this page runs them. They are also CLI operations (<code>paper.*</code> in the name map, goldens <code>pt_h</code>), implemented in Python; Java, C++ and Rust ports pending in this PR. Fills from the simulated lit, dark and routed venues (ruling HR-47, <code>python/quantforge_core/paper_fills.py</code>) are implemented in Python and shown, not run, in step 2. Every number below is a golden from <code>specifications/10-execution/paper-trading.md</code>. Every output is labelled "crypto venue; simulated"; no live order can be placed.</p>
 
 Terms, defined here. `n` is the signed position and `c` its average cost. **NAV** is cash plus the position marked at the close, `cash + sum n P`. The daily **explain** splits the NAV change into `market` (the opening position times the price move), `trading` (each fill against the close), `fees` and `financing` (interest on opening cash, and a borrow charge on opening shorts, ACT/365). `L*` is the spec's limit set: at most 10 per order, notional 1,000, absolute position 5, price band 5 %, three orders a day.
 
@@ -82,7 +82,7 @@ From [`10-execution/paper-trading.md`](../../specifications/10-execution/paper-t
 - Ledger record: `{seq, ts, kind, label, body, prev, hash}`, keys sorted, no whitespace, ASCII only, numbers other than `seq` as strings (HR-45); `prev` links each record to the one before, so editing, removing or reordering a record breaks the chain from that point (`HASH`, `LINK` or `SEQ`).
 - Pre-trade (HR-49): kill switch, orders per day, size, price band, notional, position, short sale, cash, every check evaluated, reasons in that order. The checks are plain code; no model sits in front of them.
 
-## Step 2: where the fills come from (available from v0.10.0, not run here)
+## Step 2: where the fills come from (shown, not run here)
 
 The fill path, `quantforge_core.paper_fills`, replays each order into the simulated venue it names, seeded with the recorded book snapshot at the order time: `LIT` goes to the lit engine of [Tutorial 42](tutorial-42-match-orders.md), `DARK` to the dark pool and `SOR` through the router of [Tutorial 43](tutorial-43-dark-pool-and-routing.md). An IOC remainder is cancelled at once; a resting remainder is cancelled at the daily close (HR-48). When an order reaches a final state, the ledger gets a `TCA` record from `exec.tca.shortfall` ([Tutorial 38](tutorial-38-implementation-shortfall.md)).
 
