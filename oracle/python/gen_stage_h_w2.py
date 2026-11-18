@@ -96,7 +96,60 @@ def build():
         add_boundaries(s, name)
         suites.append(s)
     suites += build_w2b()
+    suites.append(e1_suite(suites))
     return suites
+
+
+def _first_number(v, path=()):
+    """Path to the first numeric leaf: a JSON float, or a decimal string (HR-12) that parses as a finite number."""
+    if isinstance(v, dict):
+        for k in sorted(v):
+            p = _first_number(v[k], path + (k,))
+            if p is not None:
+                return p
+    elif isinstance(v, list):
+        for i, x in enumerate(v):
+            p = _first_number(x, path + (i,))
+            if p is not None:
+                return p
+    elif isinstance(v, float):
+        return path
+    elif isinstance(v, str) and path and path[-1] not in ("id", "t", "seed"):
+        try:
+            if Decimal(v).is_finite() and any(ch.isdigit() for ch in v):
+                return path
+        except ArithmeticError:
+            return None
+    return None
+
+
+def e1_suite(suites):
+    """Non-finite input per wave 2 operation, from its first value case. These operations take no Real input: every
+    number is a decimal string (HR-12), so "NaN" there is a malformed decimal and the answer is E_SCHEMA, which comes
+    before F-2's E_DOMAIN. The operations are listed in conformance/E1_EXEMPT.json; these cases pin that all four
+    builds reject the string rather than read it as a number."""
+    e = Suite("e1_h2", SPEC_LIT, G)
+    seen = set()
+    for su in suites:
+        for c in su.cases:
+            op = c["operation"]
+            if op in seen or c["expected"]["status"] != "ok":
+                continue
+            path = _first_number(c["inputs"])
+            if path is None:
+                continue
+            seen.add(op)
+            inp = json.loads(json.dumps(c["inputs"]))
+            node = inp
+            for k in path[:-1]:
+                node = node[k]
+            node[path[-1]] = "NaN"
+            where = "/".join(str(k) for k in path)
+            e.add(op, inp, error="E_SCHEMA", cls=c["tolerance_class"], verified=["hand"],
+                  tags=["stage_h", "e1", "non-finite-input"],
+                  description=f"HR-12: NaN decimal string at {where} is E_SCHEMA (from {c['case_id']})")
+    assert seen == {c["operation"] for su in suites for c in su.cases}, "an operation has no E1 case"
+    return e
 
 
 def dark_check(cid, exp):

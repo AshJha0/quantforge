@@ -1,0 +1,322 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1_h2",
+ "spec": "specifications/10-execution/lit-matching.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_w2.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "e1_h2-0001",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "depth": 10,
+    "messages": [
+     {
+      "asks": [
+       [
+        "NaN",
+        "0.00100000"
+       ],
+       [
+        "45286.4",
+        "1.54571953"
+       ],
+       [
+        "45286.6",
+        "1.54571109"
+       ],
+       [
+        "45289.6",
+        "1.54560911"
+       ],
+       [
+        "45290.2",
+        "0.15890660"
+       ],
+       [
+        "45291.8",
+        "1.54553491"
+       ],
+       [
+        "45294.7",
+        "0.04454749"
+       ],
+       [
+        "45296.1",
+        "0.35380000"
+       ],
+       [
+        "45297.5",
+        "0.09945542"
+       ],
+       [
+        "45299.5",
+        "0.18772827"
+       ]
+      ],
+      "bids": [
+       [
+        "45283.5",
+        "0.10000000"
+       ],
+       [
+        "45283.4",
+        "1.54582015"
+       ],
+       [
+        "45282.1",
+        "0.10000000"
+       ],
+       [
+        "45281.0",
+        "0.10000000"
+       ],
+       [
+        "45280.3",
+        "1.54592586"
+       ],
+       [
+        "45279.0",
+        "0.07990000"
+       ],
+       [
+        "45277.6",
+        "0.03310103"
+       ],
+       [
+        "45277.5",
+        "0.30000000"
+       ],
+       [
+        "45277.3",
+        "1.54602737"
+       ],
+       [
+        "45276.6",
+        "0.15445238"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "snapshot"
+     }
+    ],
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN decimal string at messages/0/asks/0/0 is E_SCHEMA (from ob_h-0001)"
+  },
+  {
+   "case_id": "e1_h2-0002",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "events": [
+     {
+      "id": "B1",
+      "op": "NEW",
+      "price": "NaN",
+      "qty": "10",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT"
+     },
+     {
+      "id": "B2",
+      "op": "NEW",
+      "price": "100",
+      "qty": "10",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT"
+     },
+     {
+      "id": "B3",
+      "op": "NEW",
+      "price": "100",
+      "qty": "10",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT"
+     },
+     {
+      "id": "S1",
+      "op": "NEW",
+      "price": "100",
+      "qty": "15",
+      "side": "SELL",
+      "trader": "T2",
+      "type": "LIMIT"
+     }
+    ],
+    "fee_schedule": {
+     "maker_rebate": "0",
+     "taker_fee": "0"
+    },
+    "lot_size": "1",
+    "tick_size": "1"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN decimal string at events/0/price is E_SCHEMA (from lit_h-0001)"
+  },
+  {
+   "case_id": "e1_h2-0003",
+   "operation": "exec.sim.dark.run",
+   "inputs": {
+    "config": {
+     "firm_delay": 0,
+     "lot_size": "NaN",
+     "p_firm": "1",
+     "penalty_events": 2,
+     "seed": 20261118,
+     "tick_size": "0.01"
+    },
+    "events": [
+     {
+      "ask": "100.10",
+      "bid": "100.00",
+      "op": "BOOK"
+     },
+     {
+      "id": "B1",
+      "kind": "FIRM",
+      "op": "NEW",
+      "qty": "100",
+      "side": "BUY"
+     },
+     {
+      "id": "S1",
+      "kind": "FIRM",
+      "op": "NEW",
+      "qty": "60",
+      "side": "SELL"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN decimal string at config/lot_size is E_SCHEMA (from dark_h-0001)"
+  },
+  {
+   "case_id": "e1_h2-0004",
+   "operation": "exec.sim.dark.markouts",
+   "inputs": {
+    "fills": [
+     {
+      "fill_price": "NaN",
+      "mid_at": {
+       "1": "100.07",
+       "10": "100.00",
+       "60": "100.15"
+      },
+      "side": "BUY"
+     },
+     {
+      "fill_price": "100.05",
+      "mid_at": {
+       "1": "100.07",
+       "10": "100.00",
+       "60": "100.15"
+      },
+      "side": "SELL"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN decimal string at fills/0/fill_price is E_SCHEMA (from dark_h-0007)"
+  },
+  {
+   "case_id": "e1_h2-0005",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "NaN",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "0.1",
+    "lit_samples": [
+     [
+      "10"
+     ],
+     [
+      "12"
+     ],
+     [
+      "15"
+     ]
+    ],
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "0",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN decimal string at S is E_SCHEMA (from sor_h-0001)"
+  }
+ ]
+}

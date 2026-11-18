@@ -2729,6 +2729,122 @@
     "slices"
    ]
   },
+  "exec.sim.dark.markouts": {
+   "spec": "specifications/10-execution/dark-pool.md",
+   "rust": "quantforge::exec::sim_dark_markouts",
+   "python": "quantforge.exec.sim_dark_markouts",
+   "java": "Exec.simDarkMarkouts",
+   "cpp": "qf::exec::sim_dark_markouts",
+   "inputs": {
+    "fills": {
+     "java": "fills"
+    }
+   },
+   "outputs": [
+    "fills"
+   ]
+  },
+  "exec.sim.dark.run": {
+   "spec": "specifications/10-execution/dark-pool.md",
+   "rust": "quantforge::exec::sim_dark_run",
+   "python": "quantforge.exec.sim_dark_run",
+   "java": "Exec.simDarkRun",
+   "cpp": "qf::exec::sim_dark_run",
+   "inputs": {
+    "config": {
+     "java": "config"
+    },
+    "events": {
+     "java": "events"
+    },
+    "scenarios": {
+     "java": "scenarios"
+    }
+   },
+   "outputs": [
+    "fills",
+    "invitations",
+    "label",
+    "resting",
+    "scenarios",
+    "suspensions"
+   ]
+  },
+  "exec.sim.lit.run": {
+   "spec": "specifications/10-execution/dark-pool.md",
+   "rust": "quantforge::exec::sim_lit_run",
+   "python": "quantforge.exec.sim_lit_run",
+   "java": "Exec.simLitRun",
+   "cpp": "qf::exec::sim_lit_run",
+   "inputs": {
+    "events": {
+     "java": "events"
+    },
+    "fee_schedule": {
+     "java": "feeSchedule"
+    },
+    "lot_size": {
+     "java": "lotSize"
+    },
+    "tick_size": {
+     "java": "tickSize"
+    }
+   },
+   "outputs": [
+    "book",
+    "cancelled",
+    "conservation",
+    "fees",
+    "fills",
+    "label",
+    "mbp",
+    "rejects"
+   ]
+  },
+  "exec.sor.allocate": {
+   "spec": "specifications/10-execution/smart-order-router.md",
+   "rust": "quantforge::exec::sor_allocate",
+   "python": "quantforge.exec.sor_allocate",
+   "java": "Exec.sorAllocate",
+   "cpp": "qf::exec::sor_allocate",
+   "inputs": {
+    "S": {
+     "java": "s"
+    },
+    "f": {
+     "java": "f"
+    },
+    "h": {
+     "java": "h"
+    },
+    "lambda_o": {
+     "java": "lambdaO"
+    },
+    "lambda_u": {
+     "java": "lambdaU"
+    },
+    "lit_samples": {
+     "java": "litSamples"
+    },
+    "ranking": {
+     "java": "ranking"
+    },
+    "theta": {
+     "java": "theta"
+    },
+    "venues": {
+     "java": "venues"
+    }
+   },
+   "outputs": [
+    "L",
+    "M",
+    "expected_cost",
+    "expected_fill",
+    "p_underfill",
+    "ranking"
+   ]
+  },
   "exec.tca.shortfall": {
    "spec": "specifications/04-pricing/use-cases.md",
    "rust": "quantforge::exec::tca_shortfall",
@@ -4431,6 +4547,37 @@
     "modified_duration",
     "price",
     "wal"
+   ]
+  },
+  "micro.book.rebuild": {
+   "spec": "specifications/09-microstructure/low-latency-book.md",
+   "rust": "quantforge::micro::book_rebuild",
+   "python": "quantforge.micro.book_rebuild",
+   "java": "Micro.bookRebuild",
+   "cpp": "qf::micro::book_rebuild",
+   "inputs": {
+    "depth": {
+     "java": "depth"
+    },
+    "emit_checksum_string": {
+     "java": "emitChecksumString"
+    },
+    "messages": {
+     "java": "messages"
+    },
+    "price_decimals": {
+     "java": "priceDecimals"
+    },
+    "qty_decimals": {
+     "java": "qtyDecimals"
+    }
+   },
+   "outputs": [
+    "book",
+    "checksum_string",
+    "crc32",
+    "events",
+    "stats"
    ]
   },
   "micro.mm.as_quotes": {
@@ -9173,10 +9320,5 @@
   "vol.vix.term_variance: minutes_to_expiry",
   "xva.adjustments.value: im_spread"
  ],
- "spec_only": [
-  "exec.sim.dark.run",
-  "exec.sim.lit.run",
-  "exec.sor.allocate",
-  "micro.book.rebuild"
- ]
+ "spec_only": []
 }
