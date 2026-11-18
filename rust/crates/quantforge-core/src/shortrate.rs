@@ -1312,4 +1312,310 @@ mod tests {
         let err = swap_ee_hw(&c, 0.05, 0.01, &leg(true), &ex, (Some(0.02), None));
         assert_eq!(err.unwrap_err().code, "E_INPUT");
     }
+
+    // Expected values below are closed forms evaluated at 40 digits with mpmath
+    // (Brigo-Mercurio 3.39 Vasicek, 3.25 CIR, 3.39 Hull-White, 4.10 and 4.31 G2++),
+    // independent of this code.
+    fn close(got: f64, want: f64, rel: f64) {
+        assert!(
+            (got - want).abs() <= rel * want.abs(),
+            "got {got:e}, want {want:e}"
+        );
+    }
+
+    #[test]
+    fn cir_call_matches_closed_form() {
+        // BM 3.78 evaluated with mpmath bond factors and scipy's noncentral chi-square CDF.
+        let m = Model::Cir {
+            a: 0.3,
+            b: 0.05,
+            sigma: 0.1,
+        };
+        for (k, te, ts, want) in [
+            (0.9, 1.0, 3.0, 0.019148592766470487),
+            (0.7, 2.0, 10.0, 0.011406978474028375),
+        ] {
+            let (c, _, _) = zcb_option(&m, 0.04, true, k, te, ts, 1.0).unwrap();
+            close(c, want, 1e-8);
+        }
+    }
+
+    #[test]
+    fn g2_cross_small_rates_long_tau_uses_series() {
+        // a tau and b tau are tiny but a + tau > 1: only the series is accurate here.
+        // Double series summed at 40 digits: tau^3/3 - (a+b) tau^4/8 + ...
+        close(g2_cross(1e-7, 1e-7, 2.0), 2.666666266666704, 1e-13);
+    }
+
+    #[test]
+    fn curve_extrapolates_flat_forward_past_last_pillar() {
+        let c = curve();
+        close(c.forward(40.0), 0.03759938402914393, 1e-14);
+        close(c.ln_discount(40.0), -1.4846564648130504, 1e-14);
+        assert_eq!(c.segment(40.0), (5, 10.0, 30.0));
+        assert_eq!(c.segment(0.5), (1, 0.5, 1.0));
+        assert_eq!(c.pillars(), 6);
+        close(c.pillar_df(6), 0.33, 1e-15);
+    }
+
+    #[test]
+    fn b_terms_series_and_direct_are_exact() {
+        // a tau = 8e-3 is on the series branch.
+        let (b, s) = b_terms(0.004, 2.0);
+        close(b, 1.9920212907348424, 1e-15);
+        close(s, -1.9946773162893962, 1e-14);
+        // a tau = 2e-9: the direct form (B - tau)/a would lose about 7 digits.
+        close(b_terms(1e-9, 2.0).1, -1.9999999986666667, 1e-14);
+        // a tau = 1: direct branch.
+        let (b, s) = b_terms(0.5, 2.0);
+        let want = -(-1.0f64).exp_m1() / 0.5;
+        close(b, want, 1e-15);
+        close(s, (want - 2.0) / 0.5, 1e-14);
+    }
+
+    #[test]
+    fn one_factor_zcb_closed_forms() {
+        let v = Model::Vasicek {
+            a: 0.15,
+            b: 0.045,
+            sigma: 0.012,
+        };
+        let (p, z) = zcb(&v, 0.03, 0.5, 5.5).unwrap();
+        close(p, 0.84327479273661204, 1e-14);
+        close(z, 0.034092480813080286, 1e-13);
+        let v = Model::Vasicek {
+            a: 0.001,
+            b: 0.045,
+            sigma: 0.012,
+        };
+        let (p, z) = zcb(&v, 0.03, 0.5, 5.5).unwrap();
+        close(p, 0.86312270679345675, 1e-14);
+        close(z, 0.029439682337408118, 1e-13);
+        let c = curve();
+        let hw = Model::HullWhite {
+            a: 0.05,
+            sigma: 0.01,
+            curve: &c,
+        };
+        let (p, z) = zcb(&hw, 0.02, 1.5, 7.0).unwrap();
+        close(p, 0.86872473543233532, 1e-14);
+        close(z, 0.025587084371408544, 1e-13);
+        let cir = Model::Cir {
+            a: 0.3,
+            b: 0.05,
+            sigma: 0.1,
+        };
+        let (p, z) = zcb(&cir, 0.04, 0.0, 3.0).unwrap();
+        close(p, 0.87878692185280697, 1e-14);
+        close(z, 0.043070940135571765, 1e-13);
+        let code = |r: Result<(f64, f64)>| r.unwrap_err().code;
+        assert_eq!(code(zcb(&cir, -0.01, 0.0, 3.0)), "E_DOMAIN");
+        assert_eq!(code(zcb(&v, 0.03, 1.0, 1.0)), "E_DOMAIN");
+        assert_eq!(code(zcb(&v, 0.03, -0.1, 1.0)), "E_DOMAIN");
+        let bad = Model::Cir {
+            a: 0.3,
+            b: 0.0,
+            sigma: 0.1,
+        };
+        assert_eq!(code(zcb(&bad, 0.04, 0.0, 3.0)), "E_DOMAIN");
+        let bad = Model::Vasicek {
+            a: 0.0,
+            b: 0.04,
+            sigma: 0.1,
+        };
+        assert_eq!(code(zcb(&bad, 0.04, 0.0, 3.0)), "E_DOMAIN");
+        assert!(zcb(&v, 0.03, 0.0, 1.0).is_ok());
+    }
+
+    #[test]
+    fn payment_schedule_checks() {
+        let code = |s: f64, p: &[f64]| check_payments(s, p).unwrap_err().code;
+        assert_eq!(code(0.0, &[]), "E_INPUT");
+        assert_eq!(code(1.0, &[1.0, 2.0]), "E_INPUT");
+        assert_eq!(code(1.0, &[0.5, 2.0]), "E_INPUT");
+        assert_eq!(code(0.0, &[1.0, 3.0, 2.0]), "E_INPUT");
+        assert_eq!(code(0.0, &[1.0, 1.0]), "E_INPUT");
+        assert!(check_payments(0.0, &[1.0, 2.0, 3.0]).is_ok());
+        assert!(check_payments(0.99, &[1.0]).is_ok());
+        let long = vec![1.0; 10_001];
+        assert_eq!(code(0.0, &long), "E_LIMIT");
+    }
+
+    #[test]
+    fn g2pp_variance_terms_exact() {
+        // a tau = 50 with b tau = 0.5: direct branch; the double series would not converge.
+        close(g2_cross(5.0, 0.05, 10.0), 8.514531984931466, 1e-13);
+        close(g2_cross(0.05, 5.0, 10.0), 8.514531984931466, 1e-13);
+        close(g2_cross(0.3, 0.2, 2.0), 1.8646689135899995, 1e-13);
+        close(g2_vterm(0.3, 2.0), 1.7417098604426599, 1e-13);
+        close(g2_vterm(2.0, 2.0), 0.31705794330793964, 1e-13);
+    }
+
+    fn g2(c: &HwCurve) -> G2pp<'_> {
+        G2pp {
+            a: 0.1,
+            sigma: 0.01,
+            b: 0.3,
+            eta: 0.008,
+            rho: -0.4,
+            curve: c,
+        }
+    }
+
+    #[test]
+    fn g2pp_zcb_and_option_closed_forms() {
+        let c = curve();
+        let g = g2(&c);
+        let (p, z) = g.zcb(0.004, -0.002, 1.5, 6.0).unwrap();
+        close(p, 0.84724835723110001, 1e-14);
+        close(z, 0.036835868319821987, 1e-13);
+        let (call, pt, ps) = g.zcb_option(true, 0.8, 2.0, 6.0, 100.0).unwrap();
+        close(call, 6.5799827988342058, 1e-13);
+        close(pt, 0.94, 1e-15);
+        close(ps, 0.81762610405187869, 1e-15);
+        let (put, _, _) = g.zcb_option(false, 0.8, 2.0, 6.0, 100.0).unwrap();
+        close(put, 0.017372393646332686, 1e-10);
+    }
+
+    #[test]
+    fn g2pp_rejects_bad_inputs() {
+        let c = curve();
+        let g = g2(&c);
+        for rho in [1.0, -1.0, 1.5, -2.0] {
+            let e = G2pp { rho, ..g2(&c) }.zcb(0.0, 0.0, 0.0, 1.0).unwrap_err();
+            assert_eq!(e.code, "E_DOMAIN");
+        }
+        assert!(
+            G2pp {
+                rho: 0.999,
+                ..g2(&c)
+            }
+            .zcb(0.0, 0.0, 0.0, 1.0)
+            .is_ok()
+        );
+        assert!(
+            G2pp {
+                rho: -0.999,
+                ..g2(&c)
+            }
+            .zcb(0.0, 0.0, 0.0, 1.0)
+            .is_ok()
+        );
+        for bad in [
+            G2pp { a: 0.0, ..g2(&c) },
+            G2pp {
+                sigma: 0.0,
+                ..g2(&c)
+            },
+            G2pp { b: 0.0, ..g2(&c) },
+            G2pp {
+                eta: -1.0,
+                ..g2(&c)
+            },
+        ] {
+            let e = bad.zcb_option(true, 0.9, 1.0, 2.0, 1.0).unwrap_err();
+            assert_eq!(e.code, "E_DOMAIN");
+        }
+        assert_eq!(g.zcb(0.0, 0.0, 2.0, 2.0).unwrap_err().code, "E_DOMAIN");
+        assert_eq!(g.zcb(0.0, 0.0, -1.0, 2.0).unwrap_err().code, "E_DOMAIN");
+        for (k, te, ts) in [(0.0, 1.0, 2.0), (0.9, 0.0, 2.0), (0.9, 2.0, 2.0)] {
+            let e = g.zcb_option(true, k, te, ts, 1.0).unwrap_err();
+            assert_eq!(e.code, "E_DOMAIN");
+        }
+    }
+
+    #[test]
+    fn fd_grid_bounds() {
+        let g = |nx, steps_per_year, width| FdGrid {
+            nx,
+            steps_per_year,
+            width,
+        };
+        let code = |x: FdGrid| x.check().unwrap_err().code;
+        assert!(g(5, 1, 1.0).check().is_ok());
+        assert!(g(10_001, 100_000, 1.0).check().is_ok());
+        assert_eq!(code(g(3, 1, 1.0)), "E_INPUT");
+        assert_eq!(code(g(6, 1, 1.0)), "E_INPUT");
+        assert_eq!(code(g(10_003, 1, 1.0)), "E_LIMIT");
+        assert_eq!(code(g(20_001, 1, 1.0)), "E_LIMIT");
+        assert_eq!(code(g(5, 0, 1.0)), "E_INPUT");
+        assert_eq!(code(g(5, 100_001, 1.0)), "E_LIMIT");
+        assert_eq!(code(g(5, 1, 0.0)), "E_DOMAIN");
+        // Work 5 x 1e8 is at the bound; one more step is over.
+        assert!(g(5, 100_000, 1.0).check_work(&[1000.0]).is_ok());
+        let e = g(5, 100_000, 1.0).check_work(&[1000.00001]).unwrap_err();
+        assert_eq!(e.code, "E_LIMIT");
+    }
+
+    #[test]
+    fn bermudan_exercise_schedule_checks() {
+        let c = curve();
+        let pay = [2.0, 3.0, 4.0];
+        let grid = FdGrid {
+            nx: 21,
+            steps_per_year: 4,
+            width: 5.0,
+        };
+        let swap = SwapLeg {
+            start: 1.0,
+            pay: &pay,
+            fixed_rate: 0.04,
+            payer: true,
+            notional: 1.0,
+        };
+        let code = |ex: &[f64]| {
+            check_bermudan(&c, 0.05, 0.01, &swap, ex, grid)
+                .unwrap_err()
+                .code
+        };
+        assert_eq!(code(&[]), "E_INPUT");
+        assert_eq!(code(&[2.0, 1.0]), "E_INPUT");
+        assert_eq!(code(&[2.0, 2.0]), "E_INPUT");
+        assert_eq!(code(&[1.5]), "E_INPUT");
+        assert_eq!(code(&[4.0]), "E_INPUT");
+        assert!(check_bermudan(&c, 0.05, 0.01, &swap, &[1.0, 2.0, 3.0], grid).is_ok());
+        let late = SwapLeg { start: 0.0, ..swap };
+        let e = check_bermudan(&c, 0.05, 0.01, &late, &[2.0], grid).unwrap_err();
+        assert_eq!(e.code, "E_DOMAIN");
+    }
+
+    #[test]
+    fn plain_bond_on_fd_grid_matches_curve() {
+        // With no calls the bond is linear in the curve, so the scheme converges to
+        // sum c tau_i P(0,T_i) + P(0,T_n) = 1.0276292464786551 (half-year accruals).
+        let c = curve();
+        let pay = [0.5, 1.0, 1.5];
+        let bond = CallableBond {
+            pay: &pay,
+            coupon: 0.05,
+            notional: 100.0,
+            calls: &[],
+            call_price: 1.0,
+        };
+        let grid = FdGrid {
+            nx: 101,
+            steps_per_year: 2000,
+            width: 6.0,
+        };
+        let v = callable_bond(&c, 0.05, 0.01, &bond, grid).unwrap();
+        close(v, 102.76292464786551, 1e-4);
+        // A call at par on the 1.0 coupon date can only lower the price.
+        let called = CallableBond {
+            calls: &[1.0],
+            ..bond.clone()
+        };
+        assert!(callable_bond(&c, 0.05, 0.01, &called, grid).unwrap() < v);
+        let bad = CallableBond {
+            calls: &[1.5],
+            ..bond.clone()
+        };
+        let e = callable_bond(&c, 0.05, 0.01, &bad, grid).unwrap_err();
+        assert_eq!(e.code, "E_INPUT");
+        let bad = CallableBond {
+            call_price: 0.0,
+            ..bond
+        };
+        let e = callable_bond(&c, 0.05, 0.01, &bad, grid).unwrap_err();
+        assert_eq!(e.code, "E_DOMAIN");
+    }
 }
