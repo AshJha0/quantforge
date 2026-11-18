@@ -1,0 +1,500 @@
+{
+ "auc_h-0001": {
+  "cancelled": [],
+  "fills": [
+   {
+    "id": "s1",
+    "price": "10.01",
+    "qty": 100,
+    "side": "B"
+   },
+   {
+    "id": "s2",
+    "price": "10.01",
+    "qty": 200,
+    "side": "B"
+   },
+   {
+    "id": "s4",
+    "price": "10.01",
+    "qty": 150,
+    "side": "S"
+   },
+   {
+    "id": "s5",
+    "price": "10.01",
+    "qty": 150,
+    "side": "S"
+   }
+  ],
+  "imbalance": -100,
+  "label": "simulated venue; not a real exchange",
+  "price": "10.01",
+  "residual": [
+   {
+    "id": "s3",
+    "limit": "10.00",
+    "qty": 300,
+    "side": "B"
+   },
+   {
+    "id": "s5",
+    "limit": "10.01",
+    "qty": 100,
+    "side": "S"
+   },
+   {
+    "id": "s6",
+    "limit": "10.03",
+    "qty": 100,
+    "side": "S"
+   }
+  ],
+  "status": "ok",
+  "volume": 300
+ },
+ "auc_h-0002": {
+  "cancelled": [],
+  "fills": [
+   {
+    "id": "s1",
+    "price": "10.01",
+    "qty": 100,
+    "side": "B"
+   },
+   {
+    "id": "s2",
+    "price": "10.01",
+    "qty": 200,
+    "side": "B"
+   },
+   {
+    "id": "s4",
+    "price": "10.01",
+    "qty": 150,
+    "side": "S"
+   },
+   {
+    "id": "s5",
+    "price": "10.01",
+    "qty": 150,
+    "side": "S"
+   }
+  ],
+  "imbalance": -100,
+  "label": "simulated venue; not a real exchange",
+  "price": "10.01",
+  "residual": [
+   {
+    "id": "s3",
+    "limit": "10.00",
+    "qty": 300,
+    "side": "B"
+   },
+   {
+    "id": "s5",
+    "limit": "10.01",
+    "qty": 100,
+    "side": "S"
+   },
+   {
+    "id": "s6",
+    "limit": "10.03",
+    "qty": 100,
+    "side": "S"
+   }
+  ],
+  "status": "ok",
+  "volume": 300
+ },
+ "auc_h-0003": {
+  "cancelled": [],
+  "fills": [
+   {
+    "id": "b1",
+    "price": "10.01",
+    "qty": 100,
+    "side": "B"
+   },
+   {
+    "id": "a1",
+    "price": "10.01",
+    "qty": 100,
+    "side": "S"
+   }
+  ],
+  "imbalance": 0,
+  "label": "simulated venue; not a real exchange",
+  "price": "10.01",
+  "residual": [],
+  "status": "ok",
+  "volume": 100
+ },
+ "auc_h-0004": {
+  "cancelled": [],
+  "fills": [
+   {
+    "id": "b1",
+    "price": "10.02",
+    "qty": 100,
+    "side": "B"
+   },
+   {
+    "id": "a1",
+    "price": "10.02",
+    "qty": 100,
+    "side": "S"
+   }
+  ],
+  "imbalance": 0,
+  "label": "simulated venue; not a real exchange",
+  "price": "10.02",
+  "residual": [],
+  "status": "ok",
+  "volume": 100
+ },
+ "auc_h-0005": {
+  "cancelled": [],
+  "fills": [
+   {
+    "id": "b1",
+    "price": "10.01",
+    "qty": 100,
+    "side": "B"
+   },
+   {
+    "id": "a1",
+    "price": "10.01",
+    "qty": 100,
+    "side": "S"
+   }
+  ],
+  "imbalance": 0,
+  "label": "simulated venue; not a real exchange",
+  "price": "10.01",
+  "residual": [],
+  "status": "ok",
+  "volume": 100
+ },
+ "auc_h-0006": {
+  "cancelled": [],
+  "fills": [
+   {
+    "id": "b1",
+    "price": "10.02",
+    "qty": 150,
+    "side": "B"
+   },
+   {
+    "id": "a1",
+    "price": "10.02",
+    "qty": 100,
+    "side": "S"
+   },
+   {
+    "id": "a2",
+    "price": "10.02",
+    "qty": 50,
+    "side": "S"
+   }
+  ],
+  "imbalance": 50,
+  "label": "simulated venue; not a real exchange",
+  "price": "10.02",
+  "residual": [
+   {
+    "id": "b1",
+    "limit": "10.02",
+    "qty": 50,
+    "side": "B"
+   }
+  ],
+  "status": "ok",
+  "volume": 150
+ },
+ "auc_h-0007": {
+  "cancelled": [
+   "b1",
+   "a1"
+  ],
+  "fills": [],
+  "imbalance": 0,
+  "label": "simulated venue; not a real exchange",
+  "price": null,
+  "residual": [],
+  "status": "ok",
+  "volume": 0
+ },
+ "auc_h-0008": {
+  "cancelled": [],
+  "fills": [],
+  "imbalance": 0,
+  "label": "simulated venue; not a real exchange",
+  "price": null,
+  "residual": [
+   {
+    "id": "b1",
+    "limit": "10.00",
+    "qty": 100,
+    "side": "B"
+   },
+   {
+    "id": "b2",
+    "limit": "10.01",
+    "qty": 100,
+    "side": "B"
+   }
+  ],
+  "status": "ok",
+  "volume": 0
+ },
+ "eqc_h-0001": {
+  "label": "simulated venue; not a real exchange",
+  "price": "10.00",
+  "status": "ok",
+  "tick": "0.01"
+ },
+ "eqc_h-0002": {
+  "label": "simulated venue; not a real exchange",
+  "price": "10.01",
+  "status": "ok",
+  "tick": "0.01"
+ },
+ "eqc_h-0003": {
+  "label": "simulated venue; not a real exchange",
+  "price": "0.1234",
+  "status": "ok",
+  "tick": "0.0001"
+ },
+ "eqc_h-0004": {
+  "label": "simulated venue; not a real exchange",
+  "price": "0.1235",
+  "status": "ok",
+  "tick": "0.0001"
+ },
+ "eqc_h-0005": {
+  "label": "simulated venue; not a real exchange",
+  "price": "1.0000",
+  "status": "ok",
+  "tick": "0.0001"
+ },
+ "eqc_h-0006": {
+  "label": "simulated venue; not a real exchange",
+  "price": "25.00",
+  "status": "ok",
+  "tick": "0.01"
+ },
+ "eqc_h-0007": {
+  "error_code": "E_DOMAIN",
+  "status": "error"
+ },
+ "eqc_h-0008": {
+  "label": "simulated venue; not a real exchange",
+  "settle_date": "2026-11-23",
+  "status": "ok"
+ },
+ "fut_h-0001": {
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "status": "ok",
+  "ticks": 7073
+ },
+ "fut_h-0002": {
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "status": "ok",
+  "text": "110-16+"
+ },
+ "fut_h-0003": {
+  "error_code": "E_DOMAIN",
+  "status": "error"
+ },
+ "fut_h-0004": {
+  "buy_ticks": 7072,
+  "fees": "0",
+  "gross": "140.625",
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "pnl": "140.625",
+  "sell_ticks": 7075,
+  "status": "ok"
+ },
+ "fut_h-0005": {
+  "buy_ticks": 7072,
+  "fees": "6.00",
+  "gross": "140.625",
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "pnl": "134.625",
+  "sell_ticks": 7075,
+  "status": "ok"
+ },
+ "fut_h-0006": {
+  "entry_ticks": 3840,
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "pnl": "-31.25",
+  "settle_ticks": 3839,
+  "status": "ok",
+  "variation_margin": "-31.25"
+ },
+ "fxc_h-0001": {
+  "currency": "USD",
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "pip": "0.0001",
+  "pip_value": "100.0000",
+  "status": "ok"
+ },
+ "fxc_h-0002": {
+  "currency": "JPY",
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "pip": "0.01",
+  "pip_value": "10000.00",
+  "status": "ok"
+ },
+ "fxc_h-0003": {
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "spot_date": "2026-11-18",
+  "status": "ok"
+ },
+ "fxc_h-0004": {
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "spot_date": "2026-11-27",
+  "status": "ok"
+ },
+ "fxc_h-0005": {
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "spot_date": "2026-11-24",
+  "status": "ok"
+ },
+ "fxc_h-0006": {
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "spot_date": "2026-11-23",
+  "status": "ok"
+ },
+ "fxc_h-0007": {
+  "error_code": "E_INPUT",
+  "status": "error"
+ },
+ "fxv_h-0001": {
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "quotes": [
+   {
+    "ask": "1.08522",
+    "bid": "1.08502",
+    "mid": "1.08512",
+    "time": 0
+   }
+  ],
+  "status": "ok"
+ },
+ "fxv_h-0002": {
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "quotes": [
+   {
+    "ask": "1.08523",
+    "bid": "1.08502",
+    "mid": "1.085125",
+    "time": 0
+   }
+  ],
+  "status": "ok"
+ },
+ "fxv_h-0003": {
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "move_pips": "4",
+  "outcome": "LL_PRICE",
+  "price": null,
+  "status": "ok"
+ },
+ "fxv_h-0004": {
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "move_pips": "1",
+  "outcome": "FILL",
+  "price": "1.0852",
+  "status": "ok"
+ },
+ "fxv_h-0005": {
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "move_pips": "1",
+  "outcome": "LL_RANDOM",
+  "price": null,
+  "status": "ok"
+ },
+ "fxv_h-0006": {
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "move_pips": "-4",
+  "outcome": "LL_PRICE",
+  "price": null,
+  "status": "ok"
+ },
+ "fxv_h-0007": {
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "move_pips": "-4",
+  "outcome": "FILL",
+  "price": "1.0852",
+  "status": "ok"
+ },
+ "fxv_h-0008": {
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "move_pips": "-3",
+  "outcome": "LL_PRICE",
+  "price": null,
+  "status": "ok"
+ },
+ "fxv_h-0009": {
+  "label": "simulated venue; not a real exchange; no real FX data",
+  "move_pips": "2",
+  "outcome": "FILL",
+  "price": "1.0852",
+  "status": "ok"
+ },
+ "rtc_h-0001": {
+  "fraction": "199/2",
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "status": "ok",
+  "value": "99.5"
+ },
+ "rtc_h-0002": {
+  "fraction": "6369/64",
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "status": "ok",
+  "value": "99.515625"
+ },
+ "rtc_h-0003": {
+  "fraction": "12737/128",
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "status": "ok",
+  "value": "99.5078125"
+ },
+ "rtc_h-0004": {
+  "fraction": "25479/256",
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "status": "ok",
+  "value": "99.52734375"
+ },
+ "rtc_h-0005": {
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "status": "ok",
+  "text": "101-09+"
+ },
+ "rtc_h-0006": {
+  "error_code": "E_DOMAIN",
+  "status": "error"
+ },
+ "rtc_h-0007": {
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "status": "ok",
+  "tick_value": "15.625000"
+ },
+ "rtc_h-0008": {
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "price": "99.036287923855",
+  "status": "ok"
+ },
+ "rtc_h-0009": {
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "price": "100.000000000000",
+  "status": "ok"
+ },
+ "rtc_h-0010": {
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "price": "98.736111111111",
+  "status": "ok"
+ }
+}
