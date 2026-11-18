@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.quantforge.cli.Operations.Out;
+import org.quantforge.execution.AdaptiveExec;
 import org.quantforge.execution.Execution;
 import org.quantforge.execution.Execution.Mode;
 
@@ -24,6 +25,14 @@ final class OpsExecution {
         table.put("exec.tca.shortfall", OpsExecution::shortfall);
         table.put("micro.mm.as_quotes", OpsExecution::asQuotes);
         table.put("usecase.execution_tca", OpsExecution::executionTca);
+        // Stage H wave 2 execution (HR-59 to HR-67): adaptive-algos.md and tca-pretrade.md
+        table.put("exec.algo.arrival", OpsExecution::arrival);
+        table.put("exec.algo.close", OpsExecution::close);
+        table.put("exec.algo.liquidity_seek", OpsExecution::liquiditySeek);
+        table.put("exec.algo.pair", OpsExecution::pair);
+        table.put("exec.algo.basket", OpsExecution::basket);
+        table.put("exec.tca.pretrade", OpsExecution::pretrade);
+        table.put("exec.tca.attribution", OpsExecution::attribution);
     }
 
     /** HR-3: UNITS slices are written as JSON integers, CONTINUOUS slices as reals. */
@@ -166,5 +175,123 @@ final class OpsExecution {
         return Operations.out("lots", slices(r.lots(), Mode.UNITS), "expected_cost", r.expectedCost(), "variance",
                 r.variance(), "filled", (long) r.filled(), "fees", r.fees(), "delay", s.delay(), "execution",
                 s.execution(), "opportunity", s.opportunity(), "total", s.total(), "total_bps", s.totalBps());
+    }
+
+    // ---- Stage H wave 2 execution ----
+
+    private static Out arrival(In in) {
+        double x = in.real("quantity");
+        long n = in.atMost("n_buckets", Execution.MAX_STEPS);
+        double k = in.real("urgency");
+        Mode mode = mode(in);
+        return Operations.out("slices", slices(AdaptiveExec.arrival(x, n, k, mode), mode));
+    }
+
+    private static Out close(In in) {
+        double x = in.real("quantity");
+        double v = in.real("close_volume");
+        double p = in.real("auction_participation");
+        double[] w = in.reals("profile");
+        Mode mode = mode(in);
+        AdaptiveExec.Close r = AdaptiveExec.close(x, v, p, w, mode);
+        return Operations.out("auction_quantity", amount(r.auctionQuantity(), mode), "slices",
+                slices(r.slices(), mode));
+    }
+
+    private static Out liquiditySeek(In in) {
+        Execution.Side side = in.choice("side", Execution.Side.class);
+        double x = in.real("quantity");
+        double lim = in.real("limit_price");
+        double a = in.real("take_fraction");
+        double[][][] books = in.gate(in.tuples("books", 2));
+        AdaptiveExec.Seek r = AdaptiveExec.liquiditySeek(side, x, lim, a, books);
+        return Operations.out("slices", OpsSmile.list(r.slices()), "avg_prices",
+                new ArrayList<Object>(java.util.Arrays.asList((Object[]) r.avgPrices())), "filled", r.filled(),
+                "residual", r.residual(), "notional", r.notional(), "avg_fill_price", r.avgFillPrice());
+    }
+
+    private static Out pair(In in) {
+        In a = in.object("leg_a");
+        Execution.Side sa = a.choice("side", Execution.Side.class);
+        double qa = a.real("quantity");
+        double pa = a.real("price");
+        In b = in.object("leg_b");
+        Execution.Side sb = b.choice("side", Execution.Side.class);
+        double pb = b.real("price");
+        AdaptiveExec.PairMode pm = in.choice("pair_mode", AdaptiveExec.PairMode.class);
+        Double h = in.has("hedge_ratio") ? in.real("hedge_ratio") : null;
+        long n = in.atMost("n_buckets", Execution.MAX_STEPS);
+        Mode mode = mode(in);
+        AdaptiveExec.Pair r = AdaptiveExec.pair(sa, qa, pa, sb, pb, pm, h, n, mode);
+        return Operations.out("slices_a", slices(r.slicesA(), mode), "slices_b", slices(r.slicesB(), mode),
+                "quantity_b", amount(r.quantityB(), mode), "cash_imbalance", OpsSmile.list(r.cashImbalance()));
+    }
+
+    private static Out basket(In in) {
+        List<In> raw = in.objects("legs");
+        AdaptiveExec.Leg[] legs = new AdaptiveExec.Leg[raw.size()];
+        for (int k = 0; k < legs.length; k++) {
+            In g = raw.get(k);
+            legs[k] = new AdaptiveExec.Leg(g.choice("side", Execution.Side.class), g.real("quantity"),
+                    g.real("price"));
+        }
+        long n = in.atMost("n_buckets", Execution.MAX_STEPS);
+        Mode mode = mode(in);
+        AdaptiveExec.Basket r = AdaptiveExec.basket(legs, n, mode);
+        List<Object> s = new ArrayList<>(legs.length);
+        for (double[] leg : r.slices()) {
+            s.add(slices(leg, mode));
+        }
+        return Operations.out("slices", s, "cash_imbalance", OpsSmile.list(r.cashImbalance()), "gross_notional",
+                r.grossNotional());
+    }
+
+    private static Out pretrade(In in) {
+        double x = in.real("quantity");
+        double adv = in.real("adv");
+        double sigma = in.real("daily_vol");
+        double p = in.real("participation");
+        double hs = in.real("half_spread_bps");
+        In k = in.object("params");
+        double a1 = k.real("a1");
+        double a2 = k.real("a2");
+        double a3 = k.real("a3");
+        double a4 = k.real("a4");
+        double b1 = k.real("b1");
+        Double price = in.has("price") ? in.real("price") : null;
+        in.gate();
+        AdaptiveExec.Pretrade r = AdaptiveExec.pretrade(x, adv, sigma, p, hs, a1, a2, a3, a4, b1, price);
+        Map<String, Object> m = new LinkedHashMap<>(Operations.out("istar_bps", r.istarBps(), "impact_bps",
+                r.impactBps(), "spread_bps", r.spreadBps(), "expected_cost_bps", r.expectedCostBps(), "duration_days",
+                r.durationDays(), "timing_risk_bps", r.timingRiskBps()).outputs());
+        if (price != null) {
+            m.put("expected_cost", r.expectedCost());
+            m.put("timing_risk", r.timingRisk());
+        }
+        return new Out(m, Map.of());
+    }
+
+    private static Out attribution(In in) {
+        Execution.Side side = in.choice("side", Execution.Side.class);
+        double pd = in.real("decision_price");
+        double m0 = in.real("arrival_mid");
+        double pc = in.real("end_price");
+        double x = in.real("order_quantity");
+        List<In> fills = in.objects("fills");
+        double[] q = new double[fills.size()];
+        double[] px = new double[fills.size()];
+        double[] mid = new double[fills.size()];
+        for (int i = 0; i < q.length; i++) {
+            q[i] = fills.get(i).real("quantity");
+            px[i] = fills.get(i).real("price");
+            mid[i] = fills.get(i).real("mid");
+        }
+        double fees = in.real("fees", 0.0);
+        in.limit(fills.size() > Execution.MAX_FILLS, "fills"); // HR-9
+        in.gate();
+        AdaptiveExec.Attribution r = AdaptiveExec.attribution(side, pd, m0, pc, x, q, px, mid, fees);
+        return Operations.out("delay", r.delay(), "impact", r.impact(), "spread", r.spread(), "execution",
+                r.execution(), "opportunity", r.opportunity(), "fees", r.fees(), "total", r.total(), "total_bps",
+                r.totalBps());
     }
 }

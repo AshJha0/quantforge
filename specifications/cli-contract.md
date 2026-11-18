@@ -432,7 +432,7 @@ No new error code. Prices, quantities and fees are decimal strings (HR-12); outp
 
 ### Stage H wave 2 execution (H-14, H-17; rulings HR-59 to HR-66)
 
-Specs `10-execution/adaptive-algos.md` and `10-execution/tca-pretrade.md`. No new error code; error precedence HR-66 (`E_SCHEMA`, structural `E_INPUT`, `E_DOMAIN`, `E_LIMIT`). `n_buckets` at most 100,000 and attribution `fills` at most 1,000,000 (as HR-9). Goldens `datasets/golden/stage_h/alg_h.json` and `tcx_h.json` (`oracle/python/gen_stage_h_w2_exec.py`). Implemented in the Python build only; the Java, C++ and Rust builds answer `E_UNSUPPORTED_OPERATION`. `mode` is `UNITS` or `CONTINUOUS` (absent: `CONTINUOUS`); `side` is `BUY` or `SELL`.
+Specs `10-execution/adaptive-algos.md` and `10-execution/tca-pretrade.md`. No new error code; error precedence HR-66 (`E_SCHEMA`, structural `E_INPUT`, `E_DOMAIN`, `E_LIMIT`). `n_buckets` at most 100,000 and attribution `fills` at most 1,000,000 (as HR-9). Goldens `datasets/golden/stage_h/alg_h.json` and `tcx_h.json` (`oracle/python/gen_stage_h_w2_exec.py`). Implemented in the Python and Java builds; the C++ and Rust builds answer `E_UNSUPPORTED_OPERATION`, which the runner counts as not implemented. `mode` is `UNITS` or `CONTINUOUS` (absent: `CONTINUOUS`); `side` is `BUY` or `SELL`.
 
 | Operation | Spec | Inputs | Outputs |
 |---|---|---|---|

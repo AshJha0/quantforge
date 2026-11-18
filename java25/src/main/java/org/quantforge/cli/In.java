@@ -51,7 +51,7 @@ final class In {
                 || operation.startsWith("research.portfolio.") || operation.startsWith("research.estimate.")
                 || operation.equals("risk.contrib.euler") || operation.equals("risk.backtest.es_z2")
                 || operation.startsWith("research.drift.") || operation.startsWith("risk.scenario.")
-                || operation.equals("exec.tca.shortfall")
+                || operation.equals("exec.tca.shortfall") || operation.equals("exec.tca.attribution")
                 || operation.equals("micro.book.rebuild") || operation.equals("exec.sim.lit.run");
     }
 
@@ -352,6 +352,25 @@ final class In {
                 throw schema(key, "expected an array of rows");
             }
             out[i] = realsOf(key, row);
+        }
+        return out;
+    }
+
+    /** An array of arrays of fixed-width real tuples, such as order-book buckets of [price, size] levels. */
+    double[][][] tuples(String key, int width) {
+        List<?> outer = list(key);
+        double[][][] out = new double[outer.size()][][];
+        for (int i = 0; i < out.length; i++) {
+            if (!(outer.get(i) instanceof List<?> inner)) {
+                throw schema(key, "expected an array of arrays");
+            }
+            out[i] = new double[inner.size()][];
+            for (int k = 0; k < out[i].length; k++) {
+                if (!(inner.get(k) instanceof List<?> t) || t.size() != width) {
+                    throw schema(key, "expected tuples of " + width + " numbers");
+                }
+                out[i][k] = realsOf(key, t);
+            }
         }
         return out;
     }
