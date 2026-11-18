@@ -17,7 +17,7 @@ No value mismatch, so nobody was wrong on a value. alg_h-0004 differs by float n
 1. Output field names are fixed as one name each in both specs (new section "Post-blind shape changes"). The blind lane's choices are adopted: `cash_imbalance` of length N (one entry per bucket), attribution echoes `fees`, and close returns `auction_quantity`. The spec goldens already used these names.
 2. The error wrapper stays the repo conformance format. The blind `{"error": CODE}` maps to it one to one.
 
-## Error precedence (open, proposal sent to the coordinator; no expected value changed)
+## Error precedence (decided 2026-11-18: HR-66 in stage-h-rulings-w2-exec.md; no expected value changed)
 The blind lane put `E_INPUT` before `E_DOMAIN` (tcx_h-0005: X = 0). Micro-lane HR-75 says `E_DOMAIN` before `E_INPUT`. Repo precedent: B11 (length checks before domain), C15 and C17 (structural `E_INPUT` first, "before every `E_DOMAIN`"), D53 (duplicates before `divisor <= 0`), R1-4 (first check), and HR-58 (`E_SCHEMA` before `E_LIMIT`). Proposed repo-wide order: `E_SCHEMA`, then structural `E_INPUT` (missing or empty lists, lengths, ordering, enum or mode consistency, cross-field consistency), then `E_DOMAIN` (single values out of range), then `E_LIMIT`. Under this order HR-75 would be amended. No exec golden has two errors at once, so alg_h and tcx_h do not change under either order.
 
 ## Goldens moved to the oracle
