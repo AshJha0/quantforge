@@ -601,6 +601,30 @@ def huber_irls(mats, ys, tau, delta):
     return b, r
 
 
+def huber_polished(mats, ys, tau, delta):
+    """The exact minimiser, in mpmath, of the inlier/outlier split SciPy's Huber fit reaches.
+
+    Used for the 2026-11-18 regression cases, where 400 IRLS steps do not settle. The exact
+    solve is accepted only if it reproduces its own split: the objective is convex and
+    differentiable, so a stationary point of the split's quadratic is the minimum."""
+    Xn = np.array([[float(v) for v in ns_load(m, tau)] for m in mats])
+    sol = least_squares(lambda p: Xn @ p - np.array(ys), [0, 0, 0], loss="huber", f_scale=float(delta), xtol=1e-15, ftol=1e-15, gtol=1e-15)
+    sign = [0 if abs(x) <= delta else (1 if x > 0 else -1) for x in Xn @ sol.x - np.array(ys)]
+    X = [ns_load(m, tau) for m in mats]
+    y = [mp.mpf(v) for v in ys]
+    M = mp.matrix(3, 3)
+    v = mp.matrix(3, 1)
+    for j in range(len(y)):
+        for a in range(3):
+            v[a] += (y[j] if sign[j] == 0 else 0) * X[j][a] - sign[j] * delta * X[j][a]
+            for c in range(3):
+                M[a, c] += (1 if sign[j] == 0 else 0) * X[j][a] * X[j][c]
+    nb = mp.lu_solve(M, v)
+    b = [nb[k] for k in range(3)]
+    r = [sum(X[j][k] * b[k] for k in range(3)) - y[j] for j in range(len(y))]
+    assert [0 if abs(x) <= delta else (1 if x > 0 else -1) for x in r] == sign, "split not consistent"
+    return b, r
+
 def fits_d():
     s = S("fits_d", "03-calibration/curve-fits.md")
     op = "calib.curve.smooth"
@@ -654,6 +678,33 @@ def fits_d():
     s.add(rop, {"maturities": mats, "zero_rates": ys, "tau": -1.0, "delta": .0005}, error="E_DOMAIN", cls=E, tags=["invalid"])
     s.add(rop, {"maturities": mats[:2], "zero_rates": ys[:2], "tau": 2.0, "delta": .0005}, error="E_INPUT", cls=E, tags=["invalid"], description="fewer than 3 points")
     s.add(rop, {"maturities": [0.0] + mats[1:], "zero_rates": ys, "tau": 2.0, "delta": .0005}, error="E_DOMAIN", cls=E, tags=["invalid"], description="maturity must be > 0")
+    # Regression (mutation re-check 2026-11-18): valid inputs on which the old Java robust fit
+    # stopped short of the minimum (wrong outlier set). Random draws, seed 20261118, draws 75,
+    # 532 and 701; each residual is at least 1e-6 from delta, as the spec requires of goldens.
+    for mats_r, ys_r, tau_r, delta_r in (
+        ([6.079077244193639, 6.30909196635769, 9.451859102214785, 9.639174620903473, 16.527051943288185, 17.859267417379023, 18.774852330413587, 20.341430288782057, 24.477862969335643, 24.87388599312306, 28.132092020860277],
+         [-0.005851118554846008, 0.02635344651107668, 0.02473314220504889, 0.00047062268966262255, 0.04361937873465692, 0.024336163421900033, -0.0021272131429899595, -0.018684881293098875, 0.036328185399628204, 0.055199622791234595, -0.014117010374860798],
+         9.346261827971722, 0.000615750504688908),
+        ([1.9015860967441531, 4.497291201610246, 6.16161446896303, 12.1796230595406, 12.645840147205, 23.530018142806135, 24.558180589105987],
+         [0.048174659306358836, 0.05826562405653275, 0.010567107098514068, 0.020368623056845118, -0.004186773719431266, -0.011715798746360662, 0.03436753390344156],
+         2.158702131694657, 0.00014065157481983606),
+        ([0.27882680390743064, 0.6120973222536891, 4.741132193505328, 6.430428003370993, 6.985720859380131, 7.536404920236051, 9.210358012354678, 14.446129633483356, 15.890374508156711, 18.346514381059382, 22.634921036391848, 29.58162341866356],
+         [0.02164081839465801, 0.013258075635055839, 0.04461450579853693, 0.047195708036314996, -0.0030599404684943654, 0.03161927324515719, 0.044424856085740955, -0.012019358798620773, 0.038472019355860795, -0.01138589118811689, 0.029116984689204043, 0.03666500470430979],
+         5.1779363466503785, 0.000215197315208101),
+    ):
+        b, r = huber_polished(mats_r, ys_r, tau_r, mp.mpf(delta_r))
+        rf = [float(x) for x in r]
+        assert all(abs(abs(x) - delta_r) > 1e-6 for x in rf), "a residual sits near the Huber threshold"
+        Xn = np.array([[float(v) for v in ns_load(m, tau_r)] for m in mats_r])
+        for st in ([0, 0, 0], [.05, .02, -.03], [.02, -.01, .01]):
+            sol = least_squares(lambda p: Xn @ p - np.array(ys_r), st, loss="huber", f_scale=delta_r, xtol=1e-15, ftol=1e-15, gtol=1e-15)
+            assert np.max(np.abs(sol.x - np.array([float(x) for x in b]))) < 1e-8, (sol.x, b)
+        out = [j for j, x in enumerate(rf) if abs(x) > delta_r]
+        obj = sum((x * x / 2 if abs(x) <= delta_r else delta_r * abs(x) - delta_r * delta_r / 2) for x in r)
+        s.add(rop, {"maturities": mats_r, "zero_rates": ys_r, "tau": tau_r, "delta": delta_r}, {"betas": [float(x) for x in b], "residuals": rf, "outliers": out, "objective": float(obj)},
+              cls="calibration", verified=["independent-replay", "scipy-least-squares-huber"], tags=["outlier-robust", "regression"],
+              description="old Java fit stopped short of the minimum (mutation re-check 2026-11-18)",
+              output_classes={"outliers": E}, limit={"absolute": 1e-9, "relative": 0.0, "reason": "convex objective, unique minimum; exact split solve in mpmath, SciPy from three starts"})
     write(s)
 
 

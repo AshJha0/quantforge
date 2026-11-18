@@ -21,6 +21,26 @@ def case(cid):
     raise KeyError(cid)
 
 
+def basis_rcond_mp(mats, tau):
+    """D38b's reciprocal condition number in mpmath at 60 digits (exact inverse)."""
+    with D.mp.workdps(60):
+        X = [D.ns_load(m, tau) for m in mats]
+        g = D.mp.matrix(3, 3)
+        for x in X:
+            for p in range(3):
+                for q in range(3):
+                    g[p, q] += x[p] * x[q]
+        a = D.mp.matrix(3, 3)
+        for p in range(3):
+            for q in range(3):
+                a[p, q] = g[p, q] / D.mp.sqrt(g[p, p] * g[q, q])
+        if D.mp.det(a) <= 0:
+            return 0.0
+        inv = a ** -1
+        n1 = lambda m: max(sum(abs(m[i, j]) for i in range(3)) for j in range(3))
+        return float(1 / (n1(a) * n1(inv)))
+
+
 def main():
     D.estr()
     s = S("rulings_d", "stage-d-rulings.md")
@@ -95,6 +115,30 @@ def main():
     if i["fx"] is not None:
         i["fx"]["forwards"].append(dict(i["fx"]["forwards"][0]))
         s.add("rates.csa.discount", i, error="E_INPUT", cls=E, tags=tag("D42"))
+    # D38b: robust fit whose Nelson-Siegel basis is singular to working precision. rcond is the
+    # reciprocal 1-norm condition number of X^T X with unit-diagonal scaling, computed here in
+    # mpmath (60 digits) and kept at least a factor of 100 from the 1e-12 threshold.
+    m2 = [8.0, 10.0, 12.0, 15.0, 20.0]
+    for tau in (0.45, 0.3):
+        assert basis_rcond_mp(m2, tau) < 1e-14
+        y2 = [float(0.04 - 0.01 * v[1] + 0.005 * v[2]) for v in (D.ns_load(m, tau) for m in m2)]
+        s.add("calib.curve.robust", {"maturities": m2, "zero_rates": y2, "tau": tau, "delta": 0.0005}, error="E_SINGULAR", cls=E,
+              tags=tag("D38b"), description=f"min(m)/tau = {m2[0] / tau:.1f}: slope and curvature columns agree to working precision")
+    for mats, tau in (([0.25, 0.5, 1, 2, 3, 4, 5, 7, 10, 15, 20, 30], 0.2), ([1.0, 2.0, 3.0, 5.0, 7.0, 10.0], 1.0)):
+        assert basis_rcond_mp(mats, tau) > 1e-10
+        base = [D.ns_load(m, tau) for m in mats]
+        yy = [float(0.04 - 0.01 * v[1] + 0.005 * v[2]) + (j % 3 - 1) * 1e-5 + (0.003 if j == 2 else 0.0) for j, v in enumerate(base)]
+        delta = 0.0005
+        b, r = D.huber_polished(mats, yy, tau, D.mp.mpf(delta))
+        rf = [float(x) for x in r]
+        assert all(abs(abs(x) - delta) > 1e-6 for x in rf)
+        out = [j for j, x in enumerate(rf) if abs(x) > delta]
+        obj = sum((x * x / 2 if abs(x) <= delta else delta * abs(x) - delta * delta / 2) for x in r)
+        s.add("calib.curve.robust", {"maturities": mats, "zero_rates": yy, "tau": tau, "delta": delta},
+              {"betas": [float(x) for x in b], "residuals": rf, "outliers": out, "objective": float(obj)},
+              cls="calibration", verified=["independent-replay", "scipy-least-squares-huber"], tags=tag("D38b"), output_classes={"outliers": E},
+              description="basis well above the D38b threshold: fitted as usual",
+              limit={"absolute": 1e-9, "relative": 0.0, "reason": "convex objective, unique minimum; exact split solve in mpmath"})
     write(s)
     note(f"rulings_d: {len(s.cases)} cases")
     second()
