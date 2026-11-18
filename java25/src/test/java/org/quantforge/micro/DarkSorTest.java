@@ -92,7 +92,7 @@ class DarkSorTest {
         for (Map<?, ?> c : cases("sor_h")) {
             out.add(DynamicTest.dynamicTest((String) c.get("case_id"), () -> check(Sor::allocate, c)));
         }
-        assertEquals(16, out.size());
+        assertEquals(17, out.size());  // dark_h 8, sor_h 9
         return out.stream();
     }
 

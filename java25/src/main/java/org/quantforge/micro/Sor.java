@@ -155,10 +155,10 @@ public final class Sor {
         }
     }
 
-    /** As the Python reference: the rational divided in a 28-digit context, then quantized half-even to 6 places. */
+    /** As the Python reference: the exact rational rounded half-even to 6 places, with no context in between. */
     static String out(Frac x) {
-        BigDecimal q = new BigDecimal(x.n).divide(new BigDecimal(x.d), new MathContext(28, RoundingMode.HALF_EVEN));
-        return LitMatching.fmt(q.setScale(6, RoundingMode.HALF_EVEN));
+        BigDecimal q = new BigDecimal(x.n).divide(new BigDecimal(x.d), 6, RoundingMode.HALF_EVEN);
+        return LitMatching.fmt(q);
     }
 
     /** Lexicographic order of integer tuples. */
@@ -646,6 +646,15 @@ public final class Sor {
         if (v instanceof java.lang.Number n) {
             return n.doubleValue();
         }
+        if ("NaN".equals(v)) {
+            return Double.NaN;
+        }
+        if ("Infinity".equals(v)) {
+            return Double.POSITIVE_INFINITY;
+        }
+        if ("-Infinity".equals(v)) {
+            return Double.NEGATIVE_INFINITY;
+        }
         throw new QfError("E_SCHEMA", path + ": not a number", path);
     }
 
@@ -659,6 +668,10 @@ public final class Sor {
 
     /** The allocation for one input object (the CLI inputs as given). */
     public static Map<String, Object> allocate(Map<?, ?> inp) {
+        // F-2 (E1): `step` is the one Real input; non-finite is E_DOMAIN, the first rule check (as sor.py).
+        if (!Double.isFinite(realArg(inp.get("step"), 1.0, "step"))) {
+            throw new QfError("E_DOMAIN", "step: not finite", "step");
+        }
         Problem p = new Problem(inp);
         Object method = inp.containsKey("method") ? inp.get("method") : "SAMPLE_AVERAGE";
         if (!("SAMPLE_AVERAGE".equals(method) || "CLOSED_FORM".equals(method)
