@@ -20,6 +20,18 @@ if [ "$W" = micro ]; then
   sha256sum micro-estimators.blind.md venue-analytics.blind.md stage-h-rulings-micro.md > MANIFEST.sha256
   exit 0
 fi
+if [ "$W" = venue ]; then
+  # Third argument "venue": H-16 venue analytics only (fresh blind derivation, output names fixed), with the
+  # micro rulings and the exec rulings for HR-66, which HR-75 as amended cites. Leak list: venue_leaks.py, kept
+  # outside the packet.
+  awk -f "$D/wave2_extract.awk" "$R/specifications/10-execution/venue-analytics.md" > "$P/venue-analytics.blind.md"
+  cp "$R/specifications/stage-h-rulings-micro.md" "$R/specifications/stage-h-rulings-w2-exec.md" "$P/"
+  PY=python3; "$PY" -c "" >/dev/null 2>&1 || PY=python
+  "$PY" -I "$D/venue_redact.py" "$P"
+  cd "$P"
+  sha256sum venue-analytics.blind.md stage-h-rulings-micro.md stage-h-rulings-w2-exec.md > MANIFEST.sha256
+  exit 0
+fi
 if [ "$W" = exec ]; then
   for f in adaptive-algos tca-pretrade tca schedules; do awk -f "$D/wave2_extract.awk" "$R/specifications/10-execution/$f.md" > "$P/$f.blind.md"; done
   cp "$R/specifications/stage-h-rulings-w1.md" "$R/specifications/stage-h-rulings-h21.md" "$R/specifications/stage-h-rulings-w2-exec.md" "$P/"
