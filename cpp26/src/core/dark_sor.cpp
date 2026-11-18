@@ -33,6 +33,19 @@ using std::string;
 
 [[noreturn]] void fail(const char* code, const string& path, const string& why) { throw Error(code, path + ": " + why, path); }
 
+// HR-93, HR-113: `asset_class` (default EQUITY; null counts as absent); a dark venue of another class is an
+// invalid input combination, E_INPUT (structural cross-field check, HR-66).
+string asset_class(const Value* v, const string& path, bool dark = false) {
+    string c = "EQUITY";
+    if (v != nullptr && v->kind != Kind::Null) {
+        if (v->kind != Kind::String || (v->text != "EQUITY" && v->text != "FX" && v->text != "RATES"))
+            fail("E_SCHEMA", path, "not EQUITY, FX or RATES");
+        c = v->text;
+    }
+    if (dark && c != "EQUITY") fail("E_INPUT", path, "dark pool is equities only (HR-93, HR-113)");
+    return c;
+}
+
 bool present(const Value* v) { return v != nullptr && v->kind != Kind::Null; }
 
 D dec(const Value* v, const string& path) {
@@ -409,6 +422,7 @@ private:
 
 void dark_run(const Value& config, const Value& events, json::Writer& out) {
     if (events.kind != Kind::Array) fail("E_SCHEMA", "events", "expected an array");
+    if (config.kind == Kind::Object) asset_class(config.find("asset_class"), "config/asset_class", true);
     if ((long long)events.items.size() > max_dark_events) throw Error("E_LIMIT", "more than 10,000,000 events", "events");
     if (config.kind != Kind::Object) fail("E_SCHEMA", "config", "expected an object");
     Pool pool(config);
@@ -520,6 +534,23 @@ public:
         if (theta_.sign() < 0 || lu_.sign() < 0 || lo_.sign() < 0) fail("E_DOMAIN", "lambda_u", "negative penalty");
         const Value* venues = inp.find("venues");
         if (!venues || venues->kind != Kind::Array || venues->items.empty()) fail("E_INPUT", "venues", "empty");
+        {
+            const string order_class = asset_class(inp.find("asset_class"), "asset_class");
+            std::vector<string> classes;
+            for (std::size_t k = 0; k < venues->items.size(); ++k) {
+                const Value& v = venues->items[k];
+                classes.push_back(asset_class(v.kind == Kind::Object ? v.find("asset_class") : nullptr,
+                                              "venues/" + std::to_string(k) + "/asset_class"));
+            }
+            for (const string& c : classes)
+                if (c != order_class) fail("E_INPUT", "venues", "a venue's asset_class differs from the order's (HR-93)");
+            for (std::size_t k = 0; k < venues->items.size(); ++k) {
+                const Value& v = venues->items[k];
+                const Value* kind = v.kind == Kind::Object ? v.find("kind") : nullptr;
+                if (kind && kind->kind == Kind::String && kind->text == "DARK")
+                    asset_class(v.find("asset_class"), "venues/" + std::to_string(k) + "/asset_class", true);
+            }
+        }
         if (venues->items.size() > max_venues) fail("E_LIMIT", "venues", "more than 64 venues");
         for (std::size_t k = 0; k < venues->items.size(); ++k) {
             const Value& v = venues->items[k];
