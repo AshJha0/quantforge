@@ -47,6 +47,8 @@ BLIND_AC1 = ("blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.m
 ADDED = "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
 ORACLE = "mpmath 50 digits"
 EXACT = "fractions (exact rational on binary64 inputs)"
+BLIND_UC5 = "blind re-derivation DR-H2 2026-11-18 (program/STAGE_H_BLIND_UC5.md): MATCH"
+UC5_BLIND = {0, 2}  # uc5_h-0001 and -0003; uc5_h-0002's variance leaked through the packet, so it stays not blind
 
 
 class DomainError(Exception):
@@ -495,7 +497,7 @@ def build():
 
     u = Suite("uc5_h", UC, G)
     res = []
-    for inp, desc in UC_CASES:
+    for k, (inp, desc) in enumerate(UC_CASES):
         r, err = run(uc5, inp)
         res.append((r, err))
         tags = ("stage_h", "use_case", "execution", "synthetic") + (("error",) if err else ())
@@ -503,7 +505,7 @@ def build():
             u.add("usecase.execution_tca", inp, error=err, verified=("hand", ADDED), tags=tags, description=desc)
         else:
             assert sum(r["lots"]) == inp["quantity"]
-            u.add("usecase.execution_tca", inp, outputs=r, cls="simple_analytic", verified=(ORACLE, EXACT, ADDED),
+            u.add("usecase.execution_tca", inp, outputs=r, cls="simple_analytic", verified=(ORACLE, EXACT, BLIND_UC5) if k in UC5_BLIND else (ORACLE, EXACT, ADDED),
                   tags=tags, output_classes={"lots": "date_and_convention", "filled": "date_and_convention"},
                   description=desc)
     out["uc5_h"] = res

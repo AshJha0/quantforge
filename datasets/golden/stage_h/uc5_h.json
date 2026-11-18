@@ -57,7 +57,7 @@
    "verified_by": [
     "mpmath 50 digits",
     "fractions (exact rational on binary64 inputs)",
-    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_H_BLIND_UC5.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -183,7 +183,7 @@
    "verified_by": [
     "mpmath 50 digits",
     "fractions (exact rational on binary64 inputs)",
-    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_H_BLIND_UC5.md): MATCH"
    ],
    "tags": [
     "stage_h",
