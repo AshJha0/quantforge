@@ -1,20 +1,12 @@
 {
  "cpp": [
   {
-   "key": "cpp26/src/core/multicurve.cpp \t for (std::size_t j = 0; j < n; ++j) s[j] = std::fabs(r[j]) <= delta ? 0 : (r[j] > 0.0 ? 1 : -1); \t for (std::size_t j = 0; j < n; ++j) s[j] = std::fabs(r[j]) <= delta ? 0 : (r[j] >= 0.0 ? 1 : -1);",
-   "row": "equivalents-cpp.md multicurve.cpp:385"
-  },
-  {
    "key": "cpp26/src/core/shortrate.cpp \t if (mid <= lo || mid >= hi) break; \t if (mid <= lo && mid >= hi) break;",
    "row": "equivalents-cpp.md shortrate.cpp:355"
   },
   {
    "key": "cpp26/src/core/shortrate.cpp \t if (v > 0) \t if (v >= 0)",
    "row": "equivalents-cpp.md shortrate.cpp:258"
-  },
-  {
-   "key": "cpp26/src/core/multicurve.cpp \t for (std::size_t j = 0; j < n; ++j) w[j] = std::fabs(r[j]) <= delta ? 1.0 : delta / std::fabs(r[j]); \t for (std::size_t j = 0; j < n; ++j) w[j] = std::fabs(r[j]) < delta ? 1.0 : delta / std::fabs(r[j]);",
-   "row": "equivalents-cpp.md multicurve.cpp:418"
   }
  ],
  "rust": [
