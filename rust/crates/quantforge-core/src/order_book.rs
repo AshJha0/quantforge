@@ -455,7 +455,14 @@ mod tests {
         parse(text).unwrap().0.as_array().unwrap().to_vec()
     }
 
-    fn run(msgs: &str, depth: i64, pd: i64, qd: i64, cps: Option<&str>, emit: bool) -> Result<Json> {
+    fn run(
+        msgs: &str,
+        depth: i64,
+        pd: i64,
+        qd: i64,
+        cps: Option<&str>,
+        emit: bool,
+    ) -> Result<Json> {
         let c = cps.map(js);
         rebuild(&js(msgs), depth, pd, qd, c.as_deref(), emit)
     }
@@ -465,7 +472,10 @@ mod tests {
     }
 
     fn stat(out: &Json, k: &str) -> i64 {
-        out.get("stats").and_then(|s| s.get(k)).and_then(Json::as_int).unwrap()
+        out.get("stats")
+            .and_then(|s| s.get(k))
+            .and_then(Json::as_int)
+            .unwrap()
     }
 
     fn snap(body: &str) -> String {
@@ -496,12 +506,21 @@ mod tests {
         ] {
             assert_eq!(code(&snap(body), 10, 1, 1, None), "E_SCHEMA", "{body}");
         }
-        assert_eq!(code(&snap("\"bids\":[[\"0\",\"1\"]]"), 10, 1, 1, None), "E_DOMAIN");
-        assert_eq!(code(&snap("\"asks\":[[\"1\",\"-1\"]]"), 10, 1, 1, None), "E_DOMAIN");
+        assert_eq!(
+            code(&snap("\"bids\":[[\"0\",\"1\"]]"), 10, 1, 1, None),
+            "E_DOMAIN"
+        );
+        assert_eq!(
+            code(&snap("\"asks\":[[\"1\",\"-1\"]]"), 10, 1, 1, None),
+            "E_DOMAIN"
+        );
         assert_eq!(code("[]", 10, 1, 1, Some("[1]")), "E_SCHEMA");
         assert_eq!(code("[]", 10, 1, 1, Some("[{}]")), "E_SCHEMA");
         // A price with more decimals than the pair precision fails the checksum component.
-        assert_eq!(code(&snap("\"asks\":[[\"1.25\",\"1\"]]"), 10, 1, 1, None), "E_DOMAIN");
+        assert_eq!(
+            code(&snap("\"asks\":[[\"1.25\",\"1\"]]"), 10, 1, 1, None),
+            "E_DOMAIN"
+        );
     }
 
     #[test]
@@ -537,9 +556,21 @@ mod tests {
     #[test]
     fn truncates_to_depth() {
         let lv: Vec<String> = (1..=12).map(|k| format!("[\"{k}.0\",\"1.0\"]")).collect();
-        let out = run(&snap(&format!("\"bids\":[{}]", lv.join(","))), 10, 1, 1, None, false).unwrap();
+        let out = run(
+            &snap(&format!("\"bids\":[{}]", lv.join(","))),
+            10,
+            1,
+            1,
+            None,
+            false,
+        )
+        .unwrap();
         assert_eq!(stat(&out, "truncated_levels"), 2);
-        let bids = out.get("book").and_then(|b| b.get("bids")).and_then(Json::as_array).unwrap();
+        let bids = out
+            .get("book")
+            .and_then(|b| b.get("bids"))
+            .and_then(Json::as_array)
+            .unwrap();
         assert_eq!(bids.len(), 10);
     }
 
@@ -557,7 +588,10 @@ mod tests {
         let gaps = vec!["{\"type\":\"gap\"}"; MAX_EVENTS + 3].join(",");
         let out = run(&format!("[{gaps}]"), 25, 0, 0, Some("[]"), false).unwrap();
         assert_eq!(out.get("events_omitted").and_then(Json::as_int), Some(3));
-        assert_eq!(out.get("events").and_then(Json::as_array).unwrap().len(), MAX_EVENTS);
+        assert_eq!(
+            out.get("events").and_then(Json::as_array).unwrap().len(),
+            MAX_EVENTS
+        );
     }
 
     #[test]
