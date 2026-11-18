@@ -776,6 +776,34 @@ type Terminal<'a> = dyn Fn(&[f64], f64) -> Result<Vec<f64>> + 'a;
 /// Knot update of the FD scheme: `(knot index, V, x nodes, t_k)`.
 type AtKnot<'a> = dyn FnMut(usize, &mut [f64], &[f64], f64) -> Result<()> + 'a;
 
+// G-9 work counter (aad-core.md, G-9), the one definition shared by the four ports: W = number
+// of per-grid-node evaluations in every time-stepping, exercise and adjoint loop (each inner
+// per-node iteration counts 1; a tridiagonal solve over nx nodes counts nx), plus the number of
+// tape operations recorded and the number replayed in the reverse sweep. An exercise evaluation
+// at a node counts 1 with its max or active-branch test folded in, and one stage split over
+// several passes still counts 1 per node. Each call adds its count
+// once, at the end, to a per-thread total; it never touches a priced value.
+thread_local! {
+    static G9_WORK: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+pub(crate) fn g9_add_work(w: u64) {
+    G9_WORK.with(|c| c.set(c.get() + w));
+}
+
+/// Resets this thread's G-9 work counter (test entry point).
+#[doc(hidden)]
+pub fn g9_work_reset() {
+    G9_WORK.with(|c| c.set(0));
+}
+
+/// This thread's G-9 work count since the last [`g9_work_reset`] (test entry point).
+#[doc(hidden)]
+#[must_use]
+pub fn g9_work() -> u64 {
+    G9_WORK.with(std::cell::Cell::get)
+}
+
 /// The G-18 reference scheme: fully implicit backward induction on `x = r - alpha(t)` over
 /// the knots `0 < t_1 < ... < t_m`. `terminal` gives `V` at `t_m` from `(x, t_m)`; `at_knot`
 /// is called on arrival at each knot `t_k`, `k < m` (0-based into `knots`, backward order),
@@ -798,6 +826,8 @@ fn hw_fd(
     #[allow(clippy::cast_precision_loss)]
     let x: Vec<f64> = (0..nx).map(|i| -h + i as f64 * dx).collect();
     let mut v = terminal(&x, tm)?;
+    let nw = u64::try_from(nx).unwrap_or(0);
+    let mut w = nw; // terminal payoff
     let (mut lo, mut di, mut up, mut cp, mut dp) = (
         vec![0.0; nx],
         vec![0.0; nx],
@@ -845,11 +875,14 @@ fn hw_fd(
             }
             v[0] = 2.0 * v[1] - v[2];
             v[nx - 1] = 2.0 * v[nx - 2] - v[nx - 3];
+            w += 2 * (nw - 2); // coefficient rows + Thomas solve
         }
         if k >= 2 {
             at_knot(k - 2, &mut v, &x, ta)?;
+            w += nw; // knot update
         }
     }
+    g9_add_work(w);
     Ok(v[(nx - 1) / 2])
 }
 

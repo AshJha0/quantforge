@@ -480,49 +480,54 @@ TEST_CASE("Q3b AAD ladder matches Richardson bumps of the scheme, and costs at m
     const double rs = rich([&](double v) { return g_berm(P, 0.05, v); }, 0.01);
     CHECK(std::fabs(l.d_mean_reversion - ra) <= 1e-10 + 1e-7 * std::fabs(ra));
     CHECK(std::fabs(l.d_sigma - rs) <= 1e-10 + 1e-7 * std::fabs(rs));
-    // Performance (G-9): median of 21 timed runs after 5 warm-ups, price plus ladder over one price. The two are timed
-    // interleaved (price, ladder, price, ...), so a burst of load from another process hits both medians alike.
+    // G-9 cost claim, W(price + ladder) <= 5 W(price), on the deterministic work count of sr::g9_work (one ladder call
+    // returns the price and the ladder). Wall-clock is printed for the record and judged only with QF_G9_TIMED=1, set
+    // by the benchmark job where load is controlled.
     double sink = 0.0;
     const auto price_once = [&] { sink += g_berm(P, 0.05, 0.01); };
     const auto ladder_once = [&] {
         sink += sr::bermudan_ladder(p, P, {2, 3, 4, 5, 6}, 0.039462, true, {1, 2, 3, 4, 5}, {101, 50, 6.0}).price;
     };
+    sr::g9_work_reset();
+    price_once();
+    const unsigned long long w_price = sr::g9_work();
+    sr::g9_work_reset();
+    ladder_once();
+    const unsigned long long w_ladder = sr::g9_work();
+    const double w_ratio = static_cast<double>(w_ladder) / static_cast<double>(w_price);
+    std::printf("Q3b G-9 work: price %llu, price+ladder %llu, ratio %.4f
+", w_price, w_ladder, w_ratio);
+    CHECK(w_ladder <= 5 * w_price);
+    // Timed: median of 21 interleaved runs (price, ladder, price, ...) after 5 warm-ups.
     const auto timed = [](auto f) {
         const auto t0 = std::chrono::steady_clock::now();
         f();
         return std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
     };
-    // Up to three attempts; the smallest ratio is judged. Under contention from other processes (WSL with ORE running)
-    // about one measurement in five came out near 10 while the rest sat near 2.5.
-    double one = 0.0, lad = 0.0;
-    for (int attempt = 0; attempt < 3; ++attempt) {
-        for (int i = 0; i < 5; ++i) price_once(), ladder_once();
-        std::vector<double> va, vb;
-        for (int i = 0; i < 21; ++i) {
-            va.push_back(timed(price_once));
-            vb.push_back(timed(ladder_once));
-        }
-        std::sort(va.begin(), va.end());
-        std::sort(vb.begin(), vb.end());
-        std::printf("Q3b attempt %d: ratio %.2f\n", attempt + 1, vb[10] / va[10]);
-        if (attempt == 0 || vb[10] / va[10] < lad / one) one = va[10], lad = vb[10];
-        if (lad / one <= 5.0) break;
+    for (int i = 0; i < 5; ++i) price_once(), ladder_once();
+    std::vector<double> va, vb;
+    for (int i = 0; i < 21; ++i) {
+        va.push_back(timed(price_once));
+        vb.push_back(timed(ladder_once));
     }
-    std::printf("Q3b AAD cost ratio (price + ladder) / price = %.2f (sink %.3f)\n", lad / one, sink);
+    std::sort(va.begin(), va.end());
+    std::sort(vb.begin(), vb.end());
+    const double ratio = vb[10] / va[10];
+    std::printf("Q3b AAD timed cost ratio (price + ladder) / price = %.2f (sink %.3f)
+", ratio, sink);
     // R6-16: record the measured ratio for the model inventory; CI sets QF_G9_RECORD and uploads the file.
     if (const char* path = std::getenv("QF_G9_RECORD")) {
         if (std::FILE* f = std::fopen(path, "w")) {
-            std::fprintf(f, "{\"gate\":\"G-9\",\"language\":\"cpp\",\"ratio\":%.4f,\"limit\":5.0}\n", lad / one);
+            std::fprintf(f,
+                         "{\"gate\":\"G-9\",\"language\":\"cpp\",\"ratio\":%.4f,\"limit\":5.0,\"work_price\":%llu,"
+                         "\"work_price_ladder\":%llu,\"work_ratio\":%.4f}
+",
+                         ratio, w_price, w_ladder, w_ratio);
             std::fclose(f);
         }
     }
-    // The G-9 gate is a performance claim about an optimised build; sanitizer instrumentation distorts the ratio
-    // (9.3 under ASan), so it is reported but not judged there.
-#if defined(__SANITIZE_ADDRESS__) || QF_HAS_ASAN
-    std::puts("Q3b: sanitizer build, ratio not judged");
-#else
-    CHECK(lad / one <= 5.0);
-#endif
+    const char* timed_env = std::getenv("QF_G9_TIMED");
+    if (timed_env != nullptr && std::string(timed_env) == "1") CHECK(ratio <= 5.0);
 }
 
 // ---- Wave 4b and 3e, given-path xVA and the reserve statistic (through the CLI) ----

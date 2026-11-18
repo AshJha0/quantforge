@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
 #include <optional>
 #include <string>
 #include <tuple>
@@ -827,6 +828,17 @@ void write_tuple(json::Writer& out, const Tuple& t) {
 }  // namespace
 
 void sor_allocate(const Value& inp, json::Writer& out) {
+    // F-2 (E1): `step` is the router's one Real input, a number or "NaN" / "Infinity" / "-Infinity" (F-1);
+    // non-finite is E_DOMAIN, checked first, as sor.py does.
+    double step = 1.0;
+    if (const Value* st = inp.find("step"); present(st)) {
+        if (st->kind == Kind::Number) step = st->number;
+        else if (st->kind == Kind::String && st->text == "NaN") step = std::numeric_limits<double>::quiet_NaN();
+        else if (st->kind == Kind::String && st->text == "Infinity") step = std::numeric_limits<double>::infinity();
+        else if (st->kind == Kind::String && st->text == "-Infinity") step = -std::numeric_limits<double>::infinity();
+        else fail("E_SCHEMA", "step", "expected a number");
+    }
+    if (!std::isfinite(step)) fail("E_DOMAIN", "step", "step: not finite");
     const Problem p(inp);
     const Value* m = inp.find("method");
     const string method = present(m) ? (m->kind == Kind::String ? m->text : "?") : "SAMPLE_AVERAGE";
@@ -842,12 +854,6 @@ void sor_allocate(const Value& inp, json::Writer& out) {
         best = p.closed_form();
     } else if (method == "STOCHASTIC_APPROX") {
         const long long iters = nonneg_int(inp.find("iterations"), 10'000, "iterations");
-        const Value* st = inp.find("step");
-        double step = 1.0;
-        if (present(st)) {
-            if (st->kind != Kind::Number) fail("E_SCHEMA", "step", "expected a number");
-            step = st->number;
-        }
         best = p.stochastic(iters, step, std::uint64_t(nonneg_int(inp.find("seed"), 0, "seed")));
     } else if (p.grid_small()) {
         auto scored = p.exhaustive();

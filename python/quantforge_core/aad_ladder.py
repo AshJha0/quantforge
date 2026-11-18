@@ -22,6 +22,7 @@ from .shortrate import (
     Model,
     check_bermudan,
     curve_model,
+    g9_add_work,
     make_grid,
 )
 
@@ -240,6 +241,8 @@ def ladder(
     diff = sig * sig / (2 * dx * dx)
     last = _exercise(m, t_m, xs, payment_times, k, phi)
     v = [max(e, 0.0) for e in last.values]
+    # G-9 work (shortrate.g9_work); this port has no tape.
+    w = nx  # terminal exercise values with payoff
     steps: list[_Step] = []
     knot_events: list[tuple[int, _Exercise, list[bool]]] = []  # (steps done, exercise, chosen)
     times = [0.0, *knots]
@@ -260,6 +263,7 @@ def ladder(
             base[0] += 2 * lower[0]
             base[-1] += 2 * upper[-1]
             cache[dt] = (lower, base, upper)
+            w += nx - 2  # coefficient rows, once per distinct dt
         ml, base, mu = cache[dt]
         for j in range(n - 1, -1, -1):
             t = t_lo + j * dt
@@ -269,11 +273,13 @@ def ladder(
             inner = _thomas(ml, md, mu, v[1:-1])
             steps.append(_Step(t, dt, alpha, ml, md, mu, inner))
             v = [2 * inner[0] - inner[1], *inner, 2 * inner[-1] - inner[-2]]
+            w += 2 * (nx - 2)  # diagonal shift + Thomas solve
         if kk - 1 > 0:
             ex = _exercise(m, t_lo, xs, payment_times, k, phi)
             chosen = [e > vi for e, vi in zip(ex.values, v, strict=True)]
             v = [e if c else vi for e, vi, c in zip(ex.values, v, chosen, strict=True)]
             knot_events.append((len(steps), ex, chosen))
+            w += nx  # exercise values with max
     price = v[nx // 2]
 
     # --- backward sweep ---------------------------------------------------------------------
@@ -290,6 +296,7 @@ def ladder(
             bars = [b if c else 0.0 for b, c in zip(bar_v, chosen, strict=True)]
             bar_v = [0.0 if c else b for b, c in zip(bar_v, chosen, strict=True)]
             _bar_exercise(m, ex, xs, bars, k, phi, adj)
+            w += nx  # exercise adjoint with active test
         st = steps[idx]
         y = st.inner
         # v = [2 y0 - y1, y, 2 y_-1 - y_-2]
@@ -320,6 +327,7 @@ def ladder(
         adj.a += dt * (math.sumprod(bu, inner_x) - math.sumprod(bl, inner_x)) / (2 * dx)
         scale_sum += dt * math.sumprod(bd, inner_x)
         _bar_alpha(m, st.t, dt * s_d, adj)
+        w += 2 * (nx - 2)  # transposed Thomas solve + matrix adjoint
     _bar_exercise(
         m,
         last,
@@ -329,6 +337,8 @@ def ladder(
         phi,
         adj,
     )
+    w += 2 * nx  # terminal exercise adjoint; grid adjoint
+    g9_add_work(w)
     # diff = sigma^2/(2 dx^2)
     adj.sigma += bar_diff * sig / (dx * dx)
     adj.dx -= bar_diff * sig * sig / (dx**3)

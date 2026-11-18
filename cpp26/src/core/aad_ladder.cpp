@@ -142,6 +142,9 @@ Ladder bermudan_ladder(const Params& p, const std::vector<double>& P, const std:
     std::vector<Step> steps;
     std::vector<Knot> knot_log;
     const double diff = s2 / (2 * dx * dx);
+    // G-9 work (g9_work); this port has no tape.
+    const unsigned long long nw = nx;
+    unsigned long long w = nw;  // terminal exercise values with payoff
     {
         exercise_at(tm, alpha(tm), ex, nullptr);
         Knot kn{tm, std::vector<char>(nx), true};
@@ -184,6 +187,7 @@ Ladder bermudan_ladder(const Params& p, const std::vector<double>& P, const std:
             V[0] = 2 * V[1] - V[2];
             V[nx - 1] = 2 * V[nx - 2] - V[nx - 3];
             steps.push_back({t, dt, al, V});
+            w += 2 * (nw - 2);  // coefficient rows + Thomas solve
         }
         if (k - 1 >= 1) {
             exercise_at(t0, alpha(t0), ex, nullptr);
@@ -193,6 +197,7 @@ Ladder bermudan_ladder(const Params& p, const std::vector<double>& P, const std:
                 V[i] = std::max(V[i], ex[i]);
             }
             knot_log.push_back(std::move(kn));
+            w += nw;  // exercise values with max
         }
     }
     const std::size_t centre = (nx - 1) / 2;
@@ -213,6 +218,7 @@ Ladder bermudan_ladder(const Params& p, const std::vector<double>& P, const std:
                 for (std::size_t q = 0; q < np; ++q) G[q] += b * grad[i * np + q];
                 bar[i] = 0.0;
             }
+        w += nw;  // exercise adjoint with active test
     };
     // Walk the forward operations backwards: steps of interval k, then the knot at its start (if logged).
     for (std::size_t k = 1; k < knots.size(); ++k) {
@@ -266,6 +272,7 @@ Ladder bermudan_ladder(const Params& p, const std::vector<double>& P, const std:
             const Grad dal = alpha_grad(st.t);
             for (std::size_t q = 0; q < np; ++q) G[q] += bal * dal[q];
             for (std::size_t i = 0; i < nx; ++i) bar[i] = (i >= 1 && i + 1 < nx) ? lam[i] : 0.0;
+            w += 3 * (nw - 2);  // coefficient rows, transposed Thomas solve, matrix adjoint (grid adjoint folded in)
         }
         // the knot at knots[k] (k < last) was applied just before interval k's steps in the forward pass
         if (k + 1 < knots.size()) apply_knot(knot_log[--ki]);
@@ -273,6 +280,7 @@ Ladder bermudan_ladder(const Params& p, const std::vector<double>& P, const std:
     // the initial knot at t_m
     if (ki > 0) apply_knot(knot_log[--ki]);
     for (std::size_t q = 0; q < np; ++q) G[q] += bar_h * dh[q];
+    g9_add_work(w);
     out.d_discount_factors.assign(G.begin(), G.begin() + static_cast<std::ptrdiff_t>(m));
     out.d_mean_reversion = G[ia];
     out.d_sigma = G[is];

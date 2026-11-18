@@ -12,6 +12,34 @@ import java.util.Set;
 public final class ShortRateFd {
     private ShortRateFd() {}
 
+    /*
+     * G-9 work counter (aad-core.md, G-9), the one definition shared by the four ports: W = number of per-grid-node
+     * evaluations in every time-stepping, exercise and adjoint loop (each inner per-node iteration counts 1; a
+     * tridiagonal solve over nx nodes counts nx), plus the number of tape operations recorded and the number replayed
+     * in the reverse sweep. An exercise evaluation at a node counts 1 with its max or active-branch test folded in,
+     * and one stage split over several passes still counts 1 per node. Each call adds its count once, at the end, to a per-thread total; it never touches a
+     * priced value.
+     */
+    private static final ThreadLocal<long[]> WORK = ThreadLocal.withInitial(() -> new long[1]);
+
+    static void addWork(long w) {
+        WORK.get()[0] += w;
+    }
+
+    /** Resets this thread's G-9 work counter (test entry point). */
+    public static void workReset() {
+        WORK.get()[0] = 0L;
+    }
+
+    /**
+     * This thread's G-9 work count since the last {@link #workReset} (test entry point).
+     *
+     * @return W
+     */
+    public static long work() {
+        return WORK.get()[0];
+    }
+
     /**
      * The space and time grid inputs.
      *
@@ -47,6 +75,7 @@ public final class ShortRateFd {
         double[] up = new double[nx];
         double[] rhs = new double[nx];
         int m = knots.length - 1;
+        long w = 0L;
         for (int k = m; k >= 1; k--) {
             double t1 = knots[k - 1];
             double span = knots[k] - t1;
@@ -69,11 +98,14 @@ public final class ShortRateFd {
                 solve(lo, di, up, rhs, v, 1, nx - 2);
                 v[0] = 2.0 * v[1] - v[2];
                 v[nx - 1] = 2.0 * v[nx - 2] - v[nx - 3];
+                w += 2L * (nx - 2); // coefficient rows + Thomas solve
             }
             if (k - 1 > 0) {
                 at.apply(k - 1, t1, x, v);
+                w += nx; // knot update
             }
         }
+        addWork(w);
         return v[(nx - 1) / 2];
     }
 
@@ -147,6 +179,7 @@ public final class ShortRateFd {
         for (int i = 0; i < x.length; i++) {
             v[i] = Math.max(exercise(p, tm, x[i] + al, pay, rate, phi), 0.0);
         }
+        addWork(x.length); // terminal payoff
         return notional * roll(p, g, knots, x, v, (k, t, xs, vs) -> {
             double alk = alpha(p, t);
             for (int i = 0; i < xs.length; i++) {
