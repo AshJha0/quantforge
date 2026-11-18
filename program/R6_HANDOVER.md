@@ -338,3 +338,7 @@ TOTALS: 15723 value 7755 error 5454 invariance 2514
 Stage H round 3, paper operations (2026-11-18, h-paper-ops): `pt_h` 28 (paper trading as CLI operations) and `e1_hpt` 5 (NaN decimal strings, `E_SCHEMA` per HR-12 and F-2a): 33 cases (20 value, 13 error).
 
 TOTALS: 15756 value 7775 error 5467 invariance 2514
+
+Stage H round 3, paper Java merge (2026-11-18, h-paper-ops up to 21319a61 via h-paper-java): `pt_h` 28 to 34 cases (4 value, 2 error).
+
+TOTALS: 15762 value 7779 error 5469 invariance 2514
