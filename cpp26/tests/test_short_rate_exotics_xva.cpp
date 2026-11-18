@@ -518,8 +518,7 @@ TEST_CASE("Q3b AAD ladder matches Richardson bumps of the scheme, and costs at m
         if (std::FILE* f = std::fopen(path, "w")) {
             std::fprintf(f,
                          "{\"gate\":\"G-9\",\"language\":\"cpp\",\"ratio\":%.4f,\"limit\":5.0,\"work_price\":%llu,"
-                         "\"work_price_ladder\":%llu,\"work_ratio\":%.4f}
-",
+                         "\"work_price_ladder\":%llu,\"work_ratio\":%.4f}\n",
                          ratio, w_price, w_ladder, w_ratio);
             std::fclose(f);
         }
