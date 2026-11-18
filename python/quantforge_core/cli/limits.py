@@ -552,7 +552,23 @@ def _check_surface_grid(raw: Raw, grid: str) -> None:
             raise _over(key, limit)
 
 
+# Stage K wave 1 verbs check their own sizes in the core, after E_DOMAIN (HR-66: E_LIMIT last), with
+# the spec sizes (records 1,000,000; quotes 200; changes and positions 100,000).
+STAGE_K_OPS = frozenset(
+    (
+        "core.store.bitemporal_query",
+        "curve.bootstrap.par_annual",
+        "curve.incremental.update",
+        "calib.trigger.check",
+        "risk.intraday.delta_gamma_bound",
+        "num.richardson.check",
+    )
+)
+
+
 def check_limits(operation: str, raw: Raw) -> None:
+    if operation in STAGE_K_OPS:
+        return
     stage_f = STAGE_F_ARRAYS.get(operation)
     _check_arrays(raw, stage_f)
     if stage_f is not None:

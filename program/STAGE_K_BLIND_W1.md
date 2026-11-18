@@ -26,3 +26,7 @@ Each tolerance is the one its spec states. Small binary64 differences against th
 ## Provisional
 
 The golden `bound` of idr_k-0001..0004 is given to only 6 decimals, so it was compared at 5e-7 absolute. The blind values (for example 17.056890689124625) agree at that precision. These cases stay provisional until the oracle lane (mpmath, 30 digits) fills the bound to full precision, at which point they are re-compared at 1e-9 relative. idr_k-0005 is still oracle-pending.
+
+## Oracle fill (2026-11-18, after the compare)
+
+The oracle lane (`oracle/python/gen_stage_k_w1.py`, mpmath 50 digits) filled idr_k-0001..0004 `bound` to full binary64 precision and wrote idr_k-0005. The blind check of the four bounds is not upgraded: it stays a check to 6 decimals (5e-7 absolute), and `verified_by` in `datasets/golden/stage_k/idr_k.json` says so. idr_k-0005 was not in the packet and is not blind. The oracle `false_alarm_rate` of trig_k-0001..0003 is 0.002699796063260189 (the spec printed ...186, inside the 1e-14 tolerance).

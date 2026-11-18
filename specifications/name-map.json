@@ -440,6 +440,36 @@
     "parameters"
    ]
   },
+  "calib.trigger.check": {
+   "spec": "specifications/03-calibration/recalibration-triggers.md",
+   "rust": "quantforge::calib::trigger_check",
+   "python": "quantforge.calib.trigger_check",
+   "java": "Calib.triggerCheck",
+   "cpp": "qf::calib::trigger_check",
+   "inputs": {
+    "changes": {
+     "java": "changes"
+    },
+    "days_since": {
+     "java": "daysSince"
+    },
+    "k": {
+     "java": "k"
+    },
+    "x_now": {
+     "java": "xNow"
+    },
+    "x_ref": {
+     "java": "xRef"
+    }
+   },
+   "outputs": [
+    "false_alarm_rate",
+    "fire",
+    "sigma",
+    "threshold"
+   ]
+  },
   "cmdty.curve.forward": {
    "spec": "specifications/02-curves/commodity.md",
    "rust": "quantforge::cmdty::curve_forward",
@@ -1467,6 +1497,31 @@
     "variance"
    ]
   },
+  "core.store.bitemporal_query": {
+   "spec": "specifications/01-core/bitemporal-store.md",
+   "rust": "quantforge::core::store_bitemporal_query",
+   "python": "quantforge.core.store_bitemporal_query",
+   "java": "Core.storeBitemporalQuery",
+   "cpp": "qf::core::store_bitemporal_query",
+   "inputs": {
+    "knowledge_as_of": {
+     "java": "knowledgeAsOf"
+    },
+    "records": {
+     "java": "records"
+    },
+    "series_id": {
+     "java": "seriesId"
+    },
+    "valid_at": {
+     "java": "validAt"
+    }
+   },
+   "outputs": [
+    "row",
+    "status"
+   ]
+  },
   "core.store.chain": {
    "spec": "specifications/01-core/asof-store.md",
    "rust": "quantforge::core::store_chain",
@@ -2195,6 +2250,44 @@
    },
    "outputs": [
     "expected_loss_fraction"
+   ]
+  },
+  "curve.bootstrap.par_annual": {
+   "spec": "specifications/02-curves/incremental-update.md",
+   "rust": "quantforge::curve::bootstrap_par_annual",
+   "python": "quantforge.curve.bootstrap_par_annual",
+   "java": "Curve.bootstrapParAnnual",
+   "cpp": "qf::curve::bootstrap_par_annual",
+   "inputs": {
+    "quotes": {
+     "java": "quotes"
+    }
+   },
+   "outputs": [
+    "discount_factors"
+   ]
+  },
+  "curve.incremental.update": {
+   "spec": "specifications/02-curves/incremental-update.md",
+   "rust": "quantforge::curve::incremental_update",
+   "python": "quantforge.curve.incremental_update",
+   "java": "Curve.incrementalUpdate",
+   "cpp": "qf::curve::incremental_update",
+   "inputs": {
+    "new_quotes": {
+     "java": "newQuotes"
+    },
+    "previous_discount_factors": {
+     "java": "previousDiscountFactors"
+    },
+    "previous_quotes": {
+     "java": "previousQuotes"
+    }
+   },
+   "outputs": [
+    "discount_factors",
+    "first_changed_index",
+    "recomputed"
    ]
   },
   "eq.borrow.implied": {
@@ -4628,6 +4721,29 @@
     "bid",
     "reservation",
     "spread"
+   ]
+  },
+  "num.richardson.check": {
+   "spec": "specifications/06-risk/bermudan-ladder-k8.md",
+   "rust": "quantforge::num::richardson_check",
+   "python": "quantforge.num.richardson_check",
+   "java": "Num.richardsonCheck",
+   "cpp": "qf::num::richardson_check",
+   "inputs": {
+    "assumed_order": {
+     "java": "assumedOrder"
+    },
+    "ratio": {
+     "java": "ratio"
+    },
+    "values": {
+     "java": "values"
+    }
+   },
+   "outputs": [
+    "extrapolated",
+    "observed_order",
+    "status"
    ]
   },
   "rates.basis.ois_spread": {
@@ -7079,6 +7195,26 @@
     "scenarios"
    ]
   },
+  "risk.intraday.delta_gamma_bound": {
+   "spec": "specifications/06-risk/intraday-risk-bounds.md",
+   "rust": "quantforge::risk::intraday_delta_gamma_bound",
+   "python": "quantforge.risk.intraday_delta_gamma_bound",
+   "java": "Risk.intradayDeltaGammaBound",
+   "cpp": "qf::risk::intraday_delta_gamma_bound",
+   "inputs": {
+    "positions": {
+     "java": "positions"
+    },
+    "shift": {
+     "java": "shift"
+    }
+   },
+   "outputs": [
+    "bound",
+    "estimate_pnl",
+    "label"
+   ]
+  },
   "risk.limits.check": {
    "spec": "specifications/06-risk/portfolio-risk-tools.md",
    "rust": "quantforge::risk::limits_check",
@@ -9320,6 +9456,7 @@
   "hedge.backtest.delta: half_spread",
   "rates.basis.ois_spread: tenor",
   "rates.csa.discount: collateral_spread",
+  "risk.intraday.delta_gamma_bound: shift",
   "risk.mc.greeks: bump_relative",
   "risk.var.liquidity_adjusted: spread_mean",
   "risk.var.liquidity_adjusted: spread_vol",

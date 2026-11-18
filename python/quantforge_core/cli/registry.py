@@ -98,6 +98,8 @@ CORE_MODULES = (
     "variance",
     "vol_usecase",
     "xccy",
+    "stage_k",
+    "bermudan_k8",
 )
 
 
