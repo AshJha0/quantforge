@@ -94,7 +94,7 @@ def schedules():
         b = schedule(cal, st, en, m, eom)
         assert [str(x) for x in b] == qd, (qd, b)
         per = [{"start": str(x), "end": str(y), "payment": str(add_bd(cal, y, lag))} for x, y in zip(b, b[1:])]
-        s.add(op, {"start": str(st), "end": str(en), "frequency_months": m, "calendar": cal, "end_of_month": eom, "payment_lag": lag}, {"periods": per}, cls=E, verified=["quantlib-1.44"])
+        s.add(op, {"start": str(st), "end": str(en), "frequency_months": m, "calendar": cal, "end_of_month": eom, "payment_lag": lag}, {"periods": per}, cls=E, verified=["quantlib-1.44", "quantlib-1.44-schedule"])  # schedule tag: outside_validation.py (M24)
     b = {"calendar": "GBLO", "end_of_month": False, "payment_lag": 0}
     s.add(op, {**b, "start": "2027-01-01", "end": "2026-01-01", "frequency_months": 3}, error="E_DATE_ORDER", cls=E, tags=["invalid"])
     s.add(op, {**b, "start": "2026-01-02", "end": "2027-01-04", "frequency_months": 5}, error="E_SCHEMA", cls=E, tags=["invalid"])

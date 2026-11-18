@@ -15,6 +15,9 @@ QuantLib's Windows DLL may be blocked by an application-control policy; the pack
 (`UV_PROJECT_ENVIRONMENT=~/qf-oracle-venv uv sync` in oracle/python).
 
 Checks:
+  rates.schedule.generate  (M24, H-19) QuantLib Schedule, Backward, ModifiedFollowing, the case's end-of-month flag, on
+                        UnitedKingdom(Settlement) / TARGET / UnitedStates(GovernmentBond); payment dates by Calendar.advance.
+                        Every period date is compared exactly (class date_and_convention).
   fx.forward.outright   QuantLib FxForward.fairForwardRate on DiscountingFxForwardEngine (GBP base curve, USD quote
                         curve, spot quote), settlement 2 days on JointCalendar(UK Settlement, US GovernmentBond).
                         Curves: DiscountCurve, log-linear on discount factors, Actual365Fixed, with D(as_of) = 1.
@@ -52,10 +55,11 @@ GOLD = ROOT / "datasets" / "golden"
 OUT = ROOT / "oracle" / "OUTSIDE_VALIDATION.json"
 QLV = "quantlib-1.44"
 TAG = {"fx.forward.outright": QLV + "-fxforward", "eq.forward.outright": QLV + "-dividend-engine",
-       "vol.svi.evaluate": QLV, "vol.ssvi.evaluate": QLV + "-svi-slices"}
+       "vol.svi.evaluate": QLV, "vol.ssvi.evaluate": QLV + "-svi-slices", "rates.schedule.generate": QLV + "-schedule"}
 SUITES = {"fx.forward.outright": ["stage_b/fx.json", "stage_b/fx_deep.json"],
           "eq.forward.outright": ["stage_c/equity_forward.json"],
-          "vol.svi.evaluate": ["stage_c/smile.json"], "vol.ssvi.evaluate": ["stage_c/smile.json"]}
+          "vol.svi.evaluate": ["stage_c/smile.json"], "vol.ssvi.evaluate": ["stage_c/smile.json"],
+          "rates.schedule.generate": ["stage_b/schedule.json", "stage_b/schedule_deep.json", "stage_b/rulings_b.json"]}
 TOL = {"simple_analytic": (1e-12, 1e-10), "per_unit": (1e-10, 1e-8), "interpolation": (1e-10, 1e-8),
        "root_finding": (1e-10, 1e-10), "date_and_convention": None}
 # Disagreements that trace to a stated convention difference, not a value error. Recorded, never tagged, never
@@ -187,8 +191,24 @@ def ssvi(case):
             cmp(case, "calendar_free", min(m2) >= 0, via="arithmetic")], None
 
 
+def schedule(case):
+    """M24 (H-19): QuantLib Schedule, Backward, MODIFIED_FOLLOWING on both ends, the case's end-of-month flag, on the calendar's
+    QuantLib object (the map compare_calendars.py checks); payment = QuantLib Calendar.advance(end, payment_lag, Days)."""
+    i = case["inputs"]
+    cal = {"GBLO": ql.UnitedKingdom(ql.UnitedKingdom.Settlement), "EUTA": ql.TARGET(),
+           "USGS": ql.UnitedStates(ql.UnitedStates.GovernmentBond)}[i["calendar"]]
+    try:
+        sc = ql.Schedule(Q(i["start"]), Q(i["end"]), ql.Period(i["frequency_months"], ql.Months), cal, ql.ModifiedFollowing, ql.ModifiedFollowing,
+                         ql.DateGeneration.Backward, i["end_of_month"])
+    except RuntimeError as e:
+        return None, "QuantLib refuses a schedule whose end adjusts back onto start (" + str(e).splitlines()[0] + "); the empty schedule is the spec's rule 4, with no outside source"
+    ds = list(sc)
+    per = [{"start": a.ISO(), "end": b.ISO(), "payment": cal.advance(b, i["payment_lag"], ql.Days).ISO()} for a, b in zip(ds, ds[1:])]
+    return [cmp(case, "periods", per)], None
+
+
 RUN = {"fx.forward.outright": lambda c: (fx_forward(c), None), "eq.forward.outright": eq_forward,
-       "vol.svi.evaluate": svi, "vol.ssvi.evaluate": ssvi}
+       "vol.svi.evaluate": svi, "vol.ssvi.evaluate": ssvi, "rates.schedule.generate": schedule}
 
 
 def cases(op):

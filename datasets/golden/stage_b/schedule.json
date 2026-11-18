@@ -51,7 +51,8 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "synthetic"
@@ -102,7 +103,8 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "synthetic"
@@ -153,7 +155,8 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "synthetic"
@@ -239,7 +242,8 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "synthetic"
@@ -285,7 +289,8 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "synthetic"

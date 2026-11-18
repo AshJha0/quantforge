@@ -43,6 +43,12 @@ Review: self-reviewed 2026-11-07. The spec session read each spec section and th
 | `CRV.HAZARD_FLAT` | 04-pricing/credit.md piecewise-flat hazard between survival pillars | `ql.HazardRateCurve(dates, hz, ql.Actual365Fixed()), ""` |  |
 | `OPT.BLACK_76` | 05-volatility/black-models.md BLACK_76, time ACT/365F from as_of | `ql.BlackCapFloorEngine, ""` |  |
 | `OPT.BACHELIER` | 05-volatility/black-models.md BACHELIER, time ACT/365F from as_of | `ql.BachelierCapFloorEngine, ""` |  |
+| `IDX.TERM_FRN` | 04-pricing/bonds.md bond.frn.price: term rate, alpha = days/360, unadjusted dates, period rate (P(s)/P(e) - 1)/alpha | `ql.IborIndex("QF-FRN", ql.Period(months, ql.Months), 0, ql.USDCurrency(), ql.NullCalendar(), ql.Unadjusted,...` | fixing lag 0, NullCalendar; QuantLib par coupons forecast over the accrual period itself |
+| `CRV.DISCOUNT_MARGIN` | 04-pricing/bonds.md bond.frn.price: Dm(d) = D(d) exp(-dm t(d)), t ACT/365F from as_of | `ql.ZeroSpreadedTermStructure(h, ql.QuoteHandle(ql.SimpleQuote(s)), ql.Continuous, ql.NoFrequency, ql.Actual...` |  |
+| `CF.CME_SYNTHETIC` | 04-pricing/bonds.md bond.futures.conversion_factor (CME formula, ruling R1-3) | `"settle on the 1st of the delivery month; synthetic maturity n years z months later; 6% yield, Compounded S...` | day-1 dates: THIRTY_360_BOND gives whole months / 12, which is CME's v/6 per half-year; clean / 100, rounded to 4 decimals |
+| `CPI.TIPS_REF` | 02-curves/inflation.md Reference CPI: I(m-3) + (day(d) - 1)/days_in_month(m) (I(m-2) - I(m-3)) | `(ql.Period(3, ql.Months), ql.CPI.Linear), "QuantLib CPI.laggedFixing on USCPI fixings"` | QuantLib CPI.laggedFixing on USCPI fixings |
+| `OPT.FORMULA.BLACK_76` | 05-volatility/black-models.md BLACK_76 price | `ql.blackFormula, "stdDev = vol sqrt(T), the case's discount factor"` | stdDev = vol sqrt(T), the case's discount factor |
+| `OPT.FORMULA.BACHELIER` | 05-volatility/black-models.md BACHELIER price | `ql.bachelierBlackFormula, "stdDev = vol sqrt(T)"` | stdDev = vol sqrt(T) |
 | `ENG.ISDA_CDS` | 04-pricing/credit.md ISDA CDS Standard Model | `ql.IsdaCdsEngine, "Taylor, NoBias, Piecewise"` | Taylor, NoBias, Piecewise |
 
 ## Known mapping points
@@ -52,4 +58,14 @@ Review: self-reviewed 2026-11-07. The spec session read each spec section and th
 - `credit.cds.bootstrap` is counted by a reprice check: QuantLib's `cdsMaturity` gives the pillar dates, and the golden survivals priced in QuantLib's ISDA engine return each quoted spread within 1e-10.
 - `rates.ois.pv`: the strings in `valuation` are identities of the inputs and the spec's fixed strings; only the numbers come from QuantLib.
 - `repo.*`: QuantLib gives the bond's cash flows, accrued and the simple ACT/360 growth factors; the forward-price identity is the spec's own algebra on those objects.
+- H-19 (2026-11-18), what is library and what is the spec's arithmetic:
+  - `bond.spread.asset_swap`: P_curve from QuantLib's bond engine and the annuity as QuantLib's NPV of a unit ACT/360 leg on the spec's floating schedule; the spread is arithmetic.
+  - `bond.frn.price`: QuantLib IborLeg (par coupons) on the projection curve, discount margin as a continuous zero spread; fully library.
+  - `bond.futures.conversion_factor`: QuantLib clean price at 6% of a bond on the CME synthetic dates (row `CF.CME_SYNTHETIC`); coupon rounding to 1/8, the month count and the 4-decimal rounding are arithmetic.
+  - `bond.futures.basis`: accrued, coupons and ACT/360 growth from QuantLib; invoice, bases and implied repo are the spec's algebra.
+  - `fx.ndf.pv`: discount factors from QuantLib curves; covered-parity forward and payoff value are arithmetic (QuantLib has no NDF object).
+  - `infl.linker.price`: Ref CPI from QuantLib CPI.laggedFixing, real prices from BondFunctions; Treasury rounding and index-ratio products are arithmetic.
+  - `rates.csa.discount` with FX: QuantLib ZeroSpreadedTermStructure times the input identity spot / F(d).
+  - `credit.index.intrinsic`: per-name upfronts from QuantLib IsdaCdsEngine; the weighted mean is arithmetic. `credit.curve.composite`: weighted spreads, then the bootstrap reprice check.
+  - `vol.option.price`: QuantLib blackFormula. `core.calendar.*`: QuantLib UnitedStates(GovernmentBond); it agrees with ruling R1-6 on the 2023 and 2026 Good Friday early closes. `rates.basis.ois_spread`: difference of QuantLib MakeOIS fair rates.
 - Strata and the ISDA C library are not used for stage D counting yet.

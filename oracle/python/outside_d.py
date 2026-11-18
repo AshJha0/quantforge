@@ -417,6 +417,203 @@ def h_xccy_boot(u, i, exp):
     return {"pillars": exp["pillars"]}
 
 
+# ---------------------------------------------------------------- H-19 handlers (2026-11-18): FRN, asset swap, conversion factor,
+# futures basis, NDF, linker from yield, Black-76 edge prices, USGS calendar edges, OIS basis spread, CSA with FX, credit index and composite.
+# Where an output is the spec's algebra on QuantLib objects (not a QuantLib instrument), the docstring says so; CONVENTION_MAP.md
+# lists each one under "Known mapping points".
+def h_asset_swap(u, i, exp):
+    """Par-par asset swap: P_curve from QuantLib's bond engine; the annuity is QuantLib's NPV of a unit ACT/360 leg on the spec's
+    floating schedule (quarterly back from maturity, unadjusted, first period from settlement), valued at settlement. The spread is
+    arithmetic on the two."""
+    st, mat = D(i["settlement"]), D(i["bond"]["maturity"])
+    pc = h_price_from_curve(u, {"bond": i["bond"], "settlement": i["settlement"], "curve": i["curve"]}, None)["dirty"]
+    qc, _ = curve(u, i["curve"])
+    qc.enableExtrapolation()
+    sch = ql.Schedule(Q(st), Q(mat), ql.Period(3, ql.Months), u("CAL.NONE"), u("BDC.UNADJUSTED"), u("BDC.UNADJUSTED"), u("GEN.BACKWARD"), False)
+    leg = ql.FixedRateLeg(sch, u("DC.ACT_360"), [1.0], [1.0])
+    ann = ql.CashFlows.npv(leg, ql.YieldTermStructureHandle(qc), False, Q(st), Q(st))
+    return {"spread": (pc - i["dirty_price"]) / (100 * ann), "annuity": ann}
+
+
+def h_frn(u, i, exp):
+    """QuantLib IborLeg (par coupons, fixing lag 0, unadjusted, ACT/360) on the projection curve, the current period's rate as a
+    fixing, plus redemption; discounted on the discount curve with the discount margin as a continuous zero spread, valued at settlement."""
+    st, mat, f = D(i["settlement"]), D(i["maturity"]), i["frequency"]
+    disc, a = curve(u, i["discount"])
+    proj, _ = curve(u, i["projection"])
+    disc.enableExtrapolation()
+    proj.enableExtrapolation()
+    ql.Settings.instance().evaluationDate = Q(a)
+    ql.IndexManager.instance().clearHistories()
+    sch = ql.Schedule(Q(add_months(mat, -12 * 40)), Q(mat), ql.Period(12 // f, ql.Months), u("CAL.NONE"), u("BDC.UNADJUSTED"), u("BDC.UNADJUSTED"),
+                      u("GEN.BACKWARD"), eom(mat))
+    idx = u("IDX.TERM_FRN", ql.YieldTermStructureHandle(proj), 12 // f)
+    for k in range(len(sch) - 1):
+        if sch[k] <= Q(st) < sch[k + 1] and sch[k] <= Q(a):
+            idx.addFixing(sch[k], i["current_rate"])
+    leg = ql.IborLeg([100.0], sch, idx, u("DC.ACT_360"), u("BDC.UNADJUSTED"), fixingDays=[0], spreads=[i["margin"]])
+    leg = ql.Leg([cf for cf in leg if cf.date() > Q(st)] + [ql.SimpleCashFlow(100.0, Q(mat))])
+    dm = u("CRV.DISCOUNT_MARGIN", ql.YieldTermStructureHandle(disc), i["discount_margin"])
+    dm.enableExtrapolation()
+    dirty = ql.CashFlows.npv(leg, ql.YieldTermStructureHandle(dm), False, Q(st), Q(st))
+    acc = ql.CashFlows.accruedAmount(leg, False, Q(st))
+    ql.IndexManager.instance().clearHistories()
+    return {"dirty": dirty, "accrued": acc, "clean": dirty - acc}
+
+
+CF_QUARTERS = {None, "TEN_YEAR", "ULTRA_TEN_YEAR", "BOND", "ULTRA_BOND"}
+
+
+def h_conversion_factor(u, i, exp):
+    """CME conversion factor as a QuantLib price: a semi-annual bond with the rounded coupon, maturing n years and z months
+    (rounded down to a quarter where the contract says so) after the first day of the delivery month, priced at a 6% yield
+    compounded semi-annually on THIRTY_360_BOND (all dates on the 1st, so periods are whole months, as CME's v/6), clean,
+    per unit. The 1/8 coupon rounding, the month count and the 4-decimal rounding are the spec's arithmetic."""
+    b = i["bond"]
+    c = math.floor(b["coupon"] * 800 + 0.5) / 800
+    y, m = map(int, i["delivery_month"].split("-"))
+    st, mat = date(y, m, 1), D(b["maturity"])
+    months = (mat.year - st.year) * 12 + mat.month - st.month
+    n, z = divmod(months, 12)
+    if i.get("contract") in CF_QUARTERS:
+        z -= z % 3
+    syn = add_months(st, 12 * n + z)
+    ql.Settings.instance().evaluationDate = Q(st)
+    sch = ql.Schedule(Q(add_months(syn, -12 * 40)), Q(syn), ql.Period(6, ql.Months), u("CAL.NONE"), u("BDC.UNADJUSTED"), u("BDC.UNADJUSTED"),
+                      u("GEN.BACKWARD"), False)
+    dc = u("DC.THIRTY_360_BOND")
+    qb = ql.FixedRateBond(0, 100.0, sch, [c], dc, u("BDC.UNADJUSTED"))
+    u.rows.add("CF.CME_SYNTHETIC")
+    cl = ql.BondFunctions.cleanPrice(qb, i["notional_coupon"], dc, u("CMP.BOND_YIELD"), u("FREQ.2"), Q(st))
+    return {"conversion_factor": round(cl / 100, 4)}
+
+
+def h_futures_basis(u, i, exp):
+    """Accrued and coupon cash flows from QuantLib's bond, growth factors from QuantLib InterestRate on ACT/360; invoice, bases and
+    implied repo are the spec's algebra on them (as repo.forward)."""
+    F, rr = i["futures_price"], i["repo_rate"]
+    out = []
+    for b in i["bonds"]:
+        r = {"bond": b, "start": i["settlement"], "end": i["delivery"], "clean_price": b["clean_price"]}
+        st, en, dirty, cpns, ai1, rate = _repo_parts(u, r)
+        inv = F * b["conversion_factor"] + ai1
+        fd = dirty * rate(rr).compoundFactor(Q(st), Q(en)) - sum(c * rate(rr).compoundFactor(d, Q(en)) for d, c in cpns)
+        dc = u("DC.ACT_360")
+        imp = (inv + sum(c for _, c in cpns) - dirty) / (dirty * dc.yearFraction(Q(st), Q(en)) - sum(c * dc.yearFraction(d, Q(en)) for d, c in cpns))
+        out.append({"invoice": inv, "gross_basis": b["clean_price"] - F * b["conversion_factor"], "net_basis": fd - inv, "implied_repo": imp})
+    ctd = max(range(len(out)), key=lambda k: out[k]["implied_repo"])
+    return {"bonds": out, "ctd": ctd}
+
+
+def h_ndf(u, i, exp):
+    """USD and offshore discount factors from QuantLib curves; F (covered parity) and the USD payoff's forward value are arithmetic."""
+    du, a = curve(u, i["usd_curve"])
+    do, _ = curve(u, i["offshore_curve"])
+    du.enableExtrapolation()
+    do.enableExtrapolation()
+    ql.Settings.instance().evaluationDate = Q(a)
+    t = i["trade"]
+    p = Q(D(t["payment_date"]))
+    F = i["fixing"] if i["fixing"] is not None else i["spot"] * du.discount(p) / do.discount(p)
+    sign = 1 if t["side"] == "BUY" else -1
+    return {"pv": sign * t["usd_notional"] * (1 - t["strike"] / F) * du.discount(p), "forward": F}
+
+
+def _treasury_round(x):
+    """31 CFR 356 App. B (ruling R6-7.5): truncate to six decimals, then round half up to five. Arithmetic, not library."""
+    from decimal import Decimal, ROUND_DOWN, ROUND_HALF_UP
+    return float(Decimal(repr(x)).quantize(Decimal("0.000001"), ROUND_DOWN).quantize(Decimal("0.00001"), ROUND_HALF_UP))
+
+
+def h_linker(u, i, exp):
+    """Ref CPI from QuantLib CPI.laggedFixing (3-month lag, linear) on a USCPI index holding the case's fixings; real prices from
+    QuantLib BondFunctions (as bond.price.from_yield); Treasury rounding and the index-ratio products are arithmetic."""
+    st = D(i["settlement"])
+    ql.Settings.instance().evaluationDate = Q(st)
+    ql.IndexManager.instance().clearHistories()
+    ix = ql.USCPI()
+    for fx in i["cpi_fixings"]:
+        y, m = map(int, fx["month"].split("-"))
+        ix.addFixing(ql.Date(1, m, y), fx["value"])
+    lag, interp = u("CPI.TIPS_REF")
+    ref = _treasury_round(ql.CPI.laggedFixing(ix, Q(st), lag, interp))
+    ql.IndexManager.instance().clearHistories()
+    ratio = _treasury_round(ref / i["base_ref_cpi"])
+    r = h_price_from_yield(u, {"bond": i["bond"], "settlement": i["settlement"], "yield": i["real_yield"]}, None)
+    return {"ref_cpi": ref, "index_ratio": ratio, "real_clean": r["clean"], "real_accrued": r["accrued"],
+            "nominal_clean": r["clean"] * ratio, "nominal_accrued": r["accrued"] * ratio}
+
+
+def h_option_price(u, i, exp):
+    """QuantLib blackFormula (BLACK_76) or bachelierBlackFormula on the case's forward, strike, discount factor and vol x sqrt(T)."""
+    ty = ql.Option.Call if i["option_type"] == "CALL" else ql.Option.Put
+    sd = i["vol"] * math.sqrt(i["expiry_years"])
+    fn = u("OPT.FORMULA." + i["model"])
+    return {"price": fn(ty, i["strike"], i["forward"], sd, i["discount_factor"]), "forward": i["forward"]}
+
+
+def h_is_bd(u, i, exp):
+    return {"is_business_day": bool(u("CAL." + i["calendar"]).isBusinessDay(Q(D(i["date"]))))}
+
+
+def h_add_bd(u, i, exp):
+    return {"date": u("CAL." + i["calendar"]).advance(Q(D(i["date"])), i["days"], ql.Days).ISO()}
+
+
+def h_ois_spread(u, i, exp):
+    """Difference of QuantLib MakeOIS fair rates on the two projection curves, both discounted on `discount` (spec acceptance)."""
+    disc, a = curve(u, i["discount"])
+    disc.enableExtrapolation()
+    ql.Settings.instance().evaluationDate = Q(a)
+    conv = i["convention"]
+    sl, pl = u("OIS.LAGS", conv)
+    dh = ql.YieldTermStructureHandle(disc)
+    fr = []
+    for k in ("projection_a", "projection_b"):
+        pc, pa = curve(u, i[k])
+        if pa != a:
+            raise NotImplementedError("projection as_of differs")
+        pc.enableExtrapolation()
+        sw = ql.MakeOIS(_qper(i["tenor"]), u("IDX." + conv, ql.YieldTermStructureHandle(pc)), 0.0, settlementDays=sl, paymentLag=pl,
+                        pricingEngine=ql.DiscountingSwapEngine(dh), telescopicValueDates=True)
+        fr.append(sw.fairRate())
+    return {"spread": fr[0] - fr[1]}
+
+
+def h_csa_fx(u, i, exp):
+    """CSA with FX: the collateral discount from QuantLib ZeroSpreadedTermStructure (as rates.csa.discount without FX), times the
+    input identity spot / F(d)."""
+    fx = i.get("fx")
+    if fx is None:
+        return h_csa(u, i, exp)
+    base = h_csa(u, {**i, "fx": None}, exp)["discount_factors"]
+    fwd = {f["date"]: f["forward"] for f in fx["forwards"]}
+    return {"discount_factors": [b * fx["spot"] / fwd[d] for b, d in zip(base, i["dates"])]}
+
+
+def h_index_intrinsic(u, i, exp):
+    """Each name's clean upfront from QuantLib IsdaCdsEngine (as credit.cds.price); the weighted mean and basis are arithmetic."""
+    ups = []
+    for nm in i["names"]:
+        c = h_cds(u, {"trade_date": i["trade_date"], "discount": i["discount"], "hazard": nm["hazard"], "recovery": nm["recovery"], "payout": "STANDARD",
+                      "trade": {"maturity": i["trade"]["maturity"], "coupon": i["trade"]["coupon"], "notional": 1.0, "side": "BUY_PROTECTION"}}, None)
+        ups.append(c["upfront"])
+    w = [nm["weight"] for nm in i["names"]]
+    iu = sum(a * b for a, b in zip(w, ups)) / sum(w)
+    return {"intrinsic_upfront": iu, "basis": i["quoted_upfront"] - iu, "name_upfronts": ups}
+
+
+def h_composite(u, i, exp):
+    """Composite spreads are arithmetic on the inputs; the pillars pass the credit.cds.bootstrap reprice check in QuantLib's ISDA engine."""
+    cs = i["constituents"]
+    W = sum(c["weight"] for c in cs)
+    sc = i.get("scale", 1.0)
+    sp = [sc * sum(c["weight"] * c["quotes"][k]["spread"] for c in cs) / W for k in range(len(cs[0]["quotes"]))]
+    q = [{"tenor": cs[0]["quotes"][k]["tenor"], "spread": s} for k, s in enumerate(sp)]
+    pil = h_cds_bootstrap(u, {"trade_date": i["trade_date"], "discount": i["discount"], "recovery": i["recovery"], "quotes": q}, {"pillars": exp["pillars"]})
+    return {"spreads": sp, "pillars": pil["pillars"]}
+
+
 # ---------------------------------------------------------------- dispatch
 HANDLERS = {
     "bond.price.from_yield": h_price_from_yield,
@@ -425,9 +622,21 @@ HANDLERS = {
     "bond.spread.z": h_z_spread,
     "rates.curve.discount": h_curve_discount,
     "rates.cap.price": h_cap,
+    "bond.spread.asset_swap": h_asset_swap,
+    "bond.frn.price": h_frn,
+    "bond.futures.conversion_factor": h_conversion_factor,
+    "bond.futures.basis": h_futures_basis,
+    "fx.ndf.pv": h_ndf,
+    "infl.linker.price": h_linker,
+    "vol.option.price": h_option_price,
+    "core.calendar.is_business_day": h_is_bd,
+    "core.calendar.add_business_days": h_add_bd,
+    "rates.basis.ois_spread": h_ois_spread,
+    "credit.index.intrinsic": h_index_intrinsic,
+    "credit.curve.composite": h_composite,
     "rates.swaption.price": h_swaption,
     "credit.cds.price": h_cds,
-    "rates.csa.discount": h_csa,
+    "rates.csa.discount": h_csa_fx,
     "fx.xccy.pv": h_xccy_pv,
     "fx.xccy.bootstrap": h_xccy_boot,
     "rates.futures.convexity": h_futures_convexity,
@@ -497,18 +706,19 @@ def verify_all(folder="stage_d", show=True):
 NO_ORACLE = {
     "bondfit_d": "Nelson-Siegel fit judged on repricing; QuantLib's FittedBondDiscountCurve fits by its own optimiser path, so it cannot reproduce a golden independently of iteration path",
     "commodity_d": "no QuantLib object for monthly log-linear commodity forwards with additive seasonality or for storage carry",
-    "csa_d": "cases without FX count via QuantLib ZeroSpreadedTermStructure; CSA with FX forwards has no QuantLib object; spread and basis cases are internal",
+    "csa_d": "CSA (with and without FX) and OIS basis spreads count; the joint bootstrap's term-rate (USD-TERM-3M) helpers are not mapped to QuantLib objects yet; the rest are error cases",
+    "credit_d": "credit_d-0002: QuantLib IsdaCdsEngine reprices the golden 5Y pillar to 1.9e-10 in spread, above the 1e-10 reprice bar (maturity 2031-12-20 is a Saturday; spec R6-25 states about 1e-11 there); the rest are error cases",
     "equity_d": "QuantLib has no implied-dividend, implied-borrow or equity futures-basis object; its dividend handling uses other conventions",
     "fits_d": "smooth and robust curve fits are internal estimators (penalised and Huber); no QuantLib equivalent",
     "index_d": "index dividends, rebalancing and corporate actions have no QuantLib object",
-    "inflation_d": "QuantLib's inflation curves use other lag and interpolation conventions (spec 02-curves/inflation.md); ZCIS and linkers would need the spec's own CPI curve",
+    "inflation_d": "linkers from a real yield count (QuantLib CPI.laggedFixing and BondFunctions); the CPI curve, ZCIS and linker-from-curve cases use the spec's own log-linear CPI curve with seasonality, which QuantLib's inflation curves (other interpolation and lag conventions) cannot express",
     "mbs_d": "QuantLib has no agency MBS pool cash-flow model",
     "rulings_d": "internal: spec rulings, mostly error and order cases",
     "rulings2_d": "internal: spec rulings, mostly error and order cases",
-    "rulings_r1": "internal: spec rulings; CME conversion factors have no QuantLib object",
+    "rulings_r1": "conversion factors count (QuantLib bond priced at 6% on the CME synthetic dates); the rest are spec-ruling error cases",
     "steps_d": "meeting-date step fits are internal; QuantLib ForwardCurve could replay a step curve but not the fit",
     "trs_d": "QuantLib has no equity total return swap with these legs",
-    "xccy_d": "PV and bootstrap count via QuantLib OvernightLeg; NDF has no QuantLib object; the rest are error cases",
+    "xccy_d": "PV, bootstrap and NDF count via QuantLib; the rest are error cases",
 }
 
 
@@ -535,6 +745,16 @@ def write_map():
           "- `credit.cds.bootstrap` is counted by a reprice check: QuantLib's `cdsMaturity` gives the pillar dates, and the golden survivals priced in QuantLib's ISDA engine return each quoted spread within 1e-10.",
           "- `rates.ois.pv`: the strings in `valuation` are identities of the inputs and the spec's fixed strings; only the numbers come from QuantLib.",
           "- `repo.*`: QuantLib gives the bond's cash flows, accrued and the simple ACT/360 growth factors; the forward-price identity is the spec's own algebra on those objects.",
+          "- H-19 (2026-11-18), what is library and what is the spec's arithmetic:",
+          "  - `bond.spread.asset_swap`: P_curve from QuantLib's bond engine and the annuity as QuantLib's NPV of a unit ACT/360 leg on the spec's floating schedule; the spread is arithmetic.",
+          "  - `bond.frn.price`: QuantLib IborLeg (par coupons) on the projection curve, discount margin as a continuous zero spread; fully library.",
+          "  - `bond.futures.conversion_factor`: QuantLib clean price at 6% of a bond on the CME synthetic dates (row `CF.CME_SYNTHETIC`); coupon rounding to 1/8, the month count and the 4-decimal rounding are arithmetic.",
+          "  - `bond.futures.basis`: accrued, coupons and ACT/360 growth from QuantLib; invoice, bases and implied repo are the spec's algebra.",
+          "  - `fx.ndf.pv`: discount factors from QuantLib curves; covered-parity forward and payoff value are arithmetic (QuantLib has no NDF object).",
+          "  - `infl.linker.price`: Ref CPI from QuantLib CPI.laggedFixing, real prices from BondFunctions; Treasury rounding and index-ratio products are arithmetic.",
+          "  - `rates.csa.discount` with FX: QuantLib ZeroSpreadedTermStructure times the input identity spot / F(d).",
+          "  - `credit.index.intrinsic`: per-name upfronts from QuantLib IsdaCdsEngine; the weighted mean is arithmetic. `credit.curve.composite`: weighted spreads, then the bootstrap reprice check.",
+          "  - `vol.option.price`: QuantLib blackFormula. `core.calendar.*`: QuantLib UnitedStates(GovernmentBond); it agrees with ruling R1-6 on the 2023 and 2026 Good Friday early closes. `rates.basis.ois_spread`: difference of QuantLib MakeOIS fair rates.",
           "- Strata and the ISDA C library are not used for stage D counting yet.", ""]
     (ROOT / "oracle" / "CONVENTION_MAP.md").write_text("\n".join(L), encoding="utf-8", newline="\n")
 
@@ -562,7 +782,9 @@ def coverage_section():
     out[-1] = "|---|---|---|---|---|"
     out += [f"| `{s}` | {k} | {n} | {100 * k / n:.0f}% | {NO_ORACLE.get(s, '')} |" for s, k, n in table]
     out += [f"| **stage D** | **{tot_ok}** | **{tot}** | **{100 * tot_ok / tot:.1f}%** | |", "",
-            "Caveat: most counted cases are fixed-rate bonds (suite `outside_d`), so the stage-wide share leans on one product family.", ""]
+            "Caveat: most counted cases are fixed-rate bonds (suite `outside_d`), so the stage-wide share leans on one product family. "
+            "Several H-19 handlers (asset swap, FRN, conversion factor, futures basis, NDF, linker, CSA with FX, index intrinsic) build the instrument "
+            "from QuantLib objects but apply the spec's own closing algebra; `oracle/CONVENTION_MAP.md` lists which part is library and which arithmetic.", ""]
     (ROOT / "oracle" / "outside_register.json").write_text(json.dumps({"rule": "plan 11.2.5", "library": CM.LIBRARY, "version": CM.VERSION,
                                                                        "map_review": CM.REVIEW, "cases": reg}, indent=1) + "\n", encoding="utf-8", newline="\n")
     return out, tot_ok, tot

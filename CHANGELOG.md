@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- **Stage D outside checks for the cases that had none (H-19).** `oracle/python/outside_d.py` gains QuantLib 1.44 handlers for the asset swap, FRN, CME conversion factor, futures basis, NDF, linker from a real yield, CSA with FX, OIS basis spread, credit index intrinsic and composite curve, the Black-76 edge prices and the USGS calendar edges, with six new convention rows (`oracle/CONVENTION_MAP.md`, which also says for each handler which part is library and which is the spec's arithmetic). 51 of the 101 unchecked value cases now agree within their own tolerance; no golden value changed and no disagreement was found among the new checks. Stage D coverage goes from 64.1% (419 of 654) to 71.9% (470 of 654), or 90.2% (470 of 521) of value cases (`oracle/OUTSIDE_SHARES.md`). Still unchecked, with reasons in `oracle/REPORT.md`: commodity, equity, index, MBS, TRS and fitted curves (no QuantLib object), the CPI curve, ZCIS and linker-from-curve (the spec's own CPI curve), the joint bootstrap, and `credit_d-0002`, whose 5Y pillar QuantLib reprices to 1.9e-10 against a 1e-10 bar (a weekend maturity; the spec states about 1e-11 there, so this is recorded as a finding, not fixed).
+- **QuantLib Schedule comparison for M24.** `oracle/python/outside_validation.py` checks every value case of `rates.schedule.generate` against QuantLib `Schedule` (Backward, ModifiedFollowing) and `Calendar.advance`: 53 of 54 agree exactly and carry `quantlib-1.44-schedule`; the generators carry the same tag. The one case left (`start` 2027-02-26, `end` 2027-02-28 adjusting back onto it) is refused by QuantLib as a degenerate schedule; the empty schedule is the spec's own rule 4.
+
 ## 0.9.1 (2026-11-18)
 
 Follow-ups to v0.9.0: hedge solver precision, fuzz and G2++ fixes, a mutation gate that gives the same verdict for the same code, the full `hedging.cpp` mutation run, and documentation. PRs #50 and #51 and the release PR; release notes in `docs/releases/v0.9.1.md`.
