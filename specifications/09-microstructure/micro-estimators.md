@@ -59,4 +59,4 @@ Each test draws with `numpy.random.default_rng(seed)` in the order listed (HR-71
 | 7 | passive_vs_aggressive | 1,000 passive costs `normal(-1, 2)` bp, then 1,000 aggressive `normal(1.5, 2)` bp; planted delta 2.5 |
 
 ## Limitations
-Method tests on simulated data with known truth only; no claim on real markets (14.7 H-4). Each model is the simplest of its family (Poisson arrivals, exponential cancels, exponential recovery, linear impact); Hawkes arrivals, queue-position cancels and nonlinear impact are not covered. The cancel and resilience goldens are exact fits (HR-74).
+Method tests on simulated data with known truth only; no claim on real markets (14.7 H-4). Each model is the simplest of its family (Poisson arrivals, exponential cancels, exponential recovery, linear impact); Hawkes arrivals, queue-position cancels and nonlinear impact are not covered. The resilience and liquidity-decay goldens are exact fits (HR-74).
