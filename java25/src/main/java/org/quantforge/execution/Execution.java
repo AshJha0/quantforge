@@ -6,7 +6,9 @@ import org.quantforge.core.QfError;
  * Stage H wave 1 (rulings HR-1 to HR-10): execution schedules ({@code 10-execution/schedules.md}), Almgren-Chriss
  * ({@code 10-execution/almgren-chriss.md}), square-root and Obizhaeva-Wang impact ({@code 10-execution/impact.md}),
  * implementation-shortfall TCA ({@code 10-execution/tca.md}) and Avellaneda-Stoikov quotes
- * ({@code 09-microstructure/avellaneda-stoikov.md}).
+ * ({@code 09-microstructure/avellaneda-stoikov.md}). Typed layer of H-5 ({@code 10-execution/library-interfaces.md}).
+ *
+ * <p>Thread safety: every method is pure and holds no state; safe to call from any thread.
  */
 public final class Execution {
     private Execution() {}
@@ -20,8 +22,10 @@ public final class Execution {
 
     private static final double TWO_53 = 0x1p53;
 
+    /** Whole units or continuous quantities. Thread safety: immutable; safe to share between threads. */
     public enum Mode { UNITS, CONTINUOUS }
 
+    /** Order side. Thread safety: immutable; safe to share between threads. */
     public enum Side { BUY, SELL }
 
     private static QfError input(String field, String why) {
@@ -116,6 +120,7 @@ public final class Execution {
     }
 
     /** POV result: child slices, their sum and the part of the order left (never an error). */
+    /** Schedule with residual. Thread safety: safe to share once built; the arrays are not copied, so callers must not write to them. */
     public record Pov(double[] slices, double filled, double residual) {}
 
     /** POV (HR-4): child i = min(remaining, p v_i / (1 - p)), floored in UNITS. */
@@ -148,36 +153,52 @@ public final class Execution {
 
     // ---- exec.ac.* ----
 
-    /** Model inputs of [AC00] (HR-5). */
+    /** Model inputs of [AC00] (HR-5), checked when built (H-5, ADR-0011 rule 4). Thread safety: immutable; safe to share between threads. */
     public record AcParams(double quantity, double horizon, long nSteps, double sigma, double epsilon, double eta,
-            double gamma) {}
+            double gamma) {
+        public AcParams {
+            String[] names = {"quantity", "horizon", "sigma", "epsilon", "eta", "gamma"};
+            double[] xs = {quantity, horizon, sigma, epsilon, eta, gamma};
+            for (int i = 0; i < xs.length; i++) {
+                if (!Double.isFinite(xs[i])) {
+                    throw domain(names[i], "must be finite");
+                }
+            }
+            check(quantity, horizon, nSteps, sigma, epsilon, eta, gamma);
+        }
+    }
 
-    /** One optimal trajectory: holdings x_0..x_N, trades n_1..n_N, kappa, E, V and E + lambda V. */
+    /** One optimal trajectory: holdings x_0..x_N, trades n_1..n_N, kappa, E, V and E + lambda V. Thread safety: safe to share once built; the arrays are not copied, so callers must not write to them. */
     public record AcTrajectory(double[] holdings, double[] trades, double kappa, double expectedCost, double variance,
             double objective) {}
 
     /** Checks in the order of almgren-chriss.md; returns eta_tilde. */
     static double checkAc(AcParams p) {
-        if (p.nSteps() < 1) {
+        return check(p.quantity(), p.horizon(), p.nSteps(), p.sigma(), p.epsilon(), p.eta(), p.gamma());
+    }
+
+    private static double check(double quantity, double horizon, long nSteps, double sigma, double epsilon,
+            double eta, double gamma) {
+        if (nSteps < 1) {
             throw input("n_steps", "must be at least 1");
         }
-        if (!(p.quantity() > 0)) {
+        if (!(quantity > 0)) {
             throw input("quantity", "must be positive");
         }
-        if (!(p.horizon() > 0)) {
+        if (!(horizon > 0)) {
             throw domain("horizon", "must be positive");
         }
-        if (p.sigma() < 0) {
+        if (sigma < 0) {
             throw domain("sigma", "must be non-negative");
         }
-        if (p.epsilon() < 0) {
+        if (epsilon < 0) {
             throw domain("epsilon", "must be non-negative");
         }
-        if (p.gamma() < 0) {
+        if (gamma < 0) {
             throw domain("gamma", "must be non-negative");
         }
-        double tau = p.horizon() / p.nSteps();
-        double etaTilde = p.eta() - p.gamma() * tau / 2;
+        double tau = horizon / nSteps;
+        double etaTilde = eta - gamma * tau / 2;
         if (!(etaTilde > 0)) {
             throw domain("eta", "eta_tilde = eta - gamma tau / 2 must be positive");
         }
@@ -241,6 +262,7 @@ public final class Execution {
     }
 
     /** One (lambda, E, V) per entry of {@code lambdas}. */
+    /** One (lambda, E, V) per input. Thread safety: safe to share once built; the arrays are not copied, so callers must not write to them. */
     public record AcFrontier(double[] riskAversions, double[] expectedCost, double[] variance) {}
 
     public static AcFrontier acFrontier(AcParams p, double[] lambdas) {
@@ -281,6 +303,7 @@ public final class Execution {
     }
 
     /** [OW13] eq. (31): blocks X / (rho T + 2) at both ends, rate rho X / (rho T + 2) between. */
+    /** Obizhaeva-Wang blocks and rate. Thread safety: immutable; safe to share between threads. */
     public record OwOptimal(double initialBlock, double rate, double finalBlock) {}
 
     public static OwOptimal owOptimal(double x, double t, double rho) {
@@ -300,7 +323,7 @@ public final class Execution {
 
     // ---- exec.tca.shortfall ----
 
-    /** Perold decomposition (HR-8); {@code vwapSlippage} is null without a benchmark. */
+    /** Perold decomposition (HR-8); {@code vwapSlippage} is null without a benchmark. Thread safety: immutable; safe to share between threads. */
     public record Shortfall(double delay, double execution, double opportunity, double total, double totalBps,
             Double vwapSlippage) {}
 
@@ -351,8 +374,36 @@ public final class Execution {
         return new Shortfall(delay, exec, opp, total, total / (x * decision) * 1e4, slip);
     }
 
+    /** One execution (H-5): quantity > 0 is E_INPUT, price > 0 and finite is E_DOMAIN. Thread safety: immutable; safe to share between threads. */
+    public record Fill(double quantity, double price) {
+        public Fill {
+            if (!Double.isFinite(quantity) || !Double.isFinite(price)) {
+                throw domain("fills", "must be finite");
+            }
+            if (!(quantity > 0)) {
+                throw input("fills", "fill quantities must be positive");
+            }
+            if (!(price > 0)) {
+                throw domain("fills", "fill prices must be positive");
+            }
+        }
+    }
+
+    /** {@link #shortfall(Side, double, double, double, double, double[], double[], double, Double)} over typed fills. */
+    public static Shortfall shortfall(Side side, double decision, double arrival, double end, double x,
+            java.util.List<Fill> fills, double fees, Double benchmarkVwap) {
+        double[] q = new double[fills.size()];
+        double[] p = new double[fills.size()];
+        for (int i = 0; i < q.length; i++) {
+            q[i] = fills.get(i).quantity();
+            p[i] = fills.get(i).price();
+        }
+        return shortfall(side, decision, arrival, end, x, q, p, fees, benchmarkVwap);
+    }
+
     // ---- usecase.execution_tca (use case 5, 04-pricing/use-cases.md) ----
 
+    /** Use case 5 result. Thread safety: safe to share once built; the arrays are not copied, so callers must not write to them. */
     public record ExecutionTca(double[] lots, double expectedCost, double variance, double filled, double fees,
             Shortfall shortfall) {}
 
@@ -386,8 +437,14 @@ public final class Execution {
 
     // ---- micro.mm.as_quotes ----
 
-    /** [AS08] eqs. (29)-(30), p. 221 (HR-7). */
-    public record Quotes(double reservation, double spread, double bid, double ask) {}
+    /** [AS08] eqs. (29)-(30), p. 221 (HR-7); bid at or below ask. Thread safety: immutable; safe to share between threads. */
+    public record Quotes(double reservation, double spread, double bid, double ask) {
+        public Quotes {
+            if (!(bid <= ask)) {
+                throw domain("bid", "must not exceed ask");
+            }
+        }
+    }
 
     public static Quotes asQuotes(double mid, double q, double gamma, double sigma, double timeLeft, double k) {
         if (!(gamma > 0)) {
