@@ -119,3 +119,22 @@ with open(f"{R}/datasets/golden/stage_h/e1_h3.json", "w", newline="\n") as fh:
         if op in (T, X):
             c["description"] += " (spec specifications/10-execution/tca-pretrade.md)"
     json.dump(s, fh, indent=1); fh.write("\n")
+
+# Enum values outside the listed set (side, pair_mode, mode) are E_SCHEMA in every build (a malformed input, before
+# HR-66's structural E_INPUT), as in wave 1. One case per enum field and operation; not blind-checked (hand).
+SCHEMA = E("E_SCHEMA")
+P0 = next(i for o, i, e in alg if o == P and e["status"] == "ok")
+enum = [
+    (A, dict(quantity=1000, n_buckets=4, urgency=0.0, mode="FOO"), SCHEMA),
+    (P, m(P0, pair_mode="FOO"), SCHEMA),
+    (P, m(P0, leg_a=dict(P0["leg_a"], side="HOLD")), SCHEMA),
+    (L, dict(side="HOLD", quantity=1000, limit_price=101.0, take_fraction=1.0, books=[[[100.0, 300]]]), SCHEMA),
+    (B, dict(legs=[leg("HOLD", 3, 10.0)], n_buckets=2, mode="CONTINUOUS"), SCHEMA),
+    (X, m(b6, side="HOLD"), SCHEMA),
+]
+with open(f"{R}/datasets/golden/stage_h/enum_h.json", "w", newline="\n") as fh:
+    s = suite("enum_h", "specifications/10-execution/adaptive-algos.md", enum)
+    for c in s["cases"]:
+        c["tags"] = ["stage_h", "wave2", "enum"]
+        c["description"] = "an enum value outside the listed set is E_SCHEMA"
+    json.dump(s, fh, indent=1); fh.write("\n")

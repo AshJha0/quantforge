@@ -452,8 +452,9 @@ fn stage_h_micro_goldens() {
 }
 
 /// The stage H wave 2 execution goldens: adaptive algorithms (`alg_h`) and pre-trade TCA and
-/// attribution (`tcx_h`), which put `adaptive_exec.rs` under `cargo test`.
+/// attribution (`tcx_h`), and the enum `E_SCHEMA` cases (`enum_h`), which put `adaptive_exec.rs`
+/// under `cargo test`.
 #[test]
 fn stage_h_w2_exec_goldens() {
-    replay_only("stage_h", &["alg_h", "tcx_h"], 36);
+    replay_only("stage_h", &["alg_h", "tcx_h", "enum_h"], 42);
 }

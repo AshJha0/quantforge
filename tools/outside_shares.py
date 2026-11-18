@@ -203,7 +203,7 @@ def load_percase_j():
 STAGE_H_ITEMS = {"sched_h": "H-3a", "ac_h": "H-3b", "tca_h": "H-3c", "imp_h": "H-15a", "as_h": "H-4a", "uc5_h": "H-6",
                  "ob_h": "H-2", "lit_h": "H-11", "dark_h": "H-12", "sor_h": "H-13",
                  "mest_h": "H-4b", "venue_h": "H-16", "alg_h": "H-14", "tcx_h": "H-17",
-                 "e1_h": None, "e1_h2": None, "e1_h3": None,  # E1 non-finite-input error cases only: no value cases, so no item share
+                 "e1_h": None, "e1_h2": None, "e1_h3": None, "enum_h": None,  # E1 non-finite-input error cases only: no value cases, so no item share
                  "sorx_h": None}  # cross-build agreement cases (Python build output), not outside-checked: no item
 H_REDERIVE_SRC = "blind second-lane re-derivation or printed paper figure (DR-H2)"
 

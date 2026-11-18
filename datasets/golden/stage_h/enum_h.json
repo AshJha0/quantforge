@@ -1,0 +1,197 @@
+{
+ "schema_version": "1.0",
+ "suite": "enum_h",
+ "spec": "specifications/10-execution/adaptive-algos.md",
+ "spec_version": "0.1.0",
+ "generator": "oracle/python/gen_stage_h_w2_exec.py",
+ "reviewer": "none: self-assessment; blind re-derivation pending",
+ "cases": [
+  {
+   "case_id": "enum_h-0001",
+   "operation": "exec.algo.arrival",
+   "inputs": {
+    "quantity": 1000,
+    "n_buckets": 4,
+    "urgency": 0.0,
+    "mode": "FOO"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "enum"
+   ],
+   "description": "an enum value outside the listed set is E_SCHEMA"
+  },
+  {
+   "case_id": "enum_h-0002",
+   "operation": "exec.algo.pair",
+   "inputs": {
+    "leg_a": {
+     "side": "BUY",
+     "quantity": 1000,
+     "price": 50.0
+    },
+    "leg_b": {
+     "side": "SELL",
+     "price": 25.0
+    },
+    "pair_mode": "FOO",
+    "n_buckets": 4,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "enum"
+   ],
+   "description": "an enum value outside the listed set is E_SCHEMA"
+  },
+  {
+   "case_id": "enum_h-0003",
+   "operation": "exec.algo.pair",
+   "inputs": {
+    "leg_a": {
+     "side": "HOLD",
+     "quantity": 1000,
+     "price": 50.0
+    },
+    "leg_b": {
+     "side": "SELL",
+     "price": 25.0
+    },
+    "pair_mode": "CASH_BALANCED",
+    "n_buckets": 4,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "enum"
+   ],
+   "description": "an enum value outside the listed set is E_SCHEMA"
+  },
+  {
+   "case_id": "enum_h-0004",
+   "operation": "exec.algo.liquidity_seek",
+   "inputs": {
+    "side": "HOLD",
+    "quantity": 1000,
+    "limit_price": 101.0,
+    "take_fraction": 1.0,
+    "books": [
+     [
+      [
+       100.0,
+       300
+      ]
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "enum"
+   ],
+   "description": "an enum value outside the listed set is E_SCHEMA"
+  },
+  {
+   "case_id": "enum_h-0005",
+   "operation": "exec.algo.basket",
+   "inputs": {
+    "legs": [
+     {
+      "side": "HOLD",
+      "quantity": 3,
+      "price": 10.0
+     }
+    ],
+    "n_buckets": 2,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "enum"
+   ],
+   "description": "an enum value outside the listed set is E_SCHEMA"
+  },
+  {
+   "case_id": "enum_h-0006",
+   "operation": "exec.tca.attribution",
+   "inputs": {
+    "side": "HOLD",
+    "decision_price": 100.0,
+    "arrival_mid": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 1000,
+    "fills": [
+     {
+      "quantity": 600,
+      "price": 100.2,
+      "mid": 100.15
+     },
+     {
+      "quantity": 200,
+      "price": 100.3,
+      "mid": 100.25
+     }
+    ],
+    "fees": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "enum"
+   ],
+   "description": "an enum value outside the listed set is E_SCHEMA"
+  }
+ ]
+}

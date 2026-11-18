@@ -3811,7 +3811,7 @@
     "counted_with_rederivation": 81,
     "share_with_rederivation": 0.818182,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 97
+    "error_and_invariance_cases": 103
    },
    "with_sweeps": {
     "cases": 99,
@@ -3826,7 +3826,7 @@
     "counted_with_rederivation": 81,
     "share_with_rederivation": 0.818182,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 97
+    "error_and_invariance_cases": 103
    },
    "sweeps": null,
    "libraries": {},
@@ -3875,7 +3875,7 @@
      "counted_with_rederivation": 4,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 3
+     "error_and_invariance_cases": 4
     },
     "exec.algo.basket": {
      "cases": 2,
@@ -3890,7 +3890,7 @@
      "counted_with_rederivation": 2,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 2
+     "error_and_invariance_cases": 3
     },
     "exec.algo.close": {
      "cases": 3,
@@ -3920,7 +3920,7 @@
      "counted_with_rederivation": 4,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 3
+     "error_and_invariance_cases": 4
     },
     "exec.algo.pair": {
      "cases": 3,
@@ -3935,7 +3935,7 @@
      "counted_with_rederivation": 3,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 3
+     "error_and_invariance_cases": 5
     },
     "exec.impact.ow_optimal": {
      "cases": 2,
@@ -4085,7 +4085,7 @@
      "counted_with_rederivation": 4,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 3
+     "error_and_invariance_cases": 4
     },
     "exec.tca.pretrade": {
      "cases": 2,

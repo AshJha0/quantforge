@@ -330,3 +330,7 @@ TOTALS: 15646 value 7721 error 5411 invariance 2514
 Stage H round 3 (2026-11-18): `mest_h` 18 and `venue_h` 10 (H-4b, H-16), `alg_h` 25 and `tcx_h` 11 (H-14, H-17), `e1_h3` 7 (a NaN at one Real input per H-14/H-17 operation, `E_DOMAIN` per F-2): 71 cases (34 value, 37 error).
 
 TOTALS: 15717 value 7755 error 5448 invariance 2514
+
+Stage H round 3 addition (2026-11-18): `enum_h` 6 (an enum value outside the listed set, `E_SCHEMA`, one per enum field of the H-14/H-17 operations): 6 error cases.
+
+TOTALS: 15723 value 7755 error 5454 invariance 2514
