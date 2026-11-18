@@ -175,6 +175,11 @@ impl Dec {
         Ok(!rem)
     }
 
+    /// The value as `(c, s)` with `self == c * 10^-s` (normalised; `s <= 36`).
+    pub fn parts(self) -> (i128, u32) {
+        (self.m, self.s)
+    }
+
     pub fn is_zero(self) -> bool {
         self.m == 0
     }

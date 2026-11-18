@@ -310,7 +310,8 @@ fn raised_array_keys(op: &str) -> &'static [&'static str] {
         // research.estimate.ledoit_wolf: ruling J-W2-14
         "risk.var.filtered_historical" | "research.estimate.ledoit_wolf" => &["returns"],
         "risk.backtest.christoffersen" => &["exceptions"],
-        "book.lifecycle.apply" | "exec.sim.lit.run" => &["events"],
+        "book.lifecycle.apply" | "exec.sim.lit.run" | "exec.sim.dark.run" => &["events"],
+        "exec.sor.allocate" => &["lit_samples"],
         "research.backtest.run" => &["prices", "targets"],
         "exec.tca.shortfall" => &["fills"], // ruling HR-9: 1,000,000 fills
         "research.cv.purged_kfold" => &["t0", "t1"],
@@ -339,6 +340,7 @@ fn too_long_with_raised(op: &str, i: &Json) -> bool {
             | "research.drift.cusum"
             | "research.drift.page_hinkley"
             | "exec.sim.lit.run"
+            | "exec.sim.dark.run"
     ) {
         10_000_000
     } else {

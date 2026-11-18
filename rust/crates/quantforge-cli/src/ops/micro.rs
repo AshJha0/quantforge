@@ -46,3 +46,49 @@ pub mod lit {
         }
     }
 }
+
+pub mod dark {
+    use crate::input::Inputs;
+    use crate::ops::{Outcome, plain};
+    use quantforge_core::dark_pool;
+    use quantforge_core::error::{Result, err};
+    use quantforge_core::json::Json;
+    use quantforge_core::sor;
+
+    crate::ops::registry! {
+    (op, i)
+        "exec.sim.dark.run" => {
+            if i.opt("scenarios").is_some() {
+                let runs = i.array("scenarios")?;
+                i.gate()?;
+                let empty = Json::Obj(Vec::new());
+                let mut out = Vec::with_capacity(runs.len());
+                for (k, s) in runs.iter().enumerate() {
+                    if !matches!(s, Json::Obj(_)) {
+                        return Err(err("E_SCHEMA", format!("scenarios/{k}: not an object")));
+                    }
+                    let cfg = s.get("config").filter(|c| !matches!(c, Json::Null)).unwrap_or(&empty);
+                    let events = s.get("events").and_then(Json::as_array).unwrap_or(&[]);
+                    out.push(dark_pool::run(cfg, events)?);
+                }
+                return plain(Json::Obj(vec![("scenarios".into(), Json::Arr(out))]));
+            }
+            let cfg = i.req("config")?;
+            if !matches!(cfg, Json::Obj(_)) {
+                return Err(err("E_SCHEMA", "config: expected an object"));
+            }
+            let events = i.array("events")?;
+            i.gate()?;
+            plain(dark_pool::run(cfg, events)?)
+        },
+        "exec.sim.dark.markouts" => {
+            let fills = i.array("fills")?;
+            i.gate()?;
+            plain(dark_pool::markouts(fills)?)
+        },
+        "exec.sor.allocate" => {
+            i.gate()?;
+            plain(sor::allocate(i.0)?)
+        }
+    }
+}

@@ -81,6 +81,7 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("eq", termcurve::eq::NAMES, termcurve::eq::dispatch),
     ("exec", execution::exec::NAMES, execution::exec::dispatch),
     ("exec", micro::lit::NAMES, micro::lit::dispatch),
+    ("exec", micro::dark::NAMES, micro::dark::dispatch),
     ("exotic", exotic::NAMES, exotic::dispatch),
     ("fx", fx::NAMES, fx::dispatch),
     ("hedge", hedge::NAMES, hedge::dispatch),
