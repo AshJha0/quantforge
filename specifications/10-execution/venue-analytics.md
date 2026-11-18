@@ -16,7 +16,7 @@ Per venue V and horizon h, over V's fills:
 
 Per venue: `fill_rate` = `sum filled / sum sent` over V's orders.
 
-A venue with no fills has no markout or toxicity rows; one with no orders has no fill rate. Errors: filled > sent or non-increasing mid times `E_INPUT`; a price, mid, q or sent <= 0, filled < 0, or h < 0 `E_DOMAIN`. Outputs binary64, 1e-12 relative (an expected 0 compared absolutely to 1e-15).
+A venue with no fills has no markout or toxicity rows; one with no orders has no fill rate. Errors (all `E_DOMAIN` checks before any `E_INPUT` check, HR-75): filled > sent or non-increasing mid times `E_INPUT`; a price, mid, q or sent <= 0, filled < 0, or h < 0 `E_DOMAIN`. Outputs binary64, 1e-12 relative (an expected 0 compared absolutely to 1e-15).
 
 ## Golden cases
 Base input: mids (0, 100.00), (1, 100.02), (5, 100.05), (10, 99.98). Fills F1 (A, BUY, 100, 100.01, t 0), F2 (A, SELL, 200, 100.03, t 1), F3 (B, BUY, 300, 100.00, t 1). Orders (A, 500, 300), (B, 300, 300). For A, sum q p = 30,007; for B, 30,000.
@@ -28,8 +28,9 @@ Base input: mids (0, 100.00), (1, 100.02), (5, 100.05), (10, 99.98). Fills F1 (A
 | venue_h-0003 | base, h = 0 | A: markout 0.00333333333333333, bps 0.333255573699470, toxicity 0.333333333333333; B: markout 0.02, bps 2, toxicity 0 | F1 mid 100.00: -1; F2 mid 100.02: +2; F3 mid 100.02: +6 |
 | venue_h-0004 | base, fill rates | A 0.6; B 1 | 300/500; 300/300 |
 | venue_h-0005 | base with order (A, 500, 600) | `E_INPUT` | filled > sent |
-| venue_h-0006 | base with a fill (B, BUY, 10, 100, t -1) | `E_INPUT` | no mid at or before -1 |
+| venue_h-0006 | base with a fill (B, BUY, 10, 100, t -1), h = 0 | `E_INPUT` | no mid at or before -1; horizon h = 0 added post-blind 2026-11-18 (the packet gave none and with h = 5 the lookup at t 4 succeeds), so this case is not blind-checked |
 | venue_h-0007 | base, h = -1 | `E_DOMAIN` | negative horizon |
+| venue_h-0008 | base with order (A, 500, 600), h = -1 | `E_DOMAIN` | both errors apply; `E_DOMAIN` first (HR-75); added post-blind 2026-11-18, hand only, not blind-checked |
 
 ## Property tests
 For every venue and h, `markout_bps` has the sign of `markout`; toxicity lies in [0, 1]; reversing every side and reflecting every price and mid about a constant c (p -> 2c - p) leaves markout unchanged.
