@@ -321,7 +321,9 @@ def _step(v: Any) -> float:
 
 def allocate(inp: dict[str, Any]) -> dict[str, Any]:
     step = _step(inp.get("step", 1.0))
-    if not math.isfinite(step):  # F-2 (E1): a non-finite Real input is E_DOMAIN, the first rule check
+    if not math.isfinite(
+        step
+    ):  # F-2 (E1): a non-finite Real input is E_DOMAIN, the first rule check
         raise QfError("E_DOMAIN", "step: not finite", "step")
     p = Problem(inp)
     method = inp.get("method", "SAMPLE_AVERAGE")
@@ -333,9 +335,7 @@ def allocate(inp: dict[str, Any]) -> dict[str, Any]:
         M, L = p.closed_form()
         best = (M, *L)
     elif method == "STOCHASTIC_APPROX":
-        best = p.stochastic(
-            int(inp.get("iterations", 10_000)), step, int(inp.get("seed", 0))
-        )
+        best = p.stochastic(int(inp.get("iterations", 10_000)), step, int(inp.get("seed", 0)))
     else:
         best, ranking = p.sample_average(want_rank)
     cost, fill, under, sq = p.evaluate(best[0], list(best[1:]))
