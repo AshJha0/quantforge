@@ -432,7 +432,7 @@ No new error code. Prices, quantities and fees are decimal strings (HR-12); outp
 
 ### Stage H wave 2: microstructure estimators (H-4b) and venue analytics (H-16)
 
-Rulings `stage-h-rulings-micro.md` HR-70 to HR-75a. No new error code. Unlike the other wave 2 operations, every number here is a JSON Real (the F-2 finite rule applies: a non-finite input is `E_DOMAIN`); `count` is an Integer. Outputs are binary64, compared to 1e-12 relative (1e-15 absolute at 0). Error order HR-75a: structural `E_INPUT`, then `E_DOMAIN`, then value-dependent `E_INPUT`. Goldens `datasets/golden/stage_h/mest_h.json` and `venue_h.json` (`oracle/python/gen_stage_h_micro.py`). Implemented in the Python build only; the Java, C++ and Rust builds answer `E_UNSUPPORTED_OPERATION`. The planted-truth simulations (HR-71) are Python tests, not operations.
+Rulings `stage-h-rulings-micro.md` HR-70 to HR-75 as amended (HR-66). No new error code. Unlike the other wave 2 operations, every number here is a JSON Real (the F-2 finite rule applies: a non-finite input is `E_DOMAIN`); `count` is an Integer. Outputs are binary64, compared to 1e-12 relative (1e-15 absolute at 0). Error order HR-75 as amended (HR-66): structural `E_INPUT`, then `E_DOMAIN`, then value-dependent `E_INPUT`. Goldens `datasets/golden/stage_h/mest_h.json` and `venue_h.json` (`oracle/python/gen_stage_h_micro.py`). Implemented in the Python build only; the Java, C++ and Rust builds answer `E_UNSUPPORTED_OPERATION`. The planted-truth simulations (HR-71) are Python tests, not operations.
 
 | Operation | Spec | Inputs | Outputs |
 |---|---|---|---|

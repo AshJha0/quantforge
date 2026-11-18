@@ -2,7 +2,7 @@
 stage H H-4b; rulings HR-70, HR-71, HR-74, HR-75).
 
 Each estimator returns its point estimate and a standard error `se`. Sums use `math.fsum`, so an
-exact fit (HR-74) gives SE 0 or a value at the rounding floor. Error order HR-75a: structural
+exact fit (HR-74) gives SE 0 or a value at the rounding floor. Error order HR-75 as amended (HR-66): structural
 `E_INPUT` (lengths, counts, labels), then `E_DOMAIN`, then value-dependent `E_INPUT`."""
 
 import math

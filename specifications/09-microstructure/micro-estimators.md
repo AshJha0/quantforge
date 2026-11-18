@@ -16,7 +16,7 @@ Order arrivals as a Poisson process. Inputs: event count N >= 0, window T. `lamb
 Resting orders cancelled at exponential rate theta; fills censor the lifetime. Inputs: list of (lifetime L_i > 0, outcome cancel or fill). `theta = C / sum L_i` with C the cancel count, `SE = theta / sqrt(C)`. C = 0: `E_INPUT`.
 
 ## `micro.est.resilience`
-Spread after a shock: `S_t - S_inf = (S_0 - S_inf) exp(-kappa t)`. Inputs: S_inf (known), list of (t_i, S_i). Every S_i must exceed S_inf, else `E_DOMAIN` (checked after the count, HR-75a). OLS with intercept of `ln(S_i - S_inf)` on t_i; `kappa = -slope`, SE the OLS slope SE with n - 2 degrees of freedom. n < 3: `E_INPUT`.
+Spread after a shock: `S_t - S_inf = (S_0 - S_inf) exp(-kappa t)`. Inputs: S_inf (known), list of (t_i, S_i). Every S_i must exceed S_inf, else `E_DOMAIN` (checked after the count, HR-75 as amended (HR-66)). OLS with intercept of `ln(S_i - S_inf)` on t_i; `kappa = -slope`, SE the OLS slope SE with n - 2 degrees of freedom. n < 3: `E_INPUT`.
 
 ## `micro.est.liquidity_decay`
 Depth against distance from the touch: `D_k = D_0 exp(-alpha k)`. Same estimator as resilience with k for t and S_inf = 0.
@@ -43,7 +43,7 @@ Every number is a JSON Real; `count` is an Integer. Every output standard error 
 | `micro.est.regime_impact` | `regimes`: object, label to `{x, y}`; must hold `calm` and `stressed` (else `E_INPUT`) | `regimes`: label to `{lambda_as, se}`; `ratio` = stressed / calm `lambda_as`; a calm `lambda_as` of 0 is `E_DOMAIN`, checked after the fits |
 | `micro.est.passive_vs_aggressive` | `passive`, `aggressive`: arrays of costs in bp | `delta`, `se` |
 
-In the OLS with intercept (resilience, liquidity decay), all t (or k) equal gives `sum (t - mean t)^2 = 0`: `E_INPUT`. Errors follow HR-75a: structural `E_INPUT` checks (list lengths, n below the minimum, a missing regime label, enum) come first, then `E_DOMAIN`, then the value-dependent `E_INPUT` checks (no cancel, sum x^2 = 0, all t equal).
+In the OLS with intercept (resilience, liquidity decay), all t (or k) equal gives `sum (t - mean t)^2 = 0`: `E_INPUT`. Errors follow HR-75 as amended (HR-66): structural `E_INPUT` checks (list lengths, n below the minimum, a missing regime label, enum) come first, then `E_DOMAIN`, then the value-dependent `E_INPUT` checks (no cancel, sum x^2 = 0, all t equal).
 
 ## Golden cases
 | Case | Input | Expected | Derivation |
@@ -53,7 +53,7 @@ In the OLS with intercept (resilience, liquidity decay), all t (or k) equal give
 | mest_h-0003 | cancel (2, cancel), (3, fill), (5, cancel) | theta 0.2; SE 0.141421356237310 | 2/10; 0.2/sqrt 2 |
 | mest_h-0004 | cancel (3, fill) only | `E_INPUT` | no cancel |
 | mest_h-0005 | resilience S_inf 1; (0, 5), (1, 3), (2, 2) | kappa 0.693147180559945; SE 0 | ln 4, ln 2, ln 1 lie on a line of slope -ln 2 |
-| mest_h-0006 | resilience S_inf 1; (0, 5), (1, 0.5) | `E_INPUT` | n = 2 < 3, a structural check, before 0.5 <= S_inf (HR-75a; was `E_DOMAIN` under HR-75, changed 2026-11-18, hand re-derivation, not blind-checked under the new order) |
+| mest_h-0006 | resilience S_inf 1; (0, 5), (1, 0.5) | `E_INPUT` | n = 2 < 3, a structural check, before 0.5 <= S_inf (HR-75 as amended (HR-66); was `E_DOMAIN` under HR-75, changed 2026-11-18, hand re-derivation, not blind-checked under the new order) |
 | mest_h-0007 | liquidity decay D = 800, 400, 200, 100 at k = 0..3 | alpha 0.693147180559945; SE 0 | depth halves each tick |
 | mest_h-0008 | adverse selection x = (1, -1, 2), y = (0.02, -0.01, 0.05) | lambda_as 0.0216666666666667; SE 0.00390867979985286 | 0.13/6 = 13/600; residuals (-1, 7, 4)/600; s2 = 66/360000/2; SE = sqrt(s2/6) |
 | mest_h-0009 | regime calm x = (1, 2), y = (0.01, 0.02); stressed x = (1, -1, 1), y = (0.05, -0.03, 0.04) | calm lambda_as 0.01, SE 0; stressed lambda_as 0.04, SE 0.00577350269189626; ratio 4 | stressed 0.12/3; residuals (0.01, 0.01, 0); s2 = 0.0001; SE = sqrt(0.0001/3) |

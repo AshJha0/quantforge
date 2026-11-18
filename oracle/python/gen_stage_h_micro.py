@@ -7,7 +7,7 @@ specs fix ("Operation inputs and outputs", "Input and output names"), and the ex
 prints them (TABLE). Every value is then recomputed here with mpmath at 50 digits from the inputs and must agree with
 the table to 1e-12 relative (1e-15 absolute at 0); the golden carries the mpmath value rounded once to binary64. No
 value is taken from an implementation. Blind record: program/STAGE_H_BLIND_MICRO.md (venue_h-0006 post-blind,
-venue_h-0008 hand only; mest_h-0006 and venue_h-0008 re-derived by hand under HR-75a). After the spec rows, one E1 case per operation (ruling F-2: NaN input, E_DOMAIN).
+venue_h-0008 hand only; mest_h-0006 and venue_h-0008 re-derived by hand under HR-75 as amended (HR-66)). After the spec rows, one E1 case per operation (ruling F-2: NaN input, E_DOMAIN).
 
     cd oracle/python && uv run python -W ignore gen_stage_h_micro.py
 """
@@ -158,7 +158,7 @@ def mest_ref(op, inp):
 def mest_suite():
     s = Suite("mest_h", SPEC_M, G)
     for cid, op, inp, exp in MEST:
-        verified = (["hand"] if cid == "mest_h-0006"  # HR-75a re-derivation; the blind MATCH was under HR-75
+        verified = (["hand"] if cid == "mest_h-0006"  # HR-75 as amended (HR-66) re-derivation; the blind MATCH was under HR-75
                     else ["hand", SHAPE] if cid in ("mest_h-0008", "mest_h-0009") else ["hand", MATCH])
         if isinstance(exp, str):
             s.add(op, inp, error=exp, cls="simple_analytic", verified=verified, tags=["stage_h", "microstructure", "error"],
@@ -208,7 +208,7 @@ VENUE = [  # case, inputs, table (venue: (markout, markout_bps, toxicity)) or fi
     ("venue_h-0006", base([0.0], extra=[{"venue": "B", "side": "BUY", "quantity": 10.0, "price": 100.0, "t": -1.0}]),
      "E_INPUT", ["hand", "post-blind 2026-11-18 (h = 0 added after the blind lane): not blind-checked"]),
     ("venue_h-0007", base([-1.0]), "E_DOMAIN", ["hand", MATCH]),
-    ("venue_h-0008", base([-1.0], OVERFILL), "E_INPUT", ["hand"]),  # HR-75a; was E_DOMAIN under HR-75
+    ("venue_h-0008", base([-1.0], OVERFILL), "E_INPUT", ["hand"]),  # HR-75 as amended (HR-66); was E_DOMAIN under HR-75
 ]
 
 

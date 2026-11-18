@@ -16,7 +16,7 @@ Per venue V and horizon h, over V's fills:
 
 Per venue: `fill_rate` = `sum filled / sum sent` over V's orders.
 
-A venue with no fills has no markout or toxicity rows; one with no orders has no fill rate. Errors (HR-75a: the structural `E_INPUT` checks, filled > sent and non-increasing mid times, come before every `E_DOMAIN` check; a missing mid at a lookup time is `E_INPUT` after them): filled > sent or non-increasing mid times `E_INPUT`; a price, mid, q or sent <= 0, filled < 0, or h < 0 `E_DOMAIN`. Outputs binary64, 1e-12 relative (an expected 0 compared absolutely to 1e-15).
+A venue with no fills has no markout or toxicity rows; one with no orders has no fill rate. Errors (HR-75 as amended (HR-66): the structural `E_INPUT` checks, filled > sent and non-increasing mid times, come before every `E_DOMAIN` check; a missing mid at a lookup time is `E_INPUT` after them): filled > sent or non-increasing mid times `E_INPUT`; a price, mid, q or sent <= 0, filled < 0, or h < 0 `E_DOMAIN`. Outputs binary64, 1e-12 relative (an expected 0 compared absolutely to 1e-15).
 
 ## Input and output names (fixed 2026-11-18 by the implementation lane, before generating goldens)
 Inputs: `mids` array of `{t, mid}`; `fills` array of `{venue, side, quantity, price, t}` with side `BUY` or `SELL`; `orders` array of `{venue, sent, filled}`; `horizons` array of h (may be empty). Every number is a JSON Real; `venue` is a string.
@@ -37,7 +37,7 @@ Base input: mids (0, 100.00), (1, 100.02), (5, 100.05), (10, 99.98). Fills F1 (A
 | venue_h-0005 | base with order (A, 500, 600) | `E_INPUT` | filled > sent |
 | venue_h-0006 | base with a fill (B, BUY, 10, 100, t -1), h = 0 | `E_INPUT` | no mid at or before -1; horizon h = 0 added post-blind 2026-11-18 (the packet gave none and with h = 5 the lookup at t 4 succeeds), so this case is not blind-checked |
 | venue_h-0007 | base, h = -1 | `E_DOMAIN` | negative horizon |
-| venue_h-0008 | base with order (A, 500, 600), h = -1 | `E_INPUT` | both errors apply; filled > sent is a structural cross-field check and comes first (HR-75a; was `E_DOMAIN` under HR-75, changed 2026-11-18 on the coordinator's repo-wide order); hand only, not blind-checked |
+| venue_h-0008 | base with order (A, 500, 600), h = -1 | `E_INPUT` | both errors apply; filled > sent is a structural cross-field check and comes first (HR-75 as amended (HR-66); was `E_DOMAIN` under HR-75, changed 2026-11-18 on the coordinator's repo-wide order); hand only, not blind-checked |
 
 ## Property tests
 For every venue and h, `markout_bps` has the sign of `markout`; toxicity lies in [0, 1]; reversing every side and reflecting every price and mid about a constant c (p -> 2c - p) leaves markout unchanged.
