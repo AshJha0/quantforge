@@ -87,7 +87,7 @@ jobs:
                    bash -c 'set -e; apt-get update -qq && apt-get install -y -qq cmake ninja-build git >/dev/null
                      cmake -S cpp26 -B build/g9 -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON >/dev/null
                      cmake --build build/g9 --target quantforge_core_tests >/dev/null
-                     build/g9/quantforge_core_tests "Q3b AAD ladder matches Richardson bumps of the scheme, and costs at most 5 prices (G-9)"' ;;
+                     build/g9/quantforge_core_tests "Q3b AAD ladder matches Richardson bumps of the scheme and costs at most 5 prices (G-9)"' ;;
             python) uv run --project python pytest python/tests/test_stage_g2.py -k cost_ratio -s -p no:cacheprovider ;;
           esac
       - name: gate against the stored baseline

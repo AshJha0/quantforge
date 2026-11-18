@@ -456,7 +456,7 @@ double g_berm(const std::vector<double>& P, double a, double s) {
 }
 }  // namespace
 
-TEST_CASE("Q3b AAD ladder matches Richardson bumps of the scheme, and costs at most 5 prices (G-9)") {
+TEST_CASE("Q3b AAD ladder matches Richardson bumps of the scheme and costs at most 5 prices (G-9)") {
     const sr::Params p = g_hw();
     const auto P = g_dfs();
     const sr::Ladder l = sr::bermudan_ladder(p, P, {2, 3, 4, 5, 6}, 0.039462, true, {1, 2, 3, 4, 5}, {101, 50, 6.0});
