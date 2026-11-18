@@ -11,7 +11,7 @@ env:
   # Account-free Central fallback for HTTP 429 (CI only), as java25.yml
   MAVEN_ARGS: --settings ${{ github.workspace }}/java25/.mvn/ci-settings.xml
 jobs:
-  bench:
+  lowlat-bench:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
