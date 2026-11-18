@@ -1,0 +1,303 @@
+{
+ "schema_version": "1.0",
+ "suite": "sched_h",
+ "spec": "specifications/10-execution/schedules.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_w1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "sched_h-0001",
+   "operation": "exec.schedule.twap",
+   "inputs": {
+    "quantity": 1000,
+    "n_buckets": 3,
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "slices": [
+      334,
+      333,
+      333
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "schedule",
+    "synthetic"
+   ],
+   "description": "floor 333, remainder 1 to slice 0 (HR-3)"
+  },
+  {
+   "case_id": "sched_h-0002",
+   "operation": "exec.schedule.twap",
+   "inputs": {
+    "quantity": 1000.0,
+    "n_buckets": 4,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "slices": [
+      250.0,
+      250.0,
+      250.0,
+      250.0
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "schedule",
+    "synthetic"
+   ],
+   "description": "X/N"
+  },
+  {
+   "case_id": "sched_h-0003",
+   "operation": "exec.schedule.vwap",
+   "inputs": {
+    "quantity": 1000.0,
+    "profile": [
+     1.0,
+     2.0,
+     3.0,
+     4.0
+    ],
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "slices": [
+      100.0,
+      200.0,
+      300.0,
+      400.0
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "schedule",
+    "synthetic"
+   ],
+   "description": "weights over 10"
+  },
+  {
+   "case_id": "sched_h-0004",
+   "operation": "exec.schedule.vwap",
+   "inputs": {
+    "quantity": 10,
+    "profile": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "slices": [
+      4,
+      3,
+      3
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "schedule",
+    "synthetic"
+   ],
+   "description": "3.333 each, equal remainders, earliest wins (HR-3)"
+  },
+  {
+   "case_id": "sched_h-0005",
+   "operation": "exec.schedule.pov",
+   "inputs": {
+    "quantity": 1000,
+    "participation": 0.2,
+    "market_volume": [
+     1000.0,
+     2000.0,
+     4000.0
+    ],
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "slices": [
+      250,
+      500,
+      250
+     ],
+     "filled": 1000,
+     "residual": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "schedule",
+    "synthetic"
+   ],
+   "description": "p/(1-p) = 0.25; third capped at the remaining 250 (HR-4)"
+  },
+  {
+   "case_id": "sched_h-0006",
+   "operation": "exec.schedule.pov",
+   "inputs": {
+    "quantity": 1000.0,
+    "participation": 0.1,
+    "market_volume": [
+     900.0,
+     900.0
+    ],
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "slices": [
+      100.0,
+      100.0
+     ],
+     "filled": 200.0,
+     "residual": 800.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "schedule",
+    "synthetic"
+   ],
+   "description": "0.1/0.9 x 900; residual 800 is not an error"
+  },
+  {
+   "case_id": "sched_h-0007",
+   "operation": "exec.schedule.pov",
+   "inputs": {
+    "quantity": 1000,
+    "participation": 1.0,
+    "market_volume": [
+     1000.0
+    ],
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "schedule",
+    "synthetic",
+    "error"
+   ],
+   "description": "p = 1 is outside (0, 1) (HR-4)"
+  },
+  {
+   "case_id": "sched_h-0008",
+   "operation": "exec.schedule.vwap",
+   "inputs": {
+    "quantity": 1000,
+    "profile": [
+     0.0,
+     0.0
+    ],
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "schedule",
+    "synthetic",
+    "error"
+   ],
+   "description": "all-zero profile"
+  },
+  {
+   "case_id": "sched_h-0009",
+   "operation": "exec.schedule.twap",
+   "inputs": {
+    "quantity": 1000.5,
+    "n_buckets": 2,
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "schedule",
+    "synthetic",
+    "error"
+   ],
+   "description": "non-integer X in UNITS mode"
+  }
+ ]
+}
