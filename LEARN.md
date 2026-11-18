@@ -8,8 +8,8 @@ QuantForge has four equal implementations of the same maths, in Java, C++, Pytho
 
 Two ways in:
 
-- **New to quantitative finance, or to this project.** Work through the [tutorials](docs/getting-started/README.md), starting with [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md): quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Tutorials 2 to 16 go on, 10 to 15 minutes each, to bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk and the LIBOR market model, with every number checked in all four languages. Tutorials 17 to 21 cover stage I, hedging: Greek and dynamic delta hedges, minimum-variance and constrained hedges, credit and correlation hedges, a cross-asset hedge with instrument selection, and what a hedge costs. Tutorials 23 and 24 cover stage J research tools: an honest backtest with purged cross-validation, and whether a Sharpe ratio is real. Then read the topics below in order.
-- **Test yourself.** The [question bank](docs/question-bank/README.md) has 371 questions with worked answers, at foundation, practitioner and advanced level, across all the topics below.
+- **New to quantitative finance, or to this project.** Work through the [tutorials](docs/getting-started/README.md), starting with [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md): quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Tutorials 2 to 16 go on, 10 to 15 minutes each, to bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk and the LIBOR market model, with every number checked in all four languages. Tutorials 17 to 21 cover stage I, hedging: Greek and dynamic delta hedges, minimum-variance and constrained hedges, credit and correlation hedges, a cross-asset hedge with instrument selection, and what a hedge costs. Tutorials 23 to 35 cover stage J research tools: an honest backtest with purged cross-validation, whether a Sharpe ratio is real, portfolios, costs, trials and power, leakage, shrinkage, stress and drift, financing term structures and liquidity curves. Tutorials 36 to 40 preview stage H execution (schedules, Almgren-Chriss, shortfall, impact, market-making quotes) as hand checks of its spec goldens, ahead of the code. Then read the topics below in order.
+- **Test yourself.** The [question bank](docs/question-bank/README.md) has 389 questions with worked answers, at foundation, practitioner and advanced level, across all the topics below.
 - **Practitioner.** Jump to a topic. Each worked example names its golden case, so you can rerun it as `COOKBOOK.md` shows and check the number yourself.
 
 **What the tests check.** 7,656 value-checked golden cases, where each build must return the oracle's numbers within a stated tolerance; 5,351 error cases, which check only that a bad input is refused with the right code; and 2,514 invariance cases (1,257 pairs), which check that two related inputs get the same answer. Counts are generated in [`docs/case-figures.md`](docs/case-figures.md). Outside-library shares per stage, under the tight rule D6, are in [`oracle/OUTSIDE_SHARES.md`](oracle/OUTSIDE_SHARES.md).
@@ -30,6 +30,7 @@ Each result below is real output from the CLIs, on the date each section gives. 
 | [Stage G: rates models and xVA](#stage-g-rates-models-and-xva) | Short-rate models, swaptions and Bermudans, LMM, MC Greeks, exposure, CVA, DVA and FVA |
 | [Stage I: hedging](#stage-i-hedging) | Least-squares and QP hedges, costs and switch points, backtests and effectiveness |
 | [Stage J: backtest overfitting and research statistics](#stage-j-backtest-overfitting-and-research-statistics) | Lag and look-ahead, purged CV, PSR, DSR, PBO, power, regimes |
+| [Stage H: execution and microstructure (planned, v0.10.0)](#stage-h-execution-and-microstructure-planned-v0100) | Schedules, Almgren-Chriss, shortfall, three impact models, order books and quotes, simulated venues |
 
 ## Foundations
 
@@ -704,6 +705,61 @@ Two curve families the curves page listed as missing, added in v0.9.0 by the cur
 - **The operations are tools, not results.** The gallery page and Tutorials 23 to 32 are teaching examples on synthetic data. The one set of study results in stage J, the three R3 holdout runs, is null with a pass probability of 13 % to 15 % at the minimum detectable Sharpe, so it is weak evidence either way (`research/r3/RESULTS.md`).
 - **The iid formulas are optimistic.** PSR, DSR and the power formula assume independent returns; studies add block-bootstrap intervals and simulated power.
 - **Tested on one machine, then in CI.** The 15,215-case wave 1 runs and the 15,315-case wave 2 runs were on one Windows machine. The cross-platform workflow passed on the stage J pull request (2026-11-14), and all eleven push workflows passed on `main` at `a148d0e`, including the tutorial check in all four languages (observed with `gh run list`, 2026-11-15).
+
+## Stage H: execution and microstructure (planned, v0.10.0)
+
+Stage H is specified but not merged. Its specs are in `specifications/09-microstructure/` and `specifications/10-execution/` (spec version 0.1.0, confirmed 2026-11-18; rulings HR-1 to HR-41 in the stage H rulings files). The worked examples below are spec golden cases; none was produced by a build, and each operation is available from v0.10.0. [Tutorials 36 to 40](docs/getting-started/README.md) check the same goldens with a short standard-library script, and question bank [set 13](docs/question-bank/13-execution-microstructure.md) tests them.
+
+### Why slicing exists
+
+**Plain idea.** An order bigger than the quantity at the best price moves the price if sent at once. Cutting it into child orders over time lets the book refill, at the cost of leaving the rest of the order exposed to price moves.
+
+**Formal statement.** `exec.schedule.twap`, `exec.schedule.vwap` and `exec.schedule.pov` (`10-execution/schedules.md`). TWAP gives equal slices, VWAP slices in proportion to an input volume profile, POV a share `p` of all volume including its own, so the child is `p v / (1 - p)` against outside volume `v` (ruling HR-4). In whole units, leftover units go to the earliest slices, so the slices always sum to the order (HR-3).
+
+**Worked example.** `sched_h-0005`: 1,000 units at 20 % against outside volumes 1,000, 2,000 and 4,000 gives 250, 500 and 250 (the last capped by what is left), residual 0. Evidence: hand calculation and a blind re-derivation from the inputs (DR-H2).
+
+### Almgren-Chriss in plain terms
+
+**Plain idea.** Fast trading costs impact; slow trading costs risk. Pick the schedule that minimises expected cost plus a risk aversion times its variance.
+
+**Formal statement.** `exec.ac.trajectory` (`10-execution/almgren-chriss.md`, [AC00] eqs. (5), (8), (16), (17)): holdings `x_j = X sinh(kappa (T - t_j)) / sinh(kappa T)` with `2 (cosh(kappa tau) - 1) = tau^2 lambda sigma^2 / eta_tilde`; `lambda = 0` returns the straight line exactly (HR-5).
+
+**Worked example.** On the paper's test parameters, `ac_h-0001` (straight line) costs 662,500 with variance 1.083e12, and `ac_h-0002` (`lambda = 1e-6`) costs 911,226.986 with variance 3.641285721e11. The paper prints `kappa` about 0.6 a day; the exact value is 0.6070761632 (`ac_h-0005`, outside-checked against the printed figure). See the [frontier page](docs/curves/ac-frontier.md).
+
+### Implementation shortfall and its four parts
+
+**Plain idea.** Compare the trade with a paper portfolio that bought everything at the decision price, and split the difference by cause.
+
+**Formal statement.** `exec.tca.shortfall` (`10-execution/tca.md`): delay `s Q (P_0 - P_d)` on the filled quantity, execution `s sum q_i (p_i - P_0)`, opportunity `s (X - Q)(P_c - P_d)`, plus fees (Perold split, HR-8 confirmed by DR-H3).
+
+**Worked example.** `tca_h-0001`: a buy of 1,000 with 800 filled gives delay 80, execution 100, opportunity 200 and fees 5, total 385 or 38.5 bp. Perold's paper was not read; the definition rests on the spec and the blind re-derivation.
+
+### Three ways to model impact, and when each applies
+
+**Plain idea.** Your trading moves the price. How you model that depends on the question.
+
+**Formal statement.** (1) Stage I's quadratic cost in the traded amount, a penalty inside the hedge optimiser (`08-hedging/hedge-costs-and-frontier.md`). (2) The square-root law, `exec.impact.sqrt`, `I = Y sigma sqrt(Q / V)` ([TLD11] eq. (1)), for the average move over an order of a given size; `Y` is an input, labelled assumed (HR-10). (3) Transient impact, `exec.impact.ow_optimal` ([OW13] eq. (31)), where the book refills at rate `rho` and the risk-neutral optimum is a block, a constant rate and a block.
+
+**Worked example.** `imp_h-0001`: 1 % of daily volume at 2 % daily volatility moves the price 20 bp; `imp_h-0002`: four times the size, 40 bp. `imp_h-0004`: on the paper's Fig. 2 parameters each Obizhaeva-Wang block is 23,635.0744504845 of 100,000. See the [impact page](docs/curves/impact-curves.md).
+
+### Order books, queues and why fills are uncertain
+
+**Plain idea.** A limit order waits in a queue at its price. Whether it fills depends on how much is ahead of it and on whether the price moves away first.
+
+**Formal statement.** The simulated lit engine, `exec.sim.lit.run`, keeps a FIFO queue per price level and matches best price first, then by arrival (`10-execution/lit-matching.md`, HR-25 to HR-31). The real book QuantForge records, Kraken's L2 feed, is market by price only, so queue position on the real venue is not observed (`09-microstructure/order-book.md`). `micro.mm.as_quotes` gives inventory-aware quotes ([AS08] eqs. (29), (30)).
+
+**Worked example.** `as_h-0001`: mid 100, long 2 units, `gamma = 0.1`, `sigma = 2`, one unit of time left, `k = 1.5`: reservation price 99.2, spread 1.6907704228. At half the horizon the spreads for three risk aversions match the paper's printed tables to two decimals (`as_h-0005` to `0007`).
+
+### Simulated venues: what a simulator can and cannot tell you
+
+A simulator shows what happens under our rules and our order flow. It can test whether an estimator recovers a rate we planted, and compare two strategies on the same replay. It cannot show how a real venue behaves. The dark pool, the router and paper trading are simulated only; every output carries its label ([Simulators](docs/simulators/README.md)).
+
+### What stage H's evidence does and does not show
+
+- Crypto venue only for real data, and lit only: one venue's L2 book, recorded locally, aggregates published ([Recorded feeds](docs/data/recorded-feeds.md)). Not equities or rates.
+- No live orders, ever. Paper trading (H-21) uses simulated fills.
+- Dark pools and multi-venue routing are simulated; no real dark-pool data is used.
+- The formula goldens check arithmetic and the papers' printed figures. They do not show that any market follows these models; that needs the crypto study's estimates with standard errors.
 
 ## Appendix: stage history
 
