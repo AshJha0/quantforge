@@ -40,6 +40,10 @@ Stage H, microstructure and execution; not tagged. What is merged so far is list
 - `almgren-chriss.md`: the lambda = 1e-15 property bound is 2e-9 relative, with the derivation (the model's own shift from linear is kappa^2 T^2 / 6, about 1.6e-9 on parameter set P); the earlier 1e-9 was below it.
 - Site status: the implemented-stage list comes from ROADMAP and now names R6 (`tools/site_facts.json`).
 
+### Fixed
+
+- **Robust curve fit (active set) in all four languages; ruling D38b (owner-adopted 2026-11-18).** The robust fit's active-set step could stop on the wrong outlier set: Java and C++ silently returned a wrong set of outliers with no error, and Rust and Python failed to converge. The active-set update is fixed in all four builds, and D38b makes a near-singular system an error: when the reciprocal condition of the scaled Gram matrix is below 1e-12 the answer is `E_SINGULAR`, never a number. New goldens `fits_d-0017` to `-0019` and `rulings_d-0019` to `-0022` (5 value, 2 error); stage D passes 661 of 661 in each build. Stage D's outside share is now 85.7% of value cases (451 of 526), the new cases having no outside check.
+
 ## 0.9.1 (2026-11-18)
 
 Follow-ups to v0.9.0: hedge solver precision, fuzz and G2++ fixes, a mutation gate that gives the same verdict for the same code, the full `hedging.cpp` mutation run, and documentation. PRs #50 and #51 and the release PR; release notes in `docs/releases/v0.9.1.md`.

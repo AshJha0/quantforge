@@ -6,7 +6,7 @@ Version 1.0.0. Plan 11.2.6: governance in the style of SR 11-7, written before s
 
 **Use restriction for every model.** Research, education and conformance testing only. Do not use for trading, valuation of record, risk limits or regulatory capital. Nothing here is investment advice.
 
-Each model below gets one entry, the "page" the plan asks for. Outside-checked shares count stage D goldens by operation, from `oracle/outside_register.json` on 2026-11-07. The H-19 checks of 2026-11-18 are not in the index column yet: current stage D figures are in `oracle/OUTSIDE_SHARES.md` (451 of 521 value cases, 86.6%; 19 further H-19 agreements are spec-closed and counted as reimplementation, not as outside checks).
+Each model below gets one entry, the "page" the plan asks for. Outside-checked shares count stage D goldens by operation, from `oracle/outside_register.json` on 2026-11-07. The H-19 checks of 2026-11-18 are not in the index column yet: current stage D figures are in `oracle/OUTSIDE_SHARES.md` (451 of 526 value cases, 85.7%; 19 further H-19 agreements are spec-closed and counted as reimplementation, not as outside checks).
 
 ## Index
 

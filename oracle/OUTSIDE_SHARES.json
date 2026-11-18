@@ -4,34 +4,34 @@
  "stages": {
   "D": {
    "without_sweeps": {
-    "cases": 521,
+    "cases": 526,
     "library-object": 451,
     "library-primitive": 0,
     "independent-rederivation": 0,
     "reimplementation": 19,
-    "none": 51,
+    "none": 56,
     "counted": 451,
-    "share": 0.865643,
+    "share": 0.857414,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 451,
-    "share_with_rederivation": 0.865643,
-    "all_cases_share": 0.689602,
-    "error_and_invariance_cases": 133
+    "share_with_rederivation": 0.857414,
+    "all_cases_share": 0.6823,
+    "error_and_invariance_cases": 135
    },
    "with_sweeps": {
-    "cases": 521,
+    "cases": 526,
     "library-object": 451,
     "library-primitive": 0,
     "independent-rederivation": 0,
     "reimplementation": 19,
-    "none": 51,
+    "none": 56,
     "counted": 451,
-    "share": 0.865643,
+    "share": 0.857414,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 451,
-    "share_with_rederivation": 0.865643,
-    "all_cases_share": 0.689602,
-    "error_and_invariance_cases": 133
+    "share_with_rederivation": 0.857414,
+    "all_cases_share": 0.6823,
+    "error_and_invariance_cases": 135
    },
    "sweeps": null,
    "libraries": {
@@ -175,19 +175,19 @@
      "error_and_invariance_cases": 1
     },
     "calib.curve.robust": {
-     "cases": 4,
+     "cases": 9,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 0,
      "reimplementation": 0,
-     "none": 4,
+     "none": 9,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 5
+     "error_and_invariance_cases": 7
     },
     "calib.curve.smooth": {
      "cases": 4,

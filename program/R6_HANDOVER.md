@@ -342,3 +342,7 @@ TOTALS: 15756 value 7775 error 5467 invariance 2514
 Stage H round 3, paper Java merge (2026-11-18, h-paper-ops up to 21319a61 via h-paper-java): `pt_h` 28 to 34 cases (4 value, 2 error).
 
 TOTALS: 15762 value 7779 error 5469 invariance 2514
+
+Robust curve fit fix (2026-11-18, robust-fit-fix, ruling D38b): `fits_d-0017` to `-0019` and `rulings_d-0019` to `-0022`: 7 cases (5 value, 2 error).
+
+TOTALS: 15769 value 7784 error 5471 invariance 2514
