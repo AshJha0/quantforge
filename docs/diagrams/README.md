@@ -423,3 +423,115 @@ flowchart LR
 ```
 
 For 1,000,000 shares against a 10 million daily volume, `sigma` 2 %, `z = 1.645`, the cheapest horizon is 0.3330 days at 224 bp ([Tutorial 35](../getting-started/tutorial-35-liquidity-curve.md), ruling J-C-8).
+
+## Stage H: execution and microstructure (planned, v0.10.0)
+
+The operations drawn here are specified (spec version 0.1.0, confirmed 2026-11-18) but not merged; the boxes name the operations as the specs fix them. Simulated parts are drawn with dashed borders; real recorded data with a solid border. Specs: `specifications/09-microstructure/` and `specifications/10-execution/`.
+
+### Order lifecycle
+
+```mermaid
+flowchart LR
+  accTitle: Order lifecycle from parent order to cost analysis
+  accDescr: A parent order is cut into child orders by a schedule, TWAP, VWAP or POV, or by an Almgren-Chriss trajectory. A router splits each child across simulated venues, a lit engine and a dark pool. Their fills go to implementation shortfall analysis, which compares them with the decision, arrival and end prices.
+  PO[parent order X, side, decision price] --> SCH["exec.schedule.twap / vwap / pov<br/>exec.ac.trajectory"]
+  SCH -->|child slices| SOR["exec.sor.allocate"]
+  SOR -->|market and limit lots| LIT["exec.sim.lit.run"]
+  SOR -->|dark lots| DARK["exec.sim.dark.run"]
+  LIT -->|fills| TCA["exec.tca.shortfall"]
+  DARK -->|fills| TCA
+  LIT -.->|lit mid| DARK
+  classDef sim stroke-dasharray: 5 5
+  class SOR,LIT,DARK sim
+```
+
+Each step has one owner: the schedule and trajectory operations decide how much to trade when, the router decides where, the simulated venues decide what fills, and `exec.tca.shortfall` measures the cost afterwards. Worked through in [Tutorial 36](../getting-started/tutorial-36-slice-an-order.md) to [Tutorial 38](../getting-started/tutorial-38-implementation-shortfall.md).
+
+### Matching engine state
+
+```mermaid
+flowchart TB
+  accTitle: Lit matching engine book state and order handling
+  accDescr: Each side of the book holds price levels; each level holds a first-in first-out queue of orders. An incoming order trades against the best opposite level while it is marketable, at the resting order's price, displayed orders first by arrival, then pegged hidden orders, then iceberg hidden quantity. What is left rests, is cancelled, or is rejected according to its type.
+  IN[incoming order] --> M{marketable?}
+  M -->|yes| T["trade at resting price<br/>displayed by seq, then PEG_MID, then iceberg hidden"]
+  T --> M
+  M -->|no, LIMIT or ICEBERG or PEG| R[rest at the back of its level's FIFO queue]
+  M -->|no, IOC or MARKET| C[cancel the remainder]
+  IN -->|FOK, not fully fillable| X1[reject: FOK_UNFILLABLE]
+  IN -->|POST_ONLY that would cross| X2[reject: POST_ONLY_WOULD_CROSS]
+  subgraph Book["book, one instrument, integer ticks"]
+    B1["bid level p: order seq 3, seq 7, seq 9"]
+    A1["ask level p + 1: order seq 2, seq 5"]
+  end
+  R --> Book
+```
+
+Price-time priority: best price first, then arrival order (`seq`) within a price. A quantity decrease keeps `seq`; a price change or increase takes a new one; an iceberg refresh joins the back of the queue (rulings HR-25 to HR-28, after CME's FIFO steps). Every output is labelled "simulated venue; not a real exchange". Spec: `10-execution/lit-matching.md`.
+
+### Simulated venue topology
+
+```mermaid
+flowchart LR
+  accTitle: Simulated venues and the one real data source
+  accDescr: The recorded Kraken book is the only real data. It can supply a reference mid to the simulated dark pool. Two simulated lit engines with different fees and one simulated dark pool form the multi-venue world in which the router is scored, driven by planted order flow from a seeded random number generator. A fill simulator for passive orders sits beside the lit engines.
+  KR["Kraken L2 book, recorded<br/>crypto venue; not equities or rates"]
+  FLOW["planted order flow<br/>core.rng, fixed seed"]
+  L1["lit engine A"]
+  L2["lit engine B, other fees"]
+  DP["dark pool"]
+  FS["queue fill model<br/>Cont-Stoikov-Talreja"]
+  RT["router exec.sor.allocate"]
+  FLOW --> L1 & L2 & DP
+  KR -.->|lit mid, labelled| DP
+  L1 & L2 --> FS
+  RT --> L1 & L2 & DP
+  classDef sim stroke-dasharray: 5 5
+  class FLOW,L1,L2,DP,FS,RT sim
+```
+
+Only the Kraken box is real data, and it is a single lit venue: it is never routed across. The router comparison against single-venue routing is a result inside this simulated world (ruling HR-40). See [Simulators](../simulators/README.md).
+
+### Shortfall decomposition
+
+```mermaid
+flowchart LR
+  accTitle: Implementation shortfall from decision price to end price
+  accDescr: The decision price is set when the order is decided. Delay cost is the move from decision to arrival on the filled quantity. Execution cost is the fills against the arrival price. Opportunity cost is the unfilled quantity times the move from decision to end price. Fees are added. The four parts sum to the total.
+  PD["decision price P_d"] -->|delay = s Q (P_0 - P_d)| P0["arrival price P_0"]
+  P0 -->|execution = s sum q_i (p_i - P_0)| F["fills (q_i, p_i)"]
+  PD -->|opportunity = s (X - Q)(P_c - P_d)| PC["end price P_c"]
+  F --> TOT["total = delay + execution + opportunity + fees"]
+  PC --> TOT
+```
+
+For a buy of 1,000 with 800 filled, delay 80, execution 100, opportunity 200 and fees 5 give a total of 385, 38.5 bp (golden `tca_h-0001`, [Tutorial 38](../getting-started/tutorial-38-implementation-shortfall.md), ruling HR-8).
+
+### AC frontier: cost against variance
+
+```mermaid
+flowchart LR
+  accTitle: Almgren-Chriss frontier, two points from the goldens
+  accDescr: At zero risk aversion the straight-line schedule has expected cost 662,500 and variance 1.083e12. At risk aversion 1e-6 the sinh schedule has expected cost 911,227 and variance 3.641e11. Raising risk aversion moves along the frontier towards lower variance and higher cost.
+  A["lambda = 0, straight line (TWAP)<br/>E = 662,500, V = 1.083e12"] -->|raise lambda| B["lambda = 1e-6, sinh schedule<br/>E = 911,227, V = 3.641e11"]
+  B -->|raise lambda further| C["towards selling at once<br/>higher E, lower V"]
+```
+
+The risk-neutral end of the frontier is the TWAP schedule (ruling HR-5). Values from goldens `ac_h-0001` and `ac_h-0002` on the paper's test parameters ([AC00] Table 1); see the [frontier page](../curves/ac-frontier.md).
+
+### Crypto data path: recorder to aggregate
+
+```mermaid
+flowchart LR
+  accTitle: Crypto order book data path from recorder to published aggregate
+  accDescr: The recorder subscribes to Kraken's public book at 100 levels and writes per-second snapshots with the venue checksum result, trades and gap rows to local files, never to git. The study first checks the recorded dates against the prereg holdout. The book rebuild counts checksum agreement, crossed books and gaps. The study then computes its statistics and publishes aggregates only, labelled crypto venue.
+  WS["wss://ws.kraken.com/v2<br/>book depth 100, trades"] --> REC["tools/recorder/crypto_l2.py"]
+  REC --> FILES["local gzip JSON lines, per symbol per hour<br/>snapshot + ok flag, trades, gap rows"]
+  FILES --> HD{"dates outside the prereg holdout?"}
+  HD -->|yes| RB["micro.book.rebuild<br/>checksum, crossed, gaps counted"]
+  HD -->|no| STOP[not read]
+  RB --> ST["study: impact proxy, walk-the-book"]
+  ST --> AG["aggregates only<br/>crypto venue; not equities or rates"]
+```
+
+The crypto files carry no hash chain yet; integrity rests on the per-row checksum flag and the gap rows ([Recorded feeds](../data/recorded-feeds.md)). Raw messages exist for one 14-minute sample only (ruling HR-11).

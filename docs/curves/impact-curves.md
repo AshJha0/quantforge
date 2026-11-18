@@ -43,4 +43,4 @@ Static formulas with assumed parameters. No permanent-impact estimate, no decay 
 
 ## Related
 
-[Tutorial 39](../getting-started/tutorial-39-market-impact.md); [glossary: market impact](../../GLOSSARY.md#market-impact).
+[Tutorial 39](../getting-started/tutorial-39-market-impact.md); [glossary: market impact](../../GLOSSARY.md#stage-h-terms).

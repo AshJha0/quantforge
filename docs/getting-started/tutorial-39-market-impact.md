@@ -78,7 +78,7 @@ Expected, from golden `imp_h-0001`: `impact` 0.002. The same number already come
 
 ## For practitioners
 
-- **Three impact models in the library.** Stage I's hedge solver charges a quadratic cost in the traded amount; this page adds the square-root law and the transient (decaying) model. They answer different questions: a cost to put in an optimiser, an average move for a size, and a schedule that lets the book recover. See the [glossary entry](../../GLOSSARY.md#market-impact).
+- **Three impact models in the library.** Stage I's hedge solver charges a quadratic cost in the traded amount; this page adds the square-root law and the transient (decaying) model. They answer different questions: a cost to put in an optimiser, an average move for a size, and a schedule that lets the book recover. See the [glossary entry](../../GLOSSARY.md#stage-h-terms).
 - **`Y` must be estimated before it means anything.** The crypto study (plan item H-1) will estimate it on one venue's book with standard errors; until it reports, every impact number here is an assumption.
 - **A venue's book is not a market.** Impact fitted on one crypto venue's lit book is a proxy for that venue, not for equities or rates.
 
