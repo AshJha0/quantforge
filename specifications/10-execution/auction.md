@@ -26,3 +26,6 @@ Inputs: `orders` (each `id, side, limit or MARKET, qty, seq`), `tick_size`, `ref
 | auc_h-0008 | buys 10.00x100, 10.01x100; no sells | no auction, volume 0 | one side empty |
 
 Invariants: V maximal over the candidate grid; no fill worse than its limit; quantity conserved. Acceptance A1 to A5 of `asset-conventions.md`.
+
+## Output shape (pre-comparison spec fix, 2026-11-18, HR-100, HR-101)
+`{status, label, price (decimal or null), volume (int), imbalance (int), fills: [{id, side ("B"|"S"), qty, price}], residual: [{id, side, limit, qty}], cancelled: [id]}`. Fills list buys in allocation order, then sells in allocation order. With no auction (HR-101): `price` null, `volume` 0, `imbalance` 0, no fills, limit orders rest, MARKET orders cancelled. Order ids in goldens: as labelled, else b1, b2, ... for buys and a1, a2, ... for sells in listing order, `seq` = listing order.

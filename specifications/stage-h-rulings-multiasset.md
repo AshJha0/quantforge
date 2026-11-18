@@ -24,3 +24,12 @@ Drafted on branch `h-multiasset` from the owner decision of 2026-11-18 (end of `
 | HR-97 | Last look | Strict threshold on the mid move in pips over the hold; symmetric by default; random reject from `u` (core.rng in simulation, explicit in goldens) |
 | HR-98 | Sources | Every source tagged unverified is read and re-tagged before v0.10.0 |
 | HR-99 | Excluded | No London Stock Exchange or LSEG material; no Nasdaq or LOBSTER sign-ups; IEX HIST used only if `IEX_HIST_TERMS_CHECK.md` clears it (no account, no spend); currently not cleared |
+
+## Pre-comparison spec fixes (2026-11-18, after the blind lane froze its file, before comparing)
+| # | Point | Ruling |
+|---|---|---|
+| HR-100 | Output shapes | Field names and shapes fixed in each spec (Output shapes sections); decimals as strings compared by value |
+| HR-101 | No auction | price null, volume 0, imbalance 0; limit orders rest, MARKET orders cancelled |
+| HR-102 | fut_h-0004/0005 | One participant's round trip against other resting orders; fee per contract per side |
+| HR-103 | Variation margin | Previous mark = fill price on the trade day, previous settlement afterwards |
+Cases whose answer was decided by HR-102 or HR-103 (fut_h-0004, 0005, 0006) do not count as blind.

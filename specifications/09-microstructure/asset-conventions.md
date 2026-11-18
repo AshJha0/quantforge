@@ -107,3 +107,16 @@ Coupon bond on a coupon date, street convention: P = sum_{i=1..n} (100 c/f)/(1+y
 - A3 property tests: rounding never makes an order more aggressive; parse(format(x)) = x on the 1/256 grid; spot date is a good day and at least T+1; auction volume is maximal over the candidate grid.
 - A4 every output carries its label (HR-94).
 - A5 no source still tagged unverified at release (HR-98).
+
+## Output shapes (pre-comparison spec fix, 2026-11-18, HR-100)
+Every success output is `{"status": "ok", "label": <HR-94 label>, ...fields}`; every error `{"status": "error", "error_code": <code>}`. Decimals are JSON strings compared by value (trailing zeros are representation only). Fields:
+| Operation | Fields |
+|---|---|
+| `micro.eq.round_price` | `price` (decimal, printed at the tick decimals) |
+| equities settle date | `settle_date` (ISO date) |
+| FX pip value | `pip_value` (decimal), `currency` (quote currency) |
+| FX spot date | `spot_date` (ISO date) |
+| 32nds parse | `value` (decimal) |
+| 32nds format | `text` |
+| futures tick value | `tick_value` (decimal) |
+| bond or bill price | `price` (decimal; goldens state 9 dp, compared to 5e-10 absolute) |

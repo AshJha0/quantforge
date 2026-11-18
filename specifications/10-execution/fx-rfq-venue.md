@@ -27,3 +27,6 @@ Plugs into: SOR as a venue of class FX (request for quote, not a book); paper tr
 | fxv_h-0007 | as fxv_h-0006 with symmetric false | FILL 1.0852 | -4 is not adverse for a client buy |
 | fxv_h-0008 | client SELL; quote as fxv_h-0003; mid_after 1.0848; symmetric false; p 0.05; u 0.50 | LL_PRICE | move -3 adverse for a sell, > 2 |
 | fxv_h-0009 | as fxv_h-0004 with mid_after 1.0853 | FILL 1.0852 | move +2, not strictly above 2 |
+
+## Output shapes (pre-comparison spec fix, 2026-11-18, HR-100)
+`exec.sim.fx.stream`: `{status, label, quotes: [{time, mid, bid, ask}]}`; a golden with one mid is a one-point path at time 0. `exec.sim.fx.request`: `{status, label, outcome ("FILL"|"LL_PRICE"|"LL_RANDOM"), price (decimal or null), move_pips (decimal)}`.
