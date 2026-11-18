@@ -471,6 +471,10 @@ for _name in (
     STAGE_F_ARRAYS[_name] = dict(_G_TIMES)
 STAGE_F_ARRAYS["xva.exposure.swap_ee_hw"] = {**_G_TIMES, "exposure_times": 10_000}
 STAGE_F_ARRAYS["xva.exposure.portfolio_hw"] = {**_G_TIMES, "exposure_times": 10_000}
+STAGE_F_ARRAYS["micro.book.rebuild"] = {"messages": 50_000_000, "checkpoints": 50_000_000}
+STAGE_F_ARRAYS["exec.sim.lit.run"] = {"events": 10_000_000}
+STAGE_F_ARRAYS["exec.sim.dark.run"] = {"events": 10_000_000}
+STAGE_F_ARRAYS["exec.sor.allocate"] = {"lit_samples": 1_000_000}
 
 
 def _check_stage_f(raw: Raw, limits: Mapping[str, int]) -> None:

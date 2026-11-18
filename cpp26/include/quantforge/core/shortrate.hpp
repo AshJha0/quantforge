@@ -99,6 +99,15 @@ struct Ladder {
 };
 Ladder bermudan_ladder(const Params& p, const std::vector<double>& P, const std::vector<double>& payment_times,
                        double fixed_rate, bool payer, const std::vector<double>& exercise_times, const Grid& g);
+/// G-9 work counter (aad-core.md, G-9), the one definition shared by the four ports: W = number of per-grid-node
+/// evaluations in every time-stepping, exercise and adjoint loop (each inner per-node iteration counts 1; a tridiagonal
+/// solve over nx nodes counts nx), plus the number of tape operations recorded and the number replayed in the reverse
+/// sweep. An exercise evaluation at a node counts 1 with its max or active-branch test folded in, and one stage split
+/// over several passes still counts 1 per node. bermudan_swaption and bermudan_ladder each add their count once, at
+/// the end, to a per-thread total; no priced value depends on it. Test entry points.
+void g9_work_reset();
+unsigned long long g9_work();
+void g9_add_work(unsigned long long w);
 /// Callable bond on the G-18 scheme (ruling G-21), per unit notional.
 double callable_bond(const Params& p, const std::vector<double>& payment_times, double coupon,
                      const std::vector<double>& call_times, double call_price, const Grid& g);

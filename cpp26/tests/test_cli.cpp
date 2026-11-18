@@ -51,7 +51,7 @@ TEST_CASE("nulls, and diagnostics") {
 
 TEST_CASE("operations are sorted and all answer") {
     const auto ops = quantforge::cli::operations();
-    CHECK(ops.size() == 312);  // R6-4.1 sbm_total, R6-11.20 usecase.option_hedge_lots, stage J wave 1 (+8), wave 2 (+7), wave 3 (+8), curves lane (+3), stage H wave 1 (+10)
+    CHECK(ops.size() == 317);  // R6-4.1 sbm_total, R6-11.20 usecase.option_hedge_lots, stage J wave 1 (+8), wave 2 (+7), wave 3 (+8), curves lane (+3), stage H wave 1 (+10), wave 2 (+2, +3 dark pool and router)
     CHECK(std::is_sorted(ops.begin(), ops.end()));
     for (const auto& op : ops) CHECK_FALSE(has(run_case(wrap(op, "{}")).json, "E_UNSUPPORTED_OPERATION"));
 }

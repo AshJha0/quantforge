@@ -16,6 +16,7 @@ mod infl;
 mod lmm;
 mod mbs;
 mod mcgreeks;
+mod micro;
 mod rates;
 mod repo;
 mod research;
@@ -79,6 +80,8 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("eq", eq::NAMES, eq::dispatch),
     ("eq", termcurve::eq::NAMES, termcurve::eq::dispatch),
     ("exec", execution::exec::NAMES, execution::exec::dispatch),
+    ("exec", micro::lit::NAMES, micro::lit::dispatch),
+    ("exec", micro::dark::NAMES, micro::dark::dispatch),
     ("exotic", exotic::NAMES, exotic::dispatch),
     ("fx", fx::NAMES, fx::dispatch),
     ("hedge", hedge::NAMES, hedge::dispatch),
@@ -86,6 +89,7 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("liq", termcurve::liq::NAMES, termcurve::liq::dispatch),
     ("mbs", mbs::NAMES, mbs::dispatch),
     ("micro", execution::micro::NAMES, execution::micro::dispatch),
+    ("micro", micro::rebuild::NAMES, micro::rebuild::dispatch),
     ("rates", rates::NAMES, rates::dispatch),
     ("rates", shortrate::NAMES, shortrate::dispatch),
     ("rates", lmm::NAMES, lmm::dispatch),

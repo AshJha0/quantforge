@@ -433,3 +433,14 @@ fn stage_j_w1_goldens() {
         99,
     );
 }
+
+/// The stage H wave 2 goldens: `micro.book.rebuild` (`ob_h`), `exec.sim.lit.run` (`lit_h`), the
+/// dark pool (`dark_h`) and the router (`sor_h`, `sorx_h`). `e1_h2` is replayed with wave 1 (prefix `e1_h`).
+#[test]
+fn stage_h_w2_goldens() {
+    replay_only(
+        "stage_h",
+        &["ob_h", "lit_h", "dark_h", "sor_h", "sorx_h"],
+        56,
+    );
+}

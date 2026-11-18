@@ -715,6 +715,31 @@ def make_grid(nx: int, steps_per_year: int, width: float) -> Grid:
     return Grid(nx, steps_per_year, width)
 
 
+# G-9 work counter (aad-core.md, G-9), the one definition shared by the four ports: W = number of
+# per-grid-node evaluations in every time-stepping, exercise and adjoint loop (each inner per-node
+# iteration counts 1; a tridiagonal solve over nx nodes counts nx), plus the number of tape
+# operations recorded and the number replayed in the reverse sweep. An exercise evaluation at a
+# node counts 1 with its max or active-branch test folded in, and one stage split over several
+# vectorised passes still counts 1 per node. Each call adds its count once, at the end; it never
+# touches a priced value.
+_G9_WORK = [0]
+
+
+def g9_add_work(w: int) -> None:
+    """Adds one call's G-9 work count (internal to the pricers)."""
+    _G9_WORK[0] += w
+
+
+def g9_work_reset() -> None:
+    """Resets the G-9 work counter (test entry point)."""
+    _G9_WORK[0] = 0
+
+
+def g9_work() -> int:
+    """The G-9 work count since the last `g9_work_reset` (test entry point)."""
+    return _G9_WORK[0]
+
+
 def _hw_alpha(model: Model, t: float) -> float:
     curve = model.curve
     assert curve is not None
@@ -743,6 +768,7 @@ def _backward(
     v = start
     diff = sig * sig / (2 * dx * dx)
     times = [0.0, *knots]
+    w = 0
     for k in range(len(times) - 1, 0, -1):
         t_hi, t_lo = times[k], times[k - 1]
         n = max(1, math.ceil(grid.steps_per_year * (t_hi - t_lo)))
@@ -767,8 +793,11 @@ def _backward(
             diag[-1] += 2 * upper[-1]
             inner = _thomas(lower, diag, upper, v[1:-1])
             v = [2 * inner[0] - inner[1], *inner, 2 * inner[-1] - inner[-2]]
+            w += 2 * (nx - 2)  # coefficient rows + Thomas solve
         if k - 1 > 0:
             at_knot(k - 2, t_lo, xs, v)
+            w += nx  # knot update
+    g9_add_work(w)
     return v[nx // 2]
 
 
@@ -849,6 +878,7 @@ def bermudan_swaption(
     xs = [-h + i * dx for i in range(nx)]
     last = _exercise_values(model, t_m, xs, payment_times, fixed_rate, phi)
     v0 = [max(e, 0.0) for e in last]
+    g9_add_work(nx)  # terminal payoff
 
     def exercise(k: int, t: float, grid_x: list[float], v: list[float]) -> None:
         ex = _exercise_values(model, t, grid_x, payment_times, fixed_rate, phi)

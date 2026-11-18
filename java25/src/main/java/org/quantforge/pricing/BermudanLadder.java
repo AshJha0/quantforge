@@ -352,6 +352,8 @@ public final class BermudanLadder {
         for (int i = 1; i < nx - 1; i++) {
             q[i] = a * x[i] / (2.0 * dx);
         }
+        // G-9 work (ShortRateFd.work): exercise values (max and active tests folded in), steps, adjoint, tape
+        long w = (long) mEx * nx;
         int s = 0;
         for (int k = mEx; k >= 1; k--) {
             double t1 = knots[k - 1];
@@ -366,6 +368,7 @@ public final class BermudanLadder {
                 v[0] = 2.0 * v[1] - v[2];
                 v[nx - 1] = 2.0 * v[nx - 2] - v[nx - 3];
                 vNew[s] = v.clone();
+                w += 2L * (nx - 2);
                 s++;
             }
             if (k - 1 > 0) {
@@ -433,6 +436,7 @@ public final class BermudanLadder {
                     vb[i] = li;
                 }
                 adj[alN[s]] += alBar;
+                w += 4L * (nx - 2); // coefficients, transpose, Thomas solve, diagonal adjoints
             }
         }
         for (int i = 0; i < nx; i++) {
@@ -479,6 +483,9 @@ public final class BermudanLadder {
             adj[xN[i]] += xBar[i];
         }
         tp.sweep(adj);
+        // exercise adjoint, grid adjoint (drift and x, one stage); tape recorded and replayed
+        w += (long) mEx * nx + nx + 2L * tp.size();
+        ShortRateFd.addWork(w);
         double[] dDf = new double[dfs.length];
         for (int i = 0; i < dfs.length; i++) {
             dDf[i] = adj[dfIn[i]];

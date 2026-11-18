@@ -373,6 +373,14 @@ Calibration hw_calibrate(const Curve& curve, double a, const std::vector<CalSwap
 }
 
 namespace {
+thread_local unsigned long long g9_counter = 0;
+}  // namespace
+
+void g9_work_reset() { g9_counter = 0; }
+unsigned long long g9_work() { return g9_counter; }
+void g9_add_work(unsigned long long w) { g9_counter += w; }
+
+namespace {
 // The G-18 scheme: backward fully implicit steps through the knots, with an action at each knot after 0.
 template <class Init, class Knot>
 double fd_scheme(const Params& p, const std::vector<double>& knots, const Grid& g, Init init, Knot at_knot) {
@@ -389,6 +397,8 @@ double fd_scheme(const Params& p, const std::vector<double>& knots, const Grid& 
         return p.curve.fwd(t) + s2 / (2 * a * a) * e * e;
     };
     init(tm, x, alpha(tm), V);
+    const unsigned long long nw = nx;
+    unsigned long long w = nw;  // terminal payoff (G-9 work)
     for (std::size_t k = knots.size() - 1; k >= 1; --k) {
         const double t0 = knots[k - 1], t1 = knots[k];
         const double steps = std::max(1.0, std::ceil(static_cast<double>(g.steps_per_year) * (t1 - t0)));
@@ -419,9 +429,14 @@ double fd_scheme(const Params& p, const std::vector<double>& knots, const Grid& 
             for (std::size_t i = nx - 3; i >= 1; --i) V[i] = (rhs[i] - sup[i] * V[i + 1]) / dia[i];
             V[0] = 2 * V[1] - V[2];
             V[nx - 1] = 2 * V[nx - 2] - V[nx - 3];
+            w += 2 * (nw - 2);  // coefficient rows + Thomas solve
         }
-        if (k - 1 >= 1) at_knot(k - 1, t0, x, alpha(t0), V);
+        if (k - 1 >= 1) {
+            at_knot(k - 1, t0, x, alpha(t0), V);
+            w += nw;  // knot update
+        }
     }
+    g9_add_work(w);
     return V[(nx - 1) / 2];
 }
 }  // namespace

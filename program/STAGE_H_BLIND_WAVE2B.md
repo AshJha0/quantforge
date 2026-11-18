@@ -26,3 +26,7 @@ Blind-lane interpretations (its notes.md): 0002 financing 0 with no rate given; 
 Outside-checked by re-derivation (DR-H2): 23 of 29 (dark_h 4/5, sor_h 3/5, pt_h 16/19). Not counted: the six NOT BLIND cases.
 
 Files: `stage_h_blind/wave2b/` (blind_ref.py, blind_results.json, blind_results.sha256, notes.md, packet_MANIFEST.sha256).
+
+## Post-blind shape change (2026-11-18, H-13 implementation lane)
+
+sor_h-0006: the input gains `"ranking":true`, the flag that asks for the `ranking` output (the conformance runner requires identical output keys, and the other sor_h inputs have the same shape). No expected value changed; the blind comparison above was made before this change and is not affected.
