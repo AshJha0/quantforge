@@ -13,7 +13,7 @@ import json, sys
 R = sys.argv[1] if len(sys.argv) > 1 else str(__import__("pathlib").Path(__file__).resolve().parents[2])
 LN2 = 0.69314718055994531
 E = lambda c: {"status": "error", "error_code": c}
-def ok(**k): return {"status": "ok", **k}
+def ok(**k): return {"status": "ok", "outputs": k}
 A, C, L, P, B = "exec.algo.arrival", "exec.algo.close", "exec.algo.liquidity_seek", "exec.algo.pair", "exec.algo.basket"
 def leg(side, q=None, p=None):
     d = {"side": side}
@@ -78,11 +78,11 @@ def _check():
             Q = sum(q for q, _, _ in fs); pd, m0 = F(str(i["decision_price"])), F(str(i["arrival_mid"]))
             d = s * Q * (m0 - pd); im = s * sum(q * (m - m0) for q, _, m in fs); sp = s * sum(q * (p - m) for q, p, m in fs)
             op_ = s * (F(str(i["order_quantity"])) - Q) * (F(str(i["end_price"])) - pd)
-            assert (d, im, sp, op_) == tuple(F(str(e[k])) for k in ("delay", "impact", "spread", "opportunity")), i
-            assert d + im + sp + op_ + F(str(i["fees"])) == F(str(e["total"]))
+            assert (d, im, sp, op_) == tuple(F(str(e["outputs"][k])) for k in ("delay", "impact", "spread", "opportunity")), i
+            assert d + im + sp + op_ + F(str(i["fees"])) == F(str(e["outputs"]["total"]))
     for op, i, e in alg:
         if op == P and e["status"] == "ok":
-            sa = e["slices_a"]; assert sum(sa) == i["leg_a"]["quantity"] and sum(e["slices_b"]) == e["quantity_b"]
+            o = e["outputs"]; assert sum(o["slices_a"]) == i["leg_a"]["quantity"] and sum(o["slices_b"]) == o["quantity_b"]
 _check()
 def suite(name, spec, rows):
     cs = []
