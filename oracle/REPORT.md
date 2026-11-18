@@ -269,8 +269,8 @@ stage D D8: 3 wrong-convention checks, each caught
 mbs_d: PSA ramp, SMM, level-pay amortisation by the standard formulas; the last month retires the balance within 1e-6
 suite mbs_d: 12 cases (6 value-checked, 6 error)
 stage D D9: 10 wrong-convention checks, each caught
-suite rulings_d: 18 cases (1 value-checked, 17 error)
-rulings_d: 18 cases
+suite rulings_d: 22 cases (3 value-checked, 19 error)
+rulings_d: 22 cases
 suite rulings2_d: 25 cases (2 value-checked, 23 error)
 rulings2_d: 25 cases
 suite outside_d: 284 cases (284 value-checked, 0 error)
@@ -369,7 +369,7 @@ Written by `oracle/python/outside_d.py`. A case counts only if QuantLib 1.44, bu
 | `outside_d` | 284 | 284 | 100% |  |
 | `repo_d` | 16 | 19 | 84% |  |
 | `rulings2_d` | 2 | 25 | 8% | internal: spec rulings, mostly error and order cases |
-| `rulings_d` | 0 | 18 | 0% | internal: spec rulings, mostly error and order cases |
+| `rulings_d` | 0 | 22 | 0% | internal: spec rulings, mostly error and order cases |
 | `rulings_r1` | 9 | 15 | 60% | conversion factors count (QuantLib bond priced at 6% on the CME synthetic dates); the rest are spec-ruling error cases |
 | `steps_d` | 0 | 11 | 0% | meeting-date step fits are internal; QuantLib ForwardCurve could replay a step curve but not the fit |
 | `trs_d` | 0 | 3 | 0% | QuantLib has no equity total return swap with these legs |

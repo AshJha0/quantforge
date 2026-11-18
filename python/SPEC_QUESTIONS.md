@@ -299,33 +299,8 @@ Wave 1 (hedge solvers) passes 121 of 121 with no open question. Choices made whe
 
 Every heading above now names its rulings. Questions with no ruling in `specifications/`, carried to the R6 spec lane: E-Q7 (cube domain checks on every node), E-Q11 (E2 array caps), F-Q1 (E1 order against E_SCHEMA and E_INPUT, field naming), F-Q2 (G4 naming; finished in R6 by renaming `cli/ops_stage_g2.py` to `cli/ops_lmm_xva_frtb.py`), F-Q4 (R8 estimator stopping rule), G-Q2 (flat objective as E_NO_CONVERGENCE). G-Q4 is closed by G-42 (goldens regenerated).
 
-## D-Q (2026-11-18): `calib.curve.robust` on a nearly rank-deficient basis (proposed ruling, not applied)
+## D-Q (2026-11-18): `calib.curve.robust` convergence and near-singular bases: closed
 
-Found by the curve_fits mutation re-check: on 20,000 random valid inputs (seed 20261118, 3-12
-maturities in (0.1, 30), `tau` in (0.1, 10), `delta` 1e-4 to 1e-2) the old Python fit raised
-`E_SINGULAR` 235 times and `E_NO_CONVERGENCE` 15 times. Two causes:
-
-1. Algorithm defect, fixed in all four languages. On the 19,444 inputs with basis condition number
-   below 1e6: Python raised `E_NO_CONVERGENCE` on 5 (its split-then-IRLS loop cycles when a
-   residual at the minimum sits within about 1e-7 of `delta`); Rust raised `E_NO_CONVERGENCE` on
-   594 (its pattern loop gave up on any split with fewer than three inliers); Java returned a wrong
-   outlier set, with no error, on 235 (its Newton/backtracking loop stopped short of the minimum);
-   C++ returned a wrong outlier set on 8 (the near-`delta` cases). All four now use the same finite
-   active-set method on the dual; on those inputs all four return the same outlier sets, residuals
-   within 3e-10, and meet the first-order condition. D62 (`E_NO_CONVERGENCE` cannot be an outcome
-   at full rank) now holds in practice. Goldens `fits_d-0017` to `-0019` are three of the Java
-   failures; the near-`delta` inputs are unit tests, since goldens keep residuals 1e-6 from `delta`.
-2. Spec gap, open: every remaining error is an ill-conditioned basis. When `min(m)/tau` is above
-   about 17, `exp(-m/tau)` is below 4e-8 and the slope and curvature columns of the Nelson-Siegel
-   basis agree to working precision, so `b1` and `b2` are not identified (betas of order 1e7 with
-   opposite signs). The languages then differ: Python returns huge betas or raises `E_SINGULAR`
-   only on an exact zero pivot; Java and C++ raise `E_SINGULAR` from their relative pivot tests.
-   D38 covers maturities that cannot fix three betas exactly, not numerically.
-
-Proposed ruling: after the existing checks, `calib.curve.robust` raises `E_SINGULAR` when the
-3x3 Gram matrix `X^T X` of the basis (all points, unit weights), with its columns scaled to unit
-diagonal, has reciprocal condition number below `1e-12` (1-norm estimate or exact; the threshold
-is far from every golden, whose condition numbers are below 1e3). Reason: the answer on such inputs
-is not defined to the acceptance tolerance (1e-9) in any language, so the contract should name the
-outcome instead of leaving it to each solver's pivot test. Goldens to add with it: one case at
-`min(m)/tau` about 40 (exact float rank deficiency) and one at about 20.
+The algorithm defect (old loops cycled, stopped short, or gave up; all four languages) is fixed by
+one finite active-set method on the dual in every language. The near-singular basis case is closed
+by ruling D38b in `specifications/stage-d-rulings.md` (owner decision 2026-11-18).

@@ -97,6 +97,54 @@ public final class CurveFits {
 
     public record Robust(double[] betas, double[] residuals, int[] outliers, double objective) {}
 
+    /** Ruling D38b: below this reciprocal condition number the robust fit's basis is singular. */
+    static final double RCOND_MIN = 1e-12;
+
+    /**
+     * Ruling D38b: reciprocal 1-norm condition number of X^T X with columns scaled to unit diagonal, from the
+     * explicit 3x3 inverse (adjugate over determinant), in the same operation order as the other languages.
+     * 0 when the determinant is not positive.
+     */
+    static double basisRcond(double[][] x) {
+        double[][] g = new double[3][3];
+        for (double[] row : x) {
+            for (int p = 0; p < 3; p++) {
+                for (int q = 0; q < 3; q++) {
+                    g[p][q] += row[p] * row[q];
+                }
+            }
+        }
+        double[] s = new double[3];
+        for (int p = 0; p < 3; p++) {
+            s[p] = 1.0 / Math.sqrt(g[p][p]);
+        }
+        double[][] a = new double[3][3];
+        for (int p = 0; p < 3; p++) {
+            for (int q = 0; q < 3; q++) {
+                a[p][q] = g[p][q] * s[p] * s[q];
+            }
+        }
+        double[][] c = {
+            {a[1][1] * a[2][2] - a[1][2] * a[2][1], a[1][2] * a[2][0] - a[1][0] * a[2][2],
+                a[1][0] * a[2][1] - a[1][1] * a[2][0]},
+            {a[0][2] * a[2][1] - a[0][1] * a[2][2], a[0][0] * a[2][2] - a[0][2] * a[2][0],
+                a[0][1] * a[2][0] - a[0][0] * a[2][1]},
+            {a[0][1] * a[1][2] - a[0][2] * a[1][1], a[0][2] * a[1][0] - a[0][0] * a[1][2],
+                a[0][0] * a[1][1] - a[0][1] * a[1][0]},
+        };
+        double det = a[0][0] * c[0][0] + a[0][1] * c[0][1] + a[0][2] * c[0][2];
+        if (!(det > 0.0)) {
+            return 0.0;
+        }
+        double normA = 0.0;
+        double normInv = 0.0;
+        for (int q = 0; q < 3; q++) {
+            normA = Math.max(normA, Math.abs(a[0][q]) + Math.abs(a[1][q]) + Math.abs(a[2][q]));
+            normInv = Math.max(normInv, (Math.abs(c[q][0]) + Math.abs(c[q][1]) + Math.abs(c[q][2])) / det);
+        }
+        return 1.0 / (normA * normInv);
+    }
+
     /** Working-set changes allowed before {@code robust} gives up (never reached at full rank). */
     private static final int ROBUST_ITERATIONS = 1000;
 
@@ -124,6 +172,9 @@ public final class CurveFits {
             x[j][0] = 1.0;
             x[j][1] = e;
             x[j][2] = e - Math.exp(-u);
+        }
+        if (!(basisRcond(x) >= RCOND_MIN)) {
+            throw new QfError("E_SINGULAR", "the Nelson-Siegel basis is singular to working precision (D38b)");
         }
         // Primal active-set method on the dual (Nocedal and Wright, algorithm 16.3); the Python
         // implementation carries the full derivation. theta is the dual point, bound[j] the sign
@@ -229,6 +280,52 @@ public final class CurveFits {
                 }
             }
         }
-        return LinearAlgebra.solve(a, rhs);
+        return solve3(a, rhs);
+    }
+
+    /**
+     * Gaussian elimination with partial pivoting and an exact-zero pivot test, as Python's
+     * {@code lu_solve}. Ruling D38b has already rejected bases singular to working precision, so the
+     * shared solver's relative pivot test must not reject the systems it lets through.
+     */
+    private static double[] solve3(double[][] input, double[] rhs) {
+        double[][] m = {input[0].clone(), input[1].clone(), input[2].clone()};
+        double[] x = rhs.clone();
+        for (int k = 0; k < 3; k++) {
+            int p = k;
+            for (int i = k + 1; i < 3; i++) {
+                if (Math.abs(m[i][k]) > Math.abs(m[p][k])) {
+                    p = i;
+                }
+            }
+            if (m[p][k] == 0.0) {
+                throw new QfError("E_SINGULAR", "the matrix is singular to working precision");
+            }
+            if (p != k) {
+                double[] t = m[k];
+                m[k] = m[p];
+                m[p] = t;
+                double tx = x[k];
+                x[k] = x[p];
+                x[p] = tx;
+            }
+            for (int i = k + 1; i < 3; i++) {
+                double factor = m[i][k] / m[k][k];
+                if (factor != 0.0) {
+                    for (int j = k; j < 3; j++) {
+                        m[i][j] -= factor * m[k][j];
+                    }
+                    x[i] -= factor * x[k];
+                }
+            }
+        }
+        for (int i = 2; i >= 0; i--) {
+            double total = x[i];
+            for (int j = i + 1; j < 3; j++) {
+                total -= m[i][j] * x[j];
+            }
+            x[i] = total / m[i][i];
+        }
+        return x;
     }
 }

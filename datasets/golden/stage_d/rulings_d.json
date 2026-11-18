@@ -1451,6 +1451,226 @@
     "D42",
     "synthetic"
    ]
+  },
+  {
+   "case_id": "rulings_d-0019",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     8.0,
+     10.0,
+     12.0,
+     15.0,
+     20.0
+    ],
+    "zero_rates": [
+     0.039718749910249644,
+     0.03977499999893344,
+     0.03981249999998738,
+     0.03984999999999998,
+     0.0398875
+    ],
+    "tau": 0.45,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "D38b",
+    "synthetic"
+   ],
+   "description": "min(m)/tau = 17.8: slope and curvature columns agree to working precision"
+  },
+  {
+   "case_id": "rulings_d-0020",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     8.0,
+     10.0,
+     12.0,
+     15.0,
+     20.0
+    ],
+    "zero_rates": [
+     0.03981249999998738,
+     0.03984999999999998,
+     0.039875,
+     0.0399,
+     0.039925
+    ],
+    "tau": 0.3,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "D38b",
+    "synthetic"
+   ],
+   "description": "min(m)/tau = 26.7: slope and curvature columns agree to working precision"
+  },
+  {
+   "case_id": "rulings_d-0021",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.035703495203139805,
+     0.03775374500412831,
+     0.04198304821200367,
+     0.03948979570031606,
+     0.0396666652391225,
+     0.03975999999020952,
+     0.03978999999993334,
+     0.039857142857142855,
+     0.03991,
+     0.03992333333333333,
+     0.03995,
+     0.03997666666666667
+    ],
+    "tau": 0.2,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "betas": [
+      0.03995615107045899,
+      -0.012083825929292032,
+      0.009007976976523436
+     ],
+     "residuals": [
+      -8.385552516733306e-05,
+      0.0003336391303233381,
+      -0.0026986172220910035,
+      0.00015837547767667235,
+      8.442654165147551e-05,
+      4.235861436120284e-05,
+      4.3117112291515456e-05,
+      1.1126814665598109e-05,
+      -1.536590859638302e-05,
+      -8.193582244589516e-06,
+      -2.460741906869542e-05,
+      -4.1021255892801326e-05
+     ],
+     "outliers": [
+      2
+     ],
+     "objective": 1.302771665686174e-06
+    }
+   },
+   "tolerance_class": "calibration",
+   "verified_by": [
+    "independent-replay",
+    "scipy-least-squares-huber"
+   ],
+   "tags": [
+    "ruling",
+    "D38b",
+    "synthetic"
+   ],
+   "description": "basis well above the D38b threshold: fitted as usual",
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; exact split solve in mpmath"
+   }
+  },
+  {
+   "case_id": "rulings_d-0022",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "zero_rates": [
+     0.03499,
+     0.03716166179190847,
+     0.0411773764387738,
+     0.03896304821200366,
+     0.039281806220147625,
+     0.03950979570031607
+    ],
+    "tau": 1.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "betas": [
+      0.03960785883803251,
+      -0.011461957678134758,
+      0.009675926543620532
+     ],
+     "residuals": [
+      -7.070261048487835e-05,
+      0.0003645437342388255,
+      -0.002616956910528635,
+      0.0002248153555326569,
+      6.231467426504443e-05,
+      -8.097115355164848e-05
+     ],
+     "outliers": [
+      2
+     ],
+     "objective": 1.2829146471251583e-06
+    }
+   },
+   "tolerance_class": "calibration",
+   "verified_by": [
+    "independent-replay",
+    "scipy-least-squares-huber"
+   ],
+   "tags": [
+    "ruling",
+    "D38b",
+    "synthetic"
+   ],
+   "description": "basis well above the D38b threshold: fitted as usual",
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; exact split solve in mpmath"
+   }
   }
  ]
 }

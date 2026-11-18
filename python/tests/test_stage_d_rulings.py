@@ -115,6 +115,14 @@ def test_d38_robust_singular() -> None:
     assert _code_of(curve_fits.robust, [1.0, 5.0, 5.0], [0.03] * 3, 2.0, 1e-3) == "E_SINGULAR"
 
 
+def test_d38b_robust_basis_singular_to_working_precision() -> None:
+    m = [8.0, 10.0, 12.0, 15.0, 20.0]
+    assert curve_fits.basis_rcond([curve_fits._basis(v, 0.45) for v in m]) < 1e-14
+    assert _code_of(curve_fits.robust, m, [0.03] * 5, 0.45, 5e-4) == "E_SINGULAR"
+    assert curve_fits.basis_rcond([curve_fits._basis(v, 1.0) for v in m]) > 1e-8
+    curve_fits.robust(m, [0.03, 0.031, 0.029, 0.03, 0.032], 1.0, 5e-4)
+
+
 def test_d39_xccy_start_before_as_of() -> None:
     early = date(2026, 11, 5)
     assert (

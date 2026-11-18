@@ -57,6 +57,46 @@ def _basis(m: float, tau: float) -> list[float]:
     return [1.0, e, e - math.exp(-x)]
 
 
+RCOND_MIN = 1e-12
+
+
+def basis_rcond(xs: Sequence[Sequence[float]]) -> float:
+    """Ruling D38b: reciprocal 1-norm condition number of the basis Gram matrix X^T X, columns
+    scaled to unit diagonal, from the explicit 3x3 inverse (adjugate over determinant). The
+    operation order is fixed so the four languages give the same bits. 0 when det <= 0."""
+    g = [[0.0] * 3 for _ in range(3)]
+    for x in xs:
+        for p in range(3):
+            for q in range(3):
+                g[p][q] += x[p] * x[q]
+    s = [1.0 / math.sqrt(g[p][p]) for p in range(3)]
+    a = [[g[p][q] * s[p] * s[q] for q in range(3)] for p in range(3)]
+    c = [
+        [
+            a[1][1] * a[2][2] - a[1][2] * a[2][1],
+            a[1][2] * a[2][0] - a[1][0] * a[2][2],
+            a[1][0] * a[2][1] - a[1][1] * a[2][0],
+        ],
+        [
+            a[0][2] * a[2][1] - a[0][1] * a[2][2],
+            a[0][0] * a[2][2] - a[0][2] * a[2][0],
+            a[0][1] * a[2][0] - a[0][0] * a[2][1],
+        ],
+        [
+            a[0][1] * a[1][2] - a[0][2] * a[1][1],
+            a[0][2] * a[1][0] - a[0][0] * a[1][2],
+            a[0][0] * a[1][1] - a[0][1] * a[1][0],
+        ],
+    ]
+    det = a[0][0] * c[0][0] + a[0][1] * c[0][1] + a[0][2] * c[0][2]
+    if not det > 0.0:
+        return 0.0
+    norm_a = max(abs(a[0][q]) + abs(a[1][q]) + abs(a[2][q]) for q in range(3))
+    # Column q of the inverse is row q of the cofactor matrix over det.
+    norm_inv = max((abs(c[q][0]) + abs(c[q][1]) + abs(c[q][2])) / det for q in range(3))
+    return 1.0 / (norm_a * norm_inv)
+
+
 ITERATIONS = 1000
 
 
@@ -74,6 +114,10 @@ def robust(
     if len(set(maturities)) < 3:
         raise QfError("E_SINGULAR", "three distinct maturities are needed to fix three betas")
     xs = [_basis(m, tau) for m in maturities]
+    if not basis_rcond(xs) >= RCOND_MIN:
+        raise QfError(
+            "E_SINGULAR", "the Nelson-Siegel basis is singular to working precision (D38b)"
+        )
     ys = list(zero_rates)
 
     def weighted(w: Sequence[float], shift: Sequence[float]) -> list[float]:

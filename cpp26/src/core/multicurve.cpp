@@ -347,6 +347,69 @@ SmoothFit smooth_fit(const std::vector<double>& knots, const std::vector<double>
     return out;
 }
 
+namespace {
+
+// Ruling D38b: below this reciprocal condition number the robust fit's basis is singular.
+constexpr double robust_rcond_min = 1e-12;
+
+// Ruling D38b: reciprocal 1-norm condition number of X^T X with columns scaled to unit diagonal,
+// from the explicit 3x3 inverse (adjugate over determinant), in the same operation order as the
+// other languages. 0 when the determinant is not positive.
+double basis_rcond(const Matrix& x) {
+    double g[3][3] = {};
+    for (const auto& row : x)
+        for (int p = 0; p < 3; ++p)
+            for (int q = 0; q < 3; ++q) g[p][q] += row[p] * row[q];
+    double s[3], a[3][3];
+    for (int p = 0; p < 3; ++p) s[p] = 1.0 / std::sqrt(g[p][p]);
+    for (int p = 0; p < 3; ++p)
+        for (int q = 0; q < 3; ++q) a[p][q] = g[p][q] * s[p] * s[q];
+    const double c[3][3] = {
+        {a[1][1] * a[2][2] - a[1][2] * a[2][1], a[1][2] * a[2][0] - a[1][0] * a[2][2], a[1][0] * a[2][1] - a[1][1] * a[2][0]},
+        {a[0][2] * a[2][1] - a[0][1] * a[2][2], a[0][0] * a[2][2] - a[0][2] * a[2][0], a[0][1] * a[2][0] - a[0][0] * a[2][1]},
+        {a[0][1] * a[1][2] - a[0][2] * a[1][1], a[0][2] * a[1][0] - a[0][0] * a[1][2], a[0][0] * a[1][1] - a[0][1] * a[1][0]},
+    };
+    const double det = a[0][0] * c[0][0] + a[0][1] * c[0][1] + a[0][2] * c[0][2];
+    if (!(det > 0.0)) return 0.0;
+    double norm_a = 0.0, norm_inv = 0.0;
+    for (int q = 0; q < 3; ++q) {
+        norm_a = std::max(norm_a, std::fabs(a[0][q]) + std::fabs(a[1][q]) + std::fabs(a[2][q]));
+        norm_inv = std::max(norm_inv, (std::fabs(c[q][0]) + std::fabs(c[q][1]) + std::fabs(c[q][2])) / det);
+    }
+    return 1.0 / (norm_a * norm_inv);
+}
+
+// Gaussian elimination with partial pivoting and an exact-zero pivot test, as Python's lu_solve.
+// Ruling D38b has already rejected bases singular to working precision, so the shared solver's
+// relative pivot test must not reject the systems it lets through.
+std::vector<double> solve3(Matrix m, std::vector<double> x) {
+    for (int k = 0; k < 3; ++k) {
+        int p = k;
+        for (int i = k + 1; i < 3; ++i)
+            if (std::fabs(m[i][k]) > std::fabs(m[p][k])) p = i;
+        if (m[p][k] == 0.0) throw Error("E_SINGULAR", "the matrix is singular to working precision");
+        if (p != k) {
+            std::swap(m[k], m[p]);
+            std::swap(x[k], x[p]);
+        }
+        for (int i = k + 1; i < 3; ++i) {
+            const double factor = m[i][k] / m[k][k];
+            if (factor != 0.0) {
+                for (int j = k; j < 3; ++j) m[i][j] -= factor * m[k][j];
+                x[i] -= factor * x[k];
+            }
+        }
+    }
+    for (int i = 2; i >= 0; --i) {
+        double total = x[i];
+        for (int j = i + 1; j < 3; ++j) total -= m[i][j] * x[j];
+        x[i] = total / m[i][i];
+    }
+    return x;
+}
+
+}  // namespace
+
 RobustFit robust_fit(const std::vector<double>& m, const std::vector<double>& y, double tau, double delta) {
     require_finite(m, "maturities");
     require_finite(y, "zero_rates");
@@ -363,6 +426,8 @@ RobustFit robust_fit(const std::vector<double>& m, const std::vector<double>& y,
         const double u = m[j] / tau, e = -std::expm1(-u) / u;
         x[j] = {1.0, e, e - std::exp(-u)};
     }
+    if (!(basis_rcond(x) >= robust_rcond_min))
+        throw Error("E_SINGULAR", "the Nelson-Siegel basis is singular to working precision (D38b)");
     const auto residuals = [&](const std::vector<double>& b) {
         std::vector<double> r(n);
         for (std::size_t j = 0; j < n; ++j) r[j] = x[j][0] * b[0] + x[j][1] * b[1] + x[j][2] * b[2] - y[j];
@@ -377,7 +442,7 @@ RobustFit robust_fit(const std::vector<double>& m, const std::vector<double>& y,
                 rhs[k] += x[j][k] * (w[j] * y[j] - c[j]);
                 for (int l = 0; l < 3; ++l) a[k][l] += w[j] * x[j][k] * x[j][l];
             }
-        return solve_linear(a, rhs);
+        return solve3(a, rhs);
     };
     // Primal active-set method on the dual (Nocedal and Wright, algorithm 16.3); the Python
     // implementation carries the full derivation. theta is the dual point, bound[j] the sign

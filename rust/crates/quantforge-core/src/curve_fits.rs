@@ -118,8 +118,51 @@ fn normal_solve(x: &[[f64; 3]], y: &[f64], w: &[f64], g: [f64; 3]) -> Result<[f6
     for p in 0..3 {
         rhs[p] -= g[p];
     }
-    let b = solve(&a, &rhs)?;
-    Ok([b[0], b[1], b[2]])
+    solve3(&a, &rhs)
+}
+
+/// Gaussian elimination with partial pivoting and an exact-zero pivot test, as Python's
+/// `lu_solve`. Ruling D38b has already rejected bases singular to working precision, so the
+/// shared solver's relative pivot test must not reject the systems it lets through.
+fn solve3(a: &[Vec<f64>], rhs: &[f64]) -> Result<[f64; 3]> {
+    let mut m = [
+        [a[0][0], a[0][1], a[0][2]],
+        [a[1][0], a[1][1], a[1][2]],
+        [a[2][0], a[2][1], a[2][2]],
+    ];
+    let mut x = [rhs[0], rhs[1], rhs[2]];
+    for k in 0..3 {
+        let mut p = k;
+        for i in k + 1..3 {
+            if m[i][k].abs() > m[p][k].abs() {
+                p = i;
+            }
+        }
+        if m[p][k] == 0.0 {
+            return fail("E_SINGULAR", "the matrix is singular to working precision");
+        }
+        if p != k {
+            m.swap(k, p);
+            x.swap(k, p);
+        }
+        for i in k + 1..3 {
+            let factor = m[i][k] / m[k][k];
+            if factor != 0.0 {
+                for j in k..3 {
+                    m[i][j] -= factor * m[k][j];
+                }
+                x[i] -= factor * x[k];
+            }
+        }
+    }
+    for i in (0..3).rev() {
+        let mut total = x[i];
+        for j in i + 1..3 {
+            total -= m[i][j] * x[j];
+        }
+        x[i] = total / m[i][i];
+    }
+    Ok(x)
 }
 
 fn residuals(x: &[[f64; 3]], y: &[f64], b: &[f64; 3]) -> Vec<f64> {
@@ -127,6 +170,61 @@ fn residuals(x: &[[f64; 3]], y: &[f64], b: &[f64; 3]) -> Vec<f64> {
         .zip(y)
         .map(|(r, y)| r[0] * b[0] + r[1] * b[1] + r[2] * b[2] - y)
         .collect()
+}
+
+/// Ruling D38b: below this reciprocal condition number the robust fit's basis is singular.
+const RCOND_MIN: f64 = 1e-12;
+
+/// Ruling D38b: reciprocal 1-norm condition number of `X^T X` with columns scaled to unit
+/// diagonal, from the explicit 3x3 inverse (adjugate over determinant), in the same operation
+/// order as the other languages. 0 when the determinant is not positive.
+fn basis_rcond(x: &[[f64; 3]]) -> f64 {
+    let mut g = [[0.0; 3]; 3];
+    for row in x {
+        for p in 0..3 {
+            for q in 0..3 {
+                g[p][q] += row[p] * row[q];
+            }
+        }
+    }
+    let s = [
+        1.0 / g[0][0].sqrt(),
+        1.0 / g[1][1].sqrt(),
+        1.0 / g[2][2].sqrt(),
+    ];
+    let mut a = [[0.0; 3]; 3];
+    for p in 0..3 {
+        for q in 0..3 {
+            a[p][q] = g[p][q] * s[p] * s[q];
+        }
+    }
+    let c = [
+        [
+            a[1][1] * a[2][2] - a[1][2] * a[2][1],
+            a[1][2] * a[2][0] - a[1][0] * a[2][2],
+            a[1][0] * a[2][1] - a[1][1] * a[2][0],
+        ],
+        [
+            a[0][2] * a[2][1] - a[0][1] * a[2][2],
+            a[0][0] * a[2][2] - a[0][2] * a[2][0],
+            a[0][1] * a[2][0] - a[0][0] * a[2][1],
+        ],
+        [
+            a[0][1] * a[1][2] - a[0][2] * a[1][1],
+            a[0][2] * a[1][0] - a[0][0] * a[1][2],
+            a[0][0] * a[1][1] - a[0][1] * a[1][0],
+        ],
+    ];
+    let det = a[0][0] * c[0][0] + a[0][1] * c[0][1] + a[0][2] * c[0][2];
+    if det.is_nan() || det <= 0.0 {
+        return 0.0;
+    }
+    let (mut norm_a, mut norm_inv) = (0.0_f64, 0.0_f64);
+    for q in 0..3 {
+        norm_a = norm_a.max(a[0][q].abs() + a[1][q].abs() + a[2][q].abs());
+        norm_inv = norm_inv.max((c[q][0].abs() + c[q][1].abs() + c[q][2].abs()) / det);
+    }
+    1.0 / (norm_a * norm_inv)
 }
 
 /// Working-set changes allowed before `robust` gives up (never reached at full rank).
@@ -147,6 +245,13 @@ pub fn robust(maturities: &[f64], zero_rates: &[f64], tau: f64, delta: f64) -> R
         return fail("E_DOMAIN", "tau, delta and maturities must be positive");
     }
     let x: Vec<[f64; 3]> = maturities.iter().map(|m| ns_row(*m, tau)).collect();
+    let rcond = basis_rcond(&x);
+    if rcond.is_nan() || rcond < RCOND_MIN {
+        return fail(
+            "E_SINGULAR",
+            "the Nelson-Siegel basis is singular to working precision (D38b)",
+        );
+    }
     // Primal active-set method on the dual (Nocedal and Wright, algorithm 16.3); the Python
     // implementation carries the full derivation. theta is the dual point, bound[j] the sign
     // s_j of a theta_j held at s_j delta (0 when free); the betas solve the inlier/outlier

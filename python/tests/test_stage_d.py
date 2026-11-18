@@ -441,7 +441,7 @@ NEAR_THRESHOLD = [
 
 @pytest.mark.parametrize("ms,ys,tau,delta", NEAR_THRESHOLD)
 def test_robust_converges_with_a_residual_near_delta(ms, ys, tau, delta) -> None:
-    betas, res, out, obj = curve_fits.robust(ms, ys, tau, delta)
+    _, res, out, _ = curve_fits.robust(ms, ys, tau, delta)
     xs = [curve_fits._basis(m, tau) for m in ms]
     for p in range(3):
         g = sum(max(-delta, min(delta, r)) * x[p] for r, x in zip(res, xs, strict=True))
