@@ -454,7 +454,8 @@ CaseResult run_case(string_view text) {
         const bool research =
             op_name.starts_with("research.") || op_name == "risk.contrib.euler" || op_name == "risk.backtest.es_z2" ||
             op_name == "exec.tca.shortfall" ||  // HR-9: TCA fills limit 1,000,000
-            op_name == "micro.book.rebuild" || op_name == "exec.sim.lit.run";  // stage H wave 2 page limits
+            op_name == "micro.book.rebuild" || op_name == "exec.sim.lit.run" || op_name == "exec.sim.dark.run" ||
+            op_name == "exec.sor.allocate";  // stage H wave 2 page limits
         const bool big = !research && oversized(inputs);
         Out out;
         out.values.begin_object();
