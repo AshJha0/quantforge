@@ -62,7 +62,7 @@ def test_golden(case: dict[str, Any]) -> None:
         assert r["error"]["code"] == exp["error_code"], r
     else:
         assert "outputs" in r, r
-        _close(r["outputs"], {k: v for k, v in exp.items() if k != "status"})
+        _close(r["outputs"], exp["outputs"])
 
 
 def test_units_outputs_are_integers() -> None:

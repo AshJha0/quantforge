@@ -17,12 +17,14 @@
    },
    "expected": {
     "status": "ok",
-    "slices": [
-     250,
-     250,
-     250,
-     250
-    ]
+    "outputs": {
+     "slices": [
+      250,
+      250,
+      250,
+      250
+     ]
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -46,10 +48,12 @@
    },
    "expected": {
     "status": "ok",
-    "slices": [
-     600,
-     400
-    ]
+    "outputs": {
+     "slices": [
+      600,
+      400
+     ]
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -73,10 +77,12 @@
    },
    "expected": {
     "status": "ok",
-    "slices": [
-     601,
-     400
-    ]
+    "outputs": {
+     "slices": [
+      601,
+      400
+     ]
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -100,11 +106,13 @@
    },
    "expected": {
     "status": "ok",
-    "slices": [
-     1100,
-     600,
-     400
-    ]
+    "outputs": {
+     "slices": [
+      1100,
+      600,
+      400
+     ]
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -182,13 +190,15 @@
    },
    "expected": {
     "status": "ok",
-    "auction_quantity": 5000,
-    "slices": [
-     625,
-     625,
-     1250,
-     2500
-    ]
+    "outputs": {
+     "auction_quantity": 5000,
+     "slices": [
+      625,
+      625,
+      1250,
+      2500
+     ]
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -218,13 +228,15 @@
    },
    "expected": {
     "status": "ok",
-    "auction_quantity": 3000,
-    "slices": [
-     0,
-     0,
-     0,
-     0
-    ]
+    "outputs": {
+     "auction_quantity": 3000,
+     "slices": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -253,12 +265,14 @@
    },
    "expected": {
     "status": "ok",
-    "auction_quantity": 5000,
-    "slices": [
-     1668,
-     1667,
-     1667
-    ]
+    "outputs": {
+     "auction_quantity": 5000,
+     "slices": [
+      1668,
+      1667,
+      1667
+     ]
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -363,18 +377,20 @@
    },
    "expected": {
     "status": "ok",
-    "slices": [
-     400,
-     600
-    ],
-    "avg_prices": [
-     100.0,
-     100.1
-    ],
-    "filled": 1000,
-    "residual": 0,
-    "notional": 100060,
-    "avg_fill_price": 100.06
+    "outputs": {
+     "slices": [
+      400,
+      600
+     ],
+     "avg_prices": [
+      100.0,
+      100.1
+     ],
+     "filled": 1000,
+     "residual": 0,
+     "notional": 100060,
+     "avg_fill_price": 100.06
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -416,18 +432,20 @@
    },
    "expected": {
     "status": "ok",
-    "slices": [
-     300,
-     0
-    ],
-    "avg_prices": [
-     100.0,
-     null
-    ],
-    "filled": 300,
-    "residual": 700,
-    "notional": 30000,
-    "avg_fill_price": 100.0
+    "outputs": {
+     "slices": [
+      300,
+      0
+     ],
+     "avg_prices": [
+      100.0,
+      null
+     ],
+     "filled": 300,
+     "residual": 700,
+     "notional": 30000,
+     "avg_fill_price": 100.0
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -473,18 +491,20 @@
    },
    "expected": {
     "status": "ok",
-    "slices": [
-     200,
-     300
-    ],
-    "avg_prices": [
-     100.0,
-     99.95
-    ],
-    "filled": 500,
-    "residual": 0,
-    "notional": 49985,
-    "avg_fill_price": 99.97
+    "outputs": {
+     "slices": [
+      200,
+      300
+     ],
+     "avg_prices": [
+      100.0,
+      99.95
+     ],
+     "filled": 500,
+     "residual": 0,
+     "notional": 49985,
+     "avg_fill_price": 99.97
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -524,16 +544,18 @@
    },
    "expected": {
     "status": "ok",
-    "slices": [
-     1000
-    ],
-    "avg_prices": [
-     100.55
-    ],
-    "filled": 1000,
-    "residual": 0,
-    "notional": 100550,
-    "avg_fill_price": 100.55
+    "outputs": {
+     "slices": [
+      1000
+     ],
+     "avg_prices": [
+      100.55
+     ],
+     "filled": 1000,
+     "residual": 0,
+     "notional": 100550,
+     "avg_fill_price": 100.55
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -633,25 +655,27 @@
    },
    "expected": {
     "status": "ok",
-    "slices_a": [
-     250,
-     250,
-     250,
-     250
-    ],
-    "slices_b": [
-     500,
-     500,
-     500,
-     500
-    ],
-    "quantity_b": 2000,
-    "cash_imbalance": [
-     0,
-     0,
-     0,
-     0
-    ]
+    "outputs": {
+     "slices_a": [
+      250,
+      250,
+      250,
+      250
+     ],
+     "slices_b": [
+      500,
+      500,
+      500,
+      500
+     ],
+     "quantity_b": 2000,
+     "cash_imbalance": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -683,22 +707,24 @@
    },
    "expected": {
     "status": "ok",
-    "slices_a": [
-     334,
-     333,
-     333
-    ],
-    "slices_b": [
-     143,
-     143,
-     143
-    ],
-    "quantity_b": 429,
-    "cash_imbalance": [
-     10,
-     -10,
-     -30
-    ]
+    "outputs": {
+     "slices_a": [
+      334,
+      333,
+      333
+     ],
+     "slices_b": [
+      143,
+      143,
+      143
+     ],
+     "quantity_b": 429,
+     "cash_imbalance": [
+      10,
+      -10,
+      -30
+     ]
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -731,19 +757,21 @@
    },
    "expected": {
     "status": "ok",
-    "slices_a": [
-     500,
-     500
-    ],
-    "slices_b": [
-     400,
-     400
-    ],
-    "quantity_b": 800,
-    "cash_imbalance": [
-     30000,
-     60000
-    ]
+    "outputs": {
+     "slices_a": [
+      500,
+      500
+     ],
+     "slices_b": [
+      400,
+      400
+     ],
+     "quantity_b": 800,
+     "cash_imbalance": [
+      30000,
+      60000
+     ]
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -847,25 +875,27 @@
    },
    "expected": {
     "status": "ok",
-    "slices": [
-     [
-      150,
-      150
+    "outputs": {
+     "slices": [
+      [
+       150,
+       150
+      ],
+      [
+       100,
+       100
+      ],
+      [
+       350,
+       350
+      ]
      ],
-     [
-      100,
-      100
+     "cash_imbalance": [
+      0,
+      0
      ],
-     [
-      350,
-      350
-     ]
-    ],
-    "cash_imbalance": [
-     0,
-     0
-    ],
-    "gross_notional": 14000
+     "gross_notional": 14000
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -899,21 +929,23 @@
    },
    "expected": {
     "status": "ok",
-    "slices": [
-     [
-      2,
-      1
+    "outputs": {
+     "slices": [
+      [
+       2,
+       1
+      ],
+      [
+       1,
+       0
+      ]
      ],
-     [
-      1,
+     "cash_imbalance": [
+      -10,
       0
-     ]
-    ],
-    "cash_imbalance": [
-     -10,
-     0
-    ],
-    "gross_notional": 60
+     ],
+     "gross_notional": 60
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [

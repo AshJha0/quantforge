@@ -26,14 +26,16 @@
    },
    "expected": {
     "status": "ok",
-    "istar_bps": 2.8,
-    "impact_bps": 1.54,
-    "spread_bps": 1.5,
-    "expected_cost_bps": 3.04,
-    "duration_days": 0.16,
-    "timing_risk_bps": 46.1880215352,
-    "expected_cost": 608,
-    "timing_risk": 9237.60430703
+    "outputs": {
+     "istar_bps": 2.8,
+     "impact_bps": 1.54,
+     "spread_bps": 1.5,
+     "expected_cost_bps": 3.04,
+     "duration_days": 0.16,
+     "timing_risk_bps": 46.1880215352,
+     "expected_cost": 608,
+     "timing_risk": 9237.60430703
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -65,12 +67,14 @@
    },
    "expected": {
     "status": "ok",
-    "istar_bps": 1.4,
-    "impact_bps": 0.28,
-    "spread_bps": 0,
-    "expected_cost_bps": 0.28,
-    "duration_days": 2.5,
-    "timing_risk_bps": 182.574185835
+    "outputs": {
+     "istar_bps": 1.4,
+     "impact_bps": 0.28,
+     "spread_bps": 0,
+     "expected_cost_bps": 0.28,
+     "duration_days": 2.5,
+     "timing_risk_bps": 182.574185835
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -204,14 +208,16 @@
    },
    "expected": {
     "status": "ok",
-    "delay": 80,
-    "impact": 60,
-    "spread": 40,
-    "execution": 100,
-    "opportunity": 200,
-    "fees": 5,
-    "total": 385,
-    "total_bps": 38.5
+    "outputs": {
+     "delay": 80,
+     "impact": 60,
+     "spread": 40,
+     "execution": 100,
+     "opportunity": 200,
+     "fees": 5,
+     "total": 385,
+     "total_bps": 38.5
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -249,14 +255,16 @@
    },
    "expected": {
     "status": "ok",
-    "delay": 0,
-    "impact": 125,
-    "spread": 75,
-    "execution": 200,
-    "opportunity": 0,
-    "fees": 2,
-    "total": 202,
-    "total_bps": 20.2
+    "outputs": {
+     "delay": 0,
+     "impact": 125,
+     "spread": 75,
+     "execution": 200,
+     "opportunity": 0,
+     "fees": 2,
+     "total": 202,
+     "total_bps": 20.2
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -289,14 +297,16 @@
    },
    "expected": {
     "status": "ok",
-    "delay": 50,
-    "impact": 5,
-    "spread": -5,
-    "execution": 0,
-    "opportunity": 0,
-    "fees": 0,
-    "total": 50,
-    "total_bps": 50.2512562814
+    "outputs": {
+     "delay": 50,
+     "impact": 5,
+     "spread": -5,
+     "execution": 0,
+     "opportunity": 0,
+     "fees": 0,
+     "total": 50,
+     "total_bps": 50.2512562814
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
@@ -323,14 +333,16 @@
    },
    "expected": {
     "status": "ok",
-    "delay": 0,
-    "impact": 0,
-    "spread": 0,
-    "execution": 0,
-    "opportunity": 100,
-    "fees": 0,
-    "total": 100,
-    "total_bps": 100
+    "outputs": {
+     "delay": 0,
+     "impact": 0,
+     "spread": 0,
+     "execution": 0,
+     "opportunity": 100,
+     "fees": 0,
+     "total": 100,
+     "total_bps": 100
+    }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
