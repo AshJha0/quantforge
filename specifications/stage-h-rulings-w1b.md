@@ -1,8 +1,10 @@
-# Stage H rulings, wave 1b (spec lane): DRAFT
+# Stage H rulings, wave 1b (spec lane): confirmed 2026-11-18
 
-DRAFT written 2026-11-17, after v0.9.0. Not normative until the stage H coordinator confirms it. Separate file from `stage-h-rulings-w1.md` (HR-1 to HR-10) so the branches merge without conflict; numbering continues. Covers `09-microstructure/order-book.md`, `09-microstructure/low-latency-book.md`, `10-execution/lit-matching.md`, `10-execution/dark-pool.md`, `10-execution/smart-order-router.md`. Append-only once confirmed.
+Drafted 2026-11-17, after v0.9.0. Not normative until the stage H coordinator confirms it. Separate file from `stage-h-rulings-w1.md` (HR-1 to HR-10) so the branches merge without conflict; numbering continues. Covers `09-microstructure/order-book.md`, `09-microstructure/low-latency-book.md`, `10-execution/lit-matching.md`, `10-execution/dark-pool.md`, `10-execution/smart-order-router.md`. Append-only once confirmed.
 
-| # | Point | Ruling (proposed) |
+**Confirmed 2026-11-18 by the stage H coordinator (spec lane).** Each ruling checked against `order-book.md`, `low-latency-book.md`, `lit-matching.md`, `dark-pool.md` and `smart-order-router.md`, the sources those files record as read ([KR-BOOK], [KR-CRC], [KR-L3], [KR-ADD], [CK], [CST10]) and DR-H2. All 31 confirmed; none left proposed. One change: HR-23 now names `09-microstructure/low-latency-targets.md` as the place the H-9 targets are fixed (with L1 to L6 rows mirrored in `benchmarks/targets.md`), because the targets need per-workload and per-query rows and their sources, which the T-table layout does not hold; the rule itself (targets fixed before any H-9 run, own commit) is unchanged. Notes, not changes: HR-13's checksum variant is confirmed as a rule; whether Kraken's recorded `ok = true` rows agree is the local-only test of HR-41 and is not yet run. HR-35's 14 Gaver-Stehfest terms stand until the published term sweep in `dark-pool.md` shows otherwise.
+
+| # | Point | Ruling |
 |---|---|---|
 | HR-11 | Recorder input for H-2 and H-9 | **Owner decisions 2026-11-17.** First "yes, record raw": raw Kraken book messages were recorded from 20:29 UTC under `<SYMBOL>-raw/` (recorder commit 547e6690, branch `hedge-followups-0918`). Then **reversed for disk space**: about 0.5 GB a day against about 29 GB free, so raw recording is off from 20:43 UTC (a `NO_RAW` file in the data folder; the code can still record raw). Result: H-2 and H-9 run in form B on the per-second 100-level snapshots, labelled. The 14-minute raw sample (20:29 to 20:43 UTC, both symbols, about 5.7 MB) is kept and used only as a labelled form A demonstration, not pooled with form B and not counted as an H-2 day. Route to form A: re-enable raw recording with the data folder on a larger drive; raw days then run in form A and become the H-2 result |
 | HR-12 | Number representation | Prices and quantities are decimal strings at the venue's precision in inputs and outputs; internally integer ticks and lots. Floats never touch the checksum path ([KR-CRC]) |
@@ -16,7 +18,7 @@ DRAFT written 2026-11-17, after v0.9.0. Not normative until the stage H coordina
 | HR-20 | Hot-path units | Integer ticks and lots, pre-decoded fixed-size messages; parsing excluded from timing |
 | HR-21 | Timing method | Per-message clock pairs, clock overhead published not subtracted; batch timing added if overhead exceeds half the p50; unpaced replay, so no coordinated-omission correction |
 | HR-22 | Allocation gate | C++ and Rust: counting allocator, exactly 0 after warm-up. Java: JFR and GC logs, miss published with bytes per message. Python: reported only |
-| HR-23 | Targets | L1 to L6 written to `benchmarks/targets.md` in their own commit before any H-9 run |
+| HR-23 | Targets | Fixed in `09-microstructure/low-latency-targets.md` (2026-11-18), with rows L1 to L6 mirrored in `benchmarks/targets.md`, in their own commit before any H-9 run (changed at confirmation: file named) |
 | HR-24 | CI threshold | p99 threshold = max(20%, 3 x CV of 10 runner baselines); median of 3 PR runs; baseline refreshed only by its own commit |
 | HR-25 | Lit order types | LIMIT, MARKET, IOC, FOK, ICEBERG, POST_ONLY, PEG_MID, PEG_PRIMARY as in `lit-matching.md`; GTD and auctions out of wave 1b |
 | HR-26 | Post-only crossing | Rejected (not repriced) |

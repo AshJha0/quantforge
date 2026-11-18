@@ -1,6 +1,6 @@
-# Smart order router over simulated venues (DRAFT)
+# Smart order router over simulated venues
 
-Spec version 0.1.0 (DRAFT, stage H wave 1b). Status: Specified, not implemented. Rulings HR-37 to HR-40. Plan items 15.1 "Smart order router (simulated)", 14.7 H-4. **Labelled "simulated venues; router scored in simulation only".**
+Spec version 0.1.0 (stage H wave 1b; confirmed 2026-11-18 by the stage H coordinator). Status: Specified, not implemented. Rulings HR-37 to HR-40. Plan items 15.1 "Smart order router (simulated)", 14.7 H-4. **Labelled "simulated venues; router scored in simulation only".**
 
 **Plain idea.** To buy S units, send some as a market order now and post limit orders at several venues, more in total than needed if fills are uncertain; choose the split that minimises expected cost including fees, rebates, the risk of filling too little or too much, and impact.
 

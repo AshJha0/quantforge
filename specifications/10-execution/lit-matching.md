@@ -1,6 +1,6 @@
-# Simulated lit matching engine (DRAFT)
+# Simulated lit matching engine
 
-Spec version 0.1.0 (DRAFT, stage H wave 1b). Status: Specified, not implemented. Rulings HR-25 to HR-31. Plan items 15.1 "Lit book (simulated)", 14.7 H-4 (method tests on a simulated book with known truth). **Every output is labelled "simulated venue; not a real exchange".** No real venue's rule book is reproduced; the rules below are a small, stated subset chosen to match common published practice.
+Spec version 0.1.0 (stage H wave 1b; confirmed 2026-11-18 by the stage H coordinator). Status: Specified, not implemented. Rulings HR-25 to HR-31. Plan items 15.1 "Lit book (simulated)", 14.7 H-4 (method tests on a simulated book with known truth). **Every output is labelled "simulated venue; not a real exchange".** No real venue's rule book is reproduced; the rules below are a small, stated subset chosen to match common published practice.
 
 **Plain idea.** Orders rest at their price; at one price, the first to arrive is filled first. An incoming order trades against the best opposite prices while it is marketable, then rests, is cancelled, or is rejected according to its type.
 
