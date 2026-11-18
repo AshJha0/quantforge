@@ -244,3 +244,176 @@ pub fn passive_vs_aggressive(passive: &[f64], aggressive: &[f64]) -> Result<Esti
         se: (av / aggressive.len() as f64 + pv / passive.len() as f64).sqrt(),
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn code(r: Result<impl std::fmt::Debug>) -> (&'static str, String) {
+        let e = r.unwrap_err();
+        (e.code, e.field.unwrap_or_default())
+    }
+
+    #[test]
+    fn arrival_rate_values_and_errors() {
+        let e = arrival_rate(50, 10.0).unwrap();
+        assert_eq!((e.value, e.se), (5.0, 0.5_f64.sqrt()));
+        assert_eq!(
+            code(arrival_rate(1, f64::NAN)),
+            ("E_DOMAIN", "window".into())
+        );
+        assert_eq!(code(arrival_rate(-1, 1.0)), ("E_DOMAIN", "count".into()));
+        assert_eq!(code(arrival_rate(1, 0.0)), ("E_DOMAIN", "window".into()));
+    }
+
+    #[test]
+    fn cancel_rate_values_and_errors() {
+        let e = cancel_rate(&[(1.0, true), (3.0, false), (4.0, true)]).unwrap();
+        assert_eq!(e.value, 0.25);
+        assert_eq!(e.se, 0.25 / 2.0_f64.sqrt());
+        assert_eq!(
+            code(cancel_rate(&[(f64::INFINITY, true)])),
+            ("E_DOMAIN", "orders".into())
+        );
+        assert_eq!(
+            code(cancel_rate(&[(0.0, true)])),
+            ("E_DOMAIN", "orders".into())
+        );
+        assert_eq!(
+            code(cancel_rate(&[(1.0, false)])),
+            ("E_INPUT", "orders".into())
+        );
+    }
+
+    #[test]
+    fn resilience_exact_fit_and_errors() {
+        // S - 1 = e^{-2t}: kappa 2, exact fit.
+        let pts: Vec<(f64, f64)> = (0..4)
+            .map(|t| (f64::from(t), 1.0 + (-2.0 * f64::from(t)).exp()))
+            .collect();
+        let e = resilience(1.0, &pts).unwrap();
+        assert!((e.value - 2.0).abs() < 1e-12 && e.se < 1e-7);
+        assert_eq!(
+            code(resilience(f64::NAN, &pts)),
+            ("E_DOMAIN", "s_inf".into())
+        );
+        assert_eq!(
+            code(resilience(1.0, &[(0.0, f64::NAN)])),
+            ("E_DOMAIN", "points".into())
+        );
+        assert_eq!(
+            code(resilience(1.0, &pts[..2])),
+            ("E_INPUT", "points".into())
+        );
+        assert_eq!(code(resilience(5.0, &pts)), ("E_DOMAIN", "points".into()));
+        let same_t = [(1.0, 2.0), (1.0, 3.0), (1.0, 4.0)];
+        assert_eq!(code(resilience(1.0, &same_t)), ("E_INPUT", "points".into()));
+    }
+
+    #[test]
+    fn liquidity_decay_values_and_errors() {
+        let lv: Vec<(f64, f64)> = (0..5)
+            .map(|k| (f64::from(k), 100.0 * (-0.5 * f64::from(k)).exp()))
+            .collect();
+        let e = liquidity_decay(&lv).unwrap();
+        assert!((e.value - 0.5).abs() < 1e-12);
+        assert_eq!(
+            code(liquidity_decay(&[(0.0, f64::INFINITY)])),
+            ("E_DOMAIN", "levels".into())
+        );
+        assert_eq!(
+            code(liquidity_decay(&lv[..2])),
+            ("E_INPUT", "levels".into())
+        );
+        assert_eq!(
+            code(liquidity_decay(&[(0.0, 1.0), (1.0, 0.0), (2.0, 1.0)])),
+            ("E_DOMAIN", "levels".into())
+        );
+        assert_eq!(
+            code(liquidity_decay(&[(2.0, 1.0), (2.0, 2.0), (2.0, 3.0)])),
+            ("E_INPUT", "levels".into())
+        );
+    }
+
+    #[test]
+    fn adverse_selection_values_and_errors() {
+        let e = adverse_selection(&[1.0, 2.0, 3.0], &[2.0, 4.0, 6.0]).unwrap();
+        assert_eq!((e.value, e.se), (2.0, 0.0));
+        assert_eq!(
+            code(adverse_selection(&[f64::NAN], &[1.0])),
+            ("E_DOMAIN", "x".into())
+        );
+        assert_eq!(
+            code(adverse_selection(&[1.0], &[f64::NAN])),
+            ("E_DOMAIN", "y".into())
+        );
+        assert_eq!(
+            code(adverse_selection(&[1.0, 2.0], &[1.0])),
+            ("E_INPUT", "x".into())
+        );
+        assert_eq!(
+            code(adverse_selection(&[0.0, 0.0], &[1.0, 2.0])),
+            ("E_INPUT", "x".into())
+        );
+    }
+
+    fn reg(name: &str, x: &[f64], y: &[f64]) -> (String, Sample) {
+        (
+            name.into(),
+            Sample {
+                x: x.to_vec(),
+                y: y.to_vec(),
+            },
+        )
+    }
+
+    #[test]
+    fn regime_impact_values_and_errors() {
+        let calm = reg("calm", &[1.0, 2.0], &[1.0, 2.0]);
+        let stressed = reg("stressed", &[1.0, 2.0], &[3.0, 6.0]);
+        let (out, ratio) = regime_impact(&[stressed.clone(), calm.clone()]).unwrap();
+        assert_eq!(
+            out.iter().map(|r| r.0.as_str()).collect::<Vec<_>>(),
+            ["calm", "stressed"]
+        );
+        assert_eq!(ratio, 3.0);
+        let bad = reg("calm", &[f64::NAN, 1.0], &[1.0, 1.0]);
+        assert_eq!(code(regime_impact(&[bad, stressed.clone()])).0, "E_DOMAIN");
+        assert_eq!(
+            code(regime_impact(std::slice::from_ref(&calm))),
+            ("E_INPUT", "regimes".into())
+        );
+        let short = reg("stressed", &[1.0], &[1.0]);
+        assert_eq!(
+            code(regime_impact(&[calm.clone(), short])),
+            ("E_INPUT", "regimes.stressed".into())
+        );
+        let zero = reg("calm", &[1.0, 2.0], &[0.0, 0.0]);
+        assert_eq!(
+            code(regime_impact(&[zero, stressed])),
+            ("E_DOMAIN", "regimes".into())
+        );
+    }
+
+    #[test]
+    fn passive_vs_aggressive_values_and_errors() {
+        let e = passive_vs_aggressive(&[1.0, 3.0], &[4.0, 6.0]).unwrap();
+        assert_eq!((e.value, e.se), (3.0, 2.0_f64.sqrt())); // var 2 in each class: sqrt(2/2 + 2/2)
+        assert_eq!(
+            code(passive_vs_aggressive(&[f64::NAN, 1.0], &[1.0, 2.0])),
+            ("E_DOMAIN", "passive".into())
+        );
+        assert_eq!(
+            code(passive_vs_aggressive(&[1.0, 2.0], &[f64::NAN, 1.0])),
+            ("E_DOMAIN", "aggressive".into())
+        );
+        assert_eq!(
+            code(passive_vs_aggressive(&[1.0], &[1.0, 2.0])),
+            ("E_INPUT", "passive".into())
+        );
+        assert_eq!(
+            code(passive_vs_aggressive(&[1.0, 2.0], &[1.0])),
+            ("E_INPUT", "aggressive".into())
+        );
+    }
+}

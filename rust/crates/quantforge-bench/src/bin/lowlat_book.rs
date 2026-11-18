@@ -240,7 +240,8 @@ fn ns(t: Instant) -> u64 {
     t.elapsed().as_nanos() as u64
 }
 
-fn timed_run(msgs: &[Msg], levels: &[Level], qseed: u64) -> String {
+/// One timed run after `warmup` unmeasured messages (the harness uses `WARMUP`; tests a short stream).
+fn timed_run_with(msgs: &[Msg], levels: &[Level], qseed: u64, warmup: usize) -> String {
     let mut all = Hist::new();
     let mut kinds: Vec<Hist> = (0..KINDS.len()).map(|_| Hist::new()).collect();
     let mut queries: Vec<Hist> = (0..QUERIES.len()).map(|_| Hist::new()).collect();
@@ -251,18 +252,18 @@ fn timed_run(msgs: &[Msg], levels: &[Level], qseed: u64) -> String {
     let sides: Vec<bool> = (0..1024).map(|_| r.next_u64() & 1 == 1).collect();
     let mut buf = vec![Level::default(); DEPTH];
     let mut b = Book::new(DEPTH);
-    for m in &msgs[..WARMUP] {
+    for m in &msgs[..warmup] {
         b.apply(m, levels);
     }
     let far0 = b.far_lookups();
     ALLOCS.store(0, Ordering::Relaxed);
-    for (i, m) in msgs.iter().enumerate().skip(WARMUP) {
+    for (i, m) in msgs.iter().enumerate().skip(warmup) {
         let t0 = Instant::now();
         b.apply(black_box(m), levels);
         let dt = ns(t0);
         all.record(dt);
         kinds[usize::from(m.reserved)].record(dt);
-        if (i - WARMUP) % 1000 == 999 {
+        if (i - warmup) % 1000 == 999 {
             let a = Instant::now();
             black_box(b.best_bid());
             queries[0].record(ns(a));
@@ -341,11 +342,11 @@ fn timed_run(msgs: &[Msg], levels: &[Level], qseed: u64) -> String {
     let grows = b.grows();
     let fallbacks = b.index_fallbacks();
     let mut b = Book::new(DEPTH);
-    for m in &msgs[..WARMUP] {
+    for m in &msgs[..warmup] {
         b.apply(m, levels);
     }
     ALLOCS.store(0, Ordering::Relaxed);
-    let mut i = WARMUP;
+    let mut i = warmup;
     while i + 1000 <= msgs.len() {
         let t0 = Instant::now();
         for m in &msgs[i..i + 1000] {
@@ -387,26 +388,27 @@ fn timed_run(msgs: &[Msg], levels: &[Level], qseed: u64) -> String {
     )
 }
 
-fn main() {
-    let args: Vec<String> = std::env::args().collect();
+/// The whole harness for `args` (as `std::env::args`), with the warm-up length and the number of clock pairs as
+/// parameters; returns the exit code. `main` passes the specified 1,000,000 and 1,000,000.
+fn run(args: &[String], warmup: usize, clock_pairs: usize) -> i32 {
     if args.len() < 2 {
         eprintln!("usage: lowlat_book <workload S file> [runs] [out.json]");
-        std::process::exit(2);
+        return 2;
     }
     let (msgs, levels) = read_stream(&args[1]);
     let runs: u64 = args.get(2).map_or(5, |s| s.parse().expect("runs"));
     let bad = verify(&msgs, &levels);
     let mut clock = Hist::new();
-    for _ in 0..1_000_000 {
+    for _ in 0..clock_pairs {
         let a = Instant::now();
         clock.record(ns(black_box(a)));
     }
     let runs_json = (0..runs)
-        .map(|k| timed_run(&msgs, &levels, SEED + 1 + k))
+        .map(|k| timed_run_with(&msgs, &levels, SEED + 1 + k, warmup))
         .collect::<Vec<_>>()
         .join(",");
     let out = format!(
-        "{{\"workload\":\"S\",\"messages\":{},\"warmup\":{WARMUP},\"depth\":100,\"alloc_method\":\"counting #[global_allocator]\",\
+        "{{\"workload\":\"S\",\"messages\":{},\"warmup\":{warmup},\"depth\":100,\"alloc_method\":\"counting #[global_allocator]\",\
          \"correctness_mismatches\":{bad},\"clock_overhead\":{},\"runs\":[{runs_json}]}}\n",
         msgs.len(),
         clock.json()
@@ -415,5 +417,14 @@ fn main() {
         Some(p) => std::fs::write(p, out).expect("write results"),
         None => print!("{out}"),
     }
-    std::process::exit(i32::from(bad != 0));
+    i32::from(bad != 0)
 }
+
+fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    std::process::exit(run(&args, WARMUP, 1_000_000));
+}
+
+#[cfg(test)]
+#[path = "lowlat_book/tests.rs"]
+mod tests;
