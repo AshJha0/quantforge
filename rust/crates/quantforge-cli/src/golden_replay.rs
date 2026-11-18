@@ -439,3 +439,9 @@ fn stage_j_w1_goldens() {
 fn stage_h_w2_goldens() {
     replay_only("stage_h", &["ob_h", "lit_h"], 29);
 }
+
+/// The stage H wave 2 microstructure estimator (`mest_h`) and venue analytics (`venue_h`) goldens.
+#[test]
+fn stage_h_micro_goldens() {
+    replay_only("stage_h", &["mest_h", "venue_h"], 27);
+}
