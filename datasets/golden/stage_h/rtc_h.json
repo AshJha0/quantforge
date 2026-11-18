@@ -89,13 +89,14 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md, rates packet 2): MATCH"
    ],
    "tags": [
     "stage_h",
     "multiasset"
    ],
-   "description": "rtc_h-0004 from the spec table, value re-derived under HR-109 (CME quarters); not blind"
+   "description": "rtc_h-0004: blind in rates packet 2 (HR-114), was hand-only"
   },
   {
    "case_id": "rtc_h-0011",
@@ -114,13 +115,14 @@
    },
    "tolerance_class": "root_finding",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md, rates packet 2): MATCH"
    ],
    "tags": [
     "stage_h",
     "multiasset"
    ],
-   "description": "rtc_h-0011 hand: yield solve (HR-92) (source check 2026-11-18); not blind"
+   "description": "rtc_h-0011: blind in rates packet 2 (HR-114), was hand-only"
   },
   {
    "case_id": "rtc_h-0012",
@@ -139,13 +141,14 @@
    },
    "tolerance_class": "root_finding",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md, rates packet 2): MATCH"
    ],
    "tags": [
     "stage_h",
     "multiasset"
    ],
-   "description": "rtc_h-0012 hand: yield solve (HR-92) (source check 2026-11-18); not blind"
+   "description": "rtc_h-0012: blind in rates packet 2 (HR-114), was hand-only"
   },
   {
    "case_id": "rtc_h-0005",
@@ -208,13 +211,14 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md, rates packet 2): MATCH by value; representation only"
    ],
    "tags": [
     "stage_h",
     "multiasset"
    ],
-   "description": "rtc_h-0007 from the spec table; not blind: 15.625 printed in the spec text (soft leak)"
+   "description": "rtc_h-0007: blind in rates packet 2 (HR-114), was hand-only"
   },
   {
    "case_id": "rtc_h-0008",

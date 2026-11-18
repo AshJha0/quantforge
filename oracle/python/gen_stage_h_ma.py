@@ -47,7 +47,14 @@ FX = "simulated venue; not a real exchange; no real FX data"
 RT = "simulated venue; not a real exchange; no real rates data"
 
 
+RATES2 = {"rtc_h-0004": "MATCH", "rtc_h-0011": "MATCH", "rtc_h-0012": "MATCH",
+          "rtc_h-0007": "MATCH by value; representation only", "fut_h-0004": "MATCH by value; representation only",
+          "fut_h-0005": "MATCH by value; representation only", "fut_h-0006": "MATCH by value; representation only"}
+
+
 def verified(cid):
+    if cid in RATES2:  # second blind lane, HR-114 (packet 2 had the rulings and no expected values)
+        return ["hand", f"blind-rederivation (DR-H2, {REC}, rates packet 2): {RATES2[cid]}"]
     if cid in NOT_BLIND:
         return ["hand"]
     if cid in REPR:
@@ -383,10 +390,10 @@ def build():
             if err is None:
                 assert name == "acls_h" or ("label" in exp) == (name in VENUE_SUITES or "exec." in op), cid  # A4, HR-94 as ruled
             desc = f"{cid} from the spec table" + (f"; not blind: {NOT_BLIND[cid]}" if cid in NOT_BLIND else "")
-            if cid in ADDED:
+            if cid in RATES2:
+                desc = f"{cid}: blind in rates packet 2 (HR-114), was hand-only"
+            elif cid in ADDED:
                 desc = f"{cid} hand: {ADDED[cid]} (source check 2026-11-18); not blind"
-            if cid == "rtc_h-0004":
-                desc = "rtc_h-0004 from the spec table, value re-derived under HR-109 (CME quarters); not blind"
             if name == "auc_h" and cid not in ("auc_h-0001", "auc_h-0002", "auc_h-0009"):
                 desc += "; fills, residual and cancelled hand-derived (the table states price, volume, imbalance)"
             cls = "root_finding" if op == "micro.rates.bond_yield" else "date_and_convention"
