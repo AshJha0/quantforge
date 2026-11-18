@@ -420,7 +420,7 @@ Rulings `stage-h-rulings-w1.md` HR-1 to HR-10 (confirmed 2026-11-18). No new err
 
 ## Stage H wave 2 operations
 
-No new error code. Prices, quantities and fees are decimal strings (HR-12); outputs are canonical JSON (HR-29). The specs' Errors lines give the page limits (`micro.book.rebuild` 50,000,000 messages, HR-17; `exec.sim.lit.run` 10,000,000 events), which replace the general per-array limit for those arrays. Goldens `datasets/golden/stage_h/ob_h.json`, `lit_h.json`, `dark_h.json` and `sor_h.json` (`oracle/python/gen_stage_h_w2.py`). `micro.book.rebuild` and `exec.sim.lit.run` are implemented in all four builds. `exec.sim.dark.run`, `exec.sim.dark.markouts` and `exec.sor.allocate` are implemented in the Python build only; the Java, C++ and Rust builds answer `E_UNSUPPORTED_OPERATION`, which the runner counts as not implemented.
+No new error code. Prices, quantities and fees are decimal strings (HR-12); outputs are canonical JSON (HR-29). The specs' Errors lines give the page limits (`micro.book.rebuild` 50,000,000 messages, HR-17; `exec.sim.lit.run` 10,000,000 events), which replace the general per-array limit for those arrays. Goldens `datasets/golden/stage_h/ob_h.json`, `lit_h.json`, `dark_h.json` and `sor_h.json` (`oracle/python/gen_stage_h_w2.py`). `micro.book.rebuild` and `exec.sim.lit.run` are implemented in all four builds. `exec.sim.dark.run`, `exec.sim.dark.markouts` and `exec.sor.allocate` are implemented in the Python and Rust builds; the Java and C++ builds answer `E_UNSUPPORTED_OPERATION`, which the runner counts as not implemented.
 
 | Prefix | Spec | Slice |
 |---|---|---|
