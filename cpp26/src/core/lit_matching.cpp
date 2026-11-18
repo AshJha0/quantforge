@@ -8,6 +8,7 @@
 // of the refresh. Pegs are stepped one tick away from the opposite best (other pegs included), so a peg never
 // takes and two PEG_MIDs never lock (the Python reference's rule, found by its property test).
 #include <algorithm>
+#include <functional>
 #include <map>
 #include <optional>
 #include <set>
@@ -17,6 +18,7 @@
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/exact_decimal.hpp"
 #include "quantforge/core/microstructure.hpp"
+#include "quantforge/core/multiasset.hpp"
 
 namespace quantforge::micro {
 namespace {
@@ -71,7 +73,14 @@ public:
     void cancel(const Value& e, const string& path);
     void modify(const Value& e, const string& path);
     void reprice();
-    void output(json::Writer& out);
+    // Session extras (HR-83): auctions written first, resting overrides for orders still in a call book, phase.
+    struct Extra {
+        std::function<void(json::Writer&)> auctions;
+        std::map<string, D> call_resting;
+        string phase;
+    };
+    void output(json::Writer& out, const Extra* extra = nullptr);
+    friend class Session;
 
 private:
     long long next_seq() { return ++seq_; }
@@ -301,7 +310,7 @@ void Engine::modify(const Value& e, const string& path) {
     }
 }
 
-void Engine::output(json::Writer& out) {
+void Engine::output(json::Writer& out, const Extra* extra) {
     const auto pair_list = [&](const char* key, const char* second, const std::vector<std::pair<string, string>>& v) {
         out.key(key);
         out.begin_array();
@@ -317,6 +326,10 @@ void Engine::output(json::Writer& out) {
     };
     // Sorted keys (HR-29): book, cancelled, conservation, fees, fills, label, mbp, rejects.
     std::map<D, D> levels[2];  // asks, bids: displayed quantity per price
+    if (extra) {
+        out.key("auctions");
+        extra->auctions(out);
+    }
     out.key("book");
     out.begin_object();
     for (const bool buy : {false, true}) {
@@ -356,6 +369,8 @@ void Engine::output(json::Writer& out) {
     for (auto& [oid, c] : cons_) {
         const auto live = resting_.find(oid);
         c.resting = live == resting_.end() ? D{} : live->second.open();
+        if (extra)
+            if (const auto cr = extra->call_resting.find(oid); cr != extra->call_resting.end()) c.resting = cr->second;
         out.key(oid);
         out.begin_object();
         const std::pair<const char*, const D*> fields[] = {{"cancelled", &c.cancelled}, {"filled", &c.filled},
@@ -415,13 +430,250 @@ void Engine::output(json::Writer& out) {
         out.end_array();
     }
     out.end_object();
+    if (extra) {
+        out.key("phase");
+        out.string(extra->phase);
+    }
     pair_list("rejects", "reason", rejects_);
 }
 
 }  // namespace
 
+constexpr std::string_view phases[] = {"PRE_OPEN", "CONTINUOUS", "PRE_CLOSE", "CLOSED"};  // HR-83
+
+int phase_index(const Value* v) {
+    if (v && v->kind == Kind::String)
+        for (int i = 0; i < 4; ++i)
+            if (phases[i] == v->text) return i;
+    return -1;
+}
+
+Value text_value(const string& s) {
+    Value v;
+    v.kind = Kind::String;
+    v.text = s;
+    return v;
+}
+
+Value int_value(const string& digits) {
+    Value v;
+    v.kind = Kind::Number;
+    v.integral = true;
+    v.text = digits;
+    return v;
+}
+
+// Writes a value built here (strings, nulls, booleans, arrays and objects only).
+void write_value(json::Writer& out, const Value& v) {
+    if (v.kind == Kind::Object) {
+        out.begin_object();
+        for (const auto& m : v.members) {
+            out.key(m.first);
+            write_value(out, m.second);
+        }
+        out.end_object();
+    } else if (v.kind == Kind::Array) {
+        out.begin_array();
+        for (const Value& x : v.items) write_value(out, x);
+        out.end_array();
+    } else {
+        out.value(v);
+    }
+}
+
+// Equity session phases (asset-conventions.md 1.3, HR-83; auction.md). In PRE_OPEN, NEW LIMIT and MARKET
+// orders collect in a call book without matching; at CONTINUOUS the call book is uncrossed by
+// exec.sim.auction.uncross (phase OPEN) and its unfilled limit orders rest in the continuous book in allocation
+// order. In PRE_CLOSE only on_close orders are accepted, into a second call book uncrossed at CLOSED (phase
+// CLOSE); unfilled on-close orders are cancelled (HR-96). Stated simplification: the continuous book does not
+// join the closing cross. Orders in the wrong phase are rejected with reason PHASE. Auction fills pay
+// auction_fee x notional.
+class Session {
+public:
+    Session(Engine& eng, const Value& raw, D fee) : eng_(eng), fee_(fee) {
+        if (raw.kind != Kind::Object) fail("E_SCHEMA", "session", "not an object");
+        if (const Value* p = raw.find("phase")) {
+            phase_ = phase_index(p);
+            if (phase_ < 0) fail("E_SCHEMA", "session/phase", "not a phase");
+        }
+        ref_ = dec(raw.find("ref_price"), "session/ref_price");
+        const Value* t = raw.find("tie_break");
+        tie_ = t ? *t : text_value("CBOE");
+    }
+
+    // True when the session handled the event (the engine must not).
+    bool event(const Value& e, std::size_t k) {
+        const Value* op = e.find("op");
+        const string path = "events/" + std::to_string(k);
+        if (op->text == "PHASE") {
+            move(e.find("phase"), path);
+            return true;
+        }
+        if (phase_ == 1) return false;
+        if (op->text == "CANCEL") {
+            const Value* id = e.find("id");
+            for (auto it = call_.begin(); it != call_.end(); ++it)
+                if (id && id->kind == Kind::String && it->id == id->text) {
+                    eng_.cancelled_.emplace_back(it->id, it->qty_dec.str());
+                    eng_.cons_[it->id].cancelled = it->qty_dec;
+                    call_.erase(it);
+                    return true;
+                }
+            return false;
+        }
+        if (op->text != "NEW") return false;
+        const Value* id = e.find("id");
+        const Value* trader = e.find("trader");
+        if (!id || id->kind != Kind::String || !trader || trader->kind != Kind::String)
+            fail("E_SCHEMA", path, "id and trader must be strings");
+        const Value* side_v = e.find("side");
+        const Value* type_v = e.find("type");
+        const bool side_ok = side_v && side_v->kind == Kind::String && (side_v->text == "BUY" || side_v->text == "SELL");
+        bool type_ok = false;
+        if (type_v && type_v->kind == Kind::String)
+            for (const auto& [name, t] : type_names) type_ok = type_ok || type_v->text == name;
+        if (!side_ok || !type_ok) fail("E_SCHEMA", path, "bad side or type");
+        bool on_close = false;
+        if (const Value* oc = e.find("on_close")) {
+            if (oc->kind != Kind::Bool) fail("E_SCHEMA", path + "/on_close", "not a boolean");
+            on_close = oc->boolean;
+        }
+        const D qty = dec(e.find("qty"), path + "/qty");
+        const bool market = type_v->text == "MARKET";
+        Price limit;
+        if (!market) limit = dec(e.find("price"), path + "/price");
+        const string& oid = id->text;
+        if (eng_.seen_.contains(oid)) throw Error("E_INPUT", path + ": duplicate id " + oid, path);
+        if (qty.sign() <= 0) fail("E_DOMAIN", path, "quantity must be positive");
+        eng_.on_grid(qty, eng_.lot_, "qty");
+        if (limit) {
+            if (limit->sign() <= 0) fail("E_DOMAIN", path, "price must be positive");
+            eng_.on_grid(*limit, eng_.tick_, "price");
+        }
+        eng_.seen_.insert(oid);
+        eng_.cons_[oid] = Cons{qty, {}, {}, {}, {}};
+        const bool ok = (type_v->text == "LIMIT" || market) && (phase_ == 0 || (phase_ == 2 && on_close));
+        if (!ok) {
+            eng_.reject(oid, "PHASE", qty);
+            return true;
+        }
+        trader_[oid] = trader->text;
+        call_.push_back({oid, side_v->text, market ? string("MARKET") : e.find("price")->text,
+                         qty.divide_integral(eng_.lot_, false).str(), qty, phase_ == 2});
+        return true;
+    }
+
+    void finish(Engine::Extra& x) const {
+        x.auctions = [this](json::Writer& out) {
+            out.begin_array();
+            for (const Value& a : auctions_) write_value(out, a);
+            out.end_array();
+        };
+        for (const auto& c : call_) x.call_resting[c.id] = c.qty_dec;  // still in a call book: counted as resting
+        x.phase = string(phases[phase_]);
+    }
+
+private:
+    struct Call {
+        string id, side, limit, qty;
+        D qty_dec;
+        bool on_close;
+    };
+
+    void move(const Value* to, const string& path) {
+        const int t = phase_index(to);
+        if (t < 0) fail("E_SCHEMA", path + "/phase", "not a phase");
+        if (t != phase_ + 1)
+            throw Error("E_INPUT", path + ": phase " + string(phases[phase_]) + " cannot move to " + string(phases[t]), path);
+        if (t == 1) uncross("OPEN");
+        else if (t == 3) uncross("CLOSE");
+        phase_ = t;
+    }
+
+    void uncross(const char* phase) {
+        Value in;
+        in.kind = Kind::Object;
+        Value orders;
+        orders.kind = Kind::Array;
+        for (std::size_t n = 0; n < call_.size(); ++n) {
+            const Call& c = call_[n];
+            Value o;
+            o.kind = Kind::Object;
+            o.members.push_back({"id", text_value(c.id)});
+            o.members.push_back({"side", text_value(c.side)});
+            o.members.push_back({"limit", text_value(c.limit)});
+            o.members.push_back({"qty", int_value(c.qty)});
+            o.members.push_back({"seq", int_value(std::to_string(n + 1))});
+            Value b;
+            b.kind = Kind::Bool;
+            b.boolean = c.on_close;
+            o.members.push_back({"on_close", b});
+            orders.items.push_back(std::move(o));
+        }
+        in.members.push_back({"orders", std::move(orders)});
+        in.members.push_back({"phase", text_value(phase)});
+        in.members.push_back({"ref_price", text_value(ref_.str())});
+        in.members.push_back({"tick_size", text_value(eng_.tick_.str())});
+        in.members.push_back({"tie_break", tie_});
+        json::Writer w;
+        w.begin_object();
+        ma::auction_uncross(in, w);
+        w.end_object();
+        const Value res = json::parse(w.str()).value;
+        const D lot = eng_.lot_;
+        const auto n_of = [](const Value& v) { return D::parse(v.text); };
+        Value fills;
+        fills.kind = Kind::Array;
+        for (const Value& f : res.find("fills")->items) {
+            const string& id = f.find("id")->text;
+            const D q = n_of(*f.find("qty")) * lot;
+            const D px = D::parse(f.find("price")->text);
+            Value r;
+            r.kind = Kind::Object;
+            r.members.push_back({"id", text_value(id)});
+            r.members.push_back({"price", text_value(px.str())});
+            r.members.push_back({"qty", text_value(q.str())});
+            r.members.push_back({"side", *f.find("side")});
+            fills.items.push_back(std::move(r));
+            eng_.cons_[id].filled += q;
+            eng_.fees_[trader_.at(id)] += fee_ * (px * q);
+        }
+        for (const Value& r : res.find("residual")->items) {
+            const string& id = r.find("id")->text;
+            const D q = n_of(*r.find("qty")) * lot;
+            const D limit = D::parse(r.find("limit")->text);
+            Order o{id, trader_.at(id), r.find("side")->text == "B", Type::Limit, limit, limit, q, {}, q, eng_.next_seq()};
+            eng_.resting_.insert_or_assign(id, std::move(o));
+        }
+        for (const Value& c : res.find("cancelled")->items) {
+            const auto it = std::find_if(call_.begin(), call_.end(), [&](const Call& x) { return x.id == c.text; });
+            const D left = it->qty_dec - eng_.cons_[c.text].filled;
+            eng_.cancelled_.emplace_back(c.text, left.str());
+            eng_.cons_[c.text].cancelled = left;
+        }
+        Value a;
+        a.kind = Kind::Object;
+        a.members.push_back({"fills", std::move(fills)});
+        a.members.push_back({"imbalance", text_value((n_of(*res.find("imbalance")) * lot).str())});
+        a.members.push_back({"phase", text_value(phase)});
+        const Value& price = *res.find("price");
+        a.members.push_back({"price", price.kind == Kind::Null ? price : text_value(D::parse(price.text).str())});
+        a.members.push_back({"volume", text_value((n_of(*res.find("volume")) * lot).str())});
+        auctions_.push_back(std::move(a));
+        call_.clear();
+    }
+
+    Engine& eng_;
+    D fee_, ref_;
+    int phase_ = 0;
+    Value tie_;
+    std::vector<Call> call_;
+    std::map<string, string> trader_;
+    std::vector<Value> auctions_;
+};
+
 void lit_run(std::string_view tick_size, std::string_view lot_size, const Value& events, const Value& fee_schedule,
-             json::Writer& out) {
+             json::Writer& out, const Value* session) {
     if (!D::well_formed(tick_size)) fail("E_SCHEMA", "tick_size", "not a decimal string");
     const D tick = D::parse(tick_size);
     if (!D::well_formed(lot_size)) fail("E_SCHEMA", "lot_size", "not a decimal string");
@@ -431,16 +683,30 @@ void lit_run(std::string_view tick_size, std::string_view lot_size, const Value&
     const D rebate = dec(fee_schedule.find("maker_rebate"), "fee_schedule/maker_rebate");
     if ((long long)events.items.size() > max_lit_events) throw Error("E_LIMIT", "more than 10,000,000 events", "events");
     Engine eng(tick, lot, taker, rebate);
+    std::optional<Session> ses;
+    if (session != nullptr) {
+        const Value* af = fee_schedule.find("auction_fee");
+        const D auction_fee = af ? dec(af, "fee_schedule/auction_fee") : D{};
+        ses.emplace(eng, *session, auction_fee);
+    }
     for (std::size_t k = 0; k < events.items.size(); ++k) {
         const Value& e = events.items[k];
         const string path = "events/" + std::to_string(k);
         const Value* op = e.kind == Kind::Object ? e.find("op") : nullptr;
-        if (!op || op->kind != Kind::String || (op->text != "NEW" && op->text != "CANCEL" && op->text != "MODIFY"))
+        if (!op || op->kind != Kind::String ||
+            (op->text != "NEW" && op->text != "CANCEL" && op->text != "MODIFY" && !(ses && op->text == "PHASE")))
             fail("E_SCHEMA", "events", path + " is not an event");
+        if (ses && ses->event(e, k)) continue;
         if (op->text == "NEW") eng.new_order(e, path);
         else if (op->text == "CANCEL") eng.cancel(e, path);
         else eng.modify(e, path);
         eng.reprice();
+    }
+    if (ses) {
+        Engine::Extra extra;
+        ses->finish(extra);
+        eng.output(out, &extra);
+        return;
     }
     eng.output(out);
 }
