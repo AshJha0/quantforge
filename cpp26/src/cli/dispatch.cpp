@@ -66,6 +66,7 @@
 #include "quantforge/core/hedging.hpp"
 #include "quantforge/core/research.hpp"
 #include "quantforge/core/term_curves.hpp"
+#include "quantforge/core/microstructure.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {
@@ -319,6 +320,7 @@ struct Entry {
 #include "ops_research.inc"
 #include "ops_term_curves.inc"
 #include "ops_research_w3.inc"
+#include "ops_micro.inc"
 
 // Every verb this build runs. The operations command, and dispatch, are generated from this list alone.
 constexpr std::span<const Entry> registry[] = {
@@ -351,6 +353,7 @@ constexpr std::span<const Entry> registry[] = {
     research_ops,
     term_curve_ops,
     research_w3_ops,
+    micro_w2_ops,
 };
 
 // Built on first use, never at static initialisation, so no order between translation units matters.
@@ -446,7 +449,8 @@ CaseResult run_case(string_view text) {
         // Rulings J-20, J-W2-14: the stage J verbs carry their own page limits in place of the general array limit.
         const string& op_name = parsed.value.find("operation")->text;
         const bool research =
-            op_name.starts_with("research.") || op_name == "risk.contrib.euler" || op_name == "risk.backtest.es_z2";
+            op_name.starts_with("research.") || op_name == "risk.contrib.euler" || op_name == "risk.backtest.es_z2" ||
+            op_name == "micro.book.rebuild" || op_name == "exec.sim.lit.run";  // stage H wave 2 page limits
         const bool big = !research && oversized(inputs);
         Out out;
         out.values.begin_object();
