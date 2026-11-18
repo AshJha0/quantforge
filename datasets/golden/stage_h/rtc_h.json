@@ -1,0 +1,317 @@
+{
+ "schema_version": "1.0",
+ "suite": "rtc_h",
+ "spec": "specifications/09-microstructure/asset-conventions.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_ma.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "rtc_h-0001",
+   "operation": "micro.rates.parse_32nds",
+   "inputs": {
+    "text": "99-16"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "value": "99.5"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "rtc_h-0001 from the spec table"
+  },
+  {
+   "case_id": "rtc_h-0002",
+   "operation": "micro.rates.parse_32nds",
+   "inputs": {
+    "text": "99-16+"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "value": "99.515625"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "rtc_h-0002 from the spec table"
+  },
+  {
+   "case_id": "rtc_h-0003",
+   "operation": "micro.rates.parse_32nds",
+   "inputs": {
+    "text": "99-162"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "value": "99.5078125"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "rtc_h-0003 from the spec table"
+  },
+  {
+   "case_id": "rtc_h-0004",
+   "operation": "micro.rates.parse_32nds",
+   "inputs": {
+    "text": "99-167"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "value": "99.52734375"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "rtc_h-0004 from the spec table"
+  },
+  {
+   "case_id": "rtc_h-0005",
+   "operation": "micro.rates.format_32nds",
+   "inputs": {
+    "resolution": 64,
+    "value": "101.296875"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "text": "101-09+"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "rtc_h-0005 from the spec table"
+  },
+  {
+   "case_id": "rtc_h-0006",
+   "operation": "micro.rates.format_32nds",
+   "inputs": {
+    "resolution": 128,
+    "value": "101.3"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "rtc_h-0006 from the spec table"
+  },
+  {
+   "case_id": "rtc_h-0007",
+   "operation": "micro.rates.tick_value",
+   "inputs": {
+    "face": "100000",
+    "tick": "0.015625"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "tick_value": "15.625"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "rtc_h-0007 from the spec table; not blind: 15.625 printed in the spec text (soft leak)"
+  },
+  {
+   "case_id": "rtc_h-0008",
+   "operation": "micro.rates.bond_price",
+   "inputs": {
+    "coupon": "0.04",
+    "frequency": 2,
+    "periods": 2,
+    "yield": "0.05"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "price": "99.036287924"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH by value; representation only (12 dp vs 9 dp)"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "rtc_h-0008 from the spec table"
+  },
+  {
+   "case_id": "rtc_h-0009",
+   "operation": "micro.rates.bond_price",
+   "inputs": {
+    "coupon": "0.04",
+    "frequency": 2,
+    "periods": 4,
+    "yield": "0.04"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "price": "100"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH by value; representation only (\"100.000000000000\" vs \"100\")"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "rtc_h-0009 from the spec table"
+  },
+  {
+   "case_id": "rtc_h-0010",
+   "operation": "micro.rates.bill_price",
+   "inputs": {
+    "days": 91,
+    "discount": "0.05"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "price": "98.736111111"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH by value; representation only (12 dp vs 9 dp)"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "rtc_h-0010 from the spec table"
+  },
+  {
+   "case_id": "rtc_h-0011",
+   "operation": "micro.rates.parse_32nds",
+   "inputs": {
+    "text": "99-32"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: 32nds above 31"
+  },
+  {
+   "case_id": "rtc_h-0012",
+   "operation": "micro.rates.parse_32nds",
+   "inputs": {
+    "text": "99.16"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: malformed text"
+  },
+  {
+   "case_id": "rtc_h-0013",
+   "operation": "micro.rates.format_32nds",
+   "inputs": {
+    "resolution": 100,
+    "value": "99"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: resolution not allowed"
+  }
+ ]
+}

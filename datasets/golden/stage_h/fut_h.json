@@ -1,0 +1,230 @@
+{
+ "schema_version": "1.0",
+ "suite": "fut_h",
+ "spec": "specifications/10-execution/rates-futures-venue.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_ma.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "fut_h-0001",
+   "operation": "exec.sim.fut.to_ticks",
+   "inputs": {
+    "contract": {
+     "symbol": "ZN"
+    },
+    "price": "110-16+"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "ticks": 7073
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fut_h-0001 from the spec table"
+  },
+  {
+   "case_id": "fut_h-0002",
+   "operation": "exec.sim.fut.to_text",
+   "inputs": {
+    "contract": {
+     "symbol": "ZN"
+    },
+    "ticks": 7073
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "text": "110-16+"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fut_h-0002 from the spec table"
+  },
+  {
+   "case_id": "fut_h-0003",
+   "operation": "exec.sim.fut.to_ticks",
+   "inputs": {
+    "contract": {
+     "symbol": "ZN"
+    },
+    "price": "110-162"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fut_h-0003 from the spec table"
+  },
+  {
+   "case_id": "fut_h-0004",
+   "operation": "exec.sim.fut.pnl",
+   "inputs": {
+    "buy_price": "110-16",
+    "contract": {
+     "symbol": "ZN"
+    },
+    "fee_per_contract": "0",
+    "qty": 3,
+    "sell_price": "110-17+"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fees": "0",
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "pnl": "140.625"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fut_h-0004 from the spec table; not blind: answer fixed by HR-102 (spec gap)"
+  },
+  {
+   "case_id": "fut_h-0005",
+   "operation": "exec.sim.fut.pnl",
+   "inputs": {
+    "buy_price": "110-16",
+    "contract": {
+     "symbol": "ZN"
+    },
+    "fee_per_contract": "1.00",
+    "qty": 3,
+    "sell_price": "110-17+"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fees": "6",
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "pnl": "134.625"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fut_h-0005 from the spec table; not blind: answer fixed by HR-102 (spec gap)"
+  },
+  {
+   "case_id": "fut_h-0006",
+   "operation": "exec.sim.fut.variation",
+   "inputs": {
+    "contract": {
+     "symbol": "ZB"
+    },
+    "price": "120-00",
+    "qty": 1,
+    "settlements": [
+     "119-31"
+    ],
+    "side": "BUY"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "variation_margin": [
+      "-31.25"
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fut_h-0006 from the spec table; not blind: answer fixed by HR-103 (spec gap)"
+  },
+  {
+   "case_id": "fut_h-0007",
+   "operation": "exec.sim.fut.to_ticks",
+   "inputs": {
+    "contract": {
+     "symbol": "ZN"
+    },
+    "price": "110.01"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: decimal price off the grid"
+  },
+  {
+   "case_id": "fut_h-0008",
+   "operation": "exec.sim.fut.variation",
+   "inputs": {
+    "contract": {
+     "symbol": "ZN"
+    },
+    "price": "110-00",
+    "qty": 0,
+    "settlements": [],
+    "side": "BUY"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: empty settlements"
+  }
+ ]
+}

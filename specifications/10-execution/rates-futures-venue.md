@@ -18,6 +18,6 @@ Inputs: `contract` (HR-91), `events` with prices as 32nds strings or decimals, `
 | fut_h-0006 | ZB (tick 1/32, value 31.25): buy 1 at 120-00, settle 119-31 | variation margin -31.25 | -1 tick x 31.25 |
 
 ## Output shapes and gap rulings (pre-comparison spec fixes, 2026-11-18, HR-100, HR-102, HR-103)
-Price to ticks `{status, label, ticks}`; ticks to text `{status, label, text}`; trade P&L `{status, label, pnl, fees}`; variation `{status, label, variation_margin}`.
+Operations `exec.sim.fut.to_ticks`, `exec.sim.fut.to_text`, `exec.sim.fut.pnl`, `exec.sim.fut.variation` (`variation_margin` is a list, one per settlement) and `exec.sim.fut.run`; decimals are HR-12 decimal strings; `contract` defaults to `{symbol: ZN}`. Price to ticks `{status, label, ticks}`; ticks to text `{status, label, text}`; trade P&L `{status, label, pnl, fees}`; variation `{status, label, variation_margin}`.
 HR-102 (gap found by the blind lane): fut_h-0004 and fut_h-0005 list a buy and a sell at different prices that would not cross in one book; they are **one participant's round trip filled against other resting orders**, pnl = (sell ticks - buy ticks) x qty x tick_value - fees; the fee is per contract per side (3 + 3 = 6 contracts).
 HR-103 (gap found by the blind lane): on the trade day the previous mark for variation margin is the **fill price**; on later days it is the previous settlement price.

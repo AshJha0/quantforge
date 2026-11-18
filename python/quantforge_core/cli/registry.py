@@ -79,6 +79,7 @@ CORE_MODULES = (
     "lit_matching",
     "dark_pool",
     "sor",
+    "multiasset",
     "order_book",
     "xva",
     "risk_tools",

@@ -1,0 +1,468 @@
+{
+ "schema_version": "1.0",
+ "suite": "eqc_h",
+ "spec": "specifications/09-microstructure/asset-conventions.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_ma.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "eqc_h-0001",
+   "operation": "micro.eq.round_price",
+   "inputs": {
+    "price": "10.005",
+    "side": "BUY"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange",
+     "price": "10.00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0001 from the spec table"
+  },
+  {
+   "case_id": "eqc_h-0002",
+   "operation": "micro.eq.round_price",
+   "inputs": {
+    "price": "10.005",
+    "side": "SELL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange",
+     "price": "10.01"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0002 from the spec table"
+  },
+  {
+   "case_id": "eqc_h-0003",
+   "operation": "micro.eq.round_price",
+   "inputs": {
+    "price": "0.12345",
+    "side": "BUY"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange",
+     "price": "0.1234"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0003 from the spec table"
+  },
+  {
+   "case_id": "eqc_h-0004",
+   "operation": "micro.eq.round_price",
+   "inputs": {
+    "price": "0.12345",
+    "side": "SELL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange",
+     "price": "0.1235"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0004 from the spec table"
+  },
+  {
+   "case_id": "eqc_h-0005",
+   "operation": "micro.eq.round_price",
+   "inputs": {
+    "price": "0.99995",
+    "side": "SELL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange",
+     "price": "1.00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0005 from the spec table"
+  },
+  {
+   "case_id": "eqc_h-0006",
+   "operation": "micro.eq.round_price",
+   "inputs": {
+    "price": "25.00",
+    "side": "BUY"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange",
+     "price": "25.00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0006 from the spec table"
+  },
+  {
+   "case_id": "eqc_h-0007",
+   "operation": "micro.eq.fee_check",
+   "inputs": {
+    "cap_check": true,
+    "price": "20",
+    "taker_fee": "0.0031"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0007 from the spec table"
+  },
+  {
+   "case_id": "eqc_h-0008",
+   "operation": "micro.eq.settle_date",
+   "inputs": {
+    "holidays": [],
+    "settle_lag": 1,
+    "trade_date": "2026-11-20"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange",
+     "settle_date": "2026-11-23"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0008 from the spec table"
+  },
+  {
+   "case_id": "eqc_h-0009",
+   "operation": "micro.eq.round_price",
+   "inputs": {
+    "price": "10.003",
+    "side": "BUY",
+    "tick_tier": "HALF_PENNY"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange",
+     "price": "10.000"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0009 hand: current Rule 612/610 regime (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "eqc_h-0010",
+   "operation": "micro.eq.round_price",
+   "inputs": {
+    "price": "10.003",
+    "side": "SELL",
+    "tick_tier": "HALF_PENNY"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange",
+     "price": "10.005"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0010 hand: current Rule 612/610 regime (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "eqc_h-0011",
+   "operation": "micro.eq.fee_check",
+   "inputs": {
+    "price": "20",
+    "taker_fee": "0.0015"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0011 hand: current Rule 612/610 regime (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "eqc_h-0012",
+   "operation": "micro.eq.fee_check",
+   "inputs": {
+    "as_of": "2024-01-02",
+    "price": "20",
+    "taker_fee": "0.0015"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cap": "0.003",
+     "label": "simulated venue; not a real exchange",
+     "taker_fee": "0.0015"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0012 hand: current Rule 612/610 regime (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "eqc_h-0013",
+   "operation": "micro.eq.fee_check",
+   "inputs": {
+    "price": "0.50",
+    "taker_fee": "0.0005"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cap": "0.0005",
+     "label": "simulated venue; not a real exchange",
+     "taker_fee": "0.0005"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0013 hand: current Rule 612/610 regime (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "eqc_h-0014",
+   "operation": "micro.eq.round_lot",
+   "inputs": {
+    "price": "250.00"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange",
+     "round_lot": 100
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0014 hand: round lot by price, Rule 600(b)(93) (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "eqc_h-0015",
+   "operation": "micro.eq.round_lot",
+   "inputs": {
+    "price": "250.01"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange",
+     "round_lot": 40
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0015 hand: round lot by price, Rule 600(b)(93) (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "eqc_h-0016",
+   "operation": "micro.eq.round_lot",
+   "inputs": {
+    "price": "10000.01"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange",
+     "round_lot": 1
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0016 hand: round lot by price, Rule 600(b)(93) (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "eqc_h-0017",
+   "operation": "micro.eq.round_lot",
+   "inputs": {
+    "as_of": "2024-01-02",
+    "price": "10000.01"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange",
+     "round_lot": 100
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "eqc_h-0017 hand: round lot by price, Rule 600(b)(93) (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "eqc_h-0018",
+   "operation": "micro.eq.round_price",
+   "inputs": {
+    "price": "0",
+    "side": "BUY"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: non-positive price"
+  },
+  {
+   "case_id": "eqc_h-0019",
+   "operation": "micro.eq.round_price",
+   "inputs": {
+    "price": "10",
+    "side": "BUY",
+    "tick_tier": "HALF_PENNY",
+    "as_of": "2024-01-02"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: half-penny tier before the compliance date"
+  }
+ ]
+}

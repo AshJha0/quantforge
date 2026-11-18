@@ -43,3 +43,6 @@ No mismatch needed investigating, so neither side was found wrong. The lane's in
 - All sources in the specs are still tagged unverified (HR-98). Agreement with the blind lane checks the arithmetic, not whether the venue rules are right.
 - Labels were not compared.
 - The goldens state only some fields (for example, auc_h-0003..0006 state price, volume and imbalance, not the fills).
+
+## Rule-version fixes after the source check (2026-11-18, implementation lane)
+Coordinator rulings HR-104 to HR-108 (Rule 612 half-penny tier, Rule 610 $0.001 cap, Rule 600 round lots, FX USD-only T+1 holiday, auction tie-break as a venue parameter). The goldens were regenerated through `oracle/python/gen_stage_h_ma.py`. **No blind case changed its expected value**: the defaults keep the penny tier for eqc_h-0001..0006; eqc_h-0007 (0.0031 at $20) is still E_DOMAIN under the $0.001 cap; fxc_h-0004 still settles 2026-11-27 (Thursday is not good in both currencies at T+2); auc_h rows use the default CBOE tie-break. So no case loses blind status and the shares above stand. New cases eqc_h-0009..0017, fxc_h-0008 and auc_h-0009 are hand-derived and **not blind**; they do not count toward the 60 % rule.

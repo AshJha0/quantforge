@@ -33,3 +33,14 @@ Drafted on branch `h-multiasset` from the owner decision of 2026-11-18 (end of `
 | HR-102 | fut_h-0004/0005 | One participant's round trip against other resting orders; fee per contract per side |
 | HR-103 | Variation margin | Previous mark = fill price on the trade day, previous settlement afterwards |
 Cases whose answer was decided by HR-102 or HR-103 (fut_h-0004, 0005, 0006) do not count as blind.
+
+## Rule versions after the HR-98 source check (coordinator rulings 2026-11-18; source `MULTIASSET_SOURCE_CHECK.md`)
+| # | Point | Ruling |
+|---|---|---|
+| HR-104 | Rule 612 tick | Dated rule versions: current two-tier rule by default (`tick_tier` PENNY or HALF_PENNY $0.005 at $1.00 or more); `as_of` before `compliance_date` (default 2026-11-03, **unverified**) selects the old penny table. Amends HR-81 |
+| HR-105 | Rule 610 cap | Current cap $0.001 per share at $1.00 or more, 0.1 % below; old regime $0.003 / 0.3 % by `as_of`. Amends HR-85 |
+| HR-106 | Round lot | Amended Rule 600(b)(93): 100 up to $250, 40 to $1,000, 10 to $10,000, 1 above; old regime 100. Amends HR-82 |
+| HR-107 | FX spot | A USD-only holiday on T+1 does not stop the count (convention, partly verified). Amends HR-89 |
+| HR-108 | Auction tie-break | Venue parameter `tie_break`: `CBOE` (default, the HR-84 steps, re-cited to the Cboe model) or `IEX` (nearest the reference midpoint, then higher). Amends HR-84 |
+| HR-109 | 32nds `3` | The digit `3` (3/8 of a 32nd) is accepted and printed, so every 1/256 point formats (A3); fills a gap in HR-90. Implementation-lane proposal, **needs the owner or coordinator** |
+No existing golden changed value under HR-104 to HR-108 (eqc_h-0001..0008, fxc_h-0001..0007, auc_h-0001..0008 are identical), so none loses blind status. Added hand goldens, not blind: eqc_h-0009..0017, fxc_h-0008, auc_h-0009.
