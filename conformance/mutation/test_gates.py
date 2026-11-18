@@ -11,7 +11,9 @@ Each check shows the gate failing on a planted fault and passing on the real con
   5. semantic_changes drops formatting/comment-only edits and keeps real, new and unknown changes;
   6. the pull-request sample in mutation-stage.yml is large enough to pass a good module: at least 3
      survivors allowed per module and a pass probability of at least 0.9 at a true 90% kill rate (a
-     12-mutant sample allowed none and passed a 90% module 28% of the time).
+     12-mutant sample allowed none and passed a 90% module 28% of the time);
+  7. a mutmut timeout (its own per-mutant CPU limit, as for an endless loop) counts as caught, as a C++
+     hang does; a survivor and a segfault do not.
 """
 import contextlib
 import io
@@ -25,6 +27,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import check_stages  # noqa: E402
+import golden_mutants  # noqa: E402
 import plan_matrix  # noqa: E402
 import semantic_changes  # noqa: E402
 import stage_report  # noqa: E402
@@ -183,6 +186,22 @@ def joint_pass_checks():
     check("12 cells at a true 90% all pass with probability >= 0.75", p_cell(0.9) ** 12 >= 0.75)
 
 
+def timeout_checks():
+    """mutmut 3.8.1 files exit 36 and SIGXCPU (24, -24, 152, 255) as "timeout"; cpp_mutants.py counts a hang."""
+    for code in (36, 24, -24, 152, 255):
+        check(f"mutmut exit {code} is a timeout", golden_mutants.MUTMUT_VERDICT.get(code) == "timeout")
+    for code in (0, -11, 5):
+        check(f"mutmut exit {code} is not a timeout", golden_mutants.MUTMUT_VERDICT.get(code) != "timeout")
+    rows = [{"id": "hang", "unit": golden_mutants.MUTMUT_VERDICT[36], "golden": "survived"},
+            {"id": "live", "unit": golden_mutants.MUTMUT_VERDICT[0], "golden": "survived"},
+            {"id": "crash", "unit": golden_mutants.MUTMUT_VERDICT.get(-11, "mutmut code -11"), "golden": "survived"}]
+
+    class A:
+        impl, target, suite, seed = "python", "t*", "*", 1
+    s = quiet(golden_mutants.summarise, A, rows)
+    check("planted endless-loop mutant counts as caught (1 of 3)", s["sample_either_killed"] == 1)
+
+
 def main():
     cfg = json.loads((HERE / "stages.json").read_text(encoding="utf-8"))
     with tempfile.TemporaryDirectory() as d:
@@ -227,6 +246,7 @@ def main():
     cpp_site_checks()
     skip_and_seed_checks()
     joint_pass_checks()
+    timeout_checks()
     lo, hi = stage_report.wilson(17, 20)
     check("Wilson 17/20 is 64% to 95%", round(lo, 2) == 0.64 and round(hi, 2) == 0.95)
     print(f"{len(FAILS)} failure(s)")

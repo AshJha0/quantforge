@@ -25,6 +25,13 @@ reformat or a new long boolean guard (usage in the script's docstring).
   `conformance/` beside it); the checkout is never modified. The profile's tests run with the copy
   first on `PYTHONPATH`, `pytest -x`. Exit 1 or a timeout is killed, exit 0 survived.
 
+In the stage runs (`golden_mutants.py --impl python`, mutmut 3.8.1) a mutant that mutmut itself
+stops on its per-mutant CPU-time limit (exit 36, or SIGXCPU as 24, -24, 152 or 255: mutmut's own
+"timeout" class) counts as caught, as a golden timeout does and as `cpp_mutants.py` counts a C++
+hang. Such a mutant made a test spin (for example `fx_smile._pa_call_peak` `low -= 1` to `low = 1`,
+an endless loop that `test_pa_call_strike_at_high_total_vol` reaches). Segfaults and "no tests"
+stay uncounted. `test_gates.py` check 7 covers the mapping. Thresholds are unchanged.
+
 ## The credit profile
 
 Modules `quantforge_core/credit.py` and `quantforge_core/credit_options.py` (836 sites). Tests:
