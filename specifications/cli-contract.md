@@ -401,7 +401,7 @@ Rulings `stage-j-rulings-curves.md` J-C-1 to J-C-9. No new error code; the gener
 
 Rulings `stage-j-rulings-w3.md` J-W3-1 to J-W3-17. No new error code; page limits J-W3-14. Implemented in all four builds; the contract number 1.15.0 is shared with the curves lane (J-C-1, J-W3-1).
 
-### Stage H wave 1 (contract number per HR-1, DR-H7)
+### Stage H wave 1 (contract 1.16.0 per HR-1 and DR-H8; DR-H7's 1.15.0 was taken by stage J)
 
 Rulings `stage-h-rulings-w1.md` HR-1 to HR-10 (confirmed 2026-11-18). No new error code; `E_LIMIT` sizes HR-9. Goldens in `datasets/golden/stage_h/` (`oracle/python/gen_stage_h_w1.py`). Not implemented yet. Names below are fixed by the oracle lane (2026-11-18) where the spec left them open; they bind all four builds.
 
