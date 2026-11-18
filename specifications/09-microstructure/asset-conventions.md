@@ -24,7 +24,7 @@ Every source tagged unverified must be read and re-tagged "read <date>" before v
 
 ### 1.1 Tick table and rounding (HR-81)
 Parameter `tick_table`: list of `(price_floor, tick)`. Default [REGNMS-612]: `[(0, 0.0001), (1.00, 0.01)]`. The tick that applies is that of the highest `price_floor <= price`.
-Operation `micro.eq.round_price(price, side, tick_table)`: a buy limit rounds **down** to the grid, a sell limit rounds **up** (never more aggressive than asked). Exact decimals. If a rounded sell lands on a floor it is valid on both grids (0.99995 sell gives 1.0000).
+Operation `micro.eq.round_price(price, side, tick_table)`: a buy limit rounds **down** to the grid, a sell limit rounds **up** (never more aggressive than asked). Exact decimals. A rounded sell that lands exactly on a floor is valid on both grids.
 Errors: price <= 0 `E_DOMAIN`.
 
 ### 1.2 Lots (HR-82)
