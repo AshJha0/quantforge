@@ -458,3 +458,10 @@ fn stage_h_micro_goldens() {
 fn stage_h_w2_exec_goldens() {
     replay_only("stage_h", &["alg_h", "tcx_h", "enum_h"], 42);
 }
+
+/// The stage H paper trading goldens (`pt_h`) and their non-finite `E_SCHEMA` cases (`e1_hpt`):
+/// ledger hashes byte for byte, book, explain, pre-trade and LIT sessions (HR-42 to HR-55).
+#[test]
+fn stage_h_paper_goldens() {
+    replay_only("stage_h", &["pt_h", "e1_hpt"], 33);
+}

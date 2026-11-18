@@ -70,6 +70,8 @@ pub mod mc_greeks;
 pub mod micro_est;
 pub mod ois;
 pub mod order_book;
+pub mod paper;
+pub mod paper_dec;
 pub mod pde;
 pub mod portfolio_opt;
 pub mod projection;
