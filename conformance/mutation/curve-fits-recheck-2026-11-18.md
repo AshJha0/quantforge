@@ -148,8 +148,8 @@ Both are worth a spec question and a fix in a later round; they are not mutation
 ## Re-score
 
 Tests unchanged for `curve_fits`, so the seeded sample and verdicts are the same as run
-44362557841. Re-score run: see the row below.
+44362557841. Re-score run 44383318047, read from the job log:
 
 | Module | Run | Killed (40) | Gate |
 |---|---|---|---|
-| curve_fits | RUN_ID | RESULT | |
+| curve_fits | 44383318047 | 31/40 (77.5%, Wilson LB 62.5%), seed 355377703 | below gate (same 9 survivors) |
