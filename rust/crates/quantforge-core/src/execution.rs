@@ -31,7 +31,7 @@ impl Amount {
 }
 
 /// HR-2, HR-3: the order is positive, and a whole number of units in `UNITS` mode.
-fn quantity(x: f64, units: bool) -> Result<()> {
+pub(crate) fn quantity(x: f64, units: bool) -> Result<()> {
     if x <= 0.0 {
         return fail("E_INPUT", "quantity must be positive");
     }

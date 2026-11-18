@@ -8,6 +8,7 @@
 )]
 
 pub mod aad;
+pub mod adaptive_exec;
 pub mod arb_surface;
 pub mod attribution;
 pub mod bermudan_aad;
