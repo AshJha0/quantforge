@@ -252,7 +252,7 @@ TEST_CASE("stage H operations through the CLI", "[execution]") {
     has(run("exec.schedule.vwap", R"({"quantity":10,"profile":[1,1,1],"mode":"UNITS"})"), "[4,3,3]");
     const std::string ac = R"("quantity":1e6,"horizon":5,"n_steps":5,"sigma":0.95,"epsilon":0.0625,"eta":2.5e-6,"gamma":2.5e-7)";
     has(run("exec.ac.trajectory", "{" + ac + R"(,"risk_aversion":0})"), R"("expected_cost":662500)");
-    has(run("exec.ac.frontier", "{" + ac + R"(,"risk_aversions":[0,1e-6]})"), R"("variance":[)");
+    has(run("exec.ac.frontier", "{" + ac + R"(,"risk_aversions":[0,1e-6]})"), R"("variances":[)");
     has(run("exec.impact.sqrt", R"({"quantity":1e5,"daily_volume":1e7,"daily_vol":0.02})"),
         R"("model":"assumed parameters; not calibrated to any venue")");
     has(run("exec.impact.ow_optimal", R"({"quantity":1000,"horizon":1,"resilience":8})"), R"("rate":800)");

@@ -348,6 +348,39 @@ public final class Execution {
         return new Shortfall(delay, exec, opp, total, total / (x * decision) * 1e4, slip);
     }
 
+    // ---- usecase.execution_tca (use case 5, 04-pricing/use-cases.md) ----
+
+    public record ExecutionTca(double[] lots, double expectedCost, double variance, double filled, double fees,
+            Shortfall shortfall) {}
+
+    public static ExecutionTca executionTca(AcParams p, double lambda, Side side, double decision, double arrival,
+            double end, double[] fillPrices, long completedSteps, double feePerUnit) {
+        if (!(p.quantity() >= 1) || p.quantity() != Math.rint(p.quantity()) || p.quantity() > TWO_53) {
+            throw input("quantity", "must be an Integer >= 1");
+        }
+        if (fillPrices.length != p.nSteps()) {
+            throw input("fill_prices", "needs one price per step");
+        }
+        if (completedSteps < 0 || completedSteps > p.nSteps()) {
+            throw input("completed_steps", "must lie in 0 to n_steps");
+        }
+        if (feePerUnit < 0) {
+            throw domain("fee_per_unit", "must be non-negative");
+        }
+        AcTrajectory ac = acTrajectory(p, lambda);
+        double[] lots = vwap(p.quantity(), ac.trades(), Mode.UNITS);
+        int k = (int) completedSteps;
+        double[] q = java.util.Arrays.copyOf(lots, k);
+        double[] px = java.util.Arrays.copyOf(fillPrices, k);
+        double filled = 0;
+        for (double x : q) {
+            filled += x;
+        }
+        double fees = feePerUnit * filled;
+        Shortfall s = shortfall(side, decision, arrival, end, p.quantity(), q, px, fees, null);
+        return new ExecutionTca(lots, ac.expectedCost(), ac.variance(), filled, fees, s);
+    }
+
     // ---- micro.mm.as_quotes ----
 
     /** [AS08] eqs. (29)-(30), p. 221 (HR-7). */

@@ -207,6 +207,26 @@ Shortfall shortfall(Side side, double pd, double p0, double pc, double x, const 
     return {delay, exec, opp, total, total / (x * pd) * 1e4, slip};
 }
 
+ExecutionTca execution_tca(const AcParams& p, double lambda, Side side, double pd, double p0, double pc,
+                           const Vec& fill_prices, long long completed, double fee_per_unit) {
+    if (!(p.quantity >= 1) || p.quantity != std::rint(p.quantity) || p.quantity > 9007199254740992.0)
+        input("quantity", "must be an Integer >= 1");
+    if ((long long)fill_prices.size() != p.n_steps) input("fill_prices", "needs one price per step");
+    if (completed < 0 || completed > p.n_steps) input("completed_steps", "must lie in 0 to n_steps");
+    if (fee_per_unit < 0) domain("fee_per_unit", "must be non-negative");
+    const AcTrajectory ac = ac_trajectory(p, lambda);
+    Vec lots = vwap(p.quantity, ac.trades, Mode::Units);
+    std::vector<Fill> fills;
+    double filled = 0;
+    for (std::size_t k = 0; k < (std::size_t)completed; ++k) {
+        fills.push_back({lots[k], fill_prices[k]});
+        filled += lots[k];
+    }
+    const double fees = fee_per_unit * filled;
+    const Shortfall s = shortfall(side, pd, p0, pc, p.quantity, fills, fees, std::nullopt);
+    return {std::move(lots), ac.expected_cost, ac.variance, filled, fees, s};
+}
+
 Quotes as_quotes(double mid, double q, double gamma, double sigma, double time_left, double k) {
     if (!(gamma > 0)) domain("risk_aversion", "must be positive");
     if (!(k > 0)) domain("k", "must be positive");

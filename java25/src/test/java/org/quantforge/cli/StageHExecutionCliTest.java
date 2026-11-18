@@ -27,7 +27,7 @@ class StageHExecutionCliTest {
         has(run("exec.schedule.pov", "{\"quantity\":1000,\"participation\":0.2,\"market_volume\":[1000,2000,4000],"
                 + "\"mode\":\"UNITS\"}"), "\"slices\":[250,500,250],\"filled\":1000,\"residual\":0");
         has(run("exec.ac.trajectory", "{" + AC + ",\"risk_aversion\":0}"), "\"expected_cost\":662500");
-        has(run("exec.ac.frontier", "{" + AC + ",\"risk_aversions\":[0,1e-6]}"), "\"variance\":[");
+        has(run("exec.ac.frontier", "{" + AC + ",\"risk_aversions\":[0,1e-6]}"), "\"variances\":[");
         has(run("exec.impact.sqrt", "{\"quantity\":1e5,\"daily_volume\":1e7,\"daily_vol\":0.02}"),
                 "\"model\":\"assumed parameters; not calibrated to any venue\"");
         has(run("exec.impact.ow_optimal", "{\"quantity\":1000,\"horizon\":1,\"resilience\":8}"), "\"rate\":800");

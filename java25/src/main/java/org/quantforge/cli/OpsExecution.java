@@ -23,6 +23,7 @@ final class OpsExecution {
         table.put("exec.impact.ow_optimal", OpsExecution::owOptimal);
         table.put("exec.tca.shortfall", OpsExecution::shortfall);
         table.put("micro.mm.as_quotes", OpsExecution::asQuotes);
+        table.put("usecase.execution_tca", OpsExecution::executionTca);
     }
 
     /** HR-3: UNITS slices are written as JSON integers, CONTINUOUS slices as reals. */
@@ -88,8 +89,8 @@ final class OpsExecution {
         Execution.AcParams p = acParams(in);
         double[] lambdas = in.gate(in.reals("risk_aversions"));
         Execution.AcFrontier r = Execution.acFrontier(p, lambdas);
-        return Operations.out("risk_aversions", OpsSmile.list(r.riskAversions()), "expected_cost",
-                OpsSmile.list(r.expectedCost()), "variance", OpsSmile.list(r.variance()));
+        return Operations.out("risk_aversions", OpsSmile.list(r.riskAversions()), "expected_costs",
+                OpsSmile.list(r.expectedCost()), "variances", OpsSmile.list(r.variance()));
     }
 
     private static Out sqrt(In in) {
@@ -143,5 +144,22 @@ final class OpsExecution {
         double k = in.gate(in.real("k"));
         Execution.Quotes r = Execution.asQuotes(s, q, gamma, sigma, tl, k);
         return Operations.out("reservation", r.reservation(), "spread", r.spread(), "bid", r.bid(), "ask", r.ask());
+    }
+
+    private static Out executionTca(In in) {
+        Execution.AcParams p = acParams(in);
+        double lambda = in.real("risk_aversion");
+        Execution.Side side = in.choice("side", Execution.Side.class);
+        double pd = in.real("decision_price");
+        double p0 = in.real("arrival_price");
+        double pc = in.real("end_price");
+        double[] fp = in.reals("fill_prices");
+        long done = in.integer("completed_steps");
+        double fee = in.gate(in.real("fee_per_unit"));
+        Execution.ExecutionTca r = Execution.executionTca(p, lambda, side, pd, p0, pc, fp, done, fee);
+        Execution.Shortfall s = r.shortfall();
+        return Operations.out("lots", slices(r.lots(), Mode.UNITS), "expected_cost", r.expectedCost(), "variance",
+                r.variance(), "filled", (long) r.filled(), "fees", r.fees(), "delay", s.delay(), "execution",
+                s.execution(), "opportunity", s.opportunity(), "total", s.total(), "total_bps", s.totalBps());
     }
 }

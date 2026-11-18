@@ -62,6 +62,15 @@ Shortfall shortfall(Side side, double decision, double arrival, double end, doub
 struct Quotes {
     double reservation, spread, bid, ask;
 };
+// usecase.execution_tca (use case 5, 04-pricing/use-cases.md).
+struct ExecutionTca {
+    Vec lots;
+    double expected_cost, variance, filled, fees;
+    Shortfall shortfall;
+};
+ExecutionTca execution_tca(const AcParams& p, double risk_aversion, Side side, double decision, double arrival,
+                           double end, const Vec& fill_prices, long long completed_steps, double fee_per_unit);
+
 Quotes as_quotes(double mid, double inventory, double gamma, double sigma, double time_left, double k);
 
 }  // namespace quantforge::execution

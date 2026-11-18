@@ -87,8 +87,8 @@ void op_exec_ac_frontier(const In& in, Out& out) {
     in.ready();
     const exe::AcFrontier r = exe::ac_frontier(p, lambdas);
     out.key_reals("risk_aversions", r.risk_aversions);
-    out.key_reals("expected_cost", r.expected_cost);
-    out.key_reals("variance", r.variance);
+    out.key_reals("expected_costs", r.expected_cost);
+    out.key_reals("variances", r.variance);
 }
 
 void op_exec_impact_sqrt(const In& in, Out& out) {
@@ -146,6 +146,29 @@ void op_micro_mm_as_quotes(const In& in, Out& out) {
     out.key_real("ask", r.ask);
 }
 
+void op_usecase_execution_tca(const In& in, Out& out) {
+    const exe::AcParams p = read_ac(in);
+    const double lambda = in.real("risk_aversion");
+    const auto side = in.choice("side", exec_sides);
+    const double pd = in.real("decision_price"), p0 = in.real("arrival_price"), pc = in.real("end_price");
+    const Vec fp = in.reals("fill_prices");
+    const long long done = in.integer("completed_steps");
+    const double fee = in.real("fee_per_unit");
+    limit_if(p.n_steps > exe::max_steps, "n_steps");
+    in.ready();
+    const exe::ExecutionTca r = exe::execution_tca(p, lambda, side, pd, p0, pc, fp, done, fee);
+    key_slices(out, "lots", r.lots, exe::Mode::Units);
+    out.key_real("expected_cost", r.expected_cost);
+    out.key_real("variance", r.variance);
+    key_amount(out, "filled", r.filled, exe::Mode::Units);
+    out.key_real("fees", r.fees);
+    out.key_real("delay", r.shortfall.delay);
+    out.key_real("execution", r.shortfall.execution);
+    out.key_real("opportunity", r.shortfall.opportunity);
+    out.key_real("total", r.shortfall.total);
+    out.key_real("total_bps", r.shortfall.total_bps);
+}
+
 constexpr Entry execution_ops[] = {
     {"exec.schedule.twap", op_exec_twap},
     {"exec.schedule.vwap", op_exec_vwap},
@@ -156,4 +179,5 @@ constexpr Entry execution_ops[] = {
     {"exec.impact.ow_optimal", op_exec_impact_ow_optimal},
     {"exec.tca.shortfall", op_exec_tca_shortfall},
     {"micro.mm.as_quotes", op_micro_mm_as_quotes},
+    {"usecase.execution_tca", op_usecase_execution_tca},
 };
