@@ -1,0 +1,641 @@
+{
+ "schema_version": "1.0",
+ "suite": "sor_h",
+ "spec": "specifications/10-execution/smart-order-router.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_w2.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "sor_h-0001",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "10",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "0.1",
+    "lit_samples": [
+     [
+      "10"
+     ],
+     [
+      "12"
+     ],
+     [
+      "15"
+     ]
+    ],
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "0",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "L": [
+      "10"
+     ],
+     "M": "0",
+     "expected_cost": "-7",
+     "expected_fill": "10",
+     "p_underfill": "0"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated"
+   ],
+   "description": "sor_h-0001 from the spec table; not blind"
+  },
+  {
+   "case_id": "sor_h-0002",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "10",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "10",
+    "lit_samples": [
+     [
+      "0"
+     ],
+     [
+      "0"
+     ],
+     [
+      "0"
+     ],
+     [
+      "2"
+     ]
+    ],
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "0",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "L": [
+      "0"
+     ],
+     "M": "10",
+     "expected_cost": "8",
+     "expected_fill": "10",
+     "p_underfill": "0"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated"
+   ],
+   "description": "sor_h-0002 from the spec table; not blind"
+  },
+  {
+   "case_id": "sor_h-0003",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "10",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "4",
+    "lit_samples": [
+     [
+      "0"
+     ],
+     [
+      "2"
+     ],
+     [
+      "4"
+     ],
+     [
+      "6"
+     ],
+     [
+      "8"
+     ],
+     [
+      "10"
+     ],
+     [
+      "12"
+     ],
+     [
+      "14"
+     ]
+    ],
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "2",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "L": [
+      "2"
+     ],
+     "M": "8",
+     "expected_cost": "7.35",
+     "expected_fill": "9.5",
+     "p_underfill": "0.25"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated"
+   ],
+   "description": "sor_h-0003 from the spec table"
+  },
+  {
+   "case_id": "sor_h-0005",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "4",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "1",
+    "lit_samples": [
+     [
+      "0"
+     ],
+     [
+      "4"
+     ]
+    ],
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "0",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2"
+     },
+     {
+      "as": "0.1",
+      "kind": "DARK",
+      "r": "0",
+      "tail": [
+       "0.5",
+       "0.5",
+       "0.5",
+       "0"
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "L": [
+      "4",
+      "3"
+     ],
+     "M": "0",
+     "expected_cost": "0",
+     "expected_fill": "2.75",
+     "p_underfill": "0.5"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated"
+   ],
+   "description": "sor_h-0005 from the spec table"
+  },
+  {
+   "case_id": "sor_h-0006",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "2",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "1",
+    "lit_samples": [
+     [
+      "0",
+      "1"
+     ],
+     [
+      "2",
+      "3"
+     ]
+    ],
+    "ranking": true,
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "0",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.3"
+     },
+     {
+      "Q": "1",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.1"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "L": [
+      "2",
+      "0"
+     ],
+     "M": "0",
+     "expected_cost": "0.2",
+     "expected_fill": "1",
+     "p_underfill": "0.5",
+     "ranking": [
+      {
+       "L": [
+        "2",
+        "0"
+       ],
+       "M": "0",
+       "expected_cost": "0.2"
+      },
+      {
+       "L": [
+        "1",
+        "1"
+       ],
+       "M": "0",
+       "expected_cost": "0.3"
+      },
+      {
+       "L": [
+        "0",
+        "2"
+       ],
+       "M": "0",
+       "expected_cost": "0.4"
+      },
+      {
+       "L": [
+        "2",
+        "1"
+       ],
+       "M": "0",
+       "expected_cost": "0.4"
+      },
+      {
+       "L": [
+        "1",
+        "2"
+       ],
+       "M": "0",
+       "expected_cost": "0.5"
+      },
+      {
+       "L": [
+        "2",
+        "2"
+       ],
+       "M": "0",
+       "expected_cost": "0.6"
+      },
+      {
+       "L": [
+        "1",
+        "0"
+       ],
+       "M": "1",
+       "expected_cost": "0.9"
+      },
+      {
+       "L": [
+        "0",
+        "1"
+       ],
+       "M": "1",
+       "expected_cost": "1"
+      },
+      {
+       "L": [
+        "2",
+        "0"
+       ],
+       "M": "1",
+       "expected_cost": "1"
+      },
+      {
+       "L": [
+        "1",
+        "0"
+       ],
+       "M": "0",
+       "expected_cost": "1.1"
+      },
+      {
+       "L": [
+        "1",
+        "1"
+       ],
+       "M": "1",
+       "expected_cost": "1.1"
+      },
+      {
+       "L": [
+        "0",
+        "1"
+       ],
+       "M": "0",
+       "expected_cost": "1.2"
+      },
+      {
+       "L": [
+        "0",
+        "2"
+       ],
+       "M": "1",
+       "expected_cost": "1.2"
+      },
+      {
+       "L": [
+        "2",
+        "1"
+       ],
+       "M": "1",
+       "expected_cost": "1.2"
+      },
+      {
+       "L": [
+        "1",
+        "2"
+       ],
+       "M": "1",
+       "expected_cost": "1.3"
+      },
+      {
+       "L": [
+        "2",
+        "2"
+       ],
+       "M": "1",
+       "expected_cost": "1.4"
+      },
+      {
+       "L": [
+        "0",
+        "0"
+       ],
+       "M": "2",
+       "expected_cost": "1.6"
+      },
+      {
+       "L": [
+        "1",
+        "0"
+       ],
+       "M": "2",
+       "expected_cost": "1.7"
+      },
+      {
+       "L": [
+        "0",
+        "0"
+       ],
+       "M": "1",
+       "expected_cost": "1.8"
+      },
+      {
+       "L": [
+        "0",
+        "1"
+       ],
+       "M": "2",
+       "expected_cost": "1.8"
+      },
+      {
+       "L": [
+        "2",
+        "0"
+       ],
+       "M": "2",
+       "expected_cost": "1.8"
+      },
+      {
+       "L": [
+        "1",
+        "1"
+       ],
+       "M": "2",
+       "expected_cost": "1.9"
+      },
+      {
+       "L": [
+        "0",
+        "0"
+       ],
+       "M": "0",
+       "expected_cost": "2"
+      },
+      {
+       "L": [
+        "0",
+        "2"
+       ],
+       "M": "2",
+       "expected_cost": "2"
+      },
+      {
+       "L": [
+        "2",
+        "1"
+       ],
+       "M": "2",
+       "expected_cost": "2"
+      },
+      {
+       "L": [
+        "1",
+        "2"
+       ],
+       "M": "2",
+       "expected_cost": "2.1"
+      },
+      {
+       "L": [
+        "2",
+        "2"
+       ],
+       "M": "2",
+       "expected_cost": "2.2"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated"
+   ],
+   "description": "sor_h-0006 from the spec table"
+  },
+  {
+   "case_id": "sor_h-0007",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "0",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "4",
+    "theta": "0",
+    "lit_samples": [
+     [
+      "0"
+     ],
+     [
+      "2"
+     ]
+    ],
+    "venues": [
+     {
+      "Q": "2",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: S not positive"
+  },
+  {
+   "case_id": "sor_h-0008",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "10",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "-1",
+    "theta": "0",
+    "lit_samples": [
+     [
+      "0"
+     ],
+     [
+      "2"
+     ]
+    ],
+    "venues": [
+     {
+      "Q": "2",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: negative penalty"
+  },
+  {
+   "case_id": "sor_h-0009",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "10",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "4",
+    "theta": "0",
+    "lit_samples": [],
+    "venues": [
+     {
+      "Q": "2",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: empty sample"
+  }
+ ]
+}

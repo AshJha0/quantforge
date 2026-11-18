@@ -417,11 +417,15 @@ Rulings `stage-h-rulings-w1.md` HR-1 to HR-10 (confirmed 2026-11-18). No new err
 | `exec.tca.shortfall` | `10-execution/tca.md` | `side` (`BUY`, `SELL`), `decision_price`, `arrival_price`, `end_price`, `order_quantity`, `fills` (array of `{quantity, price}`), `fees`, optional `benchmark_vwap` | `delay`, `execution`, `opportunity`, `total`, `total_bps`; `vwap_slippage` only when `benchmark_vwap` is given |
 | `micro.mm.as_quotes` | `09-microstructure/avellaneda-stoikov.md` | `mid`, `inventory`, `risk_aversion`, `sigma`, `time_left`, `k` | `reservation`, `spread`, `bid`, `ask` |
 | `usecase.execution_tca` | `04-pricing/use-cases.md` (use case 5) | see the spec | `lots`, `expected_cost`, `variance`, `filled`, `fees`, `delay`, `execution`, `opportunity`, `total`, `total_bps` |
+
 ## Stage H wave 2 operations
 
-No new error code. Prices, quantities and fees are decimal strings (HR-12); outputs are canonical JSON (HR-29). The specs' Errors lines give the page limits (`micro.book.rebuild` 50,000,000 messages, HR-17; `exec.sim.lit.run` 10,000,000 events), which replace the general per-array limit for those arrays. Goldens `datasets/golden/stage_h/ob_h.json` and `lit_h.json` (`oracle/python/gen_stage_h_w2.py`). Implemented in all four builds.
+No new error code. Prices, quantities and fees are decimal strings (HR-12); outputs are canonical JSON (HR-29). The specs' Errors lines give the page limits (`micro.book.rebuild` 50,000,000 messages, HR-17; `exec.sim.lit.run` 10,000,000 events), which replace the general per-array limit for those arrays. Goldens `datasets/golden/stage_h/ob_h.json`, `lit_h.json`, `dark_h.json` and `sor_h.json` (`oracle/python/gen_stage_h_w2.py`). `micro.book.rebuild` and `exec.sim.lit.run` are implemented in all four builds. `exec.sim.dark.run`, `exec.sim.dark.markouts` and `exec.sor.allocate` are implemented in the Python build only; the Java, C++ and Rust builds answer `E_UNSUPPORTED_OPERATION`, which the runner counts as not implemented.
 
 | Prefix | Spec | Slice |
 |---|---|---|
 | `micro.book.rebuild` | `09-microstructure/order-book.md` | wave 2 (H-2) |
 | `exec.sim.lit.run` | `10-execution/lit-matching.md` | wave 2 (H-11); every output carries `label` "simulated venue; not a real exchange" |
+| `exec.sim.dark.run` | `10-execution/dark-pool.md` | wave 2 (H-12); one run (`config`, `events`) or `scenarios`; every run carries `label` "simulated venue; not a real dark pool"; `events` up to 10,000,000 |
+| `exec.sim.dark.markouts` | `10-execution/dark-pool.md` (Adverse selection; name set by the H-12 lane, the spec names no verb) | wave 2 (H-12); each markout element carries `label` |
+| `exec.sor.allocate` | `10-execution/smart-order-router.md` | wave 2 (H-13); `method` default `SAMPLE_AVERAGE`; optional `ranking` (true adds the full ranking, grid at most 10^6 points) and `report_se` (adds `expected_cost_se` and `label` "simulated venues; router scored in simulation only"); `lit_samples` up to 1,000,000 |

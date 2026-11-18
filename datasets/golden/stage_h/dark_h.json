@@ -1,0 +1,579 @@
+{
+ "schema_version": "1.0",
+ "suite": "dark_h",
+ "spec": "specifications/10-execution/dark-pool.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_w2.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "dark_h-0001",
+   "operation": "exec.sim.dark.run",
+   "inputs": {
+    "config": {
+     "firm_delay": 0,
+     "lot_size": "1",
+     "p_firm": "1",
+     "penalty_events": 2,
+     "seed": 20261118,
+     "tick_size": "0.01"
+    },
+    "events": [
+     {
+      "ask": "100.10",
+      "bid": "100.00",
+      "op": "BOOK"
+     },
+     {
+      "id": "B1",
+      "kind": "FIRM",
+      "op": "NEW",
+      "qty": "100",
+      "side": "BUY"
+     },
+     {
+      "id": "S1",
+      "kind": "FIRM",
+      "op": "NEW",
+      "qty": "60",
+      "side": "SELL"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fills": [
+      {
+       "buy_id": "B1",
+       "price": "100.05",
+       "qty": "60",
+       "sell_id": "S1",
+       "seq": 1
+      }
+     ],
+     "invitations": [],
+     "label": "simulated venue; not a real dark pool",
+     "resting": [
+      {
+       "id": "B1",
+       "open_qty": "40",
+       "seq": 1,
+       "side": "BUY"
+      }
+     ],
+     "suspensions": []
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated"
+   ],
+   "description": "dark_h-0001 from the spec table"
+  },
+  {
+   "case_id": "dark_h-0002",
+   "operation": "exec.sim.dark.run",
+   "inputs": {
+    "config": {
+     "firm_delay": 0,
+     "lot_size": "1",
+     "p_firm": "1",
+     "penalty_events": 2,
+     "seed": 20261118,
+     "tick_size": "0.01"
+    },
+    "events": [
+     {
+      "ask": "100.10",
+      "bid": "100.00",
+      "op": "BOOK"
+     },
+     {
+      "id": "B1",
+      "kind": "FIRM",
+      "min_qty": "80",
+      "op": "NEW",
+      "qty": "100",
+      "side": "BUY"
+     },
+     {
+      "id": "S1",
+      "kind": "FIRM",
+      "op": "NEW",
+      "qty": "60",
+      "side": "SELL"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fills": [],
+     "invitations": [],
+     "label": "simulated venue; not a real dark pool",
+     "resting": [
+      {
+       "id": "B1",
+       "open_qty": "100",
+       "seq": 1,
+       "side": "BUY"
+      },
+      {
+       "id": "S1",
+       "open_qty": "60",
+       "seq": 2,
+       "side": "SELL"
+      }
+     ],
+     "suspensions": []
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated"
+   ],
+   "description": "dark_h-0002 from the spec table"
+  },
+  {
+   "case_id": "dark_h-0003",
+   "operation": "exec.sim.dark.run",
+   "inputs": {
+    "config": {
+     "firm_delay": 0,
+     "lot_size": "1",
+     "p_firm": "1",
+     "penalty_events": 2,
+     "seed": 20261118,
+     "tick_size": "0.01"
+    },
+    "events": [
+     {
+      "ask": "100.10",
+      "bid": "100.00",
+      "op": "BOOK"
+     },
+     {
+      "id": "B1",
+      "kind": "FIRM",
+      "limit": "100.04",
+      "op": "NEW",
+      "qty": "100",
+      "side": "BUY"
+     },
+     {
+      "id": "S1",
+      "kind": "FIRM",
+      "op": "NEW",
+      "qty": "60",
+      "side": "SELL"
+     },
+     {
+      "ask": "100.01",
+      "bid": "100.00",
+      "op": "BOOK"
+     },
+     {
+      "ask": "100.02",
+      "bid": "100.02",
+      "op": "BOOK"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fills": [
+      {
+       "buy_id": "B1",
+       "price": "100.005",
+       "qty": "60",
+       "sell_id": "S1",
+       "seq": 1
+      }
+     ],
+     "invitations": [],
+     "label": "simulated venue; not a real dark pool",
+     "resting": [
+      {
+       "id": "B1",
+       "open_qty": "40",
+       "seq": 1,
+       "side": "BUY"
+      }
+     ],
+     "suspensions": []
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated"
+   ],
+   "description": "dark_h-0003 from the spec table; not blind"
+  },
+  {
+   "case_id": "dark_h-0004",
+   "operation": "exec.sim.dark.run",
+   "inputs": {
+    "scenarios": [
+     {
+      "config": {
+       "firm_delay": 0,
+       "lot_size": "1",
+       "p_firm": "1",
+       "penalty_events": 2,
+       "seed": 20261118,
+       "tick_size": "0.01"
+      },
+      "events": [
+       {
+        "ask": "100.10",
+        "bid": "100.00",
+        "op": "BOOK"
+       },
+       {
+        "id": "C1",
+        "kind": "CONDITIONAL",
+        "op": "NEW",
+        "qty": "50",
+        "side": "BUY"
+       },
+       {
+        "id": "S1",
+        "kind": "FIRM",
+        "op": "NEW",
+        "qty": "30",
+        "side": "SELL"
+       },
+       {
+        "ask": "100.20",
+        "bid": "100.00",
+        "op": "BOOK"
+       },
+       {
+        "ask": "100.20",
+        "bid": "100.00",
+        "op": "BOOK"
+       },
+       {
+        "ask": "100.30",
+        "bid": "100.00",
+        "op": "BOOK"
+       }
+      ]
+     },
+     {
+      "config": {
+       "firm_delay": 0,
+       "lot_size": "1",
+       "p_firm": "0",
+       "penalty_events": 2,
+       "seed": 20261118,
+       "tick_size": "0.01"
+      },
+      "events": [
+       {
+        "ask": "100.10",
+        "bid": "100.00",
+        "op": "BOOK"
+       },
+       {
+        "id": "C1",
+        "kind": "CONDITIONAL",
+        "op": "NEW",
+        "qty": "50",
+        "side": "BUY"
+       },
+       {
+        "id": "S1",
+        "kind": "FIRM",
+        "op": "NEW",
+        "qty": "30",
+        "side": "SELL"
+       },
+       {
+        "ask": "100.20",
+        "bid": "100.00",
+        "op": "BOOK"
+       },
+       {
+        "ask": "100.20",
+        "bid": "100.00",
+        "op": "BOOK"
+       },
+       {
+        "ask": "100.30",
+        "bid": "100.00",
+        "op": "BOOK"
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": [
+      {
+       "fills": [
+        {
+         "buy_id": "C1",
+         "price": "100.05",
+         "qty": "30",
+         "sell_id": "S1",
+         "seq": 1
+        }
+       ],
+       "invitations": [
+        {
+         "contra_id": "S1",
+         "event": 3,
+         "id": "C1",
+         "result": "FIRMED"
+        }
+       ],
+       "label": "simulated venue; not a real dark pool",
+       "resting": [
+        {
+         "id": "C1",
+         "open_qty": "20",
+         "seq": 1,
+         "side": "BUY"
+        }
+       ],
+       "suspensions": []
+      },
+      {
+       "fills": [],
+       "invitations": [
+        {
+         "contra_id": "S1",
+         "event": 3,
+         "id": "C1",
+         "result": "DECLINED"
+        },
+        {
+         "contra_id": "S1",
+         "event": 6,
+         "id": "C1",
+         "result": "DECLINED"
+        }
+       ],
+       "label": "simulated venue; not a real dark pool",
+       "resting": [
+        {
+         "id": "C1",
+         "open_qty": "50",
+         "seq": 1,
+         "side": "BUY"
+        },
+        {
+         "id": "S1",
+         "open_qty": "30",
+         "seq": 2,
+         "side": "SELL"
+        }
+       ],
+       "suspensions": [
+        {
+         "from_event": 4,
+         "id": "C1",
+         "to_event": 5
+        },
+        {
+         "from_event": 7,
+         "id": "C1",
+         "to_event": 8
+        }
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated"
+   ],
+   "description": "dark_h-0004 from the spec table"
+  },
+  {
+   "case_id": "dark_h-0007",
+   "operation": "exec.sim.dark.markouts",
+   "inputs": {
+    "fills": [
+     {
+      "fill_price": "100.05",
+      "mid_at": {
+       "1": "100.07",
+       "10": "100.00",
+       "60": "100.15"
+      },
+      "side": "BUY"
+     },
+     {
+      "fill_price": "100.05",
+      "mid_at": {
+       "1": "100.07",
+       "10": "100.00",
+       "60": "100.15"
+      },
+      "side": "SELL"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fills": [
+      {
+       "label": "simulated venue; not a real dark pool",
+       "markouts_bp": {
+        "1": "1.999",
+        "10": "-4.997501",
+        "60": "9.995002"
+       }
+      },
+      {
+       "label": "simulated venue; not a real dark pool",
+       "markouts_bp": {
+        "1": "-1.999",
+        "10": "4.997501",
+        "60": "-9.995002"
+       }
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated"
+   ],
+   "description": "dark_h-0007 from the spec table"
+  },
+  {
+   "case_id": "dark_h-0008",
+   "operation": "exec.sim.dark.run",
+   "inputs": {
+    "config": {
+     "firm_delay": 0,
+     "lot_size": "1",
+     "p_firm": "1.5",
+     "penalty_events": 2,
+     "seed": 20261118,
+     "tick_size": "0.01"
+    },
+    "events": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: p_firm above 1"
+  },
+  {
+   "case_id": "dark_h-0009",
+   "operation": "exec.sim.dark.run",
+   "inputs": {
+    "config": {
+     "firm_delay": 0,
+     "lot_size": "1",
+     "p_firm": "1",
+     "penalty_events": 2,
+     "seed": 20261118,
+     "tick_size": "0.01"
+    },
+    "events": [
+     {
+      "id": "B1",
+      "kind": "FIRM",
+      "op": "NEW",
+      "qty": "100",
+      "side": "BUY",
+      "min_qty": "200"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: min_qty above qty"
+  },
+  {
+   "case_id": "dark_h-0010",
+   "operation": "exec.sim.dark.run",
+   "inputs": {
+    "config": {
+     "firm_delay": 0,
+     "lot_size": "1",
+     "p_firm": "1",
+     "penalty_events": 2,
+     "seed": 20261118,
+     "tick_size": "0.01"
+    },
+    "events": [
+     {
+      "id": "B1",
+      "kind": "FIRM",
+      "op": "NEW",
+      "qty": "0",
+      "side": "BUY"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: non-positive qty"
+  }
+ ]
+}
