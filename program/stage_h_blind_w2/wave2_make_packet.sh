@@ -8,6 +8,15 @@
 set -eu
 R="$1"; P="$2"; W="${3:-a}"; D="$(cd "$(dirname "$0")" && pwd)"
 mkdir -p "$P"
+if [ "$W" = micro ]; then
+  # Third argument "micro": H-4b estimators and H-16 venue analytics with HR-70..74.
+  awk -f "$D/wave2_extract.awk" "$R/specifications/09-microstructure/micro-estimators.md" > "$P/micro-estimators.blind.md"
+  awk -f "$D/wave2_extract.awk" "$R/specifications/10-execution/venue-analytics.md" > "$P/venue-analytics.blind.md"
+  cp "$R/specifications/stage-h-rulings-micro.md" "$P/"
+  cd "$P"
+  sha256sum micro-estimators.blind.md venue-analytics.blind.md stage-h-rulings-micro.md > MANIFEST.sha256
+  exit 0
+fi
 if [ "$W" = b ]; then
   S="dark-pool smart-order-router paper-trading"
   for f in $S; do awk -f "$D/wave2_extract.awk" "$R/specifications/10-execution/$f.md" > "$P/$f.blind.md"; done

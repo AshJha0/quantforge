@@ -1,0 +1,11 @@
+# Stage H rulings, wave 2 microstructure estimators and venue analytics: 2026-11-18
+
+Written 2026-11-18 by the H-4b / H-16 spec lane under the owner's delegation. Numbers start at HR-70 so they cannot clash with a parallel wave-2 lane that continues from HR-59. Covers `09-microstructure/micro-estimators.md` and `10-execution/venue-analytics.md`. Append-only.
+
+| # | Point | Ruling |
+|---|---|---|
+| HR-70 | Recovery criterion (14.7 H-4) | An estimator passes on one seed when `\|theta_hat - theta\| <= 3 SE_hat`. Fixed seeds are stated in the spec before any run; a failing seed is reported, never replaced. The coverage run uses 200 stated seeds and passes with at most 4 misses: under a correct estimator the miss probability is about 0.0027 per seed and P(more than 4 misses of 200) = 2.4e-4 (Binomial, computed 2026-11-18 before any run), so the gate can pass |
+| HR-71 | Random numbers | Simulations are Python-oracle only: `numpy.random.default_rng(seed)` (PCG64), draws in the order the spec lists. Other languages implement the deterministic estimators and are compared on the `mest_h-*` and `venue_h-*` goldens only; no cross-language random stream is promised |
+| HR-72 | Markout sign and mid lookup | Markout is from the fill owner's side: `s (m(t+h) - p)`, positive when the mid moved in the owner's favour. Toxicity is the quantity share of fills with a strictly negative markout. The mid at time `u` is the last mid stamped at or before `u` (step function) |
+| HR-73 | VPIN | Not specified. The [ELO12] bucket example could not be verified (paper not free, not read in this lane, so its bucket numbers would be recalled), and STAGE_H_START allows it only if verifiable. Omitted; a later lane may add it after reading the paper |
+| HR-74 | Degenerate fits | An exact fit gives SE 0 and is a valid golden; recovery tests use noisy simulations only, so SE 0 never decides a 3 SE test. Fewer observations than the estimator's stated minimum is `E_INPUT` |
