@@ -352,6 +352,18 @@ fn stage_j_w3_curves_goldens() {
     );
 }
 
+/// The stage H wave 1 goldens (schedules, Almgren-Chriss, impact, shortfall TCA, Avellaneda-Stoikov,
+/// use case 5), which put `ops/execution.rs` and `execution.rs` under `cargo test` and so under the
+/// per-file coverage gate.
+#[test]
+fn stage_h_w1_goldens() {
+    replay_only(
+        "stage_h",
+        &["sched_h", "ac_h", "imp_h", "tca_h", "as_h", "uc5_h"],
+        40,
+    );
+}
+
 /// The R6 hedge goldens (audit, Jacobi scaling, use case 6, and the e1 error and edge cases), which put the hedge
 /// adapters under `cargo test`. The other R6 files (n = 200 QP, barrier MC) are too slow for a debug build and run in the external runner.
 #[test]
