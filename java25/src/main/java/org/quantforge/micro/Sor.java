@@ -220,6 +220,20 @@ public final class Sor {
             if (!(inp.get("venues") instanceof List<?> venues) || venues.isEmpty()) {
                 throw new QfError("E_INPUT", "venues: empty", "venues");
             }
+            String orderClass = DarkPool.assetClass(inp.get("asset_class"), "asset_class", false);
+            List<String> classes = new ArrayList<>();
+            for (int k = 0; k < venues.size(); k++) {
+                classes.add(DarkPool.assetClass(venues.get(k) instanceof Map<?, ?> m ? m.get("asset_class") : null,
+                        "venues/" + k + "/asset_class", false));
+            }
+            if (classes.stream().anyMatch(cl -> !cl.equals(orderClass))) {
+                throw new QfError("E_INPUT", "a venue's asset_class differs from the order's (HR-93)", "venues");
+            }
+            for (int k = 0; k < venues.size(); k++) {
+                if (venues.get(k) instanceof Map<?, ?> m && "DARK".equals(m.get("kind"))) {
+                    DarkPool.assetClass(classes.get(k), "venues/" + k + "/asset_class", true);
+                }
+            }
             if (venues.size() > MAX_VENUES) {
                 throw new QfError("E_LIMIT", "more than 64 venues", "venues");
             }
