@@ -11,11 +11,12 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from quantforge_core import dark_pool, lit_matching, sor
 from quantforge_core import multiasset as ma
 from quantforge_core.errors import QfError
 
 GOLD = Path(__file__).resolve().parents[2] / "datasets" / "golden" / "stage_h"
-SUITES = ("auc_h", "eqc_h", "fxc_h", "fxv_h", "rtc_h", "fut_h", "e1_h3")
+SUITES = ("auc_h", "eqc_h", "fxc_h", "fxv_h", "rtc_h", "fut_h", "ses_h", "acls_h", "e1_h3")
 FN = {
     "micro.eq.round_price": ma.eq_round_price,
     "micro.eq.fee_check": ma.eq_fee_check,
@@ -36,6 +37,12 @@ FN = {
     "exec.sim.fut.pnl": ma.fut_pnl,
     "exec.sim.fut.variation": ma.fut_variation,
     "exec.sim.fut.run": ma.fut_run,
+    "micro.rates.bond_yield": ma.rates_bond_yield,
+    "exec.sim.lit.run": lambda i: lit_matching.run(
+        i["tick_size"], i["lot_size"], i["events"], i["fee_schedule"], i.get("session")
+    ),
+    "exec.sor.allocate": sor.allocate,
+    "exec.sim.dark.run": lambda i: dark_pool.run(i["config"], i["events"]),
 }
 CASES = [
     c for s in SUITES for c in json.loads((GOLD / f"{s}.json").read_text(encoding="utf-8"))["cases"]
@@ -53,8 +60,13 @@ def test_golden(case: dict[str, Any]) -> None:
         assert e.value.code == exp["error_code"]
     else:
         out = fn(case["inputs"])
-        assert out == exp["outputs"]
-        assert out["label"] in LABELS
+        if case["operation"] == "micro.rates.bond_yield":
+            assert out["yield"] == pytest.approx(exp["outputs"]["yield"], abs=1e-10)
+        else:
+            assert out == exp["outputs"]
+        # A4 as ruled 2026-11-18: venue and simulator outputs carry a label, pure conventions none
+        venue = case["operation"].startswith("exec.") and case["operation"] != "exec.sor.allocate"
+        assert (out.get("label") in LABELS) if venue else ("label" not in out)
 
 
 def test_cli_registered() -> None:
@@ -84,10 +96,11 @@ def test_a3_rounding_never_more_aggressive() -> None:
                 assert r % tick == 0 or r == 1
 
 
-def test_a3_32nds_round_trip_on_1_256_grid() -> None:
-    for n in range(0, 256 * 130, 7):
-        x = Decimal(n) / 256
-        text = ma.rates_format_32nds({"resolution": 256, "value": str(x)})["text"]
+def test_a3_32nds_round_trip_on_1_128_grid() -> None:
+    """A3 as amended by HR-109: CME quarter-32nds, so the round trip holds on the 1/128 grid."""
+    for n in range(0, 128 * 130, 7):
+        x = Decimal(n) / 128
+        text = ma.rates_format_32nds({"resolution": 128, "value": str(x)})["text"]
         assert Decimal(ma.rates_parse_32nds({"text": text})["value"]) == x
 
 
@@ -234,8 +247,17 @@ def test_fut_run_reuses_lit_engine() -> None:
 
 
 def test_more_paths() -> None:
+    assert "label" not in ma.eq_round_price({"price": "5", "side": "BUY"})
     assert (
-        ma.eq_round_price({"price": "5", "side": "BUY", "data_source": "IEX"})["label"]
+        ma.auction_uncross(
+            {
+                "orders": [],
+                "phase": "OPEN",
+                "ref_price": "1",
+                "tick_size": "0.01",
+                "data_source": "IEX",
+            }
+        )["label"]
         == ma.IEX_LABEL
     )
     assert (
@@ -258,7 +280,6 @@ def test_more_paths() -> None:
         ({"price": "1", "side": "BUY", "tick_table": [["1", "0.01"]]}, "E_INPUT"),
         ({"price": "1", "side": "BUY", "tick_table": [["0", "0"]]}, "E_DOMAIN"),
         ({"price": "1", "side": "BUY", "tick_tier": "X"}, "E_SCHEMA"),
-        ({"price": "1", "side": "BUY", "data_source": "X"}, "E_SCHEMA"),
         ({"price": 1, "side": "BUY"}, "E_SCHEMA"),
     ):
         with pytest.raises(QfError) as e:
@@ -267,3 +288,86 @@ def test_more_paths() -> None:
     with pytest.raises(QfError) as e:
         ma.eq_settle_date({"trade_date": "2026-13-01"})
     assert e.value.code == "E_SCHEMA"
+
+
+def test_hr93_asset_class_dark_and_sor() -> None:
+    cfg = {"lot_size": "1", "tick_size": "0.01", "p_firm": "1", "seed": 1}
+    for cls in ("FX", "RATES"):
+        with pytest.raises(QfError) as e:
+            dark_pool.run(dict(cfg, asset_class=cls), [])
+        assert e.value.code == "E_INPUT"
+    assert dark_pool.run(dict(cfg, asset_class="EQUITY"), [])["label"]
+    base = {
+        "S": "4",
+        "f": "0.3",
+        "h": "0.5",
+        "lambda_o": "1",
+        "lambda_u": "1",
+        "theta": "0",
+        "lit_samples": [["0"], ["4"]],
+        "asset_class": "FX",
+        "venues": [
+            {"Q": "0", "as": "0", "kind": "LIT", "r": "0.2", "asset_class": "FX"},
+            {"as": "0.1", "kind": "DARK", "r": "0", "tail": ["0.5", "0"], "asset_class": "FX"},
+        ],
+    }
+    with pytest.raises(QfError) as e:
+        sor.allocate(base)
+    assert e.value.code == "E_INPUT"
+
+
+def test_last_look_draw_reproducible() -> None:
+    from quantforge_core.rng import Xoshiro256
+
+    inp = {
+        "mid_after": "1.0852",
+        "p_random_reject": "0.5",
+        "pair": "EURUSD",
+        "qty": "1",
+        "quote": {"ask": "1.0852", "bid": "1.0850", "quote_mid": "1.0851"},
+        "side": "BUY",
+        "threshold_pips": "2",
+        "seed": 7,
+        "request_index": 5,
+    }
+    out = ma.fx_request(inp)
+    assert out["u"] == Xoshiro256.seeded(7, 5).uniform()
+    assert out == ma.fx_request(inp)
+    with pytest.raises(QfError) as e:
+        ma.fx_request(dict(inp, request_index=-1))
+    assert e.value.code == "E_SCHEMA"
+
+
+def test_session_conservation_and_phase_order() -> None:
+    ev = [
+        {
+            "id": "B1",
+            "op": "NEW",
+            "qty": "5",
+            "side": "BUY",
+            "trader": "A",
+            "type": "LIMIT",
+            "price": "1.00",
+        },
+        {
+            "id": "S1",
+            "op": "NEW",
+            "qty": "5",
+            "side": "SELL",
+            "trader": "B",
+            "type": "LIMIT",
+            "price": "1.01",
+        },
+        {"id": "S1", "op": "CANCEL"},
+    ]
+    out = lit_matching.run(
+        "0.01", "1", ev, {"maker_rebate": "0", "taker_fee": "0"}, {"ref_price": "1"}
+    )
+    assert out["phase"] == "PRE_OPEN" and out["auctions"] == []
+    assert out["conservation"]["B1"]["resting"] == "5"
+    assert out["conservation"]["S1"]["cancelled"] == "5"
+    ev2 = ev[:2] + [{"op": "PHASE", "phase": "CONTINUOUS"}]
+    out = lit_matching.run(
+        "0.01", "1", ev2, {"maker_rebate": "0", "taker_fee": "0"}, {"ref_price": "1"}
+    )
+    assert out["auctions"][0]["price"] is None and len(out["book"]["bids"]) == 1

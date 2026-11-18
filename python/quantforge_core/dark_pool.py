@@ -221,8 +221,23 @@ def _int(v: Any, path: str) -> int:
     return v
 
 
+ASSET_CLASSES = ("EQUITY", "FX", "RATES")
+
+
+def asset_class(v: Any, path: str, dark: bool = False) -> str:
+    """HR-93, HR-113: `asset_class` (default EQUITY); a dark venue of another class is an invalid
+    input combination, E_INPUT (structural cross-field check, HR-66)."""
+    v = "EQUITY" if v is None else v
+    if v not in ASSET_CLASSES:
+        raise QfError("E_SCHEMA", f"{path}: not EQUITY, FX or RATES", path)
+    if dark and v != "EQUITY":
+        raise QfError("E_INPUT", f"{path}: dark pool is equities only (HR-93, HR-113)", path)
+    return str(v)
+
+
 def run(config: dict[str, Any], events: list[Any]) -> dict[str, Any]:
     """One pool run over `events` (BOOK, NEW, CANCEL), numbered from 1."""
+    asset_class(config.get("asset_class"), "config/asset_class", dark=True)
     if len(events) > MAX_EVENTS:
         raise QfError("E_LIMIT", "more than 10,000,000 events", "events")
     pool = _Pool(config)

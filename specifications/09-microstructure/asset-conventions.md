@@ -12,13 +12,14 @@ Spec version 0.1.0 (stage H, multi-asset spec lane, drafted 2026-11-18; not norm
 - [REGNMS-600] SEC Rule 600(b)(93) (17 CFR 242.600), round lot as amended: 100 shares up to $250.00, 40 to $1,000.00, 10 to $10,000.00, 1 above. [regulation text; **read 2026-11-18** (source check retry)]
 - [FX-USD-T1] Market convention for USD pairs: a USD-only holiday on T+1 does not stop the spot count; the spot date itself must be a USD business day. [industry convention; **partly verified**: no central-bank source found, source check retry 2026-11-18]
 - [CBOE-AUC] Cboe (Bats) auction model: maximum volume, then minimum imbalance, then imbalance side, then nearest the reference. [venue documentation; **unverified this session**]
-- [SEC-2024-TICK] SEC 2024 amendments to Rules 612/610/600 (half-penny tier, $0.001 fee cap, round lots by price). The amended text is codified (read 2026-11-18). Compliance date used as the default switch: **2026-11-03 (unverified**; the source check could not confirm it; parameter `compliance_date`).
+- [SEC-2024-TICK] SEC 2024 amendments to Rules 612/610/600 (half-penny tier, $0.001 fee cap, round lots by price). The amended text is codified (read 2026-11-18). Compliance date used as the default switch (parameter `compliance_date`): **2025-11-03**, the first business day of November 2025, for Rules 612, 610 and 600(b)(93) as adopted (SEC release 34-101070, section VI, **read 2026-11-18**). Whether a later SEC order moved it is **unverified** (the order listings were not read); HR-110.
 - [SEC-T1] SEC 2023 T+1 standard settlement amendment to Rule 15c6-1, compliance 2024-05-28. [regulation; **unverified this session**]
 - [IEX-AUC] IEX Exchange rule book and auction pages (iex.io), opening/closing auction price determination. [venue documentation; **unverified this session**; used only for the shape of the uncrossing criteria]
 - [FXGC] Global Foreign Exchange Committee, "FX Global Code", Principle 17 (last look). globalfxc.org. [industry code; **unverified this session**]
 - [BIS-FX] BIS Triennial Survey definitions (spot = settlement within two business days). bis.org. [central-bank; **unverified this session**]
 - [CME-ZN] CME Group, 10-Year T-Note futures contract specs (face $100,000; tick one-half of 1/32 = $15.625). cmegroup.com. [exchange spec; **unverified this session**]
 - [CME-ZB] CME Group, U.S. Treasury Bond futures specs (tick 1/32 = $31.25). [exchange spec; **unverified this session**]
+- [CME-32NDS] CME Group Treasury futures price quotation convention (third digit in quarter-32nds: 0, 2, 5 or +, 7). [exchange convention; **unverified**: CME rulebook ch. 19 and contract-spec page timed out on the 2026-11-18 retry, HR-115]
 - [UST-BILL] US Treasury (TreasuryDirect), bill discount-basis price formula. [government; **unverified this session**]
 
 Every source tagged unverified must be read and re-tagged "read <date>" before v0.10.0 (HR-98). No London Stock Exchange or LSEG material is used anywhere (HR-99).
@@ -26,7 +27,7 @@ Every source tagged unverified must be read and re-tagged "read <date>" before v
 ## 1. Equities (H-22)
 
 ### 1.1 Tick table and rounding (HR-81)
-Parameter `tick_table`: list of `(price_floor, tick)`. The tick that applies is that of the highest `price_floor <= price`. Dated rule versions (coordinator ruling 2026-11-18, after the HR-98 source check): input `as_of` (ISO date, optional) and `compliance_date` (default 2026-11-03, unverified); with no `as_of`, or `as_of` on or after the compliance date, the **current** rules apply; before it, the old regime. Current default [REGNMS-612]: input `tick_tier` `PENNY` (default) gives `[(0, 0.0001), (1.00, 0.01)]`, `HALF_PENNY` gives `[(0, 0.0001), (1.00, 0.005)]` (the tier is a per-stock input; the six-monthly spread test is not modelled). Old regime: `PENNY` only; `HALF_PENNY` before the compliance date, or with an explicit `tick_table`, is `E_INPUT`.
+Parameter `tick_table`: list of `(price_floor, tick)`. The tick that applies is that of the highest `price_floor <= price`. Dated rule versions (coordinator ruling 2026-11-18, after the HR-98 source check): input `as_of` (ISO date, optional) and `compliance_date` (default 2025-11-03; see [SEC-2024-TICK]); with no `as_of`, or `as_of` on or after the compliance date, the **current** rules apply; before it, the old regime. Current default [REGNMS-612]: input `tick_tier` `PENNY` (default) gives `[(0, 0.0001), (1.00, 0.01)]`, `HALF_PENNY` gives `[(0, 0.0001), (1.00, 0.005)]` (the tier is a per-stock input; the six-monthly spread test is not modelled). Old regime: `PENNY` only; `HALF_PENNY` before the compliance date, or with an explicit `tick_table`, is `E_INPUT`.
 Operation `micro.eq.round_price(price, side, tick_table)`: a buy limit rounds **down** to the grid, a sell limit rounds **up** (never more aggressive than asked). Exact decimals. A rounded sell that lands exactly on a floor is valid on both grids.
 Errors: price <= 0 `E_DOMAIN`.
 
@@ -58,7 +59,7 @@ T+2 business days; pairs in `t1_pairs` (default `[USDCAD]`) T+1 [BIS-FX]. A day 
 ## 3. Rates (H-24)
 
 ### 3.1 32nds quoting (HR-90)
-Text `H-FF[f]`: handle `H`, `FF` = 32nds 00 to 31, optional `f` in eighths of a 32nd: `''`=0, `1`=1/8, `2`=1/4, `+`=1/2, `5`=5/8, `6`=3/4, `7`=7/8. Value = H + (FF + f)/32. Formatting takes a `resolution` (32, 64, 128 or 256 parts per point); a price not exactly on that grid is `E_DOMAIN`; a half is printed `+`.
+Text `H-FF[q]`: handle `H`, `FF` = 32nds 00 to 31, optional third digit in quarter-32nds by the CME convention [CME-32NDS, **unverified** until a CME page is read] (HR-109, amends the eighths of HR-90): `''` or `0` = 0, `2` = 1/4, `5` or `+` = 1/2, `7` = 3/4; any other third digit (1, 3, 4, 6, 8, 9) is `E_SCHEMA`, as is any other malformed text. Value = H + (FF + q)/32. Formatting takes a `resolution` (32, 64 or 128 parts per point); a price not exactly on that grid is `E_DOMAIN`; a half is printed `+`.
 
 ### 3.2 Futures contract specs (HR-91)
 `contract`: `{symbol, face, tick, tick_value, months, last_trade_rule}`. Defaults: ZN face 100,000, tick 1/64 point, tick value 15.625 [CME-ZN]; ZB tick 1/32, tick value 31.25 [CME-ZB]. Tick value = face x tick / 100.
@@ -69,9 +70,9 @@ Coupon bond on a coupon date, street convention: P = sum_{i=1..n} (100 c/f)/(1+y
 ## How each plugs into existing modules
 | Module | Change |
 |---|---|
-| `exec.sim.lit.run` (`lit-matching.md`) | optional `asset` block `{class, tick_table or pip or contract, session, fee_schedule}`; prices mapped to integer ticks at the edge; matching unchanged; auction phases call `exec.sim.auction.uncross` |
-| dark pool | equities only (midpoint of the lit NBBO); FX and rates `E_UNSUPPORTED_OPERATION` (HR-93) |
-| SOR | venues gain `asset_class`; an order routed across classes is `E_INPUT`; FX RFQ venue is a venue of class FX |
+| `exec.sim.lit.run` (`lit-matching.md`) | optional `session` `{phase (default PRE_OPEN), ref_price, tie_break}` and `PHASE` events (HR-112): PRE_OPEN collects LIMIT/MARKET orders in a call book, CONTINUOUS uncrosses it with `exec.sim.auction.uncross` (OPEN) and rests unfilled limits in allocation order, PRE_CLOSE takes only `on_close` orders into a second call book, CLOSED uncrosses it (CLOSE) and cancels on-close leftovers; wrong-phase orders are rejected `PHASE`; `fee_schedule.auction_fee` x notional per auction fill; outputs gain `auctions` and `phase`. Stated simplification: the continuous book does not join the closing cross. Without `session` the engine and its goldens are unchanged. Goldens `ses_h` |
+| dark pool | equities only (midpoint of the lit NBBO); `config.asset_class` (`EQUITY` default, `FX`, `RATES`); FX and rates `E_INPUT` (HR-93 as amended by HR-113; goldens acls_h-0004/0005) |
+| SOR | order and venues gain `asset_class` (default `EQUITY`); a venue of another class than the order is `E_INPUT`; a DARK venue of class FX or RATES is `E_INPUT` (HR-113); goldens `acls_h` |
 | paper trading | label per class (HR-94); settlement lag sets the cash posting date; FX cash per currency; futures P&L = ticks x tick value, variation margin daily |
 | order book | unchanged (integer ticks) |
 
@@ -103,23 +104,25 @@ Coupon bond on a coupon date, street convention: P = sum_{i=1..n} (100 c/f)/(1+y
 | rtc_h-0001 | parse 99-16 | 99.5 | 99 + 16/32 |
 | rtc_h-0002 | parse 99-16+ | 99.515625 | 99 + 16.5/32 |
 | rtc_h-0003 | parse 99-162 | 99.5078125 | 99 + 16.25/32 |
-| rtc_h-0004 | parse 99-167 | 99.52734375 | 99 + 16.875/32 |
+| rtc_h-0004 | parse 99-167 | 99.5234375 | 99 + 16.75/32 (HR-109; was 16.875/32 under HR-90; not blind) |
 | rtc_h-0005 | format 101.296875, resolution 64 | 101-09+ | 0.296875 x 32 = 9.5 |
 | rtc_h-0006 | format 101.3, resolution 128 | E_DOMAIN | 9.6/32 not on 1/128 grid |
 | rtc_h-0007 | tick value, face 100,000, tick 1/64 | 15.625 | 100000 x 0.015625 / 100 |
 | rtc_h-0008 | price, 1 y bond, 4 % semiannual, yield 5 %, on coupon date | 99.036287924 (9 dp) | 2/1.025 + 102/1.025^2 |
 | rtc_h-0009 | price, 2 y bond, 4 % semiannual, yield 4 %, on coupon date | 100 | coupon equals yield |
 | rtc_h-0010 | bill, discount 5 %, 91 days | 98.736111111 (9 dp) | 100 (1 - 0.05 x 91/360) |
+| rtc_h-0011 | yield, 2 y bond, 4 % semiannual, price 100 | 0.04 | coupon equals yield (added, not blind) |
+| rtc_h-0012 | yield, 1 y bond, 4 % semiannual, price 99.036287923854848305 | 0.05 | inverse of rtc_h-0008 (added, not blind) |
 
 ## Acceptance (fixed before any run, HR-95)
 - A1 all goldens here and in `auction.md`, `fx-rfq-venue.md`, `rates-futures-venue.md` pass in all four languages with byte-identical outputs.
 - A2 the blind lane (DR-H2) re-derives at least 60 % of value cases; every mismatch explained before release.
-- A3 property tests: rounding never makes an order more aggressive; parse(format(x)) = x on the 1/256 grid; spot date is a good day and at least T+1; auction volume is maximal over the candidate grid.
-- A4 every output carries its label (HR-94).
+- A3 property tests: rounding never makes an order more aggressive; parse(format(x)) = x on the 1/128 grid (HR-109; was 1/256); spot date is a good day and at least T+1; auction volume is maximal over the candidate grid.
+- A4 every venue or simulator output carries its label (HR-94, HR-111); convention outputs carry none.
 - A5 no source still tagged unverified at release (HR-98).
 
 ## Output shapes (pre-comparison spec fix, 2026-11-18, HR-100)
-Operation names (oracle lane, 2026-11-18): `micro.eq.round_price`, `micro.eq.fee_check`, `micro.eq.round_lot`, `micro.eq.settle_date`, `micro.fx.pip_value`, `micro.fx.spot_date`, `micro.rates.parse_32nds`, `micro.rates.format_32nds`, `micro.rates.tick_value`, `micro.rates.bond_price` (`coupon`, `frequency`, `periods`, `yield`), `micro.rates.bill_price` (`discount`, `days`). Every decimal input is an HR-12 decimal string. Equities labels: "simulated venue; not a real exchange", or "IEX only; one venue" with `data_source` IEX. 32nds text also accepts `3` (3/8 of a 32nd) so that every point of the 1/256 grid prints (A3; gap in HR-90). Every success output is `{"status": "ok", "label": <HR-94 label>, ...fields}`; every error `{"status": "error", "error_code": <code>}`. Decimals are JSON strings compared by value (trailing zeros are representation only). Fields:
+Operation names (oracle lane, 2026-11-18): `micro.eq.round_price`, `micro.eq.fee_check`, `micro.eq.round_lot`, `micro.eq.settle_date`, `micro.fx.pip_value`, `micro.fx.spot_date`, `micro.rates.parse_32nds`, `micro.rates.format_32nds`, `micro.rates.tick_value`, `micro.rates.bond_price` (`coupon`, `frequency`, `periods`, `yield`), `micro.rates.bond_yield` (`coupon`, `frequency`, `periods`, `price`; output `yield`, a binary64 Real by Brent, tolerance 1e-12, golden class `root_finding`), `micro.rates.bill_price` (`discount`, `days`). Every decimal input is an HR-12 decimal string. Labels (HR-111): these pure convention operations carry **no** label (they are not venue output); every venue or simulator operation (`exec.sim.*`) keeps its label. Every venue or simulator success output is `{"status": "ok", "label": <HR-94 label>, ...fields}` (convention operations: no `label`, HR-111); every error `{"status": "error", "error_code": <code>}`. Decimals are JSON strings compared by value (trailing zeros are representation only). Fields:
 | Operation | Fields |
 |---|---|
 | `micro.eq.round_price` | `price` (decimal, printed at the tick decimals) |

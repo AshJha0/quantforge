@@ -205,7 +205,8 @@ STAGE_H_ITEMS = {"sched_h": "H-3a", "ac_h": "H-3b", "tca_h": "H-3c", "imp_h": "H
                  "e1_h": None, "e1_h2": None,  # E1 non-finite-input error cases only: no value cases, so no item share
                  "sorx_h": None,
                  "eqc_h": "H-22", "auc_h": "H-22", "fxc_h": "H-23", "fxv_h": "H-23", "rtc_h": "H-24",
-                 "fut_h": "H-24", "e1_h3": None}  # cross-build agreement cases (Python build output), not outside-checked: no item
+                 "fut_h": "H-24", "ses_h": "H-22", "e1_h3": None,
+                 "acls_h": None}  # acls_h: asset-class routing, cross-item hand cases only  # cross-build agreement cases (Python build output), not outside-checked: no item
 H_REDERIVE_SRC = "blind second-lane re-derivation or printed paper figure (DR-H2)"
 
 

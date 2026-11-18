@@ -17,7 +17,6 @@
     "status": "ok",
     "outputs": {
      "currency": "USD",
-     "label": "simulated venue; not a real exchange; no real FX data",
      "pip_value": "100"
     }
    },
@@ -43,7 +42,6 @@
     "status": "ok",
     "outputs": {
      "currency": "JPY",
-     "label": "simulated venue; not a real exchange; no real FX data",
      "pip_value": "10000"
     }
    },
@@ -69,7 +67,6 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real FX data",
      "spot_date": "2026-11-18"
     }
    },
@@ -99,7 +96,6 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real FX data",
      "spot_date": "2026-11-27"
     }
    },
@@ -125,7 +121,6 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real FX data",
      "spot_date": "2026-11-24"
     }
    },
@@ -151,7 +146,6 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real FX data",
      "spot_date": "2026-11-23"
     }
    },
@@ -204,7 +198,6 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real FX data",
      "spot_date": "2026-11-27"
     }
    },

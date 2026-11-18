@@ -24,6 +24,8 @@ from .errors import QfError
 from .finite import guard
 from .lit_matching import fmt
 from .order_book import EXACT, check_range, input_dec
+from .rng import Xoshiro256
+from .roots import brent
 
 EQ_LABEL = "simulated venue; not a real exchange"
 IEX_LABEL = "IEX only; one venue"
@@ -34,9 +36,10 @@ DEFAULT_TICK_TABLE = (("0", "0.0001"), ("1.00", "0.01"))  # [REGNMS-612], penny 
 HALF_PENNY_TABLE = (("0", "0.0001"), ("1.00", "0.005"))  # [REGNMS-612] current, narrow-spread tier
 # Dated rule versions (coordinator ruling 2026-11-18 after the HR-98 source check): the current
 # Rule 612/610 text applies on and after RULE_2024_COMPLIANCE; an `as_of` before it selects the old
-# regime. The compliance date is a parameter whose default is UNVERIFIED (source check could not
-# confirm it). Fee caps per share at $1.00 or more, and as a fraction of price below.
-RULE_2024_COMPLIANCE = "2026-11-03"
+# regime. Default: the first business day of November 2025 for Rules 612, 610 and 600(b)(93), read
+# 2026-11-18 in the adopting release 34-101070, section VI; any later SEC extension is UNVERIFIED (HR-110).
+# Fee caps per share at $1.00 or more, and as a fraction of price below.
+RULE_2024_COMPLIANCE = "2025-11-03"
 FEE_CAP_CURRENT = (Decimal("0.001"), Decimal("0.001"))  # [REGNMS-610] read 2026-11-18
 FEE_CAP_OLD = (Decimal("0.003"), Decimal("0.003"))
 CCY_ORDER = ("EUR", "GBP", "AUD", "NZD", "USD", "CAD", "CHF", "JPY")  # HR-88
@@ -45,10 +48,12 @@ CONTRACTS = {  # HR-91, [CME-ZN] and [CME-ZB]
     "ZN": ("100000", "0.015625"),
     "ZB": ("100000", "0.03125"),
 }
-RESOLUTIONS = (32, 64, 128, 256)
-_EIGHTHS = {"": 0, "1": 1, "2": 2, "3": 3, "+": 4, "5": 5, "6": 6, "7": 7}
-_EIGHTH_TEXT = {v: k for k, v in _EIGHTHS.items()}
-_32NDS = re.compile(r"([0-9]+)-([0-9]{2})([1235-7+]?)")
+RESOLUTIONS = (32, 64, 128)
+# HR-109 (coordinator ruling 2026-11-18): CME convention, third digit in quarter-32nds
+# [CME-32NDS, unverified]: 0, 2, 5, 7 = 0, 1/4, 1/2, 3/4 and "+" = 1/2; values in quarters.
+_QUARTERS = {"": 0, "0": 0, "2": 1, "5": 2, "+": 2, "7": 3}
+_QUARTER_TEXT = {0: "", 1: "2", 2: "+", 3: "7"}
+_32NDS = re.compile(r"([0-9]+)-([0-9]{2})(.?)")
 MAX_CANDIDATES = 1_000_000
 MAX_ORDERS = 10_000_000
 MAX_DAYS = 3660
@@ -198,7 +203,6 @@ def _label_eq(raw: dict[str, Any]) -> str:
 @_exact
 def eq_round_price(raw: dict[str, Any]) -> dict[str, Any]:
     """`micro.eq.round_price` (HR-81): a buy rounds down to the grid, a sell up."""
-    label = _label_eq(raw)
     price = _dec(raw, "price")
     buy = _enum(raw, "side", ("BUY", "SELL")) == "BUY"
     table = _tick_table(raw)
@@ -207,13 +211,12 @@ def eq_round_price(raw: dict[str, Any]) -> dict[str, Any]:
     tick = _tick_at(table, price)
     r = _c((price / tick).to_integral_value(ROUND_FLOOR if buy else ROUND_CEILING) * tick)
     # A sell rounded up across a floor lands on the floor, which is on both grids (HR-81).
-    return {"label": label, "price": _at(r, _places(_tick_at(table, r)))}
+    return {"price": _at(r, _places(_tick_at(table, r)))}
 
 
 @_exact
 def eq_fee_check(raw: dict[str, Any]) -> dict[str, Any]:
     """`micro.eq.fee_check` (HR-85): the [REGNMS-610] access-fee cap for the price band."""
-    label = _label_eq(raw)
     price = _dec(raw, "price")
     fee = _dec(raw, "taker_fee")
     check = _bool(raw, "cap_check", True)
@@ -223,7 +226,7 @@ def eq_fee_check(raw: dict[str, Any]) -> dict[str, Any]:
     cap = per_share if price >= 1 else _c(frac * price)
     if check and fee > cap:
         raise QfError("E_DOMAIN", "taker_fee above the Rule 610 cap", "taker_fee")
-    return {"cap": fmt(cap), "label": label, "taker_fee": fmt(fee)}
+    return {"cap": fmt(cap), "taker_fee": fmt(fee)}
 
 
 def _good(d: date, holidays: set[date]) -> bool:
@@ -253,7 +256,6 @@ ROUND_LOTS_CURRENT = (  # amended Reg NMS 242.600(b)(93), source check 2026-11-1
 def eq_round_lot(raw: dict[str, Any]) -> dict[str, Any]:
     """`micro.eq.round_lot` (HR-82 as dated rule versions): 100 shares under the old regime; under
     the current one 100 up to $250.00, 40 to $1,000.00, 10 to $10,000.00 and 1 above."""
-    label = _label_eq(raw)
     price = _dec(raw, "price")
     current = _current(raw)
     if price <= 0:
@@ -261,20 +263,18 @@ def eq_round_lot(raw: dict[str, Any]) -> dict[str, Any]:
     lot = 100
     if current:
         lot = next((n for cap, n in ROUND_LOTS_CURRENT if price <= cap), 1)
-    return {"label": label, "round_lot": lot}
+    return {"round_lot": lot}
 
 
 @_exact
 def eq_settle_date(raw: dict[str, Any]) -> dict[str, Any]:
     """Equities settlement date (HR-86): `settle_lag` business days on the supplied calendar."""
-    label = _label_eq(raw)
     trade = _date(_need(raw, "trade_date"), "trade_date")
     lag = _int(raw, "settle_lag", 1)
     hol = _dates(raw.get("holidays", []), "holidays")
     if not 0 <= lag <= 30:
         raise QfError("E_DOMAIN", "settle_lag outside 0..30", "settle_lag")
     return {
-        "label": label,
         "settle_date": _add_good(trade, lag, lambda d: _good(d, hol)).isoformat(),
     }
 
@@ -423,7 +423,7 @@ def fx_pip_value(raw: dict[str, Any]) -> dict[str, Any]:
     _, quote = _pair(raw)
     if notional < 0:
         raise QfError("E_DOMAIN", "notional must not be negative", "notional")
-    return {"currency": quote, "label": FX_LABEL, "pip_value": fmt(_c(notional * _pip(quote)))}
+    return {"currency": quote, "pip_value": fmt(_c(notional * _pip(quote)))}
 
 
 @_exact
@@ -451,7 +451,7 @@ def fx_spot_date(raw: dict[str, Any]) -> dict[str, Any]:
     else:
         d = _add_good(_add_good(trade, 1, non_usd), 1, both)
     d = _add_good(d - timedelta(days=1), 1, lambda x: both(x) and _good(x, hol.get("USD", empty)))
-    return {"label": FX_LABEL, "spot_date": d.isoformat()}
+    return {"spot_date": d.isoformat()}
 
 
 @_exact
@@ -492,7 +492,16 @@ def fx_request(raw: dict[str, Any]) -> dict[str, Any]:
     thr = _dec(raw, "threshold_pips")
     sym = _bool(raw, "symmetric", True)
     prr = _dec(raw, "p_random_reject")
-    u = _dec(raw, "u")
+    drawn = "u" not in raw
+    if drawn:  # HR-97: u from core.rng, stream = request_index (rng.md jumps)
+        seed = _int(raw, "seed")
+        idx = _int(raw, "request_index")
+        if idx < 0 or not 0 <= seed < 2**64:
+            raise QfError("E_SCHEMA", "seed or request_index out of range", "request_index")
+        uf = Xoshiro256.seeded(seed, idx).uniform()
+        u = Decimal(uf)
+    else:
+        u = _dec(raw, "u")
     _, quote = _pair(raw)
     if bid > ask:
         raise QfError("E_INPUT", "quote: bid above ask", "quote")
@@ -507,7 +516,15 @@ def fx_request(raw: dict[str, Any]) -> dict[str, Any]:
     else:
         outcome = "FILL"
     price = fmt(ask if buy else bid) if outcome == "FILL" else None
-    return {"label": FX_LABEL, "move_pips": fmt(move), "outcome": outcome, "price": price}
+    out: dict[str, Any] = {
+        "label": FX_LABEL,
+        "move_pips": fmt(move),
+        "outcome": outcome,
+        "price": price,
+    }
+    if drawn:
+        out["u"] = uf
+    return out
 
 
 # ------------------------------------------------------------------ rates (H-24)
@@ -518,31 +535,31 @@ def parse_32nds(text: Any, path: str = "text") -> Decimal:
     if not isinstance(text, str):
         raise QfError("E_SCHEMA", f"{path}: not a string", path)
     m = _32NDS.fullmatch(text)
-    if m is None:
-        raise QfError("E_INPUT", f"{path}: not H-FF[f]", path)
+    if m is None or m.group(3) not in _QUARTERS:
+        raise QfError("E_SCHEMA", f"{path}: not H-FF[q] with q in 0, 2, 5, 7, + (HR-109)", path)
     ff = int(m.group(2))
     if ff > 31:
         raise QfError("E_DOMAIN", f"{path}: 32nds above 31", path)
     return check_range(
-        Decimal(int(m.group(1))) + (ff + Decimal(_EIGHTHS[m.group(3)]) / 8) / 32, path
+        Decimal(int(m.group(1))) + (ff + Decimal(_QUARTERS[m.group(3)]) / 4) / 32, path
     )
 
 
 def format_32nds(x: Decimal, resolution: int) -> str:
     if resolution not in RESOLUTIONS:
-        raise QfError("E_DOMAIN", "resolution not 32, 64, 128 or 256", "resolution")
+        raise QfError("E_DOMAIN", "resolution not 32, 64 or 128", "resolution")
     if x < 0 or (x * resolution) % 1 != 0:
         raise QfError("E_DOMAIN", "value not on the requested grid", "value")
     h = int(x)
-    eighths = int((x - h) * 256)
-    ff, f = divmod(eighths, 8)
-    return f"{h}-{ff:02d}{_EIGHTH_TEXT[f]}"
+    quarters = int((x - h) * 128)
+    ff, q = divmod(quarters, 4)
+    return f"{h}-{ff:02d}{_QUARTER_TEXT[q]}"
 
 
 @_exact
 def rates_parse_32nds(raw: dict[str, Any]) -> dict[str, Any]:
     """32nds text to a decimal (HR-90)."""
-    return {"label": RATES_LABEL, "value": fmt(parse_32nds(_need(raw, "text")))}
+    return {"value": fmt(parse_32nds(_need(raw, "text")))}
 
 
 @_exact
@@ -550,7 +567,7 @@ def rates_format_32nds(raw: dict[str, Any]) -> dict[str, Any]:
     """A decimal to 32nds text at `resolution` parts per point (HR-90)."""
     x = _dec(raw, "value")
     res = _int(raw, "resolution")
-    return {"label": RATES_LABEL, "text": format_32nds(x, res)}
+    return {"text": format_32nds(x, res)}
 
 
 def _contract(raw: dict[str, Any]) -> tuple[Decimal, Decimal]:
@@ -576,7 +593,7 @@ def rates_tick_value(raw: dict[str, Any]) -> dict[str, Any]:
     face, tick = _dec(raw, "face"), _dec(raw, "tick")
     if face <= 0 or tick <= 0:
         raise QfError("E_DOMAIN", "face and tick must be positive", "face")
-    return {"label": RATES_LABEL, "tick_value": fmt(_tick_value(face, tick))}
+    return {"tick_value": fmt(_tick_value(face, tick))}
 
 
 def _price9(p: Decimal) -> str:
@@ -597,7 +614,30 @@ def rates_bond_price(raw: dict[str, Any]) -> dict[str, Any]:
         raise QfError("E_DOMAIN", "yield at or below -frequency", "yield")
     cpn = 100 * c / f
     p = sum((cpn / g**i for i in range(1, n + 1)), Decimal(0)) + 100 / g**n
-    return {"label": RATES_LABEL, "price": _price9(_c(p.quantize(Decimal("1E-30"))))}
+    return {"price": _price9(_c(p.quantize(Decimal("1E-30"))))}
+
+
+@_exact
+def rates_bond_yield(raw: dict[str, Any]) -> dict[str, Any]:
+    """Yield from a coupon-date price (HR-92): Brent (`core.solve`), tolerance 1e-12, binary64."""
+    c, p = _dec(raw, "coupon"), _dec(raw, "price")
+    f, n = _int(raw, "frequency"), _int(raw, "periods")
+    if f not in (1, 2, 4, 12):
+        raise QfError("E_DOMAIN", "frequency not 1, 2, 4 or 12", "frequency")
+    if not 1 <= n <= 1200:
+        raise QfError("E_DOMAIN", "periods outside 1..1200", "periods")
+    if p <= 0:
+        raise QfError("E_DOMAIN", "price must be positive", "price")
+    cf, pf = float(100 * c / f), float(p)
+
+    def g(y: float) -> float:
+        d = 1.0 + y / f
+        return sum(cf / d**i for i in range(1, n + 1)) + 100.0 / d**n - pf
+
+    lo, hi = -0.99 * f, 10.0
+    if g(lo) * g(hi) > 0:
+        raise QfError("E_DOMAIN", "no yield in (-0.99 f, 10)", "price")
+    return {"yield": brent(g, lo, hi, x_tol=1e-12).root}
 
 
 @_exact
@@ -607,7 +647,7 @@ def rates_bill_price(raw: dict[str, Any]) -> dict[str, Any]:
     days = _int(raw, "days")
     if not 0 <= days <= 366:
         raise QfError("E_DOMAIN", "days outside 0..366", "days")
-    return {"label": RATES_LABEL, "price": _price9(100 * (1 - d * days / 360))}
+    return {"price": _price9(100 * (1 - d * days / 360))}
 
 
 def _fut_ticks(v: Any, tick: Decimal, path: str) -> int:
@@ -634,7 +674,7 @@ def fut_to_text(raw: dict[str, Any]) -> dict[str, Any]:
         raise QfError("E_DOMAIN", "ticks must not be negative", "ticks")
     res = 1 / tick
     if res % 1 != 0 or int(res) not in RESOLUTIONS:
-        raise QfError("E_DOMAIN", "contract tick is not 1/32, 1/64, 1/128 or 1/256", "contract")
+        raise QfError("E_DOMAIN", "contract tick is not 1/32, 1/64 or 1/128", "contract")
     return {"label": RATES_LABEL, "text": format_32nds(t * tick, int(res))}
 
 
