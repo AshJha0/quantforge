@@ -1,0 +1,57 @@
+{
+ "label": "simulated data only; no recorded data; H18-01 prereg is an unsigned draft",
+ "params": {
+  "A": 140.0,
+  "T": 1.0,
+  "dt": 0.005,
+  "k": 1.5,
+  "paths": 1000,
+  "s0": 100.0,
+  "seed": 20261118,
+  "sigma": 2.0
+ },
+ "runs": {
+  "gamma=0.01 inventory": {
+   "final_q_mean": 0.092,
+   "final_q_std": 5.345850176923602,
+   "profit_mean": 68.68582947720583,
+   "profit_std": 9.006910296020248,
+   "spread_at_half_horizon": 1.3489085437337158
+  },
+  "gamma=0.01 symmetric": {
+   "final_q_mean": -0.025,
+   "final_q_std": 8.936119360730878,
+   "profit_mean": 68.87897949992728,
+   "profit_std": 14.113593649043901,
+   "spread_at_half_horizon": 1.3489085437337158
+  },
+  "gamma=0.1 inventory": {
+   "final_q_mean": 0.005,
+   "final_q_std": 3.0063288264947023,
+   "profit_mean": 64.98266211922389,
+   "profit_std": 6.631461576807006,
+   "spread_at_half_horizon": 1.4907704227514234
+  },
+  "gamma=0.1 symmetric": {
+   "final_q_mean": -0.042,
+   "final_q_std": 8.653040570291527,
+   "profit_mean": 68.34934778287521,
+   "profit_std": 13.706398045569868,
+   "spread_at_half_horizon": 1.4907704227514234
+  },
+  "gamma=1.0 inventory": {
+   "final_q_mean": 0.001,
+   "final_q_std": 1.6576328745372864,
+   "profit_mean": 31.37376131675701,
+   "profit_std": 4.932447657234554,
+   "spread_at_half_horizon": 3.0216512475319814
+  },
+  "gamma=1.0 symmetric": {
+   "final_q_mean": 0.16,
+   "final_q_std": 5.800003451726562,
+   "profit_mean": 44.019508953815425,
+   "profit_std": 9.719972024619608,
+   "spread_at_half_horizon": 3.0216512475319814
+  }
+ }
+}
