@@ -37,6 +37,7 @@ pub mod equity_carry;
 pub mod error;
 pub mod execution;
 pub mod exotics;
+pub mod fast_book;
 pub mod frtb;
 pub mod frtb2;
 pub mod frtb3;
