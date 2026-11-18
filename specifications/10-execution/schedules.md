@@ -30,6 +30,7 @@ Inputs `quantity`, `participation` p in (0, 1) (HR-4, confirmed by DR-H4: partic
 | sched_h-0006 | POV X = 1,000, p = 0.1, v = [900, 900], CONTINUOUS | [100, 100], residual 800 | 0.1/0.9 x 900 |
 | sched_h-0007 | POV p = 1.0 | `E_DOMAIN` | HR-4 |
 | sched_h-0008 | VWAP profile [0, 0] | `E_DOMAIN` | |
+| sched_h-0009 | TWAP X = 1,000.5, N = 2, UNITS | `E_INPUT` | non-integer X in UNITS; added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
 
 ## Property tests
 Slices sum to X (HR-3); POV realised participation `s_i / (s_i + v_i)` equals p wherever not capped.

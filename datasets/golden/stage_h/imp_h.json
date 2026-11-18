@@ -1,0 +1,179 @@
+{
+ "schema_version": "1.0",
+ "suite": "imp_h",
+ "spec": "specifications/10-execution/impact.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_w1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "imp_h-0001",
+   "operation": "exec.impact.sqrt",
+   "inputs": {
+    "quantity": 100000.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "coefficient": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "impact": 0.002,
+     "model": "assumed parameters; not calibrated to any venue"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "impact",
+    "synthetic"
+   ],
+   "description": "0.02 x sqrt(0.01)"
+  },
+  {
+   "case_id": "imp_h-0002",
+   "operation": "exec.impact.sqrt",
+   "inputs": {
+    "quantity": 400000.0,
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "coefficient": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "impact": 0.004,
+     "model": "assumed parameters; not calibrated to any venue"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "impact",
+    "synthetic"
+   ],
+   "description": "four times Q, twice the impact"
+  },
+  {
+   "case_id": "imp_h-0003",
+   "operation": "exec.impact.ow_optimal",
+   "inputs": {
+    "quantity": 1000.0,
+    "horizon": 1.0,
+    "resilience": 8.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "initial_block": 100.0,
+     "rate": 800.0,
+     "final_block": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "impact",
+    "synthetic"
+   ],
+   "description": "1000/10; 8 x 1000/10 ([OW13] eq. (31))"
+  },
+  {
+   "case_id": "imp_h-0004",
+   "operation": "exec.impact.ow_optimal",
+   "inputs": {
+    "quantity": 100000.0,
+    "horizon": 1.0,
+    "resilience": 2.231
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "initial_block": 23635.07445048452,
+     "rate": 52729.85109903096,
+     "final_block": 23635.07445048452
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "impact",
+    "synthetic"
+   ],
+   "description": "[OW13] eq. (31) with the Fig. 2 parameters: 1e5 / 4.231; 2.231e5 / 4.231"
+  },
+  {
+   "case_id": "imp_h-0005",
+   "operation": "exec.impact.sqrt",
+   "inputs": {
+    "quantity": 100000.0,
+    "daily_volume": 0.0,
+    "daily_vol": 0.02,
+    "coefficient": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "impact",
+    "synthetic",
+    "error"
+   ],
+   "description": "V <= 0"
+  },
+  {
+   "case_id": "imp_h-0006",
+   "operation": "exec.impact.ow_optimal",
+   "inputs": {
+    "quantity": 1000.0,
+    "horizon": 1.0,
+    "resilience": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "impact",
+    "synthetic",
+    "error"
+   ],
+   "description": "rho <= 0"
+  }
+ ]
+}

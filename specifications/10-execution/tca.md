@@ -22,6 +22,8 @@ Errors: Q > X: `E_INPUT`; a price <= 0: `E_DOMAIN`.
 | tca_h-0001 | BUY X = 1,000, P_d = 100, P_0 = 100.10, P_c = 101, fills (600 @ 100.20), (200 @ 100.30), fees 5 | delay 80; execution 100; opportunity 200; total 385; 38.5 bp | 800 x 0.10; 600 x 0.10 + 200 x 0.20; 200 x 1 |
 | tca_h-0002 | SELL, same prices and fills, fees 0 | delay -80, execution -100, opportunity -200, total -380 | a seller gains when prices rise |
 | tca_h-0003 | fills sum to 1,200 with X = 1,000 | `E_INPUT` | overfill |
+| tca_h-0004 | as 0001 with benchmark_vwap = 100.15 | vwap_slippage 60, rest as 0001 | average fill 100.225; 800 x 0.075; added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
+| tca_h-0005 | as 0001 with P_0 = 0 | `E_DOMAIN` | a price <= 0; added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
 
 ## Property tests
 Components sum to total to 1e-10 relative; a full fill has opportunity 0.
