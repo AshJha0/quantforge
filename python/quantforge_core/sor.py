@@ -20,13 +20,14 @@ iterates, rounded to the best neighbouring integer point).
 
 import itertools
 import math
-from decimal import ROUND_HALF_EVEN, Decimal
+from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from fractions import Fraction
 from typing import Any
 
 from .errors import QfError
 from .finite import guard
 from .lit_matching import _dec, fmt
+from .order_book import EXACT, check_range
 from .rng import Xoshiro256
 
 LABEL = "simulated venues; router scored in simulation only"
@@ -45,6 +46,35 @@ def _lots(v: Any, path: str) -> int:
     if d != d.to_integral_value() or d < 0:
         raise QfError("E_DOMAIN", f"{path}: not a non-negative integer number of lots", path)
     return int(d)
+
+
+def _r(x: Fraction) -> Fraction:
+    """HR-57/HR-58: every exact value the router computes must be a decimal in range, else `E_LIMIT`.
+    The checks sit at the same steps as the C++ and Java ports (each sum, difference and product of
+    the cost of a scenario and of the row totals), so the four builds agree on which inputs fail."""
+    with localcontext(EXACT):
+        check_range(Decimal(x.numerator) / Decimal(x.denominator), "sor")
+    return x
+
+
+def _dec18(x: Fraction) -> float:
+    """`x` rounded half-even to 18 decimals, then read as binary64 (correctly rounded)."""
+    with localcontext(EXACT):
+        d = (Decimal(x.numerator) / Decimal(x.denominator)).quantize(
+            Decimal(10) ** -18, rounding=ROUND_HALF_EVEN
+        )
+    return float(d)
+
+
+def _se(mean_cost: Fraction, mean_sq: Fraction, n_rows: int) -> str:
+    """HR-40 standard error, one rule in all four builds: a = E[c^2] and b = E[c], each exact, rounded
+    half-even to 18 decimals and read as binary64; then in binary64, with no fused multiply-add,
+    se = sqrt(max(a - b * b, 0) / n_rows); written rounded half-even to 6 decimals from the exact
+    binary value. The binary64 steps are IEEE 754 basic operations, so every build gets the same bits."""
+    a, b = _dec18(mean_sq), _dec18(mean_cost)
+    bb = b * b
+    se = math.sqrt(max(a - bb, 0.0) / n_rows)
+    return fmt(Decimal(se).quantize(Decimal("0.000001"), rounding=ROUND_HALF_EVEN))
 
 
 def _out(x: Fraction) -> str:
@@ -84,7 +114,10 @@ class Problem:
                 raise QfError("E_SCHEMA", f"venues/{k}/kind", "venues")
             self.kinds.append(kind)
             self.coef.append(
-                self.h + _frac(v.get("r"), f"venues/{k}/r") - _frac(v.get("as"), f"venues/{k}/as")
+                _r(
+                    _r(self.h + _frac(v.get("r"), f"venues/{k}/r"))
+                    - _frac(v.get("as"), f"venues/{k}/as")
+                )
             )
             if kind == "LIT":
                 self.Q.append(_lots(v.get("Q"), f"venues/{k}/Q"))
@@ -97,6 +130,9 @@ class Problem:
                 ):
                     raise QfError("E_DOMAIN", f"venues/{k}/tail: not a tail", "venues")
                 self.tails.append(tail)
+        self.want_sq = (
+            inp.get("report_se", False) is True
+        )  # only then is sum p c^2 computed (and range-checked)
         self.lit = [k for k, kd in enumerate(self.kinds) if kd == "LIT"]
         self.dark = [k for k, kd in enumerate(self.kinds) if kd == "DARK"]
         rows = inp.get("lit_samples", [])
@@ -114,41 +150,51 @@ class Problem:
 
     def dark_dist(self, k: int, L: int) -> list[tuple[int, Fraction]]:
         """Distribution of min(L, s) for dark venue k."""
-        out = [(j, self.tail(k, j) - self.tail(k, j + 1)) for j in range(L)]
+        out = [(j, _r(self.tail(k, j) - self.tail(k, j + 1))) for j in range(L)]
         out.append((L, self.tail(k, L)))
         return [(j, p) for j, p in out if p]
 
     def scenario_cost(self, M: int, L: list[int], fills: list[int]) -> tuple[Fraction, int]:
+        """Cost of one scenario, each step range-checked (HR-57) in the order the C++ port takes."""
         A = M + sum(fills)
         under, over = max(self.S - A, 0), max(A - self.S, 0)
-        c = (self.h + self.f) * M - sum(
-            (self.coef[k] * fills[k] for k in range(len(L))), Fraction(0)
-        )
-        c += self.theta * (M + sum(L) + under) + self.lu * under + self.lo * over
+        c = _r(_r(self.h + self.f) * M)
+        for k in range(len(L)):
+            if fills[k]:
+                c = _r(c - _r(self.coef[k] * fills[k]))
+        if self.theta:
+            c = _r(c + _r(self.theta * (M + sum(L) + under)))
+        if under:
+            c = _r(c + _r(self.lu * under))
+        if over:
+            c = _r(c + _r(self.lo * over))
         return c, A
 
     def evaluate(self, M: int, L: list[int]) -> tuple[Fraction, Fraction, Fraction, Fraction]:
         """Exact (expected cost, E min(A, S), P(A < S), E cost^2)."""
         dists = [self.dark_dist(k, L[k]) for k in self.dark]
+        # Row sums first (each step range-checked, HR-57), divided by the row count at the end.
         cost = fill = under = sq = Fraction(0)
-        w_row = Fraction(1, len(self.rows))
+        n_rows = len(self.rows)
         for row in self.rows:
             base = [0] * len(L)
             for i, k in enumerate(self.lit):
                 x = row[i] - self.Q[k]
                 base[k] = max(x, 0) - max(x - L[k], 0)
             for combo in itertools.product(*dists) if dists else [()]:
-                p = w_row
+                p = Fraction(1)
                 fills = list(base)
                 for (j, pj), k in zip(combo, self.dark):
                     fills[k] = j
-                    p *= pj
+                    p = _r(p * pj)
                 c, A = self.scenario_cost(M, L, fills)
-                cost += p * c
-                sq += p * c * c
-                fill += p * min(A, self.S)
-                under += p if A < self.S else 0
-        return cost, fill, under, sq
+                cost = _r(cost + _r(p * c))
+                if self.want_sq:
+                    sq = _r(sq + _r(_r(p * c) * c))
+                fill = _r(fill + _r(p * min(A, self.S)))
+                if A < self.S:
+                    under = _r(under + p)
+        return cost / n_rows, fill / n_rows, under / n_rows, sq / n_rows
 
     # ------------------------------------------------------------ methods
     def closed_form(self) -> tuple[int, list[int]]:
@@ -157,23 +203,29 @@ class Problem:
             raise QfError("E_DOMAIN", "CLOSED_FORM needs exactly one LIT venue", "method")
         xs = sorted(r[0] for r in self.rows)
         n, Q, S = len(xs), self.Q[0], self.S
-        r_eff = self.coef[0] - self.h
-        num = 2 * self.h + self.f + r_eff
-        base = self.h + r_eff + self.theta
+        r_eff = _r(self.coef[0] - self.h)
+        num = _r(_r(_r(self.h + self.h) + self.f) + r_eff)
+        base = _r(_r(self.h + r_eff) + self.theta)
 
-        def F(x: int) -> Fraction:
-            return Fraction(sum(1 for v in xs if v <= x), n)
+        def count(x: int) -> int:  # n F(x)
+            return sum(1 for v in xs if v <= x)
 
-        def thr(x: int) -> Fraction | None:
-            return None if F(x) == 0 else num / F(x) - base  # None: +infinity
-
-        lo_t, hi_t = thr(Q + S), thr(Q)
-        if lo_t is None or self.lu <= lo_t:
+        # lambda_u <= num / F(x) - base  <=>  (lambda_u + base) c <= num n, with c = n F(x) > 0; compared in
+        # this cross-multiplied form, each step range-checked (HR-57), as the C++, Java and Rust ports do.
+        lb, numn = _r(self.lu + base), _r(num * n)
+        c_lo, c_hi = count(Q + S), count(Q)
+        if c_lo == 0 or _r(lb * c_lo) <= numn:
             return 0, [S]
-        if hi_t is not None and self.lu >= hi_t:
+        if c_hi != 0 and _r(lb * c_hi) >= numn:
             return S, [0]
-        target = num / (self.lu + base)
-        q = next(v for v in xs if F(v) >= target)
+        if lb == 0:
+            raise QfError("E_DOMAIN", "lambda_u + h + r + theta is zero", "lambda_u")
+        q = xs[-1]
+        for v in xs:
+            lhs = _r(lb * count(v))
+            if (lhs >= numn) if lb > 0 else (lhs <= numn):
+                q = v
+                break
         M = min(max(S - q + Q, 0), S)
         return M, [S - M]
 
@@ -276,10 +328,7 @@ def allocate(inp: dict[str, Any]) -> dict[str, Any]:
         "p_underfill": _out(under),
     }
     if inp.get("report_se", False) is True:
-        out["expected_cost_se"] = _out(
-            Fraction(math.sqrt(max(float(sq - cost * cost), 0.0)))
-            / Fraction(math.sqrt(len(p.rows)))
-        )
+        out["expected_cost_se"] = _se(cost, sq, len(p.rows))
         out["label"] = LABEL
     if want_rank:
         out["ranking"] = [
