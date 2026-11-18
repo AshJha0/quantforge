@@ -238,7 +238,31 @@ def session_cases():
     c31 = (dict(base, script=script + [close]),
            {"results": results + [{"status": "CLOSED", "eod": eod}], "records": recs31, "head": recs31[-1]["hash"],
             "positions": {"BTC-USD": "3"}, "cash": "9697.698", "label": LABEL, "ceiling": CEILING})
-    return c30, c31
+    # pt_h-0032, SOR overfill trim (HR-77 fourth division). Router by hand: one DARK venue, T(1) = 1, T(2) = 0.5,
+    # h 0.5, f 0.3, r = as = 0, lambda_u 10, lambda_o 0, theta 0; cost 0.8 M - 0.5 fill + 10 (S - A)+ with S = 2:
+    # (1, 2) gives 0.8 - 0.5 x 1.5 = 0.05, below (1, 1) 0.3, (2, 2) 0.85, (0, 2) 4.25, (1, 0) 10.8: M = 1, L = 2.
+    # M (MARKET 1) takes the one ask lot, 1 @ 100.5, fee 0.001 x 100.5 = 0.1005. The dark child fills 2 at the mid
+    # 100 against the contra SELL 2; room is 1, so the fill is trimmed to 1 and its fee to 0 x 1 / 2 = 0.
+    # Cash 10000 - 100.5 - 0.1005 - 100 = 9799.3995.
+    router = {"f": "0.3", "h": "0.5", "lambda_o": "0", "lambda_u": "10", "lit_samples": [[]], "theta": "0",
+              "venues": [{"as": "0", "kind": "DARK", "r": "0", "tail": ["1", "0.5", "0"]}]}
+    dark = {"firm_delay": 0, "lot_size": "1", "p_firm": "1", "penalty_events": 2, "seed": 20261118,
+            "tick_size": "0.01"}
+    op1 = {"order_id": "P1", "symbol": "BTC-USD", "side": "BUY", "type": "MARKET", "quantity": "2", "venue": "SOR"}
+    fill = {"order_id": "P1", "symbol": "BTC-USD", "side": "BUY"}
+    recs32 = chain([
+        (T1, "ORDER", dict(op1, decision_price="100")),
+        (T1, "FILL", dict(fill, child_id="P1.M", venue="LIT", quantity="1", price="100.5", fee="0.1005")),
+        (T1, "FILL", dict(fill, child_id="P1.L0", venue="DARK", quantity="1", price="100", fee="0")),
+    ])
+    c32 = (dict(base, lit=dict(LIT), dark=dark,
+                script=[{"op": "SUBMIT", "ts": T1, "order": op1,
+                         "snapshot": {"bids": [["99.5", "4"]], "asks": [["100.5", "1"]]},
+                         "contra": [{"op": "NEW", "id": "C1", "side": "SELL", "qty": "2", "kind": "FIRM"}],
+                         "router": router}]),
+           {"results": [{"status": "DONE", "filled": "2"}], "records": recs32, "head": recs32[-1]["hash"],
+            "positions": {"BTC-USD": "2"}, "cash": "9799.3995", "label": LABEL, "ceiling": CEILING})
+    return c30, c31, c32
 
 
 def build():
@@ -253,10 +277,11 @@ def build():
         s.add(op, inp, cls=CLS, verified=verified, tags=["stage_h", "simulated", "paper"],
               description=f"{cid} from the spec table" + ("" if cid not in VERDICT else "; not counted as blind"), **kw)
         s.cases[-1]["case_id"] = cid
-    c30, c31 = session_cases()
+    c30, c31, c32 = session_cases()
     for k, (inp, out, desc) in enumerate((
             (*c30, "session: one LIT order filled across two levels, one rejected; ledger hashes recomputed"),
-            (*c31, "session c30 then the daily close: TCA and EOD records, HR-53 identity"))):
+            (*c31, "session c30 then the daily close: TCA and EOD records, HR-53 identity"),
+            (*c32, "SOR order: market child 1 lot, dark child 2 trimmed to 1 (HR-77 overfill trim)"))):
         s.add("paper.session.run", inp, out, cls=CLS, verified=["hand", "outside: hashlib sha256 of the canonical bytes"],
               tags=["stage_h", "simulated", "paper", "session"], description=f"hand, not blind: {desc}")
         s.cases[-1]["case_id"] = f"pt_h-{30 + k:04d}"
@@ -278,6 +303,40 @@ def build():
         s.add(op, inp, error=code, cls=CLS, verified=["hand"], tags=["stage_h", "paper", "error"],
               description=f"hand: {desc}")
         s.cases[-1]["case_id"] = f"pt_h-{40 + k:04d}"
+    # HR-77 exactness and range, HR-78 duplicate keys: hand cases, not blind (the rulings came after the blind run)
+    big = "10000000000000000000000000000.01"  # 31 significant digits: a 28-digit context would round it
+    hr77 = [
+        ("pt_h-0050", "paper.book.apply_fill",
+         {"cash": big, "fills": [{"side": "BUY", "quantity": "1", "price": "1", "fee": "0"}]},
+         L(position="1", avg_cost="1", realised="0", fees="0", cash="9999999999999999999999999999.01"),
+         "exact cash at 31 digits (fails under 28-digit rounding)"),
+        ("pt_h-0051", "paper.book.apply_fill",
+         {"fills": [{"side": "BUY", "quantity": "1", "price": "1"}, {"side": "BUY", "quantity": "2", "price": "2"}]},
+         L(position="3", avg_cost="1.666666666666666667", realised="0", fees="0", cash_delta="-5"),
+         "average cost 5/3 rounded half-even to 18 decimals"),
+    ]
+    for cid, op, inp, out, desc in hr77:
+        s.add(op, inp, out, cls=CLS, verified=["hand"], tags=["stage_h", "paper", "exact"],
+              description=f"hand, not blind: HR-77 {desc}")
+        s.cases[-1]["case_id"] = cid
+    r0 = rec(0, TS, "ORDER", dict(ORDER_BODY), Z64)
+    dup = canon(r0).replace('"kind":"ORDER"', '"kind":"ORDER","kind":"ORDER"', 1) + "\n"
+    lim = [
+        ("paper.book.apply_fill", {"fills": [{"side": "BUY", "quantity": "1", "price": "1.0000000000000000001"}]},
+         "E_LIMIT", "HR-77: an input with 19 decimals"),
+        ("paper.book.apply_fill",
+         {"fills": [{"side": "BUY", "quantity": "100", "price": "10000000000000000000000000000000000"}]},
+         "E_LIMIT", "HR-77: notional 10^36 has 37 digits"),
+    ]
+    for k, (op, inp, code, desc) in enumerate(lim):
+        s.add(op, inp, error=code, cls=CLS, verified=["hand"], tags=["stage_h", "paper", "error", "exact"],
+              description=f"hand, not blind: {desc}")
+        s.cases[-1]["case_id"] = f"pt_h-{52 + k:04d}"
+    s.add("paper.ledger.verify", {"text": dup},
+          {"ok": False, "records": 0, "first_bad_seq": 0, "reason": "PARSE", "head": None, "label": LABEL},
+          cls=CLS, verified=["hand"], tags=["stage_h", "paper", "ledger"],
+          description="hand, not blind: HR-78 a repeated key (same value) is PARSE, though last-wins would verify")
+    s.cases[-1]["case_id"] = "pt_h-0054"
     return s
 
 

@@ -1228,6 +1228,182 @@
    "description": "hand, not blind: session c30 then the daily close: TCA and EOD records, HR-53 identity"
   },
   {
+   "case_id": "pt_h-0032",
+   "operation": "paper.session.run",
+   "inputs": {
+    "cash": "10000",
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    },
+    "lit": {
+     "tick_size": "0.5",
+     "lot_size": "1",
+     "fee_schedule": {
+      "maker_rebate": "0",
+      "taker_fee": "0.001"
+     }
+    },
+    "dark": {
+     "firm_delay": 0,
+     "lot_size": "1",
+     "p_firm": "1",
+     "penalty_events": 2,
+     "seed": 20261118,
+     "tick_size": "0.01"
+    },
+    "script": [
+     {
+      "op": "SUBMIT",
+      "ts": "2026-11-18T00:00:01Z",
+      "order": {
+       "order_id": "P1",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "MARKET",
+       "quantity": "2",
+       "venue": "SOR"
+      },
+      "snapshot": {
+       "bids": [
+        [
+         "99.5",
+         "4"
+        ]
+       ],
+       "asks": [
+        [
+         "100.5",
+         "1"
+        ]
+       ]
+      },
+      "contra": [
+       {
+        "op": "NEW",
+        "id": "C1",
+        "side": "SELL",
+        "qty": "2",
+        "kind": "FIRM"
+       }
+      ],
+      "router": {
+       "f": "0.3",
+       "h": "0.5",
+       "lambda_o": "0",
+       "lambda_u": "10",
+       "lit_samples": [
+        []
+       ],
+       "theta": "0",
+       "venues": [
+        {
+         "as": "0",
+         "kind": "DARK",
+         "r": "0",
+         "tail": [
+          "1",
+          "0.5",
+          "0"
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "status": "DONE",
+       "filled": "2"
+      }
+     ],
+     "records": [
+      {
+       "seq": 0,
+       "ts": "2026-11-18T00:00:01Z",
+       "kind": "ORDER",
+       "body": {
+        "order_id": "P1",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "type": "MARKET",
+        "quantity": "2",
+        "venue": "SOR",
+        "decision_price": "100"
+       },
+       "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+       "label": "crypto venue; simulated",
+       "hash": "1afbf623b4c29984c9e714f5f75bd6862a5c7209b35081492ecdfcdec53da340"
+      },
+      {
+       "seq": 1,
+       "ts": "2026-11-18T00:00:01Z",
+       "kind": "FILL",
+       "body": {
+        "order_id": "P1",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "child_id": "P1.M",
+        "venue": "LIT",
+        "quantity": "1",
+        "price": "100.5",
+        "fee": "0.1005"
+       },
+       "prev": "1afbf623b4c29984c9e714f5f75bd6862a5c7209b35081492ecdfcdec53da340",
+       "label": "crypto venue; simulated",
+       "hash": "ed55e499f7cd7f333ab5f5ffc340459bd6436afeae408c2b4d0417cf4645afd9"
+      },
+      {
+       "seq": 2,
+       "ts": "2026-11-18T00:00:01Z",
+       "kind": "FILL",
+       "body": {
+        "order_id": "P1",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "child_id": "P1.L0",
+        "venue": "DARK",
+        "quantity": "1",
+        "price": "100",
+        "fee": "0"
+       },
+       "prev": "ed55e499f7cd7f333ab5f5ffc340459bd6436afeae408c2b4d0417cf4645afd9",
+       "label": "crypto venue; simulated",
+       "hash": "783d2f9582393724dde6157510269639db6b5392bbd798bc8565a24dced1e954"
+      }
+     ],
+     "head": "783d2f9582393724dde6157510269639db6b5392bbd798bc8565a24dced1e954",
+     "positions": {
+      "BTC-USD": "2"
+     },
+     "cash": "9799.3995",
+     "label": "crypto venue; simulated",
+     "ceiling": "Paper trading on free data; simulated fills; no evidence of tradable profitability."
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "outside: hashlib sha256 of the canonical bytes"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper",
+    "session"
+   ],
+   "description": "hand, not blind: SOR order: market child 1 lot, dark child 2 trimmed to 1 (HR-77 overfill trim)"
+  },
+  {
    "case_id": "pt_h-0040",
    "operation": "paper.pretrade.check",
    "inputs": {
@@ -1528,6 +1704,165 @@
     "error"
    ],
    "description": "hand: unknown venue"
+  },
+  {
+   "case_id": "pt_h-0050",
+   "operation": "paper.book.apply_fill",
+   "inputs": {
+    "cash": "10000000000000000000000000000.01",
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "1",
+      "price": "1",
+      "fee": "0"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "position": "1",
+     "avg_cost": "1",
+     "realised": "0",
+     "fees": "0",
+     "cash": "9999999999999999999999999999.01"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "exact"
+   ],
+   "description": "hand, not blind: HR-77 exact cash at 31 digits (fails under 28-digit rounding)"
+  },
+  {
+   "case_id": "pt_h-0051",
+   "operation": "paper.book.apply_fill",
+   "inputs": {
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "1",
+      "price": "1"
+     },
+     {
+      "side": "BUY",
+      "quantity": "2",
+      "price": "2"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "position": "3",
+     "avg_cost": "1.666666666666666667",
+     "realised": "0",
+     "fees": "0",
+     "cash_delta": "-5"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "exact"
+   ],
+   "description": "hand, not blind: HR-77 average cost 5/3 rounded half-even to 18 decimals"
+  },
+  {
+   "case_id": "pt_h-0052",
+   "operation": "paper.book.apply_fill",
+   "inputs": {
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "1",
+      "price": "1.0000000000000000001"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "error",
+    "exact"
+   ],
+   "description": "hand, not blind: HR-77: an input with 19 decimals"
+  },
+  {
+   "case_id": "pt_h-0053",
+   "operation": "paper.book.apply_fill",
+   "inputs": {
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "100",
+      "price": "10000000000000000000000000000000000"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "error",
+    "exact"
+   ],
+   "description": "hand, not blind: HR-77: notional 10^36 has 37 digits"
+  },
+  {
+   "case_id": "pt_h-0054",
+   "operation": "paper.ledger.verify",
+   "inputs": {
+    "text": "{\"body\":{\"limit_price\":\"101\",\"order_id\":\"O1\",\"quantity\":\"3\",\"side\":\"BUY\",\"symbol\":\"BTC-USD\",\"type\":\"LIMIT\"},\"hash\":\"72c85984abb1b7c4072c65dbba0567b3de51279645b0ad63cfd242137aed7e81\",\"kind\":\"ORDER\",\"kind\":\"ORDER\",\"label\":\"crypto venue; simulated\",\"prev\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"seq\":0,\"ts\":\"2026-11-18T00:00:01Z\"}\n"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "ok": false,
+     "records": 0,
+     "first_bad_seq": 0,
+     "reason": "PARSE",
+     "head": null,
+     "label": "crypto venue; simulated"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "ledger"
+   ],
+   "description": "hand, not blind: HR-78 a repeated key (same value) is PARSE, though last-wins would verify"
   }
  ]
 }
