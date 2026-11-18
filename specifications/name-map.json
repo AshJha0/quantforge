@@ -4788,6 +4788,9 @@
     "cash": {
      "java": "cash"
     },
+    "dark": {
+     "java": "dark"
+    },
     "limits": {
      "java": "limits"
     },
