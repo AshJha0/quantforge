@@ -129,8 +129,8 @@ def _first_number(v, path=()):
 def e1_suite(suites):
     """Non-finite input per wave 2 operation, from its first value case. These operations take no Real input: every
     number is a decimal string (HR-12), so "NaN" there is a malformed decimal and the answer is E_SCHEMA, which comes
-    before F-2's E_DOMAIN. The operations are listed in conformance/E1_EXEMPT.json; these cases pin that all four
-    builds reject the string rather than read it as a number."""
+    before F-2's E_DOMAIN; under ruling F-2a (stage-f-rulings.md) this case is the operation's E1 golden in
+    tools/check_e1_coverage.py, and it pins that all four builds reject the string rather than read it as a number."""
     e = Suite("e1_h2", SPEC_LIT, G)
     seen = set()
     for su in suites:
