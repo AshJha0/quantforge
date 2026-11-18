@@ -139,8 +139,53 @@ def level_diff(e, b, side_key):
     return rows
 
 
+# --- exec packet (H-14, H-17): expected from datasets/golden/stage_h/{alg_h,tcx_h}.json ---
+# Usage: wave2_compare.py <checkout> <blind_results.json> exec
+# MATCH: same field names and every number within simple_analytic
+# (1e-12 abs + 1e-10 rel). SHAPE-ONLY: values agree once the error shape
+# {"status","error_code"} -> {"error"} and blind-only echo fields are allowed.
+def _close(a, b):
+    if isinstance(a, list) and isinstance(b, list):
+        return len(a) == len(b) and all(_close(x, y) for x, y in zip(a, b))
+    if isinstance(a, dict) and isinstance(b, dict):
+        return set(a) == set(b) and all(_close(a[k], b[k]) for k in a)
+    if isinstance(a, (int, float)) and isinstance(b, (int, float)) and not isinstance(a, bool):
+        return abs(a - b) <= 1e-12 + 1e-10 * max(abs(a), abs(b))
+    return a == b
+
+
+def exec_main(root, blind_path):
+    blind = json.loads(Path(blind_path).read_text(encoding="utf-8"))
+    bad = n = 0
+    for suite in ("alg_h", "tcx_h"):
+        cases = json.loads((Path(root) / "datasets/golden/stage_h" / (suite + ".json")).read_text(encoding="utf-8"))["cases"]
+        for c in cases:
+            n += 1
+            cid, e = c["case_id"], dict(c["expected"])
+            b = blind.get(cid)
+            if b is None:
+                print(f"{cid}	MISSING"); bad += 1; continue
+            st = e.pop("status")
+            if st == "error" and "error_code" in e:
+                e = {"error": e["error_code"]}
+            if _close(e, b):
+                print(f"{cid}	MATCH" if c["expected"].get("status") != "error" or "error" in c["expected"] else f"{cid}	SHAPE-ONLY (error shape)")
+                continue
+            if set(b) > set(e) and _close(e, {k: b[k] for k in e}):
+                print(f"{cid}	SHAPE-ONLY (blind adds {sorted(set(b) - set(e))})"); continue
+            bad += 1
+            print(f"{cid}	VALUE MISMATCH")
+            for k in sorted(set(e) | set(b)):
+                if not _close(e.get(k), b.get(k)):
+                    print(f"  {k}: spec={canon(e.get(k))} blind={canon(b.get(k))}")
+    print(f"{n - bad}/{n} MATCH or SHAPE-ONLY")
+    sys.exit(1 if bad else 0)
+
+
 def main():
     root, blind_path = sys.argv[1], sys.argv[2]
+    if len(sys.argv) > 3 and sys.argv[3] == "exec":
+        exec_main(root, blind_path)
     exp = expected(root)
     blind = json.loads(Path(blind_path).read_text(encoding="utf-8"))
     bad = 0

@@ -8,7 +8,7 @@ Sources:
 - [Kis13] R. Kissell, *The Science of Algorithmic Trading and Portfolio Management*, Academic Press, 2013: the "I-star" impact model `I* = a1 (Q/ADV)^a2 sigma^a3` and its split into a participation-dependent temporary part `b1 I* POV^a4` and a permanent part `(1 - b1) I*`. Not free; chapter, page and the exact parameterisation **NOT verified** (recalled). The parameters a1..a4, b1 are inputs here; no default value is claimed from the book. Evidence class: textbook, recalled, UNVERIFIED.
 - [AC00] eq. (10), p. 12 (preprint pages, see `almgren-chriss.md`): the linear trajectory's price variance `1/3 sigma^2 X^2 T (1 - 1/N)(1 - 1/(2N))`, which tends to `1/3 sigma^2 X^2 T` as N grows; the timing-risk line below is its square root over X. Evidence class: paper, read.
 - [Per88] as in `tca.md` for the paper-portfolio total that the attribution splits.
-- Hand calculation for every golden below by this spec lane, 2026-11-18. Exact decimal arithmetic except the square roots, which were taken to 20 digits and printed to 12 significant digits. No blind re-derivation yet.
+- Hand calculation for every golden below by this spec lane, 2026-11-18. Exact decimal arithmetic except the square roots, which were taken to 20 digits and printed to 12 significant digits. Blind re-derivation (DR-H2, 2026-11-18): 11/11 agree (6 MATCH, 5 error cases SHAPE-ONLY), 0 VALUE MISMATCH; program/STAGE_H_BLIND_EXEC.md. Generator: `oracle/python/gen_stage_h_w2_exec.py`.
 
 ## `exec.tca.pretrade`
 Inputs `quantity` X (> 0), `adv` (average daily volume, > 0), `daily_vol` sigma (decimal, >= 0), `participation` p in (0, 1) (of total market volume including our own, HR-4), `half_spread_bps` (>= 0), `params` {a1 > 0, a2, a3, a4, b1 in [0, 1]}, optional `price` P (> 0).
@@ -54,6 +54,9 @@ Canonical JSON for every case: `datasets/golden/stage_h/tcx_h.json`.
 1. Attribution identity above on every golden and on 1,000 random inputs (seed 20261118, 1 to 50 fills, prices in [1, 1000]): delay + impact + spread equals `s sum q_i (p_i - P_d)` within 1e-10 max(1, |total|); total equals `exec.tca.shortfall` total within the same bound.
 2. Pre-trade monotonicity (property): `impact_bps` non-decreasing in X when a2 >= 0, in p when a4 >= 0; `timing_risk_bps` non-increasing in p.
 3. Goldens tcx_h-0001..0011 in all four languages to the `simple_analytic` tolerance.
+
+## Post-blind shape changes (2026-11-18, after the blind lane froze; no value changed)
+Output field names are fixed as one name each. Pretrade: `istar_bps`, `impact_bps`, `spread_bps`, `expected_cost_bps`, `duration_days`, `timing_risk_bps`, and only with `price`: `expected_cost`, `timing_risk`. Attribution: `delay`, `impact`, `spread`, `execution`, `opportunity`, `fees` (the input echoed, so the output alone sums to `total`), `total`, `total_bps`. Errors as `{"status": "error", "error_code": CODE}`. Record: program/STAGE_H_BLIND_EXEC.md.
 
 ## Limitations
 The pre-trade model is a parameterised form; its parameters are inputs and nothing here says they fit any venue (calibration is the research lane, H-1). Timing risk assumes a straight-line schedule and no drift. Attribution needs the mid at each fill; with a stale or missing mid the impact/spread split is wrong even though the sum stays right.

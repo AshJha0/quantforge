@@ -3,7 +3,7 @@
  "suite": "alg_h",
  "spec": "specifications/10-execution/adaptive-algos.md",
  "spec_version": "0.1.0",
- "generator": "hand (wave-2 execution spec lane 2026-11-18)",
+ "generator": "oracle/python/gen_stage_h_w2_exec.py",
  "reviewer": "none: self-assessment; blind re-derivation pending",
  "cases": [
   {
