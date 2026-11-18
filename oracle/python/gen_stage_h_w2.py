@@ -26,15 +26,18 @@ G = "oracle/python/gen_stage_h_w2.py"
 FOLDER = "stage_h"
 SPEC_OB = "specifications/09-microstructure/order-book.md"
 SPEC_LIT = "specifications/10-execution/lit-matching.md"
-BLIND = "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
-NOT_BLIND = {
+BLIND = "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md): MATCH"
+NOT_BLIND = {  # verdicts from program/STAGE_H_BLIND_WAVE2.md; only a blind MATCH counts in tools/outside_shares.py
     "ob_h-0001": ["hand", "outside: [KR-CRC] printed checksum 3310070434"],
     "lit_h-0001": ["hand"],
+    "lit_h-0010": ["hand", "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md): MISMATCH; spec lane wrong, "
+                   "golden fixed, blind lane not rerun"],
 }
 OPS = {"ob_h": "micro.book.rebuild", "lit_h": "exec.sim.lit.run"}
 SPEC_DARK = "specifications/10-execution/dark-pool.md"
 SPEC_SOR = "specifications/10-execution/smart-order-router.md"
-BLIND_2B = "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md)"
+BLIND_2B = "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): MATCH"
+SHAPE_ONLY_2B = {"dark_h-0007": "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"}
 NOT_BLIND_2B = {"dark_h-0003", "sor_h-0001", "sor_h-0002"}
 DARK_LABEL = "simulated venue; not a real dark pool"
 
@@ -173,7 +176,8 @@ def build_w2b():
                 assert ("ranking" in exp) == (inp.get("ranking") is True), cid
             blind = cid not in NOT_BLIND_2B
             s.add(op, inp, exp, cls="date_and_convention",
-                  verified=["hand", BLIND_2B] if blind else ["hand"],
+                  verified=(["hand", SHAPE_ONLY_2B[cid]] if cid in SHAPE_ONLY_2B
+                            else ["hand", BLIND_2B] if blind else ["hand"]),
                   tags=["stage_h", "simulated"],
                   description=f"{cid} from the spec table" + ("" if blind else "; not blind"))
             s.cases[-1]["case_id"] = cid

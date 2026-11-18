@@ -322,3 +322,7 @@ TOTALS: 15574 value 7685 error 5375 invariance 2514
 Stage H E1 completion (2026-11-18, `e1_h`: one non-finite input per stage H operation, 10 error cases).
 
 TOTALS: 15584 value 7685 error 5385 invariance 2514
+
+Stage H round 2 (2026-11-18): wave 2 `ob_h` 17, `lit_h` 20, `dark_h` 8, `sor_h` 8, and `e1_h2` 5 (a NaN decimal string per wave 2 operation, `E_SCHEMA` per HR-12): 58 cases (34 value, 24 error).
+
+TOTALS: 15642 value 7719 error 5409 invariance 2514

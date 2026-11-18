@@ -293,7 +293,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -414,7 +414,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -535,7 +535,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -658,7 +658,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -789,7 +789,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -945,7 +945,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -1096,7 +1096,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -1189,7 +1189,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -1336,13 +1336,13 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md): MISMATCH; spec lane wrong, golden fixed, blind lane not rerun"
    ],
    "tags": [
     "stage_h",
     "simulated"
    ],
-   "description": "lit_h-0010 from the spec table"
+   "description": "lit_h-0010 from the spec table; not blind"
   },
   {
    "case_id": "lit_h-0011",
@@ -1560,7 +1560,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md): MATCH"
    ],
    "tags": [
     "stage_h",

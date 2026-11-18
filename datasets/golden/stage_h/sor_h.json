@@ -173,7 +173,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md)"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -235,7 +235,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md)"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -513,7 +513,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md)"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): MATCH"
    ],
    "tags": [
     "stage_h",
