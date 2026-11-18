@@ -363,7 +363,30 @@ fn s_(d: Dec) -> Json {
 }
 
 /// One pool run over `events` (BOOK, NEW, CANCEL), numbered from 1. `config` is an object.
+/// HR-93, HR-113: `asset_class` (default EQUITY; `null` counts as absent); a dark venue of another
+/// class is an invalid input combination, `E_INPUT` (structural cross-field check, HR-66).
+pub fn asset_class(v: Option<&Json>, path: &str, dark: bool) -> Result<&'static str> {
+    let c = match v {
+        None | Some(Json::Null) => "EQUITY",
+        Some(x) => match x.as_str() {
+            Some("EQUITY") => "EQUITY",
+            Some("FX") => "FX",
+            Some("RATES") => "RATES",
+            _ => return Err(at("E_SCHEMA", path, "not EQUITY, FX or RATES")),
+        },
+    };
+    if dark && c != "EQUITY" {
+        return Err(at(
+            "E_INPUT",
+            path,
+            "dark pool is equities only (HR-93, HR-113)",
+        ));
+    }
+    Ok(c)
+}
+
 pub fn run(config: &Json, events: &[Json]) -> Result<Json> {
+    asset_class(config.get("asset_class"), "config/asset_class", true)?;
     if events.len() > MAX_EVENTS {
         return Err(at("E_LIMIT", "events", "more than 10,000,000 events"));
     }
