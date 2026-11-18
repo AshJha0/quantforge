@@ -735,3 +735,108 @@ TEST_CASE("hsu near-singular equality and costed paths are refined", "[hedging][
     REQUIRE(near(kr.objective, 0.25000000096536956));
     REQUIRE(kr.x[2] == 0.0);
 }
+
+// Full mutation run 2026-11-18 (hedging.cpp, seed 1): kill tests for survivors without a row. Expected values are
+// closed forms worked by hand, or the exact minimum 0 of the square nonsingular ns2 data.
+
+// Impact on the equality path (line 1079, refine_face diag). min (x0 - 1)^2 + (x1 - 1)^2 + 3 x0^2 + x1^2 subject to
+// x0 + x1 = 1: stationarity 8 x0 - 2 = 4 x1 - 2, so x1 = 2 x0 and x = (1/3, 2/3). With impact divided instead of
+// multiplied the refinement would move to the minimiser of the wrong quadratic, (3/5, 2/5).
+TEST_CASE("hsu impact on the equality path is refined with cost_weight times impact", "[hedging][hsu][fullrun]") {
+    hg::QpProblem p;
+    p.a = {{1.0, 0.0}, {0.0, 1.0}};
+    p.b = {-1.0, -1.0};
+    p.weights = {1.0, 1.0};
+    p.impact = hg::Vec{3.0, 1.0};
+    p.eq_matrix = Matrix{{1.0, 1.0}};
+    p.eq_rhs = hg::Vec{1.0};
+    const hg::QpResult r = hg::solve_qp(p);
+    REQUIRE(std::fabs(r.x[0] - 1.0 / 3.0) <= 1e-12);
+    REQUIRE(std::fabs(r.x[1] - 2.0 / 3.0) <= 1e-12);
+}
+
+// Impact on the sign-state path (line 868). One instrument, f = (x - 1)^2 + 3 x^2 + 0.5 |x|. For x > 0,
+// 2 (x - 1) + 6 x + 0.5 = 0 gives x = 3/16; for x < 0 the stationary point 5/16 is not in the orthant. The mutant
+// (diag 1/3) would refine to 9/16.
+TEST_CASE("hsu impact on the sign-state path is refined with cost_weight times impact", "[hedging][hsu][fullrun]") {
+    hg::QpProblem p;
+    p.a = {{1.0}};
+    p.b = {-1.0};
+    p.weights = {1.0};
+    p.impact = hg::Vec{3.0};
+    p.half_spreads = hg::Vec{0.5};
+    const hg::QpResult r = hg::solve_qp(p);
+    REQUIRE(std::fabs(r.x[0] - 3.0 / 16.0) <= 1e-12);
+}
+
+// Integer ridge in lot units is ridge L^2 (line 1408). f(n) = (0.01 n - 1)^2 + (0.01 n)^2 is minimised at n = 50
+// exactly, f = 0.25 + 0.25 = 0.5, and the relaxation has the same minimum. With ridge L or ridge on the diagonal the
+// ellipsoid is centred near n = 1 and its Newton refinement contracts by 0.98 or less per step, so neither the
+// lattice point 50 nor the relaxed minimum 0.5 is reached.
+TEST_CASE("hsu integer ridge in lot units is ridge times the squared lot size", "[hedging][hsu][fullrun]") {
+    hg::IntegerProblem ip;
+    ip.a = {{1.0}};
+    ip.b = {-1.0};
+    ip.weights = {1.0};
+    ip.ridge = 1.0;
+    ip.lot_sizes = {0.01};
+    const hg::IntegerResult r = hg::solve_integer(ip);
+    REQUIRE(r.lots == std::vector<long long>{50});
+    REQUIRE(std::fabs(r.objective - 0.5) <= 1e-12);
+    REQUIRE(std::fabs(r.continuous_objective - 0.5) <= 1e-12);
+}
+
+// J-W3-18 (line 1413): L H L overflows while L A' W b is finite (b = 0). The overflow check must look at every entry
+// of H, not stop at the finite c; only that check gives this message.
+TEST_CASE("hsu integer normal equations overflowing in H alone are E_NON_FINITE", "[hedging][hsu][fullrun]") {
+    hg::IntegerProblem ip;
+    ip.a = {{1e200}};
+    ip.b = {0.0};
+    ip.weights = {1.0};
+    ip.lot_sizes = {1.0};
+    std::string code, message;
+    try {
+        (void)hg::solve_integer(ip);
+    } catch (const Error& e) {
+        code = e.code();
+        message = e.what();
+    }
+    REQUIRE(code == "E_NON_FINITE");
+    REQUIRE(message.find("overflow") != std::string::npos);
+}
+
+// refine_face on the ns2 data (lines 869, 865, 866, 1294, 1360). Square nonsingular A, so the exact minimum is 0 for
+// any weights and any scaling of an equality row; without the refinement the objective is about 1e-6 too high.
+TEST_CASE("hsu near-singular refinement survives zero-cost instruments, small weights and a small row",
+          "[hedging][hsu][fullrun]") {
+    const Matrix a2 = {{-0.04684068765297382, 0.85014589759939}, {0.06966430897729968, -1.2643959406278287}};
+    const hg::Vec b = {-18.480681166672692, -6.198617610506782}, w = {1.6701886487345696, 2.992546829483374};
+    const auto zero = [](double f) { return f >= 0.0 && f <= 1e-10; };
+    // A margin that does not bind and an instrument with no spread and no rate (sign 0 in the sign search): its
+    // lin term is 0 (not 0/0), and its bounds are not clipped to an orthant. x* is negative for b, positive for -b.
+    for (const double s : {1.0, -1.0}) {
+        hg::QpProblem m;
+        m.a = a2;
+        m.b = {s * b[0], s * b[1]};
+        m.weights = w;
+        m.margin_rates = hg::Vec{1.0, 0.0};
+        m.margin_limit = 1e9;
+        REQUIRE(zero(hg::solve_qp(m).objective));
+    }
+    // Weights below 1/sqrt(2): a gradient taken with r / w instead of w r overshoots and is rejected.
+    hg::QpProblem m;
+    m.a = a2;
+    m.b = b;
+    m.weights = {0.25, 0.25};
+    m.margin_rates = hg::Vec{1.0, 1.0};
+    m.margin_limit = 1e9;
+    REQUIRE(zero(hg::solve_qp(m).objective));
+    // The equality x2 = 3 written as 1e-7 x2 = 3e-7: the row is kept at 1e-12 of its own norm, not 1e-12 / norm.
+    hg::QpProblem e;
+    e.a = {{16 * a2[0][0], a2[0][1], 0.5}, {16 * a2[1][0], a2[1][1], 0.375}};
+    e.b = b;
+    e.weights = w;
+    e.eq_matrix = Matrix{{0.0, 0.0, 1e-7}};
+    e.eq_rhs = hg::Vec{3e-7};
+    REQUIRE(zero(hg::solve_qp(e).objective));
+}

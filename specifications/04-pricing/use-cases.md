@@ -1,6 +1,6 @@
 # Use cases 1 to 4
 
-Spec version 1.0.0. Status: Implemented, not Validated. All data in the cases is synthetic.
+Spec version 1.0.0. Status: Implemented. All data in the cases is synthetic.
 
 Each use case runs a slice from market data to a hedge, by composing other specs. Nothing new is defined here but the sums.
 

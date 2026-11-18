@@ -25,7 +25,7 @@ Java, C++ and Rust figures are not rechecked here. They are as of the recorded r
 
 ## Add a curve
 
-Add a synthetic example to `examples/` and an entry in `CURVES`, and remove the curve from `PLANNED`. Use only operations that `quantforge operations` lists. Inputs stay labelled synthetic unless a real, redistributable source exists. Status moves to Validated only after the human review.
+Add a synthetic example to `examples/` and an entry in `CURVES`, and remove the curve from `PLANNED`. Use only operations that `quantforge operations` lists. Inputs stay labelled synthetic unless a real, redistributable source exists. The gallery table has no status column: each row shows its stage and evidence only.
 
 ## Charts
 

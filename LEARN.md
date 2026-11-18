@@ -364,7 +364,7 @@ Nothing in these examples is traded. They are calculations on synthetic data.
 
 ## Validation and evidence
 
-Stages A to C test correctness with analytic, hand and outside-library answers. Stages B and C add calibration on known truth. Later stages add backtests and new-model tests. `specifications/stage-b-rulings.md` says which stage B suites have an outside oracle. Evidence is always labelled analytic, simulated, proxy or observed, and validation reports are self-assessment until the human review at the end of the project.
+Stages A to C test correctness with analytic, hand and outside-library answers. Stages B and C add calibration on known truth. Later stages add backtests and new-model tests. `specifications/stage-b-rulings.md` says which stage B suites have an outside oracle. Evidence is always labelled analytic, simulated, proxy or observed, and validation reports are self-assessment; there is no second review (owner decision, 2026-11-18).
 
 R1 adds the records that say how far each result goes. The [model inventory](docs/model-inventory.md) gives every model its spec, oracle, outside-checked share and limits. The [edge-case register](specifications/edge-case-register.md) lists boundary cases and whether a golden pins each one; a row marked out of scope names the stage that would bring it in. `conformance/tolerances/money.md` restates every tolerance as money on 10 million notional, so a reader can judge whether a pass is tight enough to matter. The R1 daily workflows are the first runs on observed public data, and their USD curve is labelled a proxy.
 
@@ -378,19 +378,19 @@ QuantLib's Python wheel has no GARCH, no VIX method, no bivariate t and no large
 
 ### Known limits, by topic
 
-Every topic is Implemented, not Validated, and all inputs are synthetic unless a section says otherwise. The limits as each stage recorded them:
+Every topic is Implemented, and all inputs are synthetic unless a section says otherwise. The limits as each stage recorded them:
 
 - **Foundations (stage A).** Many golden cases have hand or replay sources, which can share a misreading with the spec. Constructed inputs test the method only. The recorder is built but not scheduled. See the [Roadmap](ROADMAP.md#stage-status).
 
-- **Curves (stage B).** Stage B is Implemented, not Validated. Almost all curve inputs are synthetic, so exact repricing says nothing about a market. `usecases` and `rulings_b` have no outside oracle, and `risk` is hand and self-consistency only. Risk is bump and rebuild, with no AD. See `specifications/stage-b-rulings.md` and the [Roadmap](ROADMAP.md#stage-status).
+- **Curves (stage B).** Stage B is Implemented. Almost all curve inputs are synthetic, so exact repricing says nothing about a market. `usecases` and `rulings_b` have no outside oracle, and `risk` is hand and self-consistency only. Risk is bump and rebuild, with no AD. See `specifications/stage-b-rulings.md` and the [Roadmap](ROADMAP.md#stage-status).
 
-- **Options and vol (stage C).** Stage C is Implemented, not Validated. All inputs are synthetic: the stage C data survey found no free history of option quotes, vol surfaces, borrow cost or dividends. European options only (C1). Arbitrage checks run on the given points only. `vol.sabr.arbfree` at `nu > 0` lacks a tight outside source. See `specifications/stage-c-rulings.md`.
+- **Options and vol (stage C).** Stage C is Implemented. All inputs are synthetic: the stage C data survey found no free history of option quotes, vol surfaces, borrow cost or dividends. European options only (C1). Arbitrage checks run on the given points only. `vol.sabr.arbfree` at `nu > 0` lacks a tight outside source. See `specifications/stage-c-rulings.md`.
 
-- **Curves and fixed income (stage D).** Stage D is Implemented, not Validated. All inputs are synthetic. The ESTR payment lag of 2 is a library choice (Strata), not a market standard; TP ICAP terms use 1 (ruling R1-2). From R1, bond-future conversion factors take an optional `contract` input with CME rounding; `null` keeps the stage D `TEN_YEAR` behaviour (ruling R1-3). The stage D data survey (2026-11-07) found free overnight fixings, fitted Bank of England curves, US Treasury par and real curves and UK CPI, but no free swap quotes, bond-level prices, special repo, cross-currency basis, CDS spreads, borrow, commodity curves or MBS factors; those studies stay method tests. Several suites have no outside oracle (CSA discounting, asset swap, FRN, repo, NDF, equity, inflation, commodities, MBS); `specifications/stage-d-rulings.md` lists them. R1 counts outside-oracle cases under a stricter rule: QuantLib is built from its own convention objects through one reviewed table, `oracle/CONVENTION_MAP.md`. On that rule, 419 of the 654 stage D cases (64.1%; most counted cases are fixed-rate bonds) count, suite by suite in `oracle/REPORT.md`.
+- **Curves and fixed income (stage D).** Stage D is Implemented. All inputs are synthetic. The ESTR payment lag of 2 is a library choice (Strata), not a market standard; TP ICAP terms use 1 (ruling R1-2). From R1, bond-future conversion factors take an optional `contract` input with CME rounding; `null` keeps the stage D `TEN_YEAR` behaviour (ruling R1-3). The stage D data survey (2026-11-07) found free overnight fixings, fitted Bank of England curves, US Treasury par and real curves and UK CPI, but no free swap quotes, bond-level prices, special repo, cross-currency basis, CDS spreads, borrow, commodity curves or MBS factors; those studies stay method tests. Several suites have no outside oracle (CSA discounting, asset swap, FRN, repo, NDF, equity, inflation, commodities, MBS); `specifications/stage-d-rulings.md` lists them. R1 counts outside-oracle cases under a stricter rule: QuantLib is built from its own convention objects through one reviewed table, `oracle/CONVENTION_MAP.md`. On that rule, 419 of the 654 stage D cases (64.1%; most counted cases are fixed-rate bonds) count, suite by suite in `oracle/REPORT.md`.
 
 ## Stage F: curves, portfolio risk and the book
 
-Stage F (v0.6.0) is at Implemented, not Validated. On the merged part 2 tree (`stage-f-part2` at `db99d87`, 2026-11-10, observed on one Windows machine through the neutral runner), each of the four builds passed 12,462 of 12,462 golden cases (value-checked, error and invariance cases counted together): Java (JDK 25.0.5), Python (CPython 3.15.2), Rust (1.99.1) and C++ (GCC 15.2.0 under WSL, built with `-DQF_WERROR=ON`). Specs and rulings F-1 to F-44 are in `specifications/`. Every number quoted here is the expected output of the named golden case, computed by the oracle at 40 or more digits.
+Stage F (v0.6.0) is Implemented. On the merged part 2 tree (`stage-f-part2` at `db99d87`, 2026-11-10, observed on one Windows machine through the neutral runner), each of the four builds passed 12,462 of 12,462 golden cases (value-checked, error and invariance cases counted together): Java (JDK 25.0.5), Python (CPython 3.15.2), Rust (1.99.1) and C++ (GCC 15.2.0 under WSL, built with `-DQF_WERROR=ON`). Specs and rulings F-1 to F-44 are in `specifications/`. Every number quoted here is the expected output of the named golden case, computed by the oracle at 40 or more digits.
 
 Tutorials for this section: [5, risk](docs/getting-started/tutorial-5-risk.md) (VaR, ES, backtests, FRTB delta), [8, multi-curve building](docs/getting-started/tutorial-8-multicurve.md) (joint solve and Jacobian), [14, the trading book](docs/getting-started/tutorial-14-book.md) and [15, advanced risk](docs/getting-started/tutorial-15-advanced-risk.md).
 
@@ -424,7 +424,7 @@ Use case 4 regresses a portfolio's returns on factor returns, and each factor's 
 
 ## Stage G: rates models and xVA
 
-Stage G (released as v0.7.0 on 2026-11-11) is at Implemented, not Validated. On the integration tree `stage-g-int` (2026-11-11, observed on one Windows machine through the neutral runner) each of the four builds passed 14,492 of 14,492 golden cases, of which 589 are stage G value and error cases and 1,026 are E1 cases for the first 20 stage G operations.
+Stage G (released as v0.7.0 on 2026-11-11) is Implemented. On the integration tree `stage-g-int` (2026-11-11, observed on one Windows machine through the neutral runner) each of the four builds passed 14,492 of 14,492 golden cases, of which 589 are stage G value and error cases and 1,026 are E1 cases for the first 20 stage G operations.
 
 Tutorials for this section: [6, interest rate models](docs/getting-started/tutorial-6-hull-white.md), [7, counterparty risk](docs/getting-started/tutorial-7-counterparty.md), [12, exotic options](docs/getting-started/tutorial-12-exotics.md) (discrete barriers), [15, advanced risk](docs/getting-started/tutorial-15-advanced-risk.md) (AAD ladder, MC Greeks, model reserve) and [16, the LIBOR market model](docs/getting-started/tutorial-16-lmm.md).
 
@@ -729,7 +729,7 @@ The order things were built, with each stage's own summary. The topics above reu
 
 ### Stage D: Curves and fixed income
 
-**Status: built, target v0.4.** Implemented, not Validated. At merge `95cbf11` on 2026-11-07, each of the four implementations passed 5,514 of 5,514 golden cases (value-checked and error cases counted together) locally, 331 of them in stage D's 20 suites (`conformance/README.md`). `specifications/stage-d-handover.md` lists every stage D spec; rulings D1 to D64 are in `specifications/stage-d-rulings.md`.
+**Status: built, target v0.4.** Implemented. At merge `95cbf11` on 2026-11-07, each of the four implementations passed 5,514 of 5,514 golden cases (value-checked and error cases counted together) locally, 331 of them in stage D's 20 suites (`conformance/README.md`). `specifications/stage-d-handover.md` lists every stage D spec; rulings D1 to D64 are in `specifications/stage-d-rulings.md`.
 
 ### R2: Risk
 

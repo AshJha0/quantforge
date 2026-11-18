@@ -1,16 +1,16 @@
 # Validation evidence pack
 
-Every curve in the [Curves gallery](../curves/README.md) is at Implemented, not Validated. The project's rule (ROADMAP.md, "Stage status") is that only an independent human review moves a curve to Validated. This folder does not move any row. It gathers the evidence so that review is quick: one checklist per curve, each ending in a blank sign-off block.
+This folder gathers the evidence behind each curve in the [Curves gallery](../curves/README.md): one checklist per curve. Owner decision 2026-11-18: there is no second review, human or otherwise, and the gallery carries no per-curve validation status. The pack states what has been checked and how; it does not certify a curve. All inputs are synthetic except the real-data round trip below, and nothing is traded.
 
 ## What the pack holds
 
 | Part | Where | What it shows |
 |---|---|---|
-| One checklist per curve | `docs/validation/<curve>.md` (29 pages, one per gallery row) | Spec, rulings, golden counts by source, outside-library share, the gallery's own oracle paragraph and limits, the real-data result, open questions, sign-off block |
+| One checklist per curve | `docs/validation/<curve>.md` (29 pages, one per gallery row) | Spec, rulings, golden counts by source, outside-library share, the gallery's own oracle paragraph and limits, the real-data result, open questions, a "What to check" list |
 | Outside-library checks added by the pack | `oracle/python/outside_validation.py`, `oracle/OUTSIDE_VALIDATION.json` | QuantLib 1.44 on the golden inputs, every compared output at the case's own tolerance |
 | Real-data round trip | `tools/validation/reconcile_official.py`, `docs/validation/data/real-data.json` | SONIA and SOFR bootstraps against published fitted curves; pass or fail only |
-| AI review packet | [`docs/validation/ai-review/`](ai-review/README.md) (one self-contained prompt per curve, about 30,000 characters or less) | Spec text, rulings, golden cases, evidence and questions for an outside model with no repository access; its answer is filed as a labelled "AI review" section, never as the sign-off |
-| Deferred review steps | [HOW-TO-REVIEW.md](HOW-TO-REVIEW.md) | Owner decision 2026-11-18: AI review and sign-off run at the end of stage K or after |
+| AI review packet | [`docs/validation/ai-review/`](ai-review/README.md) (one self-contained prompt per curve, about 30,000 characters or less) | Spec text, rulings, golden cases, evidence and questions for an outside model with no repository access; its answer is filed as a labelled "AI review" section and checked against the repository before anything is acted on |
+| How to use the pack | [HOW-TO-REVIEW.md](HOW-TO-REVIEW.md) | Rebuilding the pack and running the optional AI check |
 | Page generator | `tools/validation/build_checklists.py` (`--check` for staleness) | Reads the counts from the gallery data and the goldens, so a page cannot drift from them |
 
 ## Outside-library checks (option C)
@@ -29,7 +29,7 @@ Before the pack, four stage B and C curves had value cases with no outside libra
 
 All figures are observed from `oracle/OUTSIDE_VALIDATION.json`. Stages B and C are outside the R6-13 share table (`oracle/OUTSIDE_SHARES.md` covers D to J), so that table and the golden totals (`tools/check_case_total.py`) do not change.
 
-One disagreement, now settled by ruling C18 (owner, 2026-11-18; `specifications/stage-c-rulings.md`) and left for the reviewer to confirm: `equity_forward-0012` has a dividend with `ex_date` equal to `as_of`. The spec ignores it (`specifications/02-curves/equity-forward.md`, "Dividends with `ex_date <= as_of` ... are ignored"); QuantLib's engine counts a dividend dated on the evaluation date. With that dividend removed, QuantLib agrees on all four outputs (observed, `probe_without_as_of_dividend_pass` in the register). This is a boundary convention, not an arithmetic error, but it is a ruling a reviewer should confirm.
+One disagreement, settled by ruling C18 (owner, 2026-11-18; `specifications/stage-c-rulings.md`): `equity_forward-0012` has a dividend with `ex_date` equal to `as_of`. The spec ignores it (`specifications/02-curves/equity-forward.md`, "Dividends with `ex_date <= as_of` ... are ignored"); QuantLib's engine counts a dividend dated on the evaluation date. With that dividend removed, QuantLib agrees on all four outputs (observed, `probe_without_as_of_dividend_pass` in the register). This is a boundary convention, not an arithmetic error, and the ruling records the choice.
 
 Round 2 (2026-11-18) added the funding, financing and liquidity rows above. The R6-13 shares moved: stage F value cases 53.0% to 53.7%, stage J 61.3% to 67.5% (observed, `oracle/OUTSIDE_SHARES.md`).
 
@@ -61,13 +61,10 @@ UV_PROJECT_ENVIRONMENT=~/qf-oracle-venv uv sync --project oracle/python
 python tools/validation/reconcile_official.py compare --work <scratch dir> --out docs/validation/data/real-data.json
 ```
 
-## How a review works
+## How the checklists are used
 
-1. The reviewer reads the checklist, the spec and the rulings it names, and ticks the boxes under "What to check".
-2. The reviewer answers the open questions, in the checklist or in a linked issue.
-3. The reviewer fills the sign-off block: name, date (YYYY-MM-DD), verdict (exactly `Validated`, `Validated with conditions` or `Not validated`), conditions. Everything below the line `<!-- Hand-filled below this line ... -->` is kept when the pages are rebuilt, so the sign-off and any AI review sections go there. Commit the signed checklist on its own.
-4. In a separate commit, run `python tools/build_gallery.py --evidence-only` and then `python tools/validation/build_checklists.py`. The gallery reads the signed verdict and changes that row to `Validated (name, date; checklist link)` or `Validated with conditions (...)`; `Not validated` leaves the row as it is. No other route changes a row: a hand edit of the table is overwritten by the generator.
+Each checklist lists the spec, the rulings, the golden sources, the outside-library share, the real-data result and the open questions for one curve, and ends with a "What to check" list for anyone reading the evidence. Everything below the line `<!-- Hand-filled below this line ... -->` is kept when the pages are rebuilt, so any AI review section or note goes there. No checklist, and nothing in this folder, changes the gallery table: `tools/build_gallery.py` writes that table from the gallery data alone.
 
 ## AI review
 
-An AI review is a useful second opinion: it can recheck formulas, rerun scripts and look for gaps a single author missed. It may be attached to a checklist as a separate section headed "AI review", stating the model, the date and what it checked. It is never counted as the sign-off and never moves a row, because it shares the failure modes of the tools that built the evidence and is not accountable for the verdict.
+An AI review is an optional extra check: a model can recheck formulas and look for gaps a single author missed. It may be attached to a checklist as a separate section headed "AI review", stating the model, the date and what it checked. Its findings count only once checked against the spec or golden they quote, because the model shares the failure modes of the tools that built the evidence and can be confidently wrong.

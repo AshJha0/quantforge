@@ -1,6 +1,6 @@
 # Stage D numeric targets
 
-Set before any stage D code, as plan section 8 requires. "Oracle measured" is the oracle's own replay against the outside source, from `oracle/python/gen_stage_d.py`. Self-assessment until the end-of-project human review.
+Set before any stage D code, as plan section 8 requires. "Oracle measured" is the oracle's own replay against the outside source, from `oracle/python/gen_stage_d.py`. Self-assessment; there is no second review (owner decision, 2026-11-18).
 
 Calibration is judged on repricing, and on parameters only where the minimum is unique (every stage D fit is). Iteration counts are never compared.
 

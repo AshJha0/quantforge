@@ -3,11 +3,11 @@
 
 Two checks, run by `python tools/quality_gate.py --check-docs`:
 
-1. The status table in docs/curves/README.md. A row marked Planned fails if its text names an operation that
-   exists in specifications/name-map.json (the work was done but the table was not updated). A row marked
-   Implemented fails if an operation it names in backticks is not in the name map. And every curve-building
+1. The curve table in docs/curves/README.md (Curve | Stage | Evidence). A row whose evidence starts "Planned" fails
+   if its text names an operation that exists in specifications/name-map.json (the work was done but the table was
+   not updated). Any other row is implemented, and fails if an operation it names in backticks is not in the name map. And every curve-building
    operation in the name map (`*.curve`, `*.curve.*`, `*.bootstrap`, outside `rates.curve.*`, `risk.*`, `calib.*`)
-   must be named on an Implemented row or on a page such a row links to, so a new curve cannot stay "Planned".
+   must be named on an implemented row or on a page such a row links to, so a new curve cannot stay "Planned".
 2. Release wording. CHANGELOG headings `## X.Y.Z: stage L, ...` map each stage to a version. For every stage whose
    version has a git tag (`vX.Y.Z`, or `vX.Y` for X.Y.0), a tracked Markdown line, or tools/site_facts.json, fails if it calls that
    version or that stage pending, unreleased or not yet tagged.
@@ -33,10 +33,10 @@ def operations(root=ROOT):
 
 
 def table_rows(text):
-    """Rows of the first Markdown table under "## Status of every curve", as lists of cells."""
+    """Rows of the first Markdown table under "## Every curve in the plan", as lists of cells."""
     rows, inside = [], False
     for line in text.splitlines():
-        if line.startswith("## Status of every curve"):
+        if line.startswith("## Every curve in the plan"):
             inside = True
             continue
         if inside and line.startswith("## "):
@@ -50,21 +50,21 @@ def curve_table_problems(text, ops):
     bad = []
     rows = table_rows(text)
     if not rows:
-        return ["docs/curves/README.md: no status table found"]
+        return ["docs/curves/README.md: no curve table found"]
     for cells in rows:
-        if len(cells) < 4:
-            bad.append(f"curve row {cells[0]!r}: expected 4 cells")
+        if len(cells) != 3:
+            bad.append(f"curve row {cells[0]!r}: expected 3 cells (Curve, Stage, Evidence)")
             continue
-        name, status, evidence = cells[0], cells[1], " ".join(cells[2:])
+        name, evidence = cells[0], cells[2]
         named = OP.findall(name + " " + evidence)
-        if status.startswith("Planned"):
+        if evidence.startswith("Planned"):
             done = [o for o in named if o in ops]
             if done:
                 bad.append(f"curve row {name!r} is Planned but names implemented operation(s) {', '.join(done)}")
-        elif status.startswith(("Implemented", "Validated")):
+        else:
             missing = [o for o in named if o not in ops]
             if missing:
-                bad.append(f"curve row {name!r} is Implemented but {', '.join(missing)} is not in specifications/name-map.json")
+                bad.append(f"curve row {name!r} is implemented but {', '.join(missing)} is not in specifications/name-map.json")
     return bad
 
 
@@ -73,10 +73,10 @@ CURVE_BUILDER = re.compile(r"^(?!rates\.curve\.|risk\.|calib\.)[a-z]+\.(?:[a-z_]
 
 
 def unlisted_curve_operations(pages, ops):
-    """Curve-building operations named on no Implemented gallery page or row: work done that the table does not show.
-    pages: {name: text} of the gallery README and the pages its Implemented rows link to."""
+    """Curve-building operations named on no implemented gallery page or row: work done that the table does not show.
+    pages: {name: text} of the gallery README and the pages its implemented rows link to."""
     text = "\n".join(pages.values())
-    return [f"curve operation {o} is implemented but no Implemented curve row or page names it"
+    return [f"curve operation {o} is implemented but no implemented curve row or page names it"
             for o in sorted(ops) if CURVE_BUILDER.match(o) and f"`{o}`" not in text]
 
 
@@ -84,7 +84,7 @@ def implemented_pages(readme, folder):
     pages = {"README.md": readme}
     for cells in table_rows(readme):
         m = re.match(r"\[[^\]]+\]\(([\w.-]+\.md)\)", cells[0])
-        if m and len(cells) > 1 and cells[1].startswith(("Implemented", "Validated")) and (folder / m.group(1)).is_file():
+        if m and len(cells) == 3 and not cells[2].startswith("Planned") and (folder / m.group(1)).is_file():
             pages[m.group(1)] = (folder / m.group(1)).read_text(encoding="utf-8")
     return pages
 

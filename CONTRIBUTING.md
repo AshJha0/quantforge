@@ -83,7 +83,7 @@ faults. CI runs them per stage. On a pull request, each module whose source you 
 per language) with a seed taken from that source's content, so re-running CI gives the same verdict: if the
 `mutation-report` check is red, kill the listed survivors with unit tests (expected values from an independent
 source, never the code's own output) or, for a mutant no input can tell apart, add an `Equivalent` row with a proof
-to `conformance/mutation/equivalents-<lang>.md`. Only after a second reviewer signs the row can its mutant be added to
+to `conformance/mutation/equivalents-<lang>.md`. Only a row whose sign-off cell is filled (`conformance/mutation/skips.py` checks it) can have its mutant added to
 `skip-equivalents.json`, which every sampler leaves out; `python conformance/mutation/test_gates.py` checks each
 entry. Never re-run CI hoping for a different sample.
 

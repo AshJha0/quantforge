@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Write one reviewer checklist per curve in the gallery status table (docs/validation/<slug>.md).
+"""Write one evidence checklist per curve in the gallery curve table (docs/validation/<slug>.md).
 
-Standard library only. Facts are read, not typed: the row and status from docs/curves/README.md, the golden counts
+Standard library only. Facts are read, not typed: the row and stage from docs/curves/README.md, the golden counts
 and `verified_by` sources from docs/curves/data/<slug>.json (written by tools/build_gallery.py from the goldens), the
 spec and rulings files from the curve page, the oracle paragraph from the page's "Oracle evidence and limits" section,
 and the real-data result from docs/validation/data/real-data.json (tools/validation/reconcile_official.py). The only
@@ -47,12 +47,12 @@ NOTES = {
     "sonia-ois": {"real": SONIA_RD, "open": ["One of 18 cases (`rulings_b`) has replay only; confirm it needs no outside check."]},
     "sofr-ois": {"real": SOFR_RD, "open": ["No free SOFR swap quotes exist, so level checks against a SOFR market curve stay open."]},
     "usd-term-3m": {"real": [NO_FREE.format(what="term-rate swap or FRA quotes")],
-                    "open": ["USD-TERM-3M is a synthetic index (no live USD term IBOR); confirm the reviewer accepts a method-only test.",
+                    "open": ["USD-TERM-3M is a synthetic index (no live USD term IBOR), so only the method can be tested.",
                              "One case (`rulings_b`) has replay only."]},
     "gbpusd-fx-forward": {"before": "0 of 11", "real": [NO_FREE.format(what="FX forward points")],
                           "open": ["QuantLib's `FxForward` uses the same spot-normalised forward as the spec (both cite covered interest parity); it is an outside implementation of the same formula, not an independent model."]},
     "equity-forward": {"before": "0 of 4", "real": [NO_FREE.format(what="dividend or borrow history")],
-                       "open": ["**Settled by ruling C18 (owner, 2026-11-18), for the reviewer to confirm** (`equity_forward-0012`): the spec ignores a dividend with `ex_date <= as_of` (`specifications/02-curves/equity-forward.md`); QuantLib's `AnalyticDividendEuropeanEngine` counts one dated on the evaluation date. With that dividend removed, QuantLib agrees on all four outputs. The golden was not changed. Is the spec's rule (ex on as_of means already ex) the one the reviewer accepts?",
+                       "open": ["**Settled by ruling C18 (owner, 2026-11-18)** (`equity_forward-0012`): the spec ignores a dividend with `ex_date <= as_of` (`specifications/02-curves/equity-forward.md`); QuantLib's `AnalyticDividendEuropeanEngine` counts one dated on the evaluation date. With that dividend removed, QuantLib agrees on all four outputs. The golden was not changed. Is the spec's rule (ex on as_of means already ex) the one the reviewer accepts?",
                                 "`equity_forward-0014` (expiry on as_of) has no outside check: there is no option for the engine to price."]},
     "svi-smile": {"before": "1 of 2", "real": [NO_FREE.format(what="option quotes or vol surfaces")],
                   "open": ["`g` and `min_g` on the counterexample are checked by central differences on QuantLib's variance at 1e-6, not at the case's own tolerance; QuantLib has no Durrleman `g`."]},
@@ -93,9 +93,9 @@ NOTES = {
 }
 
 
-# Everything from this line down in a checklist is hand-filled (sign-off, AI review sections) and is kept on rebuild;
+# Everything from this line down in a checklist is hand-filled (AI review sections, notes) and is kept on rebuild;
 # --check compares only the part above it.
-MARK = "<!-- Hand-filled below this line: the generator keeps it. Sign-off and any AI review sections go here. -->"
+MARK = "<!-- Hand-filled below this line: the generator keeps it. Any AI review sections go here. -->"
 
 RULINGS = {"B": ["stage-b-rulings.md"], "C": ["stage-c-rulings.md"], "D": ["stage-d-rulings.md", "r1-rulings.md"],
            "E": ["stage-e-rulings.md", "stage-e-rulings-b.md"], "F": ["stage-f-rulings.md"], "I": ["stage-i-rulings.md"],
@@ -118,9 +118,9 @@ def golden_specs(slug):
 def rows():
     out = []
     for line in (CURVES / "README.md").read_text(encoding="utf-8").splitlines():
-        m = re.match(r"\| \[(.+?)\]\((.+?)\.md\) \| (.+?) \| (\w) \| (.+) \|$", line)
+        m = re.match(r"\| \[(.+?)\]\((.+?)\.md\) \| (\w) \| (.+) \|$", line)
         if m:
-            out.append(dict(zip(("name", "slug", "status", "stage", "evidence"), m.groups())))
+            out.append(dict(zip(("name", "slug", "stage", "evidence"), m.groups())))
     return out
 
 
@@ -160,11 +160,11 @@ def page(r):
     counts, table = evidence(slug)
     n = NOTES.get(slug, {})
     share = f"{counts[1]} of {counts[0]} ({100 * counts[1] / counts[0]:.0f}%)" if counts else "not counted per case on the gallery page"
-    L = [f"# Reviewer checklist: {r['name']}", "",
+    L = [f"# Evidence checklist: {r['name']}", "",
          f"Generated by `tools/validation/build_checklists.py` from the gallery data and the goldens; do not edit by hand. Process: [README](README.md).", "",
          "| Item | Value | Evidence class |", "|---|---|---|",
          f"| Gallery page | [{r['name']}](../curves/{slug}.md) | observed |",
-         f"| Status | {r['status']} (stage {r['stage']}) | observed |",
+         f"| Stage | {r['stage']} | observed |",
          f"| Spec (named by the golden suites) | {', '.join('`' + s + '`' for s in specs) or 'see gallery page'} | observed |",
          f"| Rulings (the stage's rulings files) | {', '.join('`' + s + '`' for s in rulings)} | derived from the stage |",
          f"| Golden value cases | {counts[0] if counts else 'see gallery page'} | observed |",
@@ -174,7 +174,7 @@ def page(r):
     L += ["", "## Golden cases by source", "", "| Operation or suite | Sources | Cases | Outside |", "|---|---|---:|---|"] + (table or ["| see gallery page | | | |"])
     L += ["", "## Oracle evidence and limits (from the gallery page)", "", oracle or "None stated on the page.", "",
           "## Real-data reconciliation", ""] + [f"- {x}" for x in n.get("real", ["Not assessed in this pack."])]
-    L += ["", "## Open questions for the reviewer", ""] + [f"- {x}" for x in n.get("open", ["None raised by the pack."])]
+    L += ["", "## Open questions", ""] + [f"- {x}" for x in n.get("open", ["None raised by the pack."])]
     L += ["", "## What to check", "",
           "- [ ] Spec read; formula and conventions match the cited sources",
           "- [ ] Rulings read; each one is a decision you accept",
@@ -182,10 +182,7 @@ def page(r):
           "- [ ] Outside checks: the library object really computes the same quantity",
           "- [ ] Real data: result and stated method differences accepted, or absence of free data accepted",
           "- [ ] Open questions answered",
-          "", MARK, "", "## Reviewer sign-off", "",
-          "Only a named human reviewer's sign-off moves the status row to Validated (ROADMAP.md). An AI review may be attached below it, labelled as such; it is not the sign-off.", "",
-          "| Field | Entry |", "|---|---|", "| Reviewer name | |", "| Date | |",
-          "| Verdict (Validated / Validated with conditions / Not validated) | |", "| Conditions or findings | |", ""]
+          "", MARK, ""]
     return "\n".join(L)
 
 
@@ -254,8 +251,8 @@ def ai_page(r):
         "- Quote the spec line or the exact number you question.",
         "- Return findings as one table with columns: curve, claim, issue, severity (high / medium / low / note), evidence (quote or your working).",
         "- After the table, list the questions you answered \"cannot check\", and why.",
-        "- Your review is a second opinion. It is filed under a labelled \"AI review\" section and never counts as the human sign-off.",
-        "", f"Status: {r['status']} (stage {r['stage']}). Evidence line from the project's status table: {r['evidence']}.",
+        "- Your review is filed under a labelled \"AI review\" section of the curve's evidence checklist and checked against the repository before anything is acted on.",
+        "", f"Stage: {r['stage']}. Evidence line from the project's curve table: {r['evidence']}.",
         "", "## Questions", ""] + [f"{i}. {q}" for i, q in enumerate(QUESTIONS + n.get("open", []), 1)])
     rul = ruling_lines(r["stage"], ops)
     rest = "\n".join(["", "## Outside-library evidence and limits (from the project's own page)", "", oracle or "None stated.", "",
@@ -281,15 +278,15 @@ def ai_page(r):
 
 AI_README = """# AI review packet
 
-A second opinion on each curve from an outside AI model (for example ChatGPT or Gemini), prepared before the human sign-off. It is not the sign-off and never moves a status row (see [the process](../README.md)).
+An optional outside reading of each curve by an AI model (for example ChatGPT or Gemini). It is a source of findings to check, not a verdict on the curve (see [the evidence pack](../README.md)).
 
 ## How to run it
 
 1. Open a new conversation for each curve and paste one file from this folder, whole. Each file is self-contained and kept to about 30,000 characters: spec text, rulings that name the curve's operations, golden cases with inputs and expected outputs (a subset when there are many, with the total stated), the outside-library and real-data results, known limits and the questions.
-2. The reviewer must quote the spec line or the number it questions, and say "cannot check" rather than guess.
+2. The model must quote the spec line or the number it questions, and say "cannot check" rather than guess.
 3. Findings come back as one table: curve, claim, issue, severity, evidence.
 4. File the answer in that curve's checklist (`docs/validation/<curve>.md`), anywhere below the line `<!-- Hand-filled below this line ... -->`, under a section headed "AI review (model, date)", naming the model and version. The generator keeps everything below that line. Check each finding against the repository before acting on it: a model can be confidently wrong.
-5. The AI review never counts as the sign-off. Only a named human reviewer's verdict moves a row to Validated.
+5. An AI review does not change any page or count: a finding matters only once it is checked against the spec or golden it quotes.
 
 The files are generated by `tools/validation/build_checklists.py` from the specs, rulings, goldens and gallery data, and contain nothing beyond what that evidence shows. Where a spec is too long it is truncated, and the file says so.
 """
@@ -302,22 +299,6 @@ def split_hand(path):
     t = path.read_text(encoding="utf-8")
     i = t.find(MARK)
     return (t, None) if i < 0 else (t[:i], t[i:])
-
-
-def verdict(slug, root=None):
-    """The signed verdict of docs/validation/<slug>.md, or None while the name, date or verdict is blank."""
-    _, hand = split_hand((Path(root) if root else OUT) / f"{slug}.md")
-    if not hand:
-        return None
-    f = {}
-    for line in hand.splitlines():
-        m = re.match(r"\| (Reviewer name|Date|Verdict)[^|]* \| (.*?) \|$", line)
-        if m:
-            f[m.group(1)] = m.group(2).strip()
-    v = f.get("Verdict", "")
-    if v in ("Validated", "Validated with conditions", "Not validated") and f.get("Reviewer name") and re.fullmatch(r"\d{4}-\d\d-\d\d", f.get("Date", "")):
-        return {"reviewer": f["Reviewer name"], "date": f["Date"], "verdict": v}
-    return None
 
 
 def main():

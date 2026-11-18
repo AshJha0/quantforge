@@ -19,7 +19,7 @@ The contract every implementation's CLI follows is `cli-contract.md`.
 | 11 Research and backtesting | `11-research` | J | Capability list |
 | 12 Platform and governance | `12-platform` | K | Capability list |
 
-Stage A and the stage B specs are at Implemented: all four builds pass their golden cases. None is Validated, as validation is self-assessment until the human review after the project. Everything else in domains 02 to 12 is unspecified and unbuilt. Each real spec is written before its own stage, with numeric targets first; `02-curves/stage-b-targets.md` is the first of these targets. `stage-b-rulings.md` is normative for stage B and lists each suite's oracle. `stage-b-followups.md` is the build list, kept as a record. Stage C specs are at Specified: `stage-c-rulings.md` is normative for them, targets are in `05-volatility/stage-c-targets.md`, and `stage-c-handover.md` lists what a language session reads.
+Stage A and the stage B specs are at Implemented: all four builds pass their golden cases. None is Validated, as validation is self-assessment; there is no second review (owner decision, 2026-11-18). Everything else in domains 02 to 12 is unspecified and unbuilt. Each real spec is written before its own stage, with numeric targets first; `02-curves/stage-b-targets.md` is the first of these targets. `stage-b-rulings.md` is normative for stage B and lists each suite's oracle. `stage-b-followups.md` is the build list, kept as a record. Stage C specs are at Specified: `stage-c-rulings.md` is normative for them, targets are in `05-volatility/stage-c-targets.md`, and `stage-c-handover.md` lists what a language session reads.
 
 ## Spec template: required sections (stage F, rule F-6)
 

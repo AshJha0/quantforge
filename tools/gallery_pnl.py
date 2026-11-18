@@ -88,7 +88,7 @@ def page(d, chart, table, versions):
     worst = max(abs(e["unexplained"]) / max(abs(e["full"]), 1.0) for e in ex)
     return f"""# Real data: P&L explain and calibration stability
 
-<p class="note">Status: Implemented, not Validated. This page uses <strong>real public data</strong>: daily US Treasury par curves. {eod_curves.CURVE_LABEL} The swap book is synthetic, and nothing is traded. The thresholds are provisional until the R2 spec sets them.</p>
+<p class="note">This page uses <strong>real public data</strong>: daily US Treasury par curves. {eod_curves.CURVE_LABEL} The swap book is synthetic, and nothing is traded. The thresholds are provisional until the R2 spec sets them.</p>
 
 Snapshot of {len(ex)} daily moves from {ex[0]['from']} to {ex[-1]['to']} (fetched {inputs['fetched']}), {inputs['trades']} swaps from `tools/workflows/sample_book.py`, run from commit `{d['meta']['commit']}` by {versions}. Largest unexplained share: {worst:.2%}.
 

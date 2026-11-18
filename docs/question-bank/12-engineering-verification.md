@@ -32,7 +32,7 @@ The oracle runs on its own pinned Python (3.12), separate from the Python implem
 
 Because all four were written from the same spec, and a misreading in the spec is shared by all of them. The conformance README says it plainly: agreement between languages proves nothing alone.
 
-Passing means a build matches the oracle within tolerance. That is stronger, but it has the same gap where a case has only hand or replay sources: one author wrote both the spec and the check, so they can share a misreading. ARCHITECTURE calls the specification "a shared-error risk" and gives the two defences: outside libraries wherever a licence allows, and a human review that closes the project. Until that review, validation is self-assessment, and no model is marked Validated in the model inventory.
+Passing means a build matches the oracle within tolerance. That is stronger, but it has the same gap where a case has only hand or replay sources: one author wrote both the spec and the check, so they can share a misreading. ARCHITECTURE calls the specification "a shared-error risk" and gives the two defences: outside libraries wherever a licence allows, and the project says plainly that validation is self-assessment: there is no second review (owner decision, 2026-11-18), and no model is marked Validated in the model inventory.
 
 The practical reading of a green run: the four builds implement the spec as the oracle understands it. Whether the spec is the right finance is a separate question, answered best by the outside-library share (Q12.27).
 
@@ -180,7 +180,7 @@ Message-text mutants: the CLI contract fixes the error `code` and `field`, not t
 
 Equivalent mutants: changing an iteration cap or a bracket growth factor gives the same answer on every input the spec allows, because the solve converges long before the cap and any bracket containing the root gives the same root to the solver tolerance. No test can kill a mutant that does not change behaviour.
 
-Of the 13 survivors of the credit rerun (Q12.15), 8 were caps or bracket factors, 4 changed only message text or an unreachable branch's code string, and 1 was a real gap, closed by a new test afterwards. Survivors are classified as equivalent by the author, with a second reviewer's sign-off scheduled.
+Of the 13 survivors of the credit rerun (Q12.15), 8 were caps or bracket factors, 4 changed only message text or an unreachable branch's code string, and 1 was a real gap, closed by a new test afterwards. Survivors are classified as equivalent by the author, with no second review (owner decision, 2026-11-18).
 
 ### Q12.17 How do golden cases double as mutation tests for the specs themselves?
 
@@ -335,4 +335,4 @@ It names them and says why. The outside-shares report has a table of value class
 
 For such suites the oracle uses a second method of its own instead: for `hedgeint_i`, an exhaustive search in exact rational arithmetic plus a float search over a box with the same tie rule; for `hedgeslip_i`, exact rational arithmetic with the identities `shortfall = execution + opportunity` asserted on every order.
 
-That is weaker evidence than an outside library, and the project says so: these cases are self-assessment until the human review. Naming them stops a high overall share from hiding the suites where it is zero.
+That is weaker evidence than an outside library, and the project says so: these cases are self-assessment, with no second review. Naming them stops a high overall share from hiding the suites where it is zero.

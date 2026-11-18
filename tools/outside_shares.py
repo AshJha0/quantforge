@@ -63,7 +63,7 @@ PRIMITIVE_ROWS = {"SCIPY.QUAD", "SCIPY.EIGH", "NUMPY.QUANTILE", "SCIPY.NORM", "S
 REIMPL_ROWS = {"SCIPY.BINOM", "SCIPY.CHI2"}
 
 # Suite-level rulings for registers that hold counts only (stage G, stage I). Reviewed 2026-11-12 by the R6
-# evidence lane against each register's own rule text; second review open.
+# evidence lane against each register's own rule text; no second review (owner decision, 2026-11-18).
 SUITE_CLASS = {
     # stage G
     "shortrate_g": ("library-object", "QuantLib 1.44 short-rate model discountBond and discountBondOption"),

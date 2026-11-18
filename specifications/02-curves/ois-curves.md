@@ -1,6 +1,6 @@
 # OIS curves: SONIA, SOFR and ESTR
 
-Spec version 1.1.0. Status: SONIA and SOFR Implemented, not Validated; ESTR and jumps Specified (stage D).
+Spec version 1.1.0. Status: SONIA and SOFR Implemented; ESTR and jumps Specified (stage D).
 
 An overnight indexed swap exchanges a fixed rate for daily compounded overnight rates. Its quotes pin down the discount curve.
 

@@ -448,7 +448,7 @@ class GalleryVol(unittest.TestCase):
         out = ROOT / "docs/curves"
         for slug, spec in self.bg.VOLS.items():
             text = (out / f"{slug}.md").read_text(encoding="utf-8")
-            for head in ("Implemented, not Validated", "## What it is", "## Inputs", "## Command", "## Charts", "## Numbers",
+            for head in ("Data: synthetic.", "## What it is", "## Inputs", "## Command", "## Charts", "## Numbers",
                          "## Four-language agreement", "## Oracle evidence and limits", "Limits:", "Synthetic inputs, not market data."):
                 self.assertIn(head, text, f"{slug}: {head}")
             self.assertIn("<svg", text)
@@ -493,10 +493,11 @@ class GalleryVol(unittest.TestCase):
             self.assertTrue(self.bg.is_live(spec), slug)
             d = json.loads((out / "data" / f"{slug}.json").read_text(encoding="utf-8"))
             text = (out / f"{slug}.md").read_text(encoding="utf-8")
-            for head in ("Implemented, not Validated", "## Four-language agreement", "## Oracle evidence and limits", self.bg.SYNTHETIC):
+            for head in ("Data: synthetic.", "## Four-language agreement", "## Oracle evidence and limits", self.bg.SYNTHETIC):
                 self.assertIn(head, text, f"{slug}: {head}")
             self.assertNotIn("nterview", text)
-            self.assertIn(f"]({slug}.md) | Implemented, not Validated | {spec.get('stage', 'D')} |", index)
+            self.assertIn(f"]({slug}.md) | {spec.get('stage', 'D')} |", index)
+            self.assertNotIn("not Validated", text)
             self.assertEqual(set(d["reference"]), set(spec["examples"]))
             for op, f in spec["examples"].items():
                 ex = json.loads((ROOT / "examples" / f).read_text(encoding="utf-8"))
@@ -568,15 +569,15 @@ class GalleryStageE(unittest.TestCase):
             self.assertNotIn("nterview", text)
             if self.ge.is_live(spec):
                 d = json.loads((out / "data" / f"{slug}.json").read_text(encoding="utf-8"))
-                self.assertIn("Implemented, not Validated", text)
+                self.assertIn("Data: synthetic.", text)
                 self.assertIn("<svg", text)
                 self.assertGreater(d["evidence"]["cases"], 0)
                 self.assertTrue(all(r["largest_difference"] is not None and r["largest_difference"] < 1e-9 for r in d["agreement"]), slug)
-                self.assertIn(f"]({slug}.md) | Implemented, not Validated | E |", index)
+                self.assertIn(f"]({slug}.md) | E |", index)
             else:
                 self.assertIn("Status: Planned", text)
                 self.assertNotIn("<svg", text)
-                self.assertIn(f"]({slug}.md) | Planned | E |", index)
+                self.assertIn(f"]({slug}.md) | E | Planned", index)
 
     def test_contract_accepts_good_and_names_the_broken_field(self):
         self.assertEqual(len(self.ge.check_contract("surface", self.surface())["vols"]), 3)
@@ -629,7 +630,7 @@ class GalleryStageE(unittest.TestCase):
             outs = {"implied_vol": [v for row in self.surface()["vols"] for v in row]}
             d = {"meta": meta, "inputs": {op: {"points": pts}}, "reference": {op: outs}, "agreement": [], "evidence": {"operations": [op], "cases": 0, "by_source": {}}}
             text = ge.page("vol-surface", spec, d, bg)
-            for want in ("Implemented, not Validated", "<svg", "## Numbers", "examples/vol_dupire_grid_e.json"):
+            for want in ("Data: synthetic.", "<svg", "## Numbers", "examples/vol_dupire_grid_e.json"):
                 self.assertIn(want, text)
         finally:
             ge.is_live = live
@@ -1098,7 +1099,7 @@ class StageFInfra(unittest.TestCase):
 class DocsStatus(unittest.TestCase):
     """tools/check_docs_status.py: stale Planned curve rows and stale release wording fail."""
 
-    TABLE = ("# Curves\n\n## Status of every curve in the plan\n\n| Curve | Status | Stage | Evidence |\n|---|---|---|---|\n"
+    TABLE = ("# Curves\n\n## Every curve in the plan\n\n| Curve | Stage | Evidence |\n|---|---|---|\n"
              "{rows}\n## Real data\n")
 
     def setUp(self):
@@ -1106,19 +1107,19 @@ class DocsStatus(unittest.TestCase):
         self.ops = {"credit.curve.composite", "rates.funding.curve", "repo.forward", "rates.curve.discount"}
 
     def test_planned_row_naming_an_implemented_operation_fails(self):
-        t = self.TABLE.format(rows="| Funding curve | Planned | F | `rates.funding.curve` |")
+        t = self.TABLE.format(rows="| Funding curve | F | Planned: `rates.funding.curve` |")
         self.assertEqual(len(self.c.curve_table_problems(t, self.ops)), 1)
-        ok = self.TABLE.format(rows="| Liquidity curves | Planned | H | None yet |")
+        ok = self.TABLE.format(rows="| Liquidity curves | H | Planned; none yet |")
         self.assertEqual(self.c.curve_table_problems(ok, self.ops), [])
 
     def test_implemented_row_with_unknown_operation_fails(self):
-        t = self.TABLE.format(rows="| [X](x.md) | Implemented, not Validated | D | 2 golden cases for `credit.curve.nope` |")
+        t = self.TABLE.format(rows="| [X](x.md) | D | 2 golden cases for `credit.curve.nope` |")
         self.assertIn("credit.curve.nope", self.c.curve_table_problems(t, self.ops)[0])
 
     def test_curve_operation_on_no_implemented_page_fails(self):
         # the old table: sector and funding curves done but still Planned with no operation named
-        old = self.TABLE.format(rows="| [Repo](repo.md) | Implemented, not Validated | D | `repo.forward` |\n"
-                                     "| Funding curve | Planned | F | None yet |")
+        old = self.TABLE.format(rows="| [Repo](repo.md) | D | `repo.forward` |\n"
+                                     "| Funding curve | F | Planned; none yet |")
         bad = self.c.unlisted_curve_operations({"README.md": old}, self.ops)
         self.assertEqual(bad[0].split()[2], "credit.curve.composite")
         self.assertEqual(len(bad), 2)  # rates.curve.discount reads a curve, so it is not a builder
