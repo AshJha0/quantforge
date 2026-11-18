@@ -106,13 +106,14 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md, rates packet 2): MATCH by value; representation only"
    ],
    "tags": [
     "stage_h",
     "multiasset"
    ],
-   "description": "fut_h-0004 from the spec table; not blind: answer fixed by HR-102 (spec gap)"
+   "description": "fut_h-0004: blind in rates packet 2 (HR-114), was hand-only"
   },
   {
    "case_id": "fut_h-0005",
@@ -136,13 +137,14 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md, rates packet 2): MATCH by value; representation only"
    ],
    "tags": [
     "stage_h",
     "multiasset"
    ],
-   "description": "fut_h-0005 from the spec table; not blind: answer fixed by HR-102 (spec gap)"
+   "description": "fut_h-0005: blind in rates packet 2 (HR-114), was hand-only"
   },
   {
    "case_id": "fut_h-0006",
@@ -169,13 +171,14 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md, rates packet 2): MATCH by value; representation only"
    ],
    "tags": [
     "stage_h",
     "multiasset"
    ],
-   "description": "fut_h-0006 from the spec table; not blind: answer fixed by HR-103 (spec gap)"
+   "description": "fut_h-0006: blind in rates packet 2 (HR-114), was hand-only"
   },
   {
    "case_id": "fut_h-0007",

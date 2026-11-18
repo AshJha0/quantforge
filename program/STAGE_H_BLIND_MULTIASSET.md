@@ -46,3 +46,16 @@ No mismatch needed investigating, so neither side was found wrong. The lane's in
 
 ## Rule-version fixes after the source check (2026-11-18, implementation lane)
 Coordinator rulings HR-104 to HR-108 (Rule 612 half-penny tier, Rule 610 $0.001 cap, Rule 600 round lots, FX USD-only T+1 holiday, auction tie-break as a venue parameter). The goldens were regenerated through `oracle/python/gen_stage_h_ma.py`. **No blind case changed its expected value**: the defaults keep the penny tier for eqc_h-0001..0006; eqc_h-0007 (0.0031 at $20) is still E_DOMAIN under the $0.001 cap; fxc_h-0004 still settles 2026-11-27 (Thursday is not good in both currencies at T+2); auc_h rows use the default CBOE tie-break. So no case loses blind status and the shares above stand. New cases eqc_h-0009..0017, fxc_h-0008 and auc_h-0009 are hand-derived and **not blind**; they do not count toward the 60 % rule.
+
+## Coordinator decisions 2026-11-18 (HR-109 to HR-113), implementation lane
+- **rtc_h-0004 loses blind status**: HR-109 (CME quarter-32nds) changes its expected value from 99.52734375 to 99.5234375 (`7` is now 3/4 of a 32nd, not 7/8). Its verified_by is now `hand` only. H-24 blind share drops by one case.
+- HR-111 removes the `label` field from eqc_h, fxc_h and rtc_h outputs. Values did not change and the blind lane never compared labels, so those cases stay blind.
+- New hand cases, not blind: rtc_h-0011/0012 (yield solve), fxv_h-0010..0012 (core.rng draw; u from the oracle's own xoshiro), ses_h (session phases), acls_h (asset class on SOR). The rtc_h and fxv_h error-case ids after the table rows were renumbered (hand cases only).
+
+## Rates blind packet 2 (HR-114), 2026-11-18
+- Packet: `institutional-quant-engine-plan/stage_h_blind/rates2_packet/` (stripped rates spec, rulings, inputs; leak list `rates2_LEAKS.tsv` outside). Cases: the 7 hand-only H-24 value cases rtc_h-0004, 0007, 0011, 0012, fut_h-0004, 0005, 0006.
+- Blind lane: Sonnet, packet only, frozen by the coordinator. `blind_results.json` SHA-256 `3a3a9db05ec1a1a7eeba01bc736672933f27609d050d8020da466496720ca354` (verified); copies unedited in `stage_h_blind/rates2/`.
+- Mapping and compare script `program/stage_h_blind_w2/rates2_compare.py`, committed before the comparison ran (one crash fix in loading error cases, committed before any output). Field names equal; decimals by value; `yield` to the root_finding tolerance; labels compared. One run, no rerun.
+- Result: 7 of 7 agree. MATCH 3 (rtc_h-0004, 0011, 0012); REPRESENTATION-ONLY 4 (rtc_h-0007 "15.625000", fut_h-0004/0005 pnl and fees with trailing zeros, fut_h-0006 "-31.25000"); VALUE MISMATCH 0, so nobody was found wrong.
+- Caveats: fut_h-0004..0006 were computed with HR-102/103 given as written rules (the reason they were not blind before was that those readings were missing from the spec). rtc_h-0007's 15.625 was removed from the packet text. rtc_h-0004 uses HR-109's quarter-32nds, whose CME source is still unverified (HR-115); agreement checks the arithmetic, not the convention.
+- H-24 share: 16 of 16 value cases now blind and agreeing = **100 %** (60 % rule met; was 56.2 %).

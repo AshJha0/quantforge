@@ -1,0 +1,457 @@
+{
+ "schema_version": "1.0",
+ "suite": "ses_h",
+ "spec": "specifications/10-execution/auction.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_ma.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "ses_h-0001",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "0.01",
+    "lot_size": "1",
+    "session": {
+     "ref_price": "10.00"
+    },
+    "fee_schedule": {
+     "auction_fee": "0",
+     "maker_rebate": "0",
+     "taker_fee": "0"
+    },
+    "events": [
+     {
+      "id": "B1",
+      "op": "NEW",
+      "qty": "100",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT",
+      "price": "10.02"
+     },
+     {
+      "id": "S1",
+      "op": "NEW",
+      "qty": "60",
+      "side": "SELL",
+      "trader": "T2",
+      "type": "LIMIT",
+      "price": "10.00"
+     },
+     {
+      "id": "S2",
+      "op": "NEW",
+      "qty": "80",
+      "side": "SELL",
+      "trader": "T2",
+      "type": "LIMIT",
+      "price": "10.01"
+     },
+     {
+      "id": "I1",
+      "op": "NEW",
+      "qty": "10",
+      "side": "BUY",
+      "trader": "T3",
+      "type": "IOC",
+      "price": "10.05"
+     },
+     {
+      "op": "PHASE",
+      "phase": "CONTINUOUS"
+     },
+     {
+      "id": "B2",
+      "op": "NEW",
+      "qty": "40",
+      "side": "BUY",
+      "trader": "T3",
+      "type": "LIMIT",
+      "price": "10.01"
+     },
+     {
+      "op": "PHASE",
+      "phase": "PRE_CLOSE"
+     },
+     {
+      "id": "B3",
+      "op": "NEW",
+      "qty": "50",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT",
+      "price": "10.00"
+     },
+     {
+      "id": "B4",
+      "op": "NEW",
+      "qty": "30",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "MARKET",
+      "on_close": true
+     },
+     {
+      "id": "S3",
+      "op": "NEW",
+      "qty": "20",
+      "side": "SELL",
+      "trader": "T2",
+      "type": "LIMIT",
+      "price": "9.99",
+      "on_close": true
+     },
+     {
+      "op": "PHASE",
+      "phase": "CLOSED"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "auctions": [
+      {
+       "fills": [
+        {
+         "id": "B1",
+         "price": "10.01",
+         "qty": "100",
+         "side": "B"
+        },
+        {
+         "id": "S1",
+         "price": "10.01",
+         "qty": "60",
+         "side": "S"
+        },
+        {
+         "id": "S2",
+         "price": "10.01",
+         "qty": "40",
+         "side": "S"
+        }
+       ],
+       "imbalance": "-40",
+       "phase": "OPEN",
+       "price": "10.01",
+       "volume": "100"
+      },
+      {
+       "fills": [
+        {
+         "id": "B4",
+         "price": "9.99",
+         "qty": "20",
+         "side": "B"
+        },
+        {
+         "id": "S3",
+         "price": "9.99",
+         "qty": "20",
+         "side": "S"
+        }
+       ],
+       "imbalance": "10",
+       "phase": "CLOSE",
+       "price": "9.99",
+       "volume": "20"
+      }
+     ],
+     "book": {
+      "asks": [],
+      "bids": []
+     },
+     "cancelled": [
+      {
+       "id": "B4",
+       "qty": "10"
+      }
+     ],
+     "conservation": {
+      "B1": {
+       "cancelled": "0",
+       "filled": "100",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "100"
+      },
+      "B2": {
+       "cancelled": "0",
+       "filled": "40",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "40"
+      },
+      "B3": {
+       "cancelled": "0",
+       "filled": "0",
+       "rejected": "50",
+       "resting": "0",
+       "submitted": "50"
+      },
+      "B4": {
+       "cancelled": "10",
+       "filled": "20",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "30"
+      },
+      "I1": {
+       "cancelled": "0",
+       "filled": "0",
+       "rejected": "10",
+       "resting": "0",
+       "submitted": "10"
+      },
+      "S1": {
+       "cancelled": "0",
+       "filled": "60",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "60"
+      },
+      "S2": {
+       "cancelled": "0",
+       "filled": "80",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "80"
+      },
+      "S3": {
+       "cancelled": "0",
+       "filled": "20",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "20"
+      }
+     },
+     "fees": {
+      "T1": "0",
+      "T2": "0",
+      "T3": "0"
+     },
+     "fills": [
+      {
+       "maker_id": "S2",
+       "price": "10.01",
+       "qty": "40",
+       "seq": 1,
+       "taker_id": "B2"
+      }
+     ],
+     "label": "simulated venue; not a real exchange",
+     "mbp": {
+      "asks": [],
+      "bids": []
+     },
+     "phase": "CLOSED",
+     "rejects": [
+      {
+       "id": "I1",
+       "reason": "PHASE"
+      },
+      {
+       "id": "B3",
+       "reason": "PHASE"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "ses_h-0001 hand: session phases in exec.sim.lit.run (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "ses_h-0002",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "0.01",
+    "lot_size": "1",
+    "session": {
+     "ref_price": "10.00"
+    },
+    "fee_schedule": {
+     "auction_fee": "0",
+     "maker_rebate": "0",
+     "taker_fee": "0"
+    },
+    "events": [
+     {
+      "id": "B1",
+      "op": "NEW",
+      "qty": "100",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT",
+      "price": "10.02"
+     },
+     {
+      "id": "S1",
+      "op": "NEW",
+      "qty": "60",
+      "side": "SELL",
+      "trader": "T2",
+      "type": "LIMIT",
+      "price": "10.00"
+     },
+     {
+      "id": "S2",
+      "op": "NEW",
+      "qty": "80",
+      "side": "SELL",
+      "trader": "T2",
+      "type": "LIMIT",
+      "price": "10.01"
+     },
+     {
+      "id": "I1",
+      "op": "NEW",
+      "qty": "10",
+      "side": "BUY",
+      "trader": "T3",
+      "type": "IOC",
+      "price": "10.05"
+     },
+     {
+      "op": "PHASE",
+      "phase": "PRE_CLOSE"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "ses_h-0002 hand: session phases in exec.sim.lit.run (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "ses_h-0003",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "0.01",
+    "lot_size": "1",
+    "fee_schedule": {
+     "auction_fee": "0",
+     "maker_rebate": "0",
+     "taker_fee": "0"
+    },
+    "events": [
+     {
+      "id": "B1",
+      "op": "NEW",
+      "qty": "100",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT",
+      "price": "10.02"
+     },
+     {
+      "id": "S1",
+      "op": "NEW",
+      "qty": "60",
+      "side": "SELL",
+      "trader": "T2",
+      "type": "LIMIT",
+      "price": "10.00"
+     },
+     {
+      "id": "S2",
+      "op": "NEW",
+      "qty": "80",
+      "side": "SELL",
+      "trader": "T2",
+      "type": "LIMIT",
+      "price": "10.01"
+     },
+     {
+      "id": "I1",
+      "op": "NEW",
+      "qty": "10",
+      "side": "BUY",
+      "trader": "T3",
+      "type": "IOC",
+      "price": "10.05"
+     },
+     {
+      "op": "PHASE",
+      "phase": "CONTINUOUS"
+     },
+     {
+      "id": "B2",
+      "op": "NEW",
+      "qty": "40",
+      "side": "BUY",
+      "trader": "T3",
+      "type": "LIMIT",
+      "price": "10.01"
+     },
+     {
+      "op": "PHASE",
+      "phase": "PRE_CLOSE"
+     },
+     {
+      "id": "B3",
+      "op": "NEW",
+      "qty": "50",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT",
+      "price": "10.00"
+     },
+     {
+      "id": "B4",
+      "op": "NEW",
+      "qty": "30",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "MARKET",
+      "on_close": true
+     },
+     {
+      "id": "S3",
+      "op": "NEW",
+      "qty": "20",
+      "side": "SELL",
+      "trader": "T2",
+      "type": "LIMIT",
+      "price": "9.99",
+      "on_close": true
+     },
+     {
+      "op": "PHASE",
+      "phase": "CLOSED"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: PHASE without a session is not an event"
+  }
+ ]
+}

@@ -1,0 +1,6 @@
+- Contracts with only a symbol use the spec defaults (ZN 1/64, ZB 1/32, face 100000).
+- "110-17+": + = 1/2 of a 32nd. Prices converted to exact Fractions; ticks = price/tick.
+- Fees = fee_per_contract x 2 x qty (HR-102); output as decimal string (trailing zeros are scale artefacts, compare by value).
+- Variation: previous mark = fill price on trade day, then previous settlement (HR-103); BUY sign +.
+- Yield: float Brent (tol 1e-12), bracket [1e-9,1]; results 0.04 and 0.05 within ~3e-16 of exact; compare with tolerance.
+- No error cases occurred in inputs.

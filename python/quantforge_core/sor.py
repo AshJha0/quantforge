@@ -24,6 +24,7 @@ from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from fractions import Fraction
 from typing import Any
 
+from .dark_pool import asset_class
 from .errors import QfError
 from .finite import guard
 from .lit_matching import _dec
@@ -109,6 +110,20 @@ class Problem:
         venues = inp.get("venues")
         if not isinstance(venues, list) or not venues:
             raise QfError("E_INPUT", "venues: empty", "venues")
+        order_class = asset_class(inp.get("asset_class"), "asset_class")
+        classes = [
+            asset_class(
+                v.get("asset_class") if isinstance(v, dict) else None, f"venues/{k}/asset_class"
+            )
+            for k, v in enumerate(venues)
+        ]
+        if any(c != order_class for c in classes):
+            raise QfError(
+                "E_INPUT", "a venue's asset_class differs from the order's (HR-93)", "venues"
+            )
+        for k, v in enumerate(venues):
+            if isinstance(v, dict) and v.get("kind") == "DARK":
+                asset_class(classes[k], f"venues/{k}/asset_class", dark=True)
         if len(venues) > MAX_VENUES:
             raise QfError("E_LIMIT", "more than 64 venues", "venues")
         self.kinds: list[str] = []

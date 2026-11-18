@@ -2920,6 +2920,12 @@
     "quote": {
      "java": "quote"
     },
+    "request_index": {
+     "java": "requestIndex"
+    },
+    "seed": {
+     "java": "seed"
+    },
     "side": {
      "java": "side"
     },
@@ -2937,7 +2943,8 @@
     "label",
     "move_pips",
     "outcome",
-    "price"
+    "price",
+    "u"
    ]
   },
   "exec.sim.fx.stream": {
@@ -2981,11 +2988,15 @@
     "lot_size": {
      "java": "lotSize"
     },
+    "session": {
+     "java": "session"
+    },
     "tick_size": {
      "java": "tickSize"
     }
    },
    "outputs": [
+    "auctions",
     "book",
     "cancelled",
     "conservation",
@@ -2993,6 +3004,7 @@
     "fills",
     "label",
     "mbp",
+    "phase",
     "rejects"
    ]
   },
@@ -3005,6 +3017,9 @@
    "inputs": {
     "S": {
      "java": "s"
+    },
+    "asset_class": {
+     "java": "assetClass"
     },
     "f": {
      "java": "f"
@@ -4814,7 +4829,6 @@
    },
    "outputs": [
     "cap",
-    "label",
     "taker_fee"
    ]
   },
@@ -4833,7 +4847,6 @@
     }
    },
    "outputs": [
-    "label",
     "round_lot"
    ]
   },
@@ -4858,7 +4871,6 @@
     }
    },
    "outputs": [
-    "label",
     "price"
    ]
   },
@@ -4880,7 +4892,6 @@
     }
    },
    "outputs": [
-    "label",
     "settle_date"
    ]
   },
@@ -4900,7 +4911,6 @@
    },
    "outputs": [
     "currency",
-    "label",
     "pip_value"
    ]
   },
@@ -4922,7 +4932,6 @@
     }
    },
    "outputs": [
-    "label",
     "spot_date"
    ]
   },
@@ -4974,7 +4983,6 @@
     }
    },
    "outputs": [
-    "label",
     "price"
    ]
   },
@@ -4999,8 +5007,31 @@
     }
    },
    "outputs": [
-    "label",
     "price"
+   ]
+  },
+  "micro.rates.bond_yield": {
+   "spec": "specifications/09-microstructure/asset-conventions.md",
+   "rust": "quantforge::micro::rates_bond_yield",
+   "python": "quantforge.micro.rates_bond_yield",
+   "java": "Micro.ratesBondYield",
+   "cpp": "qf::micro::rates_bond_yield",
+   "inputs": {
+    "coupon": {
+     "java": "coupon"
+    },
+    "frequency": {
+     "java": "frequency"
+    },
+    "periods": {
+     "java": "periods"
+    },
+    "price": {
+     "java": "price"
+    }
+   },
+   "outputs": [
+    "yield"
    ]
   },
   "micro.rates.format_32nds": {
@@ -5018,7 +5049,6 @@
     }
    },
    "outputs": [
-    "label",
     "text"
    ]
   },
@@ -5034,7 +5064,6 @@
     }
    },
    "outputs": [
-    "label",
     "value"
    ]
   },
@@ -5053,7 +5082,6 @@
     }
    },
    "outputs": [
-    "label",
     "tick_value"
    ]
   },
