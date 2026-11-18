@@ -355,6 +355,10 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "exec.ac.trajectory": _caps(n_steps=100_000),
     "exec.ac.frontier": _caps(n_steps=100_000),
     "usecase.execution_tca": _caps(n_steps=100_000),
+    # Stage H wave 2 execution (adaptive-algos.md): buckets 100,000 as HR-9.
+    "exec.algo.arrival": _caps(n_buckets=100_000),
+    "exec.algo.pair": _caps(n_buckets=100_000),
+    "exec.algo.basket": _caps(n_buckets=100_000),
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")
@@ -377,6 +381,7 @@ STAGE_F_ARRAYS: dict[str, dict[str, int]] = {
     # Stage J wave 1 (rulings J-5, J-9, J-12, J-15).
     "research.backtest.run": {"prices": 1_000_000, "targets": 1_000_000},
     "exec.tca.shortfall": {"fills": 1_000_000},  # ruling HR-9
+    "exec.tca.attribution": {"fills": 1_000_000},  # as exec.tca.shortfall (HR-9)
     "research.cv.purged_kfold": {"t0": 1_000_000, "t1": 1_000_000},
     "research.stats.pbo": {"performance": 10_000_000},
     # Stage J wave 2 (ruling J-W2-14): assets and views 500, series 1,000,000.
