@@ -64,6 +64,7 @@ pub mod lmm;
 pub mod mbs;
 pub mod mc;
 pub mod mc_greeks;
+pub mod multiasset;
 pub mod ois;
 pub mod order_book;
 pub mod pde;
