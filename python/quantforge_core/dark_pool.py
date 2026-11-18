@@ -225,14 +225,13 @@ ASSET_CLASSES = ("EQUITY", "FX", "RATES")
 
 
 def asset_class(v: Any, path: str, dark: bool = False) -> str:
-    """HR-93: `asset_class` (default EQUITY); a dark venue of another class is E_UNSUPPORTED_OPERATION."""
+    """HR-93, HR-113: `asset_class` (default EQUITY); a dark venue of another class is an invalid
+    input combination, E_INPUT (structural cross-field check, HR-66)."""
     v = "EQUITY" if v is None else v
     if v not in ASSET_CLASSES:
         raise QfError("E_SCHEMA", f"{path}: not EQUITY, FX or RATES", path)
     if dark and v != "EQUITY":
-        raise QfError(
-            "E_UNSUPPORTED_OPERATION", f"{path}: dark pool is equities only (HR-93)", path
-        )
+        raise QfError("E_INPUT", f"{path}: dark pool is equities only (HR-93, HR-113)", path)
     return str(v)
 
 

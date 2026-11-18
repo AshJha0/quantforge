@@ -3811,7 +3811,7 @@
     "counted_with_rederivation": 86,
     "share_with_rederivation": 0.68254,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 99
+    "error_and_invariance_cases": 101
    },
    "with_sweeps": {
     "cases": 126,
@@ -3826,7 +3826,7 @@
     "counted_with_rederivation": 86,
     "share_with_rederivation": 0.68254,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 99
+    "error_and_invariance_cases": 101
    },
    "sweeps": null,
    "libraries": {},
@@ -3980,7 +3980,7 @@
      "counted_with_rederivation": 3,
      "share_with_rederivation": 0.75,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 4
+     "error_and_invariance_cases": 5
     },
     "exec.sim.fut.pnl": {
      "cases": 2,
@@ -4100,7 +4100,7 @@
      "counted_with_rederivation": 3,
      "share_with_rederivation": 0.375,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 9
+     "error_and_invariance_cases": 10
     },
     "exec.tca.shortfall": {
      "cases": 3,

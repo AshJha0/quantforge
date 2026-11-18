@@ -333,10 +333,17 @@ ACLS_ROWS = [
     ("acls_h-0001", "exec.sor.allocate", classed(SOR_LIT["inputs"], "FX", "FX"), SOR_LIT["expected"]["outputs"]),
     ("acls_h-0002", "exec.sor.allocate", classed(SOR_LIT["inputs"], "EQUITY", "RATES"), "E_INPUT"),
     ("acls_h-0003", "exec.sor.allocate", classed(SOR_LIT["inputs"], "EQUITY", "BONDS"), "E_SCHEMA"),
+    ("acls_h-0004", "exec.sim.dark.run", {"config": {"asset_class": "FX", "lot_size": "1", "p_firm": "1", "seed": 1,
+                                                      "tick_size": "0.01"}, "events": []}, "E_INPUT"),
+    ("acls_h-0005", "exec.sor.allocate",
+     dict(classed(SOR_LIT["inputs"], "RATES", "RATES"),
+          venues=[dict(SOR_LIT["inputs"]["venues"][0], asset_class="RATES"),
+                  {"as": "0.1", "asset_class": "RATES", "kind": "DARK", "r": "0", "tail": ["0.5", "0"]}]), "E_INPUT"),
 ]
 ADDED.update({c: "session phases in exec.sim.lit.run" for c, *_ in SES_ROWS})
 ADDED.update({"acls_h-0001": "asset_class on SOR (HR-93); outputs as sor_h-0001",
-              "acls_h-0002": "asset_class mismatch (HR-93)", "acls_h-0003": "asset_class schema"})
+              "acls_h-0002": "asset_class mismatch (HR-93)", "acls_h-0003": "asset_class schema",
+              "acls_h-0004": "FX dark pool is E_INPUT (HR-113)", "acls_h-0005": "RATES dark venue in SOR is E_INPUT (HR-113)"})
 ERRORS["ses_h"] = [("PHASE without a session is not an event", "exec.sim.lit.run",
                     {k: v for k, v in SES_IN.items() if k != "session"}, "E_SCHEMA")]
 ERRORS["acls_h"] = []
