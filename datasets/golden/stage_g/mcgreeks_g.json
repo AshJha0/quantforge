@@ -4,7 +4,7 @@
  "spec": "specifications/06-risk/mc-greeks.md",
  "spec_version": "1.0.0",
  "generator": "oracle/python/gen_stage_g_q9.py",
- "reviewer": "none: self-assessment until the end-of-project human review",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
  "cases": [
   {
    "case_id": "mcgreeks_g-0001",

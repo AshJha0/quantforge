@@ -4,7 +4,7 @@
  "spec": "specifications/08-hedging/hedge-solvers.md",
  "spec_version": "1.0.0",
  "generator": "oracle/python/gen_r6_w3.py",
- "reviewer": "none: self-assessment until the end-of-project human review",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
  "cases": [
   {
    "case_id": "hedgeaudit_r6-0001",
