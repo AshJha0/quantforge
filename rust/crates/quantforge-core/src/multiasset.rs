@@ -27,13 +27,13 @@ pub const RATES_LABEL: &str = "simulated venue; not a real exchange; no real rat
 const DEFAULT_TICK_TABLE: [(&str, &str); 2] = [("0", "0.0001"), ("1.00", "0.01")]; // [REGNMS-612]
 const HALF_PENNY_TABLE: [(&str, &str); 2] = [("0", "0.0001"), ("1.00", "0.005")];
 /// The current Rule 612/610 text applies on and after this date (a parameter; default UNVERIFIED).
-pub const RULE_2024_COMPLIANCE: &str = "2026-11-03";
+pub const RULE_2024_COMPLIANCE: &str = "2025-11-03"; // HR-110, release 34-101070
 const FEE_CAP_CURRENT: (&str, &str) = ("0.001", "0.001"); // [REGNMS-610]
 const FEE_CAP_OLD: (&str, &str) = ("0.003", "0.003");
 const ROUND_LOTS_CURRENT: [(&str, i64); 3] = [("250", 100), ("1000", 40), ("10000", 10)];
 const CCY_ORDER: [&str; 8] = ["EUR", "GBP", "AUD", "NZD", "USD", "CAD", "CHF", "JPY"]; // HR-88
 const T1_PAIRS: [&str; 1] = ["USDCAD"]; // HR-89
-const RESOLUTIONS: [i64; 4] = [32, 64, 128, 256];
+const RESOLUTIONS: [i64; 3] = [32, 64, 128];
 const MAX_CANDIDATES: i128 = 1_000_000;
 const MAX_ORDERS: usize = 10_000_000;
 const MAX_DAYS: usize = 3660;
@@ -282,7 +282,6 @@ fn positive_price(price: Dec) -> Result<()> {
 
 /// `micro.eq.round_price` (HR-81): a buy rounds down to the grid, a sell up.
 pub fn eq_round_price(raw: &Json) -> Result<Json> {
-    let label = label_eq(raw)?;
     let price = dec_of(raw, "price", None, "")?;
     let buy = enum_of(raw, "side", &["BUY", "SELL"], "")? == "BUY";
     let table = tick_table(raw)?;
@@ -291,15 +290,11 @@ pub fn eq_round_price(raw: &Json) -> Result<Json> {
     let r = price.div_int(tick, !buy)?.checked_mul(tick)?;
     // A sell rounded up across a floor lands on the floor, which is on both grids (HR-81).
     let p = places(tick_at(&table, r));
-    Ok(out(vec![
-        ("label", label.into()),
-        ("price", fixed_at(r, p).into()),
-    ]))
+    Ok(out(vec![("price", fixed_at(r, p).into())]))
 }
 
 /// `micro.eq.fee_check` (HR-85): the [REGNMS-610] access-fee cap for the price band.
 pub fn eq_fee_check(raw: &Json) -> Result<Json> {
-    let label = label_eq(raw)?;
     let price = dec_of(raw, "price", None, "")?;
     let fee = dec_of(raw, "taker_fee", None, "")?;
     let check = bool_of(raw, "cap_check", true)?;
@@ -317,16 +312,11 @@ pub fn eq_fee_check(raw: &Json) -> Result<Json> {
     if check && fee > cap {
         return Err(at("E_DOMAIN", "taker_fee", "above the Rule 610 cap"));
     }
-    Ok(out(vec![
-        ("cap", s(cap)),
-        ("label", label.into()),
-        ("taker_fee", s(fee)),
-    ]))
+    Ok(out(vec![("cap", s(cap)), ("taker_fee", s(fee))]))
 }
 
 /// `micro.eq.round_lot` (HR-82 as dated rule versions).
 pub fn eq_round_lot(raw: &Json) -> Result<Json> {
-    let label = label_eq(raw)?;
     let price = dec_of(raw, "price", None, "")?;
     let cur = current(raw)?;
     positive_price(price)?;
@@ -338,10 +328,7 @@ pub fn eq_round_lot(raw: &Json) -> Result<Json> {
     } else {
         100
     };
-    Ok(out(vec![
-        ("label", label.into()),
-        ("round_lot", Json::Int(lot)),
-    ]))
+    Ok(out(vec![("round_lot", Json::Int(lot))]))
 }
 
 fn good(x: Date, hol: &HashSet<Date>) -> bool {
@@ -372,7 +359,6 @@ fn add_good(mut x: Date, n: i64, ok: &dyn Fn(Date) -> bool) -> Result<Date> {
 
 /// Equities settlement date (HR-86): `settle_lag` business days on the supplied calendar.
 pub fn eq_settle_date(raw: &Json) -> Result<Json> {
-    let label = label_eq(raw)?;
     let trade = date_of(need(raw, "trade_date", "")?, "trade_date")?;
     let lag = int_of_key(raw, "settle_lag", Some(1), "")?;
     let hol = match raw.get("holidays") {
@@ -383,10 +369,7 @@ pub fn eq_settle_date(raw: &Json) -> Result<Json> {
         return Err(at("E_DOMAIN", "settle_lag", "outside 0..30"));
     }
     let x = add_good(trade, lag, &|x| good(x, &hol))?;
-    Ok(out(vec![
-        ("label", label.into()),
-        ("settle_date", x.to_string().into()),
-    ]))
+    Ok(out(vec![("settle_date", x.to_string().into())]))
 }
 
 // ------------------------------------------------------------------ equity auction
@@ -657,7 +640,6 @@ pub fn fx_pip_value(raw: &Json) -> Result<Json> {
     }
     Ok(out(vec![
         ("currency", quote.into()),
-        ("label", FX_LABEL.into()),
         ("pip_value", s(notional.checked_mul(pip(quote))?)),
     ]))
 }
@@ -711,10 +693,7 @@ pub fn fx_spot_date(raw: &Json) -> Result<Json> {
         add_good(add_good(trade, 1, &non_usd)?, 1, &both)?
     };
     let x = add_good(x.add_days(-1), 1, &|x| both(x) && good(x, h("USD")))?;
-    Ok(out(vec![
-        ("label", FX_LABEL.into()),
-        ("spot_date", x.to_string().into()),
-    ]))
+    Ok(out(vec![("spot_date", x.to_string().into())]))
 }
 
 /// `exec.sim.fx.stream`: bid rounded down and ask rounded up to the tick (fx-rfq-venue.md).
@@ -785,7 +764,27 @@ pub fn fx_request(raw: &Json) -> Result<Json> {
     let thr = dec_of(raw, "threshold_pips", None, "")?;
     let sym = bool_of(raw, "symmetric", true)?;
     let prr = dec_of(raw, "p_random_reject", None, "")?;
-    let u = dec_of(raw, "u", None, "")?;
+    // HR-97: without `u`, u is drawn from core.rng with stream = request_index; the draw is
+    // (k + 1/2) 2^-52 = (2k + 1) / 2^53, kept exact for the comparison.
+    let drawn = if raw.get("u").is_none() {
+        let seed = int_of_key(raw, "seed", None, "")?;
+        let idx = int_of_key(raw, "request_index", None, "")?;
+        let (Ok(seed), Ok(idx)) = (u64::try_from(seed), u32::try_from(idx)) else {
+            return Err(at(
+                "E_SCHEMA",
+                "request_index",
+                "seed or request_index out of range",
+            ));
+        };
+        let x = crate::rng::Xoshiro::seeded(seed, idx).next_u64();
+        Some((2 * i128::from(x >> 12) + 1, crate::rng::to_uniform(x)))
+    } else {
+        None
+    };
+    let u = match drawn {
+        Some(_) => Dec::ZERO,
+        None => dec_of(raw, "u", None, "")?,
+    };
     let (_, quote) = pair(raw)?;
     if bid > ask {
         return Err(at("E_INPUT", "quote", "bid above ask"));
@@ -811,7 +810,13 @@ pub fn fx_request(raw: &Json) -> Result<Json> {
     let test = if sym { mv.max(neg) } else { adverse };
     let outcome = if test > thr {
         "LL_PRICE"
-    } else if u < prr {
+    } else if match drawn {
+        Some((odd, _)) => {
+            let (pm, ps) = prr.parts();
+            odd * 10i128.pow(ps) < pm * (1i128 << 53)
+        }
+        None => u < prr,
+    } {
         "LL_RANDOM"
     } else {
         "FILL"
@@ -821,12 +826,16 @@ pub fn fx_request(raw: &Json) -> Result<Json> {
     } else {
         Json::Null
     };
-    Ok(out(vec![
+    let mut fields = vec![
         ("label", FX_LABEL.into()),
         ("move_pips", s(mv)),
         ("outcome", outcome.into()),
         ("price", price),
-    ]))
+    ];
+    if let Some((_, uf)) = drawn {
+        fields.push(("u", Json::Num(uf)));
+    }
+    Ok(out(fields))
 }
 
 // ------------------------------------------------------------------ rates (H-24)
@@ -836,25 +845,26 @@ pub fn parse_32nds(text: &Json, path: &str) -> Result<Dec> {
     let Some(t) = text.as_str() else {
         return Err(at("E_SCHEMA", path, "not a string"));
     };
-    let bad = || at("E_INPUT", path, "not H-FF[f]");
+    // HR-109: CME quarter-32nds, third digit 0, 2, 5, 7 (0, 1/4, 1/2, 3/4) or "+" (1/2).
+    let bad = || {
+        at(
+            "E_SCHEMA",
+            path,
+            "not H-FF[q] with q in 0, 2, 5, 7, + (HR-109)",
+        )
+    };
     let (h, rest) = t.split_once('-').ok_or_else(bad)?;
     let digits = |x: &str| !x.is_empty() && x.bytes().all(|b| b.is_ascii_digit());
-    if !digits(h) || rest.len() < 2 || rest.len() > 3 || !rest.is_ascii() {
+    let ff: String = rest.chars().take(2).collect();
+    let q: String = rest.chars().skip(2).collect();
+    if !digits(h) || ff.len() != 2 || !digits(&ff) || q.chars().count() > 1 {
         return Err(bad());
     }
-    let (ff, f) = rest.split_at(2);
-    if !digits(ff) {
-        return Err(bad());
-    }
-    let eighth = match f {
-        "" => 0,
-        "1" => 1,
-        "2" => 2,
-        "3" => 3,
-        "+" => 4,
-        "5" => 5,
-        "6" => 6,
-        "7" => 7,
+    let quarter = match q.as_str() {
+        "" | "0" => 0,
+        "2" => 1,
+        "5" | "+" => 2,
+        "7" => 3,
         _ => return Err(bad()),
     };
     let ff: i64 = ff.parse().map_err(|_| bad())?;
@@ -864,42 +874,35 @@ pub fn parse_32nds(text: &Json, path: &str) -> Result<Dec> {
     let hd = Dec::parse(h)
         .ok_or_else(bad)?
         .map_err(|_| at("E_LIMIT", path, "decimal outside the exact range"))?;
-    hd.checked_add(Dec::int(8 * ff + eighth).checked_mul(d("0.00390625"))?)
+    hd.checked_add(Dec::int(4 * ff + quarter).checked_mul(d("0.0078125"))?)
         .map_err(|_| at("E_LIMIT", path, "decimal outside the exact range"))
 }
 
 fn format_32nds(x: Dec, resolution: i64) -> Result<String> {
     if !RESOLUTIONS.contains(&resolution) {
-        return Err(at(
-            "E_DOMAIN",
-            "resolution",
-            "resolution not 32, 64, 128 or 256",
-        ));
+        return Err(at("E_DOMAIN", "resolution", "resolution not 32, 64 or 128"));
     }
     if x.signum() < 0 || !x.checked_mul(Dec::int(resolution))?.on_grid(Dec::int(1))? {
         return Err(at("E_DOMAIN", "value", "value not on the requested grid"));
     }
     let h = x.div_int(Dec::int(1), false)?;
-    let eighths = int_of(x.checked_sub(h)?.checked_mul(Dec::int(256))?);
-    let (ff, f) = (eighths / 8, eighths % 8);
-    let ft = ["", "1", "2", "3", "+", "5", "6", "7"][f as usize];
-    Ok(format!("{h}-{ff:02}{ft}"))
+    let quarters = int_of(x.checked_sub(h)?.checked_mul(Dec::int(128))?);
+    let (ff, q) = (quarters / 4, quarters % 4);
+    let qt = ["", "2", "+", "7"][q as usize];
+    Ok(format!("{h}-{ff:02}{qt}"))
 }
 
 /// 32nds text to a decimal (HR-90).
 pub fn rates_parse_32nds(raw: &Json) -> Result<Json> {
     let v = parse_32nds(need(raw, "text", "")?, "text")?;
-    Ok(out(vec![("label", RATES_LABEL.into()), ("value", s(v))]))
+    Ok(out(vec![("value", s(v))]))
 }
 
 /// A decimal to 32nds text at `resolution` parts per point (HR-90).
 pub fn rates_format_32nds(raw: &Json) -> Result<Json> {
     let x = dec_of(raw, "value", None, "")?;
     let res = int_of_key(raw, "resolution", None, "")?;
-    Ok(out(vec![
-        ("label", RATES_LABEL.into()),
-        ("text", format_32nds(x, res)?.into()),
-    ]))
+    Ok(out(vec![("text", format_32nds(x, res)?.into())]))
 }
 
 fn contract(raw: &Json) -> Result<(Dec, Dec)> {
@@ -938,10 +941,7 @@ pub fn rates_tick_value(raw: &Json) -> Result<Json> {
     if face.signum() <= 0 || tick.signum() <= 0 {
         return Err(at("E_DOMAIN", "face", "face and tick must be positive"));
     }
-    Ok(out(vec![
-        ("label", RATES_LABEL.into()),
-        ("tick_value", s(tick_value(face, tick)?)),
-    ]))
+    Ok(out(vec![("tick_value", s(tick_value(face, tick)?))]))
 }
 
 /// Coupon bond price on a coupon date, street convention (HR-92), 9 decimals.
@@ -1022,10 +1022,51 @@ pub fn rates_bond_price(raw: &Json) -> Result<Json> {
             (f9, ip) = (0, ip + 1);
         }
     }
-    Ok(out(vec![
-        ("label", RATES_LABEL.into()),
-        ("price", text9(neg, ip, f9).into()),
-    ]))
+    Ok(out(vec![("price", text9(neg, ip, f9).into())]))
+}
+
+/// Yield from a coupon-date price (HR-92): Brent (`core.solve`), tolerance 1e-12, binary64.
+pub fn rates_bond_yield(raw: &Json) -> Result<Json> {
+    let c = dec_of(raw, "coupon", None, "")?;
+    let p = dec_of(raw, "price", None, "")?;
+    let f = int_of_key(raw, "frequency", None, "")?;
+    let n = int_of_key(raw, "periods", None, "")?;
+    if ![1, 2, 4, 12].contains(&f) {
+        return Err(at("E_DOMAIN", "frequency", "frequency not 1, 2, 4 or 12"));
+    }
+    if !(1..=1200).contains(&n) {
+        return Err(at("E_DOMAIN", "periods", "periods outside 1..1200"));
+    }
+    if p.signum() <= 0 {
+        return Err(at("E_DOMAIN", "price", "price must be positive"));
+    }
+    // float(100 c / f): the exact quotient, rounded once to binary64.
+    let (cm, cs) = c.parts();
+    let den = Big::from((f as u128) * 10u128.pow(cs));
+    let (ip, frac) = split(&Big::from(100 * cm.unsigned_abs()), &den, 30);
+    let mag: f64 = format!("{ip}.{frac:030}").parse().unwrap_or(0.0);
+    let cf = if cm < 0 { -mag } else { mag };
+    let pf: f64 = p.to_string().parse().unwrap_or(0.0);
+    let ff = f as f64;
+    let g = |y: f64| {
+        let d = 1.0 + y / ff;
+        let mut sum = 0.0;
+        for i in 1..=n {
+            sum += cf / d.powf(i as f64);
+        }
+        sum + 100.0 / d.powf(n as f64) - pf
+    };
+    let (lo, hi) = (-0.99 * ff, 10.0);
+    if g(lo) * g(hi) > 0.0 {
+        return Err(at("E_DOMAIN", "price", "no yield in (-0.99 f, 10)"));
+    }
+    let ctl = crate::root::Controls {
+        x_tol: 1e-12,
+        f_tol: 0.0,
+        max_iter: 200,
+    };
+    let r = crate::root::brent(&g, lo, hi, &ctl)?;
+    Ok(out(vec![("yield", Json::Num(r.root))]))
 }
 
 /// Bill price on the discount basis [UST-BILL]: 100 (1 - d days / 360), 9 decimals.
@@ -1048,10 +1089,7 @@ pub fn rates_bill_price(raw: &Json) -> Result<Json> {
     };
     let den = Big::from(18 * 10u128.pow(ds));
     let (ip, f9) = split(&num, &den, 9);
-    Ok(out(vec![
-        ("label", RATES_LABEL.into()),
-        ("price", text9(neg, ip, f9).into()),
-    ]))
+    Ok(out(vec![("price", text9(neg, ip, f9).into())]))
 }
 
 fn trailing_zeros(mut x: u128) -> usize {
@@ -1134,7 +1172,7 @@ pub fn fut_to_text(raw: &Json) -> Result<Json> {
         return Err(at(
             "E_DOMAIN",
             "contract",
-            "contract tick is not 1/32, 1/64, 1/128 or 1/256",
+            "contract tick is not 1/32, 1/64 or 1/128",
         ));
     };
     Ok(out(vec![
@@ -1250,7 +1288,7 @@ pub fn fut_run(raw: &Json) -> Result<Json> {
         ("maker_rebate".into(), "0".into()),
         ("taker_fee".into(), "0".into()),
     ]);
-    let res = lit_matching::run(&tick.to_string(), "1", &mapped, &zero)?;
+    let res = lit_matching::run(&tick.to_string(), "1", &mapped, &zero, None)?;
     let tv = tick_value(face, tick)?;
     let mut pos: BTreeMap<String, Dec> = BTreeMap::new();
     let mut cash: BTreeMap<String, Dec> = BTreeMap::new();
@@ -1443,13 +1481,15 @@ mod tests {
 
     #[test]
     fn thirty_seconds_round_trip() {
-        for t in ["110-16+", "0-00", "99-317", "1-013"] {
+        for t in ["110-16+", "0-00", "99-317", "1-012"] {
             let v = parse_32nds(&Json::Str(t.into()), "text").expect("parse");
-            assert_eq!(format_32nds(v, 256).expect("format"), t);
+            assert_eq!(format_32nds(v, 128).expect("format"), t);
         }
+        let v = parse_32nds(&Json::Str("1-165".into()), "t").expect("parse");
+        assert_eq!(format_32nds(v, 64).expect("format"), "1-16+");
         assert!(parse_32nds(&Json::Str("1-32".into()), "t").is_err_and(|e| e.code == "E_DOMAIN"));
-        assert!(parse_32nds(&Json::Str("1-3".into()), "t").is_err_and(|e| e.code == "E_INPUT"));
-        assert!(parse_32nds(&Json::Str("1-014".into()), "t").is_err_and(|e| e.code == "E_INPUT"));
+        assert!(parse_32nds(&Json::Str("1-3".into()), "t").is_err_and(|e| e.code == "E_SCHEMA"));
+        assert!(parse_32nds(&Json::Str("1-013".into()), "t").is_err_and(|e| e.code == "E_SCHEMA"));
     }
 
     #[test]

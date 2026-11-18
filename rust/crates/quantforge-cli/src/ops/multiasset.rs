@@ -35,6 +35,7 @@ pub mod micro {
         "micro.rates.tick_value" => call(i, ma::rates_tick_value),
         "micro.rates.bond_price" => call(i, ma::rates_bond_price),
         "micro.rates.bill_price" => call(i, ma::rates_bill_price),
+        "micro.rates.bond_yield" => call(i, ma::rates_bond_yield),
     }
 }
 

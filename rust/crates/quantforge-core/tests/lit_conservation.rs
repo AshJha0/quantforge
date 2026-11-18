@@ -65,7 +65,7 @@ proptest! {
         (0u8..6, 0usize..8, any::<bool>(), 0u32..20, 1u32..12, 1u32..6, 0usize..40), 1..40)) {
         let events: Vec<Json> = raw.iter().enumerate().map(|(k, r)| event(k, *r)).collect();
         let fees = obj([("taker_fee", "0.0003".into()), ("maker_rebate", "0.0001".into())]);
-        let out = run("0.5", "1", &events, &fees).expect("valid stream");
+        let out = run("0.5", "1", &events, &fees, None).expect("valid stream");
         prop_assert_eq!(out.get("label").and_then(Json::as_str), Some(LABEL));
         let Some(Json::Obj(cons)) = out.get("conservation") else { panic!("conservation") };
         for (id, c) in cons {

@@ -536,7 +536,13 @@ impl Engine {
 }
 
 /// Runs the event list. `fee_schedule` is the raw JSON object.
-pub fn run(tick_size: &str, lot_size: &str, events: &[Json], fee_schedule: &Json) -> Result<Json> {
+pub fn run(
+    tick_size: &str,
+    lot_size: &str,
+    events: &[Json],
+    fee_schedule: &Json,
+    session: Option<&Json>,
+) -> Result<Json> {
     let tick = dec(Some(&Json::Str(tick_size.into())), "tick_size")?;
     let lot = dec(Some(&Json::Str(lot_size.into())), "lot_size")?;
     if tick.signum() <= 0 || lot.signum() <= 0 {
@@ -568,14 +574,339 @@ pub fn run(tick_size: &str, lot_size: &str, events: &[Json], fee_schedule: &Json
         fees: BTreeMap::new(),
         cons: BTreeMap::new(),
     };
+    let mut ses = match session {
+        Some(raw) => {
+            let fee = match fee_schedule.get("auction_fee") {
+                None => Dec::ZERO,
+                v => dec(v, "fee_schedule/auction_fee")?,
+            };
+            Some(Session::new(raw, fee)?)
+        }
+        None => None,
+    };
     for (k, e) in events.iter().enumerate() {
-        match e.get("op").and_then(Json::as_str) {
+        let op = e.get("op").and_then(Json::as_str);
+        let known = matches!(op, Some("NEW" | "CANCEL" | "MODIFY"))
+            || (ses.is_some() && op == Some("PHASE"));
+        if !matches!(e, Json::Obj(_)) || !known {
+            return Err(at("E_SCHEMA", &format!("events/{k}"), "not an event"));
+        }
+        if let Some(sx) = ses.as_mut()
+            && sx.event(&mut eng, e, k)?
+        {
+            continue;
+        }
+        match op {
             Some("NEW") => eng.new_order(e, k)?,
             Some("CANCEL") => eng.cancel(e, k)?,
-            Some("MODIFY") => eng.modify(e, k)?,
-            _ => return Err(at("E_SCHEMA", &format!("events/{k}"), "not an event")),
+            _ => eng.modify(e, k)?,
         }
         eng.reprice()?;
     }
-    eng.output()
+    let out = eng.output()?;
+    let Some(sx) = ses else {
+        return Ok(out);
+    };
+    let Json::Obj(mut fields) = out else {
+        return Err(err("E_INPUT", "engine output is not an object"));
+    };
+    for (key, v) in &mut fields {
+        if key == "conservation"
+            && let Json::Obj(cons) = v
+        {
+            // Still in a call book at the end: counted as resting.
+            for c in &sx.call {
+                if let Some((_, Json::Obj(row))) = cons.iter_mut().find(|(id, _)| *id == c.id) {
+                    for (rk, rv) in row.iter_mut() {
+                        if rk == "resting" {
+                            *rv = s(c.qty_dec);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    fields.push(("auctions".into(), Json::Arr(sx.auctions)));
+    fields.push(("phase".into(), sx.phase.into()));
+    fields.sort_by(|a, b| a.0.cmp(&b.0));
+    Ok(Json::Obj(fields))
+}
+
+const PHASES: [&str; 4] = ["PRE_OPEN", "CONTINUOUS", "PRE_CLOSE", "CLOSED"]; // HR-83
+
+struct CallOrder {
+    id: String,
+    side: String,
+    limit: Json,
+    qty: i64,
+    qty_dec: Dec,
+    on_close: bool,
+}
+
+/// Equity session phases (asset-conventions.md 1.3, HR-83; auction.md), as the Python reference:
+/// in `PRE_OPEN`, NEW LIMIT and MARKET orders collect in a call book without matching; at `CONTINUOUS`
+/// the call book is uncrossed by `exec.sim.auction.uncross` (phase OPEN) and its unfilled limit
+/// orders rest in allocation order. In `PRE_CLOSE` only `on_close` orders are accepted, into a
+/// second call book uncrossed at `CLOSED` (phase CLOSE); unfilled on-close orders are cancelled
+/// (HR-96). The continuous book does not join the closing cross. Orders in the wrong phase are
+/// rejected with reason `PHASE`. Auction fills pay `auction_fee` x notional.
+struct Session {
+    fee: Dec,
+    phase: &'static str,
+    ref_price: Dec,
+    tie: Json,
+    call: Vec<CallOrder>,
+    trader: BTreeMap<String, String>,
+    auctions: Vec<Json>,
+}
+
+impl Session {
+    fn new(raw: &Json, fee: Dec) -> Result<Session> {
+        if !matches!(raw, Json::Obj(_)) {
+            return Err(at("E_SCHEMA", "session", "not an object"));
+        }
+        let phase = match raw.get("phase") {
+            None => "PRE_OPEN",
+            Some(v) => PHASES
+                .iter()
+                .copied()
+                .find(|p| v.as_str() == Some(p))
+                .ok_or_else(|| at("E_SCHEMA", "session/phase", "not a phase"))?,
+        };
+        let ref_price = dec(raw.get("ref_price"), "session/ref_price")?;
+        let tie = raw
+            .get("tie_break")
+            .cloned()
+            .unwrap_or_else(|| "CBOE".into());
+        Ok(Session {
+            fee,
+            phase,
+            ref_price,
+            tie,
+            call: Vec::new(),
+            trader: BTreeMap::new(),
+            auctions: Vec::new(),
+        })
+    }
+
+    /// True when the session handled the event (the engine must not).
+    fn event(&mut self, eng: &mut Engine, e: &Json, k: usize) -> Result<bool> {
+        let op = e.get("op").and_then(Json::as_str);
+        if op == Some("PHASE") {
+            self.advance(eng, e.get("phase"), k)?;
+            return Ok(true);
+        }
+        if self.phase == "CONTINUOUS" {
+            return Ok(false);
+        }
+        if op == Some("CANCEL") {
+            let id = e.get("id").and_then(Json::as_str);
+            if let Some(i) = self.call.iter().position(|c| id == Some(c.id.as_str())) {
+                let c = self.call.remove(i);
+                eng.cancelled
+                    .push(pair(("id", c.id.clone().into()), ("qty", s(c.qty_dec))));
+                eng.cons.entry(c.id).or_default().cancelled = c.qty_dec;
+                return Ok(true);
+            }
+            return Ok(false);
+        }
+        if op != Some("NEW") {
+            return Ok(false);
+        }
+        let path = format!("events/{k}");
+        let (Some(oid), Some(trader)) = (
+            e.get("id").and_then(Json::as_str),
+            e.get("trader").and_then(Json::as_str),
+        ) else {
+            return Err(at("E_SCHEMA", &path, "id and trader must be strings"));
+        };
+        let side = e.get("side").and_then(Json::as_str);
+        let typ = e.get("type").and_then(Json::as_str);
+        let (Some(side @ ("BUY" | "SELL")), Some(typ)) = (side, typ) else {
+            return Err(at("E_SCHEMA", &path, "bad side or type"));
+        };
+        if !TYPES.contains(&typ) {
+            return Err(at("E_SCHEMA", &path, "bad side or type"));
+        }
+        let on_close = match e.get("on_close") {
+            None => false,
+            Some(Json::Bool(b)) => *b,
+            Some(_) => return Err(at("E_SCHEMA", &path, "on_close: not a boolean")),
+        };
+        let qty = dec(e.get("qty"), &format!("{path}/qty"))?;
+        let market = typ == "MARKET";
+        let limit = if market {
+            None
+        } else {
+            Some(dec(e.get("price"), &format!("{path}/price"))?)
+        };
+        if eng.seen.contains(oid) {
+            return Err(at("E_INPUT", &path, &format!("duplicate id {oid}")));
+        }
+        if qty.signum() <= 0 {
+            return Err(at("E_DOMAIN", &path, "quantity must be positive"));
+        }
+        Engine::on_grid(qty, eng.lot, "qty")?;
+        if let Some(l) = limit {
+            if l.signum() <= 0 {
+                return Err(at("E_DOMAIN", &path, "price must be positive"));
+            }
+            Engine::on_grid(l, eng.tick, "price")?;
+        }
+        eng.seen.insert(oid.to_string());
+        eng.cons.insert(
+            oid.to_string(),
+            Cons {
+                submitted: qty,
+                ..Cons::default()
+            },
+        );
+        let ok = matches!(typ, "LIMIT" | "MARKET")
+            && (self.phase == "PRE_OPEN" || (self.phase == "PRE_CLOSE" && on_close));
+        if !ok {
+            eng.reject(oid, "PHASE", qty)?;
+            return Ok(true);
+        }
+        self.trader.insert(oid.to_string(), trader.to_string());
+        let lots = qty
+            .div_int(eng.lot, false)?
+            .to_string()
+            .parse::<i64>()
+            .map_err(|_| at("E_LIMIT", &path, "too many lots"))?;
+        self.call.push(CallOrder {
+            id: oid.to_string(),
+            side: side.to_string(),
+            limit: if market {
+                "MARKET".into()
+            } else {
+                e.get("price").cloned().unwrap_or(Json::Null)
+            },
+            qty: lots,
+            qty_dec: qty,
+            on_close: self.phase == "PRE_CLOSE",
+        });
+        Ok(true)
+    }
+
+    fn advance(&mut self, eng: &mut Engine, to: Option<&Json>, k: usize) -> Result<()> {
+        let path = format!("events/{k}");
+        let want = to.and_then(Json::as_str);
+        let Some(to) = PHASES.iter().position(|p| want == Some(p)) else {
+            return Err(at("E_SCHEMA", &path, "phase: not a phase"));
+        };
+        let from = PHASES.iter().position(|p| *p == self.phase).unwrap_or(0);
+        if to != from + 1 {
+            return Err(at(
+                "E_INPUT",
+                &path,
+                &format!("phase {} cannot move to {}", self.phase, PHASES[to]),
+            ));
+        }
+        match PHASES[to] {
+            "CONTINUOUS" => self.uncross(eng, "OPEN")?,
+            "CLOSED" => self.uncross(eng, "CLOSE")?,
+            _ => {}
+        }
+        self.phase = PHASES[to];
+        Ok(())
+    }
+
+    fn uncross(&mut self, eng: &mut Engine, phase: &str) -> Result<()> {
+        let lot = eng.lot;
+        let orders: Vec<Json> = self
+            .call
+            .iter()
+            .enumerate()
+            .map(|(n, c)| {
+                Json::Obj(vec![
+                    ("id".into(), c.id.clone().into()),
+                    ("side".into(), c.side.clone().into()),
+                    ("limit".into(), c.limit.clone()),
+                    ("qty".into(), Json::Int(c.qty)),
+                    ("seq".into(), Json::Int(n as i64 + 1)),
+                    ("on_close".into(), Json::Bool(c.on_close)),
+                ])
+            })
+            .collect();
+        let req = Json::Obj(vec![
+            ("orders".into(), Json::Arr(orders)),
+            ("phase".into(), phase.into()),
+            ("ref_price".into(), s(self.ref_price)),
+            ("tick_size".into(), s(eng.tick)),
+            ("tie_break".into(), self.tie.clone()),
+        ]);
+        let res = crate::multiasset::auction_uncross(&req)?;
+        let lots =
+            |v: Option<&Json>| Dec::int(v.and_then(Json::as_int).unwrap_or(0)).checked_mul(lot);
+        let list = |k: &str| res.get(k).and_then(Json::as_array).unwrap_or(&[]).to_vec();
+        let text = |v: &Json, k: &str| {
+            v.get(k)
+                .and_then(Json::as_str)
+                .unwrap_or_default()
+                .to_string()
+        };
+        let mut fills = Vec::new();
+        for f in list("fills") {
+            let id = text(&f, "id");
+            let q = lots(f.get("qty"))?;
+            let price = dec(f.get("price"), "price")?;
+            fills.push(Json::Obj(vec![
+                ("id".into(), id.clone().into()),
+                ("price".into(), s(price)),
+                ("qty".into(), s(q)),
+                ("side".into(), f.get("side").cloned().unwrap_or(Json::Null)),
+            ]));
+            let c = eng.cons.entry(id.clone()).or_default();
+            c.filled = c.filled.checked_add(q)?;
+            let t = self.trader.get(&id).cloned().unwrap_or_default();
+            let add = self.fee.checked_mul(price.checked_mul(q)?)?;
+            let fe = eng.fees.entry(t).or_default();
+            *fe = fe.checked_add(add)?;
+        }
+        for r in list("residual") {
+            let id = text(&r, "id");
+            let q = lots(r.get("qty"))?;
+            let limit = dec(r.get("limit"), "limit")?;
+            let seq = eng.next_seq();
+            let o = Order {
+                id: id.clone(),
+                trader: self.trader.get(&id).cloned().unwrap_or_default(),
+                buy: r.get("side").and_then(Json::as_str) == Some("B"),
+                typ: "LIMIT",
+                cap: Some(limit),
+                price: Some(limit),
+                display: q,
+                hidden: Dec::ZERO,
+                slice: q,
+                seq,
+            };
+            eng.resting.insert(id, o);
+        }
+        for oid in list("cancelled") {
+            let oid = oid.as_str().unwrap_or_default().to_string();
+            let qd = self
+                .call
+                .iter()
+                .find(|c| c.id == oid)
+                .map_or(Dec::ZERO, |c| c.qty_dec);
+            let c = eng.cons.entry(oid.clone()).or_default();
+            let left = qd.checked_sub(c.filled)?;
+            c.cancelled = left;
+            eng.cancelled
+                .push(pair(("id", oid.into()), ("qty", s(left))));
+        }
+        let price = match res.get("price") {
+            Some(p @ Json::Str(_)) => s(dec(Some(p), "price")?),
+            _ => Json::Null,
+        };
+        self.auctions.push(Json::Obj(vec![
+            ("fills".into(), Json::Arr(fills)),
+            ("imbalance".into(), s(lots(res.get("imbalance"))?)),
+            ("phase".into(), phase.into()),
+            ("price".into(), price),
+            ("volume".into(), s(lots(res.get("volume"))?)),
+        ]));
+        self.call.clear();
+        Ok(())
+    }
 }
