@@ -12,17 +12,25 @@ Inputs: `changes`, `x_ref`, `x_now`, `days_since`, `k`. Outputs: `fire` (bool), 
 
 ## Golden value cases (hand-derived)
 
-| Case | changes | x_ref | x_now | d | k | sigma | threshold | fire |
-|---|---|---|---|---|---|---|---|---|
-| trig_k-0001 | [1, -1, 1, -1] | 100 | 105 | 1 | 3 | 1.1547005383792515 (= 2/sqrt 3) | 3.4641016151377546 | true (planted move) |
-| trig_k-0002 | same | 100 | 102 | 1 | 3 | same | 3.4641016151377546 | false (noise) |
-| trig_k-0003 | same | 100 | 105 | 4 | 3 | same | 6.928203230275509 | false |
-| trig_k-0004 | [0.5, -1.0, 1.5, -0.5, 0.0, 1.0, -1.5, 0.0] | 0 | 2.5 | 1 | 2.5 | 1.0 exactly (mean 0, sum of squares 7, / 7) | 2.5 | false (equality does not fire) |
-| trig_k-0005 | same as 0004 | 0 | -2.5000001 | 1 | 2.5 | 1.0 | 2.5 | true |
+Output fields compared: `fire` (boolean), `sigma` (binary64), `threshold` (binary64), `false_alarm_rate` (binary64). Error cases compare `error.code` (string) only.
 
-`false_alarm_rate`: k = 3 gives 0.002699796063260186; k = 2.5 gives 0.012419330651552265 (SciPy `2*norm.sf(k)`: outside check, KR-11).
+| Case | changes | x_ref | x_now | days_since | k | Expected sigma | Expected threshold | Expected fire | Expected false_alarm_rate | Why |
+|---|---|---|---|---|---|---|---|---|---|---|
+| trig_k-0001 | [1, -1, 1, -1] | 100 | 105 | 1 | 3 | 1.1547005383792515 (= 2/sqrt 3) | 3.4641016151377546 | true | 0.002699796063260186 | planted move |
+| trig_k-0002 | [1, -1, 1, -1] | 100 | 102 | 1 | 3 | 1.1547005383792515 | 3.4641016151377546 | false | 0.002699796063260186 | noise |
+| trig_k-0003 | [1, -1, 1, -1] | 100 | 105 | 4 | 3 | 1.1547005383792515 | 6.928203230275509 | false | 0.002699796063260186 | |
+| trig_k-0004 | [0.5, -1.0, 1.5, -0.5, 0.0, 1.0, -1.5, 0.0] | 0 | 2.5 | 1 | 2.5 | 1.0 exactly (mean 0, sum of squares 7, / 7) | 2.5 | false | 0.012419330651552265 | equality does not fire |
+| trig_k-0005 | [0.5, -1.0, 1.5, -0.5, 0.0, 1.0, -1.5, 0.0] | 0 | -2.5000001 | 1 | 2.5 | 1.0 | 2.5 | true | 0.012419330651552265 | |
 
-Error cases: trig_k-0006 one change → `E_INPUT`; trig_k-0007 `k = 0` → `E_DOMAIN`; trig_k-0008 changes `[1, 1, 1]` (sigma 0) → `E_DOMAIN`.
+<!-- blind:strip -->
+`false_alarm_rate` by SciPy `2*norm.sf(k)` (outside check, KR-11).
+<!-- /blind:strip -->
+
+| Case | changes | x_ref | x_now | days_since | k | Expected error.code |
+|---|---|---|---|---|---|---|
+| trig_k-0006 | [1] | 100 | 105 | 1 | 3 | E_INPUT |
+| trig_k-0007 | [1, -1, 1, -1] | 100 | 105 | 1 | 0 | E_DOMAIN |
+| trig_k-0008 | [1, 1, 1] | 100 | 105 | 1 | 3 | E_DOMAIN |
 
 ## Acceptance (fixed before any run; plan K-4 "fires on a planted move and not on noise at its stated level")
 

@@ -8,7 +8,7 @@ Planning context: `institutional-quant-engine-plan/STAGE_K_START.md`.
 
 | # | Point | Proposed ruling |
 |---|---|---|
-| KR-1 | Operations and contract | Wave 1 adds `core.store.bitemporal_query` (`01-core/bitemporal-store.md`), `curve.bootstrap.par_annual` and `curve.incremental.update` (`02-curves/incremental-update.md`), `calib.trigger.check` (`03-calibration/recalibration-triggers.md`), `risk.intraday.delta_gamma_bound` (`06-risk/intraday-risk-bounds.md`), `num.richardson.check` and a new `method` value `CN_RANNACHER_SMOOTHED` on `rates.shortrate.bermudan_swaption` and `rates.shortrate.bermudan_ladder` (`06-risk/bermudan-ladder-k8.md`). One new status-like output field, no new error code. Contract number: the next minor after the one stage H ships (1.17.0 if stage H stays on 1.16.0); fixed at the v0.10.0 tag |
+| KR-1 | Operations and contract | Wave 1 adds `core.store.bitemporal_query` (`01-core/bitemporal-store.md`), `curve.bootstrap.par_annual` and `curve.incremental.update` (`02-curves/incremental-update.md`), `calib.trigger.check` (`03-calibration/recalibration-triggers.md`), `risk.intraday.delta_gamma_bound` (`06-risk/intraday-risk-bounds.md`), `num.richardson.check` and a new `method` value `CN_RANNACHER_SMOOTHED` on `rates.shortrate.bermudan_swaption` and `rates.shortrate.bermudan_ladder` (`06-risk/bermudan-ladder-k8.md`). One new status-like output field, no new error code. Contract number 1.17.0, one number for all stage K waves (owner decision K-QC, 2026-11-18) |
 | KR-2 | Bitemporal model | Two time axes: valid time as a half-open interval `[valid_from, valid_to)` (`valid_to` null means open), and knowledge time as an instant. A query fixes both. The winner at `(K, V)` is the record with the highest `sequence` among those known by `K` (inclusive) whose interval contains `V`. A deleted record that wins masks every lower-sequence record over its interval: the answer is "withdrawn", never a fall-back to an older version |
 | KR-3 | Stage A store unchanged | `core.store.*` of stage A keep their meaning and goldens. A stage A record is the bitemporal record with `valid_from = event_time`, `valid_to = event_time + 1 ns`; this mapping is documented, not a conversion operation |
 | KR-4 | Correction property | For every log `L`, every appended record `r` with `knowledge_time(r) > K`, and every `V`: `query(L + r, K, V) == query(L, K, V)` byte for byte. This is the K-4 property test, run on at least 10,000 generated logs per language |
@@ -20,7 +20,10 @@ Planning context: `institutional-quant-engine-plan/STAGE_K_START.md`.
 | KR-10 | Labels | Intraday and incremental outputs computed on simulated or recorded data carry `"label": "latency-aware analytics on simulated data"` (plan 14.8 K-5) where data is simulated. No output is called "real-time" |
 | KR-11 | Outside checks for wave 1 | Counted as outside: SciPy for the normal false-alarm rate (KR-6); `mpmath` at 30 digits for the zero-coupon exact revaluation and bound (KR-7) only where a second lane writes the check without seeing these tables (DR-H2 rule); QuantLib `FdHullWhiteSwaptionEngine` bump-and-revalue for K-8. Hand cases on the bitemporal store and the bootstrap are blind re-derivation candidates under DR-H2, not outside checks by themselves |
 
-## Open points carried to the owner (see STAGE_K_START.md)
+## Owner decisions 2026-11-18 (STAGE_K_START.md, "yes to your recommendation")
 
-- KR-8 reference definition for "converged model derivative" (K-QA): QuantLib fine-grid bump, or the new method at 1601/800, or both.
-- KR-1 contract number.
+- K-Q1: no audit of any kind at K-9 (owner rule: no second review anywhere, ever). No wave-1 acceptance relies on an audit.
+- K-QA (KR-8): the "converged model derivative" reference is both the QuantLib fine-grid bump and `CN_RANNACHER_SMOOTHED` at 1601/800; QuantLib is the counted outside check.
+- K-QB (KR-8): if K-8 misses 1% at the default grid, it moves to a point release; the default grid is never redefined to pass.
+- K-QC (KR-1): contract 1.17.0.
+- K-QH: sub-item IDs (K-4a, K-8a, ...) and the `KR-n` ruling prefix adopted.

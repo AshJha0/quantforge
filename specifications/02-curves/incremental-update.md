@@ -19,16 +19,24 @@ Spec version 0.1.0. Status: **PROPOSED** (stage K wave 1, plan 14.8 K-4). Ruling
 
 Base quotes `[0.02, 0.025, 0.03]`.
 
-| Case | Input | Expected discount factors | first_changed_index / recomputed |
+Output fields compared: `curve.bootstrap.par_annual` returns `discount_factors` (array of binary64, same length as `quotes`). `curve.incremental.update` returns `discount_factors` (array of binary64, length 3 here), `first_changed_index` (0-based integer, or `null`) and `recomputed` (integer). Error cases compare `error.code` (string) only.
+
+| Case | Operation | Input | Expected discount_factors | Expected first_changed_index | Expected recomputed |
+|---|---|---|---|---|---|
+| inc_k-0001 | `curve.bootstrap.par_annual` | `quotes` = base | [0.980392156862745098, 0.951697752271640363, 0.914599323034920812] | not an output | not an output |
+| inc_k-0002 | `curve.incremental.update` | previous = base and its bootstrap; `new_quotes` = [0.02, 0.026, 0.03] | [0.980392156862745098 (copied), 0.949814623705232580, 0.914654171439767640] | 1 | 2 |
+| inc_k-0003 | `curve.incremental.update` | previous = base and its bootstrap; `new_quotes` = [0.02, 0.025, 0.031] | [first two copied from inc_k-0001, 0.911838227756386082] | 2 | 1 |
+| inc_k-0004 | `curve.incremental.update` | previous = base and its bootstrap; `new_quotes` = base | inc_k-0001 values, all copied | null | 0 |
+
+<!-- blind:strip -->
+Derivation of inc_k-0001: `P_1 = 1/1.02`; `P_2 = (1 - 0.025 P_1)/1.025 = 0.975490196.../1.025`; `P_3 = (1 - 0.03 (P_1 + P_2))/1.03`.
+<!-- /blind:strip -->
+Tolerance against the expected decimals: 1e-15 absolute (binary64). Between `update` and a full rebuild in the same build: equal to 1e-12 relative (K-4), expected bit-identical.
+
+| Case | Operation | Input | Expected error.code |
 |---|---|---|---|
-| inc_k-0001 | bootstrap base | 0.980392156862745098, 0.951697752271640363, 0.914599323034920812 | n/a |
-| inc_k-0002 | update, S_2 → 0.026 | 0.980392156862745098 (copied), 0.949814623705232580, 0.914654171439767640 | 1 / 2 |
-| inc_k-0003 | update, S_3 → 0.031 | first two copied, 0.911838227756386082 | 2 / 1 |
-| inc_k-0004 | update, no change | base, all copied | null / 0 |
-
-Derivation of inc_k-0001: `P_1 = 1/1.02`; `P_2 = (1 - 0.025 P_1)/1.025 = 0.975490196.../1.025`; `P_3 = (1 - 0.03 (P_1 + P_2))/1.03`. Tolerance against these decimals: 1e-15 absolute (binary64). Between `update` and a full rebuild in the same build: equal to 1e-12 relative (K-4), expected bit-identical.
-
-Error cases: inc_k-0005 lengths differ → `E_INPUT`; inc_k-0006 previous DFs perturbed in the last bit → `E_INPUT`.
+| inc_k-0005 | `curve.incremental.update` | previous = base and its bootstrap; `new_quotes` = [0.02, 0.025] (lengths differ) | E_INPUT |
+| inc_k-0006 | `curve.incremental.update` | previous = base; `previous_discount_factors` = the base bootstrap with the last element moved up by one unit in the last place (next binary64 toward +infinity); `new_quotes` = [0.02, 0.026, 0.03] | E_INPUT |
 
 ## Acceptance (fixed before any run)
 

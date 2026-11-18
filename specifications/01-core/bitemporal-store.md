@@ -42,20 +42,29 @@ Shared log, series `A`, all times `T00:00:00Z` unless shown:
 | 3 | 2026-02-01 | 2026-03-01 | 2026-04-01 | 105 | |
 | 4 | 2026-03-01 | null | 2026-04-02 | | true |
 
-| Case | K | V | Expected | Why |
-|---|---|---|---|---|
-| bt_k-0001 | 2026-03-15 | 2026-02-15 | FOUND, seq 1, 100 | seq 3 not yet known |
-| bt_k-0002 | 2026-04-01 | 2026-02-15 | FOUND, seq 3, 105 | K inclusive; correction known |
-| bt_k-0003 | 2026-03-15 | 2026-03-10 | FOUND, seq 2, 110 | |
-| bt_k-0004 | 2026-04-05 | 2026-03-10 | WITHDRAWN, row null | seq 4 wins and masks seq 2 and seq 1 (KR-2) |
-| bt_k-0005 | 2026-04-05 | 2026-01-15 | FOUND, seq 1, 100 | only seq 1 covers January |
-| bt_k-0006 | 2026-01-01T12:00:00Z | 2026-01-15 | NONE, row null | nothing known yet |
-| bt_k-0007 | 2026-04-01 | 2026-03-01 | FOUND, seq 2, 110 | seq 3 ends at 03-01 exclusive; seq 4 not yet known |
-| bt_k-0008 | 2026-04-01 | 2026-02-28T23:59:59Z | FOUND, seq 3, 105 | last second inside seq 3 |
+Output fields compared (every case): `status` (string, one of `FOUND`, `WITHDRAWN`, `NONE`); `row` (object with keys `sequence` integer, `valid_from` string, `valid_to` string or null, `knowledge_time` string, `value` JSON value; or `null`). Instants in `Z` form, e.g. `2026-01-01T00:00:00Z`. Error cases compare `error.code` (string) only. Query `series_id` is `A` in every case.
 
-Error cases: bt_k-0009 a record with `valid_to = valid_from` → `E_INPUT`; bt_k-0010 seq 3 with `knowledge_time` 2026-03-01 (earlier than seq 2's) → `E_INPUT`.
+| Case | K | V | Expected status | Expected row.sequence | Expected row.value | Why |
+|---|---|---|---|---|---|---|
+| bt_k-0001 | 2026-03-15 | 2026-02-15 | FOUND | 1 | 100 | seq 3 not yet known |
+| bt_k-0002 | 2026-04-01 | 2026-02-15 | FOUND | 3 | 105 | K inclusive; correction known |
+| bt_k-0003 | 2026-03-15 | 2026-03-10 | FOUND | 2 | 110 | |
+| bt_k-0004 | 2026-04-05 | 2026-03-10 | WITHDRAWN | row null | row null | seq 4 wins and masks seq 2 and seq 1 (KR-2) |
+| bt_k-0005 | 2026-04-05 | 2026-01-15 | FOUND | 1 | 100 | only seq 1 covers January |
+| bt_k-0006 | 2026-01-01T12:00:00Z | 2026-01-15 | NONE | row null | row null | nothing known yet |
+| bt_k-0007 | 2026-04-01 | 2026-03-01 | FOUND | 2 | 110 | seq 3 ends at 03-01 exclusive; seq 4 not yet known |
+| bt_k-0008 | 2026-04-01 | 2026-02-28T23:59:59Z | FOUND | 3 | 105 | last second inside seq 3 |
 
+When `status` is `FOUND`, the other `row` keys (`valid_from`, `valid_to`, `knowledge_time`) are those of the winning record in the shared log, copied as written.
+
+| Case | Input | Expected error.code |
+|---|---|---|
+| bt_k-0009 | shared log with seq 3's `valid_to` set equal to its `valid_from` (2026-02-01); query K 2026-04-01, V 2026-02-15 | E_INPUT |
+| bt_k-0010 | shared log with seq 3's `knowledge_time` set to 2026-03-01 (earlier than seq 2's); query K 2026-04-01, V 2026-02-15 | E_INPUT |
+
+<!-- blind:strip -->
 Property (KR-4, the K-4 acceptance test): appending any record with `knowledge_time > K` leaves every `(K, V)` answer unchanged byte for byte. Example: bt_k-0001 is unchanged after appending seq 3 and seq 4, because both have `knowledge_time > 2026-03-15`.
+<!-- /blind:strip -->
 
 ## Acceptance (fixed before any run)
 
