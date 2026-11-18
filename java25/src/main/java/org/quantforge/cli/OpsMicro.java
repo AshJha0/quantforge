@@ -40,6 +40,7 @@ final class OpsMicro {
         multiAsset(table, "micro.rates.tick_value", MultiAsset::ratesTickValue);
         multiAsset(table, "micro.rates.bond_price", MultiAsset::ratesBondPrice);
         multiAsset(table, "micro.rates.bill_price", MultiAsset::ratesBillPrice);
+        multiAsset(table, "micro.rates.bond_yield", MultiAsset::ratesBondYield);
         multiAsset(table, "exec.sim.fut.to_ticks", MultiAsset::futToTicks);
         multiAsset(table, "exec.sim.fut.to_text", MultiAsset::futToText);
         multiAsset(table, "exec.sim.fut.pnl", MultiAsset::futPnl);
@@ -81,9 +82,10 @@ final class OpsMicro {
         String lot = in.string("lot_size");
         List<?> events = array(in, "events");
         Map<?, ?> fees = in.object("fee_schedule").raw();
+        Map<?, ?> session = in.has("session") ? in.object("session").raw() : null;
         in.limit(events.size() > LitMatching.MAX_EVENTS, "events");
         in.gate();
-        return new Out(LitMatching.run(tick, lot, events, fees), Map.of());
+        return new Out(LitMatching.run(tick, lot, events, fees, session), Map.of());
     }
 
     /** One run ({@code config}, {@code events}) or several ({@code scenarios}), {@code 10-execution/dark-pool.md}. */

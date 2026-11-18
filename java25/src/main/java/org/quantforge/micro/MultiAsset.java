@@ -13,11 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.quantforge.core.Json;
 import org.quantforge.core.QfError;
+import org.quantforge.core.Rng;
+import org.quantforge.core.RootFinders;
 
 /**
  * Multi-asset microstructure: equities (H-22), FX spot (H-23) and rates (H-24). Port of the Python
@@ -42,8 +45,8 @@ public final class MultiAsset {
     /** [REGNMS-612] penny tier and the current narrow-spread half-penny tier: rows of [floor, tick]. */
     private static final String[][] DEFAULT_TICK_TABLE = {{"0", "0.0001"}, {"1.00", "0.01"}};
     private static final String[][] HALF_PENNY_TABLE = {{"0", "0.0001"}, {"1.00", "0.005"}};
-    /** Dated rule versions (2026-11-18 ruling after the HR-98 source check); default UNVERIFIED. */
-    public static final String RULE_2024_COMPLIANCE = "2026-11-03";
+    /** Dated rule versions: first business day of November 2025, release 34-101070 section VI (HR-110). */
+    public static final String RULE_2024_COMPLIANCE = "2025-11-03";
     private static final BigDecimal FEE_CAP_CURRENT = new BigDecimal("0.001"); // [REGNMS-610] read 2026-11-18
     private static final BigDecimal FEE_CAP_OLD = new BigDecimal("0.003");
     private static final List<String> CCY_ORDER = List.of("EUR", "GBP", "AUD", "NZD", "USD", "CAD", "CHF", "JPY");
@@ -51,9 +54,11 @@ public final class MultiAsset {
     private static final Map<String, String[]> CONTRACTS = Map.of( // HR-91, [CME-ZN] and [CME-ZB]
             "ZN", new String[] {"100000", "0.015625"},
             "ZB", new String[] {"100000", "0.03125"});
-    private static final Set<Integer> RESOLUTIONS = Set.of(32, 64, 128, 256);
-    private static final String EIGHTHS = "0123+567"; // index = eighths of a 32nd; '0' means no suffix
-    private static final Pattern N32 = Pattern.compile("([0-9]+)-([0-9]{2})([1235-7+]?)");
+    private static final Set<Integer> RESOLUTIONS = Set.of(32, 64, 128);
+    /** HR-109: CME third digit in quarter-32nds: 0, 2, 5, 7 = 0, 1/4, 1/2, 3/4 and "+" = 1/2. */
+    private static final Map<String, Integer> QUARTERS = Map.of("", 0, "0", 0, "2", 1, "5", 2, "+", 2, "7", 3);
+    private static final String[] QUARTER_TEXT = {"", "2", "+", "7"};
+    private static final Pattern N32 = Pattern.compile("([0-9]+)-([0-9]{2})(.?)");
     private static final Pattern DATE = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
     public static final int MAX_CANDIDATES = 1_000_000;
     public static final int MAX_ORDERS = 10_000_000;
@@ -112,6 +117,19 @@ public final class MultiAsset {
         }
         if (v instanceof Integer x) {
             return x;
+        }
+        throw err("E_SCHEMA", path + ": not an integer", path);
+    }
+
+    private static BigInteger bigInt(Object v, String path) {
+        if (v instanceof Json.Number n && n.isIntegerForm()) {
+            return new BigInteger(n.text());
+        }
+        if (v instanceof Long x) {
+            return BigInteger.valueOf(x);
+        }
+        if (v instanceof Integer x) {
+            return BigInteger.valueOf(x);
         }
         throw err("E_SCHEMA", path + ": not an integer", path);
     }
@@ -303,7 +321,6 @@ public final class MultiAsset {
 
     /** {@code micro.eq.round_price} (HR-81): a buy rounds down to the grid, a sell up. */
     public static Map<String, Object> eqRoundPrice(Map<?, ?> raw) {
-        String label = labelEq(raw);
         BigDecimal price = dec(raw, "price");
         boolean buy = enumOf(raw, "side", "", "BUY", "SELL").equals("BUY");
         List<BigDecimal[]> table = tickTable(raw);
@@ -311,12 +328,11 @@ public final class MultiAsset {
         BigDecimal tick = tickAt(table, price);
         BigDecimal r = c(floorDiv(price, tick, !buy).multiply(tick));
         // A sell rounded up across a floor lands on the floor, which is on both grids (HR-81).
-        return out("label", label, "price", at(r, places(tickAt(table, r))));
+        return out("price", at(r, places(tickAt(table, r))));
     }
 
     /** {@code micro.eq.fee_check} (HR-85): the [REGNMS-610] access-fee cap for the price band. */
     public static Map<String, Object> eqFeeCheck(Map<?, ?> raw) {
-        String label = labelEq(raw);
         BigDecimal price = dec(raw, "price");
         BigDecimal fee = dec(raw, "taker_fee");
         boolean check = bool(raw, "cap_check", true);
@@ -326,7 +342,7 @@ public final class MultiAsset {
         if (check && fee.compareTo(cap) > 0) {
             throw err("E_DOMAIN", "taker_fee above the Rule 610 cap", "taker_fee");
         }
-        return out("cap", fmt(cap), "label", label, "taker_fee", fmt(fee));
+        return out("cap", fmt(cap), "taker_fee", fmt(fee));
     }
 
     private static boolean good(LocalDate d, Set<LocalDate> holidays) {
@@ -349,7 +365,6 @@ public final class MultiAsset {
 
     /** {@code micro.eq.round_lot} (HR-82 as dated rule versions). */
     public static Map<String, Object> eqRoundLot(Map<?, ?> raw) {
-        String label = labelEq(raw);
         BigDecimal price = dec(raw, "price");
         boolean cur = current(raw);
         positivePrice(price);
@@ -363,19 +378,18 @@ public final class MultiAsset {
                 }
             }
         }
-        return out("label", label, "round_lot", lot);
+        return out("round_lot", lot);
     }
 
     /** Equities settlement date (HR-86): {@code settle_lag} business days on the supplied calendar. */
     public static Map<String, Object> eqSettleDate(Map<?, ?> raw) {
-        String label = labelEq(raw);
         LocalDate trade = date(need(raw, "trade_date", ""), "trade_date");
         long lag = intOf(get(raw, "settle_lag", 1L), "settle_lag");
         Set<LocalDate> hol = dates(get(raw, "holidays", List.of()), "holidays");
         if (lag < 0 || lag > 30) {
             throw err("E_DOMAIN", "settle_lag outside 0..30", "settle_lag");
         }
-        return out("label", label, "settle_date", addGood(trade, lag, d -> good(d, hol)).toString());
+        return out("settle_date", addGood(trade, lag, d -> good(d, hol)).toString());
     }
 
     // ------------------------------------------------------------------ equity auction (HR-84, HR-96, HR-101)
@@ -603,7 +617,7 @@ public final class MultiAsset {
         if (notional.signum() < 0) {
             throw err("E_DOMAIN", "notional must not be negative", "notional");
         }
-        return out("currency", quote, "label", FX_LABEL, "pip_value", fmt(c(notional.multiply(pip(quote)))));
+        return out("currency", quote, "pip_value", fmt(c(notional.multiply(pip(quote)))));
     }
 
     /** FX spot value date (HR-89): T+2 (T+1 pairs) good days in both currencies, then a USD day. */
@@ -636,7 +650,7 @@ public final class MultiAsset {
         LocalDate d = t1l.contains(bq[0] + bq[1]) ? addGood(trade, 1, both)
                 : addGood(addGood(trade, 1, nonUsd), 1, both);
         d = addGood(d.minusDays(1), 1, x -> both.test(x) && good(x, hol.getOrDefault("USD", empty)));
-        return out("label", FX_LABEL, "spot_date", d.toString());
+        return out("spot_date", d.toString());
     }
 
     /** {@code exec.sim.fx.stream}: bid rounded down and ask rounded up to the tick (fx-rfq-venue.md). */
@@ -686,7 +700,20 @@ public final class MultiAsset {
         BigDecimal thr = dec(raw, "threshold_pips");
         boolean sym = bool(raw, "symmetric", true);
         BigDecimal prr = dec(raw, "p_random_reject");
-        BigDecimal u = dec(raw, "u");
+        boolean drawn = !raw.containsKey("u");
+        double uf = 0;
+        BigDecimal u;
+        if (drawn) { // HR-97: u from core.rng, stream = request_index (rng.md jumps)
+            BigInteger seed = bigInt(need(raw, "seed", ""), "seed");
+            BigInteger idx = bigInt(need(raw, "request_index", ""), "request_index");
+            if (idx.signum() < 0 || seed.signum() < 0 || seed.bitLength() > 64 || idx.bitLength() > 31) {
+                throw err("E_SCHEMA", "seed or request_index out of range", "request_index");
+            }
+            uf = Rng.seeded(seed.longValue(), idx.intValue()).nextUniform();
+            u = new BigDecimal(uf);
+        } else {
+            u = dec(raw, "u");
+        }
         String quote = pair(raw)[1];
         if (bid.compareTo(ask) > 0) {
             throw err("E_INPUT", "quote: bid above ask", "quote");
@@ -706,7 +733,11 @@ public final class MultiAsset {
             outcome = "FILL";
         }
         String price = outcome.equals("FILL") ? fmt(buy ? ask : bid) : null;
-        return out("label", FX_LABEL, "move_pips", fmt(move), "outcome", outcome, "price", price);
+        Map<String, Object> r = out("label", FX_LABEL, "move_pips", fmt(move), "outcome", outcome, "price", price);
+        if (drawn) {
+            r.put("u", uf);
+        }
+        return r;
     }
 
     // ------------------------------------------------------------------ rates (H-24)
@@ -717,42 +748,40 @@ public final class MultiAsset {
             throw err("E_SCHEMA", path + ": not a string", path);
         }
         Matcher m = N32.matcher(s);
-        if (!m.matches()) {
-            throw err("E_INPUT", path + ": not H-FF[f]", path);
+        if (!m.matches() || !QUARTERS.containsKey(m.group(3))) {
+            throw err("E_SCHEMA", path + ": not H-FF[q] with q in 0, 2, 5, 7, + (HR-109)", path);
         }
         int ff = Integer.parseInt(m.group(2));
         if (ff > 31) {
             throw err("E_DOMAIN", path + ": 32nds above 31", path);
         }
-        int e = m.group(3).isEmpty() ? 0 : EIGHTHS.indexOf(m.group(3).charAt(0));
-        BigDecimal frac = BigDecimal.valueOf(ff * 8L + e).divide(BigDecimal.valueOf(256));
+        BigDecimal frac = BigDecimal.valueOf(ff * 4L + QUARTERS.get(m.group(3))).divide(BigDecimal.valueOf(128));
         return OrderBook.range(new BigDecimal(new BigInteger(m.group(1))).add(frac), path, OrderBook.MAX_SCALE);
     }
 
     public static String format32nds(BigDecimal x, long resolution) {
-        if (resolution > 256 || !RESOLUTIONS.contains((int) resolution)) {
-            throw err("E_DOMAIN", "resolution not 32, 64, 128 or 256", "resolution");
+        if (resolution > 128 || !RESOLUTIONS.contains((int) resolution)) {
+            throw err("E_DOMAIN", "resolution not 32, 64 or 128", "resolution");
         }
         if (x.signum() < 0 || x.multiply(BigDecimal.valueOf(resolution)).remainder(BigDecimal.ONE).signum() != 0) {
             throw err("E_DOMAIN", "value not on the requested grid", "value");
         }
         BigInteger h = x.toBigInteger();
-        int eighths = x.subtract(new BigDecimal(h)).multiply(BigDecimal.valueOf(256)).intValueExact();
-        int ff = eighths / 8;
-        int f = eighths % 8;
-        return h + "-" + (ff < 10 ? "0" : "") + ff + (f == 0 ? "" : String.valueOf(EIGHTHS.charAt(f)));
+        int quarters = x.subtract(new BigDecimal(h)).multiply(BigDecimal.valueOf(128)).intValueExact();
+        int ff = quarters / 4;
+        return h + "-" + (ff < 10 ? "0" : "") + ff + QUARTER_TEXT[quarters % 4];
     }
 
     /** 32nds text to a decimal (HR-90). */
     public static Map<String, Object> ratesParse32nds(Map<?, ?> raw) {
-        return out("label", RATES_LABEL, "value", fmt(parse32nds(need(raw, "text", ""), "text")));
+        return out("value", fmt(parse32nds(need(raw, "text", ""), "text")));
     }
 
     /** A decimal to 32nds text at {@code resolution} parts per point (HR-90). */
     public static Map<String, Object> ratesFormat32nds(Map<?, ?> raw) {
         BigDecimal x = dec(raw, "value");
         long res = integer(raw, "resolution");
-        return out("label", RATES_LABEL, "text", format32nds(x, res));
+        return out("text", format32nds(x, res));
     }
 
     private static BigDecimal[] contract(Map<?, ?> raw) {
@@ -781,7 +810,7 @@ public final class MultiAsset {
         if (face.signum() <= 0 || tick.signum() <= 0) {
             throw err("E_DOMAIN", "face and tick must be positive", "face");
         }
-        return out("label", RATES_LABEL, "tick_value", fmt(tickValue(face, tick)));
+        return out("tick_value", fmt(tickValue(face, tick)));
     }
 
     private static String price9(BigDecimal p) {
@@ -814,7 +843,42 @@ public final class MultiAsset {
             p = p.add(cpn.divide(gi.round(MC), MC), MC);
         }
         p = p.add(HUNDRED.divide(gi.round(MC), MC), MC);
-        return out("label", RATES_LABEL, "price", price9(c(p.setScale(30, RoundingMode.HALF_EVEN))));
+        return out("price", price9(c(p.setScale(30, RoundingMode.HALF_EVEN))));
+    }
+
+    /** Yield from a coupon-date price (HR-92): Brent ({@code core.solve}), tolerance 1e-12, binary64. */
+    public static Map<String, Object> ratesBondYield(Map<?, ?> raw) {
+        BigDecimal cp = dec(raw, "coupon");
+        BigDecimal p = dec(raw, "price");
+        long f = integer(raw, "frequency");
+        long n = integer(raw, "periods");
+        if (f != 1 && f != 2 && f != 4 && f != 12) {
+            throw err("E_DOMAIN", "frequency not 1, 2, 4 or 12", "frequency");
+        }
+        if (n < 1 || n > 1200) {
+            throw err("E_DOMAIN", "periods outside 1..1200", "periods");
+        }
+        if (p.signum() <= 0) {
+            throw err("E_DOMAIN", "price must be positive", "price");
+        }
+        double cf = HUNDRED.multiply(cp).divide(BigDecimal.valueOf(f), MC).doubleValue();
+        double pf = p.doubleValue();
+        double fd = f;
+        DoubleUnaryOperator g = y -> {
+            double d = 1.0 + y / fd;
+            double s = 0.0;
+            for (int i = 1; i <= n; i++) {
+                s += cf / Math.pow(d, i);
+            }
+            return s + 100.0 / Math.pow(d, n) - pf;
+        };
+        double lo = -0.99 * f;
+        double hi = 10.0;
+        if (g.applyAsDouble(lo) * g.applyAsDouble(hi) > 0) {
+            throw err("E_DOMAIN", "no yield in (-0.99 f, 10)", "price");
+        }
+        double y = RootFinders.brent(g, lo, hi, new RootFinders.Tolerances(1e-12, 0.0, 200)).root();
+        return out("yield", y);
     }
 
     /** Bill price on the discount basis [UST-BILL]: 100 (1 - d days / 360), 9 decimals. */
@@ -826,7 +890,7 @@ public final class MultiAsset {
         }
         BigDecimal x = d.multiply(BigDecimal.valueOf(days), MC).divide(BigDecimal.valueOf(360), MC);
         BigDecimal p = HUNDRED.multiply(BigDecimal.ONE.subtract(x, MC), MC);
-        return out("label", RATES_LABEL, "price", price9(p));
+        return out("price", price9(p));
     }
 
     private static BigInteger futTicks(Object v, BigDecimal tick, String path) {
@@ -853,9 +917,9 @@ public final class MultiAsset {
             throw err("E_DOMAIN", "ticks must not be negative", "ticks");
         }
         BigDecimal res = BigDecimal.ONE.divide(tick, MC);
-        if (res.remainder(BigDecimal.ONE).signum() != 0 || res.compareTo(BigDecimal.valueOf(256)) > 0
+        if (res.remainder(BigDecimal.ONE).signum() != 0 || res.compareTo(BigDecimal.valueOf(128)) > 0
                 || !RESOLUTIONS.contains(res.intValue())) {
-            throw err("E_DOMAIN", "contract tick is not 1/32, 1/64, 1/128 or 1/256", "contract");
+            throw err("E_DOMAIN", "contract tick is not 1/32, 1/64 or 1/128", "contract");
         }
         return out("label", RATES_LABEL, "text", format32nds(BigDecimal.valueOf(t).multiply(tick), res.intValue()));
     }

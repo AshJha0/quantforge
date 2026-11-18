@@ -32,7 +32,7 @@ import org.quantforge.core.QfError;
  */
 class MultiAssetTest {
     private static final Path GOLD = Path.of("..", "datasets", "golden", "stage_h");
-    private static final String[] SUITES = {"auc_h", "eqc_h", "fxc_h", "fxv_h", "rtc_h", "fut_h", "e1_h3"};
+    private static final String[] SUITES = {"auc_h", "eqc_h", "fxc_h", "fxv_h", "rtc_h", "fut_h", "ses_h", "acls_h", "e1_h3"};
     private static final Map<String, Function<Map<?, ?>, Map<String, Object>>> FN = new HashMap<>();
     private static final Set<String> LABELS =
             Set.of(MultiAsset.EQ_LABEL, MultiAsset.IEX_LABEL, MultiAsset.FX_LABEL, MultiAsset.RATES_LABEL);
@@ -57,6 +57,10 @@ class MultiAssetTest {
         FN.put("exec.sim.fut.pnl", MultiAsset::futPnl);
         FN.put("exec.sim.fut.variation", MultiAsset::futVariation);
         FN.put("exec.sim.fut.run", MultiAsset::futRun);
+        FN.put("micro.rates.bond_yield", MultiAsset::ratesBondYield);
+        FN.put("exec.sim.lit.run", i -> LitMatching.run((String) i.get("tick_size"), (String) i.get("lot_size"),
+                (List<?>) i.get("events"), (Map<?, ?>) i.get("fee_schedule"), i.get("session")));
+        FN.put("exec.sor.allocate", Sor::allocate);
     }
 
     private static Object canon(Object v) {
@@ -93,8 +97,16 @@ class MultiAssetTest {
                         assertEquals(exp.get("error_code"), e.code(), e.getMessage());
                     } else {
                         Map<String, Object> got = fn.apply(inp);
-                        assertEquals(text(exp.get("outputs")), text(got), String.valueOf(c.get("case_id")));
-                        assertTrue(LABELS.contains(got.get("label")));
+                        String op = (String) c.get("operation");
+                        if (op.equals("micro.rates.bond_yield")) {
+                            double want = ((Json.Number) ((Map<?, ?>) exp.get("outputs")).get("yield")).value();
+                            assertEquals(want, (Double) got.get("yield"), 1e-10);
+                        } else {
+                            assertEquals(text(exp.get("outputs")), text(got), String.valueOf(c.get("case_id")));
+                        }
+                        // A4 as ruled 2026-11-18 (HR-111): venue and simulator outputs carry a label, conventions none
+                        boolean venue = op.startsWith("exec.") && !op.equals("exec.sor.allocate");
+                        assertTrue(venue ? LABELS.contains(got.get("label")) : !got.containsKey("label"));
                     }
                 }));
             }
@@ -135,10 +147,10 @@ class MultiAssetTest {
     }
 
     @Test
-    void a3ThirtySecondsRoundTripOn256Grid() {
-        for (int n = 0; n < 256 * 130; n += 7) {
-            BigDecimal x = BigDecimal.valueOf(n).divide(BigDecimal.valueOf(256));
-            String t = (String) MultiAsset.ratesFormat32nds(m("resolution", 256L, "value", x.toPlainString()))
+    void a3ThirtySecondsRoundTripOn128Grid() {
+        for (int n = 0; n < 128 * 130; n += 7) { // HR-109: quarter-32nds, so the 1/128 grid
+            BigDecimal x = BigDecimal.valueOf(n).divide(BigDecimal.valueOf(128));
+            String t = (String) MultiAsset.ratesFormat32nds(m("resolution", 128L, "value", x.toPlainString()))
                     .get("text");
             assertEquals(0, new BigDecimal((String) MultiAsset.ratesParse32nds(m("text", t)).get("value"))
                     .compareTo(x));
@@ -262,8 +274,9 @@ class MultiAssetTest {
 
     @Test
     void morePaths() {
-        assertEquals(MultiAsset.IEX_LABEL,
-                MultiAsset.eqRoundPrice(m("price", "5", "side", "BUY", "data_source", "IEX")).get("label"));
+        assertTrue(!MultiAsset.eqRoundPrice(m("price", "5", "side", "BUY")).containsKey("label"));
+        assertEquals(MultiAsset.IEX_LABEL, MultiAsset.auctionUncross(m("orders", List.of(), "phase", "OPEN",
+                "ref_price", "1", "tick_size", "0.01", "data_source", "IEX")).get("label"));
         assertEquals("0.001", MultiAsset.eqFeeCheck(m("price", "20", "taker_fee", "0.01", "cap_check", false))
                 .get("cap"));
         assertEquals("100", MultiAsset.ratesBondPrice(m("coupon", "0", "frequency", 1L, "periods", 1L, "yield", "0"))
@@ -276,13 +289,15 @@ class MultiAssetTest {
         assertEquals("E_INPUT", code(rp, m("price", "1", "side", "BUY", "tick_table", List.of(List.of("1", "0.01")))));
         assertEquals("E_DOMAIN", code(rp, m("price", "1", "side", "BUY", "tick_table", List.of(List.of("0", "0")))));
         assertEquals("E_SCHEMA", code(rp, m("price", "1", "side", "BUY", "tick_tier", "X")));
-        assertEquals("E_SCHEMA", code(rp, m("price", "1", "side", "BUY", "data_source", "X")));
         assertEquals("E_SCHEMA", code(rp, m("price", 1L, "side", "BUY")));
         assertEquals("E_SCHEMA", code(MultiAsset::eqSettleDate, m("trade_date", "2026-13-01")));
         assertEquals("E_INPUT", code(MultiAsset::fxPipValue, m("notional", "1", "pair", "USDEUR")));
         assertEquals("E_INPUT", code(MultiAsset::fxPipValue, m("notional", "1", "pair", "EUR")));
         assertEquals("E_DOMAIN", code(MultiAsset::ratesFormat32nds, m("value", "1", "resolution", 100L)));
-        assertEquals("E_INPUT", code(MultiAsset::ratesParse32nds, m("text", "1-1")));
+        assertEquals("E_SCHEMA", code(MultiAsset::ratesParse32nds, m("text", "1-1")));
+        assertEquals("E_SCHEMA", code(MultiAsset::ratesParse32nds, m("text", "1-013")));
+        assertEquals("E_DOMAIN", code(MultiAsset::ratesBondYield, m("coupon", "0.04", "frequency", 2L,
+                "periods", 2L, "price", "0.0001")));
         assertEquals("E_DOMAIN", code(MultiAsset::ratesParse32nds, m("text", "1-32")));
         assertEquals("E_SCHEMA", code(MultiAsset::ratesParse32nds, m("text", 1L)));
         assertEquals("E_DOMAIN", code(MultiAsset::futToText, m("ticks", 1L, "contract", m("face", "1", "tick", "0.1"))));
@@ -290,5 +305,57 @@ class MultiAssetTest {
         assertEquals("E_INPUT", code(MultiAsset::futVariation, m("side", "BUY", "qty", 1L, "price", "1",
                 "settlements", List.of())));
         assertEquals("E_DOMAIN", code(MultiAsset::eqSettleDate, m("trade_date", "2026-11-18", "settle_lag", 31L)));
+    }
+
+    @Test
+    void hr93AssetClassDarkAndSor() {
+        for (String cls : new String[] {"FX", "RATES"}) {
+            assertEquals("E_UNSUPPORTED_OPERATION", assertThrows(QfError.class, () -> DarkPool.run(
+                    m("lot_size", "1", "tick_size", "0.01", "p_firm", "1", "seed", 1L, "asset_class", cls),
+                    List.of())).code());
+        }
+        assertTrue(DarkPool.run(m("lot_size", "1", "tick_size", "0.01", "p_firm", "1", "seed", 1L,
+                "asset_class", "EQUITY"), List.of()).containsKey("label"));
+        Map<String, Object> base = m("S", "4", "f", "0.3", "h", "0.5", "lambda_o", "1", "lambda_u", "1",
+                "theta", "0", "lit_samples", List.of(List.of("0"), List.of("4")), "asset_class", "FX",
+                "venues", List.of(m("Q", "0", "as", "0", "kind", "LIT", "r", "0.2", "asset_class", "FX"),
+                        m("as", "0.1", "kind", "DARK", "r", "0", "tail", List.of("0.5", "0"), "asset_class", "FX")));
+        assertEquals("E_UNSUPPORTED_OPERATION", code(Sor::allocate, base));
+        base.put("asset_class", "RATES");
+        assertEquals("E_INPUT", code(Sor::allocate, base));
+    }
+
+    @Test
+    void lastLookDrawReproducible() {
+        Map<String, Object> inp = m("mid_after", "1.0852", "p_random_reject", "0.5", "pair", "EURUSD", "qty", "1",
+                "quote", m("ask", "1.0852", "bid", "1.0850", "quote_mid", "1.0851"), "side", "BUY",
+                "threshold_pips", "2", "seed", 7L, "request_index", 5L);
+        Map<String, Object> out = MultiAsset.fxRequest(inp);
+        assertEquals(org.quantforge.core.Rng.seeded(7, 5).nextUniform(), (Double) out.get("u"));
+        assertEquals(text(out), text(MultiAsset.fxRequest(inp)));
+        inp.put("request_index", -1L);
+        assertEquals("E_SCHEMA", code(MultiAsset::fxRequest, inp));
+    }
+
+    @Test
+    void sessionConservationAndPhaseOrder() {
+        List<Object> ev = new ArrayList<>(List.of(
+                m("id", "B1", "op", "NEW", "qty", "5", "side", "BUY", "trader", "A", "type", "LIMIT", "price", "1.00"),
+                m("id", "S1", "op", "NEW", "qty", "5", "side", "SELL", "trader", "B", "type", "LIMIT", "price", "1.01"),
+                m("id", "S1", "op", "CANCEL")));
+        Map<String, Object> fees = m("maker_rebate", "0", "taker_fee", "0");
+        Map<String, Object> out = LitMatching.run("0.01", "1", ev, fees, m("ref_price", "1"));
+        assertEquals("PRE_OPEN", out.get("phase"));
+        assertEquals(List.of(), out.get("auctions"));
+        Map<?, ?> cons = (Map<?, ?>) out.get("conservation");
+        assertEquals("5", ((Map<?, ?>) cons.get("B1")).get("resting"));
+        assertEquals("5", ((Map<?, ?>) cons.get("S1")).get("cancelled"));
+        ev.set(2, m("op", "PHASE", "phase", "CONTINUOUS"));
+        out = LitMatching.run("0.01", "1", ev, fees, m("ref_price", "1"));
+        assertEquals(null, ((Map<?, ?>) ((List<?>) out.get("auctions")).get(0)).get("price"));
+        assertEquals(1, ((List<?>) ((Map<?, ?>) out.get("book")).get("bids")).size());
+        ev.add(m("op", "PHASE", "phase", "PRE_OPEN"));
+        assertEquals("E_INPUT", assertThrows(QfError.class,
+                () -> LitMatching.run("0.01", "1", ev, fees, m("ref_price", "1"))).code());
     }
 }
