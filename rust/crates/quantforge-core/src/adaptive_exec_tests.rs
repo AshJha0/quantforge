@@ -533,3 +533,27 @@ fn pretrade_monotonicity() {
         );
     }
 }
+
+/// A bad leg quantity names `quantity` as its field in all four builds (`adaptive-algos.md`).
+#[test]
+fn leg_quantity_error_names_quantity() {
+    let a = Leg {
+        buy: true,
+        quantity: 0.0,
+        price: 50.0,
+    };
+    let b = Leg {
+        buy: false,
+        quantity: 0.0,
+        price: 25.0,
+    };
+    let e = pair(a, b, false, None, 2, false).unwrap_err();
+    assert_eq!((e.code, e.field.as_deref()), ("E_INPUT", Some("quantity")));
+    let legs = [Leg {
+        buy: true,
+        quantity: 2.5,
+        price: 10.0,
+    }];
+    let e = basket(&legs, 2, true).unwrap_err();
+    assert_eq!((e.code, e.field.as_deref()), ("E_INPUT", Some("quantity")));
+}

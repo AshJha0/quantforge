@@ -327,4 +327,16 @@ class AdaptiveExecTest {
             assertTrue(lo.timingRiskBps() >= hi.timingRiskBps() * (1 - 1e-14));
         }
     }
+
+    /** A bad leg quantity names {@code quantity} as its field in all four builds (adaptive-algos.md). */
+    @Test
+    void legQuantityErrorNamesQuantity() {
+        org.quantforge.core.QfError e = org.junit.jupiter.api.Assertions.assertThrows(org.quantforge.core.QfError.class,
+                () -> AdaptiveExec.pair(Side.BUY, 0.0, 50.0, Side.SELL, 25.0, PairMode.CASH_BALANCED, null, 2, Mode.CONTINUOUS));
+        assertEquals("quantity", e.field());
+        AdaptiveExec.Leg[] legs = {new AdaptiveExec.Leg(Side.BUY, 2.5, 10.0)};
+        e = org.junit.jupiter.api.Assertions.assertThrows(org.quantforge.core.QfError.class,
+                () -> AdaptiveExec.basket(legs, 2, Mode.UNITS));
+        assertEquals("quantity", e.field());
+    }
 }

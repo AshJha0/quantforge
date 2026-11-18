@@ -238,7 +238,7 @@ public final class AdaptiveExec {
     public static Pair pair(Side sideA, double qa, double pa, Side sideB, double pb, PairMode pairMode,
             Double hedgeRatio, long n, Mode mode) {
         buckets(n);
-        quantity(qa, mode, "leg_a");
+        quantity(qa, mode, "quantity");  // the leg key, as in Python, C++ and Rust (adaptive-algos.md)
         if (pairMode == PairMode.CASH_BALANCED && sideA == sideB) {
             throw input("leg_b", "a cash-balanced pair needs opposite sides");
         }
@@ -287,7 +287,7 @@ public final class AdaptiveExec {
         }
         buckets(n);
         for (Leg g : legs) {
-            quantity(g.quantity(), mode, "legs");
+            quantity(g.quantity(), mode, "quantity");
         }
         for (Leg g : legs) {
             if (!(g.price() > 0)) {

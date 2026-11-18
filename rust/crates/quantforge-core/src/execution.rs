@@ -8,7 +8,7 @@
 //! (8), (16)-(19); [OW13] Obizhaeva and Wang, J. Financial Markets 16(1), eq. (31); [TLD11] Toth
 //! et al., Phys. Rev. X 1, 021006, eq. (1); [Per88] Perold (recalled); [AS08] Avellaneda and
 //! Stoikov, Quantitative Finance 8(3), eqs. (29)-(30).
-use crate::error::{Result, fail};
+use crate::error::{Result, err, fail};
 
 /// HR-10: the label on outputs that rest on assumed, uncalibrated parameters.
 pub const MODEL: &str = "assumed parameters; not calibrated to any venue";
@@ -31,15 +31,18 @@ impl Amount {
 }
 
 /// HR-2, HR-3: the order is positive, and a whole number of units in `UNITS` mode.
+/// The error names `quantity` as its field (also for a pair or basket leg; `adaptive-algos.md`).
 pub(crate) fn quantity(x: f64, units: bool) -> Result<()> {
+    let at = |msg: &str| {
+        let mut e = err("E_INPUT", msg);
+        e.field = Some("quantity".to_string());
+        Err(e)
+    };
     if x <= 0.0 {
-        return fail("E_INPUT", "quantity must be positive");
+        return at("quantity must be positive");
     }
     if units && x != x.floor() {
-        return fail(
-            "E_INPUT",
-            "quantity must be a whole number of units in UNITS mode",
-        );
+        return at("quantity must be a whole number of units in UNITS mode");
     }
     Ok(())
 }
