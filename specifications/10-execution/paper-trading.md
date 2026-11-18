@@ -1,6 +1,6 @@
 # Paper trading with simulated fills
 
-Spec version 0.1.0 (stage H item H-21, moved from stage K by the owner 2026-11-18). Status: Specified; ledger, book (positions, cash, financing, P&L explain) and pre-trade checks implemented in Python (`quantforge_core/paper.py`); fill wiring to the simulated venues not implemented. Rulings HR-42 to HR-55 (proposed, `stage-h-rulings-h21.md`). Plan items: section 2 owner decision "proper paper trading", 12.7 Q8k (TCA and the fill simulator wired into paper trading; the ledger carries TCA per order). The public dashboard stays in stage K and is out of scope here.
+Spec version 0.1.0 (stage H item H-21, moved from stage K by the owner 2026-11-18). Status: Specified; ledger, book (positions, cash, financing, P&L explain) and pre-trade checks implemented in Python (`quantforge_core/paper.py`); fills from the lit, dark and SOR simulators, per-order TCA records and the session close implemented in Python (`quantforge_core/paper_fills.py`, A7). Rulings HR-42 to HR-55 (proposed, `stage-h-rulings-h21.md`). Plan items: section 2 owner decision "proper paper trading", 12.7 Q8k (TCA and the fill simulator wired into paper trading; the ledger carries TCA per order). The public dashboard stays in stage K and is out of scope here.
 
 **Every output is labelled "crypto venue; simulated"** (HR-43), and every report also carries the 11.6 honest-ceiling sentence: "Paper trading on free data; simulated fills; no evidence of tradable profitability." **No live order is ever placed**: there is no code path to any venue's order entry, and a request with `mode` other than `"simulated"` is `E_UNSUPPORTED_OPERATION` (HR-42).
 
@@ -23,7 +23,7 @@ Prices, quantities, cash and rates are decimal strings in inputs, outputs and th
 ### Orders and fills
 An order: `order_id`, `symbol`, `side` (BUY, SELL), `type` (LIMIT, MARKET, IOC, plus the lit types of HR-25 passed through), `quantity` (> 0), `limit_price` (required unless MARKET), `venue` (`LIT`, `DARK`, `SOR`). States as [FIX-ER].
 
-Fill source (HR-47, not implemented): the order is replayed into `lit-matching.md`, `dark-pool.md` or `smart-order-router.md`, seeded with the recorded book snapshot at the order time (forward-log per-second 100-level snapshots, form B of HR-11). Spread and slippage come from walking that book; partial fills come from the venue (IOC remainder cancelled; resting remainder cancelled at the daily close, HR-48). The simulated book does not remember our own past fills (no permanent impact on the recorded data) and this is stated as a limitation. Fees are the venue simulator's signed fees (HR-30).
+Fill source (HR-47, `paper_fills.py`): the order is replayed into `lit-matching.md`, `dark-pool.md` or `smart-order-router.md`, seeded with the recorded book snapshot at the order time (forward-log per-second 100-level snapshots, form B of HR-11). Spread and slippage come from walking that book; partial fills come from the venue (IOC remainder cancelled; resting remainder cancelled at the daily close, HR-48). The simulated book does not remember our own past fills (no permanent impact on the recorded data) and this is stated as a limitation. Fees are the venue simulator's signed fees (HR-30).
 
 ### Positions and cash (`paper.book.apply_fill`)
 Per symbol, signed position `n` and average cost `c` (HR-50, average-cost method). For a fill of side s (+1 BUY, -1 SELL), quantity q, price p, fee f (fee >= 0 charged, < 0 rebate):
@@ -83,7 +83,7 @@ When an order reaches a final state, a `TCA` record carries `exec.tca.shortfall`
 - A4 Pre-trade: goldens pt_h-0010..0018; property: an order accepted never makes |n| exceed max_abs_position when fully filled.
 - A5 No live path: a static test that no module under `quantforge_core/paper*` imports a network library or names an order-entry endpoint; mode `"live"` raises.
 - A6 Labels: every ledger record and report has the label; `verify` fails on a record without it.
-- A7 (not yet runnable) fills: lit, dark and SOR goldens of their own specs reproduced through the paper path, and every final order has one `TCA` record whose components sum to total to 1e-10 (tca.md).
+- A7 fills: lit, dark and SOR goldens of their own specs reproduced through the paper path, and every final order has one `TCA` record whose components sum to total to 1e-10 (tca.md).
 - A8 Determinism: the same order list and recorded snapshots give a byte-identical ledger.
 
 ## Golden cases
