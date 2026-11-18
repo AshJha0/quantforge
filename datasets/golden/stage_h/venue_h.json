@@ -95,7 +95,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): SHAPE-ONLY, values identical",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md, second derivation venue2): MATCH field by field",
     "mpmath 50 digits"
    ],
    "tags": [
@@ -198,7 +198,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): SHAPE-ONLY, values identical",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md, second derivation venue2): MATCH field by field",
     "mpmath 50 digits"
    ],
    "tags": [
@@ -301,7 +301,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): SHAPE-ONLY, values identical",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md, second derivation venue2): MATCH field by field",
     "mpmath 50 digits"
    ],
    "tags": [
@@ -387,7 +387,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): SHAPE-ONLY, values identical",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md, second derivation venue2): MATCH field by field",
     "mpmath 50 digits"
    ],
    "tags": [
@@ -469,7 +469,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md, second derivation venue2): MATCH field by field"
    ],
    "tags": [
     "stage_h",
@@ -553,7 +554,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "post-blind 2026-11-18 (h = 0 added after the blind lane): not blind-checked"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md, second derivation venue2): MATCH field by field"
    ],
    "tags": [
     "stage_h",
@@ -630,7 +631,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md, second derivation venue2): MATCH field by field"
    ],
    "tags": [
     "stage_h",
@@ -706,7 +708,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md, second derivation venue2): MATCH field by field"
    ],
    "tags": [
     "stage_h",
@@ -855,7 +858,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "exact rational (fractions)"
+    "exact rational (fractions)",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md, second derivation venue2): MATCH field by field"
    ],
    "tags": [
     "stage_h",

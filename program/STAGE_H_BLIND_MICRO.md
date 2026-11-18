@@ -51,3 +51,20 @@ Why: the compare above matched numbers as sorted multisets, which cannot see two
 Effect: H-4b 7 of 7 value cases blind-checked (was 5 of 7). H-16 stays 0 of 5 value cases, under the 60% item floor: no venue value case has every output field from the blind lane.
 
 Wave 2b (`STAGE_H_BLIND_WAVE2B.md`) used a keyed canonical-JSON compare, not a sorted-list one, and its SHAPE-ONLY cases were never counted, so the rule changes nothing there.
+
+## Second blind derivation of H-16 (2026-11-18, coordinator decision)
+
+Why: the first lane could not produce complete venue outputs because the spec did not then name them. This is a fresh derivation on a packet with the fixed output names, not a rerun to agree.
+
+- Packet: `wave2_make_packet.sh <stage-h3> <dir> venue` (venue-analytics.md stripped of Expected/Derivation, with values and verdicts removed by `venue_redact.py`; rulings micro and w2-exec). Manifest copied to `stage_h_blind/venue2/packet_MANIFEST.sha256`. Leak list (`venue_leaks.py`, kept outside the packet): 0 hard leaks.
+- Blind lane: a separate Sonnet context with the packet only. Frozen output `stage_h_blind/venue2/blind_results.json`, SHA-256 `bae6257fd95e6b447a3b480dc7bb55fe2ecdffb5b35d00e46a2941455c86d0e2` (checked by the script before reading; copied unedited with `blind_ref.py`, `notes.md`, `blind_results.sha256`). 9 cases; venue_h-0009 (generated F-2 case) not computed, the packet has no non-finite input.
+- Compare: `python -I program/stage_h_blind_w2/venue2_compare.py .`, mapping fixed before the first run and stated in the script: identity field names; `h` integer or float, a missing `status` wrapper on success, and key order are representation only; values at 1e-12 relative or 1e-15 absolute at 0, venue_h-0010 at absolute 0 as its golden states; every golden leaf needs exactly one blind leaf and no extra blind leaf.
+
+| Case | Result |
+|---|---|
+| venue_h-0001..0004 | MATCH (every field) |
+| venue_h-0005..0008 | MATCH (error code); 0005 and 0008 read as in the blind notes (order replaces A's; filled > sent before the negative horizon under HR-66) |
+| venue_h-0009 | not computed |
+| venue_h-0010 | MATCH at absolute 0 |
+
+No value mismatch, so nobody was wrong. H-16 is now 5 of 5 value cases blind-checked (100%); the goldens carry the second-derivation MATCH in `verified_by` (`oracle/python/gen_stage_h_micro.py`). No expected value changed.

@@ -26,6 +26,8 @@ REC = "program/STAGE_H_BLIND_MICRO.md"
 MATCH = f"blind-rederivation (DR-H2, {REC}): MATCH"
 SHAPE = f"blind-rederivation (DR-H2, {REC}): SHAPE-ONLY, values identical"
 # Field-by-field re-compare (program/stage_h_blind_w2/micro_fieldwise.py, fixed name map, frozen file SHA-256 checked).
+# Second blind derivation of H-16 (packet venue2, frozen SHA-256 bae6257f..., program/stage_h_blind_w2/venue2_compare.py).
+BLIND2 = f"blind-rederivation (DR-H2, {REC}, second derivation venue2): MATCH field by field"
 FIELDWISE = f"blind-rederivation (DR-H2, {REC}): MATCH field by field under the fixed name map"
 MP = "mpmath 50 digits"
 TOL = {"absolute": 1e-15, "relative": 1e-12}  # both specs: 1e-12 relative, an expected 0 to 1e-15 absolute
@@ -200,17 +202,17 @@ def base(h, orders=None, extra=None):
 
 OVERFILL = [{"venue": "A", "sent": 500.0, "filled": 600.0}, {"venue": "B", "sent": 300.0, "filled": 300.0}]
 VENUE = [  # case, inputs, table (venue: (markout, markout_bps, toxicity)) or fill rates or error code, verified_by
-    ("venue_h-0001", base([5.0]), {"A": ("0", "0", "0.666666666666667"), "B": ("0.05", "5", "0")}, ["hand", SHAPE]),
+    ("venue_h-0001", base([5.0]), {"A": ("0", "0", "0.666666666666667"), "B": ("0.05", "5", "0")}, ["hand", BLIND2]),
     ("venue_h-0002", base([10.0]), {"A": ("0.0233333333333333", "2.33278901589629", "0.333333333333333"),
-                                    "B": ("-0.02", "-2", "1")}, ["hand", SHAPE]),
+                                    "B": ("-0.02", "-2", "1")}, ["hand", BLIND2]),
     ("venue_h-0003", base([0.0]), {"A": ("0.00333333333333333", "0.333255573699470", "0.333333333333333"),
-                                   "B": ("0.02", "2", "0")}, ["hand", SHAPE]),
-    ("venue_h-0004", base([]), {"fill_rates": {"A": "0.6", "B": "1"}}, ["hand", SHAPE]),
-    ("venue_h-0005", base([5.0], OVERFILL), "E_INPUT", ["hand", MATCH]),
+                                   "B": ("0.02", "2", "0")}, ["hand", BLIND2]),
+    ("venue_h-0004", base([]), {"fill_rates": {"A": "0.6", "B": "1"}}, ["hand", BLIND2]),
+    ("venue_h-0005", base([5.0], OVERFILL), "E_INPUT", ["hand", MATCH, BLIND2]),
     ("venue_h-0006", base([0.0], extra=[{"venue": "B", "side": "BUY", "quantity": 10.0, "price": 100.0, "t": -1.0}]),
-     "E_INPUT", ["hand", "post-blind 2026-11-18 (h = 0 added after the blind lane): not blind-checked"]),
-    ("venue_h-0007", base([-1.0]), "E_DOMAIN", ["hand", MATCH]),
-    ("venue_h-0008", base([-1.0], OVERFILL), "E_INPUT", ["hand"]),  # HR-75 as amended (HR-66); was E_DOMAIN under HR-75
+     "E_INPUT", ["hand", BLIND2]),  # h = 0 added after the first blind lane; checked by the second
+    ("venue_h-0007", base([-1.0]), "E_DOMAIN", ["hand", MATCH, BLIND2]),
+    ("venue_h-0008", base([-1.0], OVERFILL), "E_INPUT", ["hand", BLIND2]),  # HR-75 as amended (HR-66); was E_DOMAIN under HR-75
 ]
 
 
@@ -290,7 +292,7 @@ def long_decimal(s):
                          "markout_bps": float(10000 * n / sum(a * b for a, b in zip(q, p))),
                          "toxicity": float(tox / sum(q))}]}
     assert out["markouts"][0]["markout"] == 5e-41 and out["markouts"][0]["markout_bps"] == 5.000500050005001e-39
-    s.add("exec.venue.analytics", inp, out, cls="simple_analytic", verified=["hand", "exact rational (fractions)"],
+    s.add("exec.venue.analytics", inp, out, cls="simple_analytic", verified=["hand", "exact rational (fractions)", BLIND2],
           limit={"absolute": 0.0, "relative": 1e-12}, tags=["stage_h", "execution", "boundary"],
           description="HR-76: exact unbounded sums; a 28-digit context returns markout 0")
     assert s.cases[-1]["case_id"] == "venue_h-0010"
