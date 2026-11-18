@@ -1,0 +1,156 @@
+{
+ "schema_version": "1.0",
+ "suite": "acls_h",
+ "spec": "specifications/09-microstructure/asset-conventions.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_ma.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "acls_h-0001",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "10",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "0.1",
+    "lit_samples": [
+     [
+      "10"
+     ],
+     [
+      "12"
+     ],
+     [
+      "15"
+     ]
+    ],
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "0",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2",
+      "asset_class": "FX"
+     }
+    ],
+    "asset_class": "FX"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "L": [
+      "10"
+     ],
+     "M": "0",
+     "expected_cost": "-7",
+     "expected_fill": "10",
+     "p_underfill": "0"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "acls_h-0001 hand: asset_class on SOR (HR-93); outputs as sor_h-0001 (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "acls_h-0002",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "10",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "0.1",
+    "lit_samples": [
+     [
+      "10"
+     ],
+     [
+      "12"
+     ],
+     [
+      "15"
+     ]
+    ],
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "0",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2",
+      "asset_class": "RATES"
+     }
+    ],
+    "asset_class": "EQUITY"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "acls_h-0002 hand: asset_class mismatch (HR-93) (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "acls_h-0003",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "10",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "0.1",
+    "lit_samples": [
+     [
+      "10"
+     ],
+     [
+      "12"
+     ],
+     [
+      "15"
+     ]
+    ],
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "0",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2",
+      "asset_class": "BONDS"
+     }
+    ],
+    "asset_class": "EQUITY"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "acls_h-0003 hand: asset_class schema (source check 2026-11-18); not blind"
+  }
+ ]
+}

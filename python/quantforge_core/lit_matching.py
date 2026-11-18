@@ -342,16 +342,197 @@ class _Engine:
         }
 
 
+PHASES = ("PRE_OPEN", "CONTINUOUS", "PRE_CLOSE", "CLOSED")  # HR-83
+
+
+class _Session:
+    """Equity session phases (asset-conventions.md 1.3, HR-83; auction.md). In PRE_OPEN, NEW LIMIT
+    and MARKET orders collect in a call book without matching; at CONTINUOUS the call book is
+    uncrossed by `exec.sim.auction.uncross` (phase OPEN) and its unfilled limit orders rest in the
+    continuous book in allocation order. In PRE_CLOSE only `on_close` orders are accepted, into a
+    second call book uncrossed at CLOSED (phase CLOSE); unfilled on-close orders are cancelled
+    (HR-96). Stated simplification: the continuous book does not join the closing cross. Orders in
+    the wrong phase are rejected with reason PHASE. Auction fills pay `auction_fee` x notional."""
+
+    def __init__(self, eng: _Engine, raw: dict[str, Any], fee: Decimal):
+        if not isinstance(raw, dict):
+            raise QfError("E_SCHEMA", "session: not an object", "session")
+        self.eng, self.fee = eng, fee
+        self.phase = raw.get("phase", "PRE_OPEN")
+        if self.phase not in PHASES:
+            raise QfError("E_SCHEMA", "session/phase: not a phase", "session/phase")
+        self.ref = _dec(raw.get("ref_price"), "session/ref_price")
+        self.tie = raw.get("tie_break", "CBOE")
+        self.call: list[dict[str, Any]] = []
+        self.trader: dict[str, str] = {}
+        self.auctions: list[dict[str, Any]] = []
+
+    def event(self, e: dict[str, Any], k: int) -> bool:
+        """True when the session handled the event (the engine must not)."""
+        op = e.get("op")
+        if op == "PHASE":
+            self.move(e.get("phase"), k)
+            return True
+        if self.phase == "CONTINUOUS":
+            return False
+        if op == "CANCEL":
+            for i, c in enumerate(self.call):
+                if c["id"] == e.get("id"):
+                    del self.call[i]
+                    self.eng.cancelled.append({"id": c["id"], "qty": fmt(c["qty_dec"])})
+                    self.eng.cons[c["id"]]["cancelled"] = c["qty_dec"]
+                    return True
+            return False
+        if op != "NEW":
+            return False
+        path = f"events/{k}"
+        oid, trader = e.get("id"), e.get("trader")
+        if not isinstance(oid, str) or not isinstance(trader, str):
+            raise QfError("E_SCHEMA", f"{path}: id and trader must be strings", path)
+        if e.get("side") not in ("BUY", "SELL") or e.get("type") not in TYPES:
+            raise QfError("E_SCHEMA", f"{path}: bad side or type", path)
+        on_close = e.get("on_close", False)
+        if not isinstance(on_close, bool):
+            raise QfError("E_SCHEMA", f"{path}/on_close: not a boolean", path)
+        qty = _dec(e.get("qty"), f"{path}/qty")
+        market = e["type"] == "MARKET"
+        limit = None if market else _dec(e.get("price"), f"{path}/price")
+        if oid in self.eng.seen:
+            raise QfError("E_INPUT", f"{path}: duplicate id {oid}", path)
+        if qty <= 0:
+            raise QfError("E_DOMAIN", f"{path}: quantity must be positive", path)
+        self.eng.on_grid(qty, self.eng.lot, "qty")
+        if limit is not None:
+            if limit <= 0:
+                raise QfError("E_DOMAIN", f"{path}: price must be positive", path)
+            self.eng.on_grid(limit, self.eng.tick, "price")
+        self.eng.seen.add(oid)
+        zero = Decimal(0)
+        self.eng.cons[oid] = {
+            "submitted": qty,
+            "filled": zero,
+            "resting": zero,
+            "cancelled": zero,
+            "rejected": zero,
+        }
+        ok = e["type"] in ("LIMIT", "MARKET") and (
+            self.phase == "PRE_OPEN" or (self.phase == "PRE_CLOSE" and on_close)
+        )
+        if not ok:
+            self.eng.reject(oid, "PHASE", qty)
+            return True
+        self.trader[oid] = trader
+        self.call.append(
+            {
+                "id": oid,
+                "side": e["side"],
+                "limit": "MARKET" if market else e["price"],
+                "qty": int(qty / self.eng.lot),
+                "qty_dec": qty,
+                "on_close": self.phase == "PRE_CLOSE",
+            }
+        )
+        return True
+
+    def move(self, to: Any, k: int) -> None:
+        if to not in PHASES:
+            raise QfError("E_SCHEMA", f"events/{k}/phase: not a phase", f"events/{k}")
+        if PHASES.index(to) != PHASES.index(self.phase) + 1:
+            raise QfError(
+                "E_INPUT", f"events/{k}: phase {self.phase} cannot move to {to}", f"events/{k}"
+            )
+        if to == "CONTINUOUS":
+            self.uncross("OPEN")
+        elif to == "CLOSED":
+            self.uncross("CLOSE")
+        self.phase = to
+
+    def uncross(self, phase: str) -> None:
+        from .multiasset import auction_uncross  # the auction module builds on this engine
+
+        eng, lot = self.eng, self.eng.lot
+        orders = [
+            {
+                "id": c["id"],
+                "side": c["side"],
+                "limit": c["limit"],
+                "qty": c["qty"],
+                "seq": n + 1,
+                "on_close": c["on_close"],
+            }
+            for n, c in enumerate(self.call)
+        ]
+        res = auction_uncross(
+            {
+                "orders": orders,
+                "phase": phase,
+                "ref_price": fmt(self.ref),
+                "tick_size": fmt(eng.tick),
+                "tie_break": self.tie,
+            }
+        )
+        fills = []
+        for f in res["fills"]:
+            q = _c(f["qty"] * lot)
+            fills.append(
+                {"id": f["id"], "price": fmt(Decimal(f["price"])), "qty": fmt(q), "side": f["side"]}
+            )
+            eng.cons[f["id"]]["filled"] = _c(eng.cons[f["id"]]["filled"] + q)
+            t = self.trader[f["id"]]
+            eng.fees[t] = _c(
+                eng.fees.get(t, Decimal(0)) + _c(self.fee * _c(Decimal(f["price"]) * q))
+            )
+        for r in res["residual"]:
+            q = _c(r["qty"] * lot)
+            limit = Decimal(r["limit"])
+            o = Order(
+                r["id"],
+                self.trader[r["id"]],
+                r["side"] == "B",
+                "LIMIT",
+                limit,
+                limit,
+                q,
+                Decimal(0),
+                q,
+                eng.next_seq(),
+            )
+            eng.resting[r["id"]] = o
+        for oid in res["cancelled"]:
+            c = next(c for c in self.call if c["id"] == oid)
+            left = _c(c["qty_dec"] - eng.cons[oid]["filled"])
+            eng.cancelled.append({"id": oid, "qty": fmt(left)})
+            eng.cons[oid]["cancelled"] = left
+        self.auctions.append(
+            {
+                "fills": fills,
+                "imbalance": fmt(_c(res["imbalance"] * lot)),
+                "phase": phase,
+                "price": None if res["price"] is None else fmt(Decimal(res["price"])),
+                "volume": fmt(_c(res["volume"] * lot)),
+            }
+        )
+        self.call = []
+
+
 def run(
-    tick_size: str, lot_size: str, events: list[Any], fee_schedule: dict[str, Any]
+    tick_size: str,
+    lot_size: str,
+    events: list[Any],
+    fee_schedule: dict[str, Any],
+    session: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     # Wide enough that no sum, difference or product of in-range values rounds (HR-58).
     with localcontext(EXACT):
-        return _run(tick_size, lot_size, events, fee_schedule)
+        return _run(tick_size, lot_size, events, fee_schedule, session)
 
 
 def _run(
-    tick_size: str, lot_size: str, events: list[Any], fee_schedule: dict[str, Any]
+    tick_size: str,
+    lot_size: str,
+    events: list[Any],
+    fee_schedule: dict[str, Any],
+    session: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     tick, lot = _dec(tick_size, "tick_size"), _dec(lot_size, "lot_size")
     if tick <= 0 or lot <= 0:
@@ -361,9 +542,16 @@ def _run(
     if len(events) > MAX_EVENTS:
         raise QfError("E_LIMIT", "more than 10,000,000 events", "events")
     eng = _Engine(tick, lot, taker, rebate)
+    ses = None
+    if session is not None:
+        auction_fee = _dec(fee_schedule.get("auction_fee", "0"), "fee_schedule/auction_fee")
+        ses = _Session(eng, session, auction_fee)
+    ops = ("NEW", "CANCEL", "MODIFY", "PHASE") if ses else ("NEW", "CANCEL", "MODIFY")
     for k, e in enumerate(events):
-        if not isinstance(e, dict) or e.get("op") not in ("NEW", "CANCEL", "MODIFY"):
+        if not isinstance(e, dict) or e.get("op") not in ops:
             raise QfError("E_SCHEMA", f"events/{k}: not an event", "events")
+        if ses is not None and ses.event(e, k):
+            continue
         if e["op"] == "NEW":
             eng.new(e, k)
         elif e["op"] == "CANCEL":
@@ -371,7 +559,13 @@ def _run(
         else:
             eng.modify(e, k)
         eng.reprice()
-    return eng.output()
+    out = eng.output()
+    if ses is not None:
+        out["auctions"] = ses.auctions
+        for c in ses.call:  # still in a call book at the end: counted as resting
+            out["conservation"][c["id"]]["resting"] = fmt(c["qty_dec"])
+        out["phase"] = ses.phase
+    return out
 
 
 guard(globals())

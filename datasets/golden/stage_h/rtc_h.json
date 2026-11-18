@@ -15,7 +15,6 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real rates data",
      "value": "99.5"
     }
    },
@@ -39,7 +38,6 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real rates data",
      "value": "99.515625"
     }
    },
@@ -63,7 +61,6 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real rates data",
      "value": "99.5078125"
     }
    },
@@ -87,20 +84,68 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real rates data",
-     "value": "99.52734375"
+     "value": "99.5234375"
     }
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+    "hand"
    ],
    "tags": [
     "stage_h",
     "multiasset"
    ],
-   "description": "rtc_h-0004 from the spec table"
+   "description": "rtc_h-0004 from the spec table, value re-derived under HR-109 (CME quarters); not blind"
+  },
+  {
+   "case_id": "rtc_h-0011",
+   "operation": "micro.rates.bond_yield",
+   "inputs": {
+    "coupon": "0.04",
+    "frequency": 2,
+    "periods": 4,
+    "price": "100"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "yield": 0.04
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "rtc_h-0011 hand: yield solve (HR-92) (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "rtc_h-0012",
+   "operation": "micro.rates.bond_yield",
+   "inputs": {
+    "coupon": "0.04",
+    "frequency": 2,
+    "periods": 2,
+    "price": "99.036287923854848305"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "yield": 0.05
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "rtc_h-0012 hand: yield solve (HR-92) (source check 2026-11-18); not blind"
   },
   {
    "case_id": "rtc_h-0005",
@@ -112,7 +157,6 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real rates data",
      "text": "101-09+"
     }
    },
@@ -159,7 +203,6 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real rates data",
      "tick_value": "15.625"
     }
    },
@@ -185,7 +228,6 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real rates data",
      "price": "99.036287924"
     }
    },
@@ -212,7 +254,6 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real rates data",
      "price": "100"
     }
    },
@@ -237,7 +278,6 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "label": "simulated venue; not a real exchange; no real rates data",
      "price": "98.736111111"
     }
    },
@@ -253,7 +293,7 @@
    "description": "rtc_h-0010 from the spec table"
   },
   {
-   "case_id": "rtc_h-0011",
+   "case_id": "rtc_h-0013",
    "operation": "micro.rates.parse_32nds",
    "inputs": {
     "text": "99-32"
@@ -273,14 +313,14 @@
    "description": "hand: 32nds above 31"
   },
   {
-   "case_id": "rtc_h-0012",
+   "case_id": "rtc_h-0014",
    "operation": "micro.rates.parse_32nds",
    "inputs": {
     "text": "99.16"
    },
    "expected": {
     "status": "error",
-    "error_code": "E_INPUT"
+    "error_code": "E_SCHEMA"
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
@@ -293,7 +333,50 @@
    "description": "hand: malformed text"
   },
   {
-   "case_id": "rtc_h-0013",
+   "case_id": "rtc_h-0015",
+   "operation": "micro.rates.parse_32nds",
+   "inputs": {
+    "text": "99-163"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: third digit 3 is not a CME quarter (HR-109)"
+  },
+  {
+   "case_id": "rtc_h-0016",
+   "operation": "micro.rates.bond_yield",
+   "inputs": {
+    "coupon": "0.04",
+    "frequency": 2,
+    "periods": 2,
+    "price": "0"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: price not positive"
+  },
+  {
+   "case_id": "rtc_h-0017",
    "operation": "micro.rates.format_32nds",
    "inputs": {
     "resolution": 100,

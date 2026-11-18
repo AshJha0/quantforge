@@ -19,6 +19,7 @@ from decimal import Decimal
 
 from qf_oracle import common
 from qf_oracle.common import Suite
+from qf_oracle.rng import Xo
 
 G = "oracle/python/gen_stage_h_ma.py"
 CONV = "specifications/09-microstructure/asset-conventions.md"
@@ -32,11 +33,15 @@ REPR = {  # representation-only differences (value equal), counted as agreeing i
     "rtc_h-0010": "12 dp vs 9 dp", "rtc_h-0009": '"100.000000000000" vs "100"'}
 NOT_BLIND = {
     "fut_h-0004": "answer fixed by HR-102 (spec gap)", "fut_h-0005": "answer fixed by HR-102 (spec gap)",
-    "fut_h-0006": "answer fixed by HR-103 (spec gap)", "rtc_h-0007": "15.625 printed in the spec text (soft leak)",
+    "fut_h-0006": "answer fixed by HR-103 (spec gap)",
+    "rtc_h-0004": "expected value changed by HR-109 (CME quarter-32nds: 7 = 3/4, was 7/8 under HR-90)", "rtc_h-0007": "15.625 printed in the spec text (soft leak)",
 }
 ADDED = {**{f"eqc_h-{k:04d}": "current Rule 612/610 regime" for k in range(9, 14)},
          **{f"eqc_h-{k:04d}": "round lot by price, Rule 600(b)(93)" for k in range(14, 18)},
-         "fxc_h-0008": "USD-only holiday on T+1 rule", "auc_h-0009": "IEX tie-break parameter"}
+         "fxc_h-0008": "USD-only holiday on T+1 rule", "auc_h-0009": "IEX tie-break parameter",
+         "rtc_h-0011": "yield solve (HR-92)", "rtc_h-0012": "yield solve (HR-92)",
+         **{f"fxv_h-{k:04d}": "last-look draw from core.rng (HR-97)" for k in (10, 11, 12)}}
+VENUE_SUITES = ("auc_h", "fxv_h", "fut_h", "ses_h")
 EQ = "simulated venue; not a real exchange"
 FX = "simulated venue; not a real exchange; no real FX data"
 RT = "simulated venue; not a real exchange; no real rates data"
@@ -114,28 +119,28 @@ def rp(price, side, **kw):
 
 
 EQC_ROWS = [
-    ("eqc_h-0001", *rp("10.005", "BUY"), {"label": EQ, "price": "10.00"}),
-    ("eqc_h-0002", *rp("10.005", "SELL"), {"label": EQ, "price": "10.01"}),
-    ("eqc_h-0003", *rp("0.12345", "BUY"), {"label": EQ, "price": "0.1234"}),
-    ("eqc_h-0004", *rp("0.12345", "SELL"), {"label": EQ, "price": "0.1235"}),
-    ("eqc_h-0005", *rp("0.99995", "SELL"), {"label": EQ, "price": "1.00"}),
-    ("eqc_h-0006", *rp("25.00", "BUY"), {"label": EQ, "price": "25.00"}),
+    ("eqc_h-0001", *rp("10.005", "BUY"), {"price": "10.00"}),
+    ("eqc_h-0002", *rp("10.005", "SELL"), {"price": "10.01"}),
+    ("eqc_h-0003", *rp("0.12345", "BUY"), {"price": "0.1234"}),
+    ("eqc_h-0004", *rp("0.12345", "SELL"), {"price": "0.1235"}),
+    ("eqc_h-0005", *rp("0.99995", "SELL"), {"price": "1.00"}),
+    ("eqc_h-0006", *rp("25.00", "BUY"), {"price": "25.00"}),
     ("eqc_h-0007", "micro.eq.fee_check", {"cap_check": True, "price": "20", "taker_fee": "0.0031"}, "E_DOMAIN"),
     ("eqc_h-0008", "micro.eq.settle_date", {"holidays": [], "settle_lag": 1, "trade_date": "2026-11-20"},
-     {"label": EQ, "settle_date": "2026-11-23"}),
+     {"settle_date": "2026-11-23"}),
     # Added 2026-11-18 (source check): current Rule 612 $0.005 tier and Rule 610(c) $0.001 cap. Hand.
-    ("eqc_h-0009", *rp("10.003", "BUY", tick_tier="HALF_PENNY"), {"label": EQ, "price": "10.000"}),
-    ("eqc_h-0010", *rp("10.003", "SELL", tick_tier="HALF_PENNY"), {"label": EQ, "price": "10.005"}),
+    ("eqc_h-0009", *rp("10.003", "BUY", tick_tier="HALF_PENNY"), {"price": "10.000"}),
+    ("eqc_h-0010", *rp("10.003", "SELL", tick_tier="HALF_PENNY"), {"price": "10.005"}),
     ("eqc_h-0011", "micro.eq.fee_check", {"price": "20", "taker_fee": "0.0015"}, "E_DOMAIN"),
     ("eqc_h-0012", "micro.eq.fee_check", {"as_of": "2024-01-02", "price": "20", "taker_fee": "0.0015"},
-     {"cap": "0.003", "label": EQ, "taker_fee": "0.0015"}),
+     {"cap": "0.003", "taker_fee": "0.0015"}),
     ("eqc_h-0013", "micro.eq.fee_check", {"price": "0.50", "taker_fee": "0.0005"},
-     {"cap": "0.0005", "label": EQ, "taker_fee": "0.0005"}),
+     {"cap": "0.0005", "taker_fee": "0.0005"}),
     # Round lots, amended Reg NMS 242.600(b)(93) (source check retry 2026-11-18). Hand.
-    ("eqc_h-0014", "micro.eq.round_lot", {"price": "250.00"}, {"label": EQ, "round_lot": 100}),
-    ("eqc_h-0015", "micro.eq.round_lot", {"price": "250.01"}, {"label": EQ, "round_lot": 40}),
-    ("eqc_h-0016", "micro.eq.round_lot", {"price": "10000.01"}, {"label": EQ, "round_lot": 1}),
-    ("eqc_h-0017", "micro.eq.round_lot", {"as_of": "2024-01-02", "price": "10000.01"}, {"label": EQ, "round_lot": 100}),
+    ("eqc_h-0014", "micro.eq.round_lot", {"price": "250.00"}, {"round_lot": 100}),
+    ("eqc_h-0015", "micro.eq.round_lot", {"price": "250.01"}, {"round_lot": 40}),
+    ("eqc_h-0016", "micro.eq.round_lot", {"price": "10000.01"}, {"round_lot": 1}),
+    ("eqc_h-0017", "micro.eq.round_lot", {"as_of": "2024-01-02", "price": "10000.01"}, {"round_lot": 100}),
 ]
 
 
@@ -145,16 +150,16 @@ def spot(pair, d, hol=None):
 
 FXC_ROWS = [
     ("fxc_h-0001", "micro.fx.pip_value", {"notional": "1000000", "pair": "EURUSD"},
-     {"currency": "USD", "label": FX, "pip_value": "100"}),
+     {"currency": "USD", "pip_value": "100"}),
     ("fxc_h-0002", "micro.fx.pip_value", {"notional": "1000000", "pair": "USDJPY"},
-     {"currency": "JPY", "label": FX, "pip_value": "10000"}),
-    ("fxc_h-0003", *spot("EURUSD", "2026-11-16"), {"label": FX, "spot_date": "2026-11-18"}),
-    ("fxc_h-0004", *spot("EURUSD", "2026-11-24", {"USD": ["2026-11-26"]}), {"label": FX, "spot_date": "2026-11-27"}),
-    ("fxc_h-0005", *spot("EURUSD", "2026-11-20"), {"label": FX, "spot_date": "2026-11-24"}),
-    ("fxc_h-0006", *spot("USDCAD", "2026-11-20"), {"label": FX, "spot_date": "2026-11-23"}),
+     {"currency": "JPY", "pip_value": "10000"}),
+    ("fxc_h-0003", *spot("EURUSD", "2026-11-16"), {"spot_date": "2026-11-18"}),
+    ("fxc_h-0004", *spot("EURUSD", "2026-11-24", {"USD": ["2026-11-26"]}), {"spot_date": "2026-11-27"}),
+    ("fxc_h-0005", *spot("EURUSD", "2026-11-20"), {"spot_date": "2026-11-24"}),
+    ("fxc_h-0006", *spot("USDCAD", "2026-11-20"), {"spot_date": "2026-11-23"}),
     ("fxc_h-0007", *spot("USDEUR", "2026-11-16"), "E_INPUT"),
     # USD-only holiday on T+1 does not stop the count (source check retry 2026-11-18). Hand.
-    ("fxc_h-0008", *spot("EURUSD", "2026-11-25", {"USD": ["2026-11-26"]}), {"label": FX, "spot_date": "2026-11-27"}),
+    ("fxc_h-0008", *spot("EURUSD", "2026-11-25", {"USD": ["2026-11-26"]}), {"spot_date": "2026-11-27"}),
 ]
 
 Q = {"ask": "1.0852", "bid": "1.0850", "quote_mid": "1.0851"}
@@ -167,6 +172,17 @@ def req(side="BUY", after="1.0855", sym=True, u="0.50"):
 
 def res(outcome, move, price=None):
     return {"label": FX, "move_pips": move, "outcome": outcome, "price": price}
+
+
+def rng_row(cid, idx, seed=20261118, p="0.5"):
+    """HR-97 in simulation: u is the first uniform of stream `idx` of core.rng seeded by `seed`
+    (rng.md: stream k = the seeded generator jumped k times), computed with the oracle's own Xo."""
+    u = Xo(seed=seed, stream=idx).uniform()
+    inp = {k: v for k, v in req(after="1.0852").items() if k != "u"}
+    inp.update(p_random_reject=p, request_index=idx, seed=seed)
+    out = res("LL_RANDOM", "1") if u < float(p) else res("FILL", "1", "1.0852")
+    out["u"] = u
+    return (cid, "exec.sim.fx.request", inp, out)
 
 
 def stream(mid):
@@ -185,26 +201,31 @@ FXV_ROWS = [
     ("fxv_h-0007", "exec.sim.fx.request", req(after="1.0847", sym=False), res("FILL", "-4", "1.0852")),
     ("fxv_h-0008", "exec.sim.fx.request", req("SELL", "1.0848", False), res("LL_PRICE", "-3")),
     ("fxv_h-0009", "exec.sim.fx.request", req(after="1.0853"), res("FILL", "2", "1.0852")),
+    rng_row("fxv_h-0010", 0), rng_row("fxv_h-0011", 1), rng_row("fxv_h-0012", 2),
 ]
 
 
 def parse(t, v):
-    return ("micro.rates.parse_32nds", {"text": t}, {"label": RT, "value": v})
+    return ("micro.rates.parse_32nds", {"text": t}, {"value": v})
 
 
 RTC_ROWS = [
     ("rtc_h-0001", *parse("99-16", "99.5")),
     ("rtc_h-0002", *parse("99-16+", "99.515625")),
     ("rtc_h-0003", *parse("99-162", "99.5078125")),
-    ("rtc_h-0004", *parse("99-167", "99.52734375")),
-    ("rtc_h-0005", "micro.rates.format_32nds", {"resolution": 64, "value": "101.296875"}, {"label": RT, "text": "101-09+"}),
+    ("rtc_h-0004", *parse("99-167", "99.5234375")),  # HR-109: 7 = 3/4 of a 32nd (was 7/8): not blind
+    ("rtc_h-0011", "micro.rates.bond_yield", {"coupon": "0.04", "frequency": 2, "periods": 4, "price": "100"},
+     {"yield": 0.04}),
+    ("rtc_h-0012", "micro.rates.bond_yield", {"coupon": "0.04", "frequency": 2, "periods": 2,
+                                              "price": "99.036287923854848305"}, {"yield": 0.05}),
+    ("rtc_h-0005", "micro.rates.format_32nds", {"resolution": 64, "value": "101.296875"}, {"text": "101-09+"}),
     ("rtc_h-0006", "micro.rates.format_32nds", {"resolution": 128, "value": "101.3"}, "E_DOMAIN"),
-    ("rtc_h-0007", "micro.rates.tick_value", {"face": "100000", "tick": "0.015625"}, {"label": RT, "tick_value": "15.625"}),
+    ("rtc_h-0007", "micro.rates.tick_value", {"face": "100000", "tick": "0.015625"}, {"tick_value": "15.625"}),
     ("rtc_h-0008", "micro.rates.bond_price", {"coupon": "0.04", "frequency": 2, "periods": 2, "yield": "0.05"},
-     {"label": RT, "price": "99.036287924"}),
+     {"price": "99.036287924"}),
     ("rtc_h-0009", "micro.rates.bond_price", {"coupon": "0.04", "frequency": 2, "periods": 4, "yield": "0.04"},
-     {"label": RT, "price": "100"}),
-    ("rtc_h-0010", "micro.rates.bill_price", {"days": 91, "discount": "0.05"}, {"label": RT, "price": "98.736111111"}),
+     {"price": "100"}),
+    ("rtc_h-0010", "micro.rates.bill_price", {"days": 91, "discount": "0.05"}, {"price": "98.736111111"}),
 ]
 ZN = {"symbol": "ZN"}
 FUT_ROWS = [
@@ -238,15 +259,91 @@ ERRORS = {
               ("bid above ask (input before domain)", "exec.sim.fx.request",
                dict(req(u="1"), quote={"ask": "1.0850", "bid": "1.0852", "quote_mid": "1.0851"}), "E_INPUT")],
     "rtc_h": [("32nds above 31", "micro.rates.parse_32nds", {"text": "99-32"}, "E_DOMAIN"),
-              ("malformed text", "micro.rates.parse_32nds", {"text": "99.16"}, "E_INPUT"),
+              ("malformed text", "micro.rates.parse_32nds", {"text": "99.16"}, "E_SCHEMA"),
+              ("third digit 3 is not a CME quarter (HR-109)", "micro.rates.parse_32nds", {"text": "99-163"}, "E_SCHEMA"),
+              ("price not positive", "micro.rates.bond_yield",
+               {"coupon": "0.04", "frequency": 2, "periods": 2, "price": "0"}, "E_DOMAIN"),
               ("resolution not allowed", "micro.rates.format_32nds", {"resolution": 100, "value": "99"}, "E_DOMAIN")],
     "fut_h": [("decimal price off the grid", "exec.sim.fut.to_ticks", {"contract": ZN, "price": "110.01"}, "E_DOMAIN"),
               ("empty settlements", "exec.sim.fut.variation",
                {"contract": ZN, "price": "110-00", "qty": 0, "settlements": [], "side": "BUY"}, "E_INPUT")],
 }
 
+LIT = "simulated venue; not a real exchange"
+
+
+def ev(oid, trader, side, typ, price, qty, **kw):
+    e = {"id": oid, "op": "NEW", "qty": qty, "side": side, "trader": trader, "type": typ}
+    if price is not None:
+        e["price"] = price
+    e.update(kw)
+    return e
+
+
+def cons(sub, filled="0", cancelled="0", rejected="0"):
+    return {"cancelled": cancelled, "filled": filled, "rejected": rejected, "resting": "0", "submitted": sub}
+
+
+SES_IN = {"tick_size": "0.01", "lot_size": "1", "session": {"ref_price": "10.00"},
+          "fee_schedule": {"auction_fee": "0", "maker_rebate": "0", "taker_fee": "0"},
+          "events": [ev("B1", "T1", "BUY", "LIMIT", "10.02", "100"), ev("S1", "T2", "SELL", "LIMIT", "10.00", "60"),
+                     ev("S2", "T2", "SELL", "LIMIT", "10.01", "80"), ev("I1", "T3", "BUY", "IOC", "10.05", "10"),
+                     {"op": "PHASE", "phase": "CONTINUOUS"}, ev("B2", "T3", "BUY", "LIMIT", "10.01", "40"),
+                     {"op": "PHASE", "phase": "PRE_CLOSE"}, ev("B3", "T1", "BUY", "LIMIT", "10.00", "50"),
+                     ev("B4", "T1", "BUY", "MARKET", None, "30", on_close=True),
+                     ev("S3", "T2", "SELL", "LIMIT", "9.99", "20", on_close=True), {"op": "PHASE", "phase": "CLOSED"}]}
+# Hand: open call book B1 100@10.02 | S1 60@10.00, S2 80@10.01. V: 10.00 60 (I +40), 10.01 100 (I -40),
+# 10.02 100 (I -40); min |I| ties, all negative: lowest, 10.01. B1 100; S1 60, S2 40; S2 40 rests and
+# B2 takes it in CONTINUOUS. I1 (IOC) and B3 (no on_close in PRE_CLOSE) are rejected PHASE. Close book:
+# B4 MARKET 30 | S3 20@9.99: one candidate, V 20, I +10; B4's 10 left is cancelled (HR-96).
+SES_OUT = {
+    "auctions": [
+        {"fills": [{"id": "B1", "price": "10.01", "qty": "100", "side": "B"},
+                   {"id": "S1", "price": "10.01", "qty": "60", "side": "S"},
+                   {"id": "S2", "price": "10.01", "qty": "40", "side": "S"}],
+         "imbalance": "-40", "phase": "OPEN", "price": "10.01", "volume": "100"},
+        {"fills": [{"id": "B4", "price": "9.99", "qty": "20", "side": "B"},
+                   {"id": "S3", "price": "9.99", "qty": "20", "side": "S"}],
+         "imbalance": "10", "phase": "CLOSE", "price": "9.99", "volume": "20"}],
+    "book": {"asks": [], "bids": []}, "cancelled": [{"id": "B4", "qty": "10"}],
+    "conservation": {"B1": cons("100", "100"), "B2": cons("40", "40"), "B3": cons("50", rejected="50"),
+                     "B4": cons("30", "20", "10"), "I1": cons("10", rejected="10"), "S1": cons("60", "60"),
+                     "S2": cons("80", "80"), "S3": cons("20", "20")},
+    "fees": {"T1": "0", "T2": "0", "T3": "0"},
+    "fills": [{"maker_id": "S2", "price": "10.01", "qty": "40", "seq": 1, "taker_id": "B2"}],
+    "label": LIT, "mbp": {"asks": [], "bids": []}, "phase": "CLOSED",
+    "rejects": [{"id": "I1", "reason": "PHASE"}, {"id": "B3", "reason": "PHASE"}],
+}
+SES_ROWS = [
+    ("ses_h-0001", "exec.sim.lit.run", SES_IN, SES_OUT),
+    ("ses_h-0002", "exec.sim.lit.run", dict(SES_IN, events=SES_IN["events"][:4] + [{"op": "PHASE", "phase": "PRE_CLOSE"}]),
+     "E_INPUT"),
+]
+SOR_LIT = json.loads((common.ROOT / "datasets/golden/stage_h/sor_h.json").read_text(encoding="utf-8"))["cases"][0]
+assert SOR_LIT["case_id"] == "sor_h-0001"
+
+
+def classed(inp, order, venue):
+    out = dict(inp, asset_class=order)
+    out["venues"] = [dict(v, asset_class=venue) for v in inp["venues"]]
+    return out
+
+
+ACLS_ROWS = [
+    ("acls_h-0001", "exec.sor.allocate", classed(SOR_LIT["inputs"], "FX", "FX"), SOR_LIT["expected"]["outputs"]),
+    ("acls_h-0002", "exec.sor.allocate", classed(SOR_LIT["inputs"], "EQUITY", "RATES"), "E_INPUT"),
+    ("acls_h-0003", "exec.sor.allocate", classed(SOR_LIT["inputs"], "EQUITY", "BONDS"), "E_SCHEMA"),
+]
+ADDED.update({c: "session phases in exec.sim.lit.run" for c, *_ in SES_ROWS})
+ADDED.update({"acls_h-0001": "asset_class on SOR (HR-93); outputs as sor_h-0001",
+              "acls_h-0002": "asset_class mismatch (HR-93)", "acls_h-0003": "asset_class schema"})
+ERRORS["ses_h"] = [("PHASE without a session is not an event", "exec.sim.lit.run",
+                    {k: v for k, v in SES_IN.items() if k != "session"}, "E_SCHEMA")]
+ERRORS["acls_h"] = []
+
 SUITES = [("auc_h", AUC, [(c, "exec.sim.auction.uncross", i, e) for c, i, e in AUC_ROWS]), ("eqc_h", CONV, EQC_ROWS),
-          ("fxc_h", CONV, FXC_ROWS), ("fxv_h", FXV, FXV_ROWS), ("rtc_h", CONV, RTC_ROWS), ("fut_h", FUT, FUT_ROWS)]
+          ("fxc_h", CONV, FXC_ROWS), ("fxv_h", FXV, FXV_ROWS), ("rtc_h", CONV, RTC_ROWS), ("fut_h", FUT, FUT_ROWS),
+          ("ses_h", AUC, SES_ROWS), ("acls_h", CONV, ACLS_ROWS)]
 
 
 def _first_number(v, path=()):
@@ -277,17 +374,20 @@ def build():
             assert cid.startswith(name + "-")
             err = exp if isinstance(exp, str) else None
             if err is None:
-                assert "label" in exp, cid  # A4 / HR-94
+                assert name == "acls_h" or ("label" in exp) == (name in VENUE_SUITES or "exec." in op), cid  # A4, HR-94 as ruled
             desc = f"{cid} from the spec table" + (f"; not blind: {NOT_BLIND[cid]}" if cid in NOT_BLIND else "")
             if cid in ADDED:
                 desc = f"{cid} hand: {ADDED[cid]} (source check 2026-11-18); not blind"
+            if cid == "rtc_h-0004":
+                desc = "rtc_h-0004 from the spec table, value re-derived under HR-109 (CME quarters); not blind"
             if name == "auc_h" and cid not in ("auc_h-0001", "auc_h-0002", "auc_h-0009"):
                 desc += "; fills, residual and cancelled hand-derived (the table states price, volume, imbalance)"
+            cls = "root_finding" if op == "micro.rates.bond_yield" else "date_and_convention"
             if err:
-                s.add(op, inp, error=err, cls="date_and_convention", verified=verified(cid),
+                s.add(op, inp, error=err, cls=cls, verified=verified(cid),
                       tags=["stage_h", "multiasset"], description=desc)
             else:
-                s.add(op, inp, exp, cls="date_and_convention", verified=verified(cid),
+                s.add(op, inp, exp, cls=cls, verified=verified(cid),
                       tags=["stage_h", "multiasset"], description=desc)
             s.cases[-1]["case_id"] = cid
         first = len(rows) + 1

@@ -7,7 +7,7 @@ Spec version 0.1.0 (drafted 2026-11-18; rulings HR-87 to HR-89, HR-97). Label al
 ## Operations
 `exec.sim.fx.stream`: inputs `mid_path` (time, mid), `half_spread_pips`, `pair`, `tick`; output quotes, bid rounded down and ask rounded up to the tick.
 
-`exec.sim.fx.request`: inputs `quote` (bid, ask, quote_mid), `side` (client BUY takes the ask, SELL hits the bid), `qty`, `mid_after` (mid at the end of `hold_ms`), `threshold_pips`, `symmetric` (default true), `p_random_reject`, `u` in [0,1). In simulations `u` comes from `core.rng` seeded by (`seed`, `request_index`); goldens give `u` directly so the blind lane needs no generator.
+`exec.sim.fx.request`: inputs `quote` (bid, ask, quote_mid), `side` (client BUY takes the ask, SELL hits the bid), `qty`, `mid_after` (mid at the end of `hold_ms`), `threshold_pips`, `symmetric` (default true), `p_random_reject`, `u` in [0,1). In simulations `u` comes from `core.rng`: when `u` is absent, `seed` (integer, 0 to 2^64 - 1) and `request_index` (integer >= 0) are required and u is the first `uniform` of stream `request_index` of the generator seeded by `seed` (rng.md: stream k is the seeded generator jumped k times); the output then also carries `u` (binary64, HR-97). Goldens fxv_h-0001..0009 give `u` directly; fxv_h-0010..0012 draw it (hand, oracle generator, not blind).
 
 Rule (HR-97): move = (mid_after - quote_mid)/pip. Adverse to the dealer: move > 0 when the client buys, move < 0 when the client sells. If `symmetric`, reject `LL_PRICE` when |move| > threshold; otherwise reject `LL_PRICE` only when the adverse move exceeds the threshold. If not rejected on price, reject `LL_RANDOM` when u < p_random_reject. Otherwise `FILL` at the quoted price. Comparisons are strict; exact decimals.
 

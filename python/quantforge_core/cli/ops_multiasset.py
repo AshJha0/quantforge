@@ -100,3 +100,8 @@ def exec_sim_fut_run(i: Inputs) -> Any:
 @op("micro.eq.round_lot")
 def micro_eq_round_lot(i: Inputs) -> Any:
     return core.multiasset.eq_round_lot(dict(i.raw))
+
+
+@op("micro.rates.bond_yield")
+def micro_rates_bond_yield(i: Inputs) -> Any:
+    return core.multiasset.rates_bond_yield(dict(i.raw))
