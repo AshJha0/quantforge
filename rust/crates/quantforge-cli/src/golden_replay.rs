@@ -450,3 +450,10 @@ fn stage_h_w2_goldens() {
 fn stage_h_micro_goldens() {
     replay_only("stage_h", &["mest_h", "venue_h"], 27);
 }
+
+/// The stage H wave 2 execution goldens: adaptive algorithms (`alg_h`) and pre-trade TCA and
+/// attribution (`tcx_h`), which put `adaptive_exec.rs` under `cargo test`.
+#[test]
+fn stage_h_w2_exec_goldens() {
+    replay_only("stage_h", &["alg_h", "tcx_h"], 36);
+}

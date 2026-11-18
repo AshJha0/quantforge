@@ -107,6 +107,10 @@ fn operation_above(op: &str, i: &Json) -> bool {
         "research.drift.psi" => above(i, "bins", 1_000),
         // Stage H wave 1 (HR-9): schedule buckets and AC steps 100,000.
         "exec.schedule.twap" => above(i, "n_buckets", 100_000),
+        // Stage H wave 2 execution (as HR-9): buckets 100,000.
+        "exec.algo.arrival" | "exec.algo.pair" | "exec.algo.basket" => {
+            above(i, "n_buckets", 100_000)
+        }
         "exec.ac.trajectory" | "exec.ac.frontier" | "usecase.execution_tca" => {
             above(i, "n_steps", 100_000)
         }
@@ -313,7 +317,8 @@ fn raised_array_keys(op: &str) -> &'static [&'static str] {
         "book.lifecycle.apply" | "exec.sim.lit.run" | "exec.sim.dark.run" => &["events"],
         "exec.sor.allocate" => &["lit_samples"],
         "research.backtest.run" => &["prices", "targets"],
-        "exec.tca.shortfall" => &["fills"], // ruling HR-9: 1,000,000 fills
+        // ruling HR-9: 1,000,000 fills (attribution as HR-9, cli-contract.md)
+        "exec.tca.shortfall" | "exec.tca.attribution" => &["fills"],
         "research.cv.purged_kfold" => &["t0", "t1"],
         "research.regime.baum_welch" => &["observations"],
         "risk.backtest.es_z2" => &["losses", "var", "es"],

@@ -8,7 +8,7 @@ use quantforge_core::time::{Zone, parse_instant, parse_local};
 /// The inputs, and the `E_LIMIT` they break, if any.
 pub struct Inputs<'a>(pub &'a Json, pub Option<QfError>);
 
-fn schema(field: &str, what: &str) -> QfError {
+pub(crate) fn schema(field: &str, what: &str) -> QfError {
     let mut e = err("E_SCHEMA", format!("{field}: {what}"));
     e.field = Some(field.to_string());
     e
