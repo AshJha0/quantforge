@@ -1,6 +1,6 @@
 # Adaptive algorithms: arrival price, close, liquidity seeking, pairs and baskets
 
-Spec version 0.1.0 (stage H wave 2; spec lane 2026-11-18). Status: Specified, not implemented. Rulings: `stage-h-rulings-w2-exec.md` HR-59 to HR-63, with HR-2, HR-3, HR-4, HR-56 from earlier stage H files. Plan item STAGE_H_START.md H-14 (acceptance: schedule identities plus a simulated-book method test).
+Spec version 0.1.0 (stage H wave 2; spec lane 2026-11-18). Status: implemented in all four builds (Python, Java, C++, Rust; 2026-11-18). Rulings: `stage-h-rulings-w2-exec.md` HR-59 to HR-63, with HR-2, HR-3, HR-4, HR-56 from earlier stage H files. Plan item STAGE_H_START.md H-14 (acceptance: schedule identities plus a simulated-book method test).
 
 **Plain idea.** The wave-1 schedules (`schedules.md`) slice an order without looking at the market. The algorithms here react to something: arrival price trades early because waiting costs risk; a close algorithm puts what it can into the closing auction and spreads the rest over the last buckets; liquidity seeking takes a share of whatever depth sits inside its limit; pairs and baskets keep several legs in step so the cash (or the hedge) stays balanced while the orders work.
 

@@ -27,7 +27,7 @@ Simulators are kept out of the numerical core: they consume the library's operat
 
 ## Goldens and paper trading
 
-The simulators' goldens are generated and checked in every build: `ob_h` 17, `lit_h` 20, `dark_h` 8, `sor_h` 9 and `sorx_h` 2 (`datasets/golden/stage_h/`; for example `lit_h-0006`, an iceberg refresh; `dark_h-0002`, a minimum-quantity block; `sor_h-0001`, a corner solution). Paper trading with simulated fills (plan item H-21, moved into stage H on 2026-11-18) runs on these simulators through `python/quantforge_core/paper_fills.py`: simulated fills, positions, cash, daily P&L explain, risk limits, pre-trade checks and a hashed append-only ledger ([Tutorial 44](../getting-started/tutorial-44-paper-trading.md)). The `paper.*` CLI operations (`pt_h`, 28 cases) are Python only; Java, C++ and Rust ports pending in this PR. It never sends a live order.
+The simulators' goldens are generated and checked in every build: `ob_h` 17, `lit_h` 20, `dark_h` 8, `sor_h` 9 and `sorx_h` 2 (`datasets/golden/stage_h/`; for example `lit_h-0006`, an iceberg refresh; `dark_h-0002`, a minimum-quantity block; `sor_h-0001`, a corner solution). Paper trading with simulated fills (plan item H-21, moved into stage H on 2026-11-18) runs on these simulators through `python/quantforge_core/paper_fills.py`: simulated fills, positions, cash, daily P&L explain, risk limits, pre-trade checks and a hashed append-only ledger ([Tutorial 44](../getting-started/tutorial-44-paper-trading.md)). The `paper.*` CLI operations (`pt_h`, 34 cases) are in all four languages. It never sends a live order.
 
 ## Related
 

@@ -254,7 +254,7 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 
 ## Stage H terms
 
-Stage H (v0.10.0, unreleased, execution and microstructure) is implemented in all four languages, the `paper.*` operations in Python only (Java, C++ and Rust ports pending in this PR); these terms are defined as its specs use them (`specifications/09-microstructure/`, `specifications/10-execution/`).
+Stage H (v0.10.0, unreleased, execution and microstructure) is implemented in all four languages, the `paper.*` operations included; these terms are defined as its specs use them (`specifications/09-microstructure/`, `specifications/10-execution/`).
 
 | Term | Meaning |
 |---|---|

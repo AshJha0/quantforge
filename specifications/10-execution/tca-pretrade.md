@@ -1,6 +1,6 @@
 # Transaction cost analysis: pre-trade estimates and cost attribution
 
-Spec version 0.1.0 (stage H wave 2; spec lane 2026-11-18). Status: Specified, not implemented. Rulings: `stage-h-rulings-w2-exec.md` HR-64, HR-65, with HR-2, HR-8, HR-56 from earlier stage H files. Plan item STAGE_H_START.md H-17 (acceptance: attribution sums to the total within 1e-10). Extends `tca.md` (`exec.tca.shortfall`), which is unchanged.
+Spec version 0.1.0 (stage H wave 2; spec lane 2026-11-18). Status: implemented in all four builds (Python, Java, C++, Rust; 2026-11-18). Rulings: `stage-h-rulings-w2-exec.md` HR-64, HR-65, with HR-2, HR-8, HR-56 from earlier stage H files. Plan item STAGE_H_START.md H-17 (acceptance: attribution sums to the total within 1e-10). Extends `tca.md` (`exec.tca.shortfall`), which is unchanged.
 
 **Plain idea.** Before trading, estimate what the order will cost: half the spread, plus market impact that grows with the order's share of daily volume and with volatility, and say separately how much the price may wander while the order works (timing risk). After trading, split what it did cost into three parts that add up exactly: delay (the mid moved between the decision and arrival), impact (the mid moved while we traded) and spread (what we paid against the mid at each fill).
 

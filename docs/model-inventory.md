@@ -970,7 +970,7 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 
 ## Stage H (v0.10.0, not tagged)
 
-Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings HR-1 to HR-41; HR-42 to HR-55 for paper trading; HR-56 for wave 1 input rules). The wave 1 operations (MH-6 to MH-10, and use case 5) are implemented in all four languages on branch `stage-h` with a generated suite in `datasets/golden/stage_h/` (63 cases with `e1_h`, each build passes all, local, 2026-11-18); their outside check is a blind second-lane re-derivation or a printed paper figure (DR-H2), 23 of 29 value cases, no library. The wave 2 operations (book rebuild, lit matching, dark pool, router) are implemented in all four languages on branch `stage-h2` (round 2, 2026-11-18); round 3 adds the estimators, venue analytics, adaptive algos, TCA and the `paper.*` operations (the last in Python only; Java, C++ and Rust ports pending in this PR). Stage H has 95 of 119 value cases (79.8%) outside-checked by DR-H2 blind re-derivation or printed paper figures, none by a library (`oracle/OUTSIDE_SHARES.md`). Each entry is re-dated when its operation lands.
+Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings HR-1 to HR-41; HR-42 to HR-55 for paper trading; HR-56 for wave 1 input rules). The wave 1 operations (MH-6 to MH-10, and use case 5) are implemented in all four languages on branch `stage-h` with a generated suite in `datasets/golden/stage_h/` (63 cases with `e1_h`, each build passes all, local, 2026-11-18); their outside check is a blind second-lane re-derivation or a printed paper figure (DR-H2), 23 of 29 value cases, no library. The wave 2 operations (book rebuild, lit matching, dark pool, router) are implemented in all four languages on branch `stage-h2` (round 2, 2026-11-18); round 3 adds the estimators, venue analytics, adaptive algos, TCA and the `paper.*` operations, all in four languages. Stage H has 98 of 123 value cases (79.7%) outside-checked by DR-H2 blind re-derivation or printed paper figures, none by a library (`oracle/OUTSIDE_SHARES.md`). Each entry is re-dated when its operation lands.
 
 ### MH-1 Order book rebuild (stage H wave 1b)
 - **Purpose:** MBP book rebuilt from the Kraken v2 L2 feed, checksum, crossed, locked and gap counting (`micro.book.rebuild`, H-2).
@@ -1095,12 +1095,12 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MH-11 Paper trading: ledger, book and pre-trade checks (stage H, H-21)
 - **Purpose:** a simulated paper book with a hash-chained append-only ledger, positions, cash, financing, daily P&L explain and pre-trade risk checks (`specifications/10-execution/paper-trading.md`).
 - **Inputs:** as in the spec page; decimal strings throughout (HR-44).
-- **Limitations:** Python only (`paper.py`, `paper_fills.py`, the `paper.*` CLI operations); Java, C++ and Rust ports pending in this PR; simulated fills only, from the lit, dark and router simulators (HR-47), with a TCA record per order; labelled "crypto venue; simulated"; never live orders (HR-42); the dashboard is stage K.
+- **Limitations:** the book, explain and fill path are Python (`paper.py`, `paper_fills.py`); the `paper.*` CLI operations are in all four languages; simulated fills only, from the lit, dark and router simulators (HR-47), with a TCA record per order; labelled "crypto venue; simulated"; never live orders (HR-42); the dashboard is stage K.
 - **Validation:** goldens `pt_h` (28) and `e1_hpt` (5), passed by the Python build; the blind lane matched values on some and checked only the shape of others (SHAPE-ONLY is not an outside check). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** `sha256sum` on the canonical bytes of `pt_h-0020`; blind re-derivation (DR-H2).
 - **Monitoring thresholds:** P&L explain residual not exactly zero (HR-53); a ledger record without the label fails `verify` (HR-43).
-- **Data lineage hash:** sha256 f0e626c97db756d113c0807d749dce32b9593222d7f35c6219a9ea929be7dd12 (`pt_h`, 28 cases); sha256 fb91aafcd38d1cbdd3c80511200e462c351d0aaf614c401ed222d6f94421fdc8 (`e1_hpt`, 5 cases) (2026-11-18).
+- **Data lineage hash:** sha256 ab5bf3bf7604b7695d3c524f794416a1b75de983302025e8eb55c81d81d9475f (`pt_h`, 34 cases); sha256 bdc23fa1f7fa045a770f3af19905e97b332cdab1152e5f08b9e50485c95ec49c (`e1_hpt`, 5 cases) (2026-11-18).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/10-execution/paper-trading.md`.
 

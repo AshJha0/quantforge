@@ -708,7 +708,7 @@ Two curve families the curves page listed as missing, added in v0.9.0 by the cur
 
 ## Stage H: execution and microstructure (planned, v0.10.0)
 
-Stage H is implemented in all four languages from v0.10.0 (unreleased), except the `paper.*` operations, which are Python only (Java, C++ and Rust ports pending in this PR). Its specs are in `specifications/09-microstructure/` and `specifications/10-execution/` (spec version 0.1.0, confirmed 2026-11-18; rulings HR-1 to HR-41 in the stage H rulings files). The worked examples below are spec golden cases, which every build reproduces in conformance (observed, local, 2026-11-18). [Tutorials 36 to 40](docs/getting-started/README.md) check the same goldens with a short standard-library script, and question bank [set 13](docs/question-bank/13-execution-microstructure.md) tests them.
+Stage H is implemented in all four languages from v0.10.0 (unreleased), the `paper.*` operations included. Its specs are in `specifications/09-microstructure/` and `specifications/10-execution/` (spec version 0.1.0, confirmed 2026-11-18; rulings HR-1 to HR-41 in the stage H rulings files). The worked examples below are spec golden cases, which every build reproduces in conformance (observed, local, 2026-11-18). [Tutorials 36 to 40](docs/getting-started/README.md) check the same goldens with a short standard-library script, and question bank [set 13](docs/question-bank/13-execution-microstructure.md) tests them.
 
 ### Why slicing exists
 
@@ -758,7 +758,7 @@ A simulator shows what happens under our rules and our order flow. It can test w
 
 **Plain idea.** Run a trading book exactly as a desk would, with checks, fills, a ledger and a daily P&L, but with every fill from a simulator and no route to any real venue.
 
-**Formal statement.** `specifications/10-execution/paper-trading.md` (HR-42 to HR-55). Positions by average cost (HR-50); daily explain `market + trading + fees + financing = NAV_t - NAV_{t-1}` exactly in decimal, a residual being a defect (HR-53); financing on opening balances, ACT/365, posted half-even to the cent (HR-52); eight pre-trade checks in a fixed order (HR-49); an append-only JSON Lines ledger in which each record carries the SHA-256 of its canonical bytes and of the record before it (HR-45, HR-46). Paper trading is a Python application on the library's four-language operations; its steps are also `paper.*` CLI operations, Python only (Java, C++ and Rust ports pending in this PR).
+**Formal statement.** `specifications/10-execution/paper-trading.md` (HR-42 to HR-55). Positions by average cost (HR-50); daily explain `market + trading + fees + financing = NAV_t - NAV_{t-1}` exactly in decimal, a residual being a defect (HR-53); financing on opening balances, ACT/365, posted half-even to the cent (HR-52); eight pre-trade checks in a fixed order (HR-49); an append-only JSON Lines ledger in which each record carries the SHA-256 of its canonical bytes and of the record before it (HR-45, HR-46). Paper trading is a Python application on the library's four-language operations; its steps are also `paper.*` CLI operations, in all four languages.
 
 **Worked example.** `pt_h-0001` to `0003`: buy 2 at 100, sell 1 at 110, close 105: cash 9909.69, realised 10, day total 14.69; next day close 102 with 3.65 % interest: financing 0.99, total -2.01. `pt_h-0020`: one ORDER record hashes to `72c85984...7e81`, checked with `sha256sum`. Run in [Tutorial 44](docs/getting-started/tutorial-44-paper-trading.md). Fills through the simulated venues come from `paper_fills.py` (Python).
 

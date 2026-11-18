@@ -1,6 +1,6 @@
 # Microstructure estimators with planted truth
 
-Spec version 0.1.0 (stage H wave 2, H-4b; written 2026-11-18). Status: Specified, not implemented. Rulings HR-70, HR-71, HR-74. Plan item 14.7 H-4: the estimator recovers the planted parameter within 3 SE on a simulated book with known truth; no claim on real markets.
+Spec version 0.1.0 (stage H wave 2, H-4b; written 2026-11-18). Status: implemented in all four builds (Python, Java, C++, Rust; 2026-11-18). Rulings HR-70, HR-71, HR-74. Plan item 14.7 H-4: the estimator recovers the planted parameter within 3 SE on a simulated book with known truth; no claim on real markets.
 
 Sources: textbook maximum likelihood and ordinary least squares; no number comes from a paper. Evidence class: derivation. Goldens are hand calculations checked with mpmath (30 digits) by the spec lane; not yet blind re-derived.
 

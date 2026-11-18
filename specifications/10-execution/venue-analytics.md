@@ -1,6 +1,6 @@
 # Venue analytics: markouts, fill rates, toxicity
 
-Spec version 0.1.0 (stage H wave 2, H-16; written 2026-11-18). Status: Specified, not implemented. Rulings HR-72, HR-73. VPIN is not specified: the [ELO12] bucket example could not be verified (HR-73).
+Spec version 0.1.0 (stage H wave 2, H-16; written 2026-11-18). Status: implemented in all four builds (Python, Java, C++, Rust; 2026-11-18). Rulings HR-72, HR-73. VPIN is not specified: the [ELO12] bucket example could not be verified (HR-73).
 
 Sources: the usual desk definitions, written out in full here; no number comes from a paper. Evidence class: definition and hand calculation, checked with mpmath by the spec lane; not yet blind re-derived.
 

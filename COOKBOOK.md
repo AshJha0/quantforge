@@ -876,7 +876,7 @@ To check the suites: `python conformance/runner/runner.py --impl python --suite 
 
 ## Stage H recipes (available from v0.10.0)
 
-Stage H is implemented in all four languages from v0.10.0 (unreleased; spec version 0.1.0, confirmed 2026-11-18), except the `paper.*` operations, which are Python only (Java, C++ and Rust ports pending in this PR). Each request copies the inputs of the named golden case, and the expected outputs are that case's values in the spec, which every build reproduces in conformance. Send a request with `quantforge batch` (one JSON object per line, as in [Batch mode](#batch-mode)). [Tutorials 36 to 40](docs/getting-started/README.md) also check the same numbers by hand with a standard-library script.
+Stage H is implemented in all four languages from v0.10.0 (unreleased; spec version 0.1.0, confirmed 2026-11-18), the `paper.*` operations included. Each request copies the inputs of the named golden case, and the expected outputs are that case's values in the spec, which every build reproduces in conformance. Send a request with `quantforge batch` (one JSON object per line, as in [Batch mode](#batch-mode)). [Tutorials 36 to 40](docs/getting-started/README.md) also check the same numbers by hand with a standard-library script.
 
 | Task | Operation | From golden | Expected |
 |---|---|---|---|
