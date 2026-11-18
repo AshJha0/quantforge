@@ -110,7 +110,9 @@ void replay(const char* suite, int expect_cases) {
 }
 
 TEST_CASE("dark_h goldens: every row, exact", "[dark_sor]") { replay("dark_h", 8); }
-TEST_CASE("sor_h goldens: every row, exact", "[dark_sor]") { replay("sor_h", 8); }
+TEST_CASE("sor_h goldens: every row, exact", "[dark_sor]") { replay("sor_h", 9); }  // with sor_h-0010 (HR-57 E_LIMIT)
+TEST_CASE("sorx_h goldens: cross-build agreement, exact", "[dark_sor]") { replay("sorx_h", 2); }
+TEST_CASE("e1_h2 goldens: non-finite inputs of the wave 2 operations", "[dark_sor]") { replay("e1_h2", 6); }
 
 TEST_CASE("CLOSED_FORM agrees with SAMPLE_AVERAGE on sor_h-0001..0003", "[dark_sor]") {
     for (int k = 0; k < 3; ++k) {
