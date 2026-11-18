@@ -56,7 +56,10 @@ tests_dir = ["tests/test_core.py", "tests/test_cli.py", "tests/test_stage_b.py",
              "tests/test_stage_j_rulings.py", "tests/test_stage_j_fuzzfix.py",
              "tests/test_research_j.py", "tests/test_r6_hedge.py", "tests/test_r6_jacobian.py",
              "tests/test_shortrate_units.py", "tests/test_hedge_solvers_units.py",
-             "tests/test_joint_internals_units.py", "tests/test_variance_internals_units.py"]
+             "tests/test_joint_internals_units.py", "tests/test_variance_internals_units.py",
+             "tests/test_frtb_kills.py", "tests/test_book_kills.py", "tests/test_bonds_kills.py",
+             "tests/test_credit_fx_kills.py", "tests/test_var_kills.py",
+             "tests/test_caps_crossasset_kills.py"]
 pytest_add_cli_args = ["--deselect=tests/test_core.py::test_sobol_table_equals_the_spec_data"]
 do_not_mutate = ["quantforge_core/_sobol_data.py", "quantforge_core/_legendre_1024.py"]
 
