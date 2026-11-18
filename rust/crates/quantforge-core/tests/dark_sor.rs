@@ -335,3 +335,32 @@ fn sor_errors() {
         "E_DOMAIN"
     );
 }
+
+#[test]
+fn sor_range_check_is_e_limit() {
+    // theta 10^35 times (M + L + under) leaves the HR-57 range: E_LIMIT, as in the Python build.
+    let inp = j(
+        r#"{"S":"10","theta":"100000000000000000000000000000000000","h":"0.5","f":"0.3",
+        "lambda_u":"4","lambda_o":"1","venues":[{"kind":"LIT","Q":"0","r":"0.2","as":"0"}],
+        "lit_samples":[["0"],["2"]]}"#,
+    );
+    assert_eq!(code(sor::allocate(&inp)), "E_LIMIT");
+}
+
+#[test]
+fn sor_standard_error_matches_python() {
+    // Expected text from python/quantforge_core/sor.py allocate (commit 0543de77).
+    let inp = j(
+        r#"{"S":"4","theta":"0.01","h":"0.5","f":"0.3","lambda_u":"4","lambda_o":"1",
+        "report_se":true,"venues":[{"kind":"LIT","Q":"1","r":"0.2","as":"0.05"},
+        {"kind":"DARK","r":"0.1","as":"0.3","tail":["0.7","0.33","0.1"]}],
+        "lit_samples":[["0"],["2"],["5"],["3"],["7"]]}"#,
+    );
+    let out = sor::allocate(&inp).unwrap();
+    let s = |k: &str| out.get(k).unwrap().as_str().unwrap().to_string();
+    assert_eq!(s("M"), "2");
+    assert_eq!(s("expected_cost"), "2.14354");
+    assert_eq!(s("expected_fill"), "3.746");
+    assert_eq!(s("p_underfill"), "0.194");
+    assert_eq!(s("expected_cost_se"), "1.077228");
+}

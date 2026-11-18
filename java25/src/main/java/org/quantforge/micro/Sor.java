@@ -96,6 +96,49 @@ public final class Sor {
         }
     }
 
+    private static final BigInteger FIVE = BigInteger.valueOf(5);
+
+    /**
+     * HR-57/HR-58: every exact value the router computes must be a decimal with |coefficient| &lt; 10^36 and minimal
+     * scale &lt;= 36, else {@code E_LIMIT}; checked at the same steps as the Python reference's {@code _r}.
+     */
+    static Frac r(Frac x) {
+        if (x.n.signum() == 0) {
+            return x;
+        }
+        BigInteger d = x.d;
+        int twos = d.getLowestSetBit();
+        d = d.shiftRight(twos);
+        int fives = 0;
+        while (d.mod(FIVE).signum() == 0) {
+            d = d.divide(FIVE);
+            fives++;
+        }
+        int scale = Math.max(twos, fives);
+        if (!d.equals(BigInteger.ONE) || scale > OrderBook.MAX_SCALE) {
+            throw new QfError("E_LIMIT", "sor: decimal outside the exact range (36 digits, 36 decimals; HR-57)", "sor");
+        }
+        BigInteger unscaled = x.n.multiply(BigInteger.TEN.pow(scale).divide(x.d));
+        OrderBook.range(new BigDecimal(unscaled, scale), "sor", OrderBook.MAX_SCALE);
+        return x;
+    }
+
+    /** {@code x} rounded half-even to 18 decimals (after a 200-digit division, as Python), read as binary64. */
+    static double dec18(Frac x) {
+        BigDecimal d = new BigDecimal(x.n).divide(new BigDecimal(x.d), new MathContext(200, RoundingMode.HALF_EVEN))
+                .setScale(18, RoundingMode.HALF_EVEN);
+        return Double.parseDouble(d.toString());
+    }
+
+    /** HR-40 standard error, the Python reference's {@code _se} rule (binary64 steps, no fused multiply-add). */
+    static String se(Frac meanCost, Frac meanSq, int nRows) {
+        double a = dec18(meanSq);
+        double b = dec18(meanCost);
+        double bb = b * b;
+        double se = Math.sqrt(Math.max(a - bb, 0.0) / nRows);
+        return LitMatching.fmt(new BigDecimal(se).setScale(6, RoundingMode.HALF_EVEN));
+    }
+
     private static Frac frac(Object v, String path) {
         return Frac.of(OrderBook.dec(v, path));
     }
@@ -146,8 +189,10 @@ public final class Sor {
         final int[] lit;
         final int[] dark;
         final int[][] rows;
+        final boolean wantSq;
 
         Problem(Map<?, ?> inp) {
+            wantSq = Boolean.TRUE.equals(inp.get("report_se"));
             S = lots(inp.get("S"), "S");
             if (S <= 0) {
                 throw new QfError("E_DOMAIN", "S must be positive", "S");
@@ -185,7 +230,7 @@ public final class Sor {
                     throw new QfError("E_SCHEMA", "venues/" + k + "/kind", "venues");
                 }
                 kinds.add((String) kind);
-                coef.add(h.add(frac(v.get("r"), "venues/" + k + "/r")).sub(frac(v.get("as"), "venues/" + k + "/as")));
+                coef.add(r(r(h.add(frac(v.get("r"), "venues/" + k + "/r"))).sub(frac(v.get("as"), "venues/" + k + "/as"))));
                 if (kind.equals("LIT")) {
                     qs.add(lots(v.get("Q"), "venues/" + k + "/Q"));
                     tails.add(new Frac[0]);
@@ -266,7 +311,7 @@ public final class Sor {
         List<Object[]> darkDist(int k, int L) {
             List<Object[]> out = new ArrayList<>();
             for (int j = 0; j < L; j++) {
-                Frac p = tail(k, j).sub(tail(k, j + 1));
+                Frac p = r(tail(k, j).sub(tail(k, j + 1)));
                 if (!p.isZero()) {
                     out.add(new Object[] {j, p});
                 }
@@ -294,8 +339,7 @@ public final class Sor {
             Frac fill = Frac.ZERO;
             Frac under = Frac.ZERO;
             Frac sq = Frac.ZERO;
-            Frac wRow = Frac.of(BigInteger.ONE, BigInteger.valueOf(rows.length));
-            Frac hf = h.add(f);
+            Frac hf = r(h.add(f));
             for (int[] row : rows) {
                 int[] base = new int[K];
                 for (int i = 0; i < lit.length; i++) {
@@ -312,12 +356,12 @@ public final class Sor {
                     continue;
                 }
                 while (true) {
-                    Frac p = wRow;
+                    Frac p = Frac.ONE;
                     int[] fills = base.clone();
                     for (int i = 0; i < dark.length; i++) {
                         Object[] jp = dists.get(i).get(idx[i]);
                         fills[dark[i]] = (Integer) jp[0];
-                        p = p.mul((Frac) jp[1]);
+                        p = r(p.mul((Frac) jp[1]));
                     }
                     long A = M;
                     for (int x : fills) {
@@ -325,18 +369,29 @@ public final class Sor {
                     }
                     long underQ = Math.max(S - A, 0);
                     long overQ = Math.max(A - S, 0);
-                    Frac c = hf.mul(M);
-                    Frac s = Frac.ZERO;
+                    Frac c = r(hf.mul(M));
                     for (int k = 0; k < K; k++) {
-                        s = s.add(coef.get(k).mul(fills[k]));
+                        if (fills[k] != 0) {
+                            c = r(c.sub(r(coef.get(k).mul(fills[k]))));
+                        }
                     }
-                    c = c.sub(s);
-                    c = c.add(theta.mul(M + sumL + underQ)).add(lu.mul(underQ)).add(lo.mul(overQ));
-                    cost = cost.add(p.mul(c));
-                    sq = sq.add(p.mul(c).mul(c));
-                    fill = fill.add(p.mul(Math.min(A, S)));
+                    if (!theta.isZero()) {
+                        c = r(c.add(r(theta.mul(M + sumL + underQ))));
+                    }
+                    if (underQ != 0) {
+                        c = r(c.add(r(lu.mul(underQ))));
+                    }
+                    if (overQ != 0) {
+                        c = r(c.add(r(lo.mul(overQ))));
+                    }
+                    Frac pc = r(p.mul(c));
+                    cost = r(cost.add(pc));
+                    if (wantSq) {
+                        sq = r(sq.add(r(pc.mul(c))));
+                    }
+                    fill = r(fill.add(r(p.mul(Math.min(A, S)))));
                     if (A < S) {
-                        under = under.add(p);
+                        under = r(under.add(p));
                     }
                     int i = dists.size() - 1;
                     while (i >= 0) {
@@ -351,7 +406,8 @@ public final class Sor {
                     }
                 }
             }
-            return new Eval(cost, fill, under, sq);
+            Frac nr = Frac.of(rows.length);
+            return new Eval(cost.div(nr), fill.div(nr), under.div(nr), sq.div(nr));
         }
 
         Frac cost(int[] t) {
@@ -370,41 +426,43 @@ public final class Sor {
             Arrays.sort(xs);
             int n = xs.length;
             int Q = qs.get(0);
-            Frac rEff = coef.get(0).sub(h);
-            Frac num = h.mul(2).add(f).add(rEff);
-            Frac base = h.add(rEff).add(theta);
-            Frac loT = thr(xs, n, (long) Q + S, num, base);
-            Frac hiT = thr(xs, n, Q, num, base);
-            if (loT == null || lu.compareTo(loT) <= 0) {
+            Frac rEff = r(coef.get(0).sub(h));
+            Frac num = r(r(r(h.add(h)).add(f)).add(rEff));
+            Frac base = r(r(h.add(rEff)).add(theta));
+            Frac lb = r(lu.add(base));
+            Frac numn = r(num.mul(n));
+            int cLo = count(xs, (long) Q + S);
+            int cHi = count(xs, Q);
+            if (cLo == 0 || r(lb.mul(cLo)).compareTo(numn) <= 0) {
                 return new int[] {0, S};
             }
-            if (hiT != null && lu.compareTo(hiT) >= 0) {
+            if (cHi != 0 && r(lb.mul(cHi)).compareTo(numn) >= 0) {
                 return new int[] {S, 0};
             }
-            Frac target = num.div(lu.add(base));
+            if (lb.isZero()) {
+                throw new QfError("E_DOMAIN", "lambda_u + h + r + theta is zero", "lambda_u");
+            }
+            int q = xs[n - 1];
             for (int v : xs) {
-                if (cdf(xs, n, v).compareTo(target) >= 0) {
-                    int M = (int) Math.min(Math.max((long) S - v + Q, 0), S);
-                    return new int[] {M, S - M};
+                int cmp = r(lb.mul(count(xs, v))).compareTo(numn);
+                if (lb.n.signum() > 0 ? cmp >= 0 : cmp <= 0) {
+                    q = v;
+                    break;
                 }
             }
-            throw new QfError("E_DOMAIN", "CLOSED_FORM: no sample quantile reaches the target", "method");
+            int M = (int) Math.min(Math.max((long) S - q + Q, 0), S);
+            return new int[] {M, S - M};
         }
 
-        private static Frac cdf(int[] xs, int n, long x) {
+        /** n F(x): the number of samples at most x. */
+        private static int count(int[] xs, long x) {
             int c = 0;
             for (int v : xs) {
                 if (v <= x) {
                     c++;
                 }
             }
-            return Frac.of(BigInteger.valueOf(c), BigInteger.valueOf(n));
-        }
-
-        /** num / F(x) - base, or null for +infinity when F(x) = 0. */
-        private static Frac thr(int[] xs, int n, long x, Frac num, Frac base) {
-            Frac F = cdf(xs, n, x);
-            return F.isZero() ? null : num.div(F).sub(base);
+            return c;
         }
 
         /** Every grid tuple in lexicographic order, scored and sorted by (cost, tuple); or null above 10^6 points. */
@@ -637,12 +695,7 @@ public final class Sor {
         out.put("expected_fill", out(e.fill()));
         out.put("p_underfill", out(e.under()));
         if (Boolean.TRUE.equals(inp.get("report_se"))) {
-            double var = Math.max(e.sq().sub(e.cost().mul(e.cost())).toDouble(), 0.0);
-            BigDecimal a = new BigDecimal(Math.sqrt(var));
-            BigDecimal b = new BigDecimal(Math.sqrt(p.rows.length));
-            Frac fa = Frac.of(a);
-            Frac fb = Frac.of(b);
-            out.put("expected_cost_se", out(fa.div(fb)));
+            out.put("expected_cost_se", se(e.cost(), e.sq(), p.rows.length));
             out.put("label", LABEL);
         }
         if (wantRank) {

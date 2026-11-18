@@ -140,6 +140,17 @@ TEST_CASE("report_se adds a positive standard error and the label", "[dark_sor]"
     CHECK(std::stod(o.find("expected_cost_se")->text) > 0);
 }
 
+TEST_CASE("report_se matches the Python _se rule exactly", "[dark_sor]") {
+    // Expected value from python/quantforge_core/sor.py allocate on the same input.
+    const json::Value o = outv("exec.sor.allocate", R"({"S":"3","f":"0.3","h":"0.5","lambda_o":"1","lambda_u":"4","theta":"0.01","report_se":true,"lit_samples":[["0"],["2"],["5"],["1"]],"venues":[{"Q":"1","as":"0","kind":"LIT","r":"0.2"},{"kind":"DARK","as":"0.1","r":"0","tail":["0.7","0.3"]}]})");
+    CHECK(o.find("expected_cost")->text == "1.9615");
+    CHECK(o.find("expected_cost_se")->text == "0.781289");
+}
+
+TEST_CASE("router cost outside the HR-57 range is E_LIMIT", "[dark_sor]") {
+    CHECK(code_of(call("exec.sor.allocate", R"({"theta":"100000000000000000000000000000000000","S":"10","venues":[{"kind":"LIT","Q":"0","r":"0.2","as":"0"}],"h":"0.5","f":"0.3","lambda_u":"4","lambda_o":"1","lit_samples":[["0"],["2"]]})")) == "E_LIMIT");
+}
+
 TEST_CASE("router errors", "[dark_sor]") {
     const std::string base = golden_inputs("sor_h", 2);
     auto patched = [&](const std::string& kv) { return "{" + kv + "," + base.substr(1); };

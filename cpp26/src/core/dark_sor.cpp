@@ -8,6 +8,7 @@
 #include <charconv>
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
 #include <optional>
 #include <string>
 #include <tuple>
@@ -502,7 +503,7 @@ using Tuple = std::vector<long long>;
 
 struct Totals {
     D cost, fill, under;  // sums over rows (dark probabilities applied); divide by the row count for the mean
-    long double sq = 0;   // sum of p * cost^2, for the standard error only
+    D sq;                 // sum of (p * cost) * cost, exact, for the standard error only (report_se)
 };
 
 class Problem {
@@ -781,12 +782,9 @@ private:
         if (under != 0) c += lu_ * D::integer(under);
         if (over != 0) c += lo_ * D::integer(over);
         tot.cost += p * c;
+        if (want_sq_) tot.sq += (p * c) * c;  // after cost, before fill: the order of the HR-57 checks in sor.py
         tot.fill += p * D::integer(std::min(A, S_));
         if (A < S_) tot.under += p;
-        if (want_sq_) {
-            const long double cl = std::strtold(c.str().c_str(), nullptr);
-            tot.sq += std::strtold(p.str().c_str(), nullptr) * cl * cl;
-        }
     }
 
     long long S_ = 0;
@@ -799,6 +797,23 @@ private:
     std::vector<std::size_t> lit_, dark_;
     std::vector<std::vector<long long>> rows_;
 };
+
+// HR-40 standard error, the rule of sor.py _se: a = E[c^2] and b = E[c], each exact, rounded half-even to 18
+// decimals by long division and read as binary64 (strtod rounds correctly); then se = sqrt(max(a - b * b, 0) / n)
+// in binary64 basic operations, each stored through a volatile so no fused multiply-add can form; written from the
+// exact binary value rounded half-even to 6 decimals (glibc printf is exact and rounds ties to even).
+string std_error(const D& cost, const D& sq, long long rows) {
+    const D n = D::integer(rows);
+    const volatile double a = std::strtod(div_round(sq, n, 18).c_str(), nullptr);
+    const volatile double b = std::strtod(div_round(cost, n, 18).c_str(), nullptr);
+    const volatile double bb = b * b;
+    const volatile double diff = a - bb;
+    const volatile double var = std::max(double(diff), 0.0) / double(rows);
+    const double se = std::sqrt(double(var));
+    char buf[64];
+    std::snprintf(buf, sizeof buf, "%.6f", se);
+    return trim(buf);
+}
 
 void write_tuple(json::Writer& out, const Tuple& t) {
     out.key("L");
@@ -849,13 +864,8 @@ void sor_allocate(const Value& inp, json::Writer& out) {
     out.key("expected_cost");
     out.string(div_round(t.cost, n, 6));
     if (report_se) {
-        const long double nn = (long double)p.rows();
-        const long double mean = std::strtold(t.cost.str().c_str(), nullptr) / nn;
-        const long double var = std::max(t.sq / nn - mean * mean, (long double)0);
-        char buf[64];
-        std::snprintf(buf, sizeof buf, "%.6f", double(std::sqrt(var) / std::sqrt(nn)));
         out.key("expected_cost_se");
-        out.string(trim(buf));
+        out.string(std_error(t.cost, t.sq, (long long)p.rows()));
     }
     out.key("expected_fill");
     out.string(div_round(t.fill, n, 6));

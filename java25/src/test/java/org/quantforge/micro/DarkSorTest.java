@@ -380,4 +380,50 @@ class DarkSorTest {
         assertEquals(64, rank.size());
         assertEquals(out.get("expected_cost"), ((Map<?, ?>) rank.get(0)).get("expected_cost"));
     }
+
+    private static Map<String, Object> sorInput(String s, String theta, List<Object> venues, List<Object> rows) {
+        Map<String, Object> in = new LinkedHashMap<>();
+        in.put("S", s);
+        in.put("theta", theta);
+        in.put("h", "0.5");
+        in.put("f", "0.3");
+        in.put("lambda_u", "4");
+        in.put("lambda_o", "1");
+        in.put("venues", venues);
+        in.put("lit_samples", rows);
+        return in;
+    }
+
+    private static Map<String, Object> venue(String... kv) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        for (int i = 0; i < kv.length; i += 2) {
+            m.put(kv[i], kv[i + 1]);
+        }
+        return m;
+    }
+
+    @Test
+    void sorOutOfRangeValueIsLimit() {
+        Map<String, Object> in = sorInput("10", "100000000000000000000000000000000000",
+                List.of(venue("kind", "LIT", "Q", "0", "r", "0.2", "as", "0")), List.of(List.of("0"), List.of("2")));
+        QfError e = assertThrows(QfError.class, () -> Sor.allocate(in));
+        assertEquals("E_LIMIT", e.code());
+    }
+
+    @Test
+    void sorStandardErrorMatchesPython() {
+        Map<String, Object> dark = venue("kind", "DARK", "r", "0.1", "as", "0.05");
+        dark.put("tail", List.of("0.7", "0.3"));
+        Map<String, Object> in = sorInput("3", "0.01",
+                List.of(venue("kind", "LIT", "Q", "0", "r", "0.2", "as", "0"), dark),
+                List.of(List.of("0"), List.of("2"), List.of("5")));
+        in.put("report_se", true);
+        Map<String, Object> out = Sor.allocate(in);
+        assertEquals("1", out.get("M"));
+        assertEquals(List.of("2", "2"), out.get("L"));
+        assertEquals("1.37", out.get("expected_cost"));
+        assertEquals("2.666667", out.get("expected_fill"));
+        assertEquals("0.233333", out.get("p_underfill"));
+        assertEquals("1.689331", out.get("expected_cost_se"));
+    }
 }

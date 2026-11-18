@@ -8,8 +8,10 @@
 //! `+ lambda_u (S - A)_+ + lambda_o (A - S)_+`,
 //! LIT fill = `(xi - Q)_+ - (xi - Q - L)_+`, DARK fill = `min(L, s)`, `A = M + sum fills`. The
 //! expectation is exact: equally weighted `lit_samples` rows times the independent dark
-//! distributions given by their tails, in rational arithmetic ([`Q`], 128-bit; a value that does
-//! not fit is `E_LIMIT`), rounded half-even to 6 decimals only on output.
+//! distributions given by their tails, in exact decimals ([`Dec`]; HR-57: every value computed,
+//! at the same steps as the Python build's `_r`, has `|coefficient| < 10^36` and scale <= 36, else
+//! `E_LIMIT`), summed over rows and divided by the row count only on output (long division,
+//! rounded half-even to 6 decimals). [`Q`] is the 128-bit rational the dark pool uses.
 //!
 //! Methods: `SAMPLE_AVERAGE` (HR-39; exhaustive integer search over 0..S per coordinate, HR-38,
 //! ties to the lexicographically smallest `(M, L_1, ..., L_K)`; coordinate descent from the [CK]
@@ -178,8 +180,143 @@ impl PartialOrd for Q {
     }
 }
 
-fn frac(v: Option<&Json>, path: &str) -> Result<Q> {
-    Q::from_dec(dec(v, path)?)
+fn limit() -> QfError {
+    at(
+        "E_LIMIT",
+        "sor",
+        "decimal outside the exact range (36 digits, 36 decimals; HR-57)",
+    )
+}
+
+/// HR-57/HR-58 at one exact step (Python `_r`): the result in range, else `E_LIMIT`. [`Dec`]
+/// checks its range on every operation and treats a 128-bit overflow as out of range.
+fn r(x: Result<Dec>) -> Result<Dec> {
+    x.map_err(|_| limit())
+}
+
+fn add(a: Dec, b: Dec) -> Result<Dec> {
+    r(a.checked_add(b))
+}
+
+fn sub(a: Dec, b: Dec) -> Result<Dec> {
+    r(a.checked_sub(b))
+}
+
+fn mul(a: Dec, b: Dec) -> Result<Dec> {
+    r(a.checked_mul(b))
+}
+
+fn mul_int(a: Dec, n: i64) -> Result<Dec> {
+    mul(a, Dec::int(n))
+}
+
+/// Rounds a non-negative decimal `int.frac` (with `sticky` set when non-zero digits follow
+/// `frac`) half-even to `places` decimals; returns the integer and fraction digit strings.
+fn round_digits(int: &str, frac: &str, sticky: bool, places: usize) -> (String, String) {
+    let mut fr: Vec<u8> = frac.bytes().collect();
+    fr.resize(fr.len().max(places), b'0');
+    let (kept, rest) = fr.split_at(places);
+    let mut digits: Vec<u8> = int.bytes().chain(kept.iter().copied()).collect();
+    let up = match rest.first() {
+        None => false,
+        Some(&d) if d > b'5' => true,
+        Some(&d) if d < b'5' => false,
+        Some(_) => {
+            if sticky || rest[1..].iter().any(|&d| d != b'0') {
+                true
+            } else {
+                digits.last().is_some_and(|&d| (d - b'0') % 2 == 1)
+            }
+        }
+    };
+    if up {
+        let mut i = digits.len();
+        loop {
+            if i == 0 {
+                digits.insert(0, b'1');
+                break;
+            }
+            i -= 1;
+            if digits[i] == b'9' {
+                digits[i] = b'0';
+            } else {
+                digits[i] += 1;
+                break;
+            }
+        }
+    }
+    let t = String::from_utf8(digits).expect("ascii digits");
+    let (i, f) = t.split_at(t.len() - places);
+    (i.to_string(), f.to_string())
+}
+
+/// Canonical text of a rounded value: leading zeros and trailing fraction zeros dropped, "0" for
+/// zero, `-` only for a non-zero negative value.
+fn canon(neg: bool, int: &str, frac: &str) -> String {
+    let int = int.trim_start_matches('0');
+    let frac = frac.trim_end_matches('0');
+    if int.is_empty() && frac.is_empty() {
+        return "0".into();
+    }
+    let int = if int.is_empty() { "0" } else { int };
+    let mut t = String::from(if neg { "-" } else { "" });
+    t.push_str(int);
+    if !frac.is_empty() {
+        t.push('.');
+        t.push_str(frac);
+    }
+    t
+}
+
+/// `x / n` (`n > 0`) by long division, rounded half-even to `places` decimals, as canonical text.
+fn div_round(x: Dec, n: u64, places: usize) -> String {
+    let (m, s) = x.parts();
+    let mut digits = m.unsigned_abs().to_string();
+    let s = s as usize;
+    if digits.len() <= s {
+        digits = format!("{}{digits}", "0".repeat(s + 1 - digits.len()));
+    }
+    let point = digits.len() - s;
+    let mut src: Vec<u8> = digits.into_bytes();
+    src.resize(src.len().max(point + places + 1), b'0');
+    let (n, mut rem) = (u128::from(n), 0u128);
+    let mut q = Vec::with_capacity(src.len());
+    for d in src {
+        rem = rem * 10 + u128::from(d - b'0');
+        q.push(b'0' + (rem / n) as u8);
+        rem %= n;
+    }
+    let q = String::from_utf8(q).expect("ascii digits");
+    let (int, frac) = q.split_at(point);
+    let (int, frac) = round_digits(int, frac, rem != 0, places);
+    canon(m < 0, &int, &frac)
+}
+
+/// Python `_dec18`: `x / n` rounded half-even to 18 decimals, read as binary64.
+fn dec18(x: Dec, n: u64) -> f64 {
+    div_round(x, n, 18).parse().expect("decimal text")
+}
+
+/// HR-40 standard error (Python `_se`): a = E[c^2], b = E[c], each exact, rounded half-even to 18
+/// decimals and read as binary64; `se = sqrt(max(a - b * b, 0) / n_rows)` in binary64 (no fused
+/// multiply-add), written from its exact binary value rounded half-even to 6 decimals.
+fn std_err(sum_cost: Dec, sum_sq: Dec, n_rows: u64) -> String {
+    let (a, b) = (dec18(sum_sq, n_rows), dec18(sum_cost, n_rows));
+    let bb = b * b;
+    let se = ((a - bb).max(0.0) / n_rows as f64).sqrt();
+    // 1100 fraction digits hold every binary64 value exactly.
+    let t = format!("{se:.1100}");
+    let (int, frac) = t.split_once('.').expect("fixed text");
+    let (int, frac) = round_digits(int, frac, false, 6);
+    canon(false, &int, &frac)
+}
+
+fn to_f64(x: Dec) -> f64 {
+    x.to_string().parse().expect("decimal text")
+}
+
+fn frac(v: Option<&Json>, path: &str) -> Result<Dec> {
+    dec(v, path)
 }
 
 fn lots(v: Option<&Json>, path: &str) -> Result<i64> {
@@ -196,26 +333,27 @@ fn lots(v: Option<&Json>, path: &str) -> Result<i64> {
         .map_err(|_| at("E_LIMIT", path, "too many lots"))
 }
 
-/// Expected cost, E min(A, S), P(A < S), E cost^2.
-pub type Eval = (Q, Q, Q, Q);
+/// Row sums (each divided by the row count only on output): cost, E min(A, S), P(A < S), cost^2.
+pub type Eval = (Dec, Dec, Dec, Dec);
 
-/// Every grid point with its expected cost, in rank order.
-pub type Ranking = Vec<(Q, Vec<i64>)>;
+/// Every grid point with its summed cost, in rank order.
+pub type Ranking = Vec<(Dec, Vec<i64>)>;
 
 pub struct Problem {
     pub s: i64,
-    h: Q,
-    f: Q,
-    theta: Q,
-    lu: Q,
-    lo: Q,
+    h: Dec,
+    f: Dec,
+    theta: Dec,
+    lu: Dec,
+    lo: Dec,
     lit_kind: Vec<bool>,
     qs: Vec<i64>,
-    coef: Vec<Q>,
-    tails: Vec<Vec<Q>>,
+    coef: Vec<Dec>,
+    tails: Vec<Vec<Dec>>,
     lit: Vec<usize>,
     dark: Vec<usize>,
     rows: Vec<Vec<i64>>,
+    want_sq: bool,
 }
 
 impl Problem {
@@ -229,7 +367,7 @@ impl Problem {
         let theta = frac(inp.get("theta"), "theta")?;
         let lu = frac(inp.get("lambda_u"), "lambda_u")?;
         let lo = frac(inp.get("lambda_o"), "lambda_o")?;
-        if [theta, lu, lo].iter().any(|g| *g < Q::ZERO) {
+        if [theta, lu, lo].iter().any(|g| g.signum() < 0) {
             return Err(at("E_DOMAIN", "lambda_u", "negative penalty"));
         }
         let venues = match inp.get("venues").and_then(Json::as_array) {
@@ -240,6 +378,7 @@ impl Problem {
             return Err(at("E_LIMIT", "venues", "more than 64 venues"));
         }
         let (mut lit_kind, mut qs, mut coef, mut tails) = (vec![], vec![], vec![], vec![]);
+        let one = Dec::int(1);
         for (k, v) in venues.iter().enumerate() {
             let kind = v.get("kind").and_then(Json::as_str);
             let lit = match kind {
@@ -248,9 +387,10 @@ impl Problem {
                 _ => return Err(at("E_SCHEMA", "venues", &format!("venues/{k}/kind"))),
             };
             lit_kind.push(lit);
-            let r = frac(v.get("r"), &format!("venues/{k}/r"))?;
+            let rk = frac(v.get("r"), &format!("venues/{k}/r"))?;
+            let hr = add(h, rk)?;
             let adv = frac(v.get("as"), &format!("venues/{k}/as"))?;
-            coef.push(h.plus(r)?.minus(adv)?);
+            coef.push(sub(hr, adv)?);
             if lit {
                 qs.push(lots(v.get("Q"), &format!("venues/{k}/Q"))?);
                 tails.push(vec![]);
@@ -265,8 +405,8 @@ impl Problem {
                 let tail = raw
                     .iter()
                     .map(|t| frac(Some(t), &format!("venues/{k}/tail")))
-                    .collect::<Result<Vec<Q>>>()?;
-                if tail.iter().any(|t| *t < Q::ZERO || *t > Q::ONE)
+                    .collect::<Result<Vec<Dec>>>()?;
+                if tail.iter().any(|t| t.signum() < 0 || *t > one)
                     || tail.windows(2).any(|w| w[0] < w[1])
                 {
                     return Err(at(
@@ -278,6 +418,7 @@ impl Problem {
                 tails.push(tail);
             }
         }
+        let want_sq = matches!(inp.get("report_se"), Some(Json::Bool(true)));
         let lit: Vec<usize> = (0..lit_kind.len()).filter(|&k| lit_kind[k]).collect();
         let dark: Vec<usize> = (0..lit_kind.len()).filter(|&k| !lit_kind[k]).collect();
         let raw_rows = match inp.get("lit_samples") {
@@ -329,6 +470,7 @@ impl Problem {
             lit,
             dark,
             rows,
+            want_sq,
         })
     }
 
@@ -336,50 +478,64 @@ impl Problem {
         self.lit_kind.len()
     }
 
-    fn tail(&self, k: usize, s: i64) -> Q {
+    /// The number of `lit_samples` rows (1 when there are none).
+    pub fn n_rows(&self) -> u64 {
+        self.rows.len() as u64
+    }
+
+    fn tail(&self, k: usize, s: i64) -> Dec {
         let t = &self.tails[k];
         if s <= 0 {
-            Q::ONE
+            Dec::int(1)
         } else if (s as usize) <= t.len() {
             t[s as usize - 1]
         } else {
-            Q::ZERO
+            Dec::ZERO
         }
     }
 
     /// Distribution of min(L, s) for dark venue k (zero-probability values dropped).
-    fn dark_dist(&self, k: usize, l: i64) -> Result<Vec<(i64, Q)>> {
+    fn dark_dist(&self, k: usize, l: i64) -> Result<Vec<(i64, Dec)>> {
         let mut out = Vec::new();
         for j in 0..l {
-            out.push((j, self.tail(k, j).minus(self.tail(k, j + 1))?));
+            out.push((j, sub(self.tail(k, j), self.tail(k, j + 1))?));
         }
         out.push((l, self.tail(k, l)));
         Ok(out.into_iter().filter(|(_, p)| !p.is_zero()).collect())
     }
 
-    fn scenario_cost(&self, m: i64, l: &[i64], fills: &[i64]) -> Result<(Q, i64)> {
+    /// Cost of one scenario, each step range-checked (HR-57) in the order of the Python build.
+    fn scenario_cost(&self, m: i64, l: &[i64], fills: &[i64]) -> Result<(Dec, i64)> {
         let a = m + fills.iter().sum::<i64>();
         let (under, over) = ((self.s - a).max(0), (a - self.s).max(0));
-        let mut c = self.h.plus(self.f)?.times(Q::int(m))?;
+        let mut c = mul_int(add(self.h, self.f)?, m)?;
         for k in 0..l.len() {
-            c = c.minus(self.coef[k].times(Q::int(fills[k]))?)?;
+            if fills[k] != 0 {
+                c = sub(c, mul_int(self.coef[k], fills[k])?)?;
+            }
         }
-        let posted = m + l.iter().sum::<i64>() + under;
-        c = c.plus(self.theta.times(Q::int(posted))?)?;
-        c = c.plus(self.lu.times(Q::int(under))?)?;
-        c = c.plus(self.lo.times(Q::int(over))?)?;
+        if !self.theta.is_zero() {
+            let posted = m + l.iter().sum::<i64>() + under;
+            c = add(c, mul_int(self.theta, posted)?)?;
+        }
+        if under != 0 {
+            c = add(c, mul_int(self.lu, under)?)?;
+        }
+        if over != 0 {
+            c = add(c, mul_int(self.lo, over)?)?;
+        }
         Ok((c, a))
     }
 
-    /// Exact (expected cost, E min(A, S), P(A < S), E cost^2).
+    /// Exact row sums (cost, min(A, S), [A < S], cost^2), each step range-checked (HR-57); divide
+    /// by [`Problem::n_rows`] for the expectations. cost^2 is summed only when `report_se` is set.
     pub fn evaluate(&self, m: i64, l: &[i64]) -> Result<Eval> {
         let dists = self
             .dark
             .iter()
             .map(|&k| self.dark_dist(k, l[k]))
             .collect::<Result<Vec<_>>>()?;
-        let (mut cost, mut fill, mut under, mut sq) = (Q::ZERO, Q::ZERO, Q::ZERO, Q::ZERO);
-        let w_row = Q::new(1, self.rows.len() as i128)?;
+        let (mut cost, mut fill, mut under, mut sq) = (Dec::ZERO, Dec::ZERO, Dec::ZERO, Dec::ZERO);
         for row in &self.rows {
             let mut base = vec![0i64; l.len()];
             for (i, &k) in self.lit.iter().enumerate() {
@@ -388,20 +544,21 @@ impl Problem {
             }
             let mut idx = vec![0usize; dists.len()];
             loop {
-                let mut p = w_row;
+                let mut p = Dec::int(1);
                 let mut fills = base.clone();
                 for (d, &k) in self.dark.iter().enumerate() {
                     let (j, pj) = dists[d][idx[d]];
                     fills[k] = j;
-                    p = p.times(pj)?;
+                    p = mul(p, pj)?;
                 }
                 let (c, a) = self.scenario_cost(m, l, &fills)?;
-                let pc = p.times(c)?;
-                cost = cost.plus(pc)?;
-                sq = sq.plus(pc.times(c)?)?;
-                fill = fill.plus(p.times(Q::int(a.min(self.s)))?)?;
+                cost = add(cost, mul(p, c)?)?;
+                if self.want_sq {
+                    sq = add(sq, mul(mul(p, c)?, c)?)?;
+                }
+                fill = add(fill, mul_int(p, a.min(self.s))?)?;
                 if a < self.s {
-                    under = under.plus(p)?;
+                    under = add(under, p)?;
                 }
                 // Odometer over the dark distributions, last venue fastest (itertools.product).
                 if !next_index(&mut idx, |d| dists[d].len()) {
@@ -412,11 +569,13 @@ impl Problem {
         Ok((cost, fill, under, sq))
     }
 
-    fn cost(&self, t: &[i64]) -> Result<Q> {
+    fn cost(&self, t: &[i64]) -> Result<Dec> {
         Ok(self.evaluate(t[0], &t[1..])?.0)
     }
 
-    /// [CK] Prop. 3 for one lit venue, F the empirical CDF of xi, left-inverse quantile.
+    /// [CK] Prop. 3 for one lit venue, F the empirical CDF of xi, left-inverse quantile, compared
+    /// in the cross-multiplied form `(lambda_u + base) n F(x) <= num n` of the Python build, each
+    /// step range-checked (HR-57).
     pub fn closed_form(&self) -> Result<Vec<i64>> {
         if self.lit_kind != [true] {
             return Err(at(
@@ -427,35 +586,40 @@ impl Problem {
         }
         let mut xs: Vec<i64> = self.rows.iter().map(|r| r[0]).collect();
         xs.sort_unstable();
-        let (n, q0, s) = (xs.len() as i128, self.qs[0], self.s);
-        let r_eff = self.coef[0].minus(self.h)?;
-        let num = self.h.times(Q::int(2))?.plus(self.f)?.plus(r_eff)?;
-        let base = self.h.plus(r_eff)?.plus(self.theta)?;
-        let cdf = |x: i64| Q::new(xs.iter().filter(|&&v| v <= x).count() as i128, n);
-        let thr = |x: i64| -> Result<Option<Q>> {
-            let fx = cdf(x)?;
-            if fx.is_zero() {
-                Ok(None)
-            } else {
-                Ok(Some(num.over(fx)?.minus(base)?))
-            }
-        };
-        let (lo_t, hi_t) = (thr(q0 + s)?, thr(q0)?);
-        if lo_t.is_none_or(|t| self.lu <= t) {
+        let (n, q0, s) = (xs.len() as i64, self.qs[0], self.s);
+        let r_eff = sub(self.coef[0], self.h)?;
+        let num = add(add(add(self.h, self.h)?, self.f)?, r_eff)?;
+        let base = add(add(self.h, r_eff)?, self.theta)?;
+        let count = |x: i64| xs.iter().filter(|&&v| v <= x).count() as i64;
+        let lb = add(self.lu, base)?;
+        let numn = mul_int(num, n)?;
+        let (c_lo, c_hi) = (count(q0 + s), count(q0));
+        if c_lo == 0 || mul_int(lb, c_lo)? <= numn {
             return Ok(vec![0, s]);
         }
-        if hi_t.is_some_and(|t| self.lu >= t) {
+        if c_hi != 0 && mul_int(lb, c_hi)? >= numn {
             return Ok(vec![s, 0]);
         }
-        let target = num.over(self.lu.plus(base)?)?;
-        let mut q = None;
+        if lb.is_zero() {
+            return Err(at(
+                "E_DOMAIN",
+                "lambda_u",
+                "lambda_u + h + r + theta is zero",
+            ));
+        }
+        let mut q = *xs.last().expect("at least one row");
         for &v in &xs {
-            if cdf(v)? >= target {
-                q = Some(v);
+            let lhs = mul_int(lb, count(v))?;
+            let hit = if lb.signum() > 0 {
+                lhs >= numn
+            } else {
+                lhs <= numn
+            };
+            if hit {
+                q = v;
                 break;
             }
         }
-        let q = q.ok_or_else(|| at("E_DOMAIN", "method", "no quantile reaches the target"))?;
         let m = (s - q + q0).max(0).min(s);
         Ok(vec![m, s - m])
     }
@@ -542,17 +706,17 @@ impl Problem {
         let mut x: Vec<f64> = self.start()?.iter().map(|&v| v as f64).collect();
         let mut avg = vec![0.0f64; k_n + 1];
         let (h, f, th, lu, lo) = (
-            self.h.to_f64(),
-            self.f.to_f64(),
-            self.theta.to_f64(),
-            self.lu.to_f64(),
-            self.lo.to_f64(),
+            to_f64(self.h),
+            to_f64(self.f),
+            to_f64(self.theta),
+            to_f64(self.lu),
+            to_f64(self.lo),
         );
-        let coef: Vec<f64> = self.coef.iter().map(|c| c.to_f64()).collect();
+        let coef: Vec<f64> = self.coef.iter().map(|c| to_f64(*c)).collect();
         let tails: Vec<Vec<f64>> = self
             .tails
             .iter()
-            .map(|t| t.iter().map(|v| v.to_f64()).collect())
+            .map(|t| t.iter().map(|v| to_f64(*v)).collect())
             .collect();
         let nrows = self.rows.len();
         for n in 1..=iterations.max(0) {
@@ -595,7 +759,7 @@ impl Problem {
             })
             .collect();
         let mut idx = vec![0usize; opts.len()];
-        let mut best: Option<(Q, Vec<i64>)> = None;
+        let mut best: Option<(Dec, Vec<i64>)> = None;
         loop {
             let t: Vec<i64> = idx.iter().zip(&opts).map(|(&i, o)| o[i]).collect();
             let c = self.cost(&t)?;
@@ -672,24 +836,25 @@ pub fn allocate(inp: &Json) -> Result<Json> {
         _ => return Err(at("E_SCHEMA", "method", "unknown method")),
     };
     let (cost, fill, under, sq) = p.evaluate(best[0], &best[1..])?;
+    let n = p.n_rows();
     let (m, l) = point(&best);
     let mut out = vec![
         ("L".to_string(), l),
         ("M".to_string(), m),
-        ("expected_cost".to_string(), Json::Str(cost.round6()?)),
+        (
+            "expected_cost".to_string(),
+            Json::Str(div_round(cost, n, 6)),
+        ),
     ];
-    if matches!(inp.get("report_se"), Some(Json::Bool(true))) {
-        let var = sq.minus(cost.times(cost)?)?.to_f64().max(0.0);
-        let se = var.sqrt() / (p.rows.len() as f64).sqrt();
-        let t = format!("{se:.6}");
-        let t = Dec::parse(&t).expect("fixed text")?.to_string();
-        out.push(("expected_cost_se".into(), Json::Str(t)));
+    let report_se = matches!(inp.get("report_se"), Some(Json::Bool(true)));
+    if report_se {
+        out.push(("expected_cost_se".into(), Json::Str(std_err(cost, sq, n))));
     }
-    out.push(("expected_fill".into(), Json::Str(fill.round6()?)));
-    if matches!(inp.get("report_se"), Some(Json::Bool(true))) {
+    out.push(("expected_fill".into(), Json::Str(div_round(fill, n, 6))));
+    if report_se {
         out.push(("label".into(), LABEL.into()));
     }
-    out.push(("p_underfill".into(), Json::Str(under.round6()?)));
+    out.push(("p_underfill".into(), Json::Str(div_round(under, n, 6))));
     if want_rank {
         let rows = ranking
             .iter()
@@ -698,7 +863,7 @@ pub fn allocate(inp: &Json) -> Result<Json> {
                 Ok(Json::Obj(vec![
                     ("L".into(), l),
                     ("M".into(), m),
-                    ("expected_cost".into(), Json::Str(c.round6()?)),
+                    ("expected_cost".into(), Json::Str(div_round(*c, n, 6))),
                 ]))
             })
             .collect::<Result<Vec<Json>>>()?;
