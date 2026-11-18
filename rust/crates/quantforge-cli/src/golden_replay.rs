@@ -463,5 +463,5 @@ fn stage_h_w2_exec_goldens() {
 /// ledger hashes byte for byte, book, explain, pre-trade and LIT sessions (HR-42 to HR-55).
 #[test]
 fn stage_h_paper_goldens() {
-    replay_only("stage_h", &["pt_h", "e1_hpt"], 33);
+    replay_only("stage_h", &["pt_h", "e1_hpt"], 39);
 }

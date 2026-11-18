@@ -1,16 +1,17 @@
-//! Decimal arithmetic as the Python reference does it for paper trading: Python `decimal` with
-//! its default context (28 significant digits, `ROUND_HALF_EVEN`). Inputs are held exactly; every
-//! sum, difference, product and quotient is the exact result rounded to 28 significant digits, so
-//! an average cost such as 301/3 carries the same last digit as the Python build
-//! (`specifications/10-execution/paper-trading.md`, HR-44). Digits are kept in a little-endian
-//! base-10 vector: the values are small and the code stays obviously right.
+//! Decimal arithmetic as the Python reference does it for paper trading (HR-77): Python `decimal`
+//! in the 200-digit context of HR-58, so every sum, difference and product of in-range values is
+//! exact; `rng` is the HR-57 range check (`E_LIMIT`, never a rounded value); the stated divisions
+//! round half-even with `quantize` (`specifications/10-execution/paper-trading.md`). Digits are
+//! kept in a little-endian base-10 vector: the values are small and the code stays obviously right.
 // Value-returning arithmetic, as the operators of Python `decimal`.
 #![allow(clippy::return_self_not_must_use)]
 use crate::error::{Result, err};
 use std::cmp::Ordering;
 
-/// Python's default context precision.
-pub const PREC: usize = 28;
+/// The HR-58 context precision (Python `EXACT = Context(prec=200)`).
+pub const PREC: usize = 200;
+/// HR-57: at most 36 digits.
+const MAX_DIGITS: usize = 36;
 /// Largest input exponent accepted (Python has none; this bounds the digit vectors).
 const MAX_EXP: i64 = 4000;
 
@@ -351,6 +352,28 @@ impl PyDec {
         self.plus().plain()
     }
 
+    /// HR-57: `self` when it has at most 36 digits and `max_scale` decimals, else `E_LIMIT`.
+    pub fn rng(self, name: &str, max_scale: i64) -> Result<PyDec> {
+        if self.is_zero() {
+            return Ok(self);
+        }
+        let len = self.mag.len() as i64;
+        let (n, scale) = if self.exp >= 0 {
+            (len + self.exp, 0)
+        } else {
+            (len, -self.exp)
+        };
+        if n > MAX_DIGITS as i64 || scale > max_scale {
+            return Err(err(
+                "E_LIMIT",
+                format!(
+                    "{name}: decimal outside the exact range (36 digits, {max_scale} decimals; HR-57)"
+                ),
+            ));
+        }
+        Ok(self)
+    }
+
     /// The nearest binary64 (Python `float(Decimal)`).
     pub fn to_f64(&self) -> f64 {
         self.plain().parse().unwrap_or(f64::NAN)
@@ -397,25 +420,24 @@ mod tests {
         assert_eq!(d("0.1").add(&d("0.2")), d("0.3"));
         assert_eq!(d("1").sub(&d("1.5")).fmt(), "-0.5");
         assert_eq!(d("1.5").mul(&d("-0.2")).fmt(), "-0.3");
-        // Python: Decimal(301) / 3 and Decimal(2) / 3 (28 digits, half-even).
+        // HR-77: 5 / 3 to 18 decimals, half-even (pt_h-0051); a 31-digit sum stays exact.
         assert_eq!(
-            d("301").div(&d("3")).expect("div").fmt(),
-            "100.3333333333333333333333333"
-        );
-        assert_eq!(
-            d("2").div(&d("3")).expect("div").fmt(),
-            "0.6666666666666666666666666667"
+            d("5").div(&d("3")).expect("div").quantize(-18).fmt(),
+            "1.666666666666666667"
         );
         assert_eq!(d("201").div(&d("2")).expect("div").fmt(), "100.5");
-        // Python: Decimal("1234567890123456789012345678.5") + 0 rounds half-even to ...678
+        let big = d("1234567890123456789012345678901");
         assert_eq!(
-            d("1234567890123456789012345678.5").plus().fmt(),
-            "1234567890123456789012345678"
+            big.add(&d("0.5")).fmt(),
+            "1234567890123456789012345678901.5"
         );
-        assert_eq!(
-            d("1234567890123456789012345677.5").plus().fmt(),
-            "1234567890123456789012345678"
+        assert!(
+            d(&"9".repeat(37))
+                .rng("x", 36)
+                .is_err_and(|e| e.code == "E_LIMIT")
         );
+        assert!(d("0.0000000000000000001").rng("x", 18).is_err());
+        assert!(d("0.0000000000000000001").rng("x", 36).is_ok());
         assert_eq!(d("0.990969").quantize(-2).fmt(), "0.99");
         assert_eq!(d("0.005").quantize(-2).fmt(), "0");
         assert_eq!(d("0.015").quantize(-2).fmt(), "0.02");

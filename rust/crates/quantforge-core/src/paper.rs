@@ -69,16 +69,17 @@ fn dec(v: &Json, name: &str) -> Result<PyDec> {
         Json::Bool(_) | Json::Num(_) => {
             Err(e("E_INPUT", format!("{name} must be a decimal string")))
         }
-        Json::Int(n) => Ok(PyDec::int(*n)),
-        Json::Str(t) => parse_text(t, name),
+        Json::Int(n) => PyDec::int(*n).rng(name, 36),
+        Json::Str(t) => parse_text(t, name)?.rng(name, 36),
         _ => Err(e("E_PARSE", format!("{name} is not a decimal"))),
     }
 }
 
-/// A decimal input over the CLI must be a JSON string (HR-12, HR-44).
+/// A decimal input over the CLI must be a JSON string (HR-12, HR-44) in the HR-57 input range
+/// (36 digits, 18 decimals), else `E_LIMIT` (HR-77).
 fn dstr(v: &Json, name: &str) -> Result<PyDec> {
     match v {
-        Json::Str(t) => parse_text(t, name),
+        Json::Str(_) => dec(v, name)?.rng(name, 18),
         _ => Err(e("E_SCHEMA", format!("{name} must be a decimal string"))),
     }
 }
@@ -423,22 +424,32 @@ impl Book {
         if !q.is_pos() || !p.is_pos() {
             return Err(e("E_DOMAIN", "quantity and price must be positive"));
         }
-        self.cash = self.cash.sub(&i(sg).mul(q).mul(p).add(f));
-        self.fees = self.fees.add(f);
+        let notional = q.mul(p).rng("notional", 36)?;
+        let flow = i(sg).mul(&notional).add(f).rng("cash_flow", 36)?;
+        self.cash = self.cash.sub(&flow).rng("cash", 36)?;
+        self.fees = self.fees.add(f).rng("fees", 36)?;
         let pos = self.pos(sym).clone();
         let mut realised = None;
         let np = if pos.n.is_zero() || pos.n.is_pos() == (sg > 0) {
             let an = pos.n.abs();
+            let basis = an
+                .mul(&pos.c)
+                .rng("basis", 36)?
+                .add(&notional)
+                .rng("basis", 36)?;
+            // HR-77: the one division of the book, half-even to 18 decimals
+            let c = basis.div(&an.add(q).rng("position", 36)?)?.quantize(-18);
             Pos {
-                c: an.mul(&pos.c).add(&q.mul(p)).div(&an.add(q))?,
-                n: pos.n.add(&i(sg).mul(q)),
+                c: c.rng("avg_cost", 36)?,
+                n: pos.n.add(&i(sg).mul(q)).rng("position", 36)?,
             }
         } else {
             let an = pos.n.abs();
             let closed = if an < *q { an } else { q.clone() };
             let sign = if pos.n.is_pos() { 1 } else { -1 };
-            realised = Some(closed.mul(&p.sub(&pos.c)).mul(&i(sign)));
-            let n = pos.n.add(&i(sg).mul(q));
+            let pnl = p.sub(&pos.c).rng("pnl", 36)?;
+            realised = Some(closed.mul(&pnl).mul(&i(sign)).rng("pnl", 36)?);
+            let n = pos.n.add(&i(sg).mul(q)).rng("position", 36)?;
             let c = if n.is_zero() {
                 PyDec::zero()
             } else if n.is_pos() != (sign > 0) {
@@ -449,7 +460,7 @@ impl Book {
             Pos { n, c }
         };
         if let Some(r) = realised {
-            self.realised = self.realised.add(&r);
+            self.realised = self.realised.add(&r).rng("realised", 36)?;
         }
         *self.pos(sym) = np;
         Ok(())
@@ -459,10 +470,11 @@ impl Book {
         let mut t = PyDec::zero();
         for (sym, p) in &self.positions {
             if !p.n.is_zero() {
-                t = t.add(&p.n.mul(&dec(mark(marks, sym)?, "marks")?));
+                let mv = p.n.mul(&dec(mark(marks, sym)?, "marks")?);
+                t = t.add(&mv.rng("market_value", 36)?);
             }
         }
-        Ok(self.cash.add(&t))
+        self.cash.add(&t).rng("nav", 36)
     }
 }
 
@@ -513,8 +525,11 @@ fn end_of_day(
     } else {
         dec(rates[0], "cash_rate")?
     };
-    let d365 = |x: PyDec| x.mul(&i(days)).div(&i(365));
-    let interest = d365(cash.mul(&r))?.quantize(-2);
+    // HR-77: the exact product, then one division by 365, half-even to 0.01
+    let d365 = |x: PyDec, name: &str| -> Result<PyDec> {
+        Ok(x.mul(&i(days)).rng(name, 36)?.div(&i(365))?.quantize(-2))
+    };
+    let interest = d365(cash.mul(&r), "interest")?;
     let mut smv = PyDec::zero();
     for (sym, n) in &opening {
         let px = dec(mark(prev_marks, sym)?, "close")?;
@@ -522,10 +537,9 @@ fn end_of_day(
             smv = smv.add(&n.neg().mul(&px));
         }
     }
-    let borrow = d365(smv.mul(&dec(rates[2], "borrow_rate")?))?
-        .quantize(-2)
-        .neg();
-    let financing = interest.add(&borrow);
+    let smv = smv.rng("short_value", 36)?;
+    let borrow = d365(smv.mul(&dec(rates[2], "borrow_rate")?), "borrow")?.neg();
+    let financing = interest.add(&borrow).rng("financing", 36)?;
     let mut market = PyDec::zero();
     for (sym, n) in &opening {
         let m1 = dec(mark(marks, sym)?, "mark")?;
@@ -540,7 +554,15 @@ fn end_of_day(
         book.apply_fill(&f.symbol, f.sign, &f.quantity, &f.price, &f.fee)?;
     }
     book.cash = book.cash.add(&financing);
-    let total = market.add(&trading).add(&fees).add(&financing);
+    let market = market.rng("market", 36)?;
+    let trading = trading.rng("trading", 36)?;
+    let fees = fees.rng("fees", 36)?;
+    book.cash = book.cash.clone().rng("cash", 36)?;
+    let total = market
+        .add(&trading)
+        .add(&fees)
+        .add(&financing)
+        .rng("total", 36)?;
     let nav = book.nav(marks)?;
     if total != nav.sub(&nav0) {
         return Err(e("E_INPUT", "explain residual (HR-53)"));
@@ -629,12 +651,13 @@ fn pretrade_check(
         out.push("MAX_QTY");
     }
     if let Some(l) = &limit
-        && l.sub(p_ref).abs().div(p_ref)? > band
+        // cross-multiplied, so no division (HR-77): |limit - P_ref| / P_ref > band
+        && l.sub(p_ref).abs().rng("band", 36)? > band.mul(p_ref).rng("band", 36)?
     {
         out.push("PRICE_BAND");
     }
     let notional = q.mul(&p_chk);
-    if notional > dec(lim("max_notional")?, "max_notional")? {
+    if notional.clone().rng("notional", 36)? > dec(lim("max_notional")?, "max_notional")? {
         out.push("MAX_NOTIONAL");
     }
     if after.abs() > dec(lim("max_abs_position")?, "max_abs_position")? {
@@ -1342,9 +1365,7 @@ pub fn session_case(
     script: &[Json],
     dark: Option<&Json>,
 ) -> Result<Json> {
-    if !matches!(cash, Json::Str(_)) {
-        return Err(e("E_SCHEMA", "cash must be a decimal string"));
-    }
+    dstr(cash, "cash")?;
     for k in ["tick_size", "lot_size", "fee_schedule"] {
         req(lit, k, "lit/")?;
     }
@@ -1381,6 +1402,11 @@ pub fn session_case(
             for key in ["order_id", "symbol", "side", "type", "quantity"] {
                 req(order, key, &format!("{w}order/"))?;
             }
+            for key in ["quantity", "limit_price"] {
+                if let Some(v) = order.get(key).filter(|v| **v != Json::Null) {
+                    dstr(v, key)?;
+                }
+            }
             symbols.insert(str_of(req(order, "symbol", "")?, "symbol")?.to_string());
             let contra = match step.get("contra") {
                 Some(Json::Arr(a)) => a.as_slice(),
@@ -1397,6 +1423,16 @@ pub fn session_case(
             };
             let zero = s("0");
             let r = |k: &str| step.get(k).unwrap_or(&zero);
+            for k in ["cash_rate", "debit_rate", "borrow_rate"] {
+                dstr(r(k), k)?;
+            }
+            for name in ["prev_marks", "marks"] {
+                if let Some(Json::Obj(m)) = step.get(name) {
+                    for (sym, v) in m {
+                        dstr(v, sym)?;
+                    }
+                }
+            }
             let pm = obj_or_empty(step.get("prev_marks"), "prev_marks")?;
             let mk = obj_or_empty(step.get("marks"), "marks")?;
             let eod = ss.close_day(
