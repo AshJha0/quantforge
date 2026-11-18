@@ -25,7 +25,7 @@ def main():
     out = [
         "# QuantForge question bank",
         "",
-        f"A learning question bank and knowledge check: {n} questions with full answers, in twelve sets that follow the "
+        f"A learning question bank and knowledge check: {n} questions with full answers, in {len(rows)} sets that follow the "
         "project's topics. It is for two readers. A newcomer can work through the foundation questions in order; a "
         "practitioner can jump to a set and test themselves against QuantForge's own conventions and rulings.",
         "",

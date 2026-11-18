@@ -1,6 +1,6 @@
 # QuantForge question bank
 
-A learning question bank and knowledge check: 371 questions with full answers, in twelve sets that follow the project's topics. It is for two readers. A newcomer can work through the foundation questions in order; a practitioner can jump to a set and test themselves against QuantForge's own conventions and rulings.
+A learning question bank and knowledge check: 389 questions with full answers, in 13 sets that follow the project's topics. It is for two readers. A newcomer can work through the foundation questions in order; a practitioner can jump to a set and test themselves against QuantForge's own conventions and rulings.
 
 How to use it: read the question, answer it on paper, then read the answer. Each answer starts with the plain idea, then gives the formal rule as the spec states it, then (for quantitative topics) a worked example with numbers, and ends with the pitfall that matters on a desk or in validation. Each question names its source spec or tutorial and an evidence class:
 
@@ -26,13 +26,14 @@ Levels: **foundation** (the idea and the convention), **practitioner** (using th
 | [Hedging and hedge solvers](10-hedging.md) | 9 | 14 | 8 | 31 |
 | [Research statistics and backtest honesty](11-research-statistics.md) | 10 | 12 | 8 | 30 |
 | [Four-language engineering and verification](12-engineering-verification.md) | 11 | 13 | 6 | 30 |
-| **Total** | 125 | 157 | 89 | **371** |
+| [Execution and microstructure](13-execution-microstructure.md) | 8 | 6 | 4 | 18 |
+| **Total** | 133 | 163 | 93 | **389** |
 
 Back to [Learn QuantForge](../../LEARN.md).
 
 ## Foundation questions
 
-125 questions.
+133 questions.
 
 - Q1.1 (01-foundations-numerics.md) How do ACT/360 and ACT/365F differ, and what year fraction does each give from 1 January to 1 July 2024?
 - Q1.4 (01-foundations-numerics.md) What does QuantForge return when the start equals the end, or the end is before the start?
@@ -159,10 +160,18 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q12.19 (12-engineering-verification.md) Which results must agree to the last bit in every language, and why can they?
 - Q12.23 (12-engineering-verification.md) How is a snapshot hash computed so that four languages get the same hash?
 - Q12.26 (12-engineering-verification.md) What commands and exit codes does every `quantforge` CLI support?
+- Q13.1 (13-execution-microstructure.md) Why cut a large order into slices at all?
+- Q13.2 (13-execution-microstructure.md) You must send 1,000 units in 3 buckets, in whole units. What does `exec.schedule.twap` return, and why?
+- Q13.5 (13-execution-microstructure.md) A POV order ends the day unfilled. Is that an error?
+- Q13.6 (13-execution-microstructure.md) In plain terms, what trade-off does Almgren-Chriss solve?
+- Q13.10 (13-execution-microstructure.md) What are the four parts of implementation shortfall in QuantForge, and which quantity carries the delay cost?
+- Q13.12 (13-execution-microstructure.md) What does the square-root law say, and what do QuantForge's square-root goldens prove?
+- Q13.16 (13-execution-microstructure.md) In the simulated lit engine, three bids rest at one price and a sell arrives that fills one and a half of them. Which bids fill?
+- Q13.18 (13-execution-microstructure.md) Why does QuantForge have no market-by-order data from a real venue?
 
 ## Practitioner questions
 
-157 questions.
+163 questions.
 
 - Q1.2 (01-foundations-numerics.md) What does ACT/ACT ISDA give from 1 November 2003 to 1 May 2004, and how does ACT/ACT ICMA differ on the same dates?
 - Q1.3 (01-foundations-numerics.md) How do the 30/360 variants treat 29 February 2024 to 31 August 2024?
@@ -321,10 +330,16 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q12.25 (12-engineering-verification.md) What does strict JSON mean in the QuantForge contract?
 - Q12.27 (12-engineering-verification.md) What does batch mode guarantee, line by line?
 - Q12.29 (12-engineering-verification.md) What is the outside-library share, and what floor must each stage meet?
+- Q13.3 (13-execution-microstructure.md) How does the VWAP schedule break ties when it rounds to whole units?
+- Q13.4 (13-execution-microstructure.md) A POV order is set to 20 % participation. Outside traders print 1,000 units in a bucket. How much does the order trade there?
+- Q13.7 (13-execution-microstructure.md) Using the paper's test parameters, what are the expected cost and variance of the straight-line schedule?
+- Q13.8 (13-execution-microstructure.md) At `lambda = 1e-6`, how much of the position is left after the first day, and what does risk aversion cost?
+- Q13.11 (13-execution-microstructure.md) A buy of 1,000 is decided at 100, arrives at 100.10, fills 600 at 100.20 and 200 at 100.30, ends at 101, with fees of 5. Decompose the shortfall.
+- Q13.14 (13-execution-microstructure.md) A market maker is long 2 units. How do the Avellaneda-Stoikov quotes move, and by how much?
 
 ## Advanced questions
 
-89 questions.
+93 questions.
 
 - Q1.5 (01-foundations-numerics.md) Why does ACT/ACT AFB give the same answer from 28 February 2004 to both 28 and 29 February 2008, and why does Strata disagree?
 - Q1.21 (01-foundations-numerics.md) How does the adaptive Gauss-Kronrod rule integrate `1/sqrt(x)` on `[0, 1]` when the integrand is infinite at 0?
@@ -415,3 +430,7 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q12.21 (12-engineering-verification.md) What does QuantForge do about fused multiply-add and summation order?
 - Q12.28 (12-engineering-verification.md) Why must a batch result equal the `run` result bit for bit, and what does "no state" rule out?
 - Q12.30 (12-engineering-verification.md) Some suites have no outside reference at all. How does QuantForge handle them?
+- Q13.9 (13-execution-microstructure.md) Why does selling everything in one step at the same parameters give a lower expected cost (562,500) than the five-step straight line (662,500)?
+- Q13.13 (13-execution-microstructure.md) In the Obizhaeva-Wang model, what is the risk-neutral optimal schedule, and what happens as resilience goes to zero?
+- Q13.15 (13-execution-microstructure.md) How were the Avellaneda-Stoikov goldens checked against the paper, when the paper prints only simulated averages?
+- Q13.17 (13-execution-microstructure.md) The recorded Kraken book is a once-a-second snapshot of the recorder's own book. What can the book check claim, and what can it not?
