@@ -432,11 +432,11 @@ No new error code. Prices, quantities and fees are decimal strings (HR-12); outp
 
 ## Stage H paper trading operations (H-21, owner decision 2026-11-18: all four builds)
 
-Spec `10-execution/paper-trading.md`, rulings HR-42 to HR-55. Goldens `datasets/golden/stage_h/pt_h.json` and `e1_hpt.json` (`oracle/python/gen_stage_h_pt.py`). Implemented in the Python build; the Java, C++ and Rust builds answer `E_UNSUPPORTED_OPERATION` until ported. No new error code.
+Spec `10-execution/paper-trading.md`, rulings HR-42 to HR-55. Goldens `datasets/golden/stage_h/pt_h.json` and `e1_hpt.json` (`oracle/python/gen_stage_h_pt.py`). Implemented in the Python build; the Java, C++ and Rust builds answer `E_UNSUPPORTED_OPERATION` until ported. Dark pool and SOR are in all four builds (stage-h2/stage-h3), so DARK and SOR sessions are portable too. No new error code.
 
 **Simulated only.** No operation opens a socket, reads a credential or names an order-entry endpoint. An order with `mode` other than `"simulated"` (absent means simulated) is `E_UNSUPPORTED_OPERATION` (HR-42). The runner reads that code as "not implemented", so the live-mode case (spec pt_h-0018) is not a golden: every build pins it in its own unit tests (acceptance test A5).
 
-**Numbers.** Every price, quantity, cash amount, fee and rate, in and out, is an HR-12 decimal string: no exponent, no trailing zeros after the point, `"0"` for zero (so `"-0.00"` is written `"0"`), arithmetic exact. A JSON number where a decimal string is expected is `E_SCHEMA`. A decimal string that parses as `NaN`, `Infinity` or `-Infinity` is `E_DOMAIN` (F-2; unlike the wave 2 venue verbs, where it is `E_SCHEMA`). Only `seq`, `days`, `orders_today` and `max_orders_per_day` are JSON integers; `kill_switch` and `allow_short` are booleans. Every output carries `label` `"crypto venue; simulated"` (HR-43).
+**Numbers.** Every price, quantity, cash amount, fee and rate, in and out, is an HR-12 decimal string: no exponent, no trailing zeros after the point, `"0"` for zero (so `"-0.00"` is written `"0"`), arithmetic exact. A JSON number where a decimal string is expected is `E_SCHEMA`. A non-finite token (`"NaN"`, `"Infinity"`, `"-Infinity"`) in a decimal-string input, including any string leaf of a ledger `body`, is a malformed decimal, `E_SCHEMA` (HR-12, ruling F-2a), as for the wave 2 venue verbs. Only `seq`, `days`, `orders_today` and `max_orders_per_day` are JSON integers; `kill_switch` and `allow_short` are booleans. Every output carries `label` `"crypto venue; simulated"` (HR-43).
 
 | Operation | Inputs | Outputs |
 |---|---|---|
@@ -461,7 +461,7 @@ Step semantics are those of the Python `Session` (`paper_fills.py`), which the p
 - One `FILL` record per venue fill of our order, in venue order: `order_id`, `child_id`, `venue`, `symbol`, `side`, `quantity`, `price`, `fee` (taker fee x qty x price when we take, minus maker rebate x qty x price when we make).
 - When nothing rests and the order is not fully filled (IOC or MARKET remainder, venue reject), one `CANCEL` record (`order_id`, `quantity` = unfilled).
 - At `CLOSE`: for each accepted order of the day, in submit order, a `CANCEL` if it has a resting remainder (HR-48), then its `TCA` record (`order_id`, `delay`, `execution`, `opportunity`, `total`, `total_bps`; decision and arrival = the submit mid, end = the close mark); then one `EOD`. The day's fills are applied to the book only here; `positions` and `cash` in the output include them either way. All records of a step carry the step's `ts`.
-- A duplicate `order_id` within a day or an unknown venue: `E_INPUT`. `DARK` and `SOR` need `exec.sim.dark.run` and `exec.sor.allocate` in that build (today Python only), so a port may first ship `LIT` and answer `E_UNSUPPORTED_OPERATION` for a script with a `DARK` or `SOR` order.
+- A duplicate `order_id` within a day or an unknown venue: `E_INPUT`. `DARK` and `SOR` replay through that build's `exec.sim.dark.run` and `exec.sor.allocate`.
 
 ### Canonical bytes and hash (HR-45), byte-exact in every build
 

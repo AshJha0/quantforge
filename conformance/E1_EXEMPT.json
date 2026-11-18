@@ -20,8 +20,7 @@
  "core.units.add_money": "no Real input in any golden: a non-finite value cannot be sent",
  "core.units.round_money": "no Real input in any golden: a non-finite value cannot be sent",
  "fx.spot_date": "no Real input in any golden: a non-finite value cannot be sent",
- "paper.ledger.append": "no number input: a ledger body and ledger text are hashed or parsed as given strings (paper-trading.md HR-45)",
- "paper.ledger.verify": "no number input: a ledger body and ledger text are hashed or parsed as given strings (paper-trading.md HR-45)",
+ "paper.ledger.verify": "takes only the ledger text; a bad line is a verify result, never an error (paper-trading.md); no number input",
  "rates.schedule.generate": "no Real input in any golden: a non-finite value cannot be sent",
  "research.cv.cpcv_paths": "no Real input in any golden: a non-finite value cannot be sent"
 }

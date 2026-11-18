@@ -40,7 +40,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -91,7 +91,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -132,7 +132,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -173,7 +173,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -211,7 +211,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -246,7 +246,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -290,7 +290,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -338,7 +338,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -384,7 +384,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -430,7 +430,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -475,7 +475,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -521,7 +521,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -567,7 +567,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -613,7 +613,7 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -666,14 +666,15 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
+    "outside: sha256sum of the stated bytes ([SHA])",
+    "blind compare: SHAPE MISMATCH (blind adds verify fields); not counted"
    ],
    "tags": [
     "stage_h",
     "simulated",
     "paper"
    ],
-   "description": "pt_h-0020 from the spec table"
+   "description": "pt_h-0020 from the spec table; not counted as blind"
   },
   {
    "case_id": "pt_h-0021",
@@ -695,14 +696,14 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "not blind: the input names the corruption (program/STAGE_H_BLIND_WAVE2B.md)"
+    "not blind (the input names the corruption); blind compare: VALUE MISMATCH on records (count defined after the blind run); not counted"
    ],
    "tags": [
     "stage_h",
     "simulated",
     "paper"
    ],
-   "description": "pt_h-0021 from the spec table; not blind"
+   "description": "pt_h-0021 from the spec table; not counted as blind"
   },
   {
    "case_id": "pt_h-0022",
@@ -724,14 +725,14 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "not blind: the input names the corruption (program/STAGE_H_BLIND_WAVE2B.md)"
+    "not blind (the input names the corruption); blind compare: VALUE MISMATCH on records (count defined after the blind run); not counted"
    ],
    "tags": [
     "stage_h",
     "simulated",
     "paper"
    ],
-   "description": "pt_h-0022 from the spec table; not blind"
+   "description": "pt_h-0022 from the spec table; not counted as blind"
   },
   {
    "case_id": "pt_h-0023",
@@ -753,14 +754,14 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "hand",
-    "not blind: the input names the corruption (program/STAGE_H_BLIND_WAVE2B.md)"
+    "not blind (the input names the corruption); blind compare: SHAPE MISMATCH (blind returns hash and record too); not counted"
    ],
    "tags": [
     "stage_h",
     "simulated",
     "paper"
    ],
-   "description": "pt_h-0023 from the spec table; not blind"
+   "description": "pt_h-0023 from the spec table; not counted as blind"
   },
   {
    "case_id": "pt_h-0030",

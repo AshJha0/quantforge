@@ -42,10 +42,8 @@ def dec(value: Any, name: str) -> Decimal:
         d = Decimal(str(value))
     except InvalidOperation:
         raise QfError("E_PARSE", f"{name} is not a decimal", name) from None
-    if not d.is_finite():
-        raise QfError(
-            "E_DOMAIN", f"{name} is not finite", name
-        )  # E1: a non-finite input is E_DOMAIN
+    if not d.is_finite():  # HR-12, ruling F-2a: a non-finite token is a malformed decimal
+        raise QfError("E_SCHEMA", f"{name} is not a finite decimal", name)
     return d
 
 
@@ -468,12 +466,28 @@ def pretrade_case(
     return {"accepted": r["accepted"], "reasons": r["reasons"], "label": LABEL}
 
 
+NONFINITE_TOKENS = ("NaN", "Infinity", "-Infinity")
+
+
+def _no_nonfinite(v: Any, path: str) -> None:
+    """Body values are decimal strings (HR-44): a non-finite token is E_SCHEMA (HR-12, F-2a)."""
+    if isinstance(v, Mapping):
+        for k, x in v.items():
+            _no_nonfinite(x, f"{path}/{k}")
+    elif isinstance(v, list):
+        for i, x in enumerate(v):
+            _no_nonfinite(x, f"{path}/{i}")
+    elif isinstance(v, str) and v in NONFINITE_TOKENS:
+        raise QfError("E_SCHEMA", f"{path} is not a finite decimal", path)
+
+
 def record_case(seq: int, ts: str, kind: str, body: Mapping[str, Any], prev: str) -> dict[str, Any]:
     """`paper.ledger.append` for one record: its canonical bytes (HR-45), hash and full record."""
     if kind not in KINDS:
         raise QfError("E_INPUT", f"unknown kind {kind!r}", "kind")
     if seq < 0:
         raise QfError("E_DOMAIN", "seq must be >= 0", "seq")
+    _no_nonfinite(body, "body")
     rec: dict[str, Any] = {
         "seq": seq,
         "ts": ts,

@@ -6,8 +6,9 @@ transcribed here by hand: inputs as the row states them, expected values exactly
 them, written as HR-12 decimal strings ("-0.60" becomes "-0.6"). No value is taken from an implementation.
 Every output also carries the HR-43 label.
 
-Blind record program/STAGE_H_BLIND_WAVE2B.md: pt_h-0001..0006, 0010..0018, 0020 SHAPE-ONLY (values identical,
-shapes invented by the blind lane and then adopted by the spec); 0021..0023 NOT BLIND. pt_h-0018 (live mode,
+Blind record program/STAGE_H_BLIND_WAVE2B.md, field-by-field comparison program/stage_h_blind_w2/pt_compare.py
+(mapping fixed before comparing): 0001..0006 and 0010..0017 MATCH; 0020 SHAPE MISMATCH, 0021/0022 VALUE MISMATCH on
+`records`, 0023 SHAPE MISMATCH (0021..0023 also not blind); these four are not counted as blind-checked. pt_h-0018 (live mode,
 E_UNSUPPORTED_OPERATION) is checked against the blind value but left out of the file: the conformance runner reads
 that code as "not implemented", so each build pins it in its own unit tests (acceptance test A5). The comparison below also
 asserts that the blind lane's frozen values (stage_h_blind/wave2b/blind_results.json) agree on every quantity the
@@ -31,8 +32,18 @@ SPEC = "specifications/10-execution/paper-trading.md"
 LABEL = "crypto venue; simulated"
 CEILING = "Paper trading on free data; simulated fills; no evidence of tradable profitability."
 Z64 = "0" * 64
-SHAPE = "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md): SHAPE-ONLY, values identical"
-NOT_BLIND = "not blind: the input names the corruption (program/STAGE_H_BLIND_WAVE2B.md)"
+BLIND = ("blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by "
+         "program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH")
+VERDICT = {  # pt_compare.py verdicts for the cases that are not counted as blind-checked
+    "pt_h-0020": ["hand", "outside: sha256sum of the stated bytes ([SHA])",
+                  "blind compare: SHAPE MISMATCH (blind adds verify fields); not counted"],
+    "pt_h-0021": ["hand", "not blind (the input names the corruption); blind compare: VALUE MISMATCH on records "
+                  "(count defined after the blind run); not counted"],
+    "pt_h-0022": ["hand", "not blind (the input names the corruption); blind compare: VALUE MISMATCH on records "
+                  "(count defined after the blind run); not counted"],
+    "pt_h-0023": ["hand", "not blind (the input names the corruption); blind compare: SHAPE MISMATCH "
+                  "(blind returns hash and record too); not counted"],
+}
 CLS = "date_and_convention"
 LSTAR = {"max_order_qty": "10", "max_notional": "1000", "max_abs_position": "5", "price_band": "0.05",
          "max_orders_per_day": 3, "kill_switch": False, "allow_short": True}
@@ -237,10 +248,10 @@ def build():
     for cid, op, inp, exp in cases:
         if exp == "E_UNSUPPORTED_OPERATION":
             continue  # the runner reads that code as "not implemented"; A5 unit tests in every build cover live mode
-        verified = ["hand", NOT_BLIND] if cid >= "pt_h-0021" else ["hand", SHAPE]
+        verified = VERDICT.get(cid, ["hand", BLIND])
         kw = {"error": exp} if isinstance(exp, str) else {"outputs": exp.get("verify", exp)}
         s.add(op, inp, cls=CLS, verified=verified, tags=["stage_h", "simulated", "paper"],
-              description=f"{cid} from the spec table" + ("; not blind" if cid >= "pt_h-0021" else ""), **kw)
+              description=f"{cid} from the spec table" + ("" if cid not in VERDICT else "; not counted as blind"), **kw)
         s.cases[-1]["case_id"] = cid
     c30, c31 = session_cases()
     for k, (inp, out, desc) in enumerate((
@@ -271,9 +282,9 @@ def build():
 
 
 def e1_suite(s):
-    """One non-finite decimal string per paper operation that takes a number. Unlike wave 2 (e1_h2, E_SCHEMA), a
-    paper decimal that parses as NaN or Infinity is E_DOMAIN (paper.dec, F-2). paper.ledger.append and
-    paper.ledger.verify take no number (a body is hashed as given) and are listed in conformance/E1_EXEMPT.json."""
+    """One non-finite token per paper operation, in a decimal-string input: E_SCHEMA (HR-12, ruling F-2a), as for
+    the wave 2 operations (e1_h2). paper.ledger.verify takes only the ledger text and never errors on content (a bad
+    line is a verify result), so it has no rejection case and stays in conformance/E1_EXEMPT.json."""
     e = Suite("e1_hpt", SPEC, G)
     by = {c["operation"]: c for c in s.cases if c["expected"]["status"] == "ok"}
     plan = [
@@ -281,6 +292,7 @@ def e1_suite(s):
         ("paper.book.end_of_day", ("close",), "Infinity"),
         ("paper.pretrade.check", ("ref_price",), "NaN"),
         ("paper.session.run", ("cash",), "-Infinity"),
+        ("paper.ledger.append", ("body", "limit_price"), "NaN"),
     ]
     for op, path, bad in plan:
         inp = json.loads(json.dumps(by[op]["inputs"]))
@@ -288,8 +300,8 @@ def e1_suite(s):
         for k in path[:-1]:
             node = node[k]
         node[path[-1]] = bad
-        e.add(op, inp, error="E_DOMAIN", cls=CLS, verified=["hand"], tags=["stage_h", "e1", "non-finite-input"],
-              description=f"F-2: {bad} at {'/'.join(path)} is E_DOMAIN (from {by[op]['case_id']})")
+        e.add(op, inp, error="E_SCHEMA", cls=CLS, verified=["hand"], tags=["stage_h", "e1", "non-finite-input"],
+              description=f"HR-12, F-2a: {bad} at {'/'.join(path)} is E_SCHEMA (from {by[op]['case_id']})")
     return e
 
 

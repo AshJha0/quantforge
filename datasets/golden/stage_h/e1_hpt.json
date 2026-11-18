@@ -24,7 +24,7 @@
    },
    "expected": {
     "status": "error",
-    "error_code": "E_DOMAIN"
+    "error_code": "E_SCHEMA"
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
@@ -35,7 +35,7 @@
     "e1",
     "non-finite-input"
    ],
-   "description": "F-2: NaN at cash is E_DOMAIN (from pt_h-0005)"
+   "description": "HR-12, F-2a: NaN at cash is E_SCHEMA (from pt_h-0005)"
   },
   {
    "case_id": "e1_hpt-0002",
@@ -48,7 +48,7 @@
    },
    "expected": {
     "status": "error",
-    "error_code": "E_DOMAIN"
+    "error_code": "E_SCHEMA"
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
@@ -59,7 +59,7 @@
     "e1",
     "non-finite-input"
    ],
-   "description": "F-2: Infinity at close is E_DOMAIN (from pt_h-0006)"
+   "description": "HR-12, F-2a: Infinity at close is E_SCHEMA (from pt_h-0006)"
   },
   {
    "case_id": "e1_hpt-0003",
@@ -87,7 +87,7 @@
    },
    "expected": {
     "status": "error",
-    "error_code": "E_DOMAIN"
+    "error_code": "E_SCHEMA"
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
@@ -98,7 +98,7 @@
     "e1",
     "non-finite-input"
    ],
-   "description": "F-2: NaN at ref_price is E_DOMAIN (from pt_h-0017)"
+   "description": "HR-12, F-2a: NaN at ref_price is E_SCHEMA (from pt_h-0017)"
   },
   {
    "case_id": "e1_hpt-0004",
@@ -198,7 +198,7 @@
    },
    "expected": {
     "status": "error",
-    "error_code": "E_DOMAIN"
+    "error_code": "E_SCHEMA"
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
@@ -209,7 +209,39 @@
     "e1",
     "non-finite-input"
    ],
-   "description": "F-2: -Infinity at cash is E_DOMAIN (from pt_h-0031)"
+   "description": "HR-12, F-2a: -Infinity at cash is E_SCHEMA (from pt_h-0031)"
+  },
+  {
+   "case_id": "e1_hpt-0005",
+   "operation": "paper.ledger.append",
+   "inputs": {
+    "seq": 0,
+    "ts": "2026-11-18T00:00:01Z",
+    "kind": "ORDER",
+    "body": {
+     "order_id": "O1",
+     "symbol": "BTC-USD",
+     "side": "BUY",
+     "type": "LIMIT",
+     "quantity": "3",
+     "limit_price": "NaN"
+    },
+    "prev": "0000000000000000000000000000000000000000000000000000000000000000"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12, F-2a: NaN at body/limit_price is E_SCHEMA (from pt_h-0020)"
   }
  ]
 }

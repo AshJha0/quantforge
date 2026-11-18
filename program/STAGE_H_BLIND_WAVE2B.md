@@ -30,3 +30,17 @@ Files: `stage_h_blind/wave2b/` (blind_ref.py, blind_results.json, blind_results.
 ## Post-blind shape change (2026-11-18, H-13 implementation lane)
 
 sor_h-0006: the input gains `"ranking":true`, the flag that asks for the `ranking` output (the conformance runner requires identical output keys, and the other sor_h inputs have the same shape). No expected value changed; the blind comparison above was made before this change and is not affected.
+
+## pt_h field-by-field comparison (2026-11-18, paper CLI lane)
+
+Rule now in force: a shape-only match counts only after a field-by-field comparison against the frozen file with a mapping written before comparing. Script `program/stage_h_blind_w2/pt_compare.py`, mapping in its docstring, committed before its first run; frozen file SHA-256 checked against the value above.
+
+| Case | Verdict | Counted |
+|---|---|---|
+| pt_h-0001..0006, 0010..0017 | MATCH | yes (14) |
+| pt_h-0018 | blind `E_UNSUPPORTED_OPERATION` equals the spec; not in the golden file (runner reads the code as not implemented) | no |
+| pt_h-0020 | SHAPE MISMATCH: blind adds `verify` fields | no |
+| pt_h-0021, 0022 | VALUE MISMATCH on `records` (blind counts all lines; the CLI counts records verified before the bad one, defined after the blind run); not blind anyway | no |
+| pt_h-0023 | SHAPE MISMATCH: blind returns `hash` and `record` as well; not blind anyway | no |
+
+This replaces the SHAPE-ONLY rows for pt_h above: pt_h outside-checked by re-derivation is 14 of 19, not 16.
