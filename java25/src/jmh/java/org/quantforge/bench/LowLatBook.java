@@ -201,6 +201,12 @@ public final class LowLatBook {
             queries[k] = new Hist();
         }
         Hist batch = new Hist();
+        Hist[] qbatch = new Hist[QUERIES.length];
+        for (int k = 0; k < qbatch.length; k++) {
+            qbatch[k] = new Hist();
+        }
+        long[] ppx = new long[DEPTH];
+        long[] pq = new long[DEPTH];
         Rng r = Rng.seeded(qseed, 0);
         long[] px = new long[DEPTH];
         long[] q = new long[DEPTH];
@@ -239,6 +245,41 @@ public final class LowLatBook {
                 a = System.nanoTime();
                 sink = b.top(bid, 100, px, q);
                 queries[5].record(System.nanoTime() - a);
+                // HR-21 batch timing: each query 1,000 times in a row, total divided by 1,000; prices cycle so
+                // no call repeats the previous one.
+                long acc = 0;
+                a = System.nanoTime();
+                for (int j = 0; j < 1000; j++) {
+                    acc += b.hasBestBid() ? b.bestBidQty() : 0;
+                }
+                qbatch[0].record((System.nanoTime() - a + 500) / 1000);
+                a = System.nanoTime();
+                for (int j = 0; j < 1000; j++) {
+                    acc += b.hasBestAsk() ? b.bestAskQty() : 0;
+                }
+                qbatch[1].record((System.nanoTime() - a + 500) / 1000);
+                int np = Math.max(1, b.top(bid, DEPTH, ppx, pq));
+                a = System.nanoTime();
+                for (int j = 0; j < 1000; j++) {
+                    acc += b.qtyAt(bid, ppx[j % np]);
+                }
+                qbatch[2].record((System.nanoTime() - a + 500) / 1000);
+                a = System.nanoTime();
+                for (int j = 0; j < 1000; j++) {
+                    acc += b.qtyAt(true, absent + j);
+                }
+                qbatch[3].record((System.nanoTime() - a + 500) / 1000);
+                a = System.nanoTime();
+                for (int j = 0; j < 1000; j++) {
+                    acc += b.top(bid, 10, px, q) + q[0];
+                }
+                qbatch[4].record((System.nanoTime() - a + 500) / 1000);
+                a = System.nanoTime();
+                for (int j = 0; j < 1000; j++) {
+                    acc += b.top(bid, 100, px, q) + q[99];
+                }
+                qbatch[5].record((System.nanoTime() - a + 500) / 1000);
+                sink = acc;
             }
         }
         long bytes = allocatedBytes() - bytes0;
@@ -266,6 +307,10 @@ public final class LowLatBook {
         o.append("},\"queries\":{");
         for (int k = 0; k < QUERIES.length; k++) {
             o.append(k > 0 ? "," : "").append('"').append(QUERIES[k]).append("\":").append(queries[k].json());
+        }
+        o.append("},\"queries_batch_per_call\":{");
+        for (int k = 0; k < QUERIES.length; k++) {
+            o.append(k > 0 ? "," : "").append('"').append(QUERIES[k]).append("\":").append(qbatch[k].json());
         }
         return o.append("},\"batch_per_message\":").append(batch.json()).append(",\"allocated_bytes_measured\":").append(bytes)
                 .append(",\"allocated_bytes_batch\":").append(batchBytes).append(",\"gc_count_measured\":").append(gcs)

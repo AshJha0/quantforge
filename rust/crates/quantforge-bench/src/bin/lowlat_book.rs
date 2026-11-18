@@ -245,6 +245,8 @@ fn timed_run(msgs: &[Msg], levels: &[Level], qseed: u64) -> String {
     let mut kinds: Vec<Hist> = (0..KINDS.len()).map(|_| Hist::new()).collect();
     let mut queries: Vec<Hist> = (0..QUERIES.len()).map(|_| Hist::new()).collect();
     let mut batch = Hist::new();
+    let mut qbatch: Vec<Hist> = (0..QUERIES.len()).map(|_| Hist::new()).collect();
+    let mut pres = vec![Level::default(); DEPTH];
     let mut r = Xoshiro::seeded(qseed, 0);
     let mut buf = vec![Level::default(); DEPTH];
     let mut b = Book::new(DEPTH);
@@ -286,6 +288,41 @@ fn timed_run(msgs: &[Msg], levels: &[Level], qseed: u64) -> String {
             let a = Instant::now();
             black_box(b.top(bid, &mut buf[..100]));
             queries[5].record(ns(a));
+            // HR-21 batch timing: each query 1,000 times in a row, total divided by 1,000; prices cycle so no
+            // call repeats the previous one.
+            let mut acc = 0i64;
+            let a = Instant::now();
+            for _ in 0..1000 {
+                acc += black_box(&b).best_bid().map_or(0, |l| l.qty);
+            }
+            qbatch[0].record((ns(a) + 500) / 1000);
+            let a = Instant::now();
+            for _ in 0..1000 {
+                acc += black_box(&b).best_ask().map_or(0, |l| l.qty);
+            }
+            qbatch[1].record((ns(a) + 500) / 1000);
+            let np = b.top(bid, &mut pres).max(1);
+            let a = Instant::now();
+            for j in 0..1000 {
+                acc += b.qty_at(bid, black_box(pres[j % np].px));
+            }
+            qbatch[2].record((ns(a) + 500) / 1000);
+            let a = Instant::now();
+            for j in 0..1000i64 {
+                acc += b.qty_at(true, black_box(absent + j));
+            }
+            qbatch[3].record((ns(a) + 500) / 1000);
+            let a = Instant::now();
+            for _ in 0..1000 {
+                acc += black_box(&b).top(bid, &mut buf[..10]) as i64 + buf[0].qty;
+            }
+            qbatch[4].record((ns(a) + 500) / 1000);
+            let a = Instant::now();
+            for _ in 0..1000 {
+                acc += black_box(&b).top(bid, &mut buf[..100]) as i64 + buf[99].qty;
+            }
+            qbatch[5].record((ns(a) + 500) / 1000);
+            black_box(acc);
         }
     }
     let allocs = ALLOCS.load(Ordering::Relaxed);
@@ -319,6 +356,12 @@ fn timed_run(msgs: &[Msg], levels: &[Level], qseed: u64) -> String {
         .map(|(k, h)| format!("\"{k}\":{}", h.json()))
         .collect::<Vec<_>>()
         .join(",");
+    let qbj = QUERIES
+        .iter()
+        .zip(&qbatch)
+        .map(|(k, h)| format!("\"{k}\":{}", h.json()))
+        .collect::<Vec<_>>()
+        .join(",");
     let qj = QUERIES
         .iter()
         .zip(&queries)
@@ -326,7 +369,7 @@ fn timed_run(msgs: &[Msg], levels: &[Level], qseed: u64) -> String {
         .collect::<Vec<_>>()
         .join(",");
     format!(
-        "{{\"all\":{},\"kinds\":{{{kj}}},\"queries\":{{{qj}}},\"batch_per_message\":{},\"allocations_measured\":{allocs},\
+        "{{\"all\":{},\"kinds\":{{{kj}}},\"queries\":{{{qj}}},\"queries_batch_per_call\":{{{qbj}}},\"batch_per_message\":{},\"allocations_measured\":{allocs},\
          \"allocations_batch\":{batch_allocs},\"far_lookups\":{far},\"buffer_grows\":{grows},\"qty_at_index_fallbacks\":{fallbacks}}}",
         all.json(),
         batch.json()

@@ -16,10 +16,11 @@ Targets: `specifications/09-microstructure/low-latency-targets.md`, fixed in com
   `df9aeb5c48149bf107ad913c95c6ef825bbeaf4bccb0c5cb9ca9f1dfa6cc0bf3` (written by `qf_lowlat_book gen`; all three
   languages read the same file). Warm-up 1,000,000 messages; 9,000,000 measured; 5 runs; median of runs (min-max).
   Unpaced replay, so no coordinated-omission correction.
-- **Workload R not run.** It needs the first complete UTC day at 100 levels, which is 2026-11-18 at the earliest
-  (low-latency-book.md, Workloads). At the time of these runs (2026-11-18, about 16:30 UTC) that day is not over, so
-  no complete day exists. R runs once 2026-11-18 is recorded in full with no gap row and its file hashes are fixed.
-  The L1 to L3 R rows stay open.
+- **Workload R not run.** R needs one complete recorded UTC day at 100 levels with no gap row
+  (low-latency-book.md, Workloads), its file hashes fixed before any timing. The recorder was being killed by its
+  watchdog until a fix made on 2026-11-18, so days up to and including the fix are damaged or partial and will not
+  be used. The earliest eligible day is the first full UTC day after the fix has been verified in operation. The
+  L1 to L3 R rows stay open until then.
 - Correctness in the same process (L6): 10,000 top(100) checkpoints against a std/TreeMap transcription, 0 mismatches
   in every language. The property test (1,000 streams x 10,000 messages; top(100), qty_at and the cached best after
   every message) and the ob_h goldens pass in all three ports.
@@ -48,12 +49,12 @@ prices share a slot (0 fallbacks on S).
 
 Bold = missed. The "after" session ran with the clock itself 40% slower (C++ p50 21 ns against 15 ns before), so
 every row moved up, update rows included, although the update path itself changed only by the cache refresh and
-index upkeep. An intermediate session with the same top-of-book cache and a 24-byte index slot (counts inline),
-clock p50 15 ns, met every C++ L5 row (qty_at present p99 84 ns, absent 65) and Rust missed only qty_at absent
-(103 ns); its JSON was overwritten by the final run and is not published as a result. qty_at present p50 is 26 ns
+index upkeep. Anecdotal only: an intermediate session (top-of-book cache, 24-byte index slot with counts inline, clock p50
+15 ns) printed C++ qty_at present p99 84 ns and Rust qty_at absent p99 103 ns. Its JSON was overwritten and is not
+a result. qty_at present p50 is 26 ns
 (C++) and 32 ns (Rust), close to the clock cost: the p99 is set by one cold cache line per query (queries run every
-1,000th message), and the single-sample p99 includes the clock read. HR-21 batch timing for queries is not
-implemented yet, so no batch figure is given for them.
+1,000th message), and the single-sample p99 includes the clock read. HR-21 batch timing for queries came in the next
+change (below).
 
 ## Workload S, Java (ns; L3 and L5; native Windows, unpinned)
 
@@ -78,4 +79,47 @@ which runs no queries; JFR attributes no allocation to `FastBook`, so the 792 by
 measurement calls themselves. This is not proven here. GC log: two young pauses during file load and the
 correctness pass, none in any timed region.
 
-Raw output: `cpp_S.json`, `rust_S.json` (before), `cpp_S_after.json`, `rust_S_after.json`, `java_S.json`.
+## HR-21 query batch timing (workload S, final code; C++/Rust WSL pinned, Java native Windows)
+
+HR-21: when the clock's own p50 is more than half the measured p50, batch timing is also reported and the report
+says which figure is the headline. Here the clock p50 (C++ 16 ns, Rust 17 ns, Java 100 ns) is close to or above
+every query's single-sample p50, so **batch timing is the headline for L5**. At every 1,000th measured message each
+query runs 1,000 times in a row and the total is divided by 1,000. Prices cycle (present prices over the side's
+levels; absent prices over best ask + 5 + j). So these are warm-cache, back-to-back figures. The single-sample p99
+includes one clock read and usually a cold cache line, and is kept alongside. This C++/Rust session began with WSL
+load average 3.6 from other lanes' jobs, even though the harness waited for load to fall below 0.7 before taking
+the lock. The absent-price loop runs past 1,024 ticks, so it also exercises the shared-slot fallback (163,843
+fallbacks per run, all from that loop).
+
+| Row | Query | Target C++/Rust (Java) | C++ batch p50 / p99 | C++ single p99 | Rust batch p50 / p99 | Rust single p99 | Java batch p50 / p99 | Java single p99 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| L5 | best_bid | 50 (100) | 0 / 0 * | 26 | 0 / 0 * | 36 | 0 / 0 * | 200 |
+| L5 | best_ask | 50 (100) | 0 / 0 * | 28 | 0 / 0 * | 34 | 0 / 1 * | 200 |
+| L5 | qty_at present | 100 (200) | 2 / 3 | 103 | 2 / 4 | 91 | 8 / 26 | 300 |
+| L5 | qty_at absent | 100 (200) | 1 / 2 | 30 | 2 / 3 | 60 | 4 / 10 | 200 |
+| L5 | top(10) | 200 (400) | 4 / 7 | 59 | 9 / 17 | 59 | 23 / 58 | 300 |
+| L5 | top(100) | 1,000 (2,000) | 11 / 30 | 62 | 17 / 44 | 80 | 41 / 149 | 400 |
+
+Median of 5 runs (ns). * Under 1 ns per call: the cached best is a field read, and the compiler or JIT very
+likely hoisted it out of the loop. These batch figures show only that the call costs less than a nanosecond;
+they are not a measurement of the query.
+
+Verdict, with the batch headline: every L5 row is met in all three languages. On the single-sample figures,
+kept for comparison: C++ qty_at present p99 is 103 ns against 100, a miss by 3 ns. Rust met every single-sample
+L5 row in this session. Java best_* and qty_at present miss, but the Windows clock steps in 100 ns, so those
+single-sample figures cannot resolve the targets. In this session, update p50/p99/p99.9 were C++ 48/101/290 ns,
+Rust 52/103/244 ns and Java (batch) 122/315/506 ns, all met; allocations were 0 (C++, Rust), and Java had 0 GC
+events and 0 allocation samples in the book's classes.
+
+Before/after in brief, query p99 (ns), single sample unless marked batch:
+
+| Query | C++ first | C++ after cache/index | C++ HR-21 batch | Rust first | Rust after cache/index | Rust HR-21 batch |
+|---|---:|---:|---:|---:|---:|---:|
+| best_bid | 26 | 45 | <1 | 105 | 43 | <1 |
+| best_ask | 22 | 42 | <1 | 53 | 39 | <1 |
+| qty_at present | 120 | 197 | 3 | 99 | 130 | 4 |
+
+The GitHub-runner record (the controlled machine) comes from the manual `lowlat-book` workflow, which runs the
+same three harnesses. It has not been dispatched yet, because the branch is not pushed.
+
+Raw output: `cpp_S_hr21.json`, `rust_S_hr21.json`, `java_S_hr21.json` (HR-21 session); `cpp_S.json`, `rust_S.json` (before), `cpp_S_after.json`, `rust_S_after.json`, `java_S.json`.

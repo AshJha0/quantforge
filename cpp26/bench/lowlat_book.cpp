@@ -308,7 +308,7 @@ enum Query { QBestBid, QBestAsk, QQtyPresent, QQtyAbsent, QTop10, QTop100, NQuer
 const char* const query_names[NQueries] = {"best_bid", "best_ask", "qty_at_present", "qty_at_absent", "top10", "top100"};
 
 struct RunResult {
-    Hist all, kinds[NKinds], queries[NQueries], batch;
+    Hist all, kinds[NKinds], queries[NQueries], qbatch[NQueries], batch;
     long long allocs = 0, batch_allocs = 0, far = 0, grows = 0, fallbacks = 0;
 };
 
@@ -316,7 +316,7 @@ volatile std::int64_t g_sink;
 
 void timed_run(const Stream& st, RunResult& rr, std::uint64_t qseed) {
     quantforge::Xoshiro256 r(qseed, 0);
-    std::vector<ll::Level> buf(depth);
+    std::vector<ll::Level> buf(depth), pres(depth);
     {
         ll::Book b(depth);
         for (std::size_t i = 0; i < warmup; ++i) b.apply(st.msgs[i], st.levels.data());
@@ -354,6 +354,29 @@ void timed_run(const Stream& st, RunResult& rr, std::uint64_t qseed) {
                 a = now_ns();
                 g_sink = std::int64_t(b.top(bid, 100, buf.data()));
                 rr.queries[QTop100].record(now_ns() - a);
+                // HR-21 batch timing: each query 1,000 times in a row, total divided by 1,000. Prices cycle over
+                // the present levels (and over absent prices above the ask) so no call repeats the previous one.
+                std::int64_t acc = 0;
+                a = now_ns();
+                for (int j = 0; j < 1000; ++j) acc += b.best_bid(q) ? q.qty : 0;
+                rr.qbatch[QBestBid].record((now_ns() - a + 500) / 1000);
+                a = now_ns();
+                for (int j = 0; j < 1000; ++j) acc += b.best_ask(q) ? q.qty : 0;
+                rr.qbatch[QBestAsk].record((now_ns() - a + 500) / 1000);
+                const std::size_t np = b.top(bid, depth, pres.data());  // untimed
+                a = now_ns();
+                for (std::size_t j = 0; j < 1000; ++j) acc += b.qty_at(bid, pres[j % (np ? np : 1)].px);
+                rr.qbatch[QQtyPresent].record((now_ns() - a + 500) / 1000);
+                a = now_ns();
+                for (std::int64_t j = 0; j < 1000; ++j) acc += b.qty_at(true, absent + j);
+                rr.qbatch[QQtyAbsent].record((now_ns() - a + 500) / 1000);
+                a = now_ns();
+                for (int j = 0; j < 1000; ++j) acc += std::int64_t(b.top(bid, 10, buf.data())) + buf[0].qty;
+                rr.qbatch[QTop10].record((now_ns() - a + 500) / 1000);
+                a = now_ns();
+                for (int j = 0; j < 1000; ++j) acc += std::int64_t(b.top(bid, 100, buf.data())) + buf[99].qty;
+                rr.qbatch[QTop100].record((now_ns() - a + 500) / 1000);
+                g_sink = acc;
             }
         }
         rr.allocs = g_allocs.load();
@@ -408,6 +431,8 @@ int main(int argc, char** argv) {
         for (int j = 0; j < NKinds; ++j) out += (j ? ",\"" : "\"") + std::string(kind_names[j]) + "\":" + rr->kinds[j].json();
         out += "},\"queries\":{";
         for (int j = 0; j < NQueries; ++j) out += (j ? ",\"" : "\"") + std::string(query_names[j]) + "\":" + rr->queries[j].json();
+        out += "},\"queries_batch_per_call\":{";
+        for (int j = 0; j < NQueries; ++j) out += (j ? ",\"" : "\"") + std::string(query_names[j]) + "\":" + rr->qbatch[j].json();
         out += "},\"batch_per_message\":" + rr->batch.json() + ",\"allocations_measured\":" + std::to_string(rr->allocs) +
                ",\"allocations_batch\":" + std::to_string(rr->batch_allocs) + ",\"far_lookups\":" + std::to_string(rr->far) +
                ",\"buffer_grows\":" + std::to_string(rr->grows) +
