@@ -42,6 +42,7 @@ FN = {
         i["tick_size"], i["lot_size"], i["events"], i["fee_schedule"], i.get("session")
     ),
     "exec.sor.allocate": sor.allocate,
+    "exec.sim.dark.run": lambda i: dark_pool.run(i["config"], i["events"]),
 }
 CASES = [
     c for s in SUITES for c in json.loads((GOLD / f"{s}.json").read_text(encoding="utf-8"))["cases"]
@@ -294,7 +295,7 @@ def test_hr93_asset_class_dark_and_sor() -> None:
     for cls in ("FX", "RATES"):
         with pytest.raises(QfError) as e:
             dark_pool.run(dict(cfg, asset_class=cls), [])
-        assert e.value.code == "E_UNSUPPORTED_OPERATION"
+        assert e.value.code == "E_INPUT"
     assert dark_pool.run(dict(cfg, asset_class="EQUITY"), [])["label"]
     base = {
         "S": "4",
@@ -312,7 +313,7 @@ def test_hr93_asset_class_dark_and_sor() -> None:
     }
     with pytest.raises(QfError) as e:
         sor.allocate(base)
-    assert e.value.code == "E_UNSUPPORTED_OPERATION"
+    assert e.value.code == "E_INPUT"
 
 
 def test_last_look_draw_reproducible() -> None:

@@ -19,7 +19,7 @@ Spec version 0.1.0 (stage H, multi-asset spec lane, drafted 2026-11-18; not norm
 - [BIS-FX] BIS Triennial Survey definitions (spot = settlement within two business days). bis.org. [central-bank; **unverified this session**]
 - [CME-ZN] CME Group, 10-Year T-Note futures contract specs (face $100,000; tick one-half of 1/32 = $15.625). cmegroup.com. [exchange spec; **unverified this session**]
 - [CME-ZB] CME Group, U.S. Treasury Bond futures specs (tick 1/32 = $31.25). [exchange spec; **unverified this session**]
-- [CME-32NDS] CME Group Treasury futures price quotation convention (third digit in quarter-32nds: 0, 2, 5 or +, 7). [exchange convention; **unverified**: no CME page read yet, HR-109]
+- [CME-32NDS] CME Group Treasury futures price quotation convention (third digit in quarter-32nds: 0, 2, 5 or +, 7). [exchange convention; **unverified**: CME rulebook ch. 19 and contract-spec page timed out on the 2026-11-18 retry, HR-115]
 - [UST-BILL] US Treasury (TreasuryDirect), bill discount-basis price formula. [government; **unverified this session**]
 
 Every source tagged unverified must be read and re-tagged "read <date>" before v0.10.0 (HR-98). No London Stock Exchange or LSEG material is used anywhere (HR-99).
@@ -71,8 +71,8 @@ Coupon bond on a coupon date, street convention: P = sum_{i=1..n} (100 c/f)/(1+y
 | Module | Change |
 |---|---|
 | `exec.sim.lit.run` (`lit-matching.md`) | optional `session` `{phase (default PRE_OPEN), ref_price, tie_break}` and `PHASE` events (HR-112): PRE_OPEN collects LIMIT/MARKET orders in a call book, CONTINUOUS uncrosses it with `exec.sim.auction.uncross` (OPEN) and rests unfilled limits in allocation order, PRE_CLOSE takes only `on_close` orders into a second call book, CLOSED uncrosses it (CLOSE) and cancels on-close leftovers; wrong-phase orders are rejected `PHASE`; `fee_schedule.auction_fee` x notional per auction fill; outputs gain `auctions` and `phase`. Stated simplification: the continuous book does not join the closing cross. Without `session` the engine and its goldens are unchanged. Goldens `ses_h` |
-| dark pool | equities only (midpoint of the lit NBBO); `config.asset_class` (`EQUITY` default, `FX`, `RATES`); FX and rates `E_UNSUPPORTED_OPERATION` (HR-93). Note: the conformance runner reads that code as "not implemented", so HR-93's error is pinned by unit tests, not goldens (HR-113) |
-| SOR | order and venues gain `asset_class` (default `EQUITY`); a venue of another class than the order is `E_INPUT`; a DARK venue of class FX or RATES is `E_UNSUPPORTED_OPERATION`; goldens `acls_h` |
+| dark pool | equities only (midpoint of the lit NBBO); `config.asset_class` (`EQUITY` default, `FX`, `RATES`); FX and rates `E_INPUT` (HR-93 as amended by HR-113; goldens acls_h-0004/0005) |
+| SOR | order and venues gain `asset_class` (default `EQUITY`); a venue of another class than the order is `E_INPUT`; a DARK venue of class FX or RATES is `E_INPUT` (HR-113); goldens `acls_h` |
 | paper trading | label per class (HR-94); settlement lag sets the cash posting date; FX cash per currency; futures P&L = ticks x tick value, variation margin daily |
 | order book | unchanged (integer ticks) |
 

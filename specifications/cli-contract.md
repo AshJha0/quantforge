@@ -432,7 +432,7 @@ No new error code. Prices, quantities and fees are decimal strings (HR-12); outp
 
 ## Stage H multi-asset operations (H-22, H-23, H-24)
 
-Rulings `stage-h-rulings-multiasset.md` HR-80 to HR-103 and the 2026-11-18 rule-version rulings. No new error code; error order HR-66. Decimals are HR-12 decimal strings; venue and simulator outputs (`exec.*`) carry `label` (HR-94), convention outputs (`micro.*`) none (HR-111). `exec.sim.lit.run` gains optional `session` and `PHASE` events (HR-112, goldens `ses_h`); `exec.sim.dark.run` `config.asset_class` and `exec.sor.allocate` `asset_class` on the order and venues (HR-93, HR-113, goldens `acls_h`). Goldens `datasets/golden/stage_h/auc_h.json`, `eqc_h.json`, `fxc_h.json`, `fxv_h.json`, `rtc_h.json`, `fut_h.json`, E1 cases `e1_h3.json` (`oracle/python/gen_stage_h_ma.py`). Implemented in the Python and Java builds so far.
+Rulings `stage-h-rulings-multiasset.md` HR-80 to HR-103 and the 2026-11-18 rule-version rulings. No new error code; error order HR-66. Decimals are HR-12 decimal strings; venue and simulator outputs (`exec.*`) carry `label` (HR-94), convention outputs (`micro.*`) none (HR-111). `exec.sim.lit.run` gains optional `session` and `PHASE` events (HR-112, goldens `ses_h`); `exec.sim.dark.run` `config.asset_class` and `exec.sor.allocate` `asset_class` on the order and venues (HR-93; other classes on a dark venue are `E_INPUT`, HR-113; goldens `acls_h`). Goldens `datasets/golden/stage_h/auc_h.json`, `eqc_h.json`, `fxc_h.json`, `fxv_h.json`, `rtc_h.json`, `fut_h.json`, E1 cases `e1_h3.json` (`oracle/python/gen_stage_h_ma.py`). Implemented in the Python and Java builds so far.
 
 | Operation | Spec | Inputs | Outputs |
 |---|---|---|---|

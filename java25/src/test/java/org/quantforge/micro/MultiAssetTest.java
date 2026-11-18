@@ -310,7 +310,7 @@ class MultiAssetTest {
     @Test
     void hr93AssetClassDarkAndSor() {
         for (String cls : new String[] {"FX", "RATES"}) {
-            assertEquals("E_UNSUPPORTED_OPERATION", assertThrows(QfError.class, () -> DarkPool.run(
+            assertEquals("E_INPUT", assertThrows(QfError.class, () -> DarkPool.run(
                     m("lot_size", "1", "tick_size", "0.01", "p_firm", "1", "seed", 1L, "asset_class", cls),
                     List.of())).code());
         }
@@ -320,7 +320,7 @@ class MultiAssetTest {
                 "theta", "0", "lit_samples", List.of(List.of("0"), List.of("4")), "asset_class", "FX",
                 "venues", List.of(m("Q", "0", "as", "0", "kind", "LIT", "r", "0.2", "asset_class", "FX"),
                         m("as", "0.1", "kind", "DARK", "r", "0", "tail", List.of("0.5", "0"), "asset_class", "FX")));
-        assertEquals("E_UNSUPPORTED_OPERATION", code(Sor::allocate, base));
+        assertEquals("E_INPUT", code(Sor::allocate, base));
         base.put("asset_class", "RATES");
         assertEquals("E_INPUT", code(Sor::allocate, base));
     }

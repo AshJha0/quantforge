@@ -309,14 +309,14 @@ public final class DarkPool {
     }
 
     /** One pool run over {@code events} (BOOK, NEW, CANCEL), numbered from 1. */
-    /** HR-93: {@code asset_class} (default EQUITY); a dark venue of another class is E_UNSUPPORTED_OPERATION. */
+    /** HR-93: {@code asset_class} (default EQUITY); a dark venue of another class is E_INPUT (HR-113). */
     static String assetClass(Object v, String path, boolean dark) {
         Object x = v == null ? "EQUITY" : v;
         if (!("EQUITY".equals(x) || "FX".equals(x) || "RATES".equals(x))) {
             throw new QfError("E_SCHEMA", path + ": not EQUITY, FX or RATES", path);
         }
         if (dark && !"EQUITY".equals(x)) {
-            throw new QfError("E_UNSUPPORTED_OPERATION", path + ": dark pool is equities only (HR-93)", path);
+            throw new QfError("E_INPUT", path + ": dark pool is equities only (HR-93, HR-113)", path);
         }
         return (String) x;
     }
