@@ -444,3 +444,17 @@ Rulings `stage-h-rulings-micro.md` HR-70 to HR-75 as amended (HR-66). No new err
 | `micro.est.regime_impact` | same | `regimes` (object, label to `{x, y}`; `calm` and `stressed` required) | `regimes` (label to `{lambda_as, se}`), `ratio` |
 | `micro.est.passive_vs_aggressive` | same | `passive`, `aggressive` (costs in bp) | `delta`, `se` |
 | `exec.venue.analytics` | `10-execution/venue-analytics.md` | `mids` (array of `{t, mid}`), `fills` (array of `{venue, side, quantity, price, t}`), `orders` (array of `{venue, sent, filled}`), `horizons` | `fill_rates` (venue to rate), `markouts` (array of `{venue, h, markout, markout_bps, toxicity}`, venues in code-point order, horizons in input order) |
+
+### Stage H wave 2 execution (H-14, H-17; rulings HR-59 to HR-66)
+
+Specs `10-execution/adaptive-algos.md` and `10-execution/tca-pretrade.md`. No new error code; error precedence HR-66 (`E_SCHEMA`, structural `E_INPUT`, `E_DOMAIN`, `E_LIMIT`). `n_buckets` at most 100,000 and attribution `fills` at most 1,000,000 (as HR-9). Goldens `datasets/golden/stage_h/alg_h.json` and `tcx_h.json` (`oracle/python/gen_stage_h_w2_exec.py`). Implemented in the Python build only; the Java, C++ and Rust builds answer `E_UNSUPPORTED_OPERATION`. `mode` is `UNITS` or `CONTINUOUS` (absent: `CONTINUOUS`); `side` is `BUY` or `SELL`.
+
+| Operation | Spec | Inputs | Outputs |
+|---|---|---|---|
+| `exec.algo.arrival` | `10-execution/adaptive-algos.md` | `quantity`, `n_buckets` (Integer), `urgency`, `mode` | `slices` |
+| `exec.algo.close` | same | `quantity`, `close_volume`, `auction_participation`, `profile`, `mode` | `auction_quantity`, `slices` |
+| `exec.algo.liquidity_seek` | same | `side`, `quantity`, `limit_price`, `take_fraction`, `books` (array of buckets, each an array of `[price, size]` best first) | `slices`, `avg_prices` (null for an empty bucket), `filled`, `residual`, `notional`, `avg_fill_price` (null when nothing filled) |
+| `exec.algo.pair` | same | `leg_a` `{side, quantity, price}`, `leg_b` `{side, price}`, `pair_mode` (`CASH_BALANCED`, `HEDGED`), `hedge_ratio` (HEDGED only), `n_buckets`, `mode` | `slices_a`, `slices_b`, `quantity_b`, `cash_imbalance` |
+| `exec.algo.basket` | same | `legs` (array of `{side, quantity, price}`), `n_buckets`, `mode` | `slices` (one array per leg), `cash_imbalance`, `gross_notional` |
+| `exec.tca.pretrade` | `10-execution/tca-pretrade.md` | `quantity`, `adv`, `daily_vol`, `participation`, `half_spread_bps`, `params` `{a1, a2, a3, a4, b1}`, optional `price` | `istar_bps`, `impact_bps`, `spread_bps`, `expected_cost_bps`, `duration_days`, `timing_risk_bps`; with `price` also `expected_cost`, `timing_risk` |
+| `exec.tca.attribution` | same | `side`, `decision_price`, `arrival_mid`, `end_price`, `order_quantity`, `fills` (array of `{quantity, price, mid}`), `fees` | `delay`, `impact`, `spread`, `execution`, `opportunity`, `fees`, `total`, `total_bps` |

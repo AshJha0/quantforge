@@ -13,7 +13,7 @@ Sources:
 Inputs `quantity` X (> 0), `n_buckets` N (1 to 100,000), `mode` `UNITS` or `CONTINUOUS`. Output `slices` (length N). UNITS: `floor(X/N)` each, remainder `X mod N` one unit to slices 0, 1, ... (HR-3). X <= 0, or non-integer X in UNITS: `E_INPUT`.
 
 ## `exec.schedule.vwap`
-Inputs `quantity`, `profile` (length N, non-negative; normalised internally), `mode`. Slice i = `X w_i / sum w`; UNITS by largest remainder (HR-3). All-zero profile: `E_DOMAIN`.
+Inputs `quantity`, `profile` (length N, non-negative; normalised internally), `mode`. Slice i = `X w_i / sum w`, evaluated as `X (w_i / sum w)` (ratio first: `X w_i` underflows when a weight is subnormal, e.g. X = 1.5, profile [5e-324] gave 2.0; rule added 2026-11-18, no golden changes); UNITS by largest remainder (HR-3). All-zero profile: `E_DOMAIN`.
 
 ## `exec.schedule.pov`
 Inputs `quantity`, `participation` p in (0, 1) (HR-4, confirmed by DR-H4: participation is of total market volume including own fills), `market_volume` (outside volume per bucket). Child i = `min(remaining, p v_i / (1 - p))`, floored in UNITS. Outputs `slices`, `filled`, `residual` (may be > 0; never an error).

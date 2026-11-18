@@ -78,7 +78,8 @@ def schedule_vwap(quantity: float, profile: Sequence[float], mode: str) -> dict[
     total = sum(profile, 0.0)  # array order (cli-contract numeric rules)
     if total == 0:
         raise _fail("E_DOMAIN", "profile is all zero", "profile")
-    exact = [quantity * w / total for w in profile]
+    # ratio first: X w_i underflows when a weight is subnormal (5e-324 gave 2.0 for X = 1.5)
+    exact = [quantity * (w / total) for w in profile]
     return {"slices": _largest_remainder(quantity, exact) if units else exact}
 
 
