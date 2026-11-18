@@ -160,4 +160,6 @@ TEST_CASE("stage H wave 2 adaptive algorithm goldens") { replay("stage_h/alg_h")
 TEST_CASE("stage H wave 2 pre-trade and attribution goldens") { replay("stage_h/tcx_h"); }
 TEST_CASE("stage H wave 2 execution E1 goldens") { replay("stage_h/e1_h3"); }
 TEST_CASE("stage H wave 2 execution enum goldens") { replay("stage_h/enum_h"); }
+TEST_CASE("stage H paper trading goldens") { replay("stage_h/pt_h"); }
+TEST_CASE("stage H paper trading E1 goldens") { replay("stage_h/e1_hpt"); }
 #endif

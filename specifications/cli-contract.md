@@ -461,7 +461,7 @@ Specs `10-execution/adaptive-algos.md` and `10-execution/tca-pretrade.md`. No ne
 
 ## Stage H paper trading operations (H-21, owner decision 2026-11-18: all four builds)
 
-Spec `10-execution/paper-trading.md`, rulings HR-42 to HR-55. Goldens `datasets/golden/stage_h/pt_h.json` and `e1_hpt.json` (`oracle/python/gen_stage_h_pt.py`). Implemented in the Python and Java builds (Java: `org.quantforge.paper.Paper`, all six operations, ledger hashes byte-identical to Python); the C++ and Rust builds answer `E_UNSUPPORTED_OPERATION` until ported. Dark pool and SOR are in all four builds (stage-h2/stage-h3), so DARK and SOR sessions are portable too. No new error code.
+Spec `10-execution/paper-trading.md`, rulings HR-42 to HR-55. Goldens `datasets/golden/stage_h/pt_h.json` and `e1_hpt.json` (`oracle/python/gen_stage_h_pt.py`). Implemented in the Python, Java and C++ builds (Java: `org.quantforge.paper.Paper`, all six operations; the C++ TCA built with `-ffp-contract=off`; both reproduce the Python ledger hashes byte for byte); the Rust build answers `E_UNSUPPORTED_OPERATION` until ported. Dark pool and SOR are in all four builds (stage-h2/stage-h3), so DARK and SOR sessions are portable too. No new error code.
 
 **Simulated only.** No operation opens a socket, reads a credential or names an order-entry endpoint. An order with `mode` other than `"simulated"` (absent means simulated) is `E_UNSUPPORTED_OPERATION` (HR-42). The runner reads that code as "not implemented", so the live-mode case (spec pt_h-0018) is not a golden: every build pins it in its own unit tests (acceptance test A5).
 
