@@ -98,6 +98,8 @@ CORE_MODULES = (
     "variance",
     "vol_usecase",
     "xccy",
+    "micro_est",
+    "venue_analytics",
 )
 
 

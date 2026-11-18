@@ -2903,6 +2903,31 @@
     "vwap_slippage"
    ]
   },
+  "exec.venue.analytics": {
+   "spec": "specifications/10-execution/venue-analytics.md",
+   "rust": "quantforge::exec::venue_analytics",
+   "python": "quantforge.exec.venue_analytics",
+   "java": "Exec.venueAnalytics",
+   "cpp": "qf::exec::venue_analytics",
+   "inputs": {
+    "fills": {
+     "java": "fills"
+    },
+    "horizons": {
+     "java": "horizons"
+    },
+    "mids": {
+     "java": "mids"
+    },
+    "orders": {
+     "java": "orders"
+    }
+   },
+   "outputs": [
+    "fill_rates",
+    "markouts"
+   ]
+  },
   "exotic.american.baw": {
    "spec": "specifications/04-pricing/exotics.md",
    "rust": "quantforge::exotic::american_baw",
@@ -4595,6 +4620,130 @@
     "crc32",
     "events",
     "stats"
+   ]
+  },
+  "micro.est.adverse_selection": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_adverse_selection",
+   "python": "quantforge.micro.est_adverse_selection",
+   "java": "Micro.estAdverseSelection",
+   "cpp": "qf::micro::est_adverse_selection",
+   "inputs": {
+    "x": {
+     "java": "x"
+    },
+    "y": {
+     "java": "y"
+    }
+   },
+   "outputs": [
+    "lambda_as",
+    "se"
+   ]
+  },
+  "micro.est.arrival_rate": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_arrival_rate",
+   "python": "quantforge.micro.est_arrival_rate",
+   "java": "Micro.estArrivalRate",
+   "cpp": "qf::micro::est_arrival_rate",
+   "inputs": {
+    "count": {
+     "java": "count"
+    },
+    "window": {
+     "java": "window"
+    }
+   },
+   "outputs": [
+    "lambda",
+    "se"
+   ]
+  },
+  "micro.est.cancel_rate": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_cancel_rate",
+   "python": "quantforge.micro.est_cancel_rate",
+   "java": "Micro.estCancelRate",
+   "cpp": "qf::micro::est_cancel_rate",
+   "inputs": {
+    "orders": {
+     "java": "orders"
+    }
+   },
+   "outputs": [
+    "se",
+    "theta"
+   ]
+  },
+  "micro.est.liquidity_decay": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_liquidity_decay",
+   "python": "quantforge.micro.est_liquidity_decay",
+   "java": "Micro.estLiquidityDecay",
+   "cpp": "qf::micro::est_liquidity_decay",
+   "inputs": {
+    "levels": {
+     "java": "levels"
+    }
+   },
+   "outputs": [
+    "alpha",
+    "se"
+   ]
+  },
+  "micro.est.passive_vs_aggressive": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_passive_vs_aggressive",
+   "python": "quantforge.micro.est_passive_vs_aggressive",
+   "java": "Micro.estPassiveVsAggressive",
+   "cpp": "qf::micro::est_passive_vs_aggressive",
+   "inputs": {
+    "aggressive": {
+     "java": "aggressive"
+    },
+    "passive": {
+     "java": "passive"
+    }
+   },
+   "outputs": [
+    "delta",
+    "se"
+   ]
+  },
+  "micro.est.regime_impact": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_regime_impact",
+   "python": "quantforge.micro.est_regime_impact",
+   "java": "Micro.estRegimeImpact",
+   "cpp": "qf::micro::est_regime_impact",
+   "inputs": {
+    "regimes": {
+     "java": "regimes"
+    }
+   },
+   "outputs": [
+    "ratio",
+    "regimes"
+   ]
+  },
+  "micro.est.resilience": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_resilience",
+   "python": "quantforge.micro.est_resilience",
+   "java": "Micro.estResilience",
+   "cpp": "qf::micro::est_resilience",
+   "inputs": {
+    "points": {
+     "java": "points"
+    },
+    "s_inf": {
+     "java": "sInf"
+    }
+   },
+   "outputs": [
+    "kappa",
+    "se"
    ]
   },
   "micro.mm.as_quotes": {
