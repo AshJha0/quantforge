@@ -7,6 +7,8 @@ written out here; the `sbm_total` tests check MAR21.7 (ruling R6-4.1) on hand-co
 """
 
 import math
+from collections.abc import Callable
+from typing import Any
 
 import pytest
 
@@ -14,7 +16,7 @@ from quantforge_core import frtb
 from quantforge_core.errors import QfError
 
 
-def _err(fn, *args):
+def _err(fn: Callable[..., Any], *args: Any) -> tuple[str, str | None]:
     with pytest.raises(QfError) as e:
         fn(*args)
     return e.value.code, e.value.field
@@ -64,7 +66,7 @@ def test_alternative_specification_when_the_sum_is_negative() -> None:
     n = 20
     rows = [(f"L{i}", 9, "SPOT", 1.0) for i in range(n)]
     rows += [(f"S{i}", 10, "SPOT", -1.0) for i in range(n)]
-    out = frtb.equity_delta(rows)
+    out: Any = frtb.equity_delta(rows)
     med = out["scenarios"]["medium"]
     w9, w10 = 0.70, 0.50  # MAR21.77 risk weights
     k9 = math.sqrt(n * w9**2 + n * (n - 1) * 0.075 * w9**2)
@@ -76,13 +78,12 @@ def test_alternative_specification_when_the_sum_is_negative() -> None:
     assert med["delta"] == pytest.approx(expected, rel=1e-12)
     assert [b["s_used"] for b in med["buckets"]] == pytest.approx([k9, -k10], rel=1e-12)
     # one bucket alone never needs it
-    assert frtb.equity_delta(rows[:n])["scenarios"]["medium"]["alternative_used"] is False
+    alone: Any = frtb.equity_delta(rows[:n])
+    assert alone["scenarios"]["medium"]["alternative_used"] is False
 
 
 def test_sbm_total_adds_within_a_scenario_then_takes_the_largest() -> None:
-    out = frtb.sbm_total(
-        [("GIRR", "DELTA", (10.0, 20.0, 5.0)), ("FX", "DELTA", (15.0, 1.0, 30.0))]
-    )
+    out = frtb.sbm_total([("GIRR", "DELTA", (10.0, 20.0, 5.0)), ("FX", "DELTA", (15.0, 1.0, 30.0))])
     assert out["scenario_totals"] == {"high": 25.0, "medium": 21.0, "low": 35.0}
     assert out["capital"] == 35.0
     assert out["binding_scenario"] == "low"
