@@ -16,6 +16,7 @@ from typing import Any
 
 from . import execution as _k
 from .errors import QfError
+from .finite import guard
 
 
 def _schema(field: str, why: str) -> QfError:
@@ -302,3 +303,6 @@ def as_quotes(
     _finite("as_quotes", mid, inventory, risk_aversion, sigma, time_left, k)
     o = _k.as_quotes(mid, inventory, risk_aversion, sigma, time_left, k)
     return Quotes(o["reservation"], o["spread"], o["bid"], o["ask"])
+
+
+guard(globals())
