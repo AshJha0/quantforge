@@ -77,3 +77,17 @@ Written by the R6 spec and oracle lane before any language ran the `r6/hedgeqp_l
 | T7 | Same at n = 50 | the `n = 50` cases | ≤ 0.5 s (≤ 2 s Python) | ≤ 0.05 s |
 
 Why these numbers: the review measured one such solve at 46 s in Python on v0.8.0 (finding 7). A split-variable active-set method on a 200-variable QP needs a few hundred factorisation updates of a matrix this size, well under a second in a compiled language; 20 s for Python allows a pure-numpy active set without a compiled QP library. A miss is reported, not refitted.
+
+## Stage H addition: order-book latency H-9 (written 2026-11-18 before any measurement)
+
+Rows L1 to L6 are fixed in `specifications/09-microstructure/low-latency-targets.md` (ruling HR-23), with their reasons; summary on the pinned local Linux run, median of 5:
+
+| # | Measure | Target |
+|---|---|---|
+| L1, L2 | C++, Rust update p50 / p99 / p99.9 | R: 100 ns / 500 ns / 2 us; S: 150 ns / 1 us / 5 us |
+| L3 | Java update p50 / p99 / p99.9 | R: 200 ns / 1 us / 5 us; S: 300 ns / 2 us / 12.5 us |
+| L4 | Allocations after warm-up | C++, Rust exactly 0; Java no GC and 0 sampled, else miss published |
+| L5 | Query p99 (best, qty_at, top(10), top(100)) | C++/Rust 50 / 100 / 200 ns / 1 us; Java twice that |
+| L6 | Correctness on the same replay | zero mismatches |
+
+Python: reported only. A miss is reported, not refitted.
