@@ -26,7 +26,7 @@ from .errors import QfError
 from .execution import tca_shortfall
 from .finite import guard
 from .lit_matching import fmt
-from .paper import LABEL, Book, Ledger, dec, end_of_day, pretrade_check, side_sign
+from .paper import CEILING, LABEL, Book, Ledger, dec, end_of_day, pretrade_check, side_sign
 
 TRADER = "PAPER"
 VENUES = ("LIT", "DARK", "SOR")
@@ -338,6 +338,69 @@ class Session:
         )
         self.today, self.day_fills, self.orders_today = [], [], 0
         return {"eod": eod, "tca": tcas}
+
+
+def session_case(
+    cash: Any,
+    limits: Mapping[str, Any],
+    lit: Mapping[str, Any],
+    script: Sequence[Any],
+    dark: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """`paper.session.run`: replays a script of SUBMIT and CLOSE steps through one Session and
+    returns every ledger record (with its hash), the head, positions and cash (cli-contract.md).
+    Deterministic (A8); simulated only (HR-42)."""
+    if not isinstance(cash, str):
+        raise QfError("E_SCHEMA", "cash must be a decimal string", "cash")
+    for key0 in ("tick_size", "lot_size", "fee_schedule"):
+        if lit.get(key0) is None:
+            raise QfError("E_SCHEMA", f"lit/{key0} is missing", "lit/" + key0)
+    s = Session(cash, limits, lit, dark)
+    results: list[dict[str, Any]] = []
+    symbols: set[str] = set()
+    for k, step in enumerate(script):
+        w = f"script/{k}/"
+        if not isinstance(step, Mapping) or step.get("op") not in ("SUBMIT", "CLOSE"):
+            raise QfError("E_SCHEMA", f"{w}op must be SUBMIT or CLOSE", w + "op")
+        ts = step.get("ts")
+        if not isinstance(ts, str):
+            raise QfError("E_SCHEMA", f"{w}ts is missing", w + "ts")
+        if step["op"] == "SUBMIT":
+            order, snap = step.get("order"), step.get("snapshot")
+            if not isinstance(order, Mapping) or not isinstance(snap, Mapping):
+                raise QfError("E_SCHEMA", f"{w}order and snapshot are required", w + "order")
+            for key in ("order_id", "symbol", "side", "type", "quantity"):
+                if order.get(key) is None:
+                    raise QfError("E_SCHEMA", f"{w}order/{key} is missing", w + "order/" + key)
+            symbols.add(order["symbol"])
+            results.append(
+                s.submit(order, ts, snap, list(step.get("contra") or []), step.get("router"))
+            )
+        else:
+            days = step.get("days", 1)
+            if isinstance(days, bool) or not isinstance(days, int):
+                raise QfError("E_SCHEMA", f"{w}days must be an integer", w + "days")
+            rates = {r: step.get(r, "0") for r in ("cash_rate", "debit_rate", "borrow_rate")}
+            out = s.close_day(
+                ts, dict(step.get("prev_marks") or {}), dict(step.get("marks") or {}), days, **rates
+            )
+            e = out["eod"]
+            results.append(
+                {
+                    "status": "CLOSED",
+                    "eod": {k2: (fmt(v) if isinstance(v, Decimal) else v) for k2, v in e.items()},
+                }
+            )
+    records = [json.loads(line) for line in s.ledger.lines]
+    return {
+        "results": results,
+        "records": records,
+        "head": s.ledger.head,
+        "positions": {sym: fmt(s._position(sym)) for sym in sorted(symbols)},
+        "cash": fmt(s._cash()),
+        "label": LABEL,
+        "ceiling": CEILING,
+    }
 
 
 guard(globals())

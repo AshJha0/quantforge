@@ -13,6 +13,7 @@ from typing import Any
 
 from .errors import QfError
 from .finite import guard
+from .lit_matching import fmt
 
 LABEL = "crypto venue; simulated"
 CEILING = "Paper trading on free data; simulated fills; no evidence of tradable profitability."
@@ -311,6 +312,197 @@ def pretrade_check(
     }
     reasons = [r for r in REASONS if failed[r]]
     return {"accepted": not reasons, "reasons": reasons, "label": LABEL}
+
+
+# ---------------------------------------------------------------- CLI cases (cli-contract.md, paper.*)
+# One symbol per case; outputs are decimal strings (HR-44) with the HR-43 label.
+
+_SYM = "S"
+
+
+def _req(m: Mapping[str, Any], key: str, where: str) -> Any:
+    if m.get(key) is None:
+        raise QfError("E_SCHEMA", f"{where}{key} is missing", where + key)
+    return m[key]
+
+
+def _dstr(v: Any, name: str) -> Decimal:
+    """A decimal input over the CLI must be a JSON string (HR-12, HR-44)."""
+    if not isinstance(v, str):
+        raise QfError("E_SCHEMA", f"{name} must be a decimal string", name)
+    return dec(v, name)
+
+
+def _fill_list(fills: Sequence[Any]) -> list[dict[str, Any]]:
+    out = []
+    for k, f in enumerate(fills):
+        w = f"fills/{k}/"
+        if not isinstance(f, Mapping):
+            raise QfError("E_SCHEMA", f"{w} is not an object", w)
+        side = _req(f, "side", w)
+        side_sign(side)
+        q, p = (
+            _dstr(_req(f, "quantity", w), w + "quantity"),
+            _dstr(_req(f, "price", w), w + "price"),
+        )
+        fee = _dstr(f.get("fee", "0"), w + "fee")
+        if q <= 0 or p <= 0:
+            raise QfError("E_DOMAIN", "quantity and price must be positive", w + "quantity")
+        out.append(
+            {"symbol": _SYM, "side": side, "quantity": fmt(q), "price": fmt(p), "fee": fmt(fee)}
+        )
+    return out
+
+
+def book_case(
+    fills: Sequence[Any], cash: Any = None, position: Any = "0", avg_cost: Any = "0"
+) -> dict[str, Any]:
+    """`paper.book.apply_fill`: fills in order on one symbol (HR-50). Without `cash` the output
+    gives `cash_delta` (the change of cash) instead of `cash`."""
+    start = Decimal(0) if cash is None else _dstr(cash, "cash")
+    book = Book(cash=start)
+    pos = book.pos(_SYM)
+    pos.n, pos.c = _dstr(position, "position"), _dstr(avg_cost, "avg_cost")
+    for f in _fill_list(fills):
+        book.apply_fill(_SYM, f["side"], f["quantity"], f["price"], f["fee"])
+    out = {
+        "position": fmt(pos.n),
+        "avg_cost": fmt(pos.c),
+        "realised": fmt(book.realised),
+        "fees": fmt(book.fees),
+        "label": LABEL,
+    }
+    out["cash_delta" if cash is None else "cash"] = fmt(book.cash)
+    return out
+
+
+def day_case(
+    cash_open: Any,
+    fills: Sequence[Any] = (),
+    position_open: Any = "0",
+    avg_cost_open: Any = None,
+    prev_close: Any = None,
+    close: Any = None,
+    days: int = 1,
+    cash_rate: Any = "0",
+    debit_rate: Any = "0",
+    borrow_rate: Any = "0",
+) -> dict[str, Any]:
+    """`paper.book.end_of_day` with `paper.pnl.explain` for one symbol (HR-51 to HR-53)."""
+    cash = _dstr(cash_open, "cash_open")
+    n = _dstr(position_open, "position_open")
+    fl = _fill_list(fills)
+    if n != 0 and prev_close is None:
+        raise QfError("E_SCHEMA", "prev_close is missing (open position)", "prev_close")
+    if (n != 0 or fl) and close is None:
+        raise QfError("E_SCHEMA", "close is missing (position or fills)", "close")
+    prev = None if prev_close is None else _dstr(prev_close, "prev_close")
+    px = None if close is None else _dstr(close, "close")
+    for name, v in (("prev_close", prev), ("close", px)):
+        if v is not None and v <= 0:
+            raise QfError("E_DOMAIN", f"{name} must be positive", name)
+    rates = {
+        "cash_rate": fmt(_dstr(cash_rate, "cash_rate")),
+        "debit_rate": fmt(_dstr(debit_rate, "debit_rate")),
+        "borrow_rate": fmt(_dstr(borrow_rate, "borrow_rate")),
+    }
+    book = Book(cash=cash)
+    pos = book.pos(_SYM)
+    pos.n = n
+    if avg_cost_open is not None:
+        pos.c = _dstr(avg_cost_open, "avg_cost_open")
+    elif prev is not None:
+        pos.c = prev
+    prev_marks = {} if prev is None else {_SYM: fmt(prev)}
+    marks = {} if px is None else {_SYM: fmt(px)}
+    nav_open = cash + (n * prev if n != 0 and prev is not None else 0)
+    e = end_of_day(book, fl, prev_marks, marks, days, **rates)
+    out = {
+        "market": fmt(e["market"]),
+        "trading": fmt(e["trading"]),
+        "fees": fmt(e["fees"]),
+        "financing": fmt(e["financing"]),
+        "cash_interest": fmt(e["interest"]),
+        "short_borrow": fmt(e["borrow"]),
+        "total": fmt(e["total"]),
+        "position": fmt(pos.n),
+        "cash_close": fmt(book.cash),
+        "label": LABEL,
+    }
+    if px is not None:
+        out["nav_open"] = fmt(nav_open)
+        out["nav_close"] = fmt(e["nav"])
+    return out
+
+
+def pretrade_case(
+    order: Mapping[str, Any],
+    ref_price: Any,
+    position: Any,
+    cash: Any,
+    orders_today: int,
+    limits: Mapping[str, Any],
+) -> dict[str, Any]:
+    """`paper.pretrade.check` over the CLI: schema first, then HR-42, then the checks."""
+    for k in ("side", "type", "quantity"):
+        _req(order, k, "order/")
+    _dstr(order["quantity"], "order/quantity")
+    if order.get("limit_price") is not None:
+        _dstr(order["limit_price"], "order/limit_price")
+    for k in ("max_order_qty", "max_notional", "max_abs_position", "price_band"):
+        _dstr(_req(limits, k, "limits/"), "limits/" + k)
+    mo = _req(limits, "max_orders_per_day", "limits/")
+    if isinstance(mo, bool) or not isinstance(mo, int):
+        raise QfError("E_SCHEMA", "limits/max_orders_per_day must be an integer", "limits")
+    for k in ("kill_switch", "allow_short"):
+        if k in limits and not isinstance(limits[k], bool):
+            raise QfError("E_SCHEMA", f"limits/{k} must be a boolean", "limits/" + k)
+    r = pretrade_check(
+        order,
+        _dstr(ref_price, "ref_price"),
+        _dstr(position, "position"),
+        _dstr(cash, "cash"),
+        orders_today,
+        limits,
+    )
+    return {"accepted": r["accepted"], "reasons": r["reasons"], "label": LABEL}
+
+
+def record_case(seq: int, ts: str, kind: str, body: Mapping[str, Any], prev: str) -> dict[str, Any]:
+    """`paper.ledger.append` for one record: its canonical bytes (HR-45), hash and full record."""
+    if kind not in KINDS:
+        raise QfError("E_INPUT", f"unknown kind {kind!r}", "kind")
+    if seq < 0:
+        raise QfError("E_DOMAIN", "seq must be >= 0", "seq")
+    rec: dict[str, Any] = {
+        "seq": seq,
+        "ts": ts,
+        "kind": kind,
+        "label": LABEL,
+        "body": dict(body),
+        "prev": prev,
+    }
+    raw = canonical(rec)
+    rec["hash"] = hashlib.sha256(raw).hexdigest()
+    return {
+        "canonical_bytes": raw.decode("ascii"),
+        "hash": rec["hash"],
+        "record": rec,
+        "label": LABEL,
+    }
+
+
+def verify_case(text: str) -> dict[str, Any]:
+    """`paper.ledger.verify` with a fixed output shape: `head` is null unless ok."""
+    r = verify(text)
+    return {
+        "ok": r["ok"],
+        "records": r["records"],
+        "first_bad_seq": r["first_bad_seq"],
+        "reason": r["reason"],
+        "head": r.get("head"),
+        "label": LABEL,
+    }
 
 
 guard(globals())  # E1: NaN and infinity at a public input are E_DOMAIN, checked first

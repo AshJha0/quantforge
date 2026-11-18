@@ -117,6 +117,8 @@ Golden output shapes (added 2026-11-18 as a fix after blind lane 2b, which had t
 - Pre-trade 0010 to 0017: `{"accepted", "reasons"}` with reasons in check order; 0018: `{"error": "E_UNSUPPORTED_OPERATION"}`.
 - Ledger 0020: `{"canonical_bytes", "hash", "record"}`; 0021 to 0023: `{"verify": {"ok", "first_bad_seq", "reason", "records"}}`.
 
+CLI form (2026-11-18, cross-language lane; shapes only, no value changed): the operations, inputs and byte-exact hash rule are in `cli-contract.md`, "Stage H paper trading operations". Every output also carries `label` (HR-43). `paper.ledger.verify` returns the verify object itself (not wrapped in `verify`) plus `head`; `records` is the number of records that verified before the first bad one, so 0021 and 0023 give 0 and 0022 gives 1 (the blind lane counted all lines; the spec stated no value). pt_h-0018 is pinned by unit tests, not by the golden file, because the runner reads `E_UNSUPPORTED_OPERATION` as "not implemented". Further hand cases in the golden file, not blind: pt_h-0030 and 0031 (`paper.session.run`, one LIT order filled over two levels and one rejected, then the close with TCA and EOD; hashes recomputed with `hashlib` from the canonical bytes), pt_h-0040 to 0047 (errors), and `e1_hpt` (a non-finite decimal string is `E_DOMAIN`).
+
 L* = max_order_qty 10, max_notional 1000, max_abs_position 5, price_band 0.05, max_orders_per_day 3, kill_switch false, allow_short true.
 
 ## Limitations

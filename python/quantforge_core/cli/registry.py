@@ -80,6 +80,8 @@ CORE_MODULES = (
     "dark_pool",
     "sor",
     "order_book",
+    "paper",
+    "paper_fills",
     "xva",
     "risk_tools",
     "aad_ladder",
