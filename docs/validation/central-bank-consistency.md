@@ -13,7 +13,7 @@ Rebuilding a central bank's fitted curve from the parameters that the same centr
 | Federal Reserve, Gürkaynak-Sack-Wright (2006) fitted Treasury curve, `feds200628.csv` | https://www.federalreserve.gov/data/yield-curve-tables/feds200628.csv | Federal Reserve Board public data; free to use with attribution | parameters BETA0-3, TAU1-2; published zeros SVENYnn and instantaneous forwards SVENFnn |
 | ONS series D7BT (CPI INDEX 00: ALL ITEMS 2015=100), dataset MM23 | https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23 | Open Government Licence v3.0 | monthly index levels |
 
-Downloads live outside the repository in their own folder (`C:/Work/Claude/qf-downloads/h20-2026-11-18/`), are read only with `python -I`, and are never committed. Retrieval date and SHA-256 are recorded in `data/cb-consistency.json`. Real rows are never goldens: the output is a reconciliation record, not a golden suite. No London Stock Exchange or LSEG material is used.
+Downloads live outside the repository in their own folder (`C:/Work/Claude/qf-downloads/h20-2026-11-18/`), are read only with `python -I`, and are never committed. Retrieval date and SHA-256 are recorded in `data/cb-consistency.json`. Real rows are never goldens: the output is a reconciliation record, not a golden suite.
 
 ## Acceptance criteria (fixed before the run)
 
