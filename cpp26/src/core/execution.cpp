@@ -122,19 +122,20 @@ Vec vwap(double x, const Vec& w, Mode mode) {
 Pov pov(double x, double p, const Vec& mv, Mode mode) {
     check_quantity(x, mode);
     if (!(p > 0 && p < 1)) domain("participation", "must lie in (0, 1)");
+    if (mv.empty()) input("market_volume", "must not be empty");
     for (const double v : mv)
         if (v < 0) domain("market_volume", "must be non-negative");
-    const double ratio = p / (1 - p);
+    const double ratio = 1 - p;
     double remaining = x, filled = 0;
     Vec s(mv.size());
     for (std::size_t i = 0; i < mv.size(); ++i) {
-        const double raw = ratio * mv[i];
+        const double raw = p * mv[i] / ratio;
         const double c = std::min(remaining, mode == Mode::Units ? snap_floor(raw) : raw);
         s[i] = c;
         filled += c;
-        remaining = x - filled;
+        remaining -= c;  // running remaining (HR-56): c <= remaining, so never negative
     }
-    return {std::move(s), filled, x - filled};
+    return {std::move(s), filled, remaining};
 }
 
 double ac_kappa(double lambda, double sigma, double tau, double eta_tilde) {

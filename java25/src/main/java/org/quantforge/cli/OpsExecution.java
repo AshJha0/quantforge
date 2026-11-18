@@ -42,17 +42,22 @@ final class OpsExecution {
         return mode == Mode.UNITS ? (Object) (long) x : (Object) x;
     }
 
+    /** `mode` absent means CONTINUOUS (ruling HR-56). */
+    private static Mode mode(In in) {
+        return in.gate(in.has("mode") ? in.choice("mode", Mode.class) : Mode.CONTINUOUS);
+    }
+
     private static Out twap(In in) {
         double x = in.real("quantity");
         long n = in.atMost("n_buckets", Execution.MAX_STEPS);
-        Mode mode = in.gate(in.choice("mode", Mode.class));
+        Mode mode = mode(in);
         return Operations.out("slices", slices(Execution.twap(x, n, mode), mode));
     }
 
     private static Out vwap(In in) {
         double x = in.real("quantity");
         double[] profile = in.reals("profile");
-        Mode mode = in.gate(in.choice("mode", Mode.class));
+        Mode mode = mode(in);
         return Operations.out("slices", slices(Execution.vwap(x, profile, mode), mode));
     }
 
@@ -60,7 +65,7 @@ final class OpsExecution {
         double x = in.real("quantity");
         double p = in.real("participation");
         double[] v = in.reals("market_volume");
-        Mode mode = in.gate(in.choice("mode", Mode.class));
+        Mode mode = mode(in);
         Execution.Pov r = Execution.pov(x, p, v, mode);
         return Operations.out("slices", slices(r.slices(), mode), "filled", amount(r.filled(), mode), "residual",
                 amount(r.residual(), mode));

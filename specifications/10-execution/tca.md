@@ -24,6 +24,7 @@ Errors: Q > X: `E_INPUT`; a price <= 0: `E_DOMAIN`.
 | tca_h-0003 | fills sum to 1,200 with X = 1,000 | `E_INPUT` | overfill |
 | tca_h-0004 | as 0001 with benchmark_vwap = 100.15 | vwap_slippage 60, rest as 0001 | average fill 100.225; 800 x 0.075; added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
 | tca_h-0005 | as 0001 with P_0 = 0 | `E_DOMAIN` | a price <= 0; added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
+| tca_h-0006 | as 0001 with X = 0, no fills | `E_INPUT` | non-positive order quantity (HR-56); added by the integration lane 2026-11-18 for HR-56; hand calculation and oracle only, not blind re-derived |
 
 ## Property tests
 Components sum to total to 1e-10 relative; a full fill has opportunity 0.

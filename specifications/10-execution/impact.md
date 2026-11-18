@@ -23,6 +23,9 @@ Inputs `quantity` X, `horizon` T, `resilience` rho (> 0). Outputs `initial_block
 | imp_h-0004 | X = 100,000, T = 1, rho = 2.231 | blocks 23,635.0744504845 each, rate 52,729.8510990310 | [OW13] eq. (31) with the Fig. 2 parameters; 1e5 / 4.231; 2.231e5 / 4.231 (mpmath) |
 | imp_h-0005 | V = 0, rest as 0001 | `E_DOMAIN` | V <= 0; added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
 | imp_h-0006 | X = 1,000, T = 1, rho = 0 | `E_DOMAIN` | rho must be > 0; added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
+| imp_h-0007 | sqrt, sigma = -0.02 | `E_DOMAIN` | negative daily_vol (HR-56); added by the integration lane 2026-11-18 for HR-56; hand calculation and oracle only, not blind re-derived |
+| imp_h-0008 | sqrt, Y = -1 | `E_DOMAIN` | negative coefficient (HR-56); added by the integration lane 2026-11-18 for HR-56; hand calculation and oracle only, not blind re-derived |
+| imp_h-0009 | OW, X = 0, T = 1, rho = 8 | `E_INPUT` | non-positive quantity (HR-56); added by the integration lane 2026-11-18 for HR-56; hand calculation and oracle only, not blind re-derived |
 
 Property test: as rho -> 0 each block tends to X/2 (follows directly from [OW13] eq. (31)).
 

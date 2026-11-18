@@ -79,7 +79,7 @@ def is_integer(x):
 
 
 def twap(inp):
-    x, n, mode = inp["quantity"], inp["n_buckets"], inp["mode"]
+    x, n, mode = inp["quantity"], inp["n_buckets"], inp.get("mode", "CONTINUOUS")  # HR-56
     check(x > 0, "E_INPUT")
     check(1 <= n <= 100_000, "E_INPUT")
     if mode == "UNITS":
@@ -91,7 +91,7 @@ def twap(inp):
 
 
 def vwap(inp):
-    x, prof, mode = inp["quantity"], inp["profile"], inp["mode"]
+    x, prof, mode = inp["quantity"], inp["profile"], inp.get("mode", "CONTINUOUS")
     check(x > 0, "E_INPUT")
     check(all(w >= 0 for w in prof), "E_DOMAIN")
     check(sum(prof) > 0, "E_DOMAIN")
@@ -103,9 +103,11 @@ def vwap(inp):
 
 
 def pov(inp):
-    x, p, vol, mode = inp["quantity"], inp["participation"], inp["market_volume"], inp["mode"]
+    x, p, vol, mode = inp["quantity"], inp["participation"], inp["market_volume"], inp.get("mode", "CONTINUOUS")
     check(0 < p < 1, "E_DOMAIN")
     check(x > 0, "E_INPUT")
+    check(len(vol) > 0, "E_INPUT")
+    check(all(v >= 0 for v in vol), "E_DOMAIN")
     if mode == "UNITS":
         check(is_integer(x), "E_INPUT")
     rem, out = Fr(x), []
@@ -117,8 +119,8 @@ def pov(inp):
         rem -= child
     filled = sum(out)
     if mode == "UNITS":
-        return {"slices": [int(c) for c in out], "filled": int(filled), "residual": int(Fr(x) - filled)}
-    return {"slices": [float(c) for c in out], "filled": float(filled), "residual": float(Fr(x) - filled)}
+        return {"slices": [int(c) for c in out], "filled": int(filled), "residual": int(rem)}
+    return {"slices": [float(c) for c in out], "filled": float(filled), "residual": float(rem)}  # running remaining (HR-56)
 
 
 # ---------------------------------------------------------------- Almgren-Chriss (HR-5, HR-6)
@@ -127,7 +129,8 @@ def ac_core(inp, lam):
     X, T, N = mp.mpf(inp["quantity"]), mp.mpf(inp["horizon"]), inp["n_steps"]
     sigma, eps, eta, gamma = (mp.mpf(inp[k]) for k in ("sigma", "epsilon", "eta", "gamma"))
     check(N >= 1, "E_INPUT")
-    check(T > 0 and sigma >= 0 and lam >= 0, "E_DOMAIN")
+    check(X > 0, "E_INPUT")  # HR-56
+    check(T > 0 and sigma >= 0 and lam >= 0 and eps >= 0 and gamma >= 0, "E_DOMAIN")  # HR-56
     tau = T / N
     eta_t = eta - gamma * tau / 2
     check(eta_t > 0, "E_DOMAIN")
@@ -166,12 +169,13 @@ def ac_frontier(inp):
 
 def imp_sqrt(inp):
     q, v, s, y = (mp.mpf(inp[k]) for k in ("quantity", "daily_volume", "daily_vol", "coefficient"))
-    check(q >= 0 and v > 0, "E_DOMAIN")
+    check(q >= 0 and v > 0 and s >= 0 and y >= 0, "E_DOMAIN")  # HR-56: a zero order has zero impact
     return {"impact": common.f(y * s * mp.sqrt(q / v)), "model": MODEL}
 
 
 def imp_ow(inp):
     x, t, rho = (mp.mpf(inp[k]) for k in ("quantity", "horizon", "resilience"))
+    check(x > 0, "E_INPUT")  # HR-56
     check(rho > 0 and t > 0, "E_DOMAIN")
     b = x / (rho * t + 2)
     return {"initial_block": common.f(b), "rate": common.f(rho * b), "final_block": common.f(b)}
@@ -184,6 +188,7 @@ def tca(inp):
     pd, p0, pc, X = (mp.mpf(inp[k]) for k in ("decision_price", "arrival_price", "end_price", "order_quantity"))
     fills = [(mp.mpf(f_["quantity"]), mp.mpf(f_["price"])) for f_ in inp["fills"]]
     Q = mp.fsum(q for q, _ in fills)
+    check(X > 0 and all(q > 0 for q, _ in fills), "E_INPUT")  # HR-56
     check(Q <= X, "E_INPUT")
     check(min([pd, p0, pc] + [p for _, p in fills]) > 0, "E_DOMAIN")
     delay = s * Q * (p0 - pd)
@@ -276,6 +281,15 @@ SCHED_CASES = [
      "all-zero profile", True),
     ("exec.schedule.twap", {"quantity": 1000.5, "n_buckets": 2, "mode": "UNITS"}, "E_INPUT",
      "non-integer X in UNITS mode", False),
+    ("exec.schedule.twap", {"quantity": 1000.0, "n_buckets": 4}, {"slices": [250.0] * 4},
+     "mode absent: CONTINUOUS (HR-56)", False),
+    ("exec.schedule.pov", {"quantity": 0.0, "participation": 0.1, "market_volume": [900.0]}, "E_INPUT",
+     "quantity 0 (HR-56)", False),
+    ("exec.schedule.pov", {"quantity": 1000.0, "participation": 0.1, "market_volume": [], "mode": "CONTINUOUS"},
+     "E_INPUT", "empty market_volume (HR-56)", False),
+    ("exec.schedule.pov", {"quantity": 1.0, "participation": 0.5, "market_volume": [0.75, 0.75, 0.75], "mode": "CONTINUOUS"},
+     {"slices": [0.75, 0.25, 0.0], "filled": 1.0, "residual": 0.0},
+     "residual is the running remaining after each child, never negative (HR-56)", False),
 ]
 
 AC_CASES = [
@@ -291,6 +305,9 @@ AC_CASES = [
     ("exec.ac.frontier", dict({k: v for k, v in P.items()}, risk_aversions=[0.0, 5e-7, 1e-6, 2e-6]),
      "frontier: E non-decreasing, V non-increasing in lambda; points 0 and 1e-6 equal ac_h-0001, ac_h-0002", ADDED),
     ("exec.ac.trajectory", dict(P, n_steps=0, risk_aversion=1e-6), "N < 1", ADDED),
+    ("exec.ac.trajectory", dict(P, quantity=0.0, risk_aversion=1e-6), "quantity 0 is E_INPUT (HR-56)", ADDED),
+    ("exec.ac.trajectory", dict(P, epsilon=-0.0625, risk_aversion=1e-6), "negative epsilon (HR-56)", ADDED),
+    ("exec.ac.trajectory", dict(P, gamma=-2.5e-7, risk_aversion=1e-6), "negative gamma (HR-56)", ADDED),
 ]
 
 IMP_CASES = [
@@ -305,6 +322,12 @@ IMP_CASES = [
     ("exec.impact.sqrt", {"quantity": 1e5, "daily_volume": 0.0, "daily_vol": 0.02, "coefficient": 1.0},
      "V <= 0", ADDED),
     ("exec.impact.ow_optimal", {"quantity": 1000.0, "horizon": 1.0, "resilience": 0.0}, "rho <= 0", ADDED),
+    ("exec.impact.sqrt", {"quantity": 1e5, "daily_volume": 1e7, "daily_vol": -0.02, "coefficient": 1.0},
+     "negative daily_vol (HR-56)", ADDED),
+    ("exec.impact.sqrt", {"quantity": 1e5, "daily_volume": 1e7, "daily_vol": 0.02, "coefficient": -1.0},
+     "negative coefficient (HR-56)", ADDED),
+    ("exec.impact.ow_optimal", {"quantity": 0.0, "horizon": 1.0, "resilience": 8.0}, "quantity 0 is E_INPUT (HR-56)",
+     ADDED),
 ]
 
 FILLS = [{"quantity": 600.0, "price": 100.2}, {"quantity": 200.0, "price": 100.3}]
@@ -317,6 +340,7 @@ TCA_CASES = [
      "fills sum to 1,200 against X = 1,000: overfill", BLIND),
     (dict(TCA_BASE, benchmark_vwap=100.15), "average fill 100.225; slippage 800 x 0.075 = 60", ADDED),
     (dict(TCA_BASE, arrival_price=0.0), "a price <= 0", ADDED),
+    (dict(TCA_BASE, order_quantity=0.0, fills=[]), "order_quantity 0 is E_INPUT (HR-56)", ADDED),
 ]
 
 AS_BASE = {"mid": 100.0, "inventory": 2.0, "risk_aversion": 0.1, "sigma": 2.0, "time_left": 1.0, "k": 1.5}
@@ -401,7 +425,7 @@ def build():
             assert r == want, (r, want)
         ver = ("hand", BLIND) if in_table else ("hand", ADDED)
         tags = ("stage_h", "execution", "schedule", "synthetic") + (("error",) if err else ())
-        units = inp["mode"] == "UNITS"
+        units = inp.get("mode") == "UNITS"
         if err:
             s.add(op, inp, error=err, verified=ver, tags=tags, description=desc)
         else:

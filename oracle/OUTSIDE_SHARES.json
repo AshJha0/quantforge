@@ -3799,34 +3799,34 @@
   },
   "H": {
    "without_sweeps": {
-    "cases": 27,
+    "cases": 29,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 21,
     "reimplementation": 0,
-    "none": 6,
+    "none": 8,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 21,
-    "share_with_rederivation": 0.777778,
+    "share_with_rederivation": 0.724138,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 15
+    "error_and_invariance_cases": 24
    },
    "with_sweeps": {
-    "cases": 27,
+    "cases": 29,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 21,
     "reimplementation": 0,
-    "none": 6,
+    "none": 8,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 21,
-    "share_with_rederivation": 0.777778,
+    "share_with_rederivation": 0.724138,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 15
+    "error_and_invariance_cases": 24
    },
    "sweeps": null,
    "libraries": {},
@@ -3860,7 +3860,7 @@
      "counted_with_rederivation": 3,
      "share_with_rederivation": 0.75,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 2
+     "error_and_invariance_cases": 5
     },
     "exec.impact.ow_optimal": {
      "cases": 2,
@@ -3875,7 +3875,7 @@
      "counted_with_rederivation": 2,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 1
+     "error_and_invariance_cases": 2
     },
     "exec.impact.sqrt": {
      "cases": 2,
@@ -3890,35 +3890,35 @@
      "counted_with_rederivation": 2,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 1
+     "error_and_invariance_cases": 3
     },
     "exec.schedule.pov": {
-     "cases": 2,
+     "cases": 3,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 2,
      "reimplementation": 0,
-     "none": 0,
+     "none": 1,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 2,
-     "share_with_rederivation": 1.0,
+     "share_with_rederivation": 0.666667,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 1
+     "error_and_invariance_cases": 3
     },
     "exec.schedule.twap": {
-     "cases": 2,
+     "cases": 3,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 2,
      "reimplementation": 0,
-     "none": 0,
+     "none": 1,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 2,
-     "share_with_rederivation": 1.0,
+     "share_with_rederivation": 0.666667,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 1
     },
@@ -3950,7 +3950,7 @@
      "counted_with_rederivation": 2,
      "share_with_rederivation": 0.666667,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 2
+     "error_and_invariance_cases": 3
     },
     "micro.mm.as_quotes": {
      "cases": 6,
@@ -3998,26 +3998,26 @@
      "counted_with_rederivation": 4,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 2,
+     "error_and_invariance_cases": 5,
      "suites": [
       "imp_h"
      ],
      "meets_item_floor": true
     },
     "H-3a": {
-     "cases": 6,
+     "cases": 8,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 6,
      "reimplementation": 0,
-     "none": 0,
+     "none": 2,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
-     "share_with_rederivation": 1.0,
+     "share_with_rederivation": 0.75,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 3,
+     "error_and_invariance_cases": 5,
      "suites": [
       "sched_h"
      ],
@@ -4036,7 +4036,7 @@
      "counted_with_rederivation": 3,
      "share_with_rederivation": 0.6,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 2,
+     "error_and_invariance_cases": 5,
      "suites": [
       "ac_h"
      ],
@@ -4055,7 +4055,7 @@
      "counted_with_rederivation": 2,
      "share_with_rederivation": 0.666667,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 2,
+     "error_and_invariance_cases": 3,
      "suites": [
       "tca_h"
      ],

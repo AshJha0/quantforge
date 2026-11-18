@@ -220,6 +220,36 @@
     "error"
    ],
    "description": "a price <= 0"
+  },
+  {
+   "case_id": "tca_h-0006",
+   "operation": "exec.tca.shortfall",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": 100.0,
+    "arrival_price": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 0.0,
+    "fills": [],
+    "fees": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "tca",
+    "synthetic",
+    "error"
+   ],
+   "description": "order_quantity 0 is E_INPUT (HR-56)"
   }
  ]
 }

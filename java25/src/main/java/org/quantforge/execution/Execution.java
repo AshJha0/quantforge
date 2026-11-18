@@ -124,23 +124,26 @@ public final class Execution {
         if (!(p > 0 && p < 1)) {
             throw domain("participation", "must lie in (0, 1)");
         }
+        if (marketVolume.length == 0) {
+            throw input("market_volume", "must not be empty");
+        }
         for (double v : marketVolume) {
             if (v < 0) {
                 throw domain("market_volume", "must be non-negative");
             }
         }
-        double ratio = p / (1 - p);
+        double ratio = 1 - p;
         double remaining = x;
         double[] s = new double[marketVolume.length];
         double filled = 0;
         for (int i = 0; i < s.length; i++) {
-            double raw = ratio * marketVolume[i];
+            double raw = p * marketVolume[i] / ratio;
             double c = Math.min(remaining, mode == Mode.UNITS ? snapFloor(raw) : raw);
             s[i] = c;
             filled += c;
-            remaining = x - filled;
+            remaining -= c; // running remaining (HR-56): c <= remaining, so never negative
         }
-        return new Pov(s, filled, x - filled);
+        return new Pov(s, filled, remaining);
     }
 
     // ---- exec.ac.* ----

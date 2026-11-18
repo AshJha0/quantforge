@@ -29,7 +29,7 @@ void key_amount(Out& out, string_view k, double x, exe::Mode mode) {
 void op_exec_twap(const In& in, Out& out) {
     const double x = in.real("quantity");
     const long long n = in.integer("n_buckets");
-    const auto mode = in.choice("mode", exec_modes);
+    const auto mode = in.find("mode") ? in.choice("mode", exec_modes) : exe::Mode::Continuous;  // HR-56
     limit_if(n > exe::max_steps, "n_buckets");
     in.ready();
     key_slices(out, "slices", exe::twap(x, n, mode), mode);
@@ -38,7 +38,7 @@ void op_exec_twap(const In& in, Out& out) {
 void op_exec_vwap(const In& in, Out& out) {
     const double x = in.real("quantity");
     const Vec w = in.reals("profile");
-    const auto mode = in.choice("mode", exec_modes);
+    const auto mode = in.find("mode") ? in.choice("mode", exec_modes) : exe::Mode::Continuous;  // HR-56
     in.ready();
     key_slices(out, "slices", exe::vwap(x, w, mode), mode);
 }
@@ -46,7 +46,7 @@ void op_exec_vwap(const In& in, Out& out) {
 void op_exec_pov(const In& in, Out& out) {
     const double x = in.real("quantity"), p = in.real("participation");
     const Vec v = in.reals("market_volume");
-    const auto mode = in.choice("mode", exec_modes);
+    const auto mode = in.find("mode") ? in.choice("mode", exec_modes) : exe::Mode::Continuous;  // HR-56
     in.ready();
     const exe::Pov r = exe::pov(x, p, v, mode);
     key_slices(out, "slices", r.slices, mode);

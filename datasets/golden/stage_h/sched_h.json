@@ -298,6 +298,130 @@
     "error"
    ],
    "description": "non-integer X in UNITS mode"
+  },
+  {
+   "case_id": "sched_h-0010",
+   "operation": "exec.schedule.twap",
+   "inputs": {
+    "quantity": 1000.0,
+    "n_buckets": 4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "slices": [
+      250.0,
+      250.0,
+      250.0,
+      250.0
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "schedule",
+    "synthetic"
+   ],
+   "description": "mode absent: CONTINUOUS (HR-56)"
+  },
+  {
+   "case_id": "sched_h-0011",
+   "operation": "exec.schedule.pov",
+   "inputs": {
+    "quantity": 0.0,
+    "participation": 0.1,
+    "market_volume": [
+     900.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "schedule",
+    "synthetic",
+    "error"
+   ],
+   "description": "quantity 0 (HR-56)"
+  },
+  {
+   "case_id": "sched_h-0012",
+   "operation": "exec.schedule.pov",
+   "inputs": {
+    "quantity": 1000.0,
+    "participation": 0.1,
+    "market_volume": [],
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "schedule",
+    "synthetic",
+    "error"
+   ],
+   "description": "empty market_volume (HR-56)"
+  },
+  {
+   "case_id": "sched_h-0013",
+   "operation": "exec.schedule.pov",
+   "inputs": {
+    "quantity": 1.0,
+    "participation": 0.5,
+    "market_volume": [
+     0.75,
+     0.75,
+     0.75
+    ],
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "slices": [
+      0.75,
+      0.25,
+      0.0
+     ],
+     "filled": 1.0,
+     "residual": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "schedule",
+    "synthetic"
+   ],
+   "description": "residual is the running remaining after each child, never negative (HR-56)"
   }
  ]
 }

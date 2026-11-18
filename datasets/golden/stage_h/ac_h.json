@@ -322,6 +322,99 @@
     "error"
    ],
    "description": "N < 1"
+  },
+  {
+   "case_id": "ac_h-0008",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 0.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "almgren_chriss",
+    "synthetic",
+    "error"
+   ],
+   "description": "quantity 0 is E_INPUT (HR-56)"
+  },
+  {
+   "case_id": "ac_h-0009",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": -0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "almgren_chriss",
+    "synthetic",
+    "error"
+   ],
+   "description": "negative epsilon (HR-56)"
+  },
+  {
+   "case_id": "ac_h-0010",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": -2.5e-07,
+    "risk_aversion": 1e-06
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "almgren_chriss",
+    "synthetic",
+    "error"
+   ],
+   "description": "negative gamma (HR-56)"
   }
  ]
 }
