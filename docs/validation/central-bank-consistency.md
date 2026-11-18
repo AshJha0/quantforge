@@ -34,3 +34,18 @@ A failed criterion is reported as failed; thresholds are not moved after the run
 Reproduce: `python -I tools/validation/cb_consistency.py --gsw <dir>/feds200628.csv --ons <dir>/ons_d7bt_mm23.csv --retrieved 2026-11-18 --out docs/validation/data/cb-consistency.json`
 
 ---
+
+## Results (run 2026-11-18, data retrieved 2026-11-18)
+
+Record: [`data/cb-consistency.json`](data/cb-consistency.json) (SHA-256 of both downloads inside). GSW rows 1980-01-02 to 2026-11-13 (11,699 rows, 334,365 points per test); ONS D7BT to 2026-10.
+
+| Check | Result | Criterion | Verdict |
+|---|---|---|---|
+| A1 zeros (circular) | 100 % within 0.05 bp; max 0.038 bp | 99.9 % within 0.05 bp, max 0.5 bp | pass |
+| A2 forwards (circular) | 99.990 % within 0.05 bp; max 0.156 bp | same | pass |
+| A3 library NS fit, 323 month-ends | median RMSE 3.81 bp; p95 9.21 bp; max 19.99 bp | median 5 bp, p95 15 bp | pass |
+| B1 2015 base | mean 100.008 | 100 within 0.05 | pass |
+| B2 base and 10 pillars (circular) | errors below 1.2e-13 | 1e-9 / 1e-6 | pass |
+| B3 between pillars | mean gap 0.85, max 3.22 index points | none | informational |
+
+Reading: A1, A2 and B2 confirm that our Svensson formula, units and CPI curve indexing match the publishers' conventions; they say nothing about whether the curves are correct. A3 shows a three-factor Nelson-Siegel fit leaves a few bp against the Fed's four-factor curve, worst in 2000s-era humped curves. B3's gaps are mostly seasonality and the 2021-2023 inflation path, which a pillar-only log-linear curve cannot follow; they are not defects.

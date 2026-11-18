@@ -1,0 +1,64 @@
+{
+ "generator": "tools/validation/cb_consistency.py",
+ "nature": "consistency checks, not validation; A1, A2, B2 are circular by construction",
+ "golden": false,
+ "sources": {
+  "gsw": {
+   "url": "https://www.federalreserve.gov/data/yield-curve-tables/feds200628.csv",
+   "retrieved": "2026-11-18",
+   "sha256": "96af2ea14f2f9a1881b9dbd43015c3def725e5123aed267d120e19475564f2f3",
+   "terms": "Federal Reserve Board public data"
+  },
+  "ons_d7bt": {
+   "url": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+   "retrieved": "2026-11-18",
+   "sha256": "fe1d758dfed5205f458062a27097983e266989c8a2d262642b80c4e827a3bfab",
+   "terms": "Open Government Licence v3.0"
+  }
+ },
+ "gsw": {
+  "rows": 11699,
+  "first": "1980-01-02",
+  "last": "2026-11-13",
+  "A1_zeros": {
+   "points": 334365,
+   "share_within_0.05bp": 1.0,
+   "max_bp": 0.03796498729968789,
+   "pass": true
+  },
+  "A2_forwards": {
+   "points": 334365,
+   "share_within_0.05bp": 0.9998983147159541,
+   "max_bp": 0.15610767845899431,
+   "pass": true
+  },
+  "A3_library_ns_fit": {
+   "dates": 323,
+   "median_rmse_bp": 3.810033328749846,
+   "p95_rmse_bp": 9.207937834572629,
+   "max_rmse_bp": 19.99281186762915,
+   "pass": true
+  }
+ },
+ "ons_cpi": {
+  "latest_month": "2026-10",
+  "B1_base_year": {
+   "mean_2015": 100.00833333333333,
+   "pass": true
+  },
+  "B2_library_base_pillars": {
+   "base": "2016-01",
+   "base_cpi": 99.5,
+   "pillars": 10,
+   "base_abs_err": 2.842170943040401e-14,
+   "max_pillar_abs_err": 1.1368683772161603e-13,
+   "pass": true
+  },
+  "B3_between_pillars": {
+   "months": 110,
+   "max_abs_gap": 3.222364805536273,
+   "mean_abs_gap": 0.8509365332105282,
+   "gate": "informational, none"
+  }
+ }
+}
