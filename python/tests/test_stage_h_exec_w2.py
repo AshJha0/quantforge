@@ -28,7 +28,8 @@ SEED = 20261118
 
 
 def _cases(name: str) -> list[dict[str, Any]]:
-    cases: list[dict[str, Any]] = json.loads((GOLD / f"{name}.json").read_text(encoding="utf-8"))["cases"]
+    text = (GOLD / f"{name}.json").read_text(encoding="utf-8")
+    cases: list[dict[str, Any]] = json.loads(text)["cases"]
     return cases
 
 
