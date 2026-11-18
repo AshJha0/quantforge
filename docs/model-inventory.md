@@ -35,7 +35,7 @@ Each model below gets one entry, the "page" the plan asks for. Outside-checked s
 | M21 | Vol Greeks | `06-risk/vol-greeks.md` | C | Implemented | stage C only |
 | M22 | Least-squares calibration | `03-calibration/least-squares.md` | B | Implemented | known truth only |
 | M23 | Linear-cost hedge solver | `08-hedging/stage-b-hedges.md` | B | Implemented | none |
-| M24 | Coupon schedule generation | `02-curves/schedules.md` | B | Implemented | none recorded |
+| M24 | Coupon schedule generation | `02-curves/schedules.md` | B | Implemented | QuantLib Schedule, 53 of 54 |
 
 Stage E has its own index tables (ME-A1 to ME-A8, EB1 to EB12) under "Stage E models". Stages F, G and I, with fields taken from each entry below (outside-checked counts as the entry's Validation line states them, "see entry" where it gives none):
 
@@ -232,7 +232,7 @@ Each entry gives: purpose; inputs; known limitations; validation status; use res
 - **Purpose:** regular coupon periods with one short first stub, business-day adjusted, with payment dates (`rates.schedule.generate`).
 - **Inputs:** start and end dates, frequency in months, calendar, end-of-month flag, payment lag.
 - **Limitations:** short first stub only; long stubs and ex-dividend periods are stage D; `MODIFIED_FOLLOWING` only.
-- **Validation:** oracle `oracle/python/gen_stage_b.py`; suites `schedule` (7 cases) and `schedule_deep` (48 cases). The spec's acceptance is exact agreement with QuantLib `Schedule` (backward generation), but no outside-check record for these suites was found in `oracle/` on 2026-11-17, so none is counted. **Review:** 2026-11-17.
+- **Validation:** oracle `oracle/python/gen_stage_b.py`; suites `schedule` (7 cases) and `schedule_deep` (48 cases). The spec's acceptance is exact agreement with QuantLib `Schedule` (backward generation). Outside check (H-19, 2026-11-18): `oracle/python/outside_validation.py` compares every value case with QuantLib 1.44 `Schedule` and `Calendar.advance`; 53 of 54 agree exactly (`oracle/OUTSIDE_VALIDATION.json`, tag `quantlib-1.44-schedule`); QuantLib refuses the remaining degenerate case (end adjusts back onto start), which rests on the spec's rule 4. **Review:** 2026-11-18.
 - **Tier:** 2.
 - **Challenger:** the Python oracle against each of the three ported builds (Rust, Java, C++).
 - **Monitoring thresholds:** any period date differing from the oracle (exact match required).

@@ -610,6 +610,86 @@
    "map_review": "self-reviewed 2026-11-07"
   },
   {
+   "case_id": "bonds_d-0040",
+   "operation": "bond.spread.asset_swap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CRV.LOG_LINEAR_DF",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "bonds_d-0041",
+   "operation": "bond.spread.asset_swap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CRV.LOG_LINEAR_DF",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "bonds_d-0042",
+   "operation": "bond.spread.asset_swap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CRV.LOG_LINEAR_DF",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "bonds_d-0043",
+   "operation": "bond.spread.asset_swap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CRV.LOG_LINEAR_DF",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.1",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "bonds_d-0044",
+   "operation": "bond.spread.asset_swap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CRV.LOG_LINEAR_DF",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
    "case_id": "capswaption_d-0001",
    "operation": "rates.cap.price",
    "library": "QuantLib",
@@ -1163,6 +1243,60 @@
    "map_review": "self-reviewed 2026-11-07"
   },
   {
+   "case_id": "credit_d-0009",
+   "operation": "credit.index.intrinsic",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.FOLLOWING",
+    "BDC.UNADJUSTED",
+    "CAL.WEEKENDS",
+    "CRV.HAZARD_FLAT",
+    "CRV.LOG_LINEAR_DF",
+    "DC.ACT_360",
+    "DC.ACT_360_INCL_LAST",
+    "ENG.ISDA_CDS",
+    "GEN.CDS2015"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "credit_d-0011",
+   "operation": "credit.curve.composite",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.FOLLOWING",
+    "BDC.UNADJUSTED",
+    "CAL.WEEKENDS",
+    "CRV.HAZARD_FLAT",
+    "CRV.LOG_LINEAR_DF",
+    "DC.ACT_360",
+    "DC.ACT_360_INCL_LAST",
+    "ENG.ISDA_CDS",
+    "GEN.CDS2015"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "credit_d-0012",
+   "operation": "credit.curve.composite",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.FOLLOWING",
+    "BDC.UNADJUSTED",
+    "CAL.WEEKENDS",
+    "CRV.HAZARD_FLAT",
+    "CRV.LOG_LINEAR_DF",
+    "DC.ACT_360",
+    "DC.ACT_360_INCL_LAST",
+    "ENG.ISDA_CDS",
+    "GEN.CDS2015"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
    "case_id": "credit_d-0017",
    "operation": "credit.cds.bootstrap",
    "library": "QuantLib",
@@ -1246,6 +1380,64 @@
    "convention_rows": [
     "CRV.LOG_LINEAR_DF",
     "CRV.ZERO_SPREAD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "csa_d-0004",
+   "operation": "rates.csa.discount",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF",
+    "CRV.ZERO_SPREAD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "csa_d-0005",
+   "operation": "rates.csa.discount",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF",
+    "CRV.ZERO_SPREAD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "csa_d-0008",
+   "operation": "rates.basis.ois_spread",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF",
+    "IDX.SOFR",
+    "OIS.LAGS"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "csa_d-0009",
+   "operation": "rates.basis.ois_spread",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF",
+    "IDX.SOFR",
+    "OIS.LAGS"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "csa_d-0010",
+   "operation": "rates.basis.ois_spread",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF",
+    "IDX.SOFR",
+    "OIS.LAGS"
    ],
    "map_review": "self-reviewed 2026-11-07"
   },
@@ -1358,6 +1550,154 @@
    "map_review": "self-reviewed 2026-11-07"
   },
   {
+   "case_id": "edge_d-0010",
+   "operation": "vol.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "OPT.FORMULA.BLACK_76"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "edge_d-0011",
+   "operation": "vol.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "OPT.FORMULA.BLACK_76"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "edge_d-0012",
+   "operation": "vol.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "OPT.FORMULA.BLACK_76"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "edge_d-0013",
+   "operation": "vol.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "OPT.FORMULA.BLACK_76"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "edge_d-0014",
+   "operation": "vol.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "OPT.FORMULA.BLACK_76"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "edge_d-0015",
+   "operation": "infl.linker.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CMP.BOND_YIELD",
+    "CPI.TIPS_REF",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "edge_d-0016",
+   "operation": "infl.linker.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CMP.BOND_YIELD",
+    "CPI.TIPS_REF",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "edge_d-0017",
+   "operation": "infl.linker.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CMP.BOND_YIELD",
+    "CPI.TIPS_REF",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "edge_d-0018",
+   "operation": "core.calendar.is_business_day",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CAL.USGS"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "edge_d-0019",
+   "operation": "core.calendar.is_business_day",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CAL.USGS"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "edge_d-0020",
+   "operation": "core.calendar.is_business_day",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CAL.USGS"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "edge_d-0021",
+   "operation": "core.calendar.is_business_day",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CAL.USGS"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "edge_d-0022",
+   "operation": "core.calendar.add_business_days",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CAL.USGS"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
    "case_id": "edge_d-0023",
    "operation": "rates.ois.compound_dated",
    "library": "QuantLib",
@@ -1436,6 +1776,38 @@
    "version": "1.44",
    "convention_rows": [
     "HW.CONVEXITY"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "inflation_d-0010",
+   "operation": "infl.linker.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CMP.BOND_YIELD",
+    "CPI.TIPS_REF",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "inflation_d-0011",
+   "operation": "infl.linker.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CMP.BOND_YIELD",
+    "CPI.TIPS_REF",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
    ],
    "map_review": "self-reviewed 2026-11-07"
   },
@@ -5982,6 +6354,70 @@
    "map_review": "self-reviewed 2026-11-07"
   },
   {
+   "case_id": "repo_d-0001",
+   "operation": "bond.frn.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CRV.DISCOUNT_MARGIN",
+    "CRV.LOG_LINEAR_DF",
+    "DC.ACT_360",
+    "GEN.BACKWARD",
+    "IDX.TERM_FRN"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "repo_d-0002",
+   "operation": "bond.frn.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CRV.DISCOUNT_MARGIN",
+    "CRV.LOG_LINEAR_DF",
+    "DC.ACT_360",
+    "GEN.BACKWARD",
+    "IDX.TERM_FRN"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "repo_d-0003",
+   "operation": "bond.frn.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CRV.DISCOUNT_MARGIN",
+    "CRV.LOG_LINEAR_DF",
+    "DC.ACT_360",
+    "GEN.BACKWARD",
+    "IDX.TERM_FRN"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "repo_d-0004",
+   "operation": "bond.frn.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CRV.DISCOUNT_MARGIN",
+    "CRV.LOG_LINEAR_DF",
+    "DC.ACT_360",
+    "GEN.BACKWARD",
+    "IDX.TERM_FRN"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
    "case_id": "repo_d-0005",
    "operation": "repo.forward",
    "library": "QuantLib",
@@ -6106,6 +6542,98 @@
    "map_review": "self-reviewed 2026-11-07"
   },
   {
+   "case_id": "repo_d-0015",
+   "operation": "bond.futures.conversion_factor",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CF.CME_SYNTHETIC",
+    "CMP.BOND_YIELD",
+    "DC.THIRTY_360_BOND",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "repo_d-0016",
+   "operation": "bond.futures.conversion_factor",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CF.CME_SYNTHETIC",
+    "CMP.BOND_YIELD",
+    "DC.THIRTY_360_BOND",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "repo_d-0017",
+   "operation": "bond.futures.conversion_factor",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CF.CME_SYNTHETIC",
+    "CMP.BOND_YIELD",
+    "DC.THIRTY_360_BOND",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "repo_d-0018",
+   "operation": "bond.futures.conversion_factor",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CF.CME_SYNTHETIC",
+    "CMP.BOND_YIELD",
+    "DC.THIRTY_360_BOND",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "repo_d-0019",
+   "operation": "bond.futures.basis",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD",
+    "RATE.SIMPLE_ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "rulings2_d-0001",
+   "operation": "rates.basis.ois_spread",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF",
+    "IDX.ESTR",
+    "OIS.LAGS"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
    "case_id": "rulings2_d-0015",
    "operation": "rates.cap.price",
    "library": "QuantLib",
@@ -6118,6 +6646,150 @@
     "DC.ACT_365F",
     "GEN.BACKWARD",
     "OPT.BACHELIER"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "rulings_r1-0001",
+   "operation": "bond.futures.conversion_factor",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CF.CME_SYNTHETIC",
+    "CMP.BOND_YIELD",
+    "DC.THIRTY_360_BOND",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "rulings_r1-0002",
+   "operation": "bond.futures.conversion_factor",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CF.CME_SYNTHETIC",
+    "CMP.BOND_YIELD",
+    "DC.THIRTY_360_BOND",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "rulings_r1-0003",
+   "operation": "bond.futures.conversion_factor",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CF.CME_SYNTHETIC",
+    "CMP.BOND_YIELD",
+    "DC.THIRTY_360_BOND",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "rulings_r1-0004",
+   "operation": "bond.futures.conversion_factor",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CF.CME_SYNTHETIC",
+    "CMP.BOND_YIELD",
+    "DC.THIRTY_360_BOND",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "rulings_r1-0005",
+   "operation": "bond.futures.conversion_factor",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CF.CME_SYNTHETIC",
+    "CMP.BOND_YIELD",
+    "DC.THIRTY_360_BOND",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "rulings_r1-0006",
+   "operation": "bond.futures.conversion_factor",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CF.CME_SYNTHETIC",
+    "CMP.BOND_YIELD",
+    "DC.THIRTY_360_BOND",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "rulings_r1-0007",
+   "operation": "bond.futures.conversion_factor",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CF.CME_SYNTHETIC",
+    "CMP.BOND_YIELD",
+    "DC.THIRTY_360_BOND",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "rulings_r1-0008",
+   "operation": "bond.futures.conversion_factor",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CF.CME_SYNTHETIC",
+    "CMP.BOND_YIELD",
+    "DC.THIRTY_360_BOND",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "rulings_r1-0009",
+   "operation": "bond.futures.conversion_factor",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CF.CME_SYNTHETIC",
+    "CMP.BOND_YIELD",
+    "DC.THIRTY_360_BOND",
+    "FREQ.2",
+    "GEN.BACKWARD"
    ],
    "map_review": "self-reviewed 2026-11-07"
   },
@@ -6181,6 +6853,36 @@
     "GEN.FORWARD",
     "IDX.ESTR",
     "IDX.SOFR"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "xccy_d-0008",
+   "operation": "fx.ndf.pv",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "xccy_d-0009",
+   "operation": "fx.ndf.pv",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF"
+   ],
+   "map_review": "self-reviewed 2026-11-07"
+  },
+  {
+   "case_id": "xccy_d-0010",
+   "operation": "fx.ndf.pv",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF"
    ],
    "map_review": "self-reviewed 2026-11-07"
   }
