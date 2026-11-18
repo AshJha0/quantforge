@@ -54,7 +54,7 @@ def load_rederivation():
     doc = json.loads(p.read_text(encoding="utf-8"))
     return {c["case_id"]: c["operation"] for c in doc["cases"] if c["pass"]}, doc.get("source", "independent re-derivation")
 
-STAGE_DIRS = {"D": ["stage_d"], "E": ["stage_e", "stage_e_b"], "F": ["stage_f"], "G": ["stage_g"], "I": ["stage_i"], "J": ["stage_j"]}
+STAGE_DIRS = {"D": ["stage_d"], "E": ["stage_e", "stage_e_b"], "F": ["stage_f"], "G": ["stage_g"], "I": ["stage_i"], "J": ["stage_j"], "H": ["stage_h"]}
 
 # Stage F convention rows naming a numpy or scipy primitive. Kupiec (SCIPY.BINOM) and Christoffersen (SCIPY.CHI2)
 # cases rebuild the spec's likelihood-ratio formula around a distribution call: reimplementation (review finding 6).
@@ -129,6 +129,8 @@ def classify_case_register(entries, partly):
         lib = e.get("library") or "none"
         if e["case_id"] in partly:
             cls = "none"
+        elif e.get("evidence_class") == "reimplementation":  # set by the register's generator (H-19 honesty pass)
+            cls, lib = "reimplementation", f"{lib} {e.get('version', '')}".strip() + " plus spec arithmetic"
         elif e.get("library") is None:
             cls, lib = "none", e.get("source", "published example")
         elif rows & REIMPL_ROWS:
@@ -192,10 +194,41 @@ def load_percase_j():
             if c["pass"] and all(x["pass"] for x in c["checks"]) and c.get("class") in COUNTED}
 
 
+# Stage H (plan 15 gate rule, decision DR-H2 of 2026-11-15): no free library implements Almgren-Chriss,
+# Avellaneda-Stoikov, Perold shortfall or the impact formulas, so the stage H outside check is a blind
+# re-derivation by a second lane that never saw the first lane's numbers (STAGE_H_BLIND_REDERIVATION.md), or a
+# figure printed in the paper. It is the `independent-rederivation` class and is shown apart from library checks.
+# A case counts only if its `verified_by` records the DR-H2 MATCH and does not say any output was not blind.
+# Plan 15 applies the 60% floor per item: STAGE_H_ITEMS maps each golden suite to its plan item.
+STAGE_H_ITEMS = {"sched_h": "H-3a", "ac_h": "H-3b", "tca_h": "H-3c", "imp_h": "H-15a", "as_h": "H-4a", "uc5_h": "H-6",
+                 "e1_h": None}  # E1 non-finite-input error cases only: no value cases, so no item share
+H_REDERIVE_SRC = "blind second-lane re-derivation or printed paper figure (DR-H2)"
+
+
+def load_stage_h():
+    out = {}
+    for f in sorted((GOLDEN / "stage_h").glob("*.json")):
+        doc = json.loads(f.read_text(encoding="utf-8"))
+        for c in (doc["cases"] if isinstance(doc, dict) else doc):
+            vb = " | ".join(c.get("verified_by", []))
+            if "DR-H2" in vb and "MATCH" in vb and "not blind" not in vb:
+                out[c["case_id"]] = (REDERIVED, H_REDERIVE_SRC)
+    return out
+
+
 def stage_report(stage, problems):
     """Rows (suite, operation, class, sweep, library, value-checked)."""
     suites = golden_suites(stage)
     rows = []  # (suite, operation, class, sweep, library)
+    if stage == "H":
+        reg = load_stage_h()
+        for suite, cases in suites.items():
+            if suite not in STAGE_H_ITEMS:
+                problems.append(f"stage H: golden suite {suite} has no plan item in STAGE_H_ITEMS")
+            for cid, op, st in cases:
+                cls, lib = reg.get(cid, ("none", ""))
+                rows.append((suite, op, cls, False, lib, st == "ok"))
+        return rows
     if stage == "J":
         reg = load_percase_j()
         known = {cid for s in suites.values() for cid, _, _ in s}
@@ -289,6 +322,17 @@ def build(problems):
         entry["meets_floor"] = s >= FLOOR
         if not entry["meets_floor"]:
             problems.append(f"stage {st}: {s:.1%} of value-checked cases (library plus re-derivation) is under the {FLOOR:.0%} floor")
+        if st == "H":
+            items = defaultdict(list)
+            for r in core:
+                if STAGE_H_ITEMS.get(r[0], "?") is not None:
+                    items[STAGE_H_ITEMS.get(r[0], "?")].append(r)
+            entry["per_item"] = {}
+            for it, rs in sorted(items.items()):
+                v = vshare(rs)
+                v["suites"] = sorted({r[0] for r in rs})
+                v["meets_item_floor"] = (v["share_with_rederivation"] or 0.0) >= FLOOR
+                entry["per_item"][it] = v
         out["stages"][st] = entry
     return out
 
@@ -311,6 +355,15 @@ def markdown(doc):
           "(no source outside the spec, so the re-derivation checks the spec against itself; shown separately for that reason). "
           f"Library plus re-derivation without them: {(wf['counted_with_rederivation'] - wf['rederived_book_spec_only'])} of {wf['cases']} = "
           f"{(wf['counted_with_rederivation'] - wf['rederived_book_spec_only']) / wf['cases']:.1%}."]
+    eh = doc["stages"].get("H")
+    if eh:
+        L += ["", "## Stage H per plan item (plan 15 gate rule: at least 60% of each item's value cases)", "",
+              "Stage H has no free outside library (decision DR-H2): every counted case is `independent-rederivation`, a blind "
+              "second-lane re-derivation or a figure printed in the paper, so the library-only share is 0%. Cases the blind lane "
+              "did not see, or saw part of, do not count. An item under 60% moves to a point release unless it is re-derived blind first.", "",
+              "| Item | Suites | Value cases | Blind or paper | Share | 60% per item |", "|---|---|---:|---:|---:|---|"]
+        L += [f"| {it} | {', '.join('`' + s + '`' for s in v['suites'])} | {v['cases']} | {v['counted_with_rederivation']} | "
+              f"{(v['share_with_rederivation'] or 0):.1%} | {'met' if v['meets_item_floor'] else 'NOT MET'} |" for it, v in eh["per_item"].items()]
     L += ["", "## Value classes with no free outside reference", "", "| Suite | Reason |", "|---|---|"]
     for e in doc["stages"].values():
         L += [f"| `{k}` | {v} |" for k, v in e["no_outside_reference"].items()]

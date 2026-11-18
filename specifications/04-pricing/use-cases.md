@@ -1,4 +1,4 @@
-# Use cases 1 to 4
+# Use cases 1 to 6
 
 Spec version 1.0.0. Status: Implemented. All data in the cases is synthetic.
 
@@ -47,6 +47,19 @@ Ordinary least squares with an intercept on `X = [1, F]`. If the smallest singul
 - `r_squared` `= 1 - SSR/SST`; `residual_vol` `= sqrt(SSR/(T - K - 1))`; `beta_se` `= sqrt(residual_vol^2 [(X'X)^-1]_kk)`.
 
 Class `interpolation`. Goldens: 40-digit normal equations. Outside: `scipy.linalg.lstsq` (rule 11.2.5) [S2, S3].
+
+## Use case 5: `usecase.execution_tca` (stage H, item H-6)
+
+Added 2026-11-18 by the stage H oracle lane, before any build (H-6: written before the build, with goldens). **Plain idea.** A desk must sell (or buy) a block. It plans the child orders with Almgren-Chriss, rounds them to whole units, sends them, and afterwards measures what the trade cost against the decision price. The use case chains three stage H wave 1 pieces and defines nothing new but the rounding and the bookkeeping between them.
+
+Inputs: the `exec.ac.trajectory` inputs (`quantity` an Integer `>= 1`, else `E_INPUT`; `horizon`, `n_steps`, `sigma`, `epsilon`, `eta`, `gamma`, `risk_aversion`); `side` (`BUY`, `SELL`); `decision_price`, `arrival_price`, `end_price`; `fill_prices` (one per step; another length is `E_INPUT`); `completed_steps` (Integer, 0 to `n_steps`, else `E_INPUT`): the first `completed_steps` child orders fill, the rest do not; `fee_per_unit` (`>= 0`, else `E_DOMAIN`).
+
+1. `exec.ac.trajectory` gives the trades `n_1..n_N`, `expected_cost` and `variance` (its errors propagate, for example `E_DOMAIN` when `eta_tilde <= 0`).
+2. `lots`: the trades rounded to Integers summing to `quantity` by largest remainder, ties to the earliest, as `exec.schedule.vwap` in `UNITS` mode with the trades as the profile (HR-3).
+3. Fills `(lots_k, fill_prices_k)` for `k < completed_steps`; `filled` is their sum; `fees = fee_per_unit * filled`.
+4. `exec.tca.shortfall` on those fills with `order_quantity = quantity` gives `delay`, `execution`, `opportunity`, `total`, `total_bps` (HR-8).
+
+Outputs: `lots`, `expected_cost`, `variance`, `filled`, `fees`, `delay`, `execution`, `opportunity`, `total`, `total_bps`. Class `simple_analytic`, `lots` and `filled` exact. Suite `stage_h/uc5_h` (`oracle/python/gen_stage_h_w1.py`): 3 value cases (a sell on [AC00]'s parameter set P with lambda = 1e-6, all filled; the linear schedule with two of five steps unfilled, so opportunity cost is charged; a buy of 1,000 in three steps, lots [334, 333, 333]) and 5 error cases. Evidence: mpmath at 50 digits and exact rational rounding; hand calculation of the linear cases; blind re-derivation 2026-11-18 (DR-H2, `program/STAGE_H_BLIND_UC5.md`): 3 of 3 match, uc5_h-0001 and -0003 count, uc5_h-0002 does not (its variance leaked through the packet). Self-assessment otherwise (no second review, owner decision 2026-11-18). Fill prices are synthetic and assumed (HR-10); nothing is traded.
 
 ## Use case 6: `usecase.option_hedge_lots` (stage I, ruling R6-11.20)
 

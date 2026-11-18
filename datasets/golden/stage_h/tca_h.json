@@ -1,0 +1,255 @@
+{
+ "schema_version": "1.0",
+ "suite": "tca_h",
+ "spec": "specifications/10-execution/tca.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_w1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "tca_h-0001",
+   "operation": "exec.tca.shortfall",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": 100.0,
+    "arrival_price": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 1000.0,
+    "fills": [
+     {
+      "quantity": 600.0,
+      "price": 100.2
+     },
+     {
+      "quantity": 200.0,
+      "price": 100.3
+     }
+    ],
+    "fees": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delay": 79.99999999999545,
+     "execution": 100.00000000000568,
+     "opportunity": 200.0,
+     "total": 385.00000000000114,
+     "total_bps": 38.500000000000114
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "tca",
+    "synthetic"
+   ],
+   "description": "800 x 0.10; 600 x 0.10 + 200 x 0.20; 200 x 1; + 5 fees; 385 / 1e5 x 1e4 = 38.5 bp"
+  },
+  {
+   "case_id": "tca_h-0002",
+   "operation": "exec.tca.shortfall",
+   "inputs": {
+    "side": "SELL",
+    "decision_price": 100.0,
+    "arrival_price": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 1000.0,
+    "fills": [
+     {
+      "quantity": 600.0,
+      "price": 100.2
+     },
+     {
+      "quantity": 200.0,
+      "price": 100.3
+     }
+    ],
+    "fees": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delay": -79.99999999999545,
+     "execution": -100.00000000000568,
+     "opportunity": -200.0,
+     "total": -380.00000000000114,
+     "total_bps": -38.000000000000114
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "tca",
+    "synthetic"
+   ],
+   "description": "a seller gains when prices rise"
+  },
+  {
+   "case_id": "tca_h-0003",
+   "operation": "exec.tca.shortfall",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": 100.0,
+    "arrival_price": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 1000.0,
+    "fills": [
+     {
+      "quantity": 600.0,
+      "price": 100.2
+     },
+     {
+      "quantity": 600.0,
+      "price": 100.3
+     }
+    ],
+    "fees": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "tca",
+    "synthetic",
+    "error"
+   ],
+   "description": "fills sum to 1,200 against X = 1,000: overfill"
+  },
+  {
+   "case_id": "tca_h-0004",
+   "operation": "exec.tca.shortfall",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": 100.0,
+    "arrival_price": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 1000.0,
+    "fills": [
+     {
+      "quantity": 600.0,
+      "price": 100.2
+     },
+     {
+      "quantity": 200.0,
+      "price": 100.3
+     }
+    ],
+    "fees": 5.0,
+    "benchmark_vwap": 100.15
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delay": 79.99999999999545,
+     "execution": 100.00000000000568,
+     "opportunity": 200.0,
+     "total": 385.00000000000114,
+     "total_bps": 38.500000000000114,
+     "vwap_slippage": 59.99999999999659
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "tca",
+    "synthetic"
+   ],
+   "description": "average fill 100.225; slippage 800 x 0.075 = 60"
+  },
+  {
+   "case_id": "tca_h-0005",
+   "operation": "exec.tca.shortfall",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": 100.0,
+    "arrival_price": 0.0,
+    "end_price": 101.0,
+    "order_quantity": 1000.0,
+    "fills": [
+     {
+      "quantity": 600.0,
+      "price": 100.2
+     },
+     {
+      "quantity": 200.0,
+      "price": 100.3
+     }
+    ],
+    "fees": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "tca",
+    "synthetic",
+    "error"
+   ],
+   "description": "a price <= 0"
+  },
+  {
+   "case_id": "tca_h-0006",
+   "operation": "exec.tca.shortfall",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": 100.0,
+    "arrival_price": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 0.0,
+    "fills": [],
+    "fees": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "tca",
+    "synthetic",
+    "error"
+   ],
+   "description": "order_quantity 0 is E_INPUT (HR-56)"
+  }
+ ]
+}

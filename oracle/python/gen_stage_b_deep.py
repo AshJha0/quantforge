@@ -64,6 +64,7 @@ def schedules():
         if r[-1].split(",") == q:
             ver.append("strata-2.12.78")
             n_strata += 1
+        ver.append("quantlib-1.44-schedule")  # outside_validation.py (M24) checks the committed case against QuantLib Schedule
         per = [{"start": str(x), "end": str(y), "payment": str(add_bd(cal, y, lag))} for x, y in zip(got, got[1:])]
         s.add("rates.schedule.generate", {"start": str(st), "end": str(en), "frequency_months": m, "calendar": cal, "end_of_month": False, "payment_lag": lag}, {"periods": per}, cls=E, verified=ver, tags=["stub", "holiday"])
         f = [d.ISO() for d in ql.Schedule(Q(st), Q(en), ql.Period(m, ql.Months), qc[cal], ql.ModifiedFollowing, ql.ModifiedFollowing, ql.DateGeneration.Forward, False)]

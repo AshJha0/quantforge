@@ -1,0 +1,418 @@
+{
+ "schema_version": "1.0",
+ "suite": "uc5_h",
+ "spec": "specifications/04-pricing/use-cases.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_w1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "uc5_h-0001",
+   "operation": "usecase.execution_tca",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06,
+    "side": "SELL",
+    "decision_price": 50.0,
+    "arrival_price": 50.0,
+    "end_price": 49.5,
+    "fill_prices": [
+     49.9,
+     49.8,
+     49.7,
+     49.6,
+     49.5
+    ],
+    "completed_steps": 5,
+    "fee_per_unit": 0.001
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      458044,
+      252101,
+      141957,
+      85756,
+      62142
+     ],
+     "expected_cost": 911226.9863037935,
+     "variance": 364128572058.14105,
+     "filled": 1000000,
+     "fees": 1000.0,
+     "delay": 0.0,
+     "execution": 204185.10000000085,
+     "opportunity": 0.0,
+     "total": 205185.10000000085,
+     "total_bps": 41.03702000000017
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "fractions (exact rational on binary64 inputs)",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_H_BLIND_UC5.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "use_case",
+    "execution",
+    "synthetic"
+   ],
+   "description": "sell 1e6 on parameter set P, lambda = 1e-6, all five child orders filled; opportunity 0",
+   "output_classes": {
+    "lots": "date_and_convention",
+    "filled": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "uc5_h-0002",
+   "operation": "usecase.execution_tca",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 0.0,
+    "side": "SELL",
+    "decision_price": 50.0,
+    "arrival_price": 50.0,
+    "end_price": 49.5,
+    "fill_prices": [
+     49.9,
+     49.8,
+     49.7,
+     49.6,
+     49.5
+    ],
+    "completed_steps": 3,
+    "fee_per_unit": 0.001
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      200000,
+      200000,
+      200000,
+      200000,
+      200000
+     ],
+     "expected_cost": 662500.0,
+     "variance": 1082999999999.9999,
+     "filled": 600000,
+     "fees": 600.0,
+     "delay": 0.0,
+     "execution": 120000.00000000029,
+     "opportunity": 200000.0,
+     "total": 320600.0000000003,
+     "total_bps": 64.12000000000006
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "fractions (exact rational on binary64 inputs)",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "use_case",
+    "execution",
+    "synthetic"
+   ],
+   "description": "lambda = 0: 200,000 per step; three of five filled, 400,000 left at the end price (opportunity)",
+   "output_classes": {
+    "lots": "date_and_convention",
+    "filled": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "uc5_h-0003",
+   "operation": "usecase.execution_tca",
+   "inputs": {
+    "quantity": 1000,
+    "horizon": 1.0,
+    "n_steps": 3,
+    "sigma": 0.5,
+    "epsilon": 0.01,
+    "eta": 0.001,
+    "gamma": 0.0001,
+    "risk_aversion": 0.0,
+    "side": "BUY",
+    "decision_price": 20.0,
+    "arrival_price": 20.02,
+    "end_price": 20.1,
+    "fill_prices": [
+     20.03,
+     20.05,
+     20.08
+    ],
+    "completed_steps": 3,
+    "fee_per_unit": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      334,
+      333,
+      333
+     ],
+     "expected_cost": 1043.3333333333333,
+     "variance": 46296.2962962963,
+     "filled": 1000,
+     "fees": 0.0,
+     "delay": 19.999999999999574,
+     "execution": 33.31000000000047,
+     "opportunity": 0.0,
+     "total": 53.310000000000045,
+     "total_bps": 26.655000000000022
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "fractions (exact rational on binary64 inputs)",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_H_BLIND_UC5.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "use_case",
+    "execution",
+    "synthetic"
+   ],
+   "description": "buy 1,000 in three linear steps: lots [334, 333, 333] by largest remainder, ties to the earliest (HR-3)",
+   "output_classes": {
+    "lots": "date_and_convention",
+    "filled": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "uc5_h-0004",
+   "operation": "usecase.execution_tca",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06,
+    "side": "SELL",
+    "decision_price": 50.0,
+    "arrival_price": 50.0,
+    "end_price": 49.5,
+    "fill_prices": [
+     49.9,
+     49.8
+    ],
+    "completed_steps": 5,
+    "fee_per_unit": 0.001
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "use_case",
+    "execution",
+    "synthetic",
+    "error"
+   ],
+   "description": "fill_prices shorter than n_steps"
+  },
+  {
+   "case_id": "uc5_h-0005",
+   "operation": "usecase.execution_tca",
+   "inputs": {
+    "quantity": 1000000.5,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06,
+    "side": "SELL",
+    "decision_price": 50.0,
+    "arrival_price": 50.0,
+    "end_price": 49.5,
+    "fill_prices": [
+     49.9,
+     49.8,
+     49.7,
+     49.6,
+     49.5
+    ],
+    "completed_steps": 5,
+    "fee_per_unit": 0.001
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "use_case",
+    "execution",
+    "synthetic",
+    "error"
+   ],
+   "description": "non-integer quantity"
+  },
+  {
+   "case_id": "uc5_h-0006",
+   "operation": "usecase.execution_tca",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06,
+    "side": "SELL",
+    "decision_price": 50.0,
+    "arrival_price": 50.0,
+    "end_price": 49.5,
+    "fill_prices": [
+     49.9,
+     49.8,
+     49.7,
+     49.6,
+     49.5
+    ],
+    "completed_steps": 6,
+    "fee_per_unit": 0.001
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "use_case",
+    "execution",
+    "synthetic",
+    "error"
+   ],
+   "description": "completed_steps > n_steps"
+  },
+  {
+   "case_id": "uc5_h-0007",
+   "operation": "usecase.execution_tca",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06,
+    "side": "SELL",
+    "decision_price": 50.0,
+    "arrival_price": 50.0,
+    "end_price": 49.5,
+    "fill_prices": [
+     49.9,
+     49.8,
+     49.7,
+     49.6,
+     49.5
+    ],
+    "completed_steps": 5,
+    "fee_per_unit": -0.001
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "use_case",
+    "execution",
+    "synthetic",
+    "error"
+   ],
+   "description": "negative fee"
+  },
+  {
+   "case_id": "uc5_h-0008",
+   "operation": "usecase.execution_tca",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 5e-06,
+    "risk_aversion": 1e-06,
+    "side": "SELL",
+    "decision_price": 50.0,
+    "arrival_price": 50.0,
+    "end_price": 49.5,
+    "fill_prices": [
+     49.9,
+     49.8,
+     49.7,
+     49.6,
+     49.5
+    ],
+    "completed_steps": 5,
+    "fee_per_unit": 0.001
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "use_case",
+    "execution",
+    "synthetic",
+    "error"
+   ],
+   "description": "eta_tilde = 0, from exec.ac.trajectory"
+  }
+ ]
+}

@@ -14,6 +14,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 env:
+  # Account-free Central fallback for HTTP 429 (CI only; checksums fail on mismatch): java25/.mvn/ci-settings.xml
+  MAVEN_ARGS: --settings ${{ github.workspace }}/java25/.mvn/ci-settings.xml
   # Half the draws come from the current stage's goldens (conformance/quality/stage_e.json); no-op until they exist.
   FUZZ_ARGS: --seconds ${{ inputs.seconds || '180' }} --seed ${{ github.run_number }} --focus-config conformance/quality/stage_e.json
 jobs:

@@ -1,0 +1,54 @@
+{
+ "uc5_h-0001": {
+  "delay": 0.0,
+  "execution": 204185.1,
+  "expected_cost": 911226.9863037935,
+  "fees": 1000.0,
+  "filled": 1000000,
+  "lots": [
+   458044,
+   252101,
+   141957,
+   85756,
+   62142
+  ],
+  "opportunity": 0.0,
+  "total": 205185.1,
+  "total_bps": 41.03702,
+  "variance": 364128572058.141
+ },
+ "uc5_h-0002": {
+  "delay": 0.0,
+  "execution": 120000.0,
+  "expected_cost": 662500.0,
+  "fees": 600.0,
+  "filled": 600000,
+  "lots": [
+   200000,
+   200000,
+   200000,
+   200000,
+   200000
+  ],
+  "opportunity": 200000.0,
+  "total": 320600.0,
+  "total_bps": 64.12,
+  "variance": 1083000000000.0
+ },
+ "uc5_h-0003": {
+  "delay": 20.0,
+  "execution": 33.31,
+  "expected_cost": 1043.3333333333333,
+  "fees": 0.0,
+  "filled": 1000,
+  "lots": [
+   334,
+   333,
+   333
+  ],
+  "opportunity": 0.0,
+  "total": 53.31,
+  "total_bps": 26.655,
+  "variance": 46296.2962962963
+ }
+}

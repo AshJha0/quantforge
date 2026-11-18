@@ -1,0 +1,420 @@
+{
+ "schema_version": "1.0",
+ "suite": "ac_h",
+ "spec": "specifications/10-execution/almgren-chriss.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_w1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "ac_h-0001",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "holdings": [
+      1000000.0,
+      800000.0,
+      600000.0,
+      400000.0,
+      200000.0,
+      0.0
+     ],
+     "trades": [
+      200000.0,
+      200000.0,
+      200000.0,
+      200000.0,
+      200000.0
+     ],
+     "kappa": 0.0,
+     "expected_cost": 662500.0,
+     "variance": 1082999999999.9999,
+     "objective": 662500.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH; the standard deviation 1.0407e6 was visible to the blind lane beforehand, so V is not blind"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "almgren_chriss",
+    "synthetic"
+   ],
+   "description": "lambda = 0: linear trajectory exactly (HR-5); E = 125,000 + 62,500 + 475,000; V = 0.9025e12 x 1.2 ([AC00] eqs. (10), (11))"
+  },
+  {
+   "case_id": "ac_h-0002",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "holdings": [
+      1000000.0,
+      541955.5543739223,
+      289854.2194099351,
+      147897.48782172316,
+      62141.80160576604,
+      0.0
+     ],
+     "trades": [
+      458044.44562607765,
+      252101.33496398723,
+      141956.73158821193,
+      85755.68621595713,
+      62141.80160576604
+     ],
+     "kappa": 0.6070761632470627,
+     "expected_cost": 911226.9863037935,
+     "variance": 364128572058.14105,
+     "objective": 1275355.5583619345
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "almgren_chriss",
+    "synthetic"
+   ],
+   "description": "cosh(kappa) = 1.19; sinh-ratio holdings ([AC00] eq. (17))"
+  },
+  {
+   "case_id": "ac_h-0003",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 5e-06,
+    "risk_aversion": 1e-06
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "almgren_chriss",
+    "synthetic",
+    "error"
+   ],
+   "description": "gamma = 2 eta / tau: eta_tilde = 0"
+  },
+  {
+   "case_id": "ac_h-0004",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 1,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "holdings": [
+      1000000.0,
+      0.0
+     ],
+     "trades": [
+      1000000.0
+     ],
+     "kappa": 0.527263700248781,
+     "expected_cost": 562500.0,
+     "variance": 0.0,
+     "objective": 562500.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "almgren_chriss",
+    "synthetic"
+   ],
+   "description": "N = 1, tau = 5, eta_tilde = 1.875e-6: E = 125,000 + 62,500 + 375,000"
+  },
+  {
+   "case_id": "ac_h-0005",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "holdings": [
+      1000000.0,
+      541955.5543739223,
+      289854.2194099351,
+      147897.48782172316,
+      62141.80160576604,
+      0.0
+     ],
+     "trades": [
+      458044.44562607765,
+      252101.33496398723,
+      141956.73158821193,
+      85755.68621595713,
+      62141.80160576604
+     ],
+     "kappa": 0.6070761632470627,
+     "expected_cost": 911226.9863037935,
+     "variance": 364128572058.14105,
+     "objective": 1275355.5583619345
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH",
+    "[AC00] p. 24 printed: kappa about 0.6/day, kappa T about 3 (extra check 0.05)"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "almgren_chriss",
+    "synthetic"
+   ],
+   "description": "P, lambda = 1e-6: kappa against the printed 'about 0.6/day' ([AC00] p. 24), extra check 0.05",
+   "extra_checks": [
+    {
+     "method": "absolute",
+     "output": "kappa",
+     "expected": 0.6,
+     "limit": 0.05
+    }
+   ]
+  },
+  {
+   "case_id": "ac_h-0006",
+   "operation": "exec.ac.frontier",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversions": [
+     0.0,
+     5e-07,
+     1e-06,
+     2e-06
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "risk_aversions": [
+      0.0,
+      5e-07,
+      1e-06,
+      2e-06
+     ],
+     "expected_costs": [
+      662500.0,
+      768132.8121801238,
+      911226.9863037935,
+      1140715.1670497854
+     ],
+     "variances": [
+      1082999999999.9999,
+      563396571730.559,
+      364128572058.14105,
+      201931287150.52435
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "almgren_chriss",
+    "synthetic"
+   ],
+   "description": "frontier: E non-decreasing, V non-increasing in lambda; points 0 and 1e-6 equal ac_h-0001, ac_h-0002"
+  },
+  {
+   "case_id": "ac_h-0007",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 0,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "almgren_chriss",
+    "synthetic",
+    "error"
+   ],
+   "description": "N < 1"
+  },
+  {
+   "case_id": "ac_h-0008",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 0.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "almgren_chriss",
+    "synthetic",
+    "error"
+   ],
+   "description": "quantity 0 is E_INPUT (HR-56)"
+  },
+  {
+   "case_id": "ac_h-0009",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": -0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "almgren_chriss",
+    "synthetic",
+    "error"
+   ],
+   "description": "negative epsilon (HR-56)"
+  },
+  {
+   "case_id": "ac_h-0010",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": -2.5e-07,
+    "risk_aversion": 1e-06
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18: hand calculation and mpmath only, not blind re-derived"
+   ],
+   "tags": [
+    "stage_h",
+    "execution",
+    "almgren_chriss",
+    "synthetic",
+    "error"
+   ],
+   "description": "negative gamma (HR-56)"
+  }
+ ]
+}

@@ -16,6 +16,7 @@ from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
+from threadpoolctl import threadpool_limits  # type: ignore[import-untyped]
 
 from .errors import QfError
 from .finite import guard
@@ -289,7 +290,8 @@ class _Qp:
     def subproblem(self, free: list[int], x: NDArray) -> NDArray:
         """The minimiser of f with the variables outside `free` held at their values in x and
         E x = e: the equality-constrained step of the active-set method."""
-        fixed = [j for j in range(self.n) if j not in set(free)]
+        free_set = set(free)  # built once: the set inside the comprehension was O(n^2)
+        fixed = [j for j in range(self.n) if j not in free_set]
         out = x.copy()
         if not free:
             return out
@@ -536,7 +538,8 @@ class _CostQp:
         out = x.copy()
         if not free:
             return out
-        fixed = [j for j in range(self.n) if j not in set(free)]
+        free_set = set(free)  # built once: the set inside the comprehension was O(n^2)
+        fixed = [j for j in range(self.n) if j not in free_set]
         mats = [self.e_mat[:, free]]
         rhs = [self.e_rhs - self.e_mat[:, fixed] @ x[fixed]]
         if row is not None:
@@ -689,7 +692,19 @@ class _CostQp:
         raise QfError("E_NO_CONVERGENCE", "the sign search did not settle")
 
 
-def _qp_core(
+def _qp_core(*args: Any, **kwargs: Any) -> dict[str, Any]:
+    """`_qp_solve` with the BLAS held to one thread for the solve only (plan 14.7 H-8).
+
+    The active-set and orthant searches factor hundreds of small matrices (at most 250 x 200). A
+    multi-threaded BLAS spends more time waking its threads than computing on them: on a 12-thread
+    laptop the n = 200 goldens took 21 s and 25 s, and 7 s and 4 s on one thread. The limit is
+    scoped (threadpoolctl restores the caller's setting on exit) and changes no ruling; the
+    answers stay within the golden tolerance class."""
+    with threadpool_limits(limits=1, user_api="blas"):
+        return _qp_solve(*args, **kwargs)
+
+
+def _qp_solve(
     a: Matrix,
     b: Floats,
     weights: Floats,

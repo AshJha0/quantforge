@@ -356,24 +356,24 @@ Written by `oracle/python/outside_d.py`. A case counts only if QuantLib 1.44, bu
 | `capswaption_d` | 9 | 14 | 64% |  |
 | `commodity_d` | 0 | 10 | 0% | no QuantLib object for monthly log-linear commodity forwards with additive seasonality or for storage carry |
 | `compound_d` | 25 | 35 | 71% |  |
-| `credit_d` | 9 | 19 | 47% |  |
-| `csa_d` | 3 | 13 | 23% | cases without FX count via QuantLib ZeroSpreadedTermStructure; CSA with FX forwards has no QuantLib object; spread and basis cases are internal |
-| `edge_d` | 11 | 24 | 46% |  |
+| `credit_d` | 10 | 19 | 53% | credit_d-0002 not counted: QuantLib IsdaCdsEngine reprices the golden 5Y pillar to 1.95e-10 in spread, above the 1e-10 reprice bar. Cause (found 2026-11-18): the 5Y maturity 2031-12-20 is a Saturday, and for that contract QuantLib reads the hazard on (2031-12-20, 2031-12-21], one day past the pillar, which in the full curve is the 7Y segment; the spec bootstrap solves the 5Y pillar before the 7Y hazard exists. The gap is exactly linear in the hazard jump at the pillar (zero with no later pillar or with the 5Y node moved one day later) and of the size of one day of accrual on default; credit_d-0002 has the largest jump times spread (recovery 0.25, steep curve), so the R6-25 figure of about 1e-11 holds for the other cases (5e-12 to 1.5e-11) but not here. Golden unchanged; whether the pillar belongs at maturity (ruling D20) or one day later is a spec question; the rest are error cases |
+| `csa_d` | 6 | 13 | 46% | CSA without FX and OIS basis spreads count; CSA with FX (QuantLib curve times the spec identity spot / F(d)) agrees but is reimplementation and does not count; the joint bootstrap's term-rate (USD-TERM-3M) helpers are not mapped to QuantLib objects yet; the rest are error cases |
+| `edge_d` | 21 | 24 | 88% |  |
 | `equity_d` | 0 | 10 | 0% | QuantLib has no implied-dividend, implied-borrow or equity futures-basis object; its dividend handling uses other conventions |
 | `fits_d` | 0 | 16 | 0% | smooth and robust curve fits are internal estimators (penalised and Huber); no QuantLib equivalent |
 | `futures_d` | 6 | 10 | 60% |  |
 | `index_d` | 0 | 12 | 0% | index dividends, rebalancing and corporate actions have no QuantLib object |
-| `inflation_d` | 0 | 13 | 0% | QuantLib's inflation curves use other lag and interpolation conventions (spec 02-curves/inflation.md); ZCIS and linkers would need the spec's own CPI curve |
+| `inflation_d` | 0 | 13 | 0% | linkers from a real yield agree with QuantLib CPI.laggedFixing and BondFunctions but the index-ratio products are the spec's arithmetic, so they do not count; the CPI curve, ZCIS and linker-from-curve cases use the spec's own log-linear CPI curve with seasonality, which QuantLib's inflation curves (other interpolation and lag conventions) cannot express |
 | `mbs_d` | 0 | 12 | 0% | QuantLib has no agency MBS pool cash-flow model |
 | `ois_d` | 20 | 25 | 80% |  |
 | `outside_d` | 284 | 284 | 100% |  |
-| `repo_d` | 8 | 19 | 42% |  |
-| `rulings2_d` | 1 | 25 | 4% | internal: spec rulings, mostly error and order cases |
+| `repo_d` | 16 | 19 | 84% |  |
+| `rulings2_d` | 2 | 25 | 8% | internal: spec rulings, mostly error and order cases |
 | `rulings_d` | 0 | 18 | 0% | internal: spec rulings, mostly error and order cases |
-| `rulings_r1` | 0 | 15 | 0% | internal: spec rulings; CME conversion factors have no QuantLib object |
+| `rulings_r1` | 9 | 15 | 60% | conversion factors count (QuantLib bond priced at 6% on the CME synthetic dates); the rest are spec-ruling error cases |
 | `steps_d` | 0 | 11 | 0% | meeting-date step fits are internal; QuantLib ForwardCurve could replay a step curve but not the fit |
 | `trs_d` | 0 | 3 | 0% | QuantLib has no equity total return swap with these legs |
-| `xccy_d` | 4 | 13 | 31% | PV and bootstrap count via QuantLib OvernightLeg; NDF has no QuantLib object; the rest are error cases |
-| **stage D** | **419** | **654** | **64.1%** | |
+| `xccy_d` | 4 | 13 | 31% | PV and bootstrap count via QuantLib OvernightLeg; NDF agrees with QuantLib discount factors but the forward and payoff are the spec's arithmetic, so it does not count; the rest are error cases |
+| **stage D** | **451** | **654** | **69.0%** | |
 
-Caveat: most counted cases are fixed-rate bonds (suite `outside_d`), so the stage-wide share leans on one product family.
+Caveat: most counted cases are fixed-rate bonds (suite `outside_d`), so the stage-wide share leans on one product family. Several H-19 handlers (asset swap, futures basis, NDF, linker, CSA with FX, index intrinsic, composite curve) build the instrument from QuantLib objects but apply the spec's own closing algebra; those 19 cases agree but are `reimplementation` and are not counted here (`oracle/CONVENTION_MAP.md` lists which part is library and which arithmetic).

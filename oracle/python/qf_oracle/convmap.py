@@ -74,6 +74,20 @@ ROWS = {
     "OPT.BLACK_76": ("05-volatility/black-models.md BLACK_76, time ACT/365F from as_of", lambda: ql.BlackCapFloorEngine, ""),
     "OPT.BACHELIER": ("05-volatility/black-models.md BACHELIER, time ACT/365F from as_of", lambda: ql.BachelierCapFloorEngine, ""),
     # Credit engine
+    # H-19 rows (2026-11-18)
+    "IDX.TERM_FRN": ("04-pricing/bonds.md bond.frn.price: term rate, alpha = days/360, unadjusted dates, period rate (P(s)/P(e) - 1)/alpha",
+                     lambda h, months: ql.IborIndex("QF-FRN", ql.Period(months, ql.Months), 0, ql.USDCurrency(), ql.NullCalendar(), ql.Unadjusted, False,
+                                                    ql.Actual360(), h),
+                     "fixing lag 0, NullCalendar; QuantLib par coupons forecast over the accrual period itself"),
+    "CRV.DISCOUNT_MARGIN": ("04-pricing/bonds.md bond.frn.price: Dm(d) = D(d) exp(-dm t(d)), t ACT/365F from as_of",
+                            lambda h, s: ql.ZeroSpreadedTermStructure(h, ql.QuoteHandle(ql.SimpleQuote(s)), ql.Continuous, ql.NoFrequency, ql.Actual365Fixed()), ""),
+    "CF.CME_SYNTHETIC": ("04-pricing/bonds.md bond.futures.conversion_factor (CME formula, ruling R1-3)",
+                         lambda: "settle on the 1st of the delivery month; synthetic maturity n years z months later; 6% yield, Compounded Semiannual, THIRTY_360_BOND",
+                         "day-1 dates: THIRTY_360_BOND gives whole months / 12, which is CME's v/6 per half-year; clean / 100, rounded to 4 decimals"),
+    "CPI.TIPS_REF": ("02-curves/inflation.md Reference CPI: I(m-3) + (day(d) - 1)/days_in_month(m) (I(m-2) - I(m-3))",
+                     lambda: (ql.Period(3, ql.Months), ql.CPI.Linear), "QuantLib CPI.laggedFixing on USCPI fixings"),
+    "OPT.FORMULA.BLACK_76": ("05-volatility/black-models.md BLACK_76 price", lambda: ql.blackFormula, "stdDev = vol sqrt(T), the case's discount factor"),
+    "OPT.FORMULA.BACHELIER": ("05-volatility/black-models.md BACHELIER price", lambda: ql.bachelierBlackFormula, "stdDev = vol sqrt(T)"),
     "ENG.ISDA_CDS": ("04-pricing/credit.md ISDA CDS Standard Model", lambda: ql.IsdaCdsEngine, "Taylor, NoBias, Piecewise"),
 }
 

@@ -62,7 +62,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -136,7 +137,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -200,7 +202,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -259,7 +262,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -323,7 +327,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -397,7 +402,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -461,7 +467,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -520,7 +527,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -584,7 +592,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -658,7 +667,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -722,7 +732,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -781,7 +792,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -845,7 +857,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -919,7 +932,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -983,7 +997,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1042,7 +1057,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1106,7 +1122,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1180,7 +1197,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1244,7 +1262,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1303,7 +1322,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1367,7 +1387,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1441,7 +1462,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1505,7 +1527,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1564,7 +1587,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1628,7 +1652,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1702,7 +1727,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1766,7 +1792,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1825,7 +1852,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1889,7 +1917,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -1963,7 +1992,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2027,7 +2057,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2086,7 +2117,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2150,7 +2182,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2224,7 +2257,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2288,7 +2322,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2347,7 +2382,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2411,7 +2447,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2485,7 +2522,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2549,7 +2587,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2608,7 +2647,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2672,7 +2712,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2746,7 +2787,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2810,7 +2852,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2869,7 +2912,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -2933,7 +2977,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -3007,7 +3052,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -3071,7 +3117,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",
@@ -3130,7 +3177,8 @@
    "tolerance_class": "date_and_convention",
    "verified_by": [
     "quantlib-1.44",
-    "strata-2.12.78"
+    "strata-2.12.78",
+    "quantlib-1.44-schedule"
    ],
    "tags": [
     "stub",

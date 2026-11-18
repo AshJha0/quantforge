@@ -18,7 +18,7 @@ to start it from `conformance/runner/implementations.json`.
 | `quantforge run` | Read one case JSON document from stdin to end of file. Write one result JSON document to stdout. |
 | `quantforge batch` | Read JSON Lines from stdin, one case per line. Write one result per line to stdout, in the same order, flushing after each line. |
 | `quantforge --batch` | Exactly the same as `quantforge batch` (1.6.0). Both spellings must work. |
-| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.15.0", "toolchain":...}`. |
+| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.16.0", "toolchain":...}`. |
 | `quantforge operations` | Write a JSON array of the operation names this build supports, sorted. |
 
 `batch` exists because a JVM start per case would dominate run time. `run` and `batch` must give
@@ -400,3 +400,20 @@ Rulings `stage-j-rulings-curves.md` J-C-1 to J-C-9. No new error code; the gener
 ### Stage J wave 3 (contract 1.15.0)
 
 Rulings `stage-j-rulings-w3.md` J-W3-1 to J-W3-17. No new error code; page limits J-W3-14. Implemented in all four builds; the contract number 1.15.0 is shared with the curves lane (J-C-1, J-W3-1).
+
+### Stage H wave 1 (contract 1.16.0 per HR-1 and DR-H8; DR-H7's 1.15.0 was taken by stage J)
+
+Rulings `stage-h-rulings-w1.md` HR-1 to HR-10 (confirmed 2026-11-18). No new error code; `E_LIMIT` sizes HR-9. Goldens in `datasets/golden/stage_h/` (`oracle/python/gen_stage_h_w1.py`). Not implemented yet. Names below are fixed by the oracle lane (2026-11-18) where the spec left them open; they bind all four builds.
+
+| Operation | Spec | Inputs | Outputs |
+|---|---|---|---|
+| `exec.schedule.twap` | `10-execution/schedules.md` | `quantity`, `n_buckets` (Integer), `mode` (`UNITS`, `CONTINUOUS`) | `slices` (Integers in `UNITS`) |
+| `exec.schedule.vwap` | same | `quantity`, `profile`, `mode` | `slices` |
+| `exec.schedule.pov` | same | `quantity`, `participation`, `market_volume`, `mode` | `slices`, `filled`, `residual` |
+| `exec.ac.trajectory` | `10-execution/almgren-chriss.md` | `quantity`, `horizon`, `n_steps` (Integer), `sigma`, `epsilon`, `eta`, `gamma`, `risk_aversion` | `holdings`, `trades`, `kappa` (0 when linear), `expected_cost`, `variance`, `objective` |
+| `exec.ac.frontier` | same | as `exec.ac.trajectory` with `risk_aversions` (array) in place of `risk_aversion` | parallel arrays `risk_aversions`, `expected_costs`, `variances` |
+| `exec.impact.sqrt` | `10-execution/impact.md` | `quantity`, `daily_volume`, `daily_vol`, `coefficient` | `impact`, `model` (the HR-10 label string, always) |
+| `exec.impact.ow_optimal` | same | `quantity`, `horizon`, `resilience` (rho <= 0 or T <= 0: `E_DOMAIN`) | `initial_block`, `rate`, `final_block` |
+| `exec.tca.shortfall` | `10-execution/tca.md` | `side` (`BUY`, `SELL`), `decision_price`, `arrival_price`, `end_price`, `order_quantity`, `fills` (array of `{quantity, price}`), `fees`, optional `benchmark_vwap` | `delay`, `execution`, `opportunity`, `total`, `total_bps`; `vwap_slippage` only when `benchmark_vwap` is given |
+| `micro.mm.as_quotes` | `09-microstructure/avellaneda-stoikov.md` | `mid`, `inventory`, `risk_aversion`, `sigma`, `time_left`, `k` | `reservation`, `spread`, `bid`, `ask` |
+| `usecase.execution_tca` | `04-pricing/use-cases.md` (use case 5) | see the spec | `lots`, `expected_cost`, `variance`, `filled`, `fees`, `delay`, `execution`, `opportunity`, `total`, `total_bps` |

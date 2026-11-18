@@ -1,6 +1,6 @@
-# Avellaneda-Stoikov inventory-aware quotes (DRAFT)
+# Avellaneda-Stoikov inventory-aware quotes
 
-Spec version 0.1.0 (DRAFT, stage H wave 1). Status: Specified, not implemented. Rulings HR-2, HR-7. Plan items 14.7 H-4 (quotes match the closed form to 1e-10), 15.1 "Research" (reused by the market-making prereg study).
+Spec version 0.1.0 (stage H wave 1; confirmed 2026-11-18 by the stage H coordinator). Status: Specified, not implemented. Rulings HR-2, HR-7. Plan items 14.7 H-4 (quotes match the closed form to 1e-10), 15.1 "Research" (reused by the market-making prereg study).
 
 **Plain idea.** A market maker long inventory shades both quotes down to sell more readily; the spread widens with risk aversion, volatility and time left, plus a term from how fast fill probability falls with distance from the mid.
 

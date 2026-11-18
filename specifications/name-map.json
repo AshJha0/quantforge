@@ -2534,6 +2534,242 @@
     "pv"
    ]
   },
+  "exec.ac.frontier": {
+   "spec": "specifications/10-execution/almgren-chriss.md",
+   "rust": "quantforge::exec::ac_frontier",
+   "python": "quantforge.exec.ac_frontier",
+   "java": "Exec.acFrontier",
+   "cpp": "qf::exec::ac_frontier",
+   "inputs": {
+    "epsilon": {
+     "java": "epsilon"
+    },
+    "eta": {
+     "java": "eta"
+    },
+    "gamma": {
+     "java": "gamma"
+    },
+    "horizon": {
+     "java": "horizon"
+    },
+    "n_steps": {
+     "java": "nSteps"
+    },
+    "quantity": {
+     "java": "quantity"
+    },
+    "risk_aversions": {
+     "java": "riskAversions"
+    },
+    "sigma": {
+     "java": "sigma"
+    }
+   },
+   "outputs": [
+    "expected_costs",
+    "risk_aversions",
+    "variances"
+   ]
+  },
+  "exec.ac.trajectory": {
+   "spec": "specifications/04-pricing/use-cases.md",
+   "rust": "quantforge::exec::ac_trajectory",
+   "python": "quantforge.exec.ac_trajectory",
+   "java": "Exec.acTrajectory",
+   "cpp": "qf::exec::ac_trajectory",
+   "inputs": {
+    "epsilon": {
+     "java": "epsilon"
+    },
+    "eta": {
+     "java": "eta"
+    },
+    "gamma": {
+     "java": "gamma"
+    },
+    "horizon": {
+     "java": "horizon"
+    },
+    "n_steps": {
+     "java": "nSteps"
+    },
+    "quantity": {
+     "java": "quantity"
+    },
+    "risk_aversion": {
+     "java": "riskAversion"
+    },
+    "sigma": {
+     "java": "sigma"
+    }
+   },
+   "outputs": [
+    "expected_cost",
+    "holdings",
+    "kappa",
+    "objective",
+    "trades",
+    "variance"
+   ]
+  },
+  "exec.impact.ow_optimal": {
+   "spec": "specifications/10-execution/impact.md",
+   "rust": "quantforge::exec::impact_ow_optimal",
+   "python": "quantforge.exec.impact_ow_optimal",
+   "java": "Exec.impactOwOptimal",
+   "cpp": "qf::exec::impact_ow_optimal",
+   "inputs": {
+    "horizon": {
+     "java": "horizon"
+    },
+    "quantity": {
+     "java": "quantity"
+    },
+    "resilience": {
+     "java": "resilience"
+    }
+   },
+   "outputs": [
+    "final_block",
+    "initial_block",
+    "rate"
+   ]
+  },
+  "exec.impact.sqrt": {
+   "spec": "specifications/10-execution/impact.md",
+   "rust": "quantforge::exec::impact_sqrt",
+   "python": "quantforge.exec.impact_sqrt",
+   "java": "Exec.impactSqrt",
+   "cpp": "qf::exec::impact_sqrt",
+   "inputs": {
+    "coefficient": {
+     "java": "coefficient"
+    },
+    "daily_vol": {
+     "java": "dailyVol"
+    },
+    "daily_volume": {
+     "java": "dailyVolume"
+    },
+    "quantity": {
+     "java": "quantity"
+    }
+   },
+   "outputs": [
+    "impact",
+    "model"
+   ]
+  },
+  "exec.schedule.pov": {
+   "spec": "specifications/10-execution/schedules.md",
+   "rust": "quantforge::exec::schedule_pov",
+   "python": "quantforge.exec.schedule_pov",
+   "java": "Exec.schedulePov",
+   "cpp": "qf::exec::schedule_pov",
+   "inputs": {
+    "market_volume": {
+     "java": "marketVolume"
+    },
+    "mode": {
+     "java": "mode"
+    },
+    "participation": {
+     "java": "participation"
+    },
+    "quantity": {
+     "java": "quantity"
+    }
+   },
+   "outputs": [
+    "filled",
+    "residual",
+    "slices"
+   ]
+  },
+  "exec.schedule.twap": {
+   "spec": "specifications/10-execution/schedules.md",
+   "rust": "quantforge::exec::schedule_twap",
+   "python": "quantforge.exec.schedule_twap",
+   "java": "Exec.scheduleTwap",
+   "cpp": "qf::exec::schedule_twap",
+   "inputs": {
+    "mode": {
+     "java": "mode"
+    },
+    "n_buckets": {
+     "java": "nBuckets"
+    },
+    "quantity": {
+     "java": "quantity"
+    }
+   },
+   "outputs": [
+    "slices"
+   ]
+  },
+  "exec.schedule.vwap": {
+   "spec": "specifications/04-pricing/use-cases.md",
+   "rust": "quantforge::exec::schedule_vwap",
+   "python": "quantforge.exec.schedule_vwap",
+   "java": "Exec.scheduleVwap",
+   "cpp": "qf::exec::schedule_vwap",
+   "inputs": {
+    "mode": {
+     "java": "mode"
+    },
+    "profile": {
+     "java": "profile"
+    },
+    "quantity": {
+     "java": "quantity"
+    }
+   },
+   "outputs": [
+    "slices"
+   ]
+  },
+  "exec.tca.shortfall": {
+   "spec": "specifications/04-pricing/use-cases.md",
+   "rust": "quantforge::exec::tca_shortfall",
+   "python": "quantforge.exec.tca_shortfall",
+   "java": "Exec.tcaShortfall",
+   "cpp": "qf::exec::tca_shortfall",
+   "inputs": {
+    "arrival_price": {
+     "java": "arrivalPrice"
+    },
+    "benchmark_vwap": {
+     "java": "benchmarkVwap"
+    },
+    "decision_price": {
+     "java": "decisionPrice"
+    },
+    "end_price": {
+     "java": "endPrice"
+    },
+    "fees": {
+     "java": "fees"
+    },
+    "fills": {
+     "java": "fills"
+    },
+    "order_quantity": {
+     "java": "orderQuantity"
+    },
+    "side": {
+     "java": "side"
+    }
+   },
+   "outputs": [
+    "delay",
+    "execution",
+    "opportunity",
+    "total",
+    "total_bps",
+    "vwap_slippage"
+   ]
+  },
   "exotic.american.baw": {
    "spec": "specifications/04-pricing/exotics.md",
    "rust": "quantforge::exotic::american_baw",
@@ -4195,6 +4431,39 @@
     "modified_duration",
     "price",
     "wal"
+   ]
+  },
+  "micro.mm.as_quotes": {
+   "spec": "specifications/09-microstructure/avellaneda-stoikov.md",
+   "rust": "quantforge::micro::mm_as_quotes",
+   "python": "quantforge.micro.mm_as_quotes",
+   "java": "Micro.mmAsQuotes",
+   "cpp": "qf::micro::mm_as_quotes",
+   "inputs": {
+    "inventory": {
+     "java": "inventory"
+    },
+    "k": {
+     "java": "k"
+    },
+    "mid": {
+     "java": "mid"
+    },
+    "risk_aversion": {
+     "java": "riskAversion"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "time_left": {
+     "java": "timeLeft"
+    }
+   },
+   "outputs": [
+    "ask",
+    "bid",
+    "reservation",
+    "spread"
    ]
   },
   "rates.basis.ois_spread": {
@@ -7278,6 +7547,72 @@
     "pv"
    ]
   },
+  "usecase.execution_tca": {
+   "spec": "specifications/10-execution/schedules.md",
+   "rust": "quantforge::usecase::execution_tca_",
+   "python": "quantforge.usecase.execution_tca_",
+   "java": "Usecase.executionTca",
+   "cpp": "qf::usecase::execution_tca_",
+   "inputs": {
+    "arrival_price": {
+     "java": "arrivalPrice"
+    },
+    "completed_steps": {
+     "java": "completedSteps"
+    },
+    "decision_price": {
+     "java": "decisionPrice"
+    },
+    "end_price": {
+     "java": "endPrice"
+    },
+    "epsilon": {
+     "java": "epsilon"
+    },
+    "eta": {
+     "java": "eta"
+    },
+    "fee_per_unit": {
+     "java": "feePerUnit"
+    },
+    "fill_prices": {
+     "java": "fillPrices"
+    },
+    "gamma": {
+     "java": "gamma"
+    },
+    "horizon": {
+     "java": "horizon"
+    },
+    "n_steps": {
+     "java": "nSteps"
+    },
+    "quantity": {
+     "java": "quantity"
+    },
+    "risk_aversion": {
+     "java": "riskAversion"
+    },
+    "side": {
+     "java": "side"
+    },
+    "sigma": {
+     "java": "sigma"
+    }
+   },
+   "outputs": [
+    "delay",
+    "execution",
+    "expected_cost",
+    "fees",
+    "filled",
+    "lots",
+    "opportunity",
+    "total",
+    "total_bps",
+    "variance"
+   ]
+  },
   "usecase.factor_attribution": {
    "spec": "specifications/stage-f-rulings.md",
    "rust": "quantforge::usecase::factor_attribution_",
@@ -8815,6 +9150,9 @@
   "eq.forward.outright: expiry",
   "eq.futures.basis: expiry",
   "eq.futures.basis: financing_spread",
+  "exec.ac.frontier: horizon",
+  "exec.ac.trajectory: horizon",
+  "exec.impact.ow_optimal: horizon",
   "hedge.backtest.delta: half_spread",
   "rates.basis.ois_spread: tenor",
   "rates.csa.discount: collateral_spread",
@@ -8822,6 +9160,7 @@
   "risk.var.liquidity_adjusted: spread_mean",
   "risk.var.liquidity_adjusted: spread_vol",
   "risk.vol.greeks: shift",
+  "usecase.execution_tca: horizon",
   "usecase.fx_hedge: half_spread",
   "vol.equity.price: expiry",
   "vol.garch.forecast: horizon",
@@ -8834,5 +9173,10 @@
   "vol.vix.term_variance: minutes_to_expiry",
   "xva.adjustments.value: im_spread"
  ],
- "spec_only": []
+ "spec_only": [
+  "exec.sim.dark.run",
+  "exec.sim.lit.run",
+  "exec.sor.allocate",
+  "micro.book.rebuild"
+ ]
 }

@@ -90,6 +90,14 @@ NOTES = {
                               "open": ["Tension spline and hybrid cases have mpmath replay and properties only (oracle README)."]},
     "hedging-costs": {"real": ["Not applicable: an optimisation on given inputs, not a market curve."]},
     "research-workflow": {"real": ["Not applicable: synthetic prices, a teaching example."]},
+    "ac-frontier": {"real": ["Not applicable: a model curve on assumed parameters, not a market curve (HR-10)."],
+                    "open": ["No free library implements Almgren-Chriss; the outside check is a blind second-lane re-derivation or [AC00]'s printed kappa (DR-H2), 3 of 5 value cases in `ac_h` (`oracle/OUTSIDE_SHARES.md`). Is a blind re-derivation from the same paper independent enough?"]},
+    "impact-curves": {"real": ["Not calibrated: the impact coefficient Y is an input. The crypto calibration (H-1) is a pilot on partial recorded days with no conclusions in v0.10.0."],
+                      "open": ["No free library implements the square-root law or Obizhaeva-Wang; all 4 value cases in `imp_h` are blind re-derived (DR-H2), and imp_h-0001 and -0002 check arithmetic on the stated form only."]},
+    "volume-profile": {"real": ["Not applicable: the profile is an input; no free intraday equity volume data is used (crypto venue only, aggregates)."],
+                       "open": ["Schedule cases are integer and rational arithmetic; blind re-derived (DR-H2), 6 of 8 value cases in `sched_h`."]},
+    "walk-the-book": {"real": ["Recorded crypto venue order-book snapshots only (forward-log), labelled \"crypto venue; not equities or rates\"; H-1 is a pilot on partial days 2026-11-12..18 with no conclusions."],
+                      "open": ["No result yet: the curve waits for the H-1 pilot run; no golden suite."]},
 }
 
 
@@ -99,7 +107,8 @@ MARK = "<!-- Hand-filled below this line: the generator keeps it. Any AI review 
 
 RULINGS = {"B": ["stage-b-rulings.md"], "C": ["stage-c-rulings.md"], "D": ["stage-d-rulings.md", "r1-rulings.md"],
            "E": ["stage-e-rulings.md", "stage-e-rulings-b.md"], "F": ["stage-f-rulings.md"], "I": ["stage-i-rulings.md"],
-           "J": ["stage-j-rulings.md", "stage-j-rulings-curves.md", "stage-j-rulings-w1.md", "stage-j-rulings-w2.md", "stage-j-rulings-w3.md"]}
+           "J": ["stage-j-rulings.md", "stage-j-rulings-curves.md", "stage-j-rulings-w1.md", "stage-j-rulings-w2.md", "stage-j-rulings-w3.md"],
+           "H": ["stage-h-rulings-w1.md", "stage-h-rulings-w1b.md"]}
 GOLDEN = {}
 for _p in sorted((ROOT / "datasets" / "golden").rglob("*.json")):
     _d = json.loads(_p.read_text(encoding="utf-8"))

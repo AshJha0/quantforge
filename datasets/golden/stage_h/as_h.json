@@ -1,0 +1,270 @@
+{
+ "schema_version": "1.0",
+ "suite": "as_h",
+ "spec": "specifications/09-microstructure/avellaneda-stoikov.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_w1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "as_h-0001",
+   "operation": "micro.mm.as_quotes",
+   "inputs": {
+    "mid": 100.0,
+    "inventory": 2.0,
+    "risk_aversion": 0.1,
+    "sigma": 2.0,
+    "time_left": 1.0,
+    "k": 1.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "reservation": 99.2,
+     "spread": 1.6907704227514235,
+     "bid": 98.35461478862429,
+     "ask": 100.04538521137572
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure",
+    "market_making",
+    "synthetic"
+   ],
+   "description": "100 - 2 x 0.1 x 4; 0.4 + 20 ln(16/15) ([AS08] eqs. (29), (30))"
+  },
+  {
+   "case_id": "as_h-0002",
+   "operation": "micro.mm.as_quotes",
+   "inputs": {
+    "mid": 100.0,
+    "inventory": 0.0,
+    "risk_aversion": 0.1,
+    "sigma": 2.0,
+    "time_left": 1.0,
+    "k": 1.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "reservation": 100.0,
+     "spread": 1.6907704227514235,
+     "bid": 99.15461478862429,
+     "ask": 100.84538521137571
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure",
+    "market_making",
+    "synthetic"
+   ],
+   "description": "symmetric about the mid"
+  },
+  {
+   "case_id": "as_h-0003",
+   "operation": "micro.mm.as_quotes",
+   "inputs": {
+    "mid": 100.0,
+    "inventory": 2.0,
+    "risk_aversion": 0.1,
+    "sigma": 2.0,
+    "time_left": 0.0,
+    "k": 1.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "reservation": 100.0,
+     "spread": 1.2907704227514234,
+     "bid": 99.35461478862429,
+     "ask": 100.64538521137571
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure",
+    "market_making",
+    "synthetic"
+   ],
+   "description": "terminal: only (2/gamma) ln(1 + gamma/k)"
+  },
+  {
+   "case_id": "as_h-0004",
+   "operation": "micro.mm.as_quotes",
+   "inputs": {
+    "mid": 100.0,
+    "inventory": 2.0,
+    "risk_aversion": 0.0,
+    "sigma": 2.0,
+    "time_left": 1.0,
+    "k": 1.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure",
+    "market_making",
+    "synthetic",
+    "error"
+   ],
+   "description": "gamma = 0"
+  },
+  {
+   "case_id": "as_h-0005",
+   "operation": "micro.mm.as_quotes",
+   "inputs": {
+    "mid": 100.0,
+    "inventory": 0.0,
+    "risk_aversion": 0.1,
+    "sigma": 2.0,
+    "time_left": 0.5,
+    "k": 1.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "reservation": 100.0,
+     "spread": 1.4907704227514234,
+     "bid": 99.2546147886243,
+     "ask": 100.7453852113757
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH",
+    "[AS08] printed average spread 1.49 (extra check 0.005)"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure",
+    "market_making",
+    "synthetic"
+   ],
+   "description": "[AS08] Table 1, p. 222, prints 1.49; 0.2 + 20 ln(16/15)",
+   "extra_checks": [
+    {
+     "method": "absolute",
+     "output": "spread",
+     "expected": 1.49,
+     "limit": 0.005
+    }
+   ]
+  },
+  {
+   "case_id": "as_h-0006",
+   "operation": "micro.mm.as_quotes",
+   "inputs": {
+    "mid": 100.0,
+    "inventory": 0.0,
+    "risk_aversion": 0.01,
+    "sigma": 2.0,
+    "time_left": 0.5,
+    "k": 1.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "reservation": 100.0,
+     "spread": 1.3489085437337158,
+     "bid": 99.32554572813314,
+     "ask": 100.67445427186686
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH",
+    "[AS08] printed average spread 1.35 (extra check 0.005)"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure",
+    "market_making",
+    "synthetic"
+   ],
+   "description": "[AS08] Table 2, p. 222, prints 1.35",
+   "extra_checks": [
+    {
+     "method": "absolute",
+     "output": "spread",
+     "expected": 1.35,
+     "limit": 0.005
+    }
+   ]
+  },
+  {
+   "case_id": "as_h-0007",
+   "operation": "micro.mm.as_quotes",
+   "inputs": {
+    "mid": 100.0,
+    "inventory": 0.0,
+    "risk_aversion": 1.0,
+    "sigma": 2.0,
+    "time_left": 0.5,
+    "k": 1.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "reservation": 100.0,
+     "spread": 3.0216512475319814,
+     "bid": 98.489174376234,
+     "ask": 101.510825623766
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-15 (STAGE_H_BLIND_REDERIVATION.md): MATCH",
+    "[AS08] printed average spread 3.02 (extra check 0.005)"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure",
+    "market_making",
+    "synthetic"
+   ],
+   "description": "[AS08] Table 3, p. 223, prints 3.02",
+   "extra_checks": [
+    {
+     "method": "absolute",
+     "output": "spread",
+     "expected": 3.02,
+     "limit": 0.005
+    }
+   ]
+  }
+ ]
+}

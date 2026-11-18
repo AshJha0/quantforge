@@ -20,7 +20,7 @@ use quantforge_core::json::{Flags, Json, nesting_exceeds, obj, parse};
 use std::io::{BufRead, Read, Write};
 use std::process::ExitCode;
 
-const CONTRACT: &str = "1.15.0"; // rulings J-C-1 (curves lane) and J-W3-1 (wave 3); was 1.14.0 (J-W2-1)
+const CONTRACT: &str = "1.16.0"; // stage H, ruling DR-H8; was 1.15.0 (J-C-1, J-W3-1)
 const SCHEMA: &str = "1.0";
 const MAX_CASE_NESTING: usize = 80;
 

@@ -12,6 +12,9 @@ permissions:
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
+env:
+  # Account-free Central fallback for HTTP 429 (CI only; checksums fail on mismatch): java25/.mvn/ci-settings.xml
+  MAVEN_ARGS: --settings ${{ github.workspace }}/java25/.mvn/ci-settings.xml
 jobs:
   changelog:
     name: release-changelog

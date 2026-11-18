@@ -1,6 +1,6 @@
-# Low-latency order book: complexity, harness and thresholds (DRAFT)
+# Low-latency order book: complexity, harness and thresholds
 
-Spec version 0.1.0 (DRAFT, stage H wave 1b). Status: Specified, not implemented. Rulings HR-18 to HR-24 (`stage-h-rulings-w1b.md`). Plan item 14.7 **H-9** (owner 2026-11-17), quoted:
+Spec version 0.1.0 (stage H wave 1b; confirmed 2026-11-18 by the stage H coordinator). Status: Specified, not implemented. Rulings HR-18 to HR-24 (`stage-h-rulings-w1b.md`). Plan item 14.7 **H-9** (owner 2026-11-17), quoted:
 
 > Targets written before measuring (R1 rule), per language, on the Actions Linux runner and a pinned local Linux run: (a) per-message book update (add, modify, delete, trade) p50 and p99 and p99.9 latency on a replayed recorded Kraken day at 100 levels and on a synthetic stress stream (bursts, deep sweeps), measured in-process with no I/O; (b) C++ and Rust hot path allocation-free after warm-up (heap allocation counted by an instrumented allocator: 0 in steady state); Java with no allocation in steady state measured by JFR or GC logs, or the miss stated; Python is reference only, no latency target; (c) best bid/ask, depth-at-price and top-N snapshot queries O(1) or O(N) with measured latency; (d) the H-2 correctness check (book equals the venue snapshot at every checkpoint) holds on the same replay, so speed never trades against correctness; (e) regression thresholds in CI as for R4 (H-5): a later PR that worsens p99 beyond the threshold fails; (f) results published with machine, compiler and flags; claims limited to "in-process, simulated feed"; no network or venue latency is claimed
 
@@ -48,7 +48,7 @@ This spec fixes what is required of the data structure, how it is measured and h
 - Java: JFR with `jdk.ObjectAllocationSample` and GC logs (`-Xlog:gc`); pass when the measured region shows no GC and an allocation-sample total of 0 for the book's classes; if not achieved, the miss is published with the bytes per message.
 - Python: reported (`tracemalloc` peak), no target.
 
-## Targets and thresholds (process; numbers come in a separate commit)
+## Targets and thresholds (process; the numbers are in `low-latency-targets.md`)
 
 1. Before any H-9 timing is run, a commit to `benchmarks/targets.md` adds rows L1 to L6 (per language, per workload R and S: update p50, p99, p99.9; query `top(100)` p99; allocation count) with a one-line reason each, the way T1 to T5 were written. The commit hash is quoted in the results.
 2. The first measurement is published as it is, met or missed. A target changes only in its own later commit with a reason and before the next measurement ([TGT]).

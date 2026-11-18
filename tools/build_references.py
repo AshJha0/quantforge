@@ -29,6 +29,19 @@ TOPICS = {
 }
 PAYWALL = re.compile(r"licen[cs]ed|paywall", re.I)
 NOT_OPENED = re.compile(r"not opened", re.I)
+# G-12 (docs plan): mark entries the spec says are free to read, and entries the spec says were read in a session.
+FREE = re.compile(r"\bfree\b|open access", re.I)
+NOT_FREE = re.compile(r"not free|not freely", re.I)
+READ = re.compile(r"\b(?:read|opened) (?:on )?20\d\d-\d\d-\d\d|evidence class: [\w ,]*\bread\b|\bpaper, read\b", re.I)
+NOT_READ = re.compile(r"not read|\brecalled\b", re.I)
+
+
+def is_free(entry):
+    return bool(FREE.search(entry)) and not NOT_FREE.search(entry)
+
+
+def is_read(entry):
+    return bool(READ.search(entry)) and not NOT_READ.search(entry) and not NOT_OPENED.search(entry)
 
 
 SOURCES_PARA = re.compile(r"^(?:\*\*)?Sources\b[^:]*:(?:\*\*)?\s*(.*)$")
@@ -123,6 +136,8 @@ def render(found):
     n = len(found)
     paid = sum(1 for _, e in found if PAYWALL.search(e))
     unopened = sum(1 for _, e in found if NOT_OPENED.search(e))
+    free = sum(1 for _, e in found if is_free(e))
+    read = sum(1 for _, e in found if is_read(e))
     out = ["# References", "",
            "Every source the specifications cite, grouped by topic. Each entry is copied from the spec that cites it, with that "
            "spec's own status words, and links back to every spec that relies on it. Nothing here is added from memory.", "",
@@ -130,9 +145,12 @@ def render(found):
            '- **Not opened** means the spec gives the usual citation from memory, and nobody has re-read the source for this project. '
            "Confirm it before relying on it.",
            "- **Paywalled** marks an entry the spec calls licensed: a person with access must confirm section or equation numbers.",
+           "- **Free** marks an entry the spec says is free to read (a free copy or open access); anyone can check it.",
+           "- **Read** marks an entry the spec says was read or opened in a dated session and does not call recalled or not read. "
+           "Without it, treat the citation as recalled.",
            "- DOI and arXiv links are formed from the identifiers the specs give. `tools/check_links.py` checks their HTTP status; "
            "run it by hand, as it needs the network (see `tools/README.md`).", "",
-           f"{n} entries: {unopened} marked Not opened, {paid} marked Paywalled (the spec calls them licensed or paywalled). "
+           f"{n} entries: {unopened} marked Not opened, {paid} marked Paywalled (the spec calls them licensed or paywalled), {free} marked Free, {read} marked Read. "
            "Built by `python tools/build_references.py` from `specifications/`; CI fails if this page is out of date.", ""]
     for topic in sorted(by_topic, key=lambda t: (t == "", t)):
         out += [f"## {TOPICS.get(topic, topic)}", ""]
@@ -142,6 +160,10 @@ def render(found):
                 marks.append("**Not opened.**")
             if PAYWALL.search(entry):
                 marks.append("**Paywalled.**")
+            if is_free(entry):
+                marks.append("**Free.**")
+            if is_read(entry):
+                marks.append("**Read.**")
             if marks and entry.endswith(" (not opened)"):  # the bold mark already says it
                 entry = entry.removesuffix(" (not opened)")
             refs = ", ".join(f"[`{u.removeprefix('specifications/')}`](../{u})" for u in used)

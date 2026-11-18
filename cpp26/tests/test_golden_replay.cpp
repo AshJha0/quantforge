@@ -144,4 +144,12 @@ TEST_CASE("stage J interpolation backtest goldens") { replay("stage_j/interpbt_j
 TEST_CASE("stage J drift detector goldens") { replay("stage_j/drift_j"); }
 TEST_CASE("stage J term financing goldens") { replay("stage_j/termfin_j"); }
 TEST_CASE("stage J liquidity curve goldens") { replay("stage_j/liqcurve_j"); }
+// Stage H wave 1: puts ops_execution.inc and execution.cpp under ctest and the per-file coverage gate.
+TEST_CASE("stage H schedule goldens") { replay("stage_h/sched_h"); }
+TEST_CASE("stage H Almgren-Chriss goldens") { replay("stage_h/ac_h"); }
+TEST_CASE("stage H impact goldens") { replay("stage_h/imp_h"); }
+TEST_CASE("stage H shortfall TCA goldens") { replay("stage_h/tca_h"); }
+TEST_CASE("stage H Avellaneda-Stoikov goldens") { replay("stage_h/as_h"); }
+TEST_CASE("stage H use case 5 goldens") { replay("stage_h/uc5_h"); }
+TEST_CASE("stage H E1 non-finite input goldens") { replay("stage_h/e1_h"); }
 #endif

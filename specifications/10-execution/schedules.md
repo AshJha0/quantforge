@@ -1,6 +1,6 @@
-# Execution schedules: TWAP, VWAP, POV (DRAFT)
+# Execution schedules: TWAP, VWAP, POV
 
-Spec version 0.1.0 (DRAFT, stage H wave 1). Status: Specified, not implemented. Rulings: `stage-h-rulings-w1.md` HR-2 to HR-4, HR-9. Plan items 14.7 H-3, 15.1 "Execution schedules".
+Spec version 0.1.0 (stage H wave 1; confirmed 2026-11-18 by the stage H coordinator). Status: Specified, not implemented. Rulings: `stage-h-rulings-w1.md` HR-2 to HR-4, HR-9. Plan items 14.7 H-3, 15.1 "Execution schedules".
 
 **Plain idea.** A parent order of `X` units is split into child slices over `N` buckets: evenly in time (TWAP), in proportion to an expected volume profile (VWAP), or as a fixed share of the market volume actually seen (POV).
 
@@ -30,6 +30,11 @@ Inputs `quantity`, `participation` p in (0, 1) (HR-4, confirmed by DR-H4: partic
 | sched_h-0006 | POV X = 1,000, p = 0.1, v = [900, 900], CONTINUOUS | [100, 100], residual 800 | 0.1/0.9 x 900 |
 | sched_h-0007 | POV p = 1.0 | `E_DOMAIN` | HR-4 |
 | sched_h-0008 | VWAP profile [0, 0] | `E_DOMAIN` | |
+| sched_h-0009 | TWAP X = 1,000.5, N = 2, UNITS | `E_INPUT` | non-integer X in UNITS; added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
+| sched_h-0010 | TWAP X = 1,000, N = 4, `mode` absent | slices [250, 250, 250, 250] (reals) | `mode` defaults to CONTINUOUS (HR-56); added by the integration lane 2026-11-18 for HR-56; hand calculation and oracle only, not blind re-derived |
+| sched_h-0011 | POV X = 0, p = 0.1, v = [900] | `E_INPUT` | non-positive quantity (HR-56); added by the integration lane 2026-11-18 for HR-56; hand calculation and oracle only, not blind re-derived |
+| sched_h-0012 | POV X = 1,000, p = 0.1, v = [] | `E_INPUT` | empty market volume (HR-56); added by the integration lane 2026-11-18 for HR-56; hand calculation and oracle only, not blind re-derived |
+| sched_h-0013 | POV X = 1, p = 0.5, v = [0.75, 0.75, 0.75], CONTINUOUS | slices [0.75, 0.25, 0], filled 1, residual 0 | running remaining caps the second child; residual never negative (HR-56); added by the integration lane 2026-11-18 for HR-56; hand calculation and oracle only, not blind re-derived |
 
 ## Property tests
 Slices sum to X (HR-3); POV realised participation `s_i / (s_i + v_i)` equals p wherever not capped.

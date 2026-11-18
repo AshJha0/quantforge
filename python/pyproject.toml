@@ -7,7 +7,7 @@ name = "quantforge-core"
 version = "0.9.1"
 description = "Quantitative analytics and trading infrastructure"
 requires-python = "==3.15.*"
-dependencies = ["numpy>=2.0"]
+dependencies = ["numpy>=2.0", "threadpoolctl==3.6.0"]
 
 [project.scripts]
 quantforge = "quantforge_core.cli.main:main"
@@ -47,7 +47,7 @@ tests_dir = ["tests/test_core.py", "tests/test_cli.py", "tests/test_stage_b.py",
              "tests/test_hedge_costs_cross_asset.py",
              "tests/test_dynamic_hedge_selection.py", "tests/test_slippage.py",
              "tests/test_stage_i_rulings.py", "tests/test_hedge_invariants.py",
-             "tests/test_research_w3_units.py", "tests/test_term_curves_units.py",
+             "tests/test_research_w3_units.py", "tests/test_term_curves_units.py", "tests/test_execution_h.py",
              "tests/test_drift_units.py", "tests/test_garch_units.py",
              "tests/test_correlation_units.py", "tests/test_g2pp_units.py",
              "tests/test_joint_units.py", "tests/test_variance_more_units.py",
@@ -91,6 +91,7 @@ module = [
     "test_joint_units",
     "test_joint_solve_units",
     "test_term_curves_units",
+    "test_execution_h",
     "test_credit_correlation_hedges",
     "test_credit_kills",
     "test_variance_kills",

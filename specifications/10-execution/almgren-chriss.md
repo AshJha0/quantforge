@@ -1,6 +1,6 @@
-# Almgren-Chriss optimal execution (DRAFT)
+# Almgren-Chriss optimal execution
 
-Spec version 0.1.0 (DRAFT, stage H wave 1). Status: Specified, not implemented. Rulings HR-2, HR-5, HR-6, HR-9. Plan items 14.7 H-3 (trajectory and frontier to 1e-12), 15.1.
+Spec version 0.1.0 (stage H wave 1; confirmed 2026-11-18 by the stage H coordinator). Status: Specified, not implemented. Rulings HR-2, HR-5, HR-6, HR-9. Plan items 14.7 H-3 (trajectory and frontier to 1e-12), 15.1.
 
 **Plain idea.** Selling fast costs impact; selling slowly leaves the position exposed to price moves. With linear impact and mean-variance preferences the optimal holdings decay like a hyperbolic sine, and the risk aversion `lambda` slides the schedule along an efficient frontier of (expected cost, variance).
 
@@ -35,6 +35,11 @@ P: X = 1e6, T = 5, N = 5 (tau = 1), sigma = 0.95, epsilon = 0.0625, eta = 2.5e-6
 | ac_h-0003 | gamma = 2 eta / tau | `E_DOMAIN` | eta_tilde = 0 |
 | ac_h-0004 | P with N = 1 (so tau = T = 5), lambda = 1e-6 | holdings [1e6, 0]; E = 562,500 | E = 1/2 gamma X^2 + epsilon X + eta_tilde X^2 / T = 125,000 + 62,500 + 375,000. Here eta_tilde = eta - gamma tau / 2 depends on tau: with tau = 5, eta_tilde = 2.5e-6 - 2.5e-7 x 5 / 2 = 1.875e-6, not the 2.375e-6 of the P line (which holds for tau = 1); reusing 2.375e-6 would give 662,500. Lambda (1e-6) does not change the single-trade holdings or E; it only enters kappa (about 0.527 here), which is not asserted. Blind re-derived (DR-H2) |
 | ac_h-0005 | P, lambda = 1e-6 | kappa = 0.6070761632 (as ac_h-0002); kappa T = 3.0353808 | OUTSIDE-CHECKED against printed figures, [AC00] p. 24: "kappa about 0.6/day, so kappa T about 3". Agreement to the one significant figure printed; the paper's figure comes from approximation (19), sqrt(lambda sigma^2 / eta) = 0.6008, so the test tolerance is 0.05 on kappa and 0.25 on kappa T |
+| ac_h-0006 | `exec.ac.frontier`, P, lambdas [0, 5e-7, 1e-6, 2e-6] | E non-decreasing, V non-increasing; points 1 and 3 equal ac_h-0001, ac_h-0002 | added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
+| ac_h-0007 | P with N = 0 | `E_INPUT` | N < 1; added by the oracle lane 2026-11-18; hand calculation and oracle only, not blind re-derived |
+| ac_h-0008 | P with X = 0 | `E_INPUT` | non-positive quantity (HR-56); added by the integration lane 2026-11-18 for HR-56; hand calculation and oracle only, not blind re-derived |
+| ac_h-0009 | P with epsilon = -0.0625 | `E_DOMAIN` | negative epsilon (HR-56); added by the integration lane 2026-11-18 for HR-56; hand calculation and oracle only, not blind re-derived |
+| ac_h-0010 | P with gamma = -2.5e-7 | `E_DOMAIN` | negative gamma (HR-56); added by the integration lane 2026-11-18 for HR-56; hand calculation and oracle only, not blind re-derived |
 
 ## Property tests
 Trades sum to X to 1e-12 relative; for lambda > 0 holdings lie strictly below linear; as tau -> 0, kappa tends to `sqrt(lambda sigma^2 / eta)` ([AC00] eq. (19), p. 15).
@@ -42,7 +47,7 @@ Trades sum to X to 1e-12 relative; for lambda > 0 holdings lie strictly below li
 ## Convergence and limit cases
 | Limit | Behaviour | Check |
 |---|---|---|
-| lambda -> 0 | trajectory tends to the linear one; lambda = 0 returns it exactly, not by cancellation (HR-5) | ac_h-0001; property test at lambda = 1e-15 within 1e-9 relative of linear |
+| lambda -> 0 | trajectory tends to the linear one; lambda = 0 returns it exactly, not by cancellation (HR-5) | ac_h-0001; property test at lambda = 1e-15 on P within 2e-9 relative of linear. Derivation: x_k = X sinh(kappa (T - t_k)) / sinh(kappa T) = linear x (1 + kappa^2 ((T - t_k)^2 - T^2) / 6 + O(kappa^4)), so the model's own shift from linear is at most kappa^2 T^2 / 6; on P, y = lambda sigma^2 tau^2 / (2 eta_tilde) = 1.9e-10, kappa^2 about 2y = 3.8e-10, kappa^2 T^2 / 6 about 1.6e-9 (the earlier 1e-9 bound was below the model's own shift; corrected 2026-11-18) |
 | tau -> 0 (N large, T fixed) | kappa_tilde -> sqrt(lambda sigma^2 / eta), [AC00] eq. (19) | property test at N = 10, 100, 1000: error falls like tau |
 | y small in HR-6 | `log1p` form keeps kappa accurate where `acosh(1 + y)` loses digits | property test at y = 1e-14 against the series sqrt(2y) |
 | kappa T > 700 | sinh ratio in exponential form, no overflow (HR-6) | property test at kappa T = 1000: holdings finite, decreasing |

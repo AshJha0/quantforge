@@ -10,7 +10,7 @@ name: Microbenchmarks
 # Pull requests that touch library code or the benchmarks, weekly, and manual.
 on:
   pull_request:
-    paths: ['cpp26/**', 'java25/**', 'python/**', 'rust/**', 'benchmarks/micro/**', 'tools/bench_gate.py',
+    paths: ['cpp26/**', 'java25/**', 'python/**', 'rust/**', 'benchmarks/micro/**', 'benchmarks/hedge_qp_timing.py', 'tools/bench_gate.py',
             '.github/workflows/bench.yml']
   schedule:
     - cron: '17 5 * * 2'
@@ -21,6 +21,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 env:
+  # Account-free Central fallback for HTTP 429 (CI only; checksums fail on mismatch): java25/.mvn/ci-settings.xml
+  MAVEN_ARGS: --settings ${{ github.workspace }}/java25/.mvn/ci-settings.xml
   MACHINE: github-ubuntu-24.04
   INJECT_NS: '200000'
 jobs:
@@ -68,6 +70,10 @@ jobs:
           cp "benchmarks/micro/out/$LANG_.json" clean/
           QF_BENCH_INJECT_NS="$INJECT_NS" run
           cp "benchmarks/micro/out/$LANG_.json" injected/
+      - name: T6/T7 hedge QP wall time (plan 14.7 H-8; Python targets 2 s at n = 50, 20 s at n = 200)
+        if: matrix.lang == 'python'
+        run: |
+          uv run --project python python benchmarks/hedge_qp_timing.py --gate | tee -a "$GITHUB_STEP_SUMMARY"
       - name: gate against the stored baseline
         run: |
           # Pushes to main, the weekly run and manual runs require a stored baseline from this runner class (R6-15);

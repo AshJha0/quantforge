@@ -81,7 +81,8 @@ final class Operations {
             new Registry.Module("hedge_dynamic", OpsHedgeDynamic::register),
             new Registry.Module("hedge_selection", OpsHedgeSelect::register),
             new Registry.Module("hedge_slippage", OpsHedgeSlippage::register),
-            new Registry.Module("research", OpsResearch::register)
+            new Registry.Module("research", OpsResearch::register),
+            new Registry.Module("execution", OpsExecution::register)
     );
 
     static final Registry REGISTRY = Registry.of(MODULES);

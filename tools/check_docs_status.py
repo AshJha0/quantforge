@@ -89,8 +89,14 @@ def implemented_pages(readme, folder):
     return pages
 
 
-def unknown_operations(files, ops):
-    """Backticked names that look like operations (a known domain prefix and two or more dots) but are not in the name map."""
+def spec_only(root=ROOT):
+    """Names a spec page defines that have no golden case yet (name map `spec_only`): specified, not built."""
+    return set(json.loads((root / "specifications" / "name-map.json").read_text(encoding="utf-8")).get("spec_only", []))
+
+
+def unknown_operations(files, ops, specified=frozenset()):
+    """Backticked names that look like operations (a known domain prefix and two or more dots) but are neither in the
+    name map nor a specified-only name (`spec_only`, a name a spec page defines before any build)."""
     prefixes = {o.split(".")[0] for o in ops}
     bad = []
     for path, text in files.items():
@@ -98,7 +104,7 @@ def unknown_operations(files, ops):
             continue  # history, and specs may name operations before they exist
         for n, line in enumerate(text.splitlines(), 1):
             for name in OP.findall(line):
-                if name.count(".") >= 2 and name.split(".")[0] in prefixes and name not in ops:
+                if name.count(".") >= 2 and name.split(".")[0] in prefixes and name not in ops and name not in specified:
                     bad.append(f"{path}:{n}: `{name}` is not an operation in specifications/name-map.json")
     return bad
 
@@ -163,7 +169,7 @@ def main():
     tags = [t for t in git("tag", "-l", "v*") if t]
     released = released_stages((ROOT / "CHANGELOG.md").read_text(encoding="utf-8"), tags)
     files = docs_files()
-    bad += release_problems(files, released) + unknown_operations(files, ops) + case_count_problems(files)
+    bad += release_problems(files, released) + unknown_operations(files, ops, spec_only()) + case_count_problems(files)
     for b in bad:
         print("BAD", b)
     print(f"docs status: curve table checked; {len(tags)} release tags, stages released {''.join(sorted(released)) or 'none found'}; {len(bad)} problems")
