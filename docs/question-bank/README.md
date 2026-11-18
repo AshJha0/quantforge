@@ -1,6 +1,6 @@
 # QuantForge question bank
 
-A learning question bank and knowledge check: 389 questions with full answers, in 13 sets that follow the project's topics. It is for two readers. A newcomer can work through the foundation questions in order; a practitioner can jump to a set and test themselves against QuantForge's own conventions and rulings.
+A learning question bank and knowledge check: 397 questions with full answers, in 13 sets that follow the project's topics. It is for two readers. A newcomer can work through the foundation questions in order; a practitioner can jump to a set and test themselves against QuantForge's own conventions and rulings.
 
 How to use it: read the question, answer it on paper, then read the answer. Each answer starts with the plain idea, then gives the formal rule as the spec states it, then (for quantitative topics) a worked example with numbers, and ends with the pitfall that matters on a desk or in validation. Each question names its source spec or tutorial and an evidence class:
 
@@ -26,14 +26,14 @@ Levels: **foundation** (the idea and the convention), **practitioner** (using th
 | [Hedging and hedge solvers](10-hedging.md) | 9 | 14 | 8 | 31 |
 | [Research statistics and backtest honesty](11-research-statistics.md) | 10 | 12 | 8 | 30 |
 | [Four-language engineering and verification](12-engineering-verification.md) | 11 | 13 | 6 | 30 |
-| [Execution and microstructure](13-execution-microstructure.md) | 8 | 6 | 4 | 18 |
-| **Total** | 133 | 163 | 93 | **389** |
+| [Execution and microstructure](13-execution-microstructure.md) | 11 | 10 | 5 | 26 |
+| **Total** | 136 | 167 | 94 | **397** |
 
 Back to [Learn QuantForge](../../LEARN.md).
 
 ## Foundation questions
 
-133 questions.
+136 questions.
 
 - Q1.1 (01-foundations-numerics.md) How do ACT/360 and ACT/365F differ, and what year fraction does each give from 1 January to 1 July 2024?
 - Q1.4 (01-foundations-numerics.md) What does QuantForge return when the start equals the end, or the end is before the start?
@@ -168,10 +168,13 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q13.12 (13-execution-microstructure.md) What does the square-root law say, and what do QuantForge's square-root goldens prove?
 - Q13.16 (13-execution-microstructure.md) In the simulated lit engine, three bids rest at one price and a sell arrives that fills one and a half of them. Which bids fill?
 - Q13.18 (13-execution-microstructure.md) Why does QuantForge have no market-by-order data from a real venue?
+- Q13.19 (13-execution-microstructure.md) A paper book buys 2 at 100 (fee 0.20) and sells 1 at 110 (fee 0.11), then closes the day at 105. Explain the day's P&L.
+- Q13.21 (13-execution-microstructure.md) An order to buy 11 at 100 meets limits of 10 per order, notional 1,000 and position 5. Which checks fail, and in what order are they reported?
+- Q13.22 (13-execution-microstructure.md) Twelve orders arrive in four seconds. What is the arrival rate, and how sure are you?
 
 ## Practitioner questions
 
-163 questions.
+167 questions.
 
 - Q1.2 (01-foundations-numerics.md) What does ACT/ACT ISDA give from 1 November 2003 to 1 May 2004, and how does ACT/ACT ICMA differ on the same dates?
 - Q1.3 (01-foundations-numerics.md) How do the 30/360 variants treat 29 February 2024 to 31 August 2024?
@@ -336,10 +339,14 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q13.8 (13-execution-microstructure.md) At `lambda = 1e-6`, how much of the position is left after the first day, and what does risk aversion cost?
 - Q13.11 (13-execution-microstructure.md) A buy of 1,000 is decided at 100, arrives at 100.10, fills 600 at 100.20 and 200 at 100.30, ends at 101, with fees of 5. Decompose the shortfall.
 - Q13.14 (13-execution-microstructure.md) A market maker is long 2 units. How do the Avellaneda-Stoikov quotes move, and by how much?
+- Q13.20 (13-execution-microstructure.md) How does the paper ledger show that a record was edited after it was written, and what can it not show?
+- Q13.23 (13-execution-microstructure.md) Venue A's fills have a markout of 0 at 5 seconds, yet a toxicity of two thirds. How can both be true?
+- Q13.24 (13-execution-microstructure.md) Why does the arrival-price golden use an urgency of exactly ln 2?
+- Q13.25 (13-execution-microstructure.md) A pre-trade estimate says 3.04 bp expected cost and 46.2 bp timing risk. Should you add them?
 
 ## Advanced questions
 
-93 questions.
+94 questions.
 
 - Q1.5 (01-foundations-numerics.md) Why does ACT/ACT AFB give the same answer from 28 February 2004 to both 28 and 29 February 2008, and why does Strata disagree?
 - Q1.21 (01-foundations-numerics.md) How does the adaptive Gauss-Kronrod rule integrate `1/sqrt(x)` on `[0, 1]` when the integrand is infinite at 0?
@@ -434,3 +441,4 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q13.13 (13-execution-microstructure.md) In the Obizhaeva-Wang model, what is the risk-neutral optimal schedule, and what happens as resilience goes to zero?
 - Q13.15 (13-execution-microstructure.md) How were the Avellaneda-Stoikov goldens checked against the paper, when the paper prints only simulated averages?
 - Q13.17 (13-execution-microstructure.md) The recorded Kraken book is a once-a-second snapshot of the recorder's own book. What can the book check claim, and what can it not?
+- Q13.26 (13-execution-microstructure.md) The first H-9 run shows Rust `best_bid` p99 at 105 ns against a 50 ns target. What can you conclude?
