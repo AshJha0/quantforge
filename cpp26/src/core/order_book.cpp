@@ -4,10 +4,14 @@
 // Checksum failures, crossed and locked books are counted and reported, never raised.
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <map>
 #include <optional>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 #include "quantforge/core/dates.hpp"
