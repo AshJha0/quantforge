@@ -1,0 +1,408 @@
+{
+ "dates": "2026-11-12..2026-11-18 (partial)",
+ "excluded_from_later_studies": true,
+ "label": "pilot; partial days; crypto venue; not equities or rates; no conclusions",
+ "seed": 20261118,
+ "symbols": {
+  "BTC-USD": {
+   "a_impact_proxy": {
+    "10s": {
+     "c_bps": 1.1740411317672814,
+     "ci95_percentile": [
+      0.2034986038942534,
+      0.3664866795642784
+     ],
+     "days": 7,
+     "delta": 0.29418308942629445,
+     "n_buckets": 27437,
+     "se_day_bootstrap": 0.043608342475156506
+    },
+    "300s": {
+     "c_bps": 6.189151389423976,
+     "ci95_percentile": [
+      0.4448229813739412,
+      0.8196639618606092
+     ],
+     "days": 7,
+     "delta": 0.6058459491314518,
+     "n_buckets": 916,
+     "se_day_bootstrap": 0.1009260356104539
+    },
+    "60s": {
+     "c_bps": 2.379698636672552,
+     "ci95_percentile": [
+      0.3848925181880829,
+      0.6095033323844845
+     ],
+     "days": 7,
+     "delta": 0.4871565761860089,
+     "n_buckets": 4597,
+     "se_day_bootstrap": 0.05706293782170716
+    }
+   },
+   "b_walk_the_book": {
+    "buy_1000": {
+     "beyond_recorded_depth": 1,
+     "median_bps": 0.007710486647813559,
+     "p90_bps": 0.6727674441719923,
+     "p99_bps": 2.3193623750268486,
+     "snapshots": 4871
+    },
+    "buy_10000": {
+     "beyond_recorded_depth": 4,
+     "median_bps": 0.007734352824610461,
+     "p90_bps": 0.9293828882763682,
+     "p99_bps": 2.866474749872738,
+     "snapshots": 4868
+    },
+    "buy_100000": {
+     "beyond_recorded_depth": 150,
+     "median_bps": 0.2149027954173711,
+     "p90_bps": 1.5065664036965567,
+     "p99_bps": 4.053925629190281,
+     "snapshots": 4722
+    },
+    "buy_1000000": {
+     "beyond_recorded_depth": 3557,
+     "median_bps": 0.5209507684146508,
+     "p90_bps": 2.9309316489696378,
+     "p99_bps": 7.087963989874082,
+     "snapshots": 1315
+    },
+    "sell_1000": {
+     "beyond_recorded_depth": 2,
+     "median_bps": 0.007733228368097088,
+     "p90_bps": 1.1538769659052064,
+     "p99_bps": 2.5311410566907653,
+     "snapshots": 4870
+    },
+    "sell_10000": {
+     "beyond_recorded_depth": 27,
+     "median_bps": 0.007766368981065504,
+     "p90_bps": 1.4654512843422252,
+     "p99_bps": 3.006433911562073,
+     "snapshots": 4845
+    },
+    "sell_100000": {
+     "beyond_recorded_depth": 372,
+     "median_bps": 0.3596156557358592,
+     "p90_bps": 1.9004007421864222,
+     "p99_bps": 4.123191998217484,
+     "snapshots": 4500
+    },
+    "sell_1000000": {
+     "beyond_recorded_depth": 3767,
+     "median_bps": 0.659692839954791,
+     "p90_bps": 3.290775486945562,
+     "p99_bps": 7.4244598320483,
+     "snapshots": 1105
+    }
+   },
+   "c_fill_bounds_touch_bid": {
+    "10s": {
+     "lower": 0.5552134646962233,
+     "placements": 4872,
+     "upper": 0.7229064039408867
+    },
+    "1s": {
+     "lower": 0.15599343185550082,
+     "placements": 4872,
+     "upper": 0.27504105090311987
+    },
+    "60s": {
+     "lower": 0.8048029556650246,
+     "placements": 4872,
+     "upper": 0.8688423645320197
+    }
+   },
+   "coverage_per_day": {
+    "20261112": {
+     "gaps_over_10min": 1,
+     "hour_files": 13,
+     "missing_hours": 11
+    },
+    "20261113": {
+     "gaps_over_10min": 2,
+     "hour_files": 13,
+     "missing_hours": 11
+    },
+    "20261114": {
+     "gaps_over_10min": 1,
+     "hour_files": 18,
+     "missing_hours": 6
+    },
+    "20261115": {
+     "gaps_over_10min": 2,
+     "hour_files": 16,
+     "missing_hours": 8
+    },
+    "20261116": {
+     "gaps_over_10min": 0,
+     "hour_files": 18,
+     "missing_hours": 6
+    },
+    "20261117": {
+     "gaps_over_10min": 6,
+     "hour_files": 11,
+     "missing_hours": 13
+    },
+    "20261118": {
+     "gaps_over_10min": 9,
+     "hour_files": 10,
+     "missing_hours": 14
+    }
+   },
+   "d_tca_twap_lit_engine": {
+    "twap_buy_10000": {
+     "execution_bps_mean": 1.6086751602020968,
+     "fill_ratio_min": 0.9999999999999998,
+     "orders": 7,
+     "total_bps_mean": 1.6086751602020972,
+     "total_bps_median": -4.785459862240979
+    },
+    "twap_buy_100000": {
+     "execution_bps_mean": 6.090157112694212,
+     "fill_ratio_min": 0.2998868369502406,
+     "orders": 7,
+     "total_bps_mean": 4.538978092674069,
+     "total_bps_median": 1.6601412891853276
+    },
+    "twap_buy_1000000": {
+     "execution_bps_mean": 0.048376926173120775,
+     "fill_ratio_min": 0.9991312315176217,
+     "orders": 7,
+     "total_bps_mean": 0.049929065202537544,
+     "total_bps_median": 2.9528455574827883
+    }
+   },
+   "files": 99,
+   "files_sha256_of_list": "e6db1565550e58df63800b10a61312adfdda9a06a11bf414f394921367524883",
+   "files_truncated_while_recording": [
+    "20261112T17.jsonl.gz",
+    "20261113T01.jsonl.gz",
+    "20261113T09.jsonl.gz",
+    "20261114T00.jsonl.gz",
+    "20261115T00.jsonl.gz",
+    "20261115T22.jsonl.gz",
+    "20261117T00.jsonl.gz",
+    "20261117T20.jsonl.gz",
+    "20261117T21.jsonl.gz",
+    "20261117T22.jsonl.gz",
+    "20261117T23.jsonl.gz",
+    "20261118T04.jsonl.gz",
+    "20261118T05.jsonl.gz",
+    "20261118T06.jsonl.gz",
+    "20261118T07.jsonl.gz",
+    "20261118T08.jsonl.gz",
+    "20261118T09.jsonl.gz",
+    "20261118T10.jsonl.gz",
+    "20261118T11.jsonl.gz",
+    "20261118T12.jsonl.gz",
+    "20261118T13.jsonl.gz"
+   ],
+   "recorded_depth_levels": 20,
+   "snapshots": 488652,
+   "trade_prints": 718345
+  },
+  "ETH-USD": {
+   "a_impact_proxy": {
+    "10s": {
+     "c_bps": 1.4354613886400114,
+     "ci95_percentile": [
+      0.16735157255824862,
+      0.40047060010501506
+     ],
+     "days": 7,
+     "delta": 0.309326255031723,
+     "n_buckets": 26331,
+     "se_day_bootstrap": 0.05668753424681063
+    },
+    "300s": {
+     "c_bps": 7.960748201379457,
+     "ci95_percentile": [
+      0.49142008661497766,
+      0.808100205499547
+     ],
+     "days": 7,
+     "delta": 0.5764391309262498,
+     "n_buckets": 918,
+     "se_day_bootstrap": 0.06993360841052298
+    },
+    "60s": {
+     "c_bps": 2.9033348203951608,
+     "ci95_percentile": [
+      0.4530300271787626,
+      0.6031443570208408
+     ],
+     "days": 7,
+     "delta": 0.5151929428923823,
+     "n_buckets": 4597,
+     "se_day_bootstrap": 0.03965664107465646
+    }
+   },
+   "b_walk_the_book": {
+    "buy_1000": {
+     "beyond_recorded_depth": 0,
+     "median_bps": 0.051774166623509456,
+     "p90_bps": 1.48818072687796,
+     "p99_bps": 3.0774391151716727,
+     "snapshots": 4875
+    },
+    "buy_10000": {
+     "beyond_recorded_depth": 0,
+     "median_bps": 0.5288376328580139,
+     "p90_bps": 2.0246891368425475,
+     "p99_bps": 3.9046655173489047,
+     "snapshots": 4875
+    },
+    "buy_100000": {
+     "beyond_recorded_depth": 625,
+     "median_bps": 1.7292456054242402,
+     "p90_bps": 3.4617609766863704,
+     "p99_bps": 5.870036052978562,
+     "snapshots": 4250
+    },
+    "buy_1000000": {
+     "beyond_recorded_depth": 4624,
+     "median_bps": 5.267477004320284,
+     "p90_bps": 7.484883640560074,
+     "p99_bps": 14.084468983041264,
+     "snapshots": 251
+    },
+    "sell_1000": {
+     "beyond_recorded_depth": 0,
+     "median_bps": 0.09542388227633906,
+     "p90_bps": 1.648332837727488,
+     "p99_bps": 3.229318004447022,
+     "snapshots": 4875
+    },
+    "sell_10000": {
+     "beyond_recorded_depth": 0,
+     "median_bps": 0.5616611805968088,
+     "p90_bps": 2.234212796923808,
+     "p99_bps": 4.041217124609297,
+     "snapshots": 4875
+    },
+    "sell_100000": {
+     "beyond_recorded_depth": 655,
+     "median_bps": 1.7395752254585435,
+     "p90_bps": 3.5163103595325556,
+     "p99_bps": 6.215774376068645,
+     "snapshots": 4220
+    },
+    "sell_1000000": {
+     "beyond_recorded_depth": 4622,
+     "median_bps": 6.232536075269187,
+     "p90_bps": 8.297138246115804,
+     "p99_bps": 10.848311903029469,
+     "snapshots": 253
+    }
+   },
+   "c_fill_bounds_touch_bid": {
+    "10s": {
+     "lower": 0.4094358974358974,
+     "placements": 4875,
+     "upper": 0.5224615384615384
+    },
+    "1s": {
+     "lower": 0.072,
+     "placements": 4875,
+     "upper": 0.15056410256410258
+    },
+    "60s": {
+     "lower": 0.7425641025641025,
+     "placements": 4875,
+     "upper": 0.7895384615384615
+    }
+   },
+   "coverage_per_day": {
+    "20261112": {
+     "gaps_over_10min": 1,
+     "hour_files": 13,
+     "missing_hours": 11
+    },
+    "20261113": {
+     "gaps_over_10min": 2,
+     "hour_files": 13,
+     "missing_hours": 11
+    },
+    "20261114": {
+     "gaps_over_10min": 1,
+     "hour_files": 18,
+     "missing_hours": 6
+    },
+    "20261115": {
+     "gaps_over_10min": 2,
+     "hour_files": 16,
+     "missing_hours": 8
+    },
+    "20261116": {
+     "gaps_over_10min": 0,
+     "hour_files": 18,
+     "missing_hours": 6
+    },
+    "20261117": {
+     "gaps_over_10min": 6,
+     "hour_files": 11,
+     "missing_hours": 13
+    },
+    "20261118": {
+     "gaps_over_10min": 9,
+     "hour_files": 10,
+     "missing_hours": 14
+    }
+   },
+   "d_tca_twap_lit_engine": {
+    "twap_buy_10000": {
+     "execution_bps_mean": -0.8799025424914287,
+     "fill_ratio_min": 0.9999999999999999,
+     "orders": 7,
+     "total_bps_mean": -0.879902542491429,
+     "total_bps_median": -4.092427332110138
+    },
+    "twap_buy_100000": {
+     "execution_bps_mean": 2.4150816408457136,
+     "fill_ratio_min": 0.2999056041264191,
+     "orders": 7,
+     "total_bps_mean": -0.2149651783997684,
+     "total_bps_median": -3.89760122521319
+    },
+    "twap_buy_1000000": {
+     "execution_bps_mean": 2.201838490935649,
+     "fill_ratio_min": 0.910910301729703,
+     "orders": 7,
+     "total_bps_mean": 2.2302832106320745,
+     "total_bps_median": 7.304541329578067
+    }
+   },
+   "files": 99,
+   "files_sha256_of_list": "3263b58bc988b5bca5a49a965c4f465a1012825b824a3ee022b91920bdd2250b",
+   "files_truncated_while_recording": [
+    "20261112T17.jsonl.gz",
+    "20261113T01.jsonl.gz",
+    "20261113T09.jsonl.gz",
+    "20261114T00.jsonl.gz",
+    "20261115T00.jsonl.gz",
+    "20261115T22.jsonl.gz",
+    "20261117T00.jsonl.gz",
+    "20261117T20.jsonl.gz",
+    "20261117T21.jsonl.gz",
+    "20261117T22.jsonl.gz",
+    "20261117T23.jsonl.gz",
+    "20261118T04.jsonl.gz",
+    "20261118T05.jsonl.gz",
+    "20261118T06.jsonl.gz",
+    "20261118T07.jsonl.gz",
+    "20261118T08.jsonl.gz",
+    "20261118T09.jsonl.gz",
+    "20261118T10.jsonl.gz",
+    "20261118T11.jsonl.gz",
+    "20261118T12.jsonl.gz",
+    "20261118T13.jsonl.gz"
+   ],
+   "recorded_depth_levels": 20,
+   "snapshots": 488736,
+   "trade_prints": 221941
+  }
+ }
+}
