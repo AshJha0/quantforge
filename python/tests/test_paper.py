@@ -17,7 +17,7 @@ L = {"max_order_qty": "10", "max_notional": "1000", "max_abs_position": "5", "pr
 
 
 def day1():
-    b = paper.Book(cash=D("10000"))
+    b = paper.Book(cash=D(10000))
     fills = [{"symbol": "BTC-USD", "side": "BUY", "quantity": "2", "price": "100", "fee": "0.20"},
              {"symbol": "BTC-USD", "side": "SELL", "quantity": "1", "price": "110", "fee": "0.11"}]
     return b, fills
@@ -48,7 +48,7 @@ def test_pt_0004_short_financing():
 
 
 def test_pt_0005_cross_zero():
-    b = paper.Book(cash=D("0"))
+    b = paper.Book(cash=D(0))
     b.apply_fill("X", "BUY", "1", "100")
     b.apply_fill("X", "SELL", "3", "90")
     p = b.pos("X")
@@ -149,7 +149,7 @@ def test_a1_floats_refused():
 def test_a2_a3_random_reconcile_and_explain():
     rng = random.Random(7)
     for _ in range(50):
-        b = paper.Book(cash=D("100000"))
+        b = paper.Book(cash=D(100000))
         prev: dict[str, str] = {}
         for _day in range(5):
             marks = {"A": str(rng.randint(50, 150)), "B": str(D(rng.randint(100, 900)) / 10)}

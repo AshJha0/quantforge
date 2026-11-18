@@ -27,7 +27,7 @@ CENT = Decimal("0.01")
 
 def dec(value: Any, name: str) -> Decimal:
     """A decimal input given as a string (HR-44). Floats are refused so they never reach the ledger."""
-    if isinstance(value, bool) or isinstance(value, float):
+    if isinstance(value, (bool, float)):
         raise QfError("E_INPUT", f"{name} must be a decimal string", name)
     try:
         d = Decimal(str(value))

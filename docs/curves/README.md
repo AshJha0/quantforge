@@ -41,9 +41,9 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Five interpolation methods](interpolation-methods.md) | F | 47 golden cases for `rates.curve.inspect`, 36 reproduced by an outside library |
 | [Hedging against trading costs](hedging-costs.md) | I | 33 golden cases for `hedge.qp.solve` with costs and `hedge.frontier.solve`, 15 reproduced by an outside library |
 | [Research workflow: backtest to PBO](research-workflow.md) | J | 83 golden cases for the backtest, purged CV and research statistics, 31 reproduced by an outside library; synthetic prices, a teaching example |
-| [Almgren-Chriss efficient frontier](ac-frontier.md) | H | Planned; specified, 5 golden cases for `exec.ac.trajectory` in the spec (1 against the paper's printed figure, 3 blind re-derived), available from v0.10.0 |
-| [Market impact curves: square-root and Obizhaeva-Wang](impact-curves.md) | H | Planned; specified, 4 golden cases for `exec.impact.sqrt` and `exec.impact.ow_optimal` in the spec (all blind re-derived), available from v0.10.0 |
-| [Intraday volume profile (VWAP input)](volume-profile.md) | H | Planned; specified, 3 golden cases for `exec.schedule.vwap` in the spec (blind re-derived), available from v0.10.0 |
+| [Almgren-Chriss efficient frontier](ac-frontier.md) | H | Implemented on `stage-h` (v0.10.0, unreleased), all four languages; `ac_h` 10 goldens (5 value: 1 also against the paper's printed figure, 3 counted blind re-derived) |
+| [Market impact curves: square-root and Obizhaeva-Wang](impact-curves.md) | H | Implemented on `stage-h` (v0.10.0, unreleased), all four languages; `imp_h` 9 goldens (4 value, all blind re-derived); not calibrated |
+| [Intraday volume profile (VWAP input)](volume-profile.md) | H | Implemented on `stage-h` (v0.10.0, unreleased), all four languages; `exec.schedule.vwap` cases in `sched_h` (blind re-derived) |
 | [Walk-the-book cost curves (crypto venue, recorded)](walk-the-book.md) | H | Planned; research item H-1(b), no result yet; crypto venue, not equities or rates; aggregates only |
 
 Stage J wave 3 (historical scenario stress, interpolation backtests, drift detectors) has no gallery page: those operations take a curve, a smile or a series rather than build a curve, so they are worked through in [Tutorial 33](../getting-started/tutorial-33-stress-test-and-watch-for-drift.md) instead.
