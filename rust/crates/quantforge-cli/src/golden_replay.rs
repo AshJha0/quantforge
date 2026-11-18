@@ -359,7 +359,7 @@ fn stage_j_w3_curves_goldens() {
 fn stage_h_w1_goldens() {
     replay_only(
         "stage_h",
-        &["sched_h", "ac_h", "imp_h", "tca_h", "as_h", "uc5_h"],
+        &["sched_h", "ac_h", "imp_h", "tca_h", "as_h", "uc5_h", "e1_h"],
         40,
     );
 }

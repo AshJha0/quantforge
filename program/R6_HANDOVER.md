@@ -318,3 +318,7 @@ TOTALS: 15563 value 7683 error 5366 invariance 2514
 HR-56 integration (2026-11-18): `sched_h` +4 (2 value, 2 error), `ac_h` +3 error, `imp_h` +3 error, `tca_h` +1 error (11: 2 value, 9 error).
 
 TOTALS: 15574 value 7685 error 5375 invariance 2514
+
+Stage H E1 completion (2026-11-18, `e1_h`: one non-finite input per stage H operation, 10 error cases).
+
+TOTALS: 15584 value 7685 error 5385 invariance 2514

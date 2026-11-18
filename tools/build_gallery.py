@@ -257,11 +257,11 @@ CURVES = {
 # then generated like the others. Evidence starts "Planned" so tools/check_docs_status.py treats them as planned.
 PLANNED = [
     ["[Almgren-Chriss efficient frontier](ac-frontier.md)", "H",
-     "Planned; specified, 5 golden cases for `exec.ac.trajectory` in the spec (1 against the paper's printed figure, 3 blind re-derived), available from v0.10.0"],
+     "Implemented on `stage-h` (v0.10.0, unreleased), all four languages; `ac_h` 10 goldens (5 value: 1 also against the paper's printed figure, 3 counted blind re-derived)"],
     ["[Market impact curves: square-root and Obizhaeva-Wang](impact-curves.md)", "H",
-     "Planned; specified, 4 golden cases for `exec.impact.sqrt` and `exec.impact.ow_optimal` in the spec (all blind re-derived), available from v0.10.0"],
+     "Implemented on `stage-h` (v0.10.0, unreleased), all four languages; `imp_h` 9 goldens (4 value, all blind re-derived); not calibrated"],
     ["[Intraday volume profile (VWAP input)](volume-profile.md)", "H",
-     "Planned; specified, 3 golden cases for `exec.schedule.vwap` in the spec (blind re-derived), available from v0.10.0"],
+     "Implemented on `stage-h` (v0.10.0, unreleased), all four languages; `exec.schedule.vwap` cases in `sched_h` (blind re-derived)"],
     ["[Walk-the-book cost curves (crypto venue, recorded)](walk-the-book.md)", "H",
      "Planned; research item H-1(b), no result yet; crypto venue, not equities or rates; aggregates only"],
 ]

@@ -200,7 +200,8 @@ def load_percase_j():
 # figure printed in the paper. It is the `independent-rederivation` class and is shown apart from library checks.
 # A case counts only if its `verified_by` records the DR-H2 MATCH and does not say any output was not blind.
 # Plan 15 applies the 60% floor per item: STAGE_H_ITEMS maps each golden suite to its plan item.
-STAGE_H_ITEMS = {"sched_h": "H-3a", "ac_h": "H-3b", "tca_h": "H-3c", "imp_h": "H-15a", "as_h": "H-4a", "uc5_h": "H-6"}
+STAGE_H_ITEMS = {"sched_h": "H-3a", "ac_h": "H-3b", "tca_h": "H-3c", "imp_h": "H-15a", "as_h": "H-4a", "uc5_h": "H-6",
+                 "e1_h": None}  # E1 non-finite-input error cases only: no value cases, so no item share
 H_REDERIVE_SRC = "blind second-lane re-derivation or printed paper figure (DR-H2)"
 
 
@@ -324,7 +325,8 @@ def build(problems):
         if st == "H":
             items = defaultdict(list)
             for r in core:
-                items[STAGE_H_ITEMS.get(r[0], "?")].append(r)
+                if STAGE_H_ITEMS.get(r[0], "?") is not None:
+                    items[STAGE_H_ITEMS.get(r[0], "?")].append(r)
             entry["per_item"] = {}
             for it, rs in sorted(items.items()):
                 v = vshare(rs)

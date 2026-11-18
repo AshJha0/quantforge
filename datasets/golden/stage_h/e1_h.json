@@ -1,0 +1,300 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1_h",
+ "spec": "specifications/10-execution/schedules.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_w1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "e1_h-0001",
+   "operation": "exec.schedule.twap",
+   "inputs": {
+    "quantity": "NaN",
+    "n_buckets": 4,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at quantity (from sched_h-0002)"
+  },
+  {
+   "case_id": "e1_h-0002",
+   "operation": "exec.schedule.vwap",
+   "inputs": {
+    "quantity": "NaN",
+    "profile": [
+     1.0,
+     2.0,
+     3.0,
+     4.0
+    ],
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at quantity (from sched_h-0003)"
+  },
+  {
+   "case_id": "e1_h-0003",
+   "operation": "exec.schedule.pov",
+   "inputs": {
+    "quantity": 1000,
+    "participation": "NaN",
+    "market_volume": [
+     1000.0,
+     2000.0,
+     4000.0
+    ],
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at participation (from sched_h-0005)"
+  },
+  {
+   "case_id": "e1_h-0004",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": "NaN",
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at quantity (from ac_h-0001)"
+  },
+  {
+   "case_id": "e1_h-0005",
+   "operation": "exec.ac.frontier",
+   "inputs": {
+    "quantity": "NaN",
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversions": [
+     0.0,
+     5e-07,
+     1e-06,
+     2e-06
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at quantity (from ac_h-0006)"
+  },
+  {
+   "case_id": "e1_h-0006",
+   "operation": "exec.impact.sqrt",
+   "inputs": {
+    "quantity": "NaN",
+    "daily_volume": 10000000.0,
+    "daily_vol": 0.02,
+    "coefficient": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at quantity (from imp_h-0001)"
+  },
+  {
+   "case_id": "e1_h-0007",
+   "operation": "exec.impact.ow_optimal",
+   "inputs": {
+    "quantity": "NaN",
+    "horizon": 1.0,
+    "resilience": 8.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at quantity (from imp_h-0003)"
+  },
+  {
+   "case_id": "e1_h-0008",
+   "operation": "exec.tca.shortfall",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": "NaN",
+    "arrival_price": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 1000.0,
+    "fills": [
+     {
+      "quantity": 600.0,
+      "price": 100.2
+     },
+     {
+      "quantity": 200.0,
+      "price": 100.3
+     }
+    ],
+    "fees": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at decision_price (from tca_h-0001)"
+  },
+  {
+   "case_id": "e1_h-0009",
+   "operation": "micro.mm.as_quotes",
+   "inputs": {
+    "mid": "NaN",
+    "inventory": 2.0,
+    "risk_aversion": 0.1,
+    "sigma": 2.0,
+    "time_left": 1.0,
+    "k": 1.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at mid (from as_h-0001)"
+  },
+  {
+   "case_id": "e1_h-0010",
+   "operation": "usecase.execution_tca",
+   "inputs": {
+    "quantity": "NaN",
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06,
+    "side": "SELL",
+    "decision_price": 50.0,
+    "arrival_price": 50.0,
+    "end_price": 49.5,
+    "fill_prices": [
+     49.9,
+     49.8,
+     49.7,
+     49.6,
+     49.5
+    ],
+    "completed_steps": 5,
+    "fee_per_unit": 0.001
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at quantity (from uc5_h-0001)"
+  }
+ ]
+}

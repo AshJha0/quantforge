@@ -970,7 +970,7 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 
 ## Stage H (specified, not implemented)
 
-Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings HR-1 to HR-41; HR-42 to HR-55 for paper trading; HR-56 for wave 1 input rules). The wave 1 operations (MH-6 to MH-10, and use case 5) are implemented in all four languages on branch `stage-h` with a generated suite in `datasets/golden/stage_h/` (53 cases, each build 53 of 53, local, 2026-11-18); their outside check is a blind second-lane re-derivation or a printed paper figure (DR-H2), 23 of 29 value cases, no library. The wave 1b specs (MH-1 to MH-5) state a golden plan only and are not implemented. Each entry is re-dated when its operation lands.
+Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings HR-1 to HR-41; HR-42 to HR-55 for paper trading; HR-56 for wave 1 input rules). The wave 1 operations (MH-6 to MH-10, and use case 5) are implemented in all four languages on branch `stage-h` with a generated suite in `datasets/golden/stage_h/` (63 cases with `e1_h`, each build passes all, local, 2026-11-18); their outside check is a blind second-lane re-derivation or a printed paper figure (DR-H2), 23 of 29 value cases, no library. The wave 1b specs (MH-1 to MH-5) state a golden plan only and are not implemented. Each entry is re-dated when its operation lands.
 
 ### MH-1 Order book rebuild (stage H wave 1b)
 - **Purpose:** MBP book rebuilt from the Kraken v2 L2 feed, checksum, crossed, locked and gap counting (`micro.book.rebuild`, H-2).

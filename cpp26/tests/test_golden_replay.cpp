@@ -151,4 +151,5 @@ TEST_CASE("stage H impact goldens") { replay("stage_h/imp_h"); }
 TEST_CASE("stage H shortfall TCA goldens") { replay("stage_h/tca_h"); }
 TEST_CASE("stage H Avellaneda-Stoikov goldens") { replay("stage_h/as_h"); }
 TEST_CASE("stage H use case 5 goldens") { replay("stage_h/uc5_h"); }
+TEST_CASE("stage H E1 non-finite input goldens") { replay("stage_h/e1_h"); }
 #endif

@@ -23,6 +23,7 @@ the closed form at the case tolerance.
 
     wsl: cd oracle/python && ~/qf-oracle-venv/bin/python -W ignore gen_stage_h_w1.py
 """
+import json
 import math
 from fractions import Fraction as Fr
 
@@ -510,7 +511,47 @@ def build():
                   description=desc)
     out["uc5_h"] = res
     assert_tables(out)
-    return [s, a, m, t, q, u], out
+    e = Suite("e1_h", SCHED, G)
+    e1_cases(e, [s, a, m, t, q, u])
+    return [s, a, m, t, q, u, e], out
+
+
+def _first_real(inputs):
+    """Path of the first binary64 input (a top-level Real, else the first Real in a top-level list)."""
+    for k, v in inputs.items():
+        if isinstance(v, float):
+            return k, None
+    for k, v in inputs.items():
+        if isinstance(v, list):
+            for i, x in enumerate(v):
+                if isinstance(x, float):
+                    return k, i
+    return None
+
+
+def e1_cases(e, suites):
+    """E1 (ruling F-2): one non-finite input per stage H operation, from its first value case; E_DOMAIN before any
+    other check. Written for tools/check_e1_coverage.py."""
+    seen = set()
+    for su in suites:
+        for c in su.cases:
+            op = c["operation"]
+            if op in seen or c["expected"]["status"] != "ok":
+                continue
+            path = _first_real(c["inputs"])
+            if path is None:  # an all-integer case (UNITS mode); the next value case of the operation has a Real
+                continue
+            seen.add(op)
+            inp = json.loads(json.dumps(c["inputs"]))
+            k, i = path
+            if i is None:
+                inp[k] = "NaN"
+            else:
+                inp[k][i] = "NaN"
+            where = k if i is None else f"{k}/{i}"
+            e.add(op, inp, error="E_DOMAIN", cls=c["tolerance_class"], verified=("hand",),
+                  tags=("stage_h", "e1", "non-finite-input"), description=f"F-2: NaN at {where} (from {c['case_id']})")
+    assert len(seen) == len({c["operation"] for su in suites for c in su.cases}), "an operation has no E1 case"
 
 
 def main():
