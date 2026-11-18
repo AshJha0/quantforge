@@ -692,9 +692,14 @@ def verify_all(folder="stage_d", show=True):
             except RuntimeError as e:  # QuantLib refused the inputs (for example a fixing on a day its calendar closes)
                 ok, why, worst = False, f"QuantLib refused: {e}", None
             if ok:
-                n_ok += 1
-                reg.append({"case_id": c["case_id"], "operation": c["operation"], "library": CM.LIBRARY, "version": CM.VERSION,
-                            "convention_rows": sorted(u.rows), "map_review": CM.REVIEW})
+                row = {"case_id": c["case_id"], "operation": c["operation"], "library": CM.LIBRARY, "version": CM.VERSION,
+                       "convention_rows": sorted(u.rows), "map_review": CM.REVIEW}
+                note = spec_closed(c)
+                if note:
+                    row["evidence_class"], row["evidence_note"] = "reimplementation", note
+                else:
+                    n_ok += 1  # agreement on a spec-closed output is recorded but not counted (H-19 honesty pass)
+                reg.append(row)
                 # The raw worst gap is not stored: near 1e-16 it differs between libm builds
                 # (Windows against Linux CI), which made the committed register non-reproducible.
             elif show:
@@ -706,19 +711,19 @@ def verify_all(folder="stage_d", show=True):
 NO_ORACLE = {
     "bondfit_d": "Nelson-Siegel fit judged on repricing; QuantLib's FittedBondDiscountCurve fits by its own optimiser path, so it cannot reproduce a golden independently of iteration path",
     "commodity_d": "no QuantLib object for monthly log-linear commodity forwards with additive seasonality or for storage carry",
-    "csa_d": "CSA (with and without FX) and OIS basis spreads count; the joint bootstrap's term-rate (USD-TERM-3M) helpers are not mapped to QuantLib objects yet; the rest are error cases",
+    "csa_d": "CSA without FX and OIS basis spreads count; CSA with FX (QuantLib curve times the spec identity spot / F(d)) agrees but is reimplementation and does not count; the joint bootstrap's term-rate (USD-TERM-3M) helpers are not mapped to QuantLib objects yet; the rest are error cases",
     "credit_d": "credit_d-0002: QuantLib IsdaCdsEngine reprices the golden 5Y pillar to 1.9e-10 in spread, above the 1e-10 reprice bar (maturity 2031-12-20 is a Saturday; spec R6-25 states about 1e-11 there); the rest are error cases",
     "equity_d": "QuantLib has no implied-dividend, implied-borrow or equity futures-basis object; its dividend handling uses other conventions",
     "fits_d": "smooth and robust curve fits are internal estimators (penalised and Huber); no QuantLib equivalent",
     "index_d": "index dividends, rebalancing and corporate actions have no QuantLib object",
-    "inflation_d": "linkers from a real yield count (QuantLib CPI.laggedFixing and BondFunctions); the CPI curve, ZCIS and linker-from-curve cases use the spec's own log-linear CPI curve with seasonality, which QuantLib's inflation curves (other interpolation and lag conventions) cannot express",
+    "inflation_d": "linkers from a real yield agree with QuantLib CPI.laggedFixing and BondFunctions but the index-ratio products are the spec's arithmetic, so they do not count; the CPI curve, ZCIS and linker-from-curve cases use the spec's own log-linear CPI curve with seasonality, which QuantLib's inflation curves (other interpolation and lag conventions) cannot express",
     "mbs_d": "QuantLib has no agency MBS pool cash-flow model",
     "rulings_d": "internal: spec rulings, mostly error and order cases",
     "rulings2_d": "internal: spec rulings, mostly error and order cases",
     "rulings_r1": "conversion factors count (QuantLib bond priced at 6% on the CME synthetic dates); the rest are spec-ruling error cases",
     "steps_d": "meeting-date step fits are internal; QuantLib ForwardCurve could replay a step curve but not the fit",
     "trs_d": "QuantLib has no equity total return swap with these legs",
-    "xccy_d": "PV, bootstrap and NDF count via QuantLib; the rest are error cases",
+    "xccy_d": "PV and bootstrap count via QuantLib OvernightLeg; NDF agrees with QuantLib discount factors but the forward and payoff are the spec's arithmetic, so it does not count; the rest are error cases",
 }
 
 
@@ -754,6 +759,7 @@ def write_map():
           "  - `infl.linker.price`: Ref CPI from QuantLib CPI.laggedFixing, real prices from BondFunctions; Treasury rounding and index-ratio products are arithmetic.",
           "  - `rates.csa.discount` with FX: QuantLib ZeroSpreadedTermStructure times the input identity spot / F(d).",
           "  - `credit.index.intrinsic`: per-name upfronts from QuantLib IsdaCdsEngine; the weighted mean is arithmetic. `credit.curve.composite`: weighted spreads, then the bootstrap reprice check.",
+          "  - Counting (honesty pass, 2026-11-18, R6-13 rule D6): where the spec's own formula finishes the compared output (asset swap, futures basis, NDF, linker, CSA with FX, index intrinsic, composite curve), the case agrees with QuantLib but is recorded as `reimplementation` in `oracle/outside_register.json` and does not count. FRN, Black-76, calendars, conversion factors (a rounded QuantLib clean price) and OIS spreads (a difference of two QuantLib fair rates) count.",
           "  - `vol.option.price`: QuantLib blackFormula. `core.calendar.*`: QuantLib UnitedStates(GovernmentBond); it agrees with ruling R1-6 on the 2023 and 2026 Good Friday early closes. `rates.basis.ois_spread`: difference of QuantLib MakeOIS fair rates.",
           "- Strata and the ISDA C library are not used for stage D counting yet.", ""]
     (ROOT / "oracle" / "CONVENTION_MAP.md").write_text("\n".join(L), encoding="utf-8", newline="\n")
@@ -783,11 +789,36 @@ def coverage_section():
     out += [f"| `{s}` | {k} | {n} | {100 * k / n:.0f}% | {NO_ORACLE.get(s, '')} |" for s, k, n in table]
     out += [f"| **stage D** | **{tot_ok}** | **{tot}** | **{100 * tot_ok / tot:.1f}%** | |", "",
             "Caveat: most counted cases are fixed-rate bonds (suite `outside_d`), so the stage-wide share leans on one product family. "
-            "Several H-19 handlers (asset swap, FRN, conversion factor, futures basis, NDF, linker, CSA with FX, index intrinsic) build the instrument "
-            "from QuantLib objects but apply the spec's own closing algebra; `oracle/CONVENTION_MAP.md` lists which part is library and which arithmetic.", ""]
+            "Several H-19 handlers (asset swap, futures basis, NDF, linker, CSA with FX, index intrinsic, composite curve) build the instrument "
+            "from QuantLib objects but apply the spec's own closing algebra; those 19 cases agree but are `reimplementation` and are not counted here "
+            "(`oracle/CONVENTION_MAP.md` lists which part is library and which arithmetic).", ""]
     (ROOT / "oracle" / "outside_register.json").write_text(json.dumps({"rule": "plan 11.2.5", "library": CM.LIBRARY, "version": CM.VERSION,
                                                                        "map_review": CM.REVIEW, "cases": reg}, indent=1) + "\n", encoding="utf-8", newline="\n")
     return out, tot_ok, tot
+
+
+# H-19 honesty pass (2026-11-18, R6-13 rule D6): where QuantLib builds the instrument but the spec's own formula
+# finishes the compared output, the case agrees with QuantLib but is a `reimplementation`, which does not count
+# toward the outside share. Fully library outputs (FRN, Black-76, calendars, CME conversion factor = rounded
+# QuantLib clean price, OIS spread = difference of two QuantLib fair rates) still count. `repo.*` predates this pass
+# and keeps its class under the earlier map review.
+SPEC_CLOSED = {
+    "bond.spread.asset_swap": "QuantLib bond engine price and unit-leg annuity; the spread (P_curve - P_market) / annuity is the spec formula",
+    "bond.futures.basis": "QuantLib accrued, coupons and ACT/360 growth; invoice, bases and implied repo are the spec algebra",
+    "fx.ndf.pv": "QuantLib discount factors; covered-parity forward and payoff value are the spec formula (QuantLib has no NDF object)",
+    "infl.linker.price": "QuantLib reference CPI and real price; Treasury rounding and index-ratio products are the spec arithmetic",
+    "credit.index.intrinsic": "QuantLib IsdaCdsEngine per-name upfronts; the weighted mean is the spec formula",
+    "credit.curve.composite": "spec weighting of the name spreads, then a QuantLib bootstrap reprice of the weighted spreads",
+}
+
+
+def spec_closed(c):
+    op = c["operation"]
+    if op == "rates.csa.discount" and c["inputs"].get("fx"):
+        why = "QuantLib spreaded curve times the spec identity spot / F(d)"
+    else:
+        why = SPEC_CLOSED.get(op)
+    return "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): " + why if why else None
 
 
 def main():

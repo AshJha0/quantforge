@@ -129,6 +129,8 @@ def classify_case_register(entries, partly):
         lib = e.get("library") or "none"
         if e["case_id"] in partly:
             cls = "none"
+        elif e.get("evidence_class") == "reimplementation":  # set by the register's generator (H-19 honesty pass)
+            cls, lib = "reimplementation", f"{lib} {e.get('version', '')}".strip() + " plus spec arithmetic"
         elif e.get("library") is None:
             cls, lib = "none", e.get("source", "published example")
         elif rows & REIMPL_ROWS:

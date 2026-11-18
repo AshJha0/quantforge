@@ -67,5 +67,6 @@ Review: self-reviewed 2026-11-07. The spec session read each spec section and th
   - `infl.linker.price`: Ref CPI from QuantLib CPI.laggedFixing, real prices from BondFunctions; Treasury rounding and index-ratio products are arithmetic.
   - `rates.csa.discount` with FX: QuantLib ZeroSpreadedTermStructure times the input identity spot / F(d).
   - `credit.index.intrinsic`: per-name upfronts from QuantLib IsdaCdsEngine; the weighted mean is arithmetic. `credit.curve.composite`: weighted spreads, then the bootstrap reprice check.
+  - Counting (honesty pass, 2026-11-18, R6-13 rule D6): where the spec's own formula finishes the compared output (asset swap, futures basis, NDF, linker, CSA with FX, index intrinsic, composite curve), the case agrees with QuantLib but is recorded as `reimplementation` in `oracle/outside_register.json` and does not count. FRN, Black-76, calendars, conversion factors (a rounded QuantLib clean price) and OIS spreads (a difference of two QuantLib fair rates) count.
   - `vol.option.price`: QuantLib blackFormula. `core.calendar.*`: QuantLib UnitedStates(GovernmentBond); it agrees with ruling R1-6 on the 2023 and 2026 Good Friday early closes. `rates.basis.ois_spread`: difference of QuantLib MakeOIS fair rates.
 - Strata and the ISDA C library are not used for stage D counting yet.

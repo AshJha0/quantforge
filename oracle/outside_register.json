@@ -623,7 +623,9 @@
     "FREQ.2",
     "GEN.BACKWARD"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib bond engine price and unit-leg annuity; the spread (P_curve - P_market) / annuity is the spec formula"
   },
   {
    "case_id": "bonds_d-0041",
@@ -639,7 +641,9 @@
     "FREQ.2",
     "GEN.BACKWARD"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib bond engine price and unit-leg annuity; the spread (P_curve - P_market) / annuity is the spec formula"
   },
   {
    "case_id": "bonds_d-0042",
@@ -655,7 +659,9 @@
     "FREQ.2",
     "GEN.BACKWARD"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib bond engine price and unit-leg annuity; the spread (P_curve - P_market) / annuity is the spec formula"
   },
   {
    "case_id": "bonds_d-0043",
@@ -671,7 +677,9 @@
     "FREQ.1",
     "GEN.BACKWARD"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib bond engine price and unit-leg annuity; the spread (P_curve - P_market) / annuity is the spec formula"
   },
   {
    "case_id": "bonds_d-0044",
@@ -687,7 +695,9 @@
     "FREQ.2",
     "GEN.BACKWARD"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib bond engine price and unit-leg annuity; the spread (P_curve - P_market) / annuity is the spec formula"
   },
   {
    "case_id": "capswaption_d-0001",
@@ -1258,7 +1268,9 @@
     "ENG.ISDA_CDS",
     "GEN.CDS2015"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib IsdaCdsEngine per-name upfronts; the weighted mean is the spec formula"
   },
   {
    "case_id": "credit_d-0011",
@@ -1276,7 +1288,9 @@
     "ENG.ISDA_CDS",
     "GEN.CDS2015"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): spec weighting of the name spreads, then a QuantLib bootstrap reprice of the weighted spreads"
   },
   {
    "case_id": "credit_d-0012",
@@ -1294,7 +1308,9 @@
     "ENG.ISDA_CDS",
     "GEN.CDS2015"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): spec weighting of the name spreads, then a QuantLib bootstrap reprice of the weighted spreads"
   },
   {
    "case_id": "credit_d-0017",
@@ -1392,7 +1408,9 @@
     "CRV.LOG_LINEAR_DF",
     "CRV.ZERO_SPREAD"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib spreaded curve times the spec identity spot / F(d)"
   },
   {
    "case_id": "csa_d-0005",
@@ -1403,7 +1421,9 @@
     "CRV.LOG_LINEAR_DF",
     "CRV.ZERO_SPREAD"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib spreaded curve times the spec identity spot / F(d)"
   },
   {
    "case_id": "csa_d-0008",
@@ -1613,7 +1633,9 @@
     "FREQ.2",
     "GEN.BACKWARD"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib reference CPI and real price; Treasury rounding and index-ratio products are the spec arithmetic"
   },
   {
    "case_id": "edge_d-0016",
@@ -1629,7 +1651,9 @@
     "FREQ.2",
     "GEN.BACKWARD"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib reference CPI and real price; Treasury rounding and index-ratio products are the spec arithmetic"
   },
   {
    "case_id": "edge_d-0017",
@@ -1645,7 +1669,9 @@
     "FREQ.2",
     "GEN.BACKWARD"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib reference CPI and real price; Treasury rounding and index-ratio products are the spec arithmetic"
   },
   {
    "case_id": "edge_d-0018",
@@ -1793,7 +1819,9 @@
     "FREQ.2",
     "GEN.BACKWARD"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib reference CPI and real price; Treasury rounding and index-ratio products are the spec arithmetic"
   },
   {
    "case_id": "inflation_d-0011",
@@ -1809,7 +1837,9 @@
     "FREQ.2",
     "GEN.BACKWARD"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib reference CPI and real price; Treasury rounding and index-ratio products are the spec arithmetic"
   },
   {
    "case_id": "ois_d-0001",
@@ -6619,7 +6649,9 @@
     "GEN.BACKWARD",
     "RATE.SIMPLE_ACT_360"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib accrued, coupons and ACT/360 growth; invoice, bases and implied repo are the spec algebra"
   },
   {
    "case_id": "rulings2_d-0001",
@@ -6864,7 +6896,9 @@
    "convention_rows": [
     "CRV.LOG_LINEAR_DF"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib discount factors; covered-parity forward and payoff value are the spec formula (QuantLib has no NDF object)"
   },
   {
    "case_id": "xccy_d-0009",
@@ -6874,7 +6908,9 @@
    "convention_rows": [
     "CRV.LOG_LINEAR_DF"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib discount factors; covered-parity forward and payoff value are the spec formula (QuantLib has no NDF object)"
   },
   {
    "case_id": "xccy_d-0010",
@@ -6884,7 +6920,9 @@
    "convention_rows": [
     "CRV.LOG_LINEAR_DF"
    ],
-   "map_review": "self-reviewed 2026-11-07"
+   "map_review": "self-reviewed 2026-11-07",
+   "evidence_class": "reimplementation",
+   "evidence_note": "H-19 honesty pass 2026-11-18 (R6-13: spec formula around library values does not count): QuantLib discount factors; covered-parity forward and payoff value are the spec formula (QuantLib has no NDF object)"
   }
  ]
 }
