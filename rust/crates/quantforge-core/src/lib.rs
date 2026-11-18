@@ -34,6 +34,7 @@ pub mod daycount;
 pub mod equity;
 pub mod equity_carry;
 pub mod error;
+pub mod execution;
 pub mod exotics;
 pub mod frtb;
 pub mod frtb2;

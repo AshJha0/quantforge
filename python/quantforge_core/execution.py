@@ -17,6 +17,7 @@ from .finite import guard
 
 MODES = ("UNITS", "CONTINUOUS")
 SIDES = ("BUY", "SELL")
+MODEL = "assumed parameters; not calibrated to any venue"  # HR-10
 
 
 def _fail(code: str, message: str, field: str) -> QfError:
@@ -111,7 +112,12 @@ def schedule_pov(
 
 
 def _ac_check(
-    quantity: float, horizon: float, n_steps: int, sigma: float, epsilon: float, eta: float,
+    quantity: float,
+    horizon: float,
+    n_steps: int,
+    sigma: float,
+    epsilon: float,
+    eta: float,
     gamma: float,
 ) -> float:
     """The [AC00] checks in the order of almgren-chriss.md (eta_tilde, sigma, T, then N), then the
@@ -148,8 +154,15 @@ def _sinh_ratio(a: float, b: float) -> float:
 
 
 def _ac_point(
-    quantity: float, horizon: float, n_steps: int, sigma: float, epsilon: float, eta: float,
-    gamma: float, lam: float, eta_tilde: float,
+    quantity: float,
+    horizon: float,
+    n_steps: int,
+    sigma: float,
+    epsilon: float,
+    eta: float,
+    gamma: float,
+    lam: float,
+    eta_tilde: float,
 ) -> dict[str, Any]:
     tau = horizon / n_steps
     if lam < 0:
@@ -182,8 +195,14 @@ def _ac_point(
 
 
 def ac_trajectory(
-    quantity: float, horizon: float, n_steps: int, sigma: float, epsilon: float, eta: float,
-    gamma: float, risk_aversion: float,
+    quantity: float,
+    horizon: float,
+    n_steps: int,
+    sigma: float,
+    epsilon: float,
+    eta: float,
+    gamma: float,
+    risk_aversion: float,
 ) -> dict[str, Any]:
     """`exec.ac.trajectory`: x_j = X sinh(kappa (T - t_j)) / sinh(kappa T), [AC00] eq. (17)."""
     et = _ac_check(quantity, horizon, n_steps, sigma, epsilon, eta, gamma)
@@ -191,8 +210,14 @@ def ac_trajectory(
 
 
 def ac_frontier(
-    quantity: float, horizon: float, n_steps: int, sigma: float, epsilon: float, eta: float,
-    gamma: float, risk_aversions: Sequence[float],
+    quantity: float,
+    horizon: float,
+    n_steps: int,
+    sigma: float,
+    epsilon: float,
+    eta: float,
+    gamma: float,
+    risk_aversions: Sequence[float],
 ) -> dict[str, Any]:
     """`exec.ac.frontier`: one (lambda, E, V) per entry, in input order."""
     et = _ac_check(quantity, horizon, n_steps, sigma, epsilon, eta, gamma)
@@ -224,7 +249,10 @@ def impact_sqrt(
         raise _fail("E_DOMAIN", "daily_vol must be non-negative", "daily_vol")
     if coefficient < 0:
         raise _fail("E_DOMAIN", "coefficient must be non-negative", "coefficient")
-    return {"impact": coefficient * daily_vol * math.sqrt(quantity / daily_volume)}
+    return {
+        "impact": coefficient * daily_vol * math.sqrt(quantity / daily_volume),
+        "model": MODEL,
+    }
 
 
 def impact_ow_optimal(quantity: float, horizon: float, resilience: float) -> dict[str, Any]:

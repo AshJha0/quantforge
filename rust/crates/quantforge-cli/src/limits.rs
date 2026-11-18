@@ -105,6 +105,9 @@ fn operation_above(op: &str, i: &Json) -> bool {
             widest(i, &["expiries", "strikes", "vols", "holdout"]) > 1_000
         }
         "research.drift.psi" => above(i, "bins", 1_000),
+        // Stage H wave 1 (HR-9): schedule buckets and AC steps 100,000.
+        "exec.schedule.twap" => above(i, "n_buckets", 100_000),
+        "exec.ac.trajectory" | "exec.ac.frontier" => above(i, "n_steps", 100_000),
         "research.drift.ks" => product_above(len(i, "a"), len(i, "b"), 4_000_000),
         "research.regime.baum_welch" => {
             // Ruling J-W2-18: K is the longest of the four state inputs.
@@ -307,6 +310,7 @@ fn raised_array_keys(op: &str) -> &'static [&'static str] {
         "risk.backtest.christoffersen" => &["exceptions"],
         "book.lifecycle.apply" => &["events"],
         "research.backtest.run" => &["prices", "targets"],
+        "exec.tca.shortfall" => &["fills"], // ruling HR-9: 1,000,000 fills
         "research.cv.purged_kfold" => &["t0", "t1"],
         "research.regime.baum_welch" => &["observations"],
         "risk.backtest.es_z2" => &["losses", "var", "es"],
