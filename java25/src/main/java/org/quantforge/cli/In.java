@@ -52,7 +52,8 @@ final class In {
                 || operation.equals("risk.contrib.euler") || operation.equals("risk.backtest.es_z2")
                 || operation.startsWith("research.drift.") || operation.startsWith("risk.scenario.")
                 || operation.equals("exec.tca.shortfall")
-                || operation.equals("micro.book.rebuild") || operation.equals("exec.sim.lit.run");
+                || operation.equals("micro.book.rebuild") || operation.equals("exec.sim.lit.run")
+                || operation.equals("exec.sim.dark.run") || operation.equals("exec.sor.allocate");
     }
 
     private void scanArrays(Object v) {
