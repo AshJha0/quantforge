@@ -21,6 +21,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 env:
+  # Account-free Central fallback for HTTP 429 (CI only; checksums fail on mismatch): java25/.mvn/ci-settings.xml
+  MAVEN_ARGS: --settings ${{ github.workspace }}/java25/.mvn/ci-settings.xml
   MACHINE: github-ubuntu-24.04
   INJECT_NS: '200000'
 jobs:

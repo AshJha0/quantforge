@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CI-only Maven settings (used by the workflows through MAVEN_ARGS; local builds do not read this file).
+  Maven Central answers bursts from shared GitHub runner addresses with HTTP 429. maven.config already retries
+  8 x 15 s; this adds a second, account-free copy of Central (the Google Cloud Storage mirror listed in the
+  Maven Central mirror guide). The resolver asks central first and moves to the fallback only when central
+  fails for that file. Checksum verification is tightened, not relaxed: both repositories use
+  checksumPolicy=fail, so a file whose checksum does not match is rejected, whichever host served it.
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
+  <profiles>
+    <profile>
+      <id>central-fallback</id>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repo.maven.apache.org/maven2</url>
+          <releases><enabled>true</enabled><checksumPolicy>fail</checksumPolicy></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+        <repository>
+          <id>central-gcs-mirror</id>
+          <url>https://maven-central.storage-download.googleapis.com/maven2</url>
+          <releases><enabled>true</enabled><checksumPolicy>fail</checksumPolicy></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>https://repo.maven.apache.org/maven2</url>
+          <releases><enabled>true</enabled><checksumPolicy>fail</checksumPolicy></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </pluginRepository>
+        <pluginRepository>
+          <id>central-gcs-mirror</id>
+          <url>https://maven-central.storage-download.googleapis.com/maven2</url>
+          <releases><enabled>true</enabled><checksumPolicy>fail</checksumPolicy></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>central-fallback</activeProfile>
+  </activeProfiles>
+</settings>
