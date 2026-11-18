@@ -97,6 +97,9 @@ public final class CurveFits {
 
     public record Robust(double[] betas, double[] residuals, int[] outliers, double objective) {}
 
+    /** Working-set changes allowed before {@code robust} gives up (never reached at full rank). */
+    private static final int ROBUST_ITERATIONS = 1000;
+
     public static Robust robust(double[] m, double[] y, double tau, double delta) {
         Finite.check("m", m);
         Finite.check("y", y);
@@ -122,38 +125,61 @@ public final class CurveFits {
             x[j][1] = e;
             x[j][2] = e - Math.exp(-u);
         }
-        double[] beta = weighted(x, y, new double[n], delta, null);
-        double obj = objective(x, y, beta, delta);
-        for (int it = 0; it < 500; it++) {
-            double[] r = residuals(x, y, beta);
-            double[] next = newton(x, y, r, delta);
-            if (next == null) {
-                next = irls(x, y, r, delta);
-            }
-            double[] p = new double[3];
-            for (int i = 0; i < 3; i++) {
-                p[i] = next[i] - beta[i];
-            }
-            double step = 1.0;
-            double[] trial = beta;
-            double trialObj = obj;
-            for (int h = 0; h < 60; h++) {
-                double[] cand = {beta[0] + step * p[0], beta[1] + step * p[1], beta[2] + step * p[2]};
-                double co = objective(x, y, cand, delta);
-                if (co <= obj) {
-                    trial = cand;
-                    trialObj = co;
-                    break;
+        // Primal active-set method on the dual (Nocedal and Wright, algorithm 16.3); the Python
+        // implementation carries the full derivation. theta is the dual point, bound[j] the sign
+        // s_j of a theta_j held at s_j delta (0 when free); the betas solve the inlier/outlier
+        // normal equations of the current working set.
+        double[] theta = new double[n];
+        double[] bound = new double[n];
+        double[] beta = null;
+        for (int it = 0; it < ROBUST_ITERATIONS && beta == null; it++) {
+            double[] b = weighted(x, y, bound, delta, null);
+            double[] r = residuals(x, y, b);
+            double alpha = 1.0;
+            int block = -1;
+            for (int j = 0; j < n; j++) {
+                double p = r[j] - theta[j];
+                if (bound[j] != 0.0 || p == 0.0) {
+                    continue;
                 }
-                step /= 2.0;
+                double limit = ((p > 0.0 ? delta : -delta) - theta[j]) / p;
+                if (limit < alpha) {
+                    alpha = limit;
+                    block = j;
+                }
             }
-            boolean same = trial[0] == beta[0] && trial[1] == beta[1] && trial[2] == beta[2];
-            beta = trial;
-            obj = trialObj;
-            if (same) {
-                break;
+            if (block >= 0) {
+                for (int j = 0; j < n; j++) {
+                    if (bound[j] == 0.0) {
+                        theta[j] += alpha * (r[j] - theta[j]);
+                    }
+                }
+                bound[block] = r[block] - theta[block] > 0.0 ? 1.0 : -1.0;
+                theta[block] = bound[block] * delta;
+                continue;
+            }
+            for (int j = 0; j < n; j++) {
+                theta[j] = bound[j] == 0.0 ? r[j] : bound[j] * delta;
+            }
+            double worst = 0.0;
+            int leave = -1;
+            for (int j = 0; j < n; j++) {
+                double m2 = bound[j] * r[j] - delta;
+                if (bound[j] != 0.0 && m2 < worst) {
+                    worst = m2;
+                    leave = j;
+                }
+            }
+            if (leave >= 0) {
+                bound[leave] = 0.0;
+            } else {
+                beta = b;
             }
         }
+        if (beta == null) {
+            throw new QfError("E_NO_CONVERGENCE", "the Huber fit did not settle");
+        }
+        double obj = objective(x, y, beta, delta);
         double[] r = residuals(x, y, beta);
         List<Integer> out = new ArrayList<>();
         for (int j = 0; j < n; j++) {
@@ -179,28 +205,6 @@ public final class CurveFits {
             s += a <= delta ? r * r / 2.0 : delta * a - delta * delta / 2.0;
         }
         return s;
-    }
-
-    /** The exact minimiser for the inlier set and outlier signs that {@code r} implies; null if singular. */
-    private static double[] newton(double[][] x, double[] y, double[] r, double delta) {
-        double[] sign = new double[y.length];
-        for (int j = 0; j < y.length; j++) {
-            sign[j] = Math.abs(r[j]) <= delta ? 0.0 : Math.signum(r[j]);
-        }
-        try {
-            return weighted(x, y, sign, delta, null);
-        } catch (QfError e) {
-            return null;
-        }
-    }
-
-    /** One reweighted least-squares step, for when too few inliers remain for {@link #newton}. */
-    private static double[] irls(double[][] x, double[] y, double[] r, double delta) {
-        double[] w = new double[y.length];
-        for (int j = 0; j < y.length; j++) {
-            w[j] = Math.abs(r[j]) <= delta ? 1.0 : delta / Math.abs(r[j]);
-        }
-        return weighted(x, y, new double[y.length], delta, w);
     }
 
     /**

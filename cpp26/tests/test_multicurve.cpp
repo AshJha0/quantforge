@@ -1,5 +1,6 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <algorithm>
 #include <cmath>
 
 #include "quantforge/core/error.hpp"
@@ -294,4 +295,28 @@ TEST_CASE("SOFR compounding skips every Good Friday (ruling R1-6)") {
     const auto r = compound_dated(sofr, *parse_date("2021-03-31"), *parse_date("2021-04-06"), ShiftMethod::None, 0, fx);
     CHECK(r.compounded_rate > 0.0);
     CHECK_THROWS(compound_dated(sofr, gf, *parse_date("2021-04-06"), ShiftMethod::None, 0, fx));
+}
+
+// Valid input where the old robust fit failed: at the minimum one residual sits within 1e-7 of
+// delta (mutation re-check 2026-11-18). Not a golden, because the spec keeps golden residuals 1e-6
+// from delta. The same input is in the Python, Java and Rust tests.
+TEST_CASE("Huber Nelson-Siegel with a residual near delta") {
+    const Vec m{3.8740307873000113, 7.757472624115791, 24.769272470090453, 24.76936904673551};
+    const Vec y{0.022406223051166397, 0.0025821078676810487, 0.052253746187190836, 0.04025167916426023};
+    const double tau = 2.1121330519140273, delta = 0.0010283264459667806;
+    const auto r = robust_fit(m, y, tau, delta);
+    double nearest = 1.0;
+    for (int k = 0; k < 3; ++k) {
+        double g = 0.0;
+        for (std::size_t j = 0; j < m.size(); ++j) {
+            const double u = m[j] / tau, e = -std::expm1(-u) / u;
+            const double xk = k == 0 ? 1.0 : k == 1 ? e : e - std::exp(-u);
+            g += std::max(-delta, std::min(delta, r.residuals[j])) * xk;
+            nearest = std::min(nearest, std::fabs(std::fabs(r.residuals[j]) - delta));
+        }
+        CHECK(std::fabs(g) < 1e-14);
+    }
+    CHECK(nearest < 1e-7);
+    REQUIRE(r.outliers.size() == 1);
+    CHECK(r.outliers[0] == 2);
 }

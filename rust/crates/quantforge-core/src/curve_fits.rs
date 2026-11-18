@@ -1,6 +1,6 @@
 //! Regularised and outlier-robust curve fits (`curve-fits.md`).
 
-use crate::error::{Result, err, fail};
+use crate::error::{Result, fail};
 use crate::linalg::solve;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -129,8 +129,11 @@ fn residuals(x: &[[f64; 3]], y: &[f64], b: &[f64; 3]) -> Vec<f64> {
         .collect()
 }
 
-/// `calib.curve.robust`: Nelson-Siegel with fixed `tau`, Huber loss. IRLS to find the region,
-/// then exact Newton steps on the inlier set and outlier signs until they stop changing.
+/// Working-set changes allowed before `robust` gives up (never reached at full rank).
+const ROBUST_ITERATIONS: usize = 1000;
+
+/// `calib.curve.robust`: Nelson-Siegel with fixed `tau`, Huber loss. An active-set method on the
+/// dual finds the outlier set and signs exactly; the betas solve the inlier/outlier normal equations.
 pub fn robust(maturities: &[f64], zero_rates: &[f64], tau: f64, delta: f64) -> Result<Robust> {
     crate::error::finite("maturities", &maturities)?;
     crate::error::finite("zero_rates", &zero_rates)?;
@@ -144,55 +147,70 @@ pub fn robust(maturities: &[f64], zero_rates: &[f64], tau: f64, delta: f64) -> R
         return fail("E_DOMAIN", "tau, delta and maturities must be positive");
     }
     let x: Vec<[f64; 3]> = maturities.iter().map(|m| ns_row(*m, tau)).collect();
-    let mut b = normal_solve(&x, zero_rates, &vec![1.0; n], [0.0; 3])?;
-    for _ in 0..200 {
-        let w: Vec<f64> = residuals(&x, zero_rates, &b)
-            .iter()
-            .map(|r| {
-                if r.abs() <= delta {
-                    1.0
-                } else {
-                    delta / r.abs()
-                }
-            })
-            .collect();
-        b = normal_solve(&x, zero_rates, &w, [0.0; 3])?;
-    }
-    let pattern = |r: &[f64]| -> Vec<i8> {
-        r.iter()
-            .map(|v| {
-                if v.abs() <= delta {
-                    0
-                } else if *v > 0.0 {
-                    1
-                } else {
-                    -1
-                }
-            })
-            .collect()
-    };
-    let mut last = pattern(&residuals(&x, zero_rates, &b));
-    let mut stable = false;
-    for _ in 0..100 {
-        let w: Vec<f64> = last.iter().map(|s| f64::from(*s == 0)).collect();
+    // Primal active-set method on the dual (Nocedal and Wright, algorithm 16.3); the Python
+    // implementation carries the full derivation. theta is the dual point, bound[j] the sign
+    // s_j of a theta_j held at s_j delta (0 when free); the betas solve the inlier/outlier
+    // normal equations of the current working set.
+    let mut theta = vec![0.0; n];
+    let mut bound = vec![0_i8; n];
+    let mut solved = None;
+    for _ in 0..ROBUST_ITERATIONS {
+        let w: Vec<f64> = bound.iter().map(|s| f64::from(*s == 0)).collect();
         let mut g = [0.0; 3];
-        for (row, s) in x.iter().zip(&last) {
+        for (row, s) in x.iter().zip(&bound) {
             for p in 0..3 {
                 g[p] += delta * f64::from(*s) * row[p];
             }
         }
-        b = normal_solve(&x, zero_rates, &w, g)
-            .map_err(|_| err("E_NO_CONVERGENCE", "too few inliers to fix the betas"))?;
-        let next = pattern(&residuals(&x, zero_rates, &b));
-        if next == last {
-            stable = true;
+        let b = normal_solve(&x, zero_rates, &w, g)?;
+        let r = residuals(&x, zero_rates, &b);
+        let (mut alpha, mut block) = (1.0, None);
+        for j in 0..n {
+            let p = r[j] - theta[j];
+            if bound[j] != 0 || p == 0.0 {
+                continue;
+            }
+            let limit = ((if p > 0.0 { delta } else { -delta }) - theta[j]) / p;
+            if limit < alpha {
+                alpha = limit;
+                block = Some(j);
+            }
+        }
+        if let Some(k) = block {
+            for j in 0..n {
+                if bound[j] == 0 {
+                    theta[j] += alpha * (r[j] - theta[j]);
+                }
+            }
+            bound[k] = if r[k] - theta[k] > 0.0 { 1 } else { -1 };
+            theta[k] = f64::from(bound[k]) * delta;
+            continue;
+        }
+        for j in 0..n {
+            theta[j] = if bound[j] == 0 {
+                r[j]
+            } else {
+                f64::from(bound[j]) * delta
+            };
+        }
+        let (mut worst, mut leave) = (0.0, None);
+        for j in 0..n {
+            let m = f64::from(bound[j]) * r[j] - delta;
+            if bound[j] != 0 && m < worst {
+                worst = m;
+                leave = Some(j);
+            }
+        }
+        if let Some(j) = leave {
+            bound[j] = 0;
+        } else {
+            solved = Some(b);
             break;
         }
-        last = next;
     }
-    if !stable || b.iter().any(|v| !v.is_finite()) {
+    let Some(b) = solved else {
         return fail("E_NO_CONVERGENCE", "the Huber fit did not settle");
-    }
+    };
     let r = residuals(&x, zero_rates, &b);
     let objective = r
         .iter()
@@ -311,5 +329,39 @@ mod tests {
             robust(&[0.0, 1.0, 2.0], &y, 2.0, 0.1).unwrap_err().code,
             "E_DOMAIN"
         );
+    }
+
+    /// Valid input where the old robust fit failed: at the minimum one residual sits within 1e-7
+    /// of delta (mutation re-check 2026-11-18). Not a golden, because the spec keeps golden
+    /// residuals 1e-6 from delta. The same input is in the Python, Java and C++ tests.
+    #[test]
+    fn robust_converges_with_a_residual_near_delta() {
+        let m = [
+            3.8740307873000113,
+            7.757472624115791,
+            24.769272470090453,
+            24.76936904673551,
+        ];
+        let y = [
+            0.022406223051166397,
+            0.0025821078676810487,
+            0.052253746187190836,
+            0.04025167916426023,
+        ];
+        let (tau, delta) = (2.1121330519140273, 0.0010283264459667806);
+        let fit = robust(&m, &y, tau, delta).unwrap();
+        let mut g = [0.0; 3];
+        let mut nearest = f64::MAX;
+        for (j, mj) in m.iter().enumerate() {
+            let x = ns_row(*mj, tau);
+            let r = fit.residuals[j];
+            for p in 0..3 {
+                g[p] += r.clamp(-delta, delta) * x[p];
+            }
+            nearest = nearest.min((r.abs() - delta).abs());
+        }
+        assert!(g.iter().all(|v| v.abs() < 1e-14), "{g:?}");
+        assert!(nearest < 1e-7);
+        assert_eq!(fit.outliers, vec![2]);
     }
 }

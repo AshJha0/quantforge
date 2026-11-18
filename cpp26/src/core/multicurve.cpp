@@ -379,56 +379,57 @@ RobustFit robust_fit(const std::vector<double>& m, const std::vector<double>& y,
             }
         return solve_linear(a, rhs);
     };
-    // Exact minimiser for a fixed inlier/outlier split; a split that reproduces itself is the minimum.
-    const auto split_of = [&](const std::vector<double>& r) {
-        std::vector<int> s(n);
-        for (std::size_t j = 0; j < n; ++j) s[j] = std::fabs(r[j]) <= delta ? 0 : (r[j] > 0.0 ? 1 : -1);
-        return s;
-    };
-    const auto solve_split = [&](const std::vector<int>& s) {
+    // Primal active-set method on the dual (Nocedal and Wright, algorithm 16.3); the Python
+    // implementation carries the full derivation. theta is the dual point, bound[j] the sign
+    // s_j of a theta_j held at s_j delta (0 when free); the betas solve the inlier/outlier
+    // normal equations of the current working set.
+    constexpr int robust_iterations = 1000;  // never reached at full rank
+    std::vector<double> theta(n, 0.0), bound(n, 0.0), b;
+    bool done = false;
+    for (int it = 0; it < robust_iterations && !done; ++it) {
         std::vector<double> w(n), c(n);
         for (std::size_t j = 0; j < n; ++j) {
-            w[j] = s[j] == 0 ? 1.0 : 0.0;
-            c[j] = s[j] == 0 ? 0.0 : delta * s[j];
+            w[j] = bound[j] == 0.0 ? 1.0 : 0.0;
+            c[j] = delta * bound[j];
         }
-        return solve(w, c);
-    };
-    std::vector<double> b = solve(std::vector<double>(n, 1.0), std::vector<double>(n, 0.0));
-    std::set<std::vector<int>> seen;
-    bool done = false;
-    for (int it = 0; it < 200 && !done; ++it) {
-        const auto s = split_of(residuals(b));
-        if (!seen.insert(s).second) break;
-        try {
-            const auto next = solve_split(s);
-            if (split_of(residuals(next)) == s) {
-                b = next;
-                done = true;
-            } else {
-                b = next;
+        const std::vector<double> next = solve(w, c);
+        const std::vector<double> r = residuals(next);
+        double alpha = 1.0;
+        std::size_t block = n;
+        for (std::size_t j = 0; j < n; ++j) {
+            const double p = r[j] - theta[j];
+            if (bound[j] != 0.0 || p == 0.0) continue;
+            const double limit = ((p > 0.0 ? delta : -delta) - theta[j]) / p;
+            if (limit < alpha) {
+                alpha = limit;
+                block = j;
             }
-        } catch (const Error&) {
-            break;
         }
-    }
-    if (!done) {  // IRLS, then the exact split solve
-        for (int it = 0; it < 20000; ++it) {
-            const auto r = residuals(b);
-            std::vector<double> w(n);
-            for (std::size_t j = 0; j < n; ++j) w[j] = std::fabs(r[j]) <= delta ? 1.0 : delta / std::fabs(r[j]);
-            const auto next = solve(w, std::vector<double>(n, 0.0));
-            double change = 0.0;
-            for (int k = 0; k < 3; ++k) change = std::max(change, std::fabs(next[k] - b[k]));
+        if (block < n) {
+            for (std::size_t j = 0; j < n; ++j)
+                if (bound[j] == 0.0) theta[j] += alpha * (r[j] - theta[j]);
+            bound[block] = r[block] - theta[block] > 0.0 ? 1.0 : -1.0;
+            theta[block] = bound[block] * delta;
+            continue;
+        }
+        for (std::size_t j = 0; j < n; ++j) theta[j] = bound[j] == 0.0 ? r[j] : bound[j] * delta;
+        double worst = 0.0;
+        std::size_t leave = n;
+        for (std::size_t j = 0; j < n; ++j) {
+            const double m2 = bound[j] * r[j] - delta;
+            if (bound[j] != 0.0 && m2 < worst) {
+                worst = m2;
+                leave = j;
+            }
+        }
+        if (leave < n) {
+            bound[leave] = 0.0;
+        } else {
             b = next;
-            if (change < 1e-17) break;
-        }
-        try {
-            const auto s = split_of(residuals(b));
-            const auto next = solve_split(s);
-            if (split_of(residuals(next)) == s) b = next;
-        } catch (const Error&) {
+            done = true;
         }
     }
+    if (!done) throw Error("E_NO_CONVERGENCE", "the Huber fit did not settle");
     RobustFit out{b, residuals(b), {}, 0.0};
     for (std::size_t j = 0; j < n; ++j) {
         const double a = std::fabs(out.residuals[j]);

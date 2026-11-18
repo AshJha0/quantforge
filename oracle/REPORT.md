@@ -143,7 +143,7 @@ csa_d: joint bootstrap agrees with QuantLib's two-step build within 1e-10
 suite csa_d: 13 cases (10 value-checked, 3 error)
 fits_d: smoothness-regularised forward fits solved in exact rationals; NumPy agrees within 1e-9
 fits_d: Huber Nelson-Siegel fits (fixed tau) agree with SciPy least_squares loss='huber' from three starts within 1e-8
-suite fits_d: 16 cases (8 value-checked, 8 error)
+suite fits_d: 19 cases (11 value-checked, 8 error)
 stage D: 65 wrong-convention checks, each caught
   mutant ois_d: ESTR payment lag 1 instead of 2: gap 1.873e-04
   mutant ois_d: SOFR turn of year ignored: gap 4.675e-07
@@ -360,7 +360,7 @@ Written by `oracle/python/outside_d.py`. A case counts only if QuantLib 1.44, bu
 | `csa_d` | 6 | 13 | 46% | CSA without FX and OIS basis spreads count; CSA with FX (QuantLib curve times the spec identity spot / F(d)) agrees but is reimplementation and does not count; the joint bootstrap's term-rate (USD-TERM-3M) helpers are not mapped to QuantLib objects yet; the rest are error cases |
 | `edge_d` | 21 | 24 | 88% |  |
 | `equity_d` | 0 | 10 | 0% | QuantLib has no implied-dividend, implied-borrow or equity futures-basis object; its dividend handling uses other conventions |
-| `fits_d` | 0 | 16 | 0% | smooth and robust curve fits are internal estimators (penalised and Huber); no QuantLib equivalent |
+| `fits_d` | 0 | 19 | 0% | smooth and robust curve fits are internal estimators (penalised and Huber); no QuantLib equivalent |
 | `futures_d` | 6 | 10 | 60% |  |
 | `index_d` | 0 | 12 | 0% | index dividends, rebalancing and corporate actions have no QuantLib object |
 | `inflation_d` | 0 | 13 | 0% | linkers from a real yield agree with QuantLib CPI.laggedFixing and BondFunctions but the index-ratio products are the spec's arithmetic, so they do not count; the CPI curve, ZCIS and linker-from-curve cases use the spec's own log-linear CPI curve with seasonality, which QuantLib's inflation curves (other interpolation and lag conventions) cannot express |
