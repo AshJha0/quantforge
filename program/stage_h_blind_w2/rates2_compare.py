@@ -39,7 +39,7 @@ def main():
     gold = {}
     for s in ("rtc_h", "fut_h"):
         for c in json.loads((ROOT / f"datasets/golden/stage_h/{s}.json").read_text(encoding="utf-8"))["cases"]:
-            gold[c["case_id"]] = c["expected"]["outputs"]
+            gold[c["case_id"]] = c["expected"].get("outputs")
     for cid in CASES:
         if cid not in blind:
             print(cid, "MISSING")
