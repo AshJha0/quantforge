@@ -186,7 +186,7 @@ private:
 
 inline void AcParams::check() const {
     // The kernel's own check (E_INPUT / E_DOMAIN, almgren-chriss.md order), run once here so an AcParams is valid.
-    (void)kx::ac_frontier(p_, {});
+    (void)kx::ac_trajectory(p_, 0.0);
 }
 
 /// exec.schedule.twap
