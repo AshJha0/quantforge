@@ -17,8 +17,6 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "specifications" / "name-map.json"
 OP = re.compile(r"`([a-z]+(?:\.[a-z0-9_]+){2,3})`")
 UNIT_SUFFIXES = ("_years", "_days", "_bp", "_pct", "_minutes", "_months", "_ns")
-# Operations whose first naming page (path order) is not their spec page.
-SPEC_OVERRIDES = {"micro.book.rebuild": "specifications/09-microstructure/order-book.md"}
 UNIT_WORDS = ("expiry", "maturity", "tenor", "horizon", "spread", "shift", "bump")
 
 
@@ -35,7 +33,9 @@ def golden_ops():
         if not isinstance(doc, dict):
             continue
         for c in doc.get("cases", []):
-            k = keys.setdefault(c["operation"], {"inputs": set(), "outputs": set(), "spec": doc.get("spec")})
+            k = keys.setdefault(c["operation"], {"inputs": set(), "outputs": set(), "spec": doc.get("spec"), "specs": set()})
+            if doc.get("spec") and "e1" not in c.get("tags", []):  # E1 suites name one page for several specs
+                k["specs"].add(doc["spec"])
             if isinstance(c.get("inputs"), dict):
                 k["inputs"].update(c["inputs"])
             outs = (c.get("expected") or {}).get("outputs")
@@ -47,24 +47,28 @@ def golden_ops():
 def spec_ops():
     """First page naming each operation; the limits table (01-core/limits.md) only as a last
     resort, since a limits row is not an operation's spec page."""
-    found, limits = {}, {}
+    found, limits, pages = {}, {}, {}
     for p in sorted((ROOT / "specifications").rglob("*.md")):
         rel = p.relative_to(ROOT).as_posix()
         target = limits if rel == "specifications/01-core/limits.md" else found
         for m in OP.finditer(p.read_text(encoding="utf-8")):
             target.setdefault(m.group(1), rel)
-    return {**limits, **found}
+            if target is found and rel not in pages.setdefault(m.group(1), []):
+                pages[m.group(1)].append(rel)
+    return {**limits, **found}, pages
 
 
 def build():
-    gold, specs = golden_ops(), spec_ops()
+    gold, (specs, pages) = golden_ops(), spec_ops()
     rows, warnings = {}, []
     for op in sorted(gold):
         dom, area, verb = op.split(".")[0], op.split(".")[1], "_".join(op.split(".")[2:])
         fn = f"{area}_{verb}"
         k = gold[op]
         rows[op] = {
-            "spec": SPEC_OVERRIDES.get(op) or specs.get(op) or k["spec"],
+            # The operation's own spec page: a page that names it and is the `spec` of one of its value golden
+            # suites wins; otherwise the first page naming it in path order (the limits table last).
+            "spec": next((pg for pg in pages.get(op, []) if pg in k["specs"]), None) or specs.get(op) or k["spec"],
             "rust": f"quantforge::{dom}::{fn}",
             "python": f"quantforge.{dom}.{fn}",
             "java": f"{camel(dom, True)}.{camel(area)}{camel(verb, True)}",

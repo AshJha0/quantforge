@@ -29,3 +29,25 @@ Process: `program/STAGE_H_BLIND_LANE.md` (DR-H2, HR-31).
 
 No spec golden value was wrong, and the blind lane made no value errors. No rerun.
 3. HR-75 as amended (HR-66) (coordinator decision, 2026-11-18, after the implementation lane started) replaces HR-75 with the repo-wide order: structural `E_INPUT`, then `E_DOMAIN`. venue_h-0008 is now `E_INPUT`. mest_h-0006 is now `E_INPUT` (n = 2 is structural); its blind MATCH was under the old order and is no longer claimed, so the golden carries `hand` only.
+
+## Field-by-field re-compare (2026-11-18, coordinator decision)
+
+Why: the compare above matched numbers as sorted multisets, which cannot see two values swapped between fields, so its SHAPE-ONLY cases were not counted on trust. The spec now fixes every output name, so the blind names are mapped to the spec names with one fixed, one-to-one table and compared leaf by leaf. No re-derivation; the frozen blind file is unchanged.
+
+- Frozen file: `stage_h_blind/micro/blind_results.json` (copied unedited from the blind lane's directory with `blind_ref.py`, `notes.md`, `LEAKS.txt` and `blind_results.sha256`); SHA-256 `975000bfcf123c983b3e444f6234685ce2b666378405f173585ab9318a6bf0f3`, checked by the script before it reads the file.
+- Script: `python -I program/stage_h_blind_w2/micro_fieldwise.py .`
+- Name map (`FIELD_MAP` in the script): `beta` to `lambda_as`, `SE` to `se`; `lambda`, `theta`, `kappa`, `alpha`, `delta`, `ratio`, `markout`, `markout_bps`, `toxicity` unchanged. Structure: a regime key `<label>` to `regimes.<label>`; `<V>|h=<H>` to the `markouts` element with venue V and horizon H; `fill_rate|<V>` to `fill_rates.<V>`. The table was written before the first run; the first run stopped on the identity names (`lambda` and so on, which the first draft left out because they need no renaming), and they were added as identity entries. No entry maps one name to another after a value was seen.
+- Rule: a case counts only when every blind leaf maps to a golden output, every golden output is reached by one blind leaf, and each pair agrees to 1e-12 relative (1e-15 absolute at 0). Error cases compare the code.
+
+| Case | Field-by-field result |
+|---|---|
+| mest_h-0001..0005, 0007..0011 | MATCH (0008 and 0009 were SHAPE-ONLY; now counted) |
+| mest_h-0006 | not counted: golden is `E_INPUT` under HR-75 as amended (HR-66); the blind lane said `E_DOMAIN` under the old order |
+| venue_h-0001..0003 | not counted: the blind lane gave markouts only, no `fill_rates` |
+| venue_h-0004 | not counted: the blind lane gave fill rates only, no (empty) `markouts` |
+| venue_h-0005, 0007 | MATCH (error code) |
+| venue_h-0006 | not counted: not blind (input changed after the blind lane) |
+
+Effect: H-4b 7 of 7 value cases blind-checked (was 5 of 7). H-16 stays 0 of 5 value cases, under the 60% item floor: no venue value case has every output field from the blind lane.
+
+Wave 2b (`STAGE_H_BLIND_WAVE2B.md`) used a keyed canonical-JSON compare, not a sorted-list one, and its SHAPE-ONLY cases were never counted, so the rule changes nothing there.

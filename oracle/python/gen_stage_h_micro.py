@@ -25,6 +25,8 @@ SPEC_V = "specifications/10-execution/venue-analytics.md"
 REC = "program/STAGE_H_BLIND_MICRO.md"
 MATCH = f"blind-rederivation (DR-H2, {REC}): MATCH"
 SHAPE = f"blind-rederivation (DR-H2, {REC}): SHAPE-ONLY, values identical"
+# Field-by-field re-compare (program/stage_h_blind_w2/micro_fieldwise.py, fixed name map, frozen file SHA-256 checked).
+FIELDWISE = f"blind-rederivation (DR-H2, {REC}): MATCH field by field under the fixed name map"
 MP = "mpmath 50 digits"
 TOL = {"absolute": 1e-15, "relative": 1e-12}  # both specs: 1e-12 relative, an expected 0 to 1e-15 absolute
 mp.mp.dps = 50
@@ -159,7 +161,7 @@ def mest_suite():
     s = Suite("mest_h", SPEC_M, G)
     for cid, op, inp, exp in MEST:
         verified = (["hand"] if cid == "mest_h-0006"  # HR-75 as amended (HR-66) re-derivation; the blind MATCH was under HR-75
-                    else ["hand", SHAPE] if cid in ("mest_h-0008", "mest_h-0009") else ["hand", MATCH])
+                    else ["hand", FIELDWISE] if cid in ("mest_h-0008", "mest_h-0009") else ["hand", MATCH])
         if isinstance(exp, str):
             s.add(op, inp, error=exp, cls="simple_analytic", verified=verified, tags=["stage_h", "microstructure", "error"],
                   description=f"{cid} from the spec table")

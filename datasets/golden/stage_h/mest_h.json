@@ -273,7 +273,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): SHAPE-ONLY, values identical",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH field by field under the fixed name map",
     "mpmath 50 digits"
    ],
    "tags": [
@@ -334,7 +334,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): SHAPE-ONLY, values identical",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MICRO.md): MATCH field by field under the fixed name map",
     "mpmath 50 digits"
    ],
    "tags": [

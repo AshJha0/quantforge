@@ -1,0 +1,84 @@
+{
+ "mest_h-0001": {
+  "SE": 0.8660254037844386,
+  "lambda": 3.0
+ },
+ "mest_h-0002": "E_DOMAIN",
+ "mest_h-0003": {
+  "SE": 0.1414213562373095,
+  "theta": 0.2
+ },
+ "mest_h-0004": "E_INPUT",
+ "mest_h-0005": {
+  "SE": 0.0,
+  "kappa": 0.6931471805599453
+ },
+ "mest_h-0006": "E_DOMAIN",
+ "mest_h-0007": {
+  "SE": 0.0,
+  "alpha": 0.6931471805599453
+ },
+ "mest_h-0008": {
+  "SE": 0.0039086797998528575,
+  "beta": 0.021666666666666667
+ },
+ "mest_h-0009": {
+  "calm": {
+   "SE": 0.0,
+   "beta": 0.01
+  },
+  "ratio": 4.0,
+  "stressed": {
+   "SE": 0.005773502691896258,
+   "beta": 0.04
+  }
+ },
+ "mest_h-0010": {
+  "SE": 0.408248290463863,
+  "delta": 2.0
+ },
+ "mest_h-0011": "E_INPUT",
+ "venue_h-0001": {
+  "A|h=5": {
+   "markout": 0.0,
+   "markout_bps": 0.0,
+   "toxicity": 0.6666666666666666
+  },
+  "B|h=5": {
+   "markout": 0.05,
+   "markout_bps": 5.0,
+   "toxicity": 0.0
+  }
+ },
+ "venue_h-0002": {
+  "A|h=10": {
+   "markout": 0.023333333333333334,
+   "markout_bps": 2.332789015896291,
+   "toxicity": 0.3333333333333333
+  },
+  "B|h=10": {
+   "markout": -0.02,
+   "markout_bps": -2.0,
+   "toxicity": 1.0
+  }
+ },
+ "venue_h-0003": {
+  "A|h=0": {
+   "markout": 0.0033333333333333335,
+   "markout_bps": 0.3332555736994701,
+   "toxicity": 0.3333333333333333
+  },
+  "B|h=0": {
+   "markout": 0.02,
+   "markout_bps": 2.0,
+   "toxicity": 0.0
+  }
+ },
+ "venue_h-0004": {
+  "fill_rate|A": 0.6,
+  "fill_rate|B": 1.0
+ },
+ "venue_h-0005": "E_INPUT",
+ "venue_h-0006": "E_INPUT",
+ "venue_h-0007": "E_DOMAIN"
+}
