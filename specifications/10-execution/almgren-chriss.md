@@ -1,6 +1,6 @@
-# Almgren-Chriss optimal execution (DRAFT)
+# Almgren-Chriss optimal execution
 
-Spec version 0.1.0 (DRAFT, stage H wave 1). Status: Specified, not implemented. Rulings HR-2, HR-5, HR-6, HR-9. Plan items 14.7 H-3 (trajectory and frontier to 1e-12), 15.1.
+Spec version 0.1.0 (stage H wave 1; confirmed 2026-11-18 by the stage H coordinator). Status: Specified, not implemented. Rulings HR-2, HR-5, HR-6, HR-9. Plan items 14.7 H-3 (trajectory and frontier to 1e-12), 15.1.
 
 **Plain idea.** Selling fast costs impact; selling slowly leaves the position exposed to price moves. With linear impact and mean-variance preferences the optimal holdings decay like a hyperbolic sine, and the risk aversion `lambda` slides the schedule along an efficient frontier of (expected cost, variance).
 

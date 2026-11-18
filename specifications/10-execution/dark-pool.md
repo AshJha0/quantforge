@@ -1,6 +1,6 @@
-# Simulated dark pool, fill probability and adverse selection (DRAFT)
+# Simulated dark pool, fill probability and adverse selection
 
-Spec version 0.1.0 (DRAFT, stage H wave 1b). Status: Specified, not implemented. Rulings HR-32 to HR-36. Plan items 15.1 "Dark pools (simulated)", 14.7 H-4. **Every output is labelled "simulated venue; not a real dark pool". No real dark-pool data is used; crypto venues are lit only.**
+Spec version 0.1.0 (stage H wave 1b; confirmed 2026-11-18 by the stage H coordinator). Status: Specified, not implemented. Rulings HR-32 to HR-36. Plan items 15.1 "Dark pools (simulated)", 14.7 H-4. **Every output is labelled "simulated venue; not a real dark pool". No real dark-pool data is used; crypto venues are lit only.**
 
 **Plain idea.** Buy and sell orders that nobody can see wait in the pool; when both sides are present and each side's minimum size is met, they trade at the lit market's midpoint. A trader who sends an order to the pool risks not trading, and the trades it does get are more likely to come just before the price moves against it.
 

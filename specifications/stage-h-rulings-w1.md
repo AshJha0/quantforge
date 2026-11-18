@@ -1,10 +1,12 @@
-# Stage H rulings, wave 1 (spec lane): DRAFT
+# Stage H rulings, wave 1 (spec lane): confirmed 2026-11-18
 
-DRAFT written 2026-11-15 before v0.9.0 is tagged; not normative until the stage H coordinator confirms it at the start of stage H (plan 15 gate rule: source, acceptance test fixed before the run, outside checks on at least 60% of value cases). Earlier rulings still hold, among them `stage-j-rulings-w1.md` J-1 (the backtester's close fill is unchanged by stage H). Append-only once confirmed.
+Drafted 2026-11-15 before v0.9.0 is tagged; not normative until the stage H coordinator confirms it at the start of stage H (plan 15 gate rule: source, acceptance test fixed before the run, outside checks on at least 60% of value cases). Earlier rulings still hold, among them `stage-j-rulings-w1.md` J-1 (the backtester's close fill is unchanged by stage H). Append-only once confirmed.
+
+**Confirmed 2026-11-18 by the stage H coordinator (spec lane).** Each ruling checked against its spec file, the paper facts recorded in the 2026-11-15 paper check and the decisions DR-H1 to DR-H7. All ten confirmed; none left proposed. Changes at confirmation: none to the ruling text. HR-8 already carried DR-H3 (delay on executed quantity, unexecuted part as opportunity cost) and `tca.md` agrees; HR-4 carries DR-H4; HR-1's contract number 1.15.0 is DR-H7. Spec fixes applied with this confirmation: `almgren-chriss.md` ac_h-0004 prints E = 562,500, states that eta_tilde changes with tau (N = 1, tau = 5 gives 1.875e-6) and states lambda = 1e-6; outside-check marks per DR-H2 are in each golden table (ac_h-0001's standard deviation was visible to the blind lane beforehand, so that one figure is not blind). [TLD11] eq. (1) was read on 2026-11-18, so `exec.impact.sqrt` is normative as a formula; no claim about the value of Y rests on it.
 
 ## Wave 1
 
-| # | Point | Ruling (proposed) |
+| # | Point | Ruling |
 |---|---|---|
 | HR-1 | Operations and contract | Wave 1 adds `exec.schedule.twap`, `exec.schedule.vwap`, `exec.schedule.pov` (`10-execution/schedules.md`), `exec.ac.trajectory`, `exec.ac.frontier` (`10-execution/almgren-chriss.md`), `exec.impact.sqrt`, `exec.impact.ow_optimal` (`10-execution/impact.md`), `exec.tca.shortfall` (`10-execution/tca.md`), `micro.mm.as_quotes` (`09-microstructure/avellaneda-stoikov.md`). No new error code; target contract 1.15.0 (minor). Confirm the number at the v0.9.0 tag |
 | HR-2 | Sign convention | Quantities are positive; `side` is `BUY` or `SELL`. Costs are positive when they hurt the order. Prices in currency per unit, volumes in units |
