@@ -2,11 +2,16 @@
 // (specifications/09-microstructure/order-book.md; rulings HR-11 to HR-17, HR-29, HR-41).
 // The book keeps the price and quantity strings as received; ordering and equality use exact decimals.
 // Checksum failures, crossed and locked books are counted and reported, never raised.
+#include <algorithm>
 #include <array>
+#include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <map>
 #include <optional>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 #include "quantforge/core/dates.hpp"
