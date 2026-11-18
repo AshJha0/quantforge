@@ -106,7 +106,9 @@ def _cross_term(a: float, b: float, tau: float) -> float:
     xa, xb = a * tau, b * tau
     total = 0.0
     for n in range(2, _SERIES_TERMS):
-        inner = ordered_sum(math.comb(n, k) * xa ** (k - 1) * xb ** (n - k - 1) for k in range(1, n))
+        inner = ordered_sum(
+            math.comb(n, k) * xa ** (k - 1) * xb ** (n - k - 1) for k in range(1, n)
+        )
         total += (-1) ** n / math.factorial(n + 1) * inner
     return tau**3 * total
 
