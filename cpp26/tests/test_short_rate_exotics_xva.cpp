@@ -495,8 +495,7 @@ TEST_CASE("Q3b AAD ladder matches Richardson bumps of the scheme, and costs at m
     ladder_once();
     const unsigned long long w_ladder = sr::g9_work();
     const double w_ratio = static_cast<double>(w_ladder) / static_cast<double>(w_price);
-    std::printf("Q3b G-9 work: price %llu, price+ladder %llu, ratio %.4f
-", w_price, w_ladder, w_ratio);
+    std::printf("Q3b G-9 work: price %llu, price+ladder %llu, ratio %.4f\n", w_price, w_ladder, w_ratio);
     CHECK(w_ladder <= 5 * w_price);
     // Timed: median of 21 interleaved runs (price, ladder, price, ...) after 5 warm-ups.
     const auto timed = [](auto f) {
@@ -513,8 +512,7 @@ TEST_CASE("Q3b AAD ladder matches Richardson bumps of the scheme, and costs at m
     std::sort(va.begin(), va.end());
     std::sort(vb.begin(), vb.end());
     const double ratio = vb[10] / va[10];
-    std::printf("Q3b AAD timed cost ratio (price + ladder) / price = %.2f (sink %.3f)
-", ratio, sink);
+    std::printf("Q3b AAD timed cost ratio (price + ladder) / price = %.2f (sink %.3f)\n", ratio, sink);
     // R6-16: record the measured ratio for the model inventory; CI sets QF_G9_RECORD and uploads the file.
     if (const char* path = std::getenv("QF_G9_RECORD")) {
         if (std::FILE* f = std::fopen(path, "w")) {
