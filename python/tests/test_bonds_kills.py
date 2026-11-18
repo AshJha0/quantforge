@@ -56,7 +56,9 @@ def test_z_spread_of_a_distressed_price_below_one() -> None:
     dirty = _dirty_at(3.0, settlement)
     assert 0 < dirty < 1
     fl = bonds.flows(BOND, settlement)
-    assert bonds.z_spread(BOND, settlement, FLAT, dirty - fl.accrued) == pytest.approx(3.0, abs=1e-9)
+    assert bonds.z_spread(BOND, settlement, FLAT, dirty - fl.accrued) == pytest.approx(
+        3.0, abs=1e-9
+    )
 
 
 def test_futures_net_basis_is_forward_dirty_minus_invoice() -> None:

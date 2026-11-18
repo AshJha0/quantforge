@@ -86,9 +86,10 @@ def test_quote_sensitivity_matches_bump_and_reprice(interp: str) -> None:
     out: dict[str, Any] = book_risk.ois_sensitivity(AS_OF, "SOFR", QUOTES, interp, swaps)
     sens = out["quote_sensitivity"]["matrix"]
     h = 1e-6
+    rates = [float(q.rate or 0.0) for q in QUOTES]
     for j in range(len(QUOTES)):
-        up = [replace(q, rate=q.rate + h) if k == j else q for k, q in enumerate(QUOTES)]
-        dn = [replace(q, rate=q.rate - h) if k == j else q for k, q in enumerate(QUOTES)]
+        up = [replace(q, rate=rates[k] + h) if k == j else q for k, q in enumerate(QUOTES)]
+        dn = [replace(q, rate=rates[k] - h) if k == j else q for k, q in enumerate(QUOTES)]
         fd = [(a - b) / (2 * h) for a, b in zip(_pv(up, interp, swaps), _pv(dn, interp, swaps))]
         for i in range(len(swaps)):
             assert sens[i][j] == pytest.approx(fd[i], rel=1e-5, abs=1e-8), (i, j)
