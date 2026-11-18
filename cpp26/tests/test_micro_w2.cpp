@@ -76,8 +76,8 @@ void replay(const char* suite, int expect_cases) {
     CHECK(n == expect_cases);
 }
 
-TEST_CASE("ob_h goldens: every row", "[micro_w2]") { replay("ob_h", 14); }
-TEST_CASE("lit_h goldens: every row", "[micro_w2]") { replay("lit_h", 15); }
+TEST_CASE("ob_h goldens: every row", "[micro_w2]") { replay("ob_h", 17); }
+TEST_CASE("lit_h goldens: every row", "[micro_w2]") { replay("lit_h", 20); }
 #endif
 
 TEST_CASE("exact decimal units", "[micro_w2]") {
@@ -100,6 +100,35 @@ TEST_CASE("exact decimal units", "[micro_w2]") {
     CHECK(!D::well_formed("1."));
     CHECK(!D::well_formed(".5"));
     CHECK(quantforge::micro::crc32("123456789") == 0xCBF43926U);  // the CRC-32/ISO-HDLC check value
+}
+
+TEST_CASE("exact decimal range (HR-57, HR-58)", "[micro_w2]") {
+    const auto limit = [](auto f) {
+        try {
+            f();
+        } catch (const quantforge::Error& e) {
+            return std::string(e.code()) == "E_LIMIT";
+        }
+        return false;
+    };
+    CHECK(D::parse("123456789012345678.123456789012345678").str() == "123456789012345678.123456789012345678");
+    CHECK(D::parse("1.000000000000000000000").str() == "1");  // written zeros are not counted
+    CHECK(limit([] { D::parse("0.0000000000000000001"); }));
+    CHECK(limit([] { D::parse("1000000000000000000000000000000000000"); }));
+    // 5^50 * 10^-18 times 2^50 * 10^-18: the coefficients overflow 128 bits, the value is 10^14.
+    CHECK((D::parse("88817841970012523.233890533447265625") * D::parse("0.001125899906842624")).str() == "100000000000000");
+    CHECK(limit([] { (void)(D::parse("100000000000000000000000000000000000") * D::integer(10)); }));
+    const D big = D::parse("1000000000000000000000000000000");
+    const D tiny = D::parse("0.000000000000000001");
+    CHECK(big.multiple_of(tiny));
+    CHECK(!tiny.multiple_of(big));
+    CHECK(tiny < big);
+    CHECK(big > tiny);
+    CHECK(limit([] { (void)D::parse("1000000000000000000").divide_integral(D::parse("0.000000000000000001"), false); }));
+    CHECK(D::parse("7").divide_integral(D::parse("0.000000000000000002"), true).str() == "3500000000000000000");
+    std::string s;
+    CHECK(big.fixed(18, s));
+    CHECK(s == "1000000000000000000000000000000.000000000000000000");
 }
 
 TEST_CASE("book rebuild: checksum check, resync and checkpoints", "[micro_w2]") {

@@ -283,3 +283,30 @@ def test_mbp_projection_equals_book_rebuild_of_engine_levels() -> None:
     )
     msg = snap(out["mbp"]["bids"], out["mbp"]["asks"])
     assert rebuild([msg], 10, 0, 0)["book"] == out["mbp"]
+
+
+def test_exact_decimal_range_hr57_hr58() -> None:
+    def code(f: Any) -> str:
+        with pytest.raises(QfError) as e:
+            f()
+        return e.value.code
+
+    one = [snap([["0.0000000000000000001", "1"]], [])]
+    assert code(lambda: rebuild(one, 10, 1, 8)) == "E_LIMIT"
+    fine = {"maker_rebate": "0", "taker_fee": "0"}
+    big = "1" + "0" * 35
+
+    def cross(p: str, q: str) -> list[dict[str, str]]:
+        return [
+            {"op": "NEW", "id": i, "trader": t, "side": s, "type": "LIMIT", "price": p, "qty": q}
+            for i, t, s in (("S1", "T1", "SELL"), ("B1", "T2", "BUY"))
+        ]
+
+    assert code(lambda: run("1", "1", cross(big, "10"), fine)) == "E_LIMIT"
+    out = run("1", "1", cross("9" * 35, "10"), fine)
+    assert out["fills"][0]["price"] == "9" * 35
+    # 5^50 * 10^-18 times 2^50 * 10^-18 is exactly 10^14; the default 28-digit context would round.
+    p, q = "88817841970012523.233890533447265625", "0.001125899906842624"
+    t = "0.000000000000000001"
+    out = run(t, t, cross(p, q), {"maker_rebate": "0", "taker_fee": "0.001"})
+    assert out["fees"]["T2"] == "100000000000"

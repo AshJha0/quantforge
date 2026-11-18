@@ -46,7 +46,27 @@ public final class OrderBook {
         if (!(v instanceof String s) || !DEC.matcher(s).matches()) {
             throw new QfError("E_SCHEMA", path + ": not a decimal string", path);
         }
-        return new BigDecimal(s);
+        return range(new BigDecimal(s), path, MAX_INPUT_SCALE);
+    }
+
+    /** HR-57: a value c * 10^-s (s >= 0, minimal) is in range when |c| < 10^36 and s <= 36; inputs need s <= 18. */
+    static final int MAX_DIGITS = 36;
+    static final int MAX_SCALE = 36;
+    static final int MAX_INPUT_SCALE = 18;
+
+    /** HR-57/HR-58: {@code x} unchanged if in range, else {@code E_LIMIT} (never a rounded value). */
+    static BigDecimal range(BigDecimal x, String path, int maxScale) {
+        if (x.signum() == 0) {
+            return x;
+        }
+        BigDecimal n = x.stripTrailingZeros();
+        int scale = Math.max(n.scale(), 0);
+        int digits = n.scale() >= 0 ? n.precision() : n.precision() - n.scale();
+        if (digits > MAX_DIGITS || scale > maxScale) {
+            throw new QfError("E_LIMIT", path + ": decimal outside the exact range (36 digits, " + maxScale
+                    + " decimals; HR-57)", path);
+        }
+        return x;
     }
 
     private static List<Level> levels(Map<?, ?> m, String key, String path) {

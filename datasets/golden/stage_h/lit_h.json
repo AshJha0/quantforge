@@ -1721,6 +1721,342 @@
     "error"
    ],
    "description": "hand: duplicate id"
+  },
+  {
+   "case_id": "lit_h-0016",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "0.000000000000000001",
+    "lot_size": "0.000000000000000001",
+    "fee_schedule": {
+     "maker_rebate": "0.0001",
+     "taker_fee": "0.001"
+    },
+    "events": [
+     {
+      "id": "S1",
+      "op": "NEW",
+      "price": "88817841970012523.233890533447265625",
+      "qty": "0.001125899906842624",
+      "side": "SELL",
+      "trader": "T1",
+      "type": "LIMIT"
+     },
+     {
+      "id": "B1",
+      "op": "NEW",
+      "price": "88817841970012523.233890533447265625",
+      "qty": "0.001125899906842624",
+      "side": "BUY",
+      "trader": "T2",
+      "type": "LIMIT"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [],
+      "bids": []
+     },
+     "cancelled": [],
+     "conservation": {
+      "B1": {
+       "cancelled": "0",
+       "filled": "0.001125899906842624",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "0.001125899906842624"
+      },
+      "S1": {
+       "cancelled": "0",
+       "filled": "0.001125899906842624",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "0.001125899906842624"
+      }
+     },
+     "fees": {
+      "T1": "-10000000000",
+      "T2": "100000000000"
+     },
+     "fills": [
+      {
+       "maker_id": "S1",
+       "price": "88817841970012523.233890533447265625",
+       "qty": "0.001125899906842624",
+       "seq": 1,
+       "taker_id": "B1"
+      }
+     ],
+     "label": "simulated venue; not a real exchange",
+     "mbp": {
+      "asks": [],
+      "bids": []
+     },
+     "rejects": []
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "boundary"
+   ],
+   "description": "hand: product whose raw coefficients overflow 128 bits but whose value is in range (HR-58)"
+  },
+  {
+   "case_id": "lit_h-0017",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "0.000000000000000001",
+    "lot_size": "0.000000000000000001",
+    "fee_schedule": {
+     "maker_rebate": "0.0001",
+     "taker_fee": "0.001"
+    },
+    "events": [
+     {
+      "id": "B1",
+      "op": "NEW",
+      "price": "1000000000000000000000000000000",
+      "qty": "1",
+      "side": "BUY",
+      "trader": "T2",
+      "type": "LIMIT"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [],
+      "bids": [
+       {
+        "display_qty": "1",
+        "hidden_qty": "0",
+        "id": "B1",
+        "price": "1000000000000000000000000000000",
+        "seq": 1
+       }
+      ]
+     },
+     "cancelled": [],
+     "conservation": {
+      "B1": {
+       "cancelled": "0",
+       "filled": "0",
+       "rejected": "0",
+       "resting": "1",
+       "submitted": "1"
+      }
+     },
+     "fees": {},
+     "fills": [],
+     "label": "simulated venue; not a real exchange",
+     "mbp": {
+      "asks": [],
+      "bids": [
+       [
+        "1000000000000000000000000000000",
+        "1"
+       ]
+      ]
+     },
+     "rejects": []
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "boundary"
+   ],
+   "description": "hand: 31-digit price on an 18-decimal tick grid (HR-58: grid checks never overflow)"
+  },
+  {
+   "case_id": "lit_h-0018",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "1",
+    "lot_size": "1",
+    "fee_schedule": {
+     "maker_rebate": "0",
+     "taker_fee": "0"
+    },
+    "events": [
+     {
+      "id": "S1",
+      "op": "NEW",
+      "price": "99999999999999999999999999999999999",
+      "qty": "10",
+      "side": "SELL",
+      "trader": "T1",
+      "type": "LIMIT"
+     },
+     {
+      "id": "B1",
+      "op": "NEW",
+      "price": "99999999999999999999999999999999999",
+      "qty": "10",
+      "side": "BUY",
+      "trader": "T2",
+      "type": "LIMIT"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [],
+      "bids": []
+     },
+     "cancelled": [],
+     "conservation": {
+      "B1": {
+       "cancelled": "0",
+       "filled": "10",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "10"
+      },
+      "S1": {
+       "cancelled": "0",
+       "filled": "10",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "10"
+      }
+     },
+     "fees": {
+      "T1": "0",
+      "T2": "0"
+     },
+     "fills": [
+      {
+       "maker_id": "S1",
+       "price": "99999999999999999999999999999999999",
+       "qty": "10",
+       "seq": 1,
+       "taker_id": "B1"
+      }
+     ],
+     "label": "simulated venue; not a real exchange",
+     "mbp": {
+      "asks": [],
+      "bids": []
+     },
+     "rejects": []
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "boundary"
+   ],
+   "description": "hand: notional of 36 digits: in range (HR-57)"
+  },
+  {
+   "case_id": "lit_h-0019",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "1",
+    "lot_size": "1",
+    "fee_schedule": {
+     "maker_rebate": "0",
+     "taker_fee": "0"
+    },
+    "events": [
+     {
+      "id": "S1",
+      "op": "NEW",
+      "price": "100000000000000000000000000000000000",
+      "qty": "10",
+      "side": "SELL",
+      "trader": "T1",
+      "type": "LIMIT"
+     },
+     {
+      "id": "B1",
+      "op": "NEW",
+      "price": "100000000000000000000000000000000000",
+      "qty": "10",
+      "side": "BUY",
+      "trader": "T2",
+      "type": "LIMIT"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error",
+    "boundary"
+   ],
+   "description": "hand: notional of 37 digits (HR-57)"
+  },
+  {
+   "case_id": "lit_h-0020",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "0.000000000000000001",
+    "lot_size": "0.000000000000000001",
+    "fee_schedule": {
+     "maker_rebate": "0.0001",
+     "taker_fee": "0.001"
+    },
+    "events": [
+     {
+      "id": "S1",
+      "op": "NEW",
+      "price": "100.0000000000000000001",
+      "qty": "1",
+      "side": "SELL",
+      "trader": "T1",
+      "type": "LIMIT"
+     },
+     {
+      "id": "B1",
+      "op": "NEW",
+      "price": "100.0000000000000000001",
+      "qty": "1",
+      "side": "BUY",
+      "trader": "T2",
+      "type": "LIMIT"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error",
+    "boundary"
+   ],
+   "description": "hand: price with 19 decimals (HR-57)"
   }
  ]
 }

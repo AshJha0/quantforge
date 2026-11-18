@@ -49,7 +49,7 @@ Algorithm (normative):
 4. `update` before any `snapshot`, or after a gap row, is `UPDATE_BEFORE_SNAPSHOT`: ignored and counted, until the next snapshot (HR-15).
 5. A `gap` row (reconnect) clears the book and counts in `gaps`; a checksum failure sets `resyncs += 1` only if the caller marks the next snapshot as a resubscribe. The rebuild never invents a recovery the venue does not document.
 
-Errors: malformed message or non-decimal price `E_SCHEMA`; negative quantity, non-positive price or `depth` not in the list `E_DOMAIN`; more than 50,000,000 messages `E_LIMIT` (HR-17). Checksum failures and crossed books are **reported, not errors**: a replay over a day must count them, not stop.
+Errors: malformed message or non-decimal price `E_SCHEMA`; negative quantity, non-positive price or `depth` not in the list `E_DOMAIN`; more than 50,000,000 messages `E_LIMIT` (HR-17). A price or quantity outside the exact decimal range (36 digits, at most 18 decimals) `E_LIMIT` (HR-57, HR-58). Checksum failures and crossed books are **reported, not errors**: a replay over a day must count them, not stop.
 
 ## H-2 acceptance (as fixed here, before any run)
 

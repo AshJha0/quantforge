@@ -1,7 +1,7 @@
 #pragma once
 // Exact decimals for the stage H wave 2 decimal-string operations (HR-12): a 128-bit integer mantissa and a
 // base-10 scale, value = mantissa * 10^-scale. No floating point touches a price, a quantity or a fee.
-// Arithmetic is checked: a result outside the exact range throws E_DOMAIN rather than rounding.
+// Arithmetic is checked: a value outside the HR-57 range (36 digits, 36 decimals) throws E_LIMIT, never rounds.
 #include <compare>
 #include <string>
 #include <string_view>
@@ -16,7 +16,7 @@ public:
     static ExactDecimal integer(long long v) { return ExactDecimal(Int(v), 0); }
     /// True when `text` matches -?[0-9]+(\.[0-9]+)? (the contract's decimal-string form).
     static bool well_formed(std::string_view text);
-    /// The text must be well formed. Throws E_DOMAIN above 30 significant digits or 18 decimals.
+    /// The text must be well formed. Throws E_LIMIT above 36 digits or 18 decimals (HR-57).
     static ExactDecimal parse(std::string_view text);
 
     friend ExactDecimal operator+(ExactDecimal a, ExactDecimal b);

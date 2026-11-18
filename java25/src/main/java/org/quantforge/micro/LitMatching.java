@@ -35,6 +35,11 @@ public final class LitMatching {
         return x.signum() == 0 ? "0" : x.stripTrailingZeros().toPlainString();
     }
 
+    /** Every sum, difference and product is range-checked (HR-58). */
+    private static BigDecimal c(BigDecimal x) {
+        return OrderBook.range(x, "value", OrderBook.MAX_SCALE);
+    }
+
     private static boolean isPeg(String t) {
         return t.equals("PEG_MID") || t.equals("PEG_PRIMARY");
     }
@@ -62,7 +67,7 @@ public final class LitMatching {
         }
 
         BigDecimal open() {
-            return display.add(hidden);
+            return c(display.add(hidden));
         }
 
         boolean mid() {
@@ -143,7 +148,7 @@ public final class LitMatching {
             BigDecimal s = BigDecimal.ZERO;
             for (Order o : side(!buy)) {
                 if (marketable(buy, limit, o.price)) {
-                    s = s.add(o.open());
+                    s = c(s.add(o.open()));
                 }
             }
             return s;
@@ -177,14 +182,14 @@ public final class LitMatching {
                 BigDecimal avail = maker.mid() ? maker.hidden : maker.display;
                 BigDecimal q = qty.min(avail);
                 trade(taker, maker, p, q);
-                qty = qty.subtract(q);
+                qty = c(qty.subtract(q));
                 if (maker.mid()) {
-                    maker.hidden = maker.hidden.subtract(q);
+                    maker.hidden = c(maker.hidden.subtract(q));
                 } else {
-                    maker.display = maker.display.subtract(q);
+                    maker.display = c(maker.display.subtract(q));
                     if (maker.display.signum() == 0 && maker.hidden.signum() > 0) {
                         maker.display = maker.slice.min(maker.hidden);
-                        maker.hidden = maker.hidden.subtract(maker.display);
+                        maker.hidden = c(maker.hidden.subtract(maker.display));
                         maker.seq = nextSeq();
                     }
                 }
@@ -203,11 +208,11 @@ public final class LitMatching {
             f.put("qty", fmt(q));
             f.put("seq", (long) fills.size() + 1);
             fills.add(f);
-            BigDecimal notional = price.multiply(q);
-            fees.merge(taker.trader, takerFee.multiply(notional), BigDecimal::add);
-            fees.merge(maker.trader, makerRebate.multiply(notional).negate(), BigDecimal::add);
-            cons.get(taker.id).filled = cons.get(taker.id).filled.add(q);
-            cons.get(maker.id).filled = cons.get(maker.id).filled.add(q);
+            BigDecimal notional = c(price.multiply(q));
+            fees.merge(taker.trader, c(takerFee.multiply(notional)), (a, b) -> c(a.add(b)));
+            fees.merge(maker.trader, c(makerRebate.multiply(notional)).negate(), (a, b) -> c(a.add(b)));
+            cons.get(taker.id).filled = c(cons.get(taker.id).filled.add(q));
+            cons.get(maker.id).filled = c(cons.get(maker.id).filled.add(q));
         }
 
         BigDecimal pegPrice(Order o) {
@@ -218,9 +223,9 @@ public final class LitMatching {
                 if (bb == null || ba == null) {
                     return null;
                 }
-                BigDecimal ticks = bb.add(ba).divide(tick.multiply(BigDecimal.TWO), 0,
+                BigDecimal ticks = c(bb.add(ba)).divide(c(tick.multiply(BigDecimal.TWO)), 0,
                         o.buy ? RoundingMode.FLOOR : RoundingMode.CEILING);
-                p = ticks.multiply(tick);
+                p = c(c(ticks).multiply(tick));
             } else {
                 p = best(o.buy, true, o.id);
                 if (p == null) {
@@ -231,7 +236,7 @@ public final class LitMatching {
             // HR-28 rounded away from crossing: a peg stays a tick away from the opposite best, other pegs included.
             BigDecimal opp = best(!o.buy, false, o.id);
             if (opp != null && (o.buy ? p.compareTo(opp) >= 0 : p.compareTo(opp) <= 0)) {
-                p = o.buy ? opp.subtract(tick) : opp.add(tick);
+                p = c(o.buy ? opp.subtract(tick) : opp.add(tick));
             }
             return p.signum() > 0 ? p : null;
         }
@@ -324,11 +329,11 @@ public final class LitMatching {
             }
             if (typ.equals("MARKET") || typ.equals("IOC")) {
                 cancelled.add(idQty(oid, rest));
-                cons.get(oid).cancelled = cons.get(oid).cancelled.add(rest);
+                cons.get(oid).cancelled = c(cons.get(oid).cancelled.add(rest));
                 return;
             }
             o.display = slice.min(rest);
-            o.hidden = rest.subtract(o.display);
+            o.hidden = c(rest.subtract(o.display));
             o.seq = nextSeq();
             resting.put(oid, o);
         }
@@ -345,7 +350,7 @@ public final class LitMatching {
             m.put("id", oid);
             m.put("reason", reason);
             rejects.add(m);
-            cons.get(oid).rejected = cons.get(oid).rejected.add(qty);
+            cons.get(oid).rejected = c(cons.get(oid).rejected.add(qty));
         }
 
         void unknown(String oid) {
@@ -365,7 +370,7 @@ public final class LitMatching {
                 return;
             }
             cancelled.add(idQty(oid, o.open()));
-            cons.get(oid).cancelled = cons.get(oid).cancelled.add(o.open());
+            cons.get(oid).cancelled = c(cons.get(oid).cancelled.add(o.open()));
         }
 
         void modify(Map<?, ?> e, int k) {
@@ -399,9 +404,9 @@ public final class LitMatching {
             }
             Cons cs = cons.get(oid);
             if (c < 0) {
-                cs.cancelled = cs.cancelled.add(old.subtract(qty));
+                cs.cancelled = c(cs.cancelled.add(c(old.subtract(qty))));
             } else {
-                cs.submitted = cs.submitted.add(qty.subtract(old));
+                cs.submitted = c(cs.submitted.add(c(qty.subtract(old))));
                 o.seq = nextSeq();
             }
         }
@@ -435,7 +440,7 @@ public final class LitMatching {
                 TreeMap<BigDecimal, BigDecimal> levels =
                         new TreeMap<>(buy ? Comparator.<BigDecimal>reverseOrder() : Comparator.<BigDecimal>naturalOrder());
                 for (Order o : priced) {
-                    levels.merge(o.price, o.display, BigDecimal::add);
+                    levels.merge(o.price, o.display, (a, b) -> c(a.add(b)));
                 }
                 List<Object> lv = new ArrayList<>();
                 levels.forEach((p, q) -> {

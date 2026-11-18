@@ -1423,6 +1423,144 @@
     "error"
    ],
    "description": "hand: unknown message type"
+  },
+  {
+   "case_id": "ob_h-0016",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "messages": [
+     {
+      "type": "snapshot",
+      "bids": [
+       [
+        "123456789012345678.123456789012345678",
+        "1.000000000000000000000"
+       ]
+      ],
+      "asks": [],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z"
+     }
+    ],
+    "depth": 10,
+    "price_decimals": 18,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [],
+      "bids": [
+       [
+        "123456789012345678.123456789012345678",
+        "1.000000000000000000000"
+       ]
+      ]
+     },
+     "crc32": 4292053808,
+     "events": [],
+     "stats": {
+      "checkpoint_checked": 0,
+      "checkpoint_failed": 0,
+      "checksum_checked": 0,
+      "checksum_failed": 0,
+      "crossed": 0,
+      "deletes_of_absent_level": 0,
+      "gaps": 0,
+      "level_changes": 0,
+      "locked": 0,
+      "messages": 1,
+      "resyncs": 0,
+      "snapshots": 1,
+      "truncated_levels": 0,
+      "updates": 0
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "boundary"
+   ],
+   "description": "hand: 36 digits at 18 decimals, quantity with 21 written zeros: in range (HR-57)"
+  },
+  {
+   "case_id": "ob_h-0017",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "messages": [
+     {
+      "type": "snapshot",
+      "bids": [
+       [
+        "0.0000000000000000001",
+        "1"
+       ]
+      ],
+      "asks": [],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z"
+     }
+    ],
+    "depth": 10,
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error",
+    "boundary"
+   ],
+   "description": "hand: price with 19 decimals (HR-57)"
+  },
+  {
+   "case_id": "ob_h-0018",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "messages": [
+     {
+      "type": "snapshot",
+      "bids": [
+       [
+        "100.0",
+        "1000000000000000000000000000000000000"
+       ]
+      ],
+      "asks": [],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z"
+     }
+    ],
+    "depth": 10,
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error",
+    "boundary"
+   ],
+   "description": "hand: quantity with 37 digits (HR-57)"
   }
  ]
 }

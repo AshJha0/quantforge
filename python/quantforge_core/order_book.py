@@ -8,7 +8,7 @@ Checksum failures, crossed and locked books are counted and reported, never rais
 import re
 import zlib
 from datetime import datetime
-from decimal import Decimal
+from decimal import Context, Decimal
 from typing import Any
 
 from .errors import QfError
@@ -35,10 +35,39 @@ _STATS = (
 )
 
 
-def _dec(v: Any, path: str) -> Decimal:
+# HR-57: the exact decimal range shared by all four languages. A value c * 10^-s (s >= 0 and as
+# small as possible) is in range when |c| < 10^36 and s <= 36; an input string also needs s <= 18.
+MAX_DIGITS = 36
+MAX_SCALE = 36
+MAX_INPUT_SCALE = 18
+# Wide enough that every sum, difference and product of in-range values is exact (HR-58).
+EXACT = Context(prec=200)
+
+
+def check_range(x: Decimal, path: str, max_scale: int = MAX_SCALE) -> Decimal:
+    """HR-57/HR-58: `x` unchanged if in range, else `E_LIMIT` (never a rounded value)."""
+    if x.is_zero():
+        return x
+    _, digits, exp = x.normalize(EXACT).as_tuple()
+    assert isinstance(exp, int)
+    n, scale = (len(digits) + exp, 0) if exp >= 0 else (len(digits), -exp)
+    if n > MAX_DIGITS or scale > max_scale:
+        raise QfError(
+            "E_LIMIT",
+            f"{path}: decimal outside the exact range (36 digits, {max_scale} decimals; HR-57)",
+            path,
+        )
+    return x
+
+
+def input_dec(v: Any, path: str) -> Decimal:
+    """A decimal-string input (HR-12): `E_SCHEMA` if malformed, `E_LIMIT` if out of range (HR-57)."""
     if not isinstance(v, str) or _DEC.fullmatch(v) is None:
         raise QfError("E_SCHEMA", f"{path}: not a decimal string", path)
-    return Decimal(v)
+    return check_range(Decimal(v), path, MAX_INPUT_SCALE)
+
+
+_dec = input_dec
 
 
 def _levels(raw: Any, path: str) -> list[tuple[Decimal, str, Decimal, str]]:
@@ -60,7 +89,7 @@ def _levels(raw: Any, path: str) -> list[tuple[Decimal, str, Decimal, str]]:
 def _component(text: str, decimals: int) -> str:
     """[KR-CRC]: the value at the pair's precision, decimal point and leading zeros removed."""
     value = Decimal(text)
-    fixed = value.quantize(Decimal(1).scaleb(-decimals))
+    fixed = value.quantize(Decimal(1).scaleb(-decimals), context=EXACT)
     if fixed != value:
         raise QfError("E_DOMAIN", f"{text} has more than {decimals} decimals", text)
     return format(fixed, "f").replace(".", "").lstrip("0") or "0"

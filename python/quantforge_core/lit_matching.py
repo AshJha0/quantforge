@@ -10,18 +10,17 @@ back of the queue (new `seq`) as soon as its shown part is filled ([CME-FIFO]), 
 quantity always trades after every displayed order that was ahead of the refresh.
 """
 
-import re
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from typing import Any
 
 from .errors import QfError
+from .order_book import EXACT, check_range, input_dec
 
 LABEL = "simulated venue; not a real exchange"
 MAX_EVENTS = 10_000_000
 TYPES = ("LIMIT", "MARKET", "IOC", "FOK", "ICEBERG", "POST_ONLY", "PEG_MID", "PEG_PRIMARY")
 PEGS = ("PEG_MID", "PEG_PRIMARY")
-_DEC = re.compile(r"-?[0-9]+(\.[0-9]+)?")
 
 
 def fmt(x: Decimal) -> str:
@@ -32,10 +31,12 @@ def fmt(x: Decimal) -> str:
     return s
 
 
-def _dec(v: Any, path: str) -> Decimal:
-    if not isinstance(v, str) or _DEC.fullmatch(v) is None:
-        raise QfError("E_SCHEMA", f"{path}: not a decimal string", path)
-    return Decimal(v)
+_dec = input_dec
+
+
+def _c(x: Decimal) -> Decimal:
+    """Every sum, difference and product is range-checked (HR-58)."""
+    return check_range(x, "value")
 
 
 @dataclass
@@ -52,7 +53,7 @@ class Order:
     seq: int
 
     def open(self) -> Decimal:
-        return self.display + self.hidden
+        return _c(self.display + self.hidden)
 
 
 class _Engine:
@@ -96,14 +97,11 @@ class _Engine:
         return limit is None or (price <= limit if buy else price >= limit)
 
     def available(self, buy: bool, limit: Decimal | None) -> Decimal:
-        return sum(
-            (
-                o.open()
-                for o in self.side(not buy)
-                if o.price is not None and self.marketable(buy, limit, o.price)
-            ),
-            Decimal(0),
-        )
+        total = Decimal(0)
+        for o in self.side(not buy):
+            if o.price is not None and self.marketable(buy, limit, o.price):
+                total = _c(total + o.open())
+        return total
 
     def queue_at(self, buy_side: bool, price: Decimal) -> list[Order]:
         at = [o for o in self.side(buy_side) if o.price == price]
@@ -122,14 +120,14 @@ class _Engine:
             avail = maker.hidden if maker.type == "PEG_MID" else maker.display
             q = min(qty, avail)
             self.trade(taker, maker, p, q)
-            qty -= q
+            qty = _c(qty - q)
             if maker.type == "PEG_MID":
-                maker.hidden -= q
+                maker.hidden = _c(maker.hidden - q)
             else:
-                maker.display -= q
+                maker.display = _c(maker.display - q)
                 if maker.display == 0 and maker.hidden > 0:  # iceberg refresh, back of the queue
                     maker.display = min(maker.slice, maker.hidden)
-                    maker.hidden -= maker.display
+                    maker.hidden = _c(maker.hidden - maker.display)
                     maker.seq = self.next_seq()
             if maker.open() == 0:
                 del self.resting[maker.id]
@@ -145,15 +143,15 @@ class _Engine:
                 "seq": len(self.fills) + 1,
             }
         )
-        notional = price * q
-        self.fees[taker.trader] = (
-            self.fees.get(taker.trader, Decimal(0)) + self.taker_fee * notional
+        notional = _c(price * q)
+        self.fees[taker.trader] = _c(
+            self.fees.get(taker.trader, Decimal(0)) + _c(self.taker_fee * notional)
         )
-        self.fees[maker.trader] = (
-            self.fees.get(maker.trader, Decimal(0)) - self.maker_rebate * notional
+        self.fees[maker.trader] = _c(
+            self.fees.get(maker.trader, Decimal(0)) - _c(self.maker_rebate * notional)
         )
-        self.cons[taker.id]["filled"] += q
-        self.cons[maker.id]["filled"] += q
+        self.cons[taker.id]["filled"] = _c(self.cons[taker.id]["filled"] + q)
+        self.cons[maker.id]["filled"] = _c(self.cons[maker.id]["filled"] + q)
 
     # ---- pegs
     def peg_price(self, o: Order) -> Decimal | None:
@@ -161,9 +159,10 @@ class _Engine:
             bb, ba = self.best(True, exclude_mid=True), self.best(False, exclude_mid=True)
             if bb is None or ba is None:
                 return None
-            steps = (bb + ba) / 2 / self.tick
-            ticks = steps.to_integral_value(rounding="ROUND_FLOOR" if o.buy else "ROUND_CEILING")
-            p = ticks * self.tick
+            # Exact: prices are positive, so the truncated quotient is the floor (HR-58).
+            q, r = divmod(_c(bb + ba), _c(2 * self.tick))
+            ticks = _c(q if o.buy or r == 0 else q + 1)
+            p = _c(ticks * self.tick)
         else:
             same = self.best(o.buy, exclude_mid=True, exclude=o.id)
             if same is None:
@@ -175,7 +174,7 @@ class _Engine:
         # opposite best, other pegs included (two PEG_MIDs on an on-grid mid would otherwise lock).
         opp = self.best(not o.buy, exclude=o.id)
         if opp is not None and (p >= opp if o.buy else p <= opp):
-            p = opp - self.tick if o.buy else opp + self.tick
+            p = _c(opp - self.tick if o.buy else opp + self.tick)
         return p if p > 0 else None
 
     def reprice(self) -> None:
@@ -248,16 +247,16 @@ class _Engine:
             return
         if typ in ("MARKET", "IOC"):
             self.cancelled.append({"id": oid, "qty": fmt(rest)})
-            self.cons[oid]["cancelled"] += rest
+            self.cons[oid]["cancelled"] = _c(self.cons[oid]["cancelled"] + rest)
             return
         o.display = min(slice_, rest)
-        o.hidden = rest - o.display
+        o.hidden = _c(rest - o.display)
         o.seq = self.next_seq()
         self.resting[oid] = o
 
     def reject(self, oid: str, reason: str, qty: Decimal) -> None:
         self.rejects.append({"id": oid, "reason": reason})
-        self.cons[oid]["rejected"] += qty
+        self.cons[oid]["rejected"] = _c(self.cons[oid]["rejected"] + qty)
 
     def cancel(self, e: dict[str, Any], k: int) -> None:
         oid = e.get("id")
@@ -268,7 +267,7 @@ class _Engine:
             self.rejects.append({"id": oid, "reason": "UNKNOWN_ID"})
             return
         self.cancelled.append({"id": oid, "qty": fmt(o.open())})
-        self.cons[oid]["cancelled"] += o.open()
+        self.cons[oid]["cancelled"] = _c(self.cons[oid]["cancelled"] + o.open())
 
     def modify(self, e: dict[str, Any], k: int) -> None:
         path = f"events/{k}"
@@ -294,9 +293,9 @@ class _Engine:
         else:
             o.display = qty
         if qty < old:
-            self.cons[oid]["cancelled"] += old - qty
+            self.cons[oid]["cancelled"] = _c(self.cons[oid]["cancelled"] + _c(old - qty))
         else:
-            self.cons[oid]["submitted"] += qty - old
+            self.cons[oid]["submitted"] = _c(self.cons[oid]["submitted"] + _c(qty - old))
             o.seq = self.next_seq()
 
     # ---- output
@@ -323,7 +322,7 @@ class _Engine:
             levels: dict[Decimal, Decimal] = {}
             for o in priced:
                 assert o.price is not None
-                levels[o.price] = levels.get(o.price, Decimal(0)) + o.display
+                levels[o.price] = _c(levels.get(o.price, Decimal(0)) + o.display)
             mbp[name] = [[fmt(p), fmt(q)] for p, q in sorted(levels.items(), reverse=buy) if q > 0]
         for oid, c in self.cons.items():
             live = self.resting.get(oid)
@@ -343,6 +342,14 @@ class _Engine:
 
 
 def run(
+    tick_size: str, lot_size: str, events: list[Any], fee_schedule: dict[str, Any]
+) -> dict[str, Any]:
+    # Wide enough that no sum, difference or product of in-range values rounds (HR-58).
+    with localcontext(EXACT):
+        return _run(tick_size, lot_size, events, fee_schedule)
+
+
+def _run(
     tick_size: str, lot_size: str, events: list[Any], fee_schedule: dict[str, Any]
 ) -> dict[str, Any]:
     tick, lot = _dec(tick_size, "tick_size"), _dec(lot_size, "lot_size")

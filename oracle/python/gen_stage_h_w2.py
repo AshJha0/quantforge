@@ -12,7 +12,7 @@ here with zlib from the expected book, per [KR-CRC]. Synthetic message lists onl
 """
 import json
 import zlib
-from decimal import Decimal
+from decimal import Context, Decimal
 
 from qf_oracle import common
 from qf_oracle.common import Suite, note
@@ -46,7 +46,7 @@ def table(rel):
 
 def component(text, decimals):
     v = Decimal(text)
-    q = v.quantize(Decimal(1).scaleb(-decimals))
+    q = v.quantize(Decimal(1).scaleb(-decimals), context=Context(prec=200))
     assert q == v, text
     return format(q, "f").replace(".", "").lstrip("0") or "0"
 
@@ -83,6 +83,7 @@ def build():
                   description=f"{cid} from the spec table" + ("; not blind" if cid in NOT_BLIND else ""))
             s.cases[-1]["case_id"] = cid  # spec ids (ob_h-0009 left the goldens, HR-41)
         add_errors(s, name)
+        add_boundaries(s, name)
         suites.append(s)
     return suites
 
@@ -113,6 +114,88 @@ def add_errors(s, name):
     for k, (desc, inp, code) in enumerate(cases):
         s.add(OPS[name], inp, error=code, cls="date_and_convention", verified=["hand"],
               tags=["stage_h", "error"], description=f"hand: {desc}")
+        s.cases[-1]["case_id"] = f"{name}-{first + k:04d}"
+
+
+def _cons(filled, resting, submitted):
+    return {"cancelled": "0", "filled": filled, "rejected": "0", "resting": resting, "submitted": submitted}
+
+
+def _lit_out(fills, bids, mbp_bids, cons, fees):
+    return {"book": {"asks": [], "bids": bids}, "cancelled": [], "conservation": cons, "fees": fees,
+            "fills": fills, "label": "simulated venue; not a real exchange",
+            "mbp": {"asks": [], "bids": mbp_bids}, "rejects": []}
+
+
+def _cross(price, qty):
+    return [{"id": "S1", "op": "NEW", "price": price, "qty": qty, "side": "SELL", "trader": "T1", "type": "LIMIT"},
+            {"id": "B1", "op": "NEW", "price": price, "qty": qty, "side": "BUY", "trader": "T2", "type": "LIMIT"}]
+
+
+def add_boundaries(s, name):
+    """HR-57/HR-58 range boundaries (hand). A value c * 10^-s is in range when |c| < 10^36 and s <= 36;
+    an input string also needs s <= 18; outside is E_LIMIT in every language, never a rounded value.
+    Expected outputs are written out by hand below; crc32 is recomputed with zlib per [KR-CRC]."""
+    stats = {k: 0 for k in ("checkpoint_checked", "checkpoint_failed", "checksum_checked", "checksum_failed",
+                            "crossed", "deletes_of_absent_level", "gaps", "level_changes", "locked",
+                            "resyncs", "truncated_levels", "updates")}
+    stats = dict(sorted({**stats, "messages": 1, "snapshots": 1}.items()))
+
+    def snap(bids):
+        return {"type": "snapshot", "bids": bids, "asks": [], "checksum": None, "t": "2026-01-01T00:00:00Z"}
+
+    big = "123456789012345678.123456789012345678"  # 36 digits, 18 decimals: the largest input shape
+    zeros = "1." + "0" * 21  # trailing zeros are not counted (21 written, value 1)
+    fine = {"tick_size": "0.000000000000000001", "lot_size": "0.000000000000000001",
+            "fee_schedule": {"maker_rebate": "0.0001", "taker_fee": "0.001"}}
+    # 5^50 * 10^-18 times 2^50 * 10^-18 = 10^14 exactly; the raw coefficient product (10^50)
+    # overflows 128 bits, so C++ and Rust must cancel factors of ten before multiplying (HR-58).
+    p5, q2 = "88817841970012523.233890533447265625", "0.001125899906842624"
+    assert Decimal(f"{5**50}E-18") == Decimal(p5) and Decimal(f"{2**50}E-18") == Decimal(q2)  # exact
+    unit = {"tick_size": "1", "lot_size": "1", "fee_schedule": {"maker_rebate": "0", "taker_fee": "0"}}
+    nines = "9" * 35  # notional 35 nines then 0: 36 digits, in range
+    e30 = "1" + "0" * 30
+    cases = {
+        "ob_h": [
+            ("36 digits at 18 decimals, quantity with 21 written zeros: in range (HR-57)",
+             {"messages": [snap([[big, zeros]])], "depth": 10, "price_decimals": 18, "qty_decimals": 8},
+             {"book": {"asks": [], "bids": [[big, zeros]]},
+              "crc32": zlib.crc32((component(big, 18) + component(zeros, 8)).encode("ascii")) & 0xFFFFFFFF,
+              "events": [], "stats": stats}, None),
+            ("price with 19 decimals (HR-57)",
+             {"messages": [snap([["0.0000000000000000001", "1"]])], "depth": 10, "price_decimals": 1,
+              "qty_decimals": 8}, None, "E_LIMIT"),
+            ("quantity with 37 digits (HR-57)",
+             {"messages": [snap([["100.0", "1" + "0" * 36]])], "depth": 10, "price_decimals": 1,
+              "qty_decimals": 8}, None, "E_LIMIT"),
+        ],
+        "lit_h": [
+            ("product whose raw coefficients overflow 128 bits but whose value is in range (HR-58)",
+             dict(fine, events=_cross(p5, q2)),
+             _lit_out([{"maker_id": "S1", "price": p5, "qty": q2, "seq": 1, "taker_id": "B1"}], [], [],
+                      {"B1": _cons(q2, "0", q2), "S1": _cons(q2, "0", q2)},
+                      {"T1": "-10000000000", "T2": "100000000000"}), None),
+            ("31-digit price on an 18-decimal tick grid (HR-58: grid checks never overflow)",
+             dict(fine, events=_cross(e30, "1")[1:]),
+             _lit_out([], [{"display_qty": "1", "hidden_qty": "0", "id": "B1", "price": e30, "seq": 1}],
+                      [[e30, "1"]], {"B1": _cons("0", "1", "1")}, {}), None),
+            ("notional of 36 digits: in range (HR-57)",
+             dict(unit, events=_cross(nines, "10")),
+             _lit_out([{"maker_id": "S1", "price": nines, "qty": "10", "seq": 1, "taker_id": "B1"}], [], [],
+                      {"B1": _cons("10", "0", "10"), "S1": _cons("10", "0", "10")}, {"T1": "0", "T2": "0"}), None),
+            ("notional of 37 digits (HR-57)", dict(unit, events=_cross("1" + "0" * 35, "10")), None, "E_LIMIT"),
+            ("price with 19 decimals (HR-57)",
+             dict(fine, events=_cross("100.0000000000000000001", "1")), None, "E_LIMIT"),
+        ],
+    }[name]
+    first = int(s.cases[-1]["case_id"].split("-")[1]) + 1
+    for k, (desc, inp, exp, code) in enumerate(cases):
+        if code is None:
+            s.add(OPS[name], inp, exp, cls="date_and_convention", verified=["hand"],
+                  tags=["stage_h", "boundary"], description=f"hand: {desc}")
+        else:
+            s.add(OPS[name], inp, error=code, cls="date_and_convention", verified=["hand"],
+                  tags=["stage_h", "error", "boundary"], description=f"hand: {desc}")
         s.cases[-1]["case_id"] = f"{name}-{first + k:04d}"
 
 
