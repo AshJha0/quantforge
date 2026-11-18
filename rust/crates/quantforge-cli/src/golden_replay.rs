@@ -433,3 +433,9 @@ fn stage_j_w1_goldens() {
         99,
     );
 }
+
+/// The stage H wave 2 goldens: `micro.book.rebuild` (`ob_h`) and `exec.sim.lit.run` (`lit_h`).
+#[test]
+fn stage_h_w2_goldens() {
+    replay_only("stage_h", &["ob_h", "lit_h"], 29);
+}

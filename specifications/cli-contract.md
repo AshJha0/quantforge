@@ -417,3 +417,11 @@ Rulings `stage-h-rulings-w1.md` HR-1 to HR-10 (confirmed 2026-11-18). No new err
 | `exec.tca.shortfall` | `10-execution/tca.md` | `side` (`BUY`, `SELL`), `decision_price`, `arrival_price`, `end_price`, `order_quantity`, `fills` (array of `{quantity, price}`), `fees`, optional `benchmark_vwap` | `delay`, `execution`, `opportunity`, `total`, `total_bps`; `vwap_slippage` only when `benchmark_vwap` is given |
 | `micro.mm.as_quotes` | `09-microstructure/avellaneda-stoikov.md` | `mid`, `inventory`, `risk_aversion`, `sigma`, `time_left`, `k` | `reservation`, `spread`, `bid`, `ask` |
 | `usecase.execution_tca` | `04-pricing/use-cases.md` (use case 5) | see the spec | `lots`, `expected_cost`, `variance`, `filled`, `fees`, `delay`, `execution`, `opportunity`, `total`, `total_bps` |
+## Stage H wave 2 operations
+
+No new error code. Prices, quantities and fees are decimal strings (HR-12); outputs are canonical JSON (HR-29). The specs' Errors lines give the page limits (`micro.book.rebuild` 50,000,000 messages, HR-17; `exec.sim.lit.run` 10,000,000 events), which replace the general per-array limit for those arrays. Goldens `datasets/golden/stage_h/ob_h.json` and `lit_h.json` (`oracle/python/gen_stage_h_w2.py`). Implemented in all four builds.
+
+| Prefix | Spec | Slice |
+|---|---|---|
+| `micro.book.rebuild` | `09-microstructure/order-book.md` | wave 2 (H-2) |
+| `exec.sim.lit.run` | `10-execution/lit-matching.md` | wave 2 (H-11); every output carries `label` "simulated venue; not a real exchange" |

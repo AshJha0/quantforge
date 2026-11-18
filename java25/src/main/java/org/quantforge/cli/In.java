@@ -51,7 +51,8 @@ final class In {
                 || operation.startsWith("research.portfolio.") || operation.startsWith("research.estimate.")
                 || operation.equals("risk.contrib.euler") || operation.equals("risk.backtest.es_z2")
                 || operation.startsWith("research.drift.") || operation.startsWith("risk.scenario.")
-                || operation.equals("exec.tca.shortfall");
+                || operation.equals("exec.tca.shortfall")
+                || operation.equals("micro.book.rebuild") || operation.equals("exec.sim.lit.run");
     }
 
     private void scanArrays(Object v) {

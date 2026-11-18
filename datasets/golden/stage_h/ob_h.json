@@ -1,0 +1,1566 @@
+{
+ "schema_version": "1.0",
+ "suite": "ob_h",
+ "spec": "specifications/09-microstructure/order-book.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_w2.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "ob_h-0001",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "depth": 10,
+    "messages": [
+     {
+      "asks": [
+       [
+        "45285.2",
+        "0.00100000"
+       ],
+       [
+        "45286.4",
+        "1.54571953"
+       ],
+       [
+        "45286.6",
+        "1.54571109"
+       ],
+       [
+        "45289.6",
+        "1.54560911"
+       ],
+       [
+        "45290.2",
+        "0.15890660"
+       ],
+       [
+        "45291.8",
+        "1.54553491"
+       ],
+       [
+        "45294.7",
+        "0.04454749"
+       ],
+       [
+        "45296.1",
+        "0.35380000"
+       ],
+       [
+        "45297.5",
+        "0.09945542"
+       ],
+       [
+        "45299.5",
+        "0.18772827"
+       ]
+      ],
+      "bids": [
+       [
+        "45283.5",
+        "0.10000000"
+       ],
+       [
+        "45283.4",
+        "1.54582015"
+       ],
+       [
+        "45282.1",
+        "0.10000000"
+       ],
+       [
+        "45281.0",
+        "0.10000000"
+       ],
+       [
+        "45280.3",
+        "1.54592586"
+       ],
+       [
+        "45279.0",
+        "0.07990000"
+       ],
+       [
+        "45277.6",
+        "0.03310103"
+       ],
+       [
+        "45277.5",
+        "0.30000000"
+       ],
+       [
+        "45277.3",
+        "1.54602737"
+       ],
+       [
+        "45276.6",
+        "0.15445238"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "snapshot"
+     }
+    ],
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [
+       [
+        "45285.2",
+        "0.00100000"
+       ],
+       [
+        "45286.4",
+        "1.54571953"
+       ],
+       [
+        "45286.6",
+        "1.54571109"
+       ],
+       [
+        "45289.6",
+        "1.54560911"
+       ],
+       [
+        "45290.2",
+        "0.15890660"
+       ],
+       [
+        "45291.8",
+        "1.54553491"
+       ],
+       [
+        "45294.7",
+        "0.04454749"
+       ],
+       [
+        "45296.1",
+        "0.35380000"
+       ],
+       [
+        "45297.5",
+        "0.09945542"
+       ],
+       [
+        "45299.5",
+        "0.18772827"
+       ]
+      ],
+      "bids": [
+       [
+        "45283.5",
+        "0.10000000"
+       ],
+       [
+        "45283.4",
+        "1.54582015"
+       ],
+       [
+        "45282.1",
+        "0.10000000"
+       ],
+       [
+        "45281.0",
+        "0.10000000"
+       ],
+       [
+        "45280.3",
+        "1.54592586"
+       ],
+       [
+        "45279.0",
+        "0.07990000"
+       ],
+       [
+        "45277.6",
+        "0.03310103"
+       ],
+       [
+        "45277.5",
+        "0.30000000"
+       ],
+       [
+        "45277.3",
+        "1.54602737"
+       ],
+       [
+        "45276.6",
+        "0.15445238"
+       ]
+      ]
+     },
+     "crc32": 3310070434,
+     "events": [],
+     "stats": {
+      "checkpoint_checked": 0,
+      "checkpoint_failed": 0,
+      "checksum_checked": 0,
+      "checksum_failed": 0,
+      "crossed": 0,
+      "deletes_of_absent_level": 0,
+      "gaps": 0,
+      "level_changes": 0,
+      "locked": 0,
+      "messages": 1,
+      "resyncs": 0,
+      "snapshots": 1,
+      "truncated_levels": 0,
+      "updates": 0
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "outside: [KR-CRC] printed checksum 3310070434"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "ob_h-0001 from the spec table; not blind"
+  },
+  {
+   "case_id": "ob_h-0002",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "depth": 10,
+    "messages": [
+     {
+      "asks": [
+       [
+        "101.0",
+        "1.00000000"
+       ],
+       [
+        "102.0",
+        "2.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "100.0",
+        "1.00000000"
+       ],
+       [
+        "99.0",
+        "2.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "snapshot"
+     },
+     {
+      "asks": [],
+      "bids": [
+       [
+        "99.0",
+        "0.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "update"
+     }
+    ],
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [
+       [
+        "101.0",
+        "1.00000000"
+       ],
+       [
+        "102.0",
+        "2.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "100.0",
+        "1.00000000"
+       ]
+      ]
+     },
+     "crc32": 3791984124,
+     "events": [],
+     "stats": {
+      "checkpoint_checked": 0,
+      "checkpoint_failed": 0,
+      "checksum_checked": 0,
+      "checksum_failed": 0,
+      "crossed": 0,
+      "deletes_of_absent_level": 0,
+      "gaps": 0,
+      "level_changes": 1,
+      "locked": 0,
+      "messages": 2,
+      "resyncs": 0,
+      "snapshots": 1,
+      "truncated_levels": 0,
+      "updates": 1
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "ob_h-0002 from the spec table"
+  },
+  {
+   "case_id": "ob_h-0003",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "depth": 25,
+    "messages": [
+     {
+      "asks": [
+       [
+        "101.0",
+        "1.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "100.0",
+        "1.00000000"
+       ],
+       [
+        "99.0",
+        "1.00000000"
+       ],
+       [
+        "98.0",
+        "1.00000000"
+       ],
+       [
+        "97.0",
+        "1.00000000"
+       ],
+       [
+        "96.0",
+        "1.00000000"
+       ],
+       [
+        "95.0",
+        "1.00000000"
+       ],
+       [
+        "94.0",
+        "1.00000000"
+       ],
+       [
+        "93.0",
+        "1.00000000"
+       ],
+       [
+        "92.0",
+        "1.00000000"
+       ],
+       [
+        "91.0",
+        "1.00000000"
+       ],
+       [
+        "90.0",
+        "1.00000000"
+       ],
+       [
+        "89.0",
+        "1.00000000"
+       ],
+       [
+        "88.0",
+        "1.00000000"
+       ],
+       [
+        "87.0",
+        "1.00000000"
+       ],
+       [
+        "86.0",
+        "1.00000000"
+       ],
+       [
+        "85.0",
+        "1.00000000"
+       ],
+       [
+        "84.0",
+        "1.00000000"
+       ],
+       [
+        "83.0",
+        "1.00000000"
+       ],
+       [
+        "82.0",
+        "1.00000000"
+       ],
+       [
+        "81.0",
+        "1.00000000"
+       ],
+       [
+        "80.0",
+        "1.00000000"
+       ],
+       [
+        "79.0",
+        "1.00000000"
+       ],
+       [
+        "78.0",
+        "1.00000000"
+       ],
+       [
+        "77.0",
+        "1.00000000"
+       ],
+       [
+        "76.0",
+        "1.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "snapshot"
+     },
+     {
+      "asks": [],
+      "bids": [
+       [
+        "100.5",
+        "3.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "update"
+     }
+    ],
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [
+       [
+        "101.0",
+        "1.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "100.5",
+        "3.00000000"
+       ],
+       [
+        "100.0",
+        "1.00000000"
+       ],
+       [
+        "99.0",
+        "1.00000000"
+       ],
+       [
+        "98.0",
+        "1.00000000"
+       ],
+       [
+        "97.0",
+        "1.00000000"
+       ],
+       [
+        "96.0",
+        "1.00000000"
+       ],
+       [
+        "95.0",
+        "1.00000000"
+       ],
+       [
+        "94.0",
+        "1.00000000"
+       ],
+       [
+        "93.0",
+        "1.00000000"
+       ],
+       [
+        "92.0",
+        "1.00000000"
+       ],
+       [
+        "91.0",
+        "1.00000000"
+       ],
+       [
+        "90.0",
+        "1.00000000"
+       ],
+       [
+        "89.0",
+        "1.00000000"
+       ],
+       [
+        "88.0",
+        "1.00000000"
+       ],
+       [
+        "87.0",
+        "1.00000000"
+       ],
+       [
+        "86.0",
+        "1.00000000"
+       ],
+       [
+        "85.0",
+        "1.00000000"
+       ],
+       [
+        "84.0",
+        "1.00000000"
+       ],
+       [
+        "83.0",
+        "1.00000000"
+       ],
+       [
+        "82.0",
+        "1.00000000"
+       ],
+       [
+        "81.0",
+        "1.00000000"
+       ],
+       [
+        "80.0",
+        "1.00000000"
+       ],
+       [
+        "79.0",
+        "1.00000000"
+       ],
+       [
+        "78.0",
+        "1.00000000"
+       ],
+       [
+        "77.0",
+        "1.00000000"
+       ]
+      ]
+     },
+     "crc32": 2675096268,
+     "events": [],
+     "stats": {
+      "checkpoint_checked": 0,
+      "checkpoint_failed": 0,
+      "checksum_checked": 0,
+      "checksum_failed": 0,
+      "crossed": 0,
+      "deletes_of_absent_level": 0,
+      "gaps": 0,
+      "level_changes": 1,
+      "locked": 0,
+      "messages": 2,
+      "resyncs": 0,
+      "snapshots": 1,
+      "truncated_levels": 1,
+      "updates": 1
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "ob_h-0003 from the spec table"
+  },
+  {
+   "case_id": "ob_h-0004",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "depth": 10,
+    "messages": [
+     {
+      "asks": [
+       [
+        "101.0",
+        "1.00000000"
+       ],
+       [
+        "102.0",
+        "2.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "100.0",
+        "1.00000000"
+       ],
+       [
+        "99.0",
+        "2.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "snapshot"
+     },
+     {
+      "asks": [],
+      "bids": [
+       [
+        "100.0",
+        "5.00000000"
+       ],
+       [
+        "100.0",
+        "7.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "update"
+     }
+    ],
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [
+       [
+        "101.0",
+        "1.00000000"
+       ],
+       [
+        "102.0",
+        "2.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "100.0",
+        "7.00000000"
+       ],
+       [
+        "99.0",
+        "2.00000000"
+       ]
+      ]
+     },
+     "crc32": 4137560982,
+     "events": [],
+     "stats": {
+      "checkpoint_checked": 0,
+      "checkpoint_failed": 0,
+      "checksum_checked": 0,
+      "checksum_failed": 0,
+      "crossed": 0,
+      "deletes_of_absent_level": 0,
+      "gaps": 0,
+      "level_changes": 2,
+      "locked": 0,
+      "messages": 2,
+      "resyncs": 0,
+      "snapshots": 1,
+      "truncated_levels": 0,
+      "updates": 1
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "ob_h-0004 from the spec table"
+  },
+  {
+   "case_id": "ob_h-0005",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "depth": 10,
+    "messages": [
+     {
+      "asks": [],
+      "bids": [
+       [
+        "100.0",
+        "5.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "update"
+     },
+     {
+      "asks": [
+       [
+        "101.0",
+        "1.00000000"
+       ],
+       [
+        "102.0",
+        "2.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "100.0",
+        "1.00000000"
+       ],
+       [
+        "99.0",
+        "2.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "snapshot"
+     }
+    ],
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [
+       [
+        "101.0",
+        "1.00000000"
+       ],
+       [
+        "102.0",
+        "2.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "100.0",
+        "1.00000000"
+       ],
+       [
+        "99.0",
+        "2.00000000"
+       ]
+      ]
+     },
+     "crc32": 10694224,
+     "events": [
+      {
+       "i": 0,
+       "kind": "UPDATE_BEFORE_SNAPSHOT"
+      }
+     ],
+     "stats": {
+      "checkpoint_checked": 0,
+      "checkpoint_failed": 0,
+      "checksum_checked": 0,
+      "checksum_failed": 0,
+      "crossed": 0,
+      "deletes_of_absent_level": 0,
+      "gaps": 0,
+      "level_changes": 0,
+      "locked": 0,
+      "messages": 2,
+      "resyncs": 0,
+      "snapshots": 1,
+      "truncated_levels": 0,
+      "updates": 1
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "ob_h-0005 from the spec table"
+  },
+  {
+   "case_id": "ob_h-0006",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "depth": 10,
+    "messages": [
+     {
+      "asks": [
+       [
+        "101.0",
+        "1.00000000"
+       ],
+       [
+        "102.0",
+        "2.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "100.0",
+        "1.00000000"
+       ],
+       [
+        "99.0",
+        "2.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "snapshot"
+     },
+     {
+      "asks": [],
+      "bids": [
+       [
+        "101.0",
+        "1.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "update"
+     },
+     {
+      "asks": [],
+      "bids": [
+       [
+        "101.5",
+        "1.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "update"
+     }
+    ],
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [
+       [
+        "101.0",
+        "1.00000000"
+       ],
+       [
+        "102.0",
+        "2.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "101.5",
+        "1.00000000"
+       ],
+       [
+        "101.0",
+        "1.00000000"
+       ],
+       [
+        "100.0",
+        "1.00000000"
+       ],
+       [
+        "99.0",
+        "2.00000000"
+       ]
+      ]
+     },
+     "crc32": 210668884,
+     "events": [
+      {
+       "i": 1,
+       "kind": "LOCKED"
+      },
+      {
+       "i": 2,
+       "kind": "CROSSED"
+      }
+     ],
+     "stats": {
+      "checkpoint_checked": 0,
+      "checkpoint_failed": 0,
+      "checksum_checked": 0,
+      "checksum_failed": 0,
+      "crossed": 1,
+      "deletes_of_absent_level": 0,
+      "gaps": 0,
+      "level_changes": 2,
+      "locked": 1,
+      "messages": 3,
+      "resyncs": 0,
+      "snapshots": 1,
+      "truncated_levels": 0,
+      "updates": 2
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "ob_h-0006 from the spec table"
+  },
+  {
+   "case_id": "ob_h-0007",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "depth": 10,
+    "messages": [
+     {
+      "asks": [
+       [
+        "101.0",
+        "1.00000000"
+       ],
+       [
+        "102.0",
+        "2.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "100.0",
+        "1.00000000"
+       ],
+       [
+        "99.0",
+        "2.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "snapshot"
+     },
+     {
+      "asks": [],
+      "bids": [
+       [
+        "98.0",
+        "0.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "update"
+     }
+    ],
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [
+       [
+        "101.0",
+        "1.00000000"
+       ],
+       [
+        "102.0",
+        "2.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "100.0",
+        "1.00000000"
+       ],
+       [
+        "99.0",
+        "2.00000000"
+       ]
+      ]
+     },
+     "crc32": 10694224,
+     "events": [],
+     "stats": {
+      "checkpoint_checked": 0,
+      "checkpoint_failed": 0,
+      "checksum_checked": 0,
+      "checksum_failed": 0,
+      "crossed": 0,
+      "deletes_of_absent_level": 1,
+      "gaps": 0,
+      "level_changes": 1,
+      "locked": 0,
+      "messages": 2,
+      "resyncs": 0,
+      "snapshots": 1,
+      "truncated_levels": 0,
+      "updates": 1
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "ob_h-0007 from the spec table"
+  },
+  {
+   "case_id": "ob_h-0008",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "depth": 10,
+    "messages": [
+     {
+      "asks": [
+       [
+        "101.0",
+        "1.00000000"
+       ],
+       [
+        "102.0",
+        "2.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "100.0",
+        "1.00000000"
+       ],
+       [
+        "99.0",
+        "2.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "snapshot"
+     },
+     {
+      "type": "gap"
+     },
+     {
+      "asks": [],
+      "bids": [
+       [
+        "100.0",
+        "9.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "update"
+     },
+     {
+      "asks": [
+       [
+        "91.0",
+        "1.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "90.0",
+        "1.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "snapshot"
+     }
+    ],
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [
+       [
+        "91.0",
+        "1.00000000"
+       ]
+      ],
+      "bids": [
+       [
+        "90.0",
+        "1.00000000"
+       ]
+      ]
+     },
+     "crc32": 3400329642,
+     "events": [
+      {
+       "i": 1,
+       "kind": "GAP"
+      },
+      {
+       "i": 2,
+       "kind": "UPDATE_BEFORE_SNAPSHOT"
+      }
+     ],
+     "stats": {
+      "checkpoint_checked": 0,
+      "checkpoint_failed": 0,
+      "checksum_checked": 0,
+      "checksum_failed": 0,
+      "crossed": 0,
+      "deletes_of_absent_level": 0,
+      "gaps": 1,
+      "level_changes": 0,
+      "locked": 0,
+      "messages": 3,
+      "resyncs": 0,
+      "snapshots": 2,
+      "truncated_levels": 0,
+      "updates": 1
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "ob_h-0008 from the spec table"
+  },
+  {
+   "case_id": "ob_h-0010",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "depth": 10,
+    "emit_checksum_string": true,
+    "messages": [
+     {
+      "asks": [],
+      "bids": [
+       [
+        "0.00012300",
+        "1.00000000"
+       ]
+      ],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z",
+      "type": "snapshot"
+     }
+    ],
+    "price_decimals": 8,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [],
+      "bids": [
+       [
+        "0.00012300",
+        "1.00000000"
+       ]
+      ]
+     },
+     "checksum_string": "12300100000000",
+     "crc32": 1057566538,
+     "events": [],
+     "stats": {
+      "checkpoint_checked": 0,
+      "checkpoint_failed": 0,
+      "checksum_checked": 0,
+      "checksum_failed": 0,
+      "crossed": 0,
+      "deletes_of_absent_level": 0,
+      "gaps": 0,
+      "level_changes": 0,
+      "locked": 0,
+      "messages": 1,
+      "resyncs": 0,
+      "snapshots": 1,
+      "truncated_levels": 0,
+      "updates": 0
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2.md)"
+   ],
+   "tags": [
+    "stage_h",
+    "microstructure"
+   ],
+   "description": "ob_h-0010 from the spec table"
+  },
+  {
+   "case_id": "ob_h-0011",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "messages": [
+     {
+      "type": "snapshot",
+      "bids": [
+       [
+        "100.0",
+        "1.00000000"
+       ]
+      ],
+      "asks": [],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z"
+     }
+    ],
+    "depth": 20,
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: depth not in the list"
+  },
+  {
+   "case_id": "ob_h-0012",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "messages": [
+     {
+      "type": "snapshot",
+      "bids": [
+       [
+        "100.0",
+        "-1"
+       ]
+      ],
+      "asks": [],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z"
+     }
+    ],
+    "depth": 10,
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: negative quantity"
+  },
+  {
+   "case_id": "ob_h-0013",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "messages": [
+     {
+      "type": "snapshot",
+      "bids": [
+       [
+        "0",
+        "1"
+       ]
+      ],
+      "asks": [],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z"
+     }
+    ],
+    "depth": 10,
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: non-positive price"
+  },
+  {
+   "case_id": "ob_h-0014",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "messages": [
+     {
+      "type": "snapshot",
+      "bids": [
+       [
+        100.0,
+        "1"
+       ]
+      ],
+      "asks": [],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z"
+     }
+    ],
+    "depth": 10,
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: price as a number, not a decimal string (HR-12)"
+  },
+  {
+   "case_id": "ob_h-0015",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "messages": [
+     {
+      "type": "trade",
+      "bids": [
+       [
+        "100.0",
+        "1.00000000"
+       ]
+      ],
+      "asks": [],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z"
+     }
+    ],
+    "depth": 10,
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: unknown message type"
+  },
+  {
+   "case_id": "ob_h-0016",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "messages": [
+     {
+      "type": "snapshot",
+      "bids": [
+       [
+        "123456789012345678.123456789012345678",
+        "1.000000000000000000000"
+       ]
+      ],
+      "asks": [],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z"
+     }
+    ],
+    "depth": 10,
+    "price_decimals": 18,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [],
+      "bids": [
+       [
+        "123456789012345678.123456789012345678",
+        "1.000000000000000000000"
+       ]
+      ]
+     },
+     "crc32": 4292053808,
+     "events": [],
+     "stats": {
+      "checkpoint_checked": 0,
+      "checkpoint_failed": 0,
+      "checksum_checked": 0,
+      "checksum_failed": 0,
+      "crossed": 0,
+      "deletes_of_absent_level": 0,
+      "gaps": 0,
+      "level_changes": 0,
+      "locked": 0,
+      "messages": 1,
+      "resyncs": 0,
+      "snapshots": 1,
+      "truncated_levels": 0,
+      "updates": 0
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "boundary"
+   ],
+   "description": "hand: 36 digits at 18 decimals, quantity with 21 written zeros: in range (HR-57)"
+  },
+  {
+   "case_id": "ob_h-0017",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "messages": [
+     {
+      "type": "snapshot",
+      "bids": [
+       [
+        "0.0000000000000000001",
+        "1"
+       ]
+      ],
+      "asks": [],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z"
+     }
+    ],
+    "depth": 10,
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error",
+    "boundary"
+   ],
+   "description": "hand: price with 19 decimals (HR-57)"
+  },
+  {
+   "case_id": "ob_h-0018",
+   "operation": "micro.book.rebuild",
+   "inputs": {
+    "messages": [
+     {
+      "type": "snapshot",
+      "bids": [
+       [
+        "100.0",
+        "1000000000000000000000000000000000000"
+       ]
+      ],
+      "asks": [],
+      "checksum": null,
+      "t": "2026-01-01T00:00:00Z"
+     }
+    ],
+    "depth": 10,
+    "price_decimals": 1,
+    "qty_decimals": 8
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error",
+    "boundary"
+   ],
+   "description": "hand: quantity with 37 digits (HR-57)"
+  }
+ ]
+}
