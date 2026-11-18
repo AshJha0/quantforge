@@ -152,4 +152,6 @@ TEST_CASE("stage H shortfall TCA goldens") { replay("stage_h/tca_h"); }
 TEST_CASE("stage H Avellaneda-Stoikov goldens") { replay("stage_h/as_h"); }
 TEST_CASE("stage H use case 5 goldens") { replay("stage_h/uc5_h"); }
 TEST_CASE("stage H E1 non-finite input goldens") { replay("stage_h/e1_h"); }
+TEST_CASE("stage H microstructure estimator goldens") { replay("stage_h/mest_h"); }
+TEST_CASE("stage H venue analytics goldens") { replay("stage_h/venue_h"); }
 #endif
