@@ -3,6 +3,7 @@
 // A3 (properties) and A4 (labels) of specifications/09-microstructure/asset-conventions.md, and the paths the
 // goldens do not reach.
 #include <catch2/catch_test_macros.hpp>
+#include <cmath>
 #include <fstream>
 #include <map>
 #include <random>
@@ -86,8 +87,17 @@ void replay(const char* suite, int expect_cases) {
         INFO(c.find("case_id")->text << " -> " << to_text(doc));
         if (exp.find("status")->text == "ok") {
             REQUIRE(doc.find("status")->text == "ok");
-            CHECK(to_text(*doc.find("outputs")) == to_text(*exp.find("outputs")));
-            CHECK(labels.contains(doc.find("outputs")->find("label")->text));  // A4
+            if (c.find("operation")->text == "micro.rates.bond_yield") {  // root_finding class, 1e-10 (binary64 Brent)
+                const double got = std::stod(doc.find("outputs")->find("yield")->text);
+                const double want = std::stod(exp.find("outputs")->find("yield")->text);
+                CHECK(std::abs(got - want) <= 1e-10 + 1e-10 * std::abs(want));
+            } else {
+                CHECK(to_text(*doc.find("outputs")) == to_text(*exp.find("outputs")));
+            }
+            // A4: venue and simulator outputs carry their label; convention outputs (micro.*) none (HR-111).
+            const json::Value* label = doc.find("outputs")->find("label");
+            if (c.find("operation")->text.starts_with("micro.")) CHECK(label == nullptr);
+            else if (label != nullptr) CHECK(labels.contains(label->text));
         } else {
             CHECK(code_of(doc) == exp.find("error_code")->text);
         }
@@ -99,10 +109,12 @@ TEST_CASE("multi-asset goldens, every row exact (A1, A4)") {
     replay("auc_h", 12);
     replay("eqc_h", 19);
     replay("fxc_h", 9);
-    replay("fxv_h", 11);
-    replay("rtc_h", 13);
+    replay("fxv_h", 14);
+    replay("rtc_h", 17);
     replay("fut_h", 8);
-    replay("e1_h3", 12);
+    replay("e1_h3", 15);
+    replay("ses_h", 3);
+    replay("acls_h", 5);
 }
 #endif
 
@@ -129,11 +141,11 @@ TEST_CASE("A3: equity rounding is never more aggressive and lands on the grid") 
         }
 }
 
-TEST_CASE("A3: 32nds text round-trips on the 1/256 grid") {
-    for (int n = 0; n < 256 * 130; n += 7) {
-        const D x = D::integer(n) * D::parse("0.00390625");
+TEST_CASE("A3: 32nds text round-trips on the 1/128 grid (HR-109 quarter-32nds)") {
+    for (int n = 0; n < 128 * 130; n += 7) {
+        const D x = D::integer(n) * D::parse("0.0078125");
         const std::string text =
-            out_text("micro.rates.format_32nds", R"({"resolution":256,"value":")" + x.str() + "\"}", "text");
+            out_text("micro.rates.format_32nds", R"({"resolution":128,"value":")" + x.str() + "\"}", "text");
         CHECK(D::parse(out_text("micro.rates.parse_32nds", R"({"text":")" + text + "\"}", "value")) == x);
     }
 }
@@ -258,7 +270,7 @@ TEST_CASE("fut.run reuses the lit engine; P&L per trader") {
 }
 
 TEST_CASE("more paths: labels, caps, bond, variation, T+1 pair, error codes") {
-    CHECK(out_text("micro.eq.round_price", R"({"price":"5","side":"BUY","data_source":"IEX"})", "label") == ma::iex_label);
+    CHECK(outv("micro.eq.round_price", R"({"price":"5","side":"BUY"})").find("label") == nullptr);  // HR-111
     CHECK(out_text("micro.eq.fee_check", R"({"price":"20","taker_fee":"0.01","cap_check":false})", "cap") == "0.001");
     CHECK(out_text("micro.eq.fee_check", R"({"price":"0.5","taker_fee":"0.0001","as_of":"2024-01-02"})", "cap") == "0.0015");
     CHECK(code("micro.eq.fee_check", R"({"price":"20","taker_fee":"0.0011"})") == "E_DOMAIN");
@@ -271,7 +283,6 @@ TEST_CASE("more paths: labels, caps, bond, variation, T+1 pair, error codes") {
              {R"({"price":"1","side":"BUY","tick_table":[["1","0.01"]]})", "E_INPUT"},
              {R"({"price":"1","side":"BUY","tick_table":[["0","0"]]})", "E_DOMAIN"},
              {R"({"price":"1","side":"BUY","tick_tier":"X"})", "E_SCHEMA"},
-             {R"({"price":"1","side":"BUY","data_source":"X"})", "E_SCHEMA"},
              {R"({"price":1,"side":"BUY"})", "E_SCHEMA"},
              {R"({"price":"1","side":"BUY","tick_tier":"HALF_PENNY","as_of":"2024-01-02"})", "E_INPUT"},
              {R"({"price":"1","side":"BUY","tick_tier":"HALF_PENNY","tick_table":[["0","0.01"]]})", "E_INPUT"},
@@ -289,10 +300,23 @@ TEST_CASE("more paths: labels, caps, bond, variation, T+1 pair, error codes") {
     CHECK(code("micro.fx.pip_value", R"({"notional":"-1","pair":"EURUSD"})") == "E_DOMAIN");
     CHECK(out_text("micro.fx.pip_value", R"({"notional":"1000000","pair":"USDJPY"})", "pip_value") == "10000");
     CHECK(code("micro.rates.parse_32nds", R"({"text":"99-32"})") == "E_DOMAIN");
-    CHECK(code("micro.rates.parse_32nds", R"({"text":"99-1"})") == "E_INPUT");
-    CHECK(code("micro.rates.parse_32nds", R"({"text":"99-164"})") == "E_INPUT");
+    CHECK(code("micro.rates.parse_32nds", R"({"text":"99-1"})") == "E_SCHEMA");
+    CHECK(code("micro.rates.parse_32nds", R"({"text":"99-163"})") == "E_SCHEMA");  // HR-109: 0, 2, 5, 7, +
     CHECK(code("micro.rates.parse_32nds", R"({"text":99})") == "E_SCHEMA");
-    CHECK(out_text("micro.rates.parse_32nds", R"({"text":"99-163"})", "value") == "99.51171875");
+    CHECK(out_text("micro.rates.parse_32nds", R"({"text":"99-165"})", "value") == "99.515625");
+    CHECK(code("micro.rates.format_32nds", R"({"resolution":256,"value":"1"})") == "E_DOMAIN");
+    CHECK(std::abs(std::stod(outv("micro.rates.bond_yield", R"({"coupon":"0.04","frequency":2,"periods":60,"price":"105.40876848"})")
+                                 .find("yield")->text) -
+                   0.037) < 1e-10);
+    CHECK(code("micro.rates.bond_yield", R"({"coupon":"0.04","frequency":2,"periods":60,"price":"0"})") == "E_DOMAIN");
+    {  // HR-97 last look: u drawn from core.rng, stream = request_index (value from the Python reference)
+        const json::Value o = outv("exec.sim.fx.request",
+                                   R"({"mid_after":"1.0851","p_random_reject":"0.5","pair":"EURUSD","qty":"1",)"
+                                   R"("quote":{"ask":"1.0852","bid":"1.0850","quote_mid":"1.0851"},"side":"BUY",)"
+                                   R"("threshold_pips":"1","seed":42,"request_index":3})");
+        CHECK(o.find("outcome")->text == "LL_RANDOM");
+        CHECK(std::stod(o.find("u")->text) == 0.021463828447983224);
+    }
     CHECK(code("micro.rates.format_32nds", R"({"resolution":48,"value":"1"})") == "E_DOMAIN");
     CHECK(code("micro.rates.format_32nds", R"({"resolution":64,"value":"1.001"})") == "E_DOMAIN");
     CHECK(out_text("micro.rates.format_32nds", R"({"resolution":64,"value":"99.515625"})", "text") == "99-16+");

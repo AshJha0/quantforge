@@ -161,4 +161,6 @@ TEST_CASE("stage H FX venue goldens") { replay("stage_h/fxv_h"); }
 TEST_CASE("stage H rates convention goldens") { replay("stage_h/rtc_h"); }
 TEST_CASE("stage H rates futures goldens") { replay("stage_h/fut_h"); }
 TEST_CASE("stage H E1 multi-asset goldens") { replay("stage_h/e1_h3"); }
+TEST_CASE("stage H session phase goldens") { replay("stage_h/ses_h"); }
+TEST_CASE("stage H asset-class goldens") { replay("stage_h/acls_h"); }
 #endif

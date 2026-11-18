@@ -21,6 +21,7 @@
 #include "quantforge/core/multiasset.hpp"
 
 namespace quantforge::micro {
+class Session;  // the session phases (below) drive the engine directly
 namespace {
 
 using json::Kind;
@@ -80,7 +81,7 @@ public:
         string phase;
     };
     void output(json::Writer& out, const Extra* extra = nullptr);
-    friend class Session;
+    friend class quantforge::micro::Session;
 
 private:
     long long next_seq() { return ++seq_; }

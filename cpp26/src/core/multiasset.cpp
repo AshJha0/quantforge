@@ -136,7 +136,9 @@ const Value& list_need(const Value& o, string_view key) {
 // ------------------------------------------------------------------ decimal helpers
 
 const D zero{};
-const D one = D::integer(1);
+// Built on first use, never at static initialisation: ExactDecimal's range limit lives in another
+// translation unit, so a namespace-scope decimal could be built before it.
+D one() { return D::integer(1); }
 
 int places(D x) {  // decimals of the normalised value (trailing zeros gone)
     const string s = x.str();
@@ -144,7 +146,7 @@ int places(D x) {  // decimals of the normalised value (trailing zeros gone)
     return dot == string::npos ? 0 : int(s.size() - dot - 1);
 }
 
-D unit(int p) { return p == 0 ? one : D::parse("0." + string(std::size_t(p - 1), '0') + "1"); }
+D unit(int p) { return p == 0 ? one() : D::parse("0." + string(std::size_t(p - 1), '0') + "1"); }
 
 bool odd(D integral) {
     const string s = integral.str();
@@ -157,7 +159,7 @@ string at(D x, int p) {
     D q = x.divide_integral(u, false);
     const D rem = x - q * u;
     const D twice = rem + rem;
-    if (twice > u || (twice == u && odd(q))) q += one;
+    if (twice > u || (twice == u && odd(q))) q += one();
     string out;
     (q * u).fixed(p, out);
     return out;
@@ -334,8 +336,8 @@ string fmt_scaled(bool negative, const Big& q, int scale) {
 
 // ------------------------------------------------------------------ equities (H-22)
 
-const D fee_cap_current = D::parse("0.001");
-const D fee_cap_old = D::parse("0.003");
+D fee_cap_current() { return D::parse("0.001"); }
+D fee_cap_old() { return D::parse("0.003"); }
 
 bool current_rules(const Value& raw) {
     const Value* cv = raw.find("compliance_date");
@@ -440,7 +442,7 @@ D per_pip(const string& quote) { return D::integer(quote == "JPY" ? 100 : 10000)
 
 // ------------------------------------------------------------------ rates (H-24)
 
-const D one_128th = D::parse("0.0078125");
+D one_128th() { return D::parse("0.0078125"); }
 
 // HR-109: CME convention, third digit in quarter-32nds [CME-32NDS, unverified]: 0, 2, 5, 7 = 0, 1/4, 1/2,
 // 3/4 and "+" = 1/2. Anything else, the shape included, is E_SCHEMA.
@@ -462,13 +464,13 @@ D parse_32nds(const Value* v, const string& path) {
         const char c = t[h_end + 3];
         q = c == '2' ? 1 : (c == '5' || c == '+') ? 2 : c == '7' ? 3 : 0;
     }
-    return D::parse(string_view(t).substr(0, h_end)) + D::integer(4 * ff + q) * one_128th;
+    return D::parse(string_view(t).substr(0, h_end)) + D::integer(4 * ff + q) * one_128th();
 }
 
 string format_32nds(D x, long long res) {
     if (res != 32 && res != 64 && res != 128) fail("E_DOMAIN", "resolution", "resolution not 32, 64 or 128");
-    if (x.sign() < 0 || !(x * D::integer(res)).multiple_of(one)) fail("E_DOMAIN", "value", "value not on the requested grid");
-    const D h = x.divide_integral(one, false);
+    if (x.sign() < 0 || !(x * D::integer(res)).multiple_of(one())) fail("E_DOMAIN", "value", "value not on the requested grid");
+    const D h = x.divide_integral(one(), false);
     const long long quarters = to_ll((x - h) * D::integer(128));
     const long long ff = quarters / 4, q = quarters % 4;
     static constexpr const char* text[] = {"", "2", "+", "7"};
@@ -556,9 +558,9 @@ void eq_fee_check(const Value& raw, Writer& out) {
     const D price = dec(raw, "price");
     const D fee = dec(raw, "taker_fee");
     const bool check = bool_or(raw, "cap_check", true);
-    const D cap_rate = current_rules(raw) ? fee_cap_current : fee_cap_old;  // [REGNMS-610]
+    const D cap_rate = current_rules(raw) ? fee_cap_current() : fee_cap_old();  // [REGNMS-610]
     if (price.sign() <= 0) fail("E_DOMAIN", "price", "price must be positive");
-    const D cap = price >= one ? cap_rate : cap_rate * price;
+    const D cap = price >= one() ? cap_rate : cap_rate * price;
     if (check && fee > cap) fail("E_DOMAIN", "taker_fee", "taker_fee above the Rule 610 cap");
     put(out, "cap", cap.str());
     put(out, "taker_fee", fee.str());
@@ -681,7 +683,7 @@ void auction_uncross(const Value& raw, Writer& out) {
         }
     std::optional<Cand> best;
     if (!buys.empty() && !sells.empty() && lo) {
-        const D count = (*hi - *lo).divide_integral(tick, false) + one;
+        const D count = (*hi - *lo).divide_integral(tick, false) + one();
         if (count > D::integer(max_auction_candidates)) fail("E_LIMIT", "orders", "more than 1,000,000 candidate prices");
         const long long n = to_ll(count);
         std::vector<Cand> cands;
@@ -882,7 +884,7 @@ void fx_request(const Value& raw, Writer& out) {
     const D two53 = D::integer(9'007'199'254'740'992LL);
     const auto [b, quote] = pair_of(raw);
     if (bid > ask) fail("E_INPUT", "quote", "bid above ask");
-    if (qty.sign() <= 0 || thr.sign() < 0 || prr.sign() < 0 || prr > one || (!drawn && (u.sign() < 0 || u >= one)))
+    if (qty.sign() <= 0 || thr.sign() < 0 || prr.sign() < 0 || prr > one() || (!drawn && (u.sign() < 0 || u >= one())))
         fail("E_DOMAIN", "u", "qty > 0, threshold >= 0, p in [0, 1], u in [0, 1)");
     const bool u_below = drawn ? u_scaled < prr * two53 : u < prr;
     const D move = (after - qmid) * per_pip(quote);
@@ -1018,7 +1020,7 @@ void fut_to_text(const Value& raw, Writer& out) {
     if (t < 0) fail("E_DOMAIN", "ticks", "ticks must not be negative");
     long long res = 0;
     for (const long long r : {32LL, 64LL, 128LL})
-        if (tick * D::integer(r) == one) res = r;
+        if (tick * D::integer(r) == one()) res = r;
     if (res == 0) fail("E_DOMAIN", "contract", "contract tick is not 1/32, 1/64 or 1/128");
     const string text = format_32nds(D::integer(t) * tick, res);
     put(out, "label", rates_label);
