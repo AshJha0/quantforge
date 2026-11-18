@@ -405,9 +405,23 @@ proptest! {
     fn as_reservation_decreasing(q1 in -50.0f64..50.0, q2 in -50.0f64..50.0) {
         let a = as_quotes(100.0, q1, 0.1, 2.0, 1.0, 1.5).unwrap();
         let b = as_quotes(100.0, q2, 0.1, 2.0, 1.0, 1.5).unwrap();
-        if q1 < q2 {
+        if q1 < q2 - 1e-9 {
             prop_assert!(a.reservation > b.reservation);
         }
         prop_assert!(a.spread == b.spread);
     }
+}
+
+#[test]
+fn four_build_edge_choices() {
+    let r = tca_shortfall(&TcaOrder {
+        order_quantity: 800.0,
+        ..order(false, 0.0)
+    })
+    .unwrap();
+    assert!(r.opportunity.is_sign_positive());
+    let s = schedule_pov(1000.0, 0.2, &[999.999_999_999_999_9], true).unwrap();
+    assert_eq!(units(&s.slices), [250]);
+    let s = schedule_pov(1000.0, 0.2, &[999.0], true).unwrap();
+    assert_eq!(units(&s.slices), [249]);
 }

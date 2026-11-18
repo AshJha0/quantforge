@@ -128,12 +128,11 @@ def test_pov_participation_and_conservation(x: int, p: float, v: list[float], mo
     remaining = float(x)
     for s, vol in zip(r["slices"], v, strict=True):
         uncapped = p * vol / (1 - p)
-        if mode == "CONTINUOUS" and s < remaining and s > 0:
+        if mode == "CONTINUOUS" and s < remaining and vol > 1e-6:
             assert s / (s + vol) == pytest.approx(p, rel=1e-12)  # realised participation
         if mode == "UNITS":
-            assert s == min(math.floor(remaining), math.floor(uncapped)) or s == math.floor(
-                min(remaining, uncapped)
-            )
+            assert isinstance(s, int) and 0 <= s <= min(remaining, uncapped * (1 + 1e-12))
+            assert s >= math.floor(min(remaining, uncapped))
         remaining -= s
 
 
@@ -402,7 +401,7 @@ def test_as_errors_and_limits() -> None:
 def test_as_reservation_decreasing_in_inventory(q1: float, q2: float) -> None:
     r1 = ex.as_quotes(100.0, q1, 0.1, 2.0, 1.0, 1.5)
     r2 = ex.as_quotes(100.0, q2, 0.1, 2.0, 1.0, 1.5)
-    if q1 < q2:
+    if q1 < q2 - 1e-9:  # closer inventories can round to one reservation
         assert r1["reservation"] > r2["reservation"]
     assert r1["spread"] == r2["spread"]
     assert r1["ask"] - r1["bid"] == pytest.approx(r1["spread"], rel=1e-12)
@@ -498,3 +497,12 @@ def test_cli_limits_hr_9() -> None:
     assert r["status"] == "ok"  # fills are allowed up to 1,000,000 (HR-9)
     r = _case("exec.tca.shortfall", {**base, "fills": [fill] * 1_000_001})
     assert r["error"]["code"] == "E_LIMIT"
+
+
+def test_four_build_edge_choices() -> None:
+    # a full SELL has opportunity +0, never -0
+    r = ex.tca_shortfall("SELL", 100.0, 100.1, 101.0, 800.0, FILLS, 0.0, None)
+    assert math.copysign(1.0, r["opportunity"]) == 1.0
+    # POV UNITS snaps a value within 1e-12 relative of an integer before flooring
+    assert ex.schedule_pov(1000.0, 0.2, [999.9999999999999], "UNITS")["slices"] == [250]
+    assert ex.schedule_pov(1000.0, 0.2, [999.0], "UNITS")["slices"] == [249]

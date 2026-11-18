@@ -107,7 +107,9 @@ fn operation_above(op: &str, i: &Json) -> bool {
         "research.drift.psi" => above(i, "bins", 1_000),
         // Stage H wave 1 (HR-9): schedule buckets and AC steps 100,000.
         "exec.schedule.twap" => above(i, "n_buckets", 100_000),
-        "exec.ac.trajectory" | "exec.ac.frontier" => above(i, "n_steps", 100_000),
+        "exec.ac.trajectory" | "exec.ac.frontier" | "usecase.execution_tca" => {
+            above(i, "n_steps", 100_000)
+        }
         "research.drift.ks" => product_above(len(i, "a"), len(i, "b"), 4_000_000),
         "research.regime.baum_welch" => {
             // Ruling J-W2-18: K is the longest of the four state inputs.

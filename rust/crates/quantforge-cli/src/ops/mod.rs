@@ -99,6 +99,11 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("risk", riskw2::NAMES, riskw2::dispatch),
     ("risk", w3::risk::NAMES, w3::risk::dispatch),
     ("usecase", usecase::NAMES, usecase::dispatch),
+    (
+        "usecase",
+        execution::usecase::NAMES,
+        execution::usecase::dispatch,
+    ),
     ("vol", vol::NAMES, vol::dispatch),
     ("xva", xva::NAMES, xva::dispatch),
 ];

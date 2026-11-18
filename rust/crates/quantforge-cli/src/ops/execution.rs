@@ -172,6 +172,49 @@ pub mod micro {
     }
 }
 
+/// Use case 5 lives in the `usecase` domain but reuses this module's readers.
+pub mod usecase {
+    use super::{Inputs, Json, Outcome, Result, ac_params, ex, obj, plain};
+
+    super::super::registry! {
+    (op, i)
+        "usecase.execution_tca" => {
+            let p = ac_params(i)?;
+            let risk_aversion = i.f64("risk_aversion")?;
+            let buy = match i.str("side")? {
+                "BUY" => true,
+                "SELL" => false,
+                _ => return i.fail("side", "unknown side"),
+            };
+            let u = ex::ExecutionTca {
+                risk_aversion,
+                buy,
+                decision_price: i.f64("decision_price")?,
+                arrival_price: i.f64("arrival_price")?,
+                end_price: i.f64("end_price")?,
+                fill_prices: i.reals("fill_prices")?,
+                completed_steps: i.int("completed_steps")?,
+                fee_per_unit: i.f64("fee_per_unit")?,
+            };
+            i.gate()?;
+            let r = ex::execution_tca(&p, &u)?;
+            let s = r.shortfall;
+            plain(obj([
+                ("lots", Json::Arr(r.lots.into_iter().map(Json::Int).collect())),
+                ("expected_cost", r.expected_cost.into()),
+                ("variance", r.variance.into()),
+                ("filled", Json::Int(r.filled)),
+                ("fees", r.fees.into()),
+                ("delay", s.delay.into()),
+                ("execution", s.execution.into()),
+                ("opportunity", s.opportunity.into()),
+                ("total", s.total.into()),
+                ("total_bps", s.total_bps.into()),
+            ]))
+        },
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::limits::check;

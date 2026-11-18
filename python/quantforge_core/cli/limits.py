@@ -354,6 +354,7 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "exec.schedule.twap": _caps(n_buckets=100_000),
     "exec.ac.trajectory": _caps(n_steps=100_000),
     "exec.ac.frontier": _caps(n_steps=100_000),
+    "usecase.execution_tca": _caps(n_steps=100_000),
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")

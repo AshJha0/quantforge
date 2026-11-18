@@ -101,11 +101,12 @@ def schedule_pov(
     for v in market_volume:
         child = min(remaining, participation * v / ratio)
         if units:
-            child = math.floor(child)
+            near = round(child)  # within 1e-12 relative of an integer: snap before flooring
+            child = near if abs(child - near) <= 1e-12 * abs(near) else math.floor(child)
         remaining -= child
         filled += child
         slices.append(_whole(child) if units else child)
-    residual = quantity - filled
+    residual = remaining  # child <= remaining, so never negative
     if units:
         return {"slices": slices, "filled": _whole(filled), "residual": _whole(residual)}
     return {"slices": slices, "filled": filled, "residual": residual}
@@ -301,8 +302,9 @@ def tca_shortfall(
         if p <= 0:
             raise _fail("E_DOMAIN", "prices must be positive", key)
     delay = s * filled * (arrival_price - decision_price)
+    # + 0.0 turns the -0 of a full SELL into +0
     execution = s * sum((q * (p - arrival_price) for q, p in fills), 0.0)
-    opportunity = s * (order_quantity - filled) * (end_price - decision_price)
+    opportunity = s * (order_quantity - filled) * (end_price - decision_price) + 0.0
     total = delay + execution + opportunity + fees
     out: dict[str, Any] = {
         "delay": delay,
@@ -340,6 +342,47 @@ def as_quotes(
         "spread": spread,
         "bid": reservation - spread / 2.0,
         "ask": reservation + spread / 2.0,
+    }
+
+
+def execution_tca(
+    ac: tuple[float, float, int, float, float, float, float],
+    risk_aversion: float,
+    side: str,
+    decision_price: float,
+    arrival_price: float,
+    end_price: float,
+    fill_prices: Sequence[float],
+    completed_steps: int,
+    fee_per_unit: float,
+) -> dict[str, Any]:
+    """`usecase.execution_tca` (use-cases.md, use case 5): AC trades rounded to whole lots by
+    largest remainder (HR-3), the first `completed_steps` filled, then the shortfall (HR-8)."""
+    quantity, n_steps = ac[0], ac[2]
+    if quantity < 1 or quantity != math.floor(quantity):
+        raise _fail("E_INPUT", "quantity must be a whole number of units, at least 1", "quantity")
+    if n_steps < 1:
+        raise _fail("E_INPUT", "n_steps must be at least 1", "n_steps")
+    if len(fill_prices) != n_steps:
+        raise _fail("E_INPUT", "fill_prices needs one price per step", "fill_prices")
+    if not 0 <= completed_steps <= n_steps:
+        raise _fail("E_INPUT", "completed_steps must lie in 0..n_steps", "completed_steps")
+    if fee_per_unit < 0:
+        raise _fail("E_DOMAIN", "fee_per_unit must be non-negative", "fee_per_unit")
+    t = ac_trajectory(*ac, risk_aversion)
+    exact = [quantity / n_steps] * n_steps if t["kappa"] == 0 else t["trades"]
+    lots = _largest_remainder(quantity, exact)
+    fills = [(float(lots[k]), fill_prices[k]) for k in range(completed_steps)]
+    filled = sum(lots[:completed_steps])
+    fees = fee_per_unit * filled
+    s = tca_shortfall(side, decision_price, arrival_price, end_price, quantity, fills, fees, None)
+    return {
+        "lots": lots,
+        "expected_cost": t["expected_cost"],
+        "variance": t["variance"],
+        "filled": filled,
+        "fees": fees,
+        **s,
     }
 
 

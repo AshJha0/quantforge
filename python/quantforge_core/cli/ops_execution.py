@@ -88,3 +88,13 @@ def micro_mm_as_quotes(i: Inputs) -> Any:
     g, sig = i.real("risk_aversion"), i.real("sigma")
     t, k = i.real("time_left"), i.real("k")
     return core.execution.as_quotes(s, q, g, sig, t, k)
+
+
+@op("usecase.execution_tca")
+def usecase_execution_tca(i: Inputs) -> Any:
+    a, lam = _ac(i), i.real("risk_aversion")
+    side = i.enum("side", SIDES)
+    pd, p0, pc = i.real("decision_price"), i.real("arrival_price"), i.real("end_price")
+    fp, m = i.reals("fill_prices"), i.integer("completed_steps")
+    fee = i.real("fee_per_unit")
+    return core.execution.execution_tca(a, lam, side, pd, p0, pc, fp, m, fee)

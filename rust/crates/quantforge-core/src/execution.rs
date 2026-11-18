@@ -140,7 +140,13 @@ pub fn schedule_pov(x: f64, p: f64, volume: &[f64], units: bool) -> Result<Pov> 
     for &v in volume {
         let mut child = remaining.min(p * v / ratio);
         if units {
-            child = child.floor();
+            // within 1e-12 relative of an integer: snap before flooring
+            let near = child.round();
+            child = if (child - near).abs() <= 1e-12 * near.abs() {
+                near
+            } else {
+                child.floor()
+            };
         }
         remaining -= child;
         filled += child;
@@ -150,7 +156,7 @@ pub fn schedule_pov(x: f64, p: f64, volume: &[f64], units: bool) -> Result<Pov> 
             Amount::Real(child)
         });
     }
-    let residual = x - filled;
+    let residual = remaining; // child <= remaining, so never negative
     let wrap = |v: f64| {
         if units {
             Amount::Units(whole(v))
@@ -384,7 +390,8 @@ pub fn tca_shortfall(o: &TcaOrder) -> Result<Shortfall> {
         .iter()
         .map(|(q, p)| q * (p - o.arrival_price))
         .sum::<f64>();
-    let opportunity = s * (o.order_quantity - filled) * (o.end_price - o.decision_price);
+    // + 0.0 turns the -0 of a full SELL into +0
+    let opportunity = s * (o.order_quantity - filled) * (o.end_price - o.decision_price) + 0.0;
     let total = delay + execution + opportunity + o.fees;
     // s Q (avg_fill - VWAP) = s (sum q_i p_i - Q VWAP): no division when Q = 0
     let vwap_slippage = o.benchmark_vwap.map(|v| {
@@ -441,6 +448,88 @@ pub fn as_quotes(
         spread,
         bid: reservation - spread / 2.0,
         ask: reservation + spread / 2.0,
+    })
+}
+
+/// `usecase.execution_tca` inputs beyond the AC parameters (use case 5).
+#[derive(Debug, Clone)]
+pub struct ExecutionTca {
+    pub risk_aversion: f64,
+    pub buy: bool,
+    pub decision_price: f64,
+    pub arrival_price: f64,
+    pub end_price: f64,
+    pub fill_prices: Vec<f64>,
+    pub completed_steps: i64,
+    pub fee_per_unit: f64,
+}
+
+/// The use case 5 result.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExecutionTcaResult {
+    pub lots: Vec<i64>,
+    pub expected_cost: f64,
+    pub variance: f64,
+    pub filled: i64,
+    pub fees: f64,
+    pub shortfall: Shortfall,
+}
+
+/// `usecase.execution_tca` (`04-pricing/use-cases.md`, use case 5): AC trades rounded to whole
+/// lots by largest remainder (HR-3), the first `completed_steps` filled, then the shortfall
+/// (HR-8).
+pub fn execution_tca(p: &AcParams, u: &ExecutionTca) -> Result<ExecutionTcaResult> {
+    let x = p.quantity;
+    if x < 1.0 || x != x.floor() {
+        return fail(
+            "E_INPUT",
+            "quantity must be a whole number of units, at least 1",
+        );
+    }
+    if p.n_steps < 1 {
+        return fail("E_INPUT", "n_steps must be at least 1");
+    }
+    let n = usize::try_from(p.n_steps).unwrap_or(0);
+    if u.fill_prices.len() != n {
+        return fail("E_INPUT", "fill_prices needs one price per step");
+    }
+    if u.completed_steps < 0 || u.completed_steps > p.n_steps {
+        return fail("E_INPUT", "completed_steps must lie in 0..n_steps");
+    }
+    if u.fee_per_unit < 0.0 {
+        return fail("E_DOMAIN", "fee_per_unit must be non-negative");
+    }
+    let t = ac_trajectory(p, u.risk_aversion)?;
+    #[allow(clippy::cast_precision_loss)]
+    let exact = if t.kappa == 0.0 {
+        vec![x / p.n_steps as f64; n]
+    } else {
+        t.trades.clone()
+    };
+    let lots = largest_remainder(x, &exact);
+    let m = usize::try_from(u.completed_steps).unwrap_or(0);
+    #[allow(clippy::cast_precision_loss)]
+    let fills: Vec<(f64, f64)> = (0..m).map(|k| (lots[k] as f64, u.fill_prices[k])).collect();
+    let filled: i64 = lots[..m].iter().sum();
+    #[allow(clippy::cast_precision_loss)]
+    let fees = u.fee_per_unit * filled as f64;
+    let shortfall = tca_shortfall(&TcaOrder {
+        buy: u.buy,
+        decision_price: u.decision_price,
+        arrival_price: u.arrival_price,
+        end_price: u.end_price,
+        order_quantity: x,
+        fills,
+        fees,
+        benchmark_vwap: None,
+    })?;
+    Ok(ExecutionTcaResult {
+        lots,
+        expected_cost: t.expected_cost,
+        variance: t.variance,
+        filled,
+        fees,
+        shortfall,
     })
 }
 
