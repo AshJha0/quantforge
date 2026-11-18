@@ -168,6 +168,8 @@ def exec_main(root, blind_path):
             st = e.pop("status")
             if st == "error" and "error_code" in e:
                 e = {"error": e["error_code"]}
+            elif st == "ok" and "outputs" in e:  # goldens moved to {status, outputs} after the compare
+                e = dict(e["outputs"])
             if _close(e, b):
                 print(f"{cid}	MATCH" if c["expected"].get("status") != "error" or "error" in c["expected"] else f"{cid}	SHAPE-ONLY (error shape)")
                 continue

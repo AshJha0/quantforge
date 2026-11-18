@@ -326,3 +326,7 @@ TOTALS: 15584 value 7685 error 5385 invariance 2514
 Stage H round 2 (2026-11-18): wave 2 `ob_h` 17, `lit_h` 20, `dark_h` 8, `sor_h` 9 (with `sor_h-0010`, HR-57 `E_LIMIT`), `sorx_h` 2 (cross-build agreement) and `e1_h2` 6 (a NaN decimal string per wave 2 operation, `E_SCHEMA` per HR-12, and the router's `step`, `E_DOMAIN` per F-2): 62 cases (36 value, 26 error).
 
 TOTALS: 15646 value 7721 error 5411 invariance 2514
+
+Stage H round 3 (2026-11-18): `mest_h` 18 and `venue_h` 10 (H-4b, H-16), `alg_h` 25 and `tcx_h` 11 (H-14, H-17), `e1_h3` 7 (a NaN at one Real input per H-14/H-17 operation, `E_DOMAIN` per F-2): 71 cases (34 value, 37 error).
+
+TOTALS: 15717 value 7755 error 5448 invariance 2514

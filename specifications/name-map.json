@@ -2613,6 +2613,146 @@
     "variance"
    ]
   },
+  "exec.algo.arrival": {
+   "spec": "specifications/10-execution/adaptive-algos.md",
+   "rust": "quantforge::exec::algo_arrival",
+   "python": "quantforge.exec.algo_arrival",
+   "java": "Exec.algoArrival",
+   "cpp": "qf::exec::algo_arrival",
+   "inputs": {
+    "mode": {
+     "java": "mode"
+    },
+    "n_buckets": {
+     "java": "nBuckets"
+    },
+    "quantity": {
+     "java": "quantity"
+    },
+    "urgency": {
+     "java": "urgency"
+    }
+   },
+   "outputs": [
+    "slices"
+   ]
+  },
+  "exec.algo.basket": {
+   "spec": "specifications/10-execution/adaptive-algos.md",
+   "rust": "quantforge::exec::algo_basket",
+   "python": "quantforge.exec.algo_basket",
+   "java": "Exec.algoBasket",
+   "cpp": "qf::exec::algo_basket",
+   "inputs": {
+    "legs": {
+     "java": "legs"
+    },
+    "mode": {
+     "java": "mode"
+    },
+    "n_buckets": {
+     "java": "nBuckets"
+    }
+   },
+   "outputs": [
+    "cash_imbalance",
+    "gross_notional",
+    "slices"
+   ]
+  },
+  "exec.algo.close": {
+   "spec": "specifications/10-execution/adaptive-algos.md",
+   "rust": "quantforge::exec::algo_close",
+   "python": "quantforge.exec.algo_close",
+   "java": "Exec.algoClose",
+   "cpp": "qf::exec::algo_close",
+   "inputs": {
+    "auction_participation": {
+     "java": "auctionParticipation"
+    },
+    "close_volume": {
+     "java": "closeVolume"
+    },
+    "mode": {
+     "java": "mode"
+    },
+    "profile": {
+     "java": "profile"
+    },
+    "quantity": {
+     "java": "quantity"
+    }
+   },
+   "outputs": [
+    "auction_quantity",
+    "slices"
+   ]
+  },
+  "exec.algo.liquidity_seek": {
+   "spec": "specifications/10-execution/adaptive-algos.md",
+   "rust": "quantforge::exec::algo_liquidity_seek",
+   "python": "quantforge.exec.algo_liquidity_seek",
+   "java": "Exec.algoLiquiditySeek",
+   "cpp": "qf::exec::algo_liquidity_seek",
+   "inputs": {
+    "books": {
+     "java": "books"
+    },
+    "limit_price": {
+     "java": "limitPrice"
+    },
+    "quantity": {
+     "java": "quantity"
+    },
+    "side": {
+     "java": "side"
+    },
+    "take_fraction": {
+     "java": "takeFraction"
+    }
+   },
+   "outputs": [
+    "avg_fill_price",
+    "avg_prices",
+    "filled",
+    "notional",
+    "residual",
+    "slices"
+   ]
+  },
+  "exec.algo.pair": {
+   "spec": "specifications/10-execution/adaptive-algos.md",
+   "rust": "quantforge::exec::algo_pair",
+   "python": "quantforge.exec.algo_pair",
+   "java": "Exec.algoPair",
+   "cpp": "qf::exec::algo_pair",
+   "inputs": {
+    "hedge_ratio": {
+     "java": "hedgeRatio"
+    },
+    "leg_a": {
+     "java": "legA"
+    },
+    "leg_b": {
+     "java": "legB"
+    },
+    "mode": {
+     "java": "mode"
+    },
+    "n_buckets": {
+     "java": "nBuckets"
+    },
+    "pair_mode": {
+     "java": "pairMode"
+    }
+   },
+   "outputs": [
+    "cash_imbalance",
+    "quantity_b",
+    "slices_a",
+    "slices_b"
+   ]
+  },
   "exec.impact.ow_optimal": {
    "spec": "specifications/10-execution/impact.md",
    "rust": "quantforge::exec::impact_ow_optimal",
@@ -2662,7 +2802,7 @@
    ]
   },
   "exec.schedule.pov": {
-   "spec": "specifications/10-execution/schedules.md",
+   "spec": "specifications/10-execution/library-interfaces.md",
    "rust": "quantforge::exec::schedule_pov",
    "python": "quantforge.exec.schedule_pov",
    "java": "Exec.schedulePov",
@@ -2688,7 +2828,7 @@
    ]
   },
   "exec.schedule.twap": {
-   "spec": "specifications/10-execution/schedules.md",
+   "spec": "specifications/10-execution/adaptive-algos.md",
    "rust": "quantforge::exec::schedule_twap",
    "python": "quantforge.exec.schedule_twap",
    "java": "Exec.scheduleTwap",
@@ -2860,6 +3000,86 @@
     "label",
     "p_underfill",
     "ranking"
+   ]
+  },
+  "exec.tca.attribution": {
+   "spec": "specifications/10-execution/tca-pretrade.md",
+   "rust": "quantforge::exec::tca_attribution",
+   "python": "quantforge.exec.tca_attribution",
+   "java": "Exec.tcaAttribution",
+   "cpp": "qf::exec::tca_attribution",
+   "inputs": {
+    "arrival_mid": {
+     "java": "arrivalMid"
+    },
+    "decision_price": {
+     "java": "decisionPrice"
+    },
+    "end_price": {
+     "java": "endPrice"
+    },
+    "fees": {
+     "java": "fees"
+    },
+    "fills": {
+     "java": "fills"
+    },
+    "order_quantity": {
+     "java": "orderQuantity"
+    },
+    "side": {
+     "java": "side"
+    }
+   },
+   "outputs": [
+    "delay",
+    "execution",
+    "fees",
+    "impact",
+    "opportunity",
+    "spread",
+    "total",
+    "total_bps"
+   ]
+  },
+  "exec.tca.pretrade": {
+   "spec": "specifications/10-execution/tca-pretrade.md",
+   "rust": "quantforge::exec::tca_pretrade",
+   "python": "quantforge.exec.tca_pretrade",
+   "java": "Exec.tcaPretrade",
+   "cpp": "qf::exec::tca_pretrade",
+   "inputs": {
+    "adv": {
+     "java": "adv"
+    },
+    "daily_vol": {
+     "java": "dailyVol"
+    },
+    "half_spread_bps": {
+     "java": "halfSpreadBps"
+    },
+    "params": {
+     "java": "params"
+    },
+    "participation": {
+     "java": "participation"
+    },
+    "price": {
+     "java": "price"
+    },
+    "quantity": {
+     "java": "quantity"
+    }
+   },
+   "outputs": [
+    "duration_days",
+    "expected_cost",
+    "expected_cost_bps",
+    "impact_bps",
+    "istar_bps",
+    "spread_bps",
+    "timing_risk",
+    "timing_risk_bps"
    ]
   },
   "exec.tca.shortfall": {
@@ -4592,7 +4812,7 @@
    ]
   },
   "micro.book.rebuild": {
-   "spec": "specifications/09-microstructure/low-latency-book.md",
+   "spec": "specifications/09-microstructure/order-book.md",
    "rust": "quantforge::micro::book_rebuild",
    "python": "quantforge.micro.book_rebuild",
    "java": "Micro.bookRebuild",

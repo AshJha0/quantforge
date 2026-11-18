@@ -39,7 +39,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -78,7 +79,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -221,7 +223,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -268,7 +271,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -310,7 +314,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH"
    ],
    "tags": [
     "stage_h",
@@ -346,7 +351,8 @@
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH"
    ],
    "tags": [
     "stage_h",

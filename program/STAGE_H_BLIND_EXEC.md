@@ -26,3 +26,7 @@ The blind lane put `E_INPUT` before `E_DOMAIN` (tcx_h-0005: X = 0). Micro-lane H
 ## Amendment 2026-11-18: HR-67 (arrival UNITS rounding)
 
 HR-59's half-up cumulative rounding was replaced by the HR-3 largest-remainder rule (HR-67) so that kappa = 0 equals TWAP in UNITS. The only UNITS arrival golden, alg_h-0003, has the same expected value [601, 400] under both rules (exact slices 600.6 and 400.4); `oracle/python/gen_stage_h_w2_exec.py` re-run gives byte-identical `alg_h.json`. No expected value changed, so every case keeps its blind status.
+
+## Recount 2026-11-18 (round 3 integration)
+
+The goldens moved to the `{status, outputs}` record after the comparison above, and `wave2_compare.py ... exec` then read every value case as a mismatch. With the `outputs` unwrapped (no other change to the script), the rerun gives 36 of 36: all 22 value cases (alg_h 16, tcx_h 6) MATCH and the 14 error cases are SHAPE-ONLY (error wrapper only). The table above (20 MATCH, 16 SHAPE-ONLY) counted two value cases as SHAPE-ONLY; the per-case rerun output is the record. The value cases now carry `blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH` in `verified_by`, written by `oracle/python/gen_stage_h_w2_exec.py`; no expected value changed.

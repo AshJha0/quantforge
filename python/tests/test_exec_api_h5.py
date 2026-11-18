@@ -5,6 +5,8 @@ public type states its thread safety (ADR-0011 rule 5)."""
 import dataclasses
 import inspect
 import math
+from collections.abc import Callable
+from typing import Any
 
 import pytest
 from hypothesis import given, settings
@@ -14,7 +16,7 @@ from quantforge_core import exec_api as api
 from quantforge_core import execution as ex
 from quantforge_core.errors import QfError
 
-AC = {
+AC: dict[str, Any] = {
     "quantity": 1e6,
     "horizon": 5.0,
     "n_steps": 5,
@@ -25,7 +27,7 @@ AC = {
 }
 
 
-def _code(fn, code: str) -> None:
+def _code(fn: Callable[[], object], code: str) -> None:
     with pytest.raises(QfError) as e:
         fn()
     assert e.value.code == code
@@ -59,7 +61,7 @@ def test_schedules_match_kernel() -> None:
 def test_ac_matches_kernel() -> None:
     prm = api.AcParams(**AC)
     tr = api.ac_trajectory(prm, 1e-6)
-    k = ex.ac_trajectory(*AC.values(), 1e-6)
+    k = ex.ac_trajectory(**AC, risk_aversion=1e-6)
     assert list(tr.holdings) == k["holdings"] and list(tr.trades) == k["trades"]
     assert (tr.kappa, tr.expected_cost, tr.variance, tr.objective) == (
         k["kappa"],
@@ -68,7 +70,7 @@ def test_ac_matches_kernel() -> None:
         k["objective"],
     )
     fr = api.ac_frontier(prm, [0.0, 1e-6])
-    kf = ex.ac_frontier(*AC.values(), [0.0, 1e-6])
+    kf = ex.ac_frontier(**AC, risk_aversions=[0.0, 1e-6])
     assert list(fr.expected_costs) == kf["expected_costs"] and list(fr.variances) == kf["variances"]
 
 
@@ -119,6 +121,6 @@ def test_every_public_type_states_thread_safety() -> None:
 def test_property_bit_equal(lam: float, n: int, sigma: float, mid: float, inv: float) -> None:
     a = {**AC, "n_steps": n, "sigma": sigma}
     tr = api.ac_trajectory(api.AcParams(**a), lam)
-    assert list(tr.trades) == ex.ac_trajectory(*a.values(), lam)["trades"]
+    assert list(tr.trades) == ex.ac_trajectory(**a, risk_aversion=lam)["trades"]
     q = api.as_quotes(mid, inv, 0.1, sigma, 0.5, 1.5)
     assert dataclasses.asdict(q) == ex.as_quotes(mid, inv, 0.1, sigma, 0.5, 1.5)

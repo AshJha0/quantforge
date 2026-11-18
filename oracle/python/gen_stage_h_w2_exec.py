@@ -84,14 +84,38 @@ def _check():
         if op == P and e["status"] == "ok":
             o = e["outputs"]; assert sum(o["slices_a"]) == i["leg_a"]["quantity"] and sum(o["slices_b"]) == o["quantity_b"]
 _check()
+# Every value case MATCHes the frozen blind output (program/STAGE_H_BLIND_EXEC.md, wave2_compare.py ... exec).
+BLIND = "blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH"
 def suite(name, spec, rows):
     cs = []
     for i, (op, inp, exp) in enumerate(rows, 1):
         cid = f"{name}-{i:04d}"
         cs.append(dict(case_id=cid, operation=op, inputs=inp, expected=exp, tolerance_class="simple_analytic",
-                       verified_by=["hand"], tags=["stage_h", "wave2", name.split("_")[0]], description=f"{spec} golden {cid}"))
+                       verified_by=["hand"] + ([BLIND] if exp["status"] == "ok" and name != "e1_h3" else []), tags=["stage_h", "wave2", name.split("_")[0]], description=f"{spec} golden {cid}"))
     return dict(schema_version="1.0", suite=name, spec=spec, spec_version="0.1.0", generator="oracle/python/gen_stage_h_w2_exec.py",
                 reviewer="none: self-assessment; blind re-derivation pending", cases=cs)
 for n, s, r in [("alg_h", "specifications/10-execution/adaptive-algos.md", alg), ("tcx_h", "specifications/10-execution/tca-pretrade.md", tcx)]:
     with open(f"{R}/datasets/golden/stage_h/{n}.json", "w", newline="\n") as fh:
         json.dump(suite(n, s, r), fh, indent=1); fh.write("\n")
+
+# E1 goldens (F-2, gate tools/check_e1_coverage.py): one case per operation, the first ok case with "NaN" at one
+# Real input, which is E_DOMAIN. Error order HR-66: the case is otherwise well formed, so E_DOMAIN is the answer.
+E1_AT = {A: ("urgency",), C: ("auction_participation",), L: ("take_fraction",), P: ("leg_a", "price"),
+         B: ("legs", 0, "price"), T: ("daily_vol",), X: ("decision_price",)}
+e1 = []
+for op, path in E1_AT.items():
+    inp = json.loads(json.dumps(next(i for o, i, e in alg + tcx if o == op and e["status"] == "ok")))
+    node = inp
+    for k in path[:-1]:
+        node = node[k]
+    assert isinstance(node[path[-1]], float), (op, path)
+    node[path[-1]] = "NaN"
+    e1.append((op, inp, E("E_DOMAIN")))
+with open(f"{R}/datasets/golden/stage_h/e1_h3.json", "w", newline="\n") as fh:
+    s = suite("e1_h3", "specifications/10-execution/adaptive-algos.md", e1)
+    for c, (op, path) in zip(s["cases"], E1_AT.items()):
+        c["tags"] = ["stage_h", "e1", "non-finite-input"]
+        c["description"] = f"F-2: NaN at {'/'.join(map(str, path))} is E_DOMAIN"
+        if op in (T, X):
+            c["description"] += " (spec specifications/10-execution/tca-pretrade.md)"
+    json.dump(s, fh, indent=1); fh.write("\n")

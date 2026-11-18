@@ -1,0 +1,256 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1_h3",
+ "spec": "specifications/10-execution/adaptive-algos.md",
+ "spec_version": "0.1.0",
+ "generator": "oracle/python/gen_stage_h_w2_exec.py",
+ "reviewer": "none: self-assessment; blind re-derivation pending",
+ "cases": [
+  {
+   "case_id": "e1_h3-0001",
+   "operation": "exec.algo.arrival",
+   "inputs": {
+    "quantity": 1000,
+    "n_buckets": 4,
+    "urgency": "NaN",
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at urgency is E_DOMAIN"
+  },
+  {
+   "case_id": "e1_h3-0002",
+   "operation": "exec.algo.close",
+   "inputs": {
+    "quantity": 10000,
+    "close_volume": 50000,
+    "auction_participation": "NaN",
+    "profile": [
+     1,
+     1,
+     2,
+     4
+    ],
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at auction_participation is E_DOMAIN"
+  },
+  {
+   "case_id": "e1_h3-0003",
+   "operation": "exec.algo.liquidity_seek",
+   "inputs": {
+    "side": "BUY",
+    "quantity": 1000,
+    "limit_price": 100.2,
+    "take_fraction": "NaN",
+    "books": [
+     [
+      [
+       100.0,
+       400
+      ],
+      [
+       100.1,
+       400
+      ],
+      [
+       100.3,
+       1000
+      ]
+     ],
+     [
+      [
+       100.1,
+       600
+      ],
+      [
+       100.2,
+       600
+      ]
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at take_fraction is E_DOMAIN"
+  },
+  {
+   "case_id": "e1_h3-0004",
+   "operation": "exec.algo.pair",
+   "inputs": {
+    "leg_a": {
+     "side": "BUY",
+     "quantity": 1000,
+     "price": "NaN"
+    },
+    "leg_b": {
+     "side": "SELL",
+     "price": 25.0
+    },
+    "pair_mode": "CASH_BALANCED",
+    "n_buckets": 4,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at leg_a/price is E_DOMAIN"
+  },
+  {
+   "case_id": "e1_h3-0005",
+   "operation": "exec.algo.basket",
+   "inputs": {
+    "legs": [
+     {
+      "side": "BUY",
+      "quantity": 300,
+      "price": "NaN"
+     },
+     {
+      "side": "BUY",
+      "quantity": 200,
+      "price": 20.0
+     },
+     {
+      "side": "SELL",
+      "quantity": 700,
+      "price": 10.0
+     }
+    ],
+    "n_buckets": 2,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at legs/0/price is E_DOMAIN"
+  },
+  {
+   "case_id": "e1_h3-0006",
+   "operation": "exec.tca.pretrade",
+   "inputs": {
+    "quantity": 40000,
+    "adv": 1000000,
+    "daily_vol": "NaN",
+    "participation": 0.25,
+    "half_spread_bps": 1.5,
+    "params": {
+     "a1": 700.0,
+     "a2": 0.5,
+     "a3": 1.0,
+     "a4": 0.5,
+     "b1": 0.9
+    },
+    "price": 50.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at daily_vol is E_DOMAIN (spec specifications/10-execution/tca-pretrade.md)"
+  },
+  {
+   "case_id": "e1_h3-0007",
+   "operation": "exec.tca.attribution",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": "NaN",
+    "arrival_mid": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 1000,
+    "fills": [
+     {
+      "quantity": 600,
+      "price": 100.2,
+      "mid": 100.15
+     },
+     {
+      "quantity": 200,
+      "price": 100.3,
+      "mid": 100.25
+     }
+    ],
+    "fees": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at decision_price is E_DOMAIN (spec specifications/10-execution/tca-pretrade.md)"
+  }
+ ]
+}

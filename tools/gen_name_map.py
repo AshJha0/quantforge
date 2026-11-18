@@ -17,6 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "specifications" / "name-map.json"
 OP = re.compile(r"`([a-z]+(?:\.[a-z0-9_]+){2,3})`")
 UNIT_SUFFIXES = ("_years", "_days", "_bp", "_pct", "_minutes", "_months", "_ns")
+# Operations whose first naming page (path order) is not their spec page.
+SPEC_OVERRIDES = {"micro.book.rebuild": "specifications/09-microstructure/order-book.md"}
 UNIT_WORDS = ("expiry", "maturity", "tenor", "horizon", "spread", "shift", "bump")
 
 
@@ -62,7 +64,7 @@ def build():
         fn = f"{area}_{verb}"
         k = gold[op]
         rows[op] = {
-            "spec": specs.get(op) or k["spec"],
+            "spec": SPEC_OVERRIDES.get(op) or specs.get(op) or k["spec"],
             "rust": f"quantforge::{dom}::{fn}",
             "python": f"quantforge.{dom}.{fn}",
             "java": f"{camel(dom, True)}.{camel(area)}{camel(verb, True)}",
