@@ -20,7 +20,7 @@ For a scalar in a class with limits:
 Exact classes allow no difference. Never silently ignore missing outputs.
 
 ## Independence
-Passing means a build matches the oracle within tolerance. Agreement between languages proves nothing alone. Where a case has only hand or replay sources, one author wrote both the spec and the check, so this is self-assessment until the human review after the project.
+Passing means a build matches the oracle within tolerance. Agreement between languages proves nothing alone. Where a case has only hand or replay sources, one author wrote both the spec and the check, so this is self-assessment; there is no second review (owner decision, 2026-11-18).
 
 ## Report
 Each run writes `conformance/reports/NAME.json`, which git ignores, and prints pass, fail and not-implemented counts per suite.

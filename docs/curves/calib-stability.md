@@ -1,6 +1,6 @@
 # Calibration stability
 
-<p class="note">Status: Implemented, not Validated. <strong>Synthetic inputs; stability of the method, not of any market.</strong> The thresholds are the spec's provisional ones, and this is the first run, so a failure is a finding about the threshold or the method, reported as it is.</p>
+<p class="note"><strong>Synthetic inputs; stability of the method, not of any market.</strong> The thresholds are the spec's provisional ones, and this is the first run, so a failure is a finding about the threshold or the method, reported as it is.</p>
 
 From `tools/workflows/calib_stability.py` (spec `specifications/03-calibration/stability.md`), run on 2026-11-07 with python, java, cpp, rust: seed 20261107, 200 noise draws per calibration from the library's own generator (`core.rng.normals`, stream = calibration number). 0 of 28 rows fail a judged metric.
 

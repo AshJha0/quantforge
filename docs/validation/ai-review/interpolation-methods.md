@@ -7,9 +7,9 @@ Rules for your answer:
 - Quote the spec line or the exact number you question.
 - Return findings as one table with columns: curve, claim, issue, severity (high / medium / low / note), evidence (quote or your working).
 - After the table, list the questions you answered "cannot check", and why.
-- Your review is a second opinion. It is filed under a labelled "AI review" section and never counts as the human sign-off.
+- Your review is filed under a labelled "AI review" section of the curve's evidence checklist and checked against the repository before anything is acted on.
 
-Status: Implemented, not Validated (stage F). Evidence line from the project's status table: 47 golden cases for `rates.curve.inspect`, 36 reproduced by an outside library.
+Stage: F. Evidence line from the project's curve table: 47 golden cases for `rates.curve.inspect`, 36 reproduced by an outside library.
 
 ## Questions
 
@@ -28,7 +28,7 @@ Status: Implemented, not Validated (stage F). Evidence line from the project's s
 
 # Curve framework
 
-Spec version 1.0.0. Status: Implemented, not Validated.
+Spec version 1.0.0. Status: Implemented.
 
 A discount curve says what one unit paid on a future date is worth today. Everything else in stage B is built on this.
 
@@ -146,7 +146,7 @@ Locality is stated on the pillar inputs, not on quotes, because a bootstrap spre
 
 ## Convergence and limit cases
 
-| M
+| Method | Asserted 
 
 [... truncated to fit one chat; the rest of this file is not included, so answer "cannot check" for anything that depends on it]
 

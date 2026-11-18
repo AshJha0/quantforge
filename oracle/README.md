@@ -15,8 +15,8 @@ apart from the differences recorded in the specs. Each case's `verified_by` list
 The oracle runs on Python 3.12, pinned separately from the Python implementation.
 
 A hand or replay source is written by the same author as the spec, so it can share a misreading with it.
-Where a case has no outside library in `verified_by`, this risk stands. These results are self-assessment until
-the human review at the end of the project.
+Where a case has no outside library in `verified_by`, this risk stands. These results are self-assessment; there is no second
+review (owner decision, 2026-11-18).
 
 `REPORT.md`'s invariant lines cover all three folders: 4,394 stage A cases, 343 stage B cases and 446 stage C cases. Most stage B and C cases have no stated invariant, so for them the check only confirms that none is broken; the lines below each total count the cases that do have one. Stage B's outside and hand sources, suite by suite, are in `specifications/stage-b-rulings.md`.
 

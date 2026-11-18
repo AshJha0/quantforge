@@ -251,7 +251,7 @@ CURVES = {
 
 # Curves named in the plan's stage rows that have no page. Stage from the plan.
 # Stage D curves are in STAGE_D below, each with a planned page.
-# Each row: name, status, stage, evidence. A Planned row must not name an operation that exists in
+# Each row: name, stage, evidence (a Planned row's evidence starts "Planned"). A Planned row must not name an operation that exists in
 # specifications/name-map.json; tools/test_tools.py and quality_gate check this against the README table.
 PLANNED = []
 
@@ -470,8 +470,7 @@ def table(head, rows):
 
 def status_block(d):
     versions = ", ".join(f"{NAMES[k]} {v['implementation_version']} ({v['toolchain']})" for k, v in d["meta"]["cli"].items())
-    return ('<p class="note">Status: Implemented, not Validated. Validation is self-assessment until the human review at the end of the project. '
-            "Data: synthetic. These are constructed inputs, not market data, and nothing is traded.</p>\n\n"
+    return ('<p class="note">Data: synthetic. These are constructed inputs, not market data, and nothing is traded.</p>\n\n'
             f"Generated on {d['meta']['date']} from commit `{d['meta']['commit']}`, by {versions}, on one Windows machine.")
 
 
@@ -664,11 +663,11 @@ def index_page(all_data):
         e = all_data[slug]["evidence"]
         outside = sum(v for k, v in e["by_source"].items() if "quantlib" in k or "strata" in k)
         ev = f"{e['cases']} golden cases for `{e['operation']}`, {outside} with an outside library in `verified_by`"
-        rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated", "B", ev])
+        rows.append([f"[{spec['short']}]({slug}.md)", "B", ev])
     for slug, spec in VOLS.items():
         e = all_data[slug]["evidence"]
         outside = sum(v for k, v in e["by_source"].items() if "quantlib" in k or "strata" in k)
-        rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated", "C",
+        rows.append([f"[{spec['short']}]({slug}.md)", "C",
                      f"{e['cases']} golden cases for {', '.join('`' + o + '`' for o in e['operations'])}, {outside} with an outside library in `verified_by`"])
     for slug, spec in STAGE_D.items():
         live = is_live(spec) and slug in all_data
@@ -679,35 +678,27 @@ def index_page(all_data):
             if spec.get("golden"):  # newer pages name the operation and the outside-library share, like stages B, C and F
                 outside = sum(v for k, v in e["by_source"].items() if "quantlib" in k or "strata" in k)
                 ev += f" for {', '.join('`' + o + '`' for o in e['operations'])}, {outside} with an outside library in `verified_by`"
-        rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated" if live else "Planned", spec.get("stage", "D"), ev])
+        rows.append([f"[{spec['short']}]({slug}.md)", spec.get("stage", "D"), ev if live else "Planned; none yet"])
     for slug, spec in gallery_e.STAGE_E.items():
         live = gallery_e.is_live(spec) and slug in all_data
         n = all_data[slug]["evidence"]["cases"] if live else 0
-        rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated" if live else "Planned", "E",
-                     f"{n} golden case{'s' if n != 1 else ''}" if live else "None yet"])
+        rows.append([f"[{spec['short']}]({slug}.md)", "E",
+                     f"{n} golden case{'s' if n != 1 else ''}" if live else "Planned; none yet"])
     if gallery_f.SLUG in all_data:
         e = all_data[gallery_f.SLUG]["evidence"]
-        rows.append([f"[Five interpolation methods]({gallery_f.SLUG}.md)", "Implemented, not Validated", "F",
+        rows.append([f"[Five interpolation methods]({gallery_f.SLUG}.md)", "F",
                      f"{e['cases']} golden cases for `{e['operation']}`, {e['outside']} reproduced by an outside library"])
     if gallery_i.SLUG in all_data:
         e = all_data[gallery_i.SLUG]["evidence"]
-        rows.append([f"[Hedging against trading costs]({gallery_i.SLUG}.md)", "Implemented, not Validated", "I",
+        rows.append([f"[Hedging against trading costs]({gallery_i.SLUG}.md)", "I",
                      f"{sum(r['cases'] for r in e['suites'][:2])} golden cases for `hedge.qp.solve` with costs and `hedge.frontier.solve`, "
                      f"{sum(r['outside'] for r in e['suites'][:2])} reproduced by an outside library"])
     if gallery_j.SLUG in all_data:
         e = all_data[gallery_j.SLUG]["evidence"]
-        rows.append([f"[Research workflow: backtest to PBO]({gallery_j.SLUG}.md)", "Implemented, not Validated", "J",
+        rows.append([f"[Research workflow: backtest to PBO]({gallery_j.SLUG}.md)", "J",
                      f"{sum(r['cases'] for r in e['suites'])} golden cases for the backtest, purged CV and research statistics, "
                      f"{sum(r['outside'] for r in e['suites'])} reproduced by an outside library; synthetic prices, a teaching example"])
-    rows += [[name, status, stage, ev] for name, status, stage, ev in PLANNED]
-    # A signed checklist in docs/validation/ sets the status (docs/validation/README.md); nothing else does.
-    sys.path.insert(0, str(ROOT / "tools" / "validation"))
-    import build_checklists
-    for row in rows:
-        m = re.search(r"\]\(([\w-]+)\.md\)", row[0])
-        v = build_checklists.verdict(m.group(1)) if m else None
-        if v and v["verdict"] != "Not validated":
-            row[1] = f"{v['verdict']} ({v['reviewer']}, {v['date']}; [checklist](../validation/{m.group(1)}.md))"
+    rows += [[name, stage, ev] for name, stage, ev in PLANNED]
     real = ""
     if gallery_real.SLUG in all_data:
         real = ("\n## Real data\n\n"
@@ -718,22 +709,22 @@ def index_page(all_data):
                      "over real daily Treasury moves, and day-to-day calibration diagnostics. Runs daily in `tools/workflows/keyrate_explain.py`.\n")
         real += (f"\n[Calibration stability]({gallery_r2.CALIB}.md): seven calibrations under seeded noise in four languages, synthetic inputs. "
                  f"[Rich/cheap screen]({gallery_r2.RICH}.md): workflow (b), blocked on data until a price source is cleared.\n")
-        real += ("\n[Validation evidence pack](../validation/README.md): one reviewer checklist per row of the table above, the "
-                 "outside-library checks added for review, and a round trip of the SONIA and SOFR bootstraps against published fitted "
-                 "curves. No row moves to Validated without a named human reviewer's sign-off.\n")
+        real += ("\n[Validation evidence pack](../validation/README.md): one evidence checklist per row of the table above, the "
+                 "outside-library checks behind it, and a round trip of the SONIA and SOFR bootstraps against published fitted "
+                 "curves.\n")
     return f"""# Curves
 
 A curve says what one unit paid on a future date is worth today, or what a rate or price is expected to be on that date. Pricing, risk and hedging all read from curves, so a mistake here reaches everything else. Formally, a discount curve is a function `D(t)` with `D(0) = 1`, stored as dated pillars plus a rule for the dates in between (`specifications/02-curves/curve-framework.md`).
 
-<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market, except the one Real data page below. Every page in the table is at Implemented, not Validated, unless its row says otherwise: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
+<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market, except the one Real data page below. The Evidence column says how each curve is checked. Nothing is traded, and trading in this project is simulated only.</p>
 
 Generated on {any_d['meta']['date']} from commit `{any_d['meta']['commit']}`.
 
-## Status of every curve in the plan
+## Every curve in the plan
 
 An outside library in `verified_by` means QuantLib or Strata. The other cases have hand or replay sources, which can share a misreading with the spec. Each page gives the breakdown. The papers and standards behind each curve are cited in its spec and collected in [References](../references.md).
 
-{table(['Curve', 'Status', 'Stage', 'Evidence'], rows)}
+{table(['Curve', 'Stage', 'Evidence'], rows)}
 
 Stage J wave 3 (historical scenario stress, interpolation backtests, drift detectors) has no gallery page: those operations take a curve, a smile or a series rather than build a curve, so they are worked through in [Tutorial 33](../getting-started/tutorial-33-stress-test-and-watch-for-drift.md) instead.
 {real}

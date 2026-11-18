@@ -7,9 +7,9 @@ Rules for your answer:
 - Quote the spec line or the exact number you question.
 - Return findings as one table with columns: curve, claim, issue, severity (high / medium / low / note), evidence (quote or your working).
 - After the table, list the questions you answered "cannot check", and why.
-- Your review is a second opinion. It is filed under a labelled "AI review" section and never counts as the human sign-off.
+- Your review is filed under a labelled "AI review" section of the curve's evidence checklist and checked against the repository before anything is acted on.
 
-Status: Implemented, not Validated (stage J). Evidence line from the project's status table: 13 golden cases for `repo.term.curve`, `eq.forward.term_financed`, 13 with an outside library in `verified_by`.
+Stage: J. Evidence line from the project's curve table: 13 golden cases for `repo.term.curve`, `eq.forward.term_financed`, 13 with an outside library in `verified_by`.
 
 ## Questions
 
@@ -87,7 +87,7 @@ Reduction to D22 (property test in all four builds): flat funding `r`, repo quot
 
 ## Acceptance
 
-Class `simple_analytic` for every value output. Evidence (J-C-9): three value cases are hand derivations (`termfin_j-0001` to `-0003`), two more for the forward (`-0022`, `-0023`); the rest are reference-computed by `oracle/python/gen_stage_j_curves.py` in mpmath at 50 digits from this text. There is no outside library check: QuantLib's `PiecewiseZeroSpreadedTermStructure` interpolates zero spreads, not cumulative spreads, and no free published worked example of a term repo spread curve was found, so this curve is self-assessed (Implemented, not Validated). Property tests in each language: quote round trip, forward rates chaining to `1/P_f`, D22 reduction, borrow and dividends lowering the forward.
+Class `simple_analytic` for every value output. Evidence (J-C-9): three value cases are hand derivations (`termfin_j-0001` to `-0003`), two more for the forward (`-0022`, `-0023`); the rest are reference-computed by `oracle/python/gen_stage_j_curves.py` in mpmath at 50 digits from this text. There is no outside library check: QuantLib's `PiecewiseZeroSpreadedTermStructure` interpolates zero spreads, not cumulative spreads, and no free published worked example of a term repo spread curve was found, so this curve is self-assessed. Property tests in each language: quote round trip, forward rates chaining to `1/P_f`, D22 reduction, borrow and dividends lowering the forward.
 
 ## Limitations
 

@@ -58,7 +58,7 @@ Reduction to D22 (property test in all four builds): flat funding `r`, repo quot
 
 ## Acceptance
 
-Class `simple_analytic` for every value output. Evidence (J-C-9): three value cases are hand derivations (`termfin_j-0001` to `-0003`), two more for the forward (`-0022`, `-0023`); the rest are reference-computed by `oracle/python/gen_stage_j_curves.py` in mpmath at 50 digits from this text. There is no outside library check: QuantLib's `PiecewiseZeroSpreadedTermStructure` interpolates zero spreads, not cumulative spreads, and no free published worked example of a term repo spread curve was found, so this curve is self-assessed (Implemented, not Validated). Property tests in each language: quote round trip, forward rates chaining to `1/P_f`, D22 reduction, borrow and dividends lowering the forward.
+Class `simple_analytic` for every value output. Evidence (J-C-9): three value cases are hand derivations (`termfin_j-0001` to `-0003`), two more for the forward (`-0022`, `-0023`); the rest are reference-computed by `oracle/python/gen_stage_j_curves.py` in mpmath at 50 digits from this text. There is no outside library check: QuantLib's `PiecewiseZeroSpreadedTermStructure` interpolates zero spreads, not cumulative spreads, and no free published worked example of a term repo spread curve was found, so this curve is self-assessed. Property tests in each language: quote round trip, forward rates chaining to `1/P_f`, D22 reduction, borrow and dividends lowering the forward.
 
 ## Limitations
 

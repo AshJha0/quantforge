@@ -77,7 +77,7 @@ def page(d, chart, table, status_versions):
     failed = sum(1 for x in checks if not x["ok"] and x["level"] == "fail")
     return f"""# Real data: US Treasury curve with sanity bands
 
-<p class="note">Status: Implemented, not Validated. This page uses <strong>real public data</strong>, unlike the rest of the gallery. {LABEL} Par yields are fitted, not traded: this shows a working pipeline on real inputs, not a tradable curve. Nothing is traded.</p>
+<p class="note">This page uses <strong>real public data</strong>, unlike the rest of the gallery. {LABEL} Par yields are fitted, not traded: this shows a working pipeline on real inputs, not a tradable curve. Nothing is traded.</p>
 
 Snapshot of {as_of} (fetched {inputs['fetched']}), bootstrapped from commit `{d['meta']['commit']}` by {status_versions}. Four-language agreement: largest discount-factor gap {d['agreement']:.2e}. Bands: {len(checks)} checks, {failed} failed.
 

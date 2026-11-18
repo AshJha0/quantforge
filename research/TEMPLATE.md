@@ -47,7 +47,7 @@ Otherwise it **fails**, and is reported as a null or negative result. The forwar
 ## 6. Limitations
 - *Signal on a fitted curve; tradability not established.*
 - Every assumption about costs, financing and capacity, with its source.
-- Self-assessment until the human review at the end of the project.
+- Self-assessment; there is no second review (owner decision, 2026-11-18).
 
 ## 7. AI assistance
 Recorded for every study and every prereg or amendment (plan 13.1 R5, A8 brought forward).

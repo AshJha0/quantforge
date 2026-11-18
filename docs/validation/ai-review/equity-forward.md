@@ -7,9 +7,9 @@ Rules for your answer:
 - Quote the spec line or the exact number you question.
 - Return findings as one table with columns: curve, claim, issue, severity (high / medium / low / note), evidence (quote or your working).
 - After the table, list the questions you answered "cannot check", and why.
-- Your review is a second opinion. It is filed under a labelled "AI review" section and never counts as the human sign-off.
+- Your review is filed under a labelled "AI review" section of the curve's evidence checklist and checked against the repository before anything is acted on.
 
-Status: Implemented, not Validated (stage C). Evidence line from the project's status table: 4 golden cases for `eq.forward.outright`, 2 with an outside library in `verified_by`.
+Stage: C. Evidence line from the project's curve table: 4 golden cases for `eq.forward.outright`, 2 with an outside library in `verified_by`.
 
 ## Questions
 
@@ -20,7 +20,7 @@ Status: Implemented, not Validated (stage C). Evidence line from the project's s
 5. Golden cases: recompute any case you can from its inputs with the spec's formulas. Report any number you get differently, with your working.
 6. Outside-library and real-data evidence: does the check really test the same quantity? Is anything claimed beyond what it shows?
 7. Anything that looks wrong, inconsistent or missing.
-8. **Settled by ruling C18 (owner, 2026-11-18), for the reviewer to confirm** (`equity_forward-0012`): the spec ignores a dividend with `ex_date <= as_of` (`specifications/02-curves/equity-forward.md`); QuantLib's `AnalyticDividendEuropeanEngine` counts one dated on the evaluation date. With that dividend removed, QuantLib agrees on all four outputs. The golden was not changed. Is the spec's rule (ex on as_of means already ex) the one the reviewer accepts?
+8. **Settled by ruling C18 (owner, 2026-11-18)** (`equity_forward-0012`): the spec ignores a dividend with `ex_date <= as_of` (`specifications/02-curves/equity-forward.md`); QuantLib's `AnalyticDividendEuropeanEngine` counts one dated on the evaluation date. With that dividend removed, QuantLib agrees on all four outputs. The golden was not changed. Is the spec's rule (ex on as_of means already ex) the one the reviewer accepts?
 9. `equity_forward-0014` (expiry on as_of) has no outside check: there is no option for the engine to price.
 
 ## Spec
@@ -124,4 +124,4 @@ Synthetic inputs, not market data.
 
 ## Rulings that name this curve's operations
 
-- (stage-c-rulings.md) | C18 | Dividend with `ex_date = as_of` in `eq.forward.outright` (owner, 2026-11-18, validation evidence pack) | Ignored, as the spec already says (`ex_date <= as_of`). `spot` is a price observed on `as_of` after the ex-date open, so it is already ex-dividend; counting the dividend would subtract it twice. Only the ex-date matters, not the record or payment date. QuantLib's `AnalyticDividendEuropeanEngine` counts a dividend dated on the evaluation date (its spot is taken as cum-dividend), so it differs on `equity_forward-0012` by convention; with that dividend removed it agrees on every output (`oracle/OUTSIDE_VALIDATION.json`). A caller holding a cum-dividend price on the ex-date must adjust it first. The human reviewer still confirms this on the curve's checklist |
+- (stage-c-rulings.md) | C18 | Dividend with `ex_date = as_of` in `eq.forward.outright` (owner, 2026-11-18, validation evidence pack) | Ignored, as the spec already says (`ex_date <= as_of`). `spot` is a price observed on `as_of` after the ex-date open, so it is already ex-dividend; counting the dividend would subtract it twice. Only the ex-date matters, not the record or payment date. QuantLib's `AnalyticDividendEuropeanEngine` counts a dividend dated on the evaluation date (its spot is taken as cum-dividend), so it differs on `equity_forward-0012` by convention; with that dividend removed it agrees on every output (`oracle/OUTSIDE_VALIDATION.json`). A caller holding a cum-dividend price on the ex-date must adjust it first. |

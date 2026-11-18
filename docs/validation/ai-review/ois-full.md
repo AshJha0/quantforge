@@ -7,9 +7,9 @@ Rules for your answer:
 - Quote the spec line or the exact number you question.
 - Return findings as one table with columns: curve, claim, issue, severity (high / medium / low / note), evidence (quote or your working).
 - After the table, list the questions you answered "cannot check", and why.
-- Your review is a second opinion. It is filed under a labelled "AI review" section and never counts as the human sign-off.
+- Your review is filed under a labelled "AI review" section of the curve's evidence checklist and checked against the repository before anything is acted on.
 
-Status: Implemented, not Validated (stage D). Evidence line from the project's status table: 81 golden cases.
+Stage: D. Evidence line from the project's curve table: 81 golden cases.
 
 ## Questions
 
@@ -28,7 +28,7 @@ Status: Implemented, not Validated (stage D). Evidence line from the project's s
 
 # Curve framework
 
-Spec version 1.0.0. Status: Implemented, not Validated.
+Spec version 1.0.0. Status: Implemented.
 
 A discount curve says what one unit paid on a future date is worth today. Everything else in stage B is built on this.
 
@@ -72,7 +72,7 @@ Class `interpolation`. Oracle: hand replay, and QuantLib `DiscountCurve` for `LO
 Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
 
 - [S1] Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "Interest Rates" (zero rates, discount factors, forward rates) (not opened)
-- [S2] Hagan, P. S. and West, G.
+- [S2] Hagan, P. S. and West, G., "Interpolatio
 
 [... truncated to fit one chat; the rest of this file is not included, so answer "cannot check" for anything that depends on it]
 
@@ -80,7 +80,7 @@ Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: th
 
 # OIS curves: SONIA, SOFR and ESTR
 
-Spec version 1.1.0. Status: SONIA and SOFR Implemented, not Validated; ESTR and jumps Specified (stage D).
+Spec version 1.1.0. Status: SONIA and SOFR Implemented; ESTR and jumps Specified (stage D).
 
 An overnight indexed swap exchanges a fixed rate for daily compounded overnight rates. Its quotes pin down the discount curve.
 
@@ -120,7 +120,7 @@ Negative rates are valid, and give discount factors above 1.
 
 ## `rates.ois.compound`
 
-Compounded in arrears, from actual fixings. Inputs: `rates`, `days` (integers at least 1, same length, else `E_INPUT`), `denominator
+Compounded in arrears, from actual fixings. Inputs: `rates`, `days` (integers at least 1, same length, else `E_INPUT`), `denominator` (360 or 365).
 
 [... truncated to fit one chat; the rest of this file is not included, so answer "cannot check" for anything that depends on it]
 

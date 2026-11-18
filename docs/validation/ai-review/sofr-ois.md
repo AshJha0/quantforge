@@ -7,9 +7,9 @@ Rules for your answer:
 - Quote the spec line or the exact number you question.
 - Return findings as one table with columns: curve, claim, issue, severity (high / medium / low / note), evidence (quote or your working).
 - After the table, list the questions you answered "cannot check", and why.
-- Your review is a second opinion. It is filed under a labelled "AI review" section and never counts as the human sign-off.
+- Your review is filed under a labelled "AI review" section of the curve's evidence checklist and checked against the repository before anything is acted on.
 
-Status: Implemented, not Validated (stage B). Evidence line from the project's status table: 16 golden cases for `rates.ois.bootstrap`, 16 with an outside library in `verified_by`.
+Stage: B. Evidence line from the project's curve table: 16 golden cases for `rates.ois.bootstrap`, 16 with an outside library in `verified_by`.
 
 ## Questions
 
@@ -28,7 +28,7 @@ Status: Implemented, not Validated (stage B). Evidence line from the project's s
 
 # Curve framework
 
-Spec version 1.0.0. Status: Implemented, not Validated.
+Spec version 1.0.0. Status: Implemented.
 
 A discount curve says what one unit paid on a future date is worth today. Everything else in stage B is built on this.
 
@@ -92,7 +92,7 @@ The convex monotone method of Hagan and West [S2] in the form QuantLib 1.44 impl
    - (c) `g0 < 0` and `g1 > -2 g0`, or `g0 > 0` and `g1 < -2 g0`: `eta = (g1 + 2 g0)/(g1 - g0)`. If `eta < 1`: `f = y_i + g0` for `x <= eta`, else `f = y_i + g0 + (g1 - g0) ((x - eta)/(1 - eta))^2`. If `eta >= 1`: rule (e) with `eta = 1`.
    - (d) `g0 > 0`, `g1 < 0` and `g1 > -0.5 g0`, or `g0 < 0`, `g1 > 0` and `g1 < -0.5 g0`: `eta = 3 g1/(g1 - g0)`. If `eta > 0`: `f = y_i + g1 + (g0 - g1) ((eta - x)/eta)^2` for `x <= eta`, else `f = y_i + g1`. If `eta <= 0`: rule (e) with `eta = 0`.
    - (e) otherwise: `eta = g1/(g0 + g1)` clamped to `[0, 1]`, `A = -(eta g0 + (1 - eta) g1)/2`; `f = y_i + A + (g0 - A) ((eta - x)/eta)^2` for `x <= eta`, else `f = y_i + A + (g1 - A) ((x - eta)/(1 - eta))^2`. When `eta = 0` the first piece is only the point `x = 0`, where `f = f_{i-1}` and the integral is 0 (QuantLib divides 0 by 0 there; ruling F-19).
-   Every branch integrates to `y_i` over its section, so `S` returns every node exactly. `ln S(t) = -(sum of y_k (t_k - t_{k-1}) over the sections before i) - (t_i - t_{i-1}) * (int
+   Every branch integrates to `y_i` over its section, so `S` returns every node exactly. `ln S(t) = -(sum of y_k (t_k - t_{k-1}) over the sections before i) - (t_i - t_{i-1}) * (integral of the bra
 
 [... truncated to fit one chat; the rest of this file is not included, so answer "cannot check" for anything that depends on it]
 
@@ -100,7 +100,7 @@ The convex monotone method of Hagan and West [S2] in the form QuantLib 1.44 impl
 
 # OIS curves: SONIA, SOFR and ESTR
 
-Spec version 1.1.0. Status: SONIA and SOFR Implemented, not Validated; ESTR and jumps Specified (stage D).
+Spec version 1.1.0. Status: SONIA and SOFR Implemented; ESTR and jumps Specified (stage D).
 
 An overnight indexed swap exchanges a fixed rate for daily compounded overnight rates. Its quotes pin down the discount curve.
 

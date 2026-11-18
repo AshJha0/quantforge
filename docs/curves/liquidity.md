@@ -1,6 +1,6 @@
 # Liquidity cost curve
 
-<p class="note">Status: Implemented, not Validated. Validation is self-assessment until the human review at the end of the project. Data: synthetic. These are constructed inputs, not market data, and nothing is traded.</p>
+<p class="note">Data: synthetic. These are constructed inputs, not market data, and nothing is traded.</p>
 
 Generated on 2026-11-15 from commit `cb525c5a`, by Java 0.8.3 (JDK 25.0.5+8-LTS), C++ 0.8.3 (GCC 16.2.0), Python 0.8.3 (CPython 3.15.2), Rust 0.8.3 (rustc 1.99.1), on one Windows machine.
 

@@ -7,9 +7,9 @@ Rules for your answer:
 - Quote the spec line or the exact number you question.
 - Return findings as one table with columns: curve, claim, issue, severity (high / medium / low / note), evidence (quote or your working).
 - After the table, list the questions you answered "cannot check", and why.
-- Your review is a second opinion. It is filed under a labelled "AI review" section and never counts as the human sign-off.
+- Your review is filed under a labelled "AI review" section of the curve's evidence checklist and checked against the repository before anything is acted on.
 
-Status: Implemented, not Validated (stage B). Evidence line from the project's status table: 6 golden cases for `rates.projection.bootstrap`, 5 with an outside library in `verified_by`.
+Stage: B. Evidence line from the project's curve table: 6 golden cases for `rates.projection.bootstrap`, 5 with an outside library in `verified_by`.
 
 ## Questions
 
@@ -20,7 +20,7 @@ Status: Implemented, not Validated (stage B). Evidence line from the project's s
 5. Golden cases: recompute any case you can from its inputs with the spec's formulas. Report any number you get differently, with your working.
 6. Outside-library and real-data evidence: does the check really test the same quantity? Is anything claimed beyond what it shows?
 7. Anything that looks wrong, inconsistent or missing.
-8. USD-TERM-3M is a synthetic index (no live USD term IBOR); confirm the reviewer accepts a method-only test.
+8. USD-TERM-3M is a synthetic index (no live USD term IBOR), so only the method can be tested.
 9. One case (`rulings_b`) has replay only.
 
 ## Spec
@@ -29,7 +29,7 @@ Status: Implemented, not Validated (stage B). Evidence line from the project's s
 
 # Projection curves, FRAs, swaps and basis
 
-Spec version 1.0.0. Status: Implemented, not Validated.
+Spec version 1.0.0. Status: Implemented.
 
 Multi-curve means forecasting a rate on one curve and discounting on another. The index is `USD-TERM-3M`, which is synthetic (see `01-core/conventions.md`).
 

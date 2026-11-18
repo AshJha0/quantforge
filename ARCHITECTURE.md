@@ -21,7 +21,7 @@ Sources: each spec ends with a `## Sources` section naming the papers, books and
 - Libraries first, services last. Infrastructure arrives as local adapters in stage K.
 - Trading is simulated only. There are no live orders.
 
-The specification remains a shared-error risk: four builds and a hand case can share one misreading. That is why outside libraries are used wherever a licence allows, and why a human review closes the project. Until that review, validation is self-assessment.
+The specification remains a shared-error risk: four builds and a hand case can share one misreading. That is why outside libraries are used wherever a licence allows. Validation is self-assessment: there is no second review (owner decision, 2026-11-18).
 
 ## Inside one implementation
 

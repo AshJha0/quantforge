@@ -198,7 +198,7 @@ python conformance/fuzz/fuzz_cli.py --impl rust --seconds 20 --seed 1
 
 ## Stage B recipes
 
-FX and rates slices, at Implemented, not Validated. All inputs are synthetic, and nothing is traded. Charts of the same curves are in the [Curves gallery](docs/curves/README.md).
+FX and rates slices. All inputs are synthetic, and nothing is traded. Charts of the same curves are in the [Curves gallery](docs/curves/README.md).
 
 ### Run a stage B use case
 
@@ -266,7 +266,7 @@ This reruns the Python CLI against the committed [gallery](docs/curves/README.md
 
 ## Stage C recipes
 
-Equity vol slice, at Implemented, not Validated. All inputs are synthetic, and nothing is traded. Outputs below are real, from the Rust build on 2026-11-07. There are no stage C files in `examples/` yet, so these use golden-case inputs.
+Equity vol slice. All inputs are synthetic, and nothing is traded. Outputs below are real, from the Rust build on 2026-11-07. There are no stage C files in `examples/` yet, so these use golden-case inputs.
 
 ### Run the stage C suites
 

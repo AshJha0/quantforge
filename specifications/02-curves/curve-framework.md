@@ -1,6 +1,6 @@
 # Curve framework
 
-Spec version 1.0.0. Status: Implemented, not Validated.
+Spec version 1.0.0. Status: Implemented.
 
 A discount curve says what one unit paid on a future date is worth today. Everything else in stage B is built on this.
 

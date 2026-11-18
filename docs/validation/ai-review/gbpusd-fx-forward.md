@@ -7,9 +7,9 @@ Rules for your answer:
 - Quote the spec line or the exact number you question.
 - Return findings as one table with columns: curve, claim, issue, severity (high / medium / low / note), evidence (quote or your working).
 - After the table, list the questions you answered "cannot check", and why.
-- Your review is a second opinion. It is filed under a labelled "AI review" section and never counts as the human sign-off.
+- Your review is filed under a labelled "AI review" section of the curve's evidence checklist and checked against the repository before anything is acted on.
 
-Status: Implemented, not Validated (stage B). Evidence line from the project's status table: 11 golden cases for `fx.forward.outright`, 11 with an outside library in `verified_by`.
+Stage: B. Evidence line from the project's curve table: 11 golden cases for `fx.forward.outright`, 11 with an outside library in `verified_by`.
 
 ## Questions
 
@@ -28,7 +28,7 @@ Status: Implemented, not Validated (stage B). Evidence line from the project's s
 
 # FX spot, forwards and swaps
 
-Spec version 1.0.0. Status: Implemented, not Validated.
+Spec version 1.0.0. Status: Implemented.
 
 A rate of 1.28 for `GBPUSD` means 1 GBP (base) costs 1.28 USD (quote). A forward follows from no-arbitrage between the two currencies' discount curves.
 
