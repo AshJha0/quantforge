@@ -68,8 +68,10 @@ def stage_span(done):
 
 def check_status(figures, rows):
     """Problems where site_facts.json disagrees with ROADMAP: implemented_stages must span the Done stages."""
-    done = [st for st, _, status in rows if status.lower().startswith("done") and len(st) == 1]
-    want = stage_span(done)
+    done = [st for st, _, status in rows if status.lower().startswith("done")]
+    letters = [st for st in done if len(st) == 1]
+    others = [st for st in done if len(st) > 1]  # repair rounds such as R6 have their own ROADMAP row
+    want = stage_span(letters) + "".join(f", plus {st}" for st in others)
     have = figures.get("implemented_stages", "")
     return [] if have == want else [f"site_facts.json implemented_stages is '{have}', ROADMAP says '{want}'"]
 
