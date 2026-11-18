@@ -74,7 +74,7 @@ def test_estimator_errors() -> None:
     assert _code(lambda: me.resilience(1.0, [(0, 2.0), (0, 3.0), (0, 4.0)])) == "E_INPUT"
     assert _code(lambda: me.resilience(1.0, [(0, 2.0), (1, 0.5), (2, 4.0)])) == "E_DOMAIN"
     assert _code(lambda: me.liquidity_decay([(0, 1.0), (1, 0.0), (2, 1.0)])) == "E_DOMAIN"
-    assert _code(lambda: me.liquidity_decay([(0, 1.0), (1, 0.0)])) == "E_INPUT"  # HR-75a
+    assert _code(lambda: me.liquidity_decay([(0, 1.0), (1, 0.0)])) == "E_INPUT"  # HR-66
     assert _code(lambda: me.adverse_selection([1.0], [1.0, 2.0])) == "E_INPUT"
     assert _code(lambda: me.adverse_selection([0.0, 0.0], [1.0, 2.0])) == "E_INPUT"
     good = ([1.0, 2.0], [1.0, 2.0])

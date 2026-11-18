@@ -1,5 +1,5 @@
 """Venue analytics: markouts, fill rates, toxicity (specifications/10-execution/venue-analytics.md,
-stage H H-16; rulings HR-72, HR-75a).
+stage H H-16; rulings HR-72, HR-75 as amended (HR-66)).
 
 Each input number is read as the decimal it prints as (shortest round trip) and every sum, and the
 sign test of the toxicity indicator, is exact on those decimals; each output is rounded once to
@@ -45,7 +45,7 @@ def analytics(
 ) -> dict[str, Any]:
     """`exec.venue.analytics`: per venue and horizon, markout, markout_bps and toxicity; per venue
     fill_rate. The mid at u is the last mid stamped at or before u (HR-72)."""
-    # HR-75a: structural E_INPUT first, then E_DOMAIN, then the mid lookups
+    # HR-75 as amended (HR-66): structural E_INPUT first, then E_DOMAIN, then the mid lookups
     if any(o.filled > o.sent for o in orders):
         raise _fail("E_INPUT", "filled exceeds sent", "orders")
     times = [_q(t) for t, _ in mids]
