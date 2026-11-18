@@ -39,6 +39,7 @@ CORE_MODULES = (
     "dynamic_hedge",
     "equity",
     "equity_curves",
+    "execution",
     "exotics",
     "futures",
     "fx",

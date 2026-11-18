@@ -350,6 +350,10 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     # Stage J wave 3 (ruling J-W3-14); array lengths are in STAGE_F_ARRAYS.
     "research.drift.psi": _caps(bins=1_000),
     "research.drift.ks": _ks_cells,
+    # Stage H wave 1 (ruling HR-9): buckets and AC steps 100,000; TCA fills in STAGE_F_ARRAYS.
+    "exec.schedule.twap": _caps(n_buckets=100_000),
+    "exec.ac.trajectory": _caps(n_steps=100_000),
+    "exec.ac.frontier": _caps(n_steps=100_000),
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")
@@ -371,6 +375,7 @@ STAGE_F_ARRAYS: dict[str, dict[str, int]] = {
     "risk.book.ois_sensitivity": {"swaps": 10_000},
     # Stage J wave 1 (rulings J-5, J-9, J-12, J-15).
     "research.backtest.run": {"prices": 1_000_000, "targets": 1_000_000},
+    "exec.tca.shortfall": {"fills": 1_000_000},  # ruling HR-9
     "research.cv.purged_kfold": {"t0": 1_000_000, "t1": 1_000_000},
     "research.stats.pbo": {"performance": 10_000_000},
     # Stage J wave 2 (ruling J-W2-14): assets and views 500, series 1,000,000.
