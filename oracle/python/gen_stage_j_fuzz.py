@@ -187,7 +187,7 @@ CASES += [
 
 DOC = {"schema_version": "1.0", "suite": "fuzzfix_j", "spec": "specifications/stage-j-rulings.md",
        "spec_version": "1.0.0", "generator": "oracle/python/gen_stage_j_fuzz.py",
-       "reviewer": "none: self-assessment until the end-of-project human review", "cases": CASES}
+       "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)", "cases": CASES}
 
 if __name__ == "__main__":
     OUT.parent.mkdir(parents=True, exist_ok=True)

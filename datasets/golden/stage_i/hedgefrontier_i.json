@@ -4,7 +4,7 @@
  "spec": "specifications/08-hedging/hedge-costs-and-frontier.md",
  "spec_version": "1.0.0",
  "generator": "oracle/python/gen_stage_i_w4a.py",
- "reviewer": "none: self-assessment until the end-of-project human review",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
  "cases": [
   {
    "case_id": "hedgefrontier_i-0001",

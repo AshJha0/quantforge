@@ -4,7 +4,7 @@
  "spec": "specifications/08-hedging/credit-and-correlation-hedges.md",
  "spec_version": "1.0.0",
  "generator": "oracle/python/gen_stage_i_w2.py",
- "reviewer": "none: self-assessment until the end-of-project human review",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
  "cases": [
   {
    "case_id": "hedgecorr_i-0001",
