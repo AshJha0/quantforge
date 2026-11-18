@@ -278,6 +278,40 @@ def build():
         s.add(op, inp, error=code, cls=CLS, verified=["hand"], tags=["stage_h", "paper", "error"],
               description=f"hand: {desc}")
         s.cases[-1]["case_id"] = f"pt_h-{40 + k:04d}"
+    # HR-77 exactness and range, HR-78 duplicate keys: hand cases, not blind (the rulings came after the blind run)
+    big = "10000000000000000000000000000.01"  # 31 significant digits: a 28-digit context would round it
+    hr77 = [
+        ("pt_h-0050", "paper.book.apply_fill",
+         {"cash": big, "fills": [{"side": "BUY", "quantity": "1", "price": "1", "fee": "0"}]},
+         L(position="1", avg_cost="1", realised="0", fees="0", cash="9999999999999999999999999999.01"),
+         "exact cash at 31 digits (fails under 28-digit rounding)"),
+        ("pt_h-0051", "paper.book.apply_fill",
+         {"fills": [{"side": "BUY", "quantity": "1", "price": "1"}, {"side": "BUY", "quantity": "2", "price": "2"}]},
+         L(position="3", avg_cost="1.666666666666666667", realised="0", fees="0", cash_delta="-5"),
+         "average cost 5/3 rounded half-even to 18 decimals"),
+    ]
+    for cid, op, inp, out, desc in hr77:
+        s.add(op, inp, out, cls=CLS, verified=["hand"], tags=["stage_h", "paper", "exact"],
+              description=f"hand, not blind: HR-77 {desc}")
+        s.cases[-1]["case_id"] = cid
+    r0 = rec(0, TS, "ORDER", dict(ORDER_BODY), Z64)
+    dup = canon(r0).replace('"kind":"ORDER"', '"kind":"ORDER","kind":"ORDER"', 1) + "\n"
+    lim = [
+        ("paper.book.apply_fill", {"fills": [{"side": "BUY", "quantity": "1", "price": "1.0000000000000000001"}]},
+         "E_LIMIT", "HR-77: an input with 19 decimals"),
+        ("paper.book.apply_fill",
+         {"fills": [{"side": "BUY", "quantity": "100", "price": "10000000000000000000000000000000000"}]},
+         "E_LIMIT", "HR-77: notional 10^36 has 37 digits"),
+    ]
+    for k, (op, inp, code, desc) in enumerate(lim):
+        s.add(op, inp, error=code, cls=CLS, verified=["hand"], tags=["stage_h", "paper", "error", "exact"],
+              description=f"hand, not blind: {desc}")
+        s.cases[-1]["case_id"] = f"pt_h-{52 + k:04d}"
+    s.add("paper.ledger.verify", {"text": dup},
+          {"ok": False, "records": 0, "first_bad_seq": 0, "reason": "PARSE", "head": None, "label": LABEL},
+          cls=CLS, verified=["hand"], tags=["stage_h", "paper", "ledger"],
+          description="hand, not blind: HR-78 a repeated key (same value) is PARSE, though last-wins would verify")
+    s.cases[-1]["case_id"] = "pt_h-0054"
     return s
 
 

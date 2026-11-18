@@ -26,7 +26,18 @@ from .errors import QfError
 from .execution import tca_shortfall
 from .finite import guard
 from .lit_matching import fmt
-from .paper import CEILING, LABEL, Book, Ledger, dec, end_of_day, pretrade_check, side_sign
+from .paper import (
+    CEILING,
+    LABEL,
+    Book,
+    Ledger,
+    dec,
+    end_of_day,
+    exact,
+    input_decimal,
+    pretrade_check,
+    side_sign,
+)
 
 TRADER = "PAPER"
 VENUES = ("LIT", "DARK", "SOR")
@@ -340,6 +351,7 @@ class Session:
         return {"eod": eod, "tca": tcas}
 
 
+@exact
 def session_case(
     cash: Any,
     limits: Mapping[str, Any],
@@ -350,8 +362,7 @@ def session_case(
     """`paper.session.run`: replays a script of SUBMIT and CLOSE steps through one Session and
     returns every ledger record (with its hash), the head, positions and cash (cli-contract.md).
     Deterministic (A8); simulated only (HR-42)."""
-    if not isinstance(cash, str):
-        raise QfError("E_SCHEMA", "cash must be a decimal string", "cash")
+    input_decimal(cash, "cash")
     for key0 in ("tick_size", "lot_size", "fee_schedule"):
         if lit.get(key0) is None:
             raise QfError("E_SCHEMA", f"lit/{key0} is missing", "lit/" + key0)
@@ -372,6 +383,9 @@ def session_case(
             for key in ("order_id", "symbol", "side", "type", "quantity"):
                 if order.get(key) is None:
                     raise QfError("E_SCHEMA", f"{w}order/{key} is missing", w + "order/" + key)
+            for key in ("quantity", "limit_price"):
+                if order.get(key) is not None:
+                    input_decimal(order[key], f"{w}order/{key}")
             symbols.add(order["symbol"])
             results.append(
                 s.submit(order, ts, snap, list(step.get("contra") or []), step.get("router"))
@@ -381,6 +395,11 @@ def session_case(
             if isinstance(days, bool) or not isinstance(days, int):
                 raise QfError("E_SCHEMA", f"{w}days must be an integer", w + "days")
             rates = {r: step.get(r, "0") for r in ("cash_rate", "debit_rate", "borrow_rate")}
+            for r, v in rates.items():
+                input_decimal(v, w + r)
+            for name in ("prev_marks", "marks"):
+                for sym, v in (step.get(name) or {}).items():
+                    input_decimal(v, f"{w}{name}/{sym}")
             out = s.close_day(
                 ts, dict(step.get("prev_marks") or {}), dict(step.get("marks") or {}), days, **rates
             )
