@@ -22,6 +22,7 @@ from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from typing import Any
 
 from .errors import QfError
+from .finite import guard
 from .lit_matching import _dec, fmt
 from .rng import Xoshiro256
 
@@ -280,3 +281,6 @@ def km_tail(obs: list[tuple[int, int]], s_max: int) -> list[tuple[float, float]]
                 gw += d / (at_risk * (at_risk - d))
         out.append((t, t * gw**0.5))
     return out
+
+
+guard(globals())

@@ -12,6 +12,7 @@ from decimal import Decimal
 from typing import Any
 
 from .errors import QfError
+from .finite import guard
 
 DEPTHS = (10, 25, 100, 500, 1000)
 MAX_MESSAGES = 50_000_000
@@ -265,3 +266,6 @@ def rebuild(
     if emit_checksum_string:
         out["checksum_string"] = final
     return out
+
+
+guard(globals())

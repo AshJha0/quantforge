@@ -25,6 +25,7 @@ from fractions import Fraction
 from typing import Any
 
 from .errors import QfError
+from .finite import guard
 from .lit_matching import _dec, fmt
 from .rng import Xoshiro256
 
@@ -196,8 +197,10 @@ class Problem:
             return (M, *L)
         return (0, *([self.S] if self.kinds[0] == "LIT" else [0]), *([0] * (len(self.kinds) - 1)))
 
-    def _descent(self) -> tuple[int, ...]:
-        best = list(self._start())
+    def _descent(self, start: tuple[int, ...] | None = None) -> tuple[int, ...]:
+        """Exact coordinate descent on the sample-average cost from `start` (default the [CK]
+        single-venue start); each pass tries every value 0..S per coordinate."""
+        best = list(self._start() if start is None else start)
         cur = self.evaluate(best[0], best[1:])[0]
         changed = True
         while changed:
@@ -241,7 +244,11 @@ class Problem:
             x = [min(max(v - eta * g, 0.0), float(self.S)) for v, g in zip(x, grad)]
             avg = [a + (v - a) / n for a, v in zip(avg, x)]
         cands = itertools.product(*[sorted({math.floor(a), math.ceil(a)}) for a in avg])
-        return min((self.evaluate(t[0], list(t[1:]))[0], t) for t in cands)[1]
+        rounded = min((self.evaluate(t[0], list(t[1:]))[0], t) for t in cands)[1]
+        # The subgradient is zero where the cost is flat in a coordinate (posted size beyond every
+        # outflow, theta = 0), so the averaged iterate can stop anywhere on that plateau; an exact
+        # coordinate-descent polish from the rounded point moves it to the integer optimum.
+        return self._descent(rounded)
 
 
 def allocate(inp: dict[str, Any]) -> dict[str, Any]:
@@ -280,3 +287,6 @@ def allocate(inp: dict[str, Any]) -> dict[str, Any]:
             for c, t in ranking
         ]
     return out
+
+
+guard(globals())

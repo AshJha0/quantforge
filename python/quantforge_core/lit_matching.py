@@ -16,6 +16,7 @@ from decimal import Decimal
 from typing import Any
 
 from .errors import QfError
+from .finite import guard
 
 LABEL = "simulated venue; not a real exchange"
 MAX_EVENTS = 10_000_000
@@ -364,3 +365,6 @@ def run(
             eng.modify(e, k)
         eng.reprice()
     return eng.output()
+
+
+guard(globals())

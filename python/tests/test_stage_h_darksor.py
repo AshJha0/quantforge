@@ -243,3 +243,15 @@ def test_planted_leakage_recovered_within_3_se() -> None:
     mean = sum(adverse) / n
     se = math.sqrt(sum((a - mean) ** 2 for a in adverse) / (n - 1) / n)
     assert abs(mean - alpha * jump) <= 3 * se, (mean, se, n)
+
+
+@pytest.mark.parametrize("k", [0, 1, 2, 3, 4])
+def test_stochastic_approx_reaches_sample_average_optimum_on_every_golden(k: int) -> None:
+    """Spec convergence row: the averaged iterate approaches the SAMPLE_AVERAGE optimum. sor_h-0002
+    has a flat cost region in L (theta = 0); before the polish the iterate stopped at L = 5,
+    cost 8.15 against 8."""
+    inp = {key: v for key, v in _cases("sor_h")[k]["inputs"].items() if key != "ranking"}
+    best = sor.allocate(inp)
+    for n in (1_000, 10_000):
+        got = sor.allocate(dict(inp, method="STOCHASTIC_APPROX", iterations=n, step=1.0, seed=3))
+        assert got == best, (k, n)
