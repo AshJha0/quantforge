@@ -153,3 +153,9 @@ Tests unchanged for `curve_fits`, so the seeded sample and verdicts are the same
 | Module | Run | Killed (40) | Gate |
 |---|---|---|---|
 | curve_fits | 44383318047 | 31/40 (77.5%, Wilson LB 62.5%), seed 355377703 | below gate (same 9 survivors) |
+
+## Signed 2026-11-18 and re-scored
+
+The owner signed the six proven-equivalent rows in chat on 2026-11-18 ("Yes, sign the 6"): `x_smooth__mutmut_104`, `_133`, `_137`, `x_robust__mutmut_56`, `_97`, `_180`. They are now in `skip-equivalents.json` and their rows in `equivalents-python.md` carry the signature. `x_robust__mutmut_12`, `_28` and `_114` stay unsigned and counted.
+
+Re-scored from the existing run 44383318047 (seed 355377703), no new CI draw: the six leave the sample, the 31 kills and 3 survivors stand, so 31/34 = 91.2%, 95% Wilson lower bound 77.0%. That clears the gate (>= 80%, LB >= 65%). Caveat: the next CI run draws 40 from the remaining live mutants, so its sample will include mutants not in this one.
