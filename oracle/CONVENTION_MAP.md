@@ -56,6 +56,7 @@ Review: self-reviewed 2026-11-07. The spec session read each spec section and th
 - `CMPD.METHOD`: QuantLib's `lockoutDays = k` locks the last k+1 rates; the ARRC lockout in `02-curves/overnight-compounding.md` locks k, so the map passes k-1.
 - `ISDA.FALLBACK`: the spread adjustments are published constants (fixed 2021-03-05), not QuantLib values. A fallback case counts because its compounded rate comes from QuantLib.
 - `credit.cds.bootstrap` is counted by a reprice check: QuantLib's `cdsMaturity` gives the pillar dates, and the golden survivals priced in QuantLib's ISDA engine return each quoted spread within 1e-10.
+- `credit.cds.bootstrap` at a Saturday maturity with a later pillar: QuantLib's ISDA engine reads the hazard one day past the pillar (the next segment), the spec's sequential bootstrap cannot; the reprice gap is linear in the hazard jump (credit_d-0002: 1.95e-10, not counted; other cases 5e-12 to 1.5e-11). See the `credit_d` row in `oracle/REPORT.md`.
 - `rates.ois.pv`: the strings in `valuation` are identities of the inputs and the spec's fixed strings; only the numbers come from QuantLib.
 - `repo.*`: QuantLib gives the bond's cash flows, accrued and the simple ACT/360 growth factors; the forward-price identity is the spec's own algebra on those objects.
 - H-19 (2026-11-18), what is library and what is the spec's arithmetic:
