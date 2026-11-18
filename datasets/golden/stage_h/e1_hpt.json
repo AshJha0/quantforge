@@ -1,0 +1,247 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1_hpt",
+ "spec": "specifications/10-execution/paper-trading.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_pt.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "e1_hpt-0001",
+   "operation": "paper.book.apply_fill",
+   "inputs": {
+    "position": "1",
+    "avg_cost": "100",
+    "fills": [
+     {
+      "side": "SELL",
+      "quantity": "3",
+      "price": "90",
+      "fee": "0"
+     }
+    ],
+    "cash": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12, F-2a: NaN at cash is E_SCHEMA (from pt_h-0005)"
+  },
+  {
+   "case_id": "e1_hpt-0002",
+   "operation": "paper.book.end_of_day",
+   "inputs": {
+    "cash_open": "-1000",
+    "days": 3,
+    "debit_rate": "0.0730",
+    "close": "Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12, F-2a: Infinity at close is E_SCHEMA (from pt_h-0006)"
+  },
+  {
+   "case_id": "e1_hpt-0003",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "SELL",
+     "type": "LIMIT",
+     "quantity": "2",
+     "limit_price": "100"
+    },
+    "ref_price": "NaN",
+    "position": "1",
+    "cash": "10000",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12, F-2a: NaN at ref_price is E_SCHEMA (from pt_h-0017)"
+  },
+  {
+   "case_id": "e1_hpt-0004",
+   "operation": "paper.session.run",
+   "inputs": {
+    "cash": "-Infinity",
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    },
+    "lit": {
+     "tick_size": "0.5",
+     "lot_size": "1",
+     "fee_schedule": {
+      "maker_rebate": "0",
+      "taker_fee": "0.001"
+     }
+    },
+    "script": [
+     {
+      "op": "SUBMIT",
+      "ts": "2026-11-18T00:00:01Z",
+      "order": {
+       "order_id": "O1",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "LIMIT",
+       "quantity": "3",
+       "limit_price": "101",
+       "venue": "LIT"
+      },
+      "snapshot": {
+       "bids": [
+        [
+         "99.5",
+         "4"
+        ]
+       ],
+       "asks": [
+        [
+         "100.5",
+         "2"
+        ],
+        [
+         "101",
+         "5"
+        ]
+       ]
+      }
+     },
+     {
+      "op": "SUBMIT",
+      "ts": "2026-11-18T00:00:02Z",
+      "order": {
+       "order_id": "O2",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "LIMIT",
+       "quantity": "3",
+       "limit_price": "106",
+       "venue": "LIT"
+      },
+      "snapshot": {
+       "bids": [
+        [
+         "99.5",
+         "4"
+        ]
+       ],
+       "asks": [
+        [
+         "100.5",
+         "2"
+        ],
+        [
+         "101",
+         "5"
+        ]
+       ]
+      }
+     },
+     {
+      "op": "CLOSE",
+      "ts": "2026-11-19T00:00:00Z",
+      "prev_marks": {},
+      "marks": {
+       "BTC-USD": "102"
+      },
+      "days": 1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12, F-2a: -Infinity at cash is E_SCHEMA (from pt_h-0031)"
+  },
+  {
+   "case_id": "e1_hpt-0005",
+   "operation": "paper.ledger.append",
+   "inputs": {
+    "seq": 0,
+    "ts": "2026-11-18T00:00:01Z",
+    "kind": "ORDER",
+    "body": {
+     "order_id": "O1",
+     "symbol": "BTC-USD",
+     "side": "BUY",
+     "type": "LIMIT",
+     "quantity": "3",
+     "limit_price": "NaN"
+    },
+    "prev": "0000000000000000000000000000000000000000000000000000000000000000"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12, F-2a: NaN at body/limit_price is E_SCHEMA (from pt_h-0020)"
+  }
+ ]
+}

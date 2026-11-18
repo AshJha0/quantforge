@@ -4999,6 +4999,201 @@
     "spread"
    ]
   },
+  "paper.book.apply_fill": {
+   "spec": "specifications/10-execution/paper-trading.md",
+   "rust": "quantforge::paper::book_apply_fill",
+   "python": "quantforge.paper.book_apply_fill",
+   "java": "Paper.bookApplyFill",
+   "cpp": "qf::paper::book_apply_fill",
+   "inputs": {
+    "avg_cost": {
+     "java": "avgCost"
+    },
+    "cash": {
+     "java": "cash"
+    },
+    "fills": {
+     "java": "fills"
+    },
+    "position": {
+     "java": "position"
+    }
+   },
+   "outputs": [
+    "avg_cost",
+    "cash",
+    "cash_delta",
+    "fees",
+    "label",
+    "position",
+    "realised"
+   ]
+  },
+  "paper.book.end_of_day": {
+   "spec": "specifications/10-execution/paper-trading.md",
+   "rust": "quantforge::paper::book_end_of_day",
+   "python": "quantforge.paper.book_end_of_day",
+   "java": "Paper.bookEndOfDay",
+   "cpp": "qf::paper::book_end_of_day",
+   "inputs": {
+    "avg_cost_open": {
+     "java": "avgCostOpen"
+    },
+    "borrow_rate": {
+     "java": "borrowRate"
+    },
+    "cash_open": {
+     "java": "cashOpen"
+    },
+    "cash_rate": {
+     "java": "cashRate"
+    },
+    "close": {
+     "java": "close"
+    },
+    "days": {
+     "java": "days"
+    },
+    "debit_rate": {
+     "java": "debitRate"
+    },
+    "fills": {
+     "java": "fills"
+    },
+    "position_open": {
+     "java": "positionOpen"
+    },
+    "prev_close": {
+     "java": "prevClose"
+    }
+   },
+   "outputs": [
+    "cash_close",
+    "cash_interest",
+    "fees",
+    "financing",
+    "label",
+    "market",
+    "nav_close",
+    "nav_open",
+    "position",
+    "short_borrow",
+    "total",
+    "trading"
+   ]
+  },
+  "paper.ledger.append": {
+   "spec": "specifications/10-execution/paper-trading.md",
+   "rust": "quantforge::paper::ledger_append",
+   "python": "quantforge.paper.ledger_append",
+   "java": "Paper.ledgerAppend",
+   "cpp": "qf::paper::ledger_append",
+   "inputs": {
+    "body": {
+     "java": "body"
+    },
+    "kind": {
+     "java": "kind"
+    },
+    "prev": {
+     "java": "prev"
+    },
+    "seq": {
+     "java": "seq"
+    },
+    "ts": {
+     "java": "ts"
+    }
+   },
+   "outputs": [
+    "canonical_bytes",
+    "hash",
+    "label",
+    "record"
+   ]
+  },
+  "paper.ledger.verify": {
+   "spec": "specifications/10-execution/paper-trading.md",
+   "rust": "quantforge::paper::ledger_verify",
+   "python": "quantforge.paper.ledger_verify",
+   "java": "Paper.ledgerVerify",
+   "cpp": "qf::paper::ledger_verify",
+   "inputs": {
+    "text": {
+     "java": "text"
+    }
+   },
+   "outputs": [
+    "first_bad_seq",
+    "head",
+    "label",
+    "ok",
+    "reason",
+    "records"
+   ]
+  },
+  "paper.pretrade.check": {
+   "spec": "specifications/10-execution/paper-trading.md",
+   "rust": "quantforge::paper::pretrade_check",
+   "python": "quantforge.paper.pretrade_check",
+   "java": "Paper.pretradeCheck",
+   "cpp": "qf::paper::pretrade_check",
+   "inputs": {
+    "cash": {
+     "java": "cash"
+    },
+    "limits": {
+     "java": "limits"
+    },
+    "order": {
+     "java": "order"
+    },
+    "orders_today": {
+     "java": "ordersToday"
+    },
+    "position": {
+     "java": "position"
+    },
+    "ref_price": {
+     "java": "refPrice"
+    }
+   },
+   "outputs": [
+    "accepted",
+    "label",
+    "reasons"
+   ]
+  },
+  "paper.session.run": {
+   "spec": "specifications/10-execution/paper-trading.md",
+   "rust": "quantforge::paper::session_run",
+   "python": "quantforge.paper.session_run",
+   "java": "Paper.sessionRun",
+   "cpp": "qf::paper::session_run",
+   "inputs": {
+    "cash": {
+     "java": "cash"
+    },
+    "limits": {
+     "java": "limits"
+    },
+    "lit": {
+     "java": "lit"
+    },
+    "script": {
+     "java": "script"
+    }
+   },
+   "outputs": [
+    "cash",
+    "ceiling",
+    "head",
+    "label",
+    "positions",
+    "records",
+    "results"
+   ]
+  },
   "rates.basis.ois_spread": {
    "spec": "specifications/02-curves/csa-and-basis.md",
    "rust": "quantforge::rates::basis_ois_spread",
@@ -9706,5 +9901,7 @@
   "vol.vix.term_variance: minutes_to_expiry",
   "xva.adjustments.value: im_spread"
  ],
- "spec_only": []
+ "spec_only": [
+  "paper.pnl.explain"
+ ]
 }
