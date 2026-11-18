@@ -268,11 +268,39 @@ def _first_real(v):
     return None
 
 
+def long_decimal(s):
+    """venue_h-0010 (HR-76): exact unbounded sums. The two 1e20 fills cancel to leave 1e-20, which a 28-digit
+    context loses (it rounds 1e18 + 1e-20 to 1e18). Reference: exact Fractions, one rounding per output."""
+    from fractions import Fraction as F
+    inp = {"mids": [{"t": 0.0, "mid": 100.0}],
+           "fills": [{"venue": "A", "side": "BUY", "quantity": 1e20, "price": 99.99, "t": 0.0},
+                     {"venue": "A", "side": "BUY", "quantity": 1e-20, "price": 99.0, "t": 0.0},
+                     {"venue": "A", "side": "SELL", "quantity": 1e20, "price": 99.99, "t": 0.0}],
+           "orders": [{"venue": "A", "sent": 3.0, "filled": 1.0}], "horizons": [0.0]}
+    q = [F(repr(f["quantity"])) for f in inp["fills"]]
+    p = [F(repr(f["price"])) for f in inp["fills"]]
+    sg = [1, 1, -1]
+    n = sum(c * a * (100 - b) for c, a, b in zip(sg, q, p))
+    assert n == F(1, 10**20)
+    tox = sum(a for c, a, b in zip(sg, q, p) if c * (100 - b) < 0)
+    out = {"fill_rates": {"A": float(F(1, 3))},
+           "markouts": [{"venue": "A", "h": 0.0, "markout": float(n / sum(q)),
+                         "markout_bps": float(10000 * n / sum(a * b for a, b in zip(q, p))),
+                         "toxicity": float(tox / sum(q))}]}
+    assert out["markouts"][0]["markout"] == 5e-41 and out["markouts"][0]["markout_bps"] == 5.000500050005001e-39
+    s.add("exec.venue.analytics", inp, out, cls="simple_analytic", verified=["hand", "exact rational (fractions)"],
+          limit={"absolute": 0.0, "relative": 1e-12}, tags=["stage_h", "execution", "boundary"],
+          description="HR-76: exact unbounded sums; a 28-digit context returns markout 0")
+    assert s.cases[-1]["case_id"] == "venue_h-0010"
+
+
 def main():
     keep = common.GOLDEN
     common.GOLDEN = keep.parent / FOLDER
     for s in (mest_suite(), venue_suite()):
         e1(s)
+        if s.name == "venue_h":
+            long_decimal(s)
         s.write()
     common.GOLDEN = keep
 

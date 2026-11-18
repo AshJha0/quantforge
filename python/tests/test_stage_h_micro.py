@@ -30,17 +30,17 @@ def _cases(name: str) -> list[dict[str, Any]]:
     return cases
 
 
-def _close(a: Any, e: Any, path: str) -> None:
+def _close(a: Any, e: Any, path: str, ab: float = 1e-15) -> None:
     if isinstance(e, dict):
         assert set(a) == set(e), path
         for k in e:
-            _close(a[k], e[k], f"{path}.{k}")
+            _close(a[k], e[k], f"{path}.{k}", ab)
     elif isinstance(e, list):
         assert len(a) == len(e), path
         for k, (x, y) in enumerate(zip(a, e, strict=True)):
-            _close(x, y, f"{path}[{k}]")
+            _close(x, y, f"{path}[{k}]", ab)
     elif isinstance(e, float):
-        assert abs(a - e) <= 1e-15 + 1e-12 * max(abs(a), abs(e)), (path, a, e)
+        assert abs(a - e) <= ab + 1e-12 * max(abs(a), abs(e)), (path, a, e)
     else:
         assert a == e, path
 
@@ -54,7 +54,8 @@ def test_golden(case: dict[str, Any]) -> None:
             execute(case["operation"], inputs)
         assert e.value.code == exp["error_code"]
     else:
-        _close(execute(case["operation"], inputs), exp["outputs"], case["case_id"])
+        ab = case.get("tolerance_limit", {}).get("absolute", 1e-15)
+        _close(execute(case["operation"], inputs), exp["outputs"], case["case_id"], ab)
 
 
 # ------------------------------------------------------------------ paths the goldens miss

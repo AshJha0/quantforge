@@ -23,7 +23,7 @@ Inputs: `mids` array of `{t, mid}`; `fills` array of `{venue, side, quantity, pr
 
 Outputs: `fill_rates`, an object from venue to `fill_rate`; `markouts`, an array of `{venue, h, markout, markout_bps, toxicity}`, venues in code-point order, each venue's rows in `horizons` order. The blind lane's `fill_rate|A` key is the `fill_rates.A` value.
 
-Exact sums: each input number is read as the decimal it prints as (shortest round trip), and the sums and the sign test of the toxicity indicator are evaluated exactly on those decimals; each output is rounded once to binary64. Without this, venue_h-0001's A markout (exactly 0) comes out near 5e-15 in binary64, outside the 1e-15 absolute tolerance.
+Exact sums: each input number is read as the decimal it prints as (shortest round trip), and the sums and the sign test of the toxicity indicator are evaluated exactly on those decimals; each output is rounded once to binary64. HR-76 states this exactly: unbounded, no digit cap (HR-57's 36-digit range does not apply), one correctly rounded division per output. Without this, venue_h-0001's A markout (exactly 0) comes out near 5e-15 in binary64, outside the 1e-15 absolute tolerance.
 
 ## Golden cases
 Base input: mids (0, 100.00), (1, 100.02), (5, 100.05), (10, 99.98). Fills F1 (A, BUY, 100, 100.01, t 0), F2 (A, SELL, 200, 100.03, t 1), F3 (B, BUY, 300, 100.00, t 1). Orders (A, 500, 300), (B, 300, 300). For A, sum q p = 30,007; for B, 30,000.
@@ -38,6 +38,8 @@ Base input: mids (0, 100.00), (1, 100.02), (5, 100.05), (10, 99.98). Fills F1 (A
 | venue_h-0006 | base with a fill (B, BUY, 10, 100, t -1), h = 0 | `E_INPUT` | no mid at or before -1; horizon h = 0 added post-blind 2026-11-18 (the packet gave none and with h = 5 the lookup at t 4 succeeds), so this case is not blind-checked |
 | venue_h-0007 | base, h = -1 | `E_DOMAIN` | negative horizon |
 | venue_h-0008 | base with order (A, 500, 600), h = -1 | `E_INPUT` | both errors apply; filled > sent is a structural cross-field check and comes first (HR-75 as amended (HR-66); was `E_DOMAIN` under HR-75, changed 2026-11-18 on the coordinator's repo-wide order); hand only, not blind-checked |
+
+Case venue_h-0009 is the generated non-finite (F-2) case. venue_h-0010 (HR-76, added 2026-11-18, hand and exact rational arithmetic; not blind-checked): mids (0, 100); fills (A, BUY, 1e20, 99.99, t 0), (A, BUY, 1e-20, 99, t 0), (A, SELL, 1e20, 99.99, t 0); order (A, 3, 1); h = 0. N = 10^18 + 10^-20 - 10^18 = 10^-20 exactly (41 digits before the cancellation); Q = 2e20 + 1e-20; P = 19,998e18 + 99e-20. Expected: markout 5e-41 (= 10^-20 / Q rounded), markout_bps 5.000500050005001e-39, toxicity 0.5, fill_rate A 0.333333333333333. Compared with absolute tolerance 0: a 28-digit sum gives N = 0.
 
 ## Property tests
 For every venue and h, `markout_bps` has the sign of `markout`; toxicity lies in [0, 1]; reversing every side and reflecting every price and mid about a constant c (p -> 2c - p) leaves markout unchanged.
