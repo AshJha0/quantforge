@@ -1,0 +1,13 @@
+# Stage H rulings, wave 2 execution spec lane (H-14, H-17): 2026-11-18
+
+Written 2026-11-18 by the wave-2 execution spec lane under the owner's delegation. Separate file so it merges without conflict; numbering continues after HR-58 (`stage-h-rulings-w2.md`). If another lane has taken the same numbers by merge time, renumber this file only. Covers `10-execution/adaptive-algos.md` and `10-execution/tca-pretrade.md`. Append-only.
+
+| # | Point | Ruling |
+|---|---|---|
+| HR-59 | Arrival-price algorithm | Holdings follow [AC00] eq. (17) with one bucket as the time unit and the urgency kappa as the input (not lambda; `exec.ac.trajectory` covers the risk-aversion route). kappa = 0 is the TWAP limit. UNITS rounds the cumulative target half up, `floor(C + 1/2)`, and takes differences, so slices sum to X exactly and never differ from the continuous cumulative by more than 1/2. Reason: rounding each slice separately can drift; rounding the cumulative cannot |
+| HR-60 | Close algorithm | Auction quantity `min(X, p_c V_c)` (UNITS floors `p_c V_c`); the rest uses the VWAP allocation of `schedules.md` including HR-3 ties. An all-zero profile is an error only when a remainder is left to place. p_c = 0 is allowed (no auction) and p_c = 1 is allowed (the whole forecast close) |
+| HR-61 | Liquidity seeking | Available depth counts only levels inside the limit (BUY price <= L, SELL price >= L); the child is `min(remaining, alpha A)`, filled best level first. Real quantities only: rounding to lots is left to the venue adapter. Unordered levels are `E_INPUT`, never silently sorted |
+| HR-62 | Pair legs | Leg B follows leg A's cumulative fills times the ratio, rounded half up in UNITS. CASH_BALANCED needs opposite sides (`E_INPUT` otherwise); HEDGED allows either. Cash imbalance sign: BUY notional positive, SELL negative |
+| HR-63 | Basket | Each leg is TWAP-sliced independently (HR-3); the algorithm reports the per-bucket cash imbalance and does not re-balance. Gross notional is `sum X_k P_k` regardless of side |
+| HR-64 | Pre-trade estimate | Expected cost = half spread + impact in basis points; timing risk is reported beside it as one standard deviation, never added. Duration `X / (p adv)` uses participation of total volume including our own, as HR-4. [Kis13] form recalled and UNVERIFIED; parameters are inputs, no defaults |
+| HR-65 | Attribution | Delay, impact and spread are on executed quantity and use the arrival mid m_0 and the mid at each fill; opportunity and fees are reported separately as in HR-8. The three parts add to `s sum q (p - P_d)` by construction; the acceptance bound is 1e-10 max(1, \|total\|) |

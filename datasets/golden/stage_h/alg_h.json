@@ -1,0 +1,953 @@
+{
+ "schema_version": "1.0",
+ "suite": "alg_h",
+ "spec": "specifications/10-execution/adaptive-algos.md",
+ "spec_version": "0.1.0",
+ "generator": "hand (wave-2 execution spec lane 2026-11-18)",
+ "reviewer": "none: self-assessment; blind re-derivation pending",
+ "cases": [
+  {
+   "case_id": "alg_h-0001",
+   "operation": "exec.algo.arrival",
+   "inputs": {
+    "quantity": 1000,
+    "n_buckets": 4,
+    "urgency": 0.0,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "ok",
+    "slices": [
+     250,
+     250,
+     250,
+     250
+    ]
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0001"
+  },
+  {
+   "case_id": "alg_h-0002",
+   "operation": "exec.algo.arrival",
+   "inputs": {
+    "quantity": 1000,
+    "n_buckets": 2,
+    "urgency": 0.6931471805599453,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "ok",
+    "slices": [
+     600,
+     400
+    ]
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0002"
+  },
+  {
+   "case_id": "alg_h-0003",
+   "operation": "exec.algo.arrival",
+   "inputs": {
+    "quantity": 1001,
+    "n_buckets": 2,
+    "urgency": 0.6931471805599453,
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "ok",
+    "slices": [
+     601,
+     400
+    ]
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0003"
+  },
+  {
+   "case_id": "alg_h-0004",
+   "operation": "exec.algo.arrival",
+   "inputs": {
+    "quantity": 2100,
+    "n_buckets": 3,
+    "urgency": 0.6931471805599453,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "ok",
+    "slices": [
+     1100,
+     600,
+     400
+    ]
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0004"
+  },
+  {
+   "case_id": "alg_h-0005",
+   "operation": "exec.algo.arrival",
+   "inputs": {
+    "quantity": 1000,
+    "n_buckets": 4,
+    "urgency": -0.1,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0005"
+  },
+  {
+   "case_id": "alg_h-0006",
+   "operation": "exec.algo.arrival",
+   "inputs": {
+    "quantity": 1000,
+    "n_buckets": 0,
+    "urgency": 0.5,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0006"
+  },
+  {
+   "case_id": "alg_h-0007",
+   "operation": "exec.algo.close",
+   "inputs": {
+    "quantity": 10000,
+    "close_volume": 50000,
+    "auction_participation": 0.1,
+    "profile": [
+     1,
+     1,
+     2,
+     4
+    ],
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "ok",
+    "auction_quantity": 5000,
+    "slices": [
+     625,
+     625,
+     1250,
+     2500
+    ]
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0007"
+  },
+  {
+   "case_id": "alg_h-0008",
+   "operation": "exec.algo.close",
+   "inputs": {
+    "quantity": 3000,
+    "close_volume": 50000,
+    "auction_participation": 0.1,
+    "profile": [
+     1,
+     1,
+     2,
+     4
+    ],
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "ok",
+    "auction_quantity": 3000,
+    "slices": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0008"
+  },
+  {
+   "case_id": "alg_h-0009",
+   "operation": "exec.algo.close",
+   "inputs": {
+    "quantity": 10002,
+    "close_volume": 50000,
+    "auction_participation": 0.1,
+    "profile": [
+     1,
+     1,
+     1
+    ],
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "ok",
+    "auction_quantity": 5000,
+    "slices": [
+     1668,
+     1667,
+     1667
+    ]
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0009"
+  },
+  {
+   "case_id": "alg_h-0010",
+   "operation": "exec.algo.close",
+   "inputs": {
+    "quantity": 1000,
+    "close_volume": 50000,
+    "auction_participation": 1.5,
+    "profile": [
+     1
+    ],
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0010"
+  },
+  {
+   "case_id": "alg_h-0011",
+   "operation": "exec.algo.close",
+   "inputs": {
+    "quantity": 10000,
+    "close_volume": 50000,
+    "auction_participation": 0.1,
+    "profile": [
+     0,
+     0
+    ],
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0011"
+  },
+  {
+   "case_id": "alg_h-0012",
+   "operation": "exec.algo.liquidity_seek",
+   "inputs": {
+    "side": "BUY",
+    "quantity": 1000,
+    "limit_price": 100.2,
+    "take_fraction": 0.5,
+    "books": [
+     [
+      [
+       100.0,
+       400
+      ],
+      [
+       100.1,
+       400
+      ],
+      [
+       100.3,
+       1000
+      ]
+     ],
+     [
+      [
+       100.1,
+       600
+      ],
+      [
+       100.2,
+       600
+      ]
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "slices": [
+     400,
+     600
+    ],
+    "avg_prices": [
+     100.0,
+     100.1
+    ],
+    "filled": 1000,
+    "residual": 0,
+    "notional": 100060,
+    "avg_fill_price": 100.06
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0012"
+  },
+  {
+   "case_id": "alg_h-0013",
+   "operation": "exec.algo.liquidity_seek",
+   "inputs": {
+    "side": "BUY",
+    "quantity": 1000,
+    "limit_price": 100.0,
+    "take_fraction": 1.0,
+    "books": [
+     [
+      [
+       100.0,
+       300
+      ],
+      [
+       100.5,
+       1000
+      ]
+     ],
+     [
+      [
+       101.0,
+       500
+      ]
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "slices": [
+     300,
+     0
+    ],
+    "avg_prices": [
+     100.0,
+     null
+    ],
+    "filled": 300,
+    "residual": 700,
+    "notional": 30000,
+    "avg_fill_price": 100.0
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0013"
+  },
+  {
+   "case_id": "alg_h-0014",
+   "operation": "exec.algo.liquidity_seek",
+   "inputs": {
+    "side": "SELL",
+    "quantity": 500,
+    "limit_price": 99.9,
+    "take_fraction": 0.5,
+    "books": [
+     [
+      [
+       100.0,
+       200
+      ],
+      [
+       99.9,
+       200
+      ],
+      [
+       99.8,
+       1000
+      ]
+     ],
+     [
+      [
+       99.95,
+       1000
+      ]
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "slices": [
+     200,
+     300
+    ],
+    "avg_prices": [
+     100.0,
+     99.95
+    ],
+    "filled": 500,
+    "residual": 0,
+    "notional": 49985,
+    "avg_fill_price": 99.97
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0014"
+  },
+  {
+   "case_id": "alg_h-0015",
+   "operation": "exec.algo.liquidity_seek",
+   "inputs": {
+    "side": "BUY",
+    "quantity": 1000,
+    "limit_price": 101.0,
+    "take_fraction": 1.0,
+    "books": [
+     [
+      [
+       100.0,
+       300
+      ],
+      [
+       100.5,
+       300
+      ],
+      [
+       101.0,
+       1000
+      ]
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "slices": [
+     1000
+    ],
+    "avg_prices": [
+     100.55
+    ],
+    "filled": 1000,
+    "residual": 0,
+    "notional": 100550,
+    "avg_fill_price": 100.55
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0015"
+  },
+  {
+   "case_id": "alg_h-0016",
+   "operation": "exec.algo.liquidity_seek",
+   "inputs": {
+    "side": "BUY",
+    "quantity": 1000,
+    "limit_price": 101.0,
+    "take_fraction": 0.0,
+    "books": [
+     [
+      [
+       100.0,
+       300
+      ]
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0016"
+  },
+  {
+   "case_id": "alg_h-0017",
+   "operation": "exec.algo.liquidity_seek",
+   "inputs": {
+    "side": "BUY",
+    "quantity": 1000,
+    "limit_price": 101.0,
+    "take_fraction": 1.0,
+    "books": [
+     [
+      [
+       100.5,
+       300
+      ],
+      [
+       100.0,
+       300
+      ]
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0017"
+  },
+  {
+   "case_id": "alg_h-0018",
+   "operation": "exec.algo.pair",
+   "inputs": {
+    "leg_a": {
+     "side": "BUY",
+     "quantity": 1000,
+     "price": 50.0
+    },
+    "leg_b": {
+     "side": "SELL",
+     "price": 25.0
+    },
+    "pair_mode": "CASH_BALANCED",
+    "n_buckets": 4,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "ok",
+    "slices_a": [
+     250,
+     250,
+     250,
+     250
+    ],
+    "slices_b": [
+     500,
+     500,
+     500,
+     500
+    ],
+    "quantity_b": 2000,
+    "cash_imbalance": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0018"
+  },
+  {
+   "case_id": "alg_h-0019",
+   "operation": "exec.algo.pair",
+   "inputs": {
+    "leg_a": {
+     "side": "BUY",
+     "quantity": 1000,
+     "price": 30.0
+    },
+    "leg_b": {
+     "side": "SELL",
+     "price": 70.0
+    },
+    "pair_mode": "CASH_BALANCED",
+    "n_buckets": 3,
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "ok",
+    "slices_a": [
+     334,
+     333,
+     333
+    ],
+    "slices_b": [
+     143,
+     143,
+     143
+    ],
+    "quantity_b": 429,
+    "cash_imbalance": [
+     10,
+     -10,
+     -30
+    ]
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0019"
+  },
+  {
+   "case_id": "alg_h-0020",
+   "operation": "exec.algo.pair",
+   "inputs": {
+    "leg_a": {
+     "side": "BUY",
+     "quantity": 1000,
+     "price": 100.0
+    },
+    "leg_b": {
+     "side": "SELL",
+     "price": 50.0
+    },
+    "pair_mode": "HEDGED",
+    "hedge_ratio": 0.8,
+    "n_buckets": 2,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "ok",
+    "slices_a": [
+     500,
+     500
+    ],
+    "slices_b": [
+     400,
+     400
+    ],
+    "quantity_b": 800,
+    "cash_imbalance": [
+     30000,
+     60000
+    ]
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0020"
+  },
+  {
+   "case_id": "alg_h-0021",
+   "operation": "exec.algo.pair",
+   "inputs": {
+    "leg_a": {
+     "side": "BUY",
+     "quantity": 1000,
+     "price": 50.0
+    },
+    "leg_b": {
+     "side": "BUY",
+     "price": 25.0
+    },
+    "pair_mode": "CASH_BALANCED",
+    "n_buckets": 2,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0021"
+  },
+  {
+   "case_id": "alg_h-0022",
+   "operation": "exec.algo.pair",
+   "inputs": {
+    "leg_a": {
+     "side": "BUY",
+     "quantity": 1000,
+     "price": 50.0
+    },
+    "leg_b": {
+     "side": "SELL",
+     "price": 25.0
+    },
+    "pair_mode": "HEDGED",
+    "hedge_ratio": 0.0,
+    "n_buckets": 2,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0022"
+  },
+  {
+   "case_id": "alg_h-0023",
+   "operation": "exec.algo.basket",
+   "inputs": {
+    "legs": [
+     {
+      "side": "BUY",
+      "quantity": 300,
+      "price": 10.0
+     },
+     {
+      "side": "BUY",
+      "quantity": 200,
+      "price": 20.0
+     },
+     {
+      "side": "SELL",
+      "quantity": 700,
+      "price": 10.0
+     }
+    ],
+    "n_buckets": 2,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "ok",
+    "slices": [
+     [
+      150,
+      150
+     ],
+     [
+      100,
+      100
+     ],
+     [
+      350,
+      350
+     ]
+    ],
+    "cash_imbalance": [
+     0,
+     0
+    ],
+    "gross_notional": 14000
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0023"
+  },
+  {
+   "case_id": "alg_h-0024",
+   "operation": "exec.algo.basket",
+   "inputs": {
+    "legs": [
+     {
+      "side": "BUY",
+      "quantity": 3,
+      "price": 10.0
+     },
+     {
+      "side": "SELL",
+      "quantity": 1,
+      "price": 30.0
+     }
+    ],
+    "n_buckets": 2,
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "ok",
+    "slices": [
+     [
+      2,
+      1
+     ],
+     [
+      1,
+      0
+     ]
+    ],
+    "cash_imbalance": [
+     -10,
+     0
+    ],
+    "gross_notional": 60
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0024"
+  },
+  {
+   "case_id": "alg_h-0025",
+   "operation": "exec.algo.basket",
+   "inputs": {
+    "legs": [],
+    "n_buckets": 2,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "alg"
+   ],
+   "description": "specifications/10-execution/adaptive-algos.md golden alg_h-0025"
+  }
+ ]
+}
