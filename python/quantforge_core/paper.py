@@ -12,6 +12,7 @@ from decimal import ROUND_HALF_EVEN, Decimal, InvalidOperation
 from typing import Any
 
 from .errors import QfError
+from .finite import guard
 
 LABEL = "crypto venue; simulated"
 CEILING = "Paper trading on free data; simulated fills; no evidence of tradable profitability."
@@ -33,7 +34,7 @@ def dec(value: Any, name: str) -> Decimal:
     except InvalidOperation:
         raise QfError("E_PARSE", f"{name} is not a decimal", name) from None
     if not d.is_finite():
-        raise QfError("E_NON_FINITE", f"{name} is not finite", name)
+        raise QfError("E_DOMAIN", f"{name} is not finite", name)  # E1: a non-finite input is E_DOMAIN
     return d
 
 
@@ -241,3 +242,6 @@ def pretrade_check(order: Mapping[str, Any], ref_price: Any, position: Any, cash
     }
     reasons = [r for r in REASONS if failed[r]]
     return {"accepted": not reasons, "reasons": reasons, "label": LABEL}
+
+
+guard(globals())  # E1: NaN and infinity at a public input are E_DOMAIN, checked first
