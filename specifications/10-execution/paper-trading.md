@@ -20,6 +20,13 @@ Evidence for goldens: hand calculation in exact decimal (shown in each row), plu
 ### Numbers
 Prices, quantities, cash and rates are decimal strings in inputs, outputs and the ledger (HR-44); arithmetic is exact decimal. Cash postings from financing are rounded to the cash precision (2 decimal places for USD) half-even when posted; fill cash is exact (quantity x price + fee, no rounding). Floats never enter the ledger.
 
+### Rulings HR-77 and HR-78 (proposed 2026-11-18, from the Java port; numbers to be confirmed by the coordinator)
+
+| Ruling | Rule |
+|---|---|
+| HR-77 | **Exact decimals and range.** Every input decimal is in the HR-57 input range (36 digits, at most 18 decimals), and every computed value (notional q x p, each cash flow and the cash balance, fees, cost basis, position, realised, market value, NAV, each explain term, the financing products before division, q x p_chk) is in the HR-57 range (36 digits, 36 decimals); outside either is **`E_LIMIT`** (HR-58), checked after `E_SCHEMA`, never a rounded value. Inside the range sums, differences and products are exact in every build (Python in the 200-digit context, as HR-58). There are exactly three divisions, each with a stated rounding: the average cost c = (\|n\| c + q p) / (\|n\| + q), rounded half-even to 18 decimals; cash interest and short borrow, the exact product divided by 365 and rounded half-even to 0.01; the mid (bid + ask) / 2, exact. The price-band check is cross-multiplied, \|limit - P_ref\| > band x P_ref, so no division. TCA values stay binary64 (cli-contract.md). Goldens pt_h-0050 (31-digit cash, wrong under a 28-digit context), 0051 (5/3 to 18 decimals), 0052 and 0053 (`E_LIMIT`). |
+| HR-78 | **Duplicate keys.** A ledger line whose JSON repeats a key at any level is `PARSE` in `paper.ledger.verify`, even when the values agree: a last-wins parser would let an edited copy of a field pass the hash check. Golden pt_h-0054. |
+
 ### Orders and fills
 An order: `order_id`, `symbol`, `side` (BUY, SELL), `type` (LIMIT, MARKET, IOC, plus the lit types of HR-25 passed through), `quantity` (> 0), `limit_price` (required unless MARKET), `venue` (`LIT`, `DARK`, `SOR`). States as [FIX-ER].
 
@@ -68,7 +75,7 @@ Append-only JSON Lines, one record per line, in the `forward-log` branch (HR-46)
 
 Canonical bytes (HR-45): the record without `hash`, JSON with keys sorted by code point at every level, separators `,` and `:` with no whitespace, ASCII only (non-ASCII escaped `\uXXXX`), integers only for `seq`, every other number a string. `hash` = lowercase hex SHA-256 of those bytes.
 
-`verify` re-reads the file and returns `{ok, records, first_bad_seq, reason}`; reasons `HASH` (stored hash differs), `LINK` (prev differs from the previous hash), `SEQ` (gap or repeat), `LABEL` (missing or wrong label), `PARSE`. It never repairs.
+`verify` re-reads the file and returns `{ok, records, first_bad_seq, reason}`; reasons `HASH` (stored hash differs), `LINK` (prev differs from the previous hash), `SEQ` (gap or repeat), `LABEL` (missing or wrong label), `PARSE` (including a repeated key, HR-78). It never repairs.
 
 ### TCA per order
 When an order reaches a final state, a `TCA` record carries `exec.tca.shortfall` (`tca.md`) with decision price = P_ref at the pre-trade check, arrival price = mid at venue entry, end price = close P_t, the order's fills and fees.
