@@ -1,6 +1,6 @@
-# Transaction cost analysis: implementation shortfall (DRAFT)
+# Transaction cost analysis: implementation shortfall
 
-Spec version 0.1.0 (DRAFT, stage H wave 1). Status: Specified, not implemented. Rulings HR-2, HR-8, HR-9. Plan items 14.7 H-3 (decomposition sums to 1e-10), 15.1 "TCA".
+Spec version 0.1.0 (stage H wave 1; confirmed 2026-11-18 by the stage H coordinator). Status: Specified, not implemented. Rulings HR-2, HR-8, HR-9. Plan items 14.7 H-3 (decomposition sums to 1e-10), 15.1 "TCA".
 
 Sources:
 - [Per88] A. Perold, "The implementation shortfall: paper versus reality", *J. Portfolio Management* 14(3) (1988) 4-9. Paper-portfolio definition. Not free; recalled. Evidence class: paper, recalled.

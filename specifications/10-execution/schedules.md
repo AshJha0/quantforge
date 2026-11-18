@@ -1,6 +1,6 @@
-# Execution schedules: TWAP, VWAP, POV (DRAFT)
+# Execution schedules: TWAP, VWAP, POV
 
-Spec version 0.1.0 (DRAFT, stage H wave 1). Status: Specified, not implemented. Rulings: `stage-h-rulings-w1.md` HR-2 to HR-4, HR-9. Plan items 14.7 H-3, 15.1 "Execution schedules".
+Spec version 0.1.0 (stage H wave 1; confirmed 2026-11-18 by the stage H coordinator). Status: Specified, not implemented. Rulings: `stage-h-rulings-w1.md` HR-2 to HR-4, HR-9. Plan items 14.7 H-3, 15.1 "Execution schedules".
 
 **Plain idea.** A parent order of `X` units is split into child slices over `N` buckets: evenly in time (TWAP), in proportion to an expected volume profile (VWAP), or as a fixed share of the market volume actually seen (POV).
 
