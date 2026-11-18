@@ -219,6 +219,30 @@
   },
   {
    "case_id": "e1_h3-0008",
+   "operation": "micro.rates.bond_yield",
+   "inputs": {
+    "coupon": "NaN",
+    "frequency": 2,
+    "periods": 4,
+    "price": "100"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN decimal string at coupon is E_SCHEMA (from rtc_h-0011)"
+  },
+  {
+   "case_id": "e1_h3-0009",
    "operation": "micro.rates.format_32nds",
    "inputs": {
     "resolution": 64,
@@ -240,7 +264,7 @@
    "description": "HR-12: NaN decimal string at value is E_SCHEMA (from rtc_h-0005)"
   },
   {
-   "case_id": "e1_h3-0009",
+   "case_id": "e1_h3-0010",
    "operation": "micro.rates.tick_value",
    "inputs": {
     "face": "NaN",
@@ -262,7 +286,7 @@
    "description": "HR-12: NaN decimal string at face is E_SCHEMA (from rtc_h-0007)"
   },
   {
-   "case_id": "e1_h3-0010",
+   "case_id": "e1_h3-0011",
    "operation": "micro.rates.bond_price",
    "inputs": {
     "coupon": "NaN",
@@ -286,7 +310,7 @@
    "description": "HR-12: NaN decimal string at coupon is E_SCHEMA (from rtc_h-0008)"
   },
   {
-   "case_id": "e1_h3-0011",
+   "case_id": "e1_h3-0012",
    "operation": "micro.rates.bill_price",
    "inputs": {
     "days": 91,
@@ -308,7 +332,7 @@
    "description": "HR-12: NaN decimal string at discount is E_SCHEMA (from rtc_h-0010)"
   },
   {
-   "case_id": "e1_h3-0012",
+   "case_id": "e1_h3-0013",
    "operation": "exec.sim.fut.pnl",
    "inputs": {
     "buy_price": "110-16",
@@ -333,6 +357,170 @@
     "non-finite-input"
    ],
    "description": "HR-12: NaN decimal string at fee_per_contract is E_SCHEMA (from fut_h-0004)"
+  },
+  {
+   "case_id": "e1_h3-0014",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "0.01",
+    "lot_size": "1",
+    "session": {
+     "ref_price": "10.00"
+    },
+    "fee_schedule": {
+     "auction_fee": "0",
+     "maker_rebate": "0",
+     "taker_fee": "0"
+    },
+    "events": [
+     {
+      "id": "B1",
+      "op": "NEW",
+      "qty": "100",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT",
+      "price": "NaN"
+     },
+     {
+      "id": "S1",
+      "op": "NEW",
+      "qty": "60",
+      "side": "SELL",
+      "trader": "T2",
+      "type": "LIMIT",
+      "price": "10.00"
+     },
+     {
+      "id": "S2",
+      "op": "NEW",
+      "qty": "80",
+      "side": "SELL",
+      "trader": "T2",
+      "type": "LIMIT",
+      "price": "10.01"
+     },
+     {
+      "id": "I1",
+      "op": "NEW",
+      "qty": "10",
+      "side": "BUY",
+      "trader": "T3",
+      "type": "IOC",
+      "price": "10.05"
+     },
+     {
+      "op": "PHASE",
+      "phase": "CONTINUOUS"
+     },
+     {
+      "id": "B2",
+      "op": "NEW",
+      "qty": "40",
+      "side": "BUY",
+      "trader": "T3",
+      "type": "LIMIT",
+      "price": "10.01"
+     },
+     {
+      "op": "PHASE",
+      "phase": "PRE_CLOSE"
+     },
+     {
+      "id": "B3",
+      "op": "NEW",
+      "qty": "50",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT",
+      "price": "10.00"
+     },
+     {
+      "id": "B4",
+      "op": "NEW",
+      "qty": "30",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "MARKET",
+      "on_close": true
+     },
+     {
+      "id": "S3",
+      "op": "NEW",
+      "qty": "20",
+      "side": "SELL",
+      "trader": "T2",
+      "type": "LIMIT",
+      "price": "9.99",
+      "on_close": true
+     },
+     {
+      "op": "PHASE",
+      "phase": "CLOSED"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN decimal string at events/0/price is E_SCHEMA (from ses_h-0001)"
+  },
+  {
+   "case_id": "e1_h3-0015",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "NaN",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "0.1",
+    "lit_samples": [
+     [
+      "10"
+     ],
+     [
+      "12"
+     ],
+     [
+      "15"
+     ]
+    ],
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "0",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2",
+      "asset_class": "FX"
+     }
+    ],
+    "asset_class": "FX"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN decimal string at S is E_SCHEMA (from acls_h-0001)"
   }
  ]
 }
