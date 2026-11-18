@@ -203,9 +203,9 @@ def build_w2b():
                   cls="date_and_convention", verified=["hand"], tags=["stage_h", "error"],
                   description=f"hand: {desc}")
             s.cases[-1]["case_id"] = f"{name}-{first + k:04d}"
-        if name == "sor_h":
-            add_sor_range(s)
         out.append(s)
+        if name == "sor_h":
+            out.append(add_sor_range(s))
     return out
 
 
@@ -215,7 +215,7 @@ SOR_SE = {"S": "4", "f": "0.3", "h": "0.5", "lambda_o": "1", "lambda_u": "1", "t
                      {"as": "0.1", "kind": "DARK", "r": "0", "tail": ["0.7", "0.4", "0.2", "0"]}]}
 
 
-def add_sor_range(s):
+def add_sor_range(sor):
     """HR-57 boundary cases for the router, and one standard error under the binary64 rule of HR-40
     (sor.py `_se`). Hand: the theta term is theta (M + sum L + (S - A)_+) <= 30 theta here, so 10^33 keeps
     every step inside 36 digits and 10^35 does not (10 x 10^35 already at (0, 0)). The expected values
@@ -232,8 +232,11 @@ def add_sor_range(s):
           "expected_fill": "2.825", "label": "simulated venues; router scored in simulation only",
           "p_underfill": "0.525"}, None),
     ]
-    first = 10
+    # The E_LIMIT case is a hand error case of sor_h; the two value rows are agreement checks across the
+    # builds, not outside-checked, so they live in their own suite `sorx_h` (no item share in OUTSIDE_SHARES).
+    x = Suite("sorx_h", SPEC_SOR, G)
     for k, (desc, inp, exp, code) in enumerate(rows):
+        s = sor if code else x
         if code:
             s.add("exec.sor.allocate", inp, error=code, cls="date_and_convention", verified=["hand"],
                   tags=["stage_h", "error", "boundary"], description=f"hand: {desc}")
@@ -241,7 +244,8 @@ def add_sor_range(s):
             s.add("exec.sor.allocate", inp, exp, cls="date_and_convention",
                   verified=["python build; agreement check across the four builds"],
                   tags=["stage_h", "boundary"], description=desc)
-        s.cases[-1]["case_id"] = f"sor_h-{first + k:04d}"
+        s.cases[-1]["case_id"] = f"sor_h-{10 + k:04d}" if code else f"sorx_h-{k:04d}"
+    return x
 
 
 DCFG = {"firm_delay": 0, "lot_size": "1", "p_firm": "1", "penalty_events": 2, "seed": 20261118,

@@ -202,7 +202,8 @@ def load_percase_j():
 # Plan 15 applies the 60% floor per item: STAGE_H_ITEMS maps each golden suite to its plan item.
 STAGE_H_ITEMS = {"sched_h": "H-3a", "ac_h": "H-3b", "tca_h": "H-3c", "imp_h": "H-15a", "as_h": "H-4a", "uc5_h": "H-6",
                  "ob_h": "H-2", "lit_h": "H-11", "dark_h": "H-12", "sor_h": "H-13",
-                 "e1_h": None, "e1_h2": None}  # E1 non-finite-input error cases only: no value cases, so no item share
+                 "e1_h": None, "e1_h2": None,  # E1 non-finite-input error cases only: no value cases, so no item share
+                 "sorx_h": None}  # cross-build agreement cases (Python build output), not outside-checked: no item
 H_REDERIVE_SRC = "blind second-lane re-derivation or printed paper figure (DR-H2)"
 
 

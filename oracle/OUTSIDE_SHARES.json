@@ -3799,34 +3799,34 @@
   },
   "H": {
    "without_sweeps": {
-    "cases": 63,
+    "cases": 65,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 47,
     "reimplementation": 0,
-    "none": 16,
+    "none": 18,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 47,
-    "share_with_rederivation": 0.746032,
+    "share_with_rederivation": 0.723077,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 58
+    "error_and_invariance_cases": 60
    },
    "with_sweeps": {
-    "cases": 63,
+    "cases": 65,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 47,
     "reimplementation": 0,
-    "none": 16,
+    "none": 18,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 47,
-    "share_with_rederivation": 0.746032,
+    "share_with_rederivation": 0.723077,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 58
+    "error_and_invariance_cases": 60
    },
    "sweeps": null,
    "libraries": {},
@@ -3983,19 +3983,19 @@
      "error_and_invariance_cases": 7
     },
     "exec.sor.allocate": {
-     "cases": 5,
+     "cases": 7,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 3,
      "reimplementation": 0,
-     "none": 2,
+     "none": 4,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 3,
-     "share_with_rederivation": 0.6,
+     "share_with_rederivation": 0.428571,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 4
+     "error_and_invariance_cases": 6
     },
     "exec.tca.shortfall": {
      "cases": 3,
@@ -4111,7 +4111,7 @@
      "counted_with_rederivation": 3,
      "share_with_rederivation": 0.6,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 3,
+     "error_and_invariance_cases": 4,
      "suites": [
       "sor_h"
      ],

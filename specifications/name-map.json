@@ -2817,6 +2817,9 @@
     "h": {
      "java": "h"
     },
+    "iterations": {
+     "java": "iterations"
+    },
     "lambda_o": {
      "java": "lambdaO"
     },
@@ -2826,8 +2829,20 @@
     "lit_samples": {
      "java": "litSamples"
     },
+    "method": {
+     "java": "method"
+    },
     "ranking": {
      "java": "ranking"
+    },
+    "report_se": {
+     "java": "reportSe"
+    },
+    "seed": {
+     "java": "seed"
+    },
+    "step": {
+     "java": "step"
     },
     "theta": {
      "java": "theta"
@@ -2840,7 +2855,9 @@
     "L",
     "M",
     "expected_cost",
+    "expected_cost_se",
     "expected_fill",
+    "label",
     "p_underfill",
     "ranking"
    ]
