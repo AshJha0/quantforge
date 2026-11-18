@@ -89,7 +89,7 @@ public final class Execution {
         int n = profile.length;
         double[] s = new double[n];
         for (int i = 0; i < n; i++) {
-            s[i] = x * profile[i] / sum;
+            s[i] = x * (profile[i] / sum); // ratio first (schedules.md): x w_i underflows when w_i is subnormal
         }
         if (mode == Mode.CONTINUOUS) {
             return s;

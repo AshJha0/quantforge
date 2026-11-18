@@ -100,7 +100,8 @@ Vec vwap(double x, const Vec& w, Mode mode) {
     if (!(sum > 0)) domain("profile", "all weights are zero");
     const std::size_t n = w.size();
     Vec s(n);
-    for (std::size_t i = 0; i < n; ++i) s[i] = x * w[i] / sum;
+    // Ratio first (schedules.md): x w_i underflows when a weight is subnormal.
+    for (std::size_t i = 0; i < n; ++i) s[i] = x * (w[i] / sum);
     if (mode == Mode::Continuous) return s;
     Vec frac(n);
     double allotted = 0;

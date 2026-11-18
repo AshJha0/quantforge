@@ -22,3 +22,7 @@ The blind lane put `E_INPUT` before `E_DOMAIN` (tcx_h-0005: X = 0). Micro-lane H
 
 ## Goldens moved to the oracle
 `oracle/python/gen_stage_h_w2_exec.py` now writes `datasets/golden/stage_h/alg_h.json` and `tcx_h.json`. The hand values live in the generator and are re-checked there with exact fractions. Two runs give byte-identical files (sha256 checked). The only change from the hand-written files is the `generator` field.
+
+## Amendment 2026-11-18: HR-67 (arrival UNITS rounding)
+
+HR-59's half-up cumulative rounding was replaced by the HR-3 largest-remainder rule (HR-67) so that kappa = 0 equals TWAP in UNITS. The only UNITS arrival golden, alg_h-0003, has the same expected value [601, 400] under both rules (exact slices 600.6 and 400.4); `oracle/python/gen_stage_h_w2_exec.py` re-run gives byte-identical `alg_h.json`. No expected value changed, so every case keeps its blind status.

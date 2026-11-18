@@ -14,7 +14,7 @@ Shared conventions (HR-2, HR-3, HR-56): `side` is `BUY` (s = +1) or `SELL` (s = 
 
 ## `exec.algo.arrival`
 Inputs `quantity` X, `n_buckets` N (1 to 100,000), `urgency` kappa (per bucket, >= 0), `mode`. Holdings `x_j = X sinh(kappa (N - j)) / sinh(kappa N)` for j = 0..N ([AC00] eq. (17) with tau = 1 bucket); kappa = 0 is the limit `x_j = X (N - j) / N` (TWAP). Output `slices` n_j = x_{j-1} - x_j, j = 1..N.
-UNITS (HR-59): cumulative targets `C_j = X - x_j` are rounded half up, `floor(C_j + 1/2)`, with C_N = X exactly, and slices are the differences. kappa < 0: `E_DOMAIN`; N < 1: `E_INPUT`.
+UNITS (HR-67, amending HR-59 on 2026-11-18): the continuous slices are allocated by largest remainder, ties to the earliest bucket, exactly as HR-3, so kappa = 0 equals `exec.schedule.twap` in UNITS too and every slice is within 1 of its continuous value. (HR-59 rounded the cumulative half up, which gave [333, 334, 333] for X = 1000, N = 3, kappa = 0 against TWAP [334, 333, 333]; found by the implementation lane. No golden value changed: alg_h-0003 gives [601, 400] under both rules.) kappa < 0: `E_DOMAIN`; N < 1: `E_INPUT`.
 Identities: slices sum to X (exactly in UNITS); for kappa > 0 the CONTINUOUS slices are strictly decreasing; kappa = 0 equals `exec.schedule.twap`.
 
 ## `exec.algo.close`

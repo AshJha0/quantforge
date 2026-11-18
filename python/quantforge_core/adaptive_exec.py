@@ -14,7 +14,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from .errors import QfError
-from .execution import _quantity, _whole, schedule_twap, schedule_vwap
+from .execution import _largest_remainder, _quantity, _whole, schedule_twap, schedule_vwap
 from .finite import guard
 
 Level = Sequence[float]  # [price, size]
@@ -45,12 +45,6 @@ def _cosh_over_sinh(a: float, b: float) -> float:
     return math.exp(a - b) * (1.0 + math.exp(-2.0 * a)) / (-math.expm1(-2.0 * b))
 
 
-def _sinh_over_sinh(a: float, b: float) -> float:
-    if b <= 700.0:
-        return math.sinh(a) / math.sinh(b)
-    return math.exp(a - b) * (-math.expm1(-2.0 * a)) / (-math.expm1(-2.0 * b))
-
-
 def _differences(cumulative: list[int]) -> list[int]:
     return [c - p for p, c in zip([0, *cumulative[:-1]], cumulative, strict=True)]
 
@@ -60,29 +54,21 @@ def _differences(cumulative: list[int]) -> list[int]:
 
 def algo_arrival(quantity: float, n_buckets: int, urgency: float, mode: str) -> dict[str, Any]:
     """`exec.algo.arrival`: holdings x_j = X sinh(kappa (N - j)) / sinh(kappa N) ([AC00] eq. (17),
-    one bucket per time unit); kappa = 0 is TWAP. UNITS rounds the cumulative half up (HR-59)."""
+    one bucket per time unit); kappa = 0 is TWAP. UNITS by largest remainder (HR-3, HR-67)."""
     units = mode == "UNITS"
     _buckets(n_buckets)
     _quantity(quantity, units)
     if urgency < 0:
         raise _fail("E_DOMAIN", "urgency must be non-negative", "urgency")
     n, k = n_buckets, urgency
-    if not units:
-        if k == 0:
-            return schedule_twap(quantity, n, mode)
-        # n_j = x_{j-1} - x_j = X 2 sinh(k/2) cosh(k (N - j + 1/2)) / sinh(k N): strictly
-        # decreasing in j and free of cancellation.
-        h = 2.0 * math.sinh(0.5 * k)
-        return {
-            "slices": [
-                quantity * h * _cosh_over_sinh(k * (n - j + 0.5), k * n) for j in range(1, n + 1)
-            ]
-        }
-    cum: list[int] = []
-    for j in range(1, n + 1):
-        held = quantity * (n - j) / n if k == 0 else quantity * _sinh_over_sinh(k * (n - j), k * n)
-        cum.append(int(quantity) if j == n else _half_up(quantity - held))
-    return {"slices": _differences(cum)}
+    if k == 0:  # the TWAP limit, in both modes (HR-67)
+        return schedule_twap(quantity, n, mode)
+    # n_j = x_{j-1} - x_j = X 2 sinh(k/2) cosh(k (N - j + 1/2)) / sinh(k N): strictly
+    # decreasing in j and free of cancellation.
+    h = 2.0 * math.sinh(0.5 * k)
+    exact = [quantity * h * _cosh_over_sinh(k * (n - j + 0.5), k * n) for j in range(1, n + 1)]
+    # UNITS: largest remainder, ties to the earliest bucket, as HR-3 (HR-67 amends HR-59)
+    return {"slices": _largest_remainder(quantity, exact) if units else exact}
 
 
 def algo_close(

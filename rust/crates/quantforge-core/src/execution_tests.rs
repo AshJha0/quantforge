@@ -425,3 +425,12 @@ fn four_build_edge_choices() {
     let s = schedule_pov(1000.0, 0.2, &[999.0], true).unwrap();
     assert_eq!(units(&s.slices), [249]);
 }
+
+#[test]
+fn vwap_subnormal_weight_keeps_the_order() {
+    let v = schedule_vwap(1.5, &[5e-324], false).unwrap();
+    assert_eq!(v[0].value(), 1.5);
+    let v = schedule_vwap(3.0, &[5e-324, 5e-324], false).unwrap();
+    assert_eq!(v[0].value(), 1.5);
+    assert_eq!(v[1].value(), 1.5);
+}

@@ -506,3 +506,9 @@ def test_four_build_edge_choices() -> None:
     # POV UNITS snaps a value within 1e-12 relative of an integer before flooring
     assert ex.schedule_pov(1000.0, 0.2, [999.9999999999999], "UNITS")["slices"] == [250]
     assert ex.schedule_pov(1000.0, 0.2, [999.0], "UNITS")["slices"] == [249]
+
+
+def test_vwap_subnormal_weight_keeps_the_order() -> None:
+    # found by hypothesis: X w_i underflowed (1.5 x 5e-324) and gave 2.0; ratio first (schedules.md)
+    assert ex.schedule_vwap(1.5, [5e-324], "CONTINUOUS")["slices"] == [1.5]
+    assert ex.schedule_vwap(3.0, [5e-324, 5e-324], "CONTINUOUS")["slices"] == [1.5, 1.5]

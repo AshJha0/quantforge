@@ -102,7 +102,8 @@ pub fn schedule_vwap(x: f64, profile: &[f64], units: bool) -> Result<Vec<Amount>
     if total == 0.0 {
         return fail("E_DOMAIN", "profile is all zero");
     }
-    let exact: Vec<f64> = profile.iter().map(|w| x * w / total).collect();
+    // Ratio first (schedules.md): x w_i underflows when a weight is subnormal.
+    let exact: Vec<f64> = profile.iter().map(|w| x * (w / total)).collect();
     Ok(if units {
         largest_remainder(x, &exact)
             .into_iter()

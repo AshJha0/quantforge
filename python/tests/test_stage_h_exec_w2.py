@@ -261,10 +261,8 @@ def test_arrival_identities() -> None:
         assert all(a > b for a, b in itertools.pairwise(c)), (n, k)
         u = ax.algo_arrival(x, n, k, "UNITS")["slices"]
         assert sum(u) == x and all(type(v) is int for v in u)
-        cum = 0.0
-        for j, v in enumerate(u, 1):  # HR-59: within 1/2 of the continuous cumulative
-            cum += v
-            assert abs(cum - math.fsum(c[:j])) <= 0.5 + 1e-9 * x
+        for v, e in zip(u, c, strict=True):  # HR-67: each slice within 1 of the continuous
+            assert abs(v - e) < 1 + 1e-9 * x
 
 
 def test_arrival_kappa_zero_is_twap_continuous() -> None:
@@ -274,14 +272,13 @@ def test_arrival_kappa_zero_is_twap_continuous() -> None:
         assert ax.algo_arrival(x, n, 0.0, "CONTINUOUS") == ex.schedule_twap(x, n, "CONTINUOUS")
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="finding: HR-59 half-up cumulative rounding at kappa = 0 gives e.g. [333, 334, 333] "
-    "for X = 1000, N = 3, while exec.schedule.twap UNITS (HR-3) gives [334, 333, 333]; the spec "
-    "identity 'kappa = 0 equals exec.schedule.twap' does not hold in UNITS",
-)
 def test_arrival_kappa_zero_is_twap_units() -> None:
+    # HR-67 (amends HR-59): UNITS uses the HR-3 largest remainder, so this identity holds
     assert ax.algo_arrival(1000.0, 3, 0.0, "UNITS") == ex.schedule_twap(1000.0, 3, "UNITS")
+    r = _U(SEED + 6)
+    for _ in range(1000):
+        n, x = r.i(1, 500), float(r.i(1, 10**9))
+        assert ax.algo_arrival(x, n, 0.0, "UNITS") == ex.schedule_twap(x, n, "UNITS")
 
 
 def test_close_identity() -> None:
