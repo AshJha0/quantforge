@@ -305,7 +305,7 @@ fn raised_array_keys(op: &str) -> &'static [&'static str] {
         // research.estimate.ledoit_wolf: ruling J-W2-14
         "risk.var.filtered_historical" | "research.estimate.ledoit_wolf" => &["returns"],
         "risk.backtest.christoffersen" => &["exceptions"],
-        "book.lifecycle.apply" => &["events"],
+        "book.lifecycle.apply" | "exec.sim.lit.run" => &["events"],
         "research.backtest.run" => &["prices", "targets"],
         "research.cv.purged_kfold" => &["t0", "t1"],
         "research.regime.baum_welch" => &["observations"],
@@ -315,6 +315,8 @@ fn raised_array_keys(op: &str) -> &'static [&'static str] {
         "research.drift.psi" => &["reference", "test"],
         "research.drift.ks" => &["a", "b"],
         "research.stats.pbo" => &["performance"], // ruling J-20: rows judged by J-15's cell cap
+        // Stage H wave 2: the spec page limits replace the general per-array limit.
+        "micro.book.rebuild" => &["messages", "checkpoints"],
         _ => &[],
     }
 }
@@ -323,9 +325,14 @@ fn raised_array_keys(op: &str) -> &'static [&'static str] {
 fn too_long_with_raised(op: &str, i: &Json) -> bool {
     let raised = raised_array_keys(op);
     // Ruling J-20: PBO rows are bounded by the 10,000,000-cell page limit, not 1,000,000.
-    let cap = if matches!(
+    let cap = if op == "micro.book.rebuild" {
+        50_000_000 // HR-17
+    } else if matches!(
         op,
-        "research.stats.pbo" | "research.drift.cusum" | "research.drift.page_hinkley"
+        "research.stats.pbo"
+            | "research.drift.cusum"
+            | "research.drift.page_hinkley"
+            | "exec.sim.lit.run"
     ) {
         10_000_000
     } else {
