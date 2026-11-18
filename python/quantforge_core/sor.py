@@ -26,7 +26,7 @@ from typing import Any
 
 from .errors import QfError
 from .finite import guard
-from .lit_matching import _dec, fmt
+from .lit_matching import _dec
 from .order_book import EXACT, check_range
 from .rng import Xoshiro256
 
@@ -74,14 +74,21 @@ def _se(mean_cost: Fraction, mean_sq: Fraction, n_rows: int) -> str:
     a, b = _dec18(mean_sq), _dec18(mean_cost)
     bb = b * b
     se = math.sqrt(max(a - bb, 0.0) / n_rows)
-    return fmt(Decimal(se).quantize(Decimal("0.000001"), rounding=ROUND_HALF_EVEN))
+    return _fmt6(round(Fraction(se) * 10**6))  # exact binary value, ties to even
 
 
 def _out(x: Fraction) -> str:
-    d = (Decimal(x.numerator) / Decimal(x.denominator)).quantize(
-        Decimal("0.000001"), rounding=ROUND_HALF_EVEN
-    )
-    return fmt(d)
+    """`x` rounded half-even to 6 decimals, exactly (`round` on a Fraction ties to even), with no
+    decimal context in between, so a 36-digit value keeps every digit."""
+    return _fmt6(round(x * 10**6))
+
+
+def _fmt6(q: int) -> str:
+    """The decimal string of q / 10^6: no exponent, no trailing zeros, "0" for zero (HR-12)."""
+    sign, q = ("-" if q < 0 else ""), abs(q)
+    whole, frac = divmod(q, 10**6)
+    tail = f"{frac:06d}".rstrip("0")
+    return "0" if q == 0 else f"{sign}{whole}" + (f".{tail}" if tail else "")
 
 
 class Problem:
@@ -303,7 +310,19 @@ class Problem:
         return self._descent(rounded)
 
 
+def _step(v: Any) -> float:
+    """`step`, the one Real input: a JSON number, or "NaN" / "Infinity" / "-Infinity" (E_SCHEMA otherwise)."""
+    if isinstance(v, bool) or not isinstance(v, (int, float, str)):
+        raise QfError("E_SCHEMA", "step: not a number", "step")
+    if isinstance(v, str) and v not in ("NaN", "Infinity", "-Infinity"):
+        raise QfError("E_SCHEMA", "step: not a number", "step")
+    return float(v)
+
+
 def allocate(inp: dict[str, Any]) -> dict[str, Any]:
+    step = _step(inp.get("step", 1.0))
+    if not math.isfinite(step):  # F-2 (E1): a non-finite Real input is E_DOMAIN, the first rule check
+        raise QfError("E_DOMAIN", "step: not finite", "step")
     p = Problem(inp)
     method = inp.get("method", "SAMPLE_AVERAGE")
     if method not in METHODS:
@@ -315,7 +334,7 @@ def allocate(inp: dict[str, Any]) -> dict[str, Any]:
         best = (M, *L)
     elif method == "STOCHASTIC_APPROX":
         best = p.stochastic(
-            int(inp.get("iterations", 10_000)), float(inp.get("step", 1.0)), int(inp.get("seed", 0))
+            int(inp.get("iterations", 10_000)), step, int(inp.get("seed", 0))
         )
     else:
         best, ranking = p.sample_average(want_rank)

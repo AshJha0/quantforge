@@ -152,6 +152,10 @@ def e1_suite(suites):
                   tags=["stage_h", "e1", "non-finite-input"],
                   description=f"HR-12: NaN decimal string at {where} is E_SCHEMA (from {c['case_id']})")
     assert seen == {c["operation"] for su in suites for c in su.cases}, "an operation has no E1 case"
+    # exec.sor.allocate has one Real input, `step` (STOCHASTIC_APPROX): F-2 applies, so NaN there is E_DOMAIN.
+    e.add("exec.sor.allocate", dict(SOR, method="STOCHASTIC_APPROX", iterations=10, seed=1, step="NaN"),
+          error="E_DOMAIN", cls="date_and_convention", verified=["hand"], tags=["stage_h", "e1", "non-finite-input"],
+          description="F-2: NaN at step, the router's one Real input")
     return e
 
 
@@ -199,8 +203,45 @@ def build_w2b():
                   cls="date_and_convention", verified=["hand"], tags=["stage_h", "error"],
                   description=f"hand: {desc}")
             s.cases[-1]["case_id"] = f"{name}-{first + k:04d}"
+        if name == "sor_h":
+            add_sor_range(s)
         out.append(s)
     return out
+
+
+SOR_SE = {"S": "4", "f": "0.3", "h": "0.5", "lambda_o": "1", "lambda_u": "1", "theta": "0.01", "report_se": True,
+          "lit_samples": [["0"], ["1"], ["3"], ["4"]],
+          "venues": [{"Q": "0", "as": "0", "kind": "LIT", "r": "0.2"},
+                     {"as": "0.1", "kind": "DARK", "r": "0", "tail": ["0.7", "0.4", "0.2", "0"]}]}
+
+
+def add_sor_range(s):
+    """HR-57 boundary cases for the router, and one standard error under the binary64 rule of HR-40
+    (sor.py `_se`). Hand: the theta term is theta (M + sum L + (S - A)_+) <= 30 theta here, so 10^33 keeps
+    every step inside 36 digits and 10^35 does not (10 x 10^35 already at (0, 0)). The expected values
+    of 0011 and 0012 are the Python build's output (cross-language agreement checks, not outside-checked):
+    0011 = (0.5 + 0.3) 10 + 10^33 x 10 at (M, L) = (10, 0); 0012 pins expected_cost_se to 6 decimals."""
+    big = dict(SOR, lit_samples=[["0"], ["2"]], lambda_u="4")
+    rows = [
+        ("theta 10^35: theta x 10 has 37 digits (HR-57)", dict(big, theta="1" + "0" * 35), None, "E_LIMIT"),
+        ("theta 10^33: every step inside 36 digits", dict(big, theta="1" + "0" * 33),
+         {"L": ["0"], "M": "10", "expected_cost": "1" + "0" * 33 + "8", "expected_fill": "10", "p_underfill": "0"},
+         None),
+        ("report_se: the binary64 standard error rule", SOR_SE,
+         {"L": ["4", "3"], "M": "0", "expected_cost": "-0.18825", "expected_cost_se": "1.04492",
+          "expected_fill": "2.825", "label": "simulated venues; router scored in simulation only",
+          "p_underfill": "0.525"}, None),
+    ]
+    first = 10
+    for k, (desc, inp, exp, code) in enumerate(rows):
+        if code:
+            s.add("exec.sor.allocate", inp, error=code, cls="date_and_convention", verified=["hand"],
+                  tags=["stage_h", "error", "boundary"], description=f"hand: {desc}")
+        else:
+            s.add("exec.sor.allocate", inp, exp, cls="date_and_convention",
+                  verified=["python build; agreement check across the four builds"],
+                  tags=["stage_h", "boundary"], description=desc)
+        s.cases[-1]["case_id"] = f"sor_h-{first + k:04d}"
 
 
 DCFG = {"firm_delay": 0, "lot_size": "1", "p_firm": "1", "penalty_events": 2, "seed": 20261118,

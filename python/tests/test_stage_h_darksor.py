@@ -20,7 +20,8 @@ GOLD = ROOT / "datasets" / "golden" / "stage_h"
 
 
 def _cases(name: str) -> list[dict[str, Any]]:
-    return json.loads((GOLD / f"{name}.json").read_text(encoding="utf-8"))["cases"]
+    cases: list[dict[str, Any]] = json.loads((GOLD / f"{name}.json").read_text(encoding="utf-8"))["cases"]
+    return cases
 
 
 def _dark(inp: dict[str, Any]) -> dict[str, Any]:

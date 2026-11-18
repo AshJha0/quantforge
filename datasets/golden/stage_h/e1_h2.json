@@ -317,6 +317,52 @@
     "non-finite-input"
    ],
    "description": "HR-12: NaN decimal string at S is E_SCHEMA (from sor_h-0001)"
+  },
+  {
+   "case_id": "e1_h2-0006",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "10",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "4",
+    "theta": "0",
+    "lit_samples": [
+     [
+      "0"
+     ],
+     [
+      "2"
+     ]
+    ],
+    "venues": [
+     {
+      "Q": "2",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2"
+     }
+    ],
+    "method": "STOCHASTIC_APPROX",
+    "iterations": 10,
+    "seed": 1,
+    "step": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at step, the router's one Real input"
   }
  ]
 }
