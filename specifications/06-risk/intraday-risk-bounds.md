@@ -40,6 +40,6 @@ The bounds are tight (ratio near 1) because a zero bond's third derivative barel
 
 ## Acceptance (fixed before any run; plan K-5)
 
-- idr_k-0001..0004, 0006, 0007 in four languages, 1e-9 relative; idr_k-0005 once the oracle lane fills it.
+- idr_k-0001..0004, 0006, 0007 in four languages, 1e-9 relative; the oracle-pending two-position case once the oracle lane fills it.
 - 1,000 random parallel moves (seeded, h uniform in [-0.02, 0.02]) on a seeded 50-position book: `|estimate - full revaluation| <= bound` on every move, and the 1,000 results logged.
 - Instruments without a supplied `M3` are reported as "no bound" and excluded from the "with error bounds" claim. Described as latency-aware analytics on simulated data.
