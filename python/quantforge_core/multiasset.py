@@ -80,10 +80,18 @@ def _dec(raw: dict[str, Any], key: str, default: str | None = None, path: str = 
     return input_dec(v, f"{path}{key}")
 
 
+INT_MAX = 2**53 - 1  # HR-116
+REQUEST_INDEX_MAX = 2**32 - 1  # HR-116
+
+
 def _int(raw: dict[str, Any], key: str, default: int | None = None, path: str = "") -> int:
     v = raw.get(key, default) if default is not None else _need(raw, key, path)
     if isinstance(v, bool) or not isinstance(v, int):
         raise QfError("E_SCHEMA", f"{path}{key}: not an integer", f"{path}{key}")
+    if (
+        abs(v) > INT_MAX
+    ):  # HR-116: integer inputs within +-(2^53 - 1), outside E_LIMIT in all four languages
+        raise QfError("E_LIMIT", f"{path}{key}: integer outside +-(2^53 - 1)", f"{path}{key}")
     return v
 
 
@@ -496,8 +504,10 @@ def fx_request(raw: dict[str, Any]) -> dict[str, Any]:
     if drawn:  # HR-97: u from core.rng, stream = request_index (rng.md jumps)
         seed = _int(raw, "seed")
         idx = _int(raw, "request_index")
-        if idx < 0 or not 0 <= seed < 2**64:
-            raise QfError("E_SCHEMA", "seed or request_index out of range", "request_index")
+        if seed < 0:  # HR-116: seed within 0..2^53 - 1
+            raise QfError("E_LIMIT", "seed below 0", "seed")
+        if not 0 <= idx <= REQUEST_INDEX_MAX:  # HR-116: request_index within 0..2^32 - 1
+            raise QfError("E_LIMIT", "request_index outside 0..2^32 - 1", "request_index")
         uf = Xoshiro256.seeded(seed, idx).uniform()
         u = Decimal(uf)
     else:

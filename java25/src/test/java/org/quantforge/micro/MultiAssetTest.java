@@ -335,7 +335,7 @@ class MultiAssetTest {
         assertEquals(org.quantforge.core.Rng.seeded(7, 5).nextUniform(), (Double) out.get("u"));
         assertEquals(text(out), text(MultiAsset.fxRequest(inp)));
         inp.put("request_index", -1L);
-        assertEquals("E_SCHEMA", code(MultiAsset::fxRequest, inp));
+        assertEquals("E_LIMIT", code(MultiAsset::fxRequest, inp));
     }
 
     @Test

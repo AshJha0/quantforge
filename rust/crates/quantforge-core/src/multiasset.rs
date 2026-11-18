@@ -88,10 +88,20 @@ fn dec_of(raw: &Json, key: &str, default: Option<&str>, path: &str) -> Result<De
     }
 }
 
+/// HR-116: integer inputs within +-(2^53 - 1); outside is `E_LIMIT` in all four languages.
+const INT_MAX: i64 = (1 << 53) - 1;
+
 fn int_of_key(raw: &Json, key: &str, default: Option<i64>, path: &str) -> Result<i64> {
     let p = format!("{path}{key}");
     match (raw.get(key), default) {
+        (Some(Json::Int(n)), _) if n.unsigned_abs() > INT_MAX.unsigned_abs() => {
+            Err(at("E_LIMIT", &p, "integer outside +-(2^53 - 1)"))
+        }
         (Some(Json::Int(n)), _) => Ok(*n),
+        // The reader keeps integers above 2^53 as numbers (json.rs); an integral one is out of range.
+        (Some(Json::Num(v)), _) if v.is_finite() && v.fract() == 0.0 && v.abs() > INT_MAX as f64 => {
+            Err(at("E_LIMIT", &p, "integer outside +-(2^53 - 1)"))
+        }
         (Some(_), _) => Err(at("E_SCHEMA", &p, "not an integer")),
         (None, Some(n)) => Ok(n),
         (None, None) => Err(at("E_SCHEMA", &p, "missing")),
@@ -769,11 +779,15 @@ pub fn fx_request(raw: &Json) -> Result<Json> {
     let drawn = if raw.get("u").is_none() {
         let seed = int_of_key(raw, "seed", None, "")?;
         let idx = int_of_key(raw, "request_index", None, "")?;
-        let (Ok(seed), Ok(idx)) = (u64::try_from(seed), u32::try_from(idx)) else {
+        // HR-116: seed within 0..2^53 - 1, request_index within 0..2^32 - 1, outside `E_LIMIT`.
+        let Ok(seed) = u64::try_from(seed) else {
+            return Err(at("E_LIMIT", "seed", "seed below 0"));
+        };
+        let Ok(idx) = u32::try_from(idx) else {
             return Err(at(
-                "E_SCHEMA",
+                "E_LIMIT",
                 "request_index",
-                "seed or request_index out of range",
+                "request_index outside 0..2^32 - 1",
             ));
         };
         let x = crate::rng::Xoshiro::seeded(seed, idx).next_u64();

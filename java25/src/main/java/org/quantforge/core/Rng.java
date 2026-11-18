@@ -16,6 +16,11 @@ public final class Rng {
     }
 
     public static Rng seeded(long seed, int stream) {
+        return seeded(seed, (long) stream);
+    }
+
+    /** Stream {@code 0..2^32 - 1} (HR-116): the seeded generator jumped {@code stream} times. */
+    public static Rng seeded(long seed, long stream) {
         long[] w = new long[4];
         long state = seed;
         for (int k = 0; k < 4; k++) {
@@ -26,7 +31,7 @@ public final class Rng {
             w[k] = z ^ (z >>> 31);
         }
         Rng r = new Rng(w);
-        for (int k = 0; k < stream; k++) {
+        for (long k = 0; k < stream; k++) {
             r.jump();
         }
         return r;

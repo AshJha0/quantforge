@@ -276,6 +276,21 @@ ERRORS = {
                {"contract": ZN, "price": "110-00", "qty": 0, "settlements": [], "side": "BUY"}, "E_INPUT")],
 }
 
+# HR-116 integer limits: integer inputs within +-(2^53 - 1), request_index within 0..2^32 - 1, seed
+# within 0..2^53 - 1; outside is E_LIMIT in all four languages. Cases at both sides of each boundary.
+# request_index = 2^32 - 1 itself is not a golden: the stream is 2^32 - 1 jumps (rng.md), too slow to compute.
+I53 = 2**53 - 1
+FUT_VAR = {"contract": ZN, "price": "110-00", "settlements": ["110-01"], "side": "BUY"}
+for _d, _i, _s in [("HR-116: request_index -1", -1, 20261118), ("HR-116: request_index 2^32", 2**32, 20261118),
+                   ("HR-116: seed -1", 0, -1), ("HR-116: seed 2^53", 0, I53 + 1)]:
+    _inp = {k: v for k, v in req(after="1.0852").items() if k != "u"}
+    _inp.update(p_random_reject="0.5", request_index=_i, seed=_s)
+    ERRORS["fxv_h"].append((_d, "exec.sim.fx.request", _inp, "E_LIMIT"))
+ERRORS["fut_h"] += [("HR-116: qty 2^53", "exec.sim.fut.variation", dict(FUT_VAR, qty=I53 + 1), "E_LIMIT"),
+                    ("HR-116: qty -2^53", "exec.sim.fut.variation", dict(FUT_VAR, qty=-(I53 + 1)), "E_LIMIT")]
+# In-range sides (ok rows, appended after the error cases so no case id moves).
+BOUNDARY_OK = {"fxv_h": [rng_row("", 0, seed=I53)[1:], rng_row("", 0, seed=0)[1:]]}
+
 LIT = "simulated venue; not a real exchange"
 
 
@@ -409,6 +424,11 @@ def build():
             s.add(op, inp, error=code, cls="date_and_convention", verified=["hand"], tags=["stage_h", "error"],
                   description=f"hand: {desc}")
             s.cases[-1]["case_id"] = f"{name}-{first + k:04d}"
+        first += len(ERRORS[name])
+        for k, (op, inp, exp) in enumerate(BOUNDARY_OK.get(name, [])):
+            s.add(op, inp, exp, cls="date_and_convention", verified=["hand"], tags=["stage_h", "hr116"],
+                  description=f"hand: HR-116 in-range boundary (seed {inp['seed']}, request_index {inp['request_index']})")
+            s.cases[-1]["case_id"] = f"{name}-{first + k:04d}"
         suites.append(s)
     suites.append(e1_suite(suites))
     return suites
@@ -435,7 +455,23 @@ def e1_suite(suites):
             e.add(op, inp, error="E_SCHEMA", cls="date_and_convention", verified=["hand"],
                   tags=["stage_h", "e1", "non-finite-input"],
                   description=f"HR-12: NaN decimal string at {'/'.join(map(str, path))} is E_SCHEMA (from {c['case_id']})")
+    # Operations with no plain decimal input (dates, 32nds text, integer ticks): "NaN" at the named field.
+    for su in suites:
+        for c in su.cases:
+            op = c["operation"]
+            if op in seen or c["expected"]["status"] != "ok" or op not in NO_DECIMAL:
+                continue
+            seen.add(op)
+            inp = dict(json.loads(json.dumps(c["inputs"])), **{NO_DECIMAL[op]: "NaN"})
+            e.add(op, inp, error="E_SCHEMA", cls="date_and_convention", verified=["hand"],
+                  tags=["stage_h", "e1", "non-finite-input"],
+                  description=f"HR-12: NaN at {NO_DECIMAL[op]} (no decimal input) is E_SCHEMA (from {c['case_id']})")
     return e
+
+
+NO_DECIMAL = {"micro.eq.settle_date": "trade_date", "micro.fx.spot_date": "trade_date",
+              "micro.rates.parse_32nds": "text", "exec.sim.fut.to_ticks": "price",
+              "exec.sim.fut.to_text": "ticks", "exec.sim.fut.variation": "price"}
 
 
 def main():

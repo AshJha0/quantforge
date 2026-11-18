@@ -228,6 +228,62 @@
     "error"
    ],
    "description": "hand: empty settlements"
+  },
+  {
+   "case_id": "fut_h-0009",
+   "operation": "exec.sim.fut.variation",
+   "inputs": {
+    "contract": {
+     "symbol": "ZN"
+    },
+    "price": "110-00",
+    "settlements": [
+     "110-01"
+    ],
+    "side": "BUY",
+    "qty": 9007199254740992
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: HR-116: qty 2^53"
+  },
+  {
+   "case_id": "fut_h-0010",
+   "operation": "exec.sim.fut.variation",
+   "inputs": {
+    "contract": {
+     "symbol": "ZN"
+    },
+    "price": "110-00",
+    "settlements": [
+     "110-01"
+    ],
+    "side": "BUY",
+    "qty": -9007199254740992
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: HR-116: qty -2^53"
   }
  ]
 }

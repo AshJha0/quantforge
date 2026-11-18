@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+
 from quantforge_core import dark_pool, lit_matching, sor
 from quantforge_core import multiasset as ma
 from quantforge_core.errors import QfError
@@ -335,7 +336,7 @@ def test_last_look_draw_reproducible() -> None:
     assert out == ma.fx_request(inp)
     with pytest.raises(QfError) as e:
         ma.fx_request(dict(inp, request_index=-1))
-    assert e.value.code == "E_SCHEMA"
+    assert e.value.code == "E_LIMIT"
 
 
 def test_session_conservation_and_phase_order() -> None:

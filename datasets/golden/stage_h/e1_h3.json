@@ -521,6 +521,150 @@
     "non-finite-input"
    ],
    "description": "HR-12: NaN decimal string at S is E_SCHEMA (from acls_h-0001)"
+  },
+  {
+   "case_id": "e1_h3-0016",
+   "operation": "micro.eq.settle_date",
+   "inputs": {
+    "holidays": [],
+    "settle_lag": 1,
+    "trade_date": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN at trade_date (no decimal input) is E_SCHEMA (from eqc_h-0008)"
+  },
+  {
+   "case_id": "e1_h3-0017",
+   "operation": "micro.fx.spot_date",
+   "inputs": {
+    "holidays": {},
+    "pair": "EURUSD",
+    "trade_date": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN at trade_date (no decimal input) is E_SCHEMA (from fxc_h-0003)"
+  },
+  {
+   "case_id": "e1_h3-0018",
+   "operation": "micro.rates.parse_32nds",
+   "inputs": {
+    "text": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN at text (no decimal input) is E_SCHEMA (from rtc_h-0001)"
+  },
+  {
+   "case_id": "e1_h3-0019",
+   "operation": "exec.sim.fut.to_ticks",
+   "inputs": {
+    "contract": {
+     "symbol": "ZN"
+    },
+    "price": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN at price (no decimal input) is E_SCHEMA (from fut_h-0001)"
+  },
+  {
+   "case_id": "e1_h3-0020",
+   "operation": "exec.sim.fut.to_text",
+   "inputs": {
+    "contract": {
+     "symbol": "ZN"
+    },
+    "ticks": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN at ticks (no decimal input) is E_SCHEMA (from fut_h-0002)"
+  },
+  {
+   "case_id": "e1_h3-0021",
+   "operation": "exec.sim.fut.variation",
+   "inputs": {
+    "contract": {
+     "symbol": "ZB"
+    },
+    "price": "NaN",
+    "qty": 1,
+    "settlements": [
+     "119-31"
+    ],
+    "side": "BUY"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN at price (no decimal input) is E_SCHEMA (from fut_h-0006)"
   }
  ]
 }

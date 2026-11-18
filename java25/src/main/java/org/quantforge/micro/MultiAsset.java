@@ -104,16 +104,22 @@ public final class MultiAsset {
         return OrderBook.dec(get(raw, key, dflt), key);
     }
 
+    /** HR-116: integer inputs within +-(2^53 - 1); outside is E_LIMIT in all four languages. */
+    static final BigInteger INT_MAX = BigInteger.ONE.shiftLeft(53).subtract(BigInteger.ONE);
+
+    private static BigInteger inRange(BigInteger x, String path) {
+        if (x.abs().compareTo(INT_MAX) > 0) {
+            throw err("E_LIMIT", path + ": integer outside +-(2^53 - 1)", path);
+        }
+        return x;
+    }
+
     private static long intOf(Object v, String path) {
         if (v instanceof Json.Number n && n.isIntegerForm()) {
-            try {
-                return new BigDecimal(n.text()).longValueExact();
-            } catch (ArithmeticException e) {
-                throw err("E_SCHEMA", path + ": integer outside the 64-bit range", path);
-            }
+            return inRange(new BigDecimal(n.text()).toBigIntegerExact(), path).longValue();
         }
         if (v instanceof Long x) {
-            return x;
+            return inRange(BigInteger.valueOf(x), path).longValue();
         }
         if (v instanceof Integer x) {
             return x;
@@ -123,10 +129,10 @@ public final class MultiAsset {
 
     private static BigInteger bigInt(Object v, String path) {
         if (v instanceof Json.Number n && n.isIntegerForm()) {
-            return new BigInteger(n.text());
+            return inRange(new BigInteger(n.text()), path);
         }
         if (v instanceof Long x) {
-            return BigInteger.valueOf(x);
+            return inRange(BigInteger.valueOf(x), path);
         }
         if (v instanceof Integer x) {
             return BigInteger.valueOf(x);
@@ -706,10 +712,13 @@ public final class MultiAsset {
         if (drawn) { // HR-97: u from core.rng, stream = request_index (rng.md jumps)
             BigInteger seed = bigInt(need(raw, "seed", ""), "seed");
             BigInteger idx = bigInt(need(raw, "request_index", ""), "request_index");
-            if (idx.signum() < 0 || seed.signum() < 0 || seed.bitLength() > 64 || idx.bitLength() > 31) {
-                throw err("E_SCHEMA", "seed or request_index out of range", "request_index");
+            if (seed.signum() < 0) { // HR-116: seed within 0..2^53 - 1
+                throw err("E_LIMIT", "seed below 0", "seed");
             }
-            uf = Rng.seeded(seed.longValue(), idx.intValue()).nextUniform();
+            if (idx.signum() < 0 || idx.bitLength() > 32) { // HR-116: request_index within 0..2^32 - 1
+                throw err("E_LIMIT", "request_index outside 0..2^32 - 1", "request_index");
+            }
+            uf = Rng.seeded(seed.longValue(), idx.longValue()).nextUniform();
             u = new BigDecimal(uf);
         } else {
             u = dec(raw, "u");
