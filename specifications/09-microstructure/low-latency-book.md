@@ -62,6 +62,7 @@ Machine (CPU model, cores, frequency governor, RAM), OS and kernel, compiler or 
 - An update to a price beyond depth 100 on the far side of the book: insert then truncate (it falls off); must cost no allocation.
 - Price far from the touch (outside any tick window used for O(1) indexing): must still be correct; the slower path is counted and its share published.
 - A sweep emptying a side: `best_*` returns an empty marker, not an error.
+- Fixed-point range (HR-20, HR-58): the fast book holds prices in ticks and quantities in lots as signed 64-bit integers. A price or quantity that is inside the exact decimal range of `order-book.md` (36 digits, at most 18 decimals) but whose scaled value exceeds 2^63 - 1 is rejected by the decoder with `E_LIMIT` (above a limit, HR-58), never rounded, truncated or wrapped. This is the fast book's one stated difference from `micro.book.rebuild`: golden ob_h-0016 (36 digits at 18 decimals) is `ok` for the rebuild and `E_LIMIT` for the fast book, and the equivalence tests assert exactly that.
 
 ## Golden plan
 No numeric goldens (timings are not goldens). Correctness reuses `ob_h-*` and adds a property test: for 1,000 seeded random streams of 10,000 messages, the fast book's `top(100)` after every message equals `micro.book.rebuild` (Python reference) exactly.

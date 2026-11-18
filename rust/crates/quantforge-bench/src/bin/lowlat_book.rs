@@ -291,6 +291,7 @@ fn timed_run(msgs: &[Msg], levels: &[Level], qseed: u64) -> String {
     let allocs = ALLOCS.load(Ordering::Relaxed);
     let far = b.far_lookups() - far0;
     let grows = b.grows();
+    let fallbacks = b.index_fallbacks();
     let mut b = Book::new(DEPTH);
     for m in &msgs[..WARMUP] {
         b.apply(m, levels);
@@ -326,7 +327,7 @@ fn timed_run(msgs: &[Msg], levels: &[Level], qseed: u64) -> String {
         .join(",");
     format!(
         "{{\"all\":{},\"kinds\":{{{kj}}},\"queries\":{{{qj}}},\"batch_per_message\":{},\"allocations_measured\":{allocs},\
-         \"allocations_batch\":{batch_allocs},\"far_lookups\":{far},\"buffer_grows\":{grows}}}",
+         \"allocations_batch\":{batch_allocs},\"far_lookups\":{far},\"buffer_grows\":{grows},\"qty_at_index_fallbacks\":{fallbacks}}}",
         all.json(),
         batch.json()
     )

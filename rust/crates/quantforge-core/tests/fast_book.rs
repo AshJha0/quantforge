@@ -453,6 +453,38 @@ fn property(streams: u64) {
                 .map(|(&px, &qty)| Level { px, qty })
                 .collect();
             assert_eq!(&lv[..n], &want[..], "stream {s} asks at message {i}");
+            for l in &want {
+                assert_eq!(
+                    b.qty_at(false, l.px),
+                    l.qty,
+                    "stream {s} ask qty_at at message {i}"
+                );
+            }
+            assert_eq!(
+                b.best_ask(),
+                want.first().copied(),
+                "stream {s} best ask at message {i}"
+            );
+            let wb: Vec<Level> = bids
+                .iter()
+                .rev()
+                .take(100)
+                .map(|(&px, &qty)| Level { px, qty })
+                .collect();
+            for l in &wb {
+                assert_eq!(
+                    b.qty_at(true, l.px),
+                    l.qty,
+                    "stream {s} bid qty_at at message {i}"
+                );
+            }
+            assert_eq!(
+                b.best_bid(),
+                wb.first().copied(),
+                "stream {s} best bid at message {i}"
+            );
+            assert_eq!(b.qty_at(true, 1004 + (i % 7) as i64), 0);
+            assert_eq!(b.qty_at(false, 996 - (i % 7) as i64), 0);
         }
         let (msgs, _) = parse(&to_json(&st)).expect("json");
         let out = rebuild(
@@ -555,4 +587,62 @@ fn fast_book_limit_cases() {
     assert!(w.grows() >= 1);
     assert_eq!(w.best_bid().map(|l| l.px), Some(1000));
     assert_eq!(w.stats().truncated_levels, 390);
+}
+
+#[test]
+fn fast_book_index_shared_slots() {
+    let mut b = Book::new(10);
+    let lv = [
+        Level { px: 2148, qty: 3 },
+        Level { px: 1124, qty: 2 },
+        Level { px: 101, qty: 4 },
+        Level { px: 100, qty: 1 },
+    ];
+    b.apply(
+        &Msg {
+            kind: MsgType::Snapshot,
+            n_bids: 4,
+            ..Msg::default()
+        },
+        &lv,
+    );
+    assert_eq!(
+        [
+            b.qty_at(true, 100),
+            b.qty_at(true, 1124),
+            b.qty_at(true, 2148),
+            b.qty_at(true, 3172)
+        ],
+        [1, 2, 3, 0]
+    );
+    let del = [Level { px: 2148, qty: 0 }, Level { px: 1124, qty: 9 }];
+    b.apply(
+        &Msg {
+            kind: MsgType::Update,
+            n_bids: 2,
+            ..Msg::default()
+        },
+        &del,
+    );
+    assert_eq!(
+        [
+            b.qty_at(true, 2148),
+            b.qty_at(true, 1124),
+            b.qty_at(true, 100)
+        ],
+        [0, 9, 1]
+    );
+    assert!(b.index_fallbacks() > 0);
+    assert_eq!(b.best_bid(), Some(Level { px: 1124, qty: 9 }));
+    b.apply(
+        &Msg {
+            kind: MsgType::Gap,
+            ..Msg::default()
+        },
+        &[],
+    );
+    assert_eq!(
+        (b.best_bid(), b.qty_at(true, 100), b.qty_at(true, 1124)),
+        (None, 0, 0)
+    );
 }

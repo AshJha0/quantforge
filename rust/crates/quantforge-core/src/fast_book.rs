@@ -9,8 +9,10 @@
 //! Each side is a sorted array of (key, qty) with the best level at the high end (key = price for bids, -price
 //! for asks). Truncation moves one index (O(1)); inserts and deletes near the touch shift only the levels
 //! between the price and the touch (O(L) expected, HR-19); a lookup scans the 8 levels next to the touch and
-//! otherwise binary-searches. `qty_at` is O(log N): a sorted array keeps the book in a few cache lines and
-//! needs no hash table (the spec allows O(log N) with the reason stated).
+//! otherwise binary-searches. `qty_at` is O(1): a direct-mapped index on the price grid (slot = price mod
+//! 1024 ticks) holds one present price per slot with its quantity and the count of present prices there; only
+//! when two present prices share a slot does a query fall back to the sorted search (counted). The top of book
+//! is cached at the end of every `apply`, so `best_bid`/`best_ask` are one load.
 
 /// A price level in fixed point: price in ticks, quantity in lots.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -141,9 +143,21 @@ struct Entry {
     qty: i64,
 }
 
+const SLOTS: usize = 1024;
+const NO_PX: i64 = i64::MIN;
+
+#[derive(Clone, Copy)]
+struct Slot {
+    px: i64,
+    qty: i64,
+}
+
 /// One side of the book.
 pub struct Side {
     buf: Vec<Entry>,
+    index: Vec<Slot>,
+    counts: Vec<u32>, // present prices per slot, kept apart so an absent-price query reads 4 KB, not 16 KB
+    fallbacks: std::cell::Cell<i64>,
     lo: usize,
     hi: usize,
     bid: bool,
@@ -155,6 +169,9 @@ impl Side {
     fn new(bid: bool, cap: usize) -> Side {
         Side {
             buf: vec![Entry::default(); cap],
+            index: vec![Slot { px: NO_PX, qty: 0 }; SLOTS],
+            counts: vec![0; SLOTS],
+            fallbacks: std::cell::Cell::new(0),
             lo: cap / 2,
             hi: cap / 2,
             bid,
@@ -162,7 +179,22 @@ impl Side {
             far: std::cell::Cell::new(0),
         }
     }
+    fn slot(px: i64) -> usize {
+        (px as u64 as usize) & (SLOTS - 1)
+    }
+    fn unindex(&mut self, px: i64) {
+        let i = Side::slot(px);
+        self.counts[i] -= 1;
+        let s = &mut self.index[i];
+        if self.counts[i] == 0 || s.px == px {
+            s.px = NO_PX;
+        }
+    }
     fn clear(&mut self) {
+        for k in self.lo..self.hi {
+            let px = self.level(self.buf[k]).px;
+            self.unindex(px);
+        }
         self.lo = self.buf.len() / 2;
         self.hi = self.lo;
     }
@@ -185,6 +217,15 @@ impl Side {
         (!self.is_empty()).then(|| self.level(self.buf[self.hi - 1]))
     }
     pub fn qty_at(&self, px: i64) -> i64 {
+        let i = Side::slot(px);
+        if self.counts[i] == 0 {
+            return 0;
+        }
+        let s = self.index[i];
+        if s.px == px {
+            return s.qty;
+        }
+        self.fallbacks.set(self.fallbacks.get() + 1);
         let key = self.key(px);
         let pos = self.lower_bound(key);
         if pos < self.hi && self.buf[pos].key == key {
@@ -247,7 +288,20 @@ impl Side {
         let mut pos = self.lower_bound(key);
         if pos < self.hi && self.buf[pos].key == key {
             self.buf[pos].qty = qty;
+            let s = &mut self.index[Side::slot(px)];
+            if s.px == px {
+                s.qty = qty;
+            }
             return;
+        }
+        {
+            let i = Side::slot(px);
+            let s = &mut self.index[i];
+            if self.counts[i] == 0 || s.px == NO_PX {
+                s.px = px;
+                s.qty = qty;
+            }
+            self.counts[i] += 1;
         }
         if self.lo == 0 || self.hi == self.buf.len() {
             pos = self.recenter(pos);
@@ -268,6 +322,7 @@ impl Side {
         if pos >= self.hi || self.buf[pos].key != key {
             return false;
         }
+        self.unindex(px);
         if self.hi - pos - 1 <= pos - self.lo {
             self.buf.copy_within(pos + 1..self.hi, pos);
             self.hi -= 1;
@@ -282,6 +337,10 @@ impl Side {
         if n <= depth {
             return 0;
         }
+        for k in self.lo..self.lo + (n - depth) {
+            let px = self.level(self.buf[k]).px;
+            self.unindex(px);
+        }
         self.lo += n - depth;
         (n - depth) as i64
     }
@@ -295,6 +354,7 @@ pub struct Book {
     bids: Side,
     asks: Side,
     st: Stats,
+    best: [Option<Level>; 2],
     live: bool,
     pending_resync: bool,
     seq: i64,
@@ -310,6 +370,7 @@ impl Book {
             bids: Side::new(true, cap),
             asks: Side::new(false, cap),
             st: Stats::default(),
+            best: [None, None],
             live: false,
             pending_resync: false,
             seq: 0,
@@ -340,6 +401,11 @@ impl Book {
     }
 
     pub fn apply(&mut self, m: &Msg, levels: &[Level]) {
+        self.apply_book(m, levels);
+        self.best = [self.bids.best(), self.asks.best()];
+    }
+
+    fn apply_book(&mut self, m: &Msg, levels: &[Level]) {
         match m.kind {
             MsgType::Trade => {
                 self.st.trades += 1;
@@ -409,10 +475,10 @@ impl Book {
     }
 
     pub fn best_bid(&self) -> Option<Level> {
-        self.bids.best()
+        self.best[0]
     }
     pub fn best_ask(&self) -> Option<Level> {
-        self.asks.best()
+        self.best[1]
     }
     pub fn qty_at(&self, bid: bool, px: i64) -> i64 {
         if bid {
@@ -459,6 +525,10 @@ impl Book {
     }
     pub fn grows(&self) -> i64 {
         self.bids.grows + self.asks.grows
+    }
+    /// `qty_at` calls that met a shared index slot and used the sorted search.
+    pub fn index_fallbacks(&self) -> i64 {
+        self.bids.fallbacks.get() + self.asks.fallbacks.get()
     }
     pub fn far_lookups(&self) -> i64 {
         self.bids.far.get() + self.asks.far.get()

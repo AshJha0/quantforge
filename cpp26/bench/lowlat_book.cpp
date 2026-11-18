@@ -309,7 +309,7 @@ const char* const query_names[NQueries] = {"best_bid", "best_ask", "qty_at_prese
 
 struct RunResult {
     Hist all, kinds[NKinds], queries[NQueries], batch;
-    long long allocs = 0, batch_allocs = 0, far = 0, grows = 0;
+    long long allocs = 0, batch_allocs = 0, far = 0, grows = 0, fallbacks = 0;
 };
 
 volatile std::int64_t g_sink;
@@ -359,6 +359,7 @@ void timed_run(const Stream& st, RunResult& rr, std::uint64_t qseed) {
         rr.allocs = g_allocs.load();
         rr.far = b.far_lookups() - far0;
         rr.grows = b.grows();
+        rr.fallbacks = b.index_fallbacks();
     }
     {  // batch timing: 1,000 messages per sample, divided
         ll::Book b(depth);
@@ -409,7 +410,8 @@ int main(int argc, char** argv) {
         for (int j = 0; j < NQueries; ++j) out += (j ? ",\"" : "\"") + std::string(query_names[j]) + "\":" + rr->queries[j].json();
         out += "},\"batch_per_message\":" + rr->batch.json() + ",\"allocations_measured\":" + std::to_string(rr->allocs) +
                ",\"allocations_batch\":" + std::to_string(rr->batch_allocs) + ",\"far_lookups\":" + std::to_string(rr->far) +
-               ",\"buffer_grows\":" + std::to_string(rr->grows) + "}";
+               ",\"buffer_grows\":" + std::to_string(rr->grows) +
+               ",\"qty_at_index_fallbacks\":" + std::to_string(rr->fallbacks) + "}";
         std::fprintf(stderr, "run %d: p50 %llu p99 %llu p99.9 %llu ns, allocs %lld\n", k + 1, (unsigned long long)rr->all.pct(50),
                      (unsigned long long)rr->all.pct(99), (unsigned long long)rr->all.pct(99.9), rr->allocs);
         delete rr;

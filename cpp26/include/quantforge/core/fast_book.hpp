@@ -9,8 +9,10 @@
 // and -price for asks, so "better" is always "larger key". Truncation drops levels from the low end by moving
 // one index (O(1)); inserts and deletes near the touch shift only the few levels between the price and the
 // touch (O(L) expected, HR-19); a lookup first scans the 8 levels next to the touch and otherwise binary-searches
-// (O(log N)). qty_at is O(log N) for the same reason: a sorted array keeps the book in a few cache lines and
-// needs no hash table; the spec allows O(log N) with the reason stated.
+// (O(log N)). qty_at is O(1): a direct-mapped index on the price grid (slot = price mod 1024 ticks) holds one
+// present price per slot with its quantity and the count of present prices mapping there; a query reads the slot
+// and only when two present prices more than 1,024 ticks apart share it falls back to the sorted search (counted).
+// The book keeps its top of book in a cache refreshed at the end of every apply, so best_bid/best_ask are one load.
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -102,17 +104,26 @@ public:
         std::int64_t qty;
     };
 
+    static constexpr std::size_t slots = 1024;  // direct index on the tick grid; a power of two
+    static constexpr std::int64_t no_px = std::numeric_limits<std::int64_t>::min();
+
     void init(bool bid, std::size_t cap) {
         bid_ = bid;
         buf_.assign(cap, Entry{0, 0});
-        clear();
+        index_.assign(slots, Slot{no_px, 0});
+        counts_.assign(slots, 0);
+        lo_ = hi_ = buf_.size() / 2;
     }
-    void clear() { lo_ = hi_ = buf_.size() / 2; }
+    void clear() {
+        for (std::size_t k = lo_; k < hi_; ++k) unindex(to_px(buf_[k].key));
+        lo_ = hi_ = buf_.size() / 2;
+    }
     std::size_t size() const { return hi_ - lo_; }
     bool empty() const { return hi_ == lo_; }
     std::size_t capacity() const { return buf_.size(); }
     std::int64_t grows() const { return grows_; }
     std::int64_t far_lookups() const { return far_; }
+    std::int64_t index_fallbacks() const { return index_fallbacks_; }
 
     /// Best price and quantity; false when the side is empty (the empty marker, not an error).
     bool best(Level& out) const {
@@ -122,6 +133,11 @@ public:
     }
 
     std::int64_t qty_at(std::int64_t px) const {
+        const std::size_t i = slot(px);
+        if (counts_[i] == 0) return 0;
+        const Slot& s = index_[i];
+        if (s.px == px) return s.qty;
+        ++index_fallbacks_;
         const std::int64_t key = to_key(px);
         const std::size_t pos = lower_bound(key);
         return (pos < hi_ && buf_[pos].key == key) ? buf_[pos].qty : 0;
@@ -140,7 +156,14 @@ public:
         std::size_t pos = lower_bound(key);
         if (pos < hi_ && buf_[pos].key == key) {
             buf_[pos].qty = qty;
+            Slot& s = index_[slot(px)];
+            if (s.px == px) s.qty = qty;
             return;
+        }
+        {
+            const std::size_t i = slot(px);
+            Slot& s = index_[i];
+            if (counts_[i]++ == 0 || s.px == no_px) s.px = px, s.qty = qty;
         }
         if (lo_ == 0 || hi_ == buf_.size()) pos = recenter(pos);
         Entry* b = buf_.data();
@@ -160,6 +183,7 @@ public:
         const std::int64_t key = to_key(px);
         const std::size_t pos = lower_bound(key);
         if (pos >= hi_ || buf_[pos].key != key) return false;
+        unindex(px);
         Entry* b = buf_.data();
         if (hi_ - pos - 1 <= pos - lo_) {
             std::memmove(b + pos, b + pos + 1, (hi_ - pos - 1) * sizeof(Entry));
@@ -175,12 +199,24 @@ public:
     std::int64_t truncate(std::size_t depth) {
         const std::size_t n = size();
         if (n <= depth) return 0;
+        for (std::size_t k = lo_; k < lo_ + (n - depth); ++k) unindex(to_px(buf_[k].key));
         lo_ += n - depth;
         return static_cast<std::int64_t>(n - depth);
     }
 
 private:
+    struct Slot {
+        std::int64_t px;  // one present price mapping here (no_px when that one left and others remain)
+        std::int64_t qty;
+    };
+    static std::size_t slot(std::int64_t px) { return static_cast<std::size_t>(px) & (slots - 1); }
+    void unindex(std::int64_t px) {
+        const std::size_t i = slot(px);
+        Slot& s = index_[i];
+        if (--counts_[i] == 0 || s.px == px) s.px = no_px;
+    }
     std::int64_t to_key(std::int64_t px) const { return bid_ ? px : -px; }
+    std::int64_t to_px(std::int64_t key) const { return bid_ ? key : -key; }
     Level to_level(const Entry& e) const { return Level{bid_ ? e.key : -e.key, e.qty}; }
 
     // First index in [lo, hi) whose key >= key. Scans the 8 levels next to the touch first (HR-19).
@@ -223,6 +259,9 @@ private:
     }
 
     std::vector<Entry> buf_;
+    std::vector<Slot> index_;
+    std::vector<std::uint32_t> counts_;  // present prices per slot, apart so an absent query reads 4 KB
+    mutable std::int64_t index_fallbacks_ = 0;
     std::size_t lo_ = 0, hi_ = 0;
     bool bid_ = true;
     std::int64_t grows_ = 0;
@@ -242,6 +281,22 @@ public:
     }
 
     void apply(const Msg& m, const Level* levels) {
+        apply_book(m, levels);
+        has_bid_ = bids_.best(bid_);
+        has_ask_ = asks_.best(ask_);
+    }
+
+    bool best_bid(Level& out) const {
+        out = bid_;
+        return has_bid_;
+    }
+    bool best_ask(Level& out) const {
+        out = ask_;
+        return has_ask_;
+    }
+
+private:
+    void apply_book(const Msg& m, const Level* levels) {
         switch (m.type) {
             case MsgType::Trade: ++st_.trades; return;
             case MsgType::Gap:
@@ -298,8 +353,8 @@ public:
         }
     }
 
-    bool best_bid(Level& out) const { return bids_.best(out); }
-    bool best_ask(Level& out) const { return asks_.best(out); }
+
+public:
     std::int64_t qty_at(bool bid, std::int64_t px) const { return bid ? bids_.qty_at(px) : asks_.qty_at(px); }
     std::size_t top(bool bid, std::size_t n, Level* out) const { return bid ? bids_.top(n, out) : asks_.top(n, out); }
 
@@ -325,6 +380,8 @@ public:
     /// Buffer growths (the allocating path) and lookups that left the 8-level touch window, both sides.
     std::int64_t grows() const { return bids_.grows() + asks_.grows(); }
     std::int64_t far_lookups() const { return bids_.far_lookups() + asks_.far_lookups(); }
+    /// qty_at calls that met a shared index slot and used the sorted search.
+    std::int64_t index_fallbacks() const { return bids_.index_fallbacks() + asks_.index_fallbacks(); }
 
 private:
     void update_side(Side& s, const Level* l, std::uint16_t n) {
@@ -345,6 +402,8 @@ private:
     std::size_t depth_;
     Side bids_, asks_;
     Stats st_{};
+    Level bid_{}, ask_{};
+    bool has_bid_ = false, has_ask_ = false;
     bool live_ = false, pending_resync_ = false;
     std::int64_t seq_ = 0, omitted_ = 0;
     std::vector<Event> events_;

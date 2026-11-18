@@ -353,6 +353,13 @@ TEST_CASE("fast book: property test, 1,000 seeded streams of 10,000 messages", "
             for (std::size_t k = 0; same && k < nbid; ++k, ++it) same = fb[k].px == it->first && fb[k].qty == it->second;
             auto ja = nb.asks.begin();
             for (std::size_t k = 0; same && k < nask; ++k, ++ja) same = fa[k].px == ja->first && fa[k].qty == ja->second;
+            for (std::size_t k = 0; same && k < nbid; ++k) same = b.qty_at(true, fb[k].px) == fb[k].qty;
+            for (std::size_t k = 0; same && k < nask; ++k) same = b.qty_at(false, fa[k].px) == fa[k].qty;
+            ll::Level bb{}, ba{};
+            same = same && b.best_bid(bb) == (nbid > 0) && b.best_ask(ba) == (nask > 0);
+            same = same && (nbid == 0 || (bb.px == fb[0].px && bb.qty == fb[0].qty)) &&
+                   (nask == 0 || (ba.px == fa[0].px && ba.qty == fa[0].qty));
+            same = same && b.qty_at(true, 1000 + 4 + std::int64_t(i % 7)) == 0 && b.qty_at(false, 1000 - 4 - std::int64_t(i % 7)) == 0;
             if (!same) UNSCOPED_INFO("stream " << s << " diverges at message " << i);
             ++compared;
         }
@@ -404,4 +411,30 @@ TEST_CASE("fast book: a message wider than the spare capacity grows the buffer a
     CHECK(top[0].px == 1000);
     CHECK(top[9].px == 991);
     CHECK(b.stats().truncated_levels == 390);
+}
+
+TEST_CASE("fast book: qty_at direct index with shared slots", "[lowlat]") {
+    ll::Book b(10);
+    // 100, 1124 and 2148 share slot 100 (mod 1024); 101 has its own.
+    std::vector<ll::Level> lv = {{2148, 3}, {1124, 2}, {101, 4}, {100, 1}};
+    b.apply(ll::Msg{ll::MsgType::Snapshot, 0, 4, 0, 0, 0, 0}, lv.data());
+    CHECK(b.qty_at(true, 100) == 1);
+    CHECK(b.qty_at(true, 1124) == 2);
+    CHECK(b.qty_at(true, 2148) == 3);
+    CHECK(b.qty_at(true, 3172) == 0);
+    std::vector<ll::Level> del = {{2148, 0}, {1124, 9}};
+    b.apply(ll::Msg{ll::MsgType::Update, 0, 2, 0, 0, 0, 0}, del.data());
+    CHECK(b.qty_at(true, 2148) == 0);
+    CHECK(b.qty_at(true, 1124) == 9);
+    CHECK(b.qty_at(true, 100) == 1);
+    CHECK(b.index_fallbacks() > 0);
+    ll::Level best{};
+    REQUIRE(b.best_bid(best));
+    CHECK(best.px == 1124);
+    CHECK(best.qty == 9);
+    std::vector<ll::Level> gap = {};
+    b.apply(ll::Msg{ll::MsgType::Gap, 0, 0, 0, 0, 0, 0}, gap.data());
+    CHECK_FALSE(b.best_bid(best));
+    CHECK(b.qty_at(true, 100) == 0);
+    CHECK(b.qty_at(true, 1124) == 0);
 }

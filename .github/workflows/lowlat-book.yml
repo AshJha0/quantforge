@@ -7,6 +7,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+env:
+  # Account-free Central fallback for HTTP 429 (CI only), as java25.yml
+  MAVEN_ARGS: --settings ${{ github.workspace }}/java25/.mvn/ci-settings.xml
 jobs:
   bench:
     runs-on: ubuntu-24.04
@@ -28,9 +31,19 @@ jobs:
       - name: Rust run (5 repeats, unpinned runner)
         working-directory: rust
         run: cargo run --release -p quantforge-bench --bin lowlat_book -- ../S.bin 5 ../rust_S.json
+      - name: Java run (5 repeats, unpinned runner)
+        working-directory: java25
+        run: |
+          mvn -B -q -DskipTests compile
+          mkdir -p target/lowlat
+          javac -d target/lowlat -cp target/classes src/jmh/java/org/quantforge/bench/LowLatBook.java
+          java -Xms2g -Xmx2g -cp target/classes:target/lowlat -Xlog:gc:file=../gc.log             -XX:StartFlightRecording=filename=../h9.jfr,settings=profile             org.quantforge.bench.LowLatBook ../S.bin 5 ../java_S.json
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: lowlat-book-results
           path: |
             cpp_S.json
             rust_S.json
+            java_S.json
+            gc.log
+            h9.jfr
