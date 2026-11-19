@@ -1,5 +1,5 @@
 """Daily paper ledger (specifications/12-platform/paper-ledger-daily.md, rulings KR-70 to KR-89, KR-108 and
-KR-200 to KR-215).
+KR-200 to KR-214).
 
 Standard library only. Every financial number of a day comes from a CLI operation (calendar, curve
 interpolation, bond price, pre-trade estimate, pre-trade check, lit venue simulator, post-trade attribution,
@@ -26,6 +26,11 @@ FORMAT = "qf-paper-ledger/1"
 GENESIS = "0" * 64
 KINDS = ("GENESIS", "DAY", "GAP")
 GAP_CAUSES = ("no_curve", "holdout", "build_refused")  # KR-210
+# KR-212: the outputs of the two TCA operations that a row keeps. Fixed with the format string, so a later,
+# additive change to either operation does not change a row and old rows still rebuild.
+TCA_PRETRADE_KEYS = ("duration_days", "expected_cost", "expected_cost_bps", "impact_bps", "istar_bps", "spread_bps",
+                     "timing_risk", "timing_risk_bps")
+TCA_KEYS = ("delay", "execution", "fees", "impact", "opportunity", "spread", "total", "total_bps")
 D0 = Decimal(0)
 CENT = Decimal("0.01")
 DAY_FLOAT_TOL = Decimal("0.000001")  # KR-86: one unit of the last recorded decimal of a mark
@@ -76,6 +81,23 @@ def strings(v):
 # ------------------------------------------------------------------ ledger rows and chain (KR-80, KR-81)
 
 
+def _all_strings(values):
+    """True when every scalar under `values` is a string. The common case, checked without building paths."""
+    stack = list(values)
+    while stack:
+        x = stack.pop()
+        t = type(x)
+        if t is str:
+            continue
+        if t is dict:
+            stack.extend(x.values())
+        elif t is list:
+            stack.extend(x)
+        else:
+            return False
+    return True
+
+
 def canonical(record):
     """Canonical bytes of a row without its hash: the HR-45 rule of paper-trading.md, reused unchanged."""
 
@@ -90,7 +112,8 @@ def canonical(record):
             raise PaperError(f"{path} must be a string (only seq is an integer)")
 
     body = {k: v for k, v in record.items() if k != "hash"}
-    check(body, "")
+    if type(body.get("seq", "")) not in (int, str) or not _all_strings(v for k, v in body.items() if k != "seq"):
+        check(body, "")  # the slow walk, which names the path that is not a string
     return json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("ascii")
 
 
@@ -458,8 +481,8 @@ def build_day(cfg, runner, state, date, par, source, ts, timing, prev_hash, gaps
     # 5. pre-trade limit check, then the simulator only if accepted
     fills = []
     if order:
-        # KR-212: the keys copied are the configuration's fixed list, not whatever the operation returns
-        order["tca_pretrade"] = {**{k: rstr(r["tca_pre"][k], cfg["tca_decimals"]) for k in cfg["tca_pretrade_keys"]},
+        # KR-212: the keys copied are a fixed list, not whatever the operation returns
+        order["tca_pretrade"] = {**{k: rstr(r["tca_pre"][k], cfg["tca_decimals"]) for k in TCA_PRETRADE_KEYS},
                                  "label": cfg["tca_pretrade_label"]}
         chk = runner([case("chk", "paper.pretrade.check", {
             "order": {k: order[k] for k in ("side", "type", "quantity", "limit_price")}, "ref_price": par_px,
@@ -501,7 +524,7 @@ def build_day(cfg, runner, state, date, par, source, ts, timing, prev_hash, gaps
             "fees": float(sum((Decimal(f["fee"]) for f in fills), D0))}))
     r = runner(cases)
     if order:
-        order["tca"] = {k: rstr(r["tca"][k], cfg["tca_decimals"]) for k in cfg["tca_keys"]}
+        order["tca"] = {k: rstr(r["tca"][k], cfg["tca_decimals"]) for k in TCA_KEYS}
     trading = sum((Decimal(r[f"fill|{i['symbol']}"]["trading"]) for i in insts), D0)
     fees = sum((Decimal(r[f"fill|{i['symbol']}"]["fees"]) for i in insts), D0)
     positions = {i["symbol"]: r[f"fill|{i['symbol']}"]["position"] for i in insts}
@@ -675,9 +698,9 @@ def verify(text, cfg=None, runner=None, windows=None, calendar=None):
         return _verify(text, cfg, runner, windows, calendar)
 
 
-def _verify(text, cfg, runner, windows, calendar):
+def _verify(text, cfg, runner, windows, calendar, chain=None):
     label = (cfg or load_config())["label"]
-    ch = check_chain(text, label)
+    ch = chain or check_chain(text, label)  # `chain`: the caller's own check_chain(text, label), to do it once
     if not ch["ok"]:
         return ch
     rows = ch["rows"]
@@ -793,10 +816,11 @@ def run(cfg, runner, ledger_text, log_entries, now, commit="unknown", impl="pyth
 def _run(cfg, runner, ledger_text, log_entries, now, commit, impl, windows):
     windows = holdout_windows() if windows is None else windows
     cal = Calendar(runner, cfg["calendar"])
-    v = _verify(ledger_text, cfg, None, windows, cal)
+    chain = check_chain(ledger_text, cfg["label"])
+    v = _verify(ledger_text, cfg, None, windows, cal, chain)
     if not v["ok"]:
         raise PaperError(f"existing ledger does not verify: seq {v['first_bad_seq']} {v['reason']} {v['detail']}")
-    rows = check_chain(ledger_text, cfg["label"])["rows"]
+    rows = chain["rows"]
     if rows and stamp(now) < rows[-1]["ts"]:
         raise PaperError(f"the clock ({stamp(now)}) is before the last row ({rows[-1]['ts']}); nothing written")
     fields = [k["field"] for k in cfg["knots"]]

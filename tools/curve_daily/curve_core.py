@@ -56,6 +56,23 @@ def fstr(x: float) -> str:
     return "0.0" if s == "-0.0" else s
 
 
+def _all_strings(values: Any) -> bool:
+    """True when every scalar under `values` is a string. The common case, checked without building paths."""
+    stack = list(values)
+    while stack:
+        x = stack.pop()
+        t = type(x)
+        if t is str:
+            continue
+        if t is dict:
+            stack.extend(x.values())
+        elif t is list:
+            stack.extend(x)
+        else:
+            return False
+    return True
+
+
 def canonical(record: dict[str, Any]) -> bytes:
     """Row bytes without `hash`: keys sorted, `,` and `:` separators, ASCII. Every scalar is a string except
     `seq` (the HR-45 rule of paper-trading.md, reused as the paper ledger does)."""
@@ -71,7 +88,8 @@ def canonical(record: dict[str, Any]) -> bytes:
             raise CurveError(f"{path} must be a string (only seq is an integer)")
 
     body = {k: v for k, v in record.items() if k != "hash"}
-    check(body, "")
+    if type(body.get("seq", "")) not in (int, str) or not _all_strings(v for k, v in body.items() if k != "seq"):
+        check(body, "")  # the slow walk, which names the path that is not a string
     return json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("ascii")
 
 

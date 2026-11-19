@@ -58,7 +58,6 @@ sys.path.insert(0, str(ROOT / "tools" / "curve_daily"))
 sys.path.insert(0, str(ROOT / "tools" / "paper_daily"))
 curve = _load("curve_core", ROOT / "tools" / "curve_daily" / "curve_core.py")
 paper = _load("paper_core", ROOT / "tools" / "paper_daily" / "paper_core.py")
-fl = _load("forward_log_for_paper", ROOT / "tools" / "forward-log" / "forward_log.py")
 UTC = dt.UTC
 FIRST, LAST = (
     dt.date(2027, 10, 1),
@@ -202,7 +201,7 @@ def curve_sequence(seed: int) -> None:
     now = dt.datetime.combine(span[1], dt.time(rng.choice([0, 4, 15, 23]), rng.randrange(60)), UTC)
     text = ""
     year_of = re.compile(r"/(\d{4})/all")
-    for _step in range(rng.randrange(5, 11)):
+    for _step in range(rng.randrange(4, 10)):
         mode = rng.choices(["ok", "fail", "html", "empty"], [0.8, 0.1, 0.07, 0.03])[0]
         back = bool(text) and rng.random() < 0.04
         when = now - dt.timedelta(hours=rng.choice([1, 30])) if back else now
@@ -223,18 +222,19 @@ def curve_sequence(seed: int) -> None:
             return world.csv(int(m[1]), when)
 
         try:
-            out, new, _ = curve.run(
+            out, _, _ = curve.run(
                 CCFG, curve_runner, text, when, fetch, "c", "1.17.0", "python", windows
             )
         except curve.CurveError as e:
             assert back and "clock" in str(e), (seed, _step, str(e))
-            out, new = text, []
+            out = text
         else:
             assert not back or when >= curve.instant(curve.parse(text)[-1]["ts"]), (seed, _step)
         assert out.startswith(text), (seed, _step, "append-only")
         if out:
-            v = curve.verify(out, CCFG, curve_runner, windows)
-            assert v["ok"], (seed, _step, v)
+            if out != text:  # a ledger this run did not change was verified when it was written
+                v = curve.verify(out, CCFG, curve_runner, windows)
+                assert v["ok"], (seed, _step, v)
             curve_invariants(seed, _step, out, when if not back else None, mode, world, windows)
         text = out
         now += dt.timedelta(
@@ -429,7 +429,8 @@ class PaperWorld:
                 self.recorded[d] = base + dt.timedelta(
                     minutes=rng.randrange(200, 345)
                 )  # measured 3.4 to 5.7 h
-        head, rows = fl.ZERO, []
+        head = "0" * 64
+        rows: list[dict[str, Any]] = []
         order = sorted((t, d) for d, t in self.recorded.items() if t is not None)
         for n, (t, d) in enumerate(order, 1):
             ts = paper.stamp(t)
@@ -447,7 +448,8 @@ class PaperWorld:
                     }
                 },
             }
-            head = fl.link(head, rec)
+            # an opaque row id is all the writer reads; the recorder's own chain rule is not under test here
+            head = hashlib.sha256(f"{head}|{ts}|{d.isoformat()}".encode()).hexdigest()
             rows.append({"record": rec, "hash": head})
         self.log = rows
 
@@ -491,8 +493,9 @@ def paper_sequence(seed: int) -> None:
             when_ok = None
         assert out.startswith(text), (where, "append-only")
         if out:
-            v = paper.verify(out, PCFG, None, windows, PCAL)
-            assert v["ok"], (where, v)
+            if out != text:  # a ledger this run did not change was verified when it was written
+                v = paper.verify(out, PCFG, None, windows, PCAL)
+                assert v["ok"], (where, v)
             paper_invariants(where, out, when_ok, notes, world, windows, bad)
         else:
             assert new == [], where

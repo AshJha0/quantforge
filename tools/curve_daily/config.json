@@ -1,6 +1,6 @@
 {
   "format": "qf-curve-daily/1",
-  "spec": "specifications/12-platform/daily-curve-run.md 0.1.0",
+  "spec": "specifications/12-platform/daily-curve-run.md 0.2.0",
   "label": "fitted to public US Treasury par yields with a library Nelson-Siegel fit; not an official curve",
   "consistency_label": "consistency check, not proof",
   "calendar": "USGS",

@@ -2,7 +2,7 @@
 """Verify the daily paper ledger, or make and check its anchors (paper-ledger-daily.md, acceptance P1 to P14).
 
   verify_ledger.py verify --ledger FILE [--impl python | --no-cli] [--anchors DIR] [--forward-log FILE]
-                          [--bitcoin-headers FILE] [--require-days N] [--summary FILE]
+                          [--bitcoin-headers FILE] [--require-days N] [--summary FILE] [--ledger-summary FILE]
   verify_ledger.py anchor --ledger FILE --out-dir DIR [--stamp] [--if-uncovered]
   verify_ledger.py heights --anchors DIR
 
@@ -84,6 +84,17 @@ def verify(a, cfg, runner=None, max_target=evidence.MAX_TARGET, log_reader=read_
     return v
 
 
+LEDGER_KEYS = ("ok", "records", "declared_on_time_days", "late_days", "gaps", "head", "last_date", "nav", "pnl", "label")
+
+
+def ledger_summary(v):
+    """The fields that are a function of the ledger rows alone, so the file changes only when a row is added
+    (KR-205). It holds no count of recorded trading days: that needs outside evidence (KR-200)."""
+    return {**{k: v[k] for k in LEDGER_KEYS},
+            "note": "declared_on_time_days counts rows the runner labelled on time; recorded trading days are "
+                    "counted from Bitcoin block times by verify --bitcoin-headers"}
+
+
 def main(argv=None, runner=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("command", choices=["verify", "anchor", "heights"])
@@ -95,7 +106,9 @@ def main(argv=None, runner=None):
     ap.add_argument("--anchors")
     ap.add_argument("--forward-log", help="recorder log file (actions/log.jsonl on branch forward-log)")
     ap.add_argument("--bitcoin-headers", help="JSON {height: 80-byte block header as hex}")
-    ap.add_argument("--summary", help="write the result as JSON (for a dashboard)")
+    ap.add_argument("--summary", help="write the whole result as JSON")
+    ap.add_argument("--ledger-summary", help="write the part of the result that follows from the ledger alone "
+                                             "(the file kept beside the ledger on its branch)")
     ap.add_argument("--out-dir")
     ap.add_argument("--stamp", action="store_true")
     ap.add_argument("--if-uncovered", action="store_true", help="anchor: write nothing if the head is anchored")
@@ -131,6 +144,9 @@ def main(argv=None, runner=None):
         return 0
     v = verify(a, cfg, runner)
     v["label"] = cfg["label"]
+    if a.ledger_summary and v["ok"]:
+        text = json.dumps(ledger_summary(v), indent=1, sort_keys=True) + "\n"
+        Path(a.ledger_summary).write_bytes(text.encode("ascii"))
     if a.summary:
         Path(a.summary).write_text(json.dumps(v, indent=1, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
     print(json.dumps(v, sort_keys=True))

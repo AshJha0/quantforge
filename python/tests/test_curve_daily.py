@@ -18,11 +18,10 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+import daily_jobs_support as support
 import pytest
 
 from quantforge_core.cli.main import run_case
-
-import daily_jobs_support as support
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -341,7 +340,9 @@ def test_second_settled_row_for_a_day_fails(month: tuple[str, list[dt.date]]) ->
     assert check(rechain([*rows, {**copy.deepcopy(last), "ts": rows[-1]["ts"]}]))["reason"] == "DUP"
     first = copy.deepcopy(next(r for r in rows if r["kind"] == "DAY"))
     assert check(rechain([*rows, {**first, "ts": rows[-1]["ts"]}]))["reason"] == "ORDER"
-    assert check(rechain([*rows, first]))["reason"] == "TS"  # with its own, older time: refused sooner
+    assert (
+        check(rechain([*rows, first]))["reason"] == "TS"
+    )  # with its own, older time: refused sooner
 
 
 def test_missed_days_are_late_then_gaps() -> None:

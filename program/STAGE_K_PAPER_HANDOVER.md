@@ -25,9 +25,9 @@ Decided at integration (2026-11-19, ruling KR-108): `origin/forward-log` publish
 
 ## What runs when
 
-- `paper-ledger.yml`: 00:40 UTC Tuesday to Saturday and 15:10 UTC Monday to Friday, plus `workflow_dispatch` with a `dry_run` input. It starts by itself once the workflow file is on `main`. **It has not been triggered and no branch has been pushed.**
-- The recorder's 23:30 UTC run must have written the day's curve first. If it has not, the 00:40 run writes nothing and the 15:10 run picks the day up, still on time (cut-off 19:30 UTC on the next business day).
-- Ledger: branch `paper-ledger`, file `ledger/ledger.jsonl`, with `ledger/summary.json` beside it. Anchors: branch `paper-ledger-anchors`, folder `anchors/`.
+- `paper-ledger.yml` (as revised 2026-11-19 after audit C, see the last section): started by the completion of the recorder workflow, with cron slots at 03:00 and 06:00 UTC Tuesday to Saturday, plus `workflow_dispatch` with a `dry_run` input. The first version ran at 00:40 UTC Tuesday to Saturday and 15:10 UTC Monday to Friday. It starts by itself once the workflow file is on `main`. **It has not been triggered and no branch has been pushed.**
+- The recorder's evening run must have written the day's curve first; that is why the job is started by the recorder's completion. (The first version said the 15:10 UTC run would pick a missed day up "still on time"; measured start delays of 6.2 to 9.0 hours for that part of the day show it would have been late every day. See the last section.)
+- Ledger: branch `paper-ledger`, file `ledger/ledger.jsonl`, with `ledger/summary.json` beside it (only the fields that follow from the rows; it changes only when a row is added). Anchors: branch `paper-ledger-anchors`, folder `anchors/`.
 - Calendar: the library's `USGS` calendar decides which dates get a row.
 
 ## Dry run for the coordinator
@@ -44,11 +44,11 @@ Run in this worktree on 2026-11-19 at 12:10 UTC it printed the label line, the s
 {"dry_run": true, "gaps": 0, "head": "40dff9a5...", "last_date": "2026-11-18", "late_days": 0, "now": "2026-11-19T12:10:30Z", "recorded_trading_days": 1, "records": 2, "rows_added": 2}
 ```
 
-and the two rows (genesis, and the day row for 2026-11-18: a BUY of 26,500 units of `UST-CM-2Y`, partly filled). The head hash and the fill differ from run to run before the ledger exists, because the genesis row holds the run time and the book seed depends on the previous row's hash. A real write to a temporary file, a full verify, a `--require-days 20` check (failed with `DAYS`, as it should with 1 day) and a second run (nothing due) were also done locally.
+and the two rows (genesis, and the day row for 2026-11-18: a BUY of 26,500 units of `UST-CM-2Y`, partly filled). (That output is the first version's; since the audit response the field it prints as `recorded_trading_days` is `declared_on_time_days`, and no dry run against the live forward log has been made with the revised tools by the audit-response lane.) The head hash and the fill differ from run to run before the ledger exists, because the genesis row holds the run time and the book seed depends on the previous row's hash. A real write to a temporary file, a full verify, a `--require-days 20` check (failed with `DAYS`, as it should with 1 day) and a second run (nothing due) were also done locally.
 
 ## How to verify the real ledger later
 
-`docs/developer-guides/paper-ledger.md` has the three commands. The v1.0.0 gate is `verify_ledger.py verify --ledger ledger.jsonl --anchors DIR --require-days 20`.
+`docs/developer-guides/paper-ledger.md` has the commands. The v1.0.0 gate is `verify_ledger.py verify --ledger ledger.jsonl --anchors DIR --forward-log LOG --bitcoin-headers HEADERS --require-days 20` (KR-202); it refuses to run without any of the three inputs or with `--no-cli`.
 
 ## Not done, not verified
 
@@ -79,10 +79,10 @@ No library operation was added or changed. The job composes `core.calendar.is_bu
 
 ## What the dashboard lane will need
 
-- `ledger/summary.json` on `paper-ledger`: `ok`, `records`, `recorded_trading_days`, `late_days`, `gaps`, `head`, `last_date`, `nav`, `pnl`, `label`. It is rewritten by every run that adds rows.
+- `ledger/summary.json` on `paper-ledger`: `ok`, `records`, `declared_on_time_days`, `late_days`, `gaps`, `head`, `last_date`, `nav`, `pnl`, `label`, `note`. It is rewritten by every run that adds rows. `declared_on_time_days` is the runner's own label and must not be shown as the count of recorded trading days; that count comes from `verify --bitcoin-headers` (KR-200) and is not on the branch.
 - Per day, from each DAY row body: `date`, `timing`, `pnl`, `nav_close`, `explain.*` (five terms), `positions_close`, `orders[].status`, `orders[].tca.total_bps`, `orders[].tca_pretrade.expected_cost_bps`, `cumulative.*`.
 - Every chart or table built from it must show the row label, "simulated" for fills, "placeholder weights" beside the pre-trade estimate, and the sentence that no performance claim is made. A cumulative P&L line without those would read as a track record, which it is not.
-- Days: count only `timing == "on_time"` rows; show late days and gaps as what they are.
+- Days: show rows with `timing == "on_time"` as "labelled on time", late days and gaps as what they are, and the recorded trading days only from the evidence-based count.
 - Dates: run `python research/test_preregs.py` on any page that prints ledger dates (plan 14.10 rule 6). Ledger dates start after every holdout window, and the verifier enforces it.
 
 ## Gate results on this branch (2026-11-19, local laptop, not the acceptance machine)
@@ -99,3 +99,28 @@ No library operation was added or changed. The job composes `core.calendar.is_bu
 | `git grep -i` for the banned word on the diff | none |
 
 Not run: the full Python test suite, the Java, C++ and Rust builds (no change there), and the workflow itself.
+
+## Audit C response (daily-jobs lane, 2026-11-19): what changed after this handover was written
+
+Different-model audit C (`STAGE_K_R1_AUDIT_C.md`) found faults in this job before it had run. They are fixed on branch `k-audit-jobs`; rulings KR-200 to KR-214 (proposed, for the coordinator to confirm before the first scheduled run). The sections above are kept as written except where a line was plainly wrong; this section is the current state.
+
+| Finding | What it was | What is true now |
+|---|---|---|
+| KA-C1 | every run committed to `paper-ledger` and added an anchor, row or no row | a run with nothing due commits nothing and anchors nothing; one anchor per head (KR-205) |
+| KA-C2, KA-C3 | the on-time label, and so the 20-day count, was the runner's own word; the gate ran without anchors or calendar | the count is taken from Bitcoin block times of the anchors, with a 2 hour margin; the gate needs the CLI, the anchors, the recorder log and block headers (KR-200 to KR-202) |
+| KA-C4 | nothing checked a row's yields against the recorder log | `--forward-log`, reason `SOURCE`; run before every push (KR-211) |
+| KA-C5, KA-C26 | the recorded commit could be the wrong one; forks would write their own chain | `git rev-parse HEAD` of the checkout; this repository and `main` only (KR-214) |
+| KA-C12 | the 15:10 UTC "second chance" would start after the cut-off | started by the recorder's completion, plus 03:00 and 06:00 UTC slots (KR-206) |
+| KA-C13 | an additive change to a TCA operation would have failed every old row | fixed key lists; the frozen operations are named (KR-212) |
+| KA-C9 (curve job), applied here | a holdout date or a day that could not be built made every later run refuse | holdout and `build_refused` gaps; exit 2 (KR-210) |
+| bytes | golden hashes computed on Windows only | one serialisation of the file enforced (`BYTES`); pinned bytes; CI job `python-daily-jobs-bytes` on the runner image (KR-208). **Not yet run on Linux by this lane: no WSL was allowed and no workflow was triggered. The first run of that job on the PR is the check.** |
+
+Row format changes, made before any row exists: `cumulative.recorded_trading_days` is now `cumulative.declared_on_time_days`; GAP rows carry `cause` (and `studies` for a holdout gap). The golden hashes and the book of the spec's worked example changed with the rename (the book is seeded by the previous row's hash); the marks, carry, roll-down and curve move of the example are unchanged.
+
+Tests (measured 2026-11-19, local laptop, not the acceptance machine): `python/tests/test_paper_daily.py` 50 tests; `python/tests/test_daily_jobs_bytes.py` 20 tests (pinned bytes, anchor evidence on a real forward-log anchor and block header, workflow files); `python/tests/test_daily_jobs_properties.py` (10,000 generated run sequences for each writer).
+
+Not done, not verified:
+- No workflow was triggered and the ledger branches were not created, as instructed. `workflow_run` (start after the recorder) has not been seen to fire.
+- The schedule rests on ten days of measured start delays; it is not a guarantee.
+- The dashboard lane must not print `declared_on_time_days` as recorded trading days.
+- The time evidence checks a block header's proof of work and a difficulty floor, not its place in the best chain (spec, Limits).

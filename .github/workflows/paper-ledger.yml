@@ -2,14 +2,25 @@ name: Paper ledger
 # Daily paper ledger (plan 14.8 K-1, K-2; 12.7 Q8k; specifications/12-platform/paper-ledger-daily.md). It reads the
 # Treasury par curve that recorder.yml already recorded on branch forward-log (this job makes no network request
 # for market data), appends one hash-chained row per US business day to branch paper-ledger, verifies the whole
-# ledger (exact replay from the ledger alone, then a rebuild of every day through the CLI) and anchors the head on
-# branch paper-ledger-anchors. It never writes to main, places no order and reaches no venue: fills come from the
-# simulator only. Label on every row: "paper marks on a fitted curve; not tradable". No performance claim is made.
-# Guide: docs/developer-guides/paper-ledger.md
+# ledger (exact replay from the ledger alone, a rebuild of every day through the CLI, every DAY row's yields
+# against the recorder log) and anchors the head on branch paper-ledger-anchors. It never writes to main, places
+# no order and reaches no venue: fills come from the simulator only. Label on every row: "paper marks on a fitted
+# curve; not tradable". No performance claim is made. A run with nothing due commits nothing and anchors nothing
+# (KR-205). Guide: docs/developer-guides/paper-ledger.md
+#
+# When it runs (KR-206). A day's row must exist, and be stamped, before 19:30 UTC on the next business day. This
+# repository's scheduled runs start late: measured on 24 scheduled runs of recorder.yml and daily-workflows.yml
+# from 2026-11-09 to 2026-11-19 (GitHub's own run start times), the 23:30 UTC slot started 3.4 to 5.7 hours late
+# and the 14:30 and 15:00 UTC slots 6.2 to 9.0 hours late. So this job does not wait for a clock time: it starts
+# when the recorder finishes (the recorder's evening run is what writes the day's curve), and two cron slots are
+# a second and third chance that land between 06:25 and 15:00 UTC under every delay measured.
 on:
+  workflow_run:
+    workflows: [Recorder]
+    types: [completed]
   schedule:
-    - cron: '40 0 * * 2-6' # 70 minutes after the recorder's 23:30 UTC run, which takes Treasury's end-of-day curve (published by 18:00 ET)
-    - cron: '10 15 * * 1-5' # second chance after the recorder's 14:30 UTC run, still before the 19:30 UTC on-time cut-off
+    - cron: '0 3 * * 2-6' # lands 06:25 to 12:00 UTC with the measured delays (3.4 to 9.0 h)
+    - cron: '0 6 * * 2-6' # lands 09:25 to 15:00 UTC; with 1.6 h to a block and the 2 h margin still before 19:30
   workflow_dispatch:
     inputs:
       dry_run:
@@ -24,6 +35,9 @@ concurrency:
 jobs:
   ledger:
     name: paper-ledger-run
+    # Only this repository writes this ledger (a fork would start a second chain under the same format string),
+    # and only from main: the code that runs is main's, whatever branch a manual run was started from.
+    if: github.repository == 'AshJha0/quantforge' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -48,14 +62,20 @@ jobs:
           else
             git init -b paper-ledger ledger
             git -C ledger remote add origin "$url"
-            printf '# paper-ledger\n\nRows written by .github/workflows/paper-ledger.yml. Append-only. Label: "paper marks on a fitted curve; not tradable". Simulated fills; no performance claim. See docs/developer-guides/paper-ledger.md on main.\n' > ledger/README.md
+            printf '# paper-ledger\n\nRows written by .github/workflows/paper-ledger.yml. Append-only. Label: "paper marks on a fitted curve; not tradable". Simulated fills; no performance claim. Each DAY row repeats five US Treasury par yields (3 month, 2, 5, 10 and 30 year) that branch forward-log already publishes. Source: US Department of the Treasury. See docs/developer-guides/paper-ledger.md on main.\n' > ledger/README.md
+            printf '* -text\n' > ledger/.gitattributes # the ledger is bytes: no line-ending conversion on any checkout
           fi
       - name: Install the Python CLI
         run: uv sync --locked --no-dev --project code/python
       - name: Run the day
+        # Exit 2: rows were written and something needs a person (a gap, a late day, a day that could not be
+        # built); they are still verified and pushed, and the last step turns the run red. Exit 1: refused,
+        # nothing written.
         id: run
+        continue-on-error: true
         run: |
-          args=(--ledger ledger/ledger/ledger.jsonl --forward-log fwd/actions/log.jsonl --impl python --commit "$GITHUB_SHA")
+          commit=$(git -C code rev-parse HEAD) # the code that runs, not the event's commit
+          args=(--ledger ledger/ledger/ledger.jsonl --forward-log fwd/actions/log.jsonl --impl python --commit "$commit")
           if [ "$DRY_RUN" = true ]; then args+=(--dry-run); fi
           python3 code/tools/paper_daily/run_day.py "${args[@]}"
       - name: Check out the anchors, or start them
@@ -71,17 +91,18 @@ jobs:
             printf '# paper-ledger-anchors\n\nOpenTimestamps anchors for branch paper-ledger. See docs/developer-guides/paper-ledger.md on main.\n' > anchors/README.md
           fi
           mkdir -p anchors/anchors
-      - name: Verify the ledger against itself, the CLI and every anchor held
+      - name: Verify the ledger against itself, the CLI, the recorder log and every anchor held
         # Also the holdout-date guard (plan 14.10 rule 6) and the genesis configuration check. A ledger that fails
-        # here is not pushed.
+        # here is not pushed. The whole result (with the count of anchors, which changes without any new row) goes to
+        # the runner's temporary folder; ledger/summary.json holds only what follows from the rows themselves.
         if: hashFiles('ledger/ledger/ledger.jsonl') != ''
-        run: python3 code/tools/paper_daily/verify_ledger.py verify --ledger ledger/ledger/ledger.jsonl --impl python --anchors anchors/anchors --summary ledger/ledger/summary.json
+        run: python3 code/tools/paper_daily/verify_ledger.py verify --ledger ledger/ledger/ledger.jsonl --impl python --anchors anchors/anchors --forward-log fwd/actions/log.jsonl --summary "$RUNNER_TEMP/paper_summary.json" --ledger-summary ledger/ledger/summary.json
       - name: Push rows
         id: push
         if: env.DRY_RUN != 'true' && hashFiles('ledger/ledger/ledger.jsonl') != ''
         env:
-          # Same optional signing key as recorder.yml: signed commits show as Verified; without the secret (forks)
-          # the rows are pushed unsigned and the dates rest on the anchors.
+          # Same optional signing key as recorder.yml: signed commits show as Verified. The commit time is the
+          # signer's own clock; the outside time of a row is its anchor's Bitcoin block (KR-201).
           SIGNING_KEY: ${{ secrets.FORWARD_LOG_SIGNING_KEY }}
         run: |
           cd ledger
@@ -96,38 +117,50 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           fi
-          git add -A
-          git diff --cached --quiet && exit 0
-          head=$(python3 -c "import json,sys; print(json.load(open('ledger/summary.json'))['head'])")
-          git commit -q -m "paper-ledger: $(date -u +%Y-%m-%dT%H:%MZ) head ${head} (main ${GITHUB_SHA::7})"
+          # Only the ledger, its summary and the two files written when the branch is started: never the whole folder.
+          git add -- ledger/ledger.jsonl ledger/summary.json
+          for f in README.md .gitattributes; do if [ -e "$f" ]; then git add -- "$f"; fi; done
+          if git diff --cached --quiet -- ledger/ledger.jsonl README.md; then echo "no new row: nothing committed"; exit 0; fi
+          head=$(python3 -c "import json,os; print(json.load(open(os.environ['RUNNER_TEMP'] + '/paper_summary.json'))['head'])")
+          commit=$(git -C ../code rev-parse HEAD)
+          git commit -q -m "paper-ledger: $(date -u +%Y-%m-%dT%H:%MZ) head ${head} (main ${commit::7})"
           # No rebase on a rejected push: this job is the only writer and the concurrency group serialises it, so a
           # rejection means the branch changed underneath and a person must look.
           git push origin paper-ledger
           echo "pushed=true" >> "$GITHUB_OUTPUT"
       - name: Anchor the head hash outside the repo
-        # As recorder.yml (plan 13.2 R4): OpenTimestamps on free calendars, no account, no secret.
+        # As recorder.yml (plan 13.2 R4): OpenTimestamps on free calendars, no account, no secret. A head that
+        # already has an anchor gets no second one; a head whose stamp failed on an earlier run gets one now.
+        # Older proofs are upgraded here so their Bitcoin attestations reach the branch (the evidence of KR-200).
         id: anchor
-        if: steps.push.outputs.pushed == 'true' # only a new head is stamped
+        if: steps.push.outcome == 'success'
         continue-on-error: true
         run: |
           pip install --quiet opentimestamps-client==0.7.2
-          (cd anchors/anchors && ots upgrade *.json.ots || true) # fills in Bitcoin attestations once confirmed
-          python3 code/tools/paper_daily/verify_ledger.py anchor --ledger ledger/ledger/ledger.jsonl --out-dir anchors/anchors --stamp
+          (cd anchors/anchors && ots upgrade *.json.ots || true)
+          rm -f anchors/anchors/*.bak
+          python3 code/tools/paper_daily/verify_ledger.py anchor --ledger ledger/ledger/ledger.jsonl --out-dir anchors/anchors --stamp --if-uncovered
           cd anchors
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add -- README.md anchors
+          if git diff --cached --quiet; then echo "nothing new to anchor or upgrade"; exit 0; fi
           git commit -q -m "anchor: $(date -u +%Y-%m-%dT%H:%MZ) paper-ledger head $(git -C ../ledger rev-parse --short HEAD)"
-          for i in 1 2 3; do git push origin paper-ledger-anchors && break; git pull --rebase -q origin paper-ledger-anchors; done
+          ok=""
+          for i in 1 2 3; do
+            if git push origin paper-ledger-anchors; then ok=1; break; fi
+            git pull --rebase -q origin paper-ledger-anchors || true
+          done
+          if [ -z "$ok" ]; then echo "the anchor was not pushed after three tries"; exit 1; fi
       - name: Fail on a failed soft step
         if: always()
         env:
-          OUTCOMES: anchor=${{ steps.anchor.outcome }}
+          OUTCOMES: run=${{ steps.run.outcome }} anchor=${{ steps.anchor.outcome }}
         run: |
           failed=""
           for kv in $OUTCOMES; do if [ "${kv#*=}" = failure ]; then failed="$failed ${kv%%=*}"; fi; done
           if [ -n "$failed" ]; then
-            echo "::error::soft steps failed:$failed (anchor: the rows are pushed but the head was not stamped; the next run stamps a later head)"
+            echo "::error::soft steps failed:$failed (run: refused, or a row records a gap or a late day, or a day could not be built; see the step log and ledger/ledger.jsonl on branch paper-ledger. anchor: the rows are pushed but the head was not stamped; the next run stamps it)"
             exit 1
           fi
           echo "all soft steps passed or were skipped ($OUTCOMES)"
