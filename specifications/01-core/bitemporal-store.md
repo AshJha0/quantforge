@@ -81,3 +81,7 @@ Property (KR-4, the K-4 acceptance test): appending any record with `knowledge_t
 ## Sources
 
 Snodgrass 2000 and Kulkarni-Michels 2012 for the vocabulary (valid time, transaction time) only; the rule above is our own and is fixed by KR-2. Both UNVERIFIED this session (not opened).
+
+## Limits and open issues
+
+- **Open audit findings (2026-11-19): KA-A1, KA-A2.** The error order stated for the wave 1 operations (`E_LIMIT` last) contradicts the contract's general rule (`E_LIMIT` straight after `E_SCHEMA`), and the 1,000,000-record limit contradicts the general array cap of 100,000 in `limits.md`. Register: `docs/known-issues.md`.

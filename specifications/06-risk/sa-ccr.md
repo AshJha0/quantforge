@@ -93,6 +93,8 @@ SA-CCR is a closed-form formula: no iteration, grid or solver. The page names "B
 
 ## Limits and scope
 
+- **Open audit findings (2026-11-19): KA-A3, KA-C18.** Volatility hedging sets follow the caller's label where CRE52.45 to 52.47 fix their construction: two offsetting equity variance swaps give 320 here against 195.96 under the Basel text. The outside-check share of this item is under review (12 of 16 as counted, 7 of 16 by the strict reading). Register: `docs/known-issues.md`.
+
 - Not covered (KR-39): CRE52.74 multiple margin agreements within one netting set; CRE52.75 and 52.76 one margin agreement over several netting sets; collateral haircuts (C is the caller's haircut value); central counterparty MPOR floors (CRE54); variable-notional averaging (CRE52.37) and digital-option collars (CRE52.42(3)), which the caller applies before the call; the sold-option and sold-protection EAD caps in the CRE52.1 FAQs.
 - The supervisory parameters are in `specifications/06-risk/sa-ccr-parameters.json`, shared by the four builds; a test checks the Python literals against it.
 - E_LIMIT: the generic array cap of 100,000 (`MAX_ARRAY`) bounds `trades`; the CRE52.51(1) "more than 5000 transactions" floor is reachable below it.

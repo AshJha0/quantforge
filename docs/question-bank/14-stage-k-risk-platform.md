@@ -236,9 +236,9 @@ The pitfall is the end correction's origin: it is derived in the lane and suppor
 
 *Level: advanced. Evidence: measured; owner decision 2026-11-19. Source: `oracle/K8_ACCEPTANCE_W2.json`, `specifications/06-risk/bermudan-ladder-k8.md`*
 
-The R6 use restriction is lifted for `CN_RANNACHER_SMOOTHED` only (ruling KR-110, 2026-11-19). The default method is still `G18_IMPLICIT`, and it keeps the restriction. All four builds have the new method.
+Nothing is lifted. The R6 use restriction stays for both methods (ruling KR-113, 2026-11-19). A lift for `CN_RANNACHER_SMOOTHED` was made on the integration branch and withdrawn the same day, before release, after a different-model audit. The default method is still `G18_IMPLICIT`. All four builds have the new method.
 
-Acceptance 1 to 3 pass in Python (worst default-grid gap 0.40% against 1%; 24 entries `OK` with orders 1.84 to 2.15), and acceptance 3 in Java (equal to Python to 3.8e-14 of the row scale), C++ and Rust (within 3.85e-14, `oracle/K8_ACCEPTANCE_PORTS.json`). Acceptance 4 then lifted the restriction for this method only, on the integration branch.
+Acceptance 1 to 3 pass in Python (worst default-grid gap 0.40% against 1%; 24 entries `OK` with orders 1.84 to 2.15), and acceptance 3 in Java (equal to Python to 3.8e-14 of the row scale), C++ and Rust (within 3.85e-14, `oracle/K8_ACCEPTANCE_PORTS.json`). The audit's objections, each checked: the evidence is at 201/100 only, and at 101/50, which the restriction's own text calls the default grid, the worst entries are +0.93%, -1.53% and +1.49%; the three cases are the ones the method was developed on (in-sample); and a deep in-the-money receiver is 7% to 9% off on d/da. The pitfall is reading "passes its acceptance" as "accurate everywhere".
 
 **Worked example.** Case `aadladder_g-0001`, row 2 at 201/401/801: 222,756.98, 223,121.25, 223,212.48, order 1.997, 0.218% from the QuantLib reference. The zero row (node 0.4986) is 0.0 on every grid and is not judged under the all-zero-row rule (owner decision 2026-11-19); `program/K8_ROW0_FINDING.md` found no bug: its true value is zero, and QuantLib's -14.27 there is that engine's own time-stepping error.
 

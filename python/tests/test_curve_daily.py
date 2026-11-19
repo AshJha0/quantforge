@@ -865,3 +865,23 @@ def test_the_on_time_label_is_checked_against_bitcoin_block_times(
         str(ledger), str(a), runner, CFG, NO_WINDOWS, headers, support.EASY_TARGET
     )
     assert v["reason"] == "EVIDENCE" and "Merkle root" in v["detail"]
+
+
+def test_a_next_year_file_without_a_later_date_is_no_evidence() -> None:
+    """A year-end date is closed as `not_published` only by a file that really holds a later date. If the next
+    year's URL serves older rows, the date stays `stale_input` (a gap with no later date would fail `GAPRULE`
+    and be refused on every run)."""
+    year_end = [
+        d
+        for d in (dt.date(2027, 12, 20) + dt.timedelta(days=i) for i in range(12))
+        if CAL.is_open(d)
+    ]
+    d0, d1 = year_end[-2], year_end[-1]
+    d2 = CAL.next_open(d1)
+    old = treasury_csv([d0])
+    text, _, _ = step("", evening(d0), fetcher(old, None))
+    out, new, _ = step(text, evening(d2), fetcher(old, None))  # both years' URLs serve the old file
+    assert [(r["kind"], r["body"]["date"], r["body"].get("status")) for r in new] == [
+        ("DAY", d1.isoformat(), "stale_input")
+    ]
+    assert check(out)["ok"]

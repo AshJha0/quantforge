@@ -5427,6 +5427,53 @@
      ],
      "meets_item_floor": true
     }
+   },
+   "under_review": {
+    "finding": "KA-C18",
+    "status": "open",
+    "strict_reading": "a case counted on a printed regulator figure does not count",
+    "stage": {
+     "cases": 87,
+     "counted": 50
+    },
+    "per_item": {
+     "F (existing traffic_light)": {
+      "cases": 11,
+      "counted": 0
+     },
+     "K-4a": {
+      "cases": 8,
+      "counted": 6
+     },
+     "K-4b": {
+      "cases": 4,
+      "counted": 4
+     },
+     "K-4c": {
+      "cases": 6,
+      "counted": 4
+     },
+     "K-5a": {
+      "cases": 5,
+      "counted": 5
+     },
+     "K-8": {
+      "cases": 7,
+      "counted": 7
+     },
+     "K-8 guard": {
+      "cases": 6,
+      "counted": 6
+     },
+     "K-8d": {
+      "cases": 16,
+      "counted": 7
+     },
+     "K-8e": {
+      "cases": 24,
+      "counted": 11
+     }
+    }
    }
   }
  }

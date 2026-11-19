@@ -63,15 +63,26 @@ class _Reader:
         return self.take(n)
 
 
+# Operations of the proof format that a path to a Bitcoin block does not use (SHA-1, RIPEMD-160, Keccak-256,
+# reverse, hexlify). They take no argument, so the walk can pass through them; what lies under one is not
+# recomputed and is never evidence.
+NOT_RECOMPUTED = (0x02, 0x03, 0x67, 0xF2, 0xF3)
+
+
 def _apply(tag, msg, r):
-    """One OpenTimestamps operation. Only the operations the public calendars use are accepted."""
+    """One OpenTimestamps operation. SHA-256, append and prepend are recomputed. `msg` None means the path
+    passed through an operation that is not recomputed: its length is still read, its content is unknown."""
     if tag == 0x08:
-        return hashlib.sha256(msg).digest()
+        return None if msg is None else hashlib.sha256(msg).digest()
     if tag == 0xF0:
-        return msg + r.varbytes(4096)
+        arg = r.varbytes(4096)
+        return None if msg is None else msg + arg
     if tag == 0xF1:
-        return r.varbytes(4096) + msg
-    raise EvidenceError(f"operation 0x{tag:02x} is not accepted")
+        arg = r.varbytes(4096)
+        return None if msg is None else arg + msg
+    if tag in NOT_RECOMPUTED:
+        return None
+    raise EvidenceError(f"operation 0x{tag:02x} is not known")
 
 
 def attestations(proof, file_bytes):
@@ -98,7 +109,9 @@ def attestations(proof, file_bytes):
             kind = r.take(8)
             payload = _Reader(r.varbytes(8192))
             if kind == BITCOIN:
-                out.append(("bitcoin", payload.varuint(), msg))
+                height = payload.varuint()
+                if msg is not None:  # under an operation that is not recomputed there is nothing to compare
+                    out.append(("bitcoin", height, msg))
             elif kind == PENDING:
                 out.append(("pending", payload.varbytes(1000).decode("utf-8", "replace"), b""))
             return  # any other attestation kind is ignored: it is not evidence here

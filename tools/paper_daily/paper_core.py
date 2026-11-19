@@ -32,6 +32,7 @@ TCA_PRETRADE_KEYS = ("duration_days", "expected_cost", "expected_cost_bps", "imp
                      "timing_risk", "timing_risk_bps")
 TCA_KEYS = ("delay", "execution", "fees", "impact", "opportunity", "spread", "total", "total_bps")
 D0 = Decimal(0)
+INF = float("inf")
 CENT = Decimal("0.01")
 DAY_FLOAT_TOL = Decimal("0.000001")  # KR-86: one unit of the last recorded decimal of a mark
 
@@ -218,10 +219,11 @@ def par_state(entries, series, fields):
         if r["series_id"] != series:
             continue
         for key, v in (r["value"]["payload"].get("observations") or {}).items():
-            d, f = key.split("|")
-            if f in fields:
-                obs.setdefault(d, {})[f] = fstr(v)
-                src[d] = e["hash"]
+            d, _, f = key.partition("|")
+            if f not in fields or isinstance(v, bool) or not isinstance(v, (int, float)) or v != v or v in (INF, -INF):
+                continue  # not one of the five fields, or not a finite number: that date stays incomplete (a gap)
+            obs.setdefault(d, {})[f] = fstr(v)
+            src[d] = e["hash"]
     return {d: (v, src[d]) for d, v in obs.items() if all(f in v for f in fields)}
 
 

@@ -10,7 +10,7 @@ Label on every row: "paper marks on a fitted curve; not tradable". Fills are sim
 |---|---|---|
 | Spec, fixed before any scheduled run | `specifications/12-platform/paper-ledger-daily.md` | acceptance table P1 to P11 in the spec |
 | Rulings KR-70 to KR-89 (proposed) | `specifications/stage-k-rulings-paper.md` | need the coordinator's confirmation |
-| Daily job | `tools/paper_daily/paper_core.py`, `run_day.py`, `config.json` | `python/tests/test_paper_daily.py`, 40 tests, measured 2026-11-19 on the local laptop (Windows, Python 3.15), not on CI |
+| Daily job | `tools/paper_daily/paper_core.py`, `run_day.py`, `config.json` | `python/tests/test_paper_daily.py`, 40 tests when this was written (51 after the audit response), measured 2026-11-19 on the local laptop (Windows, Python 3.15), not on CI |
 | Verifier and anchor tool | `tools/paper_daily/verify_ledger.py` | same test file; planted faults listed under P7 |
 | Workflow | `.github/workflows/paper-ledger.yml` | not triggered; `tools/check_job_names.py` passes (59 jobs, 0 problems) |
 | Guide | `docs/developer-guides/paper-ledger.md` | |
@@ -25,6 +25,7 @@ Decided at integration (2026-11-19, ruling KR-108): `origin/forward-log` publish
 
 ## What runs when
 
+- **Not scheduled (2026-11-19).** The triggers below are comments in the workflow file, as on the integration branch, until the coordinator confirms rulings KR-200 to KR-214 and the Linux bytes job is green; the job starts by hand only.
 - `paper-ledger.yml` (as revised 2026-11-19 after audit C, see the last section): started by the completion of the recorder workflow, with cron slots at 03:00 and 06:00 UTC Tuesday to Saturday, plus `workflow_dispatch` with a `dry_run` input. The first version ran at 00:40 UTC Tuesday to Saturday and 15:10 UTC Monday to Friday. It starts by itself once the workflow file is on `main`. **It has not been triggered and no branch has been pushed.**
 - The recorder's evening run must have written the day's curve first; that is why the job is started by the recorder's completion. (The first version said the 15:10 UTC run would pick a missed day up "still on time"; measured start delays of 6.2 to 9.0 hours for that part of the day show it would have been late every day. See the last section.)
 - Ledger: branch `paper-ledger`, file `ledger/ledger.jsonl`, with `ledger/summary.json` beside it (only the fields that follow from the rows; it changes only when a row is added). Anchors: branch `paper-ledger-anchors`, folder `anchors/`.
@@ -110,17 +111,18 @@ Different-model audit C (`STAGE_K_R1_AUDIT_C.md`) found faults in this job befor
 | KA-C2, KA-C3 | the on-time label, and so the 20-day count, was the runner's own word; the gate ran without anchors or calendar | the count is taken from Bitcoin block times of the anchors, with a 2 hour margin; the gate needs the CLI, the anchors, the recorder log and block headers (KR-200 to KR-202) |
 | KA-C4 | nothing checked a row's yields against the recorder log | `--forward-log`, reason `SOURCE`; run before every push (KR-211) |
 | KA-C5, KA-C26 | the recorded commit could be the wrong one; forks would write their own chain | `git rev-parse HEAD` of the checkout; this repository and `main` only (KR-214) |
-| KA-C12 | the 15:10 UTC "second chance" would start after the cut-off | started by the recorder's completion, plus 03:00 and 06:00 UTC slots (KR-206) |
+| KA-C12 | the 15:10 UTC "second chance" would start after the cut-off | triggers to restore: the recorder's completion, plus 03:00 and 06:00 UTC slots (KR-206). They are comments in the workflow file: the integration branch withheld every trigger but the manual one (commit 1d184366), and this branch keeps it so until the rulings are confirmed and the Linux bytes job is green |
 | KA-C13 | an additive change to a TCA operation would have failed every old row | fixed key lists; the frozen operations are named (KR-212) |
 | KA-C9 (curve job), applied here | a holdout date or a day that could not be built made every later run refuse | holdout and `build_refused` gaps; exit 2 (KR-210) |
 | bytes | golden hashes computed on Windows only | one serialisation of the file enforced (`BYTES`); pinned bytes; CI job `python-daily-jobs-bytes` on the runner image (KR-208). **Not yet run on Linux by this lane: no WSL was allowed and no workflow was triggered. The first run of that job on the PR is the check.** |
 
 Row format changes, made before any row exists: `cumulative.recorded_trading_days` is now `cumulative.declared_on_time_days`; GAP rows carry `cause` (and `studies` for a holdout gap). The golden hashes and the book of the spec's worked example changed with the rename (the book is seeded by the previous row's hash); the marks, carry, roll-down and curve move of the example are unchanged.
 
-Tests (measured 2026-11-19, local laptop, not the acceptance machine): `python/tests/test_paper_daily.py` 50 tests; `python/tests/test_daily_jobs_bytes.py` 20 tests (pinned bytes, anchor evidence on a real forward-log anchor and block header, workflow files); `python/tests/test_daily_jobs_properties.py` (10,000 generated run sequences for each writer).
+Tests (measured 2026-11-19, local laptop, not the acceptance machine): `python/tests/test_paper_daily.py` 51 tests; `python/tests/test_daily_jobs_bytes.py` 24 tests (pinned bytes, anchor evidence on a real forward-log anchor and block header, workflow files); `python/tests/test_daily_jobs_properties.py` (10,000 generated run sequences for each writer).
 
 Not done, not verified:
-- No workflow was triggered and the ledger branches were not created, as instructed. `workflow_run` (start after the recorder) has not been seen to fire.
+- No workflow was triggered and the ledger branches were not created, as instructed. The job is not scheduled. `workflow_run` (start after the recorder) has not been seen to fire.
+- Restoring the triggers is one edit in each workflow file (uncomment the lines under `on:`) and the removal of `test_no_daily_job_is_scheduled_while_audit_findings_are_open`; it is the coordinator's step, not this lane's.
 - The schedule rests on ten days of measured start delays; it is not a guarantee.
 - The dashboard lane must not print `declared_on_time_days` as recorded trading days.
 - The time evidence checks a block header's proof of work and a difficulty floor, not its place in the best chain (spec, Limits).

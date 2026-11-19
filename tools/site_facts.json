@@ -10,7 +10,7 @@
   "outside_share": "Outside-library share of value-checked cases under the tight rule: stage J 66.5%, I 66.7%, G 81.4%, F 85.1% with an independent re-derivation (53.7% libraries alone), E 78.5%, D 85.7%; stage H 78.0% (160 of 205 value cases) by blind re-derivation or printed paper figures, no library; every stage meets the 60% floor (<a href=\"oracle/OUTSIDE_SHARES.html\">per stage, with the old all-case shares</a>).",
   "stage_h_outside": "78.0% (160 of 205 value cases, oracle/OUTSIDE_SHARES.md)",
   "stage_h_unchecked": "45 of the 205 stage H value cases",
-  "next_stage": "stage K, platform and release (target v1.0.0): planned, started 2026-11-19; nothing released from it yet",
+  "next_stage": "stage K, platform and release (target v1.0.0): started 2026-11-19; round 1 merged to main, not released; audit findings open, see docs/known-issues.md; no tag until they are closed",
   "status_glance": [
     [
       "Release",
@@ -34,7 +34,7 @@
     ],
     [
       "Missed",
-      "H-9 workload R (recorded 6-hour crypto window, 2026-11-18/19): correctness passes, timing is a recorded MISS at p99 and p99.9 in every language (local laptop, not the acceptance machine). H-9 R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS. Stage K item K-8 misses its third acceptance test and moves to a point release; its threshold is not loosened."
+      "H-9 workload R (recorded 6-hour crypto window, 2026-11-18/19): correctness passes, timing is a recorded MISS at p99 and p99.9 in every language (local laptop, not the acceptance machine). H-9 R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS. Stage K item K-8: a second-order Bermudan ladder method is added and measured (it passes its acceptance at 201/100 on the three cases it was developed on, and misses 1% at 101/50 on two of them); the R6 use restriction stays for both methods (KR-113) and lifting it moves to a later point release; the threshold is not loosened. Stage K round 1 is merged to main, not released; audit findings are open (docs/known-issues.md) and there is no tag until they are closed."
     ],
     [
       "No outside check",

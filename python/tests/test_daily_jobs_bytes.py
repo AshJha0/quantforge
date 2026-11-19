@@ -209,10 +209,14 @@ def test_malformed_proofs_are_errors_and_pending_proofs_are_no_evidence() -> Non
     ):
         with pytest.raises(evidence.EvidenceError):
             evidence.attested_time(bad, data, hdr, support.EASY_TARGET)
-    # an operation the calendars do not use (0x02, SHA-1) is refused rather than guessed at
+    # an operation a Bitcoin path does not use (0x02, SHA-1) is passed through, not guessed at: what lies under
+    # it is no evidence; a tag that is not an operation at all is an error
     at = len(evidence.MAGIC) + 2 + 32
-    with pytest.raises(evidence.EvidenceError, match="not accepted"):
-        evidence.attestations(good[:at] + b"\x02" + good[at:], data)
+    through = good[:at] + b"\x02" + good[at:]
+    assert [a[0] for a in evidence.attestations(through, data)] == ["pending"]
+    assert evidence.attested_time(through, data, hdr, support.EASY_TARGET) is None
+    with pytest.raises(evidence.EvidenceError, match="not known"):
+        evidence.attestations(good[:at] + b"\x55" + good[at:], data)
 
 
 def test_proven_before_takes_the_earliest_covering_block_and_the_margin() -> None:
@@ -310,9 +314,27 @@ def test_the_paper_workflow_commits_only_the_ledger_and_follows_the_recorder() -
     # KA-C4: SOURCE checked before every push
     assert "--forward-log fwd/actions/log.jsonl --summary" in scripts
     assert "git -C fwd remote remove origin" in scripts
-    assert "  workflow_run:\n    workflows: [Recorder]\n    types: [completed]\n" in PAPER
+    # the trigger that follows the recorder is written down and withheld with the schedule (see the test below)
+    assert (
+        "  #   workflow_run:\n  #     workflows: [Recorder]\n  #     types: [completed]\n" in PAPER
+    )
     assert RECORDER.startswith("name: Recorder\n")
     assert "Source: US Department of the Treasury." in PAPER
+
+
+@pytest.mark.parametrize("wf", [PAPER, CURVE])
+def test_no_daily_job_is_scheduled_while_audit_findings_are_open(wf: str) -> None:
+    """Triggers withheld (2026-11-19, integration branch) until audit findings KA-C1, C2, C3, C9, C11, C12 are
+    closed: manual runs only. The findings are answered by proposed rulings; restoring the triggers is the
+    coordinator's change once the rulings are confirmed and the Linux bytes job is green."""
+    code = [ln.split("#")[0] for ln in wf.splitlines()]
+    assert not any("schedule:" in ln or "cron:" in ln or "workflow_run:" in ln for ln in code)
+    assert any(ln.strip() == "workflow_dispatch:" for ln in code)
+    assert (
+        "schedule withheld until the different-model audit findings KA-C1, C2, C3, C9, C11, C12 are closed"
+        in wf
+    )
+    assert "python-daily-jobs-bytes is green" in wf and "KR-200 to KR-214" in wf
 
 
 def test_the_curve_workflow_cites_both_sources_in_the_branch_readme() -> None:

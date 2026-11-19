@@ -6,7 +6,9 @@ Label on every row: "paper marks on a fitted curve; not tradable". Fills are sim
 
 ## What runs, and when
 
-`.github/workflows/paper-ledger.yml` starts when the recorder workflow finishes, and again from two cron slots (03:00 and 06:00 UTC, Tuesday to Saturday); it can also be started by hand with a `dry_run` box. It runs only in this repository and only for `main`. Each run:
+**Not scheduled (2026-11-19).** The workflow's triggers other than a manual start are withheld, as on the integration branch, until the different-model audit findings KA-C1, C2, C3, C9, C11 and C12 are closed (`docs/known-issues.md`). They are answered by rulings KR-200 to KR-214, which are proposed; the triggers stay comments in the workflow file until the stage K coordinator confirms those rulings and CI job `python-daily-jobs-bytes` is green on the release commit. The job can only be started by hand (`workflow_dispatch`). It has never run on a GitHub runner and 0 days are recorded. The same holds for the daily curve run (`.github/workflows/curve-daily.yml`, `specifications/12-platform/daily-curve-run.md`). What follows describes the job as it will run once the triggers are restored.
+
+`.github/workflows/paper-ledger.yml` is to start when the recorder workflow finishes, and again from two cron slots (03:00 and 06:00 UTC, Tuesday to Saturday); it can also be started by hand with a `dry_run` box. It runs only in this repository and only for `main`. Each run:
 
 1. checks out `main` (code), `forward-log` (read only) and `paper-ledger`;
 2. runs `tools/paper_daily/run_day.py`, which reads the Treasury par curve the recorder already wrote to `forward-log` and appends every row that is due to `ledger/ledger.jsonl`;

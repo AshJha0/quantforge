@@ -10,7 +10,7 @@ Row label: "fitted to public US Treasury par yields with a library Nelson-Siegel
 |---|---|---|
 | Spec, fixed before any scheduled run | `specifications/12-platform/daily-curve-run.md` | acceptance table C1 to C4 in the spec |
 | Rulings KR-90 to KR-107 (proposed) | `specifications/stage-k-rulings-curve.md` | need the coordinator's confirmation |
-| Job | `tools/curve_daily/curve_core.py`, `run_day.py`, `config.json` | `python/tests/test_curve_daily.py`, 23 tests, measured 2026-11-19 on the local laptop (Windows, Python 3.15), not on CI |
+| Job | `tools/curve_daily/curve_core.py`, `run_day.py`, `config.json` | `python/tests/test_curve_daily.py`, 23 tests when this was written (38 after the audit response), measured 2026-11-19 on the local laptop (Windows, Python 3.15), not on CI |
 | Verifier, anchor, rebuild | `tools/curve_daily/verify_chain.py` | same test file; one planted fault per check (spec table) |
 | Workflow | `.github/workflows/curve-daily.yml` | not triggered; `tools/check_job_names.py` 59 jobs, 0 problems |
 | Site stub | `tools/curve_daily/site_page.py`, placeholder data `tools/curve_daily/site/latest.json` | test renders the placeholder and a real summary |
@@ -21,6 +21,7 @@ Read 2026-11-19 through the web-fetch agent (URLs in the spec). Fed Board: publi
 
 ## What runs when
 
+- **Not scheduled (2026-11-19).** The workflow's `schedule:` trigger is withheld until the different-model audit findings KA-C1, C2, C3, C9, C11 and C12 are closed (`docs/known-issues.md`); it can only be started by hand (`workflow_dispatch`). It has never run on a GitHub runner and 0 days are recorded. Planned crons, now comments in the workflow file:
 - `curve-daily.yml` (as revised 2026-11-19 after audit C, see the last section; the first version's second slot was 14:15 UTC, which measured start delays put after the cut-off every day): 23:45 UTC Monday to Friday (Treasury posts usually by 6:00 PM ET) and 03:30 and 06:30 UTC Tuesday to Saturday (second and third chance, well before the 19:30 UTC on-time cut-off), plus `workflow_dispatch` with `dry_run`. Concurrency group `curve-daily`. It starts by itself once the file is on `main`. **Not triggered; branches `curve-daily` and `curve-daily-anchors` not created.**
 - Output: branch `curve-daily`, `ledger/curves.jsonl` and `ledger/summary.json`. Anchors: branch `curve-daily-anchors`, `anchors/`. Optional signing with `FORWARD_LOG_SIGNING_KEY`, as the recorder.
 - A row with a problem (gap, failed fetch or fit, stale input, holdout block) is pushed and then the run turns red (exit 2), so the owner is emailed.
@@ -100,7 +101,7 @@ Different-model audit C (`STAGE_K_R1_AUDIT_C.md`) found one Critical fault and s
 | KA-C9 (Critical) | the chain stopped for good once an unsettled date had a later row behind it | dates in strict order; a run stops at the first date it cannot settle; a date the source skips is closed at once as a `not_published` gap with the evidence; reproduced as a failing test first (commit bb9bce54), then 10,000 generated run sequences (KR-203) |
 | KA-C10 | an error page served as HTTP 200 settled the day as a failed fit | `fetch_failed` (`E_NOT_THE_FILE`), retried (KR-204) |
 | KA-C11 | the spec said rows hold no source row; `errors_bp` and the betas give the thirteen yields back | said plainly; one position for both jobs on the recorder's reading of the source; both sources cited in rows and in the branch README (KR-209). **The coordinator should confirm this position before the first run: the alternative is to drop `errors_bp` and keep only RMSE and the largest error, which would also remove the verifier's `DIAG` recomputation** |
-| KA-C12 | the 14:15 UTC "second chance" would start after the cut-off | slots at 23:45, 03:30 and 06:30 UTC (KR-206) |
+| KA-C12 | the 14:15 UTC "second chance" would start after the cut-off | slots to restore: 23:45, 03:30 and 06:30 UTC (KR-206); comments in the workflow file while the schedule is withheld (integration branch, commit 1d184366) |
 | KA-C14 | the rebuild compared full binary64 strings across platforms | numbers within 1e-6, text exactly; reports `exact` (KR-207) |
 | KA-C15 | the account of the weights change read as if prepared | the spec now says what the repository shows (two commit times, 14 lines) and that the two run times are the lane's own record |
 | KA-C16 | spec header said proposed; KR-111 row in the wrong table | fixed |
@@ -108,10 +109,10 @@ Different-model audit C (`STAGE_K_R1_AUDIT_C.md`) found one Critical fault and s
 
 Row format changes, made before any row exists: GAP rows carry `cause` (`late_window` or `not_published`) and, for `not_published`, the `input` that shows it; a `fetch_failed` row for bytes that are not the file carries their hash, size and an error code. `config.json` names spec version 0.2.0, so the genesis hash differs from any dry run made before.
 
-Tests (measured 2026-11-19, local laptop, not the acceptance machine): `python/tests/test_curve_daily.py` 37 tests; the shared `test_daily_jobs_bytes.py` and `test_daily_jobs_properties.py`.
+Tests (measured 2026-11-19, local laptop, not the acceptance machine): `python/tests/test_curve_daily.py` 38 tests; the shared `test_daily_jobs_bytes.py` and `test_daily_jobs_properties.py`.
 
 Not done, not verified:
-- No workflow was triggered and the ledger branch was not created, as instructed.
+- No workflow was triggered and the ledger branch was not created, as instructed. The job is not scheduled; restoring the schedule is the coordinator's step once the rulings are confirmed and the Linux bytes job is green.
 - No dry run against the live Treasury and Fed files was made with the revised tools by this lane. The fit code is unchanged; the schedule rule, the row fields and the verifier changed.
 - This job has no page under `docs/developer-guides/`; the spec and this handover are its guide.
 - There is no curve-side count that depends on the on-time label; `verify_chain.py verify --anchors A --bitcoin-headers H` reports which on-time labels a Bitcoin block proves.

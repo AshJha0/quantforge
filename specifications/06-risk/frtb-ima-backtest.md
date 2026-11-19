@@ -61,6 +61,8 @@ Order (HR-122): `E_SCHEMA`, `E_LIMIT` (observations above 1,000,000, checked fir
 
 ## Limits and scope
 
+- **Open audit findings (2026-11-19): KA-A16, KA-C18, KA-C20.** The binomial probabilities lose precision as `observations` grows: relative error about 1e-10 at 100,000 and 7e-10 at 1,000,000 against the 1e-12 claimed. The outside-check share of this item is under review (11 of 24 by the strict reading). Register: `docs/known-issues.md`.
+
 - Not covered: the PLA test (MAR32.20 to 32.44), the 10% eligibility criterion (MAR32.2), the NMRF exception waiver (MAR32.6), the qualitative add-on (MAR33.44) and capital (MAR33). The desk operation applies MAR32.19 to the counts given; the caller supplies the most recent 12 months (KR-47).
 - Literal reading for very small samples (KR-42): for n <= 5, P(X = 0) = 0.99^n >= 0.95, so zero exceptions is amber. The rule is applied as written.
 - Tables shared by the four builds: `specifications/06-risk/frtb-ima-backtest-tables.json`.

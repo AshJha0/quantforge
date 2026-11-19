@@ -580,7 +580,7 @@ def run(cfg: dict[str, Any], runner: Runner, ledger_text: str, now: dt.datetime,
                     table2 = treasury_rows(data2) if data2 is not None else {}
                 except NotTheFile:
                     table2 = {}
-                if data2 is not None and table2:
+                if data2 is not None and table2 and max(table2) > ds:
                     evidence = file_input(data2, url2, max(table2))
             if evidence is not None:
                 add("GAP", {"date": ds, "cause": "not_published", "input": evidence, "run": run_info,
@@ -591,7 +591,7 @@ def run(cfg: dict[str, Any], runner: Runner, ledger_text: str, now: dt.datetime,
             notes.append(f"{ds}: stale_input (latest in file {latest or 'none'}); stopping here, a later run tries again")
             break
         inp["row_date"] = ds
-        inp["row_sha256"] = sha256(input_line(table[ds], cfg).encode("ascii"))
+        inp["row_sha256"] = sha256(input_line(table[ds], cfg).encode("utf-8"))  # ASCII in practice; never a crash
         try:
             fit = fit_day(d, table[ds], cfg, runner)
         except FitFailed as e:

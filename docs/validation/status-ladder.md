@@ -13,7 +13,7 @@ Every capability moves through `Proposed → Specified → Implemented → Valid
 | Implemented | all four languages pass the goldens (`docs/model-inventory.md`, "Status words") | stages A to J, R6 and H, released; stage K round 1 items on the integration branch `k-r1`, not released |
 | Validated | tested on real data against an independent benchmark, with a written report (`docs/model-inventory.md`) | **nothing**; every golden input to date is synthetic, except the stage J shock-library Treasury yields and the stage H crypto book |
 | Benchmarked | timed against targets fixed before the run, on the stated acceptance machine | nothing; H-9 has laptop timings only, labelled "local laptop, not the acceptance machine", and its workload R result of 2026-11-19 is a recorded MISS |
-| Operationally tested | run on a schedule, unattended, with its own evidence trail | nothing; the stage K paper ledger is built (merged on `k-r1`), is not yet running, and has 0 of the 20 recorded days its gate needs |
+| Operationally tested | run on a schedule, unattended, with its own evidence trail | nothing; the stage K paper ledger is built, is not scheduled (schedule withheld while audit findings are open, `docs/known-issues.md`), and has 0 of the 20 recorded days its gate needs |
 
 "Outside-checked" is not a rung. It is evidence attached to Implemented: some goldens are re-derived outside the author's own code (`docs/model-inventory.md`). There is no second review, human or otherwise (owner decision 2026-11-18), so every rung above Specified rests on self-assessment plus the outside checks below.
 
@@ -82,6 +82,8 @@ Stage K per plan item (plan section 15: at least 60.0% of each item's value case
 | K-8 guard | `rich_k` | 6 | 6 | 100.0% | met |
 | K-8d | `saccr_k` | 16 | 12 | 75.0% | met |
 | K-8e | `btk_k` | 24 | 23 | 95.8% | met |
+
+**Stage K shares above are under review, not settled (audit finding KA-C18, open; `docs/known-issues.md`).** They count cases checked against a figure printed in the regulator text, on part of their outputs and at print precision. By the strict reading of the rule (every compared output checked) the stage is 50 of 87 (57.5%), under the floor; items under the floor by that reading: F (existing traffic_light) 0 of 11 (0.0%); K-8d 7 of 16 (43.8%); K-8e 11 of 24 (45.8%).
 <!-- generated:status-ladder:end -->
 
 ## Stage K, round 1: what the generated table does not cover

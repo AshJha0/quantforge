@@ -1,19 +1,33 @@
 #!/usr/bin/env python3
 """Build H-9 workload R2 (low-latency-book.md item 2a, ruling HR-130) and the form B input of the same window (item 2b).
 
-  python -I build_r2.py DATA_DIR SYMBOL START END OUT_PREFIX [--tolerant]
-  python -I build_r2.py window DATA_DIR [--after ISO] [--min-hours H --max-hours H] [--tolerant]
-  python -I build_r2.py auto DATA_DIR OUT_DIR [--after ISO] [--min-hours H --max-hours H] [--tolerant]
+  python -I build_r2.py window DATA_DIR
+  python -I build_r2.py auto DATA_DIR OUT_DIR
+  python -I build_r2.py DATA_DIR SYMBOL START END OUT_PREFIX
+  sample only: add --sample-only, then any of --after ISO, --until ISO, --min-hours H, --max-hours H, --tolerant
 
 DATA_DIR is qf-crypto-data/kraken (read only). START/END are ISO UTC instants; raw messages, trades and per-second rows
-with START <= t < END are used. `window` applies the window rule of item 2a and prints START and END; `auto` does that
-and then builds both symbols into OUT_DIR. --after defaults to 2026-11-19T11:41:24Z (raw recording switched on);
-Window length by rule (window_hours): 6 to 8 hours (item 2a); for a session whose first raw snapshot is after
-2026-11-19 15:00 UTC exactly 6 hours (ruling HR-133). --min-hours/--max-hours override the rule for every session
-and are given only to exercise the code on a short sample.
---until ISO stops the scan at that hour (files of later hours are not opened).
---tolerant reads damaged gzip files with tools/recorder/read_gz.py and skips undecodable lines: development on the
-2026-11-17 sample only; such a build is marked "tolerant" and is never a workload input.
+with START <= t < END are used.
+
+Window rule (ruling HR-134, owner decision 2026-11-19, amending item 2a and HR-133): the R2 window is the FIRST
+recorder session, on any day from 2026-11-19 11:41:24 UTC on, that runs 6 hours from its first raw snapshot with no
+gap row or restart in either symbol's raw or per-second files (HR-132: a raw snapshot that does not follow a gap row
+ends the session too), taken as exactly those 6 hours. Sessions are examined in time order and the first that
+qualifies is used whatever its content; a session may cross midnight; a session cut by a shutdown before hour 6 does
+not qualify. `window` prints every session it examined (start, end, length, why it was rejected) and the window or
+"none yet"; `auto` does that and then builds both symbols into OUT_DIR. The explicit START END form is refused unless
+START and END are exactly the window `window` finds.
+
+--sample-only is the one switch that lets the rule be bypassed, for development on a short sample: --after (default
+2026-11-19T11:41:24Z), --until (stop the scan at that hour), --min-hours/--max-hours (session length needed and window
+length, both 6 by rule), --tolerant (read damaged gzip files with tools/recorder/read_gz.py, skipping undecodable
+lines), and an explicit START END that is not the window. Every such build is marked "sample_only": true (and
+"tolerant" when given) in its meta file, and run_r2.sh refuses it outside SMOKE=1: it is never a workload input.
+
+If the newest hour file of a stream has no gzip end marker (the recorder still has it open), it is not counted as a
+gap; a window that reaches into such a file is reported as complete, and `auto` refuses to build until the recorder
+has been stopped cleanly (its STOP file closes every file). benchmarks/h9/r2_status.py is the read-only check to run
+while recording.
 
 Outputs per symbol (OUT_PREFIX = OUT_DIR/R2_<SYMBOL> under `auto`):
   OUT_PREFIX.bin          QFH9S001 (the harness format): the venue's raw snapshot and update messages in file order,
@@ -24,8 +38,8 @@ Outputs per symbol (OUT_PREFIX = OUT_DIR/R2_<SYMBOL> under `auto`):
                           messages after which it may be compared: from "lo", the last book message with t < row t,
                           to "hi", the last with t <= row t (micro.book.rebuild's rule). Receive times are in
                           milliseconds and one websocket frame can carry many messages, so the order inside the
-                          row's millisecond is unknown; a row passes if the book equals it after one message in
-                          [lo, hi]. Both ends are reported (check_r2.py).
+                          row's millisecond is unknown; a row passes if the book equals it after at least one
+                          message in [lo, hi] (HR-132 as clarified by HR-135). Both ends are reported (check_r2.py).
   OUT_PREFIX.msgs.jsonl   the book messages as order-book.md messages (t, type, bids, asks, checksum; "i" = bin index)
   OUT_PREFIX.rows.jsonl   the checkpoint rows (t, bids, asks), plain decimal strings, for check_r2.py
   OUT_PREFIX.meta.json    window, counts, warm-up (first hour), decimals, SHA-256 of every input and output
@@ -44,6 +58,7 @@ import hashlib
 import json
 import struct
 import sys
+import zlib
 from array import array
 from collections import deque
 from datetime import datetime, timedelta, timezone
@@ -144,10 +159,12 @@ def level_pairs(raw):
 def scan(data_dir, after, tolerant=False, until=None):
     """One full read of every hourly file at or after `after`'s hour, both symbols, raw and per-second.
 
-    Returns gap times (every stream; a file that fails the full read counts as a gap at its hour), raw snapshot
-    times per symbol, and the last row time of each stream."""
+    Returns gap times (every stream; a file that fails the full read counts as a gap at its hour, except the newest
+    file of a stream when it only lacks its gzip end marker: that one is still open, or was cut by a kill not yet
+    followed by a restart, and is listed in `open_files`), raw snapshot times per symbol, the last row time of each
+    stream, the count of skipped lines and the open files."""
     rd = Reader(tolerant)
-    gaps, snaps, last = [], {s: [] for s in SYMBOLS}, {}
+    gaps, snaps, last, open_files = [], {s: [] for s in SYMBOLS}, {}, []
     hour0 = after.replace(minute=0, second=0, microsecond=0)
     for s in SYMBOLS:
         for sub in (s + "-raw", s):
@@ -157,8 +174,18 @@ def scan(data_dir, after, tolerant=False, until=None):
             if stems:
                 top = datetime.strptime(max(stems), "%Y%m%dT%H").replace(tzinfo=timezone.utc)
                 files = hour_files(folder, hour0, min(top + timedelta(hours=1), until or top + timedelta(hours=1)))
+            present = {f.name[:11] for f in files}
+            if files:  # HR-135 (audit KA-B17): a missing hour file between two present ones is a gap at that hour
+                h = datetime.strptime(files[0].name[:11], "%Y%m%dT%H").replace(tzinfo=timezone.utc)
+                last_h = datetime.strptime(files[-1].name[:11], "%Y%m%dT%H").replace(tzinfo=timezone.utc)
+                while h < last_h:
+                    h += timedelta(hours=1)
+                    if h.strftime("%Y%m%dT%H") not in present:
+                        gaps.append((h, sub, f"missing hour file {h.strftime('%Y%m%dT%H')}.jsonl.gz"))
             prev = None  # previous row of this stream: (t, k)
+            newest_of_folder = max(folder.glob("*.jsonl.gz"), key=_order, default=None)
             for f in files:
+                newest = f == newest_of_folder
                 try:
                     for d in rd.rows(f):
                         t = ts(d["t"])
@@ -173,60 +200,93 @@ def scan(data_dir, after, tolerant=False, until=None):
                                 gaps.append((prev[0] + timedelta(microseconds=1), sub,
                                              "snapshot without a gap row (recorder restart)"))
                         prev = (t, d["k"])
-                except (OSError, EOFError, ValueError) as e:
+                except (OSError, EOFError, ValueError, zlib.error) as e:
                     h = datetime.strptime(f.name[:11], "%Y%m%dT%H").replace(tzinfo=timezone.utc)
-                    gaps.append((h, sub, f"failed full gzip read: {type(e).__name__}"))
+                    if newest and isinstance(e, EOFError):
+                        open_files.append((h, sub, f.name))
+                    else:
+                        gaps.append((h, sub, f"failed full gzip read of {f.name}: {type(e).__name__}"))
     gaps.sort()
-    return gaps, snaps, last, rd.skipped
+    return gaps, snaps, last, rd.skipped, open_files
 
 
-HR133_AFTER = datetime(2026, 11, 19, 15, 0, tzinfo=timezone.utc)
+def _order(f):
+    rest = f.name[11 : -len(".jsonl.gz")]
+    return (f.name[:11], int(rest[1:]) if rest.startswith("-") and rest[1:].isdigit() else 0)
 
 
-def window_hours(start):
-    """(min, max) window length in hours for a session starting at `start`: item 2a, amended by HR-133."""
-    return (6.0, 6.0) if start > HR133_AFTER else (6.0, 8.0)
+WINDOW_HOURS = 6.0  # HR-134: exactly 6 hours from the session's first raw snapshot
+
+
+def _hms(d):
+    s = int(d.total_seconds())
+    return f"{s // 3600}:{s // 60 % 60:02d}:{s % 60:02d}"
 
 
 def choose_window(data_dir, after, min_hours=None, max_hours=None, tolerant=False, until=None):
-    """Item 2a: the first session (between gap rows of any stream) whose first raw snapshot, on or after `after`,
-    then runs min_hours with no gap row in either symbol's raw or per-second files. END = START + max_hours, or the
-    first gap row if that comes between min_hours and max_hours, or just after the last recorded row if the
-    recording ends there. Returns (start, end, log)."""
-    gaps, snaps, last, skipped = scan(data_dir, after, tolerant, until)
-    log = {"gaps": [[iso(t), sub, why] for t, sub, why in gaps], "streams_last_t": {k: iso(v) for k, v in last.items()},
-           "skipped_lines": skipped, "attempts": []}
+    """HR-134: sessions in time order; the first whose first raw snapshot, on or after `after`, then runs min_hours
+    (6) with no gap row or restart in either symbol's raw or per-second files is the window, START = that snapshot,
+    END = START + max_hours (6). min_hours/max_hours other than 6 are for samples only (main() needs --sample-only).
+    Returns (start, end, log); log["sessions"] lists every session examined with start, end, length and why it was
+    rejected; log["result"] is "window chosen" or starts with "none yet"."""
+    gaps, snaps, last, skipped, open_files = scan(data_dir, after, tolerant, until)
+    lo_h = WINDOW_HOURS if min_hours is None else min_hours
+    hi_h = WINDOW_HOURS if max_hours is None else max_hours
+    log = {"rule": f"HR-134: first session from --after that runs {lo_h:g} h with no gap row or restart; "
+                   f"window exactly {hi_h:g} h",
+           "gaps": [[iso(t), sub, why] for t, sub, why in gaps], "streams_last_t": {k: iso(v) for k, v in last.items()},
+           "open_files": [[iso(h), sub, name] for h, sub, name in open_files],
+           "skipped_lines": skipped, "sessions": []}
     if len(last) < 2 * len(SYMBOLS):
-        log["result"] = "a stream has no rows at or after --after"
+        log["result"] = "none yet: a stream has no rows at or after --after"
         return None, None, log
     data_end = min(last.values()) + timedelta(milliseconds=1)
     starts = sorted(t for s in SYMBOLS for t in snaps[s] if t >= after)
+    min_d, max_d = timedelta(hours=lo_h), timedelta(hours=hi_h)
     tried = set()
     for s0 in starts:
         prev_gap = max((g for g, _, _ in gaps if g <= s0), default=None)
         if prev_gap in tried:
             continue  # only the first snapshot of each session is a candidate
         tried.add(prev_gap)
-        lo_h, hi_h = window_hours(s0)
-        lo_h, hi_h = (lo_h if min_hours is None else min_hours), (hi_h if max_hours is None else max_hours)
-        min_d, max_d = timedelta(hours=lo_h), timedelta(hours=hi_h)
-        nxt = min((g for g, _, _ in gaps if g > s0), default=None)
-        limit = min(nxt, data_end) if nxt is not None else data_end
+        nxt = min((g for g in gaps if g[0] > s0), default=None)
+        limit = min(nxt[0], data_end) if nxt is not None else data_end
+        sess = {"start": iso(s0), "end": iso(limit), "length": _hms(limit - s0)}
+        log["sessions"].append(sess)
         if limit - s0 < min_d:
-            why = "gap row before hour %.4g" % lo_h if nxt is not None and nxt <= data_end else "recording ends first"
-            log["attempts"].append({"start": iso(s0), "rejected": why, "limit": iso(limit)})
+            if nxt is not None and nxt[0] <= data_end:
+                what = "restart" if "recorder restart" in nxt[2] else "gap row"
+                sess["rejected"] = f"{what} before hour {lo_h:g} at {iso(nxt[0])} in {nxt[1]}: {nxt[2]}"
+            else:
+                sess["rejected"] = f"recording ends before hour {lo_h:g}: the last session, may still qualify"
             continue
-        end = min(s0 + max_d, limit)
-        log["attempts"].append({"start": iso(s0), "end": iso(end), "hours": round((end - s0).total_seconds() / 3600, 4),
-                                "rule_hours": [lo_h, hi_h]})
+        end = min(s0 + max_d, limit)  # = s0 + 6 h under the rule (limit >= s0 + min_hours = s0 + 6 h)
+        sess["window"] = [iso(s0), iso(end)]
+        touching = [name for h, _, name in open_files if h < end]
+        if touching:
+            sess["open_files_in_window"] = touching
         log["result"] = "window chosen"
         return s0, end, log
-    log["result"] = "no session qualifies"
+    log["result"] = "none yet: no session qualifies"
     return None, None, log
 
 
+def print_sessions(log, show=print):
+    """One line per session examined: start, end, length, and why it was rejected or the window it gives."""
+    for k, s in enumerate(log["sessions"], 1):
+        if "window" in s:
+            tail = f"QUALIFIES (the first; HR-134): window {s['window'][0]} to {s['window'][1]}"
+        elif s["rejected"].startswith("recording ends"):
+            tail = "not complete: " + s["rejected"]
+        else:
+            tail = "rejected: " + s["rejected"]
+        show(f"session {k}: start {s['start']} end {s['end']} length {s['length']}: {tail}")
+    for h, sub, name in log["open_files"]:
+        show(f"open file (no gzip end marker; newest of its stream): {sub}/{name} (hour {h})")
+
+
 # ---------------------------------------------------------------- R2 builder
-def build(data_dir, symbol, start, end, prefix, tolerant=False):
+def build(data_dir, symbol, start, end, prefix, tolerant=False, sample_only=False):
     start, end = (ts(start) if isinstance(start, str) else start), (ts(end) if isinstance(end, str) else end)
     pd = PRICE_DECIMALS[symbol]
     rd = Reader(tolerant)
@@ -417,7 +477,7 @@ def build(data_dir, symbol, start, end, prefix, tolerant=False):
         "workload": "R2", "symbol": symbol, "window_start": iso(start), "window_end": iso(end),
         "first_raw_message": iso(first_t), "price_decimals": pd, "qty_decimals": QTY_DECIMALS, "depth": 100,
         "messages": nmsg, "levels": len(levels) // 2, "checkpoints": len(cps), "warmup_messages": warm if warm is not None else nmsg,
-        **counts, "tolerant": tolerant, "skipped_lines": rd.skipped, "inputs_sha256": inputs, "outputs_sha256": outputs,
+        **counts, "tolerant": tolerant, "sample_only": bool(sample_only or tolerant), "skipped_lines": rd.skipped, "inputs_sha256": inputs, "outputs_sha256": outputs,
         "form_b_prefix": Path(b_prefix).name, "form_b": l7,
     }
     Path(prefix + ".meta.json").write_text(json.dumps(meta, indent=1) + "\n", encoding="utf-8")
@@ -428,6 +488,8 @@ def build(data_dir, symbol, start, end, prefix, tolerant=False):
         print(f"input {k} sha256 {v}")
     for k, v in outputs.items():
         print(f"output {k} sha256 {v}")
+    if sample_only or tolerant:
+        print("WARNING: sample-only build (HR-134 rule bypassed); never a workload input")
     if tolerant:
         print("WARNING: tolerant build (damaged input read past); development only, never a workload input")
     return meta
@@ -468,8 +530,8 @@ def _opts(argv, names):
         if argv[k] in names:
             out[argv[k]] = argv[k + 1]
             k += 2
-        elif argv[k] == "--tolerant":
-            out["--tolerant"] = True
+        elif argv[k] in ("--tolerant", "--sample-only"):
+            out[argv[k]] = True
             k += 1
         else:
             rest.append(argv[k])
@@ -477,32 +539,67 @@ def _opts(argv, names):
     return out, rest
 
 
+SAMPLE_OPTS = ("--after", "--until", "--min-hours", "--max-hours", "--tolerant")
+
+
+def explicit_window_allowed(data_dir, start, end):
+    """(ok, message): an explicit START END is allowed only if it is exactly the HR-134 window."""
+    w0, w1, log = choose_window(data_dir, ts(AFTER_DEFAULT))
+    if w0 is None:
+        return False, f"no session qualifies yet ({log['result']}); an explicit window needs --sample-only"
+    if (start, end) != (w0, w1):
+        return False, (f"{iso(start)} to {iso(end)} is not the first qualifying session's window "
+                       f"({iso(w0)} to {iso(w1)}, HR-134); give --sample-only for a development build")
+    return True, "the explicit window is the HR-134 window"
+
+
 def main(argv):
     o, rest = _opts(argv, ("--after", "--min-hours", "--max-hours", "--until"))
+    sample = bool(o.get("--sample-only"))
+    used = [k for k in SAMPLE_OPTS if k in o]
+    if used and not sample:
+        print(f"REFUSED: {', '.join(used)} bypass the HR-134 window rule; give --sample-only (never a workload input)")
+        return 4
     until = ts(o["--until"]) if "--until" in o else None
     tolerant = bool(o.get("--tolerant"))
     after = ts(o.get("--after", AFTER_DEFAULT))
     lo = float(o["--min-hours"]) if "--min-hours" in o else None
     hi = float(o["--max-hours"]) if "--max-hours" in o else None
     if rest and rest[0] in ("window", "auto"):
+        if len(rest) != (2 if rest[0] == "window" else 3):
+            print(__doc__)
+            return 2
         start, end, log = choose_window(rest[1], after, lo, hi, tolerant, until)
-        print(json.dumps(log, indent=1))
+        print(f"rule: {log['rule']}; sessions from {iso(after)}")
+        print_sessions(log)
+        if sample:
+            print("WARNING: --sample-only: not the HR-134 rule as fixed; never a workload input")
         if start is None:
-            print(f"NO WINDOW: {log['result']}")
+            print(f"window: {log['result']}")
             return 3
         print(f"START {iso(start)} END {iso(end)}")
+        sess = log["sessions"][-1]
+        if sess.get("open_files_in_window"):
+            print(f"window complete at {end.strftime('%H:%M:%S')}; stop the recorder cleanly before building "
+                  f"(open: {', '.join(sess['open_files_in_window'])})")
+            return 0 if rest[0] == "window" else 5
         if rest[0] == "window":
             return 0
         out = Path(rest[2])
         out.mkdir(parents=True, exist_ok=True)
-        (out / "R2_window.json").write_text(json.dumps({"start": iso(start), "end": iso(end), "after": iso(after),
-                                                        "min_hours": lo, "max_hours": hi, **log}, indent=1) + "\n")
+        # Every option is stamped here (HR-135, audit KA-B6); this file's hash goes into R2_replay.sha256, and
+        # run_r2.sh refuses outside SMOKE=1 any input whose options are not the rule's (r2_meta.py inputs).
+        options = {"after": iso(after), "until": iso(until) if until else None, "min_hours": lo, "max_hours": hi,
+                   "tolerant": tolerant, "sample_only": sample, "argv": list(argv)}
+        (out / "R2_window.json").write_text(json.dumps({"start": iso(start), "end": iso(end), "options": options,
+                                                        **log}, indent=1) + "\n")
         ins, outs = [], []
         for s in SYMBOLS:
-            m = build(rest[1], s, start, end, str(out / f"R2_{s}"), tolerant)
+            m = build(rest[1], s, start, end, str(out / f"R2_{s}"), tolerant, sample)
             ins += [f"{v}  {k}\n" for k, v in m["inputs_sha256"].items()]
             outs += [f"{v}  {k}\n" for k, v in m["outputs_sha256"].items()]
             outs.append(f"{sha(out / f'R2_{s}.meta.json')}  R2_{s}.meta.json\n")
+        outs.append(f"{sha(out / 'R2_window.json')}  R2_window.json\n")
         (out / "R2_inputs.sha256").write_bytes("".join(ins).encode())
         (out / "R2_replay.sha256").write_bytes("".join(outs).encode())
         print(f"wrote {out / 'R2_inputs.sha256'} and {out / 'R2_replay.sha256'}")
@@ -510,7 +607,12 @@ def main(argv):
     if len(rest) != 5:
         print(__doc__)
         return 2
-    build(*rest, tolerant=tolerant)
+    if not sample:
+        ok, msg = explicit_window_allowed(rest[0], ts(rest[2]), ts(rest[3]))
+        if not ok:
+            print("REFUSED: " + msg)
+            return 4
+    build(*rest, tolerant=tolerant, sample_only=sample)
     return 0
 
 

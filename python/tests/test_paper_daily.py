@@ -938,3 +938,30 @@ def test_a_run_with_nothing_due_writes_nothing_and_anchors_nothing(
         summary["declared_on_time_days"] == 30 and summary["head"] == rows_of(ledger30)[-1]["hash"]
     )
     assert "anchors" not in summary and "recorded_trading_days" not in summary
+
+
+def test_odd_recorder_values_leave_the_date_incomplete_instead_of_stopping_the_job(
+    days30: list[dt.date],
+) -> None:
+    """The recorder log is outside this job's control. A value that is not a finite number, or a key that is not
+    `date|field`, is ignored: the date has no complete curve, so it becomes a gap after its cut-off. Before
+    this was guarded, such a row raised on every run (KR-210: no state stops the ledger)."""
+    days = days30[:3]
+    log = forward_log(synthetic_yields(days))
+    obs = log[1]["record"]["value"]["payload"]["observations"]
+    date = days[1].isoformat()
+    obs[f"{date}|5 Yr"] = None
+    obs[f"{date}|10 Yr"] = float("nan")
+    obs["not a key"] = 4.2
+    obs[f"{date}|2 Yr"] = True
+    state = core.par_state(log, CFG["source_series"], FIELDS)
+    assert sorted(state) == [days[0].isoformat(), days[2].isoformat()]
+    text = run_days(days[:2], log)
+    kinds = [(r["kind"], r["body"]["date"], r["body"].get("cause")) for r in rows_of(text)[1:]]
+    assert kinds == [("DAY", days[0].isoformat(), None)]  # day 2 is waited for until its cut-off...
+    out, new, _ = core.run(CFG, runner, text, log, evening(days[2]), "c", "python", NO_WINDOWS)
+    assert [(r["kind"], r["body"].get("cause")) for r in new] == [
+        ("GAP", "no_curve"),
+        ("DAY", None),
+    ]
+    assert check(out)["ok"]
