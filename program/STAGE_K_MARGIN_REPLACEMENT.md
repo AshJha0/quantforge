@@ -56,3 +56,14 @@ Before: `xva.simm.ir_delta` had 4 value cases, 0 outside-checked (`oracle/OUTSID
 - A full rerun of `gen_stage_f_e1.py G` on this tree also adds E1 cases for `xva.exposure.portfolio_hw` and `output_classes` to `e1g_rates.json` (drift from earlier waves, not from this change), and a full rerun of `cpp26/tests/gen_cli_cases.py` adds the stage K cases. Both were left alone; only the margin lines were taken.
 - The other MG-8 lineage hashes (`collexp_g`, `xvaadj_g`, `wwr_g`) are file hashes from v0.7.0 and no longer match the files; no gate checks them.
 - Every C++ row of the name map says `qf::<domain>`; the C++ code uses namespace `quantforge`. This is the F-5 naming shorthand across all rows, not specific to this operation.
+
+## Verification (2026-11-19, local laptop, not the acceptance machine; observed)
+
+| Check | Result |
+|---|---|
+| Python chain (Windows): ruff, format, mypy, pytest with coverage, per-file coverage gate, conformance, tutorials | all rc 0; conformance 16,129 of 16,129 |
+| Java chain (Windows): `mvn -Pcoverage verify` (1,000 tests, 0 failures), coverage gate, package, table check, conformance, tutorials | all rc 0; conformance 16,129 of 16,129 |
+| Rust chain (WSL): fmt, clippy `-D warnings`, tests, release, conformance, tutorials, llvm-cov gate | all rc 0; conformance 16,129 of 16,129 |
+| C++ chain (WSL): Release with `-Werror`, clang `-Wshadow`, ctest, conformance, tutorials, ASan/UBSan ctest and conformance, coverage gate | first run: `test_cli.cpp` hard-coded 368 operations (fixed to 369, `c4e87010`); ASan ctest of the second run used a stale object (source mtime older than the object), rebuilt and rerun: 670 of 670 test cases, 894 s; all other steps rc 0; conformance 16,129 of 16,129 plain and under ASan |
+| Repo gates, `governance_gate.py`, `outside_shares.py --check`, `test_tools.py`, `check_md_anchors.py`, site build (670 pages, 0 broken links), `research/test_preregs.py`, `test_sbim_placeholder.py` | pass; `check_e1_coverage.py` red only on `risk.frtb.backtest.zone`, as on `k-r1` (another lane) |
+| Banned words (`interview`, LSEG), em dashes in the diff | none |
