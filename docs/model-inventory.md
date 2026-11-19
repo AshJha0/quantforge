@@ -1259,3 +1259,15 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Data lineage hash:** sha256 7529524f6558dbdf27d65327bbe53396e1efaffdfa33159b6ce314afbbf7e153 (`idr_k`, 7 cases) (2026-11-19).
 - **Retirement trigger:** a superseding stage K ruling.
 - **Validation report:** `specifications/06-risk/intraday-risk-bounds.md`.
+
+### MK-5 Second-order Bermudan scheme and its ladder (stage K, K-8)
+- **Purpose:** `CN_RANNACHER_SMOOTHED`, an optional `method` on `rates.shortrate.bermudan_swaption` and `rates.shortrate.bermudan_ladder`: Crank-Nicolson with four implicit half steps after each exercise date, the curve term integrated exactly, and the exercise `max` smoothed to second order (KR-8 as revised by KR-18), so that the ladder at the default grid 201/100 is within 1% of the converged model derivative.
+- **Inputs:** as in the spec page; `method` absent or `G18_IMPLICIT` keeps the G-18 scheme bit for bit.
+- **Limitations:** spec 0.2.0 PROPOSED (`specifications/06-risk/bermudan-ladder-k8.md`); not the default method, and the R6 use restriction of MG-6 still applies until the coordinator lifts it after acceptance in all four builds; the ladder row of a curve node the price does not depend on (0.4986 years in the judged cases) is exactly 0 and is not judged by any acceptance test (owner decision 2026-11-19); the end correction of the smoothing is derived in `program/K8_DIAGNOSIS.md`, not taken from a paper.
+- **Validation:** acceptance 1 to 3 pass in Python, acceptance 3 in Java, C++ and Rust (`oracle/K8_ACCEPTANCE_W2.json`, `oracle/K8_ACCEPTANCE_PORTS.json`): worst judged entry at 201/100 0.40% from QuantLib, observed orders 1.84 to 2.15 on 24 entries; goldens `k8_k` in all four builds; ladder against its own Richardson bumps to 1e-8 in each language's unit tests. **Review:** 2026-11-19.
+- **Tier:** 1.
+- **Challenger:** QuantLib 1.44 `FdHullWhiteSwaptionEngine` central bump at tGrid 8,000, xGrid 3,201 (KR-19, `oracle/K8_REFERENCE_QL.json`), counted outside only on the judged ladder entries of k8_k-0001..0003; the goldens themselves are the Python build's output, not an independent oracle.
+- **Monitoring thresholds:** any judged ladder entry at 201/100 more than 1% from the reference; any observed order outside 1.5 to 2.5 or a `NON_MONOTONE` status on 201/401/801; AAD against bump beyond 1e-8 relative.
+- **Data lineage hash:** sha256 HASH_K8K (`k8_k`, 14 cases) (2026-11-19).
+- **Retirement trigger:** a superseding stage K ruling, or the method failing acceptance in any build.
+- **Validation report:** `specifications/06-risk/bermudan-ladder-k8.md`.

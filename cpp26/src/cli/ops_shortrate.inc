@@ -3,6 +3,7 @@
 // Included by dispatch.cpp inside its unnamed namespace; not a translation unit of its own.
 
 namespace sr = quantforge::shortrate;
+namespace bk8 = quantforge::bermudan_k8;
 namespace mcg = quantforge::mcgreeks;
 
 // An enum whose unknown value is E_INPUT (spec errors list), not E_SCHEMA.
@@ -208,7 +209,30 @@ void sr_grid_work(const sr::Grid& g, const Vec& knots) {
 
 bool sr_contains(const Vec& v, double x) { return std::find(v.begin(), v.end(), x) != v.end(); }
 
+// Optional `method` (KR-8, KR-18; stage K PROPOSED): absent or G18_IMPLICIT is the pinned G-18 scheme (the default
+// stays G-18 until the coordinator lifts the R6 use restriction); CN_RANNACHER_SMOOTHED is the K-8 scheme
+// (core/bermudan_k8.cpp); any other value is E_SCHEMA, before every other check.
+bool sr_k8_method(const In& in) {
+    if (!in.find("method")) return false;
+    const string& m = in.text("method");
+    if (m == bk8::method) return true;
+    if (m != "G18_IMPLICIT") schema("method", "not a listed value");
+    return false;
+}
+
+// G-31: the grid size limits are checked after E_SCHEMA and before F-2 and every domain check, as the Python and
+// Java builds read them (golden k8_k-0014 and the G-18 cases in e2_k: sigma = 0 with nx above 10,001 is E_LIMIT).
+void sr_grid_limits(const In& in) {
+    const Value* gv = in.find("grid");
+    if (!gv || gv->kind != Kind::Object) return;  // sr_grid raises the schema error later
+    const In g(*gv);
+    if (g.find("nx")) limit_if(g.integer("nx") > 10001, "nx");
+    if (g.find("steps_per_year")) limit_if(g.integer("steps_per_year") > 100000, "steps_per_year");
+}
+
 void op_sr_bermudan(const In& in, Out& out) {
+    const bool k8 = sr_k8_method(in);
+    sr_grid_limits(in);
     const sr::Params p = sr_hw(in);
     const double T0 = in.real("start_years");
     if (!(T0 > 0)) throw Error("E_DOMAIN", "start_years is not positive", "start_years");
@@ -227,10 +251,18 @@ void op_sr_bermudan(const In& in, Out& out) {
     const sr::Grid g = sr_grid(in);
     sr_grid_work(g, ex);
     in.ready();
+    if (k8) {
+        const In c(in.need("curve"));
+        out.key_real("price", bk8::price(c.reals("times"), c.reals("discount_factors"), p.a, p.sigma, pay, K, payer,
+                                         notional, ex, g.nx, g.steps_per_year, g.width));
+        return;
+    }
     out.key_real("price", notional * sr::bermudan_swaption(p, pay, K, payer, ex, g));
 }
 
 void op_sr_bermudan_ladder(const In& in, Out& out) {
+    const bool k8 = sr_k8_method(in);
+    sr_grid_limits(in);
     const sr::Params p = sr_hw(in);
     const Vec P = In(in.need("curve")).reals("discount_factors");
     const double T0 = in.real("start_years");
@@ -250,6 +282,15 @@ void op_sr_bermudan_ladder(const In& in, Out& out) {
     const sr::Grid g = sr_grid(in);
     sr_grid_work(g, ex);
     in.ready();
+    if (k8) {
+        const bk8::Ladder l = bk8::ladder(In(in.need("curve")).reals("times"), P, p.a, p.sigma, pay, K, payer, notional,
+                                          ex, g.nx, g.steps_per_year, g.width);
+        out.key_real("price", l.price);
+        out.key_reals("d_price_d_discount_factors", l.d_discount_factors);
+        out.key_real("d_price_d_mean_reversion", l.d_mean_reversion);
+        out.key_real("d_price_d_sigma", l.d_sigma);
+        return;
+    }
     sr::Ladder l = sr::bermudan_ladder(p, P, pay, K, payer, ex, g);
     for (double& v : l.d_discount_factors) v *= notional;
     out.key_real("price", notional * l.price);
