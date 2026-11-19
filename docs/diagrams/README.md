@@ -673,7 +673,7 @@ Plain idea: a latency figure is a claim about one machine, one workload and one 
 
 ## Stage K: risk platform and capital (in progress)
 
-Stage K round 1 is on lane branches that are not merged; nothing here is released. Each diagram names the spec and branch it was drawn from (read 2026-11-19 with `git show`). All four render in the locally built site with every node drawn and no parse error (checked in the built-in browser, 2026-11-19); render them again after the merge (`program/STAGE_K_DOCS_PENDING.md`).
+Stage K round 1 is merged on the integration branch `k-r1` (2026-11-19); nothing here is released. Each diagram names the spec it was drawn from (read 2026-11-19). All four rendered in the locally built site of the docs lane with every node drawn and no parse error (checked in the built-in browser, 2026-11-19); the site is rebuilt on `k-r1` (`program/STAGE_K_DOCS_PENDING.md`).
 
 ### SA-CCR: from trades to EAD
 
@@ -697,7 +697,7 @@ flowchart TB
   RC & PFE --> EAD["EAD = 1.4 x (RC + PFE)<br/>margined: capped at unmargined"]
 ```
 
-The order follows `specifications/06-risk/sa-ccr.md` steps 1 to 8 (branch `k-w1b`; CRE52 read 2026-11-19 by that lane). Worked through on Basel CRE99 Example 1 in [Tutorial 56](../getting-started/tutorial-56-sa-ccr-example-1.md): the two USD swaps meet in the IR offset formula and give 59,270 from 114,948 gross; EAD 569.47, printed 569. Python only; scope limits KR-39 (no multiple or shared margin agreements, no haircut computation, no central counterparty floors).
+The order follows `specifications/06-risk/sa-ccr.md` steps 1 to 8 (CRE52 read 2026-11-19 by the SA-CCR lane). Worked through on Basel CRE99 Example 1 in [Tutorial 56](../getting-started/tutorial-56-sa-ccr-example-1.md): the two USD swaps meet in the IR offset formula and give 59,270 from 114,948 gross; EAD 569.47, printed 569. All four builds; scope limits KR-39 (no multiple or shared margin agreements, no haircut computation, no central counterparty floors).
 
 ### Bitemporal as-of query
 
@@ -718,7 +718,7 @@ flowchart LR
   DEL -->|no| F["FOUND, the winner's row"]
 ```
 
-Rule KR-2 of `specifications/01-core/bitemporal-store.md` (branch `k-w1`). `valid_to` is exclusive and null means open; instants are whole seconds (KR-16). The "ignored as of K" branch is why the acceptance property KR-4 holds: 10,000 generated logs, 500,000 query pairs, zero failures in Python and Java. Worked through in [Tutorial 51](../getting-started/tutorial-51-bitemporal-store.md).
+Rule KR-2 of `specifications/01-core/bitemporal-store.md`. `valid_to` is exclusive and null means open; instants are whole seconds (KR-16). The "ignored as of K" branch is why the acceptance property KR-4 holds: 10,000 generated logs, 500,000 query pairs, zero failures in Python and Java. Worked through in [Tutorial 51](../getting-started/tutorial-51-bitemporal-store.md).
 
 ### Daily paper ledger: run, hash chain and anchor
 
@@ -743,7 +743,7 @@ flowchart TB
   class SIM sim
 ```
 
-From `specifications/12-platform/paper-ledger-daily.md` and `docs/developer-guides/paper-ledger.md` (branch `k-paper`, rulings KR-70 to KR-89, proposed). The job writes only to its own two branches, never to `main` or `forward-log`. **Not running yet: 0 of 20 recorded trading days**; the workflow has never run on a GitHub runner. No performance claim is made: the order rule ignores the market and fills are simulated. The chain shows rows were not edited after writing; the anchor catches a consistent rewrite of old rows and a truncated tail. Worked through in [Tutorial 58](../getting-started/tutorial-58-daily-paper-ledger.md). The stage H paper book's ledger, a different file, is in the [paper-trading ledger flow](#paper-trading-ledger-flow).
+From `specifications/12-platform/paper-ledger-daily.md` and `docs/developer-guides/paper-ledger.md` (rulings KR-70 to KR-89, proposed). The job writes only to its own two branches, never to `main` or `forward-log`. **Not running yet: 0 of 20 recorded trading days**; the workflow has never run on a GitHub runner. No performance claim is made: the order rule ignores the market and fills are simulated. The chain shows rows were not edited after writing; the anchor catches a consistent rewrite of old rows and a truncated tail. Worked through in [Tutorial 58](../getting-started/tutorial-58-daily-paper-ledger.md). The stage H paper book's ledger, a different file, is in the [paper-trading ledger flow](#paper-trading-ledger-flow).
 
 ### Blind re-derivation: packet, deriver, compare
 
@@ -763,7 +763,7 @@ flowchart LR
   CMP -->|no| INV["investigated; the blind lane<br/>is never rerun to agree"]
 ```
 
-Process `program/STAGE_H_BLIND_LANE.md` (decision DR-H2), used for stage H and for stage K. Stage K records (lane branches): wave 1, 38 of 38 matched, 36 fully blind (`program/STAGE_K_BLIND_W1.md`, `k-w1`); SA-CCR, 11 of 11 matched, 7 counted and 4 excluded because the lane had read the unstripped spec once before the packet existed (`program/STAGE_K_BLIND_W1B.md`, `k-w1b`). Its limit: the blind lane reads the same rules, so it catches arithmetic and convention slips but not a wrong rule (the stage H SEC date, HR-120). The counts feed the [status ladder page](../validation/status-ladder.md).
+Process `program/STAGE_H_BLIND_LANE.md` (decision DR-H2), used for stage H and for stage K. Stage K records: wave 1, 38 of 38 matched, 36 fully blind (`program/STAGE_K_BLIND_W1.md`); SA-CCR, 11 of 11 matched, 7 counted and 4 excluded because the lane had read the unstripped spec once before the packet existed (`program/STAGE_K_BLIND_W1B.md`); K-5a, 5 of 5 (`program/STAGE_K_BLIND_K5A.md`); the K-8 method, 7 of 7 (`program/STAGE_K_BLIND_K8.md`); FRTB backtesting, 12 of 12 matched and 11 counted, one case whose answer the rules text states being excluded (`program/STAGE_K_BLIND_BTK.md`). Its limit: the blind lane reads the same rules, so it catches arithmetic and convention slips but not a wrong rule (the stage H SEC date, HR-120). The counts feed the [status ladder page](../validation/status-ladder.md).
 
 ## Per-domain flows
 

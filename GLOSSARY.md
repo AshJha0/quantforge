@@ -330,7 +330,7 @@ Stage H (v0.10.0, execution and microstructure) is implemented in all four langu
 
 ## Stage K terms (in progress)
 
-Stage K round 1 is on lane branches that are not merged; these terms are defined as the lanes' specs use them (branches `k-w1`, `k-k8`, `k-w1b`, `k-paper`; read 2026-11-19). [Tutorials 51 to 58](docs/getting-started/README.md#stage-k-in-progress) use them.
+Stage K round 1 is merged on the integration branch `k-r1` (2026-11-19) and not released; these terms are defined as its specs use them (read 2026-11-19). [Tutorials 51 to 58](docs/getting-started/README.md#stage-k-in-progress) use them.
 
 | Term | Meaning |
 |---|---|

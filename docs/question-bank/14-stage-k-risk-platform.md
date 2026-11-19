@@ -1,12 +1,12 @@
 # Question bank 14: Stage K: data platform, intraday risk, capital and the paper ledger
 
-This set covers the stage K round 1 work, which is **in progress and not released**: the bitemporal store, incremental curve updates, recalibration triggers, intraday risk with error bounds (branch `k-w1`), the Bermudan ladder convergence fix (branch `k-k8`), SA-CCR and FRTB backtesting (branch `k-w1b`) and the daily paper ledger (branch `k-paper`). Spec paths are given in backticks because the specs are on those branches until they are merged. It is for a reader who has worked through [Tutorials 51 to 58](../getting-started/README.md#stage-k-in-progress). Every worked-example number is rechecked by `verify/v14_stage_k.py`, which restates the formulas with the standard library and compares them with the goldens' values. All data is synthetic, except the Basel examples, which are the regulator's own sample portfolios.
+This set covers the stage K round 1 work, which is **in progress and not released**: the bitemporal store, incremental curve updates, recalibration triggers, intraday risk with error bounds, the Bermudan ladder convergence fix, SA-CCR and FRTB backtesting, and the daily paper ledger. All of it is merged on the integration branch `k-r1` (2026-11-19), in all four builds, and none of it is on `main` or in a tag. It is for a reader who has worked through [Tutorials 51 to 58](../getting-started/README.md#stage-k-in-progress). Every worked-example number is rechecked by `verify/v14_stage_k.py`, which restates the formulas with the standard library and compares them with the goldens' values. All data is synthetic, except the Basel examples, which are the regulator's own sample portfolios.
 
 ## Bitemporal store
 
 ### Q14.1 What are valid time and knowledge time, and why does a risk store need both?
 
-*Level: foundation. Evidence: spec; golden (`bt_k-0001`, `bt_k-0002`). Source: `specifications/01-core/bitemporal-store.md` (k-w1), [Tutorial 51](../getting-started/tutorial-51-bitemporal-store.md)*
+*Level: foundation. Evidence: spec; golden (`bt_k-0001`, `bt_k-0002`). Source: `specifications/01-core/bitemporal-store.md`, [Tutorial 51](../getting-started/tutorial-51-bitemporal-store.md)*
 
 Valid time is the period a value describes (February's rate); knowledge time is when we learned it. A store with one time can say what was known at a moment, but not separate "the February value as known in March" from "the February value as known in April".
 
@@ -18,7 +18,7 @@ The pitfall is overwriting the old value: a report rerun "as of March" would the
 
 ### Q14.2 Which record wins when several are known and cover the date?
 
-*Level: practitioner. Evidence: spec; golden (`bt_k-0004`, `bt_k-0005`). Source: `specifications/01-core/bitemporal-store.md` (k-w1)*
+*Level: practitioner. Evidence: spec; golden (`bt_k-0004`, `bt_k-0005`). Source: `specifications/01-core/bitemporal-store.md`*
 
 The latest one in the log that was already known: among the records known by `K` whose valid interval contains `V`, the one with the largest `sequence`.
 
@@ -30,19 +30,19 @@ The pitfall is choosing by knowledge time: two records learned in the same secon
 
 ### Q14.3 What property does the stage K acceptance test check, and with what evidence?
 
-*Level: advanced. Evidence: spec; measured by the k-w1 lane. Source: `specifications/01-core/bitemporal-store.md`, `program/STAGE_K_W1_HANDOVER.md` (k-w1)*
+*Level: advanced. Evidence: spec; measured by the k-w1 lane. Source: `specifications/01-core/bitemporal-store.md`, `program/STAGE_K_W1_HANDOVER.md`*
 
 That the past cannot be changed by the future: appending any record learned after `K` leaves every answer as of `K` unchanged, byte for byte (KR-4).
 
 The test generated 10,000 seeded logs and asked 500,000 `(K, V)` pairs before and after appending later records.
 
-**Worked example.** Result: 0 failures in Python and in Java (`program/stage_k_w1/acceptance_python.json` and `acceptance_java.jsonl`, key `kr4_correction_property`). C++ and Rust run the same property in unit tests and write no evidence file; their status is "in progress" in these docs.
+**Worked example.** Result: 0 failures in Python and in Java (`program/stage_k_w1/acceptance_python.json` and `acceptance_java.jsonl`, key `kr4_correction_property`). C++ and Rust run the same property in their unit tests and write no evidence file.
 
 The pitfall is reading this as a database: the operation reads a log passed in the request. There is no persistent store yet.
 
 ### Q14.4 Is `valid_to` inclusive, and how is a stage A record mapped into the bitemporal form?
 
-*Level: practitioner. Evidence: spec; golden (`bt_k-0007`, `bt_k-0008`). Source: `specifications/stage-k-rulings-w1.md` KR-3, KR-16 (k-w1)*
+*Level: practitioner. Evidence: spec; golden (`bt_k-0007`, `bt_k-0008`). Source: `specifications/stage-k-rulings-w1.md` KR-3, KR-16*
 
 Exclusive: a record valid `[1 February, 1 March)` does not answer for 1 March itself. Instants are whole seconds.
 
@@ -56,7 +56,7 @@ The pitfall is an off-by-one at month ends when `valid_to` is treated as inclusi
 
 ### Q14.5 Why can an annual par bootstrap be patched from the first moved quote onwards?
 
-*Level: foundation. Evidence: spec; golden (`inc_k-0001`). Source: `specifications/02-curves/incremental-update.md` (k-w1), [Tutorial 52](../getting-started/tutorial-52-incremental-curve-update.md)*
+*Level: foundation. Evidence: spec; golden (`inc_k-0001`). Source: `specifications/02-curves/incremental-update.md`, [Tutorial 52](../getting-started/tutorial-52-incremental-curve-update.md)*
 
 Each discount factor uses only quotes up to its own maturity, so a later quote cannot change an earlier pillar.
 
@@ -68,7 +68,7 @@ The pitfall is assuming this for any curve: with a global spline every pillar's 
 
 ### Q14.6 What does `curve.incremental.update` return for a move of the 2-year quote to 2.6%?
 
-*Level: practitioner. Evidence: golden (`inc_k-0002`). Source: `specifications/02-curves/incremental-update.md` (k-w1)*
+*Level: practitioner. Evidence: golden (`inc_k-0002`). Source: `specifications/02-curves/incremental-update.md`*
 
 The patched curve, the first changed index and how many pillars were recomputed.
 
@@ -80,7 +80,7 @@ The pitfall is expecting later pillars to move in the same direction as the move
 
 ### Q14.7 Why must the cached discount factors match the bootstrap bit for bit, not within a tolerance?
 
-*Level: advanced. Evidence: spec; golden (`inc_k-0006`). Source: `specifications/02-curves/incremental-update.md` (k-w1)*
+*Level: advanced. Evidence: spec; golden (`inc_k-0006`). Source: `specifications/02-curves/incremental-update.md`*
 
 A cache built from other quotes would make the patched curve silently wrong, and "close" would hide exactly that bug.
 
@@ -90,23 +90,25 @@ The operation recomputes the bootstrap of `previous_quotes` and refuses with `E_
 
 The pitfall is comparing binary64 values with the golden's exact decimals: the golden prints 0.951697752271640363, binary64 gives 0.9516977522716404, and only binary64 against binary64 is exact.
 
-### Q14.8 What was checked on the production (stage B) bootstrap, and what was not?
+### Q14.8 What was checked on the production (stage B) bootstrap?
 
-*Level: advanced. Evidence: measured by the k-w1 lane. Source: `program/STAGE_K_W1_HANDOVER.md` (k-w1)*
+*Level: advanced. Evidence: measured by the k-w1 lane. Source: `program/STAGE_K_W1_HANDOVER.md`*
 
-Only the premise: that earlier pillars cannot move. The patched-against-rebuild check is on the hand-sized instrument set, because the stage B bootstrap has no incremental entry point.
+First the premise, that earlier pillars cannot move; then, in a follow-up lane, the patched-against-rebuild check itself, after the stage B bootstrap got incremental entry points in all four builds.
 
 On 10 sequential log-linear stage B bootstrap goldens, each quote was moved by 1 bp in turn.
 
 **Worked example.** 45 single-quote moves; in every one the first pillar that changed was the moved quote's pillar and every earlier pillar was bit-identical (key `incremental_property_stage_b`, Python and Java). On the hand set, 10,000 random vectors were bit-identical to a full rebuild (key `incremental_property`).
 
-The pitfall is reading "incremental update in production" from this: it is a premise check plus a hand-sized method.
+Follow-up (2026-11-19): 10,000 moves over the 25 sequential stage B instrument sets, 10,000 of 10,000 bit-identical to a full rebuild in each of the four builds (key `incremental_property_stage_b_patched`; `specifications/02-curves/incremental-update.md`, "Acceptance evidence").
+
+The pitfall is reading the CLI operation as the production path: `curve.incremental.update` works on the hand-sized annual par set; the stage B entry points are library functions, not a CLI operation.
 
 ## Recalibration triggers
 
 ### Q14.9 When does `calib.trigger.check` fire?
 
-*Level: foundation. Evidence: golden (`trig_k-0001`, `trig_k-0002`). Source: `specifications/03-calibration/recalibration-triggers.md` (k-w1), [Tutorial 53](../getting-started/tutorial-53-recalibration-triggers.md)*
+*Level: foundation. Evidence: golden (`trig_k-0001`, `trig_k-0002`). Source: `specifications/03-calibration/recalibration-triggers.md`, [Tutorial 53](../getting-started/tutorial-53-recalibration-triggers.md)*
 
 When the input has moved since calibration by more than `k` standard deviations of its daily changes, scaled for the days elapsed.
 
@@ -118,7 +120,7 @@ The pitfall is the population standard deviation: dividing by `n` gives 1.0 here
 
 ### Q14.10 What false-alarm rate does `k = 3` give, and why does the simulation centre on 0.0030306 instead?
 
-*Level: advanced. Evidence: spec; measured by the k-w1 lane. Source: `specifications/03-calibration/recalibration-triggers.md` (k-w1)*
+*Level: advanced. Evidence: spec; measured by the k-w1 lane. Source: `specifications/03-calibration/recalibration-triggers.md`*
 
 `alpha = 2 (1 - Phi(3)) = 0.0027` if `sigma` were known. With `sigma` estimated from a 250-day window, the move is judged against an estimate, and the predictive rate is a Student-t tail.
 
@@ -130,7 +132,7 @@ The pitfall is testing an estimated-sigma trigger against the known-sigma rate: 
 
 ### Q14.11 Does a move exactly at the threshold fire?
 
-*Level: practitioner. Evidence: golden (`trig_k-0004`, `trig_k-0005`); ruling KR-13. Source: `specifications/stage-k-rulings-w1.md` (k-w1)*
+*Level: practitioner. Evidence: golden (`trig_k-0004`, `trig_k-0005`); ruling KR-13. Source: `specifications/stage-k-rulings-w1.md`*
 
 No: the rule is strictly greater.
 
@@ -142,7 +144,7 @@ The pitfall is `>=` in an implementation, which differs only on exact ties and s
 
 ### Q14.12 Why scale the threshold by `sqrt(d)`?
 
-*Level: foundation. Evidence: golden (`trig_k-0003`). Source: `specifications/03-calibration/recalibration-triggers.md` (k-w1)*
+*Level: foundation. Evidence: golden (`trig_k-0003`). Source: `specifications/03-calibration/recalibration-triggers.md`*
 
 A move built up over several days should be compared with several days of noise; for independent daily changes the standard deviation of a `d`-day move is `sigma sqrt(d)`.
 
@@ -154,7 +156,7 @@ The pitfall is fat tails and autocorrelation: real changes are neither normal no
 
 ### Q14.13 What is the delta-gamma estimate for a zero-coupon bond, and what bounds its error?
 
-*Level: foundation. Evidence: golden (`idr_k-0001`). Source: `specifications/06-risk/intraday-risk-bounds.md` (k-w1), [Tutorial 54](../getting-started/tutorial-54-intraday-risk-bounds.md)*
+*Level: foundation. Evidence: golden (`idr_k-0001`). Source: `specifications/06-risk/intraday-risk-bounds.md`, [Tutorial 54](../getting-started/tutorial-54-intraday-risk-bounds.md)*
 
 The first two Taylor terms of the price change; the Lagrange remainder bounds what they leave out.
 
@@ -166,7 +168,7 @@ The pitfall is reporting the estimate alone: a fast number with no bound is the 
 
 ### Q14.14 Why is the bound larger for a fall in yield than for a rise of the same size?
 
-*Level: practitioner. Evidence: golden (`idr_k-0002`). Source: `specifications/06-risk/intraday-risk-bounds.md` (k-w1)*
+*Level: practitioner. Evidence: golden (`idr_k-0002`). Source: `specifications/06-risk/intraday-risk-bounds.md`*
 
 `|V'''| = T^3 V` grows as the yield falls, so its maximum on the segment is at the lower end, `y + h` when `h < 0`.
 
@@ -176,19 +178,19 @@ The pitfall is evaluating `M3` at the starting yield, which understates the boun
 
 ### Q14.15 How are position bounds combined for a book, and why not net them?
 
-*Level: advanced. Evidence: golden (`idr_k-0005`, oracle-filled, not blind). Source: `specifications/06-risk/intraday-risk-bounds.md` (k-w1)*
+*Level: advanced. Evidence: golden (`idr_k-0005`, oracle-filled, not blind). Source: `specifications/06-risk/intraday-risk-bounds.md`*
 
 They are added in absolute value. The remainders' signs are not known in general, so they may add instead of cancel.
 
 **Worked example.** Long 1,000,000 at 5 years (4%) and short 500,000 at 2 years (3%), `h = +1%`: estimate -30,589.66, exact -30,605.88, error 16.22, bound 17.68, error over bound 0.917 (`idr_k-0005`).
 
-The pitfall is treating `idr_k-0005` as blind-checked: it was filled by our own 50-digit oracle and was not in the blind packet.
+The pitfall is reading the expected value as an outside check: it was filled by our own 50-digit oracle; it counts as outside-checked only because the later K-5a blind packet re-derived it (`program/STAGE_K_BLIND_K5A.md`).
 
-### Q14.16 Why does this item fail the 60% outside-check rule, and what was measured instead?
+### Q14.16 Why did this item first fail the 60% outside-check rule, and what closed the gap?
 
-*Level: advanced. Evidence: measured by the k-w1 lane. Source: `oracle/OUTSIDE_SHARES.md` stage K section, `program/STAGE_K_BLIND_W1.md` (k-w1)*
+*Level: advanced. Evidence: measured by the k-w1 lane. Source: `oracle/OUTSIDE_SHARES.md` stage K section, `program/STAGE_K_BLIND_W1.md`*
 
-The blind lane checked the four single-position bounds only to six decimals (the goldens were later filled to full precision), and the fifth case was not in its packet. So 0 of 5 value cases count: NOT MET.
+The first blind lane checked the four single-position bounds only to six decimals (the goldens were later filled to full precision), and the fifth case was not in its packet, so at first 0 of 5 value cases counted. A second, clean blind packet re-derived all five at 1e-9 relative: 5 of 5 MATCH, so the item now stands at 5 of 5 (`program/STAGE_K_BLIND_K5A.md`, `oracle/OUTSIDE_SHARES.md`). That shows the spec is unambiguous and the arithmetic right; it does not check the bound's derivation.
 
 **Worked example.** What was measured: 1,000 seeded moves on a 50-position book, zero violations of `|estimate - full revaluation| <= bound` in Python (worst ratio 0.0105) and Java (0.382), rechecked at 50 digits with zero violations and rounding at most 2.3e-8 of the bound (`oracle/IDR_K_MOVES_CHECK_W1.json`). That recheck is our own oracle, not an outside check.
 
@@ -198,7 +200,7 @@ The pitfall is counting the oracle as outside: it shares the author's reading of
 
 ### Q14.17 What is the observed order, and how did it expose the first K-8 build?
 
-*Level: foundation. Evidence: measured by the K-8 lane. Source: `program/K8_DIAGNOSIS.md` (k-k8), [Tutorial 55](../getting-started/tutorial-55-bermudan-ladder-convergence.md)*
+*Level: foundation. Evidence: measured by the K-8 lane. Source: `program/K8_DIAGNOSIS.md`, [Tutorial 55](../getting-started/tutorial-55-bermudan-ladder-convergence.md)*
 
 From values on three grids, each twice as fine, `p = log2((f1 - f2)/(f2 - f3))`; a second-order scheme gives about 2.
 
@@ -210,7 +212,7 @@ The pitfall is trusting a size check alone: that build was already within 0.39% 
 
 ### Q14.18 What were the two causes of lost second order?
 
-*Level: advanced. Evidence: measured and derived by the K-8 lane. Source: `program/K8_DIAGNOSIS.md` section 3 (k-k8)*
+*Level: advanced. Evidence: measured and derived by the K-8 lane. Source: `program/K8_DIAGNOSIS.md` section 3*
 
 (A) In time, a curve node at 0.4986 years fell inside a time step, so the step used the wrong mix of two forward rates; the price hardly noticed but the derivative of the jump is of order one over the node spacing. (B) In space, the cell-average smoothing of the exercise `max` left a price error of size `dx^3` that depends on where the exercise boundary sits in its cell; differentiating with respect to an input that moves the boundary turns it into a `dx^2` ladder error whose coefficient changes from grid to grid.
 
@@ -220,7 +222,7 @@ The pitfall is the obvious suspect: more Rannacher half steps changed the result
 
 ### Q14.19 What does `CN_RANNACHER_SMOOTHED` change, and what does the smoothing give on `f = (-1, 0, 1)`?
 
-*Level: practitioner. Evidence: spec (worked example). Source: `specifications/06-risk/bermudan-ladder-k8.md` 0.2.0 (k-k8)*
+*Level: practitioner. Evidence: spec (worked example). Source: `specifications/06-risk/bermudan-ladder-k8.md` 0.2.0*
 
 It solves for `U = V exp(-int alpha)` so the curve leaves the time stepping (fix A), and replaces the cell average by a hat-weighted smoothing with an end correction and a `1 - delta^2/6` stencil (fix B). Each interval starts with implicit half steps.
 
@@ -230,15 +232,15 @@ It solves for `U = V exp(-int alpha)` so the curve leaves the time stepping (fix
 
 The pitfall is the end correction's origin: it is derived in the lane and supported by measurements, not taken from a paper.
 
-### Q14.20 After the second run passed, what is still restricted?
+### Q14.20 After the second run passed, what is lifted and what is still restricted?
 
-*Level: advanced. Evidence: measured; owner decision 2026-11-19. Source: `oracle/K8_ACCEPTANCE_W2.json`, `specifications/06-risk/bermudan-ladder-k8.md` (k-k8)*
+*Level: advanced. Evidence: measured; owner decision 2026-11-19. Source: `oracle/K8_ACCEPTANCE_W2.json`, `specifications/06-risk/bermudan-ladder-k8.md`*
 
-The R6 use restriction is still in place, the default method is still `G18_IMPLICIT`, and C++ and Rust do not have the method.
+The R6 use restriction is lifted for `CN_RANNACHER_SMOOTHED` only (ruling KR-110, 2026-11-19). The default method is still `G18_IMPLICIT`, and it keeps the restriction. All four builds have the new method.
 
-Acceptance 1 to 3 pass in Python (worst default-grid gap 0.40% against 1%; 24 entries `OK` with orders 1.84 to 2.15), and acceptance 3 in Java (equal to Python to 3.8e-14 of the row scale). Acceptance 4 lifts the restriction for this method only, in the integration branch.
+Acceptance 1 to 3 pass in Python (worst default-grid gap 0.40% against 1%; 24 entries `OK` with orders 1.84 to 2.15), and acceptance 3 in Java (equal to Python to 3.8e-14 of the row scale), C++ and Rust (within 3.85e-14, `oracle/K8_ACCEPTANCE_PORTS.json`). Acceptance 4 then lifted the restriction for this method only, on the integration branch.
 
-**Worked example.** Case `aadladder_g-0001`, row 2 at 201/401/801: 222,756.98, 223,121.25, 223,212.48, order 1.997, 0.218% from the QuantLib reference. The zero row (node 0.4986) is 0.0 on every grid and stays skipped under the all-zero-row rule (owner decision 2026-11-19).
+**Worked example.** Case `aadladder_g-0001`, row 2 at 201/401/801: 222,756.98, 223,121.25, 223,212.48, order 1.997, 0.218% from the QuantLib reference. The zero row (node 0.4986) is 0.0 on every grid and is not judged under the all-zero-row rule (owner decision 2026-11-19); `program/K8_ROW0_FINDING.md` found no bug: its true value is zero, and QuantLib's -14.27 there is that engine's own time-stepping error.
 
 The pitfall is hedging from the default ladder because "K-8 passed": the default has not changed.
 
@@ -246,7 +248,7 @@ The pitfall is hedging from the default ladder because "K-8 passed": the default
 
 ### Q14.21 What are RC, PFE and EAD under SA-CCR?
 
-*Level: foundation. Evidence: read (CRE52); golden (`saccr_k-0001`). Source: `specifications/06-risk/sa-ccr.md` (k-w1b), [Tutorial 56](../getting-started/tutorial-56-sa-ccr-example-1.md)*
+*Level: foundation. Evidence: read (CRE52); golden (`saccr_k-0001`). Source: `specifications/06-risk/sa-ccr.md`, [Tutorial 56](../getting-started/tutorial-56-sa-ccr-example-1.md)*
 
 RC is what the bank loses now if the counterparty defaults; PFE is what the exposure could grow to before replacement; EAD is 1.4 times their sum.
 
@@ -258,7 +260,7 @@ The pitfall is rounding the add-on to 347 first: `1.4 x 407 = 569.8` would print
 
 ### Q14.22 How do the two swaps of Example 1 offset each other?
 
-*Level: practitioner. Evidence: golden (`saccr_k-0001`). Source: `specifications/06-risk/sa-ccr.md` step 6 (k-w1b)*
+*Level: practitioner. Evidence: golden (`saccr_k-0001`). Source: `specifications/06-risk/sa-ccr.md` step 6*
 
 They are in one hedging set (USD) but in adjacent maturity buckets, which offset with correlation 0.7 in the aggregation formula.
 
@@ -270,7 +272,7 @@ The pitfall is bucketing by time to start or by option expiry: the swaption (1 i
 
 ### Q14.23 How is the supervisory delta of the swaption found?
 
-*Level: practitioner. Evidence: read (CRE52.40); golden (`saccr_k-0001`). Source: `specifications/06-risk/sa-ccr.md` step 3 (k-w1b)*
+*Level: practitioner. Evidence: read (CRE52.40); golden (`saccr_k-0001`). Source: `specifications/06-risk/sa-ccr.md` step 3*
 
 From a Black-type formula with a fixed supervisory volatility, 50% for interest rate options, not the market's volatility.
 
@@ -282,7 +284,7 @@ The pitfall is the sign: the swaption is short the floating rate, so it is a put
 
 ### Q14.24 What is the SA-CCR outside-check share, and why are four matching cases excluded?
 
-*Level: advanced. Evidence: measured; blind record. Source: `program/STAGE_K_BLIND_W1B.md` (k-w1b)*
+*Level: advanced. Evidence: measured; blind record. Source: `program/STAGE_K_BLIND_W1B.md`*
 
 12 of 16 value cases, 75%: the five published Basel examples plus seven blind re-derivations. Four more blind matches are excluded because the blind lane had read the unstripped spec once before the packet existed, which showed output facts for those four.
 
@@ -294,7 +296,7 @@ The pitfall is "they matched, so count them": a blind check is only blind if the
 
 ### Q14.25 Where do the amber and red boundaries come from?
 
-*Level: foundation. Evidence: read (MAR99.17); computed. Source: `specifications/06-risk/frtb-ima-backtest.md` (k-w1b), [Tutorial 57](../getting-started/tutorial-57-backtesting-traffic-light.md)*
+*Level: foundation. Evidence: read (MAR99.17); computed. Source: `specifications/06-risk/frtb-ima-backtest.md`, [Tutorial 57](../getting-started/tutorial-57-backtesting-traffic-light.md)*
 
 From the binomial distribution of exceptions for a correct 99% model: amber starts at the first count whose cumulative probability reaches 95%, red at 99.99%.
 
@@ -306,7 +308,7 @@ The pitfall is reading 95% as the chance of wrongly leaving green; that chance i
 
 ### Q14.26 Which exception count does FRTB use, and what multiplier follows?
 
-*Level: practitioner. Evidence: read (MAR99.8, MAR32 Table 1). Source: `specifications/06-risk/frtb-ima-backtest.md` (k-w1b)*
+*Level: practitioner. Evidence: read (MAR99.8, MAR32 Table 1). Source: `specifications/06-risk/frtb-ima-backtest.md`*
 
 The greater of the actual and hypothetical P&L counts. At 250 days the multiplier is 1.50 for 0 to 4, then 1.70, 1.76, 1.83, 1.88, 1.92 for 5 to 9, and 2.00 from 10.
 
@@ -316,7 +318,7 @@ The pitfall is the 1996 framework of stage F (`risk.backtest.traffic_light`), wh
 
 ### Q14.27 Why is zero exceptions in five days amber under the rule as written?
 
-*Level: advanced. Evidence: spec (KR-42). Source: `specifications/stage-k-rulings-w1b.md` (k-w1b)*
+*Level: advanced. Evidence: spec (KR-42). Source: `specifications/stage-k-rulings-w1b.md`*
 
 Because `P(X = 0) = 0.99^5 = 0.950990 >= 0.95`, so the first count reaching 95% is 0. The spec applies MAR99.17's general rule as written and records the oddity rather than adding a rule of its own.
 
@@ -326,7 +328,7 @@ The pitfall is "fixing" small samples quietly: any such rule is a new ruling and
 
 ### Q14.28 When does a trading desk lose permission to use its model?
 
-*Level: practitioner. Evidence: read (MAR32.19); ruling KR-44. Source: `specifications/06-risk/frtb-ima-backtest.md` (k-w1b)*
+*Level: practitioner. Evidence: read (MAR32.19); ruling KR-44. Source: `specifications/06-risk/frtb-ima-backtest.md`*
 
 With more than 12 exceptions at 99% or more than 30 at 97.5% in the most recent 12 months, each the greater of actual and hypothetical.
 
@@ -338,7 +340,7 @@ The pitfall is the text: "more than 12 ... or 30" is read as "more than 30" for 
 
 ### Q14.29 What does a DAY row's P&L explain contain, and why must the unexplained term be exactly zero?
 
-*Level: foundation. Evidence: spec (worked example); computed. Source: `specifications/12-platform/paper-ledger-daily.md` (k-paper), [Tutorial 58](../getting-started/tutorial-58-daily-paper-ledger.md)*
+*Level: foundation. Evidence: spec (worked example); computed. Source: `specifications/12-platform/paper-ledger-daily.md`, [Tutorial 58](../getting-started/tutorial-58-daily-paper-ledger.md)*
 
 Carry (coupon accrual and cash interest), roll-down, curve move, and fills and costs; unexplained is the NAV change minus those.
 
@@ -350,7 +352,7 @@ The pitfall is reading the zero as model quality: it is a bookkeeping test, with
 
 ### Q14.30 What can be verified from the ledger alone, with no CLI and no outside data?
 
-*Level: practitioner. Evidence: spec. Source: `specifications/12-platform/paper-ledger-daily.md` "Verification" (k-paper)*
+*Level: practitioner. Evidence: spec. Source: `specifications/12-platform/paper-ledger-daily.md` "Verification"*
 
 The chain (`PARSE`, `SEQ`, `HASH`, `LINK`, `LABEL`, `FORMAT`, `KIND`), the configuration against the genesis row, the dates (business days, none missing, timing label, holdout windows), and an exact replay: from the genesis cash each day opens at the previous close, and cash interest, every explain term, cash, positions, NAV and P&L are recomputed in exact decimal from the row's own marks and fills.
 
@@ -360,7 +362,7 @@ The pitfall is thinking the replay checks the marks: a wrong mark replays consis
 
 ### Q14.31 What do the anchors add to the hash chain?
 
-*Level: advanced. Evidence: spec (P5). Source: `specifications/12-platform/paper-ledger-daily.md` "Chain and anchor" (k-paper)*
+*Level: advanced. Evidence: spec (P5). Source: `specifications/12-platform/paper-ledger-daily.md` "Chain and anchor"*
 
 A chain shows that rows were not edited after writing, but someone who rewrites an old row can recompute every later hash and get a valid chain. An anchor, the head hash and row count stamped with OpenTimestamps on a separate branch, fixes what the ledger was at a moment.
 
@@ -370,7 +372,7 @@ The pitfall is a ledger without published anchors: truncating the last line leav
 
 ### Q14.32 How many recorded trading days are there, and why are FedInvest prices not used?
 
-*Level: foundation. Evidence: read (terms and robots file, 2026-11-19); handover. Source: `program/STAGE_K_PAPER_HANDOVER.md` (k-paper)*
+*Level: foundation. Evidence: read (terms and robots file, 2026-11-19); handover. Source: `program/STAGE_K_PAPER_HANDOVER.md`*
 
 Zero of the 20 that the v1.0.0 gate needs: the workflow has never run, and the earliest 20th on-time day is 20 US business days after it reaches `main`. FedInvest prices are not used because the site's robots file disallows automated agents and its terms limit use to personal viewing (KR-70); the ledger uses constant-maturity exposures on a curve through the five Treasury par yields the recorder already keeps.
 

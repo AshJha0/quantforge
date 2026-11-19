@@ -1,6 +1,6 @@
 # Tutorials
 
-Fifty guided tutorials, each 10 to 15 minutes, that walk through what QuantForge already does. Each one starts from small synthetic data you can follow by hand, runs it in Python first, then sends the same operations to the Rust, Java and C++ builds, which print the same digits. Every number on every page is real output, and CI runs each page in all four languages and fails if a printed line differs (`.github/workflows/tutorial.yml`, `tools/check_tutorial.py`). Eight further pages, 51 to 58, are stage K drafts for work not yet merged; they are listed apart under [Stage K, in progress](#stage-k-in-progress).
+Fifty-eight guided tutorials (51 to 58 cover stage K, not yet released), each 10 to 15 minutes, that walk through what QuantForge already does. Each one starts from small synthetic data you can follow by hand, runs it in Python first, then sends the same operations to the Rust, Java and C++ builds, which print the same digits. Every number on every page is real output, and CI runs each page in all four languages and fails if a printed line differs (`.github/workflows/tutorial.yml`, `tools/check_tutorial.py`). Eight further pages, 51 to 58, are stage K drafts for work not yet merged; they are listed apart under [Stage K, in progress](#stage-k-in-progress).
 
 Each tutorial explains its results in the same order: the plain idea, the formal statement from the spec, then a worked example with a check you can do in your head. Each ends with notes for practitioners, common mistakes, what you just did, and references.
 
@@ -61,18 +61,18 @@ Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the f
 
 ## Stage K, in progress
 
-These eight pages are drafts for stage K round 1. They are not released: the operations they describe are on lane branches that have not been merged, and none is in a tag. Each page runs a short standard-library restatement of the spec's rule on the golden inputs, in Python only, so CI checks its printed lines now; the library call is shown in a block marked "runs after integration", which is not run until the coordinator turns it on after the merge (`program/STAGE_K_DOCS_PENDING.md`). Numbers are taken from the lanes' evidence files and goldens, and each page names the file.
+These eight pages cover stage K round 1. They are not released: the operations they describe are merged on the integration branch `k-r1` (2026-11-19), in all four builds, and none is in a tag. Each page first restates the spec's rule with the standard library on the golden inputs; Tutorials 51 to 57 then call the library in Step 2 through the Python build, and CI checks that Step 2 prints the page's lines (turned on at integration, `program/STAGE_K_DOCS_PENDING.md`). Tutorial 58 checks Step 1 only, because the paper ledger is not running yet. Numbers are taken from evidence files and goldens, and each page names the file.
 
-| Tutorial | What you do | Operations (branch) | Stage |
+| Tutorial | What you do | Operations | Stage |
 |---|---|---|---|
-| [51. A bitemporal store](tutorial-51-bitemporal-store.md) | A correction and a withdrawal seen from both sides of when they were learned; the KR-4 property | `core.store.bitemporal_query` (`k-w1`) | K, in progress |
-| [52. Incremental curve update](tutorial-52-incremental-curve-update.md) | Patch a par curve for one moved quote, bit for bit against a full rebuild; a stale cache refused | `curve.bootstrap.par_annual`, `curve.incremental.update` (`k-w1`) | K, in progress |
-| [53. Recalibration triggers](tutorial-53-recalibration-triggers.md) | A planted move against noise, equality that does not fire, the simulation's binomial interval | `calib.trigger.check` (`k-w1`) | K, in progress |
-| [54. Intraday risk with error bounds](tutorial-54-intraday-risk-bounds.md) | Delta-gamma estimates and their Taylor bounds against exact revaluation; outside share not met | `risk.intraday.delta_gamma_bound` (`k-w1`) | K, in progress |
-| [55. The Bermudan ladder convergence fix](tutorial-55-bermudan-ladder-convergence.md) | Why second order was lost, the two fixes, the acceptance evidence, what is still restricted | `CN_RANNACHER_SMOOTHED`, `num.richardson.check` (`k-k8`, `k-w1`) | K, in progress |
-| [56. SA-CCR, Basel Example 1](tutorial-56-sa-ccr-example-1.md) | Two swaps and a swaption from trades to an EAD of 569, step by step | `risk.saccr.ead` (`k-w1b`) | K, in progress |
-| [57. The backtesting traffic light](tutorial-57-backtesting-traffic-light.md) | MAR99 Table 2 from the binomial distribution, zone boundaries, desk limits | `risk.frtb.backtest.zone`, `.desk` (`k-w1b`) | K, in progress |
-| [58. The daily paper ledger](tutorial-58-daily-paper-ledger.md) | One day replayed in exact decimal with zero unexplained; a hash chain catches an edit; the verifier's order of checks | `tools/paper_daily/` (`k-paper`); not running yet, 0 of 20 days | K, in progress |
+| [51. A bitemporal store](tutorial-51-bitemporal-store.md) | A correction and a withdrawal seen from both sides of when they were learned; the KR-4 property | `core.store.bitemporal_query` | K, in progress |
+| [52. Incremental curve update](tutorial-52-incremental-curve-update.md) | Patch a par curve for one moved quote, bit for bit against a full rebuild; a stale cache refused | `curve.bootstrap.par_annual`, `curve.incremental.update` | K, in progress |
+| [53. Recalibration triggers](tutorial-53-recalibration-triggers.md) | A planted move against noise, equality that does not fire, the simulation's binomial interval | `calib.trigger.check` | K, in progress |
+| [54. Intraday risk with error bounds](tutorial-54-intraday-risk-bounds.md) | Delta-gamma estimates and their Taylor bounds against exact revaluation; outside share 5 of 5 | `risk.intraday.delta_gamma_bound` | K, in progress |
+| [55. The Bermudan ladder convergence fix](tutorial-55-bermudan-ladder-convergence.md) | Why second order was lost, the two fixes, the acceptance evidence, the restriction lifted for the new method only | `CN_RANNACHER_SMOOTHED`, `num.richardson.check` | K, in progress |
+| [56. SA-CCR, Basel Example 1](tutorial-56-sa-ccr-example-1.md) | Two swaps and a swaption from trades to an EAD of 569, step by step | `risk.saccr.ead` | K, in progress |
+| [57. The backtesting traffic light](tutorial-57-backtesting-traffic-light.md) | MAR99 Table 2 from the binomial distribution, zone boundaries, desk limits | `risk.frtb.backtest.zone`, `.desk` | K, in progress |
+| [58. The daily paper ledger](tutorial-58-daily-paper-ledger.md) | One day replayed in exact decimal with zero unexplained; a hash chain catches an edit; the verifier's order of checks | `tools/paper_daily/`; not running yet, 0 of 20 days | K, in progress |
 
 ## How the scripts work
 

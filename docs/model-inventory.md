@@ -1227,8 +1227,8 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MK-2 Incremental curve update (stage K wave 1, K-4b)
 - **Purpose:** sequential annual par bootstrap and its incremental update from the first changed quote (`curve.bootstrap.par_annual`, `curve.incremental.update`), in all four languages.
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-19; hand-sized instrument set; the stage B production bootstrap has no incremental entry point (only the premise that earlier pillars cannot move is checked on it).
-- **Validation:** goldens `inc_k`; 10,000 random vectors bit-identical to a full rebuild in Python and Java; 45 quote moves on stage B bootstraps (`program/stage_k_w1/`). **Review:** 2026-11-19.
+- **Limitations:** spec confirmed 2026-11-19; `curve.incremental.update` works on a hand-sized instrument set (annual par swaps); the stage B production bootstrap has its own incremental entry points in all four builds (follow-up lane, `program/STAGE_K_W1_HANDOVER.md`), not exposed as a CLI operation.
+- **Validation:** goldens `inc_k`; 10,000 random vectors bit-identical to a full rebuild in Python and Java; on the stage B bootstrap, 10,000 of 10,000 patched moves bit-identical to a full rebuild in all four builds (key `incremental_property_stage_b_patched`, `program/stage_k_w1/`; `specifications/02-curves/incremental-update.md`, "Acceptance evidence"). **Review:** 2026-11-19.
 - **Tier:** 3.
 - **Challenger:** blind re-derivation (DR-H2), 4 of 4 value cases.
 - **Monitoring thresholds:** any recomputed pillar differing from a full rebuild by more than 1e-12 relative, or any copied pillar not bit-identical.
@@ -1242,7 +1242,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Limitations:** spec confirmed 2026-11-19; two-sided normal level only, which understates the false-alarm rate of a short window (the acceptance uses the Student-t predictive rate); CUSUM and EWMA are out of wave 1.
 - **Validation:** goldens `trig_k`; simulation of 100,000 noise paths inside the 99% binomial interval and a planted 6-sigma move firing on every path, Python and Java (`program/stage_k_w1/`). **Review:** 2026-11-19.
 - **Tier:** 3.
-- **Challenger:** blind re-derivation (DR-H2), 4 of 5 value cases; SciPy `2*norm.sf(k)` on `false_alarm_rate` only (KR-11).
+- **Challenger:** blind re-derivation (DR-H2), 4 of 6 value cases (66.7%, after the far-tail case trig_k-0009, `oracle/OUTSIDE_SHARES.md`); SciPy `2*norm.sf(k)` on `false_alarm_rate` only (KR-11). `false_alarm_rate` is computed as `2 Phi(-k)` with a tail-accurate normal CDF in all four builds.
 - **Monitoring thresholds:** observed noise fire rate outside the 99% binomial interval of its stated level.
 - **Data lineage hash:** sha256 b3297f772ed002b9b369e10ef77c1d70b952dcff32604c2b9cf6b9105aafb5b3 (`trig_k`, 8 cases) (2026-11-19).
 - **Retirement trigger:** a superseding stage K ruling.
@@ -1254,7 +1254,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Limitations:** spec confirmed 2026-11-19; zero-coupon positions only (other instruments have no `M3`, so no bound); latency-aware analytics on simulated data; the binary64 comparison is meaningful only for `T abs(h)` well above 1e-7 (KR-17).
 - **Validation:** goldens `idr_k`; 1,000 seeded moves with zero violations in Python and Java, rechecked at 50 digits (`oracle/IDR_K_MOVES_CHECK_W1.json`). **Review:** 2026-11-19.
 - **Tier:** 3.
-- **Challenger:** none counted: the blind lane checked the bounds only to 6 decimals and idr_k-0005 was not blind, so the item has 0 of 5 value cases outside-checked (under the 60% per-item floor, `oracle/OUTSIDE_SHARES.md`); mpmath is our own oracle.
+- **Challenger:** blind re-derivation (DR-H2), 5 of 5 value cases at 1e-9 relative by a second, clean packet (`program/STAGE_K_BLIND_K5A.md`; the first blind lane had checked the bounds only to 6 decimals and lacked idr_k-0005); `oracle/OUTSIDE_SHARES.md`. It checks the spec's arithmetic, not the bound's derivation; mpmath is our own oracle and does not count.
 - **Monitoring thresholds:** any move with abs(estimate - revaluation) above the bound.
 - **Data lineage hash:** sha256 7529524f6558dbdf27d65327bbe53396e1efaffdfa33159b6ce314afbbf7e153 (`idr_k`, 7 cases) (2026-11-19).
 - **Retirement trigger:** a superseding stage K ruling.

@@ -2,6 +2,20 @@
 
 Docs lane, branch `k-docs`, second pass, 2026-11-19. Everything listed here describes an operation, tool or file that lives on another lane branch (`k-w1`, `k-k8`, `k-w1b`, `k-paper`, `k-w2-spec`) and was not run on this branch. The coordinator turns each item on after the merge into `k-r1` and runs the checks in the last section. Nothing here was merged from the lane branches: their files were read with `git show origin/<branch>:<path>`.
 
+
+## Status at integration (k-r1, 2026-11-19)
+
+Done by the integration lane, evidence class measured, local laptop, not the acceptance machine:
+
+- **T51 to T57:** Step 2 turned on (the `tutorial:run python` marker moved from Step 1 to Step 2). Each printed exactly the lines of Step 1, so no expected block changed and no tutorial needed a behaviour fix. `python tools/check_tutorial.py --lang python --page <page>`: 51 (9 lines), 52 (5), 53 (6), 54 (6), 55 (8, 2 s), 56 (6), 57 (8) match. Page notes and evidence lines brought to the merged state.
+- **T58:** stays Step 1 only (the ledger is not running, 0 of 20 days); Step 2 needs the `paper-ledger` branch, which does not exist yet. Step 1 matches (4 lines).
+- **C1 to C8:** run once on `k-r1`; the "not run" notes replaced with the observed output. C2, C4 and C7 differ from the golden in the last digit or two, inside each golden's tolerance, and the recipe says so. C6 run in Python only; its text corrected from "Python and Java only" to all four builds, the restriction lifted for `CN_RANNACHER_SMOOTHED` only (KR-110) and the 0.4986-year row not judged. C7 and C8 corrected from "Python only, needs registration" to registered in all four builds.
+- **C9:** not run (no `paper-ledger` branch); `verify_ledger.py --help` lists the options the recipe uses.
+- Status ladder: the hand-quoted stage K table is deleted; every stage K share on that page is generated.
+- `tools/check_docs_status.py`: 0 problems on `k-r1`.
+
+The sections below are the docs lane's original list, kept as written.
+
 ## How the tutorial blocks are built
 
 Tutorials 51 to 58 are marked `<!-- tutorial:only python -->`. Step 1 of each is a standard-library restatement of the spec's rule on the golden inputs, marked `<!-- tutorial:run python -->`, and CI checks its lines today (`python tools/check_tutorial.py --lang python --page <page>`, all eight pass on this branch, 2026-11-19). Step 2 is the library call, preceded by a comment `<!-- runs-after-integration: Tnn -->` and NOT marked `tutorial:run`. The checker allows one run block per language, so turning Step 2 on means moving the `<!-- tutorial:run python -->` marker from Step 1 to Step 2. Steps 2 of T51 to T57 are written to print the same lines as Step 1, so the `tutorial:expect` block should not need to change. **None of them has been run**: if a line differs, the library output wins only if the block's own golden assertion passed; otherwise it is a finding.

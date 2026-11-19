@@ -487,12 +487,12 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q13.46 (13-execution-microstructure.md) On workload R, the recorded crypto window, the low-latency book passes every correctness check and misses its timing targets. How should that be reported?
 - Q14.3 (14-stage-k-risk-platform.md) What property does the stage K acceptance test check, and with what evidence?
 - Q14.7 (14-stage-k-risk-platform.md) Why must the cached discount factors match the bootstrap bit for bit, not within a tolerance?
-- Q14.8 (14-stage-k-risk-platform.md) What was checked on the production (stage B) bootstrap, and what was not?
+- Q14.8 (14-stage-k-risk-platform.md) What was checked on the production (stage B) bootstrap?
 - Q14.10 (14-stage-k-risk-platform.md) What false-alarm rate does `k = 3` give, and why does the simulation centre on 0.0030306 instead?
 - Q14.15 (14-stage-k-risk-platform.md) How are position bounds combined for a book, and why not net them?
-- Q14.16 (14-stage-k-risk-platform.md) Why does this item fail the 60% outside-check rule, and what was measured instead?
+- Q14.16 (14-stage-k-risk-platform.md) Why did this item first fail the 60% outside-check rule, and what closed the gap?
 - Q14.18 (14-stage-k-risk-platform.md) What were the two causes of lost second order?
-- Q14.20 (14-stage-k-risk-platform.md) After the second run passed, what is still restricted?
+- Q14.20 (14-stage-k-risk-platform.md) After the second run passed, what is lifted and what is still restricted?
 - Q14.24 (14-stage-k-risk-platform.md) What is the SA-CCR outside-check share, and why are four matching cases excluded?
 - Q14.27 (14-stage-k-risk-platform.md) Why is zero exceptions in five days amber under the rule as written?
 - Q14.31 (14-stage-k-risk-platform.md) What do the anchors add to the hash chain?
