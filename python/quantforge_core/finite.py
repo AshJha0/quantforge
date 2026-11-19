@@ -86,6 +86,7 @@ def _wrap[**P, R](f: Callable[P, R]) -> Callable[P, R]:
     while hasattr(inner, "__wrapped__"):
         inner = inner.__wrapped__
     code = inner.__code__
+    limits: Callable[..., None] | None = getattr(inner, "__qf_limits__", None)
     positional = list(code.co_varnames[: code.co_argcount])
     rest = (
         code.co_varnames[code.co_argcount + code.co_kwonlyargcount] if code.co_flags & 4 else "args"
@@ -95,6 +96,8 @@ def _wrap[**P, R](f: Callable[P, R]) -> Callable[P, R]:
     def checked(*args: P.args, **kwargs: P.kwargs) -> R:
         if _state.inside:
             return f(*args, **kwargs)
+        if limits is not None:
+            limits(*args, **kwargs)
         for k, a in enumerate(args):
             found = bad_field(a)
             if found is not None:
@@ -110,6 +113,18 @@ def _wrap[**P, R](f: Callable[P, R]) -> Callable[P, R]:
             _state.inside = False
 
     return checked
+
+
+def limits_first[F: Callable[..., Any]](check: Callable[..., None]) -> Callable[[F], F]:
+    """Marks a public core function whose size limits (E_LIMIT) the guard checks before the finite rule, so
+    that a library call keeps the command-line order (HR-122: E_LIMIT, then the finite rule; ruling KR-230).
+    `check` takes the function's arguments."""
+
+    def mark(f: F) -> F:
+        setattr(f, "__qf_limits__", check)  # noqa: B010 - mypy cannot type a dynamic attribute
+        return f
+
+    return mark
 
 
 def guard(namespace: dict[str, Any]) -> None:

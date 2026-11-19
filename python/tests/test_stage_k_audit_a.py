@@ -1,7 +1,7 @@
 """Stage K round 1 audit A (institutional-quant-engine-plan/STAGE_K_R1_AUDIT_A.md): one reproduction per Major
 finding (KA-A1 to KA-A6, KA-A16), each with the concrete input that shows it. They were committed first as
-expected failures (strict xfail, marked with the finding id) on the unfixed code, so the evidence exists in the
-history; the fix commits remove the markers. The arithmetic of each expected value is in the test or its ruling
+expected failures (strict xfail, marked with the finding id) on the unfixed code (commit 9edc7348), so the
+evidence exists in the history; the fix commit removed the markers. The arithmetic of each expected value is in the test or its ruling
 (stage-k-rulings-w1.md and stage-k-rulings-w1b.md, KR-230 onward)."""
 
 import json
@@ -55,7 +55,6 @@ def _bt(records: list[dict[str, Any]]) -> dict[str, Any]:
 # --- KA-A1: one error order (HR-122: E_SCHEMA, E_LIMIT, finite rule, structural E_INPUT, E_DOMAIN) --------------
 
 
-@pytest.mark.xfail(strict=True, reason="KA-A1: reproduced on the unfixed code")
 def test_ka_a1_a_finite_rule_before_structural_input() -> None:
     """`changes` = [NaN]: the finite rule (cli-contract.md, F-2: "the first rule check of every operation")
     outranks the structural "fewer than two" E_INPUT."""
@@ -63,7 +62,6 @@ def test_ka_a1_a_finite_rule_before_structural_input() -> None:
     assert _code("calib.trigger.check", inputs) == "E_DOMAIN"
 
 
-@pytest.mark.xfail(strict=True, reason="KA-A1: reproduced on the unfixed code")
 def test_ka_a1_b_size_limit_before_domain() -> None:
     """100,001 changes and k = 0: E_LIMIT straight after E_SCHEMA (cli-contract.md order; limits.md B3)."""
     inputs = {
@@ -76,13 +74,11 @@ def test_ka_a1_b_size_limit_before_domain() -> None:
     assert _code("calib.trigger.check", inputs) == "E_LIMIT"
 
 
-@pytest.mark.xfail(strict=True, reason="KA-A1: reproduced on the unfixed code")
 def test_ka_a1_c_size_limit_before_log_checks() -> None:
     """A log above the array limit whose sequence repeats: E_LIMIT before log checks 2 and 3 (rulings.md A2)."""
     assert _code("core.store.bitemporal_query", _bt([_record(1)] * 100_001)) == "E_LIMIT"
 
 
-@pytest.mark.xfail(strict=True, reason="KA-A1: reproduced on the unfixed code")
 def test_ka_a1_d_finite_rule_before_empty_list() -> None:
     """`positions` = [] and `shift` = NaN: E_DOMAIN by the finite rule, before the structural E_INPUT."""
     assert _code("risk.intraday.delta_gamma_bound", {"positions": [], "shift": "NaN"}) == "E_DOMAIN"
@@ -91,7 +87,6 @@ def test_ka_a1_d_finite_rule_before_empty_list() -> None:
 # --- KA-A2: the records cap is the generic array cap of limits.md -----------------------------------------------
 
 
-@pytest.mark.xfail(strict=True, reason="KA-A2: reproduced on the unfixed code")
 def test_ka_a2_records_above_the_generic_array_cap() -> None:
     """100,001 well-formed records: limits.md caps any array at 100,000 elements (E_LIMIT)."""
     assert (
@@ -109,7 +104,6 @@ def test_ka_a2_records_at_the_generic_array_cap() -> None:
 # --- KA-A3: volatility hedging sets follow CRE52.45 (CRE52.47) --------------------------------------------------
 
 
-@pytest.mark.xfail(strict=True, reason="KA-A3: reproduced on the unfixed code")
 def test_ka_a3_two_equity_volatility_trades_form_one_hedging_set() -> None:
     """Two equity variance swaps on two single names, long and short, effective notional 100 each, labelled
     "V1" and "V2". CRE52.47: "all equity volatility transactions form a single hedging set". SF = 32% x 5 = 1.6,
@@ -122,7 +116,7 @@ def test_ka_a3_two_equity_volatility_trades_form_one_hedging_set() -> None:
             subclass="SINGLE",
         ),
     ]  # fmt: skip
-    r = saccr.ead(trades)
+    r: Any = saccr.ead(trades)
     assert math.isclose(r["addon"]["EQUITY"], math.sqrt(38_400.0), rel_tol=1e-15)
     assert [(h["treatment"], h["key"]) for h in r["hedging_sets"]] == [("VOLATILITY", "")]
 
@@ -130,7 +124,6 @@ def test_ka_a3_two_equity_volatility_trades_form_one_hedging_set() -> None:
 # --- KA-A4: the reported false-alarm rate is the rate of the trigger as used ------------------------------------
 
 
-@pytest.mark.xfail(strict=True, reason="KA-A4: reproduced on the unfixed code")
 def test_ka_a4_false_alarm_rate_matches_the_estimated_sigma_trigger() -> None:
     """Noise-only paths drawn the way the trigger is used: a window of n = 4 N(0, 1) changes, then one
     independent N(0, 1) move (d = 1), k = 3. numpy default_rng(20261119), 400,000 paths. The statistic is
@@ -151,7 +144,6 @@ def test_ka_a4_false_alarm_rate_matches_the_estimated_sigma_trigger() -> None:
 # --- KA-A5: a constant window is E_DOMAIN whatever the rounding ------------------------------------------------
 
 
-@pytest.mark.xfail(strict=True, reason="KA-A5: reproduced on the unfixed code")
 def test_ka_a5_constant_window_is_a_domain_error() -> None:
     """[0.1, 0.1, 0.1]: the left-to-right mean is 0.10000000000000002 and sigma 1.7e-17 in binary64; a constant
     window has no noise scale (KR-6), so E_DOMAIN."""
@@ -171,11 +163,7 @@ def _exact_revaluation(n: float, t: float, y: float, h: float) -> Decimal:
 
 @pytest.mark.parametrize(
     "h",
-    [1e-8]
-    + [
-        pytest.param(h, marks=pytest.mark.xfail(strict=True, reason="KA-A6: reproduced"))
-        for h in (1e-9, 1e-10, 1e-12)
-    ],
+    [1e-8, 1e-9, 1e-10, 1e-12],
 )
 def test_ka_a6_bound_holds_for_tiny_moves(h: float) -> None:
     """One position N = 1e6, T = 5, y = 0.04 against a 60-digit revaluation (decimal module, exactly rounded
@@ -206,7 +194,6 @@ def _exact_cdf(n: int, x: int, p: Fraction) -> Fraction:
     return Fraction(total, b**n)
 
 
-@pytest.mark.xfail(strict=True, reason="KA-A16: reproduced on the unfixed code")
 def test_ka_a16_binomial_cdf_at_n_100000() -> None:
     """n = 100,000, x = 1,050, p = 1/100 exact: the class simple_analytic allows 1e-10 relative; the lgamma form
     was 1.3e-10 off (audit). The binary64 p = 0.01 differs from 1/100 by 2.1e-17 relative, which moves this

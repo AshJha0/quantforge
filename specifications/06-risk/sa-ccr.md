@@ -24,7 +24,9 @@ Netting set of trades i with notional N_i (domestic currency), market value v_i,
    - FX, per currency pair: AddOn = SF x |sum D|.
    - Credit and equity (one hedging set each): per entity a_e = SF_e x sum D; AddOn = sqrt((sum rho_e a_e)^2 + sum (1 - rho_e^2) a_e^2).
    - Commodity, four hedging sets (energy, metals, agricultural, other; KR-33): per commodity type a_t = SF_t x sum D; per hedging set the same single-factor formula with rho = 0.4; AddOn = sum over hedging sets.
-   - Basis and volatility transactions: own hedging sets named by the caller's `hedging_set`, same aggregation as their class (KR-34).
+   - Basis transactions: own hedging sets named by the caller's `hedging_set`, one per pair of risk factors, same aggregation as their class (CRE52.46, KR-34).
+   - Volatility transactions (KR-236, superseding KR-34 for them; audit A KA-A3): separate hedging sets built as CRE52.45 builds the normal ones (CRE52.47: "all equity volatility transactions form a single hedging set"): IR one per currency and FX one per pair (from `hedging_set`), credit one set, equity one set, commodity one per category (energy, metals, agricultural, other). A label on a credit, equity or commodity volatility trade does not form a set. Worked example (saccr_k-0040): two equity variance swaps on two names, notional 100, maturity 1, long and short, labels "V1" and "V2": SF = 0.32 x 5 = 1.6, entity add-ons +160 and -160, one set: `sqrt((0.5 x 160 - 0.5 x 160)^2 + 0.75 x (160^2 + 160^2)) = sqrt(38,400) = 195.96`; the first version's label rule gave 320. Only saccr_k-0011's `hedging_sets[].key` changed ("EQ VOL" to ""); no number of any golden changed and the five CRE99 examples reproduce unchanged.
+   - Sums (KA-A18): every sum of the steps above (buckets, entities, hedging sets, classes) is exactly rounded.
 7. AddOn_aggregate = sum over the five classes; multiplier m = 1 if V - C >= 0, else min{1; 0.05 + 0.95 exp((V - C) / (2 x 0.95 x AddOn))} (0.05 when AddOn = 0, KR-36); PFE = m x AddOn.
 8. RC = max(V - C, 0) unmargined; max(V - C, TH + MTA - NICA, 0) margined. EAD = 1.4 (RC + PFE). Margined: EAD = min(EAD_margined, EAD_unmargined) with the unmargined figure computed from the same trades, V and C (KR-37).
 
@@ -48,7 +50,7 @@ Inputs:
 | `trades[].kind` | `LINEAR` (default) `OPTION` `CDO` | |
 | `trades[].treatment` | `NORMAL` (default) `BASIS` `VOLATILITY` | CRE52.46, CRE52.47 |
 | `trades[].start`, `end` | Real, 0 <= start <= end; required for IR and CREDIT | S, E |
-| `trades[].hedging_set` | string; required for IR (currency), FX (pair), and every BASIS or VOLATILITY trade (label) | |
+| `trades[].hedging_set` | string; required for IR (currency), FX (pair) and every BASIS trade (label). From KR-236 not required for credit, equity or commodity VOLATILITY trades. The FX pair is not normalised: the caller spells each pair one way ("EUR/USD" and "USD/EUR" are two sets; KR-238(c)) | |
 | `trades[].entity` | string; required for CREDIT, EQUITY, COMMODITY | reference entity, index or commodity type |
 | `trades[].subclass` | credit `AAA` `AA` `A` `BBB` `BB` `B` `CCC` `IG` `SG`; equity `SINGLE` `INDEX`; commodity `ELECTRICITY` `OIL_GAS` `METALS` `AGRICULTURAL` `OTHER`; required for those classes, absent for IR and FX | Table 2 row |
 | `trades[].option_type`, `underlying_price`, `strike`, `exercise` | `CALL` `PUT`, Real, Real, Real > 0 years; required for OPTION | P, K, T |
@@ -58,11 +60,12 @@ Inputs:
 | `margin` | object, optional (absent = unmargined) | `threshold` >= 0, `mta` >= 0, `nica` (Real), `remargin_days` (Integer >= 1), `mpor_days` (Integer >= 1, optional estimate), `illiquid` (bool, default false), `disputes` (bool, default false) |
 | `ir_offset` | bool, default true | offset or no-offset IR formula |
 
-Outputs: `ead`, `rc`, `pfe`, `multiplier`, `addon_aggregate`, `addon` (object with all five classes), `v`, `c`, `margined` (bool), `mpor_days` (Integer or null), `ead_unmargined` (Real or null), `capped` (bool), `hedging_sets` (array of `asset_class`, `treatment`, `key`, `addon`, sorted by class in the order IR, FX, CREDIT, EQUITY, COMMODITY, then NORMAL, BASIS, VOLATILITY, then key; credit and equity NORMAL key is ""), `trades` (input order: `id`, `supervisory_duration` (null outside IR and credit), `adjusted_notional`, `maturity_factor`, `delta`, `effective_notional`, `supervisory_factor`, the margined figures when margined). Reals are binary64; tolerance class `simple_analytic`.
+Outputs: `ead`, `rc`, `pfe`, `multiplier`, `addon_aggregate`, `addon` (object with all five classes), `v`, `c`, `margined` (bool), `mpor_days` (Integer or null), `ead_unmargined` (Real or null), `capped` (bool), `hedging_sets` (array of `asset_class`, `treatment`, `key`, `addon`, sorted by class in the order IR, FX, CREDIT, EQUITY, COMMODITY, then NORMAL, BASIS, VOLATILITY, then key in Unicode code point order (UTF-8 byte order, KR-238(c)); credit and equity NORMAL key is ""), `trades` (input order: `id`, `supervisory_duration` (null outside IR and credit), `adjusted_notional`, `maturity_factor`, `delta`, `effective_notional`, `supervisory_factor`, the margined figures when margined). Reals are binary64; tolerance class `simple_analytic`.
 
 ## Errors
 
 Order (HR-122): `E_SCHEMA` (missing or mistyped key, value not in an enum list), `E_LIMIT` (an array above 100,000), the finite rule (`E_DOMAIN`), structural `E_INPUT`, then `E_DOMAIN`.
+- A field that only the trade's class, kind or treatment requires is a cross-field consistency check, structural `E_INPUT` (HR-122 step 4); limits.md B3's "conditional inputs" are keys whose type the schema fixes, which stay `E_SCHEMA` (KR-238(c)).
 - `E_INPUT`: no trades; duplicate `id`; a field required by the trade's class, kind or treatment is missing; a subclass of another class, or a subclass on IR or FX; a position that does not fit the kind; a CDO outside CREDIT; one entity with two subclasses in one hedging set.
 - `E_DOMAIN`: notional <= 0; maturity <= 0; not 0 <= start <= end; shifted price or strike <= 0; exercise <= 0; not 0 <= attachment < detachment <= 1; threshold or MTA < 0; `remargin_days` or `mpor_days` < 1.
 
@@ -74,6 +77,7 @@ Order (HR-122): `E_SCHEMA` (missing or mistyped key, value not in an enum list),
 | saccr_k-0006 | Example 1, no-offset IR formula | hand |
 | saccr_k-0007 to 0016 | FX pairs with a sold call; equity netting and an index put; CDO and second-to-default; electricity, gas, agriculture and a basis set; volatility and IR basis sets; shifted IR option, three buckets; daily margin illiquid and disputed (MPOR 40); own MPOR estimate 15; capped margined EAD; exactly offsetting FX (multiplier 0.05) | hand, mpmath oracle |
 | saccr_k-0017 to 0037 | 21 error cases, four with two errors at once | hand |
+| saccr_k-0040 to 0042 (audit A, 2026-11-19) | KR-236 worked example (two equity volatility trades, one set, add-on 195.96); electricity and silver volatility trades in two category sets despite one label; daily margin replaced by re-margining every 15 days with `illiquid`: MPOR floor max(9 + 15, 20) = 24 (KR-238(b): the combination is inferred, not read) | hand, mpmath oracle; not blind |
 | saccr_k-0038, 0039 | E1 goldens (ruling F-2): a NaN notional; a -Infinity market value with no currency pair (two errors, the finite rule first), both `E_DOMAIN`; added at integration 2026-11-19 | hand |
 
 ## Acceptance (fixed before the goldens were generated)
@@ -93,6 +97,6 @@ SA-CCR is a closed-form formula: no iteration, grid or solver. The page names "B
 
 ## Limits and scope
 
-- Not covered (KR-39): CRE52.74 multiple margin agreements within one netting set; CRE52.75 and 52.76 one margin agreement over several netting sets; collateral haircuts (C is the caller's haircut value); central counterparty MPOR floors (CRE54); variable-notional averaging (CRE52.37) and digital-option collars (CRE52.42(3)), which the caller applies before the call; the sold-option and sold-protection EAD caps in the CRE52.1 FAQs.
+- Not covered (KR-39): CRE52.74 multiple margin agreements within one netting set; CRE52.75 and 52.76 one margin agreement over several netting sets; CRE52.77 collateral held outside the netting set (the caller decides what enters C; added to this list by KR-238(c) to match KR-39); collateral haircuts (C is the caller's haircut value); central counterparty MPOR floors (CRE54); variable-notional averaging (CRE52.37) and digital-option collars (CRE52.42(3)), which the caller applies before the call; the sold-option and sold-protection EAD caps in the CRE52.1 FAQs.
 - The supervisory parameters are in `specifications/06-risk/sa-ccr-parameters.json`, shared by the four builds; a test checks the Python literals against it.
 - E_LIMIT: the generic array cap of 100,000 (`MAX_ARRAY`) bounds `trades`; the CRE52.51(1) "more than 5000 transactions" floor is reachable below it.

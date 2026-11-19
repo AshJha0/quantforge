@@ -14,6 +14,12 @@ classes:
     # A few operations on well-conditioned values.
     absolute: 1.0e-12
     relative: 1.0e-10
+  tail_probability:
+    # Stage K (ruling KR-232): a Student-t two-sided tail probability by the stated finite or remainder series.
+    # Measured within about 2e-12 relative of 50-digit values (mpmath) for 1 to 99,999 degrees of freedom; the
+    # builds share the arithmetic. Purely relative, so a tail of 1e-200 is still compared.
+    absolute: 0.0
+    relative: 1.0e-11
   per_unit:
     # R6 ruling R6-10.2 (review finding 14): rates, spreads, vols, ratios and per-unit factors never inherit a money
     # tolerance. Measured on the v0.8.0 Python, Rust and C++ builds: every flagged output within 1e-15 relative.

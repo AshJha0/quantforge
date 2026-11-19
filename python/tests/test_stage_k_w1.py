@@ -192,13 +192,15 @@ def test_bt_cli_schema_order_and_limit() -> None:
     bad = copy.deepcopy(base)
     bad["records"][0]["sequence"] = 0
     assert _code("core.store.bitemporal_query", bad) == "E_SCHEMA"
-    # HR-66: a structural E_INPUT (sequence order) before the finite rule's E_DOMAIN
+    # KR-230 (HR-122): the finite rule's E_DOMAIN before a structural E_INPUT (sequence order); the HR-66
+    # order of the first version gave E_INPUT here
     bad = copy.deepcopy(base)
     bad["records"][1]["sequence"] = 1
     bad["records"][0]["value"] = "NaN"
-    assert _code("core.store.bitemporal_query", bad) == "E_INPUT"
-    log = [sk.BiRecord(s, "A", T0, None, T0, 0, False) for s in range(1, sk.MAX_RECORDS + 2)]
-    _err(lambda: sk.bitemporal_query(log, "A", T0, T0), "E_LIMIT")
+    assert _code("core.store.bitemporal_query", bad) == "E_DOMAIN"
+    assert sk.MAX_RECORDS == 100_000  # KR-231: the generic array cap
+    log = [sk.BiRecord(1, "A", T0, None, T0, 0, False)] * (sk.MAX_RECORDS + 1)
+    _err(lambda: sk.bitemporal_query(log, "A", T0, T0), "E_LIMIT")  # before log check 2 (A2)
     r = _cli("core.store.bitemporal_query", base)
     assert r["outputs"]["row"]["valid_to"] is None
 
@@ -548,13 +550,17 @@ def test_trig_k_rows(case: dict[str, Any]) -> None:
         return
     got, want = sk.trigger_check(*args), case["expected"]["outputs"]
     assert got["fire"] is want["fire"]
-    for key in ("sigma", "threshold", "false_alarm_rate"):
-        assert _rel(got[key], want[key]) <= 1e-14
+    for key in ("sigma", "threshold", "nominal_rate"):
+        assert _rel(got[key], want[key]) <= case.get("tolerance_limit", {}).get("relative", 1e-14)
+    assert (
+        _rel(got["false_alarm_rate"], want["false_alarm_rate"]) <= 1e-11
+    )  # class tail_probability (KR-232)
 
 
-def test_false_alarm_rate_is_twice_the_normal_tail() -> None:
-    """KR-6 states 2 (1 - Phi(k)); at k = 30 a bare erfc(k / sqrt 2) is 1.2e-13 off (trig_k-0009, mpmath)."""
-    far = sk.trigger_check([1.0, -1.0, 1.0, -1.0], 100.0, 105.0, 1.0, 30.0)["false_alarm_rate"]
+def test_nominal_rate_is_twice_the_normal_tail() -> None:
+    """KR-6 states 2 (1 - Phi(k)), kept as `nominal_rate` by KR-232; at k = 30 a bare erfc(k / sqrt 2) is
+    1.2e-13 off (trig_k-0009, mpmath)."""
+    far = sk.trigger_check([1.0, -1.0, 1.0, -1.0], 100.0, 105.0, 1.0, 30.0)["nominal_rate"]
     assert _rel(far, 9.813427854296374e-198) <= 1e-14
     # the form not used: a bare erfc(k / sqrt 2)
     assert _rel(math.erfc(30.0 / math.sqrt(2.0)), 9.813427854296374e-198) > 1e-14
@@ -562,52 +568,60 @@ def test_false_alarm_rate_is_twice_the_normal_tail() -> None:
 
 
 def test_trigger_simulation_acceptance() -> None:
-    """recalibration-triggers.md: 100,000 noise paths, window 250, k = 3, d = 1; fire rate inside
-    the 99% binomial interval of the Student-t predictive rate; a 6-sigma planted move fires on at
-    least 99.9% of paths."""
-    rng = np.random.default_rng(20261118)
-    n, w, k = 100_000, 250, 3.0
-    fires = planted = 0
-    for block in range(10):
-        z = rng.standard_normal((n // 10, w + 1))
-        sig = z[:, :w].std(axis=1, ddof=1)
-        fires += int(np.sum(np.abs(z[:, w]) > k * sig))
-        planted += int(np.sum(6.0 > k * sig))  # a move of exactly 6 true sigma
-        if block == 0:  # the operation itself agrees with the vectorised rule on a sample
-            for row in range(200):
-                r = sk.trigger_check(list(z[row, :w]), 0.0, float(z[row, w]), 1.0, k)
-                assert r["fire"] == bool(abs(z[row, w]) > k * sig[row])
-    centre = 2 * stats.t.sf(k / math.sqrt(1 + 1 / w), w - 1)
-    lo, hi = stats.binom.interval(0.99, n, centre)
-    _evidence(
-        "trigger_simulation",
-        {
-            "paths": n,
-            "window": w,
-            "k": k,
+    """KR-232 acceptance (replaces the window-250 simulation of the first version): for n in {2, 4, 30, 250},
+    k = 3, d = 1, 100,000 noise paths per n, each a fresh window of n N(0, 1) changes and an independent N(0, 1)
+    move; the fire count lies in the 99% binomial interval of paths x the operation's own false_alarm_rate.
+    A 6-sigma planted move fires on at least 99.9% of the n = 250 paths."""
+    rng = np.random.default_rng(20261119)
+    paths, k = 100_000, 3.0
+    record: dict[str, Any] = {
+        "paths": paths,
+        "k": k,
+        "seed": "numpy default_rng(20261119)",
+        "by_window": {},
+    }
+    ok = True
+    for n in (2, 4, 30, 250):
+        fires = planted = 0
+        for block in range(10):
+            z = rng.standard_normal((paths // 10, n + 1))
+            sig = z[:, :n].std(axis=1, ddof=1)
+            fires += int(np.sum(np.abs(z[:, n]) > k * sig))
+            planted += int(np.sum(6.0 > k * sig))  # a move of exactly 6 true sigma
+            if block == 0:  # the operation itself agrees with the vectorised rule on a sample
+                for row in range(100):
+                    r = sk.trigger_check(list(z[row, :n]), 0.0, float(z[row, n]), 1.0, k)
+                    assert r["fire"] == bool(abs(z[row, n]) > k * sig[row])
+        rate = sk.trigger_check([1.0, -1.0] * (n // 2) + [0.5] * (n % 2), 0.0, 0.0, 1.0, k)[
+            "false_alarm_rate"
+        ]
+        lo, hi = stats.binom.interval(0.99, paths, rate)
+        passed = bool(lo <= fires <= hi)
+        ok = ok and passed and (n != 250 or planted >= 0.999 * paths)
+        record["by_window"][str(n)] = {
             "fires": fires,
-            "centre_rate": centre,
+            "false_alarm_rate": rate,
+            "nominal_rate": 2 * stats.norm.sf(k),
             "binomial_99_interval": [lo, hi],
             "planted_6_sigma_fires": planted,
-            "planted_rate": planted / n,
-            "seed": "numpy default_rng(20261118)",
-            "pass": bool(lo <= fires <= hi and planted >= 0.999 * n),
-        },
-    )
-    assert lo <= fires <= hi, (fires, lo, hi, centre)
-    assert planted >= 0.999 * n
+            "pass": passed,
+        }
+    record["pass"] = ok
+    _evidence("trigger_simulation_kr232", record)
+    assert ok, record
 
 
 def test_trigger_cli_order() -> None:
     base = _gold("trig_k")[0]["inputs"]
-    # HR-66: fewer than two changes (structural E_INPUT) before a non-finite x_now (E_DOMAIN)
-    assert _code("calib.trigger.check", dict(base, changes=[1.0], x_now="NaN")) == "E_INPUT"
+    # KR-230 (HR-122): the finite rule (E_DOMAIN) before fewer than two changes (structural E_INPUT)
+    assert _code("calib.trigger.check", dict(base, changes=[1.0], x_now="NaN")) == "E_DOMAIN"
     assert _code("calib.trigger.check", dict(base, days_since=0.5)) == "E_DOMAIN"
     assert _code("calib.trigger.check", dict(base, changes=[1.0, -1.0] * 50_001)) == "E_LIMIT"
-    # E_DOMAIN before E_LIMIT
+    # E_LIMIT before E_DOMAIN, in the CLI and in a library call
     assert _code("calib.trigger.check", dict(base, k=-1.0, changes=[1.0, -1.0] * 50_001)) == (
-        "E_DOMAIN"
+        "E_LIMIT"
     )
+    _err(lambda: sk.trigger_check([math.nan] * 100_001, 0.0, 0.0, 1.0, 3.0), "E_LIMIT")
 
 
 # --- intraday bound -------------------------------------------------------------------------------
@@ -667,9 +681,83 @@ def test_intraday_bound_acceptance_1000_moves() -> None:
     print(f"intraday bound acceptance: 1000 moves, worst |error| / bound = {worst:.6f}")
 
 
+SWEEP_H = (
+    [0.0]
+    + [
+        x * 10.0**-e
+        for e in (30, 25, 20, 16, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+        for x in (1.0, -1.0)
+    ]
+    + [0.5, -0.5, 1.0, -1.0, 1.0 / 3.0, -0.07]
+)
+SWEEP_T = (1e-6, 1e-3, 0.25, 1.0, 5.0, 30.0, 100.0)
+SWEEP_Y = (-1.0, -0.01, 0.0, 0.04, 0.3, 1.0)
+SWEEP_N = (0.0, 1e-6, 1.0, 1e6, -1e6, 1e15, -1e15)
+
+
+def sweep_books() -> list[list[sk.ZeroPosition]]:
+    """KR-234 acceptance books: every single position of the grid, hedged books, delta-neutral pairs and 300
+    seeded random books (random.Random(20261119)); each is judged at every move of SWEEP_H."""
+    import itertools
+
+    books = [[sk.ZeroPosition(n, t, y)] for n, t, y in itertools.product(SWEEP_N, SWEEP_T, SWEEP_Y)]
+    for t, y in itertools.product(SWEEP_T, SWEEP_Y):
+        books.append([sk.ZeroPosition(1e6, t, y), sk.ZeroPosition(-1e6 * (1 + 1e-12), t, y)])
+        books.append([sk.ZeroPosition(1e6, t, y), sk.ZeroPosition(-1e6, t, y)])
+        if 2 * t <= 100:
+            n2 = -1e6 * t * math.exp(-y * t) / (2 * t * math.exp(-y * 2 * t))
+            books.append([sk.ZeroPosition(1e6, t, y), sk.ZeroPosition(n2, 2 * t, y)])
+    rnd = random.Random(20261119)
+    for _ in range(300):
+        books.append(
+            [
+                sk.ZeroPosition(
+                    rnd.uniform(-1e9, 1e9),
+                    rnd.choice(SWEEP_T) * rnd.uniform(0.5, 1.0),
+                    rnd.uniform(-0.05, 0.1),
+                )
+                for _ in range(rnd.randint(1, 20))
+            ]
+        )
+    return books
+
+
+def test_intraday_bound_small_move_sweep() -> None:
+    """KR-234 acceptance, binary64 half: |estimate - V_64| <= bound on every book of the sweep at every move
+    (V_64 the stated binary64 revaluation). The 50-digit half is oracle/python/check_stage_k_audit_a.py, which
+    judges each build's own outputs; single positions are also judged here at 60 digits (decimal)."""
+    from decimal import Decimal, localcontext
+
+    worst, cases = 0.0, 0
+    for book in sweep_books():
+        for h in SWEEP_H:
+            r = sk.delta_gamma_bound(book, h)
+            gap = abs(r["estimate_pnl"] - sk.zero_revalue(book, h))
+            assert gap <= r["bound"], (
+                [(p.notional, p.maturity, p.yield_) for p in book],
+                h,
+                gap,
+                r["bound"],
+            )
+            if r["bound"]:
+                worst = max(worst, gap / r["bound"])
+            cases += 1
+            if len(book) == 1 and book[0].notional:
+                p = book[0]
+                with localcontext() as ctx:
+                    ctx.prec = 60
+                    n, t, y, dh = (Decimal(x) for x in (p.notional, p.maturity, p.yield_, h))
+                    exact = n * ((-(y + dh) * t).exp() - (-y * t).exp())
+                    assert abs(Decimal(r["estimate_pnl"]) - exact) <= Decimal(r["bound"]), (p, h)
+    _evidence(
+        "intraday_bound_sweep_kr234", {"cases": cases, "worst_binary64_gap_over_bound": worst}
+    )
+    assert cases > 20_000
+
+
 def test_intraday_cli_order_and_label() -> None:
     i = {"positions": [], "shift": "NaN"}
-    assert _code("risk.intraday.delta_gamma_bound", i) == "E_INPUT"  # HR-66
+    assert _code("risk.intraday.delta_gamma_bound", i) == "E_DOMAIN"  # KR-230: finite rule first
     pos = {"notional": 1.0, "maturity": 1.0, "yield": 0.0}
     assert _code("risk.intraday.delta_gamma_bound", {"positions": [pos], "shift": "NaN"}) == (
         "E_DOMAIN"
@@ -677,7 +765,7 @@ def test_intraday_cli_order_and_label() -> None:
     big: dict[str, Any] = {"positions": [pos] * 100_001, "shift": 0.01}
     assert _code("risk.intraday.delta_gamma_bound", big) == "E_LIMIT"
     big["positions"] = [*big["positions"][:-1], dict(pos, maturity=0.0)]
-    assert _code("risk.intraday.delta_gamma_bound", big) == "E_DOMAIN"  # before E_LIMIT
+    assert _code("risk.intraday.delta_gamma_bound", big) == "E_LIMIT"  # KR-230: before E_DOMAIN
     r = _cli("risk.intraday.delta_gamma_bound", {"positions": [pos], "shift": 0.0})
     assert r["outputs"] == {"estimate_pnl": 0.0, "bound": 0.0, "label": sk.LABEL}
 
@@ -706,7 +794,7 @@ def test_richardson_more() -> None:
     assert sk.richardson_check([1.0, 1.0, 1.0], 2.0, 2.0)["status"] == "NON_MONOTONE"
     assert _code(
         "num.richardson.check", {"values": [1.0], "ratio": "NaN", "assumed_order": 1.0}
-    ) == ("E_INPUT")
+    ) == ("E_DOMAIN")  # KR-230: the finite rule before the structural E_INPUT
 
 
 # --- E1 (F-2) and the K-8 method ----------------------------------------------------------------

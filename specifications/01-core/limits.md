@@ -47,6 +47,9 @@ Bounds that come from a table or a definition, not from work, keep their own cod
 | `core.pde.bs_european` | `space_steps` x `time_steps` | 10,000,000 | Grid updates. `J = 2000`, `M = 5000` is far past the accuracy needed |
 | `core.cos.european` | `terms` | 100,000 | Complex evaluations. The series converges far sooner |
 | `vol.garch.forecast` | `horizon` | 100,000 | Output size: one variance per step (ruling J-0b.1) |
+| `curve.bootstrap.par_annual` | `quotes` | 200 | Each is a solve step; the stage K spec has always used 200, so this row replaces the 100 of the curve rule for the two stage K curve operations (ruling KR-231) |
+| `curve.incremental.update` | `previous_quotes`, `previous_discount_factors`, `new_quotes` | 200 each | As `curve.bootstrap.par_annual` (KR-231) |
+| `core.store.bitemporal_query`, `calib.trigger.check`, `risk.intraday.delta_gamma_bound` | `records`, `changes`, `positions` | 100,000 (the general array row; no row of their own) | KR-231: one rule, stated here only. `bitemporal-store.md` 1.0.0 had 1,000,000 records, which this file never allowed |
 | `risk.backtest.traffic_light` | `observations` | 1,000,000 | The binomial sum has up to `observations + 1` terms (ruling J-W3-17) |
 | `core.calendar.add_business_days` | `|days|` | 30,000 | More than the business days in 2000 to 2099 |
 | `core.ts.rolling` | `window` | 1,000 | Each window is computed afresh |
