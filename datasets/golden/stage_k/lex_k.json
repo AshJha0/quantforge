@@ -1,0 +1,1714 @@
+{
+ "schema_version": "1.0",
+ "suite": "lex_k",
+ "spec": "specifications/06-risk/leverage-large-exposures.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w2b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "lex_k-0001",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "bank_gsib": false,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     },
+     {
+      "id": "C"
+     },
+     {
+      "id": "D"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 260
+     },
+     {
+      "counterparty": "B",
+      "value": 100
+     },
+     {
+      "counterparty": "C",
+      "value": 250
+     },
+     {
+      "counterparty": "D",
+      "value": 99.99
+     }
+    ],
+    "off_balance": [],
+    "crm": [],
+    "trading_book": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "counterparties": [
+      {
+       "id": "A",
+       "banking_book": 260.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 260.0
+      },
+      {
+       "id": "B",
+       "banking_book": 100.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 100.0
+      },
+      {
+       "id": "C",
+       "banking_book": 250.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 250.0
+      },
+      {
+       "id": "D",
+       "banking_book": 99.99,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 99.99
+      }
+     ],
+     "groups": [
+      {
+       "group": "A",
+       "members": [
+        "A"
+       ],
+       "exposure": 260.0,
+       "share": 0.26,
+       "large": true,
+       "limit": 250.0,
+       "breach": true,
+       "exempt": false
+      },
+      {
+       "group": "B",
+       "members": [
+        "B"
+       ],
+       "exposure": 100.0,
+       "share": 0.1,
+       "large": true,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "C",
+       "members": [
+        "C"
+       ],
+       "exposure": 250.0,
+       "share": 0.25,
+       "large": true,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "D",
+       "members": [
+        "D"
+       ],
+       "exposure": 99.99,
+       "share": 0.09999,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      }
+     ],
+     "report": [
+      "A",
+      "C",
+      "B",
+      "D"
+     ],
+     "label": "simplified large exposures (LEX subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "10% is large, 25% is not a breach",
+   "output_classes": {
+    "label": "date_and_convention",
+    "report": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lex_k-0002",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "bank_gsib": false,
+    "counterparties": [
+     {
+      "id": "A1",
+      "group": "G"
+     },
+     {
+      "id": "A2",
+      "group": "G"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A1",
+      "value": 150
+     },
+     {
+      "counterparty": "A2",
+      "value": 120
+     }
+    ],
+    "off_balance": [],
+    "crm": [],
+    "trading_book": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "counterparties": [
+      {
+       "id": "A1",
+       "banking_book": 150.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 150.0
+      },
+      {
+       "id": "A2",
+       "banking_book": 120.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 120.0
+      }
+     ],
+     "groups": [
+      {
+       "group": "G",
+       "members": [
+        "A1",
+        "A2"
+       ],
+       "exposure": 270.0,
+       "share": 0.27,
+       "large": true,
+       "limit": 250.0,
+       "breach": true,
+       "exempt": false
+      }
+     ],
+     "report": [
+      "G"
+     ],
+     "label": "simplified large exposures (LEX subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "a group of two",
+   "output_classes": {
+    "label": "date_and_convention",
+    "report": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lex_k-0003",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "bank_gsib": false,
+    "counterparties": [
+     {
+      "id": "E"
+     },
+     {
+      "id": "F"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "E",
+      "value": 300
+     },
+     {
+      "counterparty": "F",
+      "value": 200
+     }
+    ],
+    "off_balance": [],
+    "crm": [
+     {
+      "counterparty": "E",
+      "provider": "F",
+      "protected": 100
+     }
+    ],
+    "trading_book": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "counterparties": [
+      {
+       "id": "E",
+       "banking_book": 300.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 100.0,
+       "received": 0.0,
+       "exposure": 200.0
+      },
+      {
+       "id": "F",
+       "banking_book": 200.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 100.0,
+       "exposure": 300.0
+      }
+     ],
+     "groups": [
+      {
+       "group": "E",
+       "members": [
+        "E"
+       ],
+       "exposure": 200.0,
+       "share": 0.2,
+       "large": true,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "F",
+       "members": [
+        "F"
+       ],
+       "exposure": 300.0,
+       "share": 0.3,
+       "large": true,
+       "limit": 250.0,
+       "breach": true,
+       "exempt": false
+      }
+     ],
+     "report": [
+      "F",
+      "E"
+     ],
+     "label": "simplified large exposures (LEX subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "CRM substitution to the provider",
+   "output_classes": {
+    "label": "date_and_convention",
+    "report": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lex_k-0004",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "bank_gsib": false,
+    "counterparties": [
+     {
+      "id": "G"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "G",
+      "value": 200
+     }
+    ],
+    "off_balance": [],
+    "crm": [],
+    "trading_book": [
+     {
+      "id": "bond",
+      "counterparty": "G",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 90,
+      "maturity_years": 5
+     },
+     {
+      "id": "stock",
+      "counterparty": "G",
+      "seniority": "EQUITY",
+      "notional": -30,
+      "market_value": -30,
+      "maturity_years": 1,
+      "cash_equity": true
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "counterparties": [
+      {
+       "id": "G",
+       "banking_book": 200.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 60.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 260.0
+      }
+     ],
+     "groups": [
+      {
+       "group": "G",
+       "members": [
+        "G"
+       ],
+       "exposure": 260.0,
+       "share": 0.26,
+       "large": true,
+       "limit": 250.0,
+       "breach": true,
+       "exempt": false
+      }
+     ],
+     "report": [
+      "G"
+     ],
+     "label": "simplified large exposures (LEX subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "trading book (worked example)",
+   "output_classes": {
+    "label": "date_and_convention",
+    "report": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lex_k-0005",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "bank_gsib": false,
+    "counterparties": [
+     {
+      "id": "H"
+     }
+    ],
+    "banking_book": [],
+    "off_balance": [],
+    "crm": [],
+    "trading_book": [
+     {
+      "id": "long",
+      "counterparty": "H",
+      "seniority": "SENIOR",
+      "notional": 50,
+      "market_value": 50,
+      "maturity_years": 5
+     },
+     {
+      "id": "short",
+      "counterparty": "H",
+      "seniority": "SENIOR",
+      "notional": -80,
+      "market_value": -80,
+      "maturity_years": 5
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "counterparties": [
+      {
+       "id": "H",
+       "banking_book": 0.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": -30.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 0.0
+      }
+     ],
+     "groups": [
+      {
+       "group": "H",
+       "members": [
+        "H"
+       ],
+       "exposure": 0.0,
+       "share": 0.0,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      }
+     ],
+     "report": [
+      "H"
+     ],
+     "label": "simplified large exposures (LEX subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "net short counts 0",
+   "output_classes": {
+    "label": "date_and_convention",
+    "report": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lex_k-0006",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "bank_gsib": false,
+    "counterparties": [
+     {
+      "id": "O"
+     }
+    ],
+    "banking_book": [],
+    "off_balance": [
+     {
+      "counterparty": "O",
+      "notional": 1000,
+      "ccf": 0
+     }
+    ],
+    "crm": [],
+    "trading_book": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "counterparties": [
+      {
+       "id": "O",
+       "banking_book": 0.0,
+       "off_balance": 100.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 100.0
+      }
+     ],
+     "groups": [
+      {
+       "group": "O",
+       "members": [
+        "O"
+       ],
+       "exposure": 100.0,
+       "share": 0.1,
+       "large": true,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      }
+     ],
+     "report": [
+      "O"
+     ],
+     "label": "simplified large exposures (LEX subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "CCF floor 10%",
+   "output_classes": {
+    "label": "date_and_convention",
+    "report": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lex_k-0007",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "bank_gsib": true,
+    "counterparties": [
+     {
+      "id": "K",
+      "gsib": true
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "K",
+      "value": 160
+     }
+    ],
+    "off_balance": [],
+    "crm": [],
+    "trading_book": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "counterparties": [
+      {
+       "id": "K",
+       "banking_book": 160.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 160.0
+      }
+     ],
+     "groups": [
+      {
+       "group": "K",
+       "members": [
+        "K"
+       ],
+       "exposure": 160.0,
+       "share": 0.16,
+       "large": true,
+       "limit": 150.0,
+       "breach": true,
+       "exempt": false
+      }
+     ],
+     "report": [
+      "K"
+     ],
+     "label": "simplified large exposures (LEX subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "G-SIB to G-SIB limit 15%",
+   "output_classes": {
+    "label": "date_and_convention",
+    "report": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lex_k-0008",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "N00"
+     },
+     {
+      "id": "N01"
+     },
+     {
+      "id": "N02"
+     },
+     {
+      "id": "N03"
+     },
+     {
+      "id": "N04"
+     },
+     {
+      "id": "N05"
+     },
+     {
+      "id": "N06"
+     },
+     {
+      "id": "N07"
+     },
+     {
+      "id": "N08"
+     },
+     {
+      "id": "N09"
+     },
+     {
+      "id": "N10"
+     },
+     {
+      "id": "N11"
+     },
+     {
+      "id": "N12"
+     },
+     {
+      "id": "N13"
+     },
+     {
+      "id": "N14"
+     },
+     {
+      "id": "N15"
+     },
+     {
+      "id": "N16"
+     },
+     {
+      "id": "N17"
+     },
+     {
+      "id": "N18"
+     },
+     {
+      "id": "N19"
+     },
+     {
+      "id": "N20"
+     },
+     {
+      "id": "N21"
+     },
+     {
+      "id": "N22"
+     },
+     {
+      "id": "X",
+      "group": "GX",
+      "exempt": true
+     },
+     {
+      "id": "Y",
+      "group": "GX"
+     },
+     {
+      "id": "Z",
+      "exempt": true
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "N00",
+      "value": 10
+     },
+     {
+      "counterparty": "N01",
+      "value": 11
+     },
+     {
+      "counterparty": "N02",
+      "value": 12
+     },
+     {
+      "counterparty": "N03",
+      "value": 13
+     },
+     {
+      "counterparty": "N04",
+      "value": 14
+     },
+     {
+      "counterparty": "N05",
+      "value": 15
+     },
+     {
+      "counterparty": "N06",
+      "value": 16
+     },
+     {
+      "counterparty": "N07",
+      "value": 17
+     },
+     {
+      "counterparty": "N08",
+      "value": 18
+     },
+     {
+      "counterparty": "N09",
+      "value": 19
+     },
+     {
+      "counterparty": "N10",
+      "value": 20
+     },
+     {
+      "counterparty": "N11",
+      "value": 21
+     },
+     {
+      "counterparty": "N12",
+      "value": 22
+     },
+     {
+      "counterparty": "N13",
+      "value": 23
+     },
+     {
+      "counterparty": "N14",
+      "value": 24
+     },
+     {
+      "counterparty": "N15",
+      "value": 25
+     },
+     {
+      "counterparty": "N16",
+      "value": 26
+     },
+     {
+      "counterparty": "N17",
+      "value": 27
+     },
+     {
+      "counterparty": "N18",
+      "value": 28
+     },
+     {
+      "counterparty": "N19",
+      "value": 29
+     },
+     {
+      "counterparty": "N20",
+      "value": 30
+     },
+     {
+      "counterparty": "N21",
+      "value": 31
+     },
+     {
+      "counterparty": "N22",
+      "value": 32
+     },
+     {
+      "counterparty": "X",
+      "value": 200
+     },
+     {
+      "counterparty": "Y",
+      "value": 100
+     },
+     {
+      "counterparty": "Z",
+      "value": 400
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "counterparties": [
+      {
+       "id": "N00",
+       "banking_book": 10.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 10.0
+      },
+      {
+       "id": "N01",
+       "banking_book": 11.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 11.0
+      },
+      {
+       "id": "N02",
+       "banking_book": 12.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 12.0
+      },
+      {
+       "id": "N03",
+       "banking_book": 13.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 13.0
+      },
+      {
+       "id": "N04",
+       "banking_book": 14.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 14.0
+      },
+      {
+       "id": "N05",
+       "banking_book": 15.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 15.0
+      },
+      {
+       "id": "N06",
+       "banking_book": 16.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 16.0
+      },
+      {
+       "id": "N07",
+       "banking_book": 17.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 17.0
+      },
+      {
+       "id": "N08",
+       "banking_book": 18.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 18.0
+      },
+      {
+       "id": "N09",
+       "banking_book": 19.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 19.0
+      },
+      {
+       "id": "N10",
+       "banking_book": 20.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 20.0
+      },
+      {
+       "id": "N11",
+       "banking_book": 21.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 21.0
+      },
+      {
+       "id": "N12",
+       "banking_book": 22.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 22.0
+      },
+      {
+       "id": "N13",
+       "banking_book": 23.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 23.0
+      },
+      {
+       "id": "N14",
+       "banking_book": 24.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 24.0
+      },
+      {
+       "id": "N15",
+       "banking_book": 25.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 25.0
+      },
+      {
+       "id": "N16",
+       "banking_book": 26.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 26.0
+      },
+      {
+       "id": "N17",
+       "banking_book": 27.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 27.0
+      },
+      {
+       "id": "N18",
+       "banking_book": 28.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 28.0
+      },
+      {
+       "id": "N19",
+       "banking_book": 29.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 29.0
+      },
+      {
+       "id": "N20",
+       "banking_book": 30.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 30.0
+      },
+      {
+       "id": "N21",
+       "banking_book": 31.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 31.0
+      },
+      {
+       "id": "N22",
+       "banking_book": 32.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 32.0
+      },
+      {
+       "id": "X",
+       "banking_book": 200.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 200.0
+      },
+      {
+       "id": "Y",
+       "banking_book": 100.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 100.0
+      },
+      {
+       "id": "Z",
+       "banking_book": 400.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 400.0
+      }
+     ],
+     "groups": [
+      {
+       "group": "GX",
+       "members": [
+        "X",
+        "Y"
+       ],
+       "exposure": 300.0,
+       "share": 0.3,
+       "large": true,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N00",
+       "members": [
+        "N00"
+       ],
+       "exposure": 10.0,
+       "share": 0.01,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N01",
+       "members": [
+        "N01"
+       ],
+       "exposure": 11.0,
+       "share": 0.011,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N02",
+       "members": [
+        "N02"
+       ],
+       "exposure": 12.0,
+       "share": 0.012,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N03",
+       "members": [
+        "N03"
+       ],
+       "exposure": 13.0,
+       "share": 0.013,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N04",
+       "members": [
+        "N04"
+       ],
+       "exposure": 14.0,
+       "share": 0.014,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N05",
+       "members": [
+        "N05"
+       ],
+       "exposure": 15.0,
+       "share": 0.015,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N06",
+       "members": [
+        "N06"
+       ],
+       "exposure": 16.0,
+       "share": 0.016,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N07",
+       "members": [
+        "N07"
+       ],
+       "exposure": 17.0,
+       "share": 0.017,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N08",
+       "members": [
+        "N08"
+       ],
+       "exposure": 18.0,
+       "share": 0.018,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N09",
+       "members": [
+        "N09"
+       ],
+       "exposure": 19.0,
+       "share": 0.019,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N10",
+       "members": [
+        "N10"
+       ],
+       "exposure": 20.0,
+       "share": 0.02,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N11",
+       "members": [
+        "N11"
+       ],
+       "exposure": 21.0,
+       "share": 0.021,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N12",
+       "members": [
+        "N12"
+       ],
+       "exposure": 22.0,
+       "share": 0.022,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N13",
+       "members": [
+        "N13"
+       ],
+       "exposure": 23.0,
+       "share": 0.023,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N14",
+       "members": [
+        "N14"
+       ],
+       "exposure": 24.0,
+       "share": 0.024,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N15",
+       "members": [
+        "N15"
+       ],
+       "exposure": 25.0,
+       "share": 0.025,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N16",
+       "members": [
+        "N16"
+       ],
+       "exposure": 26.0,
+       "share": 0.026,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N17",
+       "members": [
+        "N17"
+       ],
+       "exposure": 27.0,
+       "share": 0.027,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N18",
+       "members": [
+        "N18"
+       ],
+       "exposure": 28.0,
+       "share": 0.028,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N19",
+       "members": [
+        "N19"
+       ],
+       "exposure": 29.0,
+       "share": 0.029,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N20",
+       "members": [
+        "N20"
+       ],
+       "exposure": 30.0,
+       "share": 0.03,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N21",
+       "members": [
+        "N21"
+       ],
+       "exposure": 31.0,
+       "share": 0.031,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "N22",
+       "members": [
+        "N22"
+       ],
+       "exposure": 32.0,
+       "share": 0.032,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "Z",
+       "members": [
+        "Z"
+       ],
+       "exposure": 400.0,
+       "share": 0.4,
+       "large": true,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": true
+      }
+     ],
+     "report": [
+      "Z",
+      "GX",
+      "N22",
+      "N21",
+      "N20",
+      "N19",
+      "N18",
+      "N17",
+      "N16",
+      "N15",
+      "N14",
+      "N13",
+      "N12",
+      "N11",
+      "N10",
+      "N09",
+      "N08",
+      "N07",
+      "N06",
+      "N05"
+     ],
+     "label": "simplified large exposures (LEX subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand"
+   ],
+   "description": "hand: report: large groups plus the 20 largest, ties by name; exempt members never breach (KR-134)",
+   "output_classes": {
+    "label": "date_and_convention",
+    "report": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lex_k-0009",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 400,
+    "bank_gsib": true,
+    "counterparties": [
+     {
+      "id": "P",
+      "group": "GP",
+      "gsib": true
+     },
+     {
+      "id": "Q",
+      "group": "GP"
+     },
+     {
+      "id": "R"
+     }
+    ],
+    "off_balance": [
+     {
+      "counterparty": "R",
+      "notional": 100,
+      "ccf": 0.5
+     }
+    ],
+    "trading_book": [
+     {
+      "id": "b1",
+      "counterparty": "P",
+      "seniority": "COVERED",
+      "notional": 20,
+      "market_value": 21
+     },
+     {
+      "id": "b2",
+      "counterparty": "P",
+      "seniority": "NON_SENIOR",
+      "notional": 30,
+      "market_value": 25
+     },
+     {
+      "id": "s1",
+      "counterparty": "P",
+      "seniority": "SENIOR",
+      "notional": -15,
+      "market_value": -14
+     },
+     {
+      "id": "s2",
+      "counterparty": "P",
+      "seniority": "EQUITY",
+      "notional": -40,
+      "market_value": -40,
+      "cash_equity": true
+     },
+     {
+      "id": "c1",
+      "counterparty": "Q",
+      "seniority": "SENIOR",
+      "notional": 0,
+      "market_value": 3
+     }
+    ],
+    "crm": [
+     {
+      "counterparty": "R",
+      "provider": "Q",
+      "protected": 20
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "counterparties": [
+      {
+       "id": "P",
+       "banking_book": 0.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": -8.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 0.0
+      },
+      {
+       "id": "Q",
+       "banking_book": 0.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 3.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 20.0,
+       "exposure": 23.0
+      },
+      {
+       "id": "R",
+       "banking_book": 0.0,
+       "off_balance": 50.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 20.0,
+       "received": 0.0,
+       "exposure": 30.0
+      }
+     ],
+     "groups": [
+      {
+       "group": "GP",
+       "members": [
+        "P",
+        "Q"
+       ],
+       "exposure": 23.0,
+       "share": 0.0575,
+       "large": false,
+       "limit": 60.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "R",
+       "members": [
+        "R"
+       ],
+       "exposure": 30.0,
+       "share": 0.075,
+       "large": false,
+       "limit": 100.0,
+       "breach": false,
+       "exempt": false
+      }
+     ],
+     "report": [
+      "R",
+      "GP"
+     ],
+     "label": "simplified large exposures (LEX subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand"
+   ],
+   "description": "hand: KR-53 offsets across ranks; a G-SIB member makes the group G-SIB (KR-133); notional 0 is long (KR-132)",
+   "output_classes": {
+    "label": "date_and_convention",
+    "report": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  }
+ ]
+}

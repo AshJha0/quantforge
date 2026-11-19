@@ -1,0 +1,840 @@
+{
+ "schema_version": "1.0",
+ "suite": "lev_k",
+ "spec": "specifications/06-risk/leverage-large-exposures.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w2b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "lev_k-0001",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 100,
+    "on_balance": [],
+    "derivatives": [
+     {
+      "v": 60,
+      "cvm_received": 0,
+      "cvm_provided": 0,
+      "pfe": 347
+     }
+    ],
+    "written_credit_derivatives": [],
+    "sfts": [],
+    "off_balance": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "on_balance": 0.0,
+     "derivatives": 569.8,
+     "derivative_netting_sets": 569.8,
+     "written_credit_derivatives": 0.0,
+     "sfts": 0.0,
+     "off_balance": 0.0,
+     "exposure": 569.8,
+     "ratio": 0.1755001755001755,
+     "meets_minimum": true,
+     "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "published: Basel Framework CRE99.40, p.528 printed EAD 569 (Example 1, multiplier 1, unmargined, V >= 0): within 1.0 (spec A1 tolerance, fixed before the run): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "outside_checked",
+    "published"
+   ],
+   "description": "derivative netting set of CRE99 Example 1 (LEV30.16)",
+   "output_classes": {
+    "meets_minimum": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lev_k-0002",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 100,
+    "on_balance": [],
+    "derivatives": [
+     {
+      "v": 20,
+      "cvm_received": 0,
+      "cvm_provided": 0,
+      "pfe": 3841
+     }
+    ],
+    "written_credit_derivatives": [],
+    "sfts": [],
+    "off_balance": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "on_balance": 0.0,
+     "derivatives": 5405.4,
+     "derivative_netting_sets": 5405.4,
+     "written_credit_derivatives": 0.0,
+     "sfts": 0.0,
+     "off_balance": 0.0,
+     "exposure": 5405.4,
+     "ratio": 0.0185000185000185,
+     "meets_minimum": false,
+     "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "published: Basel Framework CRE99.76, p.536 printed EAD 5406 (Example 3, multiplier 1, unmargined, V >= 0): within 1.0 (spec A1 tolerance, fixed before the run): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "outside_checked",
+    "published"
+   ],
+   "description": "derivative netting set of CRE99 Example 3 (LEV30.16)",
+   "output_classes": {
+    "meets_minimum": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lev_k-0003",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 100,
+    "on_balance": [],
+    "derivatives": [
+     {
+      "v": 40,
+      "cvm_received": 0,
+      "cvm_provided": 0,
+      "pfe": 629
+     }
+    ],
+    "written_credit_derivatives": [],
+    "sfts": [],
+    "off_balance": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "on_balance": 0.0,
+     "derivatives": 936.6,
+     "derivative_netting_sets": 936.6,
+     "written_credit_derivatives": 0.0,
+     "sfts": 0.0,
+     "off_balance": 0.0,
+     "exposure": 936.6,
+     "ratio": 0.10676916506512919,
+     "meets_minimum": true,
+     "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "published: Basel Framework CRE99.79, p.537 printed EAD 936 (Example 4, multiplier 1, unmargined, V >= 0): within 1.0 (spec A1 tolerance, fixed before the run): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "outside_checked",
+    "published"
+   ],
+   "description": "derivative netting set of CRE99 Example 4 (LEV30.16)",
+   "output_classes": {
+    "meets_minimum": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lev_k-0004",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 100,
+    "on_balance": [],
+    "derivatives": [],
+    "written_credit_derivatives": [
+     {
+      "notional": 100,
+      "fair_value": -10,
+      "purchased_offset": 0
+     }
+    ],
+    "sfts": [],
+    "off_balance": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "on_balance": 0.0,
+     "derivatives": 90.0,
+     "derivative_netting_sets": 0.0,
+     "written_credit_derivatives": 90.0,
+     "sfts": 0.0,
+     "off_balance": 0.0,
+     "exposure": 90.0,
+     "ratio": 1.1111111111111112,
+     "meets_minimum": true,
+     "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "published: LEV30.31 footnote 384 (Basel Framework PDF p.801): effective notional 90: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "outside_checked",
+    "published"
+   ],
+   "description": "written credit derivative, notional 100, fair value -10",
+   "output_classes": {
+    "meets_minimum": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lev_k-0005",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 100,
+    "on_balance": [],
+    "derivatives": [],
+    "written_credit_derivatives": [
+     {
+      "notional": 100,
+      "fair_value": 5,
+      "purchased_offset": 0
+     }
+    ],
+    "sfts": [],
+    "off_balance": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "on_balance": 0.0,
+     "derivatives": 100.0,
+     "derivative_netting_sets": 0.0,
+     "written_credit_derivatives": 100.0,
+     "sfts": 0.0,
+     "off_balance": 0.0,
+     "exposure": 100.0,
+     "ratio": 1.0,
+     "meets_minimum": true,
+     "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "published: LEV30.31 footnote 384 (Basel Framework PDF p.801): effective notional 100: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "outside_checked",
+    "published"
+   ],
+   "description": "written credit derivative, notional 100, fair value 5",
+   "output_classes": {
+    "meets_minimum": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lev_k-0006",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 100,
+    "on_balance": [],
+    "derivatives": [],
+    "written_credit_derivatives": [],
+    "sfts": [],
+    "off_balance": [
+     {
+      "notional": 1000,
+      "ccf_category": "COMMITMENT"
+     },
+     {
+      "notional": 500,
+      "ccf_category": "UNCONDITIONALLY_CANCELLABLE"
+     },
+     {
+      "notional": 200,
+      "ccf_category": "NIF_RUF"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "on_balance": 0.0,
+     "derivatives": 0.0,
+     "derivative_netting_sets": 0.0,
+     "written_credit_derivatives": 0.0,
+     "sfts": 0.0,
+     "off_balance": 550.0,
+     "exposure": 550.0,
+     "ratio": 0.18181818181818182,
+     "meets_minimum": true,
+     "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "off balance sheet CCFs",
+   "output_classes": {
+    "meets_minimum": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lev_k-0007",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 100,
+    "on_balance": [],
+    "derivatives": [],
+    "written_credit_derivatives": [],
+    "sfts": [
+     {
+      "gross_assets": 150,
+      "mna": true,
+      "exposures": [
+       100,
+       50
+      ],
+      "collateral": [
+       80,
+       90
+      ]
+     }
+    ],
+    "off_balance": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "on_balance": 0.0,
+     "derivatives": 0.0,
+     "derivative_netting_sets": 0.0,
+     "written_credit_derivatives": 0.0,
+     "sfts": 150.0,
+     "off_balance": 0.0,
+     "exposure": 150.0,
+     "ratio": 0.6666666666666666,
+     "meets_minimum": true,
+     "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "SFT with an MNA",
+   "output_classes": {
+    "meets_minimum": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lev_k-0008",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 100,
+    "on_balance": [],
+    "derivatives": [],
+    "written_credit_derivatives": [],
+    "sfts": [
+     {
+      "gross_assets": 150,
+      "mna": false,
+      "exposures": [
+       100,
+       50
+      ],
+      "collateral": [
+       80,
+       90
+      ]
+     }
+    ],
+    "off_balance": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "on_balance": 0.0,
+     "derivatives": 0.0,
+     "derivative_netting_sets": 0.0,
+     "written_credit_derivatives": 0.0,
+     "sfts": 170.0,
+     "off_balance": 0.0,
+     "exposure": 170.0,
+     "ratio": 0.5882352941176471,
+     "meets_minimum": true,
+     "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "SFT without an MNA",
+   "output_classes": {
+    "meets_minimum": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lev_k-0009",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 100,
+    "on_balance": [],
+    "derivatives": [
+     {
+      "v": 100,
+      "cvm_received": 30,
+      "cvm_provided": 0,
+      "pfe": 50
+     }
+    ],
+    "written_credit_derivatives": [],
+    "sfts": [],
+    "off_balance": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "on_balance": 0.0,
+     "derivatives": 168.0,
+     "derivative_netting_sets": 168.0,
+     "written_credit_derivatives": 0.0,
+     "sfts": 0.0,
+     "off_balance": 0.0,
+     "exposure": 168.0,
+     "ratio": 0.5952380952380952,
+     "meets_minimum": true,
+     "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "derivative with CVM received",
+   "output_classes": {
+    "meets_minimum": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lev_k-0010",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 60,
+    "on_balance": [
+     500
+    ],
+    "derivatives": [
+     {
+      "v": 60,
+      "cvm_received": 0,
+      "cvm_provided": 0,
+      "pfe": 347
+     }
+    ],
+    "written_credit_derivatives": [],
+    "sfts": [
+     {
+      "gross_assets": 150,
+      "mna": true,
+      "exposures": [
+       100,
+       50
+      ],
+      "collateral": [
+       80,
+       90
+      ]
+     }
+    ],
+    "off_balance": [
+     {
+      "notional": 1000,
+      "ccf_category": "COMMITMENT"
+     },
+     {
+      "notional": 500,
+      "ccf_category": "UNCONDITIONALLY_CANCELLABLE"
+     },
+     {
+      "notional": 200,
+      "ccf_category": "NIF_RUF"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "on_balance": 500.0,
+     "derivatives": 569.8,
+     "derivative_netting_sets": 569.8,
+     "written_credit_derivatives": 0.0,
+     "sfts": 150.0,
+     "off_balance": 550.0,
+     "exposure": 1769.8,
+     "ratio": 0.033902135834557576,
+     "meets_minimum": true,
+     "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "worked example: ratio above 3%",
+   "output_classes": {
+    "meets_minimum": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lev_k-0011",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 30,
+    "on_balance": [
+     500
+    ],
+    "derivatives": [
+     {
+      "v": 60,
+      "cvm_received": 0,
+      "cvm_provided": 0,
+      "pfe": 347
+     }
+    ],
+    "written_credit_derivatives": [],
+    "sfts": [
+     {
+      "gross_assets": 150,
+      "mna": true,
+      "exposures": [
+       100,
+       50
+      ],
+      "collateral": [
+       80,
+       90
+      ]
+     }
+    ],
+    "off_balance": [
+     {
+      "notional": 1000,
+      "ccf_category": "COMMITMENT"
+     },
+     {
+      "notional": 500,
+      "ccf_category": "UNCONDITIONALLY_CANCELLABLE"
+     },
+     {
+      "notional": 200,
+      "ccf_category": "NIF_RUF"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "on_balance": 500.0,
+     "derivatives": 569.8,
+     "derivative_netting_sets": 569.8,
+     "written_credit_derivatives": 0.0,
+     "sfts": 150.0,
+     "off_balance": 550.0,
+     "exposure": 1769.8,
+     "ratio": 0.016951067917278788,
+     "meets_minimum": false,
+     "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "worked example with Tier 1 30: ratio below 3%",
+   "output_classes": {
+    "meets_minimum": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lev_k-0012",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 5,
+    "on_balance": [
+     40,
+     0
+    ],
+    "derivatives": [
+     {
+      "v": -20,
+      "pfe": 10,
+      "cvm_provided": 5
+     }
+    ],
+    "written_credit_derivatives": [
+     {
+      "notional": 50,
+      "fair_value": -4,
+      "purchased_offset": 30
+     },
+     {
+      "notional": 10,
+      "fair_value": -12
+     }
+    ],
+    "sfts": [],
+    "off_balance": [
+     {
+      "notional": 10,
+      "ccf_category": "DIRECT_CREDIT_SUBSTITUTE"
+     },
+     {
+      "notional": 10,
+      "ccf_category": "FORWARD_PURCHASE"
+     },
+     {
+      "notional": 10,
+      "ccf_category": "OTHER_CREDIT_SUBSTITUTE"
+     },
+     {
+      "notional": 10,
+      "ccf_category": "TRANSACTION_CONTINGENT"
+     },
+     {
+      "notional": 10,
+      "ccf_category": "TRADE_LC"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "on_balance": 40.0,
+     "derivatives": 30.0,
+     "derivative_netting_sets": 14.0,
+     "written_credit_derivatives": 16.0,
+     "sfts": 0.0,
+     "off_balance": 37.0,
+     "exposure": 107.0,
+     "ratio": 0.04672897196261682,
+     "meets_minimum": true,
+     "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand"
+   ],
+   "description": "hand: negative V floored at 0 with CVM provided; purchased offset; a written CD reduced to 0; remaining CCFs",
+   "output_classes": {
+    "meets_minimum": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "lev_k-0013",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 2,
+    "sfts": [
+     {
+      "gross_assets": 0,
+      "mna": false,
+      "exposures": [],
+      "collateral": []
+     },
+     {
+      "gross_assets": 30,
+      "mna": true,
+      "exposures": [
+       10
+      ],
+      "collateral": [
+       4
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "on_balance": 0.0,
+     "derivatives": 0.0,
+     "derivative_netting_sets": 0.0,
+     "written_credit_derivatives": 0.0,
+     "sfts": 36.0,
+     "off_balance": 0.0,
+     "exposure": 36.0,
+     "ratio": 0.05555555555555555,
+     "meets_minimum": true,
+     "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand"
+   ],
+   "description": "hand: absent lists are empty (KR-128); an SFT with no transactions",
+   "output_classes": {
+    "meets_minimum": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  }
+ ]
+}

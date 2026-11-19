@@ -1,0 +1,146 @@
+{
+ "schema_version": "1.0",
+ "suite": "df_k",
+ "spec": "specifications/06-risk/cva-capital.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w2b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "df_k-0001",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "version": "REDUCED",
+     "counterparties": [
+      {
+       "id": "C1",
+       "scva": 157999.44066328224,
+       "snh": null,
+       "hma": null,
+       "netting_sets": [
+        {
+         "df": 0.8847968677143805
+        }
+       ]
+      }
+     ],
+     "ih": null,
+     "k_reduced": 157999.44066328224,
+     "k_hedged": null,
+     "k_full": null,
+     "capital": 102699.63643113345,
+     "rwa": 1283745.455389168,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "scipy.integrate.quad 1.x (independent library): quad average of exp(-0.05 t) over [0, 5] = 0.8847968677143806: MATCH 1e-15"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "outside_checked",
+    "library"
+   ],
+   "description": "DF(5) of footnote 357 in the expm1 form (KR-64)",
+   "output_classes": {
+    "version": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "df_k-0002",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 0.1,
+        "imm": false
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "version": "REDUCED",
+     "counterparties": [
+      {
+       "id": "C1",
+       "scva": 3562.5148623697764,
+       "snh": null,
+       "hma": null,
+       "netting_sets": [
+        {
+         "df": 0.9975041614635374
+        }
+       ]
+      }
+     ],
+     "ih": null,
+     "k_reduced": 3562.5148623697764,
+     "k_hedged": null,
+     "k_full": null,
+     "capital": 2315.6346605403546,
+     "rwa": 28945.433256754433,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "scipy.integrate.quad 1.x (independent library): quad average of exp(-0.05 t) over [0, 0.1] = 0.9975041614635374: MATCH 1e-15"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "outside_checked",
+    "library"
+   ],
+   "description": "DF(0.1) of footnote 357 in the expm1 form (KR-64)",
+   "output_classes": {
+    "version": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  }
+ ]
+}

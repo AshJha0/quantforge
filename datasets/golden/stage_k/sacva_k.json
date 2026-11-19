@@ -1,0 +1,1237 @@
+{
+ "schema_version": "1.0",
+ "suite": "sacva_k",
+ "spec": "specifications/06-risk/cva-capital.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w2b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "sacva_k-0001",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "m_cva": 1,
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "USD",
+       "factor": "5Y",
+       "s_cva": -2000000,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "classes": {
+      "IR.DELTA": {
+       "buckets": [
+        {
+         "bucket": "USD",
+         "k_b": 10280.408552192855,
+         "s_b": -3700.0,
+         "sum_ws": -3700.0,
+         "floored": false
+        }
+       ],
+       "k": 10280.408552192855
+      }
+     },
+     "m_cva": 1.0,
+     "total": 10280.408552192855,
+     "rwa": 128505.1069024107,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "IR delta USD 1Y and 5Y",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "sacva_k-0002",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "m_cva": 1,
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "USD",
+       "factor": "5Y",
+       "s_cva": -2000000,
+       "s_hdg": -1500000
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "classes": {
+      "IR.DELTA": {
+       "buckets": [
+        {
+         "bucket": "USD",
+         "k_b": 8887.704990603592,
+         "s_b": 7400.0,
+         "sum_ws": 7400.0,
+         "floored": false
+        }
+       ],
+       "k": 8887.704990603592
+      }
+     },
+     "m_cva": 1.0,
+     "total": 8887.704990603592,
+     "rwa": 111096.3123825449,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "IR delta with a hedge (worked example): the R term",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "sacva_k-0003",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "m_cva": 1,
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "USD",
+       "factor": "5Y",
+       "s_cva": -2000000,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "EUR",
+       "factor": "10Y",
+       "s_cva": 3000000,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "classes": {
+      "IR.DELTA": {
+       "buckets": [
+        {
+         "bucket": "EUR",
+         "k_b": 22200.0,
+         "s_b": 22200.0,
+         "sum_ws": 22200.0,
+         "floored": false
+        },
+        {
+         "bucket": "USD",
+         "k_b": 10280.408552192855,
+         "s_b": -3700.0,
+         "sum_ws": -3700.0,
+         "floored": false
+        }
+       ],
+       "k": 22724.14574852045
+      }
+     },
+     "m_cva": 1.0,
+     "total": 22724.14574852045,
+     "rwa": 284051.8218565056,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "IR delta USD and EUR",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "sacva_k-0004",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "m_cva": 1,
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "USD",
+       "factor": "30Y",
+       "s_cva": 1000000,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "EUR",
+       "factor": "10Y",
+       "s_cva": 3000000,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "classes": {
+      "IR.DELTA": {
+       "buckets": [
+        {
+         "bucket": "EUR",
+         "k_b": 22200.0,
+         "s_b": 22200.0,
+         "sum_ws": 22200.0,
+         "floored": false
+        },
+        {
+         "bucket": "USD",
+         "k_b": 15129.335742193045,
+         "s_b": 15129.335742193045,
+         "sum_ws": 18500.0,
+         "floored": false
+        }
+       ],
+       "k": 32520.8864189875
+      }
+     },
+     "m_cva": 1.0,
+     "total": 32520.8864189875,
+     "rwa": 406511.08023734373,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "clipping S_b at K_b (worked example)",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "sacva_k-0005",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "m_cva": 1,
+    "reporting_currency": "USD",
+    "classes": {
+     "CCS.DELTA": [
+      {
+       "bucket": "2",
+       "factor": {
+        "name": "X",
+        "tenor": "1Y",
+        "quality": "IG",
+        "legal_group": "GX"
+       },
+       "s_cva": 100000,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "2",
+       "factor": {
+        "name": "X",
+        "tenor": "5Y",
+        "quality": "IG",
+        "legal_group": "GX"
+       },
+       "s_cva": 100000,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "2",
+       "factor": {
+        "name": "Y",
+        "tenor": "5Y",
+        "quality": "IG",
+        "legal_group": "GX"
+       },
+       "s_cva": 0,
+       "s_hdg": 80000
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "classes": {
+      "CCS.DELTA": {
+       "buckets": [
+        {
+         "bucket": "2",
+         "k_b": 6539.113089708726,
+         "s_b": 6000.0,
+         "sum_ws": 6000.0,
+         "floored": false
+        }
+       ],
+       "k": 6539.113089708726
+      }
+     },
+     "m_cva": 1.0,
+     "total": 6539.113089708726,
+     "rwa": 81738.91362135907,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "CCS bucket 2, legally related names",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "sacva_k-0006",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "m_cva": 1.25,
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "USD",
+       "factor": "5Y",
+       "s_cva": -2000000,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "classes": {
+      "IR.DELTA": {
+       "buckets": [
+        {
+         "bucket": "USD",
+         "k_b": 10280.408552192855,
+         "s_b": -3700.0,
+         "sum_ws": -3700.0,
+         "floored": false
+        }
+       ],
+       "k": 12850.51069024107
+      }
+     },
+     "m_cva": 1.25,
+     "total": 12850.51069024107,
+     "rwa": 160631.38362801337,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "m_cva 1.25",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "sacva_k-0007",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "m_cva": 1,
+    "reporting_currency": "USD",
+    "classes": {
+     "FX.DELTA": [
+      {
+       "bucket": "EUR",
+       "factor": "EUR",
+       "s_cva": 200000,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "JPY",
+       "factor": "JPY",
+       "s_cva": -100000,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "classes": {
+      "FX.DELTA": {
+       "buckets": [
+        {
+         "bucket": "EUR",
+         "k_b": 22000.0,
+         "s_b": 22000.0,
+         "sum_ws": 22000.0,
+         "floored": false
+        },
+        {
+         "bucket": "JPY",
+         "k_b": 11000.0,
+         "s_b": -11000.0,
+         "sum_ws": -11000.0,
+         "floored": false
+        }
+       ],
+       "k": 17736.96704625681
+      }
+     },
+     "m_cva": 1.0,
+     "total": 17736.96704625681,
+     "rwa": 221712.0880782101,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "FX delta EUR and JPY",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "sacva_k-0008",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "m_cva": 1,
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "USD",
+       "factor": "5Y",
+       "s_cva": -2000000,
+       "s_hdg": 0
+      }
+     ],
+     "FX.DELTA": [
+      {
+       "bucket": "EUR",
+       "factor": "EUR",
+       "s_cva": 200000,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "JPY",
+       "factor": "JPY",
+       "s_cva": -100000,
+       "s_hdg": 0
+      }
+     ],
+     "IR.VEGA": [
+      {
+       "bucket": "USD",
+       "factor": "IR_VOL",
+       "s_cva": 1000,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "classes": {
+      "IR.DELTA": {
+       "buckets": [
+        {
+         "bucket": "USD",
+         "k_b": 10280.408552192855,
+         "s_b": -3700.0,
+         "sum_ws": -3700.0,
+         "floored": false
+        }
+       ],
+       "k": 10280.408552192855
+      },
+      "IR.VEGA": {
+       "buckets": [
+        {
+         "bucket": "USD",
+         "k_b": 1000.0,
+         "s_b": 1000.0,
+         "sum_ws": 1000.0,
+         "floored": false
+        }
+       ],
+       "k": 1000.0
+      },
+      "FX.DELTA": {
+       "buckets": [
+        {
+         "bucket": "EUR",
+         "k_b": 22000.0,
+         "s_b": 22000.0,
+         "sum_ws": 22000.0,
+         "floored": false
+        },
+        {
+         "bucket": "JPY",
+         "k_b": 11000.0,
+         "s_b": -11000.0,
+         "sum_ws": -11000.0,
+         "floored": false
+        }
+       ],
+       "k": 17736.96704625681
+      }
+     },
+     "m_cva": 1.0,
+     "total": 29017.375598449664,
+     "rwa": 362717.1949806208,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "IR delta + FX delta + IR vega: total",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "sacva_k-0009",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "EUR",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "EUR",
+       "factor": "2Y",
+       "s_cva": 400000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "EUR",
+       "factor": "inflation",
+       "s_cva": -100000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "NOK",
+       "factor": "CURVE",
+       "s_cva": 200000.0,
+       "s_hdg": 50000.0
+      },
+      {
+       "bucket": "NOK",
+       "factor": "inflation",
+       "s_cva": 30000.0,
+       "s_hdg": 0
+      }
+     ],
+     "IR.VEGA": [
+      {
+       "bucket": "EUR",
+       "factor": "IR_VOL",
+       "s_cva": 20000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "EUR",
+       "factor": "INFLATION_VOL",
+       "s_cva": -5000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "classes": {
+      "IR.DELTA": {
+       "buckets": [
+        {
+         "bucket": "EUR",
+         "k_b": 3430.3265150711236,
+         "s_b": 2610.0,
+         "sum_ws": 2610.0,
+         "floored": false
+        },
+        {
+         "bucket": "NOK",
+         "k_b": 2597.4065911982284,
+         "s_b": 2597.4065911982284,
+         "sum_ws": 2844.0,
+         "floored": false
+        }
+       ],
+       "k": 5029.20393333054
+      },
+      "IR.VEGA": {
+       "buckets": [
+        {
+         "bucket": "EUR",
+         "k_b": 18574.17562100671,
+         "s_b": 15000.0,
+         "sum_ws": 15000.0,
+         "floored": false
+        }
+       ],
+       "k": 18574.17562100671
+      }
+     },
+     "m_cva": 1.0,
+     "total": 23603.37955433725,
+     "rwa": 295042.2444292156,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand"
+   ],
+   "description": "hand: reporting currency EUR specified; NOK unspecified: CURVE and inflation at 1.58%, rho 40%; IR vega rho 40%",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "sacva_k-0010",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "CCS.DELTA": [
+      {
+       "bucket": "1a",
+       "factor": {
+        "name": "S1",
+        "tenor": "1Y",
+        "quality": "IG"
+       },
+       "s_cva": 200000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "1b",
+       "factor": {
+        "name": "M1",
+        "tenor": "1Y",
+        "quality": "HY_NR"
+       },
+       "s_cva": 100000.0,
+       "s_hdg": 20000.0
+      },
+      {
+       "bucket": "3",
+       "factor": {
+        "name": "N1",
+        "tenor": "0.5Y",
+        "quality": "IG"
+       },
+       "s_cva": -50000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "3",
+       "factor": {
+        "name": "N2",
+        "tenor": "10Y",
+        "quality": "HY_NR",
+        "legal_group": "G"
+       },
+       "s_cva": 80000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "8",
+       "factor": {
+        "name": "IDX",
+        "tenor": "5Y",
+        "quality": "IG",
+        "index": "CDX.IG",
+        "series": "S45"
+       },
+       "s_cva": 300000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "8",
+       "factor": {
+        "name": "IDX2",
+        "tenor": "5Y",
+        "quality": "IG",
+        "index": "CDX.IG",
+        "series": "S44"
+       },
+       "s_cva": 0,
+       "s_hdg": 250000.0
+      },
+      {
+       "bucket": "8",
+       "factor": {
+        "name": "IDX3",
+        "tenor": "3Y",
+        "quality": "HY_NR",
+        "index": "CDX.HY",
+        "series": "S45"
+       },
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "classes": {
+      "CCS.DELTA": {
+       "buckets": [
+        {
+         "bucket": "1",
+         "k_b": 3715.6964353940434,
+         "s_b": 3715.6964353940434,
+         "sum_ws": 4200.0,
+         "floored": false
+        },
+        {
+         "bucket": "3",
+         "k_b": 5249.952380736419,
+         "s_b": 4100.0,
+         "sum_ws": 4100.0,
+         "floored": false
+        },
+        {
+         "bucket": "8",
+         "k_b": 5779.111090816649,
+         "s_b": 5750.0,
+         "sum_ws": 5750.0,
+         "floored": false
+        }
+       ],
+       "k": 11013.922834631192
+      }
+     },
+     "m_cva": 1.0,
+     "total": 11013.922834631192,
+     "rwa": 137674.0354328899,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand"
+   ],
+   "description": "hand: CCS: 1a and 1b share bucket 1 (KR-121); bucket 8 index and series correlations; gamma Table 6",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "sacva_k-0011",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "RCS.DELTA": [
+      {
+       "bucket": "3",
+       "factor": "RCS3",
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "10",
+       "factor": "RCS10",
+       "s_cva": 40000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "15",
+       "factor": "RCS15",
+       "s_cva": 10000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "16",
+       "factor": "RCS16",
+       "s_cva": -20000.0,
+       "s_hdg": 10000.0
+      }
+     ],
+     "RCS.VEGA": [
+      {
+       "bucket": "1",
+       "factor": "V1",
+       "s_cva": 1000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "17",
+       "factor": "V17",
+       "s_cva": 2000.0,
+       "s_hdg": 0
+      }
+     ],
+     "EQ.DELTA": [
+      {
+       "bucket": "5",
+       "factor": "EQ5",
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "12",
+       "factor": "EQ12",
+       "s_cva": -60000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "11",
+       "factor": "EQ11",
+       "s_cva": 20000.0,
+       "s_hdg": 0
+      }
+     ],
+     "EQ.VEGA": [
+      {
+       "bucket": "2",
+       "factor": "V2",
+       "s_cva": 1000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "10",
+       "factor": "V10",
+       "s_cva": 1000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "12",
+       "factor": "V12",
+       "s_cva": 1000.0,
+       "s_hdg": 0
+      }
+     ],
+     "COM.DELTA": [
+      {
+       "bucket": "2",
+       "factor": "C2",
+       "s_cva": 50000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "7",
+       "factor": "C7",
+       "s_cva": -30000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "11",
+       "factor": "C11",
+       "s_cva": 10000.0,
+       "s_hdg": 0
+      }
+     ],
+     "COM.VEGA": [
+      {
+       "bucket": "3",
+       "factor": "CV3",
+       "s_cva": 500,
+       "s_hdg": 0
+      }
+     ],
+     "FX.VEGA": [
+      {
+       "bucket": "GBP",
+       "factor": "GBP",
+       "s_cva": 4000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "JPY",
+       "factor": "JPY",
+       "s_cva": -1000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "classes": {
+      "FX.VEGA": {
+       "buckets": [
+        {
+         "bucket": "GBP",
+         "k_b": 4000.0,
+         "s_b": 4000.0,
+         "sum_ws": 4000.0,
+         "floored": false
+        },
+        {
+         "bucket": "JPY",
+         "k_b": 1000.0,
+         "s_b": -1000.0,
+         "sum_ws": -1000.0,
+         "floored": false
+        }
+       ],
+       "k": 3492.849839314596
+      },
+      "RCS.DELTA": {
+       "buckets": [
+        {
+         "bucket": "3",
+         "k_b": 5000.0,
+         "s_b": 5000.0,
+         "sum_ws": 5000.0,
+         "floored": false
+        },
+        {
+         "bucket": "10",
+         "k_b": 4800.0,
+         "s_b": 4800.0,
+         "sum_ws": 4800.0,
+         "floored": false
+        },
+        {
+         "bucket": "15",
+         "k_b": 1200.0,
+         "s_b": 1200.0,
+         "sum_ws": 1200.0,
+         "floored": false
+        },
+        {
+         "bucket": "16",
+         "k_b": 450.24993059410906,
+         "s_b": -450.0,
+         "sum_ws": -450.0,
+         "floored": false
+        }
+       ],
+       "k": 8349.474534364423
+      },
+      "RCS.VEGA": {
+       "buckets": [
+        {
+         "bucket": "1",
+         "k_b": 1000.0,
+         "s_b": 1000.0,
+         "sum_ws": 1000.0,
+         "floored": false
+        },
+        {
+         "bucket": "17",
+         "k_b": 2000.0,
+         "s_b": 2000.0,
+         "sum_ws": 2000.0,
+         "floored": false
+        }
+       ],
+       "k": 2607.6809620810595
+      },
+      "EQ.DELTA": {
+       "buckets": [
+        {
+         "bucket": "5",
+         "k_b": 30000.0,
+         "s_b": 30000.0,
+         "sum_ws": 30000.0,
+         "floored": false
+        },
+        {
+         "bucket": "11",
+         "k_b": 14000.0,
+         "s_b": 14000.0,
+         "sum_ws": 14000.0,
+         "floored": false
+        },
+        {
+         "bucket": "12",
+         "k_b": 9000.0,
+         "s_b": -9000.0,
+         "sum_ws": -9000.0,
+         "floored": false
+        }
+       ],
+       "k": 30561.41357987225
+      },
+      "EQ.VEGA": {
+       "buckets": [
+        {
+         "bucket": "2",
+         "k_b": 780.0,
+         "s_b": 780.0,
+         "sum_ws": 780.0,
+         "floored": false
+        },
+        {
+         "bucket": "10",
+         "k_b": 1000.0,
+         "s_b": 1000.0,
+         "sum_ws": 1000.0,
+         "floored": false
+        },
+        {
+         "bucket": "12",
+         "k_b": 780.0,
+         "s_b": 780.0,
+         "sum_ws": 780.0,
+         "floored": false
+        }
+       ],
+       "k": 1923.6319814351184
+      },
+      "COM.DELTA": {
+       "buckets": [
+        {
+         "bucket": "2",
+         "k_b": 17500.0,
+         "s_b": 17500.0,
+         "sum_ws": 17500.0,
+         "floored": false
+        },
+        {
+         "bucket": "7",
+         "k_b": 6000.0,
+         "s_b": -6000.0,
+         "sum_ws": -6000.0,
+         "floored": false
+        },
+        {
+         "bucket": "11",
+         "k_b": 5000.0,
+         "s_b": 5000.0,
+         "sum_ws": 5000.0,
+         "floored": false
+        }
+       ],
+       "k": 18034.688796871433
+      },
+      "COM.VEGA": {
+       "buckets": [
+        {
+         "bucket": "3",
+         "k_b": 500.0,
+         "s_b": 500.0,
+         "sum_ws": 500.0,
+         "floored": false
+        }
+       ],
+       "k": 500.0
+      }
+     },
+     "m_cva": 1.0,
+     "total": 65469.73969393888,
+     "rwa": 818371.7461742361,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand"
+   ],
+   "description": "hand: RCS across quality (halved gamma), 15, 16; EQ large-cap vega 78% (KR-124); COM with bucket 11; FX vega",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  }
+ ]
+}
