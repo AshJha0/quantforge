@@ -14,7 +14,7 @@ Inputs: `positions` (list of `{notional N, maturity T > 0, yield y}`; empty `E_I
 
 ## Golden value cases (hand-derived; 30-digit mpmath check)
 
-Output fields compared: `estimate_pnl` (binary64, delta-gamma estimate of `V(y + h) - V(y)` summed over positions), `bound` (binary64, sum of position bounds), `label` (string, KR-10). Tolerance 1e-9 relative on `estimate_pnl` and `bound`. Error cases compare `error.code` (string) only.
+Output fields compared: `estimate_pnl` (binary64, delta-gamma estimate of `V(y + h) - V(y)` summed over positions), `bound` (binary64, sum of position bounds), `label` (string, KR-10). Tolerance 1e-9 relative on `estimate_pnl` and `bound`. Error cases compare `error.code` (string) only. **Cancelling books (KR-240, stated here 2026-11-19 so that any later blind compare uses it from the start).** Plain words: when the terms of a book cancel, the estimate is a small number left over from large ones, and binary64 cannot hold it to 1e-9 of its own size whatever order the arithmetic takes; so on the goldens of a cancelling book (idr_k-0012, idr_k-0013) `estimate_pnl` is compared at 1e-9 relative plus an absolute term equal to the estimate's share of the KR-234 rounding allowance, `2^-49 sum_i (1 + T abs(y) + T abs(h)) abs(v_i) (T abs(h) + T^2 h^2)`: 1.9e-10 for idr_k-0012 and 2.8e-8 for idr_k-0013. The expected value stays the 50-digit one; `bound` keeps the plain 1e-9 relative. Worked example: idr_k-0012 expects 3.991807462997163e-08; a value 2.2e-12 away (relative 5.4e-05) passes, because 2.2e-12 is below 1.9e-10. Chosen over fixing the evaluation order to the last bit: the expected value is the exact one, not a binary64 one, so a fixed order would still leave every build about 2e-12 from it on idr_k-0012, outside a plain 1e-9 relative test.
 
 Cases 0001 to 0004: one position, `notional` N = 1,000,000, `maturity` T = 5, `yield` y = 0.04; input `shift` h as below.
 
@@ -40,7 +40,7 @@ The bounds are tight (ratio near 1) because a zero bond's third derivative barel
 | idr_k-0006 | one position N = 1,000,000, T = 0, y = 0.04; h = +0.01 | E_DOMAIN |
 | idr_k-0007 | `positions` = []; h = +0.01 | E_INPUT |
 
-**`bound` before and after KR-234** (oracle `oracle/python/gen_stage_k_w1.py`, mpmath 50 digits; also in `oracle/STAGE_K_AUDIT_A_CHANGES.json`). `estimate_pnl` does not change. The change is at most 1.7e-10 relative, inside the goldens' 1e-9 tolerance, but the expected values are regenerated and the K-5a blind match of `bound` (5 of 5, `program/STAGE_K_BLIND_K5A.md`) was a match of the 1.0.0 formula, so **`bound` of idr_k-0001 to 0005 is not blind from 1.1.0** until the K-5a packet is rerun (`program/STAGE_K_BLIND_K5A_V2.md`, prepared, not run). `estimate_pnl` keeps its blind match.
+**`bound` before and after KR-234** (oracle `oracle/python/gen_stage_k_w1.py`, mpmath 50 digits; also in `oracle/STAGE_K_AUDIT_A_CHANGES.json`). `estimate_pnl` does not change. The change is at most 1.7e-10 relative, inside the goldens' 1e-9 tolerance, but the expected values are regenerated and the K-5a blind match of `bound` (5 of 5, `program/STAGE_K_BLIND_K5A.md`) was a match of the 1.0.0 formula, so **`bound` of idr_k-0001 to 0005 is not blind from 1.1.0** until the K-5a packet is rerun (`program/STAGE_K_BLIND_K5A_V2.md`). `estimate_pnl` keeps its blind match. **Rerun on the v2 packet (2026-11-19 23:35 UTC, `program/STAGE_K_BLIND_K5A_V2.md`, one compare run, tolerance fixed before it: 1e-9 relative, no absolute term):** 11 value cases in spec 1.1.0; blind MATCH and counted 9 of 11 (81.8%); idr_k-0012 and idr_k-0013 are MISMATCH on `estimate_pnl` (absolute differences 2.2e-12 and 1.4e-10, inside the KR-240 terms above but outside the tolerance the compare fixed) and are not counted; all 11 `bound` values match.
 
 | Case | 1.0.0 `bound` | 1.1.0 `bound` |
 |---|---|---|
@@ -72,4 +72,5 @@ New cases (1.1.0; oracle, not blind): idr_k-0008 (h = 1e-9), 0009 (h = -1e-12), 
 
 ## Limits and open issues
 
-- **Open audit finding (2026-11-19): KA-A6.** In binary64 the reported `bound` can be exceeded for very small moves: for one position with maturity 5 the error is 1.40 times the bound at a yield move of 1e-8 and 21.6 times at 1e-9 (absolute size about 1e-17 on a million). Register: `docs/known-issues.md`.
+- **Audit finding KA-A6 (2026-11-19): closed by KR-234 (spec 1.1.0).** In 1.0.0 the reported `bound` could be exceeded for very small moves (1.40 times the bound at a yield move of 1e-8 and 21.6 times at 1e-9 for one position with maturity 5); the 1.1.0 bound passes the small-move sweep above in all four builds.
+- **Open (2026-11-19): two cancelling-book estimates are not reproduced to 1e-9 relative by an independent implementation** (idr_k-0012, idr_k-0013; order-of-operations sensitivity; the K-5a v2 blind lane). `bound` is unaffected. Register: `docs/known-issues.md`.
