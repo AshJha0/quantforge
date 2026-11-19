@@ -1,15 +1,15 @@
-"""Compare a frozen K-8h (SIMM structure, placeholder weights) blind result with the hidden expected values (DR-H2).
+"""Compare a frozen K-8h (sensitivity-based initial margin, placeholder weights; sbim) blind result with the hidden expected values (DR-H2).
 
 Copy of k2_compare.py (stage K wave 2) with the K-8h case list. Fixed before any blind result exists (commit
-recorded in program/STAGE_K_BLIND_SIMM.md). Nothing here may change
+recorded in program/STAGE_K_BLIND_SBIM.md). Nothing here may change
 after the blind lane hands back, except a representation fix that compares no value differently, recorded with
 its reason in the record.
 
-    python -I program/stage_h_blind_w2/simm_compare.py <checkout> <blind_results.json>   # the real run
-    python -I program/stage_h_blind_w2/simm_compare.py <checkout> --self-test            # dry run on fabricated data
+    python -I program/stage_h_blind_w2/sbim_compare.py <checkout> <blind_results.json>   # the real run
+    python -I program/stage_h_blind_w2/sbim_compare.py <checkout> --self-test            # dry run on fabricated data
 
-Field mapping: every field of simm_expected.json is looked up in the blind case object by its path, which is the
-path of output_template.json's results_skeleton (simm_make_packet.skeleton); the self-test proves that every expected
+Field mapping: every field of sbim_expected.json is looked up in the blind case object by its path, which is the
+path of output_template.json's results_skeleton (sbim_make_packet.skeleton); the self-test proves that every expected
 path exists in the skeleton the blind lane fills. Fields the blind lane reports but the spec does not print are
 not compared.
 
@@ -27,7 +27,7 @@ Representation rules (fixed now, so a wrapper or level slip cannot void the run;
      name, key that matches the key (printed as LIST-KEYED).
   R4 a number given as a decimal string is read with float() (printed as STRING-NUMBER).
 Counting: a case is MATCH only if every expected field matches. Cases that cannot count (named in
-program/STAGE_K_BLIND_SIMM.md, fixed now) are compared and reported but never counted as blind: NOT_COUNTED below.
+program/STAGE_K_BLIND_SBIM.md, fixed now) are compared and reported but never counted as blind: NOT_COUNTED below.
 K-8h has no table-lookup field (T_FIELDS empty).
 Exit 0 when every case is MATCH, 1 on any MISMATCH or MISSING, 2 on a SHAPE error.
 """
@@ -42,9 +42,9 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 REL, ABS = 1e-12, 1e-15
-NOT_COUNTED = {"simm_k-0028": "expected total 0 is stated by the rules text (spec step 9 and KR-136: no records gives total 0)"}
+NOT_COUNTED = {"sbim_k-0028": "expected total 0 is stated by the rules text (spec step 9 and KR-136: no records gives total 0)"}
 T_FIELDS = set()
-GATE = {"K-8h": (29, 18)}  # (value cases, blind matches needed: ceil(0.6 x 29)) from STAGE_K_BLIND_SIMM.md
+GATE = {"K-8h": (29, 18)}  # (value cases, blind matches needed: ceil(0.6 x 29)) from STAGE_K_BLIND_SBIM.md
 KEYS = ("id", "bucket", "group", "factor", "class", "name", "key")
 WRAP = ("outputs", "result", "results")
 
@@ -92,7 +92,7 @@ def cases_of(res):
         if isinstance(c, list) and all(isinstance(x, dict) and "case_id" in x for x in c):
             return {x["case_id"]: {k: v for k, v in x.items() if k != "case_id"} for x in c}
         raise Shape("'cases' is neither an object nor a list of objects with case_id")
-    if isinstance(res, dict) and res and all(re.fullmatch(r"simm_k-\d{4}", k) for k in res):
+    if isinstance(res, dict) and res and all(re.fullmatch(r"sbim_k-\d{4}", k) for k in res):
         return res
     raise Shape("no case map found at the top level (R1)")
 
@@ -114,7 +114,7 @@ def same(b, e, notes):
 
 
 def compare(root, res, out=print):
-    exp = json.loads((Path(root) / "program/stage_h_blind_w2/simm_expected.json").read_text(encoding="utf-8"))["cases"]
+    exp = json.loads((Path(root) / "program/stage_h_blind_w2/sbim_expected.json").read_text(encoding="utf-8"))["cases"]
     got = cases_of(res)
     summary = {}
     status = {}
@@ -161,11 +161,11 @@ def compare(root, res, out=print):
 
 def self_test(root):
     import io
-    from simm_cases import CASES
-    from simm_make_packet import skeleton
-    from simm_ref import load_table
+    from sbim_cases import CASES
+    from sbim_make_packet import skeleton
+    from sbim_ref import load_table
     P = load_table(root)
-    exp = json.loads((Path(root) / "program/stage_h_blind_w2/simm_expected.json").read_text(encoding="utf-8"))["cases"]
+    exp = json.loads((Path(root) / "program/stage_h_blind_w2/sbim_expected.json").read_text(encoding="utf-8"))["cases"]
     filled = {}
     for cid, inp in CASES:
         sk = skeleton(P, inp)
@@ -202,7 +202,7 @@ def self_test(root):
         return o
 
     def rc(d, cid, pc, r):
-        return d[cid]["product_classes"][pc]["risk_classes"][r]
+        return d[cid]["groups"][pc]["risk_classes"][r]
 
     st, _, _ = run({"cases": filled})
     checks.append(("exact values from the skeleton: all MATCH", list(st.values()).count("MATCH") == n))
@@ -224,30 +224,30 @@ def self_test(root):
     st, _, _ = run({"cases": blank})
     checks.append(("unfilled skeleton (all null): no MATCH, all MISSING", isinstance(st, dict) and set(st.values()) == {"MISSING"}))
     part = dict(filled)
-    part.pop("simm_k-0019")
+    part.pop("sbim_k-0019")
     st, _, _ = run({"cases": part})
     checks.append(("one case absent: that case MISSING, the rest MATCH",
-                   st["simm_k-0019"] == "MISSING" and list(st.values()).count("MATCH") == n - 1))
+                   st["sbim_k-0019"] == "MISSING" and list(st.values()).count("MATCH") == n - 1))
     b = copy.deepcopy(filled)
-    b["simm_k-0001"]["total"] = True
+    b["sbim_k-0001"]["total"] = True
     st, _, _ = run({"cases": b})
-    checks.append(("True for a number: MISMATCH", st["simm_k-0001"] == "MISMATCH"))
+    checks.append(("True for a number: MISMATCH", st["sbim_k-0001"] == "MISMATCH"))
     s = copy.deepcopy(filled)
-    s["simm_k-0002"]["total"] = repr(s["simm_k-0002"]["total"])
-    dl = rc(s, "simm_k-0005", "RatesFX", "IR")["delta"]
+    s["sbim_k-0002"]["total"] = repr(s["sbim_k-0002"]["total"])
+    dl = rc(s, "sbim_k-0005", "RATES", "IR")["delta"]
     dl["buckets"] = [dict(bucket=k, **v) for k, v in dl["buckets"].items()]
     st, _, _ = run({"cases": s})
-    checks.append(("decimal string (R4) and keyed list (R3): MATCH", st["simm_k-0002"] == "MATCH" and st["simm_k-0005"] == "MATCH"))
+    checks.append(("decimal string (R4) and keyed list (R3): MATCH", st["sbim_k-0002"] == "MATCH" and st["sbim_k-0005"] == "MATCH"))
     d = copy.deepcopy(filled)
-    rc(d, "simm_k-0006", "RatesFX", "IR")["delta"]["buckets"]["USD"]["s_b"] *= -1
-    rc(d, "simm_k-0019", "RatesFX", "IR")["curvature"]["theta"] = 0.0
+    rc(d, "sbim_k-0006", "RATES", "IR")["delta"]["buckets"]["USD"]["s_b"] *= -1
+    rc(d, "sbim_k-0019", "RATES", "IR")["curvature"]["theta"] = 0.0
     st, _, _ = run({"cases": d})
     checks.append(("wrong sign of a clipped S_b, and theta 0 where it is -1/3: MISMATCH",
-                   st["simm_k-0006"] == "MISMATCH" and st["simm_k-0019"] == "MISMATCH"))
+                   st["sbim_k-0006"] == "MISMATCH" and st["sbim_k-0019"] == "MISMATCH"))
     e = copy.deepcopy(filled)
-    e["simm_k-0025"]["product_classes"].pop("Equity")
+    e["sbim_k-0025"]["groups"].pop("EQUITY")
     st, _, _ = run({"cases": e})
-    checks.append(("a product class missing: MISSING", st["simm_k-0025"] == "MISSING"))
+    checks.append(("a group missing: MISSING", st["sbim_k-0025"] == "MISSING"))
     ok = True
     for name, good in checks:
         print(f"{'PASS' if good else 'FAIL'}\t{name}")

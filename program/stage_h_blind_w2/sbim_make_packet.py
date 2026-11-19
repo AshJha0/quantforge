@@ -1,21 +1,21 @@
-"""K-8h blind packet (DR-H2) for the 29 hand value cases of specifications/06-risk/simm-placeholder.md.
+"""K-8h blind packet (DR-H2) for the 29 hand value cases of specifications/06-risk/sbim-placeholder.md.
 
 Built exactly like k2_make_packet.py (stage K wave 2). Writes, into <packet dir> (which must lie outside every
 repository worktree and be empty):
   README.md                              what the blind lane must produce, and the read-nothing-else rule
-  specs/simm-placeholder.blind.md        the PROPOSED spec with the sections "Worked example", "Hand cases" and
+  specs/sbim-placeholder.blind.md        the PROPOSED spec with the sections "Worked example", "Hand cases" and
                                          "Acceptance" cut (they print expected values, intermediates and arithmetic;
                                          W1B lesson: an acceptance line can name an output)
-  rulings/stage-k-rulings-simm.blind.md  the rulings with KR-141 (gate classes) cut
-  tables/simm-placeholder.json           the placeholder table, byte for byte
-  inputs/K-8h.inputs.json                per case: case_id, operation, inputs (from simm_cases.py; nothing else)
+  rulings/stage-k-rulings-sbim.blind.md  the rulings with KR-141 (gate classes) cut
+  tables/sbim-placeholder.json           the placeholder table, byte for byte
+  inputs/K-8h.inputs.json                per case: case_id, operation, inputs (from sbim_cases.py; nothing else)
   output_template.json                   field definitions and a results skeleton (every field to report, null)
   MANIFEST.sha256                        SHA-256 of every file above
-Never reads simm_expected.json. The skeleton's keys (which product classes, risk classes, kinds, buckets, factors
-and groups exist for a case) come from running simm_ref.simm on the case inputs and replacing every leaf by null:
+Never reads sbim_expected.json. The skeleton's keys (which groups, risk classes, kinds, buckets, factors
+and groups exist for a case) come from running sbim_ref.sbim on the case inputs and replacing every leaf by null:
 the structure follows from the rules and inputs, and no value is written.
 
-    python -I program/stage_h_blind_w2/simm_make_packet.py <checkout> C:/Work/Claude/qf-blind/simm_packet
+    python -I program/stage_h_blind_w2/sbim_make_packet.py <checkout> C:/Work/Claude/qf-blind/sbim_packet
 """
 import hashlib
 import json
@@ -25,20 +25,20 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from simm_cases import CASES  # noqa: E402
-import simm_ref  # noqa: E402
+from sbim_cases import CASES  # noqa: E402
+import sbim_ref  # noqa: E402
 
-SPEC = "specifications/06-risk/simm-placeholder.md"
-RULINGS = "specifications/stage-k-rulings-simm.md"
-TABLE = "specifications/tables/stage_k/simm-placeholder.json"
+SPEC = "specifications/06-risk/sbim-placeholder.md"
+RULINGS = "specifications/stage-k-rulings-sbim.md"
+TABLE = "specifications/tables/stage_k/sbim-placeholder.json"
 CUT = ("Worked example", "Hand cases", "Acceptance")
 CUT_RULINGS = ("KR-141",)
-OP = "risk.simm.placeholder"
+OP = "risk.sbim.placeholder"
 
-PFX = "product_classes[<pc>].risk_classes[<rc>]"
+PFX = "groups[<g>].risk_classes[<rc>]"
 FIELDS = {
-    "total": "sum over product classes (step 9)",
-    "product_classes[<pc>].im": "product class margin (step 8)",
+    "total": "sum over groups (step 9)",
+    "groups[<g>].im": "group margin (step 8)",
     PFX + ".im": "risk class margin = delta + vega + curvature margins present (step 7)",
     PFX + ".<delta|vega>.margin": "M + K_residual (step 5)",
     PFX + ".<delta|vega>.buckets[<b>].k_b": "K_b of a non-residual bucket (step 4)",
@@ -70,24 +70,24 @@ def nulls(o):
 
 
 def skeleton(P, inp):
-    return nulls(simm_ref.simm(P, inp))
+    return nulls(sbim_ref.sbim(P, inp))
 
 
-README = """# K-8h blind re-derivation packet (DR-H2): SIMM structure on placeholder weights
+README = """# K-8h blind re-derivation packet (DR-H2): sensitivity-based initial margin on placeholder weights
 
 You are the blind lane. Your job: from the rules in this folder alone, write your own small reference
 implementation and compute the outputs of the {n} cases in `inputs/`. Nobody will tell you whether you are right
 until your results are frozen.
 
-Every number here is computed on PLACEHOLDER WEIGHTS (`tables/simm-placeholder.json`): round numbers with no
-relation to any ISDA SIMM parameter set. Do not look for, recall or use any ISDA value.
+Every number here is computed on PLACEHOLDER WEIGHTS (`tables/sbim-placeholder.json`): round numbers with no
+relation to any industry or regulatory margin model. Do not look for, recall or use any outside parameter value.
 
 ## Hard rules
 
 1. Read nothing outside this folder. No repository, no other folder on this machine, no web page, no earlier
    conversation about this spec. If a rule here is unclear, decide, write the decision down (rule 4) and go on.
 2. Write your reference yourself: plain Python (standard library only is fine), no imports from any repository.
-   Keep it in your own working folder next to (not inside) this packet, for example `../simm_blind/`.
+   Keep it in your own working folder next to (not inside) this packet, for example `../sbim_blind/`.
 3. Do not round. Report every number as a JSON number at full binary64 precision (Python `json.dumps` of the float).
    The rulings (KR-139) fix the comparison tolerance at 1e-12 relative (1e-15 absolute at 0); you do not need to
    aim for it, just compute in binary64.
@@ -109,10 +109,10 @@ relation to any ISDA SIMM parameter set. Do not look for, recall or use any ISDA
 
 ## What is here
 
-- `specs/simm-placeholder.blind.md`: the draft spec with its worked example, hand cases and acceptance sections
+- `specs/sbim-placeholder.blind.md`: the draft spec with its worked example, hand cases and acceptance sections
   removed. Inputs, every formula step, outputs, errors and limits are complete.
-- `rulings/stage-k-rulings-simm.blind.md`: the rulings that decide the choices the spec leaves open.
-- `tables/simm-placeholder.json`: the placeholder parameters (decimal strings).
+- `rulings/stage-k-rulings-sbim.blind.md`: the rulings that decide the choices the spec leaves open.
+- `tables/sbim-placeholder.json`: the placeholder parameters (decimal strings).
 - `inputs/K-8h.inputs.json`: per case the case id, the operation and its inputs. Each input object is complete.
 - `output_template.json`: what to report per case.
 - `MANIFEST.sha256`: hashes of every file here. Check them first (`sha256sum -c MANIFEST.sha256` or Python) and
@@ -149,10 +149,10 @@ def main():
         raise SystemExit("packet dir is inside a git worktree; refusing")
     if pk.exists() and any(pk.iterdir()):
         raise SystemExit(f"{pk} is not empty; remove it first so no stale file survives")
-    P = simm_ref.load_table(root)
-    write(pk, "specs/simm-placeholder.blind.md", strip_spec((root / SPEC).read_text(encoding="utf-8")))
-    write(pk, "rulings/stage-k-rulings-simm.blind.md", strip_rulings((root / RULINGS).read_text(encoding="utf-8")))
-    write(pk, "tables/simm-placeholder.json", (root / TABLE).read_bytes())
+    P = sbim_ref.load_table(root)
+    write(pk, "specs/sbim-placeholder.blind.md", strip_spec((root / SPEC).read_text(encoding="utf-8")))
+    write(pk, "rulings/stage-k-rulings-sbim.blind.md", strip_rulings((root / RULINGS).read_text(encoding="utf-8")))
+    write(pk, "tables/sbim-placeholder.json", (root / TABLE).read_bytes())
     rows = [{"case_id": cid, "operation": OP, "inputs": inp} for cid, inp in CASES]
     write(pk, "inputs/K-8h.inputs.json", json.dumps({"item": "K-8h", "cases": rows}, indent=1) + "\n")
     tmpl = {"fields": FIELDS,

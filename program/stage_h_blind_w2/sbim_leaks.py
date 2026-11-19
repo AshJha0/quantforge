@@ -1,6 +1,6 @@
-"""Leak check for the K-8h SIMM blind packet (hidden side; never put this script or its output in the packet).
+"""Leak check for the K-8h sbim blind packet (hidden side; never put this script or its output in the packet).
 
-Copy of k2_leaks.py (stage K wave 2) with the case list, expected file and case-id pattern of K-8h. For each of the 29 cases, every expected output value in simm_expected.json (numbers and date
+Copy of k2_leaks.py (stage K wave 2) with the case list, expected file and case-id pattern of K-8h. For each of the 29 cases, every expected output value in sbim_expected.json (numbers and date
 strings; booleans and null carry no digits and are not searched) is searched for in every packet file, as printed:
 the plain decimal form (signed as printed; a negative value is searched with its sign), the comma-grouped form, the
 forms rounded to 2 and 4 decimals when the value has more digits, and the percent form for theta, lambda and concentration factors.
@@ -14,7 +14,7 @@ A hit is classified:
            tell the deriver which case it belongs to or that it is an answer. Allowed, every hit listed.
   ALLOWED  in prose, a value of three or more significant digits, listed in ALLOW below with the reason
   HARD     anything else: a leak. Also HARD: any case id outside inputs/ and output_template.json.
-    python -I program/stage_h_blind_w2/simm_leaks.py <checkout> <packet dir> > <outside dir>/simm_LEAKS.tsv
+    python -I program/stage_h_blind_w2/sbim_leaks.py <checkout> <packet dir> > <outside dir>/sbim_LEAKS.tsv
 Exit 1 on any HARD hit.
 """
 import json
@@ -24,7 +24,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from simm_cases import CASES  # noqa: E402
+from sbim_cases import CASES  # noqa: E402
 
 GENERIC = {"0", "1", "-0"}
 
@@ -83,7 +83,7 @@ def variants(v, path):
 
 def main():
     root, pk = Path(sys.argv[1]), Path(sys.argv[2])
-    exp = json.loads((root / "program/stage_h_blind_w2/simm_expected.json").read_text(encoding="utf-8"))["cases"]
+    exp = json.loads((root / "program/stage_h_blind_w2/sbim_expected.json").read_text(encoding="utf-8"))["cases"]
     files = sorted(p for p in pk.rglob("*") if p.is_file() and p.name != "MANIFEST.sha256")
     lines = [(p.relative_to(pk).as_posix(), i + 1, ln) for p in files for i, ln in enumerate(p.read_text(encoding="utf-8").splitlines())]
     allow = {(v, f) for v, f, _ in ALLOW}
@@ -120,7 +120,7 @@ def main():
                         hard += 1
                     counts[cls] += 1
                     print(f"{cid}\t{f['path']}\t{var}\t{cls}\t{name}:{n}\t{ln.strip()[:150]}")
-    idpat = re.compile(r"\bsimm_ke?-\d{4}\b")
+    idpat = re.compile(r"\bsbim_ke?-\d{4}\b")
     for name, n, ln in lines:
         if name.startswith("inputs/") or name == "output_template.json":
             continue

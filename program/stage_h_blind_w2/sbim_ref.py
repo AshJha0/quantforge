@@ -1,9 +1,9 @@
-"""Spec lane's own reference for specifications/06-risk/simm-placeholder.md (K-8h). HIDDEN side of the blind packet.
+"""Spec lane's own reference for specifications/06-risk/sbim-placeholder.md (K-8h). HIDDEN side of the blind packet.
 
-Used only to recheck the hand arithmetic of the spec's hand cases and to write simm_expected.json; it is our own
+Used only to recheck the hand arithmetic of the spec's hand cases and to write sbim_expected.json; it is our own
 second computation and counts as no outside check (KR-68). Standard library only; reads the placeholder table.
 
-    python -I program/stage_h_blind_w2/simm_ref.py <checkout>     # prints every case's outputs
+    python -I program/stage_h_blind_w2/sbim_ref.py <checkout>     # prints every case's outputs
 """
 import json
 import math
@@ -16,7 +16,7 @@ RC_ORDER = ("IR", "FX", "EQ")
 
 
 def load_table(root):
-    t = json.loads((Path(root) / "specifications/tables/stage_k/simm-placeholder.json").read_text(encoding="utf-8"))
+    t = json.loads((Path(root) / "specifications/tables/stage_k/sbim-placeholder.json").read_text(encoding="utf-8"))
     f = float
     days = {x["label"]: x["days"] for x in t["tenors"]}
     order = t["IR"]["delta"]["rho"]["order"]
@@ -32,7 +32,7 @@ def load_table(root):
                "gamma": f(t["EQ"]["delta"]["gamma"]), "T": f(t["EQ"]["delta"]["threshold"]),
                "vrw": f(t["EQ"]["vega"]["rw"]), "VT": f(t["EQ"]["vega"]["threshold"])},
         "sf_scale": f(t["curvature"]["sf_scale"]), "sf_days": f(t["curvature"]["sf_days"]), "z": f(t["curvature"]["z"]),
-        "psi": f(t["psi"]["value"]),
+        "rho_class": f(t["rho_class"]["value"]),
     }
 
 
@@ -46,13 +46,13 @@ def ratio(a, b):
 
 def factor_key(rc, rec):
     if rc == "IR":
-        return rec["qualifier"] + "|" + rec["label1"]
-    return rec["qualifier"]
+        return rec["name"] + "|" + rec["tenor"]
+    return rec["name"]
 
 
 def bucket_of(rc, rec):
     if rc == "IR":
-        return rec["qualifier"]
+        return rec["name"]
     if rc == "FX":
         return "FX"
     return rec["bucket"]
@@ -60,7 +60,7 @@ def bucket_of(rc, rec):
 
 def group_of(rc, rec):
     """Concentration group: the currency for IR (the bucket), the currency for FX, the issuer for EQ."""
-    return rec["qualifier"]
+    return rec["name"]
 
 
 def rho(P, rc, b, fk, fl, label):
@@ -79,7 +79,7 @@ def weighted(P, rc, kind, recs):
         net[k] = net.get(k, 0.0) + r["amount"]
         bucket[k], group[k] = bucket_of(rc, r), group_of(rc, r)
         if rc == "IR":
-            label[k] = r["label1"]
+            label[k] = r["tenor"]
     gsum = {}
     for k, v in net.items():
         gsum[group[k]] = gsum.get(group[k], 0.0) + v
@@ -160,12 +160,12 @@ def risk_class(P, rc, recs):
             cvr, cb, cl = {}, {}, {}
             for r in rs:
                 k = factor_key(rc, r)
-                t = P["days"][r["label1"]]
+                t = P["days"][r["tenor"]]
                 sf = P["sf_scale"] * min(1.0, P["sf_days"] / t)
                 cvr[k] = cvr.get(k, 0.0) + sf * r["amount"]
                 cb[k] = bucket_of(rc, r)
                 if rc == "IR":
-                    cl[k] = r["label1"]
+                    cl[k] = r["tenor"]
             buckets, inner, res_k = aggregate(P, rc, cb, {}, cl, {}, cvr, True)
             c = {"cvr": cvr, "buckets": buckets}
             margin = 0.0
@@ -185,11 +185,11 @@ def risk_class(P, rc, recs):
     return out
 
 
-def simm(P, inp):
+def sbim(P, inp):
     pcs = {}
     for r in inp["records"]:
-        pcs.setdefault(r["product_class"], []).append(r)
-    res = {"product_classes": {}}
+        pcs.setdefault(r["group"], []).append(r)
+    res = {"groups": {}}
     total = 0.0
     for pc, recs in pcs.items():
         rcs = {}
@@ -198,9 +198,9 @@ def simm(P, inp):
             if rr:
                 rcs[rc] = risk_class(P, rc, rr)
         ims = [v["im"] for v in rcs.values()]
-        s2 = sum(a * b * (1.0 if i == j else P["psi"]) for i, a in enumerate(ims) for j, b in enumerate(ims))
+        s2 = sum(a * b * (1.0 if i == j else P["rho_class"]) for i, a in enumerate(ims) for j, b in enumerate(ims))
         im = math.sqrt(max(0.0, s2))
-        res["product_classes"][pc] = {"im": im, "risk_classes": rcs}
+        res["groups"][pc] = {"im": im, "risk_classes": rcs}
         total += im
     res["total"] = total
     return res
@@ -211,7 +211,7 @@ def flatten(o, prefix=""):
     out = []
     for k, v in o.items():
         if isinstance(v, dict):
-            keyed = k in ("product_classes", "risk_classes", "buckets", "cr", "ws", "cvr")
+            keyed = k in ("groups", "risk_classes", "buckets", "cr", "ws", "cvr")
             if keyed:
                 for kk, vv in v.items():
                     p = f"{prefix}{k}[{kk}]"
@@ -228,19 +228,26 @@ def flatten(o, prefix=""):
 
 def main():
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from simm_cases import CASES
+    from sbim_cases import CASES, ADDED_CASES
     P = load_table(sys.argv[1])
     if "--write-expected" in sys.argv:
-        exp = {"note": "K-8h hand cases; values from simm_ref.py (the spec lane's own computation), each headline value "
+        exp = {"note": "K-8h hand cases; values from sbim_ref.py (the spec lane's own computation), each headline value "
                        "also printed in the spec section 'Hand cases'; HIDDEN from the blind lane",
-               "cases": {cid: {"item": "K-8h", "fields": [{"path": p, "value": v} for p, v in flatten(simm(P, inp))]}
+               "cases": {cid: {"item": "K-8h", "fields": [{"path": p, "value": v} for p, v in flatten(sbim(P, inp))]}
                          for cid, inp in CASES}}
-        out = Path(__file__).resolve().parent / "simm_expected.json"
+        out = Path(__file__).resolve().parent / "sbim_expected.json"
         out.write_text(json.dumps(exp, indent=1) + "\n", encoding="utf-8", newline="\n")
         print(f"wrote {out}: {sum(len(c['fields']) for c in exp['cases'].values())} fields")
+        add = {"note": "K-8h cases added AFTER the blind run of 2026-11-19; values from sbim_ref.py; NOT blind-checked "
+                       "and never counted as outside-checked",
+               "cases": {cid: {"item": "K-8h", "fields": [{"path": p, "value": v} for p, v in flatten(sbim(P, inp))]}
+                         for cid, inp in ADDED_CASES}}
+        out = Path(__file__).resolve().parent / "sbim_added_expected.json"
+        out.write_text(json.dumps(add, indent=1) + "\n", encoding="utf-8", newline="\n")
+        print(f"wrote {out}: {sum(len(c['fields']) for c in add['cases'].values())} fields")
         return
-    for cid, inp in CASES:
-        print(cid, json.dumps(simm(P, inp)))
+    for cid, inp in CASES + ADDED_CASES:
+        print(cid, json.dumps(sbim(P, inp)))
 
 
 if __name__ == "__main__":

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Guards specifications/tables/stage_k/simm-placeholder.json (K-8h, KR-131). Standard library only.
+"""Guards specifications/tables/stage_k/sbim-placeholder.json (K-8h, KR-130). Standard library only.
 
-  1. the committed file is byte for byte the output of tools/gen_simm_placeholder.py, so a hand edit or a file
+  1. the committed file is byte for byte the output of tools/gen_sbim_placeholder.py, so a hand edit or a file
      replaced by any other parameter set (a licensed calibration included) fails;
-  2. the header says placeholder (placeholder: true, label "placeholder weights", notice naming no relation to any
-     ISDA parameter set);
+  2. the header says placeholder (placeholder: true, label "placeholder weights", notice stating no relation to any
+     industry or regulatory margin model's parameters);
   3. every number follows the stated artificial rule, recomputed here independently of the generator;
   4. planted fault: a table with one weight changed is rejected by check 1 and check 3.
 """
@@ -14,7 +14,7 @@ from fractions import Fraction
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import gen_simm_placeholder as G  # noqa: E402
+import gen_sbim_placeholder as G  # noqa: E402
 
 
 def rule_errors(doc):
@@ -54,8 +54,8 @@ def rule_errors(doc):
     c = doc["curvature"]
     if (F(c["sf_scale"]), F(c["sf_days"]), F(c["z"])) != (F(1, 4), 20, 2):
         err.append("curvature")
-    if F(doc["psi"]["value"]) != F(1, 5):
-        err.append("psi")
+    if F(doc["rho_class"]["value"]) != F(1, 5):
+        err.append("rho_class")
     return err
 
 
@@ -65,7 +65,7 @@ def main():
     checks.append(("committed file equals generator output", committed == G.text()))
     doc = json.loads(committed)
     checks.append(("header says placeholder", doc.get("placeholder") is True and doc.get("label") == "placeholder weights"
-                   and "no relation" in doc.get("notice", "") and "ISDA" in doc.get("notice", "")))
+                   and "no relation" in doc.get("notice", "") and "project definition" in doc.get("notice", "")))
     checks.append(("every number follows the stated rule", rule_errors(doc) == []))
     bad = json.loads(committed)
     bad["IR"]["delta"]["rw"]["5Y"] = "31"
