@@ -103,6 +103,12 @@ check_hashes() {
   fi
   (cd "$R2DIR" && sha256sum --strict --quiet -c "$H") || die "inputs in $R2DIR do not match $H"
   say "inputs match $(basename "$H") ($(wc -l < "$H") files)"
+  if [ "$SMOKE" != 1 ]; then  # HR-134: a --sample-only or --tolerant build is never a workload input
+    for s in BTC-USD ETH-USD; do
+      [ "$(meta_field "$s" '.get("sample_only", False)')" = False ] || die "R2_$s was built with --sample-only (HR-134 rule bypassed)"
+      [ "$(meta_field "$s" '.get("tolerant", False)')" = False ] || die "R2_$s is a tolerant build"
+    done
+  fi
 }
 
 meta_field() { python -I -c "import json,sys; m=json.load(open(sys.argv[1])); print(eval('m'+sys.argv[2]))" "$R2DIR/R2_$1.meta.json" "$2"; }

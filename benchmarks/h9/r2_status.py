@@ -20,7 +20,8 @@ The raw message files (DATA_DIR/<SYM>-raw/) are never opened. `build_r2.py windo
 Sessions (item 2a, HR-132, HR-134): a session starts at the first "snapshot depth" line after a recorder start or a
 reconnect, and ends at the first gap row or "reconnect after" line, a clean stop, or a new "recording" line (a restart;
 a killed or shut-down recorder writes no gap row, and its end is estimated from the last modification time of the
-data files before the restart). Sessions are examined in time order; the first that runs 6 hours is the window, taken
+data files before the restart; the last session, with no end line, is still open while some data file was written
+in the last 3 minutes and otherwise ended at the last file write). Sessions are examined in time order; the first that runs 6 hours is the window, taken
 as exactly its first 6 hours, whatever its content; no later session is examined.
 
 `cleanup` lists the raw hour files that belong ONLY to rejected sessions (dry run); with --delete it deletes exactly
@@ -39,7 +40,8 @@ AFTER_DEFAULT = "2026-11-19T11:41:24Z"
 SYMBOLS = ("BTC-USD", "ETH-USD")
 WINDOW = timedelta(hours=6)  # HR-134: exactly 6 hours from the session's first raw snapshot
 MARGIN = timedelta(minutes=5)  # protected intervals are widened by this much in `cleanup`
-SAMPLE_KEEP = "20261117T20"  # the old development sample: never deleted here
+SAMPLE_KEEP = "20261117T20"
+STALE = timedelta(seconds=180)  # the recorder flushes every 30 s; no file written for 3 minutes = not recording  # the old development sample: never deleted here
 
 
 def ts(text):
@@ -171,9 +173,14 @@ def sessions(log_events, files, per_second, after, now):
                 cur = {"start": t, "end": None, "end_reason": None, "open": True}
         elif kind in ("gap", "stop") or kind == "closed":
             end(t, detail)
-    if cur is not None:
-        cur["end"] = now
-        out.append(cur)
+    if cur is not None:  # no end line yet: still recording, or killed (a shutdown) with no restart since
+        last_write = mtimes[-1] if mtimes else cur["start"]
+        if now - last_write > STALE:
+            end(max(last_write, cur["start"]),
+                f"no recorder output since {iso(last_write)} and no log line (killed or shut down); end from file times")
+        else:
+            cur["end"] = now
+            out.append(cur)
 
     newest_open = []  # per-second files still being written (newest of their folder, no end marker)
     for s in SYMBOLS:

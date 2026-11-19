@@ -252,7 +252,7 @@ def choose_window(data_dir, after, min_hours=None, max_hours=None, tolerant=Fals
             else:
                 sess["rejected"] = f"recording ends before hour {lo_h:g}: the last session, may still qualify"
             continue
-        end = s0 + max_d
+        end = min(s0 + max_d, limit)  # = s0 + 6 h under the rule (limit >= s0 + min_hours = s0 + 6 h)
         sess["window"] = [iso(s0), iso(end)]
         touching = [name for h, _, name in open_files if h < end]
         if touching:
@@ -567,7 +567,7 @@ def main(argv):
         if sample:
             print("WARNING: --sample-only: not the HR-134 rule as fixed; never a workload input")
         if start is None:
-            print(f"window: none yet ({log['result']})")
+            print(f"window: {log['result']}")
             return 3
         print(f"START {iso(start)} END {iso(end)}")
         sess = log["sessions"][-1]
