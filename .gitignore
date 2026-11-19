@@ -17,6 +17,7 @@ site/
 !tools/curve_daily/site/
 reports/workflows/
 python/.coverage
+python/coverage.json
 *.egg-info
 .hypothesis/
 .benchmarks/
