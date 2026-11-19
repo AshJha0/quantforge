@@ -23,6 +23,8 @@ def files(lang, target, root=ROOT):
         return sorted((root / "rust").glob(target))
     if lang == "python":  # mutmut target such as quantforge_core.shortrate*
         mod = target.split(".", 1)[1] if "." in target else target
+        if mod.endswith(".*"):  # quantforge_core.frtb.* names exactly frtb.py
+            return [f for f in [root / "python" / "quantforge_core" / (mod[:-2].replace(".", "/") + ".py")] if f.is_file()]
         return sorted((root / "python" / "quantforge_core").glob(mod.replace(".", "/") + ".py"))
     return []  # java: PIT mutates every class in the target, no sample
 

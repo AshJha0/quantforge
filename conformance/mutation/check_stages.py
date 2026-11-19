@@ -15,9 +15,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
-from plan_matrix import LANGS, target_glob  # noqa: E402
+from plan_matrix import LANGS, target_glob, targets  # noqa: E402
 
-REQUIRED_STAGES = ("A", "D", "E", "F", "G", "I", "J")
+REQUIRED_STAGES = ("A", "D", "E", "F", "G", "I", "J", "K")
 
 
 def files_under(prefix):
@@ -41,13 +41,14 @@ def problems(cfg):
                 t = m.get(lang)
                 if not t:
                     continue
-                g = target_glob(lang, t)
                 if lang == "python" and not t.endswith("*"):  # mutmut keys are module.function names
                     out.append(f"stage {st} module {m['module']} python: target {t!r} must end in '*'")
-                if lang == "python":  # a mutmut name glob: quantforge_core.credit.* covers credit.py
-                    g = "python/" + t.rstrip("*").rstrip(".").replace(".", "/") + "*"
-                if not any(fnmatch.fnmatch(f, g) or fnmatch.fnmatch(f, "*/" + g.lstrip("*/")) for f in src):
-                    out.append(f"stage {st} module {m['module']} {lang}: target {t!r} matches no file")
+                for part in targets(lang, t):
+                    g = target_glob(lang, part)
+                    if lang == "python" and not part.endswith(".*"):  # a name glob: shortrate* covers shortrate*.py
+                        g = "python/" + part.rstrip("*").rstrip(".").replace(".", "/") + "*"
+                    if not any(fnmatch.fnmatch(f, g) or fnmatch.fnmatch(f, "*/" + g.lstrip("*/")) for f in src):
+                        out.append(f"stage {st} module {m['module']} {lang}: target {part!r} matches no file")
             for key in [k for k in m if k == "suite" or k.endswith("_suite")]:
                 for g in m[key].split(","):  # a comma-separated list is a union (runner.py --suite)
                     if not any(fnmatch.fnmatch(s, g.strip()) for s in goldens):
