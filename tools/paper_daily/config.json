@@ -1,0 +1,65 @@
+{
+  "format": "qf-paper-ledger/1",
+  "spec": "specifications/12-platform/paper-ledger-daily.md",
+  "label": "paper marks on a fitted curve; not tradable",
+  "fill_label": "simulated",
+  "tca_pretrade_label": "placeholder weights",
+  "ceiling": "Paper trading on free data; simulated fills; no evidence of tradable profitability.",
+  "statement": "Plumbing evidence only. The trading rule is a fixed rotation that ignores the market. No performance claim is made from this ledger.",
+  "calendar": "USGS",
+  "source_series": "recorder/us-treasury-par-yields",
+  "knots": [
+    {"field": "3 Mo", "years": 0.25},
+    {"field": "2 Yr", "years": 2},
+    {"field": "5 Yr", "years": 5},
+    {"field": "10 Yr", "years": 10},
+    {"field": "30 Yr", "years": 30}
+  ],
+  "interp": "linear",
+  "cash_rate_field": "3 Mo",
+  "start_cash": "10000000",
+  "par_price": "100",
+  "coupon_frequency": 2,
+  "mark_decimals": 6,
+  "tca_decimals": 10,
+  "tick_size": "0.00390625",
+  "lot_size": "100",
+  "book_levels": 3,
+  "depth_percent_min": 20,
+  "depth_percent_span": 31,
+  "target_dv01_usd": "500",
+  "instruments": [
+    {"symbol": "UST-CM-2Y", "field": "2 Yr", "years": 2, "half_spread": "0.0078125", "daily_vol": 0.001},
+    {"symbol": "UST-CM-5Y", "field": "5 Yr", "years": 5, "half_spread": "0.0078125", "daily_vol": 0.0025},
+    {"symbol": "UST-CM-10Y", "field": "10 Yr", "years": 10, "half_spread": "0.015625", "daily_vol": 0.0045},
+    {"symbol": "UST-CM-30Y", "field": "30 Yr", "years": 30, "half_spread": "0.03125", "daily_vol": 0.009}
+  ],
+  "rule": [
+    {"side": "BUY", "symbol": "UST-CM-2Y"},
+    {"side": "BUY", "symbol": "UST-CM-5Y"},
+    {"side": "BUY", "symbol": "UST-CM-10Y"},
+    {"side": "BUY", "symbol": "UST-CM-30Y"},
+    {"side": "SELL", "symbol": "UST-CM-2Y"},
+    {"side": "SELL", "symbol": "UST-CM-5Y"},
+    {"side": "SELL", "symbol": "UST-CM-10Y"},
+    {"side": "SELL", "symbol": "UST-CM-30Y"}
+  ],
+  "order_type": "IOC",
+  "limits": {
+    "max_order_qty": "40000",
+    "max_notional": "4500000",
+    "max_abs_position": "40000",
+    "price_band": "0.005",
+    "max_orders_per_day": 2,
+    "kill_switch": false,
+    "allow_short": false
+  },
+  "fee_schedule": {"taker_fee": "0", "maker_rebate": "0"},
+  "tca_pretrade": {
+    "adv_multiple": 10,
+    "participation": 0.1,
+    "params": {"a1": 700, "a2": 0.5, "a3": 1, "a4": 0.5, "b1": 0.9}
+  },
+  "on_time_cutoff_utc": "19:30:00",
+  "unexplained_threshold": "0"
+}
