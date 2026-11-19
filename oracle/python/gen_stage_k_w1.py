@@ -496,6 +496,8 @@ def build():
 
 
 TWO = "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+TWO_G31 = ("added by the K-8 port lane 2026-11-19 (two errors at once, size limit before domain by G-31): hand, not "
+           "blind re-derived; Python and Java already gave E_LIMIT, the C++ and Rust builds were fixed to match")
 TWO_G18 = ("added by the K-8 port lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived; "
            "Java, C++ and Rust already gave E_INPUT, the Python build was fixed to match")
 
@@ -558,6 +560,15 @@ def e2_suite():
         s.add(op, bad, error="E_INPUT", verified=("hand", TWO_G18), tags=("stage_k", "e2", "two-errors", "error"),
               description="G-18 path (no method): exercise time 1.5 not a reset date (structural E_INPUT) "
                           "and grid width 0 (E_DOMAIN)")
+    # G-31 puts the size limits after E_SCHEMA and before F-2 and the domain checks. Python and Java gave E_LIMIT;
+    # C++ and Rust checked sigma first and gave E_DOMAIN (four-build probe, K-8 port lane; fixed there).
+    big = json.loads(json.dumps(g18["inputs"]))
+    big["sigma"] = 0.0
+    big["grid"]["nx"] = 20001
+    for op in ("rates.shortrate.bermudan_swaption", "rates.shortrate.bermudan_ladder"):
+        s.add(op, big, error="E_LIMIT", verified=("hand", TWO_G31), tags=("stage_k", "e2", "two-errors", "error"),
+              description="G-18 path (no method): sigma 0 (E_DOMAIN) and nx 20,001 above 10,001 (E_LIMIT, "
+                          "checked before the domain checks by G-31)")
     return s
 
 

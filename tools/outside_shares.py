@@ -230,7 +230,7 @@ def load_stage_h():
 # cases) or "only to 6 decimals" (idr_k-0001..0004 `bound`, compared at 1e-9 relative but blind-checked to 5e-7
 # absolute) does not count. The mpmath values are our own oracle and never count (KR-11).
 STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-5a", "rich_k": "K-8 guard",
-                 "e1_k": None, "e2_k": None}  # e1_k, e2_k: error cases only
+                 "k8_k": "K-8", "e1_k": None, "e2_k": None}  # e1_k, e2_k: error cases only
 
 
 def load_stage_k():
