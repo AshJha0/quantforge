@@ -94,7 +94,7 @@ class StageKCliTest {
                 }
             }
         }
-        assertEquals(45, rows);
+        assertTrue(rows >= 46, "rows " + rows);  // a minimum: adding goldens must not break this test
     }
 
     private static void compare(String where, Object want, Object got, double tol) {
