@@ -110,7 +110,7 @@ java_run() {  # java_run FILE RUNS OUT LOGTAG [K=V ...]
 
 wsl_run() {  # wsl_run LANG FILE RUNS OUT LOGTAG [K=V ...]
   local l=$1 f=$2 n=$3 o=$4 tag=$5; shift 5
-  wsl.exe -e bash "$(wslpath_of "$SELF")" wsl-run "$l" "$(wslpath_of "$f")" "$n" "$(wslpath_of "$o")" "$@" 2> "$LOGS/${l}_$tag.err"
+  MSYS2_ARG_CONV_EXCL="*" wsl.exe -e bash "$(wslpath_of "$SELF")" wsl-run "$l" "$(wslpath_of "$f")" "$n" "$(wslpath_of "$o")" "$@" 2> "$LOGS/${l}_$tag.err"
 }
 
 warmup_of() {  # warmup_of SYM r2|l7
@@ -120,9 +120,13 @@ warmup_of() {  # warmup_of SYM r2|l7
 
 do_build() {
   say "build: C++ and Rust in WSL (Release; --release), Java on Windows"
-  wsl.exe -e bash "$(wslpath_of "$SELF")" wsl-build "$(wslpath_of "$REPO")"
+  MSYS2_ARG_CONV_EXCL="*" wsl.exe -e bash "$(wslpath_of "$SELF")" wsl-build "$(wslpath_of "$REPO")"
+  local LOCK=/c/Work/Claude/qf-wt/_h4ci/mvn.lock.d  # one Maven run at a time on the machine (Git Bash has no flock)
+  until mkdir "$LOCK" 2> /dev/null; do say "waiting for the Maven lock"; sleep 20; done
   (cd "$REPO/java25" && mvn -B -q -DskipTests compile && mkdir -p target/lowlat && \
-     "$JAVA_HOME/bin/javac" -d target/lowlat -cp target/classes src/jmh/java/org/quantforge/bench/LowLatBook.java)
+     "$JAVA_HOME/bin/javac" -d target/lowlat -cp target/classes src/jmh/java/org/quantforge/bench/LowLatBook.java) \
+     || { rmdir "$LOCK"; exit 1; }
+  rmdir "$LOCK"
   say "build done"
 }
 
@@ -173,7 +177,7 @@ do_time() {
   [ -e "$QUIET_FLAG" ] && [ "$SMOKE" != 1 ] && die "QUIET is already set: another measurement is running"
   [ "$SMOKE" = 1 ] || { touch "$QUIET_FLAG"; trap 'rm -f "$QUIET_FLAG"' EXIT; }
   local META=$LOGS/publication.json
-  local WF; WF=$(wsl.exe -e bash "$(wslpath_of "$SELF")" wsl-facts)
+  local WF; WF=$(MSYS2_ARG_CONV_EXCL="*" wsl.exe -e bash "$(wslpath_of "$SELF")" wsl-facts)
   local JV; JV=$("$JAVA" -version 2>&1 | head -1)
   python -I - "$META" "$WF" "$(hash_file)" "$RUNS" "$(git -C "$REPO" rev-parse HEAD)" "$SMOKE" "$JV" <<'PY'
 import json, platform, sys
