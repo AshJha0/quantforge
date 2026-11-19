@@ -79,6 +79,19 @@ rich_k-0005/0006 show the G-18 ladder entry converging at first order (as G-18 s
 ## Limits
 
 - **The 0.4986-year row is not judged.** Plainly: the ladder row of the curve node at 0.4986 years is not checked by any acceptance test. Under this method its value is exactly 0.0 on every grid, which is also the model's value (the price does not depend on that node). Acceptance 2 already leaves it out (below the 1e-3 floor) and acceptance 3 skips it under the rule it had from the first run, "an entry exactly zero on all three grids is not put through `num.richardson.check`". Owner decision 2026-11-19: the row stays skipped under that rule; no new ruling. The exact zero is checked only by the unit test named in the table above, not by an acceptance test. Example: case 0001, row 1 reads 0 / 0 / 0 on 201, 401, 801; the first definition read -337 / -105 / +11.
+<!-- blind:strip -->
+- **What QuantLib's number for that row measures (added 2026-11-19, `program/K8_ROW0_FINDING.md`; no rule, threshold or value changed).** Plainly: the reference file holds about -14.27 for this row of case 0001 (-10.00 and -9.59 for the other two), while the method gives 0. The two numbers are the same derivative, and the model's value of it is 0; QuantLib's number is the time-stepping error of its finite-difference engine. Side by side:
+
+  | | This ladder (step 7) | QuantLib reference (acceptance 1) |
+  |---|---|---|
+  | Input moved | the discount factor `DF_1` of the node at 0.4986 years, alone | the same, by a relative bump of 1e-4 up and down |
+  | Curve | `ln P` linear between nodes, rebuilt from the moved node | `DiscountCurve` (log-linear), rebuilt from the moved node |
+  | Held fixed | `a`, `sigma`, every other discount factor, the schedule | the same; `HullWhite(curve, a, sigma)` with no calibration, nothing refitted |
+  | Unit | per unit absolute change of `DF_1`, times `notional` | the same (the bump is divided by `2 h DF_1`) |
+  | How the curve enters | only `ln P(0, s)` at the exercise and payment times 1, 2, ..., 6 years | the forward rate `f(0, t)` sampled at every time step |
+
+  Formal statement: in the model the price is a function of `P(0, s)` at the exercise and payment times only (step 2 and step 3: `D(t)` and `Q(s)` are `P(0, t)` and `P(0, s)` times curve-free factors, and the operator `A` has no curve term). `DF_1` moves `P(0, s)` only for `0 < s < 1`, and no exercise or payment time lies there, so the derivative is exactly 0. QuantLib's engine instead integrates the forward rate step by step; a step that holds the node, or the forward read at the kink at 1 year, lets `DF_1` leak in at first order in the time step. Worked example (measured 2026-11-19, QuantLib 1.44, case 0001, xGrid 801): with the node on a time-grid point (tGrid 1,825, 3,650, 7,300, 14,600) the row reads +15.77, +7.88, +3.94, +1.97, halving with the step; with the node inside a step (tGrid 1,000, 2,000, 4,000, 8,000, 16,000) it reads -76.1, +25.5, -39.7, -14.3, -1.6. At the KR-19 grid 8,000 / 3,201 it is -14.274 and at 7,300 / 3,201 it is +3.95. The size, 4e-5 of the largest entry of the ladder, is the size of the reference's own error on the judged rows (its two bumps differ by 6 to 20 on rows 2 to 5 of the same case) and below the 1e-3 floor of acceptance 2. Bumping `DF_1` in this method by 1e-6 to 20% leaves the price bit-identical on 201/100 and 801/400 (measured, same file). The rows after 7.0055 years are 0.0 in both.
+<!-- /blind:strip -->
 - The same rule skips the rows of the nodes after the segment that holds the last payment (exact zeros for the same reason; step 7 says which nodes these are).
 - The end correction of step 5 is derived in `program/K8_DIAGNOSIS.md` and supported by the measurements there, not by an outside source (inferred and measured).
 - The default method stays `G18_IMPLICIT` and the R6 use restriction stays until the coordinator lifts it after all four builds pass (acceptance 4).
