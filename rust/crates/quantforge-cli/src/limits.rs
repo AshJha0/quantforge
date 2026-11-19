@@ -212,7 +212,32 @@ fn operation_above(op: &str, i: &Json) -> bool {
     }
 }
 
-fn curve_points_above(i: &Json) -> bool {
+/// Operations the generic 100-quote curve rule does not cover: `book.marks.resolve` (its quotes are
+/// marks), `core.store.bitemporal_query` (`value` is any JSON) and the two stage K curve verbs, whose
+/// quote lists have their own row of 200 (ruling KR-231).
+const NO_CURVE_RULE: &[&str] = &[
+    "book.marks.resolve",
+    "core.store.bitemporal_query",
+    "curve.bootstrap.par_annual",
+    "curve.incremental.update",
+];
+
+/// Ruling KR-231: the stage K quote lists, 200 each, checked in the gate (step 2 of HR-122).
+fn stage_k_sizes_above(op: &str, i: &Json) -> bool {
+    let over = |k: &str| len(i, k).is_some_and(|n| n > 200);
+    match op {
+        "curve.bootstrap.par_annual" => over("quotes"),
+        "curve.incremental.update" => {
+            over("previous_quotes") || over("previous_discount_factors") || over("new_quotes")
+        }
+        _ => false,
+    }
+}
+
+fn curve_points_above(op: &str, i: &Json) -> bool {
+    if NO_CURVE_RULE.contains(&op) {
+        return false;
+    }
     let pillars = |k: &str| {
         i.get(k)
             .is_some_and(|c| len(c, "pillars").is_some_and(|n| n > 100))
@@ -488,7 +513,8 @@ pub fn check(op: &str, inputs: &Json) -> Option<QfError> {
         || risk_book_sizes_above(op, inputs)
         || hedge_sizes_above(op, inputs)
         || matrix_above(op, inputs)
-        || curve_points_above(inputs)
+        || stage_k_sizes_above(op, inputs)
+        || curve_points_above(op, inputs)
         || value_too_deep(op, inputs)
         || operation_above(op, inputs)
         || vol_and_exotic_above(op, inputs))
