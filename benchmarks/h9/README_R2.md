@@ -13,49 +13,33 @@ Correctness runs first, in every language and in the Python reference; timing re
 correctness rule are those of `low-latency-book.md` item 2a and targets (g); the L7 sample is item 2b. Nothing here
 changes a target, a threshold or a rule (evidence class: read, 2026-11-19).
 
-## Commands, in order (coordinator, after the raw window has closed)
+## Tonight's commands, in order (coordinator, 2026-11-19)
 
-All from Git Bash at the root of a checkout of this branch, Python through `uv` in `python/`. Times are for the
-14-minute sample's 10-minute session (BTC/USD 164,718 messages, ETH/USD 126,249; measured 2026-11-19 on this laptop)
-and, in brackets, an estimate for an 8-hour window scaled by message count (about 48 times the sample; evidence class:
-inferred, not measured).
+Git Bash at the root of a checkout of `k-h9` (PowerShell where marked). Window by HR-133: the session from 15:02:28
+UTC, exactly 6 hours, so it ends 21:02:28 if nothing breaks. Measured times are for the old sample's 10-minute session
+(BTC/USD 164,718 messages, ETH/USD 126,249) on this laptop on 2026-11-19; the bracketed 6-hour figures scale them by
+message count (about 36 times; evidence class: inferred, not measured).
 
-1. Choose the window (the rule of item 2a, with ruling HR-133: a session whose first raw snapshot is after
-   2026-11-19 15:00 UTC gets exactly 6 hours, so the first attempt from 11:41:24, cut at 15:01:58, is listed as
-   rejected and the session from 15:02:28 is chosen, ending 21:02:28 if nothing breaks; prints the attempts and `START ... END ...`; reads every hourly file of both
-   symbols once, raw and per-second, in full):
+**Why the recorder is stopped first.** The window ends inside the hour file `20261119T21`, which the recorder keeps
+open; a gzip file still being written has no end-of-stream marker, so the full gzip read of item 2a fails on it and
+the window rule would count it as a gap at 21:00 (the session would be rejected). The recorder's STOP file closes
+every file cleanly; a hard kill would leave a broken member and the same failure. So raw recording is switched off
+before the build, not after.
 
-   `python -I benchmarks/h9/build_r2.py window C:/Work/Claude/qf-crypto-data/kraken`
+| # | When (UTC) | Command | Sample | 6 h (inferred) |
+|---|---|---|---|---|
+| 0 | before 20:50 | `benchmarks/h9/run_r2.sh build` (C++, Rust in WSL; Java with the Maven mkdir lock) | MEASURED_BUILD | same |
+| 1 | 21:03 | Raw off, recorder files closed: (a) `mv C:/Work/Claude/qf-crypto-data/kraken/NO_RAW.off-20261119 C:/Work/Claude/qf-crypto-data/kraken/NO_RAW`; (b) `touch C:/Work/Claude/qf-crypto-data/kraken/STOP`; (c) wait until `C:/Work/Claude/qf-crypto-data/heartbeat.json` shows `"stopped": true` and no python process runs `crypto_l2.py` (PowerShell: `Get-CimInstance Win32_Process -Filter "Name='python.exe'" \| ? CommandLine -like '*crypto_l2*'`); only if it is still alive after 60 s kill it (`Stop-Process -Id <pid>`), knowing the open hour file may then fail the gzip read; (d) PowerShell `Start-ScheduledTask "QF crypto L2"`; (e) after a minute, `ls -l C:/Work/Claude/qf-crypto-data/kraken/*-raw/` shows no new file and no size change | | 2 min |
+| 2 | 21:06 | `python -I benchmarks/h9/build_r2.py auto C:/Work/Claude/qf-crypto-data/kraken C:/Work/Claude/qf-h9-r2` (must print `START 2026-11-19T15:02:28...` and an END 6 h later; exit 3 = no window, stop) | MEASURED_AUTO | 10 to 15 min |
+| 3 | 21:20 | `cp C:/Work/Claude/qf-h9-r2/R2_{inputs,replay}.sha256 C:/Work/Claude/qf-h9-r2/R2_window.json benchmarks/results/h9/ && git add benchmarks/results/h9/R2_* && git commit -m "H-9 R2 input hashes (before any R2 timing)"` | | 1 min |
+| 4 | 21:21 | `benchmarks/h9/run_r2.sh correct` (Python reference for both symbols in parallel with the harness passes; the counts compared; L7 dumps checked) | MEASURED_CORRECT | 40 to 50 min |
+| 5 | after 4 passes | Delete the window's raw files: `rm C:/Work/Claude/qf-crypto-data/kraken/BTC-USD-raw/20261119T1[1-9]*.jsonl.gz C:/Work/Claude/qf-crypto-data/kraken/BTC-USD-raw/20261119T2*.jsonl.gz` and the same for `ETH-USD-raw`; only `20261119T11` onward, never the old `20261117T20` sample, never the per-second folders | | 1 min |
+| 6 | about 22:10 | `benchmarks/h9/run_r2.sh time` (stages r2-cpp, r2-rust, r2-java, l7 in that order; QUIET already set by the coordinator is used as is) | code path only | MEASURED_TIME_EST |
+| 7 | 22:45 at the latest | Stop timing (Ctrl-C). Stages that finished have complete files and markers; rerunning `time` later skips them. `STAGES="l7" benchmarks/h9/run_r2.sh time` runs one stage alone; `--skip-l7` leaves L7 out | | |
+| 8 | then | `git add benchmarks/results/h9/*_R2_*.json benchmarks/results/h9/*_L7_*.json benchmarks/results/h9/correct` and write up as the R section of `benchmarks/results/h9/README.md` (median of 5 runs, min-max, met or missed) | | |
 
-   About 3 s on the sample (about 3 min for 8 hours). Exit 3 and `NO WINDOW` if no session qualifies: then R2 is not
-   run and the row stays open.
-2. Build both symbols' inputs and the hash files (same rule, then the builder; also builds the form B stream of the
-   same window with `build_r.py` for L7):
-
-   `python -I benchmarks/h9/build_r2.py auto C:/Work/Claude/qf-crypto-data/kraken C:/Work/Claude/qf-h9-r2`
-
-   About 13 s on the sample (about 10 min for 8 hours). Writes `R2_<SYM>.{bin,cps.bin,msgs.jsonl,rows.jsonl,meta.json}`,
-   `L7_<SYM>.{bin,msgs.jsonl}`, `R2_window.json`, `R2_inputs.sha256` (recorder files) and `R2_replay.sha256` (built
-   files).
-3. Fix the inputs before any timing: copy `R2_inputs.sha256`, `R2_replay.sha256` and `R2_window.json` to
-   `benchmarks/results/h9/` and commit them. The runner refuses to run without the committed `R2_replay.sha256`.
-4. Build the harnesses: `benchmarks/h9/run_r2.sh build` (C++ Release and Rust `--release` in WSL under the WSL lock,
-   Java with Maven on Windows; a few minutes, most of it the C++ core library on a cold build directory).
-5. Correctness: `benchmarks/h9/run_r2.sh correct`. For each symbol: form A in C++, Rust and Java (harness with 0 timed
-   runs), the Python reference `check_r2.py` (micro.book.rebuild, 6 worker processes), the counts compared field by
-   field (`r2_meta.py compare`); the form B input dumped by each language and checked with `check_r.py`. Writes
-   `benchmarks/results/h9/correct/R2_correctness.ok` only if all of it passes. Sample: about 2.5 min, nearly all of it
-   the Python reference (about 1 hour for 8 hours, the reference again dominating; BTC/USD and ETH/USD run one after
-   the other).
-6. Timing: `benchmarks/h9/run_r2.sh time` (sets the QUIET flag while it runs; 5 runs per language, R2 then L7, both
-   symbols). Refuses unless step 5's marker matches the same input hashes and the same commit. No timing figure was
-   taken from the sample (smoke runs only checked that the code path works); the R2 timing for 8 hours is estimated at
-   10 to 20 min in all (inferred from the R run of 2026-11-19, which took a few minutes for 63,195 messages).
-7. Then `git add benchmarks/results/h9/*_R2_*.json benchmarks/results/h9/*_L7_*.json` and write up the result as the R
-   section of `benchmarks/results/h9/README.md` does (median of 5 runs, min-max, met or missed).
-8. Delete the raw files of the window once the replay input is built and checked (item 2a); keep `C:/Work/Claude/qf-h9-r2`.
-
-`run_r2.sh all` is steps 5 and 6 in one go.
+If step 4 fails, no timing runs. If time runs short, the order already puts R2 C++ and Rust first, then Java, then
+L7. Keep `C:/Work/Claude/qf-h9-r2` (the pre-decoded replay input, item 2a).
 
 ## What is checked, and one decision for the coordinator
 
