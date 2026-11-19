@@ -94,14 +94,14 @@ rich_k-0005/0006 show the G-18 ladder entry converging at first order (as G-18 s
 <!-- /blind:strip -->
 - The same rule skips the rows of the nodes after the segment that holds the last payment (exact zeros for the same reason; step 7 says which nodes these are).
 - The end correction of step 5 is derived in `program/K8_DIAGNOSIS.md` and supported by the measurements there, not by an outside source (inferred and measured).
-- The default method stays `G18_IMPLICIT` and the R6 use restriction stays until the coordinator lifts it after all four builds pass (acceptance 4).
+- The default method stays `G18_IMPLICIT` (KR-8 as confirmed). The R6 use restriction was lifted for `CN_RANNACHER_SMOOTHED` only, by the stage K coordinator lane on 2026-11-19 (ruling KR-110, acceptance 4); it stays for `G18_IMPLICIT`, the default.
 
 ## Acceptance (fixed before any run; plan 14.8 K-8)
 
 1. Reference ("converged model derivative"): central bump-and-revalue with QuantLib `FdHullWhiteSwaptionEngine` at a fine grid (proposed tGrid 2,000, xGrid 801; set to tGrid 8,000, xGrid 3,201 by KR-19 before the second run), relative bump 1e-4 on each discount factor, repeated at 5e-5; the two must agree within 0.1% or the entry is reported as unresolved. Cross-check: `CN_RANNACHER_SMOOTHED` at 801/400 and 1601/800 agree with each other within 0.2%. Both are required (owner decision K-QA, 2026-11-18); QuantLib is the counted outside check.
 2. At the default grid 201/100, every ladder entry of aadladder_g-0001..0003 with `|reference| >= 1e-3 max |reference|` is within 1% of the reference; `d_price_d_mean_reversion` and `d_price_d_sigma` too.
 3. Observed order of the new method's price and ladder, by `num.richardson.check` on 201/401/801, between 1.5 and 2.5 with status `OK` on every entry. If any entry is `NON_MONOTONE`, step 3 of the method is not working and the test fails, whatever step 2 says.
-4. The R6 use restriction is removed from docs and the model inventory only for `CN_RANNACHER_SMOOTHED`, only after 1 to 3 pass; G-18 goldens unchanged.
+4. The R6 use restriction is removed from docs and the model inventory only for `CN_RANNACHER_SMOOTHED`, only after 1 to 3 pass; G-18 goldens unchanged. **Done 2026-11-19 (KR-110):** 1 to 3 pass in all four builds (`oracle/K8_ACCEPTANCE_W2.json` (acceptance 1 to 3, Python; acceptance 3, Java), `oracle/K8_ACCEPTANCE_PORTS.json` (acceptance 3, C++ and Rust, values within 3.85e-14 of the row scale of Python), `program/STAGE_K_BLIND_K8.md` (blind re-derivation 7 of 7), `program/K8_ROW0_FINDING.md` (the 0.4986-year row, no bug), conformance on `k-r1` 2026-11-19); removed for `CN_RANNACHER_SMOOTHED` only; no golden changed.
 5. AAD of the new scheme equals its own Richardson bump reference to 1e-8 relative (the aad-core rule).
 
 If 2 fails after the method is built, K-8 moves to a point release under the plan 15 gate rule and the restriction stays; the default grid is not redefined to pass (owner decision K-QB, 2026-11-18).

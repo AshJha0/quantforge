@@ -301,7 +301,7 @@ super::registry! {
         let st = i.str("swaption_type")?;
         let ex = i.reals("exercise_times")?;
         // Optional `method` (KR-8, KR-18; stage K PROPOSED): absent or G18_IMPLICIT is the pinned G-18
-        // scheme (the default stays G-18 until the coordinator lifts the R6 use restriction);
+        // scheme (the default stays G-18, KR-8; the R6 use restriction is lifted for the K-8 method only, KR-110);
         // CN_RANNACHER_SMOOTHED is the K-8 scheme; any other value is E_SCHEMA, before every other check.
         let k8 = match i.opt("method") {
             None => false,
