@@ -10,7 +10,9 @@ holdout windows, fetch the Treasury par yield file for the year, fit the library
 append one DAY row per date (ok, fit_failed, stale_input, fetch_failed or holdout_blocked) or a GAP row; then
 compare settled fits with the Federal Reserve's GSW curve once the Fed has posted that date. The whole new
 ledger is verified before the file is written. Raw downloads are held in memory only and never written.
---dry-run prints the rows it would add and writes nothing. Exit 0 also when nothing is due; 1 on a refusal.
+--dry-run prints the rows it would add and writes nothing. Exit 0 also when nothing is due; 1 on a refusal
+(nothing written); 2 when rows were written and one records a problem (gap, failed fetch or fit, stale input,
+holdout block).
 """
 import argparse
 import datetime as dt
@@ -116,7 +118,7 @@ def main(argv=None):
     if a.dry_run:
         for r in new:
             print(core.line(r))
-        return 0
+        return problems(new)
     if new:
         p = Path(a.ledger)
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -126,7 +128,17 @@ def main(argv=None):
     if a.summary:
         Path(a.summary).write_text(json.dumps(core.summary(out, v), indent=1, sort_keys=True) + "\n", encoding="utf-8",
                                    newline="\n")
-    return 0
+    return problems(new)
+
+
+def problems(new):
+    """Exit 2 when a written row records a problem (a gap, a failed fetch or fit, a stale input, a holdout
+    block), so the scheduled run turns red after the rows are pushed; 0 otherwise."""
+    bad = [f"{r['body']['date']} {r['kind']} {r['body'].get('status', '')}".strip() for r in new
+           if r["kind"] == "GAP" or (r["kind"] == "DAY" and r["body"]["status"] != "ok")]
+    for b in bad:
+        print(f"problem row: {b}", file=sys.stderr)
+    return 2 if bad else 0
 
 
 if __name__ == "__main__":

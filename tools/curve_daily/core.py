@@ -314,10 +314,14 @@ def fit_day(d: dt.date, row: dict[str, str], cfg: dict[str, Any], runner: Runner
     for b in bonds:
         o = _ok(r, b["field"])
         b["dirty"], b["accrued"] = o["dirty"], o["accrued"]
+        # KR-98: weight 1/D^2 (D the modified duration from the same operation), so the price objective is close
+        # to the sum of squared yield errors; unweighted, the bills' tiny price errors hide large yield errors.
+        b["weight"] = 1.0 / (o["modified_duration"] * o["modified_duration"])
     fit_bonds = [{**b["bond"], "dirty_price": b["dirty"]} for b in bonds]
+    w = [b["weight"] for b in bonds]
     taus = cfg["fit"]["tau_grid"]
-    r = runner([case(f"tau={t}", cfg["fit"]["operation"], {"settlement": settle, "tau": float(t), "bonds": fit_bonds})
-                for t in taus])
+    r = runner([case(f"tau={t}", cfg["fit"]["operation"], {"settlement": settle, "tau": float(t), "bonds": fit_bonds,
+                                                         "weights": w}) for t in taus])
     tried, failed = [], []
     for t in taus:
         res = r[f"tau={t}"]
@@ -325,7 +329,7 @@ def fit_day(d: dt.date, row: dict[str, str], cfg: dict[str, Any], runner: Runner
             failed.append({"tau": t, "code": str((res.get("error") or {}).get("code") or "E_UNKNOWN")})
             continue
         resid = res["outputs"]["residuals"]
-        sse = math.fsum(x * x for x in resid)
+        sse = math.fsum(wi * x * x for wi, x in zip(w, resid))  # the operation's own objective
         if not math.isfinite(sse):
             failed.append({"tau": t, "code": "E_NONFINITE"})
             continue
@@ -337,7 +341,7 @@ def fit_day(d: dt.date, row: dict[str, str], cfg: dict[str, Any], runner: Runner
     # (bonds.md: "a bond with weight 0 shows its richness"); their residual is model minus the dummy 100.
     probes = [{"maturity": iso(add_months(d, 12 * int(n))), "coupon": 0.0, "frequency": 1, "dirty_price": 100.0}
               for n in cfg["fit"]["probe_years"]]
-    weights = [1.0] * len(fit_bonds) + [0.0] * len(probes)
+    weights = w + [0.0] * len(probes)
     o = _ok(runner([case("probe", cfg["fit"]["operation"], {"settlement": settle, "tau": float(tau),
                                                             "bonds": fit_bonds + probes, "weights": weights})]), "probe")
     if o["betas"] != best["betas"] or o["residuals"][:len(fit_bonds)] != best["residuals"]:
@@ -361,7 +365,7 @@ def fit_day(d: dt.date, row: dict[str, str], cfg: dict[str, Any], runner: Runner
     flag = cfg["fit_flag_bp"]
     return {
         "operation": cfg["fit"]["operation"], "tau": tau, "betas": [fstr(x) for x in best["betas"]],
-        "sse_price": fstr(sse), "taus_ok": str(len(tried)), "taus_failed": failed,
+        "objective": fstr(sse), "weighting": cfg["fit"]["weighting"], "taus_ok": str(len(tried)), "taus_failed": failed,
         "errors_bp": errors, "rmse_bp": rmse, "max_abs_bp": mx, "max_at": at,
         "within_fit_flag": "true" if float(rmse) <= float(flag["rmse"]) and float(mx) <= float(flag["max_abs"]) else "false",
         "zeros_pct": zeros,

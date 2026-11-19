@@ -517,3 +517,11 @@ def test_run_day_dry_run_and_write(
     assert "No verified daily fit yet" in site_page.render(
         json.loads((TOOLS / "site" / "latest.json").read_text())
     )
+
+
+def test_problem_rows_make_the_run_red() -> None:
+    days = business_days(1)
+    _, new, _ = step("", evening(days[0]), fetcher(None, None))
+    assert run_day.problems(new) == 2
+    _, new, _ = step("", evening(days[0]), fetcher(treasury_csv(days), None))
+    assert run_day.problems(new) == 0
