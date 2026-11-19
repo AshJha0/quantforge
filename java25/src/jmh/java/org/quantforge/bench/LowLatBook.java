@@ -33,7 +33,8 @@ import org.quantforge.micro.FastBook;
  */
 public final class LowLatBook {
     static final int DEPTH = 100;
-    static final int WARMUP = 1_000_000;
+    // QF_H9_WARMUP overrides the warm-up count (workload R, 2026-11-19, warms up on its first hour).
+    static final int WARMUP = System.getenv("QF_H9_WARMUP") != null ? Integer.parseInt(System.getenv("QF_H9_WARMUP")) : 1_000_000;
     static final long SEED = 20261117L;
     static final String[] KINDS = {"snapshot", "add", "modify", "delete", "trade", "sweep", "refill", "truncated_price"};
     static final String[] QUERIES = {"best_bid", "best_ask", "qty_at_present", "qty_at_absent", "top10", "top100"};
@@ -124,8 +125,11 @@ public final class LowLatBook {
         }
     }
 
-    static long verify(FastBook.Stream s) {
+    static long verify(FastBook.Stream s) throws IOException {
         FastBook b = new FastBook(DEPTH);
+        // QF_H9_DUMP: the full top(100) after every non-trade message, for benchmarks/h9_check_r.py.
+        java.io.PrintWriter dump = System.getenv("QF_H9_DUMP") == null ? null
+                : new java.io.PrintWriter(java.nio.file.Files.newBufferedWriter(Path.of(System.getenv("QF_H9_DUMP"))));
         TreeMap<Long, Long> bids = new TreeMap<>();
         TreeMap<Long, Long> asks = new TreeMap<>();
         long[] px = new long[DEPTH];
@@ -154,6 +158,17 @@ public final class LowLatBook {
                 while (asks.size() > DEPTH) {
                     asks.pollLastEntry();
                 }
+                if (dump != null) {
+                    StringBuilder line = new StringBuilder().append(i);
+                    for (boolean bid : new boolean[] {true, false}) {
+                        int n = b.top(bid, DEPTH, px, q);
+                        line.append(bid ? " b " : " a ").append(n);
+                        for (int k = 0; k < n; k++) {
+                            line.append(' ').append(px[k]).append(' ').append(q[k]);
+                        }
+                    }
+                    dump.print(line.append('\n'));
+                }
             }
             if (i % 1000 == 999 || i + 1 == s.messages) {
                 checks++;
@@ -170,6 +185,9 @@ public final class LowLatBook {
                     bad++;
                 }
             }
+        }
+        if (dump != null) {
+            dump.close();
         }
         System.err.printf("correctness: %d checkpoints, %d mismatches; crossed %d, grows %d%n", checks, bad, b.crossed, b.grows());
         return bad;
@@ -361,7 +379,8 @@ public final class LowLatBook {
         for (int k = 0; k < runs; k++) {
             rs.add(timedRun(s, SEED + 1 + k));
         }
-        String out = "{\"workload\":\"S\",\"messages\":" + s.messages + ",\"warmup\":" + WARMUP + ",\"depth\":100,"
+        String workload = System.getenv("QF_H9_WORKLOAD") != null ? System.getenv("QF_H9_WORKLOAD") : "S";
+        String out = "{\"workload\":\"" + workload + "\",\"messages\":" + s.messages + ",\"warmup\":" + WARMUP + ",\"depth\":100,"
                 + "\"alloc_method\":\"ThreadMXBean allocated bytes + GC count; JFR and -Xlog:gc alongside\","
                 + "\"jvm\":\"" + System.getProperty("java.vm.name") + " " + System.getProperty("java.vm.version") + "\","
                 + "\"jvm_args\":\"" + String.join(" ", ManagementFactory.getRuntimeMXBean().getInputArguments()).replace("\\", "/").replace("\"", "'") + "\","

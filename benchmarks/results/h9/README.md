@@ -129,3 +129,104 @@ The GitHub-runner record (the controlled machine) comes from the manual `lowlat-
 same three harnesses. No runner record is in this file yet.
 
 Raw output: `cpp_S_hr21b.json`, `rust_S_hr21b.json`, `java_S_hr21b.json` (corrected HR-21); `*_hr21.json` (withdrawn batch figures); `cpp_S.json`, `rust_S.json` (before), `cpp_S_after.json`, `rust_S_after.json`, `java_S.json`.
+
+## Workload R window check (2026-11-19): not run, window shorter than 6 hours
+
+Spec amended first (owner decision 2026-11-19: R = longest unbroken recorded window of at least 6 hours, window
+2026-11-18 16:00 to 2026-11-19 02:00 UTC). Every hourly file in the window passed a full `gzip` read (python -I),
+both symbols, except `20261118T16.jsonl.gz`, which is empty (0 bytes of content; the hour is in `T16-1`, starting
+16:00:21). But the files carry gap rows (identical times in BTC/USD and ETH/USD, so recorder reconnects):
+16:13:26; 17:46:08; 18:50:14, 18:51:02; 20:07:03, 20:19:47, 20:24:36; eighteen between 21:19:28 and 21:49:16 (book
+rows missing for about 31 minutes in hour 21). The longest stretch with no gap row is 21:49:16 to 02:00:00, about
+4 h 11 min, below the 6-hour minimum, so under the amended spec **R is not run**; no R timing or correctness run was
+made. The L1 to L3 R rows stay open. No gap row from 21:49 to 02:00, so if recording stayed clean past 02:00 a
+6-hour window ending about 03:50 UTC would qualify; that needs an owner ruling (it is outside the named window).
+
+**Coordinator decision (2026-11-19, under owner delegation, before any R timing was seen):** R window =
+2026-11-18 21:49:16 to 2026-11-19 03:49:16 UTC (exactly 6 h), if the files through hour 03 pass a full gzip read
+and have no gap row in the window. Recorded in `low-latency-book.md`.
+
+**What the gap rows are.** Every one is a websocket reconnect written by the recorder (`crypto_l2.py`, "gap record on
+every reconnect"), none a checksum resync: 8 x `ConnectionClosedError: sent 1011 (internal error) keepalive ping
+timeout; no close frame received`, and 17 x `TimeoutError: timed out during opening handshake` (the reconnect
+attempts in hour 21, about 1.5 min apart, are network loss on the laptop side or the venue's side; not
+distinguished here). `recorder.log` shows a fresh 100-level snapshot after each successful reconnect. Worth
+checking in the recorder: the keepalive ping interval/timeout, and backoff during the handshake timeouts.
+
+**Window start rounded to 21:49:17.** The last gap row is 21:49:13.802 in BTC/USD but 21:49:16.177 in ETH/USD, after
+the decided start of 21:49:16, so the window used for both symbols is 2026-11-18 21:49:17 to 2026-11-19 03:49:17 UTC
+(still exactly 6 h, no gap row inside). The first book row after reconnect is 21:50:25 (BTC/USD) and 21:50:27
+(ETH/USD), so the first 68-70 s of the window hold trades only.
+
+**Recorder note.** Some recorded quantities are in exponent form (`"5.5E-7"`), which `micro.book.rebuild` rejects
+as not a plain decimal string (HR-12). `benchmarks/h9/build_r.py` rewrites them in plain form, value unchanged
+(checked exactly). The recorder should write plain decimals.
+
+## Workload R input (built 2026-11-19 04:03 UTC, before any R timing)
+
+Window 2026-11-18 21:49:17 to 2026-11-19 03:49:17 UTC; every input file passed a full gzip read and no gap row lies in the window (`build_r.py` refuses one). Built by `python -I benchmarks/h9/build_r.py`; outputs kept outside the repo (scratchpad). Warm-up = the first hour (QF_H9_WARMUP). SHA-256:
+
+```
+input BTC-USD/20261118T21.jsonl.gz sha256 5608a3b30f32af46877ae352e53f2bad89e663ed08cd0535900d85b48e66be6a
+input BTC-USD/20261118T22.jsonl.gz sha256 7d0372355c7d9144378125745f6f87a39dcf51139b0de81e2bcea8af2f2fa313
+input BTC-USD/20261118T23.jsonl.gz sha256 f473942c4091ab054d617ac4262396728999a5436cfbfa0bba04c215ef26eebf
+input BTC-USD/20261119T00.jsonl.gz sha256 ad2ca8ae634b4eb7babf071301f56d2c8d2f416494408d9c17c586e11ef7a76d
+input BTC-USD/20261119T01.jsonl.gz sha256 b0ef6ffcfb7767c1b0c562937f4b7714608af526957ae4fa68ff18792903fc3a
+input BTC-USD/20261119T02.jsonl.gz sha256 2ce7fc422d3b48376513b80ef962cdaf9ffff95a306903a4ca8baa3841aff797
+input BTC-USD/20261119T03.jsonl.gz sha256 5f778a67cd416a9014555c3787e117972cbef6e7436f789da319c9edcea46c33
+BTC-USD: 48815 rows, 63195 messages (31287 book, 31908 trade fills), 1824755 levels; warm-up (first hour) 9322 messages; span 2026-11-18T21:50:25.086000+00:00 .. 2026-11-19T03:49:16.037000+00:00
+output R_BTC-USD.bin sha256 608517351830a5b0784cfe18f12d2b7eb838108c7f739ebe19c8189ad996f235
+output R_BTC-USD.msgs.jsonl sha256 2cd1807e043470c41c2b24d86fa4c459c757224f5b4e090814580c32f8169c7e
+input ETH-USD/20261118T21.jsonl.gz sha256 6855c1d87cb201b535322fd79d9b54f22bf229a73b6ec55c140253f82f5acb95
+input ETH-USD/20261118T22.jsonl.gz sha256 f225ee4894dbc9fffcd4d8e2b293ae4862d80be35287e0ffc8ec3f08c13c3178
+input ETH-USD/20261118T23.jsonl.gz sha256 a24c9d191a3565c0372d3f73406721b2005d61bb2fcdcd9b883cef2291ca3a48
+input ETH-USD/20261119T00.jsonl.gz sha256 1aa48bdcb7f37ff3a88d4e20f55f1dd2155f4343fe32314251909a11bd3c5619
+input ETH-USD/20261119T01.jsonl.gz sha256 5b60fb804b79a002b3d8a40d37a3143b63e35c7860c8e2ffb3086112db973f55
+input ETH-USD/20261119T02.jsonl.gz sha256 0d16900eeed4dc755cbc5999540cb1d93f70647497a5f67230620534a1908f7d
+input ETH-USD/20261119T03.jsonl.gz sha256 8adaa9d58637e8be99958202201799c0acd03f34d723263cf7e019137dd030e9
+ETH-USD: 38721 rows, 42426 messages (31287 book, 11139 trade fills), 1831549 levels; warm-up (first hour) 6592 messages; span 2026-11-18T21:50:27.499000+00:00 .. 2026-11-19T03:49:16.037000+00:00
+output R_ETH-USD.bin sha256 0ec00235f23417a33fbdc6332d981696cbfcc986ff484b7b09eef07a1e644f40
+output R_ETH-USD.msgs.jsonl sha256 8575a279cf02b6fad99e95bfe6b49a0535931edf13233aa336b9a448a41909a7
+```
+
+## Workload R correctness (all three languages)
+
+The fast book's full top(100) after every book message (31,287 per symbol) was dumped by each harness
+(`QF_H9_DUMP`) and checked by `benchmarks/h9/check_r.py` against `micro.book.rebuild` (Python, exact decimals), one
+checkpoint per book message: **0 failed of 31,287, BTC/USD and ETH/USD, in C++, Rust and Java**. The final book
+equals rebuild's in full, every checkpoint has 100 levels a side, 0 crossed, 0 locked. The three dumps are
+byte-identical. The in-harness std::map / BTreeMap / TreeMap check also shows 0 mismatches (64 and 43 checkpoints).
+
+## Workload R timing: crypto venue; 6-hour window, not a full day; local laptop, not the acceptance machine
+
+Run 2026-11-19 04:03 UTC, WSL load average 0.1-0.3 (below 1.5). C++/Rust: WSL 2, `taskset -c 2`. Java: native
+Windows, unpinned. Same builds and flags as for S. 5 runs; median (min-max), ns. Warm-up = first hour (9,322
+messages BTC/USD, 6,592 ETH/USD; JIT warm-up for Java is therefore short). Messages: BTC/USD 63,195 (31,287 form B
+updates, 31,908 trade fills), ETH/USD 42,426 (31,287 updates, 11,139 trades). The pooled figure is the target
+basis. Clock p50 21 ns in WSL; Java `nanoTime` steps 100 ns here.
+
+| Row | Lang | Symbol | Target p50 / p99 / p99.9 | pooled p50 | pooled p99 | pooled p99.9 | Met? |
+|---|---|---|---|---:|---:|---:|---|
+| L1 | C++ | BTC | 100 / 500 / 2,000 | 39 (39-40) | **9,223** (8,735-9,343) | **21,471** (15,279-28,143) | p50 met; p99, p99.9 missed |
+| L1 | C++ | ETH | 100 / 500 / 2,000 | **784** (759-813) | **9,631** | **23,087** | all missed |
+| L2 | Rust | BTC | 100 / 500 / 2,000 | 47 (45-52) | **8,927** | **19,695** | p50 met; p99, p99.9 missed |
+| L2 | Rust | ETH | 100 / 500 / 2,000 | **755** (751-802) | **8,703** | **21,151** | all missed |
+| L3 | Java | BTC | 200 / 1,000 / 5,000 | 100 | **17,407** | **31,503** | p50 met; p99, p99.9 missed |
+| L3 | Java | ETH | 200 / 1,000 / 5,000 | **1,300** | **17,407** | **27,407** | all missed |
+
+Per kind: the form B update alone has p50 about 2.2-2.4 us (C++/Rust) and 4.0 us (Java), and p99 9-11 us
+(C++/Rust) and 18-21 us (Java). A trade has p50 27-34 ns. BTC/USD's pooled p50 passes only because half its
+messages are trades. Batch timing (1,000 messages, divided), p50 / p99: C++ 1,376 / 2,055 (BTC), 2,036 / 2,739
+(ETH); Rust 1,281 / 1,781, 1,887 / 2,420; Java 2,271 / 3,053, 3,599 / 5,668.
+
+**Why R misses.** The targets were set for a message that changes one or a few levels (targets point 1, HR-19).
+A form B update instead carries a whole second of changes: about 58 levels on average (1.82 M levels / 31,287
+updates). Per level that is about 40 ns (C++/Rust), in line with the S figures. The miss is real against the
+targets as written, and the targets are not changed (HR-23). Whether L1 to L3 R should be stated per level for a
+differenced stream is a question for the owner, not something settled here.
+
+L4: C++ and Rust 0 allocations in every measured run. Java: 792 allocated bytes per run (the same as S, taken to be
+the measurement calls) and 0 GC events in the timed regions (`gc_R_*.log` not kept in the repo). L5 queries on R
+(batch top(100) p99): C++ 147 / 177, Rust 181 / 181, Java 164 / 180 ns, all under 1,000 (C++/Rust) and 2,000 (Java).
+
+Raw output: `cpp_R_BTC-USD.json`, `cpp_R_ETH-USD.json`, `rust_R_*.json`, `java_R_*.json`.

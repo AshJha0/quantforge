@@ -140,7 +140,11 @@ struct Stream {
 };
 
 constexpr std::uint64_t seed = 20261117ULL;
-constexpr std::size_t n_messages = 10'000'000, depth = 100, warmup = 1'000'000;
+constexpr std::size_t n_messages = 10'000'000, depth = 100;
+// Workload R (2026-11-19): QF_H9_WARMUP overrides the warm-up count (R warms up on its first hour), QF_H9_WORKLOAD the
+// label, and QF_H9_DUMP names a file that receives the fast book's full top(100) after every non-trade message of the
+// correctness pass, for the independent check against micro.book.rebuild (benchmarks/h9_check_r.py).
+std::size_t warmup = 1'000'000;
 
 Stream generate() {
     quantforge::Xoshiro256 r(seed, 0);
@@ -269,6 +273,7 @@ bool read_stream(const char* path, Stream& st) {
 // The stream against a std::map transcription of order-book.md, top(100) compared every 1,000 messages and at the end.
 long long verify(const Stream& st) {
     ll::Book b(depth);
+    FILE* dump = std::getenv("QF_H9_DUMP") ? std::fopen(std::getenv("QF_H9_DUMP"), "w") : nullptr;
     std::map<std::int64_t, std::int64_t> bids, asks;
     std::vector<ll::Level> t(depth);
     long long mismatches = 0, checks = 0;
@@ -285,6 +290,15 @@ long long verify(const Stream& st) {
             }
             while (bids.size() > depth) bids.erase(bids.begin());
             while (asks.size() > depth) asks.erase(std::prev(asks.end()));
+            if (dump) {
+                std::fprintf(dump, "%zu", i);
+                for (int side = 1; side >= 0; --side) {
+                    const std::size_t n = b.top(side == 1, depth, t.data());
+                    std::fprintf(dump, " %c %zu", side ? 'b' : 'a', n);
+                    for (std::size_t k = 0; k < n; ++k) std::fprintf(dump, " %lld %lld", (long long)t[k].px, (long long)t[k].qty);
+                }
+                std::fputc('\n', dump);
+            }
         }
         if (i % 1000 == 999 || i + 1 == st.msgs.size()) {
             ++checks;
@@ -299,6 +313,7 @@ long long verify(const Stream& st) {
             if (!same) ++mismatches;
         }
     }
+    if (dump) std::fclose(dump);
     std::fprintf(stderr, "correctness: %lld checkpoints, %lld mismatches; crossed %lld, grows %lld\n", checks, mismatches,
                  (long long)b.stats().crossed, (long long)b.grows());
     return mismatches;
@@ -442,6 +457,8 @@ int main(int argc, char** argv) {
     Stream st;
     if (!read_stream(argv[2], st)) return std::fprintf(stderr, "cannot read %s\n", argv[2]), 2;
     const int runs = argc >= 4 ? std::atoi(argv[3]) : 5;
+    if (const char* w = std::getenv("QF_H9_WARMUP")) warmup = std::size_t(std::strtoull(w, nullptr, 10));
+    const char* workload = std::getenv("QF_H9_WORKLOAD") ? std::getenv("QF_H9_WORKLOAD") : "S";
     const long long mismatches = verify(st);
 
     Hist clock;  // 1,000,000 empty pairs
@@ -449,7 +466,7 @@ int main(int argc, char** argv) {
         const std::uint64_t a = now_ns();
         clock.record(now_ns() - a);
     }
-    std::string out = "{\"workload\":\"S\",\"messages\":" + std::to_string(st.msgs.size()) +
+    std::string out = "{\"workload\":\"" + std::string(workload) + "\",\"messages\":" + std::to_string(st.msgs.size()) +
                       ",\"warmup\":" + std::to_string(warmup) + ",\"depth\":100,\"alloc_method\":\"" + alloc_method +
                       "\",\"correctness_mismatches\":" + std::to_string(mismatches) + ",\"clock_overhead\":" + clock.json() +
                       ",\"runs\":[";

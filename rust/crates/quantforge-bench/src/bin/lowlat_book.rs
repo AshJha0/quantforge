@@ -187,6 +187,11 @@ fn verify(msgs: &[Msg], levels: &[Level]) -> u64 {
     let (mut bids, mut asks) = (BTreeMap::<i64, i64>::new(), BTreeMap::<i64, i64>::new());
     let mut t = vec![Level::default(); DEPTH];
     let (mut checks, mut bad) = (0u64, 0u64);
+    // QF_H9_DUMP (workload R, 2026-11-19): the full top(100) after every non-trade message, for the check against
+    // micro.book.rebuild in benchmarks/h9_check_r.py.
+    let mut dump = std::env::var("QF_H9_DUMP")
+        .ok()
+        .map(|p| std::io::BufWriter::new(std::fs::File::create(p).expect("create dump")));
     for (i, m) in msgs.iter().enumerate() {
         b.apply(m, levels);
         if m.kind != MsgType::Trade {
@@ -209,6 +214,18 @@ fn verify(msgs: &[Msg], levels: &[Level]) -> u64 {
             }
             while asks.len() > DEPTH {
                 asks.pop_last();
+            }
+            if let Some(w) = dump.as_mut() {
+                use std::io::Write;
+                let mut line = format!("{i}");
+                for (bid, c) in [(true, 'b'), (false, 'a')] {
+                    let n = b.top(bid, &mut t);
+                    line += &format!(" {c} {n}");
+                    for l in &t[..n] {
+                        line += &format!(" {} {}", l.px, l.qty);
+                    }
+                }
+                writeln!(w, "{line}").expect("write dump");
             }
         }
         if i % 1000 == 999 || i + 1 == msgs.len() {
@@ -403,12 +420,13 @@ fn run(args: &[String], warmup: usize, clock_pairs: usize) -> i32 {
         let a = Instant::now();
         clock.record(ns(black_box(a)));
     }
+    let workload = std::env::var("QF_H9_WORKLOAD").unwrap_or_else(|_| "S".to_string());
     let runs_json = (0..runs)
         .map(|k| timed_run_with(&msgs, &levels, SEED + 1 + k, warmup))
         .collect::<Vec<_>>()
         .join(",");
     let out = format!(
-        "{{\"workload\":\"S\",\"messages\":{},\"warmup\":{warmup},\"depth\":100,\"alloc_method\":\"counting #[global_allocator]\",\
+        "{{\"workload\":\"{workload}\",\"messages\":{},\"warmup\":{warmup},\"depth\":100,\"alloc_method\":\"counting #[global_allocator]\",\
          \"correctness_mismatches\":{bad},\"clock_overhead\":{},\"runs\":[{runs_json}]}}\n",
         msgs.len(),
         clock.json()
@@ -422,7 +440,9 @@ fn run(args: &[String], warmup: usize, clock_pairs: usize) -> i32 {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    std::process::exit(run(&args, WARMUP, 1_000_000));
+    // QF_H9_WARMUP overrides the warm-up count (workload R warms up on its first hour).
+    let warmup = std::env::var("QF_H9_WARMUP").map_or(WARMUP, |w| w.parse().expect("QF_H9_WARMUP"));
+    std::process::exit(run(&args, warmup, 1_000_000));
 }
 
 #[cfg(test)]

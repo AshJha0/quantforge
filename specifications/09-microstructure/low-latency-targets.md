@@ -24,7 +24,7 @@ The local Linux run is WSL 2 on the reference laptop unless a native Linux machi
 
 | # | Language | Workload | p50 | p99 | p99.9 |
 |---|---|---|---:|---:|---:|
-| L1 | C++ | R (recorded day, form B, 100 levels) | <= 100 ns | <= 500 ns | <= 2 us |
+| L1 | C++ | R (recorded window of at least 6 h, form B, 100 levels; amended 2026-11-19 by owner decision, targets unchanged) | <= 100 ns | <= 500 ns | <= 2 us |
 | L1 | C++ | S (synthetic stress) | <= 150 ns | <= 1 us | <= 5 us |
 | L2 | Rust | R | <= 100 ns | <= 500 ns | <= 2 us |
 | L2 | Rust | S | <= 150 ns | <= 1 us | <= 5 us |
