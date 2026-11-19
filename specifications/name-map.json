@@ -10674,6 +10674,7 @@
   "risk.frtb.rfet",
   "risk.frtb.rfet.bucket",
   "risk.frtb.rrao",
-  "risk.sbim.placeholder"
+  "risk.sbim.placeholder",
+  "xva.sbim.ir_delta"
  ]
 }
