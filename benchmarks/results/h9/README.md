@@ -141,3 +141,14 @@ rows missing for about 31 minutes in hour 21). The longest stretch with no gap r
 4 h 11 min, below the 6-hour minimum, so under the amended spec **R is not run**; no R timing or correctness run was
 made. The L1 to L3 R rows stay open. No gap row from 21:49 to 02:00, so if recording stayed clean past 02:00 a
 6-hour window ending about 03:50 UTC would qualify; that needs an owner ruling (it is outside the named window).
+
+**Coordinator decision (2026-11-19, under owner delegation, before any R timing was seen):** R window =
+2026-11-18 21:49:16 to 2026-11-19 03:49:16 UTC (exactly 6 h), if the files through hour 03 pass a full gzip read
+and have no gap row in the window. Recorded in `low-latency-book.md`.
+
+**What the gap rows are.** Every one is a websocket reconnect written by the recorder (`crypto_l2.py`, "gap record on
+every reconnect"), none a checksum resync: 8 x `ConnectionClosedError: sent 1011 (internal error) keepalive ping
+timeout; no close frame received`, and 17 x `TimeoutError: timed out during opening handshake` (the reconnect
+attempts in hour 21, about 1.5 min apart, are network loss on the laptop side or the venue's side; not
+distinguished here). `recorder.log` shows a fresh 100-level snapshot after each successful reconnect. Worth
+checking in the recorder: the keepalive ping interval/timeout, and backoff during the handshake timeouts.
