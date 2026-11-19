@@ -23,14 +23,14 @@
     "status": "ok",
     "outputs": {
      "estimate_pnl": -39913.124212551615,
-     "bound": 17.05689068912462,
+     "bound": 17.056890689308766,
      "label": "latency-aware analytics on simulated data"
     }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md, packet manifest 1a9c4cbc): MATCH on estimate_pnl and bound at 1e-9 relative on full-precision values (largest relative difference 2.08e-16); label rules-stated (KR-10), no credit"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts: not blind until the K-5a packet is rerun"
    ],
    "tags": [
     "stage_k",
@@ -64,14 +64,14 @@
     "status": "ok",
     "outputs": {
      "estimate_pnl": 41959.95109524657,
-     "bound": 17.93141617552204,
+     "bound": 17.93141617571073,
      "label": "latency-aware analytics on simulated data"
     }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md, packet manifest 1a9c4cbc): MATCH on estimate_pnl and bound at 1e-9 relative on full-precision values (largest relative difference 2.08e-16); label rules-stated (KR-10), no credit"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts: not blind until the K-5a packet is rerun"
    ],
    "tags": [
     "stage_k",
@@ -105,14 +105,14 @@
     "status": "ok",
     "outputs": {
      "estimate_pnl": -10170.171073390557,
-     "bound": 0.2665139170175722,
+     "bound": 0.2665139170617964,
      "label": "latency-aware analytics on simulated data"
     }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md, packet manifest 1a9c4cbc): MATCH on estimate_pnl and bound at 1e-9 relative on full-precision values (largest relative difference 2.08e-16); label rules-stated (KR-10), no credit"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts: not blind until the K-5a packet is rerun"
    ],
    "tags": [
     "stage_k",
@@ -146,14 +146,14 @@
     "status": "ok",
     "outputs": {
      "estimate_pnl": -179097.35223580853,
-     "bound": 2132.1113361405783,
+     "bound": 2132.111336141709,
      "label": "latency-aware analytics on simulated data"
     }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md, packet manifest 1a9c4cbc): MATCH on estimate_pnl and bound at 1e-9 relative on full-precision values (largest relative difference 2.08e-16); label rules-stated (KR-10), no credit"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts: not blind until the K-5a packet is rerun"
    ],
    "tags": [
     "stage_k",
@@ -192,14 +192,14 @@
     "status": "ok",
     "outputs": {
      "estimate_pnl": -30589.655330067555,
-     "bound": 17.684733711514124,
+     "bound": 17.684733711734584,
      "label": "latency-aware analytics on simulated data"
     }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md, packet manifest 1a9c4cbc): MATCH on estimate_pnl and bound at 1e-9 relative on full-precision values (largest relative difference 2.08e-16); label rules-stated (KR-10), no credit"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts: not blind until the K-5a packet is rerun"
    ],
    "tags": [
     "stage_k",
@@ -271,6 +271,303 @@
     "error"
    ],
    "description": "no positions"
+  },
+  {
+   "case_id": "idr_k-0008",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000.0,
+      "maturity": 5.0,
+      "yield": 0.04
+     }
+    ],
+    "shift": 1e-09
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "estimate_pnl": -0.004093653755155775,
+     "bound": 1.7469352659511083e-17,
+     "label": "latency-aware analytics on simulated data"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic"
+   ],
+   "description": "KR-234: h = 1e-9: the rounding allowance dominates (old bound 1.7e-20 against an error of 3.7e-19)",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09
+   }
+  },
+  {
+   "case_id": "idr_k-0009",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000.0,
+      "maturity": 5.0,
+      "yield": 0.04
+     }
+    ],
+    "shift": -1e-12
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "estimate_pnl": 4.093653765400144e-06,
+     "bound": 1.7452295691483744e-20,
+     "label": "latency-aware analytics on simulated data"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic"
+   ],
+   "description": "KR-234: h = -1e-12",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09
+   }
+  },
+  {
+   "case_id": "idr_k-0010",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000.0,
+      "maturity": 5.0,
+      "yield": 0.04
+     }
+    ],
+    "shift": 1e-30
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "estimate_pnl": -4.0936537653899094e-24,
+     "bound": 1.745229567428869e-38,
+     "label": "latency-aware analytics on simulated data"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic"
+   ],
+   "description": "KR-234: h = 1e-30, the smallest nonzero move of the domain D",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09
+   }
+  },
+  {
+   "case_id": "idr_k-0011",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000.0,
+      "maturity": 5.0,
+      "yield": 0.04
+     }
+    ],
+    "shift": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "estimate_pnl": 0.0,
+     "bound": 0.0,
+     "label": "latency-aware analytics on simulated data"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic"
+   ],
+   "description": "KR-234: h = 0: estimate and bound are 0",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09
+   }
+  },
+  {
+   "case_id": "idr_k-0012",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000.0,
+      "maturity": 5.0,
+      "yield": 0.04
+     },
+     {
+      "notional": -1000000.0000010001,
+      "maturity": 5.0,
+      "yield": 0.04
+     }
+    ],
+    "shift": 0.01
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "estimate_pnl": 3.991807462997163e-08,
+     "bound": 34.11378137863459,
+     "label": "latency-aware analytics on simulated data"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic"
+   ],
+   "description": "KR-234: hedged book, N and -N(1 + 1e-12): the estimate cancels to 4e-8 (KA-A7) (cancelling: compared at 1e-9 relative plus 1.91e-10 absolute, the estimate's share of the KR-234 rounding allowance; KR-240)",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1.90884483937628e-10,
+    "relative": 1e-09
+   }
+  },
+  {
+   "case_id": "idr_k-0013",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000.0,
+      "maturity": 5.0,
+      "yield": 0.04
+     }
+    ],
+    "shift": 0.4000000001
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "estimate_pnl": 0.0004093652741663154,
+     "bound": 1091641.0049227446,
+     "label": "latency-aware analytics on simulated data"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic"
+   ],
+   "description": "KR-234: T h near 2, where the delta and gamma terms cancel (KA-A7) (cancelling: compared at 1e-9 relative plus 2.79e-08 absolute, the estimate's share of the KR-234 rounding allowance; KR-240)",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 2.7923673094859836e-08,
+    "relative": 1e-09
+   }
+  },
+  {
+   "case_id": "idr_k-0014",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000000000000.0,
+      "maturity": 1e-06,
+      "yield": 1.0
+     },
+     {
+      "notional": -1e-06,
+      "maturity": 100.0,
+      "yield": -1.0
+     }
+    ],
+    "shift": -1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "estimate_pnl": -1.370939742326229e+41,
+     "bound": 1.2043289613547214e+86,
+     "label": "latency-aware analytics on simulated data"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic"
+   ],
+   "description": "KR-234: domain corners: T 1e-6 and 100, y 1 and -1, N 1e15 and -1e-6, h -1",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09
+   }
   }
  ]
 }

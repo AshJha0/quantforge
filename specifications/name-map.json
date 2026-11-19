@@ -466,6 +466,7 @@
    "outputs": [
     "false_alarm_rate",
     "fire",
+    "nominal_rate",
     "sigma",
     "threshold"
    ]

@@ -1,0 +1,118 @@
+{
+ "generator": "oracle/python/gen_stage_k_w1.py",
+ "note": "before and after of every expected value of the wave 1 goldens changed by the audit A rulings (KR-230 to KR-234), 2026-11-19",
+ "changes": [
+  {
+   "case": "trig_k-0001",
+   "output": "false_alarm_rate",
+   "before": 0.002699796063260189,
+   "after": 0.057668885622437306,
+   "ruling": "KR-232"
+  },
+  {
+   "case": "trig_k-0002",
+   "output": "false_alarm_rate",
+   "before": 0.002699796063260189,
+   "after": 0.057668885622437306,
+   "ruling": "KR-232"
+  },
+  {
+   "case": "trig_k-0003",
+   "output": "false_alarm_rate",
+   "before": 0.002699796063260189,
+   "after": 0.057668885622437306,
+   "ruling": "KR-232"
+  },
+  {
+   "case": "trig_k-0004",
+   "output": "false_alarm_rate",
+   "before": 0.01241933065155227,
+   "after": 0.040992218585752895,
+   "ruling": "KR-232"
+  },
+  {
+   "case": "trig_k-0005",
+   "output": "false_alarm_rate",
+   "before": 0.01241933065155227,
+   "after": 0.040992218585752895,
+   "ruling": "KR-232"
+  },
+  {
+   "case": "trig_k-0009",
+   "output": "false_alarm_rate",
+   "before": 9.813427854296374e-198,
+   "after": 8.135280427163959e-05,
+   "ruling": "KR-232"
+  },
+  {
+   "case": "idr_k-0001",
+   "output": "bound",
+   "before": 17.05689068912462,
+   "after": 17.056890689308766,
+   "ruling": "KR-234"
+  },
+  {
+   "case": "idr_k-0002",
+   "output": "bound",
+   "before": 17.93141617552204,
+   "after": 17.93141617571073,
+   "ruling": "KR-234"
+  },
+  {
+   "case": "idr_k-0003",
+   "output": "bound",
+   "before": 0.2665139170175722,
+   "after": 0.2665139170617964,
+   "ruling": "KR-234"
+  },
+  {
+   "case": "idr_k-0004",
+   "output": "bound",
+   "before": 2132.1113361405783,
+   "after": 2132.111336141709,
+   "ruling": "KR-234"
+  },
+  {
+   "case": "idr_k-0005",
+   "output": "bound",
+   "before": 17.684733711514124,
+   "after": 17.684733711734584,
+   "ruling": "KR-234"
+  },
+  {
+   "case": "e2_k-0002",
+   "output": "error_code",
+   "before": "E_INPUT",
+   "after": "E_DOMAIN",
+   "ruling": "KR-230"
+  },
+  {
+   "case": "e2_k-0003",
+   "output": "error_code",
+   "before": "E_DOMAIN",
+   "after": "E_LIMIT",
+   "ruling": "KR-230"
+  },
+  {
+   "case": "e2_k-0004",
+   "output": "error_code",
+   "before": "E_DOMAIN",
+   "after": "E_LIMIT",
+   "ruling": "KR-230"
+  },
+  {
+   "case": "e2_k-0005",
+   "output": "error_code",
+   "before": "E_INPUT",
+   "after": "E_DOMAIN",
+   "ruling": "KR-230"
+  },
+  {
+   "case": "e2_k-0011",
+   "output": "error_code",
+   "before": "E_INPUT",
+   "after": "E_DOMAIN",
+   "ruling": "KR-230"
+  }
+ ]
+}

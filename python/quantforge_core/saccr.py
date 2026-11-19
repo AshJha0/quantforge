@@ -117,8 +117,8 @@ def _structure(trades: list[Trade]) -> None:
         if c in ("IR", "CREDIT"):
             _need(t, t.start, "start", "for IR and CREDIT trades")
             _need(t, t.end, "end", "for IR and CREDIT trades")
-        if c in ("IR", "FX") or t.treatment != "NORMAL":
-            _need(t, t.hedging_set, "hedging_set", "for IR, FX, basis and volatility trades")
+        if c in ("IR", "FX") or t.treatment == "BASIS":
+            _need(t, t.hedging_set, "hedging_set", "for IR, FX and basis trades")
         if c in ("CREDIT", "EQUITY", "COMMODITY"):
             _need(t, t.entity, "entity", "for CREDIT, EQUITY and COMMODITY trades")
             _need(t, t.subclass, "subclass", "for CREDIT, EQUITY and COMMODITY trades")
@@ -154,7 +154,7 @@ def _structure(trades: list[Trade]) -> None:
     for t in trades:
         if t.entity is None or t.subclass is None:
             continue
-        key = (t.asset_class, t.treatment, t.hedging_set or "", t.entity)
+        key = (t.asset_class, t.treatment, _set_key(t), t.entity)
         if entity_sub.setdefault(key, t.subclass) != t.subclass:
             raise QfError("E_INPUT", f"entity {t.entity} has two subclasses", "subclass")
 
@@ -233,6 +233,17 @@ def _factor(t: Trade) -> float:
     return TABLE2[(t.asset_class, t.subclass or "")][0] * TREATMENT_SCALE[t.treatment]
 
 
+def _set_key(t: Trade) -> str:
+    """The hedging-set key within (class, treatment). CRE52.45 for NORMAL trades and, by CRE52.47, for
+    VOLATILITY trades (ruling KR-236): IR the currency and FX the pair (`hedging_set`), credit and equity
+    one set, commodity the category of the subclass. BASIS trades: the caller's label (CRE52.46, KR-34)."""
+    if t.treatment == "BASIS" or t.asset_class in ("IR", "FX"):
+        return t.hedging_set or ""
+    if t.asset_class == "COMMODITY":
+        return COMMODITY_SET[t.subclass or ""]
+    return ""
+
+
 def _bucket(end: float) -> int:
     """CRE52.57 step 3 on E (CRE52.31(3)); 1 and 5 years fall in bucket 2 (ruling KR-32)."""
     return 1 if end < 1 else 2 if end <= 5 else 3
@@ -253,13 +264,7 @@ def _addons(
     eff = [d[i] * mf[i] * deltas[i] for i in range(len(trades))]
     groups: dict[tuple[str, str, str], list[int]] = {}
     for i, t in enumerate(trades):
-        if t.asset_class == "COMMODITY" and t.treatment == "NORMAL":
-            key = COMMODITY_SET[t.subclass or ""]
-        elif t.asset_class in ("CREDIT", "EQUITY") and t.treatment == "NORMAL":
-            key = ""
-        else:
-            key = t.hedging_set or ""
-        groups.setdefault((t.asset_class, t.treatment, key), []).append(i)
+        groups.setdefault((t.asset_class, t.treatment, _set_key(t)), []).append(i)
     by_class = dict.fromkeys(CLASSES, 0.0)
     rows: list[dict[str, object]] = []
     order = sorted(groups, key=lambda g: (CLASSES.index(g[0]), TREATMENTS.index(g[1]), g[2]))

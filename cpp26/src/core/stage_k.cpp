@@ -67,8 +67,8 @@ void check_log(const std::vector<BiRecord>& records) {
 
 BiAnswer bitemporal_query(const std::vector<BiRecord>& records, std::string_view series_id,
                           std::int64_t knowledge_as_of, std::int64_t valid_at) {
-    check_log(records);
     limit(records.size(), max_records, "records");
+    check_log(records);
     std::optional<std::size_t> best;
     for (std::size_t i = 0; i < records.size(); ++i) {
         const BiRecord& r = records[i];
@@ -88,9 +88,9 @@ void check_quotes_shape(std::size_t n) {
 }
 
 Vec par_annual(const Vec& quotes) {
+    limit(quotes.size(), max_quotes, "quotes");
     check_quotes_shape(quotes.size());
     check_quotes(quotes, "quotes");
-    limit(quotes.size(), max_quotes, "quotes");
     return bootstrap_from(quotes, {});
 }
 
@@ -101,6 +101,9 @@ void check_update_shape(std::size_t n_previous, std::size_t n_dfs, std::size_t n
 }
 
 Update incremental_update(const Vec& previous_quotes, const Vec& previous_dfs, const Vec& new_quotes) {
+    limit(previous_quotes.size(), max_quotes, "previous_quotes");
+    limit(previous_dfs.size(), max_quotes, "previous_discount_factors");
+    limit(new_quotes.size(), max_quotes, "new_quotes");
     check_update_shape(previous_quotes.size(), previous_dfs.size(), new_quotes.size());
     check_quotes(previous_quotes, "previous_quotes");
     check_quotes(new_quotes, "new_quotes");
@@ -108,7 +111,6 @@ Update incremental_update(const Vec& previous_quotes, const Vec& previous_dfs, c
     for (std::size_t i = 0; i < fresh.size(); ++i)
         if (fresh[i] != previous_dfs[i] || std::signbit(fresh[i]) != std::signbit(previous_dfs[i]))
             input("previous_discount_factors is not the bootstrap of previous_quotes", "previous_discount_factors");
-    limit(new_quotes.size(), max_quotes, "new_quotes");
     std::size_t j = 0;
     while (j < new_quotes.size() && previous_quotes[j] == new_quotes[j]) ++j;
     if (j == new_quotes.size()) return {previous_dfs, std::nullopt, 0};
@@ -128,20 +130,89 @@ namespace {
 double two_sided_normal_tail(double k) { return 2.0 * normal_cdf(-k); }
 }  // namespace
 
+namespace {
+
+constexpr double two_over_pi = 0.6366197723675814;
+constexpr double t_up = 0x1p500;
+constexpr double t_down = 0x1p-500;
+constexpr double noise_floor = 0x1p-26;  // KR-233: sigma at or below 2^-26 max|c_i| is no noise scale
+
+double t_step(double t, long long j, double c2, bool odd) {
+    if (odd) return (t * (double(2 * j + 2) * c2)) / double(2 * j + 3);
+    return (t * (double(2 * j + 1) * c2)) / double(2 * j + 2);
+}
+
+}  // namespace
+
+double student_t_two_sided_tail(long long nu, double k) {
+    const double rn = std::sqrt(double(nu));
+    double s = 0.0, c = 0.0, c2 = 0.0;
+    if (k <= rn) {
+        const double den = double(nu) + k * k;
+        c2 = double(nu) / den;
+        const double root = std::sqrt(den);
+        s = k / root;
+        c = rn / root;
+    } else {
+        const double r = rn / k;
+        const double w = std::sqrt(1.0 + r * r);
+        s = 1.0 / w;
+        c = r / w;
+        c2 = c * c;
+    }
+    const bool odd = nu % 2 == 1;
+    const long long m = odd ? (nu - 1) / 2 : nu / 2;
+    double t = 1.0, total = 0.0;
+    long long e = 0;
+    for (long long j = 0; j < m; ++j) {
+        if (e == 0) total += t;
+        t = t_step(t, j, c2, odd);
+        if (0.0 < t && t < t_down) {
+            t *= t_up;
+            ++e;
+        }
+    }
+    const double a = odd ? two_over_pi * (std::atan2(c, s) - s * c * total) : 1.0 - s * total;
+    if (a >= 0.125) return a;
+    double rem = 0.0;
+    long long j = m;
+    while (true) {
+        rem += t;
+        t = t_step(t, j, c2, odd);
+        ++j;
+        if (t <= rem * 0x1p-60) break;
+        if (t < t_down) {
+            t *= t_up;
+            rem *= t_up;
+            ++e;
+        }
+    }
+    double out = odd ? two_over_pi * s * c * rem : s * rem;
+    for (long long i = 0; i < e; ++i) out *= t_down;
+    return out;
+}
+
 Trigger trigger_check(const Vec& changes, double x_ref, double x_now, double days_since, double k) {
+    limit(changes.size(), max_changes, "changes");
     check_changes_shape(changes.size());
     if (!(k > 0)) domain("k must be above 0", "k");
     if (!(days_since >= 1)) domain("days_since must be at least 1", "days_since");
+    // KR-233: exactly rounded sums, mean = S1 / n, sigma = sqrt(S2 / (n - 1)).
     const double n = static_cast<double>(changes.size());
     const double mean = fsum(changes) / n;
     Vec squares;
     squares.reserve(changes.size());
-    for (const double x : changes) squares.push_back((x - mean) * (x - mean));
+    double largest = 0.0;
+    for (const double x : changes) {
+        squares.push_back((x - mean) * (x - mean));
+        largest = std::max(largest, std::fabs(x));
+    }
     const double sigma = std::sqrt(fsum(squares) / (n - 1.0));
-    if (sigma == 0) domain("the changes have zero standard deviation: no noise scale", "changes");
-    limit(changes.size(), max_changes, "changes");
+    if (sigma <= noise_floor * largest)
+        domain("the changes have no noise scale (sigma at or below 2^-26 max|c|)", "changes");
     const double threshold = k * sigma * std::sqrt(days_since);
-    return {std::fabs(x_now - x_ref) > threshold, sigma, threshold, two_sided_normal_tail(k)};
+    return {std::fabs(x_now - x_ref) > threshold, sigma, threshold,
+            student_t_two_sided_tail(static_cast<long long>(changes.size()) - 1, k), two_sided_normal_tail(k)};
 }
 
 // ---- intraday delta-gamma ----
@@ -151,9 +222,9 @@ void check_positions_shape(std::size_t n) {
 }
 
 double position_bound(const ZeroPosition& p, double shift) {
-    const double t = p.maturity;
-    const double m3 = std::pow(t, 3.0) * std::fabs(p.notional) * std::exp(-t * std::min(p.yield, p.yield + shift));
-    return std::pow(std::fabs(shift), 3.0) * m3 / 6.0;
+    const double t = p.maturity, ah = std::fabs(shift);
+    const double e = std::exp(-t * std::min(p.yield, p.yield + shift));
+    return ah * ah * ah * (t * t * t * std::fabs(p.notional) * e) / 6.0;
 }
 
 double position_estimate(const ZeroPosition& p, double shift) {
@@ -162,19 +233,29 @@ double position_estimate(const ZeroPosition& p, double shift) {
     return v * (-t * shift + t * t * shift * shift / 2.0);
 }
 
+double position_rounding(const ZeroPosition& p, double shift) {
+    const double t = p.maturity, ah = std::fabs(shift);
+    const double v = p.notional * std::exp(-p.yield * t);
+    const double g = std::fabs(std::expm1(-shift * t));
+    const double scale = 1.0 + t * std::fabs(p.yield) + t * ah;
+    return rounding_factor * scale * (std::fabs(v) * (t * ah + t * t * (shift * shift) + g) + position_bound(p, shift));
+}
+
 Intraday delta_gamma_bound(const std::vector<ZeroPosition>& positions, double shift) {
+    limit(positions.size(), max_positions, "positions");
     check_positions_shape(positions.size());
     if (std::ranges::any_of(positions, [](const ZeroPosition& p) { return !(p.maturity > 0); }))
         domain("every maturity must be above 0", "positions.maturity");
-    limit(positions.size(), max_positions, "positions");
-    Vec estimates, bounds;
+    // KR-234: one exactly rounded sum over every Lagrange bound, then every rounding allowance (2n terms).
+    Vec estimates, parts;
     estimates.reserve(positions.size());
-    bounds.reserve(positions.size());
+    parts.reserve(2 * positions.size());
     for (const ZeroPosition& p : positions) {
         estimates.push_back(position_estimate(p, shift));
-        bounds.push_back(position_bound(p, shift));
+        parts.push_back(position_bound(p, shift));
     }
-    return {fsum(estimates), fsum(bounds)};
+    for (const ZeroPosition& p : positions) parts.push_back(position_rounding(p, shift));
+    return {fsum(estimates), fsum(parts)};
 }
 
 double zero_revalue(const std::vector<ZeroPosition>& positions, double shift) {

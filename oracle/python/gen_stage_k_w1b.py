@@ -97,7 +97,7 @@ def sa_ccr(inp):
         for i, t in enumerate(trades):
             tr = t.get("treatment", "NORMAL")
             c = t["asset_class"]
-            if tr != "NORMAL" or c in ("IR", "FX"):
+            if tr == "BASIS" or c in ("IR", "FX"):  # KR-236: VOLATILITY sets follow CRE52.45 (CRE52.47)
                 key = t["hedging_set"]
             elif c == "COMMODITY":
                 key = row(t)["hedging_set"]
@@ -335,9 +335,13 @@ def gen_saccr():
          "margined EAD above the unmargined EAD is capped (CRE52.2)")
     hand({"trades": [tr("z1", "FX", 1000, -10, 1, hedging_set="GBPUSD"), tr("z2", "FX", 1000, 0, 1, position="SHORT", hedging_set="GBPUSD")]},
          "exactly offsetting FX trades: zero add-on, multiplier at its floor 0.05 (KR-36)")
+    AUDIT_W1B = ("added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-236 to KR-238): hand and "
+                 "oracle, not blind re-derived")
 
     def err(inp, code, desc):
-        s.add("risk.saccr.ead", inp, error=code, cls="date_and_convention", verified=["hand"], tags=TAGS_S + ["error"], description="hand: " + desc)
+        two = ["two-errors"] if "two errors" in desc else []
+        s.add("risk.saccr.ead", inp, error=code, cls="date_and_convention", verified=["hand"], tags=TAGS_S + ["error"] + two,
+              description="hand: " + desc)
 
     ok = tr("a", "FX", 100, 0, 1, hedging_set="EURUSD")
     err({"trades": []}, "E_INPUT", "no trades")
@@ -361,15 +365,40 @@ def gen_saccr():
     err({"trades": [ok], "margin": {"threshold": -1, "mta": 0, "nica": 0, "remargin_days": 1}}, "E_DOMAIN", "negative threshold")
     err({"trades": [ok], "margin": {"threshold": 0, "mta": 0, "nica": 0, "remargin_days": 0}}, "E_DOMAIN", "re-margining period of zero days")
     # two errors at once (repo-wide order HR-122: E_SCHEMA, structural E_INPUT, E_DOMAIN)
-    err({"trades": [{**ok, "asset_class": "RATES", "notional": 0}]}, "E_SCHEMA", "two errors: unknown asset class and zero notional")
-    err({"trades": [tr("a", "FX", -5, 0, 1)]}, "E_INPUT", "two errors: no currency pair and negative notional")
-    err({"trades": [ok, {**ok, "notional": "1"}]}, "E_SCHEMA", "two errors: duplicate id and notional as a string")
-    err({"trades": [ok, {**ok, "maturity": 0}]}, "E_INPUT", "two errors: duplicate id and zero maturity")
+    err({"trades": [{**ok, "asset_class": "RATES", "notional": 0}]}, "E_SCHEMA", "two errors: unknown asset class [schema] and zero notional [domain]")
+    err({"trades": [tr("a", "FX", -5, 0, 1)]}, "E_INPUT", "two errors: no currency pair [structural] and negative notional [domain]")
+    err({"trades": [ok, {**ok, "notional": "1"}]}, "E_SCHEMA", "two errors: duplicate id [structural] and notional as a string [schema]")
+    err({"trades": [ok, {**ok, "maturity": 0}]}, "E_INPUT", "two errors: duplicate id [structural] and zero maturity [domain]")
     # E1 goldens (ruling F-2, tools/check_e1_coverage.py): a non-finite Real input is E_DOMAIN by the finite rule,
     # which comes before structural E_INPUT (HR-122)
     err({"trades": [{**ok, "notional": "NaN"}]}, "E_DOMAIN", "E1: non-finite notional (NaN)")
     err({"trades": [{k: v for k, v in {**ok, "market_value": "-Infinity"}.items() if k != "hedging_set"}]}, "E_DOMAIN",
-        "E1, two errors: market value -Infinity and no currency pair (the finite rule first)")
+        "E1, two errors: market value -Infinity [finite] and no currency pair [structural] (the finite rule first)")
+    # Audit A response (2026-11-19), appended so that the case ids above stay as they were.
+    va = {"trades": [tr("v1", "EQUITY", 100, 0, 1, treatment="VOLATILITY", hedging_set="V1", entity="X", subclass="SINGLE"),
+                     tr("v2", "EQUITY", 100, 0, 1, position="SHORT", treatment="VOLATILITY", hedging_set="V2", entity="Y",
+                        subclass="SINGLE")]}
+    hi, lo = sa_ccr(va)
+    check(len(lo["hedging_sets"]) == 1 and abs(hi["addon"]["EQUITY"] - mp.sqrt(38400)) < mp.mpf(10) ** -40,
+          "KR-236 worked example: one equity volatility set, add-on sqrt(38,400) = 195.959...")
+    s.add("risk.saccr.ead", va, lo, verified=["hand", ORACLE, AUDIT_W1B], tags=TAGS_S + ["hand"], output_classes=oc,
+          description="hand: KR-236 (KA-A3): two equity volatility trades on two names with two labels form one hedging "
+                      "set (CRE52.47): add-on sqrt(38,400) = 195.96, not 320")
+    vc = {"trades": [tr("w1", "COMMODITY", 100, 0, 1, treatment="VOLATILITY", entity="POWER", subclass="ELECTRICITY"),
+                     tr("w2", "COMMODITY", 100, 0, 1, position="SHORT", treatment="VOLATILITY", entity="SILVER",
+                        subclass="METALS", hedging_set="SAME LABEL")]}
+    _, lo = sa_ccr(vc)
+    check([h["key"] for h in lo["hedging_sets"]] == ["ENERGY", "METALS"], "KR-236: commodity volatility sets by category")
+    s.add("risk.saccr.ead", vc, lo, verified=["hand", ORACLE, AUDIT_W1B], tags=TAGS_S + ["hand"], output_classes=oc,
+          description="hand: KR-236 (KA-A3 b): electricity and silver volatility trades sit in the energy and metals "
+                      "volatility sets, a label does not merge them")
+    m15 = {"trades": EX1 + EX3, "collateral": 200,
+           "margin": {"threshold": 0, "mta": 5, "nica": 150, "remargin_days": 15, "illiquid": True}}
+    _, lo = sa_ccr(m15)
+    check(lo["mpor_days"] == 24, "KR-238(b): remargin 15 and illiquid give max(9 + 15, 20) = 24")
+    s.add("risk.saccr.ead", m15, lo, verified=["hand", ORACLE, AUDIT_W1B], tags=TAGS_S + ["hand"], output_classes=oc,
+          description="hand: KR-238(b) (KA-A11): re-margining every 15 days and illiquid: MPOR floor max(9 + 15, 20) = 24 "
+                      "(the combination is inferred, not read)")
     s.write()
     return s
 
@@ -394,6 +423,37 @@ def zone_oracle(n, xa, xh):
 def bcdf(n, k, p):
     p = M(p)
     return mp.fsum(mp.binomial(n, j) * p ** j * (1 - p) ** (n - j) for j in range(k + 1))
+
+
+def zone_exact(n, xa, xh):
+    """KR-237 check: the zone outputs from exact rationals at p = 1/100 (integer term recurrence, streamed so that
+    only the running term and sum are held; fast enough for n = 1,000,000)."""
+    from fractions import Fraction
+    x = max(xa, xh)
+    a, b = 1, 100
+    c = b - a
+    den = b ** n
+    term = c ** n
+    total = term
+    amber = red = cum = None
+    k = 0
+    while amber is None or red is None or cum is None:
+        if cum is None and k == x:
+            cum = Fraction(total, den)
+        if amber is None and 100 * total >= 95 * den:
+            amber = k
+        if red is None and 10000 * total >= 9999 * den:
+            red = k
+        if k == n:
+            break
+        term = term * (n - k) * a // ((k + 1) * c)
+        total += term
+        k += 1
+    zone = "RED" if x >= red else "AMBER" if x >= amber else "GREEN"
+    sc = float(binom.cdf(x, n, 0.01))
+    assert abs(sc / float(cum) - 1) <= 1e-12, (n, x, sc, float(cum))
+    return {"exceptions": x, "cumulative_probability": float(cum), "zone": zone, "amber_from": amber, "red_from": red,
+            "multiplier": None}
 
 
 def gen_backtest():
@@ -436,7 +496,9 @@ def gen_backtest():
           description="hand: strict exceedance, a loss equal to VaR is not an exception, a missing VaR or P&L is (MAR32.5(2))")
 
     def err(op, inp, code, desc):
-        s.add(op, inp, error=code, cls="date_and_convention", verified=["hand"], tags=TAGS_B + ["error"], description="hand: " + desc)
+        two = ["two-errors"] if "two errors" in desc else []
+        s.add(op, inp, error=code, cls="date_and_convention", verified=["hand"], tags=TAGS_B + ["error"] + two,
+              description="hand: " + desc)
 
     z = "risk.frtb.backtest.zone"
     err(z, {"observations": 0, "exceptions_actual": 0, "exceptions_hypothetical": 0}, "E_DOMAIN", "no observations")
@@ -445,22 +507,41 @@ def gen_backtest():
     err(z, {"observations": 1000001, "exceptions_actual": 0, "exceptions_hypothetical": 0}, "E_LIMIT", "observations above 1,000,000")
     err(z, {"observations": 250, "exceptions_actual": 1.5, "exceptions_hypothetical": 0}, "E_SCHEMA", "count not an integer")
     err(z, {"observations": 250, "exceptions_actual": 1}, "E_SCHEMA", "hypothetical count missing")
-    err(z, {"observations": 1000001, "exceptions_actual": -1, "exceptions_hypothetical": 0}, "E_LIMIT", "two errors: limit and negative count")
-    err(z, {"observations": "250", "exceptions_actual": -1, "exceptions_hypothetical": 0}, "E_SCHEMA", "two errors: observations a string and negative count")
+    err(z, {"observations": 1000001, "exceptions_actual": -1, "exceptions_hypothetical": 0}, "E_LIMIT", "two errors: limit [limit] and negative count [domain]")
+    err(z, {"observations": "250", "exceptions_actual": -1, "exceptions_hypothetical": 0}, "E_SCHEMA", "two errors: observations a string [schema] and negative count [domain]")
     d = "risk.frtb.backtest.desk"
     err(d, {"observations": 250, "exceptions_99_actual": 0, "exceptions_99_hypothetical": 0, "exceptions_975_actual": 251, "exceptions_975_hypothetical": 0},
         "E_DOMAIN", "97.5% count above observations")
     err(d, {"observations": 250, "exceptions_99_actual": -1, "exceptions_99_hypothetical": 0, "exceptions_975_actual": 0}, "E_SCHEMA",
-        "two errors: a count missing and a negative count")
+        "two errors: a count missing [schema] and a negative count [domain]")
     c = "risk.frtb.backtest.count"
     err(c, {"var": [], "actual": [], "hypothetical": []}, "E_INPUT", "empty series")
     err(c, {"var": [1.0, 1.0], "actual": [0.0], "hypothetical": [0.0, 0.0]}, "E_INPUT", "series of different lengths")
     err(c, {"var": [1.0], "actual": ["x"], "hypothetical": [0.0]}, "E_SCHEMA", "a P&L that is not a number")
-    err(c, {"var": [1.0, 1.0], "actual": [0.0], "hypothetical": ["x", 0.0]}, "E_SCHEMA", "two errors: lengths differ and a string")
+    err(c, {"var": [1.0, 1.0], "actual": [0.0], "hypothetical": ["x", 0.0]}, "E_SCHEMA", "two errors: lengths differ [structural] and a string [schema]")
     # E1 goldens (ruling F-2, tools/check_e1_coverage.py): a non-finite Real is E_DOMAIN, before structural E_INPUT
     err(c, {"var": [1.0, "NaN"], "actual": [0.0, 0.0], "hypothetical": [0.0, 0.0]}, "E_DOMAIN", "E1: non-finite VaR (NaN)")
     err(c, {"var": [1.0, 1.0], "actual": ["Infinity"], "hypothetical": [0.0, 0.0]}, "E_DOMAIN",
-        "E1, two errors: actual P&L Infinity and series of different lengths (the finite rule first)")
+        "E1, two errors: actual P&L Infinity [finite] and series of different lengths [structural] (the finite rule first)")
+    # Audit A response (KR-237: KA-A16, KA-A17), appended so that the case ids above stay as they were.
+    import sys
+    sys.set_int_max_str_digits(0)
+    audit = ("added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; ruling KR-237): exact rational "
+             "arithmetic at p = 1/100 (Python fractions)")
+    o2 = zone_exact(2, 1, 0)
+    check((o2["zone"], o2["amber_from"], o2["red_from"], o2["cumulative_probability"]) == ("RED", 0, 1, 0.9999),
+          "KR-237: n = 2, one exception: P(X <= 1) = 0.9999 exactly, a tie with the red threshold: RED from 1")
+    s.add("risk.frtb.backtest.zone", {"observations": 2, "exceptions_actual": 1, "exceptions_hypothetical": 0}, o2,
+          verified=["hand", audit, SCIPY + ": binom.cdf MATCH 1e-12"], tags=TAGS_B + ["outside_checked"], output_classes=oc,
+          description="KR-237 (KA-A17): n = 2, one exception: 1 - p^2 = 0.9999 ties the red threshold exactly: RED, "
+                      "red_from 1, amber_from 0")
+    for n, xa, xh in [(100_000, 1_050, 0), (1_000_000, 10_164, 10_100), (1_000_000, 9_800, 0)]:
+        o = zone_exact(n, xa, xh)
+        s.add("risk.frtb.backtest.zone", {"observations": n, "exceptions_actual": xa, "exceptions_hypothetical": xh}, o,
+              verified=[audit, SCIPY + ": binom.cdf MATCH 1e-12"], tags=TAGS_B + ["outside_checked"], output_classes=oc,
+              limit={"absolute": 1e-15, "relative": 1e-12},
+              description=f"KR-237 (KA-A16): {n:,} observations, {max(xa, xh):,} exceptions: the binomial sum at large n "
+                          "against exact rationals (the lgamma form was 1.3e-10 off at 100,000)")
     s.write()
     return s
 

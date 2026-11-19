@@ -15,9 +15,9 @@ import org.quantforge.risk.StageK;
 /**
  * Stage K wave 1 verbs (PROPOSED rulings KR-1 to KR-14), as {@code python/quantforge_core/cli/ops_stage_k.py}.
  *
- * <p>Error order HR-66: reading the inputs is E_SCHEMA; the structural E_INPUT checks run here, before the held
- * non-finite read (F-2) is raised; the core then applies E_DOMAIN, value-dependent E_INPUT and E_LIMIT. The stage K
- * sizes are checked in the core, last, so the general per-array limit is skipped for these verbs.
+ * <p>Error order HR-122 (ruling KR-230): reading the inputs is E_SCHEMA; the gate then raises a held size limit
+ * (limits.md, KR-231: the generic 100,000 per array, 200 for the quote lists here) and then a held non-finite read
+ * (F-2); the core applies structural E_INPUT, E_DOMAIN and, for the incremental update, the stale-cache E_INPUT.
  */
 final class OpsStageK {
     private OpsStageK() {}
@@ -33,16 +33,6 @@ final class OpsStageK {
         table.put("calib.trigger.check", OpsStageK::trigger);
         table.put("risk.intraday.delta_gamma_bound", OpsStageK::intraday);
         table.put("num.richardson.check", OpsStageK::richardson);
-    }
-
-    /** Runs a structural check; its E_INPUT outranks a held non-finite read (HR-66). Then raises that read. */
-    private static void structural(In in, Runnable check) {
-        try {
-            check.run();
-        } catch (QfError e) {
-            throw in.structural(e);
-        }
-        in.gate();
     }
 
     private static QfError schema(String message) {
@@ -88,7 +78,7 @@ final class OpsStageK {
         String seriesId = in.string("series_id");
         long k = in.instant("knowledge_as_of");
         long v = in.instant("valid_at");
-        structural(in, () -> StageK.checkLog(log));
+        in.gate();
         StageK.Answer a = StageK.bitemporalQuery(log, seriesId, k, v);
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("status", a.status());
@@ -109,7 +99,8 @@ final class OpsStageK {
 
     private static Out parAnnual(In in) {
         double[] quotes = in.reals("quotes");
-        structural(in, () -> StageK.checkQuotesShape(quotes.length));
+        in.limit(quotes.length > StageK.MAX_QUOTES, "quotes");
+        in.gate();
         return Operations.out("discount_factors", StageK.parAnnual(quotes));
     }
 
@@ -117,7 +108,10 @@ final class OpsStageK {
         double[] pq = in.reals("previous_quotes");
         double[] pd = in.reals("previous_discount_factors");
         double[] nq = in.reals("new_quotes");
-        structural(in, () -> StageK.checkUpdateShape(pq.length, pd.length, nq.length));
+        in.limit(pq.length > StageK.MAX_QUOTES, "previous_quotes");
+        in.limit(pd.length > StageK.MAX_QUOTES, "previous_discount_factors");
+        in.limit(nq.length > StageK.MAX_QUOTES, "new_quotes");
+        in.gate();
         StageK.Update u = StageK.incrementalUpdate(pq, pd, nq);
         return Operations.out("discount_factors", u.discountFactors(), "first_changed_index",
                 u.firstChangedIndex(), "recomputed", u.recomputed());
@@ -129,10 +123,10 @@ final class OpsStageK {
         double xNow = in.real("x_now");
         double d = in.real("days_since");
         double k = in.real("k");
-        structural(in, () -> StageK.checkChangesShape(changes.length));
+        in.gate();
         StageK.Trigger t = StageK.triggerCheck(changes, xRef, xNow, d, k);
         return Operations.out("fire", t.fire(), "sigma", t.sigma(), "threshold", t.threshold(), "false_alarm_rate",
-                t.falseAlarmRate());
+                t.falseAlarmRate(), "nominal_rate", t.nominalRate());
     }
 
     private static Out intraday(In in) {
@@ -141,7 +135,7 @@ final class OpsStageK {
             positions.add(new StageK.ZeroPosition(p.real("notional"), p.real("maturity"), p.real("yield")));
         }
         double shift = in.real("shift");
-        structural(in, () -> StageK.checkPositionsShape(positions.size()));
+        in.gate();
         StageK.Intraday r = StageK.deltaGammaBound(positions, shift);
         return Operations.out("estimate_pnl", r.estimatePnl(), "bound", r.bound(), "label", r.label());
     }
@@ -150,7 +144,7 @@ final class OpsStageK {
         double[] values = in.reals("values");
         double ratio = in.real("ratio");
         double p = in.real("assumed_order");
-        structural(in, () -> StageK.checkValuesShape(values.length));
+        in.gate();
         return new Out(StageK.richardsonCheck(values, ratio, p).toMap(), Map.of());
     }
 }

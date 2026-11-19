@@ -187,6 +187,31 @@ class SaCcrTest {
         assertEquals(0, SaCcr.codePointCompare("ab", "ab"));
     }
 
+    /**
+     * KA-A3 (ruling KR-236): two equity variance swaps on two single names, long and short, labelled V1 and V2, form
+     * one hedging set (CRE52.47). SF = 32% x 5 = 1.6, a = +-160, rho = 0.5: sqrt(0.75 x (160^2 + 160^2)) =
+     * sqrt(38,400). A volatility trade other than IR or FX needs no hedging_set.
+     */
+    @Test
+    void equityVolatilityTradesFormOneHedgingSet() {
+        SaCcr.Trade v1 = new SaCcr.Trade("v1", "EQUITY", 100, 0, 1, "LINEAR", "LONG", "VOLATILITY", null, null, "V1",
+                "X", "SINGLE", null, null, null, null, 0.0, null, null);
+        SaCcr.Trade v2 = new SaCcr.Trade("v2", "EQUITY", 100, 0, 1, "LINEAR", "SHORT", "VOLATILITY", null, null, "V2",
+                "Y", "SINGLE", null, null, null, null, 0.0, null, null);
+        SaCcr.Result r = ead(List.of(v1, v2));
+        assertEquals(Math.sqrt(38_400.0), r.addon().get("EQUITY"), 1e-15 * Math.sqrt(38_400.0));
+        assertEquals(1, r.hedgingSets().size());
+        assertEquals("VOLATILITY", r.hedgingSets().get(0).treatment());
+        assertEquals("", r.hedgingSets().get(0).key());
+        SaCcr.Trade unlabelled = new SaCcr.Trade("v3", "EQUITY", 100, 0, 1, "LINEAR", "LONG", "VOLATILITY", null,
+                null, null, "X", "SINGLE", null, null, null, null, 0.0, null, null);
+        assertEquals(r.addon().get("EQUITY"), ead(List.of(unlabelled, v2)).addon().get("EQUITY"));
+        // the one-entity-two-subclasses check uses the same key: X under V1 and V2 is one entity
+        SaCcr.Trade xIndex = new SaCcr.Trade("v4", "EQUITY", 100, 0, 1, "LINEAR", "LONG", "VOLATILITY", null, null,
+                "V2", "X", "INDEX", null, null, null, null, 0.0, null, null);
+        fails("E_INPUT", "subclass", List.of(v1, xIndex), null);
+    }
+
     private static void fails(String code, String field, List<SaCcr.Trade> t, SaCcr.Margin m) {
         QfError e = assertThrows(QfError.class, () -> SaCcr.ead(t, 0, m, true));
         assertEquals(code, e.code());
