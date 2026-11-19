@@ -11,6 +11,7 @@ This folder gathers the evidence behind each curve in the [Curves gallery](../cu
 | Real-data round trip | `tools/validation/reconcile_official.py`, `docs/validation/data/real-data.json` | SONIA and SOFR bootstraps against published fitted curves; pass or fail only |
 | AI review packet | [`docs/validation/ai-review/`](ai-review/README.md) (one self-contained prompt per curve, about 30,000 characters or less) | Spec text, rulings, golden cases, evidence and questions for an outside model with no repository access; its answer is filed as a labelled "AI review" section and checked against the repository before anything is acted on |
 | How to use the pack | [HOW-TO-REVIEW.md](HOW-TO-REVIEW.md) | Rebuilding the pack and running the optional AI check |
+| Status ladder and the 60% rule | [status-ladder.md](status-ladder.md) | The six status rungs, the outside-check rule per stage and per plan item, current shares generated from `oracle/OUTSIDE_SHARES.json` by `tools/validation/status_ladder.py`, and the stage K round 1 shares quoted from lane files |
 | Page generator | `tools/validation/build_checklists.py` (`--check` for staleness) | Reads the counts from the gallery data and the goldens, so a page cannot drift from them |
 
 ## Outside-library checks (option C)

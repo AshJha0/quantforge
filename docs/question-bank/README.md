@@ -1,6 +1,6 @@
 # QuantForge question bank
 
-A learning question bank and knowledge check: 397 questions with full answers, in 13 sets that follow the project's topics. It is for two readers. A newcomer can work through the foundation questions in order; a practitioner can jump to a set and test themselves against QuantForge's own conventions and rulings.
+A learning question bank and knowledge check: 450 questions with full answers, in 14 sets that follow the project's topics. It is for two readers. A newcomer can work through the foundation questions in order; a practitioner can jump to a set and test themselves against QuantForge's own conventions and rulings.
 
 How to use it: read the question, answer it on paper, then read the answer. Each answer starts with the plain idea, then gives the formal rule as the spec states it, then (for quantitative topics) a worked example with numbers, and ends with the pitfall that matters on a desk or in validation. Each question names its source spec or tutorial and an evidence class:
 
@@ -26,14 +26,15 @@ Levels: **foundation** (the idea and the convention), **practitioner** (using th
 | [Hedging and hedge solvers](10-hedging.md) | 9 | 14 | 8 | 31 |
 | [Research statistics and backtest honesty](11-research-statistics.md) | 10 | 12 | 8 | 30 |
 | [Four-language engineering and verification](12-engineering-verification.md) | 11 | 13 | 6 | 30 |
-| [Execution and microstructure](13-execution-microstructure.md) | 11 | 10 | 5 | 26 |
-| **Total** | 136 | 167 | 94 | **397** |
+| [Execution and microstructure](13-execution-microstructure.md) | 18 | 20 | 9 | 47 |
+| [Stage K: data platform, intraday risk, capital and the paper ledger](14-stage-k-risk-platform.md) | 10 | 11 | 11 | 32 |
+| **Total** | 153 | 188 | 109 | **450** |
 
 Back to [Learn QuantForge](../../LEARN.md).
 
 ## Foundation questions
 
-136 questions.
+153 questions.
 
 - Q1.1 (01-foundations-numerics.md) How do ACT/360 and ACT/365F differ, and what year fraction does each give from 1 January to 1 July 2024?
 - Q1.4 (01-foundations-numerics.md) What does QuantForge return when the start equals the end, or the end is before the start?
@@ -171,10 +172,27 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q13.19 (13-execution-microstructure.md) A paper book buys 2 at 100 (fee 0.20) and sells 1 at 110 (fee 0.11), then closes the day at 105. Explain the day's P&L.
 - Q13.21 (13-execution-microstructure.md) An order to buy 11 at 100 meets limits of 10 per order, notional 1,000 and position 5. Which checks fail, and in what order are they reported?
 - Q13.22 (13-execution-microstructure.md) Twelve orders arrive in four seconds. What is the arrival rate, and how sure are you?
+- Q13.27 (13-execution-microstructure.md) A buy of 100 and a sell of 60 sit in the simulated dark pool while the lit book is 100.00 bid, 100.10 offered. What trades?
+- Q13.34 (13-execution-microstructure.md) A buy of 12 at 102 meets 5 offered at 101 and 5 at 102. What happens to it as a fill-or-kill, and what would an immediate-or-cancel buy of 8 at 102 do against 5 at 101 and 5 at 103?
+- Q13.35 (13-execution-microstructure.md) The book is 100 bid, 103 offered. Where does a mid-peg buy with a cap of 105 rest, and what fills when a market sell of 2 arrives?
+- Q13.38 (13-execution-microstructure.md) A buy limit at 10.005 and a sell limit at 10.005 are rounded to the equity tick. What do you get, and when does the half-penny tier apply?
+- Q13.40 (13-execution-microstructure.md) What is one pip worth on 1,000,000 EURUSD and on 1,000,000 USDJPY, and when does EURUSD traded on 2026-11-24 settle if the 26th is a USD holiday?
+- Q13.41 (13-execution-microstructure.md) What are 99-16, 99-16+, 99-162 and 99-167 as decimals, and why is 99-163 refused?
+- Q13.47 (13-execution-microstructure.md) A paper book is long 1 at an average cost of 100 with 9,909.69 cash. The next day closes at 102 after 105, with no trades and cash earning 3.65 %. Explain the day.
+- Q14.1 (14-stage-k-risk-platform.md) What are valid time and knowledge time, and why does a risk store need both?
+- Q14.5 (14-stage-k-risk-platform.md) Why can an annual par bootstrap be patched from the first moved quote onwards?
+- Q14.9 (14-stage-k-risk-platform.md) When does `calib.trigger.check` fire?
+- Q14.12 (14-stage-k-risk-platform.md) Why scale the threshold by `sqrt(d)`?
+- Q14.13 (14-stage-k-risk-platform.md) What is the delta-gamma estimate for a zero-coupon bond, and what bounds its error?
+- Q14.17 (14-stage-k-risk-platform.md) What is the observed order, and how did it expose the first K-8 build?
+- Q14.21 (14-stage-k-risk-platform.md) What are RC, PFE and EAD under SA-CCR?
+- Q14.25 (14-stage-k-risk-platform.md) Where do the amber and red boundaries come from?
+- Q14.29 (14-stage-k-risk-platform.md) What does a DAY row's P&L explain contain, and why must the unexplained term be exactly zero?
+- Q14.32 (14-stage-k-risk-platform.md) How many recorded trading days are there, and why are FedInvest prices not used?
 
 ## Practitioner questions
 
-167 questions.
+188 questions.
 
 - Q1.2 (01-foundations-numerics.md) What does ACT/ACT ISDA give from 1 November 2003 to 1 May 2004, and how does ACT/ACT ICMA differ on the same dates?
 - Q1.3 (01-foundations-numerics.md) How do the 30/360 variants treat 29 February 2024 to 31 August 2024?
@@ -343,10 +361,31 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q13.23 (13-execution-microstructure.md) Venue A's fills have a markout of 0 at 5 seconds, yet a toxicity of two thirds. How can both be true?
 - Q13.24 (13-execution-microstructure.md) Why does the arrival-price golden use an urgency of exactly ln 2?
 - Q13.25 (13-execution-microstructure.md) A pre-trade estimate says 3.04 bp expected cost and 46.2 bp timing risk. Should you add them?
+- Q13.28 (13-execution-microstructure.md) Repeat Q13.27 with a minimum quantity of 80 on the buy, then with a buy limit of 100.04. What changes?
+- Q13.29 (13-execution-microstructure.md) A conditional buy of 50 meets a firm sell of 30. What happens when the owner firms up, and when it declines?
+- Q13.31 (13-execution-microstructure.md) With one lit venue and one dark venue, the router posts 4 lots lit and 3 dark for an order of 4. Why post 7 for 4?
+- Q13.32 (13-execution-microstructure.md) An iceberg buy of 100 showing 10 rests first, then a plain buy of 20 at the same price. A sell of 15 arrives. Who fills?
+- Q13.33 (13-execution-microstructure.md) Two bids rest at 100. The first is cut from 10 to 5, a sell of 3 arrives, then the first is raised to 8, and another sell of 3 arrives. Which bid fills each sell?
+- Q13.36 (13-execution-microstructure.md) How is the Kraken book checksum computed, and what does `ob_h-0001` check?
+- Q13.39 (13-execution-microstructure.md) On 2026-11-19, is an access fee of 0.0015 a share at a price of 20 within the cap? What is the round lot for a stock at 500?
+- Q13.42 (13-execution-microstructure.md) Six orders meet in a simulated opening auction. At what price does it uncross, how much trades, and what is the imbalance?
+- Q13.43 (13-execution-microstructure.md) A client buys EURUSD on the simulated dealer's quote 1.0850 / 1.0852 (mid 1.0851). During the hold the mid moves to 1.0855, or only to 1.0852. What does last look do with a 2-pip threshold?
+- Q13.44 (13-execution-microstructure.md) On the simulated ZN futures venue, P buys 3 at 110-16 from M and sells 3 at 110-17+ to N, with fees of 1.00 a contract a side. What is each trader's P&L?
+- Q14.2 (14-stage-k-risk-platform.md) Which record wins when several are known and cover the date?
+- Q14.4 (14-stage-k-risk-platform.md) Is `valid_to` inclusive, and how is a stage A record mapped into the bitemporal form?
+- Q14.6 (14-stage-k-risk-platform.md) What does `curve.incremental.update` return for a move of the 2-year quote to 2.6%?
+- Q14.11 (14-stage-k-risk-platform.md) Does a move exactly at the threshold fire?
+- Q14.14 (14-stage-k-risk-platform.md) Why is the bound larger for a fall in yield than for a rise of the same size?
+- Q14.19 (14-stage-k-risk-platform.md) What does `CN_RANNACHER_SMOOTHED` change, and what does the smoothing give on `f = (-1, 0, 1)`?
+- Q14.22 (14-stage-k-risk-platform.md) How do the two swaps of Example 1 offset each other?
+- Q14.23 (14-stage-k-risk-platform.md) How is the supervisory delta of the swaption found?
+- Q14.26 (14-stage-k-risk-platform.md) Which exception count does FRTB use, and what multiplier follows?
+- Q14.28 (14-stage-k-risk-platform.md) When does a trading desk lose permission to use its model?
+- Q14.30 (14-stage-k-risk-platform.md) What can be verified from the ledger alone, with no CLI and no outside data?
 
 ## Advanced questions
 
-94 questions.
+109 questions.
 
 - Q1.5 (01-foundations-numerics.md) Why does ACT/ACT AFB give the same answer from 28 February 2004 to both 28 and 29 February 2008, and why does Strata disagree?
 - Q1.21 (01-foundations-numerics.md) How does the adaptive Gauss-Kronrod rule integrate `1/sqrt(x)` on `[0, 1]` when the integrand is infinite at 0?
@@ -442,3 +481,18 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q13.15 (13-execution-microstructure.md) How were the Avellaneda-Stoikov goldens checked against the paper, when the paper prints only simulated averages?
 - Q13.17 (13-execution-microstructure.md) The recorded Kraken book is a once-a-second snapshot of the recorder's own book. What can the book check claim, and what can it not?
 - Q13.26 (13-execution-microstructure.md) The first H-9 run shows Rust `best_bid` p99 at 105 ns against a 50 ns target. What can you conclude?
+- Q13.30 (13-execution-microstructure.md) To buy 10 lots with 2 lots queued ahead at one lit venue, what split between a market order and a limit order does the router choose?
+- Q13.37 (13-execution-microstructure.md) During a rebuild, an update deletes a level that is not in the book, a later update makes the book locked and then crossed, and a reconnect row arrives. Which of these are errors?
+- Q13.45 (13-execution-microstructure.md) A request breaks two rules at once. Which error code does each build return?
+- Q13.46 (13-execution-microstructure.md) On workload R, the recorded crypto window, the low-latency book passes every correctness check and misses its timing targets. How should that be reported?
+- Q14.3 (14-stage-k-risk-platform.md) What property does the stage K acceptance test check, and with what evidence?
+- Q14.7 (14-stage-k-risk-platform.md) Why must the cached discount factors match the bootstrap bit for bit, not within a tolerance?
+- Q14.8 (14-stage-k-risk-platform.md) What was checked on the production (stage B) bootstrap, and what was not?
+- Q14.10 (14-stage-k-risk-platform.md) What false-alarm rate does `k = 3` give, and why does the simulation centre on 0.0030306 instead?
+- Q14.15 (14-stage-k-risk-platform.md) How are position bounds combined for a book, and why not net them?
+- Q14.16 (14-stage-k-risk-platform.md) Why does this item fail the 60% outside-check rule, and what was measured instead?
+- Q14.18 (14-stage-k-risk-platform.md) What were the two causes of lost second order?
+- Q14.20 (14-stage-k-risk-platform.md) After the second run passed, what is still restricted?
+- Q14.24 (14-stage-k-risk-platform.md) What is the SA-CCR outside-check share, and why are four matching cases excluded?
+- Q14.27 (14-stage-k-risk-platform.md) Why is zero exceptions in five days amber under the rule as written?
+- Q14.31 (14-stage-k-risk-platform.md) What do the anchors add to the hash chain?

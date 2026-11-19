@@ -738,11 +738,15 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 {table(['Curve', 'Stage', 'Evidence'], rows)}
 
 Stage J wave 3 (historical scenario stress, interpolation backtests, drift detectors) has no gallery page: those operations take a curve, a smile or a series rather than build a curve, so they are worked through in [Tutorial 33](../getting-started/tutorial-33-stress-test-and-watch-for-drift.md) instead.
-{real}
+{real}{RISK_CAPITAL}
 ## How the gallery is built
 
 `tools/build_gallery.py` runs the CLIs and writes these pages and `docs/curves/data/`. CI reruns the Python CLI and fails if a committed number moves by more than {TOL['curve'][0]:g} plus {TOL['curve'][1]:g} relative, or {TOL['risk'][0]:g} plus {TOL['risk'][1]:g} relative for risk figures. See [the guide](../developer-guides/curves-gallery.md).
 """
+
+
+# Gap G-5 of the docs plan: risk and capital term structures, only what is released (stage K docs lane, 2026-11-19).
+RISK_CAPITAL = "\n## Risk and capital term structures\n\nSome risk and capital figures are themselves functions of tenor or time: a regulator's risk weight per tenor, an exposure profile over a trade's life, a supervisory duration. This section lists only what is built and released today; it has no chart yet, and nothing here is a gallery row.\n\n| Term structure | What it is | Where (released) | Evidence |\n|---|---|---|---|\n| FRTB GIRR delta risk weights | Regulator's weight per tenor vertex: 1.7% at 0.25Y and 0.5Y, 1.6% at 1Y, 1.3% at 2Y, 1.2% at 3Y, 1.1% from 5Y to 30Y (MAR21.42 Table 1) | `risk.frtb.girr_delta`, `specifications/06-risk/frtb-sa-girr.md`, stage F | regulator text, read in stage F; goldens re-derived under the stage F rule |\n| Key-rate DV01 ladder | Sensitivity of a position to each curve tenor, money per basis point | `risk.ois.dv01` and the R2 key-rate operations, `specifications/06-risk/par-and-key-rate.md` | goldens; see [Tutorial 1](../getting-started/tutorial-1-swap.md) |\n| Exposure profile under Hull-White | Expected exposure EE(t) and the deflated quantile `deflated_pfe_q(t)` over a swap portfolio's life; the quantile is of deflated value, not PFE as a desk reads it (R6-5.1) | `xva.exposure.portfolio_hw`, `specifications/06-risk/xva-exposure-portfolio.md`, stage G | 80 of 96 value cases within 3 Monte Carlo standard errors of ORE 1.8.17 (`oracle/OUTSIDE_SHARES.md`) |\n\nNot built yet, and not shown here until it is merged and released (stage K, on lane branches): SA-CCR supervisory duration and maturity factors (branch `k-w1b`), FRTB internal-model liquidity horizons (wave 2, specification only), and SIMM tenor weights, which will use placeholder weights, not ISDA-calibrated.\n"
 
 
 def render_all(all_data):

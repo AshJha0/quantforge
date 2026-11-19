@@ -328,6 +328,43 @@ Stage H (v0.10.0, execution and microstructure) is implemented in all four langu
 | Spread cost | In attribution, what fills paid against the mid at the fill time; negative means price improvement |
 | Coordinated omission | Undercounting slow samples when a load generator waits for a slow response; not corrected here because replay is unpaced |
 
+## Stage K terms (in progress)
+
+Stage K round 1 is on lane branches that are not merged; these terms are defined as the lanes' specs use them (branches `k-w1`, `k-k8`, `k-w1b`, `k-paper`; read 2026-11-19). [Tutorials 51 to 58](docs/getting-started/README.md#stage-k-in-progress) use them.
+
+| Term | Meaning |
+|---|---|
+| Bitemporal (stage K) | A record carries two times: a valid-time interval `[valid_from, valid_to)`, the period it describes, and a knowledge time, when the store learned it. Nothing is overwritten; a correction is a new record (`core.store.bitemporal_query`, KR-2) |
+| As-of (knowledge as of) | The knowledge instant `K` of a query: only records with `knowledge_time <= K` are seen, so an answer as of `K` never changes when later records are appended (KR-4) |
+| Valid time | The period a stored value is meant to describe, `valid_from` inclusive, `valid_to` exclusive, null meaning open-ended |
+| Withdrawn | The answer of a bitemporal query when the latest record known by `K` that covers `V` is a deletion |
+| Incremental curve update | Rebuilding a sequential bootstrap from the first changed quote only, with earlier pillars copied; must equal a full rebuild bit for bit (`curve.incremental.update`, KR-5) |
+| Recalibration trigger | A rule that fires when an input has moved since the last calibration by more than `k sigma sqrt(d)`, `sigma` the sample standard deviation of past daily changes (`calib.trigger.check`, KR-6) |
+| False-alarm rate | The share of pure-noise checks on which a trigger still fires; `2 (1 - Phi(k))` when `sigma` is known |
+| Lagrange remainder bound | The bound `M3 abs(h)^3 / 6` on the error of a delta-gamma estimate, `M3` the largest third derivative on the segment; for a zero-coupon position it is exact to compute (`risk.intraday.delta_gamma_bound`, KR-7) |
+| Observed order | `log((f1 - f2)/(f2 - f3)) / log r` from values on three grids refined by `r`; a second-order scheme gives about 2 (`num.richardson.check`, KR-9) |
+| Richardson extrapolation | Estimating the limit of a grid sequence as `(r^p f3 - f2)/(r^p - 1)` for order `p`; used only after the order check returns `OK`, never unguarded (KR-9) |
+| Rannacher start-up (stage K) | In `CN_RANNACHER_SMOOTHED`, the first two Crank-Nicolson steps of each interval between exercise dates replaced by two implicit half steps each, to damp the high-frequency error a kink leaves [Rannacher 1984, recalled; Giles and Carter 2006, read by the K-8 lane] |
+| Exercise smoothing | Replacing the pointwise `max(U, E)` at an exercise date by a hat-weighted average with an end correction, so the result does not depend on where the exercise boundary sits inside its grid cell (K-8, KR-15) |
+| SA-CCR | The Basel standardised approach for counterparty credit risk: a fixed recipe from trade data to exposure at default, with no model (CRE52; `risk.saccr.ead`) |
+| EAD | Exposure at default: `1.4 x (RC + PFE)` under SA-CCR; a margined EAD is capped at the unmargined one |
+| Replacement cost (RC) | What the bank loses now if the counterparty defaults: `max(V - C, 0)` unmargined, `max(V - C, TH + MTA - NICA, 0)` margined |
+| PFE (SA-CCR) | Potential future exposure: `multiplier x AddOn`, a supervisory estimate of how far the exposure could grow before replacement |
+| PFE multiplier | `min{1; 0.05 + 0.95 exp((V - C) / (2 x 0.95 x AddOn))}` when `V - C < 0`, else 1: excess collateral lowers the PFE but never below 5% of the add-on (CRE52.23, KR-36) |
+| Add-on | Supervisory factor times a hedging set's aggregated effective notional; summed over hedging sets and asset classes |
+| Hedging set | A group of trades allowed to offset each other: interest rates by currency, FX by currency pair, one each for credit and equity, four for commodities; basis and volatility trades in their own sets (CRE52.45 to 52.47) |
+| Adjusted notional | Trade size in SA-CCR: notional times supervisory duration for interest rate and credit trades, the notional itself for FX, equity and commodity |
+| Supervisory duration | `(exp(-0.05 S) - exp(-0.05 E)) / 0.05`, floored at 10 business days, `S` and `E` the start and end in years (CRE52.34) |
+| Supervisory delta | +1 or -1 for linear trades; a Black-type delta with a fixed supervisory volatility for options; a formula in attachment and detachment for CDO tranches (CRE52.40, 52.41) |
+| Effective notional | Adjusted notional times maturity factor times supervisory delta |
+| Traffic light (FRTB) | The backtesting zones of the internal models approach: GREEN, AMBER, RED by the binomial cumulative probability of the exception count, amber from 95% and red from 99.99%; at 250 days amber from 5 and red from 10, with a capital multiplier from 1.50 to 2.00 (`risk.frtb.backtest.zone`, MAR32, MAR99). The stage F operation follows the 1996 framework with a plus factor ([Basel traffic light](#tutorial-terms)) |
+| Exception (backtesting) | A day whose loss exceeds the VaR, strictly; a day with a missing P&L or VaR counts as one. FRTB uses the greater of the actual and hypothetical counts |
+| Desk eligibility | Whether a trading desk may keep using its internal model: not if it has more than 12 exceptions at 99% or more than 30 at 97.5% in the last 12 months (MAR32.19, KR-44) |
+| Paper ledger (stage K) | The daily, hash-chained record of a fixed-rule paper book marked on the recorded Treasury par curve, labelled "paper marks on a fitted curve; not tradable"; plumbing evidence, no performance claim (`tools/paper_daily/`, KR-70 to KR-89) |
+| Anchor | The head hash and row count of a ledger stamped with OpenTimestamps on a separate branch, so that a consistent rewrite of old rows or a truncated tail becomes visible |
+| Blind re-derivation | An outside check where no library exists: a lane on a different model derives the answers from a spec stripped of every expected value, freezes them with a hash, and a fixed script compares them with the goldens; a leaked case does not count (DR-H2) |
+| Placeholder weights | Risk weights or impact parameters that are not calibrated to any market; every output that uses them says "placeholder weights" (SIMM in stage K: "placeholder weights, not ISDA-calibrated") |
+
 ## Tutorial terms
 
 Terms the [tutorials](docs/getting-started/README.md) use that the stage sections above do not define.

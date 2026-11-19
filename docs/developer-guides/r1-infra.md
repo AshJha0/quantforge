@@ -89,7 +89,7 @@ Offline reruns: `--data DIR` reads saved source files instead of fetching them. 
 | Fixing | Level outside -1% to 15%; day change over 100 bp | Day change over 25 bp |
 | Par quotes | Level outside -1% to 15%; day change over 100 bp | Day change over 30 bp; adjacent tenors more than 150 bp apart |
 | Curve | DF outside (0, 1.02]; zero rate outside -1% to 15%; pillar forward outside -2% to 20% | DF rising (a negative forward) |
-| Front end | — | Fixing more than 75 bp from the shortest quote |
+| Front end | none | Fixing more than 75 bp from the shortest quote |
 | SOFR averages | Library more than 1e-7 from the published figure | Index step more than 5e-6 off |
 
 A band changes only in its own commit, with the reason. The gallery page [real-usd-treasury.md](../curves/real-usd-treasury.md) shows them on a committed snapshot, with all four CLIs agreeing to 1.1e-14. `python tools/build_gallery.py --real-only --refresh-real` fetches a new snapshot and rewrites only that page and the index. `--check` reruns the Python CLI against the snapshot, offline.

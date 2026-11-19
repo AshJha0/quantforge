@@ -56,6 +56,18 @@ Stage J wave 3 (historical scenario stress, interpolation backtests, drift detec
 
 [Validation evidence pack](../validation/README.md): one evidence checklist per row of the table above, the outside-library checks behind it, and a round trip of the SONIA and SOFR bootstraps against published fitted curves.
 
+## Risk and capital term structures
+
+Some risk and capital figures are themselves functions of tenor or time: a regulator's risk weight per tenor, an exposure profile over a trade's life, a supervisory duration. This section lists only what is built and released today; it has no chart yet, and nothing here is a gallery row.
+
+| Term structure | What it is | Where (released) | Evidence |
+|---|---|---|---|
+| FRTB GIRR delta risk weights | Regulator's weight per tenor vertex: 1.7% at 0.25Y and 0.5Y, 1.6% at 1Y, 1.3% at 2Y, 1.2% at 3Y, 1.1% from 5Y to 30Y (MAR21.42 Table 1) | `risk.frtb.girr_delta`, `specifications/06-risk/frtb-sa-girr.md`, stage F | regulator text, read in stage F; goldens re-derived under the stage F rule |
+| Key-rate DV01 ladder | Sensitivity of a position to each curve tenor, money per basis point | `risk.ois.dv01` and the R2 key-rate operations, `specifications/06-risk/par-and-key-rate.md` | goldens; see [Tutorial 1](../getting-started/tutorial-1-swap.md) |
+| Exposure profile under Hull-White | Expected exposure EE(t) and the deflated quantile `deflated_pfe_q(t)` over a swap portfolio's life; the quantile is of deflated value, not PFE as a desk reads it (R6-5.1) | `xva.exposure.portfolio_hw`, `specifications/06-risk/xva-exposure-portfolio.md`, stage G | 80 of 96 value cases within 3 Monte Carlo standard errors of ORE 1.8.17 (`oracle/OUTSIDE_SHARES.md`) |
+
+Not built yet, and not shown here until it is merged and released (stage K, on lane branches): SA-CCR supervisory duration and maturity factors (branch `k-w1b`), FRTB internal-model liquidity horizons (wave 2, specification only), and SIMM tenor weights, which will use placeholder weights, not ISDA-calibrated.
+
 ## How the gallery is built
 
 `tools/build_gallery.py` runs the CLIs and writes these pages and `docs/curves/data/`. CI reruns the Python CLI and fails if a committed number moves by more than 1e-10 plus 1e-08 relative, or 0.01 plus 1e-06 relative for risk figures. See [the guide](../developer-guides/curves-gallery.md).

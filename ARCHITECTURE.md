@@ -13,6 +13,33 @@ Sources: each spec ends with a `## Sources` section naming the papers, books and
 | `java25/`, `cpp26/`, `python/`, `rust/` | Four equal implementations | Specs only. Never each other, never the oracle |
 | `tools/` | Recorder, forward log, docs site build and Curves gallery | CLI output. No financial logic |
 
+## The whole system in one picture
+
+Plain idea: specifications are the only thing the four builds share. The oracle turns the specifications into expected answers, the golden files hold them, and a runner that knows no finance sends each case to each build's command-line program and compares. Gates in CI refuse a change that breaks a count, a share, a tolerance or a page.
+
+```mermaid
+flowchart LR
+  accTitle: QuantForge top-level architecture
+  accDescr: Specifications and the CLI contract feed the oracle and four separate builds. The oracle writes golden files. The neutral conformance runner removes expected values, sends each case to the Java, C++, Python and Rust command-line programs, and compares their result JSON with the goldens by tolerance class. CI gates check the conformance result, golden counts, outside-check shares, mutation and coverage, tutorials and the docs site.
+  SP[specifications/ and rulings] --> CC[CLI contract 1.16.0: specifications/cli-contract.md]
+  SP --> OR[oracle/: hand cases, QuantLib, Strata, ORE, blind re-derivation]
+  OR --> GD[(datasets/golden/: goldens by stage)]
+  SP --> JV[java25/] & CP[cpp26/] & PY[python/] & RS[rust/]
+  CC --> JV & CP & PY & RS
+  GD --> RN[conformance/runner/runner.py]
+  JV & CP & PY & RS -->|quantforge run / batch: result JSON| RN
+  RN --> RP[pass or fail per case, by tolerance class]
+  RP --> GT{CI gates}
+  GD --> GT
+  GT --> G1[conformance.yml: every golden, four builds]
+  GT --> G2[repo-gates.yml: case_figures, check_e1_coverage, quality_gate, test_preregs]
+  GT --> G3[oracle-coverage.yml: outside-check floor 60% of value cases]
+  GT --> G4[mutation and coverage-stage: kill rate, 90% line coverage per file]
+  GT --> G5[tutorial.yml and docs.yml: tutorials in four languages, site build]
+```
+
+Formal statement: the arrows are the only allowed dependencies (table above). No build reads the oracle, a golden file or another build; the runner compares outputs only through `conformance/tolerances/`; the contract number is the one the runner requires (`CONTRACT` in `conformance/runner/runner.py`, 1.16.0 at v0.10.0). Worked example: `exec.impact.sqrt` with quantity 100,000, daily volume 10,000,000, daily volatility 0.02 and coefficient 1 is specified in `specifications/10-execution/impact.md`, written as golden `imp_h-0001` (impact 0.002) by the oracle, and each build's CLI must return 0.002 within its tolerance class; the Python build printed `"impact":0.002` on 2026-11-19 (observed, local). Per-domain flows, one diagram per domain 01 to 12, are in [Diagrams: per-domain flows](docs/diagrams/README.md#per-domain-flows).
+
 ## Rules that shape it
 
 - No language is a reference. The oracle is the source of golden results.
@@ -31,7 +58,7 @@ Stage B calculations are pure functions of their inputs, so stage F can add AD (
 
 ## What each stage added
 
-Services, `infra/` and the other domains do not exist yet.
+Services, `infra/` and domain 12 (platform) do not exist yet; stage K builds them. Domains 09 and 10 have the stage H slices below.
 
 ### Stage A: Foundation
 
@@ -151,18 +178,18 @@ Built in all four languages on branch `stage-j2` (2026-11-15). Wave 3 adds 88 go
 - **Data:** the shock library `datasets/scenarios/us_treasury_shocks.json` is built by `datasets/scenarios/build_shock_library.py` from Treasury daily par-yield files and checked against H.15 (J-W3-6, J-W3-7); it is the first stored market data an operation's worked example reads.
 - **Operations:** `risk.scenario.historical_shock`, `risk.scenario.replay`, `research.backtest.interp_loo`, `research.backtest.surface_holdout`, `research.drift.cusum`, `.page_hinkley`, `.psi`, `.ks` (wave 3); `repo.term.curve`, `eq.forward.term_financed`, `liq.curve.cost` (curves lane); 302 operations in the generated name map.
 - **Contract:** 1.15.0 for both lanes (J-W3-1, J-C-1), no new error code; wave 3 page limits J-W3-14; `risk.backtest.traffic_light` `observations` above 1,000,000 is `E_LIMIT` (J-W3-17).
-- **Outside checks:** 31 of the 56 wave 3 value cases (numpy `interp` on replays, scipy interpolants, scipy `ks_2samp` exact; `oracle/OUTSIDE_J.json`), none of the curves lane's (J-C-9); stage J as a whole 130 of 212 (61.3%).
+- **Outside checks:** 31 of the 56 wave 3 value cases (numpy `interp` on replays, scipy interpolants, scipy `ks_2samp` exact; `oracle/OUTSIDE_J.json`), none of the curves lane's (J-C-9); stage J as a whole 130 of 212 (61.3%) at v0.9.0, 143 of 215 (66.5%) after the validation evidence pack and the v0.9.1 fuzz-fix value cases (`oracle/OUTSIDE_SHARES.md`).
 
 ### Stage H: microstructure and execution (v0.10.0)
 
 Built in all four languages, the `paper.*` operations included. The specs are confirmed (spec version 0.1.0, 2026-11-18; rulings HR-1 to HR-41 in `specifications/stage-h-rulings-w1.md` and `stage-h-rulings-w1b.md`, later rulings up to HR-129 in the other `stage-h-rulings-*.md` files); `tools/gen_name_map.py` counts 358 operations on this tree (2026-11-19), and there are 412 stage H golden cases in `datasets/golden/stage_h/` (205 value-checked, 207 error; `docs/case-figures.md`). What the specs fix about the structure:
 
 - **Domains 09 and 10 get their first slices.** Formula operations (`exec.schedule.*`, `exec.ac.*`, `exec.tca.shortfall`, `exec.impact.*`, `micro.mm.as_quotes`) are pure functions like the rest of the library and sit beside the stage J liquidity curve, which was put in domain 10 for this reuse (J-C-8).
-- **Simulated venues.** The lit engine (`exec.sim.lit.run`), dark pool (`exec.sim.dark.run`) and router (`exec.sor.allocate`) are deterministic simulators: integer ticks and lots, a logical event sequence, seeded randomness from `core.rng`, and byte-identical replays in every language. They consume library operations but are not models of prices, so they are kept out of the numerical core in their own module per language, in line with ADR-0006's modular boundaries. Every output carries a "simulated" label fixed in its spec. Whether this boundary needs its own decision record ("simulators are not the library") is open for the stage H integration. See [Simulators](docs/simulators/README.md).
+- **Simulated venues.** The lit engine (`exec.sim.lit.run`), dark pool (`exec.sim.dark.run`) and router (`exec.sor.allocate`) are deterministic simulators: integer ticks and lots, a logical event sequence, seeded randomness from `core.rng`, and byte-identical replays in every language. They consume library operations but are not models of prices, so they are kept out of the numerical core in their own module per language, in line with ADR-0006's modular boundaries. Every output carries a "simulated" label fixed in its spec. Whether this boundary needs its own decision record ("simulators are not the library") is still open; it was not decided at the v0.10.0 release and is carried to stage K. See [Simulators](docs/simulators/README.md).
 - **Multi-asset conventions and venues (round 4, H-22 to H-24).** One module per language (`multiasset.py`, `multiasset.rs`, `MultiAsset.java`, `multiasset.hpp`) holds the equity, FX and rates conventions (`micro.eq.*`, `micro.fx.*`, `micro.rates.*`), which are exact decimal arithmetic and carry no label (HR-111), and three more simulated venues, which do. (1) The auction, `exec.sim.auction.uncross`, is also called from inside the lit engine: with a `session` and `PHASE` events `exec.sim.lit.run` collects orders in PRE_OPEN, uncrosses at the open, trades continuously, takes on-close orders in PRE_CLOSE and uncrosses again at the close (HR-112); without `session` the engine is unchanged. (2) The FX dealer venue, `exec.sim.fx.stream` and `exec.sim.fx.request`, is a quote stream with a last-look accept or reject, seeded from `core.rng` (HR-97); it has no order book. (3) The futures venue, `exec.sim.fut.run`, converts 32nds to integer ticks and runs the lit engine, then adds fees and a P&L per trader. The dark pool and the router take an `asset_class`; a dark venue for FX or rates is `E_INPUT` (HR-113). Rule dates are data, not code paths: `as_of` and `compliance_date` select the rule text (HR-120). The paper-trading path drives the lit engine, the dark pool and the router only; the auction, FX and futures venues are not on it. See the [multi-asset venues diagram](docs/diagrams/README.md#multi-asset-venues).
 - **One order of checks (HR-122).** Every stage H operation validates in the same order in every language: `E_SCHEMA`; `E_LIMIT` for a size limit on the input; a non-finite Real, `E_DOMAIN`; structural `E_INPUT`; `E_DOMAIN`. Suite `rule_h` (40 cases) pins it with requests that break two rules at once.
 - **Recorded data.** `micro.book.rebuild` reads the recorded Kraken L2 files as decimal strings (HR-12); the recorder stays in `tools/recorder/`, with no financial logic, and its data never enters git ([Recorded feeds](docs/data/recorded-feeds.md)).
-- **Latency (H-9).** The in-process order-book benchmark measures the rebuild and engine paths in each language against targets fixed before any run (`specifications/09-microstructure/low-latency-targets.md`); every table carries "in-process, simulated feed; no network or venue latency". It follows ADR-0011's in-process API style. Result on workload R (the recorded window 2026-11-18 21:49:17 to 2026-11-19 03:49:17 UTC, median of 5 runs, laptop under WSL): correctness passes, timing is a MISS at p99 and p99.9; the targets are unchanged.
+- **Latency (H-9).** The in-process order-book benchmark measures the rebuild and engine paths in each language against targets fixed before any run (`specifications/09-microstructure/low-latency-targets.md`); every table carries "in-process, simulated feed; no network or venue latency". It follows ADR-0011's in-process API style. Result on workload R (the recorded window 2026-11-18 21:49:17 to 2026-11-19 03:49:17 UTC, median of 5 runs, laptop under WSL): correctness passes, timing is a MISS at p99 and p99.9; the targets are unchanged and the miss stays recorded. A fresh measurement on raw venue messages, workload R2, is in progress, with targets fixed on 2026-11-19 before any timing (HR-130, HR-131 in `specifications/09-microstructure/low-latency-targets.md`).
 - **Scope added 2026-11-18 (owner):** H-19, outside checks for the stage D value cases and a QuantLib Schedule comparison; H-20, curves against published central-bank curves as consistency checks; H-21, paper trading with simulated fills, positions, cash, daily P&L explain, risk limits, pre-trade checks and a hashed append-only ledger, on the stage H simulators. Never live orders.
 - **Simulator layer (wave 2).** The three venues share one shape: decimal strings in, integer ticks and lots inside, a logical event sequence, seeded draws from `core.rng`, and a fixed label on every output. The router calls the venue simulators' cost model, not the venues; paper trading is the only caller that drives all three in sequence. See the [simulator flow](docs/diagrams/README.md#simulator-flow).
 - **Paper trading is a Python application above the library.** `python/quantforge_core/paper.py` (book, explain, pre-trade, ledger) and `paper_fills.py` (fills) sit above the library: they call the operations that exist in all four languages (`exec.sim.lit.run`, `exec.sim.dark.run`, `exec.sor.allocate`, `exec.tca.shortfall`) through one dispatch and keep the stateful parts (positions, cash, the ledger file) to themselves. That keeps the four-language contract stateless and lets acceptance test A7 replay every venue golden through the paper path. Round 3 also exposes the stateless steps as CLI operations (`paper.book.apply_fill`, `.end_of_day`, `paper.ledger.append`, `.verify`, `paper.pnl.explain`, `paper.pretrade.check`, `paper.session.run`; goldens `pt_h` 34 and `e1_hpt` 5), in all four languages (Python `cli/ops_paper.py`, Java `org.quantforge.paper.Paper`, C++ and Rust `paper` modules), each reproducing the Python ledger hashes byte for byte. No module under `paper*` imports a network library (test A5). See the [ledger flow](docs/diagrams/README.md#paper-trading-ledger-flow).

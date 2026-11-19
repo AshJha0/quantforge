@@ -5,9 +5,9 @@ name: Docs
 on:
   push:
     branches: [main]
-    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', '.pa11yci.json', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
+    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
   pull_request:
-    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', '.pa11yci.json', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
+    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -31,6 +31,8 @@ jobs:
       - run: python3 tools/build_references.py --check  # docs/references.md matches the specs' Sources sections
       # Also fails if the home stage table or site_facts.json disagree with ROADMAP.md (plan 13.2 E7)
       - run: uv run --no-project --with markdown==3.11.2 python tools/build_site.py --out site
+      # Relative links and #anchors in every tracked .md and every href in the built site (build_site checks files only)
+      - run: python3 tools/check_md_anchors.py --site site
       # WCAG 2 AA, zero errors, on home, LEARN, COOKBOOK and the Curves gallery (plan 13.2 E6)
       - name: accessibility (pa11y-ci, axe and HTML_CodeSniffer)
         run: |
