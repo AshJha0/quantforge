@@ -1191,7 +1191,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MH-19 Simulated FX dealer venue with last look (stage H round 4, H-23)
 - **Purpose:** streamed quotes and request handling with a price-move and a random last-look reject (`exec.sim.fx.stream`, `exec.sim.fx.request`).
 - **Inputs:** as in the spec page; the draw from `core.rng` stream `request_index` (HR-97), `request_index` within 0..2^32-1 (HR-116).
-- **Limitations:** a stated toy, not any dealer's practice; labelled "simulated venue; not a real exchange; no real FX data"; FX Global Code source unverified this session.
+- **Limitations:** a stated toy, not any dealer's practice; labelled "simulated venue; not a real exchange; no real FX data"; FX Global Code Principle 17 read 2026-11-19; the thresholds and the random reject are the spec's own, not from the Code (HR-119).
 - **Validation:** goldens `fxv_h` (HR-116 boundary cases included); blind share H-23 71.4 %. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** blind second lane.
@@ -1203,7 +1203,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MH-20 Simulated Treasury futures venue (stage H round 4, H-24)
 - **Purpose:** ZN and ZB futures on the lit engine in integer ticks, 32nds display, P&L and variation margin (`exec.sim.fut.*`).
 - **Inputs:** as in the spec page; contract specs are parameters with [CME-ZN] and [CME-ZB] defaults.
-- **Limitations:** simulated venue, labelled "simulated venue; not a real exchange; no real rates data"; quarter-tick price text only, eighth-tick contracts not supported (HR-118); [CME-ZB] source not yet re-tagged; no delivery or conversion-factor logic here.
+- **Limitations:** simulated venue, labelled "simulated venue; not a real exchange; no real rates data"; quarter-tick price text only, eighth-tick contracts not supported (HR-118); no delivery or conversion-factor logic here.
 - **Validation:** goldens `fut_h` (HR-116 integer boundary included); blind share H-24 84.2 % (16 of 19; the three `exec.sim.fut.run` value cases are hand-only) after rates packet 2 (HR-114). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** blind second lane.

@@ -1,6 +1,6 @@
 # Simulated Treasury futures venue (H-24)
 
-Spec version 0.1.0 (drafted 2026-11-18; rulings HR-90 to HR-92). Label: "simulated venue; not a real exchange; no real rates data". Contract specs are parameters with [CME-ZN] (face, tick and tick value verified 2026-11-19, HR-117) and [CME-ZB] (unverified) defaults (see `../09-microstructure/asset-conventions.md`).
+Spec version 0.1.0 (drafted 2026-11-18; rulings HR-90 to HR-92). Label: "simulated venue; not a real exchange; no real rates data". Contract specs are parameters with [CME-ZN] (face, tick and tick value verified 2026-11-19, HR-117) and [CME-ZB] (read 2026-11-19) defaults (see `../09-microstructure/asset-conventions.md`).
 
 **Plain idea.** The existing lit engine runs unchanged in integer ticks; for futures a tick is 1/64 (ZN) or 1/32 (ZB) of a point. Prices are shown in 32nds and P&L is ticks times tick value.
 
