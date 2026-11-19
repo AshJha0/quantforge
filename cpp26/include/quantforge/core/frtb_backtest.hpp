@@ -20,7 +20,7 @@ struct Tables {
 /// The parsed table file, built once.
 const Tables& tables();
 
-/// P(X <= x) for X ~ Binomial(n, p), 0 < p < 1 (compensated sum of log-space terms).
+/// P(X <= x) for X ~ Binomial(n, p), 0 < p < 1 (KR-237: compensated partial sums of the binomial weight recursion).
 double binomial_cdf(long long n, long long x, double p);
 /// The smallest k in 0..n with P(X <= k) >= level.
 long long first_at_least(long long n, double p, double level);
