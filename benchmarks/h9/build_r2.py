@@ -378,10 +378,23 @@ def build(data_dir, symbol, start, end, prefix, tolerant=False):
     b_prefix = str(out_dir / f"L7_{symbol}")
     if tolerant:  # development only: let build_r.py read the damaged sample through read_gz.py too
         build_r.gzip = _TolerantGzip(rd)
+    import contextlib
+    import io
+    import re
+
+    printed = io.StringIO()
     try:
-        build_r.main(data_dir, symbol, iso(start), iso(end), b_prefix)
+        with contextlib.redirect_stdout(printed):
+            build_r.main(data_dir, symbol, iso(start), iso(end), b_prefix)
     finally:
         build_r.gzip = gzip
+    print(printed.getvalue(), end="")
+    found = re.search(r"(\d+) messages \((\d+) book, (\d+) trade fills\), (\d+) levels; warm-up \(first hour\) (\d+|None)",
+                      printed.getvalue())
+    if found is None:
+        raise SystemExit("could not read build_r.py's summary line")
+    l7 = {"messages": int(found[1]), "book_messages": int(found[2]), "trade_fills": int(found[3]),
+          "levels": int(found[4]), "warmup_messages": int(found[1]) if found[5] == "None" else int(found[5])}
 
     outputs = {}
     for p in (prefix + ".bin", prefix + ".cps.bin", prefix + ".msgs.jsonl", rows_path,
@@ -392,7 +405,7 @@ def build(data_dir, symbol, start, end, prefix, tolerant=False):
         "first_raw_message": iso(first_t), "price_decimals": pd, "qty_decimals": QTY_DECIMALS, "depth": 100,
         "messages": nmsg, "levels": len(levels) // 2, "checkpoints": len(cps), "warmup_messages": warm if warm is not None else nmsg,
         **counts, "tolerant": tolerant, "skipped_lines": rd.skipped, "inputs_sha256": inputs, "outputs_sha256": outputs,
-        "form_b_prefix": Path(b_prefix).name,
+        "form_b_prefix": Path(b_prefix).name, "form_b": l7,
     }
     Path(prefix + ".meta.json").write_text(json.dumps(meta, indent=1) + "\n", encoding="utf-8")
     print(f"{symbol}: R2 {nmsg} messages ({counts['snapshots']} snapshots, {counts['updates']} updates, "
