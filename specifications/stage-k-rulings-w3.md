@@ -32,3 +32,9 @@ Status: PROPOSED by lane k-w3-spec on 2026-11-19. Not normative until the stage 
 | KR-208 | Red-team set | >= 50 items in five categories of >= 10, written by a different-model session or another person with no view of the server code, hashed before any run; 100% refused |
 | KR-209 | Red-team authorship vs no second review | Treated as test authorship required by plan 12.10, not a review. Coordinator to confirm; if not accepted, A7 moves to a point release and the requirement stays |
 | KR-210 | Local model, no spend | Ollama (MIT) on the laptop, quantised model <= about 8B parameters, weight licence read before use, run alone; model name, version, digest and date in the release notes. No paid API |
+| KR-211 | Dashboard build | `tools/dashboard/render.py` via `build_site.py --dashboards`; reads the `paper-ledger`, `curve-daily` and anchor branches with `git show` at build time; nothing committed to `main`; verifies each ledger first and shows no figures from an unverified ledger |
+| KR-212 | No performance claim | Daily tables only; no return, Sharpe, annualised figure, drawdown, benchmark or cumulative P&L chart; word lint `CLAIM` on every dashboard page (the fixed 11.6 sentence excepted by exact match) |
+| KR-213 | 20-day counter | Counts only `timing == "on_time"` rows; recomputed and compared with `summary.json` (`COUNTER`); late days and gaps listed as such |
+| KR-214 | Curve page | Uses `site_page.render`; keeps the curve label, "consistency check, not proof" and the 2026-11-13 recorded miss note until a ruling removes it with a reason |
+| KR-215 | Model-reserve page | Reads the reserve report (MG-7, later K-8j output); label "model-risk reserve from a set of calibrated models on simulated or golden inputs; not a prudent-valuation figure for any firm" |
+| KR-216 | Page holdout scan | Every rendered page passes `research/holdout_scan.scan_text`; a hit fails the build (`HOLDOUT`) |
