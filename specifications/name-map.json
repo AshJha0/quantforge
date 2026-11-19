@@ -6641,6 +6641,9 @@
     "mean_reversion": {
      "java": "meanReversion"
     },
+    "method": {
+     "java": "method"
+    },
     "notional": {
      "java": "notional"
     },
@@ -6685,6 +6688,9 @@
     },
     "mean_reversion": {
      "java": "meanReversion"
+    },
+    "method": {
+     "java": "method"
     },
     "notional": {
      "java": "notional"

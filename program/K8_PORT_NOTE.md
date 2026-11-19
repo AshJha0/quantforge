@@ -47,7 +47,10 @@ Notation: dual numbers `(value, tangents)`; `P` curve nodes; `expm1`, `exp`, `sq
 
 ## Reported to the coordinator, outside this lane's files
 
-- **Python G-18 path, two errors at once**: with a bad exercise time and `width = 0`, `rates.shortrate.bermudan_swaption` and `bermudan_ladder` without `method` return `E_DOMAIN` in Python (grid checked first, `shortrate.py` / the two ops files) and `E_INPUT` in Java. HR-66 says `E_INPUT`. The K-8 path gives `E_INPUT` in both builds. No stage G golden covers the combination.
-- The conformance runner globs every golden file, so `k8_k` will fail for the C++ and Rust builds until they carry the method.
-- `specifications/cli-contract.md` line on `method` still describes the K-8 scheme by its first definition's ruling only (KR-8); it should cite KR-18 and the suite `k8_k`.
+Status after the port lane (branch `k-k8-ports`, 2026-11-19); the K-8c lane's original list is in its commit 238d7213.
+
+- **Python G-18 path, two errors at once**: was `E_DOMAIN` for a bad exercise time with `width = 0`; fixed to `E_INPUT` (HR-66) in `cli/ops_shortrate.py` and `aad_ladder.py`. Java, C++ and Rust already gave `E_INPUT` (four-build probe). Goldens: two G-18 cases in `e2_k`.
+- **C++ and Rust G-18 path, sigma = 0 with `nx` above 10,001**: gave `E_DOMAIN`; G-31 puts the size limits before F-2 and the domain checks, and Python and Java gave `E_LIMIT`. Fixed in both CLIs (the grid size limits are read right after `E_SCHEMA`). Goldens: two G-18 cases in `e2_k`.
+- The C++ and Rust builds now carry the method (`cpp26/src/core/bermudan_k8.cpp`, `rust/crates/quantforge-core/src/bermudan_k8.rs`) and pass `k8_k`.
+- `specifications/cli-contract.md` now cites KR-18 and the suite `k8_k`.
 - `oracle/K8_ACCEPTANCE_W1.json` (first run, a miss) is kept unchanged.
