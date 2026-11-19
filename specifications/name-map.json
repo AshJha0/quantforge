@@ -7728,7 +7728,7 @@
    ]
   },
   "risk.backtest.traffic_light": {
-   "spec": "specifications/06-risk/var-es-and-backtests.md",
+   "spec": "specifications/06-risk/frtb-ima-backtest.md",
    "rust": "quantforge::risk::backtest_traffic_light",
    "python": "quantforge.risk.backtest_traffic_light",
    "java": "Risk.backtestTrafficLight",
@@ -8094,6 +8094,91 @@
     "loadings"
    ]
   },
+  "risk.frtb.backtest.count": {
+   "spec": "specifications/06-risk/frtb-ima-backtest.md",
+   "rust": "quantforge::risk::frtb_backtest_count",
+   "python": "quantforge.risk.frtb_backtest_count",
+   "java": "Risk.frtbBacktestCount",
+   "cpp": "qf::risk::frtb_backtest_count",
+   "inputs": {
+    "actual": {
+     "java": "actual"
+    },
+    "hypothetical": {
+     "java": "hypothetical"
+    },
+    "var": {
+     "java": "var"
+    }
+   },
+   "outputs": [
+    "days_actual",
+    "days_hypothetical",
+    "exceptions",
+    "exceptions_actual",
+    "exceptions_hypothetical",
+    "observations"
+   ]
+  },
+  "risk.frtb.backtest.desk": {
+   "spec": "specifications/06-risk/frtb-ima-backtest.md",
+   "rust": "quantforge::risk::frtb_backtest_desk",
+   "python": "quantforge.risk.frtb_backtest_desk",
+   "java": "Risk.frtbBacktestDesk",
+   "cpp": "qf::risk::frtb_backtest_desk",
+   "inputs": {
+    "exceptions_975_actual": {
+     "java": "exceptions975Actual"
+    },
+    "exceptions_975_hypothetical": {
+     "java": "exceptions975Hypothetical"
+    },
+    "exceptions_99_actual": {
+     "java": "exceptions99Actual"
+    },
+    "exceptions_99_hypothetical": {
+     "java": "exceptions99Hypothetical"
+    },
+    "observations": {
+     "java": "observations"
+    }
+   },
+   "outputs": [
+    "breach_975",
+    "breach_99",
+    "cumulative_probability_975",
+    "cumulative_probability_99",
+    "eligible",
+    "exceptions_975",
+    "exceptions_99"
+   ]
+  },
+  "risk.frtb.backtest.zone": {
+   "spec": "specifications/06-risk/frtb-ima-backtest.md",
+   "rust": "quantforge::risk::frtb_backtest_zone",
+   "python": "quantforge.risk.frtb_backtest_zone",
+   "java": "Risk.frtbBacktestZone",
+   "cpp": "qf::risk::frtb_backtest_zone",
+   "inputs": {
+    "exceptions_actual": {
+     "java": "exceptionsActual"
+    },
+    "exceptions_hypothetical": {
+     "java": "exceptionsHypothetical"
+    },
+    "observations": {
+     "java": "observations"
+    }
+   },
+   "outputs": [
+    "amber_from",
+    "cumulative_probability",
+    "exceptions",
+    "multiplier",
+    "red_from",
+    "zone"
+   ]
+  },
   "risk.frtb.commodity_delta": {
    "spec": "specifications/06-risk/frtb-sa-fx-equity.md",
    "rust": "quantforge::risk::frtb_commodity_delta",
@@ -8425,6 +8510,43 @@
     "unexplained",
     "value_end",
     "value_start"
+   ]
+  },
+  "risk.saccr.ead": {
+   "spec": "specifications/06-risk/sa-ccr.md",
+   "rust": "quantforge::risk::saccr_ead",
+   "python": "quantforge.risk.saccr_ead",
+   "java": "Risk.saccrEad",
+   "cpp": "qf::risk::saccr_ead",
+   "inputs": {
+    "collateral": {
+     "java": "collateral"
+    },
+    "ir_offset": {
+     "java": "irOffset"
+    },
+    "margin": {
+     "java": "margin"
+    },
+    "trades": {
+     "java": "trades"
+    }
+   },
+   "outputs": [
+    "addon",
+    "addon_aggregate",
+    "c",
+    "capped",
+    "ead",
+    "ead_unmargined",
+    "hedging_sets",
+    "margined",
+    "mpor_days",
+    "multiplier",
+    "pfe",
+    "rc",
+    "trades",
+    "v"
    ]
   },
   "risk.scenario.historical_shock": {
@@ -10526,6 +10648,25 @@
   "xva.adjustments.value: im_spread"
  ],
  "spec_only": [
-  "paper.pnl.explain"
+  "paper.pnl.explain",
+  "risk.capital.large_exposures",
+  "risk.capital.leverage",
+  "risk.ccr.sa_ccr",
+  "risk.cva.ba",
+  "risk.cva.sa",
+  "risk.frtb.drc_ctp",
+  "risk.frtb.drc_nonsec",
+  "risk.frtb.drc_sec_nonctp",
+  "risk.frtb.ima.capital",
+  "risk.frtb.ima.es_lh",
+  "risk.frtb.ima.es_stressed",
+  "risk.frtb.ima.imcc",
+  "risk.frtb.ima.lh",
+  "risk.frtb.ima.ses",
+  "risk.frtb.pla",
+  "risk.frtb.pla.ks_pvalue",
+  "risk.frtb.rfet",
+  "risk.frtb.rfet.bucket",
+  "risk.frtb.rrao"
  ]
 }

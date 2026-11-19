@@ -266,6 +266,9 @@ def published_intermediates(outs):
     check(near(o5["addon_aggregate"], 1401) and near(o5["multiplier"], "0.958", 3), "CRE99.95-96 AddOn 1,401, multiplier 0.958")
 
 
+BLIND_W1B = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W1B.md): MATCH"
+
+
 def gen_saccr():
     s = Suite("saccr_k", SPEC_S, G)
     oc = {"margined": "date_and_convention", "capped": "date_and_convention", "mpor_days": "date_and_convention"}
@@ -281,46 +284,49 @@ def gen_saccr():
             description=f"CRE99 worked example, printed EAD {printed} ({cre})")
     published_intermediates(hp)
 
-    def hand(inp, desc):
+    def hand(inp, desc, blind=False):
         _, lo = sa_ccr(inp)
-        s.add("risk.saccr.ead", inp, lo, verified=["hand", ORACLE], tags=TAGS_S + ["hand"], output_classes=oc, description="hand: " + desc)
+        # blind: one of the seven cases counted by the DR-H2 blind lane (program/STAGE_K_BLIND_W1B.md); the other four
+        # hand cases matched too but are not counted (the lane had read output facts for them, a recorded process failure)
+        verified = ["hand", ORACLE] + ([BLIND_W1B] if blind else [])
+        s.add("risk.saccr.ead", inp, lo, verified=verified, tags=TAGS_S + ["hand"], output_classes=oc, description="hand: " + desc)
 
     hand({"trades": EX1, "ir_offset": False}, "Example 1 with the no-offset IR formula (CRE52.57 step 5)")
     hand({"trades": [tr("f1", "FX", 1000, 12, 0.5, hedging_set="EURUSD"),
                      tr("f2", "FX", 600, -5, 2, position="SHORT", hedging_set="EURUSD"),
                      tr("f3", "FX", 800, 3, 1, kind="OPTION", position="SOLD", option_type="CALL", underlying_price=1.1,
                         strike=1.15, exercise=0.75, hedging_set="USDJPY")]},
-         "FX forwards netting in one pair, sold call in a second pair")
+         "FX forwards netting in one pair, sold call in a second pair", blind=True)
     hand({"trades": [tr("e1", "EQUITY", 500, 20, 1, entity="ACME", subclass="SINGLE"),
                      tr("e2", "EQUITY", 300, -4, 0.5, position="SHORT", entity="ACME", subclass="SINGLE"),
                      tr("e3", "EQUITY", 1000, 7, 2, kind="OPTION", position="BOUGHT", option_type="PUT",
                         underlying_price=4000, strike=3800, exercise=0.5, entity="SPX", subclass="INDEX")],
-          "collateral": 10}, "equity single name netting plus an index put; collateral 10")
+          "collateral": 10}, "equity single name netting plus an index put; collateral 10", blind=True)
     hand({"trades": [tr("c1", "CREDIT", 1000, 5, 5, kind="CDO", position="BOUGHT", attachment=0.03, detachment=0.07,
                         start=0, end=5, entity="ITRAXX 3-7", subclass="IG"),
                      tr("c2", "CREDIT", 500, -2, 3, kind="CDO", position="SOLD", attachment=0.25, detachment=0.5,
                         start=0, end=3, entity="FTD basket", subclass="SG"),
                      tr("c3", "CREDIT", 800, 1, 0.02, start=0, end=0.02, entity="Firm C", subclass="CCC")]},
-         "CDO tranche bought, second-to-default sold (A = 1/4, D = 1/2), floored M and SD")
+         "CDO tranche bought, second-to-default sold (A = 1/4, D = 1/2), floored M and SD", blind=True)
     hand({"trades": [tr("p1", "COMMODITY", 400, 3, 1, entity="POWER", subclass="ELECTRICITY"),
                      tr("p2", "COMMODITY", 400, -1, 1, position="SHORT", entity="GAS", subclass="OIL_GAS"),
                      tr("p3", "COMMODITY", 250, 0, 1, entity="CORN", subclass="AGRICULTURAL"),
                      tr("p4", "COMMODITY", 250, 0, 1, treatment="BASIS", hedging_set="BRENT/HENRY HUB", entity="BRENT/HH",
                         subclass="OIL_GAS")]},
-         "electricity and gas offset within energy; agriculture alone; a basis hedging set at half the factor")
+         "electricity and gas offset within energy; agriculture alone; a basis hedging set at half the factor", blind=True)
     hand({"trades": [tr("v1", "EQUITY", 100, 0, 1, treatment="VOLATILITY", hedging_set="EQ VOL", entity="VIX", subclass="INDEX"),
                      tr("i1", "IR", 1000, 0, 3, start=0, end=3, treatment="BASIS", hedging_set="USD SOFR/TBILL")]},
-         "a volatility hedging set at five times the factor; an IR basis set at half")
+         "a volatility hedging set at five times the factor; an IR basis set at half", blind=True)
     hand({"trades": [tr("n1", "IR", 1000, 2, 2, kind="OPTION", position="BOUGHT", option_type="CALL",
                         underlying_price=-0.002, strike=0.001, exercise=1, shift=0.01, start=1, end=2, hedging_set="EUR"),
                      tr("n2", "IR", 2000, -3, 0.5, start=0, end=0.5, hedging_set="EUR"),
                      tr("n3", "IR", 2000, 1, 7, position="SHORT", start=0, end=7, hedging_set="EUR")]},
-         "shifted IR option at negative rates (CRE52.40 FAQ2) and all three maturity buckets")
+         "shifted IR option at negative rates (CRE52.40 FAQ2) and all three maturity buckets", blind=True)
     hand({"trades": EX1 + EX3, "collateral": 200,
           "margin": {"threshold": 0, "mta": 5, "nica": 150, "remargin_days": 1, "illiquid": True, "disputes": True}},
          "Example 5 netting set, daily margin, illiquid and disputed: MPOR floor 40")
     hand({"trades": EX1 + EX3, "collateral": 200, "margin": {"threshold": 0, "mta": 5, "nica": 150, "remargin_days": 1, "mpor_days": 15}},
-         "Example 5 netting set, daily margin, own MPOR estimate 15 above the floor 10")
+         "Example 5 netting set, daily margin, own MPOR estimate 15 above the floor 10", blind=True)
     hand({"trades": [tr("s1", "IR", 1000, 1, 0.02, start=0, end=0.02, hedging_set="USD")],
           "margin": {"threshold": 1000000, "mta": 0, "nica": 0, "remargin_days": 1}},
          "margined EAD above the unmargined EAD is capped (CRE52.2)")
@@ -356,6 +362,11 @@ def gen_saccr():
     err({"trades": [tr("a", "FX", -5, 0, 1)]}, "E_INPUT", "two errors: no currency pair and negative notional")
     err({"trades": [ok, {**ok, "notional": "1"}]}, "E_SCHEMA", "two errors: duplicate id and notional as a string")
     err({"trades": [ok, {**ok, "maturity": 0}]}, "E_INPUT", "two errors: duplicate id and zero maturity")
+    # E1 goldens (ruling F-2, tools/check_e1_coverage.py): a non-finite Real input is E_DOMAIN by the finite rule,
+    # which comes before structural E_INPUT (HR-122)
+    err({"trades": [{**ok, "notional": "NaN"}]}, "E_DOMAIN", "E1: non-finite notional (NaN)")
+    err({"trades": [{k: v for k, v in {**ok, "market_value": "-Infinity"}.items() if k != "hedging_set"}]}, "E_DOMAIN",
+        "E1, two errors: market value -Infinity and no currency pair (the finite rule first)")
     s.write()
     return s
 
@@ -443,6 +454,10 @@ def gen_backtest():
     err(c, {"var": [1.0, 1.0], "actual": [0.0], "hypothetical": [0.0, 0.0]}, "E_INPUT", "series of different lengths")
     err(c, {"var": [1.0], "actual": ["x"], "hypothetical": [0.0]}, "E_SCHEMA", "a P&L that is not a number")
     err(c, {"var": [1.0, 1.0], "actual": [0.0], "hypothetical": ["x", 0.0]}, "E_SCHEMA", "two errors: lengths differ and a string")
+    # E1 goldens (ruling F-2, tools/check_e1_coverage.py): a non-finite Real is E_DOMAIN, before structural E_INPUT
+    err(c, {"var": [1.0, "NaN"], "actual": [0.0, 0.0], "hypothetical": [0.0, 0.0]}, "E_DOMAIN", "E1: non-finite VaR (NaN)")
+    err(c, {"var": [1.0, 1.0], "actual": ["Infinity"], "hypothetical": [0.0, 0.0]}, "E_DOMAIN",
+        "E1, two errors: actual P&L Infinity and series of different lengths (the finite rule first)")
     s.write()
     return s
 

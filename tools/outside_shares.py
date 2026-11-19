@@ -229,8 +229,14 @@ def load_stage_h():
 # blind at the golden's tolerance: a case whose `verified_by` says "not blind" (gap-decided fields, oracle-only
 # cases) or "only to 6 decimals" (idr_k-0001..0004 `bound`, compared at 1e-9 relative but blind-checked to 5e-7
 # absolute) does not count. The mpmath values are our own oracle and never count (KR-11).
+# Stage K wave 1b (integration 2026-11-19, program/STAGE_K_W1B_HANDOVER.md): a case also counts when its `verified_by`
+# records a figure printed in the regulator text with MATCH ("published: ... MATCH", CRE99 and MAR99 Table 2), as stage H
+# counts printed paper figures. SciPy `binom.cdf` checks on btk_k are not counted (KR-11 reading: SciPy checks one of the
+# compared outputs, not the zone, limits or flags); that class decision is the coordinator's.
 STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-5a", "rich_k": "K-8 guard",
-                 "e1_k": None, "e2_k": None}  # e1_k, e2_k: error cases only
+                 "e1_k": None, "e2_k": None,  # e1_k, e2_k: error cases only
+                 "saccr_k": "K-8d", "btk_k": "K-8e", "tlk_k": "F (existing traffic_light)"}
+K_PUBLISHED_SRC = "figure printed in the regulator text (Basel Framework CRE99, MAR99 Table 2)"
 
 
 def load_stage_k():
@@ -240,6 +246,8 @@ def load_stage_k():
             vb = " | ".join(c.get("verified_by", []))
             if "DR-H2" in vb and "MATCH" in vb and "not blind" not in vb and "only to 6 decimals" not in vb:
                 out[c["case_id"]] = (REDERIVED, H_REDERIVE_SRC)
+            elif any(v.startswith("published:") and "MATCH" in v for v in c.get("verified_by", [])):
+                out[c["case_id"]] = (REDERIVED, K_PUBLISHED_SRC)
     return out
 
 
@@ -398,7 +406,9 @@ def markdown(doc):
               "Ruling KR-11: SciPy checks only trig_k `false_alarm_rate`, one of four compared outputs, so no case is "
               "library-checked. A case counts as `independent-rederivation` only if the wave-1 blind lane (DR-H2) checked "
               "every compared output at the golden's tolerance; gap-decided, oracle-only and 6-decimal bound cases do not count. "
-              "The mpmath oracle is our own and never counts.", "",
+              "Wave 1b also counts a figure printed in the regulator text (CRE99 Examples 1 to 5, MAR99 Table 2) and the "
+              "seven SA-CCR cases the wave-1b blind lane matched (program/STAGE_K_BLIND_W1B.md); SciPy binomial checks on "
+              "btk_k are not counted. The mpmath oracle is our own and never counts.", "",
               "| Item | Suites | Value cases | Blind | Share | 60% per item |", "|---|---|---:|---:|---:|---|"]
         L += [f"| {it} | {', '.join('`' + s + '`' for s in v['suites'])} | {v['cases']} | {v['counted_with_rederivation']} | "
               f"{(v['share_with_rederivation'] or 0):.1%} | {'met' if v['meets_item_floor'] else 'NOT MET'} |" for it, v in ek["per_item"].items()]

@@ -369,10 +369,10 @@ mod tests {
     }
 
     #[test]
-    fn verbs_are_not_registered_yet() {
-        // Fails once the coordinator registers the module: then delete this test.
+    fn verbs_are_registered() {
+        // Registered in ops/mod.rs DOMAINS at integration (stage K round 1).
         for op in NAMES {
-            assert!(!crate::ops::operations().contains(op), "{op}");
+            assert!(crate::ops::operations().contains(op), "{op}");
         }
         assert!(dispatch("risk.none", &Inputs::new(&Json::Null)).is_none());
     }

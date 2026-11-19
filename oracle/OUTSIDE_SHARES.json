@@ -5025,34 +5025,34 @@
   },
   "K": {
    "without_sweeps": {
-    "cases": 28,
+    "cases": 79,
     "library-object": 0,
     "library-primitive": 0,
-    "independent-rederivation": 20,
+    "independent-rederivation": 55,
     "reimplementation": 0,
-    "none": 8,
+    "none": 24,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
-    "counted_with_rederivation": 20,
-    "share_with_rederivation": 0.714286,
+    "counted_with_rederivation": 55,
+    "share_with_rederivation": 0.696203,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 31
+    "error_and_invariance_cases": 70
    },
    "with_sweeps": {
-    "cases": 28,
+    "cases": 79,
     "library-object": 0,
     "library-primitive": 0,
-    "independent-rederivation": 20,
+    "independent-rederivation": 55,
     "reimplementation": 0,
-    "none": 8,
+    "none": 24,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
-    "counted_with_rederivation": 20,
-    "share_with_rederivation": 0.714286,
+    "counted_with_rederivation": 55,
+    "share_with_rederivation": 0.696203,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 31
+    "error_and_invariance_cases": 70
    },
    "sweeps": null,
    "libraries": {},
@@ -5133,6 +5133,66 @@
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 5
     },
+    "risk.backtest.traffic_light": {
+     "cases": 11,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 11,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 11,
+     "share_with_rederivation": 1.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 0
+    },
+    "risk.frtb.backtest.count": {
+     "cases": 1,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 0,
+     "reimplementation": 0,
+     "none": 1,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 0,
+     "share_with_rederivation": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 6
+    },
+    "risk.frtb.backtest.desk": {
+     "cases": 5,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 0,
+     "reimplementation": 0,
+     "none": 5,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 0,
+     "share_with_rederivation": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 2
+    },
+    "risk.frtb.backtest.zone": {
+     "cases": 18,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 12,
+     "reimplementation": 0,
+     "none": 6,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 12,
+     "share_with_rederivation": 0.666667,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 8
+    },
     "risk.intraday.delta_gamma_bound": {
      "cases": 5,
      "library-object": 0,
@@ -5147,10 +5207,44 @@
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 5
+    },
+    "risk.saccr.ead": {
+     "cases": 16,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 12,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 12,
+     "share_with_rederivation": 0.75,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 23
     }
    },
    "meets_floor": true,
    "per_item": {
+    "F (existing traffic_light)": {
+     "cases": 11,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 11,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 11,
+     "share_with_rederivation": 1.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 0,
+     "suites": [
+      "tlk_k"
+     ],
+     "meets_item_floor": true
+    },
     "K-4a": {
      "cases": 8,
      "library-object": 0,
@@ -5245,6 +5339,44 @@
       "rich_k"
      ],
      "meets_item_floor": true
+    },
+    "K-8d": {
+     "cases": 16,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 12,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 12,
+     "share_with_rederivation": 0.75,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 23,
+     "suites": [
+      "saccr_k"
+     ],
+     "meets_item_floor": true
+    },
+    "K-8e": {
+     "cases": 24,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 12,
+     "reimplementation": 0,
+     "none": 12,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 12,
+     "share_with_rederivation": 0.5,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 16,
+     "suites": [
+      "btk_k"
+     ],
+     "meets_item_floor": false
     }
    }
   }

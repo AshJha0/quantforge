@@ -1,6 +1,6 @@
 # FRTB internal models approach: backtesting zones and desk exception limits
 
-Spec version 0.1.0 (stage K round 1, wave 1b, plan item K-8e; written 2026-11-19). Status: implemented in Python only (`python/quantforge_core/frtb_backtest.py`); C++, Rust and Java to follow from the porting note in `program/STAGE_K_W1B_HANDOVER.md`. Rulings KR-40 to KR-47 (`specifications/stage-k-rulings-w1b.md`). Operations `risk.frtb.backtest.zone`, `risk.frtb.backtest.desk`, `risk.frtb.backtest.count`. Not yet in `cli-contract.md` (the coordinator adds it at integration).
+Spec version 0.1.0 (stage K round 1, wave 1b, plan item K-8e; written 2026-11-19). Status: implemented in all four builds (Python `python/quantforge_core/frtb_backtest.py`; ports per `program/STAGE_K_W1B_PORTS_HANDOVER.md`), registered at integration on `k-r1` 2026-11-19. Rulings KR-40 to KR-47 (`specifications/stage-k-rulings-w1b.md`). Operations `risk.frtb.backtest.zone`, `risk.frtb.backtest.desk`, `risk.frtb.backtest.count`. In `cli-contract.md` under stage K wave 1b (contract 1.17.0).
 
 **Plain idea.** A bank that uses its own model for market risk capital must check, every day, whether the loss it made was bigger than the model's one-day 99% value at risk. A correct model should be beaten about 2.5 days in 250. The regulator turns the count into a colour: green (nothing to see), amber (suspicious; capital goes up) and red (the model is almost certainly wrong; capital goes up most or the model is withdrawn). The boundaries come from the binomial distribution: amber starts at the count that a correct model would reach or stay under 95% of the time, red at 99.99%. Separately, each trading desk loses its permission to use the model if it has too many exceptions in a year.
 
@@ -51,6 +51,7 @@ Order (HR-122): `E_SCHEMA`, `E_LIMIT` (observations above 1,000,000, checked fir
 | btk_k-0019 to 0023 | desk at the limits (12 / 30 eligible, 13, 31), mixed, n = 300 | OUTSIDE (library): SciPy cdf; limits hand (KR-44) |
 | btk_k-0024 | exception counting with nulls and a loss equal to VaR | hand |
 | btk_k-0025 to 0038 | 14 error cases, four with two errors | hand |
+| btk_k-0039, 0040 | E1 goldens for `risk.frtb.backtest.count` (ruling F-2): a NaN VaR; an Infinity P&L with series of different lengths (two errors, the finite rule first), both `E_DOMAIN`; added at integration 2026-11-19. `zone` and `desk` take Integers only, where a non-finite token is `E_SCHEMA` (not an integer), so they can have no E1 golden: `desk` is listed in `conformance/E1_EXEMPT.json`; `zone` cannot be, because btk_k-0029 sends the Real 1.5 (open point for the coordinator) | hand |
 | tlk_k-0001 to 0011 | existing `risk.backtest.traffic_light` at 250, 0.99, 0 to 10 exceptions | OUTSIDE (published): MAR99 Table 2; OUTSIDE (library): SciPy |
 
 ## Acceptance (fixed before the goldens were generated)

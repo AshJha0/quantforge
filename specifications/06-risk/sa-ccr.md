@@ -1,6 +1,6 @@
 # SA-CCR: exposure at default for a derivatives netting set
 
-Spec version 0.1.0 (stage K round 1, wave 1b, plan item K-8d; written 2026-11-19). Status: implemented in Python only (`python/quantforge_core/saccr.py`); C++, Rust and Java to follow from the porting note in `program/STAGE_K_W1B_HANDOVER.md`. Rulings KR-30 to KR-39 (`specifications/stage-k-rulings-w1b.md`). Operation `risk.saccr.ead`. Not yet in `cli-contract.md` (the coordinator adds it at integration).
+Spec version 0.1.0 (stage K round 1, wave 1b, plan item K-8d; written 2026-11-19). Status: implemented in all four builds (Python `python/quantforge_core/saccr.py`; ports per `program/STAGE_K_W1B_PORTS_HANDOVER.md`), registered at integration on `k-r1` 2026-11-19. Rulings KR-30 to KR-39 (`specifications/stage-k-rulings-w1b.md`). Operation `risk.saccr.ead`. In `cli-contract.md` under stage K wave 1b (contract 1.17.0).
 
 **Plain idea.** If a counterparty defaults today, a bank loses what its derivatives with that counterparty are worth now, less the collateral it holds (the replacement cost), plus whatever they could grow to be worth before it can replace them (the potential future exposure). SA-CCR is the regulator's fixed recipe for both: no model, only the trades' sizes, maturities, directions and option deltas, a table of supervisory factors, and simple netting rules that let opposite trades offset fully, partly or not at all. The answer, exposure at default (EAD), is 1.4 times the sum.
 
@@ -74,12 +74,22 @@ Order (HR-122): `E_SCHEMA` (missing or mistyped key, value not in an enum list),
 | saccr_k-0006 | Example 1, no-offset IR formula | hand |
 | saccr_k-0007 to 0016 | FX pairs with a sold call; equity netting and an index put; CDO and second-to-default; electricity, gas, agriculture and a basis set; volatility and IR basis sets; shifted IR option, three buckets; daily margin illiquid and disputed (MPOR 40); own MPOR estimate 15; capped margined EAD; exactly offsetting FX (multiplier 0.05) | hand, mpmath oracle |
 | saccr_k-0017 to 0037 | 21 error cases, four with two errors at once | hand |
+| saccr_k-0038, 0039 | E1 goldens (ruling F-2): a NaN notional; a -Infinity market value with no currency pair (two errors, the finite rule first), both `E_DOMAIN`; added at integration 2026-11-19 | hand |
 
 ## Acceptance (fixed before the goldens were generated)
 
 - Rule KR-30: every figure is computed at full precision and compared with the printed figure after rounding half away from zero to the printed number of digits (CRE99.20). The five EADs and the printed intermediates of CRE99.29, 99.31, 99.32, 99.37 to 99.40, 99.47, 99.52, 99.54 to 99.58, 99.66, 99.68 to 99.79, 99.82 to 99.97 reproduce under this rule, with one recorded exception: CRE99.90 prints -7,100 for the Brent forward, which is twice the rounded 3,550, while full precision gives -7,099.30 (KR-31). That figure is accepted within 1 unit as a source rounding; it was found by the first test run, after the nearest-integer rule had been taken from CRE99.20, and is stated here rather than hidden.
 - All 37 cases pass in the Python build (local registration, 2026-11-19). Properties tested (`python/tests/test_stage_k_w1b.py`, Hypothesis, 150 examples): multiplier in [0.05, 1] (in (0.05, 1] in exact arithmetic; exp underflow reaches 0.05); aggregate add-on never above the sum of the trades' stand-alone add-ons; EAD non-decreasing when every notional is scaled up; EAD non-increasing in collateral.
-- Outside share: 5 of 16 value cases (31%) have a published check. There is no free independent SA-CCR library in the oracle environment; ORE has an SA-CCR implementation that could raise this share (not attempted in this lane).
+- Outside share: 12 of 16 value cases (75%, floor 60%). Five have a published check (CRE99 Examples 1 to 5); seven (saccr_k-0007 to 0012 and 0014) were re-derived blind by a second model and matched (DR-H2, `program/STAGE_K_BLIND_W1B.md`, evidence class measured). The other four hand cases (0006, 0013, 0015, 0016) also matched but are excluded, because the blind lane had read output facts for them in the unstripped spec once (a recorded process failure). The first figure written here, 5 of 16 (31%), counted the published checks only, before the blind lane ran. There is no free independent SA-CCR library in the oracle environment; ORE has an SA-CCR implementation (not attempted).
+
+## Convergence and limit cases
+
+SA-CCR is a closed-form formula: no iteration, grid or solver. The page names "Brent" only as the crude oil underlying of CRE99 Example 3, not Brent's root-finding method. The table records the limit cases the goldens pin instead of a convergence order.
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| Closed form (CRE52 steps 1 to 8) | none: exact formula in binary64 | none | V - C >= 0: multiplier exactly 1 before any exponential (KR-36, saccr_k-0001); add-on 0 with V - C < 0: multiplier at its floor 0.05 (saccr_k-0016) | KR-36 |
+| Margined cap (CRE52.2) | none | none | margined EAD above the unmargined EAD of the same trades and C is capped at the unmargined figure (saccr_k-0015) | KR-37 |
 
 ## Limits and scope
 

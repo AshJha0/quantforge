@@ -69,9 +69,11 @@
 #include "quantforge/core/term_curves.hpp"
 #include "quantforge/core/adaptive_exec.hpp"
 #include "quantforge/core/execution.hpp"
+#include "quantforge/core/frtb_backtest.hpp"
 #include "quantforge/core/microstructure.hpp"
 #include "quantforge/core/micro_est.hpp"
 #include "quantforge/core/paper.hpp"
+#include "quantforge/core/saccr.hpp"
 #include "quantforge/core/stage_k.hpp"
 #include "test_functions.hpp"
 
@@ -331,6 +333,7 @@ struct Entry {
 #include "ops_multiasset.inc"
 #include "ops_micro_est.inc"
 #include "ops_paper.inc"
+#include "ops_k_w1b.inc"
 #include "ops_stage_k.inc"
 
 // Every verb this build runs. The operations command, and dispatch, are generated from this list alone.
@@ -369,6 +372,7 @@ constexpr std::span<const Entry> registry[] = {
     multiasset_ops,
     micro_est_ops,
     paper_ops,
+    k_w1b_ops,
     stage_k_ops,
 };
 

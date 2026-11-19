@@ -10,10 +10,6 @@ mod limits;
 mod ops;
 #[cfg(test)]
 mod ops_j_tests;
-// Stage K wave 1b, unregistered until integration: replace with `mod kw1b;` in ops/mod.rs.
-#[cfg(test)]
-#[path = "ops/kw1b.rs"]
-mod ops_kw1b;
 #[cfg(test)]
 mod rulings_j_tests;
 

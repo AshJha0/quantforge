@@ -1325,6 +1325,69 @@
     "error"
    ],
    "description": "hand: two errors: lengths differ and a string"
+  },
+  {
+   "case_id": "btk_k-0039",
+   "operation": "risk.frtb.backtest.count",
+   "inputs": {
+    "var": [
+     1.0,
+     "NaN"
+    ],
+    "actual": [
+     0.0,
+     0.0
+    ],
+    "hypothetical": [
+     0.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: E1: non-finite VaR (NaN)"
+  },
+  {
+   "case_id": "btk_k-0040",
+   "operation": "risk.frtb.backtest.count",
+   "inputs": {
+    "var": [
+     1.0,
+     1.0
+    ],
+    "actual": [
+     "Infinity"
+    ],
+    "hypothetical": [
+     0.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: E1, two errors: actual P&L Infinity and series of different lengths (the finite rule first)"
   }
  ]
 }

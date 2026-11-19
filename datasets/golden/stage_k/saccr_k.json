@@ -1022,7 +1022,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W1B.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -1142,7 +1143,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W1B.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -1268,7 +1270,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W1B.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -1415,7 +1418,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W1B.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -1520,7 +1524,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W1B.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -1643,7 +1648,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W1B.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -2054,7 +2060,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W1B.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -2935,6 +2942,67 @@
     "error"
    ],
    "description": "hand: two errors: duplicate id and zero maturity"
+  },
+  {
+   "case_id": "saccr_k-0038",
+   "operation": "risk.saccr.ead",
+   "inputs": {
+    "trades": [
+     {
+      "id": "a",
+      "asset_class": "FX",
+      "notional": "NaN",
+      "market_value": 0,
+      "maturity": 1,
+      "position": "LONG",
+      "hedging_set": "EURUSD"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "saccr",
+    "error"
+   ],
+   "description": "hand: E1: non-finite notional (NaN)"
+  },
+  {
+   "case_id": "saccr_k-0039",
+   "operation": "risk.saccr.ead",
+   "inputs": {
+    "trades": [
+     {
+      "id": "a",
+      "asset_class": "FX",
+      "notional": 100,
+      "market_value": "-Infinity",
+      "maturity": 1,
+      "position": "LONG"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "saccr",
+    "error"
+   ],
+   "description": "hand: E1, two errors: market value -Infinity and no currency pair (the finite rule first)"
   }
  ]
 }

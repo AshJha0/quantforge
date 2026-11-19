@@ -553,7 +553,7 @@ TEST_CASE("K-8d/K-8e: the three golden suites replay in process through the hand
     }
 }
 
-TEST_CASE("K-8d/K-8e: input layer order and the unregistered verbs", "[k_w1b]") {
+TEST_CASE("K-8d/K-8e: input layer order and the registered verbs", "[k_w1b]") {
     const auto code = [](const char* op, const char* text) {
         const json::Parsed in = json::parse(text);
         const json::Parsed out = json::parse(cli::k_w1b_run(op, in.value));
@@ -565,6 +565,6 @@ TEST_CASE("K-8d/K-8e: input layer order and the unregistered verbs", "[k_w1b]") 
     CHECK(code("risk.saccr.ead", R"({"trades":[{"id":"a","asset_class":"FX","notional":1,"market_value":0,"maturity":1,"position":"LONG","hedging_set":"X"}],"margin":3})") == "E_SCHEMA");
     CHECK(code("risk.frtb.backtest.desk", R"({"observations":1000001,"exceptions_99_actual":-1,"exceptions_99_hypothetical":0,"exceptions_975_actual":0,"exceptions_975_hypothetical":0})") == "E_LIMIT");
     CHECK(code("risk.saccr.ead", R"({"trades":[{"id":"o","asset_class":"EQUITY","notional":10,"market_value":1,"maturity":1,"position":"SOLD","kind":"OPTION","option_type":"PUT","underlying_price":1,"strike":1,"exercise":1,"shift":0.5,"entity":"E","subclass":"INDEX","treatment":"NORMAL"}],"collateral":1,"ir_offset":false,"margin":{"threshold":0,"mta":0,"nica":0,"remargin_days":1,"mpor_days":12,"illiquid":false,"disputes":false}})") == "ok");
-    // Remove this check when the coordinator registers k_w1b_ops in dispatch.cpp.
-    for (const auto& e : cli::k_w1b_ops) CHECK_FALSE(cli::k_w1b_registered(e.verb));
+    // Registered in dispatch.cpp at integration (stage K round 1).
+    for (const auto& e : cli::k_w1b_ops) CHECK(cli::k_w1b_registered(e.verb));
 }

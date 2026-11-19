@@ -1,6 +1,7 @@
 package org.quantforge.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -106,11 +107,11 @@ class StageKW1bCliTest {
     }
 
     @Test
-    void registersFourVerbsAndNoCollision() {
+    void registersFourVerbs() {
         assertEquals(List.of("risk.saccr.ead", "risk.frtb.backtest.zone", "risk.frtb.backtest.desk",
                 "risk.frtb.backtest.count"), new ArrayList<>(TABLE.keySet()));
         for (String op : TABLE.keySet()) {
-            assertEquals(null, Operations.find(op), op + " already registered: drop it from this test at integration");
+            assertNotNull(Operations.find(op), op + " is not registered in Operations.MODULES");
         }
     }
 

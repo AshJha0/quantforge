@@ -13,6 +13,7 @@ mod exotic;
 mod fx;
 mod hedge;
 mod infl;
+mod kw1b;
 mod lmm;
 mod mbs;
 mod mcgreeks;
@@ -118,6 +119,7 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("risk", riskcarry::NAMES, riskcarry::dispatch),
     ("risk", riskw2::NAMES, riskw2::dispatch),
     ("risk", w3::risk::NAMES, w3::risk::dispatch),
+    ("risk", kw1b::NAMES, kw1b::dispatch),
     ("risk", stagek::risk::NAMES, stagek::risk::dispatch),
     ("usecase", usecase::NAMES, usecase::dispatch),
     (
