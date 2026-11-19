@@ -29,5 +29,6 @@
  "paper.ledger.verify": "existing exemption rule (no Real input): takes only ledger text, has no numeric or decimal input, and reports bad lines as a verify result, never an error (paper-trading.md); maintainer decision 2026-11-18, stage-h-rulings-h21.md. F-2a's 'nothing exempted' refers to the decimal-string refinement only",
  "rates.schedule.generate": "no Real input in any golden: a non-finite value cannot be sent",
  "research.cv.cpcv_paths": "no Real input in any golden: a non-finite value cannot be sent",
- "risk.frtb.backtest.desk": "no Real input in any golden: a non-finite value cannot be sent (five Integer counts; a non-finite token is E_SCHEMA, not an integer)"
+ "risk.frtb.backtest.desk": "no Real input in any golden: a non-finite value cannot be sent (five Integer counts; a non-finite token is E_SCHEMA, not an integer)",
+ "risk.frtb.backtest.zone": "no Real input in any golden except btk_k-0029, which expects E_SCHEMA (a non-integer count is refused; ruling KR-112, owner decision 2026-11-19): three Integer counts; a non-finite token is E_SCHEMA, not an integer"
 }
