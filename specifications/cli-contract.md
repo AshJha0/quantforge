@@ -285,7 +285,7 @@ Batch notes for these operations: `vol.garch.fit`, `rates.cap.strip`, `rates.bon
 Stage F changes one rule for every operation and adds no error code. `stage-f-rulings.md` is normative.
 
 - **Non-finite tokens (F-1).** A Real input may be the string `"NaN"`, `"Infinity"` or `"-Infinity"`. This is the only change to the wire format; the value-encoding table above still holds for every other value. Outputs never carry these strings: a non-finite output is `E_NON_FINITE` as before.
-- **Finite rule (F-2, plan item E1).** The first rule check of every operation is that every Real input is finite; otherwise `E_DOMAIN`. Order of checks becomes `E_PARSE`, `E_SCHEMA`, `E_LIMIT`, the finite rule, then the operation's own checks.
+- **Finite rule (F-2, plan item E1).** The first rule check of every operation is that every Real input is finite; otherwise `E_DOMAIN`. Order of checks becomes `E_PARSE`, `E_SCHEMA`, `E_LIMIT`, the finite rule, then the operation's own checks. For the stage H operations the own checks are structural `E_INPUT` before `E_DOMAIN`, and a limit that only arises after validation is last (HR-122, which reconciles HR-66 with this order; goldens `rule_h`).
 - **Negative zero (F-3).** `-0.0` gives the same result as `0.0`.
 
 Stage F operations are added to the table below as each wave lands.
@@ -432,13 +432,13 @@ No new error code. Prices, quantities and fees are decimal strings (HR-12); outp
 
 ## Stage H multi-asset operations (H-22, H-23, H-24)
 
-Rulings `stage-h-rulings-multiasset.md` HR-80 to HR-103 and the 2026-11-18 rule-version rulings. No new error code; error order HR-66. Decimals are HR-12 decimal strings; venue and simulator outputs (`exec.*`) carry `label` (HR-94), convention outputs (`micro.*`) none (HR-111). `exec.sim.lit.run` gains optional `session` and `PHASE` events (HR-112, goldens `ses_h`); `exec.sim.dark.run` `config.asset_class` and `exec.sor.allocate` `asset_class` on the order and venues (HR-93; other classes on a dark venue are `E_INPUT`, HR-113; goldens `acls_h`). Goldens `datasets/golden/stage_h/auc_h.json`, `eqc_h.json`, `fxc_h.json`, `fxv_h.json`, `rtc_h.json`, `fut_h.json`, E1 cases `e1_h4.json` (`oracle/python/gen_stage_h_ma.py`). Implemented in all four builds (the Rust build reuses its lit engine for `exec.sim.fut.run`). Integer inputs within +-(2^53-1), `request_index` within 0..2^32-1, else `E_LIMIT` (HR-116).
+Rulings `stage-h-rulings-multiasset.md` HR-80 to HR-103 and the 2026-11-18 rule-version rulings, with HR-118 to HR-120 of 2026-11-19 (compliance dates per rule). No new error code; error order HR-122 (which reconciles HR-66 with "Error precedence" above). Decimals are HR-12 decimal strings; venue and simulator outputs (`exec.*`) carry `label` (HR-94), convention outputs (`micro.*`) none (HR-111). `exec.sim.lit.run` gains optional `session` and `PHASE` events (HR-112, goldens `ses_h`); `exec.sim.dark.run` `config.asset_class` and `exec.sor.allocate` `asset_class` on the order and venues (HR-93; other classes on a dark venue are `E_INPUT`, HR-113; goldens `acls_h`). Goldens `datasets/golden/stage_h/auc_h.json`, `eqc_h.json`, `fxc_h.json`, `fxv_h.json`, `rtc_h.json`, `fut_h.json`, E1 cases `e1_h4.json` (`oracle/python/gen_stage_h_ma.py`). Implemented in all four builds (the Rust build reuses its lit engine for `exec.sim.fut.run`). Integer inputs within +-(2^53-1), `request_index` within 0..2^32-1, else `E_LIMIT` (HR-116).
 
 | Operation | Spec | Inputs | Outputs |
 |---|---|---|---|
 | `micro.eq.round_price` | `09-microstructure/asset-conventions.md` 1.1 | `price`, `side`, optional `tick_table`, `tick_tier` (`PENNY`, `HALF_PENNY`), `as_of`, `compliance_date` | `price` at the tick decimals |
-| `micro.eq.fee_check` | same 1.5 | `price`, `taker_fee`, `cap_check` (default true), `as_of` | `cap`, `taker_fee` |
-| `micro.eq.round_lot` | same 1.2 | `price`, `as_of` | `round_lot` |
+| `micro.eq.fee_check` | same 1.5 | `price`, `taker_fee`, `cap_check` (default true), `as_of`, `compliance_date` | `cap`, `taker_fee` |
+| `micro.eq.round_lot` | same 1.2 | `price`, `as_of`, `compliance_date` | `round_lot` |
 | `micro.eq.settle_date` | same 1.6 | `trade_date`, `settle_lag` (default 1), `holidays` | `settle_date` |
 | `exec.sim.auction.uncross` | `10-execution/auction.md` | `orders` (`id`, `side`, `limit` or `MARKET`, `qty` Integer, `seq`, `on_close`), `tick_size`, `ref_price`, `phase`, `tie_break` (`CBOE` default, `IEX`); orders up to 10,000,000, candidates up to 1,000,000 | `price`, `volume`, `imbalance`, `fills`, `residual`, `cancelled` |
 | `micro.fx.pip_value` | `asset-conventions.md` 2.1 | `pair`, `notional` | `pip_value`, `currency` |
@@ -471,7 +471,7 @@ Rulings `stage-h-rulings-micro.md` HR-70 to HR-75 as amended (HR-66). No new err
 
 ### Stage H wave 2 execution (H-14, H-17; rulings HR-59 to HR-66)
 
-Specs `10-execution/adaptive-algos.md` and `10-execution/tca-pretrade.md`. No new error code; error precedence HR-66 (`E_SCHEMA`, structural `E_INPUT`, `E_DOMAIN`, `E_LIMIT`). `n_buckets` at most 100,000 and attribution `fills` at most 1,000,000 (as HR-9). Goldens `datasets/golden/stage_h/alg_h.json` and `tcx_h.json` (`oracle/python/gen_stage_h_w2_exec.py`); E1 goldens (F-2: a NaN at one Real input is `E_DOMAIN`) in `e1_h3.json`. Implemented in all four builds; an unlisted `side`, `pair_mode` or `mode` is `E_SCHEMA` (`enum_h.json`). `mode` is `UNITS` or `CONTINUOUS` (absent: `CONTINUOUS`); `side` is `BUY` or `SELL`.
+Specs `10-execution/adaptive-algos.md` and `10-execution/tca-pretrade.md`. No new error code; error precedence HR-122 (`E_SCHEMA`, `E_LIMIT` for a size limit on the input, the finite rule, structural `E_INPUT`, `E_DOMAIN`; it narrows HR-66's "`E_LIMIT` last" to limits that arise after validation). `n_buckets` at most 100,000 and attribution `fills` at most 1,000,000 (as HR-9). Goldens `datasets/golden/stage_h/alg_h.json` and `tcx_h.json` (`oracle/python/gen_stage_h_w2_exec.py`); E1 goldens (F-2: a NaN at one Real input is `E_DOMAIN`) in `e1_h3.json`. Implemented in all four builds; an unlisted `side`, `pair_mode` or `mode` is `E_SCHEMA` (`enum_h.json`). `mode` is `UNITS` or `CONTINUOUS` (absent: `CONTINUOUS`); `side` is `BUY` or `SELL`.
 
 | Operation | Spec | Inputs | Outputs |
 |---|---|---|---|

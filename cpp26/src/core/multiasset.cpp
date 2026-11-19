@@ -342,12 +342,12 @@ string fmt_scaled(bool negative, const Big& q, int scale) {
 D fee_cap_current() { return D::parse("0.001"); }
 D fee_cap_old() { return D::parse("0.003"); }
 
-bool current_rules(const Value& raw) {
+bool current_rules(const Value& raw, std::string_view compliance) {
     const Value* cv = raw.find("compliance_date");
-    const Value dflt = [] {
+    const Value dflt = [compliance] {
         Value v;
         v.kind = Kind::String;
-        v.text = string(rule_2024_compliance);
+        v.text = string(compliance);
         return v;
     }();
     const Date cd = to_date(cv ? cv : &dflt, "compliance_date");
@@ -364,7 +364,7 @@ Table tick_table(const Value& raw) {
             fail("E_SCHEMA", "tick_tier", "not PENNY or HALF_PENNY");
         tier = t->text;
     }
-    const bool current = current_rules(raw);
+    const bool current = current_rules(raw, tick_fee_compliance);
     const bool half = tier == "HALF_PENNY";
     if (half && !current) fail("E_INPUT", "tick_tier", "HALF_PENNY before the compliance date");
     if (half && raw.find("tick_table")) fail("E_INPUT", "tick_tier", "HALF_PENNY with an explicit tick_table");
@@ -561,7 +561,7 @@ void eq_fee_check(const Value& raw, Writer& out) {
     const D price = dec(raw, "price");
     const D fee = dec(raw, "taker_fee");
     const bool check = bool_or(raw, "cap_check", true);
-    const D cap_rate = current_rules(raw) ? fee_cap_current() : fee_cap_old();  // [REGNMS-610]
+    const D cap_rate = current_rules(raw, tick_fee_compliance) ? fee_cap_current() : fee_cap_old();  // [REGNMS-610]
     if (price.sign() <= 0) fail("E_DOMAIN", "price", "price must be positive");
     const D cap = price >= one() ? cap_rate : cap_rate * price;
     if (check && fee > cap) fail("E_DOMAIN", "taker_fee", "taker_fee above the Rule 610 cap");
@@ -571,7 +571,7 @@ void eq_fee_check(const Value& raw, Writer& out) {
 
 void eq_round_lot(const Value& raw, Writer& out) {
     const D price = dec(raw, "price");
-    const bool current = current_rules(raw);
+    const bool current = current_rules(raw, round_lot_compliance);
     if (price.sign() <= 0) fail("E_DOMAIN", "price", "price must be positive");
     long long lot = 100;
     if (current) {  // amended Reg NMS 242.600(b)(93)

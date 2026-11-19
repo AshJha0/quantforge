@@ -10,7 +10,7 @@ Sources:
 - Hand calculation for as_h-0001 to 0004, then Blind re-derivation (DR-H2, 2026-11-15, second lane, mpmath 40 digits, inputs only; STAGE_H_BLIND_REDERIVATION.md): as_h-0001..0004 MATCH (spread 2.9e-11 relative, print rounding; as_h-0004 E_DOMAIN): outside-checked per DR-H2. as_h-0005..0007 are outside-checked against the printed paper tables (blind lane also matched them).
 
 ## `micro.mm.as_quotes`
-Inputs `mid` s, `inventory` q (signed), `risk_aversion` gamma (> 0), `sigma` (>= 0), `time_left` (>= 0), `k` (> 0). Outputs `reservation`, `spread`, `bid = r - spread/2`, `ask = r + spread/2`. gamma <= 0 or k <= 0: `E_DOMAIN`.
+Inputs `mid` s, `inventory` q (signed), `risk_aversion` gamma (> 0), `sigma` (>= 0), `time_left` (>= 0), `k` (> 0). Outputs `reservation`, `spread`, `bid = r - spread/2`, `ask = r + spread/2`. gamma <= 0, k <= 0, sigma < 0 or time_left < 0: `E_DOMAIN` (HR-123).
 
 ## Golden cases
 | Case | Input | Expected | Derivation |

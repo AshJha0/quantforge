@@ -16,7 +16,7 @@ Inputs `quantity` X (> 0), `adv` (average daily volume, > 0), `daily_vol` sigma 
 - `impact_bps` = `b1 istar_bps p^a4 + (1 - b1) istar_bps`
 - `spread_bps` = `half_spread_bps`
 - `expected_cost_bps` = `spread_bps + impact_bps`
-- `duration_days` T = `X / (p adv)` (HR-64)
+- `duration_days` T = `X / (p adv)` (HR-64). `adv` is the average daily volume **including** the order's own volume, so p is the share of total volume as in HR-4. With a historical ADV that excludes the order the duration would be `X (1 - p) / (p adv)`; that variant is not implemented (audit HA-4)
 - `timing_risk_bps` = `1e4 sigma sqrt(T / 3)` (one standard deviation; NOT added to the expected cost, HR-64)
 - with `price`: `expected_cost` = `expected_cost_bps X P / 1e4`, `timing_risk` = `timing_risk_bps X P / 1e4`.
 Errors: X <= 0: `E_INPUT`; adv <= 0, sigma < 0, p outside (0, 1), half spread < 0, a1 <= 0, b1 outside [0, 1], P <= 0: `E_DOMAIN`. sigma = 0 with a3 <= 0 is `E_DOMAIN` (0 to a non-positive power).

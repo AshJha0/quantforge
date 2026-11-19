@@ -122,8 +122,8 @@ Vec vwap(double x, const Vec& w, Mode mode) {
 
 Pov pov(double x, double p, const Vec& mv, Mode mode) {
     check_quantity(x, mode);
+    if (mv.empty()) input("market_volume", "must not be empty");  // structural E_INPUT first (HR-66, HR-122)
     if (!(p > 0 && p < 1)) domain("participation", "must lie in (0, 1)");
-    if (mv.empty()) input("market_volume", "must not be empty");
     for (const double v : mv)
         if (v < 0) domain("market_volume", "must be non-negative");
     const double ratio = 1 - p;
@@ -151,8 +151,9 @@ AcTrajectory ac_trajectory(const AcParams& p, double lambda) {
 }
 
 AcFrontier ac_frontier(const AcParams& p, const Vec& lambdas) {
+    // An empty list is structural: after the other E_INPUT checks, before every E_DOMAIN (HR-122).
+    if (p.n_steps >= 1 && p.quantity > 0 && lambdas.empty()) input("risk_aversions", "must not be empty");
     const double eta_tilde = check_ac(p);
-    if (lambdas.empty()) input("risk_aversions", "must not be empty");
     for (const double l : lambdas) check_lambda(l);
     AcFrontier f{lambdas, Vec(lambdas.size()), Vec(lambdas.size())};
     for (std::size_t i = 0; i < lambdas.size(); ++i) {

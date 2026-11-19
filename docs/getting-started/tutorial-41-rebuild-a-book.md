@@ -6,7 +6,7 @@ The plain idea: a crypto venue's level-2 feed sends one snapshot of the book and
 
 You will replay two of the spec's golden feeds through `micro.book.rebuild`: a snapshot followed by a deletion, and a snapshot deeper than the requested depth. Budget 10 minutes.
 
-<p class="note">Available from v0.10.0 (unreleased). The operation is implemented in all four builds on branch <code>stage-h2</code>; this page drives the Python build in process. Every number below is a spec golden from <code>datasets/golden/stage_h/ob_h.json</code>, and the script stops if the build disagrees with it.</p>
+<p class="note">Available from v0.10.0. The operation is implemented in all four builds; this page drives the Python build in process. Every number below is a spec golden from <code>datasets/golden/stage_h/ob_h.json</code>, and the script stops if the build disagrees with it.</p>
 
 Terms, defined here. A **level** is one price on one side with the total quantity resting there; the feed never shows single orders. **Depth** is how many levels per side you keep (the venue's subscription depth: 10, 25, 100, 500 or 1000). The **checksum** is a CRC32 over the top ten levels written as digit strings, as the venue defines it ([KR-CRC]). Prices and quantities are **decimal strings** at the venue's precision (ruling HR-12), never floats.
 

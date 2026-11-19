@@ -254,7 +254,7 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 
 ## Stage H terms
 
-Stage H (v0.10.0, unreleased, execution and microstructure) is implemented in all four languages, the `paper.*` operations included; these terms are defined as its specs use them (`specifications/09-microstructure/`, `specifications/10-execution/`).
+Stage H (v0.10.0, execution and microstructure) is implemented in all four languages, the `paper.*` operations included; these terms are defined as its specs use them (`specifications/09-microstructure/`, `specifications/10-execution/`).
 
 | Term | Meaning |
 |---|---|
@@ -307,6 +307,22 @@ Stage H (v0.10.0, unreleased, execution and microstructure) is implemented in al
 | Close algorithm | Puts up to a participation cap of the forecast closing auction into the auction and spreads the rest over a profile |
 | Liquidity seeking | Takes a fixed share of the depth inside a limit price in each bucket |
 | Cash-balanced pair | Two legs on opposite sides traded so that cash paid and received stay close in every bucket |
+| Tick size | The smallest price step on a venue. US equities: 0.0001 below 1.00 and 0.01 at or above; the amended Rule 612 adds a 0.005 tier with compliance date 2027-11-01 (`micro.eq.round_price`, HR-81, HR-120) |
+| Round lot | The standard order size: 100, 40, 10 or 1 shares by price since the first business day of November 2025, 100 at every price before (`micro.eq.round_lot`, HR-82, HR-120) |
+| Access fee cap | The most a venue may charge to take a displayed quote: 0.003 a share today; the amended 0.001 cap has compliance date 2027-11-01 (`micro.eq.fee_check`, HR-85, HR-120) |
+| Compliance date | The date from which an amended rule must be followed. An input (`compliance_date`) with a default per rule; `as_of` on or after it selects the amended text, and so does no `as_of` at all (HR-120) |
+| T+1 | Settlement one good business day after the trade date (`micro.eq.settle_date`, HR-86) |
+| Pip | The unit of an FX spot quote: 0.0001, or 0.01 when JPY is the quote currency (`micro.fx.pip_value`, HR-87) |
+| Spot date | The normal FX value date: T+2 good days, T+1 for USDCAD (`micro.fx.spot_date`, HR-89) |
+| Last look | A dealer's short hold before accepting a request. In the simulated FX venue: reject `LL_PRICE` if the mid moved past a threshold, `LL_RANDOM` at a stated random rate, else fill (HR-97). The thresholds are the spec's own, not from the FX Global Code (HR-119) |
+| 32nds | Treasury price notation `H-FF[q]`: handle, 32nds, and an optional third digit in quarters of a 32nd (0, 2, 5, 7, or `+` for a half). Eighth-tick contracts are not supported (HR-109, HR-118) |
+| Tick value | The cash value of one tick on one futures contract: face x tick / 100, 15.625 for ZN and 31.25 for ZB (HR-91) |
+| Variation margin | The daily cash move from marking a futures position to the settlement price (`exec.sim.fut.variation`) |
+| Call auction and uncrossing | Orders collect without trading; uncrossing picks the one price with the largest matched volume and fills everyone there (`exec.sim.auction.uncross`, HR-84) |
+| Imbalance (auction) | Buy minus sell quantity at the uncrossing price; positive is a buy surplus |
+| Session phase | PRE_OPEN, CONTINUOUS, PRE_CLOSE or CLOSED in the simulated lit engine; an order sent in the wrong phase is rejected `PHASE` (HR-112) |
+| Blind re-derivation | A second lane works out the expected outputs from the rules and inputs alone, without seeing the answers. It catches arithmetic and convention slips; it cannot catch a wrong rule, because it reads the same rules (DR-H2) |
+| Order of checks | The fixed order in which a stage H operation validates its inputs, so that a request with two faults gets the same code in every build: `E_SCHEMA`, `E_LIMIT` on input size, non-finite `E_DOMAIN`, structural `E_INPUT`, `E_DOMAIN` (HR-122) |
 | I-star | Pre-trade impact form `a1 (X/ADV)^a2 sigma^a3` in bp, split into temporary and permanent parts by `b1` ([Kis13], recalled) |
 | Timing risk | One standard deviation of the price move while the order works; reported beside, not added to, expected cost |
 | Spread cost | In attribution, what fills paid against the mid at the fill time; negative means price improvement |

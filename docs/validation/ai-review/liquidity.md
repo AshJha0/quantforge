@@ -72,7 +72,7 @@ Class `simple_analytic`. Evidence (J-C-9): `liqcurve_j-0001` and `-0002` are han
 
 ## Sources
 
-- [TLD11] B. Toth, Y. Lemperiere, C. Deremble, J. de Lataillade, J. Kockelkoren, J.-P. Bouchaud, "Anomalous price impact and the critical nature of liquidity in financial markets", *Physical Review X* 1 (2011) 021006, open access. `I = Y sigma sqrt(Q/V)`, `Y` of order one. Evidence class: paper, recalled (the stage H draft records the same form; equation number not verified).
+- [TLD11] B. Toth, Y. Lemperiere, C. Deremble, J. de Lataillade, J. Kockelkoren, J.-P. Bouchaud, "Anomalous price impact and the critical nature of liquidity in financial markets", *Physical Review X* 1 (2011) 021006, open access. `I = Y sigma sqrt(Q/V)`, `Y` of order one. Evidence class: paper, read 2026-11-18 (arXiv:1105.1694v3, eq. (1); see `impact.md`). [TLD11]'s impact depends on Q/V on the day, not on the execution horizon; the 1/h scaling used here is the rate form of [AFTHL05], not of [TLD11] (audit HA-25).
 - [AFTHL05] R. Almgren, C. Thum, E. Hauptmann, H. Li, "Direct estimation of equity market impact", *Risk* July 2005, 57-62 (free preprint). Temporary impact a power of the trading rate, exponent near 3/5. Evidence class: paper, recalled.
 - [AC00] R. Almgren, N. Chriss, "Optimal execution of portfolio transactions", *Journal of Risk* 3(2) 2000, 5-39 (free preprint). Variance of the linear trajectory, continuous limit `sigma^2 X^2 T / 3`. Evidence class: paper, recalled; checked here by integrating `sigma^2 x(t)^2` with `x(t) = X (1 - t/T)` over `[0, T]`, which gives `sigma^2 X^2 T / 3`.
 

@@ -34,12 +34,14 @@ RATES_LABEL = "simulated venue; not a real exchange; no real rates data"
 
 DEFAULT_TICK_TABLE = (("0", "0.0001"), ("1.00", "0.01"))  # [REGNMS-612], penny tier
 HALF_PENNY_TABLE = (("0", "0.0001"), ("1.00", "0.005"))  # [REGNMS-612] current, narrow-spread tier
-# Dated rule versions (coordinator ruling 2026-11-18 after the HR-98 source check): the current
-# Rule 612/610 text applies on and after RULE_2024_COMPLIANCE; an `as_of` before it selects the old
-# regime. Default: the first business day of November 2025 for Rules 612, 610 and 600(b)(93), read
-# 2026-11-18 in the adopting release 34-101070, section VI; any later SEC extension is UNVERIFIED (HR-110).
+# Dated rule versions (HR-104 to HR-106, HR-110, HR-120): the 2024-amended text applies on and after
+# its compliance date; an `as_of` before it selects the old regime; no `as_of` means the amended text.
+# Round lots, Rule 600(b)(93): the first business day of November 2025 (adopting release 34-101070,
+# section VI; not stayed). Tick sizes and fee caps, Rules 612 and 610(c): deferred by SEC order
+# 34-105656 (2026-06-11, read 2026-11-19) to the first business day of November 2027.
 # Fee caps per share at $1.00 or more, and as a fraction of price below.
-RULE_2024_COMPLIANCE = "2025-11-03"
+ROUND_LOT_COMPLIANCE = "2025-11-03"
+TICK_FEE_COMPLIANCE = "2027-11-01"
 FEE_CAP_CURRENT = (Decimal("0.001"), Decimal("0.001"))  # [REGNMS-610] read 2026-11-18
 FEE_CAP_OLD = (Decimal("0.003"), Decimal("0.003"))
 CCY_ORDER = ("EUR", "GBP", "AUD", "NZD", "USD", "CAD", "CHF", "JPY")  # HR-88
@@ -166,9 +168,9 @@ def _exact(fn: Callable[..., dict[str, Any]]) -> Callable[..., dict[str, Any]]:
 # ------------------------------------------------------------------ equities (H-22)
 
 
-def _current(raw: dict[str, Any]) -> bool:
-    """True when the current (2024-amended) Rule 612/610 text applies at `as_of`."""
-    cd = _date(raw.get("compliance_date", RULE_2024_COMPLIANCE), "compliance_date")
+def _current(raw: dict[str, Any], compliance: str) -> bool:
+    """True when the 2024-amended text applies at `as_of`; `compliance` is the rule's default date."""
+    cd = _date(raw.get("compliance_date", compliance), "compliance_date")
     return "as_of" not in raw or _date(raw["as_of"], "as_of") >= cd
 
 
@@ -176,7 +178,7 @@ def _tick_table(raw: dict[str, Any]) -> list[tuple[Decimal, Decimal]]:
     tier = raw.get("tick_tier", "PENNY")
     if tier not in ("PENNY", "HALF_PENNY"):
         raise QfError("E_SCHEMA", "tick_tier: not PENNY or HALF_PENNY", "tick_tier")
-    current = _current(raw)
+    current = _current(raw, TICK_FEE_COMPLIANCE)
     if tier == "HALF_PENNY" and not current:
         raise QfError("E_INPUT", "tick_tier HALF_PENNY before the compliance date", "tick_tier")
     if tier == "HALF_PENNY" and "tick_table" in raw:
@@ -228,7 +230,7 @@ def eq_fee_check(raw: dict[str, Any]) -> dict[str, Any]:
     price = _dec(raw, "price")
     fee = _dec(raw, "taker_fee")
     check = _bool(raw, "cap_check", True)
-    per_share, frac = FEE_CAP_CURRENT if _current(raw) else FEE_CAP_OLD
+    per_share, frac = FEE_CAP_CURRENT if _current(raw, TICK_FEE_COMPLIANCE) else FEE_CAP_OLD
     if price <= 0:
         raise QfError("E_DOMAIN", "price must be positive", "price")
     cap = per_share if price >= 1 else _c(frac * price)
@@ -265,7 +267,7 @@ def eq_round_lot(raw: dict[str, Any]) -> dict[str, Any]:
     """`micro.eq.round_lot` (HR-82 as dated rule versions): 100 shares under the old regime; under
     the current one 100 up to $250.00, 40 to $1,000.00, 10 to $10,000.00 and 1 above."""
     price = _dec(raw, "price")
-    current = _current(raw)
+    current = _current(raw, ROUND_LOT_COMPLIANCE)
     if price <= 0:
         raise QfError("E_DOMAIN", "price must be positive", "price")
     lot = 100

@@ -9,7 +9,7 @@ Rules for your answer:
 - After the table, list the questions you answered "cannot check", and why.
 - Your review is filed under a labelled "AI review" section of the curve's evidence checklist and checked against the repository before anything is acted on.
 
-Stage: H. Evidence line from the project's curve table: Implemented on `stage-h` (v0.10.0, unreleased), all four languages; `ac_h` 10 goldens (5 value: 1 also against the paper's printed figure, 3 counted blind re-derived).
+Stage: H. Evidence line from the project's curve table: Implemented (v0.10.0), all four languages; `ac_h` 10 goldens (5 value: 1 also against the paper's printed figure, 3 counted blind re-derived).
 
 ## Questions
 

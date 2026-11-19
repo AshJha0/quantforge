@@ -1,6 +1,6 @@
 # Market impact curves: square-root and Obizhaeva-Wang
 
-<p class="note">Stage H, v0.10.0 (unreleased). The operations are built in all four languages (spec version 0.1.0, confirmed 2026-11-18), but this page is still written by hand from the spec's golden cases, not generated from CLI runs. The coefficient <code>Y</code> is assumed, not estimated; no number here describes a real venue.</p>
+<p class="note">Stage H, v0.10.0. The operations are built in all four languages (spec version 0.1.0, confirmed 2026-11-18), but this page is still written by hand from the spec's golden cases, not generated from CLI runs. The coefficient <code>Y</code> is assumed, not estimated; no number here describes a real venue.</p>
 
 ## What it is
 

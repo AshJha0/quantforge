@@ -970,7 +970,7 @@ Each stage's definition of done adds entries for its new models and re-dates eve
 
 ## Stage H (v0.10.0, not tagged)
 
-Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings HR-1 to HR-41; HR-42 to HR-55 for paper trading; HR-56 for wave 1 input rules). The wave 1 operations (MH-6 to MH-10, and use case 5) are implemented in all four languages on branch `stage-h` with a generated suite in `datasets/golden/stage_h/` (63 cases with `e1_h`, each build passes all, local, 2026-11-18); their outside check is a blind second-lane re-derivation or a printed paper figure (DR-H2), 23 of 29 value cases, no library. The wave 2 operations (book rebuild, lit matching, dark pool, router) are implemented in all four languages on branch `stage-h2` (round 2, 2026-11-18); round 3 adds the estimators, venue analytics, adaptive algos, TCA and the `paper.*` operations, all in four languages. Stage H has 98 of 123 value cases (79.7%) outside-checked by DR-H2 blind re-derivation or printed paper figures, none by a library (`oracle/OUTSIDE_SHARES.md`). Each entry is re-dated when its operation lands.
+Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings HR-1 to HR-41; HR-42 to HR-55 for paper trading; HR-56 for wave 1 input rules; HR-80 to HR-120 for the multi-asset round; HR-121 to HR-129 from the different-model audit of 2026-11-19, which reported 0 Critical, 17 Major and 15 Minor findings, all ruled, with three code faults fixed in all four builds). The wave 1 operations (MH-6 to MH-10, and use case 5) are implemented in all four languages on branch `stage-h` with a generated suite in `datasets/golden/stage_h/` (63 cases with `e1_h`, each build passes all, local, 2026-11-18); their outside check is a blind second-lane re-derivation or a printed paper figure (DR-H2), 23 of 29 value cases, no library. The wave 2 operations (book rebuild, lit matching, dark pool, router) are implemented in all four languages on branch `stage-h2` (round 2, 2026-11-18); round 3 adds the estimators, venue analytics, adaptive algos, TCA and the `paper.*` operations, all in four languages. Round 4 adds the multi-asset conventions and venues (MH-17 to MH-20), in all four languages. Stage H has 160 of 205 value cases (78.0%) outside-checked by DR-H2 blind re-derivation or printed paper figures, none by a library (`oracle/OUTSIDE_SHARES.md`). A blind lane reads the same rules as the first lane, so it catches arithmetic and convention slips, not a wrong rule (the HR-120 compliance dates were corrected by reading the SEC order). Each entry is re-dated when its operation lands.
 
 ### MH-1 Order book rebuild (stage H wave 1b)
 - **Purpose:** MBP book rebuilt from the Kraken v2 L2 feed, checksum, crossed, locked and gap counting (`micro.book.rebuild`, H-2).
@@ -1167,20 +1167,20 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MH-17 Equity, FX and rates conventions (stage H round 4, H-22 to H-24)
 - **Purpose:** tick rounding, fee cap, round lot, T+1 settlement (`micro.eq.*`); pip value and spot date (`micro.fx.*`); 32nds, tick value, bond and bill price and bond yield (`micro.rates.*`).
 - **Inputs:** as in the spec page; decimal strings (HR-12); integers within +-(2^53-1) (HR-116).
-- **Limitations:** calendars are inputs; on-coupon-date bond only (off-date pricing reuses `04-pricing`); third digit of 32nds: CME quarter digits 0, 2, 5, 7 only (source read 2026-11-19); eighth-tick contracts (2-year and 3-year notes) not supported (HR-118); outputs carry no label (HR-111).
+- **Limitations:** calendars are inputs; on-coupon-date bond only (off-date pricing reuses `04-pricing`); third digit of 32nds: CME quarter digits 0, 2, 5, 7 only (source read 2026-11-19); eighth-tick contracts (2-year and 3-year notes) not supported (HR-118); outputs carry no label (HR-111). Rule dates are per rule (HR-120): tick table and fee cap default `compliance_date` 2027-11-01, round lot 2025-11-03; with no `as_of` the amended text applies, which for ticks and fees is not in force before 2027-11-01. USDCAD T+1 has no primary source read (HR-119).
 - **Validation:** goldens `eqc_h`, `fxc_h`, `rtc_h` with E1 cases in `e1_h4`; blind re-derivation (DR-H2) per `oracle/OUTSIDE_SHARES.md`. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** blind second lane (`stage_h_blind/multiasset/`, rates packet 2).
 - **Monitoring thresholds:** acceptance A3 properties (rounding never more aggressive; parse(format(x)) = x on the 1/128 grid; spot a good day and at least T+1).
 - **Data lineage hash:** goldens `datasets/golden/stage_h/eqc_h.json`, `fxc_h.json`, `rtc_h.json` (generator `oracle/python/gen_stage_h_ma.py`).
-- **Retirement trigger:** a superseding stage H ruling or a rule change (HR-110 compliance date).
+- **Retirement trigger:** a superseding stage H ruling or a rule change (HR-120 compliance dates: the SEC has the deferred tick and fee rules under review, so 2027-11-01 may move).
 - **Validation report:** `specifications/09-microstructure/asset-conventions.md`.
 
 ### MH-18 Simulated equity auction (stage H round 4, H-22)
 - **Purpose:** opening and closing call-auction uncrossing (`exec.sim.auction.uncross`) and session phases in the lit engine (HR-112).
 - **Inputs:** as in the spec page.
-- **Limitations:** simulated venue, labelled "simulated venue; not a real exchange"; tie-break rules fixed by ruling HR-84, not one exchange's rulebook.
-- **Validation:** goldens `auc_h`, `ses_h`; blind share H-22 60 %. **Review:** 2026-11-18.
+- **Limitations:** simulated venue, labelled "simulated venue; not a real exchange"; tie-break rules fixed by ruling HR-84, not one exchange's rulebook (two steps of the default are the simulator's own, HR-119); no cross means no auction (HR-127); the continuous book does not join the closing cross.
+- **Validation:** goldens `auc_h`, `ses_h`; blind share H-22 66.7 % (20 of 30, with blind packet 3 of 2026-11-19). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** blind second lane; property: volume maximal over the candidate grid (A3).
 - **Monitoring thresholds:** any golden difference across the four builds.
@@ -1204,7 +1204,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Purpose:** ZN and ZB futures on the lit engine in integer ticks, 32nds display, P&L and variation margin (`exec.sim.fut.*`).
 - **Inputs:** as in the spec page; contract specs are parameters with [CME-ZN] and [CME-ZB] defaults.
 - **Limitations:** simulated venue, labelled "simulated venue; not a real exchange; no real rates data"; quarter-tick price text only, eighth-tick contracts not supported (HR-118); no delivery or conversion-factor logic here.
-- **Validation:** goldens `fut_h` (HR-116 integer boundary included); blind share H-24 84.2 % (16 of 19; the three `exec.sim.fut.run` value cases are hand-only) after rates packet 2 (HR-114). **Review:** 2026-11-18.
+- **Validation:** goldens `fut_h` (HR-116 integer boundary included); blind share H-24 94.7 % (18 of 19; two of the three `exec.sim.fut.run` value cases were re-derived blind in packet 3, 2026-11-19) after rates packet 2 (HR-114). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** blind second lane.
 - **Monitoring thresholds:** any golden difference across the four builds.

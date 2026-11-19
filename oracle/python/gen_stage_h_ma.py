@@ -337,8 +337,8 @@ FUT_RUN_ZB_OUT = {
 FUT_RUN = "exec.sim.fut.run"
 # (description, operation, inputs, expected outputs or error code)
 LATE = {"fut_h": [
-    ("fut.run ZN round trip with fees; pnl per trader marked at the last trade (HR-102)", FUT_RUN, FUT_RUN_ZN_IN, FUT_RUN_ZN_OUT),
-    ("fut.run ZB price priority, a resting remainder and a mark below the first fill", FUT_RUN, FUT_RUN_ZB_IN, FUT_RUN_ZB_OUT),
+    ("fut.run ZN round trip with fees; pnl per trader marked at the last trade (HR-102); lit-engine fields as exec.sim.lit.run", FUT_RUN, FUT_RUN_ZN_IN, FUT_RUN_ZN_OUT),
+    ("fut.run ZB price priority, a resting remainder and a mark below the first fill; lit-engine fields as exec.sim.lit.run", FUT_RUN, FUT_RUN_ZB_IN, FUT_RUN_ZB_OUT),
     ("fut.run with no events: empty book, no pnl", FUT_RUN, {"events": []},
      {"book": _EMPTY, "cancelled": [], "conservation": {}, "fees": {}, "fills": [], "label": RT, "mbp": _EMPTY,
       "pnl": {}, "rejects": []}),
@@ -346,6 +346,25 @@ LATE = {"fut_h": [
     ("fut.run negative fee", FUT_RUN, {"events": [], "fee_per_contract": "-1"}, "E_DOMAIN"),
     ("fut.run event that is not an object", FUT_RUN, {"events": [1]}, "E_SCHEMA"),
 ]}
+# HR-120 (2026-11-19): compliance dates per rule. Rules 612 and 610(c) were deferred to the first business
+# day of November 2027 (SEC order 34-105656, read 2026-11-19); the round lot of Rule 600(b)(93) has been in
+# force since 2025-11-03. Cases at both sides of each date; 2026-11-19 lies between the two.
+_FEE = {"price": "20", "taker_fee": "0.0015"}
+LATE["eqc_h"] = [
+    ("HR-120: half-penny tier on 2026-11-19, before the deferred Rule 612 date", *rp("10.003", "BUY", tick_tier="HALF_PENNY", as_of="2026-11-19"), "E_INPUT"),
+    ("HR-120: half-penny tier on the day before the Rule 612 date", *rp("10.003", "BUY", tick_tier="HALF_PENNY", as_of="2027-10-29"), "E_INPUT"),
+    ("HR-120: half-penny tier on the Rule 612 date 2027-11-01; a sell rounds up to 10.005", *rp("10.003", "SELL", tick_tier="HALF_PENNY", as_of="2027-11-01"), {"price": "10.005"}),
+    ("HR-120: fee 0.0015 at $20 on 2026-11-19 is inside the old cap 0.003 (Rule 610(c) deferred)", "micro.eq.fee_check", dict(_FEE, as_of="2026-11-19"), {"cap": "0.003", "taker_fee": "0.0015"}),
+    ("HR-120: fee 0.0015 at $20 on 2027-11-01 is above the amended cap 0.001", "micro.eq.fee_check", dict(_FEE, as_of="2027-11-01"), "E_DOMAIN"),
+    ("HR-120: round lot at $500 on 2026-11-19 is 40 (Rule 600(b)(93) in force since 2025-11-03)", "micro.eq.round_lot", {"as_of": "2026-11-19", "price": "500"}, {"round_lot": 40}),
+    ("HR-120: round lot at $500 on 2025-10-31, the business day before, is 100", "micro.eq.round_lot", {"as_of": "2025-10-31", "price": "500"}, {"round_lot": 100}),
+    ("HR-120: round lot at $500 on 2025-11-03 is 40", "micro.eq.round_lot", {"as_of": "2025-11-03", "price": "500"}, {"round_lot": 40}),
+]
+
+# Blind packet 3 (2026-11-19, second model, rules and inputs only, no file access): the HR-120 value cases
+# and the two exec.sim.fut.run traces. fut_h-0013 (no events) was not in the packet.
+BLIND3 = "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 3): MATCH"
+PACKET3 = {"eqc_h-0022", "eqc_h-0023", "eqc_h-0025", "eqc_h-0026", "eqc_h-0027", "fut_h-0011", "fut_h-0012"}
 
 LIT = "simulated venue; not a real exchange"
 
@@ -487,12 +506,15 @@ def build():
             s.cases[-1]["case_id"] = f"{name}-{first + k:04d}"
         first += len(BOUNDARY_OK.get(name, []))
         for k, (desc, op, inp, exp) in enumerate(LATE.get(name, [])):
+            blind = f"{name}-{first + k:04d}" in PACKET3
             if isinstance(exp, str):
                 s.add(op, inp, error=exp, cls="date_and_convention", verified=["hand"], tags=["stage_h", "error"],
                       description=f"hand: {desc}")
             else:
-                s.add(op, inp, exp, cls="date_and_convention", verified=["hand"], tags=["stage_h", "multiasset"],
-                      description=f"hand: {desc}; lit-engine fields as exec.sim.lit.run; not blind")
+                assert name == "fut_h" or "label" not in exp, desc
+                s.add(op, inp, exp, cls="date_and_convention", verified=["hand", BLIND3] if blind else ["hand"],
+                      tags=["stage_h", "multiasset"],
+                      description=f"hand: {desc}; " + ("blind in packet 3 (2026-11-19)" if blind else "not blind"))
             s.cases[-1]["case_id"] = f"{name}-{first + k:04d}"
         suites.append(s)
     suites.append(e1_suite(suites))

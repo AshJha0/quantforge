@@ -27,6 +27,16 @@ public final class AdaptiveExec {
         return new QfError("E_DOMAIN", field + ": " + why, field);
     }
 
+    /**
+     * HR-59, HR-62: {@code floor(x + 1/2)}. HR-121: {@code x + 1/2} within 1e-12 relative of an integer is that
+     * integer, so an exact half that binary64 lands just below still rounds up.
+     */
+    private static double halfUp(double x) {
+        double t = x + 0.5;
+        double near = Math.rint(t);
+        return Math.abs(t - near) <= 1e-12 * Math.abs(near) ? near : Math.floor(t);
+    }
+
     private static double sign(Side s) {
         return s == Side.BUY ? 1.0 : -1.0;
     }
@@ -263,7 +273,7 @@ public final class AdaptiveExec {
         double[] slicesB = new double[m];
         double prev = 0;
         for (int j = 0; j < m; j++) {
-            cumB[j] = mode == Mode.UNITS ? Math.floor(target[j] + 0.5) : target[j];
+            cumB[j] = mode == Mode.UNITS ? halfUp(target[j]) : target[j];
             slicesB[j] = cumB[j] - prev;
             prev = cumB[j];
         }

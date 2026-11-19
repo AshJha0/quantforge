@@ -27,7 +27,10 @@ pub const RATES_LABEL: &str = "simulated venue; not a real exchange; no real rat
 const DEFAULT_TICK_TABLE: [(&str, &str); 2] = [("0", "0.0001"), ("1.00", "0.01")]; // [REGNMS-612]
 const HALF_PENNY_TABLE: [(&str, &str); 2] = [("0", "0.0001"), ("1.00", "0.005")];
 /// The current Rule 612/610 text applies on and after this date (a parameter; default UNVERIFIED).
-pub const RULE_2024_COMPLIANCE: &str = "2025-11-03"; // HR-110, release 34-101070
+/// Round lots, Rule 600(b)(93): first business day of November 2025 (release 34-101070; not stayed).
+pub const ROUND_LOT_COMPLIANCE: &str = "2025-11-03";
+/// Rules 612 and 610(c): deferred to the first business day of November 2027 (SEC order 34-105656, HR-120).
+pub const TICK_FEE_COMPLIANCE: &str = "2027-11-01";
 const FEE_CAP_CURRENT: (&str, &str) = ("0.001", "0.001"); // [REGNMS-610]
 const FEE_CAP_OLD: (&str, &str) = ("0.003", "0.003");
 const ROUND_LOTS_CURRENT: [(&str, i64); 3] = [("250", 100), ("1000", 40), ("10000", 10)];
@@ -196,10 +199,10 @@ fn out(pairs: Vec<(&str, Json)>) -> Json {
 // ------------------------------------------------------------------ equities (H-22)
 
 /// True when the current (2024-amended) Rule 612/610 text applies at `as_of`.
-fn current(raw: &Json) -> Result<bool> {
+fn current(raw: &Json, compliance: &str) -> Result<bool> {
     let cd = match raw.get("compliance_date") {
         Some(v) => date_of(v, "compliance_date")?,
-        None => Date::parse(RULE_2024_COMPLIANCE).expect("constant date"),
+        None => Date::parse(compliance).expect("constant date"),
     };
     match raw.get("as_of") {
         None => Ok(true),
@@ -215,7 +218,7 @@ fn tick_table(raw: &Json) -> Result<Vec<(Dec, Dec)>> {
             _ => return Err(at("E_SCHEMA", "tick_tier", "not PENNY or HALF_PENNY")),
         },
     };
-    let cur = current(raw)?;
+    let cur = current(raw, TICK_FEE_COMPLIANCE)?;
     let half = tier == "HALF_PENNY";
     if half && !cur {
         return Err(at(
@@ -310,7 +313,7 @@ pub fn eq_fee_check(raw: &Json) -> Result<Json> {
     let price = dec_of(raw, "price", None, "")?;
     let fee = dec_of(raw, "taker_fee", None, "")?;
     let check = bool_of(raw, "cap_check", true)?;
-    let (per_share, frac) = if current(raw)? {
+    let (per_share, frac) = if current(raw, TICK_FEE_COMPLIANCE)? {
         FEE_CAP_CURRENT
     } else {
         FEE_CAP_OLD
@@ -330,7 +333,7 @@ pub fn eq_fee_check(raw: &Json) -> Result<Json> {
 /// `micro.eq.round_lot` (HR-82 as dated rule versions).
 pub fn eq_round_lot(raw: &Json) -> Result<Json> {
     let price = dec_of(raw, "price", None, "")?;
-    let cur = current(raw)?;
+    let cur = current(raw, ROUND_LOT_COMPLIANCE)?;
     positive_price(price)?;
     let lot = if cur {
         ROUND_LOTS_CURRENT

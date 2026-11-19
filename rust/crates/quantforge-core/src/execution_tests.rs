@@ -124,8 +124,14 @@ fn ac_rules_in_spec_order() {
             },
             0.0
         ),
-        "E_DOMAIN"
+        "E_INPUT" // two errors: the structural E_INPUT comes before every E_DOMAIN (HR-66, HR-122)
     );
+    assert_eq!(
+        code(ac_frontier(&AcParams { sigma: -1.0, ..P }, &[])),
+        "E_INPUT"
+    );
+    assert_eq!(code(ac_frontier(&with_n(0), &[])), "E_INPUT");
+    assert_eq!(code(schedule_pov(1000.0, 1.5, &[], false)), "E_INPUT");
     assert_eq!(e(AcParams { quantity: 0.0, ..P }, 0.0), "E_INPUT");
     assert_eq!(e(AcParams { epsilon: -1.0, ..P }, 0.0), "E_DOMAIN");
     assert_eq!(e(AcParams { gamma: -1.0, ..P }, 0.0), "E_DOMAIN");

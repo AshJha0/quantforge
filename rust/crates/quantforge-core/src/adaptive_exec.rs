@@ -21,10 +21,17 @@ fn sign(buy: bool) -> f64 {
     if buy { 1.0 } else { -1.0 }
 }
 
-/// HR-62: `floor(x + 1/2)`.
+/// HR-59, HR-62: `floor(x + 1/2)`. HR-121: `x + 1/2` within 1e-12 relative of an integer is that
+/// integer, so an exact half that binary64 lands just below still rounds up.
 #[allow(clippy::cast_possible_truncation)]
 fn half_up(x: f64) -> i64 {
-    (x + 0.5).floor() as i64
+    let t = x + 0.5;
+    let near = t.round();
+    if (t - near).abs() <= 1e-12 * near.abs() {
+        near as i64
+    } else {
+        t.floor() as i64
+    }
 }
 
 #[allow(clippy::cast_possible_truncation)]

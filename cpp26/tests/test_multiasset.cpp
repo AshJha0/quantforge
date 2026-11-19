@@ -107,7 +107,7 @@ void replay(const char* suite, int expect_cases) {
 
 TEST_CASE("multi-asset goldens, every row exact (A1, A4)") {
     replay("auc_h", 12);
-    replay("eqc_h", 19);
+    replay("eqc_h", 27);
     replay("fxc_h", 9);
     replay("fxv_h", 20);
     replay("rtc_h", 17);

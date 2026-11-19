@@ -6,7 +6,7 @@ The plain idea: a lit exchange keeps every resting order in a book and matches a
 
 You will run two of the spec's golden event lists through `exec.sim.lit.run`: a buy that sweeps two price levels, and a post-only buy that would cross. Budget 10 minutes.
 
-<p class="note">Available from v0.10.0 (unreleased). The operation is implemented in all four builds on branch <code>stage-h2</code>; this page drives the Python build in process. Every output is labelled "simulated venue; not a real exchange". Every number below is a spec golden from <code>datasets/golden/stage_h/lit_h.json</code>, and the script stops if the build disagrees with it.</p>
+<p class="note">Available from v0.10.0. The operation is implemented in all four builds; this page drives the Python build in process. Every output is labelled "simulated venue; not a real exchange". Every number below is a spec golden from <code>datasets/golden/stage_h/lit_h.json</code>, and the script stops if the build disagrees with it.</p>
 
 Terms, defined here. The **maker** is the resting order in a trade and the **taker** the incoming one. **MBP** (market by price) is the book summed per price, what a level-2 feed shows. **Conservation** is the per-order account `submitted = filled + resting + cancelled + rejected`, which the engine reports for every order so you can check nothing was lost.
 

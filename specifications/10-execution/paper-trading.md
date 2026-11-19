@@ -1,6 +1,6 @@
 # Paper trading with simulated fills
 
-Spec version 0.1.0 (stage H item H-21, moved from stage K by the owner 2026-11-18). Status: implemented. The ledger, book (positions, cash, financing, P&L explain), pre-trade checks, fills from the lit, dark and SOR simulators, per-order TCA records and the session close are in Python (`quantforge_core/paper.py`, `paper_fills.py`, A7); the `paper.*` CLI operations are in all four builds (Python, Java `org.quantforge.paper.Paper`, C++, Rust `quantforge_core::paper`; goldens `pt_h` and `e1_hpt`, 2026-11-18). Rulings HR-42 to HR-55 (proposed, `stage-h-rulings-h21.md`). Plan items: section 2 owner decision "proper paper trading", 12.7 Q8k (TCA and the fill simulator wired into paper trading; the ledger carries TCA per order). The public dashboard stays in stage K and is out of scope here.
+Spec version 0.1.0 (stage H item H-21, moved from stage K by the owner 2026-11-18). Status: implemented. The ledger, book (positions, cash, financing, P&L explain), pre-trade checks, fills from the lit, dark and SOR simulators, per-order TCA records and the session close are in Python (`quantforge_core/paper.py`, `paper_fills.py`, A7); the `paper.*` CLI operations are in all four builds (Python, Java `org.quantforge.paper.Paper`, C++, Rust `quantforge_core::paper`; goldens `pt_h` and `e1_hpt`, 2026-11-18). Rulings HR-42 to HR-55 (confirmed, `stage-h-rulings-h21.md`). Plan items: section 2 owner decision "proper paper trading", 12.7 Q8k (TCA and the fill simulator wired into paper trading; the ledger carries TCA per order). The public dashboard stays in stage K and is out of scope here.
 
 **Every output is labelled "crypto venue; simulated"** (HR-43), and every report also carries the 11.6 honest-ceiling sentence: "Paper trading on free data; simulated fills; no evidence of tradable profitability." **No live order is ever placed**: there is no code path to any venue's order entry, and a request with `mode` other than `"simulated"` is `E_UNSUPPORTED_OPERATION` (HR-42).
 
@@ -20,7 +20,7 @@ Evidence for goldens: hand calculation in exact decimal (shown in each row), plu
 ### Numbers
 Prices, quantities, cash and rates are decimal strings in inputs, outputs and the ledger (HR-44); arithmetic is exact decimal. Cash postings from financing are rounded to the cash precision (2 decimal places for USD) half-even when posted; fill cash is exact (quantity x price + fee, no rounding). Floats never enter the ledger.
 
-### Rulings HR-77 and HR-78 (proposed 2026-11-18, from the Java port; numbers to be confirmed by the coordinator)
+### Rulings HR-77 and HR-78 (2026-11-18, from the Java port; confirmed by the coordinator 2026-11-19, applied in `cli-contract.md`)
 
 | Ruling | Rule |
 |---|---|

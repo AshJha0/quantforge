@@ -1,11 +1,11 @@
 {
   "note": "Release facts for the site home (tools/site_home.html). A release edits this file only: tools/build_site.py fills {{name}} placeholders from here, and counts the rest (version from python/pyproject.toml unless set here, golden cases, suite files and stage E cases and operations from datasets/golden, recorder sources from tools/recorder/sources.json). The build fails on an unknown or unfilled placeholder.",
-  "release": "v0.9.1, follow-ups: hedge solver precision, fuzz and G2++ fixes, mutation gate",
-  "released": "2026-11-18",
-  "implemented_stages": "A to G and I to J, plus R6",
+  "release": "v0.10.0, stage H: microstructure and execution on simulated venues",
+  "released": "2026-11-19",
+  "implemented_stages": "A to J, plus R6",
   "languages": "Java 25, C++26, Python 3.15, Rust 2024",
   "domains": "12",
   "stages": "11 stages, A to K",
-  "version": "0.9.1",
-  "outside_share": "Outside-library share of value-checked cases under the tight rule: stage J 66.5%, I 66.7%, G 81.4%, F 85.1% with an independent re-derivation (53.7% libraries alone), E 78.5%, D 85.7%; stage H (v0.10.0, not tagged) 77.4% (144 of 186 value cases) by blind re-derivation or printed paper figures, no library; every stage meets the 60% floor (<a href=\"oracle/OUTSIDE_SHARES.html\">per stage, with the old all-case shares</a>)."
+  "version": "0.10.0",
+  "outside_share": "Outside-library share of value-checked cases under the tight rule: stage J 66.5%, I 66.7%, G 81.4%, F 85.1% with an independent re-derivation (53.7% libraries alone), E 78.5%, D 85.7%; stage H 78.0% (160 of 205 value cases) by blind re-derivation or printed paper figures, no library; every stage meets the 60% floor (<a href=\"oracle/OUTSIDE_SHARES.html\">per stage, with the old all-case shares</a>)."
 }
