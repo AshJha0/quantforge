@@ -6,7 +6,7 @@ The plain idea: a stored number has two times. One is the period it is meant to 
 
 You will run the query rule by hand on the eight golden cases, see a correction and a withdrawal, and check the property the stage K acceptance test is built on: a record learned later never changes an earlier answer. Budget 10 minutes.
 
-<p class="note">Stage K, in progress. The operation <code>core.store.bitemporal_query</code> is on branch <code>k-w1</code> (spec <code>specifications/01-core/bitemporal-store.md</code> 1.0.0, ruling KR-2 to KR-4 and KR-16), not yet merged. Acceptance evidence: Python and Java; C++ and Rust in progress (<code>program/STAGE_K_W1_HANDOVER.md</code> on <code>k-w1</code>). Step 1 below runs a standard-library restatement of the spec's rule on the golden inputs, so it runs on this branch; Step 2 is the library call and runs after integration.</p>
+<p class="note">Stage K. The operation <code>core.store.bitemporal_query</code> is on the integration branch <code>k-r1</code> in all four builds (merged 2026-11-19; not yet released) (spec <code>specifications/01-core/bitemporal-store.md</code> 1.0.0, rulings KR-2 to KR-4 and KR-16). Acceptance evidence files: Python and Java; C++ and Rust run the same properties in their unit tests without writing evidence files (<code>program/STAGE_K_W1_HANDOVER.md</code>). Step 1 restates the rule with the standard library on the golden inputs; Step 2 calls the library, and CI checks that it prints the lines shown under Step 1.</p>
 
 Terms, defined here. **Valid time** `[valid_from, valid_to)` is the period a record describes; `valid_to` null means open-ended. **Knowledge time** is the instant the store learned the record. A query asks at **knowledge as of** `K` for the value **valid at** `V`. **Withdrawn** means the latest record known by `K` that covers `V` is a deletion.
 
@@ -19,7 +19,6 @@ Terms, defined here. **Valid time** `[valid_from, valid_to)` is the period a rec
 
 The log is the one every `bt_k` value case uses (spec table "Golden value cases"): series `A`, a value of 100 from 1 January, 110 from 1 March, a correction of February to 105 learned on 1 April, and a withdrawal of March onward learned on 2 April.
 
-<!-- tutorial:run python -->
 ```python
 # The KR-2 query rule on the shared log of goldens bt_k-0001 to 0008, restated with the standard library.
 from datetime import datetime, timezone
@@ -67,7 +66,7 @@ same = all(query(early, "2026-03-15", v) == query(LOG, "2026-03-15", v) for v in
 print("KR-4: answers as of 2026-03-15 unchanged after appending seq 3 and 4:", same)
 ```
 
-Output (CI checks these lines):
+Output (CI checks that Step 2 prints these lines):
 
 <!-- tutorial:expect -->
 ```text
@@ -92,18 +91,18 @@ KR-4: answers as of 2026-03-15 unchanged after appending seq 3 and 4: True
 
 ### The formal statement, checked against the spec
 
-From `specifications/01-core/bitemporal-store.md` (branch `k-w1`, rulings KR-2 to KR-4, KR-16; read 2026-11-19).
+From `specifications/01-core/bitemporal-store.md` (rulings KR-2 to KR-4, KR-16; read 2026-11-19).
 
 - For a query `(K, V)`, let `C = { r : knowledge_time(r) <= K and valid_from(r) <= V < valid_to(r) }`, with `valid_to` null read as +infinity. If `C` is empty the answer is `NONE`. Otherwise the record with the largest `sequence` in `C` wins; if it is a deletion the answer is `WITHDRAWN`, else `FOUND` with that record.
 - The log is checked in the order of the stage A rulings: a missing or mistyped key is `E_SCHEMA`; a non-increasing `sequence`, a `knowledge_time` lower than the previous record's, or `valid_to <= valid_from` is `E_INPUT` (`bt_k-0009`, `bt_k-0010`); more than 1,000,000 records is `E_LIMIT`.
-- KR-4, the acceptance property: appending any record with `knowledge_time > K` leaves every `(K, V)` answer unchanged byte for byte. Acceptance evidence (measured by the k-w1 lane, 2026-11-19): 10,000 generated logs and 500,000 query pairs, zero failures, in Python and Java (`program/stage_k_w1/acceptance_python.json` and `acceptance_java.jsonl`, key `kr4_correction_property`, on `k-w1`). C++ and Rust: in progress.
+- KR-4, the acceptance property: appending any record with `knowledge_time > K` leaves every `(K, V)` answer unchanged byte for byte. Acceptance evidence (measured by the k-w1 lane, 2026-11-19): 10,000 generated logs and 500,000 query pairs, zero failures, in Python and Java (`program/stage_k_w1/acceptance_python.json` and `acceptance_java.jsonl`, key `kr4_correction_property`). C++ and Rust run the same property in their unit tests (`cpp26/tests/test_stage_k.cpp`, `rust/crates/quantforge-core/src/stage_k_tests.rs`) without writing an evidence file.
 - Instants are whole seconds (KR-16). A stage A record is the bitemporal record `[event_time, event_time + 1 s)`.
 
-## Step 2: the same cases through the library (runs after integration)
+## Step 2: the same cases through the library
 
-<!-- runs-after-integration: T51 -->
-This block needs `core.store.bitemporal_query` and the goldens `datasets/golden/stage_k/bt_k.json`, which are on branch `k-w1`. After the merge it is meant to print the same lines as Step 1; it has not been run.
+This block calls the library on the goldens in `datasets/golden/stage_k/`. It was turned on at integration (2026-11-19) and printed the same lines as Step 1; CI now checks them.
 
+<!-- tutorial:run python -->
 ```python
 # Goldens bt_k-0001 to 0008 through core.store.bitemporal_query, and the KR-4 property on the same log.
 import json
@@ -159,6 +158,6 @@ You ran the bitemporal query rule on eight golden cases, saw a correction and a 
 
 ## References and further reading
 
-- This project: `specifications/01-core/bitemporal-store.md` and `specifications/stage-k-rulings-w1.md` (branch `k-w1`); the stage A store, [`asof-store.md`](../../specifications/01-core/asof-store.md).
+- This project: `specifications/01-core/bitemporal-store.md` and `specifications/stage-k-rulings-w1.md`; the stage A store, [`asof-store.md`](../../specifications/01-core/asof-store.md).
 - R. T. Snodgrass, *Developing Time-Oriented Database Applications in SQL*, Morgan Kaufmann, 2000, chapters 2 and 10, for valid time and transaction time (cited in the spec; not opened, recalled).
 - K. Kulkarni and J.-E. Michels, "Temporal features in SQL:2011", *SIGMOD Record* 41(3), 2012 (cited in the spec; not opened, recalled).

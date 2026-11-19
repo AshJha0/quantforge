@@ -6,7 +6,7 @@ The plain idea: a sensitivity ladder is the derivative of a price with respect t
 
 You will run the order test on recorded ladder values from before and after the fix, and work the new exercise smoothing by hand on its three-node example. Budget 15 minutes.
 
-<p class="note">Stage K, in progress. The method <code>CN_RANNACHER_SMOOTHED</code> of <code>rates.shortrate.bermudan_ladder</code> and <code>rates.shortrate.bermudan_swaption</code> is on branch <code>k-k8</code> (spec <code>specifications/06-risk/bermudan-ladder-k8.md</code> 0.2.0, PROPOSED; rulings KR-8, KR-9, KR-15, KR-16), not yet merged. All three acceptance tests pass in Python, and the third in Java (<code>oracle/K8_ACCEPTANCE_W2.json</code> on <code>k-k8</code>); C++ and Rust are not ported. <strong>The R6 use restriction on the ladder is still in place, and the default method is unchanged (<code>G18_IMPLICIT</code>).</strong> Step 1 uses the standard library on recorded values; Step 2 runs after integration.</p>
+<p class="note">Stage K. The method <code>CN_RANNACHER_SMOOTHED</code> of <code>rates.shortrate.bermudan_ladder</code> and <code>rates.shortrate.bermudan_swaption</code> is on the integration branch <code>k-r1</code> in all four builds (merged 2026-11-19; not yet released) (spec <code>specifications/06-risk/bermudan-ladder-k8.md</code> 0.2.0, PROPOSED; rulings KR-8, KR-9, KR-15, KR-16, KR-18, KR-19, KR-110). Acceptance 1 to 3 pass in all four builds (<code>oracle/K8_ACCEPTANCE_W2.json</code>, <code>oracle/K8_ACCEPTANCE_PORTS.json</code>); outside share 7 of 7 by blind re-derivation (<code>program/STAGE_K_BLIND_K8.md</code>). <strong>The R6 use restriction is lifted for <code>CN_RANNACHER_SMOOTHED</code> only (ruling KR-110, 2026-11-19); it stays for the default method, which is unchanged (<code>G18_IMPLICIT</code>).</strong> The ladder row at 0.4986 years is not judged (owner decision 2026-11-19; <code>program/K8_ROW0_FINDING.md</code>: no bug, its true value is zero). Step 1 uses the standard library on recorded values; Step 2 calls the library, and CI checks that it prints the lines shown under Step 1.</p>
 
 Terms, defined here. **Observed order** `p` from values `f(h), f(h/2), f(h/4)` on three grids is `log2((f1 - f2)/(f2 - f3))`; a second-order scheme gives about 2. **Richardson extrapolation** uses that to estimate the limit, `(2^p f3 - f2)/(2^p - 1)`, and is only safe when the differences shrink regularly. A grid is written `nx/steps per year`; the default is 201/100. **Rannacher start-up** replaces the first Crank-Nicolson steps after a kink by implicit half steps, which damp the high-frequency error Crank-Nicolson leaves.
 
@@ -17,7 +17,6 @@ Terms, defined here. **Observed order** `p` from values `f(h), f(h/2), f(h/4)` o
 
 ## Step 1: the order test before and after, and the smoothing by hand
 
-<!-- tutorial:run python -->
 ```python
 # K-8: the Richardson order check (num.richardson.check, KR-9) on recorded ladder values, and the smoothing
 # kernel of CN_RANNACHER_SMOOTHED on its worked example, restated with the standard library.
@@ -71,7 +70,7 @@ s1 = h[1] - (h[0] - 2 * h[1] + h[2]) / 6
 print(f"smoothing f = (-1, 0, 1): h = {[str(x) for x in h]}, S_1 = {s1}; pointwise max 0, cell average 1/8")
 ```
 
-Output (CI checks these lines):
+Output (CI checks that Step 2 prints these lines):
 
 <!-- tutorial:expect -->
 ```text
@@ -107,25 +106,26 @@ Candidates checked and not the cause (measured or inferred, `K8_DIAGNOSIS.md`): 
 
 ### The formal statement, checked against the spec
 
-From `specifications/06-risk/bermudan-ladder-k8.md` 0.2.0 (branch `k-k8`, PROPOSED; read 2026-11-19).
+From `specifications/06-risk/bermudan-ladder-k8.md` 0.2.0 (PROPOSED; read 2026-11-19).
 
 - Scheme: `U(t, x) = V(t, x) D(t)` with `D(t) = P(0, t) exp(-c2 I(t))`; `U_t = A U` with a time-independent operator; Crank-Nicolson steps, the first two in each interval replaced by two implicit half steps each; at each exercise date `U_i = Ehat_i + S_i` with the hat-weighted, end-corrected, stencil-filtered smoothing `S`. The ladder is the exact derivative of the discrete scheme (`aad-core.md`), the grid included.
-- `num.richardson.check` (KR-9): status `OK` iff the two differences have the same sign and `|observed - assumed| <= 0.5`; Richardson is used only through it, never unguarded. Goldens `rich_k-0001` to `0008` (branch `k-w1`).
+- `num.richardson.check` (KR-9): status `OK` iff the two differences have the same sign and `|observed - assumed| <= 0.5`; Richardson is used only through it, never unguarded. Goldens `rich_k-0001` to `0008`.
 - Acceptance, fixed before any run: (1) the QuantLib `FdHullWhiteSwaptionEngine` bump reference at two bump sizes agrees within 0.1%, and the method at 801/400 and 1601/800 agrees within 0.2%; (2) at 201/100 every judged entry within 1% of the reference; (3) observed order on 201/401/801 in [1.5, 2.5] with status `OK` on every entry; (4) the R6 restriction is lifted only for this method and only after 1 to 3 pass; (5) the ladder equals its own Richardson bumps to 1e-8.
 - Results (`oracle/K8_ACCEPTANCE_W2.json`, measured 2026-11-19): (1) PASS, worst bump gap 0.016% (reference grid 8,000/3,201 by KR-16, set before the judged run), method grids 0.019%; (2) PASS, worst 0.40%; (3) PASS, 24 entries. Java: acceptance 3 PASS, values equal to the Python record to 3.8e-14 of the row scale. The first run (`oracle/K8_ACCEPTANCE_W1.json`) is kept unchanged as a recorded miss.
 
 ### What is still restricted
 
-- **The R6 use restriction stays.** `docs/model-inventory.md` (entry MG-6) still says the G-18 ladder is not for hedging at the default grid. Acceptance 4 lifts it only for `CN_RANNACHER_SMOOTHED`, and only in the integration branch; nothing on this branch lifts it.
+- **The R6 use restriction is lifted for `CN_RANNACHER_SMOOTHED` only.** Acceptance 4 was met on the integration branch on 2026-11-19 (ruling KR-110): `specifications/06-risk/aad-core.md` and `docs/model-inventory.md` (entry MG-6) keep the restriction for the default `G18_IMPLICIT`, which is still not for hedging at the default grid.
+- **The 0.4986-year row is not judged.** It is 0.0 on all three grids, so the all-zero-row rule skips it (owner decision 2026-11-19). `program/K8_ROW0_FINDING.md` found no bug: the true value is zero, and QuantLib's -14.27 there (`oracle/K8_ACCEPTANCE_W2.json` reference) is the time-stepping error of QuantLib's finite-difference engine.
 - **The default method is unchanged.** Without a `method` input the operations run the G-18 scheme bit for bit; `CN_RANNACHER_SMOOTHED` must be asked for.
-- **Two languages.** Python and Java carry the method; C++ and Rust are not ported, so the `k8_k` goldens fail in those builds until they are (`program/K8_PORT_NOTE.md`).
+- **Four languages.** All four builds carry the method; the C++ and Rust ports pass acceptance 3 with values within 3.85e-14 of the row scale of Python (`oracle/K8_ACCEPTANCE_PORTS.json`), and the `k8_k` goldens pass in every build through the conformance runner.
 - **The end correction is the lane's own derivation**, supported by measurements and unit tests, not by an outside source.
 
-## Step 2: through the library (runs after integration)
+## Step 2: through the library
 
-<!-- runs-after-integration: T55 -->
-This block needs `num.richardson.check` (branch `k-w1`) and, for the last assertion, the method and `datasets/golden/stage_k/k8_k.json` (branch `k-k8`). After the merge it is meant to print the same lines as Step 1; it has not been run. The smoothing has no operation of its own, so its last line stays a hand restatement.
+This block calls the library on the goldens in `datasets/golden/stage_k/`. It was turned on at integration (2026-11-19) and printed the same lines as Step 1; CI now checks them. The smoothing has no operation of its own, so its last line stays a hand restatement.
 
+<!-- tutorial:run python -->
 ```python
 # The order test through num.richardson.check; k8_k-0001 (default grid, CN_RANNACHER_SMOOTHED) against its golden.
 import json
@@ -198,11 +198,11 @@ You ran the order test that exposed the fault, read its two causes and their fix
 
 ## Try next
 
-- Compute the observed order of row 12 (`d/dsigma`) for case `aadladder_g-0001` from `oracle/K8_ACCEPTANCE_W2.json` on branch `k-k8`; the record gives 1.997.
+- Compute the observed order of row 12 (`d/dsigma`) for case `aadladder_g-0001` from `oracle/K8_ACCEPTANCE_W2.json`; the record gives 1.997.
 
 ## References and further reading
 
-- This project (branch `k-k8`): `specifications/06-risk/bermudan-ladder-k8.md`, `program/K8_DIAGNOSIS.md`, `program/K8_PORT_NOTE.md`, `oracle/K8_ACCEPTANCE_W1.json` and `W2.json`; the G-18 scheme in [`short-rate-models.md`](../../specifications/04-pricing/short-rate-models.md) and the ladder in [Tutorial 15](tutorial-15-advanced-risk.md).
+- This project: `specifications/06-risk/bermudan-ladder-k8.md`, `program/K8_DIAGNOSIS.md`, `program/K8_PORT_NOTE.md`, `oracle/K8_ACCEPTANCE_W1.json` and `W2.json`; the G-18 scheme in [`short-rate-models.md`](../../specifications/04-pricing/short-rate-models.md) and the ladder in [Tutorial 15](tutorial-15-advanced-risk.md).
 Bibliographic details below are recalled; the reading status is the K-8 lane's.
 
 - D. M. Pooley, K. R. Vetzal and P. A. Forsyth, "Convergence remedies for non-smooth payoffs in option pricing", *Journal of Computational Finance* 6(4), 2003, sections 2.2 and 2.4 (read by the K-8 lane, 2026-11-19).

@@ -15,13 +15,13 @@ The sections below follow the order in which stages were built. To find recipes 
 | 03 Calibration | [Build a curve](#build-a-curve), [Stage F](#stage-f-recipes) (joint solve), [Stage G](#stage-g-recipes) (Hull-White calibration) |
 | 04 Pricing | [Stage B](#stage-b-recipes), [Stage D](#stage-d-recipes), [Stage E](#stage-e-recipes), [Stage G](#stage-g-recipes) |
 | 05 Volatility | [Stage C](#stage-c-recipes), [Stage E](#stage-e-recipes) |
-| 06 Risk and xVA | [stage K, in progress](#stage-k-recipes-in-progress) (intraday bounds, SA-CCR, backtesting zones, K-8 ladder), [R2 risk](#r2-risk-recipes), [Stage F](#stage-f-recipes), [Stage G](#stage-g-recipes), [stress scenarios and drift](#stage-j-wave-3-stress-scenarios-interpolation-backtests-drift-detectors) |
+| 06 Risk and xVA | [stage K](#stage-k-recipes) (intraday bounds, SA-CCR, backtesting zones, K-8 ladder), [R2 risk](#r2-risk-recipes), [Stage F](#stage-f-recipes), [Stage G](#stage-g-recipes), [stress scenarios and drift](#stage-j-wave-3-stress-scenarios-interpolation-backtests-drift-detectors) |
 | 07 Portfolio | [Stage F](#stage-f-recipes) (book), [portfolio construction](#stage-j-wave-2-portfolio-construction-estimation-es-backtest-baum-welch) |
 | 08 Hedging | [Stage I](#stage-i-recipes) |
 | 09 Microstructure | [Stage H](#stage-h-recipes-available-from-v0100) (book rebuild, quotes, estimators), [trading conventions](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues) |
 | 10 Execution | [Stage H](#stage-h-recipes-available-from-v0100) (schedules, TCA, simulated venues, paper trading), [simulated auction, FX and futures venues](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues), [liquidity curve](#read-a-liquidity-cost-curve) |
 | 11 Research | [Stage J](#stage-j-recipes) |
-| 12 Platform | [Stage K, in progress](#stage-k-recipes-in-progress) (bitemporal store, daily paper ledger; runs after integration) |
+| 12 Platform | [Stage K](#stage-k-recipes) (bitemporal store, daily paper ledger, not yet running) |
 
 ## Run a tutorial script
 
@@ -1281,74 +1281,74 @@ Plain idea: when a request breaks two rules, every build must report the same on
 
 In the first case `participation` 1.5 is outside its domain and `market_volume` is empty: the structural error wins, step (4) before step (5). In the second the quantity is negative and `n_buckets` is above its limit of 100,000: the limit wins, step (2) before step (4). Limits: one exception is recorded, `paper.pretrade.check`, which reports an unknown `side` or `type` as `E_INPUT` (`rule_h-0040`). Before 2026-11-19 two builds answered `E_DOMAIN` and two `E_INPUT` for an Almgren-Chriss request with two faults; suite `rule_h` (40 cases) now pins the order.
 
-## Stage K recipes (in progress)
+## Stage K recipes
 
-Stage K round 1 is on lane branches that are not merged. **Every recipe in this section runs after integration**: the operation or tool it names is on the branch given, not on `main`, and no checker runs these blocks yet (`program/STAGE_K_DOCS_PENDING.md`, items C1 to C9). The expected outputs are copied from the goldens named; after the merge, send each case line to a build's `run` or `batch` command and compare. Python and Java for the wave 1 operations (C++ and Rust in progress); Python only for SA-CCR and backtesting.
+Stage K round 1 is merged on the integration branch `k-r1` and is not released. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
 
-### Query a bitemporal log (runs after integration)
+### Query a bitemporal log
 
-Plain idea: ask what was known at `K` about the value valid at `V`. Formally (`specifications/01-core/bitemporal-store.md`, branch `k-w1`, KR-2): among records with `knowledge_time <= K` and `valid_from <= V < valid_to`, the largest `sequence` wins.
+Plain idea: ask what was known at `K` about the value valid at `V`. Formally (`specifications/01-core/bitemporal-store.md`, KR-2): among records with `knowledge_time <= K` and `valid_from <= V < valid_to`, the largest `sequence` wins.
 
 ```json
 {"schema_version": "1.0", "case_id": "bt", "operation": "core.store.bitemporal_query", "inputs": {"records": [{"sequence": 1, "series_id": "A", "valid_from": "2027-01-01T00:00:00Z", "valid_to": null, "knowledge_time": "2027-01-02T00:00:00Z", "value": 100}, {"sequence": 2, "series_id": "A", "valid_from": "2027-03-01T00:00:00Z", "valid_to": null, "knowledge_time": "2027-03-02T00:00:00Z", "value": 110}, {"sequence": 3, "series_id": "A", "valid_from": "2027-02-01T00:00:00Z", "valid_to": "2027-03-01T00:00:00Z", "knowledge_time": "2027-04-01T00:00:00Z", "value": 105}], "series_id": "A", "knowledge_as_of": "2027-04-01T00:00:00Z", "valid_at": "2027-02-15T00:00:00Z"}}
 ```
 
-Expected: `status` `FOUND`, `row.sequence` 3, `row.value` 105. This is the log of golden `bt_k-0002` (branch `k-w1`) with every date moved one year later and record 4, learned after this `K`, left out; by KR-4 neither change alters the answer. The dates are moved so that this page carries no date inside a preregistered holdout window (`research/test_preregs.py`). Not run on this branch. Limits: the log travels in the request; there is no persistent store.
+Expected: `status` `FOUND`, `row.sequence` 3, `row.value` 105. This is the log of golden `bt_k-0002` with every date moved one year later and record 4, learned after this `K`, left out; by KR-4 neither change alters the answer. The dates are moved so that this page carries no date inside a preregistered holdout window (`research/test_preregs.py`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `status` `FOUND`, `row.sequence` 3, `row.value` 105, as expected. Limits: the log travels in the request; there is no persistent store.
 
-### Update a curve for one moved quote (runs after integration)
+### Update a curve for one moved quote
 
 ```json
 {"schema_version": "1.0", "case_id": "inc", "operation": "curve.incremental.update", "inputs": {"previous_quotes": [0.02, 0.025, 0.03], "previous_discount_factors": [0.9803921568627451, 0.9516977522716404, 0.9145993230349208], "new_quotes": [0.02, 0.026, 0.03]}}
 ```
 
-Expected (golden `inc_k-0002`, branch `k-w1`): `first_changed_index` 1, `recomputed` 2, `discount_factors` `[0.9803921568627451, 0.9498146237052326, 0.9146541714397677]`. `previous_discount_factors` must be the output of `curve.bootstrap.par_annual` on `previous_quotes`, bit for bit, or the answer is `E_INPUT`. Not run on this branch.
+Expected (golden `inc_k-0002`): `first_changed_index` 1, `recomputed` 2, `discount_factors` `[0.9803921568627451, 0.9498146237052326, 0.9146541714397677]`. `previous_discount_factors` must be the output of `curve.bootstrap.par_annual` on `previous_quotes`, bit for bit, or the answer is `E_INPUT`. Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `first_changed_index` 1, `recomputed` 2, `discount_factors` `[0.9803921568627451, 0.9498146237052325, 0.9146541714397676]`; the last two differ from the golden by one unit in the last place, inside the tolerance.
 
-### Check whether to recalibrate (runs after integration)
+### Check whether to recalibrate
 
 ```json
 {"schema_version": "1.0", "case_id": "trig", "operation": "calib.trigger.check", "inputs": {"changes": [1.0, -1.0, 1.0, -1.0], "x_ref": 100.0, "x_now": 105.0, "days_since": 1.0, "k": 3.0}}
 ```
 
-Expected (golden `trig_k-0001`, branch `k-w1`): `fire` true, `sigma` 1.1547005383792515, `threshold` 3.4641016151377544, `false_alarm_rate` 0.002699796063260189. A move exactly equal to the threshold does not fire (KR-13). Not run on this branch.
+Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `threshold` 3.4641016151377544, `false_alarm_rate` 0.002699796063260189. A move exactly equal to the threshold does not fire (KR-13). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the four values above, bit for bit. `false_alarm_rate` is the stated `2 (1 - Phi(k))`, computed as `2 Phi(-k)` with a tail-accurate normal CDF (far-tail golden `trig_k-0009`). K-4c outside share: 4 of 6 value cases, by blind re-derivation.
 
-### Intraday P&L with an error bound (runs after integration)
+### Intraday P&L with an error bound
 
 ```json
 {"schema_version": "1.0", "case_id": "idr", "operation": "risk.intraday.delta_gamma_bound", "inputs": {"positions": [{"notional": 1000000.0, "maturity": 5.0, "yield": 0.04}], "shift": 0.01}}
 ```
 
-Expected (golden `idr_k-0001`, branch `k-w1`): `estimate_pnl` -39913.124212551615, `bound` 17.05689068912462, `label` "latency-aware analytics on simulated data". Zero-coupon positions only; the item's outside-check share is 0 of 5 (NOT MET). Not run on this branch.
+Expected (golden `idr_k-0001`): `estimate_pnl` -39913.124212551615, `bound` 17.05689068912462, `label` "latency-aware analytics on simulated data". Zero-coupon positions only. The item's outside-check share is 5 of 5 value cases, by the K-5a blind packet (`program/STAGE_K_BLIND_K5A.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `estimate_pnl` -39913.124212551615, `bound` 17.056890689124625 (the golden's 17.05689068912462 differs in the last place, inside the tolerance), `label` as expected.
 
-### Guard a Richardson extrapolation (runs after integration)
+### Guard a Richardson extrapolation
 
 ```json
 {"schema_version": "1.0", "case_id": "rich", "operation": "num.richardson.check", "inputs": {"values": [10.5, 10.125, 10.03125], "ratio": 2.0, "assumed_order": 2.0}}
 ```
 
-Expected (golden `rich_k-0001`, branch `k-w1`): `status` `OK`, `observed_order` 2.0, `extrapolated` 10.0. Values that do not shrink regularly give `NON_MONOTONE` and no extrapolation (`rich_k-0004`). Not run on this branch.
+Expected (golden `rich_k-0001`): `status` `OK`, `observed_order` 2.0, `extrapolated` 10.0. Values that do not shrink regularly give `NON_MONOTONE` and no extrapolation (`rich_k-0004`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `status` `OK`, `observed_order` 2.0, `extrapolated` 10.0, as expected.
 
-### Ask for the smoothed Bermudan ladder (runs after integration)
+### Ask for the smoothed Bermudan ladder
 
-Add `"method": "CN_RANNACHER_SMOOTHED"` to the inputs of `rates.shortrate.bermudan_ladder` or `rates.shortrate.bermudan_swaption`; absent or `G18_IMPLICIT` keeps the G-18 scheme bit for bit, and any other value is `E_SCHEMA` (branch `k-k8`, `program/K8_PORT_NOTE.md`). Inputs otherwise as the stage G goldens; `datasets/golden/stage_k/k8_k.json` has seven value cases. Python and Java only. **The R6 use restriction still applies** (`docs/model-inventory.md`, MG-6) until an integration commit lifts it for this method under acceptance 4. Not run on this branch.
+Add `"method": "CN_RANNACHER_SMOOTHED"` to the inputs of `rates.shortrate.bermudan_ladder` or `rates.shortrate.bermudan_swaption`; absent or `G18_IMPLICIT` keeps the G-18 scheme bit for bit, and any other value is `E_SCHEMA` (`program/K8_PORT_NOTE.md`). Inputs otherwise as the stage G goldens; `datasets/golden/stage_k/k8_k.json` has seven value cases, run in all four builds. The default stays `G18_IMPLICIT` (KR-8). **The R6 use restriction is lifted for `CN_RANNACHER_SMOOTHED` only** (ruling KR-110, 2026-11-19, after acceptance 1 to 3 passed in all four builds); it still applies to `G18_IMPLICIT` (`docs/model-inventory.md`, MG-6). The ladder row of a curve node the price does not depend on (0.4986 years in the judged cases) is exactly zero and is not judged (owner decision 2026-11-19; `program/K8_ROW0_FINDING.md`: no bug). K-8 outside share: 7 of 7 value cases, by blind re-derivation (`program/STAGE_K_BLIND_K8.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the inputs of `k8_k-0001` with `method` `CN_RANNACHER_SMOOTHED` returned the golden's `price` 22737.43110152093 and every ladder entry bit for bit (about 3 s); the same inputs with `method` `CN_RANNACHER` returned `E_SCHEMA` ("method: CN_RANNACHER is not listed").
 
-### SA-CCR EAD for a netting set (runs after integration)
+### SA-CCR EAD for a netting set
 
 ```json
 {"schema_version": "1.0", "case_id": "saccr", "operation": "risk.saccr.ead", "inputs": {"trades": [{"id": "1", "asset_class": "IR", "notional": 10000, "market_value": 30, "maturity": 10, "position": "LONG", "start": 0, "end": 10, "hedging_set": "USD"}, {"id": "2", "asset_class": "IR", "notional": 10000, "market_value": -20, "maturity": 4, "position": "SHORT", "start": 0, "end": 4, "hedging_set": "USD"}, {"id": "3", "asset_class": "IR", "notional": 5000, "market_value": 50, "maturity": 11, "position": "BOUGHT", "kind": "OPTION", "option_type": "PUT", "underlying_price": 0.06, "strike": 0.05, "exercise": 1, "start": 1, "end": 11, "hedging_set": "EUR"}]}}
 ```
 
-Expected (golden `saccr_k-0001`, Basel CRE99 Example 1, branch `k-w1b`): `ead` 569.4701409373457, `rc` 60, `pfe` 346.76438638381836, `multiplier` 1, hedging-set add-ons EUR 50.4145690652664 and USD 296.34981731855197. Needs the registration lines of `program/STAGE_K_W1B_HANDOVER.md`. Python only. Worked step by step in [Tutorial 56](docs/getting-started/tutorial-56-sa-ccr-example-1.md). Not run on this branch.
+Expected (golden `saccr_k-0001`, Basel CRE99 Example 1): `ead` 569.4701409373457, `rc` 60, `pfe` 346.76438638381836, `multiplier` 1, hedging-set add-ons EUR 50.4145690652664 and USD 296.34981731855197. Worked step by step in [Tutorial 56](docs/getting-started/tutorial-56-sa-ccr-example-1.md). SA-CCR outside share: 12 of 16 value cases (5 published examples, 7 blind re-derivations, `program/STAGE_K_BLIND_W1B.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `ead` 569.4701409373457, `rc` 60.0 and `multiplier` 1.0 as expected; `pfe` 346.7643863838184 and the add-ons EUR 50.414569065266406 and USD 296.349817318552 differ from the golden in the last digit or two, inside the tolerance.
 
-### Backtesting zone and desk eligibility (runs after integration)
+### Backtesting zone and desk eligibility
 
 ```json
 {"schema_version": "1.0", "case_id": "zone", "operation": "risk.frtb.backtest.zone", "inputs": {"observations": 250, "exceptions_actual": 3, "exceptions_hypothetical": 5}}
 {"schema_version": "1.0", "case_id": "desk", "operation": "risk.frtb.backtest.desk", "inputs": {"observations": 250, "exceptions_99_actual": 13, "exceptions_99_hypothetical": 0, "exceptions_975_actual": 0, "exceptions_975_hypothetical": 0}}
 ```
 
-Expected (spec worked example and golden `btk_k-0020`, branch `k-w1b`): the first gives `exceptions` 5, `zone` `AMBER`, `amber_from` 5, `red_from` 10, `multiplier` 1.7; the second `breach_99` true, `eligible` false. To count exceptions from series, send `risk.frtb.backtest.count` with `var`, `actual` and `hypothetical` arrays (a null counts as an exception; a loss equal to VaR does not). Python only. Not run on this branch.
+Expected (spec worked example and golden `btk_k-0020`): the first gives `exceptions` 5, `zone` `AMBER`, `amber_from` 5, `red_from` 10, `multiplier` 1.7; the second `breach_99` true, `eligible` false. To count exceptions from series, send `risk.frtb.backtest.count` with `var`, `actual` and `hypothetical` arrays (a null counts as an exception; a loss equal to VaR does not). K-8e outside share: 23 of 24 value cases (12 against the printed MAR99 Table 2, 11 by blind re-derivation, `program/STAGE_K_BLIND_BTK.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): zone `exceptions` 5, `cumulative_probability` 0.9588168159302313, `zone` `AMBER`, `amber_from` 5, `red_from` 10, `multiplier` 1.7; desk `exceptions_99` 13, `breach_99` true, `breach_975` false, `eligible` false, as expected.
 
-### Verify the daily paper ledger (runs after integration)
+### Verify the daily paper ledger (not yet runnable)
 
 ```bash
 git fetch origin paper-ledger paper-ledger-anchors
@@ -1357,4 +1357,4 @@ python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --no-cli 
 python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --require-days 20
 ```
 
-`--no-cli` checks the chain, the configuration, the dates and holdout windows, and replays every day in exact decimal from the ledger's own numbers; the full run also rebuilds each day through the CLI. Tools on branch `k-paper`; the `paper-ledger` branch does not exist until the workflow first runs on `main`. **0 of 20 recorded trading days today.** Every row is labelled "paper marks on a fitted curve; not tradable"; no performance claim is made. Not run on this branch.
+`--no-cli` checks the chain, the configuration, the dates and holdout windows, and replays every day in exact decimal from the ledger's own numbers; the full run also rebuilds each day through the CLI. The tool is merged (`tools/paper_daily/verify_ledger.py`, spec `specifications/12-platform/paper-ledger-daily.md`). The `paper-ledger` branch does not exist until the workflow first runs on `main`, so the daily ledger is not yet running: **0 of 20 recorded trading days.** Every row is labelled "paper marks on a fitted curve; not tradable"; no performance claim is made. Not run: there is no ledger to fetch (2026-11-19, `k-r1`). Checked only that `verify_ledger.py --help` lists the `verify` command and the `--ledger`, `--no-cli` and `--require-days` options used above.

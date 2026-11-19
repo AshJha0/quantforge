@@ -6,7 +6,7 @@ The plain idea: in a sequential bootstrap each discount factor depends only on t
 
 You will bootstrap a three-pillar curve, move the second and then the third quote, check each patched curve against a full rebuild, and watch a stale cache get refused. Budget 10 minutes.
 
-<p class="note">Stage K, in progress. The operations <code>curve.bootstrap.par_annual</code> and <code>curve.incremental.update</code> are on branch <code>k-w1</code> (spec <code>specifications/02-curves/incremental-update.md</code> 1.0.0, ruling KR-5), not yet merged. Acceptance evidence: Python and Java; C++ and Rust in progress (<code>program/STAGE_K_W1_HANDOVER.md</code> on <code>k-w1</code>). Step 1 restates the spec's recursion with the standard library on the golden inputs; Step 2 is the library call and runs after integration.</p>
+<p class="note">Stage K. The operations <code>curve.bootstrap.par_annual</code> and <code>curve.incremental.update</code> are on the integration branch <code>k-r1</code> in all four builds (merged 2026-11-19; not yet released) (spec <code>specifications/02-curves/incremental-update.md</code> 1.0.0, ruling KR-5). Acceptance evidence files: Python and Java; C++ and Rust run the same properties in their unit tests without writing evidence files (<code>program/STAGE_K_W1_HANDOVER.md</code>). The incremental path on the stage B production bootstrap is in all four builds: 10,000 of 10,000 moves bit-identical to a full rebuild in each. Step 1 restates the rule with the standard library on the golden inputs; Step 2 calls the library, and CI checks that it prints the lines shown under Step 1.</p>
 
 Terms, defined here. A **par swap** with annual payments and accrual 1 has fixed rate `S_k` that makes it worth zero. **Pillar** `k` is the discount factor `P_k` at year `k`. **Bit for bit** means the two binary64 numbers are the same 64 bits, not merely close.
 
@@ -17,7 +17,6 @@ Terms, defined here. A **par swap** with annual payments and accrual 1 has fixed
 
 ## Step 1: bootstrap, patch, compare
 
-<!-- tutorial:run python -->
 ```python
 import math
 
@@ -62,7 +61,7 @@ except AssertionError as e:
     print("inc_k-0006 refused:", e)
 ```
 
-Output (CI checks these lines):
+Output (CI checks that Step 2 prints these lines):
 
 <!-- tutorial:expect -->
 ```text
@@ -83,18 +82,18 @@ inc_k-0006 refused: stale cache: E_INPUT
 
 ### The formal statement, checked against the spec
 
-From `specifications/02-curves/incremental-update.md` (branch `k-w1`, ruling KR-5; read 2026-11-19).
+From `specifications/02-curves/incremental-update.md` (ruling KR-5; read 2026-11-19).
 
 - `P_k = (1 - S_k sum_{i<k} P_i) / (1 + S_k)`. If quotes change only at indices `>= j` (0-based), `P_0..P_{j-1}` are unchanged and `P_j..P_{n-1}` follow from the same recursion. Hagan and West (2006), section 2, is cited for the bootstrap identity (UNVERIFIED section number in the spec).
 - `curve.incremental.update` checks that `previous_discount_factors` equals the bootstrap of `previous_quotes` bit for bit; if not, `E_INPUT`. Lengths that differ are `E_INPUT` (`inc_k-0005`).
 - Acceptance (fixed before the run): the goldens in four languages; for 10,000 random quote vectors and random single or multi-index changes, the update equals a full rebuild to 1e-12 relative with copied pillars bit-identical; and the same premise on the stage B production bootstrap.
-- Evidence (measured by the k-w1 lane, 2026-11-19): all 10,000 vectors bit-identical to a full rebuild (largest relative difference 0), key `incremental_property`; on the 10 stage B log-linear bootstrap goldens, 45 single-quote moves of 1 bp, in every one the first pillar that changes is the moved quote's and every earlier pillar is bit-identical, key `incremental_property_stage_b`. Python and Java (`program/stage_k_w1/`); C++ and Rust in progress.
+- Evidence (measured by the k-w1 lane, 2026-11-19): all 10,000 vectors bit-identical to a full rebuild (largest relative difference 0), key `incremental_property`; on the 10 stage B log-linear bootstrap goldens, 45 single-quote moves of 1 bp, in every one the first pillar that changes is the moved quote's and every earlier pillar is bit-identical, key `incremental_property_stage_b`. Python and Java (`program/stage_k_w1/`); C++ and Rust run the same properties in their unit tests. On the stage B production bootstrap itself (the follow-up lane, 2026-11-19), all four builds patch 10,000 of 10,000 moves bit-identically to a full rebuild, key `incremental_property_stage_b_patched` (`specifications/02-curves/incremental-update.md`, "Acceptance evidence").
 
-## Step 2: the same cases through the library (runs after integration)
+## Step 2: the same cases through the library
 
-<!-- runs-after-integration: T52 -->
-This block needs the two operations and `datasets/golden/stage_k/inc_k.json`, which are on branch `k-w1`. After the merge it is meant to print the same lines as Step 1; it has not been run.
+This block calls the library on the goldens in `datasets/golden/stage_k/`. It was turned on at integration (2026-11-19) and printed the same lines as Step 1; CI now checks them.
 
+<!-- tutorial:run python -->
 ```python
 # Goldens inc_k-0001 to 0004 and 0006 through curve.bootstrap.par_annual and curve.incremental.update.
 import json
@@ -144,5 +143,5 @@ You built a three-pillar par curve, patched it for two different quote moves, pr
 
 ## References and further reading
 
-- This project: `specifications/02-curves/incremental-update.md`, `specifications/stage-k-rulings-w1.md` (branch `k-w1`); the stage B bootstrap, [`curve-framework.md`](../../specifications/02-curves/curve-framework.md).
+- This project: `specifications/02-curves/incremental-update.md`, `specifications/stage-k-rulings-w1.md`; the stage B bootstrap, [`curve-framework.md`](../../specifications/02-curves/curve-framework.md).
 - P. S. Hagan and G. West, "Interpolation methods for curve construction", *Applied Mathematical Finance* 13(2), 2006 (cited in the spec; free preprint; section number UNVERIFIED).

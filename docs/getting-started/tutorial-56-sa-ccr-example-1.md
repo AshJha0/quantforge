@@ -6,7 +6,7 @@ The plain idea: if a counterparty defaults today, a bank loses what its derivati
 
 You will compute the first worked example of the Basel Framework (CRE99 Example 1: two interest rate swaps and a swaption) from the trades to the printed EAD of 569, one step at a time. Budget 15 minutes.
 
-<p class="note">Stage K, in progress. The operation <code>risk.saccr.ead</code> is on branch <code>k-w1b</code> (spec <code>specifications/06-risk/sa-ccr.md</code> 0.1.0, rulings KR-30 to KR-39), implemented in Python only and not yet merged or registered. The five published Basel examples reproduce (<code>oracle/python/gen_stage_k_w1b.py</code>, every line "published check MATCH"). Outside share 12 of 16 value cases, 75%: 5 published examples plus 7 blind re-derivations; 4 further blind matches are excluded because of a process failure (<code>program/STAGE_K_BLIND_W1B.md</code>). Step 1 restates the steps with the standard library; Step 2 runs after integration.</p>
+<p class="note">Stage K. The operation <code>risk.saccr.ead</code> is on the integration branch <code>k-r1</code> in all four builds (merged 2026-11-19; not yet released) and registered in the CLI contract 1.17.0 (spec <code>specifications/06-risk/sa-ccr.md</code> 0.1.0, rulings KR-30 to KR-39). The five published Basel examples reproduce (<code>oracle/python/gen_stage_k_w1b.py</code>, every line "published check MATCH"). Outside share 12 of 16 value cases, 75%: 5 published examples plus 7 blind re-derivations; 4 further blind matches are excluded because of a process failure (<code>program/STAGE_K_BLIND_W1B.md</code>). Step 1 restates the rule with the standard library on the golden inputs; Step 2 calls the library, and CI checks that it prints the lines shown under Step 1.</p>
 
 Terms, defined here. A **netting set** is the trades covered by one legally enforceable netting agreement. **V** is their total market value, **C** the collateral held (after haircuts). The **replacement cost** RC is `max(V - C, 0)` when unmargined. A **hedging set** is a group of trades allowed to offset each other (for interest rates, one currency). The **adjusted notional** `d` scales an interest rate notional by its **supervisory duration** SD. The **effective notional** `D` is `d x MF x delta`, with MF the **maturity factor**. The **add-on** is the supervisory factor SF times the hedging set's aggregated effective notional. The **PFE multiplier** lets over-collateralisation reduce the PFE; it is 1 when `V - C >= 0`.
 
@@ -29,7 +29,6 @@ No margin agreement, no collateral.
 
 ## Step 1: from trades to EAD
 
-<!-- tutorial:run python -->
 ```python
 # SA-CCR, Basel CRE99 Example 1 (golden saccr_k-0001), step by step with the standard library (CRE52 steps 1 to 8).
 import math
@@ -72,7 +71,7 @@ assert abs(ead - 569.4701409373457) <= 1e-10 * ead  # golden saccr_k-0001
 print(f"AddOn {addon:,.2f} multiplier {mult} RC {rc:.0f} PFE {pfe:,.2f} EAD = 1.4 x ({rc:.0f} + {pfe:.2f}) = {ead:.2f}; printed 569")
 ```
 
-Output (CI checks these lines):
+Output (CI checks that Step 2 prints these lines):
 
 <!-- tutorial:expect -->
 ```text
@@ -99,7 +98,7 @@ The paper writes `1.4 x (60 + 347) = 569`. That line carries 569.47 and prints t
 
 ### The formal statement, checked against the spec
 
-From `specifications/06-risk/sa-ccr.md` 0.1.0 (branch `k-w1b`; CRE52 pp.434 to 462 read 2026-11-19 by that lane).
+From `specifications/06-risk/sa-ccr.md` 0.1.0 (CRE52 pp.434 to 462 read 2026-11-19 by that lane).
 
 - `EAD = alpha (RC + PFE)`, `alpha = 1.4`; margined `EAD` capped at the unmargined `EAD` of the same trades (KR-37).
 - `PFE = m x AddOn_aggregate`, `m = 1` if `V - C >= 0`, else `min{1; 0.05 + 0.95 exp((V - C) / (2 x 0.95 x AddOn))}`; 0.05 when the add-on is 0 (KR-36).
@@ -110,13 +109,13 @@ From `specifications/06-risk/sa-ccr.md` 0.1.0 (branch `k-w1b`; CRE52 pp.434 to 4
 
 - **Published.** `saccr_k-0001` to `0005` are CRE99 Examples 1 to 5 (printed EADs 569, 381, 5,406, 936, 1,879), with every printed intermediate asserted by the generator. One printed intermediate, CRE99.90's -7,100 for a Brent forward, is -7,099.30 at full precision; it is accepted within one unit as a source rounding and recorded as such (KR-31), not hidden.
 - **Blind.** `saccr_k-0006` to `0016` were re-derived by a blind lane (a different model, packet only, results frozen with their hash before the compare): 11 of 11 MATCH. Four of them (0006, 0013, 0015, 0016) are excluded from the count because the lane had read the unstripped spec once before the packet was built, which showed output facts for those cases. So the counted share is 5 + 7 = 12 of 16 value cases, 75%, against the 60% floor. Counting the leaked four would give 16 of 16; the record does not claim that.
-- **Not yet.** Python only. The goldens' `verified_by` and the spec's acceptance line (31%) still show the pre-blind share; the coordinator updates them.
+- **Recorded.** The goldens' `verified_by` and the spec's acceptance line show the counted share, 12 of 16 (the earlier 31% line, written before the blind lane ran, is superseded).
 
-## Step 2: the same example through the library (runs after integration)
+## Step 2: the same example through the library
 
-<!-- runs-after-integration: T56 -->
-This block needs `risk.saccr.ead` registered (handover, "Registration lines") and `datasets/golden/stage_k/saccr_k.json` (branch `k-w1b`). After the merge it is meant to print the same lines as Step 1; it has not been run.
+This block calls the library on the goldens in `datasets/golden/stage_k/`. It was turned on at integration (2026-11-19) and printed the same lines as Step 1; CI now checks them.
 
+<!-- tutorial:run python -->
 ```python
 # Golden saccr_k-0001 through risk.saccr.ead, printed in the order of Step 1.
 import json
@@ -159,6 +158,6 @@ You computed Basel's first SA-CCR example from three trades to an EAD of 569.47,
 
 ## References and further reading
 
-- This project (branch `k-w1b`): `specifications/06-risk/sa-ccr.md`, `specifications/06-risk/sa-ccr-parameters.json`, `specifications/stage-k-rulings-w1b.md`, `program/STAGE_K_W1B_HANDOVER.md`, `program/STAGE_K_BLIND_W1B.md`.
+- This project: `specifications/06-risk/sa-ccr.md`, `specifications/06-risk/sa-ccr-parameters.json`, `specifications/stage-k-rulings-w1b.md`, `program/STAGE_K_W1B_HANDOVER.md`, `program/STAGE_K_BLIND_W1B.md`.
 - Basel Committee on Banking Supervision, *The Basel Framework*, CRE52 (standardised approach to counterparty credit risk) and CRE99 (application guidance, Examples 1 to 5), consolidated PDF generated 11/11/2026 (read by the k-w1b lane, 2026-11-19).
 - Basel Committee on Banking Supervision, *The standardised approach for measuring counterparty credit risk exposures*, BCBS 279, March 2014, Annex 4a (read in a browser by an earlier lane, 2026-11-15; not on disk).

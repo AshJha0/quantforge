@@ -8,7 +8,7 @@ The plain idea: each US business day a small job reads the Treasury par yield cu
 
 You will replay the spec's worked day in exact decimal and see the P&L explain close with an unexplained term of exactly zero, then build a two-row chain and catch a one-digit edit. Budget 15 minutes.
 
-<p class="note">Stage K, in progress. The daily job and its verifier (<code>tools/paper_daily/</code>), the workflow <code>.github/workflows/paper-ledger.yml</code> and the spec <code>specifications/12-platform/paper-ledger-daily.md</code> 0.1.0 (rulings KR-70 to KR-89, proposed) are on branch <code>k-paper</code>, not yet merged. <strong>The ledger is not running yet: 0 of the 20 recorded trading days the v1.0.0 gate needs.</strong> The workflow has never run on a GitHub runner. Step 1 restates the arithmetic with the standard library; Step 2 is the verifier and runs after integration, by hand.</p>
+<p class="note">Stage K. The daily job and its verifier (<code>tools/paper_daily/</code>), the workflow <code>.github/workflows/paper-ledger.yml</code> and the spec <code>specifications/12-platform/paper-ledger-daily.md</code> 0.1.0 (rulings KR-70 to KR-89, proposed) are merged on the integration branch <code>k-r1</code> (2026-11-19; not yet released). <strong>The ledger is not running yet: 0 of the 20 recorded trading days the v1.0.0 gate needs.</strong> The workflow has never run on a GitHub runner; it starts only once it is on <code>main</code>. Step 1 restates the arithmetic with the standard library and is the block CI checks; Step 2 is the verifier, run by hand once the ledger exists.</p>
 
 Terms, defined here. A **DAY row** is one business day's record; a **GAP row** marks a business day with no recorded curve; a row written after its cut-off is **late** and carries no order. **Carry** is the coupon accrued plus interest on cash; **roll-down** is what the bond gains by ageing along yesterday's curve; **curve move** is what today's curve does to it; **fills and costs** is each fill against par. **Unexplained** is the NAV change minus those four. The **anchor** is an OpenTimestamps stamp of the head hash on a separate branch.
 
@@ -110,7 +110,7 @@ That makes the explain a **bookkeeping test**, zero by construction. It is not a
 
 ### How to verify from the ledger alone
 
-The verifier (`tools/paper_daily/verify_ledger.py verify`, branch `k-paper`) checks in a fixed order and stops at the first failure, never repairing (KR-84 to KR-86, KR-89):
+The verifier (`tools/paper_daily/verify_ledger.py verify`) checks in a fixed order and stops at the first failure, never repairing (KR-84 to KR-86, KR-89):
 
 1. **The chain**, row by row: `PARSE` (including a repeated key), `SEQ`, `HASH`, `LINK`, `LABEL`, `FORMAT`, `KIND`.
 2. **The configuration**: the genesis row holds the whole configuration and its hash; a later change to it is `CONFIG`.
@@ -121,10 +121,10 @@ The verifier (`tools/paper_daily/verify_ledger.py verify`, branch `k-paper`) che
 
 Acceptance tests P1 to P11 were fixed in the spec before the first scheduled run. Planted faults, each shown failing with its own reason, are test P7; they were measured on the local laptop (40 tests, Windows, Python 3.15), not on CI.
 
-## Step 2: the real verifier (runs after integration, by hand)
+## Step 2: the real verifier (by hand, once the ledger exists)
 
 <!-- runs-after-integration: T58 (by hand; not for CI) -->
-These commands need `tools/paper_daily/` (branch `k-paper`) and, for the second block, the `paper-ledger` branch, which does not exist until the workflow first runs on `main`. They are not for the tutorial checker: their output depends on the day they are run. The handover's dry run on 2026-11-19 printed one DAY row for 2026-11-18 (a BUY of 26,500 units of `UST-CM-2Y`, partly filled; P&L -293.75); its hash changes from run to run until the ledger exists, because the genesis row holds the run time.
+These commands use `tools/paper_daily/` and, for the second block, the `paper-ledger` branch, which does not exist until the workflow first runs on `main`. They are not for the tutorial checker: their output depends on the day they are run. The handover's dry run on 2026-11-19 printed one DAY row for 2026-11-18 (a BUY of 26,500 units of `UST-CM-2Y`, partly filled; P&L -293.75); its hash changes from run to run until the ledger exists, because the genesis row holds the run time.
 
 ```bash
 # Dry run: prints the rows a run would add now and writes nothing.
@@ -165,5 +165,5 @@ You replayed a paper ledger day in exact decimal from its own numbers, saw the e
 
 ## References and further reading
 
-- This project (branch `k-paper`): `specifications/12-platform/paper-ledger-daily.md`, `specifications/stage-k-rulings-paper.md`, `docs/developer-guides/paper-ledger.md`, `program/STAGE_K_PAPER_HANDOVER.md`; the stage H paper book in [Tutorial 44](tutorial-44-paper-trading.md) and [`paper-trading.md`](../../specifications/10-execution/paper-trading.md); anchors in [`forward-log-anchors.md`](../developer-guides/forward-log-anchors.md).
+- This project: `specifications/12-platform/paper-ledger-daily.md`, `specifications/stage-k-rulings-paper.md`, `docs/developer-guides/paper-ledger.md`, `program/STAGE_K_PAPER_HANDOVER.md`; the stage H paper book in [Tutorial 44](tutorial-44-paper-trading.md) and [`paper-trading.md`](../../specifications/10-execution/paper-trading.md); anchors in [`forward-log-anchors.md`](../developer-guides/forward-log-anchors.md).
 - NIST FIPS 180-4, *Secure Hash Standard* (SHA-256), cited in the spec (standard; recalled).

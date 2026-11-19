@@ -6,7 +6,7 @@ The plain idea: a bank that uses its own model for market risk capital checks ev
 
 You will rebuild the published table of cumulative probabilities from the binomial distribution, find the zone boundaries for 250 and 500 days, see a literal reading of the rule give an odd answer for five days, and apply the desk exception limits. Budget 10 minutes.
 
-<p class="note">Stage K, in progress. The operations <code>risk.frtb.backtest.zone</code>, <code>.desk</code> and <code>.count</code> are on branch <code>k-w1b</code> (spec <code>specifications/06-risk/frtb-ima-backtest.md</code> 0.1.0, rulings KR-40 to KR-47), Python only, not yet merged or registered. The published table (MAR99 Table 2) matches for the new operation and for the existing stage F <code>risk.backtest.traffic_light</code>. Step 1 uses the standard library in exact rational arithmetic; Step 2 runs after integration.</p>
+<p class="note">Stage K. The operations <code>risk.frtb.backtest.zone</code>, <code>.desk</code> and <code>.count</code> are on the integration branch <code>k-r1</code> in all four builds (merged 2026-11-19; not yet released) and registered in the CLI contract 1.17.0 (spec <code>specifications/06-risk/frtb-ima-backtest.md</code> 0.1.0, rulings KR-40 to KR-47). The published table (MAR99 Table 2) matches for the new operation and for the existing stage F <code>risk.backtest.traffic_light</code>. Outside share of <code>btk_k</code>: 23 of 24 value cases, 12 against the printed table and 11 by blind re-derivation (<code>program/STAGE_K_BLIND_BTK.md</code>). Step 1 uses the standard library in exact rational arithmetic; Step 2 calls the library, and CI checks that it prints the lines shown under Step 1.</p>
 
 Terms, defined here. An **exception** is a day whose loss exceeds the VaR (strictly: a loss equal to VaR is not one; a missing P&L or VaR counts as one). **Actual** P&L includes the day's trading; **hypothetical** P&L revalues the start-of-day positions only; the count used is the larger of the two. `X ~ Binomial(n, 0.01)` is the exception count of a correct 99% model over `n` days, and `cdf(k) = P(X <= k)`.
 
@@ -17,7 +17,6 @@ Terms, defined here. An **exception** is a day whose loss exceeds the VaR (stric
 
 ## Step 1: the table, the zones and the desk limits
 
-<!-- tutorial:run python -->
 ```python
 # FRTB backtesting zones (risk.frtb.backtest.zone, MAR32 and MAR99) by the binomial rule, standard library only.
 from fractions import Fraction as F
@@ -58,7 +57,7 @@ for x99, x975 in ((12, 30), (13, 30), (12, 31)):  # MAR32.19: "more than 12" at 
     print(f"desk, 250 days: 99% exceptions {x99}, 97.5% exceptions {x975}: eligible {not (x99 > 12 or x975 > 30)}")
 ```
 
-Output (CI checks these lines):
+Output (CI checks that Step 2 prints these lines):
 
 <!-- tutorial:expect -->
 ```text
@@ -83,7 +82,7 @@ desk, 250 days: 99% exceptions 12, 97.5% exceptions 31: eligible False
 
 ### The formal statement, checked against the spec
 
-From `specifications/06-risk/frtb-ima-backtest.md` 0.1.0 (branch `k-w1b`; MAR32 pp.658 to 668 and MAR99 pp.753 to 761 of the Basel Framework PDF of 11/11/2026, read 2026-11-19).
+From `specifications/06-risk/frtb-ima-backtest.md` 0.1.0 (MAR32 pp.658 to 668 and MAR99 pp.753 to 761 of the Basel Framework PDF of 11/11/2026, read 2026-11-19).
 
 - `amber_from = min{k : cdf(k) >= 0.95}`, `red_from = min{k : cdf(k) >= 0.9999}`. Exceptions `x = max(x_actual, x_hypothetical)`. RED if `x >= red_from`, AMBER if `x >= amber_from`, else GREEN. Multiplier at `n = 250`: 1.50 for 0 to 4, 1.70, 1.76, 1.83, 1.88, 1.92 for 5 to 9, 2.00 from 10; null for any other `n`.
 - Desk: `breach_99 = x99 > 12`, `breach_975 = x975 > 30`, `eligible` = neither.
@@ -93,11 +92,11 @@ From `specifications/06-risk/frtb-ima-backtest.md` 0.1.0 (branch `k-w1b`; MAR32 
 - Outside share (handover table): `btk_k` 23 of 24 value cases (96%), `tlk_k` 11 of 11, if `binom.cdf` counts as a library check. Whether it does, when `binom.cdf` is itself the compared quantity, is the coordinator's classification decision (handover, "Outside-check share").
 - Not covered (KR-47): the P&L attribution test, the 10% eligibility criterion, the NMRF waiver, the qualitative add-on and capital.
 
-## Step 2: the same questions through the library (runs after integration)
+## Step 2: the same questions through the library
 
-<!-- runs-after-integration: T57 -->
-This block needs the three operations registered (handover, "Registration lines") and `datasets/golden/stage_k/tlk_k.json` (branch `k-w1b`). After the merge it is meant to print the same lines as Step 1; it has not been run.
+This block calls the library on the goldens in `datasets/golden/stage_k/`. It was turned on at integration (2026-11-19) and printed the same lines as Step 1; CI now checks them.
 
+<!-- tutorial:run python -->
 ```python
 # MAR99 Table 2 from golden tlk_k (existing operation), then risk.frtb.backtest.zone and .desk.
 import json
@@ -155,5 +154,5 @@ You rebuilt the Basel backtesting table from the binomial distribution in exact 
 
 ## References and further reading
 
-- This project (branch `k-w1b`): `specifications/06-risk/frtb-ima-backtest.md`, `specifications/06-risk/frtb-ima-backtest-tables.json`, `specifications/stage-k-rulings-w1b.md`; the stage F traffic light in [`var-es-and-backtests.md`](../../specifications/06-risk/var-es-and-backtests.md) and [Tutorial 5](tutorial-5-risk.md).
+- This project: `specifications/06-risk/frtb-ima-backtest.md`, `specifications/06-risk/frtb-ima-backtest-tables.json`, `specifications/stage-k-rulings-w1b.md`; the stage F traffic light in [`var-es-and-backtests.md`](../../specifications/06-risk/var-es-and-backtests.md) and [Tutorial 5](tutorial-5-risk.md).
 - Basel Committee on Banking Supervision, *The Basel Framework*, MAR32 (backtesting and P&L attribution) and MAR99 (guidance on the internal models approach, Tables 1 and 2), consolidated PDF generated 11/11/2026 (read by the k-w1b lane, 2026-11-19).

@@ -6,7 +6,7 @@ The plain idea: recalibrating on every tick wastes effort and adds noise; never 
 
 You will run the trigger on five golden cases, see that a move exactly at the threshold does not fire, and check the acceptance simulation's fire counts against their binomial interval. Budget 10 minutes.
 
-<p class="note">Stage K, in progress. The operation <code>calib.trigger.check</code> is on branch <code>k-w1</code> (spec <code>specifications/03-calibration/recalibration-triggers.md</code> 1.0.0, ruling KR-6), not yet merged. Acceptance evidence: Python and Java; C++ and Rust in progress (<code>program/STAGE_K_W1_HANDOVER.md</code> on <code>k-w1</code>). Step 1 restates the spec's rule with the standard library on the golden inputs; Step 2 is the library call and runs after integration.</p>
+<p class="note">Stage K. The operation <code>calib.trigger.check</code> is on the integration branch <code>k-r1</code> in all four builds (merged 2026-11-19; not yet released) (spec <code>specifications/03-calibration/recalibration-triggers.md</code> 1.0.0, rulings KR-6, KR-13). Acceptance evidence files: Python and Java; C++ and Rust run the same properties in their unit tests without writing evidence files (<code>program/STAGE_K_W1_HANDOVER.md</code>). Outside share 4 of 6 value cases after the far-tail case <code>trig_k-0009</code> (<code>oracle/OUTSIDE_SHARES.md</code>). Step 1 restates the rule with the standard library on the golden inputs; Step 2 calls the library, and CI checks that it prints the lines shown under Step 1.</p>
 
 Terms, defined here. `c_1..c_n` are past one-day changes of the monitored input; `sigma` is their sample standard deviation (divisor `n - 1`). `x_ref` is the value at the last calibration, `x_now` the value today, `d` the days since. The **level** `k` sets the **false-alarm rate** `alpha`, the share of pure-noise days on which the trigger would still fire.
 
@@ -17,7 +17,6 @@ Terms, defined here. `c_1..c_n` are past one-day changes of the monitored input;
 
 ## Step 1: five cases and the simulation's interval
 
-<!-- tutorial:run python -->
 ```python
 # The recalibration trigger of calib.trigger.check, goldens trig_k-0001 to 0005, restated with the standard library.
 import math
@@ -53,7 +52,7 @@ lo, hi = binom_interval(100_000, 0.0030306)
 print(f"99% interval for 100,000 noise paths at rate 0.0030306: [{lo}, {hi}]; Python 291 and Java 287 fires inside: {lo <= 291 <= hi and lo <= 287 <= hi}")
 ```
 
-Output (CI checks these lines):
+Output (CI checks that Step 2 prints these lines):
 
 <!-- tutorial:expect -->
 ```text
@@ -75,17 +74,17 @@ trig_k-0005 move 2.5000001 sigma 1.0000000000 threshold 2.5000000000 fire True a
 
 ### The formal statement, checked against the spec
 
-From `specifications/03-calibration/recalibration-triggers.md` (branch `k-w1`, rulings KR-6, KR-13; read 2026-11-19).
+From `specifications/03-calibration/recalibration-triggers.md` (rulings KR-6, KR-13; read 2026-11-19).
 
 - `sigma = sqrt(sum (c_i - c_bar)^2 / (n - 1))`, `n >= 2`. The trigger fires iff `|x_now - x_ref| > k sigma sqrt(d)`, `d >= 1`, `k > 0`. Under independent normal changes with that scale, `alpha = 2 (1 - Phi(k))`. Page (1954) is cited for the control-chart idea (not opened, recalled in the spec).
 - Errors: one change only is `E_INPUT` (`trig_k-0006`); `k = 0` is `E_DOMAIN` (`trig_k-0007`); constant changes give `sigma = 0`, `E_DOMAIN` (`trig_k-0008`); more than 100,000 changes `E_LIMIT`.
-- Acceptance (fixed before the run): the goldens in four languages, sigma and threshold to 1e-14 relative; the noise simulation inside the 99% interval; a planted 6-sigma move firing on at least 99.9% of paths. Evidence: `program/stage_k_w1/acceptance_python.json` and `acceptance_java.jsonl`, key `trigger_simulation` (branch `k-w1`). C++ and Rust in progress.
+- Acceptance (fixed before the run): the goldens in four languages, sigma and threshold to 1e-14 relative; the noise simulation inside the 99% interval; a planted 6-sigma move firing on at least 99.9% of paths. Evidence: `program/stage_k_w1/acceptance_python.json` and `acceptance_java.jsonl`, key `trigger_simulation`. C++ and Rust run the same simulation in their unit tests without writing an evidence file. `false_alarm_rate` is computed as `2 Phi(-k)` with a tail-accurate normal CDF in all four builds; golden `trig_k-0009` (k = 30) checks the far tail.
 
-## Step 2: the same cases through the library (runs after integration)
+## Step 2: the same cases through the library
 
-<!-- runs-after-integration: T53 -->
-This block needs `calib.trigger.check` and `datasets/golden/stage_k/trig_k.json`, which are on branch `k-w1`. After the merge it is meant to print the same lines as Step 1; it has not been run.
+This block calls the library on the goldens in `datasets/golden/stage_k/`. It was turned on at integration (2026-11-19) and printed the same lines as Step 1; CI now checks them.
 
+<!-- tutorial:run python -->
 ```python
 # Goldens trig_k-0001 to 0005 through calib.trigger.check; the binomial interval as in Step 1.
 import json
@@ -138,5 +137,5 @@ You ran a recalibration trigger on five golden cases, saw the threshold widen wi
 
 ## References and further reading
 
-- This project: `specifications/03-calibration/recalibration-triggers.md`, `specifications/stage-k-rulings-w1.md` (branch `k-w1`); drift detectors in [Tutorial 33](tutorial-33-stress-test-and-watch-for-drift.md).
+- This project: `specifications/03-calibration/recalibration-triggers.md`, `specifications/stage-k-rulings-w1.md`; drift detectors in [Tutorial 33](tutorial-33-stress-test-and-watch-for-drift.md).
 - E. S. Page, "Continuous inspection schemes", *Biometrika* 41 (1954) (cited in the spec; not opened, recalled).
