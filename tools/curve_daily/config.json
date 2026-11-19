@@ -1,0 +1,44 @@
+{
+  "format": "qf-curve-daily/1",
+  "spec": "specifications/12-platform/daily-curve-run.md 0.1.0",
+  "label": "fitted to public US Treasury par yields with a library Nelson-Siegel fit; not an official curve",
+  "consistency_label": "consistency check, not proof",
+  "calendar": "USGS",
+  "due_after_utc": "23:00:00",
+  "on_time_cutoff_utc": "19:30:00",
+  "late_max_business_days": "5",
+  "treasury": {
+    "source_id": "us-treasury-par-yields",
+    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/{year}/all?type=daily_treasury_yield_curve&field_tdr_date_value={year}&page&_format=csv",
+    "attribution": "Source: US Department of the Treasury."
+  },
+  "tenors": [
+    {"field": "1 Mo", "months": "1"},
+    {"field": "2 Mo", "months": "2"},
+    {"field": "3 Mo", "months": "3"},
+    {"field": "4 Mo", "months": "4"},
+    {"field": "6 Mo", "months": "6"},
+    {"field": "1 Yr", "months": "12"},
+    {"field": "2 Yr", "months": "24"},
+    {"field": "3 Yr", "months": "36"},
+    {"field": "5 Yr", "months": "60"},
+    {"field": "7 Yr", "months": "84"},
+    {"field": "10 Yr", "months": "120"},
+    {"field": "20 Yr", "months": "240"},
+    {"field": "30 Yr", "months": "360"}
+  ],
+  "fit": {
+    "operation": "bond.fit.nelson_siegel",
+    "frequency": "2",
+    "tau_grid": ["0.25", "0.5", "0.75", "1", "1.25", "1.5", "1.75", "2", "2.25", "2.5", "2.75", "3", "3.25", "3.5", "3.75", "4", "4.25", "4.5", "4.75", "5", "5.25", "5.5", "5.75", "6", "6.25", "6.5", "6.75", "7", "7.25", "7.5", "7.75", "8", "8.25", "8.5", "8.75", "9", "9.25", "9.5", "9.75", "10"],
+    "probe_years": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"]
+  },
+  "fit_flag_bp": {"rmse": "10", "max_abs": "25"},
+  "gsw": {
+    "url": "https://www.federalreserve.gov/data/yield-curve-tables/feds200628.csv",
+    "attribution": "Source: Board of Governors of the Federal Reserve System, Gurkaynak, Sack and Wright (2007), FEDS 2006-28 data.",
+    "column": "SVENY{nn}"
+  },
+  "consistency_tolerance_bp": {"rmse": "15", "max_abs": "40"},
+  "consistency_wait_days": "30"
+}
