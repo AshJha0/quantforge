@@ -199,7 +199,7 @@ def judge(cache: Path | None) -> None:
             "default_vs_reference": rel(coarse[0], ref_price),
             "method_1601_vs_reference": rel(finest[0], ref_price),
         }
-    worst = lambda key: max(e[key] for nm in CASES for e in doc["entries"][nm] if e["judged_by_acceptance_2"])  # noqa: E731
+    worst = lambda key: max(e[key] for nm in CASES for e in doc["entries"][nm] if e["judged_by_acceptance_2"])
     doc["summary"] = {
         "max_reference_bumps_gap": worst("reference_bumps_gap"),
         "max_method_801_vs_1601": worst("method_801_vs_1601"),

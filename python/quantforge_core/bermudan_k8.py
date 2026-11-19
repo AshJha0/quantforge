@@ -324,8 +324,9 @@ def bermudan_price(
 ) -> dict[str, float]:
     """`rates.shortrate.bermudan_swaption` with `method` `CN_RANNACHER_SMOOTHED`."""
     curve_model(times, dfs, a, sigma, rate_given)
-    grid = make_grid(nx, steps_per_year, width)
+    # the schedule (structural E_INPUT) before the grid's width (E_DOMAIN): error order HR-66, as Java
     payer = check_bermudan(start, payment_times, swaption_type, exercise_times)
+    grid = make_grid(nx, steps_per_year, width)
     r = scheme(
         times, dfs, a, sigma, payment_times, fixed_rate, payer, exercise_times,
         grid.nx, grid.steps_per_year, grid.width, False,
@@ -351,8 +352,9 @@ def bermudan_ladder(
 ) -> dict[str, Any]:
     """`rates.shortrate.bermudan_ladder` with `method` `CN_RANNACHER_SMOOTHED`."""
     curve_model(times, dfs, a, sigma, rate_given)
-    grid = make_grid(nx, steps_per_year, width)
+    # the schedule (structural E_INPUT) before the grid's width (E_DOMAIN): error order HR-66, as Java
     payer = check_bermudan(start, payment_times, swaption_type, exercise_times)
+    grid = make_grid(nx, steps_per_year, width)
     r = scheme(
         times, dfs, a, sigma, payment_times, fixed_rate, payer, exercise_times,
         grid.nx, grid.steps_per_year, grid.width, True,

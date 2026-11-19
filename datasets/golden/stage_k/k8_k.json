@@ -1,0 +1,1139 @@
+{
+ "schema_version": "1.0",
+ "suite": "k8_k",
+ "spec": "specifications/06-risk/bermudan-ladder-k8.md",
+ "spec_version": "0.2.0",
+ "generator": "oracle/python/gen_stage_k_k8.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "k8_k-0001",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "fixed_rate": 0.039462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "method": "CN_RANNACHER_SMOOTHED"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 22737.43110152093,
+     "d_price_d_discount_factors": [
+      0.0,
+      222756.97927658106,
+      157306.48127138885,
+      135525.49051133066,
+      -234107.76717224217,
+      -347573.8913112793,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "d_price_d_mean_reversion": -53342.23688107165,
+     "d_price_d_sigma": 2275014.635067192
+    }
+   },
+   "tolerance_class": "aad_sensitivity",
+   "verified_by": [
+    "python build float64 (pinned reference scheme, spec 0.2.0)",
+    "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)",
+    "default grid: every judged entry within 1% of the QuantLib fine-grid bump (oracle/K8_ACCEPTANCE_W2.json)",
+    "ladder equals its own Richardson bumps to 1e-8 on a small grid (test_k8_ladder_equals_its_own_bumps)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic"
+   ],
+   "description": "ladder at the default grid 201/100, payer at the money",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "Q3a rule per unit notional (G-9), as aadladder_g; the scheme is deterministic"
+   }
+  },
+  {
+   "case_id": "k8_k-0002",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "fixed_rate": 0.044462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "method": "CN_RANNACHER_SMOOTHED"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14538.714732033166,
+     "d_price_d_discount_factors": [
+      0.0,
+      98532.34095360176,
+      131505.3094414489,
+      146874.35268045598,
+      -146110.1817617509,
+      -278631.0289731392,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "d_price_d_mean_reversion": -51430.41258779032,
+     "d_price_d_sigma": 2132209.1919863927
+    }
+   },
+   "tolerance_class": "aad_sensitivity",
+   "verified_by": [
+    "python build float64 (pinned reference scheme, spec 0.2.0)",
+    "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)",
+    "default grid: every judged entry within 1% of the QuantLib fine-grid bump (oracle/K8_ACCEPTANCE_W2.json)",
+    "ladder equals its own Richardson bumps to 1e-8 on a small grid (test_k8_ladder_equals_its_own_bumps)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic"
+   ],
+   "description": "ladder at the default grid 201/100, payer 50 bp out of the money",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "Q3a rule per unit notional (G-9), as aadladder_g; the scheme is deterministic"
+   }
+  },
+  {
+   "case_id": "k8_k-0003",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "fixed_rate": 0.034462,
+    "swaption_type": "RECEIVER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "method": "CN_RANNACHER_SMOOTHED"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14014.364440814628,
+     "d_price_d_discount_factors": [
+      0.0,
+      -92034.23190917178,
+      -129460.80633103332,
+      -135576.212917493,
+      158812.99488158757,
+      278471.9516219159,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "d_price_d_mean_reversion": -50573.04715256333,
+     "d_price_d_sigma": 2075229.6401465738
+    }
+   },
+   "tolerance_class": "aad_sensitivity",
+   "verified_by": [
+    "python build float64 (pinned reference scheme, spec 0.2.0)",
+    "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)",
+    "default grid: every judged entry within 1% of the QuantLib fine-grid bump (oracle/K8_ACCEPTANCE_W2.json)",
+    "ladder equals its own Richardson bumps to 1e-8 on a small grid (test_k8_ladder_equals_its_own_bumps)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic"
+   ],
+   "description": "ladder at the default grid 201/100, receiver 50 bp out",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "Q3a rule per unit notional (G-9), as aadladder_g; the scheme is deterministic"
+   }
+  },
+  {
+   "case_id": "k8_k-0004",
+   "operation": "rates.shortrate.bermudan_swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "fixed_rate": 0.039462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "method": "CN_RANNACHER_SMOOTHED"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 22737.43110152093
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "python build float64 (pinned reference scheme, spec 0.2.0)",
+    "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)",
+    "default grid: every judged entry within 1% of the QuantLib fine-grid bump (oracle/K8_ACCEPTANCE_W2.json)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic"
+   ],
+   "description": "price at the default grid; equals the ladder price of k8_k-0001"
+  },
+  {
+   "case_id": "k8_k-0005",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 41,
+     "steps_per_year": 20,
+     "width": 6.0
+    },
+    "fixed_rate": 0.034462,
+    "swaption_type": "RECEIVER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "method": "CN_RANNACHER_SMOOTHED"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 13716.96718870294,
+     "d_price_d_discount_factors": [
+      0.0,
+      -85323.69457718439,
+      -129308.55315145763,
+      -138026.26813797135,
+      154928.16366504165,
+      276491.2939629992,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "d_price_d_mean_reversion": -48789.9281811259,
+     "d_price_d_sigma": 2034661.6889618998
+    }
+   },
+   "tolerance_class": "aad_sensitivity",
+   "verified_by": [
+    "python build float64 (pinned reference scheme, spec 0.2.0)",
+    "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)",
+    "ladder equals its own Richardson bumps to 1e-8 on a small grid (test_k8_ladder_equals_its_own_bumps)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic"
+   ],
+   "description": "coarse grid 41/20, receiver",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "Q3a rule per unit notional (G-9), as aadladder_g; the scheme is deterministic"
+   }
+  },
+  {
+   "case_id": "k8_k-0006",
+   "operation": "rates.shortrate.bermudan_swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 101,
+     "steps_per_year": 50,
+     "width": 6.0
+    },
+    "fixed_rate": 0.044462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0
+    ],
+    "method": "CN_RANNACHER_SMOOTHED"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7017.868206626406
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "python build float64 (pinned reference scheme, spec 0.2.0)",
+    "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic"
+   ],
+   "description": "one exercise date (European) on 101/50"
+  },
+  {
+   "case_id": "k8_k-0007",
+   "operation": "rates.shortrate.bermudan_swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 51,
+     "steps_per_year": 1,
+     "width": 6.0
+    },
+    "fixed_rate": 0.039462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     3.0
+    ],
+    "method": "CN_RANNACHER_SMOOTHED"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 19143.61007214985
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "python build float64 (pinned reference scheme, spec 0.2.0)",
+    "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic"
+   ],
+   "description": "one step a year: the 1 to 3 interval has two steps, both start-up steps; 0 to 1 has one"
+  },
+  {
+   "case_id": "k8_k-0008",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 101,
+     "steps_per_year": 50,
+     "width": 6.0
+    },
+    "fixed_rate": 0.039462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "method": "CN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (error order HR-66)",
+    "java build (StageKCliTest, 2026-11-19)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic",
+    "error"
+   ],
+   "description": "unlisted method"
+  },
+  {
+   "case_id": "k8_k-0009",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 101,
+     "steps_per_year": 50,
+     "width": 6.0
+    },
+    "fixed_rate": 0.039462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "method": "CN_RANNACHER_SMOOTHED"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (error order HR-66)",
+    "java build (StageKCliTest, 2026-11-19)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic",
+    "error"
+   ],
+   "description": "sigma = 0 with the K-8 method"
+  },
+  {
+   "case_id": "k8_k-0010",
+   "operation": "rates.shortrate.bermudan_swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 101,
+     "steps_per_year": 50,
+     "width": 6.0
+    },
+    "fixed_rate": 0.039462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.5
+    ],
+    "method": "CN_RANNACHER_SMOOTHED"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (error order HR-66)",
+    "java build (StageKCliTest, 2026-11-19)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic",
+    "error"
+   ],
+   "description": "exercise time that is not a reset date"
+  },
+  {
+   "case_id": "k8_k-0011",
+   "operation": "rates.shortrate.bermudan_swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 20001,
+     "steps_per_year": 50,
+     "width": 6.0
+    },
+    "fixed_rate": 0.039462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "method": "CN_RANNACHER_SMOOTHED"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (error order HR-66)",
+    "java build (StageKCliTest, 2026-11-19)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic",
+    "error"
+   ],
+   "description": "nx above 10,001"
+  },
+  {
+   "case_id": "k8_k-0012",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 101,
+     "steps_per_year": 50,
+     "width": 6.0
+    },
+    "fixed_rate": 0.039462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "method": "CN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (error order HR-66)",
+    "java build (StageKCliTest, 2026-11-19)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic",
+    "error",
+    "two_errors"
+   ],
+   "description": "unlisted method and sigma = 0: schema first"
+  },
+  {
+   "case_id": "k8_k-0013",
+   "operation": "rates.shortrate.bermudan_swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 101,
+     "steps_per_year": 50,
+     "width": 0.0
+    },
+    "fixed_rate": 0.039462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.5
+    ],
+    "method": "CN_RANNACHER_SMOOTHED"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (error order HR-66)",
+    "java build (StageKCliTest, 2026-11-19)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic",
+    "error",
+    "two_errors"
+   ],
+   "description": "bad exercise time and width = 0: the schedule (structural) first, HR-66"
+  },
+  {
+   "case_id": "k8_k-0014",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 20001,
+     "steps_per_year": 50,
+     "width": 6.0
+    },
+    "fixed_rate": 0.039462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "method": "CN_RANNACHER_SMOOTHED"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (error order HR-66)",
+    "java build (StageKCliTest, 2026-11-19)"
+   ],
+   "tags": [
+    "stage_k",
+    "k8",
+    "bermudan",
+    "synthetic",
+    "error",
+    "two_errors"
+   ],
+   "description": "sigma = 0 and nx above the limit: the limit is applied when nx is read"
+  }
+ ]
+}
