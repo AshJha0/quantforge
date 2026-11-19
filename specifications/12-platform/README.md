@@ -37,3 +37,13 @@ Define the scope and shared contract for the platform and governance domain.
 - [ ] Deterministic fixtures and provenance are recorded.
 - [ ] Performance baseline exists where relevant.
 - [ ] User and developer documentation includes examples and limitations.
+
+## Specifications in this folder
+- `daily-curve-run.md`: daily real-data curve run (K-11).
+- `paper-ledger-daily.md`: daily paper ledger (K-1, K-2, Q8k).
+- `adapters.md`: infrastructure adapters and simulated feed formats (K-3; PROPOSED).
+- `lock-free-snapshots.md`: snapshot publication, low-latency risk, real-time hedge (K-5b; PROPOSED).
+- `mcp-server.md`: read-only MCP server over the CLI (A7; PROPOSED).
+- `dashboard.md`: docs-site dashboards (K-1, K-2, Q8k, K-11, model reserve; PROPOSED).
+- `soak-eod-capacity.md`: soak, load, end-of-day rehearsal, capacity (K-6; PROPOSED).
+- `release-evidence.md`: release evidence, G1k, G3b, G10 (K-7; PROPOSED).
