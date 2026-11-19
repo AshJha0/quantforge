@@ -64,7 +64,7 @@ def _evidence(key: str, value: Any) -> None:
     p = Path(path)
     doc = json.loads(p.read_text("utf-8")) if p.exists() else {}
     doc[key] = value
-    p.write_text(json.dumps(doc, indent=1, sort_keys=True) + "\n", "utf-8")
+    p.write_text(json.dumps(doc, indent=1, sort_keys=True) + "\n", "utf-8", newline="\n")
 
 
 def _rel(a: float, b: float) -> float:
