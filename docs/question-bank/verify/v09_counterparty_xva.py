@@ -138,14 +138,14 @@ for cid in ("wwr_g-0001", "wwr_g-0002", "wwr_g-0003", "wwr_g-0004"):
     wi, w = rung("stage_g/wwr_g.json", cid)
     chk(f"b = {wi['wwr_b']:g}: CVA {w['cva']:.6f}")
 
-# Q9.17 SIMM
-_, s2 = rung("stage_g/simm_g.json", "simm_g-0002")
-si = golden("stage_g/simm_g.json", "simm_g-0002")["inputs"]
+# Q9.17 sensitivity-based IR delta margin (placeholder weights, KR-150)
+_, s2 = rung("stage_g/sbim_g.json", "sbim_g-0002")
+si = golden("stage_g/sbim_g.json", "sbim_g-0002")["inputs"]
 chk(f"margin {s2['margin']:,.2f}")
-sc = run("xva.simm.ir_delta", {**si, "concentration_threshold": 2500.0})
+sc = run("xva.sbim.ir_delta", {**si, "concentration_threshold": 2500.0})
 chk(f"concentration_factor {sc['concentration_factor']:.6f}")
 chk(f"margin rises to {sc['margin']:,.2f}")
-_, s1 = rung("stage_g/simm_g.json", "simm_g-0001")
+_, s1 = rung("stage_g/sbim_g.json", "sbim_g-0001")
 chk(f"mixed-sign margin {s1['margin']:,.2f}")
 
 # Q9.20 portfolio netting under Hull-White

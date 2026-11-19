@@ -450,7 +450,7 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q8.34 (08-market-risk.md) How does `risk.stress.reverse` find the size of move that loses a target amount?
 - Q8.35 (08-market-risk.md) Pathwise or likelihood ratio: which Monte Carlo Greek is less noisy for a vanilla call?
 - Q9.16 (09-counterparty-xva.md) How does QuantForge model wrong-way risk, and what does it do to CVA?
-- Q9.17 (09-counterparty-xva.md) How does the SIMM-style IR delta margin aggregate, and what does the concentration factor do?
+- Q9.17 (09-counterparty-xva.md) How does the sensitivity-based IR delta margin aggregate, and what does the concentration factor do?
 - Q9.18 (09-counterparty-xva.md) How are MVA and KVA defined in `xva.adjustments.value`?
 - Q9.19 (09-counterparty-xva.md) How was the portfolio exposure engine checked against ORE, and why do some cases not count?
 - Q9.20 (09-counterparty-xva.md) How much does netting a payer with a receiver reduce CVA in the Hull-White portfolio engine?

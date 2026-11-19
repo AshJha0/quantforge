@@ -1,6 +1,6 @@
 # Question bank 9: Counterparty risk and xVA
 
-This set covers what QuantForge implements for counterparty credit risk: exposure profiles (EE, ENE, EPE, effective EPE and the deflated PFE quantile), netting and collateral on given paths, the closed-form swap exposure under Hull-White, portfolio exposure by one-dimensional integration checked against ORE, and the valuation adjustments CVA, DVA, FVA, MVA and KVA, with the SIMM-style margin and the Hull-White wrong-way-risk model. It is for a newcomer who has done [Tutorial 7](../getting-started/tutorial-7-counterparty.md), and for a practitioner who wants the exact bucket, sign and measure conventions. Questions are tagged foundation, practitioner or advanced. Every number in a worked example was produced by `quantforge_core` and is rechecked by `verify/v09_counterparty_xva.py`. All data is synthetic.
+This set covers what QuantForge implements for counterparty credit risk: exposure profiles (EE, ENE, EPE, effective EPE and the deflated PFE quantile), netting and collateral on given paths, the closed-form swap exposure under Hull-White, portfolio exposure by one-dimensional integration checked against ORE, and the valuation adjustments CVA, DVA, FVA, MVA and KVA, with the sensitivity-based margin (on placeholder weights) and the Hull-White wrong-way-risk model. It is for a newcomer who has done [Tutorial 7](../getting-started/tutorial-7-counterparty.md), and for a practitioner who wants the exact bucket, sign and measure conventions. Questions are tagged foundation, practitioner or advanced. Every number in a worked example was produced by `quantforge_core` and is rechecked by `verify/v09_counterparty_xva.py`. All data is synthetic.
 
 ## Exposure basics
 
@@ -200,15 +200,15 @@ The spec (ruling G-44): on path `p` the hazard in bucket `i` is `exp(a_i + b V_p
 
 The calibration of `b` is not provided: it is an input, and with four paths the example is a mechanism check, not a calibrated estimate.
 
-### Q9.17 How does the SIMM-style IR delta margin aggregate, and what does the concentration factor do?
+### Q9.17 How does the sensitivity-based IR delta margin aggregate, and what does the concentration factor do?
 
-*Level: advanced. Evidence: computed; golden (`simm_g-0001`, `-0002`); spec; literature. Source: [xVA framework spec](../../specifications/06-risk/xva-framework.md), [Tutorial 15](../getting-started/tutorial-15-advanced-risk.md)*
+*Level: advanced. Evidence: computed; golden (`sbim_g-0001`, `-0002`); spec; literature. Source: [xVA framework spec](../../specifications/06-risk/xva-framework.md), [Tutorial 15](../getting-started/tutorial-15-advanced-risk.md)*
 
 Initial margin weights each sensitivity, scales it up when the net position is large relative to a concentration threshold, and aggregates with correlations.
 
-The spec (G-43): `CR = max(1, sqrt(|sum s_k| / T))`, `WS_k = RW_k s_k CR`, `margin = sqrt(max(0, sum sum rho WS WS))`. Weights and correlations are inputs. This is a SIMM-style project definition, not ISDA SIMM; no ISDA material is used (owner decision 2026-11-19; [why](../model-inventory.md#why-there-is-no-isda-simm-here)).
+The spec (G-43): `CR = max(1, sqrt(|sum s_k| / T))`, `WS_k = RW_k s_k CR`, `margin = sqrt(max(0, sum sum rho WS WS))`. Weights and correlations are inputs; the operation is `xva.sbim.ir_delta` (the old id `xva.simm.ir_delta` is a deprecated alias until v1.0.0, KR-152). This is a project definition, not an industry margin model; no ISDA material is used (owner decision 2026-11-19; [why](../model-inventory.md#why-there-is-no-isda-simm-here)).
 
-**Worked example.** One sensitivity of 10,000 with risk weight 90: margin 900,000.00. Lower the threshold to 2,500 and concentration_factor 2.000000, so the margin rises to 1,800,000.00. Tutorial 15's six-tenor mixed-sign book gives the mixed-sign margin 452,205.34.
+**Worked example**, on placeholder weights (KR-150: risk weight `10 k` for tenor index `k`, correlation `1 - 0.1 |k - l|`). One sensitivity of 10,000 at the 2-year point, risk weight 30: margin 300,000.00. Lower the threshold to 2,500 and concentration_factor 2.000000, so the margin rises to 600,000.00. Tutorial 15's six-tenor mixed-sign book gives the mixed-sign margin 190,937.16. Releases v0.7.0 to v0.10.0 printed other numbers here, from hand-typed weights whose origin was not documented.
 
 QuantForge's stage G operation has the single-bucket IR delta only: no vega, curvature or other risk classes, and no official parameters of any industry model.
 

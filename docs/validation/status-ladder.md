@@ -8,7 +8,7 @@ Every capability moves through `Proposed → Specified → Implemented → Valid
 
 | Rung | What it takes (source) | Where QuantForge is |
 |---|---|---|
-| Proposed | a capability named in a plan or a spec draft | stage K wave 2 items, SIMM |
+| Proposed | a capability named in a plan or a spec draft | stage K wave 2 items, the sensitivity-based initial margin (`sbim`, K-8h) |
 | Specified | a spec with inputs, outputs, errors, golden cases and an acceptance test fixed before any run | stage K wave 2 specs merged on the integration branch `k-r1` without an implementation |
 | Implemented | all four languages pass the goldens (`docs/model-inventory.md`, "Status words") | stages A to J, R6 and H, released; stage K round 1 items on the integration branch `k-r1`, not released |
 | Validated | tested on real data against an independent benchmark, with a written report (`docs/model-inventory.md`) | **nothing**; every golden input to date is synthetic, except the stage J shock-library Treasury yields and the stage H crypto book |
@@ -90,7 +90,7 @@ Every stage K round 1 item in the generated table above comes from `tools/outsid
 
 - The daily paper ledger (K-2) has no golden suite in `datasets/golden/`; its worked example is checked by hand only (`program/STAGE_K_PAPER_HANDOVER.md`), so no outside share is stated for it.
 - Wave 2 items (K-8a DRC and RRAO, K-8f IMA, K-8g CVA capital, K-8i leverage and large exposures) are specifications only on `k-r1`; their goldens and implementations are on lane branches not merged, and `program/STAGE_K_W2_GATE.md` records that none reaches 60% from published figures and libraries alone. No share for them is stated here until their goldens are merged and the tool computes it.
-- SIMM, if built, runs on placeholder weights, not ISDA-calibrated, and could only be checked by a blind re-derivation of its algebra, never against ISDA's numbers (`program/STAGE_K_W2_GATE.md`).
+- The sensitivity-based initial margin (`sbim`), if built, runs on placeholder weights from a stated rule, and could only be checked by a blind re-derivation of its algebra, never against any outside model's numbers (`program/STAGE_K_W2_GATE.md`).
 
 ## What the rule does not say
 
