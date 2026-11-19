@@ -10673,6 +10673,7 @@
   "risk.frtb.pla.ks_pvalue",
   "risk.frtb.rfet",
   "risk.frtb.rfet.bucket",
-  "risk.frtb.rrao"
+  "risk.frtb.rrao",
+  "risk.simm.placeholder"
  ]
 }

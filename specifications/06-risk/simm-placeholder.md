@@ -102,7 +102,7 @@ For each non-residual bucket `b`, and separately for the `RESIDUAL` bucket of EQ
 
 `K_b = sqrt+( sum_k WS_k^2 + sum_{k != l} rho_kl f_kl WS_k WS_l )`, the double sum over ordered pairs (each unordered pair counted twice), with
 - `rho_kl`: IR the tenor matrix entry for the two factors' `label1` (vega uses the same matrix on the two expiries); FX the single FX correlation; EQ the within-bucket correlation of bucket `b` (`RESIDUAL` has its own);
-- `f_kl = min(CR_g(k), CR_g(l)) / max(CR_g(k), CR_g(l))` (equal to 1 for IR, where the two factors share one group).
+- `f_kl = min(CR_g(k), CR_g(l)) / max(CR_g(k), CR_g(l))` with the delta or vega concentration factors of step 2 as the kind requires (equal to 1 for IR, where the two factors share one group).
 
 `sum_ws_b = sum_{k in b} WS_k`; `S_b = clip(sum_ws_b, K_b)` (KR-133).
 
@@ -112,7 +112,7 @@ Over the non-residual buckets of one risk class and kind:
 
 `M = sqrt+( sum_b K_b^2 + sum_{b != c} gamma_bc g_bc S_b S_c )` (ordered pairs), with
 - `gamma_bc`: IR the single inter-currency correlation; EQ the single inter-bucket correlation; FX has one bucket and no pair;
-- `g_bc = min(CR_b, CR_c) / max(CR_b, CR_c)` for IR (with `CR_b` the bucket's common concentration factor of step 2); `g_bc = 1` for EQ.
+- `g_bc = min(CR_b, CR_c) / max(CR_b, CR_c)` for IR (with `CR_b` the bucket's common concentration factor of step 2: the delta factor for delta, the vega factor for vega); `g_bc = 1` for EQ.
 
 The margin of the kind is `margin = M + K_residual`, where `K_residual` is the `K_b` of step 4 for the EQ `RESIDUAL` bucket (0 when there is none). The residual bucket takes part in no inter-bucket sum. When the kind has only residual factors, `M = 0`.
 
