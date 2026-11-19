@@ -490,35 +490,116 @@ def test_k8_ladder_equals_its_own_bumps() -> None:
         assert _rel(got, lad[key]) <= 1e-8, (key, got, lad[key])
 
 
-def test_k8_smoothing_is_a_cell_average() -> None:
+def test_k8_smoothing_worked_example() -> None:
+    """bermudan-ladder-k8.md step 5, worked example: f = (-1, 0, 1)."""
     v = np.array([[0.0], [0.0], [0.0]])
-    e = np.array([[-1.0], [0.0], [1.0]])
+    e = np.array([[1.0], [0.0], [-1.0]])
     got = k8._smoothed_max(v, e)[:, 0]
-    # node 1: cell [-0.5, 0.5] of max(x, 0) = mean 1/8; node 2: [0.5, 1.5] = 1; node 0: 0
-    assert list(got) == [0.0, 0.125, 1.0]
+    assert got[0] == 1.0 and got[2] == 0.0  # E where f < 0 around the node, V where f > 0
+    assert abs(got[1] - 1 / 18) <= 1e-16
 
 
-@pytest.mark.skipif(os.environ.get("QF_K8_ACCEPTANCE") != "1", reason="long run (about 40 s)")
+def test_k8_smoothing_keeps_the_pointwise_max_away_from_the_crossing() -> None:
+    """Step 5: with a cubic V and E = 0, nodes two or more cells inside V > 0 keep V (the stencil
+    cancels the hat average of a cubic exactly), nodes inside V < 0 get E, and the end correction
+    acts only on the two nodes of the crossing cell."""
+    x = np.linspace(-1.0, 1.0, 41)
+    f = (x - 0.013) * (1 + 0.3 * x + 0.2 * x * x)
+    got = k8._smoothed_max(f[:, None].copy(), np.zeros((41, 1)))[:, 0]
+    j = int(np.nonzero(f > 0)[0][0])
+    assert np.allclose(got[j + 2 : -2], f[j + 2 : -2], rtol=0, atol=1e-14)
+    assert np.all(got[: j - 2] == 0.0)
+    assert np.all(got[j - 2 : j + 2] != np.maximum(f, 0)[j - 2 : j + 2])
+
+
+def test_k8_hat_part_closed_form() -> None:
+    """`M(p, q)` against a fine midpoint sum, on the four branches and at their joins."""
+    u = (np.arange(200_000) + 0.5) / 200_000
+    for p, q in (
+        (1.0, 2.0),
+        (1.0, -0.5),
+        (-0.5, 1.0),
+        (-1.0, -2.0),
+        (0.0, 1.0),
+        (1.0, 0.0),
+        (0.0, -1.0),
+    ):
+        want = float(np.mean((1 - u) * np.maximum(p + (q - p) * u, 0.0)))
+        got = float(k8._hat_part(np.array([[p]]), np.array([[q]]))[0, 0])
+        assert abs(got - want) <= 1e-9, (p, q, got, want)
+
+
+def test_k8_curve_nodes_the_price_does_not_depend_on_give_exact_zeros() -> None:
+    """KR-15 a: the node at 0.4986 years sits inside a time step and before the first exercise date
+    (1.0, itself a node); the model price does not depend on it and neither does the scheme. The
+    version 0.1.0 scheme gave -337 here at 201/100."""
+    for index in range(3):
+        lad = k8.bermudan_ladder(*_args(_ladder_inputs(index), 41, 20))
+        d = lad["d_price_d_discount_factors"]
+        assert d[0] == 0.0 and d[6:] == [0.0, 0.0, 0.0, 0.0]
+        assert all(x != 0.0 for x in d[1:6])
+
+
+def _row(i: dict[str, Any], nx: int, spy: int) -> list[float]:
+    r = k8.bermudan_ladder(*_args(i, nx, spy))
+    return [
+        r["price"],
+        *r["d_price_d_discount_factors"],
+        r["d_price_d_mean_reversion"],
+        r["d_price_d_sigma"],
+    ]
+
+
+K8_JUDGED = (0, 2, 3, 4, 5, 6, 11, 12)
+
+
+def test_k8_time_order_is_two_on_every_entry() -> None:
+    """Time-only refinement (41 nodes; 10, 20, 40 steps a year): observed order 2 on the price and
+    every ladder entry. Version 0.1.0 gave order 1.00 on the two entries next to the 0.4986 node."""
+    i = _ladder_inputs(0)
+    rows = [_row(i, 41, spy) for spy in (10, 20, 40)]
+    for k in K8_JUDGED:
+        rc = sk.richardson_check([r[k] for r in rows], 2.0, 2.0)
+        assert rc["status"] == "OK" and abs(rc["observed_order"] - 2.0) <= 0.1, (k, rc)
+
+
+def test_k8_space_error_is_smooth_second_order() -> None:
+    """Space-only refinement on grids that are NOT nested (60, 80, 100, 130, 160 cells against 320):
+    the error times `cells^2` is the same on every grid to 10% for the price and every entry. This is
+    the property the cell average of version 0.1.0 lacked (the exercise boundary sits at a different
+    place in its cell on each grid; there the scaled error varied by a factor of 4)."""
+    i = _ladder_inputs(0)
+    ref = _row(i, 321, 20)
+    scaled = []
+    for nx in (61, 81, 101, 131, 161):
+        r = _row(i, nx, 20)
+        c2 = float((nx - 1) ** 2)
+        scaled.append([(r[k] - ref[k]) * c2 / (1 - c2 / 320.0**2) for k in K8_JUDGED])
+    for col in zip(*scaled, strict=True):
+        mean = sum(col) / len(col)
+        assert max(abs(x - mean) for x in col) <= 0.1 * abs(mean), col
+
+
+@pytest.mark.skipif(os.environ.get("QF_K8_ACCEPTANCE") != "1", reason="long run (about 4 min)")
 def test_k8_acceptance_3_observed_order() -> None:
     """bermudan-ladder-k8.md acceptance 3: on 201/401/801, `num.richardson.check` with assumed order 2
     gives status OK and an observed order in [1.5, 2.5] on the price and every ladder entry that is
-    not a structural zero. Recorded result (2026-11-18): FAILS, see oracle/K8_ACCEPTANCE_W1.json."""
-    record = json.loads((ROOT / "oracle/K8_ACCEPTANCE_W1.json").read_text("utf-8"))
+    not exactly zero on all three grids. First run (version 0.1.0, 2026-11-18): FAILED on 18 entries,
+    kept in oracle/K8_ACCEPTANCE_W1.json. Second run (KR-15, 2026-11-19): oracle/K8_ACCEPTANCE_W2.json."""
+    first = json.loads((ROOT / "oracle/K8_ACCEPTANCE_W1.json").read_text("utf-8"))
+    assert len(first["failures"]) == 18  # the recorded first run stays a recorded miss
+    record = json.loads((ROOT / "oracle/K8_ACCEPTANCE_W2.json").read_text("utf-8"))
     bad = []
     for index in range(3):
         i = _ladder_inputs(index)
-        rows = []
-        for nx, spy in ((201, 100), (401, 200), (801, 400)):
-            r = k8.bermudan_ladder(*_args(i, nx, spy))
-            rows.append(
-                [
-                    r["price"],
-                    *r["d_price_d_discount_factors"],
-                    r["d_price_d_mean_reversion"],
-                    r["d_price_d_sigma"],
-                ]
-            )
-        assert rows == record["values"][f"aadladder_g-000{index + 1}"]
+        rows = [_row(i, nx, spy) for nx, spy in ((201, 100), (401, 200), (801, 400))]
+        want = record["values"][f"aadladder_g-000{index + 1}"]
+        for got_row, want_row in zip(
+            rows, [want[g] for g in ("201/100", "401/200", "801/400")], strict=True
+        ):
+            scale = max(abs(x) for x in want_row[1:11])
+            for k, (g, w) in enumerate(zip(got_row, want_row, strict=True)):
+                assert abs(g - w) <= 1e-9 * (scale if 1 <= k <= 10 else abs(w)), (index, k, g, w)
         for k in range(len(rows[0])):
             vals = [row[k] for row in rows]
             if vals == [0.0, 0.0, 0.0]:
@@ -527,5 +608,4 @@ def test_k8_acceptance_3_observed_order() -> None:
             obs = rc["observed_order"]
             if rc["status"] != "OK" or not (obs is not None and 1.5 <= obs <= 2.5):
                 bad.append((index, k, rc["status"], obs))
-    assert bad == [tuple(b) for b in record["failures"]]
     assert not bad, f"K-8 acceptance 3 fails on {len(bad)} entries (KR-8, K-QB)"
