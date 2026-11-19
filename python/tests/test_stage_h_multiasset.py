@@ -5,6 +5,7 @@ are records, not tests (program/STAGE_H_BLIND_MULTIASSET.md; HR-98 source tags).
 
 import json
 import random
+from collections.abc import Callable
 from datetime import date, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -18,7 +19,7 @@ from quantforge_core.errors import QfError
 
 GOLD = Path(__file__).resolve().parents[2] / "datasets" / "golden" / "stage_h"
 SUITES = ("auc_h", "eqc_h", "fxc_h", "fxv_h", "rtc_h", "fut_h", "ses_h", "acls_h", "e1_h4")
-FN = {
+FN: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] = {
     "micro.eq.round_price": ma.eq_round_price,
     "micro.eq.fee_check": ma.eq_fee_check,
     "micro.eq.round_lot": ma.eq_round_lot,
@@ -128,7 +129,7 @@ def test_a3_spot_date_good_and_at_least_t_plus_1() -> None:
 def test_a3_auction_volume_maximal() -> None:
     rng = random.Random(11)
     for _ in range(300):
-        orders = [
+        orders: list[dict[str, Any]] = [
             {
                 "limit": "MARKET"
                 if rng.random() < 0.1
