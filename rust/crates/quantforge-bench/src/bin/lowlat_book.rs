@@ -437,6 +437,7 @@ fn ns(t: Instant) -> u64 {
 }
 
 /// One timed run after `warmup` unmeasured messages (the harness uses `WARMUP`; tests a short stream).
+#[cfg(test)]
 fn timed_run_with(msgs: &[Msg], levels: &[Level], qseed: u64, warmup: usize) -> String {
     timed_run_gen::<false>(msgs, levels, qseed, warmup)
 }

@@ -253,8 +253,14 @@ fn l7_per_level_sample_rounds_up() {
 fn r2_form_a_counts_checksums_and_checkpoint_classes() {
     // 0 snapshot (bids 100..89, asks 101..112, qty 5), 1 bid 100 -> 6, 2 trade, 3 bid 89 -> 9 (level 12), 4 bid 100 -> 7
     let mut lv: Vec<Level> = (0..12)
-        .map(|k| Level { px: 100 - k, qty: 5 })
-        .chain((0..12).map(|k| Level { px: 101 + k, qty: 5 }))
+        .map(|k| Level {
+            px: 100 - k,
+            qty: 5,
+        })
+        .chain((0..12).map(|k| Level {
+            px: 101 + k,
+            qty: 5,
+        }))
         .collect();
     lv.extend([
         Level { px: 100, qty: 6 },
@@ -275,7 +281,11 @@ fn r2_form_a_counts_checksums_and_checkpoint_classes() {
         r.apply(x, &lv);
         if x.kind != MsgType::Trade {
             x.flags = FLAG_VENUE_CHECKSUM;
-            x.checksum = if i == 3 { r.checksum() ^ 1 } else { r.checksum() };
+            x.checksum = if i == 3 {
+                r.checksum() ^ 1
+            } else {
+                r.checksum()
+            };
         }
     }
     let mut rows = Vec::new();
@@ -324,7 +334,10 @@ fn r2_form_a_counts_checksums_and_checkpoint_classes() {
             rows_with_tie: 2,
         }
     );
-    assert!(c.json().starts_with("{\"checksum_checked\":4,\"checksum_failed\":1,"));
+    assert!(
+        c.json()
+            .starts_with("{\"checksum_checked\":4,\"checksum_failed\":1,")
+    );
     // compare(): fewer row levels than the book compares only the row's levels.
     let mut b = Book::new(100);
     b.apply(&msgs[0], &lv);
