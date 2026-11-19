@@ -30,7 +30,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH; bound blind-checked only to 6 decimals (5e-7 absolute, the precision the packet carried), estimate_pnl at 1e-9 relative"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md, packet manifest 1a9c4cbc): MATCH on estimate_pnl and bound at 1e-9 relative on full-precision values (largest relative difference 2.08e-16); label rules-stated (KR-10), no credit"
    ],
    "tags": [
     "stage_k",
@@ -71,7 +71,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH; bound blind-checked only to 6 decimals (5e-7 absolute, the precision the packet carried), estimate_pnl at 1e-9 relative"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md, packet manifest 1a9c4cbc): MATCH on estimate_pnl and bound at 1e-9 relative on full-precision values (largest relative difference 2.08e-16); label rules-stated (KR-10), no credit"
    ],
    "tags": [
     "stage_k",
@@ -112,7 +112,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH; bound blind-checked only to 6 decimals (5e-7 absolute, the precision the packet carried), estimate_pnl at 1e-9 relative"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md, packet manifest 1a9c4cbc): MATCH on estimate_pnl and bound at 1e-9 relative on full-precision values (largest relative difference 2.08e-16); label rules-stated (KR-10), no credit"
    ],
    "tags": [
     "stage_k",
@@ -153,7 +153,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH; bound blind-checked only to 6 decimals (5e-7 absolute, the precision the packet carried), estimate_pnl at 1e-9 relative"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md, packet manifest 1a9c4cbc): MATCH on estimate_pnl and bound at 1e-9 relative on full-precision values (largest relative difference 2.08e-16); label rules-stated (KR-10), no credit"
    ],
    "tags": [
     "stage_k",
@@ -199,7 +199,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "not blind: oracle-pending when the wave-1 blind packet was built; mpmath only"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md, packet manifest 1a9c4cbc): MATCH on estimate_pnl and bound at 1e-9 relative on full-precision values (largest relative difference 2.08e-16); label rules-stated (KR-10), no credit"
    ],
    "tags": [
     "stage_k",

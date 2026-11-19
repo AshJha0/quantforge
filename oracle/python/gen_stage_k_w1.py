@@ -44,9 +44,13 @@ LABEL = "latency-aware analytics on simulated data"  # KR-10
 BLIND = "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
 BLIND_ROW = BLIND + " on status only; row decided by gap ruling KR-14, not blind"
 BLIND_FIRE = BLIND + " on sigma, threshold, false_alarm_rate; fire decided by gap ruling KR-13, not blind"
-BLIND_IDR = (BLIND + "; bound blind-checked only to 6 decimals (5e-7 absolute, the precision the packet carried), "
+K5A = ("blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md, packet manifest 1a9c4cbc): MATCH on "
+       "estimate_pnl and bound at 1e-9 relative on full-precision values (largest relative difference 2.08e-16); "
+       "label rules-stated (KR-10), no credit")
+BLIND_IDR_W1 = (BLIND + "; bound blind-checked only to 6 decimals (5e-7 absolute, the precision the packet carried), "
              "estimate_pnl at 1e-9 relative")
-NOT_BLIND_5 = "not blind: oracle-pending when the wave-1 blind packet was built; mpmath only"
+NOT_BLIND_5 = "not blind: oracle-pending when the wave-1 blind packet was built; mpmath only"  # history (wave 1)
+BLIND_IDR = K5A  # the K-5a packet (2026-11-19) supersedes the wave-1 6-decimal check for idr_k-0001..0004
 K_FAR = ("added 2026-11-19 (branch k-w1-fu) so that every build keeps the stated 2 (1 - Phi(k)) in the far tail: "
          "not blind")
 GAP_KR12 = "gap-decided by ruling KR-12 (E_DOMAIN code): not blind"
@@ -309,7 +313,7 @@ IDR_CASES = [
     ({"positions": [POS], "shift": 0.05}, "h = +5%: large move, bound still holds", BLIND_IDR,
      (-179097.352235808532, 2132.111336, 637628.151621773293, 639633.400842173327, 0.940)),
     ({"positions": [POS, {"notional": -500_000.0, "maturity": 2.0, "yield": 0.03}], "shift": 0.01},
-     "two positions, short 2y leg; bound = sum of position bounds (no netting of remainders)", NOT_BLIND_5, None),
+     "two positions, short 2y leg; bound = sum of position bounds (no netting of remainders)", K5A, None),
     ({"positions": [dict(POS, maturity=0.0)], "shift": 0.01}, "maturity <= 0 (KR-12)", GAP_KR12, None),
     ({"positions": [], "shift": 0.01}, "no positions", BLIND, None),
 ]

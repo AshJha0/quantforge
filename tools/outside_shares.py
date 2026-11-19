@@ -228,7 +228,9 @@ def load_stage_h():
 # is the DR-H2 blind re-derivation (program/STAGE_K_BLIND_W1.md), and only where every compared output was checked
 # blind at the golden's tolerance: a case whose `verified_by` says "not blind" (gap-decided fields, oracle-only
 # cases) or "only to 6 decimals" (idr_k-0001..0004 `bound`, compared at 1e-9 relative but blind-checked to 5e-7
-# absolute) does not count. The mpmath values are our own oracle and never count (KR-11).
+# absolute) does not count. The mpmath values are our own oracle and never count (KR-11). K-5a: the K-5a blind packet
+# (program/STAGE_K_BLIND_K5A.md, 2026-11-19) re-derived idr_k-0001..0005 at 1e-9 relative, 5 of 5 MATCH; their
+# verified_by now records that run, so they count as blind re-derivation.
 STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-5a", "rich_k": "K-8 guard",
                  "e1_k": None, "e2_k": None}  # e1_k, e2_k: error cases only
 

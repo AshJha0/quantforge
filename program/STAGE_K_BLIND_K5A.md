@@ -1,6 +1,6 @@
 # Stage K: blind re-derivation (DR-H2) of the five K-5a value cases
 
-Written 2026-11-19 by the packet builder (Claude Opus 5.5, branch `k-w1-fu`). The packet builder is not the blind lane and ran no derivation beyond rechecking the goldens at 50 digits. Process: `program/STAGE_H_BLIND_LANE.md` (DR-H2); pattern of `program/STAGE_K_BLIND_W2.md` (branch `k-w2-spec`). Scope: idr_k-0001..0005 of `risk.intraday.delta_gamma_bound` (`specifications/06-risk/intraday-risk-bounds.md`). Status: **packet built, blind lane not yet run.**
+Written 2026-11-19 by the packet builder (Claude Opus 5.5, branch `k-w1-fu`). The packet builder is not the blind lane and ran no derivation beyond rechecking the goldens at 50 digits. Process: `program/STAGE_H_BLIND_LANE.md` (DR-H2); pattern of `program/STAGE_K_BLIND_W2.md` (branch `k-w2-spec`). Scope: idr_k-0001..0005 of `risk.intraday.delta_gamma_bound` (`specifications/06-risk/intraday-risk-bounds.md`). Status: **run 2026-11-19: 5 of 5 MATCH** (results below).
 
 ## Plain idea
 
@@ -62,6 +62,26 @@ Plain answer: no. Evidence class: read (`tools/outside_shares.py` docstring and 
 4. Run `python -I program/stage_h_blind_w2/k5a_compare.py . <frozen blind_results.json> > stage_k_blind/k5a/compare_output.txt`. One run. A mismatch is investigated, never fixed by rerunning the blind lane.
 5. On MATCH: change `verified_by` of each matched case in `datasets/golden/stage_k/idr_k.json` so that it records the DR-H2 MATCH at 1e-9 relative and no longer says "only to 6 decimals" or "not blind" (that is what `tools/outside_shares.py` `load_stage_k` reads), regenerate with the after-spec-edit generators, and fill the results section below.
 
-## Results
+## Results (run of 2026-11-19, the first and only compare run)
 
-Not run. (Date, lane and model, packet manifest check, frozen hash and commit, gaps and rulings, compare run and output path, MATCH / MISMATCH / MISSING / counted per case, resolution of each mismatch: to be filled by the coordinator.)
+Facts from the coordinator (evidence class: the coordinator's report, read; the hashes and the compare output are in the repository and can be rechecked).
+
+- Deriver: a separate subagent on Claude Sonnet 5.5 (a different model from the spec lane, the oracle lane and this builder, all Claude Opus 5.5), given only the packet folder and its own folder `C:/Work/Claude/qf-blind/k5a_blind/`. It states that it read, and tried to read, nothing outside the two folders; that is its own statement, not independently logged.
+- Packet: the coordinator checked the manifest hash `1a9c4cbc710ce17b634032696c26d6be04db699cd19071a4e431e1a8b5722529` before the handover; the deriver's `notes.md` records that all 5 files matched the manifest.
+- Frozen results: `stage_k_blind/k5a/blind_results.json`, SHA-256 `e31fc25071f71ac5d01931297e119060510542516a0c504d8aa45910d1d211eb` (recomputed by the coordinator, equal to the deriver's `results.sha256`), committed in b75776d5 before the compare. The deriver's script and notes are beside it.
+- Compare: `python -I program/stage_h_blind_w2/k5a_compare.py . stage_k_blind/k5a/blind_results.json`, with the script and tolerances fixed in 3d446c5a; first and only run; output `stage_k_blind/k5a/compare_output.txt` (ee19ae3d).
+
+| Case | estimate_pnl | bound | label | Result | Counted |
+|---|---|---|---|---|---|
+| idr_k-0001 | MATCH | MATCH | MATCH (no credit) | MATCH | yes |
+| idr_k-0002 | MATCH | MATCH, 1.98e-16 relative | MATCH (no credit) | MATCH | yes |
+| idr_k-0003 | MATCH, 0 | MATCH, 2.08e-16 | MATCH (no credit) | MATCH | yes |
+| idr_k-0004 | MATCH, 0 | MATCH, 0 | MATCH (no credit) | MATCH | yes |
+| idr_k-0005 | MATCH, 1.19e-16 | MATCH, 0 | MATCH (no credit) | MATCH | yes |
+
+**K-5a: 5 of 5 MATCH, 5 counted, 3 needed for 60%.** Largest relative difference 2.08e-16 against a tolerance of 1e-9. No mismatch, so nothing to resolve. Outside share of K-5a: 5 of 5 (100%), blind re-derivation only; goldens' `verified_by` updated through `oracle/python/gen_stage_k_w1.py` so that `tools/outside_shares.py` counts them.
+
+Ambiguities the deriver recorded (`stage_k_blind/k5a/notes.md`) and what was done:
+1. It summed the estimate with an exactly rounded sum although the rules require that only for the bound (affects idr_k-0005 only). 2. The rules do not fix the binary64 operation order per position, so last-bit differences are possible. Both are now stated in `intraday-risk-bounds.md` (operation section): the order is open, the estimate sum may be exactly rounded or left to right, the bound sum is exactly rounded, and the 1e-9 tolerance is what makes the order irrelevant. No value changed. 3. The label taken from KR-10 and 4. `abs(N)` per KR-15 are the rules' reading; no change.
+
+What this shows and what it does not. A second model, reading only our stripped rules, reproduced all ten numbers to the last bit or two, so the spec is unambiguous enough to implement and the goldens are not one author's arithmetic slip. It does not show that the bound's derivation is right: the deriver used the formula the rules give. The evidence for the inequality itself (the remainder never exceeds the bound) is the 50-digit recheck of the 1,000 acceptance moves (`oracle/IDR_K_MOVES_CHECK_W1.json`), which is our own oracle, and the five exact remainder-over-bound ratios above (0.917 to 0.997).
