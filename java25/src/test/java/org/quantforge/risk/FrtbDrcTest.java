@@ -101,7 +101,10 @@ class FrtbDrcTest {
                 p("s", "S", "SENIOR", -10, -10, 5)), Map.of("Z", "A", "S", "B"));
         assertEquals(0.0, out.buckets().get(0).hbr());
         out = FrtbDrc.drcNonsec(List.of(p("z", "Z", "SENIOR", 0, 0, 5)), Map.of("Z", "A"));
-        assertEquals(new FrtbDrc.BucketRow("CORPORATE", null, 0, 0, 0), out.buckets().get(0));
+        FrtbDrc.BucketRow empty = out.buckets().get(0); // KR-54; numeric == as the Python test (-0.0 == 0.0)
+        assertEquals("CORPORATE", empty.bucket());
+        assertNull(empty.hbr());
+        assertTrue(empty.wtdLong() == 0 && empty.wtdShort() == 0 && empty.drc() == 0);
         List<FrtbDrc.Position> big = new ArrayList<>();
         for (int k = 0; k <= FrtbDrc.MAX_POSITIONS; k++) {
             big.add(p(Integer.toString(k), "X", "SENIOR", 1, 1, 5));
@@ -190,6 +193,31 @@ class FrtbDrcTest {
         return m;
     }
 
+    /**
+     * Counterexample to A3's "adding a long only to a bucket never lowers that bucket's DRC", found by the jqwik
+     * property (seed -24) and reproduced with python/quantforge_core/frtb_drc.py, which gives the same two values:
+     * the added covered long offsets obligor A's short, the HBR rises from 0.288 to 0.395 and DRC_b falls.
+     */
+    @Test
+    void a3MonotonicityCounterexample() {
+        List<FrtbDrc.Position> book = new ArrayList<>(List.of(
+                pos("p0", "B", "COVERED", 932, 943, 0.25), pos("p1", "B", "SENIOR", -773, 819, 3.0),
+                pos("p2", "B", "NON_SENIOR", 627, 943, 0.1), pos("p3", "A", "SENIOR", -805, -412, 0.1),
+                pos("p4", "A", "EQUITY", -231, -355, 0.25), pos("p5", "A", "COVERED", 368, 834, 0.25),
+                pos("p6", "B", "SENIOR", -663, -798, 0.5), pos("p7", "A", "SENIOR", -684, 387, 0.1),
+                pos("p8", "C", "COVERED", 756, 381, 1.0), pos("p9", "A", "EQUITY", -673, -326, 3.0)));
+        double before = byBucket(FrtbDrc.drcNonsec(book, RATING)).get("CORPORATE");
+        book.add(pos("new", "A", "COVERED", 885, 885, 2.0));
+        double after = byBucket(FrtbDrc.drcNonsec(book, RATING)).get("CORPORATE");
+        assertEquals(18.67915216395695, before, 1e-12 * before);
+        assertEquals(17.739318324443047, after, 1e-12 * after);
+        assertTrue(after < before);
+    }
+
+    private static FrtbDrc.Position pos(String id, String ob, String sen, double n, double mv, double m) {
+        return new FrtbDrc.Position(id, ob, BUCKET.get(ob), sen, n, mv, m, false, true);
+    }
+
     @Property(tries = 300)
     void drcProperties(@ForAll long seed) {
         Random rnd = new Random(seed);
@@ -199,14 +227,12 @@ class FrtbDrcTest {
         for (FrtbDrc.BucketRow b : out.buckets()) {
             assertTrue(b.drc() >= 0 && (b.hbr() == null || (b.hbr() >= 0 && b.hbr() <= 1)));
         }
-        // adding a long never lowers its bucket's DRC
-        String ob = OBLIGORS[rnd.nextInt(3)];
-        double extra = rnd.nextInt(1001);
-        List<FrtbDrc.Position> more = new ArrayList<>(book);
-        more.add(new FrtbDrc.Position("new", ob, BUCKET.get(ob), FrtbDrc.SENIORITIES.get(rnd.nextInt(4)), extra, extra,
-                2.0, false, true));
-        double after = byBucket(FrtbDrc.drcNonsec(more, RATING)).get(BUCKET.get(ob));
-        assertTrue(after >= byBucket(out).getOrDefault(BUCKET.get(ob), 0.0) - 1e-9 * (1 + after));
+        // "adding a long never lowers its bucket's DRC" (A3 of frtb-drc-rrao.md) is not asserted: it is false under
+        // MAR22.25 (see a3MonotonicityCounterexample and program/STAGE_K_W2A_JAVA_HANDOVER.md); the draws are kept so
+        // the remaining checks see the same random stream as the Python property.
+        rnd.nextInt(3);
+        rnd.nextInt(1001);
+        rnd.nextInt(4);
         // permutation leaves every output unchanged (totals to rounding)
         List<FrtbDrc.Position> shuffled = new ArrayList<>(book);
         Collections.shuffle(shuffled, rnd);
