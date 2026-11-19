@@ -212,7 +212,7 @@ Each prints the lines shown in step 1, digit for digit. The Monte Carlo lines ag
 - **No outside oracle for the MC Greeks.** No outside library reproduces the `core.rng` stream, so the goldens come from a float64 replica and the Black-Scholes closed form is the independent check, as above.
 - **The reserve is a statistic, not a policy.** Desks set reserves by product-specific policy (often a share of the range, or a calibrated adjustment). The registered report that applies this statistic to Heston, local vol and SLV across exotics has not been run.
 - **FRTB inputs.** Vega here is the MAR21.25 sensitivity (vega times implied vol), and curvature takes the bank's CVRs as given; computing those shocked revaluations is the caller's job. There is no FX scalar unless `fx_scalar` is set (FX only).
-- **SIMM-style, not SIMM.** One currency, IR delta only, with weights and correlations you supply. ISDA SIMM adds inflation and cross-currency basis, vega and curvature margins, cross-bucket and cross-class aggregation, and a versioned calibration licensed from ISDA.
+- **SIMM-style, not SIMM.** One currency, IR delta only, with weights and correlations you supply. It is the project's own aggregation, not ISDA SIMM: that methodology is licensed by ISDA and patented, and QuantForge uses no ISDA material (owner decision 2026-11-19; [why](../model-inventory.md#why-there-is-no-isda-simm-here)). The example's risk weights are illustrative inputs.
 
 ## Common mistakes
 
@@ -242,8 +242,8 @@ You took a full AAD ladder of a Bermudan, compared two Monte Carlo Greek estimat
 - P. Glasserman, *Monte Carlo Methods in Financial Engineering*, Springer, 2003, sections 7.2 and 7.3, [doi:10.1007/978-0-387-21617-1](https://doi.org/10.1007/978-0-387-21617-1) (paywalled). M. Broadie, P. Glasserman, "Estimating security price derivatives using simulation", *Management Science* 42(2), 1996, [doi:10.1287/mnsc.42.2.269](https://doi.org/10.1287/mnsc.42.2.269) (paywalled; 403 to scripts, resolved through Crossref). Both marked not opened by the spec.
 - R. Cont, "Model uncertainty and its impact on the pricing of derivative instruments", *Mathematical Finance* 16(3), 2006, [doi:10.1111/j.1467-9965.2006.00281.x](https://doi.org/10.1111/j.1467-9965.2006.00281.x) (paywalled; 403 to scripts, resolved through Crossref). [Commission Delegated Regulation (EU) 2016/101](https://eur-lex.europa.eu/eli/reg_del/2016/101/oj), Article 11 (free). Both marked not opened by the spec.
 - Basel Committee on Banking Supervision, *The Basel Framework*, [MAR21](https://www.bis.org/basel_framework/chapter/MAR/21.htm) (free): MAR21.4 to 21.6, 21.92 to 21.95, 21.98 to 21.101. The spec was read against the version in force from 2023-01-01.
-- ISDA, [ISDA SIMM](https://www.isda.org/category/margin/isda-simm/) methodology page (free overview; the calibrated parameters are licensed). The spec cites the methodology without opening a version.
+- [Why there is no ISDA SIMM here](../model-inventory.md#why-there-is-no-isda-simm-here): the SIMM-style aggregation is a project definition; no ISDA material is used.
 - [COOKBOOK: stage G recipes](../../COOKBOOK.md#stage-g-recipes) and [stage F recipes](../../COOKBOOK.md#stage-f-recipes).
-- [GLOSSARY: stage G terms](../../GLOSSARY.md#stage-g-terms) (Bermudan swaption, pathwise and likelihood-ratio Greeks, SIMM), [stage F terms](../../GLOSSARY.md#stage-f-terms) (FRTB-SA) and [stage C terms](../../GLOSSARY.md#stage-c-equity-vol-slice) (Greeks).
+- [GLOSSARY: stage G terms](../../GLOSSARY.md#stage-g-terms) (Bermudan swaption, pathwise and likelihood-ratio Greeks, SIMM-style margin), [stage F terms](../../GLOSSARY.md#stage-f-terms) (FRTB-SA) and [stage C terms](../../GLOSSARY.md#stage-c-equity-vol-slice) (Greeks).
 
 Links checked 2026-11-11.

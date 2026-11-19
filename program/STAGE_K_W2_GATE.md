@@ -52,3 +52,9 @@ xVA extras (K-8b) are not counted here; their outside check is ORE example outpu
 1. Whether to run one DR-H2 blind lane over the 58 wave 2 candidates (recommended; without it all four items move to a point release under the gate rule).
 2. Whether to accept KR-68's exclusion of table lookups (T). Counting them would change only K-8f (36% to 55%), still below 60%.
 3. Confirm the rulings KR-50 to KR-69 (all PROPOSED), in particular KR-56 (boundary equality in PLA is amber), KR-58 (text over image for the ratio floor) and KR-62 (floor under the SA-CVA roots, a ruling not in the text).
+
+## Decision note, 2026-11-19: SIMM removed as a named item (owner)
+
+Owner decision 2026-11-19 (binding). The ISDA SIMM methodology document carries a notice that it may be used, revised or distributed only for a market participant's own commercial transactions or under a written ISDA licence, and cites a US patent. The project therefore uses **no ISDA material**: the methodology, ISDA parameter sets and test portfolios, and the Open Source Risk Engine's margin calibration files are not opened, read or fetched. "SIMM" is not a named, delivered item of v1.0.0.
+
+What stays: K-8h is renamed to the project's own **sensitivity-based initial margin, placeholder weights** (short id `sbim`, operation `risk.sbim.placeholder`; `specifications/06-risk/sbim-placeholder.md`, rulings `stage-k-rulings-sbim.md`). It is a project-defined model, outside the plan's regulatory list, and is not presented as a regulatory item. The gate rule that applies to it: source = project definition; outside checks = the blind re-derivation share (KR-141). Result: 30 value cases, 29 blind-checked, 28 counted matches, 18 needed (`program/STAGE_K_BLIND_SBIM.md`). The section above is history: its "ORE route" is closed by the decision, and the "methodology not read" condition no longer applies because no claim to the methodology is made.

@@ -206,11 +206,11 @@ The calibration of `b` is not provided: it is an input, and with four paths the 
 
 Initial margin weights each sensitivity, scales it up when the net position is large relative to a concentration threshold, and aggregates with correlations.
 
-The spec (G-43): `CR = max(1, sqrt(|sum s_k| / T))`, `WS_k = RW_k s_k CR`, `margin = sqrt(max(0, sum sum rho WS WS))`. Weights and correlations are inputs, not an ISDA SIMM calibration.
+The spec (G-43): `CR = max(1, sqrt(|sum s_k| / T))`, `WS_k = RW_k s_k CR`, `margin = sqrt(max(0, sum sum rho WS WS))`. Weights and correlations are inputs. This is a SIMM-style project definition, not ISDA SIMM; no ISDA material is used (owner decision 2026-11-19; [why](../model-inventory.md#why-there-is-no-isda-simm-here)).
 
 **Worked example.** One sensitivity of 10,000 with risk weight 90: margin 900,000.00. Lower the threshold to 2,500 and concentration_factor 2.000000, so the margin rises to 1,800,000.00. Tutorial 15's six-tenor mixed-sign book gives the mixed-sign margin 452,205.34.
 
-QuantForge has the IR delta piece only: no vega, curvature, other risk classes or the official SIMM parameters.
+QuantForge's stage G operation has the single-bucket IR delta only: no vega, curvature or other risk classes, and no official parameters of any industry model.
 
 ### Q9.18 How are MVA and KVA defined in `xva.adjustments.value`?
 
@@ -222,7 +222,7 @@ The spec (Green and Kenyon 2014, 2015): `MVA = s_IM sum D_i IM_i S_c S_b dt_i`, 
 
 **Worked example.** On the buckets of Q9.7, an IM profile `(200, 210, 190, 150)` at a 0.6% spread gives MVA 2.125651; a capital profile `(40, 42, 38, 30)` at a 10% hurdle gives KVA 7.085503.
 
-QuantForge takes the IM and capital profiles as inputs; projecting future SIMM or SA-CCR along paths is not implemented.
+QuantForge takes the IM and capital profiles as inputs; projecting future initial margin or SA-CCR along paths is not implemented.
 
 ### Q9.19 How was the portfolio exposure engine checked against ORE, and why do some cases not count?
 
