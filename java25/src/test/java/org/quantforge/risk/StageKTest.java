@@ -34,17 +34,12 @@ class StageKTest {
         StageKEvidence.write(key, json);
     }
 
-    /** Smallest k with P(X <= k) >= q for X ~ Binomial(n, p): scipy.stats.binom.ppf, by the pmf recurrence. */
+    /**
+     * Smallest k with P(X <= k) >= q for X ~ Binomial(n, p): scipy.stats.binom.ppf, by the KR-237 compensated partial
+     * sums (rescaled, so a P(X = 0) below the binary64 range, as at n = 100,000 and p = 0.2, is no problem).
+     */
     static int binomPpf(int n, double p, double q) {
-        double pmf = Math.exp(n * Math.log1p(-p));
-        double cdf = pmf;
-        int k = 0;
-        while (cdf < q && k < n) {
-            pmf *= (double) (n - k) / (k + 1) * p / (1 - p);
-            k++;
-            cdf += pmf;
-        }
-        return k;
+        return (int) FrtbBacktest.firstAtLeast(FrtbBacktest.binomialPartialSums(n, p), n, q);
     }
 
     private static double rel(double a, double b) {
