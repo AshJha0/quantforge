@@ -43,6 +43,7 @@ import json
 import struct
 import sys
 from array import array
+from collections import deque
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -248,6 +249,7 @@ def build(data_dir, symbol, start, end, prefix, tolerant=False):
     nmsg = 0
     after = [None] * len(rows_t)
     lo_of = [None] * len(rows_t)
+    hist = deque(maxlen=200_000)  # (t, bin index) of the latest book messages
     cp_next = 0
     last_book = None
     first_t = None
@@ -310,9 +312,9 @@ def build(data_dir, symbol, start, end, prefix, tolerant=False):
                 # t > row t); messages between them share the row's millisecond (check_r2.py explains why).
                 while cp_next < len(rows_t):
                     if lo_of[cp_next] is None and t >= rows_t[cp_next]:
-                        lo_of[cp_next] = last_book
+                        lo_of[cp_next] = _last(hist, rows_t[cp_next], True)
                     if t > rows_t[cp_next]:
-                        after[cp_next] = last_book
+                        after[cp_next] = _last(hist, rows_t[cp_next], False)
                         cp_next += 1
                     else:
                         break
@@ -326,6 +328,7 @@ def build(data_dir, symbol, start, end, prefix, tolerant=False):
                     counts["venue_ok_false"] += 1
                 mark_warm(t)
                 last_book = nmsg
+                hist.append((t, nmsg))
                 msg_ts.add(d["t"])
                 jl.write(json.dumps({"i": nmsg, "t": d["t"], "type": typ, "bids": b, "asks": a, "checksum": int(cs)},
                                     separators=(",", ":")) + "\n")
@@ -341,13 +344,14 @@ def build(data_dir, symbol, start, end, prefix, tolerant=False):
     if first_t is None:
         raise SystemExit(f"{symbol}: no raw message in the window")
     while cp_next < len(rows_t):
-        after[cp_next] = last_book
+        after[cp_next] = _last(hist, rows_t[cp_next], False)
         if lo_of[cp_next] is None:
-            lo_of[cp_next] = last_book
+            lo_of[cp_next] = _last(hist, rows_t[cp_next], True)
         cp_next += 1
 
     # Checkpoints: rows at or after the symbol's first raw message (none can be earlier inside one session).
     cps = [(k, after[k]) for k in range(len(rows_t)) if rows_t[k] >= first_t and after[k] is not None]
+    counts["rows_not_after_previous_row"] = sum(1 for k in range(1, len(rows_t)) if rows_t[k] <= rows_t[k - 1])
     counts["rows_tied_with_a_message_ms"] = sum(1 for k, _ in cps if iso(rows_t[k])[:23] + "Z" in msg_ts)
     with open(prefix + ".bin", "wb") as o:
         o.write(b"QFH9S001" + struct.pack("<QQ", nmsg, len(levels) // 2))
@@ -413,6 +417,17 @@ class _TolerantGzip:
         import io
 
         return io.StringIO("".join(json.dumps(d, separators=(",", ":")) + "\n" for d in self.reader.rows(path)))
+
+
+def _last(hist, r, strict):
+    """Bin index of the latest book message seen with t < r (strict) or t <= r, None if none. Usually the message
+    just seen; a row whose time was already passed (a repeated or late row) looks back in `hist`."""
+    for t, k in reversed(hist):
+        if (t < r) if strict else (t <= r):
+            return k
+    if len(hist) == hist.maxlen:
+        raise SystemExit("a row lies further back than the message history kept")
+    return None
 
 
 def _swapped(a):

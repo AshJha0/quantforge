@@ -30,7 +30,7 @@ below-level-10 failures (published; whether they fail the run is the targets (g)
 """
 import json
 import sys
-from collections import Counter
+from collections import Counter, deque
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -193,6 +193,17 @@ def _same_book(x, y):
                                               for a, b in zip(x[s], y[s])) for s in ("bids", "asks"))
 
 
+def _last(hist, r, strict, g):
+    """Global index of the latest message seen with t < r (strict) or t <= r; -1 if none. In the usual case that is
+    the message just seen; a row whose time was already passed (a repeated or late row) looks back in `hist`."""
+    for t, k in reversed(hist):
+        if (t < r) if strict else (t <= r):
+            return k
+    if len(hist) == hist.maxlen:
+        raise SystemExit("a row lies further back than the message history kept")
+    return -1
+
+
 def tasks(prefix, chunk, pd, qd):
     """Chunk descriptors in stream order: (prefix, byte range, first global index, lead snapshot, rows, decimals).
 
@@ -208,6 +219,7 @@ def tasks(prefix, chunk, pd, qd):
         return [r, _instant(r["t"])]
 
     pre = _PrePass()
+    hist = deque(maxlen=200_000)  # (t, global index) of the latest messages
     pending, lo_of = next_row(), None
     g0, lead, rows, n = 0, None, [], 0
     g, prev_t, off0, off = -1, None, 0, 0
@@ -217,12 +229,13 @@ def tasks(prefix, chunk, pd, qd):
             t = _instant(m["t"])
             while pending is not None:
                 if lo_of is None and not pending[1] > t:
-                    lo_of = g
+                    lo_of = _last(hist, pending[1], True, g)
                 if t > pending[1]:
                     if lo_of is None:
-                        lo_of = g
-                    if g >= 0:
-                        rows.append((pending[0], max(lo_of, 0), g))
+                        lo_of = _last(hist, pending[1], True, g)
+                    hi = _last(hist, pending[1], False, g)
+                    if hi >= 0:
+                        rows.append((pending[0], max(lo_of, 0), hi))
                     pending, lo_of = next_row(), None
                 else:
                     break
@@ -233,9 +246,11 @@ def tasks(prefix, chunk, pd, qd):
             n += 1
             g += 1
             prev_t = t
+            hist.append((t, g))
             off += len(raw)
     while pending is not None:  # rows after the last message: compared with the final book
-        rows.append((pending[0], max(g if lo_of is None else lo_of, 0), g))
+        lo = _last(hist, pending[1], True, g) if lo_of is None else lo_of
+        rows.append((pending[0], max(lo, 0), _last(hist, pending[1], False, g)))
         pending, lo_of = next_row(), None
     rows_f.close()
     yield (prefix, off0, off, g0, lead, rows, pd, qd)
