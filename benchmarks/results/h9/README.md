@@ -152,3 +152,12 @@ timeout; no close frame received`, and 17 x `TimeoutError: timed out during open
 attempts in hour 21, about 1.5 min apart, are network loss on the laptop side or the venue's side; not
 distinguished here). `recorder.log` shows a fresh 100-level snapshot after each successful reconnect. Worth
 checking in the recorder: the keepalive ping interval/timeout, and backoff during the handshake timeouts.
+
+**Window start rounded to 21:49:17.** The last gap row is 21:49:13.802 in BTC/USD but 21:49:16.177 in ETH/USD, after
+the decided start of 21:49:16, so the window used for both symbols is 2026-11-18 21:49:17 to 2026-11-19 03:49:17 UTC
+(still exactly 6 h, no gap row inside). The first book row after reconnect is 21:50:25 (BTC/USD) and 21:50:27
+(ETH/USD), so the first 68-70 s of the window hold trades only.
+
+**Recorder note.** Some recorded quantities are in exponent form (`"5.5E-7"`), which `micro.book.rebuild` rejects
+as not a plain decimal string (HR-12). `benchmarks/h9/build_r.py` rewrites them in plain form, value unchanged
+(checked exactly). The recorder should write plain decimals.
