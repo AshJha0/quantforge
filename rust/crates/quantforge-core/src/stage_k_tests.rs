@@ -572,7 +572,7 @@ proptest! {
 }
 
 /// KR-232: the Student-t tail against the Python reference (`stage_k.student_t_two_sided_tail`),
-/// class tail_probability (1e-11 relative); a value that underflows to 0 there is 0 here.
+/// class `tail_probability` (1e-11 relative); a value that underflows to 0 there is 0 here.
 #[test]
 fn student_t_tail_matches_the_reference() {
     let want = [
@@ -618,7 +618,7 @@ fn student_t_tail_matches_the_reference() {
 /// KR-234 acceptance, binary64 half: `|estimate - V_64| <= bound` on every book of the sweep at
 /// every move (`V_64` the binary64 revaluation `zero_revalue`). The books follow the Python test
 /// `test_intraday_bound_small_move_sweep`: every single position of the grid, hedged books,
-/// delta-neutral pairs and 300 seeded random books (here a SplitMix64 stream, seed 20261119; the
+/// delta-neutral pairs and 300 seeded random books (here a `SplitMix64` stream, seed 20261119; the
 /// Python books use `random.Random(20261119)`, so the random books differ, the rule does not).
 #[test]
 fn intraday_bound_small_move_sweep() {

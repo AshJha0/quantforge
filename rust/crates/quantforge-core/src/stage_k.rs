@@ -343,7 +343,8 @@ fn trigger_within(
 /// KR-233: sigma at or below `2^-26 max|c_i|` is no noise scale.
 pub const NOISE_FLOOR: f64 = 1.4901161193847656e-8; // 2^-26
 
-const TWO_OVER_PI: f64 = 0.6366197723675814;
+// 0.6366197723675814 of KR-232: the binary64 nearest 2/pi, which is `FRAC_2_PI`.
+const TWO_OVER_PI: f64 = std::f64::consts::FRAC_2_PI;
 const T_UP: f64 = 3.273390607896142e150; // 2^500
 const T_DOWN: f64 = 3.054936363499605e-151; // 2^-500
 const T_STOP: f64 = 8.673617379884035e-19; // 2^-60
