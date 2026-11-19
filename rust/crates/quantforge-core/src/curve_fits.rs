@@ -470,3 +470,178 @@ mod tests {
         assert_eq!(fit.outliers, vec![2]);
     }
 }
+
+/// Behaviour of the D38b basis condition check and the Huber active-set fit (curve-fits.md).
+/// Reference reciprocal condition numbers come from numpy: 1 / (||A||_1 ||inv(A)||_1) with A the
+/// Gram matrix scaled to unit diagonal; the three matrices put the largest inverse column sum in
+/// columns 2, 0 and 1. The same cases are in the Java and C++ tests.
+#[cfg(test)]
+mod d38b_tests {
+    use super::*;
+    use crate::error::Finite;
+
+    #[test]
+    fn basis_rcond_matches_the_one_norm_definition() {
+        let x1 = [
+            [1.0, 0.5, 0.2],
+            [1.0, -1.0, 3.0],
+            [2.0, 0.1, -0.7],
+            [0.3, 2.0, 1.0],
+        ];
+        let x3 = [
+            [1.0, 2.0, 0.1],
+            [0.2, 1.0, 3.0],
+            [4.0, -0.5, 1.0],
+            [1.0, 1.0, -2.0],
+            [0.7, -3.0, 0.4],
+        ];
+        let x5 = [
+            [1.0, 0.9, 0.1],
+            [1.0, 1.1, 0.3],
+            [1.0, 1.0, -0.2],
+            [1.0, 0.95, 0.05],
+        ];
+        assert!((basis_rcond(&x1) - 0.462_147_929_545_812_85).abs() < 1e-13);
+        assert!((basis_rcond(&x3) - 0.633_503_583_772_005_4).abs() < 1e-13);
+        assert!((basis_rcond(&x5) - 0.000_993_643_936_552_422_9).abs() < 1e-15);
+        let dependent = [
+            [1.0, 2.0, 3.0],
+            [0.0, 1.0, 1.0],
+            [1.0, 0.0, 1.0],
+            [2.0, 1.0, 3.0],
+        ];
+        assert!(basis_rcond(&dependent) < RCOND_MIN);
+    }
+
+    #[test]
+    fn nearly_equal_maturities_are_singular() {
+        let m = [1.0, 1.0 + 1e-7, 1.0 + 2e-7, 1.0 + 3e-7];
+        let y = [0.01, 0.02, 0.03, 0.04];
+        assert_eq!(robust(&m, &y, 1.0, 1e-3).unwrap_err().code, "E_SINGULAR");
+    }
+
+    const M: [f64; 9] = [0.5, 1.0, 2.0, 3.0, 5.0, 7.0, 10.0, 20.0, 30.0];
+    const TAU: f64 = 1.5;
+
+    fn curve(noise: [f64; 9]) -> Vec<f64> {
+        M.iter()
+            .zip(noise)
+            .map(|(m, e)| {
+                let r = ns_row(*m, TAU);
+                0.03 * r[0] - 0.01 * r[1] + 0.02 * r[2] + e
+            })
+            .collect()
+    }
+
+    /// First-order conditions and objective of the Huber problem, from the returned betas alone.
+    fn assert_huber_optimum(y: &[f64], delta: f64, fit: &Robust) {
+        let mut g = [0.0; 3];
+        let mut obj = 0.0;
+        for (j, mj) in M.iter().enumerate() {
+            let x = ns_row(*mj, TAU);
+            let b = fit.betas;
+            let r = b[0] * x[0] + b[1] * x[1] + b[2] * x[2] - y[j];
+            assert!((r - fit.residuals[j]).abs() < 1e-15);
+            for p in 0..3 {
+                g[p] += r.clamp(-delta, delta) * x[p];
+            }
+            obj += if r.abs() <= delta {
+                r * r / 2.0
+            } else {
+                delta * r.abs() - delta * delta / 2.0
+            };
+        }
+        assert!(g.iter().all(|v| v.abs() < 1e-15), "{g:?}");
+        assert!((obj - fit.objective).abs() < 1e-18);
+        for j in &fit.outliers {
+            assert!(fit.residuals[*j].abs() > delta);
+        }
+    }
+
+    const NOISE: [f64; 9] = [2e-4, -1e-4, 0.01, 1e-4, -2e-4, 1.5e-4, -0.008, 0.0, 5e-5];
+
+    #[test]
+    fn outliers_of_both_signs_are_flagged() {
+        let y = curve(NOISE);
+        let fit = robust(&M, &y, TAU, 5e-4).unwrap();
+        assert_huber_optimum(&y, 5e-4, &fit);
+        assert_eq!(fit.outliers, vec![2, 6]);
+        assert!(fit.residuals[2] < -5e-4 && fit.residuals[6] > 5e-4);
+    }
+
+    #[test]
+    fn outlier_set_shrinks_as_delta_grows() {
+        let y = curve(NOISE);
+        let small = robust(&M, &y, TAU, 1e-4).unwrap();
+        assert_huber_optimum(&y, 1e-4, &small);
+        assert!(small.outliers.len() > 2);
+        let large = robust(&M, &y, TAU, 1.0).unwrap();
+        assert_huber_optimum(&y, 1.0, &large);
+        assert_eq!(large.outliers, [] as [usize; 0]);
+    }
+
+    #[test]
+    fn many_outliers_still_settle() {
+        let y = curve([
+            0.004, -0.003, 0.002, -0.005, 0.001, -0.002, 0.006, -0.001, 0.003,
+        ]);
+        let fit = robust(&M, &y, TAU, 2e-4).unwrap();
+        assert_huber_optimum(&y, 2e-4, &fit);
+    }
+
+    #[test]
+    fn a_point_leaves_the_working_set_before_the_fit_settles() {
+        let y = curve([
+            0.0017, 0.0018, 0.0006, -0.0023, -0.0018, 0.0026, -0.0027, 0.0015, 0.0015,
+        ]);
+        assert_huber_optimum(&y, 1e-4, &robust(&M, &y, TAU, 1e-4).unwrap());
+    }
+
+    #[test]
+    fn ill_conditioned_basis_above_the_threshold_is_fitted() {
+        // numpy: rcond of the scaled Gram matrix is 5.24e-10, well above 1e-12.
+        let m = [5.0, 5.1, 5.2, 5.3];
+        let y = [0.030, 0.031, 0.0305, 0.0302];
+        let fit = robust(&m, &y, 5.0, 1e-3).unwrap();
+        for (j, mj) in m.iter().enumerate() {
+            let x = ns_row(*mj, 5.0);
+            let b = fit.betas;
+            let r = b[0] * x[0] + b[1] * x[1] + b[2] * x[2] - y[j];
+            assert!((r - fit.residuals[j]).abs() < 1e-15);
+        }
+    }
+
+    #[test]
+    fn each_positivity_rule_is_checked_alone() {
+        let m = [1.0, 2.0, 5.0, 10.0];
+        let y = [0.01, 0.02, 0.025, 0.03];
+        assert_eq!(robust(&m, &y, -1.0, 1e-3).unwrap_err().code, "E_DOMAIN");
+        assert_eq!(robust(&m, &y, 1.0, -1e-3).unwrap_err().code, "E_DOMAIN");
+        assert_eq!(
+            robust(&[1.0, -2.0, 5.0, 10.0], &y, 1.0, 1e-3)
+                .unwrap_err()
+                .code,
+            "E_DOMAIN"
+        );
+    }
+
+    #[test]
+    fn robust_result_finiteness_needs_every_field() {
+        let ok = Robust {
+            betas: [0.03, -0.01, 0.02],
+            residuals: vec![1e-4, -1e-4],
+            outliers: vec![],
+            objective: 1e-8,
+        };
+        assert!(ok.is_all_finite());
+        let mut bad = ok.clone();
+        bad.residuals[1] = f64::NAN;
+        assert!(!bad.is_all_finite());
+        let mut bad = ok.clone();
+        bad.betas[0] = f64::INFINITY;
+        assert!(!bad.is_all_finite());
+        let mut bad = ok;
+        bad.objective = f64::NAN;
+        assert!(!bad.is_all_finite());
+    }
+}
