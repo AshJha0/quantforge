@@ -1,8 +1,8 @@
 """Recompute every worked-example number in docs/question-bank/13-execution-microstructure.md and check the strings.
 
-The stage H operations are specified but not merged, so this script restates the spec formulas with the standard
-library and checks them against the spec goldens and the page. Once the operations are merged it should call
-quantforge_core instead, like the other sets.
+This script restates the spec formulas with the standard library and checks them against the spec goldens and the
+page, so it needs no build. The stage H operations are now built in all four languages; moving this script onto
+quantforge_core, like the other sets, is still to do.
 
 Run: python docs/question-bank/verify/v13_execution_microstructure.py   (no package needed)
 """

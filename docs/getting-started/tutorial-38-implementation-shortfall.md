@@ -18,7 +18,7 @@ Terms, defined here. The **decision price** `P_d` is the price when the order wa
 
 ## Step 1: check the goldens by hand
 
-The script restates the formulas of the spec in a few lines of plain Python and runs them on the inputs of the spec's golden cases. It calls no QuantForge operation: the operations are specified but not merged, so this page cannot yet send them through the four builds. CI runs this block and checks the printed lines.
+The script restates the formulas of the spec in a few lines of plain Python and runs them on the inputs of the spec's golden cases. It calls no QuantForge operation: it checks the spec's arithmetic independently of the builds. The operations themselves are built in all four languages and pass these goldens through the conformance runner; Tutorials 41 to 44 call the Python build directly. CI runs this block and checks the printed lines.
 
 <!-- tutorial:run python -->
 ```python
