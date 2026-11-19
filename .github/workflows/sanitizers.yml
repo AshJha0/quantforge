@@ -22,7 +22,10 @@ jobs:
     container:
       image: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
       options: --cap-add=SYS_PTRACE # LeakSanitizer needs ptrace inside a container
-    timeout-minutes: 25
+    # 45, not 25: on 2026-11-19 two runs of the same code were cancelled at 25 min with every step green
+    # (build 9 min, ctest 15 min on a slow runner, against 6.5 and 11 on the run that passed in 22 min). The limit
+    # only stops a hung job; it is not a performance gate.
+    timeout-minutes: 45
     env:
       UBSAN_OPTIONS: print_stacktrace=1
     steps:
