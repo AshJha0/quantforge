@@ -66,7 +66,7 @@ class StageKCliTest {
     void operationsRegistered() {
         for (String op : OpsStageK.OPERATIONS) {
             assertNotNull(Operations.find(op), op);
-            assertTrue(In.pageLimited(op));
+            assertFalse(In.pageLimited(op)); // KR-231: the generic limits apply
         }
     }
 
@@ -174,9 +174,10 @@ class StageKCliTest {
         assertEquals("E_SCHEMA", code("core.store.bitemporal_query", bt(REC.replace("\"A\"", "\"\""))));
         assertEquals("E_SCHEMA", code("core.store.bitemporal_query", bt("1")));
         assertEquals("E_SCHEMA", code("core.store.bitemporal_query", "{\"records\":5}"));
-        // HR-66: a structural E_INPUT (sequence order) before the finite rule's E_DOMAIN
+        // HR-122 (KR-230): the finite rule's E_DOMAIN before a structural E_INPUT (sequence order)
         String nan = REC.replace("\"value\":100", "\"value\":\"NaN\"");
-        assertEquals("E_INPUT", code("core.store.bitemporal_query", bt(nan + "," + REC)));
+        assertEquals("E_DOMAIN", code("core.store.bitemporal_query", bt(nan + "," + REC)));
+        assertEquals("E_INPUT", code("core.store.bitemporal_query", bt(REC + "," + REC)));
         assertEquals("E_DOMAIN", code("core.store.bitemporal_query", bt(nan)));
         String ok = run("core.store.bitemporal_query", bt(REC));
         assertTrue(ok.contains("\"valid_to\":null"), ok);
@@ -194,35 +195,50 @@ class StageKCliTest {
     @Test
     void errorOrderAcrossVerbs() {
         String trig = "{\"changes\":[1.0,-1.0,1.0,-1.0],\"x_ref\":100,\"x_now\":104,\"days_since\":1,\"k\":3";
-        assertEquals("E_INPUT", code("calib.trigger.check", trig.replace("[1.0,-1.0,1.0,-1.0]", "[1.0]")
+        // HR-122 (KR-230): E_LIMIT, the finite rule, structural E_INPUT, E_DOMAIN
+        assertEquals("E_DOMAIN", code("calib.trigger.check", trig.replace("[1.0,-1.0,1.0,-1.0]", "[1.0]")
                 .replace("104", "\"NaN\"") + "}"));
+        assertEquals("E_INPUT", code("calib.trigger.check", trig.replace("[1.0,-1.0,1.0,-1.0]", "[1.0]")
+                .replace("\"k\":3", "\"k\":-1") + "}"));
         assertEquals("E_DOMAIN", code("calib.trigger.check", trig.replace("\"days_since\":1", "\"days_since\":0.5")
                 + "}"));
         String many = String.join(",", Collections.nCopies(50_001, "1.0,-1.0"));
         assertEquals("E_LIMIT", code("calib.trigger.check", trig.replace("1.0,-1.0,1.0,-1.0", many) + "}"));
-        assertEquals("E_DOMAIN", code("calib.trigger.check", trig.replace("1.0,-1.0,1.0,-1.0", many)
-                .replace("\"k\":3", "\"k\":-1") + "}"));
+        assertEquals("E_LIMIT", code("calib.trigger.check", trig.replace("1.0,-1.0,1.0,-1.0", many)
+                .replace("\"k\":3", "\"k\":-1").replace("104", "\"NaN\"") + "}"));
 
-        assertEquals("E_INPUT", code("risk.intraday.delta_gamma_bound", "{\"positions\":[],\"shift\":\"NaN\"}"));
+        assertEquals("E_DOMAIN", code("risk.intraday.delta_gamma_bound", "{\"positions\":[],\"shift\":\"NaN\"}"));
+        assertEquals("E_INPUT", code("risk.intraday.delta_gamma_bound", "{\"positions\":[],\"shift\":0.01}"));
         String pos = "{\"notional\":1.0,\"maturity\":1.0,\"yield\":0.0}";
         assertEquals("E_DOMAIN", code("risk.intraday.delta_gamma_bound", "{\"positions\":[" + pos
                 + "],\"shift\":\"NaN\"}"));
         String big = String.join(",", Collections.nCopies(100_001, pos));
         assertEquals("E_LIMIT", code("risk.intraday.delta_gamma_bound", "{\"positions\":[" + big
                 + "],\"shift\":0.01}"));
-        assertEquals("E_DOMAIN", code("risk.intraday.delta_gamma_bound", "{\"positions\":[" + big + ","
+        assertEquals("E_LIMIT", code("risk.intraday.delta_gamma_bound", "{\"positions\":[" + big + ","
                 + pos.replace("\"maturity\":1.0", "\"maturity\":0.0") + "],\"shift\":0.01}"));
         String zero = run("risk.intraday.delta_gamma_bound", "{\"positions\":[" + pos + "],\"shift\":0.0}");
         assertTrue(zero.contains("\"estimate_pnl\":0") && zero.contains("\"bound\":0")
                 && zero.contains("\"label\":\"latency-aware analytics on simulated data\""), zero);
 
-        assertEquals("E_INPUT", code("num.richardson.check", "{\"values\":[1.0],\"ratio\":\"NaN\","
+        assertEquals("E_DOMAIN", code("num.richardson.check", "{\"values\":[1.0],\"ratio\":\"NaN\","
                 + "\"assumed_order\":1.0}"));
         assertEquals("E_INPUT", code("curve.bootstrap.par_annual", "{\"quotes\":[]}"));
         assertEquals("E_LIMIT", code("curve.bootstrap.par_annual", "{\"quotes\":["
                 + String.join(",", Collections.nCopies(201, "0.01")) + "]}"));
-        assertEquals("E_INPUT", code("curve.incremental.update", "{\"previous_quotes\":[0.01],"
+        assertEquals("E_DOMAIN", code("curve.incremental.update", "{\"previous_quotes\":[0.01],"
                 + "\"previous_discount_factors\":[\"NaN\"],\"new_quotes\":[0.01,0.02]}"));
+        assertEquals("E_LIMIT", code("curve.incremental.update", "{\"previous_quotes\":[0.01],"
+                + "\"previous_discount_factors\":[\"NaN\"],\"new_quotes\":["
+                + String.join(",", Collections.nCopies(201, "0.01")) + "]}"));
+        assertEquals("E_LIMIT", code("curve.bootstrap.par_annual", "{\"quotes\":[\"NaN\","
+                + String.join(",", Collections.nCopies(200, "-2.0")) + "]}"));
+        String rec2 = REC.replace("\"sequence\":1", "\"sequence\":%d");
+        StringBuilder log = new StringBuilder();
+        for (int i = 100_001; i >= 1; i--) {
+            log.append(i == 100_001 ? "" : ",").append(rec2.formatted(i));
+        }
+        assertEquals("E_LIMIT", code("core.store.bitemporal_query", bt(log.toString())));
         assertEquals("E_SCHEMA", code("curve.incremental.update", "{\"previous_quotes\":[0.01],"
                 + "\"previous_discount_factors\":[1],\"new_quotes\":\"x\"}"));
         String upd = run("curve.incremental.update", "{\"previous_quotes\":[0.0],"
