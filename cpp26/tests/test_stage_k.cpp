@@ -512,7 +512,7 @@ TEST_CASE("intraday: estimate, bound, label, the error order and the position li
     CHECK(code(op, R"({"positions":[{"notional":1.0,"maturity":5.0}],"shift":0.01})") == "E_SCHEMA");
     CHECK(code(op, R"({"positions":)" + repeat(pos, 100001) + R"(,"shift":0.01})") == "E_LIMIT");
     const json::Value out = ok(op, R"({"positions":[)" + pos + R"(],"shift":0.0})");
-    CHECK(to_text(out) == R"({"estimate_pnl":0.0,"bound":0.0,"label":"latency-aware analytics on simulated data"})");
+    CHECK(to_text(out) == R"({"estimate_pnl":0,"bound":0,"label":"latency-aware analytics on simulated data"})");
 }
 
 TEST_CASE("intraday acceptance: seeded 50-position book, 1,000 moves, |estimate - revaluation| <= bound",
