@@ -558,3 +558,27 @@ def test_the_twenty_day_gate(
 def test_late_days_and_gaps_do_not_count_towards_the_gate(gappy: tuple[str, list[dt.date]]) -> None:
     text, days = gappy
     assert len(days) == 10 and check(text)["recorded_trading_days"] == 8
+
+
+# ---------------------------------------------------------------- goldens pl_k (paper-ledger-daily.md)
+
+
+def test_goldens_pl_k(ledger30: str) -> None:
+    rows = rows_of(ledger30)
+    assert rows[1]["hash"] == "d7f22a80b63fa8ad612907dd6c8b1d4ba0e67527398887bb7848f5e6e5d191f3"
+    assert rows[1]["body"]["pnl"] == "-285.9375"
+    assert rows[2]["hash"] == "f887e3d3d0a9ac889d95d5a6e3ee3578b4908286700c5428ea1c7daee2980cb4"
+    b = rows[2]["body"]
+    assert b["instruments"]["UST-CM-2Y"]["mark"] == "99.938677" and b["pnl"] == "-895.26075"
+    assert b["explain"]["carry"] == "1213.9355" and b["explain"]["curve_move"] == "-1993.7275"
+    assert rows[-1]["hash"] == "56a3dd05b177badb7e91c5f1033058282773df03d7fc58b5d1676def5258cf28"
+    status = [o["status"] for r in rows[1:] for o in r["body"]["orders"]]
+    assert (status.count("FILLED"), status.count("PARTIALLY_FILLED")) == (17, 13)
+
+
+def test_no_code_path_reaches_fedinvest_or_a_network() -> None:
+    """P1 and KR-70: the job reads the recorded log only."""
+    for name in ("core.py", "run_day.py", "verify_ledger.py"):
+        src = (ROOT / "tools" / "paper_daily" / name).read_text(encoding="utf-8")
+        for word in ("urllib", "requests", "http.client", "socket", "FedInvest", "treasurydirect"):
+            assert word not in src, (name, word)

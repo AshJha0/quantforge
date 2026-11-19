@@ -1,0 +1,131 @@
+name: Paper ledger
+# Daily paper ledger (plan 14.8 K-1, K-2; 12.7 Q8k; specifications/12-platform/paper-ledger-daily.md). It reads the
+# Treasury par curve that recorder.yml already recorded on branch forward-log (this job makes no network request
+# for market data), appends one hash-chained row per US business day to branch paper-ledger, verifies the whole
+# ledger (exact replay from the ledger alone, then a rebuild of every day through the CLI) and anchors the head on
+# branch paper-ledger-anchors. It never writes to main, places no order and reaches no venue: fills come from the
+# simulator only. Label on every row: "paper marks on a fitted curve; not tradable". No performance claim is made.
+# Guide: docs/developer-guides/paper-ledger.md
+on:
+  schedule:
+    - cron: '40 0 * * 2-6' # 70 minutes after the recorder's 23:30 UTC run, which takes Treasury's end-of-day curve (published by 18:00 ET)
+    - cron: '10 15 * * 1-5' # second chance after the recorder's 14:30 UTC run, still before the 19:30 UTC on-time cut-off
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Build and verify the rows, print them, push nothing
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: paper-ledger
+  cancel-in-progress: false
+jobs:
+  ledger:
+    name: paper-ledger-run
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          path: code
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: Check out forward-log (read only) and paper-ledger, or start it
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          url="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          git clone --quiet --depth 1 --branch forward-log "$url" fwd
+          git -C fwd remote remove origin # nothing in this job can push to forward-log
+          if git ls-remote --exit-code --heads "$url" paper-ledger >/dev/null; then
+            git clone --quiet --branch paper-ledger "$url" ledger
+          else
+            git init -b paper-ledger ledger
+            git -C ledger remote add origin "$url"
+            printf '# paper-ledger\n\nRows written by .github/workflows/paper-ledger.yml. Append-only. Label: "paper marks on a fitted curve; not tradable". Simulated fills; no performance claim. See docs/developer-guides/paper-ledger.md on main.\n' > ledger/README.md
+          fi
+      - name: Install the Python CLI
+        run: uv sync --locked --no-dev --project code/python
+      - name: Run the day
+        id: run
+        run: |
+          args=(--ledger ledger/ledger/ledger.jsonl --forward-log fwd/actions/log.jsonl --impl python --commit "$GITHUB_SHA")
+          if [ "$DRY_RUN" = true ]; then args+=(--dry-run); fi
+          python3 code/tools/paper_daily/run_day.py "${args[@]}"
+      - name: Check out the anchors, or start them
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          url="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          if git ls-remote --exit-code --heads "$url" paper-ledger-anchors >/dev/null; then
+            git clone --quiet --branch paper-ledger-anchors "$url" anchors
+          else
+            git init -b paper-ledger-anchors anchors && git -C anchors remote add origin "$url"
+            printf '# paper-ledger-anchors\n\nOpenTimestamps anchors for branch paper-ledger. See docs/developer-guides/paper-ledger.md on main.\n' > anchors/README.md
+          fi
+          mkdir -p anchors/anchors
+      - name: Verify the ledger against itself, the CLI and every anchor held
+        # Also the holdout-date guard (plan 14.10 rule 6) and the genesis configuration check. A ledger that fails
+        # here is not pushed.
+        if: hashFiles('ledger/ledger/ledger.jsonl') != ''
+        run: python3 code/tools/paper_daily/verify_ledger.py verify --ledger ledger/ledger/ledger.jsonl --impl python --anchors anchors/anchors --summary ledger/ledger/summary.json
+      - name: Push rows
+        if: env.DRY_RUN != 'true'
+        env:
+          # Same optional signing key as recorder.yml: signed commits show as Verified; without the secret (forks)
+          # the rows are pushed unsigned and the dates rest on the anchors.
+          SIGNING_KEY: ${{ secrets.FORWARD_LOG_SIGNING_KEY }}
+        run: |
+          cd ledger
+          if [ -n "$SIGNING_KEY" ]; then
+            key="$RUNNER_TEMP/pl_sign"; (umask 077; printf '%s\n' "$SIGNING_KEY" > "$key")
+            git config user.name "AshJha0"
+            git config user.email "99271665+AshJha0@users.noreply.github.com"
+            git config gpg.format ssh
+            git config user.signingkey "$key"
+            git config commit.gpgsign true
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          fi
+          git add -A
+          git diff --cached --quiet && exit 0
+          head=$(python3 -c "import json,sys; print(json.load(open('ledger/summary.json'))['head'])")
+          git commit -q -m "paper-ledger: $(date -u +%Y-%m-%dT%H:%MZ) head ${head} (main ${GITHUB_SHA::7})"
+          # No rebase on a rejected push: this job is the only writer and the concurrency group serialises it, so a
+          # rejection means the branch changed underneath and a person must look.
+          git push origin paper-ledger
+      - name: Anchor the head hash outside the repo
+        # As recorder.yml (plan 13.2 R4): OpenTimestamps on free calendars, no account, no secret.
+        id: anchor
+        if: env.DRY_RUN != 'true' && hashFiles('ledger/ledger/ledger.jsonl') != ''
+        continue-on-error: true
+        run: |
+          pip install --quiet opentimestamps-client==0.7.2
+          (cd anchors/anchors && ots upgrade *.json.ots || true) # fills in Bitcoin attestations once confirmed
+          python3 code/tools/paper_daily/verify_ledger.py anchor --ledger ledger/ledger/ledger.jsonl --out-dir anchors/anchors --stamp
+          cd anchors
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "anchor: $(date -u +%Y-%m-%dT%H:%MZ) paper-ledger head $(git -C ../ledger rev-parse --short HEAD)"
+          for i in 1 2 3; do git push origin paper-ledger-anchors && break; git pull --rebase -q origin paper-ledger-anchors; done
+      - name: Fail on a failed soft step
+        if: always()
+        env:
+          OUTCOMES: anchor=${{ steps.anchor.outcome }}
+        run: |
+          failed=""
+          for kv in $OUTCOMES; do if [ "${kv#*=}" = failure ]; then failed="$failed ${kv%%=*}"; fi; done
+          if [ -n "$failed" ]; then
+            echo "::error::soft steps failed:$failed (anchor: the rows are pushed but the head was not stamped; the next run stamps a later head)"
+            exit 1
+          fi
+          echo "all soft steps passed or were skipped ($OUTCOMES)"

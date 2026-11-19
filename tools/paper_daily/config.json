@@ -21,6 +21,7 @@
   "par_price": "100",
   "coupon_frequency": 2,
   "mark_decimals": 6,
+  "tca_decimals": 10,
   "tick_size": "0.00390625",
   "lot_size": "100",
   "book_levels": 3,

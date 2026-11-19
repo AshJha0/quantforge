@@ -340,7 +340,7 @@ def build_day(cfg, runner, state, date, par, source, ts, timing, prev_hash, gaps
             case("close", "core.interp.evaluate", {"method": cfg["interp"], "x": xs, "at": at,
                                                    "y": [float(par[k["field"]]) for k in cfg["knots"]]})])
         for n, i in enumerate(insts):
-            out_i[i["symbol"]] = {"tau": fstr(taus[i["symbol"]]), "y_roll": rstr(r["roll"]["values"][n], places),
+            out_i[i["symbol"]] = {"tau": rstr(taus[i["symbol"]], cfg["tca_decimals"]), "y_roll": rstr(r["roll"]["values"][n], places),
                                   "y_close": rstr(r["close"]["values"][n], places)}
 
     # 2. prices: the old bonds at both yields, the new par bonds for their duration
@@ -425,7 +425,8 @@ def build_day(cfg, runner, state, date, par, source, ts, timing, prev_hash, gaps
     # 5. pre-trade limit check, then the simulator only if accepted
     fills = []
     if order:
-        order["tca_pretrade"] = {**{k: fstr(v) for k, v in r["tca_pre"].items()}, "label": cfg["tca_pretrade_label"]}
+        order["tca_pretrade"] = {**{k: rstr(v, cfg["tca_decimals"]) for k, v in r["tca_pre"].items()},
+                                 "label": cfg["tca_pretrade_label"]}
         chk = runner([case("chk", "paper.pretrade.check", {
             "order": {k: order[k] for k in ("side", "type", "quantity", "limit_price")}, "ref_price": par_px,
             "position": plain(state["pos"][order["symbol"]]), "cash": plain(cash_mid), "orders_today": 0,
@@ -466,7 +467,7 @@ def build_day(cfg, runner, state, date, par, source, ts, timing, prev_hash, gaps
             "fees": float(sum((Decimal(f["fee"]) for f in fills), D0))}))
     r = runner(cases)
     if order:
-        order["tca"] = {k: fstr(v) for k, v in r["tca"].items()}
+        order["tca"] = {k: rstr(v, cfg["tca_decimals"]) for k, v in r["tca"].items()}
     trading = sum((Decimal(r[f"fill|{i['symbol']}"]["trading"]) for i in insts), D0)
     fees = sum((Decimal(r[f"fill|{i['symbol']}"]["fees"]) for i in insts), D0)
     positions = {i["symbol"]: r[f"fill|{i['symbol']}"]["position"] for i in insts}
