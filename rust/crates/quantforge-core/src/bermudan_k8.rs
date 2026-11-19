@@ -205,7 +205,10 @@ pub fn smoothed_max(v: &[Dual], e: &[Dual]) -> Vec<Dual> {
         let (pos, ng) = if fa > 0.0 { (j, j + 1) } else { (j + 1, j) };
         let rho = div(&f[pos], &sub(&f[pos], &f[ng])); // the part of the cell where V > E
         let rest = plus(&neg(&rho), 1.0);
-        let gg = div_scalar(&mul(&mul(&rho, &rest), &plus(&scale(2.0, &rho), -1.0)), 12.0);
+        let gg = div_scalar(
+            &mul(&mul(&rho, &rest), &plus(&scale(2.0, &rho), -1.0)),
+            12.0,
+        );
         let corr = mul(&gg, &scale(0.5, &add(&d2[j], &d2[j + 1])));
         hh[pos] = sub(&hh[pos], &mul(&rest, &corr));
         hh[ng] = sub(&hh[ng], &mul(&rho, &corr));
@@ -373,7 +376,11 @@ pub fn scheme(
     let mut nodes = vec![0.0];
     nodes.extend_from_slice(times);
     let s2 = mul(&sd, &sd);
-    let m = Model { curve: Curve { nodes, logs }, a: ad, s2 };
+    let m = Model {
+        curve: Curve { nodes, logs },
+        a: ad,
+        s2,
+    };
     let phi = if payer { 1.0 } else { -1.0 };
     let tm = exercise_times[exercise_times.len() - 1];
     let gq = neg(&div(&dexpm1(&scale(-2.0 * tm, &m.a)), &scale(2.0, &m.a)));

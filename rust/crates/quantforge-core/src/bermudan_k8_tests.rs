@@ -14,7 +14,11 @@ fn repo(rel: &str) -> Json {
 }
 
 fn reals(v: &Json) -> Vec<f64> {
-    v.as_array().unwrap().iter().map(|x| x.as_f64().unwrap()).collect()
+    v.as_array()
+        .unwrap()
+        .iter()
+        .map(|x| x.as_f64().unwrap())
+        .collect()
 }
 
 struct Case {
@@ -67,7 +71,7 @@ fn grid(c: &Case, nx: i64, spy: i64) -> FdGrid {
     }
 }
 
-fn swap<'a>(c: &'a Case) -> SwapLeg<'a> {
+fn swap(c: &Case) -> SwapLeg<'_> {
     SwapLeg {
         start: c.start,
         pay: &c.pay,
@@ -214,8 +218,15 @@ fn ladder_equals_its_own_bumps() {
             "{j}: {got}"
         );
     }
-    let ga = bump(|x| price_of(&c, &c.dfs, x, c.sigma, 41, 20), c.a, 1e-3 * c.a);
-    assert!((ga - l.d_mean_reversion).abs() <= 1e-8 * ga.abs(), "a: {ga}");
+    let ga = bump(
+        |x| price_of(&c, &c.dfs, x, c.sigma, 41, 20),
+        c.a,
+        1e-3 * c.a,
+    );
+    assert!(
+        (ga - l.d_mean_reversion).abs() <= 1e-8 * ga.abs(),
+        "a: {ga}"
+    );
     let gs = bump(
         |x| price_of(&c, &c.dfs, c.a, x, 41, 20),
         c.sigma,
@@ -362,9 +373,29 @@ fn checks_run_in_the_g18_order() {
     let bad = [1.5];
     let e = ladder(&curve, &c.times, &c.dfs, c.a, c.sigma, &swap(&c), &bad, g).unwrap_err();
     assert_eq!(e.code, "E_INPUT");
-    let e = price(&curve, &c.times, &c.dfs, c.a, c.sigma, &swap(&c), &c.exercise, g).unwrap_err();
+    let e = price(
+        &curve,
+        &c.times,
+        &c.dfs,
+        c.a,
+        c.sigma,
+        &swap(&c),
+        &c.exercise,
+        g,
+    )
+    .unwrap_err();
     assert_eq!(e.code, "E_DOMAIN");
-    let e = price(&curve, &c.times, &c.dfs, c.a, 0.0, &swap(&c), &c.exercise, g).unwrap_err();
+    let e = price(
+        &curve,
+        &c.times,
+        &c.dfs,
+        c.a,
+        0.0,
+        &swap(&c),
+        &c.exercise,
+        g,
+    )
+    .unwrap_err();
     assert_eq!(e.code, "E_DOMAIN");
 }
 
@@ -401,10 +432,13 @@ fn acceptance_3_observed_order() {
                 continue;
             }
             let rc = richardson_check(&vals, 2.0, 2.0).unwrap();
-            let ok = rc.status == "OK"
-                && rc.observed_order.is_some_and(|o| (1.5..=2.5).contains(&o));
+            let ok =
+                rc.status == "OK" && rc.observed_order.is_some_and(|o| (1.5..=2.5).contains(&o));
             if !ok {
-                bad.push(format!("[{index}, {k}, {}, {:?}]", rc.status, rc.observed_order));
+                bad.push(format!(
+                    "[{index}, {k}, {}, {:?}]",
+                    rc.status, rc.observed_order
+                ));
             }
             println!(
                 "K-8 acceptance 3 (Rust): case {index} entry {k} order {:?}",
@@ -415,6 +449,9 @@ fn acceptance_3_observed_order() {
     println!(
         "K-8 acceptance 3 (Rust): failures={bad:?} max_gap_vs_python_relative_to_row_scale={worst_gap:e}"
     );
-    assert!(worst_gap <= 1e-9, "Rust differs from the Python record by {worst_gap}");
+    assert!(
+        worst_gap <= 1e-9,
+        "Rust differs from the Python record by {worst_gap}"
+    );
     assert!(bad.is_empty(), "K-8 acceptance 3 fails on {bad:?}");
 }
