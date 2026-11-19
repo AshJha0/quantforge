@@ -24,3 +24,17 @@ Packet: `C:/Work/Claude/qf-blind/k5a_v2_packet/` (outside every worktree; not co
 ## Fixed now, before any blind result exists
 
 Eligible: 11 of 11; needed for the 60% floor: 7. The deriver must be a model other than Claude Opus 5.5. The procedure of version 1 applies unchanged (hash first, then compare). Until it runs, the K-5a outside share for `bound` is 0 of 5 on the old cases, and the outside-share inputs must say so (`tools/outside_shares.py` belongs to another lane tonight; the change it needs is listed in the audit response).
+
+## Results (2026-11-19 23:35 UTC; first and only compare run)
+
+- Deriver: a separate subagent on Claude Sonnet 5.5 (the 1.1.0 spec, the fix and this packet were written by Opus 5.5), given only the packet folder and its own folder; standard-library Python. Its own statements, not independently logged: it read and tried to read nothing outside the two folders; it checked for every case, with 80-digit decimal arithmetic, that the bound is at least the absolute difference between the estimate and an exact revaluation. The coordinator checked the packet manifest hash ceebd557... before the hand-over.
+- Blind results as received: `stage_k_blind/k5a_v2/`, committed in d079af0a before the compare. SHA-256 of `blind_results.json`: `7514169e2f1781af165a22eaa9184e3b73f74b845fc913e4fc08d57be7f666db`, recomputed by the coordinator, equal to the deriver's hash file.
+- Compare: `k5a_v2_compare.py` as fixed before the derivation (1e-9 relative on `estimate_pnl` and `bound`, no absolute term); output `stage_k_blind/k5a_v2/compare_output.txt`; exit code 1. Results not changed afterwards; no rerun.
+
+| Item | Cases | MATCH | MISMATCH | Eligible | Counted | Needed for 60% | Share |
+|---|---:|---:|---:|---:|---:|---:|---|
+| K-5a (spec 1.1.0) | 11 | 9 | 2 | 11 | 9 | 7 | 9 of 11 (81.8%) |
+
+All 11 `bound` values match (largest relative difference 0). The two MISMATCH rows are `estimate_pnl` of the two cancelling books: idr_k-0012 (expected 3.991807462997163e-08, blind 3.9915903471410275e-08: absolute difference 2.2e-12, relative 5.4e-05) and idr_k-0013 (expected 0.0004093652741663154, blind 0.00040936541041003405: absolute difference 1.4e-10, relative 3.3e-07). They are NOT counted. Explanation, stated as such and not used to change the verdict: on a book whose terms cancel to about 1e-8 of their size, the binary64 estimate depends on the order of operations, which the rules text does not fix to the last bit (the deriver recorded this for idr_k-0013); ruling KR-240 gives these two goldens an absolute tolerance term (1.9e-10 and 2.8e-8) for exactly that reason, and both blind differences are inside it. The compare script was fixed with the plain 1e-9 relative rule and without KR-240's term, so under the tolerance fixed before the run they are mismatches, and that is how they are recorded.
+
+Spec work this exposes: either the estimate's evaluation order is specified completely (then a second implementation reproduces it to the last bits and the plain tolerance applies), or the spec states KR-240's tolerance in its "Golden value cases" section and the compare of any later blind run uses it from the start. The deriver's other recorded readings (`-T*h` as `(-T)*h`; left-to-right sums in rho; grouping of `T^3*abs(N)*e`; idr_k-0014 huge but finite) all agree with the spec's values.
