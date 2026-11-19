@@ -1,0 +1,11 @@
+{
+ "about": "Operation ids kept as deprecated aliases (KR-152). An alias runs the same handler as its target in every build, so its outputs, error codes and diagnostics are identical; it is removed in the release named. Read by tools/gen_name_map.py; stated in specifications/cli-contract.md, section Deprecated aliases.",
+ "aliases": {
+  "xva.simm.ir_delta": {
+   "alias_of": "xva.sbim.ir_delta",
+   "deprecated_in": "contract 1.17.0, release v0.10.1",
+   "removal": "v1.0.0",
+   "ruling": "KR-152"
+  }
+ }
+}
