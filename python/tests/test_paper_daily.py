@@ -582,3 +582,20 @@ def test_no_code_path_reaches_fedinvest_or_a_network() -> None:
         src = (ROOT / "tools" / "paper_daily" / name).read_text(encoding="utf-8")
         for word in ("urllib", "requests", "http.client", "socket", "FedInvest", "treasurydirect"):
             assert word not in src, (name, word)
+
+
+def test_the_workflow_pins_actions_as_the_recorder_does_and_pushes_only_its_own_branches() -> None:
+    wf = (ROOT / ".github" / "workflows" / "paper-ledger.yml").read_text(encoding="utf-8")
+    recorder = (ROOT / ".github" / "workflows" / "recorder.yml").read_text(encoding="utf-8")
+    uses = [ln.split("uses:")[1].strip() for ln in wf.splitlines() if "uses:" in ln]
+    assert uses and all(
+        u in recorder and "@" in u and len(u.split("@")[1].split()[0]) == 40 for u in uses
+    )
+    pushes = [ln.strip() for ln in wf.splitlines() if "git push" in ln]
+    assert (
+        len(pushes) == 2
+        and "push origin paper-ledger" in pushes[0]
+        and "paper-ledger-anchors" in pushes[1]
+    )
+    assert "permissions:" + chr(10) + "  contents: write" + chr(10) + "concurrency:" in wf
+    assert "dry_run" in wf and "pull_request" not in wf and "fwd remote remove origin" in wf

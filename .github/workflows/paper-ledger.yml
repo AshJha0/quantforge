@@ -77,7 +77,8 @@ jobs:
         if: hashFiles('ledger/ledger/ledger.jsonl') != ''
         run: python3 code/tools/paper_daily/verify_ledger.py verify --ledger ledger/ledger/ledger.jsonl --impl python --anchors anchors/anchors --summary ledger/ledger/summary.json
       - name: Push rows
-        if: env.DRY_RUN != 'true'
+        id: push
+        if: env.DRY_RUN != 'true' && hashFiles('ledger/ledger/ledger.jsonl') != ''
         env:
           # Same optional signing key as recorder.yml: signed commits show as Verified; without the secret (forks)
           # the rows are pushed unsigned and the dates rest on the anchors.
@@ -102,10 +103,11 @@ jobs:
           # No rebase on a rejected push: this job is the only writer and the concurrency group serialises it, so a
           # rejection means the branch changed underneath and a person must look.
           git push origin paper-ledger
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
       - name: Anchor the head hash outside the repo
         # As recorder.yml (plan 13.2 R4): OpenTimestamps on free calendars, no account, no secret.
         id: anchor
-        if: env.DRY_RUN != 'true' && hashFiles('ledger/ledger/ledger.jsonl') != ''
+        if: steps.push.outputs.pushed == 'true' # only a new head is stamped
         continue-on-error: true
         run: |
           pip install --quiet opentimestamps-client==0.7.2

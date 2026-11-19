@@ -10,7 +10,7 @@ Label on every row: "paper marks on a fitted curve; not tradable". Fills are sim
 |---|---|---|
 | Spec, fixed before any scheduled run | `specifications/12-platform/paper-ledger-daily.md` | acceptance table P1 to P11 in the spec |
 | Rulings KR-70 to KR-89 (proposed) | `specifications/stage-k-rulings-paper.md` | need the coordinator's confirmation |
-| Daily job | `tools/paper_daily/core.py`, `run_day.py`, `config.json` | `python/tests/test_paper_daily.py`, 39 tests, measured 2026-11-19 on the local laptop (Windows, Python 3.15), not on CI |
+| Daily job | `tools/paper_daily/core.py`, `run_day.py`, `config.json` | `python/tests/test_paper_daily.py`, 40 tests, measured 2026-11-19 on the local laptop (Windows, Python 3.15), not on CI |
 | Verifier and anchor tool | `tools/paper_daily/verify_ledger.py` | same test file; planted faults listed under P7 |
 | Workflow | `.github/workflows/paper-ledger.yml` | not triggered; `tools/check_job_names.py` passes (59 jobs, 0 problems) |
 | Guide | `docs/developer-guides/paper-ledger.md` | |
@@ -85,4 +85,15 @@ No library operation was added or changed. The job composes `core.calendar.is_bu
 
 ## Gate results on this branch (2026-11-19, local laptop, not the acceptance machine)
 
-See the lane's final report for the commands run and their results.
+| Command | Result |
+|---|---|
+| `uv run pytest tests/test_paper_daily.py` | 40 passed |
+| `uv run ruff check` and `ruff format --check` on the test; `uv run mypy .` | clean; 227 source files, no issues |
+| `python research/test_preregs.py` | 10 tests OK |
+| `python tools/test_tools.py` | passed (exit 0) |
+| `tools/build_references.py --check`, `tools/validation/build_checklists.py --check`, `tools/gen_name_map.py --check`, `tools/case_figures.py --check`, `tools/outside_shares.py --check` | up to date; nothing regenerated, no generated file changed |
+| `tools/quality_gate.py --check-register --check-specs --check-docs` | 0 new gaps (10 baseline) |
+| `tools/check_job_names.py`, `tools/check_hygiene.py` | 59 jobs, 0 problems; 0 problems |
+| `git grep -i` for the banned word on the diff | none |
+
+Not run: the full Python test suite, the Java, C++ and Rust builds (no change there), and the workflow itself.
