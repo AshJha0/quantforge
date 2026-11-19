@@ -640,8 +640,10 @@ def test_idr_k_rows(case: dict[str, Any]) -> None:
         return
     got, want = sk.delta_gamma_bound(ps, i["shift"]), case["expected"]["outputs"]
     assert got["label"] == want["label"] == sk.LABEL
-    assert _rel(got["estimate_pnl"], want["estimate_pnl"]) <= 1e-9
-    assert _rel(got["bound"], want["bound"]) <= 1e-9
+    lim = case.get("tolerance_limit", {"absolute": 0.0, "relative": 1e-9})
+    for key in ("estimate_pnl", "bound"):  # runner rule: |a - e| <= absolute + relative max(|a|, |e|)
+        diff = abs(got[key] - want[key])
+        assert diff <= lim["absolute"] + lim["relative"] * max(abs(got[key]), abs(want[key])), (key, got, want)
     assert abs(got["estimate_pnl"] - sk.zero_revalue(ps, i["shift"])) <= got["bound"]
 
 

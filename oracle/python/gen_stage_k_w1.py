@@ -632,7 +632,19 @@ def build():
         exact = mp.fsum(p[2] for p in parts)
         assert abs(mp.mpf(r["estimate_pnl"]) - exact) <= mp.mpf(r["bound"]), desc  # KR-234 claim on the golden
         filled.append((s.name, len(s.cases) + 1, r, float(exact), float(mp.fsum(p[1] for p in parts) - exact)))
-        s.add("risk.intraday.delta_gamma_bound", inp, outputs=r, cls="simple_analytic", limit=lim,
+        # KR-240 (KA-A7): with cancellation the binary64 estimate cannot reach 1e-9 relative to its own small value.
+        # The tolerance adds, as an absolute term, the estimate's share of the KR-234 rounding allowance:
+        # 2^-49 sum (1 + T|y| + T|h|) |v| (T|h| + T^2 h^2), which the derivation shows the binary64 estimate is within.
+        h_ = mp.mpf(inp["shift"])
+        share = mp.fsum(RHO * (1 + mp.mpf(q["maturity"]) * abs(mp.mpf(q["yield"])) + mp.mpf(q["maturity"]) * abs(h_))
+                        * abs(p[0]) * (mp.mpf(q["maturity"]) * abs(h_) + (mp.mpf(q["maturity"]) * h_) ** 2)
+                        for p, q in zip(parts, inp["positions"]))
+        lim_ = lim
+        if share > mp.mpf("1e-9") * abs(mp.mpf(r["estimate_pnl"])):
+            lim_ = {"absolute": float(share), "relative": 1e-9}
+            desc += (f" (cancelling: compared at 1e-9 relative plus {float(share):.3g} absolute, the estimate's share of "
+                     "the KR-234 rounding allowance; KR-240)")
+        s.add("risk.intraday.delta_gamma_bound", inp, outputs=r, cls="simple_analytic", limit=lim_,
               output_classes={"label": "date_and_convention"}, verified=(ORACLE, AUDIT), tags=tags,
               description="KR-234: " + desc)
     for name, i, r, ex, e in filled:

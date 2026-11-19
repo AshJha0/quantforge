@@ -1147,9 +1147,10 @@
    "tags": [
     "stage_k",
     "frtb_backtest",
-    "error"
+    "error",
+    "two-errors"
    ],
-   "description": "hand: two errors: limit and negative count"
+   "description": "hand: two errors: limit [limit] and negative count [domain]"
   },
   {
    "case_id": "btk_k-0032",
@@ -1170,9 +1171,10 @@
    "tags": [
     "stage_k",
     "frtb_backtest",
-    "error"
+    "error",
+    "two-errors"
    ],
-   "description": "hand: two errors: observations a string and negative count"
+   "description": "hand: two errors: observations a string [schema] and negative count [domain]"
   },
   {
    "case_id": "btk_k-0033",
@@ -1219,9 +1221,10 @@
    "tags": [
     "stage_k",
     "frtb_backtest",
-    "error"
+    "error",
+    "two-errors"
    ],
-   "description": "hand: two errors: a count missing and a negative count"
+   "description": "hand: two errors: a count missing [schema] and a negative count [domain]"
   },
   {
    "case_id": "btk_k-0035",
@@ -1333,9 +1336,10 @@
    "tags": [
     "stage_k",
     "frtb_backtest",
-    "error"
+    "error",
+    "two-errors"
    ],
-   "description": "hand: two errors: lengths differ and a string"
+   "description": "hand: two errors: lengths differ [structural] and a string [schema]"
   },
   {
    "case_id": "btk_k-0039",
@@ -1396,9 +1400,175 @@
    "tags": [
     "stage_k",
     "frtb_backtest",
-    "error"
+    "error",
+    "two-errors"
    ],
-   "description": "hand: E1, two errors: actual P&L Infinity and series of different lengths (the finite rule first)"
+   "description": "hand: E1, two errors: actual P&L Infinity [finite] and series of different lengths [structural] (the finite rule first)"
+  },
+  {
+   "case_id": "btk_k-0041",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 2,
+    "exceptions_actual": 1,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 1,
+     "cumulative_probability": 0.9999,
+     "zone": "RED",
+     "amber_from": 0,
+     "red_from": 1,
+     "multiplier": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; ruling KR-237): exact rational arithmetic at p = 1/100 (Python fractions)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "KR-237 (KA-A17): n = 2, one exception: 1 - p^2 = 0.9999 ties the red threshold exactly: RED, red_from 1, amber_from 0",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0042",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 100000,
+    "exceptions_actual": 1050,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 1050,
+     "cumulative_probability": 0.9448722135510401,
+     "zone": "GREEN",
+     "amber_from": 1052,
+     "red_from": 1119,
+     "multiplier": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; ruling KR-237): exact rational arithmetic at p = 1/100 (Python fractions)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "KR-237 (KA-A16): 100,000 observations, 1,050 exceptions: the binomial sum at large n against exact rationals (the lgamma form was 1.3e-10 off at 100,000)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "btk_k-0043",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 1000000,
+    "exceptions_actual": 10164,
+    "exceptions_hypothetical": 10100
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 10164,
+     "cumulative_probability": 0.9505763522838345,
+     "zone": "AMBER",
+     "amber_from": 10164,
+     "red_from": 10372,
+     "multiplier": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; ruling KR-237): exact rational arithmetic at p = 1/100 (Python fractions)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "KR-237 (KA-A16): 1,000,000 observations, 10,164 exceptions: the binomial sum at large n against exact rationals (the lgamma form was 1.3e-10 off at 100,000)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "btk_k-0044",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 1000000,
+    "exceptions_actual": 9800,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 9800,
+     "cumulative_probability": 0.02221251036473662,
+     "zone": "GREEN",
+     "amber_from": 10164,
+     "red_from": 10372,
+     "multiplier": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; ruling KR-237): exact rational arithmetic at p = 1/100 (Python fractions)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "KR-237 (KA-A16): 1,000,000 observations, 9,800 exceptions: the binomial sum at large n against exact rationals (the lgamma form was 1.3e-10 off at 100,000)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
   }
  ]
 }

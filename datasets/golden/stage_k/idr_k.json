@@ -473,12 +473,12 @@
     "intraday",
     "synthetic"
    ],
-   "description": "KR-234: hedged book, N and -N(1 + 1e-12): the estimate cancels to 4e-8 (KA-A7)",
+   "description": "KR-234: hedged book, N and -N(1 + 1e-12): the estimate cancels to 4e-8 (KA-A7) (cancelling: compared at 1e-9 relative plus 1.91e-10 absolute, the estimate's share of the KR-234 rounding allowance; KR-240)",
    "output_classes": {
     "label": "date_and_convention"
    },
    "tolerance_limit": {
-    "absolute": 0.0,
+    "absolute": 1.90884483937628e-10,
     "relative": 1e-09
    }
   },
@@ -514,12 +514,12 @@
     "intraday",
     "synthetic"
    ],
-   "description": "KR-234: T h near 2, where the delta and gamma terms cancel (KA-A7)",
+   "description": "KR-234: T h near 2, where the delta and gamma terms cancel (KA-A7) (cancelling: compared at 1e-9 relative plus 2.79e-08 absolute, the estimate's share of the KR-234 rounding allowance; KR-240)",
    "output_classes": {
     "label": "date_and_convention"
    },
    "tolerance_limit": {
-    "absolute": 0.0,
+    "absolute": 2.7923673094859836e-08,
     "relative": 1e-09
    }
   },
