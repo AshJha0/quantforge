@@ -652,7 +652,7 @@ proptest! {
 /// KA-A3 (ruling KR-236, CRE52.47): two equity variance swaps on two single names, long and short,
 /// labelled "V1" and "V2", form one hedging set: SF = 32% x 5 = 1.6, a = +-160, rho = 0.5,
 /// sqrt((0.5 x 160 - 0.5 x 160)^2 + 0.75 x (160^2 + 160^2)) = sqrt(38,400). A volatility trade needs
-/// no hedging_set; two subclasses of one entity are judged within that one set.
+/// no `hedging_set`; two subclasses of one entity are judged within that one set.
 #[test]
 fn kr236_equity_volatility_trades_form_one_hedging_set() {
     let vol = |id: &str, pos: &str, label: Option<&str>, ent: &str| Trade {
