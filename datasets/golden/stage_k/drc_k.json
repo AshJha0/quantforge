@@ -1,0 +1,2719 @@
+{
+ "schema_version": "1.0",
+ "suite": "drc_k",
+ "spec": "specifications/06-risk/frtb-drc-rrao.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w2a.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "drc_k-0001",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      {
+       "id": "p1",
+       "gross_jtd": 75.0,
+       "weight": 1.0,
+       "scaled_jtd": 75.0
+      }
+     ],
+     "obligors": [
+      {
+       "obligor": "X",
+       "net_long": 75.0,
+       "net_short": 0.0,
+       "rw": 0.06
+      }
+     ],
+     "buckets": [
+      {
+       "bucket": "CORPORATE",
+       "hbr": 1.0,
+       "wtd_long": 4.5,
+       "wtd_short": 0.0,
+       "drc": 4.5
+      }
+     ],
+     "drc": 4.5,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: one senior long, BBB",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "drc_k-0002",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 0.5
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      {
+       "id": "p1",
+       "gross_jtd": 75.0,
+       "weight": 0.5,
+       "scaled_jtd": 37.5
+      }
+     ],
+     "obligors": [
+      {
+       "obligor": "X",
+       "net_long": 37.5,
+       "net_short": 0.0,
+       "rw": 0.06
+      }
+     ],
+     "buckets": [
+      {
+       "bucket": "CORPORATE",
+       "hbr": 1.0,
+       "wtd_long": 2.25,
+       "wtd_short": 0.0,
+       "drc": 2.25
+      }
+     ],
+     "drc": 2.25,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: as 0001 with maturity one half (MAR22.15)",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "drc_k-0003",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "future",
+      "obligor": "IDX",
+      "bucket": "CORPORATE",
+      "seniority": "EQUITY",
+      "notional": -10000000,
+      "market_value": -10000000,
+      "maturity_years": 0.08333333333333333
+     },
+     {
+      "id": "stock",
+      "obligor": "IDX",
+      "bucket": "CORPORATE",
+      "seniority": "EQUITY",
+      "notional": 10000000,
+      "market_value": 10000000,
+      "maturity_years": 0.25,
+      "cash_equity": true
+     }
+    ],
+    "ratings": {
+     "IDX": "BBB"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      {
+       "id": "future",
+       "gross_jtd": -10000000.0,
+       "weight": 0.25,
+       "scaled_jtd": -2500000.0
+      },
+      {
+       "id": "stock",
+       "gross_jtd": 10000000.0,
+       "weight": 0.25,
+       "scaled_jtd": 2500000.0
+      }
+     ],
+     "obligors": [
+      {
+       "obligor": "IDX",
+       "net_long": 0.0,
+       "net_short": 0.0,
+       "rw": 0.06
+      }
+     ],
+     "buckets": [
+      {
+       "bucket": "CORPORATE",
+       "hbr": null,
+       "wtd_long": 0.0,
+       "wtd_short": 0.0,
+       "drc": 0.0
+      }
+     ],
+     "drc": 0.0,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "published: Basel Framework MAR22.16 FAQ, PDF p.625, printed '1/4*10 - 1/4*10 = 0': MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "outside_checked",
+    "published"
+   ],
+   "description": "MAR22.16 FAQ: short equity future (1 month, weight 0.25) against stock held 3 months; rating BBB is a choice (no effect)",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "drc_k-0004",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     },
+     {
+      "id": "p2",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": -100,
+      "market_value": -100,
+      "maturity_years": 0.25
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      {
+       "id": "p1",
+       "gross_jtd": 75.0,
+       "weight": 1.0,
+       "scaled_jtd": 75.0
+      },
+      {
+       "id": "p2",
+       "gross_jtd": -75.0,
+       "weight": 0.25,
+       "scaled_jtd": -18.75
+      }
+     ],
+     "obligors": [
+      {
+       "obligor": "X",
+       "net_long": 56.25,
+       "net_short": 0.0,
+       "rw": 0.06
+      }
+     ],
+     "buckets": [
+      {
+       "bucket": "CORPORATE",
+       "hbr": 1.0,
+       "wtd_long": 3.375,
+       "wtd_short": 0.0,
+       "drc": 3.375
+      }
+     ],
+     "drc": 3.375,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: senior long 5y against a senior short of 3 months: offset after the maturity weight",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "drc_k-0005",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 80,
+      "maturity_years": 5
+     },
+     {
+      "id": "p2",
+      "obligor": "Y",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": -100,
+      "market_value": -80,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "A",
+     "Y": "BB"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      {
+       "id": "p1",
+       "gross_jtd": 55.0,
+       "weight": 1.0,
+       "scaled_jtd": 55.0
+      },
+      {
+       "id": "p2",
+       "gross_jtd": -55.0,
+       "weight": 1.0,
+       "scaled_jtd": -55.0
+      }
+     ],
+     "obligors": [
+      {
+       "obligor": "X",
+       "net_long": 55.0,
+       "net_short": 0.0,
+       "rw": 0.03
+      },
+      {
+       "obligor": "Y",
+       "net_long": 0.0,
+       "net_short": -55.0,
+       "rw": 0.15
+      }
+     ],
+     "buckets": [
+      {
+       "bucket": "CORPORATE",
+       "hbr": 0.5,
+       "wtd_long": 1.65,
+       "wtd_short": 8.25,
+       "drc": 0.0
+      }
+     ],
+     "drc": 0.0,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: long A, short BB in one bucket: HBR 0.5, floored at 0",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "drc_k-0006",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 80,
+      "maturity_years": 5
+     },
+     {
+      "id": "p2",
+      "obligor": "Y",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": -100,
+      "market_value": -80,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "A",
+     "Y": "AAA"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      {
+       "id": "p1",
+       "gross_jtd": 55.0,
+       "weight": 1.0,
+       "scaled_jtd": 55.0
+      },
+      {
+       "id": "p2",
+       "gross_jtd": -55.0,
+       "weight": 1.0,
+       "scaled_jtd": -55.0
+      }
+     ],
+     "obligors": [
+      {
+       "obligor": "X",
+       "net_long": 55.0,
+       "net_short": 0.0,
+       "rw": 0.03
+      },
+      {
+       "obligor": "Y",
+       "net_long": 0.0,
+       "net_short": -55.0,
+       "rw": 0.005
+      }
+     ],
+     "buckets": [
+      {
+       "bucket": "CORPORATE",
+       "hbr": 0.5,
+       "wtd_long": 1.65,
+       "wtd_short": 0.275,
+       "drc": 1.5125
+      }
+     ],
+     "drc": 1.5125,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: as 0005 with Y AAA",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "drc_k-0007",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "stock",
+      "obligor": "Z",
+      "bucket": "CORPORATE",
+      "seniority": "EQUITY",
+      "notional": 50,
+      "market_value": 50,
+      "maturity_years": 2,
+      "cash_equity": true
+     },
+     {
+      "id": "bond",
+      "obligor": "Z",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": -40,
+      "market_value": -40,
+      "maturity_years": 2
+     }
+    ],
+    "ratings": {
+     "Z": "BB"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      {
+       "id": "bond",
+       "gross_jtd": -30.0,
+       "weight": 1.0,
+       "scaled_jtd": -30.0
+      },
+      {
+       "id": "stock",
+       "gross_jtd": 50.0,
+       "weight": 1.0,
+       "scaled_jtd": 50.0
+      }
+     ],
+     "obligors": [
+      {
+       "obligor": "Z",
+       "net_long": 50.0,
+       "net_short": -30.0,
+       "rw": 0.15
+      }
+     ],
+     "buckets": [
+      {
+       "bucket": "CORPORATE",
+       "hbr": 0.625,
+       "wtd_long": 7.5,
+       "wtd_short": 4.5,
+       "drc": 4.6875
+      }
+     ],
+     "drc": 4.6875,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: worked example: a short senior bond does not offset a long stock (KR-53)",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "drc_k-0008",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "bond",
+      "obligor": "Z",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 40,
+      "market_value": 40,
+      "maturity_years": 2
+     },
+     {
+      "id": "stock",
+      "obligor": "Z",
+      "bucket": "CORPORATE",
+      "seniority": "EQUITY",
+      "notional": -50,
+      "market_value": -50,
+      "maturity_years": 2,
+      "cash_equity": true
+     }
+    ],
+    "ratings": {
+     "Z": "BB"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      {
+       "id": "bond",
+       "gross_jtd": 30.0,
+       "weight": 1.0,
+       "scaled_jtd": 30.0
+      },
+      {
+       "id": "stock",
+       "gross_jtd": -50.0,
+       "weight": 1.0,
+       "scaled_jtd": -50.0
+      }
+     ],
+     "obligors": [
+      {
+       "obligor": "Z",
+       "net_long": 0.0,
+       "net_short": -20.0,
+       "rw": 0.15
+      }
+     ],
+     "buckets": [
+      {
+       "bucket": "CORPORATE",
+       "hbr": 0.0,
+       "wtd_long": 0.0,
+       "wtd_short": 3.0,
+       "drc": 0.0
+      }
+     ],
+     "drc": 0.0,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: a short stock offsets a long senior bond (KR-53)",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "drc_k-0009",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     },
+     {
+      "id": "p2",
+      "obligor": "S",
+      "bucket": "SOVEREIGN",
+      "seniority": "SENIOR",
+      "notional": 200,
+      "market_value": 200,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "A",
+     "S": "AA"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      {
+       "id": "p1",
+       "gross_jtd": 75.0,
+       "weight": 1.0,
+       "scaled_jtd": 75.0
+      },
+      {
+       "id": "p2",
+       "gross_jtd": 150.0,
+       "weight": 1.0,
+       "scaled_jtd": 150.0
+      }
+     ],
+     "obligors": [
+      {
+       "obligor": "S",
+       "net_long": 150.0,
+       "net_short": 0.0,
+       "rw": 0.02
+      },
+      {
+       "obligor": "X",
+       "net_long": 75.0,
+       "net_short": 0.0,
+       "rw": 0.03
+      }
+     ],
+     "buckets": [
+      {
+       "bucket": "CORPORATE",
+       "hbr": 1.0,
+       "wtd_long": 2.25,
+       "wtd_short": 0.0,
+       "drc": 2.25
+      },
+      {
+       "bucket": "SOVEREIGN",
+       "hbr": 1.0,
+       "wtd_long": 3.0,
+       "wtd_short": 0.0,
+       "drc": 3.0
+      }
+     ],
+     "drc": 5.25,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: two buckets added (MAR22.26)",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "drc_k-0010",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "sold_put",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 92,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      {
+       "id": "sold_put",
+       "gross_jtd": 67.0,
+       "weight": 1.0,
+       "scaled_jtd": 67.0
+      }
+     ],
+     "obligors": [
+      {
+       "obligor": "X",
+       "net_long": 67.0,
+       "net_short": 0.0,
+       "rw": 0.06
+      }
+     ],
+     "buckets": [
+      {
+       "bucket": "CORPORATE",
+       "hbr": 1.0,
+       "wtd_long": 4.02,
+       "wtd_short": 0.0,
+       "drc": 4.02
+      }
+     ],
+     "drc": 4.02,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: sold put mapped by MAR22.14 Table 1: notional 100, bond-equivalent value 92",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "drc_k-0011",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "U",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     },
+     {
+      "id": "p2",
+      "obligor": "D",
+      "bucket": "CORPORATE",
+      "seniority": "EQUITY",
+      "notional": 5,
+      "market_value": 5,
+      "maturity_years": 2,
+      "cash_equity": true
+     }
+    ],
+    "ratings": {
+     "U": "UNRATED",
+     "D": "DEFAULTED"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      {
+       "id": "p1",
+       "gross_jtd": 75.0,
+       "weight": 1.0,
+       "scaled_jtd": 75.0
+      },
+      {
+       "id": "p2",
+       "gross_jtd": 5.0,
+       "weight": 1.0,
+       "scaled_jtd": 5.0
+      }
+     ],
+     "obligors": [
+      {
+       "obligor": "D",
+       "net_long": 5.0,
+       "net_short": 0.0,
+       "rw": 1.0
+      },
+      {
+       "obligor": "U",
+       "net_long": 75.0,
+       "net_short": 0.0,
+       "rw": 0.15
+      }
+     ],
+     "buckets": [
+      {
+       "bucket": "CORPORATE",
+       "hbr": 1.0,
+       "wtd_long": 16.25,
+       "wtd_short": 0.0,
+       "drc": 16.25
+      }
+     ],
+     "drc": 16.25,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: unrated and defaulted risk weights",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "ctp_k-0001",
+   "operation": "risk.frtb.drc_ctp",
+   "inputs": {
+    "bucket_drc": [
+     100,
+     -100
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "drc": 50.0,
+     "label": "regulatory formula on caller inputs; not a regulatory return",
+     "rw_source": "securitisation risk weights supplied by the caller (CRE40-CRE44 not implemented)"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "published: Basel Framework MAR22.45, PDF p.633, printed '100 - 0.5 x 100 = 50': MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "outside_checked",
+    "published"
+   ],
+   "description": "MAR22.45 printed example",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "ctp_k-0002",
+   "operation": "risk.frtb.drc_ctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "a",
+      "index": "A",
+      "series": "S1",
+      "tranche": "T1",
+      "market_value": 1000,
+      "maturity_years": 5,
+      "rw": 0.1
+     },
+     {
+      "id": "b",
+      "index": "B",
+      "series": "S1",
+      "tranche": "T1",
+      "market_value": -1000,
+      "maturity_years": 5,
+      "rw": 0.1
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      {
+       "id": "a",
+       "weight": 1.0,
+       "scaled_jtd": 1000.0
+      },
+      {
+       "id": "b",
+       "weight": 1.0,
+       "scaled_jtd": -1000.0
+      }
+     ],
+     "hbr_ctp": 0.5,
+     "buckets": [
+      {
+       "bucket": "A",
+       "wtd_long": 100.0,
+       "wtd_short": 0.0,
+       "drc": 100.0
+      },
+      {
+       "bucket": "B",
+       "wtd_long": 0.0,
+       "wtd_short": 100.0,
+       "drc": -50.0
+      }
+     ],
+     "drc": 75.0,
+     "label": "regulatory formula on caller inputs; not a regulatory return",
+     "rw_source": "securitisation risk weights supplied by the caller (CRE40-CRE44 not implemented)"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: two indices: HBR over the whole CTP, a negative DRC_b at one half",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "ctp_k-0003",
+   "operation": "risk.frtb.drc_ctp",
+   "inputs": {
+    "bucket_drc": [
+     -10
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "drc": 0.0,
+     "label": "regulatory formula on caller inputs; not a regulatory return",
+     "rw_source": "securitisation risk weights supplied by the caller (CRE40-CRE44 not implemented)"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: a negative bucket alone floors at 0",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "sec_k-0001",
+   "operation": "risk.frtb.drc_sec_nonctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "l",
+      "bucket": "RMBS-EU",
+      "pool": "P1",
+      "tranche": "T1",
+      "market_value": 50,
+      "maturity_years": 5,
+      "rw": 0.2
+     },
+     {
+      "id": "s",
+      "bucket": "RMBS-EU",
+      "pool": "P1",
+      "tranche": "T2",
+      "market_value": -20,
+      "maturity_years": 5,
+      "rw": 0.2
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      {
+       "id": "l",
+       "weight": 1.0,
+       "scaled_jtd": 50.0
+      },
+      {
+       "id": "s",
+       "weight": 1.0,
+       "scaled_jtd": -20.0
+      }
+     ],
+     "buckets": [
+      {
+       "bucket": "RMBS-EU",
+       "hbr": 0.7142857142857143,
+       "wtd_long": 10.0,
+       "wtd_short": 4.0,
+       "drc": 7.142857142857143
+      }
+     ],
+     "drc": 7.142857142857143,
+     "label": "regulatory formula on caller inputs; not a regulatory return",
+     "rw_source": "securitisation risk weights supplied by the caller (CRE40-CRE44 not implemented)"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: different tranches of one pool do not offset (MAR22.29)",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "rrao_k-0001",
+   "operation": "risk.frtb.rrao",
+   "inputs": {
+    "instruments": [
+     {
+      "id": "e",
+      "gross_notional": 1000000,
+      "kind": "EXOTIC",
+      "listed_or_clearable": false,
+      "back_to_back": false
+     },
+     {
+      "id": "o",
+      "gross_notional": 2000000,
+      "kind": "OTHER",
+      "listed_or_clearable": false,
+      "back_to_back": false
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "instruments": [
+      {
+       "id": "e",
+       "weight": 0.01,
+       "excluded": false,
+       "addon": 10000.0
+      },
+      {
+       "id": "o",
+       "weight": 0.001,
+       "excluded": false,
+       "addon": 2000.0
+      }
+     ],
+     "rrao": 12000.0,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: 1% and 0.1%",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "rrao_k-0002",
+   "operation": "risk.frtb.rrao",
+   "inputs": {
+    "instruments": [
+     {
+      "id": "o",
+      "gross_notional": 5000000,
+      "kind": "OTHER",
+      "listed_or_clearable": true,
+      "back_to_back": false
+     },
+     {
+      "id": "e1",
+      "gross_notional": 1000000,
+      "kind": "EXOTIC",
+      "listed_or_clearable": true,
+      "back_to_back": false
+     },
+     {
+      "id": "e2",
+      "gross_notional": 3000000,
+      "kind": "EXOTIC",
+      "listed_or_clearable": false,
+      "back_to_back": true
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "instruments": [
+      {
+       "id": "o",
+       "weight": 0.001,
+       "excluded": true,
+       "addon": 0.0
+      },
+      {
+       "id": "e1",
+       "weight": 0.01,
+       "excluded": false,
+       "addon": 10000.0
+      },
+      {
+       "id": "e2",
+       "weight": 0.01,
+       "excluded": true,
+       "addon": 0.0
+      }
+     ],
+     "rrao": 10000.0,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: exclusions of MAR23.7",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "rrao_k-0003",
+   "operation": "risk.frtb.rrao",
+   "inputs": {
+    "instruments": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "instruments": [],
+     "rrao": 0.0,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand (spec table, specifications/06-risk/frtb-drc-rrao.md)",
+    "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH, but not blind: the stripped rules text states the answer (not counted)"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "hand"
+   ],
+   "description": "hand: empty list",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "drc_ke-0001",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "market_value": 100,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: notional missing"
+  },
+  {
+   "case_id": "drc_ke-0002",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "JUNIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: seniority JUNIOR is not listed"
+  },
+  {
+   "case_id": "drc_ke-0003",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "Y": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: obligor without a rating"
+  },
+  {
+   "case_id": "drc_ke-0004",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 0
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: maturity 0"
+  },
+  {
+   "case_id": "drc_ke-0005",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "s",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "EQUITY",
+      "notional": 5,
+      "market_value": 5,
+      "maturity_years": 0.5,
+      "cash_equity": true
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: cash equity maturity 0.5 (KR-52)"
+  },
+  {
+   "case_id": "drc_ke-0006",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "market_value": 100,
+      "maturity_years": 0
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: two errors: notional missing and maturity 0"
+  },
+  {
+   "case_id": "drc_ke-0007",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "BAA"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: rating BAA is not listed"
+  },
+  {
+   "case_id": "drc_ke-0008",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "MUNICIPAL",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: bucket not listed"
+  },
+  {
+   "case_id": "drc_ke-0009",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": {
+     "p1": {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     }
+    },
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: positions not an array"
+  },
+  {
+   "case_id": "drc_ke-0010",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": "100",
+      "market_value": 100,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: notional a string"
+  },
+  {
+   "case_id": "drc_ke-0011",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: no positions"
+  },
+  {
+   "case_id": "drc_ke-0012",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     },
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: duplicate id"
+  },
+  {
+   "case_id": "drc_ke-0013",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     },
+     {
+      "id": "p2",
+      "obligor": "X",
+      "bucket": "SOVEREIGN",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: one obligor in two buckets (KR-113)"
+  },
+  {
+   "case_id": "drc_ke-0014",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 0,
+      "market_value": 5,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: zero notional, nonzero value"
+  },
+  {
+   "case_id": "drc_ke-0015",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 1,
+      "cash_equity": true
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: cash equity flagged on a senior bond (KR-112)"
+  },
+  {
+   "case_id": "drc_ke-0016",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "s",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "EQUITY",
+      "notional": 5,
+      "market_value": 6,
+      "maturity_years": 1,
+      "cash_equity": true
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: cash equity with notional not equal to market value (KR-112)"
+  },
+  {
+   "case_id": "drc_ke-0017",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": "NaN",
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: E1: market value NaN"
+  },
+  {
+   "case_id": "drc_ke-0018",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": "Infinity",
+      "market_value": 100,
+      "maturity_years": 5
+     }
+    ],
+    "ratings": {
+     "Y": "A"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: E1, two errors: notional Infinity and obligor without a rating (the finite rule first)"
+  },
+  {
+   "case_id": "drc_ke-0019",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5
+     },
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": -1
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: two errors: duplicate id and maturity -1"
+  },
+  {
+   "case_id": "drc_ke-0020",
+   "operation": "risk.frtb.drc_nonsec",
+   "inputs": {
+    "positions": [
+     {
+      "id": "p1",
+      "obligor": "X",
+      "bucket": "CORPORATE",
+      "seniority": "SENIOR",
+      "notional": 100,
+      "market_value": 100,
+      "maturity_years": 5,
+      "cash_equity": "yes"
+     }
+    ],
+    "ratings": {
+     "X": "BBB"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: cash_equity not a boolean"
+  },
+  {
+   "case_id": "sec_ke-0001",
+   "operation": "risk.frtb.drc_sec_nonctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "l",
+      "bucket": "RMBS-EU",
+      "pool": "P1",
+      "tranche": "T1",
+      "market_value": 50,
+      "maturity_years": 5
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: rw missing"
+  },
+  {
+   "case_id": "sec_ke-0002",
+   "operation": "risk.frtb.drc_sec_nonctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "l",
+      "bucket": "RMBS-EU",
+      "pool": "P1",
+      "tranche": "T1",
+      "market_value": 50,
+      "maturity_years": 5,
+      "rw": 13
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: rw above 12.5"
+  },
+  {
+   "case_id": "sec_ke-0003",
+   "operation": "risk.frtb.drc_sec_nonctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "l",
+      "bucket": "RMBS-EU",
+      "pool": "P1",
+      "tranche": "T1",
+      "market_value": 50,
+      "maturity_years": 5,
+      "rw": -0.1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: negative rw"
+  },
+  {
+   "case_id": "sec_ke-0004",
+   "operation": "risk.frtb.drc_sec_nonctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "l",
+      "bucket": "RMBS-EU",
+      "pool": "P1",
+      "tranche": "T1",
+      "market_value": 50,
+      "maturity_years": 0,
+      "rw": 0.2
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: maturity 0"
+  },
+  {
+   "case_id": "sec_ke-0005",
+   "operation": "risk.frtb.drc_sec_nonctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "l",
+      "bucket": "RMBS-EU",
+      "pool": "P1",
+      "tranche": "T1",
+      "market_value": 50,
+      "maturity_years": 5,
+      "rw": 0.2
+     },
+     {
+      "id": "l",
+      "bucket": "RMBS-EU",
+      "pool": "P1",
+      "tranche": "T1",
+      "market_value": 50,
+      "maturity_years": 5,
+      "rw": 0.2
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: duplicate id"
+  },
+  {
+   "case_id": "sec_ke-0006",
+   "operation": "risk.frtb.drc_sec_nonctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "l",
+      "bucket": "RMBS-EU",
+      "pool": "P1",
+      "tranche": "T1",
+      "market_value": 50,
+      "maturity_years": 5,
+      "rw": 0.2
+     },
+     {
+      "id": "m",
+      "bucket": "RMBS-EU",
+      "pool": "P1",
+      "tranche": "T1",
+      "market_value": 50,
+      "maturity_years": 5,
+      "rw": 0.3
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: one pool and tranche with two rw (KR-115)"
+  },
+  {
+   "case_id": "sec_ke-0007",
+   "operation": "risk.frtb.drc_sec_nonctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "l",
+      "bucket": "RMBS-EU",
+      "pool": "P1",
+      "tranche": "T1",
+      "market_value": 50,
+      "maturity_years": 5,
+      "rw": "NaN"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: E1: rw NaN"
+  },
+  {
+   "case_id": "sec_ke-0008",
+   "operation": "risk.frtb.drc_sec_nonctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "l",
+      "bucket": "RMBS-EU",
+      "pool": "P1",
+      "tranche": "T1",
+      "market_value": 50,
+      "maturity_years": 5,
+      "rw": 0.2
+     },
+     {
+      "id": "l",
+      "bucket": "RMBS-EU",
+      "pool": "P1",
+      "tranche": "T1",
+      "market_value": 50,
+      "maturity_years": 5,
+      "rw": 13
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: two errors: duplicate id and rw above 12.5"
+  },
+  {
+   "case_id": "ctp_ke-0001",
+   "operation": "risk.frtb.drc_ctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "a",
+      "index": "A",
+      "series": "S1",
+      "tranche": "T1",
+      "market_value": 1000,
+      "maturity_years": 5,
+      "rw": 0.1
+     }
+    ],
+    "bucket_drc": [
+     1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: both positions and bucket_drc"
+  },
+  {
+   "case_id": "ctp_ke-0002",
+   "operation": "risk.frtb.drc_ctp",
+   "inputs": {},
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: neither positions nor bucket_drc"
+  },
+  {
+   "case_id": "ctp_ke-0003",
+   "operation": "risk.frtb.drc_ctp",
+   "inputs": {
+    "bucket_drc": [
+     1,
+     "x"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: bucket_drc holds a string"
+  },
+  {
+   "case_id": "ctp_ke-0004",
+   "operation": "risk.frtb.drc_ctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "a",
+      "index": "A",
+      "series": "S1",
+      "tranche": "T1",
+      "market_value": 1000,
+      "maturity_years": 5,
+      "rw": 20
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: rw above 12.5"
+  },
+  {
+   "case_id": "ctp_ke-0005",
+   "operation": "risk.frtb.drc_ctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "a",
+      "index": "A",
+      "series": "S1",
+      "tranche": "T1",
+      "market_value": 1000,
+      "maturity_years": -1,
+      "rw": 0.1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: negative maturity"
+  },
+  {
+   "case_id": "ctp_ke-0006",
+   "operation": "risk.frtb.drc_ctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "a",
+      "index": "A",
+      "series": "S1",
+      "tranche": "T1",
+      "market_value": 1000,
+      "maturity_years": 5,
+      "rw": 0.1
+     },
+     {
+      "id": "b",
+      "index": "A",
+      "series": "S1",
+      "tranche": "T1",
+      "market_value": 1000,
+      "maturity_years": 5,
+      "rw": 0.2
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: one index, series and tranche with two rw (KR-115)"
+  },
+  {
+   "case_id": "ctp_ke-0007",
+   "operation": "risk.frtb.drc_ctp",
+   "inputs": {
+    "bucket_drc": [
+     "NaN"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: E1: bucket_drc NaN"
+  },
+  {
+   "case_id": "ctp_ke-0008",
+   "operation": "risk.frtb.drc_ctp",
+   "inputs": {
+    "positions": [
+     {
+      "id": "a",
+      "index": "A",
+      "series": "S1",
+      "tranche": "T1",
+      "market_value": 1000,
+      "maturity_years": 5,
+      "rw": 0.1
+     }
+    ],
+    "bucket_drc": [
+     "-Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: E1, two errors: bucket_drc -Infinity and both inputs given (the finite rule first)"
+  },
+  {
+   "case_id": "rrao_ke-0001",
+   "operation": "risk.frtb.rrao",
+   "inputs": {
+    "instruments": [
+     {
+      "id": "e",
+      "gross_notional": -1,
+      "kind": "EXOTIC",
+      "listed_or_clearable": false,
+      "back_to_back": false
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: negative gross notional"
+  },
+  {
+   "case_id": "rrao_ke-0002",
+   "operation": "risk.frtb.rrao",
+   "inputs": {
+    "instruments": [
+     {
+      "id": "e",
+      "gross_notional": 100,
+      "kind": "WEATHER",
+      "listed_or_clearable": false,
+      "back_to_back": false
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: kind not listed"
+  },
+  {
+   "case_id": "rrao_ke-0003",
+   "operation": "risk.frtb.rrao",
+   "inputs": {
+    "instruments": [
+     {
+      "id": "e",
+      "gross_notional": 100,
+      "kind": "EXOTIC",
+      "listed_or_clearable": false
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: back_to_back missing"
+  },
+  {
+   "case_id": "rrao_ke-0004",
+   "operation": "risk.frtb.rrao",
+   "inputs": {
+    "instruments": [
+     {
+      "id": "e",
+      "gross_notional": 100,
+      "kind": "EXOTIC",
+      "listed_or_clearable": false,
+      "back_to_back": false
+     },
+     {
+      "id": "e",
+      "gross_notional": 100,
+      "kind": "EXOTIC",
+      "listed_or_clearable": false,
+      "back_to_back": false
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: duplicate id"
+  },
+  {
+   "case_id": "rrao_ke-0005",
+   "operation": "risk.frtb.rrao",
+   "inputs": {
+    "instruments": [
+     {
+      "id": "e",
+      "gross_notional": "NaN",
+      "kind": "EXOTIC",
+      "listed_or_clearable": false,
+      "back_to_back": false
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: E1: gross notional NaN"
+  },
+  {
+   "case_id": "rrao_ke-0006",
+   "operation": "risk.frtb.rrao",
+   "inputs": {
+    "instruments": [
+     {
+      "id": "e",
+      "gross_notional": 100,
+      "kind": "EXOTIC",
+      "listed_or_clearable": false,
+      "back_to_back": false
+     },
+     {
+      "id": "e",
+      "gross_notional": -1,
+      "kind": "EXOTIC",
+      "listed_or_clearable": false,
+      "back_to_back": false
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: two errors: duplicate id and negative notional"
+  },
+  {
+   "case_id": "rrao_ke-0007",
+   "operation": "risk.frtb.rrao",
+   "inputs": {
+    "instruments": [
+     {
+      "id": "e",
+      "gross_notional": -1,
+      "kind": "WEATHER",
+      "listed_or_clearable": false,
+      "back_to_back": false
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_drc",
+    "error"
+   ],
+   "description": "hand: two errors: kind not listed and negative notional"
+  }
+ ]
+}
