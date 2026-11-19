@@ -1,6 +1,6 @@
 # Execution schedules: TWAP, VWAP, POV
 
-Spec version 0.1.0 (stage H wave 1; confirmed 2026-11-18 by the stage H coordinator). Status: Specified, not implemented. Rulings: `stage-h-rulings-w1.md` HR-2 to HR-4, HR-9. Plan items 14.7 H-3, 15.1 "Execution schedules".
+Spec version 0.1.0 (stage H wave 1; confirmed 2026-11-18 by the stage H coordinator). Status: implemented in all four builds (Python, Java, C++, Rust; 2026-11-18). Rulings: `stage-h-rulings-w1.md` HR-2 to HR-4, HR-9. Plan items 14.7 H-3, 15.1 "Execution schedules".
 
 **Plain idea.** A parent order of `X` units is split into child slices over `N` buckets: evenly in time (TWAP), in proportion to an expected volume profile (VWAP), or as a fixed share of the market volume actually seen (POV).
 
@@ -13,7 +13,7 @@ Sources:
 Inputs `quantity` X (> 0), `n_buckets` N (1 to 100,000), `mode` `UNITS` or `CONTINUOUS`. Output `slices` (length N). UNITS: `floor(X/N)` each, remainder `X mod N` one unit to slices 0, 1, ... (HR-3). X <= 0, or non-integer X in UNITS: `E_INPUT`.
 
 ## `exec.schedule.vwap`
-Inputs `quantity`, `profile` (length N, non-negative; normalised internally), `mode`. Slice i = `X w_i / sum w`; UNITS by largest remainder (HR-3). All-zero profile: `E_DOMAIN`.
+Inputs `quantity`, `profile` (length N, non-negative; normalised internally), `mode`. Slice i = `X w_i / sum w`, evaluated as `X (w_i / sum w)` (ratio first: `X w_i` underflows when a weight is subnormal, e.g. X = 1.5, profile [5e-324] gave 2.0; rule added 2026-11-18, no golden changes); UNITS by largest remainder (HR-3). All-zero profile: `E_DOMAIN`.
 
 ## `exec.schedule.pov`
 Inputs `quantity`, `participation` p in (0, 1) (HR-4, confirmed by DR-H4: participation is of total market volume including own fills), `market_volume` (outside volume per bucket). Child i = `min(remaining, p v_i / (1 - p))`, floored in UNITS. Outputs `slices`, `filled`, `residual` (may be > 0; never an error).

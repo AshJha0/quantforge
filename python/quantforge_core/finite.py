@@ -81,7 +81,11 @@ def _domain(name: str) -> QfError:
 
 def _wrap[**P, R](f: Callable[P, R]) -> Callable[P, R]:
     # From the code object rather than inspect.signature: inspect costs start-up on every process.
-    code = f.__code__
+    # A function already wrapped by functools.wraps (paper's @exact) names its inputs on the original.
+    inner: Any = f
+    while hasattr(inner, "__wrapped__"):
+        inner = inner.__wrapped__
+    code = inner.__code__
     positional = list(code.co_varnames[: code.co_argcount])
     rest = (
         code.co_varnames[code.co_argcount + code.co_kwonlyargcount] if code.co_flags & 4 else "args"

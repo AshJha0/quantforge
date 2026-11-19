@@ -326,3 +326,23 @@ TOTALS: 15584 value 7685 error 5385 invariance 2514
 Stage H round 2 (2026-11-18): wave 2 `ob_h` 17, `lit_h` 20, `dark_h` 8, `sor_h` 9 (with `sor_h-0010`, HR-57 `E_LIMIT`), `sorx_h` 2 (cross-build agreement) and `e1_h2` 6 (a NaN decimal string per wave 2 operation, `E_SCHEMA` per HR-12, and the router's `step`, `E_DOMAIN` per F-2): 62 cases (36 value, 26 error).
 
 TOTALS: 15646 value 7721 error 5411 invariance 2514
+
+Stage H round 3 (2026-11-18): `mest_h` 18 and `venue_h` 10 (H-4b, H-16), `alg_h` 25 and `tcx_h` 11 (H-14, H-17), `e1_h3` 7 (a NaN at one Real input per H-14/H-17 operation, `E_DOMAIN` per F-2): 71 cases (34 value, 37 error).
+
+TOTALS: 15717 value 7755 error 5448 invariance 2514
+
+Stage H round 3 addition (2026-11-18): `enum_h` 6 (an enum value outside the listed set, `E_SCHEMA`, one per enum field of the H-14/H-17 operations): 6 error cases.
+
+TOTALS: 15723 value 7755 error 5454 invariance 2514
+
+Stage H round 3, paper operations (2026-11-18, h-paper-ops): `pt_h` 28 (paper trading as CLI operations) and `e1_hpt` 5 (NaN decimal strings, `E_SCHEMA` per HR-12 and F-2a): 33 cases (20 value, 13 error).
+
+TOTALS: 15756 value 7775 error 5467 invariance 2514
+
+Stage H round 3, paper Java merge (2026-11-18, h-paper-ops up to 21319a61 via h-paper-java): `pt_h` 28 to 34 cases (4 value, 2 error).
+
+TOTALS: 15762 value 7779 error 5469 invariance 2514
+
+Robust curve fit fix (2026-11-18, robust-fit-fix, ruling D38b): `fits_d-0017` to `-0019` and `rulings_d-0019` to `-0022`: 7 cases (5 value, 2 error).
+
+TOTALS: 15769 value 7784 error 5471 invariance 2514

@@ -1,0 +1,441 @@
+{
+ "schema_version": "1.0",
+ "suite": "tcx_h",
+ "spec": "specifications/10-execution/tca-pretrade.md",
+ "spec_version": "0.1.0",
+ "generator": "oracle/python/gen_stage_h_w2_exec.py",
+ "reviewer": "none: self-assessment; blind re-derivation pending",
+ "cases": [
+  {
+   "case_id": "tcx_h-0001",
+   "operation": "exec.tca.pretrade",
+   "inputs": {
+    "quantity": 40000,
+    "adv": 1000000,
+    "daily_vol": 0.02,
+    "participation": 0.25,
+    "half_spread_bps": 1.5,
+    "params": {
+     "a1": 700.0,
+     "a2": 0.5,
+     "a3": 1.0,
+     "a4": 0.5,
+     "b1": 0.9
+    },
+    "price": 50.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "istar_bps": 2.8,
+     "impact_bps": 1.54,
+     "spread_bps": 1.5,
+     "expected_cost_bps": 3.04,
+     "duration_days": 0.16,
+     "timing_risk_bps": 46.1880215352,
+     "expected_cost": 608,
+     "timing_risk": 9237.60430703
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "tcx"
+   ],
+   "description": "specifications/10-execution/tca-pretrade.md golden tcx_h-0001"
+  },
+  {
+   "case_id": "tcx_h-0002",
+   "operation": "exec.tca.pretrade",
+   "inputs": {
+    "quantity": 100000,
+    "adv": 1000000,
+    "daily_vol": 0.02,
+    "participation": 0.04,
+    "half_spread_bps": 0.0,
+    "params": {
+     "a1": 700.0,
+     "a2": 1.0,
+     "a3": 1.0,
+     "a4": 0.5,
+     "b1": 1.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "istar_bps": 1.4,
+     "impact_bps": 0.28,
+     "spread_bps": 0,
+     "expected_cost_bps": 0.28,
+     "duration_days": 2.5,
+     "timing_risk_bps": 182.574185835
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "tcx"
+   ],
+   "description": "specifications/10-execution/tca-pretrade.md golden tcx_h-0002"
+  },
+  {
+   "case_id": "tcx_h-0003",
+   "operation": "exec.tca.pretrade",
+   "inputs": {
+    "quantity": 100000,
+    "adv": 1000000,
+    "daily_vol": 0.02,
+    "participation": 1.0,
+    "half_spread_bps": 0.0,
+    "params": {
+     "a1": 700.0,
+     "a2": 1.0,
+     "a3": 1.0,
+     "a4": 0.5,
+     "b1": 1.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "tcx"
+   ],
+   "description": "specifications/10-execution/tca-pretrade.md golden tcx_h-0003"
+  },
+  {
+   "case_id": "tcx_h-0004",
+   "operation": "exec.tca.pretrade",
+   "inputs": {
+    "quantity": 100000,
+    "adv": 1000000,
+    "daily_vol": 0.02,
+    "participation": 0.04,
+    "half_spread_bps": 0.0,
+    "params": {
+     "a1": 700.0,
+     "a2": 1.0,
+     "a3": 1.0,
+     "a4": 0.5,
+     "b1": 1.2
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "tcx"
+   ],
+   "description": "specifications/10-execution/tca-pretrade.md golden tcx_h-0004"
+  },
+  {
+   "case_id": "tcx_h-0005",
+   "operation": "exec.tca.pretrade",
+   "inputs": {
+    "quantity": 0,
+    "adv": 1000000,
+    "daily_vol": 0.02,
+    "participation": 0.04,
+    "half_spread_bps": 0.0,
+    "params": {
+     "a1": 700.0,
+     "a2": 1.0,
+     "a3": 1.0,
+     "a4": 0.5,
+     "b1": 1.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "tcx"
+   ],
+   "description": "specifications/10-execution/tca-pretrade.md golden tcx_h-0005"
+  },
+  {
+   "case_id": "tcx_h-0006",
+   "operation": "exec.tca.attribution",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": 100.0,
+    "arrival_mid": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 1000,
+    "fills": [
+     {
+      "quantity": 600,
+      "price": 100.2,
+      "mid": 100.15
+     },
+     {
+      "quantity": 200,
+      "price": 100.3,
+      "mid": 100.25
+     }
+    ],
+    "fees": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delay": 80,
+     "impact": 60,
+     "spread": 40,
+     "execution": 100,
+     "opportunity": 200,
+     "fees": 5,
+     "total": 385,
+     "total_bps": 38.5
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "tcx"
+   ],
+   "description": "specifications/10-execution/tca-pretrade.md golden tcx_h-0006"
+  },
+  {
+   "case_id": "tcx_h-0007",
+   "operation": "exec.tca.attribution",
+   "inputs": {
+    "side": "SELL",
+    "decision_price": 100.0,
+    "arrival_mid": 100.0,
+    "end_price": 99.0,
+    "order_quantity": 1000,
+    "fills": [
+     {
+      "quantity": 500,
+      "price": 99.9,
+      "mid": 99.95
+     },
+     {
+      "quantity": 500,
+      "price": 99.7,
+      "mid": 99.8
+     }
+    ],
+    "fees": 2.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delay": 0,
+     "impact": 125,
+     "spread": 75,
+     "execution": 200,
+     "opportunity": 0,
+     "fees": 2,
+     "total": 202,
+     "total_bps": 20.2
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "tcx"
+   ],
+   "description": "specifications/10-execution/tca-pretrade.md golden tcx_h-0007"
+  },
+  {
+   "case_id": "tcx_h-0008",
+   "operation": "exec.tca.attribution",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": 99.5,
+    "arrival_mid": 100.0,
+    "end_price": 100.0,
+    "order_quantity": 100,
+    "fills": [
+     {
+      "quantity": 100,
+      "price": 100.0,
+      "mid": 100.05
+     }
+    ],
+    "fees": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delay": 50,
+     "impact": 5,
+     "spread": -5,
+     "execution": 0,
+     "opportunity": 0,
+     "fees": 0,
+     "total": 50,
+     "total_bps": 50.2512562814
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "tcx"
+   ],
+   "description": "specifications/10-execution/tca-pretrade.md golden tcx_h-0008"
+  },
+  {
+   "case_id": "tcx_h-0009",
+   "operation": "exec.tca.attribution",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": 100.0,
+    "arrival_mid": 100.5,
+    "end_price": 101.0,
+    "order_quantity": 100,
+    "fills": [],
+    "fees": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delay": 0,
+     "impact": 0,
+     "spread": 0,
+     "execution": 0,
+     "opportunity": 100,
+     "fees": 0,
+     "total": 100,
+     "total_bps": 100
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_EXEC.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "tcx"
+   ],
+   "description": "specifications/10-execution/tca-pretrade.md golden tcx_h-0009"
+  },
+  {
+   "case_id": "tcx_h-0010",
+   "operation": "exec.tca.attribution",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": 100.0,
+    "arrival_mid": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 1000,
+    "fills": [
+     {
+      "quantity": 600,
+      "price": 100.2,
+      "mid": 100.15
+     },
+     {
+      "quantity": 600,
+      "price": 100.3,
+      "mid": 100.25
+     }
+    ],
+    "fees": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "tcx"
+   ],
+   "description": "specifications/10-execution/tca-pretrade.md golden tcx_h-0010"
+  },
+  {
+   "case_id": "tcx_h-0011",
+   "operation": "exec.tca.attribution",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": 100.0,
+    "arrival_mid": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 1000,
+    "fills": [
+     {
+      "quantity": 600,
+      "price": 100.2,
+      "mid": 0.0
+     },
+     {
+      "quantity": 200,
+      "price": 100.3,
+      "mid": 100.25
+     }
+    ],
+    "fees": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "wave2",
+    "tcx"
+   ],
+   "description": "specifications/10-execution/tca-pretrade.md golden tcx_h-0011"
+  }
+ ]
+}

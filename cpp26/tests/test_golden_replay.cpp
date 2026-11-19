@@ -160,7 +160,15 @@ TEST_CASE("stage H FX convention goldens") { replay("stage_h/fxc_h"); }
 TEST_CASE("stage H FX venue goldens") { replay("stage_h/fxv_h"); }
 TEST_CASE("stage H rates convention goldens") { replay("stage_h/rtc_h"); }
 TEST_CASE("stage H rates futures goldens") { replay("stage_h/fut_h"); }
-TEST_CASE("stage H E1 multi-asset goldens") { replay("stage_h/e1_h3"); }
+TEST_CASE("stage H E1 multi-asset goldens") { replay("stage_h/e1_h4"); }
 TEST_CASE("stage H session phase goldens") { replay("stage_h/ses_h"); }
 TEST_CASE("stage H asset-class goldens") { replay("stage_h/acls_h"); }
+TEST_CASE("stage H microstructure estimator goldens") { replay("stage_h/mest_h"); }
+TEST_CASE("stage H venue analytics goldens") { replay("stage_h/venue_h"); }
+TEST_CASE("stage H wave 2 adaptive algorithm goldens") { replay("stage_h/alg_h"); }
+TEST_CASE("stage H wave 2 pre-trade and attribution goldens") { replay("stage_h/tcx_h"); }
+TEST_CASE("stage H wave 2 execution E1 goldens") { replay("stage_h/e1_h3"); }
+TEST_CASE("stage H wave 2 execution enum goldens") { replay("stage_h/enum_h"); }
+TEST_CASE("stage H paper trading goldens") { replay("stage_h/pt_h"); }
+TEST_CASE("stage H paper trading E1 goldens") { replay("stage_h/e1_hpt"); }
 #endif

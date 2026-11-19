@@ -876,7 +876,7 @@ To check the suites: `python conformance/runner/runner.py --impl python --suite 
 
 ## Stage H recipes (available from v0.10.0)
 
-Stage H is specified (spec version 0.1.0, confirmed 2026-11-18) but not merged, so none of these commands runs yet and no output below was produced by a build. Each request copies the inputs of the named golden case, and the expected outputs are that case's values in the spec. Once merged, send a request with `quantforge batch` (one JSON object per line, as in [Batch mode](#batch-mode)). [Tutorials 36 to 40](docs/getting-started/README.md) check the same numbers today with a standard-library script.
+Stage H is implemented in all four languages from v0.10.0 (unreleased; spec version 0.1.0, confirmed 2026-11-18), the `paper.*` operations included. Each request copies the inputs of the named golden case, and the expected outputs are that case's values in the spec, which every build reproduces in conformance. Send a request with `quantforge batch` (one JSON object per line, as in [Batch mode](#batch-mode)). [Tutorials 36 to 40](docs/getting-started/README.md) also check the same numbers by hand with a standard-library script.
 
 | Task | Operation | From golden | Expected |
 |---|---|---|---|
@@ -937,3 +937,59 @@ For the frontier, send `exec.ac.frontier` with `risk_aversions` as a list; `E` m
 ### Record and refresh the crypto feed
 
 `python tools/recorder/crypto_l2.py --symbols BTC/USD ETH/USD` records Kraken's public book at 100 levels and trades to local files, never to git. See [Recorded feeds](docs/data/recorded-feeds.md) for terms, depth by date and what may be published.
+
+### Run a paper trading day
+
+The paper book is a Python application on the library operations, not an operation itself (`specifications/10-execution/paper-trading.md`, HR-42 to HR-55). Book fills, close the day and get the explain; `total` always equals the NAV change exactly, or the call raises:
+
+```python
+from decimal import Decimal
+from quantforge_core import paper
+
+book = paper.Book(Decimal("10000"))
+day = paper.end_of_day(book, fills, prev_marks, marks, days=1, cash_rate="0.0365")
+print(day["market"], day["trading"], day["fees"], day["financing"], day["total"])
+```
+
+`paper.pretrade_check(order, ref_price, position, cash, orders_today, limits)` returns `{accepted, reasons}` with reasons in the HR-49 order; `mode` other than `"simulated"` raises `E_UNSUPPORTED_OPERATION`. Golden numbers: [Tutorial 44](docs/getting-started/tutorial-44-paper-trading.md). Fills from the simulated venues come from `quantforge_core.paper_fills.Session` (Python).
+
+### Check a paper ledger has not been edited
+
+```python
+from quantforge_core import paper
+print(paper.verify(open("ledger.jsonl", encoding="utf-8").read()))
+```
+
+`ok` false with `first_bad_seq` and a reason (`HASH`, `LINK`, `SEQ`, `LABEL`, `PARSE`); it never repairs. A truncated tail is caught only by comparing the head hash with the published one (HR-46).
+
+### Estimate a book rate with its standard error (available from v0.10.0)
+
+`micro.est.arrival_rate`, `micro.est.cancel_rate`, `micro.est.resilience`, `micro.est.liquidity_decay`, `micro.est.adverse_selection`, `micro.est.regime_impact` and `micro.est.passive_vs_aggressive` each return the estimate and `se` (`specifications/09-microstructure/micro-estimators.md`). For 12 arrivals in 4 seconds:
+
+```json
+{"operation": "micro.est.arrival_rate", "inputs": {"count": 12, "window": 4}}
+```
+
+gives `lambda` 3, `se` 0.866025403784439 (`mest_h-0001`). See [Tutorial 45](docs/getting-started/tutorial-45-microstructure-estimators.md).
+
+### Compare venues by markout and fill rate (available from v0.10.0)
+
+`exec.venue.analytics` takes `mids`, `fills`, `orders` and `horizons` and returns `fill_rates` and one `{venue, h, markout, markout_bps, toxicity}` row per venue and horizon (`specifications/10-execution/venue-analytics.md`). Report several horizons: in `venue_h-0001` and `0002` the two venues swap places between 5 and 10 seconds. See [Tutorial 46](docs/getting-started/tutorial-46-venue-analytics.md).
+
+### Schedule an adaptive order (available from v0.10.0)
+
+`exec.algo.arrival` (urgency `kappa`), `exec.algo.close` (auction cap and profile), `exec.algo.liquidity_seek` (share of in-limit depth), `exec.algo.pair` and `exec.algo.basket` (`specifications/10-execution/adaptive-algos.md`). For an arrival-price order of 1,000 over two buckets at `kappa = ln 2`:
+
+```json
+{"operation": "exec.algo.arrival", "inputs": {"quantity": 1000, "n_buckets": 2, "urgency": 0.69314718055994531, "mode": "CONTINUOUS"}}
+```
+
+gives slices 600 and 400 (`alg_h-0002`). See [Tutorial 47](docs/getting-started/tutorial-47-adaptive-algos-and-tca.md).
+
+### Estimate cost before trading and split it afterwards (available from v0.10.0)
+
+`exec.tca.pretrade` returns `expected_cost_bps` and, separately, `timing_risk_bps`; `exec.tca.attribution` returns delay, impact, spread, opportunity and fees summing to `total` (`specifications/10-execution/tca-pretrade.md`). `tcx_h-0006` reproduces the `tca_h-0001` total of 385 with the execution cost split into impact 60 and spread 40.
+
+### Read the low-latency book results (available from v0.10.0)
+
+The H-9 results file `benchmarks/results/h9/README.md` gives p50, p99 and p99.9 per operation against the targets in `specifications/09-microstructure/low-latency-targets.md`. The first run is a laptop under WSL, not the acceptance machine; quote it with that label and with "in-process, simulated feed; no network or venue latency". See [Tutorial 48](docs/getting-started/tutorial-48-low-latency-book.md).

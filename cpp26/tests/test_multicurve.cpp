@@ -1,5 +1,7 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <algorithm>
+#include <array>
 #include <cmath>
 
 #include "quantforge/core/error.hpp"
@@ -294,4 +296,98 @@ TEST_CASE("SOFR compounding skips every Good Friday (ruling R1-6)") {
     const auto r = compound_dated(sofr, *parse_date("2021-03-31"), *parse_date("2021-04-06"), ShiftMethod::None, 0, fx);
     CHECK(r.compounded_rate > 0.0);
     CHECK_THROWS(compound_dated(sofr, gf, *parse_date("2021-04-06"), ShiftMethod::None, 0, fx));
+}
+
+// Valid input where the old robust fit failed: at the minimum one residual sits within 1e-7 of
+// delta (mutation re-check 2026-11-18). Not a golden, because the spec keeps golden residuals 1e-6
+// from delta. The same input is in the Python, Java and Rust tests.
+TEST_CASE("Huber Nelson-Siegel with a residual near delta") {
+    const Vec m{3.8740307873000113, 7.757472624115791, 24.769272470090453, 24.76936904673551};
+    const Vec y{0.022406223051166397, 0.0025821078676810487, 0.052253746187190836, 0.04025167916426023};
+    const double tau = 2.1121330519140273, delta = 0.0010283264459667806;
+    const auto r = robust_fit(m, y, tau, delta);
+    double nearest = 1.0;
+    for (int k = 0; k < 3; ++k) {
+        double g = 0.0;
+        for (std::size_t j = 0; j < m.size(); ++j) {
+            const double u = m[j] / tau, e = -std::expm1(-u) / u;
+            const double xk = k == 0 ? 1.0 : k == 1 ? e : e - std::exp(-u);
+            g += std::max(-delta, std::min(delta, r.residuals[j])) * xk;
+            nearest = std::min(nearest, std::fabs(std::fabs(r.residuals[j]) - delta));
+        }
+        CHECK(std::fabs(g) < 1e-14);
+    }
+    CHECK(nearest < 1e-7);
+    REQUIRE(r.outliers.size() == 1);
+    CHECK(r.outliers[0] == 2);
+}
+
+// Ruling D38b (curve-fits.md): behaviour at the singular-basis threshold and of the Huber active
+// set. The same cases are in the Java and Rust tests.
+namespace {
+std::array<double, 3> ns_row(double m, double tau) {
+    const double u = m / tau, e = -std::expm1(-u) / u;
+    return {1.0, e, e - std::exp(-u)};
+}
+// First-order conditions and objective of the Huber problem, from the returned betas alone.
+void check_huber_optimum(const Vec& m, const Vec& y, double tau, double delta, const RobustFit& f) {
+    double g[3] = {}, obj = 0.0;
+    for (std::size_t j = 0; j < m.size(); ++j) {
+        const auto x = ns_row(m[j], tau);
+        const double r = f.betas[0] * x[0] + f.betas[1] * x[1] + f.betas[2] * x[2] - y[j];
+        CHECK(std::fabs(r - f.residuals[j]) < 1e-15);
+        for (int p = 0; p < 3; ++p) g[p] += std::clamp(r, -delta, delta) * x[p];
+        const double a = std::fabs(r);
+        obj += a <= delta ? r * r / 2.0 : delta * a - delta * delta / 2.0;
+    }
+    for (const double v : g) CHECK(std::fabs(v) < 1e-15);
+    CHECK(std::fabs(obj - f.objective) < 1e-18);
+    for (const std::size_t j : f.outliers) CHECK(std::fabs(f.residuals[j]) > delta);
+}
+const Vec kM = {0.5, 1, 2, 3, 5, 7, 10, 20, 30};
+constexpr double kTau = 1.5;
+Vec ns_curve(const Vec& noise) {
+    Vec y;
+    for (std::size_t j = 0; j < kM.size(); ++j) {
+        const auto x = ns_row(kM[j], kTau);
+        y.push_back(0.03 * x[0] - 0.01 * x[1] + 0.02 * x[2] + noise[j]);
+    }
+    return y;
+}
+}  // namespace
+
+TEST_CASE("D38b: an ill-conditioned basis above the threshold is fitted") {
+    // numpy: rcond of the scaled Gram matrix is 5.24e-10, well above 1e-12.
+    const Vec m = {5.0, 5.1, 5.2, 5.3};
+    const Vec y = {0.030, 0.031, 0.0305, 0.0302};
+    const auto f = robust_fit(m, y, 5.0, 1e-3);
+    REQUIRE(f.residuals.size() == m.size());
+    for (std::size_t j = 0; j < m.size(); ++j) {
+        const auto x = ns_row(m[j], 5.0);
+        CHECK(std::fabs(f.betas[0] * x[0] + f.betas[1] * x[1] + f.betas[2] * x[2] - y[j] - f.residuals[j]) < 1e-15);
+    }
+}
+
+TEST_CASE("D38b: nearly equal maturities are singular") {
+    CHECK(code_of([] { robust_fit({1.0, 1.0 + 1e-7, 1.0 + 2e-7, 1.0 + 3e-7}, {0.01, 0.02, 0.03, 0.04}, 1.0, 1e-3); }) ==
+          "E_SINGULAR");
+}
+
+TEST_CASE("D38b: outliers of both signs and a point leaving the working set") {
+    const Vec y = ns_curve({2e-4, -1e-4, 0.01, 1e-4, -2e-4, 1.5e-4, -0.008, 0.0, 5e-5});
+    const auto f = robust_fit(kM, y, kTau, 5e-4);
+    check_huber_optimum(kM, y, kTau, 5e-4, f);
+    CHECK(f.outliers == std::vector<std::size_t>{2, 6});
+    const auto wide = robust_fit(kM, y, kTau, 1.0);
+    check_huber_optimum(kM, y, kTau, 1.0, wide);
+    CHECK(wide.outliers.empty());
+    // This input makes the active-set method release a bound point before it settles.
+    const Vec z = ns_curve({0.0017, 0.0018, 0.0006, -0.0023, -0.0018, 0.0026, -0.0027, 0.0015, 0.0015});
+    check_huber_optimum(kM, z, kTau, 1e-4, robust_fit(kM, z, kTau, 1e-4));
+}
+
+TEST_CASE("CSA discounting: a zero forward is not positive") {
+    const Curve c(d("2026-11-06"), CurveInterpolation::LogLinearDf, {{d("2027-11-06"), 0.96}, {d("2031-11-06"), 0.82}});
+    const Date x = d("2028-11-06");
+    CHECK(code_of([&] { csa_discount(c, 0.0, CsaFx{1.1, {{x, 0.0}}}, {x}); }) == "E_DOMAIN");
 }

@@ -432,7 +432,7 @@ No new error code. Prices, quantities and fees are decimal strings (HR-12); outp
 
 ## Stage H multi-asset operations (H-22, H-23, H-24)
 
-Rulings `stage-h-rulings-multiasset.md` HR-80 to HR-103 and the 2026-11-18 rule-version rulings. No new error code; error order HR-66. Decimals are HR-12 decimal strings; venue and simulator outputs (`exec.*`) carry `label` (HR-94), convention outputs (`micro.*`) none (HR-111). `exec.sim.lit.run` gains optional `session` and `PHASE` events (HR-112, goldens `ses_h`); `exec.sim.dark.run` `config.asset_class` and `exec.sor.allocate` `asset_class` on the order and venues (HR-93; other classes on a dark venue are `E_INPUT`, HR-113; goldens `acls_h`). Goldens `datasets/golden/stage_h/auc_h.json`, `eqc_h.json`, `fxc_h.json`, `fxv_h.json`, `rtc_h.json`, `fut_h.json`, E1 cases `e1_h3.json` (`oracle/python/gen_stage_h_ma.py`). Implemented in all four builds (the Rust build reuses its lit engine for `exec.sim.fut.run`). Integer inputs within +-(2^53-1), `request_index` within 0..2^32-1, else `E_LIMIT` (HR-116).
+Rulings `stage-h-rulings-multiasset.md` HR-80 to HR-103 and the 2026-11-18 rule-version rulings. No new error code; error order HR-66. Decimals are HR-12 decimal strings; venue and simulator outputs (`exec.*`) carry `label` (HR-94), convention outputs (`micro.*`) none (HR-111). `exec.sim.lit.run` gains optional `session` and `PHASE` events (HR-112, goldens `ses_h`); `exec.sim.dark.run` `config.asset_class` and `exec.sor.allocate` `asset_class` on the order and venues (HR-93; other classes on a dark venue are `E_INPUT`, HR-113; goldens `acls_h`). Goldens `datasets/golden/stage_h/auc_h.json`, `eqc_h.json`, `fxc_h.json`, `fxv_h.json`, `rtc_h.json`, `fut_h.json`, E1 cases `e1_h4.json` (`oracle/python/gen_stage_h_ma.py`). Implemented in all four builds (the Rust build reuses its lit engine for `exec.sim.fut.run`). Integer inputs within +-(2^53-1), `request_index` within 0..2^32-1, else `E_LIMIT` (HR-116).
 
 | Operation | Spec | Inputs | Outputs |
 |---|---|---|---|
@@ -453,3 +453,78 @@ Rulings `stage-h-rulings-multiasset.md` HR-80 to HR-103 and the 2026-11-18 rule-
 | `exec.sim.fut.pnl` | same (HR-102) | `buy_price`, `sell_price`, `qty`, `fee_per_contract`, `contract` | `pnl`, `fees` |
 | `exec.sim.fut.variation` | same (HR-103) | `side`, `qty`, `price`, `settlements`, `contract` | `variation_margin` (one per settlement) |
 | `exec.sim.fut.run` | same | `events` (lit events, prices as 32nds or decimals), `fee_per_contract`, `contract` | the `exec.sim.lit.run` output with `fees` and `pnl` per trader |
+
+### Stage H wave 2: microstructure estimators (H-4b) and venue analytics (H-16)
+
+Rulings `stage-h-rulings-micro.md` HR-70 to HR-75 as amended (HR-66). No new error code. Unlike the other wave 2 operations, every number here is a JSON Real (the F-2 finite rule applies: a non-finite input is `E_DOMAIN`); `count` is an Integer. Outputs are binary64, compared to 1e-12 relative (1e-15 absolute at 0). Error order HR-75 as amended (HR-66): structural `E_INPUT`, then `E_DOMAIN`, then value-dependent `E_INPUT`. Goldens `datasets/golden/stage_h/mest_h.json` and `venue_h.json` (`oracle/python/gen_stage_h_micro.py`). Implemented in all four builds (Java sums the venue decimals with `BigDecimal`, C++ with its own arbitrary-precision integers, Rust with a small unbounded integer as the bounded `Dec` of HR-57 cannot hold every product; each makes one correctly rounded division per output). The planted-truth simulations (HR-71) are tests, not operations: the Python tests draw with `numpy.random.default_rng`, and the Java, C++ and Rust tests use ports of that generator (SeedSequence, PCG64 and the numpy draws used), checked draw by draw against numpy, so all four run the same seeds on the same streams and miss the same coverage seeds.
+
+| Operation | Spec | Inputs | Outputs |
+|---|---|---|---|
+| `micro.est.arrival_rate` | `09-microstructure/micro-estimators.md` | `count` (Integer), `window` | `lambda`, `se` |
+| `micro.est.cancel_rate` | same | `orders` (array of `{lifetime, outcome}`, outcome `CANCEL` or `FILL`) | `theta`, `se` |
+| `micro.est.resilience` | same | `s_inf`, `points` (array of `{t, s}`) | `kappa`, `se` |
+| `micro.est.liquidity_decay` | same | `levels` (array of `{k, depth}`) | `alpha`, `se` |
+| `micro.est.adverse_selection` | same | `x`, `y` (equal-length arrays) | `lambda_as`, `se` |
+| `micro.est.regime_impact` | same | `regimes` (object, label to `{x, y}`; `calm` and `stressed` required) | `regimes` (label to `{lambda_as, se}`), `ratio` |
+| `micro.est.passive_vs_aggressive` | same | `passive`, `aggressive` (costs in bp) | `delta`, `se` |
+| `exec.venue.analytics` | `10-execution/venue-analytics.md` | `mids` (array of `{t, mid}`), `fills` (array of `{venue, side, quantity, price, t}`), `orders` (array of `{venue, sent, filled}`), `horizons` | `fill_rates` (venue to rate), `markouts` (array of `{venue, h, markout, markout_bps, toxicity}`, venues in code-point order, horizons in input order) |
+
+### Stage H wave 2 execution (H-14, H-17; rulings HR-59 to HR-66)
+
+Specs `10-execution/adaptive-algos.md` and `10-execution/tca-pretrade.md`. No new error code; error precedence HR-66 (`E_SCHEMA`, structural `E_INPUT`, `E_DOMAIN`, `E_LIMIT`). `n_buckets` at most 100,000 and attribution `fills` at most 1,000,000 (as HR-9). Goldens `datasets/golden/stage_h/alg_h.json` and `tcx_h.json` (`oracle/python/gen_stage_h_w2_exec.py`); E1 goldens (F-2: a NaN at one Real input is `E_DOMAIN`) in `e1_h3.json`. Implemented in all four builds; an unlisted `side`, `pair_mode` or `mode` is `E_SCHEMA` (`enum_h.json`). `mode` is `UNITS` or `CONTINUOUS` (absent: `CONTINUOUS`); `side` is `BUY` or `SELL`.
+
+| Operation | Spec | Inputs | Outputs |
+|---|---|---|---|
+| `exec.algo.arrival` | `10-execution/adaptive-algos.md` | `quantity`, `n_buckets` (Integer), `urgency`, `mode` | `slices` |
+| `exec.algo.close` | same | `quantity`, `close_volume`, `auction_participation`, `profile`, `mode` | `auction_quantity`, `slices` |
+| `exec.algo.liquidity_seek` | same | `side`, `quantity`, `limit_price`, `take_fraction`, `books` (array of buckets, each an array of `[price, size]` best first) | `slices`, `avg_prices` (null for an empty bucket), `filled`, `residual`, `notional`, `avg_fill_price` (null when nothing filled) |
+| `exec.algo.pair` | same | `leg_a` `{side, quantity, price}`, `leg_b` `{side, price}`, `pair_mode` (`CASH_BALANCED`, `HEDGED`), `hedge_ratio` (HEDGED only), `n_buckets`, `mode` | `slices_a`, `slices_b`, `quantity_b`, `cash_imbalance` |
+| `exec.algo.basket` | same | `legs` (array of `{side, quantity, price}`), `n_buckets`, `mode` | `slices` (one array per leg), `cash_imbalance`, `gross_notional` |
+| `exec.tca.pretrade` | `10-execution/tca-pretrade.md` | `quantity`, `adv`, `daily_vol`, `participation`, `half_spread_bps`, `params` `{a1, a2, a3, a4, b1}`, optional `price` | `istar_bps`, `impact_bps`, `spread_bps`, `expected_cost_bps`, `duration_days`, `timing_risk_bps`; with `price` also `expected_cost`, `timing_risk` |
+| `exec.tca.attribution` | same | `side`, `decision_price`, `arrival_mid`, `end_price`, `order_quantity`, `fills` (array of `{quantity, price, mid}`), `fees` | `delay`, `impact`, `spread`, `execution`, `opportunity`, `fees`, `total`, `total_bps` |
+
+## Stage H paper trading operations (H-21, owner decision 2026-11-18: all four builds)
+
+Spec `10-execution/paper-trading.md`, rulings HR-42 to HR-55. Goldens `datasets/golden/stage_h/pt_h.json` and `e1_hpt.json` (`oracle/python/gen_stage_h_pt.py`). Implemented in all four builds (Java: `org.quantforge.paper.Paper`; C++ with the TCA built with `-ffp-contract=off`; Rust: `quantforge_core::paper`, decimals as the Python reference in `paper_dec.rs`); each reproduces the Python ledger hashes byte for byte. Dark pool and SOR are in all four builds (stage-h2/stage-h3), so DARK and SOR sessions are portable too. No new error code.
+
+**Simulated only.** No operation opens a socket, reads a credential or names an order-entry endpoint. An order with `mode` other than `"simulated"` (absent means simulated) is `E_UNSUPPORTED_OPERATION` (HR-42). The runner reads that code as "not implemented", so the live-mode case (spec pt_h-0018) is not a golden: every build pins it in its own unit tests (acceptance test A5).
+
+**Numbers.** Every price, quantity, cash amount, fee and rate, in and out, is an HR-12 decimal string: no exponent, no trailing zeros after the point, `"0"` for zero (so `"-0.00"` is written `"0"`), arithmetic exact; inputs at most 36 digits and 18 decimals, computed values at most 36 digits and 36 decimals, else `E_LIMIT`; average cost rounded half-even to 18 decimals, financing to 0.01 (HR-77, `paper-trading.md`). A JSON number where a decimal string is expected is `E_SCHEMA`. A non-finite token (`"NaN"`, `"Infinity"`, `"-Infinity"`) in a decimal-string input, including any string leaf of a ledger `body`, is a malformed decimal, `E_SCHEMA` (HR-12, ruling F-2a), as for the wave 2 venue verbs. Only `seq`, `days`, `orders_today` and `max_orders_per_day` are JSON integers; `kill_switch` and `allow_short` are booleans. Every output carries `label` `"crypto venue; simulated"` (HR-43).
+
+| Operation | Inputs | Outputs |
+|---|---|---|
+| `paper.book.apply_fill` | `fills` (array of `{side, quantity, price, fee}`, fee default `"0"`), optional `cash`, `position` (default `"0"`), `avg_cost` (default `"0"`); one symbol | `position`, `avg_cost`, `realised`, `fees`, and `cash`, or `cash_delta` when no `cash` is given |
+| `paper.book.end_of_day` | `cash_open`, optional `fills` (applied during the day), `position_open` (default `"0"`), `avg_cost_open` (default `prev_close`), `prev_close` (required when `position_open` is not 0), `close` (required when there is a position or a fill), `days` (Integer, default 1), `cash_rate`, `debit_rate`, `borrow_rate` (default `"0"`) | `market`, `trading`, `fees`, `financing`, `cash_interest`, `short_borrow`, `total`, `position`, `cash_close`; `nav_open` and `nav_close` only when `close` is given |
+| `paper.pretrade.check` | `order` (`side`, `type`, `quantity`, `limit_price` unless MARKET, optional `mode`), `ref_price`, `position` (default `"0"`), `cash`, `orders_today` (Integer, default 0), `limits` (`max_order_qty`, `max_notional`, `max_abs_position`, `price_band`, `max_orders_per_day`, optional `kill_switch` false, `allow_short` true) | `accepted`, `reasons` (HR-49 order) |
+| `paper.ledger.append` | `seq` (Integer), `ts`, `kind`, `body` (object of strings, arrays and objects), optional `prev` (default 64 zeros) | `canonical_bytes` (string), `hash`, `record` (with `label` and `hash`) |
+| `paper.ledger.verify` | `text` (the JSON Lines file as one string) | `ok`, `records`, `first_bad_seq`, `reason`, `head` |
+| `paper.session.run` | `cash`, `limits` (as above), `lit` (`tick_size`, `lot_size`, `fee_schedule` of `exec.sim.lit.run`), optional `dark` (config of `exec.sim.dark.run`), `script` (array of steps, below) | `results` (one per step), `records` (every ledger record in order, with `hash`), `head`, `positions` (symbol to signed position, intraday fills included), `cash` (intraday fills included), `label`, `ceiling` |
+
+Order of checks for `paper.pretrade.check`: schema (`side`, `type`, `quantity` present; decimal strings; limits present), then `mode` (`E_UNSUPPORTED_OPERATION`), then unknown side or type (`E_INPUT`), then `E_DOMAIN` (quantity or reference price not positive), then a missing `limit_price` on a non-MARKET order (`E_SCHEMA`) or a non-positive one (`E_DOMAIN`), then the eight checks, all evaluated.
+
+**`paper.ledger.verify`.** Lines are split as Python `str.splitlines` does (a valid record never holds a raw line-break character, so for a valid file this is splitting on `
+`; a final newline adds no record). For each line in order, the first failing test gives the reason: `PARSE` (not a JSON object, a key repeated at any level (HR-78), no `hash`, or a JSON number other than `seq` anywhere in the record), `SEQ` (`seq` differs from the line index), `HASH`, `LINK`, `LABEL`. `records` is the number of records that verified before the first bad one (all of them when ok); `first_bad_seq` is that line's index, null when ok; `head` is the last hash when ok (64 zeros for an empty text, which is ok with 0 records), otherwise null.
+
+**`paper.session.run` script.** Each step has `op` and `ts` (string). `SUBMIT`: `order` (`order_id`, `symbol`, `side`, `type`, `quantity`, `limit_price` unless MARKET, `venue` `LIT` (default), `DARK` or `SOR`, optional `mode`), `snapshot` (`{bids, asks}`, each `[[price, qty], ...]` best first), optional `contra` (dark contra events), optional `router` (the `exec.sor.allocate` inputs without `S`). Result `{status: "DONE" or "OPEN", filled}` or `{status: "REJECTED", reasons}`. `CLOSE`: `prev_marks`, `marks` (symbol to price), optional `days`, `cash_rate`, `debit_rate`, `borrow_rate`; result `{status: "CLOSED", eod}` with `eod` the EOD record body (`market`, `trading`, `fees`, `financing`, `interest`, `borrow`, `total`, `nav`, `label`, `ceiling`).
+
+Step semantics are those of the Python `Session` (`paper_fills.py`), which the ports follow exactly:
+- Pre-trade on the snapshot mid (best bid + best ask) / 2, with intraday position and cash (fills of the day included) and the count of orders already submitted today (rejected ones count).
+- A rejection writes one `REJECT` record (the order without `mode`, plus `reasons`) and nothing else.
+- Accepted: one `ORDER` record (the order without `mode`, plus `decision_price` = mid). The order is replayed into the venue seeded with the snapshot: for `LIT`, `exec.sim.lit.run` with events asks first then bids, each level a `NEW` `LIMIT` order with id `BOOK-asks-i` or `BOOK-bids-i` and trader `BOOK`, then our order (id = `order_id`, trader `PAPER`, `price` omitted for MARKET).
+- One `FILL` record per venue fill of our order, in venue order: `order_id`, `child_id`, `venue`, `symbol`, `side`, `quantity`, `price`, `fee` (taker fee x qty x price when we take, minus maker rebate x qty x price when we make).
+- When nothing rests and the order is not fully filled (IOC or MARKET remainder, venue reject), one `CANCEL` record (`order_id`, `quantity` = unfilled).
+- At `CLOSE`: for each accepted order of the day, in submit order, a `CANCEL` if it has a resting remainder (HR-48), then its `TCA` record (`order_id`, `delay`, `execution`, `opportunity`, `total`, `total_bps`; decision and arrival = the submit mid, end = the close mark); then one `EOD`. The day's fills are applied to the book only here; `positions` and `cash` in the output include them either way. All records of a step carry the step's `ts`.
+- A duplicate `order_id` within a day or an unknown venue: `E_INPUT`. `DARK` and `SOR` replay through that build's `exec.sim.dark.run` and `exec.sor.allocate`.
+
+### Canonical bytes and hash (HR-45), byte-exact in every build
+
+The hash input is the record without its `hash` key, serialised as:
+1. Object keys sorted by Unicode code point at every level (keys here are ASCII, so byte order); array order kept.
+2. No whitespace: `,` between members and elements, `:` between key and value.
+3. Strings in double quotes. Escapes: `\"`, `\\`, `\b`, `\f`, `\n`, `\r`, `\t`; every other code point below U+0020 and every code point above U+007E as `\uXXXX` with lowercase hex (`é`, `\u007f`), a code point above U+FFFF as its UTF-16 surrogate pair (`😀`). `/` is not escaped. This is Python `json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=True)`.
+4. `seq` is a JSON integer in plain decimal (`0`, `17`); `true`, `false`, `null` as literals; every other number is a decimal string. A JSON number anywhere else is `E_INPUT` on append and `PARSE` on verify.
+5. The bytes are ASCII; `hash` is the lowercase hex SHA-256 of them (FIPS 180-4).
+
+The stored line is the full record (with `hash`) in the same form, followed by `\n`. Check value: pt_h-0020 hashes to `72c85984abb1b7c4072c65dbba0567b3de51279645b0ad63cfd242137aed7e81`.
+
+**TCA record values.** `exec.tca.shortfall` runs in binary64 in this order: delay = s x filled x (arrival - decision); execution = s x (the array-order sum, from 0.0, of q x (p - arrival)); opportunity = s x (Q - filled) x (end - decision) + 0.0; total = delay + execution + opportunity + fees; total_bps = total / (Q x decision) x 1e4. Each input is the binary64 nearest its decimal; `fees` is the exact decimal sum of the order's fill fees, converted once; `filled` is the binary64 sum of the fill quantities in order. Each output is written as the shortest round-trip decimal of the binary64 (Python `repr`, Java 19+ `Double.toString`, Rust `{}`, C++ `std::to_chars` without precision), then as an HR-12 decimal string (no exponent: `1e-05` becomes `"0.00001"`, `-0.0` becomes `"0"`). These bytes enter the hash, so a last-bit difference breaks the chain: keep this operation order and no FMA contraction.

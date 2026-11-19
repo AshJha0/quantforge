@@ -426,7 +426,7 @@ For 1,000,000 shares against a 10 million daily volume, `sigma` 2 %, `z = 1.645`
 
 ## Stage H: execution and microstructure (planned, v0.10.0)
 
-The operations drawn here are specified (spec version 0.1.0, confirmed 2026-11-18) but not merged; the boxes name the operations as the specs fix them. Simulated parts are drawn with dashed borders; real recorded data with a solid border. Specs: `specifications/09-microstructure/` and `specifications/10-execution/`.
+The operations drawn here are implemented in all four languages from v0.10.0 (spec version 0.1.0, confirmed 2026-11-18); the boxes use the names the specs fix. Simulated parts are drawn with dashed borders; real recorded data with a solid border. Specs: `specifications/09-microstructure/` and `specifications/10-execution/`.
 
 ### Order lifecycle
 
@@ -518,6 +518,69 @@ flowchart LR
 ```
 
 The risk-neutral end of the frontier is the TWAP schedule (ruling HR-5). Values from goldens `ac_h-0001` and `ac_h-0002` on the paper's test parameters ([AC00] Table 1); see the [frontier page](../curves/ac-frontier.md).
+
+### Simulator flow
+
+```mermaid
+flowchart LR
+  accTitle: How a simulated venue turns inputs into labelled outputs
+  accDescr: Inputs arrive as decimal strings: tick and lot sizes, events, fee schedule, and optionally a recorded book snapshot and a seed. They are converted to integer ticks and lots and sorted into a logical event sequence. The engine, lit, dark or router cost model, processes events one at a time, drawing any randomness from core.rng with the given seed. Outputs are converted back to decimal strings and every output gets the simulated label.
+  IN["inputs as decimal strings<br/>tick, lot, events, fees"] --> INT["integer ticks and lots<br/>off-grid input is an error"]
+  SNAP["recorded book snapshot, optional"] --> INT
+  SEED["seed for core.rng"] --> ENG
+  INT --> SEQ[logical event sequence]
+  SEQ --> ENG["engine: exec.sim.lit.run, exec.sim.dark.run,<br/>or the exec.sor.allocate cost model"]
+  ENG --> OUT["fills, rejects, book, fees<br/>as decimal strings"]
+  OUT --> LBL["label on every output<br/>simulated venue; not a real exchange"]
+  classDef sim stroke-dasharray: 5 5
+  class INT,SEQ,ENG,OUT sim
+```
+
+The same inputs and seed give byte-identical outputs in every language; that is what lets paper trading replay a venue's goldens through its own path (test A7). Specs: `10-execution/lit-matching.md`, `dark-pool.md`, `smart-order-router.md`.
+
+### Paper-trading ledger flow
+
+```mermaid
+flowchart TB
+  accTitle: Paper trading from order to ledger and daily explain
+  accDescr: An order first meets the deterministic pre-trade check. A rejection is written to the ledger as a REJECT record. An accepted order is written as ORDER and sent to a simulated venue seeded with the recorded book snapshot. Fills update the book's positions and cash and are written as FILL records; remainders are written as CANCEL. When the order is final, a TCA record is written. At the end of the day the book is marked to the close, financing is posted, and an EOD record carries the P&L explain. Every record carries the hash of the record before it.
+  O[order, mode simulated] --> PT{"pre-trade check<br/>HR-49, eight checks"}
+  PT -->|rejected| R[REJECT record]
+  PT -->|accepted| OR[ORDER record]
+  OR --> V["simulated venue<br/>LIT, DARK or SOR"]
+  SN["recorded snapshot at order time"] -.-> V
+  V -->|fills| B["book: positions, average cost, cash"]
+  V -->|fills| F[FILL records]
+  V -->|IOC or close remainder| C[CANCEL record]
+  F --> T["TCA record<br/>exec.tca.shortfall"]
+  B --> E["EOD record<br/>market + trading + fees + financing = NAV change"]
+  R & OR & F & C & T & E --> L[("ledger, JSON Lines<br/>each record hashes the one before")]
+  classDef sim stroke-dasharray: 5 5
+  class V sim
+```
+
+Only the snapshot is real data, and it is read, never traded against. The ledger lives in the `forward-log` branch, not `main` (HR-46). The book, explain, checks, ledger and venue fill path are implemented in Python (`paper.py`, `paper_fills.py`); the `paper.*` CLI operations are in all four languages. Worked through in [Tutorial 44](../getting-started/tutorial-44-paper-trading.md). Spec: `10-execution/paper-trading.md`.
+
+### Order lifecycle in paper trading
+
+```mermaid
+stateDiagram-v2
+  accTitle: States of a paper order
+  accDescr: A new order is either rejected by the pre-trade check or accepted as NEW. A NEW order can be partially filled, filled, or cancelled. A partially filled order can fill further, become filled, or have its remainder cancelled, either at once for IOC or at the daily close for a resting order.
+  [*] --> REJECTED: pre-trade check fails
+  [*] --> NEW: accepted
+  NEW --> PARTIALLY_FILLED: fill below quantity
+  NEW --> FILLED: fill for the whole quantity
+  NEW --> CANCELED: IOC with no fill, or daily close
+  PARTIALLY_FILLED --> PARTIALLY_FILLED: further fill
+  PARTIALLY_FILLED --> FILLED: last fill
+  PARTIALLY_FILLED --> CANCELED: IOC remainder, or daily close (HR-48)
+  FILLED --> [*]
+  CANCELED --> [*]
+  REJECTED --> [*]
+```
+
+State names follow the FIX 4.4 ExecutionReport vocabulary, recalled in the spec and used for names only. A fill above the remaining quantity is `E_INPUT`, so there is no overfilled state. Every final state writes one `TCA` record, except a rejection, which never reached a venue.
 
 ### Crypto data path: recorder to aggregate
 

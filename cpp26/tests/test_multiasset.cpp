@@ -1,5 +1,5 @@
 // Stage H multi-asset H-22, H-23, H-24 (port of python/tests/test_stage_h_multiasset.py): every row of the
-// auc_h, eqc_h, fxc_h, fxv_h, rtc_h, fut_h and e1_h3 goldens through the CLI layer (exact text), then acceptance
+// auc_h, eqc_h, fxc_h, fxv_h, rtc_h, fut_h and e1_h4 goldens through the CLI layer (exact text), then acceptance
 // A3 (properties) and A4 (labels) of specifications/09-microstructure/asset-conventions.md, and the paths the
 // goldens do not reach.
 #include <catch2/catch_test_macros.hpp>
@@ -109,10 +109,10 @@ TEST_CASE("multi-asset goldens, every row exact (A1, A4)") {
     replay("auc_h", 12);
     replay("eqc_h", 19);
     replay("fxc_h", 9);
-    replay("fxv_h", 14);
+    replay("fxv_h", 20);
     replay("rtc_h", 17);
-    replay("fut_h", 8);
-    replay("e1_h3", 15);
+    replay("fut_h", 10);
+    replay("e1_h4", 21);
     replay("ses_h", 3);
     replay("acls_h", 5);
 }

@@ -35,8 +35,13 @@ MUTMUT = "mutmut==3.8.1"
 SKIPPED = "skipped-equivalent"  # listed in skip-equivalents.json (skips.py)
 SKIP = shutil.ignore_patterns(".git", "target", "build", "build-*", ".venv", "mutants", "mutants.out*",
                               "__pycache__", "reports", "java25", "cpp26")
-# mutmut exit codes: 0 survived, 1 and 3 killed. Anything else (no tests, timeout) is kept by number.
-MUTMUT_VERDICT = {0: "survived", 1: "killed", 3: "killed"}
+# mutmut exit codes: 0 survived, 1 and 3 killed. The codes mutmut 3.8.1 itself files as "timeout"
+# (mutmut/stats.py status_by_exit_code: 36, and SIGXCPU from its CPU-time limit as 24, -24, 152, 255)
+# become "timeout", which summarise() counts as caught: the same rule as a golden timeout here and a
+# hang in cpp_mutants.py (exit 124, counted as killed). A mutant that turns a loop endless is caught
+# by the test that reaches the loop. Anything else (no tests, segfault) is kept by number.
+MUTMUT_VERDICT = {0: "survived", 1: "killed", 3: "killed", 36: "timeout", 24: "timeout", -24: "timeout",
+                  152: "timeout", 255: "timeout"}
 RUST_VERDICT = {"CaughtMutant": "killed", "MissedMutant": "survived", "Unviable": "unviable", "Timeout": "timeout"}
 
 

@@ -1,5 +1,5 @@
 """Stage H multi-asset goldens H-22 (auc_h, eqc_h), H-23 (fxc_h, fxv_h), H-24 (rtc_h, fut_h) and their
-E1 non-finite cases (e1_h3).
+E1 non-finite cases (e1_h4).
 
 Specs: specifications/09-microstructure/asset-conventions.md, specifications/10-execution/auction.md,
 fx-rfq-venue.md, rates-futures-venue.md; rulings specifications/stage-h-rulings-multiasset.md. The
@@ -436,7 +436,7 @@ def build():
 
 def e1_suite(suites):
     """HR-12 / F-2a: a NaN decimal string at the first decimal input of each operation is E_SCHEMA."""
-    e = Suite("e1_h3", CONV, G)
+    e = Suite("e1_h4", CONV, G)
     seen = set()
     for su in suites:
         for c in su.cases:

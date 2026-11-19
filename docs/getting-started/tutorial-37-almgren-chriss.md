@@ -6,7 +6,7 @@ The plain idea: selling a large position quickly costs impact, because you push 
 
 You will reproduce the paper's test case: the straight-line schedule at `lambda = 0`, the curved one at `lambda = 1e-6`, the paper's own printed `kappa`, and two points of the cost-risk frontier. Budget 10 minutes. The parameters are the paper's (Table 1, p. 25 of the preprint); nothing is fitted to a market.
 
-<p class="note">Available from v0.10.0. The operations on this page are specified (spec version 0.1.0, confirmed 2026-11-18) but not merged in any language. Step 1 checks the spec's golden numbers with a plain-Python restatement of the formulas; step 2 shows the library call as it will run once the operations are merged, and is not run here. Every number on the page is a spec golden or simple arithmetic on one.</p>
+<p class="note">Available from v0.10.0. The operations on this page are implemented in all four languages (stage H wave 1; each build passes their goldens, observed, local, 2026-11-18). This page stays a hand check: step 1 checks the spec's golden numbers with a plain-Python restatement of the formulas, and step 2 shows the library call without running it. Every number on the page is a spec golden or simple arithmetic on one.</p>
 
 Terms, defined here. `X` is the position to sell over `T` days in `N` steps of length `tau = T/N`. **Holdings** `x_j` are what is left after step `j`; **trades** `n_j = x_{j-1} - x_j`. `sigma` is the daily price volatility in dollars per share, `epsilon` the fixed cost per share (half spread and fees), `eta` the temporary impact per unit of trading rate, `gamma` the permanent impact. `E` is the expected cost and `V` its variance; the trader minimises `E + lambda V`.
 
@@ -85,7 +85,7 @@ From [`10-execution/almgren-chriss.md`](../../specifications/10-execution/almgre
 
 Evidence: `ac_h-0005` is checked against the paper's printed figure. `ac_h-0001`, `0002` and `0004` were re-derived blind by a second lane from the inputs only (DR-H2, 2026-11-15); one caveat, the `ac_h-0001` standard deviation was visible to that lane beforehand. No free library implements Almgren-Chriss, so there is no library cross-check.
 
-## Step 2: the library call (available from v0.10.0, not run here)
+## Step 2: the library call (shown, not run here)
 
 ```json
 {"operation": "exec.ac.trajectory", "inputs": {"quantity": 1000000, "horizon": 5, "n_steps": 5, "sigma": 0.95, "epsilon": 0.0625, "eta": 2.5e-6, "gamma": 2.5e-7, "risk_aversion": 1e-6}}

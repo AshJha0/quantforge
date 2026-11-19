@@ -1,0 +1,2 @@
+Leak list (outside MANIFEST): Expected and Derivation columns stripped; grep for every expected decimal found none.
+Remaining visible: (1) venue-analytics base-input line gives sum q p = 30,007 (A) and 30,000 (B), an intermediate for bps; (2) recovery table shows planted truths by design; (3) rulings HR-70 states the 2.4e-4 gate probability; (4) mest_h-0006 Input text has none. Exact-fit wording "resilience and liquidity-decay goldens are exact fits (HR-74)" in Limitations hints SE 0 for mest_h-0005 and 0007.

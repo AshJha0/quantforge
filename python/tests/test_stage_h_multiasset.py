@@ -1,5 +1,5 @@
 """Stage H multi-asset H-22, H-23, H-24: every golden row of auc_h, eqc_h, fxc_h, fxv_h, rtc_h, fut_h
-and e1_h3 replayed against the core functions, then acceptance A1 (Python part), A3 (properties) and
+and e1_h4 replayed against the core functions, then acceptance A1 (Python part), A3 (properties) and
 A4 (labels) of specifications/09-microstructure/asset-conventions.md as fixed (HR-95). A2 and A5
 are records, not tests (program/STAGE_H_BLIND_MULTIASSET.md; HR-98 source tags)."""
 
@@ -17,7 +17,7 @@ from quantforge_core import multiasset as ma
 from quantforge_core.errors import QfError
 
 GOLD = Path(__file__).resolve().parents[2] / "datasets" / "golden" / "stage_h"
-SUITES = ("auc_h", "eqc_h", "fxc_h", "fxv_h", "rtc_h", "fut_h", "ses_h", "acls_h", "e1_h3")
+SUITES = ("auc_h", "eqc_h", "fxc_h", "fxv_h", "rtc_h", "fut_h", "ses_h", "acls_h", "e1_h4")
 FN = {
     "micro.eq.round_price": ma.eq_round_price,
     "micro.eq.fee_check": ma.eq_fee_check,

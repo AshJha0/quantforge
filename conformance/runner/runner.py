@@ -224,7 +224,7 @@ def run_batch(command, cwd, cases, timeout):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--impl", required=True)
-    ap.add_argument("--suite", default="*")
+    ap.add_argument("--suite", default="*", help="golden file-name glob, or several separated by commas")
     ap.add_argument("--golden", default=str(ROOT / "datasets" / "golden"))
     ap.add_argument("--config", default=str(HERE / "implementations.json"))
     ap.add_argument("--policy", default=str(ROOT / "conformance" / "tolerances" / "policy.yaml"))
@@ -238,7 +238,9 @@ def main():
         return 2
     cfg = impls[a.impl]
     classes = load_policy(a.policy)
-    files = sorted(p for p in Path(a.golden).rglob(f"{a.suite}.json"))
+    # A comma-separated list of globs selects their union (stages.json uses it to give a module only the
+    # golden suites that call it, for example python roots, compounding and interp).
+    files = sorted({p for g in a.suite.split(",") for p in Path(a.golden).rglob(f"{g.strip()}.json")})
     if not files:
         print("no golden files matched", file=sys.stderr)
         return 2

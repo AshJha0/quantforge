@@ -92,6 +92,10 @@ class StubTests(unittest.TestCase):
             self.assertEqual(code, 1)
             self.assertTrue(rep["suites"][0]["crash"])
 
+    def test_comma_separated_suites_are_a_union(self):
+        _, rep, _ = run("unsupported", "sobol, compounding,sobol")
+        self.assertEqual(sorted(x["suite"] for x in rep["suites"]), ["compounding", "sobol"])
+
     def test_nan_token_fails(self):
         code, rep, _ = run("nan", "compounding")
         self.assertEqual(code, 1)

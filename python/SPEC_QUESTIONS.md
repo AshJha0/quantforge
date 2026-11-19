@@ -298,3 +298,9 @@ Wave 1 (hedge solvers) passes 121 of 121 with no open question. Choices made whe
 ## R6 status (2026-11-12, R6-25)
 
 Every heading above now names its rulings. Questions with no ruling in `specifications/`, carried to the R6 spec lane: E-Q7 (cube domain checks on every node), E-Q11 (E2 array caps), F-Q1 (E1 order against E_SCHEMA and E_INPUT, field naming), F-Q2 (G4 naming; finished in R6 by renaming `cli/ops_stage_g2.py` to `cli/ops_lmm_xva_frtb.py`), F-Q4 (R8 estimator stopping rule), G-Q2 (flat objective as E_NO_CONVERGENCE). G-Q4 is closed by G-42 (goldens regenerated).
+
+## D-Q (2026-11-18): `calib.curve.robust` convergence and near-singular bases: closed
+
+The algorithm defect (old loops cycled, stopped short, or gave up; all four languages) is fixed by
+one finite active-set method on the dual in every language. The near-singular basis case is closed
+by ruling D38b in `specifications/stage-d-rulings.md` (owner decision 2026-11-18).

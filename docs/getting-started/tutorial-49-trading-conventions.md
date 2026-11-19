@@ -1,4 +1,4 @@
-# Tutorial 44: equity, FX and rates trading conventions
+# Tutorial 49: equity, FX and rates trading conventions
 
 <!-- tutorial:only python -->
 
@@ -119,7 +119,7 @@ You put prices on equity tick grids, found a round lot and settlement and spot d
 ## Try next
 
 - Move the USD holiday in `fxc_h-0004` to 2026-11-25 and predict the spot date before you run it.
-- [Tutorial 45](tutorial-45-auction-fx-and-futures-venues.md) runs these conventions inside three simulated venues.
+- [Tutorial 50](tutorial-50-auction-fx-and-futures-venues.md) runs these conventions inside three simulated venues.
 
 ## References and further reading
 

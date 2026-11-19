@@ -27,12 +27,12 @@ import org.quantforge.core.Json;
 import org.quantforge.core.QfError;
 
 /**
- * Stage H multi-asset H-22, H-23, H-24: every golden row of auc_h, eqc_h, fxc_h, fxv_h, rtc_h, fut_h and e1_h3,
+ * Stage H multi-asset H-22, H-23, H-24: every golden row of auc_h, eqc_h, fxc_h, fxv_h, rtc_h, fut_h and e1_h4,
  * then acceptance A3 (properties) and A4 (labels) of {@code asset-conventions.md}, as the Python tests.
  */
 class MultiAssetTest {
     private static final Path GOLD = Path.of("..", "datasets", "golden", "stage_h");
-    private static final String[] SUITES = {"auc_h", "eqc_h", "fxc_h", "fxv_h", "rtc_h", "fut_h", "ses_h", "acls_h", "e1_h3"};
+    private static final String[] SUITES = {"auc_h", "eqc_h", "fxc_h", "fxv_h", "rtc_h", "fut_h", "ses_h", "acls_h", "e1_h4"};
     private static final Map<String, Function<Map<?, ?>, Map<String, Object>>> FN = new HashMap<>();
     private static final Set<String> LABELS =
             Set.of(MultiAsset.EQ_LABEL, MultiAsset.IEX_LABEL, MultiAsset.FX_LABEL, MultiAsset.RATES_LABEL);

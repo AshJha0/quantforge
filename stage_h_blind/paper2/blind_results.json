@@ -1,0 +1,345 @@
+{
+ "pt_h-0030": {
+  "cash": "9697.698",
+  "ceiling": "Paper trading on free data; simulated fills; no evidence of tradable profitability.",
+  "head": "5afe57feb517eca07f9469640c0c1e2c3c016f4ce9a7ee412804cf2172ccebdb",
+  "label": "crypto venue; simulated",
+  "positions": {
+   "BTC-USD": "3"
+  },
+  "records": [
+   {
+    "body": {
+     "decision_price": "100",
+     "limit_price": "101",
+     "order_id": "O1",
+     "quantity": "3",
+     "side": "BUY",
+     "symbol": "BTC-USD",
+     "type": "LIMIT",
+     "venue": "LIT"
+    },
+    "hash": "66fc9b214cfca20e4fc824d2591bce53befb48b72a28c8505272faff8bc18055",
+    "kind": "ORDER",
+    "label": "crypto venue; simulated",
+    "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+    "seq": 0,
+    "ts": "2026-11-18T00:00:01Z"
+   },
+   {
+    "body": {
+     "child_id": "O1",
+     "fee": "0.201",
+     "order_id": "O1",
+     "price": "100.5",
+     "quantity": "2",
+     "side": "BUY",
+     "symbol": "BTC-USD",
+     "venue": "LIT"
+    },
+    "hash": "fbb2be81c5b1dac84b2b6fe99658fe0a3142cebe25129b2240ca98ef64a62da9",
+    "kind": "FILL",
+    "label": "crypto venue; simulated",
+    "prev": "66fc9b214cfca20e4fc824d2591bce53befb48b72a28c8505272faff8bc18055",
+    "seq": 1,
+    "ts": "2026-11-18T00:00:01Z"
+   },
+   {
+    "body": {
+     "child_id": "O1",
+     "fee": "0.101",
+     "order_id": "O1",
+     "price": "101",
+     "quantity": "1",
+     "side": "BUY",
+     "symbol": "BTC-USD",
+     "venue": "LIT"
+    },
+    "hash": "1b443cf8ecde5eae99506f4bd85fadfb0665d0e22e017bbf0ce3124d4b75c47c",
+    "kind": "FILL",
+    "label": "crypto venue; simulated",
+    "prev": "fbb2be81c5b1dac84b2b6fe99658fe0a3142cebe25129b2240ca98ef64a62da9",
+    "seq": 2,
+    "ts": "2026-11-18T00:00:01Z"
+   },
+   {
+    "body": {
+     "limit_price": "106",
+     "order_id": "O2",
+     "quantity": "3",
+     "reasons": [
+      "PRICE_BAND",
+      "MAX_POSITION"
+     ],
+     "side": "BUY",
+     "symbol": "BTC-USD",
+     "type": "LIMIT",
+     "venue": "LIT"
+    },
+    "hash": "5afe57feb517eca07f9469640c0c1e2c3c016f4ce9a7ee412804cf2172ccebdb",
+    "kind": "REJECT",
+    "label": "crypto venue; simulated",
+    "prev": "1b443cf8ecde5eae99506f4bd85fadfb0665d0e22e017bbf0ce3124d4b75c47c",
+    "seq": 3,
+    "ts": "2026-11-18T00:00:02Z"
+   }
+  ],
+  "results": [
+   {
+    "filled": "3",
+    "status": "DONE"
+   },
+   {
+    "reasons": [
+     "PRICE_BAND",
+     "MAX_POSITION"
+    ],
+    "status": "REJECTED"
+   }
+  ]
+ },
+ "pt_h-0031": {
+  "cash": "9697.698",
+  "ceiling": "Paper trading on free data; simulated fills; no evidence of tradable profitability.",
+  "head": "dc9e56a5c754075da858c9c4d6dc3332a597de94815137ef45a5d049f2fe59b3",
+  "label": "crypto venue; simulated",
+  "positions": {
+   "BTC-USD": "3"
+  },
+  "records": [
+   {
+    "body": {
+     "decision_price": "100",
+     "limit_price": "101",
+     "order_id": "O1",
+     "quantity": "3",
+     "side": "BUY",
+     "symbol": "BTC-USD",
+     "type": "LIMIT",
+     "venue": "LIT"
+    },
+    "hash": "66fc9b214cfca20e4fc824d2591bce53befb48b72a28c8505272faff8bc18055",
+    "kind": "ORDER",
+    "label": "crypto venue; simulated",
+    "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+    "seq": 0,
+    "ts": "2026-11-18T00:00:01Z"
+   },
+   {
+    "body": {
+     "child_id": "O1",
+     "fee": "0.201",
+     "order_id": "O1",
+     "price": "100.5",
+     "quantity": "2",
+     "side": "BUY",
+     "symbol": "BTC-USD",
+     "venue": "LIT"
+    },
+    "hash": "fbb2be81c5b1dac84b2b6fe99658fe0a3142cebe25129b2240ca98ef64a62da9",
+    "kind": "FILL",
+    "label": "crypto venue; simulated",
+    "prev": "66fc9b214cfca20e4fc824d2591bce53befb48b72a28c8505272faff8bc18055",
+    "seq": 1,
+    "ts": "2026-11-18T00:00:01Z"
+   },
+   {
+    "body": {
+     "child_id": "O1",
+     "fee": "0.101",
+     "order_id": "O1",
+     "price": "101",
+     "quantity": "1",
+     "side": "BUY",
+     "symbol": "BTC-USD",
+     "venue": "LIT"
+    },
+    "hash": "1b443cf8ecde5eae99506f4bd85fadfb0665d0e22e017bbf0ce3124d4b75c47c",
+    "kind": "FILL",
+    "label": "crypto venue; simulated",
+    "prev": "fbb2be81c5b1dac84b2b6fe99658fe0a3142cebe25129b2240ca98ef64a62da9",
+    "seq": 2,
+    "ts": "2026-11-18T00:00:01Z"
+   },
+   {
+    "body": {
+     "limit_price": "106",
+     "order_id": "O2",
+     "quantity": "3",
+     "reasons": [
+      "PRICE_BAND",
+      "MAX_POSITION"
+     ],
+     "side": "BUY",
+     "symbol": "BTC-USD",
+     "type": "LIMIT",
+     "venue": "LIT"
+    },
+    "hash": "5afe57feb517eca07f9469640c0c1e2c3c016f4ce9a7ee412804cf2172ccebdb",
+    "kind": "REJECT",
+    "label": "crypto venue; simulated",
+    "prev": "1b443cf8ecde5eae99506f4bd85fadfb0665d0e22e017bbf0ce3124d4b75c47c",
+    "seq": 3,
+    "ts": "2026-11-18T00:00:02Z"
+   },
+   {
+    "body": {
+     "delay": "0",
+     "execution": "2",
+     "opportunity": "0",
+     "order_id": "O1",
+     "total": "2.302",
+     "total_bps": "76.73333333333333"
+    },
+    "hash": "bcd3f2bbc7bad551b76daefa6f8d3a712c58f7a45c224d107541bb26c0a1a1ae",
+    "kind": "TCA",
+    "label": "crypto venue; simulated",
+    "prev": "5afe57feb517eca07f9469640c0c1e2c3c016f4ce9a7ee412804cf2172ccebdb",
+    "seq": 4,
+    "ts": "2026-11-19T00:00:00Z"
+   },
+   {
+    "body": {
+     "borrow": "0",
+     "ceiling": "Paper trading on free data; simulated fills; no evidence of tradable profitability.",
+     "fees": "-0.302",
+     "financing": "0",
+     "interest": "0",
+     "label": "crypto venue; simulated",
+     "market": "0",
+     "nav": "10003.698",
+     "total": "3.698",
+     "trading": "4"
+    },
+    "hash": "dc9e56a5c754075da858c9c4d6dc3332a597de94815137ef45a5d049f2fe59b3",
+    "kind": "EOD",
+    "label": "crypto venue; simulated",
+    "prev": "bcd3f2bbc7bad551b76daefa6f8d3a712c58f7a45c224d107541bb26c0a1a1ae",
+    "seq": 5,
+    "ts": "2026-11-19T00:00:00Z"
+   }
+  ],
+  "results": [
+   {
+    "filled": "3",
+    "status": "DONE"
+   },
+   {
+    "reasons": [
+     "PRICE_BAND",
+     "MAX_POSITION"
+    ],
+    "status": "REJECTED"
+   },
+   {
+    "eod": {
+     "borrow": "0",
+     "ceiling": "Paper trading on free data; simulated fills; no evidence of tradable profitability.",
+     "fees": "-0.302",
+     "financing": "0",
+     "interest": "0",
+     "label": "crypto venue; simulated",
+     "market": "0",
+     "nav": "10003.698",
+     "total": "3.698",
+     "trading": "4"
+    },
+    "status": "CLOSED"
+   }
+  ]
+ },
+ "pt_h-0032": {
+  "cash": "9799.3995",
+  "ceiling": "Paper trading on free data; simulated fills; no evidence of tradable profitability.",
+  "head": "8df3e1e2a0c43ee7ccc83c6fa709c8b747b7d724055305d4be3e42a587d6a06b",
+  "label": "crypto venue; simulated",
+  "positions": {
+   "BTC-USD": "2"
+  },
+  "records": [
+   {
+    "body": {
+     "decision_price": "100",
+     "order_id": "P1",
+     "quantity": "2",
+     "side": "BUY",
+     "symbol": "BTC-USD",
+     "type": "MARKET",
+     "venue": "SOR"
+    },
+    "hash": "1afbf623b4c29984c9e714f5f75bd6862a5c7209b35081492ecdfcdec53da340",
+    "kind": "ORDER",
+    "label": "crypto venue; simulated",
+    "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+    "seq": 0,
+    "ts": "2026-11-18T00:00:01Z"
+   },
+   {
+    "body": {
+     "child_id": "P1-LIT",
+     "fee": "0.1005",
+     "order_id": "P1",
+     "price": "100.5",
+     "quantity": "1",
+     "side": "BUY",
+     "symbol": "BTC-USD",
+     "venue": "LIT"
+    },
+    "hash": "8784d40d96dcfcc86e73c68f9abaf453781573fa628b146344c3d40d0c73a8ff",
+    "kind": "FILL",
+    "label": "crypto venue; simulated",
+    "prev": "1afbf623b4c29984c9e714f5f75bd6862a5c7209b35081492ecdfcdec53da340",
+    "seq": 1,
+    "ts": "2026-11-18T00:00:01Z"
+   },
+   {
+    "body": {
+     "child_id": "P1-DARK",
+     "fee": "0",
+     "order_id": "P1",
+     "price": "100",
+     "quantity": "1",
+     "side": "BUY",
+     "symbol": "BTC-USD",
+     "venue": "DARK"
+    },
+    "hash": "8df3e1e2a0c43ee7ccc83c6fa709c8b747b7d724055305d4be3e42a587d6a06b",
+    "kind": "FILL",
+    "label": "crypto venue; simulated",
+    "prev": "8784d40d96dcfcc86e73c68f9abaf453781573fa628b146344c3d40d0c73a8ff",
+    "seq": 2,
+    "ts": "2026-11-18T00:00:01Z"
+   }
+  ],
+  "results": [
+   {
+    "filled": "2",
+    "status": "DONE"
+   }
+  ]
+ },
+ "pt_h-0050": {
+  "avg_cost": "1",
+  "cash": "9999999999999999999999999999.01",
+  "fees": "0",
+  "label": "crypto venue; simulated",
+  "position": "1",
+  "realised": "0"
+ },
+ "pt_h-0051": {
+  "avg_cost": "1.666666666666666667",
+  "cash_delta": "-5",
+  "fees": "0",
+  "label": "crypto venue; simulated",
+  "position": "3",
+  "realised": "0"
+ },
+ "pt_h-0054": {
+  "first_bad_seq": 0,
+  "head": null,
+  "label": "crypto venue; simulated",
+  "ok": false,
+  "reason": "PARSE",
+  "records": 0
+ }
+}

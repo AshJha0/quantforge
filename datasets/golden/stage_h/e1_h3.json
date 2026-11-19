@@ -1,62 +1,25 @@
 {
  "schema_version": "1.0",
  "suite": "e1_h3",
- "spec": "specifications/09-microstructure/asset-conventions.md",
- "spec_version": "1.0.0",
- "generator": "oracle/python/gen_stage_h_ma.py",
- "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "spec": "specifications/10-execution/adaptive-algos.md",
+ "spec_version": "0.1.0",
+ "generator": "oracle/python/gen_stage_h_w2_exec.py",
+ "reviewer": "none: self-assessment; blind re-derivation pending",
  "cases": [
   {
    "case_id": "e1_h3-0001",
-   "operation": "exec.sim.auction.uncross",
+   "operation": "exec.algo.arrival",
    "inputs": {
-    "orders": [
-     {
-      "id": "s1",
-      "limit": "NaN",
-      "qty": 100,
-      "side": "BUY"
-     },
-     {
-      "id": "s2",
-      "limit": "10.01",
-      "qty": 200,
-      "side": "BUY"
-     },
-     {
-      "id": "s3",
-      "limit": "10.00",
-      "qty": 300,
-      "side": "BUY"
-     },
-     {
-      "id": "s4",
-      "limit": "9.99",
-      "qty": 150,
-      "side": "SELL"
-     },
-     {
-      "id": "s5",
-      "limit": "10.01",
-      "qty": 250,
-      "side": "SELL"
-     },
-     {
-      "id": "s6",
-      "limit": "10.03",
-      "qty": 100,
-      "side": "SELL"
-     }
-    ],
-    "phase": "OPEN",
-    "ref_price": "10.00",
-    "tick_size": "0.01"
+    "quantity": 1000,
+    "n_buckets": 4,
+    "urgency": "NaN",
+    "mode": "CONTINUOUS"
    },
    "expected": {
     "status": "error",
-    "error_code": "E_SCHEMA"
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "date_and_convention",
+   "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand"
    ],
@@ -65,20 +28,28 @@
     "e1",
     "non-finite-input"
    ],
-   "description": "HR-12: NaN decimal string at orders/0/limit is E_SCHEMA (from auc_h-0001)"
+   "description": "F-2: NaN at urgency is E_DOMAIN"
   },
   {
    "case_id": "e1_h3-0002",
-   "operation": "micro.eq.round_price",
+   "operation": "exec.algo.close",
    "inputs": {
-    "price": "NaN",
-    "side": "BUY"
+    "quantity": 10000,
+    "close_volume": 50000,
+    "auction_participation": "NaN",
+    "profile": [
+     1,
+     1,
+     2,
+     4
+    ],
+    "mode": "CONTINUOUS"
    },
    "expected": {
     "status": "error",
-    "error_code": "E_SCHEMA"
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "date_and_convention",
+   "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand"
    ],
@@ -87,384 +58,48 @@
     "e1",
     "non-finite-input"
    ],
-   "description": "HR-12: NaN decimal string at price is E_SCHEMA (from eqc_h-0001)"
+   "description": "F-2: NaN at auction_participation is E_DOMAIN"
   },
   {
    "case_id": "e1_h3-0003",
-   "operation": "micro.eq.fee_check",
+   "operation": "exec.algo.liquidity_seek",
    "inputs": {
-    "as_of": "2024-01-02",
-    "price": "NaN",
-    "taker_fee": "0.0015"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN decimal string at price is E_SCHEMA (from eqc_h-0012)"
-  },
-  {
-   "case_id": "e1_h3-0004",
-   "operation": "micro.eq.round_lot",
-   "inputs": {
-    "price": "NaN"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN decimal string at price is E_SCHEMA (from eqc_h-0014)"
-  },
-  {
-   "case_id": "e1_h3-0005",
-   "operation": "micro.fx.pip_value",
-   "inputs": {
-    "notional": "NaN",
-    "pair": "EURUSD"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN decimal string at notional is E_SCHEMA (from fxc_h-0001)"
-  },
-  {
-   "case_id": "e1_h3-0006",
-   "operation": "exec.sim.fx.stream",
-   "inputs": {
-    "half_spread_pips": "NaN",
-    "mid_path": [
-     {
-      "mid": "1.08512",
-      "time": 0
-     }
-    ],
-    "pair": "EURUSD",
-    "tick": "0.00001"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN decimal string at half_spread_pips is E_SCHEMA (from fxv_h-0001)"
-  },
-  {
-   "case_id": "e1_h3-0007",
-   "operation": "exec.sim.fx.request",
-   "inputs": {
-    "mid_after": "NaN",
-    "p_random_reject": "0.05",
-    "pair": "EURUSD",
-    "qty": "1000000",
-    "quote": {
-     "ask": "1.0852",
-     "bid": "1.0850",
-     "quote_mid": "1.0851"
-    },
     "side": "BUY",
-    "symmetric": true,
-    "threshold_pips": "2",
-    "u": "0.50"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN decimal string at mid_after is E_SCHEMA (from fxv_h-0003)"
-  },
-  {
-   "case_id": "e1_h3-0008",
-   "operation": "micro.rates.bond_yield",
-   "inputs": {
-    "coupon": "NaN",
-    "frequency": 2,
-    "periods": 4,
-    "price": "100"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN decimal string at coupon is E_SCHEMA (from rtc_h-0011)"
-  },
-  {
-   "case_id": "e1_h3-0009",
-   "operation": "micro.rates.format_32nds",
-   "inputs": {
-    "resolution": 64,
-    "value": "NaN"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN decimal string at value is E_SCHEMA (from rtc_h-0005)"
-  },
-  {
-   "case_id": "e1_h3-0010",
-   "operation": "micro.rates.tick_value",
-   "inputs": {
-    "face": "NaN",
-    "tick": "0.015625"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN decimal string at face is E_SCHEMA (from rtc_h-0007)"
-  },
-  {
-   "case_id": "e1_h3-0011",
-   "operation": "micro.rates.bond_price",
-   "inputs": {
-    "coupon": "NaN",
-    "frequency": 2,
-    "periods": 2,
-    "yield": "0.05"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN decimal string at coupon is E_SCHEMA (from rtc_h-0008)"
-  },
-  {
-   "case_id": "e1_h3-0012",
-   "operation": "micro.rates.bill_price",
-   "inputs": {
-    "days": 91,
-    "discount": "NaN"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN decimal string at discount is E_SCHEMA (from rtc_h-0010)"
-  },
-  {
-   "case_id": "e1_h3-0013",
-   "operation": "exec.sim.fut.pnl",
-   "inputs": {
-    "buy_price": "110-16",
-    "contract": {
-     "symbol": "ZN"
-    },
-    "fee_per_contract": "NaN",
-    "qty": 3,
-    "sell_price": "110-17+"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN decimal string at fee_per_contract is E_SCHEMA (from fut_h-0004)"
-  },
-  {
-   "case_id": "e1_h3-0014",
-   "operation": "exec.sim.lit.run",
-   "inputs": {
-    "tick_size": "0.01",
-    "lot_size": "1",
-    "session": {
-     "ref_price": "10.00"
-    },
-    "fee_schedule": {
-     "auction_fee": "0",
-     "maker_rebate": "0",
-     "taker_fee": "0"
-    },
-    "events": [
-     {
-      "id": "B1",
-      "op": "NEW",
-      "qty": "100",
-      "side": "BUY",
-      "trader": "T1",
-      "type": "LIMIT",
-      "price": "NaN"
-     },
-     {
-      "id": "S1",
-      "op": "NEW",
-      "qty": "60",
-      "side": "SELL",
-      "trader": "T2",
-      "type": "LIMIT",
-      "price": "10.00"
-     },
-     {
-      "id": "S2",
-      "op": "NEW",
-      "qty": "80",
-      "side": "SELL",
-      "trader": "T2",
-      "type": "LIMIT",
-      "price": "10.01"
-     },
-     {
-      "id": "I1",
-      "op": "NEW",
-      "qty": "10",
-      "side": "BUY",
-      "trader": "T3",
-      "type": "IOC",
-      "price": "10.05"
-     },
-     {
-      "op": "PHASE",
-      "phase": "CONTINUOUS"
-     },
-     {
-      "id": "B2",
-      "op": "NEW",
-      "qty": "40",
-      "side": "BUY",
-      "trader": "T3",
-      "type": "LIMIT",
-      "price": "10.01"
-     },
-     {
-      "op": "PHASE",
-      "phase": "PRE_CLOSE"
-     },
-     {
-      "id": "B3",
-      "op": "NEW",
-      "qty": "50",
-      "side": "BUY",
-      "trader": "T1",
-      "type": "LIMIT",
-      "price": "10.00"
-     },
-     {
-      "id": "B4",
-      "op": "NEW",
-      "qty": "30",
-      "side": "BUY",
-      "trader": "T1",
-      "type": "MARKET",
-      "on_close": true
-     },
-     {
-      "id": "S3",
-      "op": "NEW",
-      "qty": "20",
-      "side": "SELL",
-      "trader": "T2",
-      "type": "LIMIT",
-      "price": "9.99",
-      "on_close": true
-     },
-     {
-      "op": "PHASE",
-      "phase": "CLOSED"
-     }
+    "quantity": 1000,
+    "limit_price": 100.2,
+    "take_fraction": "NaN",
+    "books": [
+     [
+      [
+       100.0,
+       400
+      ],
+      [
+       100.1,
+       400
+      ],
+      [
+       100.3,
+       1000
+      ]
+     ],
+     [
+      [
+       100.1,
+       600
+      ],
+      [
+       100.2,
+       600
+      ]
+     ]
     ]
    },
    "expected": {
     "status": "error",
-    "error_code": "E_SCHEMA"
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "date_and_convention",
+   "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand"
    ],
@@ -473,45 +108,69 @@
     "e1",
     "non-finite-input"
    ],
-   "description": "HR-12: NaN decimal string at events/0/price is E_SCHEMA (from ses_h-0001)"
+   "description": "F-2: NaN at take_fraction is E_DOMAIN"
   },
   {
-   "case_id": "e1_h3-0015",
-   "operation": "exec.sor.allocate",
+   "case_id": "e1_h3-0004",
+   "operation": "exec.algo.pair",
    "inputs": {
-    "S": "NaN",
-    "f": "0.3",
-    "h": "0.5",
-    "lambda_o": "1",
-    "lambda_u": "0.1",
-    "lit_samples": [
-     [
-      "10"
-     ],
-     [
-      "12"
-     ],
-     [
-      "15"
-     ]
-    ],
-    "theta": "0",
-    "venues": [
+    "leg_a": {
+     "side": "BUY",
+     "quantity": 1000,
+     "price": "NaN"
+    },
+    "leg_b": {
+     "side": "SELL",
+     "price": 25.0
+    },
+    "pair_mode": "CASH_BALANCED",
+    "n_buckets": 4,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at leg_a/price is E_DOMAIN"
+  },
+  {
+   "case_id": "e1_h3-0005",
+   "operation": "exec.algo.basket",
+   "inputs": {
+    "legs": [
      {
-      "Q": "0",
-      "as": "0",
-      "kind": "LIT",
-      "r": "0.2",
-      "asset_class": "FX"
+      "side": "BUY",
+      "quantity": 300,
+      "price": "NaN"
+     },
+     {
+      "side": "BUY",
+      "quantity": 200,
+      "price": 20.0
+     },
+     {
+      "side": "SELL",
+      "quantity": 700,
+      "price": 10.0
      }
     ],
-    "asset_class": "FX"
+    "n_buckets": 2,
+    "mode": "CONTINUOUS"
    },
    "expected": {
     "status": "error",
-    "error_code": "E_SCHEMA"
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "date_and_convention",
+   "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand"
    ],
@@ -520,89 +179,31 @@
     "e1",
     "non-finite-input"
    ],
-   "description": "HR-12: NaN decimal string at S is E_SCHEMA (from acls_h-0001)"
+   "description": "F-2: NaN at legs/0/price is E_DOMAIN"
   },
   {
-   "case_id": "e1_h3-0016",
-   "operation": "micro.eq.settle_date",
+   "case_id": "e1_h3-0006",
+   "operation": "exec.tca.pretrade",
    "inputs": {
-    "holidays": [],
-    "settle_lag": 1,
-    "trade_date": "NaN"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN at trade_date (no decimal input) is E_SCHEMA (from eqc_h-0008)"
-  },
-  {
-   "case_id": "e1_h3-0017",
-   "operation": "micro.fx.spot_date",
-   "inputs": {
-    "holidays": {},
-    "pair": "EURUSD",
-    "trade_date": "NaN"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN at trade_date (no decimal input) is E_SCHEMA (from fxc_h-0003)"
-  },
-  {
-   "case_id": "e1_h3-0018",
-   "operation": "micro.rates.parse_32nds",
-   "inputs": {
-    "text": "NaN"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN at text (no decimal input) is E_SCHEMA (from rtc_h-0001)"
-  },
-  {
-   "case_id": "e1_h3-0019",
-   "operation": "exec.sim.fut.to_ticks",
-   "inputs": {
-    "contract": {
-     "symbol": "ZN"
+    "quantity": 40000,
+    "adv": 1000000,
+    "daily_vol": "NaN",
+    "participation": 0.25,
+    "half_spread_bps": 1.5,
+    "params": {
+     "a1": 700.0,
+     "a2": 0.5,
+     "a3": 1.0,
+     "a4": 0.5,
+     "b1": 0.9
     },
-    "price": "NaN"
+    "price": 50.0
    },
    "expected": {
     "status": "error",
-    "error_code": "E_SCHEMA"
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "date_and_convention",
+   "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand"
    ],
@@ -611,51 +212,36 @@
     "e1",
     "non-finite-input"
    ],
-   "description": "HR-12: NaN at price (no decimal input) is E_SCHEMA (from fut_h-0001)"
+   "description": "F-2: NaN at daily_vol is E_DOMAIN (spec specifications/10-execution/tca-pretrade.md)"
   },
   {
-   "case_id": "e1_h3-0020",
-   "operation": "exec.sim.fut.to_text",
+   "case_id": "e1_h3-0007",
+   "operation": "exec.tca.attribution",
    "inputs": {
-    "contract": {
-     "symbol": "ZN"
-    },
-    "ticks": "NaN"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_SCHEMA"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "hand"
-   ],
-   "tags": [
-    "stage_h",
-    "e1",
-    "non-finite-input"
-   ],
-   "description": "HR-12: NaN at ticks (no decimal input) is E_SCHEMA (from fut_h-0002)"
-  },
-  {
-   "case_id": "e1_h3-0021",
-   "operation": "exec.sim.fut.variation",
-   "inputs": {
-    "contract": {
-     "symbol": "ZB"
-    },
-    "price": "NaN",
-    "qty": 1,
-    "settlements": [
-     "119-31"
+    "side": "BUY",
+    "decision_price": "NaN",
+    "arrival_mid": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 1000,
+    "fills": [
+     {
+      "quantity": 600,
+      "price": 100.2,
+      "mid": 100.15
+     },
+     {
+      "quantity": 200,
+      "price": 100.3,
+      "mid": 100.25
+     }
     ],
-    "side": "BUY"
+    "fees": 5.0
    },
    "expected": {
     "status": "error",
-    "error_code": "E_SCHEMA"
+    "error_code": "E_DOMAIN"
    },
-   "tolerance_class": "date_and_convention",
+   "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand"
    ],
@@ -664,7 +250,7 @@
     "e1",
     "non-finite-input"
    ],
-   "description": "HR-12: NaN at price (no decimal input) is E_SCHEMA (from fut_h-0006)"
+   "description": "F-2: NaN at decision_price is E_DOMAIN (spec specifications/10-execution/tca-pretrade.md)"
   }
  ]
 }

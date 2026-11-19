@@ -23,3 +23,8 @@ workspace = true
 [[bench]]
 name = "aad_ladder"
 harness = false
+
+# H-5 p50/p99 harness (specifications/10-execution/library-interfaces.md section 3).
+[[bench]]
+name = "h5_latency"
+harness = false
