@@ -68,7 +68,9 @@ def _gz(path: Path, rows: list[dict[str, Any]], closed: bool = True) -> None:
         path.write_bytes(c.compress(text) + c.flush(zlib.Z_SYNC_FLUSH))
 
 
-def make(root: Path, sessions: list[tuple[datetime, datetime, str]], open_last: bool = False) -> Path:
+def make(
+    root: Path, sessions: list[tuple[datetime, datetime, str]], open_last: bool = False
+) -> Path:
     """Recorder folders and recorder.log for `sessions` (start, end, how); how is "gap" (a gap row at end), "kill"
     (rows stop; the next session follows with no gap row, or nothing follows) or "stop" (clean STOP at end).
     open_last: the newest file of each stream has no gzip end marker (the recorder is still writing it)."""
@@ -79,11 +81,21 @@ def make(root: Path, sessions: list[tuple[datetime, datetime, str]], open_last: 
         if k == 0 or prev_how in ("kill", "stop"):
             log.append((s0 - timedelta(seconds=5), "recording ['BTC/USD', 'ETH/USD'] to X"))
         for j, sym in enumerate(SYMS):
-            log.append((s0 + timedelta(milliseconds=j), f"snapshot depth {sym.replace('-', '/')}: 100 bids, 100 asks"))
+            log.append(
+                (
+                    s0 + timedelta(milliseconds=j),
+                    f"snapshot depth {sym.replace('-', '/')}: 100 bids, 100 asks",
+                )
+            )
         if how == "gap":
-            log.append((s1 + timedelta(milliseconds=500), "reconnect after: TimeoutError: synthetic"))
+            log.append(
+                (s1 + timedelta(milliseconds=500), "reconnect after: TimeoutError: synthetic")
+            )
         elif how == "stop":
-            log += [(s1, "STOP file seen: stopping cleanly"), (s1 + timedelta(seconds=1), "files closed cleanly")]
+            log += [
+                (s1, "STOP file seen: stopping cleanly"),
+                (s1 + timedelta(seconds=1), "files closed cleanly"),
+            ]
         prev_how = how
     store: dict[tuple[str, str], list[dict[str, Any]]] = {}
 
@@ -92,11 +104,25 @@ def make(root: Path, sessions: list[tuple[datetime, datetime, str]], open_last: 
 
     for s0, s1, how in sessions:
         for j, sym in enumerate(SYMS):
-            put(sym + "-raw", s0 + timedelta(milliseconds=j),
-                {"k": "msg", "type": "snapshot", "bids": [], "asks": [], "checksum": 0, "ok": True})
+            put(
+                sym + "-raw",
+                s0 + timedelta(milliseconds=j),
+                {"k": "msg", "type": "snapshot", "bids": [], "asks": [], "checksum": 0, "ok": True},
+            )
             t = s0 + timedelta(seconds=1)
             while t < s1:
-                put(sym + "-raw", t, {"k": "msg", "type": "update", "bids": [], "asks": [], "checksum": 0, "ok": True})
+                put(
+                    sym + "-raw",
+                    t,
+                    {
+                        "k": "msg",
+                        "type": "update",
+                        "bids": [],
+                        "asks": [],
+                        "checksum": 0,
+                        "ok": True,
+                    },
+                )
                 put(sym, t, {"k": "book", "bids": [], "asks": [], "ok": True})
                 t += timedelta(minutes=30)
             if how == "gap":
@@ -108,10 +134,14 @@ def make(root: Path, sessions: list[tuple[datetime, datetime, str]], open_last: 
         _gz(f, rows, closed=not (open_last and h == newest[sub]))
         last = datetime.fromisoformat(rows[-1]["t"]).timestamp()
         if open_last and h == newest[sub]:
-            last = sessions[-1][1].timestamp()  # being written: modified at the session's last instant
+            last = sessions[-1][
+                1
+            ].timestamp()  # being written: modified at the session's last instant
         os.utime(f, (last, last))
     log.sort()
-    (root / "recorder.log").write_text("".join(f"{_stamp(t)} {m}\n" for t, m in log), encoding="utf-8")
+    (root / "recorder.log").write_text(
+        "".join(f"{_stamp(t)} {m}\n" for t, m in log), encoding="utf-8"
+    )
     return data
 
 
@@ -125,24 +155,43 @@ def _poison_raw(data: Path) -> None:
 
 
 # ---------------------------------------------------------------- build_r2.py window mode (HR-134)
-def test_four_rejected_sessions_then_a_shutdown_then_a_qualifying_one_next_day(tmp_path: Path) -> None:
+def test_four_rejected_sessions_then_a_shutdown_then_a_qualifying_one_next_day(
+    tmp_path: Path,
+) -> None:
     later = [(at(D20, 8), at(D20, 15), "gap"), (at(D20, 15, 1), at(D20, 16), "stop")]
     data = make(tmp_path, TODAY + later)
     start, end, log = build_r2.choose_window(data, AFTER)
-    assert (start, end) == (at(D20, 8), at(D20, 14))  # exactly 6 hours, not to the session's end at 15:00
+    assert (start, end) == (
+        at(D20, 8),
+        at(D20, 14),
+    )  # exactly 6 hours, not to the session's end at 15:00
     ss = log["sessions"]
-    assert len(ss) == 6 and "window" in ss[5]  # the session after the qualifying one is not examined
-    assert [s["start"][:19] for s in ss[:4]] == ["2026-11-19T11:41:24", "2026-11-19T15:02:28",
-                                                 "2026-11-19T15:30:22", "2026-11-19T17:18:41"]
+    assert (
+        len(ss) == 6 and "window" in ss[5]
+    )  # the session after the qualifying one is not examined
+    assert [s["start"][:19] for s in ss[:4]] == [
+        "2026-11-19T11:41:24",
+        "2026-11-19T15:02:28",
+        "2026-11-19T15:30:22",
+        "2026-11-19T17:18:41",
+    ]
     assert all(s["rejected"].startswith("gap row before hour 6") for s in ss[:4])
     assert ss[0]["end"].startswith("2026-11-19T15:01:58") and ss[0]["length"] == "3:20:34"
-    assert ss[4]["rejected"].startswith("restart before hour 6")  # the shutdown: no gap row, a restart next day
+    assert ss[4]["rejected"].startswith(
+        "restart before hour 6"
+    )  # the shutdown: no gap row, a restart next day
     lines: list[str] = []
     build_r2.print_sessions(log, lines.append)
-    assert len(lines) == 6 and "QUALIFIES" in lines[5] and "length 3:20:34: rejected: gap row" in lines[0]
+    assert (
+        len(lines) == 6
+        and "QUALIFIES" in lines[5]
+        and "length 3:20:34: rejected: gap row" in lines[0]
+    )
 
 
-def test_window_mode_prints_none_yet_while_no_session_qualifies(tmp_path: Path, capsys: Any) -> None:
+def test_window_mode_prints_none_yet_while_no_session_qualifies(
+    tmp_path: Path, capsys: Any
+) -> None:
     data = make(tmp_path, TODAY)
     assert build_r2.main(["window", str(data)]) == 3
     out = capsys.readouterr().out
@@ -167,13 +216,20 @@ def test_two_qualifying_sessions_the_first_is_chosen(tmp_path: Path) -> None:
     assert len(log["sessions"]) == 5
 
 
-def test_an_explicit_window_that_is_not_the_first_qualifying_one_is_refused(tmp_path: Path, capsys: Any) -> None:
-    data = make(tmp_path, [*TODAY[:4], (at(D20, 8), at(D20, 15), "gap"), (at(D20, 15, 1), at(D20, 23, 30), "gap")])
+def test_an_explicit_window_that_is_not_the_first_qualifying_one_is_refused(
+    tmp_path: Path, capsys: Any
+) -> None:
+    data = make(
+        tmp_path,
+        [*TODAY[:4], (at(D20, 8), at(D20, 15), "gap"), (at(D20, 15, 1), at(D20, 23, 30), "gap")],
+    )
     ok, msg = build_r2.explicit_window_allowed(data, at(D20, 15, 1), at(D20, 21, 1))
     assert not ok and "not the first qualifying session" in msg
     ok, _ = build_r2.explicit_window_allowed(data, at(D20, 8), at(D20, 14))
     assert ok
-    ok, _ = build_r2.explicit_window_allowed(data, at(D20, 8), at(D20, 15))  # the right start, but not 6 hours
+    ok, _ = build_r2.explicit_window_allowed(
+        data, at(D20, 8), at(D20, 15)
+    )  # the right start, but not 6 hours
     assert not ok
     out = str(tmp_path / "R2_BTC-USD")
     rc = build_r2.main([str(data), "BTC-USD", _stamp(at(D20, 15, 1)), _stamp(at(D20, 21, 1)), out])
@@ -189,10 +245,17 @@ def test_an_explicit_window_is_refused_while_none_qualifies(tmp_path: Path) -> N
 
 @pytest.mark.parametrize(
     "opts",
-    [["--min-hours", "0.5"], ["--max-hours", "8"], ["--after", "2026-11-20T00:00:00Z"], ["--until", "2026-11-20T00:00:00Z"],
-     ["--tolerant"]],
+    [
+        ["--min-hours", "0.5"],
+        ["--max-hours", "8"],
+        ["--after", "2026-11-20T00:00:00Z"],
+        ["--until", "2026-11-20T00:00:00Z"],
+        ["--tolerant"],
+    ],
 )
-def test_sample_overrides_need_the_sample_only_flag(tmp_path: Path, opts: list[str], capsys: Any) -> None:
+def test_sample_overrides_need_the_sample_only_flag(
+    tmp_path: Path, opts: list[str], capsys: Any
+) -> None:
     data = make(tmp_path, TODAY)
     assert build_r2.main(["window", str(data), *opts]) == 4
     assert "REFUSED" in capsys.readouterr().out
@@ -206,14 +269,22 @@ def test_a_sample_override_can_change_the_window_only_with_the_flag(tmp_path: Pa
     assert build_r2.main(["window", str(data), "--min-hours", "3", "--max-hours", "3"]) == 4
 
 
-def test_open_newest_file_is_not_a_gap_and_auto_waits_for_a_clean_stop(tmp_path: Path, capsys: Any) -> None:
+def test_open_newest_file_is_not_a_gap_and_auto_waits_for_a_clean_stop(
+    tmp_path: Path, capsys: Any
+) -> None:
     data = make(tmp_path, [*TODAY[:4], (at(D20, 8, 0, 5), at(D20, 14, 40), "kill")], open_last=True)
     start, end, log = build_r2.choose_window(data, AFTER)
-    assert (start, end) == (at(D20, 8, 0, 5), at(D20, 14, 0, 5))  # the window ends inside the open 14:00 file
+    assert (start, end) == (
+        at(D20, 8, 0, 5),
+        at(D20, 14, 0, 5),
+    )  # the window ends inside the open 14:00 file
     assert log["sessions"][-1]["open_files_in_window"] == ["20261120T14.jsonl.gz"] * 4
     assert not any("20261120T14" in g[2] for g in log["gaps"])
     assert build_r2.main(["window", str(data)]) == 0
-    assert "window complete at 14:00:05; stop the recorder cleanly before building" in capsys.readouterr().out
+    assert (
+        "window complete at 14:00:05; stop the recorder cleanly before building"
+        in capsys.readouterr().out
+    )
     assert build_r2.main(["auto", str(data), str(tmp_path / "out")]) == 5
     assert not (tmp_path / "out" / "R2_window.json").exists()
 
@@ -227,7 +298,9 @@ def test_open_session_shorter_than_six_hours_may_still_qualify(tmp_path: Path) -
 
 def test_a_file_cut_by_a_kill_inside_a_session_is_a_gap(tmp_path: Path) -> None:
     data = make(tmp_path, [(at(D20, 8), at(D20, 15), "gap"), (at(D20, 15, 1), at(D20, 16), "stop")])
-    f = data / "BTC-USD" / "20261120T10.jsonl.gz"  # not the newest file: no end marker means a broken file
+    f = (
+        data / "BTC-USD" / "20261120T10.jsonl.gz"
+    )  # not the newest file: no end marker means a broken file
     f.write_bytes(gzip.compress(f.read_bytes())[:-8])
     start, _, log = build_r2.choose_window(data, AFTER)
     assert start is None or start != at(D20, 8)
@@ -235,7 +308,9 @@ def test_a_file_cut_by_a_kill_inside_a_session_is_a_gap(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------- r2_status.py status (read-only)
-def _status(tmp_path: Path, data: Path, now: datetime) -> tuple[int, list[dict[str, Any]], dict[str, Any], str]:
+def _status(
+    tmp_path: Path, data: Path, now: datetime
+) -> tuple[int, list[dict[str, Any]], dict[str, Any], str]:
     lines: list[str] = []
     rc, found, verdict = r2_status.status(data, tmp_path / "recorder.log", AFTER, now, lines.append)
     return rc, found, verdict, "\n".join(lines)
@@ -247,19 +322,27 @@ def test_status_lists_sessions_without_opening_raw_files(tmp_path: Path) -> None
     _poison_raw(data)
     rc, found, verdict, text = _status(tmp_path, data, at(D20, 17))
     assert rc == 0 and verdict["window"] == (at(D20, 8), at(D20, 14))
-    assert [s["status"].split(":")[0] for s in found] == ["rejected"] * 5 + ["QUALIFIES", "not examined"]
+    assert [s["status"].split(":")[0] for s in found] == ["rejected"] * 5 + [
+        "QUALIFIES",
+        "not examined",
+    ]
     assert found[0]["end"] == at(D19, 15, 1, 58) and "gap row (" in found[0]["end_reason"]
     assert "recorder restart with no clean stop" in found[4]["end_reason"]
     assert found[4]["end"] < at(D19, 23, 30)  # estimated from the last file time before the restart
     assert "raw message files not opened" in text and "recorder files closed" in text
 
 
-def test_status_says_stop_the_recorder_when_the_window_is_complete_while_recording(tmp_path: Path) -> None:
+def test_status_says_stop_the_recorder_when_the_window_is_complete_while_recording(
+    tmp_path: Path,
+) -> None:
     data = make(tmp_path, [*TODAY[:4], (at(D20, 8), at(D20, 14, 40), "kill")], open_last=True)
     _poison_raw(data)
-    rc, found, verdict, text = _status(tmp_path, data, at(D20, 14, 41))
+    rc, _, verdict, text = _status(tmp_path, data, at(D20, 14, 41))
     assert rc == 0 and verdict["recorder_writing"]
-    assert "window complete at 14:00:00 (2026-11-20T14:00:00.000Z); stop the recorder cleanly before building" in text
+    assert (
+        "window complete at 14:00:00 (2026-11-20T14:00:00.000Z); stop the recorder cleanly before building"
+        in text
+    )
 
 
 def test_status_none_yet_while_the_open_session_is_short(tmp_path: Path) -> None:
@@ -276,14 +359,20 @@ def test_status_main_reads_the_default_log_next_to_the_data(tmp_path: Path, caps
     # The night's session has no end line and no restart yet: its files stopped at about 23:00, so it ended there.
     assert r2_status.main(["status", str(data), "--now", "2026-11-20T07:00:00Z"]) == 3
     out = capsys.readouterr().out
-    assert "present" in out and "no recorder output since 2026-11-19T23:07" in out and "window: none yet" in out
+    assert (
+        "present" in out
+        and "no recorder output since 2026-11-19T23:07" in out
+        and "window: none yet" in out
+    )
 
 
 # ---------------------------------------------------------------- r2_status.py cleanup
 def _plan(tmp_path: Path, data: Path, now: datetime) -> tuple[set[str], dict[str, str]]:
     _, found, verdict, _ = _status(tmp_path, data, now)
     delete, keep = r2_status.cleanup_plan(data, found, verdict, AFTER)
-    return {f"{f.parent.name}/{f.name}" for f, _, _ in delete}, {f"{f.parent.name}/{f.name}": w for f, _, w in keep}
+    return {f"{f.parent.name}/{f.name}" for f, _, _ in delete}, {
+        f"{f.parent.name}/{f.name}": w for f, _, w in keep
+    }
 
 
 def test_cleanup_lists_only_raw_files_of_rejected_sessions(tmp_path: Path) -> None:
@@ -293,16 +382,25 @@ def test_cleanup_lists_only_raw_files_of_rejected_sessions(tmp_path: Path) -> No
     _gz(sample, [])
     delete, keep = _plan(tmp_path, data, at(D20, 17))
     want = {f"{s}-raw/20261119T{h:02d}.jsonl.gz" for s in SYMS for h in range(11, 24)}
-    assert delete == want  # hour 15 is shared by three rejected sessions, hour 17 by three: all rejected
+    assert (
+        delete == want
+    )  # hour 15 is shared by three rejected sessions, hour 17 by three: all rejected
     assert all(not d.split("/")[0] in SYMS for d in delete)  # never a per-second folder
     assert keep["BTC-USD-raw/20261117T20.jsonl.gz"].startswith("2026-11-17 sample")
     assert "qualifying" in keep["BTC-USD-raw/20261120T14.jsonl.gz"]
-    assert "BTC-USD-raw/20261120T15.jsonl.gz" in keep  # shared by the qualifying session and the one after it
+    assert (
+        "BTC-USD-raw/20261120T15.jsonl.gz" in keep
+    )  # shared by the qualifying session and the one after it
 
 
-def test_cleanup_keeps_a_file_shared_by_a_rejected_session_and_the_qualifying_one(tmp_path: Path) -> None:
-    sessions = [(at(D20, 7, 30), at(D20, 8, 10), "gap"), (at(D20, 8, 20), at(D20, 15), "gap"),
-                (at(D20, 15, 1), at(D20, 16), "stop")]
+def test_cleanup_keeps_a_file_shared_by_a_rejected_session_and_the_qualifying_one(
+    tmp_path: Path,
+) -> None:
+    sessions = [
+        (at(D20, 7, 30), at(D20, 8, 10), "gap"),
+        (at(D20, 8, 20), at(D20, 15), "gap"),
+        (at(D20, 15, 1), at(D20, 16), "stop"),
+    ]
     data = make(tmp_path, sessions)
     delete, keep = _plan(tmp_path, data, at(D20, 17))
     assert delete == {f"{s}-raw/20261120T07.jsonl.gz" for s in SYMS}
@@ -317,15 +415,25 @@ def test_cleanup_margin_keeps_the_hour_just_before_the_qualifying_session(tmp_pa
 
 
 def test_cleanup_never_touches_a_session_that_could_still_qualify(tmp_path: Path) -> None:
-    sessions = [*TODAY[:4], (at(D20, 8), at(D20, 9, 40), "gap"), (at(D20, 9, 50), at(D20, 12, 40), "kill")]
+    sessions = [
+        *TODAY[:4],
+        (at(D20, 8), at(D20, 9, 40), "gap"),
+        (at(D20, 9, 50), at(D20, 12, 40), "kill"),
+    ]
     data = make(tmp_path, sessions, open_last=True)
     delete, keep = _plan(tmp_path, data, at(D20, 12, 41))
-    assert "BTC-USD-raw/20261120T09.jsonl.gz" in keep  # rejected 08:00 session shares hour 9 with the open one
+    assert (
+        "BTC-USD-raw/20261120T09.jsonl.gz" in keep
+    )  # rejected 08:00 session shares hour 9 with the open one
     assert "BTC-USD-raw/20261120T08.jsonl.gz" in delete
-    assert all(not d.startswith(("BTC-USD-raw/20261120T1", "ETH-USD-raw/20261120T1")) for d in delete)
+    assert all(
+        not d.startswith(("BTC-USD-raw/20261120T1", "ETH-USD-raw/20261120T1")) for d in delete
+    )
 
 
-def test_cleanup_dry_run_deletes_nothing_and_delete_flag_deletes_exactly_the_list(tmp_path: Path, capsys: Any) -> None:
+def test_cleanup_dry_run_deletes_nothing_and_delete_flag_deletes_exactly_the_list(
+    tmp_path: Path, capsys: Any
+) -> None:
     later = [(at(D20, 8), at(D20, 15), "gap"), (at(D20, 15, 1), at(D20, 16), "stop")]
     data = make(tmp_path, TODAY + later)
     before = sorted(p.relative_to(data).as_posix() for p in data.rglob("*.jsonl.gz"))

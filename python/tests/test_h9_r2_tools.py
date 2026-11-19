@@ -251,7 +251,15 @@ def test_auto_writes_both_symbols_and_the_hash_files(tmp_path: Path) -> None:
     assert len((out / "R2_inputs.sha256").read_text().splitlines()) == 4
     assert (
         build_r2.main(
-            ["window", str(data), "--after", _stamp(T0 - timedelta(seconds=20)), "--min-hours", "5", "--sample-only"]
+            [
+                "window",
+                str(data),
+                "--after",
+                _stamp(T0 - timedelta(seconds=20)),
+                "--min-hours",
+                "5",
+                "--sample-only",
+            ]
         )
         == 3
     )
