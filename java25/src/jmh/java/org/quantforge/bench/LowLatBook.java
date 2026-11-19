@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.TreeMap;
 import org.quantforge.core.Rng;
 import org.quantforge.micro.FastBook;
+import org.quantforge.micro.FastBookFormA;
 
 /**
  * H-9 harness, Java ({@code specifications/09-microstructure/low-latency-book.md}; targets L3 and L5 in
@@ -26,6 +27,14 @@ import org.quantforge.micro.FastBook;
  * harness reads the thread's allocated bytes ({@code com.sun.management.ThreadMXBean}) before and after the measured
  * region and reports them, and reports the GC count over the region.
  *
+ * <p>Workload R2 and row L7 (2026-11-19, low-latency-book.md items 2a and 2b; targets (g) and (h)):
+ * {@code QF_H9_CHECKPOINTS} names the checkpoint file of {@code benchmarks/h9/build_r2.py} and adds the form A pass
+ * ({@link FastBookFormA}: venue checksum after every book message, every per-second row over its millisecond range),
+ * outside the timed region. {@code QF_H9_PER_LEVEL=1} adds the L7 sample (apply time / levels, rounded up) after the
+ * clock read; the flag is a static final, so the JIT removes the branch when it is off. Every run records the system
+ * load average at its start and end ({@code getSystemLoadAverage}, -1 where the OS has none, as on Windows) and the
+ * system CPU load ({@code getCpuLoad}, 0 to 1).
+ *
  * <pre>
  * java -cp target/classes -Xlog:gc:file=gc.log -XX:StartFlightRecording=filename=h9.jfr,settings=profile \
  *   org.quantforge.bench.LowLatBook S.bin 5 java_S.json
@@ -36,6 +45,7 @@ public final class LowLatBook {
     // QF_H9_WARMUP overrides the warm-up count (workload R, 2026-11-19, warms up on its first hour).
     static final int WARMUP = System.getenv("QF_H9_WARMUP") != null ? Integer.parseInt(System.getenv("QF_H9_WARMUP")) : 1_000_000;
     static final long SEED = 20261117L;
+    static final boolean PER_LEVEL = "1".equals(System.getenv("QF_H9_PER_LEVEL"));
     static final String[] KINDS = {"snapshot", "add", "modify", "delete", "trade", "sweep", "refill", "truncated_price"};
     static final String[] QUERIES = {"best_bid", "best_ask", "qty_at_present", "qty_at_absent", "top10", "top100"};
 
@@ -240,7 +250,18 @@ public final class LowLatBook {
         return acc;
     }
 
+    static double loadAverage() {
+        return ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
+    }
+
+    static double cpuLoad() {
+        return ((com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getCpuLoad();
+    }
+
     static String timedRun(FastBook.Stream s, long qseed) {
+        double load0 = loadAverage();
+        double cpu0 = cpuLoad();
+        Hist perLevel = new Hist();
         Hist all = new Hist();
         Hist[] kinds = new Hist[KINDS.length];
         for (int k = 0; k < kinds.length; k++) {
@@ -276,6 +297,12 @@ public final class LowLatBook {
             long dt = System.nanoTime() - t0;
             all.record(dt);
             kinds[s.kind[i]].record(dt);
+            if (PER_LEVEL) { // L7: after the clock read, so the timed region is the same
+                int nl = s.nBids[i] + s.nAsks[i];
+                if (s.type[i] == FastBook.UPDATE && nl != 0) {
+                    perLevel.record(FastBookFormA.perLevelNs(dt, nl));
+                }
+            }
             if ((i - WARMUP) % 1000 == 999) {
                 long a = System.nanoTime();
                 sink = b.bestBidPx();
@@ -342,6 +369,8 @@ public final class LowLatBook {
             batch.record((System.nanoTime() - t0 + 500) / 1000);
         }
         long batchBytes = allocatedBytes() - cb0;
+        double load1 = loadAverage();
+        double cpu1 = cpuLoad();
         System.err.printf("run: p50 %d p99 %d p99.9 %d ns, allocated bytes %d, gc %d%n", all.pct(50), all.pct(99), all.pct(99.9),
                 bytes, gcs);
         StringBuilder o = new StringBuilder("{\"all\":").append(all.json()).append(",\"kinds\":{");
@@ -359,6 +388,9 @@ public final class LowLatBook {
         return o.append("},\"batch_per_message\":").append(batch.json()).append(",\"allocated_bytes_measured\":").append(bytes)
                 .append(",\"allocated_bytes_batch\":").append(batchBytes).append(",\"gc_count_measured\":").append(gcs)
                 .append(",\"buffer_grows\":").append(b.grows()).append(",\"qty_at_index_fallbacks\":").append(fallbacks)
+                .append(PER_LEVEL ? ",\"per_level\":" + perLevel.json() : "")
+                .append(",\"loadavg_1m_start\":").append(load0).append(",\"loadavg_1m_end\":").append(load1)
+                .append(",\"cpu_load_start\":").append(cpu0).append(",\"cpu_load_end\":").append(cpu1)
                 .append('}').toString();
     }
 
@@ -369,7 +401,16 @@ public final class LowLatBook {
         }
         FastBook.Stream s = read(Path.of(args[0]));
         int runs = args.length >= 2 ? Integer.parseInt(args[1]) : 5;
-        long bad = verify(s);
+        long mapBad = verify(s);
+        long bad = mapBad;
+        String formA = "";
+        if (System.getenv("QF_H9_CHECKPOINTS") != null) {
+            FastBookFormA.Counts c = FastBookFormA.verify(s, FastBookFormA.read(Path.of(System.getenv("QF_H9_CHECKPOINTS"))), DEPTH);
+            System.err.println("form A: " + c.json());
+            formA = ",\"form_a\":" + c.json();
+            // A checksum or top-10 failure fails the run; below-10 failures are published and judged by the runner.
+            bad += c.checksumFailed + c.failedTop10 + (c.checksumChecked == 0 ? 1 : 0);
+        }
         Hist clock = new Hist();
         for (int i = 0; i < 1_000_000; i++) {
             long a = System.nanoTime();
@@ -384,7 +425,10 @@ public final class LowLatBook {
                 + "\"alloc_method\":\"ThreadMXBean allocated bytes + GC count; JFR and -Xlog:gc alongside\","
                 + "\"jvm\":\"" + System.getProperty("java.vm.name") + " " + System.getProperty("java.vm.version") + "\","
                 + "\"jvm_args\":\"" + String.join(" ", ManagementFactory.getRuntimeMXBean().getInputArguments()).replace("\\", "/").replace("\"", "'") + "\","
-                + "\"correctness_mismatches\":" + bad + ",\"clock_overhead\":" + clock.json() + ",\"runs\":[" + String.join(",", rs) + "]}\n";
+                + "\"correctness_mismatches\":" + mapBad + formA + ",\"per_level_sampling\":" + PER_LEVEL
+                + ",\"available_processors\":" + Runtime.getRuntime().availableProcessors()
+                + ",\"os\":\"" + System.getProperty("os.name") + " " + System.getProperty("os.version") + "\""
+                + ",\"clock_overhead\":" + clock.json() + ",\"runs\":[" + String.join(",", rs) + "]}\n";
         if (args.length >= 3) {
             Files.writeString(Path.of(args[2]), out);
         } else {
