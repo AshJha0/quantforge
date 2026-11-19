@@ -7,9 +7,10 @@
 //! `03-calibration/recalibration-triggers.md`, `06-risk/intraday-risk-bounds.md`,
 //! `06-risk/bermudan-ladder-k8.md` (`num.richardson.check`).
 //!
-//! Error order (HR-66): structural `E_INPUT` (lengths, empty lists, log order), then `E_DOMAIN`
-//! (the F-2 finite rule first, then single values), then value-dependent `E_INPUT` (the stale
-//! cache), then `E_LIMIT` (the stage K sizes, checked last).
+//! Error order (HR-122, ruling KR-230): `E_LIMIT` for the input sizes (the command-line gate; here
+//! the first check of each function, so a library call keeps the command-line order), the F-2
+//! finite rule, structural `E_INPUT` (lengths, empty lists, log order), `E_DOMAIN`, then the
+//! stale-cache `E_INPUT` of the incremental update.
 // `!(x > 0.0)` style rules are written as the spec states them; NaN is refused first.
 #![allow(clippy::neg_cmp_op_on_partial_ord)]
 
@@ -20,7 +21,9 @@ use crate::stats::normal_cdf;
 
 /// KR-10: the label on intraday outputs computed on simulated data.
 pub const LABEL: &str = "latency-aware analytics on simulated data";
-pub const MAX_RECORDS: usize = 1_000_000;
+/// The generic array cap of `limits.md` (KR-231 supersedes 1,000,000).
+pub const MAX_RECORDS: usize = 100_000;
+/// The `limits.md` row of the stage K quote lists (KR-231).
 pub const MAX_QUOTES: usize = 200;
 pub const MAX_CHANGES: usize = 100_000;
 pub const MAX_POSITIONS: usize = 100_000;
@@ -127,13 +130,13 @@ fn query_within<'a>(
     valid_at: i64,
     max: usize,
 ) -> Result<(BiStatus, Option<&'a BiRecord>)> {
-    check_log(records)?;
-    if records.iter().any(|r| r.value.has_non_finite()) {
-        return Err(domain("a record value is NaN or infinite", "records"));
-    }
     if records.len() > max {
         return Err(limit("records", max));
     }
+    if records.iter().any(|r| r.value.has_non_finite()) {
+        return Err(domain("a record value is NaN or infinite", "records"));
+    }
+    check_log(records)?;
     let mut best: Option<&BiRecord> = None;
     for r in records {
         if r.series_id == series_id
@@ -179,14 +182,14 @@ fn check_quotes(quotes: &[f64], field: &str) -> Result<()> {
 
 /// `curve.bootstrap.par_annual`: discount factors of annual par swaps with accrual 1.
 pub fn par_annual(quotes: &[f64]) -> Result<Vec<f64>> {
-    if quotes.is_empty() {
-        return Err(input("quotes must hold at least one quote", "quotes"));
-    }
-    finite("quotes", quotes.iter().copied())?;
-    check_quotes(quotes, "quotes")?;
     if quotes.len() > MAX_QUOTES {
         return Err(limit("quotes", MAX_QUOTES));
     }
+    finite("quotes", quotes.iter().copied())?;
+    if quotes.is_empty() {
+        return Err(input("quotes must hold at least one quote", "quotes"));
+    }
+    check_quotes(quotes, "quotes")?;
     Ok(bootstrap_from(quotes, &[]))
 }
 
@@ -206,6 +209,18 @@ pub fn incremental_update(
     previous_dfs: &[f64],
     new_quotes: &[f64],
 ) -> Result<Update> {
+    for (field, xs) in [
+        ("previous_quotes", previous_quotes),
+        ("previous_discount_factors", previous_dfs),
+        ("new_quotes", new_quotes),
+    ] {
+        if xs.len() > MAX_QUOTES {
+            return Err(limit(field, MAX_QUOTES));
+        }
+    }
+    finite("previous_quotes", previous_quotes.iter().copied())?;
+    finite("previous_discount_factors", previous_dfs.iter().copied())?;
+    finite("new_quotes", new_quotes.iter().copied())?;
     let n = previous_quotes.len();
     if n < 1 || previous_dfs.len() != n || new_quotes.len() != n {
         return Err(input(
@@ -213,9 +228,6 @@ pub fn incremental_update(
             "new_quotes",
         ));
     }
-    finite("previous_quotes", previous_quotes.iter().copied())?;
-    finite("previous_discount_factors", previous_dfs.iter().copied())?;
-    finite("new_quotes", new_quotes.iter().copied())?;
     check_quotes(previous_quotes, "previous_quotes")?;
     check_quotes(new_quotes, "new_quotes")?;
     let fresh = bootstrap_from(previous_quotes, &[]);
@@ -228,9 +240,6 @@ pub fn incremental_update(
             "previous_discount_factors is not the bootstrap of previous_quotes",
             "previous_discount_factors",
         ));
-    }
-    if n > MAX_QUOTES {
-        return Err(limit("new_quotes", MAX_QUOTES));
     }
     let Some(j) = previous_quotes
         .iter()
@@ -258,7 +267,10 @@ pub struct Trigger {
     pub fire: bool,
     pub sigma: f64,
     pub threshold: f64,
+    /// KR-232: `P(|T_(n-1)| > k)`, the rate on noise with sigma estimated from the window.
     pub false_alarm_rate: f64,
+    /// KR-232: the known-sigma rate `2 Phi(-k)` of KR-6.
+    pub nominal_rate: f64,
 }
 
 /// Sample standard deviation (divisor n - 1) with exactly rounded sums for the mean and the
@@ -288,17 +300,20 @@ fn trigger_within(
     k: f64,
     max: usize,
 ) -> Result<Trigger> {
-    if changes.len() < 2 {
-        return Err(input(
-            "changes must hold at least two one-day changes",
-            "changes",
-        ));
+    if changes.len() > max {
+        return Err(limit("changes", max));
     }
     finite("changes", changes.iter().copied())?;
     finite(
         "x_ref, x_now, days_since and k",
         [x_ref, x_now, days_since, k],
     )?;
+    if changes.len() < 2 {
+        return Err(input(
+            "changes must hold at least two one-day changes",
+            "changes",
+        ));
+    }
     if !(k > 0.0) {
         return Err(domain("k must be above 0", "k"));
     }
@@ -306,24 +321,106 @@ fn trigger_within(
         return Err(domain("days_since must be at least 1", "days_since"));
     }
     let sigma = sample_sd(changes);
-    if sigma == 0.0 {
+    let top = changes.iter().fold(0.0f64, |m, c| m.max(c.abs()));
+    if sigma <= NOISE_FLOOR * top {
         return Err(domain(
-            "the changes have zero standard deviation: no noise scale",
+            "the changes have no noise scale (sigma at or below 2^-26 max|c|)",
             "changes",
         ));
-    }
-    if changes.len() > max {
-        return Err(limit("changes", max));
     }
     let threshold = k * sigma * days_since.sqrt();
     Ok(Trigger {
         fire: (x_now - x_ref).abs() > threshold,
         sigma,
         threshold,
+        false_alarm_rate: student_t_two_sided_tail(changes.len() as i64 - 1, k),
         // 2 (1 - Phi(k)) of KR-6, as 2 Phi(-k): the normal CDF forms the Gaussian factor from k itself,
         // so it keeps full precision in the far tail (a bare erfc(k / sqrt 2) loses 1.2e-13 at k = 30).
-        false_alarm_rate: 2.0 * normal_cdf(-k),
+        nominal_rate: 2.0 * normal_cdf(-k),
     })
+}
+
+/// KR-233: sigma at or below `2^-26 max|c_i|` is no noise scale.
+pub const NOISE_FLOOR: f64 = 1.4901161193847656e-8; // 2^-26
+
+const TWO_OVER_PI: f64 = 0.6366197723675814;
+const T_UP: f64 = 3.273390607896142e150; // 2^500
+const T_DOWN: f64 = 3.054936363499605e-151; // 2^-500
+const T_STOP: f64 = 8.673617379884035e-19; // 2^-60
+
+fn t_step(t: f64, j: i64, c2: f64, odd: bool) -> f64 {
+    if odd {
+        (t * ((2 * j + 2) as f64 * c2)) / (2 * j + 3) as f64
+    } else {
+        (t * ((2 * j + 1) as f64 * c2)) / (2 * j + 2) as f64
+    }
+}
+
+/// `P(|T_nu| > k)` for an integer `nu >= 1` and `k > 0`, by the stated algorithm of KR-232: the
+/// closed-form finite sum of the t distribution where the tail is at least 1/8, else its remainder
+/// series (positive terms, no cancellation). Only `+ - * /`, `sqrt` and one `atan2` (odd `nu`), so
+/// the four builds agree to the last bit except through `atan2`. A port of Python's
+/// `stage_k.student_t_two_sided_tail`.
+pub fn student_t_two_sided_tail(nu: i64, k: f64) -> f64 {
+    let rn = (nu as f64).sqrt();
+    let (s, c, c2);
+    if k <= rn {
+        let den = nu as f64 + k * k;
+        c2 = nu as f64 / den;
+        let root = den.sqrt();
+        s = k / root;
+        c = rn / root;
+    } else {
+        let r = rn / k;
+        let w = (1.0 + r * r).sqrt();
+        s = 1.0 / w;
+        c = r / w;
+        c2 = c * c;
+    }
+    let odd = nu % 2 == 1;
+    let m = if odd { (nu - 1) / 2 } else { nu / 2 };
+    let (mut t, mut total, mut e) = (1.0f64, 0.0f64, 0u32);
+    for j in 0..m {
+        if e == 0 {
+            total += t;
+        }
+        t = t_step(t, j, c2, odd);
+        if 0.0 < t && t < T_DOWN {
+            t *= T_UP;
+            e += 1;
+        }
+    }
+    let a = if odd {
+        TWO_OVER_PI * (c.atan2(s) - s * c * total)
+    } else {
+        1.0 - s * total
+    };
+    if a >= 0.125 {
+        return a;
+    }
+    let (mut rem, mut j) = (0.0f64, m);
+    loop {
+        rem += t;
+        t = t_step(t, j, c2, odd);
+        j += 1;
+        if t <= rem * T_STOP {
+            break;
+        }
+        if t < T_DOWN {
+            t *= T_UP;
+            rem *= T_UP;
+            e += 1;
+        }
+    }
+    let mut out = if odd {
+        TWO_OVER_PI * s * c * rem
+    } else {
+        s * rem
+    };
+    for _ in 0..e {
+        out *= T_DOWN;
+    }
+    out
 }
 
 // --- intraday delta-gamma with a Lagrange bound (KR-7, KR-10, KR-12) -------------------------------
@@ -336,14 +433,30 @@ pub struct ZeroPosition {
     pub yield_: f64,
 }
 
-/// `|h|^3 M3 / 6` with `M3 = T^3 |N| exp(-T min(y, y + h))`.
+/// The Lagrange bound `|h|^3 M3 / 6` with `M3 = T^3 |N| exp(-T min(y, y + h))` (KR-15), in the
+/// order of KR-234.
 pub fn position_bound(p: &ZeroPosition, shift: f64) -> f64 {
-    let t = p.maturity;
-    let m3 = t.powf(3.0) * p.notional.abs() * (-t * p.yield_.min(p.yield_ + shift)).exp();
-    shift.abs().powf(3.0) * m3 / 6.0
+    let (t, ah) = (p.maturity, shift.abs());
+    let e = (-t * p.yield_.min(p.yield_ + shift)).exp();
+    ah * ah * ah * (t * t * t * p.notional.abs() * e) / 6.0
 }
 
-/// `V' h + V'' h^2 / 2` with `V = N exp(-y T)`.
+/// KR-234: `16 u`.
+pub const ROUNDING_FACTOR: f64 = 1.7763568394002505e-15; // 2^-49
+
+/// The rounding allowance `rho` of KR-234: covers the binary64 error of the estimate, of the
+/// computed Lagrange bound and of the binary64 revaluation of the position.
+pub fn position_rounding(p: &ZeroPosition, shift: f64) -> f64 {
+    let (t, ah) = (p.maturity, shift.abs());
+    let v = p.notional * (-p.yield_ * t).exp();
+    let g = (-shift * t).exp_m1().abs();
+    let scale = 1.0 + t * p.yield_.abs() + t * ah;
+    ROUNDING_FACTOR
+        * scale
+        * (v.abs() * (t * ah + t * t * (shift * shift) + g) + position_bound(p, shift))
+}
+
+/// `V' h + V'' h^2 / 2` with `V = N exp(-y T)`, as `v * (-T h + T T h h / 2)` (KR-234).
 pub fn position_estimate(p: &ZeroPosition, shift: f64) -> f64 {
     let t = p.maturity;
     let v = p.notional * (-p.yield_ * t).exp();
@@ -357,15 +470,17 @@ pub struct Intraday {
     pub bound: f64,
 }
 
-/// `risk.intraday.delta_gamma_bound`: the delta-gamma P&L of a parallel yield move and the sum of
-/// the per-position remainder bounds (no netting: their signs are unknown in general).
+/// `risk.intraday.delta_gamma_bound`: the delta-gamma P&L of a parallel yield move and a bound on
+/// its distance from the full revaluation: the per-position Lagrange bounds (no netting: their
+/// signs are unknown in general) plus the binary64 rounding allowance (KR-234), one exactly
+/// rounded sum.
 pub fn delta_gamma_bound(positions: &[ZeroPosition], shift: f64) -> Result<Intraday> {
     intraday_within(positions, shift, MAX_POSITIONS)
 }
 
 fn intraday_within(positions: &[ZeroPosition], shift: f64, max: usize) -> Result<Intraday> {
-    if positions.is_empty() {
-        return Err(input("positions must not be empty", "positions"));
+    if positions.len() > max {
+        return Err(limit("positions", max));
     }
     finite(
         "positions",
@@ -374,18 +489,23 @@ fn intraday_within(positions: &[ZeroPosition], shift: f64, max: usize) -> Result
             .flat_map(|p| [p.notional, p.maturity, p.yield_]),
     )?;
     finite("shift", [shift])?;
+    if positions.is_empty() {
+        return Err(input("positions must not be empty", "positions"));
+    }
     if positions.iter().any(|p| !(p.maturity > 0.0)) {
         return Err(domain(
             "every maturity must be above 0",
             "positions.maturity",
         ));
     }
-    if positions.len() > max {
-        return Err(limit("positions", max));
-    }
     Ok(Intraday {
         estimate_pnl: fsum(positions.iter().map(|p| position_estimate(p, shift))),
-        bound: fsum(positions.iter().map(|p| position_bound(p, shift))),
+        bound: fsum(
+            positions
+                .iter()
+                .map(|p| position_bound(p, shift))
+                .chain(positions.iter().map(|p| position_rounding(p, shift))),
+        ),
     })
 }
 
@@ -411,16 +531,16 @@ pub struct Richardson {
 /// `num.richardson.check`: extrapolates only when the differences keep one sign and the observed
 /// order is within 0.5 of the assumed order.
 pub fn richardson_check(values: &[f64], ratio: f64, assumed_order: f64) -> Result<Richardson> {
+    finite(
+        "values, ratio and assumed_order",
+        values.iter().copied().chain([ratio, assumed_order]),
+    )?;
     let &[f1, f2, f3] = values else {
         return Err(input(
             "values must hold exactly three grid values",
             "values",
         ));
     };
-    finite(
-        "values, ratio and assumed_order",
-        [f1, f2, f3, ratio, assumed_order],
-    )?;
     if !(ratio > 1.0) {
         return Err(domain("ratio must be above 1", "ratio"));
     }

@@ -648,3 +648,52 @@ proptest! {
         prop_assert_eq!(fb::zone(n, x, 0).expect("ok").zone, want);
     }
 }
+
+/// KA-A3 (ruling KR-236, CRE52.47): two equity variance swaps on two single names, long and short,
+/// labelled "V1" and "V2", form one hedging set: SF = 32% x 5 = 1.6, a = +-160, rho = 0.5,
+/// sqrt((0.5 x 160 - 0.5 x 160)^2 + 0.75 x (160^2 + 160^2)) = sqrt(38,400). A volatility trade needs
+/// no hedging_set; two subclasses of one entity are judged within that one set.
+#[test]
+fn kr236_equity_volatility_trades_form_one_hedging_set() {
+    let vol = |id: &str, pos: &str, label: Option<&str>, ent: &str| Trade {
+        treatment: "VOLATILITY".to_string(),
+        hedging_set: label.map(str::to_string),
+        ..named(id, "EQUITY", 100.0, 0.0, 1.0, pos, ent, "SINGLE")
+    };
+    let r = ead(&[
+        vol("v1", "LONG", Some("V1"), "X"),
+        vol("v2", "SHORT", Some("V2"), "Y"),
+    ]);
+    assert!((r.addon[3] / 38_400f64.sqrt() - 1.0).abs() <= 1e-15);
+    let sets: Vec<(&str, &str)> = r
+        .hedging_sets
+        .iter()
+        .map(|h| (h.treatment, h.key.as_str()))
+        .collect();
+    assert_eq!(sets, [("VOLATILITY", "")]);
+    let unlabelled = ead(&[vol("v1", "LONG", None, "X"), vol("v2", "SHORT", None, "Y")]);
+    assert_eq!(unlabelled.addon, r.addon);
+    let two_subclasses = [
+        vol("v1", "LONG", Some("V1"), "X"),
+        Trade {
+            subclass: Some("INDEX".to_string()),
+            ..vol("v2", "SHORT", Some("V2"), "X")
+        },
+    ];
+    let e = saccr::ead(&two_subclasses, 0.0, None, true).expect_err("two subclasses");
+    assert_eq!((e.code, e.field.as_deref()), ("E_INPUT", Some("subclass")));
+}
+
+/// KA-A16 (ruling KR-237): n = 100,000, x = 1,050, p = 0.01; the Python reference value of the
+/// partial-sum algorithm, which is within 1e-12 relative of the exact rational CDF at p = 1/100.
+#[test]
+fn kr237_binomial_cdf_at_n_100000() {
+    let got = fb::binomial_cdf(100_000, 1_050, 0.01);
+    assert!((got / 0.9448722135510401 - 1.0).abs() <= 1e-13, "{got}");
+    let z = fb::zone(100_000, 1_050, 1_000).expect("ok");
+    assert_eq!((z.amber_from, z.red_from, z.zone), (1052, 1119, "GREEN"));
+    assert_eq!(z.cumulative_probability, got);
+    let z = fb::zone(250, 4, 3).expect("ok");
+    assert!((z.cumulative_probability / 0.8921876269036252 - 1.0).abs() <= 1e-15);
+    assert_eq!((z.amber_from, z.red_from), (5, 10));
+}

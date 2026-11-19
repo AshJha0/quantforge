@@ -49,51 +49,68 @@ pub fn tables() -> &'static Tables {
     })
 }
 
-/// Compensated running sum of binomial terms in log space, with a running log binomial
-/// coefficient, as `var::traffic_light` builds its terms.
-struct Terms {
-    n: i64,
-    lp: f64,
-    lq: f64,
-    ln_choose: f64,
-    sum: f64,
-    comp: f64,
-    k: i64,
-}
+/// KR-237: the binary64 literal nearest 1/100 (not `1 - coverage`, which is 0.010000000000000009).
+pub const P_99: f64 = 0.01;
+pub const P_975: f64 = 0.025;
+const UP: f64 = 4.149515568880993e180; // 2^600
+const DOWN: f64 = 2.409919865102884e-181; // 2^-600
 
-impl Terms {
-    fn new(n: i64, p: f64) -> Terms {
-        Terms {
-            n,
-            lp: p.ln(),
-            lq: (-p).ln_1p(),
-            ln_choose: 0.0,
-            sum: 0.0,
-            comp: 0.0,
-            k: -1,
-        }
-    }
-
-    /// Adds the next term and returns the partial sum `P(X <= k)`.
-    fn next_sum(&mut self) -> f64 {
-        self.k += 1;
-        let k = self.k;
-        if k > 0 {
-            self.ln_choose += ((self.n - k + 1) as f64).ln() - (k as f64).ln();
-        }
-        let term = (self.ln_choose + k as f64 * self.lp + (self.n - k) as f64 * self.lq).exp();
-        let t = self.sum + term;
-        self.comp += if self.sum.abs() >= term.abs() {
-            (self.sum - t) + term
+/// KR-237: compensated partial sums of the unnormalised weights `w_0 = 1`,
+/// `w_(k+1) = w_k ((n - k) p) / ((k + 1) q)`, each with its scale count (a weight above 2^600
+/// rescales the weight and the sum by 2^-600). Stops at `n`, or past the mode once the ratio is at
+/// most 1/2 and the weight at most 2^-64 of the sum. Only `+ - * /`, so every build gives the same
+/// bits. A port of `frtb_backtest.binomial_partial_sums`.
+pub fn binomial_partial_sums(n: i64, p: f64) -> Vec<(f64, i64)> {
+    let q = 1.0 - p;
+    let mode = ((n + 1) as f64 * p).floor();
+    let (mut w, mut s, mut c, mut e) = (1.0f64, 0.0f64, 0.0f64, 0i64);
+    let mut out = Vec::new();
+    let mut k: i64 = 0;
+    loop {
+        let t = s + w;
+        c += if s.abs() >= w.abs() {
+            (s - t) + w
         } else {
-            (term - t) + self.sum
+            (w - t) + s
         };
-        self.sum = t;
-        self.sum + self.comp
+        s = t;
+        out.push((s + c, e));
+        if k == n {
+            return out;
+        }
+        let r = ((n - k) as f64 * p) / ((k + 1) as f64 * q);
+        w *= r;
+        k += 1;
+        if k as f64 > mode && r <= 0.5 && w <= (s + c) * 5.421010862427522e-20 {
+            return out;
+        }
+        if w > UP {
+            w *= DOWN;
+            s *= DOWN;
+            c *= DOWN;
+            e += 1;
+        }
     }
 }
 
-/// `P(X <= x)` for `X ~ Binomial(n, p)`, `0 < p < 1`.
+/// `P(X <= x)` from the partial sums of [`binomial_partial_sums`].
+pub fn cdf_from(sums: &[(f64, i64)], n: i64, x: i64) -> f64 {
+    if x < 0 {
+        return 0.0;
+    }
+    if x >= n || x >= sums.len() as i64 - 1 {
+        return 1.0;
+    }
+    let (sx, ex) = sums[x as usize];
+    let (st, et) = sums[sums.len() - 1];
+    let mut v = sx / st;
+    for _ in 0..(et - ex) {
+        v *= DOWN;
+    }
+    v.min(1.0)
+}
+
+/// `P(X <= x)` for `X ~ Binomial(n, p)`, `0 < p < 1` (KR-237).
 pub fn binomial_cdf(n: i64, x: i64, p: f64) -> f64 {
     if x < 0 {
         return 0.0;
@@ -101,23 +118,18 @@ pub fn binomial_cdf(n: i64, x: i64, p: f64) -> f64 {
     if x >= n {
         return 1.0;
     }
-    let mut t = Terms::new(n, p);
-    let mut s = 0.0;
-    for _ in 0..=x {
-        s = t.next_sum();
-    }
-    s.min(1.0)
+    cdf_from(&binomial_partial_sums(n, p), n, x)
 }
 
-/// The smallest `k` in `0..=n` with `P(X <= k) >= level`.
+fn first_from(sums: &[(f64, i64)], n: i64, level: f64) -> i64 {
+    (0..=n)
+        .find(|&k| cdf_from(sums, n, k) >= level)
+        .unwrap_or(n)
+}
+
+/// The smallest `k` in `0..=n` with `P(X <= k) >= level` (exists: `P(X <= n) = 1`).
 pub fn first_at_least(n: i64, p: f64, level: f64) -> i64 {
-    let mut t = Terms::new(n, p);
-    for k in 0..n {
-        if t.next_sum() >= level {
-            return k;
-        }
-    }
-    n
+    first_from(&binomial_partial_sums(n, p), n, level)
 }
 
 fn coded(code: &'static str, field: &str, message: String) -> QfError {
@@ -175,9 +187,9 @@ pub fn zone(observations_n: i64, actual: i64, hypothetical: i64) -> Result<Zone>
     count(observations_n, hypothetical, "exceptions_hypothetical")?;
     let t = tables();
     let x = actual.max(hypothetical);
-    let p = 1.0 - t.coverage;
-    let amber = first_at_least(observations_n, p, t.amber_from);
-    let red = first_at_least(observations_n, p, t.red_from);
+    let sums = binomial_partial_sums(observations_n, P_99);
+    let amber = first_from(&sums, observations_n, t.amber_from);
+    let red = first_from(&sums, observations_n, t.red_from);
     let name = if x >= red {
         "RED"
     } else if x >= amber {
@@ -193,7 +205,7 @@ pub fn zone(observations_n: i64, actual: i64, hypothetical: i64) -> Result<Zone>
     });
     Ok(Zone {
         exceptions: x,
-        cumulative_probability: binomial_cdf(observations_n, x, p),
+        cumulative_probability: cdf_from(&sums, observations_n, x),
         zone: name,
         amber_from: amber,
         red_from: red,
@@ -232,8 +244,8 @@ pub fn desk(observations_n: i64, counts: [i64; 4]) -> Result<Desk> {
     Ok(Desk {
         exceptions_99: x99,
         exceptions_975: x975,
-        cumulative_probability_99: binomial_cdf(observations_n, x99, 0.01),
-        cumulative_probability_975: binomial_cdf(observations_n, x975, 0.025),
+        cumulative_probability_99: binomial_cdf(observations_n, x99, P_99),
+        cumulative_probability_975: binomial_cdf(observations_n, x975, P_975),
         breach_99: b99,
         breach_975: b975,
         eligible: !(b99 || b975),
