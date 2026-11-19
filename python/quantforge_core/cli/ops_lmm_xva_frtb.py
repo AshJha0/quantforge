@@ -148,9 +148,11 @@ def _adjustments(i: Inputs) -> Any:
     return core.xva.adjustments(*args[:4], core.xva.Name(*cp), core.xva.Name(*own), *args[6:])
 
 
+@op("xva.sbim.ir_delta")
+# The old id is a deprecated alias until v1.0.0 (KR-152): same handler, same result.
 @op("xva.simm.ir_delta")
-def _simm(i: Inputs) -> Any:
-    return core.xva.simm_ir_delta(
+def _sbim(i: Inputs) -> Any:
+    return core.xva.sbim_ir_delta(
         i.reals("sensitivities"),
         i.reals("risk_weights"),
         i.matrix("correlations"),

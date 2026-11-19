@@ -134,7 +134,7 @@ def test_xva_error_fields() -> None:
             cap,
             hurdle,
         ) == ("E_INPUT", key)
-    assert _err(xva.simm_ir_delta, [1.0], [1.0, 2.0], [[1.0]], 1.0) == ("E_INPUT", "sensitivities")
+    assert _err(xva.sbim_ir_delta, [1.0], [1.0, 2.0], [[1.0]], 1.0) == ("E_INPUT", "sensitivities")
     assert _err(xva.wwr_cva, [1.0, 0.5], [[1.0, 1.0]], [1.0, 1.0], 0.01, 0.4, 0.0) == (
         "E_INPUT",
         "times",

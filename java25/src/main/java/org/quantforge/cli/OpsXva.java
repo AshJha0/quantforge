@@ -38,7 +38,7 @@ final class OpsXva {
     static void register(Map<String, Function<In, Out>> table) {
         table.put("xva.exposure.collateralised", OpsXva::collateralised);
         table.put("xva.adjustments.value", OpsXva::adjustments);
-        table.put("xva.simm.ir_delta", in -> {
+        Function<In, Out> sbim = in -> {
             double[] s = in.reals("sensitivities");
             double[] rw = in.reals("risk_weights");
             double[][] rho = in.anyMatrix("correlations");
@@ -68,9 +68,12 @@ final class OpsXva {
                 throw domain("concentration_threshold");
             }
             double[] ws = new double[s.length];
-            double[] r = Xva.simm(s, rw, rho, thr, ws);
+            double[] r = Xva.sbimIrDelta(s, rw, rho, thr, ws);
             return Operations.out("weighted_sensitivities", ws, "concentration_factor", r[0], "margin", r[1]);
-        });
+        };
+        table.put("xva.sbim.ir_delta", sbim);
+        // Deprecated alias of xva.sbim.ir_delta until v1.0.0 (KR-152): the same handler, so the same result.
+        table.put("xva.simm.ir_delta", sbim);
         table.put("xva.wwr.cva_hw", in -> {
             double[] t = in.reals("times");
             double[][] v = in.anyMatrix("values");
