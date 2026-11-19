@@ -55,9 +55,19 @@ def test_first_at_least() -> None:
 
 @pytest.mark.parametrize(
     ("x", "zone", "mult"),
-    [(0, "GREEN", 1.50), (1, "GREEN", 1.50), (4, "GREEN", 1.50), (5, "AMBER", 1.70),
-     (6, "AMBER", 1.76), (7, "AMBER", 1.83), (8, "AMBER", 1.88), (9, "AMBER", 1.92),
-     (10, "RED", 2.00), (11, "RED", 2.00), (250, "RED", 2.00)],
+    [
+        (0, "GREEN", 1.50),
+        (1, "GREEN", 1.50),
+        (4, "GREEN", 1.50),
+        (5, "AMBER", 1.70),
+        (6, "AMBER", 1.76),
+        (7, "AMBER", 1.83),
+        (8, "AMBER", 1.88),
+        (9, "AMBER", 1.92),
+        (10, "RED", 2.00),
+        (11, "RED", 2.00),
+        (250, "RED", 2.00),
+    ],
 )
 def test_zone_table_250(x: int, zone: str, mult: float) -> None:
     for a, h in ((x, 0), (0, x), (x, x)):
@@ -68,12 +78,20 @@ def test_zone_table_250(x: int, zone: str, mult: float) -> None:
 
 def test_zone_full_result() -> None:
     assert fb.backtest_zone(250, 3, 5) == {
-        "exceptions": 5, "cumulative_probability": pytest.approx(0.9588168159302313, abs=1e-12),
-        "zone": "AMBER", "amber_from": 5, "red_from": 10, "multiplier": 1.7,
+        "exceptions": 5,
+        "cumulative_probability": pytest.approx(0.9588168159302313, abs=1e-12),
+        "zone": "AMBER",
+        "amber_from": 5,
+        "red_from": 10,
+        "multiplier": 1.7,
     }
     assert fb.backtest_zone(1, 0, 1) == {
-        "exceptions": 1, "cumulative_probability": 1.0, "zone": "RED", "amber_from": 0,
-        "red_from": 1, "multiplier": None,
+        "exceptions": 1,
+        "cumulative_probability": 1.0,
+        "zone": "RED",
+        "amber_from": 0,
+        "red_from": 1,
+        "multiplier": None,
     }
     r = fb.backtest_zone(500, 8, 2)
     assert (r["zone"], r["amber_from"], r["red_from"], r["multiplier"]) == ("GREEN", 9, 15, None)
@@ -85,15 +103,26 @@ def test_zone_full_result() -> None:
 
 def test_zone_errors() -> None:
     assert _err(fb.backtest_zone, 0, 0, 0) == (
-        "E_DOMAIN", "observations", "observations must be at least 1")
+        "E_DOMAIN",
+        "observations",
+        "observations must be at least 1",
+    )
     assert _err(fb.backtest_zone, 1_000_001, 0, 0) == (
-        "E_LIMIT", "observations", "observations is above its limit of 1000000")
+        "E_LIMIT",
+        "observations",
+        "observations is above its limit of 1000000",
+    )
     assert _err(fb.backtest_zone, 10, -1, 0) == (
-        "E_DOMAIN", "exceptions_actual", "exceptions_actual must be in [0, observations]")
+        "E_DOMAIN",
+        "exceptions_actual",
+        "exceptions_actual must be in [0, observations]",
+    )
     assert _err(fb.backtest_zone, 10, 11, 0)[:2] == ("E_DOMAIN", "exceptions_actual")
     assert _err(fb.backtest_zone, 10, 0, -1) == (
-        "E_DOMAIN", "exceptions_hypothetical",
-        "exceptions_hypothetical must be in [0, observations]")
+        "E_DOMAIN",
+        "exceptions_hypothetical",
+        "exceptions_hypothetical must be in [0, observations]",
+    )
     assert _err(fb.backtest_zone, 10, 0, 11)[:2] == ("E_DOMAIN", "exceptions_hypothetical")
     fb._observations(1_000_000)
     fb._observations(1)
@@ -103,10 +132,13 @@ def test_zone_errors() -> None:
 
 def test_desk() -> None:
     assert fb.backtest_desk(250, 13, 2, 30, 31) == {
-        "exceptions_99": 13, "exceptions_975": 31,
+        "exceptions_99": 13,
+        "exceptions_975": 31,
         "cumulative_probability_99": pytest.approx(0.999999673538539, abs=1e-12),
         "cumulative_probability_975": pytest.approx(0.9999999999999977, abs=1e-12),
-        "breach_99": True, "breach_975": True, "eligible": False,
+        "breach_99": True,
+        "breach_975": True,
+        "eligible": False,
     }
     r = fb.backtest_desk(100, 2, 1, 3, 4)
     assert (r["exceptions_99"], r["exceptions_975"]) == (2, 4)
@@ -116,26 +148,47 @@ def test_desk() -> None:
     r = fb.backtest_desk(250, 12, 12, 30, 30)
     assert (r["breach_99"], r["breach_975"], r["eligible"]) == (False, False, True)
     r = fb.backtest_desk(250, 0, 13, 0, 0)
-    assert (r["exceptions_99"], r["breach_99"], r["breach_975"], r["eligible"]) == (13, True, False, False)
+    assert (r["exceptions_99"], r["breach_99"], r["breach_975"], r["eligible"]) == (
+        13,
+        True,
+        False,
+        False,
+    )
     r = fb.backtest_desk(250, 0, 0, 0, 31)
-    assert (r["exceptions_975"], r["breach_99"], r["breach_975"], r["eligible"]) == (31, False, True, False)
+    assert (r["exceptions_975"], r["breach_99"], r["breach_975"], r["eligible"]) == (
+        31,
+        False,
+        True,
+        False,
+    )
     r = fb.backtest_desk(250, 0, 0, 31, 0)
     assert (r["exceptions_975"], r["breach_975"]) == (31, True)
 
 
 @pytest.mark.parametrize(
     "field",
-    ["exceptions_99_actual", "exceptions_99_hypothetical", "exceptions_975_actual",
-     "exceptions_975_hypothetical"],
+    [
+        "exceptions_99_actual",
+        "exceptions_99_hypothetical",
+        "exceptions_975_actual",
+        "exceptions_975_hypothetical",
+    ],
 )
 def test_desk_errors(field: str) -> None:
-    order = ["exceptions_99_actual", "exceptions_99_hypothetical", "exceptions_975_actual",
-             "exceptions_975_hypothetical"]
+    order = [
+        "exceptions_99_actual",
+        "exceptions_99_hypothetical",
+        "exceptions_975_actual",
+        "exceptions_975_hypothetical",
+    ]
     for bad in (-1, 11):
         args = [0, 0, 0, 0]
         args[order.index(field)] = bad
         assert _err(fb.backtest_desk, 10, *args) == (
-            "E_DOMAIN", field, f"{field} must be in [0, observations]")
+            "E_DOMAIN",
+            field,
+            f"{field} must be in [0, observations]",
+        )
     assert _err(fb.backtest_desk, 0, 0, 0, 0, 0)[:2] == ("E_DOMAIN", "observations")
     assert _err(fb.backtest_desk, 1_000_001, 0, 0, 0, 0)[:2] == ("E_LIMIT", "observations")
 
@@ -145,8 +198,12 @@ def test_count_exceptions() -> None:
     actual = [-1.0, -1.5, 0.0, None, 0.5]
     hyp = [-1.0000001, 0.0, 0.0, 0.0, -0.9]
     assert fb.count_exceptions(var, actual, hyp) == {
-        "observations": 5, "exceptions_actual": 3, "exceptions_hypothetical": 2, "exceptions": 3,
-        "days_actual": [1, 2, 3], "days_hypothetical": [0, 2],
+        "observations": 5,
+        "exceptions_actual": 3,
+        "exceptions_hypothetical": 2,
+        "exceptions": 3,
+        "days_actual": [1, 2, 3],
+        "days_hypothetical": [0, 2],
     }
     r = fb.count_exceptions([1.0], [0.0], [-2.0])
     assert (r["exceptions_actual"], r["exceptions_hypothetical"], r["exceptions"]) == (0, 1, 1)
@@ -156,6 +213,12 @@ def test_count_exceptions() -> None:
 def test_count_exceptions_errors() -> None:
     assert _err(fb.count_exceptions, [], [], []) == ("E_INPUT", "var", "var is empty")
     assert _err(fb.count_exceptions, [1.0], [], [0.0]) == (
-        "E_INPUT", "actual", "actual and var differ in length")
+        "E_INPUT",
+        "actual",
+        "actual and var differ in length",
+    )
     assert _err(fb.count_exceptions, [1.0], [0.0], [0.0, 1.0]) == (
-        "E_INPUT", "hypothetical", "hypothetical and var differ in length")
+        "E_INPUT",
+        "hypothetical",
+        "hypothetical and var differ in length",
+    )
