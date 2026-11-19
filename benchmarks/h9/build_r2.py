@@ -38,8 +38,8 @@ Outputs per symbol (OUT_PREFIX = OUT_DIR/R2_<SYMBOL> under `auto`):
                           messages after which it may be compared: from "lo", the last book message with t < row t,
                           to "hi", the last with t <= row t (micro.book.rebuild's rule). Receive times are in
                           milliseconds and one websocket frame can carry many messages, so the order inside the
-                          row's millisecond is unknown; a row passes if the book equals it after one message in
-                          [lo, hi]. Both ends are reported (check_r2.py).
+                          row's millisecond is unknown; a row passes if the book equals it after at least one
+                          message in [lo, hi] (HR-132 as clarified by HR-135). Both ends are reported (check_r2.py).
   OUT_PREFIX.msgs.jsonl   the book messages as order-book.md messages (t, type, bids, asks, checksum; "i" = bin index)
   OUT_PREFIX.rows.jsonl   the checkpoint rows (t, bids, asks), plain decimal strings, for check_r2.py
   OUT_PREFIX.meta.json    window, counts, warm-up (first hour), decimals, SHA-256 of every input and output
@@ -174,6 +174,14 @@ def scan(data_dir, after, tolerant=False, until=None):
             if stems:
                 top = datetime.strptime(max(stems), "%Y%m%dT%H").replace(tzinfo=timezone.utc)
                 files = hour_files(folder, hour0, min(top + timedelta(hours=1), until or top + timedelta(hours=1)))
+            present = {f.name[:11] for f in files}
+            if files:  # HR-135 (audit KA-B17): a missing hour file between two present ones is a gap at that hour
+                h = datetime.strptime(files[0].name[:11], "%Y%m%dT%H").replace(tzinfo=timezone.utc)
+                last_h = datetime.strptime(files[-1].name[:11], "%Y%m%dT%H").replace(tzinfo=timezone.utc)
+                while h < last_h:
+                    h += timedelta(hours=1)
+                    if h.strftime("%Y%m%dT%H") not in present:
+                        gaps.append((h, sub, f"missing hour file {h.strftime('%Y%m%dT%H')}.jsonl.gz"))
             prev = None  # previous row of this stream: (t, k)
             newest_of_folder = max(folder.glob("*.jsonl.gz"), key=_order, default=None)
             for f in files:
@@ -579,8 +587,11 @@ def main(argv):
             return 0
         out = Path(rest[2])
         out.mkdir(parents=True, exist_ok=True)
-        (out / "R2_window.json").write_text(json.dumps({"start": iso(start), "end": iso(end), "after": iso(after),
-                                                        "min_hours": lo, "max_hours": hi, "sample_only": sample,
+        # Every option is stamped here (HR-135, audit KA-B6); this file's hash goes into R2_replay.sha256, and
+        # run_r2.sh refuses outside SMOKE=1 any input whose options are not the rule's (r2_meta.py inputs).
+        options = {"after": iso(after), "until": iso(until) if until else None, "min_hours": lo, "max_hours": hi,
+                   "tolerant": tolerant, "sample_only": sample, "argv": list(argv)}
+        (out / "R2_window.json").write_text(json.dumps({"start": iso(start), "end": iso(end), "options": options,
                                                         **log}, indent=1) + "\n")
         ins, outs = [], []
         for s in SYMBOLS:
@@ -588,6 +599,7 @@ def main(argv):
             ins += [f"{v}  {k}\n" for k, v in m["inputs_sha256"].items()]
             outs += [f"{v}  {k}\n" for k, v in m["outputs_sha256"].items()]
             outs.append(f"{sha(out / f'R2_{s}.meta.json')}  R2_{s}.meta.json\n")
+        outs.append(f"{sha(out / 'R2_window.json')}  R2_window.json\n")
         (out / "R2_inputs.sha256").write_bytes("".join(ins).encode())
         (out / "R2_replay.sha256").write_bytes("".join(outs).encode())
         print(f"wrote {out / 'R2_inputs.sha256'} and {out / 'R2_replay.sha256'}")
