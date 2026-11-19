@@ -181,7 +181,7 @@ TEST_CASE("stage_k goldens: every row, values and key order", "[stage_k]") {
         CHECK(n >= 5);
         total += n;
     }
-    CHECK(total >= 45);
+    CHECK(total >= 59);
 }
 #endif
 

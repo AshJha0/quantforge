@@ -491,7 +491,62 @@ def build():
         e.add(op, inp, error="E_DOMAIN", verified=("hand", ADDED), tags=("stage_k", "e1", "non-finite-input"),
               description=desc)
     suites.append(e)
+    suites.append(e2_suite())
     return suites
+
+
+TWO = "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+
+
+def e2_suite():
+    """Two errors in one case; the code is the earlier one in the HR-66 order: E_SCHEMA, structural E_INPUT,
+    E_DOMAIN (the F-2 finite rule, then single values), value-dependent E_INPUT (stale cache), E_LIMIT."""
+    s = Suite("e2_k", BT, G)
+    q201 = [0.01] * 201
+    df201 = bootstrap_f64(q201)
+    inc = INC_CASES[1][1]
+    stale = BASE_DF[:2] + [math.nextafter(BASE_DF[2], math.inf)]
+    trig = trig_inp(TRIG_CASES[0][0])
+    rich = {"values": [10.5, 10.125, 10.03125], "ratio": 2.0, "assumed_order": 2.0}
+    no_yield = {"notional": 1.0, "maturity": 1.0}
+    cases = [
+        ("core.store.bitemporal_query",
+         bt_inp("2026-04-01", "2026-02-15", [dict(LOG[0], sequence=0)] + _with(2, knowledge_time="2026-03-01")[1:]),
+         "E_SCHEMA", "sequence 0 in records[0] (E_SCHEMA) and seq 3 knowledge_time going back (E_INPUT)"),
+        ("core.store.bitemporal_query",
+         bt_inp("2026-04-01", "2026-02-15", [dict(LOG[0], value="NaN"), dict(LOG[1], sequence=1)] + LOG[2:]),
+         "E_INPUT", "sequence not increasing (structural E_INPUT) and NaN at records[0].value (E_DOMAIN)"),
+        ("curve.bootstrap.par_annual", {"quotes": ["NaN"] + q201[1:]},
+         "E_DOMAIN", "NaN at quotes/0 (E_DOMAIN) and 201 quotes (E_LIMIT)"),
+        ("curve.bootstrap.par_annual", {"quotes": [-1.5] + q201[1:]},
+         "E_DOMAIN", "quote -1.5 (E_DOMAIN) and 201 quotes (E_LIMIT)"),
+        ("curve.incremental.update", dict(inc, new_quotes=[0.02, "NaN"]),
+         "E_INPUT", "lengths differ (structural E_INPUT) and NaN at new_quotes/1 (E_DOMAIN)"),
+        ("curve.incremental.update", dict(inc, previous_discount_factors=stale, new_quotes=[0.02, -2.0, 0.03]),
+         "E_DOMAIN", "new quote -2 (E_DOMAIN) and a stale cache (value-dependent E_INPUT)"),
+        ("curve.incremental.update",
+         {"previous_quotes": q201, "previous_discount_factors": df201[:-1] + [math.nextafter(df201[-1], math.inf)],
+          "new_quotes": q201},
+         "E_INPUT", "stale cache (value-dependent E_INPUT) and 201 quotes (E_LIMIT)"),
+        ("calib.trigger.check", dict(trig, changes=[1.0], k=0.0),
+         "E_INPUT", "one change (structural E_INPUT) and k = 0 (E_DOMAIN)"),
+        ("calib.trigger.check", {kk: vv for kk, vv in dict(trig, k=0.0).items() if kk != "x_now"},
+         "E_SCHEMA", "x_now missing (E_SCHEMA) and k = 0 (E_DOMAIN)"),
+        ("calib.trigger.check", dict(trig, changes=[1.0, 1.0, 1.0], days_since=0.5),
+         "E_DOMAIN", "days_since 0.5 and sigma 0 (both E_DOMAIN; one code)"),
+        ("risk.intraday.delta_gamma_bound", {"positions": [], "shift": "NaN"},
+         "E_INPUT", "no positions (structural E_INPUT) and NaN shift (E_DOMAIN)"),
+        ("risk.intraday.delta_gamma_bound", {"positions": [dict(POS, maturity=0.0), no_yield], "shift": 0.01},
+         "E_SCHEMA", "yield missing in positions[1] (E_SCHEMA) and maturity 0 in positions[0] (E_DOMAIN)"),
+        ("num.richardson.check", dict(rich, values=[10.5, 10.125], ratio=1.0),
+         "E_INPUT", "two values (structural E_INPUT) and ratio 1 (E_DOMAIN)"),
+        ("num.richardson.check", {"values": rich["values"], "ratio": 1.0},
+         "E_SCHEMA", "assumed_order missing (E_SCHEMA) and ratio 1 (E_DOMAIN)"),
+    ]
+    for op, inp, code, desc in cases:
+        s.add(op, inp, error=code, verified=("hand", TWO), tags=("stage_k", "e2", "two-errors", "error"),
+              description=desc)
+    return s
 
 
 def main():
