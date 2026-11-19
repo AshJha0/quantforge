@@ -944,7 +944,7 @@ Stage K round 1 is **in progress and not released**. Its work is merged on the i
 - K-8: the use restriction stays for both methods (KR-113); `CN_RANNACHER_SMOOTHED` is second order on three in-sample cases at 201/100 and misses 1% at 101/50 on two of them.
 - The E1 gate was refined for `risk.frtb.backtest.zone` by ruling KR-112 (owner decision 2026-11-19): an exempt Integer-only operation may carry a Real input only in a golden that expects `E_SCHEMA` (`program/STAGE_K_E1_ZONE_DECISION.md`).
 - The paper ledger has 0 of 20 recorded days, is not yet running and makes no performance claim. The daily curve run's consistency check against the Fed's fitted curve is a recorded miss on the one real day tried (2026-11-13: RMSE 17.36 bp against 15 bp; `program/STAGE_K_CURVE_DAILY_HANDOVER.md`); it is a consistency check, not proof.
-- SIMM, when built, runs on placeholder weights, not ISDA-calibrated, and no published number can check it (`program/STAGE_K_W2_GATE.md`).
+- The sensitivity-based initial margin (`sbim`, K-8h), when built, runs on placeholder weights from a stated rule, and no published number can check it (`program/STAGE_K_W2_GATE.md`); the stage G margin goldens use the same rule from v0.10.1 (KR-150).
 - H-9 R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS.
 
 ## Appendix: stage history

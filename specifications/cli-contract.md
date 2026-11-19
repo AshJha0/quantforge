@@ -325,7 +325,7 @@ Stage G adds operations and no error code. `stage-g-rulings.md` is normative. Op
 | `rates.lmm.capfloor`, `rates.lmm.swaption_rebonato` | `04-pricing/lmm.md` | G4a (wave 3b, LMM) |
 | `rates.shortrate.bermudan_ladder` | `06-risk/aad-core.md` | Q3b (wave 3d) |
 | `risk.model_reserve.dispersion` (`null` legal for `relative_reserve`) | `06-risk/model-reserve.md` | Q9 part 2 (wave 3e) |
-| `xva.exposure.collateralised`, `xva.adjustments.value`, `xva.simm.ir_delta`, `xva.wwr.cva_hw` | `06-risk/xva-framework.md` | G5b (wave 4b) |
+| `xva.exposure.collateralised`, `xva.adjustments.value`, `xva.sbim.ir_delta` (named `xva.simm.ir_delta` until v0.10.0; see "Deprecated aliases"), `xva.wwr.cva_hw` | `06-risk/xva-framework.md` | G5b (wave 4b); renamed in contract 1.17.0 (KR-152) |
 | `xva.exposure.portfolio_hw` | `06-risk/xva-exposure-portfolio.md` | G5c (wave 4c, ORE-checked) |
 | `risk.stress.reverse`, `risk.limits.check`, `risk.concentration.measures`, `risk.var.liquidity_adjusted`, `risk.vol.horizon` | `06-risk/portfolio-risk-tools.md` | F4 carry-over (wave 2b) |
 | `risk.sens.inflation01`, `risk.sens.dividend_borrow`, `risk.sens.correlation` | `06-risk/f3-sensitivities.md` | F3 carry-over (wave 2b) |
@@ -355,6 +355,19 @@ Stage I adds operations and one error code, `E_INFEASIBLE` (ruling I-1). `stage-
 
 Adding an operation or an error code is a minor version. Changing the meaning of a key, a code or an
 exit status is a major version, and all four implementations and the runner move together.
+
+## Deprecated aliases
+
+A deprecated alias is an old operation id that every build still accepts for a stated time. It runs the same
+handler as its target, so its outputs, error codes and diagnostics are those of the target; nothing in the result
+marks it (extra keys in `outputs` are a failure, see "Result document"). The deprecation is stated here and in
+`specifications/deprecated-aliases.json`, which `tools/gen_name_map.py` reads. Removing an alias is a major change
+(KR-154): it is done with the release named below. Golden suites pin each alias with invariance pairs (the target
+with expected `any`, the alias with `same_as`), so a build whose alias drifts from its target fails.
+
+| Alias (deprecated) | Target | Deprecated in | Removal | Ruling |
+|---|---|---|---|---|
+| `xva.simm.ir_delta` | `xva.sbim.ir_delta` | contract 1.17.0 (release v0.10.1) | v1.0.0 | KR-152; goldens `stage_k/sbim_alias_k.json` |
 
 ## R6 changes (contract 1.12.0, rulings `r6-rulings.md`)
 
@@ -553,3 +566,7 @@ Rulings `stage-k-rulings-w1b.md` KR-30 to KR-47. No new error code; the contract
 | `risk.frtb.backtest.zone` | `06-risk/frtb-ima-backtest.md` (K-8e) | `observations` (Integer 1 to 1,000,000), `exceptions_actual`, `exceptions_hypothetical` (Integers 0 to n) | `exceptions`, `cumulative_probability`, `zone` (`GREEN`, `AMBER`, `RED`), `amber_from`, `red_from`, `multiplier` (n = 250 only, else null) |
 | `risk.frtb.backtest.desk` | same | `observations`, four Integer counts (99% and 97.5%, actual and hypothetical) | the two maximum counts, two cumulative probabilities, `breach_99`, `breach_975`, `eligible` |
 | `risk.frtb.backtest.count` | same | `var`, `actual`, `hypothetical` (equal-length arrays of Real or null) | `observations`, `exceptions_actual`, `exceptions_hypothetical`, `exceptions`, `days_actual`, `days_hypothetical` |
+
+### Stage K margin rename (contract 1.17.0; rulings `stage-k-rulings-margin.md` KR-150 to KR-155)
+
+`xva.sbim.ir_delta` is the stage G operation formerly named `xva.simm.ir_delta`, with the same inputs, outputs, error codes and error order (`06-risk/xva-framework.md`, G-43). The old id is a deprecated alias until v1.0.0 (section "Deprecated aliases"). Adding the new id is a minor change under "Versioning", and KR-1 gives every stage K change the one number 1.17.0, so the contract number does not move (KR-154). The goldens' weights and correlations are now placeholder weights from a stated rule (KR-150, `specifications/tables/stage_k/sbim-ir-delta-g.json`); the formula is unchanged. Goldens `datasets/golden/stage_g/sbim_g.json` and `datasets/golden/stage_k/sbim_alias_k.json` (`oracle/python/gen_stage_g_w4b.py`).

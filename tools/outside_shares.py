@@ -239,7 +239,8 @@ def load_stage_h():
 # verified_by now records that run, so they count as blind re-derivation.
 STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-5a", "rich_k": "K-8 guard",
                  "k8_k": "K-8", "e1_k": None, "e2_k": None,  # e1_k, e2_k: error cases only
-                 "saccr_k": "K-8d", "btk_k": "K-8e", "tlk_k": "F (existing traffic_light)"}
+                 "saccr_k": "K-8d", "btk_k": "K-8e", "tlk_k": "F (existing traffic_light)",
+                 "sbim_alias_k": None}  # KR-153: the deprecated alias's invariance and error cases; no value case
 K_PUBLISHED_SRC = "figure printed in the regulator text (Basel Framework CRE99, MAR99 Table 2)"
 
 

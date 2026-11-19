@@ -15,16 +15,16 @@ Integration lane: Claude Opus 5.5. Reviewer: none: self-assessment; no second re
 
 | Step | What | Status | Commit |
 |---|---|---|---|
-| 1 | merge k-margin (fb65a4ad) | pending | |
-| 2 | merge k-audit-a (e1905bea) | pending | |
-| 3 | merge k-audit-jobs (552af98e) | pending | |
-| 4 | merge k-audit-shares (ab7e8a31), renumber KR-210..212 to KR-250..252 | pending | |
-| 5 | outside_shares: lim_k, dropped blind credit, KR-250 records | pending | |
-| 6 | E1 gate: NaN goldens for backtest.zone and .desk | pending | |
-| 7 | risk.backtest.traffic_light binomial (KR-237) in four builds | pending | |
-| 8 | mutation modules for saccr, stage_k, bermudan_k8; stage F kill tests | pending | |
-| 9 | generator drift (stage G E1, gen_cli_cases.py) | pending | |
-| 10 | docs to the merged state | pending | |
-| 11 | verification | pending | |
+| 1 | merge k-margin (fb65a4ad) | to do | |
+| 2 | merge k-audit-a (e1905bea) | to do | |
+| 3 | merge k-audit-jobs (552af98e) | to do | |
+| 4 | merge k-audit-shares (ab7e8a31), renumber KR-210..212 to KR-250..252 | to do | |
+| 5 | outside_shares: lim_k, dropped blind credit, KR-250 records | to do | |
+| 6 | E1 gate: NaN goldens for backtest.zone and .desk | to do | |
+| 7 | risk.backtest.traffic_light binomial (KR-237) in four builds | to do | |
+| 8 | mutation modules for saccr, stage_k, bermudan_k8; stage F kill tests | to do | |
+| 9 | generator drift (stage G E1, gen_cli_cases.py) | to do | |
+| 10 | docs to the merged state | to do | |
+| 11 | verification | to do | |
 
 ## Log

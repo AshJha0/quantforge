@@ -188,7 +188,8 @@ void op_xva_adjustments(const In& in, Out& out) {
     if (has_k) out.key_real("kva", hurdle * kva);
 }
 
-void op_xva_simm(const In& in, Out& out) {
+// `xva.sbim.ir_delta`; `xva.simm.ir_delta` is its deprecated alias until v1.0.0 (KR-152) and maps to this same handler.
+void op_xva_sbim(const In& in, Out& out) {
     const Vec s = sr_reals(in, "sensitivities"), rw = sr_reals(in, "risk_weights");
     const Value& cv = in.need("correlations");
     if (cv.kind != Kind::Array) schema("correlations", "expected an array");
@@ -197,27 +198,10 @@ void op_xva_simm(const In& in, Out& out) {
     for (const Value& r : cv.items) rho.push_back(to_reals(r, "correlations"));
     const double T = in.real("concentration_threshold");
     in.ready();
-    const std::size_t n = s.size();
-    if (n == 0 || rw.size() != n || rho.size() != n) throw Error("E_INPUT", "lengths differ", "risk_weights");
-    for (const Vec& r : rho)
-        if (r.size() != n) throw Error("E_INPUT", "correlations is not square", "correlations");
-    for (double x : rw)
-        if (!(x >= 0)) throw Error("E_DOMAIN", "a risk weight is negative", "risk_weights");
-    for (const Vec& r : rho)
-        for (double x : r)
-            if (!(x >= -1 && x <= 1)) throw Error("E_DOMAIN", "a correlation is outside [-1, 1]", "correlations");
-    if (!(T > 0)) throw Error("E_DOMAIN", "concentration_threshold is not positive", "concentration_threshold");
-    double net = 0.0;
-    for (double x : s) net += x;
-    const double cr = std::max(1.0, std::sqrt(std::fabs(net) / T));
-    Vec ws(n);
-    for (std::size_t k = 0; k < n; ++k) ws[k] = rw[k] * s[k] * cr;
-    double m = 0.0;
-    for (std::size_t k = 0; k < n; ++k)
-        for (std::size_t l = 0; l < n; ++l) m += (k == l ? 1.0 : rho[k][l]) * ws[k] * ws[l];
-    out.key_reals("weighted_sensitivities", ws);
-    out.key_real("concentration_factor", cr);
-    out.key_real("margin", std::sqrt(std::max(0.0, m)));
+    const xva::SbimIrDelta r = xva::sbim_ir_delta(s, rw, rho, T);
+    out.key_reals("weighted_sensitivities", r.weighted_sensitivities);
+    out.key_real("concentration_factor", r.concentration_factor);
+    out.key_real("margin", r.margin);
 }
 
 void op_xva_wwr(const In& in, Out& out) {
@@ -278,7 +262,8 @@ void op_xva_wwr(const In& in, Out& out) {
 constexpr Entry xva_ops[] = {
     {"xva.exposure.collateralised", op_xva_collateralised},
     {"xva.adjustments.value", op_xva_adjustments},
-    {"xva.simm.ir_delta", op_xva_simm},
+    {"xva.sbim.ir_delta", op_xva_sbim},
+    {"xva.simm.ir_delta", op_xva_sbim},  // deprecated alias (KR-152)
     {"xva.wwr.cva_hw", op_xva_wwr},
 };
 

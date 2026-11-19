@@ -1,0 +1,90 @@
+{
+ "note": "K-8h cases added AFTER the blind run of 2026-11-19; values from sbim_ref.py; NOT blind-checked and never counted as outside-checked",
+ "cases": {
+  "sbim_k-0030": {
+   "item": "K-8h",
+   "fields": [
+    {
+     "path": "groups[EQUITY].im",
+     "value": 1058.5376401884819
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].vega.margin",
+     "value": 1040.2043068551486
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].vega.buckets[2].k_b",
+     "value": 1040.2043068551486
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].vega.buckets[2].s_b",
+     "value": 975.0
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].vega.buckets[2].sum_ws",
+     "value": 975.0
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].vega.cr[A]",
+     "value": 1.0
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].vega.cr[B]",
+     "value": 1.0
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].vega.ws[A]",
+     "value": 1095.0
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].vega.ws[B]",
+     "value": -120.0
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].curvature.cvr[A]",
+     "value": 5.0
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].curvature.cvr[B]",
+     "value": -10.0
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].curvature.buckets[2].k_b",
+     "value": 10.0
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].curvature.buckets[2].s_b",
+     "value": -5.0
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].curvature.buckets[2].sum_cvr",
+     "value": -5.0
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].curvature.sum_cvr",
+     "value": -5.0
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].curvature.theta",
+     "value": -0.3333333333333333
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].curvature.lambda",
+     "value": 2.3333333333333335
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].curvature.margin",
+     "value": 18.333333333333336
+    },
+    {
+     "path": "groups[EQUITY].risk_classes[EQ].im",
+     "value": 1058.5376401884819
+    },
+    {
+     "path": "total",
+     "value": 1058.5376401884819
+    }
+   ]
+  }
+ }
+}

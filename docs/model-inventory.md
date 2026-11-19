@@ -462,7 +462,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Challenger:** `LOG_LINEAR_DF` (the stage B default) on the same quotes; the hybrid against `MONOTONE_CONVEX`.
 - **Monitoring thresholds:** pillars or zero rates more than 1e-10 from QuantLib on the golden builds; a forward jump above 1e-12 at an interior pillar.
 - **Data lineage hash:** sha256 291dd8a43870fa08437b0557e65e93f50a61eb865b584ae5fc5bb76733cdcbbf
-- **Retirement trigger:** a smoothing method with a published market standard (for example an ISDA SIMM curve rule) that QuantLib also implements.
+- **Retirement trigger:** a smoothing method with a published, freely usable market standard that QuantLib also implements.
 - **Validation report:** `oracle/outside_register_f.json`; `specifications/02-curves/curve-framework.md` (stage F acceptance).
 
 ### MF-5 Joint multi-curve solve (Q4)
@@ -638,14 +638,14 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Validation report:** `specifications/06-risk/model-reserve.md`.
 
 ### MG-8 Deterministic xVA layer (G5b)
-- **Purpose:** collateralised exposure with netting sets, CSA thresholds, MTA, independent amount and MPoR; CVA, DVA, FCA, FBA (DVA overlap rule), MVA, KVA; SIMM-style IR delta margin; Hull-White wrong-way CVA.
+- **Purpose:** collateralised exposure with netting sets, CSA thresholds, MTA, independent amount and MPoR; CVA, DVA, FCA, FBA (DVA overlap rule), MVA, KVA; sensitivity-based IR delta margin (`xva.sbim.ir_delta`; deprecated alias `xva.simm.ir_delta` until v1.0.0); Hull-White wrong-way CVA.
 - **Inputs:** simulated paths per trade; CSA terms; exposure, discount, IM and capital profiles; hazard and recovery; sensitivities with weights and correlations.
-- **Limitations:** paths are inputs (no simulation here); SIMM weights are inputs, not an ISDA calibration; bucket-end exposure; independence except in the WWR model.
+- **Limitations:** paths are inputs (no simulation here); the sensitivity-based margin is a project definition on caller-supplied weights (goldens on rule-generated placeholder weights, KR-150), not ISDA SIMM, and no ISDA material is used (see "Why there is no ISDA SIMM here" below); bucket-end exposure; independence except in the WWR model.
 - **Validation:** 50-digit mpmath, asserted limit cases (zero thresholds give zero exposure, `b = 0` gives the independent CVA). **Review:** 2026-11-11.
 - **Tier:** 1.
 - **Challenger:** ORE's collateral and xVA engine: not run (no stage set). ORE checks only MG-9.
 - **Monitoring thresholds:** any asserted limit case failing, or exposure differing from ORE beyond 3 SE once compared.
-- **Data lineage hash:** sha256 fef567a51bb097b31a202ab9ab1536819849f12f42fe8f801e7e2375e29b8647 (`collexp_g`); d51113f2e26b021d3e71ab18fa992782592b2c727640c68efe9c21bc0b33de39 (`xvaadj_g`); 2b477e2f2be440985d9c41e1d767609483f591aa00642543e9959f6f906d512b (`simm_g`); d7f291fe26868f3174c9696986b050ae38e60d98e000937ea6c01957352582db (`wwr_g`)
+- **Data lineage hash:** sha256 fef567a51bb097b31a202ab9ab1536819849f12f42fe8f801e7e2375e29b8647 (`collexp_g`); d51113f2e26b021d3e71ab18fa992782592b2c727640c68efe9c21bc0b33de39 (`xvaadj_g`); ce63cac19143868a10ad27bdf61347865011b7cd4cb1bfb7c5c956fa43dbed61 (`sbim_g`, file sha256 at v0.10.1 after KR-150; the suite was `simm_g`, 2b477e2f2be440985d9c41e1d767609483f591aa00642543e9959f6f906d512b at v0.7.0); d7f291fe26868f3174c9696986b050ae38e60d98e000937ea6c01957352582db (`wwr_g`)
 - **Retirement trigger:** a full simulated xVA engine with the bank's CSA library.
 - **Validation report:** `specifications/06-risk/xva-framework.md`.
 
@@ -1343,3 +1343,16 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Data lineage hash:** sha256 46b10b589b39c08b25c7d4e0f3641d9c39f9d7b03759446a19b6ea11dcc2d81c (spec page `leverage-large-exposures.md`, no golden file yet) (2026-11-19).
 - **Retirement trigger:** the wave-2 build replaces this entry's limitations, or the item is withdrawn.
 - **Validation report:** `specifications/06-risk/leverage-large-exposures.md`.
+
+## Why there is no ISDA SIMM here
+
+Plain idea: ISDA SIMM is the initial-margin methodology many dealers use for uncleared derivatives. It is not free to reuse. The methodology document carries a notice that it may be used, revised or distributed only for a market participant's own commercial transactions or under a written ISDA licence, and it cites a US patent (owner's reading, 2026-11-19; evidence class: read by the owner, not by any lane). An open-source project that publishes code, specs and test data is neither, so the owner decided on 2026-11-19 that QuantForge uses **no ISDA material** at all: the methodology document, ISDA parameter sets, ISDA test portfolios and the margin calibration files the Open Source Risk Engine ships are not opened, read, quoted or fetched.
+
+What the repository has instead (evidence class: read, the specs named):
+
+- `xva.sbim.ir_delta` (stage G, MG-8; `specifications/06-risk/xva-framework.md`, G-43; named `xva.simm.ir_delta` in v0.7.0 to v0.10.0, that id now a deprecated alias until v1.0.0, KR-152): a sensitivity-based single-bucket interest-rate delta aggregation, `CR = max(1, sqrt(|sum s_k| / T))`, `WS_k = RW_k s_k CR`, `margin = sqrt(max(0, sum sum rho WS WS))`, on weights, correlations and a threshold the caller supplies. It is not ISDA SIMM. The weights in its goldens, tutorial and question bank were hand-typed in v0.7.0 to v0.10.0 with no documented origin; v0.10.1 replaced them by placeholder weights from a stated artificial rule (`RW = 10 x k`, `rho = 1 - 0.1 |k - l|`, KR-150, `specifications/tables/stage_k/sbim-ir-delta-g.json`).
+- `risk.sbim.placeholder` (stage K item K-8h, PROPOSED; `specifications/06-risk/sbim-placeholder.md`): the project's own sensitivity-based initial margin in the general family of bucketed weighted-sensitivity models (interest rate, FX and equity; delta, vega, curvature; concentration factors; correlations within and across buckets and risk classes), on artificial placeholder weights generated by a stated rule. Every formula's evidence class is "project definition". Its blind-checked cases check our own algebra, nothing more.
+
+What neither is: a regulatory or industry-standard initial margin, a reproduction of any industry model, or a number to call or post margin with. No compliance claim is made, and no release names ISDA SIMM as a feature.
+
+Worked example: case `sbim_k-0001` (one interest-rate delta of 2 at 5Y, placeholder weights) has concentration factor 1 (2 is below the threshold 100) and placeholder weight 30, so margin = 30 x 2 = 60. That is arithmetic on artificial numbers, not a margin figure of any industry model.
