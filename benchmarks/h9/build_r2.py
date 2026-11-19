@@ -489,8 +489,8 @@ def main(argv):
             ins += [f"{v}  {k}\n" for k, v in m["inputs_sha256"].items()]
             outs += [f"{v}  {k}\n" for k, v in m["outputs_sha256"].items()]
             outs.append(f"{sha(out / f'R2_{s}.meta.json')}  R2_{s}.meta.json\n")
-        (out / "R2_inputs.sha256").write_text("".join(ins), encoding="utf-8")
-        (out / "R2_replay.sha256").write_text("".join(outs), encoding="utf-8")
+        (out / "R2_inputs.sha256").write_bytes("".join(ins).encode())
+        (out / "R2_replay.sha256").write_bytes("".join(outs).encode())
         print(f"wrote {out / 'R2_inputs.sha256'} and {out / 'R2_replay.sha256'}")
         return 0
     if len(rest) != 5:

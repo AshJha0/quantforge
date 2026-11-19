@@ -76,7 +76,7 @@ LOGS=$R2DIR/logs
 mkdir -p "$LOGS"
 
 say() { echo "[run_r2 $(date -u +%H:%M:%S)] $*"; }
-die() { say "REFUSED: $*"; exit 3; }
+die() { say "REFUSED: $*" >&2; exit 3; }
 
 hash_file() {
   if [ "$SMOKE" = 1 ]; then
@@ -88,7 +88,7 @@ hash_file() {
 }
 
 check_hashes() {
-  local H; H=$(hash_file)
+  local H; H=$(hash_file) || exit 3
   [ -f "$H" ] || die "input hash file $H is missing (commit build_r2.py's R2_replay.sha256 there first)"
   if [ "$SMOKE" != 1 ]; then
     git -C "$REPO" ls-files --error-unmatch benchmarks/results/h9/R2_replay.sha256 > /dev/null 2>&1 || die "R2_replay.sha256 is not committed"
