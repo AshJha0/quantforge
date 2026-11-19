@@ -330,7 +330,9 @@ def build_day(cfg, runner, state, date, par, source, ts, timing, prev_hash, gaps
     taus = {}
     if not first:
         for i in insts:
-            taus[i["symbol"]] = (day(state["bonds"][i["symbol"]]["maturity"]) - d).days / 365.0
+            # curve time in years of 365.25 days, held inside the knots (flat beyond the ends, KR-76)
+            t = (day(state["bonds"][i["symbol"]]["maturity"]) - d).days / 365.25
+            taus[i["symbol"]] = min(max(t, xs[0]), xs[-1])
         at = [taus[i["symbol"]] for i in insts]
         r = runner([
             case("roll", "core.interp.evaluate", {"method": cfg["interp"], "x": xs, "at": at,
