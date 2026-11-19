@@ -1,6 +1,6 @@
 # Bermudan sensitivity ladder at the default grid (stage K item K-8, R6-27)
 
-Spec version 0.1.0. Status: **PROPOSED** (stage K wave 1). Rulings: `stage-k-rulings-w1.md` KR-8, KR-9. Depends on `04-pricing/short-rate-models.md` (G-18 scheme, unchanged) and `aad-core.md`.
+Spec version 0.2.0. Status: **PROPOSED** (stage K wave 1). Rulings: `stage-k-rulings-w1.md` KR-8, KR-9, KR-15, KR-16. Depends on `04-pricing/short-rate-models.md` (G-18 scheme, unchanged) and `aad-core.md`.
 
 **Plain idea.** The ladder of the pinned G-18 scheme is the exact derivative of a first-order scheme, and at the default grid that derivative is far from the model's: the price is within 0.2% but single ladder entries are off by up to 11%. Plan K-8 asks for every entry within 1% of the converged model derivative at the default grid. This spec says how, and why Richardson extrapolation alone is not the answer.
 
@@ -16,13 +16,27 @@ Gap of the discount-factor entries (indices 0..5) at a grid against the 801/400 
 
 Two facts matter. (1) Several entries do not converge monotonically: aadladder_g-0002 entry 1 reads 87,159, 98,464, 102,352, 93,700, 96,435 on the five grids. (2) Even 801/400 is not converged for those entries (401/200 and 801/400 differ by 2.8%), so 801/400 cannot serve as the reference for a 1% test. The likely cause is the exercise boundary crossing grid nodes: the derivative of a pointwise `max` jumps when the boundary moves to the next node. A second-order time scheme alone does not remove that.
 
-## Proposed method `CN_RANNACHER_SMOOTHED` (KR-8)
+## Method `CN_RANNACHER_SMOOTHED` (KR-8 as revised by KR-15)
 
-1. Same state, grid and exercise value as G-18 steps 1 to 4.
-2. Time stepping: Crank-Nicolson (theta = 1/2) with Rannacher start-up: after the maturity payoff and after each exercise date, two fully implicit steps of half size replace the first full step [Rannacher, "Finite element solution of diffusion problems with irregular data", *Numer. Math.* 43 (1984) 309-327 (not free; idea restated in Giles and Carter, "Convergence analysis of Crank-Nicolson and Rannacher time-marching", *J. Comput. Finance* 9(4) 2006, free preprint, UNVERIFIED)].
-3. Exercise smoothing: at each exercise date, node `i` takes the average of `max(V, E)` over its cell `[x_i - dx/2, x_i + dx/2]`, with `V` and `E` linear between nodes, computed in closed form (split the cell at the crossing of `V - E` if inside it). This makes the price a smooth function of the inputs, so its derivative converges [Pooley, Vetzal, Forsyth, "Convergence remedies for non-smooth payoffs in option pricing", *J. Comput. Finance* 6(4) 2003, free preprint (UNVERIFIED)].
-4. Ladder by reverse-mode AAD of this scheme, as `aad-core.md`.
-5. Richardson only through `num.richardson.check` (KR-9), never unguarded.
+Version 0.1.0 of this method (cell average of the `max`, two implicit half steps, `alpha(t)` sampled at step ends) failed acceptance 3 on 18 entries (`oracle/K8_ACCEPTANCE_W1.json`). The causes and the measurements are in `program/K8_DIAGNOSIS.md`; the changes are ruling KR-15. This section is the full definition.
+
+**Plain idea.** Three things keep a ladder entry from converging at second order. A curve node that falls inside a time step; an exercise decision that jumps from one grid node to the next as an input moves; and high-frequency error that Crank-Nicolson does not damp. The method removes the curve from the time stepping altogether, replaces the jump by a smooth weighting, and starts each interval with implicit steps.
+
+1. **State, grid, knots.** As G-18 steps 1 to 3: `x_i = -h + i dx`, knots at the exercise times, `n = max(1, ceil(steps_per_year (t_k - t_(k-1))))` equal steps of size `dt` in each interval. Every exercise date is a time-grid point by construction.
+2. **Scaled value.** The scheme carries `U(t, x) = V(t, x) D(t)`, `D(t) = exp(-int_0^t alpha(s) ds) = P(0, t) exp(-c2 I(t))`, with `c2 = sigma^2 / (2 a^2)` and `I(t) = t + 2 expm1(-a t)/a - expm1(-2 a t)/(2a)`. `U` solves `U_t = A U` backward in time with `(A U)_i = -(sigma^2/2)(U_(i+1) - 2U_i + U_(i-1))/dx^2 + a x_i (U_(i+1) - U_(i-1))/(2 dx) + x_i U_i`. `A` has no curve term and is the same at every step. `U(0, .) = V(0, .)`.
+3. **Scaled exercise value** at `t`, node `i`: `Ehat = phi (D(t) - Q(Tn) - K sum tau_j Q(Tj))` over the payments after `t` (`tau` as G-18 step 4), `Q(s) = exp(ln P(0, s) - c2 (I(t) + B e1^2) + c4 e2 B^2 - B x_i)`, `B = -expm1(-a (s - t))/a`, `e1 = expm1(-a t)`, `e2 = expm1(-2 a t)`, `c4 = sigma^2/(4a)`. This is `D(t)` times the G-18 exercise value; the forward rate cancels and does not appear.
+4. **Time stepping.** A Crank-Nicolson step solves `(I + (dt/2) A) U_new = (I - (dt/2) A) U_old` on interior nodes; an implicit half step solves `(I + (dt/2) A) U_new = U_old`. In each interval, going backward, the first two steps (all of them if the interval has fewer) are each replaced by two implicit half steps; the rest are Crank-Nicolson steps [Rannacher 1984 (not free, recalled); Giles and Carter 2006, section 1 and Table 1 (read 2026-11-19)]. Boundaries as G-18 step 5: `U_0 = 2U_1 - U_2`, `U_(nx-1) = 2U_(nx-2) - U_(nx-3)`, substituted into the first and last interior rows, then set after each solve.
+5. **Exercise smoothing** at `t_m` (with `U = 0`) and on arriving at each earlier exercise date (not at 0). With `f_i = U_i - Ehat_i`, `f_(-1) = 2f_0 - f_1`, `f_nx = 2f_(nx-1) - f_(nx-2)`:
+   - `h_i = M(f_i, f_(i-1)) + M(f_i, f_(i+1))`, where `M(p, q) = int_0^1 (1 - u) max(p + (q - p) u, 0) du`: `p/3 + q/6` if `p >= 0` and `q >= 0`; `t - t r/3` with `r = p/(p - q)`, `t = p^2 / (2 (p - q))` if `p > 0 > q`; `q r^2 / 6` with `r = q/(q - p)` if `p < 0 < q`; 0 otherwise.
+   - End correction, for each `j` in `0..nx-2` in increasing order with `f_j > 0 > f_(j+1)` or `f_j < 0 < f_(j+1)`: let `pos` be the node of the pair with `f > 0` and `neg` the other, `rho = f_pos / (f_pos - f_neg)`, `d_i = f_(i-1) - 2f_i + f_(i+1)` for `1 <= i <= nx-2` and 0 at the two end nodes, `c = rho (1 - rho)(2 rho - 1)/12 x (d_j + d_(j+1))/2`. Then `h_pos -= (1 - rho) c` and `h_neg -= rho c`.
+   - `S_i = h_i - (h_(i-1) - 2h_i + h_(i+1))/6` for `1 <= i <= nx-2`, `S_i = h_i` at the two end nodes (all `h` taken after the end corrections).
+   - `U_i = Ehat_i + S_i`.
+   A node whose neighbours two away on each side all have `f > 0` keeps `U_i` to fourth order in `dx`, and one where they all have `f < 0` gets `Ehat_i` exactly: away from the exercise boundary this is the pointwise `max`. Sources: the hat function as the second-order smoothing operator, Kreiss, Thomee and Widlund 1970 (recalled, not read); cell averaging and its limits, Pooley, Vetzal and Forsyth 2003, sections 2.2 and 2.4 (read 2026-11-19); the end correction is derived in `program/K8_DIAGNOSIS.md` and measured there.
+6. `price = notional x U` at the centre node at `t = 0`.
+7. Ladder: the exact derivative of steps 1 to 6 with respect to each discount factor, `a` and `sigma` (`aad-core.md`). The grid of step 1 depends on `a` and `sigma` and is differentiated with everything else. An input the price does not depend on (a curve node before the first exercise date with no node between, or after the last payment) gives exactly 0.
+8. Richardson only through `num.richardson.check` (KR-9), never unguarded.
+
+**Worked example.** Three nodes with `f = (-1, 0, 1)`: `h_1 = M(0, -1) + M(0, 1) = 0 + 1/6`; `h_2 = M(1, 0) + M(1, 2) = 1/3 + 2/3 = 1` (with `f_3 = 2`); `h_0 = 0`. No end correction (no strict sign change between neighbours). `S_1 = 1/6 - (0 - 2/6 + 1)/6 = 1/18`. The pointwise value would be 0 and the cell average 1/8.
 
 ## `num.richardson.check` (guard helper, four languages)
 
@@ -50,7 +64,7 @@ rich_k-0005/0006 show the G-18 ladder entry converging at first order (as G-18 s
 
 ## Acceptance (fixed before any run; plan 14.8 K-8)
 
-1. Reference ("converged model derivative"): central bump-and-revalue with QuantLib `FdHullWhiteSwaptionEngine` at a fine grid (proposed tGrid 2,000, xGrid 801), relative bump 1e-4 on each discount factor, repeated at 5e-5; the two must agree within 0.1% or the entry is reported as unresolved. Cross-check: `CN_RANNACHER_SMOOTHED` at 801/400 and 1601/800 agree with each other within 0.2%. Both are required (owner decision K-QA, 2026-11-18); QuantLib is the counted outside check.
+1. Reference ("converged model derivative"): central bump-and-revalue with QuantLib `FdHullWhiteSwaptionEngine` at a fine grid (proposed tGrid 2,000, xGrid 801; set to tGrid 8,000, xGrid 3,201 by KR-16 before the second run), relative bump 1e-4 on each discount factor, repeated at 5e-5; the two must agree within 0.1% or the entry is reported as unresolved. Cross-check: `CN_RANNACHER_SMOOTHED` at 801/400 and 1601/800 agree with each other within 0.2%. Both are required (owner decision K-QA, 2026-11-18); QuantLib is the counted outside check.
 2. At the default grid 201/100, every ladder entry of aadladder_g-0001..0003 with `|reference| >= 1e-3 max |reference|` is within 1% of the reference; `d_price_d_mean_reversion` and `d_price_d_sigma` too.
 3. Observed order of the new method's price and ladder, by `num.richardson.check` on 201/401/801, between 1.5 and 2.5 with status `OK` on every entry. If any entry is `NON_MONOTONE`, step 3 of the method is not working and the test fails, whatever step 2 says.
 4. The R6 use restriction is removed from docs and the model inventory only for `CN_RANNACHER_SMOOTHED`, only after 1 to 3 pass; G-18 goldens unchanged.
