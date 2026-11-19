@@ -1,6 +1,6 @@
 # Recalibration triggers (stage K)
 
-Spec version 0.1.0. Status: **PROPOSED** (stage K wave 1, plan 14.8 K-4). Rulings: `stage-k-rulings-w1.md` KR-6.
+Spec version 1.0.0. Status: **CONFIRMED** 2026-11-19, confirmed by the stage K coordinator lane (branch k-w1; was PROPOSED, version 0.1.0, stage K wave 1, plan 14.8 K-4). Rulings: `stage-k-rulings-w1.md` KR-6.
 
 **Plain idea.** Recalibrating a model on every tick wastes effort and adds noise; never recalibrating lets it drift. A trigger compares how far a monitored input has moved since the last calibration with how much it normally moves, and fires only when the move is too large to be noise at a stated level.
 
@@ -36,3 +36,8 @@ Output fields compared: `fire` (boolean), `sigma` (binary64), `threshold` (binar
 
 - trig_k-0001..0008 in four languages; sigma and threshold to 1e-14 relative.
 - Simulation, seed fixed in the oracle: 100,000 noise-only paths of N(0, 1) changes, window 250, k = 3, d = 1: observed fire rate within the 99% binomial interval of 0.0027 (the window's sigma is estimated, so the expected rate is slightly above 0.0027; the test uses the Student-t predictive rate `2 t_{249}.sf(3 / sqrt(1 + 1/250))`, computed by SciPy, as the centre). Planted move of 6 sigma: fires on at least 99.9% of paths.
+
+## Acceptance evidence (2026-11-19)
+
+- trig_k-0001..0008 and the `e2_k` cases: pass in all four builds.
+- Simulation (key `trigger_simulation`): Python (numpy seed 20261118) 291 fires in 100,000 noise paths, Java (java.util.Random seed 20261118) 287; the 99% binomial interval of the Student-t predictive rate 0.0030306 is [259, 349] (SciPy `binom.interval`; Java computes the same interval exactly from the binomial pmf). The planted 6-sigma move fires on 100,000 of 100,000 paths in both (at least 99.9% required). Pass.

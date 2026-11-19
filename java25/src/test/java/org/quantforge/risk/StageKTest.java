@@ -30,6 +30,23 @@ class StageKTest {
         assertEquals(want, e.code(), e.getMessage());
     }
 
+    static void evidence(String key, String json) {
+        StageKEvidence.write(key, json);
+    }
+
+    /** Smallest k with P(X <= k) >= q for X ~ Binomial(n, p): scipy.stats.binom.ppf, by the pmf recurrence. */
+    static int binomPpf(int n, double p, double q) {
+        double pmf = Math.exp(n * Math.log1p(-p));
+        double cdf = pmf;
+        int k = 0;
+        while (cdf < q && k < n) {
+            pmf *= (double) (n - k) / (k + 1) * p / (1 - p);
+            k++;
+            cdf += pmf;
+        }
+        return k;
+    }
+
     private static double rel(double a, double b) {
         return Math.abs(a - b) / Math.max(Math.max(Math.abs(a), Math.abs(b)), 1e-300);
     }
@@ -69,6 +86,8 @@ class StageKTest {
             }
         }
         assertEquals(500_000, checked);
+        evidence("kr4_correction_property", "{\"logs\": 10000, \"queries_compared\": " + checked
+                + ", \"failures\": 0, \"seed\": \"java.util.Random(20261118)\"}");
     }
 
     @Test
@@ -107,6 +126,8 @@ class StageKTest {
     @Test
     void incrementalProperty10000Vectors() {
         Random rnd = new Random(20261118);
+        double worst = 0;
+        int bitEqual = 0;
         for (int t = 0; t < 10_000; t++) {
             int n = 1 + rnd.nextInt(40);
             double[] old = new double[n];
@@ -138,9 +159,16 @@ class StageKTest {
             for (int i = 0; i < n; i++) {
                 assertTrue(rel(up.discountFactors()[i], full[i]) <= 1e-12);
             }
+            for (int i = 0; i < n; i++) {
+                worst = Math.max(worst, rel(up.discountFactors()[i], full[i]));
+            }
             assertArrayEquals(full, up.discountFactors()); // bit-identical to a full rebuild (KR-5)
+            bitEqual++;
             assertEquals(n - j0, up.recomputed());
         }
+        evidence("incremental_property", "{\"vectors\": 10000, \"max_relative_difference\": " + worst
+                + ", \"bit_identical_to_full_rebuild\": " + bitEqual + ", \"copied_pillars_bit_identical\": true"
+                + ", \"seed\": \"java.util.Random(20261118)\"}");
     }
 
     @Test
@@ -174,7 +202,7 @@ class StageKTest {
     @Test
     void triggerSimulationAcceptance() {
         // recalibration-triggers.md: 100,000 noise paths, window 250, k = 3, d = 1; fire rate inside the 99 %
-        // interval of the Student-t predictive rate (binomial interval by the normal approximation here); a
+        // binomial interval (exact, scipy binom.interval) of the Student-t predictive rate; a
         // 6-sigma planted move fires on at least 99.9 % of paths.
         Random rnd = new Random(20261118);
         int n = 100_000;
@@ -201,8 +229,14 @@ class StageKTest {
             }
         }
         double centre = 2 * (1 - CreditOptions.studentCdf(k / Math.sqrt(1 + 1.0 / w), w - 1));
-        double sd = Math.sqrt(n * centre * (1 - centre));
-        assertTrue(Math.abs(fires - n * centre) <= 2.5758293035489 * sd + 1, fires + " vs " + n * centre);
+        int lo = binomPpf(n, centre, 0.005);
+        int hi = binomPpf(n, centre, 0.995);
+        evidence("trigger_simulation", "{\"paths\": " + n + ", \"window\": " + w + ", \"k\": " + k
+                + ", \"fires\": " + fires + ", \"centre_rate\": " + centre + ", \"binomial_99_interval\": [" + lo
+                + ", " + hi + "], \"planted_6_sigma_fires\": " + planted + ", \"planted_rate\": " + planted / (double) n
+                + ", \"seed\": \"java.util.Random(20261118)\", \"pass\": "
+                + (lo <= fires && fires <= hi && planted >= 0.999 * n) + "}");
+        assertTrue(lo <= fires && fires <= hi, fires + " outside [" + lo + ", " + hi + "]");
         assertTrue(planted >= 0.999 * n);
     }
 
@@ -236,13 +270,29 @@ class StageKTest {
             book.add(new StageK.ZeroPosition(-5e6 + 1e7 * rnd.nextDouble(), 0.1 + 29.9 * rnd.nextDouble(),
                     -0.01 + 0.09 * rnd.nextDouble()));
         }
+        StringBuilder moves = new StringBuilder();
+        double worst = 0;
+        double minAbsH = 1;
         for (int m = 0; m < 1000; m++) {
             double h = -0.02 + 0.04 * rnd.nextDouble();
             StageK.Intraday r = StageK.deltaGammaBound(book, h);
-            double err = Math.abs(r.estimatePnl() - StageK.zeroRevalue(book, h));
+            double full = StageK.zeroRevalue(book, h);
+            double err = Math.abs(r.estimatePnl() - full);
             assertTrue(err <= r.bound(), h + ": " + err + " > " + r.bound());
             assertEquals(StageK.LABEL, r.label());
+            worst = Math.max(worst, err / r.bound());
+            minAbsH = Math.min(minAbsH, Math.abs(h));
+            moves.append(m == 0 ? "" : ", ").append('[').append(h).append(", ").append(r.estimatePnl()).append(", ")
+                    .append(full).append(", ").append(r.bound()).append(']');
         }
+        StringBuilder bk = new StringBuilder();
+        for (StageK.ZeroPosition p : book) {
+            bk.append(bk.length() == 0 ? "" : ", ").append('[').append(p.notional()).append(", ").append(p.maturity())
+                    .append(", ").append(p.yield()).append(']');
+        }
+        evidence("intraday_bound_1000_moves", "{\"book\": [" + bk + "], \"seed\": \"java.util.Random(20261118)\""
+                + ", \"columns\": [\"h\", \"estimate_pnl\", \"full_revaluation\", \"bound\"], \"moves\": [" + moves
+                + "], \"violations\": 0, \"worst_error_over_bound\": " + worst + ", \"min_abs_h\": " + minAbsH + "}");
     }
 
     @Test

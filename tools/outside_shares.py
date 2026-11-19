@@ -54,7 +54,7 @@ def load_rederivation():
     doc = json.loads(p.read_text(encoding="utf-8"))
     return {c["case_id"]: c["operation"] for c in doc["cases"] if c["pass"]}, doc.get("source", "independent re-derivation")
 
-STAGE_DIRS = {"D": ["stage_d"], "E": ["stage_e", "stage_e_b"], "F": ["stage_f"], "G": ["stage_g"], "I": ["stage_i"], "J": ["stage_j"], "H": ["stage_h"]}
+STAGE_DIRS = {"D": ["stage_d"], "E": ["stage_e", "stage_e_b"], "F": ["stage_f"], "G": ["stage_g"], "I": ["stage_i"], "J": ["stage_j"], "H": ["stage_h"], "K": ["stage_k"]}
 
 # Stage F convention rows naming a numpy or scipy primitive. Kupiec (SCIPY.BINOM) and Christoffersen (SCIPY.CHI2)
 # cases rebuild the spec's likelihood-ratio formula around a distribution call: reimplementation (review finding 6).
@@ -223,15 +223,35 @@ def load_stage_h():
     return out
 
 
+# Stage K wave 1 (ruling KR-11, confirmed 2026-11-19): the only library check is SciPy on trig_k
+# `false_alarm_rate`, one of four compared outputs, so no case counts as library-checked. Counted, as for stage H,
+# is the DR-H2 blind re-derivation (program/STAGE_K_BLIND_W1.md), and only where every compared output was checked
+# blind at the golden's tolerance: a case whose `verified_by` says "not blind" (gap-decided fields, oracle-only
+# cases) or "only to 6 decimals" (idr_k-0001..0004 `bound`, compared at 1e-9 relative but blind-checked to 5e-7
+# absolute) does not count. The mpmath values are our own oracle and never count (KR-11).
+STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-5a", "rich_k": "K-8 guard",
+                 "e1_k": None, "e2_k": None}  # e1_k, e2_k: error cases only
+
+
+def load_stage_k():
+    out = {}
+    for f in sorted((GOLDEN / "stage_k").glob("*.json")):
+        for c in json.loads(f.read_text(encoding="utf-8"))["cases"]:
+            vb = " | ".join(c.get("verified_by", []))
+            if "DR-H2" in vb and "MATCH" in vb and "not blind" not in vb and "only to 6 decimals" not in vb:
+                out[c["case_id"]] = (REDERIVED, H_REDERIVE_SRC)
+    return out
+
+
 def stage_report(stage, problems):
     """Rows (suite, operation, class, sweep, library, value-checked)."""
     suites = golden_suites(stage)
     rows = []  # (suite, operation, class, sweep, library)
-    if stage == "H":
-        reg = load_stage_h()
+    if stage in ("H", "K"):
+        reg, items = (load_stage_h(), STAGE_H_ITEMS) if stage == "H" else (load_stage_k(), STAGE_K_ITEMS)
         for suite, cases in suites.items():
-            if suite not in STAGE_H_ITEMS:
-                problems.append(f"stage H: golden suite {suite} has no plan item in STAGE_H_ITEMS")
+            if suite not in items:
+                problems.append(f"stage {stage}: golden suite {suite} has no plan item in STAGE_{stage}_ITEMS")
             for cid, op, st in cases:
                 cls, lib = reg.get(cid, ("none", ""))
                 rows.append((suite, op, cls, False, lib, st == "ok"))
@@ -329,11 +349,12 @@ def build(problems):
         entry["meets_floor"] = s >= FLOOR
         if not entry["meets_floor"]:
             problems.append(f"stage {st}: {s:.1%} of value-checked cases (library plus re-derivation) is under the {FLOOR:.0%} floor")
-        if st == "H":
+        if st in ("H", "K"):
+            item_map = STAGE_H_ITEMS if st == "H" else STAGE_K_ITEMS
             items = defaultdict(list)
             for r in core:
-                if STAGE_H_ITEMS.get(r[0], "?") is not None:
-                    items[STAGE_H_ITEMS.get(r[0], "?")].append(r)
+                if item_map.get(r[0], "?") is not None:
+                    items[item_map.get(r[0], "?")].append(r)
             entry["per_item"] = {}
             for it, rs in sorted(items.items()):
                 v = vshare(rs)
@@ -371,6 +392,16 @@ def markdown(doc):
               "| Item | Suites | Value cases | Blind or paper | Share | 60% per item |", "|---|---|---:|---:|---:|---|"]
         L += [f"| {it} | {', '.join('`' + s + '`' for s in v['suites'])} | {v['cases']} | {v['counted_with_rederivation']} | "
               f"{(v['share_with_rederivation'] or 0):.1%} | {'met' if v['meets_item_floor'] else 'NOT MET'} |" for it, v in eh["per_item"].items()]
+    ek = doc["stages"].get("K")
+    if ek:
+        L += ["", "## Stage K per plan item (plan 15 gate rule: at least 60% of each item's value cases)", "",
+              "Ruling KR-11: SciPy checks only trig_k `false_alarm_rate`, one of four compared outputs, so no case is "
+              "library-checked. A case counts as `independent-rederivation` only if the wave-1 blind lane (DR-H2) checked "
+              "every compared output at the golden's tolerance; gap-decided, oracle-only and 6-decimal bound cases do not count. "
+              "The mpmath oracle is our own and never counts.", "",
+              "| Item | Suites | Value cases | Blind | Share | 60% per item |", "|---|---|---:|---:|---:|---|"]
+        L += [f"| {it} | {', '.join('`' + s + '`' for s in v['suites'])} | {v['cases']} | {v['counted_with_rederivation']} | "
+              f"{(v['share_with_rederivation'] or 0):.1%} | {'met' if v['meets_item_floor'] else 'NOT MET'} |" for it, v in ek["per_item"].items()]
     L += ["", "## Value classes with no free outside reference", "", "| Suite | Reason |", "|---|---|"]
     for e in doc["stages"].values():
         L += [f"| `{k}` | {v} |" for k, v in e["no_outside_reference"].items()]

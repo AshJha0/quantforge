@@ -1,4 +1,8 @@
-# Stage K rulings, wave 1 (spec lane): PROPOSED
+# Stage K rulings, wave 1
+
+**Status: CONFIRMED 2026-11-19 by the stage K coordinator lane (branch k-w1), except KR-8**, which stays PROPOSED with the K-8 lane that owns `bermudan-ladder-k8.md`. Each ruling was checked against the text of its spec; the result of each check is in "Confirmation" at the end. A ruling found wrong or incomplete is not edited: KR-15 to KR-17 correct or complete it and bind with it. The spec lane's text follows unchanged.
+
+## As drafted (spec lane, 2026-11-18)
 
 **PROPOSED, not normative.** Drafted 2026-11-18 by a writing-only lane (no builds, no runs) while stage H closes. Nothing here binds a build until the stage K coordinator confirms it at the start of stage K, under the plan section 15 gate rule (source, acceptance test fixed before the run, outside checks on at least 60% of value cases). Ruling numbers are `KR-n` so they never clash with plan item IDs `K-n` (lesson of DR-H6). Earlier rulings still hold; in particular G-18 (pinned Bermudan scheme keeps its meaning) and the stage A as-of store (`01-core/asof-store.md`) stay unchanged.
 
@@ -30,3 +34,32 @@ Planning context: `institutional-quant-engine-plan/STAGE_K_START.md`.
 - K-QB (KR-8): if K-8 misses 1% at the default grid, it moves to a point release; the default grid is never redefined to pass.
 - K-QC (KR-1): contract 1.17.0.
 - K-QH: sub-item IDs (K-4a, K-8a, ...) and the `KR-n` ruling prefix adopted.
+
+## Confirmation (stage K coordinator lane, 2026-11-19)
+
+Checked against `01-core/bitemporal-store.md`, `02-curves/incremental-update.md`, `03-calibration/recalibration-triggers.md`, `06-risk/intraday-risk-bounds.md` and the `num.richardson.check` section of `06-risk/bermudan-ladder-k8.md`, and against the four builds (Python, Java, C++, Rust; each passes the 59 stage K goldens). Evidence class of each check: read (spec and ruling text side by side) and measured (the acceptance runs recorded in `program/stage_k_w1/`).
+
+| # | Result | Note |
+|---|---|---|
+| KR-1 | Confirmed, wave 1 part | The six operations exist under these names in all four builds. "One new status-like output field" means the field name `status`, which two operations use (`core.store.bitemporal_query`, `num.richardson.check`). The `method` value `CN_RANNACHER_SMOOTHED` belongs to KR-8 and the K-8 lane. Contract 1.17.0 is now reported by all four builds and the runner |
+| KR-2 | Confirmed | Matches the formal statement of `bitemporal-store.md` (half-open valid interval, K inclusive, highest sequence wins, a deleted winner masks) |
+| KR-3 | Corrected by KR-16 | "event_time + 1 ns" cannot be written: contract instants are whole seconds (`cli-contract.md`, Value encoding) |
+| KR-4 | Confirmed | Run on 10,000 generated logs (500,000 query pairs) in Python and Java, and in the C++ and Rust unit tests; zero failures |
+| KR-5 | Confirmed | Recomputed pillars are bit-identical to a full rebuild in all 10,000 vectors in Python and Java (largest relative difference 0) |
+| KR-6 | Confirmed | Matches `recalibration-triggers.md`; KR-13 restates the strict inequality |
+| KR-7 | Corrected by KR-15, completed by KR-17 | `M3 = T^3 N exp(...)` is negative for a short position; every build and the oracle use `abs(N)`, as the contract table already says |
+| KR-8 | Not confirmed here | K-8 lane |
+| KR-9 | Confirmed | Matches the `num.richardson.check` section; the guard is in all four builds (rich_k, 8 cases). The K-8 spec page itself is not marked confirmed here because the K-8 lane owns it |
+| KR-10 | Confirmed | Only `risk.intraday.delta_gamma_bound` carries the label: `curve.incremental.update` works on the caller's quotes and simulates nothing, so "where data is simulated" does not apply to it |
+| KR-11 | Confirmed | Counted outside: SciPy `2*norm.sf(k)` on trig_k `false_alarm_rate` only. The mpmath values of idr_k and inc_k are our own oracle, and no second lane has written the mpmath check without the tables, so they are not counted outside |
+| KR-12 | Confirmed | idr_k-0006, rich_k-0007 |
+| KR-13 | Confirmed | trig_k-0004 |
+| KR-14 | Confirmed | bt_k-0004, bt_k-0006 |
+
+## Wave 1 confirmation rulings (2026-11-19)
+
+| # | Point | Ruling |
+|---|---|---|
+| KR-15 | `M3` with a short position (corrects KR-7) | `M3 = T^3 abs(N) exp(-T min(y, y + h))`. The third derivative of `V(y) = N exp(-yT)` is `-T^3 N exp(-yT)`; its absolute value `T^3 abs(N) exp(-yT)` is largest at the smallest yield on the segment. KR-7 wrote `N`, which gives a negative "bound" when `N < 0`. Goldens are unchanged: idr_k-0005 (short 2-year leg) was already generated with `abs(N)` |
+| KR-16 | Stage A mapping resolution (corrects KR-3) | A stage A record maps to `valid_from = event_time`, `valid_to = event_time + 1 s`, one step of the contract's whole-second instants. Still documented only, not an operation |
+| KR-17 | The intraday bound in binary64 (completes KR-7) | The `bound` output is the exact-arithmetic Lagrange bound `sum_i abs(h)^3 M3_i / 6`, evaluated in binary64 with an exactly rounded sum. Derivation: Taylor's theorem with the Lagrange remainder gives `V(y + h) - V(y) - V'(y) h - V''(y) h^2 / 2 = V3(xi) h^3 / 6` (`V3` the third derivative) for some `xi` between `y` and `y + h`, so the remainder of one position is at most `abs(h)^3 T^3 abs(N) exp(-T xi) / 6 <= abs(h)^3 M3 / 6` (KR-15); over a book the position bounds are summed (no netting, since the `xi` differ). The binary64 comparison of the acceptance (`abs(estimate - revaluation) <= bound`) adds rounding of order `10 eps sum abs(N) exp(-yT) T abs(h)` against a bound of order `sum abs(N) exp(-yT) T^3 abs(h)^3 / 6`, so it is meaningful only when `T abs(h)` is well above `sqrt(60 eps)`, about 1e-7. The 1,000-move acceptance is therefore also checked at 50 digits (`oracle/python/check_stage_k_idr_moves.py`, output `oracle/IDR_K_MOVES_CHECK_W1.json`): zero exact violations in the Python and Java runs, binary64 rounding at most 2.3e-8 of the bound, smallest exact margin 0.62 of the bound. This closes the "idr bounds provisional" note of the blind record: the four golden bounds were filled to full precision by the oracle lane (mpmath, 50 digits), idr_k-0005 is filled and is not blind, and the blind check of the four bounds stays a check to 6 decimals |

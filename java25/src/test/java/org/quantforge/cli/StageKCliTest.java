@@ -254,13 +254,19 @@ class StageKCliTest {
                             break;
                         }
                     }
-                    assertTrue(first >= 0, String.valueOf(c.get("case_id")));
+                    // quotes are in maturity order, one pillar per quote: a change at quote j leaves pillars
+                    // 0..j-1 bit-identical and moves pillar j (K-4 on the production bootstrap)
+                    assertEquals(quotes.size(), a.size());
+                    assertEquals(j, first, c.get("case_id") + " quote " + j);
                     tried++;
                 }
             }
         }
         assertTrue(used >= 4);
         assertTrue(tried >= 10, "tried " + tried);
+        org.quantforge.risk.StageKEvidence.write("incremental_property_stage_b", "{\"stage_b_cases\": " + used
+                + ", \"quote_changes_checked\": " + tried + ", \"earlier_pillars_bit_identical\": true"
+                + ", \"first_changed_pillar_is_the_changed_quote\": true}");
     }
 
     // --- KR-8 method ---------------------------------------------------------------------------------

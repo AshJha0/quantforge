@@ -1,6 +1,6 @@
 # Incremental curve update (stage K)
 
-Spec version 0.1.0. Status: **PROPOSED** (stage K wave 1, plan 14.8 K-4). Rulings: `stage-k-rulings-w1.md` KR-5.
+Spec version 1.0.0. Status: **CONFIRMED** 2026-11-19, confirmed by the stage K coordinator lane (branch k-w1; was PROPOSED, version 0.1.0, stage K wave 1, plan 14.8 K-4). Rulings: `stage-k-rulings-w1.md` KR-5.
 
 **Plain idea.** In a sequential bootstrap each discount factor depends only on the quotes up to its own maturity. When one quote ticks, the pillars before it cannot change, so only that pillar and the later ones need solving again. The test is that this shortcut gives the same curve as rebuilding everything.
 
@@ -43,3 +43,9 @@ Tolerance against the expected decimals: 1e-15 absolute (binary64). Between `upd
 - inc_k-0001..0006 in four languages.
 - Property: for 10,000 random quote vectors and random single or multi-index changes, `update` equals full rebuild to 1e-12 relative, and copied pillars are bit-identical.
 - The same property on the stage B production bootstrap (all instrument types it supports), which is the K-4 claim; this hand set alone does not make it.
+
+## Acceptance evidence (2026-11-19)
+
+- inc_k-0001..0006 and the `e2_k` cases: pass in all four builds.
+- 10,000 random vectors: recomputed pillars bit-identical to a full rebuild in all 10,000 (largest relative difference 0), copied pillars bit-identical; Python and Java (`program/stage_k_w1/acceptance_python.json` and `acceptance_java.jsonl`, key `incremental_property`); C++ and Rust unit tests.
+- Stage B production bootstrap: on the 10 sequential log-linear stage B bootstrap goldens, 45 single-quote moves of 1 bp; in every one the first pillar that changes is the moved quote's pillar and every earlier pillar is bit-identical (key `incremental_property_stage_b`, Python and Java). Limitation: the stage B bootstrap has no incremental entry point, so this checks the K-4 premise (earlier pillars cannot move) on the production code, not a patched curve against a rebuild; the patched-against-rebuild check is the hand instrument set above.

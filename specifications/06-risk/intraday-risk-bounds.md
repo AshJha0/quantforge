@@ -1,10 +1,10 @@
 # Intraday risk with error bounds (stage K)
 
-Spec version 0.1.0. Status: **PROPOSED** (stage K wave 1, plan 14.8 K-5). Rulings: `stage-k-rulings-w1.md` KR-7, KR-10.
+Spec version 1.0.0. Status: **CONFIRMED** 2026-11-19, confirmed by the stage K coordinator lane (branch k-w1; was PROPOSED, version 0.1.0, stage K wave 1, plan 14.8 K-5). Rulings: `stage-k-rulings-w1.md` KR-7 (as corrected by KR-15 and completed by KR-17), KR-10.
 
 **Plain idea.** Full revaluation of a book on every market move is slow. Delta and gamma, computed once, give a fast estimate. The estimate is only worth showing with a statement of how wrong it can be, and for smooth instruments Taylor's theorem gives that statement exactly.
 
-**Formal statement.** For `V` three times differentiable on the segment between `x` and `x + h`, `|V(x + h) - V(x) - V'(x) h - V''(x) h^2 / 2| <= M3 |h|^3 / 6` with `M3 = max |V'''|` on the segment (Lagrange remainder) [any calculus text; e.g. Apostol, *Calculus* vol. 1, 2nd ed., Wiley 1967, section 7.7 (not free, definition only)]. For a zero-coupon position `V(y) = N exp(-y T)` (continuous yield): `V' = -T V`, `V'' = T^2 V`, `|V'''| = T^3 V`, decreasing in `y`, so `M3 = T^3 N exp(-T min(y, y + h))`.
+**Formal statement.** For `V` three times differentiable on the segment between `x` and `x + h`, `|V(x + h) - V(x) - V'(x) h - V''(x) h^2 / 2| <= M3 |h|^3 / 6` with `M3 = max |V'''|` on the segment (Lagrange remainder) [any calculus text; e.g. Apostol, *Calculus* vol. 1, 2nd ed., Wiley 1967, section 7.7 (not free, definition only)]. For a zero-coupon position `V(y) = N exp(-y T)` (continuous yield): `V' = -T V`, `V'' = T^2 V`, `|V'''| = T^3 V`, decreasing in `y`, so `M3 = T^3 abs(N) exp(-T min(y, y + h))` (absolute value for a short position, KR-15). For a book the position bounds are summed without netting; the `bound` output is this exact-arithmetic bound evaluated in binary64, and the derivation and its rounding budget are in KR-17.
 
 ## `risk.intraday.delta_gamma_bound`
 
@@ -43,3 +43,8 @@ The bounds are tight (ratio near 1) because a zero bond's third derivative barel
 - idr_k-0001..0007 in four languages, 1e-9 relative (idr_k-0005 filled by the oracle lane, not blind).
 - 1,000 random parallel moves (seeded, h uniform in [-0.02, 0.02]) on a seeded 50-position book: `|estimate - full revaluation| <= bound` on every move, and the 1,000 results logged.
 - Instruments without a supplied `M3` are reported as "no bound" and excluded from the "with error bounds" claim. Described as latency-aware analytics on simulated data.
+
+## Acceptance evidence (2026-11-19)
+
+- idr_k-0001..0007 and the `e2_k` cases: pass in all four builds at 1e-9 relative. idr_k-0005 is filled from the oracle (mpmath, 50 digits) and is not blind.
+- 1,000 moves on a seeded 50-position book (key `intraday_bound_1000_moves` in `program/stage_k_w1/acceptance_python.json` and `acceptance_java.jsonl`, each move logged as `[h, estimate_pnl, full_revaluation, bound]`): zero violations in Python (worst error over bound 0.0105) and Java (0.382; Java draws its own book from java.util.Random). Checked again at 50 digits by `oracle/python/check_stage_k_idr_moves.py` (`oracle/IDR_K_MOVES_CHECK_W1.json`): zero exact violations, binary64 rounding at most 2.3e-8 of the bound (KR-17). This is our own oracle, not an outside check.

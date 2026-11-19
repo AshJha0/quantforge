@@ -1,6 +1,6 @@
 # Bitemporal store (stage K)
 
-Spec version 0.1.0. Status: **PROPOSED** (stage K wave 1, plan 14.8 K-4). Rulings: `stage-k-rulings-w1.md` KR-2, KR-3, KR-4. Depends on `asof-store.md` (unchanged) and `snapshot-hash.md`.
+Spec version 1.0.0. Status: **CONFIRMED** 2026-11-19, confirmed by the stage K coordinator lane (branch k-w1; was PROPOSED, version 0.1.0, stage K wave 1, plan 14.8 K-4). Rulings: `stage-k-rulings-w1.md` KR-2, KR-3 (as corrected by KR-16: a stage A record is `[event_time, event_time + 1 s)`), KR-4. Depends on `asof-store.md` (unchanged) and `snapshot-hash.md`.
 
 **Plain idea.** The stage A store answers "what did we know at 16:00 on Tuesday?". A bitemporal store also answers "for which period was that value meant to hold?". A rate fixed for February, corrected in April, must still read as the old value to anyone asking "as known in March", and as the corrected one to anyone asking "as known in April". Nothing is ever overwritten.
 
@@ -71,6 +71,12 @@ Property (KR-4, the K-4 acceptance test): appending any record with `knowledge_t
 - bt_k-0001..0010 in four languages, exact.
 - KR-4 property on at least 10,000 generated logs per language (seeded generator in the oracle), zero failures.
 - Stage A goldens unchanged.
+
+## Acceptance evidence (2026-11-19)
+
+- bt_k-0001..0010 and the two-error cases of `e2_k`: pass in Python, Java, C++ and Rust (`conformance/runner/runner.py --impl <lang> --suite 'stage_k/*'`).
+- KR-4: 10,000 logs, 500,000 query pairs, zero failures in Python (`program/stage_k_w1/acceptance_python.json`, key `kr4_correction_property`) and Java (`program/stage_k_w1/acceptance_java.jsonl`, same key); also in the C++ and Rust unit tests (`cpp26/tests/test_stage_k.cpp`, `rust/crates/quantforge-core/src/stage_k_tests.rs`).
+- Stage A goldens unchanged: the full conformance run passes them in all four builds.
 
 ## Sources
 
