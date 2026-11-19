@@ -14,6 +14,7 @@ import math
 from dataclasses import dataclass
 
 from .errors import QfError
+from .finite import guard
 
 ALPHA = 1.4  # CRE52.1
 FLOOR = 0.05  # CRE52.23
@@ -403,3 +404,6 @@ def ead(
         "hedging_sets": rows,
         "trades": out_trades,
     }
+
+
+guard(globals())

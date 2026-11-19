@@ -36,7 +36,7 @@ def _load(name: str, path: Path) -> ModuleType:
 
 TOOLS = ROOT / "tools" / "curve_daily"
 sys.path.insert(0, str(TOOLS))
-core = _load("core", TOOLS / "core.py")
+core = _load("curve_core", TOOLS / "curve_core.py")
 run_day = _load("run_day", TOOLS / "run_day.py")
 verify_chain = _load("verify_chain", TOOLS / "verify_chain.py")
 site_page = _load("curve_daily_site_page", TOOLS / "site_page.py")

@@ -10,7 +10,7 @@ Label on every row: "paper marks on a fitted curve; not tradable". Fills are sim
 |---|---|---|
 | Spec, fixed before any scheduled run | `specifications/12-platform/paper-ledger-daily.md` | acceptance table P1 to P11 in the spec |
 | Rulings KR-70 to KR-89 (proposed) | `specifications/stage-k-rulings-paper.md` | need the coordinator's confirmation |
-| Daily job | `tools/paper_daily/core.py`, `run_day.py`, `config.json` | `python/tests/test_paper_daily.py`, 40 tests, measured 2026-11-19 on the local laptop (Windows, Python 3.15), not on CI |
+| Daily job | `tools/paper_daily/paper_core.py`, `run_day.py`, `config.json` | `python/tests/test_paper_daily.py`, 40 tests, measured 2026-11-19 on the local laptop (Windows, Python 3.15), not on CI |
 | Verifier and anchor tool | `tools/paper_daily/verify_ledger.py` | same test file; planted faults listed under P7 |
 | Workflow | `.github/workflows/paper-ledger.yml` | not triggered; `tools/check_job_names.py` passes (59 jobs, 0 problems) |
 | Guide | `docs/developer-guides/paper-ledger.md` | |

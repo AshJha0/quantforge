@@ -35,7 +35,7 @@ def _load(name: str, path: Path) -> ModuleType:
     return mod
 
 
-core = _load("paper_daily_core", ROOT / "tools" / "paper_daily" / "core.py")
+core = _load("paper_core", ROOT / "tools" / "paper_daily" / "paper_core.py")
 fl = _load("forward_log_for_paper", ROOT / "tools" / "forward-log" / "forward_log.py")
 verify_cli = _load("paper_daily_verify", ROOT / "tools" / "paper_daily" / "verify_ledger.py")
 CFG: dict[str, Any] = core.load_config()
@@ -578,7 +578,7 @@ def test_goldens_pl_k(ledger30: str) -> None:
 
 def test_no_code_path_reaches_fedinvest_or_a_network() -> None:
     """P1 and KR-70: the job reads the recorded log only."""
-    for name in ("core.py", "run_day.py", "verify_ledger.py"):
+    for name in ("paper_core.py", "run_day.py", "verify_ledger.py"):
         src = (ROOT / "tools" / "paper_daily" / name).read_text(encoding="utf-8")
         for word in ("urllib", "requests", "http.client", "socket", "FedInvest", "treasurydirect"):
             assert word not in src, (name, word)

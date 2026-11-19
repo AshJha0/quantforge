@@ -10,7 +10,7 @@ Row label: "fitted to public US Treasury par yields with a library Nelson-Siegel
 |---|---|---|
 | Spec, fixed before any scheduled run | `specifications/12-platform/daily-curve-run.md` | acceptance table C1 to C4 in the spec |
 | Rulings KR-90 to KR-107 (proposed) | `specifications/stage-k-rulings-curve.md` | need the coordinator's confirmation |
-| Job | `tools/curve_daily/core.py`, `run_day.py`, `config.json` | `python/tests/test_curve_daily.py`, 23 tests, measured 2026-11-19 on the local laptop (Windows, Python 3.15), not on CI |
+| Job | `tools/curve_daily/curve_core.py`, `run_day.py`, `config.json` | `python/tests/test_curve_daily.py`, 23 tests, measured 2026-11-19 on the local laptop (Windows, Python 3.15), not on CI |
 | Verifier, anchor, rebuild | `tools/curve_daily/verify_chain.py` | same test file; one planted fault per check (spec table) |
 | Workflow | `.github/workflows/curve-daily.yml` | not triggered; `tools/check_job_names.py` 59 jobs, 0 problems |
 | Site stub | `tools/curve_daily/site_page.py`, placeholder data `tools/curve_daily/site/latest.json` | test renders the placeholder and a real summary |

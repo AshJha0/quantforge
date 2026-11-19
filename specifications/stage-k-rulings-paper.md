@@ -35,7 +35,7 @@ Drafted 2026-11-19 on branch `k-paper`. Proposed: not normative until the stage 
 
 ## Confirmation (stage K coordinator lane, 2026-11-19)
 
-Checked against the spec, `tools/paper_daily/core.py`, `run_day.py`, `verify_ledger.py`, `config.json`, `python/tests/test_paper_daily.py` and `.github/workflows/paper-ledger.yml` (evidence class read; the 40 tests are the measured check). Every ruling KR-70 to KR-89 matches the spec text and the code; KR-108 records the integration check of KR-72.
+Checked against the spec, `tools/paper_daily/paper_core.py`, `run_day.py`, `verify_ledger.py`, `config.json`, `python/tests/test_paper_daily.py` and `.github/workflows/paper-ledger.yml` (evidence class read; the 40 tests are the measured check). Every ruling KR-70 to KR-89 matches the spec text and the code; KR-108 records the integration check of KR-72.
 
 | # | Result | Note |
 |---|---|---|

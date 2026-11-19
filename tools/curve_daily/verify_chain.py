@@ -25,7 +25,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-import core  # noqa: E402
+import curve_core as core  # noqa: E402
 import run_day  # noqa: E402
 
 

@@ -20,7 +20,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "forward-log"))
-import core  # noqa: E402
+import paper_core as core  # noqa: E402
 import forward_log as fl  # noqa: E402
 
 

@@ -12,6 +12,7 @@ import math
 from collections.abc import Sequence
 
 from .errors import QfError
+from .finite import guard
 
 COVERAGE = 0.99  # MAR32.5: bank-wide VaR at the 99th percentile; MAR99.17: true coverage 99%
 AMBER_FROM = 0.95  # MAR99.17: amber begins where P(X <= k) >= 95%
@@ -160,3 +161,6 @@ def count_exceptions(
         "days_actual": a,
         "days_hypothetical": h,
     }
+
+
+guard(globals())
