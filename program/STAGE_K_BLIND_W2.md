@@ -140,3 +140,17 @@ Procedure: as for the first lane (steps 1 to 5 above), with the packet `C:/Work/
 ### Results (second lane)
 
 Not run. (Date, deriver and model, packet manifest check, frozen hash and commit, notes and any rulings, compare output path, MATCH / MISMATCH / MISSING per case, counted, K-8f share: to be filled by the coordinator.)
+
+### Second blind lane: results (2026-11-19; first and only compare run)
+
+- Deriver: a separate subagent on Claude Sonnet 5.5, given only the packet folder and its own folder; standard library only (no SciPy, numpy or mpmath), statistics implemented from their definitions. Its own statement: read and tried to read nothing outside the two folders (not independently logged). Coordinator checked the packet manifest hash 3de017bf... before the hand-over.
+- Blind results as received: `stage_k_blind/ima2/`, committed in fa6d42d0 before the compare. SHA-256 of `blind_results.json`: `5b10910fa72eb77e69c0337f325bd0814a4c232ae05ce72e02106b73797a7df5`, recomputed by the coordinator, equal to the deriver's hash file.
+- Compare: `ima2_compare.py` as fixed at 629234a1 (tolerance max(1e-12|e|, 1e-15)); output `stage_k_blind/ima2/compare_output.txt`. No rerun; results unchanged.
+
+| Lane | Cases | MATCH | MISMATCH | Eligible | Counted | K-8f outside share after it |
+|---|---:|---:|---:|---:|---:|---|
+| Second (SciPy-only cases) | 8 | 8 | 0 | 8 | 8 | 27 of 33 (81.8%): 4 printed, 23 blind |
+
+Largest difference seen: the normal ES factor, 2.3378027922014146 (golden) against 2.337802792201402 (blind), relative 5.4e-15, inside the tolerance; it comes from how 1 - 0.975 and the tail are evaluated in binary64. Deriver's recorded readings (`stage_k_blind/ima2/notes.md`): Spearman last-ulp rounding depends on integer or float product under the square root; pla_k-0001 is RED from the KS rule at n = 5 despite a rank correlation of 0.9, applied literally; the Q_KS series summed plainly; pla_k-0005 gives exactly 1.0. The spec should state the Spearman evaluation order or accept the tolerance explicitly.
+
+Correction also applying to K-8g (2026-11-19): its "16 of 16" above counted two discount-factor cases checked only by SciPy quad (df_k-0001, df_k-0002). Under D6 those do not count: K-8g is 14 of 16 (87.5%).
