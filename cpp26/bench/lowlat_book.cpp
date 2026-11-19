@@ -9,6 +9,12 @@
 // Warm-up: the first 1,000,000 messages, unmeasured; then the allocation counter is reset. Every 1,000th measured
 // message the six queries are timed the same way. Clock cost: 1,000,000 empty pairs, published, not subtracted.
 // Batch timing (1,000 messages per sample, divided) is always recorded; the report says which is the headline.
+// Workload R2 and row L7 (2026-11-19, items 2a and 2b; targets (g) and (h)): QF_H9_CHECKPOINTS names the checkpoint file
+// of benchmarks/h9/build_r2.py and adds the form A correctness pass (venue checksum after every book message, every
+// per-second row over its millisecond range; lowlat_r2.hpp), outside the timed region. QF_H9_PER_LEVEL=1 adds the L7
+// sample (apply time / levels, rounded up; update messages with at least one level) to the per-message figures; it
+// is a separate instantiation of the timed loop, so the R and S loops are unchanged. Every run records the 1-minute
+// load average (/proc/loadavg) at its start and end.
 // Allocation (H-9(b)): malloc/calloc/realloc are interposed on glibc (operator new goes through malloc), so every
 // heap allocation in the process is counted; elsewhere operator new is replaced.
 #include <algorithm>
@@ -26,6 +32,7 @@
 #include <string>
 #include <vector>
 
+#include "lowlat_r2.hpp"
 #include "quantforge/core/fast_book.hpp"
 #include "quantforge/core/rng.hpp"
 
@@ -324,9 +331,20 @@ enum Query { QBestBid, QBestAsk, QQtyPresent, QQtyAbsent, QTop10, QTop100, NQuer
 const char* const query_names[NQueries] = {"best_bid", "best_ask", "qty_at_present", "qty_at_absent", "top10", "top100"};
 
 struct RunResult {
-    Hist all, kinds[NKinds], queries[NQueries], qbatch[NQueries], batch;
+    Hist all, kinds[NKinds], queries[NQueries], qbatch[NQueries], batch, per_level;
     long long allocs = 0, batch_allocs = 0, far = 0, grows = 0, fallbacks = 0;
+    double load_start = -1, load_end = -1;
 };
+
+// 1-minute load average, -1 where /proc/loadavg is absent.
+double loadavg_1m() {
+    double v = -1;
+    if (FILE* f = std::fopen("/proc/loadavg", "r")) {
+        if (std::fscanf(f, "%lf", &v) != 1) v = -1;
+        std::fclose(f);
+    }
+    return v;
+}
 
 volatile std::int64_t g_sink;
 
@@ -336,7 +354,9 @@ inline void keep(std::int64_t& v) { asm volatile("" : "+r"(v) : : "memory"); }
 // Precomputed side choices for the batch loops (filled once from core.rng).
 std::array<std::uint8_t, 1024> sides{};
 
+template <bool PerLevel>
 void timed_run(const Stream& st, RunResult& rr, std::uint64_t qseed) {
+    rr.load_start = loadavg_1m();
     quantforge::Xoshiro256 r(qseed, 0);
     for (auto& x : sides) x = std::uint8_t(r.next() & 1);
     std::vector<ll::Level> buf(depth), pres(depth);
@@ -352,6 +372,10 @@ void timed_run(const Stream& st, RunResult& rr, std::uint64_t qseed) {
             const std::uint64_t dt = now_ns() - t0;
             rr.all.record(dt);
             rr.kinds[m.reserved].record(dt);
+            if constexpr (PerLevel) {  // L7: after the clock read, so the timed region is the same
+                const std::uint32_t n = std::uint32_t(m.n_bids) + m.n_asks;
+                if (m.type == ll::MsgType::Update && n != 0) rr.per_level.record(ll::r2::per_level_ns(dt, n));
+            }
             if ((i - warmup) % 1000 == 999) {
                 ll::Level q{};
                 std::uint64_t a = now_ns();
@@ -439,6 +463,7 @@ void timed_run(const Stream& st, RunResult& rr, std::uint64_t qseed) {
         }
         rr.batch_allocs = g_allocs.load();
     }
+    rr.load_end = loadavg_1m();
 }
 
 }  // namespace
@@ -459,7 +484,36 @@ int main(int argc, char** argv) {
     const int runs = argc >= 4 ? std::atoi(argv[3]) : 5;
     if (const char* w = std::getenv("QF_H9_WARMUP")) warmup = std::size_t(std::strtoull(w, nullptr, 10));
     const char* workload = std::getenv("QF_H9_WORKLOAD") ? std::getenv("QF_H9_WORKLOAD") : "S";
-    const long long mismatches = verify(st);
+    const long long map_mismatches = verify(st);
+    long long mismatches = map_mismatches;
+    std::string form_a;
+    if (const char* cp = std::getenv("QF_H9_CHECKPOINTS")) {
+        ll::r2::Checkpoints cps;
+        if (!ll::r2::read_checkpoints(cp, cps)) return std::fprintf(stderr, "cannot read %s
+", cp), 2;
+        const ll::r2::Counts c = ll::r2::verify_form_a(st.msgs, st.levels, cps, depth);
+        std::fprintf(stderr,
+                     "form A: checksum %lld checked, %lld failed; checkpoints %lld checked, %lld failed top-10, %lld failed "
+                     "below level 10; matched at lo %lld, at hi %lld, only inside the tie %lld
+",
+                     (long long)c.checksum_checked, (long long)c.checksum_failed, (long long)c.checkpoint_checked,
+                     (long long)c.checkpoint_failed_top10, (long long)c.checkpoint_failed_below10, (long long)c.matched_at_lo,
+                     (long long)c.matched_at_hi, (long long)c.matched_only_inside_tie);
+        char b[768];
+        std::snprintf(b, sizeof b,
+                      ",\"form_a\":{\"checksum_checked\":%lld,\"checksum_failed\":%lld,\"checkpoint_checked\":%lld,"
+                      "\"checkpoint_failed_top10\":%lld,\"checkpoint_failed_below10\":%lld,\"checkpoint_matched_at_lo\":%lld,"
+                      "\"checkpoint_matched_at_hi\":%lld,\"checkpoint_matched_only_inside_tie\":%lld,"
+                      "\"checkpoint_rows_with_tie\":%lld}",
+                      (long long)c.checksum_checked, (long long)c.checksum_failed, (long long)c.checkpoint_checked,
+                      (long long)c.checkpoint_failed_top10, (long long)c.checkpoint_failed_below10, (long long)c.matched_at_lo,
+                      (long long)c.matched_at_hi, (long long)c.matched_only_inside_tie, (long long)c.rows_with_tie);
+        form_a = b;
+        // A checksum or top-10 failure fails the run; below-10 failures are published and judged by the runner
+        // under targets (g).
+        mismatches += c.checksum_failed + c.checkpoint_failed_top10 + (c.checksum_checked == 0 ? 1 : 0);
+    }
+    const bool per_level = std::getenv("QF_H9_PER_LEVEL") && std::strcmp(std::getenv("QF_H9_PER_LEVEL"), "1") == 0;
 
     Hist clock;  // 1,000,000 empty pairs
     for (int i = 0; i < 1'000'000; ++i) {
@@ -468,11 +522,13 @@ int main(int argc, char** argv) {
     }
     std::string out = "{\"workload\":\"" + std::string(workload) + "\",\"messages\":" + std::to_string(st.msgs.size()) +
                       ",\"warmup\":" + std::to_string(warmup) + ",\"depth\":100,\"alloc_method\":\"" + alloc_method +
-                      "\",\"correctness_mismatches\":" + std::to_string(mismatches) + ",\"clock_overhead\":" + clock.json() +
-                      ",\"runs\":[";
+                      "\",\"correctness_mismatches\":" + std::to_string(map_mismatches) + form_a +
+                      ",\"per_level_sampling\":" + (per_level ? "true" : "false") + ",\"compiler\":\"" + __VERSION__ +
+                      "\",\"clock_overhead\":" + clock.json() + ",\"runs\":[";
     for (int k = 0; k < runs; ++k) {
         auto* rr = new RunResult();
-        timed_run(st, *rr, seed + 1 + std::uint64_t(k));
+        if (per_level) timed_run<true>(st, *rr, seed + 1 + std::uint64_t(k));
+        else timed_run<false>(st, *rr, seed + 1 + std::uint64_t(k));
         out += (k ? "," : "") + std::string("{\"all\":") + rr->all.json() + ",\"kinds\":{";
         for (int j = 0; j < NKinds; ++j) out += (j ? ",\"" : "\"") + std::string(kind_names[j]) + "\":" + rr->kinds[j].json();
         out += "},\"queries\":{";
@@ -482,7 +538,10 @@ int main(int argc, char** argv) {
         out += "},\"batch_per_message\":" + rr->batch.json() + ",\"allocations_measured\":" + std::to_string(rr->allocs) +
                ",\"allocations_batch\":" + std::to_string(rr->batch_allocs) + ",\"far_lookups\":" + std::to_string(rr->far) +
                ",\"buffer_grows\":" + std::to_string(rr->grows) +
-               ",\"qty_at_index_fallbacks\":" + std::to_string(rr->fallbacks) + "}";
+               ",\"qty_at_index_fallbacks\":" + std::to_string(rr->fallbacks) +
+               (per_level ? ",\"per_level\":" + rr->per_level.json() : std::string()) +
+               ",\"loadavg_1m_start\":" + std::to_string(rr->load_start) + ",\"loadavg_1m_end\":" + std::to_string(rr->load_end) +
+               "}";
         std::fprintf(stderr, "run %d: p50 %llu p99 %llu p99.9 %llu ns, allocs %lld\n", k + 1, (unsigned long long)rr->all.pct(50),
                      (unsigned long long)rr->all.pct(99), (unsigned long long)rr->all.pct(99.9), rr->allocs);
         delete rr;

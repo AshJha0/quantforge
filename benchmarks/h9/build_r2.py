@@ -18,9 +18,12 @@ Outputs per symbol (OUT_PREFIX = OUT_DIR/R2_<SYMBOL> under `auto`):
                           one Trade per fill of the per-second trade rows, merged by receive time `t`. Book messages
                           carry the venue `checksum` with flag bit 4 (FLAG_VENUE_CHECKSUM), which `apply` ignores, so
                           the checksum is compared by the harness outside the timed region (low-latency-targets.md (g)).
-  OUT_PREFIX.cps.bin      QFH9C001: per-second recorder rows as form A checkpoints, each placed after the bin message
-                          at which micro.book.rebuild compares it (before the first later book message whose t is
-                          greater than the row's t; ties go before the row, as in rebuild).
+  OUT_PREFIX.cps.bin      QFH9C001: per-second recorder rows as form A checkpoints. Each holds the range of bin
+                          messages after which it may be compared: from "lo", the last book message with t < row t,
+                          to "hi", the last with t <= row t (micro.book.rebuild's rule). Receive times are in
+                          milliseconds and one websocket frame can carry many messages, so the order inside the
+                          row's millisecond is unknown; a row passes if the book equals it after one message in
+                          [lo, hi]. Both ends are reported (check_r2.py).
   OUT_PREFIX.msgs.jsonl   the book messages as order-book.md messages (t, type, bids, asks, checksum; "i" = bin index)
   OUT_PREFIX.rows.jsonl   the checkpoint rows (t, bids, asks), plain decimal strings, for check_r2.py
   OUT_PREFIX.meta.json    window, counts, warm-up (first hour), decimals, SHA-256 of every input and output
@@ -30,8 +33,8 @@ format; the second is the file run_r2.sh verifies before any run.
 
 Record layouts (little endian). Header "QFH9S001", u64 messages, u64 levels; message records "<BBHHHII" (type, flags,
 n_bids, n_asks, kind slot, checksum, first level); levels "<qq" (price ticks, quantity lots), bids first. Header
-"QFH9C001", u64 checkpoints, u64 levels; checkpoint records "<IHHII" (after: bin message index, n_bids, n_asks, first
-level, 0); then levels "<qq", bids descending then asks ascending. Prices are integer ticks at the pair's price
+"QFH9C001", u64 checkpoints, u64 levels; checkpoint records "<IHHII" (lo: bin message index, n_bids, n_asks, first
+level, hi: bin message index); then levels "<qq", bids descending then asks ascending. Prices are integer ticks at the pair's price
 decimals, quantities integer lots at 8 decimals (HR-20).
 """
 import gzip
@@ -244,6 +247,7 @@ def build(data_dir, symbol, start, end, prefix, tolerant=False):
     levels = array("q")
     nmsg = 0
     after = [None] * len(rows_t)
+    lo_of = [None] * len(rows_t)
     cp_next = 0
     last_book = None
     first_t = None
@@ -301,9 +305,17 @@ def build(data_dir, symbol, start, end, prefix, tolerant=False):
                 prev_t = t
                 # micro.book.rebuild's checkpoint rule: before a book message with time t, compare every row with
                 # time < t against the book as it stands (after the previous book message).
-                while cp_next < len(rows_t) and rows_t[cp_next] < t:
-                    after[cp_next] = last_book
-                    cp_next += 1
+                # The candidates for a row run from "lo" (last book message with t < row t: fixed before the first
+                # message with t >= row t) to "hi" (micro.book.rebuild's rule: fixed before the first message with
+                # t > row t); messages between them share the row's millisecond (check_r2.py explains why).
+                while cp_next < len(rows_t):
+                    if lo_of[cp_next] is None and t >= rows_t[cp_next]:
+                        lo_of[cp_next] = last_book
+                    if t > rows_t[cp_next]:
+                        after[cp_next] = last_book
+                        cp_next += 1
+                    else:
+                        break
                 b, a = level_pairs(d.get("bids", [])), level_pairs(d.get("asks", []))
                 cs = d.get("checksum")
                 if typ not in ("snapshot", "update") or cs is None or not 0 <= int(cs) < 2**32:
@@ -330,6 +342,8 @@ def build(data_dir, symbol, start, end, prefix, tolerant=False):
         raise SystemExit(f"{symbol}: no raw message in the window")
     while cp_next < len(rows_t):
         after[cp_next] = last_book
+        if lo_of[cp_next] is None:
+            lo_of[cp_next] = last_book
         cp_next += 1
 
     # Checkpoints: rows at or after the symbol's first raw message (none can be earlier inside one session).
@@ -344,7 +358,8 @@ def build(data_dir, symbol, start, end, prefix, tolerant=False):
         recs = bytearray()
         for k, at in cps:
             nb, na, first = row_hdr[k]
-            recs.extend(struct.pack("<IHHII", at, nb, na, len(cp_lv) // 2, 0))
+            lo = at if lo_of[k] is None else lo_of[k]  # None: the row shares the first message's millisecond
+            recs.extend(struct.pack("<IHHII", lo, nb, na, len(cp_lv) // 2, at))
             cp_lv.extend(row_lv[2 * first : 2 * (first + nb + na)])
         o.write(b"QFH9C001" + struct.pack("<QQ", len(cps), len(cp_lv) // 2))
         o.write(recs)
