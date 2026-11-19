@@ -79,3 +79,18 @@ Reading (a) is not the rule (Part 1 of the response); the columns are shown beca
 ## Results
 
 (empty: to be filled by the coordinator after the one compare run: date, deriver and model, manifest check, frozen hash and commit, gaps and rulings, compare output path, per-case MATCH / MISMATCH / MISSING and counted, outside share after the run.)
+
+## Results (2026-11-19; first and only compare run)
+
+- Deriver: a separate subagent on Claude Sonnet 5.5 (specs, goldens and packet by Opus 5.5), given only the packet folder and its own folder; standard-library Python. It states that it recognised saccr_k-0001 to 0005 as resembling published SA-CCR worked examples and the btk/tlk cases as resembling the published 250-observation table, that it used no remembered value, and that it read nothing outside the two folders (its own statements, not independently logged). The coordinator checked the packet manifest hash 447989d2... before the hand-over.
+- Blind results as received: `stage_k_blind/pub/`, committed in a13d107c before the compare. SHA-256 of `blind_results.json`: `8bab1ff8d258ad084f0e78ceb34be93feb3668ed34352b51c2108e80cdebee6d`, recomputed by the coordinator, equal to the deriver's hash file.
+- Compare: `pub_compare.py` as fixed at 00167bf5; output `stage_k_blind/pub/compare_output.txt`. Results not changed afterwards; no rerun.
+
+| Suite | Cases | MATCH | MISMATCH | Counted | Share after (rule as written, D6 and KR-210) |
+|---|---:|---:|---:|---:|---|
+| saccr_k (K-8d) | 5 | 5 | 0 | 5 | 12 of 16 (75.0%): 12 blind |
+| btk_k (K-8e) | 12 | 12 | 0 | 12 | 23 of 24 (95.8%): 23 blind |
+| tlk_k (existing traffic_light) | 11 | 11 | 0 | 11 | 11 of 11 |
+| Stage K | 28 | 28 | 0 | 28 | 78 of 87 (89.7%) |
+
+What this shows and does not. Every output of the 28 cases, including those no regulator prints, now agrees at full tolerance with a second model's derivation from the rules text; the printed Basel figures remain recorded as an extra check of the reading of the source. Limit: the inputs are public examples and the deriver recognised them, so recall of printed totals cannot be excluded for the few printed outputs; it cannot explain agreement at 1e-12 on unprinted intermediates. The 2026-11-19 audit finding KA-C18 stands as found: before this run the stage K share under the rule as written was 50 of 87.
