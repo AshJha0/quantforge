@@ -109,7 +109,7 @@ def _hw_calibrate(i: Inputs) -> Any:
     return core.shortrate.hw_calibrate(times, dfs, a, strip)
 
 
-K8_METHOD = "CN_RANNACHER_SMOOTHED"  # KR-8 (stage K, PROPOSED)
+K8_METHOD = "CN_RANNACHER_SMOOTHED"  # KR-8, KR-18 (stage K, PROPOSED)
 BERMUDAN_METHODS = ("G18_IMPLICIT", K8_METHOD)
 
 
@@ -133,6 +133,8 @@ def _bermudan(i: Inputs) -> Any:
     if bermudan_method(i) == K8_METHOD:
         return core.bermudan_k8.bermudan_price(*hw, t0, times, k, kind, notional, exercise, *grid)
     model = core.shortrate.curve_model(*hw)
+    # Error order HR-66: the schedule (structural E_INPUT) before the grid's E_DOMAIN, as Java, C++, Rust.
+    core.shortrate.check_bermudan(t0, times, kind, exercise)
     return core.shortrate.bermudan_swaption(
         model, t0, times, k, kind, notional, exercise, core.shortrate.make_grid(*grid)
     )

@@ -234,7 +234,7 @@ def load_stage_h():
 # counts printed paper figures. SciPy `binom.cdf` checks on btk_k are not counted (KR-11 reading: SciPy checks one of the
 # compared outputs, not the zone, limits or flags); that class decision is the coordinator's.
 STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-5a", "rich_k": "K-8 guard",
-                 "e1_k": None, "e2_k": None,  # e1_k, e2_k: error cases only
+                 "k8_k": "K-8", "e1_k": None, "e2_k": None,  # e1_k, e2_k: error cases only
                  "saccr_k": "K-8d", "btk_k": "K-8e", "tlk_k": "F (existing traffic_light)"}
 K_PUBLISHED_SRC = "figure printed in the regulator text (Basel Framework CRE99, MAR99 Table 2)"
 

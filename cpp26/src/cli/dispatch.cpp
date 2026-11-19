@@ -21,6 +21,7 @@
 #include "quantforge/core/dates.hpp"
 #include "quantforge/core/daycount.hpp"
 #include "quantforge/core/equity.hpp"
+#include "quantforge/core/bermudan_k8.hpp"
 #include "quantforge/core/black.hpp"
 #include "quantforge/core/smile.hpp"
 #include "quantforge/core/surface.hpp"

@@ -1,0 +1,61 @@
+case	field	expected	blind	rel_diff	result	notes
+k8_k-0001	price	22737.43110152093	22737.431101520942	4.80e-16	MATCH	
+k8_k-0001	d_price_d_discount_factors[0]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0001	d_price_d_discount_factors[1]	222756.97927658106	222756.97927658106	0.00e+00	MATCH	
+k8_k-0001	d_price_d_discount_factors[2]	157306.48127138885	157306.48127138903	1.11e-15	MATCH	
+k8_k-0001	d_price_d_discount_factors[3]	135525.49051133066	135525.49051133086	1.50e-15	MATCH	
+k8_k-0001	d_price_d_discount_factors[4]	-234107.76717224217	-234107.76717224234	7.46e-16	MATCH	
+k8_k-0001	d_price_d_discount_factors[5]	-347573.8913112793	-347573.89131127944	3.35e-16	MATCH	
+k8_k-0001	d_price_d_discount_factors[6]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0001	d_price_d_discount_factors[7]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0001	d_price_d_discount_factors[8]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0001	d_price_d_discount_factors[9]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0001	d_price_d_mean_reversion	-53342.23688107165	-53342.23688107159	1.09e-15	MATCH	
+k8_k-0001	d_price_d_sigma	2275014.635067192	2275014.6350672306	1.70e-14	MATCH	
+k8_k-0002	price	14538.714732033166	14538.714732033162	2.50e-16	MATCH	
+k8_k-0002	d_price_d_discount_factors[0]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0002	d_price_d_discount_factors[1]	98532.34095360176	98532.34095360171	4.43e-16	MATCH	
+k8_k-0002	d_price_d_discount_factors[2]	131505.3094414489	131505.30944144883	4.43e-16	MATCH	
+k8_k-0002	d_price_d_discount_factors[3]	146874.35268045598	146874.35268045598	0.00e+00	MATCH	
+k8_k-0002	d_price_d_discount_factors[4]	-146110.1817617509	-146110.18176175098	5.98e-16	MATCH	
+k8_k-0002	d_price_d_discount_factors[5]	-278631.0289731392	-278631.0289731394	8.36e-16	MATCH	
+k8_k-0002	d_price_d_discount_factors[6]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0002	d_price_d_discount_factors[7]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0002	d_price_d_discount_factors[8]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0002	d_price_d_discount_factors[9]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0002	d_price_d_mean_reversion	-51430.41258779032	-51430.412587790386	1.27e-15	MATCH	
+k8_k-0002	d_price_d_sigma	2132209.1919863927	2132209.1919864314	1.81e-14	MATCH	
+k8_k-0003	price	14014.364440814628	14014.364440814632	2.60e-16	MATCH	
+k8_k-0003	d_price_d_discount_factors[0]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0003	d_price_d_discount_factors[1]	-92034.23190917178	-92034.23190917169	9.49e-16	MATCH	
+k8_k-0003	d_price_d_discount_factors[2]	-129460.80633103332	-129460.80633103341	6.74e-16	MATCH	
+k8_k-0003	d_price_d_discount_factors[3]	-135576.212917493	-135576.21291749296	2.15e-16	MATCH	
+k8_k-0003	d_price_d_discount_factors[4]	158812.99488158757	158812.9948815876	1.83e-16	MATCH	
+k8_k-0003	d_price_d_discount_factors[5]	278471.9516219159	278471.95162191597	2.09e-16	MATCH	
+k8_k-0003	d_price_d_discount_factors[6]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0003	d_price_d_discount_factors[7]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0003	d_price_d_discount_factors[8]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0003	d_price_d_discount_factors[9]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0003	d_price_d_mean_reversion	-50573.04715256333	-50573.04715256339	1.15e-15	MATCH	
+k8_k-0003	d_price_d_sigma	2075229.6401465738	2075229.640146614	1.94e-14	MATCH	
+k8_k-0004	price	22737.43110152093	22737.431101520942	4.80e-16	MATCH	
+k8_k-0005	price	13716.96718870294	13716.96718870294	0.00e+00	MATCH	
+k8_k-0005	d_price_d_discount_factors[0]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0005	d_price_d_discount_factors[1]	-85323.69457718439	-85323.69457718429	1.19e-15	MATCH	
+k8_k-0005	d_price_d_discount_factors[2]	-129308.55315145763	-129308.55315145776	1.01e-15	MATCH	
+k8_k-0005	d_price_d_discount_factors[3]	-138026.26813797135	-138026.2681379712	1.05e-15	MATCH	
+k8_k-0005	d_price_d_discount_factors[4]	154928.16366504165	154928.16366504173	5.64e-16	MATCH	
+k8_k-0005	d_price_d_discount_factors[5]	276491.2939629992	276491.2939629991	4.21e-16	MATCH	
+k8_k-0005	d_price_d_discount_factors[6]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0005	d_price_d_discount_factors[7]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0005	d_price_d_discount_factors[8]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0005	d_price_d_discount_factors[9]	0.0	0.0	0.00e+00	MATCH	 R-field (stated by spec step 7, no credit alone)
+k8_k-0005	d_price_d_mean_reversion	-48789.9281811259	-48789.92818112594	8.95e-16	MATCH	
+k8_k-0005	d_price_d_sigma	2034661.6889618998	2034661.6889619012	6.87e-16	MATCH	
+k8_k-0006	price	7017.868206626406	7017.868206626409	3.89e-16	MATCH	
+k8_k-0007	price	19143.61007214985	19143.610072149855	1.90e-16	MATCH	
+
+item	cases	MATCH	MISMATCH	MISSING	eligible	counted blind MATCH	needed (60% per item)
+K-8	7	7	0	0	7	7	5
+largest relative difference per case: k8_k-0001 1.70e-14, k8_k-0002 1.81e-14, k8_k-0003 1.94e-14, k8_k-0004 4.80e-16, k8_k-0005 1.19e-15, k8_k-0006 3.89e-16, k8_k-0007 1.90e-16
+# note: k8_k-0004 has the inputs of k8_k-0001 (price operation); its MATCH adds no evidence beyond 0001's price

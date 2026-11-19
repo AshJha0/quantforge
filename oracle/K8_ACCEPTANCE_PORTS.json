@@ -1,0 +1,93 @@
+{
+ "what": "K-8 acceptance 3 (specifications/06-risk/bermudan-ladder-k8.md 0.2.0, method as revised by KR-18) in the C++ and Rust builds, next to the Python and Java records of oracle/K8_ACCEPTANCE_W2.json (kept unchanged, as is oracle/K8_ACCEPTANCE_W1.json). Same test as the Java build: num.richardson.check on 201/100, 401/200, 801/400, assumed order 2, status OK and observed order in [1.5, 2.5] on the price and every entry not exactly zero on all three grids; and every value within 1e-9 of the row scale of the Python record (the stated tolerance).",
+ "date": "2026-11-19",
+ "machine": "local laptop, not the acceptance machine (WSL, Release builds)",
+ "rule_fixed_before_run": "acceptance 3 and the 1e-9 value tolerance are the ones of BermudanK8Test.acceptance3ObservedOrder, committed on branch k-k8 before this run",
+ "python": {
+  "result": {
+   "acceptance_1": "PASS",
+   "acceptance_2": "PASS",
+   "acceptance_3": "PASS"
+  },
+  "source": "oracle/K8_ACCEPTANCE_W2.json"
+ },
+ "java": {
+  "date": "2026-11-19",
+  "build": "java25 (org.quantforge.pricing.BermudanK8; BermudanK8Test.acceptance3ObservedOrder, QF_K8_ACCEPTANCE=1)",
+  "result": "acceptance 3 PASS: no failures; acceptance 1 and 2 follow from value equality with the Python rows",
+  "max_gap_vs_python_values_relative_to_row_scale": 3.8454976970672597e-14,
+  "note": "recorded by hand from the test's printed line; the test asserts the gap is at most 1e-9"
+ },
+ "cpp": {
+  "test": "cpp26/tests/test_bermudan_k8.cpp, TEST_CASE \"k8: acceptance 3 on 201/401/801\", QF_K8_ACCEPTANCE=1",
+  "result": "acceptance 3 PASS",
+  "entries_judged": 24,
+  "observed_order_min": 1.8425532955687705,
+  "observed_order_max": 2.152677213741693,
+  "max_gap_vs_python_values_relative_to_row_scale": 3.8454976970672597e-14,
+  "max_abs_difference_of_observed_order_vs_python": 3.4518414793183183e-09,
+  "observed_orders": {
+   "aadladder_g-0001 row 0": 1.9969461030110374,
+   "aadladder_g-0001 row 2": 1.9974848724784533,
+   "aadladder_g-0001 row 3": 2.002523394300696,
+   "aadladder_g-0001 row 4": 1.9997221493316484,
+   "aadladder_g-0001 row 5": 1.9893768064119577,
+   "aadladder_g-0001 row 6": 1.9621829472243173,
+   "aadladder_g-0001 row 11": 1.994713768433395,
+   "aadladder_g-0001 row 12": 1.9968387697318253,
+   "aadladder_g-0002 row 0": 1.9971591345401045,
+   "aadladder_g-0002 row 2": 1.9993063986877306,
+   "aadladder_g-0002 row 3": 2.152677213741693,
+   "aadladder_g-0002 row 4": 1.9815454769203569,
+   "aadladder_g-0002 row 5": 1.9977350907336522,
+   "aadladder_g-0002 row 6": 1.9886444544763269,
+   "aadladder_g-0002 row 11": 1.9942616339447186,
+   "aadladder_g-0002 row 12": 1.9962411717292823,
+   "aadladder_g-0003 row 0": 1.9969786924383346,
+   "aadladder_g-0003 row 2": 1.9938173618555528,
+   "aadladder_g-0003 row 3": 1.8425532955687705,
+   "aadladder_g-0003 row 4": 2.0004878937631716,
+   "aadladder_g-0003 row 5": 1.9983759964988823,
+   "aadladder_g-0003 row 6": 1.9928977384758673,
+   "aadladder_g-0003 row 11": 1.9939994467617228,
+   "aadladder_g-0003 row 12": 1.996623037983057
+  }
+ },
+ "rust": {
+  "test": "rust/crates/quantforge-core/src/bermudan_k8_tests.rs, acceptance_3_observed_order, QF_K8_ACCEPTANCE=1, --release",
+  "result": "acceptance 3 PASS",
+  "entries_judged": 24,
+  "observed_order_min": 1.8425532955687705,
+  "observed_order_max": 2.152677213741693,
+  "max_gap_vs_python_values_relative_to_row_scale": 3.8454976970672597e-14,
+  "max_abs_difference_of_observed_order_vs_python": 3.4518414793183183e-09,
+  "observed_orders": {
+   "aadladder_g-0001 row 0": 1.9969461030110374,
+   "aadladder_g-0001 row 2": 1.9974848724784533,
+   "aadladder_g-0001 row 3": 2.002523394300696,
+   "aadladder_g-0001 row 4": 1.9997221493316484,
+   "aadladder_g-0001 row 5": 1.9893768064119577,
+   "aadladder_g-0001 row 6": 1.9621829472243173,
+   "aadladder_g-0001 row 11": 1.994713768433395,
+   "aadladder_g-0001 row 12": 1.9968387697318253,
+   "aadladder_g-0002 row 0": 1.9971591345401045,
+   "aadladder_g-0002 row 2": 1.9993063986877306,
+   "aadladder_g-0002 row 3": 2.152677213741693,
+   "aadladder_g-0002 row 4": 1.9815454769203569,
+   "aadladder_g-0002 row 5": 1.9977350907336522,
+   "aadladder_g-0002 row 6": 1.9886444544763269,
+   "aadladder_g-0002 row 11": 1.9942616339447186,
+   "aadladder_g-0002 row 12": 1.9962411717292823,
+   "aadladder_g-0003 row 0": 1.9969786924383346,
+   "aadladder_g-0003 row 2": 1.9938173618555528,
+   "aadladder_g-0003 row 3": 1.8425532955687705,
+   "aadladder_g-0003 row 4": 2.0004878937631716,
+   "aadladder_g-0003 row 5": 1.9983759964988823,
+   "aadladder_g-0003 row 6": 1.9928977384758673,
+   "aadladder_g-0003 row 11": 1.9939994467617228,
+   "aadladder_g-0003 row 12": 1.996623037983057
+  }
+ },
+ "summary": "All four builds pass acceptance 3. Largest value difference from the Python record, relative to the row scale: 3.85e-14 (tolerance 1e-9). Acceptance 1 and 2 are judged on the Python values (QuantLib reference) and hold for the other builds through this value equality (inferred, not rerun). The R6 use restriction and the default method are unchanged; the coordinator decides.",
+ "max_abs_difference_of_observed_order_vs_python": 3.4518414793183183e-09
+}

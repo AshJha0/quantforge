@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * K-8 (stage K wave 1, PROPOSED; ruling KR-8): the {@code CN_RANNACHER_SMOOTHED} Bermudan scheme, ported from
- * {@code python/quantforge_core/bermudan_k8.py}. Same state, grid and exercise value as the pinned G-18 scheme, with
- * Crank-Nicolson stepping (two implicit half steps after the maturity payoff and after each exercise date) and the
- * cell average of {@code max(V, E)} at every exercise date.
+ * K-8 (stage K; rulings KR-8 and KR-18): the {@code CN_RANNACHER_SMOOTHED} Bermudan scheme, ported from
+ * {@code python/quantforge_core/bermudan_k8.py} (specifications/06-risk/bermudan-ladder-k8.md, version 0.2.0). Same
+ * state, grid, knots and exercise value as the pinned G-18 scheme, with three changes: the scheme carries
+ * {@code U = V exp(-int_0^t alpha)}, so the operator has no curve term and is constant in time; Crank-Nicolson
+ * stepping with the first two steps after the maturity payoff and after each exercise date each replaced by two
+ * implicit half steps; and the exercise {@code max} applied as a hat-weighted average with an end correction.
  *
  * <p>The ladder is the exact derivative of this discrete scheme in tangent mode: every quantity is a vector whose
  * entry 0 is the value and entries 1.. its derivatives with respect to the log discount factors of the curve nodes,
@@ -118,16 +120,6 @@ public final class BermudanK8 {
             }
             return o;
         }
-
-        double[] forward(double t) {
-            int j = Math.min(Math.max(bisectRight(nodes, t) - 1, 0), nodes.length - 2);
-            double[] o = new double[logs[0].length];
-            double span = nodes[j + 1] - nodes[j];
-            for (int c = 0; c < o.length; c++) {
-                o[c] = -(logs[j + 1][c] - logs[j][c]) / span;
-            }
-            return o;
-        }
     }
 
     private static final class Model {
@@ -144,23 +136,18 @@ public final class BermudanK8 {
         double[] bigB(double tau) {
             return neg(div(expm1(scale(tau, neg(a))), a));
         }
-
-        double[] alpha(double t) {
-            double[] e = expm1(scale(t, neg(a)));
-            return add(curve.forward(t), div(mul(s2, mul(e, e)), scale(2, mul(a, a))));
-        }
-
-        double[][] lnA(double t, double s) {
-            double[] b = bigB(s - t);
-            double[] e2 = expm1(scale(t, scale(-2, a)));
-            double[] ln = add(add(sub(curve.logDiscount(s), curve.logDiscount(t)), mul(b, curve.forward(t))),
-                    mul(div(s2, scale(4, a)), mul(e2, mul(b, b))));
-            return new double[][] {ln, b};
-        }
     }
 
     // --- the scheme ----------------------------------------------------------------------------------------
 
+    /** {@code u + c} for a dual {@code u} and a constant {@code c}. */
+    private static double[] plus(double[] u, double c) {
+        double[] o = u.clone();
+        o[0] += c;
+        return o;
+    }
+
+    /** Exercise value at {@code t} times {@code D(t) = exp(-int_0^t alpha)} (spec step 3); no forward rate. */
     private static double[][] exercise(Model m, double t, double[][] xs, double[] times, double k, double phi) {
         List<Double> after = new ArrayList<>();
         for (double s : times) {
@@ -170,76 +157,93 @@ public final class BermudanK8 {
         }
         int nx = xs.length;
         int w = xs[0].length;
-        double[] al = m.alpha(t);
-        double[][] r = new double[nx][];
-        for (int i = 0; i < nx; i++) {
-            r[i] = add(xs[i], al);
-        }
+        double[] e1 = expm1(scale(t, neg(m.a)));
+        double[] e2 = expm1(scale(t, scale(-2, m.a)));
+        double[] bigI = plus(sub(scale(2, div(e1, m.a)), div(e2, scale(2, m.a))), t);
+        double[] c2 = div(m.s2, scale(2, mul(m.a, m.a)));
+        double[] c4 = div(m.s2, scale(4, m.a));
+        double[] lead = exp(sub(m.curve.logDiscount(t), mul(c2, bigI)));
         double[][] fixed = new double[nx][w];
         double[][] last = fixed;
         for (int q = 0; q < after.size(); q++) {
             double s = after.get(q);
             double tau = q == 0 ? s - t : s - after.get(q - 1);
-            double[][] lb = m.lnA(t, s);
+            double[] b = m.bigB(s - t);
+            double[] drift = sub(mul(c2, add(bigI, mul(b, mul(e1, e1)))), mul(c4, mul(e2, mul(b, b))));
+            double[] head = sub(m.curve.logDiscount(s), drift);
             double[][] p = new double[nx][];
             for (int i = 0; i < nx; i++) {
-                p[i] = exp(sub(lb[0], mul(lb[1], r[i])));
+                p[i] = exp(sub(head, mul(b, xs[i])));
                 fixed[i] = add(fixed[i], scale(tau, p[i]));
             }
             last = p;
         }
         double[][] out = new double[nx][];
         for (int i = 0; i < nx; i++) {
-            double[] o = neg(add(last[i], scale(k, fixed[i])));
-            o[0] += 1.0;
-            out[i] = scale(phi, o);
+            out[i] = scale(phi, sub(sub(lead, last[i]), scale(k, fixed[i])));
         }
         return out;
     }
 
-    /** Mean of {@code max(f, 0)} over a segment where {@code f} is linear from {@code lo} to {@code hi}. */
-    private static double[] positiveMean(double[] lo, double[] hi) {
-        double a = lo[0];
-        double b = hi[0];
+    /** {@code int_0^1 (1 - u) max(p + (q - p) u, 0) du}: half of the hat-weighted average of the positive part. */
+    static double[] hatPart(double[] p, double[] q) {
+        double a = p[0];
+        double b = q[0];
         if (a >= 0 && b >= 0) {
-            return scale(0.5, add(lo, hi));
+            return add(divScalar(p, 3), divScalar(q, 6));
         }
-        if (a > 0 || b > 0) {
-            double[] p = a >= b ? lo : hi;
-            double[] q = a >= b ? hi : lo;
-            return div(mul(p, p), scale(2, sub(p, q)));
+        if (a > 0 && b < 0) {
+            double[] d = sub(p, q);
+            double[] t = div(mul(p, p), scale(2, d));
+            return sub(t, divScalar(mul(t, div(p, d)), 3));
         }
-        return new double[lo.length];
+        if (a < 0 && b > 0) {
+            double[] r = div(q, sub(q, p));
+            return divScalar(mul(q, mul(r, r)), 6);
+        }
+        return new double[p.length];
     }
 
-    private static double[][][] halves(double[][] g) {
-        int n = g.length;
-        double[][] left = new double[n][];
-        double[][] right = new double[n][];
-        for (int i = 1; i < n; i++) {
-            left[i] = scale(0.5, add(g[i - 1], g[i]));
-        }
-        for (int i = 0; i < n - 1; i++) {
-            right[i] = left[i + 1];
-        }
-        left[0] = sub(scale(1.5, g[0]), scale(0.5, g[1]));
-        right[n - 1] = sub(scale(1.5, g[n - 1]), scale(0.5, g[n - 2]));
-        return new double[][][] {left, right};
-    }
-
-    /** Cell average of {@code max(V, E)} at every node (KR-8 step 3). */
+    /** {@code max(V, E)} at an exercise date as a second-order smoothing (KR-18 b, spec step 5). */
     static double[][] smoothedMax(double[][] v, double[][] e) {
         int n = v.length;
+        int w = v[0].length;
         double[][] f = new double[n][];
         for (int i = 0; i < n; i++) {
             f[i] = sub(v[i], e[i]);
         }
-        double[][][] fh = halves(f);
-        double[][][] eh = halves(e);
+        double[][] h = new double[n][];
+        double[][] d2 = new double[n][w];
+        for (int i = 0; i < n; i++) {
+            double[] before = i > 0 ? f[i - 1] : sub(scale(2, f[0]), f[1]);
+            double[] after = i < n - 1 ? f[i + 1] : sub(scale(2, f[n - 1]), f[n - 2]);
+            h[i] = add(hatPart(f[i], before), hatPart(f[i], after));
+            if (i > 0 && i < n - 1) {
+                d2[i] = add(sub(f[i - 1], scale(2, f[i])), f[i + 1]);
+            }
+        }
+        for (int j = 0; j < n - 1; j++) {
+            double a = f[j][0];
+            double b = f[j + 1][0];
+            if (!((a > 0 && b < 0) || (a < 0 && b > 0))) {
+                continue;
+            }
+            int pos = a > 0 ? j : j + 1;
+            int neg = a > 0 ? j + 1 : j;
+            double[] rho = div(f[pos], sub(f[pos], f[neg])); // the part of the cell where V > E
+            double[] rest = plus(neg(rho), 1.0);
+            double[] g = divScalar(mul(mul(rho, rest), plus(scale(2, rho), -1.0)), 12);
+            double[] corr = mul(g, scale(0.5, add(d2[j], d2[j + 1])));
+            h[pos] = sub(h[pos], mul(rest, corr));
+            h[neg] = sub(h[neg], mul(rho, corr));
+        }
         double[][] out = new double[n][];
         for (int i = 0; i < n; i++) {
-            double[] eMean = scale(0.25, add(add(eh[0][i], scale(2, e[i])), eh[1][i]));
-            out[i] = add(eMean, scale(0.5, add(positiveMean(fh[0][i], f[i]), positiveMean(f[i], fh[1][i]))));
+            double[] o = h[i];
+            if (i > 0 && i < n - 1) {
+                o = sub(o, divScalar(add(sub(h[i - 1], scale(2, h[i])), h[i + 1]), 6));
+            }
+            out[i] = add(e[i], o);
         }
         return out;
     }
@@ -301,51 +305,39 @@ public final class BermudanK8 {
         return d;
     }
 
-    /** Rows of {@code L} at the interior nodes, before the boundary substitution. */
+    /** Rows of {@code A = -L} at the interior nodes, before the boundary substitution; constant in time (KR-18 a). */
     private static final class Operator {
-        final Model m;
         final double[][] lower;
         final double[][] upper;
-        final double[][] base;
+        final double[][] diag;
 
         Operator(Model m, double[][] xs, double[] dx) {
             int n = xs.length - 2;
             double[] diff = div(m.s2, scale(2, mul(dx, dx)));
             double[] twoDx = scale(2, dx);
-            this.m = m;
             lower = new double[n][];
             upper = new double[n][];
-            base = new double[n][];
+            diag = new double[n][];
             for (int i = 0; i < n; i++) {
                 double[] inner = xs[i + 1];
                 double[] conv = div(mul(m.a, inner), twoDx);
                 lower[i] = neg(add(diff, conv));
                 upper[i] = neg(sub(diff, conv));
-                base[i] = add(scale(2, diff), inner);
+                diag[i] = add(scale(2, diff), inner);
             }
-        }
-
-        double[][] diag(double t) {
-            double[] al = m.alpha(t);
-            double[][] o = new double[base.length][];
-            for (int i = 0; i < o.length; i++) {
-                o[i] = add(base[i], al);
-            }
-            return o;
         }
     }
 
-    /** Solves {@code (I + w L(t)) y = rhs} on the interior with linear extrapolation at both ends. */
-    private static double[][] implicit(Operator op, double t, double w, double[][] rhs) {
+    /** Solves {@code (I + w A) y = rhs} on the interior with linear extrapolation at both ends. */
+    private static double[][] implicit(Operator op, double w, double[][] rhs) {
         int n = rhs.length;
         double[][] lower = new double[n][];
         double[][] upper = new double[n][];
-        double[][] diag = op.diag(t);
+        double[][] diag = new double[n][];
         for (int i = 0; i < n; i++) {
             lower[i] = scale(w, op.lower[i]);
             upper[i] = scale(w, op.upper[i]);
-            diag[i] = scale(w, diag[i]);
-            diag[i][0] += 1.0;
+            diag[i] = plus(scale(w, op.diag[i]), 1.0);
         }
         diag[0] = add(diag[0], scale(2, lower[0]));
         upper[0] = sub(upper[0], lower[0]);
@@ -359,17 +351,19 @@ public final class BermudanK8 {
         return out;
     }
 
-    /** {@code (I - w L(t)) v} at the interior nodes. */
-    private static double[][] explicit(Operator op, double t, double w, double[][] v) {
+    /** {@code (I - w A) v} at the interior nodes. */
+    private static double[][] explicit(Operator op, double w, double[][] v) {
         int n = v.length - 2;
-        double[][] diag = op.diag(t);
         double[][] out = new double[n][];
         for (int i = 0; i < n; i++) {
-            double[] lv = add(add(mul(op.lower[i], v[i]), mul(diag[i], v[i + 1])), mul(op.upper[i], v[i + 2]));
+            double[] lv = add(add(mul(op.lower[i], v[i]), mul(op.diag[i], v[i + 1])), mul(op.upper[i], v[i + 2]));
             out[i] = sub(v[i + 1], scale(w, lv));
         }
         return out;
     }
+
+    /** Steps replaced by two implicit half steps each after every exercise date (KR-18 c). */
+    static final int START_UP_STEPS = 2;
 
     private static double[][] interior(double[][] v) {
         double[][] o = new double[v.length - 2][];
@@ -422,15 +416,13 @@ public final class BermudanK8 {
             double tHi = grid[kk];
             double tLo = grid[kk - 1];
             long steps = Math.max(1, (long) Math.ceil(stepsPerYear * (tHi - tLo)));
-            double dt = (tHi - tLo) / steps;
+            double half = (tHi - tLo) / steps / 2;
             for (long j = steps - 1; j >= 0; j--) {
-                double t = tLo + j * dt;
-                if (j == steps - 1) { // Rannacher start-up: two implicit half steps
-                    double mid = t + dt / 2;
-                    v = implicit(op, mid, dt / 2, interior(v));
-                    v = implicit(op, t, dt / 2, interior(v));
+                if (j >= steps - START_UP_STEPS) { // Rannacher start-up: two implicit half steps
+                    v = implicit(op, half, interior(v));
+                    v = implicit(op, half, interior(v));
                 } else {
-                    v = implicit(op, t, dt / 2, explicit(op, tLo + (j + 1) * dt, dt / 2, v));
+                    v = implicit(op, half, explicit(op, half, v));
                 }
             }
             if (kk - 1 > 0) {

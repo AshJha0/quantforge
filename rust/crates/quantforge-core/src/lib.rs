@@ -12,6 +12,7 @@ pub mod adaptive_exec;
 pub mod arb_surface;
 pub mod attribution;
 pub mod bermudan_aad;
+pub mod bermudan_k8;
 pub mod black;
 pub mod bonds;
 pub mod book;

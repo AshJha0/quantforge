@@ -5025,34 +5025,34 @@
   },
   "K": {
    "without_sweeps": {
-    "cases": 79,
+    "cases": 86,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 55,
     "reimplementation": 0,
-    "none": 24,
+    "none": 31,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 55,
-    "share_with_rederivation": 0.696203,
+    "share_with_rederivation": 0.639535,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 70
+    "error_and_invariance_cases": 81
    },
    "with_sweeps": {
-    "cases": 79,
+    "cases": 86,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 55,
     "reimplementation": 0,
-    "none": 24,
+    "none": 31,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 55,
-    "share_with_rederivation": 0.696203,
+    "share_with_rederivation": 0.639535,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 70
+    "error_and_invariance_cases": 81
    },
    "sweeps": null,
    "libraries": {},
@@ -5130,6 +5130,36 @@
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 6,
      "share_with_rederivation": 1.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 5
+    },
+    "rates.shortrate.bermudan_ladder": {
+     "cases": 4,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 0,
+     "reimplementation": 0,
+     "none": 4,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 0,
+     "share_with_rederivation": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 6
+    },
+    "rates.shortrate.bermudan_swaption": {
+     "cases": 3,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 0,
+     "reimplementation": 0,
+     "none": 3,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 0,
+     "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 5
     },
@@ -5318,6 +5348,25 @@
      "error_and_invariance_cases": 2,
      "suites": [
       "idr_k"
+     ],
+     "meets_item_floor": false
+    },
+    "K-8": {
+     "cases": 7,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 0,
+     "reimplementation": 0,
+     "none": 7,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 0,
+     "share_with_rederivation": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 7,
+     "suites": [
+      "k8_k"
      ],
      "meets_item_floor": false
     },
