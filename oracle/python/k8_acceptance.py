@@ -1,11 +1,11 @@
-"""K-8 acceptance (specifications/06-risk/bermudan-ladder-k8.md, rulings KR-8, KR-15, KR-16).
+"""K-8 acceptance (specifications/06-risk/bermudan-ladder-k8.md, rulings KR-8, KR-18, KR-19).
 
 Two steps, two interpreters:
 
   reference   needs the QuantLib wheel (any Python with `pip install QuantLib`; run 2026-11-19 with
               QuantLib 1.44 in a local venv outside the repo). Central bump-and-revalue with
               FdHullWhiteSwaptionEngine on the three aadladder_g cases, eleven relative bumps per
-              input, on the KR-16 grid (tGrid 8,000, xGrid 3,201) and on the grid first proposed
+              input, on the KR-19 grid (tGrid 8,000, xGrid 3,201) and on the grid first proposed
               (2,000 / 801). Writes oracle/K8_REFERENCE_QL.json.
   judge       needs the project Python. Runs CN_RANNACHER_SMOOTHED on 201/100, 401/200, 801/400 and
               1601/800, applies acceptance 1 to 3 as written in the spec and writes
@@ -139,7 +139,7 @@ def judge(cache: Path | None) -> None:
     b1, b2 = BUMPS.index(1e-4), BUMPS.index(5e-5)
     doc: dict[str, Any] = {
         "what": "K-8 acceptance 1 to 3 (specifications/06-risk/bermudan-ladder-k8.md 0.2.0), second run: "
-        "CN_RANNACHER_SMOOTHED as revised by KR-15, reference grid by KR-16. Rows: [price, d/dDF x10, d/da, "
+        "CN_RANNACHER_SMOOTHED as revised by KR-18, reference grid by KR-19. Rows: [price, d/dDF x10, d/da, "
         "d/dsigma]. The first run (method 0.1.0) is oracle/K8_ACCEPTANCE_W1.json and stays a recorded miss.",
         "date": "2026-11-19",
         "build": "python (quantforge_core.bermudan_k8, tangent-mode ladder)",

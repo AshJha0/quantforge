@@ -1,10 +1,10 @@
 # K-8 diagnosis: why the first `CN_RANNACHER_SMOOTHED` missed acceptance 3, and what fixed it
 
-Lane K-8c, 2026-11-19. Branch `k-k8`. Spec: `specifications/06-risk/bermudan-ladder-k8.md` (0.2.0). Rulings: KR-8, KR-15, KR-16. Evidence classes used below: *measured* (a run in this lane), *read* (source opened and the passage read), *recalled* (not opened), *inferred*, *derived here*.
+Lane K-8c, 2026-11-19. Branch `k-k8`. Spec: `specifications/06-risk/bermudan-ladder-k8.md` (0.2.0). Rulings: KR-8, KR-18, KR-19. Evidence classes used below: *measured* (a run in this lane), *read* (source opened and the passage read), *recalled* (not opened), *inferred*, *derived here*.
 
 ## Result in one paragraph
 
-The first definition of the method (spec 0.1.0, run of 2026-11-18, `oracle/K8_ACCEPTANCE_W1.json`) was already close in size: against the reference built here, its worst judged entry at the default grid 201/100 is 0.39% off (measured, table below). It failed because its ladder errors did not shrink in a regular way under refinement, so the order test (acceptance 3) failed on 18 entries. There were two separate causes, one in time and one in space. Both are fixed in the method (KR-15). The second run passes acceptance 1, 2 and 3 in Python, and acceptance 3 in Java with values equal to the Python record to 4e-14 of the row scale (`oracle/K8_ACCEPTANCE_W2.json`). The threshold, the default grid, the cases and the rule that picks the judged entries are unchanged.
+The first definition of the method (spec 0.1.0, run of 2026-11-18, `oracle/K8_ACCEPTANCE_W1.json`) was already close in size: against the reference built here, its worst judged entry at the default grid 201/100 is 0.39% off (measured, table below). It failed because its ladder errors did not shrink in a regular way under refinement, so the order test (acceptance 3) failed on 18 entries. There were two separate causes, one in time and one in space. Both are fixed in the method (KR-18). The second run passes acceptance 1, 2 and 3 in Python, and acceptance 3 in Java with values equal to the Python record to 4e-14 of the row scale (`oracle/K8_ACCEPTANCE_W2.json`). The threshold, the default grid, the cases and the rule that picks the judged entries are unchanged.
 
 ## 1. The 18 entries
 
@@ -39,7 +39,7 @@ QuantLib 1.44 wheel in a local venv, `FdHullWhiteSwaptionEngine`, script `oracle
 
 **Bump-size study (measured, case 0001, row 2, central differences).** Eleven relative bumps from 1e-5 to 1.6e-2 at xGrid 3,201: 223,195 / 223,263 / 223,250 / 223,244 / 223,245 / 223,256 / 223,287 / 223,404 / 223,876 / 225,809 / 234,113. There is a plateau from 2e-5 to 5e-4 (spread 0.009%); below it the differences are noisy, above it the truncation error of the bump grows as the square of the bump. The two bumps the spec fixed (1e-4 and 5e-5) are on the plateau.
 
-**Why the grid first proposed is not enough (measured).** QuantLib applies the exercise `max` pointwise, so its bumped derivative carries the grid-position noise of cause (B). At the proposed 2,000 / 801 the two bumps disagree by more than 0.1% on five judged entries (0.106%, 0.252%, 0.254%, 0.123% and 0.097% just inside), which the spec's own rule reports as unresolved. At 8,000 / 3,201 the worst disagreement is 0.016%. KR-16 moves the reference to the finer grid on that evidence alone, before the judged run. The proposed-grid numbers are kept in the reference file.
+**Why the grid first proposed is not enough (measured).** QuantLib applies the exercise `max` pointwise, so its bumped derivative carries the grid-position noise of cause (B). At the proposed 2,000 / 801 the two bumps disagree by more than 0.1% on five judged entries (0.106%, 0.252%, 0.254%, 0.123% and 0.097% just inside), which the spec's own rule reports as unresolved. At 8,000 / 3,201 the worst disagreement is 0.016%. KR-19 moves the reference to the finer grid on that evidence alone, before the judged run. The proposed-grid numbers are kept in the reference file.
 
 **Agreement of the two references (measured).** The method at 1601/800 against QuantLib: worst judged entry 0.030%. The method at 801/400 against 1601/800: worst 0.019% (limit 0.2%). QuantLib's value for row 1 (true value 0) is -14, -10, -10: it has the artefact of cause (A) too, at a size below the floor.
 
@@ -51,7 +51,7 @@ QuantLib 1.44 wheel in a local venv, `FdHullWhiteSwaptionEngine`, script `oracle
 
 Measured (first definition, case 0001, 401 nodes, 100 / 200 / 400 steps a year, time-only refinement): row 1 -337.0, -104.9, +11.1 (order 1.00); row 2 differences +117.7, +58.9 (order 1.00, half of row 1 and opposite, as the jump derivative predicts); every other row changes by less than 0.2.
 
-Fix (KR-15 a): solve for `U = V exp(-int_0^t alpha)`. The curve term commutes with the rest of the operator, so this is exact, and the operator becomes time-independent. Measured after the change: observed order 2.00 on every row in the same study, and row 1 is exactly 0.0.
+Fix (KR-18 a): solve for `U = V exp(-int_0^t alpha)`. The curve term commutes with the rest of the operator, so this is exact, and the operator becomes time-independent. Measured after the change: observed order 2.00 on every row in the same study, and row 1 is exactly 0.0.
 
 ### (B) Space: the price error depends on where the exercise boundary sits in its cell
 
@@ -100,6 +100,6 @@ Java: acceptance 3 passes with the same test, values equal to the Python record 
 
 1. **Row 1 (node 0.4986) is now exactly 0.0 on every grid** and is therefore skipped by the rule the first-run test already had (an entry exactly zero on all three grids is not put through `num.richardson.check`). The rule is unchanged; the set it selects grew by one row per case because the scheme now reproduces a true zero. If the owner wants that row judged in some absolute way instead, that is an owner ruling. Its values: first run -337 / -105 / +11 (case 0001), second run 0 / 0 / 0, model value 0.
 2. Acceptance 2 would also have passed with the first definition (worst 0.39%). The first run failed on acceptance 3 only.
-3. The method definition changed under the same name (KR-15). No golden of the first definition was published; the new goldens are `datasets/golden/stage_k/k8_k.json`.
+3. The method definition changed under the same name (KR-18). No golden of the first definition was published; the new goldens are `datasets/golden/stage_k/k8_k.json`.
 4. The end correction is derived in this lane, not taken from a paper. It is supported by the measurements above and by the unit tests, not by an outside source.
 5. Kreiss, Thomee and Widlund 1970 was not read (not free); Rannacher 1984 was not read. Pooley, Vetzal, Forsyth and Giles, Carter were read from the free preprints on 2026-11-19.

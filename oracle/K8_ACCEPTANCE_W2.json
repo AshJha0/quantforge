@@ -1,5 +1,5 @@
 {
- "what": "K-8 acceptance 1 to 3 (specifications/06-risk/bermudan-ladder-k8.md 0.2.0), second run: CN_RANNACHER_SMOOTHED as revised by KR-15, reference grid by KR-16. Rows: [price, d/dDF x10, d/da, d/dsigma]. The first run (method 0.1.0) is oracle/K8_ACCEPTANCE_W1.json and stays a recorded miss.",
+ "what": "K-8 acceptance 1 to 3 (specifications/06-risk/bermudan-ladder-k8.md 0.2.0), second run: CN_RANNACHER_SMOOTHED as revised by KR-18, reference grid by KR-19. Rows: [price, d/dDF x10, d/da, d/dsigma]. The first run (method 0.1.0) is oracle/K8_ACCEPTANCE_W1.json and stays a recorded miss.",
  "date": "2026-11-19",
  "build": "python (quantforge_core.bermudan_k8, tangent-mode ladder)",
  "reference": "oracle/K8_REFERENCE_QL.json, grid kr16, bump 1e-4 (checked against 5e-5)",

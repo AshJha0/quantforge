@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * K-8 (stage K; rulings KR-8 and KR-15): the {@code CN_RANNACHER_SMOOTHED} Bermudan scheme, ported from
+ * K-8 (stage K; rulings KR-8 and KR-18): the {@code CN_RANNACHER_SMOOTHED} Bermudan scheme, ported from
  * {@code python/quantforge_core/bermudan_k8.py} (specifications/06-risk/bermudan-ladder-k8.md, version 0.2.0). Same
  * state, grid, knots and exercise value as the pinned G-18 scheme, with three changes: the scheme carries
  * {@code U = V exp(-int_0^t alpha)}, so the operator has no curve term and is constant in time; Crank-Nicolson
@@ -204,7 +204,7 @@ public final class BermudanK8 {
         return new double[p.length];
     }
 
-    /** {@code max(V, E)} at an exercise date as a second-order smoothing (KR-15 b, spec step 5). */
+    /** {@code max(V, E)} at an exercise date as a second-order smoothing (KR-18 b, spec step 5). */
     static double[][] smoothedMax(double[][] v, double[][] e) {
         int n = v.length;
         int w = v[0].length;
@@ -305,7 +305,7 @@ public final class BermudanK8 {
         return d;
     }
 
-    /** Rows of {@code A = -L} at the interior nodes, before the boundary substitution; constant in time (KR-15 a). */
+    /** Rows of {@code A = -L} at the interior nodes, before the boundary substitution; constant in time (KR-18 a). */
     private static final class Operator {
         final double[][] lower;
         final double[][] upper;
@@ -362,7 +362,7 @@ public final class BermudanK8 {
         return out;
     }
 
-    /** Steps replaced by two implicit half steps each after every exercise date (KR-15 c). */
+    /** Steps replaced by two implicit half steps each after every exercise date (KR-18 c). */
     static final int START_UP_STEPS = 2;
 
     private static double[][] interior(double[][] v) {

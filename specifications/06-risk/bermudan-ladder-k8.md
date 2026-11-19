@@ -1,6 +1,6 @@
 # Bermudan sensitivity ladder at the default grid (stage K item K-8, R6-27)
 
-Spec version 0.2.0. Status: **PROPOSED** (stage K wave 1). Rulings: `stage-k-rulings-w1.md` KR-8, KR-9, KR-15, KR-16. Depends on `04-pricing/short-rate-models.md` (G-18 scheme, unchanged) and `aad-core.md`.
+Spec version 0.2.0. Status: **PROPOSED** (stage K wave 1). Rulings: `stage-k-rulings-w1.md` KR-8, KR-9, KR-18, KR-19. Depends on `04-pricing/short-rate-models.md` (G-18 scheme, unchanged) and `aad-core.md`.
 
 **Plain idea.** The ladder of the pinned G-18 scheme is the exact derivative of a first-order scheme, and at the default grid that derivative is far from the model's: the price is within 0.2% but single ladder entries are off by up to 11%. Plan K-8 asks for every entry within 1% of the converged model derivative at the default grid. This spec says how, and why Richardson extrapolation alone is not the answer.
 
@@ -16,9 +16,9 @@ Gap of the discount-factor entries (indices 0..5) at a grid against the 801/400 
 
 Two facts matter. (1) Several entries do not converge monotonically: aadladder_g-0002 entry 1 reads 87,159, 98,464, 102,352, 93,700, 96,435 on the five grids. (2) Even 801/400 is not converged for those entries (401/200 and 801/400 differ by 2.8%), so 801/400 cannot serve as the reference for a 1% test. The likely cause is the exercise boundary crossing grid nodes: the derivative of a pointwise `max` jumps when the boundary moves to the next node. A second-order time scheme alone does not remove that.
 
-## Method `CN_RANNACHER_SMOOTHED` (KR-8 as revised by KR-15)
+## Method `CN_RANNACHER_SMOOTHED` (KR-8 as revised by KR-18)
 
-Version 0.1.0 of this method (cell average of the `max`, two implicit half steps, `alpha(t)` sampled at step ends) failed acceptance 3 on 18 entries (`oracle/K8_ACCEPTANCE_W1.json`). The causes and the measurements are in `program/K8_DIAGNOSIS.md`; the changes are ruling KR-15. This section is the full definition.
+Version 0.1.0 of this method (cell average of the `max`, two implicit half steps, `alpha(t)` sampled at step ends) failed acceptance 3 on 18 entries (`oracle/K8_ACCEPTANCE_W1.json`). The causes and the measurements are in `program/K8_DIAGNOSIS.md`; the changes are ruling KR-18. This section is the full definition.
 
 **Plain idea.** Three things keep a ladder entry from converging at second order. A curve node that falls inside a time step; an exercise decision that jumps from one grid node to the next as an input moves; and high-frequency error that Crank-Nicolson does not damp. The method removes the curve from the time stepping altogether, replaces the jump by a smooth weighting, and starts each interval with implicit steps.
 
@@ -62,9 +62,28 @@ rich_k-0005/0006 show the G-18 ladder entry converging at first order (as G-18 s
 | rich_k-0007 | [10.5, 10.125, 10.03125] | 1 | 2 | E_DOMAIN |
 | rich_k-0008 | [10.5, 10.125] | 2 | 2 | E_INPUT |
 
+## Convergence and limit cases
+
+**Plain idea.** The method is meant to be second order in time and space for the price and for every ladder entry, so that halving both steps cuts each error by about four. That is measured, not assumed, on the three judged cases.
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| `CN_RANNACHER_SMOOTHED` price and ladder, joint refinement 201/100, 401/200, 801/400 | 2 (window 1.5 to 2.5, acceptance 3) | aadladder_g-0001..0003, 3 prices and 21 ladder entries, all `num.richardson.check` status `OK`, observed orders 1.84 to 2.15 (measured 2026-11-19, `oracle/K8_ACCEPTANCE_W2.json`; Java values equal to 3.8e-14 of the row scale, same file, key `java`) | a curve node the price does not depend on (0.4986 years, nodes after the last payment): ladder entry exactly 0.0 on every grid (measured; unit test `test_k8_curve_nodes_the_price_does_not_depend_on_give_exact_zeros`) | QuantLib 1.44 `FdHullWhiteSwaptionEngine` central bump at tGrid 8,000, xGrid 3,201 (KR-19), `oracle/K8_REFERENCE_QL.json` |
+| Same, time-only refinement at 401 nodes, 100/200/400 steps a year | 2 | case 0001: observed order 2.00 on every row (measured, `program/K8_DIAGNOSIS.md` section 3 (A)); the first definition gave 1.00 on rows 1 and 2 | one exercise date: price 15,409.2472 against QuantLib's Jamshidian engine 15,409.2486 (measured, diagnosis section 2) | QuantLib 1.44 `JamshidianSwaptionEngine` |
+| Same, space-only refinement at 100 steps a year, 101 to 401 nodes against 1601 | 2 | case 0001: error times `((nx-1)/200)^2` of row 2 is -481, -483, -476, -467, -454, of row 4 169, 171, 168, 165, 160 (measured, diagnosis section 3 (B)); unit test on non-nested grids 60 to 160 cells: within 4.5% of its mean, test tolerance 10% | `f = (-1, 0, 1)`: smoothing gives `S_1 = 1/18` (worked example above, unit test) | the method at 1601 nodes (self-reference) |
+| Default grid against the outside reference | not an order: the size of the error | 201/100: worst judged entry 0.40% from QuantLib (case 0002 row 2), 0.39% from the method at 1601/800; 1601/800 against QuantLib 0.030%; 801/400 against 1601/800 0.019% (measured, `oracle/K8_ACCEPTANCE_W2.json` key `summary`) | QuantLib's two bumps 1e-4 and 5e-5 agree to 0.016% (limit 0.1%); bump plateau 2e-5 to 5e-4 (measured, diagnosis section 2) | QuantLib 1.44 as above |
+| Ladder as the exact derivative of the scheme | equal to its own Richardson bumps to 1e-8 relative (aad-core rule, acceptance 5) | unit tests in Python and Java on the same grid (measured) | G18_IMPLICIT unchanged bit for bit when `method` is absent (G-18 goldens) | none outside |
+
+## Limits
+
+- **The 0.4986-year row is not judged.** Plainly: the ladder row of the curve node at 0.4986 years is not checked by any acceptance test. Under this method its value is exactly 0.0 on every grid, which is also the model's value (the price does not depend on that node). Acceptance 2 already leaves it out (below the 1e-3 floor) and acceptance 3 skips it under the rule it had from the first run, "an entry exactly zero on all three grids is not put through `num.richardson.check`". Owner decision 2026-11-19: the row stays skipped under that rule; no new ruling. The exact zero is checked only by the unit test named in the table above, not by an acceptance test. Example: case 0001, row 1 reads 0 / 0 / 0 on 201, 401, 801; the first definition read -337 / -105 / +11.
+- The same rule skips the rows of the nodes after the last payment (exact zeros for the same reason).
+- The end correction of step 5 is derived in `program/K8_DIAGNOSIS.md` and supported by the measurements there, not by an outside source (inferred and measured).
+- The default method stays `G18_IMPLICIT` and the R6 use restriction stays until the coordinator lifts it after all four builds pass (acceptance 4).
+
 ## Acceptance (fixed before any run; plan 14.8 K-8)
 
-1. Reference ("converged model derivative"): central bump-and-revalue with QuantLib `FdHullWhiteSwaptionEngine` at a fine grid (proposed tGrid 2,000, xGrid 801; set to tGrid 8,000, xGrid 3,201 by KR-16 before the second run), relative bump 1e-4 on each discount factor, repeated at 5e-5; the two must agree within 0.1% or the entry is reported as unresolved. Cross-check: `CN_RANNACHER_SMOOTHED` at 801/400 and 1601/800 agree with each other within 0.2%. Both are required (owner decision K-QA, 2026-11-18); QuantLib is the counted outside check.
+1. Reference ("converged model derivative"): central bump-and-revalue with QuantLib `FdHullWhiteSwaptionEngine` at a fine grid (proposed tGrid 2,000, xGrid 801; set to tGrid 8,000, xGrid 3,201 by KR-19 before the second run), relative bump 1e-4 on each discount factor, repeated at 5e-5; the two must agree within 0.1% or the entry is reported as unresolved. Cross-check: `CN_RANNACHER_SMOOTHED` at 801/400 and 1601/800 agree with each other within 0.2%. Both are required (owner decision K-QA, 2026-11-18); QuantLib is the counted outside check.
 2. At the default grid 201/100, every ladder entry of aadladder_g-0001..0003 with `|reference| >= 1e-3 max |reference|` is within 1% of the reference; `d_price_d_mean_reversion` and `d_price_d_sigma` too.
 3. Observed order of the new method's price and ladder, by `num.richardson.check` on 201/401/801, between 1.5 and 2.5 with status `OK` on every entry. If any entry is `NON_MONOTONE`, step 3 of the method is not working and the test fails, whatever step 2 says.
 4. The R6 use restriction is removed from docs and the model inventory only for `CN_RANNACHER_SMOOTHED`, only after 1 to 3 pass; G-18 goldens unchanged.

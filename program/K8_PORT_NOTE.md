@@ -1,4 +1,4 @@
-# K-8 porting note for the C++ and Rust lanes: `CN_RANNACHER_SMOOTHED` (spec 0.2.0, KR-15)
+# K-8 porting note for the C++ and Rust lanes: `CN_RANNACHER_SMOOTHED` (spec 0.2.0, KR-18)
 
 Lane K-8c, 2026-11-19. Reference builds: `python/quantforge_core/bermudan_k8.py` (the definition) and `java25/src/main/java/org/quantforge/pricing/BermudanK8.java` (a line-by-line port; read this one if your language has no array broadcasting). Spec: `specifications/06-risk/bermudan-ladder-k8.md`, section "Method". Why the method looks like this: `program/K8_DIAGNOSIS.md`.
 
@@ -49,5 +49,5 @@ Notation: dual numbers `(value, tangents)`; `P` curve nodes; `expm1`, `exp`, `sq
 
 - **Python G-18 path, two errors at once**: with a bad exercise time and `width = 0`, `rates.shortrate.bermudan_swaption` and `bermudan_ladder` without `method` return `E_DOMAIN` in Python (grid checked first, `shortrate.py` / the two ops files) and `E_INPUT` in Java. HR-66 says `E_INPUT`. The K-8 path gives `E_INPUT` in both builds. No stage G golden covers the combination.
 - The conformance runner globs every golden file, so `k8_k` will fail for the C++ and Rust builds until they carry the method.
-- `specifications/cli-contract.md` line on `method` still describes the K-8 scheme by its first definition's ruling only (KR-8); it should cite KR-15 and the suite `k8_k`.
+- `specifications/cli-contract.md` line on `method` still describes the K-8 scheme by its first definition's ruling only (KR-8); it should cite KR-18 and the suite `k8_k`.
 - `oracle/K8_ACCEPTANCE_W1.json` (first run, a miss) is kept unchanged.

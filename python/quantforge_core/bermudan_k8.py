@@ -1,17 +1,17 @@
-"""K-8 (stage K; rulings KR-8 and KR-15): the `CN_RANNACHER_SMOOTHED` Bermudan scheme.
+"""K-8 (stage K; rulings KR-8 and KR-18): the `CN_RANNACHER_SMOOTHED` Bermudan scheme.
 
 Same state, grid, knots and exercise value as the pinned G-18 scheme (shortrate.py), with three
 changes (specifications/06-risk/bermudan-ladder-k8.md, version 0.2.0):
 
 1. The scheme solves for `U(t, x) = V(t, x) exp(-int_0^t alpha)`. The operator then has no curve
    term and does not change with time; the curve enters only through `P(0, t)` at exercise and
-   payment times (KR-15 a). A curve node inside a time step can no longer leak into the ladder.
+   payment times (KR-18 a). A curve node inside a time step can no longer leak into the ladder.
 2. Time stepping is Crank-Nicolson (theta = 1/2). The first two steps after the maturity payoff
    and after each exercise date are each replaced by two fully implicit steps of half size
-   (Rannacher start-up, four half steps; KR-15 c).
+   (Rannacher start-up, four half steps; KR-18 c).
 3. At each exercise date (maturity included) the `max` is applied as a hat-weighted average of
    `max(U - E, 0)` over `[x_(i-1), x_(i+1)]`, with `U - E` linear between nodes, a third-order
-   correction in the cell that holds the crossing, and the stencil `1 - delta^2/6` (KR-15 b).
+   correction in the cell that holds the crossing, and the stencil `1 - delta^2/6` (KR-18 b).
 
 The ladder is the exact derivative of this discrete scheme, carried forward in tangent mode: every
 quantity is an array whose last axis holds the value and its derivatives with respect to the log
@@ -154,7 +154,7 @@ def _hat_part(p: Arr, q: Arr) -> Arr:
 
 
 def _smoothed_max(v: Arr, e: Arr) -> Arr:
-    """`max(V, E)` at an exercise date as a second-order smoothing (KR-15 b, spec step 5)."""
+    """`max(V, E)` at an exercise date as a second-order smoothing (KR-18 b, spec step 5)."""
     f = v - e
     before = np.empty_like(f)
     after = np.empty_like(f)
@@ -219,7 +219,7 @@ def _solve(lower: Arr, diag: Arr, upper: Arr, rhs: Arr) -> Arr:
 
 class _Operator:
     """Rows of `A = -L` at the interior nodes, before the boundary substitution. `A` has no curve
-    term (KR-15 a), so it is the same at every time."""
+    term (KR-18 a), so it is the same at every time."""
 
     def __init__(self, m: _Model, xs: Arr, dx: Arr):
         inner = xs[1:-1]
@@ -248,7 +248,7 @@ def _explicit(op: _Operator, w: float, v: Arr) -> Arr:
     return v[1:-1] - w * lv
 
 
-START_UP_STEPS = 2  # steps replaced by two implicit half steps each (KR-15 c)
+START_UP_STEPS = 2  # steps replaced by two implicit half steps each (KR-18 c)
 
 
 def scheme(

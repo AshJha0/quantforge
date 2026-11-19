@@ -1,20 +1,20 @@
 """Stage K, item K-8: goldens of `CN_RANNACHER_SMOOTHED` (specifications/06-risk/bermudan-ladder-k8.md 0.2.0,
-rulings KR-8 and KR-15) on `rates.shortrate.bermudan_swaption` and `rates.shortrate.bermudan_ladder`.
+rulings KR-8 and KR-18) on `rates.shortrate.bermudan_swaption` and `rates.shortrate.bermudan_ladder`.
 
 Expected values come from the Python build through its CLI (`quantforge_core.cli.main.run_case`): the scheme is a
 pinned deterministic reference scheme, as G-18 is, so the golden pins the scheme, not the model value. This file is
-NOT an independent oracle implementation; what stands behind the numbers is recorded per case in `verified_by`:
-the Java build agrees to 1e-9 of the row scale (BermudanK8Test), the ladder equals its own Richardson bumps to 1e-8
-(test_k8_ladder_equals_its_own_bumps), and at the default grid every judged entry is within 1% of the QuantLib
-fine-grid bump reference (oracle/K8_ACCEPTANCE_W2.json; worst 0.40%).
+NOT an independent oracle implementation, and the first `verified_by` entry of every value case says so. What else
+stands behind the numbers is recorded per case: the Java, C++ and Rust builds agree to 1e-9 of the row scale, the
+ladder equals its own Richardson bumps to 1e-8 (test_k8_ladder_equals_its_own_bumps), and, only for k8_k-0001..0003
+(the three ladders that acceptance 2 compares), every judged entry is within 1% of the QuantLib fine-grid bump
+reference (oracle/K8_ACCEPTANCE_W2.json; worst 0.40%). QuantLib is the outside check there and nowhere else.
 
 Error cases: `method` is a schema field, so an unlisted value is E_SCHEMA before anything else. Every other check is
 the operation's own stage G check (the size limit on `nx` is applied when the field is read). The generator asserts
-that each error case gives the same code with `method` set to `G18_IMPLICIT`, with one recorded exception:
-k8_k-0013 (a bad exercise time together with width = 0). The repo-wide order (HR-66) and the Java build give
-E_INPUT there (the schedule is structural); the Python G-18 path checks the grid first and gives E_DOMAIN. The K-8
-path follows HR-66 in both builds; the Python G-18 path is outside this lane's files and is reported to the
-coordinator (program/K8_PORT_NOTE.md). Three cases carry two errors at once.
+that each error case gives the same code with `method` set to `G18_IMPLICIT`. k8_k-0013 (a bad exercise time
+together with width = 0) gives E_INPUT on both paths (HR-66: the schedule is structural); until 2026-11-19 the
+Python G-18 path checked the grid first and gave E_DOMAIN, fixed by the K-8 port lane, with the G-18 cases in
+e2_k. Three cases carry two errors at once.
 
     cd python && uv run python ../oracle/python/gen_stage_k_k8.py
 """
@@ -36,8 +36,10 @@ OUT = ROOT / "datasets/golden/stage_k/k8_k.json"
 LADDER = "rates.shortrate.bermudan_ladder"
 PRICE = "rates.shortrate.bermudan_swaption"
 VALUE_EVIDENCE = [
-    "python build float64 (pinned reference scheme, spec 0.2.0)",
+    "python build float64 (pinned reference scheme, spec 0.2.0): the expected values are the Python build's own "
+    "output, not an independent oracle",
     "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)",
+    "c++ and rust builds equal to 1e-9 of the row scale (conformance runner and unit tests, 2026-11-19)",
 ]
 LIMIT = {
     "absolute": 1e-10,
@@ -103,17 +105,22 @@ def build() -> list[dict[str, Any]]:
                 "inputs": inputs,
                 "expected": {"status": "error", "error_code": code},
                 "tolerance_class": "simple_analytic",
-                "verified_by": ["hand (error order HR-66)", "java build (StageKCliTest, 2026-11-19)"],
+                "verified_by": ["hand (error order HR-66)", "java build (StageKCliTest, 2026-11-19)",
+                                "c++ and rust builds (conformance runner, 2026-11-19)"],
                 "tags": ["stage_k", "k8", "bermudan", "synthetic", "error", *(["two_errors"] if two else [])],
                 "description": description,
             }
         )
 
-    accept = "default grid: every judged entry within 1% of the QuantLib fine-grid bump (oracle/K8_ACCEPTANCE_W2.json)"
+    accept = (
+        "outside check: QuantLib 1.44 FdHullWhiteSwaptionEngine bump at tGrid 8,000 / xGrid 3,201 (KR-19); every "
+        "judged ladder entry of this case within 1% (acceptance 2, oracle/K8_ACCEPTANCE_W2.json); the price and "
+        "entries below the 1e-3 floor are not compared"
+    )
     bumps = "ladder equals its own Richardson bumps to 1e-8 on a small grid (test_k8_ladder_equals_its_own_bumps)"
     for index, name in enumerate(("payer at the money", "payer 50 bp out of the money", "receiver 50 bp out")):
         value(LADDER, with_(base(index), nx=201, steps_per_year=100), f"ladder at the default grid 201/100, {name}", [accept, bumps])
-    value(PRICE, with_(base(0), nx=201, steps_per_year=100), "price at the default grid; equals the ladder price of k8_k-0001", [accept])
+    value(PRICE, with_(base(0), nx=201, steps_per_year=100), "price at the default grid; equals the ladder price of k8_k-0001", [])
     value(LADDER, with_(base(2), nx=41, steps_per_year=20), "coarse grid 41/20, receiver", [bumps])
     value(PRICE, with_(base(1), nx=101, steps_per_year=50, exercise_times=[1.0]), "one exercise date (European) on 101/50", [])
     value(
@@ -127,7 +134,7 @@ def build() -> list[dict[str, Any]]:
     error(PRICE, with_(base(0), exercise_times=[1.5]), "E_INPUT", "exercise time that is not a reset date")
     error(PRICE, with_(base(0), nx=20001), "E_LIMIT", "nx above 10,001")
     error(LADDER, with_(base(0), method="CN", sigma=0.0), "E_SCHEMA", "unlisted method and sigma = 0: schema first", True)
-    error(PRICE, with_(base(0), exercise_times=[1.5], width=0.0), "E_INPUT", "bad exercise time and width = 0: the schedule (structural) first, HR-66", True, "E_DOMAIN")
+    error(PRICE, with_(base(0), exercise_times=[1.5], width=0.0), "E_INPUT", "bad exercise time and width = 0: the schedule (structural) first, HR-66", True)
     error(LADDER, with_(base(0), sigma=0.0, nx=20001), "E_LIMIT", "sigma = 0 and nx above the limit: the limit is applied when nx is read", True)
     return cases
 

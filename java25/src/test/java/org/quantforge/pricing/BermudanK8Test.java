@@ -17,7 +17,7 @@ import org.quantforge.core.Json;
 import org.quantforge.risk.StageK;
 
 /**
- * K-8 {@code CN_RANNACHER_SMOOTHED} (KR-8 as revised by KR-15): the Python build's values on a small grid, the tangent
+ * K-8 {@code CN_RANNACHER_SMOOTHED} (KR-8 as revised by KR-18): the Python build's values on a small grid, the tangent
  * ladder against its own bumps (acceptance 5), the smoothing of spec step 5, exact zeros, time order, and acceptance 3
  * (201/401/801), which runs only with {@code QF_K8_ACCEPTANCE=1} against {@code oracle/K8_ACCEPTANCE_W2.json}. The
  * first run of the earlier definition is {@code oracle/K8_ACCEPTANCE_W1.json} and stays a recorded miss.
@@ -192,7 +192,7 @@ class BermudanK8Test {
         }
     }
 
-    /** KR-15 a: curve nodes the price does not depend on (0.4986 years, and those after the last payment) give 0. */
+    /** KR-18 a: curve nodes the price does not depend on (0.4986 years, and those after the last payment) give 0. */
     @Test
     void curveNodesThePriceDoesNotDependOnGiveExactZeros() throws IOException {
         for (int index = 0; index < 3; index++) {

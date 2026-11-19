@@ -607,7 +607,7 @@ def test_k8_hat_part_closed_form() -> None:
 
 
 def test_k8_curve_nodes_the_price_does_not_depend_on_give_exact_zeros() -> None:
-    """KR-15 a: the node at 0.4986 years sits inside a time step and before the first exercise date
+    """KR-18 a: the node at 0.4986 years sits inside a time step and before the first exercise date
     (1.0, itself a node); the model price does not depend on it and neither does the scheme. The
     version 0.1.0 scheme gave -337 here at 201/100."""
     for index in range(3):
@@ -690,7 +690,7 @@ def test_k8_acceptance_3_observed_order() -> None:
     """bermudan-ladder-k8.md acceptance 3: on 201/401/801, `num.richardson.check` with assumed order 2
     gives status OK and an observed order in [1.5, 2.5] on the price and every ladder entry that is
     not exactly zero on all three grids. First run (version 0.1.0, 2026-11-18): FAILED on 18 entries,
-    kept in oracle/K8_ACCEPTANCE_W1.json. Second run (KR-15, 2026-11-19): oracle/K8_ACCEPTANCE_W2.json."""
+    kept in oracle/K8_ACCEPTANCE_W1.json. Second run (KR-18, 2026-11-19): oracle/K8_ACCEPTANCE_W2.json."""
     first = json.loads((ROOT / "oracle/K8_ACCEPTANCE_W1.json").read_text("utf-8"))
     assert len(first["failures"]) == 18  # the recorded first run stays a recorded miss
     record = json.loads((ROOT / "oracle/K8_ACCEPTANCE_W2.json").read_text("utf-8"))
