@@ -1,5 +1,5 @@
 {
-  "note": "Release facts for the site home (tools/site_home.html). A release edits this file only: tools/build_site.py fills {{name}} placeholders from here, and counts the rest (version from python/pyproject.toml unless set here, golden cases, suite files and stage E cases and operations from datasets/golden, recorder sources from tools/recorder/sources.json). The build fails on an unknown or unfilled placeholder.",
+  "note": "Release facts for the site home (tools/site_home.html) and the README Status at a glance block (status_glance: rows of [label, text], text with {{name}} placeholders; tools/status_glance.py --write puts it in README.md, tools/build_site.py fails if README is stale). A release edits this file only: tools/build_site.py fills {{name}} placeholders from here, and counts the rest (version from python/pyproject.toml unless set here, golden cases, suite files and stage E cases and operations from datasets/golden, recorder sources from tools/recorder/sources.json). The build fails on an unknown or unfilled placeholder.",
   "release": "v0.10.0, stage H: microstructure and execution on simulated venues",
   "released": "2026-11-19",
   "implemented_stages": "A to J, plus R6",
@@ -7,5 +7,38 @@
   "domains": "12",
   "stages": "11 stages, A to K",
   "version": "0.10.0",
-  "outside_share": "Outside-library share of value-checked cases under the tight rule: stage J 66.5%, I 66.7%, G 81.4%, F 85.1% with an independent re-derivation (53.7% libraries alone), E 78.5%, D 85.7%; stage H 78.0% (160 of 205 value cases) by blind re-derivation or printed paper figures, no library; every stage meets the 60% floor (<a href=\"oracle/OUTSIDE_SHARES.html\">per stage, with the old all-case shares</a>)."
+  "outside_share": "Outside-library share of value-checked cases under the tight rule: stage J 66.5%, I 66.7%, G 81.4%, F 85.1% with an independent re-derivation (53.7% libraries alone), E 78.5%, D 85.7%; stage H 78.0% (160 of 205 value cases) by blind re-derivation or printed paper figures, no library; every stage meets the 60% floor (<a href=\"oracle/OUTSIDE_SHARES.html\">per stage, with the old all-case shares</a>).",
+  "stage_h_outside": "78.0% (160 of 205 value cases, oracle/OUTSIDE_SHARES.md)",
+  "stage_h_unchecked": "45 of the 205 stage H value cases",
+  "next_stage": "stage K, platform and release (target v1.0.0): started 2026-11-19; round 1 merged to main, not released; audit findings open, see docs/known-issues.md; no tag until they are closed",
+  "status_glance": [
+    [
+      "Release",
+      "{{release}}, released {{released}}. Next: {{next_stage}}."
+    ],
+    [
+      "Built",
+      "Stages {{implemented_stages}}, in {{languages}}: {{operations}} CLI operations in the generated name map, CLI contract {{contract}}. Status rung Implemented; nothing is claimed as Validated, Benchmarked or Operationally tested."
+    ],
+    [
+      "Checked",
+      "{{value_checked}} value-checked golden cases, plus {{error_cases}} error and {{invariance_cases}} invariance cases ({{golden_cases}} in all, docs/case-figures.md), sent to each build by the neutral runner. Stage H outside share {{stage_h_outside}}, by blind re-derivation or printed paper figures, no library."
+    ],
+    [
+      "Real data",
+      "One crypto venue's public order book (Kraken L2, recorded locally, aggregates and hashes only; crypto venue; not equities or rates). Public rates and curve sources hashed daily into the forward log. US Treasury par-yield moves in the stage J shock library. Real-data studies so far: the three R3 holdout runs (null) and the H-1 crypto pilot (no conclusions)."
+    ],
+    [
+      "Simulated",
+      "Every venue: the lit engine, dark pool, router, auction, FX dealer venue and Treasury futures venue. Paper trading fills come from those simulators. Golden-case inputs are synthetic, except the stage J shock-library cases (`scen_j`), which carry published US Treasury par yields. No live order is ever placed."
+    ],
+    [
+      "Missed",
+      "H-9 workload R (recorded 6-hour crypto window, 2026-11-18/19): correctness passes, timing is a recorded MISS at p99 and p99.9 in every language (local laptop, not the acceptance machine). H-9 R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS. Stage K item K-8: a second-order Bermudan ladder method is added and measured (it passes its acceptance at 201/100 on the three cases it was developed on, and misses 1% at 101/50 on two of them); the R6 use restriction stays for both methods (KR-113) and lifting it moves to a later point release; the threshold is not loosened. Stage K round 1 is merged to main, not released; audit findings are open (docs/known-issues.md) and there is no tag until they are closed."
+    ],
+    [
+      "No outside check",
+      "{{stage_h_unchecked}}; the stage J curves-lane and hedge-fix value cases; DSR, PSR, PBO and the Z2 backtest (hand cases and printed examples only); every error case. Validation is self-assessment, with no second review (owner decision 2026-11-18)."
+    ]
+  ]
 }

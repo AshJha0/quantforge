@@ -1168,5 +1168,28 @@ class DocsStatus(unittest.TestCase):
         self.assertEqual(self.c.main(), 0)
 
 
+class StatusLadder(unittest.TestCase):
+    """docs/validation/status-ladder.md: generated tables come from the shares file, never hand-typed (stage K docs)."""
+
+    def setUp(self):
+        sp = importlib.util.spec_from_file_location("status_ladder", ROOT / "tools/validation/status_ladder.py")
+        self.sl = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(self.sl)
+
+    def test_render_reports_floor_and_items(self):
+        doc = {"floor": 0.6, "stages": {"Z": {"without_sweeps": {"cases": 5, "counted": 0, "share": 0.0, "counted_with_rederivation": 3,
+                                                               "share_with_rederivation": 0.6}, "meets_floor": True,
+                                            "per_item": {"Z-1": {"cases": 5, "counted_with_rederivation": 2, "share_with_rederivation": 0.4,
+                                                                 "suites": ["z_z"], "meets_item_floor": False}}}}}
+        out = self.sl.render(doc)
+        self.assertIn("| Z | 5 | 0 | 0.0% | 3 | 60.0% | met |", out)
+        self.assertIn("| Z-1 | `z_z` | 5 | 2 | 40.0% | NOT MET |", out)
+
+    def test_committed_page_is_current(self):
+        doc = json.loads((ROOT / "oracle" / "OUTSIDE_SHARES.json").read_text(encoding="utf-8"))
+        text = self.sl.PAGE.read_text(encoding="utf-8")
+        self.assertEqual(self.sl.splice(text, self.sl.render(doc)), text)
+
+
 if __name__ == "__main__":
     unittest.main()

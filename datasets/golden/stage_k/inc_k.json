@@ -1,0 +1,285 @@
+{
+ "schema_version": "1.0",
+ "suite": "inc_k",
+ "spec": "specifications/02-curves/incremental-update.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "inc_k-0001",
+   "operation": "curve.bootstrap.par_annual",
+   "inputs": {
+    "quotes": [
+     0.02,
+     0.025,
+     0.03
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      0.9803921568627451,
+      0.9516977522716403,
+      0.9145993230349209
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "curves",
+    "incremental",
+    "synthetic"
+   ],
+   "description": "base quotes; P_k = (1 - S_k sum P_i) / (1 + S_k)",
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 0.0
+   }
+  },
+  {
+   "case_id": "inc_k-0002",
+   "operation": "curve.incremental.update",
+   "inputs": {
+    "previous_quotes": [
+     0.02,
+     0.025,
+     0.03
+    ],
+    "previous_discount_factors": [
+     0.9803921568627451,
+     0.9516977522716404,
+     0.9145993230349208
+    ],
+    "new_quotes": [
+     0.02,
+     0.026,
+     0.03
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      0.9803921568627451,
+      0.9498146237052326,
+      0.9146541714397677
+     ],
+     "first_changed_index": 1,
+     "recomputed": 2
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "curves",
+    "incremental",
+    "synthetic"
+   ],
+   "description": "second quote ticks: pillar 0 copied",
+   "output_classes": {
+    "first_changed_index": "date_and_convention",
+    "recomputed": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 0.0
+   }
+  },
+  {
+   "case_id": "inc_k-0003",
+   "operation": "curve.incremental.update",
+   "inputs": {
+    "previous_quotes": [
+     0.02,
+     0.025,
+     0.03
+    ],
+    "previous_discount_factors": [
+     0.9803921568627451,
+     0.9516977522716404,
+     0.9145993230349208
+    ],
+    "new_quotes": [
+     0.02,
+     0.025,
+     0.031
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      0.9803921568627451,
+      0.9516977522716403,
+      0.9118382277563861
+     ],
+     "first_changed_index": 2,
+     "recomputed": 1
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "curves",
+    "incremental",
+    "synthetic"
+   ],
+   "description": "last quote ticks: first two copied",
+   "output_classes": {
+    "first_changed_index": "date_and_convention",
+    "recomputed": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 0.0
+   }
+  },
+  {
+   "case_id": "inc_k-0004",
+   "operation": "curve.incremental.update",
+   "inputs": {
+    "previous_quotes": [
+     0.02,
+     0.025,
+     0.03
+    ],
+    "previous_discount_factors": [
+     0.9803921568627451,
+     0.9516977522716404,
+     0.9145993230349208
+    ],
+    "new_quotes": [
+     0.02,
+     0.025,
+     0.03
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      0.9803921568627451,
+      0.9516977522716403,
+      0.9145993230349209
+     ],
+     "first_changed_index": null,
+     "recomputed": 0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "curves",
+    "incremental",
+    "synthetic"
+   ],
+   "description": "nothing changed: all copied",
+   "output_classes": {
+    "first_changed_index": "date_and_convention",
+    "recomputed": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 0.0
+   }
+  },
+  {
+   "case_id": "inc_k-0005",
+   "operation": "curve.incremental.update",
+   "inputs": {
+    "previous_quotes": [
+     0.02,
+     0.025,
+     0.03
+    ],
+    "previous_discount_factors": [
+     0.9803921568627451,
+     0.9516977522716404,
+     0.9145993230349208
+    ],
+    "new_quotes": [
+     0.02,
+     0.025
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "curves",
+    "incremental",
+    "synthetic",
+    "error"
+   ],
+   "description": "lengths differ"
+  },
+  {
+   "case_id": "inc_k-0006",
+   "operation": "curve.incremental.update",
+   "inputs": {
+    "previous_quotes": [
+     0.02,
+     0.025,
+     0.03
+    ],
+    "previous_discount_factors": [
+     0.9803921568627451,
+     0.9516977522716404,
+     0.9145993230349209
+    ],
+    "new_quotes": [
+     0.02,
+     0.026,
+     0.03
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "curves",
+    "incremental",
+    "synthetic",
+    "error"
+   ],
+   "description": "stale cache: last factor one ulp above the bootstrap"
+  }
+ ]
+}

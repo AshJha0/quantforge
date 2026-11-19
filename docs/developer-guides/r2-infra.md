@@ -8,7 +8,7 @@ Phase R2 (target v0.4.2). This builds on [r1-infra.md](r1-infra.md). Every job i
 | Rich/cheap screen, workflow (b) | `rich_cheap.py` | Daily, in `daily-workflows.yml` | `04-pricing/workflow-b-rich-cheap.md` |
 | P&L explain, spec harness | `pnl_explain.py` (from branch `r2`) | Wired in once a CLI implements `risk.pnl.explain` | `06-risk/pnl-explain.md` |
 | Key-rate explain, interim | `keyrate_explain.py` | Daily, in `daily-workflows.yml` | Plan 11.2.1, using operations that exist today |
-| Gallery pages | `tools/gallery_pnl.py`, `tools/gallery_r2.py` | `build_gallery.py` | — |
+| Gallery pages | `tools/gallery_pnl.py`, `tools/gallery_r2.py` | `build_gallery.py` | none |
 | Batch benchmarks | `benchmarks/batch_targets.py` | By hand | `benchmarks/targets.md` |
 
 ## Calibration stability
@@ -22,8 +22,8 @@ This covers seven calibrations, C1 to C7, under 200 seeded noise draws from `cor
 | C1 OIS LOG_LINEAR_DF | 1.55 (3) | 1.1e-14 (1e-12) | |
 | C2 OIS LINEAR_ZERO | 1.64 (3) | 1.1e-14 (1e-12) | |
 | C3 bond NS fit | 0.92 price per price (2), on model prices (R2-A9) | RMS 7.4e-4 (rms_0 + 1.5a = 1.5e-3) | S5: 3.7e-5, 0.0022, 0.0055 |
-| C4 smoothing spline | 4.02 (5) | — | |
-| C5 robust NS | 0.69 (5) | — | S6 1.00 (0.95) |
+| C4 smoothing spline | 4.02 (5) | none | |
+| C5 robust NS | 0.69 (5) | none | S6 1.00 (0.95) |
 | C6 SVI | 0.71 (10) | RMS 6.9e-5 vol (1.5e-4) | noise on sqrt(w), i.e. T = 1 |
 | C7 SABR | 0.98 (10) | RMS 7.6e-5 vol (1.5e-4) | S5: 2.6e-4, 0.0018, 0.0015 |
 

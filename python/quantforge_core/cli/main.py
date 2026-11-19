@@ -10,7 +10,7 @@ from typing import Any
 from .. import __version__, strictjson
 from ..errors import QfError
 
-CONTRACT_VERSION = "1.16.0"  # stage H, ruling DR-H8; was 1.15.0 (J-C-1, J-W3-1)
+CONTRACT_VERSION = "1.17.0"  # stage K, owner decision K-QC (KR-1); was 1.16.0 (stage H, DR-H8)
 SCHEMA_VERSION = "1.0"
 MAX_CASE_DEPTH = 80
 MAX_LINE_BYTES = 16_777_216  # BT5

@@ -1,0 +1,116 @@
+{
+ "source": "datasets/golden/stage_k/idr_k.json expected.outputs (oracle/python/gen_stage_k_w1.py, mpmath 50 digits, rounded once to binary64); copied 2026-11-19 by the K-5a packet builder",
+ "tolerance": {
+  "estimate_pnl": {
+   "relative": 1e-09,
+   "absolute": 0.0
+  },
+  "bound": {
+   "relative": 1e-09,
+   "absolute": 0.0
+  },
+  "label": "exact"
+ },
+ "cases": {
+  "idr_k-0001": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": -39913.124212551615,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 17.05689068912462,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0002": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": 41959.95109524657,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 17.93141617552204,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0003": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": -10170.171073390557,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 0.2665139170175722,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0004": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": -179097.35223580853,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 2132.1113361405783,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0005": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": -30589.655330067555,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 17.684733711514124,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  }
+ }
+}

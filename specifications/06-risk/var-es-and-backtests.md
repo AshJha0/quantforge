@@ -76,7 +76,7 @@ Inputs: `observations` (`>= 1`; above 1,000,000 is `E_LIMIT`, checked first, rul
 ## Acceptance (plan Q2)
 
 - Every case of `risk_f4` passes in all four languages.
-- Outside (rule 11.2.5): Kupiec, Christoffersen, traffic light and parametric cases are recomputed by SciPy (`chi2.sf`, `binom.logpmf`, `binom.cdf`, `norm.ppf`, and ES by numerical integration of the normal tail rather than the closed form); historical cases by `numpy.quantile(method="inverted_cdf")`. FHS and Monte Carlo cases have no outside library and do not count.
+- Outside (rule 11.2.5): Kupiec, Christoffersen, traffic light and parametric cases are recomputed by SciPy (`chi2.sf`, `binom.logpmf`, `binom.cdf`, `norm.ppf`, and ES by numerical integration of the normal tail rather than the closed form); historical cases by `numpy.quantile(method="inverted_cdf")`. FHS and Monte Carlo cases have no outside library and do not count. Stage K (ruling KR-43, 2026-11-19): suite `datasets/golden/stage_k/tlk_k.json` also checks `risk.backtest.traffic_light` at 250 observations and 99% against Basel Framework MAR99 Table 2 (zone, with `YELLOW` as amber, and the cumulative probability to two decimals in percent; PDF generated 11/11/2026, page 758, read 2026-11-19); all eleven rows match. The plus factor stays the 1996 table and is not compared.
 - Full revaluation against sensitivity P&L is not a new operation: `risk.pnl.explain` (R2) already reports the unexplained term. Reverse stress, limits, concentration, liquidity-adjusted risk, portfolio vol by horizon and model-risk reserves are deferred to wave 2b (handover).
 
 ## Sources

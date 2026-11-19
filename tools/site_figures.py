@@ -14,17 +14,57 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 def home_figures(root=ROOT):
     """Values for the site home: release facts from tools/site_facts.json, the rest counted from the tree."""
-    facts = {k: v for k, v in json.loads((root / "tools" / "site_facts.json").read_text(encoding="utf-8")).items() if k != "note"}
+    facts = {k: v for k, v in json.loads((root / "tools" / "site_facts.json").read_text(encoding="utf-8")).items()
+             if k not in ("note", "status_glance")}
     version = re.search(r'^version\s*=\s*"([^"]+)"', (root / "python" / "pyproject.toml").read_text(encoding="utf-8"), re.M).group(1)
+    operations = len(json.loads((root / "specifications" / "name-map.json").read_text(encoding="utf-8"))["operations"])
+    contract = re.search(r'^CONTRACT\s*=\s*"([^"]+)"', (root / "conformance" / "runner" / "runner.py").read_text(encoding="utf-8"), re.M).group(1)
     suites = sorted((root / "datasets" / "golden").rglob("*.json"))
     cases = sum(len(json.loads(p.read_text(encoding="utf-8"))["cases"]) for p in suites)
     import case_figures
     by_class = case_figures.figures(root)
     sources = len(json.loads((root / "tools" / "recorder" / "sources.json").read_text(encoding="utf-8"))["sources"])
     stage_e = [c for p in sorted((root / "datasets" / "golden").glob("stage_e*/*.json")) for c in json.loads(p.read_text(encoding="utf-8"))["cases"]]
-    counted = {"version": version, "stage_e_cases": f"{len(stage_e):,}", "stage_e_operations": str(len({c["operation"] for c in stage_e}))}
-    return {**counted, **facts, "golden_cases": f"{cases:,}", **by_class, "suite_files": str(len(suites)), "sources": str(sources),
-            "stage_rows": stage_rows(roadmap_stages(root))}
+    counted = {"version": version, "stage_e_cases": f"{len(stage_e):,}", "stage_e_operations": str(len({c["operation"] for c in stage_e})),
+               "operations": str(operations), "contract": contract}
+    figures = {**counted, **facts, "golden_cases": f"{cases:,}", **by_class, "suite_files": str(len(suites)), "sources": str(sources),
+               "stage_rows": stage_rows(roadmap_stages(root))}
+    figures["status_glance"] = glance_html(glance_rows(figures, root))
+    return figures
+
+
+def glance_rows(figures, root=ROOT):
+    """[(label, text)] for 'Status at a glance': rows from site_facts.json, {{name}} filled from the figures."""
+    rows = json.loads((root / "tools" / "site_facts.json").read_text(encoding="utf-8"))["status_glance"]
+    return [(label, render_home(text, figures)) for label, text in rows]
+
+
+def glance_html(rows):
+    esc = lambda s: s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")  # noqa: E731
+    body = "\n".join(f"      <tr><th scope=\"row\">{esc(k)}</th><td>{esc(v)}</td></tr>" for k, v in rows)
+    return f'<table class="glance">\n    <tbody>\n{body}\n    </tbody>\n  </table>'
+
+
+GLANCE_BEGIN, GLANCE_END = "<!-- status-glance:begin -->", "<!-- status-glance:end -->"
+
+
+def glance_markdown(rows):
+    """The README block, between its markers. Generated: edit tools/site_facts.json, then tools/status_glance.py --write."""
+    lines = [GLANCE_BEGIN, "",
+             "Generated from `tools/site_facts.json` and counts from the tree by `tools/status_glance.py`; do not edit by hand.", "",
+             "| | |", "|---|---|"]
+    lines += [f"| **{k}** | {v.replace('|', '/')} |" for k, v in rows]
+    return "\n".join(lines + ["", GLANCE_END])
+
+
+def readme_glance_problem(root=ROOT):
+    """'' if README.md carries the current block, else a one-line problem."""
+    text = (root / "README.md").read_text(encoding="utf-8")
+    if GLANCE_BEGIN not in text or GLANCE_END not in text:
+        return "README.md has no Status at a glance block (run tools/status_glance.py --write)"
+    have = text[text.index(GLANCE_BEGIN): text.index(GLANCE_END) + len(GLANCE_END)]
+    want = glance_markdown(glance_rows(home_figures(root), root))
+    return "" if have == want else "README.md Status at a glance is stale (run tools/status_glance.py --write)"
 
 
 def roadmap_stages(root=ROOT):

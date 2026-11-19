@@ -300,7 +300,26 @@ super::registry! {
         let k = i.f64("fixed_rate")?;
         let st = i.str("swaption_type")?;
         let ex = i.reals("exercise_times")?;
+        // Optional `method` (KR-8, KR-18; stage K PROPOSED): absent or G18_IMPLICIT is the pinned G-18
+        // scheme (the default stays G-18, KR-8; the R6 use restriction stays for both methods, KR-113);
+        // CN_RANNACHER_SMOOTHED is the K-8 scheme; any other value is E_SCHEMA, before every other check.
+        let k8 = match i.opt("method") {
+            None => false,
+            Some(_) => match i.str("method")? {
+                quantforge_core::bermudan_k8::METHOD => true,
+                "G18_IMPLICIT" => false,
+                _ => return fail("E_SCHEMA", "method: not a listed value"),
+            },
+        };
         i.gate()?;
+        // G-31: the grid size limits come after E_SCHEMA and before F-2 and every domain check, as the
+        // Python and Java builds read them (k8_k-0014 and the G-18 cases in e2_k).
+        if grid.nx > 10_001 {
+            return fail("E_LIMIT", "grid.nx is at most 10,001");
+        }
+        if grid.steps_per_year > 100_000 {
+            return fail("E_LIMIT", "grid.steps_per_year is at most 100,000");
+        }
         let curve = HwCurve::new(&ts, &ds)?;
         let payer = match st {
             "PAYER" => true,
@@ -308,6 +327,20 @@ super::registry! {
             _ => return fail("E_INPUT", "swaption_type must be PAYER or RECEIVER"),
         };
         let swap = sr::SwapLeg { start, pay: &pay, fixed_rate: k, payer, notional };
+        if k8 {
+            use quantforge_core::bermudan_k8 as bk8;
+            if op == "rates.shortrate.bermudan_ladder" {
+                let l = bk8::ladder(&curve, &ts, &ds, a, sigma, &swap, &ex, grid)?;
+                return plain(obj([
+                    ("price", l.price.into()),
+                    ("d_price_d_discount_factors", l.d_discount_factors.into()),
+                    ("d_price_d_mean_reversion", l.d_mean_reversion.into()),
+                    ("d_price_d_sigma", l.d_sigma.into()),
+                ]));
+            }
+            let p = bk8::price(&curve, &ts, &ds, a, sigma, &swap, &ex, grid)?;
+            return plain(obj([("price", p.into())]));
+        }
         if op == "rates.shortrate.bermudan_ladder" {
             let l = quantforge_core::bermudan_aad::bermudan_ladder(&curve, a, sigma, &swap, &ex, grid)?;
             return plain(obj([

@@ -83,6 +83,25 @@ public final class Projection {
 
     public static CurveSolver.Solved bootstrap(Curve discount, Conventions.RateIndex ix, LocalDate asOf,
                                                List<Quote> quotes, Curve.Interpolation interp) {
+        CurveSolver.Problem p = problem(discount, ix, asOf, quotes);
+        return CurveSolver.solve(asOf, interp, p.dates(), p.quotes(), p.models(), CurveSolver.Method.SEQUENTIAL);
+    }
+
+    /**
+     * K-4b on the stage B projection bootstrap (deposits, FRAs, swaps; the discount curve held fixed): the bootstrap
+     * of {@code next}, solving only the pillars at and after the first quote whose type, months or rate differs; see
+     * {@link CurveSolver#incremental}.
+     */
+    public static CurveSolver.Incremental bootstrapIncremental(Curve discount, Conventions.RateIndex ix,
+                                                               LocalDate asOf, List<Quote> previous,
+                                                               double[] previousFactors, List<Quote> next,
+                                                               Curve.Interpolation interp) {
+        return CurveSolver.incremental(asOf, interp, Jumps.NONE, problem(discount, ix, asOf, previous),
+                previousFactors, problem(discount, ix, asOf, next));
+    }
+
+    private static CurveSolver.Problem problem(Curve discount, Conventions.RateIndex ix, LocalDate asOf,
+                                               List<Quote> quotes) {
         if (quotes.isEmpty()) {
             throw new QfError("E_INPUT", "no quotes", "quotes");
         }
@@ -110,7 +129,11 @@ public final class Projection {
                 throw new QfError("E_INPUT", "quotes are not in pillar order", "quotes");
             }
         }
-        return CurveSolver.solve(asOf, interp, dates, target, models, CurveSolver.Method.SEQUENTIAL);
+        List<Object> keys = new ArrayList<>(n);
+        for (Quote q : quotes) {
+            keys.add(List.of(q.type(), q.months(), Double.doubleToRawLongBits(q.rate())));
+        }
+        return new CurveSolver.Problem(dates, target, models, keys);
     }
 
     /** The amount added to an overnight leg to match the term leg, on the quarterly schedule. */

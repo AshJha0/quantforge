@@ -21,6 +21,7 @@
 #include "quantforge/core/dates.hpp"
 #include "quantforge/core/daycount.hpp"
 #include "quantforge/core/equity.hpp"
+#include "quantforge/core/bermudan_k8.hpp"
 #include "quantforge/core/black.hpp"
 #include "quantforge/core/smile.hpp"
 #include "quantforge/core/surface.hpp"
@@ -69,9 +70,12 @@
 #include "quantforge/core/term_curves.hpp"
 #include "quantforge/core/adaptive_exec.hpp"
 #include "quantforge/core/execution.hpp"
+#include "quantforge/core/frtb_backtest.hpp"
 #include "quantforge/core/microstructure.hpp"
 #include "quantforge/core/micro_est.hpp"
 #include "quantforge/core/paper.hpp"
+#include "quantforge/core/saccr.hpp"
+#include "quantforge/core/stage_k.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {
@@ -330,6 +334,8 @@ struct Entry {
 #include "ops_multiasset.inc"
 #include "ops_micro_est.inc"
 #include "ops_paper.inc"
+#include "ops_k_w1b.inc"
+#include "ops_stage_k.inc"
 
 // Every verb this build runs. The operations command, and dispatch, are generated from this list alone.
 constexpr std::span<const Entry> registry[] = {
@@ -367,6 +373,8 @@ constexpr std::span<const Entry> registry[] = {
     multiasset_ops,
     micro_est_ops,
     paper_ops,
+    k_w1b_ops,
+    stage_k_ops,
 };
 
 // Built on first use, never at static initialisation, so no order between translation units matters.
@@ -465,7 +473,8 @@ CaseResult run_case(string_view text) {
             op_name.starts_with("research.") || op_name == "risk.contrib.euler" || op_name == "risk.backtest.es_z2" ||
             op_name == "exec.tca.shortfall" || op_name == "exec.tca.attribution" ||  // HR-9: fills limit 1,000,000
             op_name == "micro.book.rebuild" || op_name == "exec.sim.lit.run" || op_name == "exec.sim.dark.run" ||
-            op_name == "exec.sor.allocate";  // stage H wave 2 page limits
+            op_name == "exec.sor.allocate" ||  // stage H wave 2 page limits
+            stage_k_verb(op_name);              // stage K sizes, checked last in the library
         const bool big = !research && oversized(inputs);
         Out out;
         out.values.begin_object();
@@ -505,7 +514,7 @@ string version_json() {
     w.key("implementation_version");
     w.string(QF_VERSION);
     w.key("contract_version");
-    w.string("1.16.0");  // stage H, ruling DR-H8; was 1.15.0 (J-C-1, J-W3-1)
+    w.string("1.17.0");  // stage K, owner decision K-QC (KR-1); was 1.16.0 (stage H, DR-H8)
     w.key("toolchain");
     #if defined(__clang__)
     w.string("Clang " __clang_version__);

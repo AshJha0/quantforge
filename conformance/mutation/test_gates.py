@@ -169,6 +169,21 @@ def skip_and_seed_checks():
         check("content seed changes with the source", content_seed.seed("cpp", "cpp26/a.cpp", r) != s1)
     check("content seed resolves the rust and python targets",
           content_seed.files("rust", "**/shortrate.rs") != [] and content_seed.files("python", "quantforge_core.shortrate*") != [])
+    # PR #58: 'quantforge_core.frtb*' swept the stage K frtb_backtest.py into the stage F module frtb, where no
+    # unit test in the mutmut tests_dir reached it (mutmut code 33, "no tests") and stage F's goldens missed it.
+    frtb = next(m for m in json.loads((HERE / "stages.json").read_text(encoding="utf-8"))["stages"]["F"] if m["module"] == "frtb")
+    check("stage F frtb covers exactly frtb.py (python seed files)",
+          [p.name for p in content_seed.files("python", frtb["python"])] == ["frtb.py"])
+    check("stage F frtb covers exactly frtb.rs, frtb2.rs, frtb3.rs (rust seed files)",
+          sorted(p.name for p in content_seed.files("rust", frtb["rust"])) == ["frtb.rs", "frtb2.rs", "frtb3.rs"])
+    new_k = ["python/quantforge_core/frtb_backtest.py", "rust/crates/quantforge-core/src/frtb_backtest.rs",
+             "java25/src/main/java/org/quantforge/risk/FrtbBacktest.java", "cpp26/src/core/frtb_backtest.cpp"]
+    check("a stage K frtb_backtest change does not plan stage F frtb",
+          not any(plan_matrix.touched(lang, frtb[lang], new_k) for lang in plan_matrix.LANGS))
+    check("a frtb.py change plans stage F frtb (python '.*' target)",
+          plan_matrix.touched("python", frtb["python"], ["python/quantforge_core/frtb.py"]))
+    check("a FrtbSbm.java change plans stage F frtb (comma-separated java target)",
+          plan_matrix.touched("java", frtb["java"], ["java25/src/main/java/org/quantforge/risk/FrtbSbm.java"]))
 
 
 def joint_pass_checks():

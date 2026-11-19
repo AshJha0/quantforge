@@ -1,5 +1,5 @@
 {
-  "note": "Modules per stage and language, for the per-stage mutation report (plan 11.5.6). The stage D target is 80%: killed / (killed + survived), with unviable and non-building mutants left out. Python and Rust count a mutant killed if the unit tests or the golden cases catch it. C++ uses the golden cases only. Java uses PIT with the unit tests. 'suite' is the golden-file glob each mutant is checked against; '<lang>_suite' overrides it for one language (Python's xccy code sits in the shared cli/stage_d.py, so every stage D suite applies). Module lists come from the files the stage D branches added; extend this file when a stage adds modules. Stage E modules have the same names as conformance/quality/stage_e.json; a null target is skipped by the plan job. Suites match stage_e and stage_e_b file names. R6-14 (2026-11-12): stages A, F, G and I added; every stage is mutated by the weekly run (mutation-stage.yml loops over all stages). Paths follow the v0.8.0 file names; the G4 renames in R6 must update this file (test_stages_paths in conformance/mutation/check_stages.py fails on a target that matches no file). Stage J (2026-11-15): research_w3 (scenario shocks/replay, interpolation and surface holdout, drift in Rust/C++/Java) runs scen_j, interpbt_j and drift_j via the glob '[dis][cnr]*_j'; Python keeps drift in its own drift.py (module drift); term_curves runs termfin_j and liqcurve_j via '[lt][ie][qr]*_j'. Python roots, compounding and interp (H-0, 2026-11-18) take a python_suite list (comma-separated globs, a union in runner.py): the golden suites whose cases call that module, traced per suite with a profiler (python-h0-2026-11-18.md); with suite * each job hit the 120-minute limit. The stage I hedge_solvers suite widened to 'hedge*_[ij]' so hedgecut_j and hedgesign_j check the Stage J QP changes.",
+  "note": "Modules per stage and language, for the per-stage mutation report (plan 11.5.6). The stage D target is 80%: killed / (killed + survived), with unviable and non-building mutants left out. Python and Rust count a mutant killed if the unit tests or the golden cases catch it. C++ uses the golden cases only. Java uses PIT with the unit tests. 'suite' is the golden-file glob each mutant is checked against; '<lang>_suite' overrides it for one language (Python's xccy code sits in the shared cli/stage_d.py, so every stage D suite applies). Module lists come from the files the stage D branches added; extend this file when a stage adds modules. Stage E modules have the same names as conformance/quality/stage_e.json; a null target is skipped by the plan job. Suites match stage_e and stage_e_b file names. R6-14 (2026-11-12): stages A, F, G and I added; every stage is mutated by the weekly run (mutation-stage.yml loops over all stages). Paths follow the v0.8.0 file names; the G4 renames in R6 must update this file (test_stages_paths in conformance/mutation/check_stages.py fails on a target that matches no file). Stage J (2026-11-15): research_w3 (scenario shocks/replay, interpolation and surface holdout, drift in Rust/C++/Java) runs scen_j, interpbt_j and drift_j via the glob '[dis][cnr]*_j'; Python keeps drift in its own drift.py (module drift); term_curves runs termfin_j and liqcurve_j via '[lt][ie][qr]*_j'. Python roots, compounding and interp (H-0, 2026-11-18) take a python_suite list (comma-separated globs, a union in runner.py): the golden suites whose cases call that module, traced per suite with a profiler (python-h0-2026-11-18.md); with suite * each job hit the 120-minute limit. The stage I hedge_solvers suite widened to 'hedge*_[ij]' so hedgecut_j and hedgesign_j check the Stage J QP changes. Stage K (PR #58, 2026-11-19): the stage F frtb targets were globs (quantforge_core.frtb*, org.quantforge.risk.Frtb*, **/frtb*.rs) that swept the new stage K frtb_backtest file into stage F, scored against frtb_f goldens and a mutmut tests_dir that never reached it (mutmut exit 33, 'no tests'); they now name exactly the stage F files (python 'quantforge_core.frtb.*' is frtb.py alone; java is a comma-separated class list, as PIT targetClasses takes it; rust '**/frtb[!_]*rs' is frtb.rs, frtb2.rs, frtb3.rs), and frtb_backtest is its own stage K module on the btk_k goldens, with python/tests/test_frtb_backtest_kills.py in the mutmut tests_dir. The other new stage K library files (saccr, stage_k, bermudan_k8) are not mapped yet.",
   "target": {
     "A": 0.8,
     "D": 0.8,
@@ -7,7 +7,8 @@
     "F": 0.8,
     "G": 0.8,
     "I": 0.8,
-    "J": 0.8
+    "J": 0.8,
+    "K": 0.8
   },
   "stages": {
     "D": [
@@ -187,10 +188,10 @@
       {
         "module": "frtb",
         "suite": "frtb_f*",
-        "java": "org.quantforge.risk.Frtb*",
+        "java": "org.quantforge.risk.FrtbGirr,org.quantforge.risk.FrtbSbm,org.quantforge.risk.FrtbVegaCurvature",
         "cpp": "cpp26/src/core/var_frtb.cpp",
-        "python": "quantforge_core.frtb*",
-        "rust": "**/frtb*.rs"
+        "python": "quantforge_core.frtb.*",
+        "rust": "**/frtb[!_]*rs"
       },
       {
         "module": "var_backtest",
@@ -367,6 +368,16 @@
         "cpp": "cpp26/src/core/term_curves.cpp",
         "python": "quantforge_core.term_curves*",
         "rust": "**/term_curves.rs"
+      }
+    ],
+    "K": [
+      {
+        "module": "frtb_backtest",
+        "suite": "btk_k",
+        "java": "org.quantforge.risk.FrtbBacktest",
+        "cpp": "cpp26/src/core/frtb_backtest.cpp",
+        "python": "quantforge_core.frtb_backtest.*",
+        "rust": "**/frtb_backtest.rs"
       }
     ]
   }

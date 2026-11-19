@@ -3,7 +3,8 @@
 use crate::calendar::{Bdc, Calendar};
 use crate::conventions::Overnight;
 use crate::curve::{
-    Curve, Discount, Interpolation, SolveMethod, Solved, check_jumps, solve_curve_with_jumps,
+    Curve, Discount, Incremental, Interpolation, SequentialProblem, SolveMethod, Solved,
+    check_jumps, solve_curve_with_jumps, solve_incremental,
 };
 use crate::dates::Date;
 use crate::daycount::{DayCountInputs, year_fraction};
@@ -46,7 +47,7 @@ pub struct OisTrade {
     pub pay: bool,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct OisQuote {
     pub tenor: (i64, char),
     pub bid: f64,
@@ -142,6 +143,7 @@ pub struct OisCurveProblem {
     swaps: Vec<OisLegs>,
     dates: Vec<Date>,
     jumps: Vec<(Date, f64)>,
+    tenors: Vec<(i64, char)>,
     pub mids: Vec<f64>,
 }
 
@@ -187,8 +189,49 @@ impl OisCurveProblem {
             swaps,
             dates,
             jumps: jumps.to_vec(),
+            tenors: quotes.iter().map(|q| q.tenor).collect(),
             mids: quotes.iter().map(OisQuote::mid).collect(),
         })
+    }
+
+    /// K-4b on the stage B OIS bootstrap (method SEQUENTIAL): the solve of this problem's mids,
+    /// solving only the pillars at and after the first quote whose tenor or mid differs from
+    /// `previous`; see `curve::solve_incremental`. Both problems must share the convention, date,
+    /// interpolation and jumps.
+    pub fn solve_incremental(
+        &self,
+        previous: &OisCurveProblem,
+        previous_factors: &[f64],
+    ) -> Result<Incremental> {
+        crate::error::finite("self", self)?;
+        let keys = |p: &OisCurveProblem| -> Vec<((i64, char), u64)> {
+            p.tenors
+                .iter()
+                .zip(&p.mids)
+                .map(|(t, m)| (*t, m.to_bits()))
+                .collect()
+        };
+        let (old_keys, new_keys) = (keys(previous), keys(self));
+        let old_model = |c: &Curve, j: usize| previous.swaps[j].par_rate(c);
+        let new_model = |c: &Curve, j: usize| self.swaps[j].par_rate(c);
+        solve_incremental(
+            self.as_of,
+            self.interpolation,
+            &self.jumps,
+            &SequentialProblem {
+                dates: &previous.dates,
+                quotes: &previous.mids,
+                model: &old_model,
+                keys: &old_keys,
+            },
+            previous_factors,
+            &SequentialProblem {
+                dates: &self.dates,
+                quotes: &self.mids,
+                model: &new_model,
+                keys: &new_keys,
+            },
+        )
     }
 
     pub fn solve(&self, quotes: &[f64], method: SolveMethod) -> Result<Solved> {

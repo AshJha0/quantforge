@@ -440,6 +440,36 @@
     "parameters"
    ]
   },
+  "calib.trigger.check": {
+   "spec": "specifications/03-calibration/recalibration-triggers.md",
+   "rust": "quantforge::calib::trigger_check",
+   "python": "quantforge.calib.trigger_check",
+   "java": "Calib.triggerCheck",
+   "cpp": "qf::calib::trigger_check",
+   "inputs": {
+    "changes": {
+     "java": "changes"
+    },
+    "days_since": {
+     "java": "daysSince"
+    },
+    "k": {
+     "java": "k"
+    },
+    "x_now": {
+     "java": "xNow"
+    },
+    "x_ref": {
+     "java": "xRef"
+    }
+   },
+   "outputs": [
+    "false_alarm_rate",
+    "fire",
+    "sigma",
+    "threshold"
+   ]
+  },
   "cmdty.curve.forward": {
    "spec": "specifications/02-curves/commodity.md",
    "rust": "quantforge::cmdty::curve_forward",
@@ -1467,6 +1497,31 @@
     "variance"
    ]
   },
+  "core.store.bitemporal_query": {
+   "spec": "specifications/01-core/bitemporal-store.md",
+   "rust": "quantforge::core::store_bitemporal_query",
+   "python": "quantforge.core.store_bitemporal_query",
+   "java": "Core.storeBitemporalQuery",
+   "cpp": "qf::core::store_bitemporal_query",
+   "inputs": {
+    "knowledge_as_of": {
+     "java": "knowledgeAsOf"
+    },
+    "records": {
+     "java": "records"
+    },
+    "series_id": {
+     "java": "seriesId"
+    },
+    "valid_at": {
+     "java": "validAt"
+    }
+   },
+   "outputs": [
+    "row",
+    "status"
+   ]
+  },
   "core.store.chain": {
    "spec": "specifications/01-core/asof-store.md",
    "rust": "quantforge::core::store_chain",
@@ -2195,6 +2250,44 @@
    },
    "outputs": [
     "expected_loss_fraction"
+   ]
+  },
+  "curve.bootstrap.par_annual": {
+   "spec": "specifications/02-curves/incremental-update.md",
+   "rust": "quantforge::curve::bootstrap_par_annual",
+   "python": "quantforge.curve.bootstrap_par_annual",
+   "java": "Curve.bootstrapParAnnual",
+   "cpp": "qf::curve::bootstrap_par_annual",
+   "inputs": {
+    "quotes": {
+     "java": "quotes"
+    }
+   },
+   "outputs": [
+    "discount_factors"
+   ]
+  },
+  "curve.incremental.update": {
+   "spec": "specifications/02-curves/incremental-update.md",
+   "rust": "quantforge::curve::incremental_update",
+   "python": "quantforge.curve.incremental_update",
+   "java": "Curve.incrementalUpdate",
+   "cpp": "qf::curve::incremental_update",
+   "inputs": {
+    "new_quotes": {
+     "java": "newQuotes"
+    },
+    "previous_discount_factors": {
+     "java": "previousDiscountFactors"
+    },
+    "previous_quotes": {
+     "java": "previousQuotes"
+    }
+   },
+   "outputs": [
+    "discount_factors",
+    "first_changed_index",
+    "recomputed"
    ]
   },
   "eq.borrow.implied": {
@@ -5483,6 +5576,29 @@
     "tick_value"
    ]
   },
+  "num.richardson.check": {
+   "spec": "specifications/06-risk/bermudan-ladder-k8.md",
+   "rust": "quantforge::num::richardson_check",
+   "python": "quantforge.num.richardson_check",
+   "java": "Num.richardsonCheck",
+   "cpp": "qf::num::richardson_check",
+   "inputs": {
+    "assumed_order": {
+     "java": "assumedOrder"
+    },
+    "ratio": {
+     "java": "ratio"
+    },
+    "values": {
+     "java": "values"
+    }
+   },
+   "outputs": [
+    "extrapolated",
+    "observed_order",
+    "status"
+   ]
+  },
   "paper.book.apply_fill": {
    "spec": "specifications/10-execution/paper-trading.md",
    "rust": "quantforge::paper::book_apply_fill",
@@ -6525,6 +6641,9 @@
     "mean_reversion": {
      "java": "meanReversion"
     },
+    "method": {
+     "java": "method"
+    },
     "notional": {
      "java": "notional"
     },
@@ -6569,6 +6688,9 @@
     },
     "mean_reversion": {
      "java": "meanReversion"
+    },
+    "method": {
+     "java": "method"
     },
     "notional": {
      "java": "notional"
@@ -7612,7 +7734,7 @@
    ]
   },
   "risk.backtest.traffic_light": {
-   "spec": "specifications/06-risk/var-es-and-backtests.md",
+   "spec": "specifications/06-risk/frtb-ima-backtest.md",
    "rust": "quantforge::risk::backtest_traffic_light",
    "python": "quantforge.risk.backtest_traffic_light",
    "java": "Risk.backtestTrafficLight",
@@ -7978,6 +8100,91 @@
     "loadings"
    ]
   },
+  "risk.frtb.backtest.count": {
+   "spec": "specifications/06-risk/frtb-ima-backtest.md",
+   "rust": "quantforge::risk::frtb_backtest_count",
+   "python": "quantforge.risk.frtb_backtest_count",
+   "java": "Risk.frtbBacktestCount",
+   "cpp": "qf::risk::frtb_backtest_count",
+   "inputs": {
+    "actual": {
+     "java": "actual"
+    },
+    "hypothetical": {
+     "java": "hypothetical"
+    },
+    "var": {
+     "java": "var"
+    }
+   },
+   "outputs": [
+    "days_actual",
+    "days_hypothetical",
+    "exceptions",
+    "exceptions_actual",
+    "exceptions_hypothetical",
+    "observations"
+   ]
+  },
+  "risk.frtb.backtest.desk": {
+   "spec": "specifications/06-risk/frtb-ima-backtest.md",
+   "rust": "quantforge::risk::frtb_backtest_desk",
+   "python": "quantforge.risk.frtb_backtest_desk",
+   "java": "Risk.frtbBacktestDesk",
+   "cpp": "qf::risk::frtb_backtest_desk",
+   "inputs": {
+    "exceptions_975_actual": {
+     "java": "exceptions975Actual"
+    },
+    "exceptions_975_hypothetical": {
+     "java": "exceptions975Hypothetical"
+    },
+    "exceptions_99_actual": {
+     "java": "exceptions99Actual"
+    },
+    "exceptions_99_hypothetical": {
+     "java": "exceptions99Hypothetical"
+    },
+    "observations": {
+     "java": "observations"
+    }
+   },
+   "outputs": [
+    "breach_975",
+    "breach_99",
+    "cumulative_probability_975",
+    "cumulative_probability_99",
+    "eligible",
+    "exceptions_975",
+    "exceptions_99"
+   ]
+  },
+  "risk.frtb.backtest.zone": {
+   "spec": "specifications/06-risk/frtb-ima-backtest.md",
+   "rust": "quantforge::risk::frtb_backtest_zone",
+   "python": "quantforge.risk.frtb_backtest_zone",
+   "java": "Risk.frtbBacktestZone",
+   "cpp": "qf::risk::frtb_backtest_zone",
+   "inputs": {
+    "exceptions_actual": {
+     "java": "exceptionsActual"
+    },
+    "exceptions_hypothetical": {
+     "java": "exceptionsHypothetical"
+    },
+    "observations": {
+     "java": "observations"
+    }
+   },
+   "outputs": [
+    "amber_from",
+    "cumulative_probability",
+    "exceptions",
+    "multiplier",
+    "red_from",
+    "zone"
+   ]
+  },
   "risk.frtb.commodity_delta": {
    "spec": "specifications/06-risk/frtb-sa-fx-equity.md",
    "rust": "quantforge::risk::frtb_commodity_delta",
@@ -8128,6 +8335,26 @@
     "binding_scenario",
     "capital",
     "scenarios"
+   ]
+  },
+  "risk.intraday.delta_gamma_bound": {
+   "spec": "specifications/06-risk/intraday-risk-bounds.md",
+   "rust": "quantforge::risk::intraday_delta_gamma_bound",
+   "python": "quantforge.risk.intraday_delta_gamma_bound",
+   "java": "Risk.intradayDeltaGammaBound",
+   "cpp": "qf::risk::intraday_delta_gamma_bound",
+   "inputs": {
+    "positions": {
+     "java": "positions"
+    },
+    "shift": {
+     "java": "shift"
+    }
+   },
+   "outputs": [
+    "bound",
+    "estimate_pnl",
+    "label"
    ]
   },
   "risk.limits.check": {
@@ -8289,6 +8516,43 @@
     "unexplained",
     "value_end",
     "value_start"
+   ]
+  },
+  "risk.saccr.ead": {
+   "spec": "specifications/06-risk/sa-ccr.md",
+   "rust": "quantforge::risk::saccr_ead",
+   "python": "quantforge.risk.saccr_ead",
+   "java": "Risk.saccrEad",
+   "cpp": "qf::risk::saccr_ead",
+   "inputs": {
+    "collateral": {
+     "java": "collateral"
+    },
+    "ir_offset": {
+     "java": "irOffset"
+    },
+    "margin": {
+     "java": "margin"
+    },
+    "trades": {
+     "java": "trades"
+    }
+   },
+   "outputs": [
+    "addon",
+    "addon_aggregate",
+    "c",
+    "capped",
+    "ead",
+    "ead_unmargined",
+    "hedging_sets",
+    "margined",
+    "mpor_days",
+    "multiplier",
+    "pfe",
+    "rc",
+    "trades",
+    "v"
    ]
   },
   "risk.scenario.historical_shock": {
@@ -10371,6 +10635,7 @@
   "hedge.backtest.delta: half_spread",
   "rates.basis.ois_spread: tenor",
   "rates.csa.discount: collateral_spread",
+  "risk.intraday.delta_gamma_bound: shift",
   "risk.mc.greeks: bump_relative",
   "risk.var.liquidity_adjusted: spread_mean",
   "risk.var.liquidity_adjusted: spread_vol",
@@ -10389,6 +10654,25 @@
   "xva.adjustments.value: im_spread"
  ],
  "spec_only": [
-  "paper.pnl.explain"
+  "paper.pnl.explain",
+  "risk.capital.large_exposures",
+  "risk.capital.leverage",
+  "risk.ccr.sa_ccr",
+  "risk.cva.ba",
+  "risk.cva.sa",
+  "risk.frtb.drc_ctp",
+  "risk.frtb.drc_nonsec",
+  "risk.frtb.drc_sec_nonctp",
+  "risk.frtb.ima.capital",
+  "risk.frtb.ima.es_lh",
+  "risk.frtb.ima.es_stressed",
+  "risk.frtb.ima.imcc",
+  "risk.frtb.ima.lh",
+  "risk.frtb.ima.ses",
+  "risk.frtb.pla",
+  "risk.frtb.pla.ks_pvalue",
+  "risk.frtb.rfet",
+  "risk.frtb.rfet.bucket",
+  "risk.frtb.rrao"
  ]
 }

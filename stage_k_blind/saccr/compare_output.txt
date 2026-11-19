@@ -1,0 +1,12 @@
+saccr_k-0006	MATCH	NOT BLIND	leaves=45	unnamed=0
+saccr_k-0007	MATCH	blind	leaves=45	unnamed=0
+saccr_k-0008	MATCH	blind	leaves=41	unnamed=0
+saccr_k-0009	MATCH	blind	leaves=41	unnamed=0
+saccr_k-0010	MATCH	blind	leaves=56	unnamed=0
+saccr_k-0011	MATCH	blind	leaves=38	unnamed=0
+saccr_k-0012	MATCH	blind	leaves=41	unnamed=0
+saccr_k-0013	MATCH	NOT BLIND	leaves=74	unnamed=0
+saccr_k-0014	MATCH	blind	leaves=74	unnamed=0
+saccr_k-0015	MATCH	NOT BLIND	leaves=27	unnamed=0
+saccr_k-0016	MATCH	NOT BLIND	leaves=34	unnamed=0
+non-MATCH cases: 0

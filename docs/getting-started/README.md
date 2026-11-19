@@ -1,6 +1,6 @@
 # Tutorials
 
-Fifty guided tutorials, each 10 to 15 minutes, that walk through what QuantForge already does. Each one starts from small synthetic data you can follow by hand, runs it in Python first, then sends the same operations to the Rust, Java and C++ builds, which print the same digits. Every number on every page is real output, and CI runs each page in all four languages and fails if a printed line differs (`.github/workflows/tutorial.yml`, `tools/check_tutorial.py`).
+Fifty-eight guided tutorials (51 to 58 cover stage K, not yet released), each 10 to 15 minutes, that walk through what QuantForge already does. Each one starts from small synthetic data you can follow by hand, runs it in Python first, then sends the same operations to the Rust, Java and C++ builds, which print the same digits. Every number on every page is real output, and CI runs each page in all four languages and fails if a printed line differs (`.github/workflows/tutorial.yml`, `tools/check_tutorial.py`). Eight further pages, 51 to 58, are stage K drafts for work not yet merged; they are listed apart under [Stage K, in progress](#stage-k-in-progress).
 
 Each tutorial explains its results in the same order: the plain idea, the formal statement from the spec, then a worked example with a check you can do in your head. Each ends with notes for practitioners, common mistakes, what you just did, and references.
 
@@ -59,6 +59,21 @@ Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the f
 | [49. Trading conventions](tutorial-49-trading-conventions.md) | Equity ticks, round lots and T+1; FX pips and spot dates; Treasury 32nds, bond and bill prices | `micro.eq.*`, `micro.fx.*`, `micro.rates.*` (available from v0.10.0) | H |
 | [50. Auction, FX and futures venues](tutorial-50-auction-fx-and-futures-venues.md) | Auction uncrossing; an FX dealer venue with last look; ZN and ZB futures in ticks | `exec.sim.auction.uncross`, `exec.sim.fx.*`, `exec.sim.fut.*` (available from v0.10.0) | H |
 
+## Stage K, in progress
+
+These eight pages cover stage K round 1. They are not released: the operations they describe are merged on the integration branch `k-r1` (2026-11-19), in all four builds, and none is in a tag. Each page first restates the spec's rule with the standard library on the golden inputs; Tutorials 51 to 57 then call the library in Step 2 through the Python build, and CI checks that Step 2 prints the page's lines (turned on at integration, `program/STAGE_K_DOCS_PENDING.md`). Tutorial 58 checks Step 1 only, because the paper ledger is not running yet. Numbers are taken from evidence files and goldens, and each page names the file.
+
+| Tutorial | What you do | Operations | Stage |
+|---|---|---|---|
+| [51. A bitemporal store](tutorial-51-bitemporal-store.md) | A correction and a withdrawal seen from both sides of when they were learned; the KR-4 property | `core.store.bitemporal_query` | K, in progress |
+| [52. Incremental curve update](tutorial-52-incremental-curve-update.md) | Patch a par curve for one moved quote, bit for bit against a full rebuild; a stale cache refused | `curve.bootstrap.par_annual`, `curve.incremental.update` | K, in progress |
+| [53. Recalibration triggers](tutorial-53-recalibration-triggers.md) | A planted move against noise, equality that does not fire, the simulation's binomial interval | `calib.trigger.check` | K, in progress |
+| [54. Intraday risk with error bounds](tutorial-54-intraday-risk-bounds.md) | Delta-gamma estimates and their Taylor bounds against exact revaluation; outside share 5 of 5 | `risk.intraday.delta_gamma_bound` | K, in progress |
+| [55. The Bermudan ladder convergence fix](tutorial-55-bermudan-ladder-convergence.md) | Why second order was lost, the two fixes, the acceptance evidence, why the restriction stays | `CN_RANNACHER_SMOOTHED`, `num.richardson.check` | K, in progress |
+| [56. SA-CCR, Basel Example 1](tutorial-56-sa-ccr-example-1.md) | Two swaps and a swaption from trades to an EAD of 569, step by step | `risk.saccr.ead` | K, in progress |
+| [57. The backtesting traffic light](tutorial-57-backtesting-traffic-light.md) | MAR99 Table 2 from the binomial distribution, zone boundaries, desk limits | `risk.frtb.backtest.zone`, `.desk` | K, in progress |
+| [58. The daily paper ledger](tutorial-58-daily-paper-ledger.md) | One day replayed in exact decimal with zero unexplained; a hash chain catches an edit; the verifier's order of checks | `tools/paper_daily/`; not running yet, 0 of 20 days | K, in progress |
+
 ## How the scripts work
 
 Tutorial 44 runs the paper-trading application (`python/quantforge_core/paper.py`) in process; Tutorials 45 to 47 are hand checks in the style of 36 to 40; Tutorial 48 compares a recorded latency run (laptop, WSL) with its targets and builds nothing. Tutorials 41 to 43 (stage H wave 2) and 49 and 50 (round 4, multi-asset) call the operations in process through the Python build (`quantforge_core.cli.main.run_case`, the entry point of the `quantforge` command) and stop if a result differs from its spec golden. Tutorials 36 to 40 (stage H) are hand checks: the operations are implemented in all four languages, but each page runs a short standard-library restatement of the spec's formulas on the golden inputs, in Python only, and shows the library call without running it. Tutorials 2 to 16 and 23 to 32, 34 and 35 each run one script in `examples/tutorials/`. Tutorials 17 to 21 (stage I, hedging) instead show a short Python script on the page, calling `quantforge_core` directly, and a standard-library script per page, `examples/tutorial_hedge_17.py` to `examples/tutorial_hedge_21.py`, that sends the same cases to the Rust, Java or C++ build. The script calls operations by their names in `specifications/name-map.json` through one helper, `examples/tutorials/qf.py`: with no argument it uses the Python package in the same process, and with a command line it sends each case to that build's `batch` command (`specifications/cli-contract.md`). So one script, unchanged, drives all four implementations, and the page shows it in full; CI checks that the listing on the page equals the file.
@@ -68,7 +83,7 @@ uv run --project python python examples/tutorials/t4_credit.py          # Python
 python examples/tutorials/t4_credit.py rust/target/release/quantforge   # Rust, Java or C++
 ```
 
-To check a page yourself, as CI does: `python tools/check_tutorial.py --lang rust` (all pages) or add `--page docs/getting-started/tutorial-4-credit.md`. Pages 2 to 32 use the builds that page 1 makes, so check page 1 first in a fresh clone.
+To check a page yourself, as CI does: `python tools/check_tutorial.py --lang rust` (all pages) or add `--page docs/getting-started/tutorial-4-credit.md`. Later pages use the builds that page 1 makes, so check page 1 first in a fresh clone.
 
 Scripts that send several cases at once and read their diagnostics, as in Tutorials 8 to 16, use `runner` from the same helper, the batch form of `connect`. Tutorial 1 is the first exception: to show what the library looks like from Python, its page calls the `quantforge_core` package directly, and a standard-library script, `examples/tutorial_swap.py`, sends the same three operations to the Rust, Java or C++ `batch` command. The hedging tutorials, 17 to 21, follow tutorial 1's form (ruling I-52): the page's Python block imports the `quantforge_core` modules, and `examples/tutorial_hedge_17.py` to `tutorial_hedge_21.py` send the same cases, built from the `examples/hedge_*_i.json` inputs, to the other builds. CI runs every page in each language it marks; Tutorial 22, a Python research tool, runs in Python only.
 

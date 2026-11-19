@@ -54,7 +54,7 @@ def load_rederivation():
     doc = json.loads(p.read_text(encoding="utf-8"))
     return {c["case_id"]: c["operation"] for c in doc["cases"] if c["pass"]}, doc.get("source", "independent re-derivation")
 
-STAGE_DIRS = {"D": ["stage_d"], "E": ["stage_e", "stage_e_b"], "F": ["stage_f"], "G": ["stage_g"], "I": ["stage_i"], "J": ["stage_j"], "H": ["stage_h"]}
+STAGE_DIRS = {"D": ["stage_d"], "E": ["stage_e", "stage_e_b"], "F": ["stage_f"], "G": ["stage_g"], "I": ["stage_i"], "J": ["stage_j"], "H": ["stage_h"], "K": ["stage_k"]}
 
 # Stage F convention rows naming a numpy or scipy primitive. Kupiec (SCIPY.BINOM) and Christoffersen (SCIPY.CHI2)
 # cases rebuild the spec's likelihood-ratio formula around a distribution call: reimplementation (review finding 6).
@@ -223,15 +223,47 @@ def load_stage_h():
     return out
 
 
+# Stage K wave 1 (ruling KR-11, confirmed 2026-11-19): the only library check is SciPy on trig_k
+# `false_alarm_rate`, one of four compared outputs, so no case counts as library-checked. Counted, as for stage H,
+# is the DR-H2 blind re-derivation (program/STAGE_K_BLIND_W1.md), and only where every compared output was checked
+# blind at the golden's tolerance: a case whose `verified_by` says "not blind" (gap-decided fields, oracle-only
+# cases) or "only to 6 decimals" (idr_k-0001..0004 `bound`, compared at 1e-9 relative but blind-checked to 5e-7
+# absolute) does not count. The mpmath values are our own oracle and never count (KR-11).
+# Stage K wave 1b (integration 2026-11-19, program/STAGE_K_W1B_HANDOVER.md): a case also counts when its `verified_by`
+# records a figure printed in the regulator text with MATCH ("published: ... MATCH", CRE99 and MAR99 Table 2), as stage H
+# counts printed paper figures. SciPy `binom.cdf` checks on btk_k are not counted: the D6 precedent is stage F's
+# REIMPL_ROWS ("SCIPY.BINOM"), under which risk_f4-0082 (`risk.backtest.traffic_light`, the same binomial sum) is
+# `reimplementation`; a library primitive computing the same closed-form quantity is not a different formulation.
+# K-5a: the K-5a blind packet
+# (program/STAGE_K_BLIND_K5A.md, 2026-11-19) re-derived idr_k-0001..0005 at 1e-9 relative, 5 of 5 MATCH; their
+# verified_by now records that run, so they count as blind re-derivation.
+STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-5a", "rich_k": "K-8 guard",
+                 "k8_k": "K-8", "e1_k": None, "e2_k": None,  # e1_k, e2_k: error cases only
+                 "saccr_k": "K-8d", "btk_k": "K-8e", "tlk_k": "F (existing traffic_light)"}
+K_PUBLISHED_SRC = "figure printed in the regulator text (Basel Framework CRE99, MAR99 Table 2)"
+
+
+def load_stage_k():
+    out = {}
+    for f in sorted((GOLDEN / "stage_k").glob("*.json")):
+        for c in json.loads(f.read_text(encoding="utf-8"))["cases"]:
+            vb = " | ".join(c.get("verified_by", []))
+            if "DR-H2" in vb and "MATCH" in vb and "not blind" not in vb and "only to 6 decimals" not in vb:
+                out[c["case_id"]] = (REDERIVED, H_REDERIVE_SRC)
+            elif any(v.startswith("published:") and "MATCH" in v for v in c.get("verified_by", [])):
+                out[c["case_id"]] = (REDERIVED, K_PUBLISHED_SRC)
+    return out
+
+
 def stage_report(stage, problems):
     """Rows (suite, operation, class, sweep, library, value-checked)."""
     suites = golden_suites(stage)
     rows = []  # (suite, operation, class, sweep, library)
-    if stage == "H":
-        reg = load_stage_h()
+    if stage in ("H", "K"):
+        reg, items = (load_stage_h(), STAGE_H_ITEMS) if stage == "H" else (load_stage_k(), STAGE_K_ITEMS)
         for suite, cases in suites.items():
-            if suite not in STAGE_H_ITEMS:
-                problems.append(f"stage H: golden suite {suite} has no plan item in STAGE_H_ITEMS")
+            if suite not in items:
+                problems.append(f"stage {stage}: golden suite {suite} has no plan item in STAGE_{stage}_ITEMS")
             for cid, op, st in cases:
                 cls, lib = reg.get(cid, ("none", ""))
                 rows.append((suite, op, cls, False, lib, st == "ok"))
@@ -329,19 +361,44 @@ def build(problems):
         entry["meets_floor"] = s >= FLOOR
         if not entry["meets_floor"]:
             problems.append(f"stage {st}: {s:.1%} of value-checked cases (library plus re-derivation) is under the {FLOOR:.0%} floor")
-        if st == "H":
+        if st in ("H", "K"):
+            item_map = STAGE_H_ITEMS if st == "H" else STAGE_K_ITEMS
             items = defaultdict(list)
             for r in core:
-                if STAGE_H_ITEMS.get(r[0], "?") is not None:
-                    items[STAGE_H_ITEMS.get(r[0], "?")].append(r)
+                if item_map.get(r[0], "?") is not None:
+                    items[item_map.get(r[0], "?")].append(r)
             entry["per_item"] = {}
             for it, rs in sorted(items.items()):
                 v = vshare(rs)
                 v["suites"] = sorted({r[0] for r in rs})
                 v["meets_item_floor"] = (v["share_with_rederivation"] or 0.0) >= FLOOR
                 entry["per_item"][it] = v
+            if st == "K":
+                # Audit finding KA-C18 (2026-11-19, open): cases counted on a figure printed in the regulator text are
+                # checked on part of their outputs and at print precision, so by the strict reading of the rule above
+                # ("only if every compared output is checked") they do not count. Both figures are published until ruled.
+                def strict(rs):
+                    val = [r for r in rs if r[5]]
+                    return {"cases": len(val), "counted": sum(r[2] == REDERIVED and r[4] != K_PUBLISHED_SRC for r in val)}
+                entry["under_review"] = {
+                    "finding": "KA-C18", "status": "open",
+                    "strict_reading": "a case counted on a printed regulator figure does not count",
+                    "stage": strict(core),
+                    "per_item": {it: strict(rs) for it, rs in sorted(items.items())}}
         out["stages"][st] = entry
     return out
+
+
+def under_review_text(u):
+    s = u["stage"]
+    low = [f"{it} {v['counted']} of {v['cases']} ({v['counted'] / v['cases']:.1%})" for it, v in u["per_item"].items()
+           if v["cases"] and v["counted"] / v["cases"] < FLOOR]
+    return (f"**Stage K shares are under review (audit finding {u['finding']}, {u['status']}; `docs/known-issues.md`).** The table above "
+            "counts a case checked against a figure printed in the regulator text. Such a case is checked on part of its "
+            "outputs and at print precision, which the rule at the top of this page (\"only if every compared output is "
+            f"checked\") does not allow. By the strict reading stage K is {s['counted']} of {s['cases']} "
+            f"({s['counted'] / s['cases']:.1%}), under the floor; items under the floor by that reading: {'; '.join(low)}. "
+            "Neither figure is settled until a ruling says which reading holds.")
 
 
 def markdown(doc):
@@ -371,6 +428,22 @@ def markdown(doc):
               "| Item | Suites | Value cases | Blind or paper | Share | 60% per item |", "|---|---|---:|---:|---:|---|"]
         L += [f"| {it} | {', '.join('`' + s + '`' for s in v['suites'])} | {v['cases']} | {v['counted_with_rederivation']} | "
               f"{(v['share_with_rederivation'] or 0):.1%} | {'met' if v['meets_item_floor'] else 'NOT MET'} |" for it, v in eh["per_item"].items()]
+    ek = doc["stages"].get("K")
+    if ek:
+        L += ["", "## Stage K per plan item (plan 15 gate rule: at least 60% of each item's value cases)", "",
+              "Ruling KR-11: SciPy checks only trig_k `false_alarm_rate`, one of four compared outputs, so no case is "
+              "library-checked. A case counts as `independent-rederivation` only if the wave-1 blind lane (DR-H2) checked "
+              "every compared output at the golden's tolerance; gap-decided, oracle-only and 6-decimal bound cases do not count. "
+              "Wave 1b also counts a figure printed in the regulator text (CRE99 Examples 1 to 5, MAR99 Table 2) and the "
+              "seven SA-CCR cases the wave-1b blind lane matched (program/STAGE_K_BLIND_W1B.md); SciPy binomial checks on "
+              "btk_k are not counted. Later blind packets, counted the same way: K-5a idr_k-0001..0005 "
+              "(program/STAGE_K_BLIND_K5A.md), the K-8 ladder k8_k (program/STAGE_K_BLIND_K8.md) and eleven btk_k cases "
+              "(program/STAGE_K_BLIND_BTK.md; btk_k-0017 matched and is not counted). The mpmath oracle is our own and never counts.", "",
+              "| Item | Suites | Value cases | Blind | Share | 60% per item |", "|---|---|---:|---:|---:|---|"]
+        L += [f"| {it} | {', '.join('`' + s + '`' for s in v['suites'])} | {v['cases']} | {v['counted_with_rederivation']} | "
+              f"{(v['share_with_rederivation'] or 0):.1%} | {'met' if v['meets_item_floor'] else 'NOT MET'} |" for it, v in ek["per_item"].items()]
+    if ek and ek.get("under_review"):
+        L += ["", under_review_text(ek["under_review"])]
     L += ["", "## Value classes with no free outside reference", "", "| Suite | Reason |", "|---|---|"]
     for e in doc["stages"].values():
         L += [f"| `{k}` | {v} |" for k, v in e["no_outside_reference"].items()]

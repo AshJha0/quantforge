@@ -22,19 +22,27 @@ PR_TARGET = 0.8
 
 
 def target_glob(lang, target):
-    """The repository path glob a module target covers."""
+    """The repository path glob a module target covers (one comma-separated part of it: see targets)."""
     if lang == "java":  # class name or class glob
         return "java25/src/main/java/" + target.replace(".", "/") + ("" if target.endswith("*") else ".java")
-    if lang == "python":  # dotted mutant glob, e.g. quantforge_core.vol_e1*
+    if lang == "python":  # dotted mutant glob, e.g. quantforge_core.vol_e1*, or quantforge_core.frtb.* (one file)
+        if target.endswith(".*"):
+            return "python/" + target[:-2].replace(".", "/") + ".py"
         return "python/" + target.replace(".", "/") + ("" if target.endswith("*") else ".py")
     if lang == "rust":
         return "rust/" + target.lstrip("/") if not target.startswith(("rust/", "**")) else target
     return target  # cpp: a path
 
 
+def targets(lang, target):
+    """A java target may list several classes, comma-separated, as PIT's targetClasses takes them
+    (stage F frtb names its three classes so the stage K FrtbBacktest is not swept in by Frtb*)."""
+    return [t.strip() for t in target.split(",")] if lang == "java" else [target]
+
+
 def touched(lang, target, changed):
-    g = target_glob(lang, target)
-    return any(fnmatch.fnmatch(c, g) or fnmatch.fnmatch(c, "*/" + g.lstrip("*/")) for c in changed)
+    gs = [target_glob(lang, t) for t in targets(lang, target)]
+    return any(fnmatch.fnmatch(c, g) or fnmatch.fnmatch(c, "*/" + g.lstrip("*/")) for c in changed for g in gs)
 
 
 # Rust jobs build and test each sampled mutant (debug tests plus a release CLI), so the sample is split

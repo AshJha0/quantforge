@@ -20,7 +20,7 @@ use quantforge_core::json::{Flags, Json, nesting_exceeds, obj, parse};
 use std::io::{BufRead, Read, Write};
 use std::process::ExitCode;
 
-const CONTRACT: &str = "1.16.0"; // stage H, ruling DR-H8; was 1.15.0 (J-C-1, J-W3-1)
+const CONTRACT: &str = "1.17.0"; // stage K, owner decision K-QC (KR-1); was 1.16.0 (stage H, DR-H8)
 const SCHEMA: &str = "1.0";
 const MAX_CASE_NESTING: usize = 80;
 
@@ -93,6 +93,11 @@ fn check_envelope(doc: &Json, flags: Flags) -> Result<(&str, &Json), QfError> {
 /// works on an array stops at `Inputs::gate`, after its typed reads. An oversized array in a key
 /// the operation ignores reaches the end, and its small result is replaced here.
 fn run_operation(op: &str, inputs: &Json) -> Result<ops::Outcome, QfError> {
+    if ops::stagek::STAGE_K_OPS.contains(&op) {
+        // HR-66 for stage K: structural E_INPUT comes before the F-2 E_DOMAIN and the stage K
+        // sizes come last, so the core applies both; the generic gate sizes do not apply.
+        return dispatch(op, &Inputs::new(&stage_k_tokens(op, inputs)));
+    }
     let inputs = &with_non_finite_tokens(inputs);
     let limit = operations()
         .contains(&op)
@@ -123,6 +128,24 @@ fn with_non_finite_tokens(v: &Json) -> Json {
         ),
         other => other.clone(),
     }
+}
+
+/// F-1 for the stage K verbs. `core.store.bitemporal_query` has no Real input but `value`, which is
+/// any JSON: an F-1 token at the top level of a value is read as a Real (and refused by the finite
+/// rule); nested inside it, it stays a string, as do tokens in its string fields (ruling F-38).
+fn stage_k_tokens(op: &str, inputs: &Json) -> Json {
+    if op != "core.store.bitemporal_query" {
+        return with_non_finite_tokens(inputs);
+    }
+    let mut out = inputs.clone();
+    if let Some(Json::Arr(records)) = out.get_mut("records") {
+        for r in records {
+            if let Some(v @ Json::Str(_)) = r.get_mut("value") {
+                *v = with_non_finite_tokens(v);
+            }
+        }
+    }
+    out
 }
 
 /// Returns the result document and whether its status is `ok`.

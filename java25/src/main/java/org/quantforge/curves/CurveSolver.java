@@ -83,8 +83,18 @@ public final class CurveSolver {
     }
 
     private static double[] sequential(Setup s) {
+        return sequential(s, new double[0]);
+    }
+
+    /**
+     * The one-at-a-time solve with the first {@code fixed.length} logs taken as given (K-4b, ruling KR-5). When
+     * {@code fixed} is the start of an earlier solve of the same quotes up to there, the result is the full solve
+     * bit for bit: the same arithmetic runs in the same order.
+     */
+    private static double[] sequential(Setup s, double[] fixed) {
         double[] x = new double[s.dates().length];
-        for (int j = 0; j < x.length; j++) {
+        System.arraycopy(fixed, 0, x, 0, fixed.length);
+        for (int j = fixed.length; j < x.length; j++) {
             LocalDate[] prefix = Arrays.copyOf(s.dates(), j + 1);
             double[] logs = Arrays.copyOf(x, j + 1);
             int index = j;
@@ -97,6 +107,61 @@ public final class CurveSolver {
             x[j] = secant(error, guess, guess - 1e-4);
         }
         return x;
+    }
+
+    /**
+     * One sequential bootstrap as {@link #incremental} reads it: pillar dates, targets, one model per quote, and a key
+     * per quote that differs exactly when that quote's instrument or target does.
+     */
+    public record Problem(LocalDate[] dates, double[] quotes, List<ToDoubleFunction<Curve>> models, List<?> keys) {}
+
+    /** {@code firstChangedIndex} is null when no quote changed; {@code recomputed} counts the pillars solved again. */
+    public record Incremental(Solved solved, Integer firstChangedIndex, int recomputed) {}
+
+    /**
+     * K-4b on a production sequential bootstrap, as {@code curve.incremental.update}: {@code previousFactors} must
+     * equal the bootstrap of the previous quotes bit for bit (E_INPUT otherwise; a stale cache is not patched). That
+     * check is a full solve of the previous quotes, which also gives the exact logs from which the pillars at and
+     * after the first changed quote are solved again. Stage F interpolations are solved globally (ruling F-21), so
+     * they have no prefix to keep: E_INPUT.
+     */
+    public static Incremental incremental(LocalDate asOf, Curve.Interpolation interp, Jumps jumps, Problem previous,
+                                          double[] previousFactors, Problem next) {
+        Finite.check("previous_discount_factors", previousFactors);
+        if (interp.smooth()) {
+            throw new QfError("E_INPUT",
+                    "an incremental update needs a sequential interpolation (LOG_LINEAR_DF or LINEAR_ZERO)",
+                    "interpolation");
+        }
+        int n = next.dates().length;
+        if (previous.dates().length != n || previousFactors.length != n) {
+            throw new QfError("E_INPUT",
+                    "previous quotes, previous discount factors and new quotes must have one length", "quotes");
+        }
+        Setup old = new Setup(asOf, interp, previous.dates(), previous.quotes(), previous.models(), jumps,
+                Curve.Shape.NONE);
+        double[] logs = sequential(old);
+        double[] fresh = Curve.fromLogs(asOf, interp, previous.dates(), logs, jumps).discountFactors();
+        for (int i = 0; i < n; i++) {
+            if (Double.doubleToRawLongBits(fresh[i]) != Double.doubleToRawLongBits(previousFactors[i])) {
+                throw new QfError("E_INPUT", "previous discount factors are not the bootstrap of the previous quotes",
+                        "previous_discount_factors");
+            }
+        }
+        int first = -1;
+        for (int i = 0; i < n && first < 0; i++) {
+            if (!previous.keys().get(i).equals(next.keys().get(i)) || !previous.dates()[i].equals(next.dates()[i])) {
+                first = i;
+            }
+        }
+        Setup s = new Setup(asOf, interp, next.dates(), next.quotes(), next.models(), jumps, Curve.Shape.NONE);
+        double[] x = first < 0 ? logs : sequential(s, Arrays.copyOf(logs, first));
+        double worst = norm(s.residuals(x));
+        if (!(worst < ACCEPT)) {
+            throw new QfError("E_NO_CONVERGENCE", "curve solve stopped at repricing error " + worst);
+        }
+        Solved solved = new Solved(Curve.fromLogs(asOf, interp, next.dates(), x, jumps), worst);
+        return new Incremental(solved, first < 0 ? null : first, first < 0 ? 0 : n - first);
     }
 
     private static double secant(DoubleUnaryOperator g, double a, double b) {

@@ -8,6 +8,12 @@
 //! HDR-style histogram (3 significant digits, 1 ns to 10 s), per op kind and pooled; queries timed every 1,000th
 //! measured message; clock cost on 1,000,000 empty pairs, not subtracted; batch timing (1,000 per sample).
 //! Allocation (H-9(b)): a counting `#[global_allocator]`.
+//!
+//! Workload R2 and row L7 (2026-11-19, `low-latency-book.md` items 2a and 2b; targets (g) and (h)): `QF_H9_CHECKPOINTS`
+//! names the checkpoint file of `benchmarks/h9/build_r2.py` and adds the form A pass (venue checksum after every book
+//! message, every per-second row over its millisecond range), outside the timed region; `QF_H9_PER_LEVEL=1` adds the
+//! L7 sample (apply time / levels, rounded up) through a separate instantiation of the timed loop, so the R and S
+//! loops are unchanged. Every run records the 1-minute load average (`/proc/loadavg`) at its start and end.
 use quantforge_core::fast_book::{Book, Level, Msg, MsgType};
 use quantforge_core::rng::Xoshiro;
 use std::alloc::{GlobalAlloc, Layout, System};
@@ -254,12 +260,201 @@ fn verify(msgs: &[Msg], levels: &[Level]) -> u64 {
     bad
 }
 
+/// Venue checksum carried on a book message, checked outside the timed `apply` (not `FLAG_CHECKSUM`).
+const FLAG_VENUE_CHECKSUM: u8 = 4;
+
+/// One form A checkpoint row: compared after each message index in `lo..=hi` (the row's millisecond range); it passes
+/// if it equals the book after one of them (ruling HR-132).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct Checkpoint {
+    lo: u32,
+    n_bids: u16,
+    n_asks: u16,
+    first: u32,
+    hi: u32,
+}
+
+/// The checkpoint file: "QFH9C001", u64 rows, u64 levels; 16-byte rows (lo, `n_bids`, `n_asks`, first, hi); levels.
+fn read_checkpoints(path: &str) -> (Vec<Checkpoint>, Vec<Level>) {
+    let b = std::fs::read(path).expect("read checkpoints");
+    assert_eq!(&b[..8], b"QFH9C001", "not a checkpoint file");
+    let u64at = |o: usize| u64::from_le_bytes(b[o..o + 8].try_into().expect("8 bytes"));
+    let u32at = |o: usize| u32::from_le_bytes(b[o..o + 4].try_into().expect("4 bytes"));
+    let u16at = |o: usize| u16::from_le_bytes(b[o..o + 2].try_into().expect("2 bytes"));
+    let (nr, nl) = (u64at(8) as usize, u64at(16) as usize);
+    let rows: Vec<Checkpoint> = (0..nr)
+        .map(|k| {
+            let o = 24 + 16 * k;
+            Checkpoint {
+                lo: u32at(o),
+                n_bids: u16at(o + 4),
+                n_asks: u16at(o + 6),
+                first: u32at(o + 8),
+                hi: u32at(o + 12),
+            }
+        })
+        .collect();
+    let base = 24 + 16 * nr;
+    let levels: Vec<Level> = (0..nl)
+        .map(|k| Level {
+            px: u64at(base + 16 * k) as i64,
+            qty: u64at(base + 16 * k + 8) as i64,
+        })
+        .collect();
+    for r in &rows {
+        assert!(
+            r.lo <= r.hi && r.first as usize + usize::from(r.n_bids) + usize::from(r.n_asks) <= nl,
+            "bad checkpoint row"
+        );
+    }
+    (rows, levels)
+}
+
+/// L7 sample: apply time over levels, rounded up to a whole nanosecond (item 2b). `n >= 1`.
+fn per_level_ns(dt: u64, n: u32) -> u64 {
+    dt.div_ceil(u64::from(n))
+}
+
+/// 0: equal on all the row's levels; 1: the first 10 a side equal, a deeper one differs; 2: the first 10 differ.
+/// Each side compares our best n levels with the row's n (`micro.book.rebuild`'s checkpoint rule).
+fn compare(b: &Book, bids: &[Level], asks: &[Level], scratch: &mut [Level]) -> u8 {
+    let mut worst = 0;
+    for (bid, want) in [(true, bids), (false, asks)] {
+        let got = b.top(bid, &mut scratch[..want.len()]);
+        let k10 = want.len().min(10);
+        if got < k10 || scratch[..k10] != want[..k10] {
+            return 2;
+        }
+        if got != want.len() || scratch[k10..got] != want[k10..] {
+            worst = 1;
+        }
+    }
+    worst
+}
+
+/// Form A counts of low-latency-targets.md (g).
+#[derive(Debug, Default, PartialEq, Eq)]
+struct FormA {
+    checksum_checked: u64,
+    checksum_failed: u64,
+    checkpoint_checked: u64,
+    failed_top10: u64,
+    failed_below10: u64,
+    matched_at_lo: u64,
+    matched_at_hi: u64,
+    matched_only_inside_tie: u64,
+    rows_with_tie: u64,
+}
+
+impl FormA {
+    fn json(&self) -> String {
+        format!(
+            "{{\"checksum_checked\":{},\"checksum_failed\":{},\"checkpoint_checked\":{},\"checkpoint_failed_top10\":{},\
+             \"checkpoint_failed_below10\":{},\"checkpoint_matched_at_lo\":{},\"checkpoint_matched_at_hi\":{},\
+             \"checkpoint_matched_only_inside_tie\":{},\"checkpoint_rows_with_tie\":{},\
+             \"checkpoint_failed_strict_reading\":{}}}",
+            self.checksum_checked,
+            self.checksum_failed,
+            self.checkpoint_checked,
+            self.failed_top10,
+            self.failed_below10,
+            self.matched_at_lo,
+            self.matched_at_hi,
+            self.matched_only_inside_tie,
+            self.rows_with_tie,
+            self.checkpoint_checked - self.matched_at_lo
+        )
+    }
+}
+
+/// One replay on a fresh book, outside any timing: venue checksums and every checkpoint row over its range.
+fn verify_form_a(msgs: &[Msg], levels: &[Level], rows: &[Checkpoint], cl: &[Level]) -> FormA {
+    let mut b = Book::new(DEPTH);
+    let mut c = FormA::default();
+    let mut scratch = vec![Level::default(); 1024];
+    let mut best = vec![3u8; rows.len()];
+    let mut at_lo = vec![false; rows.len()];
+    let mut at_hi = vec![false; rows.len()];
+    let mut next = 0usize;
+    let mut live: Vec<usize> = Vec::new();
+    for (i, m) in msgs.iter().enumerate() {
+        b.apply(m, levels);
+        if m.kind != MsgType::Trade && m.flags & FLAG_VENUE_CHECKSUM != 0 {
+            c.checksum_checked += 1;
+            if b.checksum() != m.checksum {
+                c.checksum_failed += 1;
+            }
+        }
+        while next < rows.len() && rows[next].lo as usize <= i {
+            live.push(next);
+            next += 1;
+        }
+        let mut k = 0;
+        while k < live.len() {
+            let j = live[k];
+            let r = rows[j];
+            let f = r.first as usize;
+            let nb = usize::from(r.n_bids);
+            let na = usize::from(r.n_asks);
+            let res = compare(&b, &cl[f..f + nb], &cl[f + nb..f + nb + na], &mut scratch);
+            best[j] = best[j].min(res);
+            if res == 0 && i == r.lo as usize {
+                at_lo[j] = true;
+            }
+            if res == 0 && i == r.hi as usize {
+                at_hi[j] = true;
+            }
+            if i >= r.hi as usize {
+                live.swap_remove(k);
+            } else {
+                k += 1;
+            }
+        }
+    }
+    for (j, r) in rows.iter().enumerate() {
+        c.checkpoint_checked += 1;
+        c.rows_with_tie += u64::from(r.hi > r.lo);
+        match best[j] {
+            0 => {
+                c.matched_at_lo += u64::from(at_lo[j]);
+                c.matched_at_hi += u64::from(at_hi[j]);
+                c.matched_only_inside_tie += u64::from(!at_lo[j] && !at_hi[j]);
+            }
+            1 => c.failed_below10 += 1,
+            _ => c.failed_top10 += 1,
+        }
+    }
+    c
+}
+
+/// 1-minute load average; -1 where `/proc/loadavg` is absent.
+fn loadavg_1m() -> f64 {
+    std::fs::read_to_string("/proc/loadavg")
+        .ok()
+        .and_then(|s| s.split_whitespace().next().and_then(|v| v.parse().ok()))
+        .unwrap_or(-1.0)
+}
+
 fn ns(t: Instant) -> u64 {
     t.elapsed().as_nanos() as u64
 }
 
 /// One timed run after `warmup` unmeasured messages (the harness uses `WARMUP`; tests a short stream).
+#[cfg(test)]
 fn timed_run_with(msgs: &[Msg], levels: &[Level], qseed: u64, warmup: usize) -> String {
+    timed_run_gen::<false>(msgs, levels, qseed, warmup)
+}
+
+/// The timed run; `PER_LEVEL` adds the L7 sample after the clock read (a separate instantiation).
+#[allow(clippy::too_many_lines)]
+fn timed_run_gen<const PER_LEVEL: bool>(
+    msgs: &[Msg],
+    levels: &[Level],
+    qseed: u64,
+    warmup: usize,
+) -> String {
+    let load_start = loadavg_1m();
+    let mut per_level = Hist::new();
     let mut all = Hist::new();
     let mut kinds: Vec<Hist> = (0..KINDS.len()).map(|_| Hist::new()).collect();
     let mut queries: Vec<Hist> = (0..QUERIES.len()).map(|_| Hist::new()).collect();
@@ -281,6 +476,12 @@ fn timed_run_with(msgs: &[Msg], levels: &[Level], qseed: u64, warmup: usize) -> 
         let dt = ns(t0);
         all.record(dt);
         kinds[usize::from(m.reserved)].record(dt);
+        if PER_LEVEL {
+            let n = u32::from(m.n_bids) + u32::from(m.n_asks);
+            if m.kind == MsgType::Update && n != 0 {
+                per_level.record(per_level_ns(dt, n));
+            }
+        }
         if (i - warmup) % 1000 == 999 {
             let a = Instant::now();
             black_box(b.best_bid());
@@ -374,6 +575,12 @@ fn timed_run_with(msgs: &[Msg], levels: &[Level], qseed: u64, warmup: usize) -> 
         i += 1000;
     }
     let batch_allocs = ALLOCS.load(Ordering::Relaxed);
+    let load_end = loadavg_1m();
+    let pl = if PER_LEVEL {
+        format!(",\"per_level\":{}", per_level.json())
+    } else {
+        String::new()
+    };
     eprintln!(
         "run: p50 {} p99 {} p99.9 {} ns, allocs {allocs}",
         all.pct(50.0),
@@ -400,7 +607,8 @@ fn timed_run_with(msgs: &[Msg], levels: &[Level], qseed: u64, warmup: usize) -> 
         .join(",");
     format!(
         "{{\"all\":{},\"kinds\":{{{kj}}},\"queries\":{{{qj}}},\"queries_batch_per_call\":{{{qbj}}},\"batch_per_message\":{},\"allocations_measured\":{allocs},\
-         \"allocations_batch\":{batch_allocs},\"far_lookups\":{far},\"buffer_grows\":{grows},\"qty_at_index_fallbacks\":{fallbacks}}}",
+         \"allocations_batch\":{batch_allocs},\"far_lookups\":{far},\"buffer_grows\":{grows},\"qty_at_index_fallbacks\":{fallbacks}{pl},\
+         \"loadavg_1m_start\":{load_start:.6},\"loadavg_1m_end\":{load_end:.6}}}",
         all.json(),
         batch.json()
     )
@@ -415,7 +623,18 @@ fn run(args: &[String], warmup: usize, clock_pairs: usize) -> i32 {
     }
     let (msgs, levels) = read_stream(&args[1]);
     let runs: u64 = args.get(2).map_or(5, |s| s.parse().expect("runs"));
-    let bad = verify(&msgs, &levels);
+    let map_bad = verify(&msgs, &levels);
+    let mut bad = map_bad;
+    let mut form_a = String::new();
+    if let Ok(cp) = std::env::var("QF_H9_CHECKPOINTS") {
+        let (rows, cl) = read_checkpoints(&cp);
+        let c = verify_form_a(&msgs, &levels, &rows, &cl);
+        eprintln!("form A: {}", c.json());
+        form_a = format!(",\"form_a\":{}", c.json());
+        // A checksum or top-10 failure fails the run; below-10 failures are published and judged by the runner.
+        bad += c.checksum_failed + c.failed_top10 + u64::from(c.checksum_checked == 0);
+    }
+    let per_level = std::env::var("QF_H9_PER_LEVEL").is_ok_and(|v| v == "1");
     let mut clock = Hist::new();
     for _ in 0..clock_pairs {
         let a = Instant::now();
@@ -423,12 +642,18 @@ fn run(args: &[String], warmup: usize, clock_pairs: usize) -> i32 {
     }
     let workload = std::env::var("QF_H9_WORKLOAD").unwrap_or_else(|_| "S".to_string());
     let runs_json = (0..runs)
-        .map(|k| timed_run_with(&msgs, &levels, SEED + 1 + k, warmup))
+        .map(|k| {
+            if per_level {
+                timed_run_gen::<true>(&msgs, &levels, SEED + 1 + k, warmup)
+            } else {
+                timed_run_gen::<false>(&msgs, &levels, SEED + 1 + k, warmup)
+            }
+        })
         .collect::<Vec<_>>()
         .join(",");
     let out = format!(
         "{{\"workload\":\"{workload}\",\"messages\":{},\"warmup\":{warmup},\"depth\":100,\"alloc_method\":\"counting #[global_allocator]\",\
-         \"correctness_mismatches\":{bad},\"clock_overhead\":{},\"runs\":[{runs_json}]}}\n",
+         \"correctness_mismatches\":{map_bad}{form_a},\"per_level_sampling\":{per_level},\"clock_overhead\":{},\"runs\":[{runs_json}]}}\n",
         msgs.len(),
         clock.json()
     );

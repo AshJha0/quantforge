@@ -10,6 +10,11 @@ F-2's E_DOMAIN. So an E_SCHEMA case also counts as the operation's E1 golden whe
 string in the operation's value goldens (list indices ignored). A token at a Real path, or in an operation whose
 spec does not cite HR-12, still needs E_DOMAIN. Nothing is exempted by this rule.
 
+Ruling KR-112 (owner decision 2026-11-19, option A of program/STAGE_K_E1_ZONE_DECISION.md): an exempt operation may
+carry a Real (JSON float) input ONLY in goldens whose expected result is E_SCHEMA, the golden that checks a
+non-integer is refused. A Real in any other golden (a value case, or an error case expecting anything but E_SCHEMA)
+still makes the exemption a problem. Nothing changes for non-exempt operations.
+
     python tools/check_e1_coverage.py              # exit 1 on a gap
     python tools/check_e1_coverage.py --self-test  # shows the gate red on a planted operation (process rule 1)
 
@@ -95,7 +100,8 @@ def check(name_map, golden, exempt_file, root=ROOT):
             nf = [path for path, v in leaves(c["inputs"]) if isinstance(v, str) and v in NF]
             if nf and all(path in decimal_paths.get(op, set()) for path in nf):
                 covered.add(op)
-        if has_real(c["inputs"]):
+        # KR-112: a Real in a golden expecting E_SCHEMA is the refusal of a non-integer, not a Real the operation uses
+        if has_real(c["inputs"]) and code != "E_SCHEMA":
             real.add(op)
     problems = [f"{op}: no E1 golden" for op in sorted(ops - covered - set(exempt))]
     problems += [f"{op}: exempt but has a Real input in a golden" for op in sorted(set(exempt) & real)]
@@ -137,7 +143,36 @@ def self_test():
         (d / "g2" / "t.json").write_text(json.dumps({"cases": rows}), encoding="utf-8")
         bad, *_ = check(d / "nm2.json", d / "g2", d / "ex2.json", root=d)
         assert "d.dec.op: no E1 golden" in bad, bad
+        # KR-112, planted faults (a) to (d)
+        nm3 = {"operations": {"r.real.op": {}, "i.int.op": {}, "i.int.bad": {}}}
+        (d / "nm3.json").write_text(json.dumps(nm3), encoding="utf-8")
+        (d / "g3").mkdir()
+        nan_real = {"case_id": "c-1", "operation": "r.real.op", "inputs": {"x": "NaN"}, "expected": {"status": "error", "error_code": "E_DOMAIN"}}
+        real_val = {"case_id": "c-2", "operation": "r.real.op", "inputs": {"x": 1.5}, "expected": {"status": "ok", "outputs": {}}}
+        int_val = {"case_id": "c-3", "operation": "i.int.op", "inputs": {"n": 250, "k": 3}, "expected": {"status": "ok", "outputs": {}}}
+        int_schema = {"case_id": "c-4", "operation": "i.int.op", "inputs": {"n": 250, "k": 1.5}, "expected": {"status": "error", "error_code": "E_SCHEMA"}}
+        bad_val = {"case_id": "c-5", "operation": "i.int.bad", "inputs": {"n": 250, "k": 3}, "expected": {"status": "ok", "outputs": {}}}
+
+        def run3(rows, exempt):
+            (d / "g3" / "t.json").write_text(json.dumps({"cases": rows}), encoding="utf-8")
+            (d / "ex3.json").write_text(json.dumps(exempt), encoding="utf-8")
+            return check(d / "nm3.json", d / "g3", d / "ex3.json", root=d)[0]
+        ex_ok = {"i.int.op": "integers only", "i.int.bad": "integers only"}
+        # (d) the shape of btk_k-0029: an exempt integer-only operation with a Real only in an E_SCHEMA golden passes
+        assert run3([nan_real, real_val, int_val, int_schema, bad_val], ex_ok) == [], "KR-112 (d)"
+        # (a) a non-exempt operation without its NaN golden still fails
+        assert run3([real_val, int_val, int_schema, bad_val], ex_ok) == ["r.real.op: no E1 golden"], "KR-112 (a)"
+        # (b) an exempt operation with a Real in a golden expecting anything other than E_SCHEMA fails
+        for exp in ({"status": "error", "error_code": "E_DOMAIN"}, {"status": "error", "error_code": "E_INPUT"},
+                    {"status": "error", "error_code": "E_LIMIT"}, {"status": "ok", "outputs": {}}):
+            got = run3([nan_real, real_val, int_val, dict(int_schema, expected=exp), bad_val], ex_ok)
+            assert got == ["i.int.op: exempt but has a Real input in a golden"], ("KR-112 (b)", exp, got)
+        # (c) an operation with a genuine Real input put on the exemption list fails
+        got = run3([nan_real, real_val, int_val, int_schema, bad_val], dict(ex_ok, **{"r.real.op": "planted"}))
+        assert got == ["r.real.op: exempt but has a Real input in a golden"], ("KR-112 (c)", got)
     print("self-test: a planted operation with no E1 golden turns the gate red")
+    print("self-test KR-112: (a) missing NaN golden fails; (b) exempt Real outside E_SCHEMA fails; "
+          "(c) a Real-input operation on the exemption list fails; (d) a Real only in an E_SCHEMA golden of an exempt operation passes")
     print("self-test F-2a: decimal-string E_SCHEMA passes; Real-input E_SCHEMA and no non-finite case fail")
     return 0
 
@@ -148,7 +183,7 @@ def main():
     bad, n, cov, ex = check(ROOT / "specifications" / "name-map.json", ROOT / "datasets" / "golden", ROOT / "conformance" / "E1_EXEMPT.json")
     for b in bad:
         print(b)
-    print(f"E1 coverage: {cov} of {n} operations have an E1 golden, {ex} exempt (no Real input), {len(bad)} problems")
+    print(f"E1 coverage: {cov} of {n} operations have an E1 golden, {ex} exempt (no Real input outside E_SCHEMA goldens, KR-112), {len(bad)} problems")
     return 1 if bad else 0
 
 

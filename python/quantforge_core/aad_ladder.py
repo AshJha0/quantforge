@@ -372,8 +372,9 @@ def bermudan_ladder(
 ) -> dict[str, object]:
     """`rates.shortrate.bermudan_ladder`: the Bermudan price and its full ladder."""
     model = curve_model(times, dfs, a, sigma, rate_given)
-    grid = make_grid(nx, steps_per_year, width)
+    # Error order HR-66: the schedule (structural E_INPUT) before the grid's E_DOMAIN, as Java, C++, Rust.
     payer = check_bermudan(start, payment_times, swaption_type, exercise_times)
+    grid = make_grid(nx, steps_per_year, width)
     price, d_dfs, d_a, d_sigma = ladder(
         model,
         start,

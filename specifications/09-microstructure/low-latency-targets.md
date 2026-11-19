@@ -84,6 +84,49 @@ The figures are the median of 5 runs, pooled over message kinds, as the headline
 
 Context only, not a reason to pass: a form B update applies about 58 level changes on average (one per changed level in a one-second snapshot difference), at roughly 40 ns per level, so a per-update cost of a few microseconds is what the per-level speed implies. The targets were written for one or a few levels per update (HR-19, "How the numbers were chosen" item 1). Owner decision 2026-11-19: the per-update targets stay the acceptance test and the miss stays recorded. The per-level figure (about 40 ns) is descriptive only and has no target. A per-level target, if one is wanted, is committed before a fresh recorded window is measured (v0.10.1 or later); the window already seen is never judged against it.
 
+## Workload R2 and the per-level rows (added 2026-11-19, before any R2 timing; rulings HR-130, HR-131)
+
+**Fixed on 2026-11-19 while the R2 window was still being recorded.** No raw file of the window had been read and no timing had been run when this section was committed; the commit hash is quoted in the results. Owner decision 2026-11-19 (stage K start file): measure the workload the R targets were written for, against unchanged targets, and set a per-level target for the one-second stream at the same time.
+
+### (g) R2: per-message update latency on raw venue messages
+
+The R figures of table (a) apply to R2 without change, because "How the numbers were chosen" item 1 reasons about a venue update of one or a few levels, which is what R2 replays.
+
+| # | Language | Workload | p50 | p99 | p99.9 |
+|---|---|---|---:|---:|---:|
+| L1-R2 | C++ | R2 (raw venue messages, window of 6 to 8 h, 100 levels) | <= 100 ns | <= 500 ns | <= 2 us |
+| L2-R2 | Rust | R2 | <= 100 ns | <= 500 ns | <= 2 us |
+| L3-R2 | Java | R2 | <= 200 ns | <= 1 us | <= 5 us |
+
+*Amended 2026-11-19 (table kept as first fixed):* the R2 window is exactly 6 hours of the first qualifying session on any day (`stage-h-rulings-audit.md` HR-133, HR-134), not 6 to 8 hours. The figures are unchanged.
+
+Headline as in (a): all message kinds pooled, median of 5 runs, per symbol; a row passes only if both symbols pass all three percentiles. HR-21 decides between per-message and batch timing exactly as for R and S. L4 (allocation) and L5 (queries) are measured on R2 as well and reported against their existing targets.
+
+Correctness on R2 (L6, form A): after every message, the CRC32 of our top 10 equals the venue's `checksum` field; and for every per-second recorder row in the window, the full 100 levels a side equal our book as it stood at the last raw message received before the row's `t`. Zero top-10 checksum mismatches in each language, or the R2 run fails whatever its latency. Mismatches below level 10 (`order-book.md`: a truncated level the venue does not resend) are counted separately and published; they fail the run too, unless `order-book.md` as it stood before this change already classes that case as the venue's, in which case the count is published and the row is marked "passes with N venue-side holes".
+
+*Amended 2026-11-19 (paragraph kept as first fixed):* "at the last raw message received before the row's `t`" is read as HR-132 fixes it: the row must equal our book after at least one of the messages from lo (last with t < row t) to hi (last with t <= row t), the counts at lo, at hi and only inside the tie are published, and the tie guard of HR-135 applies (rows without a tie at least 25 %, rows matched only inside the tie at most 6 %, per symbol; otherwise no timing until reviewed).
+
+### (h) L7: per-level cost on the one-second differenced stream
+
+| # | Language | Sample (`low-latency-book.md` item 2b) | p50 | p99 | p99.9 |
+|---|---|---|---:|---:|---:|
+| L7 | C++, Rust | `apply` time / levels in the message, form B stream of the R2 window | <= 100 ns | <= 500 ns | <= 2 us |
+| L7 | Java | same | <= 200 ns | <= 1 us | <= 5 us |
+
+How the numbers were chosen, and what was already known. The figures are the R per-message targets carried over unchanged per level: item 1 above budgets one level change at tens of nanoseconds warm and a few hundred on a miss to memory, and that budget is per level, not per message. They were not fitted to a measurement. It must be said plainly that this row was written after the 2026-11-19 R run, whose descriptive mean was about 40 ns a level in C++ and Rust: the p50 is therefore expected to pass, and only the tail is an open question. For that reason L7 is a secondary row. It does not replace, soften or re-judge L1 to L3 on R, which stay a recorded MISS for the 2026-11-18/19 window, and the release notes, this file and tutorial 48 keep saying so. The headline H-9 result after this change is R2 (table g).
+
+*Added 2026-11-19, before any L7 timing (HR-135, audit KA-B15):* headline as in (a): median of 5 runs, per symbol; a language passes L7 only if both symbols pass all three percentiles. Every L7 line carries the label "per level, not per message; L1-L3 on R remain a recorded MISS".
+
+### R2 status (2026-11-19)
+
+R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS. Rows L1-R2 to L3-R2 and L7 stay open; no figure for them is stated anywhere until that session is measured (`specifications/stage-h-rulings-audit.md`, HR-132 to HR-134).
+
+### Order of work (owner decision 2026-11-19)
+
+1. Record the window, build and hash the R2 input and the form B input of the same window, run correctness, then timing; publish the first measurement as it is.
+2. Only if an R2 or L7 tail still misses: a single-pass batch apply for a one-second difference may be built, as a later change with its own measurement on the same hashed inputs; the first measurement stays published next to it.
+3. No target in this file changes in a change that measures.
+
 ## Mirror
 
-Rows L1 to L6 are mirrored, with a pointer to this file, in `benchmarks/targets.md` (HR-23).
+Rows L1 to L7 (with L1-R2 to L3-R2) are mirrored, with a pointer to this file, in `benchmarks/targets.md` (HR-23).

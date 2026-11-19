@@ -192,3 +192,202 @@ fn run_writes_the_results_file_and_exit_code() {
         "no file argument is a usage error"
     );
 }
+
+// ---------------------------------------------------------------- R2 / L7 (2026-11-19, items 2a and 2b)
+
+fn m(kind: MsgType, n_bids: u16, n_asks: u16, first: usize) -> Msg {
+    Msg {
+        kind,
+        flags: 0,
+        n_bids,
+        n_asks,
+        reserved: 2,
+        checksum: 0,
+        first: first as u32,
+    }
+}
+
+#[test]
+fn r2_truncation_to_100_levels_is_inside_apply() {
+    // A full 100-level book on a 10-tick grid; a raw update adds a better bid, so 101 bids: the worst falls off.
+    let mut lv: Vec<Level> = (0..100)
+        .map(|k| Level {
+            px: 10_000 - 10 * k,
+            qty: 1 + k,
+        })
+        .chain((0..100).map(|k| Level {
+            px: 10_010 + 10 * k,
+            qty: 1 + k,
+        }))
+        .collect();
+    let mut b = Book::new(100);
+    b.apply(&m(MsgType::Snapshot, 100, 100, 0), &lv);
+    lv.push(Level { px: 10_005, qty: 7 });
+    b.apply(&m(MsgType::Update, 1, 0, 200), &lv);
+    assert_eq!(b.stats().truncated_levels, 1);
+    let mut top = vec![Level::default(); 100];
+    assert_eq!(b.top(true, &mut top), 100);
+    assert_eq!(top[0].px, 10_005);
+    assert_eq!(top[99].px, 10_000 - 10 * 98);
+    assert_eq!(b.qty_at(true, 9_010), 0);
+    // Beyond depth on the far side: inserted and truncated in the same apply; the book is unchanged.
+    let before = b.checksum();
+    lv.push(Level { px: 5_000, qty: 3 });
+    b.apply(&m(MsgType::Update, 1, 0, 201), &lv);
+    assert_eq!(b.stats().truncated_levels, 2);
+    assert_eq!(b.checksum(), before);
+    assert_eq!(b.grows(), 0);
+}
+
+#[test]
+fn l7_per_level_sample_rounds_up() {
+    assert_eq!(per_level_ns(100, 1), 100);
+    assert_eq!(per_level_ns(101, 2), 51);
+    assert_eq!(per_level_ns(100, 3), 34);
+    assert_eq!(per_level_ns(99, 3), 33);
+    assert_eq!(per_level_ns(0, 5), 0);
+    assert_eq!(per_level_ns(1, 200), 1);
+}
+
+#[test]
+fn r2_form_a_counts_checksums_and_checkpoint_classes() {
+    // 0 snapshot (bids 100..89, asks 101..112, qty 5), 1 bid 100 -> 6, 2 trade, 3 bid 89 -> 9 (level 12), 4 bid 100 -> 7
+    let mut lv: Vec<Level> = (0..12)
+        .map(|k| Level {
+            px: 100 - k,
+            qty: 5,
+        })
+        .chain((0..12).map(|k| Level {
+            px: 101 + k,
+            qty: 5,
+        }))
+        .collect();
+    lv.extend([
+        Level { px: 100, qty: 6 },
+        Level { px: 101, qty: 1 },
+        Level { px: 89, qty: 9 },
+        Level { px: 100, qty: 7 },
+    ]);
+    let mut msgs = vec![
+        m(MsgType::Snapshot, 12, 12, 0),
+        m(MsgType::Update, 1, 0, 24),
+        m(MsgType::Trade, 1, 0, 25),
+        m(MsgType::Update, 1, 0, 26),
+        m(MsgType::Update, 1, 0, 27),
+    ];
+    msgs[2].reserved = 4;
+    let mut r = Book::new(100);
+    for (i, x) in msgs.iter_mut().enumerate() {
+        r.apply(x, &lv);
+        if x.kind != MsgType::Trade {
+            x.flags = FLAG_VENUE_CHECKSUM;
+            x.checksum = if i == 3 {
+                r.checksum() ^ 1
+            } else {
+                r.checksum()
+            };
+        }
+    }
+    let mut rows = Vec::new();
+    let mut cl = Vec::new();
+    let mut row = |after: usize, lo: u32, hi: u32, tweak: u8| {
+        let mut b = Book::new(100);
+        for x in &msgs[..=after] {
+            b.apply(x, &lv);
+        }
+        let (mut bids, mut asks) = (vec![Level::default(); 100], vec![Level::default(); 100]);
+        let nb = b.top(true, &mut bids);
+        let na = b.top(false, &mut asks);
+        if tweak == 1 {
+            bids[11].qty += 1;
+        }
+        if tweak == 2 {
+            asks[0].qty += 1;
+        }
+        rows.push(Checkpoint {
+            lo,
+            n_bids: nb as u16,
+            n_asks: na as u16,
+            first: cl.len() as u32,
+            hi,
+        });
+        cl.extend_from_slice(&bids[..nb]);
+        cl.extend_from_slice(&asks[..na]);
+    };
+    row(0, 0, 0, 0);
+    row(1, 0, 2, 0);
+    row(4, 3, 4, 0);
+    row(3, 3, 3, 1);
+    row(4, 4, 4, 2);
+    let c = verify_form_a(&msgs, &lv, &rows, &cl);
+    assert_eq!(
+        c,
+        FormA {
+            checksum_checked: 4,
+            checksum_failed: 1,
+            checkpoint_checked: 5,
+            failed_top10: 1,
+            failed_below10: 1,
+            matched_at_lo: 1,
+            matched_at_hi: 3,
+            matched_only_inside_tie: 0,
+            rows_with_tie: 2,
+        }
+    );
+    assert!(
+        c.json()
+            .starts_with("{\"checksum_checked\":4,\"checksum_failed\":1,")
+    );
+    // compare(): fewer row levels than the book compares only the row's levels.
+    let mut b = Book::new(100);
+    b.apply(&msgs[0], &lv);
+    let mut scratch = vec![Level::default(); 100];
+    assert_eq!(compare(&b, &lv[..5], &lv[12..14], &mut scratch), 0);
+    let mut wrong = lv[..12].to_vec();
+    wrong[11].px -= 1;
+    assert_eq!(compare(&b, &wrong, &lv[12..24], &mut scratch), 1);
+    wrong[0].qty = 99;
+    assert_eq!(compare(&b, &wrong, &lv[12..24], &mut scratch), 2);
+}
+
+#[test]
+fn r2_checkpoint_file_round_trips() {
+    let p = temp("cps.bin");
+    let mut b = b"QFH9C001".to_vec();
+    b.extend(1u64.to_le_bytes());
+    b.extend(3u64.to_le_bytes());
+    b.extend(4u32.to_le_bytes());
+    b.extend(2u16.to_le_bytes());
+    b.extend(1u16.to_le_bytes());
+    b.extend(0u32.to_le_bytes());
+    b.extend(7u32.to_le_bytes());
+    for (px, q) in [(100i64, 1i64), (99, 2), (101, 3)] {
+        b.extend(px.to_le_bytes());
+        b.extend(q.to_le_bytes());
+    }
+    std::fs::write(&p, b).unwrap();
+    let (rows, cl) = read_checkpoints(p.to_str().unwrap());
+    std::fs::remove_file(&p).unwrap();
+    assert_eq!(
+        rows,
+        vec![Checkpoint {
+            lo: 4,
+            n_bids: 2,
+            n_asks: 1,
+            first: 0,
+            hi: 7
+        }]
+    );
+    assert_eq!(cl[2], Level { px: 101, qty: 3 });
+}
+
+#[test]
+fn l7_timed_run_adds_the_per_level_histogram_and_load_average() {
+    let (msgs, levels) = stream(4_000);
+    let j = timed_run_gen::<true>(&msgs, &levels, SEED, 1_000);
+    assert!(j.contains("\"per_level\":{\"count\":"), "{j}");
+    assert!(j.contains("\"loadavg_1m_start\":"));
+    let plain = timed_run_with(&msgs, &levels, SEED, 1_000);
+    assert!(!plain.contains("\"per_level\""));
+    assert!(plain.contains("\"loadavg_1m_end\":"));
+}

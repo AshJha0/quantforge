@@ -19,7 +19,7 @@ from pathlib import Path, PurePosixPath
 import markdown
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from site_figures import check_status, home_figures, render_home, roadmap_stages  # noqa: E402
+from site_figures import check_status, home_figures, readme_glance_problem, render_home, roadmap_stages  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 LEFT_OUT = (".github/",)
@@ -41,6 +41,7 @@ h1,h2,h3{line-height:1.25}h2{color:var(--link);border-bottom:2px solid var(--lin
 .card{background:var(--panel);border-radius:6px;padding:1rem 1.2rem;box-shadow:0 1px 3px rgba(0,0,0,.12)}.card b{display:block}.card span{display:block;font-size:.92rem;color:var(--ink);background:var(--panel)}
 pre{background:var(--code);padding:.8rem;overflow-x:auto;border-radius:4px}code{font-size:.92em;overflow-wrap:anywhere}pre code{overflow-wrap:normal}
 table{border-collapse:collapse;width:100%;font-size:.9rem;margin:1rem 0}th,td{border:1px solid var(--line);padding:.45rem .7rem;text-align:left}th{background:var(--code)}
+.glance th{width:9rem;vertical-align:top}.glance td{background:var(--panel)}
 .chart{max-width:42rem;margin:1.2rem 0}.chart svg{display:block;width:100%;height:auto}.chart p{font-size:.85rem;margin:.3rem 0 0}
 .mermaid{background:var(--panel);border-radius:4px;padding:.5rem;overflow-x:auto;text-align:center}
 .skip{position:absolute;left:-999px;top:.5rem;background:var(--panel);color:var(--link);padding:.5rem 1rem;z-index:10}.skip:focus{left:.5rem}
@@ -207,6 +208,8 @@ def main():
         index.append(search_entry(here, title, text))
     figures = home_figures()
     stale = check_status(figures, roadmap_stages())  # plan 13.2 E7: home status must match ROADMAP
+    glance = readme_glance_problem()  # README Status at a glance must match tools/site_facts.json
+    stale += [glance] if glance else []
     home = render_home((ROOT / "tools" / "site_home.html").read_text(encoding="utf-8"), {**figures, "nav": nav("index.html", "")})
     (out / "index.html").write_text(home, encoding="utf-8")
     rows = "\n".join(f'<li><a href="{p[:-3]}.html">{html.escape(p)}</a>: {html.escape(t)}</li>' for p, t in listing)

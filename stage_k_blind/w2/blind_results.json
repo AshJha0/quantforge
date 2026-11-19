@@ -1,0 +1,895 @@
+{
+ "cases": {
+  "drc_k-0001": {
+   "positions": {
+    "p1": {
+     "gross_jtd": 75.0,
+     "weight": 1.0,
+     "scaled_jtd": 75.0
+    }
+   },
+   "obligors": {
+    "X": {
+     "net_long": 75.0,
+     "net_short": 0,
+     "rw": 0.06
+    }
+   },
+   "buckets": {
+    "CORPORATE": {
+     "hbr": 1.0,
+     "wtd_long": 4.5,
+     "wtd_short": 0.0,
+     "drc": 4.5
+    }
+   },
+   "drc": 4.5
+  },
+  "drc_k-0002": {
+   "positions": {
+    "p1": {
+     "gross_jtd": 75.0,
+     "weight": 0.5,
+     "scaled_jtd": 37.5
+    }
+   },
+   "obligors": {
+    "X": {
+     "net_long": 37.5,
+     "net_short": 0,
+     "rw": 0.06
+    }
+   },
+   "buckets": {
+    "CORPORATE": {
+     "hbr": 1.0,
+     "wtd_long": 2.25,
+     "wtd_short": 0.0,
+     "drc": 2.25
+    }
+   },
+   "drc": 2.25
+  },
+  "drc_k-0004": {
+   "positions": {
+    "p1": {
+     "gross_jtd": 75.0,
+     "weight": 1.0,
+     "scaled_jtd": 75.0
+    },
+    "p2": {
+     "gross_jtd": -75.0,
+     "weight": 0.25,
+     "scaled_jtd": -18.75
+    }
+   },
+   "obligors": {
+    "X": {
+     "net_long": 56.25,
+     "net_short": 0.0,
+     "rw": 0.06
+    }
+   },
+   "buckets": {
+    "CORPORATE": {
+     "hbr": 1.0,
+     "wtd_long": 3.375,
+     "wtd_short": 0.0,
+     "drc": 3.375
+    }
+   },
+   "drc": 3.375
+  },
+  "drc_k-0005": {
+   "positions": {
+    "p1": {
+     "gross_jtd": 55.0,
+     "weight": 1.0,
+     "scaled_jtd": 55.0
+    },
+    "p2": {
+     "gross_jtd": -55.0,
+     "weight": 1.0,
+     "scaled_jtd": -55.0
+    }
+   },
+   "obligors": {
+    "X": {
+     "net_long": 55.0,
+     "net_short": 0,
+     "rw": 0.03
+    },
+    "Y": {
+     "net_long": 0,
+     "net_short": -55.0,
+     "rw": 0.15
+    }
+   },
+   "buckets": {
+    "CORPORATE": {
+     "hbr": 0.5,
+     "wtd_long": 1.65,
+     "wtd_short": 8.25,
+     "drc": 0.0
+    }
+   },
+   "drc": 0.0
+  },
+  "drc_k-0006": {
+   "positions": {
+    "p1": {
+     "gross_jtd": 55.0,
+     "weight": 1.0,
+     "scaled_jtd": 55.0
+    },
+    "p2": {
+     "gross_jtd": -55.0,
+     "weight": 1.0,
+     "scaled_jtd": -55.0
+    }
+   },
+   "obligors": {
+    "X": {
+     "net_long": 55.0,
+     "net_short": 0,
+     "rw": 0.03
+    },
+    "Y": {
+     "net_long": 0,
+     "net_short": -55.0,
+     "rw": 0.005
+    }
+   },
+   "buckets": {
+    "CORPORATE": {
+     "hbr": 0.5,
+     "wtd_long": 1.65,
+     "wtd_short": 0.275,
+     "drc": 1.5125
+    }
+   },
+   "drc": 1.5125
+  },
+  "drc_k-0007": {
+   "positions": {
+    "stock": {
+     "gross_jtd": 50.0,
+     "weight": 1.0,
+     "scaled_jtd": 50.0
+    },
+    "bond": {
+     "gross_jtd": -30.0,
+     "weight": 1.0,
+     "scaled_jtd": -30.0
+    }
+   },
+   "obligors": {
+    "Z": {
+     "net_long": 50.0,
+     "net_short": -30.0,
+     "rw": 0.15
+    }
+   },
+   "buckets": {
+    "CORPORATE": {
+     "hbr": 0.625,
+     "wtd_long": 7.5,
+     "wtd_short": 4.5,
+     "drc": 4.6875
+    }
+   },
+   "drc": 4.6875
+  },
+  "drc_k-0008": {
+   "positions": {
+    "bond": {
+     "gross_jtd": 30.0,
+     "weight": 1.0,
+     "scaled_jtd": 30.0
+    },
+    "stock": {
+     "gross_jtd": -50.0,
+     "weight": 1.0,
+     "scaled_jtd": -50.0
+    }
+   },
+   "obligors": {
+    "Z": {
+     "net_long": 0.0,
+     "net_short": -20.0,
+     "rw": 0.15
+    }
+   },
+   "buckets": {
+    "CORPORATE": {
+     "hbr": 0.0,
+     "wtd_long": 0.0,
+     "wtd_short": 3.0,
+     "drc": 0.0
+    }
+   },
+   "drc": 0.0
+  },
+  "drc_k-0009": {
+   "positions": {
+    "p1": {
+     "gross_jtd": 75.0,
+     "weight": 1.0,
+     "scaled_jtd": 75.0
+    },
+    "p2": {
+     "gross_jtd": 150.0,
+     "weight": 1.0,
+     "scaled_jtd": 150.0
+    }
+   },
+   "obligors": {
+    "X": {
+     "net_long": 75.0,
+     "net_short": 0,
+     "rw": 0.03
+    },
+    "S": {
+     "net_long": 150.0,
+     "net_short": 0,
+     "rw": 0.02
+    }
+   },
+   "buckets": {
+    "CORPORATE": {
+     "hbr": 1.0,
+     "wtd_long": 2.25,
+     "wtd_short": 0.0,
+     "drc": 2.25
+    },
+    "SOVEREIGN": {
+     "hbr": 1.0,
+     "wtd_long": 3.0,
+     "wtd_short": 0.0,
+     "drc": 3.0
+    }
+   },
+   "drc": 5.25
+  },
+  "drc_k-0010": {
+   "positions": {
+    "sold_put": {
+     "gross_jtd": 67.0,
+     "weight": 1.0,
+     "scaled_jtd": 67.0
+    }
+   },
+   "obligors": {
+    "X": {
+     "net_long": 67.0,
+     "net_short": 0,
+     "rw": 0.06
+    }
+   },
+   "buckets": {
+    "CORPORATE": {
+     "hbr": 1.0,
+     "wtd_long": 4.02,
+     "wtd_short": 0.0,
+     "drc": 4.02
+    }
+   },
+   "drc": 4.02
+  },
+  "drc_k-0011": {
+   "positions": {
+    "p1": {
+     "gross_jtd": 75.0,
+     "weight": 1.0,
+     "scaled_jtd": 75.0
+    },
+    "p2": {
+     "gross_jtd": 5.0,
+     "weight": 1.0,
+     "scaled_jtd": 5.0
+    }
+   },
+   "obligors": {
+    "U": {
+     "net_long": 75.0,
+     "net_short": 0,
+     "rw": 0.15
+    },
+    "D": {
+     "net_long": 5.0,
+     "net_short": 0,
+     "rw": 1.0
+    }
+   },
+   "buckets": {
+    "CORPORATE": {
+     "hbr": 1.0,
+     "wtd_long": 16.25,
+     "wtd_short": 0.0,
+     "drc": 16.25
+    }
+   },
+   "drc": 16.25
+  },
+  "ctp_k-0002": {
+   "hbr_ctp": 0.5,
+   "buckets": {
+    "A": {
+     "drc": 100.0
+    },
+    "B": {
+     "drc": -50.0
+    }
+   },
+   "drc": 75.0
+  },
+  "ctp_k-0003": {
+   "drc": 0.0
+  },
+  "sec_k-0001": {
+   "buckets": {
+    "RMBS-EU": {
+     "hbr": 0.7142857142857143,
+     "drc": 7.142857142857142
+    }
+   },
+   "drc": 7.142857142857142
+  },
+  "rrao_k-0001": {
+   "rrao": 12000.0
+  },
+  "rrao_k-0002": {
+   "rrao": 10000.0
+  },
+  "rrao_k-0003": {
+   "rrao": 0.0
+  },
+  "es_k-0003": {
+   "es_by_horizon": [
+    10,
+    8,
+    6,
+    4,
+    2
+   ],
+   "es": 17.08800749063506
+  },
+  "es_k-0004": {
+   "es_by_horizon": [
+    10,
+    0,
+    0,
+    0,
+    0
+   ],
+   "es": 10.0
+  },
+  "es_k-0005": {
+   "es_by_horizon": [
+    493.52,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "es": 493.52
+  },
+  "est_k-0001": {
+   "ratio": 1.25,
+   "ratio_floored": false,
+   "es": 15.0
+  },
+  "est_k-0002": {
+   "ratio": 0.875,
+   "ratio_floored": true,
+   "es": 12.0
+  },
+  "imcc_k-0001": {
+   "imcc_c": 15.0,
+   "classes": {
+    "IR": 7.5,
+    "EQ": 5.0
+   },
+   "imcc": 13.75
+  },
+  "ses_k-0001": {
+   "ses": 21.84187454245971
+  },
+  "ses_k-0002": {
+   "ses": 10.0
+  },
+  "cap_k-0001": {
+   "m_c": 1.76,
+   "c_a": 173.4,
+   "ima_ga": 173.4,
+   "sa_ga": 200,
+   "k": 0.0,
+   "surcharge": 0.0,
+   "acr_total": 173.4
+  },
+  "cap_k-0002": {
+   "m_c": 1.76,
+   "c_a": 173.4,
+   "ima_ga": 203.4,
+   "sa_ga": 250,
+   "k": 0.2,
+   "surcharge": 9.319999999999999,
+   "acr_total": 252.72
+  },
+  "cap_k-0003": {
+   "m_c": 1.76,
+   "c_a": 173.4,
+   "ima_ga": 203.4,
+   "sa_ga": 180,
+   "k": 0.0,
+   "surcharge": 0.0,
+   "acr_total": 243.4
+  },
+  "rfet_k-0001": {
+   "distinct_days": 100,
+   "crit1": false,
+   "min_window_count": 0,
+   "first_failing_window_start": "2025-07-01",
+   "first_failing_window_count": 0,
+   "crit2": true,
+   "pass": true
+  },
+  "rfet_k-0002": {
+   "distinct_days": 24,
+   "crit1": true,
+   "min_window_count": 5,
+   "first_failing_window_start": null,
+   "first_failing_window_count": null,
+   "crit2": false,
+   "pass": true
+  },
+  "rfet_k-0003": {
+   "distinct_days": 30,
+   "crit1": false,
+   "min_window_count": 0,
+   "first_failing_window_start": "2025-07-28",
+   "first_failing_window_count": 3,
+   "crit2": false,
+   "pass": false
+  },
+  "rfet_k-0004": {
+   "distinct_days": 23,
+   "crit1": false,
+   "min_window_count": 4,
+   "first_failing_window_start": null,
+   "first_failing_window_count": null,
+   "crit2": false,
+   "pass": false
+  },
+  "cva_k-0001": {
+   "counterparties": {
+    "C1": {
+     "scva": 157999.44066328224
+    }
+   },
+   "k_reduced": 157999.44066328224,
+   "capital": 102699.63643113346,
+   "rwa": 1283745.4553891683
+  },
+  "cva_k-0002": {
+   "counterparties": {
+    "C1": {
+     "scva": 157999.44066328224
+    },
+    "C2": {
+     "scva": 231806.84809267896
+    }
+   },
+   "k_reduced": 311465.7513160207,
+   "capital": 202452.73835541346,
+   "rwa": 2530659.229442668
+  },
+  "cva_k-0003": {
+   "counterparties": {
+    "C1": {
+     "scva": 53571.42857142857
+    }
+   },
+   "k_reduced": 53571.42857142857,
+   "capital": 34821.42857142857,
+   "rwa": 435267.85714285716
+  },
+  "cva_k-0004": {
+   "counterparties": {
+    "C1": {
+     "scva": 157999.44066328224,
+     "snh": 110599.60846429756,
+     "hma": 0.0
+    }
+   },
+   "ih": 0.0,
+   "k_reduced": 157999.44066328224,
+   "k_hedged": 47399.83219898467,
+   "k_full": 75049.73431505906,
+   "capital": 48782.32730478839,
+   "rwa": 609779.0913098549
+  },
+  "cva_k-0005": {
+   "counterparties": {
+    "C1": {
+     "scva": 157999.44066328224,
+     "snh": 0.0,
+     "hma": 0.0
+    },
+    "C2": {
+     "scva": 231806.84809267896,
+     "snh": 0.0,
+     "hma": 0.0
+    }
+   },
+   "ih": 154839.45185001657,
+   "k_reduced": 311465.7513160207,
+   "k_hedged": 246229.1169082254,
+   "k_full": 262538.2755101742,
+   "capital": 170649.87908161324,
+   "rwa": 2133123.4885201654
+  },
+  "cva_k-0006": {
+   "counterparties": {
+    "C1": {
+     "scva": 157999.44066328224,
+     "snh": 55299.80423214878,
+     "hma": 9174205044.341942
+    }
+   },
+   "ih": 0.0,
+   "k_reduced": 157999.44066328224,
+   "k_hedged": 140432.9746442371,
+   "k_full": 144824.5911489984,
+   "capital": 94135.98424684897,
+   "rwa": 1176699.8030856121
+  },
+  "sacva_k-0001": {
+   "classes": {
+    "IR.DELTA": {
+     "buckets": {
+      "USD": {
+       "k_b": 10280.408552192855,
+       "s_b": -3700.0,
+       "sum_ws": -3700.0,
+       "floored": false
+      }
+     },
+     "k": 10280.408552192855
+    }
+   },
+   "total": 10280.408552192855,
+   "rwa": 128505.1069024107
+  },
+  "sacva_k-0002": {
+   "classes": {
+    "IR.DELTA": {
+     "buckets": {
+      "USD": {
+       "k_b": 8887.704990603592,
+       "s_b": 7400.0,
+       "sum_ws": 7400.0,
+       "floored": false
+      }
+     },
+     "k": 8887.704990603592
+    }
+   },
+   "total": 8887.704990603592,
+   "rwa": 111096.3123825449
+  },
+  "sacva_k-0003": {
+   "classes": {
+    "IR.DELTA": {
+     "buckets": {
+      "USD": {
+       "k_b": 10280.408552192855,
+       "s_b": -3700.0,
+       "sum_ws": -3700.0,
+       "floored": false
+      },
+      "EUR": {
+       "k_b": 22200.0,
+       "s_b": 22200.0,
+       "sum_ws": 22200.0,
+       "floored": false
+      }
+     },
+     "k": 22724.14574852045
+    }
+   },
+   "total": 22724.14574852045,
+   "rwa": 284051.8218565056
+  },
+  "sacva_k-0004": {
+   "classes": {
+    "IR.DELTA": {
+     "buckets": {
+      "USD": {
+       "k_b": 15129.335742193045,
+       "s_b": 15129.335742193045,
+       "sum_ws": 18500.0,
+       "floored": false
+      },
+      "EUR": {
+       "k_b": 22200.0,
+       "s_b": 22200.0,
+       "sum_ws": 22200.0,
+       "floored": false
+      }
+     },
+     "k": 32520.8864189875
+    }
+   },
+   "total": 32520.8864189875,
+   "rwa": 406511.08023734373
+  },
+  "sacva_k-0005": {
+   "classes": {
+    "CCS.DELTA": {
+     "buckets": {
+      "2": {
+       "k_b": 6539.113089708726,
+       "s_b": 6000.0,
+       "sum_ws": 6000.0,
+       "floored": false
+      }
+     },
+     "k": 6539.113089708726
+    }
+   },
+   "total": 6539.113089708726,
+   "rwa": 81738.91362135907
+  },
+  "sacva_k-0006": {
+   "classes": {
+    "IR.DELTA": {
+     "buckets": {
+      "USD": {
+       "k_b": 10280.408552192855,
+       "s_b": -3700.0,
+       "sum_ws": -3700.0,
+       "floored": false
+      }
+     },
+     "k": 12850.51069024107
+    }
+   },
+   "total": 12850.51069024107,
+   "rwa": 160631.38362801337
+  },
+  "sacva_k-0007": {
+   "classes": {
+    "FX.DELTA": {
+     "buckets": {
+      "EUR": {
+       "k_b": 22000.0,
+       "s_b": 22000.0,
+       "sum_ws": 22000.0,
+       "floored": false
+      },
+      "JPY": {
+       "k_b": 11000.0,
+       "s_b": -11000.0,
+       "sum_ws": -11000.0,
+       "floored": false
+      }
+     },
+     "k": 17736.96704625681
+    }
+   },
+   "total": 17736.96704625681,
+   "rwa": 221712.08807821013
+  },
+  "sacva_k-0008": {
+   "classes": {
+    "IR.DELTA": {
+     "buckets": {
+      "USD": {
+       "k_b": 10280.408552192855,
+       "s_b": -3700.0,
+       "sum_ws": -3700.0,
+       "floored": false
+      }
+     },
+     "k": 10280.408552192855
+    },
+    "FX.DELTA": {
+     "buckets": {
+      "EUR": {
+       "k_b": 22000.0,
+       "s_b": 22000.0,
+       "sum_ws": 22000.0,
+       "floored": false
+      },
+      "JPY": {
+       "k_b": 11000.0,
+       "s_b": -11000.0,
+       "sum_ws": -11000.0,
+       "floored": false
+      }
+     },
+     "k": 17736.96704625681
+    },
+    "IR.VEGA": {
+     "buckets": {
+      "USD": {
+       "k_b": 1000.0,
+       "s_b": 1000.0,
+       "sum_ws": 1000.0,
+       "floored": false
+      }
+     },
+     "k": 1000.0
+    }
+   },
+   "total": 29017.375598449667,
+   "rwa": 362717.1949806209
+  },
+  "lev_k-0006": {
+   "on_balance": 0,
+   "derivatives": 0,
+   "written_credit_derivatives": 0,
+   "sfts": 0.0,
+   "off_balance": 550.0,
+   "exposure": 550.0,
+   "ratio": 0.18181818181818182,
+   "meets_minimum": true
+  },
+  "lev_k-0007": {
+   "on_balance": 0,
+   "derivatives": 0,
+   "written_credit_derivatives": 0,
+   "sfts": 150.0,
+   "off_balance": 0,
+   "exposure": 150.0,
+   "ratio": 0.6666666666666666,
+   "meets_minimum": true
+  },
+  "lev_k-0008": {
+   "on_balance": 0,
+   "derivatives": 0,
+   "written_credit_derivatives": 0,
+   "sfts": 170.0,
+   "off_balance": 0,
+   "exposure": 170.0,
+   "ratio": 0.5882352941176471,
+   "meets_minimum": true
+  },
+  "lev_k-0009": {
+   "on_balance": 0,
+   "derivatives": 168.0,
+   "written_credit_derivatives": 0,
+   "sfts": 0.0,
+   "off_balance": 0,
+   "exposure": 168.0,
+   "ratio": 0.5952380952380952,
+   "meets_minimum": true
+  },
+  "lev_k-0010": {
+   "on_balance": 500,
+   "derivatives": 569.8,
+   "written_credit_derivatives": 0,
+   "sfts": 150.0,
+   "off_balance": 550.0,
+   "exposure": 1769.8,
+   "ratio": 0.033902135834557576,
+   "meets_minimum": true
+  },
+  "lev_k-0011": {
+   "on_balance": 500,
+   "derivatives": 569.8,
+   "written_credit_derivatives": 0,
+   "sfts": 150.0,
+   "off_balance": 550.0,
+   "exposure": 1769.8,
+   "ratio": 0.016951067917278788,
+   "meets_minimum": false
+  },
+  "lex_k-0001": {
+   "groups": {
+    "A": {
+     "exposure": 260.0,
+     "share": 0.26,
+     "large": true,
+     "limit": 250.0,
+     "breach": true
+    },
+    "B": {
+     "exposure": 100.0,
+     "share": 0.1,
+     "large": true,
+     "limit": 250.0,
+     "breach": false
+    },
+    "C": {
+     "exposure": 250.0,
+     "share": 0.25,
+     "large": true,
+     "limit": 250.0,
+     "breach": false
+    },
+    "D": {
+     "exposure": 99.99,
+     "share": 0.09999,
+     "large": false,
+     "limit": 250.0,
+     "breach": false
+    }
+   }
+  },
+  "lex_k-0002": {
+   "groups": {
+    "G": {
+     "exposure": 270.0,
+     "share": 0.27,
+     "large": true,
+     "limit": 250.0,
+     "breach": true
+    }
+   }
+  },
+  "lex_k-0003": {
+   "groups": {
+    "E": {
+     "exposure": 200.0,
+     "share": 0.2,
+     "large": true,
+     "limit": 250.0,
+     "breach": false
+    },
+    "F": {
+     "exposure": 300.0,
+     "share": 0.3,
+     "large": true,
+     "limit": 250.0,
+     "breach": true
+    }
+   }
+  },
+  "lex_k-0004": {
+   "groups": {
+    "G": {
+     "exposure": 260.0,
+     "share": 0.26,
+     "large": true,
+     "limit": 250.0,
+     "breach": true
+    }
+   }
+  },
+  "lex_k-0005": {
+   "groups": {
+    "H": {
+     "exposure": 0.0,
+     "share": 0.0,
+     "large": false,
+     "limit": 250.0,
+     "breach": false
+    }
+   }
+  },
+  "lex_k-0006": {
+   "groups": {
+    "O": {
+     "exposure": 100.0,
+     "share": 0.1,
+     "large": true,
+     "limit": 250.0,
+     "breach": false
+    }
+   }
+  },
+  "lex_k-0007": {
+   "groups": {
+    "K": {
+     "exposure": 160.0,
+     "share": 0.16,
+     "large": true,
+     "limit": 150.0,
+     "breach": true
+    }
+   }
+  }
+ }
+}

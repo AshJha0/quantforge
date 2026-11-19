@@ -4,6 +4,25 @@ Short recipes. Commands run from the repository root, in Git Bash or a Unix shel
 
 New here? [Tutorial 1](docs/getting-started/tutorial-1-swap.md) builds a curve, prices a swap and takes its DV01 in each language; the [tutorial series](docs/getting-started/README.md) goes on to bonds and repo, options, credit, risk, rates models and counterparty risk. `python tools/check_tutorial.py --lang rust` runs the blocks of every tutorial and checks the output.
 
+## Recipes by domain
+
+The sections below follow the order in which stages were built. To find recipes by subject, use the twelve domains of `specifications/` (01 to 12):
+
+| Domain | Recipes |
+|---|---|
+| 01 Foundation | [Stage A](#stage-a-recipes), [Batch mode](#batch-mode) |
+| 02 Curves | [Stage B](#stage-b-recipes), [Stage D](#stage-d-recipes), [Stage F](#stage-f-recipes), [financing term structure](#stage-j-curves-lane-financing-term-structure-and-liquidity-curve) |
+| 03 Calibration | [Build a curve](#build-a-curve), [Stage F](#stage-f-recipes) (joint solve), [Stage G](#stage-g-recipes) (Hull-White calibration) |
+| 04 Pricing | [Stage B](#stage-b-recipes), [Stage D](#stage-d-recipes), [Stage E](#stage-e-recipes), [Stage G](#stage-g-recipes) |
+| 05 Volatility | [Stage C](#stage-c-recipes), [Stage E](#stage-e-recipes) |
+| 06 Risk and xVA | [stage K](#stage-k-recipes) (intraday bounds, SA-CCR, backtesting zones, K-8 ladder), [R2 risk](#r2-risk-recipes), [Stage F](#stage-f-recipes), [Stage G](#stage-g-recipes), [stress scenarios and drift](#stage-j-wave-3-stress-scenarios-interpolation-backtests-drift-detectors) |
+| 07 Portfolio | [Stage F](#stage-f-recipes) (book), [portfolio construction](#stage-j-wave-2-portfolio-construction-estimation-es-backtest-baum-welch) |
+| 08 Hedging | [Stage I](#stage-i-recipes) |
+| 09 Microstructure | [Stage H](#stage-h-recipes-available-from-v0100) (book rebuild, quotes, estimators), [trading conventions](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues) |
+| 10 Execution | [Stage H](#stage-h-recipes-available-from-v0100) (schedules, TCA, simulated venues, paper trading), [simulated auction, FX and futures venues](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues), [liquidity curve](#read-a-liquidity-cost-curve) |
+| 11 Research | [Stage J](#stage-j-recipes) |
+| 12 Platform | [Stage K](#stage-k-recipes) (bitemporal store, daily paper ledger, not yet running) |
+
 ## Run a tutorial script
 
 Tutorials 2 to 16 each have a script in `examples/tutorials/` that sends its operations to any build: Python in process with no argument, or another build's CLI. Tutorial 1's script, `examples/tutorial_swap.py`, takes a build's CLI command, and so do the hedging tutorials' scripts, `examples/tutorial_hedge_17.py` to `tutorial_hedge_21.py`, which send cases built from the `examples/hedge_*_i.json` inputs.
@@ -930,15 +949,61 @@ For the frontier, send `exec.ac.frontier` with `risk_aversions` as a list; `E` m
 
 ### Rebuild a book from a recorded file and check it
 
-`micro.book.rebuild` takes the recorded messages as decimal strings, the subscribed depth (100 for days from 2026-11-17 20:15 UTC) and the pair's decimals, and returns the final book with counts of checksum failures, crossed and locked books and gaps (`specifications/09-microstructure/order-book.md`). Checksum failures are counted, not errors. Goldens: `ob_h`, 17 cases, starting from the venue's own checksum example (`ob_h-0001`). Results are labelled "crypto venue; not equities or rates".
+`micro.book.rebuild` takes the recorded messages as decimal strings, the subscribed depth (100 for days from 2026-11-17 20:15 UTC) and the pair's decimals, and returns the final book with counts of checksum failures, crossed and locked books and gaps (`specifications/09-microstructure/order-book.md`, HR-11 to HR-17). Checksum failures are counted, not errors. Goldens: `ob_h`, 17 cases, starting from the venue's own checksum example (`ob_h-0001`). Results on recorded days are labelled "crypto venue; not equities or rates". Recorded rows may not be published (HR-41), so the request below is the synthetic golden `ob_h-0002`: a depth-10 snapshot with bids 100.0 (1) and 99.0 (2) and asks 101.0 (1) and 102.0 (2), then an update that sets the 99.0 bid to 0, which removes it. Each message also carries a timestamp `t` and `checksum` null. The command reads the inputs straight from the golden file (the message timestamps are left out of this page because the holdout-date guard, `research/test_preregs.py`, scans it):
+
+```bash
+python -c "import json; c=next(c for c in json.load(open('datasets/golden/stage_h/ob_h.json'))['cases'] if c['case_id']=='ob_h-0002'); print(json.dumps({'schema_version':'1.0','case_id':c['case_id'],'operation':c['operation'],'inputs':c['inputs']}))" | uv run --project python quantforge batch
+```
+
+```json
+{"schema_version":"1.0","case_id":"ob_h-0002","status":"ok","outputs":{"book":{"bids":[["100.0","1.00000000"]],"asks":[["101.0","1.00000000"],["102.0","2.00000000"]]},"stats":{"messages":2,"snapshots":1,"updates":1,"level_changes":1,"deletes_of_absent_level":0,"truncated_levels":0,"checksum_checked":0,"checksum_failed":0,"checkpoint_checked":0,"checkpoint_failed":0,"crossed":0,"locked":0,"gaps":0,"resyncs":0},"events":[],"crc32":3791984124},"diagnostics":{}}
+```
+
+`crc32` is the venue-style checksum of the final top 10, computed whether or not the input carried one; with `checksum` null on every message, `checksum_checked` stays 0. To see a gap counted, send `ob_h-0008` from `datasets/golden/stage_h/ob_h.json`: its output has `gaps` 1 and the events `GAP` and `UPDATE_BEFORE_SNAPSHOT`.
 
 ### Replay an order sequence through the engine
 
-`exec.sim.lit.run` takes `tick_size`, `lot_size`, a list of `NEW`, `CANCEL` and `MODIFY` events and a fee schedule, and returns fills, rejects, the final book and fees (`specifications/10-execution/lit-matching.md`). Output is labelled "simulated venue; not a real exchange". Goldens: `lit_h`, 20 cases (`lit_h-0001` to `0009` cover one order type each). A quantity that is not a positive multiple of `lot_size` is `E_DOMAIN`, and a MODIFY of an id that is not open is the reject `UNKNOWN_ID` (HR-128).
+`exec.sim.lit.run` takes `tick_size`, `lot_size`, a list of `NEW`, `CANCEL` and `MODIFY` events and a fee schedule, and returns fills, rejects, the final book and fees (`specifications/10-execution/lit-matching.md`, HR-25 to HR-31). Output is labelled "simulated venue; not a real exchange". Goldens: `lit_h`, 20 cases (one per order type: LIMIT `lit_h-0002`, FOK `0003`, IOC `0004`, POST_ONLY `0005`, ICEBERG `0006`, PEG_MID `0008`, MARKET `0009`, PEG_PRIMARY `0010`; FIFO `0001` and `0007`). A quantity that is not a positive multiple of `lot_size` is `E_DOMAIN`, and a MODIFY of an id that is not open is the reject `UNKNOWN_ID` (HR-128). Price-time priority, `lit_h-0001`: three bids of 10 at 100, then a sell of 15 at 100.
 
-### Run the router against single-venue routing
+```json
+{"schema_version":"1.0","case_id":"lit_h-0001","operation":"exec.sim.lit.run","inputs":{"events":[{"id":"B1","op":"NEW","price":"100","qty":"10","side":"BUY","trader":"T1","type":"LIMIT"},{"id":"B2","op":"NEW","price":"100","qty":"10","side":"BUY","trader":"T1","type":"LIMIT"},{"id":"B3","op":"NEW","price":"100","qty":"10","side":"BUY","trader":"T1","type":"LIMIT"},{"id":"S1","op":"NEW","price":"100","qty":"15","side":"SELL","trader":"T2","type":"LIMIT"}],"fee_schedule":{"maker_rebate":"0","taker_fee":"0"},"lot_size":"1","tick_size":"1"}}
+```
 
-`exec.sor.allocate` returns the market and limit split per venue (`specifications/10-execution/smart-order-router.md`). The comparison against single-venue routing runs on 10,000 simulated parent orders with seed 20261117 and is a simulated result only (HR-40). See [Simulators](docs/simulators/README.md).
+```json
+{"schema_version":"1.0","case_id":"lit_h-0001","status":"ok","outputs":{"fills":[{"taker_id":"S1","maker_id":"B1","price":"100","qty":"10","seq":1},{"taker_id":"S1","maker_id":"B2","price":"100","qty":"5","seq":2}],"rejects":[],"cancelled":[],"book":{"bids":[{"id":"B2","price":"100","display_qty":"5","hidden_qty":"0","seq":2},{"id":"B3","price":"100","display_qty":"10","hidden_qty":"0","seq":3}],"asks":[]},"mbp":{"bids":[["100","15"]],"asks":[]},"fees":{"T1":"0","T2":"0"},"conservation":{"B1":{"submitted":"10","filled":"10","resting":"0","cancelled":"0","rejected":"0"},"B2":{"submitted":"10","filled":"5","resting":"5","cancelled":"0","rejected":"0"},"B3":{"submitted":"10","filled":"0","resting":"10","cancelled":"0","rejected":"0"},"S1":{"submitted":"15","filled":"15","resting":"0","cancelled":"0","rejected":"0"}},"label":"simulated venue; not a real exchange"},"diagnostics":{}}
+```
+
+B1 arrived first and fills in full, B2 fills 5 and keeps its place, B3 is untouched. Each order's `conservation` row adds up: submitted = filled + resting + cancelled + rejected. Simulated venue; not a real exchange.
+
+### Cross orders in the simulated dark pool
+
+Plain idea: hidden orders meet at the lit midpoint, and a minimum quantity can stop a fill that is too small. Formally (`specifications/10-execution/dark-pool.md`, HR-32 to HR-34): cross at the mid of the last `BOOK` event, on the half tick if needed, when the mid is within both limits and the fill `min(open_a, open_b)` meets each order's `min_qty`. `dark_h-0001` and `dark_h-0002` differ only in the buy's `min_qty` of 80:
+
+```json
+{"schema_version":"1.0","case_id":"dark_h-0001","operation":"exec.sim.dark.run","inputs":{"config":{"firm_delay":0,"lot_size":"1","p_firm":"1","penalty_events":2,"seed":20261118,"tick_size":"0.01"},"events":[{"ask":"100.10","bid":"100.00","op":"BOOK"},{"id":"B1","kind":"FIRM","op":"NEW","qty":"100","side":"BUY"},{"id":"S1","kind":"FIRM","op":"NEW","qty":"60","side":"SELL"}]}}
+{"schema_version":"1.0","case_id":"dark_h-0002","operation":"exec.sim.dark.run","inputs":{"config":{"firm_delay":0,"lot_size":"1","p_firm":"1","penalty_events":2,"seed":20261118,"tick_size":"0.01"},"events":[{"ask":"100.10","bid":"100.00","op":"BOOK"},{"id":"B1","kind":"FIRM","min_qty":"80","op":"NEW","qty":"100","side":"BUY"},{"id":"S1","kind":"FIRM","op":"NEW","qty":"60","side":"SELL"}]}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"dark_h-0001","status":"ok","outputs":{"fills":[{"buy_id":"B1","sell_id":"S1","price":"100.05","qty":"60","seq":1}],"invitations":[],"suspensions":[],"resting":[{"id":"B1","side":"BUY","open_qty":"40","seq":1}],"label":"simulated venue; not a real dark pool"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"dark_h-0002","status":"ok","outputs":{"fills":[],"invitations":[],"suspensions":[],"resting":[{"id":"B1","side":"BUY","open_qty":"100","seq":1},{"id":"S1","side":"SELL","open_qty":"60","seq":2}],"label":"simulated venue; not a real dark pool"},"diagnostics":{}}
+```
+
+The mid of 100.00 and 100.10 is 100.05, so 60 cross there and 40 of the buy rests. With `min_qty` 80 the only possible fill, 60, is too small, and both orders rest. Markouts of dark fills: `exec.sim.dark.markouts` (`dark_h-0007`). Simulated venue; not a real dark pool. No real dark-pool data is used.
+
+### Split an order across venues with the router
+
+`exec.sor.allocate` returns the market order `M` and the limit posts `L` per venue that minimise the sample mean of the Cont-Kukanov cost (`specifications/10-execution/smart-order-router.md`, HR-37 to HR-39). `sor_h-0003`: buy 10 lots on one lit venue with 2 lots queued ahead, half spread 0.5, fee 0.3, rebate 0.2, underfill penalty 4, eight equally likely outflows.
+
+```json
+{"schema_version":"1.0","case_id":"sor_h-0003","operation":"exec.sor.allocate","inputs":{"S":"10","f":"0.3","h":"0.5","lambda_o":"1","lambda_u":"4","lit_samples":[["0"],["2"],["4"],["6"],["8"],["10"],["12"],["14"]],"theta":"0","venues":[{"Q":"2","as":"0","kind":"LIT","r":"0.2"}]}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"sor_h-0003","status":"ok","outputs":{"M":"8","L":["2"],"expected_cost":"7.35","expected_fill":"9.5","p_underfill":"0.25"},"diagnostics":{}}
+```
+
+Send 8 at market and post 2. The post fills unless the outflow is 0 or 2, so the order is short 2 lots a quarter of the time; the worked cost is in [LEARN](LEARN.md#dark-pools-and-the-smart-order-router-simulated). This output has no `label` field; with `"report_se": true` the build adds `expected_cost_se` and the label "simulated venues; router scored in simulation only" (`sorx_h-0002`). The fill distributions are inputs, so the split is only as good as they are. The comparison of the router against single-venue routing on 10,000 simulated parent orders (seed 20261117) is fixed in the spec as a simulated result, not a gate (HR-40); no result file for it is in the repository at v0.10.0. See [Simulators](docs/simulators/README.md).
 
 ### Record and refresh the crypto feed
 
@@ -1215,3 +1280,81 @@ Plain idea: when a request breaks two rules, every build must report the same on
 ```
 
 In the first case `participation` 1.5 is outside its domain and `market_volume` is empty: the structural error wins, step (4) before step (5). In the second the quantity is negative and `n_buckets` is above its limit of 100,000: the limit wins, step (2) before step (4). Limits: one exception is recorded, `paper.pretrade.check`, which reports an unknown `side` or `type` as `E_INPUT` (`rule_h-0040`). Before 2026-11-19 two builds answered `E_DOMAIN` and two `E_INPUT` for an Almgren-Chriss request with two faults; suite `rule_h` (40 cases) now pins the order.
+
+## Stage K recipes
+
+Stage K round 1 is merged on the integration branch `k-r1` and is not released. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
+
+### Query a bitemporal log
+
+Plain idea: ask what was known at `K` about the value valid at `V`. Formally (`specifications/01-core/bitemporal-store.md`, KR-2): among records with `knowledge_time <= K` and `valid_from <= V < valid_to`, the largest `sequence` wins.
+
+```json
+{"schema_version": "1.0", "case_id": "bt", "operation": "core.store.bitemporal_query", "inputs": {"records": [{"sequence": 1, "series_id": "A", "valid_from": "2027-01-01T00:00:00Z", "valid_to": null, "knowledge_time": "2027-01-02T00:00:00Z", "value": 100}, {"sequence": 2, "series_id": "A", "valid_from": "2027-03-01T00:00:00Z", "valid_to": null, "knowledge_time": "2027-03-02T00:00:00Z", "value": 110}, {"sequence": 3, "series_id": "A", "valid_from": "2027-02-01T00:00:00Z", "valid_to": "2027-03-01T00:00:00Z", "knowledge_time": "2027-04-01T00:00:00Z", "value": 105}], "series_id": "A", "knowledge_as_of": "2027-04-01T00:00:00Z", "valid_at": "2027-02-15T00:00:00Z"}}
+```
+
+Expected: `status` `FOUND`, `row.sequence` 3, `row.value` 105. This is the log of golden `bt_k-0002` with every date moved one year later and record 4, learned after this `K`, left out; by KR-4 neither change alters the answer. The dates are moved so that this page carries no date inside a preregistered holdout window (`research/test_preregs.py`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `status` `FOUND`, `row.sequence` 3, `row.value` 105, as expected. Limits: the log travels in the request; there is no persistent store.
+
+### Update a curve for one moved quote
+
+```json
+{"schema_version": "1.0", "case_id": "inc", "operation": "curve.incremental.update", "inputs": {"previous_quotes": [0.02, 0.025, 0.03], "previous_discount_factors": [0.9803921568627451, 0.9516977522716404, 0.9145993230349208], "new_quotes": [0.02, 0.026, 0.03]}}
+```
+
+Expected (golden `inc_k-0002`): `first_changed_index` 1, `recomputed` 2, `discount_factors` `[0.9803921568627451, 0.9498146237052326, 0.9146541714397677]`. `previous_discount_factors` must be the output of `curve.bootstrap.par_annual` on `previous_quotes`, bit for bit, or the answer is `E_INPUT`. Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `first_changed_index` 1, `recomputed` 2, `discount_factors` `[0.9803921568627451, 0.9498146237052325, 0.9146541714397676]`; the last two differ from the golden by one unit in the last place, inside the tolerance.
+
+### Check whether to recalibrate
+
+```json
+{"schema_version": "1.0", "case_id": "trig", "operation": "calib.trigger.check", "inputs": {"changes": [1.0, -1.0, 1.0, -1.0], "x_ref": 100.0, "x_now": 105.0, "days_since": 1.0, "k": 3.0}}
+```
+
+Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `threshold` 3.4641016151377544, `false_alarm_rate` 0.002699796063260189. A move exactly equal to the threshold does not fire (KR-13). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the four values above, bit for bit. `false_alarm_rate` is the stated `2 (1 - Phi(k))`, computed as `2 Phi(-k)` with a tail-accurate normal CDF (far-tail golden `trig_k-0009`). K-4c outside share: 4 of 6 value cases, by blind re-derivation.
+
+### Intraday P&L with an error bound
+
+```json
+{"schema_version": "1.0", "case_id": "idr", "operation": "risk.intraday.delta_gamma_bound", "inputs": {"positions": [{"notional": 1000000.0, "maturity": 5.0, "yield": 0.04}], "shift": 0.01}}
+```
+
+Expected (golden `idr_k-0001`): `estimate_pnl` -39913.124212551615, `bound` 17.05689068912462, `label` "latency-aware analytics on simulated data". Zero-coupon positions only. The item's outside-check share is 5 of 5 value cases, by the K-5a blind packet (`program/STAGE_K_BLIND_K5A.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `estimate_pnl` -39913.124212551615, `bound` 17.056890689124625 (the golden's 17.05689068912462 differs in the last place, inside the tolerance), `label` as expected.
+
+### Guard a Richardson extrapolation
+
+```json
+{"schema_version": "1.0", "case_id": "rich", "operation": "num.richardson.check", "inputs": {"values": [10.5, 10.125, 10.03125], "ratio": 2.0, "assumed_order": 2.0}}
+```
+
+Expected (golden `rich_k-0001`): `status` `OK`, `observed_order` 2.0, `extrapolated` 10.0. Values that do not shrink regularly give `NON_MONOTONE` and no extrapolation (`rich_k-0004`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `status` `OK`, `observed_order` 2.0, `extrapolated` 10.0, as expected.
+
+### Ask for the smoothed Bermudan ladder
+
+Add `"method": "CN_RANNACHER_SMOOTHED"` to the inputs of `rates.shortrate.bermudan_ladder` or `rates.shortrate.bermudan_swaption`; absent or `G18_IMPLICIT` keeps the G-18 scheme bit for bit, and any other value is `E_SCHEMA` (`program/K8_PORT_NOTE.md`). Inputs otherwise as the stage G goldens; `datasets/golden/stage_k/k8_k.json` has seven value cases, run in all four builds. The default stays `G18_IMPLICIT` (KR-8). **The R6 use restriction stays for both methods: not for hedging** (ruling KR-113, 2026-11-19; `docs/model-inventory.md`, MG-6 and MK-5). Acceptance 1 to 3 pass at 201/100 on three in-sample cases; at 101/50 two of them miss 1%. The ladder row of a curve node the price does not depend on (0.4986 years in the judged cases) is exactly zero and is not judged (owner decision 2026-11-19; `program/K8_ROW0_FINDING.md`: no bug). K-8 outside share: 7 of 7 value cases, by blind re-derivation (`program/STAGE_K_BLIND_K8.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the inputs of `k8_k-0001` with `method` `CN_RANNACHER_SMOOTHED` returned the golden's `price` 22737.43110152093 and every ladder entry bit for bit (about 3 s); the same inputs with `method` `CN_RANNACHER` returned `E_SCHEMA` ("method: CN_RANNACHER is not listed").
+
+### SA-CCR EAD for a netting set
+
+```json
+{"schema_version": "1.0", "case_id": "saccr", "operation": "risk.saccr.ead", "inputs": {"trades": [{"id": "1", "asset_class": "IR", "notional": 10000, "market_value": 30, "maturity": 10, "position": "LONG", "start": 0, "end": 10, "hedging_set": "USD"}, {"id": "2", "asset_class": "IR", "notional": 10000, "market_value": -20, "maturity": 4, "position": "SHORT", "start": 0, "end": 4, "hedging_set": "USD"}, {"id": "3", "asset_class": "IR", "notional": 5000, "market_value": 50, "maturity": 11, "position": "BOUGHT", "kind": "OPTION", "option_type": "PUT", "underlying_price": 0.06, "strike": 0.05, "exercise": 1, "start": 1, "end": 11, "hedging_set": "EUR"}]}}
+```
+
+Expected (golden `saccr_k-0001`, Basel CRE99 Example 1): `ead` 569.4701409373457, `rc` 60, `pfe` 346.76438638381836, `multiplier` 1, hedging-set add-ons EUR 50.4145690652664 and USD 296.34981731855197. Worked step by step in [Tutorial 56](docs/getting-started/tutorial-56-sa-ccr-example-1.md). SA-CCR outside share: 12 of 16 value cases (5 published examples, 7 blind re-derivations, `program/STAGE_K_BLIND_W1B.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `ead` 569.4701409373457, `rc` 60.0 and `multiplier` 1.0 as expected; `pfe` 346.7643863838184 and the add-ons EUR 50.414569065266406 and USD 296.349817318552 differ from the golden in the last digit or two, inside the tolerance.
+
+### Backtesting zone and desk eligibility
+
+```json
+{"schema_version": "1.0", "case_id": "zone", "operation": "risk.frtb.backtest.zone", "inputs": {"observations": 250, "exceptions_actual": 3, "exceptions_hypothetical": 5}}
+{"schema_version": "1.0", "case_id": "desk", "operation": "risk.frtb.backtest.desk", "inputs": {"observations": 250, "exceptions_99_actual": 13, "exceptions_99_hypothetical": 0, "exceptions_975_actual": 0, "exceptions_975_hypothetical": 0}}
+```
+
+Expected (spec worked example and golden `btk_k-0020`): the first gives `exceptions` 5, `zone` `AMBER`, `amber_from` 5, `red_from` 10, `multiplier` 1.7; the second `breach_99` true, `eligible` false. To count exceptions from series, send `risk.frtb.backtest.count` with `var`, `actual` and `hypothetical` arrays (a null counts as an exception; a loss equal to VaR does not). K-8e outside share: 23 of 24 value cases (12 against the printed MAR99 Table 2, 11 by blind re-derivation, `program/STAGE_K_BLIND_BTK.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): zone `exceptions` 5, `cumulative_probability` 0.9588168159302313, `zone` `AMBER`, `amber_from` 5, `red_from` 10, `multiplier` 1.7; desk `exceptions_99` 13, `breach_99` true, `breach_975` false, `eligible` false, as expected.
+
+### Verify the daily paper ledger (not yet runnable)
+
+```bash
+git fetch origin paper-ledger paper-ledger-anchors
+git show origin/paper-ledger:ledger/ledger.jsonl > ledger.jsonl
+python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --no-cli         # from the ledger alone
+python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --require-days 20
+```
+
+`--no-cli` checks the chain, the configuration, the dates and holdout windows, and replays every day in exact decimal from the ledger's own numbers; the full run also rebuilds each day through the CLI. The tool is merged (`tools/paper_daily/verify_ledger.py`, spec `specifications/12-platform/paper-ledger-daily.md`). The `paper-ledger` branch does not exist until the workflow first runs on `main`, so the daily ledger is not yet running: **0 of 20 recorded trading days.** Every row is labelled "paper marks on a fitted curve; not tradable"; no performance claim is made. Not run: there is no ledger to fetch (2026-11-19, `k-r1`). Checked only that `verify_ledger.py --help` lists the `verify` command and the `--ledger`, `--no-cli` and `--require-days` options used above.

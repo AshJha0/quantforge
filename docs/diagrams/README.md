@@ -1,6 +1,6 @@
 # Diagrams
 
-Mermaid, which GitHub draws directly and the site draws in its light or dark theme. The stage J diagrams carry a title and a description for screen readers (`accTitle`, `accDescr`), and the paragraph under it says the same in words. Per-domain flows are added with each domain's specs.
+Mermaid, which GitHub draws directly and the site draws in its light or dark theme. The stage G, H and J diagrams and the per-domain flows carry a title and a description for screen readers (`accTitle`, `accDescr`), and the paragraph under each says the same in words. One flow per domain, 01 to 12, is in [Per-domain flows](#per-domain-flows) at the end of this page (added in stage K, plan 14.5); the stage sections show how each stage's operations fit together.
 
 ## System
 
@@ -14,9 +14,11 @@ flowchart LR
   N --> Rep[conformance report]
   B[batch stream fixtures] --> BC[batch_check]
   J & C & P & R -->|quantforge --batch| BC
+  G --> GT[repo gates: case_figures, check_e1_coverage, quality_gate]
+  O --> OF[outside-share floor: outside_shares.py, oracle-coverage.yml]
 ```
 
-From R1 (contract 1.6.0), batch mode is checked on its own: `datasets/batch/streams.json` feeds `conformance/runner/batch_check.py`, apart from the goldens.
+From R1 (contract 1.6.0), batch mode is checked on its own: `datasets/batch/streams.json` feeds `conformance/runner/batch_check.py`, apart from the goldens. The gates on the right are CI checks on the golden set and the oracle, not on any build: `repo-gates.yml` runs `tools/case_figures.py --check` (case totals by class), `tools/check_e1_coverage.py` (every operation with a Real input has a non-finite-input golden) and `tools/quality_gate.py`; `tools/outside_shares.py` and `oracle-coverage.yml` hold the 60% outside-library floor on value-checked cases (`oracle/OUTSIDE_SHARES.md`).
 
 ## Domain dependencies
 
@@ -159,6 +161,30 @@ flowchart LR
 ```
 
 The joint solve feeds both the prices and the Jacobian that AAD carries back to the quotes (ruling F-29). VaR and the backtests work on P&L scenarios; FRTB-SA works on sensitivities. Specs: `02-curves/joint-solve-and-funding.md`, `06-risk/book-sensitivities.md`, `06-risk/var-es-and-backtests.md`, `06-risk/frtb-sa-girr.md`, `07-portfolio/book-lifecycle.md`.
+
+## Stage G: rates models and xVA
+
+```mermaid
+flowchart LR
+  accTitle: Stage G rates models and xVA
+  accDescr: A discount curve feeds the short-rate, G2++ and LMM pricers; Hull-White sigma is calibrated to swaption prices and used by the lattice for Bermudan swaptions and callable bonds, whose AAD ladder is checked against a bump reference. Exposure under Hull-White is computed in closed form and checked against ORE; collateralised exposure takes simulated values as inputs and applies netting, CSA thresholds and the margin period of risk. Exposure profiles feed the CVA, DVA, FVA, MVA and KVA formulas; SIMM-style IR delta margin and wrong-way CVA sit beside them.
+  CRV[discount curve] --> SR[rates.shortrate.zcb, zcb_option, swaption, capfloor]
+  CRV --> G2[rates.g2pp.zcb, zcb_option]
+  CRV --> LMM[rates.lmm.capfloor, swaption_rebonato]
+  SWP[European swaption prices] --> CAL[rates.shortrate.hw_calibrate] -->|sigma| LAT
+  CRV --> LAT[lattice: rates.shortrate.bermudan_swaption, callable_bond]
+  LAT --> AAD[rates.shortrate.bermudan_ladder: AAD against bump]
+  RNG[core.rng draws] --> MCG[risk.mc.greeks]
+  MP[prices from several models] --> RES[risk.model_reserve.dispersion]
+  CRV --> EXP[xva.exposure.swap_ee_hw, portfolio_hw]
+  EXP -.->|outside check| ORE["ORE 1.8.17.0, oracle/ore"]
+  VAL[simulated values, as inputs] --> COL[xva.exposure.collateralised: netting, CSA, MPoR]
+  EXP & COL -->|EE, ENE| ADJ[xva.adjustments.value: CVA, DVA, FVA, MVA, KVA]
+  SEN[IR delta sensitivities] --> SIMM[xva.simm.ir_delta: weights are inputs]
+  VAL --> WWR[xva.wwr.cva_hw]
+```
+
+Plain idea: stage G prices rates options under term-structure models, then turns exposure into valuation adjustments. Exposure is computed first and the adjustments are pure arithmetic on exposure profiles, discount factors and hazard rates, so CVA, DVA and FVA can be checked exactly without a simulation (`xva-framework.md`). Short-rate models and G2++ are in `04-pricing/short-rate-models.md`, the LMM in `04-pricing/lmm.md`; `rates.shortrate.hw_calibrate` fits `sigma` to European swaption prices with `a` fixed (ruling G-17), and the Bermudan swaption and callable bond run on one lattice scheme (G-18). The AAD ladder differentiates the discrete scheme at the case's grid and is checked against a Richardson bump reference (`06-risk/aad-core.md`, G-9); it is not for hedging at the default grid. `risk.mc.greeks` (pathwise, likelihood ratio, smoothed digitals) and the model-reserve dispersion report are in `mc-greeks.md` and `model-reserve.md`. Portfolio exposure is exact one-factor integration, and ORE's Monte Carlo is the outside check, kept under `oracle/ore/` and never read by a build (`xva-exposure-portfolio.md`, G-42). Collateral follows a CSA with thresholds, minimum transfer amount and a lag of `mpor_steps` (G-40). The SIMM-style margin uses risk weights and correlations given as inputs, not an ISDA calibration (G-43); wrong-way CVA uses the Hull-White hazard `exp(a(t) + b V(t))` (G-44). Every input is synthetic.
 
 ## Stage I: hedging around one solver
 
@@ -528,9 +554,9 @@ Every dashed box is simulated; there is no real equity, FX or rates data here. T
 flowchart LR
   accTitle: Implementation shortfall from decision price to end price
   accDescr: The decision price is set when the order is decided. Delay cost is the move from decision to arrival on the filled quantity. Execution cost is the fills against the arrival price. Opportunity cost is the unfilled quantity times the move from decision to end price. Fees are added. The four parts sum to the total.
-  PD["decision price P_d"] -->|delay = s Q (P_0 - P_d)| P0["arrival price P_0"]
-  P0 -->|execution = s sum q_i (p_i - P_0)| F["fills (q_i, p_i)"]
-  PD -->|opportunity = s (X - Q)(P_c - P_d)| PC["end price P_c"]
+  PD["decision price P_d"] -->|"delay = s Q (P_0 - P_d)"| P0["arrival price P_0"]
+  P0 -->|"execution = s sum q_i (p_i - P_0)"| F["fills (q_i, p_i)"]
+  PD -->|"opportunity = s (X - Q)(P_c - P_d)"| PC["end price P_c"]
   F --> TOT["total = delay + execution + opportunity + fees"]
   PC --> TOT
 ```
@@ -627,4 +653,309 @@ flowchart LR
   ST --> AG["aggregates only<br/>crypto venue; not equities or rates"]
 ```
 
-The crypto files carry no hash chain yet; integrity rests on the per-row checksum flag and the gap rows ([Recorded feeds](../data/recorded-feeds.md)). Raw messages exist for one 14-minute sample only (ruling HR-11).
+The crypto files carry no hash chain yet; integrity rests on the per-row checksum flag and the gap rows ([Recorded feeds](../data/recorded-feeds.md)). Raw messages exist for one 14-minute sample (ruling HR-11) and, from 2026-11-19 11:41:24 UTC, for the one R2 timing window, recorded by owner authorisation and switched off after it (`specifications/09-microstructure/low-latency-book.md`, HR-130).
+
+### Low-latency book (H-9): targets before timing
+
+```mermaid
+flowchart LR
+  accTitle: H-9 low-latency order book benchmark
+  accDescr: Targets are committed before any timing run. A pre-decoded message stream, synthetic workload S or the recorded Kraken workload R, is replayed in-process into the low-latency book in C++, Rust and Java on one pinned thread, with a monotonic clock read per message. Every answer is compared with micro.book.rebuild on the same stream. The percentiles are compared with the fixed targets; workload R passed correctness and missed timing at p99 and p99.9 in every language, recorded as a miss.
+  TGT["targets fixed first<br/>low-latency-targets.md"] --> CMP
+  S["workload S: synthetic stress"] & R["workload R: recorded Kraken window<br/>crypto venue; not equities or rates"] --> BK["low-latency book<br/>C++, Rust, Java; no CLI operation"]
+  BK -->|"one pinned thread, clock per message"| H["p50, p99, p99.9"]
+  BK --> EQ{"same answers as micro.book.rebuild?"}
+  H --> CMP{"met?"}
+  CMP --> RES["workload R: MISS at p99 and p99.9, recorded as a miss"]
+```
+
+Plain idea: a latency figure is a claim about one machine, one workload and one method, so the targets are written down and committed before the first timing run, and a miss is reported as a miss. Formally (`specifications/09-microstructure/low-latency-book.md`, `low-latency-targets.md`, rulings HR-18 to HR-24): the book is a second implementation of `micro.book.rebuild` in C++, Rust and Java, held to the same answers on the same replay (L6); messages are pre-decoded and replayed in-process with no I/O, on one pinned thread, with a per-message monotonic clock whose own cost is published and not subtracted; C++ and Rust must make zero heap allocations after warm-up (L4). Result on workload R, the recorded window 2026-11-18 21:49:17 to 2026-11-19 03:49:17 UTC, median of 5 runs: 0 correctness mismatches in all three languages, and timing misses p99 and p99.9 in every language and symbol (for example C++ BTC/USD p99 9,223 ns against 500 ns; `benchmarks/results/h9/README.md`). The targets are unchanged. Every figure is from a local laptop, not the acceptance machine: in-process, simulated feed; no network or venue latency. Workload R2 (raw venue messages) and the per-level row L7 were fixed on 2026-11-19 before any R2 timing (HR-130, HR-131); the fresh R2 measurement is in progress.
+
+## Stage K: risk platform and capital (in progress)
+
+Stage K round 1 is merged on the integration branch `k-r1` (2026-11-19); nothing here is released. Each diagram names the spec it was drawn from (read 2026-11-19). All four rendered in the locally built site of the docs lane with every node drawn and no parse error (checked in the built-in browser, 2026-11-19); the site is rebuilt on `k-r1` (`program/STAGE_K_DOCS_PENDING.md`).
+
+### SA-CCR: from trades to EAD
+
+```mermaid
+flowchart TB
+  accTitle: SA-CCR calculation flow from trades to exposure at default
+  accDescr: Each trade gets an adjusted notional, a maturity factor and a supervisory delta, whose product is its effective notional. Trades are grouped into hedging sets by asset class; inside each set the effective notionals are aggregated by the regulator's formula and multiplied by the supervisory factor to give an add-on. The add-ons are summed into the aggregate add-on. Separately the market value V and collateral C give the replacement cost and the multiplier. PFE is the multiplier times the aggregate add-on, and EAD is 1.4 times the replacement cost plus PFE; a margined EAD is capped at the unmargined one.
+  T["trades: class, notional, market value,<br/>maturity, start and end, position, kind"] --> D1["adjusted notional d<br/>IR and credit: N x SD"]
+  T --> MF["maturity factor MF<br/>unmargined or margined (MPOR)"]
+  T --> DL["supervisory delta<br/>+1 or -1; options Phi(d1); CDO tranches"]
+  D1 & MF & DL --> EN["effective notional D = d x MF x delta"]
+  EN --> HS{"hedging sets"}
+  HS -->|"IR: per currency"| IR["3 maturity buckets<br/>offset formula 1.4, 1.4, 0.6"]
+  HS -->|"FX: per pair"| FX["SF x abs(sum D)"]
+  HS -->|"credit, equity"| CE["single-factor aggregation<br/>rho per entity"]
+  HS -->|commodity| CO["4 hedging sets, rho 0.4"]
+  IR & FX & CE & CO --> AO["AddOn aggregate<br/>sum over the five classes"]
+  VC["V = sum of market values<br/>C = collateral held"] --> RC["RC = max(V - C, 0)<br/>margined: with TH + MTA - NICA"]
+  VC --> M["multiplier m<br/>1 if V - C >= 0, else floored at 0.05"]
+  AO & M --> PFE["PFE = m x AddOn"]
+  RC & PFE --> EAD["EAD = 1.4 x (RC + PFE)<br/>margined: capped at unmargined"]
+```
+
+The order follows `specifications/06-risk/sa-ccr.md` steps 1 to 8 (CRE52 read 2026-11-19 by the SA-CCR lane). Worked through on Basel CRE99 Example 1 in [Tutorial 56](../getting-started/tutorial-56-sa-ccr-example-1.md): the two USD swaps meet in the IR offset formula and give 59,270 from 114,948 gross; EAD 569.47, printed 569. All four builds; scope limits KR-39 (no multiple or shared margin agreements, no haircut computation, no central counterparty floors).
+
+### Bitemporal as-of query
+
+```mermaid
+flowchart LR
+  accTitle: Bitemporal query at knowledge time K for valid instant V
+  accDescr: The log of records is filtered twice, first to the records whose knowledge time is at or before K, then to those whose valid interval contains V. If none is left the answer is NONE. Otherwise the record with the largest sequence number wins; if it is a deletion the answer is WITHDRAWN, else FOUND with that record. Records learned after K never reach the decision, which is why appending them cannot change an answer as of K.
+  LOG[("append-only log<br/>sequence, valid_from, valid_to,<br/>knowledge_time, value, deleted")] --> K1{"knowledge_time <= K?"}
+  K1 -->|"no: learned later"| X["ignored as of K<br/>(KR-4: cannot change the answer)"]
+  K1 -->|yes| V1{"valid_from <= V < valid_to?"}
+  V1 -->|no| X2[not about V]
+  V1 -->|yes| C["candidate set C"]
+  C --> E{"C empty?"}
+  E -->|yes| NONE[NONE]
+  E -->|no| W["winner: largest sequence in C"]
+  W --> DEL{"deleted?"}
+  DEL -->|yes| WD["WITHDRAWN, row null"]
+  DEL -->|no| F["FOUND, the winner's row"]
+```
+
+Rule KR-2 of `specifications/01-core/bitemporal-store.md`. `valid_to` is exclusive and null means open; instants are whole seconds (KR-16). The "ignored as of K" branch is why the acceptance property KR-4 holds: 10,000 generated logs, 500,000 query pairs, zero failures in Python and Java. Worked through in [Tutorial 51](../getting-started/tutorial-51-bitemporal-store.md).
+
+### Daily paper ledger: run, hash chain and anchor
+
+```mermaid
+flowchart TB
+  accTitle: Daily paper ledger run with its hash chain and anchor
+  accDescr: The scheduled job reads the Treasury par yields the recorder already wrote to the forward-log branch. For each due business day it marks four constant-maturity exposures on a linear curve through five par yields, sends the fixed rule's one order through the pre-trade estimate and limit check to the simulated lit venue, computes the post-trade TCA and the P&L explain, and refuses the day unless the unexplained term is exactly zero. The row is hashed with the previous row's hash and appended to the ledger on the paper-ledger branch. The whole ledger is verified, the summary written, and the new head hash with the row count is stamped with OpenTimestamps on the paper-ledger-anchors branch. A day with no recorded curve becomes a GAP row; a day past its cut-off becomes a late row with no order.
+  FL[("forward-log branch<br/>five recorded par yields a day")] -.->|"read only"| RUN["run_day.py<br/>00:40 and 15:10 UTC"]
+  RUN --> DUE{"curve recorded<br/>for the business day?"}
+  DUE -->|"no, cut-off passed"| GAP[GAP row]
+  DUE -->|yes| MK["marks: 4 constant-maturity exposures<br/>paper marks on a fitted curve; not tradable"]
+  MK --> ORD["fixed-rule order<br/>pre-trade estimate: placeholder weights<br/>limit check"]
+  ORD --> SIM["exec.sim.lit.run<br/>simulated fills"]
+  SIM --> EX{"explain: carry + roll + curve + fills<br/>unexplained exactly 0?"}
+  EX -->|no| REF["REFUSED, nothing written"]
+  EX -->|yes| ROW["DAY row<br/>prev = previous hash<br/>hash = SHA-256 of canonical bytes"]
+  GAP --> ROW2["row hashed the same way"]
+  ROW & ROW2 --> L[("paper-ledger branch<br/>ledger/ledger.jsonl")]
+  L --> VER["verify_ledger.py verify<br/>chain, config, dates, holdout,<br/>exact replay, CLI rebuild"]
+  VER --> ANC[("paper-ledger-anchors branch<br/>count, head hash, OpenTimestamps")]
+  classDef sim stroke-dasharray: 5 5
+  class SIM sim
+```
+
+From `specifications/12-platform/paper-ledger-daily.md` and `docs/developer-guides/paper-ledger.md` (rulings KR-70 to KR-89, proposed). The job writes only to its own two branches, never to `main` or `forward-log`. **Not running yet: 0 of 20 recorded trading days**; the workflow has never run on a GitHub runner. No performance claim is made: the order rule ignores the market and fills are simulated. The chain shows rows were not edited after writing; the anchor catches a consistent rewrite of old rows and a truncated tail. Worked through in [Tutorial 58](../getting-started/tutorial-58-daily-paper-ledger.md). The stage H paper book's ledger, a different file, is in the [paper-trading ledger flow](#paper-trading-ledger-flow).
+
+### Blind re-derivation: packet, deriver, compare
+
+```mermaid
+flowchart LR
+  accTitle: Blind re-derivation, the project's main outside-check method
+  accDescr: The spec lane writes the spec and the goldens. A script strips every expected value, derivation and worked example from the spec to make a packet, records the packet's hashes, and lists any leak. A blind lane, a separate session with a different model, sees only the packet, the rulings and the cited sources, works outside the repository with no repository imports, writes its own small reference, and freezes its results with a SHA-256 hash committed before any comparison. A compare script, whose field mapping and tolerances were committed before its first run, compares the frozen results with the goldens. A case counts only if no output fact leaked and every compared output matches at the golden's tolerance. A mismatch is investigated, never fixed by rerunning the blind lane.
+  SPEC["spec lane<br/>spec + goldens"] --> STRIP["strip script<br/>removes expected values,<br/>derivations, worked examples"]
+  STRIP --> PK[("packet<br/>MANIFEST.sha256<br/>leak list")]
+  PK --> BL["blind lane<br/>different model, packet only,<br/>no repo imports"]
+  BL --> FR[("blind_results.json<br/>SHA-256 committed<br/>before any compare")]
+  MAP["compare script<br/>mapping and tolerances<br/>committed before run 1"] --> CMP{"every compared output<br/>matches at the golden's tolerance?"}
+  FR --> CMP
+  SPEC -.->|goldens| CMP
+  CMP -->|"yes, no leak"| CNT["counted toward the 60% rule"]
+  CMP -->|"yes, but a fact leaked"| NC["MATCH, not counted"]
+  CMP -->|no| INV["investigated; the blind lane<br/>is never rerun to agree"]
+```
+
+Process `program/STAGE_H_BLIND_LANE.md` (decision DR-H2), used for stage H and for stage K. Stage K records: wave 1, 38 of 38 matched, 36 fully blind (`program/STAGE_K_BLIND_W1.md`); SA-CCR, 11 of 11 matched, 7 counted and 4 excluded because the lane had read the unstripped spec once before the packet existed (`program/STAGE_K_BLIND_W1B.md`); K-5a, 5 of 5 (`program/STAGE_K_BLIND_K5A.md`); the K-8 method, 7 of 7 (`program/STAGE_K_BLIND_K8.md`); FRTB backtesting, 12 of 12 matched and 11 counted, one case whose answer the rules text states being excluded (`program/STAGE_K_BLIND_BTK.md`). Its limit: the blind lane reads the same rules, so it catches arithmetic and convention slips but not a wrong rule (the stage H SEC date, HR-120). The counts feed the [status ladder page](../validation/status-ladder.md).
+
+## Per-domain flows
+
+One small flow per domain, from the operation names in the generated name map (`specifications/name-map.json`, 358 operations) and the spec folder of each domain (`specifications/01-core/` to `12-platform/`). Boxes name operation families; arrows show which outputs become which inputs. A family is placed in the domain whose folder holds its spec, which is not always its prefix: FX forwards and the equity forward are curve specs (02), FX options and caps are volatility specs (05), Euler contributions are a portfolio spec (07). Plan section 14.5 assigns these diagrams to stage K.
+
+### Domain 01: Foundation
+
+```mermaid
+flowchart LR
+  accTitle: Domain 01 foundation flow
+  accDescr: Dates and conventions feed every schedule; quotes pass data checks into the as-of store and a snapshot hash; numerical kernels for random numbers, roots, integration, interpolation, linear algebra and statistics are called by every later domain.
+  D["core.daycount, core.calendar, core.time, core.conventions"] --> SCH[schedules and accruals in domains 02 and 04]
+  Q[quotes] --> DC[core.data.check_quotes] --> ST["core.store: snapshot, query_as_of, replay, chain"] --> H[core.snapshot.hash]
+  K["core.rng, core.sobol, core.root, core.integrate, core.interp, core.linalg, core.diff"] --> NUM[every later domain]
+  K --> M["core.mc, core.pde, core.cos"]
+  TS["core.stats, core.ts"] --> NUM
+  U["core.units, core.compounding"] --> NUM
+```
+
+Domain 01 owns no market model: it holds the dates, conventions, units and numerical kernels the other domains call, and the as-of store and snapshot hash that tie a result to its inputs (`01-core/asof-store.md`, `snapshot-hash.md`). The random generator is specified bit for bit (`rng.md`), which is what makes Monte Carlo goldens possible in four languages.
+
+### Domain 02: Curves
+
+```mermaid
+flowchart LR
+  accTitle: Domain 02 curves flow
+  accDescr: OIS and projection quotes are bootstrapped or solved jointly into discount and projection curves; those curves, with FX, equity, financing, inflation and commodity inputs, build the derived curves used by pricing.
+  Q[OIS, FRA, swap, futures quotes] --> OIS["rates.ois.bootstrap, rates.projection.bootstrap"]
+  Q --> JS["rates.curve.joint_bootstrap, joint_solve"]
+  OIS & JS --> C["discount and projection curves<br/>rates.curve.discount, forward"]
+  C --> FX["fx.forward, fx.swap, fx.curve.implied, fx.xccy.bootstrap"]
+  C --> EQ["eq.forward, eq.dividend.implied, eq.borrow.implied, repo.term.curve"]
+  C --> OT["infl.curve.cpi, cmdty.curve.forward, rates.csa.discount, rates.funding.curve"]
+  C --> PR[pricing, domain 04]
+```
+
+A curve here is the output of one CLI call on given quotes; nothing is stored between calls, and a solve that fails is an error, never a clamped curve (`02-curves/curve-framework.md`). Joint solves return the IFT Jacobian used by book risk (ruling F-25).
+
+### Domain 03: Calibration
+
+```mermaid
+flowchart LR
+  accTitle: Domain 03 calibration flow
+  accDescr: Quotes with bid and ask are checked, fitted by least squares or by smooth and robust curve fits, and reported with repricing errors; the stability report reruns calibrations on moved data.
+  Q[quotes with bid and ask] --> BA[calib.check_bid_ask]
+  BA --> LS["calib.fit: Gauss-Newton, Levenberg-Marquardt, BFGS"]
+  BA --> CF["calib.curve.smooth, calib.curve.robust"]
+  LS & CF --> REP[calib.curve_report: repricing errors]
+  REP --> STAB[stability report C1 to C7]
+```
+
+Calibration is judged on what it must achieve (repricing inside the spread, the objective), never on an iteration path (`03-calibration/least-squares.md`, `curve-fits.md`, `stability.md`). Model calibrations (SABR, SVI, Hull-White) live with their models in domains 04 and 05.
+
+### Domain 04: Pricing
+
+```mermaid
+flowchart LR
+  accTitle: Domain 04 pricing flow
+  accDescr: Curves from domain 02 and vols from domain 05 feed the bond, credit, equity index, inflation, MBS, exotic and short-rate pricers; use cases compose these pricers.
+  C[curves, domain 02] --> B["bond.*, repo.forward, repo.implied_rate"]
+  C --> CR["credit.cds, credit.index, credit.curve.composite"]
+  C --> EI["eq.index, eq.trs, eq.futures.basis"]
+  C --> IN["infl.linker, infl.zcis, mbs.*"]
+  C --> SR["rates.shortrate.*, rates.g2pp.*, rates.lmm.*"]
+  V[vols, domain 05] --> EX["exotic.*, credit.cdsoption, credit.cdsindex.option_price"]
+  CR --> CO["credit.copula.joint_default, credit.lhp.*"]
+  B & CR & EX & SR --> UC["usecase.*"]
+```
+
+The five parts of the pricing framework (instrument, product model, market data, pricing model, valuation result) are kept apart in each build's API (`04-pricing/pricing-framework.md`); use cases define nothing but their sums (`use-cases.md`).
+
+### Domain 05: Volatility
+
+```mermaid
+flowchart LR
+  accTitle: Domain 05 volatility flow
+  accDescr: Option prices and vol quotes feed Black-type pricers and implied vols, smile fits and surfaces, local and stochastic vol models, rates and FX vol, and the time-series vol tools.
+  OQ[option quotes] --> BL["vol.option.price, implied; vol.equity.price; vol.delta.*"]
+  BL --> SM["vol.svi.*, vol.ssvi.*, vol.sabr.*, vol.smile.*"]
+  SM --> SU["vol.surface.check, query"] --> LV["vol.local.dupire, vol.forward.vol"]
+  SM --> SV["vol.heston, vol.bates, vol.merton, vol.slv.leverage"]
+  FXQ[FX vol quotes] --> FXV["fx.option, fx.delta, fx.atm, fx.smile"]
+  RQ[rates vol quotes] --> RV["rates.swaption.*, rates.cap.*, rates.bondfut.*, infl.cap.*"]
+  RET[returns, strikes] --> TS["vol.garch.*, vol.varswap.*, vol.vix.*"]
+```
+
+Surfaces are SVI slices joined linearly in total variance, so Dupire local vol has closed-form derivatives (ruling E-A4). `E_ARBITRAGE` covers smiles, surfaces, local vol and cap quotes that cannot be stripped.
+
+### Domain 06: Risk and xVA
+
+```mermaid
+flowchart LR
+  accTitle: Domain 06 risk and xVA flow
+  accDescr: Pricers are rerun on bumped inputs for curve and vol sensitivities and P&L explain; scenario P&L feeds VaR, ES and backtests; sensitivities feed FRTB standardised capital; a shock library feeds scenario replay; exposure feeds the xVA adjustments.
+  PR[pricers, domains 02 to 05] --> SEN["risk.ois.dv01, risk.curve.*, risk.vol.*, risk.sens.*, risk.book.ois_sensitivity"]
+  SEN --> PNL[risk.pnl.explain]
+  SEN --> FRTB["risk.frtb.*: delta, vega, curvature, sbm_total"]
+  PR -->|scenario P&L| VAR["risk.var.*"] --> BT["risk.backtest.*"]
+  SH[shock library] --> SC["risk.scenario.historical_shock, replay; risk.stress.reverse"]
+  PR --> XV["xva.exposure.*, then xva.adjustments.value"]
+```
+
+Plain idea: risk is the existing pricers run again on moved inputs, so the risk layer owns the moves and the arithmetic and no pricing rule (ADR-0010). Not drawn, to keep the picture small: `risk.limits.check`, `risk.concentration.measures`, `risk.credit.jtd`, `risk.corr.*`, `risk.mc.greeks` and `risk.model_reserve.dispersion`. FRTB DRC, RRAO and CSR securitisations are not built. The xVA part is drawn under [Stage G](#stage-g-rates-models-and-xva).
+
+### Domain 07: Portfolio
+
+```mermaid
+flowchart LR
+  accTitle: Domain 07 portfolio flow
+  accDescr: Trades and lifecycle events build the book and quote sources resolve marks; separately, a covariance is shrunk and combined with views, then optimised by mean-variance or risk parity, and risk is split by Euler contributions.
+  EV[trades and lifecycle events] --> BK[book.lifecycle.apply]
+  MK[quote sources and IPV prices] --> MR[book.marks.resolve]
+  BK & MR --> VAL[book valuation by the pricers]
+  RET[returns] --> LW[research.estimate.ledoit_wolf] --> BLP[research.estimate.black_litterman]
+  BLP --> OPT["research.portfolio.mean_variance, risk_parity"]
+  OPT -->|weights| EU[risk.contrib.euler]
+```
+
+The book needs pricers; the optimisation and estimation operations take returns, a covariance and weights as numbers and depend on nothing above domain 01 (`07-portfolio/book-lifecycle.md`, `optimisation.md`, `estimation.md`). The full chain is under [Portfolio pipeline](#portfolio-pipeline).
+
+### Domain 08: Hedging
+
+```mermaid
+flowchart LR
+  accTitle: Domain 08 hedging flow
+  accDescr: Book risks and hedge-instrument risks form a least-squares problem solved by one constrained solver with costs; Greek, credit, correlation, cross-asset, beta and minimum-variance hedges build their inputs and call it or stand beside it; frontier and selection call it repeatedly; backtests and slippage judge hedges afterwards.
+  R[book and instrument risks] --> QP[hedge.qp.solve]
+  G["hedge.greeks, hedge.credit, hedge.correlation, hedge.crossasset"] --> QP
+  QP --> FS["hedge.frontier.solve, hedge.select.solve"]
+  R --> INT[hedge.integer.solve]
+  QP --> RES[hedge.residual.report]
+  P[spot path, orders and fills] --> AFT["hedge.backtest.delta, hedge.effectiveness, hedge.slippage.report"]
+```
+
+One solver sits at the centre, with a fixed check order so a bad problem gives the same error code in every build (rulings I-3, I-14). `hedge.beta.futures` and `hedge.minvar.ratio` are closed forms beside it; the stage B `hedge.solve` and `hedge.spread_cost` remain for use cases 1 and 2. Detail under [Stage I](#stage-i-hedging-around-one-solver).
+
+### Domain 09: Microstructure
+
+```mermaid
+flowchart LR
+  accTitle: Domain 09 microstructure flow
+  accDescr: Recorded crypto book messages are rebuilt into a book; the low-latency book reproduces the same answers for timing; estimators turn event counts and price moves into rates with standard errors; market-making quotes and trading conventions are pure functions.
+  F["recorded Kraken L2 messages<br/>crypto venue; not equities or rates"] --> RB[micro.book.rebuild]
+  RB -.->|same answers| LL["low-latency book, H-9<br/>C++, Rust, Java; no CLI operation"]
+  EV[event counts, fills, mid moves] --> EST["micro.est.*: rates with standard errors"]
+  IN[mid, inventory, risk aversion] --> AS[micro.mm.as_quotes]
+  PX[prices, dates, quotes] --> CV["micro.eq.*, micro.fx.*, micro.rates.*"]
+```
+
+Every operation here is a pure function of its inputs; conventions are exact decimal arithmetic and carry no label (HR-111). The only real data in stage H is the recorded crypto book (`09-microstructure/order-book.md`).
+
+### Domain 10: Execution
+
+```mermaid
+flowchart LR
+  accTitle: Domain 10 execution flow
+  accDescr: A parent order is scheduled by TWAP, VWAP, POV, Almgren-Chriss or an adaptive algorithm, priced by impact models and the liquidity curve, routed across simulated venues, and measured by shortfall TCA, attribution and venue analytics; paper trading drives the simulated venues and keeps a ledger.
+  ORD[parent order] --> SCH["exec.schedule.*, exec.ac.*, exec.algo.*"]
+  IMP["exec.impact.*, liq.curve.cost, exec.tca.pretrade"] --> SCH
+  SCH --> SOR[exec.sor.allocate]
+  SOR --> SIM["exec.sim.*: lit, dark, auction, FX, futures<br/>simulated venue"]
+  SIM -->|fills| TCA["exec.tca.shortfall, exec.tca.attribution, exec.venue.analytics"]
+  SIM --> PT["paper.*: book, ledger, pre-trade, session<br/>never live orders"]
+```
+
+Formula operations are pure functions; the venues are deterministic simulators with integer ticks and lots, seeded draws from `core.rng` and a fixed "simulated" label on every output. Paper trading drives the lit engine, dark pool and router only. Detail under [Stage H](#stage-h-execution-and-microstructure-v0100).
+
+### Domain 11: Research
+
+```mermaid
+flowchart LR
+  accTitle: Domain 11 research flow
+  accDescr: Prices and target positions feed the backtester; purged cross-validation chooses train and test bars; Sharpe statistics, PBO and power judge the result; regime labels describe the sample; drift detectors and interpolation backtests monitor models.
+  IN[prices, targets, labels] --> CV["research.cv.purged_kfold, cpcv_paths"] --> BT[research.backtest.run]
+  BT --> ST["research.stats.psr, dsr, pbo, power"]
+  RET[returns] --> RG["research.regime.viterbi, baum_welch"]
+  SER[a statistic over time] --> DR["research.drift.cusum, page_hinkley, psi, ks"]
+  K[curve knots, smile strikes] --> IB["research.backtest.interp_loo, surface_holdout"]
+```
+
+The research module depends on nothing above domain 01: a backtest takes prices and target positions, not a pricer (`11-research/`). Regime labels describe the sample and never feed a signal. Detail under [Stage J](#stage-j-research-tools).
+
+### Domain 12: Platform
+
+```mermaid
+flowchart LR
+  accTitle: Domain 12 platform, capability list only
+  accDescr: Domain 12 has no operations and no built components. Its spec is a capability list. The pieces that exist today sit elsewhere: the CLI contract, the as-of store and snapshot hash in domain 01, and the recorder and forward log in tools.
+  CAP["12-platform/README.md<br/>capability list; nothing built"]
+  CLI["CLI contract: run, batch, version, operations"] -.->|exists today| CAP
+  STO["core.store, core.snapshot.hash, domain 01"] -.->|exists today| CAP
+  REC["tools/recorder, forward-log branch"] -.->|exists today| CAP
+```
+
+Domain 12 has a capability list only (`specifications/12-platform/README.md`: stable APIs, model registry, observability, audit and replay, orchestration, release governance) and no operation in the name map. The dotted arrows are pieces that exist elsewhere in the repository and that a platform layer would build on; they are not platform code. Services and adapters are planned for stage K (ARCHITECTURE, "Libraries first, services last").

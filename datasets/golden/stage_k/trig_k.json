@@ -1,0 +1,389 @@
+{
+ "schema_version": "1.0",
+ "suite": "trig_k",
+ "spec": "specifications/03-calibration/recalibration-triggers.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "trig_k-0001",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0,
+     -1.0,
+     1.0,
+     -1.0
+    ],
+    "x_ref": 100.0,
+    "x_now": 105.0,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": true,
+     "sigma": 1.1547005383792515,
+     "threshold": 3.4641016151377544,
+     "false_alarm_rate": 0.002699796063260189
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH",
+    "SciPy 2*norm.sf(k) outside check (KR-11): agrees to 1e-14 relative"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "planted move",
+   "output_classes": {
+    "fire": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
+  },
+  {
+   "case_id": "trig_k-0002",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0,
+     -1.0,
+     1.0,
+     -1.0
+    ],
+    "x_ref": 100.0,
+    "x_now": 102.0,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": false,
+     "sigma": 1.1547005383792515,
+     "threshold": 3.4641016151377544,
+     "false_alarm_rate": 0.002699796063260189
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH",
+    "SciPy 2*norm.sf(k) outside check (KR-11): agrees to 1e-14 relative"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "noise",
+   "output_classes": {
+    "fire": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
+  },
+  {
+   "case_id": "trig_k-0003",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0,
+     -1.0,
+     1.0,
+     -1.0
+    ],
+    "x_ref": 100.0,
+    "x_now": 105.0,
+    "days_since": 4.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": false,
+     "sigma": 1.1547005383792515,
+     "threshold": 6.928203230275509,
+     "false_alarm_rate": 0.002699796063260189
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH",
+    "SciPy 2*norm.sf(k) outside check (KR-11): agrees to 1e-14 relative"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "four days since calibration double the threshold",
+   "output_classes": {
+    "fire": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
+  },
+  {
+   "case_id": "trig_k-0004",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     0.5,
+     -1.0,
+     1.5,
+     -0.5,
+     0.0,
+     1.0,
+     -1.5,
+     0.0
+    ],
+    "x_ref": 0.0,
+    "x_now": 2.5,
+    "days_since": 1.0,
+    "k": 2.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": false,
+     "sigma": 1.0,
+     "threshold": 2.5,
+     "false_alarm_rate": 0.01241933065155227
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH on sigma, threshold, false_alarm_rate; fire decided by gap ruling KR-13, not blind",
+    "SciPy 2*norm.sf(k) outside check (KR-11): agrees to 1e-14 relative"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "move equal to the threshold does not fire (KR-13)",
+   "output_classes": {
+    "fire": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
+  },
+  {
+   "case_id": "trig_k-0005",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     0.5,
+     -1.0,
+     1.5,
+     -0.5,
+     0.0,
+     1.0,
+     -1.5,
+     0.0
+    ],
+    "x_ref": 0.0,
+    "x_now": -2.5000001,
+    "days_since": 1.0,
+    "k": 2.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": true,
+     "sigma": 1.0,
+     "threshold": 2.5,
+     "false_alarm_rate": 0.01241933065155227
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH",
+    "SciPy 2*norm.sf(k) outside check (KR-11): agrees to 1e-14 relative"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "just past the threshold",
+   "output_classes": {
+    "fire": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
+  },
+  {
+   "case_id": "trig_k-0006",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0
+    ],
+    "x_ref": 100.0,
+    "x_now": 105.0,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic",
+    "error"
+   ],
+   "description": "fewer than two changes"
+  },
+  {
+   "case_id": "trig_k-0007",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0,
+     -1.0,
+     1.0,
+     -1.0
+    ],
+    "x_ref": 100.0,
+    "x_now": 105.0,
+    "days_since": 1.0,
+    "k": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic",
+    "error"
+   ],
+   "description": "k <= 0"
+  },
+  {
+   "case_id": "trig_k-0008",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "x_ref": 100.0,
+    "x_now": 105.0,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic",
+    "error"
+   ],
+   "description": "sigma = 0: no noise scale"
+  },
+  {
+   "case_id": "trig_k-0009",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0,
+     -1.0,
+     1.0,
+     -1.0
+    ],
+    "x_ref": 100.0,
+    "x_now": 105.0,
+    "days_since": 1.0,
+    "k": 30.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": false,
+     "sigma": 1.1547005383792515,
+     "threshold": 34.64101615137755,
+     "false_alarm_rate": 9.813427854296374e-198
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "added 2026-11-19 (branch k-w1-fu) so that every build keeps the stated 2 (1 - Phi(k)) in the far tail: not blind",
+    "SciPy 2*norm.sf(k) is 5.7e-14 relative off (it rounds k / sqrt 2 first): no outside check"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "far tail k = 30: 2 (1 - Phi(k)) to 1e-14; a bare erfc(k / sqrt 2) is 1.2e-13 off",
+   "output_classes": {
+    "fire": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+case	field	expected	blind	rel diff	result	notes
+idr_k-0001	estimate_pnl	-39913.124212551615	-39913.12421255162	1.82e-16	MATCH	
+idr_k-0001	bound	17.05689068912462	17.056890689124625	2.08e-16	MATCH	
+idr_k-0001	label	'latency-aware analytics on simulated data'	'latency-aware analytics on simulated data'	-	MATCH	 R-field
+idr_k-0002	estimate_pnl	41959.95109524657	41959.95109524657	0.00e+00	MATCH	
+idr_k-0002	bound	17.93141617552204	17.931416175522042	1.98e-16	MATCH	
+idr_k-0002	label	'latency-aware analytics on simulated data'	'latency-aware analytics on simulated data'	-	MATCH	 R-field
+idr_k-0003	estimate_pnl	-10170.171073390557	-10170.171073390557	0.00e+00	MATCH	
+idr_k-0003	bound	0.2665139170175722	0.26651391701757227	2.08e-16	MATCH	
+idr_k-0003	label	'latency-aware analytics on simulated data'	'latency-aware analytics on simulated data'	-	MATCH	 R-field
+idr_k-0004	estimate_pnl	-179097.35223580853	-179097.35223580853	0.00e+00	MATCH	
+idr_k-0004	bound	2132.1113361405783	2132.1113361405783	0.00e+00	MATCH	
+idr_k-0004	label	'latency-aware analytics on simulated data'	'latency-aware analytics on simulated data'	-	MATCH	 R-field
+idr_k-0005	estimate_pnl	-30589.655330067555	-30589.65533006756	1.19e-16	MATCH	
+idr_k-0005	bound	17.684733711514124	17.684733711514124	0.00e+00	MATCH	
+idr_k-0005	label	'latency-aware analytics on simulated data'	'latency-aware analytics on simulated data'	-	MATCH	 R-field
+
+item	cases	MATCH	MISMATCH	MISSING	eligible	counted blind MATCH	needed (60%)
+K-5a	5	5	0	0	5	5	3
+# rules-stated field, no credit on its own: label: stated by KR-10 (rules text)

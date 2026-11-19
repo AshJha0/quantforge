@@ -178,6 +178,35 @@ def bootstrap(
     ), error
 
 
+def bootstrap_incremental(
+    convention: str,
+    as_of: date,
+    previous_quotes: Sequence[Quote],
+    previous_factors: Sequence[float],
+    new_quotes: Sequence[Quote],
+    interpolation: str,
+    jumps: tuple[tuple[date, float], ...] = (),
+) -> tuple[CurveData, float, int | None, int]:
+    """K-4b on the stage B OIS bootstrap (method SEQUENTIAL): `bootstrap` of `new_quotes`, solving
+    only the pillars at and after the first quote whose tenor or mid differs from `previous_quotes`.
+    Returns (curve, max_repricing_error, first changed index or None, pillars recomputed). See
+    `curves.incremental_solve` for the stale-cache check."""
+    curves.check_jumps(as_of, jumps)
+
+    def solve(quotes: Sequence[Quote]) -> curves.Solve:
+        swaps, pillars = _check_quotes(convention, as_of, quotes)
+        targets = [q.mid for q in quotes]
+        keys = [(q.tenor, t) for q, t in zip(quotes, targets, strict=True)]
+        return curves.Solve(pillars, _models(convention, swaps), targets, keys)
+
+    new = solve(new_quotes)
+    factors, error, first, recomputed = curves.incremental_solve(
+        as_of, interpolation, jumps, solve(previous_quotes), previous_factors, new
+    )
+    curve = CurveData(as_of, interpolation, tuple(new.pillars), tuple(factors), jumps)
+    return curve, error, first, recomputed
+
+
 def compound(rates: Sequence[float], days: Sequence[int], denominator: int) -> float:
     if len(rates) != len(days) or not rates or any(n < 1 for n in days):
         raise QfError("E_INPUT", "need equal lengths and days of at least 1")

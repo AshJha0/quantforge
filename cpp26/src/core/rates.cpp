@@ -1,7 +1,10 @@
 #include "quantforge/core/rates.hpp"
 
 #include <algorithm>
+#include <bit>
 #include <cmath>
+#include <cstdint>
+#include <memory>
 
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/finite.hpp"
@@ -58,6 +61,25 @@ double max_error(const std::vector<double>& targets, const ModelRate& model, con
         worst = std::max(worst, e);
     }
     return worst;
+}
+
+void solve_one(Curve& c, std::size_t j, double target, const ModelRate& model);
+
+/// The one-at-a-time solve from pillar `from` on, on a curve that holds pillars 0..from-1. When
+/// those are the start of an earlier solve of the same quotes, the result is the full solve bit for
+/// bit (K-4b, ruling KR-5): the same arithmetic runs in the same order.
+void sequential_from(Curve& c, const std::vector<Date>& dates, const std::vector<double>& targets,
+                     const ModelRate& model, std::size_t from) {
+    double previous_t = from == 0 ? 0.0 : c.time(dates[from - 1]);
+    double previous_x = from == 0 ? 0.0 : c.log_df(from - 1);
+    for (std::size_t j = from; j < dates.size(); ++j) {
+        const double t = c.time(dates[j]);
+        // Start from the quote as a flat forward beyond the last pillar.
+        c.push(dates[j], previous_x - targets[j] * (t - previous_t));
+        solve_one(c, j, targets[j], model);
+        previous_t = t;
+        previous_x = c.log_df(j);
+    }
 }
 
 void solve_one(Curve& c, std::size_t j, double target, const ModelRate& model) {
@@ -354,6 +376,12 @@ SolvedCurve solve_curve(Date as_of, CurveInterpolation interpolation, const std:
     c.set_jumps(jumps);
     c.set_shape(shape);
     const bool global = non_local(interpolation);
+    if (!global && method == SolveMethod::Sequential) {
+        sequential_from(c, dates, targets, model, 0);
+        const double error = max_error(targets, model, c);
+        if (error >= required) solve_failed();
+        return {std::move(c), error};
+    }
     double previous_t = 0.0, previous_x = 0.0;
     for (std::size_t j = 0; j < dates.size(); ++j) {
         const double t = c.time(dates[j]);
@@ -425,6 +453,67 @@ SolvedCurve ois_bootstrap(const RateConvention& c, Date as_of, const std::vector
                        shape);
 }
 
+IncrementalCurve solve_curve_incremental(Date as_of, CurveInterpolation interpolation, const std::vector<Jump>& jumps,
+                                         const SequentialProblem& previous, const std::vector<double>& previous_factors,
+                                         const SequentialProblem& next) {
+    require_finite(previous_factors, "previous_discount_factors");
+    if (non_local(interpolation))
+        throw Error("E_INPUT", "an incremental update needs a sequential interpolation (LOG_LINEAR_DF or LINEAR_ZERO)",
+                    "interpolation");
+    const std::size_t n = next.dates.size();
+    if (previous.dates.size() != n || previous_factors.size() != n || next.keys.size() != n ||
+        previous.keys.size() != n)
+        throw Error("E_INPUT", "previous quotes, previous discount factors and new quotes must have one length",
+                    "quotes");
+    SolvedCurve old = solve_curve(as_of, interpolation, previous.dates, previous.targets, previous.model,
+                                  SolveMethod::Sequential, jumps);
+    const std::vector<Pillar> fresh = old.curve.pillars();
+    for (std::size_t i = 0; i < n; ++i) {
+        if (std::bit_cast<std::uint64_t>(fresh[i].discount_factor) != std::bit_cast<std::uint64_t>(previous_factors[i]))
+            throw Error("E_INPUT", "previous discount factors are not the bootstrap of the previous quotes",
+                        "previous_discount_factors");
+    }
+    std::size_t j = 0;
+    while (j < n && previous.keys[j] == next.keys[j] && previous.dates[j] == next.dates[j]) ++j;
+    if (j == n) return {std::move(old), std::nullopt, 0};
+    require_finite(next.targets, "targets");
+    Curve c(as_of, interpolation);
+    c.set_jumps(jumps);
+    for (std::size_t i = 0; i < j; ++i) c.push(next.dates[i], old.curve.log_df(i));
+    sequential_from(c, next.dates, next.targets, next.model, j);
+    const double error = max_error(next.targets, next.model, c);
+    if (error >= required) solve_failed();
+    return {{std::move(c), error}, j, n - j};
+}
+
+namespace {
+SequentialProblem ois_problem(const RateConvention& c, Date as_of, const std::vector<OisQuote>& quotes) {
+    require_finite_quotes(quotes, "quotes");
+    if (quotes.empty()) throw Error("E_INPUT", "no quotes", "quotes");
+    auto swaps = std::make_shared<std::vector<std::vector<Period>>>();
+    SequentialProblem p;
+    for (const OisQuote& q : quotes) {
+        swaps->push_back(ois_periods(c, as_of, q.tenor));
+        p.dates.push_back(swaps->back().back().payment);
+        p.targets.push_back(q.rate);
+        p.keys.push_back({q.tenor.count, q.tenor.unit, std::bit_cast<long long>(q.rate)});
+        if (p.dates.size() > 1 && p.dates.back() <= p.dates[p.dates.size() - 2])
+            throw Error("E_INPUT", "pillars must strictly increase", "quotes");
+    }
+    p.model = [&c, swaps](std::size_t j, const Curve& curve) { return ois_legs(c, (*swaps)[j], curve).par(); };
+    return p;
+}
+}  // namespace
+
+IncrementalCurve ois_bootstrap_incremental(const RateConvention& c, Date as_of, const std::vector<OisQuote>& previous,
+                                           const std::vector<double>& previous_factors,
+                                           const std::vector<OisQuote>& next, CurveInterpolation interpolation,
+                                           const std::vector<Jump>& jumps) {
+    check_jumps(as_of, jumps);
+    return solve_curve_incremental(as_of, interpolation, jumps, ois_problem(c, as_of, previous), previous_factors,
+                                   ois_problem(c, as_of, next));
+}
+
 double ois_compound(const std::vector<double>& rates, const std::vector<long long>& days, double denominator) {
     require_finite(rates, "rates");
     require_finite(denominator, "denominator");
@@ -472,6 +561,38 @@ double projection_model(const RateConvention& index, const ProjectionInstrument&
     for (const Period& p : it.floating)
         floating += (projection.discount(p.start) / projection.discount(p.end) - 1.0) * discount(p.end);
     return floating / annuity;
+}
+
+namespace {
+SequentialProblem projection_problem(const Curve& discount, const RateConvention& index, Date as_of,
+                                     const std::vector<ProjectionQuote>& quotes) {
+    for (const ProjectionQuote& q : quotes) require_finite(q.rate, "quotes");
+    if (quotes.empty()) throw Error("E_INPUT", "no quotes", "quotes");
+    auto instruments = std::make_shared<std::vector<ProjectionInstrument>>();
+    SequentialProblem p;
+    for (const ProjectionQuote& q : quotes) {
+        ProjectionInstrument it = projection_instrument(index, as_of, q);
+        if (!p.dates.empty() && it.end <= p.dates.back())
+            throw Error("E_INPUT", "quotes must be in pillar order", "quotes");
+        p.dates.push_back(it.end);
+        p.targets.push_back(q.rate);
+        p.keys.push_back({static_cast<long long>(q.type), q.months, std::bit_cast<long long>(q.rate)});
+        instruments->push_back(std::move(it));
+    }
+    p.model = [&discount, &index, instruments](std::size_t j, const Curve& curve) {
+        return projection_model(index, (*instruments)[j], [&](Date x) { return discount.discount(x); }, curve);
+    };
+    return p;
+}
+}  // namespace
+
+IncrementalCurve projection_bootstrap_incremental(const Curve& discount, const RateConvention& index, Date as_of,
+                                                  const std::vector<ProjectionQuote>& previous,
+                                                  const std::vector<double>& previous_factors,
+                                                  const std::vector<ProjectionQuote>& next,
+                                                  CurveInterpolation interpolation) {
+    return solve_curve_incremental(as_of, interpolation, {}, projection_problem(discount, index, as_of, previous),
+                                   previous_factors, projection_problem(discount, index, as_of, next));
 }
 
 Curve projection_bootstrap(const Curve& discount, const RateConvention& index, Date as_of,

@@ -161,7 +161,7 @@ SIMM IR delta margin 452205.34 (CR 1.0)
 | 401 / 200 | 127, 220,895, 163,851, 132,970, -236,617, -347,516 |
 | 801 / 400 | 127, 225,712, 158,174, 131,838, -234,410, -347,771 |
 
-At the default grid the discount-factor entries are 15% to 18% from the converged values while the price is 0.24% away. Golden `aadladder_r6` (`aadladder_g-0002`'s inputs at 501 / 250) is within 0.99% of 801 / 400 on every entry. Convergence is not monotone: no single grid meets 2% for all three cases (`oracle/R6_LADDER_GRIDS.json`, `oracle/R6_LADDER_GRIDS_EXTRA.json`). **The ladder is not for hedging at the default grid.** The real fix is stage K item K-8.
+At the default grid the discount-factor entries are 15% to 18% from the converged values while the price is 0.24% away. Golden `aadladder_r6` (`aadladder_g-0002`'s inputs at 501 / 250) is within 0.99% of 801 / 400 on every entry. Stage K added a second scheme for this reason: with `"method": "CN_RANNACHER_SMOOTHED"` every judged entry at the grid 201 / 100 is within 0.40% of an outside reference and converges at second order on the three cases it was developed on. That is not enough to lift the restriction: at 101 / 50 two of those cases miss 1%, and a deep in-the-money receiver is up to 9% off (`specifications/06-risk/bermudan-ladder-k8.md`, ruling KR-113). The restriction stays for both methods; the default method and the numbers in this table are unchanged. Convergence is not monotone: no single grid meets 2% for all three cases (`oracle/R6_LADDER_GRIDS.json`, `oracle/R6_LADDER_GRIDS_EXTRA.json`). **The ladder is not for hedging at the default grid.** The real fix is stage K item K-8.
 
 ## The formal statement, checked against the specs
 

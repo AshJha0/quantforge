@@ -1,0 +1,126 @@
+{
+ "what": "K-8 blind re-derivation (DR-H2): hidden expected values, copied from the goldens' `expected.outputs` (the Python build's own output, spec 0.2.0); tolerance per case from the golden's tolerance_class and conformance/tolerances/policy.yaml: |a - e| <= absolute + relative * max(|a|, |e|)",
+ "golden": "datasets/golden/stage_k/k8_k.json",
+ "golden_sha256": "9147507a36b3bd5ffe4e8a092c81e70089054b0a38105c69a1ab692782d12d91",
+ "cases": {
+  "k8_k-0001": {
+   "operation": "rates.shortrate.bermudan_ladder",
+   "tolerance_class": "aad_sensitivity",
+   "absolute": 1e-10,
+   "relative": 1e-08,
+   "outputs": {
+    "price": 22737.43110152093,
+    "d_price_d_discount_factors": [
+     0.0,
+     222756.97927658106,
+     157306.48127138885,
+     135525.49051133066,
+     -234107.76717224217,
+     -347573.8913112793,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "d_price_d_mean_reversion": -53342.23688107165,
+    "d_price_d_sigma": 2275014.635067192
+   }
+  },
+  "k8_k-0002": {
+   "operation": "rates.shortrate.bermudan_ladder",
+   "tolerance_class": "aad_sensitivity",
+   "absolute": 1e-10,
+   "relative": 1e-08,
+   "outputs": {
+    "price": 14538.714732033166,
+    "d_price_d_discount_factors": [
+     0.0,
+     98532.34095360176,
+     131505.3094414489,
+     146874.35268045598,
+     -146110.1817617509,
+     -278631.0289731392,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "d_price_d_mean_reversion": -51430.41258779032,
+    "d_price_d_sigma": 2132209.1919863927
+   }
+  },
+  "k8_k-0003": {
+   "operation": "rates.shortrate.bermudan_ladder",
+   "tolerance_class": "aad_sensitivity",
+   "absolute": 1e-10,
+   "relative": 1e-08,
+   "outputs": {
+    "price": 14014.364440814628,
+    "d_price_d_discount_factors": [
+     0.0,
+     -92034.23190917178,
+     -129460.80633103332,
+     -135576.212917493,
+     158812.99488158757,
+     278471.9516219159,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "d_price_d_mean_reversion": -50573.04715256333,
+    "d_price_d_sigma": 2075229.6401465738
+   }
+  },
+  "k8_k-0004": {
+   "operation": "rates.shortrate.bermudan_swaption",
+   "tolerance_class": "root_finding",
+   "absolute": 1e-10,
+   "relative": 1e-10,
+   "outputs": {
+    "price": 22737.43110152093
+   }
+  },
+  "k8_k-0005": {
+   "operation": "rates.shortrate.bermudan_ladder",
+   "tolerance_class": "aad_sensitivity",
+   "absolute": 1e-10,
+   "relative": 1e-08,
+   "outputs": {
+    "price": 13716.96718870294,
+    "d_price_d_discount_factors": [
+     0.0,
+     -85323.69457718439,
+     -129308.55315145763,
+     -138026.26813797135,
+     154928.16366504165,
+     276491.2939629992,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "d_price_d_mean_reversion": -48789.9281811259,
+    "d_price_d_sigma": 2034661.6889618998
+   }
+  },
+  "k8_k-0006": {
+   "operation": "rates.shortrate.bermudan_swaption",
+   "tolerance_class": "root_finding",
+   "absolute": 1e-10,
+   "relative": 1e-10,
+   "outputs": {
+    "price": 7017.868206626406
+   }
+  },
+  "k8_k-0007": {
+   "operation": "rates.shortrate.bermudan_swaption",
+   "tolerance_class": "root_finding",
+   "absolute": 1e-10,
+   "relative": 1e-10,
+   "outputs": {
+    "price": 19143.61007214985
+   }
+  }
+ }
+}

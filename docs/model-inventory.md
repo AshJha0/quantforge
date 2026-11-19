@@ -616,7 +616,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 ### MG-6 AAD ladder of the Bermudan scheme (Q3b)
 - **Purpose:** price plus the full curve, `a` and `sigma` ladder of the G-18 Hull-White Bermudan scheme by reverse-mode AAD.
 - **Inputs:** the `rates.shortrate.bermudan_swaption` inputs.
-- **Limitations:** derivative of the discrete scheme at the case grid, **not for hedging at the default grid 101/50** (curve entries 15% to 18% from the converged model; golden `aadladder_r6` at 501/250 is within 0.99% of 801/400; convergence not monotone; fix in stage K item K-8; `oracle/R6_LADDER_GRIDS.json`); undefined where a bump moves an exercise decision across a node (such cases are dropped); no performance number recorded by the spec session.
+- **Limitations:** derivative of the discrete scheme at the case grid, **not for hedging at the default grid 101/50** (the grid of the `aadladder_g` goldens; the operation has no default grid), with either method: the restriction also stays for `method` `CN_RANNACHER_SMOOTHED`, see MK-5 and KR-113 (curve entries 15% to 18% from the converged model; golden `aadladder_r6` at 501/250 is within 0.99% of 801/400; convergence not monotone; fix in stage K item K-8; `oracle/R6_LADDER_GRIDS.json`); undefined where a bump moves an exercise decision across a node (such cases are dropped); no performance number recorded by the spec session.
 - **Validation:** Richardson central differences, two pairs agreeing within 1e-9 relative (3 value cases). **Review:** 2026-11-11.
 - **Tier:** 1.
 - **Challenger:** bump-and-reprice with Richardson extrapolation (the golden reference itself).
@@ -1211,3 +1211,135 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Data lineage hash:** `datasets/golden/stage_h/fut_h.json`.
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/10-execution/rates-futures-venue.md`.
+
+### MK-1 Bitemporal store query (stage K wave 1, K-4a)
+- **Purpose:** the value of a series as known at knowledge time K for valid time V, with corrections and withdrawals (`core.store.bitemporal_query`), in all four languages.
+- **Inputs:** as in the spec page; instants are whole seconds (KR-16).
+- **Limitations:** spec confirmed 2026-11-19 (`specifications/01-core/bitemporal-store.md`); the log is passed in the request, there is no persistent store.
+- **Validation:** goldens `bt_k` plus `e2_k` two-error cases, passed by every build (observed, local, 2026-11-19); KR-4 correction property on 10,000 logs in each language (`program/stage_k_w1/`). **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2), 6 of 8 value cases fully blind (`program/STAGE_K_BLIND_W1.md`).
+- **Monitoring thresholds:** any KR-4 property failure; any golden difference across the four builds.
+- **Data lineage hash:** sha256 15c685aa0eb348131b246aaa54e6d7df83d00545a1b0ecee71c79a660163cbce (`bt_k`, 10 cases) (2026-11-19).
+- **Retirement trigger:** a superseding stage K ruling.
+- **Validation report:** `specifications/01-core/bitemporal-store.md`.
+
+### MK-2 Incremental curve update (stage K wave 1, K-4b)
+- **Purpose:** sequential annual par bootstrap and its incremental update from the first changed quote (`curve.bootstrap.par_annual`, `curve.incremental.update`), in all four languages.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec confirmed 2026-11-19; `curve.incremental.update` works on a hand-sized instrument set (annual par swaps); the stage B production bootstrap has its own incremental entry points in all four builds (follow-up lane, `program/STAGE_K_W1_HANDOVER.md`), not exposed as a CLI operation.
+- **Validation:** goldens `inc_k`; 10,000 random vectors bit-identical to a full rebuild in Python and Java; on the stage B bootstrap, 10,000 of 10,000 patched moves bit-identical to a full rebuild in all four builds (key `incremental_property_stage_b_patched`, `program/stage_k_w1/`; `specifications/02-curves/incremental-update.md`, "Acceptance evidence"). **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2), 4 of 4 value cases.
+- **Monitoring thresholds:** any recomputed pillar differing from a full rebuild by more than 1e-12 relative, or any copied pillar not bit-identical.
+- **Data lineage hash:** sha256 746a7729fe42ed44d521621452503a014a01aa47f06546f8c08523ad70316eca (`inc_k`, 6 cases) (2026-11-19).
+- **Retirement trigger:** a superseding stage K ruling.
+- **Validation report:** `specifications/02-curves/incremental-update.md`.
+
+### MK-3 Recalibration trigger (stage K wave 1, K-4c)
+- **Purpose:** fires when a monitored input moves more than k sample sigmas times sqrt(days) since calibration (`calib.trigger.check`), in all four languages.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec confirmed 2026-11-19; two-sided normal level only, which understates the false-alarm rate of a short window (the acceptance uses the Student-t predictive rate); CUSUM and EWMA are out of wave 1.
+- **Validation:** goldens `trig_k`; simulation of 100,000 noise paths inside the 99% binomial interval and a planted 6-sigma move firing on every path, Python and Java (`program/stage_k_w1/`). **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2), 4 of 6 value cases (66.7%, after the far-tail case trig_k-0009, `oracle/OUTSIDE_SHARES.md`); SciPy `2*norm.sf(k)` on `false_alarm_rate` only (KR-11). `false_alarm_rate` is computed as `2 Phi(-k)` with a tail-accurate normal CDF in all four builds.
+- **Monitoring thresholds:** observed noise fire rate outside the 99% binomial interval of its stated level.
+- **Data lineage hash:** sha256 b3297f772ed002b9b369e10ef77c1d70b952dcff32604c2b9cf6b9105aafb5b3 (`trig_k`, 8 cases) (2026-11-19).
+- **Retirement trigger:** a superseding stage K ruling.
+- **Validation report:** `specifications/03-calibration/recalibration-triggers.md`.
+
+### MK-4 Intraday delta-gamma risk with a Lagrange bound (stage K wave 1, K-5a)
+- **Purpose:** delta-gamma P&L of a parallel yield move on zero-coupon positions with a bound on its error (`risk.intraday.delta_gamma_bound`), in all four languages.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec confirmed 2026-11-19; zero-coupon positions only (other instruments have no `M3`, so no bound); latency-aware analytics on simulated data; the binary64 comparison is meaningful only for `T abs(h)` well above 1e-7 (KR-17).
+- **Validation:** goldens `idr_k`; 1,000 seeded moves with zero violations in Python and Java, rechecked at 50 digits (`oracle/IDR_K_MOVES_CHECK_W1.json`). **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2), 5 of 5 value cases at 1e-9 relative by a second, clean packet (`program/STAGE_K_BLIND_K5A.md`; the first blind lane had checked the bounds only to 6 decimals and lacked idr_k-0005); `oracle/OUTSIDE_SHARES.md`. It checks the spec's arithmetic, not the bound's derivation; mpmath is our own oracle and does not count.
+- **Monitoring thresholds:** any move with abs(estimate - revaluation) above the bound.
+- **Data lineage hash:** sha256 7529524f6558dbdf27d65327bbe53396e1efaffdfa33159b6ce314afbbf7e153 (`idr_k`, 7 cases) (2026-11-19).
+- **Retirement trigger:** a superseding stage K ruling.
+- **Validation report:** `specifications/06-risk/intraday-risk-bounds.md`.
+
+### MK-5 Second-order Bermudan scheme and its ladder (stage K, K-8)
+- **Purpose:** `CN_RANNACHER_SMOOTHED`, an optional `method` on `rates.shortrate.bermudan_swaption` and `rates.shortrate.bermudan_ladder`: Crank-Nicolson with four implicit half steps after each exercise date, the curve term integrated exactly, and the exercise `max` smoothed to second order (KR-8 as revised by KR-18), with the aim that the ladder at 201/100 is within 1% of the converged model derivative. The aim is met on the three cases the method was developed on and not shown elsewhere.
+- **Inputs:** as in the spec page; `method` absent or `G18_IMPLICIT` keeps the G-18 scheme bit for bit.
+- **Limitations:** spec 0.2.0 PROPOSED (`specifications/06-risk/bermudan-ladder-k8.md`); not the default method (the default stays `G18_IMPLICIT`, KR-8); **the R6 use restriction of MG-6 stays for this method: not for hedging** (KR-113, 2026-11-19; a lift under KR-110 was withdrawn before release, after the different-model audit); the evidence is in-sample (the three judged cases are the ones the method was developed on) and at 201/100 only; at 101/50 the worst judged entry on the same cases is +0.93%, -1.53%, +1.49%; no accuracy envelope exists: on case 0001 turned into a deep in-the-money receiver (`fixed_rate` 0.08) d/da is 7% to 9% and d/dsigma about 5% too large at 201/100, and as a deep out-of-the-money payer the 2-year entry is about 2% too large (`program/k8_audit_response/`); lifting needs the phase 2 out-of-sample acceptance (to be written; `bermudan-ladder-k8.md`, Accuracy statement); the general use restriction at the top of this page still applies; the ladder row of a curve node the price does not depend on (0.4986 years in the judged cases) is exactly 0 and is not judged by any acceptance test (owner decision 2026-11-19); the end correction of the smoothing is derived in `program/K8_DIAGNOSIS.md`, not taken from a paper.
+- **Validation:** acceptance 1 to 3 pass in Python, acceptance 3 in Java, C++ and Rust (`oracle/K8_ACCEPTANCE_W2.json`, `oracle/K8_ACCEPTANCE_PORTS.json`): worst judged entry at 201/100 0.40% from QuantLib, observed orders 1.84 to 2.15 on 24 entries, all in-sample; goldens `k8_k` in all four builds; ladder against its own Richardson bumps to 1e-8 in each language's unit tests. **Review:** 2026-11-19.
+- **Tier:** 1.
+- **Challenger:** QuantLib 1.44 `FdHullWhiteSwaptionEngine` central bump at tGrid 8,000, xGrid 3,201 (KR-19, `oracle/K8_REFERENCE_QL.json`), counted outside only on the judged ladder entries of k8_k-0001..0003; the goldens themselves are the Python build's output, not an independent oracle. Blind re-derivation (DR-H2) by a second model from the spec text alone: 7 of 7 value cases MATCH, counted (`program/STAGE_K_BLIND_K8.md`; the row-0 question it waited on is closed, `program/K8_ROW0_FINDING.md`).
+- **Monitoring thresholds:** any judged ladder entry at 201/100 more than 1% from the reference; any observed order outside 1.5 to 2.5 or a `NON_MONOTONE` status on 201/401/801; AAD against bump beyond 1e-8 relative.
+- **Data lineage hash:** sha256 e3f51c83d7eeeac3a7c4cb35e09eb89d7feca3bce4c8e73a2362fca0aefaac89 (`k8_k`, 14 cases; regenerated 2026-11-19 to record the blind MATCH, values unchanged) (2026-11-19).
+- **Retirement trigger:** a superseding stage K ruling, or the method failing acceptance in any build.
+- **Validation report:** `specifications/06-risk/bermudan-ladder-k8.md`.
+
+### MK-6 SA-CCR exposure at default (stage K wave 1b, K-8d)
+- **Purpose:** standardised approach for counterparty credit risk EAD of one netting set, margined or unmargined (`risk.saccr.ead`, CRE52), in all four languages.
+- **Inputs:** as in the spec page; supervisory parameters in `specifications/06-risk/sa-ccr-parameters.json`, one copy for the four builds.
+- **Limitations:** rulings KR-30 to KR-39 confirmed 2026-11-19; KR-39 scope limits (one margin agreement per netting set, no haircut computation, no CCP rules); closed form, no iteration.
+- **Validation:** goldens `saccr_k` passed by every build through the neutral runner (observed, local laptop, 2026-11-19); CRE99 Examples 1 to 5 reproduce the printed EADs (KR-30). **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** 12 of 16 value cases (75%): 5 printed CRE99 examples and 7 blind re-derivations (DR-H2, `program/STAGE_K_BLIND_W1B.md`); 4 further blind matches excluded for a recorded process failure.
+- **Monitoring thresholds:** any golden difference across the four builds; any CRE99 printed EAD not reproduced at its printed digits.
+- **Data lineage hash:** sha256 e0fedebf674fc978431991dd6b16c67bf4eaa5e216682172c24c837d4a91561e (`saccr_k`, 39 cases) (2026-11-19).
+- **Retirement trigger:** a superseding stage K ruling or a change of CRE52.
+- **Validation report:** `specifications/06-risk/sa-ccr.md`.
+
+### MK-7 FRTB IMA backtesting zones and desk limits (stage K wave 1b, K-8e)
+- **Purpose:** bank-wide traffic-light zone from the larger of the actual and hypothetical exception counts, desk exception limits, and exception counting (`risk.frtb.backtest.zone`, `.desk`, `.count`, MAR32 and MAR99), in all four languages.
+- **Inputs:** as in the spec page; tables in `specifications/06-risk/frtb-ima-backtest-tables.json`.
+- **Limitations:** rulings KR-40 to KR-47 confirmed 2026-11-19; KR-44 (limits 12 and 30, "more than" covering both) is an inferred reading; backtesting only, no PLA test or capital (KR-47); `risk.frtb.backtest.zone` has no E1 golden (Integer inputs only, open point).
+- **Validation:** goldens `btk_k` and `tlk_k` passed by every build (observed, local laptop, 2026-11-19); MAR99 Table 2 rows 0 to 10 reproduced. **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** 23 of 24 `btk_k` value cases (95.8%, floor 60%): MAR99 Table 2 printed figures on 12, and 11 blind re-derivations (DR-H2, `program/STAGE_K_BLIND_BTK.md`, 12 of 12 MATCH; btk_k-0017 matched but is not counted, the rules text states its answer). SciPy `binom.cdf` on 23 of 24 is not counted (D6 precedent: stage F `SCIPY.BINOM` is `reimplementation`, risk_f4-0082).
+- **Monitoring thresholds:** any zone, limit or count difference across the four builds; any MAR99 Table 2 row not reproduced.
+- **Data lineage hash:** sha256 a987ea2f465fd2d1d139da303d3edaa4addd78b0b989fd90656595ec6cd31160 (`btk_k`, 40 cases; after the blind-lane `verified_by` entries, outputs unchanged) (2026-11-19).
+- **Retirement trigger:** a superseding stage K ruling or a change of MAR32.
+- **Validation report:** `specifications/06-risk/frtb-ima-backtest.md`.
+
+### MK-8 FRTB DRC and RRAO (stage K wave 2, K-8a, PROPOSED)
+- **Purpose:** default risk charge for non-securitisations, securitisations and the correlation trading portfolio, and the residual risk add-on (MAR22, MAR23). Specified only.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec and rulings (KR-50 to KR-69) PROPOSED; nothing implemented and no golden file written (2026-11-19). Not a model in use.
+- **Validation:** hand cases in the spec, all reproduced by a blind second model (`program/STAGE_K_BLIND_W2.md`); no build exists yet. **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) of the spec's hand cases, `program/STAGE_K_BLIND_W2.md`; gate status `program/STAGE_K_W2_GATE.md`.
+- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
+- **Data lineage hash:** sha256 5ddb8e136e2de83d001b165d0814f772f6e75b602650d60a8f45eefd57ad23e9 (spec page `frtb-drc-rrao.md`, no golden file yet) (2026-11-19).
+- **Retirement trigger:** the wave-2 build replaces this entry's limitations, or the item is withdrawn.
+- **Validation report:** `specifications/06-risk/frtb-drc-rrao.md`.
+
+### MK-9 FRTB IMA: ES with liquidity horizons, NMRF and SES, RFET, PLA, capital (stage K wave 2, K-8f, PROPOSED)
+- **Purpose:** liquidity-horizon-scaled expected shortfall, stressed ES for non-modellable factors, the risk factor eligibility test, the P&L attribution test and the IMA capital aggregation (MAR31 to MAR33). Specified only.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec and rulings (KR-50 to KR-69) PROPOSED; nothing implemented and no golden file written (2026-11-19). Not a model in use.
+- **Validation:** hand cases in the spec, all reproduced by a blind second model (`program/STAGE_K_BLIND_W2.md`); no build exists yet. **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) of the spec's hand cases, `program/STAGE_K_BLIND_W2.md`; gate status `program/STAGE_K_W2_GATE.md`.
+- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
+- **Data lineage hash:** sha256 60ac9a23779398a0c7c44dba6099093b0943ef20ce5b1b6c159ed78ea9021166 (spec page `frtb-ima.md`, no golden file yet) (2026-11-19).
+- **Retirement trigger:** the wave-2 build replaces this entry's limitations, or the item is withdrawn.
+- **Validation report:** `specifications/06-risk/frtb-ima.md`.
+
+### MK-10 CVA risk capital: BA-CVA and SA-CVA (stage K wave 2, K-8g, PROPOSED)
+- **Purpose:** basic (reduced and full) and standardised CVA capital (MAR50). Specified only.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec and rulings (KR-50 to KR-69) PROPOSED; nothing implemented and no golden file written (2026-11-19). Not a model in use.
+- **Validation:** hand cases in the spec, all reproduced by a blind second model (`program/STAGE_K_BLIND_W2.md`); no build exists yet. **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) of the spec's hand cases, `program/STAGE_K_BLIND_W2.md`; gate status `program/STAGE_K_W2_GATE.md`.
+- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
+- **Data lineage hash:** sha256 348a99ad113d40f349c9943a4ba3d49f1ff3faddcd10a49fbc76a5ac21b1b6ca (spec page `cva-capital.md`, no golden file yet) (2026-11-19).
+- **Retirement trigger:** the wave-2 build replaces this entry's limitations, or the item is withdrawn.
+- **Validation report:** `specifications/06-risk/cva-capital.md`.
+
+### MK-11 Leverage ratio and large exposures, simplified (stage K wave 2, K-8i, PROPOSED)
+- **Purpose:** leverage ratio and large-exposure limit checks (simplified). Specified only.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec and rulings (KR-50 to KR-69) PROPOSED; nothing implemented and no golden file written (2026-11-19). Not a model in use.
+- **Validation:** hand cases in the spec, all reproduced by a blind second model (`program/STAGE_K_BLIND_W2.md`); no build exists yet. **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) of the spec's hand cases, `program/STAGE_K_BLIND_W2.md`; gate status `program/STAGE_K_W2_GATE.md`.
+- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
+- **Data lineage hash:** sha256 46b10b589b39c08b25c7d4e0f3641d9c39f9d7b03759446a19b6ea11dcc2d81c (spec page `leverage-large-exposures.md`, no golden file yet) (2026-11-19).
+- **Retirement trigger:** the wave-2 build replaces this entry's limitations, or the item is withdrawn.
+- **Validation report:** `specifications/06-risk/leverage-large-exposures.md`.
