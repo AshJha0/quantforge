@@ -24,7 +24,7 @@ Inputs (KR-51): `positions` (1 to 100,000), each `{id, obligor, bucket, seniorit
 
 1. **Gross JTD** (MAR22.11, MAR22.12): `LGD` = 1 for `EQUITY` and `NON_SENIOR`, 0.75 for `SENIOR`, 0.25 for `COVERED`; with `lgd_applies: false` the notional is not multiplied (MAR22.12(4)). `PnL = market_value - notional`. If `notional > 0` (long): `JTD = max(LGD notional + PnL, 0)`; if `notional < 0` (short): `JTD = min(LGD notional + PnL, 0)`. For cash equity, notional equals market value (KR-51), so `JTD = market_value`.
 2. **Maturity weight** (MAR22.15, MAR22.18, KR-52): `w = 1` if `maturity_years >= 1`, else `max(maturity_years, 0.25)`; scaled `JTD' = w JTD`.
-3. **Offset per obligor** (MAR22.19-22.21, KR-53): shorts offset longs of the same or higher seniority, greedy rule of KR-53. Result per obligor: `net_long >= 0`, `net_short <= 0`.
+3. **Offset per obligor** (MAR22.19-22.21, KR-53): shorts offset longs of the same or higher seniority, greedy rule of KR-53. Result per obligor: `net_long >= 0`, `net_short <= 0`. The direction is by rank (`COVERED` 4, `SENIOR` 3, `NON_SENIOR` 2, `EQUITY` 1): a short of rank r offsets only longs of rank r or above, so a short equity offsets a long senior bond but a short senior bond does not offset a long equity (drc_k-0007, drc_k-0008; inferred from the expected values; blind lane note, stage_k_blind/w2/notes.md). Offsetting uses the maturity-weighted `JTD'` of step 2 (drc_k-0004).
 4. **Bucket** (MAR22.22, MAR22.23, MAR22.24, MAR22.25): with `RW` from the obligor's rating (0.005, 0.02, 0.03, 0.06, 0.15, 0.30, 0.50, 0.15 unrated, 1 defaulted),
    `HBR = sum net_long / (sum net_long + sum |net_short|)`,
    `DRC_b = max(sum RW net_long - HBR sum RW |net_short|, 0)`.
@@ -34,11 +34,11 @@ Outputs: `positions` (`id`, `gross_jtd`, `weight`, `scaled_jtd`), `obligors` (`o
 
 ### `risk.frtb.drc_sec_nonctp`
 
-Inputs: `positions` `{id, bucket, pool, tranche, market_value, maturity_years, rw}`; JTD = market value, no LGD (MAR22.27); maturity weight as above (MAR22.30); offsetting only between positions with the same `pool` and `tranche` (MAR22.29); then HBR and `DRC_b` as MAR22.25 with the caller's `rw` (MAR22.33, KR-55); total = sum (MAR22.35).
+Inputs: `positions` `{id, bucket, pool, tranche, market_value, maturity_years, rw}`; JTD = market value, no LGD (MAR22.27); maturity weight as above (MAR22.30), applied to each position's JTD before offsetting, as in `drc_nonsec`; offsetting only between positions with the same `pool` and `tranche` (MAR22.29); then HBR and `DRC_b` as MAR22.25 with the caller's `rw` (MAR22.33, KR-55); total = sum (MAR22.35).
 
 ### `risk.frtb.drc_ctp`
 
-Inputs: either `positions` `{id, index, series, tranche, market_value, maturity_years, rw}` or `bucket_drc` (list of numbers). Netting within identical `index`, `series`, `tranche` across maturities (MAR22.39(1)); `HBR_ctp` from all CTP net longs and shorts together; `DRC_b = sum RW net_long - HBR_ctp sum RW |net_short|` with **no floor** (MAR22.44); `DRC_CTP = max(sum_b (max(DRC_b, 0) + 0.5 min(DRC_b, 0)), 0)` (MAR22.45). Decomposition and replication offsets of MAR22.39(2)-(3) are the caller's (they need a valuation model).
+Inputs: either `positions` `{id, index, series, tranche, market_value, maturity_years, rw}` or `bucket_drc` (list of numbers). JTD = market value, scaled by the maturity weight of `drc_nonsec` step 2 before netting (no golden case has a maturity under one year, so no expected value pins this; it matches the securitisation rule above). Netting within identical `index`, `series`, `tranche` across maturities (MAR22.39(1)); `HBR_ctp` from all CTP net longs and shorts together, across every index bucket, on the net amounts before risk weighting: `HBR_ctp = sum net_long / (sum net_long + sum |net_short|)` as in `drc_nonsec` step 4 (ctp_k-0002: hbr_ctp 0.5 = 1000 / 2000 over both indices; inferred from the expected values; blind lane note, stage_k_blind/w2/notes.md); `DRC_b = sum RW net_long - HBR_ctp sum RW |net_short|` with **no floor** (MAR22.44); `DRC_CTP = max(sum_b (max(DRC_b, 0) + 0.5 min(DRC_b, 0)), 0)` (MAR22.45). Decomposition and replication offsets of MAR22.39(2)-(3) are the caller's (they need a valuation model).
 
 ### `risk.frtb.rrao`
 

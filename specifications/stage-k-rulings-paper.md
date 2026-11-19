@@ -1,5 +1,7 @@
 # Stage K rulings, daily paper ledger (KR-70 to KR-89)
 
+**Status: CONFIRMED 2026-11-19 by the stage K coordinator lane (branch k-r1), KR-70 to KR-89, with KR-108 added at integration.** Each ruling was checked against `12-platform/paper-ledger-daily.md` and `tools/paper_daily/`; results in "Confirmation" at the end.
+
 Drafted 2026-11-19 on branch `k-paper`. Proposed: not normative until the stage K coordinator confirms them. Separate file so branches merge without conflict; numbering starts at KR-70 as the lane brief set. Covers `12-platform/paper-ledger-daily.md`. Append-only once confirmed. Reviewer: none: self-assessment; no second review (owner decision 2026-11-18).
 
 | # | Point | Proposed ruling |
@@ -30,3 +32,17 @@ Drafted 2026-11-19 on branch `k-paper`. Proposed: not normative until the stage 
 - Library `paper.ledger.append` and `paper.ledger.verify` fix the label "crypto venue; simulated" (HR-43), so this ledger computes its HR-45 bytes and hash in the tool (a test checks them against `quantforge_core.paper.canonical`). A `label` input on those two operations would let the ledger use them; that is a four-language change and is listed in `program/STAGE_K_PAPER_HANDOVER.md`, not made here.
 - The library operations used for the book legs and the limit check return the label "crypto venue; simulated" in their outputs. The job does not copy that field into the ledger.
 - Whether to sign `paper-ledger` commits with the same owner key as `forward-log` (the workflow uses the secret if present) is the owner's call.
+
+## Confirmation (stage K coordinator lane, 2026-11-19)
+
+Checked against the spec, `tools/paper_daily/core.py`, `run_day.py`, `verify_ledger.py`, `config.json`, `python/tests/test_paper_daily.py` and `.github/workflows/paper-ledger.yml` (evidence class read; the 40 tests are the measured check). Every ruling KR-70 to KR-89 matches the spec text and the code; KR-108 records the integration check of KR-72.
+
+| # | Result | Note |
+|---|---|---|
+| KR-70 | Confirmed | A test pins that no code path reaches FedInvest or the network |
+| KR-71 | Confirmed | Labels in `config.json`; the verifier checks them |
+| KR-72 | Confirmed, with KR-108 | The DAY row writes the five values and the source row hash; KR-108 records that the forward log publishes the same values |
+| KR-73 to KR-81 | Confirmed | Calendar, instruments, rotation, marks (365.25-day curve time, 6 and 10 decimal rounding), seeded depth 20% to 50%, costs, explain with threshold 0, row format, chain and anchors |
+| KR-82 | Confirmed | Strict "before 19:30:00 UTC" in the code. Note: the curve run's KR-95 uses "no later than" (<=) at the same instant; each matches its own spec, and the two jobs differ only at exactly 19:30:00 |
+| KR-83 to KR-89 | Confirmed | Gaps, replay, rebuild, 1e-6 allowance in the rebuild only, recorded trading day, limits (40,000 units, 4,500,000, 0.005, 2 orders) and financing, holdout guards in writer and verifier |
+| KR-108 | Confirmed | Written at integration |

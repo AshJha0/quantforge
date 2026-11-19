@@ -45,9 +45,9 @@ Per class and kind (MAR50.51-50.53, KR-62):
 - `S_b = max(-K_b, min(sum_{k in b} WS_k, K_b))`.
 - `K = m_cva sqrt(max(0, sum_b K_b^2 + sum_{b != c} gamma_bc S_b S_c))`.
 
-Total SA-CVA = sum over the delta and vega capital of every class (MAR50.42-50.45). Risk weights, rho and gamma per MAR50.54-50.77 as tabulated in `mar50_cva.json`: IR specified currencies Table 3/4, other currencies 1.58% and 40%, gamma 0.5; FX 11%, gamma 0.6; CCS Table 7 RW, rho = rho_tenor x rho_name x rho_quality, gamma Table 6; RCS Table 10 RW, gamma Table 9 (halved across quality); EQ Table 12 RW, gamma per MAR50.71; COM Table 14 RW, gamma per MAR50.75; all vega RW 100% except equity large cap 78%.
+Total SA-CVA = sum over the delta and vega capital of every class (MAR50.42-50.45). Risk weights, rho and gamma per MAR50.54-50.77 as tabulated in `mar50_cva.json`: IR specified currencies Table 3/4, other currencies 1.58% and 40%, gamma 0.5; FX 11%, gamma 0.6; CCS Table 7 RW, rho = rho_tenor x rho_name x rho_quality, gamma Table 6 (buckets 1 to 7: rho_name is 1 for the same `name`, 0.90 for different names with the same `legal_group`, 0.50 otherwise; sacva_k-0005: X and Y share a legal group, so rho(X 5Y, Y 5Y) = 0.90 and rho(X 1Y, Y 5Y) = 0.81; inferred from the expected values; blind lane note, stage_k_blind/w2/notes.md); RCS Table 10 RW, gamma Table 9 (halved across quality); EQ Table 12 RW, gamma per MAR50.71; COM Table 14 RW, gamma per MAR50.75; all vega RW 100% except equity large cap 78%.
 
-Outputs: per class and kind `buckets` [{bucket, k_b, s_b, sum_ws, floored}], `k`; `total`; `rwa`.
+Outputs: per class and kind `buckets` [{bucket, k_b, s_b, sum_ws, floored}], `k`; `total`; `rwa`. `floored` is a per-bucket flag, true when that bucket's `K_b` radicand was negative and set to 0; the class-level radicand under `K` is floored at 0 as well (KR-62) but carries no flag. No golden case has a negative radicand, so no expected value exercises either floor.
 
 ## Worked examples (written out)
 

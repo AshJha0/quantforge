@@ -31,7 +31,7 @@ MAR33.12 Table 2 lookup, then FAQ4 (maturity) and FAQ5 (index) rules (KR-60). Ou
 
 ### `risk.frtb.ima.es_lh`
 
-Inputs (KR-57) one of: `es_t` (five numbers ES_T(P,j) >= 0), `sigma` (five standard deviations of 10-day P&L, normal mode), `pnl` (five lists). Each list j is the P&L of the portfolio under 10-day shocks to the factors with LH >= LH_j only (Q(p_i, j), MAR33.4(4)-(6)); the caller builds the lists. ES per list at 97.5% with the `risk.var.historical` estimator. Then (MAR33.4, image p. 671), T = 10, LH = (10, 20, 40, 60, 120):
+Inputs (KR-57) one of: `es_t` (five numbers ES_T(P,j) >= 0), `sigma` (five standard deviations of 10-day P&L, normal mode), `pnl` (five lists). Each list j is the P&L of the portfolio under 10-day shocks to the factors with LH >= LH_j only (Q(p_i, j), MAR33.4(4)-(6)); the caller builds the lists. ES per list at 97.5% with the `risk.var.historical` estimator. An empty list j (no risk factor with LH >= LH_j) gives `ES_j = 0`, not an error, as KR-57 says of missing horizons (es_k-0005: lists 2 to 5 empty, es equals ES_1 = 493.52; inferred from the expected values; blind lane note, stage_k_blind/w2/notes.md). Then (MAR33.4, image p. 671), T = 10, LH = (10, 20, 40, 60, 120):
 
 `ES = sqrt( ES_1^2 + sum_{j=2..5} ( ES_j sqrt((LH_j - LH_{j-1}) / 10) )^2 )`, so the weights on `ES_j^2` are 1, 1, 2, 2, 6.
 
@@ -51,7 +51,7 @@ Outputs: `es_by_horizon` (five), `es`.
 
 ### `risk.frtb.rfet` and `risk.frtb.rfet.bucket`
 
-As KR-59. Outputs `distinct_days`, `crit1` (with `min_window_count` and the first failing window start), `crit2`, `pass`. Bucket lookup per MAR31.16 Table 1.
+As KR-59. The 12-month window runs from the day after `as_of` minus 12 months to `as_of`, both inclusive (2025-07-01 to 2026-06-30 for `as_of` 2026-06-30). The 90-day windows are `[s, s + 89 days]`, inclusive, for every start `s` from the first day of the 12-month window to `as_of` minus 89 days; `min_window_count` is the smallest count over them and the first failing window is the earliest `s` with fewer than 4 distinct days (rfet_k-0001: first failing window 2025-07-01 to 2025-09-28; rfet_k-0003: first failing start 2025-07-28 with 3 days; inferred from the expected values; blind lane note, stage_k_blind/w2/notes.md). Outputs `distinct_days`, `crit1` (with `min_window_count` and the first failing window start), `crit2`, `pass`. Bucket lookup per MAR31.16 Table 1.
 
 ### `risk.frtb.ima.capital`
 

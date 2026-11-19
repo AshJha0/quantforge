@@ -1,5 +1,7 @@
 # Stage K rulings, daily curve run lane
 
+**Status: CONFIRMED 2026-11-19 by the stage K coordinator lane (branch k-r1), KR-91 to KR-107; KR-90 binds only together with KR-109, which corrects its last sentence.** Results in "Confirmation" at the end.
+
 Proposed by lane k-curve-daily, 2026-11-19, for plan item K-11; not normative until the stage K coordinator confirms them. They govern `12-platform/daily-curve-run.md` and `tools/curve_daily/`. A separate file from the other stage K lanes so branches merge without conflict. Append-only; an amendment is a new row that names the row it amends. Reviewer: none: self-assessment; no second review (owner decision 2026-11-18).
 
 | # | Point | Ruling |
@@ -22,3 +24,17 @@ Proposed by lane k-curve-daily, 2026-11-19, for plan item K-11; not normative un
 | KR-105 | Rebuild | `verify_chain.py rebuild` refits one ok day from a file copy whose SHA-256 matches and requires the fit to be equal |
 | KR-106 | Site stub | `tools/curve_daily/site_page.py` renders the latest settled fit from `summary.json` with its labels; no existing page calls it until the dashboard lane wires it |
 | KR-107 | Exit codes | `run_day.py`: 0 done; 1 refused, nothing written; 2 rows written and one records a problem (GAP, failed fetch or fit, stale input, holdout block), so the scheduled run turns red after pushing |
+| KR-109 | Attribution (amends KR-90's last sentence; stage K coordinator lane, integration 2026-11-19) | KR-90 says "Both attributions are in every input record" and the spec says every row names both. The code writes each source's attribution in the record that uses that source: a DAY row's `input` carries the Treasury attribution, a CONSISTENCY row's `gsw` carries the Fed's, the GENESIS row's `config` holds both, and a record that used no source data (failed fetch, unreadable file, GAP) carries the URL and no attribution. That is the binding rule: the citation goes with the data used. The site stub names both sources on every page |
+
+## Confirmation (stage K coordinator lane, 2026-11-19)
+
+Checked against `12-platform/daily-curve-run.md`, `tools/curve_daily/core.py`, `run_day.py`, `verify_chain.py`, `config.json`, `site_page.py`, `python/tests/test_curve_daily.py` and `.github/workflows/curve-daily.yml` (evidence class read; the 23 tests are the measured check).
+
+| # | Result | Note |
+|---|---|---|
+| KR-90 | **Not confirmed as written** | Its last sentence does not match the code (`core.py` writes the Treasury attribution only in DAY inputs, the Fed's only in CONSISTENCY rows, none in failed-fetch inputs). Not edited; KR-109 corrects it and binds with it. The rest of KR-90 (sources, terms read, hashes not rows) matches |
+| KR-91 to KR-97 | Confirmed | Thirteen tenors; schedule (due after 23:00 UTC); on time "no later than" 19:30 UTC (<=, see the note under paper KR-82); late limit five business days; month-end clamp |
+| KR-98 | Confirmed | Weights 1/MD^2, added in eff76a68 after 7440c936 and after one real day was seen, as the ruling and the spec disclose |
+| KR-99 to KR-101 | Confirmed | 40-value tau grid, ties to the smaller tau; fit flag 10 / 25 bp; consistency tolerance 15 / 40 bp in `config.json` at 7440c936 before any real-day run; `outside` recorded, never dropped (the 2026-11-13 dry run is a recorded miss) |
+| KR-102 to KR-107 | Confirmed | Row format, chain and anchors, verifier, rebuild, site stub, exit codes 0 / 1 / 2 |
+| KR-109 | Confirmed | Written at integration |

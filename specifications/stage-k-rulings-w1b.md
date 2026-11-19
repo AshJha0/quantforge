@@ -1,5 +1,7 @@
 # Stage K rulings, wave 1b (SA-CCR K-8d, FRTB IMA backtesting K-8e)
 
+**Status: CONFIRMED 2026-11-19 by the stage K coordinator lane (branch k-r1), KR-30 to KR-47.** Each ruling was checked against its spec text and the four builds; the result is in "Confirmation" at the end. Rulings the table labels inferred stay inferred: confirmation records that the builds and goldens follow the reading, not that the reading is the only one.
+
 Written 2026-11-19 by the wave 1b lane. Not normative until the stage K coordinator confirms it. Separate file so the branches merge without conflict; another lane holds KR-1 to KR-29, so this file starts at KR-30. Covers `06-risk/sa-ccr.md` and `06-risk/frtb-ima-backtest.md`. Evidence classes: read (the source text on the page), inferred (our reading where the text is silent or ambiguous). Page numbers are those of the Basel Framework PDF generated 11/11/2026 (`institutional-quant-engine-plan/basel-framework-full.pdf`), which equal the printed "N / 1429" footer.
 
 | # | Point | Ruling | Evidence |
@@ -22,3 +24,30 @@ Written 2026-11-19 by the wave 1b lane. Not normative until the stage K coordina
 | KR-45 | Counting exceptions | Overall count = max(actual, hypothetical) (MAR32.5(1), 32.18(1), MAR99.8). A day is an exception when the loss strictly exceeds VaR (-P&L > VaR, VaR positive for a loss, as `var-es-and-backtests.md`), or when the P&L or the VaR is missing (null) (MAR32.5(2), 32.18(2)) | read |
 | KR-46 | Limits | `observations` above 1,000,000 is `E_LIMIT`, checked first in the core (same cap and order as J-W3-17 for `risk.backtest.traffic_light`); arrays above 100,000 by the generic cap | inferred |
 | KR-47 | Desk window | The desk operation applies MAR32.19 to the counts given; the caller supplies the most recent 12 months (250 trading days, MAR32.3(3)). Other n are not rejected; the cumulative probabilities at 1% and 2.5% are information only, as MAR32 uses no probability for desks | read (p.659, 662); inferred |
+
+## Confirmation (stage K coordinator lane, 2026-11-19)
+
+Checked against `06-risk/sa-ccr.md`, `06-risk/frtb-ima-backtest.md`, the two parameter tables, the goldens `saccr_k`, `btk_k`, `tlk_k`, the Python reference and the Java, Rust and C++ ports (evidence class read; the four conformance runs on `k-r1` are the measured check).
+
+| # | Result | Note |
+|---|---|---|
+| KR-30 | Confirmed | The generator asserts the five printed EADs at the printed digits |
+| KR-31 | Confirmed | The one source rounding (CRE99.90, -7,100 printed, -7,099.30 computed) is accepted within one unit, in the test and nowhere else |
+| KR-32 | Confirmed, inferred reading kept | Middle IR bucket inclusive at 5 years in all four builds |
+| KR-33 | Confirmed | Electricity and oil and gas map to energy; two subclasses on one entity is `E_INPUT` |
+| KR-34 | Confirmed | |
+| KR-35 | Confirmed | MPOR floor 10, or 9 plus the re-margining days; 20 above 5,000 trades or illiquid; doubled for disputes; then the caller's figure if larger |
+| KR-36 | Confirmed | Multiplier exactly 1 when V - C >= 0, before any exponential, in all four builds; floor 0.05 at zero add-on |
+| KR-37 | Confirmed | EAD = min(margined, unmargined) with `capped` set, in all four builds |
+| KR-38 | Confirmed | Shift applied to both price and strike |
+| KR-39 | Confirmed | Scope limits match the spec's Limits section |
+| KR-40 | Confirmed | |
+| KR-41 | Confirmed | Multiplier table from MAR99 Table 2; 2.00 at 10 exceptions |
+| KR-42 | Confirmed | Multiplier null unless n = 250 |
+| KR-43 | Confirmed | `tlk_k` replays MAR99 Table 2 rows 0 to 10 and SciPy |
+| KR-44 | Confirmed, **inferred** reading kept | "More than" read as covering both 12 and 30. All four builds use `> 12` and `> 30`; btk_k-0019 (12 and 30) is eligible and btk_k-0021 (31) breaches. The other reading (30 itself a breach) is not excluded by the text, so the ruling stays labelled inferred |
+| KR-45 | Confirmed | Strict loss above VaR; a null P&L or VaR counts as an exception |
+| KR-46 | Confirmed | 1,000,000 cap, `E_LIMIT` first, all four builds |
+| KR-47 | Confirmed | |
+
+Integration notes (no ruling changed): `risk.frtb.backtest.desk` takes Integers only and is listed in `conformance/E1_EXEMPT.json`; `risk.frtb.backtest.zone` has no E1 golden and cannot be exempt while btk_k-0029 sends the Real 1.5 (open point for the coordinator; `06-risk/frtb-ima-backtest.md`, Goldens).
