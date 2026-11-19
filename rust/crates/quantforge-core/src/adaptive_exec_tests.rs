@@ -331,7 +331,7 @@ fn lit_fills(buy: bool, book: &[(i64, i64)], limit: i64, child: f64) -> (f64, f6
         ("taker_fee".into(), Json::Str("0".into())),
         ("maker_rebate".into(), Json::Str("0".into())),
     ]);
-    let out = lit_matching::run("0.01", "0.125", &events, &fees).unwrap();
+    let out = lit_matching::run("0.01", "0.125", &events, &fees, None).unwrap();
     let lim = limit as f64 / 100.0;
     let (mut q, mut notional) = (0.0, 0.0);
     for f in out.get("fills").and_then(Json::as_array).unwrap() {
