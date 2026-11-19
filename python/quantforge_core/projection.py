@@ -173,6 +173,41 @@ def bootstrap(
     ), error
 
 
+def bootstrap_incremental(
+    discount_data: CurveData,
+    index: str,
+    as_of: date,
+    previous_quotes: Sequence[ProjectionQuote],
+    previous_factors: Sequence[float],
+    new_quotes: Sequence[ProjectionQuote],
+    interpolation: str,
+) -> tuple[CurveData, float, int | None, int]:
+    """K-4b on the stage B projection bootstrap (deposits, FRAs, swaps; one discount curve held
+    fixed): `bootstrap` of `new_quotes`, solving only the pillars at and after the first quote whose
+    type, months or rate differs. Returns (curve, max_repricing_error, first changed index or None,
+    pillars recomputed)."""
+    discount = curves.build(discount_data)
+
+    def solve(quotes: Sequence[ProjectionQuote]) -> curves.Solve:
+        pillars, terms, _ = term_models(index, as_of, quotes)
+        models: list[curves.Model] = [lambda p, m=m: m(p, discount) for m in terms]  # type: ignore[misc]
+        if any(b <= a for a, b in itertools.pairwise(pillars)):
+            raise QfError("E_INPUT", "quotes are not in pillar order", "quotes")
+        keys = [(q.kind, q.months, q.rate) for q in quotes]
+        return curves.Solve(pillars, models, [q.rate for q in quotes], keys)
+
+    new = solve(new_quotes)
+    factors, error, first, recomputed = curves.incremental_solve(
+        as_of, interpolation, (), solve(previous_quotes), previous_factors, new
+    )
+    return (
+        CurveData(as_of, interpolation, tuple(new.pillars), tuple(factors)),
+        error,
+        first,
+        recomputed,
+    )
+
+
 def swap_pv(
     discount_data: CurveData,
     projection_data: CurveData,
