@@ -1,0 +1,722 @@
+{
+ "saccr_k-0006": {
+  "addon": {
+   "COMMODITY": 0.0,
+   "CREDIT": 0.0,
+   "EQUITY": 0.0,
+   "FX": 0.0,
+   "IR": 625.1531562746511
+  },
+  "addon_aggregate": 625.1531562746511,
+  "c": 0.0,
+  "capped": false,
+  "ead": 959.2144187845115,
+  "ead_unmargined": null,
+  "hedging_sets": [
+   {
+    "addon": 50.414569065266406,
+    "asset_class": "IR",
+    "key": "EUR",
+    "treatment": "NORMAL"
+   },
+   {
+    "addon": 574.7385872093847,
+    "asset_class": "IR",
+    "key": "USD",
+    "treatment": "NORMAL"
+   }
+  ],
+  "margined": false,
+  "mpor_days": null,
+  "multiplier": 1.0,
+  "pfe": 625.1531562746511,
+  "rc": 60.0,
+  "trades": [
+   {
+    "adjusted_notional": 78693.86805747332,
+    "delta": 1.0,
+    "effective_notional": 78693.86805747332,
+    "id": "1",
+    "maturity_factor": 1.0,
+    "supervisory_duration": 7.8693868057473315,
+    "supervisory_factor": 0.005
+   },
+   {
+    "adjusted_notional": 36253.849384403635,
+    "delta": -1.0,
+    "effective_notional": -36253.849384403635,
+    "id": "2",
+    "maturity_factor": 1.0,
+    "supervisory_duration": 3.6253849384403636,
+    "supervisory_factor": 0.005
+   },
+   {
+    "adjusted_notional": 37427.961412022734,
+    "delta": -0.2693952177105327,
+    "effective_notional": -10082.913813053281,
+    "id": "3",
+    "maturity_factor": 1.0,
+    "supervisory_duration": 7.485592282404547,
+    "supervisory_factor": 0.005
+   }
+  ],
+  "v": 60
+ },
+ "saccr_k-0007": {
+  "addon": {
+   "COMMODITY": 0.0,
+   "CREDIT": 0.0,
+   "EQUITY": 0.0,
+   "FX": 16.789830006379894,
+   "IR": 0.0
+  },
+  "addon_aggregate": 16.789830006379894,
+  "c": 0.0,
+  "capped": false,
+  "ead": 37.505762008931846,
+  "ead_unmargined": null,
+  "hedging_sets": [
+   {
+    "addon": 4.284271247461902,
+    "asset_class": "FX",
+    "key": "EURUSD",
+    "treatment": "NORMAL"
+   },
+   {
+    "addon": 12.505558758917992,
+    "asset_class": "FX",
+    "key": "USDJPY",
+    "treatment": "NORMAL"
+   }
+  ],
+  "margined": false,
+  "mpor_days": null,
+  "multiplier": 1.0,
+  "pfe": 16.789830006379894,
+  "rc": 10.0,
+  "trades": [
+   {
+    "adjusted_notional": 1000,
+    "delta": 1.0,
+    "effective_notional": 707.1067811865476,
+    "id": "f1",
+    "maturity_factor": 0.7071067811865476,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.04
+   },
+   {
+    "adjusted_notional": 600,
+    "delta": -1.0,
+    "effective_notional": -600.0,
+    "id": "f2",
+    "maturity_factor": 1.0,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.04
+   },
+   {
+    "adjusted_notional": 800,
+    "delta": -0.39079871121618726,
+    "effective_notional": -312.6389689729498,
+    "id": "f3",
+    "maturity_factor": 1.0,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.04
+   }
+  ],
+  "v": 10
+ },
+ "saccr_k-0008": {
+  "addon": {
+   "COMMODITY": 0.0,
+   "CREDIT": 0.0,
+   "EQUITY": 91.35509001849812,
+   "FX": 0.0,
+   "IR": 0.0
+  },
+  "addon_aggregate": 91.35509001849812,
+  "c": 10,
+  "capped": false,
+  "ead": 146.09712602589735,
+  "ead_unmargined": null,
+  "hedging_sets": [
+   {
+    "addon": 91.35509001849812,
+    "asset_class": "EQUITY",
+    "key": "",
+    "treatment": "NORMAL"
+   }
+  ],
+  "margined": false,
+  "mpor_days": null,
+  "multiplier": 1.0,
+  "pfe": 91.35509001849812,
+  "rc": 13,
+  "trades": [
+   {
+    "adjusted_notional": 500,
+    "delta": 1.0,
+    "effective_notional": 500.0,
+    "id": "e1",
+    "maturity_factor": 1.0,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.32
+   },
+   {
+    "adjusted_notional": 300,
+    "delta": -1.0,
+    "effective_notional": -212.13203435596427,
+    "id": "e2",
+    "maturity_factor": 0.7071067811865476,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.32
+   },
+   {
+    "adjusted_notional": 1000,
+    "delta": -0.35871913187582904,
+    "effective_notional": -358.719131875829,
+    "id": "e3",
+    "maturity_factor": 1.0,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.2
+   }
+  ],
+  "v": 23
+ },
+ "saccr_k-0009": {
+  "addon": {
+   "COMMODITY": 0.0,
+   "CREDIT": 86.03112203934711,
+   "EQUITY": 0.0,
+   "FX": 0.0,
+   "IR": 0.0
+  },
+  "addon_aggregate": 86.03112203934711,
+  "c": 0.0,
+  "capped": false,
+  "ead": 126.04357085508595,
+  "ead_unmargined": null,
+  "hedging_sets": [
+   {
+    "addon": 86.03112203934711,
+    "asset_class": "CREDIT",
+    "key": "",
+    "treatment": "NORMAL"
+   }
+  ],
+  "margined": false,
+  "mpor_days": null,
+  "multiplier": 1.0,
+  "pfe": 86.03112203934711,
+  "rc": 4.0,
+  "trades": [
+   {
+    "adjusted_notional": 4423.984338571902,
+    "delta": 5.335040546308152,
+    "effective_notional": 23602.135822513348,
+    "id": "c1",
+    "maturity_factor": 1.0,
+    "supervisory_duration": 4.423984338571902,
+    "supervisory_factor": 0.0038
+   },
+   {
+    "adjusted_notional": 1392.9202357494219,
+    "delta": -0.4166666666666667,
+    "effective_notional": -580.3834315622591,
+    "id": "c2",
+    "maturity_factor": 1.0,
+    "supervisory_duration": 2.785840471498844,
+    "supervisory_factor": 0.0106
+   },
+   {
+    "adjusted_notional": 32.0,
+    "delta": 1.0,
+    "effective_notional": 6.4,
+    "id": "c3",
+    "maturity_factor": 0.2,
+    "supervisory_duration": 0.04,
+    "supervisory_factor": 0.06
+   }
+  ],
+  "v": 4
+ },
+ "saccr_k-0010": {
+  "addon": {
+   "COMMODITY": 232.11348668927465,
+   "CREDIT": 0.0,
+   "EQUITY": 0.0,
+   "FX": 0.0,
+   "IR": 0.0
+  },
+  "addon_aggregate": 232.11348668927465,
+  "c": 0.0,
+  "capped": false,
+  "ead": 327.7588813649845,
+  "ead_unmargined": null,
+  "hedging_sets": [
+   {
+    "addon": 45.0,
+    "asset_class": "COMMODITY",
+    "key": "AGRICULTURAL",
+    "treatment": "NORMAL"
+   },
+   {
+    "addon": 164.61348668927465,
+    "asset_class": "COMMODITY",
+    "key": "ENERGY",
+    "treatment": "NORMAL"
+   },
+   {
+    "addon": 22.5,
+    "asset_class": "COMMODITY",
+    "key": "BRENT/HENRY HUB",
+    "treatment": "BASIS"
+   }
+  ],
+  "margined": false,
+  "mpor_days": null,
+  "multiplier": 1.0,
+  "pfe": 232.11348668927465,
+  "rc": 2.0,
+  "trades": [
+   {
+    "adjusted_notional": 400,
+    "delta": 1.0,
+    "effective_notional": 400.0,
+    "id": "p1",
+    "maturity_factor": 1.0,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.4
+   },
+   {
+    "adjusted_notional": 400,
+    "delta": -1.0,
+    "effective_notional": -400.0,
+    "id": "p2",
+    "maturity_factor": 1.0,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.18
+   },
+   {
+    "adjusted_notional": 250,
+    "delta": 1.0,
+    "effective_notional": 250.0,
+    "id": "p3",
+    "maturity_factor": 1.0,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.18
+   },
+   {
+    "adjusted_notional": 250,
+    "delta": 1.0,
+    "effective_notional": 250.0,
+    "id": "p4",
+    "maturity_factor": 1.0,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.09
+   }
+  ],
+  "v": 2
+ },
+ "saccr_k-0011": {
+  "addon": {
+   "COMMODITY": 0.0,
+   "CREDIT": 0.0,
+   "EQUITY": 99.99999999999999,
+   "FX": 0.0,
+   "IR": 6.96460117874711
+  },
+  "addon_aggregate": 106.9646011787471,
+  "c": 0.0,
+  "capped": false,
+  "ead": 149.75044165024593,
+  "ead_unmargined": null,
+  "hedging_sets": [
+   {
+    "addon": 6.96460117874711,
+    "asset_class": "IR",
+    "key": "USD SOFR/TBILL",
+    "treatment": "BASIS"
+   },
+   {
+    "addon": 99.99999999999999,
+    "asset_class": "EQUITY",
+    "key": "EQ VOL",
+    "treatment": "VOLATILITY"
+   }
+  ],
+  "margined": false,
+  "mpor_days": null,
+  "multiplier": 1.0,
+  "pfe": 106.9646011787471,
+  "rc": 0.0,
+  "trades": [
+   {
+    "adjusted_notional": 100,
+    "delta": 1.0,
+    "effective_notional": 100.0,
+    "id": "v1",
+    "maturity_factor": 1.0,
+    "supervisory_duration": null,
+    "supervisory_factor": 1.0
+   },
+   {
+    "adjusted_notional": 2785.8404714988437,
+    "delta": 1.0,
+    "effective_notional": 2785.8404714988437,
+    "id": "i1",
+    "maturity_factor": 1.0,
+    "supervisory_duration": 2.785840471498844,
+    "supervisory_factor": 0.0025
+   }
+  ],
+  "v": 0
+ },
+ "saccr_k-0012": {
+  "addon": {
+   "COMMODITY": 0.0,
+   "CREDIT": 0.0,
+   "EQUITY": 0.0,
+   "FX": 0.0,
+   "IR": 57.038021538889346
+  },
+  "addon_aggregate": 57.038021538889346,
+  "c": 0.0,
+  "capped": false,
+  "ead": 79.85323015444509,
+  "ead_unmargined": null,
+  "hedging_sets": [
+   {
+    "addon": 57.038021538889346,
+    "asset_class": "IR",
+    "key": "EUR",
+    "treatment": "NORMAL"
+   }
+  ],
+  "margined": false,
+  "mpor_days": null,
+  "multiplier": 1.0,
+  "pfe": 57.038021538889346,
+  "rc": 0.0,
+  "trades": [
+   {
+    "adjusted_notional": 927.8401292950899,
+    "delta": 0.3494123582618257,
+    "effective_notional": 324.1988076669546,
+    "id": "n1",
+    "maturity_factor": 1.0,
+    "supervisory_duration": 0.92784012929509,
+    "supervisory_factor": 0.005
+   },
+   {
+    "adjusted_notional": 987.6035188666954,
+    "delta": 1.0,
+    "effective_notional": 698.3411453143368,
+    "id": "n2",
+    "maturity_factor": 0.7071067811865476,
+    "supervisory_duration": 0.4938017594333477,
+    "supervisory_factor": 0.005
+   },
+   {
+    "adjusted_notional": 11812.476411251462,
+    "delta": -1.0,
+    "effective_notional": -11812.476411251462,
+    "id": "n3",
+    "maturity_factor": 1.0,
+    "supervisory_duration": 5.906238205625731,
+    "supervisory_factor": 0.005
+   }
+  ],
+  "v": 0
+ },
+ "saccr_k-0013": {
+  "addon": {
+   "COMMODITY": 2160.0000000000005,
+   "CREDIT": 0.0,
+   "EQUITY": 0.0,
+   "FX": 0.0,
+   "IR": 208.0586318302911
+  },
+  "addon_aggregate": 2368.0586318302917,
+  "c": 200,
+  "capped": false,
+  "ead": 3232.392363418537,
+  "ead_unmargined": 5779.716352199415,
+  "hedging_sets": [
+   {
+    "addon": 30.248741439159854,
+    "asset_class": "IR",
+    "key": "EUR",
+    "treatment": "NORMAL"
+   },
+   {
+    "addon": 177.80989039113123,
+    "asset_class": "IR",
+    "key": "USD",
+    "treatment": "NORMAL"
+   },
+   {
+    "addon": 1080.0000000000002,
+    "asset_class": "COMMODITY",
+    "key": "ENERGY",
+    "treatment": "NORMAL"
+   },
+   {
+    "addon": 1080.0000000000002,
+    "asset_class": "COMMODITY",
+    "key": "METALS",
+    "treatment": "NORMAL"
+   }
+  ],
+  "margined": true,
+  "mpor_days": 40,
+  "multiplier": 0.9749976867640173,
+  "pfe": 2308.851688156098,
+  "rc": 0.0,
+  "trades": [
+   {
+    "adjusted_notional": 78693.86805747332,
+    "delta": 1.0,
+    "effective_notional": 47216.320834483995,
+    "id": "1",
+    "maturity_factor": 0.6000000000000001,
+    "supervisory_duration": 7.8693868057473315,
+    "supervisory_factor": 0.005
+   },
+   {
+    "adjusted_notional": 36253.849384403635,
+    "delta": -1.0,
+    "effective_notional": -21752.309630642183,
+    "id": "2",
+    "maturity_factor": 0.6000000000000001,
+    "supervisory_duration": 3.6253849384403636,
+    "supervisory_factor": 0.005
+   },
+   {
+    "adjusted_notional": 37427.961412022734,
+    "delta": -0.2693952177105327,
+    "effective_notional": -6049.748287831971,
+    "id": "3",
+    "maturity_factor": 0.6000000000000001,
+    "supervisory_duration": 7.485592282404547,
+    "supervisory_factor": 0.005
+   },
+   {
+    "adjusted_notional": 10000,
+    "delta": 1.0,
+    "effective_notional": 6000.000000000001,
+    "id": "7",
+    "maturity_factor": 0.6000000000000001,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.18
+   },
+   {
+    "adjusted_notional": 20000,
+    "delta": -1.0,
+    "effective_notional": -12000.000000000002,
+    "id": "8",
+    "maturity_factor": 0.6000000000000001,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.18
+   },
+   {
+    "adjusted_notional": 10000,
+    "delta": 1.0,
+    "effective_notional": 6000.000000000001,
+    "id": "9",
+    "maturity_factor": 0.6000000000000001,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.18
+   }
+  ],
+  "v": 80
+ },
+ "saccr_k-0014": {
+  "addon": {
+   "COMMODITY": 1322.7244611029162,
+   "CREDIT": 0.0,
+   "EQUITY": 0.0,
+   "FX": 0.0,
+   "IR": 127.40937114144988
+  },
+  "addon_aggregate": 1450.133832244366,
+  "c": 200,
+  "capped": false,
+  "ead": 1947.9903277732792,
+  "ead_unmargined": 5779.716352199415,
+  "hedging_sets": [
+   {
+    "addon": 18.52349547183063,
+    "asset_class": "IR",
+    "key": "EUR",
+    "treatment": "NORMAL"
+   },
+   {
+    "addon": 108.88587566961925,
+    "asset_class": "IR",
+    "key": "USD",
+    "treatment": "NORMAL"
+   },
+   {
+    "addon": 661.3622305514581,
+    "asset_class": "COMMODITY",
+    "key": "ENERGY",
+    "treatment": "NORMAL"
+   },
+   {
+    "addon": 661.3622305514581,
+    "asset_class": "COMMODITY",
+    "key": "METALS",
+    "treatment": "NORMAL"
+   }
+  ],
+  "margined": true,
+  "mpor_days": 15,
+  "multiplier": 0.9595125854981965,
+  "pfe": 1391.4216626951995,
+  "rc": 0.0,
+  "trades": [
+   {
+    "adjusted_notional": 78693.86805747332,
+    "delta": 1.0,
+    "effective_notional": 28913.97339400705,
+    "id": "1",
+    "maturity_factor": 0.3674234614174767,
+    "supervisory_duration": 7.8693868057473315,
+    "supervisory_factor": 0.005
+   },
+   {
+    "adjusted_notional": 36253.849384403635,
+    "delta": -1.0,
+    "effective_notional": -13320.51483052544,
+    "id": "2",
+    "maturity_factor": 0.3674234614174767,
+    "supervisory_duration": 3.6253849384403636,
+    "supervisory_factor": 0.005
+   },
+   {
+    "adjusted_notional": 37427.961412022734,
+    "delta": -0.2693952177105327,
+    "effective_notional": -3704.699094366126,
+    "id": "3",
+    "maturity_factor": 0.3674234614174767,
+    "supervisory_duration": 7.485592282404547,
+    "supervisory_factor": 0.005
+   },
+   {
+    "adjusted_notional": 10000,
+    "delta": 1.0,
+    "effective_notional": 3674.234614174767,
+    "id": "7",
+    "maturity_factor": 0.3674234614174767,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.18
+   },
+   {
+    "adjusted_notional": 20000,
+    "delta": -1.0,
+    "effective_notional": -7348.469228349534,
+    "id": "8",
+    "maturity_factor": 0.3674234614174767,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.18
+   },
+   {
+    "adjusted_notional": 10000,
+    "delta": 1.0,
+    "effective_notional": 3674.234614174767,
+    "id": "9",
+    "maturity_factor": 0.3674234614174767,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.18
+   }
+  ],
+  "v": 80
+ },
+ "saccr_k-0015": {
+  "addon": {
+   "COMMODITY": 0.0,
+   "CREDIT": 0.0,
+   "EQUITY": 0.0,
+   "FX": 0.0,
+   "IR": 0.06000000000000001
+  },
+  "addon_aggregate": 0.06000000000000001,
+  "c": 0.0,
+  "capped": true,
+  "ead": 1.456,
+  "ead_unmargined": 1.456,
+  "hedging_sets": [
+   {
+    "addon": 0.06000000000000001,
+    "asset_class": "IR",
+    "key": "USD",
+    "treatment": "NORMAL"
+   }
+  ],
+  "margined": true,
+  "mpor_days": 10,
+  "multiplier": 1.0,
+  "pfe": 0.06000000000000001,
+  "rc": 1000000,
+  "trades": [
+   {
+    "adjusted_notional": 40.0,
+    "delta": 1.0,
+    "effective_notional": 12.000000000000002,
+    "id": "s1",
+    "maturity_factor": 0.30000000000000004,
+    "supervisory_duration": 0.04,
+    "supervisory_factor": 0.005
+   }
+  ],
+  "v": 1
+ },
+ "saccr_k-0016": {
+  "addon": {
+   "COMMODITY": 0.0,
+   "CREDIT": 0.0,
+   "EQUITY": 0.0,
+   "FX": 0.0,
+   "IR": 0.0
+  },
+  "addon_aggregate": 0.0,
+  "c": 0.0,
+  "capped": false,
+  "ead": 0.0,
+  "ead_unmargined": null,
+  "hedging_sets": [
+   {
+    "addon": 0.0,
+    "asset_class": "FX",
+    "key": "GBPUSD",
+    "treatment": "NORMAL"
+   }
+  ],
+  "margined": false,
+  "mpor_days": null,
+  "multiplier": 0.05,
+  "pfe": 0.0,
+  "rc": 0.0,
+  "trades": [
+   {
+    "adjusted_notional": 1000,
+    "delta": 1.0,
+    "effective_notional": 1000.0,
+    "id": "z1",
+    "maturity_factor": 1.0,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.04
+   },
+   {
+    "adjusted_notional": 1000,
+    "delta": -1.0,
+    "effective_notional": -1000.0,
+    "id": "z2",
+    "maturity_factor": 1.0,
+    "supervisory_duration": null,
+    "supervisory_factor": 0.04
+   }
+  ],
+  "v": -10
+ }
+}
