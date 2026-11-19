@@ -308,7 +308,7 @@ Stage H (v0.10.0, execution and microstructure) is implemented in all four langu
 | Liquidity seeking | Takes a fixed share of the depth inside a limit price in each bucket |
 | Cash-balanced pair | Two legs on opposite sides traded so that cash paid and received stay close in every bucket |
 | Tick size | The smallest price step on a venue. US equities: 0.0001 below 1.00 and 0.01 at or above; the amended Rule 612 adds a 0.005 tier with compliance date 2027-11-01 (`micro.eq.round_price`, HR-81, HR-120) |
-| Round lot | The standard order size: 100, 40, 10 or 1 shares by price since 2025-11-03, 100 at every price before (`micro.eq.round_lot`, HR-82, HR-120) |
+| Round lot | The standard order size: 100, 40, 10 or 1 shares by price since the first business day of November 2025, 100 at every price before (`micro.eq.round_lot`, HR-82, HR-120) |
 | Access fee cap | The most a venue may charge to take a displayed quote: 0.003 a share today; the amended 0.001 cap has compliance date 2027-11-01 (`micro.eq.fee_check`, HR-85, HR-120) |
 | Compliance date | The date from which an amended rule must be followed. An input (`compliance_date`) with a default per rule; `as_of` on or after it selects the amended text, and so does no `as_of` at all (HR-120) |
 | T+1 | Settlement one good business day after the trade date (`micro.eq.settle_date`, HR-86) |

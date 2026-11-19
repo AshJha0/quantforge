@@ -1046,18 +1046,18 @@ The same fee of 0.0015 fails with no `as_of` (amended cap 0.001), passes on 2026
 
 ### Find the round lot for a price
 
-Plain idea: the standard order size shrinks as the share price rises. Formally (HR-82, HR-120; SEC Rule 600(b)(93)): 100 shares up to 250.00, 40 up to 1,000.00, 10 up to 10,000.00 and 1 above. This rule was not deferred: it has applied since 2025-11-03, and before that the lot was 100 at every price.
+Plain idea: the standard order size shrinks as the share price rises. Formally (HR-82, HR-120; SEC Rule 600(b)(93)): 100 shares up to 250.00, 40 up to 1,000.00, 10 up to 10,000.00 and 1 above. This rule was not deferred: it has applied since the first business day of November 2025, and before that the lot was 100 at every price.
 
 ```json
 {"schema_version":"1.0","case_id":"eqc_h-0015","operation":"micro.eq.round_lot","inputs":{"price":"250.01"}}
 {"schema_version":"1.0","case_id":"eqc_h-0025","operation":"micro.eq.round_lot","inputs":{"as_of":"2026-11-19","price":"500"}}
-{"schema_version":"1.0","case_id":"eqc_h-0026","operation":"micro.eq.round_lot","inputs":{"as_of":"2025-10-31","price":"500"}}
+{"schema_version":"1.0","case_id":"round-lot-old","operation":"micro.eq.round_lot","inputs":{"as_of":"2012-06-01","price":"500"}}
 ```
 
 ```json
 {"schema_version":"1.0","case_id":"eqc_h-0015","status":"ok","outputs":{"round_lot":40},"diagnostics":{}}
 {"schema_version":"1.0","case_id":"eqc_h-0025","status":"ok","outputs":{"round_lot":40},"diagnostics":{}}
-{"schema_version":"1.0","case_id":"eqc_h-0026","status":"ok","outputs":{"round_lot":100},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"round-lot-old","status":"ok","outputs":{"round_lot":100},"diagnostics":{}}
 ```
 
 Limits: `price` stands for the rule's Evaluation-Period average closing price; the six-month operative period is not modelled.
