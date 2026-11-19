@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 import org.quantforge.core.QfError;
-import org.quantforge.pricing.CreditOptions;
 
 /**
  * Stage K wave 1 core (PROPOSED, KR-1 to KR-14): the acceptance tests the specs fixed (KR-4 correction property,
- * incremental-update property, trigger simulation, intraday bound on a seeded book) and the error paths. The golden
+ * incremental-update property, trigger simulation (KR-232), intraday bound on a seeded book and the KR-234
+ * small-move sweep) and the error paths in the HR-122 order (KR-230). The golden
  * rows run through the CLI in GoldenSuiteTest and StageKCliTest.
  */
 class StageKTest {
@@ -191,6 +191,13 @@ class StageKTest {
         code("E_INPUT", () -> StageK.incrementalUpdate(negZero, new double[] {-1.0}, negZero));
         double[] big = new double[StageK.MAX_QUOTES + 1];
         code("E_LIMIT", () -> StageK.incrementalUpdate(big, StageK.bootstrapFrom(big, big, 0), big));
+        // KR-230: E_LIMIT, the finite rule, structural E_INPUT, E_DOMAIN, stale-cache E_INPUT
+        code("E_LIMIT", () -> StageK.incrementalUpdate(q, new double[] {Double.NaN}, big));
+        code("E_DOMAIN", () -> StageK.incrementalUpdate(q, new double[] {Double.NaN}, new double[2]));
+        code("E_INPUT", () -> StageK.incrementalUpdate(new double[] {-3, 0, 0}, dfs, new double[2]));
+        double[] bigNan = new double[StageK.MAX_QUOTES + 1];
+        bigNan[0] = Double.NaN;
+        code("E_LIMIT", () -> StageK.parAnnual(bigNan));
         StageK.Update same = StageK.incrementalUpdate(q, dfs, q.clone());
         assertNull(same.firstChangedIndex());
         assertEquals(0, same.recomputed());
@@ -201,53 +208,80 @@ class StageKTest {
 
     @Test
     void triggerSimulationAcceptance() {
-        // recalibration-triggers.md: 100,000 noise paths, window 250, k = 3, d = 1; fire rate inside the 99 %
-        // binomial interval (exact, scipy binom.interval) of the Student-t predictive rate; a
-        // 6-sigma planted move fires on at least 99.9 % of paths.
-        Random rnd = new Random(20261118);
-        int n = 100_000;
-        int w = 250;
+        // KR-232 acceptance (replaces the window-250 simulation of the first version): for n in {2, 4, 30, 250},
+        // k = 3, d = 1, 100,000 noise paths per n, each a fresh window of n N(0, 1) changes and an independent
+        // N(0, 1) move; the fire count lies in the 99 % binomial interval (scipy binom.interval: ppf(0.005),
+        // ppf(0.995)) of paths x the operation's own false_alarm_rate. A 6-sigma planted move fires on at least
+        // 99.9 % of the n = 250 paths.
+        Random rnd = new Random(20261119);
+        int paths = 100_000;
         double k = 3.0;
-        int fires = 0;
-        int planted = 0;
-        double[] z = new double[w];
-        for (int p = 0; p < n; p++) {
-            for (int i = 0; i < w; i++) {
-                z[i] = rnd.nextGaussian();
+        StringBuilder rec = new StringBuilder();
+        boolean ok = true;
+        for (int n : new int[] {2, 4, 30, 250}) {
+            int fires = 0;
+            int planted = 0;
+            double[] z = new double[n];
+            for (int p = 0; p < paths; p++) {
+                for (int i = 0; i < n; i++) {
+                    z[i] = rnd.nextGaussian();
+                }
+                double next = rnd.nextGaussian();
+                double sig = StageK.sampleSd(z);
+                boolean fire = Math.abs(next) > k * sig;
+                if (fire) {
+                    fires++;
+                }
+                if (6.0 > k * sig) {
+                    planted++;
+                }
+                if (p < 100) { // the operation itself agrees with the rule on a sample
+                    assertEquals(fire, StageK.triggerCheck(z, 0.0, next, 1.0, k).fire());
+                }
             }
-            double next = rnd.nextGaussian();
-            double sig = StageK.sampleSd(z);
-            boolean fire = Math.abs(next) > k * sig;
-            if (fire) {
-                fires++;
+            double[] window = new double[n];
+            for (int i = 0; i < n; i++) {
+                window[i] = i == n - 1 && n % 2 == 1 ? 0.5 : i % 2 == 0 ? 1.0 : -1.0;
             }
-            if (6.0 > k * sig) {
-                planted++;
-            }
-            if (p < 200) {
-                assertEquals(fire, StageK.triggerCheck(z, 0.0, next, 1.0, k).fire());
-            }
+            double rate = StageK.triggerCheck(window, 0.0, 0.0, 1.0, k).falseAlarmRate();
+            int lo = binomPpf(paths, rate, 0.005);
+            int hi = binomPpf(paths, rate, 0.995);
+            boolean passed = lo <= fires && fires <= hi;
+            ok = ok && passed && (n != 250 || planted >= 0.999 * paths);
+            rec.append(rec.length() == 0 ? "" : ", ").append('"').append(n).append("\": {\"fires\": ").append(fires)
+                    .append(", \"false_alarm_rate\": ").append(rate).append(", \"nominal_rate\": ")
+                    .append(2.0 * org.quantforge.core.Normal.cdf(-k)).append(", \"binomial_99_interval\": [")
+                    .append(lo).append(", ").append(hi).append("], \"planted_6_sigma_fires\": ").append(planted)
+                    .append(", \"pass\": ").append(passed).append('}');
         }
-        double centre = 2 * (1 - CreditOptions.studentCdf(k / Math.sqrt(1 + 1.0 / w), w - 1));
-        int lo = binomPpf(n, centre, 0.005);
-        int hi = binomPpf(n, centre, 0.995);
-        evidence("trigger_simulation", "{\"paths\": " + n + ", \"window\": " + w + ", \"k\": " + k
-                + ", \"fires\": " + fires + ", \"centre_rate\": " + centre + ", \"binomial_99_interval\": [" + lo
-                + ", " + hi + "], \"planted_6_sigma_fires\": " + planted + ", \"planted_rate\": " + planted / (double) n
-                + ", \"seed\": \"java.util.Random(20261118)\", \"pass\": "
-                + (lo <= fires && fires <= hi && planted >= 0.999 * n) + "}");
-        assertTrue(lo <= fires && fires <= hi, fires + " outside [" + lo + ", " + hi + "]");
-        assertTrue(planted >= 0.999 * n);
+        evidence("trigger_simulation_kr232", "{\"paths\": " + paths + ", \"k\": " + k
+                + ", \"seed\": \"java.util.Random(20261119)\", \"by_window\": {" + rec + "}, \"pass\": " + ok + "}");
+        assertTrue(ok, rec.toString());
     }
 
     @Test
-    void falseAlarmRateIsTwiceTheNormalTail() {
-        // KR-6 states 2 (1 - N(k)) = 2 N(-k); at k = 30 a bare erfc(k / sqrt 2) is 1.2e-13 off (trig_k-0009,
-        // mpmath 50 digits).
+    void falseAlarmRateIsStudentTAndNominalRateTwiceTheNormalTail() {
+        // KR-6 states 2 (1 - N(k)) = 2 N(-k) (nominal_rate); at k = 30 a bare erfc(k / sqrt 2) is 1.2e-13 off
+        // (trig_k-0009, mpmath 50 digits).
         double[] c = {1, -1, 1, -1};
-        assertEquals(2.0 * org.quantforge.core.Normal.cdf(-3.0), StageK.triggerCheck(c, 100, 105, 1, 3).falseAlarmRate());
-        double far = StageK.triggerCheck(c, 100, 105, 1, 30).falseAlarmRate();
+        assertEquals(2.0 * org.quantforge.core.Normal.cdf(-3.0), StageK.triggerCheck(c, 100, 105, 1, 3).nominalRate());
+        double far = StageK.triggerCheck(c, 100, 105, 1, 30).nominalRate();
         assertTrue(Math.abs(far / 9.813427854296374e-198 - 1.0) <= 1e-14, () -> "rate " + far);
+        // KR-232: P(|T_nu| > k), against the Python reference (stage_k.student_t_two_sided_tail); the even nu use
+        // only + - * / and sqrt (same bits), the odd nu one atan2 (tail_probability class, 1e-11 relative).
+        double[][] ref = {{1, 3.0, 0.20483276469913345}, {3, 3.0, 0.05766888562243732},
+                {4, 0.5, 0.6433299631818632}, {29, 3.0, 0.0054991921339034135}, {249, 3.0, 0.0029737859324150294},
+                {1, 1e-3, 0.999363380439839}, {2, 40.0, 0.0006244146721847407}, {7, 30.0, 1.1788468880733127e-08},
+                {100000, 3.0, 0.0027004608840696964}};
+        for (double[] r : ref) {
+            double got = StageK.studentTTwoSidedTail((int) r[0], r[1]);
+            if (((int) r[0]) % 2 == 0) {
+                assertEquals(r[2], got, 0.0, () -> r[0] + " " + r[1]);
+            } else {
+                assertTrue(rel(got, r[2]) <= 1e-11, () -> r[0] + " " + r[1] + ": " + got);
+            }
+        }
+        assertEquals(StageK.studentTTwoSidedTail(3, 3.0), StageK.triggerCheck(c, 100, 105, 1, 3).falseAlarmRate());
     }
 
     @Test
@@ -263,10 +297,14 @@ class StageKTest {
             big[i] = i % 2;
         }
         code("E_LIMIT", () -> StageK.triggerCheck(big, 0, 0, 1, 3));
-        code("E_DOMAIN", () -> StageK.triggerCheck(big, 0, 0, 1, -1)); // E_DOMAIN before E_LIMIT
+        code("E_LIMIT", () -> StageK.triggerCheck(big, 0, Double.NaN, 1, -1)); // KR-230: E_LIMIT first
+        code("E_DOMAIN", () -> StageK.triggerCheck(new double[] {1.0}, 0, Double.NaN, 1, 3)); // finite, then shape
+        code("E_INPUT", () -> StageK.triggerCheck(new double[] {1.0}, 0, 0, 1, -1)); // shape, then E_DOMAIN
+        // KR-233: a constant window is E_DOMAIN whatever the rounding (sigma 1.7e-17 in binary64 here)
+        code("E_DOMAIN", () -> StageK.triggerCheck(new double[] {0.1, 0.1, 0.1}, 0, 0, 1, 3));
         StageK.Trigger t = StageK.triggerCheck(c, 100, 104, 1, 3);
         assertTrue(t.fire());
-        assertTrue(rel(t.falseAlarmRate(), 0.002699796063260189) <= 1e-14);
+        assertTrue(rel(t.nominalRate(), 0.002699796063260189) <= 1e-14);
         assertFalse(StageK.triggerCheck(c, 100, 100 + t.threshold(), 1, 3).fire()); // strict
     }
 
@@ -305,6 +343,84 @@ class StageKTest {
                 + "], \"violations\": 0, \"worst_error_over_bound\": " + worst + ", \"min_abs_h\": " + minAbsH + "}");
     }
 
+    private static final double[] SWEEP_T = {1e-6, 1e-3, 0.25, 1.0, 5.0, 30.0, 100.0};
+    private static final double[] SWEEP_Y = {-1.0, -0.01, 0.0, 0.04, 0.3, 1.0};
+    private static final double[] SWEEP_N = {0.0, 1e-6, 1.0, 1e6, -1e6, 1e15, -1e15};
+
+    private static double[] sweepH() {
+        List<Double> h = new ArrayList<>();
+        h.add(0.0);
+        for (int e : new int[] {30, 25, 20, 16, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1}) {
+            double m = Math.pow(10.0, -e); // the moves of the Python sweep (x * 10.0**-e)
+            h.add(m);
+            h.add(-m);
+        }
+        for (double x : new double[] {0.5, -0.5, 1.0, -1.0, 1.0 / 3.0, -0.07}) {
+            h.add(x);
+        }
+        return h.stream().mapToDouble(Double::doubleValue).toArray();
+    }
+
+    /**
+     * KR-234 acceptance, binary64 half (as Python test_intraday_bound_small_move_sweep): |estimate - V_64| <= bound on
+     * every book of the sweep at every move, V_64 the binary64 revaluation. Books: every single position of the
+     * grid, hedged books, delta-neutral pairs and 300 seeded random books (java.util.Random(20261119), not the
+     * Python stream).
+     */
+    @Test
+    void intradayBoundSmallMoveSweep() {
+        List<List<StageK.ZeroPosition>> books = new ArrayList<>();
+        for (double n : SWEEP_N) {
+            for (double t : SWEEP_T) {
+                for (double y : SWEEP_Y) {
+                    books.add(List.of(new StageK.ZeroPosition(n, t, y)));
+                }
+            }
+        }
+        for (double t : SWEEP_T) {
+            for (double y : SWEEP_Y) {
+                books.add(List.of(new StageK.ZeroPosition(1e6, t, y),
+                        new StageK.ZeroPosition(-1e6 * (1 + 1e-12), t, y)));
+                books.add(List.of(new StageK.ZeroPosition(1e6, t, y), new StageK.ZeroPosition(-1e6, t, y)));
+                if (2 * t <= 100) {
+                    double n2 = -1e6 * t * Math.exp(-y * t) / (2 * t * Math.exp(-y * 2 * t));
+                    books.add(List.of(new StageK.ZeroPosition(1e6, t, y), new StageK.ZeroPosition(n2, 2 * t, y)));
+                }
+            }
+        }
+        Random rnd = new Random(20261119);
+        for (int b = 0; b < 300; b++) {
+            int size = 1 + rnd.nextInt(20);
+            List<StageK.ZeroPosition> book = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+                book.add(new StageK.ZeroPosition(-1e9 + 2e9 * rnd.nextDouble(),
+                        SWEEP_T[rnd.nextInt(SWEEP_T.length)] * (0.5 + 0.5 * rnd.nextDouble()),
+                        -0.05 + 0.15 * rnd.nextDouble()));
+            }
+            books.add(book);
+        }
+        double worst = 0;
+        int cases = 0;
+        double[] moves = sweepH();
+        for (List<StageK.ZeroPosition> book : books) {
+            for (double h : moves) {
+                StageK.Intraday r = StageK.deltaGammaBound(book, h);
+                double gap = Math.abs(r.estimatePnl() - StageK.zeroRevalue(book, h));
+                assertTrue(gap <= r.bound(), () -> book + " h=" + h + ": " + gap + " > " + r.bound());
+                if (r.bound() != 0) {
+                    worst = Math.max(worst, gap / r.bound());
+                }
+                cases++;
+            }
+        }
+        evidence("intraday_bound_sweep_kr234", "{\"cases\": " + cases + ", \"worst_binary64_gap_over_bound\": "
+                + worst + "}");
+        assertTrue(cases > 20_000, "cases " + cases);
+        // KA-A6 at h = 1e-9 (Python reference value of the bound; the old output pair failed by a factor 21.6)
+        StageK.Intraday one = StageK.deltaGammaBound(List.of(new StageK.ZeroPosition(1e6, 5.0, 0.04)), 1e-9);
+        assertTrue(rel(one.bound(), 1.7469352659511083e-17) <= 1e-12, () -> "bound " + one.bound());
+    }
+
     @Test
     void intradayErrors() {
         StageK.ZeroPosition p = new StageK.ZeroPosition(1, 1, 0);
@@ -317,7 +433,8 @@ class StageKTest {
         List<StageK.ZeroPosition> big = new ArrayList<>(Collections.nCopies(StageK.MAX_POSITIONS + 1, p));
         code("E_LIMIT", () -> StageK.deltaGammaBound(big, 0.01));
         big.set(big.size() - 1, new StageK.ZeroPosition(1, 0, 0));
-        code("E_DOMAIN", () -> StageK.deltaGammaBound(big, 0.01));
+        code("E_LIMIT", () -> StageK.deltaGammaBound(big, 0.01)); // KR-230: before E_DOMAIN
+        code("E_DOMAIN", () -> StageK.deltaGammaBound(List.of(), Double.NaN)); // finite rule, then shape
         StageK.Intraday z = StageK.deltaGammaBound(List.of(p), 0.0);
         assertEquals(0.0, z.estimatePnl());
         assertEquals(0.0, z.bound());
@@ -328,6 +445,7 @@ class StageKTest {
     @Test
     void richardsonPaths() {
         code("E_INPUT", () -> StageK.richardsonCheck(new double[] {1.0}, 2, 2));
+        code("E_DOMAIN", () -> StageK.richardsonCheck(new double[] {1.0}, Double.NaN, 2)); // KR-230
         code("E_DOMAIN", () -> StageK.richardsonCheck(new double[] {1, 2, 3}, 2, 0));
         code("E_DOMAIN", () -> StageK.richardsonCheck(new double[] {1, 2, 3}, 1, 1));
         code("E_DOMAIN", () -> StageK.richardsonCheck(new double[] {1, Double.NaN, 3}, 2, 1));

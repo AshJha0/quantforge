@@ -85,7 +85,12 @@ class FrtbBacktestTest {
         }
         assertEquals(0.0, FrtbBacktest.binomialCdf(10, -1, 0.01));
         assertEquals(1.0, FrtbBacktest.binomialCdf(10, 10, 0.01));
-        assertEquals(1, FrtbBacktest.firstAtLeast(1, 0.5, 0.9999));
+        assertEquals(1, FrtbBacktest.firstAtLeast(FrtbBacktest.binomialPartialSums(1, 0.5), 1, 0.9999));
+        // KR-237: only + - * /, so the bits equal the Python reference (frtb_backtest.binomial_cdf); at n = 100,000
+        // the lgamma form was 1.3e-10 off the exact rational value (KA-A16).
+        assertEquals(0.9448722135510401, FrtbBacktest.binomialCdf(100_000, 1_050, 0.01), 0.0);
+        assertEquals(0.8921876269036252, FrtbBacktest.binomialCdf(250, 4, 0.01), 0.0);
+        assertEquals(0.9777910867630771, FrtbBacktest.binomialCdf(1_000_000, 10_200, 0.01), 0.0);
     }
 
     @Test
