@@ -6,6 +6,7 @@
 //   pricing model   ois_price, swap_price, fra_price
 //   valuation       Valuation
 // Everything is a pure function of its inputs.
+#include <array>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -214,6 +215,47 @@ double projection_model(const RateConvention& index, const ProjectionInstrument&
 Curve projection_bootstrap(const Curve& discount, const RateConvention& index, Date as_of,
                            const std::vector<ProjectionQuote>& quotes, CurveInterpolation interpolation,
                            double* max_repricing_error = nullptr, const CurveShape& shape = {});
+
+// ---- K-4b: incremental update of the sequential bootstrap (incremental-update.md, ruling KR-5) ----
+
+/// One sequential bootstrap as solve_curve_incremental reads it: pillar dates, targets, the model of
+/// quote j, and a key per quote that differs exactly when that quote's instrument or target does.
+struct SequentialProblem {
+    std::vector<Date> dates;
+    std::vector<double> targets;
+    ModelRate model;
+    std::vector<std::array<long long, 3>> keys;
+};
+
+/// first_changed_index is empty when no quote changed; recomputed counts the pillars solved again.
+struct IncrementalCurve {
+    SolvedCurve solved;
+    std::optional<std::size_t> first_changed_index;
+    std::size_t recomputed;
+};
+
+/// As curve.incremental.update: previous_factors (the pillar discount factors) must equal the
+/// sequential solve of the previous quotes bit for bit (E_INPUT otherwise; a stale cache is not
+/// patched). That check is a full solve of the previous quotes, which also gives the exact logs
+/// from which the pillars at and after the first changed quote are solved again. Stage F
+/// interpolations are solved globally (ruling F-21): E_INPUT.
+IncrementalCurve solve_curve_incremental(Date as_of, CurveInterpolation interpolation, const std::vector<Jump>& jumps,
+                                         const SequentialProblem& previous, const std::vector<double>& previous_factors,
+                                         const SequentialProblem& next);
+
+/// K-4b on the stage B OIS bootstrap (method SEQUENTIAL): only the pillars at and after the first
+/// quote whose tenor or rate differs are solved again.
+IncrementalCurve ois_bootstrap_incremental(const RateConvention& c, Date as_of, const std::vector<OisQuote>& previous,
+                                           const std::vector<double>& previous_factors,
+                                           const std::vector<OisQuote>& next, CurveInterpolation interpolation,
+                                           const std::vector<Jump>& jumps = {});
+
+/// K-4b on the stage B projection bootstrap (deposits, FRAs, swaps; the discount curve held fixed).
+IncrementalCurve projection_bootstrap_incremental(const Curve& discount, const RateConvention& index, Date as_of,
+                                                  const std::vector<ProjectionQuote>& previous,
+                                                  const std::vector<double>& previous_factors,
+                                                  const std::vector<ProjectionQuote>& next,
+                                                  CurveInterpolation interpolation);
 
 struct SwapTrade {
     const RateConvention* index;
