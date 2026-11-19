@@ -108,6 +108,15 @@ void need(const Trade& t, const std::optional<T>& v, const std::string& field, c
     if (!v) input_error(field, "trade " + t.id + ": " + field + " is required " + why);
 }
 
+// The hedging-set key within (class, treatment). CRE52.45 for NORMAL trades and, by CRE52.47, for VOLATILITY
+// trades (ruling KR-236): IR the currency and FX the pair (`hedging_set`), credit and equity one set, commodity
+// the category of the subclass. BASIS trades: the caller's label (CRE52.46, KR-34).
+std::string group_key(const Trade& t) {
+    if (t.treatment == "BASIS" || t.asset_class == "IR" || t.asset_class == "FX") return t.hedging_set.value_or("");
+    if (t.asset_class == "COMMODITY") return row_of(t).hedging_set.value_or("");
+    return "";
+}
+
 void structure(const std::vector<Trade>& trades) {
     if (trades.empty()) input_error("trades", "trades is empty");
     std::set<std::string> seen;
@@ -118,8 +127,8 @@ void structure(const std::vector<Trade>& trades) {
             need(t, t.start, "start", "for IR and CREDIT trades");
             need(t, t.end, "end", "for IR and CREDIT trades");
         }
-        if (c == "IR" || c == "FX" || t.treatment != "NORMAL")
-            need(t, t.hedging_set, "hedging_set", "for IR, FX, basis and volatility trades");
+        if (c == "IR" || c == "FX" || t.treatment == "BASIS")
+            need(t, t.hedging_set, "hedging_set", "for IR, FX and basis trades");
         if (c == "CREDIT" || c == "EQUITY" || c == "COMMODITY") {
             need(t, t.entity, "entity", "for CREDIT, EQUITY and COMMODITY trades");
             need(t, t.subclass, "subclass", "for CREDIT, EQUITY and COMMODITY trades");
@@ -146,7 +155,7 @@ void structure(const std::vector<Trade>& trades) {
     std::map<std::tuple<std::string, std::string, std::string, std::string>, std::string> entity_sub;
     for (const Trade& t : trades) {
         if (!t.entity || !t.subclass) continue;
-        const auto key = std::make_tuple(t.asset_class, t.treatment, t.hedging_set.value_or(""), *t.entity);
+        const auto key = std::make_tuple(t.asset_class, t.treatment, group_key(t), *t.entity);
         const auto [it, fresh] = entity_sub.emplace(key, *t.subclass);
         if (!fresh && it->second != *t.subclass) input_error("subclass", "entity " + *t.entity + " has two subclasses");
     }
@@ -219,13 +228,6 @@ double single_factor(const std::vector<std::pair<double, double>>& pairs) {
     }
     const double s = research::fsum(sys);
     return std::sqrt(s * s + research::fsum(idio));
-}
-
-std::string group_key(const Trade& t) {
-    const bool normal = t.treatment == "NORMAL";
-    if (t.asset_class == "COMMODITY" && normal) return row_of(t).hedging_set.value_or("");
-    if ((t.asset_class == "CREDIT" || t.asset_class == "EQUITY") && normal) return "";
-    return t.hedging_set.value_or("");
 }
 
 struct Netting {
