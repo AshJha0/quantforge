@@ -83,3 +83,28 @@ A MISMATCH can mean either a defect in the deriver's code or a choice the spec s
 ## Results
 
 Not run. (Date, deriver and model, manifest check, frozen hash and commit, gaps and rulings, compare run and output path, per-case table of MATCH / MISMATCH / MISSING and counted, resolution of each mismatch: to be filled by the coordinator.)
+
+## Results (2026-11-19; first and only compare run)
+
+- Deriver: a separate subagent on Claude Sonnet 5.5 (the spec, the method and the packet were written by Fable 5.2 and Opus 5.5 lanes), given only the packet folder and its own folder; numpy 2.4.6 and the standard library. It states that it read and tried to read nothing outside the two folders (its own statement, not independently logged). The coordinator checked the packet manifest hash 8f1241c0... before the hand-over.
+- Blind results as received: `stage_k_blind/k8/` (script, results, notes, self-checks, hash), committed in 9209a411 before the compare. SHA-256 of `blind_results.json`: `71c5a3790edff1ce8dcf83f9282a2afb47c164b31f9b7b6a31a8f53058ee42ce`, recomputed by the coordinator and equal to the deriver's hash file.
+- Compare: `python -I program/stage_h_blind_w2/k8_compare.py . <blind_results.json>` at the commit that fixed the script and tolerances (c09e5084). Output `stage_k_blind/k8/compare_output.txt`. Results not changed afterwards; no rerun.
+
+| Item | Cases | MATCH | MISMATCH | Eligible | Counted | Needed |
+|---|---:|---:|---:|---:|---:|---:|
+| K-8 | 7 | 7 | 0 | 7 | 7 | 5 |
+
+Largest relative difference per case: 1.70e-14, 1.81e-14, 1.94e-14 (ladder cases 0001 to 0003), 4.80e-16, 1.19e-15, 3.89e-16, 1.90e-16. k8_k-0004 has the inputs of 0001 and adds no evidence beyond 0001's price.
+
+Deriver's own checks, from the packet alone: single-exercise case against its own Gaussian quadrature converges at second order (errors -3.0e-3, -7.6e-4, -1.9e-4 over three grid doublings); its ladder against its own central bump agrees within 5e-9 relative on all 12 entries of case 5.
+
+Spec defects the deriver recorded (`stage_k_blind/k8/notes.md`), to be fixed in the spec text without changing a value:
+1. The "x" in the end correction can be read as multiplication or as the node coordinate; the other reading moves the price by 1e-5 to 5e-5 relative, far above tolerance. Must be made unambiguous.
+2. Whether the Crank-Nicolson explicit side uses the boundary-substituted rows or the stored boundary values (identical on the cases tried; state one).
+3. The half-step size and which steps are the first two of each interval, including [0, t_1].
+4. Whether the end nodes are re-extrapolated after smoothing.
+5. "Payments after t": strictly after.
+6. Branch order of M(p,q) at p = 0.
+7. Form of the interpolation weight (rounding only).
+
+What this shows and does not show. A second model implemented the scheme from the rules text alone and reproduced every golden to about 1e-14, so the goldens are the specified scheme and not an accident of one code base. It says nothing about model accuracy (that is acceptance 2, against QuantLib) and it does not settle the open question on the ladder row at the 0.4986y node, where the method gives exactly 0 and the QuantLib bump reference about -14.27 (`program/K8_ROW0_FINDING.md`, in progress): a blind deriver following the same rules reproduces the same zero. Outside share for K-8 by blind re-derivation: 7 of 7, counted only once that question is closed.
