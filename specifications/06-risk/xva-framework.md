@@ -8,7 +8,7 @@ Sources (none opened in this session; pointers, as G-34):
 - [G15] J. Gregory, *The xVA Challenge*, 3rd ed., Wiley, 2015: chapters on netting, collateral (thresholds, MTA, independent amount, MPoR), exposure metrics (EE, ENE, PFE, EPE), CVA, DVA, FVA, MVA, KVA.
 - [GK14] A. Green, C. Kenyon, "MVA: initial margin valuation adjustment by replication and regression", *Risk*, 2015; and A. Green, C. Kenyon, C. Dennis, "KVA: capital valuation adjustment", *Risk*, December 2014.
 - [BCBS] Basel Committee, *The Basel Framework*, CRE53 (internal model method: EE, effective EE, effective EPE over the first year).
-- [SIMM] ISDA SIMM methodology (weighted sensitivity `WS = RW s CR`, concentration risk factor, aggregation `K = sqrt(sum WS^2 + sum rho WS WS)`). The weights and correlations here are **inputs**, not a SIMM calibration (G-43).
+- [SIMM] SIMM-style single-bucket aggregation, a project definition (weighted sensitivity `WS = RW s CR`, concentration factor, aggregation `K = sqrt(sum WS^2 + sum rho WS WS)`), written from general knowledge of sensitivity-based margin models. No ISDA document, parameter or test file was read or used (owner decision 2026-11-19: the ISDA SIMM methodology is restricted to a market participant's own use and is patented, so the project uses no ISDA material); this is not ISDA SIMM. The weights and correlations here are **inputs** (G-43). See `docs/model-inventory.md#why-there-is-no-isda-simm-here`.
 - [HW12] J. Hull, A. White, "CVA and wrong-way risk", *Financial Analysts Journal* 68(5), 2012: hazard `exp(a(t) + b V(t))`.
 - [BM] D. Brigo, M. Morini, A. Pallavicini, *Counterparty Credit Risk, Collateral and Funding*, Wiley, 2013: first-to-default weighting and the DVA/FBA overlap.
 

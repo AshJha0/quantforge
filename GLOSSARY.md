@@ -170,7 +170,7 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 | EE, ENE, PFE, EPE | Expected positive and negative exposure at a date, a high quantile of exposure, and EE averaged over time (`06-risk/xva-exposure.md`) |
 | Margin period of risk (MPoR) | The time between the last collateral call met and the close-out after a default |
 | CVA, DVA, FVA (FCA, FBA) | Prices of counterparty default, own default, and funding of uncollateralised exposure (`06-risk/xva-framework.md`) |
-| SIMM | ISDA's standard initial-margin model; here a SIMM-style IR delta only (`xva.simm.ir_delta`) |
+| SIMM | An industry initial-margin methodology that ISDA licenses and that is covered by a patent. QuantForge does not implement it and uses no ISDA material (owner decision 2026-11-19); `xva.simm.ir_delta` is a SIMM-style single-bucket IR delta aggregation on weights the caller supplies, and the name is kept for contract stability. See `docs/model-inventory.md#why-there-is-no-isda-simm-here` |
 | Wrong-way risk | Exposure that grows when the counterparty is more likely to default |
 | BGK correction | Broadie, Glasserman and Kou's barrier shift `exp(0.5826 sigma sqrt(dt))`, which turns a continuous barrier formula into a discrete one (ruling G-7) |
 
