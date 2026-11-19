@@ -34,8 +34,12 @@ def _buckets(n: int) -> None:
 
 
 def _half_up(x: float) -> int:
-    """HR-59, HR-62: floor(x + 1/2)."""
-    return math.floor(x + 0.5)
+    """HR-59, HR-62: floor(x + 1/2). HR-121: `x + 1/2` within 1e-12 relative of an integer is that
+    integer, so an exact half that binary64 lands just below (0.3 / 0.2 = 1.4999999999999998)
+    still rounds up, as POV and the close do before flooring."""
+    t = x + 0.5
+    near = round(t)
+    return near if abs(t - near) <= 1e-12 * abs(near) else math.floor(t)
 
 
 def _cosh_over_sinh(a: float, b: float) -> float:

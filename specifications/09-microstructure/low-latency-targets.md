@@ -76,9 +76,11 @@ Run on the laptop under WSL (not the acceptance machine), on the recorded window
 
 | Language (target p50 / p99 / p99.9) | BTC/USD p50 / p99 / p99.9 (ns) | ETH/USD p50 / p99 / p99.9 (ns) | Verdict |
 |---|---|---|---|
-| C++ (100 / 500 / 2,000) | 39 / 9,255 / 26,687 | 789 / 9,631 / 23,087 | MISS (p99, p99.9; ETH p50) |
-| Rust (100 / 500 / 2,000) | 45 / 8,123 / 15,295 | 751 / 8,703 / 31,615 | MISS (p99, p99.9; ETH p50) |
-| Java (200 / 1,000 / 5,000) | 100 / 17,407 / 31,503 | 1,200 / 15,207 / 25,007 | MISS (p99, p99.9; ETH p50) |
+| C++ (100 / 500 / 2,000) | 39 / 9,223 / 21,471 | 784 / 9,631 / 23,087 | MISS (p99, p99.9; ETH p50) |
+| Rust (100 / 500 / 2,000) | 47 / 8,927 / 19,695 | 755 / 8,703 / 21,151 | MISS (p99, p99.9; ETH p50) |
+| Java (200 / 1,000 / 5,000) | 100 / 17,407 / 31,503 | 1,300 / 17,407 / 27,407 | MISS (p99, p99.9; ETH p50) |
+
+The figures are the median of 5 runs, pooled over message kinds, as the headline rule requires (corrected 2026-11-19, audit HA-28: this table first showed run 1 of 5; the medians were already in `benchmarks/results/h9/README.md`, and the verdict is the same). C++ and Rust: WSL 2, pinned with `taskset -c 2`; Java: native Windows, not pinned. Clock p50 21 ns in WSL; Java `nanoTime` steps 100 ns on this machine.
 
 Context only, not a reason to pass: a form B update applies about 58 level changes on average (one per changed level in a one-second snapshot difference), at roughly 40 ns per level, so a per-update cost of a few microseconds is what the per-level speed implies. The targets were written for one or a few levels per update (HR-19, "How the numbers were chosen" item 1). Owner decision 2026-11-19: the per-update targets stay the acceptance test and the miss stays recorded. The per-level figure (about 40 ns) is descriptive only and has no target. A per-level target, if one is wanted, is committed before a fresh recorded window is measured (v0.10.1 or later); the window already seen is never judged against it.
 

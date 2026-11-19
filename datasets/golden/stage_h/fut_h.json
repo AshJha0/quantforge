@@ -406,13 +406,14 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 3): MATCH"
    ],
    "tags": [
     "stage_h",
     "multiasset"
    ],
-   "description": "hand: fut.run ZN round trip with fees; pnl per trader marked at the last trade (HR-102); lit-engine fields as exec.sim.lit.run; not blind"
+   "description": "hand: fut.run ZN round trip with fees; pnl per trader marked at the last trade (HR-102); lit-engine fields as exec.sim.lit.run; blind in packet 3 (2026-11-19)"
   },
   {
    "case_id": "fut_h-0012",
@@ -550,13 +551,14 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 3): MATCH"
    ],
    "tags": [
     "stage_h",
     "multiasset"
    ],
-   "description": "hand: fut.run ZB price priority, a resting remainder and a mark below the first fill; lit-engine fields as exec.sim.lit.run; not blind"
+   "description": "hand: fut.run ZB price priority, a resting remainder and a mark below the first fill; lit-engine fields as exec.sim.lit.run; blind in packet 3 (2026-11-19)"
   },
   {
    "case_id": "fut_h-0013",
@@ -592,7 +594,7 @@
     "stage_h",
     "multiasset"
    ],
-   "description": "hand: fut.run with no events: empty book, no pnl; lit-engine fields as exec.sim.lit.run; not blind"
+   "description": "hand: fut.run with no events: empty book, no pnl; not blind"
   },
   {
    "case_id": "fut_h-0014",

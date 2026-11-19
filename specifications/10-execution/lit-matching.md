@@ -35,7 +35,7 @@ Incoming marketable order against the opposite side: best price first; within a 
 
 ## Operation `exec.sim.lit.run`
 Inputs: `tick_size`, `lot_size`, `events` (list of `{"op": "NEW"|"CANCEL"|"MODIFY", ...}`), `fee_schedule` `{taker_fee, maker_rebate}` per unit notional (signed, HR-30). Outputs: `fills` (`taker_id`, `maker_id`, `price`, `qty`, `seq`), `rejects` (`id`, `reason`: `POST_ONLY_WOULD_CROSS`, `FOK_UNFILLABLE`, `UNKNOWN_ID`), final MBO book and its MBP projection (must equal `micro.book.rebuild` applied to the engine's own level diffs), fees per participant.
-Errors: price not on the tick grid, non-positive quantity, `display_qty` > quantity `E_DOMAIN`; duplicate `id` `E_INPUT`; more than 10,000,000 events `E_LIMIT`; a decimal input or computed value outside the exact range (36 digits, 36 decimals; inputs at most 18 decimals) `E_LIMIT` (HR-57, HR-58).
+Errors: price not on the tick grid, non-positive quantity, a `qty`, `display_qty` or MODIFY quantity that is not a multiple of `lot_size`, MODIFY to 0, `display_qty` > quantity `E_DOMAIN` (HR-128); MODIFY sets the total open quantity, and MODIFY of an id that is not open is the reject `UNKNOWN_ID`; duplicate `id` `E_INPUT`; more than 10,000,000 events `E_LIMIT`; a decimal input or computed value outside the exact range (36 digits, 36 decimals; inputs at most 18 decimals) `E_LIMIT` (HR-57, HR-58).
 
 ## Invariants (property tests, every language)
 Book never crossed after an event; quantity conserved (sum of fills + resting + cancelled + rejected = submitted); FIFO: for any two fills at one price on displayed quantity, smaller `seq` fills first; FOK fills all or nothing; post-only never takes; replay determinism (byte-identical output).

@@ -129,11 +129,12 @@ pub struct Pov {
 /// own fills (HR-4); floored in `UNITS`. The residual may be positive and is never an error.
 pub fn schedule_pov(x: f64, p: f64, volume: &[f64], units: bool) -> Result<Pov> {
     quantity(x, units)?;
-    if !(p > 0.0 && p < 1.0) {
-        return fail("E_DOMAIN", "participation must lie in (0, 1)");
-    }
+    // structural E_INPUT before every E_DOMAIN (HR-66, HR-122)
     if volume.is_empty() {
         return fail("E_INPUT", "market_volume must not be empty");
+    }
+    if !(p > 0.0 && p < 1.0) {
+        return fail("E_DOMAIN", "participation must lie in (0, 1)");
     }
     if volume.iter().any(|&v| v < 0.0) {
         return fail("E_DOMAIN", "market_volume must be non-negative");
@@ -203,26 +204,21 @@ fn tau(p: &AcParams) -> f64 {
     p.horizon / p.n_steps as f64
 }
 
-/// The checks in the order of `almgren-chriss.md` (`eta_tilde`, sigma, T, then N), then the sign
-/// rules of HR-2. Returns `eta_tilde = eta - gamma tau / 2` (HR-5).
+/// The checks in the order of HR-122: structural `E_INPUT` first (N, then X), then `E_DOMAIN` for
+/// T, sigma, epsilon, gamma and last `eta_tilde`, which needs tau. Returns
+/// `eta_tilde = eta - gamma tau / 2` (HR-5).
 pub(crate) fn ac_check(p: &AcParams) -> Result<f64> {
-    if p.n_steps >= 1 && p.eta - p.gamma * tau(p) / 2.0 <= 0.0 {
-        return fail(
-            "E_DOMAIN",
-            "eta_tilde = eta - gamma tau / 2 must be positive",
-        );
-    }
-    if p.sigma < 0.0 {
-        return fail("E_DOMAIN", "sigma must be non-negative");
-    }
-    if p.horizon <= 0.0 {
-        return fail("E_DOMAIN", "horizon must be positive");
-    }
     if p.n_steps < 1 {
         return fail("E_INPUT", "n_steps must be at least 1");
     }
     if p.quantity <= 0.0 {
         return fail("E_INPUT", "quantity must be positive");
+    }
+    if p.horizon <= 0.0 {
+        return fail("E_DOMAIN", "horizon must be positive");
+    }
+    if p.sigma < 0.0 {
+        return fail("E_DOMAIN", "sigma must be non-negative");
     }
     if p.epsilon < 0.0 {
         return fail("E_DOMAIN", "epsilon must be non-negative");
@@ -230,7 +226,14 @@ pub(crate) fn ac_check(p: &AcParams) -> Result<f64> {
     if p.gamma < 0.0 {
         return fail("E_DOMAIN", "gamma must be non-negative");
     }
-    Ok(p.eta - p.gamma * tau(p) / 2.0)
+    let eta_tilde = p.eta - p.gamma * tau(p) / 2.0;
+    if eta_tilde <= 0.0 {
+        return fail(
+            "E_DOMAIN",
+            "eta_tilde = eta - gamma tau / 2 must be positive",
+        );
+    }
+    Ok(eta_tilde)
 }
 
 /// HR-6: `kappa = acosh(1 + y) / tau`, `y = lambda sigma^2 tau^2 / (2 eta_tilde)`, written
@@ -298,10 +301,11 @@ pub fn ac_trajectory(p: &AcParams, lambda: f64) -> Result<AcPoint> {
 
 /// `exec.ac.frontier`: one (lambda, E, V) per entry, in input order.
 pub fn ac_frontier(p: &AcParams, lambdas: &[f64]) -> Result<Vec<AcPoint>> {
-    let et = ac_check(p)?;
-    if lambdas.is_empty() {
+    // An empty list is structural: after the other E_INPUT checks, before every E_DOMAIN (HR-122).
+    if p.n_steps >= 1 && p.quantity > 0.0 && lambdas.is_empty() {
         return fail("E_INPUT", "risk_aversions must not be empty");
     }
+    let et = ac_check(p)?;
     if lambdas.iter().any(|&l| l < 0.0) {
         return fail("E_DOMAIN", "risk_aversions must be non-negative");
     }

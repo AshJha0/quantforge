@@ -19,7 +19,10 @@ inline constexpr std::string_view rates_label = "simulated venue; not a real exc
 /// Dated rule versions: the 2024-amended Rule 612/610 and round-lot text applies on and after this date
 /// (a parameter, `compliance_date`). Default: the first business day of November 2025, adopting release
 /// 34-101070 section VI (HR-110); any later SEC extension is UNVERIFIED.
-inline constexpr std::string_view rule_2024_compliance = "2025-11-03";
+// Round lots, Rule 600(b)(93): first business day of November 2025 (release 34-101070; not stayed).
+inline constexpr std::string_view round_lot_compliance = "2025-11-03";
+// Rules 612 and 610(c): deferred to the first business day of November 2027 (SEC order 34-105656, HR-120).
+inline constexpr std::string_view tick_fee_compliance = "2027-11-01";
 inline constexpr long long max_auction_orders = 10'000'000;
 inline constexpr long long max_auction_candidates = 1'000'000;
 inline constexpr int max_calendar_days = 3660;

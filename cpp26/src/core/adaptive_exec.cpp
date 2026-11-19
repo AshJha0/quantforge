@@ -20,6 +20,14 @@ namespace {
 
 double sign(Side s) { return s == Side::Buy ? 1.0 : -1.0; }
 
+// HR-59, HR-62: floor(x + 1/2). HR-121: x + 1/2 within 1e-12 relative of an integer is that integer, so an
+// exact half that binary64 lands just below still rounds up.
+double half_up(double x) {
+    const double t = x + 0.5;
+    const double near = std::rint(t);
+    return std::fabs(t - near) <= 1e-12 * std::fabs(near) ? near : std::floor(t);
+}
+
 void buckets(long long n) {
     if (n < 1) input("n_buckets", "must be at least 1");
 }
@@ -166,7 +174,7 @@ Pair algo_pair(Side sa, double qa, double pa, Side sb, double pb, PairMode pm, s
     for (std::size_t j = 0; j < m; ++j) {
         // P_A C first: C_B P_B stays within ulps of C_A P_A
         const double target = pm == PairMode::Hedged ? *h * cum_a[j] : cum_a[j] * pa / pb;
-        const double cb = mode == Mode::Units ? std::floor(target + 0.5) : target;
+        const double cb = mode == Mode::Units ? half_up(target) : target;
         r.slices_b[j] = cb - prev;
         prev = cb;
         r.cash_imbalance[j] = sign(sa) * cum_a[j] * pa + sign(sb) * cb * pb;

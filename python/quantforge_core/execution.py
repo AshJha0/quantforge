@@ -90,10 +90,10 @@ def schedule_pov(
     own fills (HR-4); floored in UNITS. The residual may be positive and is never an error."""
     units = mode == "UNITS"
     _quantity(quantity, units)
+    if not market_volume:  # structural E_INPUT before every E_DOMAIN (HR-66, HR-122)
+        raise _fail("E_INPUT", "market_volume must not be empty", "market_volume")
     if not 0 < participation < 1:
         raise _fail("E_DOMAIN", "participation must lie in (0, 1)", "participation")
-    if not market_volume:
-        raise _fail("E_INPUT", "market_volume must not be empty", "market_volume")
     if any(v < 0 for v in market_volume):
         raise _fail("E_DOMAIN", "market_volume must be non-negative", "market_volume")
     ratio = 1.0 - participation
@@ -122,23 +122,25 @@ def _ac_check(
     eta: float,
     gamma: float,
 ) -> float:
-    """The [AC00] checks in the order of almgren-chriss.md (eta_tilde, sigma, T, then N), then the
-    remaining sign rules (HR-2). Returns eta_tilde = eta - gamma tau / 2 (HR-5)."""
-    if n_steps >= 1 and eta - gamma * (horizon / n_steps) / 2.0 <= 0:
-        raise _fail("E_DOMAIN", "eta_tilde = eta - gamma tau / 2 must be positive", "eta")
-    if sigma < 0:
-        raise _fail("E_DOMAIN", "sigma must be non-negative", "sigma")
-    if horizon <= 0:
-        raise _fail("E_DOMAIN", "horizon must be positive", "horizon")
+    """The [AC00] checks in the order of HR-122: structural E_INPUT first (N, then X), then E_DOMAIN
+    for T, sigma, epsilon, gamma and last eta_tilde, which needs tau. Returns
+    eta_tilde = eta - gamma tau / 2 (HR-5)."""
     if n_steps < 1:
         raise _fail("E_INPUT", "n_steps must be at least 1", "n_steps")
     if quantity <= 0:
         raise _fail("E_INPUT", "quantity must be positive", "quantity")
+    if horizon <= 0:
+        raise _fail("E_DOMAIN", "horizon must be positive", "horizon")
+    if sigma < 0:
+        raise _fail("E_DOMAIN", "sigma must be non-negative", "sigma")
     if epsilon < 0:
         raise _fail("E_DOMAIN", "epsilon must be non-negative", "epsilon")
     if gamma < 0:
         raise _fail("E_DOMAIN", "gamma must be non-negative", "gamma")
-    return eta - gamma * (horizon / n_steps) / 2.0
+    eta_tilde = eta - gamma * (horizon / n_steps) / 2.0
+    if eta_tilde <= 0:
+        raise _fail("E_DOMAIN", "eta_tilde = eta - gamma tau / 2 must be positive", "eta")
+    return eta_tilde
 
 
 def ac_kappa(risk_aversion: float, sigma: float, tau: float, eta_tilde: float) -> float:
@@ -222,9 +224,10 @@ def ac_frontier(
     risk_aversions: Sequence[float],
 ) -> dict[str, Any]:
     """`exec.ac.frontier`: one (lambda, E, V) per entry, in input order."""
-    et = _ac_check(quantity, horizon, n_steps, sigma, epsilon, eta, gamma)
-    if not risk_aversions:
+    # An empty list is structural: after the other E_INPUT checks, before every E_DOMAIN (HR-122).
+    if n_steps >= 1 and quantity > 0 and not risk_aversions:
         raise _fail("E_INPUT", "risk_aversions must not be empty", "risk_aversions")
+    et = _ac_check(quantity, horizon, n_steps, sigma, epsilon, eta, gamma)
     if any(lam < 0 for lam in risk_aversions):
         raise _fail("E_DOMAIN", "risk_aversions must be non-negative", "risk_aversions")
     points = [

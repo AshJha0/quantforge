@@ -1,0 +1,1374 @@
+{
+ "schema_version": "1.0",
+ "suite": "rule_h",
+ "spec": "specifications/stage-h-rulings-audit.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_audit.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "rule_h-0001",
+   "operation": "exec.schedule.pov",
+   "inputs": {
+    "quantity": 1000,
+    "participation": 0.03,
+    "market_volume": [
+     97.0
+    ],
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "slices": [
+      3
+     ],
+     "filled": 3,
+     "residual": 997
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 3): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "audit"
+   ],
+   "description": "HR-121: POV whole units, p v / (1 - p) = 0.03 x 97 / 0.97 = 3 exactly; binary64 gives 2.9999999999999996, which is snapped to 3 before the floor"
+  },
+  {
+   "case_id": "rule_h-0002",
+   "operation": "exec.algo.close",
+   "inputs": {
+    "quantity": 10000,
+    "close_volume": 100,
+    "auction_participation": 0.57,
+    "profile": [
+     1,
+     1
+    ],
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "auction_quantity": 57,
+     "slices": [
+      4972,
+      4971
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 3): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "audit"
+   ],
+   "description": "HR-121: close whole units, p_c V_c = 0.57 x 100 = 57 exactly (binary64 56.99999999999999); the other 9,943 split over two equal buckets by largest remainder, 4,972 then 4,971"
+  },
+  {
+   "case_id": "rule_h-0003",
+   "operation": "exec.algo.pair",
+   "inputs": {
+    "leg_b": {
+     "side": "SELL",
+     "price": 0.2
+    },
+    "pair_mode": "CASH_BALANCED",
+    "n_buckets": 1,
+    "mode": "UNITS",
+    "leg_a": {
+     "side": "BUY",
+     "quantity": 1,
+     "price": 0.3
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantity_b": 2,
+     "slices_a": [
+      1
+     ],
+     "slices_b": [
+      2
+     ],
+     "cash_imbalance": [
+      -0.1
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 3): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "audit"
+   ],
+   "description": "HR-121: pair leg B at an exact half, C P_A / P_B = 0.3 / 0.2 = 1.5 (binary64 1.4999999999999998) rounds half up to 2; imbalance 0.3 - 0.4"
+  },
+  {
+   "case_id": "rule_h-0004",
+   "operation": "exec.algo.pair",
+   "inputs": {
+    "leg_b": {
+     "side": "SELL",
+     "price": 1.0
+    },
+    "pair_mode": "CASH_BALANCED",
+    "n_buckets": 1,
+    "mode": "UNITS",
+    "leg_a": {
+     "side": "BUY",
+     "quantity": 5,
+     "price": 0.7
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantity_b": 4,
+     "slices_a": [
+      5
+     ],
+     "slices_b": [
+      4
+     ],
+     "cash_imbalance": [
+      -0.5
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 3): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "audit"
+   ],
+   "description": "HR-121: pair leg B at an exact half that binary64 represents, 5 x 0.7 / 1.0 = 3.5, rounds half up to 4; imbalance 3.5 - 4.0"
+  },
+  {
+   "case_id": "rule_h-0005",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.0,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 1e-06
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "holdings": [
+      1000000.0,
+      800000.0,
+      600000.0,
+      400000.0,
+      200000.0,
+      0.0
+     ],
+     "trades": [
+      200000.0,
+      200000.0,
+      200000.0,
+      200000.0,
+      200000.0
+     ],
+     "kappa": 0.0,
+     "expected_cost": 662500.0,
+     "variance": 0.0,
+     "objective": 662500.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 4): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "audit"
+   ],
+   "description": "HR-124: AC with sigma = 0 and lambda > 0: y = 0, so the trajectory is linear and kappa = 0; E = 125,000 + 62,500 + 475,000 as ac_h-0001, V = 0"
+  },
+  {
+   "case_id": "rule_h-0006",
+   "operation": "exec.algo.arrival",
+   "inputs": {
+    "quantity": 1000,
+    "n_buckets": 4,
+    "urgency": 200.0,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "slices": [
+      1000.0,
+      1.3838965267367375e-84,
+      1.9151695967140056e-171,
+      2.6503965530043106e-258
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 4): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "audit"
+   ],
+   "description": "HR-125: arrival with kappa N = 800, where sinh overflows binary64: slices X e^(-200 (j - 1)) (1 - e^(-200)) to rounding, from mpmath"
+  },
+  {
+   "case_id": "rule_h-0007",
+   "operation": "exec.algo.arrival",
+   "inputs": {
+    "quantity": 1000,
+    "n_buckets": 4,
+    "urgency": 200.0,
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "slices": [
+      1000,
+      0,
+      0,
+      0
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 4): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "audit"
+   ],
+   "description": "HR-125: the same in whole units: everything trades in the first bucket"
+  },
+  {
+   "case_id": "rule_h-0008",
+   "operation": "exec.tca.shortfall",
+   "inputs": {
+    "side": "BUY",
+    "decision_price": 100.0,
+    "arrival_price": 100.1,
+    "end_price": 101.0,
+    "order_quantity": 1000.0,
+    "fills": [],
+    "fees": 0.0,
+    "benchmark_vwap": 100.15
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delay": 0.0,
+     "execution": 0.0,
+     "opportunity": 1000.0,
+     "total": 1000.0,
+     "total_bps": 100.0,
+     "vwap_slippage": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 4): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "audit"
+   ],
+   "description": "HR-126: shortfall with no fills and a benchmark VWAP: nothing executed, so delay, execution and vwap_slippage are 0; opportunity 1,000 x (101 - 100) = 1,000 = 100 bp of 1,000 x 100"
+  },
+  {
+   "case_id": "rule_h-0009",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "phase": "OPEN",
+    "ref_price": "10.00",
+    "tick_size": "0.01",
+    "orders": [
+     {
+      "id": "b",
+      "limit": "10.00",
+      "qty": 100,
+      "side": "BUY"
+     },
+     {
+      "id": "s",
+      "limit": "10.01",
+      "qty": 100,
+      "side": "SELL"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cancelled": [],
+     "fills": [],
+     "imbalance": 0,
+     "label": "simulated venue; not a real exchange",
+     "price": null,
+     "residual": [
+      {
+       "id": "b",
+       "limit": "10.00",
+       "qty": 100,
+       "side": "B"
+      },
+      {
+       "id": "s",
+       "limit": "10.01",
+       "qty": 100,
+       "side": "S"
+      }
+     ],
+     "volume": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 4): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "audit"
+   ],
+   "description": "HR-127: auction with both sides present and no cross (buy 10.00, sell 10.01): the maximum volume is 0, so there is no auction: price null, both orders residual"
+  },
+  {
+   "case_id": "rule_h-0010",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "0.01",
+    "lot_size": "10",
+    "events": [
+     {
+      "id": "B1",
+      "op": "NEW",
+      "price": "100",
+      "qty": "20",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT"
+     },
+     {
+      "op": "MODIFY",
+      "id": "ZZ",
+      "qty": "10"
+     }
+    ],
+    "fee_schedule": {
+     "maker_rebate": "0",
+     "taker_fee": "0"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [],
+      "bids": [
+       {
+        "display_qty": "20",
+        "hidden_qty": "0",
+        "id": "B1",
+        "price": "100",
+        "seq": 1
+       }
+      ]
+     },
+     "cancelled": [],
+     "conservation": {
+      "B1": {
+       "cancelled": "0",
+       "filled": "0",
+       "rejected": "0",
+       "resting": "20",
+       "submitted": "20"
+      }
+     },
+     "fees": {},
+     "fills": [],
+     "label": "simulated venue; not a real exchange",
+     "mbp": {
+      "asks": [],
+      "bids": [
+       [
+        "100",
+        "20"
+       ]
+      ]
+     },
+     "rejects": [
+      {
+       "id": "ZZ",
+       "reason": "UNKNOWN_ID"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit"
+   ],
+   "description": "HR-128: MODIFY of an id that is not open is rejected UNKNOWN_ID and changes nothing; not blind"
+  },
+  {
+   "case_id": "rule_h-0011",
+   "operation": "exec.sim.dark.run",
+   "inputs": {
+    "config": {
+     "firm_delay": 0,
+     "lot_size": "10",
+     "p_firm": "1",
+     "penalty_events": 2,
+     "seed": 1,
+     "tick_size": "0.01"
+    },
+    "events": [
+     {
+      "ask": "100.10",
+      "bid": "100.00",
+      "op": "BOOK"
+     },
+     {
+      "id": "B1",
+      "kind": "FIRM",
+      "op": "NEW",
+      "qty": "100",
+      "side": "BUY"
+     },
+     {
+      "id": "S1",
+      "kind": "FIRM",
+      "op": "NEW",
+      "qty": "10",
+      "side": "SELL"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fills": [
+      {
+       "buy_id": "B1",
+       "price": "100.05",
+       "qty": "10",
+       "sell_id": "S1",
+       "seq": 1
+      }
+     ],
+     "invitations": [],
+     "label": "simulated venue; not a real dark pool",
+     "resting": [
+      {
+       "id": "B1",
+       "open_qty": "90",
+       "seq": 1,
+       "side": "BUY"
+      }
+     ],
+     "suspensions": []
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit"
+   ],
+   "description": "HR-129: dark pool min_qty defaults to one lot (lot_size 10): a 10-share sell meets the default and fills 10 at the mid 100.05, leaving 90 of the buy; not blind"
+  },
+  {
+   "case_id": "rule_h-0012",
+   "operation": "exec.schedule.twap",
+   "inputs": {
+    "quantity": -5,
+    "n_buckets": 200000,
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-122: a size limit (200,000 buckets) before a structural error (negative quantity)"
+  },
+  {
+   "case_id": "rule_h-0013",
+   "operation": "exec.schedule.twap",
+   "inputs": {
+    "quantity": "NaN",
+    "n_buckets": 200000,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-122: a size limit before a non-finite value"
+  },
+  {
+   "case_id": "rule_h-0014",
+   "operation": "exec.schedule.twap",
+   "inputs": {
+    "quantity": "NaN",
+    "n_buckets": 0,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-122: a non-finite value (F-2) before a structural error (0 buckets)"
+  },
+  {
+   "case_id": "rule_h-0015",
+   "operation": "exec.schedule.pov",
+   "inputs": {
+    "quantity": 1000,
+    "participation": 1.5,
+    "market_volume": [],
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-122: POV, an empty volume list (structural) before participation outside (0, 1)"
+  },
+  {
+   "case_id": "rule_h-0016",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 0,
+    "sigma": -1.0,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-122: AC, N < 1 (structural) before sigma < 0"
+  },
+  {
+   "case_id": "rule_h-0017",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 0.0,
+    "horizon": 0.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-122: AC, X <= 0 (structural) before T <= 0"
+  },
+  {
+   "case_id": "rule_h-0018",
+   "operation": "exec.ac.frontier",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": -1.0,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversions": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-122: frontier, an empty list (structural) before sigma < 0"
+  },
+  {
+   "case_id": "rule_h-0019",
+   "operation": "exec.algo.arrival",
+   "inputs": {
+    "quantity": 5,
+    "n_buckets": 200000,
+    "urgency": -1.0,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-122: arrival, a size limit before a negative urgency"
+  },
+  {
+   "case_id": "rule_h-0020",
+   "operation": "exec.algo.arrival",
+   "inputs": {
+    "quantity": -5,
+    "n_buckets": 4,
+    "urgency": -1.0,
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-122: arrival, a non-positive quantity (structural) before a negative urgency"
+  },
+  {
+   "case_id": "rule_h-0021",
+   "operation": "exec.ac.trajectory",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversion": -1e-06
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-123: AC risk_aversion < 0"
+  },
+  {
+   "case_id": "rule_h-0022",
+   "operation": "exec.ac.frontier",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversions": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-123: frontier with an empty risk_aversions list"
+  },
+  {
+   "case_id": "rule_h-0023",
+   "operation": "exec.ac.frontier",
+   "inputs": {
+    "quantity": 1000000.0,
+    "horizon": 5.0,
+    "n_steps": 5,
+    "sigma": 0.95,
+    "epsilon": 0.0625,
+    "eta": 2.5e-06,
+    "gamma": 2.5e-07,
+    "risk_aversions": [
+     1e-06,
+     -1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-123: frontier with a negative risk aversion"
+  },
+  {
+   "case_id": "rule_h-0024",
+   "operation": "micro.mm.as_quotes",
+   "inputs": {
+    "mid": 100.0,
+    "inventory": 2.0,
+    "risk_aversion": 0.1,
+    "sigma": -2.0,
+    "time_left": 1.0,
+    "k": 1.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-123: AS sigma < 0"
+  },
+  {
+   "case_id": "rule_h-0025",
+   "operation": "micro.mm.as_quotes",
+   "inputs": {
+    "mid": 100.0,
+    "inventory": 2.0,
+    "risk_aversion": 0.1,
+    "sigma": 2.0,
+    "time_left": -1.0,
+    "k": 1.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-123: AS time_left < 0"
+  },
+  {
+   "case_id": "rule_h-0026",
+   "operation": "exec.schedule.vwap",
+   "inputs": {
+    "quantity": 1000.0,
+    "profile": [
+     1.0,
+     -2.0,
+     3.0
+    ],
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-123: VWAP with a negative weight"
+  },
+  {
+   "case_id": "rule_h-0027",
+   "operation": "exec.schedule.vwap",
+   "inputs": {
+    "quantity": 1000.0,
+    "profile": [
+     0.0,
+     0.0
+    ],
+    "mode": "CONTINUOUS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-123: VWAP with an all-zero profile"
+  },
+  {
+   "case_id": "rule_h-0028",
+   "operation": "exec.schedule.vwap",
+   "inputs": {
+    "quantity": 1000.5,
+    "profile": [
+     1.0,
+     2.0
+    ],
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-123: VWAP whole units with a fractional quantity"
+  },
+  {
+   "case_id": "rule_h-0029",
+   "operation": "exec.schedule.pov",
+   "inputs": {
+    "quantity": 1000.5,
+    "participation": 0.2,
+    "market_volume": [
+     1000.0
+    ],
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-123: POV whole units with a fractional quantity"
+  },
+  {
+   "case_id": "rule_h-0030",
+   "operation": "exec.schedule.twap",
+   "inputs": {
+    "quantity": 1000,
+    "n_buckets": 0,
+    "mode": "UNITS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-123: TWAP with 0 buckets"
+  },
+  {
+   "case_id": "rule_h-0031",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "phase": "OPEN",
+    "ref_price": "10.00",
+    "tick_size": "0.01",
+    "orders": [
+     {
+      "id": "b",
+      "limit": "10.005",
+      "qty": 100,
+      "side": "BUY"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-127: an auction limit off the tick grid"
+  },
+  {
+   "case_id": "rule_h-0032",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "0.01",
+    "lot_size": "10",
+    "events": [
+     {
+      "id": "B1",
+      "op": "NEW",
+      "price": "100",
+      "qty": "15",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT"
+     }
+    ],
+    "fee_schedule": {
+     "maker_rebate": "0",
+     "taker_fee": "0"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-128: a lit order quantity that is not a multiple of lot_size"
+  },
+  {
+   "case_id": "rule_h-0033",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "0.01",
+    "lot_size": "10",
+    "events": [
+     {
+      "id": "B1",
+      "op": "NEW",
+      "price": "100",
+      "qty": "20",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "ICEBERG",
+      "display_qty": "5"
+     }
+    ],
+    "fee_schedule": {
+     "maker_rebate": "0",
+     "taker_fee": "0"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-128: an iceberg display_qty off the lot grid"
+  },
+  {
+   "case_id": "rule_h-0034",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "0.01",
+    "lot_size": "10",
+    "events": [
+     {
+      "id": "B1",
+      "op": "NEW",
+      "price": "100",
+      "qty": "20",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT"
+     },
+     {
+      "op": "MODIFY",
+      "id": "B1",
+      "qty": "15"
+     }
+    ],
+    "fee_schedule": {
+     "maker_rebate": "0",
+     "taker_fee": "0"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-128: MODIFY to a quantity off the lot grid"
+  },
+  {
+   "case_id": "rule_h-0035",
+   "operation": "exec.sim.lit.run",
+   "inputs": {
+    "tick_size": "0.01",
+    "lot_size": "10",
+    "events": [
+     {
+      "id": "B1",
+      "op": "NEW",
+      "price": "100",
+      "qty": "20",
+      "side": "BUY",
+      "trader": "T1",
+      "type": "LIMIT"
+     },
+     {
+      "op": "MODIFY",
+      "id": "B1",
+      "qty": "0"
+     }
+    ],
+    "fee_schedule": {
+     "maker_rebate": "0",
+     "taker_fee": "0"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-128: MODIFY to quantity 0"
+  },
+  {
+   "case_id": "rule_h-0036",
+   "operation": "exec.sim.dark.run",
+   "inputs": {
+    "config": {
+     "firm_delay": 0,
+     "lot_size": "10",
+     "p_firm": "1",
+     "penalty_events": 2,
+     "seed": 1,
+     "tick_size": "0.01"
+    },
+    "events": [
+     {
+      "ask": "100.10",
+      "bid": "100.00",
+      "op": "BOOK"
+     },
+     {
+      "id": "B1",
+      "kind": "FIRM",
+      "op": "NEW",
+      "qty": "15",
+      "side": "BUY"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-129: a dark order quantity off the lot grid"
+  },
+  {
+   "case_id": "rule_h-0037",
+   "operation": "exec.sim.dark.run",
+   "inputs": {
+    "config": {
+     "firm_delay": 0,
+     "lot_size": "10",
+     "p_firm": "1",
+     "penalty_events": 2,
+     "seed": 1,
+     "tick_size": "0.01"
+    },
+    "events": [
+     {
+      "ask": "100.10",
+      "bid": "100.00",
+      "op": "BOOK"
+     },
+     {
+      "id": "B1",
+      "kind": "FIRM",
+      "op": "NEW",
+      "qty": "100",
+      "side": "BUY"
+     },
+     {
+      "id": "S1",
+      "kind": "FIRM",
+      "op": "NEW",
+      "qty": "10",
+      "side": "SELL",
+      "min_qty": "20"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-129: a dark order with min_qty above its quantity"
+  },
+  {
+   "case_id": "rule_h-0038",
+   "operation": "micro.fx.pip_value",
+   "inputs": {
+    "notional": "1000000",
+    "pair": "USDMXN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-123: a currency outside the eight ranked ones of HR-88 (pip value)"
+  },
+  {
+   "case_id": "rule_h-0039",
+   "operation": "micro.fx.spot_date",
+   "inputs": {
+    "holidays": {},
+    "pair": "USDMXN",
+    "trade_date": "2026-11-16"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-123: a currency outside the eight ranked ones of HR-88 (spot date)"
+  },
+  {
+   "case_id": "rule_h-0040",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "HOLD",
+     "type": "LIMIT",
+     "quantity": "3",
+     "limit_price": "101"
+    },
+    "ref_price": "100",
+    "position": "0",
+    "cash": "10000",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "audit",
+    "error"
+   ],
+   "description": "HR-122 exception: paper.pretrade.check reports an unknown side as E_INPUT (paper-trading.md, Errors)"
+  }
+ ]
+}

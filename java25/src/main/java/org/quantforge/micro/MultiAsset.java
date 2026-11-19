@@ -46,7 +46,10 @@ public final class MultiAsset {
     private static final String[][] DEFAULT_TICK_TABLE = {{"0", "0.0001"}, {"1.00", "0.01"}};
     private static final String[][] HALF_PENNY_TABLE = {{"0", "0.0001"}, {"1.00", "0.005"}};
     /** Dated rule versions: first business day of November 2025, release 34-101070 section VI (HR-110). */
-    public static final String RULE_2024_COMPLIANCE = "2025-11-03";
+    /** Round lots, Rule 600(b)(93): first business day of November 2025 (release 34-101070; not stayed). */
+    public static final String ROUND_LOT_COMPLIANCE = "2025-11-03";
+    /** Rules 612 and 610(c): deferred to the first business day of November 2027 (SEC order 34-105656, HR-120). */
+    public static final String TICK_FEE_COMPLIANCE = "2027-11-01";
     private static final BigDecimal FEE_CAP_CURRENT = new BigDecimal("0.001"); // [REGNMS-610] read 2026-11-18
     private static final BigDecimal FEE_CAP_OLD = new BigDecimal("0.003");
     private static final List<String> CCY_ORDER = List.of("EUR", "GBP", "AUD", "NZD", "USD", "CAD", "CHF", "JPY");
@@ -244,8 +247,8 @@ public final class MultiAsset {
     // ------------------------------------------------------------------ equities (H-22)
 
     /** True when the current (2024-amended) Rule 612/610 text applies at {@code as_of}. */
-    private static boolean current(Map<?, ?> raw) {
-        LocalDate cd = date(get(raw, "compliance_date", RULE_2024_COMPLIANCE), "compliance_date");
+    private static boolean current(Map<?, ?> raw, String compliance) {
+        LocalDate cd = date(get(raw, "compliance_date", compliance), "compliance_date");
         return !raw.containsKey("as_of") || !date(raw.get("as_of"), "as_of").isBefore(cd);
     }
 
@@ -254,7 +257,7 @@ public final class MultiAsset {
         if (!"PENNY".equals(tier) && !"HALF_PENNY".equals(tier)) {
             throw err("E_SCHEMA", "tick_tier: not PENNY or HALF_PENNY", "tick_tier");
         }
-        boolean cur = current(raw);
+        boolean cur = current(raw, TICK_FEE_COMPLIANCE);
         boolean half = "HALF_PENNY".equals(tier);
         if (half && !cur) {
             throw err("E_INPUT", "tick_tier HALF_PENNY before the compliance date", "tick_tier");
@@ -342,7 +345,7 @@ public final class MultiAsset {
         BigDecimal price = dec(raw, "price");
         BigDecimal fee = dec(raw, "taker_fee");
         boolean check = bool(raw, "cap_check", true);
-        BigDecimal cap0 = current(raw) ? FEE_CAP_CURRENT : FEE_CAP_OLD;
+        BigDecimal cap0 = current(raw, TICK_FEE_COMPLIANCE) ? FEE_CAP_CURRENT : FEE_CAP_OLD;
         positivePrice(price);
         BigDecimal cap = price.compareTo(BigDecimal.ONE) >= 0 ? cap0 : c(cap0.multiply(price));
         if (check && fee.compareTo(cap) > 0) {
@@ -372,7 +375,7 @@ public final class MultiAsset {
     /** {@code micro.eq.round_lot} (HR-82 as dated rule versions). */
     public static Map<String, Object> eqRoundLot(Map<?, ?> raw) {
         BigDecimal price = dec(raw, "price");
-        boolean cur = current(raw);
+        boolean cur = current(raw, ROUND_LOT_COMPLIANCE);
         positivePrice(price);
         long lot = 100;
         if (cur) {

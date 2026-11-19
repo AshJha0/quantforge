@@ -16,7 +16,7 @@ Inputs `quantity` X (> 0), `n_buckets` N (1 to 100,000), `mode` `UNITS` or `CONT
 Inputs `quantity`, `profile` (length N, non-negative; normalised internally), `mode`. Slice i = `X w_i / sum w`, evaluated as `X (w_i / sum w)` (ratio first: `X w_i` underflows when a weight is subnormal, e.g. X = 1.5, profile [5e-324] gave 2.0; rule added 2026-11-18, no golden changes); UNITS by largest remainder (HR-3). All-zero profile: `E_DOMAIN`.
 
 ## `exec.schedule.pov`
-Inputs `quantity`, `participation` p in (0, 1) (HR-4, confirmed by DR-H4: participation is of total market volume including own fills), `market_volume` (outside volume per bucket). Child i = `min(remaining, p v_i / (1 - p))`, floored in UNITS. Outputs `slices`, `filled`, `residual` (may be > 0; never an error).
+Inputs `quantity`, `participation` p in (0, 1) (HR-4, confirmed by DR-H4: participation is of total market volume including own fills), `market_volume` (outside volume per bucket). Child i = `min(remaining, p v_i / (1 - p))`, floored in UNITS; a value within 1e-12 relative of an integer is that integer before the floor, so 0.03 x 97 / 0.97 gives 3 (HR-121). Errors (order HR-122): an empty `market_volume` or a fractional UNITS quantity `E_INPUT`, then `participation` outside (0, 1) or a negative volume `E_DOMAIN`. Outputs `slices`, `filled`, `residual` (may be > 0; never an error).
 
 ## Golden cases
 
@@ -37,7 +37,7 @@ Inputs `quantity`, `participation` p in (0, 1) (HR-4, confirmed by DR-H4: partic
 | sched_h-0013 | POV X = 1, p = 0.5, v = [0.75, 0.75, 0.75], CONTINUOUS | slices [0.75, 0.25, 0], filled 1, residual 0 | running remaining caps the second child; residual never negative (HR-56); added by the integration lane 2026-11-18 for HR-56; hand calculation and oracle only, not blind re-derived |
 
 ## Property tests
-Slices sum to X (HR-3); POV realised participation `s_i / (s_i + v_i)` equals p wherever not capped.
+Slices sum to X (HR-3); POV realised participation `s_i / (s_i + v_i)` equals p wherever not capped, in CONTINUOUS mode (the UNITS floor breaks the equality, HR-121).
 
 ## Limitations
 The volume profile is an input (no forecast); no limit prices. Adaptive algos (arrival price, market-on-close, liquidity seeking) and baskets are wave 2.

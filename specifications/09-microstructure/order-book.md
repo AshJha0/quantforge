@@ -32,7 +32,7 @@ So the per-second rows are the main evidence. They are the recorder's own book, 
 ## `micro.book.rebuild`
 
 Inputs:
-- `messages`: list of `{"type": "snapshot" | "update", "bids": [[price, qty], ...], "asks": [...], "checksum": u32 | null, "t": RFC3339}`; prices and quantities as decimal strings (HR-12).
+- `messages`: list of `{"type": "snapshot" | "update", "bids": [[price, qty], ...], "asks": [...], "checksum": u32 | null, "t": RFC3339, "resubscribe": true (optional, snapshots only)}`; prices and quantities as decimal strings (HR-12).
 - `depth`: one of 10, 25, 100, 500, 1000 (the subscribed depth, so the truncation rule is exact).
 - `price_decimals`, `qty_decimals`: the pair's precision from Kraken's public AssetPairs call, recorded with the day (needed for the checksum string).
 - `checkpoints`: optional list of `{"t": ..., "bids": [...], "asks": [...]}` snapshots to compare against (form A, recorder rows).
@@ -47,7 +47,7 @@ Algorithm (normative):
 2. `update`: for each level in message order, `qty == 0` removes the price (a missing price counts in `deletes_of_absent_level` and is not an error; [KR-CRC] says nothing about it and the venue's truncation makes it legitimate), else sets the price's quantity (replace, not add). After all levels of the message: truncate each side to `depth` (count in `truncated_levels`), then check.
 3. Check, after the whole message: if `checksum` is present, compute it per [KR-CRC] on our top 10 and compare (HR-13); best bid >= best ask is `CROSSED`, equal is `LOCKED` (HR-14).
 4. `update` before any `snapshot`, or after a gap row, is `UPDATE_BEFORE_SNAPSHOT`: ignored and counted, until the next snapshot (HR-15).
-5. A `gap` row (reconnect) clears the book and counts in `gaps`; a checksum failure sets `resyncs += 1` only if the caller marks the next snapshot as a resubscribe. The rebuild never invents a recovery the venue does not document.
+5. A `gap` row (reconnect) clears the book and counts in `gaps`; a checksum failure sets `resyncs += 1` only if the next snapshot carries `"resubscribe": true` (HR-15 read with this condition, HR-129). The rebuild never invents a recovery the venue does not document.
 
 Errors: malformed message or non-decimal price `E_SCHEMA`; negative quantity, non-positive price or `depth` not in the list `E_DOMAIN`; more than 50,000,000 messages `E_LIMIT` (HR-17). A price or quantity outside the exact decimal range (36 digits, at most 18 decimals) `E_LIMIT` (HR-57, HR-58). Checksum failures and crossed books are **reported, not errors**: a replay over a day must count them, not stop.
 

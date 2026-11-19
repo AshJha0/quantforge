@@ -95,7 +95,7 @@ rtc_h-0010 91-day bill at 5 % discount: 98.736111111
 
 From [`09-microstructure/asset-conventions.md`](../../specifications/09-microstructure/asset-conventions.md) (rulings HR-80 to HR-116 in `specifications/stage-h-rulings-multiasset.md`).
 
-- Equity tick: 0.01 at or above 1.00, 0.0001 below; the half-penny tier 0.005 from the compliance date (HR-110). Buy rounds down, sell rounds up.
+- Equity tick: 0.01 at or above 1.00, 0.0001 below; the half-penny tier 0.005 from the compliance date, 2027-11-01 after the SEC deferral (HR-120). Buy rounds down, sell rounds up.
 - Spot date: T+2 good days on both currencies' calendars, T+1 for USDCAD; a USD holiday on T+1 counts as a settlement-day skip only.
 - Bond: P = sum over i of (100 c/f)/(1+y/f)^i + 100/(1+y/f)^n on a coupon date; the yield is Brent on (-0.99 f, 10) with tolerance 1e-12, so `rtc_h-0012` is compared within tolerance, not byte for byte.
 - Integer inputs are within +-(2^53-1); outside is `E_LIMIT` in all four builds (HR-116).

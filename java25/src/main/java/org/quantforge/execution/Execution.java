@@ -126,11 +126,11 @@ public final class Execution {
     /** POV (HR-4): child i = min(remaining, p v_i / (1 - p)), floored in UNITS. */
     public static Pov pov(double x, double p, double[] marketVolume, Mode mode) {
         checkQuantity(x, mode);
+        if (marketVolume.length == 0) { // structural E_INPUT before every E_DOMAIN (HR-66, HR-122)
+            throw input("market_volume", "must not be empty");
+        }
         if (!(p > 0 && p < 1)) {
             throw domain("participation", "must lie in (0, 1)");
-        }
-        if (marketVolume.length == 0) {
-            throw input("market_volume", "must not be empty");
         }
         for (double v : marketVolume) {
             if (v < 0) {
@@ -266,10 +266,11 @@ public final class Execution {
     public record AcFrontier(double[] riskAversions, double[] expectedCost, double[] variance) {}
 
     public static AcFrontier acFrontier(AcParams p, double[] lambdas) {
-        double etaTilde = checkAc(p);
-        if (lambdas.length == 0) {
+        // An empty list is structural: after the other E_INPUT checks, before every E_DOMAIN (HR-122).
+        if (p.nSteps() >= 1 && p.quantity() > 0 && lambdas.length == 0) {
             throw input("risk_aversions", "must not be empty");
         }
+        double etaTilde = checkAc(p);
         for (double l : lambdas) {
             checkLambda(l);
         }

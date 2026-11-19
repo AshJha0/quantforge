@@ -448,6 +448,198 @@
     "error"
    ],
    "description": "hand: half-penny tier before the compliance date"
+  },
+  {
+   "case_id": "eqc_h-0020",
+   "operation": "micro.eq.round_price",
+   "inputs": {
+    "price": "10.003",
+    "side": "BUY",
+    "tick_tier": "HALF_PENNY",
+    "as_of": "2026-11-19"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: HR-120: half-penny tier on 2026-11-19, before the deferred Rule 612 date"
+  },
+  {
+   "case_id": "eqc_h-0021",
+   "operation": "micro.eq.round_price",
+   "inputs": {
+    "price": "10.003",
+    "side": "BUY",
+    "tick_tier": "HALF_PENNY",
+    "as_of": "2027-10-29"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: HR-120: half-penny tier on the day before the Rule 612 date"
+  },
+  {
+   "case_id": "eqc_h-0022",
+   "operation": "micro.eq.round_price",
+   "inputs": {
+    "price": "10.003",
+    "side": "SELL",
+    "tick_tier": "HALF_PENNY",
+    "as_of": "2027-11-01"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": "10.005"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 3): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "hand: HR-120: half-penny tier on the Rule 612 date 2027-11-01; a sell rounds up to 10.005; blind in packet 3 (2026-11-19)"
+  },
+  {
+   "case_id": "eqc_h-0023",
+   "operation": "micro.eq.fee_check",
+   "inputs": {
+    "price": "20",
+    "taker_fee": "0.0015",
+    "as_of": "2026-11-19"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cap": "0.003",
+     "taker_fee": "0.0015"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 3): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "hand: HR-120: fee 0.0015 at $20 on 2026-11-19 is inside the old cap 0.003 (Rule 610(c) deferred); blind in packet 3 (2026-11-19)"
+  },
+  {
+   "case_id": "eqc_h-0024",
+   "operation": "micro.eq.fee_check",
+   "inputs": {
+    "price": "20",
+    "taker_fee": "0.0015",
+    "as_of": "2027-11-01"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: HR-120: fee 0.0015 at $20 on 2027-11-01 is above the amended cap 0.001"
+  },
+  {
+   "case_id": "eqc_h-0025",
+   "operation": "micro.eq.round_lot",
+   "inputs": {
+    "as_of": "2026-11-19",
+    "price": "500"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "round_lot": 40
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 3): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "hand: HR-120: round lot at $500 on 2026-11-19 is 40 (Rule 600(b)(93) in force since 2025-11-03); blind in packet 3 (2026-11-19)"
+  },
+  {
+   "case_id": "eqc_h-0026",
+   "operation": "micro.eq.round_lot",
+   "inputs": {
+    "as_of": "2025-10-31",
+    "price": "500"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "round_lot": 100
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 3): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "hand: HR-120: round lot at $500 on 2025-10-31, the business day before, is 100; blind in packet 3 (2026-11-19)"
+  },
+  {
+   "case_id": "eqc_h-0027",
+   "operation": "micro.eq.round_lot",
+   "inputs": {
+    "as_of": "2025-11-03",
+    "price": "500"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "round_lot": 40
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_AUDIT.md, packet 3): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "hand: HR-120: round lot at $500 on 2025-11-03 is 40; blind in packet 3 (2026-11-19)"
   }
  ]
 }

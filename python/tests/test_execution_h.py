@@ -178,7 +178,12 @@ def test_ac_errors_in_spec_order() -> None:
     _err(lambda: ex.ac_trajectory(x, t, 5, -1.0, e, n, G, 0.0), "E_DOMAIN")
     _err(lambda: ex.ac_trajectory(x, 0.0, 5, s, e, n, G, 0.0), "E_DOMAIN")
     _err(lambda: ex.ac_trajectory(x, t, 0, s, e, n, G, 0.0), "E_INPUT")
-    _err(lambda: ex.ac_trajectory(x, t, 0, -1.0, e, n, G, 0.0), "E_DOMAIN")  # sigma listed first
+    # Two errors at once: the structural E_INPUT comes before every E_DOMAIN (HR-66, HR-122).
+    _err(lambda: ex.ac_trajectory(x, t, 0, -1.0, e, n, G, 0.0), "E_INPUT")
+    _err(lambda: ex.ac_trajectory(0.0, 0.0, 5, s, e, n, G, 0.0), "E_INPUT")
+    _err(lambda: ex.ac_frontier(x, t, 5, -1.0, e, n, G, []), "E_INPUT")
+    _err(lambda: ex.ac_frontier(x, t, 0, s, e, n, G, []), "E_INPUT")
+    _err(lambda: ex.schedule_pov(1000.0, 1.5, [], "CONTINUOUS"), "E_INPUT")
     _err(lambda: ex.ac_trajectory(0.0, t, 5, s, e, n, G, 0.0), "E_INPUT")
     _err(lambda: ex.ac_trajectory(x, t, 5, s, -1.0, n, G, 0.0), "E_DOMAIN")
     _err(lambda: ex.ac_trajectory(x, t, 5, s, e, n, -G, 0.0), "E_DOMAIN")

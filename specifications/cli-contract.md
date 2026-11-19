@@ -285,7 +285,7 @@ Batch notes for these operations: `vol.garch.fit`, `rates.cap.strip`, `rates.bon
 Stage F changes one rule for every operation and adds no error code. `stage-f-rulings.md` is normative.
 
 - **Non-finite tokens (F-1).** A Real input may be the string `"NaN"`, `"Infinity"` or `"-Infinity"`. This is the only change to the wire format; the value-encoding table above still holds for every other value. Outputs never carry these strings: a non-finite output is `E_NON_FINITE` as before.
-- **Finite rule (F-2, plan item E1).** The first rule check of every operation is that every Real input is finite; otherwise `E_DOMAIN`. Order of checks becomes `E_PARSE`, `E_SCHEMA`, `E_LIMIT`, the finite rule, then the operation's own checks.
+- **Finite rule (F-2, plan item E1).** The first rule check of every operation is that every Real input is finite; otherwise `E_DOMAIN`. Order of checks becomes `E_PARSE`, `E_SCHEMA`, `E_LIMIT`, the finite rule, then the operation's own checks. For the stage H operations the own checks are structural `E_INPUT` before `E_DOMAIN`, and a limit that only arises after validation is last (HR-122, which reconciles HR-66 with this order; goldens `rule_h`).
 - **Negative zero (F-3).** `-0.0` gives the same result as `0.0`.
 
 Stage F operations are added to the table below as each wave lands.
@@ -437,8 +437,8 @@ Rulings `stage-h-rulings-multiasset.md` HR-80 to HR-103 and the 2026-11-18 rule-
 | Operation | Spec | Inputs | Outputs |
 |---|---|---|---|
 | `micro.eq.round_price` | `09-microstructure/asset-conventions.md` 1.1 | `price`, `side`, optional `tick_table`, `tick_tier` (`PENNY`, `HALF_PENNY`), `as_of`, `compliance_date` | `price` at the tick decimals |
-| `micro.eq.fee_check` | same 1.5 | `price`, `taker_fee`, `cap_check` (default true), `as_of` | `cap`, `taker_fee` |
-| `micro.eq.round_lot` | same 1.2 | `price`, `as_of` | `round_lot` |
+| `micro.eq.fee_check` | same 1.5 | `price`, `taker_fee`, `cap_check` (default true), `as_of`, `compliance_date` | `cap`, `taker_fee` |
+| `micro.eq.round_lot` | same 1.2 | `price`, `as_of`, `compliance_date` | `round_lot` |
 | `micro.eq.settle_date` | same 1.6 | `trade_date`, `settle_lag` (default 1), `holidays` | `settle_date` |
 | `exec.sim.auction.uncross` | `10-execution/auction.md` | `orders` (`id`, `side`, `limit` or `MARKET`, `qty` Integer, `seq`, `on_close`), `tick_size`, `ref_price`, `phase`, `tie_break` (`CBOE` default, `IEX`); orders up to 10,000,000, candidates up to 1,000,000 | `price`, `volume`, `imbalance`, `fills`, `residual`, `cancelled` |
 | `micro.fx.pip_value` | `asset-conventions.md` 2.1 | `pair`, `notional` | `pip_value`, `currency` |

@@ -13,7 +13,7 @@ Inputs `side` (s = +1 BUY, -1 SELL), `decision_price` P_d, `arrival_price` P_0, 
 - execution = `s sum q_i (p_i - P_0)`
 - opportunity = `s (X - Q)(P_c - P_d)`
 - total = delay + execution + opportunity + fees; `total_bps` = total / (X P_d) x 1e4
-- with `benchmark_vwap`: `vwap_slippage` = `s Q (avg_fill - VWAP)`
+- with `benchmark_vwap`: `vwap_slippage` = `s Q (avg_fill - VWAP)` = `s sum q_i (p_i - VWAP)`; with no fills it is 0, as are `delay` and `execution` (HR-126)
 Errors: Q > X: `E_INPUT`; a price <= 0: `E_DOMAIN`.
 
 ## Golden cases

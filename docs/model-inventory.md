@@ -1173,14 +1173,14 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Challenger:** blind second lane (`stage_h_blind/multiasset/`, rates packet 2).
 - **Monitoring thresholds:** acceptance A3 properties (rounding never more aggressive; parse(format(x)) = x on the 1/128 grid; spot a good day and at least T+1).
 - **Data lineage hash:** goldens `datasets/golden/stage_h/eqc_h.json`, `fxc_h.json`, `rtc_h.json` (generator `oracle/python/gen_stage_h_ma.py`).
-- **Retirement trigger:** a superseding stage H ruling or a rule change (HR-110 compliance date).
+- **Retirement trigger:** a superseding stage H ruling or a rule change (HR-120 compliance dates: the SEC has the deferred tick and fee rules under review, so 2027-11-01 may move).
 - **Validation report:** `specifications/09-microstructure/asset-conventions.md`.
 
 ### MH-18 Simulated equity auction (stage H round 4, H-22)
 - **Purpose:** opening and closing call-auction uncrossing (`exec.sim.auction.uncross`) and session phases in the lit engine (HR-112).
 - **Inputs:** as in the spec page.
 - **Limitations:** simulated venue, labelled "simulated venue; not a real exchange"; tie-break rules fixed by ruling HR-84, not one exchange's rulebook.
-- **Validation:** goldens `auc_h`, `ses_h`; blind share H-22 60 %. **Review:** 2026-11-18.
+- **Validation:** goldens `auc_h`, `ses_h`; blind share H-22 66.7 % (20 of 30, with blind packet 3 of 2026-11-19). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** blind second lane; property: volume maximal over the candidate grid (A3).
 - **Monitoring thresholds:** any golden difference across the four builds.
@@ -1204,7 +1204,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Purpose:** ZN and ZB futures on the lit engine in integer ticks, 32nds display, P&L and variation margin (`exec.sim.fut.*`).
 - **Inputs:** as in the spec page; contract specs are parameters with [CME-ZN] and [CME-ZB] defaults.
 - **Limitations:** simulated venue, labelled "simulated venue; not a real exchange; no real rates data"; quarter-tick price text only, eighth-tick contracts not supported (HR-118); no delivery or conversion-factor logic here.
-- **Validation:** goldens `fut_h` (HR-116 integer boundary included); blind share H-24 84.2 % (16 of 19; the three `exec.sim.fut.run` value cases are hand-only) after rates packet 2 (HR-114). **Review:** 2026-11-18.
+- **Validation:** goldens `fut_h` (HR-116 integer boundary included); blind share H-24 94.7 % (18 of 19; two of the three `exec.sim.fut.run` value cases were re-derived blind in packet 3, 2026-11-19) after rates packet 2 (HR-114). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** blind second lane.
 - **Monitoring thresholds:** any golden difference across the four builds.

@@ -456,7 +456,7 @@ fn stage_h_multiasset_goldens() {
         &[
             "auc_h", "eqc_h", "fxc_h", "fxv_h", "rtc_h", "fut_h", "ses_h", "acls_h",
         ],
-        72,
+        109,
     );
 }
 
@@ -472,6 +472,13 @@ fn stage_h_micro_goldens() {
 #[test]
 fn stage_h_w2_exec_goldens() {
     replay_only("stage_h", &["alg_h", "tcx_h", "enum_h"], 42);
+}
+
+/// The stage H audit ruling goldens (`rule_h`, HR-121 to HR-129): rounding at exact values, the
+/// order of checks when two errors apply, and the edge cases the audit found unstated.
+#[test]
+fn stage_h_audit_rule_goldens() {
+    replay_only("stage_h", &["rule_h"], 40);
 }
 
 /// The stage H paper trading goldens (`pt_h`) and their non-finite `E_SCHEMA` cases (`e1_hpt`):
