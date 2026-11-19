@@ -373,8 +373,32 @@ def build(problems):
                 v["suites"] = sorted({r[0] for r in rs})
                 v["meets_item_floor"] = (v["share_with_rederivation"] or 0.0) >= FLOOR
                 entry["per_item"][it] = v
+            if st == "K":
+                # Audit finding KA-C18 (2026-11-19, open): cases counted on a figure printed in the regulator text are
+                # checked on part of their outputs and at print precision, so by the strict reading of the rule above
+                # ("only if every compared output is checked") they do not count. Both figures are published until ruled.
+                def strict(rs):
+                    val = [r for r in rs if r[5]]
+                    return {"cases": len(val), "counted": sum(r[2] == REDERIVED and r[4] != K_PUBLISHED_SRC for r in val)}
+                entry["under_review"] = {
+                    "finding": "KA-C18", "status": "open",
+                    "strict_reading": "a case counted on a printed regulator figure does not count",
+                    "stage": strict(core),
+                    "per_item": {it: strict(rs) for it, rs in sorted(items.items())}}
         out["stages"][st] = entry
     return out
+
+
+def under_review_text(u):
+    s = u["stage"]
+    low = [f"{it} {v['counted']} of {v['cases']} ({v['counted'] / v['cases']:.1%})" for it, v in u["per_item"].items()
+           if v["cases"] and v["counted"] / v["cases"] < FLOOR]
+    return (f"**Stage K shares are under review (audit finding {u['finding']}, {u['status']}; `docs/known-issues.md`).** The table above "
+            "counts a case checked against a figure printed in the regulator text. Such a case is checked on part of its "
+            "outputs and at print precision, which the rule at the top of this page (\"only if every compared output is "
+            f"checked\") does not allow. By the strict reading stage K is {s['counted']} of {s['cases']} "
+            f"({s['counted'] / s['cases']:.1%}), under the floor; items under the floor by that reading: {'; '.join(low)}. "
+            "Neither figure is settled until a ruling says which reading holds.")
 
 
 def markdown(doc):
@@ -418,6 +442,8 @@ def markdown(doc):
               "| Item | Suites | Value cases | Blind | Share | 60% per item |", "|---|---|---:|---:|---:|---|"]
         L += [f"| {it} | {', '.join('`' + s + '`' for s in v['suites'])} | {v['cases']} | {v['counted_with_rederivation']} | "
               f"{(v['share_with_rederivation'] or 0):.1%} | {'met' if v['meets_item_floor'] else 'NOT MET'} |" for it, v in ek["per_item"].items()]
+    if ek and ek.get("under_review"):
+        L += ["", under_review_text(ek["under_review"])]
     L += ["", "## Value classes with no free outside reference", "", "| Suite | Reason |", "|---|---|"]
     for e in doc["stages"].values():
         L += [f"| `{k}` | {v} |" for k, v in e["no_outside_reference"].items()]

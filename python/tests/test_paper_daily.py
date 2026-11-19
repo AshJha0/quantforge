@@ -601,6 +601,19 @@ def test_the_workflow_pins_actions_as_the_recorder_does_and_pushes_only_its_own_
     assert "dry_run" in wf and "pull_request" not in wf and "fwd remote remove origin" in wf
 
 
+@pytest.mark.parametrize("name", ["paper-ledger.yml", "curve-daily.yml"])
+def test_no_daily_job_is_scheduled_while_audit_findings_are_open(name: str) -> None:
+    """Schedule withheld (2026-11-19) until audit findings KA-C1, C2, C3, C9, C11, C12 are closed: manual runs only."""
+    wf = (ROOT / ".github" / "workflows" / name).read_text(encoding="utf-8")
+    code = [ln.split("#")[0] for ln in wf.splitlines()]
+    assert not any("schedule:" in ln or "cron:" in ln for ln in code)
+    assert any(ln.strip() == "workflow_dispatch:" for ln in code)
+    assert (
+        "schedule withheld until the different-model audit findings KA-C1, C2, C3, C9, C11, C12 are closed"
+        in wf
+    )
+
+
 @pytest.mark.parametrize(("second", "timing"), [(59, "on_time"), (60, "late")])
 def test_cutoff_boundary_second(days30: list[dt.date], second: int, timing: str) -> None:
     """KR-82 (and KR-111 for the curve run): on time strictly before 19:30:00 UTC on the next business day."""

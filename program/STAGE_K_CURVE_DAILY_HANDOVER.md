@@ -21,6 +21,7 @@ Read 2026-11-19 through the web-fetch agent (URLs in the spec). Fed Board: publi
 
 ## What runs when
 
+- **Not scheduled (2026-11-19).** The workflow's `schedule:` trigger is withheld until the different-model audit findings KA-C1, C2, C3, C9, C11 and C12 are closed (`docs/known-issues.md`); it can only be started by hand (`workflow_dispatch`). It has never run on a GitHub runner and 0 days are recorded. Planned crons, now comments in the workflow file:
 - `curve-daily.yml`: 23:45 UTC Monday to Friday (Treasury posts usually by 6:00 PM ET) and 14:15 UTC Tuesday to Saturday (second chance, before the 19:30 UTC on-time cut-off), plus `workflow_dispatch` with `dry_run`. Concurrency group `curve-daily`. It starts by itself once the file is on `main`. **Not triggered; branches `curve-daily` and `curve-daily-anchors` not created.**
 - Output: branch `curve-daily`, `ledger/curves.jsonl` and `ledger/summary.json`. Anchors: branch `curve-daily-anchors`, `anchors/`. Optional signing with `FORWARD_LOG_SIGNING_KEY`, as the recorder.
 - A row with a problem (gap, failed fetch or fit, stale input, holdout block) is pushed and then the run turns red (exit 2), so the owner is emailed.

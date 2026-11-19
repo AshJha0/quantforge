@@ -43,3 +43,7 @@ Output fields compared: `fire` (boolean), `sigma` (binary64), `threshold` (binar
 
 - trig_k-0001..0008 and the `e2_k` cases: pass in all four builds.
 - Simulation (key `trigger_simulation`): Python (numpy seed 20261118) 291 fires in 100,000 noise paths, Java (java.util.Random seed 20261118) 287; the 99% binomial interval of the Student-t predictive rate 0.0030306 is [259, 349] (SciPy `binom.interval`; Java computes the same interval exactly from the binomial pmf). The planted 6-sigma move fires on 100,000 of 100,000 paths in both (at least 99.9% required). Pass.
+
+## Limits and open issues
+
+- **Open audit findings (2026-11-19): KA-A4, KA-A5.** `false_alarm_rate` is the rate if sigma were known exactly (0.27% at `k` = 3); with sigma estimated from a window of 4 changes the trigger fires on noise 5.8% of the time. A constant window such as `[0.1, 0.1, 0.1]` gives a sigma of 1.7e-17 instead of `E_DOMAIN`. Register: `docs/known-issues.md`.

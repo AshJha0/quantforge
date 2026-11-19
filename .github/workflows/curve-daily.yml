@@ -7,9 +7,9 @@ name: Curve daily
 # prereg holdout windows. The head is anchored on branch curve-daily-anchors. It never writes to main.
 # All numerical work is in tools/curve_daily/ and the library; this file only checks out, runs and pushes.
 on:
-  schedule:
-    - cron: '45 23 * * 1-5' # after Treasury's end-of-day par curve (usually by 6:00 PM ET, 23:00 UTC in winter)
-    - cron: '15 14 * * 2-6' # second chance next morning, still before the 19:30 UTC on-time cut-off (KR-95)
+  # schedule withheld until the different-model audit findings KA-C1, C2, C3, C9, C11, C12 are closed
+  # (STAGE K round 1 audit, 2026-11-19); see docs/known-issues.md. Crons to restore, once closed:
+  #   '45 23 * * 1-5' (after Treasury's end-of-day par curve) and '15 14 * * 2-6' (second chance, KR-95).
   workflow_dispatch:
     inputs:
       dry_run:

@@ -1,6 +1,6 @@
 # Daily paper ledger
 
-Spec version 0.1.0 (stage K round 1, lane k-paper, 2026-11-19). Status: implemented in `tools/paper_daily/` on the Python CLI; scheduled by `.github/workflows/paper-ledger.yml` from the first run after the round merges. Rulings KR-70 to KR-89 (`stage-k-rulings-paper.md`, proposed; not normative until the stage K coordinator confirms them). Plan items: 14.8 K-1 (paper trading instruments), 14.8 K-2 (paper ledger), 12.7 Q8k (the paper ledger carries TCA per order), 14.10 rule 6 (dates checked against the prereg holdout windows). Builds on `10-execution/paper-trading.md` (H-21), `10-execution/tca.md`, `tca-pretrade.md` and `lit-matching.md`, all unchanged.
+Spec version 0.1.0 (stage K round 1, lane k-paper, 2026-11-19). Status: implemented in `tools/paper_daily/` on the Python CLI; workflow `.github/workflows/paper-ledger.yml`. **Not scheduled (2026-11-19).** The workflow's `schedule:` trigger is withheld until the different-model audit findings KA-C1, C2, C3, C9, C11 and C12 are closed (`docs/known-issues.md`); it can only be started by hand (`workflow_dispatch`). It has never run on a GitHub runner and 0 days are recorded. Rulings KR-70 to KR-89 (`stage-k-rulings-paper.md`, proposed; not normative until the stage K coordinator confirms them). Plan items: 14.8 K-1 (paper trading instruments), 14.8 K-2 (paper ledger), 12.7 Q8k (the paper ledger carries TCA per order), 14.10 rule 6 (dates checked against the prereg holdout windows). Builds on `10-execution/paper-trading.md` (H-21), `10-execution/tca.md`, `tca-pretrade.md` and `lit-matching.md`, all unchanged.
 
 **Every row is labelled "paper marks on a fitted curve; not tradable"** (K-1 fallback, KR-70, KR-71). Fills are labelled "simulated", and the pre-trade cost estimate is labelled "placeholder weights" because its impact parameters are not calibrated. Every run prints the 11.6 sentence: "Paper trading on free data; simulated fills; no evidence of tradable profitability."
 
@@ -198,6 +198,7 @@ These hashes were computed on Windows with Python 3.15. They depend on binary64 
 | P11 | K-2 | `--require-days 20` fails on 19 recorded trading days and passes on 30. **The tag needs this to pass on the real ledger; on 2026-11-19 the real ledger has 0 days** |
 
 ## Limits
+- **Open audit findings (2026-11-19): KA-C1 to KA-C5, KA-C12, KA-C13.** Among them: the on-time label is the runner's own clock, and the gate command as written does not check anchors. The job is not scheduled until the schedule-blocking ones are closed. Register: `docs/known-issues.md`.
 - The marks are not prices of any security. Five par yields joined by straight lines are a crude curve, and a par yield is used as the yield to maturity of a bond that is one or more days off par.
 - The cash rate is the 3 month par yield for both credit and debit; there is no repo market, no borrow cost and no short position.
 - The book, the half spreads, the volatilities and the ADV are assumptions. The pre-trade impact parameters are placeholders.

@@ -82,6 +82,8 @@ Stage K per plan item (plan section 15: at least 60.0% of each item's value case
 | K-8 guard | `rich_k` | 6 | 6 | 100.0% | met |
 | K-8d | `saccr_k` | 16 | 12 | 75.0% | met |
 | K-8e | `btk_k` | 24 | 23 | 95.8% | met |
+
+**Stage K shares above are under review, not settled (audit finding KA-C18, open; `docs/known-issues.md`).** They count cases checked against a figure printed in the regulator text, on part of their outputs and at print precision. By the strict reading of the rule (every compared output checked) the stage is 50 of 87 (57.5%), under the floor; items under the floor by that reading: F (existing traffic_light) 0 of 11 (0.0%); K-8d 7 of 16 (43.8%); K-8e 11 of 24 (45.8%).
 <!-- generated:status-ladder:end -->
 
 ## Stage K, round 1: what the generated table does not cover

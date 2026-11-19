@@ -7,9 +7,10 @@ name: Paper ledger
 # simulator only. Label on every row: "paper marks on a fitted curve; not tradable". No performance claim is made.
 # Guide: docs/developer-guides/paper-ledger.md
 on:
-  schedule:
-    - cron: '40 0 * * 2-6' # 70 minutes after the recorder's 23:30 UTC run, which takes Treasury's end-of-day curve (published by 18:00 ET)
-    - cron: '10 15 * * 1-5' # second chance after the recorder's 14:30 UTC run, still before the 19:30 UTC on-time cut-off
+  # schedule withheld until the different-model audit findings KA-C1, C2, C3, C9, C11, C12 are closed
+  # (STAGE K round 1 audit, 2026-11-19); see docs/known-issues.md. Crons to restore, once closed:
+  #   '40 0 * * 2-6' (after the recorder's 23:30 UTC run) and '10 15 * * 1-5' (second chance); the recorder's own
+  #   runs were measured 3.5 to 8 hours late (KA-C12), so these times need rethinking first.
   workflow_dispatch:
     inputs:
       dry_run:

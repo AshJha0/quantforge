@@ -14,7 +14,9 @@ Label on every row: "paper marks on a fitted curve; not tradable". Fills are sim
 4. pushes to `paper-ledger`, and nothing else; it never writes to `main` or `forward-log`;
 5. stamps the new head with OpenTimestamps on `paper-ledger-anchors`.
 
-The first evening run of a business day D happens at 00:40 UTC on D+1, after the recorder's 23:30 UTC run has taken Treasury's end-of-day curve (source: Treasury's methodology page says the curve is usually up by 18:00 Eastern; read 2026-11-19). The 15:10 UTC run is a second chance and is still before the 19:30 UTC on-time cut-off.
+**Not scheduled (2026-11-19).** The workflow's `schedule:` trigger is withheld until the different-model audit findings KA-C1, C2, C3, C9, C11 and C12 are closed (`docs/known-issues.md`); it can only be started by hand (`workflow_dispatch`). It has never run on a GitHub runner and 0 days are recorded. The same holds for the daily curve run (`.github/workflows/curve-daily.yml`, `specifications/12-platform/daily-curve-run.md`). The times below are the planned crons, kept as comments in the workflow files; the recorder's own scheduled runs were measured 3.5 to 8 hours late (KA-C12), so they will be revised.
+
+As planned, the first evening run of a business day D happens at 00:40 UTC on D+1, after the recorder's 23:30 UTC run has taken Treasury's end-of-day curve (source: Treasury's methodology page says the curve is usually up by 18:00 Eastern; read 2026-11-19). The 15:10 UTC run is a second chance and is still before the 19:30 UTC on-time cut-off.
 
 The job makes no market-data request. FedInvest prices are not used: their site's terms and robots file do not clearly permit recording (KR-70).
 
