@@ -1,0 +1,470 @@
+{
+ "what": "hidden expected values of the 12 btk_k value cases not checked against a printed Basel figure (K-8e blind lane, DR-H2); never in the packet",
+ "source": "datasets/golden/stage_k/btk_k.json",
+ "source_sha256": "c359bf02974dc779e5f02985006f39a2e96b43347017599070000a1390e5bd28",
+ "tolerance": {
+  "simple_analytic": {
+   "absolute": 1e-12,
+   "relative": 1e-10,
+   "rule": "|a - e| <= absolute + relative * max(|a|, |e|) (conformance/tolerances/policy.yaml)"
+  },
+  "date_and_convention": {
+   "exact": true
+  }
+ },
+ "cases": {
+  "btk_k-0013": {
+   "operation": "risk.frtb.backtest.zone",
+   "fields": [
+    {
+     "path": "exceptions",
+     "value": 7,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "cumulative_probability",
+     "value": 0.9959746612881922,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "zone",
+     "value": "AMBER",
+     "class": "date_and_convention"
+    },
+    {
+     "path": "amber_from",
+     "value": 5,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "red_from",
+     "value": 10,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "multiplier",
+     "value": 1.83,
+     "class": "date_and_convention"
+    }
+   ]
+  },
+  "btk_k-0014": {
+   "operation": "risk.frtb.backtest.zone",
+   "fields": [
+    {
+     "path": "exceptions",
+     "value": 9,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "cumulative_probability",
+     "value": 0.9688978933515121,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "zone",
+     "value": "AMBER",
+     "class": "date_and_convention"
+    },
+    {
+     "path": "amber_from",
+     "value": 9,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "red_from",
+     "value": 15,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "multiplier",
+     "value": null,
+     "class": "date_and_convention"
+    }
+   ]
+  },
+  "btk_k-0015": {
+   "operation": "risk.frtb.backtest.zone",
+   "fields": [
+    {
+     "path": "exceptions",
+     "value": 2,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "cumulative_probability",
+     "value": 0.9206267977478196,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "zone",
+     "value": "GREEN",
+     "class": "date_and_convention"
+    },
+    {
+     "path": "amber_from",
+     "value": 3,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "red_from",
+     "value": 6,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "multiplier",
+     "value": null,
+     "class": "date_and_convention"
+    }
+   ]
+  },
+  "btk_k-0016": {
+   "operation": "risk.frtb.backtest.zone",
+   "fields": [
+    {
+     "path": "exceptions",
+     "value": 15,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "cumulative_probability",
+     "value": 0.9521294142420528,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "zone",
+     "value": "AMBER",
+     "class": "date_and_convention"
+    },
+    {
+     "path": "amber_from",
+     "value": 15,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "red_from",
+     "value": 24,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "multiplier",
+     "value": null,
+     "class": "date_and_convention"
+    }
+   ]
+  },
+  "btk_k-0017": {
+   "operation": "risk.frtb.backtest.zone",
+   "fields": [
+    {
+     "path": "exceptions",
+     "value": 0,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "cumulative_probability",
+     "value": 0.99,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "zone",
+     "value": "AMBER",
+     "class": "date_and_convention"
+    },
+    {
+     "path": "amber_from",
+     "value": 0,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "red_from",
+     "value": 1,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "multiplier",
+     "value": null,
+     "class": "date_and_convention"
+    }
+   ]
+  },
+  "btk_k-0018": {
+   "operation": "risk.frtb.backtest.zone",
+   "fields": [
+    {
+     "path": "exceptions",
+     "value": 6,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "cumulative_probability",
+     "value": 0.9833708518007717,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "zone",
+     "value": "AMBER",
+     "class": "date_and_convention"
+    },
+    {
+     "path": "amber_from",
+     "value": 5,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "red_from",
+     "value": 10,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "multiplier",
+     "value": null,
+     "class": "date_and_convention"
+    }
+   ]
+  },
+  "btk_k-0019": {
+   "operation": "risk.frtb.backtest.desk",
+   "fields": [
+    {
+     "path": "exceptions_99",
+     "value": 12,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "exceptions_975",
+     "value": 30,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "cumulative_probability_99",
+     "value": 0.9999980641362446,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "cumulative_probability_975",
+     "value": 0.9999999999996113,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "breach_99",
+     "value": false,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "breach_975",
+     "value": false,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "eligible",
+     "value": true,
+     "class": "date_and_convention"
+    }
+   ]
+  },
+  "btk_k-0020": {
+   "operation": "risk.frtb.backtest.desk",
+   "fields": [
+    {
+     "path": "exceptions_99",
+     "value": 13,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "exceptions_975",
+     "value": 0,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "cumulative_probability_99",
+     "value": 0.9999996735384523,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "cumulative_probability_975",
+     "value": 0.0017830105982346075,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "breach_99",
+     "value": true,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "breach_975",
+     "value": false,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "eligible",
+     "value": false,
+     "class": "date_and_convention"
+    }
+   ]
+  },
+  "btk_k-0021": {
+   "operation": "risk.frtb.backtest.desk",
+   "fields": [
+    {
+     "path": "exceptions_99",
+     "value": 0,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "exceptions_975",
+     "value": 31,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "cumulative_probability_99",
+     "value": 0.08105851616218146,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "cumulative_probability_975",
+     "value": 0.9999999999999323,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "breach_99",
+     "value": false,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "breach_975",
+     "value": true,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "eligible",
+     "value": false,
+     "class": "date_and_convention"
+    }
+   ]
+  },
+  "btk_k-0022": {
+   "operation": "risk.frtb.backtest.desk",
+   "fields": [
+    {
+     "path": "exceptions_99",
+     "value": 6,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "exceptions_975",
+     "value": 11,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "cumulative_probability_99",
+     "value": 0.9862985521447963,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "cumulative_probability_975",
+     "value": 0.9752973072254828,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "breach_99",
+     "value": false,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "breach_975",
+     "value": false,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "eligible",
+     "value": true,
+     "class": "date_and_convention"
+    }
+   ]
+  },
+  "btk_k-0023": {
+   "operation": "risk.frtb.backtest.desk",
+   "fields": [
+    {
+     "path": "exceptions_99",
+     "value": 13,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "exceptions_975",
+     "value": 31,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "cumulative_probability_99",
+     "value": 0.9999971908387492,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "cumulative_probability_975",
+     "value": 0.9999999999902074,
+     "class": "simple_analytic"
+    },
+    {
+     "path": "breach_99",
+     "value": true,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "breach_975",
+     "value": true,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "eligible",
+     "value": false,
+     "class": "date_and_convention"
+    }
+   ]
+  },
+  "btk_k-0024": {
+   "operation": "risk.frtb.backtest.count",
+   "fields": [
+    {
+     "path": "observations",
+     "value": 5,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "exceptions_actual",
+     "value": 3,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "exceptions_hypothetical",
+     "value": 3,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "exceptions",
+     "value": 3,
+     "class": "date_and_convention"
+    },
+    {
+     "path": "days_actual",
+     "value": [
+      1,
+      2,
+      3
+     ],
+     "class": "date_and_convention"
+    },
+    {
+     "path": "days_hypothetical",
+     "value": [
+      0,
+      2,
+      3
+     ],
+     "class": "date_and_convention"
+    }
+   ]
+  }
+ }
+}

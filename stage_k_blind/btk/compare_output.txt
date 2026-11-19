@@ -1,0 +1,81 @@
+case	field	expected	blind	result	notes
+btk_k-0013	exceptions	7	7	MATCH	
+btk_k-0013	cumulative_probability	0.9959746612881922	0.9959746612881922	MATCH	
+btk_k-0013	zone	'AMBER'	'AMBER'	MATCH	 rule-field
+btk_k-0013	amber_from	5	5	MATCH	 rule-field
+btk_k-0013	red_from	10	10	MATCH	 rule-field
+btk_k-0013	multiplier	1.83	1.83	MATCH	 rule-field
+btk_k-0014	exceptions	9	9	MATCH	
+btk_k-0014	cumulative_probability	0.9688978933515121	0.9688978933515121	MATCH	
+btk_k-0014	zone	'AMBER'	'AMBER'	MATCH	
+btk_k-0014	amber_from	9	9	MATCH	
+btk_k-0014	red_from	15	15	MATCH	
+btk_k-0014	multiplier	None	None	MATCH	 rule-field
+btk_k-0015	exceptions	2	2	MATCH	
+btk_k-0015	cumulative_probability	0.9206267977478196	0.9206267977478196	MATCH	
+btk_k-0015	zone	'GREEN'	'GREEN'	MATCH	
+btk_k-0015	amber_from	3	3	MATCH	
+btk_k-0015	red_from	6	6	MATCH	
+btk_k-0015	multiplier	None	None	MATCH	 rule-field
+btk_k-0016	exceptions	15	15	MATCH	
+btk_k-0016	cumulative_probability	0.9521294142420528	0.9521294142420528	MATCH	
+btk_k-0016	zone	'AMBER'	'AMBER'	MATCH	
+btk_k-0016	amber_from	15	15	MATCH	
+btk_k-0016	red_from	24	24	MATCH	
+btk_k-0016	multiplier	None	None	MATCH	 rule-field
+btk_k-0017	exceptions	0	0	MATCH	
+btk_k-0017	cumulative_probability	0.99	0.99	MATCH	
+btk_k-0017	zone	'AMBER'	'AMBER'	MATCH	
+btk_k-0017	amber_from	0	0	MATCH	
+btk_k-0017	red_from	1	1	MATCH	
+btk_k-0017	multiplier	None	None	MATCH	
+btk_k-0018	exceptions	6	6	MATCH	
+btk_k-0018	cumulative_probability	0.9833708518007717	0.9833708518007717	MATCH	
+btk_k-0018	zone	'AMBER'	'AMBER'	MATCH	
+btk_k-0018	amber_from	5	5	MATCH	
+btk_k-0018	red_from	10	10	MATCH	
+btk_k-0018	multiplier	None	None	MATCH	 rule-field
+btk_k-0019	exceptions_99	12	12	MATCH	
+btk_k-0019	exceptions_975	30	30	MATCH	
+btk_k-0019	cumulative_probability_99	0.9999980641362446	0.9999980641362446	MATCH	
+btk_k-0019	cumulative_probability_975	0.9999999999996113	0.9999999999996113	MATCH	
+btk_k-0019	breach_99	False	False	MATCH	 rule-field
+btk_k-0019	breach_975	False	False	MATCH	 rule-field
+btk_k-0019	eligible	True	True	MATCH	 rule-field
+btk_k-0020	exceptions_99	13	13	MATCH	
+btk_k-0020	exceptions_975	0	0	MATCH	
+btk_k-0020	cumulative_probability_99	0.9999996735384523	0.9999996735384523	MATCH	
+btk_k-0020	cumulative_probability_975	0.0017830105982346075	0.0017830105982346075	MATCH	
+btk_k-0020	breach_99	True	True	MATCH	 rule-field
+btk_k-0020	breach_975	False	False	MATCH	 rule-field
+btk_k-0020	eligible	False	False	MATCH	 rule-field
+btk_k-0021	exceptions_99	0	0	MATCH	
+btk_k-0021	exceptions_975	31	31	MATCH	
+btk_k-0021	cumulative_probability_99	0.08105851616218146	0.08105851616218146	MATCH	
+btk_k-0021	cumulative_probability_975	0.9999999999999323	0.9999999999999323	MATCH	
+btk_k-0021	breach_99	False	False	MATCH	 rule-field
+btk_k-0021	breach_975	True	True	MATCH	 rule-field
+btk_k-0021	eligible	False	False	MATCH	 rule-field
+btk_k-0022	exceptions_99	6	6	MATCH	
+btk_k-0022	exceptions_975	11	11	MATCH	
+btk_k-0022	cumulative_probability_99	0.9862985521447963	0.9862985521447963	MATCH	
+btk_k-0022	cumulative_probability_975	0.9752973072254828	0.9752973072254828	MATCH	
+btk_k-0022	breach_99	False	False	MATCH	 rule-field
+btk_k-0022	breach_975	False	False	MATCH	 rule-field
+btk_k-0022	eligible	True	True	MATCH	 rule-field
+btk_k-0023	exceptions_99	13	13	MATCH	
+btk_k-0023	exceptions_975	31	31	MATCH	
+btk_k-0023	cumulative_probability_99	0.9999971908387492	0.9999971908387492	MATCH	
+btk_k-0023	cumulative_probability_975	0.9999999999902074	0.9999999999902074	MATCH	
+btk_k-0023	breach_99	True	True	MATCH	 rule-field
+btk_k-0023	breach_975	True	True	MATCH	 rule-field
+btk_k-0023	eligible	False	False	MATCH	 rule-field
+btk_k-0024	observations	5	5	MATCH	
+btk_k-0024	exceptions_actual	3	3	MATCH	
+btk_k-0024	exceptions_hypothetical	3	3	MATCH	
+btk_k-0024	exceptions	3	3	MATCH	
+btk_k-0024	days_actual	[1, 2, 3]	[1, 2, 3]	MATCH	
+btk_k-0024	days_hypothetical	[0, 2, 3]	[0, 2, 3]	MATCH	
+
+K-8e	cases 12	MATCH 12	MISMATCH 0	MISSING 0	eligible 11	counted blind MATCH 11	needed 3	outside share 23 of 24 (95.8%)
+# not counted: btk_k-0017: the rules text states its answer: the spec Limits and KR-42 say that for n <= 5 zero exceptions is amber, with P(X = 0) = 0.99^n; at n = 1 that gives cumulative_probability 0.99, zone AMBER and amber_from 0, and red_from 1 follows from cdf(n) = 1 (compared: MATCH)
