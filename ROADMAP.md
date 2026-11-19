@@ -86,7 +86,7 @@ The daily curve run (K-11, `specifications/12-platform/daily-curve-run.md`, `pro
 
 | Follow-up | Why |
 |---|---|
-| Svensson (four-factor) fit, for example `bond.fit.svensson` or a `shape` input on `bond.fit.nelson_siegel` | Both real days tried left a fit RMSE just over 10 bp with a wave a three-factor curve cannot follow, and the one consistency check against the Fed's four-factor curve (2026-11-13) was outside its 15 bp tolerance (17.36 bp), a recorded miss. The Svensson formula exists only in `tools/validation/cb_consistency.py`, outside the library |
+| Svensson (four-factor) fit: a new fit operation, or a `shape` input on `bond.fit.nelson_siegel` | Both real days tried left a fit RMSE just over 10 bp with a wave a three-factor curve cannot follow, and the one consistency check against the Fed's four-factor curve (2026-11-13) was outside its 15 bp tolerance (17.36 bp), a recorded miss. The Svensson formula exists only in `tools/validation/cb_consistency.py`, outside the library |
 | Treasury par bootstrap (sovereign par yields to a zero curve) | No operation bootstraps a zero curve from Treasury par yields; `rates.ois.bootstrap` takes swap quotes |
 | Nelson-Siegel evaluation at given times | The job reads fitted zero rates through weight-0 probe bonds, exact but indirect |
 
