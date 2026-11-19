@@ -340,6 +340,15 @@ fn stage_i_goldens() {
     replay("stage_i");
 }
 
+/// The stage K wave 1 goldens (bitemporal store, par bootstrap and incremental update, triggers,
+/// intraday bound, Richardson guard, and the e1/e2 error cases), which put `ops/stagek.rs` and
+/// `stage_k.rs` under `cargo test`. The minimum count is the number of cases on disk: raise it when
+/// goldens are added.
+#[test]
+fn stage_k_goldens() {
+    replay_only("stage_k", &[], 45);
+}
+
 /// The stage J wave 3 (scenario stress, interpolation backtests, drift detectors) and curves lane
 /// (term financing, liquidity curve) goldens, which put `ops/w3.rs`, `ops/termcurve.rs` and the
 /// core modules behind them under `cargo test` and so under the per-file coverage gate.
