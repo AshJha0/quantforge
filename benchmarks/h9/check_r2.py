@@ -12,7 +12,8 @@ micro.book.rebuild itself (the L6 reference), at depth 100 with the pair's decim
     after the last message with t < row t ("lo", the strict reading) and after each later message with t equal to
     the row's t, up to "hi" (micro.book.rebuild's own checkpoint rule, ties before the row). A row passes if the
     book equals it, full 100 levels a side, at one candidate. The counts of rows matched at lo, matched at hi and
-    matched only inside the tie are published, so the strict reading can be read off as well.
+    matched only inside the tie are published, and the count that would fail under the strict "before t" reading
+    (checkpoint_failed_strict_reading). Ruling HR-132 (specifications/stage-h-rulings-audit.md) fixes this reading.
 A failed row is "top 10" if no candidate matches even the row's first 10 levels a side, else "below level 10".
 
 How rebuild is driven: messages get synthetic, strictly increasing times (one second apart; real times are used only
@@ -286,6 +287,7 @@ def check(prefix, chunk=100_000, jobs=1):
         "checkpoint_failed_below10": total["checkpoint_failed_below10"],
         "checkpoint_matched_at_lo": total["matched_at_lo"], "checkpoint_matched_at_hi": total["matched_at_hi"],
         "checkpoint_matched_only_inside_tie": total["matched_only_inside_tie"], "checkpoint_rows_with_tie": total["rows_with_tie"],
+        "checkpoint_failed_strict_reading": total["checkpoint_checked"] - total["matched_at_lo"],
         "crossed": total["crossed"], "locked": total["locked"], "truncated_levels": total["truncated_levels"],
         "deletes_of_absent_level": total["deletes_of_absent_level"], "level_changes": total["level_changes"],
         "gaps": total["gaps"], "chunk": chunk, "chunks": len(leads), "chunk_start_mismatches": lead_mismatch,

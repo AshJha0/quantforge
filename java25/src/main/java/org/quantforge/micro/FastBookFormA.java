@@ -18,7 +18,8 @@ import java.util.List;
  * lo, u16 bids, u16 asks, u32 first level, u32 hi), then levels (i64 price ticks, i64 lots), bids descending then asks
  * ascending. A row is compared after each message index in [lo, hi]: lo is the last book message received strictly
  * before the row's millisecond, hi the last one at or before it; the order inside one millisecond is not recorded, so
- * the row passes at any of them.
+ * the row passes if it equals the book after one of them (ruling HR-132). Rows that do not match at lo would fail the
+ * strict "before t" reading; that count is published as checkpoint_failed_strict_reading.
  */
 public final class FastBookFormA {
     /** Venue checksum carried on a book message, checked outside the timed apply (not {@link FastBook#FLAG_CHECKSUM}). */
@@ -68,7 +69,8 @@ public final class FastBookFormA {
                     + ",\"checkpoint_checked\":" + checkpointChecked + ",\"checkpoint_failed_top10\":" + failedTop10
                     + ",\"checkpoint_failed_below10\":" + failedBelow10 + ",\"checkpoint_matched_at_lo\":" + matchedAtLo
                     + ",\"checkpoint_matched_at_hi\":" + matchedAtHi + ",\"checkpoint_matched_only_inside_tie\":"
-                    + matchedOnlyInsideTie + ",\"checkpoint_rows_with_tie\":" + rowsWithTie + "}";
+                    + matchedOnlyInsideTie + ",\"checkpoint_rows_with_tie\":" + rowsWithTie
+                    + ",\"checkpoint_failed_strict_reading\":" + (checkpointChecked - matchedAtLo) + "}";
         }
     }
 

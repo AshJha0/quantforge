@@ -5,8 +5,8 @@
       Form A counts of the three harnesses must equal the Python reference (check_r2.py) field by field, and the
       run must pass: no checksum failure, no top-10 failure. Exit 0 = pass; 1 = fail; 2 = equal counts, no top-10 or
       checksum failure, but below-level-10 failures (targets (g): they fail the run unless order-book.md as it stood
-      before HR-130 classes them as the venue's; that is the coordinator's decision, passed as
-      QF_R2_BELOW10_VENUE_SIDE=1, and recorded in the marker and in every result file).
+      before HR-130 classes them as the venue's; HR-132: the override QF_R2_BELOW10_VENUE_SIDE=1 is set by the
+      coordinator only, and it is recorded in the correctness marker).
   python r2_meta.py stamp RESULT.json META.json
       Adds the publication fields of targets (f) to a harness result (machine, OS, compiler or runtime, flags,
       commit, workload hashes, warm-up, repeats, targets commits, labels). META.json is written by run_r2.sh.
@@ -18,7 +18,7 @@ from pathlib import Path
 
 FIELDS = ("checksum_checked", "checksum_failed", "checkpoint_checked", "checkpoint_failed_top10",
           "checkpoint_failed_below10", "checkpoint_matched_at_lo", "checkpoint_matched_at_hi",
-          "checkpoint_matched_only_inside_tie", "checkpoint_rows_with_tie")
+          "checkpoint_matched_only_inside_tie", "checkpoint_rows_with_tie", "checkpoint_failed_strict_reading")
 
 
 def compare(symbol, py, *harness):

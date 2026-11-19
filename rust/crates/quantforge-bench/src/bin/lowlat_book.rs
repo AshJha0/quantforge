@@ -263,7 +263,8 @@ fn verify(msgs: &[Msg], levels: &[Level]) -> u64 {
 /// Venue checksum carried on a book message, checked outside the timed `apply` (not `FLAG_CHECKSUM`).
 const FLAG_VENUE_CHECKSUM: u8 = 4;
 
-/// One form A checkpoint row: compared after each message index in `lo..=hi` (the row's millisecond range).
+/// One form A checkpoint row: compared after each message index in `lo..=hi` (the row's millisecond range); it passes
+/// if it equals the book after one of them (ruling HR-132).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct Checkpoint {
     lo: u32,
@@ -350,7 +351,8 @@ impl FormA {
         format!(
             "{{\"checksum_checked\":{},\"checksum_failed\":{},\"checkpoint_checked\":{},\"checkpoint_failed_top10\":{},\
              \"checkpoint_failed_below10\":{},\"checkpoint_matched_at_lo\":{},\"checkpoint_matched_at_hi\":{},\
-             \"checkpoint_matched_only_inside_tie\":{},\"checkpoint_rows_with_tie\":{}}}",
+             \"checkpoint_matched_only_inside_tie\":{},\"checkpoint_rows_with_tie\":{},\
+             \"checkpoint_failed_strict_reading\":{}}}",
             self.checksum_checked,
             self.checksum_failed,
             self.checkpoint_checked,
@@ -359,7 +361,8 @@ impl FormA {
             self.matched_at_lo,
             self.matched_at_hi,
             self.matched_only_inside_tie,
-            self.rows_with_tie
+            self.rows_with_tie,
+            self.checkpoint_checked - self.matched_at_lo
         )
     }
 }

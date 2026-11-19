@@ -67,16 +67,17 @@ inferred, not measured).
   counts at lo, at hi and only inside the tie are published with every result. On the sample: BTC/USD 846 rows, all
   equal (573 at lo, 811 at hi, 16 only inside the tie, 292 rows with a tie); ETH/USD 895 rows, all equal (722, 831, 19,
   218). Under the strict reading alone 273 and 173 rows would count as mismatches although the book is right one or
-  more messages later inside the same millisecond. **Coordinator decision needed:** confirm that the millisecond range
-  is the reading of "the last raw message received before the row's t" that targets (g) means, or say which other.
+  more messages later inside the same millisecond. This reading is fixed by ruling HR-132
+  (`specifications/stage-h-rulings-audit.md`, 2026-11-19, before any file of the R2 window was read); every result
+  publishes `checkpoint_matched_only_inside_tie` and `checkpoint_failed_strict_reading`.
 - Below-level-10 mismatches are counted apart (targets (g)); the runner stops with exit 2 when there are any and goes
-  on only with `QF_R2_BELOW10_VENUE_SIDE=1`, which the coordinator sets only after deciding that `order-book.md` as it
-  stood before HR-130 classes them as the venue's; the decision is written into the correctness marker. The sample
-  had none.
+  on only with `QF_R2_BELOW10_VENUE_SIDE=1`, which only the coordinator sets (HR-132), after deciding that
+  `order-book.md` as it stood before HR-130 classes them as the venue's; the decision is written into the correctness
+  marker. The sample had none.
 - Window rule: a gap row in either symbol's raw or per-second file ends a session. A raw snapshot that does not follow
   a gap row (a recorder restart; a killed recorder writes no gap row) is treated the same way, ending the old session
-  at its last row. The 14-minute sample holds three such sessions (restarts at 20:30:28 and 20:40:47 UTC). This
-  reading is ours (evidence class: inferred from `tools/recorder/crypto_l2.py`), and the coordinator may overrule it.
+  at its last row (ruling HR-132; the recorder behaviour is inferred from `tools/recorder/crypto_l2.py`). The
+  14-minute sample holds three such sessions (restarts at 20:30:28 and 20:40:47 UTC).
 
 ## Development on the sample
 

@@ -502,10 +502,11 @@ int main(int argc, char** argv) {
                       ",\"form_a\":{\"checksum_checked\":%lld,\"checksum_failed\":%lld,\"checkpoint_checked\":%lld,"
                       "\"checkpoint_failed_top10\":%lld,\"checkpoint_failed_below10\":%lld,\"checkpoint_matched_at_lo\":%lld,"
                       "\"checkpoint_matched_at_hi\":%lld,\"checkpoint_matched_only_inside_tie\":%lld,"
-                      "\"checkpoint_rows_with_tie\":%lld}",
+                      "\"checkpoint_rows_with_tie\":%lld,\"checkpoint_failed_strict_reading\":%lld}",
                       (long long)c.checksum_checked, (long long)c.checksum_failed, (long long)c.checkpoint_checked,
                       (long long)c.checkpoint_failed_top10, (long long)c.checkpoint_failed_below10, (long long)c.matched_at_lo,
-                      (long long)c.matched_at_hi, (long long)c.matched_only_inside_tie, (long long)c.rows_with_tie);
+                      (long long)c.matched_at_hi, (long long)c.matched_only_inside_tie, (long long)c.rows_with_tie,
+                      (long long)(c.checkpoint_checked - c.matched_at_lo));
         form_a = b;
         // A checksum or top-10 failure fails the run; below-10 failures are published and judged by the runner
         // under targets (g).

@@ -7,7 +7,9 @@
 // bytes (u32 lo, u16 n_bids, u16 n_asks, u32 first level, u32 hi); then levels (i64 price ticks, i64 lots), bids
 // descending then asks ascending. A row is compared with the book after each message index in [lo, hi]: lo is the
 // last book message received strictly before the row's millisecond, hi the last one at or before it; the order of
-// messages inside one millisecond is not recorded (benchmarks/h9/check_r2.py), so the row passes at any of them.
+// messages inside one millisecond is not recorded (benchmarks/h9/check_r2.py), so the row passes if it equals the
+// book after one of them (ruling HR-132). Rows that do not match at lo would fail the strict "before t" reading; that
+// count is published as checkpoint_failed_strict_reading.
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
