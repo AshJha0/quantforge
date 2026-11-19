@@ -89,8 +89,16 @@ class StageKCliTest {
                 Map<?, ?> w = (Map<?, ?>) want.get("outputs");
                 Map<?, ?> g = (Map<?, ?>) got.get("outputs");
                 assertEquals(w.keySet(), g.keySet(), id);
+                // KR-240: a cancelling idr case carries an absolute tolerance_limit, the derived rounding share
+                double extra = c.get("tolerance_limit") instanceof Map<?, ?> lim
+                        && lim.get("absolute") instanceof Json.Number an ? an.value() : 0.0;
                 for (Object key : w.keySet()) {
-                    compare(id + "." + key, w.get(key), g.get(key), s.equals("idr_k") ? 1e-9 : 1e-12);
+                    Object wv = w.get(key);
+                    if (extra > 0 && wv instanceof Json.Number wn && g.get(key) instanceof Json.Number gn
+                            && Math.abs(wn.value() - gn.value()) <= extra + 1e-9 * Math.abs(wn.value())) {
+                        continue;
+                    }
+                    compare(id + "." + key, wv, g.get(key), s.equals("idr_k") ? 1e-9 : 1e-12);
                 }
             }
         }

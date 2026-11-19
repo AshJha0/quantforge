@@ -36,6 +36,11 @@ def _domain(message: str, field: str | None = None) -> QfError:
     return QfError("E_DOMAIN", message, field)
 
 
+def _too_long(xs: Any, limit: int) -> bool:
+    """A size check that leaves anything without a length to the later checks (the guard's first look)."""
+    return hasattr(xs, "__len__") and len(xs) > limit
+
+
 def _limit(field: str, limit: int) -> QfError:
     return QfError("E_LIMIT", f"{field} is above its limit of {limit}", field)
 
@@ -71,7 +76,7 @@ def _check_log(records: Sequence[BiRecord]) -> None:
 
 
 def _records_limit(records: Sequence[BiRecord], *_: Any) -> None:
-    if len(records) > MAX_RECORDS:
+    if _too_long(records, MAX_RECORDS):
         raise _limit("records", MAX_RECORDS)
 
 
@@ -129,7 +134,7 @@ def _check_quotes(quotes: Floats, field: str) -> None:
 
 
 def _quotes_limit(quotes: Floats) -> None:
-    if len(quotes) > MAX_QUOTES:
+    if _too_long(quotes, MAX_QUOTES):
         raise _limit("quotes", MAX_QUOTES)
 
 
@@ -157,7 +162,7 @@ def _update_limit(previous_quotes: Floats, previous_dfs: Floats, new_quotes: Flo
         ("previous_discount_factors", previous_dfs),
         ("new_quotes", new_quotes),
     ):
-        if len(xs) > MAX_QUOTES:
+        if _too_long(xs, MAX_QUOTES):
             raise _limit(field, MAX_QUOTES)
 
 
@@ -210,7 +215,7 @@ NOISE_FLOOR = 2.0**-26  # KR-233: sigma at or below 2^-26 max|c_i| is no noise s
 
 
 def _changes_limit(changes: Floats, *_: Any) -> None:
-    if len(changes) > MAX_CHANGES:
+    if _too_long(changes, MAX_CHANGES):
         raise _limit("changes", MAX_CHANGES)
 
 
@@ -365,7 +370,7 @@ def position_rounding(p: ZeroPosition, shift: float) -> float:
 
 
 def _positions_limit(positions: Sequence[ZeroPosition], *_: Any) -> None:
-    if len(positions) > MAX_POSITIONS:
+    if _too_long(positions, MAX_POSITIONS):
         raise _limit("positions", MAX_POSITIONS)
 
 
