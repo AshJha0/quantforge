@@ -147,6 +147,16 @@ if(BUILD_TESTING)
   add_test(NAME quantforge_core_tests COMMAND quantforge_core_tests)
 endif()
 
+# Stage K wave 1b (K-8d SA-CCR, K-8e FRTB IMA backtesting), in its own block so it merges apart from the central
+# lists; the coordinator may fold it into them (program/STAGE_K_W1B_PORTS_HANDOVER.md). Both files #embed their table.
+target_sources(quantforge_core PRIVATE src/core/saccr.cpp src/core/frtb_backtest.cpp)
+set_property(SOURCE src/core/saccr.cpp src/core/frtb_backtest.cpp APPEND PROPERTY OBJECT_DEPENDS
+  ${CMAKE_CURRENT_SOURCE_DIR}/../specifications/06-risk/sa-ccr-parameters.json
+  ${CMAKE_CURRENT_SOURCE_DIR}/../specifications/06-risk/frtb-ima-backtest-tables.json)
+if(BUILD_TESTING)
+  target_sources(quantforge_core_tests PRIVATE tests/test_stage_k_w1b.cpp)
+endif()
+
 # H-5 p50/p99 harness (specifications/10-execution/library-interfaces.md section 3). Off by default; no download.
 option(QF_H5_BENCH "Build the qf_h5_latency harness" OFF)
 if(QF_H5_BENCH)
