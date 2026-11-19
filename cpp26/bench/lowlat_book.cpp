@@ -489,13 +489,11 @@ int main(int argc, char** argv) {
     std::string form_a;
     if (const char* cp = std::getenv("QF_H9_CHECKPOINTS")) {
         ll::r2::Checkpoints cps;
-        if (!ll::r2::read_checkpoints(cp, cps)) return std::fprintf(stderr, "cannot read %s
-", cp), 2;
+        if (!ll::r2::read_checkpoints(cp, cps)) return std::fprintf(stderr, "cannot read %s\n", cp), 2;
         const ll::r2::Counts c = ll::r2::verify_form_a(st.msgs, st.levels, cps, depth);
         std::fprintf(stderr,
                      "form A: checksum %lld checked, %lld failed; checkpoints %lld checked, %lld failed top-10, %lld failed "
-                     "below level 10; matched at lo %lld, at hi %lld, only inside the tie %lld
-",
+                     "below level 10; matched at lo %lld, at hi %lld, only inside the tie %lld\n",
                      (long long)c.checksum_checked, (long long)c.checksum_failed, (long long)c.checkpoint_checked,
                      (long long)c.checkpoint_failed_top10, (long long)c.checkpoint_failed_below10, (long long)c.matched_at_lo,
                      (long long)c.matched_at_hi, (long long)c.matched_only_inside_tie);
