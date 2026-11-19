@@ -10673,6 +10673,18 @@
   "risk.frtb.pla.ks_pvalue",
   "risk.frtb.rfet",
   "risk.frtb.rfet.bucket",
-  "risk.frtb.rrao"
+  "risk.frtb.rrao",
+  "xva.colva.value",
+  "xva.exposure.amc",
+  "xva.exposure.closeout",
+  "xva.exposure.closeout_normal",
+  "xva.exposure.stressed_eepe",
+  "xva.funding.asymmetric",
+  "xva.im.project",
+  "xva.mpor.days",
+  "xva.mva.value",
+  "xva.sens.aad",
+  "xva.stress.shocked",
+  "xva.wwr.cva_gaussian_copula"
  ]
 }

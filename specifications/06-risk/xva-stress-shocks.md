@@ -31,7 +31,7 @@ Outputs: `applied_bp`, `shocked_zero_rates`, `shocked_discount_factors` (pillars
 |---|---|
 | shk_k-0001 | curve pillars `(1, 2, 5, 15, 20)` all at 3%; scenario `hikes_2022`; curve outputs only |
 | shk_k-0002 | same curve; scenario `covid_2020`; curve outputs only |
-| shk_k-0003 .. 0006 | ORE cases: one G-42b netting set (portfolio `P5` of run `runb1`, its curve, `a`, `sigma`, credit), one per scenario `gfc_2008`, `taper_2013`, `covid_2020`, `hikes_2022` |
+| shk_k-0003 .. 0006 | ORE cases: one G-42b netting set (portfolio `P5` of run `runb2` (`a = 0.03`, `sigma = 0.01`), its curve converted to zero rates `z_j = -ln P_j / T_j` at its own pillars, its credit), one per scenario `gfc_2008`, `taper_2013`, `covid_2020`, `hikes_2022` |
 
 <!-- strip:begin -->
 ## Worked examples
@@ -68,7 +68,7 @@ The base and shocked values are exact one-factor integrals. The shock definition
 ## Outside-check design (registered here before any run)
 
 - **B (2):** shk_k-0001, 0002 (curve arithmetic from the library and J-W3-4).
-- **O (4), stage G route, not `xvaStress`:** for each scenario we write the **shocked curve** as the ORE market (the same generator `oracle/ore/build_case.py` writes for G-42b, fed with the shocked discount factors), so ORE's own stress-file conventions, which were not read, cannot enter. Netting set `P5` of `runb1` (`a = 0.03`, `sigma = 0.01`), seeds 20261361 to 20261364, 5,000 samples. Count as G-42b: means (EE, ENE per date, per-sample EPE and CVA) within `max(3, z_Bonf) SE`; PFE not compared (not an output here). A case counts when its shocked block passes; the base block is G-42b's own case and is not counted again.
+- **O (4), stage G route, not `xvaStress`:** for each scenario we write the **shocked curve** as the ORE market (the same generator `oracle/ore/build_case.py` writes for G-42b, fed with the shocked discount factors), so ORE's own stress-file conventions, which were not read, cannot enter. Netting set `P5` of `runb2` (`a = 0.03`, `sigma = 0.01`), seeds 20261361 to 20261364, 5,000 samples. Count as G-42b: means (EE, ENE per date, per-sample EPE and CVA) within `max(3, z_Bonf) SE`; PFE not compared (not an output here). A case counts when its shocked block passes; the base block is G-42b's own case and is not counted again.
 - **None:** 0.
 
 ## Limits
