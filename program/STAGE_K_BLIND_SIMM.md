@@ -80,3 +80,17 @@ Per formula (spec Sources table): F1 netting, F2 concentration factor, F3 weight
 ## Results
 
 Not run. (Date, lane and model, packet manifest check, frozen hash and commit, gaps and rulings, compare run and output path, MATCH / MISMATCH / MISSING / counted, resolution of each mismatch: to be filled by the coordinator.)
+
+## Results (2026-11-19; first and only compare run)
+
+- Deriver: a separate subagent on Claude Sonnet 5.5 (spec and packet by Opus 5.5), given only the packet folder and its own folder; standard-library Python. It states it used no outside knowledge (every constant from the packet table) and read or tried to read nothing outside the two folders (its own statement, not independently logged). The coordinator checked the packet manifest hash f4eed98d... before the hand-over.
+- Blind results as received: `stage_k_blind/simm/`, committed in a0d31fd1 before the compare. SHA-256 of `blind_results.json`: `55d6d5da719284fb5ab4e5de4f0939e15e12096fa125d99bd70f33b47f1de12e`, recomputed by the coordinator, equal to the deriver's hash file.
+- Compare: `simm_compare.py` as fixed at 4d4e7510; output `stage_k_blind/simm/compare_output.txt`. Results not changed afterwards; no rerun.
+
+| Item | Cases | MATCH | MISMATCH | Eligible | Counted | Needed |
+|---|---:|---:|---:|---:|---:|---:|
+| K-8h | 29 | 29 | 0 | 28 | 28 | 18 |
+
+Not counted: simm_k-0028 (answer stated by the rules text). Ambiguities the deriver recorded (`stage_k_blind/simm/notes.md`), to be closed in the spec text: the equity vega within-bucket correlation between different issuers, and its square for curvature, is not exercised by any case (case 22 has one factor per bucket): ADD a case that exercises it before the spec is confirmed; interest-rate deltas under the Equity product class; single-bucket margin equals K_b; the net-zero group; `label` absent from the template.
+
+**Gate status: NOT MET, whatever this table says.** The outside-check share is met (28 of 29), but the gate rule also requires a source actually read, and every SIMM formula in the spec is "recalled, not read" (isda.org returned HTTP 403 to the fetch on 2026-11-19). A blind match shows our statement of the aggregation is unambiguous and the arithmetic right. It does not show the aggregation is the methodology's. Until the methodology document is read and each formula's evidence class moves to "read", K-8h stays PROPOSED and is not part of any release.
