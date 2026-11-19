@@ -10,7 +10,7 @@ Business days Monday to Friday up to 2026-11-19, holidays from code/tools/record
 | recorder/ecb-aaa-yield-curve | 2026-11-07 | 8 | none | 0 |
 | recorder/ecb-estr | 2026-11-07 | 8 | 2026-11-10 | 0 |
 | recorder/ecb-reference-rates | 2026-11-07 | 8 | none | 0 |
-| recorder/eia-ng-bulk | 2026-11-07 | 8 | none | 3 |
+| recorder/eia-ng-bulk | 2026-11-07 | 8 | none | 2 |
 | recorder/eurostat-hicp | 2026-11-07 | 8 | none | 5 |
 | recorder/fiscaldata-treasury-auctions | 2026-11-09 | 8 | none | 7 |
 | recorder/frb-h10 | 2026-11-07 | 8 | none | 3 |
