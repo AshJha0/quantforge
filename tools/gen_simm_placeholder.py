@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+"""Writes specifications/tables/stage_k/simm-placeholder.json: the PLACEHOLDER weights, correlations and thresholds
+of the SIMM-structure item K-8h (spec specifications/06-risk/simm-placeholder.md, rulings KR-130 onward).
+
+Every number below is a round number chosen by QuantForge by a stated rule. None is taken from, fitted to, or
+compared with any ISDA SIMM parameter set or any licensed calibration, and no such file was opened to write this
+(owner decision 2026-11-19; program/STAGE_K_ORE_SURVEY.md section 5). The rules are deliberately artificial so that
+nobody can mistake the table for a calibration:
+
+  tenors           1W, 1Y, 5Y, 10Y with index k = 1..4 and days 7, 365, 1825, 3650
+  IR delta RW      10 x k                                   (10, 20, 30, 40)
+  IR rho(k, l)     1 - 0.1 |k - l|  between tenors           (0.9, 0.8, 0.7)
+  IR gamma         0.25 between any two currencies
+  EQ delta RW      10 x b for buckets b = 1..3, 40 for RESIDUAL
+  EQ rho           0.5 within a numbered bucket, 0.25 within RESIDUAL; gamma 0.25 between numbered buckets
+  FX delta RW      5 for every currency; rho 0.5 between any two currencies
+  vega RW          IR 2, EQ 3 (one weight per risk class); vega correlations equal the delta correlations
+  thresholds       delta: IR 100, EQ 100, FX 1000; vega: IR 1000, EQ 1000 (amount units of the input)
+  curvature        SF(t) = 0.25 min(1, 20 / t), t in days; z = 2 (lambda = (z^2 - 1)(1 + theta) - theta);
+                   correlations squared
+  psi              0.2 between any two of IR, FX, EQ within a product class
+
+    python tools/gen_simm_placeholder.py           write the table
+    python tools/gen_simm_placeholder.py --check   exit 1 if the committed table differs from the generator output
+Standard library only. Numbers are written as decimal strings (HR-12).
+"""
+
+import json
+import sys
+from fractions import Fraction
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+OUT = ROOT / "specifications" / "tables" / "stage_k" / "simm-placeholder.json"
+
+NOTICE = ("PLACEHOLDER WEIGHTS. Round numbers chosen by QuantForge by the rules in this file; they have no relation "
+          "to any ISDA SIMM parameter set, any licensed calibration or any vendor file, none of which was opened to "
+          "write them. Results computed with them are not SIMM initial margin and must not be used for margin calls.")
+
+
+def dec(x):
+    """Exact decimal string of a Fraction with a terminating decimal expansion (no binary rounding)."""
+    x = Fraction(x)
+    if x.denominator == 1:
+        return str(x.numerator)
+    sign = "-" if x < 0 else ""
+    x = abs(x)
+    whole, rem = divmod(x.numerator, x.denominator)
+    digits = []
+    for _ in range(30):
+        if rem == 0:
+            break
+        rem *= 10
+        d, rem = divmod(rem, x.denominator)
+        digits.append(str(d))
+    if rem != 0:
+        raise ValueError(f"{x} has no short decimal form")
+    return f"{sign}{whole}." + "".join(digits)
+
+
+TENORS = [("1W", 7), ("1Y", 365), ("5Y", 1825), ("10Y", 3650)]
+EQ_BUCKETS = ["1", "2", "3"]
+
+
+def build():
+    labels = [t for t, _ in TENORS]
+    ir_rho = [[dec(1 if k == l else 1 - Fraction(1, 10) * abs(k - l)) for l in range(1, 5)] for k in range(1, 5)]
+    eq_rw = {b: dec(10 * int(b)) for b in EQ_BUCKETS}
+    eq_rw["RESIDUAL"] = dec(40)
+    return {
+        "name": "simm-placeholder",
+        "placeholder": True,
+        "label": "placeholder weights",
+        "notice": NOTICE,
+        "status": "PROPOSED (stage K item K-8h, spec lane 2026-11-19)",
+        "generator": "tools/gen_simm_placeholder.py (the file must equal its output: tools/test_simm_placeholder.py)",
+        "numbers": "decimal strings (HR-12)",
+        "rules": [
+            "tenors 1W, 1Y, 5Y, 10Y: index k = 1..4, days 7, 365, 1825, 3650",
+            "IR delta RW = 10 x k; IR rho(k, l) = 1 - 0.1 |k - l|; IR gamma 0.25 between any two currencies",
+            "EQ delta RW = 10 x b for buckets 1..3, 40 for RESIDUAL; EQ rho 0.5 within a numbered bucket, "
+            "0.25 within RESIDUAL; EQ gamma 0.25 between numbered buckets",
+            "FX delta RW 5; FX rho 0.5 between any two currencies",
+            "vega RW: IR 2, EQ 3; vega correlations equal the delta correlations",
+            "concentration thresholds: delta IR 100, EQ 100, FX 1000; vega IR 1000, EQ 1000",
+            "curvature: SF(t) = 0.25 min(1, 20 / t), t in days; z = 2; correlations squared",
+            "psi 0.2 between any two of IR, FX, EQ within a product class",
+        ],
+        "tenors": [{"label": t, "index": i + 1, "days": d} for i, (t, d) in enumerate(TENORS)],
+        "IR": {
+            "delta": {"rw": {t: dec(10 * (i + 1)) for i, t in enumerate(labels)},
+                      "rho": {"order": labels, "matrix": ir_rho},
+                      "gamma": dec(Fraction(1, 4)),
+                      "threshold": dec(100)},
+            "vega": {"rw": dec(2), "threshold": dec(1000),
+                     "rho": "as delta", "gamma": "as delta"},
+        },
+        "FX": {
+            "delta": {"rw": dec(5), "rho": dec(Fraction(1, 2)), "threshold": dec(1000)},
+        },
+        "EQ": {
+            "delta": {"rw": eq_rw,
+                      "rho": {b: dec(Fraction(1, 2)) for b in EQ_BUCKETS} | {"RESIDUAL": dec(Fraction(1, 4))},
+                      "gamma": dec(Fraction(1, 4)),
+                      "threshold": dec(100)},
+            "vega": {"rw": dec(3), "threshold": dec(1000),
+                     "rho": "as delta", "gamma": "as delta"},
+        },
+        "curvature": {"sf_scale": dec(Fraction(1, 4)), "sf_days": dec(20), "z": dec(2),
+                      "correlations": "squares of the vega correlations (rho^2 within a bucket, gamma^2 across)"},
+        "psi": {"pairs": [["IR", "FX"], ["IR", "EQ"], ["FX", "EQ"]], "value": dec(Fraction(1, 5))},
+    }
+
+
+def text():
+    return json.dumps(build(), indent=1, ensure_ascii=True) + "\n"
+
+
+def main():
+    if "--check" in sys.argv[1:]:
+        if OUT.read_text(encoding="utf-8") != text():
+            print(f"{OUT} differs from the generator output; regenerate with tools/gen_simm_placeholder.py")
+            return 1
+        print("simm-placeholder.json equals the generator output")
+        return 0
+    OUT.write_text(text(), encoding="utf-8", newline="\n")
+    print(f"wrote {OUT}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
