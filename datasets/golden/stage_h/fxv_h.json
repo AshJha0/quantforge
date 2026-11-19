@@ -1,0 +1,745 @@
+{
+ "schema_version": "1.0",
+ "suite": "fxv_h",
+ "spec": "specifications/10-execution/fx-rfq-venue.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_ma.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "fxv_h-0001",
+   "operation": "exec.sim.fx.stream",
+   "inputs": {
+    "half_spread_pips": "1",
+    "mid_path": [
+     {
+      "mid": "1.08512",
+      "time": 0
+     }
+    ],
+    "pair": "EURUSD",
+    "tick": "0.00001"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "quotes": [
+      {
+       "ask": "1.08522",
+       "bid": "1.08502",
+       "mid": "1.08512",
+       "time": 0
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxv_h-0001 from the spec table"
+  },
+  {
+   "case_id": "fxv_h-0002",
+   "operation": "exec.sim.fx.stream",
+   "inputs": {
+    "half_spread_pips": "1",
+    "mid_path": [
+     {
+      "mid": "1.085125",
+      "time": 0
+     }
+    ],
+    "pair": "EURUSD",
+    "tick": "0.00001"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "quotes": [
+      {
+       "ask": "1.08523",
+       "bid": "1.08502",
+       "mid": "1.085125",
+       "time": 0
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxv_h-0002 from the spec table"
+  },
+  {
+   "case_id": "fxv_h-0003",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0855",
+    "p_random_reject": "0.05",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "u": "0.50"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "move_pips": "4",
+     "outcome": "LL_PRICE",
+     "price": null
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxv_h-0003 from the spec table"
+  },
+  {
+   "case_id": "fxv_h-0004",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0852",
+    "p_random_reject": "0.05",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "u": "0.50"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "move_pips": "1",
+     "outcome": "FILL",
+     "price": "1.0852"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxv_h-0004 from the spec table"
+  },
+  {
+   "case_id": "fxv_h-0005",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0852",
+    "p_random_reject": "0.05",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "u": "0.03"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "move_pips": "1",
+     "outcome": "LL_RANDOM",
+     "price": null
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxv_h-0005 from the spec table"
+  },
+  {
+   "case_id": "fxv_h-0006",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0847",
+    "p_random_reject": "0.05",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "u": "0.50"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "move_pips": "-4",
+     "outcome": "LL_PRICE",
+     "price": null
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxv_h-0006 from the spec table"
+  },
+  {
+   "case_id": "fxv_h-0007",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0847",
+    "p_random_reject": "0.05",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": false,
+    "threshold_pips": "2",
+    "u": "0.50"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "move_pips": "-4",
+     "outcome": "FILL",
+     "price": "1.0852"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxv_h-0007 from the spec table"
+  },
+  {
+   "case_id": "fxv_h-0008",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0848",
+    "p_random_reject": "0.05",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "SELL",
+    "symmetric": false,
+    "threshold_pips": "2",
+    "u": "0.50"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "move_pips": "-3",
+     "outcome": "LL_PRICE",
+     "price": null
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxv_h-0008 from the spec table"
+  },
+  {
+   "case_id": "fxv_h-0009",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0853",
+    "p_random_reject": "0.05",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "u": "0.50"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "move_pips": "2",
+     "outcome": "FILL",
+     "price": "1.0852"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxv_h-0009 from the spec table"
+  },
+  {
+   "case_id": "fxv_h-0010",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0852",
+    "p_random_reject": "0.5",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "request_index": 0,
+    "seed": 20261118
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "move_pips": "1",
+     "outcome": "FILL",
+     "price": "1.0852",
+     "u": 0.9911886460034905
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxv_h-0010 hand: last-look draw from core.rng (HR-97) (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "fxv_h-0011",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0852",
+    "p_random_reject": "0.5",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "request_index": 1,
+    "seed": 20261118
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "move_pips": "1",
+     "outcome": "FILL",
+     "price": "1.0852",
+     "u": 0.7521088335273628
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxv_h-0011 hand: last-look draw from core.rng (HR-97) (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "fxv_h-0012",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0852",
+    "p_random_reject": "0.5",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "request_index": 2,
+    "seed": 20261118
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "move_pips": "1",
+     "outcome": "FILL",
+     "price": "1.0852",
+     "u": 0.8774287687244974
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxv_h-0012 hand: last-look draw from core.rng (HR-97) (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "fxv_h-0013",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0855",
+    "p_random_reject": "0.05",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "u": "1"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: u outside [0, 1)"
+  },
+  {
+   "case_id": "fxv_h-0014",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0855",
+    "p_random_reject": "0.05",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0850",
+     "bid": "1.0852",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "u": "1"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: bid above ask (input before domain)"
+  },
+  {
+   "case_id": "fxv_h-0015",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0852",
+    "p_random_reject": "0.5",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "request_index": -1,
+    "seed": 20261118
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: HR-116: request_index -1"
+  },
+  {
+   "case_id": "fxv_h-0016",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0852",
+    "p_random_reject": "0.5",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "request_index": 4294967296,
+    "seed": 20261118
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: HR-116: request_index 2^32"
+  },
+  {
+   "case_id": "fxv_h-0017",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0852",
+    "p_random_reject": "0.5",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "request_index": 0,
+    "seed": -1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: HR-116: seed -1"
+  },
+  {
+   "case_id": "fxv_h-0018",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0852",
+    "p_random_reject": "0.5",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "request_index": 0,
+    "seed": 9007199254740992
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: HR-116: seed 2^53"
+  },
+  {
+   "case_id": "fxv_h-0019",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0852",
+    "p_random_reject": "0.5",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "request_index": 0,
+    "seed": 9007199254740991
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "move_pips": "1",
+     "outcome": "LL_RANDOM",
+     "price": null,
+     "u": 0.22209087645636283
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "hr116"
+   ],
+   "description": "hand: HR-116 in-range boundary (seed 9007199254740991, request_index 0)"
+  },
+  {
+   "case_id": "fxv_h-0020",
+   "operation": "exec.sim.fx.request",
+   "inputs": {
+    "mid_after": "1.0852",
+    "p_random_reject": "0.5",
+    "pair": "EURUSD",
+    "qty": "1000000",
+    "quote": {
+     "ask": "1.0852",
+     "bid": "1.0850",
+     "quote_mid": "1.0851"
+    },
+    "side": "BUY",
+    "symmetric": true,
+    "threshold_pips": "2",
+    "request_index": 0,
+    "seed": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "simulated venue; not a real exchange; no real FX data",
+     "move_pips": "1",
+     "outcome": "FILL",
+     "price": "1.0852",
+     "u": 0.601262999417905
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "hr116"
+   ],
+   "description": "hand: HR-116 in-range boundary (seed 0, request_index 0)"
+  }
+ ]
+}

@@ -952,6 +952,7 @@ fn lit_child(
         str_of(req(cfg, "lot_size", "lit/")?, "lot_size")?,
         &events,
         fees,
+        None,
     )?;
     let arr = |k: &str| out.get(k).and_then(Json::as_array).unwrap_or(&[]);
     let id_is = |v: &Json, k: &str| v.get(k).and_then(Json::as_str) == Some(cid);

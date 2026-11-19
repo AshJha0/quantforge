@@ -31,8 +31,10 @@ void book_rebuild(const json::Value& messages, long long depth, long long price_
 
 /// The simulated lit engine. `events` must be an array, `fee_schedule` an object. Writes book, cancelled,
 /// conservation, fees, fills, label, mbp and rejects into `out`.
+/// With `session` (an object: phase, ref_price, tie_break; HR-83) the run also takes PHASE events and writes
+/// auctions and phase (asset-conventions.md 1.3, auction.md); `fee_schedule/auction_fee` prices auction fills.
 void lit_run(std::string_view tick_size, std::string_view lot_size, const json::Value& events,
-             const json::Value& fee_schedule, json::Writer& out);
+             const json::Value& fee_schedule, json::Writer& out, const json::Value* session = nullptr);
 
 /// exec.sim.dark.run (specifications/10-execution/dark-pool.md, HR-32 to HR-36): one pool run; writes fills,
 /// invitations, label, resting and suspensions into `out`.

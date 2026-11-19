@@ -42,8 +42,12 @@ pub mod lit {
             if !matches!(fees, quantforge_core::json::Json::Obj(_)) {
                 return Err(err("E_SCHEMA", "fee_schedule: expected an object"));
             }
+            let session = i.opt("session");
+            if session.is_some_and(|s| !matches!(s, quantforge_core::json::Json::Obj(_))) {
+                return Err(err("E_SCHEMA", "session: expected an object"));
+            }
             i.gate()?;
-            plain(lit_matching::run(tick, lot, events, fees)?)
+            plain(lit_matching::run(tick, lot, events, fees, session)?)
         }
     }
 }

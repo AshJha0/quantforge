@@ -1163,3 +1163,51 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Data lineage hash:** none (no golden suite; the interfaces are checked by unit tests).
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/10-execution/library-interfaces.md`.
+
+### MH-17 Equity, FX and rates conventions (stage H round 4, H-22 to H-24)
+- **Purpose:** tick rounding, fee cap, round lot, T+1 settlement (`micro.eq.*`); pip value and spot date (`micro.fx.*`); 32nds, tick value, bond and bill price and bond yield (`micro.rates.*`).
+- **Inputs:** as in the spec page; decimal strings (HR-12); integers within +-(2^53-1) (HR-116).
+- **Limitations:** calendars are inputs; on-coupon-date bond only (off-date pricing reuses `04-pricing`); third digit of 32nds: CME quarter digits 0, 2, 5, 7 only (source read 2026-11-19); eighth-tick contracts (2-year and 3-year notes) not supported (HR-118); outputs carry no label (HR-111).
+- **Validation:** goldens `eqc_h`, `fxc_h`, `rtc_h` with E1 cases in `e1_h4`; blind re-derivation (DR-H2) per `oracle/OUTSIDE_SHARES.md`. **Review:** 2026-11-18.
+- **Tier:** 3.
+- **Challenger:** blind second lane (`stage_h_blind/multiasset/`, rates packet 2).
+- **Monitoring thresholds:** acceptance A3 properties (rounding never more aggressive; parse(format(x)) = x on the 1/128 grid; spot a good day and at least T+1).
+- **Data lineage hash:** goldens `datasets/golden/stage_h/eqc_h.json`, `fxc_h.json`, `rtc_h.json` (generator `oracle/python/gen_stage_h_ma.py`).
+- **Retirement trigger:** a superseding stage H ruling or a rule change (HR-110 compliance date).
+- **Validation report:** `specifications/09-microstructure/asset-conventions.md`.
+
+### MH-18 Simulated equity auction (stage H round 4, H-22)
+- **Purpose:** opening and closing call-auction uncrossing (`exec.sim.auction.uncross`) and session phases in the lit engine (HR-112).
+- **Inputs:** as in the spec page.
+- **Limitations:** simulated venue, labelled "simulated venue; not a real exchange"; tie-break rules fixed by ruling HR-84, not one exchange's rulebook.
+- **Validation:** goldens `auc_h`, `ses_h`; blind share H-22 60 %. **Review:** 2026-11-18.
+- **Tier:** 3.
+- **Challenger:** blind second lane; property: volume maximal over the candidate grid (A3).
+- **Monitoring thresholds:** any golden difference across the four builds.
+- **Data lineage hash:** `datasets/golden/stage_h/auc_h.json`, `ses_h.json`.
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/auction.md`.
+
+### MH-19 Simulated FX dealer venue with last look (stage H round 4, H-23)
+- **Purpose:** streamed quotes and request handling with a price-move and a random last-look reject (`exec.sim.fx.stream`, `exec.sim.fx.request`).
+- **Inputs:** as in the spec page; the draw from `core.rng` stream `request_index` (HR-97), `request_index` within 0..2^32-1 (HR-116).
+- **Limitations:** a stated toy, not any dealer's practice; labelled "simulated venue; not a real exchange; no real FX data"; FX Global Code Principle 17 read 2026-11-19; the thresholds and the random reject are the spec's own, not from the Code (HR-119).
+- **Validation:** goldens `fxv_h` (HR-116 boundary cases included); blind share H-23 71.4 %. **Review:** 2026-11-18.
+- **Tier:** 3.
+- **Challenger:** blind second lane.
+- **Monitoring thresholds:** any golden difference across the four builds.
+- **Data lineage hash:** `datasets/golden/stage_h/fxv_h.json`.
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/fx-rfq-venue.md`.
+
+### MH-20 Simulated Treasury futures venue (stage H round 4, H-24)
+- **Purpose:** ZN and ZB futures on the lit engine in integer ticks, 32nds display, P&L and variation margin (`exec.sim.fut.*`).
+- **Inputs:** as in the spec page; contract specs are parameters with [CME-ZN] and [CME-ZB] defaults.
+- **Limitations:** simulated venue, labelled "simulated venue; not a real exchange; no real rates data"; quarter-tick price text only, eighth-tick contracts not supported (HR-118); no delivery or conversion-factor logic here.
+- **Validation:** goldens `fut_h` (HR-116 integer boundary included); blind share H-24 84.2 % (16 of 19; the three `exec.sim.fut.run` value cases are hand-only) after rates packet 2 (HR-114). **Review:** 2026-11-18.
+- **Tier:** 3.
+- **Challenger:** blind second lane.
+- **Monitoring thresholds:** any golden difference across the four builds.
+- **Data lineage hash:** `datasets/golden/stage_h/fut_h.json`.
+- **Retirement trigger:** a superseding stage H ruling.
+- **Validation report:** `specifications/10-execution/rates-futures-venue.md`.

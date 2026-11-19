@@ -374,6 +374,30 @@ impl Problem {
             Some(v) if !v.is_empty() => v,
             _ => return Err(at("E_INPUT", "venues", "empty")),
         };
+        // HR-93, HR-113: every venue in the order's asset class; a DARK venue is equities only.
+        let ac = crate::dark_pool::asset_class;
+        let order_class = ac(inp.get("asset_class"), "asset_class", false)?;
+        let mut classes = Vec::with_capacity(venues.len());
+        for (k, v) in venues.iter().enumerate() {
+            classes.push(ac(
+                v.get("asset_class"),
+                &format!("venues/{k}/asset_class"),
+                false,
+            )?);
+        }
+        if classes.iter().any(|c| *c != order_class) {
+            return Err(at(
+                "E_INPUT",
+                "venues",
+                "a venue's asset_class differs from the order's (HR-93)",
+            ));
+        }
+        for (k, v) in venues.iter().enumerate() {
+            if v.get("kind").and_then(Json::as_str) == Some("DARK") {
+                let c = Json::Str(classes[k].into());
+                ac(Some(&c), &format!("venues/{k}/asset_class"), true)?;
+            }
+        }
         if venues.len() > MAX_VENUES {
             return Err(at("E_LIMIT", "venues", "more than 64 venues"));
         }

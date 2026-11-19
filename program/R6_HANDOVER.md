@@ -346,3 +346,7 @@ TOTALS: 15762 value 7779 error 5469 invariance 2514
 Robust curve fit fix (2026-11-18, robust-fit-fix, ruling D38b): `fits_d-0017` to `-0019` and `rulings_d-0019` to `-0022`: 7 cases (5 value, 2 error).
 
 TOTALS: 15769 value 7784 error 5471 invariance 2514
+
+Stage H round 4, multi-asset (2026-11-19, stage-h4, H-22 to H-24, rulings HR-80 to HR-117): `auc_h`, `eqc_h`, `fxc_h`, `fxv_h`, `rtc_h`, `fut_h`, `ses_h`, `acls_h`, `e1_h4`: 116 cases (63 value, 53 error).
+
+TOTALS: 15892 value 7850 error 5528 invariance 2514

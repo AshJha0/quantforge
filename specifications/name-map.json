@@ -2869,6 +2869,39 @@
     "slices"
    ]
   },
+  "exec.sim.auction.uncross": {
+   "spec": "specifications/10-execution/auction.md",
+   "rust": "quantforge::exec::sim_auction_uncross",
+   "python": "quantforge.exec.sim_auction_uncross",
+   "java": "Exec.simAuctionUncross",
+   "cpp": "qf::exec::sim_auction_uncross",
+   "inputs": {
+    "orders": {
+     "java": "orders"
+    },
+    "phase": {
+     "java": "phase"
+    },
+    "ref_price": {
+     "java": "refPrice"
+    },
+    "tick_size": {
+     "java": "tickSize"
+    },
+    "tie_break": {
+     "java": "tieBreak"
+    }
+   },
+   "outputs": [
+    "cancelled",
+    "fills",
+    "imbalance",
+    "label",
+    "price",
+    "residual",
+    "volume"
+   ]
+  },
   "exec.sim.dark.markouts": {
    "spec": "specifications/10-execution/dark-pool.md",
    "rust": "quantforge::exec::sim_dark_markouts",
@@ -2910,6 +2943,175 @@
     "suspensions"
    ]
   },
+  "exec.sim.fut.pnl": {
+   "spec": "specifications/10-execution/rates-futures-venue.md",
+   "rust": "quantforge::exec::sim_fut_pnl",
+   "python": "quantforge.exec.sim_fut_pnl",
+   "java": "Exec.simFutPnl",
+   "cpp": "qf::exec::sim_fut_pnl",
+   "inputs": {
+    "buy_price": {
+     "java": "buyPrice"
+    },
+    "contract": {
+     "java": "contract"
+    },
+    "fee_per_contract": {
+     "java": "feePerContract"
+    },
+    "qty": {
+     "java": "qty"
+    },
+    "sell_price": {
+     "java": "sellPrice"
+    }
+   },
+   "outputs": [
+    "fees",
+    "label",
+    "pnl"
+   ]
+  },
+  "exec.sim.fut.to_text": {
+   "spec": "specifications/10-execution/rates-futures-venue.md",
+   "rust": "quantforge::exec::sim_fut_to_text",
+   "python": "quantforge.exec.sim_fut_to_text",
+   "java": "Exec.simFutToText",
+   "cpp": "qf::exec::sim_fut_to_text",
+   "inputs": {
+    "contract": {
+     "java": "contract"
+    },
+    "ticks": {
+     "java": "ticks"
+    }
+   },
+   "outputs": [
+    "label",
+    "text"
+   ]
+  },
+  "exec.sim.fut.to_ticks": {
+   "spec": "specifications/10-execution/rates-futures-venue.md",
+   "rust": "quantforge::exec::sim_fut_to_ticks",
+   "python": "quantforge.exec.sim_fut_to_ticks",
+   "java": "Exec.simFutToTicks",
+   "cpp": "qf::exec::sim_fut_to_ticks",
+   "inputs": {
+    "contract": {
+     "java": "contract"
+    },
+    "price": {
+     "java": "price"
+    }
+   },
+   "outputs": [
+    "label",
+    "ticks"
+   ]
+  },
+  "exec.sim.fut.variation": {
+   "spec": "specifications/10-execution/rates-futures-venue.md",
+   "rust": "quantforge::exec::sim_fut_variation",
+   "python": "quantforge.exec.sim_fut_variation",
+   "java": "Exec.simFutVariation",
+   "cpp": "qf::exec::sim_fut_variation",
+   "inputs": {
+    "contract": {
+     "java": "contract"
+    },
+    "price": {
+     "java": "price"
+    },
+    "qty": {
+     "java": "qty"
+    },
+    "settlements": {
+     "java": "settlements"
+    },
+    "side": {
+     "java": "side"
+    }
+   },
+   "outputs": [
+    "label",
+    "variation_margin"
+   ]
+  },
+  "exec.sim.fx.request": {
+   "spec": "specifications/10-execution/fx-rfq-venue.md",
+   "rust": "quantforge::exec::sim_fx_request",
+   "python": "quantforge.exec.sim_fx_request",
+   "java": "Exec.simFxRequest",
+   "cpp": "qf::exec::sim_fx_request",
+   "inputs": {
+    "mid_after": {
+     "java": "midAfter"
+    },
+    "p_random_reject": {
+     "java": "pRandomReject"
+    },
+    "pair": {
+     "java": "pair"
+    },
+    "qty": {
+     "java": "qty"
+    },
+    "quote": {
+     "java": "quote"
+    },
+    "request_index": {
+     "java": "requestIndex"
+    },
+    "seed": {
+     "java": "seed"
+    },
+    "side": {
+     "java": "side"
+    },
+    "symmetric": {
+     "java": "symmetric"
+    },
+    "threshold_pips": {
+     "java": "thresholdPips"
+    },
+    "u": {
+     "java": "u"
+    }
+   },
+   "outputs": [
+    "label",
+    "move_pips",
+    "outcome",
+    "price",
+    "u"
+   ]
+  },
+  "exec.sim.fx.stream": {
+   "spec": "specifications/10-execution/fx-rfq-venue.md",
+   "rust": "quantforge::exec::sim_fx_stream",
+   "python": "quantforge.exec.sim_fx_stream",
+   "java": "Exec.simFxStream",
+   "cpp": "qf::exec::sim_fx_stream",
+   "inputs": {
+    "half_spread_pips": {
+     "java": "halfSpreadPips"
+    },
+    "mid_path": {
+     "java": "midPath"
+    },
+    "pair": {
+     "java": "pair"
+    },
+    "tick": {
+     "java": "tick"
+    }
+   },
+   "outputs": [
+    "label",
+    "quotes"
+   ]
+  },
   "exec.sim.lit.run": {
    "spec": "specifications/10-execution/lit-matching.md",
    "rust": "quantforge::exec::sim_lit_run",
@@ -2926,11 +3128,15 @@
     "lot_size": {
      "java": "lotSize"
     },
+    "session": {
+     "java": "session"
+    },
     "tick_size": {
      "java": "tickSize"
     }
    },
    "outputs": [
+    "auctions",
     "book",
     "cancelled",
     "conservation",
@@ -2938,6 +3144,7 @@
     "fills",
     "label",
     "mbp",
+    "phase",
     "rejects"
    ]
   },
@@ -2950,6 +3157,9 @@
    "inputs": {
     "S": {
      "java": "s"
+    },
+    "asset_class": {
+     "java": "assetClass"
     },
     "f": {
      "java": "f"
@@ -4842,6 +5052,94 @@
     "stats"
    ]
   },
+  "micro.eq.fee_check": {
+   "spec": "specifications/09-microstructure/asset-conventions.md",
+   "rust": "quantforge::micro::eq_fee_check",
+   "python": "quantforge.micro.eq_fee_check",
+   "java": "Micro.eqFeeCheck",
+   "cpp": "qf::micro::eq_fee_check",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "cap_check": {
+     "java": "capCheck"
+    },
+    "price": {
+     "java": "price"
+    },
+    "taker_fee": {
+     "java": "takerFee"
+    }
+   },
+   "outputs": [
+    "cap",
+    "taker_fee"
+   ]
+  },
+  "micro.eq.round_lot": {
+   "spec": "specifications/09-microstructure/asset-conventions.md",
+   "rust": "quantforge::micro::eq_round_lot",
+   "python": "quantforge.micro.eq_round_lot",
+   "java": "Micro.eqRoundLot",
+   "cpp": "qf::micro::eq_round_lot",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "price": {
+     "java": "price"
+    }
+   },
+   "outputs": [
+    "round_lot"
+   ]
+  },
+  "micro.eq.round_price": {
+   "spec": "specifications/09-microstructure/asset-conventions.md",
+   "rust": "quantforge::micro::eq_round_price",
+   "python": "quantforge.micro.eq_round_price",
+   "java": "Micro.eqRoundPrice",
+   "cpp": "qf::micro::eq_round_price",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "price": {
+     "java": "price"
+    },
+    "side": {
+     "java": "side"
+    },
+    "tick_tier": {
+     "java": "tickTier"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "micro.eq.settle_date": {
+   "spec": "specifications/09-microstructure/asset-conventions.md",
+   "rust": "quantforge::micro::eq_settle_date",
+   "python": "quantforge.micro.eq_settle_date",
+   "java": "Micro.eqSettleDate",
+   "cpp": "qf::micro::eq_settle_date",
+   "inputs": {
+    "holidays": {
+     "java": "holidays"
+    },
+    "settle_lag": {
+     "java": "settleLag"
+    },
+    "trade_date": {
+     "java": "tradeDate"
+    }
+   },
+   "outputs": [
+    "settle_date"
+   ]
+  },
   "micro.est.adverse_selection": {
    "spec": "specifications/09-microstructure/micro-estimators.md",
    "rust": "quantforge::micro::est_adverse_selection",
@@ -4966,6 +5264,46 @@
     "se"
    ]
   },
+  "micro.fx.pip_value": {
+   "spec": "specifications/09-microstructure/asset-conventions.md",
+   "rust": "quantforge::micro::fx_pip_value",
+   "python": "quantforge.micro.fx_pip_value",
+   "java": "Micro.fxPipValue",
+   "cpp": "qf::micro::fx_pip_value",
+   "inputs": {
+    "notional": {
+     "java": "notional"
+    },
+    "pair": {
+     "java": "pair"
+    }
+   },
+   "outputs": [
+    "currency",
+    "pip_value"
+   ]
+  },
+  "micro.fx.spot_date": {
+   "spec": "specifications/09-microstructure/asset-conventions.md",
+   "rust": "quantforge::micro::fx_spot_date",
+   "python": "quantforge.micro.fx_spot_date",
+   "java": "Micro.fxSpotDate",
+   "cpp": "qf::micro::fx_spot_date",
+   "inputs": {
+    "holidays": {
+     "java": "holidays"
+    },
+    "pair": {
+     "java": "pair"
+    },
+    "trade_date": {
+     "java": "tradeDate"
+    }
+   },
+   "outputs": [
+    "spot_date"
+   ]
+  },
   "micro.mm.as_quotes": {
    "spec": "specifications/09-microstructure/avellaneda-stoikov.md",
    "rust": "quantforge::micro::mm_as_quotes",
@@ -4997,6 +5335,123 @@
     "bid",
     "reservation",
     "spread"
+   ]
+  },
+  "micro.rates.bill_price": {
+   "spec": "specifications/09-microstructure/asset-conventions.md",
+   "rust": "quantforge::micro::rates_bill_price",
+   "python": "quantforge.micro.rates_bill_price",
+   "java": "Micro.ratesBillPrice",
+   "cpp": "qf::micro::rates_bill_price",
+   "inputs": {
+    "days": {
+     "java": "days"
+    },
+    "discount": {
+     "java": "discount"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "micro.rates.bond_price": {
+   "spec": "specifications/09-microstructure/asset-conventions.md",
+   "rust": "quantforge::micro::rates_bond_price",
+   "python": "quantforge.micro.rates_bond_price",
+   "java": "Micro.ratesBondPrice",
+   "cpp": "qf::micro::rates_bond_price",
+   "inputs": {
+    "coupon": {
+     "java": "coupon"
+    },
+    "frequency": {
+     "java": "frequency"
+    },
+    "periods": {
+     "java": "periods"
+    },
+    "yield": {
+     "java": "yield"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "micro.rates.bond_yield": {
+   "spec": "specifications/09-microstructure/asset-conventions.md",
+   "rust": "quantforge::micro::rates_bond_yield",
+   "python": "quantforge.micro.rates_bond_yield",
+   "java": "Micro.ratesBondYield",
+   "cpp": "qf::micro::rates_bond_yield",
+   "inputs": {
+    "coupon": {
+     "java": "coupon"
+    },
+    "frequency": {
+     "java": "frequency"
+    },
+    "periods": {
+     "java": "periods"
+    },
+    "price": {
+     "java": "price"
+    }
+   },
+   "outputs": [
+    "yield"
+   ]
+  },
+  "micro.rates.format_32nds": {
+   "spec": "specifications/09-microstructure/asset-conventions.md",
+   "rust": "quantforge::micro::rates_format_32nds",
+   "python": "quantforge.micro.rates_format_32nds",
+   "java": "Micro.ratesFormat32nds",
+   "cpp": "qf::micro::rates_format_32nds",
+   "inputs": {
+    "resolution": {
+     "java": "resolution"
+    },
+    "value": {
+     "java": "value"
+    }
+   },
+   "outputs": [
+    "text"
+   ]
+  },
+  "micro.rates.parse_32nds": {
+   "spec": "specifications/09-microstructure/asset-conventions.md",
+   "rust": "quantforge::micro::rates_parse_32nds",
+   "python": "quantforge.micro.rates_parse_32nds",
+   "java": "Micro.ratesParse32nds",
+   "cpp": "qf::micro::rates_parse_32nds",
+   "inputs": {
+    "text": {
+     "java": "text"
+    }
+   },
+   "outputs": [
+    "value"
+   ]
+  },
+  "micro.rates.tick_value": {
+   "spec": "specifications/09-microstructure/asset-conventions.md",
+   "rust": "quantforge::micro::rates_tick_value",
+   "python": "quantforge.micro.rates_tick_value",
+   "java": "Micro.ratesTickValue",
+   "cpp": "qf::micro::rates_tick_value",
+   "inputs": {
+    "face": {
+     "java": "face"
+    },
+    "tick": {
+     "java": "tick"
+    }
+   },
+   "outputs": [
+    "tick_value"
    ]
   },
   "paper.book.apply_fill": {
@@ -9905,6 +10360,7 @@
   "xva.adjustments.value: im_spread"
  ],
  "spec_only": [
+  "exec.sim.fut.run",
   "paper.pnl.explain"
  ]
 }

@@ -1,0 +1,756 @@
+{
+ "schema_version": "1.0",
+ "suite": "auc_h",
+ "spec": "specifications/10-execution/auction.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_ma.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "auc_h-0001",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "orders": [
+     {
+      "id": "s1",
+      "limit": "10.02",
+      "qty": 100,
+      "side": "BUY"
+     },
+     {
+      "id": "s2",
+      "limit": "10.01",
+      "qty": 200,
+      "side": "BUY"
+     },
+     {
+      "id": "s3",
+      "limit": "10.00",
+      "qty": 300,
+      "side": "BUY"
+     },
+     {
+      "id": "s4",
+      "limit": "9.99",
+      "qty": 150,
+      "side": "SELL"
+     },
+     {
+      "id": "s5",
+      "limit": "10.01",
+      "qty": 250,
+      "side": "SELL"
+     },
+     {
+      "id": "s6",
+      "limit": "10.03",
+      "qty": 100,
+      "side": "SELL"
+     }
+    ],
+    "phase": "OPEN",
+    "ref_price": "10.00",
+    "tick_size": "0.01"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cancelled": [],
+     "fills": [
+      {
+       "id": "s1",
+       "price": "10.01",
+       "qty": 100,
+       "side": "B"
+      },
+      {
+       "id": "s2",
+       "price": "10.01",
+       "qty": 200,
+       "side": "B"
+      },
+      {
+       "id": "s4",
+       "price": "10.01",
+       "qty": 150,
+       "side": "S"
+      },
+      {
+       "id": "s5",
+       "price": "10.01",
+       "qty": 150,
+       "side": "S"
+      }
+     ],
+     "imbalance": -100,
+     "label": "simulated venue; not a real exchange",
+     "price": "10.01",
+     "residual": [
+      {
+       "id": "s3",
+       "limit": "10.00",
+       "qty": 300,
+       "side": "B"
+      },
+      {
+       "id": "s5",
+       "limit": "10.01",
+       "qty": 100,
+       "side": "S"
+      },
+      {
+       "id": "s6",
+       "limit": "10.03",
+       "qty": 100,
+       "side": "S"
+      }
+     ],
+     "volume": 300
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "auc_h-0001 from the spec table"
+  },
+  {
+   "case_id": "auc_h-0002",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "orders": [
+     {
+      "id": "s1",
+      "limit": "10.02",
+      "qty": 100,
+      "side": "BUY"
+     },
+     {
+      "id": "s2",
+      "limit": "10.01",
+      "qty": 200,
+      "side": "BUY"
+     },
+     {
+      "id": "s3",
+      "limit": "10.00",
+      "qty": 300,
+      "side": "BUY"
+     },
+     {
+      "id": "s4",
+      "limit": "9.99",
+      "qty": 150,
+      "side": "SELL"
+     },
+     {
+      "id": "s5",
+      "limit": "10.01",
+      "qty": 250,
+      "side": "SELL"
+     },
+     {
+      "id": "s6",
+      "limit": "10.03",
+      "qty": 100,
+      "side": "SELL"
+     }
+    ],
+    "phase": "OPEN",
+    "ref_price": "10.00",
+    "tick_size": "0.01"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cancelled": [],
+     "fills": [
+      {
+       "id": "s1",
+       "price": "10.01",
+       "qty": 100,
+       "side": "B"
+      },
+      {
+       "id": "s2",
+       "price": "10.01",
+       "qty": 200,
+       "side": "B"
+      },
+      {
+       "id": "s4",
+       "price": "10.01",
+       "qty": 150,
+       "side": "S"
+      },
+      {
+       "id": "s5",
+       "price": "10.01",
+       "qty": 150,
+       "side": "S"
+      }
+     ],
+     "imbalance": -100,
+     "label": "simulated venue; not a real exchange",
+     "price": "10.01",
+     "residual": [
+      {
+       "id": "s3",
+       "limit": "10.00",
+       "qty": 300,
+       "side": "B"
+      },
+      {
+       "id": "s5",
+       "limit": "10.01",
+       "qty": 100,
+       "side": "S"
+      },
+      {
+       "id": "s6",
+       "limit": "10.03",
+       "qty": 100,
+       "side": "S"
+      }
+     ],
+     "volume": 300
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "auc_h-0002 from the spec table"
+  },
+  {
+   "case_id": "auc_h-0003",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "orders": [
+     {
+      "limit": "10.02",
+      "qty": 100,
+      "side": "BUY"
+     },
+     {
+      "limit": "10.00",
+      "qty": 100,
+      "side": "SELL"
+     }
+    ],
+    "phase": "OPEN",
+    "ref_price": "10.01",
+    "tick_size": "0.01"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cancelled": [],
+     "fills": [
+      {
+       "id": "b1",
+       "price": "10.01",
+       "qty": 100,
+       "side": "B"
+      },
+      {
+       "id": "a1",
+       "price": "10.01",
+       "qty": 100,
+       "side": "S"
+      }
+     ],
+     "imbalance": 0,
+     "label": "simulated venue; not a real exchange",
+     "price": "10.01",
+     "residual": [],
+     "volume": 100
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "auc_h-0003 from the spec table; fills, residual and cancelled hand-derived (the table states price, volume, imbalance)"
+  },
+  {
+   "case_id": "auc_h-0004",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "orders": [
+     {
+      "limit": "10.02",
+      "qty": 100,
+      "side": "BUY"
+     },
+     {
+      "limit": "10.00",
+      "qty": 100,
+      "side": "SELL"
+     }
+    ],
+    "phase": "OPEN",
+    "ref_price": "10.05",
+    "tick_size": "0.01"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cancelled": [],
+     "fills": [
+      {
+       "id": "b1",
+       "price": "10.02",
+       "qty": 100,
+       "side": "B"
+      },
+      {
+       "id": "a1",
+       "price": "10.02",
+       "qty": 100,
+       "side": "S"
+      }
+     ],
+     "imbalance": 0,
+     "label": "simulated venue; not a real exchange",
+     "price": "10.02",
+     "residual": [],
+     "volume": 100
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "auc_h-0004 from the spec table; fills, residual and cancelled hand-derived (the table states price, volume, imbalance)"
+  },
+  {
+   "case_id": "auc_h-0005",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "orders": [
+     {
+      "limit": "10.02",
+      "qty": 100,
+      "side": "BUY"
+     },
+     {
+      "limit": "10.00",
+      "qty": 100,
+      "side": "SELL"
+     }
+    ],
+    "phase": "OPEN",
+    "ref_price": "10.005",
+    "tick_size": "0.01"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cancelled": [],
+     "fills": [
+      {
+       "id": "b1",
+       "price": "10.01",
+       "qty": 100,
+       "side": "B"
+      },
+      {
+       "id": "a1",
+       "price": "10.01",
+       "qty": 100,
+       "side": "S"
+      }
+     ],
+     "imbalance": 0,
+     "label": "simulated venue; not a real exchange",
+     "price": "10.01",
+     "residual": [],
+     "volume": 100
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "auc_h-0005 from the spec table; fills, residual and cancelled hand-derived (the table states price, volume, imbalance)"
+  },
+  {
+   "case_id": "auc_h-0006",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "orders": [
+     {
+      "limit": "10.02",
+      "qty": 200,
+      "side": "BUY"
+     },
+     {
+      "limit": "10.00",
+      "qty": 100,
+      "side": "SELL"
+     },
+     {
+      "limit": "10.01",
+      "qty": 50,
+      "side": "SELL"
+     }
+    ],
+    "phase": "OPEN",
+    "ref_price": "10.00",
+    "tick_size": "0.01"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cancelled": [],
+     "fills": [
+      {
+       "id": "b1",
+       "price": "10.02",
+       "qty": 150,
+       "side": "B"
+      },
+      {
+       "id": "a1",
+       "price": "10.02",
+       "qty": 100,
+       "side": "S"
+      },
+      {
+       "id": "a2",
+       "price": "10.02",
+       "qty": 50,
+       "side": "S"
+      }
+     ],
+     "imbalance": 50,
+     "label": "simulated venue; not a real exchange",
+     "price": "10.02",
+     "residual": [
+      {
+       "id": "b1",
+       "limit": "10.02",
+       "qty": 50,
+       "side": "B"
+      }
+     ],
+     "volume": 150
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "auc_h-0006 from the spec table; fills, residual and cancelled hand-derived (the table states price, volume, imbalance)"
+  },
+  {
+   "case_id": "auc_h-0007",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "orders": [
+     {
+      "limit": "MARKET",
+      "qty": 100,
+      "side": "BUY"
+     },
+     {
+      "limit": "MARKET",
+      "qty": 100,
+      "side": "SELL"
+     }
+    ],
+    "phase": "OPEN",
+    "ref_price": "10.00",
+    "tick_size": "0.01"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cancelled": [
+      "b1",
+      "a1"
+     ],
+     "fills": [],
+     "imbalance": 0,
+     "label": "simulated venue; not a real exchange",
+     "price": null,
+     "residual": [],
+     "volume": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "auc_h-0007 from the spec table; fills, residual and cancelled hand-derived (the table states price, volume, imbalance)"
+  },
+  {
+   "case_id": "auc_h-0008",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "orders": [
+     {
+      "limit": "10.00",
+      "qty": 100,
+      "side": "BUY"
+     },
+     {
+      "limit": "10.01",
+      "qty": 100,
+      "side": "BUY"
+     }
+    ],
+    "phase": "OPEN",
+    "ref_price": "10.00",
+    "tick_size": "0.01"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cancelled": [],
+     "fills": [],
+     "imbalance": 0,
+     "label": "simulated venue; not a real exchange",
+     "price": null,
+     "residual": [
+      {
+       "id": "b2",
+       "limit": "10.01",
+       "qty": 100,
+       "side": "B"
+      },
+      {
+       "id": "b1",
+       "limit": "10.00",
+       "qty": 100,
+       "side": "B"
+      }
+     ],
+     "volume": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "auc_h-0008 from the spec table; fills, residual and cancelled hand-derived (the table states price, volume, imbalance)"
+  },
+  {
+   "case_id": "auc_h-0009",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "orders": [
+     {
+      "limit": "10.02",
+      "qty": 200,
+      "side": "BUY"
+     },
+     {
+      "limit": "10.00",
+      "qty": 100,
+      "side": "SELL"
+     },
+     {
+      "limit": "10.01",
+      "qty": 50,
+      "side": "SELL"
+     }
+    ],
+    "phase": "OPEN",
+    "ref_price": "10.00",
+    "tick_size": "0.01",
+    "tie_break": "IEX"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cancelled": [],
+     "fills": [
+      {
+       "id": "b1",
+       "price": "10.01",
+       "qty": 150,
+       "side": "B"
+      },
+      {
+       "id": "a1",
+       "price": "10.01",
+       "qty": 100,
+       "side": "S"
+      },
+      {
+       "id": "a2",
+       "price": "10.01",
+       "qty": 50,
+       "side": "S"
+      }
+     ],
+     "imbalance": 50,
+     "label": "simulated venue; not a real exchange",
+     "price": "10.01",
+     "residual": [
+      {
+       "id": "b1",
+       "limit": "10.02",
+       "qty": 50,
+       "side": "B"
+      }
+     ],
+     "volume": 150
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "auc_h-0009 hand: IEX tie-break parameter (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "auc_h-0010",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "orders": [
+     {
+      "id": "b1",
+      "limit": "10.005",
+      "qty": 1,
+      "side": "BUY"
+     }
+    ],
+    "phase": "OPEN",
+    "ref_price": "10.00",
+    "tick_size": "0.01"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: limit off the tick grid"
+  },
+  {
+   "case_id": "auc_h-0011",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "orders": [
+     {
+      "id": "x",
+      "limit": "10.00",
+      "qty": 1,
+      "side": "BUY"
+     },
+     {
+      "id": "x",
+      "limit": "10.00",
+      "qty": 1,
+      "side": "SELL"
+     }
+    ],
+    "phase": "OPEN",
+    "ref_price": "10.00",
+    "tick_size": "0.01"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: duplicate id"
+  },
+  {
+   "case_id": "auc_h-0012",
+   "operation": "exec.sim.auction.uncross",
+   "inputs": {
+    "orders": [
+     {
+      "id": "x",
+      "limit": "10.00",
+      "qty": "1",
+      "side": "BUY"
+     },
+     {
+      "id": "x",
+      "limit": "10.00",
+      "qty": 1,
+      "side": "SELL"
+     }
+    ],
+    "phase": "OPEN",
+    "ref_price": "10.00",
+    "tick_size": "0.01"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: schema before input: qty as a string"
+  }
+ ]
+}

@@ -24,8 +24,9 @@ def micro_book_rebuild(i: Inputs) -> Any:
 @op("exec.sim.lit.run")
 def exec_sim_lit_run(i: Inputs) -> Any:
     fees = i.object("fee_schedule").raw
+    session = dict(i.object("session").raw) if i.has("session") else None
     return core.lit_matching.run(
-        i.string("tick_size"), i.string("lot_size"), i.array("events"), dict(fees)
+        i.string("tick_size"), i.string("lot_size"), i.array("events"), dict(fees), session
     )
 
 

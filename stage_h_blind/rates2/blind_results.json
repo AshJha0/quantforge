@@ -1,0 +1,30 @@
+{
+ "fut_h-0004": {
+  "fees": "0",
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "pnl": "140.625000"
+ },
+ "fut_h-0005": {
+  "fees": "6.00",
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "pnl": "134.625000"
+ },
+ "fut_h-0006": {
+  "label": "simulated venue; not a real exchange; no real rates data",
+  "variation_margin": [
+   "-31.25000"
+  ]
+ },
+ "rtc_h-0004": {
+  "value": "99.5234375"
+ },
+ "rtc_h-0007": {
+  "tick_value": "15.625000"
+ },
+ "rtc_h-0011": {
+  "yield": 0.04000000000000025
+ },
+ "rtc_h-0012": {
+  "yield": 0.049999999999999684
+ }
+}

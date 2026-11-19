@@ -80,6 +80,7 @@ CORE_MODULES = (
     "lit_matching",
     "dark_pool",
     "sor",
+    "multiasset",
     "order_book",
     "paper",
     "paper_fills",

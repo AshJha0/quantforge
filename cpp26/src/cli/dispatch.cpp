@@ -30,6 +30,7 @@
 #include "quantforge/core/integrate.hpp"
 #include "quantforge/core/interp.hpp"
 #include "quantforge/core/json.hpp"
+#include "quantforge/core/multiasset.hpp"
 #include "quantforge/core/linalg.hpp"
 #include "quantforge/core/models.hpp"
 #include "quantforge/core/money.hpp"
@@ -326,6 +327,7 @@ struct Entry {
 #include "ops_research_w3.inc"
 #include "ops_execution.inc"
 #include "ops_micro.inc"
+#include "ops_multiasset.inc"
 #include "ops_micro_est.inc"
 #include "ops_paper.inc"
 
@@ -362,6 +364,7 @@ constexpr std::span<const Entry> registry[] = {
     research_w3_ops,
     execution_ops,
     micro_w2_ops,
+    multiasset_ops,
     micro_est_ops,
     paper_ops,
 };

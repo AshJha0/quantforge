@@ -25,8 +25,10 @@ void op_exec_sim_lit_run(const In& in, Out& out) {
     const Value& events = array_of(in, "events");
     const Value& fees = in.need("fee_schedule");
     if (fees.kind != Kind::Object) schema("fee_schedule", "expected an object");
+    const Value* session = in.find("session");
+    if (session && session->kind != Kind::Object) schema("session", "expected an object");
     in.ready();
-    micro::lit_run(tick, lot, events, fees, out.values);
+    micro::lit_run(tick, lot, events, fees, out.values, session);
 }
 
 // exec.sim.dark.run: one run (config, events) or several (scenarios), dark-pool.md. Page limit 10,000,000 events.

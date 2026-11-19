@@ -5,6 +5,7 @@
 # columns) plus the rulings files, and a SHA-256 manifest.
 # Third argument "b" builds packet 2b instead: dark-pool, smart-order-router
 # and paper-trading (dark_h, sor_h, pt_h) with the H-21 rulings added.
+# Third argument "m" builds the multi-asset packet (H-22..H-24) with its rulings.
 # Third argument "exec" builds the H-14/H-17 packet: adaptive-algos and
 # tca-pretrade (alg_h, tcx_h), inputs-only JSON, the rulings they cite, and
 # coordinator/LEAKS.tsv (not for the blind lane; fails on a leak).
@@ -59,6 +60,15 @@ if [ "$W" = b ]; then
   cp "$R/specifications/stage-h-rulings-w1.md" "$R/specifications/stage-h-rulings-w1b.md" "$R/specifications/stage-h-rulings-h21.md" "$P/"
   cd "$P"
   sha256sum dark-pool.blind.md smart-order-router.blind.md paper-trading.blind.md stage-h-rulings-w1.md stage-h-rulings-w1b.md stage-h-rulings-h21.md > MANIFEST.sha256
+  exit 0
+fi
+if [ "$W" = m ]; then
+  # Multi-asset packet (H-22..H-24); normal dir stage_h_blind\multiasset_packet
+  awk -f "$D/wave2_extract.awk" "$R/specifications/09-microstructure/asset-conventions.md" > "$P/asset-conventions.blind.md"
+  for f in auction fx-rfq-venue rates-futures-venue; do awk -f "$D/wave2_extract.awk" "$R/specifications/10-execution/$f.md" > "$P/$f.blind.md"; done
+  cp "$R/specifications/stage-h-rulings-multiasset.md" "$P/"
+  cd "$P"
+  sha256sum asset-conventions.blind.md auction.blind.md fx-rfq-venue.blind.md rates-futures-venue.blind.md stage-h-rulings-multiasset.md > MANIFEST.sha256
   exit 0
 fi
 awk -f "$D/wave2_extract.awk" "$R/specifications/09-microstructure/order-book.md" > "$P/order-book.blind.md"

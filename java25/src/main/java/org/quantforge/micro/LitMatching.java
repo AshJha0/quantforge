@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -477,8 +478,205 @@ public final class LitMatching {
         }
     }
 
+
+    static final List<String> PHASES = List.of("PRE_OPEN", "CONTINUOUS", "PRE_CLOSE", "CLOSED"); // HR-83
+
+    /**
+     * Equity session phases (asset-conventions.md 1.3, HR-83, HR-112; auction.md). In PRE_OPEN, NEW LIMIT and MARKET
+     * orders collect in a call book without matching; at CONTINUOUS the call book is uncrossed by
+     * {@code exec.sim.auction.uncross} (phase OPEN) and its unfilled limit orders rest in the continuous book in
+     * allocation order. In PRE_CLOSE only {@code on_close} orders are accepted, into a second call book uncrossed at
+     * CLOSED (phase CLOSE); unfilled on-close orders are cancelled (HR-96). The continuous book does not join the
+     * closing cross. Orders in the wrong phase are rejected with reason PHASE. Auction fills pay
+     * {@code auction_fee} x notional.
+     */
+    private static final class Session {
+        private record Call(String id, String side, Object limit, long qty, BigDecimal qtyDec, boolean onClose) {}
+
+        final Engine eng;
+        final BigDecimal fee;
+        String phase;
+        final BigDecimal ref;
+        final Object tie;
+        List<Call> call = new ArrayList<>();
+        final Map<String, String> trader = new HashMap<>();
+        final List<Object> auctions = new ArrayList<>();
+
+        Session(Engine eng, Object raw, BigDecimal fee) {
+            if (!(raw instanceof Map<?, ?> m)) {
+                throw new QfError("E_SCHEMA", "session: not an object", "session");
+            }
+            this.eng = eng;
+            this.fee = fee;
+            Object ph = m.containsKey("phase") ? m.get("phase") : "PRE_OPEN";
+            if (!PHASES.contains(ph)) {
+                throw new QfError("E_SCHEMA", "session/phase: not a phase", "session/phase");
+            }
+            phase = (String) ph;
+            ref = OrderBook.dec(m.get("ref_price"), "session/ref_price");
+            tie = m.containsKey("tie_break") ? m.get("tie_break") : "CBOE";
+        }
+
+        /** True when the session handled the event (the engine must not). */
+        boolean event(Map<?, ?> e, int k) {
+            Object op = e.get("op");
+            if ("PHASE".equals(op)) {
+                move(e.get("phase"), k);
+                return true;
+            }
+            if (phase.equals("CONTINUOUS")) {
+                return false;
+            }
+            if ("CANCEL".equals(op)) {
+                for (int i = 0; i < call.size(); i++) {
+                    Call c = call.get(i);
+                    if (c.id.equals(e.get("id"))) {
+                        call.remove(i);
+                        eng.cancelled.add(Engine.idQty(c.id, c.qtyDec));
+                        eng.cons.get(c.id).cancelled = c.qtyDec;
+                        return true;
+                    }
+                }
+                return false;
+            }
+            if (!"NEW".equals(op)) {
+                return false;
+            }
+            String path = "events/" + k;
+            if (!(e.get("id") instanceof String oid) || !(e.get("trader") instanceof String tr)) {
+                throw new QfError("E_SCHEMA", path + ": id and trader must be strings", path);
+            }
+            Object side = e.get("side");
+            if (!("BUY".equals(side) || "SELL".equals(side)) || !(e.get("type") instanceof String typ)
+                    || !TYPES.contains(typ)) {
+                throw new QfError("E_SCHEMA", path + ": bad side or type", path);
+            }
+            Object oc = e.containsKey("on_close") ? e.get("on_close") : Boolean.FALSE;
+            if (!(oc instanceof Boolean onClose)) {
+                throw new QfError("E_SCHEMA", path + "/on_close: not a boolean", path);
+            }
+            BigDecimal qty = OrderBook.dec(e.get("qty"), path + "/qty");
+            boolean market = typ.equals("MARKET");
+            BigDecimal limit = market ? null : OrderBook.dec(e.get("price"), path + "/price");
+            if (eng.seen.contains(oid)) {
+                throw new QfError("E_INPUT", path + ": duplicate id " + oid, path);
+            }
+            if (qty.signum() <= 0) {
+                throw new QfError("E_DOMAIN", path + ": quantity must be positive", path);
+            }
+            eng.onGrid(qty, eng.lot, "qty");
+            if (limit != null) {
+                if (limit.signum() <= 0) {
+                    throw new QfError("E_DOMAIN", path + ": price must be positive", path);
+                }
+                eng.onGrid(limit, eng.tick, "price");
+            }
+            eng.seen.add(oid);
+            eng.cons.put(oid, new Cons(qty));
+            boolean ok = (typ.equals("LIMIT") || market)
+                    && (phase.equals("PRE_OPEN") || (phase.equals("PRE_CLOSE") && onClose));
+            if (!ok) {
+                eng.reject(oid, "PHASE", qty);
+                return true;
+            }
+            trader.put(oid, tr);
+            call.add(new Call(oid, (String) side, market ? "MARKET" : e.get("price"),
+                    qty.divide(eng.lot).toBigIntegerExact().longValueExact(), qty, phase.equals("PRE_CLOSE")));
+            return true;
+        }
+
+        void move(Object to, int k) {
+            if (!PHASES.contains(to)) {
+                throw new QfError("E_SCHEMA", "events/" + k + "/phase: not a phase", "events/" + k);
+            }
+            if (PHASES.indexOf(to) != PHASES.indexOf(phase) + 1) {
+                throw new QfError("E_INPUT", "events/" + k + ": phase " + phase + " cannot move to " + to,
+                        "events/" + k);
+            }
+            if (to.equals("CONTINUOUS")) {
+                uncross("OPEN");
+            } else if (to.equals("CLOSED")) {
+                uncross("CLOSE");
+            }
+            phase = (String) to;
+        }
+
+        void uncross(String auctionPhase) {
+            BigDecimal lot = eng.lot;
+            List<Object> orders = new ArrayList<>();
+            for (int n = 0; n < call.size(); n++) {
+                Call c = call.get(n);
+                Map<String, Object> o = new LinkedHashMap<>();
+                o.put("id", c.id);
+                o.put("side", c.side);
+                o.put("limit", c.limit);
+                o.put("qty", c.qty);
+                o.put("seq", (long) n + 1);
+                o.put("on_close", c.onClose);
+                orders.add(o);
+            }
+            Map<String, Object> in = new LinkedHashMap<>();
+            in.put("orders", orders);
+            in.put("phase", auctionPhase);
+            in.put("ref_price", fmt(ref));
+            in.put("tick_size", fmt(eng.tick));
+            in.put("tie_break", tie);
+            Map<String, Object> res = MultiAsset.auctionUncross(in);
+            List<Object> fills = new ArrayList<>();
+            for (Object fo : (List<?>) res.get("fills")) {
+                Map<?, ?> f = (Map<?, ?>) fo;
+                String id = (String) f.get("id");
+                BigDecimal q = c(BigDecimal.valueOf((Long) f.get("qty")).multiply(lot));
+                BigDecimal px = new BigDecimal((String) f.get("price"));
+                Map<String, Object> m = new LinkedHashMap<>();
+                m.put("id", id);
+                m.put("price", fmt(px));
+                m.put("qty", fmt(q));
+                m.put("side", f.get("side"));
+                fills.add(m);
+                eng.cons.get(id).filled = c(eng.cons.get(id).filled.add(q));
+                String t = trader.get(id);
+                eng.fees.put(t, c(eng.fees.getOrDefault(t, BigDecimal.ZERO).add(c(fee.multiply(c(px.multiply(q)))))));
+            }
+            for (Object ro : (List<?>) res.get("residual")) {
+                Map<?, ?> r = (Map<?, ?>) ro;
+                String id = (String) r.get("id");
+                BigDecimal q = c(BigDecimal.valueOf((Long) r.get("qty")).multiply(lot));
+                BigDecimal limit = new BigDecimal((String) r.get("limit"));
+                Order o = new Order(id, trader.get(id), "B".equals(r.get("side")), "LIMIT", limit, q);
+                o.display = q;
+                o.hidden = BigDecimal.ZERO;
+                o.seq = eng.nextSeq();
+                eng.resting.put(id, o);
+            }
+            for (Object oid : (List<?>) res.get("cancelled")) {
+                Call cl = call.stream().filter(x -> x.id.equals(oid)).findFirst().orElseThrow();
+                BigDecimal left = c(cl.qtyDec.subtract(eng.cons.get(cl.id).filled));
+                eng.cancelled.add(Engine.idQty(cl.id, left));
+                eng.cons.get(cl.id).cancelled = left;
+            }
+            Map<String, Object> a = new LinkedHashMap<>();
+            a.put("fills", fills);
+            a.put("imbalance", fmt(c(BigDecimal.valueOf((Long) res.get("imbalance")).multiply(lot))));
+            a.put("phase", auctionPhase);
+            a.put("price", res.get("price") == null ? null : fmt(new BigDecimal((String) res.get("price"))));
+            a.put("volume", fmt(c(BigDecimal.valueOf((Long) res.get("volume")).multiply(lot))));
+            auctions.add(a);
+            call = new ArrayList<>();
+        }
+    }
+
     /** Runs the event list. {@code feeSchedule} holds {@code taker_fee} and {@code maker_rebate} decimal strings. */
     public static Map<String, Object> run(String tickSize, String lotSize, List<?> events, Map<?, ?> feeSchedule) {
+        return run(tickSize, lotSize, events, feeSchedule, null);
+    }
+
+    /**
+     * Runs the event list with an optional equity {@code session} (HR-112): {@code phase}, {@code ref_price},
+     * {@code tie_break}; PHASE events move it forward and {@code fee_schedule.auction_fee} prices auction fills.
+     */
+    public static Map<String, Object> run(String tickSize, String lotSize, List<?> events, Map<?, ?> feeSchedule,
+            Object session) {
         BigDecimal tick = OrderBook.dec(tickSize, "tick_size");
         BigDecimal lot = OrderBook.dec(lotSize, "lot_size");
         if (tick.signum() <= 0 || lot.signum() <= 0) {
@@ -490,12 +688,21 @@ public final class LitMatching {
             throw new QfError("E_LIMIT", "more than 10,000,000 events", "events");
         }
         Engine eng = new Engine(tick, lot, taker, rebate);
+        Session ses = null;
+        if (session != null) {
+            Object af = feeSchedule.containsKey("auction_fee") ? feeSchedule.get("auction_fee") : "0";
+            ses = new Session(eng, session, OrderBook.dec(af, "fee_schedule/auction_fee"));
+        }
         for (int k = 0; k < events.size(); k++) {
             Object op = events.get(k) instanceof Map<?, ?> m ? m.get("op") : null;
-            if (!("NEW".equals(op) || "CANCEL".equals(op) || "MODIFY".equals(op))) {
+            if (!("NEW".equals(op) || "CANCEL".equals(op) || "MODIFY".equals(op)
+                    || (ses != null && "PHASE".equals(op)))) {
                 throw new QfError("E_SCHEMA", "events/" + k + ": not an event", "events");
             }
             Map<?, ?> e = (Map<?, ?>) events.get(k);
+            if (ses != null && ses.event(e, k)) {
+                continue;
+            }
             switch ((String) op) {
                 case "NEW" -> eng.add(e, k);
                 case "CANCEL" -> eng.cancel(e, k);
@@ -503,6 +710,17 @@ public final class LitMatching {
             }
             eng.reprice();
         }
-        return eng.output();
+        Map<String, Object> out = eng.output();
+        if (ses != null) {
+            out.put("auctions", ses.auctions);
+            Map<?, ?> cons = (Map<?, ?>) out.get("conservation");
+            for (Session.Call c : ses.call) { // still in a call book at the end: counted as resting
+                @SuppressWarnings("unchecked")
+                Map<String, Object> m = (Map<String, Object>) cons.get(c.id());
+                m.put("resting", fmt(c.qtyDec()));
+            }
+            out.put("phase", ses.phase);
+        }
+        return out;
     }
 }

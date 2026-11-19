@@ -1,0 +1,236 @@
+{
+ "schema_version": "1.0",
+ "suite": "fxc_h",
+ "spec": "specifications/09-microstructure/asset-conventions.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_ma.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "fxc_h-0001",
+   "operation": "micro.fx.pip_value",
+   "inputs": {
+    "notional": "1000000",
+    "pair": "EURUSD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "currency": "USD",
+     "pip_value": "100"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH by value; representation only (\"100.0000\" vs \"100\")"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxc_h-0001 from the spec table"
+  },
+  {
+   "case_id": "fxc_h-0002",
+   "operation": "micro.fx.pip_value",
+   "inputs": {
+    "notional": "1000000",
+    "pair": "USDJPY"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "currency": "JPY",
+     "pip_value": "10000"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH by value; representation only (\"10000.00\" vs \"10000\")"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxc_h-0002 from the spec table"
+  },
+  {
+   "case_id": "fxc_h-0003",
+   "operation": "micro.fx.spot_date",
+   "inputs": {
+    "holidays": {},
+    "pair": "EURUSD",
+    "trade_date": "2026-11-16"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spot_date": "2026-11-18"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxc_h-0003 from the spec table"
+  },
+  {
+   "case_id": "fxc_h-0004",
+   "operation": "micro.fx.spot_date",
+   "inputs": {
+    "holidays": {
+     "USD": [
+      "2026-11-26"
+     ]
+    },
+    "pair": "EURUSD",
+    "trade_date": "2026-11-24"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spot_date": "2026-11-27"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxc_h-0004 from the spec table"
+  },
+  {
+   "case_id": "fxc_h-0005",
+   "operation": "micro.fx.spot_date",
+   "inputs": {
+    "holidays": {},
+    "pair": "EURUSD",
+    "trade_date": "2026-11-20"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spot_date": "2026-11-24"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxc_h-0005 from the spec table"
+  },
+  {
+   "case_id": "fxc_h-0006",
+   "operation": "micro.fx.spot_date",
+   "inputs": {
+    "holidays": {},
+    "pair": "USDCAD",
+    "trade_date": "2026-11-20"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spot_date": "2026-11-23"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxc_h-0006 from the spec table"
+  },
+  {
+   "case_id": "fxc_h-0007",
+   "operation": "micro.fx.spot_date",
+   "inputs": {
+    "holidays": {},
+    "pair": "USDEUR",
+    "trade_date": "2026-11-16"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_MULTIASSET.md): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxc_h-0007 from the spec table"
+  },
+  {
+   "case_id": "fxc_h-0008",
+   "operation": "micro.fx.spot_date",
+   "inputs": {
+    "holidays": {
+     "USD": [
+      "2026-11-26"
+     ]
+    },
+    "pair": "EURUSD",
+    "trade_date": "2026-11-25"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spot_date": "2026-11-27"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "fxc_h-0008 hand: USD-only holiday on T+1 rule (source check 2026-11-18); not blind"
+  },
+  {
+   "case_id": "fxc_h-0009",
+   "operation": "micro.fx.pip_value",
+   "inputs": {
+    "notional": "1",
+    "pair": "EURXXX"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: unknown currency"
+  }
+ ]
+}

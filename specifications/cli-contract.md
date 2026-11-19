@@ -430,6 +430,30 @@ No new error code. Prices, quantities and fees are decimal strings (HR-12); outp
 | `exec.sim.dark.markouts` | `10-execution/dark-pool.md` (Adverse selection; name set by the H-12 lane, the spec names no verb) | wave 2 (H-12); each markout element carries `label` |
 | `exec.sor.allocate` | `10-execution/smart-order-router.md` | wave 2 (H-13); `method` default `SAMPLE_AVERAGE`; optional `ranking` (true adds the full ranking, grid at most 10^6 points) and `report_se` (adds `expected_cost_se` and `label` "simulated venues; router scored in simulation only"); `lit_samples` up to 1,000,000 |
 
+## Stage H multi-asset operations (H-22, H-23, H-24)
+
+Rulings `stage-h-rulings-multiasset.md` HR-80 to HR-103 and the 2026-11-18 rule-version rulings. No new error code; error order HR-66. Decimals are HR-12 decimal strings; venue and simulator outputs (`exec.*`) carry `label` (HR-94), convention outputs (`micro.*`) none (HR-111). `exec.sim.lit.run` gains optional `session` and `PHASE` events (HR-112, goldens `ses_h`); `exec.sim.dark.run` `config.asset_class` and `exec.sor.allocate` `asset_class` on the order and venues (HR-93; other classes on a dark venue are `E_INPUT`, HR-113; goldens `acls_h`). Goldens `datasets/golden/stage_h/auc_h.json`, `eqc_h.json`, `fxc_h.json`, `fxv_h.json`, `rtc_h.json`, `fut_h.json`, E1 cases `e1_h4.json` (`oracle/python/gen_stage_h_ma.py`). Implemented in all four builds (the Rust build reuses its lit engine for `exec.sim.fut.run`). Integer inputs within +-(2^53-1), `request_index` within 0..2^32-1, else `E_LIMIT` (HR-116).
+
+| Operation | Spec | Inputs | Outputs |
+|---|---|---|---|
+| `micro.eq.round_price` | `09-microstructure/asset-conventions.md` 1.1 | `price`, `side`, optional `tick_table`, `tick_tier` (`PENNY`, `HALF_PENNY`), `as_of`, `compliance_date` | `price` at the tick decimals |
+| `micro.eq.fee_check` | same 1.5 | `price`, `taker_fee`, `cap_check` (default true), `as_of` | `cap`, `taker_fee` |
+| `micro.eq.round_lot` | same 1.2 | `price`, `as_of` | `round_lot` |
+| `micro.eq.settle_date` | same 1.6 | `trade_date`, `settle_lag` (default 1), `holidays` | `settle_date` |
+| `exec.sim.auction.uncross` | `10-execution/auction.md` | `orders` (`id`, `side`, `limit` or `MARKET`, `qty` Integer, `seq`, `on_close`), `tick_size`, `ref_price`, `phase`, `tie_break` (`CBOE` default, `IEX`); orders up to 10,000,000, candidates up to 1,000,000 | `price`, `volume`, `imbalance`, `fills`, `residual`, `cancelled` |
+| `micro.fx.pip_value` | `asset-conventions.md` 2.1 | `pair`, `notional` | `pip_value`, `currency` |
+| `micro.fx.spot_date` | same 2.3 | `pair`, `trade_date`, `holidays` (currency to dates), `t1_pairs` | `spot_date` |
+| `exec.sim.fx.stream` | `10-execution/fx-rfq-venue.md` | `mid_path` (`time` Integer, `mid`), `half_spread_pips`, `pair`, `tick` | `quotes` |
+| `exec.sim.fx.request` | same | `quote` (`bid`, `ask`, `quote_mid`), `side`, `qty`, `mid_after`, `threshold_pips`, `symmetric`, `p_random_reject`, `u` or (`seed`, `request_index`), `pair` | `outcome`, `price`, `move_pips`; `u` when drawn |
+| `micro.rates.parse_32nds` / `micro.rates.format_32nds` | `asset-conventions.md` 3.1 | `text` / `value`, `resolution` | `value` / `text` |
+| `micro.rates.tick_value` | same 3.2 | `face`, `tick` | `tick_value` |
+| `micro.rates.bond_price` / `micro.rates.bill_price` | same 3.3 | `coupon`, `frequency`, `periods`, `yield` / `discount`, `days` | `price` (9 decimals, half-even) |
+| `micro.rates.bond_yield` | same 3.3 | `coupon`, `frequency`, `periods`, `price` | `yield` (Real, Brent 1e-12) |
+| `exec.sim.fut.to_ticks` / `exec.sim.fut.to_text` | `10-execution/rates-futures-venue.md` | `price` or `ticks`, `contract` | `ticks` / `text` |
+| `exec.sim.fut.pnl` | same (HR-102) | `buy_price`, `sell_price`, `qty`, `fee_per_contract`, `contract` | `pnl`, `fees` |
+| `exec.sim.fut.variation` | same (HR-103) | `side`, `qty`, `price`, `settlements`, `contract` | `variation_margin` (one per settlement) |
+| `exec.sim.fut.run` | same | `events` (lit events, prices as 32nds or decimals), `fee_per_contract`, `contract` | the `exec.sim.lit.run` output with `fees` and `pnl` per trader |
+
 ### Stage H wave 2: microstructure estimators (H-4b) and venue analytics (H-16)
 
 Rulings `stage-h-rulings-micro.md` HR-70 to HR-75 as amended (HR-66). No new error code. Unlike the other wave 2 operations, every number here is a JSON Real (the F-2 finite rule applies: a non-finite input is `E_DOMAIN`); `count` is an Integer. Outputs are binary64, compared to 1e-12 relative (1e-15 absolute at 0). Error order HR-75 as amended (HR-66): structural `E_INPUT`, then `E_DOMAIN`, then value-dependent `E_INPUT`. Goldens `datasets/golden/stage_h/mest_h.json` and `venue_h.json` (`oracle/python/gen_stage_h_micro.py`). Implemented in all four builds (Java sums the venue decimals with `BigDecimal`, C++ with its own arbitrary-precision integers, Rust with a small unbounded integer as the bounded `Dec` of HR-57 cannot hold every product; each makes one correctly rounded division per output). The planted-truth simulations (HR-71) are tests, not operations: the Python tests draw with `numpy.random.default_rng`, and the Java, C++ and Rust tests use ports of that generator (SeedSequence, PCG64 and the numpy draws used), checked draw by draw against numpy, so all four run the same seeds on the same streams and miss the same coverage seeds.

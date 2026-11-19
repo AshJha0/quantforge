@@ -37,10 +37,10 @@ constexpr double F[] = {1, 0.599832206555887937690, 0.136929880922735805310, 0.0
 
 }  // namespace
 
-Xoshiro256::Xoshiro256(std::uint64_t seed, int stream) {
+Xoshiro256::Xoshiro256(std::uint64_t seed, long long stream) {
     std::uint64_t state = seed;
     for (auto& w : s_) w = splitmix(state);
-    for (int i = 0; i < stream; ++i) jump();
+    for (long long i = 0; i < stream; ++i) jump();
 }
 
 std::uint64_t Xoshiro256::next() {

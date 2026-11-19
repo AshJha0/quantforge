@@ -24,7 +24,7 @@ The local Linux run is WSL 2 on the reference laptop unless a native Linux machi
 
 | # | Language | Workload | p50 | p99 | p99.9 |
 |---|---|---|---:|---:|---:|
-| L1 | C++ | R (recorded day, form B, 100 levels) | <= 100 ns | <= 500 ns | <= 2 us |
+| L1 | C++ | R (recorded window of at least 6 h, form B, 100 levels; amended 2026-11-19 by owner decision, targets unchanged) | <= 100 ns | <= 500 ns | <= 2 us |
 | L1 | C++ | S (synthetic stress) | <= 150 ns | <= 1 us | <= 5 us |
 | L2 | Rust | R | <= 100 ns | <= 500 ns | <= 2 us |
 | L2 | Rust | S | <= 150 ns | <= 1 us | <= 5 us |
@@ -69,6 +69,18 @@ Most single queries sit near the clock cost; each query p99 is reported with the
 ### (f) Publication fields (H-9(f))
 
 Every result carries: CPU model, cores, frequency governor, RAM; OS, kernel, WSL or native; compiler or runtime and version; flags (for example `-O3 -march=x86-64-v3`; `--release`, `lto`, `codegen-units = 1`; JVM flags); commit; workload file hashes; warm-up; repeats; clock overhead; the hash of the commit that added this file. Every table states "in-process, simulated feed; no network or venue latency", and for R also "crypto venue; not equities or rates" and "snapshot-differenced stream". No claim is made about network, kernel-bypass or venue round-trip latency.
+
+## Workload R result (2026-11-19): MISS
+
+Run on the laptop under WSL (not the acceptance machine), on the recorded window of the amended workload R (Kraken 2026-11-18 21:49:17 to 2026-11-19 03:49:17 UTC, the 6-hour gap-free window; the 16:00 to 02:00 window first named had gap rows and was not used. Form B, 100 levels; a message is a book update or a trade fill: BTC/USD 63,195 messages (31,287 book, 31,908 fills), ETH/USD 42,426 (31,287 book, 11,139 fills); input hashes in `benchmarks/results/h9/README.md`; raw files `benchmarks/results/h9/*_R_*.json`). **Correctness L6 passes: 0 mismatches in C++, Rust and Java.** **Timing L1 to L3 is a MISS**: p99 and p99.9 miss in every language and symbol, and ETH/USD p50 misses too. The targets stay as fixed on 2026-11-18 (overnight decision 2026-11-19); this result is recorded as a miss, not a pass.
+
+| Language (target p50 / p99 / p99.9) | BTC/USD p50 / p99 / p99.9 (ns) | ETH/USD p50 / p99 / p99.9 (ns) | Verdict |
+|---|---|---|---|
+| C++ (100 / 500 / 2,000) | 39 / 9,255 / 26,687 | 789 / 9,631 / 23,087 | MISS (p99, p99.9; ETH p50) |
+| Rust (100 / 500 / 2,000) | 45 / 8,123 / 15,295 | 751 / 8,703 / 31,615 | MISS (p99, p99.9; ETH p50) |
+| Java (200 / 1,000 / 5,000) | 100 / 17,407 / 31,503 | 1,200 / 15,207 / 25,007 | MISS (p99, p99.9; ETH p50) |
+
+Context only, not a reason to pass: a form B update applies about 58 level changes on average (one per changed level in a one-second snapshot difference), at roughly 40 ns per level, so a per-update cost of a few microseconds is what the per-level speed implies. The targets were written for one or a few levels per update (HR-19, "How the numbers were chosen" item 1). Owner decision 2026-11-19: the per-update targets stay the acceptance test and the miss stays recorded. The per-level figure (about 40 ns) is descriptive only and has no target. A per-level target, if one is wanted, is committed before a fresh recorded window is measured (v0.10.1 or later); the window already seen is never judged against it.
 
 ## Mirror
 

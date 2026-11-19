@@ -445,6 +445,21 @@ fn stage_h_w2_goldens() {
     );
 }
 
+/// The stage H multi-asset goldens: equities conventions and the auction (`eqc_h`, `auc_h`), FX
+/// spot conventions and the RFQ venue (`fxc_h`, `fxv_h`), rates conventions and the futures venue
+/// (`rtc_h`, `fut_h`), session phases in the lit engine (`ses_h`) and asset classes on the dark
+/// pool and router (`acls_h`). `e1_h4` is replayed with wave 1 (prefix `e1_h`).
+#[test]
+fn stage_h_multiasset_goldens() {
+    replay_only(
+        "stage_h",
+        &[
+            "auc_h", "eqc_h", "fxc_h", "fxv_h", "rtc_h", "fut_h", "ses_h", "acls_h",
+        ],
+        72,
+    );
+}
+
 /// The stage H wave 2 microstructure estimator (`mest_h`) and venue analytics (`venue_h`) goldens.
 #[test]
 fn stage_h_micro_goldens() {

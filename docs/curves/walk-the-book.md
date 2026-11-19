@@ -1,6 +1,6 @@
 # Walk-the-book cost curves (crypto venue, recorded)
 
-<p class="note">Planned for v0.10.0 (stage H, research item H-1(b)). No result exists yet: this page states the method and the data it will use. Every result, when published, is labelled "crypto venue; not equities or rates" and shows aggregates only.</p>
+<p class="note">Stage H, research item H-1(b). H-1 is a pilot only (owner decision 2026-11-18): it ran on the partial days 2026-11-12 to 11-18, recorded at 20 levels, labelled "pilot; partial days; no conclusions" (`research/H1-pilot-2026-11.md`). This page states the method and the data a full study would use; no full-study result exists. Every result, when published, is labelled "crypto venue; not equities or rates" and shows aggregates only.</p>
 
 ## What it is
 

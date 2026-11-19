@@ -17,6 +17,7 @@ mod lmm;
 mod mbs;
 mod mcgreeks;
 mod micro;
+mod multiasset;
 mod paper;
 mod rates;
 mod repo;
@@ -83,6 +84,7 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("exec", execution::exec::NAMES, execution::exec::dispatch),
     ("exec", micro::lit::NAMES, micro::lit::dispatch),
     ("exec", micro::dark::NAMES, micro::dark::dispatch),
+    ("exec", multiasset::exec::NAMES, multiasset::exec::dispatch),
     ("exec", micro::venue::NAMES, micro::venue::dispatch),
     ("exotic", exotic::NAMES, exotic::dispatch),
     ("fx", fx::NAMES, fx::dispatch),
@@ -92,6 +94,11 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("mbs", mbs::NAMES, mbs::dispatch),
     ("micro", execution::micro::NAMES, execution::micro::dispatch),
     ("micro", micro::rebuild::NAMES, micro::rebuild::dispatch),
+    (
+        "micro",
+        multiasset::micro::NAMES,
+        multiasset::micro::dispatch,
+    ),
     ("micro", micro::est::NAMES, micro::est::dispatch),
     ("paper", paper::NAMES, paper::dispatch),
     ("rates", rates::NAMES, rates::dispatch),
