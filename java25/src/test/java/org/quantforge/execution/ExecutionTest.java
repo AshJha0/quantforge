@@ -158,6 +158,25 @@ class ExecutionTest {
         assertEquals("E_INPUT", code(() -> Execution.acFrontier(P, new double[] {})));
     }
 
+    /** HR-122: with two errors at once the structural E_INPUT comes before every E_DOMAIN. */
+    @Test
+    void structuralErrorsComeFirst() {
+        // N < 1 with sigma < 0; X <= 0 with T <= 0
+        assertEquals("E_INPUT", code(() -> Execution.acTrajectory(new Execution.AcParams(1e6, 5, 0, -1, 0, 1e-6, 0), 0)));
+        assertEquals("E_INPUT", code(() -> Execution.acTrajectory(new Execution.AcParams(0, 0, 5, 1, 0, 1e-6, 0), 0)));
+        // The frontier from raw inputs: an empty list with sigma < 0, and with N < 1 (N is reported, also E_INPUT).
+        // AcParams checks itself when built, so only the raw-input entry can see both errors at once.
+        assertEquals("E_INPUT", code(() -> Execution.acFrontier(1e6, 5, 5, -1, 0, 1e-6, 0, new double[] {})));
+        assertEquals("E_INPUT", code(() -> Execution.acFrontier(1e6, 5, 0, 1, 0, 1e-6, 0, new double[] {})));
+        // a sigma < 0 frontier with a non-empty list is still a domain error, and the finite rule comes first
+        assertEquals("E_DOMAIN", code(() -> Execution.acFrontier(1e6, 5, 5, -1, 0, 1e-6, 0, new double[] {0})));
+        assertEquals("E_DOMAIN", code(() -> Execution.acFrontier(1e6, Double.NaN, 5, 1, 0, 1e-6, 0, new double[] {})));
+        assertEquals(2, Execution.acFrontier(1e6, 5, 5, 0.95, 0.0625, 2.5e-6, 2.5e-7, new double[] {0, 1e-6}).riskAversions().length);
+        // POV: an empty volume list before participation outside (0, 1)
+        assertEquals("E_INPUT", code(() -> Execution.pov(1000, 1.5, new double[] {}, Mode.CONTINUOUS)));
+        assertEquals("E_DOMAIN", code(() -> Execution.pov(1000, 1.5, new double[] {10}, Mode.CONTINUOUS)));
+    }
+
     @Test
     void acProperties() {
         for (double lambda : new double[] {1e-8, 1e-6, 1e-5}) {

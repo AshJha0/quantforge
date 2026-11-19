@@ -100,9 +100,16 @@ final class OpsExecution {
     }
 
     private static Out frontier(In in) {
-        Execution.AcParams p = acParams(in);
-        double[] lambdas = in.gate(in.reals("risk_aversions"));
-        Execution.AcFrontier r = Execution.acFrontier(p, lambdas);
+        double x = in.real("quantity");
+        double t = in.real("horizon");
+        long n = in.atMost("n_steps", Execution.MAX_STEPS);
+        double sigma = in.real("sigma");
+        double eps = in.real("epsilon");
+        double eta = in.real("eta");
+        double gamma = in.real("gamma");
+        double[] lambdas = in.reals("risk_aversions");
+        // The model inputs' finite rule first, then the list: the order of HR-122 lives in Execution.acFrontier.
+        Execution.AcFrontier r = Execution.acFrontier(x, t, n, sigma, eps, eta, gamma, in.gate(lambdas));
         return Operations.out("risk_aversions", OpsSmile.list(r.riskAversions()), "expected_costs",
                 OpsSmile.list(r.expectedCost()), "variances", OpsSmile.list(r.variance()));
     }

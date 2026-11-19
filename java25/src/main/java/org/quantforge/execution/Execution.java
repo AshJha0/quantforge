@@ -157,14 +157,19 @@ public final class Execution {
     public record AcParams(double quantity, double horizon, long nSteps, double sigma, double epsilon, double eta,
             double gamma) {
         public AcParams {
-            String[] names = {"quantity", "horizon", "sigma", "epsilon", "eta", "gamma"};
-            double[] xs = {quantity, horizon, sigma, epsilon, eta, gamma};
-            for (int i = 0; i < xs.length; i++) {
-                if (!Double.isFinite(xs[i])) {
-                    throw domain(names[i], "must be finite");
-                }
-            }
+            finite(quantity, horizon, sigma, epsilon, eta, gamma);
             check(quantity, horizon, nSteps, sigma, epsilon, eta, gamma);
+        }
+    }
+
+    private static void finite(double quantity, double horizon, double sigma, double epsilon, double eta,
+            double gamma) {
+        String[] names = {"quantity", "horizon", "sigma", "epsilon", "eta", "gamma"};
+        double[] xs = {quantity, horizon, sigma, epsilon, eta, gamma};
+        for (int i = 0; i < xs.length; i++) {
+            if (!Double.isFinite(xs[i])) {
+                throw domain(names[i], "must be finite");
+            }
         }
     }
 
@@ -265,12 +270,25 @@ public final class Execution {
     /** One (lambda, E, V) per input. Thread safety: safe to share once built; the arrays are not copied, so callers must not write to them. */
     public record AcFrontier(double[] riskAversions, double[] expectedCost, double[] variance) {}
 
-    public static AcFrontier acFrontier(AcParams p, double[] lambdas) {
-        // An empty list is structural: after the other E_INPUT checks, before every E_DOMAIN (HR-122).
-        if (p.nSteps() >= 1 && p.quantity() > 0 && lambdas.length == 0) {
+    /**
+     * The frontier from raw inputs, with the checks in the order of HR-122: the finite rule, then the structural
+     * {@code E_INPUT} checks (N, X, an empty list), then every {@code E_DOMAIN}. {@link AcParams} checks its own
+     * fields when built, so a caller that already holds one can only meet the empty-list error.
+     */
+    public static AcFrontier acFrontier(double quantity, double horizon, long nSteps, double sigma, double epsilon,
+            double eta, double gamma, double[] lambdas) {
+        finite(quantity, horizon, sigma, epsilon, eta, gamma);
+        if (nSteps >= 1 && quantity > 0 && lambdas.length == 0) {
             throw input("risk_aversions", "must not be empty");
         }
+        return acFrontier(new AcParams(quantity, horizon, nSteps, sigma, epsilon, eta, gamma), lambdas);
+    }
+
+    public static AcFrontier acFrontier(AcParams p, double[] lambdas) {
         double etaTilde = checkAc(p);
+        if (lambdas.length == 0) {
+            throw input("risk_aversions", "must not be empty");
+        }
         for (double l : lambdas) {
             checkLambda(l);
         }

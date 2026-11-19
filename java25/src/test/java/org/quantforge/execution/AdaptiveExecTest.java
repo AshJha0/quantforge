@@ -328,6 +328,23 @@ class AdaptiveExecTest {
         }
     }
 
+    /**
+     * HR-121: leg B at an exact half rounds up even when binary64 lands just below it. 0.3 / 0.2 is
+     * 1.4999999999999998 in binary64 and 1.5 exactly, so one unit of A needs two of B; 5 x 0.7 / 1.0 = 3.5 needs four.
+     */
+    @Test
+    void pairRoundsAnExactHalfUp() {
+        AdaptiveExec.Pair p = AdaptiveExec.pair(Side.BUY, 1, 0.3, Side.SELL, 0.2, PairMode.CASH_BALANCED, null, 1, Mode.UNITS);
+        assertEquals(2.0, p.quantityB());
+        assertArrayEquals(new double[] {2.0}, p.slicesB());
+        assertEquals(-0.1, p.cashImbalance()[0], 1e-15);
+        p = AdaptiveExec.pair(Side.BUY, 5, 0.7, Side.SELL, 1.0, PairMode.CASH_BALANCED, null, 1, Mode.UNITS);
+        assertEquals(4.0, p.quantityB());
+        // a target well away from a half is untouched: 3 x 0.5 / 1.3 = 1.15 rounds to 1
+        p = AdaptiveExec.pair(Side.BUY, 3, 0.5, Side.SELL, 1.3, PairMode.CASH_BALANCED, null, 1, Mode.UNITS);
+        assertEquals(1.0, p.quantityB());
+    }
+
     /** A bad leg quantity names {@code quantity} as its field in all four builds (adaptive-algos.md). */
     @Test
     void legQuantityErrorNamesQuantity() {
