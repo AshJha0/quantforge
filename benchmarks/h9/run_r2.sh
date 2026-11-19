@@ -7,9 +7,16 @@
 #   benchmarks/h9/run_r2.sh correct    form A correctness in C++, Rust, Java and the Python reference (check_r2.py),
 #                                      counts compared field by field; form B (L7 input) dumps checked by check_r.py;
 #                                      writes $OUT/correct/R2_correctness.ok only if everything passes
-#   benchmarks/h9/run_r2.sh time       timing, R2 then L7, $RUNS runs each; refuses unless the correctness marker
-#                                      exists for the same input hashes and the same commit
+#   benchmarks/h9/run_r2.sh time [--skip-l7]
+#                                      timing in stages, in priority order r2-cpp, r2-rust, r2-java, l7 (STAGES="..."
+#                                      picks and orders them); $RUNS runs each. Each stage writes complete result files
+#                                      (temporary name, stamped, renamed) and then a marker; a rerun skips completed
+#                                      stages, so a stop leaves valid files for the stages that finished. Refuses unless
+#                                      the correctness marker exists for the same input hashes and the same commit.
+#                                      Uses the QUIET flag if it is already set (the coordinator's), else sets it.
 #   benchmarks/h9/run_r2.sh all        correct, then time
+# `correct` starts the Python reference for both symbols at once (PY_JOBS workers each, default 5) while the harness
+# passes run, and reuses a finished reference output on a rerun.
 #
 # Inputs: $R2DIR (default /c/Work/Claude/qf-h9-r2) holds the output of `build_r2.py auto`. Every run first checks the
 # inputs against the COMMITTED benchmarks/results/h9/R2_replay.sha256 (refuses if that file is missing, not
@@ -130,26 +137,35 @@ do_build() {
   say "build done"
 }
 
+replay_sha() { sha256sum < "$(hash_file)" | cut -d' ' -f1; }
+stage_key() { echo "replay_hashes_sha256=$(replay_sha) commit=$(git -C "$REPO" rev-parse HEAD) runs=$RUNS smoke=$SMOKE"; }
+stage_done() { [ -f "$1" ] && [ "$(cat "$1")" = "$(stage_key)" ]; }   # stage_done MARKER
+
 do_correct() {
   check_hashes
   local C=$OUT/correct; mkdir -p "$C"; rm -f "$C/R2_correctness.ok"
-  local fail=0
+  local fail=0 s
+  # 1. The Python reference for both symbols, in parallel (one process per symbol, PY_JOBS workers each), started
+  #    first because it is the long pole; each output is reused on a resumed run if its marker matches.
+  local pids=()
   for s in $SYMS; do
-    local W; W=$(warmup_of "$s" r2)
+    if stage_done "$C/py_R2_$s.done"; then say "$s Python reference: reusing $C/py_R2_$s.json"; continue; fi
+    say "$s Python reference started (background, ${PY_JOBS:-5} workers)"
+    ( cd "$REPO/python" && uv run --locked python ../benchmarks/h9/check_r2.py "$R2DIR/R2_$s" --jobs "${PY_JOBS:-5}" \
+        --out "$C/py_R2_$s.json" > "$LOGS/py_R2_$s.log" 2>&1; rc=$?
+      [ $rc -le 2 ] && [ -s "$C/py_R2_$s.json" ] && stage_key > "$C/py_R2_$s.done"; exit $rc ) &
+    pids+=($!)
+  done
+  # 2. Harness form A passes (0 timed runs) and the L7 dumps, meanwhile.
+  for s in $SYMS; do
     local PD; PD=$(meta_field "$s" '["price_decimals"]')
-    say "$s R2 form A: C++, Rust, Java (runs 0: correctness only), then the Python reference"
+    say "$s R2 form A: C++, Rust, Java (runs 0: correctness only)"
     for l in cpp rust; do
-      wsl_run $l "$R2DIR/R2_$s.bin" 0 "$C/${l}_R2_$s.json" "R2c_$s" QF_H9_WORKLOAD=R2 QF_H9_WARMUP="$W" \
+      wsl_run $l "$R2DIR/R2_$s.bin" 0 "$C/${l}_R2_$s.json" "R2c_$s" QF_H9_WORKLOAD=R2 \
         QF_H9_CHECKPOINTS="$(wslpath_of "$R2DIR/R2_$s.cps.bin")" || { say "$l R2 $s correctness exit $?"; fail=1; }
     done
-    java_run "$R2DIR/R2_$s.bin" 0 "$C/java_R2_$s.json" "R2c_$s" QF_H9_WORKLOAD=R2 QF_H9_WARMUP="$W" \
+    java_run "$R2DIR/R2_$s.bin" 0 "$C/java_R2_$s.json" "R2c_$s" QF_H9_WORKLOAD=R2 \
       QF_H9_CHECKPOINTS="$(cygpath -m "$R2DIR/R2_$s.cps.bin")" || { say "java R2 $s correctness exit $?"; fail=1; }
-    (cd "$REPO/python" && uv run --locked python ../benchmarks/h9/check_r2.py "$R2DIR/R2_$s" --jobs "${PY_JOBS:-6}" \
-      --out "$C/py_R2_$s.json") > "$LOGS/py_R2_$s.log" 2>&1 || true   # judged by the comparison below
-    local rc=0
-    python -I "$REPO/benchmarks/h9/r2_meta.py" compare "$s" "$C/py_R2_$s.json" "$C/cpp_R2_$s.json" "$C/rust_R2_$s.json" \
-      "$C/java_R2_$s.json" || rc=$?
-    [ $rc -eq 0 ] || { say "$s R2 form A: compare exit $rc"; fail=1; }
     say "$s L7 input (form B): top(100) dumps in each language, checked by check_r.py against micro.book.rebuild"
     for l in cpp rust; do
       wsl_run $l "$R2DIR/L7_$s.bin" 0 "$C/${l}_L7_$s.json" "L7c_$s" QF_H9_WORKLOAD=L7 \
@@ -162,24 +178,24 @@ do_correct() {
     (cd "$REPO/python" && uv run --locked python ../benchmarks/h9/check_r.py "$R2DIR/L7_$s" "$LOGS/dump_cpp_L7_$s.txt" "$PD") \
       > "$C/py_L7_$s.json" 2> "$LOGS/py_L7_$s.err" || { say "$s L7 check_r.py failed"; fail=1; }
   done
+  # 3. Wait for the reference, then compare the four sets of counts per symbol.
+  local p; for p in "${pids[@]}"; do wait "$p" || true; done   # judged by the comparison below
+  for s in $SYMS; do
+    local rc=0
+    python -I "$REPO/benchmarks/h9/r2_meta.py" compare "$s" "$C/py_R2_$s.json" "$C/cpp_R2_$s.json" "$C/rust_R2_$s.json" \
+      "$C/java_R2_$s.json" || rc=$?
+    [ $rc -eq 0 ] || { say "$s R2 form A: compare exit $rc"; fail=1; }
+  done
   if [ $fail -ne 0 ]; then say "CORRECTNESS FAILED: no timing will run"; exit 1; fi
-  { echo "replay_hashes_sha256=$(sha256sum < "$(hash_file)" | cut -d' ' -f1)"; echo "commit=$(git -C "$REPO" rev-parse HEAD)";
+  { echo "replay_hashes_sha256=$(replay_sha)"; echo "commit=$(git -C "$REPO" rev-parse HEAD)";
     echo "below10_venue_side=${QF_R2_BELOW10_VENUE_SIDE:-0}"; echo "at=$(date -u +%FT%TZ)"; } > "$C/R2_correctness.ok"
   say "correctness passed in every language: $C/R2_correctness.ok"
 }
 
-do_time() {
-  check_hashes
-  local C=$OUT/correct
-  [ -f "$C/R2_correctness.ok" ] || die "no correctness marker: run 'correct' first"
-  grep -q "replay_hashes_sha256=$(sha256sum < "$(hash_file)" | cut -d' ' -f1)" "$C/R2_correctness.ok" || die "the correctness marker is for other inputs"
-  grep -q "commit=$(git -C "$REPO" rev-parse HEAD)" "$C/R2_correctness.ok" || die "the correctness marker is for another commit"
-  [ -e "$QUIET_FLAG" ] && [ "$SMOKE" != 1 ] && die "QUIET is already set: another measurement is running"
-  [ "$SMOKE" = 1 ] || { touch "$QUIET_FLAG"; trap 'rm -f "$QUIET_FLAG"' EXIT; }
-  local META=$LOGS/publication.json
+write_publication() {  # write_publication META
   local WF; WF=$(MSYS2_ARG_CONV_EXCL="*" wsl.exe -e bash "$(wslpath_of "$SELF")" wsl-facts)
   local JV; JV=$("$JAVA" -version 2>&1 | head -1)
-  python -I - "$META" "$WF" "$(hash_file)" "$RUNS" "$(git -C "$REPO" rev-parse HEAD)" "$SMOKE" "$JV" <<'PY'
+  python -I - "$1" "$WF" "$(hash_file)" "$RUNS" "$(git -C "$REPO" rev-parse HEAD)" "$SMOKE" "$JV" <<'PY'
 import json, platform, sys
 out, wf, hashes, runs, commit, smoke, jv = sys.argv[1:]
 wf = json.loads(wf)
@@ -188,6 +204,7 @@ meta = {
                 "frequency_governor": wf["governor"]},
     "commit": commit, "repeats": int(runs),
     "targets_commits": {"L1-L6": "fa020dd8", "L1-R2 to L3-R2 and L7": "f2d90738"},
+    "rulings": ["HR-130", "HR-131", "HR-132", "HR-133"],
     "workload_hashes": dict(reversed(l.split()) for l in open(hashes) if l.strip()),
     "labels": ["in-process, simulated feed; no network or venue latency", "crypto venue; not equities or rates",
                "R2: raw venue messages; L7: snapshot-differenced stream (form B), per-level samples",
@@ -205,32 +222,67 @@ meta = {
 }
 json.dump(meta, open(out, "w"), indent=1)
 PY
+}
+
+# One timing stage: r2-cpp, r2-rust, r2-java or l7 (all three languages on the form B stream). Each result file is
+# written to a temporary name, stamped with the publication fields, then renamed, so a stopped run leaves only
+# complete files; the stage marker is written last, and a stage whose marker matches is skipped on a rerun.
+run_stage() {
+  local st=$1 META=$2 T=$OUT/timing; mkdir -p "$T"
+  if stage_done "$T/$st.done"; then say "stage $st already complete for these inputs and commit: skipped"; return 0; fi
+  local s l w files=()
   for s in $SYMS; do
-    local W7; W7=$(warmup_of "$s" l7)
-    local W2; W2=$(warmup_of "$s" r2)
-    say "$s timing R2 ($RUNS runs each; warm-up $W2 messages)"
-    for l in cpp rust; do
-      wsl_run $l "$R2DIR/R2_$s.bin" "$RUNS" "$OUT/${l}_R2_$s.json" "R2_$s" QF_H9_WORKLOAD=R2 QF_H9_WARMUP="$W2" \
-        QF_H9_CHECKPOINTS="$(wslpath_of "$R2DIR/R2_$s.cps.bin")"
-    done
-    java_run "$R2DIR/R2_$s.bin" "$RUNS" "$OUT/java_R2_$s.json" "R2_$s" QF_H9_WORKLOAD=R2 QF_H9_WARMUP="$W2" \
-      QF_H9_CHECKPOINTS="$(cygpath -m "$R2DIR/R2_$s.cps.bin")"
-    say "$s timing L7 on the form B stream ($RUNS runs each; warm-up $W7 messages)"
-    for l in cpp rust; do
-      wsl_run $l "$R2DIR/L7_$s.bin" "$RUNS" "$OUT/${l}_L7_$s.json" "L7_$s" QF_H9_WORKLOAD=L7 QF_H9_WARMUP="$W7" QF_H9_PER_LEVEL=1
-    done
-    java_run "$R2DIR/L7_$s.bin" "$RUNS" "$OUT/java_L7_$s.json" "L7_$s" QF_H9_WORKLOAD=L7 QF_H9_WARMUP="$W7" QF_H9_PER_LEVEL=1
-    for l in cpp rust java; do
-      for w in R2 L7; do python -I "$REPO/benchmarks/h9/r2_meta.py" stamp "$OUT/${l}_${w}_$s.json" "$META"; done
-    done
+    local W2 W7; W2=$(warmup_of "$s" r2); W7=$(warmup_of "$s" l7)
+    case $st in
+      r2-cpp|r2-rust)
+        l=${st#r2-}; say "$st $s: $RUNS runs, warm-up $W2 messages"
+        wsl_run $l "$R2DIR/R2_$s.bin" "$RUNS" "$OUT/${l}_R2_$s.json.tmp" "R2_$s" QF_H9_WORKLOAD=R2 QF_H9_WARMUP="$W2" \
+          QF_H9_CHECKPOINTS="$(wslpath_of "$R2DIR/R2_$s.cps.bin")"
+        files+=("$OUT/${l}_R2_$s.json") ;;
+      r2-java)
+        say "$st $s: $RUNS runs, warm-up $W2 messages"
+        java_run "$R2DIR/R2_$s.bin" "$RUNS" "$OUT/java_R2_$s.json.tmp" "R2_$s" QF_H9_WORKLOAD=R2 QF_H9_WARMUP="$W2" \
+          QF_H9_CHECKPOINTS="$(cygpath -m "$R2DIR/R2_$s.cps.bin")"
+        files+=("$OUT/java_R2_$s.json") ;;
+      l7)
+        say "$st $s: $RUNS runs per language, warm-up $W7 messages"
+        for l in cpp rust; do
+          wsl_run $l "$R2DIR/L7_$s.bin" "$RUNS" "$OUT/${l}_L7_$s.json.tmp" "L7_$s" QF_H9_WORKLOAD=L7 QF_H9_WARMUP="$W7" QF_H9_PER_LEVEL=1
+          files+=("$OUT/${l}_L7_$s.json")
+        done
+        java_run "$R2DIR/L7_$s.bin" "$RUNS" "$OUT/java_L7_$s.json.tmp" "L7_$s" QF_H9_WORKLOAD=L7 QF_H9_WARMUP="$W7" QF_H9_PER_LEVEL=1
+        files+=("$OUT/java_L7_$s.json") ;;
+      *) die "unknown stage $st (r2-cpp, r2-rust, r2-java, l7)" ;;
+    esac
   done
-  say "timing done: $OUT/{cpp,rust,java}_{R2,L7}_{BTC-USD,ETH-USD}.json"
+  local f
+  for f in "${files[@]}"; do
+    python -I "$REPO/benchmarks/h9/r2_meta.py" stamp "$f.tmp" "$META"
+    mv -f "$f.tmp" "$f"
+  done
+  stage_key > "$T/$st.done"
+  say "stage $st complete: ${files[*]##*/}"
+}
+
+do_time() {
+  check_hashes
+  local C=$OUT/correct
+  [ -f "$C/R2_correctness.ok" ] || die "no correctness marker: run 'correct' first"
+  grep -q "replay_hashes_sha256=$(replay_sha)" "$C/R2_correctness.ok" || die "the correctness marker is for other inputs"
+  grep -q "commit=$(git -C "$REPO" rev-parse HEAD)" "$C/R2_correctness.ok" || die "the correctness marker is for another commit"
+  if [ "$SMOKE" != 1 ] && [ ! -e "$QUIET_FLAG" ]; then touch "$QUIET_FLAG"; trap 'rm -f "$QUIET_FLAG"' EXIT; fi
+  local META=$LOGS/publication.json
+  write_publication "$META"
+  local stages=${STAGES:-"r2-cpp r2-rust r2-java l7"}
+  [ "${SKIP_L7:-0}" = 1 ] && stages=${stages//l7/}
+  local st; for st in $stages; do run_stage "$st" "$META"; done
+  say "timing done for stages: $stages"
 }
 
 case $MODE in
   build) do_build ;;
   correct) do_correct ;;
-  time) do_time ;;
+  time) shift; for a in "$@"; do [ "$a" = --skip-l7 ] && SKIP_L7=1; done; do_time ;;
   all) do_correct && do_time ;;
-  *) sed -n '2,24p' "$SELF"; exit 64 ;;
+  *) sed -n '2,32p' "$SELF"; exit 64 ;;
 esac
