@@ -320,7 +320,8 @@ fn trigger_within(
         fire: (x_now - x_ref).abs() > threshold,
         sigma,
         threshold,
-        // erfc(k / sqrt 2), the two-sided normal tail 2 (1 - Phi(k)).
+        // 2 (1 - Phi(k)) of KR-6, as 2 Phi(-k): the normal CDF forms the Gaussian factor from k itself,
+        // so it keeps full precision in the far tail (a bare erfc(k / sqrt 2) loses 1.2e-13 at k = 30).
         false_alarm_rate: 2.0 * normal_cdf(-k),
     })
 }
@@ -453,3 +454,7 @@ pub fn richardson_check(values: &[f64], ratio: f64, assumed_order: f64) -> Resul
 #[cfg(test)]
 #[path = "stage_k_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "stage_k_incremental_b_tests.rs"]
+mod incremental_b_tests;

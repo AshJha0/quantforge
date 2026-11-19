@@ -94,7 +94,7 @@ class StageKCliTest {
                 }
             }
         }
-        assertEquals(45, rows);
+        assertTrue(rows >= 46, "rows " + rows);  // a minimum: adding goldens must not break this test
     }
 
     /** The shared goldens of the K-8 method (k8_k): values at 1e-9 of the row scale, error codes exactly. */

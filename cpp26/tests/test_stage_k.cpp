@@ -23,6 +23,7 @@
 #include "quantforge/core/json.hpp"
 #include "quantforge/core/research.hpp"
 #include "quantforge/core/stage_k.hpp"
+#include "quantforge/core/stats.hpp"
 #include "quantforge/core/store.hpp"
 
 namespace {
@@ -452,7 +453,10 @@ TEST_CASE("trigger: strict threshold, sigma with exact sums, the error order and
     CHECK(t.fire);
     CHECK(t.sigma == std::sqrt(4.0 / 3.0));
     CHECK(t.threshold == 3.0 * t.sigma);
-    CHECK(t.false_alarm_rate == std::erfc(3.0 / std::sqrt(2.0)));
+    CHECK(t.false_alarm_rate == 2.0 * quantforge::normal_cdf(-3.0));
+    // KR-6 states 2 (1 - Phi(k)); at k = 30 a bare erfc(k / sqrt 2) is 1.2e-13 off (trig_k-0009, mpmath 50 digits).
+    const double far = sk::trigger_check({1.0, -1.0, 1.0, -1.0}, 100.0, 105.0, 1.0, 30.0).false_alarm_rate;
+    CHECK(std::fabs(far / 9.813427854296374e-198 - 1.0) <= 1e-14);
     // KR-13: a move equal to the threshold does not fire.
     const Vec w = {0.5, -1.0, 1.5, -0.5, 0.0, 1.0, -1.5, 0.0};
     CHECK_FALSE(sk::trigger_check(w, 0.0, 2.5, 1.0, 2.5).fire);

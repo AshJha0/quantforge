@@ -270,12 +270,33 @@ def solve_pillars(
             step_end,
             [math.log(v) for v in start],
         )
-    logs: list[float] = []
+    logs = sequential_logs(as_of, interpolation, pillars, models, targets, jumps)
+    final = Curve(
+        CurveData(as_of, interpolation, tuple(pillars), tuple(math.exp(v) for v in logs), jumps)
+    )
+    return [math.exp(v) for v in logs], repricing_error(final, models, targets)
+
+
+def sequential_logs(
+    as_of: date,
+    interpolation: str,
+    pillars: Sequence[date],
+    models: Sequence[Model],
+    targets: Sequence[float],
+    jumps: tuple[tuple[date, float], ...] = (),
+    fixed: Sequence[float] = (),
+) -> list[float]:
+    """The one-at-a-time solve of `solve_pillars`, on log discount factors. The first `len(fixed)`
+    logs are taken as given and only the later pillars are solved (K-4b, ruling KR-5): `fixed` must
+    be the logs of an earlier solve of the same quotes up to that index, and then the result is the
+    full solve bit for bit, because the same arithmetic runs in the same order."""
+    logs: list[float] = list(fixed)
 
     def curve_with(x: float, count: int) -> Curve:
         return Curve._extended(prefix, pillars[count - 1], math.exp(x))
 
-    for j, (model, target) in enumerate(zip(models, targets, strict=True)):
+    for j in range(len(logs), len(models)):
+        model, target = models[j], targets[j]
         stable_until = pillars[j - 1] if j else as_of
         stable: dict[date, float] = {}
         # The pillars before j are fixed while pillar j is solved, so their part of the curve is
@@ -299,11 +320,86 @@ def solve_pillars(
         t = (pillars[j] - as_of).days / 365
         guess = logs[-1] - target * 0.1 if logs else -target * t
         logs.append(_solve(error, guess))
+    return logs
 
-    final = Curve(
-        CurveData(as_of, interpolation, tuple(pillars), tuple(math.exp(v) for v in logs), jumps)
+
+# The interpolations whose sequential solve keeps every earlier pillar (stage B). A stage F method is
+# solved globally (ruling F-21), so it has no prefix to keep.
+SEQUENTIAL_INTERPOLATIONS = ("LOG_LINEAR_DF", "LINEAR_ZERO")
+
+
+@dataclass(frozen=True)
+class Solve:
+    """What `incremental_solve` reads of one bootstrap: pillar dates, one model and one target per
+    quote, and a key per quote that changes exactly when that quote's instrument or target does."""
+
+    pillars: Sequence[date]
+    models: Sequence[Model]
+    targets: Sequence[float]
+    keys: Sequence[tuple[object, ...]]
+
+
+def incremental_solve(
+    as_of: date,
+    interpolation: str,
+    jumps: tuple[tuple[date, float], ...],
+    previous: Solve,
+    previous_factors: Sequence[float],
+    new: Solve,
+) -> tuple[list[float], float, int | None, int]:
+    """K-4b on a production sequential bootstrap: re-solves only the pillars at and after the first
+    changed quote. Returns (discount factors, largest repricing error, first changed index or None,
+    pillars recomputed).
+
+    As `curve.incremental.update`, the cached curve is checked first: `previous_factors` must equal
+    the bootstrap of the previous quotes bit for bit (E_INPUT otherwise; a stale cache must not be
+    patched). That check is a full solve of the previous quotes; it also gives the exact logs from
+    which the later pillars are solved again."""
+    if interpolation not in SEQUENTIAL_INTERPOLATIONS:
+        raise QfError(
+            "E_INPUT",
+            "an incremental update needs a sequential interpolation (LOG_LINEAR_DF or LINEAR_ZERO)",
+            "interpolation",
+        )
+    n = len(new.models)
+    if not (len(previous.models) == len(previous_factors) == n):
+        raise QfError(
+            "E_INPUT",
+            "previous quotes, previous discount factors and new quotes must have one length",
+            "quotes",
+        )
+    old = sequential_logs(
+        as_of, interpolation, previous.pillars, previous.models, previous.targets, jumps
     )
-    return [math.exp(v) for v in logs], repricing_error(final, models, targets)
+    if any(
+        math.exp(v) != f or math.copysign(1.0, f) < 0
+        for v, f in zip(old, previous_factors, strict=True)
+    ):
+        raise QfError(
+            "E_INPUT",
+            "previous discount factors are not the bootstrap of the previous quotes",
+            "previous_discount_factors",
+        )
+    j = next(
+        (
+            i
+            for i, (a, b) in enumerate(zip(previous.keys, new.keys, strict=True))
+            if a != b or previous.pillars[i] != new.pillars[i]
+        ),
+        None,
+    )
+    logs = (
+        old
+        if j is None
+        else sequential_logs(
+            as_of, interpolation, new.pillars, new.models, new.targets, jumps, old[:j]
+        )
+    )
+    factors = [math.exp(v) for v in logs]
+    final = Curve(CurveData(as_of, interpolation, tuple(new.pillars), tuple(factors), jumps))
+    error = repricing_error(final, new.models, new.targets)
+    check_solved(error)
+    return factors, error, j, 0 if j is None else n - j
 
 
 def global_solve(

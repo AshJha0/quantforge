@@ -120,10 +120,17 @@ public final class Ois {
         if (quotes.isEmpty()) {
             throw new QfError("E_INPUT", "no quotes", "quotes");
         }
+        CurveSolver.Problem p = problem(c, asOf, quotes, bump);
+        return CurveSolver.solve(asOf, interp, p.dates(), p.quotes(), p.models(), method, jumps, shape);
+    }
+
+    private static CurveSolver.Problem problem(Conventions.RateIndex c, LocalDate asOf, List<Quote> quotes,
+                                               double[] bump) {
         int n = quotes.size();
         LocalDate[] dates = new LocalDate[n];
         List<ToDoubleFunction<Curve>> models = new ArrayList<>(n);
         double[] target = new double[n];
+        List<List<Object>> keys = new ArrayList<>(n);
         for (int j = 0; j < n; j++) {
             Legs legs = legs(c, asOf, quotes.get(j).tenor());
             dates[j] = legs.periods().getLast().payment();
@@ -137,8 +144,26 @@ public final class Ois {
                 throw new QfError("E_INPUT", "bid is above ask", "quotes");
             }
             target[j] = quotes.get(j).mid() + (bump == null ? 0.0 : bump[j]);
+            keys.add(List.of(quotes.get(j).tenor(), Double.doubleToRawLongBits(target[j])));
         }
-        return CurveSolver.solve(asOf, interp, dates, target, models, method, jumps, shape);
+        return new CurveSolver.Problem(dates, target, models, keys);
+    }
+
+    /**
+     * K-4b on the stage B OIS bootstrap (method SEQUENTIAL): the bootstrap of {@code next}, solving only the pillars
+     * at and after the first quote whose tenor or mid differs from {@code previous}; see
+     * {@link CurveSolver#incremental}.
+     */
+    public static CurveSolver.Incremental bootstrapIncremental(Conventions.RateIndex c, LocalDate asOf,
+                                                               List<Quote> previous, double[] previousFactors,
+                                                               List<Quote> next, Curve.Interpolation interp,
+                                                               Jumps jumps) {
+        jumps.check(asOf);
+        if (previous.isEmpty() || next.isEmpty()) {
+            throw new QfError("E_INPUT", "no quotes", "quotes");
+        }
+        return CurveSolver.incremental(asOf, interp, jumps, problem(c, asOf, previous, null), previousFactors,
+                problem(c, asOf, next, null));
     }
 
     /** Compounded in arrears from actual fixings. */

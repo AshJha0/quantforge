@@ -11,6 +11,7 @@ import json
 import math
 import os
 import random
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -327,6 +328,211 @@ def test_incremental_property_on_stage_b_bootstraps() -> None:
     )
 
 
+# --- K-4b on the stage B production bootstrap: patched against rebuilt ----------------------------
+
+_SEQ = ("LOG_LINEAR_DF", "LINEAR_ZERO")
+
+
+def _stage_b_sets() -> list[tuple[str, dict[str, Any]]]:
+    """Every sequential stage B bootstrap instrument set: the SEQUENTIAL OIS goldens of stage B (rate
+    and bid/ask quotes, both stage B interpolations), the SEQUENTIAL OIS goldens with jumps of stage D
+    (ois_d), and the projection goldens (deposits, FRAs, swaps) in both stage B interpolations."""
+    out = []
+    for folder, name in (
+        ("stage_b", "ois"),
+        ("stage_b", "projection"),
+        ("stage_b", "projection_deep"),
+        ("stage_d", "ois_d"),
+    ):
+        doc = json.loads((ROOT / "datasets/golden" / folder / f"{name}.json").read_text("utf-8"))
+        for c in doc["cases"]:
+            i = c["inputs"]
+            if not (c["operation"].endswith(".bootstrap") and c["expected"]["status"] == "ok"):
+                continue
+            if i.get("method", "SEQUENTIAL") != "SEQUENTIAL" or i.get("interpolation") not in _SEQ:
+                continue
+            if any(k in i for k in ("tension", "step_end")):
+                continue
+            out.append((c["case_id"], i))
+            if c["operation"] == "rates.projection.bootstrap":
+                out.append((c["case_id"] + "/LINEAR_ZERO", dict(i, interpolation="LINEAR_ZERO")))
+    return out
+
+
+def _op_of(i: dict[str, Any]) -> str:
+    return "rates.ois.bootstrap" if "convention" in i else "rates.projection.bootstrap"
+
+
+def _b_quotes(i: dict[str, Any], raw: list[dict[str, Any]]) -> list[Any]:
+    from quantforge_core.cli.inputs import Inputs
+    from quantforge_core.cli.ops_rates import projection_quote
+    from quantforge_core.cli.readers import _objects, _quotes
+
+    v = Inputs(dict(i, quotes=raw))
+    if _op_of(i) == "rates.ois.bootstrap":
+        return _quotes(v)
+    return [projection_quote(q) for q in _objects(v, "quotes")]
+
+
+def _b_solve(i: dict[str, Any], quotes: list[Any]) -> tuple[Any, float]:
+    from quantforge_core import ois, projection
+    from quantforge_core.cli.inputs import Inputs
+    from quantforge_core.cli.ops_rates import index
+    from quantforge_core.cli.readers import _curve, jumps
+
+    v = Inputs(i)
+    interp = v.string("interpolation")
+    if _op_of(i) == "rates.ois.bootstrap":
+        conv = v.string("convention")
+        return ois.bootstrap(conv, v.date("as_of"), quotes, interp, "SEQUENTIAL", jumps(v))
+    return projection.bootstrap(_curve(v, "discount"), index(v), v.date("as_of"), quotes, interp)
+
+
+def _b_incremental(i: dict[str, Any], prev: list[Any], factors: Any, new: list[Any]) -> Any:
+    from quantforge_core import ois, projection
+    from quantforge_core.cli.inputs import Inputs
+    from quantforge_core.cli.ops_rates import index
+    from quantforge_core.cli.readers import _curve, jumps
+
+    v = Inputs(i)
+    interp, as_of = v.string("interpolation"), v.date("as_of")
+    if _op_of(i) == "rates.ois.bootstrap":
+        conv = v.string("convention")
+        return ois.bootstrap_incremental(conv, as_of, prev, factors, new, interp, jumps(v))
+    disc = _curve(v, "discount")
+    return projection.bootstrap_incremental(disc, index(v), as_of, prev, factors, new, interp)
+
+
+def _shift(q: dict[str, Any], d: float) -> dict[str, Any]:
+    q = dict(q)
+    if "rate" in q:
+        q["rate"] += d
+    else:
+        q["bid"] += d
+        q["ask"] += d
+    return q
+
+
+Move = tuple[str, str, list[dict[str, Any]], list[dict[str, Any]]]
+
+
+def _b_moves(n_total: int, seed: int) -> list[Move]:
+    """(set id, kind, previous quotes, new quotes). Fixed part per set: no change, every single
+    pillar (the first, each middle one, the last), first and last together, all pillars. Random
+    part up to n_total: a random previous vector (each quote moved by up to 50 bp with probability
+    1/2), then 1 to n quotes moved by up to 25 bp each; the kind names how many quotes moved and
+    where the first change falls."""
+    sets = _stage_b_sets()
+    rnd = random.Random(seed)
+    out: list[Move] = []
+    bp = 1e-4
+    for sid, i in sets:
+        base = i["quotes"]
+        n = len(base)
+        out.append((sid, "none", base, base))
+        for j in range(n):
+            kind = "single_first" if j == 0 else "single_last" if j == n - 1 else "single_middle"
+            out.append(
+                (sid, kind, base, [_shift(q, bp) if k == j else q for k, q in enumerate(base)])
+            )
+        both = [_shift(q, -bp) if k in (0, n - 1) else q for k, q in enumerate(base)]
+        out.append((sid, "multi_first_and_last", base, both))
+        out.append((sid, "multi_all", base, [_shift(q, 2 * bp) for q in base]))
+    while len(out) < n_total:
+        sid, i = sets[rnd.randrange(len(sets))]
+        base = i["quotes"]
+        n = len(base)
+        prev = [
+            _shift(q, rnd.uniform(-50 * bp, 50 * bp)) if rnd.random() < 0.5 else q for q in base
+        ]
+        idx = sorted(rnd.sample(range(n), rnd.randint(1, n)))
+        new = list(prev)
+        for k in idx:
+            new[k] = _shift(prev[k], rnd.choice((-1, 1)) * rnd.uniform(0.01 * bp, 25 * bp))
+        where = "first" if idx[0] == 0 else "last" if idx[0] == n - 1 else "middle"
+        out.append((sid, ("multi_" if len(idx) > 1 else "single_") + where, prev, new))
+    return out
+
+
+def test_incremental_update_on_stage_b_bootstrap_equals_rebuild() -> None:
+    """K-4b acceptance on the stage B production bootstrap (incremental-update.md, Acceptance, third
+    line; KR-5): on 10,000 quote moves over every sequential stage B instrument set, the incremental
+    path equals a full rebuild to 1e-12 relative, and copied pillars are bit-identical to the cache."""
+    sets = dict(_stage_b_sets())
+    moves = _b_moves(10_000, 20261119)
+    assert len(moves) == 10_000
+    worst, bit_equal, kinds = 0.0, 0, Counter[str]()
+    for sid, kind, prev_raw, new_raw in moves:
+        i = sets[sid]
+        prev, new = _b_quotes(i, prev_raw), _b_quotes(i, new_raw)
+        cache, _ = _b_solve(i, prev)
+        patched, err, first, recomputed = _b_incremental(i, prev, cache.discount_factors, new)
+        full, full_err = _b_solve(i, new)
+        n = len(new_raw)
+        want = next((k for k in range(n) if prev_raw[k] != new_raw[k]), None)
+        assert first == want and recomputed == (0 if want is None else n - want), (sid, kind)
+        j = n if want is None else want
+        assert patched.discount_factors[:j] == cache.discount_factors[:j], (sid, kind)
+        assert patched.dates == full.dates
+        for a, b in zip(patched.discount_factors, full.discount_factors, strict=True):
+            rel = _rel(a, b)
+            worst = max(worst, rel)
+            assert rel <= 1e-12, (sid, kind, a, b)
+        bit_equal += patched.discount_factors == full.discount_factors and err == full_err
+        kinds[kind] += 1
+    _evidence(
+        "incremental_property_stage_b_patched",
+        {
+            "cases": len(moves),
+            "instrument_sets": sorted(sets),
+            "kinds": dict(sorted(kinds.items())),
+            "max_relative_difference": worst,
+            "bit_identical_to_full_rebuild": bit_equal,
+            "copied_pillars_bit_identical": True,
+            "seed": "random.Random(20261119)",
+        },
+    )
+    assert bit_equal == len(moves)
+
+
+def test_incremental_stage_b_errors_and_tenor_change() -> None:
+    import dataclasses
+
+    from quantforge_core import ois
+    from quantforge_core.errors import QfError
+
+    sets = _stage_b_sets()
+    i = next(i for _, i in sets if _op_of(i) == "rates.ois.bootstrap")
+    q = _b_quotes(i, i["quotes"])
+    cache, _ = _b_solve(i, q)
+    f = list(cache.discount_factors)
+    stale = [*f[:-1], math.nextafter(f[-1], 1.0)]
+    for bad in (
+        lambda: _b_incremental(i, q, stale, q),
+        lambda: _b_incremental(i, q, f, q[:-1]),
+        lambda: _b_incremental(i, q, f[:-1], q),
+        lambda: ois.bootstrap_incremental(i["convention"], cache.as_of, q, f, q, "MONOTONE_CONVEX"),
+    ):
+        with pytest.raises(QfError) as e:
+            bad()
+        assert e.value.code == "E_INPUT"
+    # a changed tenor is a changed instrument: its pillar and every later one are solved again
+    assert q[-1].tenor == "30Y"
+    longer = [*q[:-1], dataclasses.replace(q[-1], tenor="25Y")]
+    _, _, first, recomputed = _b_incremental(i, q, f, longer)
+    assert (first, recomputed) == (len(q) - 1, 1)
+    p = next(i for _, i in sets if _op_of(i) == "rates.projection.bootstrap")
+    pq = _b_quotes(p, p["quotes"])
+    pc, _ = _b_solve(p, pq)
+    with pytest.raises(QfError) as e:
+        _b_incremental(p, pq, [*pc.discount_factors[:-1], 0.5], pq)
+    assert e.value.code == "E_INPUT"
+    swapped = [pq[1], pq[0], *pq[2:]]
+    with pytest.raises(QfError) as e:
+        _b_incremental(p, pq, pc.discount_factors, swapped)
+    assert e.value.code == "E_INPUT"
+
+
 # --- recalibration trigger ------------------------------------------------------------------------
 
 
@@ -344,6 +550,15 @@ def test_trig_k_rows(case: dict[str, Any]) -> None:
     assert got["fire"] is want["fire"]
     for key in ("sigma", "threshold", "false_alarm_rate"):
         assert _rel(got[key], want[key]) <= 1e-14
+
+
+def test_false_alarm_rate_is_twice_the_normal_tail() -> None:
+    """KR-6 states 2 (1 - Phi(k)); at k = 30 a bare erfc(k / sqrt 2) is 1.2e-13 off (trig_k-0009, mpmath)."""
+    far = sk.trigger_check([1.0, -1.0, 1.0, -1.0], 100.0, 105.0, 1.0, 30.0)["false_alarm_rate"]
+    assert _rel(far, 9.813427854296374e-198) <= 1e-14
+    # the form not used: a bare erfc(k / sqrt 2)
+    assert _rel(math.erfc(30.0 / math.sqrt(2.0)), 9.813427854296374e-198) > 1e-14
+    assert sk.two_sided_normal_tail(3.0) == pytest.approx(0.002699796063260189, rel=1e-15)
 
 
 def test_trigger_simulation_acceptance() -> None:

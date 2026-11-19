@@ -378,38 +378,7 @@ pub fn solve_curve_with_jumps(
     let build =
         |l: &[f64]| Curve::from_logs_with_jumps(as_of, interpolation, &dates[..l.len()], l, jumps);
     match method {
-        SolveMethod::Sequential => {
-            for j in 0..dates.len() {
-                let value = |x: f64, base: &[f64]| -> Result<f64> {
-                    let mut l = base[..=j].to_vec();
-                    l[j] = x;
-                    model(&build(&l), j)
-                };
-                let (mut x, mut best, mut best_x) = (logs[j], f64::INFINITY, logs[j]);
-                for _ in 0..60 {
-                    let r = value(x, &logs)? - quotes[j];
-                    if !r.is_finite() {
-                        return Err(no_convergence());
-                    }
-                    if r.abs() < best {
-                        (best, best_x) = (r.abs(), x);
-                    }
-                    if r.abs() <= RESIDUAL_GOAL {
-                        break;
-                    }
-                    let d = (value(x + BUMP, &logs)? - value(x - BUMP, &logs)?) / (2.0 * BUMP);
-                    let step = r / d;
-                    if !step.is_finite() {
-                        return Err(no_convergence());
-                    }
-                    if step.abs() <= STEP_GOAL {
-                        break;
-                    }
-                    x -= step;
-                }
-                logs[j] = best_x;
-            }
-        }
+        SolveMethod::Sequential => sequential_from(&build, quotes, model, &mut logs, 0)?,
         SolveMethod::Global => {
             let n = dates.len();
             let residuals = |l: &[f64]| -> Result<Vec<f64>> {
@@ -451,7 +420,61 @@ pub fn solve_curve_with_jumps(
             logs = best_logs;
         }
     }
-    let curve = build(&logs);
+    finish(build(&logs), dates, logs, quotes, model)
+}
+
+/// The one-at-a-time solve, from pillar `from` on: `logs[..from]` are taken as given and
+/// `logs[from..]` hold the starting points. When `logs[..from]` is the start of an earlier solve of
+/// the same quotes up to there, the result is the full solve bit for bit (K-4b, ruling KR-5): the
+/// same arithmetic runs in the same order.
+fn sequential_from(
+    build: &dyn Fn(&[f64]) -> Curve,
+    quotes: &[f64],
+    model: &dyn Fn(&Curve, usize) -> Result<f64>,
+    logs: &mut [f64],
+    from: usize,
+) -> Result<()> {
+    for j in from..logs.len() {
+        let value = |x: f64, base: &[f64]| -> Result<f64> {
+            let mut l = base[..=j].to_vec();
+            l[j] = x;
+            model(&build(&l), j)
+        };
+        let (mut x, mut best, mut best_x) = (logs[j], f64::INFINITY, logs[j]);
+        for _ in 0..60 {
+            let r = value(x, logs)? - quotes[j];
+            if !r.is_finite() {
+                return Err(no_convergence());
+            }
+            if r.abs() < best {
+                (best, best_x) = (r.abs(), x);
+            }
+            if r.abs() <= RESIDUAL_GOAL {
+                break;
+            }
+            let d = (value(x + BUMP, logs)? - value(x - BUMP, logs)?) / (2.0 * BUMP);
+            let step = r / d;
+            if !step.is_finite() {
+                return Err(no_convergence());
+            }
+            if step.abs() <= STEP_GOAL {
+                break;
+            }
+            x -= step;
+        }
+        logs[j] = best_x;
+    }
+    Ok(())
+}
+
+/// Reprices every quote on the solved curve and checks the limit.
+fn finish(
+    curve: Curve,
+    dates: &[Date],
+    logs: Vec<f64>,
+    quotes: &[f64],
+    model: &dyn Fn(&Curve, usize) -> Result<f64>,
+) -> Result<Solved> {
     let mut worst = 0.0f64;
     for j in 0..dates.len() {
         let e = (model(&curve, j)? - quotes[j]).abs();
@@ -468,6 +491,100 @@ pub fn solve_curve_with_jumps(
         dates: dates.to_vec(),
         logs,
         max_repricing_error: worst,
+    })
+}
+
+/// One sequential bootstrap as `solve_incremental` reads it: pillar dates, targets, the model of
+/// quote `j`, and a key per quote that differs exactly when that quote's instrument or target does.
+pub struct SequentialProblem<'a, K: PartialEq> {
+    pub dates: &'a [Date],
+    pub quotes: &'a [f64],
+    pub model: &'a dyn Fn(&Curve, usize) -> Result<f64>,
+    pub keys: &'a [K],
+}
+
+/// `first_changed_index` is None when no quote changed; `recomputed` counts the pillars solved
+/// again.
+#[derive(Debug, Clone)]
+pub struct Incremental {
+    pub solved: Solved,
+    pub first_changed_index: Option<usize>,
+    pub recomputed: usize,
+}
+
+/// K-4b on a production sequential bootstrap, as `curve.incremental.update`: `previous_factors`
+/// (the pillar discount factors `exp(log)`) must equal the solve of the previous quotes bit for bit
+/// (`E_INPUT` otherwise; a stale cache is not patched). That check is a full solve of the previous
+/// quotes, which also gives the exact logs from which the pillars at and after the first changed
+/// quote are solved again. Stage F interpolations are solved globally (ruling F-21): `E_INPUT`.
+pub fn solve_incremental<K: PartialEq>(
+    as_of: Date,
+    interpolation: Interpolation,
+    jumps: &[(Date, f64)],
+    previous: &SequentialProblem<'_, K>,
+    previous_factors: &[f64],
+    next: &SequentialProblem<'_, K>,
+) -> Result<Incremental> {
+    crate::error::finite("previous_discount_factors", &previous_factors)?;
+    if !matches!(
+        interpolation,
+        Interpolation::LogLinearDf | Interpolation::LinearZero
+    ) {
+        return fail(
+            "E_INPUT",
+            "an incremental update needs a sequential interpolation (LOG_LINEAR_DF or LINEAR_ZERO)",
+        );
+    }
+    let n = next.dates.len();
+    if previous.dates.len() != n || previous_factors.len() != n || next.keys.len() != n {
+        return fail(
+            "E_INPUT",
+            "previous quotes, previous discount factors and new quotes must have one length",
+        );
+    }
+    let old = solve_curve_with_jumps(
+        as_of,
+        interpolation,
+        previous.dates,
+        jumps,
+        previous.quotes,
+        previous.model,
+        SolveMethod::Sequential,
+    )?;
+    if old
+        .logs
+        .iter()
+        .zip(previous_factors)
+        .any(|(l, f)| l.exp().to_bits() != f.to_bits())
+    {
+        return fail(
+            "E_INPUT",
+            "previous discount factors are not the bootstrap of the previous quotes",
+        );
+    }
+    let first =
+        (0..n).find(|&i| previous.keys[i] != next.keys[i] || previous.dates[i] != next.dates[i]);
+    let Some(j) = first else {
+        return Ok(Incremental {
+            solved: old,
+            first_changed_index: None,
+            recomputed: 0,
+        });
+    };
+    crate::error::finite("quotes", &next.quotes)?;
+    let start = |k: usize| -next.quotes[k] * curve_time(as_of, next.dates[k]);
+    let mut logs: Vec<f64> = (0..n)
+        .map(|k| if k < j { old.logs[k] } else { start(k) })
+        .collect();
+    let build = |l: &[f64]| {
+        Curve::from_logs_with_jumps(as_of, interpolation, &next.dates[..l.len()], l, jumps)
+    };
+    sequential_from(&build, next.quotes, next.model, &mut logs, j)?;
+    let solved = finish(build(&logs), next.dates, logs, next.quotes, next.model)?;
+    Ok(Incremental {
+        solved,
+        first_changed_index: Some(j),
+        recomputed: n - j,
     })
 }
 

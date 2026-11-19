@@ -12,6 +12,50 @@
   "rebuild_deterministic": true,
   "stage_b_cases": 10
  },
+ "incremental_property_stage_b_patched": {
+  "bit_identical_to_full_rebuild": 10000,
+  "cases": 10000,
+  "copied_pillars_bit_identical": true,
+  "instrument_sets": [
+   "ois-0001",
+   "ois-0003",
+   "ois-0005",
+   "ois-0007",
+   "ois-0009",
+   "ois-0011",
+   "ois-0013",
+   "ois-0015",
+   "ois-0018",
+   "ois_d-0001",
+   "ois_d-0003",
+   "ois_d-0005",
+   "ois_d-0007",
+   "ois_d-0009",
+   "ois_d-0011",
+   "projection-0001",
+   "projection-0001/LINEAR_ZERO",
+   "projection_deep-0001",
+   "projection_deep-0001/LINEAR_ZERO",
+   "projection_deep-0006",
+   "projection_deep-0006/LINEAR_ZERO",
+   "projection_deep-0011",
+   "projection_deep-0011/LINEAR_ZERO",
+   "projection_deep-0016",
+   "projection_deep-0016/LINEAR_ZERO"
+  ],
+  "kinds": {
+   "multi_all": 25,
+   "multi_first": 5215,
+   "multi_first_and_last": 25,
+   "multi_middle": 3481,
+   "none": 25,
+   "single_first": 129,
+   "single_last": 139,
+   "single_middle": 961
+  },
+  "max_relative_difference": 0.0,
+  "seed": "random.Random(20261119)"
+ },
  "intraday_bound_1000_moves": {
   "book": [
    [

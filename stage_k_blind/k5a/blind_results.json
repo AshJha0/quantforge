@@ -1,0 +1,29 @@
+{
+ "cases": {
+  "idr_k-0001": {
+   "estimate_pnl": -39913.12421255162,
+   "bound": 17.056890689124625,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0002": {
+   "estimate_pnl": 41959.95109524657,
+   "bound": 17.931416175522042,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0003": {
+   "estimate_pnl": -10170.171073390557,
+   "bound": 0.26651391701757227,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0004": {
+   "estimate_pnl": -179097.35223580853,
+   "bound": 2132.1113361405783,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0005": {
+   "estimate_pnl": -30589.65533006756,
+   "bound": 17.684733711514124,
+   "label": "latency-aware analytics on simulated data"
+  }
+ }
+}
