@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
@@ -18,9 +17,10 @@ import org.quantforge.core.Json;
 import org.quantforge.risk.StageK;
 
 /**
- * K-8 {@code CN_RANNACHER_SMOOTHED} (KR-8, PROPOSED): the Python build's values on a small grid, the tangent ladder
- * against its own bumps (acceptance 5), the cell-average smoothing, and acceptance 3 (201/401/801), which runs only
- * with {@code QF_K8_ACCEPTANCE=1}; the Python result is {@code oracle/K8_ACCEPTANCE_W1.json} (a known miss).
+ * K-8 {@code CN_RANNACHER_SMOOTHED} (KR-8 as revised by KR-15): the Python build's values on a small grid, the tangent
+ * ladder against its own bumps (acceptance 5), the smoothing of spec step 5, exact zeros, time order, and acceptance 3
+ * (201/401/801), which runs only with {@code QF_K8_ACCEPTANCE=1} against {@code oracle/K8_ACCEPTANCE_W2.json}. The
+ * first run of the earlier definition is {@code oracle/K8_ACCEPTANCE_W1.json} and stays a recorded miss.
  */
 class BermudanK8Test {
     private static final Path ROOT = Path.of("..");
@@ -72,17 +72,19 @@ class BermudanK8Test {
         return r;
     }
 
-    /** Python bermudan_k8.bermudan_ladder on aadladder_g-0001 and -0002 inputs, grid 41/20 (2026-11-19). */
+    /** Python bermudan_k8.bermudan_ladder (spec 0.2.0) on the aadladder_g-0001..0003 inputs, grid 41/20 (2026-11-19). */
     private static final double[][] PYTHON_41_20 = {
-        {23242.10538303547, -2239.614460578422, 211874.58626052644, 167312.8801939704, 135668.58189923508,
-            -231817.56140334287, -346529.0802496462, 0.0, 0.0, 0.0, 0.0, -56055.23884443008, 2319343.9308582232},
-        {15132.751343821015, -1458.2195175014667, 99287.02462202832, 133644.6647674322, 145269.93540935125,
-            -145945.81731299608, -278764.61920365266, 0.0, 0.0, 0.0, 0.0, -55104.22854697141, 2187522.535242841},
+        {22287.53461841767, 0.0, 211358.63631459567, 162687.8910175668, 139306.3793174654, -231877.5339021703,
+            -347142.401546213, 0.0, 0.0, 0.0, 0.0, -50599.24923667921, 2228993.5084961606},
+        {14219.03198224864, 0.0, 90811.61296827145, 131329.76588168432, 150157.18125350963, -142268.28751103743,
+            -277083.57865698315, 0.0, 0.0, 0.0, 0.0, -49394.77704993134, 2086503.2182632545},
+        {13716.96718870294, 0.0, -85323.69457718439, -129308.55315145763, -138026.26813797135, 154928.16366504165,
+            276491.2939629992, 0.0, 0.0, 0.0, 0.0, -48789.9281811259, 2034661.6889618998},
     };
 
     @Test
     void matchesPythonOnSmallGrid() throws IOException {
-        for (int k = 0; k < 2; k++) {
+        for (int k = 0; k < 3; k++) {
             double[] got = row(ladder(ladderCase(k), 41, 20));
             double scale = 0;
             for (double x : PYTHON_41_20[k]) {
@@ -129,15 +131,118 @@ class BermudanK8Test {
         assertTrue(Math.abs(gs - l.dSigma()) <= 1e-8 * Math.abs(gs), "sigma: " + gs);
     }
 
+    /** Spec step 5, worked example: f = (-1, 0, 1) gives E, 1/18, V; and its mirror image. */
     @Test
-    void smoothingIsACellAverage() {
+    void smoothingWorkedExample() {
         double[][] v = {{0.0}, {0.0}, {0.0}};
-        double[][] e = {{-1.0}, {0.0}, {1.0}};
-        double[][] got = BermudanK8.smoothedMax(v, e);
-        // node 1: cell [-0.5, 0.5] of max(x, 0) = mean 1/8; node 2: [0.5, 1.5] = 1; node 0: 0
-        assertArrayEquals(new double[] {0.0, 0.125, 1.0}, new double[] {got[0][0], got[1][0], got[2][0]});
-        double[][] w = BermudanK8.smoothedMax(new double[][] {{0.0}, {0.0}, {0.0}}, new double[][] {{1}, {0}, {-1}});
-        assertArrayEquals(new double[] {1.0, 0.125, 0.0}, new double[] {w[0][0], w[1][0], w[2][0]});
+        double[][] got = BermudanK8.smoothedMax(v, new double[][] {{1.0}, {0.0}, {-1.0}});
+        assertEquals(1.0, got[0][0]);
+        assertEquals(1.0 / 18, got[1][0], 1e-16);
+        assertEquals(0.0, got[2][0]);
+        double[][] w = BermudanK8.smoothedMax(v, new double[][] {{-1.0}, {0.0}, {1.0}});
+        assertEquals(0.0, w[0][0]);
+        assertEquals(1.0 / 18, w[1][0], 1e-16);
+        assertEquals(1.0, w[2][0]);
+    }
+
+    /** {@code M(p, q)} against a fine midpoint sum on the four branches and at their joins. */
+    @Test
+    void hatPartClosedForm() {
+        double[][] cases = {{1, 2}, {1, -0.5}, {-0.5, 1}, {-1, -2}, {0, 1}, {1, 0}, {0, -1}};
+        int n = 200_000;
+        for (double[] c : cases) {
+            double want = 0;
+            for (int i = 0; i < n; i++) {
+                double u = (i + 0.5) / n;
+                want += (1 - u) * Math.max(c[0] + (c[1] - c[0]) * u, 0.0);
+            }
+            want /= n;
+            double got = BermudanK8.hatPart(new double[] {c[0]}, new double[] {c[1]})[0];
+            assertEquals(want, got, 1e-9, c[0] + "," + c[1]);
+        }
+    }
+
+    /**
+     * Away from the crossing the smoothing is the pointwise max: with a cubic V and E = 0, nodes two or more cells
+     * inside V &gt; 0 keep V, nodes inside V &lt; 0 get E; the four nodes around the crossing change.
+     */
+    @Test
+    void smoothingKeepsThePointwiseMaxAwayFromTheCrossing() {
+        int n = 41;
+        double[][] v = new double[n][1];
+        double[] f = new double[n];
+        int j = -1;
+        for (int i = 0; i < n; i++) {
+            double x = -1.0 + 2.0 * i / (n - 1);
+            f[i] = (x - 0.013) * (1 + 0.3 * x + 0.2 * x * x);
+            v[i][0] = f[i];
+            if (j < 0 && f[i] > 0) {
+                j = i;
+            }
+        }
+        double[][] got = BermudanK8.smoothedMax(v, new double[n][1]);
+        for (int i = 0; i < n - 2; i++) {
+            if (i >= j + 2) {
+                assertEquals(f[i], got[i][0], 1e-14, "node " + i);
+            } else if (i < j - 2) {
+                assertEquals(0.0, got[i][0], "node " + i);
+            } else {
+                assertTrue(got[i][0] != Math.max(f[i], 0.0), "node " + i);
+            }
+        }
+    }
+
+    /** KR-15 a: curve nodes the price does not depend on (0.4986 years, and those after the last payment) give 0. */
+    @Test
+    void curveNodesThePriceDoesNotDependOnGiveExactZeros() throws IOException {
+        for (int index = 0; index < 3; index++) {
+            double[] d = ladder(ladderCase(index), 41, 20).dDiscountFactors();
+            for (int k = 0; k < d.length; k++) {
+                assertEquals(k == 0 || k >= 6, d[k] == 0.0, index + "/" + k);
+            }
+        }
+    }
+
+    /** Time-only refinement (41 nodes; 10, 20, 40 steps a year): observed order 2 on the price and every entry. */
+    @Test
+    void timeOrderIsTwoOnEveryEntry() throws IOException {
+        Case c = ladderCase(0);
+        double[][] rows = {row(ladder(c, 41, 10)), row(ladder(c, 41, 20)), row(ladder(c, 41, 40))};
+        for (int k : new int[] {0, 2, 3, 4, 5, 6, 11, 12}) {
+            StageK.Richardson rc = StageK.richardsonCheck(new double[] {rows[0][k], rows[1][k], rows[2][k]}, 2.0, 2.0);
+            assertEquals("OK", rc.status(), "entry " + k);
+            assertEquals(2.0, rc.observedOrder(), 0.1, "entry " + k);
+        }
+    }
+
+    /**
+     * Space-only refinement on grids that are not nested (60 to 160 cells against 320): the error times cells^2 is the
+     * same on every grid to 10% for the price and every entry (the property the cell average of the first definition
+     * lacked).
+     */
+    @Test
+    void spaceErrorIsSmoothSecondOrder() throws IOException {
+        Case c = ladderCase(0);
+        double[] ref = row(ladder(c, 321, 20));
+        int[] grids = {61, 81, 101, 131, 161};
+        int[] judged = {0, 2, 3, 4, 5, 6, 11, 12};
+        double[][] scaled = new double[grids.length][judged.length];
+        for (int g = 0; g < grids.length; g++) {
+            double[] r = row(ladder(c, grids[g], 20));
+            double c2 = Math.pow(grids[g] - 1, 2);
+            for (int q = 0; q < judged.length; q++) {
+                scaled[g][q] = (r[judged[q]] - ref[judged[q]]) * c2 / (1 - c2 / (320.0 * 320.0));
+            }
+        }
+        for (int q = 0; q < judged.length; q++) {
+            double mean = 0;
+            for (double[] row : scaled) {
+                mean += row[q] / grids.length;
+            }
+            for (double[] row : scaled) {
+                assertTrue(Math.abs(row[q] - mean) <= 0.1 * Math.abs(mean), "entry " + judged[q]);
+            }
+        }
     }
 
     @Test
@@ -153,27 +258,26 @@ class BermudanK8Test {
 
     /**
      * Acceptance 3: on 201/401/801, {@code num.richardson.check} with assumed order 2 gives OK and an observed order in
-     * [1.5, 2.5] on the price and every ladder entry that is not a structural zero. Known miss in Python (18 entries);
-     * this test records the Java result and is not tuned.
+     * [1.5, 2.5] on the price and every ladder entry that is not exactly zero on all three grids. The values must also
+     * equal the Python record {@code oracle/K8_ACCEPTANCE_W2.json} to 1e-9 of the row scale.
      */
     @Test
     @EnabledIfEnvironmentVariable(named = "QF_K8_ACCEPTANCE", matches = "1")
     void acceptance3ObservedOrder() throws IOException {
-        Map<?, ?> record = (Map<?, ?>) Json.parse(Files.readString(ROOT.resolve("oracle/K8_ACCEPTANCE_W1.json")))
+        Map<?, ?> record = (Map<?, ?>) Json.parse(Files.readString(ROOT.resolve("oracle/K8_ACCEPTANCE_W2.json")))
                 .value();
         Map<?, ?> pyValues = (Map<?, ?>) record.get("values");
         List<String> bad = new ArrayList<>();
-        Map<String, Object> values = new LinkedHashMap<>();
         double worstGap = 0;
         for (int index = 0; index < 3; index++) {
             Case c = ladderCase(index);
             List<double[]> rows = new ArrayList<>();
             int[][] grids = {{201, 100}, {401, 200}, {801, 400}};
-            List<?> py = (List<?>) pyValues.get("aadladder_g-000" + (index + 1));
+            Map<?, ?> py = (Map<?, ?>) pyValues.get("aadladder_g-000" + (index + 1));
             for (int g = 0; g < 3; g++) {
                 double[] r = row(ladder(c, grids[g][0], grids[g][1]));
                 rows.add(r);
-                double[] p = reals(py.get(g));
+                double[] p = reals(py.get(grids[g][0] + "/" + grids[g][1]));
                 double scale = 0;
                 for (double x : p) {
                     scale = Math.max(scale, Math.abs(x));
@@ -182,7 +286,6 @@ class BermudanK8Test {
                     worstGap = Math.max(worstGap, Math.abs(r[k] - p[k]) / scale);
                 }
             }
-            values.put("aadladder_g-000" + (index + 1), rows);
             for (int k = 0; k < rows.get(0).length; k++) {
                 double[] vals = {rows.get(0)[k], rows.get(1)[k], rows.get(2)[k]};
                 if (vals[0] == 0.0 && vals[1] == 0.0 && vals[2] == 0.0) {
@@ -195,13 +298,10 @@ class BermudanK8Test {
                 }
             }
         }
-        StringBuilder b = new StringBuilder();
-        Json.write(b, Map.of("build", "java25 (org.quantforge.pricing.BermudanK8, tangent-mode ladder)",
-                "failures_count", bad.size(), "max_gap_vs_python_relative_to_row_scale", worstGap));
-        System.out.println("K-8 acceptance 3 (Java): " + b + " failures=" + bad);
-        List<?> pyFailures = (List<?>) record.get("failures");
-        assertEquals(pyFailures.size(), bad.size(), "Java failures differ in number from Python's: " + bad);
+        System.out.println("K-8 acceptance 3 (Java): failures=" + bad + " max_gap_vs_python_relative_to_row_scale="
+                + worstGap);
         assertTrue(worstGap <= 1e-9, "Java differs from the Python record by " + worstGap);
         assertTrue(bad.isEmpty(), "K-8 acceptance 3 fails on " + bad.size() + " entries (KR-8, K-QB)");
     }
+
 }
