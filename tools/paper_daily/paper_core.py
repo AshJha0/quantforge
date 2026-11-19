@@ -1,4 +1,5 @@
-"""Daily paper ledger (specifications/12-platform/paper-ledger-daily.md, rulings KR-70 to KR-89).
+"""Daily paper ledger (specifications/12-platform/paper-ledger-daily.md, rulings KR-70 to KR-89, KR-108 and
+KR-200 to KR-215).
 
 Standard library only. Every financial number of a day comes from a CLI operation (calendar, curve
 interpolation, bond price, pre-trade estimate, pre-trade check, lit venue simulator, post-trade attribution,
@@ -11,14 +12,20 @@ Nothing here reaches a venue or places an order. Fills come from the simulator o
 import datetime as dt
 import hashlib
 import json
+import re
+import sys
 from decimal import ROUND_FLOOR, ROUND_HALF_EVEN, Decimal, localcontext
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
+sys.path.insert(0, str(HERE))
+import anchor_evidence as evidence  # noqa: E402 - same folder; standard library only, no network
+
 FORMAT = "qf-paper-ledger/1"
 GENESIS = "0" * 64
 KINDS = ("GENESIS", "DAY", "GAP")
+GAP_CAUSES = ("no_curve", "holdout", "build_refused")  # KR-210
 D0 = Decimal(0)
 CENT = Decimal("0.01")
 DAY_FLOAT_TOL = Decimal("0.000001")  # KR-86: one unit of the last recorded decimal of a mark
@@ -111,14 +118,24 @@ def _no_duplicates(pairs):
 
 
 def read_text(path):
+    """The ledger file as text, byte for byte: ASCII, no newline translation (KR-208). A missing file is ""."""
     p = Path(path)
-    return p.read_text(encoding="utf-8") if p.exists() else ""
+    return p.read_bytes().decode("ascii") if p.exists() else ""
+
+
+def lines_of(text):
+    """The lines of a ledger: each ends with one line feed and the file holds nothing else (KR-208)."""
+    if text == "":
+        return []
+    if not text.endswith("\n"):
+        raise ValueError("the ledger does not end with a line feed")
+    return text[:-1].split("\n")
 
 
 def parse(text):
     """Rows of a ledger text. Raises ValueError on a line that is not one JSON object (HR-78: no repeated key)."""
     rows = []
-    for n, ln in enumerate(text.splitlines()):
+    for n, ln in enumerate(lines_of(text)):
         rec = json.loads(ln, object_pairs_hook=_no_duplicates)
         if not isinstance(rec, dict):
             raise ValueError(f"line {n} is not an object")
@@ -131,10 +148,14 @@ def bad(seq, reason, detail=""):
 
 
 def check_chain(text, label):
-    """Chain check only. Reasons PARSE, SEQ, HASH, LINK, LABEL, FORMAT, KIND. Never repairs."""
+    """Chain check only. Reasons BYTES, PARSE, SEQ, HASH, LINK, LABEL, FORMAT, KIND. Never repairs."""
     prev = GENESIS
     rows = []
-    for n, ln in enumerate(text.splitlines()):
+    try:
+        lines = lines_of(text)
+    except ValueError as e:
+        return bad(text.count("\n"), "BYTES", str(e))
+    for n, ln in enumerate(lines):
         try:
             rec = json.loads(ln, object_pairs_hook=_no_duplicates)
             if not isinstance(rec, dict):
@@ -147,6 +168,8 @@ def check_chain(text, label):
             return bad(n, "SEQ")
         if computed != stored:
             return bad(n, "HASH")
+        if ln != line(rec):  # KR-208: one serialisation only, so the file's bytes follow from its rows
+            return bad(n, "BYTES", "the line is not the canonical serialisation of its row")
         if rec.get("prev") != prev:
             return bad(n, "LINK")
         if rec.get("label") != label:
@@ -197,8 +220,16 @@ def add_years(d, n):
         return d.replace(year=d.year + n, day=28)
 
 
+INSTANT = re.compile(r"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z", re.ASCII)
+
+
 def instant(s):
-    return dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
+    """A row time: exactly `YYYY-MM-DDTHH:MM:SSZ`, UTC. Anything else is a ValueError."""
+    m = INSTANT.fullmatch(s) if isinstance(s, str) else None
+    if m is None:
+        raise ValueError(f"{s!r} is not YYYY-MM-DDTHH:MM:SSZ")
+    y, mo, d, h, mi, sec = (int(x) for x in m.groups())
+    return dt.datetime(y, mo, d, h, mi, sec, tzinfo=dt.timezone.utc)
 
 
 def stamp(t):
@@ -229,11 +260,13 @@ class Calendar:
         return self.known[d]
 
     def next_open(self, d):
-        self.load(d, d + dt.timedelta(days=10))
         n = d + dt.timedelta(days=1)
-        while not self.known[n]:
+        while True:
+            if n not in self.known:
+                self.load(n, n + dt.timedelta(days=10))
+            if self.known[n]:
+                return n
             n += dt.timedelta(days=1)
-        return n
 
     def open_between(self, after, upto):
         """Business days d with after < d <= upto."""
@@ -425,7 +458,8 @@ def build_day(cfg, runner, state, date, par, source, ts, timing, prev_hash, gaps
     # 5. pre-trade limit check, then the simulator only if accepted
     fills = []
     if order:
-        order["tca_pretrade"] = {**{k: rstr(v, cfg["tca_decimals"]) for k, v in r["tca_pre"].items()},
+        # KR-212: the keys copied are the configuration's fixed list, not whatever the operation returns
+        order["tca_pretrade"] = {**{k: rstr(r["tca_pre"][k], cfg["tca_decimals"]) for k in cfg["tca_pretrade_keys"]},
                                  "label": cfg["tca_pretrade_label"]}
         chk = runner([case("chk", "paper.pretrade.check", {
             "order": {k: order[k] for k in ("side", "type", "quantity", "limit_price")}, "ref_price": par_px,
@@ -467,7 +501,7 @@ def build_day(cfg, runner, state, date, par, source, ts, timing, prev_hash, gaps
             "fees": float(sum((Decimal(f["fee"]) for f in fills), D0))}))
     r = runner(cases)
     if order:
-        order["tca"] = {k: rstr(v, cfg["tca_decimals"]) for k, v in r["tca"].items()}
+        order["tca"] = {k: rstr(r["tca"][k], cfg["tca_decimals"]) for k in cfg["tca_keys"]}
     trading = sum((Decimal(r[f"fill|{i['symbol']}"]["trading"]) for i in insts), D0)
     fees = sum((Decimal(r[f"fill|{i['symbol']}"]["fees"]) for i in insts), D0)
     positions = {i["symbol"]: r[f"fill|{i['symbol']}"]["position"] for i in insts}
@@ -491,7 +525,7 @@ def build_day(cfg, runner, state, date, par, source, ts, timing, prev_hash, gaps
                     "roll_down": plain(legs["roll"]), "curve_move": plain(legs["curve"]),
                     "fills_costs": plain(trading + fees), "trading": plain(trading), "fees": plain(fees),
                     "unexplained": plain(unexplained), "total": plain(total)},
-        "cumulative": {"recorded_trading_days": str(on_time), "pnl": plain(state["pnl"] + pnl)},
+        "cumulative": {"declared_on_time_days": str(on_time), "pnl": plain(state["pnl"] + pnl)},
     }
 
 
@@ -631,8 +665,11 @@ def same(a, b, path=""):
 def verify(text, cfg=None, runner=None, windows=None, calendar=None):
     """Full check of a ledger text. Order: chain, genesis and configuration, dates (business days, no missing
     day, holdout windows, timing label), exact replay of every day, and, with a `runner`, a rebuild of every
-    day through the CLI. Returns {ok, records, recorded_trading_days, late_days, gaps, head, pnl} or
-    {ok: False, first_bad_seq, reason, detail}. Never repairs."""
+    day through the CLI. Returns {ok, records, declared_on_time_days, late_days, gaps, head, pnl} or
+    {ok: False, first_bad_seq, reason, detail}. Never repairs.
+
+    `declared_on_time_days` counts rows whose own label says on time; that label is the writing run's clock.
+    The count of recorded trading days (KR-200) needs outside evidence and is `recorded_days` below."""
     with localcontext() as ctx:
         ctx.prec = 80
         return _verify(text, cfg, runner, windows, calendar)
@@ -645,7 +682,7 @@ def _verify(text, cfg, runner, windows, calendar):
         return ch
     rows = ch["rows"]
     if not rows:
-        return {"ok": True, "records": 0, "recorded_trading_days": 0, "late_days": 0, "gaps": 0, "head": GENESIS,
+        return {"ok": True, "records": 0, "declared_on_time_days": 0, "late_days": 0, "gaps": 0, "head": GENESIS,
                 "pnl": "0", "last_date": None}
     g = rows[0]["body"]
     if hashlib.sha256(canonical({"c": g["config"]})).hexdigest() != g["config_sha256"]:
@@ -670,7 +707,14 @@ def _verify(text, cfg, runner, windows, calendar):
             if instant(rec["ts"]).date() < d:
                 return bad(n, "DATE", f"row for {date} written before that day")
             hit = holdout_hit(date, windows)
-            if hit:
+            if rec["kind"] == "GAP":
+                cause = b.get("cause")
+                if cause not in GAP_CAUSES:
+                    return bad(n, "GAPRULE", f"unknown gap cause {cause!r}")
+                if (cause == "holdout") != bool(hit) or (hit and b.get("studies") != hit):
+                    return bad(n, "HOLDOUT", f"{date}: a holdout gap names the windows that hold its date, and "
+                                             "only a date inside a window may have one")
+            elif hit:
                 return bad(n, "HOLDOUT", f"{date} is inside the holdout window of {', '.join(hit)}")
             if cal is not None:
                 if not cal.is_open(d):
@@ -683,7 +727,7 @@ def _verify(text, cfg, runner, windows, calendar):
             if rec["kind"] == "GAP":
                 gaps += 1
                 pending.append(date)
-                if cal is not None and on_time:
+                if cal is not None and on_time and b["cause"] != "holdout":
                     return bad(n, "TIMING", f"gap for {date} declared before its cut-off")
                 continue
             if b["gaps_since_prev"] != pending:
@@ -700,15 +744,15 @@ def _verify(text, cfg, runner, windows, calendar):
                 diff = same(b, again)
                 if diff:
                     return bad(n, "RECOMPUTE", f"{diff} differs from a rebuild through the CLI")
-            if int(b["cumulative"]["recorded_trading_days"]) != state["k"] + (1 if b["timing"] == "on_time" else 0):
-                return bad(n, "COUNT", "recorded_trading_days")
+            if int(b["cumulative"]["declared_on_time_days"]) != state["k"] + (1 if b["timing"] == "on_time" else 0):
+                return bad(n, "COUNT", "declared_on_time_days")
             late += b["timing"] == "late"
             state = advance(state, b)
             if Decimal(b["cumulative"]["pnl"]) != state["pnl"]:
                 return bad(n, "NAV", "cumulative pnl")
         except (KeyError, ValueError, TypeError, ArithmeticError, PaperError) as e:
             return bad(n, "SCHEMA", f"{type(e).__name__}: {e}")
-    return {"ok": True, "records": len(rows), "recorded_trading_days": state["k"], "late_days": late, "gaps": gaps,
+    return {"ok": True, "records": len(rows), "declared_on_time_days": state["k"], "late_days": late, "gaps": gaps,
             "head": ch["head"], "pnl": plain(state["pnl"]), "nav": plain(state["nav"]),
             "last_date": iso(last) if last else None, "calendar_checked": cal is not None,
             "recomputed": runner is not None}
@@ -753,6 +797,8 @@ def _run(cfg, runner, ledger_text, log_entries, now, commit, impl, windows):
     if not v["ok"]:
         raise PaperError(f"existing ledger does not verify: seq {v['first_bad_seq']} {v['reason']} {v['detail']}")
     rows = check_chain(ledger_text, cfg["label"])["rows"]
+    if rows and stamp(now) < rows[-1]["ts"]:
+        raise PaperError(f"the clock ({stamp(now)}) is before the last row ({rows[-1]['ts']}); nothing written")
     fields = [k["field"] for k in cfg["knots"]]
     par = par_state(log_entries, cfg["source_series"], fields)
     today = now.date()
@@ -778,7 +824,7 @@ def _run(cfg, runner, ledger_text, log_entries, now, commit, impl, windows):
     if last is None:
         # the ledger starts on the latest business day whose curve is recorded and still on time: no back-fill
         cands = [d for d in cal.open_between(today - dt.timedelta(days=10), today)
-                 if iso(d) in par and now < cal.cutoff(d, cfg)]
+                 if iso(d) in par and now < cal.cutoff(d, cfg) and not holdout_hit(iso(d), windows)]
         if not cands:
             return ledger_text, [], ["no business day with a recorded curve is on time yet; nothing written"]
         due = [cands[-1]]
@@ -786,44 +832,72 @@ def _run(cfg, runner, ledger_text, log_entries, now, commit, impl, windows):
             add("GENESIS", genesis_body(cfg))
     else:
         due = cal.open_between(last, today)
+    run_info = {"commit": commit, "impl": impl}
     for d in due:
         date = iso(d)
         hit = holdout_hit(date, windows)
-        if hit:
-            raise PaperError(f"{date} is inside the holdout window of {', '.join(hit)}; nothing written")
+        if hit:  # KR-210: recorded as a gap that read nothing; a refusal here would stop the ledger for good
+            add("GAP", {"date": date, "cause": "holdout", "studies": hit, "run": run_info,
+                        "reason": "inside a prereg holdout window; no input read"})
+            pending.append(date)
+            notes.append(f"{date}: GAP (holdout window of {', '.join(hit)}; no input read)")
+            continue
         late = now >= cal.cutoff(d, cfg)
         if date not in par:
             if not late:
                 notes.append(f"{date}: curve not recorded yet and the cut-off has not passed; stopping")
                 break
-            add("GAP", {"date": date, "reason": "no complete recorded par curve for this business day by its cut-off",
-                        "run": {"commit": commit, "impl": impl}})
+            add("GAP", {"date": date, "cause": "no_curve", "run": run_info,
+                        "reason": "no complete recorded par curve for this business day by its cut-off"})
             pending.append(date)
             notes.append(f"{date}: GAP")
             continue
         yields, src = par[date]
-        body = build_day(cfg, runner, state, date, yields, {"series": cfg["source_series"], "row_hash": src},
-                         ts, "late" if late else "on_time", head, pending, {"commit": commit, "impl": impl})
-        e = replay_day(cfg, state, body)
-        if e:
-            raise PaperError(f"{date}: the row built does not replay ({e[0]}: {e[1]}); nothing written")
+        try:
+            body = build_day(cfg, runner, state, date, yields, {"series": cfg["source_series"], "row_hash": src},
+                             ts, "late" if late else "on_time", head, pending, run_info)
+            e = replay_day(cfg, state, body)
+            if e:
+                raise PaperError(f"the row built does not replay ({e[0]}: {e[1]})")
+        except PaperError as e:
+            # KR-210: before the cut-off the run stops here and says so (a fix on main can still be in time); after
+            # it the day is closed as a gap, so one day that cannot be built never blocks the days after it.
+            if not late:
+                notes.append(f"PROBLEM: {date}: the row could not be built ({e}); nothing written for this day")
+                break
+            add("GAP", {"date": date, "cause": "build_refused", "run": run_info,
+                        "reason": f"the row could not be built by its cut-off: {e}"[:400]})
+            pending.append(date)
+            notes.append(f"{date}: GAP (the row could not be built: {e})")
+            continue
         add("DAY", body)
         state, pending = advance(state, body), []
         notes.append(f"{date}: DAY {body['timing']} pnl {body['pnl']} nav {body['nav_close']} "
-                     f"orders {len(body['orders'])} recorded_trading_days {body['cumulative']['recorded_trading_days']}")
+                     f"orders {len(body['orders'])} declared_on_time_days {body['cumulative']['declared_on_time_days']}")
+    if new and new[-1]["kind"] == "GENESIS":  # the start could not be built: no ledger of a genesis row alone
+        new = []
     return ledger_text + "".join(line(r) + "\n" for r in new), new, notes
 
 
 # ------------------------------------------------------------------ anchors (KR-81; as tools/forward-log/anchor.py)
 
 
-def anchor_make(text, cfg, out_dir, when):
+def anchor_make(text, cfg, out_dir, when, if_uncovered=False):
+    """Writes `<when>.json` (count, head). With `if_uncovered` it writes nothing and returns None when an anchor
+    for exactly this head is already held (KR-205: a run that added no row adds no anchor)."""
     ch = check_chain(text, cfg["label"])
     if not ch["ok"] or not ch["rows"]:
         raise PaperError("ledger is empty or its chain is broken; nothing to anchor")
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
+    if if_uncovered:
+        for f in sorted(out.glob("*.json")):
+            a = json.loads(f.read_text(encoding="utf-8"))
+            if a.get("count") == len(ch["rows"]) and a.get("head") == ch["head"]:
+                return None
     p = out / f"{when}.json"
+    if p.exists():
+        raise PaperError(f"{p.name} exists; an anchor is never overwritten")
     rec = {"count": len(ch["rows"]), "head": ch["head"], "time": when, "format": FORMAT,
            "config_sha256": ch["rows"][0]["body"]["config_sha256"]}
     p.write_text(json.dumps(rec, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
@@ -844,6 +918,56 @@ def anchor_check(text, cfg, anchors_dir):
         if hashes[a["count"] - 1] != a["head"]:
             raise PaperError(f"{f.name}: row {a['count']} hash differs from the anchor; the ledger was rewritten")
     return len(files)
+
+
+# ------------------------------------------------------------------ evidence (KR-200 to KR-202, KR-211)
+
+
+def check_sources(text, cfg, entries):
+    """KR-211: every DAY row's `source.row_hash` names a row of the recorder log, the five yields equal the log's
+    state for that date at that row, and the DAY row was not written before that row. Returns a fault or None."""
+    rows = check_chain(text, cfg["label"])["rows"]
+    fields = [k["field"] for k in cfg["knots"]]
+    index = {e["hash"]: n for n, e in enumerate(entries)}
+    for rec in rows[1:]:
+        if rec["kind"] != "DAY":
+            continue
+        b, n = rec["body"], rec["seq"]
+        src = b.get("source") or {}
+        at = index.get(src.get("row_hash"))
+        if src.get("series") != cfg["source_series"] or at is None:
+            return bad(n, "SOURCE", f"{b['date']}: source.row_hash names no row of the recorder log")
+        got = par_state(entries[:at + 1], cfg["source_series"], fields).get(b["date"])
+        if got is None or got[1] != src["row_hash"] or got[0] != b["par_yields"]:
+            return bad(n, "SOURCE", f"{b['date']}: par_yields are not the recorder's values for this date at that row")
+        if instant(rec["ts"]) < instant(entries[at]["record"]["knowledge_time"]):
+            return bad(n, "SOURCE", f"{b['date']}: the row is dated before the recorder row it names")
+    return None
+
+
+def recorded_days(text, cfg, runner, anchors_dir, headers, max_target=evidence.MAX_TARGET):
+    """KR-200: the recorded trading days. A DAY row for business day D counts when its own label is on time AND an
+    anchor that covers the row carries a Bitcoin block time which, plus the margin, is before D's cut-off (19:30:00
+    UTC on the next business day). The row's label and `ts` are the runner's clock and are never enough alone.
+    Returns {"recorded_trading_days": n, "dates": [...], "not_proven": {date: why}}. Raises EvidenceError on a
+    proof or header that does not match."""
+    rows = check_chain(text, cfg["label"])["rows"]
+    cal = Calendar(runner, cfg["calendar"])
+    files = sorted(Path(anchors_dir).glob("*.json"))
+    pairs = [(f.name, int(json.loads(f.read_text(encoding="utf-8"))["count"])) for f in files]
+    times = evidence.anchor_times(anchors_dir, headers, max_target)
+    dates, not_proven = [], {}
+    for rec in rows[1:]:
+        if rec["kind"] != "DAY" or rec["body"]["timing"] != "on_time":
+            continue
+        date = rec["body"]["date"]
+        ok, why, _ = evidence.proven_before(rec["seq"], int(cal.cutoff(day(date), cfg).timestamp()), pairs, times)
+        if ok:
+            dates.append(date)
+        else:
+            not_proven[date] = why
+    return {"recorded_trading_days": len(dates), "dates": dates, "not_proven": not_proven,
+            "margin_seconds": evidence.MARGIN_SECONDS}
 
 
 # ------------------------------------------------------------------ runners

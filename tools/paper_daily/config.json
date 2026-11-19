@@ -60,6 +60,8 @@
     "participation": 0.1,
     "params": {"a1": 700, "a2": 0.5, "a3": 1, "a4": 0.5, "b1": 0.9}
   },
+  "tca_pretrade_keys": ["duration_days", "expected_cost", "expected_cost_bps", "impact_bps", "istar_bps", "spread_bps", "timing_risk", "timing_risk_bps"],
+  "tca_keys": ["delay", "execution", "fees", "impact", "opportunity", "spread", "total", "total_bps"],
   "on_time_cutoff_utc": "19:30:00",
   "unexplained_threshold": "0"
 }
