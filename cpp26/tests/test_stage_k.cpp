@@ -91,24 +91,27 @@ std::string lib_code(F f) {
     return "none";
 }
 
-// Empty when equal (numbers within 1e-15 + 1e-12 relative, keys in the same order); else the first difference.
-std::string differs(const json::Value& a, const json::Value& e, const std::string& path) {
+// Empty when equal (numbers within 1e-15 + extra + 1e-12 relative, keys in the same order); else the first
+// difference. `extra` is the case's absolute tolerance_limit (KR-240: the cancelling idr cases), 0 elsewhere.
+std::string differs(const json::Value& a, const json::Value& e, const std::string& path, double extra = 0.0) {
     if (a.kind != e.kind) return path + " kind";
     switch (e.kind) {
         case json::Kind::Number:
-            return std::fabs(a.number - e.number) <= 1e-15 + 1e-12 * std::max(std::fabs(a.number), std::fabs(e.number))
+            return std::fabs(a.number - e.number) <=
+                           1e-15 + extra + 1e-12 * std::max(std::fabs(a.number), std::fabs(e.number))
                        ? ""
                        : path;
         case json::Kind::Array:
             if (a.items.size() != e.items.size()) return path + "[size]";
             for (std::size_t i = 0; i < e.items.size(); ++i)
-                if (auto d = differs(a.items[i], e.items[i], path + "[" + std::to_string(i) + "]"); !d.empty()) return d;
+                if (auto d = differs(a.items[i], e.items[i], path + "[" + std::to_string(i) + "]", extra); !d.empty())
+                    return d;
             return "";
         case json::Kind::Object:
             if (a.members.size() != e.members.size()) return path + "{keys}";
             for (std::size_t i = 0; i < e.members.size(); ++i) {
                 if (a.members[i].first != e.members[i].first) return path + " key order";
-                if (auto d = differs(a.members[i].second, e.members[i].second, path + "." + e.members[i].first);
+                if (auto d = differs(a.members[i].second, e.members[i].second, path + "." + e.members[i].first, extra);
                     !d.empty())
                     return d;
             }
@@ -177,8 +180,11 @@ TEST_CASE("stage_k goldens: every row, values and key order", "[stage_k]") {
             REQUIRE(r.find("status")->text == exp.find("status")->text);
             if (exp.find("status")->text == "error")
                 CHECK(r.find("error")->find("code")->text == exp.find("error_code")->text);
-            else
-                CHECK(differs(*r.find("outputs"), *exp.find("outputs"), "outputs").empty());
+            else {
+                const json::Value* lim = c.find("tolerance_limit");
+                const double extra = lim != nullptr ? lim->find("absolute")->number : 0.0;
+                CHECK(differs(*r.find("outputs"), *exp.find("outputs"), "outputs", extra).empty());
+            }
         }
         CHECK(n >= 5);
         total += n;
