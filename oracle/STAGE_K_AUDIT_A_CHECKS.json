@@ -2034,5 +2034,35 @@
   ],
   "worst_relative_vs_mpmath": 3.962232121711937e-12,
   "worst_scipy_vs_mpmath": 3.120176117477058e-09
+ },
+ "kr234_sweep_50_digits": {
+  "sw_cpp.jsonl": {
+   "cases": 29274,
+   "expected": 29274,
+   "first": [],
+   "violations": 0,
+   "worst_gap_over_bound": 0.999979178055234
+  },
+  "sw_java.jsonl": {
+   "cases": 29274,
+   "expected": 29274,
+   "first": [],
+   "violations": 0,
+   "worst_gap_over_bound": 0.999979178055234
+  },
+  "sw_py.jsonl": {
+   "cases": 29274,
+   "expected": 29274,
+   "first": [],
+   "violations": 0,
+   "worst_gap_over_bound": 0.999979178055234
+  },
+  "sw_rust.jsonl": {
+   "cases": 29274,
+   "expected": 29274,
+   "first": [],
+   "violations": 0,
+   "worst_gap_over_bound": 0.999979178055234
+  }
  }
 }
