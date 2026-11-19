@@ -2972,6 +2972,35 @@
     "pnl"
    ]
   },
+  "exec.sim.fut.run": {
+   "spec": "specifications/10-execution/rates-futures-venue.md",
+   "rust": "quantforge::exec::sim_fut_run",
+   "python": "quantforge.exec.sim_fut_run",
+   "java": "Exec.simFutRun",
+   "cpp": "qf::exec::sim_fut_run",
+   "inputs": {
+    "contract": {
+     "java": "contract"
+    },
+    "events": {
+     "java": "events"
+    },
+    "fee_per_contract": {
+     "java": "feePerContract"
+    }
+   },
+   "outputs": [
+    "book",
+    "cancelled",
+    "conservation",
+    "fees",
+    "fills",
+    "label",
+    "mbp",
+    "pnl",
+    "rejects"
+   ]
+  },
   "exec.sim.fut.to_text": {
    "spec": "specifications/10-execution/rates-futures-venue.md",
    "rust": "quantforge::exec::sim_fut_to_text",
@@ -10360,7 +10389,6 @@
   "xva.adjustments.value: im_spread"
  ],
  "spec_only": [
-  "exec.sim.fut.run",
   "paper.pnl.explain"
  ]
 }

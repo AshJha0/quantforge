@@ -182,7 +182,7 @@ The pitfall is reading queue position or fill probability off market-by-price da
 
 ## Stage H wave 2: paper trading, estimators, venue analytics, adaptive algorithms, latency
 
-Paper trading (Q13.19 to Q13.21) runs on branch `stage-h2` in Python; the other operations here are available from v0.10.0. Numbers are spec goldens, checked by the verify script.
+Every operation here, paper trading (Q13.19 to Q13.21) included, is available in all four builds from v0.10.0. Numbers are spec goldens, checked by the verify script.
 
 ### Q13.19 A paper book buys 2 at 100 (fee 0.20) and sells 1 at 110 (fee 0.11), then closes the day at 105. Explain the day's P&L.
 

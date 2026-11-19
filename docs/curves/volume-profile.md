@@ -1,6 +1,6 @@
 # Intraday volume profile (VWAP input)
 
-<p class="note">Stage H, v0.10.0 (unreleased). The operation is built in all four languages (spec version 0.1.0, confirmed 2026-11-18), but this page is still written by hand from the spec's golden cases, not generated from CLI runs. The profiles here are synthetic.</p>
+<p class="note">Stage H, v0.10.0. The operation is built in all four languages (spec version 0.1.0, confirmed 2026-11-18), but this page is still written by hand from the spec's golden cases, not generated from CLI runs. The profiles here are synthetic.</p>
 
 ## What it is
 

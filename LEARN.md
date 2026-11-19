@@ -30,7 +30,7 @@ Each result below is real output from the CLIs, on the date each section gives. 
 | [Stage G: rates models and xVA](#stage-g-rates-models-and-xva) | Short-rate models, swaptions and Bermudans, LMM, MC Greeks, exposure, CVA, DVA and FVA |
 | [Stage I: hedging](#stage-i-hedging) | Least-squares and QP hedges, costs and switch points, backtests and effectiveness |
 | [Stage J: backtest overfitting and research statistics](#stage-j-backtest-overfitting-and-research-statistics) | Lag and look-ahead, purged CV, PSR, DSR, PBO, power, regimes |
-| [Stage H: execution and microstructure (planned, v0.10.0)](#stage-h-execution-and-microstructure-planned-v0100) | Schedules, Almgren-Chriss, shortfall, three impact models, order books and quotes, simulated venues |
+| [Stage H: execution and microstructure (v0.10.0)](#stage-h-execution-and-microstructure-v0100) | Schedules, Almgren-Chriss, shortfall, three impact models, order books and quotes, simulated venues, equity, FX and rates conventions, paper trading, and how the stage was checked |
 
 ## Foundations
 
@@ -706,15 +706,15 @@ Two curve families the curves page listed as missing, added in v0.9.0 by the cur
 - **The iid formulas are optimistic.** PSR, DSR and the power formula assume independent returns; studies add block-bootstrap intervals and simulated power.
 - **Tested on one machine, then in CI.** The 15,215-case wave 1 runs and the 15,315-case wave 2 runs were on one Windows machine. The cross-platform workflow passed on the stage J pull request (2026-11-14), and all eleven push workflows passed on `main` at `a148d0e`, including the tutorial check in all four languages (observed with `gh run list`, 2026-11-15).
 
-## Stage H: execution and microstructure (planned, v0.10.0)
+## Stage H: execution and microstructure (v0.10.0)
 
-Stage H is implemented in all four languages from v0.10.0 (unreleased), the `paper.*` operations included. Its specs are in `specifications/09-microstructure/` and `specifications/10-execution/` (spec version 0.1.0, confirmed 2026-11-18; rulings HR-1 to HR-41 in the stage H rulings files). The worked examples below are spec golden cases, which every build reproduces in conformance (observed, local, 2026-11-18). [Tutorials 36 to 40](docs/getting-started/README.md) check the same goldens with a short standard-library script, and question bank [set 13](docs/question-bank/13-execution-microstructure.md) tests them.
+Stage H is implemented in all four languages from v0.10.0, the `paper.*` operations included. Its specs are in `specifications/09-microstructure/` and `specifications/10-execution/` (spec version 0.1.0, confirmed 2026-11-18; rulings HR-1 to HR-129 in the `specifications/stage-h-rulings-*.md` files). The worked examples below are spec golden cases, which every build reproduces in conformance (observed, local, 2026-11-18 and 2026-11-19). Every venue in this stage is simulated; the only real data is one crypto venue's public book. [Tutorials 36 to 50](docs/getting-started/README.md) run the same goldens, and question bank [set 13](docs/question-bank/13-execution-microstructure.md) tests them.
 
 ### Why slicing exists
 
 **Plain idea.** An order bigger than the quantity at the best price moves the price if sent at once. Cutting it into child orders over time lets the book refill, at the cost of leaving the rest of the order exposed to price moves.
 
-**Formal statement.** `exec.schedule.twap`, `exec.schedule.vwap` and `exec.schedule.pov` (`10-execution/schedules.md`). TWAP gives equal slices, VWAP slices in proportion to an input volume profile, POV a share `p` of all volume including its own, so the child is `p v / (1 - p)` against outside volume `v` (ruling HR-4). In whole units, leftover units go to the earliest slices, so the slices always sum to the order (HR-3).
+**Formal statement.** `exec.schedule.twap`, `exec.schedule.vwap` and `exec.schedule.pov` (`10-execution/schedules.md`). TWAP gives equal slices, VWAP slices in proportion to an input volume profile, POV a share `p` of all volume including its own, so the child is `p v / (1 - p)` against outside volume `v` (ruling HR-4). In whole units, leftover units go to the earliest slices, so the slices always sum to the order (HR-3). A binary64 value within 1e-12 relative of an integer is taken as that integer before flooring (HR-121).
 
 **Worked example.** `sched_h-0005`: 1,000 units at 20 % against outside volumes 1,000, 2,000 and 4,000 gives 250, 500 and 250 (the last capped by what is left), residual 0. Evidence: hand calculation and a blind re-derivation from the inputs (DR-H2).
 
@@ -722,7 +722,7 @@ Stage H is implemented in all four languages from v0.10.0 (unreleased), the `pap
 
 **Plain idea.** Fast trading costs impact; slow trading costs risk. Pick the schedule that minimises expected cost plus a risk aversion times its variance.
 
-**Formal statement.** `exec.ac.trajectory` (`10-execution/almgren-chriss.md`, [AC00] eqs. (5), (8), (16), (17)): holdings `x_j = X sinh(kappa (T - t_j)) / sinh(kappa T)` with `2 (cosh(kappa tau) - 1) = tau^2 lambda sigma^2 / eta_tilde`; `lambda = 0` returns the straight line exactly (HR-5).
+**Formal statement.** `exec.ac.trajectory` (`10-execution/almgren-chriss.md`, [AC00] eqs. (5), (8), (16), (17)): holdings `x_j = X sinh(kappa (T - t_j)) / sinh(kappa T)` with `2 (cosh(kappa tau) - 1) = tau^2 lambda sigma^2 / eta_tilde`; `lambda = 0` returns the straight line exactly (HR-5), as does `sigma = 0`, with `kappa = 0` (HR-124).
 
 **Worked example.** On the paper's test parameters, `ac_h-0001` (straight line) costs 662,500 with variance 1.083e12, and `ac_h-0002` (`lambda = 1e-6`) costs 911,226.986 with variance 3.641285721e11. The paper prints `kappa` about 0.6 a day; the exact value is 0.6070761632 (`ac_h-0005`, outside-checked against the printed figure). See the [frontier page](docs/curves/ac-frontier.md).
 
@@ -730,7 +730,7 @@ Stage H is implemented in all four languages from v0.10.0 (unreleased), the `pap
 
 **Plain idea.** Compare the trade with a paper portfolio that bought everything at the decision price, and split the difference by cause.
 
-**Formal statement.** `exec.tca.shortfall` (`10-execution/tca.md`): delay `s Q (P_0 - P_d)` on the filled quantity, execution `s sum q_i (p_i - P_0)`, opportunity `s (X - Q)(P_c - P_d)`, plus fees (Perold split, HR-8 confirmed by DR-H3).
+**Formal statement.** `exec.tca.shortfall` (`10-execution/tca.md`): delay `s Q (P_0 - P_d)` on the filled quantity, execution `s sum q_i (p_i - P_0)`, opportunity `s (X - Q)(P_c - P_d)`, plus fees (Perold split, HR-8 confirmed by DR-H3). With no fills the whole order is opportunity cost (HR-126).
 
 **Worked example.** `tca_h-0001`: a buy of 1,000 with 800 filled gives delay 80, execution 100, opportunity 200 and fees 5, total 385 or 38.5 bp. Perold's paper was not read; the definition rests on the spec and the blind re-derivation.
 
@@ -752,7 +752,7 @@ Stage H is implemented in all four languages from v0.10.0 (unreleased), the `pap
 
 ### Simulated venues: what a simulator can and cannot tell you
 
-A simulator shows what happens under our rules and our order flow. It can test whether an estimator recovers a rate we planted, and compare two strategies on the same replay. It cannot show how a real venue behaves. The dark pool, the router and paper trading are simulated only; every output carries its label ([Simulators](docs/simulators/README.md)).
+A simulator shows what happens under our rules and our order flow. It can test whether an estimator recovers a rate we planted, and compare two strategies on the same replay. It cannot show how a real venue behaves. The lit engine, the dark pool, the router, the auction, the FX dealer venue, the futures venue and paper trading are simulated only; every venue output carries its label ([Simulators](docs/simulators/README.md)).
 
 ### Paper trading: a book that cannot leave the machine
 
@@ -768,7 +768,7 @@ A simulator shows what happens under our rules and our order flow. It can test w
 
 **Formal statement.** `specifications/09-microstructure/micro-estimators.md` (H-4b, HR-70, HR-71, HR-74; available from v0.10.0): Poisson arrival `N / T`, censored exponential cancel `C / sum L`, log-linear resilience and depth decay by OLS with intercept, adverse selection by OLS through the origin, per regime, and a Welch difference for passive against aggressive cost. Acceptance: within 3 SE of the planted value on a fixed seed, at most 4 misses in 200 seeds.
 
-**Worked example.** `mest_h-0008`: signed sizes 1, -1, 2 against mid moves 0.02, -0.01, 0.05 give `lambda_as` 13/600 = 0.0216667 with SE 0.00390868. `mest_h-0009`: the stressed regime's impact is 4 times the calm one's. Evidence: hand calculation checked with mpmath, not yet blind re-derived. [Tutorial 45](docs/getting-started/tutorial-45-microstructure-estimators.md).
+**Worked example.** `mest_h-0008`: signed sizes 1, -1, 2 against mid moves 0.02, -0.01, 0.05 give `lambda_as` 13/600 = 0.0216667 with SE 0.00390868. `mest_h-0009`: the stressed regime's impact is 4 times the calm one's. Evidence: hand calculation checked with mpmath, and a blind re-derivation of all 7 value cases (`program/STAGE_H_BLIND_MICRO.md`). [Tutorial 45](docs/getting-started/tutorial-45-microstructure-estimators.md).
 
 ### Markouts: was the fill good or was I picked off?
 
@@ -792,13 +792,47 @@ A simulator shows what happens under our rules and our order flow. It can test w
 
 **Formal statement.** `specifications/09-microstructure/low-latency-book.md` and `low-latency-targets.md` (H-9, HR-18 to HR-24): same answers as `micro.book.rebuild`, one pinned thread, per-message monotonic clock, clock cost published and not subtracted, zero heap allocations after warm-up in C++ and Rust.
 
-**Worked example.** The first run (laptop under WSL, not the acceptance machine; workload S, 9,000,000 timed messages): update p50 39 ns (C++) and 47 ns (Rust) against a 150 ns target, p99.9 264 and 242 against 5,000; Rust `best_bid` p99 105 ns misses its 50 ns target, as does C++ `qty_at` present at 120 against 100. Queries were timed singly near the clock's own 15 to 17 ns, so batch timing is still owed. Available from v0.10.0. [Tutorial 48](docs/getting-started/tutorial-48-low-latency-book.md).
+**Worked example.** The first run (laptop under WSL, not the acceptance machine; workload S, 9,000,000 timed messages): update p50 39 ns (C++) and 47 ns (Rust) against a 150 ns target, p99.9 264 and 242 against 5,000; Rust `best_bid` p99 105 ns misses its 50 ns target, as does C++ `qty_at` present at 120 against 100. Queries were timed singly near the clock's own 15 to 17 ns; batch timing came in a later session (`benchmarks/results/h9/README.md`). Workload R, the recorded Kraken window 2026-11-18 21:49:17 to 2026-11-19 03:49:17 UTC, is a timing MISS with correctness passing: 0 mismatches, but p99 and p99.9 miss in every language (C++ BTC/USD p99 9,223 ns against 500; figures are the median of 5 runs). A per-level figure of about 40 ns is descriptive only and has no target. Available from v0.10.0. [Tutorial 48](docs/getting-started/tutorial-48-low-latency-book.md).
+
+### Trading conventions: equities, FX and rates
+
+**Plain idea.** Before a model or a venue can run, a price has to sit on the right grid, a trade has to settle on the right day and a quote has to be read the way the desk writes it. These are conventions, not models: each has one right answer, fixed by a rule or by market practice.
+
+**Formal statement.** `specifications/09-microstructure/asset-conventions.md` (H-22 to H-24, rulings HR-80 to HR-120). Equities: `micro.eq.round_price` rounds a buy down and a sell up to the tick (0.0001 below 1.00, 0.01 above, 0.005 on the half-penny tier); `micro.eq.fee_check` tests an access fee against the cap; `micro.eq.round_lot` gives 100, 40, 10 or 1 shares by price; `micro.eq.settle_date` is T+1 on a supplied calendar. FX: `micro.fx.pip_value` is notional times the pip (0.0001, or 0.01 with JPY as quote currency); `micro.fx.spot_date` is T+2 good days, T+1 for USDCAD. Rates: `micro.rates.parse_32nds` reads `H-FF[q]` as `H + (FF + q)/32` with the third digit in quarters of a 32nd (0, 2, 5, 7 only; eighth-tick contracts such as 2-year and 3-year notes are not supported, HR-118); `micro.rates.bond_price`, `.bond_yield` and `.bill_price` are the street formulas on a coupon date. Compliance dates are per rule (HR-120): the amended tick table (Rule 612) and fee cap (Rule 610(c)) have the default `compliance_date` 2027-11-01, deferred by SEC order 34-105656; the round lot (Rule 600(b)(93)) has 2025-11-03. With no `as_of` an operation applies the amended text. The amended tick and fee rules are not in force before 2027-11-01, so pass `as_of` to get the rule in force on a date.
+
+**Worked example.** `eqc_h-0001` and `0002`: a buy at 10.005 rounds to 10.00 and a sell to 10.01. `eqc_h-0020` and `0022`: the half-penny tier is `E_INPUT` with `as_of` 2026-11-19 and allowed from 2027-11-01. `eqc_h-0023`: a fee of 0.0015 at a price of 20 passes on 2026-11-19 (cap 0.003) and fails with no `as_of` (cap 0.001, `eqc_h-0011`). `fxc_h-0004`: EURUSD traded on 2026-11-24 with a USD holiday on the 26th has spot 2026-11-27. `rtc_h-0003`: 99-162 is 99.5078125. Evidence: hand calculation and blind re-derivation; outside shares H-22 66.7 %, H-23 71.4 %, H-24 94.7 % (`oracle/OUTSIDE_SHARES.md`). Sources read are listed in the spec; USDCAD T+1 is market convention with no primary source read (HR-119). [Tutorial 49](docs/getting-started/tutorial-49-trading-conventions.md).
+
+### Three more simulated venues: an auction, an FX dealer and a futures venue
+
+**Plain idea.** Different asset classes trade in different ways. Equities open and close with an auction at one price. FX clients ask a dealer, who may refuse after a last look at the market. Treasury futures trade in a central order book, in ticks. Each is simulated here; none is a real venue.
+
+**Formal statement.** `exec.sim.auction.uncross` (`10-execution/auction.md`, HR-84, HR-127) picks the tick with the largest matched volume, breaks ties by smallest imbalance and then by the `tie_break` rules, and fills everyone at that price; with no cross there is no auction. The lit engine runs the same uncross at the open and the close when it is given a `session` and `PHASE` events (HR-112). `exec.sim.fx.stream` and `exec.sim.fx.request` (`fx-rfq-venue.md`, HR-97) quote around a mid and apply last look: reject `LL_PRICE` if the mid moved more than `threshold_pips` against the dealer, else reject `LL_RANDOM` if a draw is below `p_random_reject`, else fill at the quote. `exec.sim.fut.run` (`rates-futures-venue.md`, HR-90 to HR-92) is the lit engine in integer ticks with prices in 32nds, with fees and a P&L per trader, open positions marked at the last trade. Every output carries its label, for example "simulated venue; not a real exchange; no real FX data" (HR-94, HR-111).
+
+**Worked example.** `auc_h-0001`: six orders uncross at 10.01 for 300 shares with an imbalance of -100. `fxv_h-0004` and `0003`: a 1-pip move fills at 1.0852; a 4-pip move is `LL_PRICE`. `fut_h-0011`: on ZN, trader P buys 3 at 110-16 and sells 3 at 110-17+ for 140.625 less 6 in fees, 134.625; the three traders' figures sum to -12, the fees. `fut_h-0011` to `0016` were added on 2026-11-19, when `exec.sim.fut.run` had unit tests but no shared golden. The last-look thresholds and the random reject are the spec's own toy model, not taken from the FX Global Code (HR-119). [Tutorial 50](docs/getting-started/tutorial-50-auction-fx-and-futures-venues.md).
+
+### When two inputs are wrong: one order of checks
+
+**Plain idea.** A request can break two rules at once. Four builds that each check in their own order would return different error codes for the same input, and conformance would not notice unless a golden had two faults.
+
+**Formal statement.** HR-122 (`specifications/stage-h-rulings-audit.md`; `cli-contract.md`, "Finite rule"), for the stage H operations: `E_SCHEMA`; then `E_LIMIT` for a size limit on the input itself; then a non-finite Real, `E_DOMAIN`; then structural `E_INPUT` (an empty list, a count below 1, lengths, cross-field consistency); then `E_DOMAIN` for one value outside its domain. A limit that arises only after validation is last. A related rule, HR-121: a binary64 value within 1e-12 relative of an integer is that integer before a floor, so whole-unit rounding does not lose a unit to representation error.
+
+**Worked example.** `rule_h-0016`: Almgren-Chriss with `n_steps` 0 and `sigma` -1 is `E_INPUT`. Before 2026-11-19 Python and Rust answered `E_DOMAIN` and Java and C++ `E_INPUT`. `rule_h-0012`: TWAP with quantity -5 and 200,000 buckets is `E_LIMIT`, the limit before the structural check. `rule_h-0003`: a cash-balanced pair with leg prices 0.3 and 0.2 gives 2 units of leg B; `0.3 / 0.2` lands just below 1.5 in binary64 and gave 1 before the fix. Evidence: suite `rule_h`, 40 cases (11 value, 29 error), passing in all four builds.
+
+### How stage H was checked: blind re-derivation and a different-model audit
+
+**Plain idea.** No free library implements these formulas or venues, so there is nothing outside to compare with. Two substitutes were used. In a blind re-derivation a second lane gets the rules and the inputs but not the answers, works the answers out, and the two sets are compared. In the audit a different model reads the specs and code looking for faults, without seeing the goldens.
+
+**Formal statement.** Blind re-derivation (decision DR-H2): a case counts as outside-checked only if the blind lane saw neither the expected value nor anything that leaks it, and every compared output matches; a shape-only match does not count. The audit (plan rule 14.10-5; Claude Opus 5.5, read-only, no view of goldens, oracle or tests) reported 0 Critical, 17 Major and 15 Minor findings. Each was reproduced on the four builds, and all 32 are ruled (HR-121 to HR-129 and the closing notes in `specifications/stage-h-rulings-audit.md`). Three code faults were fixed, each in all four builds: the Almgren-Chriss error code with two faults at once, the POV check order, and the pair leg rounding at an exact half. Both methods are self-assessment: there is no second human review (owner decision 2026-11-18).
+
+**Worked example.** Stage H has 412 golden cases, 205 of them value cases, and 160 of those (78.0 %) are outside-checked by blind re-derivation or a figure printed in a paper; none by a library (`oracle/OUTSIDE_SHARES.md`). The limit of the method showed on 2026-11-19. The blind lane reads the same rules as the first lane, so it catches arithmetic and convention slips but not a wrong rule. Until that day the spec said the amended SEC tick and fee rules applied from 2025-11-03, and all four builds followed it. The date was wrong: the SEC had deferred it to 2027-11-01. A blind lane given that spec text derives the same wrong answer, so the fault was found by reading the SEC order, not by re-derivation (HR-120). The eight goldens added at both sides of each date are checked the same way, against the corrected text.
 
 ### What stage H's evidence does and does not show
 
 - Crypto venue only for real data, and lit only: one venue's L2 book, recorded locally, aggregates published ([Recorded feeds](docs/data/recorded-feeds.md)). Not equities or rates.
 - No live orders, ever. Paper trading (H-21) uses simulated fills.
-- Dark pools and multi-venue routing are simulated; no real dark-pool data is used.
+- Dark pools and multi-venue routing are simulated; no real dark-pool data is used. The auction, the FX dealer venue and the Treasury futures venue are simulated too: no real equity, FX or rates data is used.
+- Validation is self-assessment. 160 of 205 value cases (78.0 %) are outside-checked by blind re-derivation or a printed paper figure, none by a library; a blind lane cannot catch a wrong rule.
+- H-9 workload R timing is a miss, recorded as a miss; all H-9 figures are from a laptop under WSL, not the acceptance machine.
 - The formula goldens check arithmetic and the papers' printed figures. They do not show that any market follows these models; that needs the crypto study's estimates with standard errors.
 
 ## Appendix: stage history

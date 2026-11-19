@@ -6,7 +6,7 @@ The plain idea: after a fill, watch the mid. If you bought and the mid then rose
 
 You will compute markouts at two horizons and fill rates for two venues. Budget 10 minutes. The fills are synthetic.
 
-<p class="note">Available from v0.10.0 (unreleased). The operation `exec.venue.analytics` (H-16) is implemented in all four languages; this page restates the spec in plain Python with exact fractions as a hand check. Every number is a golden from <code>specifications/10-execution/venue-analytics.md</code>, hand calculations checked with mpmath by the spec lane; 5 of 5 value cases agree with a second, fresh blind re-derivation (<code>program/STAGE_H_BLIND_MICRO.md</code>). Nothing here is measured on real venue data.</p>
+<p class="note">Available from v0.10.0. The operation `exec.venue.analytics` (H-16) is implemented in all four languages; this page restates the spec in plain Python with exact fractions as a hand check. Every number is a golden from <code>specifications/10-execution/venue-analytics.md</code>, hand calculations checked with mpmath by the spec lane; 5 of 5 value cases agree with a second, fresh blind re-derivation (<code>program/STAGE_H_BLIND_MICRO.md</code>). Nothing here is measured on real venue data.</p>
 
 Terms, defined here. `s` is +1 for a buy and -1 for a sell, `q` the fill quantity, `p` its price, `m(u)` the last mid at or before time `u` (ruling HR-72) and `h` the horizon. **Markout** is `sum s q (m(t+h) - p) / sum q`, positive when the fill was good for us; **markout_bps** divides by `sum q p` instead and scales by 10,000; **toxicity** is the share of quantity whose own markout is negative.
 

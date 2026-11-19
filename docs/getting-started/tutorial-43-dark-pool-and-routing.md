@@ -6,7 +6,7 @@ The plain idea: in a dark pool nobody sees the resting orders. A buy and a sell 
 
 You will run two dark pool goldens through `exec.sim.dark.run` and two router goldens through `exec.sor.allocate`. Budget 15 minutes.
 
-<p class="note">Available from v0.10.0 (unreleased). The operations are implemented in all four builds on branch <code>stage-h2</code>; this page drives the Python build in process. Every dark pool output is labelled "simulated venue; not a real dark pool", and the router is scored in simulation only. Every number below is a spec golden from <code>datasets/golden/stage_h/dark_h.json</code> and <code>sor_h.json</code>, and the script stops if the build disagrees with it.</p>
+<p class="note">Available from v0.10.0. The operations are implemented in all four builds; this page drives the Python build in process. Every dark pool output is labelled "simulated venue; not a real dark pool", and the router is scored in simulation only. Every number below is a spec golden from <code>datasets/golden/stage_h/dark_h.json</code> and <code>sor_h.json</code>, and the script stops if the build disagrees with it.</p>
 
 Terms, defined here. The **mid** is halfway between the lit best bid and best ask. `min_qty` is the smallest fill an order accepts. For the router, `S` is the order size in lots, `M` the market-order part, `L[k]` the size posted at venue `k`, `h` the half spread, `f` the market-order fee, `r` a venue's rebate, `Q` the queue ahead of us, `lambda_u` and `lambda_o` the penalties per lot of underfill and overfill, and `lit_samples` equally likely draws of how much volume will trade at each venue ([CK] Cont and Kukanov).
 

@@ -876,7 +876,13 @@ To check the suites: `python conformance/runner/runner.py --impl python --suite 
 
 ## Stage H recipes (available from v0.10.0)
 
-Stage H is implemented in all four languages from v0.10.0 (unreleased; spec version 0.1.0, confirmed 2026-11-18), the `paper.*` operations included. Each request copies the inputs of the named golden case, and the expected outputs are that case's values in the spec, which every build reproduces in conformance. Send a request with `quantforge batch` (one JSON object per line, as in [Batch mode](#batch-mode)). [Tutorials 36 to 40](docs/getting-started/README.md) also check the same numbers by hand with a standard-library script.
+Stage H is implemented in all four languages from v0.10.0 (released 2026-11-19; spec version 0.1.0, confirmed 2026-11-18), the `paper.*` operations included. Each request copies the inputs of the named golden case, and the expected outputs are that case's values in the spec, which every build reproduces in conformance. Send a request with `quantforge batch`: one case per line on stdin, each line holding exactly the keys `schema_version`, `case_id`, `operation` and `inputs` (a line missing one is `E_SCHEMA`; see [Batch mode](#batch-mode)). From `python/`, with the request lines in a file:
+
+```bash
+PYTHONUTF8=1 uv run quantforge batch < requests.jsonl
+```
+
+The outputs printed below are from the Python build (observed, local, 2026-11-19); the other three builds return the same values in conformance. [Tutorials 36 to 40](docs/getting-started/README.md) also check the same numbers by hand with a standard-library script.
 
 | Task | Operation | From golden | Expected |
 |---|---|---|---|
@@ -891,13 +897,13 @@ Stage H is implemented in all four languages from v0.10.0 (unreleased; spec vers
 Plain idea: cut the parent order into child slices. Formally (`specifications/10-execution/schedules.md`, HR-3, HR-4): POV child `i = min(remaining, p v_i / (1 - p))`, floored in whole units.
 
 ```json
-{"operation": "exec.schedule.pov", "inputs": {"quantity": 1000, "participation": 0.2, "market_volume": [1000, 2000, 4000], "mode": "UNITS"}}
+{"schema_version": "1.0", "case_id": "pov", "operation": "exec.schedule.pov", "inputs": {"quantity": 1000, "participation": 0.2, "market_volume": [1000, 2000, 4000], "mode": "UNITS"}}
 ```
 
 ### Almgren-Chriss trajectory
 
 ```json
-{"operation": "exec.ac.trajectory", "inputs": {"quantity": 1000000, "horizon": 5, "n_steps": 5, "sigma": 0.95, "epsilon": 0.0625, "eta": 2.5e-6, "gamma": 2.5e-7, "risk_aversion": 1e-6}}
+{"schema_version": "1.0", "case_id": "ac", "operation": "exec.ac.trajectory", "inputs": {"quantity": 1000000, "horizon": 5, "n_steps": 5, "sigma": 0.95, "epsilon": 0.0625, "eta": 2.5e-6, "gamma": 2.5e-7, "risk_aversion": 1e-6}}
 ```
 
 For the frontier, send `exec.ac.frontier` with `risk_aversions` as a list; `E` must not fall and `V` must not rise along it.
@@ -905,13 +911,13 @@ For the frontier, send `exec.ac.frontier` with `risk_aversions` as a list; `E` m
 ### Shortfall of a fill list
 
 ```json
-{"operation": "exec.tca.shortfall", "inputs": {"side": "BUY", "decision_price": 100, "arrival_price": 100.10, "end_price": 101, "order_quantity": 1000, "fills": [[600, 100.20], [200, 100.30]], "fees": 5}}
+{"schema_version": "1.0", "case_id": "is", "operation": "exec.tca.shortfall", "inputs": {"side": "BUY", "decision_price": 100, "arrival_price": 100.10, "end_price": 101, "order_quantity": 1000, "fills": [{"quantity": 600, "price": 100.20}, {"quantity": 200, "price": 100.30}], "fees": 5}}
 ```
 
 ### Impact for a size
 
 ```json
-{"operation": "exec.impact.sqrt", "inputs": {"quantity": 100000, "daily_volume": 10000000, "daily_vol": 0.02, "coefficient": 1}}
+{"schema_version": "1.0", "case_id": "imp", "operation": "exec.impact.sqrt", "inputs": {"quantity": 100000, "daily_volume": 10000000, "daily_vol": 0.02, "coefficient": 1}}
 ```
 
 `coefficient` is an assumption (HR-10); the default is 1.
@@ -919,16 +925,16 @@ For the frontier, send `exec.ac.frontier` with `risk_aversions` as a list; `E` m
 ### Quotes for an inventory
 
 ```json
-{"operation": "micro.mm.as_quotes", "inputs": {"mid": 100, "inventory": 2, "risk_aversion": 0.1, "sigma": 2, "time_left": 1, "k": 1.5}}
+{"schema_version": "1.0", "case_id": "as", "operation": "micro.mm.as_quotes", "inputs": {"mid": 100, "inventory": 2, "risk_aversion": 0.1, "sigma": 2, "time_left": 1, "k": 1.5}}
 ```
 
 ### Rebuild a book from a recorded file and check it
 
-`micro.book.rebuild` takes the recorded messages as decimal strings, the subscribed depth (100 for days from 2026-11-17 20:15 UTC) and the pair's decimals, and returns the final book with counts of checksum failures, crossed and locked books and gaps (`specifications/09-microstructure/order-book.md`). Checksum failures are counted, not errors. No golden values are fixed yet beyond the venue's own checksum example (`ob_h-0001`, planned). Results are labelled "crypto venue; not equities or rates".
+`micro.book.rebuild` takes the recorded messages as decimal strings, the subscribed depth (100 for days from 2026-11-17 20:15 UTC) and the pair's decimals, and returns the final book with counts of checksum failures, crossed and locked books and gaps (`specifications/09-microstructure/order-book.md`). Checksum failures are counted, not errors. Goldens: `ob_h`, 17 cases, starting from the venue's own checksum example (`ob_h-0001`). Results are labelled "crypto venue; not equities or rates".
 
 ### Replay an order sequence through the engine
 
-`exec.sim.lit.run` takes `tick_size`, `lot_size`, a list of `NEW`, `CANCEL` and `MODIFY` events and a fee schedule, and returns fills, rejects, the final book and fees (`specifications/10-execution/lit-matching.md`). Output is labelled "simulated venue; not a real exchange". Goldens `lit_h-0001` to `0009` are planned, one per order type.
+`exec.sim.lit.run` takes `tick_size`, `lot_size`, a list of `NEW`, `CANCEL` and `MODIFY` events and a fee schedule, and returns fills, rejects, the final book and fees (`specifications/10-execution/lit-matching.md`). Output is labelled "simulated venue; not a real exchange". Goldens: `lit_h`, 20 cases (`lit_h-0001` to `0009` cover one order type each). A quantity that is not a positive multiple of `lot_size` is `E_DOMAIN`, and a MODIFY of an id that is not open is the reject `UNKNOWN_ID` (HR-128).
 
 ### Run the router against single-venue routing
 
@@ -967,10 +973,10 @@ print(paper.verify(open("ledger.jsonl", encoding="utf-8").read()))
 `micro.est.arrival_rate`, `micro.est.cancel_rate`, `micro.est.resilience`, `micro.est.liquidity_decay`, `micro.est.adverse_selection`, `micro.est.regime_impact` and `micro.est.passive_vs_aggressive` each return the estimate and `se` (`specifications/09-microstructure/micro-estimators.md`). For 12 arrivals in 4 seconds:
 
 ```json
-{"operation": "micro.est.arrival_rate", "inputs": {"count": 12, "window": 4}}
+{"schema_version": "1.0", "case_id": "arr", "operation": "micro.est.arrival_rate", "inputs": {"count": 12, "window": 4}}
 ```
 
-gives `lambda` 3, `se` 0.866025403784439 (`mest_h-0001`). See [Tutorial 45](docs/getting-started/tutorial-45-microstructure-estimators.md).
+gives `lambda` 3, `se` 0.8660254037844386 (`mest_h-0001`). See [Tutorial 45](docs/getting-started/tutorial-45-microstructure-estimators.md).
 
 ### Compare venues by markout and fill rate (available from v0.10.0)
 
@@ -981,10 +987,10 @@ gives `lambda` 3, `se` 0.866025403784439 (`mest_h-0001`). See [Tutorial 45](docs
 `exec.algo.arrival` (urgency `kappa`), `exec.algo.close` (auction cap and profile), `exec.algo.liquidity_seek` (share of in-limit depth), `exec.algo.pair` and `exec.algo.basket` (`specifications/10-execution/adaptive-algos.md`). For an arrival-price order of 1,000 over two buckets at `kappa = ln 2`:
 
 ```json
-{"operation": "exec.algo.arrival", "inputs": {"quantity": 1000, "n_buckets": 2, "urgency": 0.69314718055994531, "mode": "CONTINUOUS"}}
+{"schema_version": "1.0", "case_id": "arrival", "operation": "exec.algo.arrival", "inputs": {"quantity": 1000, "n_buckets": 2, "urgency": 0.69314718055994531, "mode": "CONTINUOUS"}}
 ```
 
-gives slices 600 and 400 (`alg_h-0002`). See [Tutorial 47](docs/getting-started/tutorial-47-adaptive-algos-and-tca.md).
+gives slices 600 and 400 to rounding (the build prints 599.9999999999999 and 399.99999999999994; `alg_h-0002`). See [Tutorial 47](docs/getting-started/tutorial-47-adaptive-algos-and-tca.md).
 
 ### Estimate cost before trading and split it afterwards (available from v0.10.0)
 
@@ -992,4 +998,220 @@ gives slices 600 and 400 (`alg_h-0002`). See [Tutorial 47](docs/getting-started/
 
 ### Read the low-latency book results (available from v0.10.0)
 
-The H-9 results file `benchmarks/results/h9/README.md` gives p50, p99 and p99.9 per operation against the targets in `specifications/09-microstructure/low-latency-targets.md`. The first run is a laptop under WSL, not the acceptance machine; quote it with that label and with "in-process, simulated feed; no network or venue latency". See [Tutorial 48](docs/getting-started/tutorial-48-low-latency-book.md).
+The H-9 results file `benchmarks/results/h9/README.md` gives p50, p99 and p99.9 per operation against the targets in `specifications/09-microstructure/low-latency-targets.md`. Every run so far is a laptop under WSL, not the acceptance machine; quote it with that label and with "in-process, simulated feed; no network or venue latency". Workload R (the recorded Kraken window 2026-11-18 21:49:17 to 2026-11-19 03:49:17 UTC, median of 5 runs) is a timing MISS at p99 and p99.9 in every language, with 0 correctness mismatches; the per-level figure quoted beside it is descriptive only and has no target. See [Tutorial 48](docs/getting-started/tutorial-48-low-latency-book.md).
+
+### Stage H multi-asset recipes: equities, FX, rates and their simulated venues
+
+Round 4 (H-22 to H-24) adds trading conventions and three simulated venues. Convention operations (`micro.eq.*`, `micro.fx.*`, `micro.rates.*`) are arithmetic and carry no label; venue operations (`exec.sim.*`) carry a "simulated venue" label on every output (HR-111). No venue here is real: the only real data in stage H is one crypto venue's public book. Specs: `specifications/09-microstructure/asset-conventions.md`, `specifications/10-execution/auction.md`, `fx-rfq-venue.md` and `rates-futures-venue.md`; rulings HR-80 to HR-120 in `specifications/stage-h-rulings-multiasset.md`. Decimals go in as strings (HR-12). Each request below is a golden case's inputs unless the recipe says otherwise, and each output is the Python build's real output (observed, local, 2026-11-19). The `message` text of an error is not part of the contract; the `code` is.
+
+### Round an equity price to the tick grid
+
+Plain idea: a limit price must sit on the venue's price grid, and rounding must never make the order more aggressive than asked. Formally (HR-81, HR-120; SEC Rule 612): the tick is 0.0001 below 1.00 and 0.01 at or above it, or 0.005 for a stock on the half-penny tier; a buy rounds down and a sell rounds up. The half-penny tier belongs to the amended rule, whose compliance date is 2027-11-01 (deferred by SEC order 34-105656). With no `as_of` the operation applies the amended text; with an `as_of` it applies the rule in force on that date.
+
+```json
+{"schema_version":"1.0","case_id":"eqc_h-0001","operation":"micro.eq.round_price","inputs":{"price":"10.005","side":"BUY"}}
+{"schema_version":"1.0","case_id":"eqc_h-0002","operation":"micro.eq.round_price","inputs":{"price":"10.005","side":"SELL"}}
+{"schema_version":"1.0","case_id":"eqc_h-0010","operation":"micro.eq.round_price","inputs":{"price":"10.003","side":"SELL","tick_tier":"HALF_PENNY"}}
+{"schema_version":"1.0","case_id":"eqc_h-0020","operation":"micro.eq.round_price","inputs":{"price":"10.003","side":"BUY","tick_tier":"HALF_PENNY","as_of":"2026-11-19"}}
+{"schema_version":"1.0","case_id":"eqc_h-0022","operation":"micro.eq.round_price","inputs":{"price":"10.003","side":"SELL","tick_tier":"HALF_PENNY","as_of":"2027-11-01"}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"eqc_h-0001","status":"ok","outputs":{"price":"10.00"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"eqc_h-0002","status":"ok","outputs":{"price":"10.01"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"eqc_h-0010","status":"ok","outputs":{"price":"10.005"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"eqc_h-0020","status":"error","error":{"code":"E_INPUT","message":"tick_tier HALF_PENNY before the compliance date","field":"tick_tier"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"eqc_h-0022","status":"ok","outputs":{"price":"10.005"},"diagnostics":{}}
+```
+
+The third line has no `as_of`, so it gets the amended text. That tier is not in force before 2027-11-01: the fourth line asks for it on 2026-11-19 and is refused. Limits: the tier is an input per stock, and the six-monthly spread test that assigns it is not modelled; the SEC has the deferred rules under review, so the date may move, and `compliance_date` overrides the default.
+
+### Check an access fee against the cap
+
+Plain idea: a venue may not charge more than a capped fee to take a displayed quote. Formally (HR-85, HR-120; SEC Rule 610(c)): the cap in force today is 0.003 a share at 1.00 or more and 0.3 % of the price below; the amended cap, 0.001 and 0.1 %, has the same 2027-11-01 compliance date as the tick rule. A fee above the cap is `E_DOMAIN`.
+
+```json
+{"schema_version":"1.0","case_id":"eqc_h-0011","operation":"micro.eq.fee_check","inputs":{"price":"20","taker_fee":"0.0015"}}
+{"schema_version":"1.0","case_id":"eqc_h-0023","operation":"micro.eq.fee_check","inputs":{"price":"20","taker_fee":"0.0015","as_of":"2026-11-19"}}
+{"schema_version":"1.0","case_id":"eqc_h-0024","operation":"micro.eq.fee_check","inputs":{"price":"20","taker_fee":"0.0015","as_of":"2027-11-01"}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"eqc_h-0011","status":"error","error":{"code":"E_DOMAIN","message":"taker_fee above the Rule 610 cap","field":"taker_fee"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"eqc_h-0023","status":"ok","outputs":{"cap":"0.003","taker_fee":"0.0015"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"eqc_h-0024","status":"error","error":{"code":"E_DOMAIN","message":"taker_fee above the Rule 610 cap","field":"taker_fee"},"diagnostics":{}}
+```
+
+The same fee of 0.0015 fails with no `as_of` (amended cap 0.001), passes on 2026-11-19 (cap 0.003) and fails again from 2027-11-01. Limits: this is a cap test, not a fee schedule; `cap_check: false` returns the cap without the error.
+
+### Find the round lot for a price
+
+Plain idea: the standard order size shrinks as the share price rises. Formally (HR-82, HR-120; SEC Rule 600(b)(93)): 100 shares up to 250.00, 40 up to 1,000.00, 10 up to 10,000.00 and 1 above. This rule was not deferred: it has applied since 2025-11-03, and before that the lot was 100 at every price.
+
+```json
+{"schema_version":"1.0","case_id":"eqc_h-0015","operation":"micro.eq.round_lot","inputs":{"price":"250.01"}}
+{"schema_version":"1.0","case_id":"eqc_h-0025","operation":"micro.eq.round_lot","inputs":{"as_of":"2026-11-19","price":"500"}}
+{"schema_version":"1.0","case_id":"eqc_h-0026","operation":"micro.eq.round_lot","inputs":{"as_of":"2025-10-31","price":"500"}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"eqc_h-0015","status":"ok","outputs":{"round_lot":40},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"eqc_h-0025","status":"ok","outputs":{"round_lot":40},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"eqc_h-0026","status":"ok","outputs":{"round_lot":100},"diagnostics":{}}
+```
+
+Limits: `price` stands for the rule's Evaluation-Period average closing price; the six-month operative period is not modelled.
+
+### Equity settlement date
+
+Plain idea: cash and shares change hands a fixed number of business days after the trade. Formally (HR-86): `settle_lag` good days, default 1, on the calendar passed in.
+
+```json
+{"schema_version":"1.0","case_id":"eqc_h-0008","operation":"micro.eq.settle_date","inputs":{"holidays":[],"settle_lag":1,"trade_date":"2026-11-20"}}
+{"schema_version":"1.0","case_id":"settle-holiday","operation":"micro.eq.settle_date","inputs":{"holidays":["2026-11-26"],"settle_lag":1,"trade_date":"2026-11-25"}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"eqc_h-0008","status":"ok","outputs":{"settle_date":"2026-11-23"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"settle-holiday","status":"ok","outputs":{"settle_date":"2026-11-27"},"diagnostics":{}}
+```
+
+Friday settles on Monday; a Wednesday trade before a Thursday holiday settles on Friday. Limits: holidays are inputs; the operation knows no exchange calendar. The second case is not a golden (Python build output only).
+
+### FX pip value and spot date
+
+Plain idea: a pip is the unit a spot price moves in, and the spot date is when the two currencies are delivered. Formally (HR-87 to HR-89): a pip is 0.0001, or 0.01 when JPY is the quote currency, and its value in the quote currency is notional times pip. Spot is T+2 good days, T+1 for USDCAD. The first day after the trade needs only the non-USD currency to be open, but the value date must be a good day in both.
+
+```json
+{"schema_version":"1.0","case_id":"fxc_h-0001","operation":"micro.fx.pip_value","inputs":{"notional":"1000000","pair":"EURUSD"}}
+{"schema_version":"1.0","case_id":"fxc_h-0002","operation":"micro.fx.pip_value","inputs":{"notional":"1000000","pair":"USDJPY"}}
+{"schema_version":"1.0","case_id":"fxc_h-0005","operation":"micro.fx.spot_date","inputs":{"holidays":{},"pair":"EURUSD","trade_date":"2026-11-20"}}
+{"schema_version":"1.0","case_id":"fxc_h-0004","operation":"micro.fx.spot_date","inputs":{"holidays":{"USD":["2026-11-26"]},"pair":"EURUSD","trade_date":"2026-11-24"}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"fxc_h-0001","status":"ok","outputs":{"currency":"USD","pip_value":"100"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"fxc_h-0002","status":"ok","outputs":{"currency":"JPY","pip_value":"10000"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"fxc_h-0005","status":"ok","outputs":{"spot_date":"2026-11-24"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"fxc_h-0004","status":"ok","outputs":{"spot_date":"2026-11-27"},"diagnostics":{}}
+```
+
+In the last case T+2 from Tuesday 2026-11-24 is Thursday the 26th, a USD holiday, so spot rolls to Friday the 27th. Limits: eight currencies only (EUR, GBP, AUD, NZD, USD, CAD, CHF, JPY); another currency, or a pair written the wrong way round, is `E_INPUT` (HR-88, HR-123). USDCAD T+1 is market convention with no primary source read (HR-119).
+
+### Send a last-look request to the simulated FX venue
+
+Plain idea: a dealer quotes a bid and an ask, and when a client asks to trade the dealer may look at the market once more and refuse. Formally (`specifications/10-execution/fx-rfq-venue.md`, HR-97): the request is rejected `LL_PRICE` if the mid moved by more than `threshold_pips` against the dealer (either way when `symmetric`); otherwise rejected `LL_RANDOM` if the draw `u` is below `p_random_reject`; otherwise filled at the quoted price. Without `u`, the draw comes from `core.rng` with `seed` and stream `request_index`, and is returned.
+
+```json
+{"schema_version":"1.0","case_id":"fxv_h-0004","operation":"exec.sim.fx.request","inputs":{"mid_after":"1.0852","p_random_reject":"0.05","pair":"EURUSD","qty":"1000000","quote":{"ask":"1.0852","bid":"1.0850","quote_mid":"1.0851"},"side":"BUY","symmetric":true,"threshold_pips":"2","u":"0.50"}}
+{"schema_version":"1.0","case_id":"fxv_h-0003","operation":"exec.sim.fx.request","inputs":{"mid_after":"1.0855","p_random_reject":"0.05","pair":"EURUSD","qty":"1000000","quote":{"ask":"1.0852","bid":"1.0850","quote_mid":"1.0851"},"side":"BUY","symmetric":true,"threshold_pips":"2","u":"0.50"}}
+{"schema_version":"1.0","case_id":"fxv_h-0010","operation":"exec.sim.fx.request","inputs":{"mid_after":"1.0852","p_random_reject":"0.5","pair":"EURUSD","qty":"1000000","quote":{"ask":"1.0852","bid":"1.0850","quote_mid":"1.0851"},"side":"BUY","symmetric":true,"threshold_pips":"2","request_index":0,"seed":20261118}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"fxv_h-0004","status":"ok","outputs":{"label":"simulated venue; not a real exchange; no real FX data","move_pips":"1","outcome":"FILL","price":"1.0852"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"fxv_h-0003","status":"ok","outputs":{"label":"simulated venue; not a real exchange; no real FX data","move_pips":"4","outcome":"LL_PRICE","price":null},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"fxv_h-0010","status":"ok","outputs":{"label":"simulated venue; not a real exchange; no real FX data","move_pips":"1","outcome":"FILL","price":"1.0852","u":0.9911886460034905},"diagnostics":{}}
+```
+
+A 1-pip move fills at the ask; a 4-pip move is refused; the seeded request draws 0.9912, above the 0.5 reject rate, and fills. Limits: a simulated dealer, not a real one. The thresholds and the random reject are the spec's own toy model, not taken from the FX Global Code, and `LL_RANDOM` stands in for validity and credit rejects (HR-119). `seed` is within 0..2^53-1 and `request_index` within 0..2^32-1, else `E_LIMIT` (HR-116). `exec.sim.fx.stream` builds the quotes from a mid path.
+
+### Parse and format a price in 32nds
+
+Plain idea: Treasury prices are written in 32nds of a point, not decimals. Formally (HR-90, HR-109, HR-118): `H-FF[q]` is `H + (FF + q) / 32`, with the third digit in quarters of a 32nd: none or `0` is 0, `2` is 1/4, `5` or `+` is 1/2, `7` is 3/4.
+
+```json
+{"schema_version":"1.0","case_id":"rtc_h-0003","operation":"micro.rates.parse_32nds","inputs":{"text":"99-162"}}
+{"schema_version":"1.0","case_id":"rtc_h-0005","operation":"micro.rates.format_32nds","inputs":{"resolution":64,"value":"101.296875"}}
+{"schema_version":"1.0","case_id":"rtc_h-0015","operation":"micro.rates.parse_32nds","inputs":{"text":"99-163"}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"rtc_h-0003","status":"ok","outputs":{"value":"99.5078125"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"rtc_h-0005","status":"ok","outputs":{"text":"101-09+"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"rtc_h-0015","status":"error","error":{"code":"E_SCHEMA","message":"text: not H-FF[q] with q in 0, 2, 5, 7, + (HR-109)","field":"text"},"diagnostics":{}}
+```
+
+99-162 is 99 + 16.25/32. Limits: only the third digits 0, 2, 5 and 7 are read (the CME quarter-tick convention, source read 2026-11-19). Contracts that tick in eighths of a 32nd (2-year and 3-year notes) are not supported, so any other third digit is `E_SCHEMA` (HR-118). A value off the `resolution` grid is `E_DOMAIN`.
+
+### Bond price, bond yield and bill price
+
+Plain idea: discount each coupon and the principal at the yield; a bill is quoted as a discount from par. Formally (HR-92): on a coupon date `P = sum_{i=1..n} (100 c / f) / (1 + y / f)^i + 100 / (1 + y / f)^n`; bill `P = 100 (1 - d days / 360)`; the yield is found by Brent on `(-0.99 f, 10)` to 1e-12.
+
+```json
+{"schema_version":"1.0","case_id":"rtc_h-0008","operation":"micro.rates.bond_price","inputs":{"coupon":"0.04","frequency":2,"periods":2,"yield":"0.05"}}
+{"schema_version":"1.0","case_id":"rtc_h-0012","operation":"micro.rates.bond_yield","inputs":{"coupon":"0.04","frequency":2,"periods":2,"price":"99.036287923854848305"}}
+{"schema_version":"1.0","case_id":"rtc_h-0010","operation":"micro.rates.bill_price","inputs":{"days":91,"discount":"0.05"}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"rtc_h-0008","status":"ok","outputs":{"price":"99.036287924"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"rtc_h-0012","status":"ok","outputs":{"yield":0.050000000000064035},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"rtc_h-0010","status":"ok","outputs":{"price":"98.736111111"},"diagnostics":{}}
+```
+
+The yield comes back as 5 % to within the solver tolerance, not byte for byte, so its golden is compared within tolerance. Limits: coupon dates only; off a coupon date use the stage D bond operations ([Price a bond from its yield](#price-a-bond-from-its-yield)).
+
+### Futures price to ticks, and P&L
+
+Plain idea: a futures venue counts prices in whole ticks, and P&L is ticks moved times the tick value. Formally (`specifications/10-execution/rates-futures-venue.md`, HR-91): ticks = price / tick on the contract's grid (ZN tick 1/64 of a point worth 15.625, ZB tick 1/32 worth 31.25); P&L = ticks x tick value x quantity, less `fee_per_contract` on each side.
+
+```json
+{"schema_version":"1.0","case_id":"fut_h-0001","operation":"exec.sim.fut.to_ticks","inputs":{"contract":{"symbol":"ZN"},"price":"110-16+"}}
+{"schema_version":"1.0","case_id":"fut_h-0005","operation":"exec.sim.fut.pnl","inputs":{"buy_price":"110-16","contract":{"symbol":"ZN"},"fee_per_contract":"1.00","qty":3,"sell_price":"110-17+"}}
+{"schema_version":"1.0","case_id":"fut_h-0006","operation":"exec.sim.fut.variation","inputs":{"contract":{"symbol":"ZB"},"price":"120-00","qty":1,"settlements":["119-31"],"side":"BUY"}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"fut_h-0001","status":"ok","outputs":{"label":"simulated venue; not a real exchange; no real rates data","ticks":7073},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"fut_h-0005","status":"ok","outputs":{"fees":"6","label":"simulated venue; not a real exchange; no real rates data","pnl":"134.625"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"fut_h-0006","status":"ok","outputs":{"label":"simulated venue; not a real exchange; no real rates data","variation_margin":["-31.25"]},"diagnostics":{}}
+```
+
+110-16+ is 110.515625, or 7,073 ticks of 1/64. Three lots up 3 ticks make 3 x 3 x 15.625 = 140.625, less 6 in fees. Limits: a price off the contract grid is `E_DOMAIN` (a quarter-32nd on ZN, `fut_h-0003`); an integer beyond +-(2^53-1) is `E_LIMIT` (HR-116). Simulated; no real rates data.
+
+### Run the simulated futures venue
+
+Plain idea: the futures venue is the lit matching engine with prices written in 32nds and a P&L per trader at the end. Formally (`specifications/10-execution/rates-futures-venue.md`): `exec.sim.fut.run` converts each event's price to ticks, runs the lit engine in whole contracts, charges `fee_per_contract` to both sides of each fill and reports `fees` and `pnl` per trader.
+
+```json
+{"schema_version":"1.0","case_id":"fut_h-0011","operation":"exec.sim.fut.run","inputs":{"contract":{"symbol":"ZN"},"events":[{"id":"S1","op":"NEW","price":"110-16","qty":"3","side":"SELL","trader":"M","type":"LIMIT"},{"id":"B1","op":"NEW","price":"110-16","qty":"3","side":"BUY","trader":"P","type":"LIMIT"},{"id":"S2","op":"NEW","price":"110-17+","qty":"3","side":"SELL","trader":"P","type":"LIMIT"},{"id":"B2","op":"NEW","price":"110-17+","qty":"3","side":"BUY","trader":"N","type":"LIMIT"}],"fee_per_contract":"1.00"}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"fut_h-0011","status":"ok","outputs":{"fills":[{"taker_id":"B1","maker_id":"S1","price":"110.5","qty":"3","seq":1},{"taker_id":"B2","maker_id":"S2","price":"110.546875","qty":"3","seq":2}],"rejects":[],"cancelled":[],"book":{"bids":[],"asks":[]},"mbp":{"bids":[],"asks":[]},"fees":{"M":"3","N":"3","P":"6"},"conservation":{"B1":{"submitted":"3","filled":"3","resting":"0","cancelled":"0","rejected":"0"},"B2":{"submitted":"3","filled":"3","resting":"0","cancelled":"0","rejected":"0"},"S1":{"submitted":"3","filled":"3","resting":"0","cancelled":"0","rejected":"0"},"S2":{"submitted":"3","filled":"3","resting":"0","cancelled":"0","rejected":"0"}},"label":"simulated venue; not a real exchange; no real rates data","pnl":{"M":"-143.625","N":"-3","P":"134.625"}},"diagnostics":{}}
+```
+
+Trader P buys 3 at 110-16 and sells 3 at 110-17+: 140.625 less 6 in fees is 134.625, the `exec.sim.fut.pnl` answer above. P ends flat. M is left short 3 from 110-16 and N long 3 from 110-17+; their `pnl` is marked at the last trade price, 110-17+, so M shows -140.625 less 3 in fees and N shows 0 less 3. The three figures add to -12, the fees paid. Limits: simulated; the mark is the last trade in the run, not a settlement price (use `exec.sim.fut.variation` for a settlement series). Shared goldens `fut_h-0011` to `0016` were added on 2026-11-19; two of the three value cases were re-derived blind.
+
+### Uncross an opening or closing auction
+
+Plain idea: collect orders without trading, then pick the one price at which the most shares trade and fill everyone there. Formally (`specifications/10-execution/auction.md`, HR-84, HR-127): over the candidate ticks keep the price with the largest matched volume; ties go to the smallest imbalance, then to the rules of `tie_break` (default `CBOE`), which end with the price closest to `ref_price`. Buys fill by limit descending then arrival, sells by limit ascending then arrival. `imbalance` is buy minus sell quantity at the price.
+
+```json
+{"schema_version":"1.0","case_id":"auc_h-0001","operation":"exec.sim.auction.uncross","inputs":{"orders":[{"id":"s1","limit":"10.02","qty":100,"side":"BUY"},{"id":"s2","limit":"10.01","qty":200,"side":"BUY"},{"id":"s3","limit":"10.00","qty":300,"side":"BUY"},{"id":"s4","limit":"9.99","qty":150,"side":"SELL"},{"id":"s5","limit":"10.01","qty":250,"side":"SELL"},{"id":"s6","limit":"10.03","qty":100,"side":"SELL"}],"phase":"OPEN","ref_price":"10.00","tick_size":"0.01"}}
+{"schema_version":"1.0","case_id":"close-example","operation":"exec.sim.auction.uncross","inputs":{"orders":[{"id":"b1","limit":"MARKET","qty":300,"side":"BUY"},{"id":"b2","limit":"20.10","qty":200,"side":"BUY"},{"id":"a1","limit":"20.05","qty":250,"side":"SELL"},{"id":"a2","limit":"20.10","qty":150,"side":"SELL"}],"phase":"CLOSE","ref_price":"20.08","tick_size":"0.01"}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"auc_h-0001","status":"ok","outputs":{"cancelled":[],"fills":[{"id":"s1","price":"10.01","qty":100,"side":"B"},{"id":"s2","price":"10.01","qty":200,"side":"B"},{"id":"s4","price":"10.01","qty":150,"side":"S"},{"id":"s5","price":"10.01","qty":150,"side":"S"}],"imbalance":-100,"label":"simulated venue; not a real exchange","price":"10.01","residual":[{"id":"s3","limit":"10.00","qty":300,"side":"B"},{"id":"s5","limit":"10.01","qty":100,"side":"S"},{"id":"s6","limit":"10.03","qty":100,"side":"S"}],"volume":300},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"close-example","status":"ok","outputs":{"cancelled":[],"fills":[{"id":"b1","price":"20.10","qty":300,"side":"B"},{"id":"b2","price":"20.10","qty":100,"side":"B"},{"id":"a1","price":"20.10","qty":250,"side":"S"},{"id":"a2","price":"20.10","qty":150,"side":"S"}],"imbalance":100,"label":"simulated venue; not a real exchange","price":"20.10","residual":[{"id":"b2","limit":"20.10","qty":100,"side":"B"}],"volume":400},"diagnostics":{}}
+```
+
+The open trades 300 at 10.01 with 100 of sell interest left over. The close trades 400 at 20.10: the market buy fills first, and 100 of the limit buy is left. Limits: a simulated auction, not one exchange's rule book; the imbalance-side and final higher-price tie-break steps are the simulator's own (HR-119). If nothing crosses there is no auction: `price` null and `volume` 0 (HR-127). A limit off the tick grid is `E_DOMAIN`. To run a whole session with both auctions, send `PHASE` events to `exec.sim.lit.run` (`ses_h-0001`, HR-112). The second case is not a golden (Python build output only).
+
+### What error do I get when two inputs are wrong?
+
+Plain idea: when a request breaks two rules, every build must report the same one, so the checks run in one fixed order. Formally (HR-122; `specifications/cli-contract.md`, "Finite rule"): (1) `E_SCHEMA`, for shape, type or an unlisted enum spelling; (2) `E_LIMIT`, for a size limit on the input itself; (3) a non-finite Real, `E_DOMAIN`; (4) structural `E_INPUT`, for an empty list, a count below 1, lengths or cross-field consistency; (5) `E_DOMAIN`, for one value outside its domain. A limit that only arises after validation comes last.
+
+```json
+{"schema_version":"1.0","case_id":"rule_h-0015","operation":"exec.schedule.pov","inputs":{"quantity":1000,"participation":1.5,"market_volume":[],"mode":"UNITS"}}
+{"schema_version":"1.0","case_id":"rule_h-0012","operation":"exec.schedule.twap","inputs":{"quantity":-5,"n_buckets":200000,"mode":"UNITS"}}
+```
+
+```json
+{"schema_version":"1.0","case_id":"rule_h-0015","status":"error","error":{"code":"E_INPUT","message":"market_volume must not be empty","field":"market_volume"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"rule_h-0012","status":"error","error":{"code":"E_LIMIT","message":"n_buckets is above its limit of 100000","field":"n_buckets"},"diagnostics":{}}
+```
+
+In the first case `participation` 1.5 is outside its domain and `market_volume` is empty: the structural error wins, step (4) before step (5). In the second the quantity is negative and `n_buckets` is above its limit of 100,000: the limit wins, step (2) before step (4). Limits: one exception is recorded, `paper.pretrade.check`, which reports an unknown `side` or `type` as `E_INPUT` (`rule_h-0040`). Before 2026-11-19 two builds answered `E_DOMAIN` and two `E_INPUT` for an Almgren-Chriss request with two faults; suite `rule_h` (40 cases) now pins the order.

@@ -424,9 +424,9 @@ flowchart LR
 
 For 1,000,000 shares against a 10 million daily volume, `sigma` 2 %, `z = 1.645`, the cheapest horizon is 0.3330 days at 224 bp ([Tutorial 35](../getting-started/tutorial-35-liquidity-curve.md), ruling J-C-8).
 
-## Stage H: execution and microstructure (planned, v0.10.0)
+## Stage H: execution and microstructure (v0.10.0)
 
-The operations drawn here are implemented in all four languages from v0.10.0 (spec version 0.1.0, confirmed 2026-11-18); the boxes use the names the specs fix. Simulated parts are drawn with dashed borders; real recorded data with a solid border. Specs: `specifications/09-microstructure/` and `specifications/10-execution/`.
+The operations drawn here are implemented in all four languages from v0.10.0 (spec version 0.1.0, confirmed 2026-11-18); the boxes use the names the specs fix. Simulated parts are drawn with dashed borders; real recorded data with a solid border. Every venue is simulated; the only real data is one crypto venue's recorded book. Specs: `specifications/09-microstructure/` and `specifications/10-execution/`.
 
 ### Order lifecycle
 
@@ -491,6 +491,36 @@ flowchart LR
 ```
 
 Only the Kraken box is real data, and it is a single lit venue: it is never routed across. The router comparison against single-venue routing is a result inside this simulated world (ruling HR-40). See [Simulators](../simulators/README.md).
+
+### Multi-asset venues
+
+```mermaid
+flowchart LR
+  accTitle: The three simulated venues added for equities, FX and rates
+  accDescr: Equity orders pass the tick, lot and fee conventions and enter the simulated lit engine. With a session the engine collects orders before the open, uncrosses them in an opening auction, trades continuously, collects on-close orders and uncrosses them in a closing auction. An FX request goes to a simulated dealer venue that quotes around a mid path and applies last look, giving a fill or a reject. A Treasury futures order has its price in 32nds turned into integer ticks and is matched by the same lit engine, which then reports fees and profit and loss per trader. All three venues are simulated and label every output.
+  subgraph EQ["equities, H-22"]
+    EC["micro.eq.round_price / round_lot / fee_check<br/>rule text chosen by as_of (HR-120)"] --> PO["PRE_OPEN: orders collect"]
+    PO --> OA["opening auction<br/>exec.sim.auction.uncross"]
+    OA --> CT["CONTINUOUS<br/>exec.sim.lit.run, price-time"]
+    CT --> PC["PRE_CLOSE: on-close orders only"]
+    PC --> CA["closing auction<br/>exec.sim.auction.uncross"]
+  end
+  subgraph FX["FX, H-23"]
+    FC["micro.fx.pip_value / spot_date"] --> QS["exec.sim.fx.stream<br/>bid and ask around a mid path"]
+    QS --> RQ{"exec.sim.fx.request<br/>last look"}
+    RQ -->|mid moved past threshold| R1[LL_PRICE reject]
+    RQ -->|draw below reject rate| R2[LL_RANDOM reject]
+    RQ -->|otherwise| FL[FILL at the quote]
+  end
+  subgraph RT["rates, H-24"]
+    RC["micro.rates.parse_32nds<br/>exec.sim.fut.to_ticks"] --> FR["exec.sim.fut.run<br/>lit engine in integer ticks"]
+    FR --> PL["fees and profit and loss per trader<br/>marked at the last trade"]
+  end
+  classDef sim stroke-dasharray: 5 5
+  class PO,OA,CT,PC,CA,QS,RQ,R1,R2,FL,FR,PL sim
+```
+
+Every dashed box is simulated; there is no real equity, FX or rates data here. The equity phases run inside `exec.sim.lit.run` when it is given a `session` and `PHASE` events (HR-112, golden `ses_h-0001`); the continuous book does not join the closing cross. The futures venue is the same lit engine, not a second matcher. Paper trading does not route to these three venues: its path is the lit engine, the dark pool and the router ([ledger flow](#paper-trading-ledger-flow)). Worked through in [Tutorial 49](../getting-started/tutorial-49-trading-conventions.md) and [Tutorial 50](../getting-started/tutorial-50-auction-fx-and-futures-venues.md). Specs: `10-execution/auction.md`, `fx-rfq-venue.md`, `rates-futures-venue.md`.
 
 ### Shortfall decomposition
 
