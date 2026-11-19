@@ -1268,6 +1268,6 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Tier:** 1.
 - **Challenger:** QuantLib 1.44 `FdHullWhiteSwaptionEngine` central bump at tGrid 8,000, xGrid 3,201 (KR-19, `oracle/K8_REFERENCE_QL.json`), counted outside only on the judged ladder entries of k8_k-0001..0003; the goldens themselves are the Python build's output, not an independent oracle.
 - **Monitoring thresholds:** any judged ladder entry at 201/100 more than 1% from the reference; any observed order outside 1.5 to 2.5 or a `NON_MONOTONE` status on 201/401/801; AAD against bump beyond 1e-8 relative.
-- **Data lineage hash:** sha256 HASH_K8K (`k8_k`, 14 cases) (2026-11-19).
+- **Data lineage hash:** sha256 9147507a36b3bd5ffe4e8a092c81e70089054b0a38105c69a1ab692782d12d91 (`k8_k`, 14 cases) (2026-11-19).
 - **Retirement trigger:** a superseding stage K ruling, or the method failing acceptance in any build.
 - **Validation report:** `specifications/06-risk/bermudan-ladder-k8.md`.
