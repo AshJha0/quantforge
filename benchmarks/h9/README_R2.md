@@ -20,7 +20,9 @@ All from Git Bash at the root of a checkout of this branch, Python through `uv` 
 and, in brackets, an estimate for an 8-hour window scaled by message count (about 48 times the sample; evidence class:
 inferred, not measured).
 
-1. Choose the window (the rule of item 2a; prints the attempts and `START ... END ...`; reads every hourly file of both
+1. Choose the window (the rule of item 2a, with ruling HR-133: a session whose first raw snapshot is after
+   2026-11-19 15:00 UTC gets exactly 6 hours, so the first attempt from 11:41:24, cut at 15:01:58, is listed as
+   rejected and the session from 15:02:28 is chosen, ending 21:02:28 if nothing breaks; prints the attempts and `START ... END ...`; reads every hourly file of both
    symbols once, raw and per-second, in full):
 
    `python -I benchmarks/h9/build_r2.py window C:/Work/Claude/qf-crypto-data/kraken`

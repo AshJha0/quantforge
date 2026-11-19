@@ -2,13 +2,15 @@
 """Build H-9 workload R2 (low-latency-book.md item 2a, ruling HR-130) and the form B input of the same window (item 2b).
 
   python -I build_r2.py DATA_DIR SYMBOL START END OUT_PREFIX [--tolerant]
-  python -I build_r2.py window DATA_DIR [--after ISO] [--min-hours 6] [--max-hours 8] [--tolerant]
-  python -I build_r2.py auto DATA_DIR OUT_DIR [--after ISO] [--min-hours 6] [--max-hours 8] [--tolerant]
+  python -I build_r2.py window DATA_DIR [--after ISO] [--min-hours H --max-hours H] [--tolerant]
+  python -I build_r2.py auto DATA_DIR OUT_DIR [--after ISO] [--min-hours H --max-hours H] [--tolerant]
 
 DATA_DIR is qf-crypto-data/kraken (read only). START/END are ISO UTC instants; raw messages, trades and per-second rows
 with START <= t < END are used. `window` applies the window rule of item 2a and prints START and END; `auto` does that
 and then builds both symbols into OUT_DIR. --after defaults to 2026-11-19T11:41:24Z (raw recording switched on);
---min-hours/--max-hours default to the rule's 6 and 8 and are changed only to exercise the code on a short sample.
+Window length by rule (window_hours): 6 to 8 hours (item 2a); for a session whose first raw snapshot is after
+2026-11-19 15:00 UTC exactly 6 hours (ruling HR-133). --min-hours/--max-hours override the rule for every session
+and are given only to exercise the code on a short sample.
 --until ISO stops the scan at that hour (files of later hours are not opened).
 --tolerant reads damaged gzip files with tools/recorder/read_gz.py and skips undecodable lines: development on the
 2026-11-17 sample only; such a build is marked "tolerant" and is never a workload input.
@@ -178,7 +180,15 @@ def scan(data_dir, after, tolerant=False, until=None):
     return gaps, snaps, last, rd.skipped
 
 
-def choose_window(data_dir, after, min_hours=6.0, max_hours=8.0, tolerant=False, until=None):
+HR133_AFTER = datetime(2026, 11, 19, 15, 0, tzinfo=timezone.utc)
+
+
+def window_hours(start):
+    """(min, max) window length in hours for a session starting at `start`: item 2a, amended by HR-133."""
+    return (6.0, 6.0) if start > HR133_AFTER else (6.0, 8.0)
+
+
+def choose_window(data_dir, after, min_hours=None, max_hours=None, tolerant=False, until=None):
     """Item 2a: the first session (between gap rows of any stream) whose first raw snapshot, on or after `after`,
     then runs min_hours with no gap row in either symbol's raw or per-second files. END = START + max_hours, or the
     first gap row if that comes between min_hours and max_hours, or just after the last recorded row if the
@@ -191,21 +201,24 @@ def choose_window(data_dir, after, min_hours=6.0, max_hours=8.0, tolerant=False,
         return None, None, log
     data_end = min(last.values()) + timedelta(milliseconds=1)
     starts = sorted(t for s in SYMBOLS for t in snaps[s] if t >= after)
-    min_d, max_d = timedelta(hours=min_hours), timedelta(hours=max_hours)
     tried = set()
     for s0 in starts:
         prev_gap = max((g for g, _, _ in gaps if g <= s0), default=None)
         if prev_gap in tried:
             continue  # only the first snapshot of each session is a candidate
         tried.add(prev_gap)
+        lo_h, hi_h = window_hours(s0)
+        lo_h, hi_h = (lo_h if min_hours is None else min_hours), (hi_h if max_hours is None else max_hours)
+        min_d, max_d = timedelta(hours=lo_h), timedelta(hours=hi_h)
         nxt = min((g for g, _, _ in gaps if g > s0), default=None)
         limit = min(nxt, data_end) if nxt is not None else data_end
         if limit - s0 < min_d:
-            why = "gap row before hour %.4g" % min_hours if nxt is not None and nxt <= data_end else "recording ends first"
+            why = "gap row before hour %.4g" % lo_h if nxt is not None and nxt <= data_end else "recording ends first"
             log["attempts"].append({"start": iso(s0), "rejected": why, "limit": iso(limit)})
             continue
         end = min(s0 + max_d, limit)
-        log["attempts"].append({"start": iso(s0), "end": iso(end), "hours": round((end - s0).total_seconds() / 3600, 4)})
+        log["attempts"].append({"start": iso(s0), "end": iso(end), "hours": round((end - s0).total_seconds() / 3600, 4),
+                                "rule_hours": [lo_h, hi_h]})
         log["result"] = "window chosen"
         return s0, end, log
     log["result"] = "no session qualifies"
@@ -469,7 +482,8 @@ def main(argv):
     until = ts(o["--until"]) if "--until" in o else None
     tolerant = bool(o.get("--tolerant"))
     after = ts(o.get("--after", AFTER_DEFAULT))
-    lo, hi = float(o.get("--min-hours", 6)), float(o.get("--max-hours", 8))
+    lo = float(o["--min-hours"]) if "--min-hours" in o else None
+    hi = float(o["--max-hours"]) if "--max-hours" in o else None
     if rest and rest[0] in ("window", "auto"):
         start, end, log = choose_window(rest[1], after, lo, hi, tolerant, until)
         print(json.dumps(log, indent=1))
