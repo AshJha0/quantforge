@@ -513,7 +513,7 @@ string version_json() {
     w.key("implementation_version");
     w.string(QF_VERSION);
     w.key("contract_version");
-    w.string("1.17.0");  // stage K, owner decision K-QC (KR-1); was 1.17.0 (stage H, DR-H8)
+    w.string("1.17.0");  // stage K, owner decision K-QC (KR-1); was 1.16.0 (stage H, DR-H8)
     w.key("toolchain");
     #if defined(__clang__)
     w.string("Clang " __clang_version__);

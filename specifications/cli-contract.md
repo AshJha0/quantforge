@@ -1,7 +1,7 @@
 # CLI contract
 
-Version 1.15.0 (stage J curves lane, v0.9.0; the blocks below give the minor versions each stage added). `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
-From stage J wave 3 and the curves lane (rulings J-W3-1 and J-C-1, one number for both) a build reports `contract_version` `1.15.0` (stage J wave 2: `1.14.0`, ruling J-W2-1; stage J wave 1: `1.13.0`, ruling J-1; R6: `1.12.0`, ruling R6-0.1; stage I: `1.11.0`, ruling I-51), and the runner stops on any other value. Before stage I every build reported `1.0.0`; nothing in 1.1.0 to 1.15.0 breaks the wire format.
+Version 1.17.0 (stage K, owner decision K-QC, ruling KR-1; the blocks below give the minor versions each stage added). `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
+From stage K (owner decision K-QC, ruling KR-1: one number for every stage K wave) every build reports `contract_version` `1.17.0` (stage H: `1.16.0`, rulings HR-1 and DR-H8; stage J wave 3 and the curves lane: `1.15.0`, rulings J-W3-1 and J-C-1; stage J wave 2: `1.14.0`, ruling J-W2-1; stage J wave 1: `1.13.0`, ruling J-1; R6: `1.12.0`, ruling R6-0.1; stage I: `1.11.0`, ruling I-51), and the runner stops on any other value. Before stage I every build reported `1.0.0`; nothing in 1.1.0 to 1.17.0 breaks the wire format.
  Applies identically to the Java, C++, Python and Rust implementations.
 
 The idea: every implementation is a black box that reads a case and writes a result. The neutral
