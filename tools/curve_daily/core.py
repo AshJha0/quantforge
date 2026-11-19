@@ -446,8 +446,9 @@ def run(cfg: dict[str, Any], runner: Runner, ledger_text: str, now: dt.datetime,
                (r["kind"] == "DAY" and r["body"]["status"] in FINAL)}
     dated = [r["body"]["date"] for r in rows if r["kind"] in ("DAY", "GAP")]
     target = latest_due(now, cal, cfg)
-    if dated:  # every earlier date is settled (verify: MISSING), so only the last date can still be open
-        first = day(max(dated))
+    if dated:  # start at the earliest date still open (verify: MISSING keeps every older date settled)
+        open_dates = sorted(set(dated) - settled)
+        first = day(open_dates[0] if open_dates else max(dated))
         due = [d for d in [first, *cal.open_between(first, target)] if iso(d) not in settled]
     else:
         due = [target]  # the first run starts at the latest due day; nothing is back-filled
@@ -648,9 +649,12 @@ def verify(text: str, cfg: dict[str, Any] | None = None, runner: Runner | None =
         dated = sorted({r["body"]["date"] for r in rows if r["kind"] in ("DAY", "GAP")})
         if dated:
             first, last = day(dated[0]), day(dated[-1])
+            end = instant(rows[-1]["ts"])
             for d in [first, *cal.open_between(first, last)]:
-                if d != last and iso(d) not in settled:
-                    return bad(len(rows), "MISSING", f"business day {iso(d)} has no settled row")
+                if iso(d) not in dated:
+                    return bad(len(rows), "MISSING", f"business day {iso(d)} has no row")
+                if iso(d) not in settled and end > late_limit(d, cal, cfg):
+                    return bad(len(rows), "MISSING", f"business day {iso(d)} was never settled")
     counts = {s: 0 for s in (*STATUSES, "gap", "late", "within", "outside", "unavailable")}
     for r in rows:
         if r["kind"] == "DAY":
