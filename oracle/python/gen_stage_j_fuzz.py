@@ -83,7 +83,7 @@ RAGGED = [
     ("stage_f/uc4_f.json", "uc4_f-0001", ["factor_returns"]),
     ("stage_g/collexp_g.json", "collexp_g-0001", ["trades", 0, "values"]),
     ("stage_g/collexp_g.json", "collexp_g-0002", ["trades", 1, "values"]),
-    ("stage_g/simm_g.json", "simm_g-0001", ["correlations"]),
+    ("stage_g/sbim_g.json", "sbim_g-0001", ["correlations"]),
     ("stage_g/wwr_g.json", "wwr_g-0001", ["values"]),
     ("stage_i/hedgefrontier_i.json", "hedgefrontier_i-0001", ["a"]),
     ("stage_i/hedgeint_i.json", "hedgeint_i-0001", ["a"]),

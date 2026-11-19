@@ -10523,7 +10523,7 @@
   },
   {
    "case_id": "e1g_xva-0168",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      "NaN",
@@ -10605,13 +10605,13 @@
     "e1",
     "non_finite",
     "nan",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/sensitivities/0"
    ]
   },
   {
    "case_id": "e1g_xva-0169",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      "Infinity",
@@ -10693,13 +10693,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/sensitivities/0"
    ]
   },
   {
    "case_id": "e1g_xva-0170",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      "-Infinity",
@@ -10781,13 +10781,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/sensitivities/0"
    ]
   },
   {
    "case_id": "e1g_xva-0171",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      0.0,
@@ -10867,13 +10867,13 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/sensitivities/0"
    ]
   },
   {
    "case_id": "e1g_xva-0172",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      -0.0,
@@ -10959,13 +10959,13 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/sensitivities/0"
    ]
   },
   {
    "case_id": "e1g_xva-0173",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -11047,13 +11047,13 @@
     "e1",
     "non_finite",
     "nan",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/sensitivities/5"
    ]
   },
   {
    "case_id": "e1g_xva-0174",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -11135,13 +11135,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/sensitivities/5"
    ]
   },
   {
    "case_id": "e1g_xva-0175",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -11223,13 +11223,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/sensitivities/5"
    ]
   },
   {
    "case_id": "e1g_xva-0176",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -11321,19 +11321,19 @@
     "reason": "sums of products of the inputs"
    },
    "verified_by": [
-    "copied:simm_g-0004",
+    "copied:sbim_g-0004",
     "rule-F-3"
    ],
    "tags": [
     "e1",
     "negative_zero",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/sensitivities/5"
    ]
   },
   {
    "case_id": "e1g_xva-0177",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -11415,13 +11415,13 @@
     "e1",
     "non_finite",
     "nan",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/risk_weights/0"
    ]
   },
   {
    "case_id": "e1g_xva-0178",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -11503,13 +11503,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/risk_weights/0"
    ]
   },
   {
    "case_id": "e1g_xva-0179",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -11591,13 +11591,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/risk_weights/0"
    ]
   },
   {
    "case_id": "e1g_xva-0180",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -11677,13 +11677,13 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/risk_weights/0"
    ]
   },
   {
    "case_id": "e1g_xva-0181",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -11769,13 +11769,13 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/risk_weights/0"
    ]
   },
   {
    "case_id": "e1g_xva-0182",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -11857,13 +11857,13 @@
     "e1",
     "non_finite",
     "nan",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/risk_weights/5"
    ]
   },
   {
    "case_id": "e1g_xva-0183",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -11945,13 +11945,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/risk_weights/5"
    ]
   },
   {
    "case_id": "e1g_xva-0184",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -12033,13 +12033,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/risk_weights/5"
    ]
   },
   {
    "case_id": "e1g_xva-0185",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -12131,19 +12131,19 @@
     "reason": "sums of products of the inputs"
    },
    "verified_by": [
-    "copied:simm_g-0004",
+    "copied:sbim_g-0004",
     "rule-F-3"
    ],
    "tags": [
     "e1",
     "negative_zero",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/risk_weights/5"
    ]
   },
   {
    "case_id": "e1g_xva-0186",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -12225,13 +12225,13 @@
     "e1",
     "non_finite",
     "nan",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/0/0"
    ]
   },
   {
    "case_id": "e1g_xva-0187",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -12313,13 +12313,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/0/0"
    ]
   },
   {
    "case_id": "e1g_xva-0188",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -12401,13 +12401,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/0/0"
    ]
   },
   {
    "case_id": "e1g_xva-0189",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -12487,13 +12487,13 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/0/0"
    ]
   },
   {
    "case_id": "e1g_xva-0190",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -12579,13 +12579,13 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/0/0"
    ]
   },
   {
    "case_id": "e1g_xva-0191",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -12667,13 +12667,13 @@
     "e1",
     "non_finite",
     "nan",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/0/5"
    ]
   },
   {
    "case_id": "e1g_xva-0192",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -12755,13 +12755,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/0/5"
    ]
   },
   {
    "case_id": "e1g_xva-0193",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -12843,13 +12843,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/0/5"
    ]
   },
   {
    "case_id": "e1g_xva-0194",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -12929,13 +12929,13 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/0/5"
    ]
   },
   {
    "case_id": "e1g_xva-0195",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -13021,13 +13021,13 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/0/5"
    ]
   },
   {
    "case_id": "e1g_xva-0196",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -13109,13 +13109,13 @@
     "e1",
     "non_finite",
     "nan",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/5/0"
    ]
   },
   {
    "case_id": "e1g_xva-0197",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -13197,13 +13197,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/5/0"
    ]
   },
   {
    "case_id": "e1g_xva-0198",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -13285,13 +13285,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/5/0"
    ]
   },
   {
    "case_id": "e1g_xva-0199",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -13371,13 +13371,13 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/5/0"
    ]
   },
   {
    "case_id": "e1g_xva-0200",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -13463,13 +13463,13 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/5/0"
    ]
   },
   {
    "case_id": "e1g_xva-0201",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -13551,13 +13551,13 @@
     "e1",
     "non_finite",
     "nan",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/5/5"
    ]
   },
   {
    "case_id": "e1g_xva-0202",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -13639,13 +13639,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/5/5"
    ]
   },
   {
    "case_id": "e1g_xva-0203",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -13727,13 +13727,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/5/5"
    ]
   },
   {
    "case_id": "e1g_xva-0204",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -13813,13 +13813,13 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/5/5"
    ]
   },
   {
    "case_id": "e1g_xva-0205",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -13905,13 +13905,13 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/correlations/5/5"
    ]
   },
   {
    "case_id": "e1g_xva-0206",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -13993,13 +13993,13 @@
     "e1",
     "non_finite",
     "nan",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/concentration_threshold"
    ]
   },
   {
    "case_id": "e1g_xva-0207",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -14081,13 +14081,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/concentration_threshold"
    ]
   },
   {
    "case_id": "e1g_xva-0208",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -14169,13 +14169,13 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/concentration_threshold"
    ]
   },
   {
    "case_id": "e1g_xva-0209",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -14255,13 +14255,13 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/concentration_threshold"
    ]
   },
   {
    "case_id": "e1g_xva-0210",
-   "operation": "xva.simm.ir_delta",
+   "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
      1000.0,
@@ -14347,7 +14347,7 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:simm_g-0004",
+    "base:sbim_g-0004",
     "input:/concentration_threshold"
    ]
   },
