@@ -536,3 +536,25 @@ def test_cutoff_boundary_second(second: int, timing: str) -> None:
     day = next(r for r in new if r["kind"] == "DAY")
     assert day["body"]["date"] == days[0].isoformat() and day["body"]["timing"] == timing
     assert check(out)["ok"]
+
+
+# ------------------------------------------------------------------ KA-C9: an unsettled date and a later date
+
+
+@pytest.mark.xfail(strict=True, reason="KA-C9 reproduced: the writer retries an unsettled date after a later row")
+def test_unsettled_date_followed_by_a_later_date_does_not_stop_the_chain() -> None:
+    """Audit KA-C9 (2026-11-19). Day 1 fits; day 2 is not in the file on three consecutive runs; day 3 is. Every
+    run after that must still leave a ledger that verifies, and day 2 must end as a recorded gap."""
+    days = business_days(12)
+    without_day2 = [days[0], *days[2:]]
+    text, _, _ = step("", evening(days[0]), fetcher(treasury_csv(days[:1]), None))
+    text, _, _ = step(text, evening(days[1]), fetcher(treasury_csv(days[:1]), None))
+    morning = dt.datetime.combine(days[2], dt.time(14, 15), dt.UTC)
+    text, _, _ = step(text, morning, fetcher(treasury_csv(days[:1]), None))
+    for i in range(2, 12):
+        text, _, _ = step(text, evening(days[i]), fetcher(treasury_csv(without_day2[:i]), None))
+        v = check(text)
+        assert v["ok"], (days[i], v)
+    rows = rows_of(text)
+    settled = {r["body"]["date"]: r["kind"] for r in rows if r["kind"] == "GAP"}
+    assert settled.get(days[1].isoformat()) == "GAP"
