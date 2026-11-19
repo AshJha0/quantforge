@@ -1,9 +1,9 @@
 //! K-8 `CN_RANNACHER_SMOOTHED` (KR-8 as revised by KR-18): a port of java25 `BermudanK8Test` and the
 //! k8 tests of `python/tests/test_stage_k_w1.py`. The Python build's values on a small grid, the
 //! tangent ladder against its own bumps at 1e-8 relative on the same grid (acceptance 5), the
-//! smoothing of spec step 5, exact zeros, time order 2, space error smooth at second order, and
-//! acceptance 3 (201/401/801), which runs only with `QF_K8_ACCEPTANCE=1` against
-//! `oracle/K8_ACCEPTANCE_W2.json`. The shared goldens `k8_k` run in the CLI crate's golden replay.
+//! smoothing of spec step 5, exact zeros, time order 2 and space error smooth at second order.
+//! Acceptance 3 (201/401/801, `QF_K8_ACCEPTANCE=1`) is the integration test
+//! `tests/k8_acceptance.rs`. The shared goldens `k8_k` run in the CLI crate's golden replay.
 use super::*;
 use crate::json::{Json, parse};
 use crate::stage_k::richardson_check;
@@ -397,61 +397,4 @@ fn checks_run_in_the_g18_order() {
     )
     .unwrap_err();
     assert_eq!(e.code, "E_DOMAIN");
-}
-
-/// Acceptance 3: on 201/401/801, `num.richardson.check` with assumed order 2 gives OK and an
-/// observed order in [1.5, 2.5] on the price and every ladder entry not exactly zero on all three
-/// grids; the values must equal the Python record to 1e-9 of the row scale.
-#[test]
-fn acceptance_3_observed_order() {
-    if std::env::var("QF_K8_ACCEPTANCE").as_deref() != Ok("1") {
-        return;
-    }
-    let record = repo("oracle/K8_ACCEPTANCE_W2.json");
-    let py_values = record.get("values").unwrap();
-    let mut bad = Vec::new();
-    let mut worst_gap: f64 = 0.0;
-    for index in 0..3 {
-        let c = ladder_case(index);
-        let py = py_values
-            .get(&format!("aadladder_g-000{}", index + 1))
-            .unwrap();
-        let mut rows = Vec::new();
-        for (nx, spy) in [(201, 100), (401, 200), (801, 400)] {
-            let r = row(&ladder_of(&c, nx, spy));
-            let p = reals(py.get(&format!("{nx}/{spy}")).unwrap());
-            let scale = max_abs(&p);
-            for k in 0..r.len() {
-                worst_gap = worst_gap.max((r[k] - p[k]).abs() / scale);
-            }
-            rows.push(r);
-        }
-        for k in 0..rows[0].len() {
-            let vals = [rows[0][k], rows[1][k], rows[2][k]];
-            if vals.iter().all(|x| *x == 0.0) {
-                continue;
-            }
-            let rc = richardson_check(&vals, 2.0, 2.0).unwrap();
-            let ok =
-                rc.status == "OK" && rc.observed_order.is_some_and(|o| (1.5..=2.5).contains(&o));
-            if !ok {
-                bad.push(format!(
-                    "[{index}, {k}, {}, {:?}]",
-                    rc.status, rc.observed_order
-                ));
-            }
-            println!(
-                "K-8 acceptance 3 (Rust): case {index} entry {k} order {:?}",
-                rc.observed_order
-            );
-        }
-    }
-    println!(
-        "K-8 acceptance 3 (Rust): failures={bad:?} max_gap_vs_python_relative_to_row_scale={worst_gap:e}"
-    );
-    assert!(
-        worst_gap <= 1e-9,
-        "Rust differs from the Python record by {worst_gap}"
-    );
-    assert!(bad.is_empty(), "K-8 acceptance 3 fails on {bad:?}");
 }
