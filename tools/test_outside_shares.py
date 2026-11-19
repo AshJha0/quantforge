@@ -6,7 +6,8 @@
   3. a register total that no longer matches its golden is caught;
   4. a stage under 60% of its value-checked cases fails (no dated-plan fallback, owner 2026-11-12), and error
      cases leave the denominator;
-  5. a stage F case marked SCIPY.CHI2 counts as reimplementation, not as an outside check.
+  5. a stage F case marked SCIPY.CHI2 counts as reimplementation, not as an outside check;
+  6. a stage K case whose only outside record is a printed regulator figure is not counted (KR-210, audit KA-C18).
 """
 import contextlib
 import io
@@ -42,6 +43,14 @@ def main():
     S.build(p)
     check("committed tree: no problems other than the floor", not nonfloor(p))
     check("committed OUTSIDE_SHARES.md matches a fresh run", (S.ORACLE / "OUTSIDE_SHARES.md").read_text(encoding="utf-8") == S.markdown(S.build([])))
+    k = S.load_stage_k()
+    printed_only = [c for c in ("btk_k-0001", "tlk_k-0001", "saccr_k-0001")]
+    check("printed regulator figure alone is not counted (KR-210)", not any(c in k for c in printed_only))
+    S.COUNT_PRINTED = True
+    try:
+        check("--count-printed reading does see the printed cases (the switch is live)", all(c in S.load_stage_k() for c in printed_only))
+    finally:
+        S.COUNT_PRINTED = False
     real_golden, real_oracle = S.GOLDEN, S.ORACLE
     with tempfile.TemporaryDirectory() as d:
         tmp = Path(d)
