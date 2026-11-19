@@ -1,0 +1,113 @@
+{
+ "cases": {
+  "btk_k-0013": {
+   "exceptions": 7,
+   "cumulative_probability": 0.9959746612881922,
+   "zone": "AMBER",
+   "amber_from": 5,
+   "red_from": 10,
+   "multiplier": 1.83
+  },
+  "btk_k-0014": {
+   "exceptions": 9,
+   "cumulative_probability": 0.9688978933515121,
+   "zone": "AMBER",
+   "amber_from": 9,
+   "red_from": 15,
+   "multiplier": null
+  },
+  "btk_k-0015": {
+   "exceptions": 2,
+   "cumulative_probability": 0.9206267977478196,
+   "zone": "GREEN",
+   "amber_from": 3,
+   "red_from": 6,
+   "multiplier": null
+  },
+  "btk_k-0016": {
+   "exceptions": 15,
+   "cumulative_probability": 0.9521294142420528,
+   "zone": "AMBER",
+   "amber_from": 15,
+   "red_from": 24,
+   "multiplier": null
+  },
+  "btk_k-0017": {
+   "exceptions": 0,
+   "cumulative_probability": 0.99,
+   "zone": "AMBER",
+   "amber_from": 0,
+   "red_from": 1,
+   "multiplier": null
+  },
+  "btk_k-0018": {
+   "exceptions": 6,
+   "cumulative_probability": 0.9833708518007717,
+   "zone": "AMBER",
+   "amber_from": 5,
+   "red_from": 10,
+   "multiplier": null
+  },
+  "btk_k-0019": {
+   "exceptions_99": 12,
+   "exceptions_975": 30,
+   "cumulative_probability_99": 0.9999980641362446,
+   "cumulative_probability_975": 0.9999999999996113,
+   "breach_99": false,
+   "breach_975": false,
+   "eligible": true
+  },
+  "btk_k-0020": {
+   "exceptions_99": 13,
+   "exceptions_975": 0,
+   "cumulative_probability_99": 0.9999996735384523,
+   "cumulative_probability_975": 0.0017830105982346075,
+   "breach_99": true,
+   "breach_975": false,
+   "eligible": false
+  },
+  "btk_k-0021": {
+   "exceptions_99": 0,
+   "exceptions_975": 31,
+   "cumulative_probability_99": 0.08105851616218146,
+   "cumulative_probability_975": 0.9999999999999323,
+   "breach_99": false,
+   "breach_975": true,
+   "eligible": false
+  },
+  "btk_k-0022": {
+   "exceptions_99": 6,
+   "exceptions_975": 11,
+   "cumulative_probability_99": 0.9862985521447963,
+   "cumulative_probability_975": 0.9752973072254828,
+   "breach_99": false,
+   "breach_975": false,
+   "eligible": true
+  },
+  "btk_k-0023": {
+   "exceptions_99": 13,
+   "exceptions_975": 31,
+   "cumulative_probability_99": 0.9999971908387492,
+   "cumulative_probability_975": 0.9999999999902074,
+   "breach_99": true,
+   "breach_975": true,
+   "eligible": false
+  },
+  "btk_k-0024": {
+   "observations": 5,
+   "exceptions_actual": 3,
+   "exceptions_hypothetical": 3,
+   "exceptions": 3,
+   "days_actual": [
+    1,
+    2,
+    3
+   ],
+   "days_hypothetical": [
+    0,
+    2,
+    3
+   ]
+  }
+ }
+}
