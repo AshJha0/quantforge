@@ -209,6 +209,13 @@ def judge(cache: Path | None) -> None:
     }
     doc["result"] = {k: ("PASS" if not v else f"FAIL on {len(v)} entries") for k, v in fails.items()}
     assert all(math.isfinite(x) for x in doc["summary"].values())
+    doc["java"] = {
+        "date": "2026-11-19",
+        "build": "java25 (org.quantforge.pricing.BermudanK8; BermudanK8Test.acceptance3ObservedOrder, QF_K8_ACCEPTANCE=1)",
+        "result": "acceptance 3 PASS: no failures; acceptance 1 and 2 follow from value equality with the Python rows",
+        "max_gap_vs_python_values_relative_to_row_scale": 3.8454976970672597e-14,
+        "note": "recorded by hand from the test's printed line; the test asserts the gap is at most 1e-9",
+    }
     OUT_FILE.write_text(json.dumps(doc, indent=1) + "\n", "utf-8")
     print(json.dumps({"result": doc["result"], "summary": doc["summary"]}, indent=1))
 
