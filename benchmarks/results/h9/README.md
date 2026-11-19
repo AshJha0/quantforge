@@ -129,3 +129,15 @@ The GitHub-runner record (the controlled machine) comes from the manual `lowlat-
 same three harnesses. It has not been dispatched yet, because the branch is not pushed.
 
 Raw output: `cpp_S_hr21b.json`, `rust_S_hr21b.json`, `java_S_hr21b.json` (corrected HR-21); `*_hr21.json` (withdrawn batch figures); `cpp_S.json`, `rust_S.json` (before), `cpp_S_after.json`, `rust_S_after.json`, `java_S.json`.
+
+## Workload R window check (2026-11-19): not run, window shorter than 6 hours
+
+Spec amended first (owner decision 2026-11-19: R = longest unbroken recorded window of at least 6 hours, window
+2026-11-18 16:00 to 2026-11-19 02:00 UTC). Every hourly file in the window passed a full `gzip` read (python -I),
+both symbols, except `20261118T16.jsonl.gz`, which is empty (0 bytes of content; the hour is in `T16-1`, starting
+16:00:21). But the files carry gap rows (identical times in BTC/USD and ETH/USD, so recorder reconnects):
+16:13:26; 17:46:08; 18:50:14, 18:51:02; 20:07:03, 20:19:47, 20:24:36; eighteen between 21:19:28 and 21:49:16 (book
+rows missing for about 31 minutes in hour 21). The longest stretch with no gap row is 21:49:16 to 02:00:00, about
+4 h 11 min, below the 6-hour minimum, so under the amended spec **R is not run**; no R timing or correctness run was
+made. The L1 to L3 R rows stay open. No gap row from 21:49 to 02:00, so if recording stayed clean past 02:00 a
+6-hour window ending about 03:50 UTC would qualify; that needs an owner ruling (it is outside the named window).
