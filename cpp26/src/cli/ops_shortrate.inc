@@ -210,7 +210,7 @@ void sr_grid_work(const sr::Grid& g, const Vec& knots) {
 bool sr_contains(const Vec& v, double x) { return std::find(v.begin(), v.end(), x) != v.end(); }
 
 // Optional `method` (KR-8, KR-18; stage K PROPOSED): absent or G18_IMPLICIT is the pinned G-18 scheme (the default
-// stays G-18, KR-8; the R6 use restriction is lifted for CN_RANNACHER_SMOOTHED only, KR-110); CN_RANNACHER_SMOOTHED is the K-8 scheme
+// stays G-18, KR-8; the R6 use restriction stays for both methods, KR-113); CN_RANNACHER_SMOOTHED is the K-8 scheme
 // (core/bermudan_k8.cpp); any other value is E_SCHEMA, before every other check.
 bool sr_k8_method(const In& in) {
     if (!in.find("method")) return false;
