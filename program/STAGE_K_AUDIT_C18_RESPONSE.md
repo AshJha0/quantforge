@@ -80,3 +80,23 @@ README status block and headline facts (`tools/site_facts.json`), `docs/releases
 ## Part 2, Part 3, Part 4
 
 See `program/STAGE_K_BLIND_PUB.md` (packet), the KR-211 onward rulings in `specifications/stage-k-rulings-audit-c.md` (E1 gate) and the Part 4 notes below.
+
+## Part 3. KA-C20 against the gate as it stands (`fc52df3a`, KR-112)
+
+Self-tests (a) to (d) and F-2a were green at `0b5ca451`; the gate reported 336 of 368, 32 exempt, 0 problems. The three gaps the auditor lists, checked against that code:
+
+| Gap | Still open at `0b5ca451`? | Planted-fault test | Tightening on this branch |
+|---|---|---|---|
+| (1) any Real in any `E_SCHEMA` golden of an exempt operation is ignored | yes: a golden `{"n": 250, "rate": 0.25}` expecting `E_SCHEMA` passes (measured with the `origin/k-r1` copy of the gate) | `KR-211` block in `--self-test` | KR-211: the Real must sit at an integer path of the value goldens |
+| (2) `has_real` sees JSON floats only | yes | pinned as a known blind spot in `--self-test` (the planted case passes) | not closed: needs typed inputs in the name map (outside the two files this lane may touch) |
+| (3) "a non-finite token is E_SCHEMA" asserted, not pinned | yes: no golden sends a non-finite token to `.zone` or `.desk` (checked: btk_k-0025 to 0034) | `KR-212` block in `--self-test` | KR-212: an exemption that uses the allowance or states the premise needs a non-finite `E_SCHEMA` golden at an integer path |
+
+The (a) to (d) fixtures gained one golden each (the non-finite `E_SCHEMA` case for the integer operation) because KR-212 now requires it; each still tests what it tested. Self-test passes. **The gate is red on the real tree** (`python tools/check_e1_coverage.py`: 2 problems): `risk.frtb.backtest.zone` and `risk.frtb.backtest.desk`. That is a finding, not relaxed; the fix is one golden per operation in `btk_k` (generator `oracle/python/gen_stage_k_w1b.py`), run in all four builds. For information: 26 of the 32 exempt operations have no non-finite golden of any kind; KR-212 does not demand one of them because their exemption rests on "no Real input", not on the `E_SCHEMA` premise.
+
+## Part 4. KA-C23, the blind-lane records
+
+Checked each claim: right in every point but one. Fixed in the records only:
+- `STAGE_K_BLIND_W1.md`: the blind lane's model is not named in the record, in `stage_k_blind/w1_blind/notes.md`, or in any commit read (e761b3b2 is the coordinator's commit), so I cannot name it from evidence; the record now says so instead of "a different model". **Disagreement with the auditor on this one point:** the fix asked for (name the W1 model) is not possible from the files; the coordinator should add it if known. Added the standard paragraph (own statement, not logged; what a match shows and does not; not independent or human review).
+- `STAGE_K_BLIND_W1B.md`: the no-read sentence is now the deriver's own statement, with the unstripped-spec read cross-referenced; the standard paragraph added; a dated KR-210 note under the share (K-8d 7 of 16 until the PUB run).
+- `STAGE_K_BLIND_BTK.md`: stale status and the empty "Results: Not run" block removed; standard paragraph added; dated KR-210 note (K-8e 11 of 24).
+- `STAGE_K_BLIND_K8.md`, `STAGE_K_BLIND_W2.md`: stale status and "Not run" blocks removed. `STAGE_K_BLIND_K5A.md` had neither and is unchanged.

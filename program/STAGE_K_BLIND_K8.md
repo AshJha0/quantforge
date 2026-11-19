@@ -1,6 +1,6 @@
 # Stage K: blind re-derivation (DR-H2) of the seven K-8 value cases
 
-Written 2026-11-19 by the packet builder (Claude Opus 5.5, branch `k-k8-ports`). The packet builder is not the blind lane and ran no derivation. Process: `program/STAGE_H_BLIND_LANE.md` (DR-H2); pattern of `STAGE_K_BLIND_W2.md` (branch `k-w2-spec`) and `STAGE_K_BLIND_K5A.md` (branch `k-w1-fu`). Scope: k8_k-0001..0007, the value cases of `datasets/golden/stage_k/k8_k.json` (`rates.shortrate.bermudan_ladder` and `rates.shortrate.bermudan_swaption` with `method` `CN_RANNACHER_SMOOTHED`, spec `06-risk/bermudan-ladder-k8.md`). Status: **packet built, blind lane not yet run.**
+Written 2026-11-19 by the packet builder (Claude Opus 5.5, branch `k-k8-ports`). The packet builder is not the blind lane and ran no derivation. Process: `program/STAGE_H_BLIND_LANE.md` (DR-H2); pattern of `STAGE_K_BLIND_W2.md` (branch `k-w2-spec`) and `STAGE_K_BLIND_K5A.md` (branch `k-w1-fu`). Scope: k8_k-0001..0007, the value cases of `datasets/golden/stage_k/k8_k.json` (`rates.shortrate.bermudan_ladder` and `rates.shortrate.bermudan_swaption` with `method` `CN_RANNACHER_SMOOTHED`, spec `06-risk/bermudan-ladder-k8.md`).
 
 ## Plain idea
 
@@ -79,10 +79,6 @@ A MISMATCH can mean either a defect in the deriver's code or a choice the spec s
 3. Coordinator: commit and push the frozen `blind_results.json` and its hash (copy into `stage_k_blind/k8/` with `notes.md` and `blind_ref.py`) **before** running the compare. Rule any gap from `notes.md` before the compare; a field decided by such a ruling is compared but not counted.
 4. Run `python -I program/stage_h_blind_w2/k8_compare.py . <frozen blind_results.json> > stage_k_blind/k8/compare_output.txt`. One run.
 5. On MATCH: record the DR-H2 MATCH in `verified_by` of each matched case of `datasets/golden/stage_k/k8_k.json` through `oracle/python/gen_stage_k_k8.py` (that is what `load_stage_k` reads), without the words "not blind"; rerun the after-spec-edit generators; fill the results below.
-
-## Results
-
-Not run. (Date, deriver and model, manifest check, frozen hash and commit, gaps and rulings, compare run and output path, per-case table of MATCH / MISMATCH / MISSING and counted, resolution of each mismatch: to be filled by the coordinator.)
 
 ## Results (2026-11-19; first and only compare run)
 

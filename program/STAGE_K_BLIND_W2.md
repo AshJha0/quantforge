@@ -1,6 +1,6 @@
 # Stage K wave 2: blind re-derivation (DR-H2) of the 58 hand value cases
 
-Written 2026-11-19 by the packet builder (Claude Opus 5.5, branch `k-w2-spec`). The packet builder is not the blind lane and ran no derivation beyond rechecking the specs' own arithmetic. Process: `program/STAGE_H_BLIND_LANE.md` (DR-H2); record format of `STAGE_K_BLIND_W1.md` and `STAGE_K_BLIND_W1B.md` (branches `k-w1`, `k-w1b`). Scope: the 58 B candidates of `program/STAGE_K_W2_GATE.md` (K-8a 16, K-8f 15, K-8g 14, K-8i 13). Status: **packet built, blind lane not yet run.**
+Written 2026-11-19 by the packet builder (Claude Opus 5.5, branch `k-w2-spec`). The packet builder is not the blind lane and ran no derivation beyond rechecking the specs' own arithmetic. Process: `program/STAGE_H_BLIND_LANE.md` (DR-H2); record format of `STAGE_K_BLIND_W1.md` and `STAGE_K_BLIND_W1B.md` (branches `k-w1`, `k-w1b`). Scope: the 58 B candidates of `program/STAGE_K_W2_GATE.md` (K-8a 16, K-8f 15, K-8g 14, K-8i 13).
 
 ## Plain idea
 
@@ -66,10 +66,6 @@ DR-H2 allows the blind lane the cited source documents for meaning. This packet 
 3. Coordinator: commit and push the frozen `blind_results.json` and its hash (copy into `stage_k_blind/w2/` with `notes.md` and `blind_ref.py`) **before** running the compare. Rule any gap from `notes.md` that the specs left open, before the compare, as a numbered ruling; a gap-decided field is compared but not counted.
 4. Run `python -I program/stage_h_blind_w2/k2_compare.py . <frozen blind_results.json> > stage_k_blind/w2/compare_output.txt`. One run. A mismatch is investigated, never fixed by rerunning the blind lane; if the spec was wrong the spec value is corrected with the reason; if the lane was wrong its error is recorded.
 5. Fill the results section below; update the shares in `STAGE_K_W2_GATE.md` and each spec's gate line (coordinator).
-
-## Results
-
-Not run. (Date, lane and model, packet manifest check, frozen hash and commit, gaps and rulings, compare run and output path, per-item table of MATCH / MISMATCH / MISSING / counted, resolution of each mismatch: to be filled by the coordinator.)
 
 ## Results (run of 2026-11-19, the first and only compare run)
 
