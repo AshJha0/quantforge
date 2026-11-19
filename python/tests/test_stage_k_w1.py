@@ -657,6 +657,34 @@ def test_k8_space_error_is_smooth_second_order() -> None:
         assert max(abs(x - mean) for x in col) <= 0.1 * abs(mean), col
 
 
+@pytest.mark.parametrize("case", _gold("k8_k"), ids=lambda c: c["case_id"])
+def test_k8_k_rows(case: dict[str, Any]) -> None:
+    """Shared goldens of the K-8 method: values at 1e-9 of the row scale, error codes exactly."""
+    got = _cli(case["operation"], case["inputs"])
+    want = case["expected"]
+    assert got["status"] == want["status"], got
+    if want["status"] == "error":
+        assert got["error"]["code"] == want["error_code"]
+        return
+    w, g = want["outputs"], got["outputs"]
+    assert w.keys() == g.keys()
+    assert _rel(g["price"], w["price"]) <= 1e-9
+    if "d_price_d_discount_factors" in w:
+        scale = max(abs(x) for x in w["d_price_d_discount_factors"])
+        for x, y in zip(
+            g["d_price_d_discount_factors"], w["d_price_d_discount_factors"], strict=True
+        ):
+            assert abs(x - y) <= 1e-9 * scale
+        for key in ("d_price_d_mean_reversion", "d_price_d_sigma"):
+            assert _rel(g[key], w[key]) <= 1e-9
+
+
+def test_k8_k_price_and_ladder_agree() -> None:
+    rows = {c["case_id"]: c for c in _gold("k8_k")}
+    a, b = rows["k8_k-0001"]["expected"]["outputs"], rows["k8_k-0004"]["expected"]["outputs"]
+    assert a["price"] == b["price"]
+
+
 @pytest.mark.skipif(os.environ.get("QF_K8_ACCEPTANCE") != "1", reason="long run (about 4 min)")
 def test_k8_acceptance_3_observed_order() -> None:
     """bermudan-ladder-k8.md acceptance 3: on 201/401/801, `num.richardson.check` with assumed order 2

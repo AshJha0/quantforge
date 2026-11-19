@@ -97,6 +97,44 @@ class StageKCliTest {
         assertEquals(45, rows);
     }
 
+    /** The shared goldens of the K-8 method (k8_k): values at 1e-9 of the row scale, error codes exactly. */
+    @Test
+    void k8GoldenRows() throws IOException {
+        int rows = 0;
+        for (Object o : cases("stage_k/k8_k.json")) {
+            Map<?, ?> c = (Map<?, ?>) o;
+            Map<?, ?> want = (Map<?, ?>) c.get("expected");
+            Map<?, ?> got = runMap((String) c.get("operation"), c.get("inputs"));
+            String id = (String) c.get("case_id");
+            assertEquals(want.get("status"), got.get("status"), id + " " + got);
+            rows++;
+            if ("error".equals(want.get("status"))) {
+                assertEquals(want.get("error_code"), ((Map<?, ?>) got.get("error")).get("code"), id);
+                continue;
+            }
+            Map<?, ?> w = (Map<?, ?>) want.get("outputs");
+            Map<?, ?> g = (Map<?, ?>) got.get("outputs");
+            assertEquals(w.keySet(), g.keySet(), id);
+            assertTrue(rel(num(w.get("price")), num(g.get("price"))) <= 1e-9, id + ".price");
+            if (w.containsKey("d_price_d_discount_factors")) {
+                List<?> wl = (List<?>) w.get("d_price_d_discount_factors");
+                List<?> gl = (List<?>) g.get("d_price_d_discount_factors");
+                assertEquals(wl.size(), gl.size(), id);
+                double scale = 0;
+                for (Object x : wl) {
+                    scale = Math.max(scale, Math.abs(num(x)));
+                }
+                for (int i = 0; i < wl.size(); i++) {
+                    assertTrue(Math.abs(num(wl.get(i)) - num(gl.get(i))) <= 1e-9 * scale, id + "/" + i);
+                }
+                for (String key : new String[] {"d_price_d_mean_reversion", "d_price_d_sigma"}) {
+                    assertTrue(rel(num(w.get(key)), num(g.get(key))) <= 1e-9, id + "." + key);
+                }
+            }
+        }
+        assertEquals(14, rows);
+    }
+
     private static void compare(String where, Object want, Object got, double tol) {
         if (want instanceof Json.Number wn) {
             assertTrue(got instanceof Json.Number, where);

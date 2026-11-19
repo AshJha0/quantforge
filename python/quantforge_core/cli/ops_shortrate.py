@@ -109,7 +109,7 @@ def _hw_calibrate(i: Inputs) -> Any:
     return core.shortrate.hw_calibrate(times, dfs, a, strip)
 
 
-K8_METHOD = "CN_RANNACHER_SMOOTHED"  # KR-8 (stage K, PROPOSED)
+K8_METHOD = "CN_RANNACHER_SMOOTHED"  # KR-8, KR-15 (stage K, PROPOSED)
 BERMUDAN_METHODS = ("G18_IMPLICIT", K8_METHOD)
 
 
