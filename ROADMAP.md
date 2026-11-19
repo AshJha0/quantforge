@@ -80,6 +80,16 @@ Stage E followed R2; its row is in the stage status table above. Stage F (risk, 
 
 What R1 cannot change: on free public data QuantForge can show correct pricing, curve quality against published curves and honest statistics, never tradable profitability (see the README).
 
+### Stage K follow-ups: library operations the daily curve run lacks (recorded 2026-11-19)
+
+The daily curve run (K-11, `specifications/12-platform/daily-curve-run.md`, `program/STAGE_K_CURVE_DAILY_HANDOVER.md`) composes existing operations and added none. Three operations it needs are missing from the library; each would need four builds, goldens and a ruling, and a change to the job would need a new row format and ledger (KR-102). Evidence class: read (the handover and the operation list).
+
+| Follow-up | Why |
+|---|---|
+| Svensson (four-factor) fit, for example `bond.fit.svensson` or a `shape` input on `bond.fit.nelson_siegel` | Both real days tried left a fit RMSE just over 10 bp with a wave a three-factor curve cannot follow, and the one consistency check against the Fed's four-factor curve (2026-11-13) was outside its 15 bp tolerance (17.36 bp), a recorded miss. The Svensson formula exists only in `tools/validation/cb_consistency.py`, outside the library |
+| Treasury par bootstrap (sovereign par yields to a zero curve) | No operation bootstraps a zero curve from Treasury par yields; `rates.ois.bootstrap` takes swap quotes |
+| Nelson-Siegel evaluation at given times | The job reads fitted zero rates through weight-0 probe bonds, exact but indirect |
+
 ## Not in the repository yet
 
 Planned, and absent today: `infra/`, kernel-level benchmarks, API docs per package, the eight-file spec sets and validation reports per model, per-domain flow diagrams, microstructure folders in the four implementations, and data and solutions for EX-004, EX-007 and EX-010 to EX-012.

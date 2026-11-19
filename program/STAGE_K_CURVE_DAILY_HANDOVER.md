@@ -41,6 +41,8 @@ Run in this worktree on 2026-11-19 at 13:36:47 UTC (live Treasury and Fed files,
 
 and the GENESIS and DAY rows. With `--now 2026-11-13T23:45:00Z`: fit RMSE 10.25 bp (largest 15.91 bp at 20 years), and the Fed comparison RMSE 17.36 bp, largest 25.71 bp at 22 years: **`outside` the 15 bp tolerance**, which was committed (7440c936) before any real-day run. Both days are also just over the 10 bp fit flag. The first live dry run (13:36:05 UTC) used an unweighted fit and gave 31.58 bp RMSE, 70.58 bp at 1 month; inverse squared duration weights (KR-98) were added after seeing that one day, which the spec records as a change made after seeing data. Thresholds were not moved.
 
+**Recorded miss (integration, 2026-11-19).** On the one real day tried (2026-11-13) the consistency check against the Fed's fitted curve missed: RMSE 17.36 bp against the 15 bp tolerance fixed before the run. This is a consistency check, not proof. The fit weights were changed once after one real day had been seen (disclosed in the spec); the tolerance and the method are not changed. A row outside the tolerance is recorded as `outside`, never dropped. The site stub (`tools/curve_daily/site_page.py`) prints this on every page. The three missing library operations are listed in `ROADMAP.md` as stage K follow-ups.
+
 ## How to verify the real ledger later
 
 ```bash

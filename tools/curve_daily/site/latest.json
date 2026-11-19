@@ -1,0 +1,9 @@
+{
+ "counts": null,
+ "head": "",
+ "label": "fitted to public US Treasury par yields with a library Nelson-Siegel fit; not an official curve",
+ "latest": null,
+ "note": "Placeholder until the first scheduled run of .github/workflows/curve-daily.yml; replace with ledger/summary.json from branch curve-daily.",
+ "ok": false,
+ "records": 0
+}

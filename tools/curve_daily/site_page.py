@@ -7,6 +7,8 @@ The data file is the `summary.json` that run_day.py and verify_chain.py write on
 this folder is a placeholder until the first scheduled run. No existing site page calls this yet: the hook for
 tools/build_site.py or tools/build_gallery.py is `render(json.load(...))`, which returns Markdown. Every number
 printed keeps its labels: the curve label, the timing (on time or late), and "consistency check, not proof".
+Every page also states the one recorded result from before the scheduled runs (MISS_NOTE): the dry run for
+2026-11-13 was outside the 15 bp tolerance, a recorded miss of the consistency check.
 """
 import argparse
 import json
@@ -15,11 +17,17 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 DATA = HERE / "site" / "latest.json"
+# Measured 2026-11-19 on the local laptop (dry run, nothing pushed); 12-platform/daily-curve-run.md, worked example.
+MISS_NOTE = ("Recorded miss: on the one real day tried before the scheduled runs (2026-11-13, dry run of 2026-11-19), "
+             "the comparison with the Federal Reserve's fitted curve was outside the 15 bp RMSE tolerance fixed "
+             "beforehand (RMSE 17.36 bp, largest 25.71 bp at 22 years). The fit weights were changed once after one "
+             "real day had been seen; the tolerance and the method were not changed afterwards. This is a "
+             "consistency check, not proof, and a row outside the tolerance is recorded as outside, never dropped.")
 
 
 def render(s):
     out = ["## Daily curve run", "",
-           f"Label: {s.get('label', '')}.", ""]
+           f"Label: {s.get('label', '')}.", "", MISS_NOTE, ""]
     latest = s.get("latest")
     if not s.get("ok") or latest is None:
         out += ["No verified daily fit yet. The run is scheduled by `.github/workflows/curve-daily.yml`; rows live on "
