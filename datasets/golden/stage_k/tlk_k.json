@@ -1,0 +1,384 @@
+{
+ "schema_version": "1.0",
+ "suite": "tlk_k",
+ "spec": "specifications/06-risk/frtb-ima-backtest.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w1b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "tlk_k-0001",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 0,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.08105851616218146,
+     "zone": "GREEN",
+     "plus_factor": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 0: 8.11%, zone GREEN (YELLOW = Amber): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked",
+    "published"
+   ],
+   "description": "existing operation, 0 of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "tlk_k-0002",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 1,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.2857517387939528,
+     "zone": "GREEN",
+     "plus_factor": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 1: 28.58%, zone GREEN (YELLOW = Amber): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked",
+    "published"
+   ],
+   "description": "existing operation, 1 of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "tlk_k-0003",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 2,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.5431689733157259,
+     "zone": "GREEN",
+     "plus_factor": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 2: 54.32%, zone GREEN (YELLOW = Amber): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked",
+    "published"
+   ],
+   "description": "existing operation, 2 of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "tlk_k-0004",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 3,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.7581166977648832,
+     "zone": "GREEN",
+     "plus_factor": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 3: 75.81%, zone GREEN (YELLOW = Amber): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked",
+    "published"
+   ],
+   "description": "existing operation, 3 of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "tlk_k-0005",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 4,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.8921876269036253,
+     "zone": "GREEN",
+     "plus_factor": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 4: 89.22%, zone GREEN (YELLOW = Amber): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked",
+    "published"
+   ],
+   "description": "existing operation, 4 of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "tlk_k-0006",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 5,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.9588168159301517,
+     "zone": "YELLOW",
+     "plus_factor": 0.4
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 5: 95.88%, zone AMBER (YELLOW = Amber): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked",
+    "published"
+   ],
+   "description": "existing operation, 5 of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "tlk_k-0007",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 6,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.9862985521447963,
+     "zone": "YELLOW",
+     "plus_factor": 0.5
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 6: 98.63%, zone AMBER (YELLOW = Amber): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked",
+    "published"
+   ],
+   "description": "existing operation, 6 of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "tlk_k-0008",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 7,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.9959746612881922,
+     "zone": "YELLOW",
+     "plus_factor": 0.65
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 7: 99.6%, zone AMBER (YELLOW = Amber): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked",
+    "published"
+   ],
+   "description": "existing operation, 7 of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "tlk_k-0009",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 8,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.9989434675026432,
+     "zone": "YELLOW",
+     "plus_factor": 0.75
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 8: 99.89%, zone AMBER (YELLOW = Amber): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked",
+    "published"
+   ],
+   "description": "existing operation, 8 of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "tlk_k-0010",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 9,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.9997498099312595,
+     "zone": "YELLOW",
+     "plus_factor": 0.85
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 9: 99.97%, zone AMBER (YELLOW = Amber): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked",
+    "published"
+   ],
+   "description": "existing operation, 9 of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "tlk_k-0011",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 10,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.999946101370953,
+     "zone": "RED",
+     "plus_factor": 1.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 10: 99.99%, zone RED (YELLOW = Amber): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked",
+    "published"
+   ],
+   "description": "existing operation, 10 of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   }
+  }
+ ]
+}
