@@ -514,9 +514,9 @@ pub struct Incremental {
 
 /// K-4b on a production sequential bootstrap, as `curve.incremental.update`: `previous_factors`
 /// (the pillar discount factors `exp(log)`) must equal the solve of the previous quotes bit for bit
-/// (E_INPUT otherwise; a stale cache is not patched). That check is a full solve of the previous
+/// (`E_INPUT` otherwise; a stale cache is not patched). That check is a full solve of the previous
 /// quotes, which also gives the exact logs from which the pillars at and after the first changed
-/// quote are solved again. Stage F interpolations are solved globally (ruling F-21): E_INPUT.
+/// quote are solved again. Stage F interpolations are solved globally (ruling F-21): `E_INPUT`.
 pub fn solve_incremental<K: PartialEq>(
     as_of: Date,
     interpolation: Interpolation,

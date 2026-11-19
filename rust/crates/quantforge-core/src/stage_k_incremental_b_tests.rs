@@ -1,8 +1,8 @@
 //! K-4b on the stage B production bootstrap (incremental-update.md, Acceptance, third line; KR-5):
 //! on 10,000 quote moves over every sequential stage B instrument set, the incremental path
 //! equals a full rebuild to 1e-12 relative and the copied pillars are bit-identical to the cache.
-//! The sets and the move plan are those of the Python test (test_stage_k_w1.py); the random part
-//! draws from a SplitMix64 stream seeded 20261119.
+//! The sets and the move plan are those of the Python test (`test_stage_k_w1.py`); the random part
+//! draws from a `SplitMix64` stream seeded 20261119.
 
 use crate::calendar::parse_tenor;
 use crate::conventions::{Overnight, overnight};
@@ -156,7 +156,7 @@ fn sets() -> Vec<Set> {
                 .get("method")
                 .and_then(Json::as_str)
                 .unwrap_or("SEQUENTIAL");
-            let interp = i.get("interpolation").and_then(Json::as_str).unwrap();
+            let interp = i.get("interpolation").and_then(Json::as_str).unwrap_or("");
             if !op.ends_with(".bootstrap")
                 || !ok
                 || method != "SEQUENTIAL"
@@ -247,7 +247,7 @@ fn sets() -> Vec<Set> {
     out
 }
 
-/// SplitMix64: a fixed, documented stream so the random part is reproducible without a crate.
+/// `SplitMix64`: a fixed, documented stream so the random part is reproducible without a crate.
 struct Rng(u64);
 
 impl Rng {
@@ -457,7 +457,7 @@ fn incremental_errors_and_tenor_change() {
 fn clone_ois(s: &Set) -> Set {
     Set {
         id: s.id.clone(),
-        ois: s.ois.clone(),
+        ois: s.ois,
         jumps: s.jumps.clone(),
         discount: None,
         as_of: s.as_of,

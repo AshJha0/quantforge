@@ -120,9 +120,10 @@ std::vector<IncSet> load_sets() {
         for (const json::Value& c : doc.find("cases")->items) {
             const json::Value& i = *c.find("inputs");
             const std::string op = c.find("operation")->text;
-            const std::string interp = i.find("interpolation")->text;
+            const json::Value* iv = i.find("interpolation");
+            const std::string interp = iv ? iv->text : std::string();
             const json::Value* method = i.find("method");
-            if (!op.ends_with(".bootstrap") || c.find("expected")->find("status")->text != "ok" ||
+            if ((op != "rates.ois.bootstrap" && op != "rates.projection.bootstrap") || c.find("expected")->find("status")->text != "ok" ||
                 (method && method->text != "SEQUENTIAL") || (interp != "LOG_LINEAR_DF" && interp != "LINEAR_ZERO") ||
                 i.find("tension") || i.find("step_end"))
                 continue;
@@ -230,7 +231,7 @@ std::vector<IncMove> inc_plan(const std::vector<IncSet>& sets, std::size_t total
 
 }  // namespace
 
-TEST_CASE("K-4b: incremental stage B bootstrap equals a full rebuild on 10,000 moves", "[stage_k]") {
+TEST_CASE("K-4b: incremental stage B bootstrap equals a full rebuild on 10000 moves", "[stage_k]") {
     const std::vector<IncSet> sets = load_sets();
     REQUIRE(sets.size() == 25);
     const std::vector<IncMove> moves = inc_plan(sets, 10000, 20261119ULL);
