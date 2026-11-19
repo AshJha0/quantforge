@@ -126,6 +126,6 @@ Before/after in brief, query p99 (ns), single sample unless marked batch:
 | qty_at present | 120 | 197 | 49 | 99 | 130 | 54 |
 
 The GitHub-runner record (the controlled machine) comes from the manual `lowlat-book` workflow, which runs the
-same three harnesses. It has not been dispatched yet, because the branch is not pushed.
+same three harnesses. No runner record is in this file yet.
 
 Raw output: `cpp_S_hr21b.json`, `rust_S_hr21b.json`, `java_S_hr21b.json` (corrected HR-21); `*_hr21.json` (withdrawn batch figures); `cpp_S.json`, `rust_S.json` (before), `cpp_S_after.json`, `rust_S_after.json`, `java_S.json`.
