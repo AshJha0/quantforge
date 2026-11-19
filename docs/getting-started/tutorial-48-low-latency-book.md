@@ -6,7 +6,7 @@ The plain idea: a trading system's order book must apply each market-data messag
 
 You will compare the first recorded H-9 run against its targets. Budget 10 minutes. There is nothing to build: the figures are the run's recorded results.
 
-<p class="note">Available from v0.10.0 (unreleased). The low-latency books (<code>cpp26/include/quantforge/core/fast_book.hpp</code>, <code>rust/crates/quantforge-core/src/fast_book.rs</code>) and the benchmark are in the repository. The figures below are copied from <code>benchmarks/results/h9/README.md</code> (2026-11-18): <strong>a laptop under WSL, not the acceptance machine</strong>; in-process, simulated feed; no network or venue latency. The targets are from <code>specifications/09-microstructure/low-latency-targets.md</code>, fixed before any timing run (HR-23).</p>
+<p class="note">Available from v0.10.0 (unreleased). The low-latency books (<code>cpp26/include/quantforge/core/fast_book.hpp</code>, <code>rust/crates/quantforge-core/src/fast_book.rs</code>, <code>java25/src/main/java/org/quantforge/micro/FastBook.java</code>) and the benchmarks are in the repository. The figures below are copied from <code>benchmarks/results/h9/README.md</code> (2026-11-18): <strong>a laptop under WSL, not the acceptance machine</strong>; in-process, simulated feed; no network or venue latency. The targets are from <code>specifications/09-microstructure/low-latency-targets.md</code>, fixed before any timing run (HR-23).</p>
 
 Terms, defined here. **p99** is the 99th percentile: 1 % of samples were slower. **Workload S** is the synthetic stress stream: 10,000,000 messages from `core.rng` seed 20261117, 1,000,000 of warm-up and 9,000,000 timed. `qty_at` returns the depth at one price; `top(n)` copies the best `n` levels into a caller's buffer.
 
@@ -56,10 +56,13 @@ laptop, WSL, one pinned thread; in-process, simulated feed; no network or venue 
 
 ### Reading the numbers
 
+These are the **first session's** single-sample figures (the "before" columns of the results file). The script keeps them because they are the first record against the fixed targets; later sessions are below.
+
 - **Updates meet every target in both languages**, with room: a median of 39 ns (C++) and 47 ns (Rust) against 150. Figures are the median of five runs; the results file gives the min-max range, for example Rust p99 94 (88 to 117).
-- **Three query rows miss.** Rust `best_bid` and `best_ask` p99, and C++ `qty_at` for a present price. They are published as misses; the targets were not moved (HR-23).
-- **Why the misses need care.** Each query was timed singly, and one clock read costs about 15 ns (C++) or 17 ns (Rust) at p50, so a 50 ns target is close to the clock's own cost. Batch timing for queries (HR-21) was not run, so the misses include the clock read and are stated as single-sample figures.
-- **Zero allocations** in the measured region in both languages, every run (row L4), and 0 mismatches against a plain transcription of the order-book spec at 10,000 checkpoints: speed did not trade against correctness.
+- **Three query rows missed in the first session.** Rust `best_bid` and `best_ask` p99, and C++ `qty_at` for a present price. They are published as misses; the targets were not moved (HR-23).
+- **Why the misses need care.** Each query was timed singly, and one clock read costs about 15 ns (C++) or 17 ns (Rust) at p50, so a 50 ns target is close to the clock's own cost.
+- **Later sessions.** A top-of-book cache and a direct-index `qty_at` fixed Rust `best_*` but not `qty_at` present (single sample, on a machine whose clock read cost 40% more). HR-21 batch timing for queries was then added; its first harness gave "<1 ns" and is withdrawn. With the corrected batch harness as the headline, every L5 query row is met in C++, Rust and Java, on a loaded machine (median of 5 runs). Java (native Windows, unpinned, 100 ns clock ticks) meets row L3 under batch timing: update p50 125 ns against 300. All of it is in `benchmarks/results/h9/README.md`.
+- **Zero allocations** in the measured region in C++ and Rust, every run (row L4); Java shows no GC event in any timed region. 0 mismatches against a plain transcription of the order-book spec at 10,000 checkpoints: speed did not trade against correctness.
 
 ### The formal statement, checked against the spec
 
@@ -67,7 +70,7 @@ From [`09-microstructure/low-latency-book.md`](../../specifications/09-microstru
 
 - Same answer, faster: every result must equal `micro.book.rebuild` on the same stream ([Tutorial 41](tutorial-41-rebuild-a-book.md)).
 - Harness: one process, one thread pinned to one core, a monotonic clock around each `apply`, clock cost published and not subtracted, HdrHistogram-style buckets; unpaced replay, so no coordinated-omission correction is claimed.
-- Not yet measured: workload R (a full recorded day at 100 levels) and Java (row L3). Those rows stay open rather than being filled from S.
+- Not yet measured: workload R (a full recorded day at 100 levels), and any run on the GitHub runner. Those rows stay open rather than being filled from S.
 
 ## For practitioners
 

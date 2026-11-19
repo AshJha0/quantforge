@@ -4,8 +4,9 @@ One of four equal implementations; it is not a reference for the others.
 
 Stages A to G (stage G released as v0.7.0), and stage I, hedging, waves 1 to 5 (released as v0.8.0: hedge solvers; credit and
 correlation hedges; the cross-asset hedge; costs, margin and the frontier; the delta-hedge backtest
-and effectiveness; instrument selection; hedge slippage; costs in the backtest), on Python 3.15.2,
-written from the specs in `specifications/` and `specifications/cli-contract.md`.
+and effectiveness; instrument selection; hedge slippage; costs in the backtest), stage J (research tools and portfolio construction, released as v0.9.0) and
+stage H (microstructure and execution: the `exec.*`, `micro.*` and `paper.*` operations; to ship in v0.10.0),
+on Python 3.15.2, written from the specs in `specifications/` and `specifications/cli-contract.md`.
 
 Install: `uv sync`
 
