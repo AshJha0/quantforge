@@ -1,7 +1,7 @@
 # CLI contract
 
-Version 1.15.0 (stage J curves lane, v0.9.0; the blocks below give the minor versions each stage added). `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
-From stage J wave 3 and the curves lane (rulings J-W3-1 and J-C-1, one number for both) a build reports `contract_version` `1.15.0` (stage J wave 2: `1.14.0`, ruling J-W2-1; stage J wave 1: `1.13.0`, ruling J-1; R6: `1.12.0`, ruling R6-0.1; stage I: `1.11.0`, ruling I-51), and the runner stops on any other value. Before stage I every build reported `1.0.0`; nothing in 1.1.0 to 1.15.0 breaks the wire format.
+Version 1.17.0 (stage K, owner decision K-QC, ruling KR-1; the blocks below give the minor versions each stage added). `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
+From stage K (owner decision K-QC, ruling KR-1: one number for every stage K wave) every build reports `contract_version` `1.17.0` (stage H: `1.16.0`, rulings HR-1 and DR-H8; stage J wave 3 and the curves lane: `1.15.0`, rulings J-W3-1 and J-C-1; stage J wave 2: `1.14.0`, ruling J-W2-1; stage J wave 1: `1.13.0`, ruling J-1; R6: `1.12.0`, ruling R6-0.1; stage I: `1.11.0`, ruling I-51), and the runner stops on any other value. Before stage I every build reported `1.0.0`; nothing in 1.1.0 to 1.17.0 breaks the wire format.
  Applies identically to the Java, C++, Python and Rust implementations.
 
 The idea: every implementation is a black box that reads a case and writes a result. The neutral
@@ -18,7 +18,7 @@ to start it from `conformance/runner/implementations.json`.
 | `quantforge run` | Read one case JSON document from stdin to end of file. Write one result JSON document to stdout. |
 | `quantforge batch` | Read JSON Lines from stdin, one case per line. Write one result per line to stdout, in the same order, flushing after each line. |
 | `quantforge --batch` | Exactly the same as `quantforge batch` (1.6.0). Both spellings must work. |
-| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.16.0", "toolchain":...}`. |
+| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.17.0", "toolchain":...}`. |
 | `quantforge operations` | Write a JSON array of the operation names this build supports, sorted. |
 
 `batch` exists because a JVM start per case would dominate run time. `run` and `batch` must give
@@ -528,3 +528,28 @@ The hash input is the record without its `hash` key, serialised as:
 The stored line is the full record (with `hash`) in the same form, followed by `\n`. Check value: pt_h-0020 hashes to `72c85984abb1b7c4072c65dbba0567b3de51279645b0ad63cfd242137aed7e81`.
 
 **TCA record values.** `exec.tca.shortfall` runs in binary64 in this order: delay = s x filled x (arrival - decision); execution = s x (the array-order sum, from 0.0, of q x (p - arrival)); opportunity = s x (Q - filled) x (end - decision) + 0.0; total = delay + execution + opportunity + fees; total_bps = total / (Q x decision) x 1e4. Each input is the binary64 nearest its decimal; `fees` is the exact decimal sum of the order's fill fees, converted once; `filled` is the binary64 sum of the fill quantities in order. Each output is written as the shortest round-trip decimal of the binary64 (Python `repr`, Java 19+ `Double.toString`, Rust `{}`, C++ `std::to_chars` without precision), then as an HR-12 decimal string (no exponent: `1e-05` becomes `"0.00001"`, `-0.0` becomes `"0"`). These bytes enter the hash, so a last-bit difference breaks the chain: keep this operation order and no FMA contraction.
+## Stage K wave 1 operations (contract 1.17.0; rulings `stage-k-rulings-w1.md` KR-1 to KR-17, confirmed 2026-11-19 except KR-8)
+
+Contract number 1.17.0 for all stage K waves (owner decision K-QC, 2026-11-18). The stage K coordinator lane confirmed the wave-1 rulings on 2026-11-19 with all four builds carrying wave 1, so every build and the runner report 1.17.0 from that change. No new error code. Error order HR-66: `E_SCHEMA`, structural `E_INPUT` (lengths, empty lists, log order), `E_DOMAIN` (the F-2 finite rule first, then single values), value-dependent `E_INPUT` (the stale-cache check), `E_LIMIT` (the spec sizes below, checked last). Goldens `datasets/golden/stage_k/` (`oracle/python/gen_stage_k_w1.py`): `bt_k`, `inc_k`, `trig_k`, `idr_k`, `rich_k`, `e1_k` (F-2) and `e2_k` (two errors at once, HR-66 order). Implemented in all four builds (Python `quantforge_core.stage_k`, Java `org.quantforge.risk.StageK`, C++ `core/stage_k.cpp`, Rust `quantforge_core::stage_k`). `bound` of `risk.intraday.delta_gamma_bound` uses `abs(notional)` (KR-15) and is the exact-arithmetic Lagrange bound evaluated in binary64 (KR-17). Names below are fixed by the oracle lane where the spec left them open; they bind all four builds.
+
+| Operation | Spec | Inputs | Outputs |
+|---|---|---|---|
+| `core.store.bitemporal_query` | `01-core/bitemporal-store.md` | `records` (each `sequence`, `series_id`, `valid_from`, `valid_to` (instant or null, key required), `knowledge_time`, `value` (any JSON, key required), optional `deleted`; at most 1,000,000), `series_id`, `knowledge_as_of`, `valid_at` | `status` (`FOUND`, `WITHDRAWN`, `NONE`), `row` (`sequence`, `valid_from`, `valid_to`, `knowledge_time`, `value`; instants in `Z` form) or null (KR-14) |
+| `curve.bootstrap.par_annual` | `02-curves/incremental-update.md` | `quotes` (1 to 200, each > -1) | `discount_factors` |
+| `curve.incremental.update` | same | `previous_quotes`, `previous_discount_factors` (bit-equal to the bootstrap, else `E_INPUT`), `new_quotes` (equal lengths) | `discount_factors`, `first_changed_index` (Integer or null), `recomputed` (Integer) |
+| `calib.trigger.check` | `03-calibration/recalibration-triggers.md` | `changes` (2 to 100,000), `x_ref`, `x_now`, `days_since` (Real >= 1), `k` (> 0) | `fire`, `sigma`, `threshold`, `false_alarm_rate` |
+| `risk.intraday.delta_gamma_bound` | `06-risk/intraday-risk-bounds.md` | `positions` (1 to 100,000 of `{notional, maturity > 0, yield}`), `shift` | `estimate_pnl`, `bound` (per-position `M3` uses `|notional|`), `label` "latency-aware analytics on simulated data" (KR-10) |
+| `num.richardson.check` | `06-risk/bermudan-ladder-k8.md` | `values` (exactly 3), `ratio` (> 1), `assumed_order` (> 0) | `status` (`OK`, `ORDER_MISMATCH`, `NON_MONOTONE`), `observed_order` (or null), `extrapolated` (or null) |
+
+New optional input `method` on `rates.shortrate.bermudan_swaption` and `rates.shortrate.bermudan_ladder` (KR-8): absent or `G18_IMPLICIT` is the pinned G-18 scheme, unchanged; `CN_RANNACHER_SMOOTHED` is the K-8 scheme; another value `E_SCHEMA`. The default stays `G18_IMPLICIT` and the R6 use restriction stays until the K-8 acceptance passes; the Python run of acceptance 3 on 2026-11-18 fails, and the Java run on 2026-11-19 fails on the same 18 entries (`oracle/K8_ACCEPTANCE_W1.json`, key `java`), and acceptance 2 (QuantLib reference) has not been run. No `CN_RANNACHER_SMOOTHED` golden yet.
+
+### Stage K wave 1b (contract 1.17.0; K-8d SA-CCR, K-8e FRTB IMA backtesting)
+
+Rulings `stage-k-rulings-w1b.md` KR-30 to KR-47. No new error code; the contract number stays 1.17.0 (owner decision K-QC: one number for all stage K waves). Error order HR-122: `E_SCHEMA` (enum values included), `E_LIMIT`, the finite rule, structural `E_INPUT`, `E_DOMAIN`. Reals binary64, class `simple_analytic`; counts, zones, flags, `mpor_days` and the tabulated multiplier exact. Shared tables `06-risk/sa-ccr-parameters.json` and `06-risk/frtb-ima-backtest-tables.json` (one copy: Rust `include_str!`, C++ `#embed`, Java classes generated by `tools/gen_k_w1b_tables.py`). Goldens `datasets/golden/stage_k/saccr_k.json`, `btk_k.json`, `tlk_k.json` (`oracle/python/gen_stage_k_w1b.py`). Implemented in all four builds (registered at integration on `k-r1`, 2026-11-19).
+
+| Operation | Spec | Inputs | Outputs |
+|---|---|---|---|
+| `risk.saccr.ead` | `06-risk/sa-ccr.md` (K-8d) | `trades` (class, notional, market value, maturity, position, kind, treatment, start and end, hedging set, entity, subclass, option or CDO fields), optional `collateral`, `margin`, `ir_offset` | `ead`, `rc`, `pfe`, `multiplier`, `addon_aggregate`, `addon` (by class), `v`, `c`, `margined`, `mpor_days`, `ead_unmargined`, `capped`, `hedging_sets`, `trades` (per trade `id`, `supervisory_duration`, `adjusted_notional`, `maturity_factor`, `delta`, `effective_notional`, `supervisory_factor`) |
+| `risk.frtb.backtest.zone` | `06-risk/frtb-ima-backtest.md` (K-8e) | `observations` (Integer 1 to 1,000,000), `exceptions_actual`, `exceptions_hypothetical` (Integers 0 to n) | `exceptions`, `cumulative_probability`, `zone` (`GREEN`, `AMBER`, `RED`), `amber_from`, `red_from`, `multiplier` (n = 250 only, else null) |
+| `risk.frtb.backtest.desk` | same | `observations`, four Integer counts (99% and 97.5%, actual and hypothetical) | the two maximum counts, two cumulative probabilities, `breach_99`, `breach_975`, `eligible` |
+| `risk.frtb.backtest.count` | same | `var`, `actual`, `hypothetical` (equal-length arrays of Real or null) | `observations`, `exceptions_actual`, `exceptions_hypothetical`, `exceptions`, `days_actual`, `days_hypothetical` |

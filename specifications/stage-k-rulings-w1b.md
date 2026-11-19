@@ -1,0 +1,53 @@
+# Stage K rulings, wave 1b (SA-CCR K-8d, FRTB IMA backtesting K-8e)
+
+**Status: CONFIRMED 2026-11-19 by the stage K coordinator lane (branch k-r1), KR-30 to KR-47.** Each ruling was checked against its spec text and the four builds; the result is in "Confirmation" at the end. Rulings the table labels inferred stay inferred: confirmation records that the builds and goldens follow the reading, not that the reading is the only one.
+
+Written 2026-11-19 by the wave 1b lane. Not normative until the stage K coordinator confirms it. Separate file so the branches merge without conflict; another lane holds KR-1 to KR-29, so this file starts at KR-30. Covers `06-risk/sa-ccr.md` and `06-risk/frtb-ima-backtest.md`. Evidence classes: read (the source text on the page), inferred (our reading where the text is silent or ambiguous). Page numbers are those of the Basel Framework PDF generated 11/11/2026 (`institutional-quant-engine-plan/basel-framework-full.pdf`), which equal the printed "N / 1429" footer.
+
+| # | Point | Ruling | Evidence |
+|---|---|---|---|
+| KR-30 | SA-CCR acceptance rounding | Compute every figure at full precision; compare with a printed figure after rounding half away from zero to the digits printed. Reason: CRE99.20 (p.524) says intermediates are not rounded in the calculation and are rounded for presentation. Example 1 then reads 1.4 x 406.76 = 569.47, printed 569; the "1.4 x (60 + 347)" on p.528 shows rounded inputs, and neither truncation of 569.8 nor rounding of a rounded intermediate is used | read (CRE99.20, p.524; p.528) |
+| KR-31 | One printed intermediate off by rounding | CRE99.90 (p.539) prints -7,100 for the Brent forward in Example 5; it is 2 x the rounded 3,550, whereas 20,000 x 1.5 sqrt(14/250) = 7,099.30. Accepted within one unit as a source rounding; all five EADs and every other printed intermediate meet KR-30. Found by the first test run (after KR-30 was taken from CRE99.20), recorded, not hidden | read (p.539), measured |
+| KR-32 | IR maturity bucket boundaries | Buckets by the end date E (CRE52.31(3)): E < 1 bucket 1, 1 <= E <= 5 bucket 2, E > 5 bucket 3. The text says "less than one year", "between one and five years", "more than five years"; the inclusive middle bucket is our reading. The 52.32 FAQ1 Eurodollar example (E = 1.25, bucket 2) agrees | inferred; read (p.443, 445, 453) |
+| KR-33 | Commodity hedging sets and types | The hedging set is derived from the Table 2 subclass: `ELECTRICITY` and `OIL_GAS` are energy (CRE99.67 lists crude oil, natural gas, coal and electricity under energy), `METALS`, `AGRICULTURAL`, `OTHER` are their own sets. The commodity type is the caller's `entity`; any non-electricity energy (coal included) takes the `OIL_GAS` row (18%, rho 40%, vol 70%). One entity with two subclasses in a hedging set is `E_INPUT` | read (CRE52.45(5), 52.70, 52.72; CRE99.67 p.534); inferred for coal |
+| KR-34 | Basis and volatility transactions | Each is its own hedging set named by the caller's `hedging_set` label (one per pair of risk factors for basis, CRE52.46), aggregated as its asset class (IR bucket formula, FX absolute sum, single-factor formula with the subclass correlation for credit, equity and commodity), with the supervisory factor x 0.5 (basis) or x 5 (volatility). The text does not say how a credit or commodity basis set aggregates internally | read (CRE52.46, 52.47, 52.73); inferred for the internal aggregation |
+| KR-35 | MPOR | In business days: floor 10 for daily margin, else 9 + re-margining period (CRE52.50); at least 20 when the netting set has more than 5,000 trades or the caller flags illiquid collateral or hard-to-replace trades (CRE52.51(1)-(2)); the floor doubles when the caller flags the disputes condition of CRE52.51(3); MPOR = max(floor, the caller's estimate). MF = 1.5 sqrt(MPOR / 250) (CRE52.52, 52.53). Centrally cleared floors (CRE54) are out of scope | read (p.451-452) |
+| KR-36 | Multiplier edge cases | V - C >= 0 gives exactly 1 (exp >= 1, min caps at 1) and the exponential is not evaluated (it can overflow when the add-on is tiny; found by a property test). With V - C < 0 and a zero aggregate add-on the limit 0.05 is returned (PFE is 0 either way) | read (CRE52.23, p.441); inferred for the limit |
+| KR-37 | Margined cap | Margined EAD = min(margined EAD, unmargined EAD of the same trades with the same V and C), both reported, with `capped` true when the cap binds | read (CRE52.2, p.435) |
+| KR-38 | Caller-supplied quantities | Notionals are in the domestic currency; for FX the converted foreign leg (or the larger converted leg, CRE52.35), for equity and commodity price x units (CRE52.36); P is the caller's underlying price, a forward where appropriate (CRE52.40 FAQ1); the shift lambda for P/K <= 0 is an optional input applied as ln((P + lambda)/(K + lambda)) (CRE52.40 FAQ2, whose formula renders as words only in the PDF, so the shifted form is our reading of the FAQ text) | read (p.446-448); inferred for the FAQ2 form |
+| KR-39 | SA-CCR scope and error classes | Not covered: CRE52.74 to 52.77 (several margin agreements, shared margin agreements, collateral outside netting sets), haircut computation, CRE54, CRE52.37 notional rules and CRE52.42(3) digital collars (caller decomposes), CRE52.1 FAQ caps. A value outside an enum list is `E_SCHEMA`; a field required only by the trade's class, kind or treatment is `E_INPUT` (structural); order E_SCHEMA, E_LIMIT, finite rule, E_INPUT, E_DOMAIN (HR-122) | inferred |
+| KR-40 | K-8e extends or adds | New operations `risk.frtb.backtest.zone`, `.desk`, `.count`; `risk.backtest.traffic_light` unchanged. Reasons in `frtb-ima-backtest.md`: different output (absolute multiplier 1.50 to 2.00, "amber"), different inputs (greater of APL and HPL, fixed 99%), and desk eligibility has no 1996 counterpart | read (MAR32.9 p.661, MAR99.8 p.755) |
+| KR-41 | K-8e acceptance | At 250 observations, 0 to 10 exceptions: cumulative probability in percent rounded to 2 decimals equals MAR99 Table 2, zone and multiplier equal the printed ones; 10 or more is red, 2.00. Every probability within 1e-12 relative of `scipy.stats.binom.cdf`. Fixed before the goldens were generated | read (MAR99 Table 2, p.758) |
+| KR-42 | Other sample sizes | amber_from and red_from by the MAR99.17 rule for any n >= 1; the multiplier is published only for 250, so it is null for any other n. For n <= 5 the literal rule makes zero exceptions amber (0.99^n >= 0.95); kept as written | read (MAR99.17 and notes, p.758-759); inferred (null multiplier) |
+| KR-43 | Outside check of the stage F operation | Suite `tlk_k`: `risk.backtest.traffic_light` at 250 and 0.99 against MAR99 Table 2 (zone, `YELLOW` = amber, cumulative probability) and SciPy; the 1996 plus factor is reproduced as the stage F contract states and not compared with MAR99 | read |
+| KR-44 | MAR32.19 limits | Breach when the 99% count is more than 12, or the 97.5% count is more than 30. The sentence "more than 12 exceptions at the 99th percentile or 30 exceptions at the 97.5th percentile" is read with "more than" applying to both numbers; the other reading (30 itself a breach) would differ only at exactly 30. Goldens btk_k-0019 (12 and 30: eligible) and btk_k-0021 (31: breach) pin our reading | read (p.662); inferred (the reading) |
+| KR-45 | Counting exceptions | Overall count = max(actual, hypothetical) (MAR32.5(1), 32.18(1), MAR99.8). A day is an exception when the loss strictly exceeds VaR (-P&L > VaR, VaR positive for a loss, as `var-es-and-backtests.md`), or when the P&L or the VaR is missing (null) (MAR32.5(2), 32.18(2)) | read |
+| KR-46 | Limits | `observations` above 1,000,000 is `E_LIMIT`, checked first in the core (same cap and order as J-W3-17 for `risk.backtest.traffic_light`); arrays above 100,000 by the generic cap | inferred |
+| KR-47 | Desk window | The desk operation applies MAR32.19 to the counts given; the caller supplies the most recent 12 months (250 trading days, MAR32.3(3)). Other n are not rejected; the cumulative probabilities at 1% and 2.5% are information only, as MAR32 uses no probability for desks | read (p.659, 662); inferred |
+
+## Confirmation (stage K coordinator lane, 2026-11-19)
+
+Checked against `06-risk/sa-ccr.md`, `06-risk/frtb-ima-backtest.md`, the two parameter tables, the goldens `saccr_k`, `btk_k`, `tlk_k`, the Python reference and the Java, Rust and C++ ports (evidence class read; the four conformance runs on `k-r1` are the measured check).
+
+| # | Result | Note |
+|---|---|---|
+| KR-30 | Confirmed | The generator asserts the five printed EADs at the printed digits |
+| KR-31 | Confirmed | The one source rounding (CRE99.90, -7,100 printed, -7,099.30 computed) is accepted within one unit, in the test and nowhere else |
+| KR-32 | Confirmed, inferred reading kept | Middle IR bucket inclusive at 5 years in all four builds |
+| KR-33 | Confirmed | Electricity and oil and gas map to energy; two subclasses on one entity is `E_INPUT` |
+| KR-34 | Confirmed | |
+| KR-35 | Confirmed | MPOR floor 10, or 9 plus the re-margining days; 20 above 5,000 trades or illiquid; doubled for disputes; then the caller's figure if larger |
+| KR-36 | Confirmed | Multiplier exactly 1 when V - C >= 0, before any exponential, in all four builds; floor 0.05 at zero add-on |
+| KR-37 | Confirmed | EAD = min(margined, unmargined) with `capped` set, in all four builds |
+| KR-38 | Confirmed | Shift applied to both price and strike |
+| KR-39 | Confirmed | Scope limits match the spec's Limits section |
+| KR-40 | Confirmed | |
+| KR-41 | Confirmed | Multiplier table from MAR99 Table 2; 2.00 at 10 exceptions |
+| KR-42 | Confirmed | Multiplier null unless n = 250 |
+| KR-43 | Confirmed | `tlk_k` replays MAR99 Table 2 rows 0 to 10 and SciPy |
+| KR-44 | Confirmed, **inferred** reading kept | "More than" read as covering both 12 and 30. All four builds use `> 12` and `> 30`; btk_k-0019 (12 and 30) is eligible and btk_k-0021 (31) breaches. The other reading (30 itself a breach) is not excluded by the text, so the ruling stays labelled inferred |
+| KR-45 | Confirmed | Strict loss above VaR; a null P&L or VaR counts as an exception |
+| KR-46 | Confirmed | 1,000,000 cap, `E_LIMIT` first, all four builds |
+| KR-47 | Confirmed | |
+
+Integration notes (no ruling changed): `risk.frtb.backtest.desk` takes Integers only and is listed in `conformance/E1_EXEMPT.json`; `risk.frtb.backtest.zone` has no E1 golden and cannot be exempt while btk_k-0029 sends the Real 1.5 (open point for the coordinator; `06-risk/frtb-ima-backtest.md`, Goldens).

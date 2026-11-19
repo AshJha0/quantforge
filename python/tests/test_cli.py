@@ -60,7 +60,7 @@ def test_unknown_command_exits_64_with_empty_stdout() -> None:
 def test_version_and_operations() -> None:
     version = json.loads(call("version").stdout)
     assert (
-        version["contract_version"] == "1.16.0"
+        version["contract_version"] == "1.17.0"
     )  # stage H, ruling DR-H8; was 1.15.0 (J-C-1, J-W3-1)
     assert version["language"] == "python"
     names = json.loads(call("operations").stdout)

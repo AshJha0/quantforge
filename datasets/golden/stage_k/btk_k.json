@@ -1,0 +1,1393 @@
+{
+ "schema_version": "1.0",
+ "suite": "btk_k",
+ "spec": "specifications/06-risk/frtb-ima-backtest.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w1b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "btk_k-0001",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 0,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 0,
+     "cumulative_probability": 0.08105851616218146,
+     "zone": "GREEN",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": 1.5
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 0: 8.11%, GREEN, multiplier: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked",
+    "published"
+   ],
+   "description": "0 exceptions in 250 at 99% (MAR99 Table 2)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0002",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 1,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 1,
+     "cumulative_probability": 0.2857517387939528,
+     "zone": "GREEN",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": 1.5
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 1: 28.58%, GREEN, multiplier: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked",
+    "published"
+   ],
+   "description": "1 exceptions in 250 at 99% (MAR99 Table 2)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0003",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 2,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 2,
+     "cumulative_probability": 0.5431689733157259,
+     "zone": "GREEN",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": 1.5
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 2: 54.32%, GREEN, multiplier: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked",
+    "published"
+   ],
+   "description": "2 exceptions in 250 at 99% (MAR99 Table 2)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0004",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 3,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 3,
+     "cumulative_probability": 0.7581166977648832,
+     "zone": "GREEN",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": 1.5
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 3: 75.81%, GREEN, multiplier: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked",
+    "published"
+   ],
+   "description": "3 exceptions in 250 at 99% (MAR99 Table 2)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0005",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 4,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 4,
+     "cumulative_probability": 0.8921876269036253,
+     "zone": "GREEN",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": 1.5
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 4: 89.22%, GREEN, multiplier: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked",
+    "published"
+   ],
+   "description": "4 exceptions in 250 at 99% (MAR99 Table 2)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0006",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 5,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 5,
+     "cumulative_probability": 0.9588168159301517,
+     "zone": "AMBER",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": 1.7
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 5: 95.88%, AMBER, multiplier: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked",
+    "published"
+   ],
+   "description": "5 exceptions in 250 at 99% (MAR99 Table 2)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0007",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 6,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 6,
+     "cumulative_probability": 0.9862985521447963,
+     "zone": "AMBER",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": 1.76
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 6: 98.63%, AMBER, multiplier: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked",
+    "published"
+   ],
+   "description": "6 exceptions in 250 at 99% (MAR99 Table 2)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0008",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 7,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 7,
+     "cumulative_probability": 0.9959746612881922,
+     "zone": "AMBER",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": 1.83
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 7: 99.6%, AMBER, multiplier: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked",
+    "published"
+   ],
+   "description": "7 exceptions in 250 at 99% (MAR99 Table 2)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0009",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 8,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 8,
+     "cumulative_probability": 0.9989434675026432,
+     "zone": "AMBER",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": 1.88
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 8: 99.89%, AMBER, multiplier: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked",
+    "published"
+   ],
+   "description": "8 exceptions in 250 at 99% (MAR99 Table 2)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0010",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 9,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 9,
+     "cumulative_probability": 0.9997498099312595,
+     "zone": "AMBER",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": 1.92
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 9: 99.97%, AMBER, multiplier: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked",
+    "published"
+   ],
+   "description": "9 exceptions in 250 at 99% (MAR99 Table 2)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0011",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 10,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 10,
+     "cumulative_probability": 0.999946101370953,
+     "zone": "RED",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": 2.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 10: 99.99%, RED, multiplier: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked",
+    "published"
+   ],
+   "description": "10 exceptions in 250 at 99% (MAR99 Table 2)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0012",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 12,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 12,
+     "cumulative_probability": 0.9999980641362446,
+     "zone": "RED",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": 2.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 10: RED, multiplier: MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked",
+    "published"
+   ],
+   "description": "12 exceptions in 250 at 99% (MAR99 Table 2)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0013",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 3,
+    "exceptions_hypothetical": 7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 7,
+     "cumulative_probability": 0.9959746612881922,
+     "zone": "AMBER",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": 1.83
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "general rule MAR99.17: the larger of the APL and HPL counts (MAR99.8)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0014",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 500,
+    "exceptions_actual": 9,
+    "exceptions_hypothetical": 8
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 9,
+     "cumulative_probability": 0.9688978933515121,
+     "zone": "AMBER",
+     "amber_from": 9,
+     "red_from": 15,
+     "multiplier": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "general rule MAR99.17: 500 observations",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0015",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 100,
+    "exceptions_actual": 2,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 2,
+     "cumulative_probability": 0.9206267977478196,
+     "zone": "GREEN",
+     "amber_from": 3,
+     "red_from": 6,
+     "multiplier": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "general rule MAR99.17: 100 observations",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0016",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 1000,
+    "exceptions_actual": 15,
+    "exceptions_hypothetical": 15
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 15,
+     "cumulative_probability": 0.9521294142420528,
+     "zone": "AMBER",
+     "amber_from": 15,
+     "red_from": 24,
+     "multiplier": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "general rule MAR99.17: 1,000 observations",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0017",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 1,
+    "exceptions_actual": 0,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 0,
+     "cumulative_probability": 0.99,
+     "zone": "AMBER",
+     "amber_from": 0,
+     "red_from": 1,
+     "multiplier": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "general rule MAR99.17: one observation: zero exceptions is amber (KR-42)",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0018",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 260,
+    "exceptions_actual": 6,
+    "exceptions_hypothetical": 6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions": 6,
+     "cumulative_probability": 0.9833708518007717,
+     "zone": "AMBER",
+     "amber_from": 5,
+     "red_from": 10,
+     "multiplier": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "general rule MAR99.17: 260 observations: no multiplier",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0019",
+   "operation": "risk.frtb.backtest.desk",
+   "inputs": {
+    "observations": 250,
+    "exceptions_99_actual": 12,
+    "exceptions_99_hypothetical": 10,
+    "exceptions_975_actual": 30,
+    "exceptions_975_hypothetical": 28
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions_99": 12,
+     "exceptions_975": 30,
+     "cumulative_probability_99": 0.9999980641362446,
+     "cumulative_probability_975": 0.9999999999996113,
+     "breach_99": false,
+     "breach_975": false,
+     "eligible": true
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "hand: MAR32.19 limits 12 / 30 (KR-44)"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "desk 250: 99% 12, 97.5% 30",
+   "output_classes": {
+    "exceptions_99": "date_and_convention",
+    "exceptions_975": "date_and_convention",
+    "breach_99": "date_and_convention",
+    "breach_975": "date_and_convention",
+    "eligible": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0020",
+   "operation": "risk.frtb.backtest.desk",
+   "inputs": {
+    "observations": 250,
+    "exceptions_99_actual": 13,
+    "exceptions_99_hypothetical": 0,
+    "exceptions_975_actual": 0,
+    "exceptions_975_hypothetical": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions_99": 13,
+     "exceptions_975": 0,
+     "cumulative_probability_99": 0.9999996735384523,
+     "cumulative_probability_975": 0.0017830105982346075,
+     "breach_99": true,
+     "breach_975": false,
+     "eligible": false
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "hand: MAR32.19 limits 12 / 30 (KR-44)"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "desk 250: 99% 13, 97.5% 0",
+   "output_classes": {
+    "exceptions_99": "date_and_convention",
+    "exceptions_975": "date_and_convention",
+    "breach_99": "date_and_convention",
+    "breach_975": "date_and_convention",
+    "eligible": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0021",
+   "operation": "risk.frtb.backtest.desk",
+   "inputs": {
+    "observations": 250,
+    "exceptions_99_actual": 0,
+    "exceptions_99_hypothetical": 0,
+    "exceptions_975_actual": 0,
+    "exceptions_975_hypothetical": 31
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions_99": 0,
+     "exceptions_975": 31,
+     "cumulative_probability_99": 0.08105851616218146,
+     "cumulative_probability_975": 0.9999999999999323,
+     "breach_99": false,
+     "breach_975": true,
+     "eligible": false
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "hand: MAR32.19 limits 12 / 30 (KR-44)"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "desk 250: 99% 0, 97.5% 31",
+   "output_classes": {
+    "exceptions_99": "date_and_convention",
+    "exceptions_975": "date_and_convention",
+    "breach_99": "date_and_convention",
+    "breach_975": "date_and_convention",
+    "eligible": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0022",
+   "operation": "risk.frtb.backtest.desk",
+   "inputs": {
+    "observations": 250,
+    "exceptions_99_actual": 4,
+    "exceptions_99_hypothetical": 6,
+    "exceptions_975_actual": 11,
+    "exceptions_975_hypothetical": 9
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions_99": 6,
+     "exceptions_975": 11,
+     "cumulative_probability_99": 0.9862985521447963,
+     "cumulative_probability_975": 0.9752973072254828,
+     "breach_99": false,
+     "breach_975": false,
+     "eligible": true
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "hand: MAR32.19 limits 12 / 30 (KR-44)"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "desk 250: 99% 6, 97.5% 11",
+   "output_classes": {
+    "exceptions_99": "date_and_convention",
+    "exceptions_975": "date_and_convention",
+    "breach_99": "date_and_convention",
+    "breach_975": "date_and_convention",
+    "eligible": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0023",
+   "operation": "risk.frtb.backtest.desk",
+   "inputs": {
+    "observations": 300,
+    "exceptions_99_actual": 12,
+    "exceptions_99_hypothetical": 13,
+    "exceptions_975_actual": 31,
+    "exceptions_975_hypothetical": 30
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "exceptions_99": 13,
+     "exceptions_975": 31,
+     "cumulative_probability_99": 0.9999971908387492,
+     "cumulative_probability_975": 0.9999999999902074,
+     "breach_99": true,
+     "breach_975": true,
+     "eligible": false
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "hand: MAR32.19 limits 12 / 30 (KR-44)"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "outside_checked"
+   ],
+   "description": "desk 300: 99% 13, 97.5% 31",
+   "output_classes": {
+    "exceptions_99": "date_and_convention",
+    "exceptions_975": "date_and_convention",
+    "breach_99": "date_and_convention",
+    "breach_975": "date_and_convention",
+    "eligible": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "btk_k-0024",
+   "operation": "risk.frtb.backtest.count",
+   "inputs": {
+    "var": [
+     1.0,
+     1.0,
+     null,
+     2.0,
+     0.5
+    ],
+    "actual": [
+     -1.0,
+     -1.25,
+     0.3,
+     null,
+     0.0
+    ],
+    "hypothetical": [
+     -1.5,
+     0.0,
+     0.1,
+     -2.5,
+     -0.5
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "observations": 5,
+     "exceptions_actual": 3,
+     "exceptions_hypothetical": 3,
+     "exceptions": 3,
+     "days_actual": [
+      1,
+      2,
+      3
+     ],
+     "days_hypothetical": [
+      0,
+      2,
+      3
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "hand"
+   ],
+   "description": "hand: strict exceedance, a loss equal to VaR is not an exception, a missing VaR or P&L is (MAR32.5(2))"
+  },
+  {
+   "case_id": "btk_k-0025",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 0,
+    "exceptions_actual": 0,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: no observations"
+  },
+  {
+   "case_id": "btk_k-0026",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 10,
+    "exceptions_actual": 11,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: more exceptions than observations"
+  },
+  {
+   "case_id": "btk_k-0027",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 10,
+    "exceptions_actual": 0,
+    "exceptions_hypothetical": -1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: negative count"
+  },
+  {
+   "case_id": "btk_k-0028",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 1000001,
+    "exceptions_actual": 0,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: observations above 1,000,000"
+  },
+  {
+   "case_id": "btk_k-0029",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 1.5,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: count not an integer"
+  },
+  {
+   "case_id": "btk_k-0030",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: hypothetical count missing"
+  },
+  {
+   "case_id": "btk_k-0031",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 1000001,
+    "exceptions_actual": -1,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: two errors: limit and negative count"
+  },
+  {
+   "case_id": "btk_k-0032",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": "250",
+    "exceptions_actual": -1,
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: two errors: observations a string and negative count"
+  },
+  {
+   "case_id": "btk_k-0033",
+   "operation": "risk.frtb.backtest.desk",
+   "inputs": {
+    "observations": 250,
+    "exceptions_99_actual": 0,
+    "exceptions_99_hypothetical": 0,
+    "exceptions_975_actual": 251,
+    "exceptions_975_hypothetical": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: 97.5% count above observations"
+  },
+  {
+   "case_id": "btk_k-0034",
+   "operation": "risk.frtb.backtest.desk",
+   "inputs": {
+    "observations": 250,
+    "exceptions_99_actual": -1,
+    "exceptions_99_hypothetical": 0,
+    "exceptions_975_actual": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: two errors: a count missing and a negative count"
+  },
+  {
+   "case_id": "btk_k-0035",
+   "operation": "risk.frtb.backtest.count",
+   "inputs": {
+    "var": [],
+    "actual": [],
+    "hypothetical": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: empty series"
+  },
+  {
+   "case_id": "btk_k-0036",
+   "operation": "risk.frtb.backtest.count",
+   "inputs": {
+    "var": [
+     1.0,
+     1.0
+    ],
+    "actual": [
+     0.0
+    ],
+    "hypothetical": [
+     0.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: series of different lengths"
+  },
+  {
+   "case_id": "btk_k-0037",
+   "operation": "risk.frtb.backtest.count",
+   "inputs": {
+    "var": [
+     1.0
+    ],
+    "actual": [
+     "x"
+    ],
+    "hypothetical": [
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: a P&L that is not a number"
+  },
+  {
+   "case_id": "btk_k-0038",
+   "operation": "risk.frtb.backtest.count",
+   "inputs": {
+    "var": [
+     1.0,
+     1.0
+    ],
+    "actual": [
+     0.0
+    ],
+    "hypothetical": [
+     "x",
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: two errors: lengths differ and a string"
+  },
+  {
+   "case_id": "btk_k-0039",
+   "operation": "risk.frtb.backtest.count",
+   "inputs": {
+    "var": [
+     1.0,
+     "NaN"
+    ],
+    "actual": [
+     0.0,
+     0.0
+    ],
+    "hypothetical": [
+     0.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: E1: non-finite VaR (NaN)"
+  },
+  {
+   "case_id": "btk_k-0040",
+   "operation": "risk.frtb.backtest.count",
+   "inputs": {
+    "var": [
+     1.0,
+     1.0
+    ],
+    "actual": [
+     "Infinity"
+    ],
+    "hypothetical": [
+     0.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: E1, two errors: actual P&L Infinity and series of different lengths (the finite rule first)"
+  }
+ ]
+}

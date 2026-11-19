@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.function.Function;
 import org.quantforge.cli.Operations.Out;
 import org.quantforge.core.QfError;
+import org.quantforge.pricing.BermudanK8;
 import org.quantforge.pricing.BermudanLadder;
 import org.quantforge.pricing.Lmm;
 import org.quantforge.pricing.ShortRate;
@@ -357,6 +358,7 @@ final class OpsRateModels {
         double notional = in.real("notional");
         double[] ex = in.reals("exercise_times");
         RawGrid rg = grid(in, knots(0.0, ex));
+        boolean k8 = k8Method(in);
         in.limit(pay.length > MAX, "payment_times");
         in.limit(ex.length > MAX, "exercise_times");
         in.gate();
@@ -370,6 +372,16 @@ final class OpsRateModels {
             throw input("exercise_times");
         }
         ShortRateFd.Grid g = checkGrid(rg);
+        if (k8) {
+            if (!ladder) {
+                return Operations.out("price",
+                        BermudanK8.price(raw.times(), raw.dfs(), p.a(), p.sigma(), pay, rate, payer, notional, ex, g));
+            }
+            BermudanLadder.Ladder l = BermudanK8.ladder(raw.times(), raw.dfs(), p.a(), p.sigma(), pay, rate, payer,
+                    notional, ex, g);
+            return Operations.out("price", l.price(), "d_price_d_discount_factors", l.dDiscountFactors(),
+                    "d_price_d_mean_reversion", l.dMeanReversion(), "d_price_d_sigma", l.dSigma());
+        }
         if (!ladder) {
             return Operations.out("price", ShortRateFd.bermudan(p, pay, rate, payer, notional, ex, g));
         }
@@ -377,6 +389,25 @@ final class OpsRateModels {
                 payer, notional, ex, g);
         return Operations.out("price", l.price(), "d_price_d_discount_factors", l.dDiscountFactors(),
                 "d_price_d_mean_reversion", l.dMeanReversion(), "d_price_d_sigma", l.dSigma());
+    }
+
+    /**
+     * Optional {@code method} (KR-8, stage K PROPOSED): absent or {@code G18_IMPLICIT} is the pinned G-18 scheme (the
+     * default stays G-18 until the K-8 acceptance passes); {@code CN_RANNACHER_SMOOTHED} is the K-8 scheme; any other
+     * value is E_SCHEMA.
+     */
+    private static boolean k8Method(In in) {
+        if (!in.has("method")) {
+            return false;
+        }
+        String m = in.string("method");
+        if (m.equals(BermudanK8.METHOD)) {
+            return true;
+        }
+        if (!m.equals("G18_IMPLICIT")) {
+            throw new QfError("E_SCHEMA", "method: not a listed value", "method");
+        }
+        return false;
     }
 
     /** The output key of a PFE quantile (ruling R6-5.1): {@code deflated_pfe_} and the percentage, as {@code deflated_pfe_95}. */

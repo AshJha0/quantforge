@@ -13,8 +13,11 @@ mutants/
 mutants.out*/
 .mutmut-cache
 site/
+# the daily curve run site stub keeps a committed placeholder (tools/curve_daily/site_page.py, KR-106)
+!tools/curve_daily/site/
 reports/workflows/
 python/.coverage
+python/coverage.json
 *.egg-info
 .hypothesis/
 .benchmarks/

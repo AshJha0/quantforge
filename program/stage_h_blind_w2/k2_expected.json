@@ -1,0 +1,1204 @@
+{
+ "what": "Stage K wave 2 blind lane (DR-H2): expected outputs of the 58 hand value cases, hidden side. Never put this file in the packet.",
+ "source": "specifications/06-risk/{frtb-drc-rrao,frtb-ima,cva-capital,leverage-large-exposures}.md Golden cases tables, Arithmetic columns and Worked examples, branch k-w2-spec at 4d2512b2 (PROPOSED specs); each value as printed there",
+ "src_codes": {
+  "spec": "printed in the spec (Expected or Arithmetic column, or the worked example of that case)",
+  "builder": "not printed; a direct consequence of printed values (est_k-0001: ratio 1.25 >= 1, so not floored), added by the packet builder"
+ },
+ "recheck": "every field recomputed from the k2_cases.py inputs by k2_recheck.py (own second computation; not an outside check)",
+ "cases": {
+  "drc_k-0001": {
+   "item": "K-8a",
+   "operation": "risk.frtb.drc_nonsec",
+   "fields": [
+    {
+     "path": "positions[p1].gross_jtd",
+     "value": 75,
+     "src": "spec"
+    },
+    {
+     "path": "buckets[CORPORATE].hbr",
+     "value": 1,
+     "src": "spec"
+    },
+    {
+     "path": "drc",
+     "value": 4.5,
+     "src": "spec"
+    }
+   ]
+  },
+  "drc_k-0002": {
+   "item": "K-8a",
+   "operation": "risk.frtb.drc_nonsec",
+   "fields": [
+    {
+     "path": "positions[p1].gross_jtd",
+     "value": 75,
+     "src": "spec"
+    },
+    {
+     "path": "positions[p1].weight",
+     "value": 0.5,
+     "src": "spec"
+    },
+    {
+     "path": "positions[p1].scaled_jtd",
+     "value": 37.5,
+     "src": "spec"
+    },
+    {
+     "path": "drc",
+     "value": 2.25,
+     "src": "spec"
+    }
+   ]
+  },
+  "drc_k-0004": {
+   "item": "K-8a",
+   "operation": "risk.frtb.drc_nonsec",
+   "fields": [
+    {
+     "path": "positions[p2].scaled_jtd",
+     "value": -18.75,
+     "src": "spec"
+    },
+    {
+     "path": "obligors[X].net_long",
+     "value": 56.25,
+     "src": "spec"
+    },
+    {
+     "path": "drc",
+     "value": 3.375,
+     "src": "spec"
+    }
+   ]
+  },
+  "drc_k-0005": {
+   "item": "K-8a",
+   "operation": "risk.frtb.drc_nonsec",
+   "fields": [
+    {
+     "path": "positions[p1].gross_jtd",
+     "value": 55,
+     "src": "spec"
+    },
+    {
+     "path": "positions[p2].gross_jtd",
+     "value": -55,
+     "src": "spec"
+    },
+    {
+     "path": "buckets[CORPORATE].hbr",
+     "value": 0.5,
+     "src": "spec"
+    },
+    {
+     "path": "buckets[CORPORATE].wtd_long",
+     "value": 1.65,
+     "src": "spec"
+    },
+    {
+     "path": "buckets[CORPORATE].wtd_short",
+     "value": 8.25,
+     "src": "spec"
+    },
+    {
+     "path": "drc",
+     "value": 0,
+     "src": "spec"
+    }
+   ]
+  },
+  "drc_k-0006": {
+   "item": "K-8a",
+   "operation": "risk.frtb.drc_nonsec",
+   "fields": [
+    {
+     "path": "drc",
+     "value": 1.5125,
+     "src": "spec"
+    }
+   ]
+  },
+  "drc_k-0007": {
+   "item": "K-8a",
+   "operation": "risk.frtb.drc_nonsec",
+   "fields": [
+    {
+     "path": "positions[stock].gross_jtd",
+     "value": 50,
+     "src": "spec"
+    },
+    {
+     "path": "positions[bond].gross_jtd",
+     "value": -30,
+     "src": "spec"
+    },
+    {
+     "path": "obligors[Z].net_long",
+     "value": 50,
+     "src": "spec"
+    },
+    {
+     "path": "obligors[Z].net_short",
+     "value": -30,
+     "src": "spec"
+    },
+    {
+     "path": "buckets[CORPORATE].hbr",
+     "value": 0.625,
+     "src": "spec"
+    },
+    {
+     "path": "drc",
+     "value": 4.6875,
+     "src": "spec"
+    }
+   ]
+  },
+  "drc_k-0008": {
+   "item": "K-8a",
+   "operation": "risk.frtb.drc_nonsec",
+   "fields": [
+    {
+     "path": "obligors[Z].net_short",
+     "value": -20,
+     "src": "spec"
+    },
+    {
+     "path": "buckets[CORPORATE].hbr",
+     "value": 0,
+     "src": "spec"
+    },
+    {
+     "path": "drc",
+     "value": 0,
+     "src": "spec"
+    }
+   ]
+  },
+  "drc_k-0009": {
+   "item": "K-8a",
+   "operation": "risk.frtb.drc_nonsec",
+   "fields": [
+    {
+     "path": "buckets[CORPORATE].drc",
+     "value": 2.25,
+     "src": "spec"
+    },
+    {
+     "path": "buckets[SOVEREIGN].drc",
+     "value": 3,
+     "src": "spec"
+    },
+    {
+     "path": "drc",
+     "value": 5.25,
+     "src": "spec"
+    }
+   ]
+  },
+  "drc_k-0010": {
+   "item": "K-8a",
+   "operation": "risk.frtb.drc_nonsec",
+   "fields": [
+    {
+     "path": "positions[sold_put].gross_jtd",
+     "value": 67,
+     "src": "spec"
+    },
+    {
+     "path": "drc",
+     "value": 4.02,
+     "src": "spec"
+    }
+   ]
+  },
+  "drc_k-0011": {
+   "item": "K-8a",
+   "operation": "risk.frtb.drc_nonsec",
+   "fields": [
+    {
+     "path": "drc",
+     "value": 16.25,
+     "src": "spec"
+    }
+   ]
+  },
+  "ctp_k-0002": {
+   "item": "K-8a",
+   "operation": "risk.frtb.drc_ctp",
+   "fields": [
+    {
+     "path": "hbr_ctp",
+     "value": 0.5,
+     "src": "spec"
+    },
+    {
+     "path": "buckets[A].drc",
+     "value": 100,
+     "src": "spec"
+    },
+    {
+     "path": "buckets[B].drc",
+     "value": -50,
+     "src": "spec"
+    },
+    {
+     "path": "drc",
+     "value": 75,
+     "src": "spec"
+    }
+   ]
+  },
+  "ctp_k-0003": {
+   "item": "K-8a",
+   "operation": "risk.frtb.drc_ctp",
+   "fields": [
+    {
+     "path": "drc",
+     "value": 0,
+     "src": "spec"
+    }
+   ]
+  },
+  "sec_k-0001": {
+   "item": "K-8a",
+   "operation": "risk.frtb.drc_sec_nonctp",
+   "fields": [
+    {
+     "path": "buckets[RMBS-EU].hbr",
+     "value": 0.714285714285714,
+     "src": "spec"
+    },
+    {
+     "path": "drc",
+     "value": 7.142857142857142,
+     "src": "spec"
+    }
+   ]
+  },
+  "rrao_k-0001": {
+   "item": "K-8a",
+   "operation": "risk.frtb.rrao",
+   "fields": [
+    {
+     "path": "rrao",
+     "value": 12000,
+     "src": "spec"
+    }
+   ]
+  },
+  "rrao_k-0002": {
+   "item": "K-8a",
+   "operation": "risk.frtb.rrao",
+   "fields": [
+    {
+     "path": "rrao",
+     "value": 10000,
+     "src": "spec"
+    }
+   ]
+  },
+  "rrao_k-0003": {
+   "item": "K-8a",
+   "operation": "risk.frtb.rrao",
+   "fields": [
+    {
+     "path": "rrao",
+     "value": 0,
+     "src": "spec"
+    }
+   ]
+  },
+  "es_k-0003": {
+   "item": "K-8f",
+   "operation": "risk.frtb.ima.es_lh",
+   "fields": [
+    {
+     "path": "es",
+     "value": 17.08800749063506,
+     "src": "spec"
+    }
+   ]
+  },
+  "es_k-0004": {
+   "item": "K-8f",
+   "operation": "risk.frtb.ima.es_lh",
+   "fields": [
+    {
+     "path": "es",
+     "value": 10,
+     "src": "spec"
+    }
+   ]
+  },
+  "es_k-0005": {
+   "item": "K-8f",
+   "operation": "risk.frtb.ima.es_lh",
+   "fields": [
+    {
+     "path": "es_by_horizon[0]",
+     "value": 493.52,
+     "src": "spec"
+    },
+    {
+     "path": "es_by_horizon[1]",
+     "value": 0,
+     "src": "spec"
+    },
+    {
+     "path": "es_by_horizon[2]",
+     "value": 0,
+     "src": "spec"
+    },
+    {
+     "path": "es_by_horizon[3]",
+     "value": 0,
+     "src": "spec"
+    },
+    {
+     "path": "es_by_horizon[4]",
+     "value": 0,
+     "src": "spec"
+    },
+    {
+     "path": "es",
+     "value": 493.52,
+     "src": "spec"
+    }
+   ]
+  },
+  "est_k-0001": {
+   "item": "K-8f",
+   "operation": "risk.frtb.ima.es_stressed",
+   "fields": [
+    {
+     "path": "ratio",
+     "value": 1.25,
+     "src": "spec"
+    },
+    {
+     "path": "ratio_floored",
+     "value": false,
+     "src": "builder"
+    },
+    {
+     "path": "es",
+     "value": 15,
+     "src": "spec"
+    }
+   ]
+  },
+  "est_k-0002": {
+   "item": "K-8f",
+   "operation": "risk.frtb.ima.es_stressed",
+   "fields": [
+    {
+     "path": "ratio",
+     "value": 0.875,
+     "src": "spec"
+    },
+    {
+     "path": "ratio_floored",
+     "value": true,
+     "src": "spec"
+    },
+    {
+     "path": "es",
+     "value": 12,
+     "src": "spec"
+    }
+   ]
+  },
+  "imcc_k-0001": {
+   "item": "K-8f",
+   "operation": "risk.frtb.ima.imcc",
+   "fields": [
+    {
+     "path": "imcc_c",
+     "value": 15,
+     "src": "spec"
+    },
+    {
+     "path": "classes[IR]",
+     "value": 7.5,
+     "src": "spec"
+    },
+    {
+     "path": "classes[EQ]",
+     "value": 5,
+     "src": "spec"
+    },
+    {
+     "path": "imcc",
+     "value": 13.75,
+     "src": "spec"
+    }
+   ]
+  },
+  "ses_k-0001": {
+   "item": "K-8f",
+   "operation": "risk.frtb.ima.ses",
+   "fields": [
+    {
+     "path": "ses",
+     "value": 21.84187454245971,
+     "src": "spec"
+    }
+   ]
+  },
+  "ses_k-0002": {
+   "item": "K-8f",
+   "operation": "risk.frtb.ima.ses",
+   "fields": [
+    {
+     "path": "ses",
+     "value": 10,
+     "src": "spec"
+    }
+   ]
+  },
+  "cap_k-0001": {
+   "item": "K-8f",
+   "operation": "risk.frtb.ima.capital",
+   "fields": [
+    {
+     "path": "m_c",
+     "value": 1.76,
+     "src": "spec"
+    },
+    {
+     "path": "c_a",
+     "value": 173.4,
+     "src": "spec"
+    }
+   ]
+  },
+  "cap_k-0002": {
+   "item": "K-8f",
+   "operation": "risk.frtb.ima.capital",
+   "fields": [
+    {
+     "path": "m_c",
+     "value": 1.76,
+     "src": "spec"
+    },
+    {
+     "path": "c_a",
+     "value": 173.4,
+     "src": "spec"
+    },
+    {
+     "path": "ima_ga",
+     "value": 203.4,
+     "src": "spec"
+    },
+    {
+     "path": "sa_ga",
+     "value": 250,
+     "src": "spec"
+    },
+    {
+     "path": "k",
+     "value": 0.2,
+     "src": "spec"
+    },
+    {
+     "path": "surcharge",
+     "value": 9.32,
+     "src": "spec"
+    },
+    {
+     "path": "acr_total",
+     "value": 252.72,
+     "src": "spec"
+    }
+   ]
+  },
+  "cap_k-0003": {
+   "item": "K-8f",
+   "operation": "risk.frtb.ima.capital",
+   "fields": [
+    {
+     "path": "ima_ga",
+     "value": 203.4,
+     "src": "spec"
+    },
+    {
+     "path": "k",
+     "value": 0,
+     "src": "spec"
+    },
+    {
+     "path": "surcharge",
+     "value": 0,
+     "src": "spec"
+    },
+    {
+     "path": "acr_total",
+     "value": 243.4,
+     "src": "spec"
+    }
+   ]
+  },
+  "rfet_k-0001": {
+   "item": "K-8f",
+   "operation": "risk.frtb.rfet",
+   "fields": [
+    {
+     "path": "distinct_days",
+     "value": 100,
+     "src": "spec"
+    },
+    {
+     "path": "crit1",
+     "value": false,
+     "src": "spec"
+    },
+    {
+     "path": "first_failing_window_start",
+     "value": "2025-07-01",
+     "src": "spec"
+    },
+    {
+     "path": "first_failing_window_count",
+     "value": 0,
+     "src": "spec"
+    },
+    {
+     "path": "crit2",
+     "value": true,
+     "src": "spec"
+    },
+    {
+     "path": "pass",
+     "value": true,
+     "src": "spec"
+    }
+   ]
+  },
+  "rfet_k-0002": {
+   "item": "K-8f",
+   "operation": "risk.frtb.rfet",
+   "fields": [
+    {
+     "path": "distinct_days",
+     "value": 24,
+     "src": "spec"
+    },
+    {
+     "path": "min_window_count",
+     "value": 5,
+     "src": "spec"
+    },
+    {
+     "path": "crit1",
+     "value": true,
+     "src": "spec"
+    },
+    {
+     "path": "crit2",
+     "value": false,
+     "src": "spec"
+    },
+    {
+     "path": "pass",
+     "value": true,
+     "src": "spec"
+    }
+   ]
+  },
+  "rfet_k-0003": {
+   "item": "K-8f",
+   "operation": "risk.frtb.rfet",
+   "fields": [
+    {
+     "path": "distinct_days",
+     "value": 30,
+     "src": "spec"
+    },
+    {
+     "path": "crit1",
+     "value": false,
+     "src": "spec"
+    },
+    {
+     "path": "first_failing_window_start",
+     "value": "2025-07-28",
+     "src": "spec"
+    },
+    {
+     "path": "first_failing_window_count",
+     "value": 3,
+     "src": "spec"
+    },
+    {
+     "path": "crit2",
+     "value": false,
+     "src": "spec"
+    },
+    {
+     "path": "pass",
+     "value": false,
+     "src": "spec"
+    }
+   ]
+  },
+  "rfet_k-0004": {
+   "item": "K-8f",
+   "operation": "risk.frtb.rfet",
+   "fields": [
+    {
+     "path": "distinct_days",
+     "value": 23,
+     "src": "spec"
+    },
+    {
+     "path": "crit1",
+     "value": false,
+     "src": "spec"
+    },
+    {
+     "path": "min_window_count",
+     "value": 4,
+     "src": "spec"
+    },
+    {
+     "path": "crit2",
+     "value": false,
+     "src": "spec"
+    },
+    {
+     "path": "pass",
+     "value": false,
+     "src": "spec"
+    }
+   ]
+  },
+  "cva_k-0001": {
+   "item": "K-8g",
+   "operation": "risk.cva.ba",
+   "fields": [
+    {
+     "path": "counterparties[C1].scva",
+     "value": 157999.44066328226,
+     "src": "spec"
+    },
+    {
+     "path": "k_reduced",
+     "value": 157999.44066328226,
+     "src": "spec"
+    },
+    {
+     "path": "capital",
+     "value": 102699.63643113348,
+     "src": "spec"
+    }
+   ]
+  },
+  "cva_k-0002": {
+   "item": "K-8g",
+   "operation": "risk.cva.ba",
+   "fields": [
+    {
+     "path": "counterparties[C2].scva",
+     "value": 231806.8480926789,
+     "src": "spec"
+    },
+    {
+     "path": "k_reduced",
+     "value": 311465.7513160206,
+     "src": "spec"
+    },
+    {
+     "path": "capital",
+     "value": 202452.7383554134,
+     "src": "spec"
+    }
+   ]
+  },
+  "cva_k-0003": {
+   "item": "K-8g",
+   "operation": "risk.cva.ba",
+   "fields": [
+    {
+     "path": "counterparties[C1].scva",
+     "value": 53571.42857142857,
+     "src": "spec"
+    },
+    {
+     "path": "capital",
+     "value": 34821.42857142857,
+     "src": "spec"
+    }
+   ]
+  },
+  "cva_k-0004": {
+   "item": "K-8g",
+   "operation": "risk.cva.ba",
+   "fields": [
+    {
+     "path": "counterparties[C1].snh",
+     "value": 110599.60846429756,
+     "src": "spec"
+    },
+    {
+     "path": "counterparties[C1].hma",
+     "value": 0,
+     "src": "spec"
+    },
+    {
+     "path": "k_hedged",
+     "value": 47399.8321989847,
+     "src": "spec"
+    },
+    {
+     "path": "k_full",
+     "value": 75049.73431505909,
+     "src": "spec"
+    },
+    {
+     "path": "capital",
+     "value": 48782.32730478841,
+     "src": "spec"
+    }
+   ]
+  },
+  "cva_k-0005": {
+   "item": "K-8g",
+   "operation": "risk.cva.ba",
+   "fields": [
+    {
+     "path": "ih",
+     "value": 154839.45185001657,
+     "src": "spec"
+    },
+    {
+     "path": "k_hedged",
+     "value": 246229.11690822538,
+     "src": "spec"
+    },
+    {
+     "path": "k_full",
+     "value": 262538.2755101742,
+     "src": "spec"
+    },
+    {
+     "path": "capital",
+     "value": 170649.87908161324,
+     "src": "spec"
+    }
+   ]
+  },
+  "cva_k-0006": {
+   "item": "K-8g",
+   "operation": "risk.cva.ba",
+   "fields": [
+    {
+     "path": "counterparties[C1].snh",
+     "value": 55299.80423214878,
+     "src": "spec"
+    },
+    {
+     "path": "counterparties[C1].hma",
+     "value": 9174205044.341942,
+     "src": "spec"
+    },
+    {
+     "path": "k_hedged",
+     "value": 140432.9746442371,
+     "src": "spec"
+    },
+    {
+     "path": "k_full",
+     "value": 144824.5911489984,
+     "src": "spec"
+    },
+    {
+     "path": "capital",
+     "value": 94135.98424684897,
+     "src": "spec"
+    }
+   ]
+  },
+  "sacva_k-0001": {
+   "item": "K-8g",
+   "operation": "risk.cva.sa",
+   "fields": [
+    {
+     "path": "classes[IR.DELTA].buckets[USD].k_b",
+     "value": 10280.408552192855,
+     "src": "spec"
+    },
+    {
+     "path": "classes[IR.DELTA].buckets[USD].s_b",
+     "value": -3700,
+     "src": "spec"
+    },
+    {
+     "path": "classes[IR.DELTA].k",
+     "value": 10280.408552192855,
+     "src": "spec"
+    }
+   ]
+  },
+  "sacva_k-0002": {
+   "item": "K-8g",
+   "operation": "risk.cva.sa",
+   "fields": [
+    {
+     "path": "classes[IR.DELTA].buckets[USD].k_b",
+     "value": 8887.704990603592,
+     "src": "spec"
+    }
+   ]
+  },
+  "sacva_k-0003": {
+   "item": "K-8g",
+   "operation": "risk.cva.sa",
+   "fields": [
+    {
+     "path": "classes[IR.DELTA].k",
+     "value": 22724.14574852045,
+     "src": "spec"
+    }
+   ]
+  },
+  "sacva_k-0004": {
+   "item": "K-8g",
+   "operation": "risk.cva.sa",
+   "fields": [
+    {
+     "path": "classes[IR.DELTA].buckets[USD].k_b",
+     "value": 15129.335742193045,
+     "src": "spec"
+    },
+    {
+     "path": "classes[IR.DELTA].buckets[USD].sum_ws",
+     "value": 18500,
+     "src": "spec"
+    },
+    {
+     "path": "classes[IR.DELTA].buckets[USD].s_b",
+     "value": 15129.335742193045,
+     "src": "spec"
+    },
+    {
+     "path": "classes[IR.DELTA].k",
+     "value": 32520.8864189875,
+     "src": "spec"
+    }
+   ]
+  },
+  "sacva_k-0005": {
+   "item": "K-8g",
+   "operation": "risk.cva.sa",
+   "fields": [
+    {
+     "path": "classes[CCS.DELTA].buckets[2].k_b",
+     "value": 6539.113089708726,
+     "src": "spec"
+    },
+    {
+     "path": "classes[CCS.DELTA].buckets[2].s_b",
+     "value": 6000,
+     "src": "spec"
+    }
+   ]
+  },
+  "sacva_k-0006": {
+   "item": "K-8g",
+   "operation": "risk.cva.sa",
+   "fields": [
+    {
+     "path": "classes[IR.DELTA].k",
+     "value": 12850.51069024107,
+     "src": "spec"
+    }
+   ]
+  },
+  "sacva_k-0007": {
+   "item": "K-8g",
+   "operation": "risk.cva.sa",
+   "fields": [
+    {
+     "path": "classes[FX.DELTA].k",
+     "value": 17736.96704625681,
+     "src": "spec"
+    }
+   ]
+  },
+  "sacva_k-0008": {
+   "item": "K-8g",
+   "operation": "risk.cva.sa",
+   "fields": [
+    {
+     "path": "total",
+     "value": 29017.375598449667,
+     "src": "spec"
+    }
+   ]
+  },
+  "lev_k-0006": {
+   "item": "K-8i",
+   "operation": "risk.capital.leverage",
+   "fields": [
+    {
+     "path": "off_balance",
+     "value": 550,
+     "src": "spec"
+    }
+   ]
+  },
+  "lev_k-0007": {
+   "item": "K-8i",
+   "operation": "risk.capital.leverage",
+   "fields": [
+    {
+     "path": "sfts",
+     "value": 150,
+     "src": "spec"
+    }
+   ]
+  },
+  "lev_k-0008": {
+   "item": "K-8i",
+   "operation": "risk.capital.leverage",
+   "fields": [
+    {
+     "path": "sfts",
+     "value": 170,
+     "src": "spec"
+    }
+   ]
+  },
+  "lev_k-0009": {
+   "item": "K-8i",
+   "operation": "risk.capital.leverage",
+   "fields": [
+    {
+     "path": "derivatives",
+     "value": 168,
+     "src": "spec"
+    }
+   ]
+  },
+  "lev_k-0010": {
+   "item": "K-8i",
+   "operation": "risk.capital.leverage",
+   "fields": [
+    {
+     "path": "on_balance",
+     "value": 500,
+     "src": "spec"
+    },
+    {
+     "path": "derivatives",
+     "value": 569.8,
+     "src": "spec"
+    },
+    {
+     "path": "sfts",
+     "value": 150,
+     "src": "spec"
+    },
+    {
+     "path": "off_balance",
+     "value": 550,
+     "src": "spec"
+    },
+    {
+     "path": "exposure",
+     "value": 1769.8,
+     "src": "spec"
+    },
+    {
+     "path": "ratio",
+     "value": 0.033902135834557576,
+     "src": "spec"
+    },
+    {
+     "path": "meets_minimum",
+     "value": true,
+     "src": "spec"
+    }
+   ]
+  },
+  "lev_k-0011": {
+   "item": "K-8i",
+   "operation": "risk.capital.leverage",
+   "fields": [
+    {
+     "path": "exposure",
+     "value": 1769.8,
+     "src": "spec"
+    },
+    {
+     "path": "ratio",
+     "value": 0.016951067917278788,
+     "src": "spec"
+    },
+    {
+     "path": "meets_minimum",
+     "value": false,
+     "src": "spec"
+    }
+   ]
+  },
+  "lex_k-0001": {
+   "item": "K-8i",
+   "operation": "risk.capital.large_exposures",
+   "fields": [
+    {
+     "path": "groups[A].large",
+     "value": true,
+     "src": "spec"
+    },
+    {
+     "path": "groups[A].breach",
+     "value": true,
+     "src": "spec"
+    },
+    {
+     "path": "groups[B].large",
+     "value": true,
+     "src": "spec"
+    },
+    {
+     "path": "groups[B].breach",
+     "value": false,
+     "src": "spec"
+    },
+    {
+     "path": "groups[C].large",
+     "value": true,
+     "src": "spec"
+    },
+    {
+     "path": "groups[C].breach",
+     "value": false,
+     "src": "spec"
+    },
+    {
+     "path": "groups[D].large",
+     "value": false,
+     "src": "spec"
+    },
+    {
+     "path": "groups[D].breach",
+     "value": false,
+     "src": "spec"
+    }
+   ]
+  },
+  "lex_k-0002": {
+   "item": "K-8i",
+   "operation": "risk.capital.large_exposures",
+   "fields": [
+    {
+     "path": "groups[G].exposure",
+     "value": 270,
+     "src": "spec"
+    },
+    {
+     "path": "groups[G].breach",
+     "value": true,
+     "src": "spec"
+    }
+   ]
+  },
+  "lex_k-0003": {
+   "item": "K-8i",
+   "operation": "risk.capital.large_exposures",
+   "fields": [
+    {
+     "path": "groups[E].exposure",
+     "value": 200,
+     "src": "spec"
+    },
+    {
+     "path": "groups[E].large",
+     "value": true,
+     "src": "spec"
+    },
+    {
+     "path": "groups[F].exposure",
+     "value": 300,
+     "src": "spec"
+    },
+    {
+     "path": "groups[F].breach",
+     "value": true,
+     "src": "spec"
+    }
+   ]
+  },
+  "lex_k-0004": {
+   "item": "K-8i",
+   "operation": "risk.capital.large_exposures",
+   "fields": [
+    {
+     "path": "groups[G].exposure",
+     "value": 260,
+     "src": "spec"
+    },
+    {
+     "path": "groups[G].share",
+     "value": 0.26,
+     "src": "spec"
+    },
+    {
+     "path": "groups[G].large",
+     "value": true,
+     "src": "spec"
+    },
+    {
+     "path": "groups[G].breach",
+     "value": true,
+     "src": "spec"
+    }
+   ]
+  },
+  "lex_k-0005": {
+   "item": "K-8i",
+   "operation": "risk.capital.large_exposures",
+   "fields": [
+    {
+     "path": "groups[H].exposure",
+     "value": 0,
+     "src": "spec"
+    }
+   ]
+  },
+  "lex_k-0006": {
+   "item": "K-8i",
+   "operation": "risk.capital.large_exposures",
+   "fields": [
+    {
+     "path": "groups[O].exposure",
+     "value": 100,
+     "src": "spec"
+    }
+   ]
+  },
+  "lex_k-0007": {
+   "item": "K-8i",
+   "operation": "risk.capital.large_exposures",
+   "fields": [
+    {
+     "path": "groups[K].limit",
+     "value": 150,
+     "src": "spec"
+    },
+    {
+     "path": "groups[K].breach",
+     "value": true,
+     "src": "spec"
+    }
+   ]
+  }
+ }
+}

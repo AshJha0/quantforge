@@ -1,0 +1,24 @@
+{
+ "digits": 50,
+ "generator": "oracle/python/check_stage_k_idr_moves.py",
+ "ruling": "KR-17",
+ "note": "our own oracle, not an outside check (KR-11)",
+ "python": {
+  "moves": 1000,
+  "exact_violations": 0,
+  "binary64_violations": 0,
+  "worst_exact_remainder_over_bound": 0.0104813719438627,
+  "min_exact_relative_margin": 0.9895186280561373,
+  "worst_binary64_rounding_over_bound": 2.290454603639363e-08,
+  "binary64_comparison_safe": true
+ },
+ "java": {
+  "moves": 1000,
+  "exact_violations": 0,
+  "binary64_violations": 0,
+  "worst_exact_remainder_over_bound": 0.3815214345981925,
+  "min_exact_relative_margin": 0.6184785654018075,
+  "worst_binary64_rounding_over_bound": 3.3570488571740938e-09,
+  "binary64_comparison_safe": true
+ }
+}

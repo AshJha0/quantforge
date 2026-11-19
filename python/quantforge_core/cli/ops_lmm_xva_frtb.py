@@ -6,6 +6,7 @@ from typing import Any
 
 from ..errors import QfError
 from .inputs import Inputs
+from .ops_shortrate import K8_METHOD, bermudan_method
 from .registry import core, op
 
 
@@ -89,6 +90,8 @@ def _ladder(i: Inputs) -> Any:
         g.integer("steps_per_year"),
         g.real("width"),
     )
+    if bermudan_method(i) == K8_METHOD:
+        return core.bermudan_k8.bermudan_ladder(*args)
     return core.aad_ladder.bermudan_ladder(*args)
 
 
