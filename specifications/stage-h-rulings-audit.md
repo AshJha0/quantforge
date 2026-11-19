@@ -31,6 +31,13 @@ Written 2026-11-19 by the stage H coordinator under the owner's delegation. The 
 - HA-21 (HR-70 gate probability): the 2.4e-4 figure holds for the normal-approximation estimators only. For the OLS tests the miss probability per seed is higher (t with 19 or 29 degrees of freedom): the audit computes a gate failure probability of up to 0.017 for resilience. The gate and its threshold are unchanged; the stated figure is corrected in `stage-h-rulings-micro.md`.
 - HA-22 (stale derivation text for eqc_h-0007), HA-24 ([CK] "Definition 1, eq. (5)"), HA-25 ([TLD11] read; the 1/h scaling is from [AFTHL05]), HA-26 (paper trading rulings confirmed), HA-28 (pinning and repeats in the R result), HA-30 (T+1 is the first business day of the non-USD currencies after the trade date): text corrections in the files named.
 
+## Rulings carried into stage K for H-9 (2026-11-19, owner decision; made before any R2 timing)
+
+| Ruling | Decision |
+|---|---|
+| HR-130 | **Workload R2.** H-9 is measured again on the venue's raw message sequence (form A), on one window of 6 to 8 hours recorded from 2026-11-19 11:41:24 UTC with raw recording on by owner authorisation; window rule, warm-up, labels and what happens to the raw files are in `09-microstructure/low-latency-book.md` item 2a. Targets are the R figures, unchanged (`low-latency-targets.md` section g). The 2026-11-18/19 workload R result stays a recorded MISS and is never re-judged |
+| HR-131 | **Per-level row L7.** A per-level target for the one-second differenced stream is fixed at the R per-message figures per level (`low-latency-targets.md` section h), measured only on the form B stream of the R2 window. It is a secondary row, stated as written after the earlier miss was seen; a single-pass batch apply is built only if a tail still misses, as a later change with its own measurement |
+
 ## Evidence
 
 Probe inputs and the four builds' answers before and after the fixes: `program/STAGE_H_BLIND_AUDIT.md`. Blind re-derivation of the value cases (packets 3 and 4, second model, rules and inputs only): same file.

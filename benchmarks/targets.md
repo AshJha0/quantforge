@@ -90,6 +90,14 @@ Rows L1 to L6 are fixed in `specifications/09-microstructure/low-latency-targets
 | L5 | Query p99 (best, qty_at, top(10), top(100)) | C++/Rust 50 / 100 / 200 ns / 1 us; Java twice that |
 | L6 | Correctness on the same replay | zero mismatches |
 
+Added 2026-11-19 before any R2 timing (rulings HR-130, HR-131; reasons in the same file, sections g and h):
+
+| # | Measure | Target |
+|---|---|---|
+| L1-R2, L2-R2 | C++, Rust update p50 / p99 / p99.9 on R2 (raw venue messages, 6 to 8 h window) | 100 ns / 500 ns / 2 us (the R figures, unchanged) |
+| L3-R2 | Java, same | 200 ns / 1 us / 5 us (unchanged) |
+| L7 | Per-level cost on the one-second differenced stream of the R2 window, p50 / p99 / p99.9 | C++, Rust 100 ns / 500 ns / 2 us; Java 200 ns / 1 us / 5 us. Secondary row: written after the 2026-11-19 R miss was seen (mean about 40 ns a level), so the p50 is expected to pass; it never re-judges that window |
+
 Python: reported only. A miss is reported, not refitted.
 
 ## Stage H addition: R4 library interfaces H-5 (written 2026-11-18 before any measurement)
