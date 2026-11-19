@@ -21,6 +21,8 @@ FedInvest end-of-day prices are **not** used. Read 2026-11-19 (web-fetch agent, 
 
 The coordinator may want to confirm one thing: lane rule "never publish raw recorded market data rows" against these five parsed values per day. They are the recorder's own published parsed values for a series it treats as public domain (`sources.json`: "believed yes, unconfirmed"), not a raw file. If that is not acceptable, the alternative is to keep only the forward-log row hash in the ledger; the exact replay would still work (it reads marks, not yields) but the rebuild of the marks would then need the forward log beside the ledger.
 
+Decided at integration (2026-11-19, ruling KR-108): `origin/forward-log` publishes the five parsed values themselves (for example row 346, 2026-11-18), as `docs/developer-guides/recorder-actions.md` states for public-domain sources, so the DAY rows keep the values; the spec cites the precedent. No code, test or format change.
+
 ## What runs when
 
 - `paper-ledger.yml`: 00:40 UTC Tuesday to Saturday and 15:10 UTC Monday to Friday, plus `workflow_dispatch` with a `dry_run` input. It starts by itself once the workflow file is on `main`. **It has not been triggered and no branch has been pushed.**
