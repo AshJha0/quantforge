@@ -377,7 +377,7 @@ H9 = (Path(__file__).resolve().parents[3] / "benchmarks" / "results" / "h9" / "R
 for s in ("0 failed of 31,287", "**9,223**", "about 58 levels", "Per level that is about 40 ns"):
     assert s in H9, s
 has("C++ BTC/USD p99 9,223 ns against a 500 ns target")
-has("in progress, targets fixed 2026-11-19 before timing")
+has("R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min")
 
 # Q13.47 pt_h-0003
 o = out("pt_h-0003")

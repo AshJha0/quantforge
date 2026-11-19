@@ -490,7 +490,7 @@ The pitfall is testing each validation rule alone. Single-fault goldens passed i
 
 As a miss, with the targets unchanged. Correctness: the book after every one of 31,287 book messages per symbol matched `micro.book.rebuild` exactly, 0 failed, for BTC/USD and ETH/USD in C++, Rust and Java. Timing (median of 5 runs, a laptop under WSL for C++ and Rust and native Windows for Java, not the acceptance machine; crypto venue; not equities or rates): p99 and p99.9 miss in every language, for example C++ BTC/USD p99 9,223 ns against a 500 ns target, and ETH/USD p50 misses too.
 
-The reason recorded with it: the targets were set for a message that changes one or a few levels, while a recorded update carries about 58 level changes. About 40 ns per level is descriptive only and has no target. A fresh R2 measurement is in progress, targets fixed 2026-11-19 before timing.
+The reason recorded with it: the targets were set for a message that changes one or a few levels, while a recorded update carries about 58 level changes. About 40 ns per level is descriptive only and has no target. R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS.
 
 The pitfall is replacing the missed target with the per-level figure after seeing the data. A target judges only a run it was fixed before (HR-23).
 

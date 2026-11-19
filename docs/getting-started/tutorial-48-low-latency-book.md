@@ -71,6 +71,7 @@ From [`09-microstructure/low-latency-book.md`](../../specifications/09-microstru
 - Same answer, faster: every result must equal `micro.book.rebuild` on the same stream ([Tutorial 41](tutorial-41-rebuild-a-book.md)).
 - Harness: one process, one thread pinned to one core, a monotonic clock around each `apply`, clock cost published and not subtracted, HdrHistogram-style buckets; unpaced replay, so no coordinated-omission correction is claimed.
 - Workload R (amended to a recorded window of at least 6 hours, here Kraken 2026-11-18 21:49:17 to 2026-11-19 03:49:17 UTC; measured 2026-11-19 on the same laptop): correctness passes with 0 mismatches in all three languages, but timing is a **MISS**: p99 and p99.9 miss in every language and ETH/USD p50 misses too (C++ BTC p99 9.2 us against 500 ns, median of 5 runs). The targets are unchanged. A form B update carries about 58 level changes at about 40 ns each; that per-level figure is descriptive only and has no target; it explains the size of the numbers but does not turn the miss into a pass (`low-latency-targets.md`, "Workload R result").
+- Workload R2 (raw venue messages): R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS (`low-latency-targets.md`, "R2 status").
 - Not yet measured: any run on the GitHub runner.
 
 ## For practitioners

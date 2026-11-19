@@ -111,6 +111,10 @@ Correctness on R2 (L6, form A): after every message, the CRC32 of our top 10 equ
 
 How the numbers were chosen, and what was already known. The figures are the R per-message targets carried over unchanged per level: item 1 above budgets one level change at tens of nanoseconds warm and a few hundred on a miss to memory, and that budget is per level, not per message. They were not fitted to a measurement. It must be said plainly that this row was written after the 2026-11-19 R run, whose descriptive mean was about 40 ns a level in C++ and Rust: the p50 is therefore expected to pass, and only the tail is an open question. For that reason L7 is a secondary row. It does not replace, soften or re-judge L1 to L3 on R, which stay a recorded MISS for the 2026-11-18/19 window, and the release notes, this file and tutorial 48 keep saying so. The headline H-9 result after this change is R2 (table g).
 
+### R2 status (2026-11-19)
+
+R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS. Rows L1-R2 to L3-R2 and L7 stay open; no figure for them is stated anywhere until that session is measured (`specifications/stage-h-rulings-audit.md`, HR-132 to HR-134).
+
 ### Order of work (owner decision 2026-11-19)
 
 1. Record the window, build and hash the R2 input and the form B input of the same window, run correctness, then timing; publish the first measurement as it is.

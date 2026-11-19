@@ -34,7 +34,7 @@
     ],
     [
       "Missed",
-      "H-9 workload R (recorded 6-hour crypto window, 2026-11-18/19): correctness passes, timing is a recorded MISS at p99 and p99.9 in every language (local laptop, not the acceptance machine). The fresh R2 measurement is in progress, targets fixed 2026-11-19 before timing. Stage K item K-8 misses its third acceptance test and moves to a point release; its threshold is not loosened."
+      "H-9 workload R (recorded 6-hour crypto window, 2026-11-18/19): correctness passes, timing is a recorded MISS at p99 and p99.9 in every language (local laptop, not the acceptance machine). H-9 R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS. Stage K item K-8 misses its third acceptance test and moves to a point release; its threshold is not loosened."
     ],
     [
       "No outside check",
