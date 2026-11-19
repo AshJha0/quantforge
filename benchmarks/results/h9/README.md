@@ -229,3 +229,10 @@ the measurement calls) and 0 GC events in the timed regions (`gc_R_*.log` not ke
 (batch top(100) p99): C++ 147 / 177, Rust 181 / 181, Java 164 / 180 ns, all under 1,000 (C++/Rust) and 2,000 (Java).
 
 Raw output: `cpp_R_BTC-USD.json`, `cpp_R_ETH-USD.json`, `rust_R_*.json`, `java_R_*.json`.
+
+## Workload R2 and row L7: not yet run
+
+Targets fixed in commit f2d90738 (low-latency-targets.md (g) and (h)) before any R2 file was read. The raw window
+started recording 2026-11-19 11:41:24 UTC. The builder, the Python reference, the harness support and the runner are
+in `benchmarks/h9/` (`README_R2.md` gives the commands in order). No R2 or L7 figure exists yet; the 14-minute sample
+was used for correctness only and gave no timing figure.
