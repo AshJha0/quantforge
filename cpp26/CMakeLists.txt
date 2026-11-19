@@ -93,10 +93,13 @@ add_library(quantforge_core
   src/core/term_curves.cpp
   src/core/research_w3.cpp
   src/core/execution.cpp
+  src/core/adaptive_exec.cpp
   src/core/exact_decimal.cpp
   src/core/order_book.cpp
   src/core/lit_matching.cpp
-  src/core/dark_sor.cpp)
+  src/core/dark_sor.cpp
+  src/core/micro_est.cpp
+  src/core/paper.cpp)
 target_include_directories(quantforge_core PUBLIC include)
 target_compile_features(quantforge_core PUBLIC cxx_std_26)
 # sobol.cpp pulls the direction numbers in with #embed, so no command reads a file at run time.
@@ -131,7 +134,8 @@ if(BUILD_TESTING)
   FetchContent_MakeAvailable(Catch2)
   add_executable(quantforge_core_tests
   src/core/execution.cpp
-    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_curves_money_fx.cpp tests/test_equity_vol.cpp tests/test_multicurve.cpp tests/test_bonds.cpp tests/test_xccy_credit_carry.cpp tests/test_rates_vol_commodity_mbs.cpp tests/test_cli_golden.cpp tests/test_risk.cpp tests/test_boundaries_pricing.cpp tests/test_boundaries_vol_credit.cpp tests/test_coverage.cpp tests/test_credit_options.cpp tests/test_limits.cpp tests/test_finite_rates.cpp tests/test_finite_vol.cpp tests/test_finite_numerics.cpp tests/test_cds_index.cpp tests/test_garch_vix_local_vol.cpp tests/test_curve_interp.cpp tests/test_joint_solve.cpp tests/test_book_sensitivity.cpp tests/test_var_frtb.cpp tests/test_book.cpp tests/test_mutant_kills_rates_vol.cpp tests/test_mutant_kills_survivors.cpp tests/test_short_rate_exotics_xva.cpp tests/test_hedging.cpp tests/test_mutant_kills_hedging.cpp tests/test_golden_replay.cpp tests/test_dispatch_paths.cpp tests/test_stage_j_fuzzfix.cpp tests/test_research.cpp tests/test_vol_stats_kills.cpp tests/test_vol_stats_boundary_kills.cpp tests/test_research_w2.cpp tests/test_cli_research_ops.cpp tests/test_term_curves.cpp tests/test_research_w3.cpp tests/test_research_w3_units.cpp tests/test_hedge_solvers_units.cpp tests/test_shortrate_units.cpp tests/test_micro_w2.cpp tests/test_dark_sor.cpp)
+  src/core/adaptive_exec.cpp
+    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_curves_money_fx.cpp tests/test_equity_vol.cpp tests/test_multicurve.cpp tests/test_bonds.cpp tests/test_xccy_credit_carry.cpp tests/test_rates_vol_commodity_mbs.cpp tests/test_cli_golden.cpp tests/test_risk.cpp tests/test_boundaries_pricing.cpp tests/test_boundaries_vol_credit.cpp tests/test_coverage.cpp tests/test_credit_options.cpp tests/test_limits.cpp tests/test_finite_rates.cpp tests/test_finite_vol.cpp tests/test_finite_numerics.cpp tests/test_cds_index.cpp tests/test_garch_vix_local_vol.cpp tests/test_curve_interp.cpp tests/test_joint_solve.cpp tests/test_book_sensitivity.cpp tests/test_var_frtb.cpp tests/test_book.cpp tests/test_mutant_kills_rates_vol.cpp tests/test_mutant_kills_survivors.cpp tests/test_short_rate_exotics_xva.cpp tests/test_hedging.cpp tests/test_mutant_kills_hedging.cpp tests/test_golden_replay.cpp tests/test_dispatch_paths.cpp tests/test_stage_j_fuzzfix.cpp tests/test_research.cpp tests/test_vol_stats_kills.cpp tests/test_vol_stats_boundary_kills.cpp tests/test_research_w2.cpp tests/test_cli_research_ops.cpp tests/test_term_curves.cpp tests/test_research_w3.cpp tests/test_research_w3_units.cpp tests/test_hedge_solvers_units.cpp tests/test_shortrate_units.cpp tests/test_micro_w2.cpp tests/test_dark_sor.cpp tests/test_micro_est.cpp tests/test_execution.cpp tests/test_fast_book.cpp tests/test_adaptive_exec.cpp tests/test_exec_api_h5.cpp tests/test_paper.cpp)
   target_link_libraries(quantforge_core_tests PRIVATE quantforge_cli_lib Catch2::Catch2WithMain)
   # The stage I example inputs and their goldens, read in place by tests/test_hedging.cpp.
   target_compile_definitions(quantforge_core_tests PRIVATE QF_REPO_DIR="${CMAKE_CURRENT_SOURCE_DIR}/..")
@@ -140,6 +144,18 @@ if(BUILD_TESTING)
     target_link_options(quantforge_core_tests PRIVATE -static)
   endif()
   add_test(NAME quantforge_core_tests COMMAND quantforge_core_tests)
+endif()
+
+# H-5 p50/p99 harness (specifications/10-execution/library-interfaces.md section 3). Off by default; no download.
+option(QF_H5_BENCH "Build the qf_h5_latency harness" OFF)
+if(QF_H5_BENCH)
+  add_executable(qf_h5_latency bench/h5_latency.cpp)
+  target_link_libraries(qf_h5_latency PRIVATE quantforge_core)
+  target_compile_definitions(qf_h5_latency PRIVATE QF_REPO_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/..")
+  qf_strict(qf_h5_latency)
+  if(MINGW)
+    target_link_options(qf_h5_latency PRIVATE -static)
+  endif()
 endif()
 
 # G2 microbenchmarks (Google Benchmark). Off by default; -DQF_BENCH=ON builds qf_micro.
@@ -160,4 +176,12 @@ if(QF_BENCH)
   if(MINGW)
     target_link_options(qf_micro PRIVATE -static)
   endif()
+endif()
+
+# H-9 low-latency book harness (specifications/09-microstructure/low-latency-book.md). Off by default;
+# -DQF_LOWLAT_BENCH=ON builds qf_lowlat_book. Header-only book, no third-party code.
+option(QF_LOWLAT_BENCH "Build the H-9 qf_lowlat_book harness" OFF)
+if(QF_LOWLAT_BENCH)
+  add_executable(qf_lowlat_book bench/lowlat_book.cpp)
+  target_link_libraries(qf_lowlat_book PRIVATE quantforge_core)
 endif()

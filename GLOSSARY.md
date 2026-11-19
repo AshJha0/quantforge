@@ -254,7 +254,7 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 
 ## Stage H terms
 
-Stage H (v0.10.0, execution and microstructure) is specified but not merged; these terms are defined as its specs use them (`specifications/09-microstructure/`, `specifications/10-execution/`).
+Stage H (v0.10.0, unreleased, execution and microstructure) is implemented in all four languages, the `paper.*` operations included; these terms are defined as its specs use them (`specifications/09-microstructure/`, `specifications/10-execution/`).
 
 | Term | Meaning |
 |---|---|
@@ -293,6 +293,24 @@ Stage H (v0.10.0, execution and microstructure) is specified but not merged; the
 | Toxicity | Informally, how much adverse selection a venue's flow carries |
 | Reservation price | The price at which a market maker is indifferent to one more unit, `s - q gamma sigma^2 (T - t)` ([AS08] eq. (29)) |
 | Book checksum | Kraken's CRC32 of the top 10 levels per side, used to check a rebuilt book against the venue |
+| Paper trading | Running a book with real checks, a ledger and daily P&L, but with simulated fills and no path to a live venue (HR-42) |
+| P&L explain | The day's NAV change split into market, trading, fees and financing, summing exactly (HR-53) |
+| Average cost | Position cost method: buys that grow the position average in; sells realise against the average (HR-50) |
+| Hash-chained ledger | Append-only records, each holding the SHA-256 of its own canonical bytes and of the previous record, so an edit breaks the chain (HR-45, HR-46) |
+| Pre-trade check | A deterministic limit check run before an order is sent: kill switch, order count, size, price band, notional, position, short sale, cash (HR-49) |
+| Kill switch | A flag that rejects every new order while set |
+| Resilience | The rate at which the spread returns to its resting level after a shock, `kappa` in `S_t - S_inf = (S_0 - S_inf) e^{-kappa t}` |
+| Liquidity decay | The rate at which depth falls with distance from the touch, `alpha` in `D_k = D_0 e^{-alpha k}` |
+| Planted truth | A parameter value put into simulated data so an estimator can be checked by recovering it (here within 3 SE, HR-70) |
+| Markout horizon | The time after a fill at which the mid is read for a markout; results should be shown at several |
+| Arrival price algorithm | Front-loads an order by the Almgren-Chriss `sinh` profile with urgency `kappa` per bucket |
+| Close algorithm | Puts up to a participation cap of the forecast closing auction into the auction and spreads the rest over a profile |
+| Liquidity seeking | Takes a fixed share of the depth inside a limit price in each bucket |
+| Cash-balanced pair | Two legs on opposite sides traded so that cash paid and received stay close in every bucket |
+| I-star | Pre-trade impact form `a1 (X/ADV)^a2 sigma^a3` in bp, split into temporary and permanent parts by `b1` ([Kis13], recalled) |
+| Timing risk | One standard deviation of the price move while the order works; reported beside, not added to, expected cost |
+| Spread cost | In attribution, what fills paid against the mid at the fill time; negative means price improvement |
+| Coordinated omission | Undercounting slow samples when a load generator waits for a slow response; not corrected here because replay is unpaced |
 
 ## Tutorial terms
 

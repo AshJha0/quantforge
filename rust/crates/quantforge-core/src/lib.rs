@@ -8,6 +8,7 @@
 )]
 
 pub mod aad;
+pub mod adaptive_exec;
 pub mod arb_surface;
 pub mod attribution;
 pub mod bermudan_aad;
@@ -36,8 +37,10 @@ pub mod decimal;
 pub mod equity;
 pub mod equity_carry;
 pub mod error;
+pub mod exec_api;
 pub mod execution;
 pub mod exotics;
+pub mod fast_book;
 pub mod frtb;
 pub mod frtb2;
 pub mod frtb3;
@@ -64,8 +67,11 @@ pub mod lmm;
 pub mod mbs;
 pub mod mc;
 pub mod mc_greeks;
+pub mod micro_est;
 pub mod ois;
 pub mod order_book;
+pub mod paper;
+pub mod paper_dec;
 pub mod pde;
 pub mod portfolio_opt;
 pub mod projection;
@@ -97,6 +103,7 @@ pub mod ts;
 pub mod units;
 pub mod var;
 pub mod varswap;
+pub mod venue_analytics;
 pub mod vix;
 pub mod xccy;
 pub mod xva;

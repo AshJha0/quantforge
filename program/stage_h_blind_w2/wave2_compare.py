@@ -1,6 +1,6 @@
 """Stage H wave 2 comparison (DR-H2): spec-lane expected vs frozen blind results.
 
-Usage: python -I wave2_compare.py <quantforge checkout> <blind_results.json>
+Usage: python -I wave2_compare.py <quantforge checkout> <blind_results.json> [micro]
 
 Expected values are read from the "Golden value cases" tables (Case | Input |
 Expected) of order-book.md and lit-matching.md. blind_results.json maps case id
@@ -139,8 +139,55 @@ def level_diff(e, b, side_key):
     return rows
 
 
+# --- exec packet (H-14, H-17): expected from datasets/golden/stage_h/{alg_h,tcx_h}.json ---
+# Usage: wave2_compare.py <checkout> <blind_results.json> exec
+# MATCH: same field names and every number within simple_analytic
+# (1e-12 abs + 1e-10 rel). SHAPE-ONLY: values agree once the error shape
+# {"status","error_code"} -> {"error"} and blind-only echo fields are allowed.
+def _close(a, b):
+    if isinstance(a, list) and isinstance(b, list):
+        return len(a) == len(b) and all(_close(x, y) for x, y in zip(a, b))
+    if isinstance(a, dict) and isinstance(b, dict):
+        return set(a) == set(b) and all(_close(a[k], b[k]) for k in a)
+    if isinstance(a, (int, float)) and isinstance(b, (int, float)) and not isinstance(a, bool):
+        return abs(a - b) <= 1e-12 + 1e-10 * max(abs(a), abs(b))
+    return a == b
+
+
+def exec_main(root, blind_path):
+    blind = json.loads(Path(blind_path).read_text(encoding="utf-8"))
+    bad = n = 0
+    for suite in ("alg_h", "tcx_h"):
+        cases = json.loads((Path(root) / "datasets/golden/stage_h" / (suite + ".json")).read_text(encoding="utf-8"))["cases"]
+        for c in cases:
+            n += 1
+            cid, e = c["case_id"], dict(c["expected"])
+            b = blind.get(cid)
+            if b is None:
+                print(f"{cid}	MISSING"); bad += 1; continue
+            st = e.pop("status")
+            if st == "error" and "error_code" in e:
+                e = {"error": e["error_code"]}
+            elif st == "ok" and "outputs" in e:  # goldens moved to {status, outputs} after the compare
+                e = dict(e["outputs"])
+            if _close(e, b):
+                print(f"{cid}	MATCH" if c["expected"].get("status") != "error" or "error" in c["expected"] else f"{cid}	SHAPE-ONLY (error shape)")
+                continue
+            if set(b) > set(e) and _close(e, {k: b[k] for k in e}):
+                print(f"{cid}	SHAPE-ONLY (blind adds {sorted(set(b) - set(e))})"); continue
+            bad += 1
+            print(f"{cid}	VALUE MISMATCH")
+            for k in sorted(set(e) | set(b)):
+                if not _close(e.get(k), b.get(k)):
+                    print(f"  {k}: spec={canon(e.get(k))} blind={canon(b.get(k))}")
+    print(f"{n - bad}/{n} MATCH or SHAPE-ONLY")
+    sys.exit(1 if bad else 0)
+
+
 def main():
     root, blind_path = sys.argv[1], sys.argv[2]
+    if len(sys.argv) > 3 and sys.argv[3] == "exec":
+        exec_main(root, blind_path)
     exp = expected(root)
     blind = json.loads(Path(blind_path).read_text(encoding="utf-8"))
     bad = 0
@@ -188,5 +235,70 @@ def main():
     sys.exit(1 if bad else 0)
 
 
+# --- micro packet (H-4b mest_h, H-16 venue_h): prose expected, binary64 tolerance ---
+MICRO_SPECS = ["specifications/09-microstructure/micro-estimators.md", "specifications/10-execution/venue-analytics.md"]
+NUM = re.compile(r"(?<![\w.])-?\d+(?:\.\d+)?(?:e-?\d+)?(?![\w])")
+
+
+def micro_expected(root):
+    out = {}
+    for rel in MICRO_SPECS:
+        for line in (Path(root) / rel).read_text(encoding="utf-8").splitlines():
+            if line.startswith(("| mest_h-", "| venue_h-")):
+                cells = [c.strip() for c in line.strip().strip("|").split("|")]
+                out[cells[0]] = cells[2]
+    return out
+
+
+def flat(o, pre=""):
+    if isinstance(o, dict):
+        for k, v in o.items():
+            yield from flat(v, f"{pre}{k}.")
+    else:
+        yield pre.rstrip("."), o
+
+
+def close(a, b):
+    return abs(a - b) <= 1e-15 if a == 0 or b == 0 else abs(a - b) <= 1e-12 * max(abs(a), abs(b))
+
+
+def micro_compare(exp, b):
+    """MATCH: same error code, or the spec's numbers and the blind numbers agree as
+    sorted multisets to 1e-12 relative (1e-15 absolute at 0) and every blind leaf
+    name is named in the Expected cell. Same numbers under other names: SHAPE-ONLY."""
+    if exp.startswith("`E_"):
+        return ("MATCH" if exp.strip("`") == b else "VALUE MISMATCH"), []
+    if isinstance(b, str):
+        return "VALUE MISMATCH", [f"  spec={exp} blind={b}"]
+    leaves = list(flat(b))
+    text = re.sub(r"[AB]:", "", exp.replace(",", ""))
+    en = sorted(float(x) for x in NUM.findall(text))
+    bn = sorted(float(v) for _, v in leaves)
+    if len(en) != len(bn) or not all(close(x, y) for x, y in zip(en, bn)):
+        return "VALUE MISMATCH", [f"  spec numbers={en}", f"  blind numbers={bn}"]
+    names = {k.split(".")[-1].split("|")[0] for k, _ in leaves}
+    missing = [n for n in names if n not in exp]
+    return ("SHAPE-ONLY", [f"  blind names not in spec: {missing}"]) if missing else ("MATCH", [])
+
+
+def micro_main(root, blind_path):
+    exp = micro_expected(root)
+    blind = json.loads(Path(blind_path).read_text(encoding="utf-8"))
+    bad = 0
+    for cid in sorted(exp):
+        if cid not in blind:
+            print(f"{cid}	MISSING (not in blind packet or added post-blind)")
+            continue
+        st, notes = micro_compare(exp[cid], blind[cid])
+        bad += st == "VALUE MISMATCH"
+        print(f"{cid}	{st}")
+        for n in notes:
+            print(n)
+    print(f"{len(exp) - bad}/{len(exp)} not VALUE MISMATCH")
+    sys.exit(1 if bad else 0)
+
+
 if __name__ == "__main__":
+    if len(sys.argv) > 3 and sys.argv[3] == "micro":
+        micro_main(sys.argv[1], sys.argv[2])
     main()

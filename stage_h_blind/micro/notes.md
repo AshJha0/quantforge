@@ -1,0 +1,11 @@
+# Blind notes
+- Errors are emitted as the strings E_INPUT / E_DOMAIN. Venue results keyed "V|h=h" with markout, markout_bps, toxicity; fill rates as "fill_rate|V". venue_h-0004 has no fills, so only fill rates.
+- mest_h-0005/0007: exact fits; SE set to 0 per HR-74 (residual below 1e-40 at 60-digit precision treated as exact). kappa/alpha = ln 2.
+- mest_h-0006: S=0.5 < S_inf=1 gives E_DOMAIN, checked before n<3 E_INPUT (spec says so).
+- mest_h-0009: ratio = beta_stressed/beta_calm = 4; calm SE 0 (exact fit). Output shape {calm,stressed,ratio}.
+- mest_h-0010: delta = aggressive minus passive; SE Welch, sample variances.
+- venue_h-0005, -0006: horizon unspecified. 0005 error is independent of h (filled > sent). 0006: I used h=0, so the fill at t=-1 has no mid, giving E_INPUT. With h=5 the lookup at t=4 succeeds (B markout 0.04903225806451613, bps 4.903225806451613, toxicity 0) and no error occurs; so 0006 depends on h.
+- Validation order for venue: E_DOMAIN for q/p/sent <= 0, filled < 0, h < 0 checked before E_INPUT (filled>sent, no mid). A case with both is untested.
+- Mid lookup for t+h uses the last mid with t <= t+h (step), t+h beyond last mid uses last mid.
+- Toxicity strict < 0, so zero markout is not toxic (A, h=5 F1 positive, F2 negative).
+- All arithmetic in Decimal (60 digits), converted to float at the end.

@@ -394,6 +394,62 @@ def test_robust_without_outliers_is_least_squares_and_flags_one() -> None:
         assert abs(g) < 1e-14
 
 
+# Valid inputs where the old split-then-IRLS loop raised E_NO_CONVERGENCE: at the minimum one
+# residual sits within 1e-7 of delta (mutation re-check 2026-11-18). Not goldens: the spec keeps
+# golden residuals 1e-6 away from delta. The same inputs are in the Java, C++ and Rust tests.
+NEAR_THRESHOLD = [
+    (
+        [3.8740307873000113, 7.757472624115791, 24.769272470090453, 24.76936904673551],
+        [0.022406223051166397, 0.0025821078676810487, 0.052253746187190836, 0.04025167916426023],
+        2.1121330519140273,
+        0.0010283264459667806,
+    ),
+    (
+        [
+            1.5614956534903182,
+            1.817835519363041,
+            14.479225743866296,
+            15.85505852646532,
+            18.89927632388952,
+            18.931392534460773,
+            20.94952223691998,
+            24.07803319633764,
+            24.90650776422092,
+            28.135390307117518,
+            29.5447905490115,
+            29.727597469633054,
+        ],
+        [
+            -0.013011824425523236,
+            -0.007414477586103309,
+            -0.007802709714910306,
+            0.044391651021352924,
+            -0.01001859045626497,
+            0.020434931433880917,
+            0.041233525860682435,
+            -0.005430057925222123,
+            -0.013779232054475017,
+            0.0059172243586919394,
+            0.0004711030121795981,
+            0.012878014328412773,
+        ],
+        4.985486692768895,
+        0.000626907227356661,
+    ),
+]
+
+
+@pytest.mark.parametrize("ms,ys,tau,delta", NEAR_THRESHOLD)
+def test_robust_converges_with_a_residual_near_delta(ms, ys, tau, delta) -> None:
+    _, res, out, _ = curve_fits.robust(ms, ys, tau, delta)
+    xs = [curve_fits._basis(m, tau) for m in ms]
+    for p in range(3):
+        g = sum(max(-delta, min(delta, r)) * x[p] for r, x in zip(res, xs, strict=True))
+        assert abs(g) < 1e-14
+    assert out == [j for j, r in enumerate(res) if abs(r) > delta]
+    assert min(abs(abs(r) - delta) for r in res) < 1e-7
+
+
 @pytest.mark.parametrize(
     "args,code",
     [

@@ -3,7 +3,7 @@
  "rule": "specifications/stage-f-rulings.md F-5",
  "operations": {
   "bond.fit.nelson_siegel": {
-   "spec": "specifications/03-calibration/stability.md",
+   "spec": "specifications/04-pricing/bonds.md",
    "rust": "quantforge::bond::fit_nelson_siegel",
    "python": "quantforge.bond.fit_nelson_siegel",
    "java": "Bond.fitNelsonSiegel",
@@ -141,7 +141,7 @@
    ]
   },
   "bond.price.from_yield": {
-   "spec": "specifications/02-curves/inflation.md",
+   "spec": "specifications/04-pricing/bonds.md",
    "rust": "quantforge::bond::price_from_yield",
    "python": "quantforge.bond.price_from_yield",
    "java": "Bond.priceFromYield",
@@ -1350,7 +1350,7 @@
    ]
   },
   "core.sobol.points": {
-   "spec": "specifications/01-core/monte-carlo.md",
+   "spec": "specifications/01-core/sobol.md",
    "rust": "quantforge::core::sobol_points",
    "python": "quantforge.core.sobol_points",
    "java": "Core.sobolPoints",
@@ -2573,7 +2573,7 @@
    ]
   },
   "exec.ac.trajectory": {
-   "spec": "specifications/04-pricing/use-cases.md",
+   "spec": "specifications/10-execution/almgren-chriss.md",
    "rust": "quantforge::exec::ac_trajectory",
    "python": "quantforge.exec.ac_trajectory",
    "java": "Exec.acTrajectory",
@@ -2611,6 +2611,146 @@
     "objective",
     "trades",
     "variance"
+   ]
+  },
+  "exec.algo.arrival": {
+   "spec": "specifications/10-execution/adaptive-algos.md",
+   "rust": "quantforge::exec::algo_arrival",
+   "python": "quantforge.exec.algo_arrival",
+   "java": "Exec.algoArrival",
+   "cpp": "qf::exec::algo_arrival",
+   "inputs": {
+    "mode": {
+     "java": "mode"
+    },
+    "n_buckets": {
+     "java": "nBuckets"
+    },
+    "quantity": {
+     "java": "quantity"
+    },
+    "urgency": {
+     "java": "urgency"
+    }
+   },
+   "outputs": [
+    "slices"
+   ]
+  },
+  "exec.algo.basket": {
+   "spec": "specifications/10-execution/adaptive-algos.md",
+   "rust": "quantforge::exec::algo_basket",
+   "python": "quantforge.exec.algo_basket",
+   "java": "Exec.algoBasket",
+   "cpp": "qf::exec::algo_basket",
+   "inputs": {
+    "legs": {
+     "java": "legs"
+    },
+    "mode": {
+     "java": "mode"
+    },
+    "n_buckets": {
+     "java": "nBuckets"
+    }
+   },
+   "outputs": [
+    "cash_imbalance",
+    "gross_notional",
+    "slices"
+   ]
+  },
+  "exec.algo.close": {
+   "spec": "specifications/10-execution/adaptive-algos.md",
+   "rust": "quantforge::exec::algo_close",
+   "python": "quantforge.exec.algo_close",
+   "java": "Exec.algoClose",
+   "cpp": "qf::exec::algo_close",
+   "inputs": {
+    "auction_participation": {
+     "java": "auctionParticipation"
+    },
+    "close_volume": {
+     "java": "closeVolume"
+    },
+    "mode": {
+     "java": "mode"
+    },
+    "profile": {
+     "java": "profile"
+    },
+    "quantity": {
+     "java": "quantity"
+    }
+   },
+   "outputs": [
+    "auction_quantity",
+    "slices"
+   ]
+  },
+  "exec.algo.liquidity_seek": {
+   "spec": "specifications/10-execution/adaptive-algos.md",
+   "rust": "quantforge::exec::algo_liquidity_seek",
+   "python": "quantforge.exec.algo_liquidity_seek",
+   "java": "Exec.algoLiquiditySeek",
+   "cpp": "qf::exec::algo_liquidity_seek",
+   "inputs": {
+    "books": {
+     "java": "books"
+    },
+    "limit_price": {
+     "java": "limitPrice"
+    },
+    "quantity": {
+     "java": "quantity"
+    },
+    "side": {
+     "java": "side"
+    },
+    "take_fraction": {
+     "java": "takeFraction"
+    }
+   },
+   "outputs": [
+    "avg_fill_price",
+    "avg_prices",
+    "filled",
+    "notional",
+    "residual",
+    "slices"
+   ]
+  },
+  "exec.algo.pair": {
+   "spec": "specifications/10-execution/adaptive-algos.md",
+   "rust": "quantforge::exec::algo_pair",
+   "python": "quantforge.exec.algo_pair",
+   "java": "Exec.algoPair",
+   "cpp": "qf::exec::algo_pair",
+   "inputs": {
+    "hedge_ratio": {
+     "java": "hedgeRatio"
+    },
+    "leg_a": {
+     "java": "legA"
+    },
+    "leg_b": {
+     "java": "legB"
+    },
+    "mode": {
+     "java": "mode"
+    },
+    "n_buckets": {
+     "java": "nBuckets"
+    },
+    "pair_mode": {
+     "java": "pairMode"
+    }
+   },
+   "outputs": [
+    "cash_imbalance",
+    "quantity_b",
+    "slices_a",
+    "slices_b"
    ]
   },
   "exec.impact.ow_optimal": {
@@ -2709,7 +2849,7 @@
    ]
   },
   "exec.schedule.vwap": {
-   "spec": "specifications/04-pricing/use-cases.md",
+   "spec": "specifications/10-execution/schedules.md",
    "rust": "quantforge::exec::schedule_vwap",
    "python": "quantforge.exec.schedule_vwap",
    "java": "Exec.scheduleVwap",
@@ -2771,7 +2911,7 @@
    ]
   },
   "exec.sim.lit.run": {
-   "spec": "specifications/10-execution/dark-pool.md",
+   "spec": "specifications/10-execution/lit-matching.md",
    "rust": "quantforge::exec::sim_lit_run",
    "python": "quantforge.exec.sim_lit_run",
    "java": "Exec.simLitRun",
@@ -2862,8 +3002,88 @@
     "ranking"
    ]
   },
+  "exec.tca.attribution": {
+   "spec": "specifications/10-execution/tca-pretrade.md",
+   "rust": "quantforge::exec::tca_attribution",
+   "python": "quantforge.exec.tca_attribution",
+   "java": "Exec.tcaAttribution",
+   "cpp": "qf::exec::tca_attribution",
+   "inputs": {
+    "arrival_mid": {
+     "java": "arrivalMid"
+    },
+    "decision_price": {
+     "java": "decisionPrice"
+    },
+    "end_price": {
+     "java": "endPrice"
+    },
+    "fees": {
+     "java": "fees"
+    },
+    "fills": {
+     "java": "fills"
+    },
+    "order_quantity": {
+     "java": "orderQuantity"
+    },
+    "side": {
+     "java": "side"
+    }
+   },
+   "outputs": [
+    "delay",
+    "execution",
+    "fees",
+    "impact",
+    "opportunity",
+    "spread",
+    "total",
+    "total_bps"
+   ]
+  },
+  "exec.tca.pretrade": {
+   "spec": "specifications/10-execution/tca-pretrade.md",
+   "rust": "quantforge::exec::tca_pretrade",
+   "python": "quantforge.exec.tca_pretrade",
+   "java": "Exec.tcaPretrade",
+   "cpp": "qf::exec::tca_pretrade",
+   "inputs": {
+    "adv": {
+     "java": "adv"
+    },
+    "daily_vol": {
+     "java": "dailyVol"
+    },
+    "half_spread_bps": {
+     "java": "halfSpreadBps"
+    },
+    "params": {
+     "java": "params"
+    },
+    "participation": {
+     "java": "participation"
+    },
+    "price": {
+     "java": "price"
+    },
+    "quantity": {
+     "java": "quantity"
+    }
+   },
+   "outputs": [
+    "duration_days",
+    "expected_cost",
+    "expected_cost_bps",
+    "impact_bps",
+    "istar_bps",
+    "spread_bps",
+    "timing_risk",
+    "timing_risk_bps"
+   ]
+  },
   "exec.tca.shortfall": {
-   "spec": "specifications/04-pricing/use-cases.md",
+   "spec": "specifications/10-execution/tca.md",
    "rust": "quantforge::exec::tca_shortfall",
    "python": "quantforge.exec.tca_shortfall",
    "java": "Exec.tcaShortfall",
@@ -2901,6 +3121,31 @@
     "total",
     "total_bps",
     "vwap_slippage"
+   ]
+  },
+  "exec.venue.analytics": {
+   "spec": "specifications/10-execution/venue-analytics.md",
+   "rust": "quantforge::exec::venue_analytics",
+   "python": "quantforge.exec.venue_analytics",
+   "java": "Exec.venueAnalytics",
+   "cpp": "qf::exec::venue_analytics",
+   "inputs": {
+    "fills": {
+     "java": "fills"
+    },
+    "horizons": {
+     "java": "horizons"
+    },
+    "mids": {
+     "java": "mids"
+    },
+    "orders": {
+     "java": "orders"
+    }
+   },
+   "outputs": [
+    "fill_rates",
+    "markouts"
    ]
   },
   "exotic.american.baw": {
@@ -4011,7 +4256,7 @@
    ]
   },
   "hedge.greeks.neutralise": {
-   "spec": "specifications/04-pricing/use-cases.md",
+   "spec": "specifications/08-hedging/hedge-solvers.md",
    "rust": "quantforge::hedge::greeks_neutralise",
    "python": "quantforge.hedge.greeks_neutralise",
    "java": "Hedge.greeksNeutralise",
@@ -4046,7 +4291,7 @@
    ]
   },
   "hedge.integer.solve": {
-   "spec": "specifications/04-pricing/use-cases.md",
+   "spec": "specifications/08-hedging/hedge-solvers.md",
    "rust": "quantforge::hedge::integer_solve",
    "python": "quantforge.hedge.integer_solve",
    "java": "Hedge.integerSolve",
@@ -4084,7 +4329,7 @@
    ]
   },
   "hedge.minvar.ratio": {
-   "spec": "specifications/08-hedging/dynamic-hedge-and-effectiveness.md",
+   "spec": "specifications/08-hedging/hedge-solvers.md",
    "rust": "quantforge::hedge::minvar_ratio",
    "python": "quantforge.hedge.minvar_ratio",
    "java": "Hedge.minvarRatio",
@@ -4108,7 +4353,7 @@
    ]
   },
   "hedge.qp.solve": {
-   "spec": "specifications/08-hedging/credit-and-correlation-hedges.md",
+   "spec": "specifications/08-hedging/hedge-costs-and-frontier.md",
    "rust": "quantforge::hedge::qp_solve",
    "python": "quantforge.hedge.qp_solve",
    "java": "Hedge.qpSolve",
@@ -4567,7 +4812,7 @@
    ]
   },
   "micro.book.rebuild": {
-   "spec": "specifications/09-microstructure/low-latency-book.md",
+   "spec": "specifications/09-microstructure/order-book.md",
    "rust": "quantforge::micro::book_rebuild",
    "python": "quantforge.micro.book_rebuild",
    "java": "Micro.bookRebuild",
@@ -4595,6 +4840,130 @@
     "crc32",
     "events",
     "stats"
+   ]
+  },
+  "micro.est.adverse_selection": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_adverse_selection",
+   "python": "quantforge.micro.est_adverse_selection",
+   "java": "Micro.estAdverseSelection",
+   "cpp": "qf::micro::est_adverse_selection",
+   "inputs": {
+    "x": {
+     "java": "x"
+    },
+    "y": {
+     "java": "y"
+    }
+   },
+   "outputs": [
+    "lambda_as",
+    "se"
+   ]
+  },
+  "micro.est.arrival_rate": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_arrival_rate",
+   "python": "quantforge.micro.est_arrival_rate",
+   "java": "Micro.estArrivalRate",
+   "cpp": "qf::micro::est_arrival_rate",
+   "inputs": {
+    "count": {
+     "java": "count"
+    },
+    "window": {
+     "java": "window"
+    }
+   },
+   "outputs": [
+    "lambda",
+    "se"
+   ]
+  },
+  "micro.est.cancel_rate": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_cancel_rate",
+   "python": "quantforge.micro.est_cancel_rate",
+   "java": "Micro.estCancelRate",
+   "cpp": "qf::micro::est_cancel_rate",
+   "inputs": {
+    "orders": {
+     "java": "orders"
+    }
+   },
+   "outputs": [
+    "se",
+    "theta"
+   ]
+  },
+  "micro.est.liquidity_decay": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_liquidity_decay",
+   "python": "quantforge.micro.est_liquidity_decay",
+   "java": "Micro.estLiquidityDecay",
+   "cpp": "qf::micro::est_liquidity_decay",
+   "inputs": {
+    "levels": {
+     "java": "levels"
+    }
+   },
+   "outputs": [
+    "alpha",
+    "se"
+   ]
+  },
+  "micro.est.passive_vs_aggressive": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_passive_vs_aggressive",
+   "python": "quantforge.micro.est_passive_vs_aggressive",
+   "java": "Micro.estPassiveVsAggressive",
+   "cpp": "qf::micro::est_passive_vs_aggressive",
+   "inputs": {
+    "aggressive": {
+     "java": "aggressive"
+    },
+    "passive": {
+     "java": "passive"
+    }
+   },
+   "outputs": [
+    "delta",
+    "se"
+   ]
+  },
+  "micro.est.regime_impact": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_regime_impact",
+   "python": "quantforge.micro.est_regime_impact",
+   "java": "Micro.estRegimeImpact",
+   "cpp": "qf::micro::est_regime_impact",
+   "inputs": {
+    "regimes": {
+     "java": "regimes"
+    }
+   },
+   "outputs": [
+    "ratio",
+    "regimes"
+   ]
+  },
+  "micro.est.resilience": {
+   "spec": "specifications/09-microstructure/micro-estimators.md",
+   "rust": "quantforge::micro::est_resilience",
+   "python": "quantforge.micro.est_resilience",
+   "java": "Micro.estResilience",
+   "cpp": "qf::micro::est_resilience",
+   "inputs": {
+    "points": {
+     "java": "points"
+    },
+    "s_inf": {
+     "java": "sInf"
+    }
+   },
+   "outputs": [
+    "kappa",
+    "se"
    ]
   },
   "micro.mm.as_quotes": {
@@ -4628,6 +4997,204 @@
     "bid",
     "reservation",
     "spread"
+   ]
+  },
+  "paper.book.apply_fill": {
+   "spec": "specifications/10-execution/paper-trading.md",
+   "rust": "quantforge::paper::book_apply_fill",
+   "python": "quantforge.paper.book_apply_fill",
+   "java": "Paper.bookApplyFill",
+   "cpp": "qf::paper::book_apply_fill",
+   "inputs": {
+    "avg_cost": {
+     "java": "avgCost"
+    },
+    "cash": {
+     "java": "cash"
+    },
+    "fills": {
+     "java": "fills"
+    },
+    "position": {
+     "java": "position"
+    }
+   },
+   "outputs": [
+    "avg_cost",
+    "cash",
+    "cash_delta",
+    "fees",
+    "label",
+    "position",
+    "realised"
+   ]
+  },
+  "paper.book.end_of_day": {
+   "spec": "specifications/10-execution/paper-trading.md",
+   "rust": "quantforge::paper::book_end_of_day",
+   "python": "quantforge.paper.book_end_of_day",
+   "java": "Paper.bookEndOfDay",
+   "cpp": "qf::paper::book_end_of_day",
+   "inputs": {
+    "avg_cost_open": {
+     "java": "avgCostOpen"
+    },
+    "borrow_rate": {
+     "java": "borrowRate"
+    },
+    "cash_open": {
+     "java": "cashOpen"
+    },
+    "cash_rate": {
+     "java": "cashRate"
+    },
+    "close": {
+     "java": "close"
+    },
+    "days": {
+     "java": "days"
+    },
+    "debit_rate": {
+     "java": "debitRate"
+    },
+    "fills": {
+     "java": "fills"
+    },
+    "position_open": {
+     "java": "positionOpen"
+    },
+    "prev_close": {
+     "java": "prevClose"
+    }
+   },
+   "outputs": [
+    "cash_close",
+    "cash_interest",
+    "fees",
+    "financing",
+    "label",
+    "market",
+    "nav_close",
+    "nav_open",
+    "position",
+    "short_borrow",
+    "total",
+    "trading"
+   ]
+  },
+  "paper.ledger.append": {
+   "spec": "specifications/10-execution/paper-trading.md",
+   "rust": "quantforge::paper::ledger_append",
+   "python": "quantforge.paper.ledger_append",
+   "java": "Paper.ledgerAppend",
+   "cpp": "qf::paper::ledger_append",
+   "inputs": {
+    "body": {
+     "java": "body"
+    },
+    "kind": {
+     "java": "kind"
+    },
+    "prev": {
+     "java": "prev"
+    },
+    "seq": {
+     "java": "seq"
+    },
+    "ts": {
+     "java": "ts"
+    }
+   },
+   "outputs": [
+    "canonical_bytes",
+    "hash",
+    "label",
+    "record"
+   ]
+  },
+  "paper.ledger.verify": {
+   "spec": "specifications/10-execution/paper-trading.md",
+   "rust": "quantforge::paper::ledger_verify",
+   "python": "quantforge.paper.ledger_verify",
+   "java": "Paper.ledgerVerify",
+   "cpp": "qf::paper::ledger_verify",
+   "inputs": {
+    "text": {
+     "java": "text"
+    }
+   },
+   "outputs": [
+    "first_bad_seq",
+    "head",
+    "label",
+    "ok",
+    "reason",
+    "records"
+   ]
+  },
+  "paper.pretrade.check": {
+   "spec": "specifications/10-execution/paper-trading.md",
+   "rust": "quantforge::paper::pretrade_check",
+   "python": "quantforge.paper.pretrade_check",
+   "java": "Paper.pretradeCheck",
+   "cpp": "qf::paper::pretrade_check",
+   "inputs": {
+    "cash": {
+     "java": "cash"
+    },
+    "limits": {
+     "java": "limits"
+    },
+    "order": {
+     "java": "order"
+    },
+    "orders_today": {
+     "java": "ordersToday"
+    },
+    "position": {
+     "java": "position"
+    },
+    "ref_price": {
+     "java": "refPrice"
+    }
+   },
+   "outputs": [
+    "accepted",
+    "label",
+    "reasons"
+   ]
+  },
+  "paper.session.run": {
+   "spec": "specifications/10-execution/paper-trading.md",
+   "rust": "quantforge::paper::session_run",
+   "python": "quantforge.paper.session_run",
+   "java": "Paper.sessionRun",
+   "cpp": "qf::paper::session_run",
+   "inputs": {
+    "cash": {
+     "java": "cash"
+    },
+    "dark": {
+     "java": "dark"
+    },
+    "limits": {
+     "java": "limits"
+    },
+    "lit": {
+     "java": "lit"
+    },
+    "script": {
+     "java": "script"
+    }
+   },
+   "outputs": [
+    "cash",
+    "ceiling",
+    "head",
+    "label",
+    "positions",
+    "records",
+    "results"
    ]
   },
   "rates.basis.ois_spread": {
@@ -5011,7 +5578,7 @@
    ]
   },
   "rates.funding.curve": {
-   "spec": "specifications/02-curves/financing-term-structure.md",
+   "spec": "specifications/02-curves/joint-solve-and-funding.md",
    "rust": "quantforge::rates::funding_curve",
    "python": "quantforge.rates.funding_curve",
    "java": "Rates.fundingCurve",
@@ -5228,7 +5795,7 @@
    ]
   },
   "rates.ois.bootstrap": {
-   "spec": "specifications/02-curves/csa-and-basis.md",
+   "spec": "specifications/02-curves/curve-framework.md",
    "rust": "quantforge::rates::ois_bootstrap",
    "python": "quantforge.rates.ois_bootstrap",
    "java": "Rates.oisBootstrap",
@@ -5396,7 +5963,7 @@
    ]
   },
   "rates.projection.bootstrap": {
-   "spec": "specifications/02-curves/csa-and-basis.md",
+   "spec": "specifications/02-curves/projection-and-fra.md",
    "rust": "quantforge::rates::projection_bootstrap",
    "python": "quantforge.rates.projection_bootstrap",
    "java": "Rates.projectionBootstrap",
@@ -5692,7 +6259,7 @@
    ]
   },
   "rates.shortrate.zcb": {
-   "spec": "specifications/04-pricing/lmm.md",
+   "spec": "specifications/04-pricing/short-rate-models.md",
    "rust": "quantforge::rates::shortrate_zcb",
    "python": "quantforge.rates.shortrate_zcb",
    "java": "Rates.shortrateZcb",
@@ -6677,7 +7244,7 @@
    ]
   },
   "risk.corr.dispersion": {
-   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "spec": "specifications/06-risk/correlation.md",
    "rust": "quantforge::risk::corr_dispersion",
    "python": "quantforge.risk.corr_dispersion",
    "java": "Risk.corrDispersion",
@@ -6711,7 +7278,7 @@
    ]
   },
   "risk.corr.implied": {
-   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "spec": "specifications/06-risk/correlation.md",
    "rust": "quantforge::risk::corr_implied",
    "python": "quantforge.risk.corr_implied",
    "java": "Risk.corrImplied",
@@ -6732,7 +7299,7 @@
    ]
   },
   "risk.corr.nearest": {
-   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "spec": "specifications/06-risk/correlation.md",
    "rust": "quantforge::risk::corr_nearest",
    "python": "quantforge.risk.corr_nearest",
    "java": "Risk.corrNearest",
@@ -6748,7 +7315,7 @@
    ]
   },
   "risk.corr.validate": {
-   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "spec": "specifications/06-risk/correlation.md",
    "rust": "quantforge::risk::corr_validate",
    "python": "quantforge.risk.corr_validate",
    "java": "Risk.corrValidate",
@@ -6806,7 +7373,7 @@
    ]
   },
   "risk.curve.jacobian": {
-   "spec": "specifications/02-curves/joint-solve-and-funding.md",
+   "spec": "specifications/06-risk/par-and-key-rate.md",
    "rust": "quantforge::risk::curve_jacobian",
    "python": "quantforge.risk.curve_jacobian",
    "java": "Risk.curveJacobian",
@@ -7175,7 +7742,7 @@
    ]
   },
   "risk.ois.dv01": {
-   "spec": "specifications/04-pricing/use-cases.md",
+   "spec": "specifications/06-risk/rates-sensitivities.md",
    "rust": "quantforge::risk::ois_dv01",
    "python": "quantforge.risk.ois_dv01",
    "java": "Risk.oisDv01",
@@ -7516,7 +8083,7 @@
    ]
   },
   "risk.var.monte_carlo": {
-   "spec": "specifications/06-risk/mc-greeks.md",
+   "spec": "specifications/06-risk/var-es-and-backtests.md",
    "rust": "quantforge::risk::var_monte_carlo",
    "python": "quantforge.risk.var_monte_carlo",
    "java": "Risk.varMonteCarlo",
@@ -7570,7 +8137,7 @@
    ]
   },
   "risk.vol.bump_greeks": {
-   "spec": "specifications/06-risk/book-sensitivities.md",
+   "spec": "specifications/06-risk/vol-greeks.md",
    "rust": "quantforge::risk::vol_bump_greeks",
    "python": "quantforge.risk.vol_bump_greeks",
    "java": "Risk.volBumpGreeks",
@@ -8058,7 +8625,7 @@
    ]
   },
   "vol.equity.price": {
-   "spec": "specifications/04-pricing/use-cases.md",
+   "spec": "specifications/06-risk/vol-greeks.md",
    "rust": "quantforge::vol::equity_price",
    "python": "quantforge.vol.equity_price",
    "java": "Vol.equityPrice",
@@ -8306,7 +8873,7 @@
    ]
   },
   "vol.local.dupire": {
-   "spec": "specifications/05-volatility/heston-family.md",
+   "spec": "specifications/05-volatility/local-and-forward-vol.md",
    "rust": "quantforge::vol::local_dupire",
    "python": "quantforge.vol.local_dupire",
    "java": "Vol.localDupire",
@@ -8500,7 +9067,7 @@
    ]
   },
   "vol.sabr.calibrate": {
-   "spec": "specifications/03-calibration/stability.md",
+   "spec": "specifications/05-volatility/sabr.md",
    "rust": "quantforge::vol::sabr_calibrate",
    "python": "quantforge.vol.sabr_calibrate",
    "java": "Vol.sabrCalibrate",
@@ -8808,7 +9375,7 @@
    ]
   },
   "vol.surface.check": {
-   "spec": "specifications/04-pricing/use-cases.md",
+   "spec": "specifications/05-volatility/smile-and-surface.md",
    "rust": "quantforge::vol::surface_check",
    "python": "quantforge.vol.surface_check",
    "java": "Vol.surfaceCheck",
@@ -8844,7 +9411,7 @@
    ]
   },
   "vol.svi.calibrate": {
-   "spec": "specifications/03-calibration/stability.md",
+   "spec": "specifications/05-volatility/smile-and-surface.md",
    "rust": "quantforge::vol::svi_calibrate",
    "python": "quantforge.vol.svi_calibrate",
    "java": "Vol.sviCalibrate",
@@ -8941,7 +9508,7 @@
    ]
   },
   "vol.varswap.fair_strike": {
-   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "spec": "specifications/05-volatility/variance-swaps.md",
    "rust": "quantforge::vol::varswap_fair_strike",
    "python": "quantforge.vol.varswap_fair_strike",
    "java": "Vol.varswapFairStrike",
@@ -8988,7 +9555,7 @@
    ]
   },
   "vol.varswap.realized": {
-   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "spec": "specifications/05-volatility/variance-swaps.md",
    "rust": "quantforge::vol::varswap_realized",
    "python": "quantforge.vol.varswap_realized",
    "java": "Vol.varswapRealized",
@@ -9014,7 +9581,7 @@
    ]
   },
   "vol.vix.index": {
-   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "spec": "specifications/05-volatility/vix-index.md",
    "rust": "quantforge::vol::vix_index",
    "python": "quantforge.vol.vix_index",
    "java": "Vol.vixIndex",
@@ -9034,7 +9601,7 @@
    ]
   },
   "vol.vix.term_variance": {
-   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "spec": "specifications/05-volatility/vix-index.md",
    "rust": "quantforge::vol::vix_term_variance",
    "python": "quantforge.vol.vix_term_variance",
    "java": "Vol.vixTermVariance",
@@ -9337,5 +9904,7 @@
   "vol.vix.term_variance: minutes_to_expiry",
   "xva.adjustments.value: im_spread"
  ],
- "spec_only": []
+ "spec_only": [
+  "paper.pnl.explain"
+ ]
 }

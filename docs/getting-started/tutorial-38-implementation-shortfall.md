@@ -6,7 +6,7 @@ The plain idea: compare what you actually got with a paper portfolio that traded
 
 You will decompose one buy order of 1,000 shares by hand, flip it to a sell, and see an overfilled order rejected. Budget 10 minutes. The fills are synthetic.
 
-<p class="note">Available from v0.10.0. The operations on this page are specified (spec version 0.1.0, confirmed 2026-11-18) but not merged in any language. Step 1 checks the spec's golden numbers with a plain-Python restatement of the formulas; step 2 shows the library call as it will run once the operations are merged, and is not run here. Every number on the page is a spec golden or simple arithmetic on one.</p>
+<p class="note">Available from v0.10.0. The operations on this page are implemented in all four languages (stage H wave 1; each build passes their goldens, observed, local, 2026-11-18). This page stays a hand check: step 1 checks the spec's golden numbers with a plain-Python restatement of the formulas, and step 2 shows the library call without running it. Every number on the page is a spec golden or simple arithmetic on one.</p>
 
 Terms, defined here. The **decision price** `P_d` is the price when the order was decided; the **arrival price** `P_0` the price when it reached the market; the **end price** `P_c` the price at the end of the horizon. `s` is +1 for a buy and -1 for a sell; `X` is the order and `Q` the quantity filled. A positive cost is a loss to the trader.
 
@@ -75,7 +75,7 @@ From [`10-execution/tca.md`](../../specifications/10-execution/tca.md), ruling H
 
 The components sum to the total to 1e-10 relative, and a full fill has zero opportunity cost (property tests). Evidence: hand calculation, then a blind re-derivation from the inputs only (DR-H2, 2026-11-15); `tca_h-0001` to `0003` match. Perold's paper and Kissell's book are not free and were not read; the definition rests on the spec.
 
-## Step 2: the library call (available from v0.10.0, not run here)
+## Step 2: the library call (shown, not run here)
 
 ```json
 {"operation": "exec.tca.shortfall", "inputs": {"side": "BUY", "decision_price": 100, "arrival_price": 100.10, "end_price": 101, "order_quantity": 1000, "fills": [[600, 100.20], [200, 100.30]], "fees": 5}}

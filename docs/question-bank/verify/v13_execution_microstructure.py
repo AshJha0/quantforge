@@ -136,4 +136,38 @@ for g, val, printed in ((0.1, 1.4907704228, 1.49), (0.01, 1.3489085437, 1.35), (
     assert abs(spread(g, 0.5) - printed) <= 0.005
 has("1.4907704228, 1.3489085437 and 3.0216512475")
 
+# Q13.19 to Q13.21 pt_h-0002, 0021, 0011
+from decimal import Decimal as D
+assert 2 * (D(105) - 100) + (-1) * (D(105) - 110) == 15
+assert D(10000) - D("200.20") + D("109.89") == D("9909.69") and D("9909.69") + 105 - 10000 == D("14.69")
+has("trading is `2 x (105 - 100) + (-1) x (105 - 110) = 15`; fees -0.31; total 14.69")
+has("reason `HASH` (`pt_h-0021`)")
+has("`MAX_QTY`, `MAX_NOTIONAL`, `MAX_POSITION` (`pt_h-0011`)")
+
+# Q13.22 mest_h-0001
+close(math.sqrt(12 / 4 / 4), 0.866025403784439, 1e-15)
+has("sqrt(0.75) = 0.866025403784439")
+
+# Q13.23 venue_h-0001
+assert 100 * (D("100.05") - D("100.01")) == 4 and -200 * (D("100.05") - D("100.03")) == -4
+has("gains 0.04 a share (+4) and a sell of 200 at 100.03 loses 0.02 a share (-4)")
+
+# Q13.24 alg_h-0002, 0004
+for n, v in ((1, 0.75), (2, 15 / 8), (3, 63 / 16)):
+    close(math.sinh(n * math.log(2)), v, 1e-15)
+close(1000 * (1 - 0.75 / (15 / 8)), 600, 1e-12)
+close(2100 * (1 - (15 / 8) / (63 / 16)), 1100, 1e-12)
+has("1,000 over two buckets is 600 and 400 (`alg_h-0002`)")
+
+# Q13.25 tcx_h-0001
+istar = 700 * math.sqrt(0.04) * 0.02
+close(istar, 2.8, 1e-12)
+close(0.9 * istar * 0.5 + 0.1 * istar + 1.5, 3.04, 1e-12)
+close(1e4 * 0.02 * math.sqrt(0.16 / 3), 46.1880215352, 1e-10)
+has("3.04 bp expected cost and 46.2 bp timing risk")
+
+# Q13.26 recorded H-9 laptop figures (benchmarks/results/h9/README.md on branch h-lowlat)
+assert 105 > 50 and 39 <= 150 and 47 <= 150
+has("C++ p50 39 ns, Rust 47 ns, against 150")
+
 print(f"v13: {checks} strings checked")

@@ -39,3 +39,5 @@ Checked against plan 12.7 Q8k (TCA and the fill simulator wired into paper tradi
 | HR-53 | Confirmed | none |
 | HR-54 | Confirmed | none; matches the owner's 2026-11-18 scope |
 | HR-55 | Confirmed, amended | Q8k: every order in a final state has one `TCA` record (`paper-trading.md` "TCA per order", acceptance A7); A7 is part of the acceptance fixed here |
+
+E1 note (maintainer decision 2026-11-18, round 3 integration): `paper.ledger.verify` stays E1-exempt under the existing exemption rule (no Real input; `conformance/E1_EXEMPT.json`). It takes only ledger text, has no numeric or decimal-string input, and reports bad lines as a verify result, not an error. Ruling F-2a's "nothing is exempted" refers only to the decimal-string refinement of the gate and does not remove this exemption.

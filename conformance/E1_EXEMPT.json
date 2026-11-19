@@ -20,6 +20,7 @@
  "core.units.add_money": "no Real input in any golden: a non-finite value cannot be sent",
  "core.units.round_money": "no Real input in any golden: a non-finite value cannot be sent",
  "fx.spot_date": "no Real input in any golden: a non-finite value cannot be sent",
+ "paper.ledger.verify": "existing exemption rule (no Real input): takes only ledger text, has no numeric or decimal input, and reports bad lines as a verify result, never an error (paper-trading.md); maintainer decision 2026-11-18, stage-h-rulings-h21.md. F-2a's 'nothing exempted' refers to the decimal-string refinement only",
  "rates.schedule.generate": "no Real input in any golden: a non-finite value cannot be sent",
  "research.cv.cpcv_paths": "no Real input in any golden: a non-finite value cannot be sent"
 }

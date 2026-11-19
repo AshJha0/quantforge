@@ -1012,6 +1012,255 @@
     "synthetic"
    ],
    "description": "maturity must be > 0"
+  },
+  {
+   "case_id": "fits_d-0017",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     6.079077244193639,
+     6.30909196635769,
+     9.451859102214785,
+     9.639174620903473,
+     16.527051943288185,
+     17.859267417379023,
+     18.774852330413587,
+     20.341430288782057,
+     24.477862969335643,
+     24.87388599312306,
+     28.132092020860277
+    ],
+    "zero_rates": [
+     -0.005851118554846008,
+     0.02635344651107668,
+     0.02473314220504889,
+     0.00047062268966262255,
+     0.04361937873465692,
+     0.024336163421900033,
+     -0.0021272131429899595,
+     -0.018684881293098875,
+     0.036328185399628204,
+     0.055199622791234595,
+     -0.014117010374860798
+    ],
+    "tau": 9.346261827971722,
+    "delta": 0.000615750504688908
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "betas": [
+      -0.24663319347758664,
+      0.11373498618292235,
+      0.7395295888945634
+     ],
+     "residuals": [
+      0.0006126485848664787,
+      -0.029045692293513014,
+      -0.003540172072651962,
+      0.021599252078476936,
+      -0.016230733225472534,
+      8.347195500662776e-05,
+      0.024067733995335697,
+      0.03572694891331826,
+      -0.03480002493408666,
+      -0.05527531753949762,
+      0.0005353804695047095
+     ],
+     "outliers": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9
+     ],
+     "objective": 0.00013445901305469464
+    }
+   },
+   "tolerance_class": "calibration",
+   "verified_by": [
+    "independent-replay",
+    "scipy-least-squares-huber"
+   ],
+   "tags": [
+    "outlier-robust",
+    "regression",
+    "synthetic"
+   ],
+   "description": "old Java fit stopped short of the minimum (mutation re-check 2026-11-18)",
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; exact split solve in mpmath, SciPy from three starts"
+   }
+  },
+  {
+   "case_id": "fits_d-0018",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     1.9015860967441531,
+     4.497291201610246,
+     6.16161446896303,
+     12.1796230595406,
+     12.645840147205,
+     23.530018142806135,
+     24.558180589105987
+    ],
+    "zero_rates": [
+     0.048174659306358836,
+     0.05826562405653275,
+     0.010567107098514068,
+     0.020368623056845118,
+     -0.004186773719431266,
+     -0.011715798746360662,
+     0.03436753390344156
+    ],
+    "tau": 2.158702131694657,
+    "delta": 0.00014065157481983606
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "betas": [
+      -0.020381988670531637,
+      0.10763496368025272,
+      -0.011872861268474642
+     ],
+     "residuals": [
+      2.2955957286460174e-05,
+      -0.03692683470323517,
+      0.001352355429058459,
+      -0.023795929997172383,
+      0.00013902772226050543,
+      0.00011931947009270652,
+      -0.04633184576093838
+     ],
+     "outliers": [
+      1,
+      2,
+      3,
+      6
+     ],
+     "objective": 1.5225091152664573e-05
+    }
+   },
+   "tolerance_class": "calibration",
+   "verified_by": [
+    "independent-replay",
+    "scipy-least-squares-huber"
+   ],
+   "tags": [
+    "outlier-robust",
+    "regression",
+    "synthetic"
+   ],
+   "description": "old Java fit stopped short of the minimum (mutation re-check 2026-11-18)",
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; exact split solve in mpmath, SciPy from three starts"
+   }
+  },
+  {
+   "case_id": "fits_d-0019",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.27882680390743064,
+     0.6120973222536891,
+     4.741132193505328,
+     6.430428003370993,
+     6.985720859380131,
+     7.536404920236051,
+     9.210358012354678,
+     14.446129633483356,
+     15.890374508156711,
+     18.346514381059382,
+     22.634921036391848,
+     29.58162341866356
+    ],
+    "zero_rates": [
+     0.02164081839465801,
+     0.013258075635055839,
+     0.04461450579853693,
+     0.047195708036314996,
+     -0.0030599404684943654,
+     0.03161927324515719,
+     0.044424856085740955,
+     -0.012019358798620773,
+     0.038472019355860795,
+     -0.01138589118811689,
+     0.029116984689204043,
+     0.03666500470430979
+    ],
+    "tau": 5.1779363466503785,
+    "delta": 0.000215197315208101
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "betas": [
+      -0.0007752743702316559,
+      0.019691310643614204,
+      0.11992267687036297
+     ],
+     "residuals": [
+      -0.0001303183373100019,
+      0.011092196335976039,
+      -0.0019436006153164002,
+      -0.0026599206047913594,
+      0.04780259425904479,
+      0.013174157151270578,
+      -0.0002120380715848219,
+      0.050845959950498454,
+      -0.0014411282729698497,
+      0.04540610748718589,
+      0.0001271590936867228,
+      -0.013479173123270453
+     ],
+     "outliers": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11
+     ],
+     "objective": 4.025436651417734e-05
+    }
+   },
+   "tolerance_class": "calibration",
+   "verified_by": [
+    "independent-replay",
+    "scipy-least-squares-huber"
+   ],
+   "tags": [
+    "outlier-robust",
+    "regression",
+    "synthetic"
+   ],
+   "description": "old Java fit stopped short of the minimum (mutation re-check 2026-11-18)",
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; exact split solve in mpmath, SciPy from three starts"
+   }
   }
  ]
 }

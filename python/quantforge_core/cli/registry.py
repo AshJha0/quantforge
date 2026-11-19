@@ -16,6 +16,7 @@ from .limits import check_limits
 Handler = Callable[[Inputs], Any]
 REGISTRY: dict[str, Handler] = {}
 CORE_MODULES = (
+    "adaptive_exec",
     "arb_surface",
     "black",
     "bonds",
@@ -80,6 +81,8 @@ CORE_MODULES = (
     "dark_pool",
     "sor",
     "order_book",
+    "paper",
+    "paper_fills",
     "xva",
     "risk_tools",
     "aad_ladder",
@@ -98,6 +101,8 @@ CORE_MODULES = (
     "variance",
     "vol_usecase",
     "xccy",
+    "micro_est",
+    "venue_analytics",
 )
 
 

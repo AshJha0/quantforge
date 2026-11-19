@@ -1,0 +1,1874 @@
+{
+ "schema_version": "1.0",
+ "suite": "pt_h",
+ "spec": "specifications/10-execution/paper-trading.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_h_pt.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "pt_h-0001",
+   "operation": "paper.book.apply_fill",
+   "inputs": {
+    "cash": "10000",
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "2",
+      "price": "100",
+      "fee": "0.20"
+     },
+     {
+      "side": "SELL",
+      "quantity": "1",
+      "price": "110",
+      "fee": "0.11"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "position": "1",
+     "avg_cost": "100",
+     "realised": "10",
+     "fees": "0.31",
+     "cash": "9909.69"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0001 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0002",
+   "operation": "paper.book.end_of_day",
+   "inputs": {
+    "cash_open": "10000",
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "2",
+      "price": "100",
+      "fee": "0.20"
+     },
+     {
+      "side": "SELL",
+      "quantity": "1",
+      "price": "110",
+      "fee": "0.11"
+     }
+    ],
+    "close": "105",
+    "days": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "market": "0",
+     "trading": "15",
+     "fees": "-0.31",
+     "financing": "0",
+     "cash_interest": "0",
+     "short_borrow": "0",
+     "total": "14.69",
+     "position": "1",
+     "cash_close": "9909.69",
+     "nav_open": "10000",
+     "nav_close": "10014.69"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0002 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0003",
+   "operation": "paper.book.end_of_day",
+   "inputs": {
+    "cash_open": "9909.69",
+    "position_open": "1",
+    "avg_cost_open": "100",
+    "prev_close": "105",
+    "close": "102",
+    "days": 1,
+    "cash_rate": "0.0365"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "market": "-3",
+     "trading": "0",
+     "fees": "0",
+     "financing": "0.99",
+     "cash_interest": "0.99",
+     "short_borrow": "0",
+     "total": "-2.01",
+     "position": "1",
+     "cash_close": "9910.68",
+     "nav_open": "10014.69",
+     "nav_close": "10012.68"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0003 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0004",
+   "operation": "paper.book.end_of_day",
+   "inputs": {
+    "cash_open": "10100",
+    "position_open": "-2",
+    "prev_close": "50",
+    "close": "50",
+    "days": 1,
+    "cash_rate": "0.0365",
+    "borrow_rate": "0.0730"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "market": "0",
+     "trading": "0",
+     "fees": "0",
+     "financing": "0.99",
+     "cash_interest": "1.01",
+     "short_borrow": "-0.02",
+     "total": "0.99",
+     "position": "-2",
+     "cash_close": "10100.99",
+     "nav_open": "10000",
+     "nav_close": "10000.99"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0004 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0005",
+   "operation": "paper.book.apply_fill",
+   "inputs": {
+    "position": "1",
+    "avg_cost": "100",
+    "fills": [
+     {
+      "side": "SELL",
+      "quantity": "3",
+      "price": "90",
+      "fee": "0"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "position": "-2",
+     "avg_cost": "90",
+     "realised": "-10",
+     "fees": "0",
+     "cash_delta": "270"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0005 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0006",
+   "operation": "paper.book.end_of_day",
+   "inputs": {
+    "cash_open": "-1000",
+    "days": 3,
+    "debit_rate": "0.0730"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "market": "0",
+     "trading": "0",
+     "fees": "0",
+     "financing": "-0.6",
+     "cash_interest": "-0.6",
+     "short_borrow": "0",
+     "total": "-0.6",
+     "position": "0",
+     "cash_close": "-1000.6"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0006 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0010",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "BUY",
+     "type": "LIMIT",
+     "quantity": "3",
+     "limit_price": "101"
+    },
+    "ref_price": "100",
+    "position": "0",
+    "cash": "10000",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "accepted": true,
+     "reasons": []
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0010 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0011",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "BUY",
+     "type": "LIMIT",
+     "quantity": "11",
+     "limit_price": "100"
+    },
+    "ref_price": "100",
+    "position": "0",
+    "cash": "10000",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "accepted": false,
+     "reasons": [
+      "MAX_QTY",
+      "MAX_NOTIONAL",
+      "MAX_POSITION"
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0011 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0012",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "BUY",
+     "type": "LIMIT",
+     "quantity": "3",
+     "limit_price": "106"
+    },
+    "ref_price": "100",
+    "position": "0",
+    "cash": "10000",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "accepted": false,
+     "reasons": [
+      "PRICE_BAND"
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0012 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0013",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "SELL",
+     "type": "LIMIT",
+     "quantity": "10",
+     "limit_price": "100"
+    },
+    "ref_price": "100",
+    "position": "4",
+    "cash": "10000",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "accepted": false,
+     "reasons": [
+      "MAX_POSITION"
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0013 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0014",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "BUY",
+     "type": "MARKET",
+     "quantity": "3"
+    },
+    "ref_price": "100",
+    "position": "0",
+    "cash": "300",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "accepted": false,
+     "reasons": [
+      "INSUFFICIENT_CASH"
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0014 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0015",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "BUY",
+     "type": "LIMIT",
+     "quantity": "3",
+     "limit_price": "101"
+    },
+    "ref_price": "100",
+    "position": "0",
+    "cash": "10000",
+    "orders_today": 3,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "accepted": false,
+     "reasons": [
+      "MAX_ORDERS"
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0015 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0016",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "BUY",
+     "type": "LIMIT",
+     "quantity": "3",
+     "limit_price": "101"
+    },
+    "ref_price": "100",
+    "position": "0",
+    "cash": "10000",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": true,
+     "allow_short": true
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "accepted": false,
+     "reasons": [
+      "KILL_SWITCH"
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0016 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0017",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "SELL",
+     "type": "LIMIT",
+     "quantity": "2",
+     "limit_price": "100"
+    },
+    "ref_price": "100",
+    "position": "1",
+    "cash": "10000",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": false
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "accepted": false,
+     "reasons": [
+      "NO_SHORT"
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md; field-by-field by program/stage_h_blind_w2/pt_compare.py, mapping fixed before comparing): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0017 from the spec table"
+  },
+  {
+   "case_id": "pt_h-0020",
+   "operation": "paper.ledger.append",
+   "inputs": {
+    "seq": 0,
+    "ts": "2026-11-18T00:00:01Z",
+    "kind": "ORDER",
+    "body": {
+     "order_id": "O1",
+     "symbol": "BTC-USD",
+     "side": "BUY",
+     "type": "LIMIT",
+     "quantity": "3",
+     "limit_price": "101"
+    },
+    "prev": "0000000000000000000000000000000000000000000000000000000000000000"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "canonical_bytes": "{\"body\":{\"limit_price\":\"101\",\"order_id\":\"O1\",\"quantity\":\"3\",\"side\":\"BUY\",\"symbol\":\"BTC-USD\",\"type\":\"LIMIT\"},\"kind\":\"ORDER\",\"label\":\"crypto venue; simulated\",\"prev\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"seq\":0,\"ts\":\"2026-11-18T00:00:01Z\"}",
+     "hash": "72c85984abb1b7c4072c65dbba0567b3de51279645b0ad63cfd242137aed7e81",
+     "record": {
+      "seq": 0,
+      "ts": "2026-11-18T00:00:01Z",
+      "kind": "ORDER",
+      "body": {
+       "order_id": "O1",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "LIMIT",
+       "quantity": "3",
+       "limit_price": "101"
+      },
+      "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+      "label": "crypto venue; simulated",
+      "hash": "72c85984abb1b7c4072c65dbba0567b3de51279645b0ad63cfd242137aed7e81"
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "outside: sha256sum of the stated bytes ([SHA])",
+    "blind compare: SHAPE MISMATCH (blind adds verify fields); not counted"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0020 from the spec table; not counted as blind"
+  },
+  {
+   "case_id": "pt_h-0021",
+   "operation": "paper.ledger.verify",
+   "inputs": {
+    "text": "{\"body\":{\"limit_price\":\"102\",\"order_id\":\"O1\",\"quantity\":\"3\",\"side\":\"BUY\",\"symbol\":\"BTC-USD\",\"type\":\"LIMIT\"},\"hash\":\"72c85984abb1b7c4072c65dbba0567b3de51279645b0ad63cfd242137aed7e81\",\"kind\":\"ORDER\",\"label\":\"crypto venue; simulated\",\"prev\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"seq\":0,\"ts\":\"2026-11-18T00:00:01Z\"}\n"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "ok": false,
+     "records": 0,
+     "first_bad_seq": 0,
+     "reason": "HASH",
+     "head": null
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "not blind (the input names the corruption); blind compare: VALUE MISMATCH on records (count defined after the blind run); not counted"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0021 from the spec table; not counted as blind"
+  },
+  {
+   "case_id": "pt_h-0022",
+   "operation": "paper.ledger.verify",
+   "inputs": {
+    "text": "{\"body\":{\"limit_price\":\"101\",\"order_id\":\"O1\",\"quantity\":\"3\",\"side\":\"BUY\",\"symbol\":\"BTC-USD\",\"type\":\"LIMIT\"},\"hash\":\"72c85984abb1b7c4072c65dbba0567b3de51279645b0ad63cfd242137aed7e81\",\"kind\":\"ORDER\",\"label\":\"crypto venue; simulated\",\"prev\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"seq\":0,\"ts\":\"2026-11-18T00:00:01Z\"}\n{\"body\":{\"limit_price\":\"101\",\"order_id\":\"O2\",\"quantity\":\"3\",\"side\":\"BUY\",\"symbol\":\"BTC-USD\",\"type\":\"LIMIT\"},\"hash\":\"f622dab3c97ea3eb600bc118eaea19775690f646f97a0062dd44ff1cac709988\",\"kind\":\"ORDER\",\"label\":\"crypto venue; simulated\",\"prev\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"seq\":1,\"ts\":\"2026-11-18T00:00:02Z\"}\n"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "ok": false,
+     "records": 1,
+     "first_bad_seq": 1,
+     "reason": "LINK",
+     "head": null
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "not blind (the input names the corruption); blind compare: VALUE MISMATCH on records (count defined after the blind run); not counted"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0022 from the spec table; not counted as blind"
+  },
+  {
+   "case_id": "pt_h-0023",
+   "operation": "paper.ledger.verify",
+   "inputs": {
+    "text": "{\"body\":{\"limit_price\":\"101\",\"order_id\":\"O1\",\"quantity\":\"3\",\"side\":\"BUY\",\"symbol\":\"BTC-USD\",\"type\":\"LIMIT\"},\"hash\":\"5878059bc0f7f0f17e6ba08b7604ea3e2bbfb42f299deb580f393aa2d813d1c5\",\"kind\":\"ORDER\",\"prev\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"seq\":0,\"ts\":\"2026-11-18T00:00:01Z\"}\n"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "ok": false,
+     "records": 0,
+     "first_bad_seq": 0,
+     "reason": "LABEL",
+     "head": null
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "not blind (the input names the corruption); blind compare: SHAPE MISMATCH (blind returns hash and record too); not counted"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper"
+   ],
+   "description": "pt_h-0023 from the spec table; not counted as blind"
+  },
+  {
+   "case_id": "pt_h-0030",
+   "operation": "paper.session.run",
+   "inputs": {
+    "cash": "10000",
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    },
+    "lit": {
+     "tick_size": "0.5",
+     "lot_size": "1",
+     "fee_schedule": {
+      "maker_rebate": "0",
+      "taker_fee": "0.001"
+     }
+    },
+    "script": [
+     {
+      "op": "SUBMIT",
+      "ts": "2026-11-18T00:00:01Z",
+      "order": {
+       "order_id": "O1",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "LIMIT",
+       "quantity": "3",
+       "limit_price": "101",
+       "venue": "LIT"
+      },
+      "snapshot": {
+       "bids": [
+        [
+         "99.5",
+         "4"
+        ]
+       ],
+       "asks": [
+        [
+         "100.5",
+         "2"
+        ],
+        [
+         "101",
+         "5"
+        ]
+       ]
+      }
+     },
+     {
+      "op": "SUBMIT",
+      "ts": "2026-11-18T00:00:02Z",
+      "order": {
+       "order_id": "O2",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "LIMIT",
+       "quantity": "3",
+       "limit_price": "106",
+       "venue": "LIT"
+      },
+      "snapshot": {
+       "bids": [
+        [
+         "99.5",
+         "4"
+        ]
+       ],
+       "asks": [
+        [
+         "100.5",
+         "2"
+        ],
+        [
+         "101",
+         "5"
+        ]
+       ]
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "status": "DONE",
+       "filled": "3"
+      },
+      {
+       "status": "REJECTED",
+       "reasons": [
+        "PRICE_BAND",
+        "MAX_POSITION"
+       ]
+      }
+     ],
+     "records": [
+      {
+       "seq": 0,
+       "ts": "2026-11-18T00:00:01Z",
+       "kind": "ORDER",
+       "body": {
+        "order_id": "O1",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "type": "LIMIT",
+        "quantity": "3",
+        "limit_price": "101",
+        "venue": "LIT",
+        "decision_price": "100"
+       },
+       "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+       "label": "crypto venue; simulated",
+       "hash": "66fc9b214cfca20e4fc824d2591bce53befb48b72a28c8505272faff8bc18055"
+      },
+      {
+       "seq": 1,
+       "ts": "2026-11-18T00:00:01Z",
+       "kind": "FILL",
+       "body": {
+        "order_id": "O1",
+        "child_id": "O1",
+        "venue": "LIT",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "quantity": "2",
+        "price": "100.5",
+        "fee": "0.201"
+       },
+       "prev": "66fc9b214cfca20e4fc824d2591bce53befb48b72a28c8505272faff8bc18055",
+       "label": "crypto venue; simulated",
+       "hash": "fbb2be81c5b1dac84b2b6fe99658fe0a3142cebe25129b2240ca98ef64a62da9"
+      },
+      {
+       "seq": 2,
+       "ts": "2026-11-18T00:00:01Z",
+       "kind": "FILL",
+       "body": {
+        "order_id": "O1",
+        "child_id": "O1",
+        "venue": "LIT",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "quantity": "1",
+        "price": "101",
+        "fee": "0.101"
+       },
+       "prev": "fbb2be81c5b1dac84b2b6fe99658fe0a3142cebe25129b2240ca98ef64a62da9",
+       "label": "crypto venue; simulated",
+       "hash": "1b443cf8ecde5eae99506f4bd85fadfb0665d0e22e017bbf0ce3124d4b75c47c"
+      },
+      {
+       "seq": 3,
+       "ts": "2026-11-18T00:00:02Z",
+       "kind": "REJECT",
+       "body": {
+        "order_id": "O2",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "type": "LIMIT",
+        "quantity": "3",
+        "limit_price": "106",
+        "venue": "LIT",
+        "reasons": [
+         "PRICE_BAND",
+         "MAX_POSITION"
+        ]
+       },
+       "prev": "1b443cf8ecde5eae99506f4bd85fadfb0665d0e22e017bbf0ce3124d4b75c47c",
+       "label": "crypto venue; simulated",
+       "hash": "5afe57feb517eca07f9469640c0c1e2c3c016f4ce9a7ee412804cf2172ccebdb"
+      }
+     ],
+     "head": "5afe57feb517eca07f9469640c0c1e2c3c016f4ce9a7ee412804cf2172ccebdb",
+     "positions": {
+      "BTC-USD": "3"
+     },
+     "cash": "9697.698",
+     "label": "crypto venue; simulated",
+     "ceiling": "Paper trading on free data; simulated fills; no evidence of tradable profitability."
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "outside: hashlib sha256 of the canonical bytes",
+    "blind lane 2: MATCH but not blind (LIT child_id unspecified in the packet; it enters the hashes)"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper",
+    "session"
+   ],
+   "description": "hand, not blind: session: one LIT order filled across two levels, one rejected; ledger hashes recomputed"
+  },
+  {
+   "case_id": "pt_h-0031",
+   "operation": "paper.session.run",
+   "inputs": {
+    "cash": "10000",
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    },
+    "lit": {
+     "tick_size": "0.5",
+     "lot_size": "1",
+     "fee_schedule": {
+      "maker_rebate": "0",
+      "taker_fee": "0.001"
+     }
+    },
+    "script": [
+     {
+      "op": "SUBMIT",
+      "ts": "2026-11-18T00:00:01Z",
+      "order": {
+       "order_id": "O1",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "LIMIT",
+       "quantity": "3",
+       "limit_price": "101",
+       "venue": "LIT"
+      },
+      "snapshot": {
+       "bids": [
+        [
+         "99.5",
+         "4"
+        ]
+       ],
+       "asks": [
+        [
+         "100.5",
+         "2"
+        ],
+        [
+         "101",
+         "5"
+        ]
+       ]
+      }
+     },
+     {
+      "op": "SUBMIT",
+      "ts": "2026-11-18T00:00:02Z",
+      "order": {
+       "order_id": "O2",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "LIMIT",
+       "quantity": "3",
+       "limit_price": "106",
+       "venue": "LIT"
+      },
+      "snapshot": {
+       "bids": [
+        [
+         "99.5",
+         "4"
+        ]
+       ],
+       "asks": [
+        [
+         "100.5",
+         "2"
+        ],
+        [
+         "101",
+         "5"
+        ]
+       ]
+      }
+     },
+     {
+      "op": "CLOSE",
+      "ts": "2026-11-19T00:00:00Z",
+      "prev_marks": {},
+      "marks": {
+       "BTC-USD": "102"
+      },
+      "days": 1
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "status": "DONE",
+       "filled": "3"
+      },
+      {
+       "status": "REJECTED",
+       "reasons": [
+        "PRICE_BAND",
+        "MAX_POSITION"
+       ]
+      },
+      {
+       "status": "CLOSED",
+       "eod": {
+        "market": "0",
+        "trading": "4",
+        "fees": "-0.302",
+        "financing": "0",
+        "interest": "0",
+        "borrow": "0",
+        "total": "3.698",
+        "nav": "10003.698",
+        "label": "crypto venue; simulated",
+        "ceiling": "Paper trading on free data; simulated fills; no evidence of tradable profitability."
+       }
+      }
+     ],
+     "records": [
+      {
+       "seq": 0,
+       "ts": "2026-11-18T00:00:01Z",
+       "kind": "ORDER",
+       "body": {
+        "order_id": "O1",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "type": "LIMIT",
+        "quantity": "3",
+        "limit_price": "101",
+        "venue": "LIT",
+        "decision_price": "100"
+       },
+       "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+       "label": "crypto venue; simulated",
+       "hash": "66fc9b214cfca20e4fc824d2591bce53befb48b72a28c8505272faff8bc18055"
+      },
+      {
+       "seq": 1,
+       "ts": "2026-11-18T00:00:01Z",
+       "kind": "FILL",
+       "body": {
+        "order_id": "O1",
+        "child_id": "O1",
+        "venue": "LIT",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "quantity": "2",
+        "price": "100.5",
+        "fee": "0.201"
+       },
+       "prev": "66fc9b214cfca20e4fc824d2591bce53befb48b72a28c8505272faff8bc18055",
+       "label": "crypto venue; simulated",
+       "hash": "fbb2be81c5b1dac84b2b6fe99658fe0a3142cebe25129b2240ca98ef64a62da9"
+      },
+      {
+       "seq": 2,
+       "ts": "2026-11-18T00:00:01Z",
+       "kind": "FILL",
+       "body": {
+        "order_id": "O1",
+        "child_id": "O1",
+        "venue": "LIT",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "quantity": "1",
+        "price": "101",
+        "fee": "0.101"
+       },
+       "prev": "fbb2be81c5b1dac84b2b6fe99658fe0a3142cebe25129b2240ca98ef64a62da9",
+       "label": "crypto venue; simulated",
+       "hash": "1b443cf8ecde5eae99506f4bd85fadfb0665d0e22e017bbf0ce3124d4b75c47c"
+      },
+      {
+       "seq": 3,
+       "ts": "2026-11-18T00:00:02Z",
+       "kind": "REJECT",
+       "body": {
+        "order_id": "O2",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "type": "LIMIT",
+        "quantity": "3",
+        "limit_price": "106",
+        "venue": "LIT",
+        "reasons": [
+         "PRICE_BAND",
+         "MAX_POSITION"
+        ]
+       },
+       "prev": "1b443cf8ecde5eae99506f4bd85fadfb0665d0e22e017bbf0ce3124d4b75c47c",
+       "label": "crypto venue; simulated",
+       "hash": "5afe57feb517eca07f9469640c0c1e2c3c016f4ce9a7ee412804cf2172ccebdb"
+      },
+      {
+       "seq": 4,
+       "ts": "2026-11-19T00:00:00Z",
+       "kind": "TCA",
+       "body": {
+        "order_id": "O1",
+        "delay": "0",
+        "execution": "2",
+        "opportunity": "0",
+        "total": "2.302",
+        "total_bps": "76.73333333333333"
+       },
+       "prev": "5afe57feb517eca07f9469640c0c1e2c3c016f4ce9a7ee412804cf2172ccebdb",
+       "label": "crypto venue; simulated",
+       "hash": "bcd3f2bbc7bad551b76daefa6f8d3a712c58f7a45c224d107541bb26c0a1a1ae"
+      },
+      {
+       "seq": 5,
+       "ts": "2026-11-19T00:00:00Z",
+       "kind": "EOD",
+       "body": {
+        "market": "0",
+        "trading": "4",
+        "fees": "-0.302",
+        "financing": "0",
+        "interest": "0",
+        "borrow": "0",
+        "total": "3.698",
+        "nav": "10003.698",
+        "label": "crypto venue; simulated",
+        "ceiling": "Paper trading on free data; simulated fills; no evidence of tradable profitability."
+       },
+       "prev": "bcd3f2bbc7bad551b76daefa6f8d3a712c58f7a45c224d107541bb26c0a1a1ae",
+       "label": "crypto venue; simulated",
+       "hash": "dc9e56a5c754075da858c9c4d6dc3332a597de94815137ef45a5d049f2fe59b3"
+      }
+     ],
+     "head": "dc9e56a5c754075da858c9c4d6dc3332a597de94815137ef45a5d049f2fe59b3",
+     "positions": {
+      "BTC-USD": "3"
+     },
+     "cash": "9697.698",
+     "label": "crypto venue; simulated",
+     "ceiling": "Paper trading on free data; simulated fills; no evidence of tradable profitability."
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "outside: hashlib sha256 of the canonical bytes",
+    "blind lane 2: MATCH but not blind (LIT child_id unspecified in the packet; it enters the hashes)"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper",
+    "session"
+   ],
+   "description": "hand, not blind: session c30 then the daily close: TCA and EOD records, HR-53 identity"
+  },
+  {
+   "case_id": "pt_h-0032",
+   "operation": "paper.session.run",
+   "inputs": {
+    "cash": "10000",
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    },
+    "lit": {
+     "tick_size": "0.5",
+     "lot_size": "1",
+     "fee_schedule": {
+      "maker_rebate": "0",
+      "taker_fee": "0.001"
+     }
+    },
+    "dark": {
+     "firm_delay": 0,
+     "lot_size": "1",
+     "p_firm": "1",
+     "penalty_events": 2,
+     "seed": 20261118,
+     "tick_size": "0.01"
+    },
+    "script": [
+     {
+      "op": "SUBMIT",
+      "ts": "2026-11-18T00:00:01Z",
+      "order": {
+       "order_id": "P1",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "MARKET",
+       "quantity": "2",
+       "venue": "SOR"
+      },
+      "snapshot": {
+       "bids": [
+        [
+         "99.5",
+         "4"
+        ]
+       ],
+       "asks": [
+        [
+         "100.5",
+         "1"
+        ]
+       ]
+      },
+      "contra": [
+       {
+        "op": "NEW",
+        "id": "C1",
+        "side": "SELL",
+        "qty": "2",
+        "kind": "FIRM"
+       }
+      ],
+      "router": {
+       "f": "0.3",
+       "h": "0.5",
+       "lambda_o": "0",
+       "lambda_u": "10",
+       "lit_samples": [
+        []
+       ],
+       "theta": "0",
+       "venues": [
+        {
+         "as": "0",
+         "kind": "DARK",
+         "r": "0",
+         "tail": [
+          "1",
+          "0.5",
+          "0"
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "status": "DONE",
+       "filled": "2"
+      }
+     ],
+     "records": [
+      {
+       "seq": 0,
+       "ts": "2026-11-18T00:00:01Z",
+       "kind": "ORDER",
+       "body": {
+        "order_id": "P1",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "type": "MARKET",
+        "quantity": "2",
+        "venue": "SOR",
+        "decision_price": "100"
+       },
+       "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+       "label": "crypto venue; simulated",
+       "hash": "1afbf623b4c29984c9e714f5f75bd6862a5c7209b35081492ecdfcdec53da340"
+      },
+      {
+       "seq": 1,
+       "ts": "2026-11-18T00:00:01Z",
+       "kind": "FILL",
+       "body": {
+        "order_id": "P1",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "child_id": "P1.M",
+        "venue": "LIT",
+        "quantity": "1",
+        "price": "100.5",
+        "fee": "0.1005"
+       },
+       "prev": "1afbf623b4c29984c9e714f5f75bd6862a5c7209b35081492ecdfcdec53da340",
+       "label": "crypto venue; simulated",
+       "hash": "ed55e499f7cd7f333ab5f5ffc340459bd6436afeae408c2b4d0417cf4645afd9"
+      },
+      {
+       "seq": 2,
+       "ts": "2026-11-18T00:00:01Z",
+       "kind": "FILL",
+       "body": {
+        "order_id": "P1",
+        "symbol": "BTC-USD",
+        "side": "BUY",
+        "child_id": "P1.L0",
+        "venue": "DARK",
+        "quantity": "1",
+        "price": "100",
+        "fee": "0"
+       },
+       "prev": "ed55e499f7cd7f333ab5f5ffc340459bd6436afeae408c2b4d0417cf4645afd9",
+       "label": "crypto venue; simulated",
+       "hash": "783d2f9582393724dde6157510269639db6b5392bbd798bc8565a24dced1e954"
+      }
+     ],
+     "head": "783d2f9582393724dde6157510269639db6b5392bbd798bc8565a24dced1e954",
+     "positions": {
+      "BTC-USD": "2"
+     },
+     "cash": "9799.3995",
+     "label": "crypto venue; simulated",
+     "ceiling": "Paper trading on free data; simulated fills; no evidence of tradable profitability."
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "outside: hashlib sha256 of the canonical bytes",
+    "blind lane 2: not blind (packet gap: router and dark simulator not in the packet; child_ids and hashes differ)"
+   ],
+   "tags": [
+    "stage_h",
+    "simulated",
+    "paper",
+    "session"
+   ],
+   "description": "hand, not blind: SOR order: market child 1 lot, dark child 2 trimmed to 1 (HR-77 overfill trim)"
+  },
+  {
+   "case_id": "pt_h-0040",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "HOLD",
+     "type": "LIMIT",
+     "quantity": "3",
+     "limit_price": "101"
+    },
+    "ref_price": "100",
+    "position": "0",
+    "cash": "10000",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "error"
+   ],
+   "description": "hand: unknown side"
+  },
+  {
+   "case_id": "pt_h-0041",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "BUY",
+     "type": "LIMIT",
+     "quantity": "0",
+     "limit_price": "101"
+    },
+    "ref_price": "100",
+    "position": "0",
+    "cash": "10000",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "error"
+   ],
+   "description": "hand: quantity 0"
+  },
+  {
+   "case_id": "pt_h-0042",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "BUY",
+     "type": "LIMIT",
+     "quantity": "3"
+    },
+    "ref_price": "100",
+    "position": "0",
+    "cash": "10000",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "error"
+   ],
+   "description": "hand: limit_price missing on a LIMIT order"
+  },
+  {
+   "case_id": "pt_h-0043",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "BUY",
+     "type": "LIMIT",
+     "quantity": 3,
+     "limit_price": "101"
+    },
+    "ref_price": "100",
+    "position": "0",
+    "cash": "10000",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "error"
+   ],
+   "description": "hand: quantity as a JSON number (HR-44)"
+  },
+  {
+   "case_id": "pt_h-0044",
+   "operation": "paper.book.apply_fill",
+   "inputs": {
+    "cash": "10000",
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "2",
+      "price": "-1",
+      "fee": "0.20"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "error"
+   ],
+   "description": "hand: negative price"
+  },
+  {
+   "case_id": "pt_h-0045",
+   "operation": "paper.book.end_of_day",
+   "inputs": {
+    "cash_open": "100",
+    "position_open": "1",
+    "close": "100"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "error"
+   ],
+   "description": "hand: open position without prev_close"
+  },
+  {
+   "case_id": "pt_h-0046",
+   "operation": "paper.ledger.append",
+   "inputs": {
+    "seq": 0,
+    "ts": "2026-11-18T00:00:01Z",
+    "kind": "TRADE",
+    "body": {}
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "error"
+   ],
+   "description": "hand: unknown kind"
+  },
+  {
+   "case_id": "pt_h-0047",
+   "operation": "paper.session.run",
+   "inputs": {
+    "cash": "10000",
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    },
+    "lit": {
+     "tick_size": "0.5",
+     "lot_size": "1",
+     "fee_schedule": {
+      "maker_rebate": "0",
+      "taker_fee": "0.001"
+     }
+    },
+    "script": [
+     {
+      "op": "SUBMIT",
+      "ts": "2026-11-18T00:00:01Z",
+      "order": {
+       "order_id": "O1",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "LIMIT",
+       "quantity": "3",
+       "limit_price": "101",
+       "venue": "NYSE"
+      },
+      "snapshot": {
+       "bids": [
+        [
+         "99.5",
+         "4"
+        ]
+       ],
+       "asks": [
+        [
+         "100.5",
+         "2"
+        ],
+        [
+         "101",
+         "5"
+        ]
+       ]
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "error"
+   ],
+   "description": "hand: unknown venue"
+  },
+  {
+   "case_id": "pt_h-0050",
+   "operation": "paper.book.apply_fill",
+   "inputs": {
+    "cash": "10000000000000000000000000000.01",
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "1",
+      "price": "1",
+      "fee": "0"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "position": "1",
+     "avg_cost": "1",
+     "realised": "0",
+     "fees": "0",
+     "cash": "9999999999999999999999999999.01"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md, blind lane 2; field by field by paper2_compare.py): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "exact"
+   ],
+   "description": "hand; blind lane 2 MATCH: HR-77 exact cash at 31 digits (fails under 28-digit rounding)"
+  },
+  {
+   "case_id": "pt_h-0051",
+   "operation": "paper.book.apply_fill",
+   "inputs": {
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "1",
+      "price": "1"
+     },
+     {
+      "side": "BUY",
+      "quantity": "2",
+      "price": "2"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "label": "crypto venue; simulated",
+     "position": "3",
+     "avg_cost": "1.666666666666666667",
+     "realised": "0",
+     "fees": "0",
+     "cash_delta": "-5"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md, blind lane 2; field by field by paper2_compare.py): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "exact"
+   ],
+   "description": "hand; blind lane 2 MATCH: HR-77 average cost 5/3 rounded half-even to 18 decimals"
+  },
+  {
+   "case_id": "pt_h-0052",
+   "operation": "paper.book.apply_fill",
+   "inputs": {
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "1",
+      "price": "1.0000000000000000001"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "error",
+    "exact"
+   ],
+   "description": "hand, not blind: HR-77: an input with 19 decimals"
+  },
+  {
+   "case_id": "pt_h-0053",
+   "operation": "paper.book.apply_fill",
+   "inputs": {
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "100",
+      "price": "10000000000000000000000000000000000"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "error",
+    "exact"
+   ],
+   "description": "hand, not blind: HR-77: notional 10^36 has 37 digits"
+  },
+  {
+   "case_id": "pt_h-0054",
+   "operation": "paper.ledger.verify",
+   "inputs": {
+    "text": "{\"body\":{\"limit_price\":\"101\",\"order_id\":\"O1\",\"quantity\":\"3\",\"side\":\"BUY\",\"symbol\":\"BTC-USD\",\"type\":\"LIMIT\"},\"hash\":\"72c85984abb1b7c4072c65dbba0567b3de51279645b0ad63cfd242137aed7e81\",\"kind\":\"ORDER\",\"kind\":\"ORDER\",\"label\":\"crypto venue; simulated\",\"prev\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"seq\":0,\"ts\":\"2026-11-18T00:00:01Z\"}\n"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "ok": false,
+     "records": 0,
+     "first_bad_seq": 0,
+     "reason": "PARSE",
+     "head": null,
+     "label": "crypto venue; simulated"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind-rederivation (DR-H2, program/STAGE_H_BLIND_WAVE2B.md, blind lane 2; field by field by paper2_compare.py): MATCH"
+   ],
+   "tags": [
+    "stage_h",
+    "paper",
+    "ledger"
+   ],
+   "description": "hand; blind lane 2 MATCH: HR-78 a repeated key (same value) is PARSE, though last-wins would verify"
+  }
+ ]
+}

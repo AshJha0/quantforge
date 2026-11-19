@@ -91,3 +91,7 @@ Rows L1 to L6 are fixed in `specifications/09-microstructure/low-latency-targets
 | L6 | Correctness on the same replay | zero mismatches |
 
 Python: reported only. A miss is reported, not refitted.
+
+## Stage H addition: R4 library interfaces H-5 (written 2026-11-18 before any measurement)
+
+Rows E1 to E6 (execution layer) and B1 to B4 (plan H-5 set) are fixed in `specifications/10-execution/library-interfaces.md` section 4, with method and reasons. In process, p50 / p99 per call, median of 5 repeats, acceptance machine the Actions `ubuntu-24.04` runner; regression threshold max(20%, 3 x CV of p99). Java summary: E1 1/5 us, E2 20/100 us, E3 5/25 us, E4 5/25 us, E5 200 ns/1 us, E6 100/500 ns; B1 2/5 ms, B2 50/250 us, B3 5/25 us, B4 5/6 s. Python about 50x Java; Rust and C++ half of Java. A miss is reported, not refitted.

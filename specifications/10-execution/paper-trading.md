@@ -1,6 +1,6 @@
 # Paper trading with simulated fills
 
-Spec version 0.1.0 (stage H item H-21, moved from stage K by the owner 2026-11-18). Status: Specified; ledger, book (positions, cash, financing, P&L explain) and pre-trade checks implemented in Python (`quantforge_core/paper.py`); fill wiring to the simulated venues not implemented. Rulings HR-42 to HR-55 (proposed, `stage-h-rulings-h21.md`). Plan items: section 2 owner decision "proper paper trading", 12.7 Q8k (TCA and the fill simulator wired into paper trading; the ledger carries TCA per order). The public dashboard stays in stage K and is out of scope here.
+Spec version 0.1.0 (stage H item H-21, moved from stage K by the owner 2026-11-18). Status: implemented. The ledger, book (positions, cash, financing, P&L explain), pre-trade checks, fills from the lit, dark and SOR simulators, per-order TCA records and the session close are in Python (`quantforge_core/paper.py`, `paper_fills.py`, A7); the `paper.*` CLI operations are in all four builds (Python, Java `org.quantforge.paper.Paper`, C++, Rust `quantforge_core::paper`; goldens `pt_h` and `e1_hpt`, 2026-11-18). Rulings HR-42 to HR-55 (proposed, `stage-h-rulings-h21.md`). Plan items: section 2 owner decision "proper paper trading", 12.7 Q8k (TCA and the fill simulator wired into paper trading; the ledger carries TCA per order). The public dashboard stays in stage K and is out of scope here.
 
 **Every output is labelled "crypto venue; simulated"** (HR-43), and every report also carries the 11.6 honest-ceiling sentence: "Paper trading on free data; simulated fills; no evidence of tradable profitability." **No live order is ever placed**: there is no code path to any venue's order entry, and a request with `mode` other than `"simulated"` is `E_UNSUPPORTED_OPERATION` (HR-42).
 
@@ -20,10 +20,17 @@ Evidence for goldens: hand calculation in exact decimal (shown in each row), plu
 ### Numbers
 Prices, quantities, cash and rates are decimal strings in inputs, outputs and the ledger (HR-44); arithmetic is exact decimal. Cash postings from financing are rounded to the cash precision (2 decimal places for USD) half-even when posted; fill cash is exact (quantity x price + fee, no rounding). Floats never enter the ledger.
 
+### Rulings HR-77 and HR-78 (proposed 2026-11-18, from the Java port; numbers to be confirmed by the coordinator)
+
+| Ruling | Rule |
+|---|---|
+| HR-77 | **Exact decimals and range.** Every input decimal is in the HR-57 input range (36 digits, at most 18 decimals), and every computed value (notional q x p, each cash flow and the cash balance, fees, cost basis, position, realised, market value, NAV, each explain term, the financing products before division, q x p_chk) is in the HR-57 range (36 digits, 36 decimals); outside either is **`E_LIMIT`** (HR-58), checked after `E_SCHEMA`, never a rounded value. Inside the range sums, differences and products are exact in every build (Python in the 200-digit context, as HR-58). There are exactly four divisions, each with a stated rounding: the average cost c = (\|n\| c + q p) / (\|n\| + q), rounded half-even to 18 decimals; cash interest and short borrow, the exact product divided by 365 and rounded half-even to 0.01; the mid (bid + ask) / 2, exact; the SOR overfill trim (a child fill of quantity q_c and fee f_c of which only room < q_c fits in the parent), fee' = f_c x room / q_c, which is exact: a lit fee is rate x q_c x p (so fee' = rate x room x p, terminating) and a dark fee is 0, so no rounding applies and a build may compute rate x room x p directly; the trimmed quantity is room. The price-band check is cross-multiplied, \|limit - P_ref\| > band x P_ref, so no division. TCA values stay binary64 (cli-contract.md). Goldens pt_h-0032 (SOR trim: dark child 2 trimmed to 1), pt_h-0050 (31-digit cash, wrong under a 28-digit context), 0051 (5/3 to 18 decimals), 0052 and 0053 (`E_LIMIT`). |
+| HR-78 | **Duplicate keys.** A ledger line whose JSON repeats a key at any level is `PARSE` in `paper.ledger.verify`, even when the values agree: a last-wins parser would let an edited copy of a field pass the hash check. Golden pt_h-0054. |
+
 ### Orders and fills
 An order: `order_id`, `symbol`, `side` (BUY, SELL), `type` (LIMIT, MARKET, IOC, plus the lit types of HR-25 passed through), `quantity` (> 0), `limit_price` (required unless MARKET), `venue` (`LIT`, `DARK`, `SOR`). States as [FIX-ER].
 
-Fill source (HR-47, not implemented): the order is replayed into `lit-matching.md`, `dark-pool.md` or `smart-order-router.md`, seeded with the recorded book snapshot at the order time (forward-log per-second 100-level snapshots, form B of HR-11). Spread and slippage come from walking that book; partial fills come from the venue (IOC remainder cancelled; resting remainder cancelled at the daily close, HR-48). The simulated book does not remember our own past fills (no permanent impact on the recorded data) and this is stated as a limitation. Fees are the venue simulator's signed fees (HR-30).
+Fill source (HR-47, `paper_fills.py`): the order is replayed into `lit-matching.md`, `dark-pool.md` or `smart-order-router.md`, seeded with the recorded book snapshot at the order time (forward-log per-second 100-level snapshots, form B of HR-11). Spread and slippage come from walking that book; partial fills come from the venue (IOC remainder cancelled; resting remainder cancelled at the daily close, HR-48). The simulated book does not remember our own past fills (no permanent impact on the recorded data) and this is stated as a limitation. Fees are the venue simulator's signed fees (HR-30).
 
 ### Positions and cash (`paper.book.apply_fill`)
 Per symbol, signed position `n` and average cost `c` (HR-50, average-cost method). For a fill of side s (+1 BUY, -1 SELL), quantity q, price p, fee f (fee >= 0 charged, < 0 rebate):
@@ -68,13 +75,13 @@ Append-only JSON Lines, one record per line, in the `forward-log` branch (HR-46)
 
 Canonical bytes (HR-45): the record without `hash`, JSON with keys sorted by code point at every level, separators `,` and `:` with no whitespace, ASCII only (non-ASCII escaped `\uXXXX`), integers only for `seq`, every other number a string. `hash` = lowercase hex SHA-256 of those bytes.
 
-`verify` re-reads the file and returns `{ok, records, first_bad_seq, reason}`; reasons `HASH` (stored hash differs), `LINK` (prev differs from the previous hash), `SEQ` (gap or repeat), `LABEL` (missing or wrong label), `PARSE`. It never repairs.
+`verify` re-reads the file and returns `{ok, records, first_bad_seq, reason}`; reasons `HASH` (stored hash differs), `LINK` (prev differs from the previous hash), `SEQ` (gap or repeat), `LABEL` (missing or wrong label), `PARSE` (including a repeated key, HR-78). It never repairs.
 
 ### TCA per order
 When an order reaches a final state, a `TCA` record carries `exec.tca.shortfall` (`tca.md`) with decision price = P_ref at the pre-trade check, arrival price = mid at venue entry, end price = close P_t, the order's fills and fees.
 
 ## Errors
-`E_UNSUPPORTED_OPERATION` live mode; `E_DOMAIN` non-positive quantity or price; `E_INPUT` unknown side/type/kind, a fill for an unknown order, a fill over the order quantity; `E_SCHEMA` missing field.
+`E_UNSUPPORTED_OPERATION` live mode; `E_DOMAIN` non-positive quantity or price; `E_INPUT` unknown side/type/kind, a fill for an unknown order, a fill over the order quantity; `E_SCHEMA` missing field, a JSON number where a decimal string is expected, or a non-finite token ("NaN", "Infinity", "-Infinity") in a decimal string (HR-12, ruling F-2a).
 
 ## Acceptance tests (fixed before any run, HR-55)
 - A1 Ledger: every golden pt_h-0020..0023 passes; appending 10,000 random records and flipping any one byte in any line makes `verify` fail at that seq or earlier; truncating the last line leaves a valid shorter chain (detected only by the published head hash, HR-46).
@@ -83,7 +90,7 @@ When an order reaches a final state, a `TCA` record carries `exec.tca.shortfall`
 - A4 Pre-trade: goldens pt_h-0010..0018; property: an order accepted never makes |n| exceed max_abs_position when fully filled.
 - A5 No live path: a static test that no module under `quantforge_core/paper*` imports a network library or names an order-entry endpoint; mode `"live"` raises.
 - A6 Labels: every ledger record and report has the label; `verify` fails on a record without it.
-- A7 (not yet runnable) fills: lit, dark and SOR goldens of their own specs reproduced through the paper path, and every final order has one `TCA` record whose components sum to total to 1e-10 (tca.md).
+- A7 fills: lit, dark and SOR goldens of their own specs reproduced through the paper path, and every final order has one `TCA` record whose components sum to total to 1e-10 (tca.md).
 - A8 Determinism: the same order list and recorded snapshots give a byte-identical ledger.
 
 ## Golden cases
@@ -116,6 +123,8 @@ Golden output shapes (added 2026-11-18 as a fix after blind lane 2b, which had t
 - Day cases 0002 to 0004, 0006: `{"market", "trading", "fees", "financing", "cash_interest", "short_borrow", "total", "position", "cash_close", "nav_open", "nav_close"}` (`nav_open` and `nav_close` omitted in 0006, where no price is given).
 - Pre-trade 0010 to 0017: `{"accepted", "reasons"}` with reasons in check order; 0018: `{"error": "E_UNSUPPORTED_OPERATION"}`.
 - Ledger 0020: `{"canonical_bytes", "hash", "record"}`; 0021 to 0023: `{"verify": {"ok", "first_bad_seq", "reason", "records"}}`.
+
+CLI form (2026-11-18, cross-language lane; shapes only, no value changed): the operations, inputs and byte-exact hash rule are in `cli-contract.md`, "Stage H paper trading operations". Every output also carries `label` (HR-43). `paper.ledger.verify` returns the verify object itself (not wrapped in `verify`) plus `head`; `records` is the number of records that verified before the first bad one, so 0021 and 0023 give 0 and 0022 gives 1 (the blind lane counted all lines; the spec stated no value). pt_h-0018 is pinned by unit tests, not by the golden file, because the runner reads `E_UNSUPPORTED_OPERATION` as "not implemented". Further hand cases in the golden file, not blind: pt_h-0030 and 0031 (`paper.session.run`, one LIT order filled over two levels and one rejected, then the close with TCA and EOD; hashes recomputed with `hashlib` from the canonical bytes), pt_h-0040 to 0047 (errors), and `e1_hpt` (a non-finite token in a decimal string is `E_SCHEMA`, HR-12 and F-2a). Blind status after a field-by-field comparison (`program/stage_h_blind_w2/pt_compare.py`, mapping fixed before comparing): 0001 to 0006 and 0010 to 0017 MATCH; 0020, 0021, 0022 and 0023 not counted (shape or `records` differences; 0021 to 0023 also not blind).
 
 L* = max_order_qty 10, max_notional 1000, max_abs_position 5, price_band 0.05, max_orders_per_day 3, kill_switch false, allow_short true.
 

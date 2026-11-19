@@ -107,7 +107,7 @@ def main():
             f = doc["stages"]["F"]["without_sweeps"]
             check("a stage under 60% of value cases fails", (f["share_with_rederivation"] < S.FLOOR) == any("stage F" in x and "floor" in x for x in p))
             d = doc["stages"]["D"]["without_sweeps"]
-            check("error cases leave the denominator (stage D: 521 value cases of 654)", d["cases"] == 521 and d["error_and_invariance_cases"] == 133)
+            check("error cases leave the denominator (stage D: 526 value cases of 661)", d["cases"] == 526 and d["error_and_invariance_cases"] == 135)
         finally:
             S.GOLDEN, S.ORACLE = real_golden, real_oracle
     c = S.classify_case_register([{"case_id": "x", "library": "QuantLib", "convention_rows": ["SCIPY.CHI2"]}], set())

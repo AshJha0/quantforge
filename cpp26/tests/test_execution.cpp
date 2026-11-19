@@ -43,6 +43,11 @@ std::string run(const std::string& op, const std::string& inputs) {
 }
 }  // namespace
 
+TEST_CASE("vwap subnormal weight keeps the order", "[execution]") {
+    CHECK(ex::vwap(1.5, {5e-324}, ex::Mode::Continuous) == Vec{1.5});
+    CHECK(ex::vwap(3, {5e-324, 5e-324}, ex::Mode::Continuous) == Vec{1.5, 1.5});
+}
+
 TEST_CASE("schedule goldens sched_h-0001..0008", "[execution]") {
     CHECK(ex::twap(1000, 3, ex::Mode::Units) == Vec{334, 333, 333});
     CHECK(ex::twap(1000, 4, ex::Mode::Continuous) == Vec{250, 250, 250, 250});

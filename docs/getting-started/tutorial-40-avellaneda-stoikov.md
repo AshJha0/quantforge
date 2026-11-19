@@ -6,7 +6,7 @@ The plain idea: a market maker posts a bid and an ask and earns the gap when bot
 
 You will compute the reservation price and quotes for a long and a flat book, the spread at the end of the horizon, and check three spreads against the tables printed in the paper. Budget 10 minutes. The inputs are the paper's section 3.3 parameters.
 
-<p class="note">Available from v0.10.0. The operations on this page are specified (spec version 0.1.0, confirmed 2026-11-18) but not merged in any language. Step 1 checks the spec's golden numbers with a plain-Python restatement of the formulas; step 2 shows the library call as it will run once the operations are merged, and is not run here. Every number on the page is a spec golden or simple arithmetic on one.</p>
+<p class="note">Available from v0.10.0. The operations on this page are implemented in all four languages (stage H wave 1; each build passes their goldens, observed, local, 2026-11-18). This page stays a hand check: step 1 checks the spec's golden numbers with a plain-Python restatement of the formulas, and step 2 shows the library call without running it. Every number on the page is a spec golden or simple arithmetic on one.</p>
 
 Terms, defined here. The **mid** `s` is the midpoint of the market. **Inventory** `q` is signed: positive is long. The **reservation price** `r` is the price at which the maker is indifferent to holding one more unit. `gamma` is risk aversion, `sigma` the volatility of the mid per unit of time, `time_left` the time to the end of the horizon, and `k` how fast the arrival rate of fills falls with the distance of a quote from the mid.
 
@@ -76,7 +76,7 @@ From [`09-microstructure/avellaneda-stoikov.md`](../../specifications/09-microst
 
 Evidence: `as_h-0005` to `0007` are checked against the paper's printed tables; `as_h-0001` to `0004` were re-derived blind from the inputs only (DR-H2, 2026-11-15).
 
-## Step 2: the library call (available from v0.10.0, not run here)
+## Step 2: the library call (shown, not run here)
 
 ```json
 {"operation": "micro.mm.as_quotes", "inputs": {"mid": 100, "inventory": 2, "risk_aversion": 0.1, "sigma": 2, "time_left": 1, "k": 1.5}}

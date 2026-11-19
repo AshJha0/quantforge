@@ -1,6 +1,6 @@
 # Market impact: square-root and Obizhaeva-Wang
 
-Spec version 0.1.0 (stage H wave 1; confirmed 2026-11-18 by the stage H coordinator). Status: Specified, not implemented. Rulings HR-2, HR-10. Plan item 15.1 "Market impact"; calibration on the crypto book is the research lane (14.7 H-1), not this spec.
+Spec version 0.1.0 (stage H wave 1; confirmed 2026-11-18 by the stage H coordinator). Status: implemented in all four builds (Python, Java, C++, Rust; 2026-11-18). Rulings HR-2, HR-10. Plan item 15.1 "Market impact"; calibration on the crypto book is the research lane (14.7 H-1), not this spec.
 
 Sources:
 - [TLD11] B. Toth, Y. Lemperiere, C. Deremble, J. de Lataillade, J. Kockelkoren, J.-P. Bouchaud, "Anomalous price impact and the critical nature of liquidity in financial markets", *Physical Review X* 1 (2011) 021006 (open access). Read 2026-11-18 in the arXiv v3 HTML (arXiv:1105.1694): section 1, eq. (1), `Delta(Q) = Y sigma sqrt(Q / V)`, Delta the average relative price change over a metaorder of size Q, sigma the daily volatility and V the daily volume measured on the day of the trade; the paper says only that Y is "of order unity" and gives the general form `Q^delta` with delta about 0.4 to 0.7. Our `I` is the paper's Delta; Y is an input here. Evidence class: paper, read (equation and definitions; numerical fits not re-checked).

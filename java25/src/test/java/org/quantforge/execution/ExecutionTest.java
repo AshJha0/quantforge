@@ -28,6 +28,13 @@ class ExecutionTest {
     // ---- schedules.md ----
 
     @Test
+    void vwapSubnormalWeightKeepsTheOrder() {
+        assertArrayEquals(new double[] {1.5}, Execution.vwap(1.5, new double[] {5e-324}, Mode.CONTINUOUS), 0.0);
+        assertArrayEquals(new double[] {1.5, 1.5},
+                Execution.vwap(3, new double[] {5e-324, 5e-324}, Mode.CONTINUOUS), 0.0);
+    }
+
+    @Test
     void scheduleGoldens() {
         assertArrayEquals(new double[] {334, 333, 333}, Execution.twap(1000, 3, Mode.UNITS)); // sched_h-0001
         assertArrayEquals(new double[] {250, 250, 250, 250}, Execution.twap(1000, 4, Mode.CONTINUOUS)); // 0002

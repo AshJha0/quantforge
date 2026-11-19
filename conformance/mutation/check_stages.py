@@ -49,8 +49,9 @@ def problems(cfg):
                 if not any(fnmatch.fnmatch(f, g) or fnmatch.fnmatch(f, "*/" + g.lstrip("*/")) for f in src):
                     out.append(f"stage {st} module {m['module']} {lang}: target {t!r} matches no file")
             for key in [k for k in m if k == "suite" or k.endswith("_suite")]:
-                if not any(fnmatch.fnmatch(s, m[key]) for s in goldens):
-                    out.append(f"stage {st} module {m['module']}: {key} {m[key]!r} matches no golden file")
+                for g in m[key].split(","):  # a comma-separated list is a union (runner.py --suite)
+                    if not any(fnmatch.fnmatch(s, g.strip()) for s in goldens):
+                        out.append(f"stage {st} module {m['module']}: {key} glob {g!r} matches no golden file")
     return out
 
 

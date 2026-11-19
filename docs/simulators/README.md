@@ -1,6 +1,6 @@
 # Simulators
 
-<p class="note">Planned for v0.10.0 (stage H). The simulators below are specified (spec version 0.1.0, confirmed 2026-11-18) but not merged. Every output they produce will carry the label its spec fixes, for example "simulated venue; not a real exchange". No simulator places a real order; trading in this project is simulated only.</p>
+<p class="note">Stage H, v0.10.0 (unreleased). The simulators below are implemented in all four languages (spec version 0.1.0, confirmed 2026-11-18). Every output they produce carries the label its spec fixes, for example "simulated venue; not a real exchange". No simulator places a real order; trading in this project is simulated only.</p>
 
 ## Why a page for simulators
 
@@ -25,9 +25,9 @@ Simulators are kept out of the numerical core: they consume the library's operat
 
 **Router.** It can show whether the chosen split recovers the optimum computed on the true (planted) fill distributions. The comparison of router against single-venue routing on 10,000 simulated parent orders (seed 20261117) is published whatever it shows, but it is a result inside the simulation, not evidence that routing pays on any real market (ruling HR-40). The recorded crypto data is a single venue and is not routed across.
 
-## What waits for merged code
+## Goldens and paper trading
 
-Goldens for these three simulators are planned in their specs (for example `lit_h-0006`, an iceberg refresh; `dark_h-0002`, a minimum-quantity block; `sor_h-0001`, a corner solution) but carry no values on this page until they are generated and checked. Paper trading with simulated fills (plan item H-21, moved into stage H on 2026-11-18) will run on these simulators and add its own section here: simulated fills, positions, cash, daily P&L explain, risk limits, pre-trade checks and a hashed append-only ledger. It never sends a live order.
+The simulators' goldens are generated and checked in every build: `ob_h` 17, `lit_h` 20, `dark_h` 8, `sor_h` 9 and `sorx_h` 2 (`datasets/golden/stage_h/`; for example `lit_h-0006`, an iceberg refresh; `dark_h-0002`, a minimum-quantity block; `sor_h-0001`, a corner solution). Paper trading with simulated fills (plan item H-21, moved into stage H on 2026-11-18) runs on these simulators through `python/quantforge_core/paper_fills.py`: simulated fills, positions, cash, daily P&L explain, risk limits, pre-trade checks and a hashed append-only ledger ([Tutorial 44](../getting-started/tutorial-44-paper-trading.md)). The `paper.*` CLI operations (`pt_h`, 34 cases) are in all four languages. It never sends a live order.
 
 ## Related
 

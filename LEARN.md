@@ -9,10 +9,10 @@ QuantForge has four equal implementations of the same maths, in Java, C++, Pytho
 Two ways in:
 
 - **New to quantitative finance, or to this project.** Work through the [tutorials](docs/getting-started/README.md), starting with [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md): quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Tutorials 2 to 16 go on, 10 to 15 minutes each, to bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk and the LIBOR market model, with every number checked in all four languages. Tutorials 17 to 21 cover stage I, hedging: Greek and dynamic delta hedges, minimum-variance and constrained hedges, credit and correlation hedges, a cross-asset hedge with instrument selection, and what a hedge costs. Tutorials 23 to 35 cover stage J research tools: an honest backtest with purged cross-validation, whether a Sharpe ratio is real, portfolios, costs, trials and power, leakage, shrinkage, stress and drift, financing term structures and liquidity curves. Tutorials 36 to 40 preview stage H execution (schedules, Almgren-Chriss, shortfall, impact, market-making quotes) as hand checks of its spec goldens, ahead of the code. Then read the topics below in order.
-- **Test yourself.** The [question bank](docs/question-bank/README.md) has 389 questions with worked answers, at foundation, practitioner and advanced level, across all the topics below.
+- **Test yourself.** The [question bank](docs/question-bank/README.md) has 397 questions with worked answers, at foundation, practitioner and advanced level, across all the topics below.
 - **Practitioner.** Jump to a topic. Each worked example names its golden case, so you can rerun it as `COOKBOOK.md` shows and check the number yourself.
 
-**What the tests check.** 7,721 value-checked golden cases, where each build must return the oracle's numbers within a stated tolerance; 5,411 error cases, which check only that a bad input is refused with the right code; and 2,514 invariance cases (1,257 pairs), which check that two related inputs get the same answer. Counts are generated in [`docs/case-figures.md`](docs/case-figures.md). Outside-library shares per stage, under the tight rule D6, are in [`oracle/OUTSIDE_SHARES.md`](oracle/OUTSIDE_SHARES.md).
+**What the tests check.** 7,784 value-checked golden cases, where each build must return the oracle's numbers within a stated tolerance; 5,471 error cases, which check only that a bad input is refused with the right code; and 2,514 invariance cases (1,257 pairs), which check that two related inputs get the same answer. Counts are generated in [`docs/case-figures.md`](docs/case-figures.md). Outside-library shares per stage, under the tight rule D6, are in [`oracle/OUTSIDE_SHARES.md`](oracle/OUTSIDE_SHARES.md).
 
 Sources: every model and convention cites its papers, books and standards in the sources list of its spec. [References](docs/references.md) collects them all by topic, with each one's status (read, not opened, or paywalled) and the specs that rely on it.
 
@@ -708,7 +708,7 @@ Two curve families the curves page listed as missing, added in v0.9.0 by the cur
 
 ## Stage H: execution and microstructure (planned, v0.10.0)
 
-Stage H is specified but not merged. Its specs are in `specifications/09-microstructure/` and `specifications/10-execution/` (spec version 0.1.0, confirmed 2026-11-18; rulings HR-1 to HR-41 in the stage H rulings files). The worked examples below are spec golden cases; none was produced by a build, and each operation is available from v0.10.0. [Tutorials 36 to 40](docs/getting-started/README.md) check the same goldens with a short standard-library script, and question bank [set 13](docs/question-bank/13-execution-microstructure.md) tests them.
+Stage H is implemented in all four languages from v0.10.0 (unreleased), the `paper.*` operations included. Its specs are in `specifications/09-microstructure/` and `specifications/10-execution/` (spec version 0.1.0, confirmed 2026-11-18; rulings HR-1 to HR-41 in the stage H rulings files). The worked examples below are spec golden cases, which every build reproduces in conformance (observed, local, 2026-11-18). [Tutorials 36 to 40](docs/getting-started/README.md) check the same goldens with a short standard-library script, and question bank [set 13](docs/question-bank/13-execution-microstructure.md) tests them.
 
 ### Why slicing exists
 
@@ -753,6 +753,46 @@ Stage H is specified but not merged. Its specs are in `specifications/09-microst
 ### Simulated venues: what a simulator can and cannot tell you
 
 A simulator shows what happens under our rules and our order flow. It can test whether an estimator recovers a rate we planted, and compare two strategies on the same replay. It cannot show how a real venue behaves. The dark pool, the router and paper trading are simulated only; every output carries its label ([Simulators](docs/simulators/README.md)).
+
+### Paper trading: a book that cannot leave the machine
+
+**Plain idea.** Run a trading book exactly as a desk would, with checks, fills, a ledger and a daily P&L, but with every fill from a simulator and no route to any real venue.
+
+**Formal statement.** `specifications/10-execution/paper-trading.md` (HR-42 to HR-55). Positions by average cost (HR-50); daily explain `market + trading + fees + financing = NAV_t - NAV_{t-1}` exactly in decimal, a residual being a defect (HR-53); financing on opening balances, ACT/365, posted half-even to the cent (HR-52); eight pre-trade checks in a fixed order (HR-49); an append-only JSON Lines ledger in which each record carries the SHA-256 of its canonical bytes and of the record before it (HR-45, HR-46). Paper trading is a Python application on the library's four-language operations; its steps are also `paper.*` CLI operations, in all four languages.
+
+**Worked example.** `pt_h-0001` to `0003`: buy 2 at 100, sell 1 at 110, close 105: cash 9909.69, realised 10, day total 14.69; next day close 102 with 3.65 % interest: financing 0.99, total -2.01. `pt_h-0020`: one ORDER record hashes to `72c85984...7e81`, checked with `sha256sum`. Run in [Tutorial 44](docs/getting-started/tutorial-44-paper-trading.md). Fills through the simulated venues come from `paper_fills.py` (Python).
+
+### Estimating a book's rates, with standard errors
+
+**Plain idea.** Arrival, cancel, recovery and impact rates are what a market maker or execution model needs as inputs. Each estimate is useless without a standard error, and an estimator is trusted only after it recovers a value planted in simulated data.
+
+**Formal statement.** `specifications/09-microstructure/micro-estimators.md` (H-4b, HR-70, HR-71, HR-74; available from v0.10.0): Poisson arrival `N / T`, censored exponential cancel `C / sum L`, log-linear resilience and depth decay by OLS with intercept, adverse selection by OLS through the origin, per regime, and a Welch difference for passive against aggressive cost. Acceptance: within 3 SE of the planted value on a fixed seed, at most 4 misses in 200 seeds.
+
+**Worked example.** `mest_h-0008`: signed sizes 1, -1, 2 against mid moves 0.02, -0.01, 0.05 give `lambda_as` 13/600 = 0.0216667 with SE 0.00390868. `mest_h-0009`: the stressed regime's impact is 4 times the calm one's. Evidence: hand calculation checked with mpmath, not yet blind re-derived. [Tutorial 45](docs/getting-started/tutorial-45-microstructure-estimators.md).
+
+### Markouts: was the fill good or was I picked off?
+
+**Plain idea.** Watch the mid after each fill. A venue whose fills are followed by the price moving against you is costing you more than its fee schedule says.
+
+**Formal statement.** `specifications/10-execution/venue-analytics.md` (H-16, HR-72, HR-73; available from v0.10.0): markout `sum s q (m(t+h) - p) / sum q`, in bp over `sum q p`, toxicity the share of quantity with a negative markout, fill rate filled over sent; sums exact on the printed decimals. VPIN is left out because the source example could not be verified.
+
+**Worked example.** `venue_h-0001` and `0002`: at 5 seconds venue A's markout is 0 and B's 5 bp; at 10 seconds A's is 2.33 bp and B's -2 bp. The ranking flips with the horizon. [Tutorial 46](docs/getting-started/tutorial-46-venue-analytics.md).
+
+### Adaptive algorithms and where the cost went
+
+**Plain idea.** An algorithm that reacts to urgency, the close, visible depth or a second leg still has to add up to the order. Before trading, estimate the cost and, separately, the risk; afterwards, split the cost into causes that sum exactly.
+
+**Formal statement.** `specifications/10-execution/adaptive-algos.md` (H-14, HR-59 to HR-63, HR-67) and `tca-pretrade.md` (H-17, HR-64, HR-65), both available from v0.10.0. Arrival holdings follow [AC00] eq. (17) bucket by bucket; pre-trade impact is the I-star form with parameters as inputs (form recalled from [Kis13], not verified) and timing risk `1e4 sigma sqrt(T/3)`; attribution splits the execution cost of `exec.tca.shortfall` into impact `s sum q_i (m_i - m_0)` and spread `s sum q_i (p_i - m_i)`.
+
+**Worked example.** `alg_h-0002`: 1,000 at `kappa = ln 2` over two buckets is 600 then 400. `tcx_h-0001`: 3.04 bp expected cost against 46.2 bp of timing risk. `tcx_h-0006`: the `tca_h-0001` buy, execution 100 split into impact 60 and spread 40, total 385. Evidence: a second lane re-derived all 36 cases blind, 0 value mismatches. [Tutorial 47](docs/getting-started/tutorial-47-adaptive-algos-and-tca.md).
+
+### Latency targets written before measuring
+
+**Plain idea.** A latency figure is a claim about one machine, one workload and one method. Fix the targets first, publish the machine, and report a miss as a miss.
+
+**Formal statement.** `specifications/09-microstructure/low-latency-book.md` and `low-latency-targets.md` (H-9, HR-18 to HR-24): same answers as `micro.book.rebuild`, one pinned thread, per-message monotonic clock, clock cost published and not subtracted, zero heap allocations after warm-up in C++ and Rust.
+
+**Worked example.** The first run (laptop under WSL, not the acceptance machine; workload S, 9,000,000 timed messages): update p50 39 ns (C++) and 47 ns (Rust) against a 150 ns target, p99.9 264 and 242 against 5,000; Rust `best_bid` p99 105 ns misses its 50 ns target, as does C++ `qty_at` present at 120 against 100. Queries were timed singly near the clock's own 15 to 17 ns, so batch timing is still owed. Available from v0.10.0. [Tutorial 48](docs/getting-started/tutorial-48-low-latency-book.md).
 
 ### What stage H's evidence does and does not show
 
