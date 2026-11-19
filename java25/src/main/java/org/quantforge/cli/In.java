@@ -53,7 +53,8 @@ final class In {
                 || operation.startsWith("research.drift.") || operation.startsWith("risk.scenario.")
                 || operation.equals("exec.tca.shortfall") || operation.equals("exec.tca.attribution")
                 || operation.equals("micro.book.rebuild") || operation.equals("exec.sim.lit.run")
-                || operation.equals("exec.sim.dark.run") || operation.equals("exec.sor.allocate");
+                || operation.equals("exec.sim.dark.run") || operation.equals("exec.sor.allocate")
+                || OpsStageK.OPERATIONS.contains(operation);
     }
 
     private void scanArrays(Object v) {
@@ -97,6 +98,20 @@ final class In {
     /** Ruling F-2: the first non-finite Real read, raised after any held E_LIMIT and before every rule check. */
     QfError pendingDomain() {
         return pending[1];
+    }
+
+    /**
+     * HR-66 (stage K): a structural E_INPUT outranks the finite rule's E_DOMAIN, so the held non-finite read is
+     * dropped and the returned error is the case's answer.
+     */
+    QfError structural(QfError e) {
+        pending[1] = null;
+        return e;
+    }
+
+    /** A nested object read with this case's held errors. */
+    In wrap(Map<?, ?> m) {
+        return new In(m, pending);
     }
 
     QfError pendingLimit() {

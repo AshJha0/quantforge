@@ -1,0 +1,276 @@
+{
+ "schema_version": "1.0",
+ "suite": "idr_k",
+ "spec": "specifications/06-risk/intraday-risk-bounds.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "idr_k-0001",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000.0,
+      "maturity": 5.0,
+      "yield": 0.04
+     }
+    ],
+    "shift": 0.01
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "estimate_pnl": -39913.124212551615,
+     "bound": 17.05689068912462,
+     "label": "latency-aware analytics on simulated data"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH; bound blind-checked only to 6 decimals (5e-7 absolute, the precision the packet carried), estimate_pnl at 1e-9 relative"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic"
+   ],
+   "description": "delta-gamma with Lagrange bound, h = +1%",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09
+   }
+  },
+  {
+   "case_id": "idr_k-0002",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000.0,
+      "maturity": 5.0,
+      "yield": 0.04
+     }
+    ],
+    "shift": -0.01
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "estimate_pnl": 41959.95109524657,
+     "bound": 17.93141617552204,
+     "label": "latency-aware analytics on simulated data"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH; bound blind-checked only to 6 decimals (5e-7 absolute, the precision the packet carried), estimate_pnl at 1e-9 relative"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic"
+   ],
+   "description": "h = -1%: M3 at the lower yield",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09
+   }
+  },
+  {
+   "case_id": "idr_k-0003",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000.0,
+      "maturity": 5.0,
+      "yield": 0.04
+     }
+    ],
+    "shift": 0.0025
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "estimate_pnl": -10170.171073390557,
+     "bound": 0.2665139170175722,
+     "label": "latency-aware analytics on simulated data"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH; bound blind-checked only to 6 decimals (5e-7 absolute, the precision the packet carried), estimate_pnl at 1e-9 relative"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic"
+   ],
+   "description": "h = +25 bp: bound tight",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09
+   }
+  },
+  {
+   "case_id": "idr_k-0004",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000.0,
+      "maturity": 5.0,
+      "yield": 0.04
+     }
+    ],
+    "shift": 0.05
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "estimate_pnl": -179097.35223580853,
+     "bound": 2132.1113361405783,
+     "label": "latency-aware analytics on simulated data"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH; bound blind-checked only to 6 decimals (5e-7 absolute, the precision the packet carried), estimate_pnl at 1e-9 relative"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic"
+   ],
+   "description": "h = +5%: large move, bound still holds",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09
+   }
+  },
+  {
+   "case_id": "idr_k-0005",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000.0,
+      "maturity": 5.0,
+      "yield": 0.04
+     },
+     {
+      "notional": -500000.0,
+      "maturity": 2.0,
+      "yield": 0.03
+     }
+    ],
+    "shift": 0.01
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "estimate_pnl": -30589.655330067555,
+     "bound": 17.684733711514124,
+     "label": "latency-aware analytics on simulated data"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath 50 digits",
+    "not blind: oracle-pending when the wave-1 blind packet was built; mpmath only"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic"
+   ],
+   "description": "two positions, short 2y leg; bound = sum of position bounds (no netting of remainders)",
+   "output_classes": {
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09
+   }
+  },
+  {
+   "case_id": "idr_k-0006",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000.0,
+      "maturity": 0.0,
+      "yield": 0.04
+     }
+    ],
+    "shift": 0.01
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "gap-decided by ruling KR-12 (E_DOMAIN code): not blind"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic",
+    "error"
+   ],
+   "description": "maturity <= 0 (KR-12)"
+  },
+  {
+   "case_id": "idr_k-0007",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [],
+    "shift": 0.01
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "risk",
+    "intraday",
+    "synthetic",
+    "error"
+   ],
+   "description": "no positions"
+  }
+ ]
+}

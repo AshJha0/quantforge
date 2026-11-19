@@ -1,0 +1,291 @@
+{
+ "schema_version": "1.0",
+ "suite": "rich_k",
+ "spec": "specifications/06-risk/bermudan-ladder-k8.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "rich_k-0001",
+   "operation": "num.richardson.check",
+   "inputs": {
+    "values": [
+     10.5,
+     10.125,
+     10.03125
+    ],
+    "ratio": 2.0,
+    "assumed_order": 2.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "OK",
+     "observed_order": 2.0,
+     "extrapolated": 10.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "numerics",
+    "richardson",
+    "synthetic"
+   ],
+   "description": "second-order sequence; exact",
+   "output_classes": {
+    "status": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "rich_k-0002",
+   "operation": "num.richardson.check",
+   "inputs": {
+    "values": [
+     11.0,
+     10.5,
+     10.25
+    ],
+    "ratio": 2.0,
+    "assumed_order": 2.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "ORDER_MISMATCH",
+     "observed_order": 1.0,
+     "extrapolated": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "numerics",
+    "richardson",
+    "synthetic"
+   ],
+   "description": "first-order data, second order assumed",
+   "output_classes": {
+    "status": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "rich_k-0003",
+   "operation": "num.richardson.check",
+   "inputs": {
+    "values": [
+     11.0,
+     10.5,
+     10.25
+    ],
+    "ratio": 2.0,
+    "assumed_order": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "OK",
+     "observed_order": 1.0,
+     "extrapolated": 10.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "numerics",
+    "richardson",
+    "synthetic"
+   ],
+   "description": "first-order data, first order assumed",
+   "output_classes": {
+    "status": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "rich_k-0004",
+   "operation": "num.richardson.check",
+   "inputs": {
+    "values": [
+     98464.0,
+     93700.0,
+     96435.0
+    ],
+    "ratio": 2.0,
+    "assumed_order": 2.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "NON_MONOTONE",
+     "observed_order": null,
+     "extrapolated": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "numerics",
+    "richardson",
+    "synthetic"
+   ],
+   "description": "aadladder_g-0002 entry 1 at 201, 401, 801 (rounded): oscillates",
+   "output_classes": {
+    "status": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "rich_k-0005",
+   "operation": "num.richardson.check",
+   "inputs": {
+    "values": [
+     211255.0,
+     220895.0,
+     225712.0
+    ],
+    "ratio": 2.0,
+    "assumed_order": 2.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "ORDER_MISMATCH",
+     "observed_order": 1.0008982225303467,
+     "extrapolated": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "numerics",
+    "richardson",
+    "synthetic"
+   ],
+   "description": "aadladder_g-0001 entry 1 (rounded): first order observed",
+   "output_classes": {
+    "status": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "rich_k-0006",
+   "operation": "num.richardson.check",
+   "inputs": {
+    "values": [
+     211255.0,
+     220895.0,
+     225712.0
+    ],
+    "ratio": 2.0,
+    "assumed_order": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "OK",
+     "observed_order": 1.0008982225303467,
+     "extrapolated": 230529.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "numerics",
+    "richardson",
+    "synthetic"
+   ],
+   "description": "first-order extrapolation: 2 x 225712 - 220895",
+   "output_classes": {
+    "status": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "rich_k-0007",
+   "operation": "num.richardson.check",
+   "inputs": {
+    "values": [
+     10.5,
+     10.125,
+     10.03125
+    ],
+    "ratio": 1.0,
+    "assumed_order": 2.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "gap-decided by ruling KR-12 (E_DOMAIN code): not blind"
+   ],
+   "tags": [
+    "stage_k",
+    "numerics",
+    "richardson",
+    "synthetic",
+    "error"
+   ],
+   "description": "ratio <= 1 (KR-12)"
+  },
+  {
+   "case_id": "rich_k-0008",
+   "operation": "num.richardson.check",
+   "inputs": {
+    "values": [
+     10.5,
+     10.125
+    ],
+    "ratio": 2.0,
+    "assumed_order": 2.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "numerics",
+    "richardson",
+    "synthetic",
+    "error"
+   ],
+   "description": "two values, three needed"
+  }
+ ]
+}

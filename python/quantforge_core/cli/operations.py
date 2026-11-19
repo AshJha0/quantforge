@@ -23,6 +23,7 @@ from . import (  # noqa: F401 - imported to register their verbs
     ops_research,
     ops_risk,
     ops_shortrate,
+    ops_stage_k,
     ops_term_curves,
     ops_usecases,
     ops_vol,

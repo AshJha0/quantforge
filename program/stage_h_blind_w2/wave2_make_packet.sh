@@ -6,12 +6,24 @@
 # Third argument "b" builds packet 2b instead: dark-pool, smart-order-router
 # and paper-trading (dark_h, sor_h, pt_h) with the H-21 rulings added.
 # Third argument "m" builds the multi-asset packet (H-22..H-24) with its rulings.
+# Third argument "k1" builds the stage K wave-1 packet (see the k1 block).
 # Third argument "exec" builds the H-14/H-17 packet: adaptive-algos and
 # tca-pretrade (alg_h, tcx_h), inputs-only JSON, the rulings they cite, and
 # coordinator/LEAKS.tsv (not for the blind lane; fails on a leak).
 set -eu
 R="$1"; P="$2"; W="${3:-a}"; D="$(cd "$(dirname "$0")" && pwd)"
 mkdir -p "$P"
+if [ "$W" = k1 ]; then
+  # Third argument "k1": stage K wave 1 (bt_k, inc_k, trig_k, idr_k, rich_k). k1_blind.py strips blind:strip
+  # blocks and Expected/Check/Why/Derivation columns, keeping the output field names. idr_k-0005 is
+  # oracle-pending and stays out. Packet dir: institutional-quant-engine-plan/stage_k_blind/w1_packet. The leak
+  # list goes OUTSIDE the packet: python -I k1_blind.py leaks <checkout> <packet> > ../w1_LEAKS.tsv
+  PY=python3; "$PY" -c "" >/dev/null 2>&1 || PY=python
+  "$PY" -I "$D/k1_blind.py" build "$R" "$P"
+  cd "$P"
+  sha256sum bitemporal-store.blind.md incremental-update.blind.md recalibration-triggers.blind.md intraday-risk-bounds.blind.md bermudan-ladder-k8.blind.md stage-k-rulings-w1.md > MANIFEST.sha256
+  exit 0
+fi
 if [ "$W" = micro ]; then
   # Third argument "micro": H-4b estimators and H-16 venue analytics with HR-70..74.
   awk -f "$D/wave2_extract.awk" "$R/specifications/09-microstructure/micro-estimators.md" > "$P/micro-estimators.blind.md"

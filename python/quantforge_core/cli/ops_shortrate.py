@@ -109,6 +109,16 @@ def _hw_calibrate(i: Inputs) -> Any:
     return core.shortrate.hw_calibrate(times, dfs, a, strip)
 
 
+K8_METHOD = "CN_RANNACHER_SMOOTHED"  # KR-8 (stage K, PROPOSED)
+BERMUDAN_METHODS = ("G18_IMPLICIT", K8_METHOD)
+
+
+def bermudan_method(i: Inputs) -> str:
+    """Optional `method`: absent or `G18_IMPLICIT` is the pinned G-18 scheme (the default stays G-18
+    until the K-8 acceptance passes, KR-8); an unlisted value is E_SCHEMA."""
+    return i.enum("method", BERMUDAN_METHODS) if i.has("method") else "G18_IMPLICIT"
+
+
 def _grid(i: Inputs) -> tuple[int, int, float]:
     g = i.object("grid")
     return g.integer("nx"), g.integer("steps_per_year"), g.real("width")
@@ -120,6 +130,8 @@ def _bermudan(i: Inputs) -> Any:
     t0, times, k = _swap(i, "start_years")
     kind, notional = i.string("swaption_type"), i.real("notional")
     exercise, grid = i.reals("exercise_times"), _grid(i)
+    if bermudan_method(i) == K8_METHOD:
+        return core.bermudan_k8.bermudan_price(*hw, t0, times, k, kind, notional, exercise, *grid)
     model = core.shortrate.curve_model(*hw)
     return core.shortrate.bermudan_swaption(
         model, t0, times, k, kind, notional, exercise, core.shortrate.make_grid(*grid)
