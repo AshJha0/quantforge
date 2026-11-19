@@ -162,8 +162,15 @@ def test_kr4_correction_property_10000_logs() -> None:
                 )
                 checked += 1
     assert checked == 500_000
-    _evidence("kr4_correction_property", {"logs": 10_000, "queries_compared": checked, "failures": 0,
-                                          "seed": "random.Random(20261118)"})
+    _evidence(
+        "kr4_correction_property",
+        {
+            "logs": 10_000,
+            "queries_compared": checked,
+            "failures": 0,
+            "seed": "random.Random(20261118)",
+        },
+    )
 
 
 def test_bt_withdrawn_masks_and_stage_a_mapping() -> None:
@@ -241,11 +248,20 @@ def test_incremental_property_10000_vectors() -> None:
         assert up["discount_factors"][:j0] == prev[:j0]
         assert all(_rel(a, b) <= 1e-12 for a, b in zip(up["discount_factors"], full, strict=True))
         assert up["recomputed"] == n - j0
-        worst = max([worst] + [_rel(a, b) for a, b in zip(up["discount_factors"], full, strict=True)])
+        worst = max(
+            [worst] + [_rel(a, b) for a, b in zip(up["discount_factors"], full, strict=True)]
+        )
         bit_equal += up["discount_factors"] == full
-    _evidence("incremental_property", {"vectors": 10_000, "max_relative_difference": worst,
-                                       "bit_identical_to_full_rebuild": bit_equal, "copied_pillars_bit_identical": True,
-                                       "seed": "numpy default_rng(20261118)"})
+    _evidence(
+        "incremental_property",
+        {
+            "vectors": 10_000,
+            "max_relative_difference": worst,
+            "bit_identical_to_full_rebuild": bit_equal,
+            "copied_pillars_bit_identical": True,
+            "seed": "numpy default_rng(20261118)",
+        },
+    )
 
 
 def _stage_b_cases() -> list[dict[str, Any]]:
@@ -300,8 +316,15 @@ def test_incremental_property_on_stage_b_bootstraps() -> None:
             assert old[:j] == new[:j]
             tried += 1
     assert tried >= 10
-    _evidence("incremental_property_stage_b", {"stage_b_cases": len(cases), "quote_changes_checked": tried,
-                                               "earlier_pillars_bit_identical": True, "rebuild_deterministic": True})
+    _evidence(
+        "incremental_property_stage_b",
+        {
+            "stage_b_cases": len(cases),
+            "quote_changes_checked": tried,
+            "earlier_pillars_bit_identical": True,
+            "rebuild_deterministic": True,
+        },
+    )
 
 
 # --- recalibration trigger ------------------------------------------------------------------------
@@ -341,10 +364,21 @@ def test_trigger_simulation_acceptance() -> None:
                 assert r["fire"] == bool(abs(z[row, w]) > k * sig[row])
     centre = 2 * stats.t.sf(k / math.sqrt(1 + 1 / w), w - 1)
     lo, hi = stats.binom.interval(0.99, n, centre)
-    _evidence("trigger_simulation", {"paths": n, "window": w, "k": k, "fires": fires, "centre_rate": centre,
-                                     "binomial_99_interval": [lo, hi], "planted_6_sigma_fires": planted,
-                                     "planted_rate": planted / n, "seed": "numpy default_rng(20261118)",
-                                     "pass": bool(lo <= fires <= hi and planted >= 0.999 * n)})
+    _evidence(
+        "trigger_simulation",
+        {
+            "paths": n,
+            "window": w,
+            "k": k,
+            "fires": fires,
+            "centre_rate": centre,
+            "binomial_99_interval": [lo, hi],
+            "planted_6_sigma_fires": planted,
+            "planted_rate": planted / n,
+            "seed": "numpy default_rng(20261118)",
+            "pass": bool(lo <= fires <= hi and planted >= 0.999 * n),
+        },
+    )
     assert lo <= fires <= hi, (fires, lo, hi, centre)
     assert planted >= 0.999 * n
 
@@ -403,10 +437,18 @@ def test_intraday_bound_acceptance_1000_moves() -> None:
         moves.append([float(h), r["estimate_pnl"], full, r["bound"]])
         assert err <= r["bound"], (h, err, r["bound"])
         worst = max(worst, err / r["bound"])
-    _evidence("intraday_bound_1000_moves", {
-        "book": [[p.notional, p.maturity, p.yield_] for p in book], "seed": "numpy default_rng(20261118)",
-        "columns": ["h", "estimate_pnl", "full_revaluation", "bound"], "moves": moves,
-        "violations": 0, "worst_error_over_bound": worst, "min_abs_h": min(abs(m[0]) for m in moves)})
+    _evidence(
+        "intraday_bound_1000_moves",
+        {
+            "book": [[p.notional, p.maturity, p.yield_] for p in book],
+            "seed": "numpy default_rng(20261118)",
+            "columns": ["h", "estimate_pnl", "full_revaluation", "bound"],
+            "moves": moves,
+            "violations": 0,
+            "worst_error_over_bound": worst,
+            "min_abs_h": min(abs(m[0]) for m in moves),
+        },
+    )
     print(f"intraday bound acceptance: 1000 moves, worst |error| / bound = {worst:.6f}")
 
 
