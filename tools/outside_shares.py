@@ -231,8 +231,9 @@ def load_stage_h():
 # absolute) does not count. The mpmath values are our own oracle and never count (KR-11).
 # Stage K wave 1b (integration 2026-11-19, program/STAGE_K_W1B_HANDOVER.md): a case also counts when its `verified_by`
 # records a figure printed in the regulator text with MATCH ("published: ... MATCH", CRE99 and MAR99 Table 2), as stage H
-# counts printed paper figures. SciPy `binom.cdf` checks on btk_k are not counted (KR-11 reading: SciPy checks one of the
-# compared outputs, not the zone, limits or flags); that class decision is the coordinator's.
+# counts printed paper figures. SciPy `binom.cdf` checks on btk_k are not counted: the D6 precedent is stage F's
+# REIMPL_ROWS ("SCIPY.BINOM"), under which risk_f4-0082 (`risk.backtest.traffic_light`, the same binomial sum) is
+# `reimplementation`; a library primitive computing the same closed-form quantity is not a different formulation.
 STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-5a", "rich_k": "K-8 guard",
                  "k8_k": "K-8", "e1_k": None, "e2_k": None,  # e1_k, e2_k: error cases only
                  "saccr_k": "K-8d", "btk_k": "K-8e", "tlk_k": "F (existing traffic_light)"}

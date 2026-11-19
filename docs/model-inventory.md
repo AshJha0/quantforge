@@ -1290,7 +1290,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Limitations:** rulings KR-40 to KR-47 confirmed 2026-11-19; KR-44 (limits 12 and 30, "more than" covering both) is an inferred reading; backtesting only, no PLA test or capital (KR-47); `risk.frtb.backtest.zone` has no E1 golden (Integer inputs only, open point).
 - **Validation:** goldens `btk_k` and `tlk_k` passed by every build (observed, local laptop, 2026-11-19); MAR99 Table 2 rows 0 to 10 reproduced. **Review:** 2026-11-19.
 - **Tier:** 3.
-- **Challenger:** MAR99 Table 2 printed figures on 12 of 24 `btk_k` value cases; SciPy `binom.cdf` on 23 of 24 (not counted under KR-11, coordinator's decision open).
+- **Challenger:** MAR99 Table 2 printed figures on 12 of 24 `btk_k` value cases; SciPy `binom.cdf` on 23 of 24, not counted (D6 precedent: stage F `SCIPY.BINOM` is `reimplementation`, risk_f4-0082); item share 12 of 24 (50%), under the 60% floor.
 - **Monitoring thresholds:** any zone, limit or count difference across the four builds; any MAR99 Table 2 row not reproduced.
 - **Data lineage hash:** sha256 c359bf02974dc779e5f02985006f39a2e96b43347017599070000a1390e5bd28 (`btk_k`, 40 cases) (2026-11-19).
 - **Retirement trigger:** a superseding stage K ruling or a change of MAR32.

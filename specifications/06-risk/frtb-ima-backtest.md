@@ -57,7 +57,7 @@ Order (HR-122): `E_SCHEMA`, `E_LIMIT` (observations above 1,000,000, checked fir
 ## Acceptance (fixed before the goldens were generated)
 
 - KR-41: at 250 observations, for 0 to 10 exceptions the cumulative probability rounded half to even to two decimals in percent equals the MAR99 Table 2 figure, the zone equals the printed zone (amber = `YELLOW` for the stage F operation) and the multiplier equals the printed multiplier; from 10 on the zone is red and the multiplier 2.00. Every value of the new and the existing operation agrees with `scipy.stats.binom.cdf` within 1e-12 relative. Result 2026-11-19: all rows match, for both operations; MAR99 Table 1 (176 printed numbers) also matches SciPy at one decimal.
-- Outside share: btk_k 23 of 24 value cases (96%); tlk_k 11 of 11.
+- Outside share: btk_k 12 of 24 value cases (50%, under the 60% per-item floor); tlk_k 11 of 11. Counted are the MAR99 Table 2 printed figures. The SciPy `binom.cdf` checks on 23 of 24 do not count under D6 (`tools/outside_shares.py`): `library-primitive` means "numpy or scipy numerics applied to a different formulation of the same problem", and stage F's precedent `REIMPL_ROWS = {"SCIPY.BINOM", ...}` classes risk_f4-0082 (`risk.backtest.traffic_light`, the same binomial sum) as `reimplementation`. The first figure written here, 23 of 24 (96%), counted SciPy and is withdrawn (integration 2026-11-19). A blind re-derivation lane is the coordinator's next step.
 
 ## Limits and scope
 
