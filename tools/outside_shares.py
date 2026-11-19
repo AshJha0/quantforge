@@ -412,7 +412,9 @@ def markdown(doc):
               "every compared output at the golden's tolerance; gap-decided, oracle-only and 6-decimal bound cases do not count. "
               "Wave 1b also counts a figure printed in the regulator text (CRE99 Examples 1 to 5, MAR99 Table 2) and the "
               "seven SA-CCR cases the wave-1b blind lane matched (program/STAGE_K_BLIND_W1B.md); SciPy binomial checks on "
-              "btk_k are not counted. The mpmath oracle is our own and never counts.", "",
+              "btk_k are not counted. Later blind packets, counted the same way: K-5a idr_k-0001..0005 "
+              "(program/STAGE_K_BLIND_K5A.md), the K-8 ladder k8_k (program/STAGE_K_BLIND_K8.md) and eleven btk_k cases "
+              "(program/STAGE_K_BLIND_BTK.md; btk_k-0017 matched and is not counted). The mpmath oracle is our own and never counts.", "",
               "| Item | Suites | Value cases | Blind | Share | 60% per item |", "|---|---|---:|---:|---:|---|"]
         L += [f"| {it} | {', '.join('`' + s + '`' for s in v['suites'])} | {v['cases']} | {v['counted_with_rederivation']} | "
               f"{(v['share_with_rederivation'] or 0):.1%} | {'met' if v['meets_item_floor'] else 'NOT MET'} |" for it, v in ek["per_item"].items()]

@@ -508,7 +508,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
-    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH"
+    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -546,7 +547,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
-    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH"
+    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -584,7 +586,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
-    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH"
+    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -622,7 +625,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
-    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH"
+    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -698,7 +702,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
-    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH"
+    "scipy.stats.binom 1.x (independent library): binom.cdf and the 95% / 99.99% boundaries MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -740,7 +745,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "hand: MAR32.19 limits 12 / 30 (KR-44)"
+    "hand: MAR32.19 limits 12 / 30 (KR-44)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -782,7 +788,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "hand: MAR32.19 limits 12 / 30 (KR-44)"
+    "hand: MAR32.19 limits 12 / 30 (KR-44)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -824,7 +831,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "hand: MAR32.19 limits 12 / 30 (KR-44)"
+    "hand: MAR32.19 limits 12 / 30 (KR-44)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -866,7 +874,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "hand: MAR32.19 limits 12 / 30 (KR-44)"
+    "hand: MAR32.19 limits 12 / 30 (KR-44)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -908,7 +917,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "hand: MAR32.19 limits 12 / 30 (KR-44)"
+    "hand: MAR32.19 limits 12 / 30 (KR-44)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -971,7 +981,8 @@
    },
    "tolerance_class": "date_and_convention",
    "verified_by": [
-    "hand"
+    "hand",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
    ],
    "tags": [
     "stage_k",

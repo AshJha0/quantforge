@@ -267,6 +267,9 @@ def published_intermediates(outs):
 
 
 BLIND_W1B = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W1B.md): MATCH"
+# K-8e blind lane (program/STAGE_K_BLIND_BTK.md, packet manifest 03fdc75d, compare fixed at 21392489): 12 of 12 MATCH,
+# 11 counted. btk_k-0017 (one observation) matched but is not counted: the rules text states its answer.
+BLIND_BTK = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
 
 
 def gen_saccr():
@@ -411,7 +414,7 @@ def gen_backtest():
                            (100, 2, 0, "100 observations"), (1000, 15, 15, "1,000 observations"),
                            (1, 0, 0, "one observation: zero exceptions is amber (KR-42)"), (260, 6, 6, "260 observations: no multiplier")]:
         s.add("risk.frtb.backtest.zone", {"observations": n, "exceptions_actual": xa, "exceptions_hypothetical": xh},
-              zone_oracle(n, xa, xh), verified=[ORACLE, SCIPY + ": binom.cdf and the 95% / 99.99% boundaries MATCH"],
+              zone_oracle(n, xa, xh), verified=[ORACLE, SCIPY + ": binom.cdf and the 95% / 99.99% boundaries MATCH"] + ([] if n == 1 else [BLIND_BTK]),
               tags=TAGS_B + ["outside_checked"], output_classes=oc, description="general rule MAR99.17: " + why)
     doc = {"exceptions_99": "date_and_convention", "exceptions_975": "date_and_convention", "breach_99": "date_and_convention",
            "breach_975": "date_and_convention", "eligible": "date_and_convention"}
@@ -423,13 +426,13 @@ def gen_backtest():
              "breach_99": x99 > 12, "breach_975": x975 > 30, "eligible": not (x99 > 12 or x975 > 30)}
         s.add("risk.frtb.backtest.desk", {"observations": n, "exceptions_99_actual": a99, "exceptions_99_hypothetical": h99,
                                           "exceptions_975_actual": a975, "exceptions_975_hypothetical": h975}, o,
-              verified=[ORACLE, SCIPY + ": binom.cdf MATCH 1e-12", "hand: MAR32.19 limits 12 / 30 (KR-44)"],
+              verified=[ORACLE, SCIPY + ": binom.cdf MATCH 1e-12", "hand: MAR32.19 limits 12 / 30 (KR-44)", BLIND_BTK],
               tags=TAGS_B + ["outside_checked"], output_classes=doc, description=f"desk {n}: 99% {x99}, 97.5% {x975}")
     cnt = {"var": [1.0, 1.0, None, 2.0, 0.5], "actual": [-1.0, -1.25, 0.3, None, 0.0], "hypothetical": [-1.5, 0.0, 0.1, -2.5, -0.5]}
     s.add("risk.frtb.backtest.count", cnt,
           {"observations": 5, "exceptions_actual": 3, "exceptions_hypothetical": 3, "exceptions": 3,
            "days_actual": [1, 2, 3], "days_hypothetical": [0, 2, 3]},
-          cls="date_and_convention", verified=["hand"], tags=TAGS_B + ["hand"],
+          cls="date_and_convention", verified=["hand", BLIND_BTK], tags=TAGS_B + ["hand"],
           description="hand: strict exceedance, a loss equal to VaR is not an exception, a missing VaR or P&L is (MAR32.5(2))")
 
     def err(op, inp, code, desc):

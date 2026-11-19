@@ -44,7 +44,7 @@ Source: `oracle/OUTSIDE_SHARES.json` (written by `tools/outside_shares.py`). Flo
 | I | 153 | 102 | 66.7% | 102 | 66.7% | met |
 | J | 215 | 143 | 66.5% | 143 | 66.5% | met |
 | H | 205 | 0 | 0.0% | 160 | 78.0% | met |
-| K | 87 | 0 | 0.0% | 67 | 77.0% | met |
+| K | 87 | 0 | 0.0% | 78 | 89.7% | met |
 
 Stage H per plan item (plan section 15: at least 60.0% of each item's value cases):
 
@@ -81,7 +81,7 @@ Stage K per plan item (plan section 15: at least 60.0% of each item's value case
 | K-8 | `k8_k` | 7 | 7 | 100.0% | met |
 | K-8 guard | `rich_k` | 6 | 6 | 100.0% | met |
 | K-8d | `saccr_k` | 16 | 12 | 75.0% | met |
-| K-8e | `btk_k` | 24 | 12 | 50.0% | NOT MET |
+| K-8e | `btk_k` | 24 | 23 | 95.8% | met |
 <!-- generated:status-ladder:end -->
 
 ## Stage K, round 1: per-item shares quoted from lane files (not generated)
