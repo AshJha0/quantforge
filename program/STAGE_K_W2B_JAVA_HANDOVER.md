@@ -44,7 +44,9 @@ If KR-121 changes to two buckets, Table 6 has no gamma between 1a and 1b; `ccsGa
 
 ## Evidence (measured 2026-11-19, local laptop, not the acceptance machine)
 
-Targeted Maven runs only (`mvn -o -Pcoverage test jacoco:report -Dtest=...`, JDK 25, Windows), not the full CI chain. See the commit message of the evidence commit for the exact counts; summary in the table below.
+Targeted Maven run only, not the full CI chain: `mvn -o -Pcoverage test jacoco:report -Dtest=StageKW2bCliTest,CvaTest,LeverageTest,KW2bTablesTest,FrtbAggregationReplayTest,PortfolioRiskToolsTest` (JDK 25, Windows), all passing (JUnit and jqwik; properties at 200 or 300 tries as in Python). `python tools/gen_k_w2b_tables.py --check` passes.
+
+Line coverage (JaCoCo, that run; `tools/quality_gate.py --per-file` lists none of these files below the floor; the other library files are below only because the run is targeted): `Cva.java` 455/455 (branches 296/302), `Leverage.java` 292/292 (152/154), `OpsStageKW2b.java` 171/171 (62/62), `KW2bTables.java` 78/78, `FrtbSbm.java` 156/161 (131/143; the five missed lines are pre-existing FX, CSR and commodity paths the targeted run does not reach).
 
 Golden replay, largest relative difference between Java and the golden value over every non-zero expected number (absolute difference at expected 0 was 0 in every suite):
 
@@ -59,7 +61,7 @@ Golden replay, largest relative difference between Java and the golden value ove
 
 All 128 cases pass at the goldens' own tolerances (`simple_analytic` with `tolerance_limit` 1e-12 relative, 1e-15 absolute; labels exact).
 
-FRTB extraction: `FrtbAggregationReplayTest` replays every FRTB sensitivity golden case (frtb_f, frtb_f2b, frtb_f2c, sbm_total_r6, e1_r6, e1_risk; count printed by the test, read from the files) and `PortfolioRiskToolsTest` (the FRTB property tests) passes unchanged.
+FRTB extraction: `FrtbAggregationReplayTest` replays all 85 FRTB sensitivity golden cases (frtb_f, frtb_f2b, frtb_f2c, sbm_total_r6, e1_r6, e1_risk; the set is read from the files) through `Main.handle`, all pass; `PortfolioRiskToolsTest` (the FRTB property tests, unchanged) passes.
 
 ## Notes on the reference (no golden changed)
 
