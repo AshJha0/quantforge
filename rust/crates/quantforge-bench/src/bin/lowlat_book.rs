@@ -216,13 +216,14 @@ fn verify(msgs: &[Msg], levels: &[Level]) -> u64 {
                 asks.pop_last();
             }
             if let Some(w) = dump.as_mut() {
+                use std::fmt::Write as _;
                 use std::io::Write;
                 let mut line = format!("{i}");
                 for (bid, c) in [(true, 'b'), (false, 'a')] {
                     let n = b.top(bid, &mut t);
-                    line += &format!(" {c} {n}");
+                    write!(line, " {c} {n}").expect("write to a String");
                     for l in &t[..n] {
-                        line += &format!(" {} {}", l.px, l.qty);
+                        write!(line, " {} {}", l.px, l.qty).expect("write to a String");
                     }
                 }
                 writeln!(w, "{line}").expect("write dump");

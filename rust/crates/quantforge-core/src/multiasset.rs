@@ -99,7 +99,9 @@ fn int_of_key(raw: &Json, key: &str, default: Option<i64>, path: &str) -> Result
         }
         (Some(Json::Int(n)), _) => Ok(*n),
         // The reader keeps integers above 2^53 as numbers (json.rs); an integral one is out of range.
-        (Some(Json::Num(v)), _) if v.is_finite() && v.fract() == 0.0 && v.abs() > INT_MAX as f64 => {
+        (Some(Json::Num(v)), _)
+            if v.is_finite() && v.fract() == 0.0 && v.abs() > INT_MAX as f64 =>
+        {
             Err(at("E_LIMIT", &p, "integer outside +-(2^53 - 1)"))
         }
         (Some(_), _) => Err(at("E_SCHEMA", &p, "not an integer")),
@@ -1504,6 +1506,56 @@ mod tests {
         assert!(parse_32nds(&Json::Str("1-32".into()), "t").is_err_and(|e| e.code == "E_DOMAIN"));
         assert!(parse_32nds(&Json::Str("1-3".into()), "t").is_err_and(|e| e.code == "E_SCHEMA"));
         assert!(parse_32nds(&Json::Str("1-013".into()), "t").is_err_and(|e| e.code == "E_SCHEMA"));
+    }
+
+    /// An explicit `tick_table` (HR-81): 0.05 below 10, 0.25 from 10. A buy at 10.37 rounds down to
+    /// 10.25 and a sell up to 10.50; below the floor 9.97 rounds to 9.95 and 10.00 (the floor, on both grids).
+    #[test]
+    fn explicit_tick_table_rounds_on_its_own_grid() {
+        let t = r#""tick_table":[["0","0.05"],["10","0.25"]]"#;
+        let px = |price: &str, side: &str| {
+            let r = run(
+                eq_round_price,
+                &format!(r#"{{"price":"{price}","side":"{side}",{t}}}"#),
+            );
+            field(&r, "price")
+        };
+        assert_eq!(px("10.37", "BUY"), "\"10.25\"");
+        assert_eq!(px("10.37", "SELL"), "\"10.50\"");
+        assert_eq!(px("9.97", "BUY"), "\"9.95\"");
+        assert_eq!(px("9.97", "SELL"), "\"10.00\"");
+    }
+
+    /// Error order HR-66 on the tick table: shape is `E_SCHEMA`, an inconsistent table `E_INPUT`, a
+    /// non-positive tick `E_DOMAIN`.
+    #[test]
+    fn tick_table_errors() {
+        let code = |extra: &str| {
+            run(
+                eq_round_price,
+                &format!(r#"{{"price":"10","side":"BUY",{extra}}}"#),
+            )
+            .expect_err("error")
+            .code
+        };
+        assert_eq!(code(r#""tick_tier":"NICKEL""#), "E_SCHEMA");
+        assert_eq!(code(r#""tick_table":"0.01""#), "E_SCHEMA");
+        assert_eq!(code(r#""tick_table":[["0","0.01","9"]]"#), "E_SCHEMA");
+        assert_eq!(code(r#""tick_table":[["1","0.01"]]"#), "E_INPUT");
+        assert_eq!(
+            code(r#""tick_table":[["0","0.01"],["0","0.02"]]"#),
+            "E_INPUT"
+        );
+        assert_eq!(code(r#""tick_table":[]"#), "E_INPUT");
+        assert_eq!(
+            code(r#""tick_tier":"HALF_PENNY","tick_table":[["0","0.01"]]"#),
+            "E_INPUT"
+        );
+        assert_eq!(
+            code(r#""tick_tier":"HALF_PENNY","as_of":"2024-01-02""#),
+            "E_INPUT"
+        );
+        assert_eq!(code(r#""tick_table":[["0","0"]]"#), "E_DOMAIN");
     }
 
     #[test]

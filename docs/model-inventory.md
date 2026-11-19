@@ -1204,7 +1204,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Purpose:** ZN and ZB futures on the lit engine in integer ticks, 32nds display, P&L and variation margin (`exec.sim.fut.*`).
 - **Inputs:** as in the spec page; contract specs are parameters with [CME-ZN] and [CME-ZB] defaults.
 - **Limitations:** simulated venue, labelled "simulated venue; not a real exchange; no real rates data"; CME sources unverified (HR-115); no delivery or conversion-factor logic here.
-- **Validation:** goldens `fut_h` (HR-116 integer boundary included); blind share H-24 100 % after rates packet 2 (HR-114). **Review:** 2026-11-18.
+- **Validation:** goldens `fut_h` (HR-116 integer boundary included); blind share H-24 84.2 % (16 of 19; the three `exec.sim.fut.run` value cases are hand-only) after rates packet 2 (HR-114). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** blind second lane.
 - **Monitoring thresholds:** any golden difference across the four builds.

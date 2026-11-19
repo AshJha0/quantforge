@@ -291,6 +291,62 @@ ERRORS["fut_h"] += [("HR-116: qty 2^53", "exec.sim.fut.variation", dict(FUT_VAR,
 # In-range sides (ok rows, appended after the error cases so no case id moves).
 BOUNDARY_OK = {"fxv_h": [rng_row("", 0, seed=I53)[1:], rng_row("", 0, seed=0)[1:]]}
 
+
+# exec.sim.fut.run (added 2026-11-19: the operation had unit tests per language but no shared golden).
+# Appended after every earlier fut_h case so no case id moves. Hand, not blind.
+def _fev(oid, trader, side, price, qty):
+    return {"id": oid, "op": "NEW", "price": price, "qty": qty, "side": side, "trader": trader, "type": "LIMIT"}
+
+
+def _fcons(sub, filled, resting="0"):
+    return {"cancelled": "0", "filled": filled, "rejected": "0", "resting": resting, "submitted": sub}
+
+
+_EMPTY = {"asks": [], "bids": []}
+# ZN (tick 1/64, tick value 15.625). S1 rests 3 at 110-16 (7072 ticks); B1 takes it: fill 1 at 110.5.
+# S2 rests 3 at 110-17+ (7075 ticks); B2 takes it: fill 2 at 110.546875, the mark. Fee 1.00 per contract per side.
+# P (HR-102 round trip, as fut_h-0005): (7075 - 7072) x 3 x 15.625 - 6 = 134.625. M short 3 from 7072, marked
+# 7075: -9 x 15.625 - 3 = -143.625. N long 3 at the mark: 0 - 3 = -3. Sum -12 = minus the fees paid.
+FUT_RUN_ZN_IN = {"contract": ZN, "events": [_fev("S1", "M", "SELL", "110-16", "3"), _fev("B1", "P", "BUY", "110-16", "3"),
+                                            _fev("S2", "P", "SELL", "110-17+", "3"), _fev("B2", "N", "BUY", "110-17+", "3")],
+                 "fee_per_contract": "1.00"}
+FUT_RUN_ZN_OUT = {
+    "book": _EMPTY, "cancelled": [],
+    "conservation": {"B1": _fcons("3", "3"), "B2": _fcons("3", "3"), "S1": _fcons("3", "3"), "S2": _fcons("3", "3")},
+    "fees": {"M": "3", "N": "3", "P": "6"},
+    "fills": [{"maker_id": "S1", "price": "110.5", "qty": "3", "seq": 1, "taker_id": "B1"},
+              {"maker_id": "S2", "price": "110.546875", "qty": "3", "seq": 2, "taker_id": "B2"}],
+    "label": RT, "mbp": _EMPTY, "pnl": {"M": "-143.625", "N": "-3", "P": "134.625"}, "rejects": []}
+# ZB (tick 1/32, tick value 31.25). X1 rests 2 at 120-00 (3840 ticks); Y1 bids 120-01 and fills 1 at the
+# maker's 120. Z1 rests 1 at 119-31 (3839), now the best ask; W1 bids 120-00 and fills at 119.96875 (price
+# priority), the mark. X1 keeps 1 resting. Fee 0.50. X short 1 from 3840, marked 3839: 31.25 - 0.5 = 30.75.
+# Y long 1 from 3840: -31.25 - 0.5 = -31.75. Z and W trade at the mark: -0.5 each. Sum -2 = minus the fees.
+FUT_RUN_ZB_IN = {"contract": {"symbol": "ZB"},
+                 "events": [_fev("X1", "X", "SELL", "120-00", "2"), _fev("Y1", "Y", "BUY", "120-01", "1"),
+                            _fev("Z1", "Z", "SELL", "119-31", "1"), _fev("W1", "W", "BUY", "120-00", "1")],
+                 "fee_per_contract": "0.50"}
+FUT_RUN_ZB_OUT = {
+    "book": {"asks": [{"display_qty": "1", "hidden_qty": "0", "id": "X1", "price": "120", "seq": 1}], "bids": []},
+    "cancelled": [],
+    "conservation": {"W1": _fcons("1", "1"), "X1": _fcons("2", "1", "1"), "Y1": _fcons("1", "1"), "Z1": _fcons("1", "1")},
+    "fees": {"W": "0.5", "X": "0.5", "Y": "0.5", "Z": "0.5"},
+    "fills": [{"maker_id": "X1", "price": "120", "qty": "1", "seq": 1, "taker_id": "Y1"},
+              {"maker_id": "Z1", "price": "119.96875", "qty": "1", "seq": 2, "taker_id": "W1"}],
+    "label": RT, "mbp": {"asks": [["120", "1"]], "bids": []},
+    "pnl": {"W": "-0.5", "X": "30.75", "Y": "-31.75", "Z": "-0.5"}, "rejects": []}
+FUT_RUN = "exec.sim.fut.run"
+# (description, operation, inputs, expected outputs or error code)
+LATE = {"fut_h": [
+    ("fut.run ZN round trip with fees; pnl per trader marked at the last trade (HR-102)", FUT_RUN, FUT_RUN_ZN_IN, FUT_RUN_ZN_OUT),
+    ("fut.run ZB price priority, a resting remainder and a mark below the first fill", FUT_RUN, FUT_RUN_ZB_IN, FUT_RUN_ZB_OUT),
+    ("fut.run with no events: empty book, no pnl", FUT_RUN, {"events": []},
+     {"book": _EMPTY, "cancelled": [], "conservation": {}, "fees": {}, "fills": [], "label": RT, "mbp": _EMPTY,
+      "pnl": {}, "rejects": []}),
+    ("fut.run price off the contract grid", FUT_RUN, {"events": [_fev("S1", "M", "SELL", "110-162", "3")]}, "E_DOMAIN"),
+    ("fut.run negative fee", FUT_RUN, {"events": [], "fee_per_contract": "-1"}, "E_DOMAIN"),
+    ("fut.run event that is not an object", FUT_RUN, {"events": [1]}, "E_SCHEMA"),
+]}
+
 LIT = "simulated venue; not a real exchange"
 
 
@@ -429,6 +485,15 @@ def build():
             s.add(op, inp, exp, cls="date_and_convention", verified=["hand"], tags=["stage_h", "hr116"],
                   description=f"hand: HR-116 in-range boundary (seed {inp['seed']}, request_index {inp['request_index']})")
             s.cases[-1]["case_id"] = f"{name}-{first + k:04d}"
+        first += len(BOUNDARY_OK.get(name, []))
+        for k, (desc, op, inp, exp) in enumerate(LATE.get(name, [])):
+            if isinstance(exp, str):
+                s.add(op, inp, error=exp, cls="date_and_convention", verified=["hand"], tags=["stage_h", "error"],
+                      description=f"hand: {desc}")
+            else:
+                s.add(op, inp, exp, cls="date_and_convention", verified=["hand"], tags=["stage_h", "multiasset"],
+                      description=f"hand: {desc}; lit-engine fields as exec.sim.lit.run; not blind")
+            s.cases[-1]["case_id"] = f"{name}-{first + k:04d}"
         suites.append(s)
     suites.append(e1_suite(suites))
     return suites
@@ -441,7 +506,7 @@ def e1_suite(suites):
     for su in suites:
         for c in su.cases:
             op = c["operation"]
-            if op in seen or c["expected"]["status"] != "ok":
+            if op in seen or c["expected"]["status"] != "ok" or op == FUT_RUN:
                 continue
             path = _first_number(c["inputs"])
             if path is None:
@@ -466,6 +531,10 @@ def e1_suite(suites):
             e.add(op, inp, error="E_SCHEMA", cls="date_and_convention", verified=["hand"],
                   tags=["stage_h", "e1", "non-finite-input"],
                   description=f"HR-12: NaN at {NO_DECIMAL[op]} (no decimal input) is E_SCHEMA (from {c['case_id']})")
+    # exec.sim.fut.run, appended last so no earlier e1_h4 case id moves (added 2026-11-19).
+    e.add(FUT_RUN, dict(FUT_RUN_ZN_IN, fee_per_contract="NaN"), error="E_SCHEMA", cls="date_and_convention",
+          verified=["hand"], tags=["stage_h", "e1", "non-finite-input"],
+          description="HR-12: NaN decimal string at fee_per_contract is E_SCHEMA (from fut_h-0011)")
     return e
 
 

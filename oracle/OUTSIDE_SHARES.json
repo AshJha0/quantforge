@@ -3799,34 +3799,34 @@
   },
   "H": {
    "without_sweeps": {
-    "cases": 186,
+    "cases": 189,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 144,
     "reimplementation": 0,
-    "none": 42,
+    "none": 45,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 144,
-    "share_with_rederivation": 0.774194,
+    "share_with_rederivation": 0.761905,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 171
+    "error_and_invariance_cases": 175
    },
    "with_sweeps": {
-    "cases": 186,
+    "cases": 189,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 144,
     "reimplementation": 0,
-    "none": 42,
+    "none": 45,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 144,
-    "share_with_rederivation": 0.774194,
+    "share_with_rederivation": 0.761905,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 171
+    "error_and_invariance_cases": 175
    },
    "sweeps": null,
    "libraries": {},
@@ -4071,6 +4071,21 @@
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 1
+    },
+    "exec.sim.fut.run": {
+     "cases": 3,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 0,
+     "reimplementation": 0,
+     "none": 3,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 0,
+     "share_with_rederivation": 0.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 4
     },
     "exec.sim.fut.to_text": {
      "cases": 1,
@@ -4873,19 +4888,19 @@
      "meets_item_floor": true
     },
     "H-24": {
-     "cases": 16,
+     "cases": 19,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 16,
      "reimplementation": 0,
-     "none": 0,
+     "none": 3,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 16,
-     "share_with_rederivation": 1.0,
+     "share_with_rederivation": 0.842105,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 11,
+     "error_and_invariance_cases": 14,
      "suites": [
       "fut_h",
       "rtc_h"

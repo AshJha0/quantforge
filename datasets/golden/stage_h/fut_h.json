@@ -284,6 +284,388 @@
     "error"
    ],
    "description": "hand: HR-116: qty -2^53"
+  },
+  {
+   "case_id": "fut_h-0011",
+   "operation": "exec.sim.fut.run",
+   "inputs": {
+    "contract": {
+     "symbol": "ZN"
+    },
+    "events": [
+     {
+      "id": "S1",
+      "op": "NEW",
+      "price": "110-16",
+      "qty": "3",
+      "side": "SELL",
+      "trader": "M",
+      "type": "LIMIT"
+     },
+     {
+      "id": "B1",
+      "op": "NEW",
+      "price": "110-16",
+      "qty": "3",
+      "side": "BUY",
+      "trader": "P",
+      "type": "LIMIT"
+     },
+     {
+      "id": "S2",
+      "op": "NEW",
+      "price": "110-17+",
+      "qty": "3",
+      "side": "SELL",
+      "trader": "P",
+      "type": "LIMIT"
+     },
+     {
+      "id": "B2",
+      "op": "NEW",
+      "price": "110-17+",
+      "qty": "3",
+      "side": "BUY",
+      "trader": "N",
+      "type": "LIMIT"
+     }
+    ],
+    "fee_per_contract": "1.00"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [],
+      "bids": []
+     },
+     "cancelled": [],
+     "conservation": {
+      "B1": {
+       "cancelled": "0",
+       "filled": "3",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "3"
+      },
+      "B2": {
+       "cancelled": "0",
+       "filled": "3",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "3"
+      },
+      "S1": {
+       "cancelled": "0",
+       "filled": "3",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "3"
+      },
+      "S2": {
+       "cancelled": "0",
+       "filled": "3",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "3"
+      }
+     },
+     "fees": {
+      "M": "3",
+      "N": "3",
+      "P": "6"
+     },
+     "fills": [
+      {
+       "maker_id": "S1",
+       "price": "110.5",
+       "qty": "3",
+       "seq": 1,
+       "taker_id": "B1"
+      },
+      {
+       "maker_id": "S2",
+       "price": "110.546875",
+       "qty": "3",
+       "seq": 2,
+       "taker_id": "B2"
+      }
+     ],
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "mbp": {
+      "asks": [],
+      "bids": []
+     },
+     "pnl": {
+      "M": "-143.625",
+      "N": "-3",
+      "P": "134.625"
+     },
+     "rejects": []
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "hand: fut.run ZN round trip with fees; pnl per trader marked at the last trade (HR-102); lit-engine fields as exec.sim.lit.run; not blind"
+  },
+  {
+   "case_id": "fut_h-0012",
+   "operation": "exec.sim.fut.run",
+   "inputs": {
+    "contract": {
+     "symbol": "ZB"
+    },
+    "events": [
+     {
+      "id": "X1",
+      "op": "NEW",
+      "price": "120-00",
+      "qty": "2",
+      "side": "SELL",
+      "trader": "X",
+      "type": "LIMIT"
+     },
+     {
+      "id": "Y1",
+      "op": "NEW",
+      "price": "120-01",
+      "qty": "1",
+      "side": "BUY",
+      "trader": "Y",
+      "type": "LIMIT"
+     },
+     {
+      "id": "Z1",
+      "op": "NEW",
+      "price": "119-31",
+      "qty": "1",
+      "side": "SELL",
+      "trader": "Z",
+      "type": "LIMIT"
+     },
+     {
+      "id": "W1",
+      "op": "NEW",
+      "price": "120-00",
+      "qty": "1",
+      "side": "BUY",
+      "trader": "W",
+      "type": "LIMIT"
+     }
+    ],
+    "fee_per_contract": "0.50"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [
+       {
+        "display_qty": "1",
+        "hidden_qty": "0",
+        "id": "X1",
+        "price": "120",
+        "seq": 1
+       }
+      ],
+      "bids": []
+     },
+     "cancelled": [],
+     "conservation": {
+      "W1": {
+       "cancelled": "0",
+       "filled": "1",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "1"
+      },
+      "X1": {
+       "cancelled": "0",
+       "filled": "1",
+       "rejected": "0",
+       "resting": "1",
+       "submitted": "2"
+      },
+      "Y1": {
+       "cancelled": "0",
+       "filled": "1",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "1"
+      },
+      "Z1": {
+       "cancelled": "0",
+       "filled": "1",
+       "rejected": "0",
+       "resting": "0",
+       "submitted": "1"
+      }
+     },
+     "fees": {
+      "W": "0.5",
+      "X": "0.5",
+      "Y": "0.5",
+      "Z": "0.5"
+     },
+     "fills": [
+      {
+       "maker_id": "X1",
+       "price": "120",
+       "qty": "1",
+       "seq": 1,
+       "taker_id": "Y1"
+      },
+      {
+       "maker_id": "Z1",
+       "price": "119.96875",
+       "qty": "1",
+       "seq": 2,
+       "taker_id": "W1"
+      }
+     ],
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "mbp": {
+      "asks": [
+       [
+        "120",
+        "1"
+       ]
+      ],
+      "bids": []
+     },
+     "pnl": {
+      "W": "-0.5",
+      "X": "30.75",
+      "Y": "-31.75",
+      "Z": "-0.5"
+     },
+     "rejects": []
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "hand: fut.run ZB price priority, a resting remainder and a mark below the first fill; lit-engine fields as exec.sim.lit.run; not blind"
+  },
+  {
+   "case_id": "fut_h-0013",
+   "operation": "exec.sim.fut.run",
+   "inputs": {
+    "events": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "book": {
+      "asks": [],
+      "bids": []
+     },
+     "cancelled": [],
+     "conservation": {},
+     "fees": {},
+     "fills": [],
+     "label": "simulated venue; not a real exchange; no real rates data",
+     "mbp": {
+      "asks": [],
+      "bids": []
+     },
+     "pnl": {},
+     "rejects": []
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "multiasset"
+   ],
+   "description": "hand: fut.run with no events: empty book, no pnl; lit-engine fields as exec.sim.lit.run; not blind"
+  },
+  {
+   "case_id": "fut_h-0014",
+   "operation": "exec.sim.fut.run",
+   "inputs": {
+    "events": [
+     {
+      "id": "S1",
+      "op": "NEW",
+      "price": "110-162",
+      "qty": "3",
+      "side": "SELL",
+      "trader": "M",
+      "type": "LIMIT"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: fut.run price off the contract grid"
+  },
+  {
+   "case_id": "fut_h-0015",
+   "operation": "exec.sim.fut.run",
+   "inputs": {
+    "events": [],
+    "fee_per_contract": "-1"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: fut.run negative fee"
+  },
+  {
+   "case_id": "fut_h-0016",
+   "operation": "exec.sim.fut.run",
+   "inputs": {
+    "events": [
+     1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "error"
+   ],
+   "description": "hand: fut.run event that is not an object"
   }
  ]
 }

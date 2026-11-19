@@ -665,6 +665,68 @@
     "non-finite-input"
    ],
    "description": "HR-12: NaN at price (no decimal input) is E_SCHEMA (from fut_h-0006)"
+  },
+  {
+   "case_id": "e1_h4-0022",
+   "operation": "exec.sim.fut.run",
+   "inputs": {
+    "contract": {
+     "symbol": "ZN"
+    },
+    "events": [
+     {
+      "id": "S1",
+      "op": "NEW",
+      "price": "110-16",
+      "qty": "3",
+      "side": "SELL",
+      "trader": "M",
+      "type": "LIMIT"
+     },
+     {
+      "id": "B1",
+      "op": "NEW",
+      "price": "110-16",
+      "qty": "3",
+      "side": "BUY",
+      "trader": "P",
+      "type": "LIMIT"
+     },
+     {
+      "id": "S2",
+      "op": "NEW",
+      "price": "110-17+",
+      "qty": "3",
+      "side": "SELL",
+      "trader": "P",
+      "type": "LIMIT"
+     },
+     {
+      "id": "B2",
+      "op": "NEW",
+      "price": "110-17+",
+      "qty": "3",
+      "side": "BUY",
+      "trader": "N",
+      "type": "LIMIT"
+     }
+    ],
+    "fee_per_contract": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_h",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "HR-12: NaN decimal string at fee_per_contract is E_SCHEMA (from fut_h-0011)"
   }
  ]
 }

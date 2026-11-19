@@ -85,7 +85,7 @@ From [`10-execution/auction.md`](../../specifications/10-execution/auction.md) (
 - Futures: ticks = price / tick on the contract grid, off-grid `E_DOMAIN`; P&L = ticks x tick value x quantity minus fees per side.
 - `seed` within 0..2^53-1 and `request_index` within 0..2^32-1; outside is `E_LIMIT` in all four builds (HR-116; goldens `fxv_h-0015` to `0020`).
 
-Evidence: the blind lane re-derived the value cases per item as listed in [`oracle/OUTSIDE_SHARES.md`](../../oracle/OUTSIDE_SHARES.md) (H-22 60 %, H-23 71 %, H-24 100 % after the second rates packet, HR-114).
+Evidence: the blind lane re-derived the value cases per item as listed in [`oracle/OUTSIDE_SHARES.md`](../../oracle/OUTSIDE_SHARES.md) (H-22 60 %, H-23 71 %, H-24 84 % (16 of 19) after the second rates packet, HR-114, and the three hand-only `exec.sim.fut.run` cases).
 
 ## For practitioners
 

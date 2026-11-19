@@ -349,4 +349,4 @@ TOTALS: 15769 value 7784 error 5471 invariance 2514
 
 Stage H round 4, multi-asset (2026-11-19, stage-h4, H-22 to H-24, rulings HR-80 to HR-117): `auc_h`, `eqc_h`, `fxc_h`, `fxv_h`, `rtc_h`, `fut_h`, `ses_h`, `acls_h`, `e1_h4`: 116 cases (63 value, 53 error).
 
-TOTALS: 15885 value 7847 error 5524 invariance 2514
+TOTALS: 15892 value 7850 error 5528 invariance 2514

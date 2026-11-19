@@ -58,7 +58,7 @@ Coordinator rulings HR-104 to HR-108 (Rule 612 half-penny tier, Rule 610 $0.001 
 - Mapping and compare script `program/stage_h_blind_w2/rates2_compare.py`, committed before the comparison ran (one crash fix in loading error cases, committed before any output). Field names equal; decimals by value; `yield` to the root_finding tolerance; labels compared. One run, no rerun.
 - Result: 7 of 7 agree. MATCH 3 (rtc_h-0004, 0011, 0012); REPRESENTATION-ONLY 4 (rtc_h-0007 "15.625000", fut_h-0004/0005 pnl and fees with trailing zeros, fut_h-0006 "-31.25000"); VALUE MISMATCH 0, so nobody was found wrong.
 - Caveats: fut_h-0004..0006 were computed with HR-102/103 given as written rules (the reason they were not blind before was that those readings were missing from the spec). rtc_h-0007's 15.625 was removed from the packet text. rtc_h-0004 uses HR-109's quarter-32nds, whose CME source is still unverified (HR-115); agreement checks the arithmetic, not the convention.
-- H-24 share: 16 of 16 value cases now blind and agreeing = **100 %** (60 % rule met; was 56.2 %).
+- H-24 share: 16 of 16 value cases now blind and agreeing = **100 %** (60 % rule met; was 56.2 %). Update 2026-11-19: three hand-only `exec.sim.fut.run` value cases (fut_h-0011 to fut_h-0013) were added, so the share is 16 of 19 = 84.2 %.
 
 ## Source record update 2026-11-19 (HR-117)
 
