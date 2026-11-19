@@ -14,3 +14,10 @@ Status: PROPOSED by lane k-w3-spec on 2026-11-19. Not normative until the stage 
 | KR-187 | Multicast | Met by MoldUDP64 over UDP multicast with ITCH payloads, two listeners, gap detection by sequence number |
 | KR-188 | Codecs | Python codec is the K-3 deliverable; other languages only by a later ruling |
 | KR-189 | Where adapters live | `platform/` and optional per-language modules that depend on the libraries; never the reverse |
+| KR-190 | Snapshot publication | Single writer, many readers, immutable fixed-size snapshot (at most 4 KiB). Java: release store and acquire load of a record with final fields; GC reclaims. C++ and Rust: single-writer hazard pointers [Michael 2004, recalled] over a fixed pool of R + 2 slots, R <= 64 registered readers |
+| KR-191 | Rejected designs | `std::atomic<std::shared_ptr>` (not required lock-free, cppreference read), epoch-based reclamation (stalled reader blocks reclamation), `arc-swap` as a library dependency (third-party crate in the numerical library; reference only), seqlock (readers block on a stalled writer) |
+| KR-192 | Progress claimed | Writer wait-free (bounded scan of R hazards); reader lock-free, not wait-free; Java single-access wait-free on the JVM's terms, safepoints reported in p99.9. No heap allocation after start-up in C++ and Rust |
+| KR-193 | Risk and hedge content | Writer per publish: `risk.curve.key_rate`, `hedge.greeks.neutralise` (or `hedge.solve`); reader per move: `risk.intraday.delta_gamma_bound`. No new operation |
+| KR-194 | Exactness | A number read through a snapshot is bit-identical to the direct call, 1,000 publishes per language |
+| KR-195 | Race tests | C++ TSan; Rust loom (R = 2, 3 publishes) and Miri (64 seeds), TSan if the toolchain allows; Java jcstress. Four planted faults (relaxed ordering, skipped hazard scan, in-place mutation, corrupted field) each shown failing first |
+| KR-196 | Targets | Table S1 to S5 of `lock-free-snapshots.md`, fixed in the confirming commit before any K-5b code, H-9 method: first measurement published as it is, a miss stays a miss. Label "latency-aware analytics on simulated data" |
