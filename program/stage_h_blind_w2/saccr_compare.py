@@ -8,6 +8,8 @@ Mapping and tolerances, fixed and committed before the first run:
   seven named above. Such keys are listed as UNNAMED, never as a match or a mismatch.
 - Numbers: tolerance class simple_analytic as the spec states, 1e-12 absolute + 1e-10 relative:
   |a - b| <= 1e-12 + 1e-10 |golden|. Integer against float is representation only. Booleans, strings, null exact.
+- The golden wraps outputs in an "outputs" object (found by run 1, which compared nothing: every leaf was shape-only);
+  representation only, so the compare reads gold["expected"]["outputs"] (run 2 is the record).
 - Arrays (hedging_sets, trades) compared by position (the spec fixes their order).
 - Verdicts: MATCH (every named leaf present on both sides and equal), VALUE MISMATCH (a shared leaf differs),
   SHAPE MISMATCH (a named leaf missing on one side, values otherwise equal).
@@ -65,7 +67,7 @@ def main():
     gold = {c["case_id"]: c for c in json.loads((root / "datasets/golden/stage_k/saccr_k.json").read_text(encoding="utf-8"))["cases"]}
     bad = 0
     for cid in sorted(blind):
-        g = dict(leaves(gold[cid]["expected"]))
+        g = dict(leaves(gold[cid]["expected"]["outputs"]))
         b = dict(leaves(blind[cid]))
         val, shape, unnamed = [], [], []
         for p in sorted(set(g) | set(b)):
