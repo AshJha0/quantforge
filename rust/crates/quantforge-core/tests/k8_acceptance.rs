@@ -2,6 +2,8 @@
 //! 201/401/801 for the three `aadladder_g` cases against `oracle/K8_ACCEPTANCE_W2.json`. Runs only with
 //! `QF_K8_ACCEPTANCE=1` (about a minute); moved here from `src/bermudan_k8_tests.rs` so the skipped body
 //! is not counted as uncovered library lines by the per-file coverage gate (R6-26). Same test, unchanged.
+#![allow(clippy::unwrap_used)] // tests may unwrap (G9)
+#![allow(clippy::needless_range_loop)] // entry k is read from three grid rows at once, as in the src test it came from
 use quantforge_core::bermudan_k8::{Ladder, ladder};
 use quantforge_core::json::{Json, parse};
 use quantforge_core::shortrate::{FdGrid, HwCurve, SwapLeg};
