@@ -188,3 +188,45 @@ ETH-USD: 38721 rows, 42426 messages (31287 book, 11139 trade fills), 1831549 lev
 output R_ETH-USD.bin sha256 0ec00235f23417a33fbdc6332d981696cbfcc986ff484b7b09eef07a1e644f40
 output R_ETH-USD.msgs.jsonl sha256 8575a279cf02b6fad99e95bfe6b49a0535931edf13233aa336b9a448a41909a7
 ```
+
+## Workload R correctness (all three languages)
+
+The fast book's full top(100) after every book message (31,287 per symbol) was dumped by each harness
+(`QF_H9_DUMP`) and checked by `benchmarks/h9/check_r.py` against `micro.book.rebuild` (Python, exact decimals), one
+checkpoint per book message: **0 failed of 31,287, BTC/USD and ETH/USD, in C++, Rust and Java**. The final book
+equals rebuild's in full, every checkpoint has 100 levels a side, 0 crossed, 0 locked. The three dumps are
+byte-identical. The in-harness std::map / BTreeMap / TreeMap check also shows 0 mismatches (64 and 43 checkpoints).
+
+## Workload R timing: crypto venue; 6-hour window, not a full day; local laptop, not the acceptance machine
+
+Run 2026-11-19 04:03 UTC, WSL load average 0.1-0.3 (below 1.5). C++/Rust: WSL 2, `taskset -c 2`. Java: native
+Windows, unpinned. Same builds and flags as for S. 5 runs; median (min-max), ns. Warm-up = first hour (9,322
+messages BTC/USD, 6,592 ETH/USD; JIT warm-up for Java is therefore short). Messages: BTC/USD 63,195 (31,287 form B
+updates, 31,908 trade fills), ETH/USD 42,426 (31,287 updates, 11,139 trades). The pooled figure is the target
+basis. Clock p50 21 ns in WSL; Java `nanoTime` steps 100 ns here.
+
+| Row | Lang | Symbol | Target p50 / p99 / p99.9 | pooled p50 | pooled p99 | pooled p99.9 | Met? |
+|---|---|---|---|---:|---:|---:|---|
+| L1 | C++ | BTC | 100 / 500 / 2,000 | 39 (39-40) | **9,223** (8,735-9,343) | **21,471** (15,279-28,143) | p50 met; p99, p99.9 missed |
+| L1 | C++ | ETH | 100 / 500 / 2,000 | **784** (759-813) | **9,631** | **23,087** | all missed |
+| L2 | Rust | BTC | 100 / 500 / 2,000 | 47 (45-52) | **8,927** | **19,695** | p50 met; p99, p99.9 missed |
+| L2 | Rust | ETH | 100 / 500 / 2,000 | **755** (751-802) | **8,703** | **21,151** | all missed |
+| L3 | Java | BTC | 200 / 1,000 / 5,000 | 100 | **17,407** | **31,503** | p50 met; p99, p99.9 missed |
+| L3 | Java | ETH | 200 / 1,000 / 5,000 | **1,300** | **17,407** | **27,407** | all missed |
+
+Per kind: the form B update alone has p50 about 2.2-2.4 us (C++/Rust) and 4.0 us (Java), and p99 9-11 us
+(C++/Rust) and 18-21 us (Java). A trade has p50 27-34 ns. BTC/USD's pooled p50 passes only because half its
+messages are trades. Batch timing (1,000 messages, divided), p50 / p99: C++ 1,376 / 2,055 (BTC), 2,036 / 2,739
+(ETH); Rust 1,281 / 1,781, 1,887 / 2,420; Java 2,271 / 3,053, 3,599 / 5,668.
+
+**Why R misses.** The targets were set for a message that changes one or a few levels (targets point 1, HR-19).
+A form B update instead carries a whole second of changes: about 58 levels on average (1.82 M levels / 31,287
+updates). Per level that is about 40 ns (C++/Rust), in line with the S figures. The miss is real against the
+targets as written, and the targets are not changed (HR-23). Whether L1 to L3 R should be stated per level for a
+differenced stream is a question for the owner, not something settled here.
+
+L4: C++ and Rust 0 allocations in every measured run. Java: 792 allocated bytes per run (the same as S, taken to be
+the measurement calls) and 0 GC events in the timed regions (`gc_R_*.log` not kept in the repo). L5 queries on R
+(batch top(100) p99): C++ 147 / 177, Rust 181 / 181, Java 164 / 180 ns, all under 1,000 (C++/Rust) and 2,000 (Java).
+
+Raw output: `cpp_R_BTC-USD.json`, `cpp_R_ETH-USD.json`, `rust_R_*.json`, `java_R_*.json`.
