@@ -28,7 +28,7 @@ fn rec(
     }
 }
 
-/// The bt_k golden log: two open versions, a back-dated correction of February, a withdrawal.
+/// The `bt_k` golden log: two open versions, a back-dated correction of February, a withdrawal.
 fn golden_log() -> Vec<BiRecord> {
     vec![
         rec(1, "A", T0, None, T0 + DAY, 100, false),
