@@ -199,7 +199,8 @@ def due_instant(d: dt.date, cfg: dict[str, Any]) -> dt.datetime:
 
 
 def cutoff(d: dt.date, cal: Calendar, cfg: dict[str, Any]) -> dt.datetime:
-    """Last on-time instant for business day d: the cut-off time on the next business day (KR-95)."""
+    """First late instant for business day d: the cut-off time on the next business day (KR-95 as amended by KR-111:
+    on time strictly before it)."""
     return dt.datetime.combine(cal.next_open(d), _time(cfg["on_time_cutoff_utc"]), dt.timezone.utc)
 
 
@@ -473,14 +474,14 @@ def run(cfg: dict[str, Any], runner: Runner, ledger_text: str, now: dt.datetime,
         hit = holdout_hit(ds, windows)
         if hit:
             add("DAY", {"date": ds, "status": "holdout_blocked", "studies": hit, "run": run_info,
-                        "timing": "on_time" if now <= cutoff(d, cal, cfg) else "late"})
+                        "timing": "on_time" if now < cutoff(d, cal, cfg) else "late"})
             notes.append(f"{ds}: holdout_blocked ({', '.join(hit)}); no input read")
             continue
         if now > late_limit(d, cal, cfg):
             add("GAP", {"date": ds, "reason": "no settled row before the late window closed", "run": run_info})
             notes.append(f"{ds}: GAP")
             continue
-        timing = "on_time" if now <= cutoff(d, cal, cfg) else "late"
+        timing = "on_time" if now < cutoff(d, cal, cfg) else "late"
         data, url = treasury(d.year)
         base = {"date": ds, "timing": timing, "run": run_info}
         if data is None:
@@ -610,7 +611,7 @@ def verify(text: str, cfg: dict[str, Any] | None = None, runner: Runner | None =
                 t = instant(r["ts"])
                 if t < due_instant(d, cfg):
                     return bad(n, "EARLY", f"{ds} written at {r['ts']}, before it was due")
-                if kind == "DAY" and b.get("timing") != ("on_time" if t <= cutoff(d, cal, cfg) else "late"):
+                if kind == "DAY" and b.get("timing") != ("on_time" if t < cutoff(d, cal, cfg) else "late"):
                     return bad(n, "TIMING", f"{ds} labelled {b.get('timing')}")
                 if kind == "DAY" and status != "holdout_blocked" and t > late_limit(d, cal, cfg):
                     return bad(n, "TIMING", f"{ds}: a DAY row after the late window must be a GAP")

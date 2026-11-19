@@ -599,3 +599,17 @@ def test_the_workflow_pins_actions_as_the_recorder_does_and_pushes_only_its_own_
     )
     assert "permissions:" + chr(10) + "  contents: write" + chr(10) + "concurrency:" in wf
     assert "dry_run" in wf and "pull_request" not in wf and "fwd remote remove origin" in wf
+
+
+@pytest.mark.parametrize(("second", "timing"), [(59, "on_time"), (60, "late")])
+def test_cutoff_boundary_second(days30: list[dt.date], second: int, timing: str) -> None:
+    """KR-82 (and KR-111 for the curve run): on time strictly before 19:30:00 UTC on the next business day."""
+    days = days30[:3]
+    log = forward_log(synthetic_yields(days))
+    text = run_days(days[:1], log)
+    when = dt.datetime.combine(days[2], dt.time(19, 29), dt.UTC) + dt.timedelta(seconds=second)
+    seen = [e for e in log if e["record"]["knowledge_time"] <= core.stamp(when)]
+    text, _, _ = core.run(CFG, runner, text, seen, when, "testcommit", "python", NO_WINDOWS)
+    by_date = {r["body"]["date"]: r for r in rows_of(text)[1:]}
+    assert by_date[days[1].isoformat()]["body"]["timing"] == timing
+    assert check(text)["ok"]

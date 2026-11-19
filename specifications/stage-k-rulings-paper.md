@@ -43,6 +43,6 @@ Checked against the spec, `tools/paper_daily/paper_core.py`, `run_day.py`, `veri
 | KR-71 | Confirmed | Labels in `config.json`; the verifier checks them |
 | KR-72 | Confirmed, with KR-108 | The DAY row writes the five values and the source row hash; KR-108 records that the forward log publishes the same values |
 | KR-73 to KR-81 | Confirmed | Calendar, instruments, rotation, marks (365.25-day curve time, 6 and 10 decimal rounding), seeded depth 20% to 50%, costs, explain with threshold 0, row format, chain and anchors |
-| KR-82 | Confirmed | Strict "before 19:30:00 UTC" in the code. Note: the curve run's KR-95 uses "no later than" (<=) at the same instant; each matches its own spec, and the two jobs differ only at exactly 19:30:00 |
+| KR-82 | Confirmed | Strict "before 19:30:00 UTC" in the code. The curve run's KR-95 used "no later than" (<=); curve KR-111 aligns it with this ruling (strictly before 19:30:00), and both test files check the boundary second |
 | KR-83 to KR-89 | Confirmed | Gaps, replay, rebuild, 1e-6 allowance in the rebuild only, recorded trading day, limits (40,000 units, 4,500,000, 0.005, 2 orders) and financing, holdout guards in writer and verifier |
 | KR-108 | Confirmed | Written at integration |

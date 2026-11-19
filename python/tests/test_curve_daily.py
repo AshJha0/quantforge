@@ -525,3 +525,14 @@ def test_problem_rows_make_the_run_red() -> None:
     assert run_day.problems(new) == 2
     _, new, _ = step("", evening(days[0]), fetcher(treasury_csv(days), None))
     assert run_day.problems(new) == 0
+
+
+@pytest.mark.parametrize(("second", "timing"), [(59, "on_time"), (60, "late")])
+def test_cutoff_boundary_second(second: int, timing: str) -> None:
+    """KR-111 (aligned with paper KR-82): on time strictly before 19:30:00 UTC on the next business day."""
+    days = business_days(2)
+    when = dt.datetime.combine(days[1], dt.time(19, 29), dt.UTC) + dt.timedelta(seconds=second)
+    out, new, _ = step("", when, fetcher(treasury_csv(days[:1]), None))
+    day = next(r for r in new if r["kind"] == "DAY")
+    assert day["body"]["date"] == days[0].isoformat() and day["body"]["timing"] == timing
+    assert check(out)["ok"]

@@ -91,7 +91,7 @@ Canonical bytes: the row without `hash`, keys sorted at every level, separators 
 ## When a day is due, on time, late or a gap (KR-94 to KR-96)
 
 - **Due**: business day `D` is due from 23:00:00 UTC on `D` (6:00 PM Eastern in winter, 7:00 PM in summer; Treasury usually posts by 6:00 PM ET [TY-M]).
-- **On time**: a DAY row written no later than 19:30:00 UTC on the next business day, before the next day's 3:30 PM ET input quotes in either daylight regime [UST-IRS]. Otherwise `late`. The verifier recomputes the label from `ts`.
+- **On time**: a DAY row written before 19:30:00 UTC on the next business day (strictly before; a row written at 19:30:00 exactly is late; ruling KR-111, aligned with the paper ledger's KR-82, 2026-11-19), before the next day's 3:30 PM ET input quotes in either daylight regime [UST-IRS]. Otherwise `late`. The verifier recomputes the label from `ts`.
 - **Settled**: a date is settled by one DAY row with status `ok`, `fit_failed` or `holdout_blocked`, or by a GAP row. `stale_input` and `fetch_failed` rows do not settle a date; later runs try again. A second settling row for a date fails verification.
 - **Late window**: a run may still fit an unsettled date, labelled `late`, until 19:30 UTC on the fifth business day after the date's next business day. After that the run writes a GAP row. **A gap is recorded as a gap and never filled later.**
 - **Start**: the first run writes GENESIS and the latest due day only. Nothing is back-filled.

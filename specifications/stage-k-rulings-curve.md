@@ -33,8 +33,10 @@ Checked against `12-platform/daily-curve-run.md`, `tools/curve_daily/curve_core.
 | # | Result | Note |
 |---|---|---|
 | KR-90 | **Not confirmed as written** | Its last sentence does not match the code (`curve_core.py` writes the Treasury attribution only in DAY inputs, the Fed's only in CONSISTENCY rows, none in failed-fetch inputs). Not edited; KR-109 corrects it and binds with it. The rest of KR-90 (sources, terms read, hashes not rows) matches |
-| KR-91 to KR-97 | Confirmed | Thirteen tenors; schedule (due after 23:00 UTC); on time "no later than" 19:30 UTC (<=, see the note under paper KR-82); late limit five business days; month-end clamp |
+| KR-91 to KR-97 | Confirmed | Thirteen tenors; schedule (due after 23:00 UTC); on time "no later than" 19:30 UTC as written (<=; amended by KR-111 to strictly before, as paper KR-82); late limit five business days; month-end clamp |
 | KR-98 | Confirmed | Weights 1/MD^2, added in eff76a68 after 7440c936 and after one real day was seen, as the ruling and the spec disclose |
 | KR-99 to KR-101 | Confirmed | 40-value tau grid, ties to the smaller tau; fit flag 10 / 25 bp; consistency tolerance 15 / 40 bp in `config.json` at 7440c936 before any real-day run; `outside` recorded, never dropped (the 2026-11-13 dry run is a recorded miss) |
 | KR-102 to KR-107 | Confirmed | Row format, chain and anchors, verifier, rebuild, site stub, exit codes 0 / 1 / 2 |
 | KR-109 | Confirmed | Written at integration |
+| KR-111 | Confirmed | Written at integration |
+| KR-111 | On time at the boundary (amends KR-95; stage K coordinator lane, integration 2026-11-19) | KR-95 said "no later than 19:30:00 UTC" (on time at 19:30:00 exactly); the paper ledger's KR-82, fixed first (commit 44ea219c, 12:12 UTC, against acb80745, 13:40 UTC), says "started before 19:30:00 UTC". The two daily jobs now use one rule, the paper's: on time strictly before 19:30:00 UTC on the next business day; 19:30:00 is late. `curve_core.py` compares with `<` in the writer and the verifier; `test_cutoff_boundary_second` in both test files checks 19:29:59 (on time) and 19:30:00 (late). No ledger exists yet, so no row is relabelled. The late window of KR-96 is unchanged |
