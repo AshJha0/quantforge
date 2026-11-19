@@ -69,3 +69,15 @@ Weak discrimination, stated: three probabilities lie within the tolerance of 1.0
 ## Results
 
 Not run. (Date, deriver and model, packet manifest check, frozen hash and commit, gaps and rulings, compare run and output path, per-case MATCH / MISMATCH / MISSING and counted, resolution of each mismatch, outside share after the run: to be filled by the coordinator.)
+
+## Results (2026-11-19; first and only compare run)
+
+- Deriver: a separate subagent on Claude Sonnet 5.5 (spec, goldens and packet were written by Opus 5.5), given only the packet folder and its own folder; standard-library Python. It states it read and tried to read nothing outside the two folders (its own statement, not independently logged). The coordinator checked the packet manifest hash 03fdc75d... before the hand-over.
+- Blind results as received: `stage_k_blind/btk/`, committed in ae7d8098 before the compare. SHA-256 of `blind_results.json`: `c4f210081695bdd8a9cac6832848e842a9e8a640721c60b7817e79f5da7f2e45`, recomputed by the coordinator, equal to the deriver's hash file.
+- Compare: `btk_compare.py` as fixed at 21392489; output `stage_k_blind/btk/compare_output.txt`. Results not changed afterwards; no rerun.
+
+| Item | Cases | MATCH | MISMATCH | Eligible | Counted | Needed | Outside share |
+|---|---:|---:|---:|---:|---:|---:|---|
+| K-8e | 12 | 12 | 0 | 11 | 11 | 3 | 23 of 24 (95.8%): 12 published tables, 11 blind |
+
+Not counted: btk_k-0017 (answer stated by the rules text). Readings the deriver recorded, all equal to the spec's: KR-44 "more than" applied to both desk limits, so exactly 12 and 30 is no breach (KR-44 stays labelled inferred: a blind match shows the rule is unambiguous as we wrote it, not that it reads MAR32.19 correctly); exception is strict -P&L > VaR, a null VaR or P&L counts as an exception; multiplier is null when n is not 250.
