@@ -721,6 +721,7 @@ def test_run_r2_refuses_a_sample_build_before_correctness_or_timing(tmp_path: Pa
         p = subprocess.run(
             [bash, (H9 / "run_r2.sh").as_posix(), mode],
             env=env,
+            check=False,
             capture_output=True,
             text=True,
             timeout=120,
