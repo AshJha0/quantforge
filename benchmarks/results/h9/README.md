@@ -222,8 +222,7 @@ messages are trades. Batch timing (1,000 messages, divided), p50 / p99: C++ 1,37
 **Why R misses.** The targets were set for a message that changes one or a few levels (targets point 1, HR-19).
 A form B update instead carries a whole second of changes: about 58 levels on average (1.82 M levels / 31,287
 updates). Per level that is about 40 ns (C++/Rust), in line with the S figures. The miss is real against the
-targets as written, and the targets are not changed (HR-23). Whether L1 to L3 R should be stated per level for a
-differenced stream is a question for the owner, not something settled here.
+targets as written, and the targets are not changed (HR-23). Owner decision 2026-11-19: the per-update targets stay the acceptance test and the miss stays recorded. The per-level figure (about 40 ns) is descriptive only and has no target. A per-level target, if one is wanted, is committed before a fresh recorded window is measured (v0.10.1 or later); the window already seen is never judged against it.
 
 L4: C++ and Rust 0 allocations in every measured run. Java: 792 allocated bytes per run (the same as S, taken to be
 the measurement calls) and 0 GC events in the timed regions (`gc_R_*.log` not kept in the repo). L5 queries on R

@@ -88,7 +88,7 @@ rtc_h-0010 91-day bill at 5 % discount: 98.736111111
 - **Round lot by price.** At 250.01 the round lot is 40 shares, not 100 (`eqc_h-0015`); the tiers follow the current rule by default and the older 100-share lot with an earlier `as_of` (HR-110).
 - **Settlement skips the weekend.** T+1 from Friday 2026-11-20 is Monday 2026-11-23 (`eqc_h-0008`).
 - **Spot dates.** EURUSD is T+2 and skips the weekend (Tuesday 2026-11-24); USDCAD is T+1 (Monday). A USD holiday on 2026-11-26 moves EURUSD spot from the 26th to the 27th (`fxc_h-0004`).
-- **32nds.** 99-16 is 99 and 16/32 = 99.5; the `+` adds 1/64; a third digit 2 adds 2/4 of a 32nd under HR-109, so 99-162 = 99.5078125.
+- **32nds.** 99-16 is 99 and 16/32 = 99.5; the `+` adds 1/64; a third digit 2 adds 1/4 of a 32nd under HR-109 (quarter-tick contracts; eighth-tick contracts are not supported, HR-118), so 99-162 = 99.5078125.
 - **Bond and bill.** A 4 % semi-annual bond with two periods left, at a 5 % yield, is worth 99.036287924; solving back from the exact price returns 5 %. A 91-day bill at a 5 % discount is 100 (1 - 0.05 x 91/360) = 98.736111111.
 
 ### The formal statement, checked against the spec

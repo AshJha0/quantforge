@@ -111,8 +111,8 @@ TEST_CASE("multi-asset goldens, every row exact (A1, A4)") {
     replay("fxc_h", 9);
     replay("fxv_h", 20);
     replay("rtc_h", 17);
-    replay("fut_h", 10);
-    replay("e1_h4", 21);
+    replay("fut_h", 16);
+    replay("e1_h4", 22);
     replay("ses_h", 3);
     replay("acls_h", 5);
 }

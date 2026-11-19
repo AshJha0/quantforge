@@ -799,18 +799,18 @@ void fx_spot_date(const Value& raw, Writer& out) {
             t1.push_back(x.text);
         }
     }
-    const auto [base, quote] = pair_of(raw);
+    const auto [base_ccy, quote] = pair_of(raw);
     const std::set<Date> empty;
     const auto h = [&](const string& c) -> const std::set<Date>& {
         const auto it = hol.find(c);
         return it == hol.end() ? empty : it->second;
     };
-    const auto both = [&](Date d) { return good(d, h(base)) && good(d, h(quote)); };
+    const auto both = [&](Date d) { return good(d, h(base_ccy)) && good(d, h(quote)); };
     const auto non_usd = [&](Date d) {  // a USD-only holiday on T+1 does not stop the count
-        return (base == "USD" || good(d, h(base))) && (quote == "USD" || good(d, h(quote)));
+        return (base_ccy == "USD" || good(d, h(base_ccy))) && (quote == "USD" || good(d, h(quote)));
     };
     Date d;
-    if (std::find(t1.begin(), t1.end(), base + quote) != t1.end()) d = add_good(trade, 1, both);
+    if (std::find(t1.begin(), t1.end(), base_ccy + quote) != t1.end()) d = add_good(trade, 1, both);
     else d = add_good(add_good(trade, 1, non_usd), 1, both);
     d = add_good(d - std::chrono::days{1}, 1, [&](Date x) { return both(x) && good(x, h("USD")); });
     put(out, "spot_date", format_date(d));

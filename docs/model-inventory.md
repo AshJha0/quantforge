@@ -1167,7 +1167,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MH-17 Equity, FX and rates conventions (stage H round 4, H-22 to H-24)
 - **Purpose:** tick rounding, fee cap, round lot, T+1 settlement (`micro.eq.*`); pip value and spot date (`micro.fx.*`); 32nds, tick value, bond and bill price and bond yield (`micro.rates.*`).
 - **Inputs:** as in the spec page; decimal strings (HR-12); integers within +-(2^53-1) (HR-116).
-- **Limitations:** calendars are inputs; on-coupon-date bond only (off-date pricing reuses `04-pricing`); CME third-digit 32nds reading unverified (HR-115); outputs carry no label (HR-111).
+- **Limitations:** calendars are inputs; on-coupon-date bond only (off-date pricing reuses `04-pricing`); third digit of 32nds: CME quarter digits 0, 2, 5, 7 only (source read 2026-11-19); eighth-tick contracts (2-year and 3-year notes) not supported (HR-118); outputs carry no label (HR-111).
 - **Validation:** goldens `eqc_h`, `fxc_h`, `rtc_h` with E1 cases in `e1_h4`; blind re-derivation (DR-H2) per `oracle/OUTSIDE_SHARES.md`. **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** blind second lane (`stage_h_blind/multiasset/`, rates packet 2).
@@ -1203,7 +1203,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MH-20 Simulated Treasury futures venue (stage H round 4, H-24)
 - **Purpose:** ZN and ZB futures on the lit engine in integer ticks, 32nds display, P&L and variation margin (`exec.sim.fut.*`).
 - **Inputs:** as in the spec page; contract specs are parameters with [CME-ZN] and [CME-ZB] defaults.
-- **Limitations:** simulated venue, labelled "simulated venue; not a real exchange; no real rates data"; CME sources unverified (HR-115); no delivery or conversion-factor logic here.
+- **Limitations:** simulated venue, labelled "simulated venue; not a real exchange; no real rates data"; quarter-tick price text only, eighth-tick contracts not supported (HR-118); [CME-ZB] source not yet re-tagged; no delivery or conversion-factor logic here.
 - **Validation:** goldens `fut_h` (HR-116 integer boundary included); blind share H-24 84.2 % (16 of 19; the three `exec.sim.fut.run` value cases are hand-only) after rates packet 2 (HR-114). **Review:** 2026-11-18.
 - **Tier:** 3.
 - **Challenger:** blind second lane.
