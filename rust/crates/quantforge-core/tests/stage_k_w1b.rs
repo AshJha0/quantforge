@@ -400,25 +400,25 @@ fn saccr_errors() {
     fails(
         "E_DOMAIN",
         "threshold",
-        &[ok.clone()],
+        std::slice::from_ref(&ok),
         Some(&m(-1.0, 0.0, 1, None)),
     );
     fails(
         "E_DOMAIN",
         "mta",
-        &[ok.clone()],
+        std::slice::from_ref(&ok),
         Some(&m(0.0, -1.0, 1, None)),
     );
     fails(
         "E_DOMAIN",
         "remargin_days",
-        &[ok.clone()],
+        std::slice::from_ref(&ok),
         Some(&m(0.0, 0.0, 0, None)),
     );
     fails(
         "E_DOMAIN",
         "mpor_days",
-        &[ok.clone()],
+        std::slice::from_ref(&ok),
         Some(&m(0.0, 0.0, 1, Some(0))),
     );
     // HR-122: a structural error on a later trade outranks a domain error on an earlier one,
@@ -443,7 +443,7 @@ fn saccr_errors() {
         }],
         None,
     );
-    let e = saccr::ead(&[ok.clone()], f64::NAN, None, true).expect_err("finite");
+    let e = saccr::ead(std::slice::from_ref(&ok), f64::NAN, None, true).expect_err("finite");
     assert_eq!(e.field.as_deref(), Some("collateral"));
     let e = saccr::ead(
         &[ok],

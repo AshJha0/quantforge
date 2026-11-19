@@ -240,7 +240,7 @@ pub fn desk(observations_n: i64, counts: [i64; 4]) -> Result<Desk> {
     })
 }
 
-/// Exception counts of a P&L series against VaR.
+/// Exception counts of a P&L series against value at risk.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Count {
     pub observations: i64,
@@ -263,8 +263,8 @@ fn days(var: &[Option<f64>], pnl: &[Option<f64>]) -> Vec<i64> {
         .collect()
 }
 
-/// `risk.frtb.backtest.count` (MAR32.5(1)-(2), MAR32.18(1)-(2)): VaR is positive for a loss; a day
-/// is an exception when `-pnl` strictly exceeds VaR or either value is missing (`None`).
+/// `risk.frtb.backtest.count` (MAR32.5(1)-(2), MAR32.18(1)-(2)): value at risk is positive for a loss; a day
+/// is an exception when `-pnl` strictly exceeds it or either value is missing (`None`).
 pub fn count_exceptions(
     var: &[Option<f64>],
     actual: &[Option<f64>],

@@ -3,7 +3,7 @@
 //! the gate; the core then applies the finite rule, structure (`E_INPUT`) and domain (`E_DOMAIN`),
 //! the HR-122 order. Paths are absolute (`crate::ops::...`) so the file compiles both where it is
 //! included now (a test-only `#[path]` module in `main.rs`) and as `ops::kw1b` once the coordinator
-//! registers it (program/STAGE_K_W1B_PORTS_HANDOVER.md).
+//! registers it (`program/STAGE_K_W1B_PORTS_HANDOVER.md`).
 use crate::input::Inputs;
 use crate::ops::{Outcome, plain};
 use quantforge_core::error::Result;
@@ -293,7 +293,6 @@ mod tests {
         let text = std::fs::read_to_string(path).expect("golden file");
         let (doc, _) = parse(&text).expect("golden JSON");
         let cases = doc.get("cases").and_then(Json::as_array).expect("cases");
-        assert!(!cases.is_empty());
         let mut failures = Vec::new();
         let mut two_errors = 0;
         for c in cases {

@@ -68,7 +68,17 @@ Every handler reads all inputs first (E_SCHEMA, enum values included: a value ou
 
 ## Evidence (measured on the local laptop, not the acceptance machine, 2026-11-19)
 
-Filled in below as each build ran; see the final section.
+Targeted runs only, not the full CI chain (no full test suites, no conformance runner, no mutation, no sanitizer build).
+
+| Build | Command | Result | Coverage of the new files |
+|---|---|---|---|
+| Java | `mvn -Pcoverage test -Dtest=SaCcrTest,FrtbBacktestTest,StageKW1bCliTest` (JDK 25, Windows) | 18 tests pass (7, 6, 5); saccr_k, btk_k, tlk_k replay clean | JaCoCo lines: SaCcr 262/263, FrtbBacktest 63/63, OpsStageKW1b 82/82 (branches 198/205, 48/48, 20/20) |
+| Rust | `cargo fmt --check`; `cargo clippy -p quantforge-core -p quantforge-cli --all-targets -D warnings`; `cargo test -p quantforge-core --test stage_k_w1b`; `cargo test -p quantforge-cli ops_kw1b` (WSL) | fmt and clippy clean; 11 + 5 tests pass (3 proptest properties at 150 cases each) | llvm-cov lines: saccr.rs 99.65%, frtb_backtest.rs 95.37%, ops/kw1b.rs 95.04% |
+| C++ | gcc 15.2 Release, `-DQF_WERROR=ON` (`-Werror -Wconversion -Wshadow`), targets `quantforge_core_tests` and `quantforge`; `quantforge_core_tests "[k_w1b]"`; clang 21.1.8 `-fsyntax-only -Wshadow -Wconversion -Werror` on the two core files and the test (WSL) | builds clean; 9 test cases, 4,476 assertions pass; clang clean | gcovr lines: ops_k_w1b.inc 100%, saccr.cpp 99%, frtb_backtest.cpp 97% |
+
+All three golden files are replayed in process in each build, every case (value, error, and the two-error cases, read from the files, counts not hard-coded), through each build's own input layer and gate order. Each build asserts the five CRE99 EADs 569, 381, 5,406, 936, 1,879 (KR-30 rounding), the printed intermediates, KR-31's -7,099, MAR99 Table 2 rows 0 to 10, and the KR-36 overflow case (V - C > 0 with a subnormal add-on gives multiplier exactly 1).
+
+Not verified: the full CI chain of any build, the conformance runner against the built CLIs (the verbs are unregistered), the C++ sanitizer and coverage-gate jobs, mutation testing, `tools/quality_gate.py --per-file` itself (the per-file figures above were read from the tools' own reports).
 
 ## Open points for the coordinator
 
