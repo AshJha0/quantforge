@@ -11,7 +11,7 @@ micro.book.rebuild itself (the L6 reference), at depth 100 with the pair's decim
     websocket frame), so the order inside that millisecond is not recorded. The candidates are therefore the book
     after the last message with t < row t ("lo", the strict reading) and after each later message with t equal to
     the row's t, up to "hi" (micro.book.rebuild's own checkpoint rule, ties before the row). A row passes if the
-    book equals it, full 100 levels a side, at at least one candidate (several consecutive states can be equal;
+    book equals it, full 100 levels a side, after at least one candidate (several consecutive states can be equal;
     HR-132 as clarified by HR-135). The counts of rows matched at lo, matched at hi and
     matched only inside the tie are published, and the count that would fail under the strict "before t" reading
     (checkpoint_failed_strict_reading). Ruling HR-132 (specifications/stage-h-rulings-audit.md) fixes this reading;

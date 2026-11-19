@@ -445,3 +445,287 @@ def test_cleanup_dry_run_deletes_nothing_and_delete_flag_deletes_exactly_the_lis
     after = sorted(p.relative_to(data).as_posix() for p in data.rglob("*.jsonl.gz"))
     assert set(before) - set(after) == delete
     assert any(p.startswith("BTC-USD/20261119T11") for p in after)  # per-second files untouched
+
+
+# ---------------------------------------------------------------- HR-135 (audit B: KA-B4, KA-B6, KA-B16, KA-B17)
+check_r2 = _load("check_r2")
+r2_meta = _load("r2_meta")
+
+
+def _tools() -> Any:
+    spec = importlib.util.spec_from_file_location(
+        "h9_tools", Path(__file__).with_name("test_h9_r2_tools.py")
+    )
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+T1 = datetime(2026, 11, 20, 12, 0, 10, tzinfo=UTC)
+
+# True message stream: deep changes (bid levels 11 and 12) at 0.5 s and inside the tie at 1.0 s, a touch change
+# ending the tie, a deep change at 1.5 s. Entries: (time, bid changes, ask changes).
+_TRUE: list[tuple[float, list[Any], list[Any]]] = [
+    (0.0, [[100 - k, "1.0"] for k in range(12)], [[101, "1.0"], [102, "1.0"]]),
+    (0.5, [[90, "2.0"]], []),
+    (1.0, [[89, "3.0"]], []),
+    (1.0, [[90, "4.0"]], []),
+    (1.0, [], [[102, "5.0"]]),
+    (1.5, [[89, "6.0"]], []),
+]
+# The same stream as a wrong book applies it: every below-level-10 change one message late (top 10 unchanged).
+_LAGGED: list[tuple[float, list[Any], list[Any]]] = [
+    _TRUE[0],
+    (0.5, [], []),
+    (1.0, [[90, "2.0"]], []),
+    (1.0, [[89, "3.0"]], []),
+    (1.0, [[90, "4.0"]], [[102, "5.0"]]),
+    (1.5, [], []),
+]
+
+
+def _tie_data(root: Path, stream: list[tuple[float, list[Any], list[Any]]]) -> Path:
+    """Raw files from `stream`, with the venue checksums and per-second rows of the TRUE stream: row 1 at 1.0 s is
+    the true book after message 2 (inside the tie: lo = 1, hi = 4), row 2 at 2.0 s (no tie) after message 5."""
+    tools_mod = _tools()
+    out = root / "kraken"
+    for sym in SYMS:
+        dec = tools_mod.DEC[sym]
+
+        def lv(xs: list[Any], dec: int = dec) -> list[list[str]]:
+            return [[f"{p:.{dec}f}", build_r2.fixed(q)] for p, q in xs]
+
+        true_books, crcs = [], []
+        so_far: list[dict[str, Any]] = []
+        for k, (_, b, a) in enumerate(_TRUE):
+            typ = "snapshot" if k == 0 else "update"
+            so_far.append({"type": typ, "bids": lv(b), "asks": lv(a), "checksum": None})
+            res = tools_mod.rebuild(so_far, 100, dec, 8)
+            true_books.append(res["book"])
+            crcs.append(res["crc32"])
+        raw = [
+            {
+                "t": _stamp(T1 + timedelta(seconds=dt)),
+                "k": "msg",
+                "type": "snapshot" if k == 0 else "update",
+                "bids": [{"price": p, "qty": q} for p, q in lv(b)],
+                "asks": [{"price": p, "qty": q} for p, q in lv(a)],
+                "checksum": crcs[k],
+                "ok": True,
+            }
+            for k, (dt, b, a) in enumerate(stream)
+        ]
+        rows = [
+            {"t": _stamp(T1 + timedelta(seconds=1.0)), "k": "book", **true_books[2], "ok": True},
+            {"t": _stamp(T1 + timedelta(seconds=2.0)), "k": "book", **true_books[5], "ok": True},
+        ]
+        _gz(out / f"{sym}-raw" / "20261120T12.jsonl.gz", raw)
+        _gz(out / sym / "20261120T12.jsonl.gz", rows)
+    return out
+
+
+def _tie_check(
+    tmp_path: Path, name: str, stream: list[tuple[float, list[Any], list[Any]]]
+) -> dict[str, Any]:
+    data = _tie_data(tmp_path / name, stream)
+    out = tmp_path / f"{name}_out"
+    out.mkdir()
+    prefix = str(out / "R2_BTC-USD")
+    build_r2.build(data, "BTC-USD", T1, T1 + timedelta(seconds=3), prefix, sample_only=True)
+    res: dict[str, Any] = check_r2.check(prefix)
+    return res
+
+
+def test_tie_rule_admits_a_one_message_lag_only_inside_a_tie(tmp_path: Path) -> None:
+    """HR-135 (KA-B4, KA-B16): a wrong book (deep changes one message late) passes the venue checksum at every
+    message and passes the tied row, which it equals at a later message of the tie than the true book does; the
+    next row with no tie (lo = hi, compared exactly) catches it as a below-level-10 failure."""
+    good = _tie_check(tmp_path, "true", _TRUE)
+    assert good["checksum_failed"] == 0 and good["checkpoint_checked"] == 2
+    assert good["checkpoint_failed_top10"] == 0 and good["checkpoint_failed_below10"] == 0
+    assert good["checkpoint_rows_with_tie"] == 1 and good["checkpoint_matched_only_inside_tie"] == 1
+    bad = _tie_check(tmp_path, "lagged", _LAGGED)
+    assert bad["checksum_failed"] == 0  # the top 10 never differs: the checksum cannot see this bug
+    assert bad["checkpoint_failed_top10"] == 0
+    assert (
+        bad["checkpoint_matched_only_inside_tie"] == 1
+    )  # the tied row passed, one message later than the truth
+    assert bad["checkpoint_failed_below10"] == 1  # the row at 2.0 s, no tie: caught
+    # On this two-row sample the tie guard trips too (one row of two matched only inside the tie).
+    assert r2_meta.tie_guard(good)
+
+
+def test_tie_guard_limits() -> None:
+    ok = {
+        "checkpoint_checked": 1000,
+        "checkpoint_rows_with_tie": 750,
+        "checkpoint_matched_only_inside_tie": 60,
+    }
+    assert r2_meta.tie_guard(ok) == []
+    assert r2_meta.tie_guard({**ok, "checkpoint_rows_with_tie": 751})  # 249 without a tie < 25 %
+    assert r2_meta.tie_guard({**ok, "checkpoint_matched_only_inside_tie": 61})  # > 6 %
+    assert r2_meta.tie_guard({**ok, "checkpoint_checked": 0})
+    for n, tie, inside in (
+        (846, 292, 16),
+        (895, 218, 19),
+    ):  # the 2026-11-17 sample (README_R2.md) passes
+        sample = {
+            "checkpoint_checked": n,
+            "checkpoint_rows_with_tie": tie,
+            "checkpoint_matched_only_inside_tie": inside,
+        }
+        assert r2_meta.tie_guard(sample) == []
+
+
+def test_tie_guard_fails_compare(tmp_path: Path, capsys: Any) -> None:
+    ref: dict[str, Any] = dict.fromkeys(r2_meta.FIELDS, 0)
+    ref.update(
+        checkpoint_checked=10,
+        checkpoint_rows_with_tie=9,
+        checkpoint_matched_at_lo=10,
+        checkpoint_matched_at_hi=10,
+        book_messages=5,
+        chunk_start_mismatches=0,
+    )
+    py = tmp_path / "py.json"
+    py.write_text(json.dumps(ref))
+    h = tmp_path / "cpp.json"
+    h.write_text(
+        json.dumps({"form_a": {f: ref[f] for f in r2_meta.FIELDS}, "correctness_mismatches": 0})
+    )
+    assert r2_meta.compare("BTC-USD", py, h) == 1
+    assert "TIE GUARD (HR-135)" in capsys.readouterr().out
+
+
+def test_a_missing_hour_file_inside_a_session_is_a_gap(tmp_path: Path) -> None:
+    data = make(tmp_path, [(at(D20, 8), at(D20, 15), "gap"), (at(D20, 15, 1), at(D20, 16), "stop")])
+    (data / "ETH-USD-raw" / "20261120T11.jsonl.gz").unlink()
+    start, _, log = build_r2.choose_window(data, AFTER)
+    assert start != at(D20, 8)
+    rejected = log["sessions"][0]["rejected"]
+    assert rejected.startswith("gap row before hour 6 at 2026-11-20T11:00:00")
+    assert "missing hour file 20261120T11.jsonl.gz" in rejected
+
+
+def _clean_inputs(d: Path) -> Path:
+    """An input folder as `build_r2.py auto` writes it under the rule (no option given)."""
+    d.mkdir(parents=True, exist_ok=True)
+    opts = {
+        "after": "2026-11-19T11:41:24.000000Z",
+        "until": None,
+        "min_hours": None,
+        "max_hours": None,
+        "tolerant": False,
+        "sample_only": False,
+        "argv": ["auto", "X", "Y"],
+    }
+    (d / "R2_window.json").write_text(json.dumps({"start": "s", "end": "e", "options": opts}))
+    for s in SYMS:
+        (d / f"R2_{s}.meta.json").write_text(json.dumps({"tolerant": False, "sample_only": False}))
+    (d / "R2_replay.sha256").write_text("ab  R2_BTC-USD.bin\ncd  R2_window.json\n")
+    return d
+
+
+@pytest.mark.parametrize(
+    ("where", "key", "value", "expect"),
+    [
+        ("options", "sample_only", True, "--sample-only"),
+        ("options", "tolerant", True, "--tolerant"),
+        ("options", "after", "2026-11-20T00:00:00.000000Z", "--after"),
+        ("options", "until", "2026-11-20T00:00:00.000000Z", "--until"),
+        ("options", "min_hours", 3.0, "--min-hours"),
+        ("options", "max_hours", 8.0, "--max-hours"),
+        ("meta", "sample_only", True, "sample-only build"),
+        ("meta", "tolerant", True, "tolerant build"),
+        ("nolist", None, None, "not listed in R2_replay.sha256"),
+        ("nooptions", None, None, "no options block"),
+    ],
+)
+def test_inputs_check_refuses_each_planted_option(
+    tmp_path: Path, where: str, key: str | None, value: Any, expect: str
+) -> None:
+    d = _clean_inputs(tmp_path / "r2")
+    assert r2_meta.input_problems(d) == []
+    w = json.loads((d / "R2_window.json").read_text())
+    if where == "options":
+        w["options"][key] = value
+    elif where == "nooptions":
+        del w["options"]
+    elif where == "meta":
+        meta = {"tolerant": False, "sample_only": False, str(key): value}
+        (d / "R2_ETH-USD.meta.json").write_text(json.dumps(meta))
+    else:
+        (d / "R2_replay.sha256").write_text("ab  R2_BTC-USD.bin\n")
+    (d / "R2_window.json").write_text(json.dumps(w))
+    bad = r2_meta.input_problems(d)
+    assert any(expect in b for b in bad), bad
+    assert r2_meta.main(["inputs", str(d)]) == 1
+
+
+def _sample_build(tmp_path: Path) -> Path:
+    tools_mod = _tools()
+    data = tools_mod.make_data(tmp_path / "kraken")
+    out = tmp_path / "r2"
+    argv = [
+        "auto",
+        str(data),
+        str(out),
+        "--after",
+        _stamp(tools_mod.T0 - timedelta(seconds=20)),
+        "--min-hours",
+        "0.0005",
+        "--max-hours",
+        "1",
+        "--sample-only",
+    ]
+    assert build_r2.main(argv) == 0
+    w = json.loads((out / "R2_window.json").read_text())
+    assert w["options"]["argv"] == argv
+    return out
+
+
+def test_a_real_sample_build_stamps_its_options_and_is_refused(tmp_path: Path) -> None:
+    out = _sample_build(tmp_path)
+    w = json.loads((out / "R2_window.json").read_text())
+    assert w["options"]["sample_only"] is True and w["options"]["min_hours"] == 0.0005
+    assert "  R2_window.json\n" in (out / "R2_replay.sha256").read_text()
+    bad = r2_meta.input_problems(out)
+    assert {
+        "built with --sample-only",
+        "built with --min-hours 0.0005",
+        "built with --max-hours 1.0",
+    } <= set(bad)
+    assert any(b.startswith("built with --after") for b in bad)
+
+
+def _git_bash() -> str | None:
+    import shutil
+
+    b = shutil.which("bash")
+    if b is None or (os.name == "nt" and "git" not in b.lower()):
+        return None  # never WSL's bash.exe (lane rule: no WSL from tests)
+    return b
+
+
+@pytest.mark.skipif(_git_bash() is None, reason="needs a POSIX bash (Git Bash on Windows)")
+def test_run_r2_refuses_a_sample_build_before_correctness_or_timing(tmp_path: Path) -> None:
+    import subprocess
+
+    out = _sample_build(tmp_path)
+    bash = _git_bash()
+    assert bash is not None
+    res = tmp_path / "res"
+    env = {**os.environ, "R2DIR": out.as_posix(), "OUT": res.as_posix(), "SMOKE": "0"}
+    for mode in ("correct", "time"):
+        p = subprocess.run(
+            [bash, (H9 / "run_r2.sh").as_posix(), mode],
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        assert p.returncode == 3, p.stdout + p.stderr
+        assert "built with --sample-only" in p.stderr and "REFUSED" in p.stderr
+    assert not (res / "correct" / "R2_correctness.ok").exists()
+    assert not (res / "timing").exists()
