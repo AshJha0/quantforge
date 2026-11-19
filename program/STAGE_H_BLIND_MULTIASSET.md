@@ -59,3 +59,8 @@ Coordinator rulings HR-104 to HR-108 (Rule 612 half-penny tier, Rule 610 $0.001 
 - Result: 7 of 7 agree. MATCH 3 (rtc_h-0004, 0011, 0012); REPRESENTATION-ONLY 4 (rtc_h-0007 "15.625000", fut_h-0004/0005 pnl and fees with trailing zeros, fut_h-0006 "-31.25000"); VALUE MISMATCH 0, so nobody was found wrong.
 - Caveats: fut_h-0004..0006 were computed with HR-102/103 given as written rules (the reason they were not blind before was that those readings were missing from the spec). rtc_h-0007's 15.625 was removed from the packet text. rtc_h-0004 uses HR-109's quarter-32nds, whose CME source is still unverified (HR-115); agreement checks the arithmetic, not the convention.
 - H-24 share: 16 of 16 value cases now blind and agreeing = **100 %** (60 % rule met; was 56.2 %).
+
+## Source record update 2026-11-19 (HR-117)
+
+- [CME-ZN] read in a browser (https://www.cmegroup.com/markets/interest-rates/us-treasury/10-year-us-treasury-note.contractSpecs.html): face $100,000, outright tick 1/2 of 1/32 ($15.625), calendar-spread tick 1/8 of 1/32, quarterly Mar/Jun/Sep/Dec with three consecutive quarters, last trade 12:01 p.m. CT seven business days before the last business day of the month, deliverable 6.5 to under 8 years, conversion factor at 6 %. Verified; no golden or spec value changes.
+- [CME-32NDS] still unverified: the page shows quotes like 105'250 but does not define the third digit. rtc_h-0004 stays hand-only.

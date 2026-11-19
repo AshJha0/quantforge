@@ -17,9 +17,9 @@ Spec version 0.1.0 (stage H, multi-asset spec lane, drafted 2026-11-18; not norm
 - [IEX-AUC] IEX Exchange rule book and auction pages (iex.io), opening/closing auction price determination. [venue documentation; **unverified this session**; used only for the shape of the uncrossing criteria]
 - [FXGC] Global Foreign Exchange Committee, "FX Global Code", Principle 17 (last look). globalfxc.org. [industry code; **unverified this session**]
 - [BIS-FX] BIS Triennial Survey definitions (spot = settlement within two business days). bis.org. [central-bank; **unverified this session**]
-- [CME-ZN] CME Group, 10-Year T-Note futures contract specs (face $100,000; tick one-half of 1/32 = $15.625). cmegroup.com. [exchange spec; **unverified this session**]
+- [CME-ZN] CME Group, 10-Year T-Note futures contract specs, https://www.cmegroup.com/markets/interest-rates/us-treasury/10-year-us-treasury-note.contractSpecs.html (read 2026-11-19 in a browser): face $100,000; outright minimum tick 1/2 of 1/32 = $15.625; calendar-spread tick 1/8 of 1/32; quarterly March, June, September, December, three consecutive quarters listed; trading terminates 12:01 p.m. CT seven business days before the last business day of the contract month; physically deliverable; deliverable grade 6.5 to under 8 years remaining; conversion factor at 6 %. [exchange spec; **verified 2026-11-19** (HR-117)]
 - [CME-ZB] CME Group, U.S. Treasury Bond futures specs (tick 1/32 = $31.25). [exchange spec; **unverified this session**]
-- [CME-32NDS] CME Group Treasury futures price quotation convention (third digit in quarter-32nds: 0, 2, 5 or +, 7). [exchange convention; **unverified**: CME rulebook ch. 19 and contract-spec page timed out on the 2026-11-18 retry, HR-115]
+- [CME-32NDS] CME Group Treasury futures price quotation convention (third digit in quarter-32nds: 0, 2, 5 or +, 7). [exchange convention; **unverified**: CME rulebook ch. 19 timed out on the 2026-11-18 retry (HR-115); the ZN contract-spec page read 2026-11-19 quotes prices such as 105'250 but does not state what the third digit means (HR-117)]
 - [UST-BILL] US Treasury (TreasuryDirect), bill discount-basis price formula. [government; **unverified this session**]
 
 Every source tagged unverified must be read and re-tagged "read <date>" before v0.10.0 (HR-98). No London Stock Exchange or LSEG material is used anywhere (HR-99).
@@ -62,7 +62,7 @@ T+2 business days; pairs in `t1_pairs` (default `[USDCAD]`) T+1 [BIS-FX]. A day 
 Text `H-FF[q]`: handle `H`, `FF` = 32nds 00 to 31, optional third digit in quarter-32nds by the CME convention [CME-32NDS, **unverified** until a CME page is read] (HR-109, amends the eighths of HR-90): `''` or `0` = 0, `2` = 1/4, `5` or `+` = 1/2, `7` = 3/4; any other third digit (1, 3, 4, 6, 8, 9) is `E_SCHEMA`, as is any other malformed text. Value = H + (FF + q)/32. Formatting takes a `resolution` (32, 64 or 128 parts per point); a price not exactly on that grid is `E_DOMAIN`; a half is printed `+`.
 
 ### 3.2 Futures contract specs (HR-91)
-`contract`: `{symbol, face, tick, tick_value, months, last_trade_rule}`. Defaults: ZN face 100,000, tick 1/64 point, tick value 15.625 [CME-ZN]; ZB tick 1/32, tick value 31.25 [CME-ZB]. Tick value = face x tick / 100.
+`contract`: `{symbol, face, tick, tick_value, months, last_trade_rule}`. Defaults: ZN face 100,000, tick 1/64 point, tick value 15.625 [CME-ZN, verified 2026-11-19]; ZB tick 1/32, tick value 31.25 [CME-ZB]. Tick value = face x tick / 100.
 
 ### 3.3 Yield and price (HR-92)
 Coupon bond on a coupon date, street convention: P = sum_{i=1..n} (100 c/f)/(1+y/f)^i + 100/(1+y/f)^n. Off coupon dates the existing `04-pricing` bond routines are reused (no new maths). Bill: P = 100 (1 - d days/360) [UST-BILL]. Yield from price: existing `core.solve` Brent, tolerance 1e-12.
