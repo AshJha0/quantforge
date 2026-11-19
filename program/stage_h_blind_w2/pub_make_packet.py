@@ -161,7 +161,13 @@ def strip_rulings(text):
         row = [ln for ln in lines if ln.startswith(f"| {r} |")]
         if not row:
             raise SystemExit(f"ruling {r} not found")
-        rows.append(row[0])
+        row = row[0]
+        if r == "KR-33":  # the evidence cites a worked-example paragraph; keep the rule, drop the pointer
+            row = sub1(r"\(CRE99\.67 lists crude oil, natural gas, coal and electricity under energy\)",
+                       "(the application guidance lists crude oil, natural gas, coal and electricity under energy)",
+                       row, "KR-33 CRE99.67 text")
+            row = sub1(r"; CRE99\.67 p\.534\)", ")", row, "KR-33 CRE99.67 evidence")
+        rows.append(row)
     return ("# Stage K rulings wave 1b: excerpt for SA-CCR and the backtesting zone\n\n"
             "From `specifications/stage-k-rulings-w1b.md`, confirmed 2026-11-19 by the stage K coordinator. Only the "
             "rulings these operations use. Evidence classes: read (the source text on the page), inferred (our reading "
