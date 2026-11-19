@@ -32,7 +32,7 @@ Exit codes: status 0 = a session qualifies, 3 = none yet; cleanup 0.
 import json
 import sys
 import zlib
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 AFTER_DEFAULT = "2026-11-19T11:41:24Z"
@@ -43,11 +43,11 @@ SAMPLE_KEEP = "20261117T20"  # the old development sample: never deleted here
 
 
 def ts(text):
-    return datetime.fromisoformat(text.replace("Z", "+00:00"))
+    return datetime.fromisoformat(text)  # Python 3.11+ reads the trailing Z
 
 
 def iso(t):
-    return t.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+    return t.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
 
 
 def hms(d):
@@ -57,7 +57,7 @@ def hms(d):
 
 def file_hour(name):
     try:
-        return datetime.strptime(name[:11], "%Y%m%dT%H").replace(tzinfo=timezone.utc)
+        return datetime.strptime(name[:11], "%Y%m%dT%H").replace(tzinfo=UTC)
     except ValueError:
         return None
 
@@ -126,7 +126,7 @@ def listing(data_dir):
             for f in sorted(Path(data_dir, sub).glob("*.jsonl.gz"), key=_order):
                 st = f.stat()
                 files.append((f, file_hour(f.name), st.st_size,
-                              datetime.fromtimestamp(st.st_mtime, timezone.utc)))
+                              datetime.fromtimestamp(st.st_mtime, UTC)))
             out[sub] = files
     return out
 
@@ -169,9 +169,7 @@ def sessions(log_events, files, per_second, after, now):
         elif kind == "snap":
             if cur is None:
                 cur = {"start": t, "end": None, "end_reason": None, "open": True}
-        elif kind in ("gap", "stop"):
-            end(t, detail)
-        elif kind == "closed":
+        elif kind in ("gap", "stop") or kind == "closed":
             end(t, detail)
     if cur is not None:
         cur["end"] = now
@@ -236,7 +234,7 @@ def status(data_dir, log_path, after, now, show=print):
     if verdict["window"] is None:
         show("window: none yet")
         return 3, found, verdict
-    w0, w1 = verdict["window"]
+    w1 = verdict["window"][1]
     if verdict["recorder_writing"]:
         show(f"window complete at {w1.strftime('%H:%M:%S')} ({iso(w1)}); stop the recorder cleanly before building "
              f"(open: {', '.join(verdict['open_files'])})")
@@ -256,7 +254,7 @@ def cleanup_plan(data_dir, found, verdict, after):
         elif st.startswith("before --after"):
             continue
         else:  # qualifying, open, not examined
-            protected.append((s["start"] - MARGIN, s["end"] + MARGIN if not s["open"] else datetime.max.replace(tzinfo=timezone.utc)))
+            protected.append((s["start"] - MARGIN, s["end"] + MARGIN if not s["open"] else datetime.max.replace(tzinfo=UTC)))
     if verdict["window"] is not None:
         w0, w1 = verdict["window"]
         protected.append((w0 - MARGIN, w1 + MARGIN))
@@ -269,7 +267,7 @@ def cleanup_plan(data_dir, found, verdict, after):
             size, h = f.stat().st_size, file_hour(f.name)
             span = (h, h + timedelta(hours=1)) if h else None
 
-            def hits(iv):
+            def hits(iv, span=span):
                 return span is not None and iv[0] < span[1] and span[0] < iv[1]
 
             if f.name.startswith(SAMPLE_KEEP):
@@ -308,7 +306,7 @@ def main(argv):
     data_dir = Path(rest[1])
     log_path = Path(o.get("--log", data_dir.parent / "recorder.log"))
     after = ts(o.get("--after", AFTER_DEFAULT))
-    now = ts(o["--now"]) if "--now" in o else datetime.now(timezone.utc)
+    now = ts(o["--now"]) if "--now" in o else datetime.now(UTC)
     rc, found, verdict = status(data_dir, log_path, after, now)
     if rest[0] == "status":
         return rc
