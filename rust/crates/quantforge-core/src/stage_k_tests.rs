@@ -242,6 +242,11 @@ fn trigger_golden() {
     // a small k takes the erf branch of the normal tail
     let t = trigger_check(&CH, 0.0, 0.0, 1.0, 0.5).unwrap();
     assert!((t.false_alarm_rate - 0.6170750774519739).abs() <= 1e-13);
+    // KR-6 states 2 (1 - Phi(k)) = 2 Phi(-k); at k = 30 a bare erfc(k / sqrt 2) is 1.2e-13 off
+    // (trig_k-0009, mpmath 50 digits); the same formula in all four builds, within 1e-14.
+    let t = trigger_check(&CH, 100.0, 105.0, 1.0, 30.0).unwrap();
+    assert_eq!(t.false_alarm_rate, 2.0 * crate::stats::normal_cdf(-30.0));
+    assert!((t.false_alarm_rate / 9.813427854296374e-198 - 1.0).abs() <= 1e-14);
 }
 
 #[test]

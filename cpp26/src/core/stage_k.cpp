@@ -6,6 +6,7 @@
 
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/research.hpp"
+#include "quantforge/core/stats.hpp"
 
 namespace quantforge::stage_k {
 namespace {
@@ -121,6 +122,12 @@ void check_changes_shape(std::size_t n) {
     if (n < 2) input("changes must hold at least two one-day changes", "changes");
 }
 
+// 2 (1 - Phi(k)) of KR-6, evaluated as 2 Phi(-k) through the normal CDF, which carries the rounding of
+// k / sqrt(2); a bare erfc(k / sqrt(2)) loses about 1.2e-13 relative at k = 30 (trig_k-0009).
+namespace {
+double two_sided_normal_tail(double k) { return 2.0 * normal_cdf(-k); }
+}  // namespace
+
 Trigger trigger_check(const Vec& changes, double x_ref, double x_now, double days_since, double k) {
     check_changes_shape(changes.size());
     if (!(k > 0)) domain("k must be above 0", "k");
@@ -134,7 +141,7 @@ Trigger trigger_check(const Vec& changes, double x_ref, double x_now, double day
     if (sigma == 0) domain("the changes have zero standard deviation: no noise scale", "changes");
     limit(changes.size(), max_changes, "changes");
     const double threshold = k * sigma * std::sqrt(days_since);
-    return {std::fabs(x_now - x_ref) > threshold, sigma, threshold, std::erfc(k / std::sqrt(2.0))};
+    return {std::fabs(x_now - x_ref) > threshold, sigma, threshold, two_sided_normal_tail(k)};
 }
 
 // ---- intraday delta-gamma ----

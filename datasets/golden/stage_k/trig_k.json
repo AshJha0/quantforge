@@ -338,6 +338,52 @@
     "error"
    ],
    "description": "sigma = 0: no noise scale"
+  },
+  {
+   "case_id": "trig_k-0009",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0,
+     -1.0,
+     1.0,
+     -1.0
+    ],
+    "x_ref": 100.0,
+    "x_now": 105.0,
+    "days_since": 1.0,
+    "k": 30.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": false,
+     "sigma": 1.1547005383792515,
+     "threshold": 34.64101615137755,
+     "false_alarm_rate": 9.813427854296374e-198
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "added 2026-11-19 (branch k-w1-fu) so that every build keeps the stated 2 (1 - Phi(k)) in the far tail: not blind",
+    "SciPy 2*norm.sf(k) is 5.7e-14 relative off (it rounds k / sqrt 2 first): no outside check"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "far tail k = 30: 2 (1 - Phi(k)) to 1e-14; a bare erfc(k / sqrt 2) is 1.2e-13 off",
+   "output_classes": {
+    "fire": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
   }
  ]
 }

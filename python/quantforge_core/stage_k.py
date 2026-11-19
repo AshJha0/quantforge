@@ -202,8 +202,25 @@ def trigger_check(
         "fire": abs(x_now - x_ref) > threshold,
         "sigma": sigma,
         "threshold": threshold,
-        "false_alarm_rate": math.erfc(k / math.sqrt(2.0)),
+        "false_alarm_rate": two_sided_normal_tail(k),
     }
+
+
+_C_HI = 0.70710678118654757  # 1/sqrt(2), rounded up
+_C_LO = -4.8336466567264567e-17  # 1/sqrt(2) - _C_HI
+
+
+def two_sided_normal_tail(k: float) -> float:
+    """`2 (1 - Phi(k))` for k > 0 (KR-6), evaluated as `2 Phi(-k)` with a tail accurate to about 3e-16 relative.
+
+    `erfc(k / sqrt 2)` is the same number in exact arithmetic, but rounding `k / sqrt 2` first costs about
+    `2 y^2 eps` relative (`y = k / sqrt 2`): 1.2e-13 at k = 30, over the 1e-14 of trig_k-0009. As in the C++ normal
+    CDF, the rounding error of the argument is carried and corrected by one Taylor term of erfc.
+    """
+    y = k * _C_HI
+    dy = math.fma(k, _C_HI, -y) + k * _C_LO
+    slope = -2.0 / math.sqrt(math.pi) * math.exp(-y * y)
+    return 2.0 * ((math.erfc(y) + slope * dy) / 2.0)
 
 
 # --- intraday delta-gamma with a Lagrange bound (KR-7, KR-10, KR-12) -----------------------------

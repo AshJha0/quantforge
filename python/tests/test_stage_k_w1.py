@@ -346,6 +346,15 @@ def test_trig_k_rows(case: dict[str, Any]) -> None:
         assert _rel(got[key], want[key]) <= 1e-14
 
 
+def test_false_alarm_rate_is_twice_the_normal_tail() -> None:
+    """KR-6 states 2 (1 - Phi(k)); at k = 30 a bare erfc(k / sqrt 2) is 1.2e-13 off (trig_k-0009, mpmath)."""
+    far = sk.trigger_check([1.0, -1.0, 1.0, -1.0], 100.0, 105.0, 1.0, 30.0)["false_alarm_rate"]
+    assert _rel(far, 9.813427854296374e-198) <= 1e-14
+    # the form not used: a bare erfc(k / sqrt 2)
+    assert _rel(math.erfc(30.0 / math.sqrt(2.0)), 9.813427854296374e-198) > 1e-14
+    assert sk.two_sided_normal_tail(3.0) == pytest.approx(0.002699796063260189, rel=1e-15)
+
+
 def test_trigger_simulation_acceptance() -> None:
     """recalibration-triggers.md: 100,000 noise paths, window 250, k = 3, d = 1; fire rate inside
     the 99% binomial interval of the Student-t predictive rate; a 6-sigma planted move fires on at

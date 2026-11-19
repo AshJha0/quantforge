@@ -229,7 +229,8 @@ public final class StageK {
             throw limit("changes", MAX_CHANGES);
         }
         double threshold = k * sigma * Math.sqrt(daysSince);
-        // erfc(k / sqrt 2) = 2 N(-k)
+        // 2 (1 - N(k)) of KR-6, as 2 N(-k): Normal.cdf works on the tail in k itself, so it keeps full
+        // precision far out (a bare erfc(k / sqrt 2) loses 1.2e-13 relative at k = 30, trig_k-0009).
         return new Trigger(Math.abs(xNow - xRef) > threshold, sigma, threshold,
                 2.0 * org.quantforge.core.Normal.cdf(-k));
     }

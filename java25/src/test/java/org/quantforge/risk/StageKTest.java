@@ -241,6 +241,16 @@ class StageKTest {
     }
 
     @Test
+    void falseAlarmRateIsTwiceTheNormalTail() {
+        // KR-6 states 2 (1 - N(k)) = 2 N(-k); at k = 30 a bare erfc(k / sqrt 2) is 1.2e-13 off (trig_k-0009,
+        // mpmath 50 digits).
+        double[] c = {1, -1, 1, -1};
+        assertEquals(2.0 * org.quantforge.core.Normal.cdf(-3.0), StageK.triggerCheck(c, 100, 105, 1, 3).falseAlarmRate());
+        double far = StageK.triggerCheck(c, 100, 105, 1, 30).falseAlarmRate();
+        assertTrue(Math.abs(far / 9.813427854296374e-198 - 1.0) <= 1e-14, () -> "rate " + far);
+    }
+
+    @Test
     void triggerErrors() {
         double[] c = {1.0, -1.0, 1.0, -1.0};
         code("E_INPUT", () -> StageK.triggerCheck(new double[] {1.0}, 0, 0, 1, 3));

@@ -47,6 +47,8 @@ BLIND_FIRE = BLIND + " on sigma, threshold, false_alarm_rate; fire decided by ga
 BLIND_IDR = (BLIND + "; bound blind-checked only to 6 decimals (5e-7 absolute, the precision the packet carried), "
              "estimate_pnl at 1e-9 relative")
 NOT_BLIND_5 = "not blind: oracle-pending when the wave-1 blind packet was built; mpmath only"
+K_FAR = ("added 2026-11-19 (branch k-w1-fu) so that every build keeps the stated 2 (1 - Phi(k)) in the far tail: "
+         "not blind")
 GAP_KR12 = "gap-decided by ruling KR-12 (E_DOMAIN code): not blind"
 ADDED = "added by the oracle lane 2026-11-18 (E1, ruling F-2): hand, not blind re-derived"
 ORACLE = "mpmath 50 digits"
@@ -264,6 +266,8 @@ TRIG_CASES = [  # inputs, expected (sigma, threshold, fire, rate) or error code,
     (([1.0], 100.0, 105.0, 1.0, 3.0), "E_INPUT", "fewer than two changes", BLIND),
     ((C1, 100.0, 105.0, 1.0, 0.0), "E_DOMAIN", "k <= 0", BLIND),
     (([1.0, 1.0, 1.0], 100.0, 105.0, 1.0, 3.0), "E_DOMAIN", "sigma = 0: no noise scale", BLIND),
+    ((C1, 100.0, 105.0, 1.0, 30.0), (1.1547005383792515, 34.64101615137755, False, 9.813427854296374e-198),
+     "far tail k = 30: 2 (1 - Phi(k)) to 1e-14; a bare erfc(k / sqrt 2) is 1.2e-13 off", K_FAR),
 ]
 
 
@@ -421,7 +425,13 @@ def build():
         assert abs(r["false_alarm_rate"] / rate - 1) <= 1e-14, (r, rate)
         sp = scipy_rate(t[4])
         ver_ = ("hand", ORACLE, ver)
-        if sp is not None:
+        if sp is not None and ver == K_FAR:
+            # SciPy's norm.sf rounds k / sqrt 2 before erfc, the very loss this case guards against: it is
+            # 5.7e-14 relative off at k = 30 (SciPy 1.18.1), so it is no check here.
+            off = abs(sp / r["false_alarm_rate"] - 1)
+            assert 1e-14 < off < 1e-12, (sp, r)
+            ver_ += (f"SciPy 2*norm.sf(k) is {off:.1e} relative off (it rounds k / sqrt 2 first): no outside check",)
+        elif sp is not None:
             assert abs(sp / r["false_alarm_rate"] - 1) <= 1e-14, (sp, r)
             ver_ += ("SciPy 2*norm.sf(k) outside check (KR-11): agrees to 1e-14 relative",)
         s.add("calib.trigger.check", inp, outputs=r, cls="simple_analytic", limit=lim,
