@@ -6,9 +6,15 @@
   2. the header says placeholder (placeholder: true, label "placeholder weights", notice stating no relation to any
      industry or regulatory margin model's parameters);
   3. every number follows the stated artificial rule, recomputed here independently of the generator;
-  4. planted fault: a table with one weight changed is rejected by check 1 and check 3.
+  4. planted fault: a table with one weight changed is rejected by check 1 and check 3;
+  5. the same three checks and a planted fault for specifications/tables/stage_k/sbim-ir-delta-g.json, the stage G
+     table of xva.sbim.ir_delta (KR-150, KR-151: RW = 10 x k, rho(k, l) = 1 - 0.1 |k - l|);
+  6. no tracked file outside the history files named in HISTORY still holds the hand-typed stage G weight vector or
+     the old tenor-correlation constant that KR-150 replaced (needs git; skipped with a note outside a checkout).
 """
 import json
+import re
+import subprocess
 import sys
 from fractions import Fraction
 from pathlib import Path
@@ -59,6 +65,44 @@ def rule_errors(doc):
     return err
 
 
+# The replaced stage G values (KR-150), as they were written in v0.7.0 to v0.10.0. Built from pieces so that this
+# file does not match its own pattern.
+OLD = re.compile("|".join(["10" + r"9(\.0)?, ?10" + r"5(\.0)?, ?90", "0" + r"\.659754", "exp" + r"\(-0\.3 "]))
+# History and audit records that name the old values on purpose (KR-155: not rewritten).
+HISTORY = {"program/STAGE_K_ISDA_AUDIT.md", "program/STAGE_K_MARGIN_REPLACEMENT.md", "specifications/stage-k-rulings-margin.md"}
+
+
+def rule_errors_g(doc):
+    """Independent recomputation of the stage G table from KR-150 (not from G.build_g)."""
+    err = []
+    F = Fraction
+    if doc.get("tenors_years") != ["0.25", "1", "2", "5", "10", "30"]:
+        err.append("tenors")
+    rw, m = doc["risk_weights"], doc["correlations"]
+    if len(rw) != 6 or any(F(w) != 10 * (k + 1) for k, w in enumerate(rw)):
+        err.append("RW")
+    if len(m) != 6 or any(len(r) != 6 for r in m):
+        err.append("shape")
+    else:
+        for k in range(6):
+            for l in range(6):
+                if F(m[k][l]) != 1 - F(abs(k - l), 10):
+                    err.append(f"rho {k},{l}")
+    return err
+
+
+def old_value_hits():
+    """Tracked files (outside HISTORY) that still hold a replaced value; None when git is not available."""
+    root = G.ROOT
+    try:
+        out = subprocess.run(["git", "grep", "-l", "-E", OLD.pattern], cwd=root, capture_output=True, text=True, check=False)
+    except OSError:
+        return None
+    if out.returncode not in (0, 1):
+        return None
+    return sorted(f for f in out.stdout.split() if f not in HISTORY)
+
+
 def main():
     checks = []
     committed = G.OUT.read_text(encoding="utf-8")
@@ -72,6 +116,24 @@ def main():
     bad_text = json.dumps(bad, indent=1, ensure_ascii=True) + "\n"
     checks.append(("planted fault: changed weight differs from generator output", bad_text != G.text()))
     checks.append(("planted fault: changed weight breaks the rule", rule_errors(bad) == ["IR rw 5Y"]))
+    committed_g = G.OUT_G.read_text(encoding="utf-8")
+    checks.append(("stage G table equals generator output", committed_g == G.text_g()))
+    doc_g = json.loads(committed_g)
+    checks.append(("stage G table header says placeholder", doc_g.get("placeholder") is True and doc_g.get("label") == "placeholder weights"
+                   and "no relation" in doc_g.get("notice", "")))
+    checks.append(("stage G table follows KR-150", rule_errors_g(doc_g) == []))
+    bad_g = json.loads(committed_g)
+    bad_g["risk_weights"][2] = "90"
+    checks.append(("planted fault: changed stage G weight breaks the rule", rule_errors_g(bad_g) == ["RW"]
+                   and json.dumps(bad_g, indent=1, ensure_ascii=True) + "\n" != G.text_g()))
+    checks.append(("planted fault: the old pattern finds the old vector", OLD.search("[1" + "09.0, 105.0, 90.0, 71.0]") is not None))
+    hits = old_value_hits()
+    if hits is None:
+        print("NOTE\tgit not available: old-value scan skipped")
+    else:
+        if hits:
+            print("old stage G values still in: " + ", ".join(hits))
+        checks.append(("no replaced stage G value outside the history files", hits == []))
     ok = True
     for name, good in checks:
         print(f"{'PASS' if good else 'FAIL'}\t{name}")
