@@ -32,8 +32,8 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
-sys.path.insert(0, str(HERE.parent / "paper_daily"))
+sys.path.insert(0, str(HERE.parent / "paper_daily"))  # for anchor_evidence only (shared by both daily jobs)
+sys.path.insert(0, str(HERE))  # this folder first: both folders hold a run_day.py
 import anchor_evidence as evidence  # noqa: E402
 import curve_core as core  # noqa: E402
 import run_day  # noqa: E402

@@ -425,3 +425,37 @@ def test_heights_lists_the_headers_a_verifier_must_supply(tmp_path: Path) -> Non
     (tmp_path / "bad.txt").write_text("[1, 2]", encoding="utf-8")
     with pytest.raises(evidence.EvidenceError):
         evidence.load_headers(tmp_path / "bad.txt")
+
+
+def test_each_tool_resolves_its_own_modules_in_a_fresh_interpreter() -> None:
+    """Both tool folders hold a `run_day.py`, and the curve verifier also reads the paper folder for the shared
+    evidence module. Started as scripts (as the workflows start them), each must import its own folder's files.
+    Found by running the revised curve verifier by hand on 2026-11-19: it had picked up the paper `run_day`."""
+    import subprocess
+    import sys
+
+    tools = ROOT / "tools"
+    probes = {
+        "curve_daily/verify_chain.py": ("run_day", "core"),
+        "curve_daily/run_day.py": ("core",),
+        "paper_daily/verify_ledger.py": ("core",),
+        "paper_daily/run_day.py": ("core", "fl"),
+    }
+    for script, names in probes.items():
+        folder, stem = script.split("/")[0], script.split("/")[1][:-3]
+        code = (
+            f"import sys; sys.path.insert(0, r'{tools / folder}'); import {stem} as m; "
+            f"print(*[getattr(m, n).__file__ for n in {names!r}], sep=chr(10))"
+        )
+        out = subprocess.run(
+            [sys.executable, "-c", code], capture_output=True, text=True, check=True
+        )
+        files = [Path(x) for x in out.stdout.split()]
+        assert len(files) == len(names)
+        for name, f in zip(names, files, strict=True):
+            want = "forward-log" if name == "fl" else folder
+            assert f.parent.name == want, (script, name, f)
+    assert hasattr(
+        support.load("curve_verify_chain_probe", tools / "curve_daily" / "verify_chain.py"),
+        "anchored_timing",
+    )
