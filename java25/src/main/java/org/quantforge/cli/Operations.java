@@ -83,7 +83,8 @@ final class Operations {
             new Registry.Module("hedge_slippage", OpsHedgeSlippage::register),
             new Registry.Module("research", OpsResearch::register),
             new Registry.Module("execution", OpsExecution::register),
-            new Registry.Module("micro_exec", OpsMicro::register)
+            new Registry.Module("micro_exec", OpsMicro::register),
+            new Registry.Module("bitemporal_incremental", OpsStageK::register)
     );
 
     static final Registry REGISTRY = Registry.of(MODULES);

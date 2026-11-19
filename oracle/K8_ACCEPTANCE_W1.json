@@ -261,5 +261,12 @@
     2077276.9963632994
    ]
   ]
+ },
+ "java": {
+  "date": "2026-11-19",
+  "build": "java25 (org.quantforge.pricing.BermudanK8, tangent-mode ladder; BermudanK8Test.acceptance3ObservedOrder with QF_K8_ACCEPTANCE=1)",
+  "result": "FAIL, same as Python: the same 18 entries (indices and statuses; observed orders agree to about 1e-15); price OK. Not tuned.",
+  "max_gap_vs_python_values_relative_to_row_scale": 1.771497005221023e-16,
+  "failures_count": 18
  }
 }
