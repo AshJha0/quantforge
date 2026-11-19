@@ -38,3 +38,14 @@ Status: PROPOSED by lane k-w3-spec on 2026-11-19. Not normative until the stage 
 | KR-214 | Curve page | Uses `site_page.render`; keeps the curve label, "consistency check, not proof" and the 2026-11-13 recorded miss note until a ruling removes it with a reason |
 | KR-215 | Model-reserve page | Reads the reserve report (MG-7, later K-8j output); label "model-risk reserve from a set of calibrated models on simulated or golden inputs; not a prudent-valuation figure for any firm" |
 | KR-216 | Page holdout scan | Every rendered page passes `research/holdout_scan.scan_text`; a hit fails the build (`HOLDOUT`) |
+| KR-217 | Soak workload | Per language, one `quantforge batch` process looping over the golden set for 2 hours, results compared to goldens as they come (`DRIFT` fails); K-5b publisher with 4 readers beside it for C++, Rust, Java |
+| KR-218 | Flat memory | After a 10-minute warm-up: least-squares RSS slope <= 1 MiB per hour and max - min <= 5% of median (Java: post-GC heap). Planted leak 1 KiB per 100 cases must be flagged in 20 minutes. Recommended on GitHub Actions in parallel; locally detached, WSL one job at a time |
+| KR-219 | Capacity | No targets; throughput, latency, input-size ceilings, adapter rates, daily-job times, laptop ceiling measured and written to `docs/capacity.md` with host and commit; a wrong result stops a row (`WRONG_RESULT`) |
+| KR-220 | EOD rehearsal | `tools/eod/rehearse.py --date`: eight checklist steps E1 to E8 from recorded forward-log data to rendered dashboards, dry runs only, evidence `benchmarks/results/k6/eod-<date>.json` |
+| KR-221 | EOD planted faults | One planted fault per step E1 to E7 shown failing before the rehearsal counts |
+| KR-222 | Clean machine | Every example and tutorial on fresh Linux, Windows and macOS runners from CONTRIBUTING's commands only; unlisted tutorial fails |
+| KR-223 | Attestation verify | `release-verify` job runs `gh attestation verify` on every asset and on a tampered copy (must fail) |
+| KR-224 | Registers | Runbooks, known-issues register, per-model validation reports and the public results page each have a check script with a planted fault; every recorded MISS appears in the known-issues register |
+| KR-225 | G1k | Owner turns the strict rule on; check reads ruleset 26732064 via the API and a coordinator draft PR behind main shows BEHIND |
+| KR-226 | G3b | Waits for the owner's own free PyPI and crates.io accounts; Claude never creates accounts; moves to v1.0.1 if absent at tag time (K-QF) |
+| KR-227 | G10 | Headless-browser check of every page at 1280 and 375 px (scrollWidth <= 375) and dark mode with pa11y AA; results in the release notes; planted 600 px element must fail |
