@@ -70,3 +70,20 @@ DR-H2 allows the blind lane the cited source documents for meaning. This packet 
 ## Results
 
 Not run. (Date, lane and model, packet manifest check, frozen hash and commit, gaps and rulings, compare run and output path, per-item table of MATCH / MISMATCH / MISSING / counted, resolution of each mismatch: to be filled by the coordinator.)
+
+## Results (run of 2026-11-19, the first and only compare run)
+
+- Deriver: a different model from the spec lane (Sonnet 5.5; the specs and the packet were written by Opus 5.5), given only the packet folder and its own results folder. It reports one attempted directory listing of the parent folder `qf-blind/`, which was denied and returned nothing; no other access outside the two folders. Evidence class for that statement: the deriver's own report, not independently logged.
+- Blind results as received: `stage_k_blind/w2/` (script, results, notes, hash), committed in d2274256 before the compare was run. SHA-256 of `blind_results.json`: `86a797bca1afed321e9f21340ac14a361490b64fe83d126b08a9abe4666cfb1e` (recomputed by the coordinator before the commit; equal to the deriver's `results.sha256`).
+- Compare: `python -I program/stage_h_blind_w2/k2_compare.py . <blind_results.json>` with the script and tolerances fixed at 35563758. Output: `stage_k_blind/w2/compare_output.txt`. The blind results were not changed after the compare and no rerun was made.
+
+| Item | Hand cases | MATCH | MISMATCH | Eligible | Counted blind | Needed for 60% | Outside share after the blind lane |
+|---|---:|---:|---:|---:|---:|---:|---|
+| K-8a DRC, RRAO | 16 | 16 | 0 | 15 | 15 | 9 | 17 of 18 (94%) |
+| K-8f IMA ES, NMRF/SES, PLA | 15 | 15 | 0 | 15 | 15 | 8 | 27 of 33 (82%) |
+| K-8g BA-CVA, SA-CVA | 14 | 14 | 0 | 14 | 14 | 8 | 16 of 16 (100%) |
+| K-8i leverage, large exposures | 13 | 13 | 0 | 13 | 13 | 6 | 18 of 18 (100%) |
+
+Not counted: rrao_k-0003 (its answer is stated by the rules text). Fields that are table lookups or follow directly from a ruling (m_c of cap_k-0001 and cap_k-0002; hbr and drc of drc_k-0008) matched but those cases count on their other fields only. Table-lookup value cases stay excluded (KR-68), which is why K-8f is 27 of 33.
+
+What this does and does not show. Every hand case was reproduced from the rules text and inputs alone by a second model, so the specs are unambiguous enough to implement and the expected values are not one author's arithmetic slip. It does not show that the rules text reads the Basel paragraphs correctly: the deriver did not see the Basel text (the packet left it out), so a misreading shared by the spec would pass. The seven ambiguities the deriver recorded (`stage_k_blind/w2/notes.md`: maturity weight on CTP and securitisation positions, CTP HBR on unweighted net amounts, empty ES lists for horizons 2 to 5, the RFET window convention, the 0.9 name correlation by legal group, `floored` per bucket, seniority offsetting direction) all resolved to the spec's reading; each should be tightened in the spec text before the specs are confirmed. Verdict under the gate rule: all four items can meet 60%, subject to the four-language builds reproducing the same goldens.
