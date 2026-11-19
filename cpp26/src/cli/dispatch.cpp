@@ -72,6 +72,7 @@
 #include "quantforge/core/microstructure.hpp"
 #include "quantforge/core/micro_est.hpp"
 #include "quantforge/core/paper.hpp"
+#include "quantforge/core/stage_k.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {
@@ -330,6 +331,7 @@ struct Entry {
 #include "ops_multiasset.inc"
 #include "ops_micro_est.inc"
 #include "ops_paper.inc"
+#include "ops_stage_k.inc"
 
 // Every verb this build runs. The operations command, and dispatch, are generated from this list alone.
 constexpr std::span<const Entry> registry[] = {
@@ -367,6 +369,7 @@ constexpr std::span<const Entry> registry[] = {
     multiasset_ops,
     micro_est_ops,
     paper_ops,
+    stage_k_ops,
 };
 
 // Built on first use, never at static initialisation, so no order between translation units matters.
@@ -465,7 +468,8 @@ CaseResult run_case(string_view text) {
             op_name.starts_with("research.") || op_name == "risk.contrib.euler" || op_name == "risk.backtest.es_z2" ||
             op_name == "exec.tca.shortfall" || op_name == "exec.tca.attribution" ||  // HR-9: fills limit 1,000,000
             op_name == "micro.book.rebuild" || op_name == "exec.sim.lit.run" || op_name == "exec.sim.dark.run" ||
-            op_name == "exec.sor.allocate";  // stage H wave 2 page limits
+            op_name == "exec.sor.allocate" ||  // stage H wave 2 page limits
+            stage_k_verb(op_name);              // stage K sizes, checked last in the library
         const bool big = !research && oversized(inputs);
         Out out;
         out.values.begin_object();
