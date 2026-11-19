@@ -4,7 +4,10 @@ use crate::conventions::{
     TERM_CALENDAR, TERM_CURRENCY, TERM_DAY_COUNT, TERM_FIXED_DAY_COUNT, TERM_FIXED_MONTHS,
     TERM_INDEX, TERM_MONTHS, TERM_SPOT_LAG,
 };
-use crate::curve::{Curve, Discount, Interpolation, SolveMethod, Solved, solve_curve};
+use crate::curve::{
+    Curve, Discount, Incremental, Interpolation, SequentialProblem, SolveMethod, Solved,
+    solve_curve, solve_incremental,
+};
 use crate::dates::Date;
 use crate::daycount::{DayCountInputs, year_fraction};
 
@@ -76,7 +79,7 @@ impl SwapLegs {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ProjectionQuote {
     Deposit { months: i64, rate: f64 },
     Fra { start_months: i64, rate: f64 },
@@ -136,12 +139,9 @@ impl Instrument {
     }
 }
 
-pub fn bootstrap(
-    discount: &Curve,
-    as_of: Date,
-    quotes: &[ProjectionQuote],
-    interpolation: Interpolation,
-) -> Result<Solved> {
+type Instruments = (Vec<Instrument>, Vec<f64>, Vec<Date>);
+
+fn instruments(as_of: Date, quotes: &[ProjectionQuote]) -> Result<Instruments> {
     crate::error::finite("quotes", &quotes)?;
     if quotes.is_empty() {
         return fail("E_INPUT", "no quotes");
@@ -158,6 +158,60 @@ pub fn bootstrap(
     if dates[0] <= as_of || dates.windows(2).any(|w| w[1] <= w[0]) {
         return fail("E_INPUT", "quotes are not in pillar order");
     }
+    Ok((items, rates, dates))
+}
+
+/// K-4b on the stage B projection bootstrap (deposits, FRAs, swaps; the discount curve held
+/// fixed): the bootstrap of `next`, solving only the pillars at and after the first quote that
+/// differs from `previous` (type, months or rate); see `curve::solve_incremental`.
+pub fn bootstrap_incremental(
+    discount: &Curve,
+    as_of: Date,
+    previous: &[ProjectionQuote],
+    previous_factors: &[f64],
+    next: &[ProjectionQuote],
+    interpolation: Interpolation,
+) -> Result<Incremental> {
+    let (old_items, old_rates, old_dates) = instruments(as_of, previous)?;
+    let (new_items, new_rates, new_dates) = instruments(as_of, next)?;
+    let key = |q: &ProjectionQuote| match *q {
+        ProjectionQuote::Deposit { months, rate } => (0, months, rate.to_bits()),
+        ProjectionQuote::Fra { start_months, rate } => (1, start_months, rate.to_bits()),
+        ProjectionQuote::Swap { months, rate } => (2, months, rate.to_bits()),
+    };
+    let (old_keys, new_keys): (Vec<_>, Vec<_>) = (
+        previous.iter().map(key).collect(),
+        next.iter().map(key).collect(),
+    );
+    let old_model = |c: &Curve, j: usize| old_items[j].model(discount, c);
+    let new_model = |c: &Curve, j: usize| new_items[j].model(discount, c);
+    solve_incremental(
+        as_of,
+        interpolation,
+        &[],
+        &SequentialProblem {
+            dates: &old_dates,
+            quotes: &old_rates,
+            model: &old_model,
+            keys: &old_keys,
+        },
+        previous_factors,
+        &SequentialProblem {
+            dates: &new_dates,
+            quotes: &new_rates,
+            model: &new_model,
+            keys: &new_keys,
+        },
+    )
+}
+
+pub fn bootstrap(
+    discount: &Curve,
+    as_of: Date,
+    quotes: &[ProjectionQuote],
+    interpolation: Interpolation,
+) -> Result<Solved> {
+    let (items, rates, dates) = instruments(as_of, quotes)?;
     let model = |c: &Curve, j: usize| items[j].model(discount, c);
     solve_curve(
         as_of,

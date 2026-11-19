@@ -454,3 +454,7 @@ pub fn richardson_check(values: &[f64], ratio: f64, assumed_order: f64) -> Resul
 #[cfg(test)]
 #[path = "stage_k_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "stage_k_incremental_b_tests.rs"]
+mod incremental_b_tests;
