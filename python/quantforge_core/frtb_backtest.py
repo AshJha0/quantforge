@@ -57,7 +57,9 @@ def _first_at_least(n: int, p: float, level: float) -> int:
 
 def _observations(n: int) -> None:
     if n > MAX_OBSERVATIONS:
-        raise QfError("E_LIMIT", f"observations is above its limit of {MAX_OBSERVATIONS}", "observations")
+        raise QfError(
+            "E_LIMIT", f"observations is above its limit of {MAX_OBSERVATIONS}", "observations"
+        )
     if n < 1:
         raise QfError("E_DOMAIN", "observations must be at least 1", "observations")
 
@@ -67,7 +69,9 @@ def _count(n: int, x: int, field: str) -> None:
         raise QfError("E_DOMAIN", f"{field} must be in [0, observations]", field)
 
 
-def backtest_zone(observations: int, exceptions_actual: int, exceptions_hypothetical: int) -> dict[str, object]:
+def backtest_zone(
+    observations: int, exceptions_actual: int, exceptions_hypothetical: int
+) -> dict[str, object]:
     """Bank-wide backtesting zone (MAR32.5, MAR32.9, MAR99.8, MAR99.17)."""
     _observations(observations)
     _count(observations, exceptions_actual, "exceptions_actual")

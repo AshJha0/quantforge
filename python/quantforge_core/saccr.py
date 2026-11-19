@@ -122,12 +122,20 @@ def _structure(trades: list[Trade]) -> None:
             _need(t, t.entity, "entity", "for CREDIT, EQUITY and COMMODITY trades")
             _need(t, t.subclass, "subclass", "for CREDIT, EQUITY and COMMODITY trades")
             if (c, t.subclass) not in TABLE2:
-                raise QfError("E_INPUT", f"trade {t.id}: subclass {t.subclass} is not a {c} subclass", "subclass")
+                raise QfError(
+                    "E_INPUT",
+                    f"trade {t.id}: subclass {t.subclass} is not a {c} subclass",
+                    "subclass",
+                )
         elif t.subclass is not None:
             raise QfError("E_INPUT", f"trade {t.id}: {c} trades take no subclass", "subclass")
         linear = t.position in ("LONG", "SHORT")
         if (t.kind == "LINEAR") != linear:
-            raise QfError("E_INPUT", f"trade {t.id}: position {t.position} does not fit kind {t.kind}", "position")
+            raise QfError(
+                "E_INPUT",
+                f"trade {t.id}: position {t.position} does not fit kind {t.kind}",
+                "position",
+            )
         if t.kind == "OPTION":
             for field, v in (
                 ("option_type", t.option_type),
@@ -162,13 +170,19 @@ def _domain(trades: list[Trade], collateral: float, margin: Margin | None) -> No
             p = (t.underlying_price or 0.0) + t.shift
             k = (t.strike or 0.0) + t.shift
             if not (p > 0 and k > 0):
-                raise QfError("E_DOMAIN", f"trade {t.id}: shifted price and strike must be positive", "strike")
+                raise QfError(
+                    "E_DOMAIN", f"trade {t.id}: shifted price and strike must be positive", "strike"
+                )
             if not (t.exercise or 0.0) > 0:
                 raise QfError("E_DOMAIN", f"trade {t.id}: exercise must be positive", "exercise")
         if t.kind == "CDO":
             a, d = t.attachment or 0.0, t.detachment or 0.0
             if not 0 <= a < d <= 1:
-                raise QfError("E_DOMAIN", f"trade {t.id}: need 0 <= attachment < detachment <= 1", "attachment")
+                raise QfError(
+                    "E_DOMAIN",
+                    f"trade {t.id}: need 0 <= attachment < detachment <= 1",
+                    "attachment",
+                )
     del collateral  # any finite value is allowed (CRE52.10)
     if margin is not None:
         if margin.threshold < 0:
@@ -291,15 +305,28 @@ def _addons(
 
 
 def multiplier(v_minus_c: float, addon: float) -> float:
-    """CRE52.23; with a zero aggregate add-on, the limit of the formula (ruling KR-36)."""
+    """CRE52.23; with a zero aggregate add-on, the limit of the formula (ruling KR-36).
+
+    V - C >= 0 gives exp(...) >= 1 and so exactly 1, without evaluating an exponential that can
+    overflow when the add-on is tiny."""
+    if v_minus_c >= 0:
+        return 1.0
     if addon == 0.0:
-        return 1.0 if v_minus_c >= 0 else FLOOR
+        return FLOOR
     return min(1.0, FLOOR + (1.0 - FLOOR) * math.exp(v_minus_c / (2.0 * (1.0 - FLOOR) * addon)))
 
 
 def _netting(
-    trades: list[Trade], mf: list[float], d: list[float], v: float, c: float, rc: float, ir_offset: bool
-) -> tuple[float, float, float, dict[str, float], list[dict[str, object]], list[float], list[float]]:
+    trades: list[Trade],
+    mf: list[float],
+    d: list[float],
+    v: float,
+    c: float,
+    rc: float,
+    ir_offset: bool,
+) -> tuple[
+    float, float, float, dict[str, float], list[dict[str, object]], list[float], list[float]
+]:
     by_class, rows, deltas, eff = _addons(trades, mf, d, ir_offset)
     aggregate = math.fsum(by_class[k] for k in CLASSES)  # CRE52.25
     m = multiplier(v - c, aggregate)
