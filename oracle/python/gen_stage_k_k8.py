@@ -71,6 +71,11 @@ def run(operation: str, inputs: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+# DR-H2 blind re-derivation, 7 of 7 value cases MATCH (program/STAGE_K_BLIND_K8.md, compare output
+# stage_k_blind/k8/compare_output.txt); counted since the row-0 question closed (program/K8_ROW0_FINDING.md).
+BLIND_K8 = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K8.md): MATCH"
+
+
 def build() -> list[dict[str, Any]]:
     cases: list[dict[str, Any]] = []
 
@@ -83,7 +88,7 @@ def build() -> list[dict[str, Any]]:
             "inputs": inputs,
             "expected": {"status": "ok", "outputs": r["outputs"]},
             "tolerance_class": "aad_sensitivity" if operation == LADDER else "root_finding",
-            "verified_by": VALUE_EVIDENCE + extra,
+            "verified_by": VALUE_EVIDENCE + extra + [BLIND_K8],
             "tags": ["stage_k", "k8", "bermudan", "synthetic"],
             "description": description,
         }

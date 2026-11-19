@@ -89,7 +89,8 @@
     "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)",
     "c++ and rust builds equal to 1e-9 of the row scale (conformance runner and unit tests, 2026-11-19)",
     "outside check: QuantLib 1.44 FdHullWhiteSwaptionEngine bump at tGrid 8,000 / xGrid 3,201 (KR-19); every judged ladder entry of this case within 1% (acceptance 2, oracle/K8_ACCEPTANCE_W2.json); the price and entries below the 1e-3 floor are not compared",
-    "ladder equals its own Richardson bumps to 1e-8 on a small grid (test_k8_ladder_equals_its_own_bumps)"
+    "ladder equals its own Richardson bumps to 1e-8 on a small grid (test_k8_ladder_equals_its_own_bumps)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K8.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -187,7 +188,8 @@
     "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)",
     "c++ and rust builds equal to 1e-9 of the row scale (conformance runner and unit tests, 2026-11-19)",
     "outside check: QuantLib 1.44 FdHullWhiteSwaptionEngine bump at tGrid 8,000 / xGrid 3,201 (KR-19); every judged ladder entry of this case within 1% (acceptance 2, oracle/K8_ACCEPTANCE_W2.json); the price and entries below the 1e-3 floor are not compared",
-    "ladder equals its own Richardson bumps to 1e-8 on a small grid (test_k8_ladder_equals_its_own_bumps)"
+    "ladder equals its own Richardson bumps to 1e-8 on a small grid (test_k8_ladder_equals_its_own_bumps)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K8.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -285,7 +287,8 @@
     "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)",
     "c++ and rust builds equal to 1e-9 of the row scale (conformance runner and unit tests, 2026-11-19)",
     "outside check: QuantLib 1.44 FdHullWhiteSwaptionEngine bump at tGrid 8,000 / xGrid 3,201 (KR-19); every judged ladder entry of this case within 1% (acceptance 2, oracle/K8_ACCEPTANCE_W2.json); the price and entries below the 1e-3 floor are not compared",
-    "ladder equals its own Richardson bumps to 1e-8 on a small grid (test_k8_ladder_equals_its_own_bumps)"
+    "ladder equals its own Richardson bumps to 1e-8 on a small grid (test_k8_ladder_equals_its_own_bumps)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K8.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -367,7 +370,8 @@
    "verified_by": [
     "python build float64 (pinned reference scheme, spec 0.2.0): the expected values are the Python build's own output, not an independent oracle",
     "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)",
-    "c++ and rust builds equal to 1e-9 of the row scale (conformance runner and unit tests, 2026-11-19)"
+    "c++ and rust builds equal to 1e-9 of the row scale (conformance runner and unit tests, 2026-11-19)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K8.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -459,7 +463,8 @@
     "python build float64 (pinned reference scheme, spec 0.2.0): the expected values are the Python build's own output, not an independent oracle",
     "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)",
     "c++ and rust builds equal to 1e-9 of the row scale (conformance runner and unit tests, 2026-11-19)",
-    "ladder equals its own Richardson bumps to 1e-8 on a small grid (test_k8_ladder_equals_its_own_bumps)"
+    "ladder equals its own Richardson bumps to 1e-8 on a small grid (test_k8_ladder_equals_its_own_bumps)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K8.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -537,7 +542,8 @@
    "verified_by": [
     "python build float64 (pinned reference scheme, spec 0.2.0): the expected values are the Python build's own output, not an independent oracle",
     "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)",
-    "c++ and rust builds equal to 1e-9 of the row scale (conformance runner and unit tests, 2026-11-19)"
+    "c++ and rust builds equal to 1e-9 of the row scale (conformance runner and unit tests, 2026-11-19)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K8.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -611,7 +617,8 @@
    "verified_by": [
     "python build float64 (pinned reference scheme, spec 0.2.0): the expected values are the Python build's own output, not an independent oracle",
     "java build equal to 1e-9 of the row scale (BermudanK8Test, 2026-11-19)",
-    "c++ and rust builds equal to 1e-9 of the row scale (conformance runner and unit tests, 2026-11-19)"
+    "c++ and rust builds equal to 1e-9 of the row scale (conformance runner and unit tests, 2026-11-19)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K8.md): MATCH"
    ],
    "tags": [
     "stage_k",
