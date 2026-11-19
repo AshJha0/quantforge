@@ -26,6 +26,7 @@ mod risk;
 mod riskcarry;
 mod riskw2;
 mod shortrate;
+pub mod stagek;
 mod termcurve;
 mod usecase;
 mod vol;
@@ -76,9 +77,12 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("bond", bond::NAMES, bond::dispatch),
     ("book", book::NAMES, book::dispatch),
     ("calib", calib::NAMES, calib::dispatch),
+    ("calib", stagek::calib::NAMES, stagek::calib::dispatch),
     ("cmdty", cmdty::NAMES, cmdty::dispatch),
     ("core", core::NAMES, core::dispatch),
+    ("core", stagek::core::NAMES, stagek::core::dispatch),
     ("credit", credit::NAMES, credit::dispatch),
+    ("curve", stagek::curve::NAMES, stagek::curve::dispatch),
     ("eq", eq::NAMES, eq::dispatch),
     ("eq", termcurve::eq::NAMES, termcurve::eq::dispatch),
     ("exec", execution::exec::NAMES, execution::exec::dispatch),
@@ -100,6 +104,7 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
         multiasset::micro::dispatch,
     ),
     ("micro", micro::est::NAMES, micro::est::dispatch),
+    ("num", stagek::num::NAMES, stagek::num::dispatch),
     ("paper", paper::NAMES, paper::dispatch),
     ("rates", rates::NAMES, rates::dispatch),
     ("rates", shortrate::NAMES, shortrate::dispatch),
@@ -113,6 +118,7 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("risk", riskcarry::NAMES, riskcarry::dispatch),
     ("risk", riskw2::NAMES, riskw2::dispatch),
     ("risk", w3::risk::NAMES, w3::risk::dispatch),
+    ("risk", stagek::risk::NAMES, stagek::risk::dispatch),
     ("usecase", usecase::NAMES, usecase::dispatch),
     (
         "usecase",

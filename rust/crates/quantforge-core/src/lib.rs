@@ -94,6 +94,7 @@ pub mod smile;
 pub mod snapshot;
 pub mod sobol;
 pub mod sor;
+pub mod stage_k;
 pub mod stats;
 pub mod store;
 pub mod surface;

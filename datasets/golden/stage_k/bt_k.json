@@ -1,0 +1,672 @@
+{
+ "schema_version": "1.0",
+ "suite": "bt_k",
+ "spec": "specifications/01-core/bitemporal-store.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "bt_k-0001",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     },
+     {
+      "sequence": 2,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     },
+     {
+      "sequence": 3,
+      "series_id": "A",
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     },
+     {
+      "sequence": 4,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-02T00:00:00Z",
+      "value": null,
+      "deleted": true
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-03-15T00:00:00Z",
+    "valid_at": "2026-02-15T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "FOUND",
+     "row": {
+      "sequence": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "core",
+    "bitemporal",
+    "synthetic"
+   ],
+   "description": "seq 3 not yet known"
+  },
+  {
+   "case_id": "bt_k-0002",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     },
+     {
+      "sequence": 2,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     },
+     {
+      "sequence": 3,
+      "series_id": "A",
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     },
+     {
+      "sequence": 4,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-02T00:00:00Z",
+      "value": null,
+      "deleted": true
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-04-01T00:00:00Z",
+    "valid_at": "2026-02-15T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "FOUND",
+     "row": {
+      "sequence": 3,
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "core",
+    "bitemporal",
+    "synthetic"
+   ],
+   "description": "K inclusive; correction known"
+  },
+  {
+   "case_id": "bt_k-0003",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     },
+     {
+      "sequence": 2,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     },
+     {
+      "sequence": 3,
+      "series_id": "A",
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     },
+     {
+      "sequence": 4,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-02T00:00:00Z",
+      "value": null,
+      "deleted": true
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-03-15T00:00:00Z",
+    "valid_at": "2026-03-10T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "FOUND",
+     "row": {
+      "sequence": 2,
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "core",
+    "bitemporal",
+    "synthetic"
+   ],
+   "description": "seq 2 wins"
+  },
+  {
+   "case_id": "bt_k-0004",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     },
+     {
+      "sequence": 2,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     },
+     {
+      "sequence": 3,
+      "series_id": "A",
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     },
+     {
+      "sequence": 4,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-02T00:00:00Z",
+      "value": null,
+      "deleted": true
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-04-05T00:00:00Z",
+    "valid_at": "2026-03-10T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "WITHDRAWN",
+     "row": null
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH on status only; row decided by gap ruling KR-14, not blind"
+   ],
+   "tags": [
+    "stage_k",
+    "core",
+    "bitemporal",
+    "synthetic"
+   ],
+   "description": "seq 4 wins and masks seq 2 and seq 1 (KR-2)"
+  },
+  {
+   "case_id": "bt_k-0005",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     },
+     {
+      "sequence": 2,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     },
+     {
+      "sequence": 3,
+      "series_id": "A",
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     },
+     {
+      "sequence": 4,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-02T00:00:00Z",
+      "value": null,
+      "deleted": true
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-04-05T00:00:00Z",
+    "valid_at": "2026-01-15T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "FOUND",
+     "row": {
+      "sequence": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "core",
+    "bitemporal",
+    "synthetic"
+   ],
+   "description": "only seq 1 covers January"
+  },
+  {
+   "case_id": "bt_k-0006",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     },
+     {
+      "sequence": 2,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     },
+     {
+      "sequence": 3,
+      "series_id": "A",
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     },
+     {
+      "sequence": 4,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-02T00:00:00Z",
+      "value": null,
+      "deleted": true
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-01-01T12:00:00Z",
+    "valid_at": "2026-01-15T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "NONE",
+     "row": null
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH on status only; row decided by gap ruling KR-14, not blind"
+   ],
+   "tags": [
+    "stage_k",
+    "core",
+    "bitemporal",
+    "synthetic"
+   ],
+   "description": "nothing known yet"
+  },
+  {
+   "case_id": "bt_k-0007",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     },
+     {
+      "sequence": 2,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     },
+     {
+      "sequence": 3,
+      "series_id": "A",
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     },
+     {
+      "sequence": 4,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-02T00:00:00Z",
+      "value": null,
+      "deleted": true
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-04-01T00:00:00Z",
+    "valid_at": "2026-03-01T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "FOUND",
+     "row": {
+      "sequence": 2,
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "core",
+    "bitemporal",
+    "synthetic"
+   ],
+   "description": "seq 3 ends at 03-01 exclusive; seq 4 not yet known"
+  },
+  {
+   "case_id": "bt_k-0008",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     },
+     {
+      "sequence": 2,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     },
+     {
+      "sequence": 3,
+      "series_id": "A",
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     },
+     {
+      "sequence": 4,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-02T00:00:00Z",
+      "value": null,
+      "deleted": true
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-04-01T00:00:00Z",
+    "valid_at": "2026-02-28T23:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "FOUND",
+     "row": {
+      "sequence": 3,
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "core",
+    "bitemporal",
+    "synthetic"
+   ],
+   "description": "last second inside seq 3"
+  },
+  {
+   "case_id": "bt_k-0009",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     },
+     {
+      "sequence": 2,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     },
+     {
+      "sequence": 3,
+      "series_id": "A",
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-02-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     },
+     {
+      "sequence": 4,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-02T00:00:00Z",
+      "value": null,
+      "deleted": true
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-04-01T00:00:00Z",
+    "valid_at": "2026-02-15T00:00:00Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "core",
+    "bitemporal",
+    "synthetic",
+    "error"
+   ],
+   "description": "seq 3 valid_to equal to its valid_from"
+  },
+  {
+   "case_id": "bt_k-0010",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     },
+     {
+      "sequence": 2,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     },
+     {
+      "sequence": 3,
+      "series_id": "A",
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-03-01T00:00:00Z",
+      "value": 105
+     },
+     {
+      "sequence": 4,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-02T00:00:00Z",
+      "value": null,
+      "deleted": true
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-04-01T00:00:00Z",
+    "valid_at": "2026-02-15T00:00:00Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "core",
+    "bitemporal",
+    "synthetic",
+    "error"
+   ],
+   "description": "seq 3 knowledge_time earlier than seq 2's"
+  }
+ ]
+}

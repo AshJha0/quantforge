@@ -1,0 +1,219 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1_k",
+ "spec": "specifications/01-core/bitemporal-store.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "e1_k-0001",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": "NaN"
+     },
+     {
+      "sequence": 2,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     },
+     {
+      "sequence": 3,
+      "series_id": "A",
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     },
+     {
+      "sequence": 4,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-02T00:00:00Z",
+      "value": null,
+      "deleted": true
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-03-15T00:00:00Z",
+    "valid_at": "2026-02-15T00:00:00Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18 (E1, ruling F-2): hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2/F-38: NaN token at the top level of records[0].value (from bt_k-0001)"
+  },
+  {
+   "case_id": "e1_k-0002",
+   "operation": "curve.bootstrap.par_annual",
+   "inputs": {
+    "quotes": [
+     0.02,
+     "NaN",
+     0.03
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18 (E1, ruling F-2): hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at quotes/1 (from inc_k-0001)"
+  },
+  {
+   "case_id": "e1_k-0003",
+   "operation": "curve.incremental.update",
+   "inputs": {
+    "previous_quotes": [
+     0.02,
+     0.025,
+     0.03
+    ],
+    "previous_discount_factors": [
+     0.9803921568627451,
+     0.9516977522716404,
+     0.9145993230349208
+    ],
+    "new_quotes": [
+     0.02,
+     "Infinity",
+     0.03
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18 (E1, ruling F-2): hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: Infinity at new_quotes/1 (from inc_k-0002)"
+  },
+  {
+   "case_id": "e1_k-0004",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0,
+     -1.0,
+     1.0,
+     -1.0
+    ],
+    "x_ref": 100.0,
+    "x_now": "NaN",
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18 (E1, ruling F-2): hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at x_now (from trig_k-0001)"
+  },
+  {
+   "case_id": "e1_k-0005",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "inputs": {
+    "positions": [
+     {
+      "notional": 1000000.0,
+      "maturity": 5.0,
+      "yield": 0.04
+     }
+    ],
+    "shift": "-Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18 (E1, ruling F-2): hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: -Infinity at shift (from idr_k-0001)"
+  },
+  {
+   "case_id": "e1_k-0006",
+   "operation": "num.richardson.check",
+   "inputs": {
+    "values": [
+     10.5,
+     "NaN",
+     10.03125
+    ],
+    "ratio": 2.0,
+    "assumed_order": 2.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the oracle lane 2026-11-18 (E1, ruling F-2): hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "e1",
+    "non-finite-input"
+   ],
+   "description": "F-2: NaN at values/1 (from rich_k-0001)"
+  }
+ ]
+}

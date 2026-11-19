@@ -302,6 +302,14 @@ impl Json {
         }
     }
 
+    /// The value of a key of an object, for an in-place edit.
+    pub fn get_mut(&mut self, key: &str) -> Option<&mut Json> {
+        match self {
+            Json::Obj(o) => o.iter_mut().find(|(k, _)| k == key).map(|(_, v)| v),
+            _ => None,
+        }
+    }
+
     /// Levels of nesting. An object or array is one level; scalars add none.
     pub fn depth(&self) -> usize {
         match self {

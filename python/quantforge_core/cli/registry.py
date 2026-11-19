@@ -104,6 +104,8 @@ CORE_MODULES = (
     "xccy",
     "micro_est",
     "venue_analytics",
+    "stage_k",
+    "bermudan_k8",
 )
 
 

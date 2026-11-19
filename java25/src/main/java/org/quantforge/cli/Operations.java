@@ -85,7 +85,8 @@ final class Operations {
             new Registry.Module("execution", OpsExecution::register),
             new Registry.Module("micro_exec", OpsMicro::register),
             new Registry.Module("micro_est", OpsMicroEst::register),
-            new Registry.Module("paper", OpsPaper::register)
+            new Registry.Module("paper", OpsPaper::register),
+            new Registry.Module("bitemporal_incremental", OpsStageK::register)
     );
 
     static final Registry REGISTRY = Registry.of(MODULES);

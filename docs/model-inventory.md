@@ -1211,3 +1211,51 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Data lineage hash:** `datasets/golden/stage_h/fut_h.json`.
 - **Retirement trigger:** a superseding stage H ruling.
 - **Validation report:** `specifications/10-execution/rates-futures-venue.md`.
+
+### MK-1 Bitemporal store query (stage K wave 1, K-4a)
+- **Purpose:** the value of a series as known at knowledge time K for valid time V, with corrections and withdrawals (`core.store.bitemporal_query`), in all four languages.
+- **Inputs:** as in the spec page; instants are whole seconds (KR-16).
+- **Limitations:** spec confirmed 2026-11-19 (`specifications/01-core/bitemporal-store.md`); the log is passed in the request, there is no persistent store.
+- **Validation:** goldens `bt_k` plus `e2_k` two-error cases, passed by every build (observed, local, 2026-11-19); KR-4 correction property on 10,000 logs in each language (`program/stage_k_w1/`). **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2), 6 of 8 value cases fully blind (`program/STAGE_K_BLIND_W1.md`).
+- **Monitoring thresholds:** any KR-4 property failure; any golden difference across the four builds.
+- **Data lineage hash:** sha256 15c685aa0eb348131b246aaa54e6d7df83d00545a1b0ecee71c79a660163cbce (`bt_k`, 10 cases) (2026-11-19).
+- **Retirement trigger:** a superseding stage K ruling.
+- **Validation report:** `specifications/01-core/bitemporal-store.md`.
+
+### MK-2 Incremental curve update (stage K wave 1, K-4b)
+- **Purpose:** sequential annual par bootstrap and its incremental update from the first changed quote (`curve.bootstrap.par_annual`, `curve.incremental.update`), in all four languages.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec confirmed 2026-11-19; hand-sized instrument set; the stage B production bootstrap has no incremental entry point (only the premise that earlier pillars cannot move is checked on it).
+- **Validation:** goldens `inc_k`; 10,000 random vectors bit-identical to a full rebuild in Python and Java; 45 quote moves on stage B bootstraps (`program/stage_k_w1/`). **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2), 4 of 4 value cases.
+- **Monitoring thresholds:** any recomputed pillar differing from a full rebuild by more than 1e-12 relative, or any copied pillar not bit-identical.
+- **Data lineage hash:** sha256 746a7729fe42ed44d521621452503a014a01aa47f06546f8c08523ad70316eca (`inc_k`, 6 cases) (2026-11-19).
+- **Retirement trigger:** a superseding stage K ruling.
+- **Validation report:** `specifications/02-curves/incremental-update.md`.
+
+### MK-3 Recalibration trigger (stage K wave 1, K-4c)
+- **Purpose:** fires when a monitored input moves more than k sample sigmas times sqrt(days) since calibration (`calib.trigger.check`), in all four languages.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec confirmed 2026-11-19; two-sided normal level only, which understates the false-alarm rate of a short window (the acceptance uses the Student-t predictive rate); CUSUM and EWMA are out of wave 1.
+- **Validation:** goldens `trig_k`; simulation of 100,000 noise paths inside the 99% binomial interval and a planted 6-sigma move firing on every path, Python and Java (`program/stage_k_w1/`). **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2), 4 of 5 value cases; SciPy `2*norm.sf(k)` on `false_alarm_rate` only (KR-11).
+- **Monitoring thresholds:** observed noise fire rate outside the 99% binomial interval of its stated level.
+- **Data lineage hash:** sha256 b3297f772ed002b9b369e10ef77c1d70b952dcff32604c2b9cf6b9105aafb5b3 (`trig_k`, 8 cases) (2026-11-19).
+- **Retirement trigger:** a superseding stage K ruling.
+- **Validation report:** `specifications/03-calibration/recalibration-triggers.md`.
+
+### MK-4 Intraday delta-gamma risk with a Lagrange bound (stage K wave 1, K-5a)
+- **Purpose:** delta-gamma P&L of a parallel yield move on zero-coupon positions with a bound on its error (`risk.intraday.delta_gamma_bound`), in all four languages.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec confirmed 2026-11-19; zero-coupon positions only (other instruments have no `M3`, so no bound); latency-aware analytics on simulated data; the binary64 comparison is meaningful only for `T abs(h)` well above 1e-7 (KR-17).
+- **Validation:** goldens `idr_k`; 1,000 seeded moves with zero violations in Python and Java, rechecked at 50 digits (`oracle/IDR_K_MOVES_CHECK_W1.json`). **Review:** 2026-11-19.
+- **Tier:** 3.
+- **Challenger:** none counted: the blind lane checked the bounds only to 6 decimals and idr_k-0005 was not blind, so the item has 0 of 5 value cases outside-checked (under the 60% per-item floor, `oracle/OUTSIDE_SHARES.md`); mpmath is our own oracle.
+- **Monitoring thresholds:** any move with abs(estimate - revaluation) above the bound.
+- **Data lineage hash:** sha256 7529524f6558dbdf27d65327bbe53396e1efaffdfa33159b6ce314afbbf7e153 (`idr_k`, 7 cases) (2026-11-19).
+- **Retirement trigger:** a superseding stage K ruling.
+- **Validation report:** `specifications/06-risk/intraday-risk-bounds.md`.
