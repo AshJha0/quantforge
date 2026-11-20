@@ -24,6 +24,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from . import stage_k as sk
+from .finite import guard
 
 LABEL = sk.LABEL
 MASK = (1 << 64) - 1
@@ -193,3 +194,8 @@ def run_race(
     for t in threads:
         t.join()
     return reports
+
+
+# E1: every public function rejects NaN and infinity at its inputs first (tests/test_finite.py). The guard's
+# re-entry flag is thread-local, so the reader threads of run_race are checked independently.
+guard(globals())
