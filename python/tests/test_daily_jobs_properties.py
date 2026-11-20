@@ -389,7 +389,7 @@ def test_the_property_test_sees_a_writer_that_never_closes_a_skipped_date(
     planted = src.replace("if evidence is not None and not seen_before:", "if evidence is not None:")
     assert planted != src, "the planted fault no longer applies to curve.run"
     scope = dict(vars(curve))
-    exec(compile(planted, "<planted curve.run>", "exec"), scope)
+    exec(compile(planted, "<planted curve.run>", "exec"), scope)  # noqa: S102 - test-only planted fault
     monkeypatch.setattr(curve, "run", scope["run"])
     failures = 0
     for seed in range(300):
