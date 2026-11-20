@@ -6,7 +6,7 @@ Business days Monday to Friday up to 2026-11-20, holidays from code/tools/record
 |---|---|---:|---|---:|
 | recorder/bls-cpi-u-nsa | 2026-11-09 | 9 | none | 0 |
 | recorder/boe-sonia | 2026-11-07 | 9 | none | 0 |
-| recorder/cftc-cot-disaggregated | 2026-11-07 | 9 | none | 4 |
+| recorder/cftc-cot-disaggregated | 2026-11-07 | 9 | none | 3 |
 | recorder/ecb-aaa-yield-curve | 2026-11-07 | 9 | none | 0 |
 | recorder/ecb-estr | 2026-11-07 | 9 | 2026-11-10 | 0 |
 | recorder/ecb-reference-rates | 2026-11-07 | 9 | none | 0 |

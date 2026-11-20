@@ -18,7 +18,7 @@
   "from": "2026-11-07",
   "expected": 9,
   "missing": [],
-  "unchanged_run": 4
+  "unchanged_run": 3
  },
  {
   "series": "recorder/ecb-aaa-yield-curve",
