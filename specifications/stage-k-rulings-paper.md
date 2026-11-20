@@ -49,6 +49,8 @@ Checked against the spec, `tools/paper_daily/paper_core.py`, `run_day.py`, `veri
 
 ## Rulings from different-model audit C (KR-200 to KR-214)
 
+**CONFIRMED 2026-11-20 by the stage K coordinator (branch `k-r2`, owner-delegated decisions), after the follow-up different-model audit and its checks were clean (`STAGE_K_R1_FOLLOWUP_AUDIT.md`, "Last check before tag"; the Linux bytes job `python-daily-jobs-bytes` green on PR #59). The proposal text below is kept as written.**
+
 **Status: PROPOSED 2026-11-19 by the daily-jobs audit-response lane (branch `k-audit-jobs`), in answer to `STAGE_K_R1_AUDIT_C.md` findings KA-C1 to KA-C8, KA-C12, KA-C13, KA-C25 and KA-C26. Written before any scheduled run and before either ledger branch exists, so no row is relabelled. Not normative until the stage K coordinator confirms them.** KR-200, KR-201, KR-205, KR-206, KR-208 and KR-214 are stated here once and bind the daily curve run as well (`stage-k-rulings-curve.md` points here); KR-203, KR-204, KR-207 and KR-209 are in that file, and KR-209 is the one statement of what both jobs publish. Reviewer: none: self-assessment; no second review (owner decision 2026-11-18).
 
 | # | Point | Ruling |
