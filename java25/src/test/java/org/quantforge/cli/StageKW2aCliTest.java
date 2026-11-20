@@ -1,6 +1,7 @@
 package org.quantforge.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,9 +35,9 @@ class StageKW2aCliTest {
         OpsStageKW2a.register(TABLE);
     }
 
-    /** In.pageLimited with the registration line of program/STAGE_K_W2A_JAVA_HANDOVER.md applied. */
+    /** In.pageLimited, which includes OpsStageKW2a.PAGE_LIMITED since integration. */
     static boolean pageLimited(String op) {
-        return In.pageLimited(op) || OpsStageKW2a.PAGE_LIMITED.contains(op);
+        return In.pageLimited(op);
     }
 
     /** Main.handle without the envelope: inputs, apply with the held E_LIMIT and finite rule, then the reply. */
@@ -141,12 +142,11 @@ class StageKW2aCliTest {
     }
 
     @Test
-    void registersFourteenVerbsNotYetInOperations() {
+    void registersFourteenVerbsInOperations() {
         assertEquals(14, TABLE.size());
         for (String op : TABLE.keySet()) {
             assertTrue(op.startsWith("risk.frtb."), op);
-            // remove this check at integration, when OpsStageKW2a is added to Operations.MODULES
-            assertNull(Operations.find(op), op + " is already registered");
+            assertNotNull(Operations.find(op), op + " is not registered");
         }
     }
 

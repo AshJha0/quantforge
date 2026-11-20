@@ -1,7 +1,7 @@
 package org.quantforge.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -146,11 +146,11 @@ class StageKW2bCliTest {
     }
 
     @Test
-    void registersFourVerbsAndNoCollision() {
+    void registersFourVerbs() {
         assertEquals(List.of("risk.cva.ba", "risk.cva.sa", "risk.capital.leverage", "risk.capital.large_exposures"),
                 new ArrayList<>(TABLE.keySet()));
         for (String op : TABLE.keySet()) {
-            assertNull(Operations.find(op), op + " is already registered: delete this test at integration");
+            assertNotNull(Operations.find(op), op + " is not registered");
         }
     }
 
