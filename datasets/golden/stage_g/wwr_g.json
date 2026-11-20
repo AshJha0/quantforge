@@ -1967,6 +1967,128 @@
     "synthetic"
    ],
    "description": "two errors: first time 0 [structural] and wwr_b missing [schema]; E_SCHEMA first (HR-122)"
+  },
+  {
+   "case_id": "wwr_g-0036",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "values": [
+     [
+      3.0,
+      5.0,
+      2.0,
+      -1.0
+     ],
+     [
+      -2.0,
+      -4.0
+     ],
+     [
+      1.0,
+      6.0,
+      9.0,
+      4.0
+     ],
+     [
+      0.5,
+      -1.0,
+      2.5,
+      7.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": "NaN",
+    "recovery": 0.4,
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "hr122",
+    "synthetic"
+   ],
+   "description": "two errors: a short path [structural] and a NaN hazard_rate [finite rule]; the finite rule (E_DOMAIN) before structural E_INPUT (HR-122)"
+  },
+  {
+   "case_id": "wwr_g-0037",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.0,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "values": [
+     [
+      3.0,
+      5.0,
+      2.0,
+      "NaN"
+     ],
+     [
+      -2.0,
+      -4.0,
+      -6.0,
+      -3.0
+     ],
+     [
+      1.0,
+      6.0,
+      9.0,
+      4.0
+     ],
+     [
+      0.5,
+      -1.0,
+      2.5,
+      7.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": 0.03,
+    "recovery": 0.4,
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "hr122",
+    "synthetic"
+   ],
+   "description": "two errors: first time 0 [structural] and a NaN value [finite rule]; the finite rule (E_DOMAIN) before structural E_INPUT (HR-122)"
   }
  ]
 }

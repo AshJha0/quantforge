@@ -426,6 +426,10 @@ def main():
         (dict(wbase, times=[0.25, 0.25, 0.75, 1.0], recovery="x"), "times not increasing [structural] and a string recovery [schema]"),
         (dict(wbase, values=[], discount_factors=["1", 0.99, 0.985, 0.98]), "no paths [structural] and a string discount factor [schema]"),
         ({k: v for k, v in dict(wbase, times=[0.0, 0.5, 0.75, 1.0]).items() if k != "wwr_b"}, "first time 0 [structural] and wwr_b missing [schema]")])
+    for inp, d in [(dict(wbase, values=[W[0], W[1][:2]] + W[2:], hazard_rate="NaN"), "a short path [structural] and a NaN hazard_rate [finite rule]"),
+                   (dict(wbase, times=[0.0, 0.5, 0.75, 1.0], values=[W[0][:3] + ["NaN"]] + W[1:]), "first time 0 [structural] and a NaN value [finite rule]")]:
+        s.add("xva.wwr.cva_hw", inp, error="E_DOMAIN", cls="date_and_convention", tags=["invalid", "xva", "hr122"],
+              description="two errors: " + d + "; the finite rule (E_DOMAIN) before structural E_INPUT (HR-122)")
     write(s)
     n4 = len(s.cases)
     reg = json.loads((HERE.parent / "outside_register_g.json").read_text(encoding="utf-8"))
