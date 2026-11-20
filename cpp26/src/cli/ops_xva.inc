@@ -142,7 +142,7 @@ XvaName xva_name(const In& in, const char* key) {
 
 void op_xva_adjustments(const In& in, Out& out) {
     const Vec t = xva_increasing(in, "times", 1);
-    if (!(t[0] > 0)) throw Error("E_DOMAIN", "times must be after 0", "times");
+    if (!(t[0] > 0)) throw Error("E_INPUT", "times must start after 0 (KR-258)", "times");
     const Vec D = sr_reals(in, "discount_factors"), ee = sr_reals(in, "ee"), ene = sr_reals(in, "ene");
     const std::size_t n = t.size();
     if (D.size() != n || ee.size() != n || ene.size() != n) throw Error("E_INPUT", "lengths differ from times", "ee");
@@ -262,7 +262,7 @@ double wwr_root(const Vec& surv, const Vec& cs, double dt, double hz) {
 
 void op_xva_wwr(const In& in, Out& out) {
     const Vec t = xva_increasing(in, "times", 1);
-    if (!(t[0] > 0)) throw Error("E_DOMAIN", "times must be after 0", "times");
+    if (!(t[0] > 0)) throw Error("E_INPUT", "times must start after 0 (KR-258)", "times");
     const std::vector<Vec> V = xva_paths(in.need("values"), "values", t.size());
     const Vec D = sr_reals(in, "discount_factors");
     const double h = in.real("hazard_rate"), R = in.real("recovery"), b = in.real("wwr_b");
