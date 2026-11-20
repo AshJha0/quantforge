@@ -15,6 +15,15 @@ Common checks, in order, `E_DOMAIN`: `expiry_years <= 0`; `alpha <= 0`; `beta` o
 - `z = (nu/alpha) sqrt(A) L`
 - `chi = ln((sqrt(1 - 2 rho z + z^2) + z - rho)/(1 - rho))`
 - `m = z/chi`, or for `|z| < 1e-7`, `m = 1 - rho z/2 - (3 rho^2 - 2) z^2/12`
+
+**Evaluating `chi` (ruling KR-340, PROPOSED).** Plain idea: written as above, `chi` is the log of a number close to 1 when `z` is small, so it keeps only about `16 + log10|z|` digits, and for `z` far below 0 the sum `sqrt(...) + z - rho` cancels. Every build evaluates the same value from terms of one sign. With `d = z - rho`, `q = (1 - rho)(1 + rho)`:
+
+- `s = hypot(d, sqrt(q))` (equal to `sqrt(1 - 2 rho z + z^2)`)
+- `w = s + d` if `d >= 0`, else `w = q/(s - d)` (equal to `s + z - rho`)
+- `u = (z/(s + 1)) (w/(1 - rho) + 1)` (equal to `w/(1 - rho) - 1`, the argument of the log less 1)
+- `chi = log1p(u)` if `|u| < 1/2`; else `chi = ln(s + d) - log1p(-rho)` if `d >= 0`; else `chi = log1p(rho) - ln(s - d)`
+
+Worked example (measured, mpmath at 50 digits plus two per decade of `|z|`, 2026-11-20): at `z = 1.01e-7`, `rho = 0.3` the direct form gives `m` with relative error 2.7e-9; the form above gives 3 ulp or less over `1e-7 <= |z| <= 1e307` and `|rho| <= 1 - 2^-53` (about 18,000 sampled points). The series below `1e-7` has a truncation error of order `z^3`, below `1e-20`. Goldens `sabrz_k` check `|z|` from `1e-8` to `1e5`, both signs of `rho`, at relative limit `1e-12`.
 - `den = sqrt(A) (1 + c/24 + c^2/1920)`
 - `h = 1 + T ((1-beta)^2 alpha^2/(24 A) + rho beta nu alpha/(4 sqrt A) + (2 - 3 rho^2) nu^2/24)`
 - `vol = alpha m h/den`

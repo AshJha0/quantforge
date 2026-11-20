@@ -1,0 +1,1222 @@
+{
+ "schema_version": "1.0",
+ "suite": "sabrz_k",
+ "spec": "specifications/05-volatility/sabr.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_rev1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "sabrz_k-0001",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     99.9999995
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": -0.4,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20064000040128002
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = 1e-08, rho = -0.4",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0002",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     99.99999495000013
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": -0.4,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20064000405292826
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = 1.01e-07, rho = -0.4",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0003",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     99.9999500000125
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": -0.4,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20064004012802542
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = 1e-06, rho = -0.4",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0004",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     99.99500012499792
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": -0.4,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20064401305413052
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = 0.0001, rho = -0.4",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0005",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     100.0000005
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": -0.4,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20063999959872
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = -1e-08, rho = -0.4",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0006",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     100.00000505000013
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": -0.4,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20063999594707227
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = -1.01e-07, rho = -0.4",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0007",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     100.00005000001251
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": -0.4,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20063995987202543
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = -1e-06, rho = -0.4",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0008",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     100.00500012500208
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": -0.4,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20063598745415753
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = -0.0001, rho = -0.4",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0009",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     99.9999995
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20525999969211
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = 1e-08, rho = 0.3",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0010",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     99.99999495000013
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20525999689031132
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = 1.01e-07, rho = 0.3",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0011",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     99.9999500000125
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.2052599692110296
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = 1e-06, rho = 0.3",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0012",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     99.99500012499792
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20525692139592797
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = 0.0001, rho = 0.3",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0013",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     100.0000005
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20526000030789002
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = -1e-08, rho = 0.3",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0014",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     100.00000505000013
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.2052600031096893
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = -1.01e-07, rho = 0.3",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0015",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     100.00005000001251
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.2052600307890296
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = -1e-06, rho = 0.3",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0016",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     100.00500012500208
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20526307919590506
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = -0.0001, rho = 0.3",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0017",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     99.9999995
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.95,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20428499902964625
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = 1e-08, rho = 0.95",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0018",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     99.99999495000013
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.95,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20428499019942703
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = 1.01e-07, rho = 0.95",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0019",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     99.9999500000125
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.95,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20428490296461296
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = 1e-06, rho = 0.95",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0020",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     99.99500012499792
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.95,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20427529634205363
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = 0.0001, rho = 0.95",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0021",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     100.0000005
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.95,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20428500097035376
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = -1e-08, rho = 0.95",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0022",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     100.00000505000013
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.95,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20428500980057276
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = -1.01e-07, rho = 0.95",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0023",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     100.00005000001251
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.95,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.204285097035363
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = -1e-06, rho = 0.95",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0024",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     100.00500012500208
+    ],
+    "expiry_years": 1.5,
+    "alpha": 0.2,
+    "beta": 1.0,
+    "rho": 0.95,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20429470341706032
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z"
+   ],
+   "description": "z = -0.0001, rho = 0.95",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0025",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.01,
+    "strikes": [
+     0.010000002,
+     0.01000002,
+     0.00999998,
+     0.010002
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.03,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.35,
+    "shift": 0.02
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.1755847013623308,
+      0.17558464317757036,
+      0.17558477247718993,
+      0.17557824353707327
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z",
+    "shift"
+   ],
+   "description": "z from -1.3e-07, -1.3e-06, 1.3e-06, -0.00013",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0026",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.01,
+    "strikes": [
+     0.010000002,
+     0.01000002,
+     0.00999998,
+     0.010002
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.03,
+    "beta": 0.5,
+    "rho": 0.3,
+    "nu": 0.35,
+    "shift": 0.02
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.17715970843782847,
+      0.1771597139325264,
+      0.17715970172218765,
+      0.17716031880387875
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_small_z",
+    "shift"
+   ],
+   "description": "z from -1.3e-07, -1.3e-06, 1.3e-06, -0.00013",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0027",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     738.905609893065,
+     13.53352832366127
+    ],
+    "expiry_years": 1.0,
+    "alpha": 0.01,
+    "beta": 1.0,
+    "rho": -0.4,
+    "nu": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      3.1786820425494438,
+      3.549061998878943
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_large_z"
+   ],
+   "description": "z = -1e+03, 1e+03",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0028",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     738.905609893065,
+     13.53352832366127
+    ],
+    "expiry_years": 1.0,
+    "alpha": 0.0001,
+    "beta": 1.0,
+    "rho": -0.4,
+    "nu": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      2.031379107686541,
+      2.1763853657932954
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_large_z"
+   ],
+   "description": "z = -1e+05, 1e+05",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0029",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     738.905609893065,
+     13.53352832366127
+    ],
+    "expiry_years": 1.0,
+    "alpha": 0.01,
+    "beta": 1.0,
+    "rho": 0.3,
+    "nu": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      3.8232662841518867,
+      3.5261222232987293
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_large_z"
+   ],
+   "description": "z = -1e+03, 1e+03",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0030",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     738.905609893065,
+     13.53352832366127
+    ],
+    "expiry_years": 1.0,
+    "alpha": 0.0001,
+    "beta": 1.0,
+    "rho": 0.3,
+    "nu": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      2.3461056148526382,
+      2.230500519510859
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_large_z"
+   ],
+   "description": "z = -1e+05, 1e+05",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0031",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     738.905609893065,
+     13.53352832366127
+    ],
+    "expiry_years": 1.0,
+    "alpha": 0.01,
+    "beta": 1.0,
+    "rho": 0.95,
+    "nu": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.39644495958457177,
+      0.2594413210085449
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_large_z"
+   ],
+   "description": "z = -1e+03, 1e+03",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  },
+  {
+   "case_id": "sabrz_k-0032",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     738.905609893065,
+     13.53352832366127
+    ],
+    "expiry_years": 1.0,
+    "alpha": 0.0001,
+    "beta": 1.0,
+    "rho": 0.95,
+    "nu": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.22805843182002578,
+      0.17309770068588742
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "sabr_large_z"
+   ],
+   "description": "z = -1e+05, 1e+05",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-12,
+    "reason": "KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"
+   }
+  }
+ ]
+}
