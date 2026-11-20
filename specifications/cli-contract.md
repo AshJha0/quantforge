@@ -367,7 +367,7 @@ with expected `any`, the alias with `same_as`), so a build whose alias drifts fr
 
 | Alias (deprecated) | Target | Deprecated in | Removal | Ruling |
 |---|---|---|---|---|
-| `xva.simm.ir_delta` | `xva.sbim.ir_delta` | contract 1.17.0 (release v0.10.1) | v1.0.0 | KR-152; goldens `stage_k/sbim_alias_k.json` |
+| `xva.simm.ir_delta` | `xva.sbim.ir_delta` | contract 1.17.0 (on main since 2026-11-20; no v0.10.1 tag) | v1.0.0 | KR-152; goldens `stage_k/sbim_alias_k.json` |
 
 ## R6 changes (contract 1.12.0, rulings `r6-rulings.md`)
 

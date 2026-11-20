@@ -1283,7 +1283,7 @@ In the first case `participation` 1.5 is outside its domain and `market_volume` 
 
 ## Stage K recipes
 
-Stage K round 1, with the round 2 audit fixes, is merged to main 2026-11-20 (pull requests #58 and #59), not tagged; it is released with v1.0.0. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
+Stage K round 1, with the round 2 audit fixes, is merged to main by 2026-11-20 (pull requests #58 and #59), not tagged; it is released with v1.0.0. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
 
 ### Query a bitemporal log
 

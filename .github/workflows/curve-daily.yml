@@ -18,7 +18,7 @@ name: Curve daily
 # between 20:40 and 23:15 UTC, after the cut-off, every day. The three slots below land between 03:10 and 15:30
 # UTC under every delay measured.
 on:
-  # schedule restored at the v0.10.1 release (2026-11-20) after the follow-up different-model audit was
+  # schedule restored on main 2026-11-20 (pull request #59; no v0.10.1 tag) after the follow-up different-model audit was
   # clean and the stage K coordinator confirmed rulings KR-200 to KR-214 and KR-254, KR-255 (KR-206; python/tests/
   # test_daily_jobs_bytes.py checks these lines against the measured start delays).
   schedule:

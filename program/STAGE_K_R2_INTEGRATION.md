@@ -1,5 +1,7 @@
 # Stage K round 1, second pull request: integration log (branch `k-r2`)
 
+Correction 2026-11-20 (owner decision): there is no v0.10.1 tag and there will not be one. This work is merged to `main` (pull requests #58 and #59), not tagged, and released with v1.0.0; the last tag is v0.10.0. The text below is kept as written at the time.
+
 Branch `k-r2` (worktree `C:/Work/Claude/qf-wt/k-r2`), cut from main `864c6e7d` (PR #58 merged). Target: v0.10.1 after this branch and a follow-up audit. Not released; no PR, no merge to main, no tag from this lane.
 
 Integration lane: Claude Opus 5.5. Reviewer: none: self-assessment; no second review (owner decision 2026-11-18).
