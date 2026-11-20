@@ -330,7 +330,7 @@ Stage H (v0.10.0, execution and microstructure) is implemented in all four langu
 
 ## Stage K terms (in progress)
 
-Stage K round 1 is released in v0.10.1 (2026-11-20, pull requests #58 and #59); these terms are defined as its specs use them (read 2026-11-19). [Tutorials 51 to 58](docs/getting-started/README.md#stage-k-in-progress) use them.
+Stage K round 1 is merged to main 2026-11-20 (pull requests #58 and #59), not tagged, and released with v1.0.0; these terms are defined as its specs use them (read 2026-11-19). [Tutorials 51 to 58](docs/getting-started/README.md#stage-k-in-progress) use them.
 
 | Term | Meaning |
 |---|---|

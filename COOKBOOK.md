@@ -21,7 +21,7 @@ The sections below follow the order in which stages were built. To find recipes 
 | 09 Microstructure | [Stage H](#stage-h-recipes-available-from-v0100) (book rebuild, quotes, estimators), [trading conventions](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues) |
 | 10 Execution | [Stage H](#stage-h-recipes-available-from-v0100) (schedules, TCA, simulated venues, paper trading), [simulated auction, FX and futures venues](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues), [liquidity curve](#read-a-liquidity-cost-curve) |
 | 11 Research | [Stage J](#stage-j-recipes) |
-| 12 Platform | [Stage K](#stage-k-recipes) (bitemporal store, daily paper ledger, scheduled from v0.10.1) |
+| 12 Platform | [Stage K](#stage-k-recipes) (bitemporal store, daily paper ledger, scheduled on main since 2026-11-20) |
 
 ## Run a tutorial script
 
@@ -1283,7 +1283,7 @@ In the first case `participation` 1.5 is outside its domain and `market_volume` 
 
 ## Stage K recipes
 
-Stage K round 1 is released in v0.10.1 (2026-11-20, pull requests #58 and #59), with the round 2 audit fixes. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
+Stage K round 1, with the round 2 audit fixes, is merged to main 2026-11-20 (pull requests #58 and #59), not tagged; it is released with v1.0.0. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
 
 ### Query a bitemporal log
 
