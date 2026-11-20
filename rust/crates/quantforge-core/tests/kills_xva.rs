@@ -273,7 +273,14 @@ fn wwr(t: &[f64], v: &[&[f64]], d: &[f64], h: f64, r: f64, b: f64) -> (f64, Vec<
     quantforge_core::xva::wwr_cva_hw(t, &paths, d, h, r, b).expect("valid wwr inputs")
 }
 
-fn wwr_code(t: &[f64], v: &[&[f64]], d: &[f64], h: f64, r: f64, b: f64) -> (&'static str, Option<String>) {
+fn wwr_code(
+    t: &[f64],
+    v: &[&[f64]],
+    d: &[f64],
+    h: f64,
+    r: f64,
+    b: f64,
+) -> (&'static str, Option<String>) {
     let paths: Vec<Vec<f64>> = v.iter().map(|p| p.to_vec()).collect();
     let e = quantforge_core::xva::wwr_cva_hw(t, &paths, d, h, r, b).expect_err("an error");
     (e.code, e.field)
@@ -286,26 +293,66 @@ fn golden_close(got: f64, want: f64) -> bool {
 #[test]
 fn wwr_identical_paths_match_the_closed_form_for_large_b_v() {
     for bv in [-700.0_f64, -60.0, -10.0, 10.0, 20.0, 60.0, 700.0] {
-        let (cva, a) = wwr(&[1.0, 2.0], &[&[bv, bv], &[bv, bv]], &[0.97, 0.94], 0.01, 0.4, 1.0);
+        let (cva, a) = wwr(
+            &[1.0, 2.0],
+            &[&[bv, bv], &[bv, bv]],
+            &[0.97, 0.94],
+            0.01,
+            0.4,
+            1.0,
+        );
         let exact = 0.01_f64.ln() - bv;
         for x in &a {
-            assert!((x - exact).abs() <= 1e-14 * exact.abs().max(1.0), "bv {bv}: a {x} vs {exact}");
+            assert!(
+                (x - exact).abs() <= 1e-14 * exact.abs().max(1.0),
+                "bv {bv}: a {x} vs {exact}"
+            );
         }
-        let want = 0.6 * bv.max(0.0) * (0.97 * -(-0.01_f64).exp_m1() + 0.94 * ((-0.01_f64).exp() - (-0.02_f64).exp()));
+        let want = 0.6
+            * bv.max(0.0)
+            * (0.97 * -(-0.01_f64).exp_m1() + 0.94 * ((-0.01_f64).exp() - (-0.02_f64).exp()));
         // The spec cva tolerance, 1e-12 relative: a + b V carries eps |b V| ~ 1.6e-13 at |b V| = 700.
-        assert!((cva - want).abs() <= 1e-12 * want, "bv {bv}: cva {cva} vs {want}");
+        assert!(
+            (cva - want).abs() <= 1e-12 * want,
+            "bv {bv}: cva {cva} vs {want}"
+        );
     }
 }
 
 #[test]
 fn wwr_oracle_values_mixed_paths_tiny_and_large_hazards() {
-    let p: [&[f64]; 4] = [&[30.0, 25.0, 40.0], &[-20.0, 5.0, -35.0], &[10.0, 40.0, 0.0], &[2.0, -8.0, 15.0]];
+    let p: [&[f64]; 4] = [
+        &[30.0, 25.0, 40.0],
+        &[-20.0, 5.0, -35.0],
+        &[10.0, 40.0, 0.0],
+        &[2.0, -8.0, 15.0],
+    ];
     let (t, d) = ([0.5, 1.0, 2.0], [0.99, 0.98, 0.955]);
     let rows: [(f64, f64, f64, [f64; 3]); 4] = [
-        (0.02, 1.0, 0.853870876724446, [-32.51048602143332, -42.520691113242584, -42.473238050471814]),
-        (0.02, -0.75, 1.6546995325270438e-06, [-17.51048609054749, -8.520749073538585, -28.72323562116894]),
-        (2.0, 0.1, 7.864264489887716, [0.3535902179958872, 0.45596668900756426, 3.6961779146431604]),
-        (1e-10, 0.3, 4.351665120150955e-09, [-30.6422568451193, -33.65063209843197, -33.64011564101081]),
+        (
+            0.02,
+            1.0,
+            0.853870876724446,
+            [-32.51048602143332, -42.520691113242584, -42.473238050471814],
+        ),
+        (
+            0.02,
+            -0.75,
+            1.6546995325270438e-06,
+            [-17.51048609054749, -8.520749073538585, -28.72323562116894],
+        ),
+        (
+            2.0,
+            0.1,
+            7.864264489887716,
+            [0.3535902179958872, 0.45596668900756426, 3.6961779146431604],
+        ),
+        (
+            1e-10,
+            0.3,
+            4.351665120150955e-09,
+            [-30.6422568451193, -33.65063209843197, -33.64011564101081],
+        ),
     ];
     for (h, b, cva_want, a_want) in rows {
         let (cva, a) = wwr(&t, &p, &d, h, 0.4, b);
@@ -316,9 +363,15 @@ fn wwr_oracle_values_mixed_paths_tiny_and_large_hazards() {
     }
     // b V = +700 and -700 on two paths (wwr_g-0018) and hazard 40 (wwr_g-0020).
     let (cva, a) = wwr(&[1.0], &[&[10.0], &[-10.0]], &[0.97], 0.01, 0.4, 70.0);
-    assert!(golden_close(cva, 0.057909967579841924) && golden_close(a[0], -703.9069851686718), "{cva} {a:?}");
+    assert!(
+        golden_close(cva, 0.057909967579841924) && golden_close(a[0], -703.9069851686718),
+        "{cva} {a:?}"
+    );
     let (cva, a) = wwr(&[1.0], &[&[5.0], &[-5.0], &[1.0]], &[0.97], 40.0, 0.4, 0.2);
-    assert!(golden_close(cva, 1.164) && golden_close(a[0], 4.661029923801264), "{cva} {a:?}");
+    assert!(
+        golden_close(cva, 1.164) && golden_close(a[0], 4.661029923801264),
+        "{cva} {a:?}"
+    );
     // h = 1e-50: a = ln h - 700 = -815.13 (wwr_g-0012).
     let (_, a) = wwr(&[1.0], &[&[10.0], &[10.0]], &[0.97], 1e-50, 0.4, 70.0);
     assert!(golden_close(a[0], -815.1292546497023), "{a:?}");
@@ -327,11 +380,23 @@ fn wwr_oracle_values_mixed_paths_tiny_and_large_hazards() {
 #[test]
 fn wwr_limit_and_non_finite_errors_name_their_fields() {
     let one = [0.97];
-    assert_eq!(wwr_code(&[1.0], &[&[1.0], &[-10.0]], &one, 0.01, 0.4, 70.01), ("E_DOMAIN", Some("wwr_b".to_string())));
-    assert_eq!(wwr_code(&[1.0], &[&[1.0]], &one, 709.0, 0.4, 0.0), ("E_NON_FINITE", Some("hazard_rate".to_string())));
-    assert_eq!(wwr_code(&[1.0], &[&[1.0]], &one, 2e-308, 0.4, 0.0), ("E_NON_FINITE", Some("hazard_rate".to_string())));
+    assert_eq!(
+        wwr_code(&[1.0], &[&[1.0], &[-10.0]], &one, 0.01, 0.4, 70.01),
+        ("E_DOMAIN", Some("wwr_b".to_string()))
+    );
+    assert_eq!(
+        wwr_code(&[1.0], &[&[1.0]], &one, 709.0, 0.4, 0.0),
+        ("E_NON_FINITE", Some("hazard_rate".to_string()))
+    );
+    assert_eq!(
+        wwr_code(&[1.0], &[&[1.0]], &one, 2e-308, 0.4, 0.0),
+        ("E_NON_FINITE", Some("hazard_rate".to_string()))
+    );
     // Two errors at once: the domain error comes before the non-finite one (wwr_g-0025).
-    assert_eq!(wwr_code(&[1.0], &[&[1.0]], &one, 800.0, 1.0, 0.0).0, "E_DOMAIN");
+    assert_eq!(
+        wwr_code(&[1.0], &[&[1.0]], &one, 800.0, 1.0, 0.0).0,
+        "E_DOMAIN"
+    );
     // Inclusive limits: |b V| = 700 and h t = 708 both run; every path defaults, cva = 0.6 0.97 10 / 2.
     let (cva, _) = wwr(&[1.0], &[&[10.0], &[-10.0]], &one, 708.0, 0.4, 70.0);
     assert!((cva - 0.6 * 0.97 * 5.0).abs() <= 1e-12 * cva, "{cva}");

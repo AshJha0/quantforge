@@ -421,7 +421,14 @@ fn wwr_root(surv: &[f64], cs: &[f64], dt: f64, h: f64) -> Result<f64> {
             sr += s * r;
             d += s * dq;
         }
-        (if use_q { sq - q_t * total } else { r_t * total - sr }, d)
+        (
+            if use_q {
+                sq - q_t * total
+            } else {
+                r_t * total - sr
+            },
+            d,
+        )
     };
     let ln_h = h.ln();
     let (mut lo, mut hi) = (
@@ -452,7 +459,10 @@ fn wwr_root(surv: &[f64], cs: &[f64], dt: f64, h: f64) -> Result<f64> {
         a = step;
         (val, der) = f(a);
     }
-    fail("E_NO_CONVERGENCE", "the a(t) root did not converge in 200 steps")
+    fail(
+        "E_NO_CONVERGENCE",
+        "the a(t) root did not converge in 200 steps",
+    )
 }
 
 #[cfg(test)]

@@ -277,7 +277,10 @@ def wwr_cva(
         raise _domain("|wwr_b * value| must be at most 700 (KR-257)", "wwr_b")
     prev = 0.0
     for t in times:
-        if math.exp(-hazard_rate * t) < _MIN_NORMAL or -math.expm1(-hazard_rate * (t - prev)) < _MIN_NORMAL:
+        if (
+            math.exp(-hazard_rate * t) < _MIN_NORMAL
+            or -math.expm1(-hazard_rate * (t - prev)) < _MIN_NORMAL
+        ):
             raise QfError(
                 "E_NON_FINITE",
                 "the survival target or a bucket default probability is below the smallest normal double",
@@ -295,7 +298,9 @@ def wwr_cva(
         qr = [_wwr_terms(a + c, dt) for c in cs]
         buckets.append(
             dfs[i]
-            * ordered_sum(max(p[i], 0.0) * s * x[0] for p, s, x in zip(values, surv, qr, strict=True))
+            * ordered_sum(
+                max(p[i], 0.0) * s * x[0] for p, s, x in zip(values, surv, qr, strict=True)
+            )
             / count
         )
         surv = [s * x[1] for s, x in zip(surv, qr, strict=True)]
@@ -355,7 +360,9 @@ def _wwr_root(surv: list[float], cs: list[float], dt: float, h: float) -> float:
             return step
         a = step
         val, der = f(a)
-    raise QfError("E_NO_CONVERGENCE", "the a(t) root did not converge in 200 steps", "wwr_b")  # pragma: no cover
+    raise QfError(
+        "E_NO_CONVERGENCE", "the a(t) root did not converge in 200 steps", "wwr_b"
+    )  # pragma: no cover
 
 
 # --- model reserve (G-36) -------------------------------------------------------------------------
