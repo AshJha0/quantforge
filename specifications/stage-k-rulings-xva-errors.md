@@ -48,4 +48,4 @@ Written 2026-11-20 by the lane `k-v1-fix`. **Status: PROPOSED** (awaits the stag
 | S8 | `portfolio_hw` | Empty `pfe_quantiles`: `E_DOMAIN`, ok, ok, ok | Spec silent |
 | S9 | `portfolio_hw` | A payment time of 700 years: `E_INPUT`, `E_INPUT`, ok, ok | Not investigated |
 
-No divergence was found in `xva.sbim.ir_delta` except S7, and none in the error codes of the three wave 4b operations after the fix (inferred from the same two runs repeated on the fixed builds, see the CHANGELOG entry).
+No divergence was found in `xva.sbim.ir_delta` except S7. After the fix the same two runs, repeated on the fixed builds of this branch, show no error-code difference in the three wave 4b operations (measured, 2026-11-20 19:40 UTC); the 44 remaining code differences of the 3,600 requests are all S1 to S9.
