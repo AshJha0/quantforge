@@ -85,6 +85,7 @@ CORE_MODULES = (
     "paper",
     "paper_fills",
     "xva",
+    "xva_aad",
     "risk_tools",
     "aad_ladder",
     "frtb",
