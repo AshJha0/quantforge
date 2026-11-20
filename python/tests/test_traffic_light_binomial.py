@@ -67,3 +67,22 @@ def test_traffic_light_small_n_unchanged_by_the_switch() -> None:
 
 def test_traffic_light_all_exceptions_is_one() -> None:
     assert var_risk.traffic_light(7, 7, 0.99)["cumulative_probability"] == 1.0
+
+
+# Audit KF-21 (2026-11-20): the double-double power against exact binary64 results (a^n / 2^(kn) rounded once,
+# exact integer arithmetic, lane k-r2-gate). Plain binary64 powering gives a different value on each of the
+# four large cases (for example 0.36787925722078507 at 0.999999^1,000,000), so a plain loop fails this test.
+@pytest.mark.parametrize(
+    ("c", "n", "want"),
+    [
+        (0.99, 250, 0.08105851616218128),
+        (0.95, 7, 0.6983372960937497),
+        (0.9999, 99_999, 4.5381772136224775e-05),
+        (0.999999, 1_000_000, 0.36787925722106646),
+    ],
+)
+def test_power_is_the_correctly_rounded_binary64_result(c: float, n: int, want: float) -> None:
+    from quantforge_core.frtb_backtest import power
+
+    assert power(c, n) == want
+    assert power(c, 1) == c
