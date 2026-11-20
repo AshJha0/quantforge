@@ -26,6 +26,8 @@ KINDS = ("GENESIS", "DAY", "GAP", "CONSISTENCY")
 FINAL = ("ok", "fit_failed", "holdout_blocked")  # a DAY row with one of these settles its date
 NON_FINAL = ("stale_input", "fetch_failed")  # retried by a later run until the late window closes
 STATUSES = FINAL + NON_FINAL
+GAP_CAUSES = ("late_window", "not_published")  # KR-203: why a date was closed without a fit
+REBUILD_TOL = 1e-6  # KR-207: a refit on another platform may differ in the last bits of exp, log and pow
 CODE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
 Runner = Callable[[list[dict[str, Any]]], dict[str, dict[str, Any]]]
@@ -54,6 +56,23 @@ def fstr(x: float) -> str:
     return "0.0" if s == "-0.0" else s
 
 
+def _all_strings(values: Any) -> bool:
+    """True when every scalar under `values` is a string. The common case, checked without building paths."""
+    stack = list(values)
+    while stack:
+        x = stack.pop()
+        t = type(x)
+        if t is str:
+            continue
+        if t is dict:
+            stack.extend(x.values())
+        elif t is list:
+            stack.extend(x)
+        else:
+            return False
+    return True
+
+
 def canonical(record: dict[str, Any]) -> bytes:
     """Row bytes without `hash`: keys sorted, `,` and `:` separators, ASCII. Every scalar is a string except
     `seq` (the HR-45 rule of paper-trading.md, reused as the paper ledger does)."""
@@ -69,7 +88,8 @@ def canonical(record: dict[str, Any]) -> bytes:
             raise CurveError(f"{path} must be a string (only seq is an integer)")
 
     body = {k: v for k, v in record.items() if k != "hash"}
-    check(body, "")
+    if type(body.get("seq", "")) not in (int, str) or not _all_strings(v for k, v in body.items() if k != "seq"):
+        check(body, "")  # the slow walk, which names the path that is not a string
     return json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("ascii")
 
 
@@ -97,9 +117,24 @@ def _no_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     return out
 
 
+def read_ledger(path: Any) -> str:
+    """The ledger file as text, byte for byte: ASCII, no newline translation (KR-208). A missing file is ""."""
+    p = Path(path)
+    return p.read_bytes().decode("ascii") if p.exists() else ""
+
+
+def lines_of(text: str) -> list[str]:
+    """The lines of a ledger: each ends with one line feed and the file holds nothing else (KR-208)."""
+    if text == "":
+        return []
+    if not text.endswith("\n"):
+        raise ValueError("the ledger does not end with a line feed")
+    return text[:-1].split("\n")
+
+
 def parse(text: str) -> list[dict[str, Any]]:
     rows = []
-    for n, ln in enumerate(text.splitlines()):
+    for n, ln in enumerate(lines_of(text)):
         rec = json.loads(ln, object_pairs_hook=_no_duplicates)
         if not isinstance(rec, dict):
             raise ValueError(f"line {n} is not an object")
@@ -118,8 +153,16 @@ def day(s: str) -> dt.date:
     return dt.date.fromisoformat(s)
 
 
+INSTANT = re.compile(r"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z", re.ASCII)
+
+
 def instant(s: str) -> dt.datetime:
-    return dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
+    """A row time: exactly `YYYY-MM-DDTHH:MM:SSZ`, UTC. Anything else is a ValueError."""
+    m = INSTANT.fullmatch(s) if isinstance(s, str) else None
+    if m is None:
+        raise ValueError(f"{s!r} is not YYYY-MM-DDTHH:MM:SSZ")
+    y, mo, d, h, mi, sec = (int(x) for x in m.groups())
+    return dt.datetime(y, mo, d, h, mi, sec, tzinfo=dt.timezone.utc)
 
 
 def stamp(t: dt.datetime) -> str:
@@ -172,18 +215,13 @@ class Calendar:
         return bool(self.known[d])
 
     def next_open(self, d: dt.date) -> dt.date:
-        self.load(d, d + dt.timedelta(days=12))
         n = d + dt.timedelta(days=1)
-        while not self.known[n]:
+        while True:
+            if n not in self.known:
+                self.load(n, n + dt.timedelta(days=12))
+            if self.known[n]:
+                return n
             n += dt.timedelta(days=1)
-        return n
-
-    def prev_open(self, d: dt.date) -> dt.date:
-        self.load(d - dt.timedelta(days=12), d)
-        n = d - dt.timedelta(days=1)
-        while not self.known[n]:
-            n -= dt.timedelta(days=1)
-        return n
 
     def open_between(self, after: dt.date, upto: dt.date) -> list[dt.date]:
         """Business days d with after < d <= upto."""
@@ -241,15 +279,31 @@ def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+class NotTheFile(Exception):
+    """The bytes fetched are not the Treasury CSV (an error page served with HTTP 200, a cut-off download).
+    Recorded as `fetch_failed` and retried (KR-204); it says nothing about the day's yields."""
+
+
 def treasury_rows(data: bytes) -> dict[str, dict[str, str]]:
-    """Rows of a Treasury daily par yield CSV keyed by ISO date. Dates are MM/DD/YYYY in the file."""
-    text = data.decode("utf-8-sig")
+    """Rows of a Treasury daily par yield CSV keyed by ISO date. Dates are MM/DD/YYYY in the file. A file with
+    no `Date` column, or with a date that does not read, raises NotTheFile."""
+    try:
+        text = data.decode("utf-8-sig")
+    except UnicodeDecodeError as e:
+        raise NotTheFile("not UTF-8 text") from e
+    reader = csv.DictReader(io.StringIO(text))
+    if "Date" not in [(f or "").strip() for f in (reader.fieldnames or [])]:
+        raise NotTheFile("no Date column in the first line")
     out = {}
-    for r in csv.DictReader(io.StringIO(text)):
-        raw = (r.get("Date") or "").strip()
+    for r in reader:
+        raw = next(((v or "").strip() for k, v in r.items() if k and k.strip() == "Date"), "")
         m = re.fullmatch(r"(\d{2})/(\d{2})/(\d{4})", raw)
         if not m:
-            raise CurveError(f"Treasury file: date {raw!r} is not MM/DD/YYYY")
+            raise NotTheFile(f"date {raw[:20]!r} is not MM/DD/YYYY")
+        try:
+            dt.date(int(m[3]), int(m[1]), int(m[2]))
+        except ValueError as e:
+            raise NotTheFile(f"date {raw!r} is not a calendar date") from e
         out[f"{m[3]}-{m[1]}-{m[2]}"] = {k.strip(): (v or "").strip() for k, v in r.items() if k}
     return out
 
@@ -307,7 +361,17 @@ def par_bonds(d: dt.date, row: dict[str, str], cfg: dict[str, Any]) -> list[dict
 
 
 def fit_day(d: dt.date, row: dict[str, str], cfg: dict[str, Any], runner: Runner) -> dict[str, Any]:
-    """Fit body for one day, or raise FitFailed with the first error code."""
+    """Fit body for one day, or raise FitFailed with the first error code. A non-finite number anywhere is
+    `E_NONFINITE`: a recorded failed fit, not a refused run (a refusal would repeat on every later run)."""
+    try:
+        return _fit_day(d, row, cfg, runner)
+    except CurveError as e:
+        raise FitFailed("E_NONFINITE", str(e)) from e
+    except (ZeroDivisionError, OverflowError, ValueError) as e:
+        raise FitFailed("E_NONFINITE", f"{type(e).__name__}: {e}") from e
+
+
+def _fit_day(d: dt.date, row: dict[str, str], cfg: dict[str, Any], runner: Runner) -> dict[str, Any]:
     settle = iso(d)
     bonds = par_bonds(d, row, cfg)
     r = runner([case(b["field"], "bond.price.from_yield", {"bond": b["bond"], "settlement": settle,
@@ -445,16 +509,19 @@ def run(cfg: dict[str, Any], runner: Runner, ledger_text: str, now: dt.datetime,
         prev = (new or rows)[-1]["hash"] if (new or rows) else GENESIS
         new.append(make_row(len(rows) + len(new), ts, kind, cfg, body, prev))
 
+    if rows and now < instant(rows[-1]["ts"]):
+        raise CurveError(f"the clock ({ts}) is before the last row ({rows[-1]['ts']}); nothing written")
     if not rows:
         add("GENESIS", {"config": cfg, "config_sha256": config_sha(cfg)})
+    # KR-203: dates are handled strictly in order and a run stops at the first date it cannot settle, so at
+    # most one date (the last one with a row) is ever unsettled and no later date gets a row before it.
     settled = {r["body"]["date"] for r in rows if r["kind"] == "GAP" or
                (r["kind"] == "DAY" and r["body"]["status"] in FINAL)}
     dated = [r["body"]["date"] for r in rows if r["kind"] in ("DAY", "GAP")]
     target = latest_due(now, cal, cfg)
-    if dated:  # start at the earliest date still open (verify: MISSING keeps every older date settled)
-        open_dates = sorted(set(dated) - settled)
-        first = day(open_dates[0] if open_dates else max(dated))
-        due = [d for d in [first, *cal.open_between(first, target)] if iso(d) not in settled]
+    if dated:
+        last = day(dated[-1])
+        due = ([] if dated[-1] in settled else [last]) + cal.open_between(last, target)
     else:
         due = [target]  # the first run starts at the latest due day; nothing is back-filled
     files: dict[int, tuple[bytes | None, str]] = {}
@@ -469,6 +536,10 @@ def run(cfg: dict[str, Any], runner: Runner, ledger_text: str, now: dt.datetime,
                 files[year] = (None, url)
         return files[year]
 
+    def file_input(data: bytes, url: str, latest: str) -> dict[str, str]:
+        return {"url": url, "sha256": sha256(data), "bytes": str(len(data)), "latest_date": latest,
+                "attribution": cfg["treasury"]["attribution"]}
+
     for d in due:
         ds = iso(d)
         hit = holdout_hit(ds, windows)
@@ -478,32 +549,49 @@ def run(cfg: dict[str, Any], runner: Runner, ledger_text: str, now: dt.datetime,
             notes.append(f"{ds}: holdout_blocked ({', '.join(hit)}); no input read")
             continue
         if now > late_limit(d, cal, cfg):
-            add("GAP", {"date": ds, "reason": "no settled row before the late window closed", "run": run_info})
-            notes.append(f"{ds}: GAP")
+            add("GAP", {"date": ds, "cause": "late_window", "reason": "no settled row before the late window closed",
+                        "run": run_info})
+            notes.append(f"{ds}: GAP (late window closed)")
             continue
         timing = "on_time" if now < cutoff(d, cal, cfg) else "late"
         data, url = treasury(d.year)
         base = {"date": ds, "timing": timing, "run": run_info}
         if data is None:
             add("DAY", {**base, "status": "fetch_failed", "input": {"url": url}})
-            notes.append(f"{ds}: fetch_failed")
-            continue
+            notes.append(f"{ds}: fetch_failed; stopping here, a later run tries again")
+            break
         try:
             table = treasury_rows(data)
-        except CurveError as e:
-            add("DAY", {**base, "status": "fit_failed", "error": {"code": "E_PARSE", "detail": str(e)},
+        except NotTheFile as e:  # KR-204: retried, never a settled failed fit
+            add("DAY", {**base, "status": "fetch_failed", "error": {"code": "E_NOT_THE_FILE", "detail": str(e)},
                         "input": {"url": url, "sha256": sha256(data), "bytes": str(len(data))}})
-            notes.append(f"{ds}: fit_failed E_PARSE")
-            continue
+            notes.append(f"{ds}: fetch_failed (the download is not the Treasury CSV: {e}); stopping here")
+            break
         latest = max(table) if table else ""
-        inp = {"url": url, "sha256": sha256(data), "bytes": str(len(data)), "latest_date": latest,
-               "attribution": cfg["treasury"]["attribution"]}
+        inp = file_input(data, url, latest)
         if ds not in table:
+            # Treasury moved past this date without publishing it: closed now, with the evidence (KR-203).
+            evidence = inp if latest > ds else None
+            for year in range(d.year + 1, now.year + 1):  # a year end: the later date is in the next file
+                if evidence is not None:
+                    break
+                data2, url2 = treasury(year)
+                try:
+                    table2 = treasury_rows(data2) if data2 is not None else {}
+                except NotTheFile:
+                    table2 = {}
+                if data2 is not None and table2 and max(table2) > ds:
+                    evidence = file_input(data2, url2, max(table2))
+            if evidence is not None:
+                add("GAP", {"date": ds, "cause": "not_published", "input": evidence, "run": run_info,
+                            "reason": "the Treasury file holds a later date and not this one"})
+                notes.append(f"{ds}: GAP (not published; the file is at {evidence['latest_date']})")
+                continue
             add("DAY", {**base, "status": "stale_input", "input": inp})
-            notes.append(f"{ds}: stale_input (latest in file {latest or 'none'})")
-            continue
+            notes.append(f"{ds}: stale_input (latest in file {latest or 'none'}); stopping here, a later run tries again")
+            break
         inp["row_date"] = ds
-        inp["row_sha256"] = sha256(input_line(table[ds], cfg).encode("ascii"))
+        inp["row_sha256"] = sha256(input_line(table[ds], cfg).encode("utf-8"))  # ASCII in practice; never a crash
         try:
             fit = fit_day(d, table[ds], cfg, runner)
         except FitFailed as e:
@@ -545,56 +633,38 @@ def bad(seq: int, reason: str, detail: str = "") -> dict[str, Any]:
     return {"ok": False, "first_bad_seq": seq, "reason": reason, "detail": detail}
 
 
-def verify(text: str, cfg: dict[str, Any] | None = None, runner: Runner | None = None,
-           windows: dict[str, tuple[str, str]] | None = None) -> dict[str, Any]:
-    """Every check, in order; stops at the first failure and never repairs. Without a runner the calendar
-    checks (business days, timing, missing days) are skipped and the result says so."""
-    cfg = cfg or load_config()
-    windows = holdout_windows() if windows is None else windows
-    cal = Calendar(runner, cfg["calendar"]) if runner else None
-    prev = GENESIS
-    rows: list[dict[str, Any]] = []
-    for n, ln in enumerate(text.splitlines()):
-        try:
-            rec = json.loads(ln, object_pairs_hook=_no_duplicates)
-            if not isinstance(rec, dict):
-                return bad(n, "PARSE")
-            computed = row_hash(rec)
-            stored = rec["hash"]
-        except (ValueError, KeyError, CurveError) as e:
-            return bad(n, "PARSE", str(e))
-        if rec.get("seq") != n:
-            return bad(n, "SEQ")
-        if computed != stored:
-            return bad(n, "HASH")
-        if rec.get("prev") != prev:
-            return bad(n, "LINK")
-        if rec.get("format") != cfg["format"]:
-            return bad(n, "FORMAT")
-        if rec.get("label") != cfg["label"]:
-            return bad(n, "LABEL")
-        if rec.get("kind") not in KINDS or (rec["kind"] == "GENESIS") != (n == 0):
-            return bad(n, "KIND")
-        prev = stored
-        rows.append(rec)
-    if not rows:
-        return bad(0, "EMPTY")
-    g = rows[0]["body"]
-    if g.get("config") != cfg or g.get("config_sha256") != config_sha(cfg):
-        return bad(0, "CONFIG", "the genesis configuration differs from config.json")
-    settled: dict[str, int] = {}
-    last_date = ""
+def _check_rows(rows: list[dict[str, Any]], cfg: dict[str, Any], cal: Calendar | None,
+                windows: dict[str, tuple[str, str]]) -> dict[str, Any] | None:
+    """The row rules after the chain and the configuration: the first fault, or None.
+
+    Dates (KR-203): the rows walk the business days strictly in order. At any point at most one date is
+    unsettled, and it is the last one with a row; until it is settled no other date may have a row. A settled
+    date never gets another row, and (with the calendar) the next date is the next business day, so none is
+    skipped. This is the rule the writer follows, which is why any ledger the writer can reach verifies."""
+    open_date = ""  # the one unsettled date, or ""
+    last_settled = ""
+    last_ts = rows[0]["ts"]
+    instant(last_ts)
     by_hash = {r["hash"]: r for r in rows}
     compared: set[str] = set()
+    first_dated = True
     for r in rows[1:]:
         n, b, kind = r["seq"], r["body"], r["kind"]
+        if instant(r["ts"]) < instant(last_ts):
+            return bad(n, "TS", f"{r['ts']} is before the previous row's {last_ts}")
+        last_ts = r["ts"]
         if kind in ("DAY", "GAP"):
             ds = b.get("date", "")
-            if ds < last_date:
-                return bad(n, "ORDER", f"{ds} after {last_date}")
-            last_date = ds
-            if ds in settled:
-                return bad(n, "DUP", f"{ds} already settled at seq {settled[ds]}")
+            d = day(ds)
+            if open_date:
+                if ds != open_date:
+                    return bad(n, "ORDER", f"a row for {ds} while {open_date} is unsettled")
+            elif ds == last_settled:
+                return bad(n, "DUP", f"{ds} is already settled")
+            elif ds < last_settled:
+                return bad(n, "ORDER", f"{ds} after {last_settled}")
+            elif cal is not None and last_settled and d != cal.next_open(day(last_settled)):
+                return bad(n, "MISSING", f"business day {iso(cal.next_open(day(last_settled)))} has no row")
             status = b.get("status") if kind == "DAY" else "gap"
             if kind == "DAY" and status not in STATUSES:
                 return bad(n, "STATUS", str(status))
@@ -604,21 +674,39 @@ def verify(text: str, cfg: dict[str, Any] | None = None, runner: Runner | None =
                     return bad(n, "HOLDOUT", f"{ds}: a holdout_blocked row must name the windows and read nothing")
             elif hit:
                 return bad(n, "HOLDOUT", f"{ds} is inside the holdout window of {', '.join(hit)}")
+            t = instant(r["ts"])
+            if first_dated and (n != 1 or kind != "DAY" or r["ts"] != rows[0]["ts"]):
+                return bad(n, "START", "the first dated row is a DAY row written by the run that wrote GENESIS")
             if cal is not None:
-                d = day(ds)
                 if not cal.is_open(d):
                     return bad(n, "DATE", f"{ds} is not a {cfg['calendar']} business day")
-                t = instant(r["ts"])
                 if t < due_instant(d, cfg):
                     return bad(n, "EARLY", f"{ds} written at {r['ts']}, before it was due")
+                if first_dated and d != latest_due(t, cal, cfg):
+                    return bad(n, "START", f"the ledger starts at {ds}, not at the latest day due at {r['ts']}")
                 if kind == "DAY" and b.get("timing") != ("on_time" if t < cutoff(d, cal, cfg) else "late"):
                     return bad(n, "TIMING", f"{ds} labelled {b.get('timing')}")
                 if kind == "DAY" and status != "holdout_blocked" and t > late_limit(d, cal, cfg):
                     return bad(n, "TIMING", f"{ds}: a DAY row after the late window must be a GAP")
+            first_dated = False
+            if kind == "GAP":
+                cause = b.get("cause")
+                if cause == "not_published":
+                    if not str((b.get("input") or {}).get("latest_date", "")) > ds:
+                        return bad(n, "GAPRULE", f"{ds}: a not_published gap needs a file dated after it")
+                elif cause == "late_window":
+                    if cal is not None and not t > late_limit(d, cal, cfg):
+                        return bad(n, "GAPRULE", f"{ds}: gap declared inside the late window")
+                else:
+                    return bad(n, "GAPRULE", f"{ds}: unknown gap cause {cause!r}")
             if status == "fit_failed":
                 e = b.get("error") or {}
                 if not CODE.match(str(e.get("code", ""))) or "fit" in b:
                     return bad(n, "FAILCODE", f"{ds}: a failed fit needs an error code and no fit")
+            if status in NON_FINAL and "fit" in b:
+                return bad(n, "FAILCODE", f"{ds}: a {status} row has no fit")
+            if status == "stale_input" and not str((b.get("input") or {}).get("latest_date", "")) < ds:
+                return bad(n, "STALE", f"{ds}: a stale_input row needs a file that ends before {ds}")
             if status == "ok":
                 inp, fit = b.get("input") or {}, b.get("fit") or {}
                 if inp.get("row_date") != ds or not inp.get("latest_date", "") >= ds or "error" in b:
@@ -632,7 +720,9 @@ def verify(text: str, cfg: dict[str, Any] | None = None, runner: Runner | None =
                                             fit.get("within_fit_flag")):
                     return bad(n, "DIAG", f"{ds}: RMSE, max or flag do not follow from errors_bp")
             if kind == "GAP" or status in FINAL:
-                settled[ds] = n
+                last_settled, open_date = ds, ""
+            else:
+                open_date = ds
         else:  # CONSISTENCY
             ref = by_hash.get(b.get("day_row", ""))
             if ref is None or ref["seq"] >= n or ref["kind"] != "DAY" or ref["body"].get("status") != "ok" \
@@ -650,16 +740,59 @@ def verify(text: str, cfg: dict[str, Any] | None = None, runner: Runner | None =
                     return bad(n, "VERDICT", f"{b['date']}: the verdict does not follow from diffs_bp")
             elif b.get("status") != "unavailable":
                 return bad(n, "STATUS", str(b.get("status")))
-    if cal is not None:
-        dated = sorted({r["body"]["date"] for r in rows if r["kind"] in ("DAY", "GAP")})
-        if dated:
-            first, last = day(dated[0]), day(dated[-1])
-            end = instant(rows[-1]["ts"])
-            for d in [first, *cal.open_between(first, last)]:
-                if iso(d) not in dated:
-                    return bad(len(rows), "MISSING", f"business day {iso(d)} has no row")
-                if iso(d) not in settled and end > late_limit(d, cal, cfg):
-                    return bad(len(rows), "MISSING", f"business day {iso(d)} was never settled")
+    return None
+
+
+def verify(text: str, cfg: dict[str, Any] | None = None, runner: Runner | None = None,
+           windows: dict[str, tuple[str, str]] | None = None) -> dict[str, Any]:
+    """Every check, in order; stops at the first failure and never repairs. Without a runner the calendar
+    checks (business days, timing, missing days) are skipped and the result says so."""
+    cfg = cfg or load_config()
+    windows = holdout_windows() if windows is None else windows
+    cal = Calendar(runner, cfg["calendar"]) if runner else None
+    prev = GENESIS
+    rows: list[dict[str, Any]] = []
+    try:
+        lines = lines_of(text)
+    except ValueError as e:
+        return bad(text.count("\n"), "BYTES", str(e))
+    for n, ln in enumerate(lines):
+        try:
+            rec = json.loads(ln, object_pairs_hook=_no_duplicates)
+            if not isinstance(rec, dict):
+                return bad(n, "PARSE")
+            computed = row_hash(rec)
+            stored = rec["hash"]
+        except (ValueError, KeyError, CurveError) as e:
+            return bad(n, "PARSE", str(e))
+        if rec.get("seq") != n:
+            return bad(n, "SEQ")
+        if computed != stored:
+            return bad(n, "HASH")
+        if ln != line(rec):  # KR-208: one serialisation only, so the file's bytes follow from its rows
+            return bad(n, "BYTES", "the line is not the canonical serialisation of its row")
+        if rec.get("prev") != prev:
+            return bad(n, "LINK")
+        if rec.get("format") != cfg["format"]:
+            return bad(n, "FORMAT")
+        if rec.get("label") != cfg["label"]:
+            return bad(n, "LABEL")
+        if rec.get("kind") not in KINDS or (rec["kind"] == "GENESIS") != (n == 0):
+            return bad(n, "KIND")
+        prev = stored
+        rows.append(rec)
+    if not rows:
+        return bad(0, "EMPTY")
+    g = rows[0]["body"]
+    if g.get("config") != cfg or g.get("config_sha256") != config_sha(cfg):
+        return bad(0, "CONFIG", "the genesis configuration differs from config.json")
+    try:
+        fault = _check_rows(rows, cfg, cal, windows)
+    except (KeyError, ValueError, TypeError, AttributeError) as e:
+        return bad(len(rows), "SCHEMA", f"{type(e).__name__}: {e}")
+    if fault:
+        return fault
+    last_date = next((r["body"]["date"] for r in reversed(rows) if r["kind"] in ("DAY", "GAP")), "")
     counts = {s: 0 for s in (*STATUSES, "gap", "late", "within", "outside", "unavailable")}
     for r in rows:
         if r["kind"] == "DAY":
