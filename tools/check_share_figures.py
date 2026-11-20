@@ -52,8 +52,8 @@ def check_text(rel, text, items, suites, total):
     bad = []
     for n, line in enumerate(text.split("\n"), 1):
         for m in SHARE.finditer(line):
-            # items named from 300 characters before the figure to 80 after it, so a long line mixing stages is read locally
-            win = line[max(0, m.start() - 300):m.end() + 80]
+            # items named in the bullet head (first 160 characters) or from 300 characters before the figure to 80 after it, so a long line mixing stages is read locally
+            win = line[:160] + " " + line[max(0, m.start() - 300):m.end() + 80]
             allowed = set()
             for s, pair in suites.items():
                 if re.search(r"\b%s\b" % re.escape(s), win):
