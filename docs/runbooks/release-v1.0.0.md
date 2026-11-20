@@ -145,7 +145,13 @@ The site at <https://ashjha0.github.io/quantforge/> is built from `main` by `doc
 gh run list --workflow docs.yml --branch main --limit 1
 ```
 
-The run must be green. Then open the home page and check that it names the release from `tools/site_facts.json`, and that the results page (`docs/results.md`, built to `docs/results.html`) and the known-issues page load. The G10 layout check (ruling KR-227: 1280 and 375 px, dark mode) has no script yet; until it does, it is a manual check recorded in the release notes.
+The run must be green. Then open the home page and check that it names the release from `tools/site_facts.json`, and that the results page (`docs/results.md`, built to `docs/results.html`) and the known-issues page load. The G10 layout check (ruling KR-227, confirmed 2026-11-20) is part of the same run: jobs `docs-site-view` (every page at 1280 px and at 375 px in light and dark mode, after its planted 600 px element fails) and `docs-site-view-summary`, and the dark-mode pa11y step of `docs-site`. Download the merged table and paste `site-view.md` into the release notes (`gh release edit v1.0.0 --notes-file` with the notes plus the table):
+
+```bash
+gh run download <run-id> --repo AshJha0/quantforge --name site-view --dir site-view
+```
+
+If a page fails, it is fixed or listed in `docs/known-issues.md` with its measured width; it is never left out of the check. Written 2026-11-20 before these jobs first ran in CI (inferred from the workflow file).
 
 ## 8. Rollback
 
@@ -168,4 +174,4 @@ Then release v1.0.1 with the fix and a CHANGELOG `## 1.0.1` section that says wh
 
 - Neither the tag run nor `release-verify` has ever run on v1.0.0; the first run is the release itself.
 - `gh attestation verify` output above is recalled, not observed here.
-- Registry publishing (G3b) waits for the owner's own accounts (ruling KR-226); nothing in this runbook publishes to PyPI or crates.io.
+- Registry publishing (G3b) is not done: owner decision 2026-11-20, no PyPI or crates.io accounts (ruling KR-226 and the dated line under it in `specifications/stage-k-rulings-k7.md`). Nothing in this runbook publishes to a registry, and `pip install quantforge` or `cargo add` from a registry will not install this project. Users install v1.0.0 from the release assets (the Python wheel, `quantforge-cli.jar`, the Rust and C++ CLI archives, each listed in `SHA256SUMS` and attested; check them with `gh attestation verify` as above) or build from source with CONTRIBUTING's commands.

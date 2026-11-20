@@ -3,7 +3,7 @@ name: Tutorial
 # language, and fails if a block prints anything other than the lines a page shows (plan 13.2 E2). Page 1 builds
 # each CLI and pages 2 to 26 reuse it. Tutorial 1's acceptance test is under 10 minutes per language from a cold
 # start, so the jobs use no build cache; the timeout allows for the later pages. After the pages each job sends every
-# examples/*.json case to the CLI page 1 built (tools/check_examples.py; K-7, ruling KR-222, proposed).
+# examples/*.json case to the CLI page 1 built (tools/check_examples.py; K-7, ruling KR-222, confirmed 2026-11-20).
 on:
   push:
     branches: [main]

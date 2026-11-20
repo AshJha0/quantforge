@@ -1,6 +1,6 @@
 # Runbooks
 
-One page per thing that can go wrong in operation, read when it has. Plan item 14.8 K-7 asks for runbooks; the spec is `specifications/12-platform/release-evidence.md` (check RE3, ruling KR-224, both PROPOSED).
+One page per thing that can go wrong in operation, read when it has. Plan item 14.8 K-7 asks for runbooks; the spec is `specifications/12-platform/release-evidence.md` (check RE3, ruling KR-224, confirmed 2026-11-20).
 
 | Runbook | Use it when |
 |---|---|

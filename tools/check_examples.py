@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Clean-machine run of every example (plan 14.8 K-7, check RE1, ruling KR-222, PROPOSED).
+"""Clean-machine run of every example (plan 14.8 K-7, check RE1, ruling KR-222, confirmed 2026-11-20).
 
     python tools/check_examples.py --lang python          every examples/*.json and batch.jsonl case through a CLI,
                                                           then every example script no tutorial page runs
