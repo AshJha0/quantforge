@@ -323,18 +323,16 @@ def test_the_paper_workflow_commits_only_the_ledger_and_follows_the_recorder() -
 
 
 @pytest.mark.parametrize("wf", [PAPER, CURVE])
-def test_no_daily_job_is_scheduled_while_audit_findings_are_open(wf: str) -> None:
-    """Triggers withheld (2026-11-19, integration branch) until audit findings KA-C1, C2, C3, C9, C11, C12 are
-    closed: manual runs only. The findings are answered by proposed rulings; restoring the triggers is the
-    coordinator's change once the rulings are confirmed and the Linux bytes job is green."""
+def test_daily_job_schedule_restored_at_release(wf: str) -> None:
+    """Triggers were withheld (2026-11-19) until audit findings KA-C1, C2, C3, C9, C11, C12 were closed; restored
+    at the v0.10.1 release (2026-11-20) after the follow-up different-model audit was clean and the coordinator
+    confirmed KR-200 to KR-214, KR-254 and KR-255. Manual runs stay available."""
     code = [ln.split("#")[0] for ln in wf.splitlines()]
-    assert not any("schedule:" in ln or "cron:" in ln or "workflow_run:" in ln for ln in code)
+    assert any(ln.strip() == "schedule:" for ln in code)
+    assert sum("cron:" in ln for ln in code) >= 2
     assert any(ln.strip() == "workflow_dispatch:" for ln in code)
-    assert (
-        "schedule withheld until the different-model audit findings KA-C1, C2, C3, C9, C11, C12 are closed"
-        in wf
-    )
-    assert "python-daily-jobs-bytes is green" in wf and "KR-200 to KR-214" in wf
+    assert "schedule restored at the v0.10.1 release" in wf
+    assert "KR-200 to KR-214" in wf
 
 
 def test_the_curve_workflow_cites_both_sources_in_the_branch_readme() -> None:

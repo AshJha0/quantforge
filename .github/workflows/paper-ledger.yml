@@ -15,18 +15,15 @@ name: Paper ledger
 # start when the recorder finishes (the recorder's evening run is what writes the day's curve), with two cron
 # slots as a second and third chance that land between 06:25 and 15:00 UTC under every delay measured.
 on:
-  # schedule withheld until the different-model audit findings KA-C1, C2, C3, C9, C11, C12 are closed
-  # (stage K round 1 audit, 2026-11-19); see docs/known-issues.md. They are answered on branch k-audit-jobs by
-  # rulings KR-200 to KR-214, which are proposed. The triggers below stay comments, and the job starts by hand
-  # only, until the stage K coordinator confirms those rulings and CI job python-daily-jobs-bytes is green on the
-  # release commit. Triggers to restore then (KR-206; python/tests/test_daily_jobs_bytes.py checks these lines
-  # against the measured start delays):
-  #   workflow_run:
-  #     workflows: [Recorder]
-  #     types: [completed]
-  #   schedule:
-  #     - cron: '0 3 * * 2-6' # lands 06:25 to 12:00 UTC with the measured delays (3.4 to 9.0 h)
-  #     - cron: '0 6 * * 2-6' # lands 09:25 to 15:00 UTC; with 1.6 h to a block and the 2 h margin still before 19:30
+  # schedule restored at the v0.10.1 release (2026-11-20) after the follow-up different-model audit was
+  # clean and the stage K coordinator confirmed rulings KR-200 to KR-214 and KR-254, KR-255 (KR-206; python/tests/
+  # test_daily_jobs_bytes.py checks these lines against the measured start delays).
+  workflow_run:
+    workflows: [Recorder]
+    types: [completed]
+  schedule:
+    - cron: '0 3 * * 2-6' # lands 06:25 to 12:00 UTC with the measured delays (3.4 to 9.0 h)
+    - cron: '0 6 * * 2-6' # lands 09:25 to 15:00 UTC; with 1.6 h to a block and the 2 h margin still before 19:30
   workflow_dispatch:
     inputs:
       dry_run:

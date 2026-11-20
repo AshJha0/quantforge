@@ -18,16 +18,13 @@ name: Curve daily
 # between 20:40 and 23:15 UTC, after the cut-off, every day. The three slots below land between 03:10 and 15:30
 # UTC under every delay measured.
 on:
-  # schedule withheld until the different-model audit findings KA-C1, C2, C3, C9, C11, C12 are closed
-  # (stage K round 1 audit, 2026-11-19); see docs/known-issues.md. They are answered on branch k-audit-jobs by
-  # rulings KR-200 to KR-214, which are proposed. The triggers below stay comments, and the job starts by hand
-  # only, until the stage K coordinator confirms those rulings and CI job python-daily-jobs-bytes is green on the
-  # release commit. Triggers to restore then (KR-206; python/tests/test_daily_jobs_bytes.py checks these lines
-  # against the measured start delays):
-  #   schedule:
-  #     - cron: '45 23 * * 1-5' # after Treasury's end-of-day par curve (usually by 6:00 PM ET); lands 03:10 to 08:45 UTC
-  #     - cron: '30 3 * * 2-6' # second chance: lands 06:55 to 12:30 UTC
-  #     - cron: '30 6 * * 2-6' # third chance: lands 09:55 to 15:30 UTC, four hours before the 19:30 UTC cut-off (KR-95)
+  # schedule restored at the v0.10.1 release (2026-11-20) after the follow-up different-model audit was
+  # clean and the stage K coordinator confirmed rulings KR-200 to KR-214 and KR-254, KR-255 (KR-206; python/tests/
+  # test_daily_jobs_bytes.py checks these lines against the measured start delays).
+  schedule:
+    - cron: '45 23 * * 1-5' # after Treasury's end-of-day par curve (usually by 6:00 PM ET); lands 03:10 to 08:45 UTC
+    - cron: '30 3 * * 2-6' # second chance: lands 06:55 to 12:30 UTC
+    - cron: '30 6 * * 2-6' # third chance: lands 09:55 to 15:30 UTC, four hours before the 19:30 UTC cut-off (KR-95)
   workflow_dispatch:
     inputs:
       dry_run:
