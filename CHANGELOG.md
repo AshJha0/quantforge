@@ -34,6 +34,7 @@
 
 ### Not changed
 
+- **K-8 phase 2 out-of-sample acceptance run: recorded MISS** (ruling KR-260, confirmed by the coordinator under the owner's delegation 2026-11-20 before any run; `specifications/06-risk/bermudan-ladder-k8.md`, Phase 2 acceptance, Result). 120 generated cases (seed 20261119), `CN_RANNACHER_SMOOTHED` at 201/100/6.0 against QuantLib 1.44 `FdHullWhiteSwaptionEngine` at 8,000/3,201: 53 of 120 cases with every judged entry within 1% (114 needed), largest error far above the 3% hard bound, smallest cell 0 of 12. The R6 use restriction stays for both methods; no threshold, case or grid changed. Runner `oracle/python/k8_phase2_run.py`, raw results frozen before scoring (`program/k8_phase2/RAW_MANIFEST.json`), score `oracle/K8_PHASE2_RESULT.json`. Python build only; the other three builds were not run on these cases.
 - H-9: R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS (`specifications/stage-h-rulings-audit.md`).
 
 ## 0.10.0 (2026-11-19)

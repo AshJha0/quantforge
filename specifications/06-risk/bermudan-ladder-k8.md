@@ -112,6 +112,7 @@ rich_k-0005/0006 show the G-18 ladder entry converging at first order (as G-18 s
 | the same cases at 151/75 | 0.41%, 0.71%, 0.66% | same file |
 | case 0001 as a receiver at `fixed_rate` 0.08 (deep in the money), 201/100 | d/da 7% to 9% too large in size, d/dsigma about 5% too large; order 2.0 on both | `program/k8_audit_response/medge.json`, `ql_8000.json`, `ql_16000.json` |
 | case 0001 as a payer at `fixed_rate` 0.08 (deep out of the money), 201/100 | 2-year node entry about 2% too large | same files |
+| 120 out-of-sample cases of KR-260 at 201/100 (measured 2026-11-20) | 53 of 120 cases with every judged entry within 1%; recorded MISS (section "Phase 2 acceptance", Result) | `oracle/K8_PHASE2_RESULT.json` |
 
 The last two rows and the auditor's other variations (listed under KR-113) are a **seen, diagnostic** set: they have been looked at, so they can never count toward an acceptance.
 
@@ -144,3 +145,39 @@ If 2 fails after the method is built, K-8 moves to a point release under the pla
 9. **What a fail means.** The restriction stays in full for both methods. No partial lift by picking the cells that passed after the run, no new tolerance, no other grid; a new attempt needs a changed method, a new seed and a new acceptance text committed before its run (owner decision K-QB, 2026-11-18).
 
 **Worked example.** A case with largest reference entry 8.0e5 judges entries of at least 800 in size. An entry with reference 1.20e5 and method 1.2108e5 has error 0.9%: within 1%. One with method 1.2150e5 has 1.25%: the case fails, but it is within the 3% hard bound, so the run can still pass if at most 5 other cases fail and its cell keeps 10 of 12.
+
+### Result (run 2026-11-20): recorded MISS
+
+**Plain idea.** The run was made once, as fixed above, and fails all three parts of the pass rule. The R6 use restriction stays in full for both methods (point 9). No threshold, case or grid is changed, and no partial lift is made.
+
+**Formal statement (measured).** The method values come from the repo's Python build at 201/100/6.0 and the reference values from QuantLib 1.44 at 8,000/3,201 (runner `oracle/python/k8_phase2_run.py`, SHA-256 `520deb58ed0835d0b8ba3612ce312ccdf8c0d0b4e62e0890b5f8b084783478e8`; case file `0fd9b43bd631202cbc26a5c6e286e1f3ac2c473ba1cdb14709275d977e18f553`, both frozen by the confirming commit `85b60c97`). The raw results were frozen before the comparison (`program/k8_phase2/RAW_MANIFEST.json`, combined SHA-256 `ad53af01645f49fd45e3045ac34894b8c9ad3ed17f97bbe661c69cf873b40410`, commit `c3589e58`); the score is `oracle/K8_PHASE2_RESULT.json`.
+
+| Part | Needed | Measured | Verdict |
+|---|---|---|---|
+| (a) cases passing | at least 114 of 120 | 53 | fail |
+| (b) largest judged error | at most 3% | 795 times the reference (79,546%), `d_price_d_sigma` of k8p2-0102; 49 cases have an entry above 3% | fail |
+| (c) every cell at least 10 of 12 | 10 | minimum 0 (far out-of-the-money payer) | fail |
+
+| Cell (nominal) | Passing of 12 | Largest error | Cases with an unresolved reference entry |
+|---|---|---|---|
+| near payer | 10 | 20.5% | 1 |
+| near receiver | 10 | 6.9% | 1 |
+| mid in-the-money payer | 6 | 806% | 4 |
+| mid out-of-the-money payer | 6 | 28.9% | 3 |
+| mid in-the-money receiver | 7 | 25,723% | 3 |
+| mid out-of-the-money receiver | 5 | 4.6% | 6 |
+| far in-the-money payer | 5 | 15,078% | 5 |
+| far out-of-the-money payer | 0 | 3,832% | 7 |
+| far in-the-money receiver | 1 | 79,546% | 10 |
+| far out-of-the-money receiver | 3 | 2,999% | 5 |
+
+Random cases passed 40 of 80, edge cases 13 of 40. The cross-check of point 5 (reported, not counted) is in `program/k8_phase2/CROSS_CHECK.json` when it has run.
+
+**Diagnosis (inferred from the frozen results; for a future attempt only, which needs a new seed and new cases).** Three patterns, read from `oracle/K8_PHASE2_RESULT.json`:
+
+1. Far out of the money the whole instrument is near zero: 25 cases have a reference price below 100 on a notional of 1e6 (the smallest 0.07), and 2 of them pass. The prices themselves differ by more than 1% in 12 of them. A relative test on every entry of a near-worthless option measures noise in both methods.
+2. Deep in the money, `d_price_d_mean_reversion` and `d_price_d_sigma` are tiny next to the ladder (for example 0.024 and 0.31 against a price of 358,702 in k8p2-0103) and the reference's two bumps disagree on them: 45 of the 67 failing cases have an unresolved entry, 20 of them on one of these two entries (the others on discount-factor rows). The acceptance has no absolute floor for these two entries (KR-113 item 5 asked for one; KR-260 did not set one).
+3. A smaller part is the method or the reference itself on entries that are well resolved: among the 95 cases with a reference price of at least 100, 37 of 663 resolved judged entries are above 1% and 22 above 3%. Some are a discount-factor row the method gives exactly 0 (no exercise or payment time depends on that node) while QuantLib's forward-stepping leaks into it above the 1e-3 floor (k8p2-0100, -0103, -0108: the effect described in Limits for the 0.4986-year row); the others (for example `d_price_d_sigma` of k8p2-0075) are not explained here.
+
+**Worked example.** k8p2-0103 (far in-the-money receiver): price 358,701.59 (QuantLib) against 358,701.81 (method), 6e-7 apart; the largest discount-factor entries agree within 0.02%; the 0.33-year node row is -1,096.8 in QuantLib and exactly 0 in the method, which the 1e-3 floor (782 here) judges; `d_price_d_sigma` is 0.314 (bump 1e-4) against 2.313 (bump 5e-5), unresolved, against 0.696 in the method. The case fails on all three counts, while its price and its large entries agree.
+
