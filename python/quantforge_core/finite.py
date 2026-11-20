@@ -105,6 +105,9 @@ def _wrap[**P, R](f: Callable[P, R]) -> Callable[P, R]:
         k for k in kwonly if k not in (inner.__kwdefaults__ or {})
     ]
 
+    # Bind by name only when both the function and its limit check name their parameters.
+    by_name = bool(positional or kwonly) and bool(limit_names)
+
     @functools.wraps(f)
     def checked(*args: P.args, **kwargs: P.kwargs) -> R:
         if _state.inside:
@@ -115,7 +118,12 @@ def _wrap[**P, R](f: Callable[P, R]) -> Callable[P, R]:
             if any(n not in bound for n in required):
                 # raises TypeError naming the public function; the body never runs
                 return f(*args, **kwargs)
-            limits(**{n: bound[n] for n in limit_names if n in bound})
+            if by_name:
+                limits(**{n: bound[n] for n in limit_names if n in bound})
+            else:
+                # A wrapper that hides its parameter names, such as mutmut's (*args, **kwargs) trampoline,
+                # gets the caller's arguments as given, as before KF-1.
+                limits(*args, **kwargs)
         for k, a in enumerate(args):
             found = bad_field(a)
             if found is not None:
