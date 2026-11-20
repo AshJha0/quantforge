@@ -1606,6 +1606,188 @@
     "synthetic"
    ],
    "description": "no trades"
+  },
+  {
+   "case_id": "collexp_g-0018",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     1.0,
+     0.75,
+     0.5,
+     0.25,
+     0.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75,
+    "csa": {
+     "NS1": {
+      "threshold_receive": "x",
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": 1
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "hr122",
+    "synthetic"
+   ],
+   "description": "two errors: times decreasing [structural] and a string threshold [schema]; E_SCHEMA first (HR-122)"
+  },
+  {
+   "case_id": "collexp_g-0019",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [],
+    "pfe_quantile": "0.75",
+    "csa": {
+     "NS1": {
+      "threshold_receive": 1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": 1
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "hr122",
+    "synthetic"
+   ],
+   "description": "two errors: no trades [structural] and a string pfe_quantile [schema]; E_SCHEMA first (HR-122)"
+  },
+  {
+   "case_id": "collexp_g-0020",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     1.0,
+     0.75,
+     0.5,
+     0.25,
+     0.0
+    ],
+    "trades": [
+     {
+      "netting_set": 1,
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75,
+    "csa": {
+     "NS1": {
+      "threshold_receive": 1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": 1
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "hr122",
+    "synthetic"
+   ],
+   "description": "two errors: times decreasing [structural] and a numeric netting_set [schema]; E_SCHEMA first (HR-122)"
   }
  ]
 }

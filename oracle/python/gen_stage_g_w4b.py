@@ -241,6 +241,14 @@ def first_time_cases(s, op, base, other, other_desc):
         s.add(op, inp, error=code, cls="date_and_convention", tags=["invalid", "xva", "kr258"], description=d)
 
 
+def schema_first_cases(s, op, cases):
+    """HR-122 step (1) (KR-230, KR-258 sweep, 2026-11-20): an E_SCHEMA fault anywhere in the request comes before a
+    structural or domain fault elsewhere. The four-build sweep found C++ reporting the structural or domain fault
+    first in these three operations, because it validated each field as it read it."""
+    for inp, d in cases:
+        s.add(op, inp, error="E_SCHEMA", cls="date_and_convention", tags=["invalid", "xva", "hr122"], description="two errors: " + d + "; E_SCHEMA first (HR-122)")
+
+
 OP, ALIAS = "xva.sbim.ir_delta", "xva.simm.ir_delta"  # KR-152, KR-256: the old id is a deprecated alias in v1.0.0, removed in the first release after it
 
 
@@ -335,6 +343,11 @@ def main():
             (dict(e, trades=[]), "E_INPUT", "no trades")]
     for inp, code, d in errs:
         s.add("xva.exposure.collateralised", inp, error=code, cls="date_and_convention", tags=["invalid", "xva"], description=d)
+    e0 = rows[3][0]
+    schema_first_cases(s, "xva.exposure.collateralised", [
+        (dict(e0, times=list(reversed(TIMES)), csa={"NS1": dict(csa0, threshold_receive="x")}), "times decreasing [structural] and a string threshold [schema]"),
+        (dict(e0, trades=[], pfe_quantile="0.75"), "no trades [structural] and a string pfe_quantile [schema]"),
+        (dict(e0, times=list(reversed(TIMES)), trades=[dict(netting_set=1, values=PATHS_A)]), "times decreasing [structural] and a numeric netting_set [schema]")])
     write(s)
     n1 = len(s.cases)
 
@@ -359,6 +372,10 @@ def main():
     for inp, code, d in errs:
         s.add("xva.adjustments.value", inp, error=code, cls="date_and_convention", tags=["invalid", "xva"], description=d)
     first_time_cases(s, "xva.adjustments.value", base, dict(counterparty=dict(hazard_rate=-0.01, recovery=0.4)), "negative counterparty hazard")
+    schema_first_cases(s, "xva.adjustments.value", [
+        (dict(base, ene=[1.0, -90.0, -100.0, -70.0], funding=dict(lend_spread=0.008, exclude_dva_overlap=False)), "positive ENE [domain] and funding without borrow_spread [schema]"),
+        (dict(base, times=[0.0, 1.0, 1.5, 2.0], own=dict(hazard_rate=0.01, recovery=[0.4])), "first time 0 [structural] and a list recovery [schema]"),
+        (dict(base, ee=[1.0], funding=dict(base["funding"], exclude_dva_overlap=1)), "ee length differs [structural] and a numeric flag [schema]")])
     write(s)
     n2 = len(s.cases)
 
@@ -405,6 +422,10 @@ def main():
         s.add("xva.wwr.cva_hw", inp, error=code, cls="date_and_convention", tags=["invalid", "xva"], description=d)
     wwr_root_cases(s)
     first_time_cases(s, "xva.wwr.cva_hw", wbase, dict(hazard_rate=-0.01), "negative hazard")
+    schema_first_cases(s, "xva.wwr.cva_hw", [
+        (dict(wbase, times=[0.25, 0.25, 0.75, 1.0], recovery="x"), "times not increasing [structural] and a string recovery [schema]"),
+        (dict(wbase, values=[], discount_factors=["1", 0.99, 0.985, 0.98]), "no paths [structural] and a string discount factor [schema]"),
+        ({k: v for k, v in dict(wbase, times=[0.0, 0.5, 0.75, 1.0]).items() if k != "wwr_b"}, "first time 0 [structural] and wwr_b missing [schema]")])
     write(s)
     n4 = len(s.cases)
     reg = json.loads((HERE.parent / "outside_register_g.json").read_text(encoding="utf-8"))
