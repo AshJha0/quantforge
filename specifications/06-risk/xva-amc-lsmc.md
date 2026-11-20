@@ -72,6 +72,13 @@ QuantLib values measured 2026-11-19: `FdBlackScholesVanillaEngine(process, 2000,
 - A4 Properties: price `>=` European on the same paths; price `<=` the QuantLib value plus `3 stderr` (low bias of an in-sample exercise rule is expected, high bias is a bug flag); with all exercise dates removed but the last, price equals European exactly.
 <!-- strip:end -->
 
+## Convergence and limit cases
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| LSMC Monte Carlo price | `1 / sqrt(paths)` in the standard error; regression bias does not vanish with paths | the six QuantLib PDE references of the Outside-check design | deep in or out of the money (36, 44) | [LS01] Table 1 |
+| Finite-difference PDE reference (QuantLib) | second order in the grid | the L references, measured 2026-11-19 | `vol 0.40`, `T 2` | `program/STAGE_K_SOURCES_XVA.md` |
+
 ## Accuracy envelope (plan 14.10 rule 4)
 
 LSMC has three errors: Monte Carlo noise (reported `stderr`), the regression's misfit of the continuation value (a low bias of the exercise rule), and in-sample foresight (a high bias when the same paths fit and price; two-pass removes it). The L cases cover the envelope's edges in moneyness (36, 40, 44) and in volatility and maturity (`vol 0.40`, `T 2`), the two directions in which [LS01] Table 1 shows the largest differences.

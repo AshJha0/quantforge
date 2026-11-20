@@ -61,6 +61,13 @@ Outputs: `applied_bp`, `shocked_zero_rates`, `shocked_discount_factors` (pillars
 - A3 Gate: at least 4 of 6 value cases outside-checked (60% of 6 is 3.6).
 <!-- strip:end -->
 
+## Convergence and limit cases
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| Shocked curve (replay interpolation) | exact to rounding | candidate oracle `shk_k` (50 digits, 2026-11-20) | tenor beyond the last shock tenor: flat | J-W3-4 |
+| Exposure by one-factor quadrature (O cases) | quadrature to 1e-11 relative as G-42 | not run (needs WSL) | the largest shock (`hikes_2022`) | G-42, KR-172 |
+
 ## Accuracy envelope
 
 The base and shocked values are exact one-factor integrals. The shock definition (par-yield moves applied as zero-rate moves, J-W3-4 interpolation, model parameters unchanged) is a scenario choice and is labelled; it has no accuracy to measure. The largest shock (`hikes_2022`, up to 424 bp) is the edge for the exposure engine: a payer's exposure moves far into the money, where the PFE flat-top issue of G-42 was seen; the O cases include it.

@@ -72,6 +72,13 @@ Grid `(0, 0.25, 0.5, 0.75, 1)` unless stated.
 - A3 Gate: at least 5 of 8 value cases outside-checked (60% of 8 is 4.8).
 <!-- strip:end -->
 
+## Convergence and limit cases
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| Effective EPE on a grid | exact to rounding (a definition, not an approximation) | candidate oracle `str_k` (50 digits, 2026-11-20) | horizon below one year at a grid point (str_k-0004) | KR-168 |
+| Undiscounted EE by G-42 quadrature (O cases) | quadrature to 1e-11 relative | not run | `sigma` current equal to stressed: a tie | G-42 |
+
 ## Accuracy envelope
 
 Exact arithmetic. The stress calibration itself is the caller's, and it carries all the model risk; this operation only applies the CRE53 rule. The O cases check the place where the rule meets a model: Effective EPE of a simulated profile.

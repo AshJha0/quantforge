@@ -71,6 +71,13 @@ Outputs: `fca`, `fba`, `fva`, `forward_borrow`, `forward_lend` (per bucket, afte
 - A4 AAD (KR-161) on every spread pillar, hazard, recovery and profile entry; the overlap kink is avoided by case design (fva_k-0005 keeps every bucket at least 1 bp away from it).
 <!-- strip:end -->
 
+## Convergence and limit cases
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| Closed-form sum with interpolated forward spreads | exact to rounding | candidate oracle `fva_k` (50 digits, 2026-11-20) | flat curves give G-41 exactly (fva_k-0003) | KR-164, KR-296 |
+| ORE Monte Carlo (O cases) | `1 / sqrt(samples)`, judged at `max(3, z_Bonf) SE` | not run (needs WSL) | deterministic survival: the expectation factorises | [ORE-X] |
+
 ## Accuracy envelope
 
 Exact arithmetic on given profiles. Interpolation is a definition (KR-164), not an approximation. The O cases check the formula at the place it is used in practice: on simulated exposures of a real netting set.

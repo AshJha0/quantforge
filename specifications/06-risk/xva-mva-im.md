@@ -75,6 +75,13 @@ Common for MVA cases: `times (0.5, 1, 1.5, 2)`, `discount_factors (0.985, 0.97, 
 - A4 AAD of `mva` with respect to spreads, hazards, IM entries; of `im` (`REGRESSION`) with respect to the increments, away from a floored `max(., 0)`.
 <!-- strip:end -->
 
+## Convergence and limit cases
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| Closed-form MVA sum | exact to rounding | candidate oracle `mva_k` (50 digits, 2026-11-20) | `f_b = s_I` gives 0 | KR-165, KR-296 |
+| Regression IM (least squares) | sampling error `1 / sqrt(paths)` plus polynomial misfit (does not vanish) | mva_k-0003, 0004 (exact least squares at 50 digits) | order 0: population variance | KR-166 |
+
 ## Accuracy envelope (plan 14.10 rule 4)
 
 `GIVEN` and `NORMAL_MPOR` are exact. `REGRESSION` is an approximation of the conditional standard deviation: its error is the polynomial's misfit plus sampling noise, and ORE itself says it needs benchmarking. Envelope check registered now: on one G-42 payer swap (`a = 0.03`, `sigma = 0.01`) at 1, 5 and 10 years, the order-1 and order-2 regression IM averaged over 5,000 paths must be within 3% of the exact `E[Phi^-1(q) sd(X | x(t))]` (two-dimensional quadrature); a miss is recorded and the regression method carries the measured gap in its docs. This is the edge where the swap's value is most convex in `x` (long maturity, short time).

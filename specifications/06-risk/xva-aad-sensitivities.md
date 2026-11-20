@@ -70,6 +70,13 @@ Definition: the derivative of the operation **as computed** (KR-161). For `xva.e
 - A4 Gate: at least 8 of 12 value cases outside-checked (60% of 12 is 7.2).
 <!-- strip:end -->
 
+## Convergence and limit cases
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| AAD of the computed sums (KR-161) | exact to rounding | candidate oracle `aadx_k` (50-digit `mpmath.diff`, 2026-11-20) | an input at a kink (`max(., 0)`): excluded by case design | KR-161 Richardson bump, `h^4` truncation |
+| Richardson bump reference | `h^4` truncation plus rounding `eps / h` | aadx_k-0001 scratch, 2026-11-19 | an input equal to 0: absolute bump | `aad-core.md` |
+
 ## Accuracy envelope (plan 14.10 rule 4)
 
 AAD is exact to rounding for the computed function; the bump reference carries truncation error `O(h^4)` after Richardson and rounding error about `eps |f| / (h |x|)`. With `h = 1e-4` relative both are below 1e-11 relative for the smooth functions here (measured on aadx_k-0001: largest gap 1.2e-11). The envelope's edges are (1) inputs equal to 0 (absolute bump `h`), covered by aadx_k-0006 at `mu` entries near 0 and by `ee` entries of 0 in an oracle case; (2) proximity to a kink, covered by aadx_k-0002 at 20 bp from the overlap floor; (3) large gradients relative to the value (aadx_k-0001 `d fca / d s_b`, 125 times the value). Path-based operations with `max` on each path are differentiated pathwise and are **not** in the goldens: a bump crosses a path's kink with probability of order `h` times the density at 0, so the 1e-8 acceptance would fail by design; this is stated as a limit, as [CG10] p. 6 notes for indicators.

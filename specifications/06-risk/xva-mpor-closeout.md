@@ -91,6 +91,13 @@ L values measured 2026-11-19 with SciPy `integrate.quad` of the defining integra
 - A4 AAD of `ee` with respect to `sigma`, `im`, `H`, `v0` (`d ee / d im = -Phi(m/s)`) to KR-161.
 <!-- strip:end -->
 
+## Convergence and limit cases
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| Normal close-out closed form | exact under the one-increment model | candidate oracle `cln_k` (50 digits) and SciPy `quad` (L) | `m / s` below -5: `erfcx` form | KR-170 |
+| Path form on given paths | exact arithmetic on the paths | clp_k-0001 candidate oracle (50 digits) | lag 0: no MPoR | G-40, KR-170 |
+
 ## Accuracy envelope (plan 14.10 rule 4)
 
 The closed form assumes the netted value moves as one normal increment over the MPoR with no cash flow inside the window. It is exact under that assumption. At the edges: `m/s` large negative (deep IM cover, cln_k-0004) the result is a tail of size 1e-3 of `s`, where cancellation in `m Phi + s phi` would lose digits; builds evaluate `s (phi(k) + k Phi(k))` with `k = m/s` through `erfcx` for `k < -5` (stated; a golden at `k = -6` is added by the oracle lane). `m/s` large positive: `ee -> m`, cln_k-0002. The O cases check the path form at the realistic edge, a swap with VM and an MPoR of two weeks.

@@ -75,6 +75,13 @@ Common: `times = (0, 0.5, 1, 1.5, 2)`, `D(t) = exp(-0.03 t)` at `t_1..t_4`.
 - A4 AAD (KR-161): `d colva / d C_i`, `d / d Delta_i`, `d / d D_i`, `d / d h` equal the Richardson bump to `1e-10 + 1e-8 |ref|`.
 <!-- strip:end -->
 
+## Convergence and limit cases
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| Closed-form sum on a profile | exact to rounding | candidate oracle `colva_k` (50 digits, 2026-11-20) | zero spread gives 0 exactly | KR-163 |
+| Path form: sample mean of held collateral | Monte Carlo `1 / sqrt(paths)` (the caller's paths) | colva_k-0006 on four given paths (exact mean) | one path: the mean is that path | G-40 |
+
 ## Accuracy envelope (plan 14.10 rule 4)
 
 The profile form is exact arithmetic (no approximation). The path form is a sample mean of the given paths: its error is the caller's Monte Carlo error, reported as `collateral_se` per date. The ORE route is the check at the edge that matters: a full-VM collateralised swap where the collateral equals the netted value, so ColVA has a one-factor reference.
