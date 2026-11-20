@@ -574,7 +574,15 @@ def test_a_date_the_source_never_publishes_is_closed_with_the_evidence() -> None
     text, _, _ = step("", evening(days[0]), fetcher(treasury_csv(days[:1]), None))
     text, new, _ = step(text, evening(days[1]), fetcher(treasury_csv(days[:1]), None))
     assert [r["body"]["status"] for r in new] == ["stale_input"]
-    out, new, _ = step(text, evening(days[2]), fetcher(treasury_csv([days[0], days[2]]), None))
+    later = fetcher(treasury_csv([days[0], days[2]]), None)
+    # KR-255: the first run that sees the file past the date records it (stale_input, with that file) ...
+    text, new, _ = step(text, evening(days[2]), later)
+    assert [
+        (r["kind"], r["body"].get("status"), r["body"]["input"]["latest_date"]) for r in new
+    ] == [("DAY", "stale_input", days[2].isoformat())]
+    assert check(text)["ok"]
+    # ... and a later run that sees it again closes it
+    out, new, _ = step(text, evening(days[2]) + dt.timedelta(minutes=30), later)
     assert [(r["kind"], r["body"]["date"]) for r in new] == [
         ("GAP", days[1].isoformat()),
         ("DAY", days[2].isoformat()),
@@ -738,7 +746,11 @@ def test_the_year_end_gap_is_found_in_the_next_years_file() -> None:
         ),
     )
     assert [r["body"]["status"] for r in new] == ["stale_input"]
-    out, new, _ = step(text, evening(d2), by_year)
+    text, new, _ = step(text, evening(d2), by_year)  # KR-255: first sighting of the 2028 file
+    assert [(r["body"]["status"], r["body"]["input"]["latest_date"]) for r in new] == [
+        ("stale_input", d2.isoformat())
+    ]
+    out, new, _ = step(text, evening(d2) + dt.timedelta(minutes=30), by_year)
     assert [(r["kind"], r["body"]["date"]) for r in new] == [
         ("GAP", d1.isoformat()),
         ("DAY", d2.isoformat()),
@@ -885,3 +897,62 @@ def test_a_next_year_file_without_a_later_date_is_no_evidence() -> None:
         ("DAY", d1.isoformat(), "stale_input")
     ]
     assert check(out)["ok"]
+
+
+def test_first_run_with_the_date_missing_and_a_later_date_present_verifies() -> None:
+    """KF-8 / KR-254: first run 10 minutes before the next day's due time, the file holding D+1 and not D. The
+    writer used to write GENESIS then a not_published GAP, which its own verifier refused (START). The first
+    dated row is now a DAY stale_input row naming that file, and the ledger verifies."""
+    d = dt.date(2027, 12, 6)
+    d1 = CAL.next_open(d)
+    now = dt.datetime.combine(d1, dt.time(22, 50), dt.UTC)
+    out, new, _ = step("", now, fetcher(treasury_csv([d1]), None))
+    assert [(r["kind"], r["body"].get("status")) for r in new] == [
+        ("GENESIS", None),
+        ("DAY", "stale_input"),
+    ]
+    assert check(out)["ok"]
+
+
+def test_a_not_published_gap_needs_an_earlier_run_that_saw_it() -> None:
+    """KR-255 (KF-9): one download is not enough to close a date for good. A GAP not_published must follow a
+    stale_input row of the same date, written by an earlier run, whose file already held a later date."""
+    days = business_days(3)
+    text, _, _ = step("", evening(days[0]), fetcher(treasury_csv(days[:1]), None))
+    text, _, _ = step(text, evening(days[1]), fetcher(treasury_csv(days[:1]), None))
+    later = fetcher(treasury_csv([days[0], days[2]]), None)
+    text, _, _ = step(text, evening(days[2]), later)
+    out, _, _ = step(text, evening(days[2]) + dt.timedelta(minutes=30), later)
+    assert check(out)["ok"]
+    rows = rows_of(out)
+    # planted: the first sighting's file did not hold a later date
+    sight = next(
+        r
+        for r in rows
+        if r["kind"] == "DAY"
+        and r["body"]["status"] == "stale_input"
+        and r["body"]["input"]["latest_date"] > r["body"]["date"]
+    )
+    sight["body"]["input"]["latest_date"] = days[0].isoformat()
+    assert check(rechain(rows))["reason"] == "GAPRULE"
+    # planted: the gap written by the same run as the sighting
+    rows = rows_of(out)
+    gi = next(i for i, r in enumerate(rows) if r["kind"] == "GAP")
+    for r in rows[gi:]:
+        r["ts"] = rows[gi - 1]["ts"]
+    assert check(rechain(rows))["reason"] == "GAPRULE"
+
+
+def test_a_sub_second_clock_cannot_write_a_gap_the_verifier_refuses() -> None:
+    """KF-14: the ledger stamps whole seconds. A sighting written at 23:45:00.200 and a rerun at 23:45:00.700
+    are the same instant to the verifier, so the rerun must not close the date as a gap (the verifier would
+    refuse it, GAPRULE); `core.run` compares at whole seconds."""
+    days = business_days(3)
+    text, _, _ = step("", evening(days[0]), fetcher(treasury_csv(days[:1]), None))
+    text, _, _ = step(text, evening(days[1]), fetcher(treasury_csv(days[:1]), None))
+    later = fetcher(treasury_csv([days[0], days[2]]), None)
+    first = evening(days[2]).replace(microsecond=200_000)
+    text, _, _ = step(text, first, later)
+    out, new, _ = step(text, first.replace(microsecond=700_000), later)
+    assert check(out)["ok"], check(out)
+    assert not any(r["kind"] == "GAP" for r in new)

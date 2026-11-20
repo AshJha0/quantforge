@@ -391,15 +391,19 @@ def build(problems):
             if st == "K":
                 # Audit finding KA-C18 (2026-11-19, open): cases counted on a figure printed in the regulator text are
                 # checked on part of their outputs and at print precision, so by the strict reading of the rule above
-                # ("only if every compared output is checked") they do not count. Both figures are published until ruled.
+                # ("only if every compared output is checked") they do not count. Ruled by KR-250: the strict reading is the count.
                 def strict(rs):
                     val = [r for r in rs if r[5]]
                     return {"cases": len(val), "counted": sum(r[2] == REDERIVED and r[4] != K_PUBLISHED_SRC for r in val)}
-                entry["under_review"] = {
-                    "finding": "KA-C18", "status": "open",
-                    "strict_reading": "a case counted on a printed regulator figure does not count",
-                    "stage": strict(core),
-                    "per_item": {it: strict(rs) for it, rs in sorted(items.items())}}
+                # Ruling KR-250 made the strict reading the count. The note is emitted only if the two counts differ
+                # again (for example if a printed-figure case regains credit), so the page never prints a stale review.
+                st_counts = strict(core)
+                if st_counts["counted"] != entry["without_sweeps"]["counted_with_rederivation"]:
+                    entry["under_review"] = {
+                        "finding": "KA-C18", "status": "reopened: the strict count differs from the count",
+                        "strict_reading": "a case counted on a printed regulator figure does not count",
+                        "stage": st_counts,
+                        "per_item": {it: strict(rs) for it, rs in sorted(items.items())}}
         out["stages"][st] = entry
     return out
 
@@ -412,7 +416,7 @@ def under_review_text(u):
             "counts a case checked against a figure printed in the regulator text. Such a case is checked on part of its "
             "outputs and at print precision, which the rule at the top of this page (\"only if every compared output is "
             f"checked\") does not allow. By the strict reading stage K is {s['counted']} of {s['cases']} "
-            f"({s['counted'] / s['cases']:.1%}), under the floor; items under the floor by that reading: {'; '.join(low)}. "
+            f"({s['counted'] / s['cases']:.1%}); items under the floor by that reading: {'; '.join(low) or 'none'}. "
             "Neither figure is settled until a ruling says which reading holds.")
 
 

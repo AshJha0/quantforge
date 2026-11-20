@@ -55,8 +55,8 @@ def render(doc):
             out += ["", f"**Stage {stage} shares above are under review, not settled (audit finding {u['finding']}, {u['status']}; "
                     "`docs/known-issues.md`).** They count cases checked against a figure printed in the regulator text, on part of "
                     "their outputs and at print precision. By the strict reading of the rule (every compared output checked) the "
-                    f"stage is {t['counted']} of {t['cases']} ({pct(t['counted'] / t['cases'])}), under the floor; items under the "
-                    f"floor by that reading: {'; '.join(low)}."]
+                    f"stage is {t['counted']} of {t['cases']} ({pct(t['counted'] / t['cases'])}); items under the "
+                    f"floor by that reading: {'; '.join(low) or 'none'}."]
     return "\n".join(out)
 
 

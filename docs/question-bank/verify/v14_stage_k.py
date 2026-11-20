@@ -160,8 +160,8 @@ assert f"{ead:.2f}" == "569.47" and f"{1.4 * 407:.1f}" == "569.8"
 has("`EN = 59,270` against 114,948 gross; add-on `0.005 x 59,270 = 296.35`")
 has("`EAD = 1.4 x 406.76 = 569.47`, printed 569")
 has("`d1 = (ln 1.2 + 0.125)/0.5 = 0.6146`, `delta = -0.2694`")
-assert 5 + 7 == 12 and f"{12 / 16:.0%}" == "75%"
-has("12 of 16 value cases, 75%")
+assert 5 + 7 == 12 and f"{12 / 19:.1%}" == "63.2%"
+has("12 of 19 value cases, 63.2%")
 
 # Q14.25 to 14.28: binomial zones (k-w1b: MAR99 Table 2, btk_k).
 def cdf(n, p=F(1, 100)):

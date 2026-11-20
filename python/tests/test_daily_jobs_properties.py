@@ -153,8 +153,10 @@ class CurveWorld:
             if x < 0.07:
                 self.published[d] = None  # the source never publishes this business day
             elif x < 0.30:
+                # negative offsets publish before the 23:00 due time (KF-8: a first run can then see D+1
+                # and not D)
                 self.published[d] = base + dt.timedelta(
-                    hours=rng.choice([3, 9, 20, 30, 50, 100, 200])
+                    hours=rng.choice([-3, -1, 3, 9, 20, 30, 50, 100, 200])
                 )
             else:
                 self.published[d] = base
@@ -198,7 +200,9 @@ def curve_sequence(seed: int) -> None:
         windows = {
             "T-PLANTED": (w.isoformat(), (w + dt.timedelta(days=rng.choice([0, 1, 4]))).isoformat())
         }
-    now = dt.datetime.combine(span[1], dt.time(rng.choice([0, 4, 15, 23]), rng.randrange(60)), UTC)
+    now = dt.datetime.combine(
+        span[1], dt.time(rng.choice([0, 4, 15, 20, 22, 23]), rng.randrange(60)), UTC
+    )
     text = ""
     year_of = re.compile(r"/(\d{4})/all")
     for _step in range(rng.randrange(4, 10)):
@@ -265,6 +269,8 @@ def curve_invariants(
     )
     settled: dict[dt.date, dict[str, Any]] = {}
     seen: list[dt.date] = []
+    # earliest stale_input row of a date whose file held a later date
+    sighted: dict[dt.date, dt.datetime] = {}
     for r in dated:
         d, b, t = curve.day(r["body"]["date"]), r["body"], curve.instant(r["ts"])
         assert t >= curve.due_instant(d, CCFG), (where, "written before due")
@@ -308,10 +314,19 @@ def curve_invariants(
             assert status in ("stale_input", "fetch_failed"), where
             assert t <= curve.late_limit(d, CCAL, CCFG), where
             if status == "stale_input":
-                assert not world.has(d, t) and not world.later_published(d, t), (
-                    where,
-                    "stale but published",
-                )
+                assert not world.has(d, t), (where, "stale but published")
+                # KR-255: a later date in the file is recorded once as stale_input, with that file
+                sighting = b["input"].get("latest_date", "") > d.isoformat()
+                assert sighting or not world.later_published(d, t), (where, "stale but moved on")
+                if sighting:
+                    # KF-15: recorded once. A second sighting of the same date at a later instant means the
+                    # writer did not close the date when it saw the later file again (reruns at the same
+                    # instant write nothing new, so they cannot add a second sighting).
+                    assert d not in sighted or not sighted[d] < t, (
+                        where,
+                        "a later file sighted twice, date never closed",
+                    )
+                    sighted.setdefault(d, t)
     assert all(d in settled for d in seen[:-1]), where
     if now is None:
         return
@@ -356,6 +371,31 @@ def test_the_property_test_sees_the_ka_c9_fault(monkeypatch: pytest.MonkeyPatch)
         return out, new, notes
 
     monkeypatch.setattr(curve, "run", audited)
+    failures = 0
+    for seed in range(300):
+        try:
+            curve_sequence(seed)
+        except AssertionError:
+            failures += 1
+    assert failures > 0
+
+
+def test_the_property_test_sees_a_writer_that_never_closes_a_skipped_date(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """KF-15, plan 14.10 rule 1: a writer whose "seen before" is always false records a sighting on every run
+    and never writes the not_published gap. The property test must fail on it."""
+    import inspect
+    import textwrap
+
+    src = textwrap.dedent(inspect.getsource(curve.run))
+    planted = src.replace(
+        "if evidence is not None and not seen_before:", "if evidence is not None:"
+    )
+    assert planted != src, "the planted fault no longer applies to curve.run"
+    scope = dict(vars(curve))
+    exec(compile(planted, "<planted curve.run>", "exec"), scope)  # noqa: S102 - test-only planted fault
+    monkeypatch.setattr(curve, "run", scope["run"])
     failures = 0
     for seed in range(300):
         try:

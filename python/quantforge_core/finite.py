@@ -88,16 +88,34 @@ def _wrap[**P, R](f: Callable[P, R]) -> Callable[P, R]:
     code = inner.__code__
     limits: Callable[..., None] | None = getattr(inner, "__qf_limits__", None)
     positional = list(code.co_varnames[: code.co_argcount])
+    # The limit check is called by its own parameter names (KF-1): each name is looked up in the caller's
+    # arguments bound to the wrapped function's names, so positional, keyword and mixed calls all work.
+    limit_names: list[str] = []
+    if limits is not None:
+        lc = limits.__code__
+        limit_names = list(lc.co_varnames[: lc.co_argcount])
     rest = (
         code.co_varnames[code.co_argcount + code.co_kwonlyargcount] if code.co_flags & 4 else "args"
     )
+    # Parameters without a default. A call that omits one must fail as Python fails it, naming the public
+    # function, not the private limit check (KF-16).
+    n_def = len(inner.__defaults__ or ())
+    kwonly = code.co_varnames[code.co_argcount : code.co_argcount + code.co_kwonlyargcount]
+    required = positional[: len(positional) - n_def] + [
+        k for k in kwonly if k not in (inner.__kwdefaults__ or {})
+    ]
 
     @functools.wraps(f)
     def checked(*args: P.args, **kwargs: P.kwargs) -> R:
         if _state.inside:
             return f(*args, **kwargs)
         if limits is not None:
-            limits(*args, **kwargs)
+            bound = dict(zip(positional, args, strict=False))
+            bound.update(kwargs)
+            if any(n not in bound for n in required):
+                # raises TypeError naming the public function; the body never runs
+                return f(*args, **kwargs)
+            limits(**{n: bound[n] for n in limit_names if n in bound})
         for k, a in enumerate(args):
             found = bad_field(a)
             if found is not None:

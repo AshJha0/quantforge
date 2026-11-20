@@ -493,6 +493,10 @@ def run(cfg: dict[str, Any], runner: Runner, ledger_text: str, now: dt.datetime,
         windows: dict[str, tuple[str, str]] | None = None) -> tuple[str, list[dict[str, Any]], list[str]]:
     """Rows due at `now`, appended to the ledger. Returns (new ledger text, new rows, notes). `fetch(url)`
     returns the bytes at a URL or raises. Nothing is written by this function."""
+    # KF-14: the ledger stamps whole seconds, so the writer compares at whole seconds too; with a sub-second
+    # `now` a sighting at 23:45:00.200 looked earlier than a rerun at 23:45:00.700 and the writer wrote a gap
+    # that the verifier (whole seconds) refuses.
+    now = now.replace(microsecond=0)
     windows = holdout_windows() if windows is None else windows
     rows = parse(ledger_text) if ledger_text.strip() else []
     if rows:
@@ -582,6 +586,17 @@ def run(cfg: dict[str, Any], runner: Runner, ledger_text: str, now: dt.datetime,
                     table2 = {}
                 if data2 is not None and table2 and max(table2) > ds:
                     evidence = file_input(data2, url2, max(table2))
+            # KR-255: one download does not close a date. The first run that sees a later file records it as
+            # stale_input with that file; a run at a later instant that sees it again writes the gap. This also keeps the
+            # first dated row of a new ledger a DAY row (KR-254).
+            seen_before = any(r["kind"] == "DAY" and r["body"]["date"] == ds and r["body"]["status"] == "stale_input"
+                              and str(r["body"].get("input", {}).get("latest_date", "")) > ds
+                              and instant(r["ts"]) < now for r in rows)  # a rerun at the same instant is no second look
+            if evidence is not None and not seen_before:
+                add("DAY", {**base, "status": "stale_input", "input": evidence})
+                notes.append(f"{ds}: stale_input (the file is at {evidence['latest_date']} without this date; "
+                             "closed as a gap only if a later run sees the same, KR-255); stopping here")
+                break
             if evidence is not None:
                 add("GAP", {"date": ds, "cause": "not_published", "input": evidence, "run": run_info,
                             "reason": "the Treasury file holds a later date and not this one"})
@@ -640,7 +655,9 @@ def _check_rows(rows: list[dict[str, Any]], cfg: dict[str, Any], cal: Calendar |
     Dates (KR-203): the rows walk the business days strictly in order. At any point at most one date is
     unsettled, and it is the last one with a row; until it is settled no other date may have a row. A settled
     date never gets another row, and (with the calendar) the next date is the next business day, so none is
-    skipped. This is the rule the writer follows, which is why any ledger the writer can reach verifies."""
+    skipped. A not_published gap follows an earlier run's sighting of it (KR-255), so the first dated row is
+    always a DAY row (KR-254). This is the rule the writer follows, which is why any ledger the writer can
+    reach verifies."""
     open_date = ""  # the one unsettled date, or ""
     last_settled = ""
     last_ts = rows[0]["ts"]
@@ -648,6 +665,7 @@ def _check_rows(rows: list[dict[str, Any]], cfg: dict[str, Any], cal: Calendar |
     by_hash = {r["hash"]: r for r in rows}
     compared: set[str] = set()
     first_dated = True
+    sighted = ""  # ts of the earliest stale_input row of the open date whose file held a later date (KR-255)
     for r in rows[1:]:
         n, b, kind = r["seq"], r["body"], r["kind"]
         if instant(r["ts"]) < instant(last_ts):
@@ -694,6 +712,9 @@ def _check_rows(rows: list[dict[str, Any]], cfg: dict[str, Any], cal: Calendar |
                 if cause == "not_published":
                     if not str((b.get("input") or {}).get("latest_date", "")) > ds:
                         return bad(n, "GAPRULE", f"{ds}: a not_published gap needs a file dated after it")
+                    if open_date != ds or not sighted or not instant(sighted) < t:
+                        return bad(n, "GAPRULE", f"{ds}: a not_published gap needs an earlier run's stale_input "
+                                                 "row of this date whose file held a later date (KR-255)")
                 elif cause == "late_window":
                     if cal is not None and not t > late_limit(d, cal, cfg):
                         return bad(n, "GAPRULE", f"{ds}: gap declared inside the late window")
@@ -705,8 +726,8 @@ def _check_rows(rows: list[dict[str, Any]], cfg: dict[str, Any], cal: Calendar |
                     return bad(n, "FAILCODE", f"{ds}: a failed fit needs an error code and no fit")
             if status in NON_FINAL and "fit" in b:
                 return bad(n, "FAILCODE", f"{ds}: a {status} row has no fit")
-            if status == "stale_input" and not str((b.get("input") or {}).get("latest_date", "")) < ds:
-                return bad(n, "STALE", f"{ds}: a stale_input row needs a file that ends before {ds}")
+            if status == "stale_input" and str((b.get("input") or {}).get("latest_date", "")) == ds:
+                return bad(n, "STALE", f"{ds}: a stale_input row needs a file without {ds} (KR-255)")
             if status == "ok":
                 inp, fit = b.get("input") or {}, b.get("fit") or {}
                 if inp.get("row_date") != ds or not inp.get("latest_date", "") >= ds or "error" in b:
@@ -720,8 +741,11 @@ def _check_rows(rows: list[dict[str, Any]], cfg: dict[str, Any], cal: Calendar |
                                             fit.get("within_fit_flag")):
                     return bad(n, "DIAG", f"{ds}: RMSE, max or flag do not follow from errors_bp")
             if kind == "GAP" or status in FINAL:
-                last_settled, open_date = ds, ""
+                last_settled, open_date, sighted = ds, "", ""
             else:
+                if status == "stale_input" and not sighted \
+                        and str((b.get("input") or {}).get("latest_date", "")) > ds:
+                    sighted = r["ts"]
                 open_date = ds
         else:  # CONSISTENCY
             ref = by_hash.get(b.get("day_row", ""))
