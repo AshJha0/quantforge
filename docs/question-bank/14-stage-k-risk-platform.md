@@ -286,7 +286,7 @@ The pitfall is the sign: the swaption is short the floating rate, so it is a put
 
 *Level: advanced. Evidence: measured; blind record. Source: `program/STAGE_K_BLIND_W1B.md`*
 
-12 of 16 value cases, 75%: the five published Basel examples plus seven blind re-derivations. Four more blind matches are excluded because the blind lane had read the unstripped spec once before the packet existed, which showed output facts for those four.
+12 of 19 value cases, 63.2%: the five published Basel examples, counted through the blind packet that re-derived them (a printed figure alone does not count, ruling KR-250), plus seven blind re-derivations. The three audit cases saccr_k-0040 to 0042 have no blind check. Four more blind matches are excluded because the blind lane had read the unstripped spec once before the packet existed, which showed output facts for those four.
 
 **Worked example.** Blind compare run 2: 11 of 11 MATCH; counted 7 (0007 to 0012, 0014); excluded 0006, 0013, 0015, 0016. Counting them would give 16 of 16, which the record does not claim. Run 1 compared nothing because of a wrapper-level bug in the compare script; no value was seen or changed.
 
