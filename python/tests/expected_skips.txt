@@ -1,0 +1,3 @@
+# Skip reasons that are expected. Every skip reason in a pytest run must contain one of these lines
+# (tests/conftest.py, K-9 review finding 21); any other skip fails the run.
+no golden root: datasets/golden/stage_d not found (mutation copy)
