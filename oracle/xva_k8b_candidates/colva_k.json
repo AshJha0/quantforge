@@ -1,0 +1,397 @@
+{
+ "schema_version": "1.0",
+ "suite": "colva_k",
+ "status": "PENDING implementation (candidate golden; K-8b specs PROPOSED)",
+ "spec": "specifications/06-risk/xva-colva.md",
+ "generator": "oracle/python/gen_stage_k_xva_k8b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "survival_convention": "KR-296 (proposed): survival at the bucket start for FCA, FBA, MVA, ColVA",
+ "cases": [
+  {
+   "case_id": "colva_k-0001",
+   "operation": "xva.colva.value",
+   "inputs": {
+    "times": [
+     0.0,
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.9851119396030626,
+     0.9704455335485082,
+     0.9559974818331,
+     0.9417645335842487
+    ],
+    "collateral": [
+     100.0,
+     80.0,
+     50.0,
+     20.0
+    ],
+    "spread": 0.001
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "colva": -0.12139100070376345,
+     "terms": [
+      -0.04925559698015313,
+      -0.038817821341940326,
+      -0.0238999370458275,
+      -0.009417645335842488
+     ]
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "constant spread"
+  },
+  {
+   "case_id": "colva_k-0002",
+   "operation": "xva.colva.value",
+   "inputs": {
+    "times": [
+     0.0,
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.9851119396030626,
+     0.9704455335485082,
+     0.9559974818331,
+     0.9417645335842487
+    ],
+    "collateral": [
+     100.0,
+     80.0,
+     50.0,
+     20.0
+    ],
+    "spread": 0.001,
+    "survival": "BOTH",
+    "counterparty": {
+     "hazard_rate": 0.02
+    },
+    "own": {
+     "hazard_rate": 0.01
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "colva": -0.11969232863755361,
+     "terms": [
+      -0.04925559698015313,
+      -0.038239899273323996,
+      -0.023193587158213826,
+      -0.009003245225862657
+     ]
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "with survival"
+  },
+  {
+   "case_id": "colva_k-0003",
+   "operation": "xva.colva.value",
+   "inputs": {
+    "times": [
+     0.0,
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.9851119396030626,
+     0.9704455335485082,
+     0.9559974818331,
+     0.9417645335842487
+    ],
+    "collateral": [
+     100.0,
+     80.0,
+     50.0,
+     20.0
+    ],
+    "spread": 0.001,
+    "overnight_rates": [
+     -0.005,
+     0.0,
+     0.01,
+     -0.002
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "colva": -0.12139100070376345,
+     "terms": [
+      -0.04925559698015313,
+      -0.038817821341940326,
+      -0.0238999370458275,
+      -0.009417645335842488
+     ],
+     "collateral_floor": -0.2651132755724506
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "floor output"
+  },
+  {
+   "case_id": "colva_k-0004",
+   "operation": "xva.colva.value",
+   "inputs": {
+    "times": [
+     0.0,
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.9851119396030626,
+     0.9704455335485082,
+     0.9559974818331,
+     0.9417645335842487
+    ],
+    "collateral": [
+     100.0,
+     -40.0,
+     -60.0,
+     20.0
+    ],
+    "spread": [
+     0.001,
+     0.001,
+     -0.0005,
+     -0.0005
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "colva": -0.039477825868758226,
+     "terms": [
+      -0.04925559698015313,
+      0.019408910670970163,
+      -0.0143399622274965,
+      0.004708822667921244
+     ]
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "mixed signs"
+  },
+  {
+   "case_id": "colva_k-0005",
+   "operation": "xva.colva.value",
+   "inputs": {
+    "times": [
+     0.0,
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.9851119396030626,
+     0.9704455335485082,
+     0.9559974818331,
+     0.9417645335842487
+    ],
+    "collateral": [
+     100.0,
+     80.0,
+     50.0,
+     20.0
+    ],
+    "spread": [
+     0.002,
+     0.0015,
+     0.001,
+     0.0005
+    ],
+    "survival": "BOTH",
+    "counterparty": {
+     "hazard_rate": 0.03
+    },
+    "own": {
+     "hazard_rate": 0.015
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "colva": -0.18269219993460614,
+     "terms": [
+      -0.09851119396030626,
+      -0.05693125926334808,
+      -0.022848279631780707,
+      -0.0044014670791711055
+     ]
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "time-dependent spread with survival"
+  },
+  {
+   "case_id": "colva_k-0006",
+   "operation": "xva.colva.value",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "csa": {
+     "NS1": {
+      "threshold_receive": 1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": 1
+     }
+    },
+    "spread": 0.001,
+    "discount_factors": [
+     0.9925280548191384,
+     0.9851119396030626,
+     0.9777512371933363,
+     0.9704455335485082
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "colva": -0.0004250265274052741,
+     "terms": [
+      0.0,
+      0.0,
+      -6.110945232458352e-05,
+      -0.0003639170750806906
+     ],
+     "collateral_profile": [
+      0.0,
+      0.0,
+      0.25,
+      1.5
+     ]
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "path form on collexp_g-0004 (simulated)"
+  }
+ ]
+}
