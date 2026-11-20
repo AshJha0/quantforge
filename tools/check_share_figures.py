@@ -34,7 +34,7 @@ FILE_ITEM = {
     "docs/getting-started/tutorial-56-sa-ccr-example-1.md": "K-8d",
 }
 PENDING: set[str] = set()
-SHARE_LINE = re.compile(r"\b(?:share|Challenger|outside-check|Outside-check)\b", re.I)
+SHARE_LINE = re.compile(r"\b(?:share|Challenger|outside-check)\b|\b60%", re.I)
 SHARE = re.compile(r"\b(?:share|Challenger)\b([^.\n]|\.(?=[A-Za-z0-9_]))*?\b(\d+) of (\d+)\b")
 LABEL = re.compile(r"\bK-(4a|4b|4c|5a|8d|8e)\b")
 # Names that may stand right before a figure, beyond the suite names and the K labels.
@@ -139,7 +139,9 @@ def check_text(rel, text, d):
 
 def tracked(root):
     out = subprocess.run(["git", "ls-files", "*.md"], cwd=root, capture_output=True, text=True, check=True).stdout
+    # Ruling registers record the figures of the day a ruling was made (dated history, like program/).
     return [p for p in out.split("\n") if p and not p.startswith("program/") and p not in PENDING
+            and not re.match(r"specifications/stage-[a-z]+-rulings", p)
             and not p.startswith("oracle/OUTSIDE_SHARES")]
 
 
