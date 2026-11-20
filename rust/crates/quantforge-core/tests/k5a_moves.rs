@@ -35,7 +35,11 @@ fn k5a_1000_moves_inside_the_bound() {
         let h = f(m);
         let r = stage_k::delta_gamma_bound(&book, h).expect("valid book");
         let err = (r.estimate_pnl - stage_k::zero_revalue(&book, h)).abs();
-        if !(err <= r.bound) {
+        // A NaN error or bound counts as a violation.
+        if !matches!(
+            err.partial_cmp(&r.bound),
+            Some(std::cmp::Ordering::Less | std::cmp::Ordering::Equal)
+        ) {
             violations += 1;
         }
         worst = worst.max(err / r.bound);

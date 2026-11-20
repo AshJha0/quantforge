@@ -201,8 +201,7 @@ int moves() {
         if (err / r.bound > worst) worst = err / r.bound;
     }
     expect(violations == 0, "every move inside its bound");
-    std::printf("k5a moves: %zu moves, %d violations, worst |error| / bound = %.6g
-", hs.size(), violations, worst);
+    std::printf("k5a moves: %zu moves, %d violations, worst |error| / bound = %.6g\n", hs.size(), violations, worst);
     return failures == 0 ? 0 : 1;
 }
 
