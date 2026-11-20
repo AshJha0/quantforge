@@ -188,6 +188,104 @@ void op_xva_adjustments(const In& in, Out& out) {
     if (has_k) out.key_real("kva", hurdle * kva);
 }
 
+// `xva.sens.aad` (06-risk/xva-aad-adjustments.md, KR-262 to KR-267): every typed read first (E_SCHEMA), then the
+// KR-266 limits, the finite rule, the wrt and G-41 structural checks, then the G-41 domain checks.
+void op_xva_sens_aad(const In& in, Out& out) {
+    if (in.text("operation") != "xva.adjustments.value")
+        throw Error("E_SCHEMA", "operation is not supported", "operation");
+    const Value& iv = in.need("inputs");
+    if (iv.kind != Kind::Object) schema("inputs", "expected an object");
+    const In x(iv);
+    namespace xa = quantforge::xva_aad;
+    xa::Request r;
+    r.t = x.reals("times");
+    r.df = x.reals("discount_factors");
+    r.ee = x.reals("ee");
+    r.ene = x.reals("ene");
+    auto name = [&](const char* key, double& h, double& rec) {
+        const Value& v = x.need(key);
+        if (v.kind != Kind::Object) schema(key, "expected an object");
+        const In c(v);
+        h = c.real("hazard_rate");
+        rec = c.real("recovery");
+    };
+    name("counterparty", r.hc, r.rc);
+    name("own", r.hb, r.rb);
+    const Value& fv = x.need("funding");
+    if (fv.kind != Kind::Object) schema("funding", "expected an object");
+    const In f(fv);
+    r.sb = f.real("borrow_spread");
+    r.sl = f.real("lend_spread");
+    r.exclude_overlap = f.boolean("exclude_dva_overlap");
+    const bool has_ims = x.find("im_spread") != nullptr, has_h = x.find("hurdle_rate") != nullptr;
+    r.has_im = x.find("im") != nullptr;
+    r.has_capital = x.find("capital") != nullptr;
+    if (r.has_im) r.im = x.reals("im");
+    if (has_ims) r.im_spread = x.real("im_spread");
+    if (r.has_capital) r.capital = x.reals("capital");
+    if (has_h) r.hurdle = x.real("hurdle_rate");
+    std::optional<std::vector<string>> wrt;
+    if (const Value* w = in.find("wrt")) {
+        if (w->kind != Kind::Array) schema("wrt", "expected an array of strings");
+        wrt.emplace();
+        for (const Value& k : w->items) wrt->push_back(to_string(k, "wrt"));
+    }
+    for (const Vec* v : {&r.t, &r.df, &r.ee, &r.ene, &r.im, &r.capital}) limit_if(v->size() > 10000, "inputs");
+    in.ready();
+    const std::vector<string> names = xa::check_wrt(wrt, xa::keys(r.has_im, r.has_capital));
+    const std::size_t n = r.t.size();
+    if (n == 0) throw Error("E_INPUT", "times needs at least one time", "times");
+    for (std::size_t i = 1; i < n; ++i)
+        if (!(r.t[i] > r.t[i - 1])) throw Error("E_INPUT", "times must be increasing", "times");
+    if (r.df.size() != n || r.ee.size() != n || r.ene.size() != n)
+        throw Error("E_INPUT", "lengths differ from times", "ee");
+    if (r.has_im != has_ims) throw Error("E_INPUT", "im and im_spread come together", "im_spread");
+    if (r.has_capital != has_h) throw Error("E_INPUT", "capital and hurdle_rate come together", "hurdle_rate");
+    if ((r.has_im && r.im.size() != n) || (r.has_capital && r.capital.size() != n))
+        throw Error("E_INPUT", "lengths differ from times", "im");
+    if (!(r.t[0] > 0)) throw Error("E_INPUT", "times must be after 0", "times");
+    if (!(r.hc >= 0) || !(r.hb >= 0)) throw Error("E_DOMAIN", "hazard_rate is negative", "hazard_rate");
+    if (!(r.rc >= 0 && r.rc < 1) || !(r.rb >= 0 && r.rb < 1))
+        throw Error("E_DOMAIN", "recovery must lie in [0, 1)", "recovery");
+    for (std::size_t i = 0; i < n; ++i) {
+        if (!(r.ee[i] >= 0)) throw Error("E_DOMAIN", "ee is negative", "ee");
+        if (!(r.ene[i] <= 0)) throw Error("E_DOMAIN", "ene is positive", "ene");
+    }
+    const double sl = r.exclude_overlap ? std::max(r.sl - r.hb * (1 - r.rb), 0.0) : r.sl;
+    double cva = 0, dva = 0, fca = 0, fba = 0, mva = 0, kva = 0, prev = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+        const double Sc0 = std::exp(-r.hc * prev), Sc1 = std::exp(-r.hc * r.t[i]);
+        const double Sb0 = std::exp(-r.hb * prev), Sb1 = std::exp(-r.hb * r.t[i]);
+        const double dt = r.t[i] - prev, w = r.df[i] * Sc0 * Sb0 * dt;
+        cva += r.df[i] * r.ee[i] * (Sc0 - Sc1) * Sb0;
+        dva += r.df[i] * std::fabs(r.ene[i]) * (Sb0 - Sb1) * Sc0;
+        fca += w * r.ee[i];
+        fba += w * std::fabs(r.ene[i]);
+        if (r.has_im) mva += w * r.im[i];
+        if (r.has_capital) kva += w * r.capital[i];
+        prev = r.t[i];
+    }
+    out.key_real("cva", (1 - r.rc) * cva);
+    out.key_real("dva", (1 - r.rb) * dva);
+    out.key_real("fca", r.sb * fca);
+    out.key_real("fba", sl * fba);
+    out.key_real("fva", r.sb * fca - sl * fba);
+    if (r.has_im) out.key_real("mva", r.im_spread * mva);
+    if (r.has_capital) out.key_real("kva", r.hurdle * kva);
+    out.values.key("gradient");
+    out.values.begin_object();
+    for (const auto& [o, g] : xa::gradient(r, names)) {
+        out.values.key(o);
+        out.values.begin_object();
+        for (const auto& e : g) {
+            if (e.scalar) out.key_real(e.key, e.s);
+            else out.key_reals(e.key, e.v);
+        }
+        out.values.end_object();
+    }
+    out.values.end_object();
+}
+
 // `xva.sbim.ir_delta`; `xva.simm.ir_delta` is its deprecated alias in v1.0.0, removed in the first release after it (KR-152, KR-256) and maps to this same handler.
 void op_xva_sbim(const In& in, Out& out) {
     const Vec s = sr_reals(in, "sensitivities"), rw = sr_reals(in, "risk_weights");
@@ -306,6 +404,7 @@ void op_xva_wwr(const In& in, Out& out) {
 constexpr Entry xva_ops[] = {
     {"xva.exposure.collateralised", op_xva_collateralised},
     {"xva.adjustments.value", op_xva_adjustments},
+    {"xva.sens.aad", op_xva_sens_aad},
     {"xva.sbim.ir_delta", op_xva_sbim},
     {"xva.simm.ir_delta", op_xva_sbim},  // deprecated alias (KR-152)
     {"xva.wwr.cva_hw", op_xva_wwr},

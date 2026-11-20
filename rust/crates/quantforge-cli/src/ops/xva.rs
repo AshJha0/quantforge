@@ -161,6 +161,98 @@ super::registry! {
         }
         plain(Json::Obj(o))
     },
+    "xva.sens.aad" => {
+        // KR-262 to KR-267: every typed read first (E_SCHEMA), the pairing and wrt rules after the gate.
+        if i.str("operation")? != "xva.adjustments.value" {
+            return fail("E_SCHEMA", "operation is not supported");
+        }
+        let inner = super::rates::sub(i, "inputs")?;
+        let name = |k: &str| -> Result<xva::Name> {
+            let c = super::rates::sub(&inner, k)?;
+            Ok(xva::Name { hazard_rate: c.f64("hazard_rate")?, recovery: c.f64("recovery")? })
+        };
+        let f = super::rates::sub(&inner, "funding")?;
+        let opt_pair = |a: &str, b: &str| -> Result<(Option<Vec<f64>>, Option<f64>)> {
+            let x = if inner.opt(a).is_some() { Some(inner.reals(a)?) } else { None };
+            let y = if inner.opt(b).is_some() { Some(inner.f64(b)?) } else { None };
+            Ok((x, y))
+        };
+        let (times, dfs) = (inner.reals("times")?, inner.reals("discount_factors")?);
+        let (ee, ene) = (inner.reals("ee")?, inner.reals("ene")?);
+        let (cp, own) = (name("counterparty")?, name("own")?);
+        let (sb, sl, excl) = (
+            f.f64("borrow_spread")?,
+            f.f64("lend_spread")?,
+            f.bool("exclude_dva_overlap")?,
+        );
+        let (im, ims) = opt_pair("im", "im_spread")?;
+        let (cap, hur) = opt_pair("capital", "hurdle_rate")?;
+        let wrt = match i.opt("wrt") {
+            None => None,
+            Some(_) => Some(
+                i.array("wrt")?
+                    .iter()
+                    .map(|v| v.as_str().map(str::to_string).ok_or(()))
+                    .collect::<std::result::Result<Vec<String>, ()>>()
+                    .or_else(|_| fail("E_SCHEMA", "wrt is not an array of strings"))?,
+            ),
+        };
+        i.gate()?;
+        let allowed = quantforge_core::xva_aad::keys(im.is_some(), cap.is_some());
+        let names = quantforge_core::xva_aad::check_wrt(wrt.as_deref(), &allowed)?;
+        let pair = |x: Option<Vec<f64>>, y: Option<f64>, what: &str| -> Result<Option<(Vec<f64>, f64)>> {
+            match (x, y) {
+                (Some(a), Some(b)) => Ok(Some((a, b))),
+                (None, None) => Ok(None),
+                _ => fail("E_INPUT", format!("{what} go together")),
+            }
+        };
+        let x = xva::AdjInputs {
+            times,
+            discount_factors: dfs,
+            ee,
+            ene,
+            counterparty: cp,
+            own,
+            borrow_spread: sb,
+            lend_spread: sl,
+            exclude_dva_overlap: excl,
+            im: pair(im, ims, "im and im_spread")?,
+            capital: pair(cap, hur, "capital and hurdle_rate")?,
+        };
+        let r = xva::adjustments(&x)?;
+        let mut o = vec![
+            ("cva".to_string(), Json::from(r.cva)),
+            ("dva".to_string(), r.dva.into()),
+            ("fca".to_string(), r.fca.into()),
+            ("fba".to_string(), r.fba.into()),
+            ("fva".to_string(), r.fva.into()),
+        ];
+        if let Some(m) = r.mva {
+            o.push(("mva".to_string(), m.into()));
+        }
+        if let Some(k) = r.kva {
+            o.push(("kva".to_string(), k.into()));
+        }
+        let grad = quantforge_core::xva_aad::gradient(&x, &names)
+            .into_iter()
+            .map(|(out, row)| {
+                let row = row
+                    .into_iter()
+                    .map(|(k, e)| {
+                        let v = match e {
+                            quantforge_core::xva_aad::Entry::Scalar(s) => Json::from(s),
+                            quantforge_core::xva_aad::Entry::Profile(p) => p.into(),
+                        };
+                        (k.to_string(), v)
+                    })
+                    .collect();
+                (out.to_string(), Json::Obj(row))
+            })
+            .collect();
+        o.push(("gradient".to_string(), Json::Obj(grad)));
+        plain(Json::Obj(o))
+    },
     // `xva.simm.ir_delta` is a deprecated alias of `xva.sbim.ir_delta` in v1.0.0, removed in the first release after it (KR-152, KR-256): same arm.
     "xva.sbim.ir_delta" | "xva.simm.ir_delta" => {
         let s = i.reals("sensitivities")?;

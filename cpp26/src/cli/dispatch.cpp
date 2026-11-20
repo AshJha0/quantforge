@@ -61,6 +61,7 @@
 #include "quantforge/core/vol_stats.hpp"
 #include "quantforge/core/joint.hpp"
 #include "quantforge/core/xva.hpp"
+#include "quantforge/core/xva_aad.hpp"
 #include "quantforge/core/book_sensitivity.hpp"
 #include "quantforge/core/var_frtb.hpp"
 #include "quantforge/core/book.hpp"

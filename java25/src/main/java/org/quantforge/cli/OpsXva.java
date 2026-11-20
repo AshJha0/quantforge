@@ -298,6 +298,9 @@ final class OpsXva {
             }
             names = names.stream().filter(wrt::contains).toList();
         }
+        if (r.t().length > 0 && !(r.t()[0] > 0.0)) {
+            throw input("times"); // KR-267: G-41's "increasing and above 0" is structural here
+        }
         checkAdjustments(read);
         Out o = adjustmentValues(r);
         o.outputs().put("gradient", XvaAad.gradient(r, names));

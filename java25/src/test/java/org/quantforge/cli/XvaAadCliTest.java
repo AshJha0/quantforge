@@ -89,7 +89,7 @@ class XvaAadCliTest {
             }
         }
         assertEquals(13, ok);
-        assertEquals(23, err);
+        assertEquals(24, err);
     }
 
     private static double sum(double[] x) {

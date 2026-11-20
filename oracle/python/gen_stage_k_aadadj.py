@@ -421,6 +421,8 @@ def build():
         "discount factors for 10,001 times", two=True)
     err(req(with_(base, times=big, own={"hazard_rate": "NaN"})), "E_LIMIT",
         "two errors: [limit] 10,001 times and [finite] own hazard NaN", two=True)
+    err(req(with_(base, times=[0.0, 1.0, 1.5, 2.0])), "E_INPUT", "times start at 0 (G-41: increasing and above 0, "
+        "a structural check, KR-267)")
     return s, o1
 
 

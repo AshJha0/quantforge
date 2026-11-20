@@ -112,4 +112,5 @@ pub mod venue_analytics;
 pub mod vix;
 pub mod xccy;
 pub mod xva;
+pub mod xva_aad;
 pub mod xva_port;

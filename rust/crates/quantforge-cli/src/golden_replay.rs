@@ -347,7 +347,7 @@ fn stage_i_goldens() {
 /// goldens are added.
 #[test]
 fn stage_k_goldens() {
-    replay_only("stage_k", &[], 201);
+    replay_only("stage_k", &[], 275);
 }
 
 /// The stage J wave 3 (scenario stress, interpolation backtests, drift detectors) and curves lane

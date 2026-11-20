@@ -26056,6 +26056,68 @@
     "two-errors"
    ],
    "description": "two errors: [limit] 10,001 times and [finite] own hazard NaN"
+  },
+  {
+   "case_id": "aadadj_k-0037",
+   "operation": "xva.sens.aad",
+   "inputs": {
+    "operation": "xva.adjustments.value",
+    "inputs": {
+     "times": [
+      0.0,
+      1.0,
+      1.5,
+      2.0
+     ],
+     "discount_factors": [
+      0.985,
+      0.97,
+      0.955,
+      0.94
+     ],
+     "ee": [
+      120.0,
+      150.0,
+      130.0,
+      80.0
+     ],
+     "ene": [
+      -60.0,
+      -90.0,
+      -100.0,
+      -70.0
+     ],
+     "counterparty": {
+      "hazard_rate": 0.02,
+      "recovery": 0.4
+     },
+     "own": {
+      "hazard_rate": 0.01,
+      "recovery": 0.4
+     },
+     "funding": {
+      "borrow_spread": 0.008,
+      "lend_spread": 0.008,
+      "exclude_dva_overlap": false
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "hand: expected code decided from the rulings (KR-267, KR-230 order), not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "xva",
+    "aad",
+    "error"
+   ],
+   "description": "times start at 0 (G-41: increasing and above 0, a structural check, KR-267)"
   }
  ]
 }
