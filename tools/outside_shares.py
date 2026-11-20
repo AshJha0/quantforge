@@ -229,19 +229,31 @@ def load_stage_h():
 # blind at the golden's tolerance: a case whose `verified_by` says "not blind" (gap-decided fields, oracle-only
 # cases) or "only to 6 decimals" (idr_k-0001..0004 `bound`, compared at 1e-9 relative but blind-checked to 5e-7
 # absolute) does not count. The mpmath values are our own oracle and never count (KR-11).
-# Stage K wave 1b (integration 2026-11-19, program/STAGE_K_W1B_HANDOVER.md): a case also counts when its `verified_by`
-# records a figure printed in the regulator text with MATCH ("published: ... MATCH", CRE99 and MAR99 Table 2), as stage H
-# counts printed paper figures. SciPy `binom.cdf` checks on btk_k are not counted: the D6 precedent is stage F's
+# Stage K wave 1b: a printed regulator figure ("published: ... MATCH", CRE99 and MAR99 Table 2) does NOT count on its own
+# (ruling KR-250, audit KA-C18, program/STAGE_K_AUDIT_C18_RESPONSE.md). The integration of 2026-11-19 had counted it,
+# citing stage H; but stage H never counts a printed figure alone (as_h-0005..0007 and ac_h-0005 count through their
+# DR-H2 blind MATCH, the printed figure is an "extra check"; ob_h-0001's printed checksum is not counted), stage F
+# classes the Cboe VIX worked example `none` (vix_f-0001..0003), and the D6 docstring above says a published worked
+# example alone does not count. A printed figure checks some outputs at print precision, not every compared output
+# at the golden's tolerance. `--count-printed` prints the shares under the withdrawn reading, for comparison only. SciPy `binom.cdf` checks on btk_k are not counted: the D6 precedent is stage F's
 # REIMPL_ROWS ("SCIPY.BINOM"), under which risk_f4-0082 (`risk.backtest.traffic_light`, the same binomial sum) is
 # `reimplementation`; a library primitive computing the same closed-form quantity is not a different formulation.
-# K-5a: the K-5a blind packet
-# (program/STAGE_K_BLIND_K5A.md, 2026-11-19) re-derived idr_k-0001..0005 at 1e-9 relative, 5 of 5 MATCH; their
-# verified_by now records that run, so they count as blind re-derivation.
+# K-5a: KR-234 redefined `bound`, so the version 1 packet (program/STAGE_K_BLIND_K5A.md) no longer covers it. The
+# version 2 packet (program/STAGE_K_BLIND_K5A_V2.md, 2026-11-19) re-derived 11 cases at 1e-9 relative: 9 MATCH,
+# counted; idr_k-0012 and idr_k-0013 MISMATCH on estimate_pnl and are NOT counted.
+# trig_k: KR-232 redefined `false_alarm_rate`, so the wave-1 blind MATCH no longer covers every compared output and
+# trig_k lost its blind credit (verified_by says "not blind"); the SciPy checks do not count (KR-11).
+# The 28 printed-figure cases count through the blind pub packet (program/STAGE_K_BLIND_PUB.md, 28 of 28 MATCH at
+# full tolerance), not through the printed figure (KR-250).
 STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-5a", "rich_k": "K-8 guard",
                  "k8_k": "K-8", "e1_k": None, "e2_k": None,  # e1_k, e2_k: error cases only
                  "saccr_k": "K-8d", "btk_k": "K-8e", "tlk_k": "F (existing traffic_light)",
-                 "sbim_alias_k": None}  # KR-153: the deprecated alias's invariance and error cases; no value case
+                 "sbim_alias_k": None,  # KR-153: the deprecated alias's invariance and error cases; no value case
+                 "lim_k": None}  # KR-230/KR-231: size-limit error cases only (bitemporal_query, trigger.check)
 K_PUBLISHED_SRC = "figure printed in the regulator text (Basel Framework CRE99, MAR99 Table 2)"
+
+
+COUNT_PRINTED = False  # reporting switch for --count-printed only; never written to the committed files
 
 
 def load_stage_k():
@@ -251,7 +263,7 @@ def load_stage_k():
             vb = " | ".join(c.get("verified_by", []))
             if "DR-H2" in vb and "MATCH" in vb and "not blind" not in vb and "only to 6 decimals" not in vb:
                 out[c["case_id"]] = (REDERIVED, H_REDERIVE_SRC)
-            elif any(v.startswith("published:") and "MATCH" in v for v in c.get("verified_by", [])):
+            elif COUNT_PRINTED and any(v.startswith("published:") and "MATCH" in v for v in c.get("verified_by", [])):
                 out[c["case_id"]] = (REDERIVED, K_PUBLISHED_SRC)
     return out
 
@@ -435,10 +447,13 @@ def markdown(doc):
               "Ruling KR-11: SciPy checks only trig_k `false_alarm_rate`, one of four compared outputs, so no case is "
               "library-checked. A case counts as `independent-rederivation` only if the wave-1 blind lane (DR-H2) checked "
               "every compared output at the golden's tolerance; gap-decided, oracle-only and 6-decimal bound cases do not count. "
-              "Wave 1b also counts a figure printed in the regulator text (CRE99 Examples 1 to 5, MAR99 Table 2) and the "
-              "seven SA-CCR cases the wave-1b blind lane matched (program/STAGE_K_BLIND_W1B.md); SciPy binomial checks on "
-              "btk_k are not counted. Later blind packets, counted the same way: K-5a idr_k-0001..0005 "
-              "(program/STAGE_K_BLIND_K5A.md), the K-8 ladder k8_k (program/STAGE_K_BLIND_K8.md) and eleven btk_k cases "
+              "A figure printed in the regulator text (CRE99 Examples 1 to 5, MAR99 Table 2) does not count on its own "
+              "(ruling KR-250, audit KA-C18): it checks some outputs at print precision, not every compared output at the "
+              "golden's tolerance; those 28 cases count through the blind packet that matched them 28 of 28 (program/STAGE_K_BLIND_PUB.md). "
+              "Counted from wave 1b: the seven SA-CCR cases the wave-1b blind lane matched (program/STAGE_K_BLIND_W1B.md); SciPy binomial checks on "
+              "btk_k are not counted. trig_k lost its blind credit when KR-232 redefined false_alarm_rate (the SciPy check does not count). "
+              "Later blind packets, counted the same way: K-5a version 2, 9 of 11 (program/STAGE_K_BLIND_K5A_V2.md; "
+              "idr_k-0012 and idr_k-0013 mismatched and are not counted), the K-8 ladder k8_k (program/STAGE_K_BLIND_K8.md) and eleven btk_k cases "
               "(program/STAGE_K_BLIND_BTK.md; btk_k-0017 matched and is not counted). The mpmath oracle is our own and never counts.", "",
               "| Item | Suites | Value cases | Blind | Share | 60% per item |", "|---|---|---:|---:|---:|---|"]
         L += [f"| {it} | {', '.join('`' + s + '`' for s in v['suites'])} | {v['cases']} | {v['counted_with_rederivation']} | "
@@ -458,7 +473,22 @@ def markdown(doc):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--count-printed", action="store_true",
+                    help="print stage K shares as if a printed regulator figure alone counted (withdrawn reading, KR-250); writes nothing")
     a = ap.parse_args(argv)
+    global COUNT_PRINTED
+    if a.count_printed:
+        COUNT_PRINTED = True
+        try:
+            doc = build([])
+        finally:
+            COUNT_PRINTED = False
+        ek = doc["stages"]["K"]
+        w = ek["without_sweeps"]
+        print(f"stage K (printed figure counted, withdrawn reading): {w['counted_with_rederivation']} of {w['cases']} = {w['share_with_rederivation']:.1%}")
+        for it, v in ek["per_item"].items():
+            print(f"  {it}: {v['counted_with_rederivation']} of {v['cases']} = {(v['share_with_rederivation'] or 0):.1%}")
+        return 0
     problems = []
     doc = build(problems)
     js = json.dumps(doc, indent=1, ensure_ascii=False) + "\n"

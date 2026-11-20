@@ -30,7 +30,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts: not blind until the K-5a packet is rerun"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts; the K-5a version 2 packet re-derived both outputs (next entry)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A_V2.md, spec 1.1.0): MATCH on estimate_pnl and bound"
    ],
    "tags": [
     "stage_k",
@@ -71,7 +72,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts: not blind until the K-5a packet is rerun"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts; the K-5a version 2 packet re-derived both outputs (next entry)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A_V2.md, spec 1.1.0): MATCH on estimate_pnl and bound"
    ],
    "tags": [
     "stage_k",
@@ -112,7 +114,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts: not blind until the K-5a packet is rerun"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts; the K-5a version 2 packet re-derived both outputs (next entry)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A_V2.md, spec 1.1.0): MATCH on estimate_pnl and bound"
    ],
    "tags": [
     "stage_k",
@@ -153,7 +156,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts: not blind until the K-5a packet is rerun"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts; the K-5a version 2 packet re-derived both outputs (next entry)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A_V2.md, spec 1.1.0): MATCH on estimate_pnl and bound"
    ],
    "tags": [
     "stage_k",
@@ -199,7 +203,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts: not blind until the K-5a packet is rerun"
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula no longer counts; the K-5a version 2 packet re-derived both outputs (next entry)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A_V2.md, spec 1.1.0): MATCH on estimate_pnl and bound"
    ],
    "tags": [
     "stage_k",
@@ -296,7 +301,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-5a version 2 lane (next entry)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A_V2.md, spec 1.1.0): MATCH on estimate_pnl and bound"
    ],
    "tags": [
     "stage_k",
@@ -337,7 +343,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-5a version 2 lane (next entry)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A_V2.md, spec 1.1.0): MATCH on estimate_pnl and bound"
    ],
    "tags": [
     "stage_k",
@@ -378,7 +385,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-5a version 2 lane (next entry)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A_V2.md, spec 1.1.0): MATCH on estimate_pnl and bound"
    ],
    "tags": [
     "stage_k",
@@ -552,7 +560,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "mpmath 50 digits",
-    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-5a version 2 lane (next entry)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A_V2.md, spec 1.1.0): MATCH on estimate_pnl and bound"
    ],
    "tags": [
     "stage_k",

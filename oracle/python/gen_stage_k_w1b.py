@@ -270,6 +270,9 @@ BLIND_W1B = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W1B.md)
 # K-8e blind lane (program/STAGE_K_BLIND_BTK.md, packet manifest 03fdc75d, compare fixed at 21392489): 12 of 12 MATCH,
 # 11 counted. btk_k-0017 (one observation) matched but is not counted: the rules text states its answer.
 BLIND_BTK = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
+# Printed-figure blind lane (program/STAGE_K_BLIND_PUB.md, compare fixed at 00167bf5): 28 of 28 MATCH at full
+# tolerance (saccr_k-0001..0005, btk_k-0001..0012, tlk_k-0001..0011), counted per KR-250; recorded 2026-11-20.
+BLIND_PUB = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
 
 
 def gen_saccr():
@@ -282,7 +285,7 @@ def gen_saccr():
         check(near(hi["ead"], printed), f"{cre} printed EAD {printed} (ead {mp.nstr(hi['ead'], 10)})")
         s.add("risk.saccr.ead", inp, lo, verified=[
             ORACLE, f"published: Basel Framework {cre} printed EAD {printed}: MATCH at nearest integer (KR-30)",
-            f"published: BCBS 279 Annex 4a, PDF pp.{bcbs} (read 2026-11-15, STAGE_K_SOURCES.md) EAD {printed}: MATCH"],
+            f"published: BCBS 279 Annex 4a, PDF pp.{bcbs} (read 2026-11-15, STAGE_K_SOURCES.md) EAD {printed}: MATCH", BLIND_PUB],
             tags=TAGS_S + ["outside_checked", "published"], output_classes=oc,
             description=f"CRE99 worked example, printed EAD {printed} ({cre})")
     published_intermediates(hp)
@@ -468,7 +471,7 @@ def gen_backtest():
               f"MAR99 Table 2 row {x}: {printed[k]}% {TABLES['printed_table2_zone'][k]}")
         s.add("risk.frtb.backtest.zone", {"observations": 250, "exceptions_actual": x, "exceptions_hypothetical": 0}, o,
               verified=[ORACLE, SCIPY + ": binom.cdf MATCH 1e-12",
-                        f"published: MAR99 Table 2 (Basel Framework PDF p.758) row {k}: " + (f"{printed[k]}%, " if x <= 10 else "") + f"{TABLES['printed_table2_zone'][k]}, multiplier: MATCH"],
+                        f"published: MAR99 Table 2 (Basel Framework PDF p.758) row {k}: " + (f"{printed[k]}%, " if x <= 10 else "") + f"{TABLES['printed_table2_zone'][k]}, multiplier: MATCH", BLIND_PUB],
               tags=TAGS_B + ["outside_checked", "published"], output_classes=oc, description=f"{x} exceptions in 250 at 99% (MAR99 Table 2)")
     for n, xa, xh, why in [(250, 3, 7, "the larger of the APL and HPL counts (MAR99.8)"), (500, 9, 8, "500 observations"),
                            (100, 2, 0, "100 observations"), (1000, 15, 15, "1,000 observations"),
@@ -542,6 +545,13 @@ def gen_backtest():
               limit={"absolute": 1e-15, "relative": 1e-12},
               description=f"KR-237 (KA-A16): {n:,} observations, {max(xa, xh):,} exceptions: the binomial sum at large n "
                           "against exact rationals (the lgamma form was 1.3e-10 off at 100,000)")
+    # KR-252 (audit KA-C20 (3)), appended 2026-11-20 so that the case ids above stay as they were: a non-finite
+    # token at an integer input is E_SCHEMA, which pins the Integer-only premise of the E1 exemption.
+    err(z, {"observations": 250, "exceptions_actual": "NaN", "exceptions_hypothetical": 0}, "E_SCHEMA",
+        "KR-252: a non-finite token (NaN) at an integer count is a schema error, not a number")
+    err(d, {"observations": 250, "exceptions_99_actual": "NaN", "exceptions_99_hypothetical": 0,
+            "exceptions_975_actual": 0, "exceptions_975_hypothetical": 0}, "E_SCHEMA",
+        "KR-252: a non-finite token (NaN) at an integer count is a schema error, not a number")
     s.write()
     return s
 
@@ -559,7 +569,7 @@ def gen_traffic_light():
         s.add("risk.backtest.traffic_light", {"observations": 250, "exceptions": x, "confidence": 0.99},
               {"cumulative_probability": f(c), "zone": zone, "plus_factor": 0.0 if x <= 4 else plus.get(x, 1.0)},
               verified=[ORACLE, SCIPY + ": binom.cdf MATCH 1e-12",
-                        f"published: MAR99 Table 2 (Basel Framework PDF p.758) row {x}: {printed[x]}%, zone {TABLES['printed_table2_zone'][x]} (YELLOW = Amber): MATCH"],
+                        f"published: MAR99 Table 2 (Basel Framework PDF p.758) row {x}: {printed[x]}%, zone {TABLES['printed_table2_zone'][x]} (YELLOW = Amber): MATCH", BLIND_PUB],
               tags=["stage_k", "traffic_light", "outside_checked", "published"], output_classes=oc,
               description=f"existing operation, {x} of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)")
     s.write()

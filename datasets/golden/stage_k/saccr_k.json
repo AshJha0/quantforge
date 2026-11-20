@@ -121,7 +121,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "published: Basel Framework CRE99.40, p.528 printed EAD 569: MATCH at nearest integer (KR-30)",
-    "published: BCBS 279 Annex 4a, PDF pp.26-28 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 569: MATCH"
+    "published: BCBS 279 Annex 4a, PDF pp.26-28 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 569: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -243,7 +244,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "published: Basel Framework CRE99.58, p.532 printed EAD 381: MATCH at nearest integer (KR-30)",
-    "published: BCBS 279 Annex 4a, PDF pp.28-30 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 381: MATCH"
+    "published: BCBS 279 Annex 4a, PDF pp.28-30 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 381: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -365,7 +367,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "published: Basel Framework CRE99.76, p.536 printed EAD 5406: MATCH at nearest integer (KR-30)",
-    "published: BCBS 279 Annex 4a, PDF pp.31-32 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 5406: MATCH"
+    "published: BCBS 279 Annex 4a, PDF pp.31-32 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 5406: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -564,7 +567,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "published: Basel Framework CRE99.79, p.537 printed EAD 936: MATCH at nearest integer (KR-30)",
-    "published: BCBS 279 Annex 4a, PDF pp.32-33 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 936: MATCH"
+    "published: BCBS 279 Annex 4a, PDF pp.32-33 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 936: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -770,7 +774,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "published: Basel Framework CRE99.97, p.540 printed EAD 1879: MATCH at nearest integer (KR-30)",
-    "published: BCBS 279 Annex 4a, PDF pp.33-34 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 1879: MATCH"
+    "published: BCBS 279 Annex 4a, PDF pp.33-34 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 1879: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",

@@ -26,7 +26,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 0: 8.11%, zone GREEN (YELLOW = Amber): MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 0: 8.11%, zone GREEN (YELLOW = Amber): MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -60,7 +61,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 1: 28.58%, zone GREEN (YELLOW = Amber): MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 1: 28.58%, zone GREEN (YELLOW = Amber): MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -94,7 +96,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 2: 54.32%, zone GREEN (YELLOW = Amber): MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 2: 54.32%, zone GREEN (YELLOW = Amber): MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -128,7 +131,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 3: 75.81%, zone GREEN (YELLOW = Amber): MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 3: 75.81%, zone GREEN (YELLOW = Amber): MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -162,7 +166,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 4: 89.22%, zone GREEN (YELLOW = Amber): MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 4: 89.22%, zone GREEN (YELLOW = Amber): MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -196,7 +201,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 5: 95.88%, zone AMBER (YELLOW = Amber): MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 5: 95.88%, zone AMBER (YELLOW = Amber): MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -230,7 +236,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 6: 98.63%, zone AMBER (YELLOW = Amber): MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 6: 98.63%, zone AMBER (YELLOW = Amber): MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -264,7 +271,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 7: 99.6%, zone AMBER (YELLOW = Amber): MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 7: 99.6%, zone AMBER (YELLOW = Amber): MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -298,7 +306,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 8: 99.89%, zone AMBER (YELLOW = Amber): MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 8: 99.89%, zone AMBER (YELLOW = Amber): MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -332,7 +341,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 9: 99.97%, zone AMBER (YELLOW = Amber): MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 9: 99.97%, zone AMBER (YELLOW = Amber): MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -366,7 +376,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 10: 99.99%, zone RED (YELLOW = Amber): MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 10: 99.99%, zone RED (YELLOW = Amber): MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",

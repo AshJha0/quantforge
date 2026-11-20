@@ -44,7 +44,7 @@ Source: `oracle/OUTSIDE_SHARES.json` (written by `tools/outside_shares.py`). Flo
 | I | 153 | 102 | 66.7% | 102 | 66.7% | met |
 | J | 215 | 143 | 66.5% | 143 | 66.5% | met |
 | H | 205 | 0 | 0.0% | 160 | 78.0% | met |
-| K | 87 | 0 | 0.0% | 78 | 89.7% | met |
+| K | 87 | 0 | 0.0% | 50 | 57.5% | NOT MET |
 
 Stage H per plan item (plan section 15: at least 60.0% of each item's value cases):
 
@@ -73,17 +73,22 @@ Stage K per plan item (plan section 15: at least 60.0% of each item's value case
 
 | Item | Suites | Value cases | Counted | Share | Per item |
 |---|---|---:|---:|---:|---|
-| F (existing traffic_light) | `tlk_k` | 11 | 11 | 100.0% | met |
+| F (existing traffic_light) | `tlk_k` | 11 | 0 | 0.0% | NOT MET |
 | K-4a | `bt_k` | 8 | 6 | 75.0% | met |
 | K-4b | `inc_k` | 4 | 4 | 100.0% | met |
 | K-4c | `trig_k` | 6 | 4 | 66.7% | met |
 | K-5a | `idr_k` | 5 | 5 | 100.0% | met |
 | K-8 | `k8_k` | 7 | 7 | 100.0% | met |
 | K-8 guard | `rich_k` | 6 | 6 | 100.0% | met |
+<<<<<<< HEAD
 | K-8d | `saccr_k` | 16 | 12 | 75.0% | met |
 | K-8e | `btk_k` | 24 | 23 | 95.8% | met |
 
 **Stage K shares above are under review, not settled (audit finding KA-C18, open; `docs/known-issues.md`).** They count cases checked against a figure printed in the regulator text, on part of their outputs and at print precision. By the strict reading of the rule (every compared output checked) the stage is 50 of 87 (57.5%), under the floor; items under the floor by that reading: F (existing traffic_light) 0 of 11 (0.0%); K-8d 7 of 16 (43.8%); K-8e 11 of 24 (45.8%).
+=======
+| K-8d | `saccr_k` | 16 | 7 | 43.8% | NOT MET |
+| K-8e | `btk_k` | 24 | 11 | 45.8% | NOT MET |
+>>>>>>> origin/k-audit-shares
 <!-- generated:status-ladder:end -->
 
 ## Stage K, round 1: what the generated table does not cover
