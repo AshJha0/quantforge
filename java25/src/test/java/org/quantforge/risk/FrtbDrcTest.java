@@ -228,7 +228,7 @@ class FrtbDrcTest {
         for (FrtbDrc.BucketRow b : out.buckets()) {
             assertTrue(b.drc() >= 0 && (b.hbr() == null || (b.hbr() >= 0 && b.hbr() <= 1)));
         }
-        // A3 of frtb-drc-rrao.md as corrected by KR-327 (proposed): "adding a long never lowers its bucket's DRC" is
+        // A3 of frtb-drc-rrao.md as corrected by KR-327 (confirmed 2026-11-20): "adding a long never lowers its bucket's DRC" is
         // false under MAR22.25 (a3MonotonicityCounterexample); it holds when the obligor has no net short and its risk
         // weight is at least that of every obligor with a net short in the bucket.
         String ob = OBLIGORS[rnd.nextInt(3)];

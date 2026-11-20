@@ -249,7 +249,7 @@ def test_drc_properties(
     assert total >= 0
     for b in out["buckets"]:  # type: ignore[attr-defined]
         assert b["drc"] >= 0 and (b["hbr"] is None or 0 <= b["hbr"] <= 1)
-    # KR-327 (proposed): "adding a long never lowers its bucket's DRC" is false in general
+    # KR-327 (confirmed 2026-11-20): "adding a long never lowers its bucket's DRC" is false in general
     # (test_drc_a3_monotonicity_counterexample); it holds when the obligor has no net short and its
     # risk weight is at least that of every obligor with a net short in the bucket.
     more = drc.drc_nonsec(
@@ -288,7 +288,7 @@ def test_drc_properties(
 
 
 def test_drc_a3_monotonicity_counterexample() -> None:
-    """KR-327 (proposed): the pinned book where a covered long of 885 added to obligor A lowers DRC_b.
+    """KR-327 (confirmed 2026-11-20): the pinned book where a covered long of 885 added to obligor A lowers DRC_b.
 
     The long offsets A's shorts, so the bucket's net short S falls and the HBR rises from 0.288 to
     0.395; the weight on the remaining shorts rises more than the weighted long does. Found by the

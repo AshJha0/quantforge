@@ -45,6 +45,8 @@ jobs:
         run: python3 oracle/python/gen_stage_f_e1.py G --check && python3 cpp26/tests/gen_cli_cases.py --check
       - name: sbim placeholder table is the generator's output (K-8h, KR-130)
         run: python3 tools/test_sbim_placeholder.py
+      - name: stage K generated table classes equal their JSON tables (wave 1b SA-CCR and backtesting, wave 2 K-8a, K-8f, K-8g, K-8i)
+        run: python3 tools/gen_k_w1b_tables.py --check && python3 tools/gen_k_w2a_tables.py --check && python3 tools/gen_k_w2b_tables.py --check
       - name: stage K share figures in docs match oracle/OUTSIDE_SHARES.json (KF-3, KF-13, KF-18)
         run: python3 tools/check_share_figures.py --self-test && python3 tools/check_share_figures.py
       - name: generated status ladder page is current (KF-18)
