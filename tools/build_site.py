@@ -42,7 +42,7 @@ h1,h2,h3{line-height:1.25}h2{color:var(--link);border-bottom:2px solid var(--lin
 pre{background:var(--code);padding:.8rem;overflow-x:auto;border-radius:4px}code{font-size:.92em;overflow-wrap:anywhere}pre code{overflow-wrap:normal}
 table{border-collapse:collapse;width:100%;font-size:.9rem;margin:1rem 0}th,td{border:1px solid var(--line);padding:.45rem .7rem;text-align:left}th{background:var(--code)}
 .glance th{width:9rem;vertical-align:top}.glance td{background:var(--panel)}
-.chart{max-width:42rem;margin:1.2rem 0}.chart svg{display:block;width:100%;height:auto}.chart p{font-size:.85rem;margin:.3rem 0 0}
+.chart{max-width:42rem;margin:1.2rem 0}.chart svg{display:block;width:100%;height:auto}main svg[role=img]{background:var(--bg);color:var(--ink)}.chart p{font-size:.85rem;margin:.3rem 0 0}
 .mermaid{background:var(--panel);border-radius:4px;padding:.5rem;overflow-x:auto;text-align:center}
 .skip{position:absolute;left:-999px;top:.5rem;background:var(--panel);color:var(--link);padding:.5rem 1rem;z-index:10}.skip:focus{left:.5rem}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}.bar a[aria-current=page]{text-decoration:underline;text-underline-offset:.3em}

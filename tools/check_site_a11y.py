@@ -29,7 +29,8 @@ Formal statement. Pages are every `*.html` under the built site in sorted order,
 page from the i-th (the same rule as tools/check_site_view.py). The pa11y-ci settings are those of `.pa11yci.json`
 (standard WCAG2AA, runners axe and HTML_CodeSniffer, `wait` and Chrome flags) with two changes that do not loosen
 the check: `timeout` is raised to 180 s so a long page (CHANGELOG, the known-issues register) is not reported as
-a load failure, and `concurrency` is 2. pa11y-ci counts errors only (warnings and notices are not reported), as in
+a load failure, and `concurrency` is 1 (CI run 44791215797, 2026-11-20: at concurrency 2 the bundled
+Chromium closed its connection on about a third of the pages, even on the two-page plant site). pa11y-ci counts errors only (warnings and notices are not reported), as in
 the four-page run. A page passes if pa11y-ci lists no issue for it; a page whose load failed is listed with the
 failure and fails. The merge fails unless, for each mode, the union of the shards' expected pages is the whole site
 (the count every shard read), every expected page has a result, and no result has an issue.
@@ -54,7 +55,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MODES = ("light", "dark")
 TIMEOUT_MS = 180000
-CONCURRENCY = 2
+CONCURRENCY = 1
+BATCH = 10
+RETRIES = 2
+PA11Y = ["npx", "--yes", "pa11y-ci@3.1.0"]
 
 
 def pages(site, shard=None):
@@ -234,6 +238,57 @@ def check_plant(results, base):
         return 1
     print("plant check: pa11y-ci reported the planted contrast failure and nothing on the clean page")
     return 0
+
+
+def is_load_failure(issues):
+    """True if pa11y-ci could not check the page at all (browser or protocol error), as opposed to a WCAG error."""
+    return bool(issues) and all(isinstance(x, dict) and not x.get("code") for x in issues)
+
+
+def run_pa11y(config, results, raw, cmd=None, batch=BATCH, retries=RETRIES):
+    """Runs pa11y-ci on the URLs of `config` in batches of `batch` (a fresh browser per batch), then runs each page
+    whose result was a load failure again on its own, up to `retries` times. A page that is checked and has a
+    WCAG error is never run again; a page that still cannot be loaded after the retries stays a load failure and
+    fails. Writes the merged pa11y-ci JSON to `results` (with the retries listed under "retried") and every raw
+    pa11y-ci output to `raw`. Exit status 0 only if every page was checked with no error.
+
+    Why: in CI run 44791215797 one Chromium crash failed every later page of the same pa11y-ci run ("Protocol
+    error: Connection closed"), so one bad moment cost a whole shard; batches bound that, and the retry separates
+    a crash from a page fault without dropping any page."""
+    import subprocess
+    cmd = cmd or PA11Y
+    cfg = json.loads(Path(config).read_text(encoding="utf-8"))
+    raw = Path(raw)
+    raw.mkdir(parents=True, exist_ok=True)
+    merged, retried, k = {}, {}, 0
+
+    def one(urls):
+        nonlocal k
+        k += 1
+        c = dict(cfg, urls=urls)
+        cf = raw / f"batch-{k:03d}.config.json"
+        cf.write_text(json.dumps(c, indent=1) + "\n", encoding="utf-8")
+        p = subprocess.run(cmd + ["--config", str(cf), "--json"], capture_output=True, text=True)
+        out = raw / f"batch-{k:03d}.json"
+        out.write_text(p.stdout, encoding="utf-8")
+        (raw / f"batch-{k:03d}.stderr.txt").write_text(p.stderr[-20000:], encoding="utf-8")
+        got = read_results(out) or {}
+        return {u: got.get(u, [{"message": f"no result from pa11y-ci (exit {p.returncode})"}]) for u in urls}
+
+    urls = cfg["urls"]
+    for i in range(0, len(urls), batch):
+        merged.update(one(urls[i:i + batch]))
+    for attempt in range(1, retries + 1):
+        again = [u for u in urls if is_load_failure(merged[u])]
+        for u in again:
+            retried.setdefault(u, []).append(merged[u][0].get("message", "")[:120])
+            merged[u] = one([u])[u]
+    bad = sum(1 for u in urls if merged[u])
+    Path(results).write_text(json.dumps({"total": len(urls), "errors": bad, "results": merged, "retried": retried},
+                                        indent=1) + "\n", encoding="utf-8")
+    print(f"pa11y-ci on {len(urls)} pages in {k} runs: {len(urls) - bad} pass, {bad} fail "
+          f"({sum(1 for u in urls if is_load_failure(merged[u]))} still not loadable); {len(retried)} page(s) retried")
+    return 0 if bad == 0 else 2
 
 
 # ---------------------------------------------------------------- static pre-check (no browser)
@@ -594,6 +649,34 @@ def self_test():
             fails.append("planted fault not caught: a pa11y run that missed the contrast failure passed")
         if contrast("#aaaaaa", "#ffffff") >= 4.5 or round(contrast("#aaaaaa", "#ffffff"), 2) != 2.32:
             fails.append(f"contrast formula: #aaa on #fff gave {contrast('#aaaaaa', '#ffffff'):.3f}, expected 2.32")
+    # run_pa11y with a stand-in for pa11y-ci: page b crashes once then passes, page c always crashes,
+    # page d has a WCAG error (never retried)
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        fake = t / "fake.py"
+        fake.write_text(
+            "import json,sys,pathlib\n"
+            "cfg=json.load(open(sys.argv[sys.argv.index('--config')+1]))\n"
+            "st=pathlib.Path(sys.argv[0]).with_name('seen.txt');seen=st.read_text().split() if st.exists() else []\n"
+            "r={}\n"
+            "for u in cfg['urls']:\n"
+            "  n=seen.count(u);seen.append(u)\n"
+            "  if u.endswith('/c.html') or (u.endswith('/b.html') and n==0): r[u]=[{'message':'Protocol error: Connection closed.'}]\n"
+            "  elif u.endswith('/d.html'): r[u]=[{'code':'color-contrast','type':'error'}]\n"
+            "  else: r[u]=[]\n"
+            "st.write_text(' '.join(seen));print(json.dumps({'results':r}));sys.exit(2 if any(r.values()) else 0)\n",
+            encoding="utf-8")
+        cfg = {"defaults": {}, "urls": [f"http://h/{p}.html" for p in "abcd"]}
+        (t / "cfg.json").write_text(json.dumps(cfg), encoding="utf-8")
+        rc = run_pa11y(t / "cfg.json", t / "res.json", t / "raw", cmd=[sys.executable, str(fake)], batch=3)
+        res = json.loads((t / "res.json").read_text())
+        r = res["results"]
+        if rc == 0 or r["http://h/a.html"] or r["http://h/b.html"] or not is_load_failure(r["http://h/c.html"])                 or r["http://h/d.html"][0].get("code") != "color-contrast":
+            fails.append(f"run_pa11y: wrong merge {rc} {r}")
+        if sorted(res["retried"]) != ["http://h/b.html", "http://h/c.html"] or len(res["retried"]["http://h/c.html"]) != RETRIES:
+            fails.append(f"run_pa11y: wrong retries {res['retried']}")
+        if "http://h/d.html" in res["retried"]:
+            fails.append("run_pa11y retried a page with a WCAG error")
     # static rules: each planted fault must be found, a clean page must give no error
     planted = {
         "html-has-lang": "<html><head><title>x</title></head><body><h1>x</h1></body></html>",
@@ -642,6 +725,9 @@ def main(argv=None):
     ap.add_argument("--merge", metavar="DIR")
     ap.add_argument("--shards", type=int)
     ap.add_argument("--modes", default=",".join(MODES))
+    ap.add_argument("--run", metavar="CONFIG", help="run pa11y-ci on CONFIG in batches; needs --results, --raw")
+    ap.add_argument("--results")
+    ap.add_argument("--raw")
     ap.add_argument("--static", metavar="SITE")
     ap.add_argument("--browser", metavar="SITE", help="local pass with Playwright and the installed Chrome")
     ap.add_argument("--channel", default="chrome")
@@ -654,6 +740,13 @@ def main(argv=None):
         if not (a.site and a.shard and a.mode and a.base and a.out):
             ap.error("--urls needs --site, --shard, --mode, --base and --out")
         return write_urls(a.site, a.shard, a.mode, a.base, a.out)
+    if a.run:
+        if not (a.results and a.raw):
+            ap.error("--run needs --results and --raw")
+        rc = run_pa11y(a.run, a.results, a.raw)
+        if a.out:
+            Path(a.out).write_text(f"{rc}\n", encoding="utf-8")
+        return rc
     if a.plant:
         return plant(a.plant, a.base or "http://127.0.0.1:8002")
     if a.check_plant:

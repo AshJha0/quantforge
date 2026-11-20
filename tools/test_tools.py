@@ -1252,9 +1252,21 @@ class SiteA11y(unittest.TestCase):
             self.assertEqual(m.self_test(), 0)
 
     def test_a11y_fix(self):
-        sp = importlib.util.spec_from_file_location("build_site_a11y", ROOT / "tools/build_site.py")
-        m = importlib.util.module_from_spec(sp)
-        sp.loader.exec_module(m)
+        # a11y_fix needs no Markdown; the docs-site step that runs this file has no `markdown` package, so a
+        # stand-in module lets build_site.py import (the site-build step uses the real, pinned markdown==3.11.2)
+        import types
+        saved = sys.modules.get("markdown")
+        try:
+            import markdown  # noqa: F401
+        except ImportError:
+            sys.modules["markdown"] = types.ModuleType("markdown")
+        try:
+            sp = importlib.util.spec_from_file_location("build_site_a11y", ROOT / "tools/build_site.py")
+            m = importlib.util.module_from_spec(sp)
+            sp.loader.exec_module(m)
+        finally:
+            if saved is None and isinstance(sys.modules.get("markdown"), types.ModuleType)                     and not hasattr(sys.modules["markdown"], "markdown"):
+                del sys.modules["markdown"]
         nl = chr(10)
         t1 = nl.join(["<table>", "<thead>", "<tr>", "<th></th>", "<th>A</th>", "</tr>", "</thead>",
                       "<tbody><tr><td>r</td><td>1</td></tr></tbody></table>"])
