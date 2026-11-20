@@ -15,6 +15,7 @@ Read from the register table in [known issues](known-issues.md); a miss stays a 
 | H-9 workload R | recorded miss | Timing MISS at p99 and p99.9 in every language on the recorded 6-hour crypto window of 2026-11-18/19; correctness passes; local laptop, not the acceptance machine; targets unchanged. | `specifications/09-microstructure/low-latency-targets.md`, "Workload R result" (measured) | stays a miss; H-9 R2 not yet run (below) |
 | K-11 | recorded miss | Daily curve run: on the one real day tried (2026-11-13) the consistency check against the Federal Reserve's fitted curve missed, RMSE 17.36 bp against the 15 bp tolerance fixed before the run. A consistency check, not proof; tolerance and method unchanged. | CHANGELOG Unreleased, K-11; `program/STAGE_K_CURVE_DAILY_HANDOVER.md` (measured) | stays a miss |
 | K-11 follow-ups | open limitation | The daily curve run lacks three library operations: a Svensson (four-factor) fit, a Treasury par bootstrap, and Nelson-Siegel evaluation at given times; each needs four builds, goldens and a ruling. | ROADMAP, "Stage K follow-ups" (read) | open; not in v1.0.0 |
+| K-8 AAD | recorded miss | `xva.sens.aad` (AAD of the G-41 adjustments, PROPOSED KR-262 to KR-268): 0 of 13 value cases outside-checked, under the 60% per-item floor; the 50-digit bump is our own reference, not an outside check. A blind packet (G-41, KR-263, KR-264, the 13 inputs) is the route. Only `xva.adjustments.value` is wrapped; the other K-8b operations wait for their specs. | `specifications/stage-k-rulings-xva-aad.md` KR-268; `oracle/OUTSIDE_SHARES.md` (measured) | open |
 | K-8 | point-release move | Lifting the R6 use restriction on the Bermudan ladder misses its acceptance (in-sample evidence only); the restriction stays for both methods (KR-113) and the lift moves to a later point release. Same issue as rows KA-B1 to KA-B3 above. | `specifications/06-risk/bermudan-ladder-k8.md`; README status (read) | open |
 | K-8a, K-8f, K-8g, K-8i | point-release move | Stage K wave 2 (FRTB DRC and RRAO, IMA, CVA capital, leverage ratio and large exposures) is specified and blind-checked, not implemented. Each spec's gate says the item moves to a point release unless its outside-check share reaches 60%; strict shares stated in the specs: K-8a 11%, K-8f 36%, K-8g 12.5%, K-8i 28%. | `frtb-drc-rrao.md`, `frtb-ima.md`, `cva-capital.md`, `leverage-large-exposures.md` in `specifications/06-risk/`; CHANGELOG Unreleased (read) | not in v1.0.0 as implemented operations |
 | K-2 | gate not met at the tag | The paper ledger needs 20 recorded trading days; v1.0.0 does not wait, and states "not met: N of 20 recorded trading days" (see "K-2 at v1.0.0" at the top of `docs/known-issues.md`). | owner decision 2026-11-20 (read) | open |
@@ -26,7 +27,7 @@ Read from the register table in [known issues](known-issues.md); a miss stays a 
 
 ## Golden cases and outside checks per stage
 
-All suites: 8,004 value-checked, 5,700 error and 2,554 invariance cases (16,258 in all; [case figures](case-figures.md)). A value-checked case must return the oracle's numbers within a stated tolerance; an error case checks the error code only; an invariance case checks that two related inputs get the same answer.
+All suites: 8,017 value-checked, 5,724 error and 2,554 invariance cases (16,295 in all; [case figures](case-figures.md)). A value-checked case must return the oracle's numbers within a stated tolerance; an error case checks the error code only; an invariance case checks that two related inputs get the same answer.
 
 Outside-checked share: value-checked cases re-derived outside the author's own code, by a library or by blind re-derivation where the rule allows it (rule R6-13, decision D6; floor 60.0% per stage, and from stage H on per plan item). Stages A to C, R2 and R6 are outside the share table. The share's denominator is the share table's own count (without generated sweeps), so it can be smaller than the value-checked column. The tag column is the plan's tag from ROADMAP: stage K is not tagged yet (target v1.0.0).
 
@@ -44,7 +45,7 @@ Outside-checked share: value-checked cases re-derived outside the author's own c
 | R6 |  |  |  | 43 | 93 | 0 | not in the share table |  |
 | J | Research and portfolio | v0.9 | Published study reports | 215 | 229 | 0 | 143 of 215 (66.5%) | met |
 | H | Microstructure and execution | v0.10 | Use case 5 | 205 | 207 | 0 | 160 of 205 (78.0%) | met |
-| K | Platform and release | v1.0.0 | Clean-machine run of all examples | 123 | 99 | 16 | 97 of 123 (78.9%) | met |
+| K | Platform and release | v1.0.0 | Clean-machine run of all examples | 136 | 123 | 16 | 97 of 136 (71.3%) | met |
 
 Stage H per plan item:
 
@@ -79,6 +80,7 @@ Stage K per plan item:
 | K-4c | 14 | 13 | 92.9% | met |
 | K-5a | 12 | 9 | 75.0% | met |
 | K-8 | 7 | 7 | 100.0% | met |
+| K-8 AAD | 13 | 0 | 0.0% | NOT MET |
 | K-8 guard | 6 | 6 | 100.0% | met |
 | K-8d | 19 | 12 | 63.2% | met |
 | K-8e | 28 | 23 | 82.1% | met |

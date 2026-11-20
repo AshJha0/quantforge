@@ -1331,6 +1331,14 @@ Expected (golden `rich_k-0001`): `status` `OK`, `observed_order` 2.0, `extrapola
 
 Add `"method": "CN_RANNACHER_SMOOTHED"` to the inputs of `rates.shortrate.bermudan_ladder` or `rates.shortrate.bermudan_swaption`; absent or `G18_IMPLICIT` keeps the G-18 scheme bit for bit, and any other value is `E_SCHEMA` (`program/K8_PORT_NOTE.md`). Inputs otherwise as the stage G goldens; `datasets/golden/stage_k/k8_k.json` has seven value cases, run in all four builds. The default stays `G18_IMPLICIT` (KR-8). **The R6 use restriction stays for both methods: not for hedging** (ruling KR-113, 2026-11-19; `docs/model-inventory.md`, MG-6 and MK-5). Acceptance 1 to 3 pass at 201/100 on three in-sample cases; at 101/50 two of them miss 1%. The ladder row of a curve node the price does not depend on (0.4986 years in the judged cases) is exactly zero and is not judged (owner decision 2026-11-19; `program/K8_ROW0_FINDING.md`: no bug). K-8 outside share: 7 of 7 value cases, by blind re-derivation (`program/STAGE_K_BLIND_K8.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the inputs of `k8_k-0001` with `method` `CN_RANNACHER_SMOOTHED` returned the golden's `price` 22737.43110152093 and every ladder entry bit for bit (about 3 s); the same inputs with `method` `CN_RANNACHER` returned `E_SCHEMA` ("method: CN_RANNACHER is not listed").
 
+### AAD sensitivities of CVA, DVA and FVA
+
+```json
+{"schema_version": "1.0", "case_id": "aad", "operation": "xva.sens.aad", "inputs": {"operation": "xva.adjustments.value", "wrt": ["ee", "counterparty.hazard_rate"], "inputs": {"times": [0.5, 1.0, 1.5, 2.0], "discount_factors": [0.985, 0.97, 0.955, 0.94], "ee": [120.0, 150.0, 130.0, 80.0], "ene": [-60.0, -90.0, -100.0, -70.0], "counterparty": {"hazard_rate": 0.02, "recovery": 0.4}, "own": {"hazard_rate": 0.01, "recovery": 0.4}, "funding": {"borrow_spread": 0.008, "lend_spread": 0.008, "exclude_dva_overlap": false}}}}
+```
+
+Expected (golden `aadadj_k-0011`, spec `06-risk/xva-aad-adjustments.md` 0.1.0, PROPOSED): `cva` 2.7098617740030235 and the other G-41 outputs, and `gradient.cva` with exactly two keys: `counterparty.hazard_rate` 133.0258166316599 (per 1.0 of hazard; times 1e-4 for 1 bp) and `ee` [0.00588054825424168, 0.005704780048492856, 0.005532942089013986, 0.005364956308103444]. Leave out `wrt` for every key (KR-263). Golden tolerance 1e-12 absolute plus 1e-10 relative (KR-265). No outside check (KR-268). Observed (2026-11-20 on `k-v1-aad`, Python build, local laptop, not the acceptance machine): conformance `aadadj_k` 37 of 37.
+
 ### SA-CCR EAD for a netting set
 
 ```json
