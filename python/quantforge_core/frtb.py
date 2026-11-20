@@ -165,6 +165,43 @@ def _net(items: Sequence[tuple[Factor, float]]) -> list[tuple[Factor, float]]:
     return list(out.items())
 
 
+def bucket_radicand(
+    items: Sequence[tuple[Factor, float]], rho: Callable[[Factor, Factor], float]
+) -> float:
+    """`sum_k WS_k^2 + sum_{k != l} rho_kl WS_k WS_l` over one bucket, not floored (MAR21.4(1)).
+    Shared with SA-CVA (MAR50.53(1), cva.py), which adds its hedge term before the root."""
+    total = sum(w * w for _, w in items)
+    for i, (fi, wi) in enumerate(items):
+        for j, (fj, wj) in enumerate(items):
+            if i != j:
+                total += rho(fi, fj) * wi * wj
+    return total
+
+
+def cross_radicand(
+    order: Sequence[str],
+    ks: Sequence[float],
+    s: Sequence[float],
+    gamma: Gamma,
+) -> float:
+    """`sum_b K_b^2 + sum_{b != c} gamma_bc S_b S_c`, not floored (MAR21.4(4)). Shared with
+    SA-CVA (MAR50.53(2), cva.py), which always passes the clipped S_b."""
+    total = sum(k * k for k in ks)
+    for b in range(len(s)):
+        for c in range(len(s)):
+            if b != c:
+                total += gamma(order[b], order[c]) * s[b] * s[c]
+    return total
+
+
+def _scaled_rho(rho: Rho, name: str, sc: str) -> Callable[[Factor, Factor], float]:
+    return lambda fi, fj: _scaled(rho(name, fi, fj), sc)
+
+
+def _scaled_gamma(gamma: Gamma, sc: str) -> Gamma:
+    return lambda b, c: _scaled(gamma(b, c), sc)
+
+
 def aggregate(
     buckets: dict[str, list[tuple[Factor, float]]],
     rho: Rho,
@@ -184,21 +221,12 @@ def aggregate(
             if name in simple:
                 ks.append(sum(abs(w) for _, w in _net(items)))
             else:
-                total = sum(w * w for _, w in items)
-                for i, (fi, wi) in enumerate(items):
-                    for j, (fj, wj) in enumerate(items):
-                        if i != j:
-                            total += _scaled(rho(name, fi, fj), sc) * wi * wj
+                total = bucket_radicand(items, _scaled_rho(rho, name, sc))
                 ks.append(math.sqrt(max(0.0, total)))
             ss.append(sum(w for _, w in items))
 
         def under(s: Sequence[float], ks: Sequence[float] = ks, sc: str = sc) -> float:
-            total = sum(k * k for k in ks)
-            for b in range(len(s)):
-                for c in range(len(s)):
-                    if b != c:
-                        total += _scaled(gamma(order[b], order[c]), sc) * s[b] * s[c]
-            return total
+            return cross_radicand(order, ks, s, _scaled_gamma(gamma, sc))
 
         used = list(ss)
         value = under(ss)

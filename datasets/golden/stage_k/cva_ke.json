@@ -1,0 +1,809 @@
+{
+ "schema_version": "1.0",
+ "suite": "cva_ke",
+ "spec": "specifications/06-risk/cva-capital.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w2b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "cva_ke-0001",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 0,
+        "imm": false
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: m 0 (spec cva_ke-0001)"
+  },
+  {
+   "case_id": "cva_ke-0002",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "single_name_hedges": [
+     {
+      "counterparty": "C1",
+      "relation": "DIRECT",
+      "sector": "financials",
+      "quality": "IG",
+      "m": 5,
+      "notional": 500000
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: hedge with REDUCED (spec cva_ke-0002)"
+  },
+  {
+   "case_id": "cva_ke-0003",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "SPACE",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 0,
+        "imm": false
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: two errors: sector SPACE and m 0 (spec cva_ke-0003)"
+  },
+  {
+   "case_id": "cva_ke-0004",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "FULL",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "single_name_hedges": [
+     {
+      "counterparty": "C9",
+      "relation": "DIRECT",
+      "sector": "financials",
+      "quality": "IG",
+      "m": 5,
+      "notional": 500000
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: hedge on an unknown counterparty"
+  },
+  {
+   "case_id": "cva_ke-0005",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     },
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: duplicate counterparty id (KR-312)"
+  },
+  {
+   "case_id": "cva_ke-0006",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": -1,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: negative ead"
+  },
+  {
+   "case_id": "cva_ke-0007",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "FULL",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "single_name_hedges": [
+     {
+      "counterparty": "C1",
+      "relation": "DIRECT",
+      "sector": "financials",
+      "quality": "IG",
+      "m": 5,
+      "notional": -1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: negative hedge notional"
+  },
+  {
+   "case_id": "cva_ke-0008",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "FULL",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "single_name_hedges": [
+     {
+      "counterparty": "C1",
+      "relation": "DIRECT",
+      "sector": "financials",
+      "quality": "IG",
+      "m": 0,
+      "notional": 500000
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: hedge m 0"
+  },
+  {
+   "case_id": "cva_ke-0009",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "FULL",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "index_hedges": [
+     {
+      "m": 5,
+      "notional": 1000,
+      "constituents": [
+       {
+        "sector": "financials",
+        "quality": "IG",
+        "weight": 0.9
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: index weights sum to 0.9"
+  },
+  {
+   "case_id": "cva_ke-0010",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "FULL",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "index_hedges": [
+     {
+      "m": 5,
+      "notional": 1000,
+      "constituents": [
+       {
+        "sector": "financials",
+        "quality": "IG",
+        "weight": 1.5
+       },
+       {
+        "sector": "other",
+        "quality": "IG",
+        "weight": -0.5
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: a negative index weight, weights summing to 1 (KR-313)"
+  },
+  {
+   "case_id": "cva_ke-0011",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "FULL",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "index_hedges": [
+     {
+      "m": -1,
+      "notional": 1000,
+      "constituents": [
+       {
+        "sector": "financials",
+        "quality": "IG",
+        "weight": 1
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: index hedge m negative"
+  },
+  {
+   "case_id": "cva_ke-0012",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "FULL",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "index_hedges": [
+     {
+      "m": 5,
+      "notional": -5,
+      "constituents": [
+       {
+        "sector": "financials",
+        "quality": "IG",
+        "weight": 1
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: index hedge notional negative"
+  },
+  {
+   "case_id": "cva_ke-0013",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "BASIC",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: version not listed"
+  },
+  {
+   "case_id": "cva_ke-0014",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "FULL",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "single_name_hedges": [
+     {
+      "counterparty": "C1",
+      "relation": "COUSIN",
+      "sector": "financials",
+      "quality": "IG",
+      "m": 5,
+      "notional": 500000
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: relation not listed"
+  },
+  {
+   "case_id": "cva_ke-0015",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: netting_sets missing"
+  },
+  {
+   "case_id": "cva_ke-0016",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "AA",
+      "netting_sets": [
+       {
+        "ead": 1,
+        "m": 1,
+        "imm": false
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: quality not listed"
+  },
+  {
+   "case_id": "cva_ke-0017",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "FULL",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": -1,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "single_name_hedges": [
+     {
+      "counterparty": "X",
+      "relation": "DIRECT",
+      "sector": "financials",
+      "quality": "IG",
+      "m": 5,
+      "notional": 500000
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: two errors: unknown hedge counterparty and negative ead (structural first)"
+  },
+  {
+   "case_id": "cva_ke-0018",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": "NaN",
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error",
+    "e1"
+   ],
+   "description": "hand: E1: ead NaN"
+  },
+  {
+   "case_id": "cva_ke-0019",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1,
+        "m": "Infinity",
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "single_name_hedges": [
+     {
+      "counterparty": "C1",
+      "relation": "DIRECT",
+      "sector": "financials",
+      "quality": "IG",
+      "m": 5,
+      "notional": 500000
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error",
+    "e1"
+   ],
+   "description": "hand: E1, two errors: m Infinity and a hedge with REDUCED (the finite rule first)"
+  }
+ ]
+}

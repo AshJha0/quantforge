@@ -1,0 +1,965 @@
+{
+ "schema_version": "1.0",
+ "suite": "sacva_ke",
+ "spec": "specifications/06-risk/cva-capital.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w2b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "sacva_ke-0001",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "CCS.VEGA": [
+      {
+       "bucket": "2",
+       "factor": {
+        "name": "X",
+        "tenor": "1Y",
+        "quality": "IG"
+       },
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: CCS vega (spec sacva_ke-0001)"
+  },
+  {
+   "case_id": "sacva_ke-0002",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      }
+     ]
+    },
+    "m_cva": 0.9
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: m_cva 0.9 (spec sacva_ke-0002)"
+  },
+  {
+   "case_id": "sacva_ke-0003",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.GAMMA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: kind not listed"
+  },
+  {
+   "case_id": "sacva_ke-0004",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "XX.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: class not listed"
+  },
+  {
+   "case_id": "sacva_ke-0005",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "7Y",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: IR tenor not listed"
+  },
+  {
+   "case_id": "sacva_ke-0006",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.VEGA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: IR vega factor not listed (KR-311)"
+  },
+  {
+   "case_id": "sacva_ke-0007",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "CCS.DELTA": [
+      {
+       "bucket": "2",
+       "factor": {
+        "name": "X",
+        "tenor": "2Y",
+        "quality": "IG"
+       },
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: CCS tenor not listed"
+  },
+  {
+   "case_id": "sacva_ke-0008",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "CCS.DELTA": [
+      {
+       "bucket": "2",
+       "factor": {
+        "name": "X",
+        "tenor": "1Y",
+        "quality": "AAA"
+       },
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: CCS quality not listed"
+  },
+  {
+   "case_id": "sacva_ke-0009",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "CCS.DELTA": [
+      {
+       "bucket": "2",
+       "factor": "X",
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: CCS factor given as a string"
+  },
+  {
+   "case_id": "sacva_ke-0010",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: s_hdg missing"
+  },
+  {
+   "case_id": "sacva_ke-0011",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: duplicate (bucket, factor)"
+  },
+  {
+   "case_id": "sacva_ke-0012",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "EQ.DELTA": [
+      {
+       "bucket": "1",
+       "factor": "A",
+       "s_cva": 1,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "1",
+       "factor": "B",
+       "s_cva": 1,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: two entries in a one-factor bucket (KR-311)"
+  },
+  {
+   "case_id": "sacva_ke-0013",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "CCS.DELTA": [
+      {
+       "bucket": "1a",
+       "factor": {
+        "name": "X",
+        "tenor": "1Y",
+        "quality": "IG"
+       },
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "1b",
+       "factor": {
+        "name": "X",
+        "tenor": "1Y",
+        "quality": "IG"
+       },
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: one name and tenor in 1a and 1b: the same factor of bucket 1 (KR-312)"
+  },
+  {
+   "case_id": "sacva_ke-0014",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "5",
+       "factor": "1Y",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: IR bucket that is not a currency (wrong class)"
+  },
+  {
+   "case_id": "sacva_ke-0015",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "CCS.DELTA": [
+      {
+       "bucket": "9",
+       "factor": {
+        "name": "X",
+        "tenor": "1Y",
+        "quality": "IG"
+       },
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: CCS bucket 9 (wrong class)"
+  },
+  {
+   "case_id": "sacva_ke-0016",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "RCS.DELTA": [
+      {
+       "bucket": "18",
+       "factor": "R",
+       "s_cva": 1,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: RCS bucket 18"
+  },
+  {
+   "case_id": "sacva_ke-0017",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "COM.VEGA": [
+      {
+       "bucket": "USD",
+       "factor": "R",
+       "s_cva": 1,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: commodity bucket USD"
+  },
+  {
+   "case_id": "sacva_ke-0018",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "FX.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "USD",
+       "s_cva": 1,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: reporting currency as an FX bucket"
+  },
+  {
+   "case_id": "sacva_ke-0019",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "CURVE",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: CURVE in a specified currency (KR-311)"
+  },
+  {
+   "case_id": "sacva_ke-0020",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "NOK",
+       "factor": "5Y",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: a tenor in an unspecified currency (KR-311)"
+  },
+  {
+   "case_id": "sacva_ke-0021",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "CCS.DELTA": [
+      {
+       "bucket": "8",
+       "factor": {
+        "name": "X",
+        "tenor": "1Y",
+        "quality": "IG"
+       },
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: bucket 8 factor without index and series"
+  },
+  {
+   "case_id": "sacva_ke-0022",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "CCS.DELTA": [
+      {
+       "bucket": "2",
+       "factor": {
+        "name": "X",
+        "tenor": "1Y",
+        "quality": "IG"
+       },
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      },
+      {
+       "bucket": "2",
+       "factor": {
+        "name": "X",
+        "tenor": "5Y",
+        "quality": "HY_NR"
+       },
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: one name with two qualities (KR-314)"
+  },
+  {
+   "case_id": "sacva_ke-0023",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "usd",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: reporting currency not a currency code"
+  },
+  {
+   "case_id": "sacva_ke-0024",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "CCS.VEGA": [
+      {
+       "bucket": "2",
+       "factor": {
+        "name": "X",
+        "tenor": "1Y",
+        "quality": "IG"
+       },
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      }
+     ]
+    },
+    "m_cva": 0.9
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: two errors: CCS vega and m_cva 0.9 (structural first)"
+  },
+  {
+   "case_id": "sacva_ke-0025",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "7Y",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      }
+     ],
+     "CCS.VEGA": [
+      {
+       "bucket": "2",
+       "factor": {
+        "name": "X",
+        "tenor": "1Y",
+        "quality": "IG"
+       },
+       "s_cva": 100000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error"
+   ],
+   "description": "hand: two errors: tenor not listed and CCS vega"
+  },
+  {
+   "case_id": "sacva_ke-0026",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": "NaN",
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error",
+    "e1"
+   ],
+   "description": "hand: E1: s_cva NaN"
+  },
+  {
+   "case_id": "sacva_ke-0027",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000.0,
+       "s_hdg": "-Infinity"
+      },
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error",
+    "e1"
+   ],
+   "description": "hand: E1, two errors: s_hdg -Infinity and a duplicate factor (the finite rule first)"
+  },
+  {
+   "case_id": "sacva_ke-0028",
+   "operation": "risk.cva.sa",
+   "inputs": {
+    "reporting_currency": "USD",
+    "classes": {
+     "IR.DELTA": [
+      {
+       "bucket": "USD",
+       "factor": "1Y",
+       "s_cva": 1000000.0,
+       "s_hdg": 0
+      }
+     ]
+    },
+    "m_cva": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "error",
+    "e1"
+   ],
+   "description": "hand: E1: m_cva NaN"
+  }
+ ]
+}

@@ -1,0 +1,809 @@
+{
+ "schema_version": "1.0",
+ "suite": "lex_ke",
+ "spec": "specifications/06-risk/leverage-large-exposures.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w2b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "lex_ke-0001",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A",
+      "group": "G1"
+     },
+     {
+      "id": "A",
+      "group": "G2"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: counterparty in two groups (spec lex_ke-0001)"
+  },
+  {
+   "case_id": "lex_ke-0002",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ],
+    "off_balance": [
+     {
+      "counterparty": "A",
+      "notional": 10,
+      "ccf": 1.5
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: ccf 1.5 (spec lex_ke-0002)"
+  },
+  {
+   "case_id": "lex_ke-0003",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "Q",
+      "value": 1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: banking book on an unknown counterparty"
+  },
+  {
+   "case_id": "lex_ke-0004",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ],
+    "crm": [
+     {
+      "counterparty": "A",
+      "provider": "Q",
+      "protected": 1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: unknown protection provider"
+  },
+  {
+   "case_id": "lex_ke-0005",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ],
+    "crm": [
+     {
+      "counterparty": "A",
+      "provider": "A",
+      "protected": 1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: a counterparty protecting itself"
+  },
+  {
+   "case_id": "lex_ke-0006",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ],
+    "trading_book": [
+     {
+      "id": "p",
+      "counterparty": "A",
+      "seniority": "SENIOR",
+      "notional": 10,
+      "market_value": 9
+     },
+     {
+      "id": "p",
+      "counterparty": "A",
+      "seniority": "SENIOR",
+      "notional": 10,
+      "market_value": 9
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: duplicate position id"
+  },
+  {
+   "case_id": "lex_ke-0007",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ],
+    "trading_book": [
+     {
+      "id": "p",
+      "counterparty": "Q",
+      "seniority": "SENIOR",
+      "notional": 10,
+      "market_value": 9
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: trading position on an unknown counterparty"
+  },
+  {
+   "case_id": "lex_ke-0008",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A",
+      "group": "B"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: group named like a counterparty outside it (KR-324)"
+  },
+  {
+   "case_id": "lex_ke-0009",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 0,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: tier1 0"
+  },
+  {
+   "case_id": "lex_ke-0010",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": -1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: negative banking book value"
+  },
+  {
+   "case_id": "lex_ke-0011",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ],
+    "off_balance": [
+     {
+      "counterparty": "A",
+      "notional": -1,
+      "ccf": 0.5
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: negative off-balance notional"
+  },
+  {
+   "case_id": "lex_ke-0012",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ],
+    "off_balance": [
+     {
+      "counterparty": "A",
+      "notional": 1,
+      "ccf": -0.1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: ccf below 0"
+  },
+  {
+   "case_id": "lex_ke-0013",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ],
+    "crm": [
+     {
+      "counterparty": "A",
+      "provider": "B",
+      "protected": -1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: negative protected amount"
+  },
+  {
+   "case_id": "lex_ke-0014",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ],
+    "crm": [
+     {
+      "counterparty": "A",
+      "provider": "B",
+      "protected": 11
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: protection above the exposure (KR-325)"
+  },
+  {
+   "case_id": "lex_ke-0015",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ],
+    "trading_book": [
+     {
+      "id": "p",
+      "counterparty": "A",
+      "seniority": "SUPER",
+      "notional": 10,
+      "market_value": 9
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: seniority not listed"
+  },
+  {
+   "case_id": "lex_ke-0016",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: counterparties missing"
+  },
+  {
+   "case_id": "lex_ke-0017",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 0,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "Q",
+      "value": 1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: two errors: unknown counterparty and tier1 0"
+  },
+  {
+   "case_id": "lex_ke-0018",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ],
+    "trading_book": [
+     {
+      "id": "p",
+      "counterparty": "A",
+      "seniority": "SUPER",
+      "notional": 10,
+      "market_value": 9
+     }
+    ],
+    "off_balance": [
+     {
+      "counterparty": "A",
+      "notional": 1,
+      "ccf": 1.5
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: two errors: seniority not listed and ccf 1.5"
+  },
+  {
+   "case_id": "lex_ke-0019",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 10
+     }
+    ],
+    "trading_book": [
+     {
+      "id": "p",
+      "counterparty": "A",
+      "seniority": "SENIOR",
+      "notional": 10,
+      "market_value": "NaN"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error",
+    "e1"
+   ],
+   "description": "hand: E1: market value NaN"
+  },
+  {
+   "case_id": "lex_ke-0020",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "Q",
+      "value": "-Infinity"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error",
+    "e1"
+   ],
+   "description": "hand: E1, two errors: value -Infinity and an unknown counterparty (the finite rule first)"
+  }
+ ]
+}
