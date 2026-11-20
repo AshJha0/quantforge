@@ -61,6 +61,8 @@ ORACLE = "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)"
 BLIND = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
 SCIPY = "scipy.integrate.quad 1.x (independent library)"
 ADDED = "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+# K-8i blind lane of 2026-11-20 (program/STAGE_K_BLIND_K8I.md): 9 of 9 MATCH, all counted.
+BLIND_K8I = "blind re-derivation DR-H2 2026-11-20 (K-8i lane, stage_k_blind/k8i/compare_output.txt, program/STAGE_K_BLIND_K8I.md): MATCH"
 LABEL_C = "regulatory formula on caller inputs; not a regulatory return"
 LABEL_LEV = "simplified leverage ratio (LEV30 subset); not a regulatory return"
 LABEL_LEX = "simplified large exposures (LEX subset); not a regulatory return"
@@ -420,7 +422,9 @@ def blind(s, cid, op, fn, oc, tags, desc):
 
 
 def hand(s, op, inp, fn, oc, tags, desc):
-    s.add(op, inp, to_float(fn(inp)), limit=LIM, output_classes=oc, verified=["hand", ORACLE, ADDED], tags=tags + ["hand"],
+    k8i = op.startswith("risk.capital.")  # the four K-8i hand cases, re-derived blind on 2026-11-20
+    s.add(op, inp, to_float(fn(inp)), limit=LIM, output_classes=oc, verified=["hand", ORACLE, BLIND_K8I if k8i else ADDED],
+          tags=tags + (["hand", "outside_checked", "blind"] if k8i else ["hand"]),
           description="hand: " + desc)
 
 
@@ -599,8 +603,8 @@ def gen_lev():
         note_ok(f"{cre} printed EAD {ead}: derivatives {mp.nstr(hi['derivatives'], 8)} within 1.0")
         s.add("risk.capital.leverage", inp, to_float(hi), limit=LIM, output_classes=OC_LEV,
               verified=["hand", ORACLE, f"published: Basel Framework {cre} printed EAD {ead} ({ex}, multiplier 1, unmargined, V >= 0): "
-                                        "within 1.0 (spec A1 tolerance, fixed before the run): MATCH"],
-              tags=TAGS_L + ["outside_checked", "published"], description=f"derivative netting set of CRE99 {ex} (LEV30.16)")
+                                        "within 1.0 (spec A1 tolerance, fixed before the run): MATCH", BLIND_K8I],
+              tags=TAGS_L + ["outside_checked", "published", "blind"], description=f"derivative netting set of CRE99 {ex} (LEV30.16)")
     for fv, want in ((-10, 90), (5, 100)):
         inp = base(written_credit_derivatives=[{"notional": 100, "fair_value": fv, "purchased_offset": 0}])
         hi = lev(inp)
@@ -608,8 +612,8 @@ def gen_lev():
             stop(f"LEV30.31 footnote 384: fair value {fv} gives {hi['written_credit_derivatives']}, printed {want}")
         note_ok(f"LEV30.31 footnote 384, fair value {fv}: effective notional {want}")
         s.add("risk.capital.leverage", inp, to_float(hi), limit=LIM, output_classes=OC_LEV,
-              verified=["hand", ORACLE, f"published: LEV30.31 footnote 384 (Basel Framework PDF p.801): effective notional {want}: MATCH"],
-              tags=TAGS_L + ["outside_checked", "published"], description=f"written credit derivative, notional 100, fair value {fv}")
+              verified=["hand", ORACLE, f"published: LEV30.31 footnote 384 (Basel Framework PDF p.801): effective notional {want}: MATCH", BLIND_K8I],
+              tags=TAGS_L + ["outside_checked", "published", "blind"], description=f"written credit derivative, notional 100, fair value {fv}")
     descs = ["off balance sheet CCFs", "SFT with an MNA", "SFT without an MNA", "derivative with CVM received",
              "worked example: ratio above 3%", "worked example with Tier 1 30: ratio below 3%"]
     for n, dsc in enumerate(descs, 6):

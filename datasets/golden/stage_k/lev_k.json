@@ -43,13 +43,15 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
-    "published: Basel Framework CRE99.40, p.528 printed EAD 569 (Example 1, multiplier 1, unmargined, V >= 0): within 1.0 (spec A1 tolerance, fixed before the run): MATCH"
+    "published: Basel Framework CRE99.40, p.528 printed EAD 569 (Example 1, multiplier 1, unmargined, V >= 0): within 1.0 (spec A1 tolerance, fixed before the run): MATCH",
+    "blind re-derivation DR-H2 2026-11-20 (K-8i lane, stage_k_blind/k8i/compare_output.txt, program/STAGE_K_BLIND_K8I.md): MATCH"
    ],
    "tags": [
     "stage_k",
     "leverage_large_exposures",
     "outside_checked",
-    "published"
+    "published",
+    "blind"
    ],
    "description": "derivative netting set of CRE99 Example 1 (LEV30.16)",
    "output_classes": {
@@ -98,13 +100,15 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
-    "published: Basel Framework CRE99.76, p.536 printed EAD 5406 (Example 3, multiplier 1, unmargined, V >= 0): within 1.0 (spec A1 tolerance, fixed before the run): MATCH"
+    "published: Basel Framework CRE99.76, p.536 printed EAD 5406 (Example 3, multiplier 1, unmargined, V >= 0): within 1.0 (spec A1 tolerance, fixed before the run): MATCH",
+    "blind re-derivation DR-H2 2026-11-20 (K-8i lane, stage_k_blind/k8i/compare_output.txt, program/STAGE_K_BLIND_K8I.md): MATCH"
    ],
    "tags": [
     "stage_k",
     "leverage_large_exposures",
     "outside_checked",
-    "published"
+    "published",
+    "blind"
    ],
    "description": "derivative netting set of CRE99 Example 3 (LEV30.16)",
    "output_classes": {
@@ -153,13 +157,15 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
-    "published: Basel Framework CRE99.79, p.537 printed EAD 936 (Example 4, multiplier 1, unmargined, V >= 0): within 1.0 (spec A1 tolerance, fixed before the run): MATCH"
+    "published: Basel Framework CRE99.79, p.537 printed EAD 936 (Example 4, multiplier 1, unmargined, V >= 0): within 1.0 (spec A1 tolerance, fixed before the run): MATCH",
+    "blind re-derivation DR-H2 2026-11-20 (K-8i lane, stage_k_blind/k8i/compare_output.txt, program/STAGE_K_BLIND_K8I.md): MATCH"
    ],
    "tags": [
     "stage_k",
     "leverage_large_exposures",
     "outside_checked",
-    "published"
+    "published",
+    "blind"
    ],
    "description": "derivative netting set of CRE99 Example 4 (LEV30.16)",
    "output_classes": {
@@ -207,13 +213,15 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
-    "published: LEV30.31 footnote 384 (Basel Framework PDF p.801): effective notional 90: MATCH"
+    "published: LEV30.31 footnote 384 (Basel Framework PDF p.801): effective notional 90: MATCH",
+    "blind re-derivation DR-H2 2026-11-20 (K-8i lane, stage_k_blind/k8i/compare_output.txt, program/STAGE_K_BLIND_K8I.md): MATCH"
    ],
    "tags": [
     "stage_k",
     "leverage_large_exposures",
     "outside_checked",
-    "published"
+    "published",
+    "blind"
    ],
    "description": "written credit derivative, notional 100, fair value -10",
    "output_classes": {
@@ -261,13 +269,15 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
-    "published: LEV30.31 footnote 384 (Basel Framework PDF p.801): effective notional 100: MATCH"
+    "published: LEV30.31 footnote 384 (Basel Framework PDF p.801): effective notional 100: MATCH",
+    "blind re-derivation DR-H2 2026-11-20 (K-8i lane, stage_k_blind/k8i/compare_output.txt, program/STAGE_K_BLIND_K8I.md): MATCH"
    ],
    "tags": [
     "stage_k",
     "leverage_large_exposures",
     "outside_checked",
-    "published"
+    "published",
+    "blind"
    ],
    "description": "written credit derivative, notional 100, fair value 5",
    "output_classes": {
@@ -759,12 +769,14 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
-    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+    "blind re-derivation DR-H2 2026-11-20 (K-8i lane, stage_k_blind/k8i/compare_output.txt, program/STAGE_K_BLIND_K8I.md): MATCH"
    ],
    "tags": [
     "stage_k",
     "leverage_large_exposures",
-    "hand"
+    "hand",
+    "outside_checked",
+    "blind"
    ],
    "description": "hand: negative V floored at 0 with CVM provided; purchased offset; a written CD reduced to 0; remaining CCFs",
    "output_classes": {
@@ -819,12 +831,14 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
-    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+    "blind re-derivation DR-H2 2026-11-20 (K-8i lane, stage_k_blind/k8i/compare_output.txt, program/STAGE_K_BLIND_K8I.md): MATCH"
    ],
    "tags": [
     "stage_k",
     "leverage_large_exposures",
-    "hand"
+    "hand",
+    "outside_checked",
+    "blind"
    ],
    "description": "hand: absent lists are empty (KR-319); an SFT with no transactions",
    "output_classes": {

@@ -33,4 +33,19 @@ This file, the compare script and the expected file are committed and pushed bef
 
 ## Results
 
-(Written after the frozen results commit.)
+Run 2026-11-20, the first and only compare run (evidence class: measured; hashes and output are in the repository).
+
+- Time gap: packet, compare and tolerances committed and pushed in a735c83b (12:27:17 UTC); the deriver was started after the push; frozen results committed in 50b17b88 (12:29:18 UTC); the compare ran after that commit.
+- Deriver: a separate subagent on Claude Sonnet (not Opus 5.5), given only the packet folder and its own folder `C:/Work/Claude/qf-blind/k8i_blind/`. Value source: exact `fractions.Fraction` arithmetic on the binary64 inputs, rounded once; binary64 comparisons where the rules state them. Its own statements, not independently logged: it read nothing outside the two folders; the manifest matched on all 7 files.
+- Frozen results: `stage_k_blind/k8i/` (`blind_results.json`, `blind_ref.py`, `notes.md`). SHA-256 of `blind_results.json` as handed back: `600ed8d334cb6415a064de53ba9f5aeb27b681fb0d95f3d6dcb17410b31f452b`, recomputed by the builder, equal (git stores it with LF line ends).
+- Compare: `python -I program/stage_h_blind_w2/levx_compare.py . stage_k_blind/k8i/blind_results.json`; output `stage_k_blind/k8i/compare_output.txt`.
+
+| Item | Cases | MATCH | MISMATCH | Eligible | Counted |
+|---|---:|---:|---:|---:|---:|
+| K-8i `lev_k`, `lex_k` | 9 | 9 | 0 | 9 | 9 |
+
+Assumptions the deriver recorded (`notes.md`): written credit derivative notionals in `derivatives` (KR-320); KR-53 greedy offsets; a group takes 15% when `bank_gsib` and any member is G-SIB (KR-324).
+
+Credit: `oracle/python/gen_stage_k_w2b.py` adds `BLIND_K8I` to the nine cases (and drops the "not blind" note from the four hand cases). `python tools/outside_shares.py`: K-8i **22 of 22, 100.0%, met** (was 13 of 22, 59.1%).
+
+What this does not show: lev_k-0001 to -0005 are one-line formulas, so their blind match adds little beyond the printed figures they already had; the deriver is a model, not a person.

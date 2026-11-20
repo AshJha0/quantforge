@@ -1530,12 +1530,14 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
-    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+    "blind re-derivation DR-H2 2026-11-20 (K-8i lane, stage_k_blind/k8i/compare_output.txt, program/STAGE_K_BLIND_K8I.md): MATCH"
    ],
    "tags": [
     "stage_k",
     "leverage_large_exposures",
-    "hand"
+    "hand",
+    "outside_checked",
+    "blind"
    ],
    "description": "hand: report: large groups plus the 20 largest, ties by name; exempt members never breach (KR-325)",
    "output_classes": {
@@ -1693,12 +1695,14 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
-    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+    "blind re-derivation DR-H2 2026-11-20 (K-8i lane, stage_k_blind/k8i/compare_output.txt, program/STAGE_K_BLIND_K8I.md): MATCH"
    ],
    "tags": [
     "stage_k",
     "leverage_large_exposures",
-    "hand"
+    "hand",
+    "outside_checked",
+    "blind"
    ],
    "description": "hand: KR-53 offsets across ranks; a G-SIB member makes the group G-SIB (KR-324); notional 0 is long (KR-323)",
    "output_classes": {
