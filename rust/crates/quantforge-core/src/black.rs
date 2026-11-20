@@ -190,9 +190,10 @@ impl Option_ {
         }
         let mut v = (lo + hi) / 2.0;
         for _ in 0..300 {
-            let e = self.value(v) - price;
+            let val = self.value(v);
+            let e = val - price;
             if e == 0.0 {
-                return Ok(v);
+                return self.identified(v, price);
             }
             if e > 0.0 {
                 hi = v;
@@ -200,19 +201,49 @@ impl Option_ {
                 lo = v;
             }
             let vega = self.vega(v);
-            let mut next = v - e / vega;
+            // Newton on ln V - ln price (ruling KR-341): the same step near the root, and it keeps its size
+            // far out of the money, where V spans hundreds of decades over the bracket.
+            let mut next = if vega > 0.0 && val > 0.0 {
+                v - (val / price).ln() * val / vega
+            } else {
+                f64::NAN
+            };
             if !(next > lo && next < hi) {
                 next = (lo + hi) / 2.0;
             }
             if (next - v).abs() <= 2e-16 * v {
-                return Ok(next);
+                return self.identified(next, price);
             }
             v = next;
         }
         if (self.value(v) - price).abs() <= 1e-13 * price.max(1.0) {
-            return Ok(v);
+            return self.identified(v, price);
         }
         fail("E_NO_CONVERGENCE", "implied vol did not converge")
+    }
+
+    /// Returns v if the price identifies the vol in binary64, else `E_NO_CONVERGENCE` (ruling KR-341).
+    /// Estimated vol error: (|V(v) - price| + 2^-52 M + 2^-1070 (1 + D (|F| + |K| + v sqrt T)))/(v vega), M the
+    /// sum of the magnitudes of the two terms of V (they cancel far from the money); above 1e-10 it is refused.
+    fn identified(&self, v: f64, price: f64) -> Result<f64> {
+        let (f, d, k) = self.fdk();
+        let p = phi(self.call);
+        let root = v * self.t.sqrt();
+        let mag = if self.is_normal() {
+            let x = (f - k) / root;
+            d * ((f - k).abs() * normal_cdf(p * x) + root * normal_pdf(x))
+        } else {
+            let (d1, d2) = d1_d2(f, k, v, self.t);
+            d * (f * normal_cdf(p * d1) + k * normal_cdf(p * d2))
+        };
+        let scale = v * self.vega(v);
+        let error = (self.value(v) - price).abs()
+            + f64::EPSILON * mag
+            + 2f64.powi(-1070) * (1.0 + d * (f.abs() + k.abs() + root));
+        if scale.is_nan() || scale <= 0.0 || error > 1e-10 * scale {
+            return fail("E_NO_CONVERGENCE", "the price does not identify the vol in binary64");
+        }
+        Ok(v)
     }
 }
 

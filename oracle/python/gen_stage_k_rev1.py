@@ -4,6 +4,9 @@ Suites (all in datasets/golden/stage_k):
 - sabrz_k: vol.sabr.hagan where z = (nu/alpha) sqrt(A) L is small (|z| about 1e-8 to 1e-4) or large and negative,
   both signs of rho (K-9 review finding 7, ruling KR-340). The direct chi(z) loses digits as eps/|z| for small z
   and cancels in s + z - rho for large negative z; a tight relative limit (1e-12) makes those visible.
+- ivdeep_k: vol.option.implied far out of the money (finding 8, ruling KR-341): prices down to about 1e-80 that
+  still identify the vol (value cases), and prices of 1e-200 and below, or subnormal, that do not
+  (E_NO_CONVERGENCE). The oracle prices at 60 digits and computes the KR-341 estimate at the true vol.
 - fuzzfix_k: fuzz inputs from the failed scheduled runs on main (2026-11-09 to 11-16) that were fixed without
   a golden of the exact input (K-9 finding 1).
 
@@ -84,11 +87,64 @@ def sabrz():
     s.write()
 
 
+def _bs(F, K, T, s, phi, D=1):
+    F, K, T, s, D = map(M, (F, K, T, s, D))
+    sd = s * mp.sqrt(T)
+    d1 = mp.log(F / K) / sd + sd / 2
+    d2 = d1 - sd
+    price = D * phi * (F * mp.ncdf(phi * d1) - K * mp.ncdf(phi * d2))
+    mag = D * (F * mp.ncdf(phi * d1) + K * mp.ncdf(phi * d2))
+    vega = D * F * mp.npdf(d1) * mp.sqrt(T)
+    return price, mag, vega
+
+
+def _bach(F, K, T, s, phi, D=1):
+    F, K, T, s, D = map(M, (F, K, T, s, D))
+    sd = s * mp.sqrt(T)
+    x = (F - K) / sd
+    price = D * (phi * (F - K) * mp.ncdf(phi * x) + sd * mp.npdf(x))
+    mag = D * (abs(F - K) * mp.ncdf(phi * x) + sd * mp.npdf(x))
+    vega = D * mp.sqrt(T) * mp.npdf(x)
+    return price, mag, vega
+
+
+def ivdeep():
+    s = Suite("ivdeep_k", "specifications/05-volatility/black-models.md", G)
+    op = "vol.option.implied"
+    lim = {"absolute": 0.0, "relative": 1e-9, "reason": "KR-341: an accepted vol has estimated relative error at most 1e-10"}
+    with mp.workdps(60):
+        cases = [("BLACK_76", "CALL", 100.0, 160.0, 1.0, 0.2), ("BLACK_76", "CALL", 100.0, 300.0, 1.0, 0.2),
+                 ("BLACK_76", "PUT", 100.0, 40.0, 0.5, 0.25), ("BLACK_76", "PUT", 100.0, 10.0, 2.0, 0.3),
+                 ("BLACK_76", "CALL", 100.0, 1000.0, 1.0, 0.3), ("BACHELIER", "CALL", 100.0, 160.0, 1.0, 8.0),
+                 ("BACHELIER", "PUT", 100.0, 20.0, 1.0, 6.0),
+                 # not identified: the two terms of V cancel to below 1e-200, or the price is subnormal
+                 ("BLACK_76", "CALL", 100.0, 300.0, 0.1, 0.1), ("BLACK_76", "CALL", 100.0, 500.0, 1.0, 0.05),
+                 ("BLACK_76", "CALL", 100.0, 1000.0, 0.1, 0.2), ("BACHELIER", "PUT", 100.0, 86.83731917681901, 2.9082679923151997, 0.20272253589725567),
+                 ("BACHELIER", "CALL", 100.0, 130.0, 1.0, 1.0)]
+        for model, kind, F, K, T, sig in cases:
+            phi = 1 if kind == "CALL" else -1
+            price, mag, vega = (_bach if model == "BACHELIER" else _bs)(F, K, T, sig, phi)
+            p = f(price)
+            assert p > 0, (model, K, T, sig)
+            floor = 2 ** mp.mpf(-1070) * (1 + abs(M(F)) + abs(M(K)) + M(sig) * mp.sqrt(M(T)))
+            est = (2 ** mp.mpf(-52) * mag + floor) / (M(sig) * vega)
+            ins = dict(model=model, option_type=kind, forward=F, strike=K, expiry_years=T, discount_factor=1.0, price=p)
+            if est < 1e-12:
+                s.add(op, ins, {"vol": sig}, cls="root_finding", verified=[ORACLE], limit=lim, tags=["stage_k", "deep_otm"],
+                      description=f"price {p:.3g}; KR-341 estimate {float(est):.2g} at the true vol")
+            else:
+                assert est > 1e-8, (model, K, T, sig, est)
+                s.add(op, ins, error="E_NO_CONVERGENCE", cls="date_and_convention", verified=[ORACLE], tags=["stage_k", "deep_otm", "not_identified"],
+                      description=f"price {p:.3g}; KR-341 estimate {float(est):.2g}: the price does not identify the vol")
+    s.write()
+
+
 def main():
     keep = common.GOLDEN
     common.GOLDEN = keep.parent / "stage_k"
     try:
         sabrz()
+        ivdeep()
     finally:
         common.GOLDEN = keep
 

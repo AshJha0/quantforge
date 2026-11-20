@@ -139,13 +139,16 @@ def implied(o: Option, target: float) -> float:
     for _ in range(400):
         error = _value(o, v) - target
         if error == 0:
-            return v
+            return _identified(o, v, target)
         if error > 0:
             high = v
         else:
             low = v
         vega = _vega(o, v)
-        step = v - error / vega if vega > 0 else math.nan
+        # Newton on ln V - ln price (ruling KR-341): the same step as on V - price near the root, and it keeps
+        # its size far out of the money, where V spans hundreds of decades over the bracket.
+        value = error + target
+        step = v - math.log(value / target) * value / vega if vega > 0 and value > 0 else math.nan
         if not low < step < min(high, 4.0 * v):
             step = 2.0 * v if math.isinf(high) else 0.5 * (low + high)
         if abs(step - v) <= 1e-15 * v:
@@ -154,6 +157,30 @@ def implied(o: Option, target: float) -> float:
         v = step
     if abs(_value(o, v) - target) > 1e-12 * max(1.0, target):
         raise QfError("E_NO_CONVERGENCE", "the implied vol solve did not converge", "price")
+    return _identified(o, v, target)
+
+
+def _identified(o: Option, v: float, target: float) -> float:
+    """Returns v if the price identifies the vol in binary64, else E_NO_CONVERGENCE (ruling KR-341).
+
+    Estimated vol error: (|V(v) - price| + 2^-52 M + 2^-1070)/(v vega), where M is the sum of the magnitudes of
+    the two terms of V (they cancel far from the money) and 2^-1070 (1 + D (|F| + |K| + v sqrt T)) covers
+    subnormal terms (a subnormal N times F or K, or a subnormal price). Above 1e-10 the
+    vol is refused rather than returned with an unknown, possibly large, error.
+    """
+    t, d, phi = o.expiry_years, o.discount, o.phi
+    f, k = o.forward + o.shift, o.strike + o.shift
+    root = v * math.sqrt(t)
+    if o.model == BACHELIER:
+        x = (f - k) / root
+        mag = d * (abs(f - k) * big_n(phi * x) + root * small_n(x))
+    else:
+        d1 = _d1(f, k, v, t)
+        mag = d * (f * big_n(phi * d1) + k * big_n(phi * (d1 - root)))
+    scale = v * _vega(o, v)
+    error = abs(_value(o, v) - target) + 2.0**-52 * mag + 2.0**-1070 * (1.0 + d * (abs(f) + abs(k) + root))
+    if not scale > 0 or error > 1e-10 * scale:
+        raise QfError("E_NO_CONVERGENCE", "the price does not identify the vol in binary64", "price")
     return v
 
 
