@@ -232,18 +232,8 @@ public final class PortfolioRisk {
         if (n < 1 || x < 0 || x > n) {
             throw new QfError("E_DOMAIN", "need n >= 1 and 0 <= exceptions <= n", "exceptions");
         }
-        double p = 1.0 - c;
-        // P(X <= x) by summing pmfs in log space.
-        double lnq = Math.log1p(-p);
-        double lnp = Math.log(p);
-        double s = 0.0;
-        double lnChoose = 0.0;
-        for (long k = 0; k <= x; k++) {
-            if (k > 0) {
-                lnChoose += Math.log((double) (n - k + 1)) - Math.log((double) k);
-            }
-            s += Math.exp(lnChoose + k * lnp + (n - k) * lnq);
-        }
+        // KR-253: q = c exactly, p = 1 - c; x = 0 is c^n, otherwise the KR-237 sums.
+        double s = FrtbBacktest.trafficLightCdf(n, x, c);
         String zone = s < 0.95 ? "GREEN" : s < 0.9999 ? "YELLOW" : "RED";
         Double plus = null;
         if (n == 250 && c == 0.99) {

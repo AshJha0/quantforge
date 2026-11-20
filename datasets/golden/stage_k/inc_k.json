@@ -280,6 +280,170 @@
     "error"
    ],
    "description": "stale cache: last factor one ulp above the bootstrap"
+  },
+  {
+   "case_id": "inc_k-0007",
+   "operation": "curve.incremental.update",
+   "inputs": {
+    "previous_quotes": [
+     0.047646,
+     0.042308,
+     0.042871,
+     0.036614,
+     0.058572,
+     0.050695,
+     0.015237,
+     0.059703,
+     0.026618,
+     0.051711
+    ],
+    "previous_discount_factors": [
+     0.9545208973260051,
+     0.9206646498692626,
+     0.8818050558565648,
+     0.8673002159529586,
+     0.7441326977751643,
+     0.7409788471600609,
+     0.908308144975652,
+     0.6046266071589944,
+     0.802369168127117,
+     0.585770248041184
+    ],
+    "new_quotes": [
+     0.047646,
+     0.042308,
+     0.042871,
+     0.036614,
+     0.058572,
+     0.050695,
+     0.015237,
+     0.059703,
+     0.026618,
+     0.052711
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      0.9545208973260052,
+      0.9206646498692627,
+      0.8818050558565649,
+      0.8673002159529586,
+      0.7441326977751644,
+      0.7409788471600609,
+      0.9083081449756519,
+      0.6046266071589944,
+      0.802369168127117,
+      0.578160869463167
+     ],
+     "first_changed_index": 9,
+     "recomputed": 1
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "curves",
+    "incremental",
+    "synthetic"
+   ],
+   "description": "KR-235(a): 10 seeded quotes whose fused-multiply-add bootstrap differs in 1 pillar(s): the cache must be the unfused bootstrap, bit for bit (cli-contract.md numeric rules)",
+   "output_classes": {
+    "first_changed_index": "date_and_convention",
+    "recomputed": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 0.0
+   }
+  },
+  {
+   "case_id": "inc_k-0008",
+   "operation": "curve.incremental.update",
+   "inputs": {
+    "previous_quotes": [
+     0.013902,
+     0.028689,
+     0.055773,
+     0.010019,
+     0.02325,
+     0.041701,
+     0.048157,
+     0.00837,
+     0.032104,
+     0.012701
+    ],
+    "previous_discount_factors": [
+     0.9862886156650248,
+     0.9446046044092881,
+     0.8451705929558676,
+     0.9625428993486762,
+     0.8923307050448976,
+     0.774584337306014,
+     0.7057018069406382,
+     0.9409731138260944,
+     0.7495332620839184,
+     0.8896112752557676
+    ],
+    "new_quotes": [
+     0.013902,
+     0.028689,
+     0.055773,
+     0.010019,
+     0.02325,
+     0.041701,
+     0.048157,
+     0.00837,
+     0.032104,
+     0.013701000000000001
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      0.9862886156650248,
+      0.9446046044092881,
+      0.8451705929558677,
+      0.9625428993486762,
+      0.8923307050448978,
+      0.774584337306014,
+      0.7057018069406382,
+      0.9409731138260943,
+      0.7495332620839182,
+      0.8810374046441808
+     ],
+     "first_changed_index": 9,
+     "recomputed": 1
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "curves",
+    "incremental",
+    "synthetic"
+   ],
+   "description": "KR-235(a): 10 seeded quotes whose fused-multiply-add bootstrap differs in 1 pillar(s): the cache must be the unfused bootstrap, bit for bit (cli-contract.md numeric rules)",
+   "output_classes": {
+    "first_changed_index": "date_and_convention",
+    "recomputed": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 0.0
+   }
   }
  ]
 }

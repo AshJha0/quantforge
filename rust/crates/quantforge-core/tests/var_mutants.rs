@@ -246,3 +246,15 @@ fn traffic_light_exact_boundaries() {
     let (cdf, zone, _) = traffic_light(1, 0, 0.9999).unwrap();
     assert_eq!((cdf, zone), (0.9999, "RED"));
 }
+
+/// Audit KF-21 (2026-11-20): the double-double power against exact binary64 results (a^n / 2^(kn) rounded
+/// once, exact integer arithmetic). Plain binary64 powering differs on each case, so a plain loop fails here.
+#[test]
+fn kr253_power_is_the_correctly_rounded_binary64_result() {
+    use quantforge_core::frtb_backtest::power;
+    assert_eq!(power(0.99, 250), 0.081_058_516_162_181_28);
+    assert_eq!(power(0.95, 7), 0.698_337_296_093_749_7);
+    assert_eq!(power(0.9999, 99_999), 4.538_177_213_622_477_5e-5);
+    assert_eq!(power(0.999_999, 1_000_000), 0.367_879_257_221_066_46);
+    assert_eq!(power(0.95, 1), 0.95);
+}

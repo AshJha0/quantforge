@@ -1,6 +1,6 @@
 # Stage K: blind re-derivation (DR-H2) of K-8e FRTB backtesting, the 12 btk_k value cases without a printed figure
 
-Written 2026-11-19 by the packet builder (Claude Opus 5.5, branch `k-btk-blind`, off the integration branch at `2cef4f98`). The packet builder is not the deriver and ran no derivation beyond rechecking the goldens' own arithmetic. Process: `program/STAGE_H_BLIND_LANE.md` (DR-H2); pattern and record format of `STAGE_K_BLIND_W2.md` and `STAGE_K_BLIND_W1B.md`. Status: **packet built, deriver not yet run.**
+Written 2026-11-19 by the packet builder (Claude Opus 5.5, branch `k-btk-blind`, off the integration branch at `2cef4f98`). The packet builder is not the deriver and ran no derivation beyond rechecking the goldens' own arithmetic. Process: `program/STAGE_H_BLIND_LANE.md` (DR-H2); pattern and record format of `STAGE_K_BLIND_W2.md` and `STAGE_K_BLIND_W1B.md`.
 
 ## Plain idea
 
@@ -66,10 +66,6 @@ Weak discrimination, stated: three probabilities lie within the tolerance of 1.0
 4. Run `python -I program/stage_h_blind_w2/btk_compare.py . <frozen blind_results.json> > stage_k_blind/btk/compare_output.txt`. One run. A mismatch is investigated, never fixed by rerunning the deriver; if the golden was wrong it is corrected with the reason; if the deriver was wrong its error is recorded.
 5. Fill the results section below; then the coordinator updates the counted cases' `verified_by` (a DR-H2 MATCH entry), `tools/outside_shares.py` output, the spec's outside-share line and `docs/model-inventory.md`.
 
-## Results
-
-Not run. (Date, deriver and model, packet manifest check, frozen hash and commit, gaps and rulings, compare run and output path, per-case MATCH / MISMATCH / MISSING and counted, resolution of each mismatch, outside share after the run: to be filled by the coordinator.)
-
 ## Results (2026-11-19; first and only compare run)
 
 - Deriver: a separate subagent on Claude Sonnet 5.5 (spec, goldens and packet were written by Opus 5.5), given only the packet folder and its own folder; standard-library Python. It states it read and tried to read nothing outside the two folders (its own statement, not independently logged). The coordinator checked the packet manifest hash 03fdc75d... before the hand-over.
@@ -81,3 +77,7 @@ Not run. (Date, deriver and model, packet manifest check, frozen hash and commit
 | K-8e | 12 | 12 | 0 | 11 | 11 | 3 | 23 of 24 (95.8%): 12 published tables, 11 blind |
 
 Not counted: btk_k-0017 (answer stated by the rules text). Readings the deriver recorded, all equal to the spec's: KR-44 "more than" applied to both desk limits, so exactly 12 and 30 is no breach (KR-44 stays labelled inferred: a blind match shows the rule is unambiguous as we wrote it, not that it reads MAR32.19 correctly); exception is strict -P&L > VaR, a null VaR or P&L counts as an exception; multiplier is null when n is not 250.
+
+What this shows and what it does not. The deriver's statement that it read nothing outside its folders is its own statement, not independently logged. A match shows that the rules text is unambiguous enough to implement and that the expected values are not one author's arithmetic slip; it does not show that the rules text reads its source correctly, because the deriver reads the same rules we wrote. It is not independent or human review (no second review, owner decision 2026-11-18).
+
+**Note added 2026-11-19 (ruling KR-250, audit KA-C18, `program/STAGE_K_AUDIT_C18_RESPONSE.md`).** A figure printed in the regulator text no longer counts on its own: it checks some outputs at print precision, not every compared output at the golden's tolerance. The twelve MAR99 Table 2 cases (btk_k-0001 to 0012) counted above as published therefore do not count; K-8e stands at 11 of 24 (45.8%) until the blind packet `program/STAGE_K_BLIND_PUB.md` is run. The figures above are kept as written on the day.

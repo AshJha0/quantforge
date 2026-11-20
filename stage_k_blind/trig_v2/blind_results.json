@@ -1,0 +1,102 @@
+{
+ "cases": {
+  "trig_k-0001": {
+   "fire": true,
+   "sigma": 1.1547005383792515,
+   "threshold": 3.4641016151377544,
+   "false_alarm_rate": 0.05766888562243732,
+   "nominal_rate": 0.002699796063260189
+  },
+  "trig_k-0002": {
+   "fire": false,
+   "sigma": 1.1547005383792515,
+   "threshold": 3.4641016151377544,
+   "false_alarm_rate": 0.05766888562243732,
+   "nominal_rate": 0.002699796063260189
+  },
+  "trig_k-0003": {
+   "fire": false,
+   "sigma": 1.1547005383792515,
+   "threshold": 6.928203230275509,
+   "false_alarm_rate": 0.05766888562243732,
+   "nominal_rate": 0.002699796063260189
+  },
+  "trig_k-0004": {
+   "fire": false,
+   "sigma": 1.0,
+   "threshold": 2.5,
+   "false_alarm_rate": 0.04099221858575289,
+   "nominal_rate": 0.01241933065155227
+  },
+  "trig_k-0005": {
+   "fire": true,
+   "sigma": 1.0,
+   "threshold": 2.5,
+   "false_alarm_rate": 0.04099221858575289,
+   "nominal_rate": 0.01241933065155227
+  },
+  "trig_k-0009": {
+   "fire": false,
+   "sigma": 1.1547005383792515,
+   "threshold": 34.64101615137754,
+   "false_alarm_rate": 8.13528042716396e-05,
+   "nominal_rate": 9.813427854296374e-198
+  },
+  "trig_k-0010": {
+   "fire": true,
+   "sigma": 1.4142135623730951,
+   "threshold": 4.242640687119286,
+   "false_alarm_rate": 0.20483276469913345,
+   "nominal_rate": 0.002699796063260189
+  },
+  "trig_k-0011": {
+   "fire": false,
+   "sigma": 0.6291528696058958,
+   "threshold": 1.8874586088176875,
+   "false_alarm_rate": 0.09546596626670911,
+   "nominal_rate": 0.002699796063260189
+  },
+  "trig_k-0012": {
+   "fire": true,
+   "sigma": 0.8177713616898064,
+   "threshold": 2.313006701244076,
+   "false_alarm_rate": 0.11611652351681553,
+   "nominal_rate": 0.04550026389635842
+  },
+  "trig_k-0013": {
+   "fire": false,
+   "sigma": 1.5321403991104101,
+   "threshold": 4.59642119733123,
+   "false_alarm_rate": 0.0054991921339034135,
+   "nominal_rate": 0.002699796063260189
+  },
+  "trig_k-0014": {
+   "fire": true,
+   "sigma": 1.3977668829372603,
+   "threshold": 4.193300648811781,
+   "false_alarm_rate": 0.0029737859324150294,
+   "nominal_rate": 0.002699796063260189
+  },
+  "trig_k-0015": {
+   "fire": true,
+   "sigma": 1.1547005383792515,
+   "threshold": 0.5773502691896257,
+   "false_alarm_rate": 0.651447964848151,
+   "nominal_rate": 0.6170750774519738
+  },
+  "trig_k-0016": {
+   "fire": false,
+   "sigma": 1.0,
+   "threshold": 1000.0,
+   "false_alarm_rate": 2.6409838375211855e-19,
+   "nominal_rate": 0.0
+  },
+  "trig_k-0021": {
+   "fire": true,
+   "sigma": 1.5556349217168183e-08,
+   "threshold": 4.666904765150455e-08,
+   "false_alarm_rate": 0.20483276469913345,
+   "nominal_rate": 0.002699796063260189
+  }
+ }
+}

@@ -152,8 +152,8 @@ public final class SaCcr {
                 need(t, t.start(), "start", "for IR and CREDIT trades");
                 need(t, t.end(), "end", "for IR and CREDIT trades");
             }
-            if (c.equals("IR") || c.equals("FX") || !t.treatment().equals("NORMAL")) {
-                need(t, t.hedgingSet(), "hedging_set", "for IR, FX, basis and volatility trades");
+            if (c.equals("IR") || c.equals("FX") || t.treatment().equals("BASIS")) {
+                need(t, t.hedgingSet(), "hedging_set", "for IR, FX and basis trades");
             }
             if (creditEquityCommodity(c)) {
                 need(t, t.entity(), "entity", "for CREDIT, EQUITY and COMMODITY trades");
@@ -189,8 +189,7 @@ public final class SaCcr {
             if (t.entity() == null || t.subclass() == null) {
                 continue;
             }
-            List<String> key = List.of(t.assetClass(), t.treatment(), t.hedgingSet() == null ? "" : t.hedgingSet(),
-                    t.entity());
+            List<String> key = List.of(t.assetClass(), t.treatment(), groupKey(t), t.entity());
             if (!entitySub.computeIfAbsent(key, k -> t.subclass()).equals(t.subclass())) {
                 throw new QfError("E_INPUT", "entity " + t.entity() + " has two subclasses", "subclass");
             }
@@ -357,14 +356,19 @@ public final class SaCcr {
     private record Netting(double ead, double pfe, double m, Map<String, Double> byClass, List<HedgingSet> rows,
             double[] deltas, double[] eff) {}
 
+    /**
+     * The hedging-set key within (class, treatment), as Python {@code saccr._set_key}. CRE52.45 for NORMAL trades and,
+     * by CRE52.47, for VOLATILITY trades (ruling KR-236): IR the currency and FX the pair ({@code hedging_set}), credit
+     * and equity one set, commodity the category of the subclass. BASIS trades: the caller's label (CRE52.46, KR-34).
+     */
     private static String groupKey(Trade t) {
-        if (t.assetClass().equals("COMMODITY") && t.treatment().equals("NORMAL")) {
+        if (t.treatment().equals("BASIS") || t.assetClass().equals("IR") || t.assetClass().equals("FX")) {
+            return t.hedgingSet() == null ? "" : t.hedgingSet();
+        }
+        if (t.assetClass().equals("COMMODITY")) {
             return SaCcrTables.HEDGING_SET[row(t.assetClass(), t.subclass())];
         }
-        if ((t.assetClass().equals("CREDIT") || t.assetClass().equals("EQUITY")) && t.treatment().equals("NORMAL")) {
-            return "";
-        }
-        return t.hedgingSet() == null ? "" : t.hedgingSet();
+        return "";
     }
 
     private static double irAddon(List<Trade> trades, List<Integer> members, double[] eff, String treatment,

@@ -167,7 +167,7 @@ The joint solve feeds both the prices and the Jacobian that AAD carries back to 
 ```mermaid
 flowchart LR
   accTitle: Stage G rates models and xVA
-  accDescr: A discount curve feeds the short-rate, G2++ and LMM pricers; Hull-White sigma is calibrated to swaption prices and used by the lattice for Bermudan swaptions and callable bonds, whose AAD ladder is checked against a bump reference. Exposure under Hull-White is computed in closed form and checked against ORE; collateralised exposure takes simulated values as inputs and applies netting, CSA thresholds and the margin period of risk. Exposure profiles feed the CVA, DVA, FVA, MVA and KVA formulas; SIMM-style IR delta margin and wrong-way CVA sit beside them.
+  accDescr: A discount curve feeds the short-rate, G2++ and LMM pricers; Hull-White sigma is calibrated to swaption prices and used by the lattice for Bermudan swaptions and callable bonds, whose AAD ladder is checked against a bump reference. Exposure under Hull-White is computed in closed form and checked against ORE; collateralised exposure takes simulated values as inputs and applies netting, CSA thresholds and the margin period of risk. Exposure profiles feed the CVA, DVA, FVA, MVA and KVA formulas; the sensitivity-based IR delta margin and wrong-way CVA sit beside them.
   CRV[discount curve] --> SR[rates.shortrate.zcb, zcb_option, swaption, capfloor]
   CRV --> G2[rates.g2pp.zcb, zcb_option]
   CRV --> LMM[rates.lmm.capfloor, swaption_rebonato]
@@ -180,11 +180,11 @@ flowchart LR
   EXP -.->|outside check| ORE["ORE 1.8.17.0, oracle/ore"]
   VAL[simulated values, as inputs] --> COL[xva.exposure.collateralised: netting, CSA, MPoR]
   EXP & COL -->|EE, ENE| ADJ[xva.adjustments.value: CVA, DVA, FVA, MVA, KVA]
-  SEN[IR delta sensitivities] --> SIMM[xva.simm.ir_delta: weights are inputs]
+  SEN[IR delta sensitivities] --> SBIM[xva.sbim.ir_delta: weights are inputs]
   VAL --> WWR[xva.wwr.cva_hw]
 ```
 
-Plain idea: stage G prices rates options under term-structure models, then turns exposure into valuation adjustments. Exposure is computed first and the adjustments are pure arithmetic on exposure profiles, discount factors and hazard rates, so CVA, DVA and FVA can be checked exactly without a simulation (`xva-framework.md`). Short-rate models and G2++ are in `04-pricing/short-rate-models.md`, the LMM in `04-pricing/lmm.md`; `rates.shortrate.hw_calibrate` fits `sigma` to European swaption prices with `a` fixed (ruling G-17), and the Bermudan swaption and callable bond run on one lattice scheme (G-18). The AAD ladder differentiates the discrete scheme at the case's grid and is checked against a Richardson bump reference (`06-risk/aad-core.md`, G-9); it is not for hedging at the default grid. `risk.mc.greeks` (pathwise, likelihood ratio, smoothed digitals) and the model-reserve dispersion report are in `mc-greeks.md` and `model-reserve.md`. Portfolio exposure is exact one-factor integration, and ORE's Monte Carlo is the outside check, kept under `oracle/ore/` and never read by a build (`xva-exposure-portfolio.md`, G-42). Collateral follows a CSA with thresholds, minimum transfer amount and a lag of `mpor_steps` (G-40). The SIMM-style margin uses risk weights and correlations given as inputs, not an ISDA calibration (G-43); wrong-way CVA uses the Hull-White hazard `exp(a(t) + b V(t))` (G-44). Every input is synthetic.
+Plain idea: stage G prices rates options under term-structure models, then turns exposure into valuation adjustments. Exposure is computed first and the adjustments are pure arithmetic on exposure profiles, discount factors and hazard rates, so CVA, DVA and FVA can be checked exactly without a simulation (`xva-framework.md`). Short-rate models and G2++ are in `04-pricing/short-rate-models.md`, the LMM in `04-pricing/lmm.md`; `rates.shortrate.hw_calibrate` fits `sigma` to European swaption prices with `a` fixed (ruling G-17), and the Bermudan swaption and callable bond run on one lattice scheme (G-18). The AAD ladder differentiates the discrete scheme at the case's grid and is checked against a Richardson bump reference (`06-risk/aad-core.md`, G-9); it is not for hedging at the default grid. `risk.mc.greeks` (pathwise, likelihood ratio, smoothed digitals) and the model-reserve dispersion report are in `mc-greeks.md` and `model-reserve.md`. Portfolio exposure is exact one-factor integration, and ORE's Monte Carlo is the outside check, kept under `oracle/ore/` and never read by a build (`xva-exposure-portfolio.md`, G-42). Collateral follows a CSA with thresholds, minimum transfer amount and a lag of `mpor_steps` (G-40). The sensitivity-based margin uses risk weights and correlations given as inputs; its goldens use placeholder weights from a stated rule (G-43, KR-150); wrong-way CVA uses the Hull-White hazard `exp(a(t) + b V(t))` (G-44). Every input is synthetic.
 
 ## Stage I: hedging around one solver
 
@@ -673,7 +673,7 @@ Plain idea: a latency figure is a claim about one machine, one workload and one 
 
 ## Stage K: risk platform and capital (in progress)
 
-Stage K round 1 is merged on the integration branch `k-r1` (2026-11-19); nothing here is released. Each diagram names the spec it was drawn from (read 2026-11-19). All four rendered in the locally built site of the docs lane with every node drawn and no parse error (checked in the built-in browser, 2026-11-19); the site is rebuilt on `k-r1` (`program/STAGE_K_DOCS_PENDING.md`).
+Stage K round 1 is merged to `main` (2026-11-19, pull request #58); nothing here is released. Each diagram names the spec it was drawn from (read 2026-11-19). All four rendered in the locally built site of the docs lane with every node drawn and no parse error (checked in the built-in browser, 2026-11-19); the site is rebuilt on `k-r1` (`program/STAGE_K_DOCS_PENDING.md`).
 
 ### SA-CCR: from trades to EAD
 
@@ -726,7 +726,7 @@ Rule KR-2 of `specifications/01-core/bitemporal-store.md`. `valid_to` is exclusi
 flowchart TB
   accTitle: Daily paper ledger run with its hash chain and anchor
   accDescr: The scheduled job reads the Treasury par yields the recorder already wrote to the forward-log branch. For each due business day it marks four constant-maturity exposures on a linear curve through five par yields, sends the fixed rule's one order through the pre-trade estimate and limit check to the simulated lit venue, computes the post-trade TCA and the P&L explain, and refuses the day unless the unexplained term is exactly zero. The row is hashed with the previous row's hash and appended to the ledger on the paper-ledger branch. The whole ledger is verified, the summary written, and the new head hash with the row count is stamped with OpenTimestamps on the paper-ledger-anchors branch. A day with no recorded curve becomes a GAP row; a day past its cut-off becomes a late row with no order.
-  FL[("forward-log branch<br/>five recorded par yields a day")] -.->|"read only"| RUN["run_day.py<br/>00:40 and 15:10 UTC"]
+  FL[("forward-log branch<br/>five recorded par yields a day")] -.->|"read only"| RUN["run_day.py<br/>scheduled from v0.10.1"]
   RUN --> DUE{"curve recorded<br/>for the business day?"}
   DUE -->|"no, cut-off passed"| GAP[GAP row]
   DUE -->|yes| MK["marks: 4 constant-maturity exposures<br/>paper marks on a fitted curve; not tradable"]
@@ -743,7 +743,7 @@ flowchart TB
   class SIM sim
 ```
 
-From `specifications/12-platform/paper-ledger-daily.md` and `docs/developer-guides/paper-ledger.md` (rulings KR-70 to KR-89, proposed). The job writes only to its own two branches, never to `main` or `forward-log`. **Not running yet: 0 of 20 recorded trading days**; the workflow has never run on a GitHub runner. No performance claim is made: the order rule ignores the market and fills are simulated. The chain shows rows were not edited after writing; the anchor catches a consistent rewrite of old rows and a truncated tail. Worked through in [Tutorial 58](../getting-started/tutorial-58-daily-paper-ledger.md). The stage H paper book's ledger, a different file, is in the [paper-trading ledger flow](#paper-trading-ledger-flow).
+From `specifications/12-platform/paper-ledger-daily.md` and `docs/developer-guides/paper-ledger.md` (rulings KR-70 to KR-89, confirmed 2026-11-19). The `schedule:` trigger, withheld 2026-11-19 (commit 1d184366), is restored from v0.10.1 (2026-11-20) after rulings KR-200 to KR-214 (audit C fixes, 03772bf6) were confirmed by the coordinator; the slots are after the recorder's run, with cron fallbacks at 03:00 and 06:00 UTC (KR-206). The job writes only to its own two branches, never to `main` or `forward-log`. **0 of 20 recorded trading days at the release**; the first scheduled run follows the release. No performance claim is made: the order rule ignores the market and fills are simulated. The chain shows rows were not edited after writing; the anchor catches a consistent rewrite of old rows and a truncated tail. Worked through in [Tutorial 58](../getting-started/tutorial-58-daily-paper-ledger.md). The stage H paper book's ledger, a different file, is in the [paper-trading ledger flow](#paper-trading-ledger-flow).
 
 ### Blind re-derivation: packet, deriver, compare
 

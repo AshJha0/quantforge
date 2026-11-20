@@ -27,31 +27,107 @@ DESK_LIMIT_975 = 30  # MAR32.19: (more than) 30 exceptions at the 97.5th percent
 MAX_OBSERVATIONS = 1_000_000  # ruling KR-46, as risk.backtest.traffic_light (J-W3-17)
 
 
-def binomial_cdf(n: int, x: int, p: float) -> float:
-    """P(X <= x) for X ~ Binomial(n, p), 0 < p < 1, by a compensated sum of log-space terms."""
+P_99 = 0.01  # KR-237: the binary64 literal nearest 1/100 (not 1 - COVERAGE, which is 0.010000000000000009)
+P_975 = 0.025
+_UP = 2.0**600
+_DOWN = 2.0**-600
+
+
+def binomial_partial_sums(n: int, p: float, q: float | None = None) -> list[tuple[float, int]]:
+    """KR-237: compensated partial sums of the unnormalised weights `w_0 = 1`,
+    `w_(k+1) = w_k ((n - k) p) / ((k + 1) q)`, each with its scale count (a weight above 2^600 rescales the
+    weight and the sum by 2^-600). Stops at n, or past the mode once the ratio is at most 1/2 and the weight at
+    most 2^-64 of the sum. Only + - * /, so every build gives the same bits. `q` defaults to `1 - p`; the
+    traffic light passes its exact `q = c` (KR-253)."""
+    if q is None:
+        q = 1.0 - p
+    mode = math.floor((n + 1) * p)
+    w, s, c, e = 1.0, 0.0, 0.0, 0
+    out: list[tuple[float, int]] = []
+    k = 0
+    while True:
+        t = s + w
+        c += (s - t) + w if abs(s) >= abs(w) else (w - t) + s
+        s = t
+        out.append((s + c, e))
+        if k == n:
+            return out
+        r = ((n - k) * p) / ((k + 1) * q)
+        w = w * r
+        k += 1
+        if k > mode and r <= 0.5 and w <= (s + c) * 2.0**-64:
+            return out
+        if w > _UP:
+            w, s, c, e = w * _DOWN, s * _DOWN, c * _DOWN, e + 1
+
+
+def _cdf_from(sums: list[tuple[float, int]], n: int, x: int) -> float:
+    if x < 0:
+        return 0.0
+    if x >= n or x >= len(sums) - 1:
+        return 1.0
+    sx, ex = sums[x]
+    st, et = sums[-1]
+    v = sx / st
+    for _ in range(et - ex):
+        v *= _DOWN
+    return min(v, 1.0)
+
+
+def binomial_cdf(n: int, x: int, p: float, q: float | None = None) -> float:
+    """P(X <= x) for X ~ Binomial(n, p), 0 < p < 1 (KR-237); `q` defaults to `1 - p` (KR-253)."""
     if x < 0:
         return 0.0
     if x >= n:
         return 1.0
-    lp, lq = math.log(p), math.log1p(-p)
-    head = math.lgamma(n + 1)
-    terms = [
-        math.exp(head - math.lgamma(k + 1) - math.lgamma(n - k + 1) + k * lp + (n - k) * lq)
-        for k in range(x + 1)
-    ]
-    return min(math.fsum(terms), 1.0)
+    return _cdf_from(binomial_partial_sums(n, p, q), n, x)
 
 
-def _first_at_least(n: int, p: float, level: float) -> int:
+def _two_prod(a: float, b: float) -> tuple[float, float]:
+    """Dekker's exact product a * b = p + e (Veltkamp split by 2^27 + 1); only + - *."""
+    p = a * b
+    t = 134217729.0 * a
+    ah = t - (t - a)
+    al = a - ah
+    t = 134217729.0 * b
+    bh = t - (t - b)
+    bl = b - bh
+    return p, ((ah * bh - p) + ah * bl + al * bh) + al * bl
+
+
+def _dd_mul(x: tuple[float, float], y: tuple[float, float]) -> tuple[float, float]:
+    p, e = _two_prod(x[0], y[0])
+    e += x[0] * y[1] + x[1] * y[0]
+    s = p + e
+    return s, e - (s - p)
+
+
+def power(q: float, n: int) -> float:
+    """q^n for 0 < q < 1 by right-to-left binary powering in double-double (KR-253): r = 1, b = q; for each bit
+    of n from the lowest, r = r * b if the bit is set, then b = b * b while bits remain; the result is the sum of
+    the two parts. Only + - *, so every build gives the same bits; q^1 is q exactly."""
+    r, b = (1.0, 0.0), (q, 0.0)
+    while n:
+        if n & 1:
+            r = _dd_mul(r, b)
+        n >>= 1
+        if n:
+            b = _dd_mul(b, b)
+    return r[0] + r[1]
+
+
+def traffic_light_cdf(n: int, x: int, c: float) -> float:
+    """KR-253: P(X <= x), X ~ Binomial(n, 1 - c), with the non-exception probability q = c taken exactly as
+    given: x = 0 is q^n by binary powering (so c itself at n = 1), otherwise the KR-237 sums with q = c."""
+    if x == 0 and n >= 1:
+        return power(c, n)
+    return binomial_cdf(n, x, 1.0 - c, c)
+
+
+def _first_at_least(sums: list[tuple[float, int]], n: int, level: float) -> int:
     """The smallest k in 0..n with P(X <= k) >= level (exists: P(X <= n) = 1)."""
-    lp, lq = math.log(p), math.log1p(-p)
-    head = math.lgamma(n + 1)
-    terms: list[float] = []
     for k in range(n + 1):
-        terms.append(
-            math.exp(head - math.lgamma(k + 1) - math.lgamma(n - k + 1) + k * lp + (n - k) * lq)
-        )
-        if k == n or math.fsum(terms) >= level:
+        if _cdf_from(sums, n, k) >= level:
             return k
     raise AssertionError("unreachable")  # pragma: no cover
 
@@ -78,10 +154,10 @@ def backtest_zone(
     _count(observations, exceptions_actual, "exceptions_actual")
     _count(observations, exceptions_hypothetical, "exceptions_hypothetical")
     x = max(exceptions_actual, exceptions_hypothetical)  # MAR99.8
-    p = 1.0 - COVERAGE
-    cumulative = binomial_cdf(observations, x, p)
-    amber_from = _first_at_least(observations, p, AMBER_FROM)
-    red_from = _first_at_least(observations, p, RED_FROM)
+    sums = binomial_partial_sums(observations, P_99)
+    cumulative = _cdf_from(sums, observations, x)
+    amber_from = _first_at_least(sums, observations, AMBER_FROM)
+    red_from = _first_at_least(sums, observations, RED_FROM)
     zone = "RED" if x >= red_from else "AMBER" if x >= amber_from else "GREEN"
     multiplier: float | None = None
     if observations == TABLE_OBSERVATIONS:
@@ -119,8 +195,8 @@ def backtest_desk(
     return {
         "exceptions_99": x99,
         "exceptions_975": x975,
-        "cumulative_probability_99": binomial_cdf(observations, x99, 0.01),
-        "cumulative_probability_975": binomial_cdf(observations, x975, 0.025),
+        "cumulative_probability_99": binomial_cdf(observations, x99, P_99),
+        "cumulative_probability_975": binomial_cdf(observations, x975, P_975),
         "breach_99": breach_99,
         "breach_975": breach_975,
         "eligible": not (breach_99 or breach_975),

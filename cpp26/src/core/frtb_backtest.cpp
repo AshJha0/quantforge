@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <string_view>
+#include <vector>
 
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/json.hpp"
@@ -39,29 +40,64 @@ Tables parse_tables() {
     return t;
 }
 
-// Compensated running sum of binomial terms in log space, with a running log binomial coefficient, as
-// backtest_traffic_light builds its terms.
-class Terms {
-public:
-    Terms(long long n, double p) : n_(n), lp_(std::log(p)), lq_(std::log1p(-p)) {}
+constexpr double p_99 = 0.01;  // KR-237: the binary64 literal nearest 1/100 (not 1 - coverage)
+constexpr double p_975 = 0.025;
+constexpr double up = 0x1p600;
+constexpr double down = 0x1p-600;
 
-    // Adds the next term and returns the partial sum P(X <= k).
-    double next() {
-        ++k_;
-        if (k_ > 0) ln_choose_ += std::log(double(n_ - k_ + 1)) - std::log(double(k_));
-        const double term = std::exp(ln_choose_ + double(k_) * lp_ + double(n_ - k_) * lq_);
-        const double t = sum_ + term;
-        comp_ += std::fabs(sum_) >= std::fabs(term) ? (sum_ - t) + term : (term - t) + sum_;
-        sum_ = t;
-        return sum_ + comp_;
-    }
-
-private:
-    long long n_;
-    double lp_, lq_;
-    double ln_choose_ = 0.0, sum_ = 0.0, comp_ = 0.0;
-    long long k_ = -1;
+struct Partial {
+    double sum;
+    long long scale;
 };
+
+// KR-237: compensated partial sums of the unnormalised weights w_0 = 1, w_(k+1) = w_k ((n - k) p) / ((k + 1) q),
+// each with its scale count (a weight above 2^600 rescales the weight and the sum by 2^-600). Stops at n, or past
+// the mode once the ratio is at most 1/2 and the weight at most 2^-64 of the sum. Only + - * /, as the Python
+// build's binomial_partial_sums, so every build gives the same bits.
+std::vector<Partial> partial_sums(long long n, double p, double q);
+std::vector<Partial> partial_sums(long long n, double p) { return partial_sums(n, p, 1.0 - p); }
+
+// KR-237 sums with the non-exception probability q given (KR-253: the traffic light passes q = c).
+std::vector<Partial> partial_sums(long long n, double p, double q) {
+    const double mode = std::floor(double(n + 1) * p);
+    double w = 1.0, s = 0.0, c = 0.0;
+    long long e = 0;
+    std::vector<Partial> out;
+    long long k = 0;
+    while (true) {
+        const double t = s + w;
+        c += std::fabs(s) >= std::fabs(w) ? (s - t) + w : (w - t) + s;
+        s = t;
+        out.push_back({s + c, e});
+        if (k == n) return out;
+        const double r = (double(n - k) * p) / (double(k + 1) * q);
+        w = w * r;
+        ++k;
+        if (double(k) > mode && r <= 0.5 && w <= (s + c) * 0x1p-64) return out;
+        if (w > up) {
+            w = w * down;
+            s = s * down;
+            c = c * down;
+            ++e;
+        }
+    }
+}
+
+double cdf_from(const std::vector<Partial>& sums, long long n, long long x) {
+    if (x < 0) return 0.0;
+    if (x >= n || x >= (long long)sums.size() - 1) return 1.0;
+    const Partial& at = sums[std::size_t(x)];
+    const Partial& last = sums.back();
+    double v = at.sum / last.sum;
+    for (long long i = 0; i < last.scale - at.scale; ++i) v *= down;
+    return std::min(v, 1.0);
+}
+
+long long first_at_least_in(const std::vector<Partial>& sums, long long n, double level) {
+    for (long long k = 0; k < n; ++k)
+        if (cdf_from(sums, n, k) >= level) return k;
+    return n;
+}
 
 void check_observations(long long n) {
     const long long cap = tables().max_observations;
@@ -96,18 +132,49 @@ const Tables& tables() {
 double binomial_cdf(long long n, long long x, double p) {
     if (x < 0) return 0.0;
     if (x >= n) return 1.0;
-    Terms terms(n, p);
-    double s = 0.0;
-    for (long long k = 0; k <= x; ++k) s = terms.next();
-    return std::min(s, 1.0);
+    return cdf_from(partial_sums(n, p), n, x);
 }
 
-long long first_at_least(long long n, double p, double level) {
-    Terms terms(n, p);
-    for (long long k = 0; k < n; ++k)
-        if (terms.next() >= level) return k;
-    return n;
+namespace {
+struct DD {
+    double hi, lo;
+};
+// Dekker's exact product a * b = hi + lo (Veltkamp split by 2^27 + 1); only + - * (KR-253).
+DD two_prod(double a, double b) {
+    const double p = a * b;
+    double t = 134217729.0 * a;
+    const double ah = t - (t - a);
+    const double al = a - ah;
+    t = 134217729.0 * b;
+    const double bh = t - (t - b);
+    const double bl = b - bh;
+    return {p, ((ah * bh - p) + ah * bl + al * bh) + al * bl};
 }
+DD dd_mul(DD a, DD b) {
+    const DD pe = two_prod(a.hi, b.hi);
+    const double e = pe.lo + (a.hi * b.lo + a.lo * b.hi);
+    const double s = pe.hi + e;
+    return {s, e - (s - pe.hi)};
+}
+}  // namespace
+
+double power(double q, long long n) {
+    DD r{1.0, 0.0}, b{q, 0.0};
+    while (n != 0) {
+        if ((n & 1) != 0) r = dd_mul(r, b);
+        n >>= 1;
+        if (n != 0) b = dd_mul(b, b);
+    }
+    return r.hi + r.lo;
+}
+
+double traffic_light_cdf(long long n, long long x, double c) {
+    if (x == 0) return power(c, n);
+    if (x >= n) return 1.0;
+    return cdf_from(partial_sums(n, 1.0 - c, c), n, x);
+}
+
+long long first_at_least(long long n, double p, double level) { return first_at_least_in(partial_sums(n, p), n, level); }
 
 Zone zone(long long observations, long long actual, long long hypothetical) {
     check_observations(observations);
@@ -115,12 +182,12 @@ Zone zone(long long observations, long long actual, long long hypothetical) {
     check_count(observations, hypothetical, "exceptions_hypothetical");
     const Tables& tb = tables();
     const long long x = std::max(actual, hypothetical);
-    const double p = 1.0 - tb.coverage;
+    const std::vector<Partial> sums = partial_sums(observations, p_99);
     Zone z{};
     z.exceptions = x;
-    z.cumulative_probability = binomial_cdf(observations, x, p);
-    z.amber_from = first_at_least(observations, p, tb.amber_level);
-    z.red_from = first_at_least(observations, p, tb.red_level);
+    z.cumulative_probability = cdf_from(sums, observations, x);
+    z.amber_from = first_at_least_in(sums, observations, tb.amber_level);
+    z.red_from = first_at_least_in(sums, observations, tb.red_level);
     z.zone = x >= z.red_from ? "RED" : x >= z.amber_from ? "AMBER" : "GREEN";
     if (observations == tb.table_observations)
         z.multiplier = std::size_t(x) < tb.multiplier_250.size() ? tb.multiplier_250[std::size_t(x)] : tb.multiplier_red;
@@ -136,8 +203,8 @@ Desk desk(long long observations, const std::array<long long, 4>& counts) {
     Desk out{};
     out.exceptions_99 = std::max(counts[0], counts[1]);
     out.exceptions_975 = std::max(counts[2], counts[3]);
-    out.cumulative_probability_99 = binomial_cdf(observations, out.exceptions_99, 0.01);
-    out.cumulative_probability_975 = binomial_cdf(observations, out.exceptions_975, 0.025);
+    out.cumulative_probability_99 = binomial_cdf(observations, out.exceptions_99, p_99);
+    out.cumulative_probability_975 = binomial_cdf(observations, out.exceptions_975, p_975);
     out.breach_99 = out.exceptions_99 > tb.desk_limit_99;
     out.breach_975 = out.exceptions_975 > tb.desk_limit_975;
     out.eligible = !(out.breach_99 || out.breach_975);

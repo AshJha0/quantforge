@@ -44,7 +44,7 @@ review (owner decision, 2026-11-18).
 | Further vol, pricing | D, E | QuantLib, Strata | Planned |
 | CDS | D | ISDA CDS Standard Model | Planned; licence text to read first |
 | Exposure, xVA | G | Open Source Risk Engine | Planned; licence to verify |
-| SIMM-style margin | G | Hand cases on own parameters | See `LICENCES.md` |
+| Sensitivity-based margin (`xva.sbim.ir_delta`) | G | Cases on rule-generated placeholder weights (KR-150) | See `LICENCES.md` |
 | Execution | H | Closed-form Almgren-Chriss, hand cases, known-truth simulation | Planned |
 | Portfolio, hedging | I, J | Hand cases, optimality conditions | Planned |
 | Market making | H | None outside: method test only | By decision |

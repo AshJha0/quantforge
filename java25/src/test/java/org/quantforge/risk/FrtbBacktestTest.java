@@ -85,7 +85,12 @@ class FrtbBacktestTest {
         }
         assertEquals(0.0, FrtbBacktest.binomialCdf(10, -1, 0.01));
         assertEquals(1.0, FrtbBacktest.binomialCdf(10, 10, 0.01));
-        assertEquals(1, FrtbBacktest.firstAtLeast(1, 0.5, 0.9999));
+        assertEquals(1, FrtbBacktest.firstAtLeast(FrtbBacktest.binomialPartialSums(1, 0.5), 1, 0.9999));
+        // KR-237: only + - * /, so the bits equal the Python reference (frtb_backtest.binomial_cdf); at n = 100,000
+        // the lgamma form was 1.3e-10 off the exact rational value (KA-A16).
+        assertEquals(0.9448722135510401, FrtbBacktest.binomialCdf(100_000, 1_050, 0.01), 0.0);
+        assertEquals(0.8921876269036252, FrtbBacktest.binomialCdf(250, 4, 0.01), 0.0);
+        assertEquals(0.9777910867630771, FrtbBacktest.binomialCdf(1_000_000, 10_200, 0.01), 0.0);
     }
 
     @Test
@@ -127,5 +132,19 @@ class FrtbBacktestTest {
         fails("E_INPUT", "var", () -> FrtbBacktest.countExceptions(List.of(), List.of(), List.of()));
         fails("E_INPUT", "actual", () -> FrtbBacktest.countExceptions(List.of(1.0), List.of(), List.of(1.0)));
         fails("E_INPUT", "hypothetical", () -> FrtbBacktest.countExceptions(List.of(1.0), List.of(1.0), List.of()));
+    }
+
+    /**
+     * Audit KF-21 (2026-11-20): the double-double power against exact binary64 results (a^n / 2^(kn) rounded
+     * once, exact integer arithmetic). Plain binary64 powering differs on each case (0.999999^1,000,000 gives
+     * 0.36787925722078507), so a plain loop fails here.
+     */
+    @Test
+    void powerIsTheCorrectlyRoundedBinary64Result() {
+        assertEquals(0.08105851616218128, FrtbBacktest.power(0.99, 250), 0.0);
+        assertEquals(0.6983372960937497, FrtbBacktest.power(0.95, 7), 0.0);
+        assertEquals(4.5381772136224775e-05, FrtbBacktest.power(0.9999, 99_999), 0.0);
+        assertEquals(0.36787925722106646, FrtbBacktest.power(0.999999, 1_000_000), 0.0);
+        assertEquals(0.95, FrtbBacktest.power(0.95, 1), 0.0);
     }
 }

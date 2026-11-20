@@ -325,7 +325,7 @@ Stage G adds operations and no error code. `stage-g-rulings.md` is normative. Op
 | `rates.lmm.capfloor`, `rates.lmm.swaption_rebonato` | `04-pricing/lmm.md` | G4a (wave 3b, LMM) |
 | `rates.shortrate.bermudan_ladder` | `06-risk/aad-core.md` | Q3b (wave 3d) |
 | `risk.model_reserve.dispersion` (`null` legal for `relative_reserve`) | `06-risk/model-reserve.md` | Q9 part 2 (wave 3e) |
-| `xva.exposure.collateralised`, `xva.adjustments.value`, `xva.simm.ir_delta`, `xva.wwr.cva_hw` | `06-risk/xva-framework.md` | G5b (wave 4b) |
+| `xva.exposure.collateralised`, `xva.adjustments.value`, `xva.sbim.ir_delta` (named `xva.simm.ir_delta` until v0.10.0; see "Deprecated aliases"), `xva.wwr.cva_hw` | `06-risk/xva-framework.md` | G5b (wave 4b); renamed in contract 1.17.0 (KR-152) |
 | `xva.exposure.portfolio_hw` | `06-risk/xva-exposure-portfolio.md` | G5c (wave 4c, ORE-checked) |
 | `risk.stress.reverse`, `risk.limits.check`, `risk.concentration.measures`, `risk.var.liquidity_adjusted`, `risk.vol.horizon` | `06-risk/portfolio-risk-tools.md` | F4 carry-over (wave 2b) |
 | `risk.sens.inflation01`, `risk.sens.dividend_borrow`, `risk.sens.correlation` | `06-risk/f3-sensitivities.md` | F3 carry-over (wave 2b) |
@@ -355,6 +355,19 @@ Stage I adds operations and one error code, `E_INFEASIBLE` (ruling I-1). `stage-
 
 Adding an operation or an error code is a minor version. Changing the meaning of a key, a code or an
 exit status is a major version, and all four implementations and the runner move together.
+
+## Deprecated aliases
+
+A deprecated alias is an old operation id that every build still accepts for a stated time. It runs the same
+handler as its target, so its outputs, error codes and diagnostics are those of the target; nothing in the result
+marks it (extra keys in `outputs` are a failure, see "Result document"). The deprecation is stated here and in
+`specifications/deprecated-aliases.json`, which `tools/gen_name_map.py` reads. Removing an alias is a major change
+(KR-154): it is done with the release named below. Golden suites pin each alias with invariance pairs (the target
+with expected `any`, the alias with `same_as`), so a build whose alias drifts from its target fails.
+
+| Alias (deprecated) | Target | Deprecated in | Removal | Ruling |
+|---|---|---|---|---|
+| `xva.simm.ir_delta` | `xva.sbim.ir_delta` | contract 1.17.0 (release v0.10.1) | v1.0.0 | KR-152; goldens `stage_k/sbim_alias_k.json` |
 
 ## R6 changes (contract 1.12.0, rulings `r6-rulings.md`)
 
@@ -530,14 +543,14 @@ The stored line is the full record (with `hash`) in the same form, followed by `
 **TCA record values.** `exec.tca.shortfall` runs in binary64 in this order: delay = s x filled x (arrival - decision); execution = s x (the array-order sum, from 0.0, of q x (p - arrival)); opportunity = s x (Q - filled) x (end - decision) + 0.0; total = delay + execution + opportunity + fees; total_bps = total / (Q x decision) x 1e4. Each input is the binary64 nearest its decimal; `fees` is the exact decimal sum of the order's fill fees, converted once; `filled` is the binary64 sum of the fill quantities in order. Each output is written as the shortest round-trip decimal of the binary64 (Python `repr`, Java 19+ `Double.toString`, Rust `{}`, C++ `std::to_chars` without precision), then as an HR-12 decimal string (no exponent: `1e-05` becomes `"0.00001"`, `-0.0` becomes `"0"`). These bytes enter the hash, so a last-bit difference breaks the chain: keep this operation order and no FMA contraction.
 ## Stage K wave 1 operations (contract 1.17.0; rulings `stage-k-rulings-w1.md` KR-1 to KR-17, confirmed 2026-11-19 except KR-8)
 
-Contract number 1.17.0 for all stage K waves (owner decision K-QC, 2026-11-18). The stage K coordinator lane confirmed the wave-1 rulings on 2026-11-19 with all four builds carrying wave 1, so every build and the runner report 1.17.0 from that change. No new error code. Error order HR-66: `E_SCHEMA`, structural `E_INPUT` (lengths, empty lists, log order), `E_DOMAIN` (the F-2 finite rule first, then single values), value-dependent `E_INPUT` (the stale-cache check), `E_LIMIT` (the spec sizes below, checked last). Goldens `datasets/golden/stage_k/` (`oracle/python/gen_stage_k_w1.py`): `bt_k`, `inc_k`, `trig_k`, `idr_k`, `rich_k`, `e1_k` (F-2) and `e2_k` (two errors at once, HR-66 order). Implemented in all four builds (Python `quantforge_core.stage_k`, Java `org.quantforge.risk.StageK`, C++ `core/stage_k.cpp`, Rust `quantforge_core::stage_k`). `bound` of `risk.intraday.delta_gamma_bound` uses `abs(notional)` (KR-15) and is the exact-arithmetic Lagrange bound evaluated in binary64 (KR-17). Names below are fixed by the oracle lane where the spec left them open; they bind all four builds.
+Contract number 1.17.0 for all stage K waves (owner decision K-QC, 2026-11-18). The stage K coordinator lane confirmed the wave-1 rulings on 2026-11-19 with all four builds carrying wave 1, so every build and the runner report 1.17.0 from that change. No new error code. Error order (ruling KR-230, 2026-11-19, which supersedes the HR-66 order this block first gave; audit A finding KA-A1): the general rule of this contract and HR-122, with no exception: `E_SCHEMA`, `E_LIMIT` (the sizes of `01-core/limits.md`, KR-231), the F-2 finite rule, structural `E_INPUT` (lengths, empty lists, log order), `E_DOMAIN` (single values, then the trigger's no-noise-scale rule), then the stale-cache `E_INPUT`. A two-error golden that pins any other order fails `python/tests/test_stage_k_error_order.py`. Goldens `datasets/golden/stage_k/` (`oracle/python/gen_stage_k_w1.py`): `bt_k`, `inc_k`, `trig_k`, `idr_k`, `rich_k`, `e1_k` (F-2), `e2_k` (two errors at once, KR-230 order) and `lim_k` (compact: the 100,001-record and 100,001-change limits). Implemented in all four builds (Python `quantforge_core.stage_k`, Java `org.quantforge.risk.StageK`, C++ `core/stage_k.cpp`, Rust `quantforge_core::stage_k`). `bound` of `risk.intraday.delta_gamma_bound` uses `abs(notional)` (KR-15) and, from KR-234 (superseding KR-17), is the Lagrange bound plus a binary64 rounding allowance, so that it bounds the distance of `estimate_pnl` from the exact and from the binary64 revaluation on the domain stated there. `false_alarm_rate` of `calib.trigger.check` is the Student-t rate of the trigger as used, and `nominal_rate` the known-sigma `2 Phi(-k)` (KR-232; class `tail_probability` for `false_alarm_rate`). Names below are fixed by the oracle lane where the spec left them open; they bind all four builds.
 
 | Operation | Spec | Inputs | Outputs |
 |---|---|---|---|
-| `core.store.bitemporal_query` | `01-core/bitemporal-store.md` | `records` (each `sequence`, `series_id`, `valid_from`, `valid_to` (instant or null, key required), `knowledge_time`, `value` (any JSON, key required), optional `deleted`; at most 1,000,000), `series_id`, `knowledge_as_of`, `valid_at` | `status` (`FOUND`, `WITHDRAWN`, `NONE`), `row` (`sequence`, `valid_from`, `valid_to`, `knowledge_time`, `value`; instants in `Z` form) or null (KR-14) |
+| `core.store.bitemporal_query` | `01-core/bitemporal-store.md` | `records` (each `sequence`, `series_id`, `valid_from`, `valid_to` (instant or null, key required), `knowledge_time`, `value` (any JSON, key required), optional `deleted`; at most 100,000, the general array limit, KR-231), `series_id`, `knowledge_as_of`, `valid_at` | `status` (`FOUND`, `WITHDRAWN`, `NONE`), `row` (`sequence`, `valid_from`, `valid_to`, `knowledge_time`, `value`; instants in `Z` form) or null (KR-14) |
 | `curve.bootstrap.par_annual` | `02-curves/incremental-update.md` | `quotes` (1 to 200, each > -1) | `discount_factors` |
 | `curve.incremental.update` | same | `previous_quotes`, `previous_discount_factors` (bit-equal to the bootstrap, else `E_INPUT`), `new_quotes` (equal lengths) | `discount_factors`, `first_changed_index` (Integer or null), `recomputed` (Integer) |
-| `calib.trigger.check` | `03-calibration/recalibration-triggers.md` | `changes` (2 to 100,000), `x_ref`, `x_now`, `days_since` (Real >= 1), `k` (> 0) | `fire`, `sigma`, `threshold`, `false_alarm_rate` |
+| `calib.trigger.check` | `03-calibration/recalibration-triggers.md` | `changes` (2 to 100,000), `x_ref`, `x_now`, `days_since` (Real >= 1), `k` (> 0) | `fire`, `sigma`, `threshold`, `false_alarm_rate` (KR-232), `nominal_rate` (KR-232); no noise scale (`sigma <= 2^-26 max abs(change)`) is `E_DOMAIN` (KR-233) |
 | `risk.intraday.delta_gamma_bound` | `06-risk/intraday-risk-bounds.md` | `positions` (1 to 100,000 of `{notional, maturity > 0, yield}`), `shift` | `estimate_pnl`, `bound` (per-position `M3` uses `|notional|`), `label` "latency-aware analytics on simulated data" (KR-10) |
 | `num.richardson.check` | `06-risk/bermudan-ladder-k8.md` | `values` (exactly 3), `ratio` (> 1), `assumed_order` (> 0) | `status` (`OK`, `ORDER_MISMATCH`, `NON_MONOTONE`), `observed_order` (or null), `extrapolated` (or null) |
 
@@ -553,3 +566,7 @@ Rulings `stage-k-rulings-w1b.md` KR-30 to KR-47. No new error code; the contract
 | `risk.frtb.backtest.zone` | `06-risk/frtb-ima-backtest.md` (K-8e) | `observations` (Integer 1 to 1,000,000), `exceptions_actual`, `exceptions_hypothetical` (Integers 0 to n) | `exceptions`, `cumulative_probability`, `zone` (`GREEN`, `AMBER`, `RED`), `amber_from`, `red_from`, `multiplier` (n = 250 only, else null) |
 | `risk.frtb.backtest.desk` | same | `observations`, four Integer counts (99% and 97.5%, actual and hypothetical) | the two maximum counts, two cumulative probabilities, `breach_99`, `breach_975`, `eligible` |
 | `risk.frtb.backtest.count` | same | `var`, `actual`, `hypothetical` (equal-length arrays of Real or null) | `observations`, `exceptions_actual`, `exceptions_hypothetical`, `exceptions`, `days_actual`, `days_hypothetical` |
+
+### Stage K margin rename (contract 1.17.0; rulings `stage-k-rulings-margin.md` KR-150 to KR-155)
+
+`xva.sbim.ir_delta` is the stage G operation formerly named `xva.simm.ir_delta`, with the same inputs, outputs, error codes and error order (`06-risk/xva-framework.md`, G-43). The old id is a deprecated alias until v1.0.0 (section "Deprecated aliases"). Adding the new id is a minor change under "Versioning", and KR-1 gives every stage K change the one number 1.17.0, so the contract number does not move (KR-154). The goldens' weights and correlations are now placeholder weights from a stated rule (KR-150, `specifications/tables/stage_k/sbim-ir-delta-g.json`); the formula is unchanged. Goldens `datasets/golden/stage_g/sbim_g.json` and `datasets/golden/stage_k/sbim_alias_k.json` (`oracle/python/gen_stage_g_w4b.py`).

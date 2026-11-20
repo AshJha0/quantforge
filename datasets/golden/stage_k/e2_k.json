@@ -56,7 +56,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived"
    ],
    "tags": [
     "stage_k",
@@ -64,7 +64,7 @@
     "two-errors",
     "error"
    ],
-   "description": "sequence 0 in records[0] (E_SCHEMA) and seq 3 knowledge_time going back (E_INPUT)"
+   "description": "sequence 0 in records[0] [schema] and seq 3 knowledge_time going back [structural]"
   },
   {
    "case_id": "e2_k-0002",
@@ -111,12 +111,13 @@
    },
    "expected": {
     "status": "error",
-    "error_code": "E_INPUT"
+    "error_code": "E_DOMAIN"
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived",
+    "expected code set by ruling KR-230 (one error order, HR-122; audit A, KA-A1) 2026-11-19: the HR-66 order of the first version gave E_INPUT"
    ],
    "tags": [
     "stage_k",
@@ -124,7 +125,7 @@
     "two-errors",
     "error"
    ],
-   "description": "sequence not increasing (structural E_INPUT) and NaN at records[0].value (E_DOMAIN)"
+   "description": "sequence not increasing [structural] and NaN at records[0].value [finite]"
   },
   {
    "case_id": "e2_k-0003",
@@ -336,12 +337,13 @@
    },
    "expected": {
     "status": "error",
-    "error_code": "E_DOMAIN"
+    "error_code": "E_LIMIT"
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived",
+    "expected code set by ruling KR-230 (one error order, HR-122; audit A, KA-A1) 2026-11-19: the HR-66 order of the first version gave E_DOMAIN"
    ],
    "tags": [
     "stage_k",
@@ -349,7 +351,7 @@
     "two-errors",
     "error"
    ],
-   "description": "NaN at quotes/0 (E_DOMAIN) and 201 quotes (E_LIMIT)"
+   "description": "NaN at quotes/0 [finite] and 201 quotes [limit]"
   },
   {
    "case_id": "e2_k-0004",
@@ -561,12 +563,13 @@
    },
    "expected": {
     "status": "error",
-    "error_code": "E_DOMAIN"
+    "error_code": "E_LIMIT"
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived",
+    "expected code set by ruling KR-230 (one error order, HR-122; audit A, KA-A1) 2026-11-19: the HR-66 order of the first version gave E_DOMAIN"
    ],
    "tags": [
     "stage_k",
@@ -574,7 +577,7 @@
     "two-errors",
     "error"
    ],
-   "description": "quote -1.5 (E_DOMAIN) and 201 quotes (E_LIMIT)"
+   "description": "quote -1.5 [domain] and 201 quotes [limit]"
   },
   {
    "case_id": "e2_k-0005",
@@ -597,12 +600,13 @@
    },
    "expected": {
     "status": "error",
-    "error_code": "E_INPUT"
+    "error_code": "E_DOMAIN"
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived",
+    "expected code set by ruling KR-230 (one error order, HR-122; audit A, KA-A1) 2026-11-19: the HR-66 order of the first version gave E_INPUT"
    ],
    "tags": [
     "stage_k",
@@ -610,7 +614,7 @@
     "two-errors",
     "error"
    ],
-   "description": "lengths differ (structural E_INPUT) and NaN at new_quotes/1 (E_DOMAIN)"
+   "description": "lengths differ [structural] and NaN at new_quotes/1 [finite]"
   },
   {
    "case_id": "e2_k-0006",
@@ -639,7 +643,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived"
    ],
    "tags": [
     "stage_k",
@@ -647,7 +651,7 @@
     "two-errors",
     "error"
    ],
-   "description": "new quote -2 (E_DOMAIN) and a stale cache (value-dependent E_INPUT)"
+   "description": "new quote -2 [domain] and a stale cache [after]"
   },
   {
    "case_id": "e2_k-0007",
@@ -1265,12 +1269,12 @@
    },
    "expected": {
     "status": "error",
-    "error_code": "E_INPUT"
+    "error_code": "E_LIMIT"
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived"
    ],
    "tags": [
     "stage_k",
@@ -1278,7 +1282,7 @@
     "two-errors",
     "error"
    ],
-   "description": "stale cache (value-dependent E_INPUT) and 201 quotes (E_LIMIT)"
+   "description": "stale cache [after] and 201 quotes [limit]"
   },
   {
    "case_id": "e2_k-0008",
@@ -1299,7 +1303,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived"
    ],
    "tags": [
     "stage_k",
@@ -1307,7 +1311,7 @@
     "two-errors",
     "error"
    ],
-   "description": "one change (structural E_INPUT) and k = 0 (E_DOMAIN)"
+   "description": "one change [structural] and k = 0 [domain]"
   },
   {
    "case_id": "e2_k-0009",
@@ -1330,7 +1334,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived"
    ],
    "tags": [
     "stage_k",
@@ -1338,7 +1342,7 @@
     "two-errors",
     "error"
    ],
-   "description": "x_now missing (E_SCHEMA) and k = 0 (E_DOMAIN)"
+   "description": "x_now missing [schema] and k = 0 [domain]"
   },
   {
    "case_id": "e2_k-0010",
@@ -1361,7 +1365,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived"
    ],
    "tags": [
     "stage_k",
@@ -1369,7 +1373,7 @@
     "two-errors",
     "error"
    ],
-   "description": "days_since 0.5 and sigma 0 (both E_DOMAIN; one code)"
+   "description": "days_since 0.5 [domain] and sigma 0 [domain] (one code)"
   },
   {
    "case_id": "e2_k-0011",
@@ -1380,12 +1384,13 @@
    },
    "expected": {
     "status": "error",
-    "error_code": "E_INPUT"
+    "error_code": "E_DOMAIN"
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived",
+    "expected code set by ruling KR-230 (one error order, HR-122; audit A, KA-A1) 2026-11-19: the HR-66 order of the first version gave E_INPUT"
    ],
    "tags": [
     "stage_k",
@@ -1393,7 +1398,7 @@
     "two-errors",
     "error"
    ],
-   "description": "no positions (structural E_INPUT) and NaN shift (E_DOMAIN)"
+   "description": "no positions [structural] and NaN shift [finite] (audit A pair d)"
   },
   {
    "case_id": "e2_k-0012",
@@ -1419,7 +1424,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived"
    ],
    "tags": [
     "stage_k",
@@ -1427,7 +1432,7 @@
     "two-errors",
     "error"
    ],
-   "description": "yield missing in positions[1] (E_SCHEMA) and maturity 0 in positions[0] (E_DOMAIN)"
+   "description": "yield missing in positions[1] [schema] and maturity 0 in positions[0] [domain]"
   },
   {
    "case_id": "e2_k-0013",
@@ -1447,7 +1452,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived"
    ],
    "tags": [
     "stage_k",
@@ -1455,7 +1460,7 @@
     "two-errors",
     "error"
    ],
-   "description": "two values (structural E_INPUT) and ratio 1 (E_DOMAIN)"
+   "description": "two values [structural] and ratio 1 [domain]"
   },
   {
    "case_id": "e2_k-0014",
@@ -1475,7 +1480,7 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
-    "added by the coordinator lane 2026-11-19 (two errors at once, order HR-66): hand, not blind re-derived"
+    "added by the coordinator lane 2026-11-19 (two errors at once): hand, not blind re-derived"
    ],
    "tags": [
     "stage_k",
@@ -1483,7 +1488,7 @@
     "two-errors",
     "error"
    ],
-   "description": "assumed_order missing (E_SCHEMA) and ratio 1 (E_DOMAIN)"
+   "description": "assumed_order missing [schema] and ratio 1 [domain]"
   },
   {
    "case_id": "e2_k-0015",
@@ -1552,7 +1557,7 @@
     "two-errors",
     "error"
    ],
-   "description": "G-18 path (no method): exercise time 1.5 not a reset date (structural E_INPUT) and grid width 0 (E_DOMAIN)"
+   "description": "G-18 path (no method): exercise time 1.5 not a reset date [structural] and grid width 0 [domain]"
   },
   {
    "case_id": "e2_k-0016",
@@ -1621,7 +1626,7 @@
     "two-errors",
     "error"
    ],
-   "description": "G-18 path (no method): exercise time 1.5 not a reset date (structural E_INPUT) and grid width 0 (E_DOMAIN)"
+   "description": "G-18 path (no method): exercise time 1.5 not a reset date [structural] and grid width 0 [domain]"
   },
   {
    "case_id": "e2_k-0017",
@@ -1694,7 +1699,7 @@
     "two-errors",
     "error"
    ],
-   "description": "G-18 path (no method): sigma 0 (E_DOMAIN) and nx 20,001 above 10,001 (E_LIMIT, checked before the domain checks by G-31)"
+   "description": "G-18 path (no method): sigma 0 [domain] and nx 20,001 above 10,001 [limit] (checked before the domain checks by G-31)"
   },
   {
    "case_id": "e2_k-0018",
@@ -1767,7 +1772,197 @@
     "two-errors",
     "error"
    ],
-   "description": "G-18 path (no method): sigma 0 (E_DOMAIN) and nx 20,001 above 10,001 (E_LIMIT, checked before the domain checks by G-31)"
+   "description": "G-18 path (no method): sigma 0 [domain] and nx 20,001 above 10,001 [limit] (checked before the domain checks by G-31)"
+  },
+  {
+   "case_id": "e2_k-0019",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     "NaN"
+    ],
+    "x_ref": 100.0,
+    "x_now": 105.0,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "e2",
+    "two-errors",
+    "error"
+   ],
+   "description": "changes [NaN]: one change [structural] and NaN [finite] (audit A pair a)"
+  },
+  {
+   "case_id": "e2_k-0020",
+   "operation": "num.richardson.check",
+   "inputs": {
+    "values": [
+     10.5,
+     "NaN"
+    ],
+    "ratio": 2.0,
+    "assumed_order": 2.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "e2",
+    "two-errors",
+    "error"
+   ],
+   "description": "two values [structural] and NaN at values/1 [finite]"
+  },
+  {
+   "case_id": "e2_k-0021",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": "NaN"
+     },
+     {
+      "sequence": 0,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     },
+     {
+      "sequence": 3,
+      "series_id": "A",
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     },
+     {
+      "sequence": 4,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-02T00:00:00Z",
+      "value": null,
+      "deleted": true
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-04-01T00:00:00Z",
+    "valid_at": "2026-02-15T00:00:00Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "e2",
+    "two-errors",
+    "error"
+   ],
+   "description": "sequence 0 in records[1] [schema] and NaN at records[0].value [finite]"
+  },
+  {
+   "case_id": "e2_k-0022",
+   "operation": "curve.incremental.update",
+   "inputs": {
+    "previous_quotes": [
+     0.02,
+     0.025,
+     0.03
+    ],
+    "previous_discount_factors": [
+     0.9803921568627451,
+     0.9516977522716404,
+     0.9145993230349208
+    ],
+    "new_quotes": [
+     0.02,
+     -2.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "e2",
+    "two-errors",
+    "error"
+   ],
+   "description": "lengths differ [structural] and new quote -2 [domain]"
+  },
+  {
+   "case_id": "e2_k-0023",
+   "operation": "curve.incremental.update",
+   "inputs": {
+    "previous_quotes": [
+     0.02,
+     0.025,
+     0.03
+    ],
+    "previous_discount_factors": [
+     0.9803921568627451,
+     0.9516977522716404,
+     0.9145993230349209
+    ],
+    "new_quotes": [
+     0.02,
+     0.026,
+     "Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "e2",
+    "two-errors",
+    "error"
+   ],
+   "description": "Infinity at new_quotes/2 [finite] and a stale cache [after]"
   }
  ]
 }

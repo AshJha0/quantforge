@@ -1,0 +1,236 @@
+{
+ "source": "datasets/golden/stage_k/idr_k.json expected.outputs after ruling KR-234 (oracle/python/gen_stage_k_w1.py, mpmath 50 digits, rounded once to binary64); copied 2026-11-19 by the audit-response lane (k-audit-a) for the v2 packet, which is prepared and not run",
+ "tolerance": {
+  "estimate_pnl": {
+   "relative": 1e-09,
+   "absolute": 0.0
+  },
+  "bound": {
+   "relative": 1e-09,
+   "absolute": 0.0
+  },
+  "label": "exact"
+ },
+ "cases": {
+  "idr_k-0001": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": -39913.124212551615,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 17.056890689308766,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0002": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": 41959.95109524657,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 17.93141617571073,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0003": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": -10170.171073390557,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 0.2665139170617964,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0004": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": -179097.35223580853,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 2132.111336141709,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0005": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": -30589.655330067555,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 17.684733711734584,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0008": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": -0.004093653755155775,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 1.7469352659511083e-17,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0009": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": 4.093653765400144e-06,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 1.7452295691483744e-20,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0010": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": -4.0936537653899094e-24,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 1.745229567428869e-38,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0012": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": 3.991807462997163e-08,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 34.11378137863459,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0013": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": 0.0004093652741663154,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 1091641.0049227446,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  },
+  "idr_k-0014": {
+   "item": "K-5a",
+   "fields": [
+    {
+     "path": "estimate_pnl",
+     "value": -1.370939742326229e+41,
+     "src": "golden"
+    },
+    {
+     "path": "bound",
+     "value": 1.2043289613547214e+86,
+     "src": "golden"
+    },
+    {
+     "path": "label",
+     "value": "latency-aware analytics on simulated data",
+     "src": "golden"
+    }
+   ]
+  }
+ }
+}

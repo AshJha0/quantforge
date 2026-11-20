@@ -1,19 +1,8 @@
 //! Stage K wave 1 verbs (PROPOSED rulings KR-1 to KR-14, `specifications/stage-k-rulings-w1.md`;
-//! contract table "Stage K wave 1 operations"). Error order HR-66: the reads here are `E_SCHEMA`;
-//! the core then applies structural `E_INPUT`, `E_DOMAIN` (the F-2 finite rule first),
-//! value-dependent `E_INPUT` and `E_LIMIT`, in that order. The generic gate sizes and the
-//! dispatcher's F-2 override are skipped for these verbs (`STAGE_K_OPS`), as the stage K
-//! sizes are checked last, in the core.
-
-/// The six operation names, for the dispatcher's stage K path.
-pub const STAGE_K_OPS: &[&str] = &[
-    "core.store.bitemporal_query",
-    "curve.bootstrap.par_annual",
-    "curve.incremental.update",
-    "calib.trigger.check",
-    "risk.intraday.delta_gamma_bound",
-    "num.richardson.check",
-];
+//! contract table "Stage K wave 1 operations"). Error order HR-122 (ruling KR-230): the reads
+//! here are `E_SCHEMA`; the gate then applies the size limits (`limits.md`, KR-231) and the
+//! dispatcher the F-2 finite rule; the core applies structural `E_INPUT`, `E_DOMAIN` and, for the
+//! incremental update, the stale-cache `E_INPUT`.
 
 pub mod core {
     use crate::input::{Inputs, schema};
@@ -77,6 +66,7 @@ pub mod core {
                 .collect::<Result<Vec<_>>>()?;
             let series_id = i.str("series_id")?;
             let (k, v) = (i.instant("knowledge_as_of")?, i.instant("valid_at")?);
+            i.gate()?;
             let (status, winner) = sk::bitemporal_query(&log, series_id, k, v)?;
             let row = winner.map(row).transpose()?;
             plain(obj([("status", status.name().into()), ("row", row.into())]))
@@ -95,12 +85,14 @@ pub mod curve {
     (op, i)
         "curve.bootstrap.par_annual" => {
             let quotes = i.reals("quotes")?;
+            i.gate()?;
             plain(obj([("discount_factors", sk::par_annual(&quotes)?.into())]))
         },
         "curve.incremental.update" => {
             let pq = i.reals("previous_quotes")?;
             let pd = i.reals("previous_discount_factors")?;
             let nq = i.reals("new_quotes")?;
+            i.gate()?;
             let u = sk::incremental_update(&pq, &pd, &nq)?;
             plain(obj([
                 ("discount_factors", u.discount_factors.into()),
@@ -124,12 +116,14 @@ pub mod calib {
             let changes = i.reals("changes")?;
             let (x_ref, x_now) = (i.f64("x_ref")?, i.f64("x_now")?);
             let (d, k) = (i.f64("days_since")?, i.f64("k")?);
+            i.gate()?;
             let t = sk::trigger_check(&changes, x_ref, x_now, d, k)?;
             plain(obj([
                 ("fire", t.fire.into()),
                 ("sigma", t.sigma.into()),
                 ("threshold", t.threshold.into()),
                 ("false_alarm_rate", t.false_alarm_rate.into()),
+                ("nominal_rate", t.nominal_rate.into()),
             ]))
         }
     }
@@ -157,6 +151,7 @@ pub mod risk {
                 })
                 .collect::<Result<Vec<_>>>()?;
             let shift = i.f64("shift")?;
+            i.gate()?;
             let r = sk::delta_gamma_bound(&positions, shift)?;
             plain(obj([
                 ("estimate_pnl", r.estimate_pnl.into()),
@@ -179,6 +174,7 @@ pub mod num {
         "num.richardson.check" => {
             let values = i.reals("values")?;
             let (ratio, p) = (i.f64("ratio")?, i.f64("assumed_order")?);
+            i.gate()?;
             let r = sk::richardson_check(&values, ratio, p)?;
             plain(obj([
                 ("status", r.status.into()),

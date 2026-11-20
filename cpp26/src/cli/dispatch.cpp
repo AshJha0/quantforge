@@ -60,6 +60,7 @@
 #include "quantforge/core/heston.hpp"
 #include "quantforge/core/vol_stats.hpp"
 #include "quantforge/core/joint.hpp"
+#include "quantforge/core/xva.hpp"
 #include "quantforge/core/book_sensitivity.hpp"
 #include "quantforge/core/var_frtb.hpp"
 #include "quantforge/core/book.hpp"
@@ -473,8 +474,7 @@ CaseResult run_case(string_view text) {
             op_name.starts_with("research.") || op_name == "risk.contrib.euler" || op_name == "risk.backtest.es_z2" ||
             op_name == "exec.tca.shortfall" || op_name == "exec.tca.attribution" ||  // HR-9: fills limit 1,000,000
             op_name == "micro.book.rebuild" || op_name == "exec.sim.lit.run" || op_name == "exec.sim.dark.run" ||
-            op_name == "exec.sor.allocate" ||  // stage H wave 2 page limits
-            stage_k_verb(op_name);              // stage K sizes, checked last in the library
+            op_name == "exec.sor.allocate";  // stage H wave 2 page limits
         const bool big = !research && oversized(inputs);
         Out out;
         out.values.begin_object();

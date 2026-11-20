@@ -3,7 +3,10 @@
 - `xva.exposure.collateralised`: netting sets, CSA (thresholds, MTA, independent amount), margin period of risk as a
   lag in grid steps; outputs EE, ENE, PFE, EPE and effective EPE per netting set.
 - `xva.adjustments.value`: CVA, DVA, FCA, FBA (with the DVA overlap rule), MVA and KVA from given profiles.
-- `xva.simm.ir_delta`: SIMM-style margin for one currency's IR delta (weights and correlations are inputs).
+- `xva.sbim.ir_delta`: sensitivity-based initial margin for one currency's IR delta (weights and correlations are
+  inputs; the goldens feed it the rule-generated table `specifications/tables/stage_k/sbim-ir-delta-g.json`, KR-150).
+  The old id `xva.simm.ir_delta` is a deprecated alias until v1.0.0 (KR-152); its invariance and E1 cases go to
+  `stage_k/sbim_alias_k.json`.
 - `xva.wwr.cva_hw`: wrong-way CVA with the Hull-White (2012) hazard `exp(a(t) + b V(t))`, `a(t)` fitted to the survival curve.
 
 Values: 50-digit mpmath replicas (`a(t)` by findroot to 1e-40). No outside library: not counted (ORE checks the simulated
@@ -125,8 +128,8 @@ def adjustments(inp, mut=None):
     return out
 
 
-# ------------------------------------------------------------------------------------------------ SIMM-style IR delta
-def simm(inp, mut=None):
+# ------------------------------------------------------------------------------------------------ sensitivity-based IR delta
+def sbim(inp, mut=None):
     s = [mp.mpf(x) for x in inp["sensitivities"]]
     rw = [mp.mpf(x) for x in inp["risk_weights"]]
     rho = [[mp.mpf(x) for x in r] for r in inp["correlations"]]
@@ -156,6 +159,52 @@ def wwr(inp, mut=None):
         cva += (1 - R) * df[i] * sum(max(V[p][i - 1], 0) * (S[p] - newS[p]) for p in range(n)) / n
         S = newS
     return {"cva": float(cva), "a": [float(x) for x in avals]}
+
+
+OP, ALIAS = "xva.sbim.ir_delta", "xva.simm.ir_delta"  # KR-152: the old id is a deprecated alias until v1.0.0
+
+
+def alias_suite(g):
+    """stage_k/sbim_alias_k.json (KR-153): for each sbim_g input an invariance pair (new id `any`, alias `same_as`),
+    one E1 case per Real input of the alias (F-2, E_DOMAIN) and one case with two errors at once (HR-66)."""
+    a = Suite("sbim_alias_k", "specifications/stage-k-rulings-margin.md", G)
+    for c in g.cases:
+        a.cases.append({"case_id": "", "operation": OP, "inputs": c["inputs"], "expected": {"status": "any"},
+                        "tolerance_class": "date_and_convention", "verified_by": ["rule-F-3-anchor"],
+                        "tags": ["alias", "zero_anchor", f"base:{c['case_id']}"], "description": f"new id on the inputs of {c['case_id']}"})
+        a.cases.append({"case_id": "", "operation": ALIAS, "inputs": c["inputs"], "expected": {"status": "same_as", "case_id": None},
+                        "tolerance_class": c["tolerance_class"], **({"tolerance_limit": c["tolerance_limit"]} if "tolerance_limit" in c else {}),
+                        "verified_by": ["rule-KR-152"], "tags": ["alias", "deprecated", f"base:{c['case_id']}"],
+                        "description": f"deprecated alias {ALIAS}: same result as {OP} (KR-152)"})
+    base = g.cases[0]["inputs"]
+    nf = [(["sensitivities", 0], "NaN"), (["risk_weights", 0], "Infinity"), (["correlations", 0, 1], "-Infinity"),
+          (["concentration_threshold"], "NaN")]
+    for path, tok in nf:
+        inp = json.loads(json.dumps(base))
+        h = inp
+        for p in path[:-1]:
+            h = h[p]
+        h[path[-1]] = tok
+        a.cases.append({"case_id": "", "operation": ALIAS, "inputs": inp, "expected": {"status": "error", "error_code": "E_DOMAIN"},
+                        "tolerance_class": "date_and_convention", "verified_by": ["rule-F-2"],
+                        "tags": ["e1", "non_finite", tok.lower().lstrip("-"), f"base:{g.cases[0]['case_id']}",
+                                 "input:/" + "/".join(map(str, path))],
+                        "description": f"alias, {tok} at {'/'.join(map(str, path))}"})
+    two = dict(base, risk_weights=base["risk_weights"][:5], concentration_threshold=0.0)
+    a.cases.append({"case_id": "", "operation": ALIAS, "inputs": two, "expected": {"status": "error", "error_code": "E_INPUT"},
+                    "tolerance_class": "date_and_convention", "verified_by": ["rule-HR-66"], "tags": ["invalid", "two_errors"],
+                    "description": "two errors at once: risk_weights one short [structural] and threshold 0 [domain]; structural E_INPUT first"})
+    for i, c in enumerate(a.cases, 1):
+        c["case_id"] = f"sbim_alias_k-{i:04d}"
+    for i, c in enumerate(a.cases):
+        if c["expected"].get("status") == "same_as":
+            c["expected"]["case_id"] = a.cases[i - 1]["case_id"]
+    for c in a.cases:
+        c["tags"].append("synthetic")
+    keep = common.GOLDEN
+    common.GOLDEN = keep.parent / "stage_k"
+    a.write()
+    common.GOLDEN = keep
 
 
 def write(s):
@@ -232,26 +281,28 @@ def main():
     write(s)
     n2 = len(s.cases)
 
-    # ---- SIMM-style
-    s = Suite("simm_g", "specifications/06-risk/xva-framework.md", G)
-    rw = [109.0, 105.0, 90.0, 71.0, 66.0, 66.0]  # illustrative, regular-volatility-style magnitudes; inputs, not a SIMM table
-    lab = [0.25, 1.0, 2.0, 5.0, 10.0, 30.0]
-    corr = [[1.0 if i == j else round(math.exp(-0.3 * abs(math.log(lab[i] / lab[j]))), 6) for j in range(6)] for i in range(6)]
+    # ---- sensitivity-based IR delta (KR-150 to KR-153): weights and correlations from the rule-generated table
+    s = Suite("sbim_g", "specifications/06-risk/xva-framework.md", G)
+    table = json.loads((HERE.parents[1] / "specifications" / "tables" / "stage_k" / "sbim-ir-delta-g.json").read_text(encoding="utf-8"))
+    assert table["placeholder"] is True and table["label"] == "placeholder weights"
+    rw = [float(x) for x in table["risk_weights"]]  # RW = 10 x k (KR-150)
+    corr = [[float(x) for x in r] for r in table["correlations"]]  # rho(k, l) = 1 - 0.1 |k - l| (KR-150)
     srows = [(dict(sensitivities=[1000.0, -500.0, 2500.0, 4000.0, -1200.0, 300.0], risk_weights=rw, correlations=corr, concentration_threshold=1e9), "mixed signs, below concentration"),
              (dict(sensitivities=[0.0, 0.0, 10000.0, 0.0, 0.0, 0.0], risk_weights=rw, correlations=corr, concentration_threshold=1e9), "one bucket: margin = RW x s"),
              (dict(sensitivities=[1e6, 1e6, 1e6, 1e6, 1e6, 1e6], risk_weights=rw, correlations=corr, concentration_threshold=1e6), "concentration factor sqrt(6)"),
              (dict(sensitivities=[1000.0, -1000.0, 0.0, 0.0, 0.0, 0.0], risk_weights=[100.0, 100.0, 0, 0, 0, 0], correlations=[[1.0] * 6 for _ in range(6)], concentration_threshold=1e9), "perfect correlation hedge: margin 0")]
     for inp, d in srows:
-        s.add("xva.simm.ir_delta", inp, simm(inp), verified=["mpmath-50"], tags=["xva", "simm"], limit=LIM, description=d)
-    assert abs(s.cases[1]["expected"]["outputs"]["margin"] - 900000.0) < 1e-6
-    caught("tenor correlation ignored", abs(simm(srows[0][0])["margin"] - simm(srows[0][0], "no_corr")["margin"]))
+        s.add(OP, inp, sbim(inp), verified=["mpmath-50"], tags=["xva", "sbim", "placeholder weights"], limit=LIM, description=d)
+    assert abs(s.cases[1]["expected"]["outputs"]["margin"] - 10000.0 * rw[2]) < 1e-6
+    caught("tenor correlation ignored", abs(sbim(srows[0][0])["margin"] - sbim(srows[0][0], "no_corr")["margin"]))
     errs = [(dict(srows[0][0], risk_weights=rw[:5]), "E_INPUT", "length mismatch"), (dict(srows[0][0], concentration_threshold=0.0), "E_DOMAIN", "threshold 0"),
             (dict(srows[0][0], correlations=[[1.0, 1.5] + [0.0] * 4] + corr[1:]), "E_DOMAIN", "correlation above 1"),
             (dict(srows[0][0], risk_weights=[-1.0] + rw[1:]), "E_DOMAIN", "negative risk weight")]
     for inp, code, d in errs:
-        s.add("xva.simm.ir_delta", inp, error=code, cls="date_and_convention", tags=["invalid", "xva"], description=d)
+        s.add(OP, inp, error=code, cls="date_and_convention", tags=["invalid", "xva"], description=d)
     write(s)
     n3 = len(s.cases)
+    alias_suite(s)
 
     # ---- WWR
     s = Suite("wwr_g", "specifications/06-risk/xva-framework.md", G)
@@ -274,9 +325,10 @@ def main():
     write(s)
     n4 = len(s.cases)
     reg = json.loads((HERE.parent / "outside_register_g.json").read_text(encoding="utf-8"))
-    for k, n in (("collexp_g", n1), ("xvaadj_g", n2), ("simm_g", n3), ("wwr_g", n4)):
+    reg = {("sbim_g" if k == "simm_g" else k): v for k, v in reg.items()}  # suite renamed sbim_g (KR-153), position kept
+    for k, n in (("collexp_g", n1), ("xvaadj_g", n2), ("sbim_g", n3), ("wwr_g", n4)):
         reg[k] = {"counted": 0, "total": n, "rule": "own formulas on given inputs: not counted (G-40)"}
-    (HERE.parent / "outside_register_g.json").write_text(json.dumps(reg, indent=1) + "\n", encoding="utf-8")
+    (HERE.parent / "outside_register_g.json").write_text(json.dumps(reg, indent=1) + "\n", encoding="utf-8", newline="\n")
     for m, g in MUTANTS:
         note(f"  mutant caught: {m} (gap {g:.3e})")
 

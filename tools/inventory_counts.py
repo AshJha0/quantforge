@@ -30,7 +30,7 @@ ENTRIES = {
     "MG-5": ("G", ["rates.lmm.capfloor", "rates.lmm.swaption_rebonato"]),
     "MG-6": ("G", ["rates.shortrate.bermudan_ladder"]),
     "MG-7": ("G", ["risk.model_reserve.dispersion"]),
-    "MG-8": ("G", ["xva.adjustments.value", "xva.exposure.collateralised", "xva.simm.ir_delta", "xva.wwr.cva_hw"]),
+    "MG-8": ("G", ["xva.adjustments.value", "xva.exposure.collateralised", "xva.sbim.ir_delta", "xva.wwr.cva_hw"]),
     "MG-9": ("G", ["xva.exposure.portfolio_hw"]),
     "MI-1": ("I", ["hedge.qp.solve", "hedge.integer.solve", "hedge.minvar.ratio", "hedge.greeks.neutralise", "hedge.beta.futures",
                    "hedge.residual.report"]),

@@ -15,6 +15,18 @@ carry a Real (JSON float) input ONLY in goldens whose expected result is E_SCHEM
 non-integer is refused. A Real in any other golden (a value case, or an error case expecting anything but E_SCHEMA)
 still makes the exemption a problem. Nothing changes for non-exempt operations.
 
+Rulings KR-251 and KR-252 (audit KA-C20, specifications/stage-k-rulings-audit-c.md; proposed): tightenings, nothing
+is exempted by them.
+  KR-251  the KR-112 allowance holds only where the Real sits at an input path that holds a JSON integer in the
+          operation's value goldens (list indices ignored): the E_SCHEMA golden then refuses a non-integer where an
+          integer belongs. A Real at any other path (a genuine Real field next to a missing key, say) still makes the
+          exemption a problem, as F-2a (b) does for decimal strings.
+  KR-252  an exempt operation that uses the KR-112 allowance, or whose exemption reason states that "a non-finite
+          token is E_SCHEMA", must have a golden that sends a non-finite token ("NaN", "Infinity", "-Infinity") at an
+          integer path of its value goldens and expects E_SCHEMA: the stated premise is pinned by a shared golden.
+Known gap, not closed here (KA-C20 (2)): `has_real` sees JSON floats only, so a Real field written as an integer in
+every golden is invisible; closing it needs typed inputs in the name map. The self-test pins the blind spot.
+
     python tools/check_e1_coverage.py              # exit 1 on a gap
     python tools/check_e1_coverage.py --self-test  # shows the gate red on a planted operation (process rule 1)
 
@@ -90,7 +102,13 @@ def check(name_map, golden, exempt_file, root=ROOT):
             for path, v in leaves(c["inputs"]):
                 if isinstance(v, str) and DEC.fullmatch(v):
                     decimal_paths.setdefault(c["operation"], set()).add(path)
-    covered, real = set(), set()
+    int_paths = {}  # KR-251: input paths that hold a JSON integer in the operation's value goldens
+    for c in cases:
+        if c["expected"]["status"] == "ok":
+            for path, v in leaves(c["inputs"]):
+                if isinstance(v, int) and not isinstance(v, bool):
+                    int_paths.setdefault(c["operation"], set()).add(path)
+    covered, real, uses_kr112, pinned = set(), set(), set(), set()
     for c in cases:
         op, exp = c["operation"], c["expected"]
         code = exp.get("error_code") if exp["status"] == "error" else None
@@ -100,12 +118,26 @@ def check(name_map, golden, exempt_file, root=ROOT):
             nf = [path for path, v in leaves(c["inputs"]) if isinstance(v, str) and v in NF]
             if nf and all(path in decimal_paths.get(op, set()) for path in nf):
                 covered.add(op)
-        # KR-112: a Real in a golden expecting E_SCHEMA is the refusal of a non-integer, not a Real the operation uses
-        if has_real(c["inputs"]) and code != "E_SCHEMA":
-            real.add(op)
+        # KR-112: a Real in a golden expecting E_SCHEMA is the refusal of a non-integer, not a Real the operation uses;
+        # KR-251: only when every Real sits at an integer path of the value goldens
+        if has_real(c["inputs"]):
+            if code != "E_SCHEMA":
+                real.add(op)
+            elif all(path in int_paths.get(op, set()) for path, v in leaves(c["inputs"]) if isinstance(v, float)):
+                uses_kr112.add(op)
+            else:
+                real.add(op)
+        # KR-252: a non-finite token at an integer path refused as E_SCHEMA pins the Integer-only premise
+        if code == "E_SCHEMA":
+            nf = [path for path, v in leaves(c["inputs"]) if isinstance(v, str) and v in NF]
+            if nf and all(path in int_paths.get(op, set()) for path in nf):
+                pinned.add(op)
     problems = [f"{op}: no E1 golden" for op in sorted(ops - covered - set(exempt))]
     problems += [f"{op}: exempt but has a Real input in a golden" for op in sorted(set(exempt) & real)]
     problems += [f"{op}: exempt but not in the name map" for op in sorted(set(exempt) - ops)]
+    premise = {op for op, why in exempt.items() if (op in uses_kr112 or "non-finite token is E_SCHEMA" in str(why))}
+    problems += [f"{op}: exempt on the premise that a non-finite token is E_SCHEMA, but no golden sends one at an "
+                 f"integer input and expects E_SCHEMA (KR-252)" for op in sorted(premise - pinned)]
     return problems, len(ops), len(covered & ops), len(exempt)
 
 
@@ -152,6 +184,9 @@ def self_test():
         int_val = {"case_id": "c-3", "operation": "i.int.op", "inputs": {"n": 250, "k": 3}, "expected": {"status": "ok", "outputs": {}}}
         int_schema = {"case_id": "c-4", "operation": "i.int.op", "inputs": {"n": 250, "k": 1.5}, "expected": {"status": "error", "error_code": "E_SCHEMA"}}
         bad_val = {"case_id": "c-5", "operation": "i.int.bad", "inputs": {"n": 250, "k": 3}, "expected": {"status": "ok", "outputs": {}}}
+        # KR-252 (added with KA-C20): the allowance needs its premise pinned, so the fixture carries the non-finite
+        # E_SCHEMA golden at the integer path; (a) to (d) test what they tested before
+        int_nan = {"case_id": "c-6", "operation": "i.int.op", "inputs": {"n": 250, "k": "NaN"}, "expected": {"status": "error", "error_code": "E_SCHEMA"}}
 
         def run3(rows, exempt):
             (d / "g3" / "t.json").write_text(json.dumps({"cases": rows}), encoding="utf-8")
@@ -159,17 +194,52 @@ def self_test():
             return check(d / "nm3.json", d / "g3", d / "ex3.json", root=d)[0]
         ex_ok = {"i.int.op": "integers only", "i.int.bad": "integers only"}
         # (d) the shape of btk_k-0029: an exempt integer-only operation with a Real only in an E_SCHEMA golden passes
-        assert run3([nan_real, real_val, int_val, int_schema, bad_val], ex_ok) == [], "KR-112 (d)"
+        assert run3([nan_real, real_val, int_val, int_schema, int_nan, bad_val], ex_ok) == [], "KR-112 (d)"
         # (a) a non-exempt operation without its NaN golden still fails
-        assert run3([real_val, int_val, int_schema, bad_val], ex_ok) == ["r.real.op: no E1 golden"], "KR-112 (a)"
+        assert run3([real_val, int_val, int_schema, int_nan, bad_val], ex_ok) == ["r.real.op: no E1 golden"], "KR-112 (a)"
         # (b) an exempt operation with a Real in a golden expecting anything other than E_SCHEMA fails
         for exp in ({"status": "error", "error_code": "E_DOMAIN"}, {"status": "error", "error_code": "E_INPUT"},
                     {"status": "error", "error_code": "E_LIMIT"}, {"status": "ok", "outputs": {}}):
-            got = run3([nan_real, real_val, int_val, dict(int_schema, expected=exp), bad_val], ex_ok)
+            got = run3([nan_real, real_val, int_val, dict(int_schema, expected=exp), int_nan, bad_val], ex_ok)
             assert got == ["i.int.op: exempt but has a Real input in a golden"], ("KR-112 (b)", exp, got)
         # (c) an operation with a genuine Real input put on the exemption list fails
-        got = run3([nan_real, real_val, int_val, int_schema, bad_val], dict(ex_ok, **{"r.real.op": "planted"}))
+        got = run3([nan_real, real_val, int_val, int_schema, int_nan, bad_val], dict(ex_ok, **{"r.real.op": "planted"}))
         assert got == ["r.real.op: exempt but has a Real input in a golden"], ("KR-112 (c)", got)
+    with tempfile.TemporaryDirectory() as d:
+        d = Path(d)
+        (d / "g").mkdir()
+        (d / "nm.json").write_text(json.dumps({"operations": {"i.int.op": {}}}), encoding="utf-8")
+        val = {"case_id": "k-1", "operation": "i.int.op", "inputs": {"n": 250, "k": 3}, "expected": {"status": "ok", "outputs": {}}}
+        schema_k = {"case_id": "k-2", "operation": "i.int.op", "inputs": {"n": 250, "k": 1.5}, "expected": {"status": "error", "error_code": "E_SCHEMA"}}
+        nan_k = {"case_id": "k-3", "operation": "i.int.op", "inputs": {"n": 250, "k": "NaN"}, "expected": {"status": "error", "error_code": "E_SCHEMA"}}
+
+        def run4(rows, reason="integers only"):
+            (d / "g" / "t.json").write_text(json.dumps({"cases": rows}), encoding="utf-8")
+            (d / "ex.json").write_text(json.dumps({"i.int.op": reason}), encoding="utf-8")
+            return check(d / "nm.json", d / "g", d / "ex.json", root=d)[0]
+        # the btk_k-0029 shape with its premise pinned passes
+        assert run4([val, schema_k, nan_k]) == [], "KR-251/252 clean"
+        # KR-251 planted fault (KA-C20 (1)): a genuine Real field at a path the value goldens never hold as an integer,
+        # beside a missing key, expecting E_SCHEMA, fails
+        planted = dict(schema_k, inputs={"n": 250, "rate": 0.25})
+        got = run4([val, planted, nan_k])
+        assert got == ["i.int.op: exempt but has a Real input in a golden"], ("KR-251", got)
+        # KR-252 planted fault (KA-C20 (3)): the KR-112 allowance used, no non-finite E_SCHEMA golden, fails
+        got = run4([val, schema_k])
+        assert got == ["i.int.op: exempt on the premise that a non-finite token is E_SCHEMA, but no golden sends one at "
+                       "an integer input and expects E_SCHEMA (KR-252)"], ("KR-252 allowance", got)
+        # KR-252: a reason that states the premise, no Real anywhere, no non-finite golden, fails
+        got = run4([val], reason="three Integer counts; a non-finite token is E_SCHEMA, not an integer")
+        assert len(got) == 1 and "KR-252" in got[0], ("KR-252 reason", got)
+        # KR-252: the non-finite token at a non-integer path does not pin the premise
+        got = run4([val, schema_k, dict(nan_k, inputs={"n": 250, "k": 3, "x": "NaN"})])
+        assert len(got) == 1 and "KR-252" in got[0], ("KR-252 path", got)
+        # an exemption that neither uses the allowance nor states the premise is unchanged (no new demand)
+        assert run4([val], reason="no Real input in any golden: a non-finite value cannot be sent") == [], "KR-252 scope"
+        # KA-C20 (2), known gap pinned: a Real field written as an integer in every golden is invisible to the gate
+        assert run4([dict(val, inputs={"n": 250, "k": 3, "rate": 1})]) == [], "gap (2) pinned"
+    print("self-test KR-251: a Real at a non-integer path of an E_SCHEMA golden fails; KR-252: the KR-112 allowance or a "
+          "stated premise without a non-finite E_SCHEMA golden at an integer path fails; gap (2) pinned (still invisible)")
     print("self-test: a planted operation with no E1 golden turns the gate red")
     print("self-test KR-112: (a) missing NaN golden fails; (b) exempt Real outside E_SCHEMA fails; "
           "(c) a Real-input operation on the exemption list fails; (d) a Real only in an E_SCHEMA golden of an exempt operation passes")

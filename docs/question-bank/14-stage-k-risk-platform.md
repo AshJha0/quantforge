@@ -1,6 +1,6 @@
 # Question bank 14: Stage K: data platform, intraday risk, capital and the paper ledger
 
-This set covers the stage K round 1 work, which is **in progress and not released**: the bitemporal store, incremental curve updates, recalibration triggers, intraday risk with error bounds, the Bermudan ladder convergence fix, SA-CCR and FRTB backtesting, and the daily paper ledger. All of it is merged on the integration branch `k-r1` (2026-11-19), in all four builds, and none of it is on `main` or in a tag. It is for a reader who has worked through [Tutorials 51 to 58](../getting-started/README.md#stage-k-in-progress). Every worked-example number is rechecked by `verify/v14_stage_k.py`, which restates the formulas with the standard library and compares them with the goldens' values. All data is synthetic, except the Basel examples, which are the regulator's own sample portfolios.
+This set covers the stage K round 1 work, which is **released in v0.10.1** (2026-11-20; stage K as a whole continues toward v1.0.0): the bitemporal store, incremental curve updates, recalibration triggers, intraday risk with error bounds, the Bermudan ladder convergence fix, SA-CCR and FRTB backtesting, and the daily paper ledger. All of it is in all four builds and in the v0.10.1 tag (pull requests #58 and #59). It is for a reader who has worked through [Tutorials 51 to 58](../getting-started/README.md#stage-k-in-progress). Every worked-example number is rechecked by `verify/v14_stage_k.py`, which restates the formulas with the standard library and compares them with the goldens' values. All data is synthetic, except the Basel examples, which are the regulator's own sample portfolios.
 
 ## Bitemporal store
 
@@ -190,7 +190,7 @@ The pitfall is reading the expected value as an outside check: it was filled by 
 
 *Level: advanced. Evidence: measured by the k-w1 lane. Source: `oracle/OUTSIDE_SHARES.md` stage K section, `program/STAGE_K_BLIND_W1.md`*
 
-The first blind lane checked the four single-position bounds only to six decimals (the goldens were later filled to full precision), and the fifth case was not in its packet, so at first 0 of 5 value cases counted. A second, clean blind packet re-derived all five at 1e-9 relative: 5 of 5 MATCH, so the item now stands at 5 of 5 (`program/STAGE_K_BLIND_K5A.md`, `oracle/OUTSIDE_SHARES.md`). That shows the spec is unambiguous and the arithmetic right; it does not check the bound's derivation.
+The first blind lane checked the four single-position bounds only to six decimals (the goldens were later filled to full precision), and the fifth case was not in its packet, so at first 0 of 5 value cases counted. A second, clean blind packet re-derived all five at 1e-9 relative: 5 of 5 MATCH, so the item then stood at 5 of 5 (`program/STAGE_K_BLIND_K5A.md`). Ruling KR-234 later changed the bound; the version 2 packet matched 9 of 11, so the item now stands at 9 of 12 (`program/STAGE_K_BLIND_K5A_V2.md`, `oracle/OUTSIDE_SHARES.md`). That shows the spec is unambiguous and the arithmetic right; it does not check the bound's derivation.
 
 **Worked example.** What was measured: 1,000 seeded moves on a 50-position book, zero violations of `|estimate - full revaluation| <= bound` in Python (worst ratio 0.0105) and Java (0.382), rechecked at 50 digits with zero violations and rounding at most 2.3e-8 of the bound (`oracle/IDR_K_MOVES_CHECK_W1.json`). That recheck is our own oracle, not an outside check.
 
@@ -286,7 +286,7 @@ The pitfall is the sign: the swaption is short the floating rate, so it is a put
 
 *Level: advanced. Evidence: measured; blind record. Source: `program/STAGE_K_BLIND_W1B.md`*
 
-12 of 16 value cases, 75%: the five published Basel examples plus seven blind re-derivations. Four more blind matches are excluded because the blind lane had read the unstripped spec once before the packet existed, which showed output facts for those four.
+12 of 19 value cases, 63.2%: the five published Basel examples, counted through the blind packet that re-derived them (a printed figure alone does not count, ruling KR-250), plus seven blind re-derivations. The three audit cases saccr_k-0040 to 0042 have no blind check. Four more blind matches are excluded because the blind lane had read the unstripped spec once before the packet existed, which showed output facts for those four.
 
 **Worked example.** Blind compare run 2: 11 of 11 MATCH; counted 7 (0007 to 0012, 0014); excluded 0006, 0013, 0015, 0016. Counting them would give 16 of 16, which the record does not claim. Run 1 compared nothing because of a wrapper-level bug in the compare script; no value was seen or changed.
 
@@ -346,7 +346,7 @@ Carry (coupon accrual and cash interest), roll-down, curve move, and fills and c
 
 Every term is an exact decimal product of recorded 6-decimal marks and whole lots, the three market terms telescope to `n x (mark - 100)`, and the only rounding (cash interest to the cent) is posted as rounded, so the residual is zero by construction (KR-79).
 
-**Worked example.** The spec's worked day: carry 1,213.9355, roll-down 16.5625, curve move -1,993.7275, fills and costs -132.03125; sum -895.26075, equal to NAV 9,998,818.80175 minus 9,999,714.0625.
+**Worked example.** The spec's worked day: carry 1,213.9355, roll-down 16.5625, curve move -1,993.7275, fills and costs -124.21875; sum -887.44825, equal to NAV 9,998,826.61425 minus 9,999,714.0625.
 
 The pitfall is reading the zero as model quality: it is a bookkeeping test, with no performance claim.
 
@@ -376,6 +376,6 @@ The pitfall is a ledger without published anchors: truncating the last line leav
 
 Zero of the 20 that the v1.0.0 gate needs: the workflow has never run, and the earliest 20th on-time day is 20 US business days after it reaches `main`. FedInvest prices are not used because the site's robots file disallows automated agents and its terms limit use to personal viewing (KR-70); the ledger uses constant-maturity exposures on a curve through the five Treasury par yields the recorder already keeps.
 
-**Worked example.** Only on-time DAY rows in a ledger that passes full verification count; late days and gaps do not. `verify_ledger.py verify --require-days 20` is the gate; it failed with `DAYS` on a 1-day local dry run, as it should.
+**Worked example.** A day counts only if a Bitcoin block time, plus two hours, falls before its cut-off in a ledger that passes full verification; the row's own on-time label is not counted (KR-200, KR-201). The gate is `verify_ledger.py verify --ledger L --anchors A --forward-log F --bitcoin-headers H --require-days 20` (KR-202); it refuses with `--no-cli` or without the anchors, the recorder log or the headers. A 30-day ledger written in one sitting and stamped afterwards records 0 days (spec worked example, synthetic).
 
 The pitfall is calling the marks prices: they are paper marks on a fitted curve, not tradable.

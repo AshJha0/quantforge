@@ -1,4 +1,4 @@
-"""xVA on given paths: collateralised exposure, valuation adjustments, SIMM-style IR delta
+"""xVA on given paths: collateralised exposure, valuation adjustments, sensitivity-based IR delta
 margin, Hull-White wrong-way risk, and the model-reserve dispersion statistic.
 
 Specifications: specifications/06-risk/xva-framework.md (rulings G-40 to G-44) and
@@ -217,13 +217,14 @@ def adjustments(
     return out
 
 
-# --- SIMM-style IR delta (G-43) -------------------------------------------------------------------
+# --- sensitivity-based IR delta margin (G-43, KR-152) --------------------------------------
 
 
-def simm_ir_delta(
+def sbim_ir_delta(
     sensitivities: Floats, risk_weights: Floats, correlations: Sequence[Floats], threshold: float
 ) -> dict[str, object]:
-    """`xva.simm.ir_delta`: weighted sensitivities, concentration factor and margin."""
+    """`xva.sbim.ir_delta` (deprecated alias `xva.simm.ir_delta`, KR-152): weighted sensitivities,
+    concentration factor and margin."""
     n = len(sensitivities)
     if (
         n < 1

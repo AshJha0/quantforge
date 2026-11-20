@@ -1,0 +1,504 @@
+{
+ "cases": [
+  {
+   "case_id": "saccr_k-0001",
+   "operation": "risk.saccr.ead",
+   "inputs": {
+    "trades": [
+     {
+      "id": "1",
+      "asset_class": "IR",
+      "notional": 10000,
+      "market_value": 30,
+      "maturity": 10,
+      "position": "LONG",
+      "start": 0,
+      "end": 10,
+      "hedging_set": "USD"
+     },
+     {
+      "id": "2",
+      "asset_class": "IR",
+      "notional": 10000,
+      "market_value": -20,
+      "maturity": 4,
+      "position": "SHORT",
+      "start": 0,
+      "end": 4,
+      "hedging_set": "USD"
+     },
+     {
+      "id": "3",
+      "asset_class": "IR",
+      "notional": 5000,
+      "market_value": 50,
+      "maturity": 11,
+      "position": "BOUGHT",
+      "kind": "OPTION",
+      "option_type": "PUT",
+      "underlying_price": 0.06,
+      "strike": 0.05,
+      "exercise": 1,
+      "start": 1,
+      "end": 11,
+      "hedging_set": "EUR"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "saccr_k-0002",
+   "operation": "risk.saccr.ead",
+   "inputs": {
+    "trades": [
+     {
+      "id": "4",
+      "asset_class": "CREDIT",
+      "notional": 10000,
+      "market_value": 20,
+      "maturity": 3,
+      "position": "LONG",
+      "start": 0,
+      "end": 3,
+      "entity": "Firm A",
+      "subclass": "AA"
+     },
+     {
+      "id": "5",
+      "asset_class": "CREDIT",
+      "notional": 10000,
+      "market_value": -40,
+      "maturity": 6,
+      "position": "SHORT",
+      "start": 0,
+      "end": 6,
+      "entity": "Firm B",
+      "subclass": "BBB"
+     },
+     {
+      "id": "6",
+      "asset_class": "CREDIT",
+      "notional": 10000,
+      "market_value": 0,
+      "maturity": 5,
+      "position": "LONG",
+      "start": 0,
+      "end": 5,
+      "entity": "CDX.IG",
+      "subclass": "IG"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "saccr_k-0003",
+   "operation": "risk.saccr.ead",
+   "inputs": {
+    "trades": [
+     {
+      "id": "7",
+      "asset_class": "COMMODITY",
+      "notional": 10000,
+      "market_value": -50,
+      "maturity": 0.75,
+      "position": "LONG",
+      "entity": "CRUDE_OIL",
+      "subclass": "OIL_GAS"
+     },
+     {
+      "id": "8",
+      "asset_class": "COMMODITY",
+      "notional": 20000,
+      "market_value": -30,
+      "maturity": 2,
+      "position": "SHORT",
+      "entity": "CRUDE_OIL",
+      "subclass": "OIL_GAS"
+     },
+     {
+      "id": "9",
+      "asset_class": "COMMODITY",
+      "notional": 10000,
+      "market_value": 100,
+      "maturity": 5,
+      "position": "LONG",
+      "entity": "SILVER",
+      "subclass": "METALS"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "saccr_k-0004",
+   "operation": "risk.saccr.ead",
+   "inputs": {
+    "trades": [
+     {
+      "id": "1",
+      "asset_class": "IR",
+      "notional": 10000,
+      "market_value": 30,
+      "maturity": 10,
+      "position": "LONG",
+      "start": 0,
+      "end": 10,
+      "hedging_set": "USD"
+     },
+     {
+      "id": "2",
+      "asset_class": "IR",
+      "notional": 10000,
+      "market_value": -20,
+      "maturity": 4,
+      "position": "SHORT",
+      "start": 0,
+      "end": 4,
+      "hedging_set": "USD"
+     },
+     {
+      "id": "3",
+      "asset_class": "IR",
+      "notional": 5000,
+      "market_value": 50,
+      "maturity": 11,
+      "position": "BOUGHT",
+      "kind": "OPTION",
+      "option_type": "PUT",
+      "underlying_price": 0.06,
+      "strike": 0.05,
+      "exercise": 1,
+      "start": 1,
+      "end": 11,
+      "hedging_set": "EUR"
+     },
+     {
+      "id": "4",
+      "asset_class": "CREDIT",
+      "notional": 10000,
+      "market_value": 20,
+      "maturity": 3,
+      "position": "LONG",
+      "start": 0,
+      "end": 3,
+      "entity": "Firm A",
+      "subclass": "AA"
+     },
+     {
+      "id": "5",
+      "asset_class": "CREDIT",
+      "notional": 10000,
+      "market_value": -40,
+      "maturity": 6,
+      "position": "SHORT",
+      "start": 0,
+      "end": 6,
+      "entity": "Firm B",
+      "subclass": "BBB"
+     },
+     {
+      "id": "6",
+      "asset_class": "CREDIT",
+      "notional": 10000,
+      "market_value": 0,
+      "maturity": 5,
+      "position": "LONG",
+      "start": 0,
+      "end": 5,
+      "entity": "CDX.IG",
+      "subclass": "IG"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "saccr_k-0005",
+   "operation": "risk.saccr.ead",
+   "inputs": {
+    "trades": [
+     {
+      "id": "1",
+      "asset_class": "IR",
+      "notional": 10000,
+      "market_value": 30,
+      "maturity": 10,
+      "position": "LONG",
+      "start": 0,
+      "end": 10,
+      "hedging_set": "USD"
+     },
+     {
+      "id": "2",
+      "asset_class": "IR",
+      "notional": 10000,
+      "market_value": -20,
+      "maturity": 4,
+      "position": "SHORT",
+      "start": 0,
+      "end": 4,
+      "hedging_set": "USD"
+     },
+     {
+      "id": "3",
+      "asset_class": "IR",
+      "notional": 5000,
+      "market_value": 50,
+      "maturity": 11,
+      "position": "BOUGHT",
+      "kind": "OPTION",
+      "option_type": "PUT",
+      "underlying_price": 0.06,
+      "strike": 0.05,
+      "exercise": 1,
+      "start": 1,
+      "end": 11,
+      "hedging_set": "EUR"
+     },
+     {
+      "id": "7",
+      "asset_class": "COMMODITY",
+      "notional": 10000,
+      "market_value": -50,
+      "maturity": 0.75,
+      "position": "LONG",
+      "entity": "CRUDE_OIL",
+      "subclass": "OIL_GAS"
+     },
+     {
+      "id": "8",
+      "asset_class": "COMMODITY",
+      "notional": 20000,
+      "market_value": -30,
+      "maturity": 2,
+      "position": "SHORT",
+      "entity": "CRUDE_OIL",
+      "subclass": "OIL_GAS"
+     },
+     {
+      "id": "9",
+      "asset_class": "COMMODITY",
+      "notional": 10000,
+      "market_value": 100,
+      "maturity": 5,
+      "position": "LONG",
+      "entity": "SILVER",
+      "subclass": "METALS"
+     }
+    ],
+    "collateral": 200,
+    "margin": {
+     "threshold": 0,
+     "mta": 5,
+     "nica": 150,
+     "remargin_days": 5
+    }
+   }
+  },
+  {
+   "case_id": "btk_k-0001",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 0,
+    "exceptions_hypothetical": 0
+   }
+  },
+  {
+   "case_id": "btk_k-0002",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 1,
+    "exceptions_hypothetical": 0
+   }
+  },
+  {
+   "case_id": "btk_k-0003",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 2,
+    "exceptions_hypothetical": 0
+   }
+  },
+  {
+   "case_id": "btk_k-0004",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 3,
+    "exceptions_hypothetical": 0
+   }
+  },
+  {
+   "case_id": "btk_k-0005",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 4,
+    "exceptions_hypothetical": 0
+   }
+  },
+  {
+   "case_id": "btk_k-0006",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 5,
+    "exceptions_hypothetical": 0
+   }
+  },
+  {
+   "case_id": "btk_k-0007",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 6,
+    "exceptions_hypothetical": 0
+   }
+  },
+  {
+   "case_id": "btk_k-0008",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 7,
+    "exceptions_hypothetical": 0
+   }
+  },
+  {
+   "case_id": "btk_k-0009",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 8,
+    "exceptions_hypothetical": 0
+   }
+  },
+  {
+   "case_id": "btk_k-0010",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 9,
+    "exceptions_hypothetical": 0
+   }
+  },
+  {
+   "case_id": "btk_k-0011",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 10,
+    "exceptions_hypothetical": 0
+   }
+  },
+  {
+   "case_id": "btk_k-0012",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": 12,
+    "exceptions_hypothetical": 0
+   }
+  },
+  {
+   "case_id": "tlk_k-0001",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 0,
+    "confidence": 0.99
+   }
+  },
+  {
+   "case_id": "tlk_k-0002",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 1,
+    "confidence": 0.99
+   }
+  },
+  {
+   "case_id": "tlk_k-0003",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 2,
+    "confidence": 0.99
+   }
+  },
+  {
+   "case_id": "tlk_k-0004",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 3,
+    "confidence": 0.99
+   }
+  },
+  {
+   "case_id": "tlk_k-0005",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 4,
+    "confidence": 0.99
+   }
+  },
+  {
+   "case_id": "tlk_k-0006",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 5,
+    "confidence": 0.99
+   }
+  },
+  {
+   "case_id": "tlk_k-0007",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 6,
+    "confidence": 0.99
+   }
+  },
+  {
+   "case_id": "tlk_k-0008",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 7,
+    "confidence": 0.99
+   }
+  },
+  {
+   "case_id": "tlk_k-0009",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 8,
+    "confidence": 0.99
+   }
+  },
+  {
+   "case_id": "tlk_k-0010",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 9,
+    "confidence": 0.99
+   }
+  },
+  {
+   "case_id": "tlk_k-0011",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 10,
+    "confidence": 0.99
+   }
+  }
+ ]
+}

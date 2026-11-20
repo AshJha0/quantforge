@@ -7,3 +7,6 @@ datasets/golden/core/limits.json
 datasets/golden/core/limit_order.json
 # R6-8: the n=200 hedge goldens carry full 200-instrument exposure matrices (1.35 MB); shrinking n would drop the large-n evidence the review asked for.
 datasets/golden/r6/hedgeqp_large_r6.json
+# lim_k (stage K, ruling KR-231): the E_LIMIT boundary case of core.store.bitemporal_query needs 100,001 records in one
+# input (about 15 MB compact); added at integration on k-r2, where check_hygiene first saw it.
+datasets/golden/stage_k/lim_k.json

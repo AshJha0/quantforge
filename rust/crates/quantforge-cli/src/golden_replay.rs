@@ -23,6 +23,7 @@ fn class(name: &str) -> Option<Option<(f64, f64)>> {
         "jacobian_piecewise" => Some((1e-7, 1e-5)),
         "standard_error" => Some((1e-15, 1e-5)),
         "ift_jacobian" => Some((1e-11, 1e-9)),
+        "tail_probability" => Some((0.0, 1e-11)),
         "calibration" | "monte_carlo" => Some((f64::NAN, f64::NAN)),
         _ => return None,
     })
@@ -346,7 +347,7 @@ fn stage_i_goldens() {
 /// goldens are added.
 #[test]
 fn stage_k_goldens() {
-    replay_only("stage_k", &[], 77);
+    replay_only("stage_k", &[], 201);
 }
 
 /// The stage J wave 3 (scenario stress, interpolation backtests, drift detectors) and curves lane

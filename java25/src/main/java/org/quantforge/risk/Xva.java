@@ -5,7 +5,7 @@ import org.quantforge.core.QfError;
 
 /**
  * The deterministic xVA layer on given paths (xva-framework.md, rulings G-40 to G-44): collateralised exposure,
- * valuation adjustments, SIMM-style IR delta margin and Hull-White wrong-way CVA.
+ * valuation adjustments, sensitivity-based IR delta margin and Hull-White wrong-way CVA.
  */
 public final class Xva {
     private Xva() {}
@@ -151,7 +151,8 @@ public final class Xva {
     }
 
     /**
-     * SIMM-style IR delta margin (G-43).
+     * Sensitivity-based IR delta margin, operation {@code xva.sbim.ir_delta} (G-43; the deprecated alias
+     * {@code xva.simm.ir_delta} runs the same code, KR-152).
      *
      * @param s sensitivities
      * @param rw risk weights
@@ -160,7 +161,7 @@ public final class Xva {
      * @return {concentration factor, margin} with the weighted sensitivities written to {@code ws}
      * @param ws output weighted sensitivities
      */
-    public static double[] simm(double[] s, double[] rw, double[][] rho, double threshold, double[] ws) {
+    public static double[] sbimIrDelta(double[] s, double[] rw, double[][] rho, double threshold, double[] ws) {
         double sum = 0.0;
         for (double x : s) {
             sum += x;

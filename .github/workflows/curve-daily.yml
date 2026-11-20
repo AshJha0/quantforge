@@ -2,14 +2,29 @@ name: Curve daily
 # Daily curve run (stage K item K-11; specifications/12-platform/daily-curve-run.md, rulings KR-90 onwards). It
 # fetches the US Treasury daily par yield file and the Federal Reserve's GSW file (feds200628.csv), fits the
 # library's Nelson-Siegel operation through the Python CLI, and appends hash-chained rows to branch curve-daily:
-# fitted parameters, fit diagnostics, input hashes, code commit and contract version. No raw file is committed
-# or uploaded as an artifact; the downloads stay in memory on the runner. Every date is checked against the
-# prereg holdout windows. The head is anchored on branch curve-daily-anchors. It never writes to main.
+# fitted parameters, the fit error at each tenor, fitted zero rates, input hashes, code commit and contract
+# version. No raw file is committed or uploaded as an artifact; the downloads stay in memory on the runner. The
+# fit errors beside the parameters do give back the thirteen Treasury par yields used, and the differences
+# beside the fitted zero rates give back the Fed values compared; both are published on the terms set out in
+# ruling KR-209, with the sources cited in the rows and in the branch README. Every date is checked against the
+# prereg holdout windows. The head is anchored on branch curve-daily-anchors. It never writes to main. A run
+# with nothing due commits nothing and anchors nothing (KR-205).
 # All numerical work is in tools/curve_daily/ and the library; this file only checks out, runs and pushes.
+#
+# When it will run (KR-206), once its schedule is restored (see `on:`). A day's row is on time before 19:30 UTC on the next business day. This repository's
+# scheduled runs start late: measured on 24 scheduled runs of recorder.yml and daily-workflows.yml from
+# 2026-11-09 to 2026-11-19 (GitHub's own run start times), the 23:30 UTC slot started 3.4 to 5.7 hours late and
+# the 14:30 and 15:00 UTC slots 6.2 to 9.0 hours late. The audited second slot (14:15 UTC) would have landed
+# between 20:40 and 23:15 UTC, after the cut-off, every day. The three slots below land between 03:10 and 15:30
+# UTC under every delay measured.
 on:
-  # schedule withheld until the different-model audit findings KA-C1, C2, C3, C9, C11, C12 are closed
-  # (STAGE K round 1 audit, 2026-11-19); see docs/known-issues.md. Crons to restore, once closed:
-  #   '45 23 * * 1-5' (after Treasury's end-of-day par curve) and '15 14 * * 2-6' (second chance, KR-95).
+  # schedule restored at the v0.10.1 release (2026-11-20) after the follow-up different-model audit was
+  # clean and the stage K coordinator confirmed rulings KR-200 to KR-214 and KR-254, KR-255 (KR-206; python/tests/
+  # test_daily_jobs_bytes.py checks these lines against the measured start delays).
+  schedule:
+    - cron: '45 23 * * 1-5' # after Treasury's end-of-day par curve (usually by 6:00 PM ET); lands 03:10 to 08:45 UTC
+    - cron: '30 3 * * 2-6' # second chance: lands 06:55 to 12:30 UTC
+    - cron: '30 6 * * 2-6' # third chance: lands 09:55 to 15:30 UTC, four hours before the 19:30 UTC cut-off (KR-95)
   workflow_dispatch:
     inputs:
       dry_run:
@@ -24,6 +39,9 @@ concurrency:
 jobs:
   curves:
     name: curve-daily-run
+    # Only this repository writes this chain (a fork would start a second one under the same format string), and
+    # only from main: the code that runs is main's, whatever branch a manual run was started from.
+    if: github.repository == 'AshJha0/quantforge' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -46,7 +64,8 @@ jobs:
           else
             git init -b curve-daily ledger
             git -C ledger remote add origin "$url"
-            printf '# curve-daily\n\nRows written by .github/workflows/curve-daily.yml. Append-only. Fitted parameters, diagnostics and input hashes only; no source rows. Sources: US Department of the Treasury; Board of Governors of the Federal Reserve System (GSW). See specifications/12-platform/daily-curve-run.md on main.\n' > ledger/README.md
+            printf '# curve-daily\n\nRows written by .github/workflows/curve-daily.yml. Append-only. Label: "fitted to public US Treasury par yields with a library Nelson-Siegel fit; not an official curve". No source file is stored here. A row holds the fitted parameters and the fit error at each of thirteen tenors, from which the thirteen US Treasury par yields used can be worked back; a consistency row holds the differences from the Federal Reserve staff yield curve, from which the Fed values compared can be worked back. Sources, cited as they ask: US Department of the Treasury, Daily Treasury Par Yield Curve Rates. Board of Governors of the Federal Reserve System, Gurkaynak, Sack and Wright (2007), "The U.S. Treasury Yield Curve: 1961 to the Present", FEDS 2006-28 data. Neither source has reviewed or endorsed these rows. See specifications/12-platform/daily-curve-run.md on main (ruling KR-209).\n' > ledger/README.md
+            printf '* -text\n' > ledger/.gitattributes # the ledger is bytes: no line-ending conversion on any checkout
           fi
       - name: Install the Python CLI
         run: uv sync --locked --no-dev --project code/python
@@ -57,7 +76,8 @@ jobs:
         id: run
         continue-on-error: true
         run: |
-          args=(--ledger ledger/ledger/curves.jsonl --impl python --commit "$GITHUB_SHA" --summary ledger/ledger/summary.json)
+          commit=$(git -C code rev-parse HEAD) # the code that runs, not the event's commit
+          args=(--ledger ledger/ledger/curves.jsonl --impl python --commit "$commit" --summary ledger/ledger/summary.json)
           if [ "$DRY_RUN" = true ]; then args+=(--dry-run); fi
           python3 code/tools/curve_daily/run_day.py "${args[@]}"
       - name: Check out the anchors, or start them
@@ -82,8 +102,8 @@ jobs:
         id: push
         if: env.DRY_RUN != 'true' && hashFiles('ledger/ledger/curves.jsonl') != ''
         env:
-          # Same optional signing key as recorder.yml; without the secret (forks) rows are pushed unsigned and the
-          # dates rest on the anchors.
+          # Same optional signing key as recorder.yml. The commit time is the signer's own clock; the outside time
+          # of a row is its anchor's Bitcoin block (KR-201).
           SIGNING_KEY: ${{ secrets.FORWARD_LOG_SIGNING_KEY }}
         run: |
           cd ledger
@@ -98,29 +118,41 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           fi
-          git add -A
-          git diff --cached --quiet && exit 0
+          # Only the ledger, its summary and the two files written when the branch is started: never the whole folder.
+          git add -- ledger/curves.jsonl ledger/summary.json
+          for f in README.md .gitattributes; do if [ -e "$f" ]; then git add -- "$f"; fi; done
+          if git diff --cached --quiet -- ledger/curves.jsonl README.md; then echo "no new row: nothing committed"; exit 0; fi
           head=$(python3 -c "import json; print(json.load(open('ledger/summary.json'))['head'])")
-          git commit -q -m "curve-daily: $(date -u +%Y-%m-%dT%H:%MZ) head ${head} (main ${GITHUB_SHA::7})"
+          commit=$(git -C ../code rev-parse HEAD)
+          git commit -q -m "curve-daily: $(date -u +%Y-%m-%dT%H:%MZ) head ${head} (main ${commit::7})"
           # No rebase on a rejected push: this job is the only writer and the concurrency group serialises it, so a
           # rejection means the branch changed underneath and a person must look.
           git push origin curve-daily
           echo "pushed=true" >> "$GITHUB_OUTPUT"
       - name: Anchor the head hash outside the repo
-        # As recorder.yml (plan 13.2 R4): OpenTimestamps on free calendars, no account, no secret.
+        # As recorder.yml (plan 13.2 R4): OpenTimestamps on free calendars, no account, no secret. A head that
+        # already has an anchor gets no second one; a head whose stamp failed on an earlier run gets one now.
+        # Older proofs are upgraded here so their Bitcoin attestations reach the branch.
         id: anchor
-        if: steps.push.outputs.pushed == 'true'
+        if: steps.push.outcome == 'success'
         continue-on-error: true
         run: |
           pip install --quiet opentimestamps-client==0.7.2
-          (cd anchors/anchors && ots upgrade *.json.ots || true) # fills in Bitcoin attestations once confirmed
-          python3 code/tools/curve_daily/verify_chain.py anchor --ledger ledger/ledger/curves.jsonl --out-dir anchors/anchors --stamp
+          (cd anchors/anchors && ots upgrade *.json.ots || true)
+          rm -f anchors/anchors/*.bak
+          python3 code/tools/curve_daily/verify_chain.py anchor --ledger ledger/ledger/curves.jsonl --out-dir anchors/anchors --stamp --if-uncovered
           cd anchors
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add -- README.md anchors
+          if git diff --cached --quiet; then echo "nothing new to anchor or upgrade"; exit 0; fi
           git commit -q -m "anchor: $(date -u +%Y-%m-%dT%H:%MZ) curve-daily head $(git -C ../ledger rev-parse --short HEAD)"
-          for i in 1 2 3; do git push origin curve-daily-anchors && break; git pull --rebase -q origin curve-daily-anchors; done
+          ok=""
+          for i in 1 2 3; do
+            if git push origin curve-daily-anchors; then ok=1; break; fi
+            git pull --rebase -q origin curve-daily-anchors || true
+          done
+          if [ -z "$ok" ]; then echo "the anchor was not pushed after three tries"; exit 1; fi
       - name: Fail on a failed soft step
         if: always()
         env:
@@ -129,7 +161,7 @@ jobs:
           failed=""
           for kv in $OUTCOMES; do if [ "${kv#*=}" = failure ]; then failed="$failed ${kv%%=*}"; fi; done
           if [ -n "$failed" ]; then
-            echo "::error::soft steps failed:$failed (run: refused, or a row records a gap, failed fetch or fit, stale input or holdout block; see the step log and ledger/curves.jsonl on branch curve-daily. anchor: rows pushed but the head was not stamped; the next run stamps a later head)"
+            echo "::error::soft steps failed:$failed (run: refused, or a row records a gap, failed fetch or fit, stale input or holdout block; see the step log and ledger/curves.jsonl on branch curve-daily. anchor: rows pushed but the head was not stamped; the next run stamps it)"
             exit 1
           fi
           echo "all soft steps passed or were skipped ($OUTCOMES)"

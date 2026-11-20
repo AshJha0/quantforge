@@ -667,6 +667,127 @@
     "error"
    ],
    "description": "seq 3 knowledge_time earlier than seq 2's"
+  },
+  {
+   "case_id": "bt_k-0011",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     },
+     {
+      "sequence": 2,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-03-02T00:00:00Z",
+      "value": 110
+     },
+     {
+      "sequence": 3,
+      "series_id": "A",
+      "valid_from": "2026-02-01T00:00:00Z",
+      "valid_to": "2026-03-01T00:00:00Z",
+      "knowledge_time": "2026-04-01T00:00:00Z",
+      "value": 105
+     },
+     {
+      "sequence": 4,
+      "series_id": "A",
+      "valid_from": "2026-03-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-02T00:00:00Z",
+      "value": null,
+      "deleted": true
+     },
+     {
+      "sequence": 5,
+      "series_id": "B",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-04-03T00:00:00Z",
+      "value": 999
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-04-05T00:00:00Z",
+    "valid_at": "2026-01-15T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "FOUND",
+     "row": {
+      "sequence": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T00:00:00Z",
+      "value": 100
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "core",
+    "bitemporal",
+    "synthetic"
+   ],
+   "description": "KR-235(b): a later record of series B covers V and is known by K: series A's answer is unchanged (the series condition of C)"
+  },
+  {
+   "case_id": "bt_k-0012",
+   "operation": "core.store.bitemporal_query",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "valid_from": "2026-01-01T01:00:00+01:00",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T09:30:00+05:30",
+      "value": 7
+     }
+    ],
+    "series_id": "A",
+    "knowledge_as_of": "2026-04-05T00:00:00Z",
+    "valid_at": "2026-01-15T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "status": "FOUND",
+     "row": {
+      "sequence": 1,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_to": null,
+      "knowledge_time": "2026-01-02T04:00:00Z",
+      "value": 7
+     }
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "core",
+    "bitemporal",
+    "synthetic"
+   ],
+   "description": "KR-235(b): instants with numeric offsets are output in Z form"
   }
  ]
 }

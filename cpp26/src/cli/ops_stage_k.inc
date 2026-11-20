@@ -1,9 +1,8 @@
 // CLI handlers, stage K wave 1 (PROPOSED rulings KR-1 to KR-14, specifications/stage-k-rulings-w1.md; contract
-// table "Stage K wave 1 operations" in specifications/cli-contract.md). Error order HR-66: every input is read
-// first (E_SCHEMA), then the structural E_INPUT checks run here, before In::ready() raises a non-finite input
-// (F-2) as E_DOMAIN; the library then raises E_DOMAIN, the value-dependent E_INPUT and the stage K sizes
-// (E_LIMIT), last. These verbs skip the general array limit (run_case), as the Python build skips its generic
-// sizes for them (limits.STAGE_K_OPS).
+// table "Stage K wave 1 operations" in specifications/cli-contract.md). Error order HR-122 (ruling KR-230): every
+// input is read first (E_SCHEMA); the size limits (KR-231: the general 100,000 for any array, 200 for the quote
+// lists of the bootstrap and the update) and In::ready() then raise E_LIMIT and a non-finite input (F-2, E_DOMAIN);
+// the library then raises the structural E_INPUT, E_DOMAIN and, for the update, the stale-cache E_INPUT.
 
 namespace sk = quantforge::stage_k;
 
@@ -38,7 +37,6 @@ void op_bitemporal_query(const In& in, Out& out) {
     for (const Value& v : raw.items) log.push_back(bi_record_of(v));
     const string& series = in.text("series_id");
     const Instant k = in.instant("knowledge_as_of"), at = in.instant("valid_at");
-    sk::check_log(log);
     in.ready();
     const sk::BiAnswer a = sk::bitemporal_query(log, series, k, at);
     out.key_string("status", sk::status_name(a.status));
@@ -63,7 +61,7 @@ void op_bitemporal_query(const In& in, Out& out) {
 
 void op_par_annual(const In& in, Out& out) {
     const Vec quotes = in.reals("quotes");
-    sk::check_quotes_shape(quotes.size());
+    limit_if(quotes.size() > sk::max_quotes, "quotes");
     in.ready();
     out.key_reals("discount_factors", sk::par_annual(quotes));
 }
@@ -71,7 +69,9 @@ void op_par_annual(const In& in, Out& out) {
 void op_incremental_update(const In& in, Out& out) {
     const Vec pq = in.reals("previous_quotes"), pd = in.reals("previous_discount_factors");
     const Vec nq = in.reals("new_quotes");
-    sk::check_update_shape(pq.size(), pd.size(), nq.size());
+    limit_if(pq.size() > sk::max_quotes, "previous_quotes");
+    limit_if(pd.size() > sk::max_quotes, "previous_discount_factors");
+    limit_if(nq.size() > sk::max_quotes, "new_quotes");
     in.ready();
     const sk::Update u = sk::incremental_update(pq, pd, nq);
     out.key_reals("discount_factors", u.discount_factors);
@@ -86,7 +86,6 @@ void op_trigger_check(const In& in, Out& out) {
     const Vec changes = in.reals("changes");
     const double x_ref = in.real("x_ref"), x_now = in.real("x_now");
     const double days = in.real("days_since"), k = in.real("k");
-    sk::check_changes_shape(changes.size());
     in.ready();
     const sk::Trigger t = sk::trigger_check(changes, x_ref, x_now, days, k);
     out.values.key("fire");
@@ -94,6 +93,7 @@ void op_trigger_check(const In& in, Out& out) {
     out.key_real("sigma", t.sigma);
     out.key_real("threshold", t.threshold);
     out.key_real("false_alarm_rate", t.false_alarm_rate);
+    out.key_real("nominal_rate", t.nominal_rate);
 }
 
 void op_intraday_bound(const In& in, Out& out) {
@@ -105,7 +105,6 @@ void op_intraday_bound(const In& in, Out& out) {
         positions.push_back({notional, maturity, p.real("yield")});
     }
     const double shift = in.real("shift");
-    sk::check_positions_shape(positions.size());
     in.ready();
     const sk::Intraday r = sk::delta_gamma_bound(positions, shift);
     out.key_real("estimate_pnl", r.estimate_pnl);
@@ -116,7 +115,6 @@ void op_intraday_bound(const In& in, Out& out) {
 void op_richardson_check(const In& in, Out& out) {
     const Vec values = in.reals("values");
     const double ratio = in.real("ratio"), order = in.real("assumed_order");
-    sk::check_values_shape(values.size());
     in.ready();
     const sk::Richardson r = sk::richardson_check(values, ratio, order);
     out.key_string("status", sk::status_name(r.status));
@@ -132,8 +130,3 @@ constexpr Entry stage_k_ops[] = {
     {"num.richardson.check", op_richardson_check},
     {"risk.intraday.delta_gamma_bound", op_intraday_bound},
 };
-
-// The verbs that carry their own stage K sizes in place of the general array limit.
-bool stage_k_verb(string_view op) {
-    return std::ranges::any_of(stage_k_ops, [op](const Entry& e) { return e.verb == op; });
-}

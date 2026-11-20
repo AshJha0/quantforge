@@ -21,7 +21,7 @@ The sections below follow the order in which stages were built. To find recipes 
 | 09 Microstructure | [Stage H](#stage-h-recipes-available-from-v0100) (book rebuild, quotes, estimators), [trading conventions](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues) |
 | 10 Execution | [Stage H](#stage-h-recipes-available-from-v0100) (schedules, TCA, simulated venues, paper trading), [simulated auction, FX and futures venues](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues), [liquidity curve](#read-a-liquidity-cost-curve) |
 | 11 Research | [Stage J](#stage-j-recipes) |
-| 12 Platform | [Stage K](#stage-k-recipes) (bitemporal store, daily paper ledger, not yet running) |
+| 12 Platform | [Stage K](#stage-k-recipes) (bitemporal store, daily paper ledger, scheduled from v0.10.1) |
 
 ## Run a tutorial script
 
@@ -555,7 +555,7 @@ Copy the inputs of the named case from `datasets/golden/stage_g/` and send them 
 | LMM caplets and Rebonato swaptions | `rates.lmm.capfloor`, `rates.lmm.swaption_rebonato` | `lmmcap_g`, `lmmswn_g` |
 | Monte Carlo Greeks; model-reserve dispersion | `risk.mc.greeks`, `risk.model_reserve.dispersion` | `mcgreeks_g`, `reserve_g` |
 | Expected exposure of a swap under Hull-White | `xva.exposure.swap_ee_hw` | `exposure_g-0001` |
-| Collateralised exposure; CVA, DVA, FVA; SIMM-style IR delta; wrong-way CVA | `xva.exposure.collateralised`, `xva.adjustments.value`, `xva.simm.ir_delta`, `xva.wwr.cva_hw` | `collexp_g`, `xvaadj_g-0001`, `simm_g`, `wwr_g` |
+| Collateralised exposure; CVA, DVA, FVA; sensitivity-based IR delta margin (placeholder weights); wrong-way CVA | `xva.exposure.collateralised`, `xva.adjustments.value`, `xva.sbim.ir_delta`, `xva.wwr.cva_hw` | `collexp_g`, `xvaadj_g-0001`, `sbim_g`, `wwr_g` |
 | EE, ENE, PFE, EPE and CVA of a swap portfolio under Hull-White (checked against ORE) | `xva.exposure.portfolio_hw` | `expsim_g-0001` |
 | Discretely monitored barrier (BGK shift) | `exotic.barrier.price` with `monitoring: DISCRETE` | `barrier_g` |
 
@@ -1283,7 +1283,7 @@ In the first case `participation` 1.5 is outside its domain and `market_volume` 
 
 ## Stage K recipes
 
-Stage K round 1 is merged on the integration branch `k-r1` and is not released. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
+Stage K round 1 is released in v0.10.1 (2026-11-20, pull requests #58 and #59), with the round 2 audit fixes. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
 
 ### Query a bitemporal log
 
@@ -1309,7 +1309,7 @@ Expected (golden `inc_k-0002`): `first_changed_index` 1, `recomputed` 2, `discou
 {"schema_version": "1.0", "case_id": "trig", "operation": "calib.trigger.check", "inputs": {"changes": [1.0, -1.0, 1.0, -1.0], "x_ref": 100.0, "x_now": 105.0, "days_since": 1.0, "k": 3.0}}
 ```
 
-Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `threshold` 3.4641016151377544, `false_alarm_rate` 0.002699796063260189. A move exactly equal to the threshold does not fire (KR-13). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the four values above, bit for bit. `false_alarm_rate` is the stated `2 (1 - Phi(k))`, computed as `2 Phi(-k)` with a tail-accurate normal CDF (far-tail golden `trig_k-0009`). K-4c outside share: 4 of 6 value cases, by blind re-derivation.
+Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `threshold` 3.4641016151377544, `false_alarm_rate` 0.057668885622437306, `nominal_rate` 0.002699796063260189. A move exactly equal to the threshold does not fire (KR-13). `false_alarm_rate` is the rate of the trigger as used, with `sigma` estimated from four changes: `P(abs(T_3) > 3)` (spec 1.1.0, KR-232, class `tail_probability`, 1e-11 relative); `nominal_rate` is the known-sigma rate `2 (1 - Phi(k))`, computed as `2 Phi(-k)` (far-tail golden `trig_k-0009`). Observed (2026-11-20 on `k-r2-docs`, Python build through Tutorial 53 Step 2, local laptop, not the acceptance machine): these values to the printed six decimals. K-4c outside share: see `oracle/OUTSIDE_SHARES.md` (the blind matches cover `nominal_rate`).
 
 ### Intraday P&L with an error bound
 
@@ -1317,7 +1317,7 @@ Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `thres
 {"schema_version": "1.0", "case_id": "idr", "operation": "risk.intraday.delta_gamma_bound", "inputs": {"positions": [{"notional": 1000000.0, "maturity": 5.0, "yield": 0.04}], "shift": 0.01}}
 ```
 
-Expected (golden `idr_k-0001`): `estimate_pnl` -39913.124212551615, `bound` 17.05689068912462, `label` "latency-aware analytics on simulated data". Zero-coupon positions only. The item's outside-check share is 5 of 5 value cases, by the K-5a blind packet (`program/STAGE_K_BLIND_K5A.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `estimate_pnl` -39913.124212551615, `bound` 17.056890689124625 (the golden's 17.05689068912462 differs in the last place, inside the tolerance), `label` as expected.
+Expected (golden `idr_k-0001`, spec 1.1.0): `estimate_pnl` -39913.124212551615, `bound` 17.056890689308766, `label` "latency-aware analytics on simulated data". The bound is the Lagrange term plus a binary64 rounding allowance (KR-234); it is 1.1e-11 relative above the 1.0.0 value 17.05689068912462. Zero-coupon positions only. Outside check: the version 2 blind packet matched all 11 bounds and 9 of 11 cases (`program/STAGE_K_BLIND_K5A_V2.md`). Observed (2026-11-20 on `k-r2-docs`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the three values above, bit for bit.
 
 ### Guard a Richardson extrapolation
 
@@ -1337,7 +1337,7 @@ Add `"method": "CN_RANNACHER_SMOOTHED"` to the inputs of `rates.shortrate.bermud
 {"schema_version": "1.0", "case_id": "saccr", "operation": "risk.saccr.ead", "inputs": {"trades": [{"id": "1", "asset_class": "IR", "notional": 10000, "market_value": 30, "maturity": 10, "position": "LONG", "start": 0, "end": 10, "hedging_set": "USD"}, {"id": "2", "asset_class": "IR", "notional": 10000, "market_value": -20, "maturity": 4, "position": "SHORT", "start": 0, "end": 4, "hedging_set": "USD"}, {"id": "3", "asset_class": "IR", "notional": 5000, "market_value": 50, "maturity": 11, "position": "BOUGHT", "kind": "OPTION", "option_type": "PUT", "underlying_price": 0.06, "strike": 0.05, "exercise": 1, "start": 1, "end": 11, "hedging_set": "EUR"}]}}
 ```
 
-Expected (golden `saccr_k-0001`, Basel CRE99 Example 1): `ead` 569.4701409373457, `rc` 60, `pfe` 346.76438638381836, `multiplier` 1, hedging-set add-ons EUR 50.4145690652664 and USD 296.34981731855197. Worked step by step in [Tutorial 56](docs/getting-started/tutorial-56-sa-ccr-example-1.md). SA-CCR outside share: 12 of 16 value cases (5 published examples, 7 blind re-derivations, `program/STAGE_K_BLIND_W1B.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `ead` 569.4701409373457, `rc` 60.0 and `multiplier` 1.0 as expected; `pfe` 346.7643863838184 and the add-ons EUR 50.414569065266406 and USD 296.349817318552 differ from the golden in the last digit or two, inside the tolerance.
+Expected (golden `saccr_k-0001`, Basel CRE99 Example 1): `ead` 569.4701409373457, `rc` 60, `pfe` 346.76438638381836, `multiplier` 1, hedging-set add-ons EUR 50.4145690652664 and USD 296.34981731855197. Worked step by step in [Tutorial 56](docs/getting-started/tutorial-56-sa-ccr-example-1.md). SA-CCR outside share: 12 of 19 value cases (`oracle/OUTSIDE_SHARES.md`, generated): the 5 published examples through the blind packet that re-derived them (`program/STAGE_K_BLIND_PUB.md`; a printed figure alone does not count, KR-250) and 7 blind re-derivations (`program/STAGE_K_BLIND_W1B.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `ead` 569.4701409373457, `rc` 60.0 and `multiplier` 1.0 as expected; `pfe` 346.7643863838184 and the add-ons EUR 50.414569065266406 and USD 296.349817318552 differ from the golden in the last digit or two, inside the tolerance.
 
 ### Backtesting zone and desk eligibility
 
@@ -1346,7 +1346,7 @@ Expected (golden `saccr_k-0001`, Basel CRE99 Example 1): `ead` 569.4701409373457
 {"schema_version": "1.0", "case_id": "desk", "operation": "risk.frtb.backtest.desk", "inputs": {"observations": 250, "exceptions_99_actual": 13, "exceptions_99_hypothetical": 0, "exceptions_975_actual": 0, "exceptions_975_hypothetical": 0}}
 ```
 
-Expected (spec worked example and golden `btk_k-0020`): the first gives `exceptions` 5, `zone` `AMBER`, `amber_from` 5, `red_from` 10, `multiplier` 1.7; the second `breach_99` true, `eligible` false. To count exceptions from series, send `risk.frtb.backtest.count` with `var`, `actual` and `hypothetical` arrays (a null counts as an exception; a loss equal to VaR does not). K-8e outside share: 23 of 24 value cases (12 against the printed MAR99 Table 2, 11 by blind re-derivation, `program/STAGE_K_BLIND_BTK.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): zone `exceptions` 5, `cumulative_probability` 0.9588168159302313, `zone` `AMBER`, `amber_from` 5, `red_from` 10, `multiplier` 1.7; desk `exceptions_99` 13, `breach_99` true, `breach_975` false, `eligible` false, as expected.
+Expected (spec worked example and golden `btk_k-0020`): the first gives `exceptions` 5, `zone` `AMBER`, `amber_from` 5, `red_from` 10, `multiplier` 1.7; the second `breach_99` true, `eligible` false. To count exceptions from series, send `risk.frtb.backtest.count` with `var`, `actual` and `hypothetical` arrays (a null counts as an exception; a loss equal to VaR does not). K-8e outside share: 23 of 28 value cases (`oracle/OUTSIDE_SHARES.md`, generated): the 12 MAR99 Table 2 cases through the blind packet that re-derived them (`program/STAGE_K_BLIND_PUB.md`; a printed figure alone does not count, KR-250) and 11 by blind re-derivation (`program/STAGE_K_BLIND_BTK.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): zone `exceptions` 5, `cumulative_probability` 0.9588168159302313, `zone` `AMBER`, `amber_from` 5, `red_from` 10, `multiplier` 1.7; desk `exceptions_99` 13, `breach_99` true, `breach_975` false, `eligible` false, as expected.
 
 ### Verify the daily paper ledger (not yet runnable)
 
@@ -1354,7 +1354,7 @@ Expected (spec worked example and golden `btk_k-0020`): the first gives `excepti
 git fetch origin paper-ledger paper-ledger-anchors
 git show origin/paper-ledger:ledger/ledger.jsonl > ledger.jsonl
 python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --no-cli         # from the ledger alone
-python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --require-days 20
+python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --anchors A --forward-log F --bitcoin-headers H --require-days 20
 ```
 
 `--no-cli` checks the chain, the configuration, the dates and holdout windows, and replays every day in exact decimal from the ledger's own numbers; the full run also rebuilds each day through the CLI. The tool is merged (`tools/paper_daily/verify_ledger.py`, spec `specifications/12-platform/paper-ledger-daily.md`). The `paper-ledger` branch does not exist until the workflow first runs on `main`, so the daily ledger is not yet running: **0 of 20 recorded trading days.** Every row is labelled "paper marks on a fitted curve; not tradable"; no performance claim is made. Not run: there is no ledger to fetch (2026-11-19, `k-r1`). Checked only that `verify_ledger.py --help` lists the `verify` command and the `--ledger`, `--no-cli` and `--require-days` options used above.

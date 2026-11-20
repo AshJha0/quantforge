@@ -6,8 +6,9 @@ Specifications: 01-core/bitemporal-store.md, 02-curves/incremental-update.md,
 03-calibration/recalibration-triggers.md, 06-risk/intraday-risk-bounds.md, 06-risk/bermudan-ladder-k8.md
 (`num.richardson.check`).
 
-Error order (HR-66): structural E_INPUT (the `check_*_shape` functions, which the CLI calls before the
-finite rule), then E_DOMAIN, then value-dependent E_INPUT, then E_LIMIT.
+Error order (HR-122, ruling KR-230): E_LIMIT for the input sizes (the command-line gate; here, for library
+calls, the `limits_first` check the finite guard runs first), the finite rule, structural E_INPUT, E_DOMAIN,
+then the stale-cache E_INPUT of the incremental update.
 """
 
 import itertools
@@ -17,12 +18,12 @@ from dataclasses import dataclass
 from typing import Any
 
 from .errors import QfError
-from .finite import guard
+from .finite import guard, limits_first
 
 Floats = Sequence[float]
 LABEL = "latency-aware analytics on simulated data"  # KR-10
-MAX_RECORDS = 1_000_000
-MAX_QUOTES = 200
+MAX_RECORDS = 100_000  # the generic array cap of limits.md (KR-231 supersedes 1,000,000)
+MAX_QUOTES = 200  # limits.md row (KR-231)
 MAX_CHANGES = 100_000
 MAX_POSITIONS = 100_000
 
@@ -33,6 +34,11 @@ def _input(message: str, field: str | None = None) -> QfError:
 
 def _domain(message: str, field: str | None = None) -> QfError:
     return QfError("E_DOMAIN", message, field)
+
+
+def _too_long(xs: Any, limit: int) -> bool:
+    """A size check that leaves anything without a length to the later checks (the guard's first look)."""
+    return hasattr(xs, "__len__") and len(xs) > limit
 
 
 def _limit(field: str, limit: int) -> QfError:
@@ -56,8 +62,8 @@ class BiRecord:
 
 
 def _check_log(records: Sequence[BiRecord]) -> None:
-    """Log checks 2 to 4 (structural E_INPUT), in the spec's order. Private, so the finite guard
-    does not run first (HR-66: structural E_INPUT before E_DOMAIN)."""
+    """Log checks 2 to 4 (structural E_INPUT), in the spec's order (after E_LIMIT and the finite rule,
+    KR-230)."""
     for a, b in itertools.pairwise(records):
         if b.sequence <= a.sequence:
             raise _input("sequence must be strictly increasing", "records")
@@ -69,14 +75,19 @@ def _check_log(records: Sequence[BiRecord]) -> None:
             raise _input("valid_to must be after valid_from", "records")
 
 
+def _records_limit(records: Sequence[BiRecord], *_: Any) -> None:
+    if _too_long(records, MAX_RECORDS):
+        raise _limit("records", MAX_RECORDS)
+
+
+@limits_first(_records_limit)
 def bitemporal_query(
     records: Sequence[BiRecord], series_id: str, knowledge_as_of: int, valid_at: int
 ) -> tuple[str, BiRecord | None]:
     """`core.store.bitemporal_query`: the record with the highest sequence among those known by K
     (inclusive) whose valid interval holds V. A deleted winner is WITHDRAWN (it masks older records)."""
+    _records_limit(records)
     _check_log(records)
-    if len(records) > MAX_RECORDS:
-        raise _limit("records", MAX_RECORDS)
     best: BiRecord | None = None
     for r in records:
         if (
@@ -122,12 +133,17 @@ def _check_quotes(quotes: Floats, field: str) -> None:
         raise _domain("every quote must be above -1", field)
 
 
+def _quotes_limit(quotes: Floats) -> None:
+    if _too_long(quotes, MAX_QUOTES):
+        raise _limit("quotes", MAX_QUOTES)
+
+
+@limits_first(_quotes_limit)
 def par_annual(quotes: Floats) -> dict[str, Any]:
     """`curve.bootstrap.par_annual`: discount factors of annual par swaps with accrual 1."""
+    _quotes_limit(quotes)
     check_quotes_shape(len(quotes))
     _check_quotes(quotes, "quotes")
-    if len(quotes) > MAX_QUOTES:
-        raise _limit("quotes", MAX_QUOTES)
     return {"discount_factors": _bootstrap_from(quotes, [])}
 
 
@@ -140,11 +156,24 @@ def check_update_shape(n_previous: int, n_dfs: int, n_new: int) -> None:
         )
 
 
+def _update_limit(previous_quotes: Floats, previous_dfs: Floats, new_quotes: Floats) -> None:
+    for field, xs in (
+        ("previous_quotes", previous_quotes),
+        ("previous_discount_factors", previous_dfs),
+        ("new_quotes", new_quotes),
+    ):
+        if _too_long(xs, MAX_QUOTES):
+            raise _limit(field, MAX_QUOTES)
+
+
+@limits_first(_update_limit)
 def incremental_update(
     previous_quotes: Floats, previous_dfs: Floats, new_quotes: Floats
 ) -> dict[str, Any]:
     """`curve.incremental.update`: copies the pillars before the first changed quote and solves the
-    rest. The cache must equal the bootstrap of `previous_quotes` bit for bit (E_INPUT otherwise)."""
+    rest. The cache must equal the bootstrap of `previous_quotes` bit for bit (E_INPUT otherwise; the
+    last check, KR-230 step 6)."""
+    _update_limit(previous_quotes, previous_dfs, new_quotes)
     check_update_shape(len(previous_quotes), len(previous_dfs), len(new_quotes))
     _check_quotes(previous_quotes, "previous_quotes")
     _check_quotes(new_quotes, "new_quotes")
@@ -157,8 +186,6 @@ def incremental_update(
             "previous_discount_factors is not the bootstrap of previous_quotes",
             "previous_discount_factors",
         )
-    if len(new_quotes) > MAX_QUOTES:
-        raise _limit("new_quotes", MAX_QUOTES)
     j = next((i for i, (a, b) in enumerate(zip(previous_quotes, new_quotes)) if a != b), None)
     if j is None:
         return {
@@ -179,31 +206,103 @@ def check_changes_shape(n: int) -> None:
 
 
 def _sample_sd(xs: Floats) -> float:
+    """KR-233: exactly rounded sums, `mean = S1 / n`, `sigma = sqrt(S2 / (n - 1))`."""
     mean = math.fsum(xs) / len(xs)
-    return math.sqrt(math.fsum((x - mean) ** 2 for x in xs) / (len(xs) - 1))
+    return math.sqrt(math.fsum((x - mean) * (x - mean) for x in xs) / (len(xs) - 1))
 
 
+NOISE_FLOOR = 2.0**-26  # KR-233: sigma at or below 2^-26 max|c_i| is no noise scale
+
+
+def _changes_limit(changes: Floats, *_: Any) -> None:
+    if _too_long(changes, MAX_CHANGES):
+        raise _limit("changes", MAX_CHANGES)
+
+
+@limits_first(_changes_limit)
 def trigger_check(
     changes: Floats, x_ref: float, x_now: float, days_since: float, k: float
 ) -> dict[str, Any]:
-    """`calib.trigger.check`: fires iff `|x_now - x_ref| > k sigma sqrt(d)`, strictly."""
+    """`calib.trigger.check`: fires iff `|x_now - x_ref| > k sigma sqrt(d)`, strictly. `false_alarm_rate`
+    is the rate on noise with sigma estimated from the window (Student-t, n - 1 degrees of freedom,
+    KR-232); `nominal_rate` is the known-sigma `2 Phi(-k)`."""
+    _changes_limit(changes)
     check_changes_shape(len(changes))
     if not k > 0:
         raise _domain("k must be above 0", "k")
     if not days_since >= 1:
         raise _domain("days_since must be at least 1", "days_since")
     sigma = _sample_sd(changes)
-    if sigma == 0:
-        raise _domain("the changes have zero standard deviation: no noise scale", "changes")
-    if len(changes) > MAX_CHANGES:
-        raise _limit("changes", MAX_CHANGES)
+    if sigma <= NOISE_FLOOR * max(abs(c) for c in changes):
+        raise _domain("the changes have no noise scale (sigma at or below 2^-26 max|c|)", "changes")
     threshold = k * sigma * math.sqrt(days_since)
     return {
         "fire": abs(x_now - x_ref) > threshold,
         "sigma": sigma,
         "threshold": threshold,
-        "false_alarm_rate": two_sided_normal_tail(k),
+        "false_alarm_rate": student_t_two_sided_tail(len(changes) - 1, k),
+        "nominal_rate": two_sided_normal_tail(k),
     }
+
+
+_TWO_OVER_PI = 0.6366197723675814
+_UP = 2.0**500
+_DOWN = 2.0**-500
+
+
+def _t_step(t: float, j: int, c2: float, odd: bool) -> float:
+    if odd:
+        return (t * ((2 * j + 2) * c2)) / (2 * j + 3)
+    return (t * ((2 * j + 1) * c2)) / (2 * j + 2)
+
+
+def student_t_two_sided_tail(nu: int, k: float) -> float:
+    """`P(|T_nu| > k)` for an integer `nu >= 1` and `k > 0`, by the stated algorithm of KR-232: the closed-form
+    finite sum of the t distribution where the tail is at least 1/8, else its remainder series (positive
+    terms, no cancellation). Only + - * /, sqrt and one atan2 (odd nu), so the four builds agree to the
+    last bit except through atan2."""
+    rn = math.sqrt(nu)
+    if k <= rn:
+        den = nu + k * k
+        c2 = nu / den
+        root = math.sqrt(den)
+        s, c = k / root, rn / root
+    else:
+        r = rn / k
+        w = math.sqrt(1.0 + r * r)
+        s, c = 1.0 / w, r / w
+        c2 = c * c
+    odd = nu % 2 == 1
+    m = (nu - 1) // 2 if odd else nu // 2
+    t, total, e = 1.0, 0.0, 0
+    for j in range(m):
+        if e == 0:
+            total += t
+        t = _t_step(t, j, c2, odd)
+        if 0.0 < t < _DOWN:
+            t *= _UP
+            e += 1
+    if odd:
+        a = _TWO_OVER_PI * (math.atan2(c, s) - s * c * total)
+    else:
+        a = 1.0 - s * total
+    if a >= 0.125:
+        return a
+    rem, j = 0.0, m
+    while True:
+        rem += t
+        t = _t_step(t, j, c2, odd)
+        j += 1
+        if t <= rem * 2.0**-60:
+            break
+        if t < _DOWN:
+            t *= _UP
+            rem *= _UP
+            e += 1
+    out = _TWO_OVER_PI * s * c * rem if odd else s * rem
+    for _ in range(e):
+        out *= _DOWN
+    return out
 
 
 _C_HI = 0.70710678118654757  # 1/sqrt(2), rounded up
@@ -239,30 +338,56 @@ def check_positions_shape(n: int) -> None:
 
 
 def position_bound(p: ZeroPosition, shift: float) -> float:
-    """`|h|^3 M3 / 6` with `M3 = T^3 |N| exp(-T min(y, y + h))`."""
-    t = p.maturity
-    m3 = t**3 * abs(p.notional) * math.exp(-t * min(p.yield_, p.yield_ + shift))
-    return abs(shift) ** 3 * m3 / 6
+    """The Lagrange bound `|h|^3 M3 / 6` with `M3 = T^3 |N| exp(-T min(y, y + h))` (KR-15), in the order of
+    KR-234."""
+    t, ah = p.maturity, abs(shift)
+    e = math.exp(-t * min(p.yield_, p.yield_ + shift))
+    return ah * ah * ah * (t * t * t * abs(p.notional) * e) / 6
 
 
 def position_estimate(p: ZeroPosition, shift: float) -> float:
-    """`V' h + V'' h^2 / 2` with `V = N exp(-y T)`."""
+    """`V' h + V'' h^2 / 2` with `V = N exp(-y T)`, as `v * (-T h + T T h h / 2)` (KR-234)."""
     t = p.maturity
     v = p.notional * math.exp(-p.yield_ * t)
     return v * (-t * shift + t * t * shift * shift / 2)
 
 
+ROUNDING_FACTOR = 2.0**-49  # 16 u (KR-234)
+
+
+def position_rounding(p: ZeroPosition, shift: float) -> float:
+    """The rounding allowance `rho` of KR-234: covers the binary64 error of the estimate, of the computed
+    Lagrange bound and of the binary64 revaluation of the position."""
+    t, ah = p.maturity, abs(shift)
+    v = p.notional * math.exp(-p.yield_ * t)
+    g = abs(math.expm1(-shift * t))
+    scale = 1 + t * abs(p.yield_) + t * ah
+    return (
+        ROUNDING_FACTOR
+        * scale
+        * (abs(v) * (t * ah + t * t * (shift * shift) + g) + position_bound(p, shift))
+    )
+
+
+def _positions_limit(positions: Sequence[ZeroPosition], *_: Any) -> None:
+    if _too_long(positions, MAX_POSITIONS):
+        raise _limit("positions", MAX_POSITIONS)
+
+
+@limits_first(_positions_limit)
 def delta_gamma_bound(positions: Sequence[ZeroPosition], shift: float) -> dict[str, Any]:
-    """`risk.intraday.delta_gamma_bound`: the delta-gamma P&L of a parallel yield move and the sum of
-    the per-position remainder bounds (no netting: their signs are unknown in general)."""
+    """`risk.intraday.delta_gamma_bound`: the delta-gamma P&L of a parallel yield move and a bound on its
+    distance from the full revaluation: the per-position Lagrange bounds (no netting: their signs are unknown
+    in general) plus the binary64 rounding allowance (KR-234), one exactly rounded sum."""
+    _positions_limit(positions)
     check_positions_shape(len(positions))
     if any(not p.maturity > 0 for p in positions):
         raise _domain("every maturity must be above 0", "positions.maturity")
-    if len(positions) > MAX_POSITIONS:
-        raise _limit("positions", MAX_POSITIONS)
+    parts = [position_bound(p, shift) for p in positions]
+    parts += [position_rounding(p, shift) for p in positions]
     return {
         "estimate_pnl": math.fsum(position_estimate(p, shift) for p in positions),
-        "bound": math.fsum(position_bound(p, shift) for p in positions),
+        "bound": math.fsum(parts),
         "label": LABEL,
     }
 

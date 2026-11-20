@@ -62,11 +62,12 @@ class PortfolioRiskToolsTest {
     }
 
     @Test
-    void simmSingleFactorAndConcentration() {
+    void sbimSingleFactorAndConcentration() {
         double[] ws = new double[1];
-        double[] r = Xva.simm(new double[] {10_000}, new double[] {90}, new double[][] {{1}}, 1e9, ws);
-        assertEquals(900_000.0, r[1], 1e-9);
-        r = Xva.simm(new double[] {4e6}, new double[] {1}, new double[][] {{1}}, 1e6, ws);
+        // Weight 30: the 2Y entry of specifications/tables/stage_k/sbim-ir-delta-g.json (RW = 10 x 3, KR-150).
+        double[] r = Xva.sbimIrDelta(new double[] {10_000}, new double[] {30}, new double[][] {{1}}, 1e9, ws);
+        assertEquals(300_000.0, r[1], 1e-9);
+        r = Xva.sbimIrDelta(new double[] {4e6}, new double[] {1}, new double[][] {{1}}, 1e6, ws);
         assertEquals(2.0, r[0], 1e-15);
     }
 

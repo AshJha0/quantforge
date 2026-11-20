@@ -120,8 +120,15 @@ fn bitemporal_schema_errors() {
 fn bitemporal_error_order() {
     let nan = R1.replace("\"value\":100", "\"value\":\"NaN\"");
     assert_eq!(code(&bt(&nan)), "E_DOMAIN");
-    // structural E_INPUT (log order) comes before the finite rule
-    assert_eq!(code(&bt(&format!("{nan},{R1}"))), "E_INPUT");
+    // KR-230 (HR-122): the finite rule comes before a structural E_INPUT (log order)
+    assert_eq!(code(&bt(&format!("{nan},{R1}"))), "E_DOMAIN");
+    // KR-231: 100,001 records (the generic array cap), whose sequence repeats: E_LIMIT before the
+    // log checks; 100,000 is legal
+    let many = vec![R1; 100_001].join(",");
+    assert_eq!(code(&bt(&many)), "E_LIMIT");
+    let seq = |s: usize| R1.replace("\"sequence\":1", &format!("\"sequence\":{s}"));
+    let ok: Vec<String> = (1..=100_000).map(seq).collect();
+    assert_eq!(code(&bt(&ok.join(","))), "ok");
     // E_SCHEMA comes before everything
     assert_eq!(code(&bt(&format!("{nan},{R1},1"))), "E_SCHEMA");
 }
@@ -173,14 +180,23 @@ fn curve_ops() {
     );
     assert_eq!(out(&r, "first_changed_index"), &Json::Null);
     assert_eq!(out(&r, "recomputed"), &Json::Int(0));
-    // structural E_INPUT before the finite rule's E_DOMAIN
+    // KR-230: the finite rule's E_DOMAIN before a structural E_INPUT
     let r = run(
         "curve.incremental.update",
         &format!(
             r#"{{"previous_quotes":{pq},"previous_discount_factors":{pd},"new_quotes":["NaN"]}}"#
         ),
     );
-    assert_eq!(code(&r), "E_INPUT");
+    assert_eq!(code(&r), "E_DOMAIN");
+    // KR-231: 201 previous quotes are E_LIMIT in the gate, before the length check
+    let q = vec!["0.01"; 201].join(",");
+    let r = run(
+        "curve.incremental.update",
+        &format!(
+            r#"{{"previous_quotes":[{q}],"previous_discount_factors":{pd},"new_quotes":{pq}}}"#
+        ),
+    );
+    assert_eq!(code(&r), "E_LIMIT");
     let r = run(
         "curve.incremental.update",
         &format!(r#"{{"previous_quotes":{pq},"previous_discount_factors":{pd}}}"#),
@@ -189,20 +205,27 @@ fn curve_ops() {
 }
 
 #[test]
-fn quotes_above_200_are_e_limit_not_a_gate_size() {
+fn quotes_above_200_are_e_limit_in_the_gate() {
     let q = vec!["0.01"; 201].join(",");
     let r = run(
         "curve.bootstrap.par_annual",
         &format!(r#"{{"quotes":[{q}]}}"#),
     );
     assert_eq!(code(&r), "E_LIMIT");
-    // a domain error outranks the stage K size (HR-66)
+    // KR-230: the size limit outranks a domain error
     let q = format!("-2,{}", vec!["0.01"; 200].join(","));
     let r = run(
         "curve.bootstrap.par_annual",
         &format!(r#"{{"quotes":[{q}]}}"#),
     );
-    assert_eq!(code(&r), "E_DOMAIN");
+    assert_eq!(code(&r), "E_LIMIT");
+    // 101 to 200 quotes are legal: the generic 100-quote curve rule does not apply (KR-231)
+    let q = vec!["0.01"; 200].join(",");
+    let r = run(
+        "curve.bootstrap.par_annual",
+        &format!(r#"{{"quotes":[{q}]}}"#),
+    );
+    assert_eq!(code(&r), "ok");
 }
 
 #[test]
@@ -218,7 +241,7 @@ fn trigger_op() {
             &ok.replace("[1.0,-1.0,1.0,-1.0]", "[1.0]")
                 .replace("105.0", "\"NaN\"")
         )),
-        "E_INPUT"
+        "E_DOMAIN"
     );
     assert_eq!(
         code(&run("calib.trigger.check", &ok.replace("105.0", "\"NaN\""))),
@@ -237,6 +260,19 @@ fn trigger_op() {
         &ok.replace("[1.0,-1.0,1.0,-1.0]", &format!("[{big}]")),
     );
     assert_eq!(code(&r), "E_LIMIT");
+    // KR-230: E_LIMIT before E_DOMAIN
+    let r = run(
+        "calib.trigger.check",
+        &ok.replace("[1.0,-1.0,1.0,-1.0]", &format!("[{big}]"))
+            .replace("\"k\":3.0", "\"k\":-1.0"),
+    );
+    assert_eq!(code(&r), "E_LIMIT");
+    // KR-232: the Student-t rate and the known-sigma nominal rate are both reported
+    let r = run("calib.trigger.check", ok);
+    let far = out(&r, "false_alarm_rate").as_f64().unwrap();
+    let nominal = out(&r, "nominal_rate").as_f64().unwrap();
+    assert!((far / 0.05766888562243732 - 1.0).abs() <= 1e-11, "{far}");
+    assert!((nominal / 0.002699796063260189 - 1.0).abs() <= 1e-10);
 }
 
 #[test]
@@ -256,7 +292,7 @@ fn intraday_op() {
         "risk.intraday.delta_gamma_bound",
         r#"{"positions":[],"shift":"NaN"}"#,
     );
-    assert_eq!(code(&r), "E_INPUT");
+    assert_eq!(code(&r), "E_DOMAIN"); // KR-230: the finite rule first
     let r = run(
         "risk.intraday.delta_gamma_bound",
         &format!(r#"{{"positions":[{p}],"shift":"NaN"}}"#),
@@ -273,6 +309,14 @@ fn intraday_op() {
     );
     assert_eq!(code(&r), "E_SCHEMA");
     let many = vec![p; 100_001].join(",");
+    let r = run(
+        "risk.intraday.delta_gamma_bound",
+        &format!(r#"{{"positions":[{many}],"shift":0.01}}"#),
+    );
+    assert_eq!(code(&r), "E_LIMIT");
+    // KR-230: before the E_DOMAIN of a zero maturity
+    let zero = r#"{"notional":1.0,"maturity":0.0,"yield":0.0}"#;
+    let many = format!("{},{zero}", vec![p; 100_000].join(","));
     let r = run(
         "risk.intraday.delta_gamma_bound",
         &format!(r#"{{"positions":[{many}],"shift":0.01}}"#),
@@ -302,7 +346,7 @@ fn richardson_op() {
         "num.richardson.check",
         r#"{"values":[10.5,"NaN"],"ratio":2.0,"assumed_order":2.0}"#,
     );
-    assert_eq!(code(&r), "E_INPUT");
+    assert_eq!(code(&r), "E_DOMAIN"); // KR-230: the finite rule before the structural E_INPUT
     let r = run(
         "num.richardson.check",
         r#"{"values":[10.5,10.125,10.03125],"ratio":"Infinity","assumed_order":2.0}"#,

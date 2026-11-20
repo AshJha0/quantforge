@@ -1,0 +1,806 @@
+{
+ "golden_sha256": {
+  "datasets/golden/stage_k/saccr_k.json": "e0fedebf674fc978431991dd6b16c67bf4eaa5e216682172c24c837d4a91561e",
+  "datasets/golden/stage_k/btk_k.json": "a987ea2f465fd2d1d139da303d3edaa4addd78b0b989fd90656595ec6cd31160",
+  "datasets/golden/stage_k/tlk_k.json": "0d9c72ea2f438789358225fdbea73064d217f9ee17931e3a5b58137cb45c209c"
+ },
+ "cases": {
+  "saccr_k-0001": {
+   "operation": "risk.saccr.ead",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "margined": "date_and_convention",
+    "capped": "date_and_convention",
+    "mpor_days": "date_and_convention"
+   },
+   "outputs": {
+    "ead": 569.4701409373457,
+    "rc": 60.0,
+    "pfe": 346.76438638381836,
+    "multiplier": 1.0,
+    "addon_aggregate": 346.76438638381836,
+    "addon": {
+     "IR": 346.76438638381836,
+     "FX": 0.0,
+     "CREDIT": 0.0,
+     "EQUITY": 0.0,
+     "COMMODITY": 0.0
+    },
+    "v": 60.0,
+    "c": 0.0,
+    "margined": false,
+    "mpor_days": null,
+    "ead_unmargined": null,
+    "capped": false,
+    "hedging_sets": [
+     {
+      "asset_class": "IR",
+      "treatment": "NORMAL",
+      "key": "EUR",
+      "addon": 50.4145690652664
+     },
+     {
+      "asset_class": "IR",
+      "treatment": "NORMAL",
+      "key": "USD",
+      "addon": 296.34981731855197
+     }
+    ],
+    "trades": [
+     {
+      "id": "1",
+      "supervisory_duration": 7.8693868057473315,
+      "adjusted_notional": 78693.86805747332,
+      "maturity_factor": 1.0,
+      "delta": 1.0,
+      "effective_notional": 78693.86805747332,
+      "supervisory_factor": 0.005
+     },
+     {
+      "id": "2",
+      "supervisory_duration": 3.6253849384403627,
+      "adjusted_notional": 36253.84938440363,
+      "maturity_factor": 1.0,
+      "delta": -1.0,
+      "effective_notional": -36253.84938440363,
+      "supervisory_factor": 0.005
+     },
+     {
+      "id": "3",
+      "supervisory_duration": 7.485592282404546,
+      "adjusted_notional": 37427.961412022734,
+      "maturity_factor": 1.0,
+      "delta": -0.26939521771053265,
+      "effective_notional": -10082.91381305328,
+      "supervisory_factor": 0.005
+     }
+    ]
+   }
+  },
+  "saccr_k-0002": {
+   "operation": "risk.saccr.ead",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "margined": "date_and_convention",
+    "capped": "date_and_convention",
+    "mpor_days": "date_and_convention"
+   },
+   "outputs": {
+    "ead": 381.2383187469393,
+    "rc": 0.0,
+    "pfe": 272.31308481924236,
+    "multiplier": 0.965208280997999,
+    "addon_aggregate": 282.12883185966666,
+    "addon": {
+     "IR": 0.0,
+     "FX": 0.0,
+     "CREDIT": 282.12883185966666,
+     "EQUITY": 0.0,
+     "COMMODITY": 0.0
+    },
+    "v": -20.0,
+    "c": 0.0,
+    "margined": false,
+    "mpor_days": null,
+    "ead_unmargined": null,
+    "capped": false,
+    "hedging_sets": [
+     {
+      "asset_class": "CREDIT",
+      "treatment": "NORMAL",
+      "key": "",
+      "addon": 282.12883185966666
+     }
+    ],
+    "trades": [
+     {
+      "id": "4",
+      "supervisory_duration": 2.785840471498844,
+      "adjusted_notional": 27858.40471498844,
+      "maturity_factor": 1.0,
+      "delta": 1.0,
+      "effective_notional": 27858.40471498844,
+      "supervisory_factor": 0.0038
+     },
+     {
+      "id": "5",
+      "supervisory_duration": 5.183635586365643,
+      "adjusted_notional": 51836.35586365643,
+      "maturity_factor": 1.0,
+      "delta": -1.0,
+      "effective_notional": -51836.35586365643,
+      "supervisory_factor": 0.0054
+     },
+     {
+      "id": "6",
+      "supervisory_duration": 4.423984338571903,
+      "adjusted_notional": 44239.843385719025,
+      "maturity_factor": 1.0,
+      "delta": 1.0,
+      "effective_notional": 44239.843385719025,
+      "supervisory_factor": 0.0038
+     }
+    ]
+   }
+  },
+  "saccr_k-0003": {
+   "operation": "risk.saccr.ead",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "margined": "date_and_convention",
+    "capped": "date_and_convention",
+    "mpor_days": "date_and_convention"
+   },
+   "outputs": {
+    "ead": 5405.615982463215,
+    "rc": 20.0,
+    "pfe": 3841.1542731880104,
+    "multiplier": 1.0,
+    "addon_aggregate": 3841.1542731880104,
+    "addon": {
+     "IR": 0.0,
+     "FX": 0.0,
+     "CREDIT": 0.0,
+     "EQUITY": 0.0,
+     "COMMODITY": 3841.1542731880104
+    },
+    "v": 20.0,
+    "c": 0.0,
+    "margined": false,
+    "mpor_days": null,
+    "ead_unmargined": null,
+    "capped": false,
+    "hedging_sets": [
+     {
+      "asset_class": "COMMODITY",
+      "treatment": "NORMAL",
+      "key": "ENERGY",
+      "addon": 2041.1542731880104
+     },
+     {
+      "asset_class": "COMMODITY",
+      "treatment": "NORMAL",
+      "key": "METALS",
+      "addon": 1800.0
+     }
+    ],
+    "trades": [
+     {
+      "id": "7",
+      "supervisory_duration": null,
+      "adjusted_notional": 10000.0,
+      "maturity_factor": 0.8660254037844386,
+      "delta": 1.0,
+      "effective_notional": 8660.254037844386,
+      "supervisory_factor": 0.18
+     },
+     {
+      "id": "8",
+      "supervisory_duration": null,
+      "adjusted_notional": 20000.0,
+      "maturity_factor": 1.0,
+      "delta": -1.0,
+      "effective_notional": -20000.0,
+      "supervisory_factor": 0.18
+     },
+     {
+      "id": "9",
+      "supervisory_duration": null,
+      "adjusted_notional": 10000.0,
+      "maturity_factor": 1.0,
+      "delta": 1.0,
+      "effective_notional": 10000.0,
+      "supervisory_factor": 0.18
+     }
+    ]
+   }
+  },
+  "saccr_k-0004": {
+   "operation": "risk.saccr.ead",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "margined": "date_and_convention",
+    "capped": "date_and_convention",
+    "mpor_days": "date_and_convention"
+   },
+   "outputs": {
+    "ead": 936.450505540879,
+    "rc": 40.0,
+    "pfe": 628.8932182434851,
+    "multiplier": 1.0,
+    "addon_aggregate": 628.8932182434851,
+    "addon": {
+     "IR": 346.76438638381836,
+     "FX": 0.0,
+     "CREDIT": 282.12883185966666,
+     "EQUITY": 0.0,
+     "COMMODITY": 0.0
+    },
+    "v": 40.0,
+    "c": 0.0,
+    "margined": false,
+    "mpor_days": null,
+    "ead_unmargined": null,
+    "capped": false,
+    "hedging_sets": [
+     {
+      "asset_class": "IR",
+      "treatment": "NORMAL",
+      "key": "EUR",
+      "addon": 50.4145690652664
+     },
+     {
+      "asset_class": "IR",
+      "treatment": "NORMAL",
+      "key": "USD",
+      "addon": 296.34981731855197
+     },
+     {
+      "asset_class": "CREDIT",
+      "treatment": "NORMAL",
+      "key": "",
+      "addon": 282.12883185966666
+     }
+    ],
+    "trades": [
+     {
+      "id": "1",
+      "supervisory_duration": 7.8693868057473315,
+      "adjusted_notional": 78693.86805747332,
+      "maturity_factor": 1.0,
+      "delta": 1.0,
+      "effective_notional": 78693.86805747332,
+      "supervisory_factor": 0.005
+     },
+     {
+      "id": "2",
+      "supervisory_duration": 3.6253849384403627,
+      "adjusted_notional": 36253.84938440363,
+      "maturity_factor": 1.0,
+      "delta": -1.0,
+      "effective_notional": -36253.84938440363,
+      "supervisory_factor": 0.005
+     },
+     {
+      "id": "3",
+      "supervisory_duration": 7.485592282404546,
+      "adjusted_notional": 37427.961412022734,
+      "maturity_factor": 1.0,
+      "delta": -0.26939521771053265,
+      "effective_notional": -10082.91381305328,
+      "supervisory_factor": 0.005
+     },
+     {
+      "id": "4",
+      "supervisory_duration": 2.785840471498844,
+      "adjusted_notional": 27858.40471498844,
+      "maturity_factor": 1.0,
+      "delta": 1.0,
+      "effective_notional": 27858.40471498844,
+      "supervisory_factor": 0.0038
+     },
+     {
+      "id": "5",
+      "supervisory_duration": 5.183635586365643,
+      "adjusted_notional": 51836.35586365643,
+      "maturity_factor": 1.0,
+      "delta": -1.0,
+      "effective_notional": -51836.35586365643,
+      "supervisory_factor": 0.0054
+     },
+     {
+      "id": "6",
+      "supervisory_duration": 4.423984338571903,
+      "adjusted_notional": 44239.843385719025,
+      "maturity_factor": 1.0,
+      "delta": 1.0,
+      "effective_notional": 44239.843385719025,
+      "supervisory_factor": 0.0038
+     }
+    ]
+   }
+  },
+  "saccr_k-0005": {
+   "operation": "risk.saccr.ead",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "margined": "date_and_convention",
+    "capped": "date_and_convention",
+    "mpor_days": "date_and_convention"
+   },
+   "outputs": {
+    "ead": 1879.2126315015523,
+    "rc": 0.0,
+    "pfe": 1342.294736786823,
+    "multiplier": 0.958123327392663,
+    "addon_aggregate": 1400.9623796965723,
+    "addon": {
+     "IR": 123.0891465470551,
+     "FX": 0.0,
+     "CREDIT": 0.0,
+     "EQUITY": 0.0,
+     "COMMODITY": 1277.873233149517
+    },
+    "v": 80.0,
+    "c": 200.0,
+    "margined": true,
+    "mpor_days": 14,
+    "ead_unmargined": 5779.716352199414,
+    "capped": false,
+    "hedging_sets": [
+     {
+      "asset_class": "IR",
+      "treatment": "NORMAL",
+      "key": "EUR",
+      "addon": 17.89539676924211
+     },
+     {
+      "asset_class": "IR",
+      "treatment": "NORMAL",
+      "key": "USD",
+      "addon": 105.193749777813
+     },
+     {
+      "asset_class": "COMMODITY",
+      "treatment": "NORMAL",
+      "key": "ENERGY",
+      "addon": 638.9366165747585
+     },
+     {
+      "asset_class": "COMMODITY",
+      "treatment": "NORMAL",
+      "key": "METALS",
+      "addon": 638.9366165747585
+     }
+    ],
+    "trades": [
+     {
+      "id": "1",
+      "supervisory_duration": 7.8693868057473315,
+      "adjusted_notional": 78693.86805747332,
+      "maturity_factor": 0.35496478698597694,
+      "delta": 1.0,
+      "effective_notional": 27933.55211212359,
+      "supervisory_factor": 0.005
+     },
+     {
+      "id": "2",
+      "supervisory_duration": 3.6253849384403627,
+      "adjusted_notional": 36253.84938440363,
+      "maturity_factor": 0.35496478698597694,
+      "delta": -1.0,
+      "effective_notional": -12868.839924156526,
+      "supervisory_factor": 0.005
+     },
+     {
+      "id": "3",
+      "supervisory_duration": 7.485592282404546,
+      "adjusted_notional": 37427.961412022734,
+      "maturity_factor": 0.35496478698597694,
+      "delta": -0.26939521771053265,
+      "effective_notional": -3579.079353848422,
+      "supervisory_factor": 0.005
+     },
+     {
+      "id": "7",
+      "supervisory_duration": null,
+      "adjusted_notional": 10000.0,
+      "maturity_factor": 0.35496478698597694,
+      "delta": 1.0,
+      "effective_notional": 3549.64786985977,
+      "supervisory_factor": 0.18
+     },
+     {
+      "id": "8",
+      "supervisory_duration": null,
+      "adjusted_notional": 20000.0,
+      "maturity_factor": 0.35496478698597694,
+      "delta": -1.0,
+      "effective_notional": -7099.29573971954,
+      "supervisory_factor": 0.18
+     },
+     {
+      "id": "9",
+      "supervisory_duration": null,
+      "adjusted_notional": 10000.0,
+      "maturity_factor": 0.35496478698597694,
+      "delta": 1.0,
+      "effective_notional": 3549.64786985977,
+      "supervisory_factor": 0.18
+     }
+    ]
+   }
+  },
+  "btk_k-0001": {
+   "operation": "risk.frtb.backtest.zone",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "outputs": {
+    "exceptions": 0,
+    "cumulative_probability": 0.08105851616218146,
+    "zone": "GREEN",
+    "amber_from": 5,
+    "red_from": 10,
+    "multiplier": 1.5
+   }
+  },
+  "btk_k-0002": {
+   "operation": "risk.frtb.backtest.zone",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "outputs": {
+    "exceptions": 1,
+    "cumulative_probability": 0.2857517387939528,
+    "zone": "GREEN",
+    "amber_from": 5,
+    "red_from": 10,
+    "multiplier": 1.5
+   }
+  },
+  "btk_k-0003": {
+   "operation": "risk.frtb.backtest.zone",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "outputs": {
+    "exceptions": 2,
+    "cumulative_probability": 0.5431689733157259,
+    "zone": "GREEN",
+    "amber_from": 5,
+    "red_from": 10,
+    "multiplier": 1.5
+   }
+  },
+  "btk_k-0004": {
+   "operation": "risk.frtb.backtest.zone",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "outputs": {
+    "exceptions": 3,
+    "cumulative_probability": 0.7581166977648832,
+    "zone": "GREEN",
+    "amber_from": 5,
+    "red_from": 10,
+    "multiplier": 1.5
+   }
+  },
+  "btk_k-0005": {
+   "operation": "risk.frtb.backtest.zone",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "outputs": {
+    "exceptions": 4,
+    "cumulative_probability": 0.8921876269036253,
+    "zone": "GREEN",
+    "amber_from": 5,
+    "red_from": 10,
+    "multiplier": 1.5
+   }
+  },
+  "btk_k-0006": {
+   "operation": "risk.frtb.backtest.zone",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "outputs": {
+    "exceptions": 5,
+    "cumulative_probability": 0.9588168159301517,
+    "zone": "AMBER",
+    "amber_from": 5,
+    "red_from": 10,
+    "multiplier": 1.7
+   }
+  },
+  "btk_k-0007": {
+   "operation": "risk.frtb.backtest.zone",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "outputs": {
+    "exceptions": 6,
+    "cumulative_probability": 0.9862985521447963,
+    "zone": "AMBER",
+    "amber_from": 5,
+    "red_from": 10,
+    "multiplier": 1.76
+   }
+  },
+  "btk_k-0008": {
+   "operation": "risk.frtb.backtest.zone",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "outputs": {
+    "exceptions": 7,
+    "cumulative_probability": 0.9959746612881922,
+    "zone": "AMBER",
+    "amber_from": 5,
+    "red_from": 10,
+    "multiplier": 1.83
+   }
+  },
+  "btk_k-0009": {
+   "operation": "risk.frtb.backtest.zone",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "outputs": {
+    "exceptions": 8,
+    "cumulative_probability": 0.9989434675026432,
+    "zone": "AMBER",
+    "amber_from": 5,
+    "red_from": 10,
+    "multiplier": 1.88
+   }
+  },
+  "btk_k-0010": {
+   "operation": "risk.frtb.backtest.zone",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "outputs": {
+    "exceptions": 9,
+    "cumulative_probability": 0.9997498099312595,
+    "zone": "AMBER",
+    "amber_from": 5,
+    "red_from": 10,
+    "multiplier": 1.92
+   }
+  },
+  "btk_k-0011": {
+   "operation": "risk.frtb.backtest.zone",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "outputs": {
+    "exceptions": 10,
+    "cumulative_probability": 0.999946101370953,
+    "zone": "RED",
+    "amber_from": 5,
+    "red_from": 10,
+    "multiplier": 2.0
+   }
+  },
+  "btk_k-0012": {
+   "operation": "risk.frtb.backtest.zone",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "exceptions": "date_and_convention",
+    "zone": "date_and_convention",
+    "amber_from": "date_and_convention",
+    "red_from": "date_and_convention",
+    "multiplier": "date_and_convention"
+   },
+   "outputs": {
+    "exceptions": 12,
+    "cumulative_probability": 0.9999980641362446,
+    "zone": "RED",
+    "amber_from": 5,
+    "red_from": 10,
+    "multiplier": 2.0
+   }
+  },
+  "tlk_k-0001": {
+   "operation": "risk.backtest.traffic_light",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "outputs": {
+    "cumulative_probability": 0.08105851616218146,
+    "zone": "GREEN",
+    "plus_factor": 0.0
+   }
+  },
+  "tlk_k-0002": {
+   "operation": "risk.backtest.traffic_light",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "outputs": {
+    "cumulative_probability": 0.2857517387939528,
+    "zone": "GREEN",
+    "plus_factor": 0.0
+   }
+  },
+  "tlk_k-0003": {
+   "operation": "risk.backtest.traffic_light",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "outputs": {
+    "cumulative_probability": 0.5431689733157259,
+    "zone": "GREEN",
+    "plus_factor": 0.0
+   }
+  },
+  "tlk_k-0004": {
+   "operation": "risk.backtest.traffic_light",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "outputs": {
+    "cumulative_probability": 0.7581166977648832,
+    "zone": "GREEN",
+    "plus_factor": 0.0
+   }
+  },
+  "tlk_k-0005": {
+   "operation": "risk.backtest.traffic_light",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "outputs": {
+    "cumulative_probability": 0.8921876269036253,
+    "zone": "GREEN",
+    "plus_factor": 0.0
+   }
+  },
+  "tlk_k-0006": {
+   "operation": "risk.backtest.traffic_light",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "outputs": {
+    "cumulative_probability": 0.9588168159301517,
+    "zone": "YELLOW",
+    "plus_factor": 0.4
+   }
+  },
+  "tlk_k-0007": {
+   "operation": "risk.backtest.traffic_light",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "outputs": {
+    "cumulative_probability": 0.9862985521447963,
+    "zone": "YELLOW",
+    "plus_factor": 0.5
+   }
+  },
+  "tlk_k-0008": {
+   "operation": "risk.backtest.traffic_light",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "outputs": {
+    "cumulative_probability": 0.9959746612881922,
+    "zone": "YELLOW",
+    "plus_factor": 0.65
+   }
+  },
+  "tlk_k-0009": {
+   "operation": "risk.backtest.traffic_light",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "outputs": {
+    "cumulative_probability": 0.9989434675026432,
+    "zone": "YELLOW",
+    "plus_factor": 0.75
+   }
+  },
+  "tlk_k-0010": {
+   "operation": "risk.backtest.traffic_light",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "outputs": {
+    "cumulative_probability": 0.9997498099312595,
+    "zone": "YELLOW",
+    "plus_factor": 0.85
+   }
+  },
+  "tlk_k-0011": {
+   "operation": "risk.backtest.traffic_light",
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "outputs": {
+    "cumulative_probability": 0.999946101370953,
+    "zone": "RED",
+    "plus_factor": 1.0
+   }
+  }
+ }
+}
