@@ -1191,5 +1191,47 @@ class StatusLadder(unittest.TestCase):
         self.assertEqual(self.sl.splice(text, self.sl.render(doc)), text)
 
 
+class SiteView(unittest.TestCase):
+    """tools/check_site_view.py, the parts that need no browser (K-7 RE9, KR-227): shards, dark copy, merge."""
+
+    def setUp(self):
+        sp = importlib.util.spec_from_file_location("check_site_view", ROOT / "tools/check_site_view.py")
+        self.sv = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(self.sv)
+
+    def test_shards_cover_every_page_once(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for i in range(7):
+                (Path(tmp) / f"p{i}.html").write_text("x", encoding="utf-8")
+            got = self.sv.pages(tmp, "1/3") + self.sv.pages(tmp, "2/3") + self.sv.pages(tmp, "3/3")
+            self.assertEqual(sorted(got), self.sv.pages(tmp))
+
+    def test_dark_copy_forces_dark_rules_and_refuses_none(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "src"
+            src.mkdir()
+            (src / "index.html").write_text('<style>@media (prefers-color-scheme: dark){a{color:red}}</style>'
+                                            '<script>x=window.matchMedia("(prefers-color-scheme: dark)").matches</script>',
+                                            encoding="utf-8")
+            self.assertEqual(self.sv.dark_copy(src, Path(tmp) / "dst"), 0)
+            out = (Path(tmp) / "dst" / "index.html").read_text(encoding="utf-8")
+            self.assertIn("@media all{a{color:red}}", out)
+            self.assertIn("x=true", out)
+            (src / "index.html").write_text("<style>a{color:red}</style>", encoding="utf-8")
+            self.assertEqual(self.sv.dark_copy(src, Path(tmp) / "dst"), 1)
+
+    def test_merge_fails_on_any_failing_page_and_on_no_results(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(self.sv.merge(tmp), 1)
+            ok = {v: {"ok": True, "problems": []} for v, *_ in self.sv.VIEWS}
+            bad = dict(ok, **{"phone-light": {"ok": False, "problems": ["scrollWidth 600 > 375"]}})
+            (Path(tmp) / "site-view-1of2.json").write_text(json.dumps({"pages": {"a.html": ok}}), encoding="utf-8")
+            self.assertEqual(self.sv.merge(tmp), 0)
+            (Path(tmp) / "site-view-2of2.json").write_text(json.dumps({"pages": {"b.html": bad}}), encoding="utf-8")
+            self.assertEqual(self.sv.merge(tmp), 1)
+            self.assertIn("`b.html` phone-light: scrollWidth 600 > 375",
+                          (Path(tmp) / "site-view.md").read_text(encoding="utf-8"))
+
+
 if __name__ == "__main__":
     unittest.main()
