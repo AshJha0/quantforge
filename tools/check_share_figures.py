@@ -42,7 +42,8 @@ ALIASES = {"K-8 guard": "K-8 guard", "K-8 method": "K-8", "SA-CCR": "K-8d", "FRT
            "K-8d SA-CCR": "K-8d", "K-8e FRTB backtesting": "K-8e"}
 FIG = r"(\d+) of (\d+)(?: value cases)?(?: \((\d+(?:\.\d+)?)%)?"
 TOTAL = [re.compile(r"\b[Ss]tage K\b[^.|\n]{0,60}?\bshare\b[^.|\n\d]{0,30}" + FIG),
-         re.compile(r"\bK (\d+\.\d)% \((\d+) of (\d+)\b")]
+         re.compile(r"\bK (\d+\.\d)% \((\d+) of (\d+)\b"),
+         re.compile(r"\b[Ss]tage K (?:now |has no generated sweeps: )?" + FIG + r"(?:,? (\d+\.\d)%)?")]
 EVERY = re.compile(r"\b[Ee]very (?:stage K )?(?:round 1 )?item (?:meets|at least 60%)")
 H_MARK = re.compile(r"\b(?:[Ss]tage H|H \d+\.\d%|H-\d+[a-z]?)\b")
 
@@ -100,9 +101,9 @@ def check_text(rel, text, d):
         for i, rx in enumerate(TOTAL):
             for m in rx.finditer(line):
                 g = m.groups()
-                a, b, p = (g[0], g[1], g[2]) if i == 0 else (g[1], g[2], g[0])
+                a, b, p = (g[1], g[2], g[0]) if i == 1 else (g[0], g[1], g[2] or (g[3] if i == 2 else None))
                 a, b = int(a), int(b)
-                paired.add(m.span(1 if i == 0 else 2))
+                paired.add(m.span(2 if i == 1 else 1))
                 t = d["total"]
                 if (a, b) != t or (p is not None and p != pct(*t)):
                     bad.append(f"{where}: stage K {a} of {b}" + (f" ({p}%)" if p else "")
@@ -169,6 +170,11 @@ def self_test(root):
     # one item's figure beside another's name, a wrong per-item percentage, "every item meets" with an item under.
     assert caught(f"Stage K outside-check share: {sa} of {sb} value cases (80.5%).")
     assert caught(f"K 80.5% ({sa} of {sb} value cases)")
+    # KF-24 shapes (tlk_k blind lane check): ROADMAP, known issues and the sweeps row of the release notes.
+    assert caught("SA-CCR 12 of 19; stage K 91 of 122 (74.6%, ruling KR-250).")
+    assert caught("re-derived blind, 28 of 28; stage K now 91 of 122, 74.6% (`oracle/OUTSIDE_SHARES.md`)")
+    assert caught("stage K has no generated sweeps: 91 of 122 with and without")
+    assert ok(f"stage K has no generated sweeps: {sa} of {sb} with and without")
     assert caught(f"Outside share: K-8d {a} of {b}, K-4a 6 of 10, `tlk_k` {ta} of {tb + 1}.")
     assert caught(f"Outside-check rule per item: K-4a 6 of 10, `tlk_k` {ta} of {tb + 1}.")
     assert caught(f"Outside share: K-4a {a} of {b} and K-8d {a} of {b}.")

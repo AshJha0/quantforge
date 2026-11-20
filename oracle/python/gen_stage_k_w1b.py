@@ -1,4 +1,4 @@
-﻿"""Stage K wave 1b goldens: SA-CCR (K-8d, suite saccr_k), FRTB IMA backtesting (K-8e, suite btk_k) and
+"""Stage K wave 1b goldens: SA-CCR (K-8d, suite saccr_k), FRTB IMA backtesting (K-8e, suite btk_k) and
 the MAR99 Table 2 outside check of the existing stage F operation risk.backtest.traffic_light
 (suite tlk_k).
 

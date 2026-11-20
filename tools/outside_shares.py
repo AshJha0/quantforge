@@ -433,7 +433,7 @@ def under_review_text(u):
 # on one line, so a block can sit inside a sentence or a table cell. `--check` compares every block byte for byte.
 BLOCK = re.compile(r"<!-- generated:(stage-k-[a-z-]+) -->(.*?)<!-- /generated -->")
 # Docs that state stage K or per-item shares must carry the blocks (a doc may hold more than one copy).
-BLOCK_DOCS = {"README.md": ("stage-k-total", "stage-k-items"), "LEARN.md": ("stage-k-total", "stage-k-items"), "CHANGELOG.md": ("stage-k-total",),
+BLOCK_DOCS = {"README.md": ("stage-k-total", "stage-k-items"), "LEARN.md": ("stage-k-total", "stage-k-items"), "CHANGELOG.md": ("stage-k-total",), "ROADMAP.md": ("stage-k-total", "stage-k-items"), "docs/known-issues.md": ("stage-k-total",),
               "docs/releases/v0.10.1.md": ("stage-k-total", "stage-k-items")}
 ITEM_NAME = {"K-8": "K-8 method", "K-8d": "K-8d SA-CCR", "K-8e": "K-8e FRTB backtesting"}
 
@@ -535,7 +535,9 @@ def markdown(doc):
               "that the rule reads the source correctly (audit KF-7). "
               "Later blind packets, counted the same way: K-5a version 2, 9 of 11 (program/STAGE_K_BLIND_K5A_V2.md; "
               "idr_k-0012 and idr_k-0013 mismatched and are not counted), the K-8 ladder k8_k (program/STAGE_K_BLIND_K8.md) and eleven btk_k cases "
-              "(program/STAGE_K_BLIND_BTK.md; btk_k-0017 matched and is not counted). The mpmath oracle is our own and never counts.", "",
+              "(program/STAGE_K_BLIND_BTK.md; btk_k-0017 matched and is not counted) and the KR-253 traffic-light goldens tlk_k-0012 to -0020 "
+              "(program/STAGE_K_BLIND_TLK_V2.md; 9 of 9 matched, 6 counted: the three n = 1 cases tlk_k-0016 to -0018 have the answer in "
+              "the rule text and are not counted; tlk_k-0021 was added later and has no blind re-derivation). The mpmath oracle is our own and never counts.", "",
               "| Item | Suites | Value cases | Blind | Share | 60% per item |", "|---|---|---:|---:|---:|---|"]
         L += [f"| {it} | {', '.join('`' + s + '`' for s in v['suites'])} | {v['cases']} | {v['counted_with_rederivation']} | "
               f"{(v['share_with_rederivation'] or 0):.1%} | {'met' if v['meets_item_floor'] else 'NOT MET'} |" for it, v in ek["per_item"].items()]
