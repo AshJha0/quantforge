@@ -38,8 +38,8 @@ def test_constants() -> None:
     assert sk.MAX_CHANGES == 100_000 and sk.MAX_POSITIONS == 100_000
     assert sk.NOISE_FLOOR == 2.0**-26 and sk.ROUNDING_FACTOR == 2.0**-49
     assert sk._UP == 2.0**500 and sk._DOWN == 2.0**-500
-    assert sk._TWO_OVER_PI == pytest.approx(2 / math.pi, rel=1e-16)
-    assert sk._C_HI + sk._C_LO == pytest.approx(1 / math.sqrt(2), rel=1e-17)
+    assert sk._TWO_OVER_PI == pytest.approx(2 / math.pi, rel=1e-16, abs=0)
+    assert sk._C_HI + sk._C_LO == pytest.approx(1 / math.sqrt(2), rel=1e-15, abs=0)
 
 
 def test_error_helpers() -> None:
@@ -173,7 +173,7 @@ def test_par_annual() -> None:
     q = [0.01, 0.02, 0.03]
     dfs = sk.par_annual(q)["discount_factors"]
     assert dfs == [0.9900990099009901, 0.9609784507862551, 0.9140462875527987]
-    assert dfs == pytest.approx(_boot(q), rel=1e-15)
+    assert dfs == pytest.approx(_boot(q), rel=1e-15, abs=0)
     assert sk.par_annual([0.0])["discount_factors"] == [1.0]
     assert sk.par_annual([-0.5])["discount_factors"] == [2.0]
     assert sk._bootstrap_from([0.01, 0.02], [0.5]) == [0.5, (1.0 - 0.02 * 0.5) / 1.02]
@@ -344,7 +344,7 @@ def test_t_tail_closed_forms(k: float) -> None:
     ],
 )
 def test_t_tail_values(nu: int, k: float, value: float) -> None:
-    assert sk.student_t_two_sided_tail(nu, k) == pytest.approx(value, rel=1e-13)
+    assert sk.student_t_two_sided_tail(nu, k) == pytest.approx(value, rel=1e-13, abs=0)
 
 
 def test_t_tail_exact_points() -> None:
@@ -372,7 +372,7 @@ def test_t_step() -> None:
     ],
 )
 def test_normal_tail(k: float, value: float) -> None:
-    assert sk.two_sided_normal_tail(k) == pytest.approx(value, rel=1e-15)
+    assert sk.two_sided_normal_tail(k) == pytest.approx(value, rel=1e-15, abs=0)
     assert sk.two_sided_normal_tail(k) == pytest.approx(math.erfc(k / math.sqrt(2)), rel=1e-12)
 
 
@@ -391,15 +391,17 @@ def test_position_pieces() -> None:
     }
     for (i, h), (bound, est, rnd) in expect.items():
         p = PS[i]
-        assert sk.position_bound(p, h) == pytest.approx(bound, rel=1e-14)
-        assert sk.position_estimate(p, h) == pytest.approx(est, rel=1e-14)
-        assert sk.position_rounding(p, h) == pytest.approx(rnd, rel=1e-14)
+        assert sk.position_bound(p, h) == pytest.approx(bound, rel=1e-14, abs=0)
+        assert sk.position_estimate(p, h) == pytest.approx(est, rel=1e-14, abs=0)
+        assert sk.position_rounding(p, h) == pytest.approx(rnd, rel=1e-14, abs=0)
     # the bound uses min(y, y + h): exp(-T (y + h)) for a fall, exp(-T y) for a rise
     p = Z(1.0, 1.0, 0.0)
-    assert sk.position_bound(p, 0.5) == pytest.approx(0.125 / 6, rel=1e-15)
-    assert sk.position_bound(p, -0.5) == pytest.approx(0.125 * math.exp(0.5) / 6, rel=1e-15)
-    assert sk.position_bound(Z(-2.0, 2.0, 0.0), 0.5) == pytest.approx(0.125 * 8 * 2 / 6, rel=1e-15)
-    assert sk.position_estimate(p, 0.5) == pytest.approx(-0.5 + 0.125, rel=1e-15)
+    assert sk.position_bound(p, 0.5) == pytest.approx(0.125 / 6, rel=1e-15, abs=0)
+    assert sk.position_bound(p, -0.5) == pytest.approx(0.125 * math.exp(0.5) / 6, rel=1e-15, abs=0)
+    assert sk.position_bound(Z(-2.0, 2.0, 0.0), 0.5) == pytest.approx(
+        0.125 * 8 * 2 / 6, rel=1e-15, abs=0
+    )
+    assert sk.position_estimate(p, 0.5) == pytest.approx(-0.5 + 0.125, rel=1e-15, abs=0)
     assert sk.position_rounding(p, 0.0) == 0.0
 
 
@@ -411,11 +413,11 @@ def test_delta_gamma_bound() -> None:
         "label": "latency-aware analytics on simulated data",
     }
     down = sk.delta_gamma_bound(PS, -0.02)
-    assert down["estimate_pnl"] == pytest.approx(-1.1515551816050147, rel=1e-14)
-    assert down["bound"] == pytest.approx(0.009806137721363498, rel=1e-14)
+    assert down["estimate_pnl"] == pytest.approx(-1.1515551816050147, rel=1e-14, abs=0)
+    assert down["bound"] == pytest.approx(0.009806137721363498, rel=1e-14, abs=0)
     # the bound covers the full revaluation
     assert abs(sk.zero_revalue(PS, 0.01) - up["estimate_pnl"]) <= up["bound"]
-    assert sk.zero_revalue(PS, 0.01) == pytest.approx(0.4547816034764296, rel=1e-14)
+    assert sk.zero_revalue(PS, 0.01) == pytest.approx(0.4547816034764296, rel=1e-14, abs=0)
     assert _err(sk.delta_gamma_bound, [], 0.01) == (
         "E_INPUT",
         "positions",
@@ -446,14 +448,14 @@ def test_richardson() -> None:
     assert sk.richardson_check([1.0, 0.5, 0.5], 2.0, 1.0) == nm
     # increasing values keep one sign too
     up = sk.richardson_check([0.0, 0.5, 0.75], 2.0, 1.0)
-    assert up["status"] == "OK" and up["extrapolated"] == pytest.approx(1.0, rel=1e-15)
+    assert up["status"] == "OK" and up["extrapolated"] == pytest.approx(1.0, rel=1e-15, abs=0)
     # |observed - assumed| <= 0.5 is inclusive at both ends
     assert sk.richardson_check([1.0, 0.5, 0.25], 2.0, 1.5)["status"] == "OK"
     assert sk.richardson_check([1.0, 0.5, 0.25], 2.0, 0.5)["status"] == "OK"
     assert sk.richardson_check([1.0, 0.5, 0.25], 2.0, 1.51)["status"] == "ORDER_MISMATCH"
     assert sk.richardson_check([1.0, 0.5, 0.25], 2.0, 0.49)["status"] == "ORDER_MISMATCH"
     r3 = sk.richardson_check([1.0, 1.0 / 3, 1.0 / 9], 3.0, 1.0)
-    assert r3["observed_order"] == pytest.approx(1.0, rel=1e-14)
+    assert r3["observed_order"] == pytest.approx(1.0, rel=1e-14, abs=0)
     assert r3["extrapolated"] == pytest.approx((3 * (1 / 9) - 1 / 3) / 2, abs=1e-16)
 
 
