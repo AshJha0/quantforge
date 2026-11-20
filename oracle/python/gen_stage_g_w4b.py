@@ -193,7 +193,7 @@ def alias_suite(g):
     two = dict(base, risk_weights=base["risk_weights"][:5], concentration_threshold=0.0)
     a.cases.append({"case_id": "", "operation": ALIAS, "inputs": two, "expected": {"status": "error", "error_code": "E_INPUT"},
                     "tolerance_class": "date_and_convention", "verified_by": ["rule-HR-66"], "tags": ["invalid", "two_errors"],
-                    "description": "two errors at once: risk_weights one short (E_INPUT) and threshold 0 (E_DOMAIN); structural E_INPUT first"})
+                    "description": "two errors at once: risk_weights one short [structural] and threshold 0 [domain]; structural E_INPUT first"})
     for i, c in enumerate(a.cases, 1):
         c["case_id"] = f"sbim_alias_k-{i:04d}"
     for i, c in enumerate(a.cases):

@@ -1868,7 +1868,7 @@
     "two_errors",
     "synthetic"
    ],
-   "description": "two errors at once: risk_weights one short (E_INPUT) and threshold 0 (E_DOMAIN); structural E_INPUT first"
+   "description": "two errors at once: risk_weights one short [structural] and threshold 0 [domain]; structural E_INPUT first"
   }
  ]
 }
