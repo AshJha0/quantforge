@@ -81,7 +81,9 @@ impl<T: Copy> SnapshotCell<T> {
         let slots = (0..readers + 2)
             .map(|_| Slot(UnsafeCell::new(initial)))
             .collect();
-        let hazards = (0..readers).map(|_| Hazard(AtomicU32::new(NONE_SLOT))).collect();
+        let hazards = (0..readers)
+            .map(|_| Hazard(AtomicU32::new(NONE_SLOT)))
+            .collect();
         Some(Self {
             slots,
             hazards,

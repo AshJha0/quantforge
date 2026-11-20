@@ -2,7 +2,7 @@ name: Java 25
 on:
   push:
     branches: [main]
-    paths: ['java25/**', '.github/workflows/java25.yml']
+    paths: ['java25/**', 'datasets/scenarios/k5_snapshot.json', '.github/workflows/java25.yml']
   pull_request:  # every PR, so these can be required checks on main
   workflow_call:  # release.yml reruns this on a version tag
 permissions:
@@ -29,3 +29,32 @@ jobs:
           cache: maven
       - run: mvn -B test
         working-directory: java25
+  jcstress:
+    # Stage K, K-5 (PROPOSED, KR-285, KR-288): jcstress 0.16 over the snapshot cell in its default mode. Clean means
+    # no FORBIDDEN outcome; the planted fault (InPlaceMutationFault) is graded interesting and its count is in the
+    # uploaded report. Latency-aware analytics on simulated data; nothing is timed.
+    name: java25-jcstress
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "25.0.5"
+          cache: maven
+      - run: mvn -B -Pjcstress -Djcstress.mode=default -DskipTests package exec:exec@jcstress | tee jcstress.log
+        working-directory: java25
+      - name: no FORBIDDEN outcome
+        working-directory: java25
+        run: |
+          grep -q "Failed tests: No matches." jcstress.log && grep -q "Error tests: No matches." jcstress.log
+          grep -A8 "InPlaceMutationFault" jcstress.log | grep -E "Interesting" | head -4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: jcstress-results
+          path: java25/target-jcstress/jcstress-results
+          retention-days: 14

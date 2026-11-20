@@ -10,7 +10,9 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::thread;
 
 use quantforge_core::json::{Json, parse};
-use quantforge_core::live_snapshot::{self as ls, Fault, HedgeInstrument, HedgeSnapshot, SnapshotCell};
+use quantforge_core::live_snapshot::{
+    self as ls, Fault, HedgeInstrument, HedgeSnapshot, SnapshotCell,
+};
 use quantforge_core::stage_k::{self, ZeroPosition};
 
 struct Scenario {
@@ -24,7 +26,10 @@ fn num(j: &Json, k: &str) -> f64 {
 }
 
 fn scenario() -> Scenario {
-    let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../../datasets/scenarios/k5_snapshot.json");
+    let path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../../datasets/scenarios/k5_snapshot.json"
+    );
     let text = std::fs::read_to_string(path).expect("scenario file");
     let (root, _) = parse(&text).expect("scenario parses");
     let book = root
@@ -58,7 +63,12 @@ fn close(a: f64, b: f64, tol: f64) -> bool {
 fn scenario_expected_values() {
     let sc = scenario();
     let tol = num(&sc.root, "tolerance_relative");
-    for row in sc.root.get("expected").and_then(Json::as_array).expect("expected") {
+    for row in sc
+        .root
+        .get("expected")
+        .and_then(Json::as_array)
+        .expect("expected")
+    {
         let k = num(row, "version") as u64;
         let s = build(&sc, k, ls::scenario_shift(k));
         assert!(s.intact());
@@ -91,7 +101,10 @@ fn exactness_1000_publishes() {
         cell.publish(build(&sc, k, h));
         let g = cell.acquire(0).expect("reader 0");
         let risk = stage_k::delta_gamma_bound(&sc.book, h).expect("valid");
-        let (d, u) = (ls::book_delta(&sc.book, h), ls::hedge_unit_delta(&sc.hedge, h));
+        let (d, u) = (
+            ls::book_delta(&sc.book, h),
+            ls::hedge_unit_delta(&sc.hedge, h),
+        );
         assert_eq!(g.version, k);
         assert_eq!(g.estimate_pnl.to_bits(), risk.estimate_pnl.to_bits());
         assert_eq!(g.bound.to_bits(), risk.bound.to_bits());
@@ -183,7 +196,10 @@ fn race(readers: usize, publishes: u64, fault: Fault) -> Stats {
         for k in 1..=publishes {
             cell.publish(build(&sc, k, ls::scenario_shift(k)));
         }
-        handles.into_iter().map(|h| h.join().expect("reader thread")).collect()
+        handles
+            .into_iter()
+            .map(|h| h.join().expect("reader thread"))
+            .collect()
     });
     let mut total = Stats {
         last: publishes,
