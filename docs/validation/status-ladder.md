@@ -44,7 +44,7 @@ Source: `oracle/OUTSIDE_SHARES.json` (written by `tools/outside_shares.py`). Flo
 | I | 153 | 102 | 66.7% | 102 | 66.7% | met |
 | J | 215 | 143 | 66.5% | 143 | 66.5% | met |
 | H | 205 | 0 | 0.0% | 160 | 78.0% | met |
-| K | 122 | 0 | 0.0% | 97 | 79.5% | met |
+| K | 216 | 0 | 0.0% | 162 | 75.0% | met |
 
 Stage H per plan item (plan section 15: at least 60.0% of each item's value cases):
 
@@ -80,8 +80,12 @@ Stage K per plan item (plan section 15: at least 60.0% of each item's value case
 | K-5a | `idr_k` | 12 | 9 | 75.0% | met |
 | K-8 | `k8_k` | 7 | 7 | 100.0% | met |
 | K-8 guard | `rich_k` | 6 | 6 | 100.0% | met |
+| K-8a | `drc_k` | 18 | 15 | 83.3% | met |
 | K-8d | `saccr_k` | 19 | 12 | 63.2% | met |
 | K-8e | `btk_k` | 28 | 23 | 82.1% | met |
+| K-8f | `ima_k` | 33 | 23 | 69.7% | met |
+| K-8g | `cva_k`, `df_k`, `sacva_k` | 21 | 14 | 66.7% | met |
+| K-8i | `lev_k`, `lex_k` | 22 | 13 | 59.1% | NOT MET |
 <!-- generated:status-ladder:end -->
 
 ## Stage K, round 1: what the generated table does not cover
