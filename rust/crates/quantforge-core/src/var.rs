@@ -261,17 +261,9 @@ pub fn traffic_light(
             "need observations >= 1 and 0 <= exceptions <= observations",
         );
     }
-    let (n, p) = (observations, 1.0 - c);
-    let x = exceptions;
-    // P(X <= x) by summing pmf in log space.
-    let (lp, lq) = (p.ln(), (-p).ln_1p());
-    let mut lpmf = n as f64 * lq;
-    let mut cdf = lpmf.exp();
-    for k in 0..x {
-        lpmf += ((n - k) as f64).ln() - ((k + 1) as f64).ln() + lp - lq;
-        cdf += lpmf.exp();
-    }
-    let cdf = cdf.min(1.0);
+    let n = observations;
+    // KR-253: the KR-237 arithmetic-only binomial; p stays 1 - c as stage J computes it.
+    let cdf = crate::frtb_backtest::binomial_cdf(n, exceptions, 1.0 - c);
     let zone = if cdf < 0.95 {
         "GREEN"
     } else if cdf < 0.9999 {

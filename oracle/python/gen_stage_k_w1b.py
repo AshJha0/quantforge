@@ -562,6 +562,44 @@ def gen_traffic_light():
                         f"published: MAR99 Table 2 (Basel Framework PDF p.758) row {x}: {printed[x]}%, zone {TABLES['printed_table2_zone'][x]} (YELLOW = Amber): MATCH"],
               tags=["stage_k", "traffic_light", "outside_checked", "published"], output_classes=oc,
               description=f"existing operation, {x} of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)")
+    # KR-253 (KA-A16 applied to stage J), appended so that the case ids above stay as they were. p is 1 - c as the
+    # operation computes it in binary64 (0.99 gives 0.010000000000000009), taken exactly; tolerance fixed here.
+    import sys
+    from fractions import Fraction
+    sys.set_int_max_str_digits(0)
+    kr253 = "added by lane k-r2-tl 2026-11-20 (ruling KR-253)"
+    for n, x, conf in [(100_000, 1_050, 0.99), (100_000, 2_600, 0.975), (1_000_000, 10_164, 0.99), (1_000_000, 9_800, 0.99)]:
+        pf = Fraction(1.0 - conf)
+        if n <= 100_000:
+            a, b = pf.numerator, pf.denominator
+            cc = b - a
+            term = cc ** n
+            total = term
+            for k in range(x):
+                term = term * (n - k) * a // ((k + 1) * cc)
+                total += term
+            cum = float(Fraction(total, b ** n))
+            how = "exact rational arithmetic at the binary64 p (Python fractions)"
+        else:
+            with mp.workdps(50):
+                pm = mp.mpf(pf.numerator) / pf.denominator
+                t = (1 - pm) ** n
+                acc = t
+                for k in range(x):
+                    t = t * (n - k) * pm / ((k + 1) * (1 - pm))
+                    acc += t
+                cum = float(acc)
+            how = "mpmath 50 digits at the binary64 p (term recurrence)"
+        sc = float(binom.cdf(x, n, 1.0 - conf))
+        assert abs(sc / cum - 1) <= 1e-12, (n, x, sc, cum)
+        zone = "GREEN" if cum < 0.95 else "YELLOW" if cum < 0.9999 else "RED"
+        s.add("risk.backtest.traffic_light", {"observations": n, "exceptions": x, "confidence": conf},
+              {"cumulative_probability": cum, "zone": zone, "plus_factor": None},
+              verified=[f"{kr253}: {how}", SCIPY + ": binom.cdf MATCH 1e-12"],
+              tags=["stage_k", "traffic_light", "outside_checked"], output_classes=oc,
+              limit={"absolute": 1e-15, "relative": 1e-12},
+              description=f"KR-253: {n:,} observations, {x:,} exceptions at {conf}: the stage J binomial at large n "
+                          "(the lgamma form drifted past 1e-10 here)")
     s.write()
     return s
 

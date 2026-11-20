@@ -9,6 +9,7 @@
 
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/finite.hpp"
+#include "quantforge/core/frtb_backtest.hpp"
 #include "quantforge/core/rng.hpp"
 #include "quantforge/core/stats.hpp"
 
@@ -180,17 +181,8 @@ Christoffersen backtest_christoffersen(const std::vector<bool>& exceptions, doub
 TrafficLight backtest_traffic_light(long long observations, long long exceptions, double confidence) {
     check_confidence(confidence);
     check_counts(observations, exceptions);
-    const double p = 1.0 - confidence;
-    const double nd = double(observations);
-    // The pmf by its ratio recursion in logs, so that (1 - p)^n cannot underflow.
-    double log_pmf = nd * std::log1p(-p);
-    const double log_odds = std::log(p) - std::log1p(-p);
-    double cdf = std::exp(log_pmf);
-    for (long long k = 0; k < exceptions; ++k) {
-        log_pmf += std::log((nd - double(k)) / double(k + 1)) + log_odds;
-        cdf += std::exp(log_pmf);
-    }
-    cdf = std::min(cdf, 1.0);
+    // KR-253: the KR-237 arithmetic-only binomial; p stays 1 - confidence as stage J computes it.
+    const double cdf = binomial_cdf(observations, exceptions, 1.0 - confidence);
     const TrafficZone zone = cdf < 0.95 ? TrafficZone::Green : cdf < 0.9999 ? TrafficZone::Yellow : TrafficZone::Red;
     std::optional<double> plus;
     if (observations == 250 && confidence == 0.99) {

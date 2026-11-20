@@ -64,6 +64,8 @@ p-values: chi-square with 1, 1 and 2 degrees of freedom. Ruling F-32 applies to 
 
 Inputs: `observations` (`>= 1`; above 1,000,000 is `E_LIMIT`, checked first, ruling J-W3-17), `exceptions` (`0 <= x <= n`, else `E_DOMAIN`), `confidence`. `cumulative_probability = P(X <= x)`, `X ~ Binomial(n, 1 - c)`. Zone: `GREEN` below 0.95, `YELLOW` below 0.9999, else `RED` [S8]. At `n = 250` and `c = 0.99` this gives green for 0 to 4 exceptions, yellow for 5 to 9, red from 10, as Table 2 of [S8]; `plus_factor` is that table's value (0 for 0 to 4; 0.40, 0.50, 0.65, 0.75, 0.85 for 5 to 9; 1.00 from 10). Vintage (R6-28.1): this is the 1996 plus factor on the multiplier base 3; the FRTB backtesting table (multiplier base 1.5, plus factors 0.20 to 0.50) is a different test and is not implemented. For any other `n` or `c`, `plus_factor` is `null`.
 
+**Arithmetic from 2026-11-20 (KR-253; audit A KA-A16).** `P(X <= x)` is computed with `p = 1 - c` (binary64, so 0.99 gives 0.010000000000000009) by the arithmetic-only binomial of KR-237 (`frtb-ima-backtest.md`), the same function in all four builds. The earlier sum of log-gamma terms drifted as `n` grew (relative error past 1e-10 near n = 100,000; measured by `python/tests/test_traffic_light_binomial.py` against exact rationals); the new form stays within 1e-12 of exact rationals at n up to 1,000,000 (goldens `tlk_k-0012` to `-0015`, tolerance fixed in the golden before the run).
+
 ## Convergence and limit cases
 
 | Method | Asserted order | Measured on | Limit case | Reference |
