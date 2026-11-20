@@ -37,5 +37,5 @@ Shared file `datasets/scenarios/k5a_intraday_moves.json` (the K-5a acceptance bo
 
 - Python (`test_live_snapshot.py::test_k5a_1000_moves_shared_file`): 0 violations, worst error over bound 0.0104814.
 - Java (`LiveSnapshotTest.k5a1000MovesSharedFile`): 0 violations, worst error over bound 0.0104814.
-- Rust (`tests/k5a_moves.rs`, WSL, toolchain 1.99.1): 0 violations, worst error over bound 0.010481 (printed to 6 decimals). Its first clippy run failed on `neg_cmp_op_on_partial_ord`; fixed (a NaN still counts as a violation), clippy rerun pending.
-- C++ (`qf_snapshot_race moves`, ctest `qf_k5a_moves`): written, **not yet run**. The first run failed to compile on my own broken string literal (fixed); the rerun is queued behind the shared WSL lock, held by other lanes' mutation runs.
+- Rust (`tests/k5a_moves.rs`, WSL, toolchain 1.99.1): 0 violations, worst error over bound 0.010481 (printed to 6 decimals). Its first clippy run failed on `neg_cmp_op_on_partial_ord`; fixed (a NaN still counts as a violation), clippy clean on the rerun.
+- C++ (`qf_snapshot_race moves`, ctest `qf_k5a_moves`, ThreadSanitizer build, clang 21): 0 violations, worst error over bound 0.0104814. The first run failed to compile on a broken string literal (fixed before the run that counts).
