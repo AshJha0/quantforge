@@ -1,0 +1,49 @@
+{
+ "cases": {
+  "tlk_k-0012": {
+   "cumulative_probability": 0.9448722135510369,
+   "zone": "GREEN",
+   "plus_factor": null
+  },
+  "tlk_k-0013": {
+   "cumulative_probability": 0.9786033201901807,
+   "zone": "YELLOW",
+   "plus_factor": null
+  },
+  "tlk_k-0014": {
+   "cumulative_probability": 0.9505763522838253,
+   "zone": "YELLOW",
+   "plus_factor": null
+  },
+  "tlk_k-0015": {
+   "cumulative_probability": 0.022212510364731913,
+   "zone": "GREEN",
+   "plus_factor": null
+  },
+  "tlk_k-0016": {
+   "cumulative_probability": 0.95,
+   "zone": "YELLOW",
+   "plus_factor": null
+  },
+  "tlk_k-0017": {
+   "cumulative_probability": 0.99,
+   "zone": "YELLOW",
+   "plus_factor": null
+  },
+  "tlk_k-0018": {
+   "cumulative_probability": 0.9999,
+   "zone": "RED",
+   "plus_factor": null
+  },
+  "tlk_k-0019": {
+   "cumulative_probability": 0.9588168159301514,
+   "zone": "YELLOW",
+   "plus_factor": 0.4
+  },
+  "tlk_k-0020": {
+   "cumulative_probability": 0.08105851616218128,
+   "zone": "GREEN",
+   "plus_factor": 0
+  }
+ }
+}
