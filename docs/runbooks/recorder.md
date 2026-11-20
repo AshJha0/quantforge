@@ -37,7 +37,11 @@ Worked example (read from ROADMAP, R2 table, "Carried from R1"): an ECB gap on 2
 
 ## The local backup
 
-The Windows task "QuantForge Recorder" writes its own log on the owner's laptop; `tools/recorder/gap_monitor.py reconcile` compares the two logs (`docs/developer-guides/recorder-actions.md`, "Reconciling the two"). The crypto order-book recorder (`tools/recorder/crypto_l2.py`, used for H-9) is separate and runs locally only; its sessions on 2026-11-19 were cut short by network drops, the longest 3 h 20 min, so H-9 R2 has not run.
+The Windows task "QuantForge Recorder" writes its own log on the owner's laptop; `tools/recorder/gap_monitor.py reconcile` compares the two logs (`docs/developer-guides/recorder-actions.md`, "Reconciling the two"). The crypto order-book recorder (`tools/recorder/crypto_l2.py`, used for H-9) is separate and ran locally only.
+
+## The crypto order-book recorder: stopped (2026-11-20)
+
+**Not running.** The owner ended the H-9 R2 attempt on 2026-11-20 and the crypto recorder is stopped. All 30 of its sessions on 2026-11-19 and 2026-11-20 ended before hour 6 (websocket keepalive ping timeouts; whole-connection stalls of 50 to 107 s seen before drops; cause not established), so no R2 window exists (read from the recorder log and `benchmarks/h9/r2_status.py`; `benchmarks/results/h9/README.md`). The procedure in `benchmarks/h9/README_R2.md` (status check at each start, raw cleanup, window build) is kept as a record of how the attempt was run; do not restart the recorder for R2 without a new owner decision. The public-data recorder above is unaffected.
 
 ## Limits
 

@@ -135,6 +135,7 @@ MERMAID = """<script src="https://cdn.jsdelivr.net/npm/mermaid@12.3.0/dist/merma
 document.querySelectorAll("pre > code.language-mermaid").forEach(function (code) {
   var box = document.createElement("div");
   box.className = "mermaid";
+  box.tabIndex = 0;  // a wide diagram scrolls sideways: keyboard users reach it (KR-227)
   box.textContent = code.textContent;
   code.parentElement.replaceWith(box);
 });
@@ -183,6 +184,44 @@ def title_of(text, fallback):
     return m.group(1).strip() if m else fallback
 
 
+def a11y_fix(body, title):
+    """WCAG fixes applied to every rendered page (KR-227, tools/check_site_a11y.py --static finds what these fix):
+    - <pre> can scroll sideways, so it takes keyboard focus (tabindex="0"; axe scrollable-region-focusable);
+    - an empty header cell in an otherwise named header row (the corner of a two-way table) becomes <td>; a header
+      row with no text at all is dropped and each body row's first cell becomes its row header (axe
+      empty-table-header, th-has-data-cells);
+    - a page with no <h1> gets one from its title, and a heading never skips a level below the one before it
+      (an h4 straight after an h2 is written as h3; axe page-has-heading-one, heading-order). Ids are kept.
+    Worked example: `| | A | B |` renders `<th></th><th>A</th><th>B</th>`, written `<td></td><th>A</th><th>B</th>`."""
+    body = body.replace("<pre>", '<pre tabindex="0">')
+
+    def head(m):
+        cells = re.findall(r"<th[^>]*>(.*?)</th>", m.group(1), re.S)
+        if cells and not any(c.strip() for c in cells):
+            return "\x00DROP\x00"
+        return m.group(0).replace("<th></th>", "<td></td>")
+    body = re.sub(r"<thead>(.*?)</thead>", head, body, flags=re.S)
+
+    def rows(m):
+        t = m.group(0).replace("\x00DROP\x00", "")
+        return re.sub(r"<tr>\s*<td>(.*?)</td>", r'<tr>\n<th scope="row">\1</th>', t, flags=re.S)
+    body = re.sub(r"<table>\s*\x00DROP\x00.*?</table>", rows, body, flags=re.S)
+    if not re.search(r"<h1[\s>]", body):
+        body = f"<h1>{html.escape(title)}</h1>\n" + body
+    prev = [0]
+
+    def level(m):
+        close, lvl, rest = m.group(1), int(m.group(2)), m.group(3)
+        if close:
+            return f"</h{level.stack.pop()}>" if level.stack else m.group(0)
+        new = min(lvl, prev[0] + 1) if prev[0] else lvl
+        prev[0] = new
+        level.stack.append(new)
+        return f"<h{new}{rest}"
+    level.stack = []
+    return re.sub(r"<(/?)h([1-6])((?:\s[^>]*)?>)", level, body)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(ROOT / "site"))
@@ -197,6 +236,7 @@ def main():
         text = (ROOT / page).read_text(encoding="utf-8")
         title = title_of(text, page)
         body = markdown.markdown(fix_links(text, page, known, broken), extensions=["tables", "fenced_code", "toc"])
+        body = a11y_fix(body, title)
         if "language-mermaid" in body:
             body += MERMAID
         target = out / (page[:-3] + ".html")
