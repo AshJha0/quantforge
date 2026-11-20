@@ -38,7 +38,7 @@
     ],
     [
       "No outside check",
-      "{{stage_h_unchecked}}; the stage J curves-lane and hedge-fix value cases; the stage K value cases not counted in oracle/OUTSIDE_SHARES.md (under audit finding KA-C18); DSR, PSR, PBO and the Z2 backtest (hand cases and printed examples only); every error case. Validation is self-assessment, with no second review (owner decision 2026-11-18)."
+      "{{stage_h_unchecked}}; the stage J curves-lane and hedge-fix value cases; the stage K value cases not counted in oracle/OUTSIDE_SHARES.md (ruling KR-250); DSR, PSR, PBO and the Z2 backtest (hand cases and printed examples only); every error case. Validation is self-assessment, with no second review (owner decision 2026-11-18)."
     ]
   ]
 }

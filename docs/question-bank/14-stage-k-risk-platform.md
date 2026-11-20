@@ -190,7 +190,7 @@ The pitfall is reading the expected value as an outside check: it was filled by 
 
 *Level: advanced. Evidence: measured by the k-w1 lane. Source: `oracle/OUTSIDE_SHARES.md` stage K section, `program/STAGE_K_BLIND_W1.md`*
 
-The first blind lane checked the four single-position bounds only to six decimals (the goldens were later filled to full precision), and the fifth case was not in its packet, so at first 0 of 5 value cases counted. A second, clean blind packet re-derived all five at 1e-9 relative: 5 of 5 MATCH, so the item now stands at 5 of 5 (`program/STAGE_K_BLIND_K5A.md`, `oracle/OUTSIDE_SHARES.md`). That shows the spec is unambiguous and the arithmetic right; it does not check the bound's derivation.
+The first blind lane checked the four single-position bounds only to six decimals (the goldens were later filled to full precision), and the fifth case was not in its packet, so at first 0 of 5 value cases counted. A second, clean blind packet re-derived all five at 1e-9 relative: 5 of 5 MATCH, so the item then stood at 5 of 5 (`program/STAGE_K_BLIND_K5A.md`). Ruling KR-234 later changed the bound; the version 2 packet matched 9 of 11, so the item now stands at 9 of 12 (`program/STAGE_K_BLIND_K5A_V2.md`, `oracle/OUTSIDE_SHARES.md`). That shows the spec is unambiguous and the arithmetic right; it does not check the bound's derivation.
 
 **Worked example.** What was measured: 1,000 seeded moves on a 50-position book, zero violations of `|estimate - full revaluation| <= bound` in Python (worst ratio 0.0105) and Java (0.382), rechecked at 50 digits with zero violations and rounding at most 2.3e-8 of the bound (`oracle/IDR_K_MOVES_CHECK_W1.json`). That recheck is our own oracle, not an outside check.
 
