@@ -82,4 +82,71 @@ DR-H2 allows the blind lane the cited source documents for meaning. This packet 
 
 Not counted: rrao_k-0003 (its answer is stated by the rules text). Fields that are table lookups or follow directly from a ruling (m_c of cap_k-0001 and cap_k-0002; hbr and drc of drc_k-0008) matched but those cases count on their other fields only. Table-lookup value cases stay excluded (KR-68), which is why K-8f is 27 of 33.
 
+**Correction, 2026-11-19 (packet builder of the second blind lane, Claude Opus 5.5).** The K-8f figure "27 of 33 (82%)" in the table above is corrected 2026-11-19: it counted SciPy-only cases, which D6 does not count; **K-8f is 19 of 33 (58%) until the blind lane below reports.** The old line is kept as written. Rule: the D6 precedent applied to K-8e at integration (commit `2cef4f98` on `k-r1`, `tools/outside_shares.py`; `program/STAGE_K_BLIND_BTK.md` on `k-btk-blind`): a library primitive computing the same quantity is a reimplementation, not an outside check. Case list verified from the `verified_by` and `tags` fields of `datasets/golden/stage_k/ima_k.json` (sha256 `ca5bb2ed4affc74d248865a8299e9047ec1dad15acf71ed425ee4a1f958fc24d`, branch `k-w2-py-a` at `54ee228a`; evidence class read): 4 printed (pla_k-0007, 0008 MAR32.42; lh_k-0001, 0002 MAR33.12 FAQ4, FAQ5), 15 blind matches above, 6 table lookups (rfet_k-0005 to 0008, lh_k-0003, 0004; KR-68, not counted), and 8 whose only outside check is SciPy: pla_k-0001 to 0006 (`spearmanr`, `ks_2samp`, `kstwobign.sf`) and es_k-0001, 0002 (`integrate.quad` of the normal tail). 4 + 15 = 19 of 33. The handover's alternative of counting the two `quad` cases as D6 `library-primitive` (21 of 33) is not taken here; both go to the second blind lane, so the question no longer decides the gate. Corrected in the same commit: `STAGE_K_W2_GATE.md` (K-8f row), `specifications/06-risk/frtb-ima.md` (golden-table summary and A4), `STAGE_K_W2A_HANDOVER.md`.
+
 What this does and does not show. Every hand case was reproduced from the rules text and inputs alone by a second model, so the specs are unambiguous enough to implement and the expected values are not one author's arithmetic slip. It does not show that the rules text reads the Basel paragraphs correctly: the deriver did not see the Basel text (the packet left it out), so a misreading shared by the spec would pass. The seven ambiguities the deriver recorded (`stage_k_blind/w2/notes.md`: maturity weight on CTP and securitisation positions, CTP HBR on unweighted net amounts, empty ES lists for horizons 2 to 5, the RFET window convention, the 0.9 name correlation by legal group, `floored` per bucket, seniority offsetting direction) all resolved to the spec's reading; each should be tightened in the spec text before the specs are confirmed. Verdict under the gate rule: all four items can meet 60%, subject to the four-language builds reproducing the same goldens.
+
+## Second blind lane (SciPy-only cases)
+
+Written 2026-11-19 by the packet builder (Claude Opus 5.5, branch `k-w2-py-a`), who is not the deriver and ran no derivation beyond the recheck below. Status: **packet built, blind lane not yet run.** Why: the correction above leaves K-8f at 19 of 33 (58%), one case under the 60% floor. The eight value cases of `ima_k` whose only outside check was SciPy get the DR-H2 treatment the other fifteen had. Evidence class of everything in this section: measured, 2026-11-19, local laptop, not the acceptance machine.
+
+**Plain idea.** A second model that never sees our numbers reads only the PLA and ES rules, implements Spearman's rank correlation, the two-sample KS statistic, its asymptotic p-value and the normal ES from the definitions in standard-library Python (no SciPy, no NumPy, no `statistics` module), freezes its answers by hash, and a script fixed now compares them with the goldens.
+
+| File | Role | Side |
+|---|---|---|
+| `program/stage_h_blind_w2/ima2_make_packet.py` | writes the packet; inputs written out (`CASES`, the 250-day series generated from the spec's integer formulas); never reads the expected file or the golden | builds the packet |
+| `program/stage_h_blind_w2/ima2_expected.json` | expected outputs copied from `datasets/golden/stage_k/ima_k.json` (sha256 `ca5bb2ed...fc24d`); omitted, with reasons: `n`, `regulatory_window`, `label`, `mode` (input length, a rule on it, a fixed string, the input mode) | hidden |
+| `program/stage_h_blind_w2/ima2_compare.py` | compare, with `--self-test` | hidden |
+| `program/stage_h_blind_w2/ima2_leaks.py` | leak check (model `btk_leaks.py`) | hidden |
+| `program/stage_h_blind_w2/ima2_recheck.py` | builder's recheck from the inputs, standard library only | hidden |
+
+Packet: `C:/Work/Claude/qf-blind/ima2_packet/` (outside every worktree; not committed). Six files: `README.md` (read nothing outside the packet and the deriver's own folder `C:/Work/Claude/qf-blind/ima2_blind/`; standard library only; output, notes and freeze-by-hash rules), `specs/frtb-ima.blind.md`, `rulings/stage-k-rulings-w2.blind.md`, `inputs/ima2.inputs.json`, `output_template.json`, `MANIFEST.sha256`.
+
+**Packet MANIFEST.sha256 file hash: `3de017bf0820e349d4b9d13886b7165fa85d88fef676433fce489296d56f49b9`.** Built from commit `629234a1` with `python -I program/stage_h_blind_w2/ima2_make_packet.py . C:/Work/Claude/qf-blind/ima2_packet`; a rebuild into a scratch folder gave the same hash, and `sha256sum -c MANIFEST.sha256` passes in the packet. Before handing it over, the coordinator checks that `sha256sum MANIFEST.sha256` still gives this value.
+
+What was stripped. From `frtb-ima.md`: everything except the title, plain idea, Sources (the SciPy row cut), the formal statement of `risk.frtb.pla` and `risk.frtb.ima.es_lh`, Errors and Limits; inside those, the `risk.frtb.pla.ks_pvalue` paragraph (it names the KS values of the printed p-values, one of which is pla_k-0003's), the es_k-0005 parenthetical, and the builder's measurement sentence on the two Q_KS forms. From the rulings only KR-56, KR-57, KR-67 and KR-117 are kept; cut inside them: the KR-56 clause quoting the MAR32.42 p-values with our values (0.0546 is pla_k-0003's p-value), **the KR-57 normal ES factor, which is es_k-0001's answer and would have made es_k-0001 and es_k-0002 not blind**, the KR-117 SciPy sentence and an error-case id.
+
+### Spec defects found and fixed (in `629234a1`, before the packet)
+
+1. **Normal ES formula only in a ruling.** The spec's `es_lh` text named a `sigma` mode but gave no formula; KR-57 had it. Fixed: the spec now states `ES_j = sigma_j phi(z) / (1 - 0.975)`, `z = Phi^-1(0.975)`, mean 0, losses positive, `sigma_j = 0` gives 0.
+2. **Q_KS not defined at x = 0 in the spec text.** The spec gave only the alternating series, which does not converge at 0; the theta form and the switch at x = 1 were only in KR-117. Fixed: the spec now states the KR-117 evaluation and the KR-67 tolerance for it. Measured (packet builder, standard-library Python against a 60-digit `decimal` reference, x = 0.01 to 7.99): either form alone stays within `max(1e-12 |Q|, 1e-15)` for x > 0 (worst: theta form 0.78 of the tolerance near x = 5.8, under the absolute floor; alternating series 0.001 at x = 0.01). So the p-value was already reproducible to tolerance from the earlier text at every x > 0, including all six cases here; the defect is the undefined point and the missing tolerance statement, not a value. No expected value changed.
+
+Not a defect, stated so nobody is surprised: the KS p-value is the asymptotic Kolmogorov tail `Q_KS(ks sqrt(n/2))`, which the spec fixes exactly; it is not SciPy's default exact two-sample p-value, and the packet does not mention SciPy's method.
+
+### Fixed now, before any blind result exists
+
+- **Compare script and tolerances: commit `629234a1`** (`ima2_compare.py`). Tolerance from KR-67, `frtb-ima.md` A1 and the golden `tolerance_limit` (relative 1e-12, absolute 1e-15), in the form `k2_compare.py` used for the same specs: reals `|b - e| <= max(1e-12 |e|, 1e-15)` (spearman, ks, ks_pvalue_asymptotic, es, each `es_by_horizon` element); `ks_count` by integer value, `zone` exactly; a boolean never equals a number. Representation rules R1, R2, R4 as `btk_compare.py`. pla_k-0004's p-value is 1.88e-17, so the absolute floor accepts any value within 1e-15 there; that case still counts on its other four fields.
+- **Self-test 18/18 PASS** (`python -I program/stage_h_blind_w2/ima2_compare.py . --self-test`): packet inputs equal the golden inputs; expected equals the golden minus the four omitted fields; the 8 cases are exactly the `ima_k` value cases with no printed figure, no blind match and no table lookup (computed from the golden's tags and `verified_by`); skeleton paths equal expected paths; exact values MATCH; 1e-14 noise MATCH; 1e-9 perturbation MISMATCH everywhere; wrong zone, wrong count, a p-value 2e-15 off, a short list, es 2e-12 off, True for a count each MISMATCH; 1e-16 for 0 and 0 for the 1.9e-17 p-value MATCH; 30.0 and a decimal string MATCH; wrapper, bare map and case list MATCH; extra level SHAPE; two wrappers and the empty skeleton never MATCH; absent case or field MISSING.
+- **Leak check: 0 hard leaks** (`python -I program/stage_h_blind_w2/ima2_leaks.py . C:/Work/Claude/qf-blind/ima2_packet > C:/Work/Claude/qf-blind/ima2_LEAKS.tsv`, exit 0; list file sha256 `e60eed62521f68713563fd8678d34a4d70b6e1779411142c327c052bc1cd3734`, outside the packet). Searched: every expected number not equal to an input of its own case, as printed and rounded to 2, 4, 6 decimals (at least three significant digits), KS values and p-values also as percents, `es_by_horizon` element by element, the normal quantile 1.95996 at 4 and 6 decimals, and any `pla_k`, `es_k`, `ima_k` or `pla_ke` id outside the inputs and template. Hits: 8 INPUT, 2 LOWINFO (the `9` of the green threshold `100 d < 9 n` in the spec and KR-56, equal to pla_k-0002's `ks_count`). Not searchable: zones (an enumeration the schema states).
+- **Builder recheck** (`python -I program/stage_h_blind_w2/ima2_recheck.py .`): all 8 cases reproduce from the stripped rules within tolerance (worst 0.00057 of the tolerance, from the bisected normal quantile); every zone and count equal. Our own computation; counts as no outside check.
+
+### Eligibility and what is needed
+
+| Case | Operation | Fields compared | Eligible |
+|---|---|---|---|
+| pla_k-0001 to 0006 | `risk.frtb.pla` | spearman, ks, ks_count, zone, ks_pvalue_asymptotic | yes (6) |
+| es_k-0001, es_k-0002 | `risk.frtb.ima.es_lh`, `sigma` mode | es_by_horizon, es | yes (2) |
+
+**Eligible 8 of 8. Cases that cannot count: none** (`NOT_COUNTED` is empty: with the KR-57 factor cut, no rules text in the packet states an answer). The table-lookup cases (rfet_k-0005 to 0008, lh_k-0003, 0004) stay outside, KR-68.
+
+**Matches needed for 60%: 1** (19 + 1 = 20 of 33 = 61%). If all 8 match: 27 of 33 (82%).
+
+Procedure: as for the first lane (steps 1 to 5 above), with the packet `C:/Work/Claude/qf-blind/ima2_packet/`, the deriver's folder `C:/Work/Claude/qf-blind/ima2_blind/`, the frozen results committed under `stage_k_blind/ima2/` before the compare, and `python -I program/stage_h_blind_w2/ima2_compare.py . <frozen blind_results.json> > stage_k_blind/ima2/compare_output.txt`, one run. The deriver must be a different model from this builder and from the spec and lane A authors (all Claude Opus 5.5).
+
+### Results (second lane)
+
+Not run. (Date, deriver and model, packet manifest check, frozen hash and commit, notes and any rulings, compare output path, MATCH / MISMATCH / MISSING per case, counted, K-8f share: to be filled by the coordinator.)
+
+### Second blind lane: results (2026-11-19; first and only compare run)
+
+- Deriver: a separate subagent on Claude Sonnet 5.5, given only the packet folder and its own folder; standard library only (no SciPy, numpy or mpmath), statistics implemented from their definitions. Its own statement: read and tried to read nothing outside the two folders (not independently logged). Coordinator checked the packet manifest hash 3de017bf... before the hand-over.
+- Blind results as received: `stage_k_blind/ima2/`, committed in fa6d42d0 before the compare. SHA-256 of `blind_results.json`: `5b10910fa72eb77e69c0337f325bd0814a4c232ae05ce72e02106b73797a7df5`, recomputed by the coordinator, equal to the deriver's hash file.
+- Compare: `ima2_compare.py` as fixed at 629234a1 (tolerance max(1e-12|e|, 1e-15)); output `stage_k_blind/ima2/compare_output.txt`. No rerun; results unchanged.
+
+| Lane | Cases | MATCH | MISMATCH | Eligible | Counted | K-8f outside share after it |
+|---|---:|---:|---:|---:|---:|---|
+| Second (SciPy-only cases) | 8 | 8 | 0 | 8 | 8 | 27 of 33 (81.8%): 4 printed, 23 blind |
+
+Largest difference seen: the normal ES factor, 2.3378027922014146 (golden) against 2.337802792201402 (blind), relative 5.4e-15, inside the tolerance; it comes from how 1 - 0.975 and the tail are evaluated in binary64. Deriver's recorded readings (`stage_k_blind/ima2/notes.md`): Spearman last-ulp rounding depends on integer or float product under the square root; pla_k-0001 is RED from the KS rule at n = 5 despite a rank correlation of 0.9, applied literally; the Q_KS series summed plainly; pla_k-0005 gives exactly 1.0. The spec should state the Spearman evaluation order or accept the tolerance explicitly.
+
+Correction also applying to K-8g (2026-11-19): its "16 of 16" above counted two discount-factor cases checked only by SciPy quad (df_k-0001, df_k-0002). Under D6 those do not count: K-8g is 14 of 16 (87.5%).
