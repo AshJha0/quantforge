@@ -33,6 +33,8 @@ jobs:
           [[ "$TAG" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]] || { echo "::error::tag $TAG is not vMAJOR.MINOR.PATCH"; exit 1; }
           version="${BASH_REMATCH[1]}"
           grep -Eq "^## ${version//./\\.}([: ]|$)" CHANGELOG.md || { echo "::error::CHANGELOG.md has no '## ${version}' section"; exit 1; }
+          # The four builds, their lock files and the site facts must all say the tag's version (K-7 release runbook)
+          python3 tools/check_versions.py --expect "$version" || { echo "::error::a build's version is not $version"; exit 1; }
           echo "version=$version" >> "$GITHUB_OUTPUT"
           # The section's text, up to the next "## " heading, becomes the release notes
           awk -v h="## $version" '/^## / { if (on) exit; c = substr($0, length(h) + 1, 1); if (index($0, h) == 1 && (c == "" || c == ":" || c == " ")) on = 1 } on' CHANGELOG.md > notes.md
