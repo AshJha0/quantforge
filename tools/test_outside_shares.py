@@ -43,14 +43,24 @@ def main():
     S.build(p)
     check("committed tree: no problems other than the floor", not nonfloor(p))
     check("committed OUTSIDE_SHARES.md matches a fresh run", (S.ORACLE / "OUTSIDE_SHARES.md").read_text(encoding="utf-8") == S.markdown(S.build([])))
+    # The 28 printed-figure cases now count through the blind pub packet (STAGE_K_BLIND_PUB.md, 28 of 28), so the
+    # KR-250 rule is tested on a planted printed-only case in a temporary golden tree (fixed 2026-11-20).
     k = S.load_stage_k()
-    printed_only = [c for c in ("btk_k-0001", "tlk_k-0001", "saccr_k-0001")]
-    check("printed regulator figure alone is not counted (KR-250)", not any(c in k for c in printed_only))
-    S.COUNT_PRINTED = True
-    try:
-        check("--count-printed reading does see the printed cases (the switch is live)", all(c in S.load_stage_k() for c in printed_only))
-    finally:
-        S.COUNT_PRINTED = False
+    check("blind-matched printed cases count as re-derivation, not as printed figures (KR-250)",
+          all(k.get(c, (None, None))[1] == S.H_REDERIVE_SRC for c in ("btk_k-0001", "tlk_k-0001", "saccr_k-0001")))
+    keep_golden = S.GOLDEN
+    with tempfile.TemporaryDirectory() as d:
+        (Path(d) / "stage_k").mkdir()
+        (Path(d) / "stage_k" / "pp_k.json").write_text(json.dumps({"cases": [{"case_id": "pp_k-0001", "verified_by": [
+            "mpmath 50 digits", "published: MAR99 Table 2 row 0: 8.11%, GREEN: MATCH"]}]}), encoding="utf-8")
+        S.GOLDEN = Path(d)
+        try:
+            check("printed regulator figure alone is not counted (KR-250)", "pp_k-0001" not in S.load_stage_k())
+            S.COUNT_PRINTED = True
+            check("--count-printed reading does see the printed case (the switch is live)", "pp_k-0001" in S.load_stage_k())
+        finally:
+            S.COUNT_PRINTED = False
+            S.GOLDEN = keep_golden
     real_golden, real_oracle = S.GOLDEN, S.ORACLE
     with tempfile.TemporaryDirectory() as d:
         tmp = Path(d)
