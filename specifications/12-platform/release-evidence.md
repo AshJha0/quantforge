@@ -40,3 +40,19 @@ The CHANGELOG entry for v1.0.0 says "delivered" for an item only with its eviden
 
 - `gh attestation verify` shows the asset was built by the workflow at that commit, not that the code is correct.
 - The site check is automated layout and contrast checking, not a usability study.
+
+## Build state on branch `k-v1-k7` (2026-11-20)
+
+What exists now, what has run, and what has not. Evidence class in brackets.
+
+| ID | Built | Run so far | Not done |
+|---|---|---|---|
+| RE1 | `tools/check_examples.py` (every `examples/*.json` and `batch.jsonl` case through `quantforge batch`, every example script no tutorial page runs, `UNLISTED` tutorial pages); a step in each `tutorial.yml` job; `clean-machine.yml` for the Python build on Windows and macOS | Python CLI on the owner's Windows laptop: 80 cases and 1 script as expected, 7.9 s (measured, local laptop); planted faults fail (`--self-test`) | no CI run yet; Rust, Java and C++ on Windows and macOS not run by this check (KR-222 note); `benchmarks/results/k7/clean-machine.json` not written: the run log is the evidence until a run writes it |
+| RE2 | `tools/release_verify.py` and the `release-verify` job; `SHA256SUMS` now written before the attest step and attested; `tools/check_versions.py --expect` in `release-changelog` | `--self-test` with a stub verifier (measured); v0.10.0 read via the API: 6 of 7 assets attested, `SHA256SUMS` not (`benchmarks/results/k7/v0.10.0-attestations-2026-11-20.json`, read) | the job runs only on a tag push: never run |
+| RE3 | `docs/runbooks/` (5 runbooks and an index); `tools/check_runbooks.py` | passes; planted faults fail (measured) | the anchor-failure runbook is part of `daily-jobs.md`, not its own page |
+| RE4 | `tools/check_known_issues.py`; register rows added for every recorded miss and point-release move found | passes; planted faults fail (measured) | |
+| RE5 | `tools/validation/model_reports.py`: 120 reports under `docs/validation/models/` | `--check` passes; planted faults fail (measured) | the inventory's "Validation report" lines still name specs; the reports link back to them |
+| RE6 | `docs/results.md` from `tools/results_page.py` and `tools/results_verdicts.json` | `--check` passes; planted faults fail (measured) | |
+| RE7 | `tools/check_ruleset.py` | ruleset read 2026-11-20: strict off, so the check fails (read; `benchmarks/results/k7/ruleset-2026-11-20.json`) | owner setting; the behind-main PR test is the coordinator's |
+| RE8 | nothing | | waits for the owner's accounts (KR-226) |
+| RE9 | nothing | | no headless-browser check yet (KR-227) |
