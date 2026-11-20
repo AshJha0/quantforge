@@ -237,7 +237,7 @@ fn ba_errors_in_order() {
     assert_eq!(code(cva::ba_cva(&dup, "REDUCED", &[], &[])), "E_INPUT");
     let h = hedge("C1", "DIRECT", 1.0, 1.0);
     assert_eq!(
-        code(cva::ba_cva(&ok, "REDUCED", &[h.clone()], &[])),
+        code(cva::ba_cva(&ok, "REDUCED", std::slice::from_ref(&h), &[])),
         "E_INPUT"
     );
     let ih = index_hedge(1.0, 1.0, &[1.0]);
@@ -493,7 +493,7 @@ fn sa_floored_flag() {
     // below 0; a hedge-free case is never floored. An empty book has no capital.
     let r = sa(vec![]).expect("sa");
     assert_eq!(r.total, 0.0);
-    assert!(r.classes.is_empty());
+    assert_eq!(r.classes.len(), 0);
     let r = sa(vec![("FX.DELTA", vec![s("EUR", "EUR", -1e5, 0.0)])]).expect("sa");
     let b = &r.classes[0].1.buckets[0];
     assert!(!b.floored);

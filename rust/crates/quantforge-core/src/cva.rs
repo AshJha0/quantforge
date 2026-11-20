@@ -100,7 +100,7 @@ fn mar50() -> &'static Table {
     T.get_or_init(|| Table::parse(MAR50_TEXT))
 }
 
-/// Python's built-in `sum` of floats (CPython 3.12 and later): Neumaier compensated, the
+/// Python's built-in `sum` of floats (`CPython` 3.12 and later): Neumaier compensated, the
 /// compensation added once at the end when it is finite and nonzero.
 pub fn py_sum(v: impl IntoIterator<Item = f64>) -> f64 {
     let (mut s, mut c) = (0.0_f64, 0.0_f64);
