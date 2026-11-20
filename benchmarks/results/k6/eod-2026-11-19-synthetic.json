@@ -1,5 +1,5 @@
 {
- "commit": "105f7f9673878d492f547c65f3c4d9c891546a27",
+ "commit": "1ce167bf02dbd134d0001a4fd035f1061d378231",
  "data_label": "synthetic recorded day: invented values, no market data",
  "date": "2026-11-19",
  "deviations": "see the module docstring of tools/eod/rehearse.py, list 'Deviations from the proposed spec'",
@@ -17,11 +17,11 @@
  },
  "log_ref": "",
  "outputs_sha256": {
-  "tmp/curve-daily/ledger/curves.jsonl": "043d8704f09ab20ab0950b67852661d03996ab3c5a3102039cb2fef68dc500e7",
-  "tmp/curve-daily/ledger/summary.json": "cffcbeae6069dd6c0dc7cbcc75ece7c21d48284a934f606f679fe69e9cf6a020",
-  "tmp/paper-ledger/ledger/ledger.jsonl": "5a3fbd7c5dfad21600b5b9ef01ccddb4bb41fdda3eca692f41970904e3805089",
-  "tmp/site/dashboard/curve.html": "74e7e20fe6a36740a7f730dbb78845c798934873fd3215291599e8cc1d0f0463",
-  "tmp/site/dashboard/paper.html": "916b9194726897c0e243b5899d00b29e4917dca0a74deee2b947e68be54ab55c",
+  "tmp/curve-daily/ledger/curves.jsonl": "6a2561072ddd3e26df7fa99d4dc05508c84bc3073d848700bd87b5c195257a64",
+  "tmp/curve-daily/ledger/summary.json": "25725c3812313f29597319c0514e3b4ffe158271969f62af7ddcb572c10a3e8a",
+  "tmp/paper-ledger/ledger/ledger.jsonl": "b704c5b45b2f8bb7029bf96738a60dffe8b53ee7cd80ffbfdd84564bb0fba05b",
+  "tmp/site/dashboard/curve.html": "1c0906cab56dd6c2e27e02cc277fc1bae7d32323dd2a8d23a44bcb0a053ca14e",
+  "tmp/site/dashboard/paper.html": "bd34ced6f450a93a1959631c8bbd2c2d3a8e12ba2cfc673e96636529df06b842",
   "tmp/site/index.html": "62a15eaeeee7ab7b3427f84414014a158440a05531861c9c50aa6ae4845c714f"
  },
  "plant": "",
@@ -46,7 +46,7 @@
     "tenors_for_date": 5
    },
    "reason": "",
-   "seconds": 0.418,
+   "seconds": 0.075,
    "status": "pass",
    "step": "E1",
    "title": "read the day's recorded rows and verify the chain"
@@ -60,7 +60,7 @@
     "windows": 3
    },
    "reason": "",
-   "seconds": 0.002,
+   "seconds": 0.001,
    "status": "pass",
    "step": "E2",
    "title": "holdout check on the date"
@@ -68,13 +68,13 @@
   {
    "evidence": {
     "consistency": "pending",
-    "head": "de40d7ed33e8d77d2eb8e1c722f591618da540ecb407d515e2c8a09621ad7b26",
+    "head": "cabcc5b868d07287418756482528f4ca5e08f6e74fce114b5b8a4d74d1a16da9",
     "kinds": [
      "GENESIS",
      "DAY"
     ],
     "labels_ok": true,
-    "ledger_sha256": "043d8704f09ab20ab0950b67852661d03996ab3c5a3102039cb2fef68dc500e7",
+    "ledger_sha256": "6a2561072ddd3e26df7fa99d4dc05508c84bc3073d848700bd87b5c195257a64",
     "max_abs_bp": "0.5372873699983904",
     "note": "Rehearsal fit on the five tenors the recorder keeps (3 Mo, 2 Yr, 5 Yr, 10 Yr, 30 Yr), not the scheduled thirteen-tenor run.",
     "notes": 2,
@@ -82,7 +82,7 @@
     "rmse_bp": "0.3411039312545822",
     "rows_built": 2,
     "source_sha256": "b2e47dc3fe8c2bbf519882bbeb5fa6cad5ff78ba0a27267cbfb40ad894e3743c",
-    "summary_sha256": "cffcbeae6069dd6c0dc7cbcc75ece7c21d48284a934f606f679fe69e9cf6a020",
+    "summary_sha256": "25725c3812313f29597319c0514e3b4ffe158271969f62af7ddcb572c10a3e8a",
     "tau": "2.5",
     "timing": "on_time",
     "verify_ok": true,
@@ -90,7 +90,7 @@
     "within_fit_flag": "true"
    },
    "reason": "",
-   "seconds": 0.638,
+   "seconds": 0.665,
    "status": "pass",
    "step": "E3",
    "title": "daily curve run, dry run, for the date"
@@ -99,13 +99,13 @@
    "evidence": {
     "declared_on_time_days": 2,
     "explain_sums": true,
-    "head": "bd3a6358f12506cad8cb2d4b5fcee8b40a96e782feba9bfd0076a47adaca6800",
+    "head": "4ca262141d74cf038be80fb2b876a7d2cdf135d6fde46baa663061b44c31f8be",
     "kinds": [
      "GENESIS",
      "DAY",
      "DAY"
     ],
-    "ledger_sha256": "5a3fbd7c5dfad21600b5b9ef01ccddb4bb41fdda3eca692f41970904e3805089",
+    "ledger_sha256": "b704c5b45b2f8bb7029bf96738a60dffe8b53ee7cd80ffbfdd84564bb0fba05b",
     "orders": 1,
     "problems": 0,
     "runs": 2,
@@ -115,25 +115,25 @@
     "verify_reason": ""
    },
    "reason": "",
-   "seconds": 0.067,
+   "seconds": 0.058,
    "status": "pass",
    "step": "E4",
    "title": "paper ledger run, dry run, for the date"
   },
   {
    "evidence": {
-    "bound": 1.8683291990074765e-05,
-    "estimate_pnl": -855.3900864684372,
+    "bound": 1.9871913610844035e-05,
+    "estimate_pnl": -883.9098707065582,
     "key_rate_buckets": 30,
     "key_rate_cases": 2,
     "key_rate_failed": [],
     "label": "latency-aware analytics on simulated data",
     "positions": 2,
     "shift": 0.0001,
-    "zero_dv01_sum": -925.880244285916
+    "zero_dv01_sum": -957.8849360969616
    },
    "reason": "",
-   "seconds": 0.008,
+   "seconds": 0.004,
    "status": "pass",
    "step": "E5",
    "title": "intraday risk on the day's book"
@@ -151,7 +151,7 @@
     ]
    },
    "reason": "",
-   "seconds": 0.009,
+   "seconds": 0.01,
    "status": "pass",
    "step": "E6",
    "title": "render the dashboards into a temporary site"
@@ -167,7 +167,7 @@
     "wider_than_phone": []
    },
    "reason": "",
-   "seconds": 0.007,
+   "seconds": 0.008,
    "status": "pass",
    "step": "E7",
    "title": "site checks on the rendered pages"

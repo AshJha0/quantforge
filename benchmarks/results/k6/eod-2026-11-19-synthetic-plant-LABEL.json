@@ -1,5 +1,5 @@
 {
- "commit": "105f7f9673878d492f547c65f3c4d9c891546a27",
+ "commit": "1ce167bf02dbd134d0001a4fd035f1061d378231",
  "data_label": "synthetic recorded day: invented values, no market data",
  "date": "2026-11-19",
  "deviations": "see the module docstring of tools/eod/rehearse.py, list 'Deviations from the proposed spec'",
@@ -17,9 +17,9 @@
  },
  "log_ref": "",
  "outputs_sha256": {
-  "tmp/curve-daily/ledger/curves.jsonl": "043d8704f09ab20ab0950b67852661d03996ab3c5a3102039cb2fef68dc500e7",
-  "tmp/curve-daily/ledger/summary.json": "cffcbeae6069dd6c0dc7cbcc75ece7c21d48284a934f606f679fe69e9cf6a020",
-  "tmp/paper-ledger/ledger/ledger.jsonl": "5a3fbd7c5dfad21600b5b9ef01ccddb4bb41fdda3eca692f41970904e3805089"
+  "tmp/curve-daily/ledger/curves.jsonl": "6a2561072ddd3e26df7fa99d4dc05508c84bc3073d848700bd87b5c195257a64",
+  "tmp/curve-daily/ledger/summary.json": "25725c3812313f29597319c0514e3b4ffe158271969f62af7ddcb572c10a3e8a",
+  "tmp/paper-ledger/ledger/ledger.jsonl": "b704c5b45b2f8bb7029bf96738a60dffe8b53ee7cd80ffbfdd84564bb0fba05b"
  },
  "plant": "LABEL",
  "result": "fail",
@@ -43,7 +43,7 @@
     "tenors_for_date": 5
    },
    "reason": "",
-   "seconds": 0.214,
+   "seconds": 0.118,
    "status": "pass",
    "step": "E1",
    "title": "read the day's recorded rows and verify the chain"
@@ -57,7 +57,7 @@
     "windows": 3
    },
    "reason": "",
-   "seconds": 0.001,
+   "seconds": 0.002,
    "status": "pass",
    "step": "E2",
    "title": "holdout check on the date"
@@ -65,13 +65,13 @@
   {
    "evidence": {
     "consistency": "pending",
-    "head": "de40d7ed33e8d77d2eb8e1c722f591618da540ecb407d515e2c8a09621ad7b26",
+    "head": "cabcc5b868d07287418756482528f4ca5e08f6e74fce114b5b8a4d74d1a16da9",
     "kinds": [
      "GENESIS",
      "DAY"
     ],
     "labels_ok": true,
-    "ledger_sha256": "043d8704f09ab20ab0950b67852661d03996ab3c5a3102039cb2fef68dc500e7",
+    "ledger_sha256": "6a2561072ddd3e26df7fa99d4dc05508c84bc3073d848700bd87b5c195257a64",
     "max_abs_bp": "0.5372873699983904",
     "note": "Rehearsal fit on the five tenors the recorder keeps (3 Mo, 2 Yr, 5 Yr, 10 Yr, 30 Yr), not the scheduled thirteen-tenor run.",
     "notes": 2,
@@ -79,7 +79,7 @@
     "rmse_bp": "0.3411039312545822",
     "rows_built": 2,
     "source_sha256": "b2e47dc3fe8c2bbf519882bbeb5fa6cad5ff78ba0a27267cbfb40ad894e3743c",
-    "summary_sha256": "cffcbeae6069dd6c0dc7cbcc75ece7c21d48284a934f606f679fe69e9cf6a020",
+    "summary_sha256": "25725c3812313f29597319c0514e3b4ffe158271969f62af7ddcb572c10a3e8a",
     "tau": "2.5",
     "timing": "on_time",
     "verify_ok": true,
@@ -87,7 +87,7 @@
     "within_fit_flag": "true"
    },
    "reason": "",
-   "seconds": 0.512,
+   "seconds": 1.039,
    "status": "pass",
    "step": "E3",
    "title": "daily curve run, dry run, for the date"
@@ -96,13 +96,13 @@
    "evidence": {
     "declared_on_time_days": 2,
     "explain_sums": true,
-    "head": "bd3a6358f12506cad8cb2d4b5fcee8b40a96e782feba9bfd0076a47adaca6800",
+    "head": "4ca262141d74cf038be80fb2b876a7d2cdf135d6fde46baa663061b44c31f8be",
     "kinds": [
      "GENESIS",
      "DAY",
      "DAY"
     ],
-    "ledger_sha256": "5a3fbd7c5dfad21600b5b9ef01ccddb4bb41fdda3eca692f41970904e3805089",
+    "ledger_sha256": "b704c5b45b2f8bb7029bf96738a60dffe8b53ee7cd80ffbfdd84564bb0fba05b",
     "orders": 1,
     "problems": 0,
     "runs": 2,
@@ -112,22 +112,22 @@
     "verify_reason": ""
    },
    "reason": "",
-   "seconds": 0.064,
+   "seconds": 0.102,
    "status": "pass",
    "step": "E4",
    "title": "paper ledger run, dry run, for the date"
   },
   {
    "evidence": {
-    "bound": 1.8683291990074765e-05,
-    "estimate_pnl": -855.3900864684372,
+    "bound": 1.9871913610844035e-05,
+    "estimate_pnl": -883.9098707065582,
     "key_rate_buckets": 30,
     "key_rate_cases": 2,
     "key_rate_failed": [],
     "label": "latency-aware analytics on simulated data",
     "positions": 2,
     "shift": 0.0001,
-    "zero_dv01_sum": -925.880244285916
+    "zero_dv01_sum": -957.8849360969616
    },
    "reason": "",
    "seconds": 0.008,

@@ -1,5 +1,5 @@
 {
- "commit": "105f7f9673878d492f547c65f3c4d9c891546a27",
+ "commit": "1ce167bf02dbd134d0001a4fd035f1061d378231",
  "data_label": "synthetic recorded day: invented values, no market data",
  "date": "2026-11-19",
  "deviations": "see the module docstring of tools/eod/rehearse.py, list 'Deviations from the proposed spec'",
@@ -38,7 +38,7 @@
     "tenors_for_date": 5
    },
    "reason": "",
-   "seconds": 0.22,
+   "seconds": 0.097,
    "status": "pass",
    "step": "E1",
    "title": "read the day's recorded rows and verify the chain"

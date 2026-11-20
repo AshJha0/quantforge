@@ -1,5 +1,5 @@
 {
- "commit": "105f7f9673878d492f547c65f3c4d9c891546a27",
+ "commit": "1ce167bf02dbd134d0001a4fd035f1061d378231",
  "data_label": "recorded forward-log rows; hashes and aggregates only in this file",
  "date": "2026-11-19",
  "deviations": "see the module docstring of tools/eod/rehearse.py, list 'Deviations from the proposed spec'",
@@ -17,11 +17,11 @@
  },
  "log_ref": "origin/forward-log",
  "outputs_sha256": {
-  "tmp/curve-daily/ledger/curves.jsonl": "7c7f1ddbd15ab5d67ed63ecdb1f1227e125693a83ce58675ebe89f1adaaf7c08",
-  "tmp/curve-daily/ledger/summary.json": "18675b864885f78948c1d53b707bf17161303a13864dea12d17b58641d5e87e3",
-  "tmp/paper-ledger/ledger/ledger.jsonl": "63096449a66f30b240b824fe04783e23564002d7af36b808d1df8bd856ddeb63",
-  "tmp/site/dashboard/curve.html": "ead3c6ebb1a088df8c6ddb2e8ea878d4f188f0ed4201774a07f26b8d5b7e7a43",
-  "tmp/site/dashboard/paper.html": "422a16ff6619fabc86ed58bb78d03260511f8c14b340424555e04d1d164dbae0",
+  "tmp/curve-daily/ledger/curves.jsonl": "26e0e2955186d4ded596b8262cedbbba5f0d9dcdb105df8eb5ee7df86c8901cd",
+  "tmp/curve-daily/ledger/summary.json": "35f8dd57a27671931d63aa738a6454839838db31da21d42c27641a206d30a103",
+  "tmp/paper-ledger/ledger/ledger.jsonl": "b70e73243fc8c3fab93f71dd920435fc62abf1b5be85e2c5cf2a73c98b5c85bb",
+  "tmp/site/dashboard/curve.html": "e399a8cd8ed71cb78d6441083b5809e02533db970c40ad31bfa1ca68559eea44",
+  "tmp/site/dashboard/paper.html": "cf285fc058c8fc0cbc6dc0eb9faf8b429ac1786d5dd0d7e4535607762819a04c",
   "tmp/site/index.html": "62a15eaeeee7ab7b3427f84414014a158440a05531861c9c50aa6ae4845c714f"
  },
  "plant": "",
@@ -46,7 +46,7 @@
     "tenors_for_date": 5
    },
    "reason": "",
-   "seconds": 0.611,
+   "seconds": 0.415,
    "status": "pass",
    "step": "E1",
    "title": "read the day's recorded rows and verify the chain"
@@ -68,13 +68,13 @@
   {
    "evidence": {
     "consistency": "pending",
-    "head": "f84e3f85f131e7394aba2004357849397da4aa7d91ab9ab3d8684c687504592a",
+    "head": "7ecbdf1826bce8b0157ba7b778e4f2f3f123fc4b3b35529421fff24bf462dba1",
     "kinds": [
      "GENESIS",
      "DAY"
     ],
     "labels_ok": true,
-    "ledger_sha256": "7c7f1ddbd15ab5d67ed63ecdb1f1227e125693a83ce58675ebe89f1adaaf7c08",
+    "ledger_sha256": "26e0e2955186d4ded596b8262cedbbba5f0d9dcdb105df8eb5ee7df86c8901cd",
     "max_abs_bp": "13.922034528534786",
     "note": "Rehearsal fit on the five tenors the recorder keeps (3 Mo, 2 Yr, 5 Yr, 10 Yr, 30 Yr), not the scheduled thirteen-tenor run.",
     "notes": 2,
@@ -82,7 +82,7 @@
     "rmse_bp": "8.310754743870355",
     "rows_built": 2,
     "source_sha256": "5b9b3b130f80875e9839a9faa73b5889d2d00a0dc59866df04b365de02a08539",
-    "summary_sha256": "18675b864885f78948c1d53b707bf17161303a13864dea12d17b58641d5e87e3",
+    "summary_sha256": "35f8dd57a27671931d63aa738a6454839838db31da21d42c27641a206d30a103",
     "tau": "3.75",
     "timing": "on_time",
     "verify_ok": true,
@@ -90,7 +90,7 @@
     "within_fit_flag": "true"
    },
    "reason": "",
-   "seconds": 0.695,
+   "seconds": 0.908,
    "status": "pass",
    "step": "E3",
    "title": "daily curve run, dry run, for the date"
@@ -99,13 +99,13 @@
    "evidence": {
     "declared_on_time_days": 2,
     "explain_sums": true,
-    "head": "87d0b331e62fd5fc4f047808d4d44515717560ce3f34828e3a9a30a2459ca52b",
+    "head": "d0bc2018a09b6046e40719b981e33d6d933afa81a3b123a1d06828f460a6a4bf",
     "kinds": [
      "GENESIS",
      "DAY",
      "DAY"
     ],
-    "ledger_sha256": "63096449a66f30b240b824fe04783e23564002d7af36b808d1df8bd856ddeb63",
+    "ledger_sha256": "b70e73243fc8c3fab93f71dd920435fc62abf1b5be85e2c5cf2a73c98b5c85bb",
     "orders": 1,
     "problems": 0,
     "runs": 2,
@@ -115,7 +115,7 @@
     "verify_reason": ""
    },
    "reason": "",
-   "seconds": 0.068,
+   "seconds": 0.067,
    "status": "pass",
    "step": "E4",
    "title": "paper ledger run, dry run, for the date"
@@ -133,7 +133,7 @@
     "zero_dv01_sum": -1021.4721907327184
    },
    "reason": "",
-   "seconds": 0.008,
+   "seconds": 0.006,
    "status": "pass",
    "step": "E5",
    "title": "intraday risk on the day's book"
@@ -151,7 +151,7 @@
     ]
    },
    "reason": "",
-   "seconds": 0.012,
+   "seconds": 0.016,
    "status": "pass",
    "step": "E6",
    "title": "render the dashboards into a temporary site"
@@ -167,7 +167,7 @@
     "wider_than_phone": []
    },
    "reason": "",
-   "seconds": 0.007,
+   "seconds": 0.012,
    "status": "pass",
    "step": "E7",
    "title": "site checks on the rendered pages"
