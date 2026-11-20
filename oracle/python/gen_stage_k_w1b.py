@@ -14,6 +14,7 @@ published figure fails to reproduce under the acceptance rule of the spec.
     cd oracle/python && uv run python -W ignore gen_stage_k_w1b.py
 """
 import json
+import math
 from pathlib import Path
 
 import mpmath as mp
@@ -637,6 +638,32 @@ def gen_traffic_light():
               description=f"KR-253 amendment: {n} observation(s), {x} exception(s) at {conf}: "
                           + ("P(X <= 0) = c exactly, on the zone edge" if n == 1 else
                              "MAR99 Table 2 row, exact rational at the binary64 q"))
+    # Audit KF-21 (2026-11-20): one golden that tells the double-double power from plain binary64 powering.
+    # Plain powering is 7.6e-13 relative off here (inside 1e-12), so the tolerance is relative 2.3e-16 (about one
+    # unit in the last place), absolute 0. Tolerance fixed in this commit, before any build is run against it.
+    # Expected value: c^n = a^n / 2^(k n) exactly (c = a / 2^k), rounded once to binary64 with integer arithmetic
+    # (sticky bit kept), cross-checked against mpmath at 60 digits.
+    n, conf = 1_000_000, 0.999999
+    qf = Fraction(conf)
+    a, b = qf.numerator, qf.denominator
+    assert b & (b - 1) == 0
+    num = a ** n
+    shift = num.bit_length() - 64
+    top = num >> shift
+    if top << shift != num:
+        top |= 1
+    cum = math.ldexp(float(top), shift - (b.bit_length() - 1) * n)
+    with mp.workdps(60):
+        assert abs(mp.mpf(a) ** n / mp.mpf(b) ** n / mp.mpf(cum) - 1) < mp.mpf("1.2e-16")
+    assert cum == 0.36787925722106646, cum
+    s.add("risk.backtest.traffic_light", {"observations": n, "exceptions": 0, "confidence": conf},
+          {"cumulative_probability": cum, "zone": "GREEN", "plus_factor": None},
+          verified=["added by lane k-r2-gate 2026-11-20 (audit KF-21): exact integer arithmetic, a^n / 2^(kn) rounded once to binary64; "
+                    "mpmath 60 digits agrees; the audit's own exact check gave the same value"],
+          tags=["stage_k", "traffic_light", "power"], output_classes=oc,
+          limit={"absolute": 0.0, "relative": 2.3e-16},
+          description="KF-21: 1,000,000 observations, 0 exceptions at 0.999999: P(X <= 0) = c^n; "
+                      "plain binary64 powering is 7.6e-13 off and fails this tolerance")
     s.write()
     return s
 
