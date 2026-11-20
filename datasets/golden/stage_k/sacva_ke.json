@@ -195,7 +195,7 @@
     "cva_capital",
     "error"
    ],
-   "description": "hand: IR vega factor not listed (KR-120)"
+   "description": "hand: IR vega factor not listed (KR-311)"
   },
   {
    "case_id": "sacva_ke-0007",
@@ -400,7 +400,7 @@
     "cva_capital",
     "error"
    ],
-   "description": "hand: two entries in a one-factor bucket (KR-120)"
+   "description": "hand: two entries in a one-factor bucket (KR-311)"
   },
   {
    "case_id": "sacva_ke-0013",
@@ -445,7 +445,7 @@
     "cva_capital",
     "error"
    ],
-   "description": "hand: one name and tenor in 1a and 1b: the same factor of bucket 1 (KR-121)"
+   "description": "hand: one name and tenor in 1a and 1b: the same factor of bucket 1 (KR-312)"
   },
   {
    "case_id": "sacva_ke-0014",
@@ -635,7 +635,7 @@
     "cva_capital",
     "error"
    ],
-   "description": "hand: CURVE in a specified currency (KR-120)"
+   "description": "hand: CURVE in a specified currency (KR-311)"
   },
   {
    "case_id": "sacva_ke-0020",
@@ -666,7 +666,7 @@
     "cva_capital",
     "error"
    ],
-   "description": "hand: a tenor in an unspecified currency (KR-120)"
+   "description": "hand: a tenor in an unspecified currency (KR-311)"
   },
   {
    "case_id": "sacva_ke-0021",
@@ -746,7 +746,7 @@
     "cva_capital",
     "error"
    ],
-   "description": "hand: one name with two qualities (KR-123)"
+   "description": "hand: one name with two qualities (KR-314)"
   },
   {
    "case_id": "sacva_ke-0023",

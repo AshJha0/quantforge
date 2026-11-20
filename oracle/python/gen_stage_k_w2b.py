@@ -2,7 +2,7 @@
 and large exposures (K-8i).
 
 Specs: specifications/06-risk/cva-capital.md and specifications/06-risk/leverage-large-exposures.md (PROPOSED);
-rulings specifications/stage-k-rulings-w2.md KR-50 to KR-69 and the wave 2b section KR-120 to KR-135 (PROPOSED).
+rulings specifications/stage-k-rulings-w2.md KR-50 to KR-69 and the wave 2b section KR-311 to KR-326 (PROPOSED).
 Parameters are read from specifications/tables/stage_k/{mar50_cva,lev_leverage,lex_large_exposures}.json, the
 single copy (KR-50).
 
@@ -229,7 +229,7 @@ def sa_weight(cls, kind, s, rep):
     if kind == "DELTA":
         return b, b, D(T[f"{cls.lower()}.rw"][b])
     if cls == "EQ":
-        large = int(b) <= 8 or int(b) == 12  # KR-124
+        large = int(b) <= 8 or int(b) == 12  # KR-315
         return b, b, D(T["eq.vega_rw"]["large_cap" if large else "other"])
     return b, b, D(T[f"{cls.lower()}.vega_rw"])
 
@@ -487,7 +487,7 @@ def gen_cva():
         sv("8", cf("IDX", "5Y", "IG", index="CDX.IG", series="S45"), 3e5),
         sv("8", cf("IDX2", "5Y", "IG", index="CDX.IG", series="S44"), 0, 2.5e5),
         sv("8", cf("IDX3", "3Y", "HY_NR", index="CDX.HY", series="S45"), 1e5)]}},
-        sa, OC_SA, TAGS_C, "CCS: 1a and 1b share bucket 1 (KR-121); bucket 8 index and series correlations; gamma Table 6")
+        sa, OC_SA, TAGS_C, "CCS: 1a and 1b share bucket 1 (KR-312); bucket 8 index and series correlations; gamma Table 6")
     hand(s, "risk.cva.sa", {"reporting_currency": "USD", "classes": {
         "RCS.DELTA": [sv("3", "RCS3", 1e5), sv("10", "RCS10", 4e4), sv("15", "RCS15", 1e4), sv("16", "RCS16", -2e4, 1e4)],
         "RCS.VEGA": [sv("1", "V1", 1e3), sv("17", "V17", 2e3)],
@@ -495,7 +495,7 @@ def gen_cva():
         "EQ.VEGA": [sv("2", "V2", 1e3), sv("10", "V10", 1e3), sv("12", "V12", 1e3)],
         "COM.DELTA": [sv("2", "C2", 5e4), sv("7", "C7", -3e4), sv("11", "C11", 1e4)],
         "COM.VEGA": [sv("3", "CV3", 500)], "FX.VEGA": [sv("GBP", "GBP", 4e3), sv("JPY", "JPY", -1e3)]}},
-        sa, OC_SA, TAGS_C, "RCS across quality (halved gamma), 15, 16; EQ large-cap vega 78% (KR-124); COM with bucket 11; FX vega")
+        sa, OC_SA, TAGS_C, "RCS across quality (halved gamma), 15, 16; EQ large-cap vega 78% (KR-315); COM with bucket 11; FX vega")
     s.write()
 
 
@@ -513,7 +513,7 @@ def gen_cva_errors():
     err(b, {"version": "REDUCED", "counterparties": [cp("C1", "SPACE", "IG", (1000000, 0, False))]}, "E_SCHEMA",
         "two errors: sector SPACE and m 0 (spec cva_ke-0003)")
     err(b, {"version": "FULL", "counterparties": one, "single_name_hedges": [{**hdg, "counterparty": "C9"}]}, "E_INPUT", "hedge on an unknown counterparty")
-    err(b, {"version": "REDUCED", "counterparties": one + one}, "E_INPUT", "duplicate counterparty id (KR-121)")
+    err(b, {"version": "REDUCED", "counterparties": one + one}, "E_INPUT", "duplicate counterparty id (KR-312)")
     err(b, {"version": "REDUCED", "counterparties": [cp("C1", "financials", "IG", (-1, 5, False))]}, "E_DOMAIN", "negative ead")
     err(b, {"version": "FULL", "counterparties": one, "single_name_hedges": [{**hdg, "notional": -1}]}, "E_DOMAIN", "negative hedge notional")
     err(b, {"version": "FULL", "counterparties": one, "single_name_hedges": [{**hdg, "m": 0}]}, "E_DOMAIN", "hedge m 0")
@@ -521,7 +521,7 @@ def gen_cva_errors():
     err(b, {"version": "FULL", "counterparties": one, "index_hedges": [idx]}, "E_DOMAIN", "index weights sum to 0.9")
     err(b, {"version": "FULL", "counterparties": one, "index_hedges": [{**idx, "constituents": [
         {"sector": "financials", "quality": "IG", "weight": 1.5}, {"sector": "other", "quality": "IG", "weight": -0.5}]}]},
-        "E_DOMAIN", "a negative index weight, weights summing to 1 (KR-122)")
+        "E_DOMAIN", "a negative index weight, weights summing to 1 (KR-313)")
     err(b, {"version": "FULL", "counterparties": one, "index_hedges": [{**idx, "m": -1, "constituents": [{"sector": "financials", "quality": "IG", "weight": 1}]}]},
         "E_DOMAIN", "index hedge m negative")
     err(b, {"version": "FULL", "counterparties": one, "index_hedges": [{**idx, "notional": -5, "constituents": [{"sector": "financials", "quality": "IG", "weight": 1}]}]},
@@ -554,24 +554,24 @@ def gen_cva_errors():
     s_err(sa_in({"IR.GAMMA": ir}), "E_SCHEMA", "kind not listed")
     s_err(sa_in({"XX.DELTA": ir}), "E_SCHEMA", "class not listed")
     s_err(sa_in({"IR.DELTA": [{**ir[0], "factor": "7Y"}]}), "E_SCHEMA", "IR tenor not listed")
-    s_err(sa_in({"IR.VEGA": [{**ir[0], "factor": "1Y"}]}), "E_SCHEMA", "IR vega factor not listed (KR-120)")
+    s_err(sa_in({"IR.VEGA": [{**ir[0], "factor": "1Y"}]}), "E_SCHEMA", "IR vega factor not listed (KR-311)")
     s_err(sa_in({"CCS.DELTA": [ccs(tenor="2Y")]}), "E_SCHEMA", "CCS tenor not listed")
     s_err(sa_in({"CCS.DELTA": [ccs(quality="AAA")]}), "E_SCHEMA", "CCS quality not listed")
     s_err(sa_in({"CCS.DELTA": [{**ccs(), "factor": "X"}]}), "E_SCHEMA", "CCS factor given as a string")
     s_err(sa_in({"IR.DELTA": [{"bucket": "USD", "factor": "1Y", "s_cva": 1}]}), "E_SCHEMA", "s_hdg missing")
     s_err(sa_in({"IR.DELTA": ir + ir}), "E_INPUT", "duplicate (bucket, factor)")
     s_err(sa_in({"EQ.DELTA": [{"bucket": "1", "factor": "A", "s_cva": 1, "s_hdg": 0}, {"bucket": "1", "factor": "B", "s_cva": 1, "s_hdg": 0}]}),
-          "E_INPUT", "two entries in a one-factor bucket (KR-120)")
-    s_err(sa_in({"CCS.DELTA": [ccs("1a"), ccs("1b")]}), "E_INPUT", "one name and tenor in 1a and 1b: the same factor of bucket 1 (KR-121)")
+          "E_INPUT", "two entries in a one-factor bucket (KR-311)")
+    s_err(sa_in({"CCS.DELTA": [ccs("1a"), ccs("1b")]}), "E_INPUT", "one name and tenor in 1a and 1b: the same factor of bucket 1 (KR-312)")
     s_err(sa_in({"IR.DELTA": [{**ir[0], "bucket": "5"}]}), "E_INPUT", "IR bucket that is not a currency (wrong class)")
     s_err(sa_in({"CCS.DELTA": [ccs("9")]}), "E_INPUT", "CCS bucket 9 (wrong class)")
     s_err(sa_in({"RCS.DELTA": [{"bucket": "18", "factor": "R", "s_cva": 1, "s_hdg": 0}]}), "E_INPUT", "RCS bucket 18")
     s_err(sa_in({"COM.VEGA": [{"bucket": "USD", "factor": "R", "s_cva": 1, "s_hdg": 0}]}), "E_INPUT", "commodity bucket USD")
     s_err(sa_in({"FX.DELTA": [{"bucket": "USD", "factor": "USD", "s_cva": 1, "s_hdg": 0}]}), "E_INPUT", "reporting currency as an FX bucket")
-    s_err(sa_in({"IR.DELTA": [{**ir[0], "factor": "CURVE"}]}), "E_INPUT", "CURVE in a specified currency (KR-120)")
-    s_err(sa_in({"IR.DELTA": [{**ir[0], "bucket": "NOK", "factor": "5Y"}]}), "E_INPUT", "a tenor in an unspecified currency (KR-120)")
+    s_err(sa_in({"IR.DELTA": [{**ir[0], "factor": "CURVE"}]}), "E_INPUT", "CURVE in a specified currency (KR-311)")
+    s_err(sa_in({"IR.DELTA": [{**ir[0], "bucket": "NOK", "factor": "5Y"}]}), "E_INPUT", "a tenor in an unspecified currency (KR-311)")
     s_err(sa_in({"CCS.DELTA": [ccs("8")]}), "E_INPUT", "bucket 8 factor without index and series")
-    s_err(sa_in({"CCS.DELTA": [ccs(), ccs(tenor="5Y", quality="HY_NR")]}), "E_INPUT", "one name with two qualities (KR-123)")
+    s_err(sa_in({"CCS.DELTA": [ccs(), ccs(tenor="5Y", quality="HY_NR")]}), "E_INPUT", "one name with two qualities (KR-314)")
     s_err(sa_in({"IR.DELTA": ir}) | {"reporting_currency": "usd"}, "E_INPUT", "reporting currency not a currency code")
     s_err(sa_in({"CCS.VEGA": [ccs()]}, m_cva=0.9), "E_INPUT", "two errors: CCS vega and m_cva 0.9 (structural first)")
     s_err(sa_in({"IR.DELTA": [{**ir[0], "factor": "7Y"}], "CCS.VEGA": [ccs()]}), "E_SCHEMA", "two errors: tenor not listed and CCS vega")
@@ -622,7 +622,7 @@ def gen_lev():
          lev, OC_LEV, TAGS_L, "negative V floored at 0 with CVM provided; purchased offset; a written CD reduced to 0; remaining CCFs")
     hand(s, "risk.capital.leverage", {"tier1": 2, "sfts": [{"gross_assets": 0, "mna": False, "exposures": [], "collateral": []},
                                                          {"gross_assets": 30, "mna": True, "exposures": [10], "collateral": [4]}]},
-         lev, OC_LEV, TAGS_L, "absent lists are empty (KR-128); an SFT with no transactions")
+         lev, OC_LEV, TAGS_L, "absent lists are empty (KR-319); an SFT with no transactions")
     s.write()
 
     s = Suite("lex_k", SPEC_L, G)
@@ -635,7 +635,7 @@ def gen_lev():
         {"id": "X", "group": "GX", "exempt": True}, {"id": "Y", "group": "GX"}, {"id": "Z", "exempt": True}],
         "banking_book": [{"counterparty": f"N{n:02d}", "value": 10 + n} for n in range(23)] + [
             {"counterparty": "X", "value": 200}, {"counterparty": "Y", "value": 100}, {"counterparty": "Z", "value": 400}]},
-        lex, OC_LEX, TAGS_L, "report: large groups plus the 20 largest, ties by name; exempt members never breach (KR-134)")
+        lex, OC_LEX, TAGS_L, "report: large groups plus the 20 largest, ties by name; exempt members never breach (KR-325)")
     hand(s, "risk.capital.large_exposures", {"tier1": 400, "bank_gsib": True, "counterparties": [
         {"id": "P", "group": "GP", "gsib": True}, {"id": "Q", "group": "GP"}, {"id": "R"}],
         "off_balance": [{"counterparty": "R", "notional": 100, "ccf": 0.5}],
@@ -646,7 +646,7 @@ def gen_lev():
             {"id": "s2", "counterparty": "P", "seniority": "EQUITY", "notional": -40, "market_value": -40, "cash_equity": True},
             {"id": "c1", "counterparty": "Q", "seniority": "SENIOR", "notional": 0, "market_value": 3}],
         "crm": [{"counterparty": "R", "provider": "Q", "protected": 20}]},
-        lex, OC_LEX, TAGS_L, "KR-53 offsets across ranks; a G-SIB member makes the group G-SIB (KR-133); notional 0 is long (KR-132)")
+        lex, OC_LEX, TAGS_L, "KR-53 offsets across ranks; a G-SIB member makes the group G-SIB (KR-324); notional 0 is long (KR-323)")
     s.write()
 
 
@@ -678,7 +678,7 @@ def gen_lev_errors():
         bad = dict(item)
         bad[key] = [-1] if key in ("exposures", "collateral") else -1
         err(L, {**ok, field: [bad]}, "E_DOMAIN", f"negative {key} in {field}")
-    err(L, {"tier1": 1}, "E_DOMAIN", "exposure measure zero: no ratio (KR-130)")
+    err(L, {"tier1": 1}, "E_DOMAIN", "exposure measure zero: no ratio (KR-321)")
     err(L, {**ok, "sfts": [{"gross_assets": 1, "exposures": [], "collateral": []}]}, "E_SCHEMA", "mna missing")
     err(L, {**ok, "tier1": 0, "sfts": [sft]}, "E_INPUT", "two errors: lengths differ and tier1 0 (structural first)")
     err(L, {**ok, "derivatives": [{"v": "NaN", "pfe": 1}]}, "E_DOMAIN", "E1: v NaN", ("e1",))
@@ -700,13 +700,13 @@ def gen_lev_errors():
     err(X, {**base, "crm": [{"counterparty": "A", "provider": "A", "protected": 1}]}, "E_INPUT", "a counterparty protecting itself")
     err(X, {**base, "trading_book": [pos, pos]}, "E_INPUT", "duplicate position id")
     err(X, {**base, "trading_book": [{**pos, "counterparty": "Q"}]}, "E_INPUT", "trading position on an unknown counterparty")
-    err(X, {**base, "counterparties": [{"id": "A", "group": "B"}, {"id": "B"}]}, "E_INPUT", "group named like a counterparty outside it (KR-133)")
+    err(X, {**base, "counterparties": [{"id": "A", "group": "B"}, {"id": "B"}]}, "E_INPUT", "group named like a counterparty outside it (KR-324)")
     err(X, {**base, "tier1": 0}, "E_DOMAIN", "tier1 0")
     err(X, {**base, "banking_book": [{"counterparty": "A", "value": -1}]}, "E_DOMAIN", "negative banking book value")
     err(X, {**base, "off_balance": [{"counterparty": "A", "notional": -1, "ccf": 0.5}]}, "E_DOMAIN", "negative off-balance notional")
     err(X, {**base, "off_balance": [{"counterparty": "A", "notional": 1, "ccf": -0.1}]}, "E_DOMAIN", "ccf below 0")
     err(X, {**base, "crm": [{"counterparty": "A", "provider": "B", "protected": -1}]}, "E_DOMAIN", "negative protected amount")
-    err(X, {**base, "crm": [{"counterparty": "A", "provider": "B", "protected": 11}]}, "E_DOMAIN", "protection above the exposure (KR-134)")
+    err(X, {**base, "crm": [{"counterparty": "A", "provider": "B", "protected": 11}]}, "E_DOMAIN", "protection above the exposure (KR-325)")
     err(X, {**base, "trading_book": [{**pos, "seniority": "SUPER"}]}, "E_SCHEMA", "seniority not listed")
     err(X, {"tier1": 1000}, "E_SCHEMA", "counterparties missing")
     err(X, {**base, "tier1": 0, "banking_book": [{"counterparty": "Q", "value": 1}]}, "E_INPUT", "two errors: unknown counterparty and tier1 0")

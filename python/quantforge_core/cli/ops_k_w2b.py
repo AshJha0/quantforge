@@ -2,7 +2,7 @@
 exposures (K-8i).
 
 Specifications: specifications/06-risk/cva-capital.md and leverage-large-exposures.md; rulings
-KR-50 to KR-69 and KR-120 to KR-135 (specifications/stage-k-rulings-w2.md). Registration
+KR-50 to KR-69 and KR-311 to KR-326 (specifications/stage-k-rulings-w2.md). Registration
 (CORE_MODULES entries "cva" and "leverage", and the import of this module in operations.py) is
 applied by the stage K coordinator: program/STAGE_K_W2B_HANDOVER.md.
 
@@ -20,7 +20,7 @@ from .registry import core, op
 
 
 def _list(i: Inputs, key: str) -> list[Inputs]:
-    """An optional array of objects: absent means empty (KR-128)."""
+    """An optional array of objects: absent means empty (KR-319)."""
     return _objects(i, key) if i.has(key) else []
 
 

@@ -1,7 +1,7 @@
 """CVA risk capital: BA-CVA, reduced and full, and SA-CVA (plan item K-8g).
 
 Specification: specifications/06-risk/cva-capital.md; rulings KR-50, KR-62 to KR-64, KR-67 to KR-69
-(specifications/stage-k-rulings-w2.md) and KR-120 to KR-127 (same file, wave 2b section). Source:
+(specifications/stage-k-rulings-w2.md) and KR-311 to KR-318 (same file, wave 2b section). Source:
 Basel Framework MAR50.14 to MAR50.26 (BA-CVA) and MAR50.41 to MAR50.77 (SA-CVA), read 2026-11-19
 in the PDF generated 11/11/2026, pages 726 to 750.
 
@@ -154,7 +154,7 @@ def _ba_structure(
     ids: set[str] = set()
     for c in counterparties:
         if c.id in ids:
-            raise _input(f"counterparty {c.id} appears twice", "id")  # KR-121
+            raise _input(f"counterparty {c.id} appears twice", "id")  # KR-312
         ids.add(c.id)
     if version == "REDUCED" and (single or index):
         raise _input("hedges are recognised only in the FULL version", "single_name_hedges")
@@ -185,7 +185,7 @@ def _ba_domain(
         if ih.notional < 0:
             raise _domain("index hedge notional must not be negative", "notional")
         if any(k.weight < 0 for k in ih.constituents):
-            raise _domain("index weights must not be negative", "weight")  # KR-122
+            raise _domain("index weights must not be negative", "weight")  # KR-313
         total = math.fsum(k.weight for k in ih.constituents)
         if not abs(total - 1.0) <= WEIGHT_TOLERANCE:
             raise _domain("index weights must sum to 1 within 1e-12", "weight")
@@ -274,14 +274,14 @@ RISK_CLASSES = ("IR", "FX", "CCS", "RCS", "EQ", "COM")  # MAR50.43, KR-63
 KINDS = ("DELTA", "VEGA")
 CLASS_KEYS = tuple(f"{c}.{k}" for c in RISK_CLASSES for k in KINDS if (c, k) != ("CCS", "VEGA"))
 IR_TENORS = tuple(MAR50["ir.tenors_specified"])  # MAR50.56(1), "inflation" included
-IR_CURVE = "CURVE"  # KR-120: the parallel-shift factor of an unspecified currency (MAR50.57)
+IR_CURVE = "CURVE"  # KR-311: the parallel-shift factor of an unspecified currency (MAR50.57)
 IR_DELTA_FACTORS = (*IR_TENORS, IR_CURVE)
-IR_VEGA_FACTORS = ("IR_VOL", "INFLATION_VOL")  # KR-120, MAR50.58(1)
+IR_VEGA_FACTORS = ("IR_VOL", "INFLATION_VOL")  # KR-311, MAR50.58(1)
 CCS_TENORS = tuple(MAR50["ccs.tenors"])  # MAR50.65(1)
 CCS_BUCKETS = tuple(MAR50["ccs.rw"])  # 1a, 1b, 2..8 (MAR50.65(3) Table 7)
 _CURRENCY = re.compile(r"[A-Z]{3}")
 _NUMBERED = {"RCS": len(MAR50["rcs.rw"]), "EQ": len(MAR50["eq.rw"]), "COM": len(MAR50["com.rw"])}
-_EQ_LARGE_CAP = frozenset(range(1, 9)) | {12}  # KR-124: Table 11 "Large" buckets 1-8, index 12
+_EQ_LARGE_CAP = frozenset(range(1, 9)) | {12}  # KR-315: Table 11 "Large" buckets 1-8, index 12
 
 
 @dataclass(frozen=True)
@@ -388,7 +388,7 @@ def _com_gamma(b: str, c: str) -> float:
 
 
 def _ccs_gamma(b: str, c: str) -> float:
-    """MAR50.64 Table 6; buckets 1a and 1b are bucket 1 (KR-121)."""
+    """MAR50.64 Table 6; buckets 1a and 1b are bucket 1 (KR-312)."""
     return _upper(MAR50["ccs.gamma"], int(b) - 1, int(c) - 1)
 
 
@@ -462,7 +462,7 @@ def _entry(cls: str, kind: str, s: Sensitivity, specified: frozenset[str], rep: 
 
 
 def _check_names(entries: Sequence[_Entry]) -> None:
-    """A CCS name (bucket 8: an index series) has one quality and one legal group (KR-123)."""
+    """A CCS name (bucket 8: an index series) has one quality and one legal group (KR-314)."""
     seen: dict[tuple[str, tuple[str | None, ...]], tuple[str, str | None]] = {}
     for e in entries:
         f = e.s.factor

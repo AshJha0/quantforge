@@ -333,7 +333,7 @@
     "leverage_large_exposures",
     "error"
    ],
-   "description": "hand: group named like a counterparty outside it (KR-133)"
+   "description": "hand: group named like a counterparty outside it (KR-324)"
   },
   {
    "case_id": "lex_ke-0009",
@@ -571,7 +571,7 @@
     "leverage_large_exposures",
     "error"
    ],
-   "description": "hand: protection above the exposure (KR-134)"
+   "description": "hand: protection above the exposure (KR-325)"
   },
   {
    "case_id": "lex_ke-0015",

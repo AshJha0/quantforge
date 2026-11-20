@@ -826,7 +826,7 @@
     "leverage_large_exposures",
     "hand"
    ],
-   "description": "hand: absent lists are empty (KR-128); an SFT with no transactions",
+   "description": "hand: absent lists are empty (KR-319); an SFT with no transactions",
    "output_classes": {
     "meets_minimum": "date_and_convention",
     "label": "date_and_convention"

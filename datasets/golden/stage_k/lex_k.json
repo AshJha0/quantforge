@@ -1537,7 +1537,7 @@
     "leverage_large_exposures",
     "hand"
    ],
-   "description": "hand: report: large groups plus the 20 largest, ties by name; exempt members never breach (KR-134)",
+   "description": "hand: report: large groups plus the 20 largest, ties by name; exempt members never breach (KR-325)",
    "output_classes": {
     "label": "date_and_convention",
     "report": "date_and_convention"
@@ -1700,7 +1700,7 @@
     "leverage_large_exposures",
     "hand"
    ],
-   "description": "hand: KR-53 offsets across ranks; a G-SIB member makes the group G-SIB (KR-133); notional 0 is long (KR-132)",
+   "description": "hand: KR-53 offsets across ranks; a G-SIB member makes the group G-SIB (KR-324); notional 0 is long (KR-323)",
    "output_classes": {
     "label": "date_and_convention",
     "report": "date_and_convention"

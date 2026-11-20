@@ -902,7 +902,7 @@
     "cva_capital",
     "hand"
    ],
-   "description": "hand: CCS: 1a and 1b share bucket 1 (KR-121); bucket 8 index and series correlations; gamma Table 6",
+   "description": "hand: CCS: 1a and 1b share bucket 1 (KR-312); bucket 8 index and series correlations; gamma Table 6",
    "output_classes": {
     "label": "date_and_convention"
    },
@@ -1224,7 +1224,7 @@
     "cva_capital",
     "hand"
    ],
-   "description": "hand: RCS across quality (halved gamma), 15, 16; EQ large-cap vega 78% (KR-124); COM with bucket 11; FX vega",
+   "description": "hand: RCS across quality (halved gamma), 15, 16; EQ large-cap vega 78% (KR-315); COM with bucket 11; FX vega",
    "output_classes": {
     "label": "date_and_convention"
    },

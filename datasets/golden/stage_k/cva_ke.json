@@ -211,7 +211,7 @@
     "cva_capital",
     "error"
    ],
-   "description": "hand: duplicate counterparty id (KR-121)"
+   "description": "hand: duplicate counterparty id (KR-312)"
   },
   {
    "case_id": "cva_ke-0006",
@@ -437,7 +437,7 @@
     "cva_capital",
     "error"
    ],
-   "description": "hand: a negative index weight, weights summing to 1 (KR-122)"
+   "description": "hand: a negative index weight, weights summing to 1 (KR-313)"
   },
   {
    "case_id": "cva_ke-0011",

@@ -15,7 +15,7 @@ Branch `k-w2-py-b` (off the integration branch at dea6af55), Python and oracle o
 | `python/tests/test_stage_k_w2b.py` | golden replay through the CLI (local registration in a fixture, judged by `conformance/runner/runner.py`), unit tests, Hypothesis properties |
 | `oracle/python/gen_stage_k_w2b.py` | independent mpmath oracle (does not import `quantforge_core`); asserts the acceptance targets, writes nine suites |
 | `datasets/golden/stage_k/{cva_k,df_k,sacva_k,lev_k,lex_k}.json`, `{cva_ke,sacva_ke,lev_ke,lex_ke}.json` | goldens (values; errors) |
-| `specifications/stage-k-rulings-w2.md` | new section: KR-120 to KR-135, PROPOSED |
+| `specifications/stage-k-rulings-w2.md` | new section: KR-311 to KR-326, PROPOSED |
 
 ## Operations
 
@@ -23,14 +23,14 @@ Branch `k-w2-py-b` (off the integration branch at dea6af55), Python and oracle o
 |---|---|---|
 | `risk.cva.ba` | `version` (REDUCED, FULL), `counterparties` [{id, sector, quality, netting_sets [{ead, m, imm?}]}], FULL only: `single_name_hedges` [{counterparty, relation, sector, quality, m, notional}], `index_hedges` [{m, notional, constituents [{sector, quality, weight}]}] | `version`, `counterparties` [{id, scva, snh, hma, netting_sets [{df}]}], `ih`, `k_reduced`, `k_hedged`, `k_full` (the FULL-only fields null for REDUCED), `capital`, `rwa`, `label` |
 | `risk.cva.sa` | `classes` {`IR.DELTA` ... `COM.VEGA`: [{bucket, factor, s_cva, s_hdg}]} (CCS factor an object {name, tenor, quality, legal_group?, index?, series?}), `reporting_currency`, `m_cva?` (1) | `classes` {key: {buckets [{bucket, k_b, s_b, sum_ws, floored}], k}}, `m_cva`, `total`, `rwa`, `label` |
-| `risk.capital.leverage` | `tier1`, `on_balance` [reals], `derivatives` [{v, pfe, cvm_received?, cvm_provided?}], `written_credit_derivatives` [{notional, fair_value, purchased_offset?}], `sfts` [{gross_assets, mna, exposures, collateral}], `off_balance` [{notional, ccf_category}] (lists optional) | `on_balance`, `derivatives` (netting sets + written CDs, KR-129), `derivative_netting_sets`, `written_credit_derivatives`, `sfts`, `off_balance`, `exposure`, `ratio`, `meets_minimum`, `label` |
+| `risk.capital.leverage` | `tier1`, `on_balance` [reals], `derivatives` [{v, pfe, cvm_received?, cvm_provided?}], `written_credit_derivatives` [{notional, fair_value, purchased_offset?}], `sfts` [{gross_assets, mna, exposures, collateral}], `off_balance` [{notional, ccf_category}] (lists optional) | `on_balance`, `derivatives` (netting sets + written CDs, KR-320), `derivative_netting_sets`, `written_credit_derivatives`, `sfts`, `off_balance`, `exposure`, `ratio`, `meets_minimum`, `label` |
 | `risk.capital.large_exposures` | `tier1`, `bank_gsib?`, `counterparties` [{id, group?, gsib?, exempt?}], `banking_book` [{counterparty, value}], `off_balance` [{counterparty, notional, ccf}], `crm` [{counterparty, provider, protected}], `trading_book` [{id, counterparty, seniority, notional, market_value, maturity_years?, cash_equity?, lgd_applies?}] | `counterparties` [{id, banking_book, off_balance, trading_book_net_long, trading_book_net_short, protected, received, exposure}], `groups` [{group, members, exposure, share, large, limit, breach, exempt}], `report`, `label` |
 
 ## Registration lines (apply at integration)
 
 1. `python/quantforge_core/cli/registry.py`, `CORE_MODULES`: add `"cva",` and `"leverage",` (for example after `"frtb_backtest",`).
 2. `python/quantforge_core/cli/operations.py`: add `ops_k_w2b,` to the `from . import (...)` list (after `ops_k_w1b,`).
-3. `python/quantforge_core/cli/limits.py`: nothing. The 100,000 caps are the generic `MAX_ARRAY` (KR-126).
+3. `python/quantforge_core/cli/limits.py`: nothing. The 100,000 caps are the generic `MAX_ARRAY` (KR-317).
 4. Optional: add `tests/test_stage_k_w2b.py` to `[tool.mutmut] tests_dir` in `python/pyproject.toml`. The test module is mypy-strict clean, so it needs no entry in the mypy overrides.
 
 Until 1 and 2 are applied, `tests/test_conformance.py` fails on the nine new suites on this branch (unknown operation), as on `k-w1b`. I did not apply them locally even temporarily (the edit was refused by the session's permission check, and the brief forbids it); instead `tests/test_stage_k_w2b.py::test_golden` replays all 128 cases through `registry.execute` with the verbs registered in a fixture and judges each one with the runner's own `judge` and `policy.yaml`. All 128 pass.
@@ -40,7 +40,7 @@ Until 1 and 2 are applied, `tests/test_conformance.py` fails on the nine new sui
 ```
 ### Stage K wave 2b (K-8g CVA capital, K-8i leverage ratio and large exposures, simplified)
 
-Rulings `stage-k-rulings-w2.md` KR-50 to KR-69 and KR-120 to KR-135. No new error code. Error order KR-67 (= HR-122): E_SCHEMA (enum values and factor names included), E_LIMIT (generic per-array cap), the finite rule, structural E_INPUT, E_DOMAIN. Reals binary64, class `simple_analytic` with `tolerance_limit` 1e-12 relative, 1e-15 absolute (KR-67); flags, labels, bucket and group names exact. Shared tables `specifications/tables/stage_k/mar50_cva.json`, `lev_leverage.json`, `lex_large_exposures.json`. Goldens `datasets/golden/stage_k/{cva_k,df_k,sacva_k,cva_ke,sacva_ke,lev_k,lex_k,lev_ke,lex_ke}.json` (`oracle/python/gen_stage_k_w2b.py`). Implemented in Python only. Every output carries `label`.
+Rulings `stage-k-rulings-w2.md` KR-50 to KR-69 and KR-311 to KR-326. No new error code. Error order KR-67 (= HR-122): E_SCHEMA (enum values and factor names included), E_LIMIT (generic per-array cap), the finite rule, structural E_INPUT, E_DOMAIN. Reals binary64, class `simple_analytic` with `tolerance_limit` 1e-12 relative, 1e-15 absolute (KR-67); flags, labels, bucket and group names exact. Shared tables `specifications/tables/stage_k/mar50_cva.json`, `lev_leverage.json`, `lex_large_exposures.json`. Goldens `datasets/golden/stage_k/{cva_k,df_k,sacva_k,cva_ke,sacva_ke,lev_k,lex_k,lev_ke,lex_ke}.json` (`oracle/python/gen_stage_k_w2b.py`). Implemented in Python only. Every output carries `label`.
 
 | `risk.cva.ba`, `risk.cva.sa` | `06-risk/cva-capital.md` | K-8g |
 | `risk.capital.leverage`, `risk.capital.large_exposures` | `06-risk/leverage-large-exposures.md` | K-8i |
@@ -88,11 +88,11 @@ K-8i large exposures (KR-66): connectedness (LEX10.9-10.18) is the caller's grou
 ## Findings and decisions for the coordinator
 
 1. Error order. The brief states the repo order as "E_SCHEMA, structural E_INPUT, E_DOMAIN, E_LIMIT"; both specs and KR-67 say E_SCHEMA, E_LIMIT, the finite rule, structural E_INPUT, E_DOMAIN (HR-122), which is also what `registry._pass_gate` enforces and what wave 1b followed. I implemented KR-67. Decide whether the brief's wording or the specs stand.
-2. KR-62 against the spec: KR-62 says "report `floored: [bucket ids]`", the spec's Outputs a per-bucket boolean. Implemented the spec (KR-127).
-3. KR-65 against the spec: KR-65 names the written CD field `fv_reduction_in_tier1`, the spec formal statement and case rows use `fair_value`. Implemented `fair_value` (KR-129).
-4. G-SIB group rule (KR-133): I chose "any member flagged", the blind lane assumed "every member". No golden has a mixed group, so no matched value depends on it; please confirm one reading.
-5. CCS buckets 1a and 1b aggregated as one bucket 1 (KR-121): read from Tables 5 and 6, not stated in the spec. No blind case uses bucket 1.
-6. Equity vega large-cap buckets 1 to 8 and 12 (KR-124) and the IR factor names `CURVE`, `IR_VOL`, `INFLATION_VOL` (KR-120) are new names the C++, Rust and Java builds must use.
+2. KR-62 against the spec: KR-62 says "report `floored: [bucket ids]`", the spec's Outputs a per-bucket boolean. Implemented the spec (KR-318).
+3. KR-65 against the spec: KR-65 names the written CD field `fv_reduction_in_tier1`, the spec formal statement and case rows use `fair_value`. Implemented `fair_value` (KR-320).
+4. G-SIB group rule (KR-324): I chose "any member flagged", the blind lane assumed "every member". No golden has a mixed group, so no matched value depends on it; please confirm one reading.
+5. CCS buckets 1a and 1b aggregated as one bucket 1 (KR-312): read from Tables 5 and 6, not stated in the spec. No blind case uses bucket 1.
+6. Equity vega large-cap buckets 1 to 8 and 12 (KR-315) and the IR factor names `CURVE`, `IR_VOL`, `INFLATION_VOL` (KR-311) are new names the C++, Rust and Java builds must use.
 7. `frtb.py` is an existing file touched by this lane; if another lane edits `aggregate` the merge needs care (the change is the extraction only).
 
 ## Porting note for the C++, Rust and Java lanes
@@ -100,7 +100,7 @@ K-8i large exposures (KR-66): connectedness (LEX10.9-10.18) is the caller's grou
 - Parameters: read `specifications/tables/stage_k/mar50_cva.json`, `lev_leverage.json`, `lex_large_exposures.json` (Rust `include_str!`, C++ `#embed`, Java a generated class with a check mode as `tools/gen_k_w1b_tables.py` does); `tools/gen_k_w2b_tables.py` is the Python copy and can be extended with a Java writer. Table cells such as `"0.90 legally related"` are read by their leading number. Map the input enums to table keys exactly as `cva.RELATIONS` and `leverage.CCF_CATEGORIES` do.
 - Error order (KR-67): enums and factor names are E_SCHEMA in the reader (`CCS.VEGA` is read as a valid key and refused later as E_INPUT); then the generic array cap; then the finite rule over every Real read; then all structural E_INPUT checks of the whole input; then E_DOMAIN. Java: validate from the raw input, not inside records that validate on construction (stage H lesson).
 - BA-CVA: DF = `-expm1(-0.05 m) / (0.05 m)` (KR-64); sums with a compensated sum (Python `fsum`) in input order; SCVA = RW x sum / 1.4; r_hc from Table 2; FULL fields null for REDUCED.
-- SA-CVA: WS = RW s_cva - RW s_hdg (two products, as written), WSH = RW s_hdg; bucket radicand plain summation in the double-loop order of `frtb.bucket_radicand`, plus R sum WSH^2; `floored` when that sum is below 0; S_b clipped always; K = m_CVA sqrt(max(0, cross radicand)); bucket order by (length, text); CCS rho = tenor x name x quality with the bucket-8 index/series rule; CCS 1a/1b one bucket `1`; RCS gamma by the Table 9 row map of KR-125.
+- SA-CVA: WS = RW s_cva - RW s_hdg (two products, as written), WSH = RW s_hdg; bucket radicand plain summation in the double-loop order of `frtb.bucket_radicand`, plus R sum WSH^2; `floored` when that sum is below 0; S_b clipped always; K = m_CVA sqrt(max(0, cross radicand)); bucket order by (length, text); CCS rho = tenor x name x quality with the bucket-8 index/series rule; CCS 1a/1b one bucket `1`; RCS gamma by the Table 9 row map of KR-316.
 - Leverage: `meets_minimum` = `tier1 >= 0.03 x exposure` in binary64; exposure 0 is E_DOMAIN.
-- Large exposures: KR-53 greedy offset per counterparty (shorts by descending rank, stable; each against eligible longs by ascending rank, stable); JTD = market value kept on the position's side; `large`, `limit`, `breach` in binary64 as KR-135; groups sorted by label in code-point order; report by exposure descending then label.
+- Large exposures: KR-53 greedy offset per counterparty (shorts by descending rank, stable; each against eligible longs by ascending rank, stable); JTD = market value kept on the position's side; `large`, `limit`, `breach` in binary64 as KR-326; groups sorted by label in code-point order; report by exposure descending then label.
 - Commit trailer: the lane rules ask for "Claude Fable 5.2"; this lane ran on Claude Opus 5.5 and the commits say so, as the brief asked.

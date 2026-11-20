@@ -1,7 +1,7 @@
 """Stage K wave 2b: CVA capital (K-8g) and the simplified leverage ratio and large exposures (K-8i).
 
 Specs specifications/06-risk/cva-capital.md and leverage-large-exposures.md; rulings KR-50 to KR-69 and
-KR-120 to KR-135. The goldens (oracle/python/gen_stage_k_w2b.py, an independent mpmath oracle that asserts
+KR-311 to KR-326. The goldens (oracle/python/gen_stage_k_w2b.py, an independent mpmath oracle that asserts
 the 27 blind-matched expected values) are replayed here through the CLI with the verbs registered
 locally; the properties are the A2 lists of both specs."""
 
@@ -390,7 +390,7 @@ def _exposure(p: Any) -> float:
     try:
         return _f(leverage.leverage(1.0, *p)["exposure"])
     except QfError as e:
-        assert e.code == "E_DOMAIN"  # exposure measure zero (KR-130)
+        assert e.code == "E_DOMAIN"  # exposure measure zero (KR-321)
         return 0.0
 
 

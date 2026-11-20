@@ -1,7 +1,7 @@
 """Leverage ratio and large exposures, simplified (plan item K-8i).
 
 Specification: specifications/06-risk/leverage-large-exposures.md; rulings KR-50 to KR-53, KR-65 to
-KR-69 (specifications/stage-k-rulings-w2.md) and KR-128 to KR-135 (same file, wave 2b section).
+KR-69 (specifications/stage-k-rulings-w2.md) and KR-319 to KR-326 (same file, wave 2b section).
 Source: Basel Framework LEV20, LEV30 (leverage ratio) and LEX10, LEX20, LEX30 (large exposures), read
 2026-11-19 in the PDF generated 11/11/2026, pages 787 to 810 and 937 to 956.
 
@@ -150,14 +150,14 @@ def leverage(
     on = math.fsum(on_balance)
     netting_sets = math.fsum(derivative_exposure(d) for d in derivatives)
     written = math.fsum(written_cd_effective_notional(w) for w in written_credit_derivatives)
-    deriv = netting_sets + written  # KR-129: written credit derivatives sit in the derivatives part
+    deriv = netting_sets + written  # KR-320: written credit derivatives sit in the derivatives part
     sft = math.fsum(sft_exposure(s) for s in sfts)
     obs = math.fsum(
         o.notional * float(LEV["ccf"][CCF_CATEGORIES[o.ccf_category]]) for o in off_balance
     )
     exposure = math.fsum((on, deriv, sft, obs))  # LEV20.5
     if not exposure > 0:
-        raise _domain("the exposure measure is zero: no ratio (KR-130)", "on_balance")
+        raise _domain("the exposure measure is zero: no ratio (KR-321)", "on_balance")
     return {
         "on_balance": on,
         "derivatives": deriv,
@@ -206,7 +206,7 @@ class Protection:
 @dataclass(frozen=True)
 class TradingPosition:
     """A trading book position as KR-51 with a counterparty (KR-66); maturity_years, cash_equity
-    and lgd_applies are read and ignored (LEX30.17-30.18, KR-131)."""
+    and lgd_applies are read and ignored (LEX30.17-30.18, KR-322)."""
 
     id: str
     counterparty: str
@@ -241,7 +241,7 @@ def offset_by_seniority(positions: Sequence[tuple[int, float]]) -> tuple[float, 
 
 def jtd(p: TradingPosition) -> float:
     """LEX30.17: gross JTD of MAR22.11 with LGD 100%: LGD x notional + (market value - notional)
-    is the market value, kept on the side of the position (notional >= 0 is long, KR-132)."""
+    is the market value, kept on the side of the position (notional >= 0 is long, KR-323)."""
     return max(p.market_value, 0.0) if p.notional >= 0 else min(p.market_value, 0.0)
 
 
@@ -258,7 +258,7 @@ def _le_structure(
         group_of[c.id] = c.group
     for c in counterparties:
         if c.group is not None and c.group in group_of and group_of[c.group] != c.group:
-            raise _input(f"group {c.group} is also a counterparty outside it (KR-133)", "group")
+            raise _input(f"group {c.group} is also a counterparty outside it (KR-324)", "group")
     for field, name in refs:
         if name not in group_of:
             raise _input(f"unknown counterparty {name}", field)
@@ -338,10 +338,10 @@ def large_exposures(
     for name in sorted(members):
         ms = members[name]
         total = math.fsum(exposure[c.id] for c in ms)  # LEX10.9
-        counted = math.fsum(exposure[c.id] for c in ms if not c.exempt)  # KR-134
-        gsib = bank_gsib and any(c.gsib for c in ms)  # KR-133
+        counted = math.fsum(exposure[c.id] for c in ms if not c.exempt)  # KR-325
+        gsib = bank_gsib and any(c.gsib for c in ms)  # KR-324
         limit = (LIMIT_GSIB if gsib else LIMIT) * tier1
-        large = total >= LARGE * tier1  # LEX10.8, binary64 (KR-135)
+        large = total >= LARGE * tier1  # LEX10.8, binary64 (KR-326)
         totals.append((total, name, large))
         groups.append({
             "group": name, "members": [c.id for c in ms], "exposure": total,
