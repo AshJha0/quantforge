@@ -1296,52 +1296,52 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Retirement trigger:** a superseding stage K ruling or a change of MAR32.
 - **Validation report:** `specifications/06-risk/frtb-ima-backtest.md`.
 
-### MK-8 FRTB DRC and RRAO (stage K wave 2, K-8a, PROPOSED)
-- **Purpose:** default risk charge for non-securitisations, securitisations and the correlation trading portfolio, and the residual risk add-on (MAR22, MAR23). Specified only.
-- **Inputs:** as in the spec page.
-- **Limitations:** spec and rulings (KR-50 to KR-69) PROPOSED; nothing implemented and no golden file written (2026-11-19). Not a model in use.
-- **Validation:** hand cases in the spec, all reproduced by a blind second model (`program/STAGE_K_BLIND_W2.md`); no build exists yet. **Review:** 2026-11-19.
+### MK-8 FRTB DRC and RRAO (stage K wave 2, K-8a)
+- **Purpose:** default risk charge for non-securitisations, securitisations and the correlation trading portfolio, and the residual risk add-on (`risk.frtb.drc_nonsec`, `.drc_sec_nonctp`, `.drc_ctp`, `.rrao`; MAR22, MAR23), in all four languages.
+- **Inputs:** as in the spec page; tables `specifications/tables/stage_k/mar22_drc.json` and `mar23_rrao.json`, one copy for the four builds.
+- **Limitations:** implemented on the wave 2 integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending; rulings KR-50 to KR-69 and KR-300 to KR-326 PROPOSED except KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 (confirmed 2026-11-20, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section.
+- **Validation:** goldens `drc_k` passed by every build through the neutral runner (each port lane measured 289 of 289 on the 11 wave 2 suites; local laptop, not the acceptance machine, 2026-11-20). **Review:** 2026-11-20.
 - **Tier:** 3.
-- **Challenger:** blind re-derivation (DR-H2) of the spec's hand cases, `program/STAGE_K_BLIND_W2.md`; gate status `program/STAGE_K_W2_GATE.md`.
-- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
-- **Data lineage hash:** sha256 5ddb8e136e2de83d001b165d0814f772f6e75b602650d60a8f45eefd57ad23e9 (spec page `frtb-drc-rrao.md`, no golden file yet) (2026-11-19).
-- **Retirement trigger:** the wave-2 build replaces this entry's limitations, or the item is withdrawn.
+- **Challenger:** 15 of 18 value cases (83.3%); blind re-derivation (DR-H2, `program/STAGE_K_BLIND_W2.md`) and printed figures counted only through a blind packet (KR-250); `oracle/OUTSIDE_SHARES.md`, generated.
+- **Monitoring thresholds:** any DRC or RRAO difference across the four builds; any MAR22 or MAR23 printed figure not reproduced.
+- **Data lineage hash:** sha256 34880a8459fd59ecc65d8d655703531469ddcca3bcd6926a3eebf3291e5f4011 (file bytes of `datasets/golden/stage_k/drc_k.json`, 61 cases) (2026-11-20).
+- **Retirement trigger:** a superseding stage K ruling or a change of MAR22 or MAR23.
 - **Validation report:** `specifications/06-risk/frtb-drc-rrao.md`.
 
-### MK-9 FRTB IMA: ES with liquidity horizons, NMRF and SES, RFET, PLA, capital (stage K wave 2, K-8f, PROPOSED)
-- **Purpose:** liquidity-horizon-scaled expected shortfall, stressed ES for non-modellable factors, the risk factor eligibility test, the P&L attribution test and the IMA capital aggregation (MAR31 to MAR33). Specified only.
-- **Inputs:** as in the spec page.
-- **Limitations:** spec and rulings (KR-50 to KR-69) PROPOSED; nothing implemented and no golden file written (2026-11-19). Not a model in use.
-- **Validation:** hand cases in the spec, all reproduced by a blind second model (`program/STAGE_K_BLIND_W2.md`); no build exists yet. **Review:** 2026-11-19.
+### MK-9 FRTB IMA: ES with liquidity horizons, NMRF and SES, RFET, PLA, capital (stage K wave 2, K-8f)
+- **Purpose:** liquidity-horizon-scaled expected shortfall, stressed ES for non-modellable factors, the risk factor eligibility test, the P&L attribution test and the IMA capital aggregation (`risk.frtb.ima.lh`, `.es_lh`, `.es_stressed`, `.imcc`, `.ses`, `.capital`, `risk.frtb.rfet`, `.rfet.bucket`, `risk.frtb.pla`, `.pla.ks_pvalue`; MAR31 to MAR33), in all four languages.
+- **Inputs:** as in the spec page; tables `specifications/tables/stage_k/mar31_rfet.json`, `mar32_pla.json`, `mar33_ima.json`, one copy for the four builds.
+- **Limitations:** implemented on the wave 2 integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending; rulings KR-50 to KR-69 and KR-300 to KR-326 PROPOSED except KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 (confirmed 2026-11-20, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section.
+- **Validation:** goldens `ima_k` passed by every build through the neutral runner (each port lane measured 289 of 289 on the 11 wave 2 suites; local laptop, not the acceptance machine, 2026-11-20). **Review:** 2026-11-20.
 - **Tier:** 3.
-- **Challenger:** blind re-derivation (DR-H2) of the spec's hand cases, `program/STAGE_K_BLIND_W2.md`; gate status `program/STAGE_K_W2_GATE.md`.
-- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
-- **Data lineage hash:** sha256 60ac9a23779398a0c7c44dba6099093b0943ef20ce5b1b6c159ed78ea9021166 (spec page `frtb-ima.md`, no golden file yet) (2026-11-19).
-- **Retirement trigger:** the wave-2 build replaces this entry's limitations, or the item is withdrawn.
+- **Challenger:** 23 of 33 value cases (69.7%); blind re-derivation (DR-H2, `program/STAGE_K_BLIND_W2.md`) and printed figures counted only through a blind packet (KR-250); `oracle/OUTSIDE_SHARES.md`, generated.
+- **Monitoring thresholds:** any capital, zone or test-statistic difference across the four builds.
+- **Data lineage hash:** sha256 1b09ddffe8e9249c712d5106ec90dbcbc949c126ef1f56d2c0318799b8cbff88 (file bytes of `datasets/golden/stage_k/ima_k.json`, 99 cases) (2026-11-20).
+- **Retirement trigger:** a superseding stage K ruling or a change of MAR31 to MAR33.
 - **Validation report:** `specifications/06-risk/frtb-ima.md`.
 
-### MK-10 CVA risk capital: BA-CVA and SA-CVA (stage K wave 2, K-8g, PROPOSED)
-- **Purpose:** basic (reduced and full) and standardised CVA capital (MAR50). Specified only.
-- **Inputs:** as in the spec page.
-- **Limitations:** spec and rulings (KR-50 to KR-69) PROPOSED; nothing implemented and no golden file written (2026-11-19). Not a model in use.
-- **Validation:** hand cases in the spec, all reproduced by a blind second model (`program/STAGE_K_BLIND_W2.md`); no build exists yet. **Review:** 2026-11-19.
+### MK-10 CVA risk capital: BA-CVA and SA-CVA (stage K wave 2, K-8g)
+- **Purpose:** basic (reduced and full) and standardised CVA capital (`risk.cva.ba`, `risk.cva.sa`; MAR50), in all four languages.
+- **Inputs:** as in the spec page; tables `specifications/tables/stage_k/mar50_cva.json`, one copy for the four builds.
+- **Limitations:** implemented on the wave 2 integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending; rulings KR-50 to KR-69 and KR-300 to KR-326 PROPOSED except KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 (confirmed 2026-11-20, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section.
+- **Validation:** goldens `cva_k`, `cva_ke`, `df_k`, `sacva_k`, `sacva_ke` passed by every build through the neutral runner (each port lane measured 289 of 289 on the 11 wave 2 suites; local laptop, not the acceptance machine, 2026-11-20). **Review:** 2026-11-20.
 - **Tier:** 3.
-- **Challenger:** blind re-derivation (DR-H2) of the spec's hand cases, `program/STAGE_K_BLIND_W2.md`; gate status `program/STAGE_K_W2_GATE.md`.
-- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
-- **Data lineage hash:** sha256 348a99ad113d40f349c9943a4ba3d49f1ff3faddcd10a49fbc76a5ac21b1b6ca (spec page `cva-capital.md`, no golden file yet) (2026-11-19).
-- **Retirement trigger:** the wave-2 build replaces this entry's limitations, or the item is withdrawn.
+- **Challenger:** 14 of 21 value cases of `cva_k`, `df_k`, `sacva_k` (66.7%); blind re-derivation (DR-H2, `program/STAGE_K_BLIND_W2.md`) and printed figures counted only through a blind packet (KR-250); `oracle/OUTSIDE_SHARES.md`, generated.
+- **Monitoring thresholds:** any capital difference across the four builds.
+- **Data lineage hash:** sha256 aba3523e4d99d5d3d08946763be71f7d661aa84470b8321e28c00bf645c08fb0 (file bytes of `datasets/golden/stage_k/cva_k.json`, 8 cases) (2026-11-20).
+- **Retirement trigger:** a superseding stage K ruling or a change of MAR50.
 - **Validation report:** `specifications/06-risk/cva-capital.md`.
 
-### MK-11 Leverage ratio and large exposures, simplified (stage K wave 2, K-8i, PROPOSED)
-- **Purpose:** leverage ratio and large-exposure limit checks (simplified). Specified only.
-- **Inputs:** as in the spec page.
-- **Limitations:** spec and rulings (KR-50 to KR-69) PROPOSED; nothing implemented and no golden file written (2026-11-19). Not a model in use.
-- **Validation:** hand cases in the spec, all reproduced by a blind second model (`program/STAGE_K_BLIND_W2.md`); no build exists yet. **Review:** 2026-11-19.
+### MK-11 Leverage ratio and large exposures, simplified (stage K wave 2, K-8i)
+- **Purpose:** leverage ratio and large-exposure limit checks, simplified (`risk.capital.leverage`, `risk.capital.large_exposures`; LEV, LEX), in all four languages.
+- **Inputs:** as in the spec page; tables `specifications/tables/stage_k/lev_leverage.json` and `lex_large_exposures.json`, one copy for the four builds.
+- **Limitations:** implemented on the wave 2 integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending; rulings KR-50 to KR-69 and KR-300 to KR-326 PROPOSED except KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 (confirmed 2026-11-20, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section.
+- **Validation:** goldens `lev_k`, `lev_ke`, `lex_k`, `lex_ke` passed by every build through the neutral runner (each port lane measured 289 of 289 on the 11 wave 2 suites; local laptop, not the acceptance machine, 2026-11-20). **Review:** 2026-11-20.
 - **Tier:** 3.
-- **Challenger:** blind re-derivation (DR-H2) of the spec's hand cases, `program/STAGE_K_BLIND_W2.md`; gate status `program/STAGE_K_W2_GATE.md`.
-- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
-- **Data lineage hash:** sha256 46b10b589b39c08b25c7d4e0f3641d9c39f9d7b03759446a19b6ea11dcc2d81c (spec page `leverage-large-exposures.md`, no golden file yet) (2026-11-19).
-- **Retirement trigger:** the wave-2 build replaces this entry's limitations, or the item is withdrawn.
+- **Challenger:** 22 of 23 value cases of `lev_k`, `lex_k` (95.7%); blind re-derivation (DR-H2, `program/STAGE_K_BLIND_W2.md`) and printed figures counted only through a blind packet (KR-250); `oracle/OUTSIDE_SHARES.md`, generated.
+- **Monitoring thresholds:** any ratio, limit or breach-flag difference across the four builds.
+- **Data lineage hash:** sha256 abd1899eca6de40db45345c0987505c9e0b1c255d82391d7ffe14c8ab101c14c (file bytes of `datasets/golden/stage_k/lev_k.json`, 13 cases) (2026-11-20).
+- **Retirement trigger:** a superseding stage K ruling or a change of LEV or LEX.
 - **Validation report:** `specifications/06-risk/leverage-large-exposures.md`.
 
 ## Why there is no ISDA SIMM here

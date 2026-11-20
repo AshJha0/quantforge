@@ -16,7 +16,8 @@ Read from the register table in [known issues](known-issues.md); a miss stays a 
 | K-11 | recorded miss | Daily curve run: on the one real day tried (2026-11-13) the consistency check against the Federal Reserve's fitted curve missed, RMSE 17.36 bp against the 15 bp tolerance fixed before the run. A consistency check, not proof; tolerance and method unchanged. | CHANGELOG Unreleased, K-11; `program/STAGE_K_CURVE_DAILY_HANDOVER.md` (measured) | stays a miss |
 | K-11 follow-ups | open limitation | The daily curve run lacks three library operations: a Svensson (four-factor) fit, a Treasury par bootstrap, and Nelson-Siegel evaluation at given times; each needs four builds, goldens and a ruling. | ROADMAP, "Stage K follow-ups" (read) | open; not in v1.0.0 |
 | K-8 | point-release move | Lifting the R6 use restriction on the Bermudan ladder misses its acceptance (in-sample evidence only); the restriction stays for both methods (KR-113) and the lift moves to a later point release. Same issue as rows KA-B1 to KA-B3 above. | `specifications/06-risk/bermudan-ladder-k8.md`; README status (read) | open |
-| K-8a, K-8f, K-8g, K-8i | point-release move | Stage K wave 2 (FRTB DRC and RRAO, IMA, CVA capital, leverage ratio and large exposures) is specified and blind-checked, not implemented. Each spec's gate says the item moves to a point release unless its outside-check share reaches 60%; strict shares stated in the specs: K-8a 11%, K-8f 36%, K-8g 12.5%, K-8i 28%. | `frtb-drc-rrao.md`, `frtb-ima.md`, `cva-capital.md`, `leverage-large-exposures.md` in `specifications/06-risk/`; CHANGELOG Unreleased (read) | not in v1.0.0 as implemented operations |
+| K-8a, K-8f, K-8g, K-8i | open limitation | Stage K wave 2 (18 operations: FRTB DRC and RRAO, IMA, CVA capital, leverage ratio and large exposures) is implemented in all four builds on the integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending. The 60% outside-check gate that would have moved each item to a point release is met after the DR-H2 blind lane: K-8a 15 of 18 (83.3%), K-8f 23 of 33 (69.7%), K-8g 14 of 21 (66.7%), K-8i 22 of 23 (95.7%) (the specs' pre-blind strict shares were 11%, 36%, 12.5% and 28%). Open: rulings KR-50 to KR-69 and KR-300 to KR-326 stay PROPOSED except KR-312, KR-315, KR-319, KR-320, KR-324 (and KR-327), confirmed 2026-11-20. The row closes when the branch is merged and the rulings are confirmed. | `frtb-drc-rrao.md`, `frtb-ima.md`, `cva-capital.md`, `leverage-large-exposures.md` in `specifications/06-risk/`; `oracle/OUTSIDE_SHARES.md` (generated, measured 2026-11-20); `specifications/stage-k-rulings-w2.md` (read) | in v1.0.0 as implemented operations only once merged into `k-v1` with its rulings confirmed |
+| K-8a, K-8f, K-8g, K-8i (mutation) | open limitation | The wave 2 library files are in no mutation cell: `conformance/mutation/stages.json` stage K maps `frtb_backtest`, `saccr`, `stage_k` and `bermudan_k8` only, so a pull request that changes `frtb_drc`, `frtb_ima`, `cva` or `leverage` plans no mutation sample for them (checked 2026-11-20 with `plan_matrix.py --stage PR` on the wave 2 diff: only the stage F `frtb` cells, Python and Java, are planned, because the wave 2 merge edits `frtb.py` and `FrtbSbm.java`). Proposed mapping, not yet applied: `frtb_drc` on `drc_k` (Python `quantforge_core.frtb_drc.*`, Rust `**/frtb_drc.rs`, C++ `cpp26/src/core/frtb_drc.cpp`, Java `org.quantforge.risk.FrtbDrc`); `frtb_ima` on `ima_k` (`frtb_ima`, `FrtbIma`); `cva_capital` on `cva_k,cva_ke,df_k,sacva_k,sacva_ke` (`cva`, `Cva`); `leverage` on `lev_k,lev_ke,lex_k,lex_ke` (`leverage`, `Leverage`); each with its kill tests in the mutmut `tests_dir`. Adding them makes the next pull request that touches the files run 40-mutant samples under the 32-of-40 gate, so the kill rate should be measured first. | `conformance/mutation/stages.json`, `.github/workflows/mutation-stage.yml` (read 2026-11-20) | wave 2 code is not mutation-tested until the mapping lands |
 | K-2 | gate not met at the tag | The paper ledger needs 20 recorded trading days; v1.0.0 does not wait, and states "not met: N of 20 recorded trading days" (see "K-2 at v1.0.0" at the top of `docs/known-issues.md`). | owner decision 2026-11-20 (read) | open |
 | H-9 R2 | not obtained; attempt ended | The second recording attempt needed one unbroken 6-hour session; all 30 sessions on 2026-11-19 and 2026-11-20 ended before hour 6 (websocket keepalive ping timeouts; whole-connection stalls of 50 to 107 s seen before drops; cause not established: network path or machine load). The owner ended the attempt on 2026-11-20; the recorder is stopped. No R2 figure exists; the workload R MISS of 2026-11-19 stands; targets and the 6-hour rule are unchanged. | recorder log and `benchmarks/h9/r2_status.py` (read); owner decision 2026-11-20; ruling note under HR-134, `specifications/stage-h-rulings-audit.md` | closed: not obtained |
 | G1k | release evidence | Ruleset 26732064 has `strict_required_status_checks_policy: false`, so a pull request behind main can merge. Turning it on is the owner's repository setting. | `benchmarks/results/k7/ruleset-2026-11-20.json` (read via the API); `tools/check_ruleset.py` | open; owner |
@@ -37,7 +38,7 @@ Read from the register table in [known issues](known-issues.md); a miss stays a 
 
 ## Golden cases and outside checks per stage
 
-All suites: 8,004 value-checked, 5,700 error and 2,554 invariance cases (16,258 in all; [case figures](case-figures.md)). A value-checked case must return the oracle's numbers within a stated tolerance; an error case checks the error code only; an invariance case checks that two related inputs get the same answer.
+All suites: 8,099 value-checked, 5,894 error and 2,554 invariance cases (16,547 in all; [case figures](case-figures.md)). A value-checked case must return the oracle's numbers within a stated tolerance; an error case checks the error code only; an invariance case checks that two related inputs get the same answer.
 
 Outside-checked share: value-checked cases re-derived outside the author's own code, by an outside library or, where the rule allows it, by a blind re-derivation by a second AI lane that saw the rules and inputs but not the answers; never by a person (README, "Words used here"). One definition on every page: `tools/case_figures.py outside_pair()` (rule R6-13, decision D6; floor 60.0% per stage, and from stage H on per plan item). Stages A to C, R2 and R6 are outside the share table. The share's denominator is the share table's own count (without generated sweeps), so it can be smaller than the value-checked column. The tag column is the plan's tag from ROADMAP: stage K is not tagged yet (target v1.0.0).
 
@@ -55,7 +56,7 @@ Outside-checked share: value-checked cases re-derived outside the author's own c
 | R6 |  |  |  | 43 | 93 | 0 | not in the share table |  |
 | J | Research and portfolio | v0.9 | Published study reports | 215 | 229 | 0 | 143 of 215 (66.5%) | met |
 | H | Microstructure and execution | v0.10 | Use case 5 | 205 | 207 | 0 | 160 of 205 (78.0%) | met |
-| K | Platform and release | v1.0.0 | Clean-machine run of all examples | 123 | 99 | 16 | 97 of 123 (78.9%) | met |
+| K | Platform and release | v1.0.0 | Clean-machine run of all examples | 218 | 293 | 16 | 171 of 218 (78.4%) | met |
 
 Stage H per plan item:
 
@@ -91,8 +92,12 @@ Stage K per plan item:
 | K-5a | 12 | 9 | 75.0% | met |
 | K-8 | 7 | 7 | 100.0% | met |
 | K-8 guard | 6 | 6 | 100.0% | met |
+| K-8a | 18 | 15 | 83.3% | met |
 | K-8d | 19 | 12 | 63.2% | met |
 | K-8e | 28 | 23 | 82.1% | met |
+| K-8f | 33 | 23 | 69.7% | met |
+| K-8g | 21 | 14 | 66.7% | met |
+| K-8i | 23 | 22 | 95.7% | met |
 
 ## Unit-test line coverage
 

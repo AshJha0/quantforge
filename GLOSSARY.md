@@ -376,6 +376,17 @@ Stage K round 1 is merged to main by 2026-11-20 (pull requests #58 and #59), not
 | Anchor | The head hash and row count of a ledger stamped with OpenTimestamps on a separate branch, so that a consistent rewrite of old rows or a truncated tail becomes visible |
 | Blind re-derivation | An outside check where no library exists: a lane on a different model derives the answers from a spec stripped of every expected value, freezes them with a hash, and a fixed script compares them with the goldens; a leaked case does not count (DR-H2) |
 | Placeholder weights | Risk weights or impact parameters that are not calibrated to any market; every output that uses them says "placeholder weights" (the sensitivity-based margin, `sbim`, in stages G and K) |
+| Default risk charge (DRC) | FRTB standardised capital for the loss if issuers default: jump-to-default per position, netted per obligor, weighted by rating, then `max(sum RW net_long - HBR sum RW abs(net_short), 0)` per bucket (`06-risk/frtb-drc-rrao.md`, MAR22) |
+| Jump-to-default (JTD) | The loss on a position if its issuer defaults now: `LGD x notional + PnL`, with `PnL = market value - notional`, floored at 0 for a long and capped at 0 for a short, before netting (MAR22.11, MAR22.12) |
+| Hedge benefit ratio (HBR) | Net longs over net longs plus absolute net shorts in a DRC bucket; it limits how much the shorts reduce the charge |
+| RRAO | Residual risk add-on: 1% of the gross notional of exotic instruments and 0.1% of other instruments with residual risks (MAR23) |
+| Liquidity horizon | The number of days (10, 20, 40, 60 or 120) assumed to exit a risk factor; FRTB IMA scales expected shortfall by it (MAR33) |
+| NMRF and SES | Non-modellable risk factors, which fail the eligibility test, and the stressed expected shortfall charged for them instead (MAR33) |
+| RFET | Risk factor eligibility test: enough real-price observations, spread through the year, for a factor to be modellable (MAR31) |
+| PLA test | P&L attribution test: Spearman correlation and Kolmogorov-Smirnov distance between hypothetical and risk-theoretical P&L decide a desk's zone (MAR32) |
+| BA-CVA and SA-CVA | The basic and standardised approaches to CVA risk capital: one from EAD, maturity and a supervisory weight; one from CVA sensitivities by risk class (`06-risk/cva-capital.md`, MAR50) |
+| Leverage ratio | Tier 1 capital over an exposure measure without risk weights; the minimum is 3% (`06-risk/leverage-large-exposures.md`, LEV20) |
+| Large exposure | An exposure to one counterparty or connected group of at least 10% of Tier 1; the limit is 25%, 15% between global systemically important banks (LEX) |
 
 ## Tutorial terms
 

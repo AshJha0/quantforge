@@ -110,13 +110,8 @@ public final class FrtbSbm {
                     k[b] = sum;
                     continue;
                 }
-                double q = 0.0;
-                for (int i = 0; i < ws.size(); i++) {
-                    for (int j = 0; j < ws.size(); j++) {
-                        double r = i == j ? 1.0 : scale(sc, rho.of(ids.get(b), ws.get(i).factor(), ws.get(j).factor()));
-                        q += ws.get(i).ws() * ws.get(j).ws() * r;
-                    }
-                }
+                int id = ids.get(b);
+                double q = bucketRadicand(ws, (x, y) -> scale(sc, rho.of(id, x, y)));
                 k[b] = Math.sqrt(Math.max(q, 0.0));
             }
             double[] used = s.clone();
@@ -145,6 +140,65 @@ public final class FrtbSbm {
     }
 
     private static double total(double[] k, double[] s, List<Integer> ids, Gamma gamma, String sc) {
+        return crossRadicand(k, s, (b, c) -> scale(sc, gamma.of(ids.get(b), ids.get(c))));
+    }
+
+    /** Correlation of two factors inside one bucket, any scenario scaling already applied. */
+    @FunctionalInterface
+    public interface FactorRho {
+        /**
+         * The correlation used.
+         *
+         * @param a first factor
+         * @param b second factor
+         * @return the correlation
+         */
+        double of(List<String> a, List<String> b);
+    }
+
+    /** Correlation of two buckets given by their positions in the aggregation order, any scaling already applied. */
+    @FunctionalInterface
+    public interface PositionGamma {
+        /**
+         * The correlation used.
+         *
+         * @param b position of the first bucket
+         * @param c position of the second bucket
+         * @return the correlation
+         */
+        double of(int b, int c);
+    }
+
+    /**
+     * {@code sum_k sum_l rho_kl WS_k WS_l} over one bucket with rho 1 on the diagonal, not floored (MAR21.4(1)): the
+     * arithmetic of {@link #aggregate}, in its order. Shared with SA-CVA (MAR50.53(1), {@link Cva}), which adds its
+     * hedge term before the root.
+     *
+     * @param ws the bucket's weighted sensitivities, in input order
+     * @param rho correlation of two distinct entries (called only for i != j)
+     * @return the radicand
+     */
+    public static double bucketRadicand(List<Ws> ws, FactorRho rho) {
+        double q = 0.0;
+        for (int i = 0; i < ws.size(); i++) {
+            for (int j = 0; j < ws.size(); j++) {
+                double r = i == j ? 1.0 : rho.of(ws.get(i).factor(), ws.get(j).factor());
+                q += ws.get(i).ws() * ws.get(j).ws() * r;
+            }
+        }
+        return q;
+    }
+
+    /**
+     * {@code sum_b K_b^2 + sum_{b != c} gamma_bc S_b S_c}, not floored (MAR21.4(4)): the arithmetic of
+     * {@link #aggregate}, in its order. Shared with SA-CVA (MAR50.53(2)), which always passes the clipped S_b.
+     *
+     * @param k bucket capital, in aggregation order
+     * @param s the S_b used, same order
+     * @param gamma correlation of two bucket positions
+     * @return the radicand
+     */
+    public static double crossRadicand(double[] k, double[] s, PositionGamma gamma) {
         double t = 0.0;
         for (int b = 0; b < k.length; b++) {
             t += k[b] * k[b];
@@ -152,7 +206,7 @@ public final class FrtbSbm {
         for (int b = 0; b < k.length; b++) {
             for (int c = 0; c < k.length; c++) {
                 if (b != c) {
-                    t += scale(sc, gamma.of(ids.get(b), ids.get(c))) * s[b] * s[c];
+                    t += gamma.of(b, c) * s[b] * s[c];
                 }
             }
         }

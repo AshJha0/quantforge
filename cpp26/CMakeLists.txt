@@ -159,6 +159,17 @@ if(BUILD_TESTING)
   target_sources(quantforge_core_tests PRIVATE tests/test_stage_k_w1b.cpp)
 endif()
 
+# Stage K wave 2 (K-8a FRTB DRC and RRAO, K-8f FRTB IMA, K-8g CVA capital, K-8i leverage ratio and large
+# exposures), in its own block so it merges apart from the central lists. The four files #embed their tables
+# (specifications/tables/stage_k, ruling KR-50).
+target_sources(quantforge_core PRIVATE src/core/frtb_drc.cpp src/core/frtb_ima.cpp src/core/cva.cpp src/core/leverage.cpp)
+file(GLOB QF_STAGE_K_TABLES ${CMAKE_CURRENT_SOURCE_DIR}/../specifications/tables/stage_k/*.json)
+set_property(SOURCE src/core/frtb_drc.cpp src/core/frtb_ima.cpp src/core/cva.cpp src/core/leverage.cpp APPEND PROPERTY
+  OBJECT_DEPENDS ${QF_STAGE_K_TABLES})
+if(BUILD_TESTING)
+  target_sources(quantforge_core_tests PRIVATE tests/test_frtb_drc_ima.cpp tests/test_cva_leverage.cpp)
+endif()
+
 # H-5 p50/p99 harness (specifications/10-execution/library-interfaces.md section 3). Off by default; no download.
 option(QF_H5_BENCH "Build the qf_h5_latency harness" OFF)
 if(QF_H5_BENCH)
