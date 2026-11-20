@@ -17,17 +17,21 @@ Integration lane: Claude Opus 5.5. Reviewer: none: self-assessment; no second re
 |---|---|---|---|
 | 1 | merge k-margin (fb65a4ad) | merged; Python conformance 16,129/16,129 and targeted xva tests pass | 9ecd3feb |
 | 2 | merge k-audit-a (8106ab22, incl. K-5a v2 blind commits) | merged; Python conformance + targeted tests were running at shutdown (rerun: `/c/Work/Claude/qf-wt/_h4ci/kr2/pyconf.sh m2 <tests>`) | 25ca6c61 |
-| 3 | merge k-audit-jobs (552af98e) | to do | |
-| 4 | merge k-audit-shares (ab7e8a31), renumber KR-210..212 to KR-250..252 | to do | |
-| 5 | outside_shares: lim_k, dropped blind credit, KR-250 records | to do | |
-| 6 | E1 gate: NaN goldens for backtest.zone and .desk | to do | |
-| 7 | risk.backtest.traffic_light binomial (KR-237) in four builds | to do | |
-| 8 | mutation modules for saccr, stage_k, bermudan_k8; stage F kill tests | to do | |
-| 9 | generator drift (stage G E1, gen_cli_cases.py) | to do | |
-| 10 | docs to the merged state | to do | |
-| 11 | verification | to do | |
+| 3 | merge k-audit-jobs (552af98e) | merged; KR-209 owner-confirmed; daily-job tests 117 passed | 03772bf6, bcd6835d |
+| 4 | merge k-audit-shares (ab7e8a31), renumber KR-210..212 to KR-250..252 | merged on lane k-r2-e1; KR-210..212 renumbered KR-250..252 | 0c225b83 |
+| 5 | outside_shares: lim_k, dropped blind credit, KR-250 records | lane k-r2-e1; then K-4c blind lane k-r2-blind 14/14 MATCH, 13 counted; stage K 91 of 113 | 0c225b83, 9c8b8272 |
+| 6 | E1 gate: NaN goldens for backtest.zone and .desk | lane k-r2-e1; check_e1_coverage 0 problems | 0c225b83 |
+| 7 | risk.backtest.traffic_light binomial (KR-237) in four builds | lane k-r2-tl (KR-253); boundary fix in progress | pending |
+| 8 | mutation modules for saccr, stage_k, bermudan_k8; stage F kill tests | lane k-r2-mut: 40/40, 39/40 + 1 Equivalent, 40/40 on CI sample; four stage F survivors killed | 91588373 |
+| 9 | generator drift (stage G E1, gen_cli_cases.py) | lane k-r2-gen2: stage G E1 and cli_cases.inc regenerated, --check gates | 49857faa |
+| 10 | docs to the merged state | lanes k-r2-docs, k-r2-kf3 (KF-3), k-r2-kf2 (KF-13..16) | b6cdcf8d, 918d7609, pending |
+| 11 | verification | early chains at e0f52a65 green except stale case total; follow-up audit KF-1..12 and its check done; final chains pending | 91c99115 |
 
 ## Log
+
+### 2026-11-20 (coordinator, Claude Opus 5.5, owner-delegated decisions)
+
+- Merge 2 interaction fixed (490a9654: sbim_alias_k-0021 note). Lanes run in parallel off k-r2 and merged as listed in State. Follow-up different-model audit (Fable 5.2): STAGE_K_R1_FOLLOWUP_AUDIT.md in the plan folder, 0 Critical, 4 Major, 8 Minor; its check of the responses: 8 of 12 closed, KF-2 open until k-r2-tl merges, new KF-13 (Major) to KF-16. H-9 test sample-time defect fixed (e0f52a65).
 
 ### WIP at shutdown (2026-11-20 ~00:15 UTC)
 
