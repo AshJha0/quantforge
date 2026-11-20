@@ -2272,8 +2272,8 @@
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 359,
     "share_with_rederivation": 0.787281,
-    "all_cases_share": 0.589491,
-    "error_and_invariance_cases": 153
+    "all_cases_share": 0.5781,
+    "error_and_invariance_cases": 165
    },
    "with_sweeps": {
     "cases": 456,
@@ -2287,8 +2287,8 @@
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 359,
     "share_with_rederivation": 0.787281,
-    "all_cases_share": 0.589491,
-    "error_and_invariance_cases": 153
+    "all_cases_share": 0.5781,
+    "error_and_invariance_cases": 165
    },
    "sweeps": null,
    "libraries": {
@@ -2544,7 +2544,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 6
+     "error_and_invariance_cases": 12
     },
     "xva.exposure.collateralised": {
      "cases": 10,
@@ -2619,7 +2619,7 @@
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 7
+     "error_and_invariance_cases": 13
     }
    },
    "meets_floor": true
