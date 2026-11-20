@@ -19936,46 +19936,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     "NaN",
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
+     "NaN"
     ],
     "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
+     0.97
     ],
-    "hazard_rate": 0.03,
+    "hazard_rate": 700.0,
     "recovery": 0.4,
-    "wwr_b": 0.0
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -19989,7 +19965,7 @@
     "e1",
     "non_finite",
     "nan",
-    "base:wwr_g-0001",
+    "base:wwr_g-0014",
     "input:/times/0"
    ]
   },
@@ -19998,46 +19974,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     "Infinity",
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
+     "Infinity"
     ],
     "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
+     0.97
     ],
-    "hazard_rate": 0.03,
+    "hazard_rate": 700.0,
     "recovery": 0.4,
-    "wwr_b": 0.0
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -20051,7 +20003,7 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
+    "base:wwr_g-0014",
     "input:/times/0"
    ]
   },
@@ -20060,46 +20012,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     "-Infinity",
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
+     "-Infinity"
     ],
     "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
+     0.97
     ],
-    "hazard_rate": 0.03,
+    "hazard_rate": 700.0,
     "recovery": 0.4,
-    "wwr_b": 0.0
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -20113,7 +20041,7 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
+    "base:wwr_g-0014",
     "input:/times/0"
    ]
   },
@@ -20122,46 +20050,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.0,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
+     0.0
     ],
     "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
+     0.97
     ],
-    "hazard_rate": 0.03,
+    "hazard_rate": 700.0,
     "recovery": 0.4,
-    "wwr_b": 0.0
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "any"
@@ -20173,7 +20077,7 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:wwr_g-0001",
+    "base:wwr_g-0014",
     "input:/times/0"
    ]
   },
@@ -20182,46 +20086,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     -0.0,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
+     -0.0
     ],
     "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
+     0.97
     ],
-    "hazard_rate": 0.03,
+    "hazard_rate": 700.0,
     "recovery": 0.4,
-    "wwr_b": 0.0
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "same_as",
@@ -20239,7 +20119,7 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:wwr_g-0001",
+    "base:wwr_g-0014",
     "input:/times/0"
    ]
   },
@@ -20248,46 +20128,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
-     "NaN"
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
+     1.0
     ],
     "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
+     "NaN"
     ],
-    "hazard_rate": 0.03,
+    "hazard_rate": 700.0,
     "recovery": 0.4,
-    "wwr_b": 0.0
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -20301,8 +20157,8 @@
     "e1",
     "non_finite",
     "nan",
-    "base:wwr_g-0001",
-    "input:/times/3"
+    "base:wwr_g-0014",
+    "input:/discount_factors/0"
    ]
   },
   {
@@ -20310,46 +20166,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
-     "Infinity"
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
+     1.0
     ],
     "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
+     "Infinity"
     ],
-    "hazard_rate": 0.03,
+    "hazard_rate": 700.0,
     "recovery": 0.4,
-    "wwr_b": 0.0
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -20363,8 +20195,8 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
-    "input:/times/3"
+    "base:wwr_g-0014",
+    "input:/discount_factors/0"
    ]
   },
   {
@@ -20372,46 +20204,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
-     "-Infinity"
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
+     1.0
     ],
     "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
+     "-Infinity"
     ],
-    "hazard_rate": 0.03,
+    "hazard_rate": 700.0,
     "recovery": 0.4,
-    "wwr_b": 0.0
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -20425,8 +20233,8 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
-    "input:/times/3"
+    "base:wwr_g-0014",
+    "input:/discount_factors/0"
    ]
   },
   {
@@ -20434,46 +20242,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
-     0.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
+     1.0
     ],
     "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
+     0.0
     ],
-    "hazard_rate": 0.03,
+    "hazard_rate": 700.0,
     "recovery": 0.4,
-    "wwr_b": 0.0
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "any"
@@ -20485,8 +20269,8 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:wwr_g-0001",
-    "input:/times/3"
+    "base:wwr_g-0014",
+    "input:/discount_factors/0"
    ]
   },
   {
@@ -20494,46 +20278,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
-     -0.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
+     1.0
     ],
     "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
+     -0.0
     ],
-    "hazard_rate": 0.03,
+    "hazard_rate": 700.0,
     "recovery": 0.4,
-    "wwr_b": 0.0
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "same_as",
@@ -20551,8 +20311,8 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:wwr_g-0001",
-    "input:/times/3"
+    "base:wwr_g-0014",
+    "input:/discount_factors/0"
    ]
   },
   {
@@ -20560,46 +20320,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": "NaN",
+    "recovery": 0.4,
     "values": [
      [
-      "NaN",
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -20613,8 +20349,8 @@
     "e1",
     "non_finite",
     "nan",
-    "base:wwr_g-0001",
-    "input:/values/0/0"
+    "base:wwr_g-0014",
+    "input:/hazard_rate"
    ]
   },
   {
@@ -20622,46 +20358,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": "Infinity",
+    "recovery": 0.4,
     "values": [
      [
-      "Infinity",
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -20675,8 +20387,8 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
-    "input:/values/0/0"
+    "base:wwr_g-0014",
+    "input:/hazard_rate"
    ]
   },
   {
@@ -20684,46 +20396,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": "-Infinity",
+    "recovery": 0.4,
     "values": [
      [
-      "-Infinity",
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -20737,8 +20425,8 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
-    "input:/values/0/0"
+    "base:wwr_g-0014",
+    "input:/hazard_rate"
    ]
   },
   {
@@ -20746,46 +20434,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 0.0,
+    "recovery": 0.4,
     "values": [
      [
-      0.0,
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "any"
@@ -20797,8 +20461,8 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:wwr_g-0001",
-    "input:/values/0/0"
+    "base:wwr_g-0014",
+    "input:/hazard_rate"
    ]
   },
   {
@@ -20806,46 +20470,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": -0.0,
+    "recovery": 0.4,
     "values": [
      [
-      -0.0,
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "same_as",
@@ -20863,8 +20503,8 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:wwr_g-0001",
-    "input:/values/0/0"
+    "base:wwr_g-0014",
+    "input:/hazard_rate"
    ]
   },
   {
@@ -20872,46 +20512,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": "NaN",
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      "NaN"
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -20925,8 +20541,8 @@
     "e1",
     "non_finite",
     "nan",
-    "base:wwr_g-0001",
-    "input:/values/0/3"
+    "base:wwr_g-0014",
+    "input:/recovery"
    ]
   },
   {
@@ -20934,46 +20550,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": "Infinity",
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      "Infinity"
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -20987,8 +20579,8 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
-    "input:/values/0/3"
+    "base:wwr_g-0014",
+    "input:/recovery"
    ]
   },
   {
@@ -20996,46 +20588,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": "-Infinity",
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      "-Infinity"
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -21049,8 +20617,8 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
-    "input:/values/0/3"
+    "base:wwr_g-0014",
+    "input:/recovery"
    ]
   },
   {
@@ -21058,46 +20626,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.0,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      0.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "any"
@@ -21109,8 +20653,8 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:wwr_g-0001",
-    "input:/values/0/3"
+    "base:wwr_g-0014",
+    "input:/recovery"
    ]
   },
   {
@@ -21118,46 +20662,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": -0.0,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -0.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "same_as",
@@ -21175,8 +20695,8 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:wwr_g-0001",
-    "input:/values/0/3"
+    "base:wwr_g-0014",
+    "input:/recovery"
    ]
   },
   {
@@ -21184,46 +20704,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      "NaN"
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      "NaN",
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -21237,8 +20733,8 @@
     "e1",
     "non_finite",
     "nan",
-    "base:wwr_g-0001",
-    "input:/values/3/0"
+    "base:wwr_g-0014",
+    "input:/values/0/0"
    ]
   },
   {
@@ -21246,46 +20742,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      "Infinity"
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      "Infinity",
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -21299,8 +20771,8 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
-    "input:/values/3/0"
+    "base:wwr_g-0014",
+    "input:/values/0/0"
    ]
   },
   {
@@ -21308,46 +20780,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      "-Infinity"
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      "-Infinity",
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -21361,8 +20809,8 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
-    "input:/values/3/0"
+    "base:wwr_g-0014",
+    "input:/values/0/0"
    ]
   },
   {
@@ -21370,46 +20818,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      0.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.0,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "any"
@@ -21421,8 +20845,8 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:wwr_g-0001",
-    "input:/values/3/0"
+    "base:wwr_g-0014",
+    "input:/values/0/0"
    ]
   },
   {
@@ -21430,46 +20854,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      -0.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      -0.0,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "same_as",
@@ -21487,8 +20887,8 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:wwr_g-0001",
-    "input:/values/3/0"
+    "base:wwr_g-0014",
+    "input:/values/0/0"
    ]
   },
   {
@@ -21496,46 +20896,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
       "NaN"
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -21549,8 +20925,8 @@
     "e1",
     "non_finite",
     "nan",
-    "base:wwr_g-0001",
-    "input:/values/3/3"
+    "base:wwr_g-0014",
+    "input:/values/1/0"
    ]
   },
   {
@@ -21558,46 +20934,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
       "Infinity"
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -21611,8 +20963,8 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
-    "input:/values/3/3"
+    "base:wwr_g-0014",
+    "input:/values/1/0"
    ]
   },
   {
@@ -21620,46 +20972,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
       "-Infinity"
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "error",
@@ -21673,8 +21001,8 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
-    "input:/values/3/3"
+    "base:wwr_g-0014",
+    "input:/values/1/0"
    ]
   },
   {
@@ -21682,46 +21010,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
       0.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "any"
@@ -21733,8 +21037,8 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:wwr_g-0001",
-    "input:/values/3/3"
+    "base:wwr_g-0014",
+    "input:/values/1/0"
    ]
   },
   {
@@ -21742,46 +21046,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
       -0.0
      ]
     ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": 0.5
    },
    "expected": {
     "status": "same_as",
@@ -21799,8 +21079,8 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:wwr_g-0001",
-    "input:/values/3/3"
+    "base:wwr_g-0014",
+    "input:/values/1/0"
    ]
   },
   {
@@ -21808,46 +21088,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     "NaN",
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": "NaN"
    },
    "expected": {
     "status": "error",
@@ -21861,8 +21117,8 @@
     "e1",
     "non_finite",
     "nan",
-    "base:wwr_g-0001",
-    "input:/discount_factors/0"
+    "base:wwr_g-0014",
+    "input:/wwr_b"
    ]
   },
   {
@@ -21870,46 +21126,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     "Infinity",
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": "Infinity"
    },
    "expected": {
     "status": "error",
@@ -21923,8 +21155,8 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
-    "input:/discount_factors/0"
+    "base:wwr_g-0014",
+    "input:/wwr_b"
    ]
   },
   {
@@ -21932,46 +21164,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     "-Infinity",
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": "-Infinity"
    },
    "expected": {
     "status": "error",
@@ -21985,8 +21193,8 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:wwr_g-0001",
-    "input:/discount_factors/0"
+    "base:wwr_g-0014",
+    "input:/wwr_b"
    ]
   },
   {
@@ -21994,45 +21202,21 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     0.0,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
     "wwr_b": 0.0
    },
    "expected": {
@@ -22045,8 +21229,8 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:wwr_g-0001",
-    "input:/discount_factors/0"
+    "base:wwr_g-0014",
+    "input:/wwr_b"
    ]
   },
   {
@@ -22054,46 +21238,22 @@
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
-     0.25,
-     0.5,
-     0.75,
      1.0
     ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
     "values": [
      [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
+      1.0
      ],
      [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
+      1.0
      ]
     ],
-    "discount_factors": [
-     -0.0,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
+    "wwr_b": -0.0
    },
    "expected": {
     "status": "same_as",
@@ -22111,1204 +21271,7 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:wwr_g-0001",
-    "input:/discount_factors/0"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0325",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     "NaN"
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:wwr_g-0001",
-    "input:/discount_factors/3"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0326",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     "Infinity"
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:wwr_g-0001",
-    "input:/discount_factors/3"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0327",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     "-Infinity"
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:wwr_g-0001",
-    "input:/discount_factors/3"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0328",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.0
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:wwr_g-0001",
-    "input:/discount_factors/3"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0329",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     -0.0
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1g_xva-0328"
-   },
-   "tolerance_class": "root_finding",
-   "tolerance_limit": {
-    "absolute": 1e-09,
-    "relative": 1e-12,
-    "reason": "sums of products of the inputs"
-   },
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:wwr_g-0001",
-    "input:/discount_factors/3"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0330",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": "NaN",
-    "recovery": 0.4,
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:wwr_g-0001",
-    "input:/hazard_rate"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0331",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": "Infinity",
-    "recovery": 0.4,
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:wwr_g-0001",
-    "input:/hazard_rate"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0332",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": "-Infinity",
-    "recovery": 0.4,
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:wwr_g-0001",
-    "input:/hazard_rate"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0333",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.0,
-    "recovery": 0.4,
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:wwr_g-0001",
-    "input:/hazard_rate"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0334",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": -0.0,
-    "recovery": 0.4,
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1g_xva-0333"
-   },
-   "tolerance_class": "root_finding",
-   "tolerance_limit": {
-    "absolute": 1e-09,
-    "relative": 1e-12,
-    "reason": "sums of products of the inputs"
-   },
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:wwr_g-0001",
-    "input:/hazard_rate"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0335",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": "NaN",
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:wwr_g-0001",
-    "input:/recovery"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0336",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": "Infinity",
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:wwr_g-0001",
-    "input:/recovery"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0337",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": "-Infinity",
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:wwr_g-0001",
-    "input:/recovery"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0338",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.0,
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:wwr_g-0001",
-    "input:/recovery"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0339",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": -0.0,
-    "wwr_b": 0.0
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1g_xva-0338"
-   },
-   "tolerance_class": "root_finding",
-   "tolerance_limit": {
-    "absolute": 1e-09,
-    "relative": 1e-12,
-    "reason": "sums of products of the inputs"
-   },
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:wwr_g-0001",
-    "input:/recovery"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0340",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": "NaN"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:wwr_g-0001",
-    "input:/wwr_b"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0341",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": "Infinity"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:wwr_g-0001",
-    "input:/wwr_b"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0342",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": "-Infinity"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:wwr_g-0001",
-    "input:/wwr_b"
-   ]
-  },
-  {
-   "case_id": "e1g_xva-0343",
-   "operation": "xva.wwr.cva_hw",
-   "inputs": {
-    "times": [
-     0.25,
-     0.5,
-     0.75,
-     1.0
-    ],
-    "values": [
-     [
-      3.0,
-      5.0,
-      2.0,
-      -1.0
-     ],
-     [
-      -2.0,
-      -4.0,
-      -6.0,
-      -3.0
-     ],
-     [
-      1.0,
-      6.0,
-      9.0,
-      4.0
-     ],
-     [
-      0.5,
-      -1.0,
-      2.5,
-      7.0
-     ]
-    ],
-    "discount_factors": [
-     0.995,
-     0.99,
-     0.985,
-     0.98
-    ],
-    "hazard_rate": 0.03,
-    "recovery": 0.4,
-    "wwr_b": -0.0
-   },
-   "expected": {
-    "status": "ok",
-    "outputs": {
-     "cva": 0.04362773322524341,
-     "a": [
-      -3.506557897319982,
-      -3.506557897319982,
-      -3.506557897319982,
-      -3.506557897319982
-     ]
-    }
-   },
-   "tolerance_class": "root_finding",
-   "tolerance_limit": {
-    "absolute": 1e-09,
-    "relative": 1e-12,
-    "reason": "sums of products of the inputs"
-   },
-   "verified_by": [
-    "copied:wwr_g-0001",
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:wwr_g-0001",
+    "base:wwr_g-0014",
     "input:/wwr_b"
    ]
   }

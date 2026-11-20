@@ -2261,34 +2261,34 @@
   },
   "G": {
    "without_sweeps": {
-    "cases": 441,
+    "cases": 456,
     "library-object": 303,
     "library-primitive": 56,
     "independent-rederivation": 0,
     "reimplementation": 6,
-    "none": 76,
+    "none": 91,
     "counted": 359,
-    "share": 0.814059,
+    "share": 0.787281,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 359,
-    "share_with_rederivation": 0.814059,
-    "all_cases_share": 0.609508,
-    "error_and_invariance_cases": 148
+    "share_with_rederivation": 0.787281,
+    "all_cases_share": 0.589491,
+    "error_and_invariance_cases": 153
    },
    "with_sweeps": {
-    "cases": 441,
+    "cases": 456,
     "library-object": 303,
     "library-primitive": 56,
     "independent-rederivation": 0,
     "reimplementation": 6,
-    "none": 76,
+    "none": 91,
     "counted": 359,
-    "share": 0.814059,
+    "share": 0.787281,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 359,
-    "share_with_rederivation": 0.814059,
-    "all_cases_share": 0.609508,
-    "error_and_invariance_cases": 148
+    "share_with_rederivation": 0.787281,
+    "all_cases_share": 0.589491,
+    "error_and_invariance_cases": 153
    },
    "sweeps": null,
    "libraries": {
@@ -2607,19 +2607,19 @@
      "error_and_invariance_cases": 4
     },
     "xva.wwr.cva_hw": {
-     "cases": 4,
+     "cases": 19,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 0,
      "reimplementation": 0,
-     "none": 4,
+     "none": 19,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 0,
      "share_with_rederivation": 0.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 2
+     "error_and_invariance_cases": 7
     }
    },
    "meets_floor": true

@@ -1,5 +1,7 @@
 # Stage K: replacement of the stage G margin values and rename of `xva.simm.ir_delta` (v0.10.1)
 
+Correction 2026-11-20 (owner decision): there is no v0.10.1 tag and there will not be one. This work is merged to `main` (pull requests #58 and #59), not tagged, and released with v1.0.0; the last tag is v0.10.0. The text below is kept as written at the time.
+
 Written 2026-11-19 by the stage G margin-model fix lane (Claude Opus 5.5, branch `k-margin`, from `k-r1` at `9b8bc1b5` with `k-simm-spec` merged). Rulings KR-150 to KR-155 (`specifications/stage-k-rulings-margin.md`) were committed in `d4d85cf6`, before any value, golden or code change. Owner decision 2026-11-19 (binding): the project uses no ISDA material. This lane did not open, fetch, search for or quote any ISDA document or parameter set, did not open the Open Source Risk Engine's margin calibration files, and compared no value with any outside parameter set.
 
 ## Plain idea

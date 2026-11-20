@@ -149,7 +149,7 @@ def _adjustments(i: Inputs) -> Any:
 
 
 @op("xva.sbim.ir_delta")
-# The old id is a deprecated alias until v1.0.0 (KR-152): same handler, same result.
+# The old id is a deprecated alias in v1.0.0, removed in the first release after it (KR-152, KR-256): same handler, same result.
 @op("xva.simm.ir_delta")
 def _sbim(i: Inputs) -> Any:
     return core.xva.sbim_ir_delta(

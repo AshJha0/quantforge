@@ -161,7 +161,7 @@ super::registry! {
         }
         plain(Json::Obj(o))
     },
-    // `xva.simm.ir_delta` is a deprecated alias of `xva.sbim.ir_delta` until v1.0.0 (KR-152): same arm.
+    // `xva.simm.ir_delta` is a deprecated alias of `xva.sbim.ir_delta` in v1.0.0, removed in the first release after it (KR-152, KR-256): same arm.
     "xva.sbim.ir_delta" | "xva.simm.ir_delta" => {
         let s = i.reals("sensitivities")?;
         let rw = i.reals("risk_weights")?;

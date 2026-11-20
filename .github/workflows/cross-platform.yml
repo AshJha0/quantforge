@@ -3,6 +3,11 @@ name: Cross-platform conformance
 # R6-15 (review finding 15): also on pull requests that touch core maths (the four implementations or the
 # goldens), over every golden case; at v0.8.0 stages E to I had never run on Windows or macOS in CI. The Linux
 # leg repeats conformance.yml on purpose, so the three columns of one run share a commit.
+# K-7 clean machine (ruling KR-222, confirmed 2026-11-20): on Windows and macOS each Rust, Java and C++ cell also
+# sends every example case to the CLI it just built (tools/check_examples.py, seconds), and outside pull requests
+# runs every tutorial page in that language (tools/check_tutorial.py; each page rebuilds the CLI incrementally, so
+# it is slower). Linux examples and tutorials run in tutorial.yml; Python on Windows and macOS in clean-machine.yml.
+# Added 2026-11-20 on branch k-v1-k7b; not yet run in CI.
 on:
   pull_request:
     paths: ['cpp26/src/**', 'cpp26/include/**', 'java25/src/main/**', 'python/quantforge_core/**',
@@ -33,7 +38,7 @@ jobs:
         os: [ubuntu-24.04, windows-2025, macos-15]
         lang: [java, cpp, python, rust]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 40
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 40 || 120 }}
     defaults:
       run:
         shell: bash
@@ -104,6 +109,16 @@ jobs:
         if: ${{ !(matrix.lang == 'cpp' && runner.os == 'Linux') }}
         run: |
           "$PY" conformance/runner/runner.py --impl "${{ matrix.lang }}" --golden "$GOLDEN"
+      - name: Examples on the CLI just built (K-7, KR-222)
+        if: runner.os != 'Linux' && matrix.lang != 'python'
+        run: |
+          "$PY" tools/check_examples.py --lang "${{ matrix.lang }}"
+      - name: Tutorials on the CLI just built (K-7, KR-222)
+        # Maven's launcher breaks under Git Bash with MSYS_NO_PATHCONV set (see the Java build step), and the
+        # tutorial blocks run in bash, so the variable is removed for this step only.
+        if: runner.os != 'Linux' && matrix.lang != 'python' && github.event_name != 'pull_request'
+        run: |
+          env -u MSYS_NO_PATHCONV "$PY" tools/check_tutorial.py --lang "${{ matrix.lang }}"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:

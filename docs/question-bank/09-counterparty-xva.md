@@ -206,7 +206,7 @@ The calibration of `b` is not provided: it is an input, and with four paths the 
 
 Initial margin weights each sensitivity, scales it up when the net position is large relative to a concentration threshold, and aggregates with correlations.
 
-The spec (G-43): `CR = max(1, sqrt(|sum s_k| / T))`, `WS_k = RW_k s_k CR`, `margin = sqrt(max(0, sum sum rho WS WS))`. Weights and correlations are inputs; the operation is `xva.sbim.ir_delta` (the old id `xva.simm.ir_delta` is a deprecated alias until v1.0.0, KR-152). This is a project definition, not an industry margin model; no ISDA material is used (owner decision 2026-11-19; [why](../model-inventory.md#why-there-is-no-isda-simm-here)).
+The spec (G-43): `CR = max(1, sqrt(|sum s_k| / T))`, `WS_k = RW_k s_k CR`, `margin = sqrt(max(0, sum sum rho WS WS))`. Weights and correlations are inputs; the operation is `xva.sbim.ir_delta` (the old id `xva.simm.ir_delta` is a deprecated alias in v1.0.0, removed in the first release after it, KR-152 and KR-256). This is a project definition, not an industry margin model; no ISDA material is used (owner decision 2026-11-19; [why](../model-inventory.md#why-there-is-no-isda-simm-here)).
 
 **Worked example**, on placeholder weights (KR-150: risk weight `10 k` for tenor index `k`, correlation `1 - 0.1 |k - l|`). One sensitivity of 10,000 at the 2-year point, risk weight 30: margin 300,000.00. Lower the threshold to 2,500 and concentration_factor 2.000000, so the margin rises to 600,000.00. Tutorial 15's six-tenor mixed-sign book gives the mixed-sign margin 190,937.16. Releases v0.7.0 to v0.10.0 printed other numbers here, from hand-typed weights whose origin was not documented.
 
