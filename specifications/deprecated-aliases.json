@@ -4,8 +4,8 @@
   "xva.simm.ir_delta": {
    "alias_of": "xva.sbim.ir_delta",
    "deprecated_in": "contract 1.17.0, on main since 2026-11-20 (no v0.10.1 tag)",
-   "removal": "v1.0.0",
-   "ruling": "KR-152"
+   "removal": "first release after v1.0.0 (carried in v1.0.0)",
+   "ruling": "KR-152, KR-256"
   }
  }
 }

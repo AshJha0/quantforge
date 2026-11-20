@@ -1,7 +1,7 @@
 #pragma once
 // Sensitivity-based IR delta margin of the stage G xVA layer, operation `xva.sbim.ir_delta`
 // (specifications/06-risk/xva-framework.md, ruling G-43; renamed by KR-152, the old id `xva.simm.ir_delta` is a
-// deprecated alias that runs this same function until v1.0.0). Weights and correlations are caller inputs; the
+// deprecated alias that runs this same function in v1.0.0 and is removed in the first release after it, KR-256). Weights and correlations are caller inputs; the
 // goldens feed it specifications/tables/stage_k/sbim-ir-delta-g.json (placeholder weights, KR-150).
 // Before KR-153 this computation lived inside the CLI handler; it is now the library function the name map names.
 #include <algorithm>

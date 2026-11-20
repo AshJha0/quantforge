@@ -35,7 +35,7 @@ Worked example (`xvaadj_g-0001`): CVA 2.7099, DVA 0.8998, FCA 1.8156, FBA 1.2027
 
 ## `xva.sbim.ir_delta` (ruling G-43; renamed by KR-152)
 
-The operation was `xva.simm.ir_delta` in v0.7.0 to v0.10.0. That id stays as a **deprecated alias** until v1.0.0: it runs the same code and returns the same result (KR-152, `cli-contract.md` section "Deprecated aliases").
+The operation was `xva.simm.ir_delta` in v0.7.0 to v0.10.0. That id stays as a **deprecated alias** in v1.0.0 and is removed in the first release after v1.0.0 (KR-256): it runs the same code and returns the same result (KR-152, `cli-contract.md` section "Deprecated aliases").
 
 Inputs: `sensitivities` `s_k`, `risk_weights` `RW_k >= 0`, `correlations` `rho_kl` in `[-1, 1]` (square, same length; else `E_INPUT` / `E_DOMAIN`), `concentration_threshold` `T > 0`.
 

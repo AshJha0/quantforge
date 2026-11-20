@@ -138,7 +138,7 @@ def build_g():
         "notice": NOTICE,
         "status": "ruled 2026-11-19 (KR-150, KR-151; stage K margin lane); replaces hand-typed values of v0.7.0 to v0.10.0",
         "generator": "tools/gen_sbim_placeholder.py (the file must equal its output: tools/test_sbim_placeholder.py)",
-        "operation": "xva.sbim.ir_delta (deprecated alias xva.simm.ir_delta until v1.0.0)",
+        "operation": "xva.sbim.ir_delta (deprecated alias xva.simm.ir_delta in v1.0.0, removed in the first release after it, KR-256)",
         "numbers": "decimal strings (HR-12)",
         "rules": [
             "tenors 0.25, 1, 2, 5, 10, 30 years: index k = 1..6 (labels only; no number depends on them)",
