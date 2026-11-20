@@ -37,9 +37,11 @@
 
 - **E1 gate refined (ruling KR-112, owner decision 2026-11-19, option A).** An exempt Integer-only operation may carry a Real input only in goldens expecting `E_SCHEMA` (the refusal of a non-integer); nothing changes for non-exempt operations. Shown failing on planted faults (a) to (d) in `tools/check_e1_coverage.py --self-test` before `risk.frtb.backtest.zone` was added to `conformance/E1_EXEMPT.json`; gate now 0 problems (`program/STAGE_K_E1_ZONE_DECISION.md`).
 
+- **H-9 R2 attempt ended (owner decision 2026-11-20).** R2 not obtained: no unbroken 6-hour recording in 30 sessions on 2026-11-19 and 2026-11-20 (websocket keepalive ping timeouts; stalls of 50 to 107 s seen before drops; cause not established); the crypto recorder is stopped. Status line under HR-134 (`specifications/stage-h-rulings-audit.md`), dated status in `low-latency-targets.md` (target and 6-hour rule unchanged), `benchmarks/h9/README_R2.md` closed, `docs/runbooks/recorder.md` describes a stopped recorder, `benchmarks/results/h9/README.md` outcome. The workload R MISS of 2026-11-19 stands.
+
 ### Not changed
 
-- H-9: R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS (`specifications/stage-h-rulings-audit.md`).
+- H-9: R2 not obtained: the second recording attempt needed one unbroken 6-hour session, and all 30 sessions on 2026-11-19 and 2026-11-20 ended before hour 6 (websocket keepalive ping timeouts, with whole-connection stalls of 50 to 107 s seen before drops; cause not established: network path or machine load); the owner ended the attempt on 2026-11-20 and the recorder is stopped; targets and rules stay as fixed before any timing (HR-130 to HR-134); the 2026-11-19 workload R result remains a recorded MISS (`specifications/stage-h-rulings-audit.md`).
 
 ## 0.10.0 (2026-11-19)
 
