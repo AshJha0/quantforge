@@ -5,7 +5,7 @@
 - `xva.adjustments.value`: CVA, DVA, FCA, FBA (with the DVA overlap rule), MVA and KVA from given profiles.
 - `xva.sbim.ir_delta`: sensitivity-based initial margin for one currency's IR delta (weights and correlations are
   inputs; the goldens feed it the rule-generated table `specifications/tables/stage_k/sbim-ir-delta-g.json`, KR-150).
-  The old id `xva.simm.ir_delta` is a deprecated alias until v1.0.0 (KR-152); its invariance and E1 cases go to
+  The old id `xva.simm.ir_delta` is a deprecated alias in v1.0.0, removed in the first release after it (KR-152, KR-256); its invariance and E1 cases go to
   `stage_k/sbim_alias_k.json`.
 - `xva.wwr.cva_hw`: wrong-way CVA with the Hull-White (2012) hazard `exp(a(t) + b V(t))`, `a(t)` fitted to the survival curve.
 
@@ -161,7 +161,7 @@ def wwr(inp, mut=None):
     return {"cva": float(cva), "a": [float(x) for x in avals]}
 
 
-OP, ALIAS = "xva.sbim.ir_delta", "xva.simm.ir_delta"  # KR-152: the old id is a deprecated alias until v1.0.0
+OP, ALIAS = "xva.sbim.ir_delta", "xva.simm.ir_delta"  # KR-152, KR-256: the old id is a deprecated alias in v1.0.0, removed in the first release after it
 
 
 def alias_suite(g):

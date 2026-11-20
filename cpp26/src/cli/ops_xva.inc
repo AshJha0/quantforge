@@ -188,7 +188,7 @@ void op_xva_adjustments(const In& in, Out& out) {
     if (has_k) out.key_real("kva", hurdle * kva);
 }
 
-// `xva.sbim.ir_delta`; `xva.simm.ir_delta` is its deprecated alias until v1.0.0 (KR-152) and maps to this same handler.
+// `xva.sbim.ir_delta`; `xva.simm.ir_delta` is its deprecated alias in v1.0.0, removed in the first release after it (KR-152, KR-256) and maps to this same handler.
 void op_xva_sbim(const In& in, Out& out) {
     const Vec s = sr_reals(in, "sensitivities"), rw = sr_reals(in, "risk_weights");
     const Value& cv = in.need("correlations");

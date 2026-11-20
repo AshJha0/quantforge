@@ -72,7 +72,7 @@ final class OpsXva {
             return Operations.out("weighted_sensitivities", ws, "concentration_factor", r[0], "margin", r[1]);
         };
         table.put("xva.sbim.ir_delta", sbim);
-        // Deprecated alias of xva.sbim.ir_delta until v1.0.0 (KR-152): the same handler, so the same result.
+        // Deprecated alias of xva.sbim.ir_delta in v1.0.0, removed in the first release after it (KR-152, KR-256): the same handler, so the same result.
         table.put("xva.simm.ir_delta", sbim);
         table.put("xva.wwr.cva_hw", in -> {
             double[] t = in.reals("times");
