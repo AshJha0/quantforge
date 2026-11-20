@@ -153,7 +153,10 @@ fn sensitivity(cls: &str, kind: &str, s: &Inputs) -> Result<cva::Sensitivity> {
         let allowed = if kind == "DELTA" {
             cva::ir_delta_factors()
         } else {
-            cva::IR_VEGA_FACTORS.iter().map(|x| (*x).to_string()).collect()
+            cva::IR_VEGA_FACTORS
+                .iter()
+                .map(|x| (*x).to_string())
+                .collect()
         };
         let allowed: Vec<&str> = allowed.iter().map(String::as_str).collect();
         cva::Factor::Name(choice(s, "factor", &allowed)?)
@@ -272,7 +275,14 @@ fn leverage(i: &Inputs) -> Result<Outcome> {
         })
         .collect::<Result<Vec<_>>>()?;
     i.gate()?;
-    let r = lev::leverage(tier1, &on_balance, &derivatives, &written, &sfts, &off_balance)?;
+    let r = lev::leverage(
+        tier1,
+        &on_balance,
+        &derivatives,
+        &written,
+        &sfts,
+        &off_balance,
+    )?;
     plain(obj([
         ("on_balance", r.on_balance.into()),
         ("derivatives", r.derivatives.into()),
@@ -389,4 +399,160 @@ fn large_exposures(i: &Inputs) -> Result<Outcome> {
         ("report", r.report.into()),
         ("label", lev::LARGE_EXPOSURES_LABEL.into()),
     ]))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{NAMES, dispatch};
+    use crate::input::Inputs;
+    use quantforge_core::error::{QfError, err};
+    use quantforge_core::json::{Json, parse};
+
+    /// `run_operation` of `main.rs` with this module's dispatcher: `E_SCHEMA`, then the held
+    /// `E_LIMIT`, then the finite rule, then the operation's own checks.
+    fn run(op: &str, text: &str) -> Result<Json, QfError> {
+        let inputs = &crate::with_non_finite_tokens(&parse(text).expect("valid JSON").0);
+        let limit = crate::limits::check(op, inputs);
+        let result = dispatch(op, &Inputs(inputs, limit.clone())).expect("a wave 2b operation");
+        match (result, limit) {
+            (Err(e), _) if e.code == "E_SCHEMA" => Err(e),
+            (_, Some(l)) => Err(l),
+            _ if inputs.has_non_finite() => Err(err("E_DOMAIN", "a Real input is NaN or infinite")),
+            (r, None) => r.map(|o| o.outputs),
+        }
+    }
+
+    fn code(op: &str, text: &str) -> &'static str {
+        run(op, text).expect_err("an error").code
+    }
+
+    const CP: &str = r#"{"id": "C1", "sector": "financials", "quality": "IG",
+        "netting_sets": [{"ead": 1000000, "m": 5}]}"#;
+
+    #[test]
+    fn names_and_unknown() {
+        assert_eq!(NAMES.len(), 4);
+        assert!(dispatch("risk.cva.none", &Inputs::new(&Json::Null)).is_none());
+    }
+
+    #[test]
+    fn ba_outputs_and_schema() {
+        let full = format!(
+            r#"{{"version": "FULL", "counterparties": [{CP}],
+            "single_name_hedges": [{{"counterparty": "C1", "relation": "LEGAL",
+              "sector": "financials", "quality": "IG", "m": 5, "notional": 1000}}],
+            "index_hedges": [{{"m": 5, "notional": 1000,
+              "constituents": [{{"sector": "financials", "quality": "IG", "weight": 1}}]}}]}}"#
+        );
+        let out = run("risk.cva.ba", &full).expect("ok");
+        assert!(out.get("k_full").and_then(Json::as_f64).is_some());
+        let rows = out
+            .get("counterparties")
+            .and_then(Json::as_array)
+            .expect("rows");
+        assert!(rows[0].get("snh").and_then(Json::as_f64).is_some());
+        let reduced = format!(r#"{{"version": "REDUCED", "counterparties": [{CP}]}}"#);
+        let out = run("risk.cva.ba", &reduced).expect("ok");
+        assert_eq!(out.get("ih"), Some(&Json::Null));
+        assert_eq!(code("risk.cva.ba", r#"{"version": "REDUCED"}"#), "E_SCHEMA");
+        assert_eq!(
+            code(
+                "risk.cva.ba",
+                r#"{"version": "REDUCED", "counterparties": [1]}"#
+            ),
+            "E_SCHEMA"
+        );
+        let nan = reduced.replace("1000000", "\"NaN\"");
+        assert_eq!(code("risk.cva.ba", &nan), "E_DOMAIN");
+    }
+
+    #[test]
+    fn sa_outputs_and_schema() {
+        let ok = r#"{"reporting_currency": "USD", "classes": {"IR.DELTA": [
+            {"bucket": "USD", "factor": "1Y", "s_cva": 1000000, "s_hdg": 0}],
+            "CCS.DELTA": [{"bucket": "2", "factor": {"name": "X", "tenor": "1Y",
+              "quality": "IG", "legal_group": "G"}, "s_cva": 1000, "s_hdg": 0}],
+            "IR.VEGA": [{"bucket": "USD", "factor": "IR_VOL", "s_cva": 1, "s_hdg": 0}],
+            "EQ.DELTA": [{"bucket": "1", "factor": "E", "s_cva": 1, "s_hdg": 0}]}}"#;
+        let out = run("risk.cva.sa", ok).expect("ok");
+        let classes = out.get("classes").expect("classes");
+        assert!(classes.get("IR.DELTA").is_some() && classes.get("CCS.DELTA").is_some());
+        assert_eq!(out.get("m_cva").and_then(Json::as_f64), Some(1.0));
+        for bad in [
+            r#"{"reporting_currency": "USD", "classes": []}"#,
+            r#"{"reporting_currency": "USD", "classes": {"IR": []}}"#,
+            r#"{"reporting_currency": "USD", "classes": {"CCS.DELTA": [{"bucket": "2",
+                "factor": "X", "s_cva": 1, "s_hdg": 0}]}}"#,
+            r#"{"reporting_currency": "USD", "classes": {"IR.VEGA": [{"bucket": "USD",
+                "factor": "1Y", "s_cva": 1, "s_hdg": 0}]}}"#,
+            r#"{"reporting_currency": "USD", "classes": {"EQ.DELTA": [{"bucket": "1",
+                "factor": 3, "s_cva": 1, "s_hdg": 0}]}}"#,
+            r#"{"classes": {}}"#,
+            r#"{"reporting_currency": "USD", "classes": {}, "m_cva": "x"}"#,
+        ] {
+            assert_eq!(code("risk.cva.sa", bad), "E_SCHEMA", "{bad}");
+        }
+        let vega = r#"{"reporting_currency": "USD", "m_cva": 0.9, "classes": {"CCS.VEGA": [
+            {"bucket": "2", "factor": {"name": "X", "tenor": "1Y", "quality": "IG"},
+             "s_cva": 1, "s_hdg": 0}]}}"#;
+        assert_eq!(code("risk.cva.sa", vega), "E_INPUT");
+    }
+
+    #[test]
+    fn leverage_outputs_and_schema() {
+        let ok = r#"{"tier1": 10, "on_balance": [100],
+            "derivatives": [{"v": 1, "pfe": 2, "cvm_received": 0.5}],
+            "written_credit_derivatives": [{"notional": 10, "fair_value": -1,
+              "purchased_offset": 1}],
+            "sfts": [{"gross_assets": 1, "mna": false, "exposures": [2], "collateral": [1]}],
+            "off_balance": [{"notional": 10, "ccf_category": "TRADE_LC"}]}"#;
+        let out = run("risk.capital.leverage", ok).expect("ok");
+        assert_eq!(out.get("meets_minimum"), Some(&Json::Bool(true)));
+        assert!(
+            run(
+                "risk.capital.leverage",
+                r#"{"tier1": 1, "on_balance": [1]}"#
+            )
+            .is_ok()
+        );
+        for bad in [
+            r#"{"on_balance": [1]}"#,
+            r#"{"tier1": 1, "sfts": [{"gross_assets": 1, "exposures": [], "collateral": []}]}"#,
+            r#"{"tier1": 1, "off_balance": [{"notional": 1, "ccf_category": "X"}]}"#,
+            r#"{"tier1": 1, "derivatives": [{"v": 1}]}"#,
+        ] {
+            assert_eq!(code("risk.capital.leverage", bad), "E_SCHEMA", "{bad}");
+        }
+    }
+
+    #[test]
+    fn large_exposures_outputs_and_schema() {
+        let ok = r#"{"tier1": 1000, "bank_gsib": true,
+            "counterparties": [{"id": "A", "group": "G", "gsib": true}, {"id": "B"}],
+            "banking_book": [{"counterparty": "A", "value": 200}],
+            "off_balance": [{"counterparty": "B", "notional": 10, "ccf": 0.5}],
+            "crm": [{"counterparty": "A", "provider": "B", "protected": 5}],
+            "trading_book": [{"id": "p", "counterparty": "A", "seniority": "SENIOR",
+              "notional": 10, "market_value": 9, "maturity_years": 2, "cash_equity": false,
+              "lgd_applies": true}]}"#;
+        let out = run("risk.capital.large_exposures", ok).expect("ok");
+        let groups = out.get("groups").and_then(Json::as_array).expect("groups");
+        assert_eq!(groups.len(), 2);
+        assert_eq!(groups[1].get("limit").and_then(Json::as_f64), Some(150.0));
+        for bad in [
+            r#"{"tier1": 1000}"#,
+            r#"{"tier1": 1000, "counterparties": [{"id": "A", "gsib": 1}]}"#,
+            r#"{"tier1": 1000, "counterparties": [{"id": "A"}], "trading_book": [{"id": "p",
+                "counterparty": "A", "seniority": "SUPER", "notional": 1, "market_value": 1}]}"#,
+            r#"{"tier1": 1000, "counterparties": [{"id": "A"}], "trading_book": [{"id": "p",
+                "counterparty": "A", "seniority": "SENIOR", "notional": 1, "market_value": 1,
+                "maturity_years": "x"}]}"#,
+        ] {
+            assert_eq!(
+                code("risk.capital.large_exposures", bad),
+                "E_SCHEMA",
+                "{bad}"
+            );
+        }
+    }
 }

@@ -24,8 +24,7 @@ pub const LEVERAGE_LABEL: &str =
 pub const LARGE_EXPOSURES_LABEL: &str =
     "simplified large exposures (LEX subset); not a regulatory return";
 
-const LEV_TEXT: &str =
-    include_str!("../../../../specifications/tables/stage_k/lev_leverage.json");
+const LEV_TEXT: &str = include_str!("../../../../specifications/tables/stage_k/lev_leverage.json");
 const LEX_TEXT: &str =
     include_str!("../../../../specifications/tables/stage_k/lex_large_exposures.json");
 
@@ -470,11 +469,26 @@ pub fn large_exposures(
         }
     }
     let mut refs: Vec<(&str, &str)> = Vec::new();
-    refs.extend(banking_book.iter().map(|b| ("counterparty", b.counterparty.as_str())));
-    refs.extend(off_balance.iter().map(|o| ("counterparty", o.counterparty.as_str())));
-    refs.extend(crm.iter().map(|p| ("counterparty", p.counterparty.as_str())));
+    refs.extend(
+        banking_book
+            .iter()
+            .map(|b| ("counterparty", b.counterparty.as_str())),
+    );
+    refs.extend(
+        off_balance
+            .iter()
+            .map(|o| ("counterparty", o.counterparty.as_str())),
+    );
+    refs.extend(
+        crm.iter()
+            .map(|p| ("counterparty", p.counterparty.as_str())),
+    );
     refs.extend(crm.iter().map(|p| ("provider", p.provider.as_str())));
-    refs.extend(trading_book.iter().map(|t| ("counterparty", t.counterparty.as_str())));
+    refs.extend(
+        trading_book
+            .iter()
+            .map(|t| ("counterparty", t.counterparty.as_str())),
+    );
     le_structure(counterparties, &refs, crm, trading_book)?;
     if !(tier1 > 0.0) {
         return Err(qerr("E_DOMAIN", "tier1 must be positive", "tier1"));

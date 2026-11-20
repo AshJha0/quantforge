@@ -238,7 +238,11 @@ fn quality_listed(q: &str) -> Result<()> {
     if QUALITIES.contains(&q) {
         Ok(())
     } else {
-        Err(qerr("E_SCHEMA", format!("quality {q} is not listed"), "quality"))
+        Err(qerr(
+            "E_SCHEMA",
+            format!("quality {q} is not listed"),
+            "quality",
+        ))
     }
 }
 
@@ -343,7 +347,11 @@ fn ba_domain(
             return Err(qerr("E_DOMAIN", "hedge m must be positive", "m"));
         }
         if h.notional < 0.0 {
-            return Err(qerr("E_DOMAIN", "hedge notional must not be negative", "notional"));
+            return Err(qerr(
+                "E_DOMAIN",
+                "hedge notional must not be negative",
+                "notional",
+            ));
         }
     }
     for ih in index {
@@ -358,7 +366,11 @@ fn ba_domain(
             ));
         }
         if ih.constituents.iter().any(|k| k.weight < 0.0) {
-            return Err(qerr("E_DOMAIN", "index weights must not be negative", "weight")); // KR-313
+            return Err(qerr(
+                "E_DOMAIN",
+                "index weights must not be negative",
+                "weight",
+            )); // KR-313
         }
         let total = fsum(ih.constituents.iter().map(|k| k.weight));
         if !((total - 1.0).abs() <= WEIGHT_TOLERANCE) {
@@ -404,7 +416,12 @@ pub fn ba_cva(
             .map(|ns| discount_factor(ns.m, ns.imm))
             .collect::<Result<Vec<_>>>()?;
         let s = rw(&c.sector, &c.quality)
-            * fsum(c.netting_sets.iter().zip(&dfs).map(|(ns, df)| ns.m * ns.ead * df))
+            * fsum(
+                c.netting_sets
+                    .iter()
+                    .zip(&dfs)
+                    .map(|(ns, df)| ns.m * ns.ead * df),
+            )
             / alpha; // MAR50.15
         scva.push(s);
         rows.push(BaRow {
@@ -643,7 +660,11 @@ fn rcs_row(b: usize) -> usize {
 
 fn rcs_gamma(b: &str, c: &str) -> f64 {
     let (x, y) = (bucket_number(b), bucket_number(c));
-    let mut g = upper(mar50().get("rcs.gamma_same_quality"), rcs_row(x), rcs_row(y));
+    let mut g = upper(
+        mar50().get("rcs.gamma_same_quality"),
+        rcs_row(x),
+        rcs_row(y),
+    );
     if x <= 14 && y <= 14 && (x <= 7) != (y <= 7) {
         g /= mar50().num("rcs.gamma_cross_quality_divisor"); // MAR50.67(2)
     }
@@ -1055,7 +1076,11 @@ pub fn sa_cva(
         built.push((key, cls, kind, entries));
     }
     if !(m_cva >= 1.0) {
-        return Err(qerr("E_DOMAIN", "m_cva must be at least 1 (MAR50.41)", "m_cva"));
+        return Err(qerr(
+            "E_DOMAIN",
+            "m_cva must be at least 1 (MAR50.41)",
+            "m_cva",
+        ));
     }
     let mut out = Vec::with_capacity(built.len());
     for (key, cls, kind, entries) in &built {
@@ -1095,7 +1120,10 @@ mod tests {
     fn gammas() {
         assert_eq!(rcs_gamma("1", "8"), 0.5); // cross quality: 1 / 2
         assert_eq!(rcs_gamma("15", "16"), 0.0);
-        assert_eq!(rcs_gamma("1", "15"), 0.45);
+        assert_eq!(rcs_gamma("1", "15"), 0.0);
+        assert_eq!(rcs_gamma("1", "16"), 0.45);
+        assert_eq!(rcs_gamma("16", "17"), 0.75);
+        assert_eq!(rcs_gamma("1", "2"), 0.75);
         assert_eq!(eq_gamma("12", "13"), 0.75);
         assert_eq!(eq_gamma("13", "12"), 0.75);
         assert_eq!(eq_gamma("1", "12"), 0.45);
@@ -1109,16 +1137,15 @@ mod tests {
 
     #[test]
     fn ccs_rho_parts() {
-        let f = |name: &str, tenor: &str, q: &str, idx: Option<&str>, ser: Option<&str>| {
-            CreditFactor {
+        let f =
+            |name: &str, tenor: &str, q: &str, idx: Option<&str>, ser: Option<&str>| CreditFactor {
                 name: name.into(),
                 tenor: tenor.into(),
                 quality: q.into(),
                 legal_group: None,
                 index: idx.map(Into::into),
                 series: ser.map(Into::into),
-            }
-        };
+            };
         let a = f("X", "1Y", "IG", Some("I"), Some("1"));
         let b = f("Y", "5Y", "HY_NR", Some("I"), Some("2"));
         let c = f("Z", "1Y", "IG", Some("J"), Some("1"));
