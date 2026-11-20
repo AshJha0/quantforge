@@ -56,8 +56,6 @@ Ruling KR-11: SciPy checks only trig_k `false_alarm_rate`, one of four compared 
 | K-8d | `saccr_k` | 19 | 12 | 63.2% | met |
 | K-8e | `btk_k` | 28 | 23 | 82.1% | met |
 
-**Stage K shares are under review (audit finding KA-C18, open; `docs/known-issues.md`).** The table above counts a case checked against a figure printed in the regulator text. Such a case is checked on part of its outputs and at print precision, which the rule at the top of this page ("only if every compared output is checked") does not allow. By the strict reading stage K is 91 of 113 (80.5%), under the floor; items under the floor by that reading: . Neither figure is settled until a ruling says which reading holds.
-
 ## Value classes with no free outside reference
 
 | Suite | Reason |
