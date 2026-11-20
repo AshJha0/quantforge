@@ -1,7 +1,7 @@
 """FRTB standardised approach: default risk charge (DRC) and residual risk add-on (RRAO), plan item K-8a.
 
 Specification: specifications/06-risk/frtb-drc-rrao.md; rulings KR-50 to KR-55 and KR-67 to KR-69
-(specifications/stage-k-rulings-w2.md) and KR-112 to KR-116 (same file, wave 2 lane A section).
+(specifications/stage-k-rulings-w2.md) and KR-300 to KR-304 (same file, wave 2 lane A section).
 Sources: Basel Framework MAR22 and MAR23, version effective 1 January 2023, read 2026-11-19 in the
 consolidated PDF generated 11/11/2026, pages 619 to 637.
 
@@ -25,7 +25,7 @@ RW_SOURCE = (
 )
 MAX_POSITIONS = 100_000  # KR-67
 
-BUCKETS = ("CORPORATE", "SOVEREIGN", "LOCAL_GOV")  # MAR22.22; output order (KR-114)
+BUCKETS = ("CORPORATE", "SOVEREIGN", "LOCAL_GOV")  # MAR22.22; output order (KR-302)
 SENIORITIES = ("COVERED", "SENIOR", "NON_SENIOR", "EQUITY")
 RATINGS = ("AAA", "AA", "A", "BBB", "BB", "B", "CCC", "UNRATED", "DEFAULTED")
 # MAR22.12: loss given default by seniority
@@ -188,7 +188,7 @@ def drc_nonsec(positions: Sequence[Position], ratings: Mapping[str, str]) -> dic
             raise QfError(
                 "E_INPUT", f"obligor {p.obligor!r} has no rating", f"positions/{k}/obligor"
             )
-        if bucket_of.setdefault(p.obligor, p.bucket) != p.bucket:  # KR-113
+        if bucket_of.setdefault(p.obligor, p.bucket) != p.bucket:  # KR-301
             raise QfError(
                 "E_INPUT", f"obligor {p.obligor!r} is in two buckets", f"positions/{k}/bucket"
             )
@@ -199,7 +199,7 @@ def drc_nonsec(positions: Sequence[Position], ratings: Mapping[str, str]) -> dic
             m = p.maturity_years
             if m != CASH_EQUITY_SHORT and m < CAPITAL_HORIZON:  # KR-52
                 raise QfError("E_DOMAIN", "cash equity maturity must be 0.25 or at least 1", path)
-            if p.seniority != "EQUITY" or p.notional != p.market_value:  # KR-112
+            if p.seniority != "EQUITY" or p.notional != p.market_value:  # KR-300
                 raise QfError(
                     "E_DOMAIN", "cash equity must be EQUITY with notional = market value", path
                 )
@@ -250,7 +250,7 @@ def _caller_rw(rws: Sequence[float], maturities: Sequence[float], field: str) ->
 def _net_groups(
     keys: Sequence[tuple[str, ...]], rws: Sequence[float], scaled: Sequence[float], field: str
 ) -> dict[tuple[str, ...], tuple[float, float]]:
-    """Sum the scaled JTDs per netting key (MAR22.29, MAR22.39(1)); one rw per key (KR-115)."""
+    """Sum the scaled JTDs per netting key (MAR22.29, MAR22.39(1)); one rw per key (KR-303)."""
     rw_of: dict[tuple[str, ...], float] = {}
     for k, (key, rw) in enumerate(zip(keys, rws, strict=True)):
         if rw_of.setdefault(key, rw) != rw:

@@ -1737,7 +1737,7 @@
     "frtb_drc",
     "error"
    ],
-   "description": "hand: one obligor in two buckets (KR-113)"
+   "description": "hand: one obligor in two buckets (KR-301)"
   },
   {
    "case_id": "drc_ke-0014",
@@ -1806,7 +1806,7 @@
     "frtb_drc",
     "error"
    ],
-   "description": "hand: cash equity flagged on a senior bond (KR-112)"
+   "description": "hand: cash equity flagged on a senior bond (KR-300)"
   },
   {
    "case_id": "drc_ke-0016",
@@ -1841,7 +1841,7 @@
     "frtb_drc",
     "error"
    ],
-   "description": "hand: cash equity with notional not equal to market value (KR-112)"
+   "description": "hand: cash equity with notional not equal to market value (KR-300)"
   },
   {
    "case_id": "drc_ke-0017",
@@ -2190,7 +2190,7 @@
     "frtb_drc",
     "error"
    ],
-   "description": "hand: one pool and tranche with two rw (KR-115)"
+   "description": "hand: one pool and tranche with two rw (KR-303)"
   },
   {
    "case_id": "sec_ke-0007",
@@ -2440,7 +2440,7 @@
     "frtb_drc",
     "error"
    ],
-   "description": "hand: one index, series and tranche with two rw (KR-115)"
+   "description": "hand: one index, series and tranche with two rw (KR-303)"
   },
   {
    "case_id": "ctp_ke-0007",

@@ -1,7 +1,7 @@
 """Stage K wave 2 lane A: FRTB DRC and RRAO (K-8a) and FRTB IMA (K-8f).
 
 Specs specifications/06-risk/frtb-drc-rrao.md and specifications/06-risk/frtb-ima.md; rulings KR-50 to
-KR-69 and KR-112 to KR-122 (specifications/stage-k-rulings-w2.md). Goldens datasets/golden/stage_k/drc_k.json
+KR-69 and KR-300 to KR-310 (specifications/stage-k-rulings-w2.md). Goldens datasets/golden/stage_k/drc_k.json
 and ima_k.json (oracle/python/gen_stage_k_w2a.py). SciPy is an independent cross-check of the PLA
 statistics and the normal ES (reported, not counted: D6 precedent)."""
 
@@ -406,7 +406,7 @@ def test_es_cascade_scaling(j: int, e: float) -> None:
     single = [0.0] * 5
     single[j] = e
     assert ima.es_lh(es_t=single)["es"] == pytest.approx(e * math.sqrt(w[j]), rel=1e-14)
-    # every risk factor at horizon LH_j: ES_1 = ... = ES_j = E, the rest 0 -> E sqrt(LH_j / 10) (KR-122)
+    # every risk factor at horizon LH_j: ES_1 = ... = ES_j = E, the rest 0 -> E sqrt(LH_j / 10) (KR-310)
     nested = [e if k <= j else 0.0 for k in range(5)]
     lh = ima.LIQUIDITY_HORIZONS[j]
     assert ima.es_lh(es_t=nested)["es"] == pytest.approx(e * math.sqrt(lh / 10), rel=1e-14)

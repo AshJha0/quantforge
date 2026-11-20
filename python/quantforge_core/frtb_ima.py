@@ -3,7 +3,7 @@ stressed ES, IMCC, NMRF stress scenario aggregation (SES), the risk factor eligi
 the capital aggregation, plan item K-8f.
 
 Specification: specifications/06-risk/frtb-ima.md; rulings KR-50, KR-56 to KR-61, KR-67 to KR-69
-(specifications/stage-k-rulings-w2.md) and KR-117 to KR-121 (same file, wave 2 lane A section).
+(specifications/stage-k-rulings-w2.md) and KR-305 to KR-309 (same file, wave 2 lane A section).
 Sources: Basel Framework MAR31, MAR32 and MAR33, version effective 1 January 2023, read 2026-11-19 in
 the consolidated PDF generated 11/11/2026, pages 646 to 686.
 
@@ -95,7 +95,7 @@ RFET_BUCKETS = {
 RFET_D_UPPER = 1.0
 
 
-# ---- PLA test (MAR32.34 to MAR32.44, KR-56, KR-117) ------------------------------------------------
+# ---- PLA test (MAR32.34 to MAR32.44, KR-56, KR-305) ------------------------------------------------
 
 
 def _doubled_ranks(x: Sequence[float]) -> list[int]:
@@ -144,7 +144,7 @@ def ks_count(hpl: Sequence[float], rtpl: Sequence[float]) -> int:
 
 
 def kolmogorov_q(x: float) -> float:
-    """Kolmogorov tail Q_KS(x) = 2 sum_{k>=1} (-1)^(k-1) exp(-2 k^2 x^2) (KR-56), evaluated as KR-117:
+    """Kolmogorov tail Q_KS(x) = 2 sum_{k>=1} (-1)^(k-1) exp(-2 k^2 x^2) (KR-56), evaluated as KR-305:
     1 at x <= 0; for 0 < x < 1 through the equivalent theta series
     1 - sqrt(2 pi)/x sum_{k>=1} exp(-(2k-1)^2 pi^2 / (8 x^2)); terms are added until one is 0."""
     if x <= 0:
@@ -210,7 +210,7 @@ def pla(hpl: Sequence[float], rtpl: Sequence[float]) -> dict[str, object]:
 
 
 def pla_ks_pvalue(ks: float, n: int) -> dict[str, object]:
-    """Q_KS(ks sqrt(n/2)), so the printed p-values of MAR32.42 can be checked (KR-117: n >= 1)."""
+    """Q_KS(ks sqrt(n/2)), so the printed p-values of MAR32.42 can be checked (KR-305: n >= 1)."""
     if not 0 <= ks <= 1:
         raise QfError("E_DOMAIN", "ks must be in [0, 1]", "ks")
     if n < 1:
@@ -218,7 +218,7 @@ def pla_ks_pvalue(ks: float, n: int) -> dict[str, object]:
     return {"pvalue": _pvalue(ks, n), "label": LABEL}
 
 
-# ---- Liquidity horizons (MAR33.12, KR-60, KR-118) --------------------------------------------------
+# ---- Liquidity horizons (MAR33.12, KR-60, KR-306) --------------------------------------------------
 
 
 def _pair(text: str) -> tuple[str, str]:
@@ -249,7 +249,7 @@ def liquidity_horizon(
     constituents: Sequence[tuple[float, int]] | None = None,
     maturity_days: float | None = None,
 ) -> dict[str, object]:
-    """MAR33.12 Table 2, footnote 309, FAQ4 (maturity) and FAQ5 (index constituents); KR-60, KR-118.
+    """MAR33.12 Table 2, footnote 309, FAQ4 (maturity) and FAQ5 (index constituents); KR-60, KR-306.
 
     Exactly one of `category`, `fx_pair` and `constituents` ((weight, n) pairs)."""
     given = [v is not None for v in (category, fx_pair, constituents)]
@@ -366,7 +366,7 @@ def es_lh(
         es = []
         for j, lst in enumerate(pnl):
             v = float(historical(lst, ES_CONFIDENCE)["es"]) if lst else 0.0  # type: ignore[arg-type]
-            if v < 0:  # KR-119
+            if v < 0:  # KR-307
                 raise QfError(
                     "E_DOMAIN", "the ES of a P&L list is negative (its tail is a gain)", f"pnl/{j}"
                 )
@@ -435,7 +435,7 @@ def ses(
     return {"idio_credit": a, "idio_equity": b, "other": c, "ses": a + b + c, "label": LABEL}
 
 
-# ---- Capital (MAR33.41 to MAR33.45, KR-61, KR-120) ------------------------------------------------
+# ---- Capital (MAR33.41 to MAR33.45, KR-61, KR-308) ------------------------------------------------
 
 
 def multiplier(exceptions: int) -> float:
@@ -468,12 +468,12 @@ def capital(
         ("sa_all", sa_all),
         ("qualitative_addon", qualitative_addon),
     ):
-        if v < 0:  # KR-120
+        if v < 0:  # KR-308
             raise QfError("E_DOMAIN", f"{name} must be 0 or above", name)
     if exceptions < 0:
         raise QfError("E_DOMAIN", "exceptions must be 0 or above", "exceptions")
     for j, (_, sa) in enumerate(desks):
-        if sa < 0:  # KR-120
+        if sa < 0:  # KR-308
             raise QfError("E_DOMAIN", "a desk SA must be 0 or above", f"desks/{j}/sa")
     sa_ga = math.fsum(sa for _, sa in desks)
     amber = math.fsum(sa for z, sa in desks if z == "AMBER")
@@ -547,7 +547,7 @@ def rfet(as_of: date, observations: Sequence[date]) -> dict[str, object]:
 
 def rfet_bucket(row: str, t: float | None = None, delta: float | None = None) -> dict[str, object]:
     """MAR31.16 Table 1 bucket (1-based), lower bound inclusive, upper exclusive (KR-59). Rows A to C
-    take a maturity `t` in years, row D an option `delta` (KR-121)."""
+    take a maturity `t` in years, row D an option `delta` (KR-309)."""
     field = "delta" if row == "D" else "t"
     if (delta if row == "D" else t) is None or (t if row == "D" else delta) is not None:
         raise QfError("E_INPUT", f"row {row} takes {field} and nothing else", field)

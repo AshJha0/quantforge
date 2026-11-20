@@ -5036,7 +5036,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: n 0 (KR-117)"
+   "description": "hand: n 0 (KR-305)"
   },
   {
    "case_id": "pla_ke-0011",
@@ -5266,7 +5266,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: a P&L list of gains only: negative ES (KR-119)"
+   "description": "hand: a P&L list of gains only: negative ES (KR-307)"
   },
   {
    "case_id": "es_ke-0007",
@@ -5855,7 +5855,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: negative DRC (KR-120)"
+   "description": "hand: negative DRC (KR-308)"
   },
   {
    "case_id": "cap_ke-0005",
@@ -5890,7 +5890,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: negative desk SA (KR-120)"
+   "description": "hand: negative desk SA (KR-308)"
   },
   {
    "case_id": "cap_ke-0006",
@@ -6069,7 +6069,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: row A with a delta (KR-121)"
+   "description": "hand: row A with a delta (KR-309)"
   },
   {
    "case_id": "rfet_ke-0004",
@@ -6091,7 +6091,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: row D with a maturity (KR-121)"
+   "description": "hand: row D with a maturity (KR-309)"
   },
   {
    "case_id": "rfet_ke-0005",
@@ -6270,7 +6270,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: category and fx_pair both given (KR-118)"
+   "description": "hand: category and fx_pair both given (KR-306)"
   },
   {
    "case_id": "lh_ke-0003",
@@ -6291,7 +6291,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: no category, fx_pair or constituents (KR-118)"
+   "description": "hand: no category, fx_pair or constituents (KR-306)"
   },
   {
    "case_id": "lh_ke-0004",
@@ -6333,7 +6333,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: fx_pair with one currency twice (KR-118)"
+   "description": "hand: fx_pair with one currency twice (KR-306)"
   },
   {
    "case_id": "lh_ke-0006",
@@ -6389,7 +6389,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: constituent n 30 is not a horizon (KR-118)"
+   "description": "hand: constituent n 30 is not a horizon (KR-306)"
   },
   {
    "case_id": "lh_ke-0008",
@@ -6419,7 +6419,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: negative weight (KR-118)"
+   "description": "hand: negative weight (KR-306)"
   },
   {
    "case_id": "lh_ke-0009",
@@ -6440,7 +6440,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: no constituents (KR-118)"
+   "description": "hand: no constituents (KR-306)"
   },
   {
    "case_id": "lh_ke-0010",

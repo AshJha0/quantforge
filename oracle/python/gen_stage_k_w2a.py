@@ -1,7 +1,7 @@
 """Stage K wave 2 lane A goldens: FRTB DRC and RRAO (K-8a, suite drc_k) and FRTB IMA (K-8f, suite ima_k).
 
 Specs: specifications/06-risk/frtb-drc-rrao.md and specifications/06-risk/frtb-ima.md; rulings
-specifications/stage-k-rulings-w2.md (KR-50 to KR-69, and KR-112 to KR-121 of the lane A section).
+specifications/stage-k-rulings-w2.md (KR-50 to KR-69, and KR-300 to KR-309 of the lane A section).
 This oracle is written from the specs, in exact rational arithmetic (fractions) where the rules are
 rational and in mpmath at 50 digits where they are not; it does not import quantforge_core. Parameters
 are read from specifications/tables/stage_k/*.json (KR-50), never retyped.
@@ -341,12 +341,12 @@ def gen_drc():
     err("drc_ke", nonsec, {"positions": [], "ratings": R}, "E_INPUT", "no positions")
     err("drc_ke", nonsec, {"positions": [ok, ok], "ratings": R}, "E_INPUT", "duplicate id")
     err("drc_ke", nonsec, {"positions": [ok, {**ok, "id": "p2", "bucket": "SOVEREIGN"}], "ratings": R}, "E_INPUT",
-        "one obligor in two buckets (KR-113)")
+        "one obligor in two buckets (KR-301)")
     err("drc_ke", nonsec, {"positions": [{**ok, "notional": 0, "market_value": 5}], "ratings": R}, "E_DOMAIN", "zero notional, nonzero value")
     err("drc_ke", nonsec, {"positions": [{**ok, "cash_equity": True, "maturity_years": 1}], "ratings": R}, "E_DOMAIN",
-        "cash equity flagged on a senior bond (KR-112)")
+        "cash equity flagged on a senior bond (KR-300)")
     err("drc_ke", nonsec, {"positions": [pos("s", "X", "CORPORATE", "EQUITY", 5, 6, 1, cash_equity=True)], "ratings": R}, "E_DOMAIN",
-        "cash equity with notional not equal to market value (KR-112)")
+        "cash equity with notional not equal to market value (KR-300)")
     err("drc_ke", nonsec, {"positions": [{**ok, "market_value": "NaN"}], "ratings": R}, "E_DOMAIN", "E1: market value NaN")
     err("drc_ke", nonsec, {"positions": [{**ok, "notional": "Infinity"}], "ratings": {"Y": "A"}}, "E_DOMAIN",
         "E1, two errors: notional Infinity and obligor without a rating (the finite rule first)")
@@ -359,7 +359,7 @@ def gen_drc():
     err("sec_ke", sec, {"positions": [{**sp, "rw": -0.1}]}, "E_DOMAIN", "negative rw")
     err("sec_ke", sec, {"positions": [{**sp, "maturity_years": 0}]}, "E_DOMAIN", "maturity 0")
     err("sec_ke", sec, {"positions": [sp, sp]}, "E_INPUT", "duplicate id")
-    err("sec_ke", sec, {"positions": [sp, {**sp, "id": "m", "rw": 0.3}]}, "E_INPUT", "one pool and tranche with two rw (KR-115)")
+    err("sec_ke", sec, {"positions": [sp, {**sp, "id": "m", "rw": 0.3}]}, "E_INPUT", "one pool and tranche with two rw (KR-303)")
     err("sec_ke", sec, {"positions": [{**sp, "rw": "NaN"}]}, "E_DOMAIN", "E1: rw NaN")
     err("sec_ke", sec, {"positions": [sp, {**sp, "rw": 13}]}, "E_INPUT", "two errors: duplicate id and rw above 12.5")
     cp = {"id": "a", "index": "A", "series": "S1", "tranche": "T1", "market_value": 1000, "maturity_years": 5, "rw": 0.1}
@@ -368,7 +368,7 @@ def gen_drc():
     err("ctp_ke", ctp, {"bucket_drc": [1, "x"]}, "E_SCHEMA", "bucket_drc holds a string")
     err("ctp_ke", ctp, {"positions": [{**cp, "rw": 20}]}, "E_DOMAIN", "rw above 12.5")
     err("ctp_ke", ctp, {"positions": [{**cp, "maturity_years": -1}]}, "E_DOMAIN", "negative maturity")
-    err("ctp_ke", ctp, {"positions": [cp, {**cp, "id": "b", "rw": 0.2}]}, "E_INPUT", "one index, series and tranche with two rw (KR-115)")
+    err("ctp_ke", ctp, {"positions": [cp, {**cp, "id": "b", "rw": 0.2}]}, "E_INPUT", "one index, series and tranche with two rw (KR-303)")
     err("ctp_ke", ctp, {"bucket_drc": ["NaN"]}, "E_DOMAIN", "E1: bucket_drc NaN")
     err("ctp_ke", ctp, {"positions": [cp], "bucket_drc": ["-Infinity"]}, "E_DOMAIN",
         "E1, two errors: bucket_drc -Infinity and both inputs given (the finite rule first)")
@@ -701,7 +701,7 @@ def gen_ima():
     err("pla_ke", pla, {"hpl": [1, 2, 3, 4], "rtpl": [5, 5, 5]}, "E_INPUT", "two errors: lengths differ and a constant RTPL")
     err("pla_ke", pla, {"hpl": [1, 2, "Infinity"], "rtpl": [1, 2]}, "E_DOMAIN", "E1, two errors: hpl Infinity and lengths differ (the finite rule first)")
     err("pla_ke", pv, {"ks": 1.5, "n": 250}, "E_DOMAIN", "ks above 1")
-    err("pla_ke", pv, {"ks": 0.1, "n": 0}, "E_DOMAIN", "n 0 (KR-117)")
+    err("pla_ke", pv, {"ks": 0.1, "n": 0}, "E_DOMAIN", "n 0 (KR-305)")
     err("pla_ke", pv, {"ks": 0.1, "n": 2.5}, "E_SCHEMA", "n not an integer")
     err("pla_ke", pv, {"ks": "NaN", "n": 250}, "E_DOMAIN", "E1: ks NaN")
     err("pla_ke", pv, {"ks": -0.5, "n": "x"}, "E_SCHEMA", "two errors: n a string and ks negative")
@@ -710,7 +710,7 @@ def gen_ima():
     err("es_ke", es, {"es_t": [1, 0, 0, 0, 0], "sigma": [1, 0, 0, 0, 0]}, "E_INPUT", "es_t and sigma both given")
     err("es_ke", es, {}, "E_INPUT", "none of es_t, sigma, pnl")
     err("es_ke", es, {"sigma": [1, 0, -2, 0, 0]}, "E_DOMAIN", "negative sigma")
-    err("es_ke", es, {"pnl": [[1, 2, 3], [], [], [], []]}, "E_DOMAIN", "a P&L list of gains only: negative ES (KR-119)")
+    err("es_ke", es, {"pnl": [[1, 2, 3], [], [], [], []]}, "E_DOMAIN", "a P&L list of gains only: negative ES (KR-307)")
     err("es_ke", es, {"pnl": [[1, "x"], [], [], [], []]}, "E_SCHEMA", "a P&L entry that is a string")
     err("es_ke", es, {"es_t": [10, "NaN", 0, 0, 0]}, "E_DOMAIN", "E1: es_t NaN")
     err("es_ke", es, {"es_t": ["NaN", 0, 0, 0]}, "E_DOMAIN", "E1, two errors: es_t NaN and four horizons (the finite rule first)")
@@ -734,15 +734,15 @@ def gen_ima():
     err("cap_ke", cap, {**full, "exceptions": -1}, "E_DOMAIN", "exceptions -1")
     err("cap_ke", cap, {**full, "desks": [{"zone": "RED", "sa": 1}]}, "E_SCHEMA", "desk zone RED is not listed")
     err("cap_ke", cap, {**full, "desks": [{"zone": "AMBER", "sa": 0}]}, "E_DOMAIN", "SA sum 0 with an amber desk")
-    err("cap_ke", cap, {**full, "drc": -1}, "E_DOMAIN", "negative DRC (KR-120)")
-    err("cap_ke", cap, {**full, "desks": [{"zone": "GREEN", "sa": -5}]}, "E_DOMAIN", "negative desk SA (KR-120)")
+    err("cap_ke", cap, {**full, "drc": -1}, "E_DOMAIN", "negative DRC (KR-308)")
+    err("cap_ke", cap, {**full, "desks": [{"zone": "GREEN", "sa": -5}]}, "E_DOMAIN", "negative desk SA (KR-308)")
     err("cap_ke", cap, {**full, "exceptions": 1.5}, "E_SCHEMA", "exceptions not an integer")
     err("cap_ke", cap, {**full, "imcc_avg": "NaN"}, "E_DOMAIN", "E1: imcc_avg NaN")
     err("cap_ke", cap, {**full, "desks": [{"zone": "RED", "sa": 1}], "exceptions": -1}, "E_SCHEMA", "two errors: zone RED and exceptions -1")
     err("rfet_ke", bk, {"row": "D", "delta": 1}, "E_DOMAIN", "delta 1 (KR-59)")
     err("rfet_ke", bk, {"row": "E", "t": 1}, "E_SCHEMA", "row E is not listed")
-    err("rfet_ke", bk, {"row": "A", "delta": 0.5}, "E_INPUT", "row A with a delta (KR-121)")
-    err("rfet_ke", bk, {"row": "D", "t": 0.5}, "E_INPUT", "row D with a maturity (KR-121)")
+    err("rfet_ke", bk, {"row": "A", "delta": 0.5}, "E_INPUT", "row A with a delta (KR-309)")
+    err("rfet_ke", bk, {"row": "D", "t": 0.5}, "E_INPUT", "row D with a maturity (KR-309)")
     err("rfet_ke", bk, {"row": "B", "t": -1}, "E_DOMAIN", "negative maturity")
     err("rfet_ke", bk, {"row": "C", "t": "NaN"}, "E_DOMAIN", "E1: t NaN")
     err("rfet_ke", bk, {"row": "A", "t": -1, "delta": 0.5}, "E_INPUT", "two errors: row A with a delta and a negative maturity")
@@ -750,14 +750,14 @@ def gen_ima():
     err("rfet_ke", rf, {"observations": ["2026-01-01"]}, "E_SCHEMA", "as_of missing")
     err("rfet_ke", rf, {"as_of": "2026-06-30", "observations": ["2026-1-1"]}, "E_SCHEMA", "an observation not an ISO date")
     err("lh_ke", lh, {"category": "IR_exotic"}, "E_SCHEMA", "category not listed")
-    err("lh_ke", lh, {"category": "FX_pairs", "fx_pair": "EUR/USD"}, "E_INPUT", "category and fx_pair both given (KR-118)")
-    err("lh_ke", lh, {"maturity_days": 5}, "E_INPUT", "no category, fx_pair or constituents (KR-118)")
+    err("lh_ke", lh, {"category": "FX_pairs", "fx_pair": "EUR/USD"}, "E_INPUT", "category and fx_pair both given (KR-306)")
+    err("lh_ke", lh, {"maturity_days": 5}, "E_INPUT", "no category, fx_pair or constituents (KR-306)")
     err("lh_ke", lh, {"fx_pair": "EURUSD"}, "E_SCHEMA", "fx_pair not of the form AAA/BBB")
-    err("lh_ke", lh, {"fx_pair": "EUR/EUR"}, "E_DOMAIN", "fx_pair with one currency twice (KR-118)")
+    err("lh_ke", lh, {"fx_pair": "EUR/EUR"}, "E_DOMAIN", "fx_pair with one currency twice (KR-306)")
     err("lh_ke", lh, {"constituents": [{"weight": 0.8, "n": 10}, {"weight": 0.1, "n": 20}]}, "E_DOMAIN", "weights sum to 0.9 (KR-60)")
-    err("lh_ke", lh, {"constituents": [{"weight": 1, "n": 30}]}, "E_DOMAIN", "constituent n 30 is not a horizon (KR-118)")
-    err("lh_ke", lh, {"constituents": [{"weight": -0.2, "n": 10}, {"weight": 1.2, "n": 20}]}, "E_DOMAIN", "negative weight (KR-118)")
-    err("lh_ke", lh, {"constituents": []}, "E_INPUT", "no constituents (KR-118)")
+    err("lh_ke", lh, {"constituents": [{"weight": 1, "n": 30}]}, "E_DOMAIN", "constituent n 30 is not a horizon (KR-306)")
+    err("lh_ke", lh, {"constituents": [{"weight": -0.2, "n": 10}, {"weight": 1.2, "n": 20}]}, "E_DOMAIN", "negative weight (KR-306)")
+    err("lh_ke", lh, {"constituents": []}, "E_INPUT", "no constituents (KR-306)")
     err("lh_ke", lh, {"category": "EQ_large_cap", "maturity_days": -1}, "E_DOMAIN", "negative maturity_days")
     err("lh_ke", lh, {"category": "EQ_large_cap", "maturity_days": "NaN"}, "E_DOMAIN", "E1: maturity_days NaN")
     err("lh_ke", lh, {"category": "EQ_large_cap", "fx_pair": "EUR/USD", "maturity_days": -1}, "E_INPUT",
