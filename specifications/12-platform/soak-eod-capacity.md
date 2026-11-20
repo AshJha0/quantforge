@@ -12,7 +12,7 @@ Every result names its host: "local laptop, not the acceptance machine" or "GitH
 
 ## 1. Soak (KR-217, KR-218)
 
-**Workload.** Per build (Python, Java, Rust, C++): one long-lived `quantforge batch` process fed every case of `datasets/golden` (files sorted, cases as listed, 16,258 cases at this commit; measured) in a loop for 130 minutes of wall time (the rule needs at least 7,200 s; the extra 10 minutes leave room for the warm-up), with at most 32 cases in flight. Driver: `benchmarks/soak/soak.py`.
+**Workload.** Per build (Python, Java, Rust, C++): one long-lived `quantforge batch` process fed every case of `datasets/golden` (files sorted, cases as listed; the count at the run commit is in each summary file) in a loop for 130 minutes of wall time (the rule needs at least 7,200 s; the extra 10 minutes leave room for the warm-up), with at most 32 cases in flight. Driver: `benchmarks/soak/soak.py`.
 
 **Answers.** The first answer to each case is judged against its golden with the conformance runner's `judge` (`GOLDEN` on a failure). Every later answer to the same case must be byte-identical to the first (`DRIFT` otherwise). A process that stays small but starts giving different answers has not passed.
 
