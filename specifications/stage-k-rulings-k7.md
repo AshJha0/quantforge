@@ -22,3 +22,11 @@ These notes record how the rows above were read when building; they change no ro
 - KR-222: the build on `k-v1-k7` runs the examples on Linux in all four languages (the tutorial jobs) and the Python build on Windows and macOS (`clean-machine.yml`). Rust, Java and C++ on Windows and macOS are not added: each would rebuild a CLI per runner, and the cross-platform matrix (`cross-platform.yml`) already builds them there. Whether that meets "every example on fresh Linux, Windows and macOS runners" is the coordinator's call.
 - KR-224: the planted faults live in each check's `--self-test` and run in `repo-gates`.
 - KR-225: ruleset 26732064 read on 2026-11-20 shows `strict_required_status_checks_policy: false` (saved as `benchmarks/results/k7/ruleset-2026-11-20.json`). Turning it on is a repository setting, so the owner does it; no lane changes it.
+
+## Notes from the second build lane (k-v1-k7b, 2026-11-20)
+
+These notes record what was built after confirmation; they change no row.
+
+- KR-222: `cross-platform.yml` now runs `tools/check_examples.py` in every Rust, Java and C++ cell on Windows and macOS (every run), and `tools/check_tutorial.py` in those cells outside pull requests (weekly and by hand), each against the CLI the cell just built. Python on Windows and macOS stays in `clean-machine.yml`. None of these steps has run in CI yet, so KR-222 is not yet shown met.
+- KR-226: owner decision 2026-11-20, recorded under the table above.
+- KR-227: `tools/check_site_view.py` and the `docs-site-view` jobs of `docs.yml`, plus a dark-mode pa11y run in `docs-site`; "Build state" in `12-platform/release-evidence.md` gives the local run and what CI has not yet run. The pa11y AA part runs on the four pages of the existing pa11y set (`.pa11yci.json`) in light and dark mode, as check RE9 of the spec words it ("the existing pa11y AA run passes"); the width and Mermaid checks run on every page. Whether pa11y must also cover every page is the coordinator's reading of the row.
