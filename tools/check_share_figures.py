@@ -56,7 +56,7 @@ def check_text(rel, text, items, suites, total):
             win = line[:160] + " " + line[max(0, m.start() - 300):m.end() + 80]
             allowed = set()
             for s, pair in suites.items():
-                if re.search(r"\b%s\b" % re.escape(s), win):
+                if re.search(rf"\b{re.escape(s)}\b", win):
                     allowed.add(pair)
             for lm in LABEL.finditer(win):
                 allowed.add(items["K-" + lm.group(1)])
