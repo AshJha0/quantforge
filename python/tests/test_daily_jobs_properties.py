@@ -269,6 +269,7 @@ def curve_invariants(
     )
     settled: dict[dt.date, dict[str, Any]] = {}
     seen: list[dt.date] = []
+    sighted: dict[dt.date, dt.datetime] = {}  # earliest stale_input row of a date whose file held a later date
     for r in dated:
         d, b, t = curve.day(r["body"]["date"]), r["body"], curve.instant(r["ts"])
         assert t >= curve.due_instant(d, CCFG), (where, "written before due")
@@ -316,6 +317,12 @@ def curve_invariants(
                 # KR-255: a later date in the file is recorded once as stale_input, with that file
                 sighting = b["input"].get("latest_date", "") > d.isoformat()
                 assert sighting or not world.later_published(d, t), (where, "stale but moved on")
+                if sighting:
+                    # KF-15: recorded once. A second sighting of the same date at a later instant means the
+                    # writer did not close the date when it saw the later file again (reruns at the same
+                    # instant write nothing new, so they cannot add a second sighting).
+                    assert d not in sighted or not sighted[d] < t, (where, "a later file sighted twice, date never closed")
+                    sighted.setdefault(d, t)
     assert all(d in settled for d in seen[:-1]), where
     if now is None:
         return
@@ -360,6 +367,30 @@ def test_the_property_test_sees_the_ka_c9_fault(monkeypatch: pytest.MonkeyPatch)
         return out, new, notes
 
     monkeypatch.setattr(curve, "run", audited)
+    failures = 0
+    for seed in range(300):
+        try:
+            curve_sequence(seed)
+        except AssertionError:
+            failures += 1
+    assert failures > 0
+
+
+
+def test_the_property_test_sees_a_writer_that_never_closes_a_skipped_date(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """KF-15, plan 14.10 rule 1: a writer whose "seen before" is always false records a sighting on every run
+    and never writes the not_published gap. The property test must fail on it."""
+    import inspect
+    import textwrap
+
+    src = textwrap.dedent(inspect.getsource(curve.run))
+    planted = src.replace("if evidence is not None and not seen_before:", "if evidence is not None:")
+    assert planted != src, "the planted fault no longer applies to curve.run"
+    scope = dict(vars(curve))
+    exec(compile(planted, "<planted curve.run>", "exec"), scope)
+    monkeypatch.setattr(curve, "run", scope["run"])
     failures = 0
     for seed in range(300):
         try:

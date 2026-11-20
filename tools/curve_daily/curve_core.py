@@ -743,7 +743,8 @@ def _check_rows(rows: list[dict[str, Any]], cfg: dict[str, Any], cal: Calendar |
             if kind == "GAP" or status in FINAL:
                 last_settled, open_date, sighted = ds, "", ""
             else:
-                if status == "stale_input" and not sighted                         and str((b.get("input") or {}).get("latest_date", "")) > ds:
+                if status == "stale_input" and not sighted \
+                        and str((b.get("input") or {}).get("latest_date", "")) > ds:
                     sighted = r["ts"]
                 open_date = ds
         else:  # CONSISTENCY
