@@ -243,6 +243,8 @@ def load_stage_h():
 # counted; idr_k-0012 and idr_k-0013 MISMATCH on estimate_pnl and are NOT counted.
 # trig_k: KR-232 redefined `false_alarm_rate`, so the wave-1 blind MATCH no longer covers every compared output and
 # trig_k lost its blind credit (verified_by says "not blind"); the SciPy checks do not count (KR-11).
+# K-4c version 2 packet (program/STAGE_K_BLIND_TRIG_V2.md, 2026-11-20): 14 of 14 MATCH, 13 counted (trig_k-0004's
+# fire stays gap-decided by KR-13).
 # The 28 printed-figure cases count through the blind pub packet (program/STAGE_K_BLIND_PUB.md, 28 of 28 MATCH at
 # full tolerance), not through the printed figure (KR-250).
 STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-5a", "rich_k": "K-8 guard",
@@ -451,7 +453,8 @@ def markdown(doc):
               "(ruling KR-250, audit KA-C18): it checks some outputs at print precision, not every compared output at the "
               "golden's tolerance; those 28 cases count through the blind packet that matched them 28 of 28 (program/STAGE_K_BLIND_PUB.md). "
               "Counted from wave 1b: the seven SA-CCR cases the wave-1b blind lane matched (program/STAGE_K_BLIND_W1B.md); SciPy binomial checks on "
-              "btk_k are not counted. trig_k lost its blind credit when KR-232 redefined false_alarm_rate (the SciPy check does not count). "
+              "btk_k are not counted. trig_k lost its wave-1 blind credit when KR-232 redefined false_alarm_rate (the SciPy check does not count); "
+              "the K-4c version 2 packet re-derived its 14 value cases, 14 of 14 MATCH, 13 counted (trig_k-0004: fire gap-decided by KR-13; program/STAGE_K_BLIND_TRIG_V2.md). "
               "Later blind packets, counted the same way: K-5a version 2, 9 of 11 (program/STAGE_K_BLIND_K5A_V2.md; "
               "idr_k-0012 and idr_k-0013 mismatched and are not counted), the K-8 ladder k8_k (program/STAGE_K_BLIND_K8.md) and eleven btk_k cases "
               "(program/STAGE_K_BLIND_BTK.md; btk_k-0017 matched and is not counted). The mpmath oracle is our own and never counts.", "",

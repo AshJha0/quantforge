@@ -1,0 +1,85 @@
+trig_k-0001 MATCH counted=yes
+    fire: blind True expected True ok
+    sigma: blind 1.1547005383792515 expected 1.1547005383792515 rel 0 limit 1e-14 ok
+    threshold: blind 3.4641016151377544 expected 3.4641016151377544 rel 0 limit 1e-14 ok
+    false_alarm_rate: blind 0.05766888562243732 expected 0.057668885622437306 rel 2.41e-16 limit 1e-11 ok
+    nominal_rate: blind 0.002699796063260189 expected 0.002699796063260189 rel 0 limit 1e-14 ok
+trig_k-0002 MATCH counted=yes
+    fire: blind False expected False ok
+    sigma: blind 1.1547005383792515 expected 1.1547005383792515 rel 0 limit 1e-14 ok
+    threshold: blind 3.4641016151377544 expected 3.4641016151377544 rel 0 limit 1e-14 ok
+    false_alarm_rate: blind 0.05766888562243732 expected 0.057668885622437306 rel 2.41e-16 limit 1e-11 ok
+    nominal_rate: blind 0.002699796063260189 expected 0.002699796063260189 rel 0 limit 1e-14 ok
+trig_k-0003 MATCH counted=yes
+    fire: blind False expected False ok
+    sigma: blind 1.1547005383792515 expected 1.1547005383792515 rel 0 limit 1e-14 ok
+    threshold: blind 6.928203230275509 expected 6.928203230275509 rel 0 limit 1e-14 ok
+    false_alarm_rate: blind 0.05766888562243732 expected 0.057668885622437306 rel 2.41e-16 limit 1e-11 ok
+    nominal_rate: blind 0.002699796063260189 expected 0.002699796063260189 rel 0 limit 1e-14 ok
+trig_k-0004 MATCH counted=no (fire decided by gap ruling KR-13)
+    fire: blind False expected False ok
+    sigma: blind 1.0 expected 1.0 rel 0 limit 1e-14 ok
+    threshold: blind 2.5 expected 2.5 rel 0 limit 1e-14 ok
+    false_alarm_rate: blind 0.04099221858575289 expected 0.040992218585752895 rel 1.69e-16 limit 1e-11 ok
+    nominal_rate: blind 0.01241933065155227 expected 0.01241933065155227 rel 0 limit 1e-14 ok
+trig_k-0005 MATCH counted=yes
+    fire: blind True expected True ok
+    sigma: blind 1.0 expected 1.0 rel 0 limit 1e-14 ok
+    threshold: blind 2.5 expected 2.5 rel 0 limit 1e-14 ok
+    false_alarm_rate: blind 0.04099221858575289 expected 0.040992218585752895 rel 1.69e-16 limit 1e-11 ok
+    nominal_rate: blind 0.01241933065155227 expected 0.01241933065155227 rel 0 limit 1e-14 ok
+trig_k-0009 MATCH counted=yes
+    fire: blind False expected False ok
+    sigma: blind 1.1547005383792515 expected 1.1547005383792515 rel 0 limit 1e-14 ok
+    threshold: blind 34.64101615137754 expected 34.64101615137755 rel 2.05e-16 limit 1e-14 ok
+    false_alarm_rate: blind 8.13528042716396e-05 expected 8.135280427163959e-05 rel 1.67e-16 limit 1e-11 ok
+    nominal_rate: blind 9.813427854296374e-198 expected 9.813427854296374e-198 rel 0 limit 1e-14 ok
+trig_k-0010 MATCH counted=yes
+    fire: blind True expected True ok
+    sigma: blind 1.4142135623730951 expected 1.4142135623730951 rel 0 limit 1e-14 ok
+    threshold: blind 4.242640687119286 expected 4.242640687119285 rel 2.09e-16 limit 1e-14 ok
+    false_alarm_rate: blind 0.20483276469913345 expected 0.20483276469913345 rel 0 limit 1e-11 ok
+    nominal_rate: blind 0.002699796063260189 expected 0.002699796063260189 rel 0 limit 1e-14 ok
+trig_k-0011 MATCH counted=yes
+    fire: blind False expected False ok
+    sigma: blind 0.6291528696058958 expected 0.6291528696058958 rel 0 limit 1e-14 ok
+    threshold: blind 1.8874586088176875 expected 1.8874586088176875 rel 0 limit 1e-14 ok
+    false_alarm_rate: blind 0.09546596626670911 expected 0.09546596626670913 rel 1.45e-16 limit 1e-11 ok
+    nominal_rate: blind 0.002699796063260189 expected 0.002699796063260189 rel 0 limit 1e-14 ok
+trig_k-0012 MATCH counted=yes
+    fire: blind True expected True ok
+    sigma: blind 0.8177713616898064 expected 0.8177713616898064 rel 0 limit 1e-14 ok
+    threshold: blind 2.313006701244076 expected 2.3130067012440754 rel 1.92e-16 limit 1e-14 ok
+    false_alarm_rate: blind 0.11611652351681553 expected 0.11611652351681559 rel 4.78e-16 limit 1e-11 ok
+    nominal_rate: blind 0.04550026389635842 expected 0.04550026389635842 rel 0 limit 1e-14 ok
+trig_k-0013 MATCH counted=yes
+    fire: blind False expected False ok
+    sigma: blind 1.5321403991104101 expected 1.5321403991104101 rel 0 limit 1e-14 ok
+    threshold: blind 4.59642119733123 expected 4.596421197331231 rel 1.93e-16 limit 1e-14 ok
+    false_alarm_rate: blind 0.0054991921339034135 expected 0.0054991921339034066 rel 1.26e-15 limit 1e-11 ok
+    nominal_rate: blind 0.002699796063260189 expected 0.002699796063260189 rel 0 limit 1e-14 ok
+trig_k-0014 MATCH counted=yes
+    fire: blind True expected True ok
+    sigma: blind 1.3977668829372603 expected 1.3977668829372603 rel 0 limit 1e-14 ok
+    threshold: blind 4.193300648811781 expected 4.193300648811781 rel 0 limit 1e-14 ok
+    false_alarm_rate: blind 0.0029737859324150294 expected 0.0029737859324150116 rel 5.98e-15 limit 1e-11 ok
+    nominal_rate: blind 0.002699796063260189 expected 0.002699796063260189 rel 0 limit 1e-14 ok
+trig_k-0015 MATCH counted=yes
+    fire: blind True expected True ok
+    sigma: blind 1.1547005383792515 expected 1.1547005383792515 rel 0 limit 1e-14 ok
+    threshold: blind 0.5773502691896257 expected 0.5773502691896257 rel 0 limit 1e-14 ok
+    false_alarm_rate: blind 0.651447964848151 expected 0.651447964848151 rel 0 limit 1e-11 ok
+    nominal_rate: blind 0.6170750774519738 expected 0.6170750774519738 rel 0 limit 1e-14 ok
+trig_k-0016 MATCH counted=yes
+    fire: blind False expected False ok
+    sigma: blind 1.0 expected 1.0 rel 0 limit 1e-14 ok
+    threshold: blind 1000.0 expected 1000.0 rel 0 limit 1e-14 ok
+    false_alarm_rate: blind 2.6409838375211855e-19 expected 2.6409838375211874e-19 rel 7.29e-16 limit 1e-11 ok
+    nominal_rate: blind 0.0 expected 0.0 rel 0 limit 1e-14 ok
+trig_k-0021 MATCH counted=yes
+    fire: blind True expected True ok
+    sigma: blind 1.5556349217168183e-08 expected 1.5556349217168183e-08 rel 0 limit 3e-08 ok
+    threshold: blind 4.666904765150455e-08 expected 4.666904765150455e-08 rel 0 limit 3e-08 ok
+    false_alarm_rate: blind 0.20483276469913345 expected 0.20483276469913345 rel 0 limit 1e-11 ok
+    nominal_rate: blind 0.002699796063260189 expected 0.002699796063260189 rel 0 limit 3e-08 ok
+TOTAL 14 cases: MATCH 14, counted 13, needed for 60% of 14: 9
