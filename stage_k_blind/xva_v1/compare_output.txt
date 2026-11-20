@@ -1,0 +1,22 @@
+aadx_k-0001 MISMATCH d_cva_d_h_c: blind None expected 133.0258166316599; d_cva_d_r_c: blind None expected -4.516436290005047; d_cva_d_h_b: blind None expected -1.790935732181199; d_fca_d_s_b: blind None expected 226.95280541807102; d_cva_d_ee[1]: blind None expected 0.005704780048492915
+colva_k-0001 MATCH 
+colva_k-0002 MATCH 
+colva_k-0003 MATCH 
+mva_k-0001 MATCH 
+mva_k-0002 MATCH 
+mva_k-0003 MATCH 
+str_k-0001 MATCH 
+str_k-0002 MATCH 
+str_k-0003 MATCH 
+str_k-0004 MATCH 
+mpor_k-0001 MATCH 
+mpor_k-0002 MATCH 
+mpor_k-0003 MATCH 
+mpor_k-0004 MATCH 
+mpor_k-0005 MATCH 
+mpor_k-0006 MATCH 
+fva_k-0001 MATCH 
+fva_k-0002 MATCH 
+fva_k-0003 MISMATCH fca: blind None expected 1.815622443344568; fba: blind None expected 1.2027298203433914
+fva_k-0006 MISMATCH fca: blind None expected 0
+MATCH 18 of 21
