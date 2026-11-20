@@ -13,9 +13,27 @@ Branch `k-v1-rev1` off `k-v1` at 5f2a8dc8. K-9 different-model review findings 1
 | 8 implied vol | done, four builds | Reproduced in Python and Java: a 1e-12 absolute price check accepted 0.1234 (Python) and 0.1196 (Java) for a true 0.1 at price 1.48e-265. Cause: Newton on `V - price` stalls far out of the money and the final check is met by any vol. Fix (KR-341): Newton on `ln V - ln price`, acceptance on an estimated vol error, `E_NO_CONVERGENCE` when the price does not identify the vol. Goldens `ivdeep_c` (12; scipy log-space brentq check). Other solvers with the same shape, not changed: `credit.cdsoption.implied_vol` and `rates.bondfut.implied_vol` (Brent on the price, no final check) | follow-up: check those two on tiny premiums |
 | 12 LEARN local vol | done | mpmath at 40 digits: `w_T = 0.033906` against `w/T = 0.063852` (term structure) and the curvature term (+0.21533 in `g`) lower local vol; the skew term (-0.010594) raises it | none |
 | 19 FRTB scenarios | done (Python only; the other builds had no such import) | `python/quantforge_core/frtb_scenarios.py`; no behaviour change; mutation seeds of `var_risk.py`, `frtb.py` change | mutation sample not run |
-| 21 tests | done | `test_goldens_stage_d.py` defaults to the repository root; `python/tests/conftest.py` fails on a skip not listed in `python/tests/expected_skips.txt` (KR-343) | none |
+| 21 tests | done | `test_goldens_stage_d.py` defaults to the repository root; `python/tests/skip_guard.py` fails on a skip not listed in `python/tests/expected_skips.txt` (KR-343) | none |
 | 22 CVA note | done in LEARN.md | first-order bias, measured toy example | follow-up: the one-line note beside the formula in `specifications/06-risk/xva-framework.md` (the xVA lanes were editing it) |
 
-## Verification
+## Verification (local laptop, not the acceptance machine; 2026-11-20)
 
-See the section "Results" below, filled at the stop.
+- Conformance, all 16,304 cases: Python 16,304 of 16,304; Java 16,304; Rust (release) 16,304; C++ (ASan and UBSan build) 16,304, run per golden directory in short locked jobs.
+- Unit tests: Python full pytest 4,038 passed, 2 expected skips, 2 failures found and fixed (`test_finite`: the new public `scale_correlation` was not finite-guarded; now `guard(globals())`; both tests pass after the fix, the full suite was not rerun after that one-line change). Java `mvn -Pcoverage verify` 1,014 tests, 0 failures, 1 skipped, coverage gate 0 modules below. Rust `cargo fmt --check`, `clippy -D warnings`, `cargo test --workspace` pass (includes golden replay). C++: ASan unit tests for the SABR, Black, implied and CLI test cases pass (6,919 assertions in 23 test cases); the full ASan ctest was stopped after 7 minutes to keep the shared lock short (coordinator rule), so the full C++ unit suite is NOT verified here; no plain (non-sanitizer) C++ build or clang `-Wshadow` build was run.
+- Linters: ruff, ruff format, mypy (253 files) clean; MinGW `g++ -fsyntax-only -Wall -Wextra -Wshadow` on the two C++ files clean.
+- Fuzz, seed 5, local: Java 150 s 20,200 inputs, C++ (ASan) 150 s 75,000 inputs, Rust 150 s 101,000 inputs: 0 findings. Python fuzz not run.
+- Repo gates (the `repo-gates.yml` list run locally) and the after-spec-edit list pass; `research/test_preregs.py` passes. `tools/check_case_total.py` reports a handover mismatch (16,257 recorded) that predates this lane.
+- Failing-first: `sabrz_c` 22 of 32 fail the old Python; `ivdeep_c` 4 fail the old Python and 5 the old Java. No golden is red in any build now.
+
+## Not run (deferred)
+
+- Mutation samples (coordinator rule 2026-11-20: no mutation under the WSL lock tonight; pull-request CI runs the mutation report). Cells whose sources changed, seed = sha256 of the mutated sources at the head commit: Python `sabr.py`, `black.py`, `var_risk.py`, `frtb.py`, `frtb_scenarios.py`; Java `vol/Sabr.java`, `vol/Black.java`; Rust `sabr.rs`, `black.rs`; C++ `sabr.cpp`, `black.cpp`. Status: not run: deferred.
+- Python per-file coverage gate (needs the 35-minute coverage run).
+- Full C++ ctest (plain and ASan), clang build.
+
+## Decisions for the coordinator
+
+- The new value goldens live in `datasets/golden/stage_c/` (`sabrz_c`, `ivdeep_c`): they test stage C operations; in `stage_k` they would have pulled stage K to 58.4 % under its 60 % outside floor, which counts only blind re-derivation. Each case carries a scipy library-primitive cross-check in `verified_by`; stage C has no outside-share row.
+- README and LEARN headline counts were changed (8,004 to 8,047 value-checked, 5,700 to 5,703 error, 16,258 to 16,304) because `case_figures.py --check` and `status_glance.py --check` require it; the docs lane should expect that conflict.
+- README line "Fuzzing has not run on `main` since the v0.8.3 fixes" is false (the 2026-11-16 run did, and failed); suggested text for the docs lane: fuzz failed on main at every scheduled run from 2026-11-09 to 2026-11-16; the findings are fixed (J-W3-18 to J-W3-21, goldens `fuzzfix_j`, `fuzzfix_k`); no run since; "fuzz clean" is not claimed until a green run on main.
+- Rulings KR-340 to KR-343 are PROPOSED.

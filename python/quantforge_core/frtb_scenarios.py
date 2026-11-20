@@ -5,6 +5,8 @@ down ("low"), and the largest of the three is taken. var_risk.py (GIRR delta) an
 both use this module (K-9 review finding 19: frtb.py used private names of var_risk.py).
 """
 
+from .finite import guard
+
 SCENARIOS = ("high", "medium", "low")
 
 
@@ -15,3 +17,6 @@ def scale_correlation(x: float, scenario: str) -> float:
     if scenario == "low":
         return max(2 * x - 1, 0.75 * x)
     return x
+
+
+guard(globals())
