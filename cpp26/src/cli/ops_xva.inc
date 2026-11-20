@@ -1,26 +1,35 @@
 // CLI handlers, stage G wave 4b: xVA on given paths (06-risk/xva-framework.md, rulings G-40 to G-44).
 // Included by dispatch.cpp inside its unnamed namespace; formulas on given inputs, so the maths lives here.
 
-Vec xva_increasing(const In& in, const char* key, std::size_t min_size) {
-    const Vec t = sr_reals(in, key);
-    limit_if(t.size() > 10000, key);
+// Error order HR-122 (KR-230; the KR-258 sweep found C++ out of step): every handler here first reads all of its
+// inputs (E_SCHEMA), then size limits and the finite rule, then structural E_INPUT, then E_DOMAIN.
+
+// Structural check of a time grid: at least `min_size` points, strictly increasing.
+void xva_grid(const Vec& t, const char* key, std::size_t min_size) {
     if (t.size() < min_size) throw Error("E_INPUT", string(key) + " is too short", key);
     for (std::size_t i = 1; i < t.size(); ++i)
         if (!(t[i] > t[i - 1])) throw Error("E_INPUT", string(key) + " must increase", key);
-    return t;
 }
 
-std::vector<Vec> xva_paths(const Value& v, const char* key, std::size_t len) {
+// Read phase: a list of paths, each a list of numbers (E_SCHEMA and the path-count limit only).
+std::vector<Vec> xva_read_paths(const Value& v, const char* key) {
     if (v.kind != Kind::Array) schema(key, "expected an array of paths");
     limit_if(v.items.size() > 10000000, key);
     std::vector<Vec> paths;
-    for (const Value& p : v.items) {
-        Vec x = sr_finite(to_reals(p, key), key);
-        if (x.size() != len) throw Error("E_INPUT", "a path length differs from times", key);
-        paths.push_back(std::move(x));
-    }
-    if (paths.empty()) throw Error("E_INPUT", "no paths", key);
+    paths.reserve(v.items.size());
+    for (const Value& p : v.items) paths.push_back(to_reals(p, key));
     return paths;
+}
+
+void xva_finite_paths(const std::vector<Vec>& paths, const char* key) {
+    for (const Vec& x : paths) static_cast<void>(sr_finite(x, key));
+}
+
+// Structural phase: every path has the grid's length, and there is at least one path.
+void xva_check_paths(const std::vector<Vec>& paths, const char* key, std::size_t len) {
+    for (const Vec& x : paths)
+        if (x.size() != len) throw Error("E_INPUT", "a path length differs from times", key);
+    if (paths.empty()) throw Error("E_INPUT", "no paths", key);
 }
 
 struct XvaCsa {
@@ -29,24 +38,21 @@ struct XvaCsa {
 };
 
 void op_xva_collateralised(const In& in, Out& out) {
-    const Vec t = xva_increasing(in, "times", 2);
+    // Read phase (E_SCHEMA).
+    const Vec t = in.reals("times");
+    limit_if(t.size() > 10000, "times");
     const Value& tv = in.need("trades");
     if (tv.kind != Kind::Array) schema("trades", "expected an array");
-    if (tv.items.empty()) throw Error("E_INPUT", "no trades", "trades");
-    std::map<string, std::vector<Vec>> sets;  // code-point order of names
+    std::vector<std::pair<string, std::vector<Vec>>> trades;
     for (const Value& tr : tv.items) {
         if (tr.kind != Kind::Object) schema("trades", "expected an object");
         const In q(tr);
-        const string name = q.text("netting_set");
-        const std::vector<Vec> paths = xva_paths(q.need("values"), "values", t.size());
+        string name = q.text("netting_set");
+        std::vector<Vec> paths = xva_read_paths(q.need("values"), "values");
         q.ready();
-        auto& acc = sets[name];
-        if (acc.empty()) acc.assign(paths.size(), Vec(t.size(), 0.0));
-        if (acc.size() != paths.size()) throw Error("E_INPUT", "trades of a set have different path counts", "values");
-        for (std::size_t p = 0; p < paths.size(); ++p)
-            for (std::size_t i = 0; i < t.size(); ++i) acc[p][i] += paths[p][i];
+        trades.emplace_back(std::move(name), std::move(paths));
     }
-    std::map<string, XvaCsa> csa;
+    std::vector<std::pair<string, XvaCsa>> csa_in;
     if (const Value* cv = in.find("csa")) {
         if (cv->kind != Kind::Object) schema("csa", "expected an object");
         for (const auto& m : cv->members) {
@@ -55,14 +61,33 @@ void op_xva_collateralised(const In& in, Out& out) {
             XvaCsa x{c.real("threshold_receive"), c.real("threshold_post"), c.real("minimum_transfer_amount"),
                      c.real("independent_amount", 0.0), c.integer("mpor_steps")};
             c.ready();
-            if (!(x.hr >= 0) || !(x.hp >= 0) || !(x.mta >= 0)) throw Error("E_DOMAIN", "a threshold or MTA is negative", "csa");
-            if (x.lag < 0) throw Error("E_DOMAIN", "mpor_steps is negative", "csa");
-            if (!sets.count(m.first)) throw Error("E_INPUT", "a CSA names a netting set with no trades", "csa");
-            csa[m.first] = x;
+            csa_in.emplace_back(m.first, x);
         }
     }
     const double q = in.real("pfe_quantile");
     in.ready();
+    // Finite rule.
+    static_cast<void>(sr_finite(t, "times"));
+    for (const auto& tr : trades) xva_finite_paths(tr.second, "values");
+    // Structural E_INPUT, then E_DOMAIN (per CSA in name order, as in the other builds).
+    xva_grid(t, "times", 2);
+    if (trades.empty()) throw Error("E_INPUT", "no trades", "trades");
+    std::map<string, std::vector<Vec>> sets;  // code-point order of names
+    for (const auto& [name, paths] : trades) {
+        xva_check_paths(paths, "values", t.size());
+        auto& acc = sets[name];
+        if (acc.empty()) acc.assign(paths.size(), Vec(t.size(), 0.0));
+        if (acc.size() != paths.size()) throw Error("E_INPUT", "trades of a set have different path counts", "values");
+        for (std::size_t p = 0; p < paths.size(); ++p)
+            for (std::size_t i = 0; i < t.size(); ++i) acc[p][i] += paths[p][i];
+    }
+    std::map<string, XvaCsa> csa;
+    for (const auto& [name, x] : csa_in) {
+        if (!(x.hr >= 0) || !(x.hp >= 0) || !(x.mta >= 0)) throw Error("E_DOMAIN", "a threshold or MTA is negative", "csa");
+        if (x.lag < 0) throw Error("E_DOMAIN", "mpor_steps is negative", "csa");
+        if (!sets.count(name)) throw Error("E_INPUT", "a CSA names a netting set with no trades", "csa");
+        csa[name] = x;
+    }
     if (!(q > 0 && q <= 1)) throw Error("E_DOMAIN", "pfe_quantile must lie in (0, 1]", "pfe_quantile");
     const std::size_t n = t.size();
     Vec total(n, 0.0);
@@ -129,34 +154,28 @@ void op_xva_collateralised(const In& in, Out& out) {
 struct XvaName {
     double h, R;
 };
-XvaName xva_name(const In& in, const char* key) {
+XvaName xva_read_name(const In& in, const char* key) {
     const Value& v = in.need(key);
     if (v.kind != Kind::Object) schema(key, "expected an object");
     const In c(v);
     XvaName x{c.real("hazard_rate"), c.real("recovery")};
     c.ready();
+    return x;
+}
+void xva_check_name(const XvaName& x, const char* key) {
     if (!(x.h >= 0)) throw Error("E_DOMAIN", "hazard_rate is negative", key);
     if (!(x.R >= 0 && x.R < 1)) throw Error("E_DOMAIN", "recovery must lie in [0, 1)", key);
-    return x;
 }
 
 void op_xva_adjustments(const In& in, Out& out) {
-    const Vec t = xva_increasing(in, "times", 1);
-    if (!(t[0] > 0)) throw Error("E_INPUT", "times must start after 0 (KR-258)", "times");
-    const Vec D = sr_reals(in, "discount_factors"), ee = sr_reals(in, "ee"), ene = sr_reals(in, "ene");
-    const std::size_t n = t.size();
-    if (D.size() != n || ee.size() != n || ene.size() != n) throw Error("E_INPUT", "lengths differ from times", "ee");
+    // Read phase (E_SCHEMA).
+    const Vec t = in.reals("times");
+    limit_if(t.size() > 10000, "times");
+    const Vec D = in.reals("discount_factors"), ee = in.reals("ee"), ene = in.reals("ene");
     const bool has_im = in.find("im") != nullptr, has_ims = in.find("im_spread") != nullptr;
     const bool has_k = in.find("capital") != nullptr, has_h = in.find("hurdle_rate") != nullptr;
-    if (has_im != has_ims) throw Error("E_INPUT", "im and im_spread come together", "im_spread");
-    if (has_k != has_h) throw Error("E_INPUT", "capital and hurdle_rate come together", "hurdle_rate");
-    const Vec im = has_im ? sr_reals(in, "im") : Vec{}, cap = has_k ? sr_reals(in, "capital") : Vec{};
-    if ((has_im && im.size() != n) || (has_k && cap.size() != n)) throw Error("E_INPUT", "lengths differ from times", "im");
-    for (std::size_t i = 0; i < n; ++i) {
-        if (!(ee[i] >= 0)) throw Error("E_DOMAIN", "ee is negative", "ee");
-        if (!(ene[i] <= 0)) throw Error("E_DOMAIN", "ene is positive", "ene");
-    }
-    const XvaName c = xva_name(in, "counterparty"), b = xva_name(in, "own");
+    const Vec im = has_im ? in.reals("im") : Vec{}, cap = has_k ? in.reals("capital") : Vec{};
+    const XvaName c = xva_read_name(in, "counterparty"), b = xva_read_name(in, "own");
     const Value& fv = in.need("funding");
     if (fv.kind != Kind::Object) schema("funding", "expected an object");
     const In f(fv);
@@ -165,6 +184,23 @@ void op_xva_adjustments(const In& in, Out& out) {
     f.ready();
     const double ims = has_ims ? in.real("im_spread") : 0.0, hurdle = has_h ? in.real("hurdle_rate") : 0.0;
     in.ready();
+    // Finite rule.
+    for (const Vec* v : {&t, &D, &ee, &ene, &im, &cap}) static_cast<void>(sr_finite(*v, "inputs"));
+    // Structural E_INPUT.
+    xva_grid(t, "times", 1);
+    if (!(t[0] > 0)) throw Error("E_INPUT", "times must start after 0 (KR-258)", "times");
+    const std::size_t n = t.size();
+    if (D.size() != n || ee.size() != n || ene.size() != n) throw Error("E_INPUT", "lengths differ from times", "ee");
+    if (has_im != has_ims) throw Error("E_INPUT", "im and im_spread come together", "im_spread");
+    if (has_k != has_h) throw Error("E_INPUT", "capital and hurdle_rate come together", "hurdle_rate");
+    if ((has_im && im.size() != n) || (has_k && cap.size() != n)) throw Error("E_INPUT", "lengths differ from times", "im");
+    // E_DOMAIN.
+    for (std::size_t i = 0; i < n; ++i) {
+        if (!(ee[i] >= 0)) throw Error("E_DOMAIN", "ee is negative", "ee");
+        if (!(ene[i] <= 0)) throw Error("E_DOMAIN", "ene is positive", "ene");
+    }
+    xva_check_name(c, "counterparty");
+    xva_check_name(b, "own");
     const double sl = excl ? std::max(sl0 - b.h * (1 - b.R), 0.0) : sl0;
     double cva = 0, dva = 0, fca = 0, fba = 0, mva = 0, kva = 0, prev = 0;
     for (std::size_t i = 0; i < n; ++i) {
@@ -261,12 +297,21 @@ double wwr_root(const Vec& surv, const Vec& cs, double dt, double hz) {
 }
 
 void op_xva_wwr(const In& in, Out& out) {
-    const Vec t = xva_increasing(in, "times", 1);
-    if (!(t[0] > 0)) throw Error("E_INPUT", "times must start after 0 (KR-258)", "times");
-    const std::vector<Vec> V = xva_paths(in.need("values"), "values", t.size());
-    const Vec D = sr_reals(in, "discount_factors");
+    // Read phase (E_SCHEMA).
+    const Vec t = in.reals("times");
+    limit_if(t.size() > 10000, "times");
+    const std::vector<Vec> V = xva_read_paths(in.need("values"), "values");
+    const Vec D = in.reals("discount_factors");
     const double h = in.real("hazard_rate"), R = in.real("recovery"), b = in.real("wwr_b");
     in.ready();
+    // Finite rule.
+    static_cast<void>(sr_finite(t, "times"));
+    xva_finite_paths(V, "values");
+    static_cast<void>(sr_finite(D, "discount_factors"));
+    // Structural E_INPUT, then E_DOMAIN.
+    xva_grid(t, "times", 1);
+    if (!(t[0] > 0)) throw Error("E_INPUT", "times must start after 0 (KR-258)", "times");
+    xva_check_paths(V, "values", t.size());
     if (D.size() != t.size()) throw Error("E_INPUT", "discount_factors length differs from times", "discount_factors");
     if (!(h > 0)) throw Error("E_DOMAIN", "hazard_rate is not positive", "hazard_rate");
     if (!(R >= 0 && R < 1)) throw Error("E_DOMAIN", "recovery must lie in [0, 1)", "recovery");
