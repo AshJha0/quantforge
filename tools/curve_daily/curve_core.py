@@ -493,6 +493,10 @@ def run(cfg: dict[str, Any], runner: Runner, ledger_text: str, now: dt.datetime,
         windows: dict[str, tuple[str, str]] | None = None) -> tuple[str, list[dict[str, Any]], list[str]]:
     """Rows due at `now`, appended to the ledger. Returns (new ledger text, new rows, notes). `fetch(url)`
     returns the bytes at a URL or raises. Nothing is written by this function."""
+    # KF-14: the ledger stamps whole seconds, so the writer compares at whole seconds too; with a sub-second
+    # `now` a sighting at 23:45:00.200 looked earlier than a rerun at 23:45:00.700 and the writer wrote a gap
+    # that the verifier (whole seconds) refuses.
+    now = now.replace(microsecond=0)
     windows = holdout_windows() if windows is None else windows
     rows = parse(ledger_text) if ledger_text.strip() else []
     if rows:

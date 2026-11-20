@@ -941,3 +941,18 @@ def test_a_not_published_gap_needs_an_earlier_run_that_saw_it() -> None:
     for r in rows[gi:]:
         r["ts"] = rows[gi - 1]["ts"]
     assert check(rechain(rows))["reason"] == "GAPRULE"
+
+
+def test_a_sub_second_clock_cannot_write_a_gap_the_verifier_refuses() -> None:
+    """KF-14: the ledger stamps whole seconds. A sighting written at 23:45:00.200 and a rerun at 23:45:00.700
+    are the same instant to the verifier, so the rerun must not close the date as a gap (the verifier would
+    refuse it, GAPRULE); `core.run` compares at whole seconds."""
+    days = business_days(3)
+    text, _, _ = step("", evening(days[0]), fetcher(treasury_csv(days[:1]), None))
+    text, _, _ = step(text, evening(days[1]), fetcher(treasury_csv(days[:1]), None))
+    later = fetcher(treasury_csv([days[0], days[2]]), None)
+    first = evening(days[2]).replace(microsecond=200_000)
+    text, _, _ = step(text, first, later)
+    out, new, _ = step(text, first.replace(microsecond=700_000), later)
+    assert check(out)["ok"], check(out)
+    assert not any(r["kind"] == "GAP" for r in new)
