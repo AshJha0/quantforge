@@ -1,0 +1,261 @@
+{
+ "implementation": "java",
+ "host": "local laptop, not the acceptance machine",
+ "commit": "55e8dd67726e2dd081ba844490ac2e489a9e05e3",
+ "platform": "win32",
+ "logical_cpus": 12,
+ "memory_key": "private_bytes",
+ "run_at": "2026-11-20T17:53:58+00:00",
+ "planted_wrong": false,
+ "rows": [
+  {
+   "row": "mix/golden",
+   "cases": 16258,
+   "processes": 1,
+   "wall_s": 130.901,
+   "cases_per_s": 124.2,
+   "p50_us": 83.9,
+   "p99_us": 90857.7,
+   "peak_rss_mib": 375.4,
+   "peak_judged_mib": 424.4,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "mix/cheap",
+   "cases": 3806,
+   "processes": 1,
+   "wall_s": 5.163,
+   "cases_per_s": 737.2,
+   "p50_us": 67.7,
+   "p99_us": 3353.5,
+   "peak_rss_mib": 107.0,
+   "peak_judged_mib": 353.5,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "mix/medium",
+   "cases": 770,
+   "processes": 1,
+   "wall_s": 259.848,
+   "cases_per_s": 3.0,
+   "p50_us": 512.0,
+   "p99_us": 2378536.4,
+   "peak_rss_mib": 184.3,
+   "peak_judged_mib": 366.3,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "mix/heavy",
+   "cases": 750,
+   "processes": 1,
+   "wall_s": 73.749,
+   "cases_per_s": 10.2,
+   "p50_us": 425.3,
+   "p99_us": 1114992.9,
+   "peak_rss_mib": 234.1,
+   "peak_judged_mib": 379.0,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "batch/10000",
+   "cases": 10000,
+   "processes": 1,
+   "wall_s": 172.973,
+   "cases_per_s": 57.8,
+   "p50_us": 52.6,
+   "p99_us": 24644.3,
+   "peak_rss_mib": 151.6,
+   "peak_judged_mib": 366.5,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "batch/100000",
+   "cases": 100000,
+   "processes": 1,
+   "wall_s": 39.893,
+   "cases_per_s": 2506.7,
+   "p50_us": 10.5,
+   "p99_us": 291.8,
+   "peak_rss_mib": 214.2,
+   "peak_judged_mib": 366.6,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "batch/1000000",
+   "cases": 1000000,
+   "processes": 1,
+   "wall_s": 189.557,
+   "cases_per_s": 5275.4,
+   "p50_us": 9.9,
+   "p99_us": 235.5,
+   "peak_rss_mib": 218.7,
+   "peak_judged_mib": 368.4,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/curve.bootstrap.par_annual/20",
+   "operation": "curve.bootstrap.par_annual",
+   "input": "quotes",
+   "size": 20,
+   "limit": 200,
+   "request_bytes": 268,
+   "wall_s": 0.002,
+   "extra_memory_mib": 0.0,
+   "answer": [
+    "ok",
+    null
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/curve.bootstrap.par_annual/100",
+   "operation": "curve.bootstrap.par_annual",
+   "input": "quotes",
+   "size": 100,
+   "limit": 200,
+   "request_bytes": 855,
+   "wall_s": 0.005,
+   "extra_memory_mib": 0.0,
+   "answer": [
+    "ok",
+    null
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/curve.bootstrap.par_annual/200",
+   "operation": "curve.bootstrap.par_annual",
+   "input": "quotes",
+   "size": 200,
+   "limit": 200,
+   "request_bytes": 1555,
+   "wall_s": 0.008,
+   "extra_memory_mib": 0.0,
+   "answer": [
+    "ok",
+    null
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/curve.bootstrap.par_annual/201",
+   "operation": "curve.bootstrap.par_annual",
+   "input": "quotes",
+   "size": 201,
+   "limit": 200,
+   "request_bytes": 1562,
+   "wall_s": 0.008,
+   "extra_memory_mib": 0.0,
+   "answer": [
+    "error",
+    "E_LIMIT"
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/risk.intraday.delta_gamma_bound/10000",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "input": "positions",
+   "size": 10000,
+   "limit": 100000,
+   "request_bytes": 620378,
+   "wall_s": 0.406,
+   "extra_memory_mib": 3.27,
+   "answer": [
+    "ok",
+    null
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/risk.intraday.delta_gamma_bound/50000",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "input": "positions",
+   "size": 50000,
+   "limit": 100000,
+   "request_bytes": 3101381,
+   "wall_s": 1.386,
+   "extra_memory_mib": 17.66,
+   "answer": [
+    "ok",
+    null
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/risk.intraday.delta_gamma_bound/100000",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "input": "positions",
+   "size": 100000,
+   "limit": 100000,
+   "request_bytes": 6202628,
+   "wall_s": 1.788,
+   "extra_memory_mib": 6.59,
+   "answer": [
+    "ok",
+    null
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/risk.intraday.delta_gamma_bound/100001",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "input": "positions",
+   "size": 100001,
+   "limit": 100000,
+   "request_bytes": 6202686,
+   "wall_s": 1.224,
+   "extra_memory_mib": 9.71,
+   "answer": [
+    "error",
+    "E_LIMIT"
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  }
+ ],
+ "failed_rows": [],
+ "verdict": "PASS"
+}

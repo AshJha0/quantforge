@@ -23,6 +23,7 @@ Token: GITHUB_TOKEN or GH_TOKEN from the environment (in CI, the job's GITHUB_TO
 output of `gh auth token` if gh is installed, else unauthenticated (public repository, 60 requests an hour; the
 check makes one request per scheduled workflow). Standard library only.
 """
+
 import argparse
 import json
 import os
@@ -31,6 +32,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -46,7 +48,7 @@ def scheduled_workflows(root=ROOT):
     out = []
     for p in sorted((Path(root) / ".github" / "workflows").glob("*.yml")):
         text = p.read_text(encoding="utf-8")
-        if re.search(r"^\s+schedule:\s*\n(\s*#.*\n)*\s+- cron:", text, re.M):
+        if re.search(r"^\s+schedule:\s*\n(\s*#.*\n)*\s+- cron:", text, re.MULTILINE):
             out.append(p.name)
     return out
 
@@ -68,20 +70,58 @@ def token():
         if os.environ.get(k):
             return os.environ[k]
     if shutil.which("gh"):
-        r = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, check=False)
+        r = subprocess.run(
+            ["gh", "auth", "token"], capture_output=True, text=True, check=False
+        )
         if r.returncode == 0 and r.stdout.strip():
             return r.stdout.strip()
     return None
 
 
+def registered_workflows(tok):
+    """File names of the workflows GitHub has registered for the repository (default branch)."""
+    names, page = set(), 1
+    while True:
+        url = f"https://api.github.com/repos/{REPO}/actions/workflows?per_page=100&page={page}"
+        req = urllib.request.Request(
+            url,
+            headers={
+                "Accept": "application/vnd.github+json",
+                "User-Agent": "quantforge-check",
+            },
+        )
+        if tok:
+            req.add_header("Authorization", f"Bearer {tok}")
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            items = json.load(resp)["workflows"]
+        names.update(w["path"].rsplit("/", 1)[-1] for w in items)
+        if len(items) < 100:
+            return names
+        page += 1
+
+
 def last_run(workflow, tok):
     """(conclusion, created_at, html_url) of the last completed schedule or workflow_dispatch run on main, or None."""
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{workflow}/runs?branch=main&status=completed&per_page=20"
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "quantforge-check"})
+    req = urllib.request.Request(
+        url,
+        headers={
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "quantforge-check",
+        },
+    )
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        runs = json.load(resp)["workflow_runs"]
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            runs = json.load(resp)["workflow_runs"]
+    except urllib.error.HTTPError as e:
+        # A workflow file added by the pull request under test is not registered on the default branch yet, so the
+        # API answers 404 for it. That is "no run to judge" only if the list of registered workflows is readable
+        # and does not hold the file; anything else still fails the gate (pull request #64, k6-soak.yml).
+        if e.code == 404 and workflow not in registered_workflows(tok):
+            return None
+        raise
     for r in runs:
         if r["event"] in ("schedule", "workflow_dispatch"):
             return r["conclusion"], r["created_at"], r["html_url"]
@@ -97,24 +137,46 @@ def judge(runs, register_open):
             continue
         concl, when, url = run
         named = f"`{wf}`" in register_open
-        report.append(f"{wf}: {concl} ({when[:10]}){'; named in the register' if named else ''}")
+        report.append(
+            f"{wf}: {concl} ({when[:10]}){'; named in the register' if named else ''}"
+        )
         if concl in RED and not named:
-            problems.append(f"{wf}: last run on main {when[:10]} concluded {concl} ({url}), and no open row of {REGISTER.as_posix()} names `{wf}`")
+            problems.append(
+                f"{wf}: last run on main {when[:10]} concluded {concl} ({url}), and no open row of {REGISTER.as_posix()} names `{wf}`"
+            )
     return problems, report
 
 
 def self_test():
     failures = []
     reg_with = "# K\n\n## Open\n\n| Id | x |\n|---|---|\n| F1 | `fuzz.yml` fails |\n\n## Closed\n\n| `bench.yml` |\n"
-    reg_closed_only = "# K\n\n## Open\n\n| Id |\n|---|\n\n## Closed\n\n| F1 | `fuzz.yml` fixed |\n"
+    reg_closed_only = (
+        "# K\n\n## Open\n\n| Id |\n|---|\n\n## Closed\n\n| F1 | `fuzz.yml` fixed |\n"
+    )
     red = ("failure", "2026-11-16T11:33:00Z", "u")
     green = ("success", "2026-11-17T05:17:00Z", "u")
     cases = {
-        "red workflow with an open row": ({"fuzz.yml": red, "bench.yml": green}, reg_with, False),
-        "green workflows and a never-run one": ({"bench.yml": green, "paper-ledger.yml": None}, reg_closed_only, False),
+        "red workflow with an open row": (
+            {"fuzz.yml": red, "bench.yml": green},
+            reg_with,
+            False,
+        ),
+        "green workflows and a never-run one": (
+            {"bench.yml": green, "paper-ledger.yml": None},
+            reg_closed_only,
+            False,
+        ),
         "red workflow with no row": ({"mutation-stage.yml": red}, reg_with, True),
-        "red workflow named only under Closed": ({"fuzz.yml": red}, reg_closed_only, True),
-        "timed-out run counts as red": ({"bench.yml": ("timed_out", "2026-11-17T05:17:00Z", "u")}, reg_with, True),
+        "red workflow named only under Closed": (
+            {"fuzz.yml": red},
+            reg_closed_only,
+            True,
+        ),
+        "timed-out run counts as red": (
+            {"bench.yml": ("timed_out", "2026-11-17T05:17:00Z", "u")},
+            reg_with,
+            True,
+        ),
     }
     with tempfile.TemporaryDirectory() as tmp:
         t = Path(tmp)
@@ -123,17 +185,27 @@ def self_test():
             (t / REGISTER).write_text(reg, encoding="utf-8")
             got, _ = judge(runs, open_text(t))
             if bool(got) != should_fail:
-                failures.append(f"{name}: expected {'a failure' if should_fail else 'a pass'}, got {got}")
+                failures.append(
+                    f"{name}: expected {'a failure' if should_fail else 'a pass'}, got {got}"
+                )
         wf = t / ".github" / "workflows"
         wf.mkdir(parents=True)
-        (wf / "a.yml").write_text("on:\n  schedule:\n    - cron: '1 2 * * 1'\n", encoding="utf-8")
-        (wf / "b.yml").write_text("on:\n  push:\n# schedule: not this\n", encoding="utf-8")
+        (wf / "a.yml").write_text(
+            "on:\n  schedule:\n    - cron: '1 2 * * 1'\n", encoding="utf-8"
+        )
+        (wf / "b.yml").write_text(
+            "on:\n  push:\n# schedule: not this\n", encoding="utf-8"
+        )
         if scheduled_workflows(t) != ["a.yml"]:
-            failures.append(f"schedule parse: expected ['a.yml'], got {scheduled_workflows(t)}")
+            failures.append(
+                f"schedule parse: expected ['a.yml'], got {scheduled_workflows(t)}"
+            )
     if failures:
         print("self-test FAILED:\n" + "\n".join(failures), file=sys.stderr)
         return 1
-    print(f"self-test: 2 passing cases pass, {len(cases) - 2} planted faults fail, the schedule parser finds only scheduled files")
+    print(
+        f"self-test: 2 passing cases pass, {len(cases) - 2} planted faults fail, the schedule parser finds only scheduled files"
+    )
     return 0
 
 
@@ -149,7 +221,10 @@ def main(argv=None):
         for wf in scheduled_workflows():
             runs[wf] = last_run(wf, tok)
     except Exception as e:  # noqa: BLE001 - any API failure fails the gate, with the reason
-        print(f"scheduled runs: could not read the GitHub API ({type(e).__name__}: {e}); failing, because a guard that cannot see must not pass", file=sys.stderr)
+        print(
+            f"scheduled runs: could not read the GitHub API ({type(e).__name__}: {e}); failing, because a guard that cannot see must not pass",
+            file=sys.stderr,
+        )
         return 1
     problems, report = judge(runs, open_text())
     for line in report:
