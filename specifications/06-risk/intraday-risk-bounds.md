@@ -54,7 +54,7 @@ New cases (1.1.0; oracle, not blind): idr_k-0008 (h = 1e-9), 0009 (h = -1e-12), 
 
 ## Acceptance 1.1.0 (KR-234, fixed before the run)
 
-- Every idr_k case in four languages at 1e-9 relative.
+- Every idr_k case in four languages at 1e-9 relative. Exception, added after the run: idr_k-0012 and idr_k-0013 are compared with the KR-240 absolute term as well. Both were added on 2026-11-19 (commit 120ffc92) and failed at 1e-9 relative in all four builds; KR-240 (commit 310ad50c, the same evening) then added the absolute term derived from the KR-234 rounding allowance, because their estimates cancel and 1e-9 of a near-zero result is below the binary64 error of the terms. So for these two cases this bullet was not fixed before the run. The tolerance is not changed here; the blind compare kept the plain 1e-9 rule and records both as mismatches.
 - The 1,000 random moves below, unchanged.
 - Small-move sweep (KR-234): every combination of `h` in {0, +-1e-30, +-1e-25, +-1e-20, +-1e-16, +-1e-14, +-1e-12, +-1e-11, ..., +-1e-1, +-0.5, +-1, 1/3, -0.07}, `T` in {1e-6, 1e-3, 0.25, 1, 5, 30, 100}, `y` in {-1, -0.01, 0, 0.04, 0.3, 1}, `N` in {0, 1e-6, 1, 1e6, -1e6, 1e15, -1e15}, plus hedged books, exact hedges, delta-neutral pairs and 300 seeded random books (`random.Random(20261119)`, 1 to 20 positions), each at every `h`. Pass: `abs(estimate - V_64) <= bound` in binary64 in each build's own tests, and `abs(estimate - V_exact) <= bound` against a 50-digit revaluation for every build's outputs (`oracle/python/check_stage_k_audit_a.py`). The 1.0.0 output fails the sweep by a factor above 1e58 at h = 1e-30.
 
@@ -73,4 +73,4 @@ New cases (1.1.0; oracle, not blind): idr_k-0008 (h = 1e-9), 0009 (h = -1e-12), 
 ## Limits and open issues
 
 - **Audit finding KA-A6 (2026-11-19): closed by KR-234 (spec 1.1.0).** In 1.0.0 the reported `bound` could be exceeded for very small moves (1.40 times the bound at a yield move of 1e-8 and 21.6 times at 1e-9 for one position with maturity 5); the 1.1.0 bound passes the small-move sweep above in all four builds.
-- **Open (2026-11-19): two cancelling-book estimates are not reproduced to 1e-9 relative by an independent implementation** (idr_k-0012, idr_k-0013; order-of-operations sensitivity; the K-5a v2 blind lane). `bound` is unaffected. Register: `docs/known-issues.md`.
+- **Open (2026-11-19): two cancelling-book estimates are not reproduced to 1e-9 relative by an independent implementation** (idr_k-0012, idr_k-0013; the K-5a v2 blind lane). The blind values equal the builds' own binary64 outputs bit for bit (Python checked, measured 2026-11-20); the expected values are the exact 50-digit estimates, and the difference is binary64 against exact on a cancelling book, which no order of operations removes (KR-234 fixes the order). The open question is the choice of expected value for these two goldens. `bound` is unaffected. Register: `docs/known-issues.md`.

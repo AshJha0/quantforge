@@ -1,4 +1,4 @@
-"""Stage K wave 1 verbs (PROPOSED rulings KR-1 to KR-14).
+"""Stage K wave 1 verbs (rulings KR-1 to KR-14 of `stage-k-rulings-w1.md`, confirmed except KR-8).
 
 Error order HR-122 (ruling KR-230): reading the inputs is E_SCHEMA; the gate then applies the size limits
 (limits.md, KR-231) and the finite rule; the core applies structural E_INPUT, E_DOMAIN and, for the

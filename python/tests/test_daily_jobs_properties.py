@@ -153,8 +153,10 @@ class CurveWorld:
             if x < 0.07:
                 self.published[d] = None  # the source never publishes this business day
             elif x < 0.30:
+                # negative offsets publish before the 23:00 due time (KF-8: a first run can then see D+1
+                # and not D)
                 self.published[d] = base + dt.timedelta(
-                    hours=rng.choice([3, 9, 20, 30, 50, 100, 200])
+                    hours=rng.choice([-3, -1, 3, 9, 20, 30, 50, 100, 200])
                 )
             else:
                 self.published[d] = base
@@ -198,7 +200,9 @@ def curve_sequence(seed: int) -> None:
         windows = {
             "T-PLANTED": (w.isoformat(), (w + dt.timedelta(days=rng.choice([0, 1, 4]))).isoformat())
         }
-    now = dt.datetime.combine(span[1], dt.time(rng.choice([0, 4, 15, 23]), rng.randrange(60)), UTC)
+    now = dt.datetime.combine(
+        span[1], dt.time(rng.choice([0, 4, 15, 20, 22, 23]), rng.randrange(60)), UTC
+    )
     text = ""
     year_of = re.compile(r"/(\d{4})/all")
     for _step in range(rng.randrange(4, 10)):
@@ -308,10 +312,10 @@ def curve_invariants(
             assert status in ("stale_input", "fetch_failed"), where
             assert t <= curve.late_limit(d, CCAL, CCFG), where
             if status == "stale_input":
-                assert not world.has(d, t) and not world.later_published(d, t), (
-                    where,
-                    "stale but published",
-                )
+                assert not world.has(d, t), (where, "stale but published")
+                # KR-255: a later date in the file is recorded once as stale_input, with that file
+                sighting = b["input"].get("latest_date", "") > d.isoformat()
+                assert sighting or not world.later_published(d, t), (where, "stale but moved on")
     assert all(d in settled for d in seen[:-1]), where
     if now is None:
         return
