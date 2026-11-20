@@ -5025,32 +5025,32 @@
   },
   "K": {
    "without_sweeps": {
-    "cases": 117,
+    "cases": 122,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 91,
     "reimplementation": 0,
-    "none": 26,
+    "none": 31,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 91,
-    "share_with_rederivation": 0.777778,
+    "share_with_rederivation": 0.745902,
     "all_cases_share": 0.0,
     "error_and_invariance_cases": 115
    },
    "with_sweeps": {
-    "cases": 117,
+    "cases": 122,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 91,
     "reimplementation": 0,
-    "none": 26,
+    "none": 31,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 91,
-    "share_with_rederivation": 0.777778,
+    "share_with_rederivation": 0.745902,
     "all_cases_share": 0.0,
     "error_and_invariance_cases": 115
    },
@@ -5164,17 +5164,17 @@
      "error_and_invariance_cases": 5
     },
     "risk.backtest.traffic_light": {
-     "cases": 15,
+     "cases": 20,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 11,
      "reimplementation": 0,
-     "none": 4,
+     "none": 9,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 11,
-     "share_with_rederivation": 0.733333,
+     "share_with_rederivation": 0.55,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 0
     },
@@ -5287,23 +5287,23 @@
    "meets_floor": true,
    "per_item": {
     "F (existing traffic_light)": {
-     "cases": 15,
+     "cases": 20,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 11,
      "reimplementation": 0,
-     "none": 4,
+     "none": 9,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 11,
-     "share_with_rederivation": 0.733333,
+     "share_with_rederivation": 0.55,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 0,
      "suites": [
       "tlk_k"
      ],
-     "meets_item_floor": true
+     "meets_item_floor": false
     },
     "K-4a": {
      "cases": 10,
@@ -5463,12 +5463,12 @@
     "status": "open",
     "strict_reading": "a case counted on a printed regulator figure does not count",
     "stage": {
-     "cases": 117,
+     "cases": 122,
      "counted": 91
     },
     "per_item": {
      "F (existing traffic_light)": {
-      "cases": 15,
+      "cases": 20,
       "counted": 11
      },
      "K-4a": {
