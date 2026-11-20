@@ -673,7 +673,7 @@ Plain idea: a latency figure is a claim about one machine, one workload and one 
 
 ## Stage K: risk platform and capital (in progress)
 
-Stage K round 1 is merged to `main` (2026-11-19, pull request #58); nothing here is released. Each diagram names the spec it was drawn from (read 2026-11-19). All four rendered in the locally built site of the docs lane with every node drawn and no parse error (checked in the built-in browser, 2026-11-19); the site is rebuilt on `k-r1` (`program/STAGE_K_DOCS_PENDING.md`).
+Stage K round 1 is merged to main by 2026-11-20 (pull requests #58 and #59), not tagged; it is released with v1.0.0. The last tag is v0.10.0. Each diagram names the spec it was drawn from (read 2026-11-19). All four rendered in the locally built site of the docs lane with every node drawn and no parse error (checked in the built-in browser, 2026-11-19); the site is rebuilt on `k-r1` (`program/STAGE_K_DOCS_PENDING.md`).
 
 ### SA-CCR: from trades to EAD
 
@@ -744,6 +744,74 @@ flowchart TB
 ```
 
 From `specifications/12-platform/paper-ledger-daily.md` and `docs/developer-guides/paper-ledger.md` (rulings KR-70 to KR-89, confirmed 2026-11-19). The `schedule:` trigger, withheld 2026-11-19 (commit 1d184366), is restored on main 2026-11-20 (pull request #59) after rulings KR-200 to KR-214 (audit C fixes, 03772bf6) were confirmed by the coordinator; the slots are after the recorder's run, with cron fallbacks at 03:00 and 06:00 UTC (KR-206). The job writes only to its own two branches, never to `main` or `forward-log`. **0 of 20 recorded trading days as of 2026-11-20 13:00 UTC**; the first scheduled run follows. No performance claim is made: the order rule ignores the market and fills are simulated. The chain shows rows were not edited after writing; the anchor catches a consistent rewrite of old rows and a truncated tail. Worked through in [Tutorial 58](../getting-started/tutorial-58-daily-paper-ledger.md). The stage H paper book's ledger, a different file, is in the [paper-trading ledger flow](#paper-trading-ledger-flow).
+
+### Stage K platform pieces: how a caller composes them
+
+```mermaid
+flowchart LR
+  accTitle: How a caller composes the four stage K platform operations
+  accDescr: A new quote arrives. The caller appends it to its own append-only log and can ask the bitemporal query what was known at any knowledge time. The caller passes its previous quotes, its cached discount factors and the new quotes to the incremental update, which refuses a stale cache, copies the pillars before the first changed quote and solves the rest. The caller passes the recent one-day changes and the move since the last calibration to the trigger check, which fires or not and states its false-alarm rate. The caller passes its positions and a move to the intraday operation, which returns an estimate and a bound. Each box is a separate stateless request; the caller holds the log, the cache and the calibration point. No code in the repository chains these calls.
+  Q["new quote<br/>held by the caller"] --> LOG[("caller's append-only log")]
+  LOG --> BT["core.store.bitemporal_query<br/>what was known at K about V"]
+  Q --> INC["curve.incremental.update<br/>stale cache: E_INPUT<br/>copy pillars before the first change"]
+  CACHE[("caller's cached<br/>discount factors")] --> INC
+  INC -->|"new discount factors"| CACHE
+  HIST["recent one-day changes<br/>move since last calibration"] --> TRG{"calib.trigger.check<br/>move above k sigma sqrt d?"}
+  TRG -->|"fire"| RECAL["caller recalibrates<br/>outside these operations"]
+  TRG -->|"no fire"| KEEP["keep the calibration<br/>false_alarm_rate stated"]
+  POS["positions: zero-coupon<br/>notional, maturity, yield"] --> IDR["risk.intraday.delta_gamma_bound<br/>estimate and bound"]
+  IDR --> SHOW["show estimate with bound<br/>latency-aware analytics on simulated data"]
+  classDef caller stroke-dasharray: 5 5
+  class Q,LOG,CACHE,HIST,POS,RECAL caller
+```
+
+The dashed boxes are the caller's own state and actions; the solid boxes are the four operations, each a separate request (`ARCHITECTURE.md`, [Stage K round 1](../../ARCHITECTURE.md#how-the-four-platform-operations-fit-together); specs `01-core/bitemporal-store.md`, `02-curves/incremental-update.md`, `03-calibration/recalibration-triggers.md`, `06-risk/intraday-risk-bounds.md`, read 2026-11-20). No code in the repository chains them and there is no persistent store. Worked numbers for each box, all from goldens: `bt_k-0002`, `inc_k-0002`, `trig_k-0001`, `idr_k-0001`; the requests are in the [cookbook](../../COOKBOOK.md#stage-k-desk-recipes).
+
+### Daily curve run: fetch, fit, compare and chain
+
+```mermaid
+flowchart TB
+  accTitle: Daily curve run from the Treasury file to a hash-chained row
+  accDescr: A scheduled run on a GitHub runner finds the next business day that is due. It downloads the Treasury par yield file into memory. If the file has no row for the day, a stale input row is written and the day is tried again later. Otherwise each of the thirteen par yields becomes a par bond, weighted by one over modified duration squared, and the library's Nelson-Siegel bond fit is run for forty values of tau; the best tau wins. Zero rates at one to thirty years and per-tenor fit errors in basis points go into a DAY row with the file's SHA-256. When the Fed later posts its fitted curve for the same day, a CONSISTENCY row compares the two zero curves; the status is within or outside a tolerance fixed before any real day. Every row is hashed with the previous row's hash and appended to the curve-daily branch, and the head is stamped with OpenTimestamps on the curve-daily-anchors branch. The verifier can recompute every check from the stored rows.
+  RUN["run_day.py on a GitHub runner<br/>cron 23:45, 03:30, 06:30 UTC"] --> DUE{"next business day due?"}
+  DUE -->|"none"| NOP["write nothing"]
+  DUE -->|"day D"| F["download Treasury par yield file<br/>kept in memory; SHA-256 recorded"]
+  F --> HAS{"file has a row for D?"}
+  HAS -->|"no"| ST["stale_input row<br/>D retried later"]
+  HAS -->|"yes"| PB["13 par bonds<br/>weights 1 / MD squared"]
+  PB --> FIT["bond.fit.nelson_siegel<br/>40 tau values, best objective"]
+  FIT --> DAY["DAY row: betas, tau, zeros 1 to 30 y,<br/>errors_bp, rmse_bp, within_fit_flag"]
+  FED["Fed fitted curve file<br/>posted weekly, days later"] --> CON{"consistency: rmse at most 15 bp<br/>and max at most 40 bp?"}
+  DAY --> CON
+  CON -->|"yes"| WI["CONSISTENCY row, within"]
+  CON -->|"no"| OUT["CONSISTENCY row, outside<br/>kept, never retried to pass"]
+  ST & DAY & WI & OUT --> CH[("curve-daily branch<br/>prev and hash, SHA-256")]
+  CH --> ANC[("curve-daily-anchors<br/>count, head, OpenTimestamps")]
+  CH --> VER["verify_chain.py verify<br/>chain, order, gaps, holdout,<br/>DIAG and VERDICT recomputed"]
+```
+
+From `specifications/12-platform/daily-curve-run.md` 0.2.0 (rulings KR-90 to KR-107, KR-109, KR-111, KR-203 to KR-209, KR-254, KR-255; read 2026-11-20). Scheduled on main since 2026-11-20 (pull request #59); 0 days recorded as of 2026-11-20 13:00 UTC. Row label "fitted to public US Treasury par yields with a library Nelson-Siegel fit; not an official curve"; the Fed comparison is a "consistency check, not proof". **Recorded miss:** on the one real day tried by hand, 2026-11-13, the comparison gave RMSE 17.36 bp against the 15 bp tolerance fixed before the run, largest 25.71 bp at 22 years; tolerance and method unchanged (`program/STAGE_K_CURVE_DAILY_HANDOVER.md`). The fit weights were changed once after one real day had been seen, and the spec records that. The diagram leaves out the failure rows (`fetch_failed`, `fit_failed`, `not_published`, `holdout_blocked`); the spec's verifier table lists them.
+
+### Error order: one request, two faults
+
+```mermaid
+flowchart LR
+  accTitle: The repo-wide order of input checks
+  accDescr: A request is checked in a fixed order in every build. First the schema, which gives E_SCHEMA for a wrong shape, type or unlisted enum value. Then size limits on the input, E_LIMIT. Then the finite rule, E_DOMAIN for a NaN or infinite Real. Then structural rules, E_INPUT for empty lists, counts below the minimum, lengths and cross-field consistency. Then domain rules, E_DOMAIN for one value outside its domain. The first failing step gives the error, so a request with two faults gets the code of the earlier step in every build.
+  R["request"] --> S{"schema"}
+  S -->|"fail"| ES["E_SCHEMA"]
+  S --> L{"size limit"}
+  L -->|"fail"| EL["E_LIMIT"]
+  L --> FN{"every Real finite?"}
+  FN -->|"fail"| EF["E_DOMAIN"]
+  FN --> ST{"structure: counts,<br/>lengths, consistency"}
+  ST -->|"fail"| EI["E_INPUT"]
+  ST --> DM{"each value in its domain?"}
+  DM -->|"fail"| ED["E_DOMAIN"]
+  DM --> OK["compute"]
+```
+
+HR-66 (`specifications/stage-h-rulings-w2-exec.md`), applied to stage H by HR-122 and to stage K by KR-230. Two stage K goldens with two faults each: `e2_k-0008` (`calib.trigger.check`, one change and `k = 0`) stops at the structural step, `E_INPUT`; `e2_k-0011` (`risk.intraday.delta_gamma_bound`, no positions and shift `"NaN"`) stops at the finite rule, `E_DOMAIN`. A limit that can only be found after validation comes after these steps (HR-122).
 
 ### Blind re-derivation: packet, deriver, compare
 
@@ -950,12 +1018,14 @@ The research module depends on nothing above domain 01: a backtest takes prices 
 
 ```mermaid
 flowchart LR
-  accTitle: Domain 12 platform, capability list only
-  accDescr: Domain 12 has no operations and no built components. Its spec is a capability list. The pieces that exist today sit elsewhere: the CLI contract, the as-of store and snapshot hash in domain 01, and the recorder and forward log in tools.
-  CAP["12-platform/README.md<br/>capability list; nothing built"]
-  CLI["CLI contract: run, batch, version, operations"] -.->|exists today| CAP
-  STO["core.store, core.snapshot.hash, domain 01"] -.->|exists today| CAP
-  REC["tools/recorder, forward-log branch"] -.->|exists today| CAP
+  accTitle: Domain 12 platform, two daily jobs and no operations
+  accDescr: Domain 12 has no CLI operations. Its two specs from stage K round 1, the daily paper ledger and the daily curve run, are jobs in tools that send cases to the Python CLI and write hash-chained rows to their own branches, stamped with OpenTimestamps. The rest of the domain's capability list is not built. Pieces it builds on sit elsewhere: the CLI contract, the as-of store and snapshot hash in domain 01, and the recorder and forward log in tools.
+  CAP["12-platform/README.md<br/>capability list"]
+  PL["paper-ledger-daily.md<br/>tools/paper_daily, paper-ledger branch"] --> CAP
+  CR["daily-curve-run.md<br/>tools/curve_daily, curve-daily branch"] --> CAP
+  CLI["CLI contract: run, batch, version, operations"] -.->|"used by both jobs"| PL & CR
+  REC["tools/recorder, forward-log branch"] -.->|"read by the paper ledger"| PL
+  STO["core.store, core.snapshot.hash, domain 01"] -.->|"exists elsewhere"| CAP
 ```
 
-Domain 12 has a capability list only (`specifications/12-platform/README.md`: stable APIs, model registry, observability, audit and replay, orchestration, release governance) and no operation in the name map. The dotted arrows are pieces that exist elsewhere in the repository and that a platform layer would build on; they are not platform code. Services and adapters are planned for stage K (ARCHITECTURE, "Libraries first, services last").
+Domain 12 has no operation in the name map. Two specs from stage K round 1 sit in it, `specifications/12-platform/paper-ledger-daily.md` and `daily-curve-run.md`, implemented as jobs in `tools/` that send cases to the Python CLI (scheduled on main since 2026-11-20, pull request #59; 0 days recorded as of 2026-11-20 13:00 UTC). The rest of the capability list (`specifications/12-platform/README.md`: stable APIs, model registry, observability, audit and replay, orchestration, release governance) is not built. Dotted arrows are pieces that exist elsewhere in the repository. Services and adapters are planned for stage K (ARCHITECTURE, "Libraries first, services last").
