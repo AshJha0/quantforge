@@ -4,9 +4,7 @@
 
 QuantForge is a quantitative finance library written four times, in Java, C++, Python and Rust, from one set of specifications, and checked against expected results that come from a separate oracle. It covers curves, pricing, volatility, risk, hedging, portfolio construction, research statistics, and execution and microstructure on simulated venues. It is a one-person, zero-spend project; validation is self-assessment.
 
-## Quick start
-
-With [uv](https://docs.astral.sh/uv/) installed, from the repository root. The Python build needs Python 3.15 exactly: `python/pyproject.toml` pins `requires-python = "==3.15.*"` because the code uses `lazy import` (PEP 810, new in 3.15) and unparenthesised `except A, B:` (PEP 758, new in 3.14), so it does not run on 3.14 or earlier; uv fetches 3.15 on the first run.
+**Quick start.** With [uv](https://docs.astral.sh/uv/) installed, from the repository root. The Python build needs Python 3.15 exactly: `python/pyproject.toml` pins `requires-python = "==3.15.*"` because the code uses `lazy import` (PEP 810, new in 3.15) and unparenthesised `except A, B:` (PEP 758, new in 3.14), so it does not run on 3.14 or earlier; uv fetches 3.15 on the first run.
 
 <!-- quickstart:begin -->
 ```bash
@@ -31,7 +29,7 @@ Generated from `tools/site_facts.json` and counts from the tree by `tools/status
 
 | | |
 |---|---|
-| **Release** | Latest release v0.10.0, stage H: microstructure and execution on simulated venues, released 2026-11-19. On main, unreleased: stage K round 1 (audit-answered platform pieces, intraday risk, SA-CCR, backtesting, daily jobs), merged to main by 2026-11-20 (pull requests #58 and #59), not tagged; released with v1.0.0 (owner decision 2026-11-20: there is no v0.10.1 tag). Next: stage K round 2, platform and release (target v1.0.0); open items in docs/known-issues.md. |
+| **Release** | Latest release v0.10.0, stage H: microstructure and execution on simulated venues, released 2026-11-19. On main, unreleased: stage K round 1 (platform pieces with the findings of a different-model AI audit answered, intraday risk, SA-CCR, backtesting, daily jobs), merged to main by 2026-11-20 (pull requests #58 and #59), not tagged; released with v1.0.0 (owner decision 2026-11-20: there is no v0.10.1 tag). Next: stage K round 2, platform and release (target v1.0.0); open items in docs/known-issues.md. |
 | **Built** | Stages A to J, plus R6, in Java 25, C++26, Python 3.15, Rust 2024: 369 CLI operations in the generated name map, CLI contract 1.17.0. Status rung Implemented; nothing is claimed as Validated, Benchmarked or Operationally tested. |
 | **Checked** | 8,004 value-checked golden cases (4,248 without the 3,756 stage A convention sweeps), plus 5,700 error and 2,554 invariance cases (16,258 in all, docs/case-figures.md), sent to each build by the neutral runner. Stage H outside share 78.0% (160 of 205 value cases, oracle/OUTSIDE_SHARES.md), by blind re-derivation or printed paper figures, no library. |
 | **Real data** | One crypto venue's public order book (Kraken L2, recorded locally, aggregates and hashes only; crypto venue; not equities or rates). Public rates and curve sources hashed daily into the forward log. US Treasury par-yield moves in the stage J shock library. Real-data studies so far: the three R3 holdout runs (null) and the H-1 crypto pilot (no conclusions). |

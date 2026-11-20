@@ -2,7 +2,7 @@
   "note": "Release facts for the site home (tools/site_home.html) and the README Status at a glance block (status_glance: rows of [label, text], text with {{name}} placeholders; tools/status_glance.py --write puts it in README.md, tools/build_site.py fails if README is stale). A release edits this file only: tools/build_site.py fills {{name}} placeholders from here, and counts the rest (version from python/pyproject.toml unless set here, golden cases, suite files and stage E cases and operations from datasets/golden, recorder sources from tools/recorder/sources.json). The build fails on an unknown or unfilled placeholder.",
   "release": "v0.10.0, stage H: microstructure and execution on simulated venues",
   "released": "2026-11-19",
-  "main_state": "stage K round 1 (audit-answered platform pieces, intraday risk, SA-CCR, backtesting, daily jobs), merged to main by 2026-11-20 (pull requests #58 and #59), not tagged; released with v1.0.0 (owner decision 2026-11-20: there is no v0.10.1 tag)",
+  "main_state": "stage K round 1 (platform pieces with the findings of a different-model AI audit answered, intraday risk, SA-CCR, backtesting, daily jobs), merged to main by 2026-11-20 (pull requests #58 and #59), not tagged; released with v1.0.0 (owner decision 2026-11-20: there is no v0.10.1 tag)",
   "implemented_stages": "A to J, plus R6",
   "languages": "Java 25, C++26, Python 3.15, Rust 2024",
   "domains": "12",

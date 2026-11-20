@@ -141,7 +141,7 @@ flowchart LR
   D --> E8[E8 CDS options, copulas, large-pool tranches]
   E1 & E2 & E3 & E5 --> GA[goldens stage_e]
   E4 & E6 & E7 & E8 --> GB[goldens stage_e_b]
-  GA & GB --> QL[QuantLib 1.44 outside check: 557 of 895]
+  GA & GB --> QL[QuantLib 1.44 outside check: 557 of 710 value cases]
 ```
 
 ## Stage F: from quotes to capital and the book
