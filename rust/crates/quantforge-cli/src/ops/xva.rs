@@ -194,7 +194,7 @@ super::registry! {
                     .iter()
                     .map(|v| v.as_str().map(str::to_string).ok_or(()))
                     .collect::<std::result::Result<Vec<String>, ()>>()
-                    .or_else(|_| fail("E_SCHEMA", "wrt is not an array of strings"))?,
+                    .or_else(|()| fail("E_SCHEMA", "wrt is not an array of strings"))?,
             ),
         };
         i.gate()?;

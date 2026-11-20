@@ -4,6 +4,14 @@
 use super::*;
 use crate::xva::{AdjInputs, Name, adjustments};
 
+/// (key, scalar, setter, getter) of one differentiated input in the bump test.
+type Input = (
+    &'static str,
+    bool,
+    fn(&mut AdjInputs, usize, f64),
+    fn(&AdjInputs, usize) -> f64,
+);
+
 struct Lcg(u64);
 
 impl Lcg {
@@ -218,7 +226,7 @@ fn wrt_rules() {
         vec!["own.recovery", "ene"]
     );
     for bad in [vec![], vec!["ee", "ee"], vec!["capital"], vec!["x"]] {
-        let b: Vec<String> = bad.iter().map(|s| s.to_string()).collect();
+        let b: Vec<String> = bad.iter().map(ToString::to_string).collect();
         assert_eq!(check_wrt(Some(&b), &all).unwrap_err().code, "E_INPUT");
     }
     let x = base();
@@ -258,8 +266,7 @@ fn every_entry_against_a_binary64_bump() {
                 _ => v.kva.unwrap(),
             }
         };
-        type Set = fn(&mut AdjInputs, usize, f64);
-        let inputs: [(&str, bool, Set, fn(&AdjInputs, usize) -> f64); 13] = [
+        let inputs: [Input; 13] = [
             (
                 "counterparty.hazard_rate",
                 true,
