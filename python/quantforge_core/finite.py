@@ -113,7 +113,8 @@ def _wrap[**P, R](f: Callable[P, R]) -> Callable[P, R]:
             bound = dict(zip(positional, args, strict=False))
             bound.update(kwargs)
             if any(n not in bound for n in required):
-                return f(*args, **kwargs)  # raises TypeError naming the public function; the body never runs
+                # raises TypeError naming the public function; the body never runs
+                return f(*args, **kwargs)
             limits(**{n: bound[n] for n in limit_names if n in bound})
         for k, a in enumerate(args):
             found = bad_field(a)
