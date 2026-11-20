@@ -240,7 +240,7 @@ fn hazards(s: &[f64], gs: &[f64], b: &[f64], gp: &[f64], t: &[f64], dt: &[f64]) 
     (-single - pairs, buckets)
 }
 
-fn gradient_of(tp: &Tape, bar: Bar, spread_key: Option<&str>, prof_key: Option<&str>) -> Gradient {
+fn gradient_of(tp: &Tape, bar: &Bar, spread_key: Option<&str>, prof_key: Option<&str>) -> Gradient {
     let (hc, hc_b) = hazards(&tp.sc, &bar.sc, &tp.bc, &bar.pc, &tp.t, &tp.dt);
     let (hb, mut hb_b) = hazards(&tp.sb, &bar.sb, &tp.bb, &bar.pb, &tp.t, &tp.dt);
     let mut direct = 0.0;
@@ -303,23 +303,23 @@ pub fn gradient(x: &AdjInputs, names: &[&'static str]) -> Vec<(&'static str, Gra
     let tp = Tape::new(x);
     let branch = x
         .exclude_dva_overlap
-        .then(|| x.lend_spread - x.own.hazard_rate * (1.0 - x.own.recovery) >= 0.0);
+        .then_some(x.lend_spread - x.own.hazard_rate * (1.0 - x.own.recovery) >= 0.0);
     let fca = gradient_of(
         &tp,
-        funding_bar(&tp, x.borrow_spread, &x.ee, true),
+        &funding_bar(&tp, x.borrow_spread, &x.ee, true),
         Some("funding.borrow_spread"),
         None,
     );
     let fba = gradient_of(
         &tp,
-        fba_bar(&tp, x, branch),
+        &fba_bar(&tp, x, branch),
         Some("funding.lend_spread"),
         None,
     );
     let fva = minus(&fca, &fba);
     let mut raw = vec![
-        ("cva", gradient_of(&tp, cva_bar(&tp, x), None, None)),
-        ("dva", gradient_of(&tp, dva_bar(&tp, x), None, None)),
+        ("cva", gradient_of(&tp, &cva_bar(&tp, x), None, None)),
+        ("dva", gradient_of(&tp, &dva_bar(&tp, x), None, None)),
         ("fca", fca),
         ("fba", fba),
         ("fva", fva),
@@ -327,7 +327,7 @@ pub fn gradient(x: &AdjInputs, names: &[&'static str]) -> Vec<(&'static str, Gra
     if let Some((im, s)) = &x.im {
         let g = gradient_of(
             &tp,
-            funding_bar(&tp, *s, im, false),
+            &funding_bar(&tp, *s, im, false),
             Some("im_spread"),
             Some("im"),
         );
@@ -336,7 +336,7 @@ pub fn gradient(x: &AdjInputs, names: &[&'static str]) -> Vec<(&'static str, Gra
     if let Some((cap, h)) = &x.capital {
         let g = gradient_of(
             &tp,
-            funding_bar(&tp, *h, cap, false),
+            &funding_bar(&tp, *h, cap, false),
             Some("hurdle_rate"),
             Some("capital"),
         );

@@ -330,8 +330,8 @@ fn every_entry_against_a_binary64_bump() {
             ),
         ];
         for (o, row) in &g {
-            for (key, scalar, set, get) in inputs {
-                let n = if scalar { 1 } else { 4 };
+            for (key, is_scalar, set, get) in inputs {
+                let n = if is_scalar { 1 } else { 4 };
                 for i in 0..n {
                     let x0 = get(&x, i);
                     let d = |h: f64| {
@@ -341,7 +341,7 @@ fn every_entry_against_a_binary64_bump() {
                         (value(&up, o) - value(&dn, o)) / (2.0 * h * x0)
                     };
                     let reference = (4.0 * d(5e-5) - d(1e-4)) / 3.0;
-                    let aad = if scalar {
+                    let aad = if is_scalar {
                         scalar(row, key)
                     } else {
                         profile(row, key)[i]
