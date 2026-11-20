@@ -6272,6 +6272,5586 @@
   },
   {
    "case_id": "e1g_xva-0103",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      "NaN",
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/curve/times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0104",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      "Infinity",
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/curve/times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0105",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      "-Infinity",
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/curve/times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0106",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.0,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/curve/times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0107",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      -0.0,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0106"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/curve/times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0108",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      "NaN"
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/curve/times/9"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0109",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      "Infinity"
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/curve/times/9"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0110",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      "-Infinity"
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/curve/times/9"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0111",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      0.0
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/curve/times/9"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0112",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      -0.0
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0111"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/curve/times/9"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0113",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      "NaN",
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/curve/discount_factors/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0114",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      "Infinity",
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/curve/discount_factors/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0115",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      "-Infinity",
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/curve/discount_factors/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0116",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.0,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/curve/discount_factors/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0117",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      -0.0,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0116"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/curve/discount_factors/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0118",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      "NaN"
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/curve/discount_factors/9"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0119",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      "Infinity"
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/curve/discount_factors/9"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0120",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      "-Infinity"
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/curve/discount_factors/9"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0121",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.0
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/curve/discount_factors/9"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0122",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      -0.0
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0121"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/curve/discount_factors/9"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0123",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": "NaN",
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/mean_reversion"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0124",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": "Infinity",
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/mean_reversion"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0125",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": "-Infinity",
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/mean_reversion"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0126",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.0,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/mean_reversion"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0127",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": -0.0,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0126"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/mean_reversion"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0128",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": "NaN",
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/sigma"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0129",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": "Infinity",
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/sigma"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0130",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": "-Infinity",
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/sigma"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0131",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.0,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/sigma"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0132",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": -0.0,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0131"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/sigma"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0133",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": "NaN",
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/trades/0/notional"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0134",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": "Infinity",
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/trades/0/notional"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0135",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": "-Infinity",
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/trades/0/notional"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0136",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 0.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/trades/0/notional"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0137",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": -0.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0136"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/trades/0/notional"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0138",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": "NaN",
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/trades/0/fixed_rate"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0139",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": "Infinity",
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/trades/0/fixed_rate"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0140",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": "-Infinity",
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/trades/0/fixed_rate"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0141",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.0,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/trades/0/fixed_rate"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0142",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": -0.0,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0141"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/trades/0/fixed_rate"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0143",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": "NaN",
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/trades/0/start_years"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0144",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": "Infinity",
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/trades/0/start_years"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0145",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": "-Infinity",
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/trades/0/start_years"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0146",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": -0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discounted_ee": [
+      36843.73199511616
+     ],
+     "discounted_ene": [
+      -32749.73199511639
+     ],
+     "deflated_pfe_95": [
+      145142.10508269994
+     ],
+     "deflated_pfe_99": [
+      201107.74935981797
+     ],
+     "epe": 36843.73199511616,
+     "cva": 437.7328643001884
+    }
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "copied:expsim_g-0049",
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/trades/0/start_years"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0147",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       "NaN",
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/trades/0/payment_times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0148",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       "Infinity",
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/trades/0/payment_times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0149",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       "-Infinity",
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/trades/0/payment_times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0150",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       0.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/trades/0/payment_times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0151",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       -0.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0150"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/trades/0/payment_times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0152",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       "NaN"
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/trades/0/payment_times/1"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0153",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       "Infinity"
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/trades/0/payment_times/1"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0154",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       "-Infinity"
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/trades/0/payment_times/1"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0155",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       0.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/trades/0/payment_times/1"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0156",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       -0.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0155"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/trades/0/payment_times/1"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0157",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     "NaN"
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/exposure_times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0158",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     "Infinity"
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/exposure_times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0159",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     "-Infinity"
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/exposure_times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0160",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     0.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/exposure_times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0161",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     -0.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0160"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/exposure_times/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0162",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     "NaN",
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/pfe_quantiles/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0163",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     "Infinity",
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/pfe_quantiles/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0164",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     "-Infinity",
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/pfe_quantiles/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0165",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.0,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/pfe_quantiles/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0166",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     -0.0,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0165"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/pfe_quantiles/0"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0167",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     "NaN"
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/pfe_quantiles/1"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0168",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     "Infinity"
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/pfe_quantiles/1"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0169",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     "-Infinity"
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/pfe_quantiles/1"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0170",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.0
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/pfe_quantiles/1"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0171",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     -0.0
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0170"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/pfe_quantiles/1"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0172",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": "NaN",
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/hazard_rate"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0173",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": "Infinity",
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/hazard_rate"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0174",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": "-Infinity",
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/hazard_rate"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0175",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.0,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/hazard_rate"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0176",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": -0.0,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0175"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/hazard_rate"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0177",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:expsim_g-0049",
+    "input:/recovery"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0178",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": "Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/recovery"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0179",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": "-Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:expsim_g-0049",
+    "input:/recovery"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0180",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:expsim_g-0049",
+    "input:/recovery"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0181",
+   "operation": "xva.exposure.portfolio_hw",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "mean_reversion": 0.1,
+    "sigma": 0.01,
+    "trades": [
+     {
+      "notional": 10000000.0,
+      "fixed_rate": 0.039,
+      "side": "PAY",
+      "start_years": 0.0,
+      "payment_times": [
+       1.0,
+       2.0
+      ]
+     }
+    ],
+    "exposure_times": [
+     1.0
+    ],
+    "pfe_quantiles": [
+     0.95,
+     0.99
+    ],
+    "hazard_rate": 0.02,
+    "recovery": -0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_xva-0180"
+   },
+   "tolerance_class": "root_finding",
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-08,
+    "reason": "quadrature and quantile root to 1e-11 relative"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:expsim_g-0049",
+    "input:/recovery"
+   ]
+  },
+  {
+   "case_id": "e1g_xva-0182",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": "NaN",
@@ -6336,7 +11916,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0104",
+   "case_id": "e1g_xva-0183",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": "Infinity",
@@ -6401,7 +11981,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0105",
+   "case_id": "e1g_xva-0184",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": "-Infinity",
@@ -6466,7 +12046,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0106",
+   "case_id": "e1g_xva-0185",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.0,
@@ -6529,7 +12109,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0107",
+   "case_id": "e1g_xva-0186",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": -0.0,
@@ -6579,7 +12159,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0106"
+    "case_id": "e1g_xva-0185"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -6598,7 +12178,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0108",
+   "case_id": "e1g_xva-0187",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -6663,7 +12243,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0109",
+   "case_id": "e1g_xva-0188",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -6728,7 +12308,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0110",
+   "case_id": "e1g_xva-0189",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -6793,7 +12373,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0111",
+   "case_id": "e1g_xva-0190",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -6856,7 +12436,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0112",
+   "case_id": "e1g_xva-0191",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -6906,7 +12486,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0111"
+    "case_id": "e1g_xva-0190"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -6925,7 +12505,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0113",
+   "case_id": "e1g_xva-0192",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -6990,7 +12570,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0114",
+   "case_id": "e1g_xva-0193",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7055,7 +12635,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0115",
+   "case_id": "e1g_xva-0194",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7120,7 +12700,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0116",
+   "case_id": "e1g_xva-0195",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7183,7 +12763,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0117",
+   "case_id": "e1g_xva-0196",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7233,7 +12813,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0116"
+    "case_id": "e1g_xva-0195"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -7252,7 +12832,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0118",
+   "case_id": "e1g_xva-0197",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7317,7 +12897,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0119",
+   "case_id": "e1g_xva-0198",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7382,7 +12962,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0120",
+   "case_id": "e1g_xva-0199",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7447,7 +13027,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0121",
+   "case_id": "e1g_xva-0200",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7510,7 +13090,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0122",
+   "case_id": "e1g_xva-0201",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7560,7 +13140,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0121"
+    "case_id": "e1g_xva-0200"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -7579,7 +13159,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0123",
+   "case_id": "e1g_xva-0202",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7644,7 +13224,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0124",
+   "case_id": "e1g_xva-0203",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7709,7 +13289,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0125",
+   "case_id": "e1g_xva-0204",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7774,7 +13354,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0126",
+   "case_id": "e1g_xva-0205",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7837,7 +13417,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0127",
+   "case_id": "e1g_xva-0206",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7887,7 +13467,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0126"
+    "case_id": "e1g_xva-0205"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -7906,7 +13486,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0128",
+   "case_id": "e1g_xva-0207",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -7971,7 +13551,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0129",
+   "case_id": "e1g_xva-0208",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8036,7 +13616,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0130",
+   "case_id": "e1g_xva-0209",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8101,7 +13681,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0131",
+   "case_id": "e1g_xva-0210",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8164,7 +13744,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0132",
+   "case_id": "e1g_xva-0211",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8214,7 +13794,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0131"
+    "case_id": "e1g_xva-0210"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -8233,7 +13813,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0133",
+   "case_id": "e1g_xva-0212",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8298,7 +13878,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0134",
+   "case_id": "e1g_xva-0213",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8363,7 +13943,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0135",
+   "case_id": "e1g_xva-0214",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8428,7 +14008,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0136",
+   "case_id": "e1g_xva-0215",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8491,7 +14071,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0137",
+   "case_id": "e1g_xva-0216",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8541,7 +14121,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0136"
+    "case_id": "e1g_xva-0215"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -8560,7 +14140,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0138",
+   "case_id": "e1g_xva-0217",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8625,7 +14205,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0139",
+   "case_id": "e1g_xva-0218",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8690,7 +14270,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0140",
+   "case_id": "e1g_xva-0219",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8755,7 +14335,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0141",
+   "case_id": "e1g_xva-0220",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8818,7 +14398,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0142",
+   "case_id": "e1g_xva-0221",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8868,7 +14448,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0141"
+    "case_id": "e1g_xva-0220"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -8887,7 +14467,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0143",
+   "case_id": "e1g_xva-0222",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -8952,7 +14532,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0144",
+   "case_id": "e1g_xva-0223",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9017,7 +14597,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0145",
+   "case_id": "e1g_xva-0224",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9082,7 +14662,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0146",
+   "case_id": "e1g_xva-0225",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9145,7 +14725,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0147",
+   "case_id": "e1g_xva-0226",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9195,7 +14775,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0146"
+    "case_id": "e1g_xva-0225"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -9214,7 +14794,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0148",
+   "case_id": "e1g_xva-0227",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9279,7 +14859,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0149",
+   "case_id": "e1g_xva-0228",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9344,7 +14924,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0150",
+   "case_id": "e1g_xva-0229",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9409,7 +14989,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0151",
+   "case_id": "e1g_xva-0230",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9472,7 +15052,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0152",
+   "case_id": "e1g_xva-0231",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9522,7 +15102,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0151"
+    "case_id": "e1g_xva-0230"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -9541,7 +15121,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0153",
+   "case_id": "e1g_xva-0232",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9606,7 +15186,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0154",
+   "case_id": "e1g_xva-0233",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9671,7 +15251,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0155",
+   "case_id": "e1g_xva-0234",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9736,7 +15316,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0156",
+   "case_id": "e1g_xva-0235",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9799,7 +15379,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0157",
+   "case_id": "e1g_xva-0236",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9849,7 +15429,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0156"
+    "case_id": "e1g_xva-0235"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -9868,7 +15448,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0158",
+   "case_id": "e1g_xva-0237",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9933,7 +15513,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0159",
+   "case_id": "e1g_xva-0238",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -9998,7 +15578,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0160",
+   "case_id": "e1g_xva-0239",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -10063,7 +15643,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0161",
+   "case_id": "e1g_xva-0240",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -10126,7 +15706,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0162",
+   "case_id": "e1g_xva-0241",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -10176,7 +15756,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0161"
+    "case_id": "e1g_xva-0240"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -10195,7 +15775,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0163",
+   "case_id": "e1g_xva-0242",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -10260,7 +15840,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0164",
+   "case_id": "e1g_xva-0243",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -10325,7 +15905,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0165",
+   "case_id": "e1g_xva-0244",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -10390,7 +15970,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0166",
+   "case_id": "e1g_xva-0245",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -10453,7 +16033,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0167",
+   "case_id": "e1g_xva-0246",
    "operation": "xva.exposure.swap_ee_hw",
    "inputs": {
     "mean_reversion": 0.05,
@@ -10503,7 +16083,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0166"
+    "case_id": "e1g_xva-0245"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -10522,7 +16102,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0168",
+   "case_id": "e1g_xva-0247",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -10610,7 +16190,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0169",
+   "case_id": "e1g_xva-0248",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -10698,7 +16278,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0170",
+   "case_id": "e1g_xva-0249",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -10786,7 +16366,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0171",
+   "case_id": "e1g_xva-0250",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -10872,7 +16452,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0172",
+   "case_id": "e1g_xva-0251",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -10945,7 +16525,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0171"
+    "case_id": "e1g_xva-0250"
    },
    "tolerance_class": "simple_analytic",
    "tolerance_limit": {
@@ -10964,7 +16544,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0173",
+   "case_id": "e1g_xva-0252",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -11052,7 +16632,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0174",
+   "case_id": "e1g_xva-0253",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -11140,7 +16720,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0175",
+   "case_id": "e1g_xva-0254",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -11228,7 +16808,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0176",
+   "case_id": "e1g_xva-0255",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -11332,7 +16912,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0177",
+   "case_id": "e1g_xva-0256",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -11420,7 +17000,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0178",
+   "case_id": "e1g_xva-0257",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -11508,7 +17088,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0179",
+   "case_id": "e1g_xva-0258",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -11596,7 +17176,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0180",
+   "case_id": "e1g_xva-0259",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -11682,7 +17262,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0181",
+   "case_id": "e1g_xva-0260",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -11755,7 +17335,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0180"
+    "case_id": "e1g_xva-0259"
    },
    "tolerance_class": "simple_analytic",
    "tolerance_limit": {
@@ -11774,7 +17354,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0182",
+   "case_id": "e1g_xva-0261",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -11862,7 +17442,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0183",
+   "case_id": "e1g_xva-0262",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -11950,7 +17530,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0184",
+   "case_id": "e1g_xva-0263",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -12038,7 +17618,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0185",
+   "case_id": "e1g_xva-0264",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -12142,7 +17722,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0186",
+   "case_id": "e1g_xva-0265",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -12230,7 +17810,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0187",
+   "case_id": "e1g_xva-0266",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -12318,7 +17898,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0188",
+   "case_id": "e1g_xva-0267",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -12406,7 +17986,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0189",
+   "case_id": "e1g_xva-0268",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -12492,7 +18072,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0190",
+   "case_id": "e1g_xva-0269",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -12565,7 +18145,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0189"
+    "case_id": "e1g_xva-0268"
    },
    "tolerance_class": "simple_analytic",
    "tolerance_limit": {
@@ -12584,7 +18164,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0191",
+   "case_id": "e1g_xva-0270",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -12672,7 +18252,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0192",
+   "case_id": "e1g_xva-0271",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -12760,7 +18340,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0193",
+   "case_id": "e1g_xva-0272",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -12848,7 +18428,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0194",
+   "case_id": "e1g_xva-0273",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -12934,7 +18514,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0195",
+   "case_id": "e1g_xva-0274",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -13007,7 +18587,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0194"
+    "case_id": "e1g_xva-0273"
    },
    "tolerance_class": "simple_analytic",
    "tolerance_limit": {
@@ -13026,7 +18606,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0196",
+   "case_id": "e1g_xva-0275",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -13114,7 +18694,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0197",
+   "case_id": "e1g_xva-0276",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -13202,7 +18782,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0198",
+   "case_id": "e1g_xva-0277",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -13290,7 +18870,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0199",
+   "case_id": "e1g_xva-0278",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -13376,7 +18956,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0200",
+   "case_id": "e1g_xva-0279",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -13449,7 +19029,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0199"
+    "case_id": "e1g_xva-0278"
    },
    "tolerance_class": "simple_analytic",
    "tolerance_limit": {
@@ -13468,7 +19048,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0201",
+   "case_id": "e1g_xva-0280",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -13556,7 +19136,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0202",
+   "case_id": "e1g_xva-0281",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -13644,7 +19224,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0203",
+   "case_id": "e1g_xva-0282",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -13732,7 +19312,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0204",
+   "case_id": "e1g_xva-0283",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -13818,7 +19398,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0205",
+   "case_id": "e1g_xva-0284",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -13891,7 +19471,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0204"
+    "case_id": "e1g_xva-0283"
    },
    "tolerance_class": "simple_analytic",
    "tolerance_limit": {
@@ -13910,7 +19490,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0206",
+   "case_id": "e1g_xva-0285",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -13998,7 +19578,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0207",
+   "case_id": "e1g_xva-0286",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -14086,7 +19666,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0208",
+   "case_id": "e1g_xva-0287",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -14174,7 +19754,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0209",
+   "case_id": "e1g_xva-0288",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -14260,7 +19840,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0210",
+   "case_id": "e1g_xva-0289",
    "operation": "xva.sbim.ir_delta",
    "inputs": {
     "sensitivities": [
@@ -14333,7 +19913,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0209"
+    "case_id": "e1g_xva-0288"
    },
    "tolerance_class": "simple_analytic",
    "tolerance_limit": {
@@ -14352,7 +19932,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0211",
+   "case_id": "e1g_xva-0290",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -14414,7 +19994,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0212",
+   "case_id": "e1g_xva-0291",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -14476,7 +20056,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0213",
+   "case_id": "e1g_xva-0292",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -14538,7 +20118,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0214",
+   "case_id": "e1g_xva-0293",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -14598,7 +20178,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0215",
+   "case_id": "e1g_xva-0294",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -14645,7 +20225,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0214"
+    "case_id": "e1g_xva-0293"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -14664,7 +20244,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0216",
+   "case_id": "e1g_xva-0295",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -14726,7 +20306,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0217",
+   "case_id": "e1g_xva-0296",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -14788,7 +20368,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0218",
+   "case_id": "e1g_xva-0297",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -14850,7 +20430,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0219",
+   "case_id": "e1g_xva-0298",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -14910,7 +20490,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0220",
+   "case_id": "e1g_xva-0299",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -14957,7 +20537,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0219"
+    "case_id": "e1g_xva-0298"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -14976,7 +20556,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0221",
+   "case_id": "e1g_xva-0300",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15038,7 +20618,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0222",
+   "case_id": "e1g_xva-0301",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15100,7 +20680,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0223",
+   "case_id": "e1g_xva-0302",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15162,7 +20742,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0224",
+   "case_id": "e1g_xva-0303",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15222,7 +20802,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0225",
+   "case_id": "e1g_xva-0304",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15269,7 +20849,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0224"
+    "case_id": "e1g_xva-0303"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -15288,7 +20868,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0226",
+   "case_id": "e1g_xva-0305",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15350,7 +20930,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0227",
+   "case_id": "e1g_xva-0306",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15412,7 +20992,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0228",
+   "case_id": "e1g_xva-0307",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15474,7 +21054,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0229",
+   "case_id": "e1g_xva-0308",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15534,7 +21114,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0230",
+   "case_id": "e1g_xva-0309",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15581,7 +21161,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0229"
+    "case_id": "e1g_xva-0308"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -15600,7 +21180,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0231",
+   "case_id": "e1g_xva-0310",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15662,7 +21242,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0232",
+   "case_id": "e1g_xva-0311",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15724,7 +21304,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0233",
+   "case_id": "e1g_xva-0312",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15786,7 +21366,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0234",
+   "case_id": "e1g_xva-0313",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15846,7 +21426,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0235",
+   "case_id": "e1g_xva-0314",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15893,7 +21473,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0234"
+    "case_id": "e1g_xva-0313"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -15912,7 +21492,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0236",
+   "case_id": "e1g_xva-0315",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -15974,7 +21554,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0237",
+   "case_id": "e1g_xva-0316",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16036,7 +21616,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0238",
+   "case_id": "e1g_xva-0317",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16098,7 +21678,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0239",
+   "case_id": "e1g_xva-0318",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16158,7 +21738,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0240",
+   "case_id": "e1g_xva-0319",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16205,7 +21785,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0239"
+    "case_id": "e1g_xva-0318"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -16224,7 +21804,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0241",
+   "case_id": "e1g_xva-0320",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16286,7 +21866,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0242",
+   "case_id": "e1g_xva-0321",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16348,7 +21928,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0243",
+   "case_id": "e1g_xva-0322",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16410,7 +21990,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0244",
+   "case_id": "e1g_xva-0323",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16470,7 +22050,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0245",
+   "case_id": "e1g_xva-0324",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16517,7 +22097,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0244"
+    "case_id": "e1g_xva-0323"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -16536,7 +22116,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0246",
+   "case_id": "e1g_xva-0325",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16598,7 +22178,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0247",
+   "case_id": "e1g_xva-0326",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16660,7 +22240,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0248",
+   "case_id": "e1g_xva-0327",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16722,7 +22302,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0249",
+   "case_id": "e1g_xva-0328",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16782,7 +22362,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0250",
+   "case_id": "e1g_xva-0329",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16829,7 +22409,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0249"
+    "case_id": "e1g_xva-0328"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -16848,7 +22428,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0251",
+   "case_id": "e1g_xva-0330",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16910,7 +22490,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0252",
+   "case_id": "e1g_xva-0331",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -16972,7 +22552,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0253",
+   "case_id": "e1g_xva-0332",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -17034,7 +22614,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0254",
+   "case_id": "e1g_xva-0333",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -17094,7 +22674,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0255",
+   "case_id": "e1g_xva-0334",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -17141,7 +22721,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0254"
+    "case_id": "e1g_xva-0333"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -17160,7 +22740,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0256",
+   "case_id": "e1g_xva-0335",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -17222,7 +22802,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0257",
+   "case_id": "e1g_xva-0336",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -17284,7 +22864,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0258",
+   "case_id": "e1g_xva-0337",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -17346,7 +22926,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0259",
+   "case_id": "e1g_xva-0338",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -17406,7 +22986,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0260",
+   "case_id": "e1g_xva-0339",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -17453,7 +23033,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1g_xva-0259"
+    "case_id": "e1g_xva-0338"
    },
    "tolerance_class": "root_finding",
    "tolerance_limit": {
@@ -17472,7 +23052,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0261",
+   "case_id": "e1g_xva-0340",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -17534,7 +23114,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0262",
+   "case_id": "e1g_xva-0341",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -17596,7 +23176,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0263",
+   "case_id": "e1g_xva-0342",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [
@@ -17658,7 +23238,7 @@
    ]
   },
   {
-   "case_id": "e1g_xva-0264",
+   "case_id": "e1g_xva-0343",
    "operation": "xva.wwr.cva_hw",
    "inputs": {
     "times": [

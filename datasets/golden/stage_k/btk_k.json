@@ -29,7 +29,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 0: 8.11%, GREEN, multiplier: MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 0: 8.11%, GREEN, multiplier: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -69,7 +70,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 1: 28.58%, GREEN, multiplier: MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 1: 28.58%, GREEN, multiplier: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -109,7 +111,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 2: 54.32%, GREEN, multiplier: MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 2: 54.32%, GREEN, multiplier: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -149,7 +152,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 3: 75.81%, GREEN, multiplier: MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 3: 75.81%, GREEN, multiplier: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -189,7 +193,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 4: 89.22%, GREEN, multiplier: MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 4: 89.22%, GREEN, multiplier: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -229,7 +234,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 5: 95.88%, AMBER, multiplier: MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 5: 95.88%, AMBER, multiplier: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -269,7 +275,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 6: 98.63%, AMBER, multiplier: MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 6: 98.63%, AMBER, multiplier: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -309,7 +316,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 7: 99.6%, AMBER, multiplier: MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 7: 99.6%, AMBER, multiplier: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -349,7 +357,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 8: 99.89%, AMBER, multiplier: MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 8: 99.89%, AMBER, multiplier: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -389,7 +398,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 9: 99.97%, AMBER, multiplier: MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 9: 99.97%, AMBER, multiplier: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -429,7 +439,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 10: 99.99%, RED, multiplier: MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 10: 99.99%, RED, multiplier: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -469,7 +480,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
-    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 10: RED, multiplier: MATCH"
+    "published: MAR99 Table 2 (Basel Framework PDF p.758) row 10: RED, multiplier: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -1569,6 +1581,54 @@
     "absolute": 1e-15,
     "relative": 1e-12
    }
+  },
+  {
+   "case_id": "btk_k-0045",
+   "operation": "risk.frtb.backtest.zone",
+   "inputs": {
+    "observations": 250,
+    "exceptions_actual": "NaN",
+    "exceptions_hypothetical": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: KR-252: a non-finite token (NaN) at an integer count is a schema error, not a number"
+  },
+  {
+   "case_id": "btk_k-0046",
+   "operation": "risk.frtb.backtest.desk",
+   "inputs": {
+    "observations": 250,
+    "exceptions_99_actual": "NaN",
+    "exceptions_99_hypothetical": 0,
+    "exceptions_975_actual": 0,
+    "exceptions_975_hypothetical": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "frtb_backtest",
+    "error"
+   ],
+   "description": "hand: KR-252: a non-finite token (NaN) at an integer count is a schema error, not a number"
   }
  ]
 }

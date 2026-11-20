@@ -458,12 +458,19 @@ def scipy_rate(k):
     return float(2 * norm.sf(k))
 
 
+# K-5a version 2 blind lane (program/STAGE_K_BLIND_K5A_V2.md, compare 2026-11-19 23:35 UTC, first and only run):
+# 9 of 11 MATCH on estimate_pnl and bound at 1e-9 relative. idr_k-0012 and idr_k-0013 (cancelling books) MISMATCH on
+# estimate_pnl and are NOT counted; idr_k-0011 was not in the packet. Recorded 2026-11-20.
+K5A_V2 = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A_V2.md, spec 1.1.0): MATCH on estimate_pnl and bound"
+K5A_V2_COUNTED = {1, 2, 3, 4, 5, 8, 9, 10, 14}
+
+
 def idr_ver(ver):
     """KR-234 changed `bound`: a blind match of the old formula no longer covers it."""
     if ver in (BLIND_IDR, K5A):
         return ("blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_K5A.md): MATCH on estimate_pnl; bound "
                 "redefined by KR-234 (Lagrange bound plus a rounding allowance), so its blind match of the old formula "
-                "no longer counts: not blind until the K-5a packet is rerun")
+                "no longer counts; the K-5a version 2 packet re-derived both outputs (next entry)")
     return ver
 
 
@@ -478,6 +485,40 @@ def t_scipy_check(nu, k, rate):
 
 AUDIT = ("added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and "
          "oracle, not blind re-derived")
+AUDIT_K5A_V2 = ("added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and "
+                "oracle; blind re-derived afterwards by the K-5a version 2 lane (next entry)")
+# K-4c version 2 blind lane (program/STAGE_K_BLIND_TRIG_V2.md, compare 2026-11-20, first and only run): 14 of 14
+# value cases MATCH on every output at the goldens' tolerances; trig_k-0004 is not counted (fire gap-decided, KR-13).
+TRIG_V2 = ("blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, "
+           "threshold, false_alarm_rate and nominal_rate")
+TRIG_V2_MATCHED = {1, 2, 3, 4, 5, 9, 10, 11, 12, 13, 14, 15, 16, 21}
+TRIG_V2_NOCREDIT = {4}  # its fire stays gap-decided by KR-13; the entry it already has says so
+
+
+def trig_v2_credit(cases):
+    """Record the K-4c version 2 MATCH; earlier "not blind" notes are restated as history for the counted cases."""
+    restate = [
+        ("false_alarm_rate redefined by KR-232 is not blind)",
+         "false_alarm_rate redefined by KR-232 was not covered by that match; see the version 2 entry)"),
+        ("hand and oracle, not blind re-derived", "hand and oracle; blind re-derived afterwards by the K-4c version 2 lane"),
+        ("in the far tail: not blind", "in the far tail; not in the wave-1 packet, blind re-derived by the K-4c version 2 lane"),
+    ]
+    for c in cases:
+        n = int(c["case_id"].rsplit("-", 1)[1])
+        if n not in TRIG_V2_MATCHED:
+            continue
+        assert c["expected"]["status"] == "ok", c["case_id"]
+        if n not in TRIG_V2_NOCREDIT:
+            vb = []
+            for v in c["verified_by"]:
+                for a, b in restate:
+                    v = v.replace(a, b)
+                vb.append(v)
+            assert not any("not blind" in v for v in vb), (c["case_id"], vb)
+            c["verified_by"] = vb
+        c["verified_by"].append(TRIG_V2)
+
+
 AUDIT_CHANGES = []  # before and after of every changed expected value (oracle/STAGE_K_AUDIT_A_CHECKS.json)
 
 
@@ -596,6 +637,7 @@ def build():
             # compares at 3e-8 (the derived bound), not 1e-14
             s.add("calib.trigger.check", inp, outputs=r, cls="simple_analytic", limit={"absolute": 0.0, "relative": 3e-8},
                   output_classes=oc_t, verified=("hand", ORACLE, AUDIT), tags=tags, description="KR-233: " + desc)
+    trig_v2_credit(s.cases)
     suites.append(s)
 
     s = Suite("idr_k", IDR, G)
@@ -623,7 +665,7 @@ def build():
             assert abs(float(abs(err_) / parts[0][3]) - ratio) <= 5e-4, (desc, float(abs(err_) / parts[0][3]))
         filled.append((s.name, len(s.cases) + 1, r, float(exact), float(err_)))
         s.add("risk.intraday.delta_gamma_bound", inp, outputs=r, cls="simple_analytic", limit=lim,
-              output_classes={"label": "date_and_convention"}, verified=(ORACLE, idr_ver(ver)), tags=tags,
+              output_classes={"label": "date_and_convention"}, verified=(ORACLE, idr_ver(ver)) + ((K5A_V2,) if len(s.cases) + 1 in K5A_V2_COUNTED else ()), tags=tags,
               description=desc)
     for inp, desc in IDR_AUDIT:
         r, err = run(idr, inp)
@@ -645,7 +687,7 @@ def build():
             desc += (f" (cancelling: compared at 1e-9 relative plus {float(share):.3g} absolute, the estimate's share of "
                      "the KR-234 rounding allowance; KR-240)")
         s.add("risk.intraday.delta_gamma_bound", inp, outputs=r, cls="simple_analytic", limit=lim_,
-              output_classes={"label": "date_and_convention"}, verified=(ORACLE, AUDIT), tags=tags,
+              output_classes={"label": "date_and_convention"}, verified=((ORACLE, AUDIT_K5A_V2, K5A_V2) if len(s.cases) + 1 in K5A_V2_COUNTED else (ORACLE, AUDIT)), tags=tags,
               description="KR-234: " + desc)
     for name, i, r, ex, e in filled:
         note(f"{name}-{i:04d}: estimate_pnl {r['estimate_pnl']!r} bound {r['bound']!r} exact {ex!r} est-exact {e!r}")

@@ -1,0 +1,145 @@
+{
+ "source": "datasets/golden/stage_k/trig_k.json (k-r2 0c225b83), copied 2026-11-20; hidden from the blind lane",
+ "cases": {
+  "trig_k-0001": {
+   "outputs": {
+    "fire": true,
+    "sigma": 1.1547005383792515,
+    "threshold": 3.4641016151377544,
+    "false_alarm_rate": 0.057668885622437306,
+    "nominal_rate": 0.002699796063260189
+   },
+   "rel": 1e-14
+  },
+  "trig_k-0002": {
+   "outputs": {
+    "fire": false,
+    "sigma": 1.1547005383792515,
+    "threshold": 3.4641016151377544,
+    "false_alarm_rate": 0.057668885622437306,
+    "nominal_rate": 0.002699796063260189
+   },
+   "rel": 1e-14
+  },
+  "trig_k-0003": {
+   "outputs": {
+    "fire": false,
+    "sigma": 1.1547005383792515,
+    "threshold": 6.928203230275509,
+    "false_alarm_rate": 0.057668885622437306,
+    "nominal_rate": 0.002699796063260189
+   },
+   "rel": 1e-14
+  },
+  "trig_k-0004": {
+   "outputs": {
+    "fire": false,
+    "sigma": 1.0,
+    "threshold": 2.5,
+    "false_alarm_rate": 0.040992218585752895,
+    "nominal_rate": 0.01241933065155227
+   },
+   "rel": 1e-14
+  },
+  "trig_k-0005": {
+   "outputs": {
+    "fire": true,
+    "sigma": 1.0,
+    "threshold": 2.5,
+    "false_alarm_rate": 0.040992218585752895,
+    "nominal_rate": 0.01241933065155227
+   },
+   "rel": 1e-14
+  },
+  "trig_k-0009": {
+   "outputs": {
+    "fire": false,
+    "sigma": 1.1547005383792515,
+    "threshold": 34.64101615137755,
+    "false_alarm_rate": 8.135280427163959e-05,
+    "nominal_rate": 9.813427854296374e-198
+   },
+   "rel": 1e-14
+  },
+  "trig_k-0010": {
+   "outputs": {
+    "fire": true,
+    "sigma": 1.4142135623730951,
+    "threshold": 4.242640687119285,
+    "false_alarm_rate": 0.20483276469913345,
+    "nominal_rate": 0.002699796063260189
+   },
+   "rel": 1e-14
+  },
+  "trig_k-0011": {
+   "outputs": {
+    "fire": false,
+    "sigma": 0.6291528696058958,
+    "threshold": 1.8874586088176875,
+    "false_alarm_rate": 0.09546596626670913,
+    "nominal_rate": 0.002699796063260189
+   },
+   "rel": 1e-14
+  },
+  "trig_k-0012": {
+   "outputs": {
+    "fire": true,
+    "sigma": 0.8177713616898064,
+    "threshold": 2.3130067012440754,
+    "false_alarm_rate": 0.11611652351681559,
+    "nominal_rate": 0.04550026389635842
+   },
+   "rel": 1e-14
+  },
+  "trig_k-0013": {
+   "outputs": {
+    "fire": false,
+    "sigma": 1.5321403991104101,
+    "threshold": 4.596421197331231,
+    "false_alarm_rate": 0.0054991921339034066,
+    "nominal_rate": 0.002699796063260189
+   },
+   "rel": 1e-14
+  },
+  "trig_k-0014": {
+   "outputs": {
+    "fire": true,
+    "sigma": 1.3977668829372603,
+    "threshold": 4.193300648811781,
+    "false_alarm_rate": 0.0029737859324150116,
+    "nominal_rate": 0.002699796063260189
+   },
+   "rel": 1e-14
+  },
+  "trig_k-0015": {
+   "outputs": {
+    "fire": true,
+    "sigma": 1.1547005383792515,
+    "threshold": 0.5773502691896257,
+    "false_alarm_rate": 0.651447964848151,
+    "nominal_rate": 0.6170750774519738
+   },
+   "rel": 1e-14
+  },
+  "trig_k-0016": {
+   "outputs": {
+    "fire": false,
+    "sigma": 1.0,
+    "threshold": 1000.0,
+    "false_alarm_rate": 2.6409838375211874e-19,
+    "nominal_rate": 0.0
+   },
+   "rel": 1e-14
+  },
+  "trig_k-0021": {
+   "outputs": {
+    "fire": true,
+    "sigma": 1.5556349217168183e-08,
+    "threshold": 4.666904765150455e-08,
+    "false_alarm_rate": 0.20483276469913345,
+    "nominal_rate": 0.002699796063260189
+   },
+   "rel": 3e-08
+  }
+ }
+}

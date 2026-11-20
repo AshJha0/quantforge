@@ -5028,31 +5028,31 @@
     "cases": 117,
     "library-object": 0,
     "library-primitive": 0,
-    "independent-rederivation": 69,
+    "independent-rederivation": 91,
     "reimplementation": 0,
-    "none": 48,
+    "none": 26,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
-    "counted_with_rederivation": 69,
-    "share_with_rederivation": 0.589744,
+    "counted_with_rederivation": 91,
+    "share_with_rederivation": 0.777778,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 113
+    "error_and_invariance_cases": 115
    },
    "with_sweeps": {
     "cases": 117,
     "library-object": 0,
     "library-primitive": 0,
-    "independent-rederivation": 69,
+    "independent-rederivation": 91,
     "reimplementation": 0,
-    "none": 48,
+    "none": 26,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
-    "counted_with_rederivation": 69,
-    "share_with_rederivation": 0.589744,
+    "counted_with_rederivation": 91,
+    "share_with_rederivation": 0.777778,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 113
+    "error_and_invariance_cases": 115
    },
    "sweeps": null,
    "libraries": {},
@@ -5062,14 +5062,14 @@
      "cases": 14,
      "library-object": 0,
      "library-primitive": 0,
-     "independent-rederivation": 0,
+     "independent-rederivation": 13,
      "reimplementation": 0,
-     "none": 14,
+     "none": 1,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
-     "counted_with_rederivation": 0,
-     "share_with_rederivation": 0.0,
+     "counted_with_rederivation": 13,
+     "share_with_rederivation": 0.928571,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 13
     },
@@ -5206,7 +5206,7 @@
      "counted_with_rederivation": 5,
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 2
+     "error_and_invariance_cases": 3
     },
     "risk.frtb.backtest.zone": {
      "cases": 22,
@@ -5221,20 +5221,20 @@
      "counted_with_rederivation": 17,
      "share_with_rederivation": 0.772727,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 8
+     "error_and_invariance_cases": 9
     },
     "risk.intraday.delta_gamma_bound": {
      "cases": 12,
      "library-object": 0,
      "library-primitive": 0,
-     "independent-rederivation": 0,
+     "independent-rederivation": 9,
      "reimplementation": 0,
-     "none": 12,
+     "none": 3,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
-     "counted_with_rederivation": 0,
-     "share_with_rederivation": 0.0,
+     "counted_with_rederivation": 9,
+     "share_with_rederivation": 0.75,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 5
     },
@@ -5284,27 +5284,8 @@
      "error_and_invariance_cases": 13
     }
    },
-   "meets_floor": false,
+   "meets_floor": true,
    "per_item": {
-    "?": {
-     "cases": 0,
-     "library-object": 0,
-     "library-primitive": 0,
-     "independent-rederivation": 0,
-     "reimplementation": 0,
-     "none": 0,
-     "counted": 0,
-     "share": null,
-     "rederived_book_spec_only": 0,
-     "counted_with_rederivation": 0,
-     "share_with_rederivation": null,
-     "all_cases_share": 0.0,
-     "error_and_invariance_cases": 2,
-     "suites": [
-      "lim_k"
-     ],
-     "meets_item_floor": false
-    },
     "F (existing traffic_light)": {
      "cases": 15,
      "library-object": 0,
@@ -5366,39 +5347,39 @@
      "cases": 14,
      "library-object": 0,
      "library-primitive": 0,
-     "independent-rederivation": 0,
+     "independent-rederivation": 13,
      "reimplementation": 0,
-     "none": 14,
+     "none": 1,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
-     "counted_with_rederivation": 0,
-     "share_with_rederivation": 0.0,
+     "counted_with_rederivation": 13,
+     "share_with_rederivation": 0.928571,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 7,
      "suites": [
       "trig_k"
      ],
-     "meets_item_floor": false
+     "meets_item_floor": true
     },
     "K-5a": {
      "cases": 12,
      "library-object": 0,
      "library-primitive": 0,
-     "independent-rederivation": 0,
+     "independent-rederivation": 9,
      "reimplementation": 0,
-     "none": 12,
+     "none": 3,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
-     "counted_with_rederivation": 0,
-     "share_with_rederivation": 0.0,
+     "counted_with_rederivation": 9,
+     "share_with_rederivation": 0.75,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 2,
      "suites": [
       "idr_k"
      ],
-     "meets_item_floor": false
+     "meets_item_floor": true
     },
     "K-8": {
      "cases": 7,
@@ -5470,7 +5451,7 @@
      "counted_with_rederivation": 23,
      "share_with_rederivation": 0.821429,
      "all_cases_share": 0.0,
-     "error_and_invariance_cases": 16,
+     "error_and_invariance_cases": 18,
      "suites": [
       "btk_k"
      ],
@@ -5483,16 +5464,12 @@
     "strict_reading": "a case counted on a printed regulator figure does not count",
     "stage": {
      "cases": 117,
-     "counted": 41
+     "counted": 91
     },
     "per_item": {
-     "?": {
-      "cases": 0,
-      "counted": 0
-     },
      "F (existing traffic_light)": {
       "cases": 15,
-      "counted": 0
+      "counted": 11
      },
      "K-4a": {
       "cases": 10,
@@ -5504,11 +5481,11 @@
      },
      "K-4c": {
       "cases": 14,
-      "counted": 0
+      "counted": 13
      },
      "K-5a": {
       "cases": 12,
-      "counted": 0
+      "counted": 9
      },
      "K-8": {
       "cases": 7,
@@ -5520,11 +5497,11 @@
      },
      "K-8d": {
       "cases": 19,
-      "counted": 7
+      "counted": 12
      },
      "K-8e": {
       "cases": 28,
-      "counted": 11
+      "counted": 23
      }
     }
    }

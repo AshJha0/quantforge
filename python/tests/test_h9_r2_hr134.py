@@ -380,6 +380,10 @@ def test_cleanup_lists_only_raw_files_of_rejected_sessions(tmp_path: Path) -> No
     data = make(tmp_path, TODAY + later)
     sample = data / "BTC-USD-raw" / "20261117T20.jsonl.gz"
     _gz(sample, [])
+    # the sample was written on 2026-11-17; without this its file time is the wall clock, which the end
+    # estimate of a killed session reads (the test passed only while the wall clock was before 2026-11-19T23:07)
+    t17 = datetime(2026, 11, 17, 20, 59, tzinfo=UTC).timestamp()
+    os.utime(sample, (t17, t17))
     delete, keep = _plan(tmp_path, data, at(D20, 17))
     want = {f"{s}-raw/20261119T{h:02d}.jsonl.gz" for s in SYMS for h in range(11, 24)}
     assert (
