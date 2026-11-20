@@ -33,7 +33,7 @@ Read from the register table in [known issues](known-issues.md); a miss stays a 
 
 ## Golden cases and outside checks per stage
 
-All suites: 8,004 value-checked, 5,700 error and 2,554 invariance cases (16,258 in all; [case figures](case-figures.md)). A value-checked case must return the oracle's numbers within a stated tolerance; an error case checks the error code only; an invariance case checks that two related inputs get the same answer.
+All suites: 8,004 value-checked, 5,712 error and 2,554 invariance cases (16,270 in all; [case figures](case-figures.md)). A value-checked case must return the oracle's numbers within a stated tolerance; an error case checks the error code only; an invariance case checks that two related inputs get the same answer.
 
 Outside-checked share: value-checked cases re-derived outside the author's own code, by a library or by blind re-derivation where the rule allows it (rule R6-13, decision D6; floor 60.0% per stage, and from stage H on per plan item). Stages A to C, R2 and R6 are outside the share table. The share's denominator is the share table's own count (without generated sweeps), so it can be smaller than the value-checked column. The tag column is the plan's tag from ROADMAP: stage K is not tagged yet (target v1.0.0).
 
@@ -46,7 +46,7 @@ Outside-checked share: value-checked cases re-derived outside the author's own c
 | R2 |  |  |  | 74 | 11 | 0 | not in the share table |  |
 | E | Full volatility and exotics | v0.5 | Arbitrage-free surfaces | 710 | 185 | 0 | 557 of 710 (78.5%) | met |
 | F | Risk, portfolio, book | v0.6 | Use case 4 | 472 | 3,462 | 2,126 | 355 of 417 (85.1%) | met |
-| G | Rates models and xVA | v0.7 | Exposure checked against ORE | 470 | 813 | 412 | 359 of 456 (78.7%) | met |
+| G | Rates models and xVA | v0.7 | Exposure checked against ORE | 470 | 825 | 412 | 359 of 456 (78.7%) | met |
 | I | Hedging | v0.8 | Use case 6 | 318 | 125 | 0 | 102 of 153 (66.7%) | met |
 | R6 |  |  |  | 43 | 93 | 0 | not in the share table |  |
 | J | Research and portfolio | v0.9 | Published study reports | 215 | 229 | 0 | 143 of 215 (66.5%) | met |
