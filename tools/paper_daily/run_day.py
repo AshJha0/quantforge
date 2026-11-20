@@ -8,7 +8,11 @@ One run: read the recorded Treasury par curve from the forward log (no network),
 re-strike, decide the rule's order, check its limits, simulate its fills, write TCA for it, explain the day's
 P&L, reconcile, and append one DAY row (or a GAP row for a business day with no recorded curve). The whole new
 ledger is verified, including a rebuild of every day through the CLI, before the file is written. --dry-run
-prints the rows it would add and writes nothing. Exit 0 also when nothing is due; exit 1 on a refusal.
+prints the rows it would add and writes nothing. A run with nothing due writes nothing at all (KR-205).
+
+Exit 0: done, also when nothing is due. Exit 1: refused, nothing written. Exit 2: rows were written (or, in a
+dry run, would be) and something needs a person: a GAP row, a late DAY row, or a day that could not be built
+before its cut-off (KR-210). The workflow still verifies and pushes the rows and then turns the run red.
 """
 import argparse
 import datetime as dt
@@ -70,19 +74,29 @@ def main(argv=None):
     for n in notes:
         print(n)
     print(json.dumps({"now": core.stamp(now), "rows_added": len(new), "dry_run": a.dry_run,
-                      **{k: v[k] for k in ("records", "recorded_trading_days", "late_days", "gaps", "head", "last_date")}},
+                      **{k: v[k] for k in ("records", "declared_on_time_days", "late_days", "gaps", "head", "last_date")}},
                      sort_keys=True))
     if a.dry_run:
         for r in new:
             print(core.line(r))
-        return 0
+        return problems(new, notes)
     if new:
         p = Path(a.ledger)
         p.parent.mkdir(parents=True, exist_ok=True)
         tmp = p.with_suffix(".tmp")
-        tmp.write_text(out, encoding="utf-8", newline="\n")
+        tmp.write_bytes(out.encode("ascii"))  # rows are ASCII with LF endings on every platform (KR-208)
         tmp.replace(p)
-    return 0
+    return problems(new, notes)
+
+
+def problems(new, notes):
+    """2 when a row written records a gap or a late day, or a day could not be built before its cut-off."""
+    bad = [f"{r['body']['date']} {r['kind']} {r['body'].get('timing', r['body'].get('cause', ''))}" for r in new
+           if r["kind"] == "GAP" or (r["kind"] == "DAY" and r["body"]["timing"] != "on_time")]
+    bad += [n for n in notes if n.startswith("PROBLEM:")]
+    for b in bad:
+        print(f"problem: {b}", file=sys.stderr)
+    return 2 if bad else 0
 
 
 if __name__ == "__main__":
