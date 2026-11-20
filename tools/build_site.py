@@ -8,6 +8,7 @@ does not exist fails the build. A link to a repository file that is not Markdown
 site, so it becomes plain code text. Exit status: 0 built; 1 broken links.
 """
 import argparse
+import base64
 import html
 import json
 import re
@@ -42,7 +43,7 @@ h1,h2,h3{line-height:1.25}h2{color:var(--link);border-bottom:2px solid var(--lin
 pre{background:var(--code);padding:.8rem;overflow-x:auto;border-radius:4px}code{font-size:.92em;overflow-wrap:anywhere}pre code{overflow-wrap:normal}
 table{border-collapse:collapse;width:100%;font-size:.9rem;margin:1rem 0}th,td{border:1px solid var(--line);padding:.45rem .7rem;text-align:left}th{background:var(--code)}
 .glance th{width:9rem;vertical-align:top}.glance td{background:var(--panel)}
-.chart{max-width:42rem;margin:1.2rem 0}.chart svg{display:block;width:100%;height:auto}main svg[role=img]{background:var(--bg);color:var(--ink)}.chart p{font-size:.85rem;margin:.3rem 0 0}
+.chart{max-width:42rem;margin:1.2rem 0}.chart svg{display:block;width:100%;height:auto}main picture img{display:block;max-width:100%;height:auto}.chart img{width:100%}.chart p{font-size:.85rem;margin:.3rem 0 0}
 .mermaid{background:var(--panel);border-radius:4px;padding:.5rem;overflow-x:auto;text-align:center}
 .skip{position:absolute;left:-999px;top:.5rem;background:var(--panel);color:var(--link);padding:.5rem 1rem;z-index:10}.skip:focus{left:.5rem}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}.bar a[aria-current=page]{text-decoration:underline;text-underline-offset:.3em}
@@ -184,6 +185,48 @@ def title_of(text, fallback):
     return m.group(1).strip() if m else fallback
 
 
+def css_tokens():
+    """{"light": {...}, "dark": {...}} colour tokens of CSS (the dark block overrides the light one)."""
+    light = dict(re.findall(r"--([a-z0-9]+):(#[0-9a-fA-F]{3,6})", CSS.split("@media(prefers-color-scheme:dark)")[0]))
+    m = re.search(r"@media\(prefers-color-scheme:dark\)\{:root\{([^}]*)\}", CSS)
+    return {"light": light, "dark": dict(light, **dict(re.findall(r"--([a-z0-9]+):(#[0-9a-fA-F]{3,6})", m.group(1))))}
+
+
+def chart_images(body):
+    """Inline chart SVGs (role="img", from the gallery generators) become images with the same alt text, one per
+    colour scheme (KR-227). Why: text inside an inline SVG has a drawn background that axe-core cannot measure, so
+    axe returns "incomplete" for every label, and pa11y 6.2.3 (under pa11y-ci 3.1.0) reports an incomplete result
+    of serious impact as an error (lib/runners/axe.js, axeImpactToPa11yLevel; CI run 44797986161: 30 Curves
+    pages in light and in dark). As an image the chart is checked by its alt text, as any image is.
+    Worked example: `<svg viewBox="0 0 480 300" role="img" aria-label="betas, synthetic data">` becomes
+    `<picture><source media="(prefers-color-scheme: dark)" srcset="data:image/svg+xml;base64,..."><img
+    src="data:image/svg+xml;base64,..." alt="betas, synthetic data" width="480" height="300"></picture>`, with
+    `var(--ink)`, `currentColor` and the other tokens replaced by that scheme's colours."""
+    toks = css_tokens()
+
+    def one(m):
+        svg = m.group(0)
+        label = re.search(r'aria-label="([^"]*)"', svg)
+        label = label.group(1) if label else ""
+        vb = re.search(r'viewBox="0 0 ([0-9.]+) ([0-9.]+)"', svg)
+        w, h = (vb.group(1), vb.group(2)) if vb else ("480", "300")
+        head = re.sub(r'\s(role|aria-label)="[^"]*"', "", re.match(r"<svg\b[^>]*>", svg).group(0))
+        if "xmlns=" not in head:
+            head = head.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"', 1)
+        head = head.replace("<svg", f'<svg width="{w}" height="{h}"', 1)
+        inner = svg[re.match(r"<svg\b[^>]*>", svg).end():]
+
+        def paint(mode):
+            t = head + inner
+            for k, v in toks[mode].items():
+                t = t.replace(f"var(--{k})", v)
+            t = t.replace("currentColor", toks[mode]["ink"])
+            return "data:image/svg+xml;base64," + base64.b64encode(t.encode("utf-8")).decode("ascii")
+        return (f'<picture><source media="(prefers-color-scheme: dark)" srcset="{paint("dark")}">'
+                f'<img src="{paint("light")}" alt="{label}" width="{w}" height="{h}"></picture>')
+    return re.sub(r"<svg\b[^>]*\brole=\"img\".*?</svg>", one, body, flags=re.S)
+
+
 def a11y_fix(body, title):
     """WCAG fixes applied to every rendered page (KR-227, tools/check_site_a11y.py --static finds what these fix):
     - <pre> can scroll sideways, so it takes keyboard focus (tabindex="0"; axe scrollable-region-focusable);
@@ -236,7 +279,7 @@ def main():
         text = (ROOT / page).read_text(encoding="utf-8")
         title = title_of(text, page)
         body = markdown.markdown(fix_links(text, page, known, broken), extensions=["tables", "fenced_code", "toc"])
-        body = a11y_fix(body, title)
+        body = a11y_fix(chart_images(body), title)
         if "language-mermaid" in body:
             body += MERMAID
         target = out / (page[:-3] + ".html")

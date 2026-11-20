@@ -1280,6 +1280,17 @@ class SiteA11y(unittest.TestCase):
         self.assertNotIn("<th></th>", out)
         self.assertIn('<th scope="row">k</th>', out)
         self.assertEqual(out.count("<thead>"), 1)
+        svg = ('<svg viewBox="0 0 480 300" role="img" aria-label="betas, synthetic data" '
+               'xmlns="http://www.w3.org/2000/svg" style="fill:currentColor"><text>b</text>'
+               '<line style="stroke:var(--line)"/></svg>')
+        pic = m.chart_images("<p>x</p>" + svg)
+        self.assertNotIn("<svg", pic)
+        self.assertIn('alt="betas, synthetic data" width="480" height="300"', pic)
+        import base64 as b64
+        light, dark = (b64.b64decode(u).decode() for u in reversed(re.findall(r"base64,([A-Za-z0-9+/=]+)", pic)))
+        self.assertNotIn("var(--", light + dark)
+        self.assertIn("fill:#1a1a2e", light)
+        self.assertIn("fill:#e3e6ea", dark)
 
 
 if __name__ == "__main__":
