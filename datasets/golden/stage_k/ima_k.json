@@ -42,7 +42,8 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
+    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
+    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -581,7 +582,8 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
+    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
+    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -1120,7 +1122,8 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
+    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
+    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -1659,7 +1662,8 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
+    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
+    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -2198,7 +2202,8 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
+    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
+    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -2737,7 +2742,8 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
+    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
+    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -2768,7 +2774,8 @@
    "verified_by": [
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
     "published: Basel Framework MAR32.42, PDF p.667, printed p-value 0.264: MATCH within 1e-3 (tolerance fixed in the spec before any run; the asymptotic value is 0.263380632422)",
-    "scipy 1.18.1 stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
+    "scipy 1.18.1 stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
+    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -2800,7 +2807,8 @@
    "verified_by": [
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
     "published: Basel Framework MAR32.42, PDF p.667, printed p-value 0.055: MATCH within 1e-3 (tolerance fixed in the spec before any run; the asymptotic value is 0.0546463301139)",
-    "scipy 1.18.1 stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
+    "scipy 1.18.1 stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
+    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -2845,7 +2853,8 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 integrate.quad of the normal tail (independent library, a different formulation): MATCH 1e-12; not counted here: whether D6 classes it library-primitive is the coordinator's decision"
+    "scipy 1.18.1 integrate.quad of the normal tail (independent library, a different formulation): MATCH 1e-12; not counted here: whether D6 classes it library-primitive is the coordinator's decision",
+    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -2889,7 +2898,8 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 integrate.quad of the normal tail (independent library, a different formulation): MATCH 1e-12; not counted here: whether D6 classes it library-primitive is the coordinator's decision"
+    "scipy 1.18.1 integrate.quad of the normal tail (independent library, a different formulation): MATCH 1e-12; not counted here: whether D6 classes it library-primitive is the coordinator's decision",
+    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
    ],
    "tags": [
     "stage_k",

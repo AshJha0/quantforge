@@ -44,6 +44,8 @@ LABEL = "regulatory formula on caller inputs; not a regulatory return"
 RW_SOURCE = "securitisation risk weights supplied by the caller (CRE40-CRE44 not implemented)"
 ORACLE = "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)"
 BLIND = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+# K-8f second blind lane (8 of 8 MATCH; first recorded by hand in a01f4a81, now owned here).
+BLIND_IMA2 = "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
 NOT_COUNTED_SCIPY = "not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
 LIMIT = {"absolute": 1e-15, "relative": 1e-12}  # KR-67 and A1 of both specs
 TAGS_A = ["stage_k", "frtb_drc"]
@@ -605,7 +607,7 @@ def gen_ima():
               f"{cid} SciPy spearmanr {sr!r}, ks_2samp {kr!r}, kstwobign.sf {pr!r}")
         s.add_as(cid, pla, {"hpl": hpl, "rtpl": rt}, o,
                  verified=["hand (spec table, " + SPEC_F + ")", ORACLE,
-                           f"{sp} stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; " + NOT_COUNTED_SCIPY],
+                           f"{sp} stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; " + NOT_COUNTED_SCIPY, BLIND_IMA2],
                  tags=TAGS_F + ["library_checked"], limit=LIMIT, description=desc)
     for cid, ks, val, prn in (("pla_k-0007", 0.09, "0.263380632422", "0.264"), ("pla_k-0008", 0.12, "0.0546463301139", "0.055")):
         # the input ks is the binary64 0.09 / 0.12, so the oracle evaluates at that value
@@ -616,7 +618,7 @@ def gen_ima():
         check(abs(sc - f(q)) <= 1e-12, f"{cid} SciPy kstwobign.sf {sc!r}")
         s.add_as(cid, pv, {"ks": ks, "n": 250}, {"pvalue": f(q), "label": LABEL},
                  verified=[ORACLE, f"published: Basel Framework MAR32.42, PDF p.667, printed p-value {prn}: MATCH within 1e-3 (tolerance fixed in the spec before any run; the asymptotic value is {val})",
-                           f"{sp} stats.kstwobign.sf (independent library): MATCH 1e-12; " + NOT_COUNTED_SCIPY],
+                           f"{sp} stats.kstwobign.sf (independent library): MATCH 1e-12; " + NOT_COUNTED_SCIPY, BLIND_IMA2],
                  tags=TAGS_F + ["outside_checked", "published"], limit=LIMIT, description=f"Kolmogorov tail at KS {ks}, n 250 (MAR32.42)")
 
     def blind(cid, op, inp, oracle, desc):
@@ -634,7 +636,7 @@ def gen_ima():
         check(abs(qv - o["es"]) <= 1e-12 * o["es"], f"{cid} SciPy quad of the normal tail {qv!r}")
         s.add_as(cid, es, {"sigma": sig}, o,
                  verified=["hand (spec table, " + SPEC_F + ")", ORACLE,
-                           f"{sp} integrate.quad of the normal tail (independent library, a different formulation): MATCH 1e-12; not counted here: whether D6 classes it library-primitive is the coordinator's decision"],
+                           f"{sp} integrate.quad of the normal tail (independent library, a different formulation): MATCH 1e-12; not counted here: whether D6 classes it library-primitive is the coordinator's decision", BLIND_IMA2],
                  tags=TAGS_F + ["library_checked"], limit=LIMIT, description="normal mode (KR-57)")
     blind("es_k-0003", es, {"es_t": [10, 8, 6, 4, 2]}, o_es, "liquidity-horizon cascade, weights 1, 1, 2, 2, 6")
     blind("es_k-0004", es, {"es_t": [10, 0, 0, 0, 0]}, o_es, "only the 10-day horizon")
