@@ -1435,6 +1435,378 @@
     "synthetic"
    ],
    "description": "bucket default probability below the smallest normal double"
+  },
+  {
+   "case_id": "wwr_g-0027",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.0,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "values": [
+     [
+      3.0,
+      5.0,
+      2.0,
+      -1.0
+     ],
+     [
+      -2.0,
+      -4.0,
+      -6.0,
+      -3.0
+     ],
+     [
+      1.0,
+      6.0,
+      9.0,
+      4.0
+     ],
+     [
+      0.5,
+      -1.0,
+      2.5,
+      7.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": 0.03,
+    "recovery": 0.4,
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr258",
+    "synthetic"
+   ],
+   "description": "first time 0 (the implied t_0 = 0 is not before it)"
+  },
+  {
+   "case_id": "wwr_g-0028",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     -0.5,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "values": [
+     [
+      3.0,
+      5.0,
+      2.0,
+      -1.0
+     ],
+     [
+      -2.0,
+      -4.0,
+      -6.0,
+      -3.0
+     ],
+     [
+      1.0,
+      6.0,
+      9.0,
+      4.0
+     ],
+     [
+      0.5,
+      -1.0,
+      2.5,
+      7.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": 0.03,
+    "recovery": 0.4,
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr258",
+    "synthetic"
+   ],
+   "description": "negative first time"
+  },
+  {
+   "case_id": "wwr_g-0029",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.25,
+     0.25,
+     0.75,
+     1.0
+    ],
+    "values": [
+     [
+      3.0,
+      5.0,
+      2.0,
+      -1.0
+     ],
+     [
+      -2.0,
+      -4.0,
+      -6.0,
+      -3.0
+     ],
+     [
+      1.0,
+      6.0,
+      9.0,
+      4.0
+     ],
+     [
+      0.5,
+      -1.0,
+      2.5,
+      7.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": 0.03,
+    "recovery": 0.4,
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr258",
+    "synthetic"
+   ],
+   "description": "two equal times: not increasing"
+  },
+  {
+   "case_id": "wwr_g-0030",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0,
+     0.75,
+     0.5,
+     0.25
+    ],
+    "values": [
+     [
+      3.0,
+      5.0,
+      2.0,
+      -1.0
+     ],
+     [
+      -2.0,
+      -4.0,
+      -6.0,
+      -3.0
+     ],
+     [
+      1.0,
+      6.0,
+      9.0,
+      4.0
+     ],
+     [
+      0.5,
+      -1.0,
+      2.5,
+      7.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": 0.03,
+    "recovery": 0.4,
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr258",
+    "synthetic"
+   ],
+   "description": "times decreasing"
+  },
+  {
+   "case_id": "wwr_g-0031",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.0,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "values": [
+     [
+      3.0,
+      5.0,
+      2.0,
+      -1.0
+     ],
+     [
+      -2.0,
+      -4.0,
+      -6.0,
+      -3.0
+     ],
+     [
+      1.0,
+      6.0,
+      9.0,
+      4.0
+     ],
+     [
+      0.5,
+      -1.0,
+      2.5,
+      7.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": -0.01,
+    "recovery": 0.4,
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr258",
+    "synthetic"
+   ],
+   "description": "two errors: first time 0 [structural] and negative hazard [domain]; structural E_INPUT first"
+  },
+  {
+   "case_id": "wwr_g-0032",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     -1.0,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "values": [
+     [
+      3.0,
+      5.0,
+      2.0,
+      -1.0
+     ],
+     [
+      -2.0,
+      -4.0,
+      -6.0,
+      -3.0
+     ],
+     [
+      1.0,
+      6.0,
+      9.0,
+      4.0
+     ],
+     [
+      0.5,
+      -1.0,
+      2.5,
+      7.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": -0.01,
+    "recovery": 0.4,
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr258",
+    "synthetic"
+   ],
+   "description": "two errors: negative first time [structural] and negative hazard [domain]; structural E_INPUT first"
   }
  ]
 }

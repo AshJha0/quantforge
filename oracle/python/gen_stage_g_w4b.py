@@ -226,6 +226,21 @@ def wwr_root_cases(s):
         s.add(op, inp, error=code, cls="date_and_convention", tags=["invalid", "xva", "kr257"], description=d)
 
 
+def first_time_cases(s, op, base, other, other_desc):
+    """KR-258 (proposed 2026-11-20): a first time at or below 0 is a structural E_INPUT (HR-122 step 4, ordering
+    against the implied t_0 = 0), as in Python and Rust; C++ and Java returned E_DOMAIN and no golden sent it."""
+    n = len(base["times"])
+    rest = list(base["times"][1:])
+    errs = [(dict(base, times=[0.0] + rest), "E_INPUT", "first time 0 (the implied t_0 = 0 is not before it)"),
+            (dict(base, times=[-0.5] + rest), "E_INPUT", "negative first time"),
+            (dict(base, times=[base["times"][0]] * 2 + rest[1:] if n > 1 else base["times"]), "E_INPUT", "two equal times: not increasing"),
+            (dict(base, times=list(reversed(base["times"]))), "E_INPUT", "times decreasing"),
+            (dict(base, times=[0.0] + rest, **other), "E_INPUT", f"two errors: first time 0 [structural] and {other_desc} [domain]; structural E_INPUT first"),
+            (dict(base, times=[-1.0] + rest, **other), "E_INPUT", f"two errors: negative first time [structural] and {other_desc} [domain]; structural E_INPUT first")]
+    for inp, code, d in errs:
+        s.add(op, inp, error=code, cls="date_and_convention", tags=["invalid", "xva", "kr258"], description=d)
+
+
 OP, ALIAS = "xva.sbim.ir_delta", "xva.simm.ir_delta"  # KR-152, KR-256: the old id is a deprecated alias in v1.0.0, removed in the first release after it
 
 
@@ -343,6 +358,7 @@ def main():
             (dict(base, ene=[1.0, -90.0, -100.0, -70.0]), "E_DOMAIN", "positive ENE"), (dict(base, im=[1.0, 1.0, 1.0, 1.0]), "E_INPUT", "im without im_spread")]
     for inp, code, d in errs:
         s.add("xva.adjustments.value", inp, error=code, cls="date_and_convention", tags=["invalid", "xva"], description=d)
+    first_time_cases(s, "xva.adjustments.value", base, dict(counterparty=dict(hazard_rate=-0.01, recovery=0.4)), "negative counterparty hazard")
     write(s)
     n2 = len(s.cases)
 
@@ -388,6 +404,7 @@ def main():
     for inp, code, d in errs:
         s.add("xva.wwr.cva_hw", inp, error=code, cls="date_and_convention", tags=["invalid", "xva"], description=d)
     wwr_root_cases(s)
+    first_time_cases(s, "xva.wwr.cva_hw", wbase, dict(hazard_rate=-0.01), "negative hazard")
     write(s)
     n4 = len(s.cases)
     reg = json.loads((HERE.parent / "outside_register_g.json").read_text(encoding="utf-8"))
