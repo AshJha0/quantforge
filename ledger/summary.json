@@ -1,0 +1,13 @@
+{
+ "declared_on_time_days": 1,
+ "gaps": 0,
+ "head": "34706ac63c8f4352d86a77a009549746cceb4a0e81f5e2d1a244801d19614416",
+ "label": "paper marks on a fitted curve; not tradable",
+ "last_date": "2026-11-20",
+ "late_days": 0,
+ "nav": "9999704.6875",
+ "note": "declared_on_time_days counts rows the runner labelled on time; recorded trading days are counted from Bitcoin block times by verify --bitcoin-headers",
+ "ok": true,
+ "pnl": "-295.3125",
+ "records": 2
+}
