@@ -108,8 +108,8 @@ TEST_CASE("wave 2b goldens: all nine suites through the CLI layer", "[cva_levera
 
 TEST_CASE("BA-CVA discount factor and a single counterparty by hand (MAR50.15, KR-64)", "[cva_leverage]") {
     CHECK(cv::discount_factor(5.0, true) == 1.0);
-    CHECK(std::fabs(cv::discount_factor(1.0) - 0.9754115099857198) <= 1e-16);
-    CHECK(std::fabs(cv::discount_factor(5.0) - 0.8847968677143805) <= 1e-16);
+    CHECK(std::fabs(cv::discount_factor(1.0) - 0.9754115099857198) <= 1e-15);  // 1e-15 as the golden's oracle note (df_k); 1e-16 is below one ulp at 0.975 and failed on the Windows runner (pull request #63)
+    CHECK(std::fabs(cv::discount_factor(5.0) - 0.8847968677143805) <= 1e-15);
     CHECK_THROWS_AS(cv::discount_factor(0.0), quantforge::Error);
     // SCVA = RW M EAD DF / alpha; with one counterparty K_reduced = sqrt((0.5 s)^2 + 0.75 s^2) = s.
     const cv::BaResult r = cv::ba_cva({{"C1", "financials", "IG", {{1e6, 5.0, false}}}}, "REDUCED", {}, {});
