@@ -132,6 +132,8 @@ def malformed() -> list[dict]:
         ("QF-FAST-S", "u32 seq with 6 bytes and no stop bit", "fc81" + "017f7f7f7f7f" + FAST_TWO[6:34],
          "E_OVERFLOW"),
         ("QF-FAST-S", "second message first: empty dictionary", FAST_TWO[34:], "E_FIELD"),
+        ("QF-FAST-S", "redundant symbol in message 2", FAST_TWO[:34] + "94514653" + "49cd00e400e402ac",
+         "E_OVERLONG"),
         ("QF-FAST-S", "unused presence bit 5 set", "fe" + FAST_TWO[2:34], "E_FIELD"),
         ("QF-MOLD-S", "19-byte header", (MOLD_HDR + "0000000000000001" + "00")[:38], "E_TRUNCATED"),
         ("QF-MOLD-S", "count 2, one block", MOLD_HDR + "0000000000000001" + "0002" + "0024" + ITCH_ADD,

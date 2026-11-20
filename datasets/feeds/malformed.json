@@ -178,6 +178,12 @@
   },
   {
    "format": "QF-FAST-S",
+   "name": "redundant symbol in message 2",
+   "hex": "fc818151465349cd3d6694e43d66f801c89451465349cd00e400e402ac",
+   "code": "E_OVERLONG"
+  },
+  {
+   "format": "QF-FAST-S",
    "name": "unused presence bit 5 set",
    "hex": "fe818151465349cd3d6694e43d66f801c8",
    "code": "E_FIELD"
