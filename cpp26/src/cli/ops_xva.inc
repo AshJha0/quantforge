@@ -204,6 +204,62 @@ void op_xva_sbim(const In& in, Out& out) {
     out.key_real("margin", r.margin);
 }
 
+// KR-257: hazard exp(z) over dt gives default probability q = 1 - e^-x, survival r = e^-x and dq/dz = x e^-x
+// with x = exp(z) dt; an overflowing exp(z) is inf (q = 1, r = 0).
+struct WwrTerms {
+    double q, r, dq;
+};
+WwrTerms wwr_terms(double z, double dt) {
+    const double x = (z > 709.0 ? std::numeric_limits<double>::infinity() : std::exp(z)) * dt;
+    const double r = std::exp(-x);
+    return {-std::expm1(-x), r, r == 0.0 ? 0.0 : x * r};
+}
+
+// KR-257: a with sum_p S_p (1 - e^(-x_p)) = (1 - e^(-h dt)) sum_p S_p, x_p = exp(a + c_p) dt (the G-44 equation divided
+// through by S(t_(i-1)); above a bucket default probability of 1/2 the survival form sum_p S_p e^(-x_p) = e^(-h dt)
+// sum_p S_p). Bracket [ln h - max c - 1, ln h - min c + 1] (closed form, sign change by monotonicity), safeguarded
+// Newton (rtsafe) from ln h - (S-weighted mean of c), step to 1e-15 relative, at most 200 steps.
+double wwr_root(const Vec& surv, const Vec& cs, double dt, double hz) {
+    const double q_t = -std::expm1(-hz * dt), r_t = std::exp(-hz * dt);
+    const bool use_q = q_t <= 0.5;
+    double total = 0.0, wsum = 0.0;
+    for (std::size_t p = 0; p < surv.size(); ++p) {
+        total += surv[p];
+        wsum += surv[p] * cs[p];
+    }
+    const auto fval = [&](double x, double& der) {
+        double sq = 0.0, sr = 0.0, d = 0.0;
+        for (std::size_t p = 0; p < surv.size(); ++p) {
+            const WwrTerms w = wwr_terms(x + cs[p], dt);
+            sq += surv[p] * w.q;
+            sr += surv[p] * w.r;
+            d += surv[p] * w.dq;
+        }
+        der = d;
+        return use_q ? sq - q_t * total : r_t * total - sr;
+    };
+    const double ln_h = std::log(hz);
+    double lo = ln_h - *std::max_element(cs.begin(), cs.end()) - 1.0, hi = ln_h - *std::min_element(cs.begin(), cs.end()) + 1.0;
+    double x = ln_h - wsum / total, dx = hi - lo, der = 0.0;
+    double val = fval(x, der);
+    for (int it = 0; it < 200; ++it) {
+        if (val > 0) hi = x;
+        else if (val < 0) lo = x;
+        else return x;
+        const double dx_old = dx;
+        dx = der > 0 ? val / der : std::numeric_limits<double>::infinity();
+        double step = x - dx;
+        if (!(lo < step && step < hi && std::fabs(dx) <= 0.5 * std::fabs(dx_old))) {
+            dx = 0.5 * (hi - lo);
+            step = lo + dx;
+        }
+        if (std::fabs(step - x) <= 1e-15 * std::max(1.0, std::fabs(x))) return step;
+        x = step;
+        val = fval(x, der);
+    }
+    throw Error("E_NO_CONVERGENCE", "the a(t) root did not converge in 200 steps", "wwr_b");
+}
+
 void op_xva_wwr(const In& in, Out& out) {
     const Vec t = xva_increasing(in, "times", 1);
     if (!(t[0] > 0)) throw Error("E_DOMAIN", "times must be after 0", "times");
@@ -214,45 +270,33 @@ void op_xva_wwr(const In& in, Out& out) {
     if (D.size() != t.size()) throw Error("E_INPUT", "discount_factors length differs from times", "discount_factors");
     if (!(h > 0)) throw Error("E_DOMAIN", "hazard_rate is not positive", "hazard_rate");
     if (!(R >= 0 && R < 1)) throw Error("E_DOMAIN", "recovery must lie in [0, 1)", "recovery");
+    for (const Vec& path : V)
+        for (const double v : path)
+            if (std::fabs(b * v) > 700.0) throw Error("E_DOMAIN", "|wwr_b * value| must be at most 700 (KR-257)", "wwr_b");
+    const double min_normal = std::numeric_limits<double>::min();
+    double prev = 0.0;
+    for (const double ti : t) {
+        if (std::exp(-h * ti) < min_normal || -std::expm1(-h * (ti - prev)) < min_normal)
+            throw Error("E_NON_FINITE", "the survival target or a bucket default probability is below the smallest normal double",
+                        "hazard_rate");
+        prev = ti;
+    }
     const std::size_t P = V.size(), n = t.size();
     const double Pn = static_cast<double>(P);
-    Vec S(P, 1.0), S1(P), a(n);
-    double cva = 0.0, prev = 0.0;
+    Vec S(P, 1.0), cs(P), a(n);
+    double cva = 0.0;
+    prev = 0.0;
     for (std::size_t i = 0; i < n; ++i) {
-        const double dt = t[i] - prev, target = std::exp(-h * t[i]);
-        // mean_p S_p(t_(i-1)) exp(-exp(a + b V) dt) = target: strictly decreasing in a; Newton from ln h, bracketed.
-        const auto g = [&](double x, double& d) {
-            double m = 0.0, dm = 0.0;
-            for (std::size_t p = 0; p < P; ++p) {
-                const double lam = std::exp(x + b * V[p][i]), s = S[p] * std::exp(-lam * dt);
-                m += s;
-                dm -= s * lam * dt;
-            }
-            d = dm / Pn;
-            return m / Pn - target;
-        };
-        double lo = -800.0, hi = 50.0, x = std::log(h), d = 0.0;
-        for (int it = 0; it < 300; ++it) {
-            const double v = g(x, d);
-            if (v > 0) lo = x;
-            else hi = x;
-            if (v == 0.0) break;
-            double xn = x - v / d;
-            if (!std::isfinite(xn) || !(xn > lo && xn < hi)) xn = 0.5 * (lo + hi);
-            if (std::fabs(xn - x) <= 1e-15 * std::max(1.0, std::fabs(x))) {
-                x = xn;
-                break;
-            }
-            x = xn;
-        }
-        a[i] = x;
+        const double dt = t[i] - prev;
+        for (std::size_t p = 0; p < P; ++p) cs[p] = b * V[p][i];
+        a[i] = wwr_root(S, cs, dt, h);
         double acc = 0.0;
         for (std::size_t p = 0; p < P; ++p) {
-            S1[p] = S[p] * std::exp(-std::exp(x + b * V[p][i]) * dt);
-            acc += std::max(V[p][i], 0.0) * (S[p] - S1[p]);
+            const WwrTerms w = wwr_terms(a[i] + cs[p], dt);
+            acc += std::max(V[p][i], 0.0) * S[p] * w.q;
+            S[p] *= w.r;
         }
         cva += D[i] * acc / Pn;
-        S = S1;
         prev = t[i];
     }
     out.key_real("cva", (1 - R) * cva);
