@@ -22,6 +22,10 @@ Read from the register table in [known issues](known-issues.md); a miss stays a 
 | G1k | release evidence | Ruleset 26732064 has `strict_required_status_checks_policy: false`, so a pull request behind main can merge. Turning it on is the owner's repository setting. | `benchmarks/results/k7/ruleset-2026-11-20.json` (read via the API); `tools/check_ruleset.py` | open; owner |
 | G3b | release evidence | No package-registry publishing: it waits for the owner's own free PyPI and crates.io accounts (ruling KR-226, proposed). | `specifications/12-platform/release-evidence.md` (read) | open; owner |
 | G10 | release evidence | No headless-browser layout check (1280 and 375 px, dark mode) exists yet (ruling KR-227, proposed). | same | open |
+| K-6 native soak | not yet run | The C++ and Rust 2-hour soaks and their capacity rows have not run: they run only in `.github/workflows/k6-soak.yml` (manual and weekly), because a 2-hour job in WSL on the laptop would hold the single WSL lock the port lanes need. The runner also repeats the Python and Java soaks and adds 2 and 4 processes. | `specifications/12-platform/soak-eod-capacity.md` section 1 (read) | open until the first runner artifact is committed |
+| K-6 Java soak | not yet run | The Java 2-hour soak was not started on the laptop: after the Python soak it would have ended after 22:15 UTC on 2026-11-20, and the laptop was shut down at 23:00 (coordinator notice). It runs in the `k6-soak` workflow; the Java capacity rows were measured. | `program/stage_k_k6/STOP_NOTE.md` (read) | open; next command in the stop note |
+| K-6 publisher | not done | The K-5b snapshot publisher with 4 readers beside the soak (proposed ruling KR-217 as written) is not run; the soak drives the batch CLI only. | `specifications/stage-k-rulings-k6.md`, KR-217 (read) | open; coordinator to confirm or amend KR-217 |
+| K-6 capacity scope | not done | Adapter rates (K-3) and 250-day daily-job timings proposed under KR-219 are not measured by the K-6 scripts; the laptop measures 1 process only. | `specifications/12-platform/soak-eod-capacity.md` section 2 (read) | open |
 | K-7 release-verify | release evidence | The `release-verify` job and the attested `SHA256SUMS` exist only in `release.yml` and have never run; they run first on the v1.0.0 tag. | `.github/workflows/release.yml` (read) | open until the tag run |
 
 ## Golden cases and outside checks per stage
@@ -109,6 +113,7 @@ Gate (`conformance/mutation/stages.json`, `.github/workflows/mutation-stage.yml`
 |---|---|---|---|
 | R1 | partial | "Misses to raise as issues, without moving the targets: Python on T1, T3 and T4; Java on T1" | `benchmarks/targets.md` |
 | R1 | partial | "Python meets T3 (10,000-trade key-rate risk in 214 s against 900 s, down from about 20,900 s once curve rebuilds were cached) and misses T1 (bootstrap p99 129 ms against 5 ms; p50 14.6 ms) and T4" | `README.md` |
+| K | measured | "2026-11-19 from the forward log, all eight steps pass; the synthetic day, all eight pass; each planted fault (`GAP`, `HOLDOUT`, `HASH`, `EXPLAIN`, `DOMAIN`, `LABEL`, `WIDTH`) fails its own step E1 to E7 and stops the run" | `docs/capacity.md` |
 
 ## What this page does not show
 
