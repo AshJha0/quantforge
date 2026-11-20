@@ -1,0 +1,173 @@
+{
+ "commit": "105f7f9673878d492f547c65f3c4d9c891546a27",
+ "data_label": "synthetic recorded day: invented values, no market data",
+ "date": "2026-11-19",
+ "deviations": "see the module docstring of tools/eod/rehearse.py, list 'Deviations from the proposed spec'",
+ "dry_run": true,
+ "expected_failing_step": "E6",
+ "failed_step": "E6",
+ "format": "qf-eod-rehearsal/1",
+ "host": "local laptop, not the acceptance machine",
+ "inputs_sha256": {
+  "tmp/curve-daily/config-five-tenors.json": "be67a8d12bb65584855d43ae0569a1928488c886d30e51dc4b0a2b75b1169b97",
+  "tmp/forward-log/actions/log.jsonl": "b678d9da4418b7e98e222d01a99db2a9f0137d96f397aba62c454042c47aedf0",
+  "tmp/source/treasury-par-yields.csv": "b2e47dc3fe8c2bbf519882bbeb5fa6cad5ff78ba0a27267cbfb40ad894e3743c",
+  "tools/curve_daily/config.json": "ce3d09665567504f4c7fdd57ad6b07438c56ac501a85250646f6ee5e2c03eccb",
+  "tools/paper_daily/config.json": "8221914842d4715d2a718b21314f1e95db72e0a1e975602ee4505bf35da69ce4"
+ },
+ "log_ref": "",
+ "outputs_sha256": {
+  "tmp/curve-daily/ledger/curves.jsonl": "043d8704f09ab20ab0950b67852661d03996ab3c5a3102039cb2fef68dc500e7",
+  "tmp/curve-daily/ledger/summary.json": "cffcbeae6069dd6c0dc7cbcc75ece7c21d48284a934f606f679fe69e9cf6a020",
+  "tmp/paper-ledger/ledger/ledger.jsonl": "5a3fbd7c5dfad21600b5b9ef01ccddb4bb41fdda3eca692f41970904e3805089"
+ },
+ "plant": "LABEL",
+ "result": "fail",
+ "runner": "python, in process (quantforge_core.cli.main.run_case)",
+ "source": "synthetic",
+ "spec": "specifications/12-platform/soak-eod-capacity.md section 3 (proposed, branch k-w3-spec)",
+ "steps": [
+  {
+   "evidence": {
+    "chain_head": "78f7a1625a95fc81ae725ab07e3637d15db57b94de5ac712501b343d88781151",
+    "chain_rows": 16,
+    "log_copy_sha256": "b678d9da4418b7e98e222d01a99db2a9f0137d96f397aba62c454042c47aedf0",
+    "origin": "synthetic log built in the temporary folder",
+    "par_row_hash": "2984550fea54bf23c348934b0923643ca4eb8a920cb03f162eecfe722103f498",
+    "rows_in_source": 16,
+    "rows_up_to_cutoff": 16,
+    "source_dates": 8,
+    "source_sha256": "b2e47dc3fe8c2bbf519882bbeb5fa6cad5ff78ba0a27267cbfb40ad894e3743c",
+    "state_mismatches": 0,
+    "state_rows_rechecked": 8,
+    "tenors_for_date": 5
+   },
+   "reason": "",
+   "seconds": 0.214,
+   "status": "pass",
+   "step": "E1",
+   "title": "read the day's recorded rows and verify the chain"
+  },
+  {
+   "evidence": {
+    "checked_date": "the run date",
+    "date_hits": [],
+    "row_hits": 0,
+    "rows_scanned": 2,
+    "windows": 3
+   },
+   "reason": "",
+   "seconds": 0.001,
+   "status": "pass",
+   "step": "E2",
+   "title": "holdout check on the date"
+  },
+  {
+   "evidence": {
+    "consistency": "pending",
+    "head": "de40d7ed33e8d77d2eb8e1c722f591618da540ecb407d515e2c8a09621ad7b26",
+    "kinds": [
+     "GENESIS",
+     "DAY"
+    ],
+    "labels_ok": true,
+    "ledger_sha256": "043d8704f09ab20ab0950b67852661d03996ab3c5a3102039cb2fef68dc500e7",
+    "max_abs_bp": "0.5372873699983904",
+    "note": "Rehearsal fit on the five tenors the recorder keeps (3 Mo, 2 Yr, 5 Yr, 10 Yr, 30 Yr), not the scheduled thirteen-tenor run.",
+    "notes": 2,
+    "refit_exact": true,
+    "rmse_bp": "0.3411039312545822",
+    "rows_built": 2,
+    "source_sha256": "b2e47dc3fe8c2bbf519882bbeb5fa6cad5ff78ba0a27267cbfb40ad894e3743c",
+    "summary_sha256": "cffcbeae6069dd6c0dc7cbcc75ece7c21d48284a934f606f679fe69e9cf6a020",
+    "tau": "2.5",
+    "timing": "on_time",
+    "verify_ok": true,
+    "verify_reason": "",
+    "within_fit_flag": "true"
+   },
+   "reason": "",
+   "seconds": 0.512,
+   "status": "pass",
+   "step": "E3",
+   "title": "daily curve run, dry run, for the date"
+  },
+  {
+   "evidence": {
+    "declared_on_time_days": 2,
+    "explain_sums": true,
+    "head": "bd3a6358f12506cad8cb2d4b5fcee8b40a96e782feba9bfd0076a47adaca6800",
+    "kinds": [
+     "GENESIS",
+     "DAY",
+     "DAY"
+    ],
+    "ledger_sha256": "5a3fbd7c5dfad21600b5b9ef01ccddb4bb41fdda3eca692f41970904e3805089",
+    "orders": 1,
+    "problems": 0,
+    "runs": 2,
+    "timing": "on_time",
+    "unexplained": "0",
+    "verify_ok": true,
+    "verify_reason": ""
+   },
+   "reason": "",
+   "seconds": 0.064,
+   "status": "pass",
+   "step": "E4",
+   "title": "paper ledger run, dry run, for the date"
+  },
+  {
+   "evidence": {
+    "bound": 1.8683291990074765e-05,
+    "estimate_pnl": -855.3900864684372,
+    "key_rate_buckets": 30,
+    "key_rate_cases": 2,
+    "key_rate_failed": [],
+    "label": "latency-aware analytics on simulated data",
+    "positions": 2,
+    "shift": 0.0001,
+    "zero_dv01_sum": -925.880244285916
+   },
+   "reason": "",
+   "seconds": 0.008,
+   "status": "pass",
+   "step": "E5",
+   "title": "intraday risk on the day's book"
+  },
+  {
+   "evidence": {
+    "labels_checked": 11,
+    "missing": [
+     "dashboard/paper.html: label 0"
+    ],
+    "pages": [
+     "dashboard/curve.html",
+     "dashboard/paper.html"
+    ],
+    "planted": "the paper row label removed from its page"
+   },
+   "reason": "LABEL",
+   "seconds": 0.0,
+   "status": "fail",
+   "step": "E6",
+   "title": "render the dashboards into a temporary site"
+  },
+  {
+   "evidence": {},
+   "reason": "",
+   "seconds": 0.0,
+   "status": "not run",
+   "step": "E7",
+   "title": "site checks on the rendered pages"
+  },
+  {
+   "evidence": {},
+   "reason": "",
+   "seconds": 0.0,
+   "status": "not run",
+   "step": "E8",
+   "title": "archive"
+  }
+ ]
+}
