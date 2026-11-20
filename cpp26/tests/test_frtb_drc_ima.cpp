@@ -709,7 +709,10 @@ TEST_CASE("IMA CLI errors in KR-67 order and the KR-67 page limits", "[frtb_drc_
     std::string body = big.substr(8);
     CHECK(code("risk.frtb.pla", big + R"(],"rtpl":[)" + body + "]}") == "ok");
     CHECK(code("risk.frtb.ima.ses", R"({"idio_credit":[)" + body + R"(],"idio_equity":[],"other":[]})") == "E_LIMIT");
-    CHECK(code("risk.frtb.ima.es_lh", R"({"pnl":[[)" + body + "],[],[],[],[]]}") == "ok");
+    std::string losses;  // P&L of -(k mod 997): a positive ES
+    for (int k = 0; k < 100001; ++k) losses += (k ? ",-" : "-") + std::to_string(k % 997);
+    CHECK(code("risk.frtb.ima.es_lh", R"({"pnl":[[)" + losses + "],[],[],[],[]]}") == "ok");
+    CHECK(code("risk.frtb.ima.es_lh", R"({"pnl":[[)" + body + "],[],[],[],[]]}") == "E_DOMAIN");  // KR-307
     CHECK(code("risk.frtb.ima.es_lh", R"({"es_t":[1,1,1,1,1],"sigma":[1,1,1,1,1]})") == "E_INPUT");
     CHECK(code("risk.frtb.ima.es_lh", R"({"sigma":[1,1,1,1,"Infinity"]})") == "E_DOMAIN");
     CHECK(code("risk.frtb.ima.es_lh", R"({"pnl":[[1],[2],[3]]})") == "E_INPUT");
