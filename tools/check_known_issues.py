@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Every recorded miss and every move to a point release appears in docs/known-issues.md (plan 14.8 K-7, check RE4,
-ruling KR-224, PROPOSED).
+ruling KR-224, confirmed 2026-11-20).
 
     python tools/check_known_issues.py              check the tree
     python tools/check_known_issues.py --self-test  planted faults must fail

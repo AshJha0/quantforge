@@ -1,6 +1,6 @@
 name: Clean machine
 # K-7 clean-machine run (plan 14.8; specifications/12-platform/release-evidence.md check RE1, ruling KR-222,
-# proposed). tutorial.yml already runs every tutorial page and every example in all four languages on a fresh Linux
+# confirmed 2026-11-20; not yet met until these runs are green). tutorial.yml already runs every tutorial page and every example in all four languages on a fresh Linux
 # runner. This workflow adds fresh Windows and macOS runners for the Python build, from CONTRIBUTING's commands only
 # (install uv, `uv sync --locked --project python`), with no cache: every tutorial page's Python block
 # (tools/check_tutorial.py) and every example case and script (tools/check_examples.py). Rust, Java and C++ on

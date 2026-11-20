@@ -168,4 +168,4 @@ Then release v1.0.1 with the fix and a CHANGELOG `## 1.0.1` section that says wh
 
 - Neither the tag run nor `release-verify` has ever run on v1.0.0; the first run is the release itself.
 - `gh attestation verify` output above is recalled, not observed here.
-- Registry publishing (G3b) waits for the owner's own accounts (ruling KR-226); nothing in this runbook publishes to PyPI or crates.io.
+- Registry publishing (G3b) is not done: owner decision 2026-11-20, no PyPI or crates.io accounts (ruling KR-226 and the dated line under it in `specifications/stage-k-rulings-k7.md`). Nothing in this runbook publishes to a registry, and `pip install quantforge` or `cargo add` from a registry will not install this project. Users install v1.0.0 from the release assets (the Python wheel, `quantforge-cli.jar`, the Rust and C++ CLI archives, each listed in `SHA256SUMS` and attested; check them with `gh attestation verify` as above) or build from source with CONTRIBUTING's commands.

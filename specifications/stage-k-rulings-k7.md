@@ -1,6 +1,6 @@
 # Stage K rulings, K-7 release evidence: confirmed 2026-11-20
 
-Status: **CONFIRMED** as written, by the stage K coordinator under the owner's delegation, 2026-11-20. Confirming a row fixes the rule; it does not say the rule is met. Not met at confirmation: KR-222 (Rust, Java and C++ examples do not yet run on Windows and macOS runners; Python only), KR-223 (cannot run before a tag), KR-225 (owner setting, strict is off), KR-226 (owner accounts), KR-227 (no script yet). Written by lane k-w3-spec on 2026-11-19 (commit 80b8f8ea, file `stage-k-rulings-w3.md` on branch `k-w3-spec`) and brought to branch `k-v1-k7` on 2026-11-20 with the K-7 rows only; the K-6 rows (KR-217 to KR-221) and the dashboard rows (KR-211 to KR-216 on that branch) belong to other lanes and are not copied. Reviewer: none: self-assessment; no second review (owner decision 2026-11-18). Spec: `12-platform/release-evidence.md`.
+Status: **CONFIRMED** as written, by the stage K coordinator under the owner's delegation, 2026-11-20. Confirming a row fixes the rule; it does not say the rule is met. Not met at confirmation: KR-222 (Rust, Java and C++ examples do not yet run on Windows and macOS runners; Python only), KR-223 (cannot run before a tag), KR-225 (owner setting, strict is off), KR-226 (owner decision 2026-11-20 below: registry publishing is not done), KR-227 (no script yet). Written by lane k-w3-spec on 2026-11-19 (commit 80b8f8ea, file `stage-k-rulings-w3.md` on branch `k-w3-spec`) and brought to branch `k-v1-k7` on 2026-11-20 with the K-7 rows only; the K-6 rows (KR-217 to KR-221) and the dashboard rows (KR-211 to KR-216 on that branch) belong to other lanes and are not copied. Reviewer: none: self-assessment; no second review (owner decision 2026-11-18). Spec: `12-platform/release-evidence.md`.
 
 **Numbering check (read 2026-11-20 with `git grep` over every remote branch).** KR-222 to KR-227 appear on no branch except `k-w3-spec`, where they mean the same as here. Numbers in use elsewhere: KR-200 to KR-214, KR-230 to KR-242 and KR-250 to KR-256 on `k-v1`; KR-257, KR-260 and KR-300 to KR-326 on other branches (lane brief). The `k-w3-spec` rows KR-200 to KR-216 collide with the `k-v1` rows of the same numbers and are not brought here.
 
@@ -12,6 +12,8 @@ Status: **CONFIRMED** as written, by the stage K coordinator under the owner's d
 | KR-225 | G1k | Owner turns the strict rule on; check reads ruleset 26732064 via the API and a coordinator draft PR behind main shows BEHIND |
 | KR-226 | G3b | Waits for the owner's own free PyPI and crates.io accounts; Claude never creates accounts; moves to v1.0.1 if absent at tag time (K-QF) |
 | KR-227 | G10 | Headless-browser check of every page at 1280 and 375 px (scrollWidth <= 375) and dark mode with pa11y AA; results in the release notes; planted 600 px element must fail |
+
+**Under KR-226, owner decision 2026-11-20** (relayed by the stage K coordinator; the row above is unchanged): "no registry accounts; publishing to PyPI and crates.io is not done and not planned; v1.0.0 is installed from the GitHub release assets, which are checksummed and attested". G3b is therefore stated as "not done: owner decision", not as moved to v1.0.1.
 
 ## Notes from the build lane (k-v1-k7, 2026-11-20)
 

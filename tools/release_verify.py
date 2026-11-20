@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verifies the assets of a published release (plan 14.8 K-7, check RE2, ruling KR-223, PROPOSED).
+"""Verifies the assets of a published release (plan 14.8 K-7, check RE2, ruling KR-223, confirmed 2026-11-20; not met until the first tag run).
 
     gh release download v1.0.0 --repo AshJha0/quantforge --dir assets
     python tools/release_verify.py --dir assets --repo AshJha0/quantforge --out attest.json
