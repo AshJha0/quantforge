@@ -109,7 +109,8 @@ def call(op, inputs):
     return r["outputs"]
 
 
-tlk = json.load(open("datasets/golden/stage_k/tlk_k.json", encoding="utf-8"))["cases"]
+tlk = [c for c in json.load(open("datasets/golden/stage_k/tlk_k.json", encoding="utf-8"))["cases"]
+       if c["inputs"]["observations"] == 250]  # the MAR99 Table 2 rows (tlk_k-0012 on are the KR-253 large-n cases)
 row = [f"{100 * call(c['operation'], c['inputs'])['cumulative_probability']:.2f}" for c in tlk]
 printed = ["8.11", "28.58", "54.32", "75.81", "89.22", "95.88", "98.63", "99.60", "99.89", "99.97", "99.99"]
 print("cumulative % at 250, 0 to 10 exceptions:", " ".join(row))
