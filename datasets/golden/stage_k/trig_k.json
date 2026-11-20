@@ -35,9 +35,10 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 is not blind)",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 was not covered by that match; see the version 2 entry)",
     "SciPy 2*norm.sf(k) outside check of nominal_rate (KR-11): agrees to 1e-14 relative",
-    "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 1e-16 relative"
+    "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 1e-16 relative",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -84,9 +85,10 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 is not blind)",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 was not covered by that match; see the version 2 entry)",
     "SciPy 2*norm.sf(k) outside check of nominal_rate (KR-11): agrees to 1e-14 relative",
-    "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 1e-16 relative"
+    "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 1e-16 relative",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -133,9 +135,10 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 is not blind)",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 was not covered by that match; see the version 2 entry)",
     "SciPy 2*norm.sf(k) outside check of nominal_rate (KR-11): agrees to 1e-14 relative",
-    "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 1e-16 relative"
+    "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 1e-16 relative",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -188,7 +191,8 @@
     "mpmath 50 digits",
     "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 is not blind) on sigma, threshold, false_alarm_rate; fire decided by gap ruling KR-13, not blind",
     "SciPy 2*norm.sf(k) outside check of nominal_rate (KR-11): agrees to 1e-14 relative",
-    "SciPy 2*t.sf(k, 7) outside check of false_alarm_rate (KR-232): agrees to 2e-16 relative"
+    "SciPy 2*t.sf(k, 7) outside check of false_alarm_rate (KR-232): agrees to 2e-16 relative",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -239,9 +243,10 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 is not blind)",
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 was not covered by that match; see the version 2 entry)",
     "SciPy 2*norm.sf(k) outside check of nominal_rate (KR-11): agrees to 1e-14 relative",
-    "SciPy 2*t.sf(k, 7) outside check of false_alarm_rate (KR-232): agrees to 2e-16 relative"
+    "SciPy 2*t.sf(k, 7) outside check of false_alarm_rate (KR-232): agrees to 2e-16 relative",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -383,9 +388,10 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "added 2026-11-19 (branch k-w1-fu) so that every build keeps the stated 2 (1 - Phi(k)) in the far tail: not blind",
+    "added 2026-11-19 (branch k-w1-fu) so that every build keeps the stated 2 (1 - Phi(k)) in the far tail; not in the wave-1 packet, blind re-derived by the K-4c version 2 lane",
     "SciPy 2*norm.sf(k) is 5.7e-14 relative off on nominal_rate (it rounds k / sqrt 2 first): no outside check of nominal_rate",
-    "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 1e-17 relative"
+    "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 2e-16 relative",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -431,7 +437,8 @@
     "hand",
     "mpmath 50 digits",
     "SciPy 2*t.sf(k, 1) outside check of false_alarm_rate (KR-232): agrees to 1e-17 relative",
-    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -477,8 +484,9 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "SciPy 2*t.sf(k, 2) outside check of false_alarm_rate (KR-232): agrees to 2e-16 relative",
-    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+    "SciPy 2*t.sf(k, 2) outside check of false_alarm_rate (KR-232): agrees to 1e-17 relative",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -527,7 +535,8 @@
     "hand",
     "mpmath 50 digits",
     "SciPy 2*t.sf(k, 4) outside check of false_alarm_rate (KR-232): agrees to 2e-16 relative",
-    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -601,7 +610,8 @@
     "hand",
     "mpmath 50 digits",
     "SciPy 2*t.sf(k, 29) outside check of false_alarm_rate (KR-232): agrees to 9e-16 relative",
-    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -895,7 +905,8 @@
     "hand",
     "mpmath 50 digits",
     "SciPy 2*t.sf(k, 249) outside check of false_alarm_rate (KR-232): agrees to 9e-16 relative",
-    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -943,7 +954,8 @@
     "hand",
     "mpmath 50 digits",
     "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 1e-17 relative",
-    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -994,8 +1006,9 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "SciPy 2*t.sf(k, 7) outside check of false_alarm_rate (KR-232): agrees to 2e-15 relative",
-    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+    "SciPy 2*t.sf(k, 7) outside check of false_alarm_rate (KR-232): agrees to 2e-16 relative",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -1169,7 +1182,8 @@
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",

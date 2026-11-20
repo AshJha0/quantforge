@@ -5028,14 +5028,14 @@
     "cases": 113,
     "library-object": 0,
     "library-primitive": 0,
-    "independent-rederivation": 78,
+    "independent-rederivation": 91,
     "reimplementation": 0,
-    "none": 35,
+    "none": 22,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
-    "counted_with_rederivation": 78,
-    "share_with_rederivation": 0.690265,
+    "counted_with_rederivation": 91,
+    "share_with_rederivation": 0.80531,
     "all_cases_share": 0.0,
     "error_and_invariance_cases": 115
    },
@@ -5043,14 +5043,14 @@
     "cases": 113,
     "library-object": 0,
     "library-primitive": 0,
-    "independent-rederivation": 78,
+    "independent-rederivation": 91,
     "reimplementation": 0,
-    "none": 35,
+    "none": 22,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
-    "counted_with_rederivation": 78,
-    "share_with_rederivation": 0.690265,
+    "counted_with_rederivation": 91,
+    "share_with_rederivation": 0.80531,
     "all_cases_share": 0.0,
     "error_and_invariance_cases": 115
    },
@@ -5062,14 +5062,14 @@
      "cases": 14,
      "library-object": 0,
      "library-primitive": 0,
-     "independent-rederivation": 0,
+     "independent-rederivation": 13,
      "reimplementation": 0,
-     "none": 14,
+     "none": 1,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
-     "counted_with_rederivation": 0,
-     "share_with_rederivation": 0.0,
+     "counted_with_rederivation": 13,
+     "share_with_rederivation": 0.928571,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 13
     },
@@ -5347,20 +5347,20 @@
      "cases": 14,
      "library-object": 0,
      "library-primitive": 0,
-     "independent-rederivation": 0,
+     "independent-rederivation": 13,
      "reimplementation": 0,
-     "none": 14,
+     "none": 1,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
-     "counted_with_rederivation": 0,
-     "share_with_rederivation": 0.0,
+     "counted_with_rederivation": 13,
+     "share_with_rederivation": 0.928571,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 7,
      "suites": [
       "trig_k"
      ],
-     "meets_item_floor": false
+     "meets_item_floor": true
     },
     "K-5a": {
      "cases": 12,
@@ -5464,7 +5464,7 @@
     "strict_reading": "a case counted on a printed regulator figure does not count",
     "stage": {
      "cases": 113,
-     "counted": 78
+     "counted": 91
     },
     "per_item": {
      "F (existing traffic_light)": {
@@ -5481,7 +5481,7 @@
      },
      "K-4c": {
       "cases": 14,
-      "counted": 0
+      "counted": 13
      },
      "K-5a": {
       "cases": 12,

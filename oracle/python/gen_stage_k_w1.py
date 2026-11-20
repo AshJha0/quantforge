@@ -487,6 +487,38 @@ AUDIT = ("added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; ru
          "oracle, not blind re-derived")
 AUDIT_K5A_V2 = ("added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and "
                 "oracle; blind re-derived afterwards by the K-5a version 2 lane (next entry)")
+# K-4c version 2 blind lane (program/STAGE_K_BLIND_TRIG_V2.md, compare 2026-11-20, first and only run): 14 of 14
+# value cases MATCH on every output at the goldens' tolerances; trig_k-0004 is not counted (fire gap-decided, KR-13).
+TRIG_V2 = ("blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, "
+           "threshold, false_alarm_rate and nominal_rate")
+TRIG_V2_MATCHED = {1, 2, 3, 4, 5, 9, 10, 11, 12, 13, 14, 15, 16, 21}
+TRIG_V2_NOCREDIT = {4}  # its fire stays gap-decided by KR-13; the entry it already has says so
+
+
+def trig_v2_credit(cases):
+    """Record the K-4c version 2 MATCH; earlier "not blind" notes are restated as history for the counted cases."""
+    restate = [
+        ("false_alarm_rate redefined by KR-232 is not blind)",
+         "false_alarm_rate redefined by KR-232 was not covered by that match; see the version 2 entry)"),
+        ("hand and oracle, not blind re-derived", "hand and oracle; blind re-derived afterwards by the K-4c version 2 lane"),
+        ("in the far tail: not blind", "in the far tail; not in the wave-1 packet, blind re-derived by the K-4c version 2 lane"),
+    ]
+    for c in cases:
+        n = int(c["case_id"].rsplit("-", 1)[1])
+        if n not in TRIG_V2_MATCHED:
+            continue
+        assert c["expected"]["status"] == "ok", c["case_id"]
+        if n not in TRIG_V2_NOCREDIT:
+            vb = []
+            for v in c["verified_by"]:
+                for a, b in restate:
+                    v = v.replace(a, b)
+                vb.append(v)
+            assert not any("not blind" in v for v in vb), (c["case_id"], vb)
+            c["verified_by"] = vb
+        c["verified_by"].append(TRIG_V2)
+
+
 AUDIT_CHANGES = []  # before and after of every changed expected value (oracle/STAGE_K_AUDIT_A_CHECKS.json)
 
 
@@ -605,6 +637,7 @@ def build():
             # compares at 3e-8 (the derived bound), not 1e-14
             s.add("calib.trigger.check", inp, outputs=r, cls="simple_analytic", limit={"absolute": 0.0, "relative": 3e-8},
                   output_classes=oc_t, verified=("hand", ORACLE, AUDIT), tags=tags, description="KR-233: " + desc)
+    trig_v2_credit(s.cases)
     suites.append(s)
 
     s = Suite("idr_k", IDR, G)

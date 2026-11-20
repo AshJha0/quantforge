@@ -35,4 +35,20 @@ What was stripped. From the spec (1.1.0): the "Version 1.1.0 in brief" paragraph
 
 ## Results
 
-(Filled after the compare.)
+Run 2026-11-20, the first and only compare run (evidence class: measured; the hashes and the output are in the repository and can be rechecked).
+
+- Deriver: a separate subagent on Claude Sonnet 5.5 (not Opus 5.5), given only the packet folder and its own folder `C:/Work/Claude/qf-blind/trig_k_v2/`; standard-library Python. Its own statements, not independently logged: it read nothing outside the two folders; the manifest matched on all 5 files.
+- Frozen results: `stage_k_blind/trig_v2/` (with `notes.md` and `blind_ref.py`), committed in 59ef92f2 before the compare. SHA-256 of `blind_results.json` as handed back (CRLF line ends): `c7feabfb28bcdc91314dadcfc9f32dc81ebf06fa40f4503d90456cd1cebb21ea`, recomputed by the builder, equal to the deriver's hash. Git stores the file with LF line ends; the committed blob hashes to `24ab2462c1cdfcb18927e0953bf765a313b940fbf7b6e9367af83219269c3ee2`. The JSON content is the same.
+- Compare: `python -I program/stage_h_blind_w2/trig_v2_compare.py . stage_k_blind/trig_v2/blind_results.json`, script and tolerances fixed in 1aaa62b4; output `stage_k_blind/trig_v2/compare_output.txt`; exit code 0.
+
+| Item | Cases | MATCH | MISMATCH | Eligible | Counted | Needed for 60% | Share |
+|---|---:|---:|---:|---:|---:|---:|---|
+| K-4c (spec 1.1.0) | 14 | 14 | 0 | 13 | 13 | 9 | 13 of 14 (92.9%) |
+
+Every output of every case matches; the largest relative difference on any number is 5.98e-15 (inside 1e-14 and 1e-11). trig_k-0004 matches too (fire false at equality) but is not counted, as fixed above. No mismatch, so nothing to resolve.
+
+Readings the deriver recorded (`stage_k_blind/trig_v2/notes.md`), none ruled as a gap: threshold computed as `(k * sigma) * sqrt(d)`; in the KR-232 remainder loop the stop test before the 2^-500 rescale (the text's order); `nominal_rate` from its own 700-digit Decimal normal tail, rounded once; trig_k-0016 `nominal_rate` underflows to 0.0, which it took as the value. Its notes contain two loose remarks it flagged itself (a wrong degrees-of-freedom guess for one case); the results do not depend on them.
+
+Credit: `verified_by` of the 13 counted cases records this MATCH through `oracle/python/gen_stage_k_w1.py` (`trig_v2_credit`; the earlier "not blind" notes restated as history); trig_k-0004 gets the entry but keeps its KR-13 "not blind" note. `python tools/outside_shares.py --check`: K-4c 13 of 14, 92.9%, met.
+
+What this shows and what it does not: a second model, from the stripped 1.1.0 rules alone, reproduced every output, so KR-232's algorithm and KR-233's arithmetic are stated well enough to implement, and the goldens are not one author's slip. The deriver implemented the algorithm KR-232 gives; this does not show the t-distribution model is the right one (that is the acceptance simulation's job).
