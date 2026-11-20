@@ -314,13 +314,8 @@ def test_the_paper_workflow_commits_only_the_ledger_and_follows_the_recorder() -
     # KA-C4: SOURCE checked before every push
     assert "--forward-log fwd/actions/log.jsonl --summary" in scripts
     assert "git -C fwd remote remove origin" in scripts
-    # the trigger that follows the recorder is written down and withheld with the schedule (see the test below)
-    assert (
-        "  workflow_run:
-    workflows: [Recorder]
-    types: [completed]
-" in PAPER
-    )
+    # the trigger that follows the recorder is restored with the schedule (see the test below)
+    assert "  workflow_run:\n    workflows: [Recorder]\n    types: [completed]\n" in PAPER
     assert RECORDER.startswith("name: Recorder\n")
     assert "Source: US Department of the Treasury." in PAPER
 
