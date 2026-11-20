@@ -286,6 +286,7 @@ def main(argv=None):
     ap.add_argument("--out-dir", default=str(ROOT / "benchmarks" / "results" / "k6"))
     ap.add_argument("--tag", default=datetime.date.today().isoformat())
     ap.add_argument("--plant-leak", action="store_true")
+    ap.add_argument("--leak-every", type=int, default=100, help="planted leak: 1 KiB kept per this many cases")
     ap.add_argument("--progress")
     ap.add_argument("--host", default=os.environ.get("QF_HOST_LABEL", LAPTOP))
     ap.add_argument("--normal-priority", action="store_true")
@@ -295,7 +296,9 @@ def main(argv=None):
         return 2
     out = Path(a.out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    stem = f"soak-{a.impl}-{a.tag}" + ("-planted-leak" if a.plant_leak else "")
+    stem = f"soak-{a.impl}-{a.tag}"
+    if a.plant_leak:
+        stem += "-planted-leak" if a.leak_every == 100 else f"-planted-leak-every-{a.leak_every}"
     work = out / f".{stem}-work"
     work.mkdir(exist_ok=True)
     if not a.normal_priority:
@@ -305,6 +308,7 @@ def main(argv=None):
     argv_, env, pidfile, gclog = command(a.impl, work)
     if a.plant_leak:
         env["QF_SOAK_LEAK"] = "1"
+        env["QF_SOAK_LEAK_EVERY"] = str(a.leak_every)
     if pidfile and pidfile.exists():
         pidfile.unlink()
     if gclog and gclog.exists():
@@ -405,6 +409,7 @@ def main(argv=None):
         "finished_utc": datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds"),
         "minutes": a.minutes,
         "planted_leak": a.plant_leak,
+        "leak_every": a.leak_every if a.plant_leak else None,
         "judged_key": procstat.judged_key(),
         "argv_tail": argv_[1:],
         "golden_cases": len(cases),

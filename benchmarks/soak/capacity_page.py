@@ -35,7 +35,9 @@ def block():
     out = []
     caps = [p for p in sorted(RES.glob("capacity-*.json")) if "planted" not in p.name]
     out.append("### Throughput, latency and batch size\n")
-    out.append("| Build | Row | Status | Cases | Processes | Cases per second | p50 (us) | p99 (us) | Peak memory (MiB) | File |")
+    out.append(
+        "| Build | Row | Status | Cases | Processes | Cases per second | p50 (us) | p99 (us) | Peak memory (MiB) | File |"
+    )
     out.append("|---|---|---|---|---|---|---|---|---|---|")
     for p in caps:
         d = json.loads(p.read_text(encoding="utf-8"))
@@ -49,7 +51,9 @@ def block():
                 f"{fmt(r['p99_us']) if ok else ''} | {fmt(r['peak_judged_mib']) if ok else ''} | `{p.name}` |"
             )
     out.append("\n### Input-size ceilings (documented limits from `specifications/01-core/limits.md`)\n")
-    out.append("| Build | Operation | Size | Limit | Status | Answer | Wall time (s) | Extra memory (MiB) | Request (bytes) |")
+    out.append(
+        "| Build | Operation | Size | Limit | Status | Answer | Wall time (s) | Extra memory (MiB) | Request (bytes) |"
+    )
     out.append("|---|---|---|---|---|---|---|---|---|")
     for p in caps:
         d = json.loads(p.read_text(encoding="utf-8"))

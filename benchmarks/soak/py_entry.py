@@ -4,8 +4,8 @@ Why it exists: on Windows the `python.exe` of a virtual environment is a small l
 interpreter as a child, so the process the harness starts is not the one doing the work. This entry point writes
 its own process id to the file named by QF_SOAK_PIDFILE, so the sampler watches the right process on every platform.
 
-Planted fault (rule 1, KR-218): with QF_SOAK_LEAK=1 it keeps 1 KiB alive for every 100 cases, so the analyser can be
-shown flagging a leak. The library itself is untouched; the leak lives only in this harness file.
+Planted fault (rule 1, KR-218): with QF_SOAK_LEAK=1 it keeps 1 KiB alive for every QF_SOAK_LEAK_EVERY cases (default
+100, the proposed rule's size), so the analyser can be shown flagging a leak. The library itself is untouched; the leak lives only in this harness file.
 """
 
 import os
@@ -22,10 +22,11 @@ if os.environ.get("QF_SOAK_LEAK") == "1":
     _kept: list[bytearray] = []
     _count = [0]
     _real = cli._decode_and_run
+    _every = max(1, int(os.environ.get("QF_SOAK_LEAK_EVERY", "100")))
 
     def _leaky(data: bytes):  # type: ignore[no-untyped-def]
         _count[0] += 1
-        if _count[0] % 100 == 0:
+        if _count[0] % _every == 0:
             _kept.append(bytearray(1024))
         return _real(data)
 
