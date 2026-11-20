@@ -1548,3 +1548,51 @@ EOF
 ```
 
 The first breaks a structural rule and a domain rule: structural comes first, `E_INPUT`. The second breaks a structural rule and the finite rule: the finite rule comes first, `E_DOMAIN` (KR-230). The goldens compare the code only; the messages are the Python build's.
+
+#### Default risk charge: a short bond does not offset a long stock (wave 2, golden drc_k-0007)
+
+Plain idea: the default risk charge asks what the desk loses if an issuer defaults tomorrow. Longs and shorts of the same issuer offset only when the short is at least as senior as the long, because a defaulted senior bond recovers more than a defaulted share. Here the short is a senior bond and the long is the stock: the bond cannot hedge the stock, so both stay in the bucket, and only the hedge benefit ratio gives some credit.
+
+Formal statement (`specifications/06-risk/frtb-drc-rrao.md`, MAR22 read 2026-11-19 by the spec lane; ruling KR-53, PROPOSED). Gross jump-to-default `JTD = LGD x notional + PnL` with `PnL = market value - notional` (0 here), LGD 100% for equity and 75% for senior debt; net per obligor; `HBR = sum net_long / (sum net_long + sum |net_short|)`; `DRC_b = max(sum RW net_long - HBR sum RW |net_short|, 0)`, risk weight 15% for BB.
+
+By hand: stock `JTD = 1.00 x 50 = 50`, bond `JTD = 0.75 x (-40) = -30`; `HBR = 50 / 80 = 0.625`; weighted long `0.15 x 50 = 7.5`, weighted short `0.15 x 30 = 4.5`; `DRC = 7.5 - 0.625 x 4.5 = 4.6875`.
+
+```bash
+uv run --locked --project python quantforge batch <<'EOF'
+{"schema_version":"1.0","case_id":"drc_k-0007","operation":"risk.frtb.drc_nonsec","inputs":{"positions":[{"id":"stock","obligor":"Z","bucket":"CORPORATE","seniority":"EQUITY","notional":50,"market_value":50,"maturity_years":2,"cash_equity":true},{"id":"bond","obligor":"Z","bucket":"CORPORATE","seniority":"SENIOR","notional":-40,"market_value":-40,"maturity_years":2}],"ratings":{"Z":"BB"}}}
+EOF
+```
+
+Output, key fields (Python build, read 2026-11-20): bond `gross_jtd` -30.0, stock `gross_jtd` 50.0, bucket `hbr` 0.625, `wtd_long` 7.5, `wtd_short` 4.5, `drc` 4.6875, with the label "regulatory formula on caller inputs; not a regulatory return". The golden records the same values, a fractions-and-mpmath oracle and a blind MATCH (`program/STAGE_K_BLIND_W2.md`). Limits: one bucket, and a maturity of at least one year, so no maturity scaling (the spec's Limits section).
+
+#### BA-CVA capital for one counterparty (wave 2, golden cva_k-0001)
+
+Plain idea: CVA capital covers the risk that the market value of a counterparty's default risk moves against the bank. The reduced basic approach multiplies a supervisory risk weight by the exposure, its effective maturity and a discount factor, then scales by a fixed 0.65.
+
+Formal statement (`specifications/06-risk/cva-capital.md`, MAR50 read 2026-11-19 by the spec lane): `DF = (1 - exp(-0.05 M)) / (0.05 M)`, `SCVA = (1 / 1.4) RW M EAD DF` (MAR50.15, RW from MAR50.16 Table 1), `K_reduced = sqrt((0.5 sum SCVA)^2 + 0.75 sum SCVA^2)`, capital `0.65 K_reduced` (MAR50.14), `rwa = 12.5 x capital`.
+
+By hand: financials, investment grade, RW 5%; EAD 1,000,000, M 5. `DF = (1 - e^-0.25) / 0.25 = 0.884797`; `SCVA = 0.05 x 5 x 1,000,000 x 0.884797 / 1.4 = 157,999.44`; with one counterparty `K_reduced = SCVA`; capital `0.65 x 157,999.44 = 102,699.64`.
+
+```bash
+uv run --locked --project python quantforge batch <<'EOF'
+{"schema_version":"1.0","case_id":"cva_k-0001","operation":"risk.cva.ba","inputs":{"version":"REDUCED","counterparties":[{"id":"C1","sector":"financials","quality":"IG","netting_sets":[{"ead":1000000,"m":5,"imm":false}]}]}}
+EOF
+```
+
+Output, key fields (Python build, read 2026-11-20): `df` 0.8847968677143805, `scva` and `k_reduced` 157999.44066328224, `capital` 102699.63643113346, `rwa` 1283745.4553891683. The golden's `capital` is 102699.63643113345: the last digit differs, and the case passes inside its stated tolerance. Limits: no hedges (`REDUCED`); the `FULL` version and SA-CVA are in the same spec.
+
+#### Leverage ratio from one derivative netting set (wave 2, golden lev_k-0001)
+
+Plain idea: the leverage ratio is Tier 1 capital over an exposure measure that ignores risk weights, so a bank cannot hold very little capital just because its models call its assets safe. A derivative netting set counts at 1.4 times its replacement cost plus potential future exposure.
+
+Formal statement (`specifications/06-risk/leverage-large-exposures.md`, LEV20 and LEV30 read 2026-11-19 by the spec lane): `RC = max(v - cvm_received + cvm_provided, 0)`, exposure `1.4 (RC + pfe)` per netting set (LEV30.14 to 30.16), `ratio = tier1 / exposure` (LEV20.3), `meets_minimum` when `tier1 >= 0.03 x exposure` (LEV20.7).
+
+By hand, with the netting set of Basel CRE99 Example 1 (V 60, PFE 347): `1.4 x (60 + 347) = 569.8`; `ratio = 100 / 569.8 = 17.55%`, above 3%.
+
+```bash
+uv run --locked --project python quantforge batch <<'EOF'
+{"schema_version":"1.0","case_id":"lev_k-0001","operation":"risk.capital.leverage","inputs":{"tier1":100,"on_balance":[],"derivatives":[{"v":60,"cvm_received":0,"cvm_provided":0,"pfe":347}],"written_credit_derivatives":[],"sfts":[],"off_balance":[]}}
+EOF
+```
+
+Output, key fields (Python build, read 2026-11-20): `derivatives` 569.8, `exposure` 569.8, `ratio` 0.17550017550017552, `meets_minimum` true, label "simplified leverage ratio (LEV30 subset); not a regulatory return". The golden records the Basel printed EAD 569 (CRE99.40) within its stated tolerance of 1.0 and a blind MATCH (`program/STAGE_K_BLIND_K8I.md`). Limits: a simplified subset of LEV30, not a regulatory return.
