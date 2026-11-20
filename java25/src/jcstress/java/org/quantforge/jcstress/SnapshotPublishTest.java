@@ -11,7 +11,7 @@ import org.quantforge.risk.LiveSnapshot.HedgeSnapshot;
 import org.quantforge.risk.LiveSnapshotCell;
 
 /**
- * K-5 (PROPOSED, KR-280, KR-285): the writer builds a snapshot inside its actor and publishes it; the reader must
+ * K-5 (KR-280, KR-285, confirmed 2026-11-20): the writer builds a snapshot inside its actor and publishes it; the reader must
  * see either the initial snapshot or the new one, each whole (checksum intact). Fields from two versions, or a
  * partly constructed record, are FORBIDDEN. Latency-aware analytics on simulated data.
  */

@@ -1,4 +1,4 @@
-"""K-5 snapshot semantics (PROPOSED, KR-280 to KR-288) on the shared scenario
+"""K-5 snapshot semantics (KR-280 to KR-288, confirmed 2026-11-20) on the shared scenario
 datasets/scenarios/k5_snapshot.json. The Python build is a correctness reference, not lock-free: these
 tests check the semantics (whole snapshots, monotone versions, final version seen, exactness), not
 progress. Latency-aware analytics on simulated data."""
@@ -133,3 +133,25 @@ def test_readers_see_only_whole_snapshots_under_thread_switching() -> None:
         sys.setswitchinterval(old)
     assert all(r.torn == 0 and r.mismatched == 0 and r.last_version == 300 for r in reports)
     assert threading.active_count() >= 1
+
+
+def test_k5a_1000_moves_shared_file() -> None:
+    # K-5 acceptance on the shared moves file that all four builds read (datasets/scenarios/k5a_intraday_moves.json):
+    # |estimate - full revaluation| <= bound on every move.
+    import subprocess
+    import sys
+
+    script = ROOT / "datasets" / "scenarios" / "build_k5a_moves.py"
+    assert subprocess.run([sys.executable, str(script), "--check"], check=False).returncode == 0
+    doc = json.loads(
+        (ROOT / "datasets" / "scenarios" / "k5a_intraday_moves.json").read_text(encoding="utf-8")
+    )
+    book = [sk.ZeroPosition(n, t, y) for n, t, y in doc["book"]]
+    assert len(book) == 50 and len(doc["moves"]) == 1000
+    worst = 0.0
+    for h in doc["moves"]:
+        r = sk.delta_gamma_bound(book, h)
+        err = abs(r["estimate_pnl"] - sk.zero_revalue(book, h))
+        assert err <= r["bound"], (h, err, r["bound"])
+        worst = max(worst, err / r["bound"])
+    print(f"k5a moves: 1000 moves, 0 violations, worst |error| / bound = {worst:.6g}")

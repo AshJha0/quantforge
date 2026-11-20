@@ -1,4 +1,4 @@
-//! Stage K, K-5 (PROPOSED spec `12-platform/lock-free-snapshots.md` 0.2.0, rulings KR-280 to KR-288):
+//! Stage K, K-5 (spec `12-platform/lock-free-snapshots.md` 1.0.0, rulings KR-280 to KR-288 confirmed 2026-11-20):
 //! versioned immutable snapshots published by one writer to many readers through single-writer hazard
 //! pointers over a fixed pool (KR-280), and the real-time hedge a snapshot carries (KR-283).
 //! Latency-aware analytics on simulated data.

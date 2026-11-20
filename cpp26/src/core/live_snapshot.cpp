@@ -1,4 +1,4 @@
-// Stage K, K-5 (PROPOSED, KR-283, KR-287): the writer's per-publish hedge computation. Latency-aware analytics on
+// Stage K, K-5 (KR-283, KR-287, confirmed 2026-11-20): the writer's per-publish hedge computation. Latency-aware analytics on
 // simulated data.
 #include "quantforge/core/live_snapshot.hpp"
 

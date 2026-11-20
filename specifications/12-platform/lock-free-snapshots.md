@@ -1,6 +1,6 @@
 # Lock-free snapshots, low-latency risk and real-time hedge (K-5)
 
-Spec version 0.2.0-proposed (stage K, lane k-v1-k5, 2026-11-20). Status: **PROPOSED**; not normative until the stage K coordinator confirms each ruling. Rulings KR-280 to KR-288 (`stage-k-rulings-k5.md`). Built from the proposal 0.1.0 of lane k-w3-spec (branch `k-w3-spec`, rulings KR-190 to KR-196 there, renumbered here because those numbers collide on `k-v1`); section "Changes from 0.1.0" lists what differs. Plan item 14.8 K-5 (the snapshot, race-test, hedge and label parts; the error-bound part is K-5a, `06-risk/intraday-risk-bounds.md`, confirmed). Reviewer: none: self-assessment; no second review (owner decision 2026-11-18).
+Spec version 1.0.0 (stage K, lane k-v1-k5, 2026-11-20). Status: **confirmed 2026-11-20** by the stage K coordinator under the owner's delegation, as written in 0.2.0 (was PROPOSED 0.2.0 the same day). Not met at confirmation: LF5 (no timing run, so no latency is claimed); the three CI jobs `sanitizers-tsan`, `rust-tsan` and `java25-jcstress` have not yet run green; the hedge is a library function with no goldens and no outside check. Rulings KR-280 to KR-288 (`stage-k-rulings-k5.md`). Built from the proposal 0.1.0 of lane k-w3-spec (branch `k-w3-spec`, rulings KR-190 to KR-196 there, renumbered here because those numbers collide on `k-v1`); section "Changes from 0.1.0" lists what differs. Plan item 14.8 K-5 (the snapshot, race-test, hedge and label parts; the error-bound part is K-5a, `06-risk/intraday-risk-bounds.md`, confirmed). Reviewer: none: self-assessment; no second review (owner decision 2026-11-18).
 
 **Every output, table and page of this item says "latency-aware analytics on simulated data".** The market moves come from a fixed integer rule (KR-287); no feed, venue or network is involved, and no claim is made about network, kernel or venue latency. Any timing figure is from a local laptop, not the acceptance machine, and none is published by this lane (no measured file exists yet).
 
@@ -105,7 +105,7 @@ Kept from the 0.1.0 proposal unchanged, H-9 method (`09-microstructure/low-laten
 
 The figures are first-principles ceilings (recalled orders of magnitude, from the 0.1.0 proposal); none is measured.
 
-## Acceptance tests (PROPOSED)
+## Acceptance tests (confirmed 2026-11-20)
 
 | ID | Plan | Test |
 |---|---|---|
@@ -115,8 +115,11 @@ The figures are first-principles ceilings (recalled orders of magnitude, from th
 | LF4 | K-5 | label present on every output and results table |
 | LF5 | H-9 method | S1 to S5 measured after this file's targets are committed; PASS or MISS per row |
 | LF6 | K-5 | every build reproduces the scenario's expected values at 1e-9 relative |
+| LF7 | K-5 (plan 14.8) | intraday risk within its stated bound of full revaluation on the 1,000 shared moves of `datasets/scenarios/k5a_intraday_moves.json` (the K-5a acceptance book, numpy `default_rng(20261118)`), in all four builds |
 
 ## Not done (stated, 2026-11-20)
+
+- The three CI jobs (`sanitizers-tsan`, `rust-tsan`, `java25-jcstress`) have not yet run green.
 
 - LF5: no timing harness and no measurement.
 - The hedge is a library function, not a CLI operation: no goldens, no oracle check beyond the Python reference values of the scenario file.

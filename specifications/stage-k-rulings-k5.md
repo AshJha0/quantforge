@@ -1,6 +1,6 @@
-# Stage K, K-5 rulings (lock-free snapshots, real-time hedge): PROPOSED
+# Stage K, K-5 rulings (lock-free snapshots, real-time hedge): confirmed 2026-11-20
 
-Status: PROPOSED by lane k-v1-k5 on 2026-11-20. Not normative until the stage K coordinator confirms each row. Reviewer: none: self-assessment; no second review (owner decision 2026-11-18). Spec: `12-platform/lock-free-snapshots.md` 0.2.0-proposed. KR-280 to KR-286 are the K-5 rows KR-190 to KR-196 of the k-w3-spec proposal (`stage-k-rulings-w3.md` on branch `k-w3-spec`), renumbered because KR-190 onwards collides on `k-v1`; KR-283 and KR-285 are changed, KR-287 and KR-288 are new. Number block checked free with `git grep` over every remote branch on 2026-11-20.
+Status: proposed by lane k-v1-k5 on 2026-11-20; **all rows KR-280 to KR-288 confirmed as written by the stage K coordinator under the owner's delegation, 2026-11-20** (including KR-283 and KR-285, the R = 16 cap fixed before any CI run). Not met at confirmation: LF5 (no timing run, so no latency is claimed); the three CI jobs `sanitizers-tsan`, `rust-tsan` and `java25-jcstress` have not yet run green; the hedge is a library function with no goldens and no outside check. Reviewer: none: self-assessment; no second review (owner decision 2026-11-18). Spec: `12-platform/lock-free-snapshots.md` 1.0.0. KR-280 to KR-286 are the K-5 rows KR-190 to KR-196 of the k-w3-spec proposal (`stage-k-rulings-w3.md` on branch `k-w3-spec`), renumbered because KR-190 onwards collides on `k-v1`; KR-283 and KR-285 are changed, KR-287 and KR-288 are new. Number block checked free with `git grep` over every remote branch on 2026-11-20.
 
 | ID | Topic | Ruling |
 |---|---|---|

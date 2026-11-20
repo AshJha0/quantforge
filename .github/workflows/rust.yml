@@ -27,7 +27,7 @@ jobs:
       - run: cargo clippy --workspace --all-targets -- -D warnings
       - run: cargo test --workspace
   tsan:
-    # Stage K, K-5 (PROPOSED, KR-285, KR-288): the snapshot race test under ThreadSanitizer. CI only: the pinned
+    # Stage K, K-5 (rulings confirmed 2026-11-20, KR-285, KR-288; not yet green in CI): the snapshot race test under ThreadSanitizer. CI only: the pinned
     # toolchain (1.99.1, stable) cannot build with a sanitizer, so this job uses a dated nightly for this one test
     # and nothing else. Long mode (1,000,000 publishes at R = 1 and 4,
     # 200,000 at R = 16), then both planted faults, which ThreadSanitizer must report.

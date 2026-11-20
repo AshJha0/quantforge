@@ -5,7 +5,7 @@ import org.quantforge.research.StressDrift;
 import org.quantforge.risk.StageK.ZeroPosition;
 
 /**
- * Stage K, K-5 (PROPOSED, KR-283, KR-287): the hedge snapshot the writer publishes, and its per-publish
+ * Stage K, K-5 (KR-283, KR-287, confirmed 2026-11-20): the hedge snapshot the writer publishes, and its per-publish
  * computation. Latency-aware analytics on simulated data. The hedge is a recommended quantity only: no order,
  * no venue.
  */

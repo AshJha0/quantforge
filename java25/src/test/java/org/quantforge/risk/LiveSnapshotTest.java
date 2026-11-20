@@ -25,7 +25,7 @@ import org.quantforge.risk.LiveSnapshot.HedgeSnapshot;
 import org.quantforge.risk.StageK.ZeroPosition;
 
 /**
- * K-5 (PROPOSED, KR-280 to KR-288) on the shared scenario {@code datasets/scenarios/k5_snapshot.json}. The JVM
+ * K-5 (KR-280 to KR-288, confirmed 2026-11-20) on the shared scenario {@code datasets/scenarios/k5_snapshot.json}. The JVM
  * memory-model test is the jcstress profile ({@code src/jcstress}); this is the scenario-level race test.
  * Latency-aware analytics on simulated data; nothing here is timed.
  */
@@ -201,5 +201,36 @@ class LiveSnapshotTest {
         assertEquals(0, nonMonotone.get());
         assertEquals(0, mismatched.get());
         assertEquals(readers, finalSeen.get());
+    }
+
+    @Test
+    void k5a1000MovesSharedFile() throws IOException {
+        // K-5 acceptance on the shared moves file (datasets/scenarios/k5a_intraday_moves.json), the same 50-position
+        // book and 1,000 moves in every build: |estimate - full revaluation| <= bound on every move.
+        Map<?, ?> doc = (Map<?, ?>) Json.parse(Files.readString(Path.of("..", "datasets", "scenarios",
+            "k5a_intraday_moves.json"))).value();
+        List<ZeroPosition> book = new ArrayList<>();
+        for (Object o : (List<?>) doc.get("book")) {
+            List<?> p = (List<?>) o;
+            book.add(new ZeroPosition(((Json.Number) p.get(0)).value(), ((Json.Number) p.get(1)).value(),
+                ((Json.Number) p.get(2)).value()));
+        }
+        List<?> moves = (List<?>) doc.get("moves");
+        assertEquals(50, book.size());
+        assertEquals(1000, moves.size());
+        double worst = 0;
+        int violations = 0;
+        for (Object o : moves) {
+            double h = ((Json.Number) o).value();
+            StageK.Intraday r = StageK.deltaGammaBound(book, h);
+            double err = Math.abs(r.estimatePnl() - StageK.zeroRevalue(book, h));
+            if (!(err <= r.bound())) {
+                violations++;
+            }
+            worst = Math.max(worst, err / r.bound());
+        }
+        System.out.printf("k5a moves: %d moves, %d violations, worst |error| / bound = %.6g%n", moves.size(),
+            violations, worst);
+        assertEquals(0, violations);
     }
 }

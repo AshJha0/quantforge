@@ -1,5 +1,5 @@
-"""Stage K, K-5: versioned immutable snapshots and the real-time hedge they carry (PROPOSED spec
-`specifications/12-platform/lock-free-snapshots.md`, rulings KR-280 to KR-288).
+"""Stage K, K-5: versioned immutable snapshots and the real-time hedge they carry (spec
+`specifications/12-platform/lock-free-snapshots.md` 1.0.0, rulings KR-280 to KR-288, confirmed 2026-11-20).
 
 Latency-aware analytics on simulated data. **This Python build is a correctness reference only: it is
 not lock-free.** A publish takes a `threading.Lock` (one writer is the rule, the lock only makes a

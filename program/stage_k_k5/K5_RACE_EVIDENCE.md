@@ -1,6 +1,6 @@
 # K-5 race-test evidence (lane k-v1-k5, 2026-11-20)
 
-Latency-aware analytics on simulated data; local laptop, not the acceptance machine. Nothing here is timed. Spec `specifications/12-platform/lock-free-snapshots.md` 0.2.0 (PROPOSED); rulings KR-280 to KR-288 (PROPOSED). Reviewer: none: self-assessment; no second review (owner decision 2026-11-18). Every figure below is measured on 2026-11-20 unless marked otherwise.
+Latency-aware analytics on simulated data; local laptop, not the acceptance machine. Nothing here is timed. Spec `specifications/12-platform/lock-free-snapshots.md` 1.0.0 (confirmed 2026-11-20); rulings KR-280 to KR-288 (confirmed 2026-11-20; not met: LF5 timing not run, so no latency claim; three CI jobs not yet green; hedge has no goldens or outside check). Reviewer: none: self-assessment; no second review (owner decision 2026-11-18). Every figure below is measured on 2026-11-20 unless marked otherwise.
 
 ## Java (Windows 11, Temurin 25.0.5, Maven 3.9.9)
 

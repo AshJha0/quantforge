@@ -39,7 +39,7 @@ jobs:
       - run: ctest --test-dir cpp26/build --output-on-failure
       - run: python3 conformance/runner/runner.py --impl cpp
   tsan:
-    # Stage K, K-5 (PROPOSED, KR-285, KR-288): the snapshot race test under ThreadSanitizer, long mode (1,000,000
+    # Stage K, K-5 (rulings confirmed 2026-11-20, KR-285, KR-288; not yet green in CI): the snapshot race test under ThreadSanitizer, long mode (1,000,000
     # publishes at R = 1 and 4, 200,000 at R = 16), then both planted faults, each of which ThreadSanitizer must report. Latency-aware
     # analytics on simulated data; nothing is timed. Clang 23 with libc++, as the cpp26-clang job.
     name: sanitizers-tsan

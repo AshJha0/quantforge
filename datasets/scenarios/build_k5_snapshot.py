@@ -52,7 +52,7 @@ def make() -> dict:
     return {
         "label": sk.LABEL,
         "spec": "specifications/12-platform/lock-free-snapshots.md",
-        "rulings": "specifications/stage-k-rulings-k5.md (KR-280 to KR-288, PROPOSED)",
+        "rulings": "specifications/stage-k-rulings-k5.md (KR-280 to KR-288, confirmed 2026-11-20)",
         "data": "simulated; book drawn from random.Random(20261120); no market data",
         "shift_rule": "version 0: 0; version k >= 1: ((k * 7919) mod 401 - 200) * 5e-5",
         "checksum": {"seed": "0x9E3779B97F4A7C15", "mul": "0x94D049BB133111EB", "rotl": 27},

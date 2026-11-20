@@ -1,4 +1,4 @@
-//! Stage K, K-5 (PROPOSED, KR-280 to KR-288): snapshot semantics on the shared scenario
+//! Stage K, K-5 (KR-280 to KR-288, confirmed 2026-11-20): snapshot semantics on the shared scenario
 //! `datasets/scenarios/k5_snapshot.json`, and the race test. Under `ThreadSanitizer` (nightly,
 //! `-Zsanitizer=thread`) this runs in CI only: the pinned 1.99.1 toolchain is stable. Latency-aware
 //! analytics on simulated data; nothing here is timed.

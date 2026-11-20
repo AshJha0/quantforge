@@ -30,7 +30,7 @@ jobs:
       - run: mvn -B test
         working-directory: java25
   jcstress:
-    # Stage K, K-5 (PROPOSED, KR-285, KR-288): jcstress 0.16 over the snapshot cell in its default mode. Clean means
+    # Stage K, K-5 (rulings confirmed 2026-11-20, KR-285, KR-288; not yet green in CI): jcstress 0.16 over the snapshot cell in its default mode. Clean means
     # no FORBIDDEN outcome; the planted fault (InPlaceMutationFault) is graded interesting and its count is in the
     # uploaded report. Latency-aware analytics on simulated data; nothing is timed.
     name: java25-jcstress

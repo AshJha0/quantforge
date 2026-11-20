@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.ToLongFunction;
 
 /**
- * Stage K, K-5 (PROPOSED spec {@code 12-platform/lock-free-snapshots.md} 0.2.0, ruling KR-280): one writer
+ * Stage K, K-5 (spec {@code 12-platform/lock-free-snapshots.md} 1.0.0, ruling KR-280, confirmed 2026-11-20): one writer
  * publishes immutable snapshots to many readers. Latency-aware analytics on simulated data.
  *
  * <p>The current snapshot sits in one {@link AtomicReference}: the writer builds an immutable value (a record

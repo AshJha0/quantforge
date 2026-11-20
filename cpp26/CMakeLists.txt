@@ -206,7 +206,7 @@ if(QF_LOWLAT_BENCH)
   endif()
 endif()
 
-# Stage K, K-5 (PROPOSED, KR-280 to KR-288): lock-free snapshots and the real-time hedge. The race test is its own
+# Stage K, K-5 (KR-280 to KR-288, confirmed 2026-11-20): lock-free snapshots and the real-time hedge. The race test is its own
 # executable without Catch2, so a ThreadSanitizer build (-DQF_SANITIZE=thread) can build just this target.
 target_sources(quantforge_core PRIVATE src/core/live_snapshot.cpp)
 if(BUILD_TESTING)
@@ -216,6 +216,7 @@ if(BUILD_TESTING)
   target_compile_definitions(qf_snapshot_race PRIVATE QF_REPO_DIR="${CMAKE_CURRENT_SOURCE_DIR}/..")
   qf_strict(qf_snapshot_race)
   add_test(NAME qf_snapshot_unit COMMAND qf_snapshot_race unit)
+  add_test(NAME qf_k5a_moves COMMAND qf_snapshot_race moves)
   foreach(r 1 4 16)
     add_test(NAME qf_snapshot_race_r${r} COMMAND qf_snapshot_race race ${r})
   endforeach()

@@ -1,7 +1,8 @@
-// Stage K, K-5 (PROPOSED, KR-280 to KR-288): snapshot semantics on the shared scenario
+// Stage K, K-5 (KR-280 to KR-288, confirmed 2026-11-20): snapshot semantics on the shared scenario
 // datasets/scenarios/k5_snapshot.json, and the race test that ThreadSanitizer runs. Latency-aware analytics on
 // simulated data; nothing here is timed.
 //
+//   qf_snapshot_race moves                     K-5 acceptance: 1,000 shared moves inside the intraday bound
 //   qf_snapshot_race unit                      scenario values, exactness on 1,000 publishes, checksum, faults 4
 //   qf_snapshot_race race R [P] [none|relaxed|skip]   1 writer, R readers, P publishes (default QF_SNAPSHOT_PUBLISHES
 //                                                     or the scenario's publishes_default)
@@ -178,12 +179,40 @@ int race(const Scenario& sc, std::size_t readers, std::uint64_t publishes, qs::F
     return (torn == 0 && nonmono == 0 && mism == 0 && last_min == publishes) ? 0 : 1;
 }
 
+// K-5 acceptance on the shared moves file (datasets/scenarios/k5a_intraday_moves.json, the same 50-position book and
+// 1,000 moves in every build): |estimate - full revaluation| <= bound on every move.
+int moves() {
+    std::ifstream in(std::string(QF_REPO_DIR) + "/datasets/scenarios/k5a_intraday_moves.json", std::ios::binary);
+    std::stringstream ss;
+    ss << in.rdbuf();
+    const auto root = quantforge::json::parse(ss.str()).value;
+    std::vector<sk::ZeroPosition> book;
+    for (const auto& p : root.find("book")->items) book.push_back({p.items[0].number, p.items[1].number, p.items[2].number});
+    expect(book.size() == 50, "50 positions");
+    const auto& hs = root.find("moves")->items;
+    expect(hs.size() == 1000, "1,000 moves");
+    double worst = 0.0;
+    int violations = 0;
+    for (const auto& hv : hs) {
+        const double h = hv.number;
+        const auto r = sk::delta_gamma_bound(book, h);
+        const double err = std::fabs(r.estimate_pnl - sk::zero_revalue(book, h));
+        if (!(err <= r.bound)) ++violations;
+        if (err / r.bound > worst) worst = err / r.bound;
+    }
+    expect(violations == 0, "every move inside its bound");
+    std::printf("k5a moves: %zu moves, %d violations, worst |error| / bound = %.6g
+", hs.size(), violations, worst);
+    return failures == 0 ? 0 : 1;
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
     const Scenario sc = load();
     const std::string mode = argc > 1 ? argv[1] : "unit";
     if (mode == "unit") return unit(sc);
+    if (mode == "moves") return moves();
     if (mode == "race" && argc > 2) {
         const auto readers = static_cast<std::size_t>(std::strtoull(argv[2], nullptr, 10));
         auto publishes = static_cast<std::uint64_t>(sc.root.find("race")->find("publishes_default")->number);
@@ -197,6 +226,6 @@ int main(int argc, char** argv) {
         }
         return race(sc, readers, publishes, fault);
     }
-    std::fprintf(stderr, "usage: qf_snapshot_race unit | race R [P] [none|relaxed|skip]\n");
+    std::fprintf(stderr, "usage: qf_snapshot_race unit | moves | race R [P] [none|relaxed|skip]\n");
     return 2;
 }
