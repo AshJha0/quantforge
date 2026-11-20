@@ -1,6 +1,6 @@
 # Stop note, lane k-xva-spec (2026-11-20)
 
-Written before the 23:00 UTC shutdown. Branch `k-xva-spec`, pushed; no PR (lane rules). `origin/k-v1` was merged in at 2633f416 (one conflict, the generated `specifications/name-map.json`, regenerated).
+Written before the 23:00 UTC shutdown. Repo gates: 0 failures on the pushed head (local laptop, not the acceptance machine); build_site 0 broken links; test_preregs OK. Branch `k-xva-spec`, pushed; no PR (lane rules). `origin/k-v1` was merged in at 2633f416 (one conflict, the generated `specifications/name-map.json`, regenerated).
 
 | Item | State | Evidence |
 |---|---|---|
