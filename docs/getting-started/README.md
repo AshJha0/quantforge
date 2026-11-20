@@ -1,6 +1,6 @@
 # Tutorials
 
-Fifty-eight guided tutorials (51 to 58 cover stage K, not yet released), each 10 to 15 minutes, that walk through what QuantForge already does. Each one starts from small synthetic data you can follow by hand, runs it in Python first, then sends the same operations to the Rust, Java and C++ builds, which print the same digits. Every number on every page is real output, and CI runs each page in all four languages and fails if a printed line differs (`.github/workflows/tutorial.yml`, `tools/check_tutorial.py`). Eight further pages, 51 to 58, are stage K drafts for work not yet merged; they are listed apart under [Stage K, in progress](#stage-k-in-progress).
+Fifty-eight guided tutorials (51 to 58 cover stage K round 1, released in v0.10.1), each 10 to 15 minutes, that walk through what QuantForge already does. Each one starts from small synthetic data you can follow by hand, runs it in Python first, then sends the same operations to the Rust, Java and C++ builds, which print the same digits. Every number on every page is real output, and CI runs each page in all four languages and fails if a printed line differs (`.github/workflows/tutorial.yml`, `tools/check_tutorial.py`). Pages 51 to 58 are listed apart under [Stage K, in progress](#stage-k-in-progress); stage K continues toward v1.0.0.
 
 Each tutorial explains its results in the same order: the plain idea, the formal statement from the spec, then a worked example with a check you can do in your head. Each ends with notes for practitioners, common mistakes, what you just did, and references.
 
@@ -61,7 +61,7 @@ Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the f
 
 ## Stage K, in progress
 
-These eight pages cover stage K round 1. They are not released: the operations they describe are merged to `main` (2026-11-19, pull request #58), in all four builds, and none is in a tag. Each page first restates the spec's rule with the standard library on the golden inputs; Tutorials 51 to 57 then call the library in Step 2 through the Python build, and CI checks that Step 2 prints the page's lines (turned on at integration, `program/STAGE_K_DOCS_PENDING.md`). Tutorial 58 checks Step 1 only, because the paper ledger is not running yet. Numbers are taken from evidence files and goldens, and each page names the file.
+These eight pages cover stage K round 1. They are released in v0.10.1 (2026-11-20, pull requests #58 and #59), in all four builds. Each page first restates the spec's rule with the standard library on the golden inputs; Tutorials 51 to 57 then call the library in Step 2 through the Python build, and CI checks that Step 2 prints the page's lines (turned on at integration, `program/STAGE_K_DOCS_PENDING.md`). Tutorial 58 checks Step 1 only, because the paper ledger had 0 recorded days at the release (it is scheduled from v0.10.1). Numbers are taken from evidence files and goldens, and each page names the file.
 
 | Tutorial | What you do | Operations | Stage |
 |---|---|---|---|
