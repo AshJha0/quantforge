@@ -56,6 +56,9 @@ def test_first_at_least() -> None:
     assert _fal(1, 0.01, 0.9999) == 1
     assert _fal(2, 0.5, 0.7) == 1
     assert _fal(2, 0.5, 0.999) == 2
+    # exact ties in binary64 (KF-10): P(X <= 1) equals the level, so k = 1; kills `>=` -> `>`
+    assert _fal(2, 0.01, 0.9999) == 1  # the KA-A17 tie
+    assert _fal(2, 0.5, 0.75) == 1
 
 
 @pytest.mark.parametrize(
