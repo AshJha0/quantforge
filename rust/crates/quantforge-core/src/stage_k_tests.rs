@@ -102,14 +102,21 @@ fn bitemporal_log_checks_in_order() {
 }
 
 #[test]
-fn bitemporal_finite_then_limit() {
+fn bitemporal_limit_then_finite_then_log() {
     let mut log = golden_log();
     log[0].value = Json::Num(f64::NAN);
     assert_eq!(code(bitemporal_query(&log, "A", T0, T0)), "E_DOMAIN");
-    // E_DOMAIN outranks E_LIMIT; E_INPUT outranks E_DOMAIN.
-    assert_eq!(code(query_within(&log, "A", T0, T0, 1)), "E_DOMAIN");
+    // KR-230 (HR-122): E_LIMIT outranks the finite rule, which outranks a structural E_INPUT.
+    assert_eq!(code(query_within(&log, "A", T0, T0, 1)), "E_LIMIT");
     log[1].sequence = 0;
-    assert_eq!(code(query_within(&log, "A", T0, T0, 1)), "E_INPUT");
+    assert_eq!(code(query_within(&log, "A", T0, T0, 4)), "E_DOMAIN");
+    log[0].value = Json::Int(1);
+    assert_eq!(code(query_within(&log, "A", T0, T0, 4)), "E_INPUT");
+    // KR-231: the generic array cap, before log check 2 (A2)
+    assert_eq!(MAX_RECORDS, 100_000);
+    let same = vec![rec(1, "A", T0, None, T0, 0, false); MAX_RECORDS + 1];
+    let e = bitemporal_query(&same, "A", T0, T0).unwrap_err();
+    assert_eq!((e.code, e.field.as_deref()), ("E_LIMIT", Some("records")));
     let log = golden_log();
     let e = query_within(&log, "A", T0, T0, 3).unwrap_err();
     assert_eq!((e.code, e.field.as_deref()), ("E_LIMIT", Some("records")));
@@ -126,9 +133,12 @@ fn par_annual_golden_and_errors() {
     assert_eq!((e.code, e.field.as_deref()), ("E_DOMAIN", Some("quotes")));
     assert!(par_annual(&[0.01; MAX_QUOTES]).is_ok());
     assert_eq!(code(par_annual(&[0.01; MAX_QUOTES + 1])), "E_LIMIT");
+    // KR-230: the size limit before the domain check and the finite rule
     let mut q = vec![0.01; MAX_QUOTES + 1];
     q[5] = -2.0;
-    assert_eq!(code(par_annual(&q)), "E_DOMAIN");
+    assert_eq!(code(par_annual(&q)), "E_LIMIT");
+    q[6] = f64::NAN;
+    assert_eq!(code(par_annual(&q)), "E_LIMIT");
 }
 
 const PQ: [f64; 3] = [0.02, 0.025, 0.03];
@@ -163,8 +173,8 @@ fn incremental_errors_in_order() {
     assert_eq!(code(incremental_update(&[], &[], &[])), "E_INPUT");
     assert_eq!(code(incremental_update(&PQ, &PD[..2], &new)), "E_INPUT");
     assert_eq!(code(incremental_update(&PQ, &PD, &new[..2])), "E_INPUT");
-    // structural E_INPUT before the finite rule
-    assert_eq!(code(incremental_update(&PQ, &PD, &[f64::NAN])), "E_INPUT");
+    // KR-230: the finite rule before the structural E_INPUT
+    assert_eq!(code(incremental_update(&PQ, &PD, &[f64::NAN])), "E_DOMAIN");
     let nan = [0.02, f64::NAN, 0.03];
     let e = incremental_update(&nan, &PD, &new).unwrap_err();
     assert_eq!(
@@ -214,10 +224,18 @@ fn incremental_sign_of_zero_and_limit() {
     let e = incremental_update(&big, &df, &big).unwrap_err();
     assert_eq!(
         (e.code, e.field.as_deref()),
+        ("E_LIMIT", Some("previous_quotes"))
+    );
+    let e = incremental_update(&PQ, &PD, &big).unwrap_err();
+    assert_eq!(
+        (e.code, e.field.as_deref()),
         ("E_LIMIT", Some("new_quotes"))
     );
+    let e = incremental_update(&PQ, &df, &PQ).unwrap_err();
+    assert_eq!(e.field.as_deref(), Some("previous_discount_factors"));
+    // KR-230: E_LIMIT before the stale-cache E_INPUT
     let stale = vec![0.5; MAX_QUOTES + 1];
-    assert_eq!(code(incremental_update(&big, &stale, &big)), "E_INPUT");
+    assert_eq!(code(incremental_update(&big, &stale, &big)), "E_LIMIT");
 }
 
 const CH: [f64; 4] = [1.0, -1.0, 1.0, -1.0];
@@ -228,7 +246,9 @@ fn trigger_golden() {
     assert!(t.fire);
     assert_eq!(t.sigma, 1.1547005383792515);
     assert_eq!(t.threshold, 3.4641016151377544);
-    assert!((t.false_alarm_rate - 0.002699796063260189).abs() <= 1e-10 * 0.0027);
+    assert!((t.nominal_rate - 0.002699796063260189).abs() <= 1e-10 * 0.0027);
+    // KR-232: 2 t_3.sf(3), the Python reference value (class tail_probability, 1e-11 relative)
+    assert!(rel(t.false_alarm_rate, 0.05766888562243732) <= 1e-11);
     assert!(!trigger_check(&CH, 100.0, 102.0, 1.0, 3.0).unwrap().fire);
     let t = trigger_check(&CH, 100.0, 105.0, 4.0, 3.0).unwrap();
     assert!(!t.fire);
@@ -237,22 +257,30 @@ fn trigger_golden() {
     let ch = [0.5, -1.0, 1.5, -0.5, 0.0, 1.0, -1.5, 0.0];
     let t = trigger_check(&ch, 0.0, 2.5, 1.0, 2.5).unwrap();
     assert_eq!((t.fire, t.sigma, t.threshold), (false, 1.0, 2.5));
-    assert!((t.false_alarm_rate - 0.01241933065155227).abs() <= 1e-10 * 0.0125);
+    assert!((t.nominal_rate - 0.01241933065155227).abs() <= 1e-10 * 0.0125);
+    assert!(rel(t.false_alarm_rate, 0.04099221858575289) <= 1e-11);
     assert!(trigger_check(&ch, 0.0, -2.5000001, 1.0, 2.5).unwrap().fire);
     // a small k takes the erf branch of the normal tail
     let t = trigger_check(&CH, 0.0, 0.0, 1.0, 0.5).unwrap();
-    assert!((t.false_alarm_rate - 0.6170750774519739).abs() <= 1e-13);
+    assert!((t.nominal_rate - 0.6170750774519739).abs() <= 1e-13);
+    assert!(rel(t.false_alarm_rate, 0.651447964848151) <= 1e-11);
     // KR-6 states 2 (1 - Phi(k)) = 2 Phi(-k); at k = 30 a bare erfc(k / sqrt 2) is 1.2e-13 off
     // (trig_k-0009, mpmath 50 digits); the same formula in all four builds, within 1e-14.
     let t = trigger_check(&CH, 100.0, 105.0, 1.0, 30.0).unwrap();
-    assert_eq!(t.false_alarm_rate, 2.0 * crate::stats::normal_cdf(-30.0));
-    assert!((t.false_alarm_rate / 9.813427854296374e-198 - 1.0).abs() <= 1e-14);
+    assert_eq!(t.nominal_rate, 2.0 * crate::stats::normal_cdf(-30.0));
+    assert!((t.nominal_rate / 9.813427854296374e-198 - 1.0).abs() <= 1e-14);
+    assert!(rel(t.false_alarm_rate, 8.13528042716396e-05) <= 1e-11);
 }
 
 #[test]
 fn trigger_errors_in_order() {
+    // KR-230: the finite rule before the structural E_INPUT
     assert_eq!(
         code(trigger_check(&[1.0], 100.0, f64::NAN, 1.0, 3.0)),
+        "E_DOMAIN"
+    );
+    assert_eq!(
+        code(trigger_check(&[1.0], 100.0, 105.0, 1.0, 3.0)),
         "E_INPUT"
     );
     let e = trigger_check(&[1.0, f64::NAN], 100.0, 105.0, 1.0, 3.0).unwrap_err();
@@ -270,16 +298,22 @@ fn trigger_errors_in_order() {
     );
     let e = trigger_check(&[1.0, 1.0, 1.0], 100.0, 105.0, 1.0, 3.0).unwrap_err();
     assert_eq!((e.code, e.field.as_deref()), ("E_DOMAIN", Some("changes")));
+    // KR-233 (KA-A5): a constant window whose binary64 sigma is 1.7e-17, not 0
+    let e = trigger_check(&[0.1, 0.1, 0.1], 0.0, 0.0, 1.0, 3.0).unwrap_err();
+    assert_eq!((e.code, e.field.as_deref()), ("E_DOMAIN", Some("changes")));
     assert_eq!(
         code(trigger_within(&CH, 100.0, 105.0, 1.0, 3.0, 3)),
         "E_LIMIT"
     );
+    // KR-230: E_LIMIT before E_DOMAIN and before the finite rule
     assert_eq!(
         code(trigger_within(&CH, 100.0, 105.0, 1.0, -1.0, 3)),
-        "E_DOMAIN"
+        "E_LIMIT"
     );
     let big: Vec<f64> = CH.iter().copied().cycle().take(MAX_CHANGES + 2).collect();
     assert_eq!(code(trigger_check(&big, 0.0, 0.0, 1.0, 3.0)), "E_LIMIT");
+    let nans = vec![f64::NAN; MAX_CHANGES + 1];
+    assert_eq!(code(trigger_check(&nans, 0.0, 0.0, 1.0, 3.0)), "E_LIMIT");
 }
 
 fn pos(n: f64, t: f64, y: f64) -> ZeroPosition {
@@ -298,10 +332,11 @@ fn rel(a: f64, b: f64) -> f64 {
 fn intraday_golden() {
     let book = [pos(1e6, 5.0, 0.04)];
     for (h, est, bound) in [
-        (0.01, -39913.124212551615, 17.05689068912462),
-        (-0.01, 41959.95109524657, 17.93141617552204),
-        (0.0025, -10170.171073390557, 0.2665139170175722),
-        (0.05, -179097.35223580853, 2132.1113361405783),
+        // KR-234 bounds (Lagrange bound plus rounding allowance), the Python reference values
+        (0.01, -39913.124212551615, 17.056890689308766),
+        (-0.01, 41959.95109524657, 17.931416175710734),
+        (0.0025, -10170.171073390557, 0.2665139170617964),
+        (0.05, -179097.35223580853, 2132.111336141709),
     ] {
         let r = delta_gamma_bound(&book, h).unwrap();
         assert!(rel(r.estimate_pnl, est) <= 1e-12, "{h}");
@@ -311,14 +346,16 @@ fn intraday_golden() {
     let book = [pos(1e6, 5.0, 0.04), pos(-5e5, 2.0, 0.03)];
     let r = delta_gamma_bound(&book, 0.01).unwrap();
     assert!(rel(r.estimate_pnl, -30589.655330067555) <= 1e-12);
-    assert!(rel(r.bound, 17.684733711514124) <= 1e-12);
+    assert!(rel(r.bound, 17.684733711734584) <= 1e-12);
     let r = delta_gamma_bound(&[pos(1.0, 1.0, 0.0)], 0.0).unwrap();
     assert_eq!((r.estimate_pnl, r.bound), (0.0, 0.0));
 }
 
 #[test]
 fn intraday_errors_in_order() {
-    assert_eq!(code(delta_gamma_bound(&[], f64::NAN)), "E_INPUT");
+    // KR-230: the finite rule before the structural E_INPUT
+    assert_eq!(code(delta_gamma_bound(&[], f64::NAN)), "E_DOMAIN");
+    assert_eq!(code(delta_gamma_bound(&[], 0.01)), "E_INPUT");
     let e = delta_gamma_bound(&[pos(1.0, f64::NAN, 0.0)], 0.01).unwrap_err();
     assert_eq!(
         (e.code, e.field.as_deref()),
@@ -334,7 +371,8 @@ fn intraday_errors_in_order() {
     let book = [pos(1.0, 1.0, 0.0), pos(1.0, 2.0, 0.0)];
     assert_eq!(code(intraday_within(&book, 0.01, 1)), "E_LIMIT");
     let bad = [pos(1.0, 1.0, 0.0), pos(1.0, -2.0, 0.0)];
-    assert_eq!(code(intraday_within(&bad, 0.01, 1)), "E_DOMAIN");
+    assert_eq!(code(intraday_within(&bad, 0.01, 1)), "E_LIMIT");
+    assert_eq!(code(intraday_within(&bad, 0.01, 2)), "E_DOMAIN");
     let big = vec![pos(1.0, 1.0, 0.0); MAX_POSITIONS + 1];
     assert_eq!(code(delta_gamma_bound(&big, 0.01)), "E_LIMIT");
 }
@@ -377,10 +415,12 @@ fn richardson_cases() {
 
 #[test]
 fn richardson_errors_in_order() {
+    // KR-230: the finite rule before the structural E_INPUT
     assert_eq!(
         code(richardson_check(&[1.0, f64::NAN], 0.5, 2.0)),
-        "E_INPUT"
+        "E_DOMAIN"
     );
+    assert_eq!(code(richardson_check(&[1.0], 0.5, 2.0)), "E_INPUT");
     assert_eq!(
         code(richardson_check(&[1.0, 2.0, 3.0, 4.0], 2.0, 2.0)),
         "E_INPUT"
@@ -529,4 +569,116 @@ proptest! {
             prop_assert!(old[j0] != new[j0]);
         }
     }
+}
+
+/// KR-232: the Student-t tail against the Python reference (`stage_k.student_t_two_sided_tail`),
+/// class `tail_probability` (1e-11 relative); a value that underflows to 0 there is 0 here.
+#[test]
+fn student_t_tail_matches_the_reference() {
+    let want = [
+        (1, 0.5, 0.7048327646991335),
+        (1, 3.0, 0.20483276469913345),
+        (1, 30.0, 0.02121280481107085),
+        (1, 1e4, 6.366197702455154e-05),
+        (2, 0.5, 0.6666666666666667),
+        (2, 3.0, 0.09546596626670911),
+        (2, 30.0, 0.0011092626819596593),
+        (2, 1e4, 9.999999850000006e-09),
+        (3, 0.5, 0.651447964848151),
+        (3, 3.0, 0.05766888562243732),
+        (3, 30.0, 8.13528042716396e-05),
+        (3, 1e4, 2.2053155022958095e-12),
+        (4, 0.5, 0.6433299631818632),
+        (4, 3.0, 0.0399419680717188),
+        (4, 30.0, 7.352856097661315e-06),
+        (4, 1e4, 5.999999600000019e-16),
+        (29, 0.5, 0.6208480841937815),
+        (29, 3.0, 0.0054991921339034135),
+        (29, 30.0, 2.1977448450987984e-23),
+        (29, 1e4, 2.3537866088124234e-96),
+        (249, 0.5, 0.6175166511131459),
+        (249, 3.0, 0.0029737859324150294),
+        (249, 30.0, 1.1828804310465052e-84),
+        (249, 1e4, 0.0),
+        (1000, 0.5, 0.6171850808338741),
+        (1000, 3.0, 0.0027667090442382446),
+        (1000, 30.0, 1.5374687444043042e-141),
+        (1000, 1e4, 0.0),
+    ];
+    for (nu, k, w) in want {
+        let got = student_t_two_sided_tail(nu, k);
+        if w == 0.0 {
+            assert_eq!(got, 0.0, "{nu} {k}");
+        } else {
+            assert!(rel(got, w) <= 1e-11, "{nu} {k}: {got} vs {w}");
+        }
+    }
+}
+
+/// KR-234 acceptance, binary64 half: `|estimate - V_64| <= bound` on every book of the sweep at
+/// every move (`V_64` the binary64 revaluation `zero_revalue`). The books follow the Python test
+/// `test_intraday_bound_small_move_sweep`: every single position of the grid, hedged books,
+/// delta-neutral pairs and 300 seeded random books (here a `SplitMix64` stream, seed 20261119; the
+/// Python books use `random.Random(20261119)`, so the random books differ, the rule does not).
+#[test]
+fn intraday_bound_small_move_sweep() {
+    let mut hs = vec![0.0];
+    for e in [30, 25, 20, 16, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1] {
+        for x in [1.0, -1.0] {
+            hs.push(x * 10f64.powi(-e));
+        }
+    }
+    hs.extend([0.5, -0.5, 1.0, -1.0, 1.0 / 3.0, -0.07]);
+    let ts = [1e-6, 1e-3, 0.25, 1.0, 5.0, 30.0, 100.0];
+    let ys = [-1.0, -0.01, 0.0, 0.04, 0.3, 1.0];
+    let ns = [0.0, 1e-6, 1.0, 1e6, -1e6, 1e15, -1e15];
+    let mut books: Vec<Vec<ZeroPosition>> = Vec::new();
+    for &n in &ns {
+        for &t in &ts {
+            for &y in &ys {
+                books.push(vec![pos(n, t, y)]);
+            }
+        }
+    }
+    for &t in &ts {
+        for &y in &ys {
+            books.push(vec![pos(1e6, t, y), pos(-1e6 * (1.0 + 1e-12), t, y)]);
+            books.push(vec![pos(1e6, t, y), pos(-1e6, t, y)]);
+            if 2.0 * t <= 100.0 {
+                let n2 = -1e6 * t * (-y * t).exp() / (2.0 * t * (-y * 2.0 * t).exp());
+                books.push(vec![pos(1e6, t, y), pos(n2, 2.0 * t, y)]);
+            }
+        }
+    }
+    let mut s: u64 = 20261119;
+    let mut next = || {
+        s = s.wrapping_add(0x9E37_79B9_7F4A_7C15);
+        let mut z = s;
+        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+        z ^= z >> 31;
+        (z >> 11) as f64 / (1u64 << 53) as f64
+    };
+    for _ in 0..300 {
+        let size = 1 + (next() * 20.0) as usize;
+        let book = (0..size)
+            .map(|_| {
+                let n = -1e9 + 2e9 * next();
+                let t = ts[(next() * ts.len() as f64) as usize] * (0.5 + 0.5 * next());
+                let y = -0.05 + 0.15 * next();
+                pos(n, t, y)
+            })
+            .collect();
+        books.push(book);
+    }
+    let mut cases = 0;
+    for book in &books {
+        for &h in &hs {
+            let r = delta_gamma_bound(book, h).unwrap();
+            let gap = (r.estimate_pnl - zero_revalue(book, h)).abs();
+            assert!(gap <= r.bound, "{book:?} {h}: {gap} > {}", r.bound);
+            cases += 1;
+        }
+    }
+    assert!(cases > 20_000, "{cases}");
 }

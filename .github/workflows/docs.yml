@@ -2,12 +2,18 @@ name: Docs
 # Checks the Curves gallery against the Python CLI, builds the static site and keeps it as a 7-day artifact. On a public repository, a push to main also
 # deploys it to GitHub Pages. The deploy job skips while the repository is private, because Pages on a
 # private repository needs a paid plan. Settings > Pages > Source must be set to GitHub Actions.
+# K-7 check RE9 (G10, ruling KR-227, confirmed 2026-11-20): docs-site-view opens every page of the built site in
+# headless Chrome at 1280 px and at 375 px (light and dark) and fails if a page is wider than the window or a
+# Mermaid diagram did not render (tools/check_site_view.py, after its planted faults fail); docs-site also runs
+# pa11y AA a second time on a copy of the site with the dark colours forced on. docs-site-view-summary writes the
+# table the release notes quote (artifact site-view, file site-view.md). Added 2026-11-20 on branch k-v1-k7b; not
+# yet run in CI.
 on:
   push:
     branches: [main]
-    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
+    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/check_site_view.py', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
   pull_request:
-    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
+    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/check_site_view.py', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -18,7 +24,7 @@ jobs:
   site:
     name: docs-site
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -38,6 +44,14 @@ jobs:
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 --directory site >/dev/null 2>&1 &
           npx --yes pa11y-ci@3.1.0 --config .pa11yci.json
+      # The same pages in dark mode (K-7, KR-227): --dark-copy applies the prefers-color-scheme: dark rules
+      # unconditionally and fails if it finds none to force
+      - name: accessibility in dark mode (pa11y-ci on the dark copy)
+        run: |
+          python3 tools/check_site_view.py --dark-copy site "$RUNNER_TEMP/site-dark"
+          python3 -m http.server 8001 --bind 127.0.0.1 --directory "$RUNNER_TEMP/site-dark" >/dev/null 2>&1 &
+          sed 's#127.0.0.1:8000/#127.0.0.1:8001/#' .pa11yci.json > "$RUNNER_TEMP/pa11y-dark.json"
+          npx --yes pa11y-ci@3.1.0 --config "$RUNNER_TEMP/pa11y-dark.json"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: docs-site
@@ -47,6 +61,59 @@ jobs:
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: site/
+  site-view:
+    name: docs-site-view
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ['1/2', '2/2']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - run: uv run --no-project --with markdown==3.11.2 python tools/build_site.py --out site
+      # Playwright drives the runner's installed Google Chrome (--channel chrome): no browser download
+      - name: site check self-test (planted 600 px element and broken Mermaid block must fail)
+        run: uv run --no-project --with playwright==1.64.1 python tools/check_site_view.py --self-test
+      - name: site check, every page of the shard at 1280 and 375 px, light and dark
+        run: >-
+          uv run --no-project --with playwright==1.64.1 python tools/check_site_view.py --site site
+          --shard ${{ matrix.shard }} --out site-view --screenshots site-view/screenshots
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: site-view-shard-${{ strategy.job-index }}
+          path: site-view/
+          retention-days: 30
+  site-view-summary:
+    name: docs-site-view-summary
+    needs: site-view
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: site-view-shard-*
+          merge-multiple: true
+          path: site-view
+      # One table for every page; fails if any page failed or no shard wrote a result
+      - name: merge the shard results
+        run: |
+          set -o pipefail
+          python3 tools/check_site_view.py --merge site-view | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: site-view
+          path: site-view/
+          retention-days: 90
   deploy:
     name: docs-deploy
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && !github.event.repository.private

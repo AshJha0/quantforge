@@ -153,7 +153,7 @@ def test_window_rule_skips_a_session_cut_by_a_gap(tmp_path: Path) -> None:
     data = make_data(tmp_path / "kraken")
     after = T0 - timedelta(seconds=20)
     start, end, log = build_r2.choose_window(data, after, min_hours=0.0005, max_hours=0.0008)
-    assert log["attempts"][0]["rejected"].startswith("gap row before hour")
+    assert log["sessions"][0]["rejected"].startswith("gap row before hour")
     assert start == T0
     assert end == T0 + timedelta(
         hours=0.0008
@@ -162,12 +162,12 @@ def test_window_rule_skips_a_session_cut_by_a_gap(tmp_path: Path) -> None:
     # The recording ends first: just after the last row that every stream has (the per-second rows end at 3.0 s).
     assert end == T0 + timedelta(seconds=3.0, milliseconds=1)
     none, _, log = build_r2.choose_window(data, after, min_hours=1.0, max_hours=2.0)
-    assert none is None and log["result"] == "no session qualifies"
+    assert none is None and log["result"] == "none yet: no session qualifies"
 
 
 def test_window_rule_treats_a_restart_as_a_gap(tmp_path: Path) -> None:
     data = make_data(tmp_path / "kraken", restart=True)
-    gaps, snaps, _, _ = build_r2.scan(data, T0 - timedelta(seconds=20))
+    gaps, snaps, _, _, _ = build_r2.scan(data, T0 - timedelta(seconds=20))
     why = [g[2] for g in gaps if g[1] == "ETH-USD-raw"]
     assert "snapshot without a gap row (recorder restart)" in why
     assert len(snaps["ETH-USD"]) == 3
@@ -241,6 +241,7 @@ def test_auto_writes_both_symbols_and_the_hash_files(tmp_path: Path) -> None:
             "0.0005",
             "--max-hours",
             "1",
+            "--sample-only",
         ]
     )
     assert rc == 0
@@ -250,10 +251,20 @@ def test_auto_writes_both_symbols_and_the_hash_files(tmp_path: Path) -> None:
     assert len((out / "R2_inputs.sha256").read_text().splitlines()) == 4
     assert (
         build_r2.main(
-            ["window", str(data), "--after", _stamp(T0 - timedelta(seconds=20)), "--min-hours", "5"]
+            [
+                "window",
+                str(data),
+                "--after",
+                _stamp(T0 - timedelta(seconds=20)),
+                "--min-hours",
+                "5",
+                "--sample-only",
+            ]
         )
         == 3
     )
+    meta = json.loads((out / "R2_BTC-USD.meta.json").read_text())
+    assert meta["sample_only"] is True  # run_r2.sh refuses such a build outside SMOKE=1
 
 
 @pytest.mark.parametrize("chunk", [1, 2, 100])
@@ -291,52 +302,3 @@ def test_check_r2_tells_top10_from_below10_failures(tmp_path: Path) -> None:
     msgs[1]["checksum"] ^= 1
     Path(prefix + ".msgs.jsonl").write_text("".join(json.dumps(m) + "\n" for m in msgs))
     assert check_r2.check(prefix)["checksum_failed"] == 1
-
-
-def _hr133_data(root: Path, last_hour: int) -> Path:
-    """Two sessions: 11:41:24 cut by a gap row at 15:01:58, then 15:02:28 running to last_hour:30 (sparse rows)."""
-    day = datetime(2026, 11, 19, tzinfo=UTC)
-    for k, sym in enumerate(("BTC-USD", "ETH-USD")):
-        raw: dict[int, list[dict[str, Any]]] = {}
-        sec: dict[int, list[dict[str, Any]]] = {}
-
-        def put(store: dict[int, list[dict[str, Any]]], t: datetime, row: dict[str, Any]) -> None:
-            store.setdefault(t.hour, []).append({"t": _stamp(t), **row})
-
-        snap = {"k": "msg", "type": "snapshot", "bids": [], "asks": [], "checksum": 0, "ok": True}
-        upd = {"k": "msg", "type": "update", "bids": [], "asks": [], "checksum": 0, "ok": True}
-        book = {"k": "book", "bids": [], "asks": [], "ok": True}
-        put(raw, day.replace(hour=11, minute=41, second=24), snap)
-        for h in (12, 13, 14):
-            put(raw, day.replace(hour=h, minute=10), upd)
-            put(sec, day.replace(hour=h, minute=10), book)
-        gap = {"k": "gap", "why": "getaddrinfo failed"}
-        put(raw, day.replace(hour=15, minute=1, second=58), gap)
-        put(sec, day.replace(hour=15, minute=1, second=58), gap)
-        put(raw, day.replace(hour=15, minute=2, second=28, microsecond=1000 * k), snap)
-        for h in range(16, last_hour + 1):
-            put(raw, day.replace(hour=h, minute=30), upd)
-            put(sec, day.replace(hour=h, minute=30), book)
-        for store, sub in ((raw, f"{sym}-raw"), (sec, sym)):
-            for h, rows in store.items():
-                _write(root / sub / f"20261119T{h:02d}.jsonl.gz", rows)
-    return root
-
-
-def test_hr133_six_hour_window_after_a_lost_first_attempt(tmp_path: Path) -> None:
-    data = _hr133_data(tmp_path / "kraken", last_hour=21)
-    after = datetime(2026, 11, 19, 11, 41, 24, tzinfo=UTC)
-    assert build_r2.window_hours(after) == (6.0, 8.0)
-    assert build_r2.window_hours(after.replace(hour=15, minute=2)) == (6.0, 6.0)
-    start, end, log = build_r2.choose_window(data, after)
-    assert log["attempts"][0]["start"].startswith("2026-11-19T11:41:24")
-    assert log["attempts"][0]["rejected"].startswith("gap row before hour 6")
-    assert start == datetime(2026, 11, 19, 15, 2, 28, tzinfo=UTC)
-    assert end == datetime(2026, 11, 19, 21, 2, 28, tzinfo=UTC)  # exactly 6 hours (HR-133), not 8
-    assert log["attempts"][1]["rule_hours"] == [6.0, 6.0]
-
-
-def test_hr133_no_window_if_the_recording_stops_before_hour_six(tmp_path: Path) -> None:
-    data = _hr133_data(tmp_path / "kraken", last_hour=20)
-    start, _, log = build_r2.choose_window(data, datetime(2026, 11, 19, 11, 41, 24, tzinfo=UTC))
-    assert start is None and log["attempts"][1]["rejected"] == "recording ends first"

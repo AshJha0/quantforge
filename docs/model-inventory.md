@@ -6,7 +6,7 @@ Version 1.0.0. Plan 11.2.6: governance in the style of SR 11-7, written before s
 
 **Use restriction for every model.** Research, education and conformance testing only. Do not use for trading, valuation of record, risk limits or regulatory capital. Nothing here is investment advice.
 
-Each model below gets one entry, the "page" the plan asks for. Outside-checked shares count stage D goldens by operation, from `oracle/outside_register.json` on 2026-11-07. The H-19 checks of 2026-11-18 are not in the index column yet: current stage D figures are in `oracle/OUTSIDE_SHARES.md` (451 of 526 value cases, 85.7%; 19 further H-19 agreements are spec-closed and counted as reimplementation, not as outside checks).
+Each model below gets one entry, the "page" the plan asks for. Each entry also has a generated validation report, [`docs/validation/models/`](validation/models/README.md) (plan 14.8 K-7): goldens by class, outside-checked value cases, unit-test files and mutation modules counted from the tree by `tools/validation/model_reports.py`; the "Validation report" lines below still name the spec, which is where each report starts. Outside-checked shares count stage D goldens by operation, from `oracle/outside_register.json` on 2026-11-07. The H-19 checks of 2026-11-18 are not in the index column yet: current stage D figures are in `oracle/OUTSIDE_SHARES.md` (451 of 526 value cases, 85.7%; 19 further H-19 agreements are spec-closed and counted as reimplementation, not as outside checks).
 
 ## Index
 
@@ -59,7 +59,7 @@ Stage E has its own index tables (ME-A1 to ME-A8, EB1 to EB12) under "Stage E mo
 | MG-5 | LIBOR market model, closed-form layer and simulation (G4a, waves 3b and 3c) | `04-pricing/lmm.md` | G | Implemented | 53 of 53 (0 library object, 53 numpy or scipy primitive; D6, generated) |
 | MG-6 | AAD ladder of the Bermudan scheme (Q3b) | `06-risk/aad-core.md` | G | Implemented | 0 of 3 (0 library object, 0 numpy or scipy primitive; D6, generated) |
 | MG-7 | Model-reserve dispersion (Q9 part 2) | `06-risk/model-reserve.md` | G | Implemented | 0 of 6 (0 library object, 0 numpy or scipy primitive; D6, generated) |
-| MG-8 | Deterministic xVA layer (G5b) | `06-risk/xva-framework.md` | G | Implemented | 0 of 24 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-8 | Deterministic xVA layer (G5b) | `06-risk/xva-framework.md` | G | Implemented | 0 of 39 (0 library object, 0 numpy or scipy primitive; D6, generated) |
 | MG-9 | Portfolio exposure under Hull-White, ORE-checked (G5c) | `06-risk/xva-exposure-portfolio.md` | G | Implemented | 80 of 96 (80 library object, 0 numpy or scipy primitive; D6, generated) |
 | MG-10 | F3 sensitivities (inflation01, dividend and borrow, correlation) | `06-risk/f3-sensitivities.md` | G | Implemented | 9 of 18 |
 | MG-11 | FRTB-SA delta for FX, equity, CSR and commodity | `06-risk/frtb-sa-fx-equity.md` | G | Implemented | see entry |
@@ -462,7 +462,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Challenger:** `LOG_LINEAR_DF` (the stage B default) on the same quotes; the hybrid against `MONOTONE_CONVEX`.
 - **Monitoring thresholds:** pillars or zero rates more than 1e-10 from QuantLib on the golden builds; a forward jump above 1e-12 at an interior pillar.
 - **Data lineage hash:** sha256 291dd8a43870fa08437b0557e65e93f50a61eb865b584ae5fc5bb76733cdcbbf
-- **Retirement trigger:** a smoothing method with a published market standard (for example an ISDA SIMM curve rule) that QuantLib also implements.
+- **Retirement trigger:** a smoothing method with a published, freely usable market standard that QuantLib also implements.
 - **Validation report:** `oracle/outside_register_f.json`; `specifications/02-curves/curve-framework.md` (stage F acceptance).
 
 ### MF-5 Joint multi-curve solve (Q4)
@@ -616,7 +616,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 ### MG-6 AAD ladder of the Bermudan scheme (Q3b)
 - **Purpose:** price plus the full curve, `a` and `sigma` ladder of the G-18 Hull-White Bermudan scheme by reverse-mode AAD.
 - **Inputs:** the `rates.shortrate.bermudan_swaption` inputs.
-- **Limitations:** derivative of the discrete scheme at the case grid, **not for hedging at the default grid 101/50** with the default method `G18_IMPLICIT` (for `method` `CN_RANNACHER_SMOOTHED` see MK-5: restriction lifted 2026-11-19, KR-110) (curve entries 15% to 18% from the converged model; golden `aadladder_r6` at 501/250 is within 0.99% of 801/400; convergence not monotone; fix in stage K item K-8; `oracle/R6_LADDER_GRIDS.json`); undefined where a bump moves an exercise decision across a node (such cases are dropped); no performance number recorded by the spec session.
+- **Limitations:** derivative of the discrete scheme at the case grid, **not for hedging at the default grid 101/50** (the grid of the `aadladder_g` goldens; the operation has no default grid), with either method: the restriction also stays for `method` `CN_RANNACHER_SMOOTHED`, see MK-5 and KR-113 (curve entries 15% to 18% from the converged model; golden `aadladder_r6` at 501/250 is within 0.99% of 801/400; convergence not monotone; fix in stage K item K-8; `oracle/R6_LADDER_GRIDS.json`); undefined where a bump moves an exercise decision across a node (such cases are dropped); no performance number recorded by the spec session.
 - **Validation:** Richardson central differences, two pairs agreeing within 1e-9 relative (3 value cases). **Review:** 2026-11-11.
 - **Tier:** 1.
 - **Challenger:** bump-and-reprice with Richardson extrapolation (the golden reference itself).
@@ -638,14 +638,14 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Validation report:** `specifications/06-risk/model-reserve.md`.
 
 ### MG-8 Deterministic xVA layer (G5b)
-- **Purpose:** collateralised exposure with netting sets, CSA thresholds, MTA, independent amount and MPoR; CVA, DVA, FCA, FBA (DVA overlap rule), MVA, KVA; SIMM-style IR delta margin; Hull-White wrong-way CVA.
+- **Purpose:** collateralised exposure with netting sets, CSA thresholds, MTA, independent amount and MPoR; CVA, DVA, FCA, FBA (DVA overlap rule), MVA, KVA; sensitivity-based IR delta margin (`xva.sbim.ir_delta`; deprecated alias `xva.simm.ir_delta` in v1.0.0, removed in the first release after it, KR-256); Hull-White wrong-way CVA.
 - **Inputs:** simulated paths per trade; CSA terms; exposure, discount, IM and capital profiles; hazard and recovery; sensitivities with weights and correlations.
-- **Limitations:** paths are inputs (no simulation here); SIMM weights are inputs, not an ISDA calibration; bucket-end exposure; independence except in the WWR model.
+- **Limitations:** paths are inputs (no simulation here); the sensitivity-based margin is a project definition on caller-supplied weights (goldens on rule-generated placeholder weights, KR-150), not ISDA SIMM, and no ISDA material is used (see "Why there is no ISDA SIMM here" below); bucket-end exposure; independence except in the WWR model.
 - **Validation:** 50-digit mpmath, asserted limit cases (zero thresholds give zero exposure, `b = 0` gives the independent CVA). **Review:** 2026-11-11.
 - **Tier:** 1.
 - **Challenger:** ORE's collateral and xVA engine: not run (no stage set). ORE checks only MG-9.
 - **Monitoring thresholds:** any asserted limit case failing, or exposure differing from ORE beyond 3 SE once compared.
-- **Data lineage hash:** sha256 fef567a51bb097b31a202ab9ab1536819849f12f42fe8f801e7e2375e29b8647 (`collexp_g`); d51113f2e26b021d3e71ab18fa992782592b2c727640c68efe9c21bc0b33de39 (`xvaadj_g`); 2b477e2f2be440985d9c41e1d767609483f591aa00642543e9959f6f906d512b (`simm_g`); d7f291fe26868f3174c9696986b050ae38e60d98e000937ea6c01957352582db (`wwr_g`)
+- **Data lineage hash:** sha256 fef567a51bb097b31a202ab9ab1536819849f12f42fe8f801e7e2375e29b8647 (`collexp_g`); d51113f2e26b021d3e71ab18fa992782592b2c727640c68efe9c21bc0b33de39 (`xvaadj_g`); ce63cac19143868a10ad27bdf61347865011b7cd4cb1bfb7c5c956fa43dbed61 (`sbim_g`, file sha256 on main since 2026-11-20 after KR-150; the suite was `simm_g`, 2b477e2f2be440985d9c41e1d767609483f591aa00642543e9959f6f906d512b at v0.7.0); d7f291fe26868f3174c9696986b050ae38e60d98e000937ea6c01957352582db (`wwr_g`)
 - **Retirement trigger:** a full simulated xVA engine with the bank's CSA library.
 - **Validation report:** `specifications/06-risk/xva-framework.md`.
 
@@ -1239,10 +1239,10 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MK-3 Recalibration trigger (stage K wave 1, K-4c)
 - **Purpose:** fires when a monitored input moves more than k sample sigmas times sqrt(days) since calibration (`calib.trigger.check`), in all four languages.
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-19; two-sided normal level only, which understates the false-alarm rate of a short window (the acceptance uses the Student-t predictive rate); CUSUM and EWMA are out of wave 1.
+- **Limitations:** spec 1.1.0 (KR-232, KR-233, after different-model audit A): `false_alarm_rate` is the Student-t rate of the trigger with sigma estimated from the window; the normal level is `nominal_rate`. Both assume independent normal changes, so fat tails raise the real rate; CUSUM and EWMA are out of wave 1.
 - **Validation:** goldens `trig_k`; simulation of 100,000 noise paths inside the 99% binomial interval and a planted 6-sigma move firing on every path, Python and Java (`program/stage_k_w1/`). **Review:** 2026-11-19.
 - **Tier:** 3.
-- **Challenger:** blind re-derivation (DR-H2), 4 of 6 value cases (66.7%, after the far-tail case trig_k-0009, `oracle/OUTSIDE_SHARES.md`); SciPy `2*norm.sf(k)` on `false_alarm_rate` only (KR-11). `false_alarm_rate` is computed as `2 Phi(-k)` with a tail-accurate normal CDF in all four builds.
+- **Challenger:** blind re-derivation (DR-H2) of the 1.0.0 outputs, which now cover `nominal_rate` (`oracle/OUTSIDE_SHARES.md`); SciPy `2*norm.sf(k)` on `nominal_rate` and `scipy.stats.t.sf` on `false_alarm_rate` (spec 1.1.0). `nominal_rate` is computed as `2 Phi(-k)` with a tail-accurate normal CDF in all four builds.
 - **Monitoring thresholds:** observed noise fire rate outside the 99% binomial interval of its stated level.
 - **Data lineage hash:** sha256 b3297f772ed002b9b369e10ef77c1d70b952dcff32604c2b9cf6b9105aafb5b3 (`trig_k`, 8 cases) (2026-11-19).
 - **Retirement trigger:** a superseding stage K ruling.
@@ -1251,20 +1251,20 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MK-4 Intraday delta-gamma risk with a Lagrange bound (stage K wave 1, K-5a)
 - **Purpose:** delta-gamma P&L of a parallel yield move on zero-coupon positions with a bound on its error (`risk.intraday.delta_gamma_bound`), in all four languages.
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-19; zero-coupon positions only (other instruments have no `M3`, so no bound); latency-aware analytics on simulated data; the binary64 comparison is meaningful only for `T abs(h)` well above 1e-7 (KR-17).
-- **Validation:** goldens `idr_k`; 1,000 seeded moves with zero violations in Python and Java, rechecked at 50 digits (`oracle/IDR_K_MOVES_CHECK_W1.json`). **Review:** 2026-11-19.
+- **Limitations:** spec confirmed 2026-11-19; zero-coupon positions only (other instruments have no `M3`, so no bound); latency-aware analytics on simulated data. Spec 1.1.0 (KR-234, after different-model audit A, KA-A6): the bound adds a binary64 rounding allowance on a stated domain, so it also holds for small moves, where the 1.0.0 bound was exceeded (21.6 times at h = 1e-9, measured by the auditor). On cancelling books the estimate is sensitive to the order of operations (KR-240; known-issues row K-5a).
+- **Validation:** goldens `idr_k`; 1,000 seeded moves with zero violations in Python and Java, rechecked at 50 digits (`oracle/IDR_K_MOVES_CHECK_W1.json`); KR-234 sweep, 29,274 sweep points per build, 0 violations judged at 50 digits in all four builds (`oracle/STAGE_K_AUDIT_A_CHECKS.json`). **Review:** 2026-11-19.
 - **Tier:** 3.
-- **Challenger:** blind re-derivation (DR-H2), 5 of 5 value cases at 1e-9 relative by a second, clean packet (`program/STAGE_K_BLIND_K5A.md`; the first blind lane had checked the bounds only to 6 decimals and lacked idr_k-0005); `oracle/OUTSIDE_SHARES.md`. It checks the spec's arithmetic, not the bound's derivation; mpmath is our own oracle and does not count.
+- **Challenger:** blind re-derivation (DR-H2). The 1.0.0 packet (5 of 5, `program/STAGE_K_BLIND_K5A.md`) no longer covers the KR-234 bound; the version 2 packet matched 9 of 11 (all 11 bounds; the estimates of the cancelling books idr_k-0012 and -0013 are not reproduced to 1e-9 relative, recorded as mismatches; `program/STAGE_K_BLIND_K5A_V2.md`); `oracle/OUTSIDE_SHARES.md`. It checks the spec's arithmetic, not the bound's derivation; mpmath is our own oracle and does not count.
 - **Monitoring thresholds:** any move with abs(estimate - revaluation) above the bound.
 - **Data lineage hash:** sha256 7529524f6558dbdf27d65327bbe53396e1efaffdfa33159b6ce314afbbf7e153 (`idr_k`, 7 cases) (2026-11-19).
 - **Retirement trigger:** a superseding stage K ruling.
 - **Validation report:** `specifications/06-risk/intraday-risk-bounds.md`.
 
 ### MK-5 Second-order Bermudan scheme and its ladder (stage K, K-8)
-- **Purpose:** `CN_RANNACHER_SMOOTHED`, an optional `method` on `rates.shortrate.bermudan_swaption` and `rates.shortrate.bermudan_ladder`: Crank-Nicolson with four implicit half steps after each exercise date, the curve term integrated exactly, and the exercise `max` smoothed to second order (KR-8 as revised by KR-18), so that the ladder at the default grid 201/100 is within 1% of the converged model derivative.
+- **Purpose:** `CN_RANNACHER_SMOOTHED`, an optional `method` on `rates.shortrate.bermudan_swaption` and `rates.shortrate.bermudan_ladder`: Crank-Nicolson with four implicit half steps after each exercise date, the curve term integrated exactly, and the exercise `max` smoothed to second order (KR-8 as revised by KR-18), with the aim that the ladder at 201/100 is within 1% of the converged model derivative. The aim is met on the three cases the method was developed on and not shown elsewhere.
 - **Inputs:** as in the spec page; `method` absent or `G18_IMPLICIT` keeps the G-18 scheme bit for bit.
-- **Limitations:** spec 0.2.0 PROPOSED (`specifications/06-risk/bermudan-ladder-k8.md`); not the default method (the default stays `G18_IMPLICIT`, KR-8); the R6 use restriction of MG-6 was lifted for this method on 2026-11-19 (KR-110) after acceptance 1 to 3 passed in all four builds; the general use restriction at the top of this page still applies; the ladder row of a curve node the price does not depend on (0.4986 years in the judged cases) is exactly 0 and is not judged by any acceptance test (owner decision 2026-11-19); the end correction of the smoothing is derived in `program/K8_DIAGNOSIS.md`, not taken from a paper.
-- **Validation:** acceptance 1 to 3 pass in Python, acceptance 3 in Java, C++ and Rust (`oracle/K8_ACCEPTANCE_W2.json`, `oracle/K8_ACCEPTANCE_PORTS.json`): worst judged entry at 201/100 0.40% from QuantLib, observed orders 1.84 to 2.15 on 24 entries; goldens `k8_k` in all four builds; ladder against its own Richardson bumps to 1e-8 in each language's unit tests. **Review:** 2026-11-19.
+- **Limitations:** spec 0.2.0 PROPOSED (`specifications/06-risk/bermudan-ladder-k8.md`); not the default method (the default stays `G18_IMPLICIT`, KR-8); **the R6 use restriction of MG-6 stays for this method: not for hedging** (KR-113, 2026-11-19; a lift under KR-110 was withdrawn before release, after the different-model audit); the evidence is in-sample (the three judged cases are the ones the method was developed on) and at 201/100 only; at 101/50 the worst judged entry on the same cases is +0.93%, -1.53%, +1.49%; no accuracy envelope exists: on case 0001 turned into a deep in-the-money receiver (`fixed_rate` 0.08) d/da is 7% to 9% and d/dsigma about 5% too large at 201/100, and as a deep out-of-the-money payer the 2-year entry is about 2% too large (`program/k8_audit_response/`); lifting needs the phase 2 out-of-sample acceptance (to be written; `bermudan-ladder-k8.md`, Accuracy statement); the general use restriction at the top of this page still applies; the ladder row of a curve node the price does not depend on (0.4986 years in the judged cases) is exactly 0 and is not judged by any acceptance test (owner decision 2026-11-19); the end correction of the smoothing is derived in `program/K8_DIAGNOSIS.md`, not taken from a paper.
+- **Validation:** acceptance 1 to 3 pass in Python, acceptance 3 in Java, C++ and Rust (`oracle/K8_ACCEPTANCE_W2.json`, `oracle/K8_ACCEPTANCE_PORTS.json`): worst judged entry at 201/100 0.40% from QuantLib, observed orders 1.84 to 2.15 on 24 entries, all in-sample; goldens `k8_k` in all four builds; ladder against its own Richardson bumps to 1e-8 in each language's unit tests. **Review:** 2026-11-19.
 - **Tier:** 1.
 - **Challenger:** QuantLib 1.44 `FdHullWhiteSwaptionEngine` central bump at tGrid 8,000, xGrid 3,201 (KR-19, `oracle/K8_REFERENCE_QL.json`), counted outside only on the judged ladder entries of k8_k-0001..0003; the goldens themselves are the Python build's output, not an independent oracle. Blind re-derivation (DR-H2) by a second model from the spec text alone: 7 of 7 value cases MATCH, counted (`program/STAGE_K_BLIND_K8.md`; the row-0 question it waited on is closed, `program/K8_ROW0_FINDING.md`).
 - **Monitoring thresholds:** any judged ladder entry at 201/100 more than 1% from the reference; any observed order outside 1.5 to 2.5 or a `NON_MONOTONE` status on 201/401/801; AAD against bump beyond 1e-8 relative.
@@ -1278,7 +1278,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Limitations:** rulings KR-30 to KR-39 confirmed 2026-11-19; KR-39 scope limits (one margin agreement per netting set, no haircut computation, no CCP rules); closed form, no iteration.
 - **Validation:** goldens `saccr_k` passed by every build through the neutral runner (observed, local laptop, 2026-11-19); CRE99 Examples 1 to 5 reproduce the printed EADs (KR-30). **Review:** 2026-11-19.
 - **Tier:** 3.
-- **Challenger:** 12 of 16 value cases (75%): 5 printed CRE99 examples and 7 blind re-derivations (DR-H2, `program/STAGE_K_BLIND_W1B.md`); 4 further blind matches excluded for a recorded process failure.
+- **Challenger:** 12 of 19 value cases (63.2%; `oracle/OUTSIDE_SHARES.md`): the 5 CRE99 examples re-derived blind (`program/STAGE_K_BLIND_PUB.md`; printed figures alone do not count, KR-250) and 7 blind re-derivations (DR-H2, `program/STAGE_K_BLIND_W1B.md`); 4 further blind matches excluded for a recorded process failure; saccr_k-0040 to 0042 have no blind check.
 - **Monitoring thresholds:** any golden difference across the four builds; any CRE99 printed EAD not reproduced at its printed digits.
 - **Data lineage hash:** sha256 e0fedebf674fc978431991dd6b16c67bf4eaa5e216682172c24c837d4a91561e (`saccr_k`, 39 cases) (2026-11-19).
 - **Retirement trigger:** a superseding stage K ruling or a change of CRE52.
@@ -1290,7 +1290,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Limitations:** rulings KR-40 to KR-47 confirmed 2026-11-19; KR-44 (limits 12 and 30, "more than" covering both) is an inferred reading; backtesting only, no PLA test or capital (KR-47); `risk.frtb.backtest.zone` has no E1 golden (Integer inputs only, open point).
 - **Validation:** goldens `btk_k` and `tlk_k` passed by every build (observed, local laptop, 2026-11-19); MAR99 Table 2 rows 0 to 10 reproduced. **Review:** 2026-11-19.
 - **Tier:** 3.
-- **Challenger:** 23 of 24 `btk_k` value cases (95.8%, floor 60%): MAR99 Table 2 printed figures on 12, and 11 blind re-derivations (DR-H2, `program/STAGE_K_BLIND_BTK.md`, 12 of 12 MATCH; btk_k-0017 matched but is not counted, the rules text states its answer). SciPy `binom.cdf` on 23 of 24 is not counted (D6 precedent: stage F `SCIPY.BINOM` is `reimplementation`, risk_f4-0082).
+- **Challenger:** 23 of 28 `btk_k` value cases (82.1%, floor 60%; `oracle/OUTSIDE_SHARES.md`): the 12 MAR99 Table 2 cases re-derived blind (`program/STAGE_K_BLIND_PUB.md`; printed figures alone do not count, KR-250), and 11 blind re-derivations (DR-H2, `program/STAGE_K_BLIND_BTK.md`, 12 of 12 MATCH; btk_k-0017 matched but is not counted, the rules text states its answer). SciPy `binom.cdf` checks are not counted (D6 precedent: stage F `SCIPY.BINOM` is `reimplementation`, risk_f4-0082).
 - **Monitoring thresholds:** any zone, limit or count difference across the four builds; any MAR99 Table 2 row not reproduced.
 - **Data lineage hash:** sha256 a987ea2f465fd2d1d139da303d3edaa4addd78b0b989fd90656595ec6cd31160 (`btk_k`, 40 cases; after the blind-lane `verified_by` entries, outputs unchanged) (2026-11-19).
 - **Retirement trigger:** a superseding stage K ruling or a change of MAR32.
@@ -1343,3 +1343,16 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Data lineage hash:** sha256 46b10b589b39c08b25c7d4e0f3641d9c39f9d7b03759446a19b6ea11dcc2d81c (spec page `leverage-large-exposures.md`, no golden file yet) (2026-11-19).
 - **Retirement trigger:** the wave-2 build replaces this entry's limitations, or the item is withdrawn.
 - **Validation report:** `specifications/06-risk/leverage-large-exposures.md`.
+
+## Why there is no ISDA SIMM here
+
+Plain idea: ISDA SIMM is the initial-margin methodology many dealers use for uncleared derivatives. It is not free to reuse. The methodology document carries a notice that it may be used, revised or distributed only for a market participant's own commercial transactions or under a written ISDA licence, and it cites a US patent (owner's reading, 2026-11-19; evidence class: read by the owner, not by any lane). An open-source project that publishes code, specs and test data is neither, so the owner decided on 2026-11-19 that QuantForge uses **no ISDA material** at all: the methodology document, ISDA parameter sets, ISDA test portfolios and the margin calibration files the Open Source Risk Engine ships are not opened, read, quoted or fetched.
+
+What the repository has instead (evidence class: read, the specs named):
+
+- `xva.sbim.ir_delta` (stage G, MG-8; `specifications/06-risk/xva-framework.md`, G-43; named `xva.simm.ir_delta` in v0.7.0 to v0.10.0, that id now a deprecated alias in v1.0.0, removed in the first release after it, KR-152 and KR-256): a sensitivity-based single-bucket interest-rate delta aggregation, `CR = max(1, sqrt(|sum s_k| / T))`, `WS_k = RW_k s_k CR`, `margin = sqrt(max(0, sum sum rho WS WS))`, on weights, correlations and a threshold the caller supplies. It is not ISDA SIMM. The weights in its goldens, tutorial and question bank were hand-typed in v0.7.0 to v0.10.0 with no documented origin; stage K round 1 (on main since 2026-11-20, released with v1.0.0) replaced them by placeholder weights from a stated artificial rule (`RW = 10 x k`, `rho = 1 - 0.1 |k - l|`, KR-150, `specifications/tables/stage_k/sbim-ir-delta-g.json`).
+- `risk.sbim.placeholder` (stage K item K-8h, PROPOSED; `specifications/06-risk/sbim-placeholder.md`): the project's own sensitivity-based initial margin in the general family of bucketed weighted-sensitivity models (interest rate, FX and equity; delta, vega, curvature; concentration factors; correlations within and across buckets and risk classes), on artificial placeholder weights generated by a stated rule. Every formula's evidence class is "project definition". Its blind-checked cases check our own algebra, nothing more.
+
+What neither is: a regulatory or industry-standard initial margin, a reproduction of any industry model, or a number to call or post margin with. No compliance claim is made, and no release names ISDA SIMM as a feature.
+
+Worked example: case `sbim_k-0001` (one interest-rate delta of 2 at 5Y, placeholder weights) has concentration factor 1 (2 is below the threshold 100) and placeholder weight 30, so margin = 30 x 2 = 60. That is arithmetic on artificial numbers, not a margin figure of any industry model.

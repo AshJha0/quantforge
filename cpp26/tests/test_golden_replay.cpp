@@ -59,6 +59,7 @@ std::pair<double, double> tolerance(const std::string& cls) {
         {"jacobian", {1e-9, 1e-6}},          {"jacobian_piecewise", {1e-7, 1e-5}},
         {"standard_error", {1e-15, 1e-5}},   {"aad_sensitivity", {1e-10, 1e-8}},
         {"ift_jacobian", {1e-11, 1e-9}},     {"numerical_scheme", {1e-8, 1e-8}},
+        {"tail_probability", {0.0, 1e-11}},
         {"fourier", {1e-9, 1e-9}},           {"common_rng", {1e-9, 1e-9}},
     };
     const auto it = classes.find(cls);

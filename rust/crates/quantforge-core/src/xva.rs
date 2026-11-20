@@ -1,7 +1,7 @@
 //! Deterministic xVA layer on given paths (`06-risk/xva-framework.md`, rulings G-40 to G-44):
-//! collateralised exposure, valuation adjustments, SIMM-style IR delta margin, Hull-White
+//! collateralised exposure, valuation adjustments, sensitivity-based IR delta margin, Hull-White
 //! wrong-way risk.
-use crate::error::{Result, fail};
+use crate::error::{QfError, Result, fail};
 
 /// CSA terms of one netting set (G-40).
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -280,8 +280,9 @@ pub fn adjustments(x: &AdjInputs) -> Result<Adjustments> {
     Ok(o)
 }
 
-/// `xva.simm.ir_delta` (G-43): `(weighted sensitivities, concentration factor, margin)`.
-pub fn simm_ir_delta(
+/// `xva.sbim.ir_delta` (G-43; deprecated alias `xva.simm.ir_delta`, KR-152):
+/// `(weighted sensitivities, concentration factor, margin)`.
+pub fn sbim_ir_delta(
     s: &[f64],
     rw: &[f64],
     rho: &[Vec<f64>],
@@ -351,62 +352,117 @@ pub fn wwr_cva_hw(
     if h <= 0.0 || !(0.0..1.0).contains(&recovery) {
         return fail("E_DOMAIN", "hazard_rate > 0 and recovery in [0, 1)");
     }
+    if values.iter().flatten().any(|v| (b * v).abs() > WWR_MAX_BV) {
+        return Err(QfError {
+            code: "E_DOMAIN",
+            message: "|wwr_b * value| must be at most 700 (KR-257)".into(),
+            field: Some("wwr_b".into()),
+        });
+    }
+    let mut prev = 0.0;
+    for &t in times {
+        if (-h * t).exp() < f64::MIN_POSITIVE || -(-h * (t - prev)).exp_m1() < f64::MIN_POSITIVE {
+            return Err(QfError {
+                code: "E_NON_FINITE",
+                message: "the survival target or a bucket default probability is below the smallest normal double".into(),
+                field: Some("hazard_rate".into()),
+            });
+        }
+        prev = t;
+    }
     #[allow(clippy::cast_precision_loss)]
     let np = values.len() as f64;
     let mut surv = vec![1.0; values.len()];
     let mut a_out = Vec::with_capacity(n);
     let mut cva = 0.0;
-    let mut prev = 0.0;
+    prev = 0.0;
     for i in 0..n {
         let dt = times[i] - prev;
-        let target = (-h * times[i]).exp();
-        // g(a) = mean S_p(t_i) - target, strictly decreasing in a.
-        let g = |a: f64| -> (f64, f64) {
-            let (mut m, mut d) = (0.0, 0.0);
-            for (p, v) in values.iter().enumerate() {
-                let lam = (a + b * v[i]).exp();
-                let s = surv[p] * (-lam * dt).exp();
-                m += s;
-                d -= s * lam * dt;
-            }
-            (m / np - target, d / np)
-        };
-        let mut a = h.ln();
-        let (mut lo, mut hi) = (f64::NEG_INFINITY, f64::INFINITY);
-        for _ in 0..200 {
-            let (f, d) = g(a);
-            if f > 0.0 {
-                lo = a;
-            } else {
-                hi = a;
-            }
-            let mut next = a - f / d;
-            if !(next > lo && next < hi && next.is_finite()) {
-                next = if lo.is_finite() && hi.is_finite() {
-                    0.5 * (lo + hi)
-                } else if lo.is_finite() {
-                    lo + 1.0
-                } else {
-                    hi - 1.0
-                };
-            }
-            if (next - a).abs() <= 1e-15 * a.abs().max(1.0) {
-                a = next;
-                break;
-            }
-            a = next;
-        }
+        let cs: Vec<f64> = values.iter().map(|v| b * v[i]).collect();
+        let a = wwr_root(&surv, &cs, dt, h)?;
         let mut bucket = 0.0;
         for (p, v) in values.iter().enumerate() {
-            let s_new = surv[p] * (-(a + b * v[i]).exp() * dt).exp();
-            bucket += v[i].max(0.0) * (surv[p] - s_new);
-            surv[p] = s_new;
+            let (q, r, _) = wwr_terms(a + cs[p], dt);
+            bucket += v[i].max(0.0) * surv[p] * q;
+            surv[p] *= r;
         }
         cva += dfs[i] * bucket / np;
         a_out.push(a);
         prev = times[i];
     }
     Ok(((1.0 - recovery) * cva, a_out))
+}
+
+/// KR-257: the largest `|b V|` the wrong-way root accepts (`E_DOMAIN` above it).
+pub const WWR_MAX_BV: f64 = 700.0;
+
+/// For hazard `exp(z)` over `dt`: default probability `q = 1 - e^-x`, survival `r = e^-x` and
+/// `dq/dz = x e^-x`, with `x = exp(z) dt`; an overflowing `exp(z)` is `inf` (q = 1, r = 0).
+fn wwr_terms(z: f64, dt: f64) -> (f64, f64, f64) {
+    let x = if z > 709.0 { f64::INFINITY } else { z.exp() } * dt;
+    let r = (-x).exp();
+    (-(-x).exp_m1(), r, if r == 0.0 { 0.0 } else { x * r })
+}
+
+/// KR-257: `a` with `sum_p S_p (1 - e^(-x_p)) = (1 - e^(-h dt)) sum_p S_p`, `x_p = exp(a + c_p) dt`
+/// (the G-44 equation divided through by `S(t_(i-1))`; above a bucket default probability of 1/2
+/// the survival form `sum_p S_p e^(-x_p) = e^(-h dt) sum_p S_p`). Bracket
+/// `[ln h - max c - 1, ln h - min c + 1]` (closed form, sign change by monotonicity), safeguarded
+/// Newton (rtsafe) from `ln h - (S-weighted mean of c)`, step to 1e-15 relative, at most 200 steps.
+fn wwr_root(surv: &[f64], cs: &[f64], dt: f64, h: f64) -> Result<f64> {
+    let (q_t, r_t) = (-(-h * dt).exp_m1(), (-h * dt).exp());
+    let use_q = q_t <= 0.5;
+    let total: f64 = surv.iter().sum();
+    let f = |a: f64| -> (f64, f64) {
+        let (mut sq, mut sr, mut d) = (0.0, 0.0, 0.0);
+        for (s, c) in surv.iter().zip(cs) {
+            let (q, r, dq) = wwr_terms(a + c, dt);
+            sq += s * q;
+            sr += s * r;
+            d += s * dq;
+        }
+        (
+            if use_q {
+                sq - q_t * total
+            } else {
+                r_t * total - sr
+            },
+            d,
+        )
+    };
+    let ln_h = h.ln();
+    let (mut lo, mut hi) = (
+        ln_h - cs.iter().copied().fold(f64::NEG_INFINITY, f64::max) - 1.0,
+        ln_h - cs.iter().copied().fold(f64::INFINITY, f64::min) + 1.0,
+    );
+    let mut a = ln_h - surv.iter().zip(cs).map(|(s, c)| s * c).sum::<f64>() / total;
+    let mut dx = hi - lo;
+    let (mut val, mut der) = f(a);
+    for _ in 0..200 {
+        if val > 0.0 {
+            hi = a;
+        } else if val < 0.0 {
+            lo = a;
+        } else {
+            return Ok(a);
+        }
+        let dx_old = dx;
+        dx = if der > 0.0 { val / der } else { f64::INFINITY };
+        let mut step = a - dx;
+        if !(lo < step && step < hi && dx.abs() <= 0.5 * dx_old.abs()) {
+            dx = 0.5 * (hi - lo);
+            step = lo + dx;
+        }
+        if (step - a).abs() <= 1e-15 * a.abs().max(1.0) {
+            return Ok(step);
+        }
+        a = step;
+        (val, der) = f(a);
+    }
+    fail(
+        "E_NO_CONVERGENCE",
+        "the a(t) root did not converge in 200 steps",
+    )
 }
 
 #[cfg(test)]
@@ -510,10 +566,11 @@ mod tests {
     }
 
     #[test]
-    fn simm_single_factor() {
-        let (ws, cr, m) = simm_ir_delta(&[10_000.0], &[90.0], &[vec![1.0]], 1e9).unwrap();
-        assert_eq!((ws[0], cr), (900_000.0, 1.0));
-        assert!((m - 900_000.0).abs() < 1e-9);
+    fn sbim_single_factor() {
+        // Weight 30: the 2Y entry of specifications/tables/stage_k/sbim-ir-delta-g.json (RW = 10 x 3, KR-150).
+        let (ws, cr, m) = sbim_ir_delta(&[10_000.0], &[30.0], &[vec![1.0]], 1e9).unwrap();
+        assert_eq!((ws[0], cr), (300_000.0, 1.0));
+        assert!((m - 300_000.0).abs() < 1e-9);
     }
 }
 

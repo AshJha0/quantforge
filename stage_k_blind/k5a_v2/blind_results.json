@@ -1,0 +1,59 @@
+{
+ "cases": {
+  "idr_k-0001": {
+   "estimate_pnl": -39913.124212551615,
+   "bound": 17.056890689308766,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0002": {
+   "estimate_pnl": 41959.95109524657,
+   "bound": 17.931416175710734,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0003": {
+   "estimate_pnl": -10170.171073390557,
+   "bound": 0.2665139170617964,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0004": {
+   "estimate_pnl": -179097.35223580853,
+   "bound": 2132.111336141709,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0005": {
+   "estimate_pnl": -30589.65533006755,
+   "bound": 17.684733711734584,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0008": {
+   "estimate_pnl": -0.004093653755155775,
+   "bound": 1.7469352659511083e-17,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0009": {
+   "estimate_pnl": 4.093653765400143e-06,
+   "bound": 1.7452295691483738e-20,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0010": {
+   "estimate_pnl": -4.0936537653899094e-24,
+   "bound": 1.7452295674288688e-38,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0012": {
+   "estimate_pnl": 3.9915903471410275e-08,
+   "bound": 34.11378137863459,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0013": {
+   "estimate_pnl": 0.00040936541041003405,
+   "bound": 1091641.0049227446,
+   "label": "latency-aware analytics on simulated data"
+  },
+  "idr_k-0014": {
+   "estimate_pnl": -1.370939742326229e+41,
+   "bound": 1.2043289613547214e+86,
+   "label": "latency-aware analytics on simulated data"
+  }
+ }
+}

@@ -2,7 +2,7 @@
 
 Copy this file to `docs/releases/vX.Y.Z.md` for each release and fill every section. The "Evidence" and "Limits" sections are fixed: a release with nothing to say in one of them writes "None" and why, rather than deleting the heading. Gap G-7 of the docs plan; the stage H and stage K limits text (plan sections 15.1 and 15.2) goes in "Limits" word for word.
 
-Rules that apply to every section: numbers come from committed files and name them; status words come only from the ladder in README `Status` (Proposed, Specified, Implemented, Validated, Benchmarked, Operationally tested); simulated results say "simulated" in their first sentence; crypto results say "crypto venue; not equities or rates" and show aggregates only; placeholder SIMM weights say "placeholder weights, not ISDA-calibrated".
+Rules that apply to every section: numbers come from committed files and name them; status words come only from the ladder in README `Status` (Proposed, Specified, Implemented, Validated, Benchmarked, Operationally tested); simulated results say "simulated" in their first sentence; crypto results say "crypto venue; not equities or rates" and show aggregates only; the project's sensitivity-based initial margin (K-8h, `sbim`) says "placeholder weights; project-defined, not a regulatory or industry-standard calculation", and no release note names ISDA SIMM as a feature (owner decision 2026-11-19: no ISDA material is used).
 
 ---
 

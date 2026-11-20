@@ -30,8 +30,9 @@ def render(s):
            f"Label: {s.get('label', '')}.", "", MISS_NOTE, ""]
     latest = s.get("latest")
     if not s.get("ok") or latest is None:
-        out += ["No verified daily fit yet. The run is scheduled by `.github/workflows/curve-daily.yml`; rows live on "
-                "branch `curve-daily` (`ledger/curves.jsonl`).", ""]
+        out += ["No verified daily fit yet. The run is scheduled on main since 2026-11-20 (pull request #59); the workflow "
+                "`.github/workflows/curve-daily.yml` has three cron slots; rows would live on branch `curve-daily` "
+                "(`ledger/curves.jsonl`).", ""]
         return "\n".join(out)
     c = latest["consistency"]
     out += [

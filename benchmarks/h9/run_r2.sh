@@ -95,6 +95,12 @@ hash_file() {
 }
 
 check_hashes() {
+  # HR-134, HR-135 (audit KA-B6): outside SMOKE=1, an input built with --sample-only, --tolerant, --after, --until,
+  # --min-hours or --max-hours (stamped in R2_window.json, whose hash is in R2_replay.sha256) is refused before
+  # anything else, so it can give neither a correctness marker nor a timing result.
+  if [ "$SMOKE" != 1 ]; then
+    python -I "$REPO/benchmarks/h9/r2_meta.py" inputs "$R2DIR" >&2 || die "input not built under the HR-134 rule (see above)"
+  fi
   local H; H=$(hash_file) || exit 3
   [ -f "$H" ] || die "input hash file $H is missing (commit build_r2.py's R2_replay.sha256 there first)"
   if [ "$SMOKE" != 1 ]; then
@@ -204,7 +210,7 @@ meta = {
                 "frequency_governor": wf["governor"]},
     "commit": commit, "repeats": int(runs),
     "targets_commits": {"L1-L6": "fa020dd8", "L1-R2 to L3-R2 and L7": "f2d90738"},
-    "rulings": ["HR-130", "HR-131", "HR-132", "HR-133"],
+    "rulings": ["HR-130", "HR-131", "HR-132", "HR-133", "HR-134", "HR-135"],
     "workload_hashes": dict(reversed(l.split()) for l in open(hashes) if l.strip()),
     "labels": ["in-process, simulated feed; no network or venue latency", "crypto venue; not equities or rates",
                "R2: raw venue messages; L7: snapshot-differenced stream (form B), per-level samples",

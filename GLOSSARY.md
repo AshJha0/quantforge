@@ -170,7 +170,7 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 | EE, ENE, PFE, EPE | Expected positive and negative exposure at a date, a high quantile of exposure, and EE averaged over time (`06-risk/xva-exposure.md`) |
 | Margin period of risk (MPoR) | The time between the last collateral call met and the close-out after a default |
 | CVA, DVA, FVA (FCA, FBA) | Prices of counterparty default, own default, and funding of uncollateralised exposure (`06-risk/xva-framework.md`) |
-| SIMM | ISDA's standard initial-margin model; here a SIMM-style IR delta only (`xva.simm.ir_delta`) |
+| Sensitivity-based initial margin (sbim) | The project's own initial-margin aggregation from weighted sensitivities, on placeholder weights; not a regulatory or industry-standard calculation, and no ISDA material is used (owner decision 2026-11-19). In stage G, `xva.sbim.ir_delta` is a single-bucket IR delta aggregation on weights the caller supplies; its old id `xva.simm.ir_delta` is a deprecated alias in v1.0.0, removed in the first release after it (KR-152, KR-256). Why there is no industry model here: `docs/model-inventory.md#why-there-is-no-isda-simm-here` |
 | Wrong-way risk | Exposure that grows when the counterparty is more likely to default |
 | BGK correction | Broadie, Glasserman and Kou's barrier shift `exp(0.5826 sigma sqrt(dt))`, which turns a continuous barrier formula into a discrete one (ruling G-7) |
 
@@ -330,7 +330,7 @@ Stage H (v0.10.0, execution and microstructure) is implemented in all four langu
 
 ## Stage K terms (in progress)
 
-Stage K round 1 is merged on the integration branch `k-r1` (2026-11-19) and not released; these terms are defined as its specs use them (read 2026-11-19). [Tutorials 51 to 58](docs/getting-started/README.md#stage-k-in-progress) use them.
+Stage K round 1 is merged to main by 2026-11-20 (pull requests #58 and #59), not tagged, and released with v1.0.0; these terms are defined as its specs use them (read 2026-11-19). [Tutorials 51 to 58](docs/getting-started/README.md#stage-k-in-progress) use them.
 
 | Term | Meaning |
 |---|---|
@@ -363,7 +363,7 @@ Stage K round 1 is merged on the integration branch `k-r1` (2026-11-19) and not 
 | Paper ledger (stage K) | The daily, hash-chained record of a fixed-rule paper book marked on the recorded Treasury par curve, labelled "paper marks on a fitted curve; not tradable"; plumbing evidence, no performance claim (`tools/paper_daily/`, KR-70 to KR-89) |
 | Anchor | The head hash and row count of a ledger stamped with OpenTimestamps on a separate branch, so that a consistent rewrite of old rows or a truncated tail becomes visible |
 | Blind re-derivation | An outside check where no library exists: a lane on a different model derives the answers from a spec stripped of every expected value, freezes them with a hash, and a fixed script compares them with the goldens; a leaked case does not count (DR-H2) |
-| Placeholder weights | Risk weights or impact parameters that are not calibrated to any market; every output that uses them says "placeholder weights" (SIMM in stage K: "placeholder weights, not ISDA-calibrated") |
+| Placeholder weights | Risk weights or impact parameters that are not calibrated to any market; every output that uses them says "placeholder weights" (the sensitivity-based margin, `sbim`, in stages G and K) |
 
 ## Tutorial terms
 

@@ -14,6 +14,7 @@ published figure fails to reproduce under the acceptance rule of the spec.
     cd oracle/python && uv run python -W ignore gen_stage_k_w1b.py
 """
 import json
+import math
 from pathlib import Path
 
 import mpmath as mp
@@ -97,7 +98,7 @@ def sa_ccr(inp):
         for i, t in enumerate(trades):
             tr = t.get("treatment", "NORMAL")
             c = t["asset_class"]
-            if tr != "NORMAL" or c in ("IR", "FX"):
+            if tr == "BASIS" or c in ("IR", "FX"):  # KR-236: VOLATILITY sets follow CRE52.45 (CRE52.47)
                 key = t["hedging_set"]
             elif c == "COMMODITY":
                 key = row(t)["hedging_set"]
@@ -270,6 +271,13 @@ BLIND_W1B = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W1B.md)
 # K-8e blind lane (program/STAGE_K_BLIND_BTK.md, packet manifest 03fdc75d, compare fixed at 21392489): 12 of 12 MATCH,
 # 11 counted. btk_k-0017 (one observation) matched but is not counted: the rules text states its answer.
 BLIND_BTK = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md): MATCH"
+# Printed-figure blind lane (program/STAGE_K_BLIND_PUB.md, compare fixed at 00167bf5): 28 of 28 MATCH at full
+# tolerance (saccr_k-0001..0005, btk_k-0001..0012, tlk_k-0001..0011), counted per KR-250; recorded 2026-11-20.
+BLIND_PUB = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
+# tlk_k v2 blind lane (program/STAGE_K_BLIND_TLK_V2.md, compare fixed and pushed at 51180fb2, results 370f24d7):
+# 9 of 9 MATCH, 6 counted; tlk_k-0016..0018 (n = 1) matched but are not counted: the rules text gives the answer.
+BLIND_TLK = "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TLK_V2.md): MATCH"
+BLIND_TLK_NC = "blind lane program/STAGE_K_BLIND_TLK_V2.md 2026-11-20 matched, not counted: not blind (n = 1, the rules text gives P = c)"
 
 
 def gen_saccr():
@@ -282,7 +290,7 @@ def gen_saccr():
         check(near(hi["ead"], printed), f"{cre} printed EAD {printed} (ead {mp.nstr(hi['ead'], 10)})")
         s.add("risk.saccr.ead", inp, lo, verified=[
             ORACLE, f"published: Basel Framework {cre} printed EAD {printed}: MATCH at nearest integer (KR-30)",
-            f"published: BCBS 279 Annex 4a, PDF pp.{bcbs} (read 2026-11-15, STAGE_K_SOURCES.md) EAD {printed}: MATCH"],
+            f"published: BCBS 279 Annex 4a, PDF pp.{bcbs} (read 2026-11-15, STAGE_K_SOURCES.md) EAD {printed}: MATCH", BLIND_PUB],
             tags=TAGS_S + ["outside_checked", "published"], output_classes=oc,
             description=f"CRE99 worked example, printed EAD {printed} ({cre})")
     published_intermediates(hp)
@@ -335,9 +343,13 @@ def gen_saccr():
          "margined EAD above the unmargined EAD is capped (CRE52.2)")
     hand({"trades": [tr("z1", "FX", 1000, -10, 1, hedging_set="GBPUSD"), tr("z2", "FX", 1000, 0, 1, position="SHORT", hedging_set="GBPUSD")]},
          "exactly offsetting FX trades: zero add-on, multiplier at its floor 0.05 (KR-36)")
+    AUDIT_W1B = ("added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-236 to KR-238): hand and "
+                 "oracle, not blind re-derived")
 
     def err(inp, code, desc):
-        s.add("risk.saccr.ead", inp, error=code, cls="date_and_convention", verified=["hand"], tags=TAGS_S + ["error"], description="hand: " + desc)
+        two = ["two-errors"] if "two errors" in desc else []
+        s.add("risk.saccr.ead", inp, error=code, cls="date_and_convention", verified=["hand"], tags=TAGS_S + ["error"] + two,
+              description="hand: " + desc)
 
     ok = tr("a", "FX", 100, 0, 1, hedging_set="EURUSD")
     err({"trades": []}, "E_INPUT", "no trades")
@@ -361,15 +373,40 @@ def gen_saccr():
     err({"trades": [ok], "margin": {"threshold": -1, "mta": 0, "nica": 0, "remargin_days": 1}}, "E_DOMAIN", "negative threshold")
     err({"trades": [ok], "margin": {"threshold": 0, "mta": 0, "nica": 0, "remargin_days": 0}}, "E_DOMAIN", "re-margining period of zero days")
     # two errors at once (repo-wide order HR-122: E_SCHEMA, structural E_INPUT, E_DOMAIN)
-    err({"trades": [{**ok, "asset_class": "RATES", "notional": 0}]}, "E_SCHEMA", "two errors: unknown asset class and zero notional")
-    err({"trades": [tr("a", "FX", -5, 0, 1)]}, "E_INPUT", "two errors: no currency pair and negative notional")
-    err({"trades": [ok, {**ok, "notional": "1"}]}, "E_SCHEMA", "two errors: duplicate id and notional as a string")
-    err({"trades": [ok, {**ok, "maturity": 0}]}, "E_INPUT", "two errors: duplicate id and zero maturity")
+    err({"trades": [{**ok, "asset_class": "RATES", "notional": 0}]}, "E_SCHEMA", "two errors: unknown asset class [schema] and zero notional [domain]")
+    err({"trades": [tr("a", "FX", -5, 0, 1)]}, "E_INPUT", "two errors: no currency pair [structural] and negative notional [domain]")
+    err({"trades": [ok, {**ok, "notional": "1"}]}, "E_SCHEMA", "two errors: duplicate id [structural] and notional as a string [schema]")
+    err({"trades": [ok, {**ok, "maturity": 0}]}, "E_INPUT", "two errors: duplicate id [structural] and zero maturity [domain]")
     # E1 goldens (ruling F-2, tools/check_e1_coverage.py): a non-finite Real input is E_DOMAIN by the finite rule,
     # which comes before structural E_INPUT (HR-122)
     err({"trades": [{**ok, "notional": "NaN"}]}, "E_DOMAIN", "E1: non-finite notional (NaN)")
     err({"trades": [{k: v for k, v in {**ok, "market_value": "-Infinity"}.items() if k != "hedging_set"}]}, "E_DOMAIN",
-        "E1, two errors: market value -Infinity and no currency pair (the finite rule first)")
+        "E1, two errors: market value -Infinity [finite] and no currency pair [structural] (the finite rule first)")
+    # Audit A response (2026-11-19), appended so that the case ids above stay as they were.
+    va = {"trades": [tr("v1", "EQUITY", 100, 0, 1, treatment="VOLATILITY", hedging_set="V1", entity="X", subclass="SINGLE"),
+                     tr("v2", "EQUITY", 100, 0, 1, position="SHORT", treatment="VOLATILITY", hedging_set="V2", entity="Y",
+                        subclass="SINGLE")]}
+    hi, lo = sa_ccr(va)
+    check(len(lo["hedging_sets"]) == 1 and abs(hi["addon"]["EQUITY"] - mp.sqrt(38400)) < mp.mpf(10) ** -40,
+          "KR-236 worked example: one equity volatility set, add-on sqrt(38,400) = 195.959...")
+    s.add("risk.saccr.ead", va, lo, verified=["hand", ORACLE, AUDIT_W1B], tags=TAGS_S + ["hand"], output_classes=oc,
+          description="hand: KR-236 (KA-A3): two equity volatility trades on two names with two labels form one hedging "
+                      "set (CRE52.47): add-on sqrt(38,400) = 195.96, not 320")
+    vc = {"trades": [tr("w1", "COMMODITY", 100, 0, 1, treatment="VOLATILITY", entity="POWER", subclass="ELECTRICITY"),
+                     tr("w2", "COMMODITY", 100, 0, 1, position="SHORT", treatment="VOLATILITY", entity="SILVER",
+                        subclass="METALS", hedging_set="SAME LABEL")]}
+    _, lo = sa_ccr(vc)
+    check([h["key"] for h in lo["hedging_sets"]] == ["ENERGY", "METALS"], "KR-236: commodity volatility sets by category")
+    s.add("risk.saccr.ead", vc, lo, verified=["hand", ORACLE, AUDIT_W1B], tags=TAGS_S + ["hand"], output_classes=oc,
+          description="hand: KR-236 (KA-A3 b): electricity and silver volatility trades sit in the energy and metals "
+                      "volatility sets, a label does not merge them")
+    m15 = {"trades": EX1 + EX3, "collateral": 200,
+           "margin": {"threshold": 0, "mta": 5, "nica": 150, "remargin_days": 15, "illiquid": True}}
+    _, lo = sa_ccr(m15)
+    check(lo["mpor_days"] == 24, "KR-238(b): remargin 15 and illiquid give max(9 + 15, 20) = 24")
+    s.add("risk.saccr.ead", m15, lo, verified=["hand", ORACLE, AUDIT_W1B], tags=TAGS_S + ["hand"], output_classes=oc,
+          description="hand: KR-238(b) (KA-A11): re-margining every 15 days and illiquid: MPOR floor max(9 + 15, 20) = 24 "
+                      "(the combination is inferred, not read)")
     s.write()
     return s
 
@@ -396,6 +433,37 @@ def bcdf(n, k, p):
     return mp.fsum(mp.binomial(n, j) * p ** j * (1 - p) ** (n - j) for j in range(k + 1))
 
 
+def zone_exact(n, xa, xh):
+    """KR-237 check: the zone outputs from exact rationals at p = 1/100 (integer term recurrence, streamed so that
+    only the running term and sum are held; fast enough for n = 1,000,000)."""
+    from fractions import Fraction
+    x = max(xa, xh)
+    a, b = 1, 100
+    c = b - a
+    den = b ** n
+    term = c ** n
+    total = term
+    amber = red = cum = None
+    k = 0
+    while amber is None or red is None or cum is None:
+        if cum is None and k == x:
+            cum = Fraction(total, den)
+        if amber is None and 100 * total >= 95 * den:
+            amber = k
+        if red is None and 10000 * total >= 9999 * den:
+            red = k
+        if k == n:
+            break
+        term = term * (n - k) * a // ((k + 1) * c)
+        total += term
+        k += 1
+    zone = "RED" if x >= red else "AMBER" if x >= amber else "GREEN"
+    sc = float(binom.cdf(x, n, 0.01))
+    assert abs(sc / float(cum) - 1) <= 1e-12, (n, x, sc, float(cum))
+    return {"exceptions": x, "cumulative_probability": float(cum), "zone": zone, "amber_from": amber, "red_from": red,
+            "multiplier": None}
+
+
 def gen_backtest():
     s = Suite("btk_k", SPEC_B, G)
     oc = {"exceptions": "date_and_convention", "zone": "date_and_convention", "amber_from": "date_and_convention",
@@ -408,7 +476,7 @@ def gen_backtest():
               f"MAR99 Table 2 row {x}: {printed[k]}% {TABLES['printed_table2_zone'][k]}")
         s.add("risk.frtb.backtest.zone", {"observations": 250, "exceptions_actual": x, "exceptions_hypothetical": 0}, o,
               verified=[ORACLE, SCIPY + ": binom.cdf MATCH 1e-12",
-                        f"published: MAR99 Table 2 (Basel Framework PDF p.758) row {k}: " + (f"{printed[k]}%, " if x <= 10 else "") + f"{TABLES['printed_table2_zone'][k]}, multiplier: MATCH"],
+                        f"published: MAR99 Table 2 (Basel Framework PDF p.758) row {k}: " + (f"{printed[k]}%, " if x <= 10 else "") + f"{TABLES['printed_table2_zone'][k]}, multiplier: MATCH", BLIND_PUB],
               tags=TAGS_B + ["outside_checked", "published"], output_classes=oc, description=f"{x} exceptions in 250 at 99% (MAR99 Table 2)")
     for n, xa, xh, why in [(250, 3, 7, "the larger of the APL and HPL counts (MAR99.8)"), (500, 9, 8, "500 observations"),
                            (100, 2, 0, "100 observations"), (1000, 15, 15, "1,000 observations"),
@@ -436,7 +504,9 @@ def gen_backtest():
           description="hand: strict exceedance, a loss equal to VaR is not an exception, a missing VaR or P&L is (MAR32.5(2))")
 
     def err(op, inp, code, desc):
-        s.add(op, inp, error=code, cls="date_and_convention", verified=["hand"], tags=TAGS_B + ["error"], description="hand: " + desc)
+        two = ["two-errors"] if "two errors" in desc else []
+        s.add(op, inp, error=code, cls="date_and_convention", verified=["hand"], tags=TAGS_B + ["error"] + two,
+              description="hand: " + desc)
 
     z = "risk.frtb.backtest.zone"
     err(z, {"observations": 0, "exceptions_actual": 0, "exceptions_hypothetical": 0}, "E_DOMAIN", "no observations")
@@ -445,22 +515,48 @@ def gen_backtest():
     err(z, {"observations": 1000001, "exceptions_actual": 0, "exceptions_hypothetical": 0}, "E_LIMIT", "observations above 1,000,000")
     err(z, {"observations": 250, "exceptions_actual": 1.5, "exceptions_hypothetical": 0}, "E_SCHEMA", "count not an integer")
     err(z, {"observations": 250, "exceptions_actual": 1}, "E_SCHEMA", "hypothetical count missing")
-    err(z, {"observations": 1000001, "exceptions_actual": -1, "exceptions_hypothetical": 0}, "E_LIMIT", "two errors: limit and negative count")
-    err(z, {"observations": "250", "exceptions_actual": -1, "exceptions_hypothetical": 0}, "E_SCHEMA", "two errors: observations a string and negative count")
+    err(z, {"observations": 1000001, "exceptions_actual": -1, "exceptions_hypothetical": 0}, "E_LIMIT", "two errors: limit [limit] and negative count [domain]")
+    err(z, {"observations": "250", "exceptions_actual": -1, "exceptions_hypothetical": 0}, "E_SCHEMA", "two errors: observations a string [schema] and negative count [domain]")
     d = "risk.frtb.backtest.desk"
     err(d, {"observations": 250, "exceptions_99_actual": 0, "exceptions_99_hypothetical": 0, "exceptions_975_actual": 251, "exceptions_975_hypothetical": 0},
         "E_DOMAIN", "97.5% count above observations")
     err(d, {"observations": 250, "exceptions_99_actual": -1, "exceptions_99_hypothetical": 0, "exceptions_975_actual": 0}, "E_SCHEMA",
-        "two errors: a count missing and a negative count")
+        "two errors: a count missing [schema] and a negative count [domain]")
     c = "risk.frtb.backtest.count"
     err(c, {"var": [], "actual": [], "hypothetical": []}, "E_INPUT", "empty series")
     err(c, {"var": [1.0, 1.0], "actual": [0.0], "hypothetical": [0.0, 0.0]}, "E_INPUT", "series of different lengths")
     err(c, {"var": [1.0], "actual": ["x"], "hypothetical": [0.0]}, "E_SCHEMA", "a P&L that is not a number")
-    err(c, {"var": [1.0, 1.0], "actual": [0.0], "hypothetical": ["x", 0.0]}, "E_SCHEMA", "two errors: lengths differ and a string")
+    err(c, {"var": [1.0, 1.0], "actual": [0.0], "hypothetical": ["x", 0.0]}, "E_SCHEMA", "two errors: lengths differ [structural] and a string [schema]")
     # E1 goldens (ruling F-2, tools/check_e1_coverage.py): a non-finite Real is E_DOMAIN, before structural E_INPUT
     err(c, {"var": [1.0, "NaN"], "actual": [0.0, 0.0], "hypothetical": [0.0, 0.0]}, "E_DOMAIN", "E1: non-finite VaR (NaN)")
     err(c, {"var": [1.0, 1.0], "actual": ["Infinity"], "hypothetical": [0.0, 0.0]}, "E_DOMAIN",
-        "E1, two errors: actual P&L Infinity and series of different lengths (the finite rule first)")
+        "E1, two errors: actual P&L Infinity [finite] and series of different lengths [structural] (the finite rule first)")
+    # Audit A response (KR-237: KA-A16, KA-A17), appended so that the case ids above stay as they were.
+    import sys
+    sys.set_int_max_str_digits(0)
+    audit = ("added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; ruling KR-237): exact rational "
+             "arithmetic at p = 1/100 (Python fractions)")
+    o2 = zone_exact(2, 1, 0)
+    check((o2["zone"], o2["amber_from"], o2["red_from"], o2["cumulative_probability"]) == ("RED", 0, 1, 0.9999),
+          "KR-237: n = 2, one exception: P(X <= 1) = 0.9999 exactly, a tie with the red threshold: RED from 1")
+    s.add("risk.frtb.backtest.zone", {"observations": 2, "exceptions_actual": 1, "exceptions_hypothetical": 0}, o2,
+          verified=["hand", audit, SCIPY + ": binom.cdf MATCH 1e-12"], tags=TAGS_B + ["outside_checked"], output_classes=oc,
+          description="KR-237 (KA-A17): n = 2, one exception: 1 - p^2 = 0.9999 ties the red threshold exactly: RED, "
+                      "red_from 1, amber_from 0")
+    for n, xa, xh in [(100_000, 1_050, 0), (1_000_000, 10_164, 10_100), (1_000_000, 9_800, 0)]:
+        o = zone_exact(n, xa, xh)
+        s.add("risk.frtb.backtest.zone", {"observations": n, "exceptions_actual": xa, "exceptions_hypothetical": xh}, o,
+              verified=[audit, SCIPY + ": binom.cdf MATCH 1e-12"], tags=TAGS_B + ["outside_checked"], output_classes=oc,
+              limit={"absolute": 1e-15, "relative": 1e-12},
+              description=f"KR-237 (KA-A16): {n:,} observations, {max(xa, xh):,} exceptions: the binomial sum at large n "
+                          "against exact rationals (the lgamma form was 1.3e-10 off at 100,000)")
+    # KR-252 (audit KA-C20 (3)), appended 2026-11-20 so that the case ids above stay as they were: a non-finite
+    # token at an integer input is E_SCHEMA, which pins the Integer-only premise of the E1 exemption.
+    err(z, {"observations": 250, "exceptions_actual": "NaN", "exceptions_hypothetical": 0}, "E_SCHEMA",
+        "KR-252: a non-finite token (NaN) at an integer count is a schema error, not a number")
+    err(d, {"observations": 250, "exceptions_99_actual": "NaN", "exceptions_99_hypothetical": 0,
+            "exceptions_975_actual": 0, "exceptions_975_hypothetical": 0}, "E_SCHEMA",
+        "KR-252: a non-finite token (NaN) at an integer count is a schema error, not a number")
     s.write()
     return s
 
@@ -478,9 +574,101 @@ def gen_traffic_light():
         s.add("risk.backtest.traffic_light", {"observations": 250, "exceptions": x, "confidence": 0.99},
               {"cumulative_probability": f(c), "zone": zone, "plus_factor": 0.0 if x <= 4 else plus.get(x, 1.0)},
               verified=[ORACLE, SCIPY + ": binom.cdf MATCH 1e-12",
-                        f"published: MAR99 Table 2 (Basel Framework PDF p.758) row {x}: {printed[x]}%, zone {TABLES['printed_table2_zone'][x]} (YELLOW = Amber): MATCH"],
+                        f"published: MAR99 Table 2 (Basel Framework PDF p.758) row {x}: {printed[x]}%, zone {TABLES['printed_table2_zone'][x]} (YELLOW = Amber): MATCH", BLIND_PUB],
               tags=["stage_k", "traffic_light", "outside_checked", "published"], output_classes=oc,
               description=f"existing operation, {x} of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)")
+    # KR-253 (KA-A16 applied to stage J), appended so that the case ids above stay as they were. p is 1 - c as the
+    # operation computes it in binary64 (0.99 gives 0.010000000000000009), taken exactly; tolerance fixed here.
+    import sys
+    from fractions import Fraction
+    sys.set_int_max_str_digits(0)
+    kr253 = "added by lane k-r2-tl 2026-11-20 (ruling KR-253)"
+    for n, x, conf in [(100_000, 1_050, 0.99), (100_000, 2_600, 0.975), (1_000_000, 10_164, 0.99), (1_000_000, 9_800, 0.99)]:
+        pf = Fraction(1.0 - conf)
+        if n <= 100_000:
+            a, b = pf.numerator, pf.denominator
+            cc = b - a
+            term = cc ** n
+            total = term
+            for k in range(x):
+                term = term * (n - k) * a // ((k + 1) * cc)
+                total += term
+            cum = float(Fraction(total, b ** n))
+            how = "exact rational arithmetic at the binary64 p (Python fractions)"
+        else:
+            with mp.workdps(50):
+                pm = mp.mpf(pf.numerator) / pf.denominator
+                t = (1 - pm) ** n
+                acc = t
+                for k in range(x):
+                    t = t * (n - k) * pm / ((k + 1) * (1 - pm))
+                    acc += t
+                cum = float(acc)
+            how = "mpmath 50 digits at the binary64 p (term recurrence)"
+        sc = float(binom.cdf(x, n, 1.0 - conf))
+        assert abs(sc / cum - 1) <= 1e-12, (n, x, sc, cum)
+        zone = "GREEN" if cum < 0.95 else "YELLOW" if cum < 0.9999 else "RED"
+        s.add("risk.backtest.traffic_light", {"observations": n, "exceptions": x, "confidence": conf},
+              {"cumulative_probability": cum, "zone": zone, "plus_factor": None},
+              verified=[f"{kr253}: {how}", SCIPY + ": binom.cdf MATCH 1e-12", BLIND_TLK],
+              tags=["stage_k", "traffic_light", "outside_checked"], output_classes=oc,
+              limit={"absolute": 1e-15, "relative": 1e-12},
+              description=f"KR-253: {n:,} observations, {x:,} exceptions at {conf}: the stage J binomial at large n "
+                          "(the lgamma form drifted past 1e-10 here)")
+    # KR-253 amendment (coordinator 2026-11-20): exact boundaries. q = c is taken exactly as given, so at n = 1,
+    # x = 0 the cumulative probability is c itself and the zone edge (>= 0.95, >= 0.9999) is decided exactly.
+    for n, x, conf in [(1, 0, 0.95), (1, 0, 0.99), (1, 0, 0.9999), (250, 5, 0.99), (250, 0, 0.99)]:
+        qf = Fraction(conf)
+        pf = 1 - qf
+        a, b = pf.numerator, pf.denominator
+        cc = b - a
+        term = cc ** n
+        total = term
+        for k in range(x):
+            term = term * (n - k) * a // ((k + 1) * cc)
+            total += term
+        exact = Fraction(total, b ** n)
+        cum = float(exact)
+        if n == 1:
+            assert exact == qf and cum == conf
+        zone = "GREEN" if cum < 0.95 else "YELLOW" if cum < 0.9999 else "RED"
+        plus = (0.0 if x <= 4 else {5: 0.40, 6: 0.50, 7: 0.65, 8: 0.75, 9: 0.85}.get(x, 1.0)) if (n, conf) == (250, 0.99) else None
+        s.add("risk.backtest.traffic_light", {"observations": n, "exceptions": x, "confidence": conf},
+              {"cumulative_probability": cum, "zone": zone, "plus_factor": plus},
+              verified=[f"{kr253} amendment: exact rational arithmetic with q = c exactly (Python fractions)",
+                        "hand" if n == 1 else SCIPY + ": binom.cdf MATCH 1e-12",
+                        BLIND_TLK_NC if n == 1 else BLIND_TLK],
+              tags=["stage_k", "traffic_light", "boundary"] + ([] if n == 1 else ["outside_checked"]), output_classes=oc,
+              limit={"absolute": 0.0, "relative": 0.0} if n == 1 else {"absolute": 1e-15, "relative": 1e-12},
+              description=f"KR-253 amendment: {n} observation(s), {x} exception(s) at {conf}: "
+                          + ("P(X <= 0) = c exactly, on the zone edge" if n == 1 else
+                             "MAR99 Table 2 row, exact rational at the binary64 q"))
+    # Audit KF-21 (2026-11-20): one golden that tells the double-double power from plain binary64 powering.
+    # Plain powering is 7.6e-13 relative off here (inside 1e-12), so the tolerance is relative 2.3e-16 (about one
+    # unit in the last place), absolute 0. Tolerance fixed in this commit, before any build is run against it.
+    # Expected value: c^n = a^n / 2^(k n) exactly (c = a / 2^k), rounded once to binary64 with integer arithmetic
+    # (sticky bit kept), cross-checked against mpmath at 60 digits.
+    n, conf = 1_000_000, 0.999999
+    qf = Fraction(conf)
+    a, b = qf.numerator, qf.denominator
+    assert b & (b - 1) == 0
+    num = a ** n
+    shift = num.bit_length() - 64
+    top = num >> shift
+    if top << shift != num:
+        top |= 1
+    cum = math.ldexp(float(top), shift - (b.bit_length() - 1) * n)
+    with mp.workdps(60):
+        assert abs(mp.mpf(a) ** n / mp.mpf(b) ** n / mp.mpf(cum) - 1) < mp.mpf("1.2e-16")
+    assert cum == 0.36787925722106646, cum
+    s.add("risk.backtest.traffic_light", {"observations": n, "exceptions": 0, "confidence": conf},
+          {"cumulative_probability": cum, "zone": "GREEN", "plus_factor": None},
+          verified=["added by lane k-r2-gate 2026-11-20 (audit KF-21): exact integer arithmetic, a^n / 2^(kn) rounded once to binary64; "
+                    "mpmath 60 digits agrees; the audit's own exact check gave the same value"],
+          tags=["stage_k", "traffic_light", "power"], output_classes=oc,
+          limit={"absolute": 0.0, "relative": 2.3e-16},
+          description="KF-21: 1,000,000 observations, 0 exceptions at 0.999999: P(X <= 0) = c^n; "
+                      "plain binary64 powering is 7.6e-13 off and fails this tolerance")
     s.write()
     return s
 

@@ -99,8 +99,7 @@ def main(argv=None):
     offline = a.treasury_file or a.gsw_file
     fetch = file_fetch(a.treasury_file, a.gsw_file, cfg) if offline else http_fetch
     try:
-        text = (Path(a.ledger).read_text(encoding="utf-8") if Path(a.ledger).exists() else "") if a.ledger \
-            else git_show(a.ledger_ref, "ledger/curves.jsonl")
+        text = core.read_ledger(a.ledger) if a.ledger else git_show(a.ledger_ref, "ledger/curves.jsonl")
         runner = cli_runner(a.impl)
         out, new, notes = core.run(cfg, runner, text, now, fetch, a.commit, contract_version(a.impl), a.impl)
         v = core.verify(out, cfg, runner)
@@ -123,7 +122,7 @@ def main(argv=None):
         p = Path(a.ledger)
         p.parent.mkdir(parents=True, exist_ok=True)
         tmp = p.with_suffix(".tmp")
-        tmp.write_text(out, encoding="utf-8", newline="\n")
+        tmp.write_bytes(out.encode("ascii"))  # rows are ASCII with LF endings on every platform (KR-208)
         tmp.replace(p)
     if a.summary:
         Path(a.summary).write_text(json.dumps(core.summary(out, v), indent=1, sort_keys=True) + "\n", encoding="utf-8",

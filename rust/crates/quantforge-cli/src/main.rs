@@ -93,12 +93,8 @@ fn check_envelope(doc: &Json, flags: Flags) -> Result<(&str, &Json), QfError> {
 /// works on an array stops at `Inputs::gate`, after its typed reads. An oversized array in a key
 /// the operation ignores reaches the end, and its small result is replaced here.
 fn run_operation(op: &str, inputs: &Json) -> Result<ops::Outcome, QfError> {
-    if ops::stagek::STAGE_K_OPS.contains(&op) {
-        // HR-66 for stage K: structural E_INPUT comes before the F-2 E_DOMAIN and the stage K
-        // sizes come last, so the core applies both; the generic gate sizes do not apply.
-        return dispatch(op, &Inputs::new(&stage_k_tokens(op, inputs)));
-    }
-    let inputs = &with_non_finite_tokens(inputs);
+    // HR-122 (ruling KR-230) holds for the stage K verbs too: no special path.
+    let inputs = &tokens_for(op, inputs);
     let limit = operations()
         .contains(&op)
         .then(|| limits::check(op, inputs))
@@ -130,10 +126,10 @@ fn with_non_finite_tokens(v: &Json) -> Json {
     }
 }
 
-/// F-1 for the stage K verbs. `core.store.bitemporal_query` has no Real input but `value`, which is
-/// any JSON: an F-1 token at the top level of a value is read as a Real (and refused by the finite
+/// F-1 by operation. `core.store.bitemporal_query` has no Real input but `value`, which is any
+/// JSON: an F-1 token at the top level of a value is read as a Real (and refused by the finite
 /// rule); nested inside it, it stays a string, as do tokens in its string fields (ruling F-38).
-fn stage_k_tokens(op: &str, inputs: &Json) -> Json {
+fn tokens_for(op: &str, inputs: &Json) -> Json {
     if op != "core.store.bitemporal_query" {
         return with_non_finite_tokens(inputs);
     }

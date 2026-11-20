@@ -1,4 +1,4 @@
-"""xVA on given paths: collateralised exposure, valuation adjustments, SIMM-style IR delta
+"""xVA on given paths: collateralised exposure, valuation adjustments, sensitivity-based IR delta
 margin, Hull-White wrong-way risk, and the model-reserve dispersion statistic.
 
 Specifications: specifications/06-risk/xva-framework.md (rulings G-40 to G-44) and
@@ -217,13 +217,14 @@ def adjustments(
     return out
 
 
-# --- SIMM-style IR delta (G-43) -------------------------------------------------------------------
+# --- sensitivity-based IR delta margin (G-43, KR-152) --------------------------------------
 
 
-def simm_ir_delta(
+def sbim_ir_delta(
     sensitivities: Floats, risk_weights: Floats, correlations: Sequence[Floats], threshold: float
 ) -> dict[str, object]:
-    """`xva.simm.ir_delta`: weighted sensitivities, concentration factor and margin."""
+    """`xva.sbim.ir_delta` (deprecated alias `xva.simm.ir_delta`, KR-152): weighted sensitivities,
+    concentration factor and margin."""
     n = len(sensitivities)
     if (
         n < 1
@@ -272,58 +273,96 @@ def wwr_cva(
         raise _domain("hazard_rate must be above 0", "hazard_rate")
     if not 0 <= recovery < 1:
         raise _domain("recovery must be in [0, 1)", "recovery")
+    if any(abs(b * v) > WWR_MAX_BV for p in values for v in p):
+        raise _domain("|wwr_b * value| must be at most 700 (KR-257)", "wwr_b")
+    prev = 0.0
+    for t in times:
+        if (
+            math.exp(-hazard_rate * t) < _MIN_NORMAL
+            or -math.expm1(-hazard_rate * (t - prev)) < _MIN_NORMAL
+        ):
+            raise QfError(
+                "E_NON_FINITE",
+                "the survival target or a bucket default probability is below the smallest normal double",
+                "hazard_rate",
+            )
+        prev = t
     count = len(values)
     surv = [1.0] * count
     a_out, buckets = [], []
     prev = 0.0
     for i, t in enumerate(times):
         dt = t - prev
-        target = math.exp(-hazard_rate * t)
-        vs = [p[i] for p in values]
-
-        def g(
-            a: float,
-            vs: list[float] = vs,
-            dt: float = dt,
-            target: float = target,
-            surv: list[float] = surv,
-        ) -> tuple[float, float]:
-            terms = [s * math.exp(-math.exp(a + b * v) * dt) for s, v in zip(surv, vs, strict=True)]
-            hz = [math.exp(a + b * v) * dt for v in vs]
-            return (
-                ordered_sum(terms) / count - target,
-                -ordered_sum(x * h for x, h in zip(terms, hz, strict=True)) / count,
-            )
-
-        a = math.log(hazard_rate)
-        lo, hi = -math.inf, math.inf
-        for _ in range(200):
-            f, df = g(a)
-            if f > 0:
-                lo = a
-            else:
-                hi = a
-            step = a - f / df if df < 0 else math.nan
-            if not lo < step < hi:
-                step = (
-                    (lo + hi) / 2
-                    if math.isfinite(lo) and math.isfinite(hi)
-                    else (a + 1.0 if f > 0 else a - 1.0)
-                )
-            if abs(step - a) <= 1e-15 * max(1.0, abs(a)):
-                a = step
-                break
-            a = step
-        new = [s * math.exp(-math.exp(a + b * v) * dt) for s, v in zip(surv, vs, strict=True)]
+        cs = [b * p[i] for p in values]
+        a = _wwr_root(surv, cs, dt, hazard_rate)
+        qr = [_wwr_terms(a + c, dt) for c in cs]
         buckets.append(
             dfs[i]
-            * ordered_sum(max(v, 0.0) * (s0 - s1) for v, s0, s1 in zip(vs, surv, new, strict=True))
+            * ordered_sum(
+                max(p[i], 0.0) * s * x[0] for p, s, x in zip(values, surv, qr, strict=True)
+            )
             / count
         )
-        surv = new
+        surv = [s * x[1] for s, x in zip(surv, qr, strict=True)]
         a_out.append(a)
         prev = t
     return {"cva": (1 - recovery) * ordered_sum(buckets), "a": a_out}
+
+
+WWR_MAX_BV = 700.0
+_MIN_NORMAL = 2.2250738585072014e-308
+
+
+def _wwr_terms(z: float, dt: float) -> tuple[float, float, float]:
+    """For hazard `exp(z)` over `dt`: default probability `q = 1 - e^-x`, survival `r = e^-x` and
+    `dq/dz = x e^-x`, with `x = exp(z) dt`; an overflowing `exp(z)` is `inf` (q = 1, r = 0)."""
+    x = (math.inf if z > 709.0 else math.exp(z)) * dt
+    r = math.exp(-x)
+    return -math.expm1(-x), r, 0.0 if r == 0.0 else x * r
+
+
+def _wwr_root(surv: list[float], cs: list[float], dt: float, h: float) -> float:
+    """KR-257: `a` with `sum_p S_p (1 - e^(-x_p)) = (1 - e^(-h dt)) sum_p S_p`, `x_p = exp(a + c_p) dt`
+    (the G-44 equation divided through by `S(t_(i-1))`; above a bucket default probability of 1/2 the
+    survival form `sum_p S_p e^(-x_p) = e^(-h dt) sum_p S_p`). Bracket `[ln h - max c - 1,
+    ln h - min c + 1]` (closed form, sign change by monotonicity), safeguarded Newton (rtsafe) from
+    `ln h - (S-weighted mean of c)`, step to 1e-15 relative, at most 200 iterations."""
+    q_t, r_t = -math.expm1(-h * dt), math.exp(-h * dt)
+    use_q = q_t <= 0.5
+    total = ordered_sum(surv)
+
+    def f(a: float) -> tuple[float, float]:
+        terms = [_wwr_terms(a + c, dt) for c in cs]
+        if use_q:
+            val = ordered_sum(s * x[0] for s, x in zip(surv, terms, strict=True)) - q_t * total
+        else:
+            val = r_t * total - ordered_sum(s * x[1] for s, x in zip(surv, terms, strict=True))
+        return val, ordered_sum(s * x[2] for s, x in zip(surv, terms, strict=True))
+
+    ln_h = math.log(h)
+    lo, hi = ln_h - max(cs) - 1.0, ln_h - min(cs) + 1.0
+    a = ln_h - ordered_sum(s * c for s, c in zip(surv, cs, strict=True)) / total
+    dx = hi - lo
+    val, der = f(a)
+    for _ in range(200):
+        if val > 0:
+            hi = a
+        elif val < 0:
+            lo = a
+        else:
+            return a
+        dx_old, dx = dx, (val / der if der > 0 else math.inf)
+        step = a - dx
+        if not (lo < step < hi and abs(dx) <= 0.5 * abs(dx_old)):
+            dx = 0.5 * (hi - lo)
+            step = lo + dx
+        if abs(step - a) <= 1e-15 * max(1.0, abs(a)):
+            return step
+        a = step
+        val, der = f(a)
+    raise QfError(
+        "E_NO_CONVERGENCE", "the a(t) root did not converge in 200 steps", "wwr_b"
+    )  # pragma: no cover
 
 
 # --- model reserve (G-36) -------------------------------------------------------------------------

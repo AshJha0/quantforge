@@ -1,0 +1,16 @@
+{
+ "format": "QF-MOLD-S",
+ "label": "simulated; not a certified implementation; not connected to any venue",
+ "fields": {
+  "session": "QFSIM00001",
+  "sequence": 1,
+  "count": 1,
+  "blocks": [
+   "41000100001f1aced9f00000000000000000014200000064514653494d202020000f7314"
+  ]
+ },
+ "hex": "514653494d303030303100000000000000010001002441000100001f1aced9f00000000000000000014200000064514653494d202020000f7314",
+ "length": 58,
+ "sha256": "b05977dad951cc16a353128148917e087ba7a63056e7550b15e5f5a55ca3f235",
+ "derivation": "specifications/12-platform/adapters.md section 3.5"
+}

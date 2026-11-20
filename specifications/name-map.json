@@ -466,6 +466,7 @@
    "outputs": [
     "false_alarm_rate",
     "fire",
+    "nominal_rate",
     "sigma",
     "threshold"
    ]
@@ -10557,12 +10558,12 @@
     "discounted_ee"
    ]
   },
-  "xva.simm.ir_delta": {
+  "xva.sbim.ir_delta": {
    "spec": "specifications/06-risk/xva-framework.md",
-   "rust": "quantforge::xva::simm_ir_delta",
-   "python": "quantforge.xva.simm_ir_delta",
-   "java": "Xva.simmIrDelta",
-   "cpp": "qf::xva::simm_ir_delta",
+   "rust": "quantforge::xva::sbim_ir_delta",
+   "python": "quantforge.xva.sbim_ir_delta",
+   "java": "Xva.sbimIrDelta",
+   "cpp": "qf::xva::sbim_ir_delta",
    "inputs": {
     "concentration_threshold": {
      "java": "concentrationThreshold"
@@ -10582,6 +10583,34 @@
     "margin",
     "weighted_sensitivities"
    ]
+  },
+  "xva.simm.ir_delta": {
+   "spec": "specifications/06-risk/xva-framework.md",
+   "rust": "quantforge::xva::sbim_ir_delta",
+   "python": "quantforge.xva.sbim_ir_delta",
+   "java": "Xva.sbimIrDelta",
+   "cpp": "qf::xva::sbim_ir_delta",
+   "inputs": {
+    "concentration_threshold": {
+     "java": "concentrationThreshold"
+    },
+    "correlations": {
+     "java": "correlations"
+    },
+    "risk_weights": {
+     "java": "riskWeights"
+    },
+    "sensitivities": {
+     "java": "sensitivities"
+    }
+   },
+   "outputs": [
+    "concentration_factor",
+    "margin",
+    "weighted_sensitivities"
+   ],
+   "deprecated_alias_of": "xva.sbim.ir_delta",
+   "removal": "first release after v1.0.0 (carried in v1.0.0)"
   },
   "xva.wwr.cva_hw": {
    "spec": "specifications/06-risk/xva-framework.md",
@@ -10674,6 +10703,7 @@
   "risk.frtb.rfet",
   "risk.frtb.rfet.bucket",
   "risk.frtb.rrao",
+  "risk.sbim.placeholder",
   "xva.colva.value",
   "xva.exposure.amc",
   "xva.exposure.closeout",

@@ -94,9 +94,9 @@ Added 2026-11-19 before any R2 timing (rulings HR-130, HR-131; reasons in the sa
 
 | # | Measure | Target |
 |---|---|---|
-| L1-R2, L2-R2 | C++, Rust update p50 / p99 / p99.9 on R2 (raw venue messages, 6 to 8 h window) | 100 ns / 500 ns / 2 us (the R figures, unchanged) |
+| L1-R2, L2-R2 | C++, Rust update p50 / p99 / p99.9 on R2 (raw venue messages; window exactly 6 h of the first qualifying session, HR-134; first written as 6 to 8 h) | 100 ns / 500 ns / 2 us (the R figures, unchanged) |
 | L3-R2 | Java, same | 200 ns / 1 us / 5 us (unchanged) |
-| L7 | Per-level cost on the one-second differenced stream of the R2 window, p50 / p99 / p99.9 | C++, Rust 100 ns / 500 ns / 2 us; Java 200 ns / 1 us / 5 us. Secondary row: written after the 2026-11-19 R miss was seen (mean about 40 ns a level), so the p50 is expected to pass; it never re-judges that window |
+| L7 | Per-level cost on the one-second differenced stream of the R2 window, p50 / p99 / p99.9 | C++, Rust 100 ns / 500 ns / 2 us; Java 200 ns / 1 us / 5 us. Secondary row: written after the 2026-11-19 R miss was seen (mean about 40 ns a level), so the p50 is expected to pass; it never re-judges that window. Headline as in (a), both symbols, all three percentiles; label "per level, not per message; L1-L3 on R remain a recorded MISS" (HR-135) |
 
 Python: reported only. A miss is reported, not refitted.
 

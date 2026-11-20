@@ -15,13 +15,13 @@ The sections below follow the order in which stages were built. To find recipes 
 | 03 Calibration | [Build a curve](#build-a-curve), [Stage F](#stage-f-recipes) (joint solve), [Stage G](#stage-g-recipes) (Hull-White calibration) |
 | 04 Pricing | [Stage B](#stage-b-recipes), [Stage D](#stage-d-recipes), [Stage E](#stage-e-recipes), [Stage G](#stage-g-recipes) |
 | 05 Volatility | [Stage C](#stage-c-recipes), [Stage E](#stage-e-recipes) |
-| 06 Risk and xVA | [stage K](#stage-k-recipes) (intraday bounds, SA-CCR, backtesting zones, K-8 ladder), [R2 risk](#r2-risk-recipes), [Stage F](#stage-f-recipes), [Stage G](#stage-g-recipes), [stress scenarios and drift](#stage-j-wave-3-stress-scenarios-interpolation-backtests-drift-detectors) |
+| 06 Risk and xVA | [stage K](#stage-k-recipes) (intraday bounds, SA-CCR, backtesting zones, K-8 ladder; [desk recipes](#stage-k-desk-recipes)), [R2 risk](#r2-risk-recipes), [Stage F](#stage-f-recipes), [Stage G](#stage-g-recipes), [stress scenarios and drift](#stage-j-wave-3-stress-scenarios-interpolation-backtests-drift-detectors) |
 | 07 Portfolio | [Stage F](#stage-f-recipes) (book), [portfolio construction](#stage-j-wave-2-portfolio-construction-estimation-es-backtest-baum-welch) |
 | 08 Hedging | [Stage I](#stage-i-recipes) |
 | 09 Microstructure | [Stage H](#stage-h-recipes-available-from-v0100) (book rebuild, quotes, estimators), [trading conventions](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues) |
 | 10 Execution | [Stage H](#stage-h-recipes-available-from-v0100) (schedules, TCA, simulated venues, paper trading), [simulated auction, FX and futures venues](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues), [liquidity curve](#read-a-liquidity-cost-curve) |
 | 11 Research | [Stage J](#stage-j-recipes) |
-| 12 Platform | [Stage K](#stage-k-recipes) (bitemporal store, daily paper ledger, not yet running) |
+| 12 Platform | [Stage K](#stage-k-recipes) (bitemporal store, daily paper ledger, scheduled on main since 2026-11-20) |
 
 ## Run a tutorial script
 
@@ -555,7 +555,7 @@ Copy the inputs of the named case from `datasets/golden/stage_g/` and send them 
 | LMM caplets and Rebonato swaptions | `rates.lmm.capfloor`, `rates.lmm.swaption_rebonato` | `lmmcap_g`, `lmmswn_g` |
 | Monte Carlo Greeks; model-reserve dispersion | `risk.mc.greeks`, `risk.model_reserve.dispersion` | `mcgreeks_g`, `reserve_g` |
 | Expected exposure of a swap under Hull-White | `xva.exposure.swap_ee_hw` | `exposure_g-0001` |
-| Collateralised exposure; CVA, DVA, FVA; SIMM-style IR delta; wrong-way CVA | `xva.exposure.collateralised`, `xva.adjustments.value`, `xva.simm.ir_delta`, `xva.wwr.cva_hw` | `collexp_g`, `xvaadj_g-0001`, `simm_g`, `wwr_g` |
+| Collateralised exposure; CVA, DVA, FVA; sensitivity-based IR delta margin (placeholder weights); wrong-way CVA | `xva.exposure.collateralised`, `xva.adjustments.value`, `xva.sbim.ir_delta`, `xva.wwr.cva_hw` | `collexp_g`, `xvaadj_g-0001`, `sbim_g`, `wwr_g` |
 | EE, ENE, PFE, EPE and CVA of a swap portfolio under Hull-White (checked against ORE) | `xva.exposure.portfolio_hw` | `expsim_g-0001` |
 | Discretely monitored barrier (BGK shift) | `exotic.barrier.price` with `monitoring: DISCRETE` | `barrier_g` |
 
@@ -1283,7 +1283,7 @@ In the first case `participation` 1.5 is outside its domain and `market_volume` 
 
 ## Stage K recipes
 
-Stage K round 1 is merged on the integration branch `k-r1` and is not released. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
+Stage K round 1, with the round 2 audit fixes, is merged to main by 2026-11-20 (pull requests #58 and #59), not tagged; it is released with v1.0.0. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
 
 ### Query a bitemporal log
 
@@ -1309,7 +1309,7 @@ Expected (golden `inc_k-0002`): `first_changed_index` 1, `recomputed` 2, `discou
 {"schema_version": "1.0", "case_id": "trig", "operation": "calib.trigger.check", "inputs": {"changes": [1.0, -1.0, 1.0, -1.0], "x_ref": 100.0, "x_now": 105.0, "days_since": 1.0, "k": 3.0}}
 ```
 
-Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `threshold` 3.4641016151377544, `false_alarm_rate` 0.002699796063260189. A move exactly equal to the threshold does not fire (KR-13). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the four values above, bit for bit. `false_alarm_rate` is the stated `2 (1 - Phi(k))`, computed as `2 Phi(-k)` with a tail-accurate normal CDF (far-tail golden `trig_k-0009`). K-4c outside share: 4 of 6 value cases, by blind re-derivation.
+Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `threshold` 3.4641016151377544, `false_alarm_rate` 0.057668885622437306, `nominal_rate` 0.002699796063260189. A move exactly equal to the threshold does not fire (KR-13). `false_alarm_rate` is the rate of the trigger as used, with `sigma` estimated from four changes: `P(abs(T_3) > 3)` (spec 1.1.0, KR-232, class `tail_probability`, 1e-11 relative); `nominal_rate` is the known-sigma rate `2 (1 - Phi(k))`, computed as `2 Phi(-k)` (far-tail golden `trig_k-0009`). Observed (2026-11-20 on `k-r2-docs`, Python build through Tutorial 53 Step 2, local laptop, not the acceptance machine): these values to the printed six decimals. K-4c outside share: see `oracle/OUTSIDE_SHARES.md` (the blind matches cover `nominal_rate`).
 
 ### Intraday P&L with an error bound
 
@@ -1317,7 +1317,7 @@ Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `thres
 {"schema_version": "1.0", "case_id": "idr", "operation": "risk.intraday.delta_gamma_bound", "inputs": {"positions": [{"notional": 1000000.0, "maturity": 5.0, "yield": 0.04}], "shift": 0.01}}
 ```
 
-Expected (golden `idr_k-0001`): `estimate_pnl` -39913.124212551615, `bound` 17.05689068912462, `label` "latency-aware analytics on simulated data". Zero-coupon positions only. The item's outside-check share is 5 of 5 value cases, by the K-5a blind packet (`program/STAGE_K_BLIND_K5A.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `estimate_pnl` -39913.124212551615, `bound` 17.056890689124625 (the golden's 17.05689068912462 differs in the last place, inside the tolerance), `label` as expected.
+Expected (golden `idr_k-0001`, spec 1.1.0): `estimate_pnl` -39913.124212551615, `bound` 17.056890689308766, `label` "latency-aware analytics on simulated data". The bound is the Lagrange term plus a binary64 rounding allowance (KR-234); it is 1.1e-11 relative above the 1.0.0 value 17.05689068912462. Zero-coupon positions only. Outside check: the version 2 blind packet matched all 11 bounds and 9 of 11 cases (`program/STAGE_K_BLIND_K5A_V2.md`). Observed (2026-11-20 on `k-r2-docs`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the three values above, bit for bit.
 
 ### Guard a Richardson extrapolation
 
@@ -1329,7 +1329,7 @@ Expected (golden `rich_k-0001`): `status` `OK`, `observed_order` 2.0, `extrapola
 
 ### Ask for the smoothed Bermudan ladder
 
-Add `"method": "CN_RANNACHER_SMOOTHED"` to the inputs of `rates.shortrate.bermudan_ladder` or `rates.shortrate.bermudan_swaption`; absent or `G18_IMPLICIT` keeps the G-18 scheme bit for bit, and any other value is `E_SCHEMA` (`program/K8_PORT_NOTE.md`). Inputs otherwise as the stage G goldens; `datasets/golden/stage_k/k8_k.json` has seven value cases, run in all four builds. The default stays `G18_IMPLICIT` (KR-8). **The R6 use restriction is lifted for `CN_RANNACHER_SMOOTHED` only** (ruling KR-110, 2026-11-19, after acceptance 1 to 3 passed in all four builds); it still applies to `G18_IMPLICIT` (`docs/model-inventory.md`, MG-6). The ladder row of a curve node the price does not depend on (0.4986 years in the judged cases) is exactly zero and is not judged (owner decision 2026-11-19; `program/K8_ROW0_FINDING.md`: no bug). K-8 outside share: 7 of 7 value cases, by blind re-derivation (`program/STAGE_K_BLIND_K8.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the inputs of `k8_k-0001` with `method` `CN_RANNACHER_SMOOTHED` returned the golden's `price` 22737.43110152093 and every ladder entry bit for bit (about 3 s); the same inputs with `method` `CN_RANNACHER` returned `E_SCHEMA` ("method: CN_RANNACHER is not listed").
+Add `"method": "CN_RANNACHER_SMOOTHED"` to the inputs of `rates.shortrate.bermudan_ladder` or `rates.shortrate.bermudan_swaption`; absent or `G18_IMPLICIT` keeps the G-18 scheme bit for bit, and any other value is `E_SCHEMA` (`program/K8_PORT_NOTE.md`). Inputs otherwise as the stage G goldens; `datasets/golden/stage_k/k8_k.json` has seven value cases, run in all four builds. The default stays `G18_IMPLICIT` (KR-8). **The R6 use restriction stays for both methods: not for hedging** (ruling KR-113, 2026-11-19; `docs/model-inventory.md`, MG-6 and MK-5). Acceptance 1 to 3 pass at 201/100 on three in-sample cases; at 101/50 two of them miss 1%. The ladder row of a curve node the price does not depend on (0.4986 years in the judged cases) is exactly zero and is not judged (owner decision 2026-11-19; `program/K8_ROW0_FINDING.md`: no bug). K-8 outside share: 7 of 7 value cases, by blind re-derivation (`program/STAGE_K_BLIND_K8.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the inputs of `k8_k-0001` with `method` `CN_RANNACHER_SMOOTHED` returned the golden's `price` 22737.43110152093 and every ladder entry bit for bit (about 3 s); the same inputs with `method` `CN_RANNACHER` returned `E_SCHEMA` ("method: CN_RANNACHER is not listed").
 
 ### SA-CCR EAD for a netting set
 
@@ -1337,7 +1337,7 @@ Add `"method": "CN_RANNACHER_SMOOTHED"` to the inputs of `rates.shortrate.bermud
 {"schema_version": "1.0", "case_id": "saccr", "operation": "risk.saccr.ead", "inputs": {"trades": [{"id": "1", "asset_class": "IR", "notional": 10000, "market_value": 30, "maturity": 10, "position": "LONG", "start": 0, "end": 10, "hedging_set": "USD"}, {"id": "2", "asset_class": "IR", "notional": 10000, "market_value": -20, "maturity": 4, "position": "SHORT", "start": 0, "end": 4, "hedging_set": "USD"}, {"id": "3", "asset_class": "IR", "notional": 5000, "market_value": 50, "maturity": 11, "position": "BOUGHT", "kind": "OPTION", "option_type": "PUT", "underlying_price": 0.06, "strike": 0.05, "exercise": 1, "start": 1, "end": 11, "hedging_set": "EUR"}]}}
 ```
 
-Expected (golden `saccr_k-0001`, Basel CRE99 Example 1): `ead` 569.4701409373457, `rc` 60, `pfe` 346.76438638381836, `multiplier` 1, hedging-set add-ons EUR 50.4145690652664 and USD 296.34981731855197. Worked step by step in [Tutorial 56](docs/getting-started/tutorial-56-sa-ccr-example-1.md). SA-CCR outside share: 12 of 16 value cases (5 published examples, 7 blind re-derivations, `program/STAGE_K_BLIND_W1B.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `ead` 569.4701409373457, `rc` 60.0 and `multiplier` 1.0 as expected; `pfe` 346.7643863838184 and the add-ons EUR 50.414569065266406 and USD 296.349817318552 differ from the golden in the last digit or two, inside the tolerance.
+Expected (golden `saccr_k-0001`, Basel CRE99 Example 1): `ead` 569.4701409373457, `rc` 60, `pfe` 346.76438638381836, `multiplier` 1, hedging-set add-ons EUR 50.4145690652664 and USD 296.34981731855197. Worked step by step in [Tutorial 56](docs/getting-started/tutorial-56-sa-ccr-example-1.md). SA-CCR outside share: 12 of 19 value cases (`oracle/OUTSIDE_SHARES.md`, generated): the 5 published examples through the blind packet that re-derived them (`program/STAGE_K_BLIND_PUB.md`; a printed figure alone does not count, KR-250) and 7 blind re-derivations (`program/STAGE_K_BLIND_W1B.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `ead` 569.4701409373457, `rc` 60.0 and `multiplier` 1.0 as expected; `pfe` 346.7643863838184 and the add-ons EUR 50.414569065266406 and USD 296.349817318552 differ from the golden in the last digit or two, inside the tolerance.
 
 ### Backtesting zone and desk eligibility
 
@@ -1346,7 +1346,7 @@ Expected (golden `saccr_k-0001`, Basel CRE99 Example 1): `ead` 569.4701409373457
 {"schema_version": "1.0", "case_id": "desk", "operation": "risk.frtb.backtest.desk", "inputs": {"observations": 250, "exceptions_99_actual": 13, "exceptions_99_hypothetical": 0, "exceptions_975_actual": 0, "exceptions_975_hypothetical": 0}}
 ```
 
-Expected (spec worked example and golden `btk_k-0020`): the first gives `exceptions` 5, `zone` `AMBER`, `amber_from` 5, `red_from` 10, `multiplier` 1.7; the second `breach_99` true, `eligible` false. To count exceptions from series, send `risk.frtb.backtest.count` with `var`, `actual` and `hypothetical` arrays (a null counts as an exception; a loss equal to VaR does not). K-8e outside share: 23 of 24 value cases (12 against the printed MAR99 Table 2, 11 by blind re-derivation, `program/STAGE_K_BLIND_BTK.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): zone `exceptions` 5, `cumulative_probability` 0.9588168159302313, `zone` `AMBER`, `amber_from` 5, `red_from` 10, `multiplier` 1.7; desk `exceptions_99` 13, `breach_99` true, `breach_975` false, `eligible` false, as expected.
+Expected (spec worked example and golden `btk_k-0020`): the first gives `exceptions` 5, `zone` `AMBER`, `amber_from` 5, `red_from` 10, `multiplier` 1.7; the second `breach_99` true, `eligible` false. To count exceptions from series, send `risk.frtb.backtest.count` with `var`, `actual` and `hypothetical` arrays (a null counts as an exception; a loss equal to VaR does not). K-8e outside share: 23 of 28 value cases (`oracle/OUTSIDE_SHARES.md`, generated): the 12 MAR99 Table 2 cases through the blind packet that re-derived them (`program/STAGE_K_BLIND_PUB.md`; a printed figure alone does not count, KR-250) and 11 by blind re-derivation (`program/STAGE_K_BLIND_BTK.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): zone `exceptions` 5, `cumulative_probability` 0.9588168159302313, `zone` `AMBER`, `amber_from` 5, `red_from` 10, `multiplier` 1.7; desk `exceptions_99` 13, `breach_99` true, `breach_975` false, `eligible` false, as expected.
 
 ### Verify the daily paper ledger (not yet runnable)
 
@@ -1354,7 +1354,197 @@ Expected (spec worked example and golden `btk_k-0020`): the first gives `excepti
 git fetch origin paper-ledger paper-ledger-anchors
 git show origin/paper-ledger:ledger/ledger.jsonl > ledger.jsonl
 python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --no-cli         # from the ledger alone
-python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --require-days 20
+python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --anchors A --forward-log F --bitcoin-headers H --require-days 20
 ```
 
-`--no-cli` checks the chain, the configuration, the dates and holdout windows, and replays every day in exact decimal from the ledger's own numbers; the full run also rebuilds each day through the CLI. The tool is merged (`tools/paper_daily/verify_ledger.py`, spec `specifications/12-platform/paper-ledger-daily.md`). The `paper-ledger` branch does not exist until the workflow first runs on `main`, so the daily ledger is not yet running: **0 of 20 recorded trading days.** Every row is labelled "paper marks on a fitted curve; not tradable"; no performance claim is made. Not run: there is no ledger to fetch (2026-11-19, `k-r1`). Checked only that `verify_ledger.py --help` lists the `verify` command and the `--ledger`, `--no-cli` and `--require-days` options used above.
+`--no-cli` checks the chain, the configuration, the dates and holdout windows, and replays every day in exact decimal from the ledger's own numbers; the full run also rebuilds each day through the CLI. The tool is merged (`tools/paper_daily/verify_ledger.py`, spec `specifications/12-platform/paper-ledger-daily.md`). The workflow is scheduled on main since 2026-11-20 (pull request #59), and its first run creates the `paper-ledger` branch; on 2026-11-20 the branch did not exist yet (`git ls-remote origin`, read by the docs lane), so **0 of 20 recorded trading days.** Every row is labelled "paper marks on a fitted curve; not tradable"; no performance claim is made. Not run: there is no ledger to fetch (2026-11-19, `k-r1`). Checked only that `verify_ledger.py --help` lists the `verify` command and the `--ledger`, `--no-cli` and `--require-days` options used above.
+
+### Stage K desk recipes
+
+Tasks a desk user would do with the stage K operations and the jobs around them, each worked by hand and then run. Commands run from the repository root in Git Bash or a Unix shell and send the lines between `<<'EOF'` and `EOF` to the Python build in one batch. The outputs shown were observed on 2026-11-20 on branch `k-v1-docs2` with the Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine; the other three builds return the same values within each golden's tolerance in conformance. Every input below is synthetic or comes from a named golden; dates in requests are moved to 2027 so that this page carries no date inside a preregistered holdout window (`research/test_preregs.py`). No checker runs these blocks; they were run once by hand for this page.
+
+#### Correct a past value and prove that earlier as-of answers do not change
+
+Plain idea: when a correction arrives, append it with the time you learned it; never overwrite. A report rerun as of an earlier date must then give the number it gave then.
+
+Formal statement (`specifications/01-core/bitemporal-store.md`, KR-2, KR-4): the answer at `(K, V)` depends only on records with `knowledge_time <= K`, so appending a record with a later knowledge time cannot change it. Here record 3 corrects February from 100 to 105 and is learned on 1 April.
+
+```bash
+uv run --locked --project python quantforge batch <<'EOF'
+{"schema_version":"1.0","case_id":"mar_before","operation":"core.store.bitemporal_query","inputs":{"records":[{"sequence":1,"series_id":"A","valid_from":"2027-01-01T00:00:00Z","valid_to":null,"knowledge_time":"2027-01-02T00:00:00Z","value":100},{"sequence":2,"series_id":"A","valid_from":"2027-03-01T00:00:00Z","valid_to":null,"knowledge_time":"2027-03-02T00:00:00Z","value":110}],"series_id":"A","knowledge_as_of":"2027-03-15T00:00:00Z","valid_at":"2027-02-15T00:00:00Z"}}
+{"schema_version":"1.0","case_id":"apr_after","operation":"core.store.bitemporal_query","inputs":{"records":[{"sequence":1,"series_id":"A","valid_from":"2027-01-01T00:00:00Z","valid_to":null,"knowledge_time":"2027-01-02T00:00:00Z","value":100},{"sequence":2,"series_id":"A","valid_from":"2027-03-01T00:00:00Z","valid_to":null,"knowledge_time":"2027-03-02T00:00:00Z","value":110},{"sequence":3,"series_id":"A","valid_from":"2027-02-01T00:00:00Z","valid_to":"2027-03-01T00:00:00Z","knowledge_time":"2027-04-01T00:00:00Z","value":105}],"series_id":"A","knowledge_as_of":"2027-04-01T00:00:00Z","valid_at":"2027-02-15T00:00:00Z"}}
+{"schema_version":"1.0","case_id":"mar_after","operation":"core.store.bitemporal_query","inputs":{"records":[{"sequence":1,"series_id":"A","valid_from":"2027-01-01T00:00:00Z","valid_to":null,"knowledge_time":"2027-01-02T00:00:00Z","value":100},{"sequence":2,"series_id":"A","valid_from":"2027-03-01T00:00:00Z","valid_to":null,"knowledge_time":"2027-03-02T00:00:00Z","value":110},{"sequence":3,"series_id":"A","valid_from":"2027-02-01T00:00:00Z","valid_to":"2027-03-01T00:00:00Z","knowledge_time":"2027-04-01T00:00:00Z","value":105}],"series_id":"A","knowledge_as_of":"2027-03-15T00:00:00Z","valid_at":"2027-02-15T00:00:00Z"}}
+EOF
+```
+
+Output, key fields: `mar_before` `FOUND`, `row.sequence` 1, `row.value` 100; `apr_after` `FOUND`, sequence 3, value 105; `mar_after` `FOUND`, sequence 1, value 100. The third line is the check: the log now holds the correction, and the March answer is still the March answer, row for row. This is the log of golden `bt_k-0002` with every date one year later and its record 4 left out. Limits: one series, one pair of times per request; the acceptance property behind it (10,000 logs, 500,000 query pairs, 0 failures) is in `program/stage_k_w1/acceptance_python.json`, key `kr4_correction_property` (measured).
+
+#### Update one curve node incrementally and compare with a full rebuild
+
+Plain idea: when the 2-year quote ticks, the 1-year pillar cannot move, so copy it and solve only the 2-year and 3-year pillars. The result must be the same bits as rebuilding the whole curve, and a cache from somewhere else must be refused.
+
+Formal statement (`specifications/02-curves/incremental-update.md`, KR-5): `P_k = (1 - S_k sum_{i<k} P_i) / (1 + S_k)`. By hand for quotes 2%, 2.6%, 3%: `P_1 = 1/1.02 = 0.980392`, `P_2 = (1 - 0.026 x 0.980392) / 1.026 = 0.949815`, `P_3 = (1 - 0.03 x (0.980392 + 0.949815)) / 1.03 = 0.914654`.
+
+```bash
+uv run --locked --project python quantforge batch <<'EOF'
+{"schema_version":"1.0","case_id":"incremental","operation":"curve.incremental.update","inputs":{"previous_quotes":[0.02,0.025,0.03],"previous_discount_factors":[0.9803921568627451,0.9516977522716404,0.9145993230349208],"new_quotes":[0.02,0.026,0.03]}}
+{"schema_version":"1.0","case_id":"full_rebuild","operation":"curve.bootstrap.par_annual","inputs":{"quotes":[0.02,0.026,0.03]}}
+{"schema_version":"1.0","case_id":"stale_cache","operation":"curve.incremental.update","inputs":{"previous_quotes":[0.02,0.025,0.03],"previous_discount_factors":[0.9803921568627451,0.9516977522716404,0.9145993230349209],"new_quotes":[0.02,0.026,0.03]}}
+EOF
+```
+
+```json
+{"schema_version":"1.0","case_id":"incremental","status":"ok","outputs":{"discount_factors":[0.9803921568627451,0.9498146237052325,0.9146541714397676],"first_changed_index":1,"recomputed":2},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"full_rebuild","status":"ok","outputs":{"discount_factors":[0.9803921568627451,0.9498146237052325,0.9146541714397676]},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"stale_cache","status":"error","error":{"code":"E_INPUT","message":"previous_discount_factors is not the bootstrap of previous_quotes","field":"previous_discount_factors"},"diagnostics":{}}
+```
+
+The incremental and full answers are the same three binary64 numbers. The golden `inc_k-0002` states the last two as `...2326` and `...7677` (the 30-digit value rounded once); the build's `...2325` and `...7676` are one unit in the last place away, inside the 1e-15 absolute tolerance. The third line moves the cached last pillar by one unit in the last place (as golden `inc_k-0006` does) and is refused. Limits: the operation re-runs the previous bootstrap to check the cache, so it is never faster than one rebuild; the saving is in the library entry points without the check (`ois.bootstrap_incremental` in Python), measured bit-identical on 10,000 of 10,000 moves in each build (`program/STAGE_K_W1_HANDOVER.md`, key `incremental_property_stage_b_patched`).
+
+#### SA-CCR EAD for a small netting set, by hand and by CLI
+
+Plain idea: SA-CCR exposure is 1.4 times (what the netting set is worth to us now, floored at zero, plus a supervisory add-on for how much it could grow). Trades in the same currency and maturity bucket offset in full.
+
+Formal statement (`specifications/06-risk/sa-ccr.md`, CRE52 read 2026-11-19 by the SA-CCR lane). For an interest-rate trade from `S` to `E` years: supervisory duration `SD = (exp(-0.05 S) - exp(-0.05 E)) / 0.05`, adjusted notional `d = N x SD`, maturity factor `MF = sqrt(min(M, 1))` unmargined, delta +1 long and -1 short, effective notional `D = delta x d x MF`. Inside a currency the bucket sums `D_1` (under 1 year), `D_2` (1 to 5), `D_3` (over 5) combine as `sqrt(D_1^2 + D_2^2 + D_3^2 + 1.4 D_1 D_2 + 1.4 D_2 D_3 + 0.6 D_1 D_3)`; the add-on is 0.5% of that. `RC = max(V - C, 0)`, multiplier `m = min(1, 0.05 + 0.95 exp((V - C) / (2 x 0.95 x AddOn)))`, `PFE = m x AddOn`, `EAD = 1.4 (RC + PFE)`.
+
+By hand, a 10-year USD swap received on 10,000 (market value +30) and a 10-year USD swap paid on 5,000 (market value -10), no collateral: `SD = (1 - exp(-0.5)) / 0.05 = 7.869387`; `D_A = 78,693.87`, `D_B = -39,346.93`, both in bucket 3, so `D_3 = 39,346.93` and the effective notional is 39,346.93; add-on `0.005 x 39,346.93 = 196.73`; `V = 20`, `RC = 20`, `m = 1`; `EAD = 1.4 x (20 + 196.73) = 303.43`. If the set were worth -310 to us instead (the long swap at -300), `RC = 0` and `m = 0.05 + 0.95 exp(-310 / 373.80) = 0.4645`, so `EAD = 1.4 x 0.4645 x 196.73 = 127.94`.
+
+```bash
+uv run --locked --project python quantforge batch <<'EOF'
+{"schema_version":"1.0","case_id":"set_plus","operation":"risk.saccr.ead","inputs":{"trades":[{"id":"A","asset_class":"IR","notional":10000,"market_value":30,"maturity":10,"position":"LONG","start":0,"end":10,"hedging_set":"USD"},{"id":"B","asset_class":"IR","notional":5000,"market_value":-10,"maturity":10,"position":"SHORT","start":0,"end":10,"hedging_set":"USD"}]}}
+{"schema_version":"1.0","case_id":"set_minus","operation":"risk.saccr.ead","inputs":{"trades":[{"id":"A","asset_class":"IR","notional":10000,"market_value":-300,"maturity":10,"position":"LONG","start":0,"end":10,"hedging_set":"USD"},{"id":"B","asset_class":"IR","notional":5000,"market_value":-10,"maturity":10,"position":"SHORT","start":0,"end":10,"hedging_set":"USD"}]}}
+EOF
+```
+
+Output, key fields: `set_plus` `ead` 303.4285382011566, `rc` 20.0, `pfe` 196.7346701436833, `multiplier` 1.0, trade A `supervisory_duration` 7.8693868057473315 and `effective_notional` 78693.86805747332, trade B `effective_notional` -39346.93402873666; `set_minus` `ead` 127.94333326981402, `rc` 0.0, `multiplier` 0.4645246062932369. Both agree with the hand figures. These two netting sets are not goldens; for a published check, run golden `saccr_k-0001` (Basel CRE99 Example 1, EAD 569.47, worked in [Tutorial 56](docs/getting-started/tutorial-56-sa-ccr-example-1.md)). Limits: no margin agreement here; scope limits KR-39.
+
+#### Count exceptions and read the traffic-light zone
+
+Plain idea: an exception is a day the loss beat the VaR. FRTB counts them on actual and on hypothetical P&L and takes the larger count; the binomial distribution of exceptions for a correct 99% model says when that count is too many.
+
+Formal statement (`specifications/06-risk/frtb-ima-backtest.md`, KR-40 to KR-47; MAR32 and MAR99 read 2026-11-19): day `t` is an exception when the loss `-pnl_t` is strictly greater than `VaR_t`, or when either value is missing; a loss equal to VaR is not one. With `X ~ Binomial(n, 0.01)`, amber starts at the first count with `P(X <= x) >= 0.95` and red at `0.9999`.
+
+Step 1, count. Golden `btk_k-0024`: VaR `[1, 1, null, 2, 0.5]`, actual P&L `[-1, -1.25, 0.3, null, 0]`, hypothetical `[-1.5, 0, 0.1, -2.5, -0.5]`. By hand, actual: day 0 loses exactly the VaR (not an exception), day 1 loses 1.25 (exception), day 2 has no VaR and day 3 no P&L (both exceptions); hypothetical: days 0, 2 and 3. Step 2, the zone for 0 to 11 exceptions in 250 days.
+
+```bash
+{ echo '{"schema_version":"1.0","case_id":"count","operation":"risk.frtb.backtest.count","inputs":{"var":[1.0,1.0,null,2.0,0.5],"actual":[-1.0,-1.25,0.3,null,0.0],"hypothetical":[-1.5,0.0,0.1,-2.5,-0.5]}}'
+  for x in 0 1 2 3 4 5 6 7 8 9 10 11; do echo "{\"schema_version\":\"1.0\",\"case_id\":\"zone$x\",\"operation\":\"risk.frtb.backtest.zone\",\"inputs\":{\"observations\":250,\"exceptions_actual\":$x,\"exceptions_hypothetical\":0}}"; done
+} | uv run --locked --project python quantforge batch
+```
+
+`count` returns `days_actual` `[1, 2, 3]`, `days_hypothetical` `[0, 2, 3]`, `exceptions` 3, as worked. The zone lines, read from the output:
+
+| Exceptions | `cumulative_probability` | `zone` | `multiplier` |
+|---|---|---|---|
+| 0 | 0.08105851616218145 | GREEN | 1.5 |
+| 4 | 0.8921876269036252 | GREEN | 1.5 |
+| 5 | 0.9588168159301516 | AMBER | 1.7 |
+| 6 | 0.9862985521447962 | AMBER | 1.76 |
+| 9 | 0.9997498099312594 | AMBER | 1.92 |
+| 10 | 0.9999461013709529 | RED | 2.0 |
+
+Every line also says `amber_from` 5 and `red_from` 10. How to read it: with 4 exceptions a correct model is still well inside its own distribution (89.2% of correct models would show 4 or fewer); at 5 the chance of 5 or fewer first reaches 95%. A correct model still shows 5 or more about 1 time in 9 (`1 - 0.8922 = 10.8%`), which is why amber means "look", not "wrong"; red starts at 10, the first count with `P(X <= x)` at or above 99.99% (0.99995 at 10, 0.99975 at 9), so 10 or more happens to a correct model 2.5 times in 10,000 (`1 - 0.99975`). The multipliers are MAR32 Table 1's for 250 days. Golden for the 5-exception line: `btk_k-0006`, expected `cumulative_probability` 0.9588168159301517, one unit in the last place from the Python output, inside the tolerance (the probabilities follow ruling KR-237's arithmetic-only recurrence). An earlier recipe observed 0.9588168159302313 on 2026-11-19, before that ruling's code was merged (inferred from the dates). Limits: the zone is a statement about a 99% VaR model under independence of exceptions; clustering of exceptions is not tested here (that is the Christoffersen test of stage F).
+
+#### Check the intraday bound against full revaluation
+
+Plain idea: the delta-gamma estimate is fast; the bound says how far it can be from revaluing the position. Check it yourself by revaluing.
+
+Formal statement (`specifications/06-risk/intraday-risk-bounds.md` 1.1.0, KR-7, KR-15, KR-234): for `V(y) = N exp(-y T)` the estimate is `V (-T h + T^2 h^2 / 2)` and the Lagrange part of the bound is `|h|^3 T^3 |N| exp(-T min(y, y + h)) / 6`, plus a binary64 rounding allowance.
+
+```bash
+uv run --locked --project python quantforge batch <<'EOF'
+{"schema_version":"1.0","case_id":"move_1pct","operation":"risk.intraday.delta_gamma_bound","inputs":{"positions":[{"notional":1000000.0,"maturity":5.0,"yield":0.04}],"shift":0.01}}
+{"schema_version":"1.0","case_id":"move_1bp","operation":"risk.intraday.delta_gamma_bound","inputs":{"positions":[{"notional":1000000.0,"maturity":5.0,"yield":0.04}],"shift":0.0001}}
+EOF
+python -c "import math; [print(h, 1e6*(math.exp(-(0.04+h)*5)-math.exp(-0.2))) for h in (0.01, 0.0001)]"
+```
+
+Output: `move_1pct` `estimate_pnl` -39913.124212551615, `bound` 17.056890689308766 (golden `idr_k-0001`); `move_1bp` `estimate_pnl` -409.2630351948562, `bound` 1.7056892435299685e-05. Full revaluation, from the last line: -39929.97000657694 and -409.2630522495311. Errors: 16.85, which is 98.8% of the bound, and 1.7055e-05, 99.99% of the bound. The bound is close to the error because one zero-coupon position's third derivative barely changes over the move; on a book, bounds are added without netting, so the ratio falls. Limits: zero-coupon positions and parallel moves only; label "latency-aware analytics on simulated data".
+
+#### Catch an edited ledger row and recompute its hash
+
+Plain idea: each ledger row stores the SHA-256 of its own canonical bytes and the hash of the row before it. Change one character and the stored hash no longer fits.
+
+Formal statement (`specifications/10-execution/paper-trading.md`, HR-45, HR-46): `hash = SHA-256(canonical(row without "hash"))`, canonical meaning keys sorted, separators `,` and `:` with no spaces, ASCII escapes; `prev` of row 0 is 64 zeros. The daily paper ledger uses the same rule (`specifications/12-platform/paper-ledger-daily.md`). Golden `pt_h-0021` is a one-row ledger whose `limit_price` was changed from "101" to "102" after hashing.
+
+```bash
+python -c "
+import json
+c = next(c for c in json.load(open('datasets/golden/stage_h/pt_h.json'))['cases'] if c['case_id'] == 'pt_h-0021')
+t = c['inputs']['text']
+for cid, text in (('as_edited', t), ('restored', t.replace('\"limit_price\":\"102\"', '\"limit_price\":\"101\"', 1))):
+    print(json.dumps({'schema_version': '1.0', 'case_id': cid, 'operation': 'paper.ledger.verify', 'inputs': {'text': text}}))
+" | uv run --locked --project python quantforge batch
+python -c "
+import hashlib, json
+row = {'body': {'limit_price': '101', 'order_id': 'O1', 'quantity': '3', 'side': 'BUY', 'symbol': 'BTC-USD', 'type': 'LIMIT'}, 'kind': 'ORDER', 'label': 'crypto venue; simulated', 'prev': '0' * 64, 'seq': 0, 'ts': '2026-11-18T00:00:01Z'}
+for price in ('101', '102'):
+    row['body']['limit_price'] = price
+    print(price, hashlib.sha256(json.dumps(row, sort_keys=True, separators=(',', ':'), ensure_ascii=True).encode()).hexdigest())
+"
+```
+
+```json
+{"schema_version":"1.0","case_id":"as_edited","status":"ok","outputs":{"ok":false,"records":0,"first_bad_seq":0,"reason":"HASH","head":null,"label":"crypto venue; simulated"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"restored","status":"ok","outputs":{"ok":true,"records":1,"first_bad_seq":null,"reason":null,"head":"72c85984abb1b7c4072c65dbba0567b3de51279645b0ad63cfd242137aed7e81","label":"crypto venue; simulated"},"diagnostics":{}}
+```
+
+The standard-library lines print `101 72c85984...7e81` (the stored hash) and `102 937f6a4d3baa1a1870e38e7ffb2e7152385de5fcf0b097ebc789238943764e90`. So the verifier is not trusting anything it cannot recompute. Limits: a chain alone does not catch someone who edits a row and recomputes every later hash; that is what the anchors on a separate branch are for (HR-46; for the daily ledger, OpenTimestamps on `paper-ledger-anchors`). The daily ledger has no rows yet: 0 of 20 recorded trading days as of 2026-11-20 13:00 UTC.
+
+#### Explain a day's P&L into carry, roll-down, curve move and costs
+
+Plain idea: a day's change in NAV splits into what the positions earn by the passing of time (carry and roll-down), what the curve's move did to them, and what trading cost. In the daily paper ledger the split must close exactly, with nothing left unexplained.
+
+Formal statement (`specifications/12-platform/paper-ledger-daily.md`, "Daily P&L explain", KR-79), with `n` the opening units and positions struck at par: carry = `sum n x accrued` + cash interest; roll-down = `sum n x (clean_roll - 100)`, where `clean_roll` is the clean price on yesterday's curve one day older; curve move = `sum n x (clean_close - clean_roll)`; fills and costs = `sum s q (100 - p)` minus fees (`s` +1 for a buy). Every term is an exact decimal from recorded 6-decimal marks and whole lots, so `unexplained = total - (carry + roll_down + curve_move + fills_costs)` is exactly 0, a bookkeeping identity rather than a model test.
+
+The command builds the first three days of the synthetic 30-day ledger of `python/tests/test_paper_daily.py` (invented yields from 2027-01-04; not market data) through the job's own code, `tools/paper_daily/paper_core.py`, and prints day 2:
+
+```bash
+uv run --locked --project python python -c "
+import sys; sys.path.insert(0, 'python/tests')
+import test_paper_daily as t
+days = t.business_days(3)
+row = t.rows_of(t.run_days(days, t.forward_log(t.synthetic_yields(days))))[2]
+b = row['body']
+print(b['date'], b['nav_open'], b['nav_close'], b['pnl'])
+print({k: b['explain'][k] for k in ('carry', 'coupon_accrual', 'cash_interest', 'roll_down', 'curve_move', 'fills_costs', 'total', 'unexplained')})
+print(row['hash'])
+"
+```
+
+Output: `2027-01-05 9999714.0625 9998826.61425 -887.44825`; carry 1213.9355 (coupon accrual 352.1055 plus cash interest 861.83), roll-down 16.5625, curve move -1993.7275, fills and costs -124.21875, total -887.44825, unexplained 0; row hash `06897fde4a8a5a7a787777ec9769827e136257b53007282ae1415732e3eba468`. Check by hand: 1,213.9355 + 16.5625 - 1,993.7275 - 124.21875 = -887.44825 = 9,998,826.61425 - 9,999,714.0625. The cash interest is one day at the previous day's 3-month yield: 7,349,714.0625 x 4.28% / 365 = 861.83 to the cent. The row hash is the one `test_goldens_pl_k` pins, so the day above is the spec's worked day; `uv run --locked --project python pytest python/tests/test_paper_daily.py::test_goldens_pl_k -q` checks it (1 passed, 2026-11-20). Limits: the order rule ignores the market and fills are simulated; label "paper marks on a fitted curve; not tradable"; no performance claim. Replayed by hand in exact decimal in [Tutorial 58](docs/getting-started/tutorial-58-daily-paper-ledger.md).
+
+#### Confirm that the deprecated margin alias gives the same answer
+
+Plain idea: the stage G margin operation was renamed; the old id still works in v1.0.0 and must return exactly what the new id returns.
+
+Formal statement (`specifications/cli-contract.md`, section "Deprecated aliases"; KR-152, KR-256): `xva.simm.ir_delta` runs the handler of `xva.sbim.ir_delta`; it stays in v1.0.0 and is removed in the first release after v1.0.0. The inputs below are those of golden `sbim_alias_k-0001` (placeholder weights `RW = 10 x k`, `rho = 1 - 0.1 abs(k - l)`).
+
+```bash
+python -c "
+import json
+c = json.load(open('datasets/golden/stage_k/sbim_alias_k.json'))['cases'][0]
+for op in ('xva.sbim.ir_delta', 'xva.simm.ir_delta'):
+    print(json.dumps({'schema_version': '1.0', 'case_id': op, 'operation': op, 'inputs': c['inputs']}))
+" | uv run --locked --project python quantforge batch
+```
+
+Both lines return `weighted_sensitivities` `[10000.0, -10000.0, 75000.0, 160000.0, -60000.0, 18000.0]`, `concentration_factor` 1.0 and `margin` 190937.1624383268. By hand, the weighted sensitivities are `RW_k x s_k`: 10 x 1,000, 20 x -500, 30 x 2,500, 40 x 4,000, 50 x -1,200, 60 x 300. Limits: placeholder weights; not a margin anyone could post; no ISDA material is used (owner decision 2026-11-19).
+
+#### Which error does a request with two faults get?
+
+Plain idea: every build checks in one fixed order, so two faults give one code everywhere (see [ARCHITECTURE](ARCHITECTURE.md#the-four-build-conformance-model-and-why-two-wrong-inputs-give-one-error)).
+
+```bash
+uv run --locked --project python quantforge batch <<'EOF'
+{"schema_version":"1.0","case_id":"e2_k-0008","operation":"calib.trigger.check","inputs":{"changes":[1.0],"x_ref":100.0,"x_now":105.0,"days_since":1.0,"k":0.0}}
+{"schema_version":"1.0","case_id":"e2_k-0011","operation":"risk.intraday.delta_gamma_bound","inputs":{"positions":[],"shift":"NaN"}}
+EOF
+```
+
+```json
+{"schema_version":"1.0","case_id":"e2_k-0008","status":"error","error":{"code":"E_INPUT","message":"changes must hold at least two one-day changes","field":"changes"},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"e2_k-0011","status":"error","error":{"code":"E_DOMAIN","message":"shift is not finite","field":"shift"},"diagnostics":{}}
+```
+
+The first breaks a structural rule and a domain rule: structural comes first, `E_INPUT`. The second breaks a structural rule and the finite rule: the finite rule comes first, `E_DOMAIN` (KR-230). The goldens compare the code only; the messages are the Python build's.

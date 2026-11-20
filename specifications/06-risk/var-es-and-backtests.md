@@ -1,6 +1,6 @@
 # Value at risk, expected shortfall and backtests
 
-Spec version 1.0.0. Status: Specified (stage F, slice F4, plan item Q2). Rulings: `stage-f-rulings.md` F-31 to F-32. Suite `stage_f/risk_f4`, written by `oracle/python/gen_stage_f_w2.py` (slice `F4`).
+Spec version 1.1.0 (1.0.0 to 1.1.0 on 2026-11-20: traffic light arithmetic changed by KR-253, a behaviour change of a released operation, audit KF-20). Status: Specified (stage F, slice F4, plan item Q2). Rulings: `stage-f-rulings.md` F-31 to F-32. Suite `stage_f/risk_f4`, written by `oracle/python/gen_stage_f_w2.py` (slice `F4`).
 
 **Plain idea.** Value at risk (VaR) answers "how much could we lose on a bad day, at 99% confidence?"; expected shortfall (ES) answers "and when it is that bad, how much on average?". Both are read off a set of profit-and-loss scenarios: past days replayed (historical), past days rescaled to today's volatility (filtered historical), simulated days (Monte Carlo), or a normal distribution (parametric). A backtest then asks whether the model's losses broke VaR as often as they should (Kupiec), whether the breaks bunch together (Christoffersen), and which supervisory zone that puts the bank in (the Basel traffic light).
 
@@ -63,6 +63,8 @@ p-values: chi-square with 1, 1 and 2 degrees of freedom. Ruling F-32 applies to 
 ## `risk.backtest.traffic_light`
 
 Inputs: `observations` (`>= 1`; above 1,000,000 is `E_LIMIT`, checked first, ruling J-W3-17), `exceptions` (`0 <= x <= n`, else `E_DOMAIN`), `confidence`. `cumulative_probability = P(X <= x)`, `X ~ Binomial(n, 1 - c)`. Zone: `GREEN` below 0.95, `YELLOW` below 0.9999, else `RED` [S8]. At `n = 250` and `c = 0.99` this gives green for 0 to 4 exceptions, yellow for 5 to 9, red from 10, as Table 2 of [S8]; `plus_factor` is that table's value (0 for 0 to 4; 0.40, 0.50, 0.65, 0.75, 0.85 for 5 to 9; 1.00 from 10). Vintage (R6-28.1): this is the 1996 plus factor on the multiplier base 3; the FRTB backtesting table (multiplier base 1.5, plus factors 0.20 to 0.50) is a different test and is not implemented. For any other `n` or `c`, `plus_factor` is `null`.
+
+**Arithmetic from 2026-11-20 (KR-253; audit A KA-A16).** The non-exception probability is `q = c`, taken exactly as given, and `p = 1 - c`. For `x = 0`, `P(X <= 0) = q^n`, computed by binary powering in double-double, so at `n = 1` it is `c` itself and a confidence on a zone edge lands in the higher zone (`n = 1, x = 0, c = 0.95` is YELLOW). For `x >= 1` it is the arithmetic-only binomial of KR-237 (`frtb-ima-backtest.md`) with that `q`. Worked example: `n = 250, x = 0, c = 0.99` gives `0.99^250 = 0.0810585...`, GREEN. The earlier sum of log-gamma terms drifted as `n` grew (relative error past 1e-10 near n = 100,000; measured by `python/tests/test_traffic_light_binomial.py` against exact rationals); the new form stays within 1e-12 of exact rationals at n up to 1,000,000 (goldens `tlk_k-0012` to `-0020`, tolerance fixed in the generator before the run).
 
 ## Convergence and limit cases
 

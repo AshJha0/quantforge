@@ -7,6 +7,7 @@
 
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/var_frtb.hpp"
+#include "quantforge/core/frtb_backtest.hpp"
 #include "dispatch.hpp"
 #include "quantforge/core/rng.hpp"
 
@@ -142,4 +143,14 @@ TEST_CASE("R6-4.1 sbm_total sums classes within a scenario, then takes the worst
     CHECK(code(R"([{"risk_class":"FX","measure":"DELTA","scenarios":{"high":"NaN","medium":1,"low":1}}])") == "E_DOMAIN");
     CHECK(code(R"([{"risk_class":"FX","measure":"DELTA","scenarios":{"high":1,"medium":1,"low":1}},)"
                R"({"risk_class":"FX","measure":"DELTA","scenarios":{"high":1,"medium":1,"low":1}}])") == "E_INPUT");
+}
+
+// Audit KF-21 (2026-11-20): the double-double power against exact binary64 results (a^n / 2^(kn) rounded once,
+// exact integer arithmetic). Plain binary64 powering differs on each case, so a plain loop fails here.
+TEST_CASE("KR-253 power is the correctly rounded binary64 result", "[k8e]") {
+    CHECK(frtb_backtest::power(0.99, 250) == 0.08105851616218128);
+    CHECK(frtb_backtest::power(0.95, 7) == 0.6983372960937497);
+    CHECK(frtb_backtest::power(0.9999, 99999) == 4.5381772136224775e-05);
+    CHECK(frtb_backtest::power(0.999999, 1000000) == 0.36787925722106646);
+    CHECK(frtb_backtest::power(0.95, 1) == 0.95);
 }

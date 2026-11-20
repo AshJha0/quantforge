@@ -94,14 +94,14 @@
   "total": 12,
   "rule": "own formulas on given inputs: not counted (G-40)"
  },
- "simm_g": {
+ "sbim_g": {
   "counted": 0,
   "total": 8,
   "rule": "own formulas on given inputs: not counted (G-40)"
  },
  "wwr_g": {
   "counted": 0,
-  "total": 6,
+  "total": 26,
   "rule": "own formulas on given inputs: not counted (G-40)"
  },
  "expsim_g": {

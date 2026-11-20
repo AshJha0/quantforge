@@ -111,3 +111,7 @@ SIMM check until the owner decides.
 - Whether the PyPI wheel 1.8.17.0 exposes the `saccr`, `bacva`, `sacva`, `simm` and `dim` analytics through `OREApp` was not checked; the repository's own stage G runs only used `npv`, `simulation` and `xva`.
 - The origin of the 2016 market data in `Examples/Input/` is not stated in any file read.
 - Our own item scopes (16 SA-CCR value cases, the SIMM-style item) are taken from the lane brief and `oracle/LICENCES.md`, not re-read from the stage K plan.
+
+## 8. Decision note, 2026-11-19: SIMM removed as a named item (owner)
+
+Owner decision 2026-11-19 (binding), answering the flag in section 5: the ISDA SIMM methodology is restricted by its own notice to a market participant's own commercial transactions or a written ISDA licence, and cites a US patent, so the project uses **no ISDA material**. ORE's SIMM example, CRIF inputs and margin calibration files listed in sections 3 and 5 are not to be opened, run or used as a check, and section 6's SIMM recommendation is withdrawn. The file names in sections 3 and 5 stay as a record of what the survey listed; no content of those files was read. Stage K item K-8h continues only as the project's own sensitivity-based initial margin on placeholder weights (`sbim`; `specifications/06-risk/sbim-placeholder.md`), checked by a blind re-derivation of our own algebra, not by ORE.

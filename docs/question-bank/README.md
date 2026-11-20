@@ -1,6 +1,6 @@
 # QuantForge question bank
 
-A learning question bank and knowledge check: 450 questions with full answers, in 14 sets that follow the project's topics. It is for two readers. A newcomer can work through the foundation questions in order; a practitioner can jump to a set and test themselves against QuantForge's own conventions and rulings.
+A learning question bank and knowledge check: 470 questions with full answers, in 14 sets that follow the project's topics. It is for two readers. A newcomer can work through the foundation questions in order; a practitioner can jump to a set and test themselves against QuantForge's own conventions and rulings.
 
 How to use it: read the question, answer it on paper, then read the answer. Each answer starts with the plain idea, then gives the formal rule as the spec states it, then (for quantitative topics) a worked example with numbers, and ends with the pitfall that matters on a desk or in validation. Each question names its source spec or tutorial and an evidence class:
 
@@ -27,14 +27,14 @@ Levels: **foundation** (the idea and the convention), **practitioner** (using th
 | [Research statistics and backtest honesty](11-research-statistics.md) | 10 | 12 | 8 | 30 |
 | [Four-language engineering and verification](12-engineering-verification.md) | 11 | 13 | 6 | 30 |
 | [Execution and microstructure](13-execution-microstructure.md) | 18 | 20 | 9 | 47 |
-| [Stage K: data platform, intraday risk, capital and the paper ledger](14-stage-k-risk-platform.md) | 10 | 11 | 11 | 32 |
-| **Total** | 153 | 188 | 109 | **450** |
+| [Stage K: data platform, intraday risk, capital and the paper ledger](14-stage-k-risk-platform.md) | 13 | 20 | 19 | 52 |
+| **Total** | 156 | 197 | 117 | **470** |
 
 Back to [Learn QuantForge](../../LEARN.md).
 
 ## Foundation questions
 
-153 questions.
+156 questions.
 
 - Q1.1 (01-foundations-numerics.md) How do ACT/360 and ACT/365F differ, and what year fraction does each give from 1 January to 1 July 2024?
 - Q1.4 (01-foundations-numerics.md) What does QuantForge return when the start equals the end, or the end is before the start?
@@ -189,10 +189,13 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q14.25 (14-stage-k-risk-platform.md) Where do the amber and red boundaries come from?
 - Q14.29 (14-stage-k-risk-platform.md) What does a DAY row's P&L explain contain, and why must the unexplained term be exactly zero?
 - Q14.32 (14-stage-k-risk-platform.md) How many recorded trading days are there, and why are FedInvest prices not used?
+- Q14.33 (14-stage-k-risk-platform.md) Why can a store with one time axis not replace a bitemporal store, and what does a query before the first knowledge time return?
+- Q14.42 (14-stage-k-risk-platform.md) Derive the bound of `idr_k-0001` by hand.
+- Q14.52 (14-stage-k-risk-platform.md) Why are the margin weights labelled "placeholder weights", and what can a result computed with them be used for?
 
 ## Practitioner questions
 
-188 questions.
+197 questions.
 
 - Q1.2 (01-foundations-numerics.md) What does ACT/ACT ISDA give from 1 November 2003 to 1 May 2004, and how does ACT/ACT ICMA differ on the same dates?
 - Q1.3 (01-foundations-numerics.md) How do the 30/360 variants treat 29 February 2024 to 31 August 2024?
@@ -382,10 +385,19 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q14.26 (14-stage-k-risk-platform.md) Which exception count does FRTB use, and what multiplier follows?
 - Q14.28 (14-stage-k-risk-platform.md) When does a trading desk lose permission to use its model?
 - Q14.30 (14-stage-k-risk-platform.md) What can be verified from the ledger alone, with no CLI and no outside data?
+- Q14.34 (14-stage-k-risk-platform.md) A quote at 0-based index `j` of an `n`-pillar annual par curve moves. How many pillars does `curve.incremental.update` solve again, and what does the call cost?
+- Q14.36 (14-stage-k-risk-platform.md) Why is a cache that is off by one unit in the last place refused instead of patched?
+- Q14.40 (14-stage-k-risk-platform.md) A move lands exactly on the threshold. Does the trigger fire, and why does the spec bother to say?
+- Q14.41 (14-stage-k-risk-platform.md) Why is a window of three equal changes refused?
+- Q14.43 (14-stage-k-risk-platform.md) Why are position bounds added without netting, and what does a two-position book show?
+- Q14.45 (14-stage-k-risk-platform.md) Two 10-year USD swaps, received on 10,000 (value +30) and paid on 5,000 (value -10), no collateral. What is the SA-CCR EAD?
+- Q14.47 (14-stage-k-risk-platform.md) The same two swaps are worth -310 to us. What happens to the multiplier and the EAD?
+- Q14.50 (14-stage-k-risk-platform.md) An attacker edits row 7 of a hash-chained ledger. What does the verifier report if they recompute nothing, only row 7's hash, or every later hash?
+- Q14.51 (14-stage-k-risk-platform.md) Show that the paper ledger's three market terms telescope on the spec's worked day.
 
 ## Advanced questions
 
-109 questions.
+117 questions.
 
 - Q1.5 (01-foundations-numerics.md) Why does ACT/ACT AFB give the same answer from 28 February 2004 to both 28 and 29 February 2008, and why does Strata disagree?
 - Q1.21 (01-foundations-numerics.md) How does the adaptive Gauss-Kronrod rule integrate `1/sqrt(x)` on `[0, 1]` when the integrand is infinite at 0?
@@ -450,7 +462,7 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q8.34 (08-market-risk.md) How does `risk.stress.reverse` find the size of move that loses a target amount?
 - Q8.35 (08-market-risk.md) Pathwise or likelihood ratio: which Monte Carlo Greek is less noisy for a vanilla call?
 - Q9.16 (09-counterparty-xva.md) How does QuantForge model wrong-way risk, and what does it do to CVA?
-- Q9.17 (09-counterparty-xva.md) How does the SIMM-style IR delta margin aggregate, and what does the concentration factor do?
+- Q9.17 (09-counterparty-xva.md) How does the sensitivity-based IR delta margin aggregate, and what does the concentration factor do?
 - Q9.18 (09-counterparty-xva.md) How are MVA and KVA defined in `xva.adjustments.value`?
 - Q9.19 (09-counterparty-xva.md) How was the portfolio exposure engine checked against ORE, and why do some cases not count?
 - Q9.20 (09-counterparty-xva.md) How much does netting a payer with a receiver reduce CVA in the Hull-White portfolio engine?
@@ -496,3 +508,11 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q14.24 (14-stage-k-risk-platform.md) What is the SA-CCR outside-check share, and why are four matching cases excluded?
 - Q14.27 (14-stage-k-risk-platform.md) Why is zero exceptions in five days amber under the rule as written?
 - Q14.31 (14-stage-k-risk-platform.md) What do the anchors add to the hash chain?
+- Q14.35 (14-stage-k-risk-platform.md) Why does the spec ask for the incremental curve to be bit-identical to a full rebuild, not just within 1e-12?
+- Q14.37 (14-stage-k-risk-platform.md) With two one-day changes, how often does `calib.trigger.check` fire on noise at `k = 3`?
+- Q14.38 (14-stage-k-risk-platform.md) And with three changes?
+- Q14.39 (14-stage-k-risk-platform.md) How long must the window be before the as-used false-alarm rate is close to the nominal 0.27% at `k = 3`?
+- Q14.44 (14-stage-k-risk-platform.md) Why did version 1.0.0's bound fail for very small moves?
+- Q14.46 (14-stage-k-risk-platform.md) Why does the interest-rate aggregation have cross terms 1.4 and 0.6, and what do they do to two offsetting trades?
+- Q14.48 (14-stage-k-risk-platform.md) A desk's true 99% VaR is really a 98% VaR. How likely is a 250-day backtest to put it in amber or red?
+- Q14.49 (14-stage-k-risk-platform.md) Why is one observation with no exception YELLOW at 95% confidence in `risk.backtest.traffic_light`?

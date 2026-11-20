@@ -3,7 +3,8 @@
 
 Operation names come from the spec pages (every backticked `<domain>.<area>.<verb>` whose domain is a
 registered operation prefix and that has golden cases); input and output keys come from the golden cases
-that pin each operation. Standard library only.
+that pin each operation. An operation listed in specifications/deprecated-aliases.json (KR-152) gets the library
+names of its target and a `deprecated_alias_of` field, since it runs the target's code. Standard library only.
 
     python tools/gen_name_map.py           write the file
     python tools/gen_name_map.py --check   exit 1 if the file is stale
@@ -15,6 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "specifications" / "name-map.json"
+ALIASES = ROOT / "specifications" / "deprecated-aliases.json"
 OP = re.compile(r"`([a-z]+(?:\.[a-z0-9_]+){2,3})`")
 UNIT_SUFFIXES = ("_years", "_days", "_bp", "_pct", "_minutes", "_months", "_ns")
 UNIT_WORDS = ("expiry", "maturity", "tenor", "horizon", "spread", "shift", "bump")
@@ -61,8 +63,10 @@ def spec_ops():
 def build():
     gold, (specs, pages) = golden_ops(), spec_ops()
     rows, warnings = {}, []
+    aliases = json.loads(ALIASES.read_text(encoding="utf-8"))["aliases"] if ALIASES.exists() else {}
     for op in sorted(gold):
-        dom, area, verb = op.split(".")[0], op.split(".")[1], "_".join(op.split(".")[2:])
+        named = aliases[op]["alias_of"] if op in aliases else op
+        dom, area, verb = named.split(".")[0], named.split(".")[1], "_".join(named.split(".")[2:])
         fn = f"{area}_{verb}"
         k = gold[op]
         rows[op] = {
@@ -79,6 +83,12 @@ def build():
         for i in sorted(k["inputs"]):
             if any(w in i for w in UNIT_WORDS) and not i.endswith(UNIT_SUFFIXES) and not i.endswith(("_date", "_dates", "s")):
                 warnings.append(f"{op}: {i}")
+    for op, a in aliases.items():  # after the loop, so the target's row exists: same spec and outputs as the target
+        if op in rows and a["alias_of"] in rows:
+            rows[op]["spec"] = rows[a["alias_of"]]["spec"]
+            rows[op]["outputs"] = rows[a["alias_of"]]["outputs"]
+            rows[op]["deprecated_alias_of"] = a["alias_of"]
+            rows[op]["removal"] = a["removal"]
     return {"generated_by": "tools/gen_name_map.py", "rule": "specifications/stage-f-rulings.md F-5",
             "operations": rows, "unit_warnings": warnings,
             "spec_only": sorted(o for o in specs if o not in gold and o.split(".")[0] in {x.split(".")[0] for x in gold})}

@@ -121,7 +121,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "published: Basel Framework CRE99.40, p.528 printed EAD 569: MATCH at nearest integer (KR-30)",
-    "published: BCBS 279 Annex 4a, PDF pp.26-28 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 569: MATCH"
+    "published: BCBS 279 Annex 4a, PDF pp.26-28 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 569: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -243,7 +244,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "published: Basel Framework CRE99.58, p.532 printed EAD 381: MATCH at nearest integer (KR-30)",
-    "published: BCBS 279 Annex 4a, PDF pp.28-30 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 381: MATCH"
+    "published: BCBS 279 Annex 4a, PDF pp.28-30 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 381: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -365,7 +367,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "published: Basel Framework CRE99.76, p.536 printed EAD 5406: MATCH at nearest integer (KR-30)",
-    "published: BCBS 279 Annex 4a, PDF pp.31-32 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 5406: MATCH"
+    "published: BCBS 279 Annex 4a, PDF pp.31-32 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 5406: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -564,7 +567,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "published: Basel Framework CRE99.79, p.537 printed EAD 936: MATCH at nearest integer (KR-30)",
-    "published: BCBS 279 Annex 4a, PDF pp.32-33 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 936: MATCH"
+    "published: BCBS 279 Annex 4a, PDF pp.32-33 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 936: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -770,7 +774,8 @@
    "verified_by": [
     "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
     "published: Basel Framework CRE99.97, p.540 printed EAD 1879: MATCH at nearest integer (KR-30)",
-    "published: BCBS 279 Annex 4a, PDF pp.33-34 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 1879: MATCH"
+    "published: BCBS 279 Annex 4a, PDF pp.33-34 (read 2026-11-15, STAGE_K_SOURCES.md) EAD 1879: MATCH",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -1495,7 +1500,7 @@
       {
        "asset_class": "EQUITY",
        "treatment": "VOLATILITY",
-       "key": "EQ VOL",
+       "key": "",
        "addon": 100.0
       }
      ],
@@ -2829,9 +2834,10 @@
    "tags": [
     "stage_k",
     "saccr",
-    "error"
+    "error",
+    "two-errors"
    ],
-   "description": "hand: two errors: unknown asset class and zero notional"
+   "description": "hand: two errors: unknown asset class [schema] and zero notional [domain]"
   },
   {
    "case_id": "saccr_k-0035",
@@ -2859,9 +2865,10 @@
    "tags": [
     "stage_k",
     "saccr",
-    "error"
+    "error",
+    "two-errors"
    ],
-   "description": "hand: two errors: no currency pair and negative notional"
+   "description": "hand: two errors: no currency pair [structural] and negative notional [domain]"
   },
   {
    "case_id": "saccr_k-0036",
@@ -2899,9 +2906,10 @@
    "tags": [
     "stage_k",
     "saccr",
-    "error"
+    "error",
+    "two-errors"
    ],
-   "description": "hand: two errors: duplicate id and notional as a string"
+   "description": "hand: two errors: duplicate id [structural] and notional as a string [schema]"
   },
   {
    "case_id": "saccr_k-0037",
@@ -2939,9 +2947,10 @@
    "tags": [
     "stage_k",
     "saccr",
-    "error"
+    "error",
+    "two-errors"
    ],
-   "description": "hand: two errors: duplicate id and zero maturity"
+   "description": "hand: two errors: duplicate id [structural] and zero maturity [domain]"
   },
   {
    "case_id": "saccr_k-0038",
@@ -3000,9 +3009,421 @@
    "tags": [
     "stage_k",
     "saccr",
-    "error"
+    "error",
+    "two-errors"
    ],
-   "description": "hand: E1, two errors: market value -Infinity and no currency pair (the finite rule first)"
+   "description": "hand: E1, two errors: market value -Infinity [finite] and no currency pair [structural] (the finite rule first)"
+  },
+  {
+   "case_id": "saccr_k-0040",
+   "operation": "risk.saccr.ead",
+   "inputs": {
+    "trades": [
+     {
+      "id": "v1",
+      "asset_class": "EQUITY",
+      "notional": 100,
+      "market_value": 0,
+      "maturity": 1,
+      "position": "LONG",
+      "treatment": "VOLATILITY",
+      "hedging_set": "V1",
+      "entity": "X",
+      "subclass": "SINGLE"
+     },
+     {
+      "id": "v2",
+      "asset_class": "EQUITY",
+      "notional": 100,
+      "market_value": 0,
+      "maturity": 1,
+      "position": "SHORT",
+      "treatment": "VOLATILITY",
+      "hedging_set": "V2",
+      "entity": "Y",
+      "subclass": "SINGLE"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "ead": 274.34285119171597,
+     "rc": 0.0,
+     "pfe": 195.95917942265424,
+     "multiplier": 1.0,
+     "addon_aggregate": 195.95917942265424,
+     "addon": {
+      "IR": 0.0,
+      "FX": 0.0,
+      "CREDIT": 0.0,
+      "EQUITY": 195.95917942265424,
+      "COMMODITY": 0.0
+     },
+     "v": 0.0,
+     "c": 0.0,
+     "margined": false,
+     "mpor_days": null,
+     "ead_unmargined": null,
+     "capped": false,
+     "hedging_sets": [
+      {
+       "asset_class": "EQUITY",
+       "treatment": "VOLATILITY",
+       "key": "",
+       "addon": 195.95917942265424
+      }
+     ],
+     "trades": [
+      {
+       "id": "v1",
+       "supervisory_duration": null,
+       "adjusted_notional": 100.0,
+       "maturity_factor": 1.0,
+       "delta": 1.0,
+       "effective_notional": 100.0,
+       "supervisory_factor": 1.6
+      },
+      {
+       "id": "v2",
+       "supervisory_duration": null,
+       "adjusted_notional": 100.0,
+       "maturity_factor": 1.0,
+       "delta": -1.0,
+       "effective_notional": -100.0,
+       "supervisory_factor": 1.6
+      }
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-236 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "saccr",
+    "hand"
+   ],
+   "description": "hand: KR-236 (KA-A3): two equity volatility trades on two names with two labels form one hedging set (CRE52.47): add-on sqrt(38,400) = 195.96, not 320",
+   "output_classes": {
+    "margined": "date_and_convention",
+    "capped": "date_and_convention",
+    "mpor_days": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "saccr_k-0041",
+   "operation": "risk.saccr.ead",
+   "inputs": {
+    "trades": [
+     {
+      "id": "w1",
+      "asset_class": "COMMODITY",
+      "notional": 100,
+      "market_value": 0,
+      "maturity": 1,
+      "position": "LONG",
+      "treatment": "VOLATILITY",
+      "entity": "POWER",
+      "subclass": "ELECTRICITY"
+     },
+     {
+      "id": "w2",
+      "asset_class": "COMMODITY",
+      "notional": 100,
+      "market_value": 0,
+      "maturity": 1,
+      "position": "SHORT",
+      "treatment": "VOLATILITY",
+      "entity": "SILVER",
+      "subclass": "METALS",
+      "hedging_set": "SAME LABEL"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "ead": 406.0,
+     "rc": 0.0,
+     "pfe": 290.0,
+     "multiplier": 1.0,
+     "addon_aggregate": 290.0,
+     "addon": {
+      "IR": 0.0,
+      "FX": 0.0,
+      "CREDIT": 0.0,
+      "EQUITY": 0.0,
+      "COMMODITY": 290.0
+     },
+     "v": 0.0,
+     "c": 0.0,
+     "margined": false,
+     "mpor_days": null,
+     "ead_unmargined": null,
+     "capped": false,
+     "hedging_sets": [
+      {
+       "asset_class": "COMMODITY",
+       "treatment": "VOLATILITY",
+       "key": "ENERGY",
+       "addon": 200.0
+      },
+      {
+       "asset_class": "COMMODITY",
+       "treatment": "VOLATILITY",
+       "key": "METALS",
+       "addon": 90.0
+      }
+     ],
+     "trades": [
+      {
+       "id": "w1",
+       "supervisory_duration": null,
+       "adjusted_notional": 100.0,
+       "maturity_factor": 1.0,
+       "delta": 1.0,
+       "effective_notional": 100.0,
+       "supervisory_factor": 2.0
+      },
+      {
+       "id": "w2",
+       "supervisory_duration": null,
+       "adjusted_notional": 100.0,
+       "maturity_factor": 1.0,
+       "delta": -1.0,
+       "effective_notional": -100.0,
+       "supervisory_factor": 0.9
+      }
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-236 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "saccr",
+    "hand"
+   ],
+   "description": "hand: KR-236 (KA-A3 b): electricity and silver volatility trades sit in the energy and metals volatility sets, a label does not merge them",
+   "output_classes": {
+    "margined": "date_and_convention",
+    "capped": "date_and_convention",
+    "mpor_days": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "saccr_k-0042",
+   "operation": "risk.saccr.ead",
+   "inputs": {
+    "trades": [
+     {
+      "id": "1",
+      "asset_class": "IR",
+      "notional": 10000,
+      "market_value": 30,
+      "maturity": 10,
+      "position": "LONG",
+      "start": 0,
+      "end": 10,
+      "hedging_set": "USD"
+     },
+     {
+      "id": "2",
+      "asset_class": "IR",
+      "notional": 10000,
+      "market_value": -20,
+      "maturity": 4,
+      "position": "SHORT",
+      "start": 0,
+      "end": 4,
+      "hedging_set": "USD"
+     },
+     {
+      "id": "3",
+      "asset_class": "IR",
+      "notional": 5000,
+      "market_value": 50,
+      "maturity": 11,
+      "position": "BOUGHT",
+      "kind": "OPTION",
+      "option_type": "PUT",
+      "underlying_price": 0.06,
+      "strike": 0.05,
+      "exercise": 1,
+      "start": 1,
+      "end": 11,
+      "hedging_set": "EUR"
+     },
+     {
+      "id": "7",
+      "asset_class": "COMMODITY",
+      "notional": 10000,
+      "market_value": -50,
+      "maturity": 0.75,
+      "position": "LONG",
+      "entity": "CRUDE_OIL",
+      "subclass": "OIL_GAS"
+     },
+     {
+      "id": "8",
+      "asset_class": "COMMODITY",
+      "notional": 20000,
+      "market_value": -30,
+      "maturity": 2,
+      "position": "SHORT",
+      "entity": "CRUDE_OIL",
+      "subclass": "OIL_GAS"
+     },
+     {
+      "id": "9",
+      "asset_class": "COMMODITY",
+      "notional": 10000,
+      "market_value": 100,
+      "maturity": 5,
+      "position": "LONG",
+      "entity": "SILVER",
+      "subclass": "METALS"
+     }
+    ],
+    "collateral": 200,
+    "margin": {
+     "threshold": 0,
+     "mta": 5,
+     "nica": 150,
+     "remargin_days": 15,
+     "illiquid": true
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "ead": 2485.4361395930387,
+     "rc": 0.0,
+     "pfe": 1775.311528280742,
+     "multiplier": 0.9678465292118533,
+     "addon_aggregate": 1834.2903287842876,
+     "addon": {
+      "IR": 161.1615232226835,
+      "FX": 0.0,
+      "CREDIT": 0.0,
+      "EQUITY": 0.0,
+      "COMMODITY": 1673.1288055616042
+     },
+     "v": 80.0,
+     "c": 200.0,
+     "margined": true,
+     "mpor_days": 24,
+     "ead_unmargined": 5779.716352199414,
+     "capped": false,
+     "hedging_sets": [
+      {
+       "asset_class": "IR",
+       "treatment": "NORMAL",
+       "key": "EUR",
+       "addon": 23.430574367520045
+      },
+      {
+       "asset_class": "IR",
+       "treatment": "NORMAL",
+       "key": "USD",
+       "addon": 137.73094885516346
+      },
+      {
+       "asset_class": "COMMODITY",
+       "treatment": "NORMAL",
+       "key": "ENERGY",
+       "addon": 836.5644027808021
+      },
+      {
+       "asset_class": "COMMODITY",
+       "treatment": "NORMAL",
+       "key": "METALS",
+       "addon": 836.5644027808021
+      }
+     ],
+     "trades": [
+      {
+       "id": "1",
+       "supervisory_duration": 7.8693868057473315,
+       "adjusted_notional": 78693.86805747332,
+       "maturity_factor": 0.46475800154489005,
+       "delta": 1.0,
+       "effective_notional": 36573.60485222856,
+       "supervisory_factor": 0.005
+      },
+      {
+       "id": "2",
+       "supervisory_duration": 3.6253849384403627,
+       "adjusted_notional": 36253.84938440363,
+       "maturity_factor": 0.46475800154489005,
+       "delta": -1.0,
+       "effective_notional": -16849.26658820487,
+       "supervisory_factor": 0.005
+      },
+      {
+       "id": "3",
+       "supervisory_duration": 7.485592282404546,
+       "adjusted_notional": 37427.961412022734,
+       "maturity_factor": 0.46475800154489005,
+       "delta": -0.26939521771053265,
+       "effective_notional": -4686.114873504009,
+       "supervisory_factor": 0.005
+      },
+      {
+       "id": "7",
+       "supervisory_duration": null,
+       "adjusted_notional": 10000.0,
+       "maturity_factor": 0.46475800154489005,
+       "delta": 1.0,
+       "effective_notional": 4647.580015448901,
+       "supervisory_factor": 0.18
+      },
+      {
+       "id": "8",
+       "supervisory_duration": null,
+       "adjusted_notional": 20000.0,
+       "maturity_factor": 0.46475800154489005,
+       "delta": -1.0,
+       "effective_notional": -9295.160030897801,
+       "supervisory_factor": 0.18
+      },
+      {
+       "id": "9",
+       "supervisory_duration": null,
+       "adjusted_notional": 10000.0,
+       "maturity_factor": 0.46475800154489005,
+       "delta": 1.0,
+       "effective_notional": 4647.580015448901,
+       "supervisory_factor": 0.18
+      }
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w1b.py)",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-236 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "saccr",
+    "hand"
+   ],
+   "description": "hand: KR-238(b) (KA-A11): re-margining every 15 days and illiquid: MPOR floor max(9 + 15, 20) = 24 (the combination is inferred, not read)",
+   "output_classes": {
+    "margined": "date_and_convention",
+    "capped": "date_and_convention",
+    "mpor_days": "date_and_convention"
+   }
   }
  ]
 }

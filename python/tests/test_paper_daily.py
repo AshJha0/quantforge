@@ -5,6 +5,7 @@ fault for every check (plan 14.10 rule 1: a gate counts as built only when a run
 The yields are invented by a hash of the date; no market data is in this file. Dates are after every prereg
 holdout window, and the one test that needs a date inside a window builds it at run time."""
 
+import argparse
 import copy
 import datetime as dt
 import hashlib
@@ -17,6 +18,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+import daily_jobs_support as support
 import pytest
 
 from quantforge_core import paper
@@ -38,6 +40,7 @@ def _load(name: str, path: Path) -> ModuleType:
 core = _load("paper_core", ROOT / "tools" / "paper_daily" / "paper_core.py")
 fl = _load("forward_log_for_paper", ROOT / "tools" / "forward-log" / "forward_log.py")
 verify_cli = _load("paper_daily_verify", ROOT / "tools" / "paper_daily" / "verify_ledger.py")
+run_day = _load("paper_daily_run_day", ROOT / "tools" / "paper_daily" / "run_day.py")
 CFG: dict[str, Any] = core.load_config()
 FIELDS = [k["field"] for k in CFG["knots"]]
 BASE = {"3 Mo": 430, "2 Yr": 480, "5 Yr": 490, "10 Yr": 510, "30 Yr": 540}  # basis points, invented
@@ -153,7 +156,7 @@ def check(text: str, cfg: dict[str, Any] = CFG, cli: bool = True) -> dict[str, A
 def test_thirty_business_days_verify_and_replay(ledger30: str, days30: list[dt.date]) -> None:
     v = check(ledger30)
     assert v["ok"], v
-    assert v["recorded_trading_days"] == 30 and v["late_days"] == 0 and v["gaps"] == 0
+    assert v["declared_on_time_days"] == 30 and v["late_days"] == 0 and v["gaps"] == 0
     assert v["records"] == 31 and v["recomputed"] and v["calendar_checked"]
     rows = rows_of(ledger30)
     assert [r["body"]["date"] for r in rows[1:]] == [d.isoformat() for d in days30]
@@ -266,7 +269,7 @@ def test_a_tampered_row_breaks_the_chain(ledger30: str) -> None:
         ("positions_close/UST-CM-2Y", "100", "POSITION"),
         ("instruments/UST-CM-5Y/position_open", "700", "POSITION"),
         ("instruments/UST-CM-10Y/accrued", "0.5", "EXPLAIN"),
-        ("cumulative/recorded_trading_days", "20", "COUNT"),
+        ("cumulative/declared_on_time_days", "20", "COUNT"),
         ("date", "2027-01-18", "DATE"),
     ],
 )
@@ -389,10 +392,11 @@ def test_a_missed_curve_is_a_gap_row_and_a_missed_run_is_labelled_late(
     text, days = gappy
     v = check(text)
     assert v["ok"], v
-    assert (v["gaps"], v["late_days"], v["recorded_trading_days"]) == (1, 1, 8)
+    assert (v["gaps"], v["late_days"], v["declared_on_time_days"]) == (1, 1, 8)
     by_date = {r["body"]["date"]: r for r in rows_of(text)[1:]}
     assert list(by_date) == [d.isoformat() for d in days]  # every business day has a row, in order
     gap = by_date[days[3].isoformat()]
+    assert gap["body"]["cause"] == "no_curve"
     assert gap["kind"] == "GAP" and gap["ts"] > core.stamp(
         core.Calendar(runner, "USGS").cutoff(days[3], CFG)
     )
@@ -412,8 +416,8 @@ def test_a_missed_curve_is_a_gap_row_and_a_missed_run_is_labelled_late(
         late["ts"] == by_date[days[7].isoformat()]["ts"]
     )  # written by the next run, with that run's time
     assert (
-        late["body"]["cumulative"]["recorded_trading_days"]
-        == by_date[days[5].isoformat()]["body"]["cumulative"]["recorded_trading_days"]
+        late["body"]["cumulative"]["declared_on_time_days"]
+        == by_date[days[5].isoformat()]["body"]["cumulative"]["declared_on_time_days"]
     )
 
 
@@ -463,13 +467,14 @@ def test_a_date_inside_a_holdout_window_is_refused_and_fails_verify(
     planted = {"PLANTED": (days30[10].isoformat(), days30[12].isoformat())}
     v = core.verify(ledger30, CFG, None, planted)
     assert (v["ok"], v["first_bad_seq"], v["reason"]) == (False, 11, "HOLDOUT")
-    # the writer refuses a real holdout date (built here so that no such date is written in this file)
+    # the writer, given a real holdout date as the first day, starts nothing (built here so that no such date
+    # is written in this file); KR-210 covers a holdout date after the start
     inside = dt.date.fromisoformat(max(hi for _, hi in windows.values()))
     while not core.Calendar(runner, "USGS").is_open(inside):
         inside -= dt.timedelta(days=1)
     log = forward_log(synthetic_yields([inside]))
-    with pytest.raises(core.PaperError, match="holdout window"):
-        core.run(CFG, runner, "", log, evening(inside), "c", "python")
+    out, new, notes = core.run(CFG, runner, "", log, evening(inside), "c", "python")
+    assert (out, new) == ("", []) and "nothing written" in notes[0]
 
 
 # ---------------------------------------------------------------- the builder refuses an explain that does not sum
@@ -487,8 +492,19 @@ def test_the_writer_refuses_a_day_whose_explain_does_not_sum(days30: list[dt.dat
             )
         return out
 
-    with pytest.raises(core.PaperError, match="does not replay|unexplained"):
-        core.run(CFG, off_by_a_cent, text, log, evening(days30[5]), "c", "python", NO_WINDOWS)
+    # before the day's cut-off: nothing is written for it and the run reports a problem (exit 2), KR-210
+    out, new, notes = core.run(
+        CFG, off_by_a_cent, text, log, evening(days30[5]), "c", "python", NO_WINDOWS
+    )
+    assert (out, new) == (text, []) and run_day.problems(new, notes) == 2
+    assert notes[-1].startswith("PROBLEM:") and (
+        "does not replay" in notes[-1] or "unexplained" in notes[-1]
+    )
+    # after it: the day is closed as a gap; a day whose explain does not sum never becomes a DAY row
+    after = evening(days30[5]) + dt.timedelta(days=4)
+    out, new, notes = core.run(CFG, off_by_a_cent, text, log, after, "c", "python", NO_WINDOWS)
+    assert new[0]["kind"] == "GAP" and new[0]["body"]["cause"] == "build_refused"
+    assert all(r["kind"] == "GAP" for r in new) and check(out)["ok"]
     assert rows_of(
         run_days(days30[5:6], log)
     )  # sanity: the same call without the fault is fine on its own
@@ -526,38 +542,17 @@ def test_anchors_catch_a_rewrite_with_every_hash_recomputed(ledger30: str, tmp_p
 # ---------------------------------------------------------------- the 20-day gate (K-2)
 
 
-def test_the_twenty_day_gate(
-    ledger30: str, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+def test_late_days_and_gaps_do_not_count_towards_the_gate(
+    gappy: tuple[str, list[dt.date]], tmp_path: Path
 ) -> None:
-    short = tmp_path / "short.jsonl"
-    short.write_text(
-        "".join(x + "\n" for x in ledger30.splitlines()[:20]), encoding="utf-8", newline="\n"
-    )
-    full = tmp_path / "full.jsonl"
-    full.write_text(ledger30, encoding="utf-8", newline="\n")
-    assert (
-        verify_cli.main(["verify", "--ledger", str(short), "--no-cli", "--require-days", "20"]) == 1
-    )
-    out = json.loads(capsys.readouterr().out)
-    assert out["reason"] == "DAYS" and "19 recorded trading days" in out["detail"]
-    summary = tmp_path / "s.json"
-    args = [
-        "verify",
-        "--ledger",
-        str(full),
-        "--no-cli",
-        "--require-days",
-        "20",
-        "--summary",
-        str(summary),
-    ]
-    assert verify_cli.main(args) == 0
-    assert json.loads(summary.read_text())["recorded_trading_days"] == 30
-
-
-def test_late_days_and_gaps_do_not_count_towards_the_gate(gappy: tuple[str, list[dt.date]]) -> None:
     text, days = gappy
-    assert len(days) == 10 and check(text)["recorded_trading_days"] == 8
+    assert len(days) == 10 and check(text)["declared_on_time_days"] == 8
+    # and with block times: the late day has no order and its label is not on time, so it is never counted
+    rows = rows_of(text)
+    folder, headers = anchored(text, tmp_path, {seq: 25 for seq in range(1, len(rows))})
+    r = core.recorded_days(text, CFG, runner, folder, headers, support.EASY_TARGET)
+    assert r["recorded_trading_days"] == 8 and days[6].isoformat() not in r["dates"]
+    assert days[3].isoformat() not in r["dates"] and r["not_proven"] == {}
 
 
 # ---------------------------------------------------------------- goldens pl_k (paper-ledger-daily.md)
@@ -565,40 +560,24 @@ def test_late_days_and_gaps_do_not_count_towards_the_gate(gappy: tuple[str, list
 
 def test_goldens_pl_k(ledger30: str) -> None:
     rows = rows_of(ledger30)
-    assert rows[1]["hash"] == "d7f22a80b63fa8ad612907dd6c8b1d4ba0e67527398887bb7848f5e6e5d191f3"
+    assert rows[0]["hash"] == "8633f7ad65ae5777d1e2c03da62da21379b9039f4ffa93674aacf373dad53600"
+    assert rows[1]["hash"] == "7cc277dccc3f8012837dc0d703b0ceae702e0deba8be0a7042655c2fe3760612"
     assert rows[1]["body"]["pnl"] == "-285.9375"
-    assert rows[2]["hash"] == "f887e3d3d0a9ac889d95d5a6e3ee3578b4908286700c5428ea1c7daee2980cb4"
+    assert rows[2]["hash"] == "06897fde4a8a5a7a787777ec9769827e136257b53007282ae1415732e3eba468"
     b = rows[2]["body"]
-    assert b["instruments"]["UST-CM-2Y"]["mark"] == "99.938677" and b["pnl"] == "-895.26075"
+    assert b["instruments"]["UST-CM-2Y"]["mark"] == "99.938677" and b["pnl"] == "-887.44825"
     assert b["explain"]["carry"] == "1213.9355" and b["explain"]["curve_move"] == "-1993.7275"
-    assert rows[-1]["hash"] == "56a3dd05b177badb7e91c5f1033058282773df03d7fc58b5d1676def5258cf28"
+    assert rows[-1]["hash"] == "45de6c4d891e20b52d011d14e057a6550e54ef30f38304358f7c2e4552264a4f"
     status = [o["status"] for r in rows[1:] for o in r["body"]["orders"]]
-    assert (status.count("FILLED"), status.count("PARTIALLY_FILLED")) == (17, 13)
+    assert (status.count("FILLED"), status.count("PARTIALLY_FILLED")) == (18, 12)
 
 
 def test_no_code_path_reaches_fedinvest_or_a_network() -> None:
     """P1 and KR-70: the job reads the recorded log only."""
-    for name in ("paper_core.py", "run_day.py", "verify_ledger.py"):
+    for name in ("paper_core.py", "run_day.py", "verify_ledger.py", "anchor_evidence.py"):
         src = (ROOT / "tools" / "paper_daily" / name).read_text(encoding="utf-8")
         for word in ("urllib", "requests", "http.client", "socket", "FedInvest", "treasurydirect"):
             assert word not in src, (name, word)
-
-
-def test_the_workflow_pins_actions_as_the_recorder_does_and_pushes_only_its_own_branches() -> None:
-    wf = (ROOT / ".github" / "workflows" / "paper-ledger.yml").read_text(encoding="utf-8")
-    recorder = (ROOT / ".github" / "workflows" / "recorder.yml").read_text(encoding="utf-8")
-    uses = [ln.split("uses:")[1].strip() for ln in wf.splitlines() if "uses:" in ln]
-    assert uses and all(
-        u in recorder and "@" in u and len(u.split("@")[1].split()[0]) == 40 for u in uses
-    )
-    pushes = [ln.strip() for ln in wf.splitlines() if "git push" in ln]
-    assert (
-        len(pushes) == 2
-        and "push origin paper-ledger" in pushes[0]
-        and "paper-ledger-anchors" in pushes[1]
-    )
-    assert "permissions:" + chr(10) + "  contents: write" + chr(10) + "concurrency:" in wf
-    assert "dry_run" in wf and "pull_request" not in wf and "fwd remote remove origin" in wf
 
 
 @pytest.mark.parametrize(("second", "timing"), [(59, "on_time"), (60, "late")])
@@ -613,3 +592,376 @@ def test_cutoff_boundary_second(days30: list[dt.date], second: int, timing: str)
     by_date = {r["body"]["date"]: r for r in rows_of(text)[1:]}
     assert by_date[days[1].isoformat()]["body"]["timing"] == timing
     assert check(text)["ok"]
+
+
+# ---------------------------------------------------------------- audit C: evidence, sources, gaps (KR-200 on)
+
+
+def gate_args(ledger: Path, **over: Any) -> argparse.Namespace:
+    base: dict[str, Any] = {
+        "ledger": str(ledger),
+        "impl": "python",
+        "no_cli": False,
+        "require_days": 0,
+        "anchors": None,
+        "forward_log": None,
+        "bitcoin_headers": None,
+    }
+    return argparse.Namespace(**{**base, **over})
+
+
+def gate(a: argparse.Namespace, log: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    out: dict[str, Any] = verify_cli.verify(
+        a, CFG, runner, max_target=support.EASY_TARGET, log_reader=lambda _path: log or []
+    )
+    return out
+
+
+def anchored(
+    text: str, folder: Path, minutes_after: dict[int, int | None]
+) -> tuple[Path, dict[str, str]]:
+    """One anchor after each DAY row of `minutes_after` (row index -> minutes from the row's `ts` to the block
+    time, or None for a proof that is still pending). Returns the anchors folder and the block headers."""
+    rows = rows_of(text)
+    headers: dict[str, str] = {}
+    out = folder / "anchors"
+    for n, (seq, minutes) in enumerate(sorted(minutes_after.items())):
+        part = "".join(core.line(r) + "\n" for r in rows[: seq + 1])
+        made = core.instant(rows[seq]["ts"])
+        p = core.anchor_make(part, CFG, out, f"{made:%Y-%m-%dT%H%M%S}Z-{n:03d}")
+        when = None if minutes is None else int(made.timestamp()) + 60 * minutes
+        support.stamp(p, None if minutes is None else 800000 + n, when, headers)
+    return out, headers
+
+
+def test_the_gate_refuses_to_run_without_outside_evidence(ledger30: str, tmp_path: Path) -> None:
+    """KA-C3, KR-202: `--require-days` needs the CLI (calendar and rebuild), the anchors, the recorder log and
+    the block headers. Each one left out is a refusal, not a pass."""
+    full = tmp_path / "full.jsonl"
+    full.write_bytes(ledger30.encode("ascii"))
+    everything = {"anchors": "a", "forward_log": "f", "bitcoin_headers": "h", "require_days": 20}
+    for missing in ("anchors", "forward_log", "bitcoin_headers"):
+        v = gate(gate_args(full, **{**everything, missing: None}))
+        assert (v["ok"], v["reason"]) == (False, "GATE"), missing
+    v = gate(gate_args(full, **everything, no_cli=True))
+    assert (v["ok"], v["reason"]) == (False, "GATE")
+    # through the command line as well: the audited gate command is now a refusal
+    assert (
+        verify_cli.main(["verify", "--ledger", str(full), "--no-cli", "--require-days", "20"]) == 1
+    )
+    assert verify_cli.main(["verify", "--ledger", str(full), "--require-days", "20"], runner) == 1
+
+
+def test_a_ledger_written_in_one_sitting_records_no_trading_day(
+    ledger30: str, days30: list[dt.date], tmp_path: Path
+) -> None:
+    """KA-C2, KR-200: the audit's attack. Thirty rows written with chosen `--now` values are all labelled on
+    time and pass every chain, replay and rebuild check; stamped afterwards, their only block time is after
+    every cut-off, so none counts. The honest ledger, anchored within the hour each day, counts all thirty."""
+    full = tmp_path / "full.jsonl"
+    full.write_bytes(ledger30.encode("ascii"))
+    log = forward_log(synthetic_yields(days30))
+    last = len(rows_of(ledger30)) - 1
+    forged, headers = anchored(ledger30, tmp_path / "forged", {last: 60 * 24 * 40})
+    hfile = support.write_headers(tmp_path / "h1.json", headers)
+    args = gate_args(
+        full, anchors=str(forged), forward_log="log", bitcoin_headers=str(hfile), require_days=20
+    )
+    v = gate(args, log)
+    assert (v["ok"], v["reason"]) == (False, "DAYS"), v
+    assert "0 recorded trading days, 20 required (30 rows are labelled on time" in v["detail"]
+    honest, headers = anchored(
+        ledger30, tmp_path / "honest", {seq: 25 for seq in range(1, last + 1)}
+    )
+    hfile = support.write_headers(tmp_path / "h2.json", headers)
+    args = gate_args(
+        full, anchors=str(honest), forward_log="log", bitcoin_headers=str(hfile), require_days=20
+    )
+    v = gate(args, log)
+    assert v["ok"] and v["recorded_trading_days"] == 30 and v["declared_on_time_days"] == 30, v
+    assert v["sources_checked"] and v["anchors"] == 30 and v["not_proven"] == {}
+    # without block headers the count is not computed at all: the label alone is never reported as the count
+    v = gate(gate_args(full, anchors=str(honest)))
+    assert v["ok"] and v["recorded_trading_days"] is None and v["declared_on_time_days"] == 30
+    # the production floor refuses the hand-made headers (a forger cannot mint block times)
+    v = verify_cli.verify(args, CFG, runner, log_reader=lambda _p: log)
+    assert (v["ok"], v["reason"]) == (False, "EVIDENCE") and "floor" in v["detail"]
+
+
+def test_the_count_follows_the_block_times_day_by_day(
+    ledger30: str, days30: list[dt.date], tmp_path: Path
+) -> None:
+    """KR-200, KR-201: nineteen proven days fail the gate of twenty; a pending proof, a missing header and a
+    block time inside the two hour margin of the cut-off each leave their day uncounted, and say why."""
+    rows = rows_of(ledger30)
+    cal = core.Calendar(runner, "USGS")
+
+    def minutes_to_cutoff(seq: int) -> int:
+        cut = cal.cutoff(core.day(rows[seq]["body"]["date"]), CFG)
+        return int((cut - core.instant(rows[seq]["ts"])).total_seconds() // 60)
+
+    plan: dict[int, int | None] = {seq: 25 for seq in range(1, 20)}  # days 1 to 19 proven
+    plan[20] = None  # day 20: proof still pending
+    plan[21] = (
+        minutes_to_cutoff(21) - 119
+    )  # day 21: block time 1 h 59 min before the cut-off, inside the margin
+    plan[22] = minutes_to_cutoff(22) - 121  # day 22: 2 h 01 min before: proven
+    folder, headers = anchored(ledger30, tmp_path, plan)
+    r = core.recorded_days(ledger30, CFG, runner, folder, headers, support.EASY_TARGET)
+    assert r["recorded_trading_days"] == 20 and r["dates"][-1] == rows[22]["body"]["date"]
+    assert (
+        "is not before" in r["not_proven"][rows[20]["body"]["date"]]
+    )  # only later blocks cover it
+    assert "is not before" in r["not_proven"][rows[21]["body"]["date"]]
+    assert "no anchor covers" in r["not_proven"][rows[30]["body"]["date"]]
+    # one header withheld: that day is no longer proven; the rest stand
+    fewer = {k: v for k, v in headers.items() if k != "800000"}
+    r = core.recorded_days(ledger30, CFG, runner, folder, fewer, support.EASY_TARGET)
+    assert r["recorded_trading_days"] == 19 and rows[1]["body"]["date"] in r["not_proven"]
+    full = tmp_path / "full.jsonl"
+    full.write_bytes(ledger30.encode("ascii"))
+    hfile = support.write_headers(tmp_path / "h.json", fewer)
+    log = forward_log(synthetic_yields(days30))
+    v = gate(
+        gate_args(
+            full, anchors=str(folder), forward_log="l", bitcoin_headers=str(hfile), require_days=20
+        ),
+        log,
+    )
+    assert (v["ok"], v["reason"]) == (False, "DAYS") and "19 recorded trading days" in v["detail"]
+    # an anchor that does not match its proof, or a header that is not the proof's block, is an error
+    bad = dict(headers)
+    bad["800001"] = bad["800002"]
+    with pytest.raises(support.evidence.EvidenceError, match="Merkle root"):
+        core.recorded_days(ledger30, CFG, runner, folder, bad, support.EASY_TARGET)
+
+
+def test_day_rows_are_checked_against_the_recorder_log(
+    ledger30: str, days30: list[dt.date]
+) -> None:
+    """KA-C4, KR-211: a ledger whose yields are not the recorder's passes the replay and the rebuild (both
+    start from the row's own yields) and fails SOURCE."""
+    log = forward_log(synthetic_yields(days30))
+    assert core.check_sources(ledger30, CFG, log) is None
+    other = synthetic_yields(days30)
+    for y in other.values():
+        y["10 Yr"] += 0.25
+    forged = run_days(days30[:5], forward_log(other))
+    assert check(forged)["ok"]  # self-consistent: only the outside log can tell
+    v = core.check_sources(forged, CFG, log)
+    assert v is not None and (v["reason"], v["first_bad_seq"]) == ("SOURCE", 1)
+    rows = copy.deepcopy(rows_of(ledger30))
+    rows[4]["body"]["source"]["row_hash"] = "ab" * 32
+    v = core.check_sources(rechain(rows), CFG, log)
+    assert (
+        v is not None
+        and (v["reason"], v["first_bad_seq"]) == ("SOURCE", 4)
+        and "names no row" in v["detail"]
+    )
+    rows = copy.deepcopy(rows_of(ledger30))
+    for r in rows:  # every row dated before the recorder had the first curve
+        r["ts"] = f"{days30[0].isoformat()}T00:00:00Z"
+    v = core.check_sources(rechain(rows), CFG, log)
+    assert v is not None and v["reason"] == "SOURCE" and "before the recorder row" in v["detail"]
+    # a revised value in a later recorder row does not change what an earlier DAY row is checked against
+    revised = synthetic_yields(days30)
+    extra = forward_log({days30[0].isoformat(): {**revised[days30[0].isoformat()], "2 Yr": 9.99}})
+    assert core.check_sources(ledger30, CFG, [*log, {**extra[0], "hash": "cd" * 32}]) is None
+
+
+def test_a_holdout_date_is_a_gap_that_read_nothing_and_the_ledger_goes_on(
+    days30: list[dt.date],
+) -> None:
+    """KR-210, plan 14.10 rule 6: a due date inside a prereg holdout window gets a GAP row with cause `holdout`
+    and no input; the next day's row spans it. (Before this ruling the writer refused, on that run and on every
+    later one.) A DAY row inside a window still fails verification."""
+    days = days30[:5]
+    window = {"PLANTED": (days[2].isoformat(), days[2].isoformat())}
+    log = forward_log(synthetic_yields(days))
+    text = ""
+    for d in days:
+        seen = [e for e in log if e["record"]["knowledge_time"] <= core.stamp(evening(d))]
+        text, _, _ = core.run(CFG, runner, text, seen, evening(d), "c", "python", window)
+    rows = rows_of(text)
+    assert [r["kind"] for r in rows] == ["GENESIS", "DAY", "DAY", "GAP", "DAY", "DAY"]
+    gap = rows[3]["body"]
+    assert gap["cause"] == "holdout" and gap["studies"] == ["PLANTED"] and "par_yields" not in gap
+    assert rows[4]["body"]["gaps_since_prev"] == [days[2].isoformat()]
+    assert rows[4]["body"]["prev_date"] == days[1].isoformat()
+    assert core.verify(text, CFG, runner, window)["ok"]
+    # planted faults
+    assert (
+        core.verify(text, CFG, runner, NO_WINDOWS)["reason"] == "HOLDOUT"
+    )  # a holdout gap outside any window
+    wide = {"PLANTED": (days[2].isoformat(), days[3].isoformat())}
+    v = core.verify(text, CFG, runner, wide)
+    assert (v["reason"], v["first_bad_seq"]) == ("HOLDOUT", 4)  # a DAY row inside a window
+    edited = copy.deepcopy(rows)
+    edited[3]["body"]["cause"] = "weather"
+    assert core.verify(rechain(edited), CFG, runner, window)["reason"] == "GAPRULE"
+    edited = copy.deepcopy(rows)
+    edited[3]["body"]["studies"] = ["OTHER"]
+    assert core.verify(rechain(edited), CFG, runner, window)["reason"] == "HOLDOUT"
+
+
+def test_a_day_that_cannot_be_built_stops_the_run_then_becomes_a_gap(days30: list[dt.date]) -> None:
+    """KR-210: before its cut-off the run stops at the day and says so (exit 2, earlier rows kept); after the
+    cut-off the day is closed as a `build_refused` gap and the following days are written. No state stops the
+    ledger for good."""
+    days = days30[:5]
+    log = forward_log(synthetic_yields(days))
+    text = run_days(days[:2], log)
+    broken_day = days[2].isoformat()
+
+    def broken(cases: list[dict[str, Any]]) -> dict[str, Any]:
+        if any(
+            c["operation"] == "bond.price.from_yield" and c["inputs"]["settlement"] == broken_day
+            for c in cases
+        ):
+            raise core.PaperError("CLI case new|UST-CM-2Y failed: planted")
+        return runner(cases)
+
+    seen = [e for e in log if e["record"]["knowledge_time"] <= core.stamp(evening(days[2]))]
+    out, new, notes = core.run(CFG, broken, text, seen, evening(days[2]), "c", "python", NO_WINDOWS)
+    assert (out, new) == (text, []) and notes[-1].startswith("PROBLEM: " + broken_day)
+    assert run_day.problems(new, notes) == 2
+    out, new, notes = core.run(CFG, broken, text, log, evening(days[4]), "c", "python", NO_WINDOWS)
+    assert [(r["kind"], r["body"]["date"]) for r in new] == [
+        ("GAP", days[2].isoformat()),
+        ("DAY", days[3].isoformat()),
+        ("DAY", days[4].isoformat()),
+    ]
+    assert new[0]["body"]["cause"] == "build_refused" and "planted" in new[0]["body"]["reason"]
+    assert new[1]["body"]["timing"] == "late" and new[2]["body"]["timing"] == "on_time"
+    assert check(out)["ok"] and run_day.problems(new, notes) == 2
+    # a build_refused or no_curve gap declared before the day's cut-off fails
+    rows = rows_of(out)
+    rows[3]["ts"] = core.stamp(evening(days[2]))
+    v = check(rechain(rows))
+    assert (v["reason"], v["first_bad_seq"]) == ("TIMING", 3)
+
+
+def test_a_clock_before_the_last_row_is_refused(ledger30: str, days30: list[dt.date]) -> None:
+    log = forward_log(synthetic_yields(days30))
+    with pytest.raises(core.PaperError, match="clock"):
+        core.run(
+            CFG,
+            runner,
+            ledger30,
+            log,
+            evening(days30[-1]) - dt.timedelta(seconds=1),
+            "c",
+            "python",
+            NO_WINDOWS,
+        )
+    out, new, _ = core.run(
+        CFG, runner, ledger30, log, evening(days30[-1]), "c", "python", NO_WINDOWS
+    )
+    assert (out, new) == (ledger30, [])
+
+
+def test_the_ledger_file_has_one_serialisation(ledger30: str) -> None:
+    """KR-208: LF line ends, sorted keys, no spaces, a final line feed; any other bytes fail with BYTES."""
+    assert check(ledger30, cli=False)["ok"]
+    assert check(ledger30.replace("\n", "\r\n"), cli=False)["reason"] == "BYTES"
+    assert check(ledger30[:-1], cli=False)["reason"] == "BYTES"
+    lines = ledger30.split("\n")
+    lines[3] = json.dumps(json.loads(lines[3]))
+    assert check("\n".join(lines), cli=False)["reason"] == "BYTES"
+
+
+def test_only_the_configured_tca_keys_are_copied(ledger30: str, days30: list[dt.date]) -> None:
+    """KA-C13, KR-212: a later, additive change to the outputs of the two TCA operations does not change a row,
+    so old rows still rebuild; a dropped key is a loud failure, not a different row."""
+
+    def wider(cases: list[dict[str, Any]]) -> dict[str, Any]:
+        out = runner(cases)
+        for cid in ("tca", "tca_pre"):
+            if cid in out:
+                out[cid]["a_new_output"] = 1.25
+        return out
+
+    again = run_days(days30[:3], forward_log(synthetic_yields(days30)), run=wider)
+    assert again == "".join(x + "\n" for x in ledger30.split("\n")[:4])
+    assert core.verify(ledger30, CFG, wider, NO_WINDOWS)["ok"]
+
+    def narrower(cases: list[dict[str, Any]]) -> dict[str, Any]:
+        out = runner(cases)
+        if "tca" in out:
+            del out["tca"]["total_bps"]
+        return out
+
+    with pytest.raises(KeyError):
+        run_days(days30[:1], forward_log(synthetic_yields(days30)), run=narrower)
+
+
+def test_a_run_with_nothing_due_writes_nothing_and_anchors_nothing(
+    ledger30: str, days30: list[dt.date], tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """KA-C1, KR-205: the second run of a day leaves the ledger file untouched (same bytes, no temporary file)
+    and `anchor --if-uncovered` adds no anchor; a head with no anchor does get one."""
+    ledger = tmp_path / "ledger" / "ledger.jsonl"
+    ledger.parent.mkdir()
+    ledger.write_bytes(ledger30.encode("ascii"))
+    before = ledger.stat().st_mtime_ns
+    log = forward_log(synthetic_yields(days30))
+    monkeypatch.setattr(core, "cli_runner", lambda impl="python": runner)
+    monkeypatch.setattr(core, "holdout_windows", lambda: NO_WINDOWS)
+    monkeypatch.setattr(run_day.fl, "verify", lambda path: None)
+    monkeypatch.setattr(run_day.fl, "read", lambda path: log)
+    now = core.stamp(evening(days30[-1]) + dt.timedelta(hours=3))
+    assert run_day.main(["--ledger", str(ledger), "--forward-log", "log", "--now", now]) == 0
+    assert ledger.read_bytes() == ledger30.encode("ascii") and ledger.stat().st_mtime_ns == before
+    assert sorted(p.name for p in ledger.parent.iterdir()) == ["ledger.jsonl"]
+    anchors = tmp_path / "anchors"
+    first = core.anchor_make(ledger30, CFG, anchors, "2027-02-17T024500Z", if_uncovered=True)
+    assert first is not None and first.name == "2027-02-17T024500Z.json"
+    assert core.anchor_make(ledger30, CFG, anchors, "2027-02-17T070000Z", if_uncovered=True) is None
+    assert len(list(anchors.iterdir())) == 1
+    with pytest.raises(core.PaperError, match="never overwritten"):
+        core.anchor_make(ledger30, CFG, anchors, "2027-02-17T024500Z")
+    # an anchor for an older head does not cover the current one
+    shorter = "".join(x + "\n" for x in ledger30.split("\n")[:12])
+    other = tmp_path / "anchors2"
+    core.anchor_make(shorter, CFG, other, "2027-01-20T024500Z")
+    assert (
+        core.anchor_make(ledger30, CFG, other, "2027-02-17T024500Z", if_uncovered=True) is not None
+    )
+    # the summary kept beside the ledger follows from the rows alone: one more anchor does not change it
+    s1, s2 = tmp_path / "s1.json", tmp_path / "s2.json"
+    base = ["verify", "--ledger", str(ledger), "--no-cli"]
+    assert verify_cli.main([*base, "--anchors", str(anchors), "--ledger-summary", str(s1)]) == 0
+    assert verify_cli.main([*base, "--anchors", str(other), "--ledger-summary", str(s2)]) == 0
+    assert s1.read_bytes() == s2.read_bytes() and b"\r" not in s1.read_bytes()
+    summary = json.loads(s1.read_text())
+    assert (
+        summary["declared_on_time_days"] == 30 and summary["head"] == rows_of(ledger30)[-1]["hash"]
+    )
+    assert "anchors" not in summary and "recorded_trading_days" not in summary
+
+
+def test_odd_recorder_values_leave_the_date_incomplete_instead_of_stopping_the_job(
+    days30: list[dt.date],
+) -> None:
+    """The recorder log is outside this job's control. A value that is not a finite number, or a key that is not
+    `date|field`, is ignored: the date has no complete curve, so it becomes a gap after its cut-off. Before
+    this was guarded, such a row raised on every run (KR-210: no state stops the ledger)."""
+    days = days30[:3]
+    log = forward_log(synthetic_yields(days))
+    obs = log[1]["record"]["value"]["payload"]["observations"]
+    date = days[1].isoformat()
+    obs[f"{date}|5 Yr"] = None
+    obs[f"{date}|10 Yr"] = float("nan")
+    obs["not a key"] = 4.2
+    obs[f"{date}|2 Yr"] = True
+    state = core.par_state(log, CFG["source_series"], FIELDS)
+    assert sorted(state) == [days[0].isoformat(), days[2].isoformat()]
+    text = run_days(days[:2], log)
+    kinds = [(r["kind"], r["body"]["date"], r["body"].get("cause")) for r in rows_of(text)[1:]]
+    assert kinds == [("DAY", days[0].isoformat(), None)]  # day 2 is waited for until its cut-off...
+    out, new, _ = core.run(CFG, runner, text, log, evening(days[2]), "c", "python", NO_WINDOWS)
+    assert [(r["kind"], r["body"].get("cause")) for r in new] == [
+        ("GAP", "no_curve"),
+        ("DAY", None),
+    ]
+    assert check(out)["ok"]

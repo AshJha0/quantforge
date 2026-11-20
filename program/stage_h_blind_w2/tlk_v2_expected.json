@@ -1,0 +1,101 @@
+{
+ "tlk_k-0012": {
+  "outputs": {
+   "cumulative_probability": 0.9448722135510369,
+   "zone": "GREEN",
+   "plus_factor": null
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ },
+ "tlk_k-0013": {
+  "outputs": {
+   "cumulative_probability": 0.9786033201901807,
+   "zone": "YELLOW",
+   "plus_factor": null
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ },
+ "tlk_k-0014": {
+  "outputs": {
+   "cumulative_probability": 0.9505763522838253,
+   "zone": "YELLOW",
+   "plus_factor": null
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ },
+ "tlk_k-0015": {
+  "outputs": {
+   "cumulative_probability": 0.022212510364731913,
+   "zone": "GREEN",
+   "plus_factor": null
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ },
+ "tlk_k-0016": {
+  "outputs": {
+   "cumulative_probability": 0.95,
+   "zone": "YELLOW",
+   "plus_factor": null
+  },
+  "tolerance_limit": {
+   "absolute": 0.0,
+   "relative": 0.0
+  }
+ },
+ "tlk_k-0017": {
+  "outputs": {
+   "cumulative_probability": 0.99,
+   "zone": "YELLOW",
+   "plus_factor": null
+  },
+  "tolerance_limit": {
+   "absolute": 0.0,
+   "relative": 0.0
+  }
+ },
+ "tlk_k-0018": {
+  "outputs": {
+   "cumulative_probability": 0.9999,
+   "zone": "RED",
+   "plus_factor": null
+  },
+  "tolerance_limit": {
+   "absolute": 0.0,
+   "relative": 0.0
+  }
+ },
+ "tlk_k-0019": {
+  "outputs": {
+   "cumulative_probability": 0.9588168159301514,
+   "zone": "YELLOW",
+   "plus_factor": 0.4
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ },
+ "tlk_k-0020": {
+  "outputs": {
+   "cumulative_probability": 0.08105851616218128,
+   "zone": "GREEN",
+   "plus_factor": 0.0
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ }
+}

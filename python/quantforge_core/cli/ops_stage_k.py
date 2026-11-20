@@ -1,9 +1,8 @@
-"""Stage K wave 1 verbs (PROPOSED rulings KR-1 to KR-14).
+"""Stage K wave 1 verbs (rulings KR-1 to KR-14 of `stage-k-rulings-w1.md`, confirmed except KR-8).
 
-Error order HR-66: reading the inputs is E_SCHEMA; the structural E_INPUT checks run here, before the
-first gated core call, so they come before the finite rule's E_DOMAIN (F-2); the core then applies
-E_DOMAIN, value-dependent E_INPUT and E_LIMIT (the stage K sizes are checked in the core, last, so
-the gate's generic sizes are skipped for these verbs: limits.STAGE_K_OPS)."""
+Error order HR-122 (ruling KR-230): reading the inputs is E_SCHEMA; the gate then applies the size limits
+(limits.md, KR-231) and the finite rule; the core applies structural E_INPUT, E_DOMAIN and, for the
+incremental update, the stale-cache E_INPUT."""
 
 from typing import Any
 
@@ -45,7 +44,6 @@ def _bitemporal_query(i: Inputs) -> Any:
     log = [_bi_record(r) for r in i.array("records")]
     series_id = i.string("series_id")
     k, v = i.instant("knowledge_as_of"), i.instant("valid_at")
-    sk._check_log(log)
     status, w = core.stage_k.bitemporal_query(log, series_id, k, v)
     if w is None:
         return {"status": status, "row": None}
@@ -62,7 +60,6 @@ def _bitemporal_query(i: Inputs) -> Any:
 @op("curve.bootstrap.par_annual")
 def _par_annual(i: Inputs) -> Any:
     quotes = i.reals("quotes")
-    sk.check_quotes_shape(len(quotes))
     return core.stage_k.par_annual(quotes)
 
 
@@ -70,7 +67,6 @@ def _par_annual(i: Inputs) -> Any:
 def _incremental(i: Inputs) -> Any:
     pq, pd = i.reals("previous_quotes"), i.reals("previous_discount_factors")
     nq = i.reals("new_quotes")
-    sk.check_update_shape(len(pq), len(pd), len(nq))
     return core.stage_k.incremental_update(pq, pd, nq)
 
 
@@ -79,7 +75,6 @@ def _trigger(i: Inputs) -> Any:
     changes = i.reals("changes")
     x_ref, x_now = i.real("x_ref"), i.real("x_now")
     d, k = i.real("days_since"), i.real("k")
-    sk.check_changes_shape(len(changes))
     return core.stage_k.trigger_check(changes, x_ref, x_now, d, k)
 
 
@@ -90,7 +85,6 @@ def _intraday(i: Inputs) -> Any:
         for p in _objects(i, "positions")
     ]
     shift = i.real("shift")
-    sk.check_positions_shape(len(positions))
     return core.stage_k.delta_gamma_bound(positions, shift)
 
 
@@ -98,5 +92,4 @@ def _intraday(i: Inputs) -> Any:
 def _richardson(i: Inputs) -> Any:
     values = i.reals("values")
     ratio, p = i.real("ratio"), i.real("assumed_order")
-    sk.check_values_shape(len(values))
     return core.stage_k.richardson_check(values, ratio, p)
