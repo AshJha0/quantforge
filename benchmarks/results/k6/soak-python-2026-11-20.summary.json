@@ -1,0 +1,30 @@
+{
+ "implementation": "python",
+ "host": "local laptop, not the acceptance machine",
+ "commit": "a95aa17583d3cf6d4c46aa6fc31a70b416849c4b",
+ "started_utc": "2026-11-20T18:19:40.005585+00:00",
+ "finished_utc": "2026-11-20T20:45:02+00:00",
+ "minutes": 145.0,
+ "planted_leak": false,
+ "leak_every": null,
+ "judged_key": "private_bytes",
+ "argv_tail": [
+  "C:\\Work\\Claude\\qf-wt\\k-v1-k6\\benchmarks\\soak\\py_entry.py",
+  "batch"
+ ],
+ "golden_cases": 16258,
+ "cases": 199127,
+ "passes": 12,
+ "drift": 0,
+ "drift_examples": [],
+ "golden_failures": 0,
+ "golden_examples": [],
+ "errors": 0,
+ "stderr_bytes": 0,
+ "exit_code": 0,
+ "died": false,
+ "quiesce_timeouts": 0,
+ "platform": "win32",
+ "csv": "soak-python-2026-11-20.csv",
+ "csv_sha256": "3ea94515fdeacff8a03e573d1aee55bd34658195dfdc50a1d5c237a70cbe40b0"
+}
