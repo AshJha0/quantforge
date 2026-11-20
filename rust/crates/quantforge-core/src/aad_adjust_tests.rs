@@ -225,3 +225,133 @@ fn wrt_rules() {
     let g = gradient(&x, &["ee"]);
     assert!(g.iter().all(|(_, row)| row.len() == 1 && row[0].0 == "ee"));
 }
+
+/// Every scalar and profile entry against a binary64 Richardson bump of `adjustments` on benign
+/// inputs (no small profile point, so the bump's own rounding stays near 1e-10; KR-265 explains why
+/// this is not the acceptance). Three overlap settings, with im and capital.
+#[test]
+fn every_entry_against_a_binary64_bump() {
+    for (own_h, own_r, lend, excl) in [
+        (0.01, 0.4, 0.008, false),
+        (0.01, 0.4, 0.008, true),
+        (0.02, 0.4, 0.008, true),
+    ] {
+        let mut x = base();
+        x.own = Name {
+            hazard_rate: own_h,
+            recovery: own_r,
+        };
+        x.lend_spread = lend;
+        x.exclude_dva_overlap = excl;
+        x.im = Some((vec![200.0, 210.0, 190.0, 150.0], 0.006));
+        x.capital = Some((vec![40.0, 42.0, 38.0, 30.0], 0.1));
+        let g = gradient(&x, &keys(true, true));
+        let value = |y: &AdjInputs, o: &str| -> f64 {
+            let v = adjustments(y).unwrap();
+            match o {
+                "cva" => v.cva,
+                "dva" => v.dva,
+                "fca" => v.fca,
+                "fba" => v.fba,
+                "fva" => v.fva,
+                "mva" => v.mva.unwrap(),
+                _ => v.kva.unwrap(),
+            }
+        };
+        type Set = fn(&mut AdjInputs, usize, f64);
+        let inputs: [(&str, bool, Set, fn(&AdjInputs, usize) -> f64); 13] = [
+            (
+                "counterparty.hazard_rate",
+                true,
+                |y, _, v| y.counterparty.hazard_rate = v,
+                |y, _| y.counterparty.hazard_rate,
+            ),
+            (
+                "counterparty.recovery",
+                true,
+                |y, _, v| y.counterparty.recovery = v,
+                |y, _| y.counterparty.recovery,
+            ),
+            (
+                "own.hazard_rate",
+                true,
+                |y, _, v| y.own.hazard_rate = v,
+                |y, _| y.own.hazard_rate,
+            ),
+            (
+                "own.recovery",
+                true,
+                |y, _, v| y.own.recovery = v,
+                |y, _| y.own.recovery,
+            ),
+            (
+                "discount_factors",
+                false,
+                |y, i, v| y.discount_factors[i] = v,
+                |y, i| y.discount_factors[i],
+            ),
+            ("ee", false, |y, i, v| y.ee[i] = v, |y, i| y.ee[i]),
+            ("ene", false, |y, i, v| y.ene[i] = v, |y, i| y.ene[i]),
+            (
+                "funding.borrow_spread",
+                true,
+                |y, _, v| y.borrow_spread = v,
+                |y, _| y.borrow_spread,
+            ),
+            (
+                "funding.lend_spread",
+                true,
+                |y, _, v| y.lend_spread = v,
+                |y, _| y.lend_spread,
+            ),
+            (
+                "im",
+                false,
+                |y, i, v| y.im.as_mut().unwrap().0[i] = v,
+                |y, i| y.im.as_ref().unwrap().0[i],
+            ),
+            (
+                "im_spread",
+                true,
+                |y, _, v| y.im.as_mut().unwrap().1 = v,
+                |y, _| y.im.as_ref().unwrap().1,
+            ),
+            (
+                "capital",
+                false,
+                |y, i, v| y.capital.as_mut().unwrap().0[i] = v,
+                |y, i| y.capital.as_ref().unwrap().0[i],
+            ),
+            (
+                "hurdle_rate",
+                true,
+                |y, _, v| y.capital.as_mut().unwrap().1 = v,
+                |y, _| y.capital.as_ref().unwrap().1,
+            ),
+        ];
+        for (o, row) in &g {
+            for (key, scalar, set, get) in inputs {
+                let n = if scalar { 1 } else { 4 };
+                for i in 0..n {
+                    let x0 = get(&x, i);
+                    let d = |h: f64| {
+                        let (mut up, mut dn) = (x.clone(), x.clone());
+                        set(&mut up, i, x0 * (1.0 + h));
+                        set(&mut dn, i, x0 * (1.0 - h));
+                        (value(&up, o) - value(&dn, o)) / (2.0 * h * x0)
+                    };
+                    let reference = (4.0 * d(5e-5) - d(1e-4)) / 3.0;
+                    let aad = if scalar {
+                        scalar(row, key)
+                    } else {
+                        profile(row, key)[i]
+                    };
+                    assert!(
+                        (aad - reference).abs() <= 1e-7 * 1f64.max(reference.abs()),
+                        "{o} {key}[{i}] {aad} {reference} overlap {excl}"
+                    );
+                }
+            }
+        }
+    }
+}
