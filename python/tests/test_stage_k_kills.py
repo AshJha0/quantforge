@@ -19,6 +19,7 @@ from quantforge_core import stage_k as sk
 from quantforge_core.errors import QfError
 
 B = sk.BiRecord
+_NONE: list[Any] = [None]
 Z = sk.ZeroPosition
 
 
@@ -64,14 +65,18 @@ def test_limits() -> None:
     for i, field in enumerate(("previous_quotes", "previous_discount_factors", "new_quotes")):
         args = [[0.0], [0.0], [0.0]]
         args[i] = big
-        assert _err(sk._update_limit, *args) == ("E_LIMIT", field, f"{field} is above its limit of 200")
+        assert _err(sk._update_limit, *args) == (
+            "E_LIMIT",
+            field,
+            f"{field} is above its limit of 200",
+        )
     sk._update_limit([0.0] * 200, [0.0] * 200, [0.0] * 200)
-    assert _err(sk._records_limit, [None] * 100_001)[:2] == ("E_LIMIT", "records")
-    sk._records_limit([None] * 100_000)
+    assert _err(sk._records_limit, _NONE * 100_001)[:2] == ("E_LIMIT", "records")
+    sk._records_limit(_NONE * 100_000)
     assert _err(sk._changes_limit, [0.0] * 100_001)[:2] == ("E_LIMIT", "changes")
     sk._changes_limit([0.0] * 100_000)
-    assert _err(sk._positions_limit, [None] * 100_001)[:2] == ("E_LIMIT", "positions")
-    sk._positions_limit([None] * 100_000)
+    assert _err(sk._positions_limit, _NONE * 100_001)[:2] == ("E_LIMIT", "positions")
+    sk._positions_limit(_NONE * 100_000)
     assert sk.par_annual.__qf_limits__ is sk._quotes_limit  # type: ignore[attr-defined]
     assert sk.incremental_update.__qf_limits__ is sk._update_limit  # type: ignore[attr-defined]
     assert sk.bitemporal_query.__qf_limits__ is sk._records_limit  # type: ignore[attr-defined]
@@ -123,18 +128,32 @@ def test_bitemporal_query() -> None:
 def test_bitemporal_log_errors() -> None:
     seq = [B(2, "S", 0, None, 1, 1, False), B(2, "S", 0, None, 2, 1, False)]
     assert _err(sk.bitemporal_query, seq, "S", 0, 0) == (
-        "E_INPUT", "records", "sequence must be strictly increasing")
+        "E_INPUT",
+        "records",
+        "sequence must be strictly increasing",
+    )
     kt = [B(1, "S", 0, None, 5, 1, False), B(2, "S", 0, None, 4, 1, False)]
     assert _err(sk.bitemporal_query, kt, "S", 0, 0) == (
-        "E_INPUT", "records", "knowledge_time went backwards")
-    sk.bitemporal_query([B(1, "S", 0, None, 5, 1, False), B(2, "S", 0, None, 5, 1, False)], "S", 0, 0)
+        "E_INPUT",
+        "records",
+        "knowledge_time went backwards",
+    )
+    sk.bitemporal_query(
+        [B(1, "S", 0, None, 5, 1, False), B(2, "S", 0, None, 5, 1, False)], "S", 0, 0
+    )
     vt = [B(1, "S", 3, 3, 5, 1, False)]
     assert _err(sk.bitemporal_query, vt, "S", 0, 0) == (
-        "E_INPUT", "records", "valid_to must be after valid_from")
+        "E_INPUT",
+        "records",
+        "valid_to must be after valid_from",
+    )
     sk.bitemporal_query([B(1, "S", 3, 4, 5, 1, False)], "S", 0, 0)
     # sequence is checked over the whole log before knowledge time (spec order)
-    both = [B(1, "S", 0, None, 5, 1, False), B(2, "S", 0, None, 4, 1, False),
-            B(2, "S", 0, None, 6, 1, False)]
+    both = [
+        B(1, "S", 0, None, 5, 1, False),
+        B(2, "S", 0, None, 4, 1, False),
+        B(2, "S", 0, None, 6, 1, False),
+    ]
     assert _err(sk.bitemporal_query, both, "S", 0, 0)[2] == "sequence must be strictly increasing"
     order = [B(1, "S", 3, 3, 5, 1, False), B(2, "S", 0, None, 4, 1, False)]
     assert _err(sk.bitemporal_query, order, "S", 0, 0)[2] == "knowledge_time went backwards"
@@ -163,7 +182,11 @@ def test_par_annual() -> None:
 
 def test_par_annual_errors() -> None:
     assert _err(sk.par_annual, []) == ("E_INPUT", "quotes", "quotes must hold at least one quote")
-    assert _err(sk.par_annual, [0.01, -1.0]) == ("E_DOMAIN", "quotes", "every quote must be above -1")
+    assert _err(sk.par_annual, [0.01, -1.0]) == (
+        "E_DOMAIN",
+        "quotes",
+        "every quote must be above -1",
+    )
     sk.check_quotes_shape(1)
     assert _err(sk._check_quotes, [-1.5], "x") == ("E_DOMAIN", "x", "every quote must be above -1")
     sk._check_quotes([-0.999], "x")
@@ -173,8 +196,11 @@ def test_incremental_update() -> None:
     q = [0.01, 0.02, 0.03]
     dfs = sk.par_annual(q)["discount_factors"]
     out = sk.incremental_update(q, dfs, [0.01, 0.025, 0.03])
-    assert out == {"discount_factors": [0.9900990099009901, 0.9514609997585125, 0.9143234948642862],
-                   "first_changed_index": 1, "recomputed": 2}
+    assert out == {
+        "discount_factors": [0.9900990099009901, 0.9514609997585125, 0.9143234948642862],
+        "first_changed_index": 1,
+        "recomputed": 2,
+    }
     assert out["discount_factors"] == sk.par_annual([0.01, 0.025, 0.03])["discount_factors"]
     first = sk.incremental_update(q, dfs, [0.02, 0.02, 0.03])
     assert first["first_changed_index"] == 0 and first["recomputed"] == 3
@@ -188,16 +214,24 @@ def test_incremental_update() -> None:
 def test_incremental_update_errors() -> None:
     q = [0.01, 0.02]
     dfs = sk.par_annual(q)["discount_factors"]
-    msg = ("previous_quotes, previous_discount_factors and new_quotes must have one equal, "
-           "non-zero length")
+    msg = (
+        "previous_quotes, previous_discount_factors and new_quotes must have one equal, "
+        "non-zero length"
+    )
     assert _err(sk.incremental_update, [], [], []) == ("E_INPUT", "new_quotes", msg)
     assert _err(sk.incremental_update, q, dfs, [0.01]) == ("E_INPUT", "new_quotes", msg)
     assert _err(sk.incremental_update, q, dfs[:1], q) == ("E_INPUT", "new_quotes", msg)
     sk.check_update_shape(1, 1, 1)
     assert _err(sk.incremental_update, [0.01, -2.0], dfs, q) == (
-        "E_DOMAIN", "previous_quotes", "every quote must be above -1")
+        "E_DOMAIN",
+        "previous_quotes",
+        "every quote must be above -1",
+    )
     assert _err(sk.incremental_update, q, dfs, [0.01, -2.0]) == (
-        "E_DOMAIN", "new_quotes", "every quote must be above -1")
+        "E_DOMAIN",
+        "new_quotes",
+        "every quote must be above -1",
+    )
     stale = "previous_discount_factors is not the bootstrap of previous_quotes"
     bad = [dfs[0], dfs[1] + 1e-16]
     assert _err(sk.incremental_update, q, bad, q) == ("E_INPUT", "previous_discount_factors", stale)
@@ -206,7 +240,11 @@ def test_incremental_update_errors() -> None:
     zd = sk.par_annual(zq)["discount_factors"]
     assert zd == [1.0, 0.0] and math.copysign(1.0, zd[1]) == 1.0
     neg = [zd[0], -0.0]
-    assert _err(sk.incremental_update, zq, neg, zq) == ("E_INPUT", "previous_discount_factors", stale)
+    assert _err(sk.incremental_update, zq, neg, zq) == (
+        "E_INPUT",
+        "previous_discount_factors",
+        stale,
+    )
 
 
 # --- recalibration trigger -------------------------------------------------------------------------
@@ -219,8 +257,13 @@ def test_sample_sd() -> None:
 
 def test_trigger_check() -> None:
     out = sk.trigger_check([0.1, -0.2, 0.3, 0.05], 1.0, 1.9, 4.0, 2.0)
-    assert out == {"fire": True, "sigma": 0.2056493779875511, "threshold": 0.8225975119502044,
-                   "false_alarm_rate": 0.1393259685588432, "nominal_rate": 0.04550026389635841}
+    assert out == {
+        "fire": True,
+        "sigma": 0.2056493779875511,
+        "threshold": 0.8225975119502044,
+        "false_alarm_rate": 0.1393259685588432,
+        "nominal_rate": 0.04550026389635841,
+    }
     assert out["threshold"] == 2.0 * out["sigma"] * 2.0
     assert out["false_alarm_rate"] == sk.student_t_two_sided_tail(3, 2.0)
     # strict: equality does not fire; days_since = 1 is allowed
@@ -235,19 +278,33 @@ def test_trigger_check() -> None:
 
 def test_trigger_check_errors() -> None:
     assert _err(sk.trigger_check, [1.0], 0.0, 0.0, 1.0, 1.0) == (
-        "E_INPUT", "changes", "changes must hold at least two one-day changes")
+        "E_INPUT",
+        "changes",
+        "changes must hold at least two one-day changes",
+    )
     sk.check_changes_shape(2)
     assert _err(sk.trigger_check, [1.0, 2.0], 0.0, 0.0, 1.0, 0.0) == (
-        "E_DOMAIN", "k", "k must be above 0")
+        "E_DOMAIN",
+        "k",
+        "k must be above 0",
+    )
     assert _err(sk.trigger_check, [1.0, 2.0], 0.0, 0.0, 0.999, 1.0) == (
-        "E_DOMAIN", "days_since", "days_since must be at least 1")
+        "E_DOMAIN",
+        "days_since",
+        "days_since must be at least 1",
+    )
     assert _err(sk.trigger_check, [1.0, 2.0], 0.0, 0.0, 0.0, 0.0)[1] == "k"
     flat = "the changes have no noise scale (sigma at or below 2^-26 max|c|)"
-    assert _err(sk.trigger_check, [1.0, 1.0, 1.0], 0.0, 0.0, 1.0, 1.0) == ("E_DOMAIN", "changes", flat)
+    assert _err(sk.trigger_check, [1.0, 1.0, 1.0], 0.0, 0.0, 1.0, 1.0) == (
+        "E_DOMAIN",
+        "changes",
+        flat,
+    )
     # sigma just above and at the floor, scaled by max |c| (a negative change counts by its size)
     tiny = 2.0**-26
-    assert _err(sk.trigger_check, [-1.0, -1.0 + tiny * math.sqrt(2.0) * 0.5], 0.0, 0.0, 1.0, 1.0)[1] == (
-        "changes")
+    assert _err(sk.trigger_check, [-1.0, -1.0 + tiny * math.sqrt(2.0) * 0.5], 0.0, 0.0, 1.0, 1.0)[
+        1
+    ] == ("changes")
     sk.trigger_check([-1.0, -1.0 + 4 * tiny], 0.0, 0.0, 1.0, 1.0)
     assert _err(sk.trigger_check, [0.0, 0.0], 0.0, 0.0, 1.0, 1.0)[1] == "changes"
 
@@ -255,8 +312,12 @@ def test_trigger_check_errors() -> None:
 @pytest.mark.parametrize("k", [0.25, 0.5, 1.0, 1.7, 3.0, 10.0, 100.0])
 def test_t_tail_closed_forms(k: float) -> None:
     # nu = 1 (Cauchy): 1 - (2/pi) atan(k); nu = 2: 1 - k / sqrt(2 + k^2)
-    assert sk.student_t_two_sided_tail(1, k) == pytest.approx(1 - 2 / math.pi * math.atan(k), rel=1e-13)
-    assert sk.student_t_two_sided_tail(2, k) == pytest.approx(1 - k / math.sqrt(2 + k * k), rel=1e-12)
+    assert sk.student_t_two_sided_tail(1, k) == pytest.approx(
+        1 - 2 / math.pi * math.atan(k), rel=1e-13
+    )
+    assert sk.student_t_two_sided_tail(2, k) == pytest.approx(
+        1 - k / math.sqrt(2 + k * k), rel=1e-12
+    )
 
 
 @pytest.mark.parametrize(
@@ -286,7 +347,9 @@ def test_t_tail_values(nu: int, k: float, value: float) -> None:
 
 def test_t_tail_exact_points() -> None:
     assert sk.student_t_two_sided_tail(1, 1.0) == 0.5
-    assert sk.student_t_two_sided_tail(2, math.sqrt(2.0)) == pytest.approx(1 - 1 / math.sqrt(2), rel=1e-15)
+    assert sk.student_t_two_sided_tail(2, math.sqrt(2.0)) == pytest.approx(
+        1 - 1 / math.sqrt(2), rel=1e-15
+    )
     assert sk.student_t_two_sided_tail(200, 1e3) == 0.0
 
 
@@ -299,8 +362,12 @@ def test_t_step() -> None:
 
 @pytest.mark.parametrize(
     ("k", "value"),
-    [(0.5, 0.6170750774519738), (1.0, 0.3173105078629141), (3.0, 0.002699796063260189),
-     (30.0, 9.813427854296374e-198)],
+    [
+        (0.5, 0.6170750774519738),
+        (1.0, 0.3173105078629141),
+        (3.0, 0.002699796063260189),
+        (30.0, 9.813427854296374e-198),
+    ],
 )
 def test_normal_tail(k: float, value: float) -> None:
     assert sk.two_sided_normal_tail(k) == pytest.approx(value, rel=1e-15)
@@ -336,18 +403,28 @@ def test_position_pieces() -> None:
 
 def test_delta_gamma_bound() -> None:
     up = sk.delta_gamma_bound(PS, 0.01)
-    assert up == {"estimate_pnl": 0.45392794572367823, "bound": 0.0011164325883494877,
-                  "label": "latency-aware analytics on simulated data"}
+    assert up == {
+        "estimate_pnl": 0.45392794572367823,
+        "bound": 0.0011164325883494877,
+        "label": "latency-aware analytics on simulated data",
+    }
     down = sk.delta_gamma_bound(PS, -0.02)
     assert down["estimate_pnl"] == pytest.approx(-1.1515551816050147, rel=1e-14)
     assert down["bound"] == pytest.approx(0.009806137721363498, rel=1e-14)
     # the bound covers the full revaluation
     assert abs(sk.zero_revalue(PS, 0.01) - up["estimate_pnl"]) <= up["bound"]
     assert sk.zero_revalue(PS, 0.01) == pytest.approx(0.4547816034764296, rel=1e-14)
-    assert _err(sk.delta_gamma_bound, [], 0.01) == ("E_INPUT", "positions", "positions must not be empty")
+    assert _err(sk.delta_gamma_bound, [], 0.01) == (
+        "E_INPUT",
+        "positions",
+        "positions must not be empty",
+    )
     sk.check_positions_shape(1)
     assert _err(sk.delta_gamma_bound, [Z(1.0, 0.0, 0.0)], 0.01) == (
-        "E_DOMAIN", "positions.maturity", "every maturity must be above 0")
+        "E_DOMAIN",
+        "positions.maturity",
+        "every maturity must be above 0",
+    )
 
 
 # --- Richardson guard ------------------------------------------------------------------------------
@@ -357,7 +434,10 @@ def test_richardson() -> None:
     ok = sk.richardson_check([1.0, 0.75, 0.6875], 2.0, 2.0)
     assert ok == {"status": "OK", "observed_order": 2.0, "extrapolated": (4 * 0.6875 - 0.75) / 3}
     assert sk.richardson_check([1.0, 0.5, 0.25], 2.0, 2.0) == {
-        "status": "ORDER_MISMATCH", "observed_order": 1.0, "extrapolated": None}
+        "status": "ORDER_MISMATCH",
+        "observed_order": 1.0,
+        "extrapolated": None,
+    }
     nm = {"status": "NON_MONOTONE", "observed_order": None, "extrapolated": None}
     assert sk.richardson_check([1.0, 0.5, 0.6], 2.0, 1.0) == nm
     assert sk.richardson_check([1.0, 1.0, 0.5], 2.0, 1.0) == nm
@@ -377,9 +457,18 @@ def test_richardson() -> None:
 
 def test_richardson_errors() -> None:
     assert _err(sk.richardson_check, [1.0, 2.0], 2.0, 1.0) == (
-        "E_INPUT", "values", "values must hold exactly three grid values")
+        "E_INPUT",
+        "values",
+        "values must hold exactly three grid values",
+    )
     assert _err(sk.richardson_check, [1.0, 2.0, 3.0, 4.0], 2.0, 1.0)[1] == "values"
     assert _err(sk.richardson_check, [1.0, 2.0, 3.0], 1.0, 1.0) == (
-        "E_DOMAIN", "ratio", "ratio must be above 1")
+        "E_DOMAIN",
+        "ratio",
+        "ratio must be above 1",
+    )
     assert _err(sk.richardson_check, [1.0, 2.0, 3.0], 2.0, 0.0) == (
-        "E_DOMAIN", "assumed_order", "assumed_order must be above 0")
+        "E_DOMAIN",
+        "assumed_order",
+        "assumed_order must be above 0",
+    )
