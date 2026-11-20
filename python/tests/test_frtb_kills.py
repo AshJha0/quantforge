@@ -99,3 +99,21 @@ def test_sbm_total_errors() -> None:
     assert _err(frtb.sbm_total, neg) == ("E_DOMAIN", "components/1/scenarios")
     dup = [("FX", "DELTA", (1.0, 1.0, 1.0)), ("FX", "DELTA", (2.0, 2.0, 2.0))]
     assert _err(frtb.sbm_total, dup) == ("E_INPUT", "components/1")
+
+
+def test_csr_name_rho_buckets_17_and_18() -> None:
+    # MAR21.55: name correlation 80% in the index buckets 17 and 18, 35% elsewhere (kills
+    # x__csr_name_rho__mutmut_5, which drops bucket 17).
+    assert frtb._csr_name_rho(17) == 0.80
+    assert frtb._csr_name_rho(18) == 0.80
+    assert frtb._csr_name_rho(16) == 0.35
+    assert frtb._csr_name_rho(1) == 0.35
+
+
+def test_stage_f_survivor_fields() -> None:
+    # Code and field of three errors whose field a stage F mutant dropped or renamed
+    # (x__class_bucket__mutmut_32, x_vega__mutmut_9, x_curvature__mutmut_7).
+    assert _err(frtb._class_bucket, "EQUITY", 99) == ("E_INPUT", "bucket")
+    assert _err(frtb._class_bucket, "CSR_NONSEC", True) == ("E_INPUT", "bucket")
+    assert _err(frtb.vega, "EQUITY", []) == ("E_INPUT", "sensitivities")
+    assert _err(frtb.curvature, "EQUITY", [], True) == ("E_INPUT", "fx_scalar")
