@@ -42,8 +42,7 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
-    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
+    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
    ],
    "tags": [
     "stage_k",
@@ -582,8 +581,7 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
-    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
+    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
    ],
    "tags": [
     "stage_k",
@@ -1122,8 +1120,7 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
-    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
+    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
    ],
    "tags": [
     "stage_k",
@@ -1662,8 +1659,7 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
-    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
+    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
    ],
    "tags": [
     "stage_k",
@@ -2202,8 +2198,7 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
-    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
+    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
    ],
    "tags": [
     "stage_k",
@@ -2742,8 +2737,7 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)",
-    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
+    "scipy 1.18.1 stats.spearmanr, stats.ks_2samp, stats.kstwobign.sf (independent library): MATCH 1e-12; not counted: D6 precedent (a library primitive computing the same quantity, as btk_k SciPy binom)"
    ],
    "tags": [
     "stage_k",
@@ -2851,8 +2845,7 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 integrate.quad of the normal tail (independent library, a different formulation): MATCH 1e-12; not counted here: whether D6 classes it library-primitive is the coordinator's decision",
-    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
+    "scipy 1.18.1 integrate.quad of the normal tail (independent library, a different formulation): MATCH 1e-12; not counted here: whether D6 classes it library-primitive is the coordinator's decision"
    ],
    "tags": [
     "stage_k",
@@ -2896,8 +2889,7 @@
    "verified_by": [
     "hand (spec table, specifications/06-risk/frtb-ima.md)",
     "fractions and mpmath 50 digits (independent oracle, gen_stage_k_w2a.py)",
-    "scipy 1.18.1 integrate.quad of the normal tail (independent library, a different formulation): MATCH 1e-12; not counted here: whether D6 classes it library-primitive is the coordinator's decision",
-    "blind re-derivation DR-H2 2026-11-19 (second lane, stage_k_blind/ima2/compare_output.txt, program/STAGE_K_BLIND_W2.md): MATCH"
+    "scipy 1.18.1 integrate.quad of the normal tail (independent library, a different formulation): MATCH 1e-12; not counted here: whether D6 classes it library-primitive is the coordinator's decision"
    ],
    "tags": [
     "stage_k",
@@ -4971,7 +4963,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: two errors: lengths differ and a constant RTPL"
+   "description": "hand: two errors: lengths differ and a constant RTPL [structural] [domain]"
   },
   {
    "case_id": "pla_ke-0008",
@@ -5000,7 +4992,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: E1, two errors: hpl Infinity and lengths differ (the finite rule first)"
+   "description": "hand: E1, two errors: hpl Infinity and lengths differ (the finite rule first) [finite] [structural]"
   },
   {
    "case_id": "pla_ke-0009",
@@ -5110,7 +5102,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: two errors: n a string and ks negative"
+   "description": "hand: two errors: n a string and ks negative [schema] [domain]"
   },
   {
    "case_id": "es_ke-0001",
@@ -5163,7 +5155,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: two errors: four horizons and a negative ES"
+   "description": "hand: two errors: four horizons and a negative ES [structural] [domain]"
   },
   {
    "case_id": "es_ke-0003",
@@ -5357,7 +5349,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: E1, two errors: es_t NaN and four horizons (the finite rule first)"
+   "description": "hand: E1, two errors: es_t NaN and four horizons (the finite rule first) [finite] [structural]"
   },
   {
    "case_id": "est_ke-0001",
@@ -5470,7 +5462,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: two errors: es_fc missing and ES_R,C 0"
+   "description": "hand: two errors: es_fc missing and ES_R,C 0 [schema] [domain]"
   },
   {
    "case_id": "imcc_ke-0001",
@@ -5618,7 +5610,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: two errors: no risk class and portfolio ES_R,C 0"
+   "description": "hand: two errors: no risk class and portfolio ES_R,C 0 [structural] [domain]"
   },
   {
    "case_id": "ses_ke-0001",
@@ -5715,7 +5707,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: two errors: other missing and a negative charge"
+   "description": "hand: two errors: other missing and a negative charge [schema] [domain]"
   },
   {
    "case_id": "cap_ke-0001",
@@ -6011,7 +6003,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: two errors: zone RED and exceptions -1"
+   "description": "hand: two errors: zone RED and exceptions -1 [schema] [domain]"
   },
   {
    "case_id": "rfet_ke-0001",
@@ -6166,7 +6158,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: two errors: row A with a delta and a negative maturity"
+   "description": "hand: two errors: row A with a delta and a negative maturity [structural] [domain]"
   },
   {
    "case_id": "rfet_ke-0008",
@@ -6515,7 +6507,7 @@
     "frtb_ima",
     "error"
    ],
-   "description": "hand: two errors: category and fx_pair both given and negative maturity_days"
+   "description": "hand: two errors: category and fx_pair both given and negative maturity_days [structural] [domain]"
   }
  ]
 }

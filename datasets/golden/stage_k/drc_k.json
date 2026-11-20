@@ -1491,7 +1491,7 @@
     "frtb_drc",
     "error"
    ],
-   "description": "hand: two errors: notional missing and maturity 0"
+   "description": "hand: two errors: notional missing and maturity 0 [schema] [domain]"
   },
   {
    "case_id": "drc_ke-0007",
@@ -1909,7 +1909,7 @@
     "frtb_drc",
     "error"
    ],
-   "description": "hand: E1, two errors: notional Infinity and obligor without a rating (the finite rule first)"
+   "description": "hand: E1, two errors: notional Infinity and obligor without a rating (the finite rule first) [finite] [structural]"
   },
   {
    "case_id": "drc_ke-0019",
@@ -1952,7 +1952,7 @@
     "frtb_drc",
     "error"
    ],
-   "description": "hand: two errors: duplicate id and maturity -1"
+   "description": "hand: two errors: duplicate id and maturity -1 [structural] [domain]"
   },
   {
    "case_id": "drc_ke-0020",
@@ -2261,7 +2261,7 @@
     "frtb_drc",
     "error"
    ],
-   "description": "hand: two errors: duplicate id and rw above 12.5"
+   "description": "hand: two errors: duplicate id and rw above 12.5 [structural] [domain]"
   },
   {
    "case_id": "ctp_ke-0001",
@@ -2497,7 +2497,7 @@
     "frtb_drc",
     "error"
    ],
-   "description": "hand: E1, two errors: bucket_drc -Infinity and both inputs given (the finite rule first)"
+   "description": "hand: E1, two errors: bucket_drc -Infinity and both inputs given (the finite rule first) [finite] [structural]"
   },
   {
    "case_id": "rrao_ke-0001",
@@ -2684,7 +2684,7 @@
     "frtb_drc",
     "error"
    ],
-   "description": "hand: two errors: duplicate id and negative notional"
+   "description": "hand: two errors: duplicate id and negative notional [structural] [domain]"
   },
   {
    "case_id": "rrao_ke-0007",
@@ -2713,7 +2713,7 @@
     "frtb_drc",
     "error"
    ],
-   "description": "hand: two errors: kind not listed and negative notional"
+   "description": "hand: two errors: kind not listed and negative notional [schema] [domain]"
   }
  ]
 }

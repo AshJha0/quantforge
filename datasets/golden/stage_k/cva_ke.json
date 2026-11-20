@@ -119,7 +119,7 @@
     "cva_capital",
     "error"
    ],
-   "description": "hand: two errors: sector SPACE and m 0 (spec cva_ke-0003)"
+   "description": "hand: two errors: sector SPACE and m 0 (spec cva_ke-0003) [schema] [domain]"
   },
   {
    "case_id": "cva_ke-0004",
@@ -721,7 +721,7 @@
     "cva_capital",
     "error"
    ],
-   "description": "hand: two errors: unknown hedge counterparty and negative ead (structural first)"
+   "description": "hand: two errors: unknown hedge counterparty and negative ead (structural first) [structural] [domain]"
   },
   {
    "case_id": "cva_ke-0018",
@@ -803,7 +803,7 @@
     "error",
     "e1"
    ],
-   "description": "hand: E1, two errors: m Infinity and a hedge with REDUCED (the finite rule first)"
+   "description": "hand: E1, two errors: m Infinity and a hedge with REDUCED (the finite rule first) [finite] [structural]"
   }
  ]
 }

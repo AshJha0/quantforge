@@ -671,7 +671,7 @@
     "leverage_large_exposures",
     "error"
    ],
-   "description": "hand: two errors: unknown counterparty and tier1 0"
+   "description": "hand: two errors: unknown counterparty and tier1 0 [structural] [domain]"
   },
   {
    "case_id": "lex_ke-0018",
@@ -722,7 +722,7 @@
     "leverage_large_exposures",
     "error"
    ],
-   "description": "hand: two errors: seniority not listed and ccf 1.5"
+   "description": "hand: two errors: seniority not listed and ccf 1.5 [schema] [domain]"
   },
   {
    "case_id": "lex_ke-0019",
@@ -803,7 +803,7 @@
     "error",
     "e1"
    ],
-   "description": "hand: E1, two errors: value -Infinity and an unknown counterparty (the finite rule first)"
+   "description": "hand: E1, two errors: value -Infinity and an unknown counterparty (the finite rule first) [finite] [structural]"
   }
  ]
 }

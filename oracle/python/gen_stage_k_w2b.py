@@ -511,7 +511,7 @@ def gen_cva_errors():
     err(b, {"version": "REDUCED", "counterparties": [cp("C1", "financials", "IG", (1000000, 0, False))]}, "E_DOMAIN", "m 0 (spec cva_ke-0001)")
     err(b, {"version": "REDUCED", "counterparties": one, "single_name_hedges": [hdg]}, "E_INPUT", "hedge with REDUCED (spec cva_ke-0002)")
     err(b, {"version": "REDUCED", "counterparties": [cp("C1", "SPACE", "IG", (1000000, 0, False))]}, "E_SCHEMA",
-        "two errors: sector SPACE and m 0 (spec cva_ke-0003)")
+        "two errors: sector SPACE and m 0 (spec cva_ke-0003) [schema] [domain]")
     err(b, {"version": "FULL", "counterparties": one, "single_name_hedges": [{**hdg, "counterparty": "C9"}]}, "E_INPUT", "hedge on an unknown counterparty")
     err(b, {"version": "REDUCED", "counterparties": one + one}, "E_INPUT", "duplicate counterparty id (KR-312)")
     err(b, {"version": "REDUCED", "counterparties": [cp("C1", "financials", "IG", (-1, 5, False))]}, "E_DOMAIN", "negative ead")
@@ -531,10 +531,10 @@ def gen_cva_errors():
     err(b, {"version": "REDUCED", "counterparties": [{"id": "C1", "sector": "financials", "quality": "IG"}]}, "E_SCHEMA", "netting_sets missing")
     err(b, {"version": "REDUCED", "counterparties": [cp("C1", "financials", "AA", (1, 1, False))]}, "E_SCHEMA", "quality not listed")
     err(b, {"version": "FULL", "counterparties": [cp("C1", "financials", "IG", (-1, 5, False))], "single_name_hedges": [{**hdg, "counterparty": "X"}]},
-        "E_INPUT", "two errors: unknown hedge counterparty and negative ead (structural first)")
+        "E_INPUT", "two errors: unknown hedge counterparty and negative ead (structural first) [structural] [domain]")
     err(b, {"version": "REDUCED", "counterparties": [cp("C1", "financials", "IG", ("NaN", 5, False))]}, "E_DOMAIN", "E1: ead NaN", ("e1",))
     err(b, {"version": "REDUCED", "counterparties": [cp("C1", "financials", "IG", (1, "Infinity", False))], "single_name_hedges": [hdg]},
-        "E_DOMAIN", "E1, two errors: m Infinity and a hedge with REDUCED (the finite rule first)", ("e1",))
+        "E_DOMAIN", "E1, two errors: m Infinity and a hedge with REDUCED (the finite rule first) [finite] [structural]", ("e1",))
     s.write()
 
     s = Suite("sacva_ke", SPEC_C, G)
@@ -573,10 +573,10 @@ def gen_cva_errors():
     s_err(sa_in({"CCS.DELTA": [ccs("8")]}), "E_INPUT", "bucket 8 factor without index and series")
     s_err(sa_in({"CCS.DELTA": [ccs(), ccs(tenor="5Y", quality="HY_NR")]}), "E_INPUT", "one name with two qualities (KR-314)")
     s_err(sa_in({"IR.DELTA": ir}) | {"reporting_currency": "usd"}, "E_INPUT", "reporting currency not a currency code")
-    s_err(sa_in({"CCS.VEGA": [ccs()]}, m_cva=0.9), "E_INPUT", "two errors: CCS vega and m_cva 0.9 (structural first)")
-    s_err(sa_in({"IR.DELTA": [{**ir[0], "factor": "7Y"}], "CCS.VEGA": [ccs()]}), "E_SCHEMA", "two errors: tenor not listed and CCS vega")
+    s_err(sa_in({"CCS.VEGA": [ccs()]}, m_cva=0.9), "E_INPUT", "two errors: CCS vega and m_cva 0.9 (structural first) [structural] [domain]")
+    s_err(sa_in({"IR.DELTA": [{**ir[0], "factor": "7Y"}], "CCS.VEGA": [ccs()]}), "E_SCHEMA", "two errors: tenor not listed and CCS vega [schema] [structural]")
     s_err(sa_in({"IR.DELTA": [{**ir[0], "s_cva": "NaN"}]}), "E_DOMAIN", "E1: s_cva NaN", ("e1",))
-    s_err(sa_in({"IR.DELTA": [{**ir[0], "s_hdg": "-Infinity"}] + ir}), "E_DOMAIN", "E1, two errors: s_hdg -Infinity and a duplicate factor (the finite rule first)", ("e1",))
+    s_err(sa_in({"IR.DELTA": [{**ir[0], "s_hdg": "-Infinity"}] + ir}), "E_DOMAIN", "E1, two errors: s_hdg -Infinity and a duplicate factor (the finite rule first) [finite] [structural]", ("e1",))
     s_err(sa_in({"IR.DELTA": ir}, m_cva="NaN"), "E_DOMAIN", "E1: m_cva NaN", ("e1",))
     s.write()
 
@@ -662,7 +662,7 @@ def gen_lev_errors():
     err(L, {**ok, "tier1": 0}, "E_DOMAIN", "tier1 0 (spec lev_ke-0001)")
     err(L, {**ok, "sfts": [sft]}, "E_INPUT", "exposures and collateral of lengths 2 and 1 (spec lev_ke-0002)")
     err(L, {**ok, "off_balance": [{"notional": -1, "ccf_category": "GUARANTEE"}]}, "E_SCHEMA",
-        "two errors: unlisted CCF category and a negative notional (spec lev_ke-0003)")
+        "two errors: unlisted CCF category and a negative notional (spec lev_ke-0003) [schema] [domain]")
     for field, item, key in (("on_balance", None, None), ("derivatives", {"v": 1, "pfe": 1}, "pfe"),
                              ("derivatives", {"v": 1, "pfe": 1, "cvm_received": 1}, "cvm_received"),
                              ("derivatives", {"v": 1, "pfe": 1, "cvm_provided": 1}, "cvm_provided"),
@@ -680,9 +680,9 @@ def gen_lev_errors():
         err(L, {**ok, field: [bad]}, "E_DOMAIN", f"negative {key} in {field}")
     err(L, {"tier1": 1}, "E_DOMAIN", "exposure measure zero: no ratio (KR-321)")
     err(L, {**ok, "sfts": [{"gross_assets": 1, "exposures": [], "collateral": []}]}, "E_SCHEMA", "mna missing")
-    err(L, {**ok, "tier1": 0, "sfts": [sft]}, "E_INPUT", "two errors: lengths differ and tier1 0 (structural first)")
+    err(L, {**ok, "tier1": 0, "sfts": [sft]}, "E_INPUT", "two errors: lengths differ and tier1 0 (structural first) [structural] [domain]")
     err(L, {**ok, "derivatives": [{"v": "NaN", "pfe": 1}]}, "E_DOMAIN", "E1: v NaN", ("e1",))
-    err(L, {**ok, "tier1": "Infinity", "sfts": [sft]}, "E_DOMAIN", "E1, two errors: tier1 Infinity and lengths differ (the finite rule first)", ("e1",))
+    err(L, {**ok, "tier1": "Infinity", "sfts": [sft]}, "E_DOMAIN", "E1, two errors: tier1 Infinity and lengths differ (the finite rule first) [finite] [structural]", ("e1",))
     s.write()
 
     s = Suite("lex_ke", SPEC_L, G)
@@ -709,12 +709,12 @@ def gen_lev_errors():
     err(X, {**base, "crm": [{"counterparty": "A", "provider": "B", "protected": 11}]}, "E_DOMAIN", "protection above the exposure (KR-325)")
     err(X, {**base, "trading_book": [{**pos, "seniority": "SUPER"}]}, "E_SCHEMA", "seniority not listed")
     err(X, {"tier1": 1000}, "E_SCHEMA", "counterparties missing")
-    err(X, {**base, "tier1": 0, "banking_book": [{"counterparty": "Q", "value": 1}]}, "E_INPUT", "two errors: unknown counterparty and tier1 0")
+    err(X, {**base, "tier1": 0, "banking_book": [{"counterparty": "Q", "value": 1}]}, "E_INPUT", "two errors: unknown counterparty and tier1 0 [structural] [domain]")
     err(X, {**base, "trading_book": [{**pos, "seniority": "SUPER"}], "off_balance": [{"counterparty": "A", "notional": 1, "ccf": 1.5}]},
-        "E_SCHEMA", "two errors: seniority not listed and ccf 1.5")
+        "E_SCHEMA", "two errors: seniority not listed and ccf 1.5 [schema] [domain]")
     err(X, {**base, "trading_book": [{**pos, "market_value": "NaN"}]}, "E_DOMAIN", "E1: market value NaN", ("e1",))
     err(X, {**base, "banking_book": [{"counterparty": "Q", "value": "-Infinity"}]}, "E_DOMAIN",
-        "E1, two errors: value -Infinity and an unknown counterparty (the finite rule first)", ("e1",))
+        "E1, two errors: value -Infinity and an unknown counterparty (the finite rule first) [finite] [structural]", ("e1",))
     s.write()
 
 

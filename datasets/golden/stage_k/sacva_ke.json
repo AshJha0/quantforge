@@ -813,7 +813,7 @@
     "cva_capital",
     "error"
    ],
-   "description": "hand: two errors: CCS vega and m_cva 0.9 (structural first)"
+   "description": "hand: two errors: CCS vega and m_cva 0.9 (structural first) [structural] [domain]"
   },
   {
    "case_id": "sacva_ke-0025",
@@ -856,7 +856,7 @@
     "cva_capital",
     "error"
    ],
-   "description": "hand: two errors: tenor not listed and CCS vega"
+   "description": "hand: two errors: tenor not listed and CCS vega [schema] [structural]"
   },
   {
    "case_id": "sacva_ke-0026",
@@ -926,7 +926,7 @@
     "error",
     "e1"
    ],
-   "description": "hand: E1, two errors: s_hdg -Infinity and a duplicate factor (the finite rule first)"
+   "description": "hand: E1, two errors: s_hdg -Infinity and a duplicate factor (the finite rule first) [finite] [structural]"
   },
   {
    "case_id": "sacva_ke-0028",
