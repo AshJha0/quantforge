@@ -10,10 +10,10 @@ Every capability moves through `Proposed → Specified → Implemented → Valid
 |---|---|---|
 | Proposed | a capability named in a plan or a spec draft | stage K wave 2 items, the sensitivity-based initial margin (`sbim`, K-8h) |
 | Specified | a spec with inputs, outputs, errors, golden cases and an acceptance test fixed before any run | stage K wave 2 specs merged on the integration branch `k-r1` without an implementation |
-| Implemented | all four languages pass the goldens (`docs/model-inventory.md`, "Status words") | stages A to J, R6 and H, released; stage K round 1 items on the integration branch `k-r1`, not released |
+| Implemented | all four languages pass the goldens (`docs/model-inventory.md`, "Status words") | stages A to J, R6 and H, released; stage K round 1 items, released in v0.10.1 |
 | Validated | tested on real data against an independent benchmark, with a written report (`docs/model-inventory.md`) | **nothing**; every golden input to date is synthetic, except the stage J shock-library Treasury yields and the stage H crypto book |
 | Benchmarked | timed against targets fixed before the run, on the stated acceptance machine | nothing; H-9 has laptop timings only, labelled "local laptop, not the acceptance machine", and its workload R result of 2026-11-19 is a recorded MISS |
-| Operationally tested | run on a schedule, unattended, with its own evidence trail | nothing; the stage K paper ledger is built, is not scheduled (schedule withheld while audit findings are open, `docs/known-issues.md`), and has 0 of the 20 recorded days its gate needs |
+| Operationally tested | run on a schedule, unattended, with its own evidence trail | nothing; the stage K paper ledger is built, is scheduled from v0.10.1 (2026-11-20), and had 0 of the 20 recorded days its gate needs at the release |
 
 "Outside-checked" is not a rung. It is evidence attached to Implemented: some goldens are re-derived outside the author's own code (`docs/model-inventory.md`). There is no second review, human or otherwise (owner decision 2026-11-18), so every rung above Specified rests on self-assessment plus the outside checks below.
 
