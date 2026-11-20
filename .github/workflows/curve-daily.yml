@@ -138,7 +138,7 @@ jobs:
         continue-on-error: true
         run: |
           pip install --quiet opentimestamps-client==0.7.2
-          (cd anchors/anchors && ots upgrade *.json.ots || true)
+          (cd anchors/anchors && ots upgrade *.json.ots) || echo "::warning::ots upgrade exited $? (a proof still waiting for its Bitcoin attestation also exits non-zero); proofs not upgraded now are retried on a later run; the new anchor below is still made"
           rm -f anchors/anchors/*.bak
           python3 code/tools/curve_daily/verify_chain.py anchor --ledger ledger/ledger/curves.jsonl --out-dir anchors/anchors --stamp --if-uncovered
           cd anchors
@@ -150,7 +150,7 @@ jobs:
           ok=""
           for i in 1 2 3; do
             if git push origin curve-daily-anchors; then ok=1; break; fi
-            git pull --rebase -q origin curve-daily-anchors || true
+            git pull --rebase -q origin curve-daily-anchors || echo "::warning::git pull --rebase of curve-daily-anchors failed (try $i); retrying the push"
           done
           if [ -z "$ok" ]; then echo "the anchor was not pushed after three tries"; exit 1; fi
       - name: Fail on a failed soft step

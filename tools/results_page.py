@@ -114,8 +114,11 @@ def render(root=ROOT):
           f"invariance cases ({fig['total_cases']} in all; [case figures](case-figures.md)). A value-checked case must "
           "return the oracle's numbers within a stated tolerance; an error case checks the error code only; an "
           "invariance case checks that two related inputs get the same answer.", "",
-          "Outside-checked share: value-checked cases re-derived outside the author's own code, by a library or by blind "
-          f"re-derivation where the rule allows it (rule R6-13, decision D6; floor {pct(shares['floor'])} per stage, and from "
+          "Outside-checked share: value-checked cases re-derived outside the author's own code, by an outside library or, "
+          "where the rule allows it, by a blind re-derivation by a second AI lane that saw the rules and inputs but not the "
+          "answers; never by a person (README, \"Words used here\"). One definition on every page: "
+          "`tools/case_figures.py outside_pair()` (rule R6-13, decision D6; floor "
+          f"{pct(shares['floor'])} per stage, and from "
           "stage H on per plan item). Stages A to C, R2 and R6 are outside the share table. The share's denominator is the "
           "share table's own count (without generated sweeps), so it can be smaller than the value-checked column. The tag "
           "column is the plan's tag from ROADMAP: stage K is not tagged yet (target v1.0.0).", "",
@@ -128,8 +131,8 @@ def render(root=ROOT):
         c = by_stage[st]
         s = shares["stages"].get(st)
         if s:
-            w = s["without_sweeps"]
-            oc = f"{w['counted_with_rederivation']} of {w['cases']} ({pct(w['share_with_rederivation'])})"
+            counted, cases, share = case_figures.outside_pair(s)  # the one definition, shared with README and case-figures
+            oc = f"{counted} of {cases} ({pct(share)})"
             fl = "met" if s.get("meets_floor") else "NOT MET"
         else:
             oc, fl = "not in the share table", ""
@@ -142,6 +145,29 @@ def render(root=ROOT):
         for it, v in sorted(items.items()):
             L.append(f"| {it} | {v['cases']} | {v['counted_with_rederivation']} | {pct(v['share_with_rederivation'])} | "
                      f"{'met' if v.get('meets_item_floor') else 'NOT MET'} |")
+    cov_files = sorted((root / "benchmarks" / "results" / "coverage").glob("coverage-ci-*.json"))
+    if cov_files:
+        cov = json.loads(cov_files[-1].read_text(encoding="utf-8"))
+        rel = cov_files[-1].relative_to(root).as_posix()
+        floors = {}
+        L += ["", "## Unit-test line coverage", "",
+              f"Measured in CI by `{cov['workflow']}` (run [{cov['run']}]({cov['run_url']}), {cov['event']}, head "
+              f"`{cov['head_sha'][:8]}`, {cov['date']}; {cov['tools']}), copied verbatim from the run log into `{rel}`. "
+              "Line coverage of each language's library by its own unit tests. The gate fails a language below its floor "
+              "(`conformance/quality/floors.json`) or any file below 90% outside the allow-list "
+              "(`conformance/quality/coverage_allow.json`). Line coverage says which lines ran, not that their results "
+              "were checked; the golden cases and mutation testing are the checks on results.", "",
+              "| Language | Lines covered | Lines | Line coverage | Floor | Files below 90% |", "|---|---:|---:|---:|---:|---:|"]
+        below = {}
+        for line in cov["log_lines"]:
+            m = re.match(r"(\w+): library (\d+)/(\d+) lines, [\d.]+% against the floor (\d+)%", line)
+            if m:
+                floors[m.group(1)] = (int(m.group(2)), int(m.group(3)), m.group(4))
+            m = re.match(r"(\w+): per-file gate at 90%: (\d+) file", line)
+            if m:
+                below[m.group(1)] = m.group(2)
+        for lang, (c, n, fl) in sorted(floors.items()):
+            L.append(f"| {lang} | {c:,} | {n:,} | {100 * c / n:.1f}% | {fl}% | {below.get(lang, 'not recorded')} |")
     for sec in ("Mutation testing", "Studies and gates", "Benchmarks"):
         rows = [r for r in verdicts["rows"] if r["section"] == sec]
         if not rows:
@@ -149,9 +175,12 @@ def render(root=ROOT):
         L += ["", f"## {sec}", ""]
         if sec == "Mutation testing":
             L += ["Gate (`conformance/mutation/stages.json`, `.github/workflows/mutation-stage.yml`): at least 80% of a "
-                  "40-mutant sample killed per module and language, with a 95% Wilson lower bound of at least 65%. Unsigned "
-                  "Equivalent rows stay counted as survivors, so scores are lower bounds. Per-run scores are not stored in "
-                  "the tree; the rows below quote the files that recorded them.", ""]
+                  "40-mutant sample killed per module and language, with a 95% Wilson lower bound of at least 65%. Scores "
+                  "are sampled: on pull requests 40 mutants per module and language, not every mutant, so a score of 32 of "
+                  "40 (80%) has a Wilson 95% interval of about 65% to 90%. Which surviving mutants are equivalent (cannot "
+                  "change any output) is the project's own judgement, written by the lanes that wrote the code, with no "
+                  "second review; unsigned Equivalent rows stay counted as survivors, so scores are lower bounds. Per-run "
+                  "scores are not stored in the tree; the rows below quote the files that recorded them.", ""]
         L += ["| Stage | Verdict | Quoted from the evidence | Evidence |", "|---|---|---|---|"]
         for r in rows:
             q = r["quote"].replace("|", "\\|")

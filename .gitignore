@@ -34,3 +34,6 @@ research/r3/data/
 platform/compose/*/work/
 platform/compose/work/
 benchmarks/results/k3/
+
+# jqwik writes failed-property seeds here at test time; local state, not a source file (K-9 review finding 20)
+.jqwik-database

@@ -22,7 +22,7 @@ Each model below gets one entry, the "page" the plan asks for. Each entry also h
 | M8 | Fixed-rate bonds: price, yield, spreads | `04-pricing/bonds.md` | D | Implemented, outside-checked | price 143 of 148, yield 36 of 37, spreads 70 of 76 |
 | M9 | FRNs, repo, bond futures | `04-pricing/bonds.md` | D | Implemented | 0 of 23 |
 | M10 | Sovereign curve fits (Nelson-Siegel, smooth, robust) | `04-pricing/bonds.md`, `03-calibration/curve-fits.md` | D | Implemented | 0 of 23 |
-| M11 | CDS: ISDA standard model, index intrinsic | `04-pricing/credit.md` | D | Implemented, outside-checked | `credit.cds` 29 of 39; index and composite 0 of 7 |
+| M11 | CDS: ISDA-standard-model conventions (checked against QuantLib), index intrinsic | `04-pricing/credit.md` | D | Implemented, outside-checked | `credit.cds` 29 of 39; index and composite 0 of 7 |
 | M12 | Equity forwards, dividends, borrow, index, TRS | `02-curves/equity-forward.md`, `equity-curves.md`, `04-pricing/equity-index.md` | C, D | Implemented | 0 of 30 (stage D) |
 | M13 | Inflation curve, ZCIS, linkers | `02-curves/inflation.md` | D | Implemented | 0 of 18 |
 | M14 | Black-76 and Bachelier | `05-volatility/black-models.md` | C | Implemented, outside-checked (stage C, QuantLib formula) | not counted under 11.2.5 |
@@ -154,7 +154,7 @@ Each entry gives: purpose; inputs; known limitations; validation status; use res
 - **Validation:** known truth and SciPy. No comparison yet with published BoE or Fed fitted curves. **Review:** 2026-11-07.
 
 ### M11 CDS
-- **Purpose:** CDS PV, upfront, par spread and RPV01 under the ISDA standard model; hazard curve bootstrap; index intrinsic value.
+- **Purpose:** CDS PV, upfront, par spread and RPV01 with ISDA-standard-model conventions, checked against QuantLib's `IsdaCdsEngine`; hazard curve bootstrap; index intrinsic value.
 - **Inputs:** trade date, discount curve, hazard pillars or spread quotes, recovery, trade terms.
 - **Limitations:** flat recovery. No default event, auction or succession handling (E8). Discount curve is supplied; the ISDA standard curve-building conventions are not reproduced.
 - **Validation:** QuantLib `IsdaCdsEngine` agrees on price outputs and reprices bootstrap quotes. The ISDA C library itself is not run (licence check pending). **Review:** 2026-11-07.
@@ -242,7 +242,7 @@ Each entry gives: purpose; inputs; known limitations; validation status; use res
 
 ## Stage E models (E1 to E8)
 
-Stage E is Implemented: all four languages pass every stage E golden (6,817 of 6,817 cases (value-checked and error cases counted together) in the full set at merge `597abf2`, 2026-11-08). 557 of the 895 stage E cases (62.2%) are outside-checked under rule 11.2.5 and rulings E-A17 and E-B28. Every input is synthetic; no entry is Validated. Last full review of these entries: 2026-11-08.
+Stage E is Implemented: all four languages pass every stage E golden (6,817 of 6,817 cases (value-checked and error cases counted together) in the full set at merge `597abf2`, 2026-11-08). 557 of the 895 stage E cases (62.2%) (stage E counted error cases in that denominator; under the one definition now used everywhere, value-checked cases only, rule D6, it is 557 of 710, 78.5%: `docs/results.md`) are outside-checked under rule 11.2.5 and rulings E-A17 and E-B28. Every input is synthetic; no entry is Validated. Last full review of these entries: 2026-11-08.
 
 ### Slices E1, E2, E3, E5 (entries ME-A)
 
