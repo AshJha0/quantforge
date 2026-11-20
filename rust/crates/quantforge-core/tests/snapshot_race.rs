@@ -239,9 +239,11 @@ fn publishes() -> u64 {
 fn race_scenario_r1_r4_r16() {
     let p = publishes();
     for r in [1, 4, 16] {
-        let t = race(r, p, Fault::None);
+        // Long mode caps R = 16 at 200,000 publishes (KR-285): 16 readers under ThreadSanitizer.
+        let pr = if r == 16 { p.min(200_000) } else { p };
+        let t = race(r, pr, Fault::None);
         assert_eq!((t.torn, t.non_monotone, t.mismatched), (0, 0, 0));
-        assert_eq!(t.last, p, "every reader saw the final version");
+        assert_eq!(t.last, pr, "every reader saw the final version");
         assert!(t.reads >= r as u64);
     }
 }

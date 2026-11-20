@@ -29,7 +29,8 @@ jobs:
   tsan:
     # Stage K, K-5 (PROPOSED, KR-285, KR-288): the snapshot race test under ThreadSanitizer. CI only: the pinned
     # toolchain (1.99.1, stable) cannot build with a sanitizer, so this job uses a dated nightly for this one test
-    # and nothing else. Long mode (1,000,000 publishes), then both planted faults, which ThreadSanitizer must report.
+    # and nothing else. Long mode (1,000,000 publishes at R = 1 and 4,
+    # 200,000 at R = 16), then both planted faults, which ThreadSanitizer must report.
     # Latency-aware analytics on simulated data; nothing is timed.
     name: rust-tsan
     runs-on: ubuntu-24.04

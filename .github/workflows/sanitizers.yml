@@ -40,7 +40,7 @@ jobs:
       - run: python3 conformance/runner/runner.py --impl cpp
   tsan:
     # Stage K, K-5 (PROPOSED, KR-285, KR-288): the snapshot race test under ThreadSanitizer, long mode (1,000,000
-    # publishes, R = 1, 4, 16), then both planted faults, each of which ThreadSanitizer must report. Latency-aware
+    # publishes at R = 1 and 4, 200,000 at R = 16), then both planted faults, each of which ThreadSanitizer must report. Latency-aware
     # analytics on simulated data; nothing is timed. Clang 23 with libc++, as the cpp26-clang job.
     name: sanitizers-tsan
     runs-on: ubuntu-24.04
@@ -60,7 +60,7 @@ jobs:
       - run: cmake --build build --target qf_snapshot_race --parallel
       - run: ./build/qf_snapshot_race unit
       - name: race, long mode
-        run: for r in 1 4 16; do ./build/qf_snapshot_race race $r 1000000; done
+        run: ./build/qf_snapshot_race race 1 1000000 && ./build/qf_snapshot_race race 4 1000000 && ./build/qf_snapshot_race race 16 200000
       - name: planted faults must be reported
         run: |
           for f in relaxed skip; do

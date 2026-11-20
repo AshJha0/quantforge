@@ -61,6 +61,7 @@ def make() -> dict:
         "race": {
             "publishes_default": 20000,
             "publishes_long": 1000000,
+            "publishes_long_r16": 200000,
             "readers": [1, 4, 16],
             "verify_every": 64,
         },
