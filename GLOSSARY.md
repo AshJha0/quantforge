@@ -2,6 +2,18 @@
 
 Terms are listed under the stage that first needed them. The [Curves gallery](docs/curves/README.md) shows most stage B terms on real output.
 
+## Words that qualify a claim
+
+Defined once here and in the README ("Words used here"); every page uses them in this sense (K-9 review finding 6, 2026-11-20).
+
+| Term | Meaning |
+|---|---|
+| Outside-checked | A value-checked case whose expected values were reproduced outside the code that produced them: by an outside library (QuantLib, Strata, ORE, NumPy, SciPy and others) or by a blind re-derivation by a second AI lane (DR-H2). Never a check by a person; no person has reviewed the work (owner decision 2026-11-18). Shares use one definition, rule D6, computed by `tools/case_figures.py outside_pair()` |
+| Audit | A different-model AI audit: an AI model other than the one that wrote the work reads the specs and code and reports findings (plan rule 14.10-5). Not a person and not an outside firm |
+| Self-assessment | Every check designed and run by the project itself (one person and AI lanes), with no second human review |
+| Sampled mutation score | Share of a sample of injected faults that the tests catch; 40 mutants per module and language on pull requests, quoted with a Wilson 95% interval. Equivalent-mutant judgements are the project's own |
+| Evidence class of a golden case | Where a value-checked case's expected values were checked, read from its `verified_by` labels: outside library, printed published figure, blind re-derivation, own mpmath oracle, own float64 or exact oracle, reference-computed, hand-derived only, or implementation-sourced (`docs/case-figures.md`) |
+
 ## Stage A: Foundation
 
 | Term | Meaning |

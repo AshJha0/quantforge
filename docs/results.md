@@ -35,7 +35,7 @@ Read from the register table in [known issues](known-issues.md); a miss stays a 
 
 All suites: 8,004 value-checked, 5,700 error and 2,554 invariance cases (16,258 in all; [case figures](case-figures.md)). A value-checked case must return the oracle's numbers within a stated tolerance; an error case checks the error code only; an invariance case checks that two related inputs get the same answer.
 
-Outside-checked share: value-checked cases re-derived outside the author's own code, by a library or by blind re-derivation where the rule allows it (rule R6-13, decision D6; floor 60.0% per stage, and from stage H on per plan item). Stages A to C, R2 and R6 are outside the share table. The share's denominator is the share table's own count (without generated sweeps), so it can be smaller than the value-checked column. The tag column is the plan's tag from ROADMAP: stage K is not tagged yet (target v1.0.0).
+Outside-checked share: value-checked cases re-derived outside the author's own code, by an outside library or, where the rule allows it, by a blind re-derivation by a second AI lane that saw the rules and inputs but not the answers; never by a person (README, "Words used here"). One definition on every page: `tools/case_figures.py outside_pair()` (rule R6-13, decision D6; floor 60.0% per stage, and from stage H on per plan item). Stages A to C, R2 and R6 are outside the share table. The share's denominator is the share table's own count (without generated sweeps), so it can be smaller than the value-checked column. The tag column is the plan's tag from ROADMAP: stage K is not tagged yet (target v1.0.0).
 
 | Stage | Name | Planned tag | Demo (ROADMAP) | Value-checked | Error | Invariance | Outside-checked value cases | Floor |
 |---|---|---|---|---:|---:|---:|---|---|
@@ -90,9 +90,20 @@ Stage K per plan item:
 | K-8d | 19 | 12 | 63.2% | met |
 | K-8e | 28 | 23 | 82.1% | met |
 
+## Unit-test line coverage
+
+Measured in CI by `.github/workflows/coverage-stage.yml` (run [44791215671](https://github.com/AshJha0/quantforge/actions/runs/44791215671), pull_request (k-v1 into main), head `146102d2`, 2026-11-20; Java JaCoCo, C++ gcovr, Python coverage.py, Rust cargo-llvm-cov (lcov), as in the workflow), copied verbatim from the run log into `benchmarks/results/coverage/coverage-ci-2026-11-20.json`. Line coverage of each language's library by its own unit tests. The gate fails a language below its floor (`conformance/quality/floors.json`) or any file below 90% outside the allow-list (`conformance/quality/coverage_allow.json`). Line coverage says which lines ran, not that their results were checked; the golden cases and mutation testing are the checks on results.
+
+| Language | Lines covered | Lines | Line coverage | Floor | Files below 90% |
+|---|---:|---:|---:|---:|---:|
+| cpp | 48,488 | 49,846 | 97.3% | 95% | 0 |
+| java | 24,722 | 25,289 | 97.8% | 96% | 0 |
+| python | 18,524 | 18,872 | 98.2% | 96% | 0 |
+| rust | 40,826 | 42,143 | 96.9% | 94% | 0 |
+
 ## Mutation testing
 
-Gate (`conformance/mutation/stages.json`, `.github/workflows/mutation-stage.yml`): at least 80% of a 40-mutant sample killed per module and language, with a 95% Wilson lower bound of at least 65%. Unsigned Equivalent rows stay counted as survivors, so scores are lower bounds. Per-run scores are not stored in the tree; the rows below quote the files that recorded them.
+Gate (`conformance/mutation/stages.json`, `.github/workflows/mutation-stage.yml`): at least 80% of a 40-mutant sample killed per module and language, with a 95% Wilson lower bound of at least 65%. Scores are sampled: on pull requests 40 mutants per module and language, not every mutant, so a score of 32 of 40 (80%) has a Wilson 95% interval of about 65% to 90%. Which surviving mutants are equivalent (cannot change any output) is the project's own judgement, written by the lanes that wrote the code, with no second review; unsigned Equivalent rows stay counted as survivors, so scores are lower bounds. Per-run scores are not stored in the tree; the rows below quote the files that recorded them.
 
 | Stage | Verdict | Quoted from the evidence | Evidence |
 |---|---|---|---|

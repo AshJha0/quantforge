@@ -24,3 +24,43 @@ Classes: `ok` is value-checked (numbers within a stated tolerance); `error` chec
 | `stage_j` | 215 | 229 | 0 | 0 | 444 |
 | `stage_k` | 123 | 99 | 8 | 8 | 238 |
 | all | 8,004 | 5,700 | 2,554 | 1,277 | 16,258 |
+
+## Without the stage A convention sweeps
+
+`core/daycount`, `core/calendar` and `core/compounding` are generated grids of dates and conventions: 3,756 value-checked cases. Without them the headline is **4,248** value-checked cases.
+
+## Outside-checked share per stage
+
+One definition on every page: value-checked cases counted under rule D6 (an outside library, or a blind re-derivation by a second AI lane where the rule allows it; never a person), over the share table's value-checked cases without generated sweeps, read from `oracle/OUTSIDE_SHARES.json` by `outside_pair()`: D 451 of 526 (85.7%), E 557 of 710 (78.5%), F 355 of 417 (85.1%), G 359 of 456 (78.7%), I 102 of 153 (66.7%), J 143 of 215 (66.5%), H 160 of 205 (78.0%), K 97 of 123 (78.9%). Stages A to C, R2 and R6 are not in the share table.
+
+## Evidence classes per stage
+
+Read from each value-checked case's `verified_by` labels; a case counts once, in the first class below that one of its labels matches. This is a reading of the labels, not rule D6: stage J's outside checks are recorded in `oracle/OUTSIDE_J.json`, not in the labels, so its `library` column is lower than its D6 share, and stage K's `library` column counts SciPy cross-checks of single outputs that D6 does not count.
+
+- `impl`: implementation-sourced (expected values are a build's own output)
+- `library`: outside library (QuantLib, Strata, ORE, NumPy, SciPy, HiGHS, Python zoneinfo or hashlib)
+- `printed`: figure printed in a published source (regulator text, paper, standard test vector)
+- `blind`: blind re-derivation by a second AI lane (DR-H2), matched
+- `mpmath`: own high-precision oracle (mpmath, 25 to 50 digits)
+- `own`: own independent oracle in float64 or exact arithmetic (exact rationals, closed forms, replays, parity, rules)
+- `reference`: reference-computed (the spec's reference scheme, stored reference values)
+- `hand`: hand-derived only
+
+| Stage | `impl` | `library` | `printed` | `blind` | `mpmath` | `own` | `reference` | `hand` | All |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| A | 0 | 2,950 | 15 | 0 | 853 | 312 | 0 | 93 | 4,223 |
+| B | 0 | 210 | 0 | 0 | 0 | 34 | 0 | 27 | 271 |
+| C | 0 | 253 | 0 | 0 | 0 | 94 | 0 | 7 | 354 |
+| D | 0 | 442 | 3 | 0 | 5 | 76 | 0 | 0 | 526 |
+| R2 | 0 | 74 | 0 | 0 | 0 | 0 | 0 | 0 | 74 |
+| E | 0 | 315 | 1 | 0 | 345 | 47 | 0 | 2 | 710 |
+| F | 0 | 16 | 36 | 0 | 217 | 192 | 0 | 11 | 472 |
+| G | 0 | 346 | 0 | 0 | 64 | 50 | 10 | 0 | 470 |
+| I | 0 | 278 | 0 | 0 | 22 | 18 | 0 | 0 | 318 |
+| R6 | 0 | 13 | 0 | 0 | 7 | 23 | 0 | 0 | 43 |
+| J | 0 | 56 | 7 | 0 | 0 | 28 | 124 | 0 | 215 |
+| H | 2 | 4 | 5 | 156 | 5 | 5 | 0 | 28 | 205 |
+| K | 7 | 57 | 5 | 36 | 13 | 5 | 0 | 0 | 123 |
+| all | 9 | 5,014 | 72 | 192 | 1,531 | 884 | 134 | 168 | 8,004 |
+
+Exceptions to design principle 5 (expected results never come from an implementation): `sorx_h-0001`, `sorx_h-0002`, `k8_k-0001`, `k8_k-0002`, `k8_k-0003`, `k8_k-0004`, `k8_k-0005`, `k8_k-0006`, `k8_k-0007`. The `k8_k` values are the Python build's output under the pinned reference scheme (`oracle/python/gen_stage_k_k8.py` imports the build); the `sorx_h` values are the Python build's output, kept as an agreement check across the builds and not counted as outside-checked. 168 value-checked cases rest on hand derivation only.
