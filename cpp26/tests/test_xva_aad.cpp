@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdint>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "quantforge/core/xva_aad.hpp"
@@ -21,13 +22,13 @@ struct Lcg {
     }
 };
 
-const xa::Entry& entry(const xa::Gradient& g, const std::string& k) {
+const xa::Entry& entry(const xa::Gradient& g, std::string_view k) {
     const auto it = std::find_if(g.begin(), g.end(), [&](const xa::Entry& e) { return e.key == k; });
     REQUIRE(it != g.end());
     return *it;
 }
 
-const xa::Gradient& output(const std::vector<std::pair<std::string, xa::Gradient>>& g, const std::string& o) {
+const xa::Gradient& output(const std::vector<std::pair<std::string, xa::Gradient>>& g, std::string_view o) {
     const auto it = std::find_if(g.begin(), g.end(), [&](const auto& p) { return p.first == o; });
     REQUIRE(it != g.end());
     return it->second;
