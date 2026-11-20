@@ -66,4 +66,4 @@ Before: `xva.simm.ir_delta` had 4 value cases, 0 outside-checked (`oracle/OUTSID
 | Rust chain (WSL): fmt, clippy `-D warnings`, tests, release, conformance, tutorials, llvm-cov gate | all rc 0; conformance 16,129 of 16,129 |
 | C++ chain (WSL): Release with `-Werror`, clang `-Wshadow`, ctest, conformance, tutorials, ASan/UBSan ctest and conformance, coverage gate | first run: `test_cli.cpp` hard-coded 368 operations (fixed to 369, `c4e87010`); ASan ctest of the second run used a stale object (source mtime older than the object), rebuilt and rerun: 670 of 670 test cases, 894 s; all other steps rc 0; conformance 16,129 of 16,129 plain and under ASan |
 | Repo gates, `governance_gate.py`, `outside_shares.py --check`, `test_tools.py`, `check_md_anchors.py`, site build (670 pages, 0 broken links), `research/test_preregs.py`, `test_sbim_placeholder.py` | pass; `check_e1_coverage.py` red only on `risk.frtb.backtest.zone`, as on `k-r1` (another lane) |
-| Banned words (`interview`, LSEG), em dashes in the diff | none |
+| Banned words (the owner's banned word, LSEG), em dashes in the diff | none |
