@@ -193,7 +193,8 @@ def test_sbim_domain_errors_name_their_fields() -> None:
 
 
 def _one_set(times: list[float], path: list[float]) -> Any:
-    return xva.collateralised(times, [("S", [path])], {}, 0.5)["netting_sets"]["S"]
+    sets: Any = xva.collateralised(times, [("S", [path])], {}, 0.5)["netting_sets"]
+    return sets["S"]
 
 
 def test_effective_epe_with_no_grid_point_within_one_year_is_ee_at_t0() -> None:
@@ -223,9 +224,7 @@ def test_effective_epe_includes_the_point_exactly_one_year_out() -> None:
 def test_total_ee_sums_netting_sets_without_netting() -> None:
     # Spec G-40: total_ee is the sum over sets of ee; set A has ee (1, 0), set B (0, 3): a path
     # value of -3 in A does not offset B.
-    r = xva.collateralised(
-        [0.0, 1.0], [("A", [[1.0, -3.0]]), ("B", [[-1.0, 3.0]])], {}, 1.0
-    )
+    r = xva.collateralised([0.0, 1.0], [("A", [[1.0, -3.0]]), ("B", [[-1.0, 3.0]])], {}, 1.0)
     assert r["total_ee"] == [1.0, 3.0]
 
 
