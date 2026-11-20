@@ -1,0 +1,50 @@
+{
+ "read": "2026-11-20",
+ "how": "gh api repos/AshJha0/quantforge/releases/tags/v0.10.0 (asset digests), then gh api repos/AshJha0/quantforge/attestations/<digest> per asset; no asset downloaded, so this is not gh attestation verify",
+ "release": "v0.10.0",
+ "rows": [
+  {
+   "asset": "quantforge-0.10.0.cdx.json",
+   "digest": "sha256:26fa30853e4680cf3dea4d00d10bf5ae8599c96fee616e1dfb50953dbcd095c0",
+   "attestations": 1,
+   "api_status": "ok"
+  },
+  {
+   "asset": "quantforge-cli-0.10.0-linux-x86_64.tar.gz",
+   "digest": "sha256:f4cf56acaf7c844cb742119d07613b4668f3e3dc3dd421b00806d683fcb744a1",
+   "attestations": 1,
+   "api_status": "ok"
+  },
+  {
+   "asset": "quantforge-cli.jar",
+   "digest": "sha256:ffc841675e8bf31c71159fab0c4ebb092b2b120e27c1d9334e03e28a3c62f397",
+   "attestations": 1,
+   "api_status": "ok"
+  },
+  {
+   "asset": "quantforge-rust-cli-0.10.0-linux-x86_64.tar.gz",
+   "digest": "sha256:e6ef002a9971f135aed7d4386cf4295ebba3b0b388646ab4c9b8c5f22e66422b",
+   "attestations": 1,
+   "api_status": "ok"
+  },
+  {
+   "asset": "quantforge_core-0.10.0-py3-none-any.whl",
+   "digest": "sha256:09ce9ac524a8c9a8a6d711735c8a9e4d772893bb9f6b844cb3fca3e4022b3643",
+   "attestations": 1,
+   "api_status": "ok"
+  },
+  {
+   "asset": "quantforge_core-0.10.0.tar.gz",
+   "digest": "sha256:86166e5089616d68278ebd80861dcb1401f34ab5d7fe55a3041ce65feef19b8d",
+   "attestations": 1,
+   "api_status": "ok"
+  },
+  {
+   "asset": "SHA256SUMS",
+   "digest": "sha256:6f7bfd6c8b4a85840d3f460dec279e90f544725e528700edabaffe347e54f1e8",
+   "attestations": 0,
+   "api_status": "404 Not Found"
+  }
+ ],
+ "finding": "SHA256SUMS had no attestation: release.yml wrote it after the attest step. Fixed on branch k-v1-k7 (written before the attest step and attested)."
+}
