@@ -1,0 +1,36 @@
+{
+ "implementation": "python",
+ "host": "local laptop, not the acceptance machine",
+ "commit": "a95aa17583d3cf6d4c46aa6fc31a70b416849c4b",
+ "planted": false,
+ "judged_series": "private_bytes",
+ "warmup_end_s": 2037.4,
+ "samples_after_warmup": 671,
+ "duration_s": 8720.5,
+ "slope_mib_per_h": 2.3243,
+ "slope_ci95_mib_per_h": [
+  1.696,
+  3.7996
+ ],
+ "median_mib": 432.59,
+ "range_mib": 13.035,
+ "range_fraction_of_median": 0.03013,
+ "longest_stall_s": 1.7000000000000455,
+ "cases": 199127,
+ "drift": 0,
+ "golden_failures": 0,
+ "reasons": [
+  "SLOPE"
+ ],
+ "rules": {
+  "warmup_s": 600,
+  "slope_max_mib_per_h": 1.0,
+  "range_max_fraction_of_median": 0.05,
+  "min_samples": 660,
+  "min_samples_java_heap": 200,
+  "min_duration_s": 7200,
+  "stall_max_s": 300,
+  "block_s": 600
+ },
+ "verdict": "MISS"
+}

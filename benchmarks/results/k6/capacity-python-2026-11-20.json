@@ -1,0 +1,261 @@
+{
+ "implementation": "python",
+ "host": "local laptop, not the acceptance machine",
+ "commit": "55e8dd67726e2dd081ba844490ac2e489a9e05e3",
+ "platform": "win32",
+ "logical_cpus": 12,
+ "memory_key": "private_bytes",
+ "run_at": "2026-11-20T17:20:12+00:00",
+ "planted_wrong": false,
+ "rows": [
+  {
+   "row": "mix/golden",
+   "cases": 16258,
+   "processes": 1,
+   "wall_s": 362.905,
+   "cases_per_s": 44.8,
+   "p50_us": 120.2,
+   "p99_us": 359146.1,
+   "peak_rss_mib": 157.5,
+   "peak_judged_mib": 529.1,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "mix/cheap",
+   "cases": 3806,
+   "processes": 1,
+   "wall_s": 0.513,
+   "cases_per_s": 7420.9,
+   "p50_us": 35.5,
+   "p99_us": 550.4,
+   "peak_rss_mib": 22.4,
+   "peak_judged_mib": 16.8,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "mix/medium",
+   "cases": 770,
+   "processes": 1,
+   "wall_s": 17.641,
+   "cases_per_s": 43.6,
+   "p50_us": 309.8,
+   "p99_us": 323897.9,
+   "peak_rss_mib": 35.1,
+   "peak_judged_mib": 410.1,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "mix/heavy",
+   "cases": 750,
+   "processes": 1,
+   "wall_s": 215.307,
+   "cases_per_s": 3.5,
+   "p50_us": 452.0,
+   "p99_us": 3588395.0,
+   "peak_rss_mib": 52.1,
+   "peak_judged_mib": 427.4,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "batch/10000",
+   "cases": 10000,
+   "processes": 1,
+   "wall_s": 6.604,
+   "cases_per_s": 1514.3,
+   "p50_us": 91.9,
+   "p99_us": 1063.7,
+   "peak_rss_mib": 25.6,
+   "peak_judged_mib": 19.6,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "batch/100000",
+   "cases": 100000,
+   "processes": 1,
+   "wall_s": 38.642,
+   "cases_per_s": 2587.8,
+   "p50_us": 108.6,
+   "p99_us": 3751.4,
+   "peak_rss_mib": 26.0,
+   "peak_judged_mib": 19.9,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "batch/1000000",
+   "cases": 1000000,
+   "processes": 1,
+   "wall_s": 904.617,
+   "cases_per_s": 1105.4,
+   "p50_us": 112.2,
+   "p99_us": 5032.5,
+   "peak_rss_mib": 26.5,
+   "peak_judged_mib": 20.3,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 0,
+   "wrong_examples": [],
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/curve.bootstrap.par_annual/20",
+   "operation": "curve.bootstrap.par_annual",
+   "input": "quotes",
+   "size": 20,
+   "limit": 200,
+   "request_bytes": 268,
+   "wall_s": 0.009,
+   "extra_memory_mib": 0.0,
+   "answer": [
+    "ok",
+    null
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/curve.bootstrap.par_annual/100",
+   "operation": "curve.bootstrap.par_annual",
+   "input": "quotes",
+   "size": 100,
+   "limit": 200,
+   "request_bytes": 855,
+   "wall_s": 0.004,
+   "extra_memory_mib": 0.0,
+   "answer": [
+    "ok",
+    null
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/curve.bootstrap.par_annual/200",
+   "operation": "curve.bootstrap.par_annual",
+   "input": "quotes",
+   "size": 200,
+   "limit": 200,
+   "request_bytes": 1555,
+   "wall_s": 0.009,
+   "extra_memory_mib": 0.0,
+   "answer": [
+    "ok",
+    null
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/curve.bootstrap.par_annual/201",
+   "operation": "curve.bootstrap.par_annual",
+   "input": "quotes",
+   "size": 201,
+   "limit": 200,
+   "request_bytes": 1562,
+   "wall_s": 0.005,
+   "extra_memory_mib": 0.0,
+   "answer": [
+    "error",
+    "E_LIMIT"
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/risk.intraday.delta_gamma_bound/10000",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "input": "positions",
+   "size": 10000,
+   "limit": 100000,
+   "request_bytes": 620378,
+   "wall_s": 0.55,
+   "extra_memory_mib": 6.95,
+   "answer": [
+    "ok",
+    null
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/risk.intraday.delta_gamma_bound/50000",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "input": "positions",
+   "size": 50000,
+   "limit": 100000,
+   "request_bytes": 3101381,
+   "wall_s": 4.911,
+   "extra_memory_mib": 35.89,
+   "answer": [
+    "ok",
+    null
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/risk.intraday.delta_gamma_bound/100000",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "input": "positions",
+   "size": 100000,
+   "limit": 100000,
+   "request_bytes": 6202628,
+   "wall_s": 8.252,
+   "extra_memory_mib": 71.3,
+   "answer": [
+    "ok",
+    null
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  },
+  {
+   "row": "ceiling/risk.intraday.delta_gamma_bound/100001",
+   "operation": "risk.intraday.delta_gamma_bound",
+   "input": "positions",
+   "size": 100001,
+   "limit": 100000,
+   "request_bytes": 6202686,
+   "wall_s": 8.396,
+   "extra_memory_mib": 72.43,
+   "answer": [
+    "error",
+    "E_LIMIT"
+   ],
+   "exit_code": 0,
+   "status": "pass"
+  }
+ ],
+ "failed_rows": [],
+ "verdict": "PASS"
+}
