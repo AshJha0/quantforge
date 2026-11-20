@@ -196,18 +196,23 @@ def dark_copy(src, dst):
         shutil.rmtree(dst)
     shutil.copytree(src, dst)
     css = js = 0
+    forced = set()
     for p in list(dst.rglob("*.html")) + list(dst.rglob("*.css")):
         t = p.read_text(encoding="utf-8")
         t2, k = DARK_CSS.subn("@media all", t)
         css += k
+        if k:
+            forced.add(p.resolve())
         js += t2.count(DARK_JS)
         t2 = t2.replace(DARK_JS, "true")
         if t2 != t:
             p.write_text(t2, encoding="utf-8")
-    home = (dst / "index.html").read_text(encoding="utf-8") if (dst / "index.html").is_file() else ""
-    if css == 0 or "@media all" not in home:
-        print(f"dark copy: no `prefers-color-scheme: dark` rule found to force (home page included: "
-              f"{'@media all' in home}); the dark run would test light colours", file=sys.stderr)
+    home = dst / "index.html"
+    sheets = re.findall(r'<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"', home.read_text(encoding="utf-8"))         if home.is_file() else []
+    home_forced = home.resolve() in forced or any((dst / s).resolve() in forced for s in sheets if "//" not in s)
+    if css == 0 or not home_forced:
+        print(f"dark copy: no `prefers-color-scheme: dark` rule found to force (home page or its stylesheets "
+              f"included: {home_forced}); the dark run would test light colours", file=sys.stderr)
         return 1
     print(f"dark copy written to {dst}: {css} dark rules forced on, {js} Mermaid theme switches set to dark")
     return 0

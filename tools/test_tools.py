@@ -1219,6 +1219,11 @@ class SiteView(unittest.TestCase):
             self.assertIn("x=true", out)
             (src / "index.html").write_text("<style>a{color:red}</style>", encoding="utf-8")
             self.assertEqual(self.sv.dark_copy(src, Path(tmp) / "dst"), 1)
+            # the site's real layout: the dark rule lives in style.css, which the home page links
+            (src / "index.html").write_text('<link rel="stylesheet" href="style.css">', encoding="utf-8")
+            (src / "style.css").write_text("@media(prefers-color-scheme:dark){:root{--bg:#000}}", encoding="utf-8")
+            self.assertEqual(self.sv.dark_copy(src, Path(tmp) / "dst"), 0)
+            self.assertIn("@media all{", (Path(tmp) / "dst" / "style.css").read_text(encoding="utf-8"))
 
     def test_merge_fails_on_any_failing_page_and_on_no_results(self):
         with tempfile.TemporaryDirectory() as tmp:
