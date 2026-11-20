@@ -7425,6 +7425,10 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -7671,6 +7675,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -7919,6 +7927,10 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -8165,6 +8177,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -8413,6 +8429,10 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -8659,6 +8679,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -8907,6 +8931,10 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -9153,6 +9181,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -9401,6 +9433,10 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -9647,6 +9683,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -9895,6 +9935,10 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -10141,6 +10185,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "black_vols": "per_unit",
+    "forward_rates": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -10464,6 +10512,11 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -10785,6 +10838,11 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -11108,6 +11166,11 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -11430,6 +11493,11 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -11695,6 +11763,11 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
+   },
    "verified_by": [
     "copied:lmmswn_g-0023",
     "rule-F-3"
@@ -11704,12 +11777,7 @@
     "negative_zero",
     "base:lmmswn_g-0023",
     "input:/abcd/a"
-   ],
-   "output_classes": {
-    "annuity": "per_unit",
-    "black_vol": "per_unit",
-    "swap_rate": "per_unit"
-   }
+   ]
   },
   {
    "case_id": "e1g_rates-0212",
@@ -11966,6 +12034,11 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
+   },
    "verified_by": [
     "copied:lmmswn_g-0023",
     "rule-F-3"
@@ -11975,12 +12048,7 @@
     "negative_zero",
     "base:lmmswn_g-0023",
     "input:/abcd/b"
-   ],
-   "output_classes": {
-    "annuity": "per_unit",
-    "black_vol": "per_unit",
-    "swap_rate": "per_unit"
-   }
+   ]
   },
   {
    "case_id": "e1g_rates-0216",
@@ -12293,6 +12361,11 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -12616,6 +12689,11 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -12881,6 +12959,11 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
+   },
    "verified_by": [
     "copied:lmmswn_g-0023",
     "rule-F-3"
@@ -12890,12 +12973,7 @@
     "negative_zero",
     "base:lmmswn_g-0023",
     "input:/correlation_beta"
-   ],
-   "output_classes": {
-    "annuity": "per_unit",
-    "black_vol": "per_unit",
-    "swap_rate": "per_unit"
-   }
+   ]
   },
   {
    "case_id": "e1g_rates-0230",
@@ -13208,6 +13286,11 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -13531,6 +13614,11 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -13852,6 +13940,11 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -14175,6 +14268,11 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -14496,6 +14594,11 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "black_vol": "per_unit",
+    "swap_rate": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -39213,6 +39316,10 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_swap_rate": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -39399,6 +39506,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_swap_rate": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -39587,6 +39698,10 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_swap_rate": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -39773,6 +39888,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_swap_rate": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -39961,6 +40080,10 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_swap_rate": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -40147,6 +40270,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_swap_rate": "per_unit"
    },
    "verified_by": [
     "rule-F-3"
@@ -40335,6 +40462,10 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_swap_rate": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -40522,6 +40653,10 @@
     "relative": 1e-09,
     "reason": "1e-12 per unit notional"
    },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_swap_rate": "per_unit"
+   },
    "verified_by": [
     "rule-F-3"
    ],
@@ -40708,6 +40843,10 @@
     "absolute": 1e-06,
     "relative": 1e-09,
     "reason": "1e-12 per unit notional"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "forward_swap_rate": "per_unit"
    },
    "verified_by": [
     "rule-F-3"

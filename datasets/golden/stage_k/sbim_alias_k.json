@@ -1,0 +1,1874 @@
+{
+ "schema_version": "1.0",
+ "suite": "sbim_alias_k",
+ "spec": "specifications/stage-k-rulings-margin.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_w4b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "sbim_alias_k-0001",
+   "operation": "xva.sbim.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "alias",
+    "zero_anchor",
+    "base:sbim_g-0001",
+    "synthetic"
+   ],
+   "description": "new id on the inputs of sbim_g-0001"
+  },
+  {
+   "case_id": "sbim_alias_k-0002",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "sbim_alias_k-0001"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   },
+   "verified_by": [
+    "rule-KR-152"
+   ],
+   "tags": [
+    "alias",
+    "deprecated",
+    "base:sbim_g-0001",
+    "synthetic"
+   ],
+   "description": "deprecated alias xva.simm.ir_delta: same result as xva.sbim.ir_delta (KR-152)"
+  },
+  {
+   "case_id": "sbim_alias_k-0003",
+   "operation": "xva.sbim.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     0.0,
+     0.0,
+     10000.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "alias",
+    "zero_anchor",
+    "base:sbim_g-0002",
+    "synthetic"
+   ],
+   "description": "new id on the inputs of sbim_g-0002"
+  },
+  {
+   "case_id": "sbim_alias_k-0004",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     0.0,
+     0.0,
+     10000.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "sbim_alias_k-0003"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   },
+   "verified_by": [
+    "rule-KR-152"
+   ],
+   "tags": [
+    "alias",
+    "deprecated",
+    "base:sbim_g-0002",
+    "synthetic"
+   ],
+   "description": "deprecated alias xva.simm.ir_delta: same result as xva.sbim.ir_delta (KR-152)"
+  },
+  {
+   "case_id": "sbim_alias_k-0005",
+   "operation": "xva.sbim.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000000.0,
+     1000000.0,
+     1000000.0,
+     1000000.0,
+     1000000.0,
+     1000000.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "alias",
+    "zero_anchor",
+    "base:sbim_g-0003",
+    "synthetic"
+   ],
+   "description": "new id on the inputs of sbim_g-0003"
+  },
+  {
+   "case_id": "sbim_alias_k-0006",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000000.0,
+     1000000.0,
+     1000000.0,
+     1000000.0,
+     1000000.0,
+     1000000.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "sbim_alias_k-0005"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   },
+   "verified_by": [
+    "rule-KR-152"
+   ],
+   "tags": [
+    "alias",
+    "deprecated",
+    "base:sbim_g-0003",
+    "synthetic"
+   ],
+   "description": "deprecated alias xva.simm.ir_delta: same result as xva.sbim.ir_delta (KR-152)"
+  },
+  {
+   "case_id": "sbim_alias_k-0007",
+   "operation": "xva.sbim.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -1000.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "risk_weights": [
+     100.0,
+     100.0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "correlations": [
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "alias",
+    "zero_anchor",
+    "base:sbim_g-0004",
+    "synthetic"
+   ],
+   "description": "new id on the inputs of sbim_g-0004"
+  },
+  {
+   "case_id": "sbim_alias_k-0008",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -1000.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "risk_weights": [
+     100.0,
+     100.0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "correlations": [
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "sbim_alias_k-0007"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   },
+   "verified_by": [
+    "rule-KR-152"
+   ],
+   "tags": [
+    "alias",
+    "deprecated",
+    "base:sbim_g-0004",
+    "synthetic"
+   ],
+   "description": "deprecated alias xva.simm.ir_delta: same result as xva.sbim.ir_delta (KR-152)"
+  },
+  {
+   "case_id": "sbim_alias_k-0009",
+   "operation": "xva.sbim.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "alias",
+    "zero_anchor",
+    "base:sbim_g-0005",
+    "synthetic"
+   ],
+   "description": "new id on the inputs of sbim_g-0005"
+  },
+  {
+   "case_id": "sbim_alias_k-0010",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "sbim_alias_k-0009"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-KR-152"
+   ],
+   "tags": [
+    "alias",
+    "deprecated",
+    "base:sbim_g-0005",
+    "synthetic"
+   ],
+   "description": "deprecated alias xva.simm.ir_delta: same result as xva.sbim.ir_delta (KR-152)"
+  },
+  {
+   "case_id": "sbim_alias_k-0011",
+   "operation": "xva.sbim.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "alias",
+    "zero_anchor",
+    "base:sbim_g-0006",
+    "synthetic"
+   ],
+   "description": "new id on the inputs of sbim_g-0006"
+  },
+  {
+   "case_id": "sbim_alias_k-0012",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "sbim_alias_k-0011"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-KR-152"
+   ],
+   "tags": [
+    "alias",
+    "deprecated",
+    "base:sbim_g-0006",
+    "synthetic"
+   ],
+   "description": "deprecated alias xva.simm.ir_delta: same result as xva.sbim.ir_delta (KR-152)"
+  },
+  {
+   "case_id": "sbim_alias_k-0013",
+   "operation": "xva.sbim.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      1.5,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "alias",
+    "zero_anchor",
+    "base:sbim_g-0007",
+    "synthetic"
+   ],
+   "description": "new id on the inputs of sbim_g-0007"
+  },
+  {
+   "case_id": "sbim_alias_k-0014",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      1.5,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "sbim_alias_k-0013"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-KR-152"
+   ],
+   "tags": [
+    "alias",
+    "deprecated",
+    "base:sbim_g-0007",
+    "synthetic"
+   ],
+   "description": "deprecated alias xva.simm.ir_delta: same result as xva.sbim.ir_delta (KR-152)"
+  },
+  {
+   "case_id": "sbim_alias_k-0015",
+   "operation": "xva.sbim.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     -1.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "alias",
+    "zero_anchor",
+    "base:sbim_g-0008",
+    "synthetic"
+   ],
+   "description": "new id on the inputs of sbim_g-0008"
+  },
+  {
+   "case_id": "sbim_alias_k-0016",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     -1.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "sbim_alias_k-0015"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-KR-152"
+   ],
+   "tags": [
+    "alias",
+    "deprecated",
+    "base:sbim_g-0008",
+    "synthetic"
+   ],
+   "description": "deprecated alias xva.simm.ir_delta: same result as xva.sbim.ir_delta (KR-152)"
+  },
+  {
+   "case_id": "sbim_alias_k-0017",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     "NaN",
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:sbim_g-0001",
+    "input:/sensitivities/0",
+    "synthetic"
+   ],
+   "description": "alias, NaN at sensitivities/0"
+  },
+  {
+   "case_id": "sbim_alias_k-0018",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     "Infinity",
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:sbim_g-0001",
+    "input:/risk_weights/0",
+    "synthetic"
+   ],
+   "description": "alias, Infinity at risk_weights/0"
+  },
+  {
+   "case_id": "sbim_alias_k-0019",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      "-Infinity",
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:sbim_g-0001",
+    "input:/correlations/0/1",
+    "synthetic"
+   ],
+   "description": "alias, -Infinity at correlations/0/1"
+  },
+  {
+   "case_id": "sbim_alias_k-0020",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0,
+     60.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:sbim_g-0001",
+    "input:/concentration_threshold",
+    "synthetic"
+   ],
+   "description": "alias, NaN at concentration_threshold"
+  },
+  {
+   "case_id": "sbim_alias_k-0021",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     10.0,
+     20.0,
+     30.0,
+     40.0,
+     50.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6,
+      0.5
+     ],
+     [
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7,
+      0.6
+     ],
+     [
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8,
+      0.7
+     ],
+     [
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9,
+      0.8
+     ],
+     [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0,
+      0.9
+     ],
+     [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-HR-66"
+   ],
+   "tags": [
+    "invalid",
+    "two_errors",
+    "synthetic"
+   ],
+   "description": "two errors at once: risk_weights one short [structural] and threshold 0 [domain]; structural E_INPUT first"
+  }
+ ]
+}

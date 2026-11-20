@@ -21,7 +21,7 @@ Plain idea: specifications are the only thing the four builds share. The oracle 
 flowchart LR
   accTitle: QuantForge top-level architecture
   accDescr: Specifications and the CLI contract feed the oracle and four separate builds. The oracle writes golden files. The neutral conformance runner removes expected values, sends each case to the Java, C++, Python and Rust command-line programs, and compares their result JSON with the goldens by tolerance class. CI gates check the conformance result, golden counts, outside-check shares, mutation and coverage, tutorials and the docs site.
-  SP[specifications/ and rulings] --> CC[CLI contract 1.16.0: specifications/cli-contract.md]
+  SP[specifications/ and rulings] --> CC[CLI contract 1.17.0 on main, 1.16.0 at v0.10.0: specifications/cli-contract.md]
   SP --> OR[oracle/: hand cases, QuantLib, Strata, ORE, blind re-derivation]
   OR --> GD[(datasets/golden/: goldens by stage)]
   SP --> JV[java25/] & CP[cpp26/] & PY[python/] & RS[rust/]
@@ -38,14 +38,14 @@ flowchart LR
   GT --> G5[tutorial.yml and docs.yml: tutorials in four languages, site build]
 ```
 
-Formal statement: the arrows are the only allowed dependencies (table above). No build reads the oracle, a golden file or another build; the runner compares outputs only through `conformance/tolerances/`; the contract number is the one the runner requires (`CONTRACT` in `conformance/runner/runner.py`, 1.16.0 at v0.10.0). Worked example: `exec.impact.sqrt` with quantity 100,000, daily volume 10,000,000, daily volatility 0.02 and coefficient 1 is specified in `specifications/10-execution/impact.md`, written as golden `imp_h-0001` (impact 0.002) by the oracle, and each build's CLI must return 0.002 within its tolerance class; the Python build printed `"impact":0.002` on 2026-11-19 (observed, local). Per-domain flows, one diagram per domain 01 to 12, are in [Diagrams: per-domain flows](docs/diagrams/README.md#per-domain-flows).
+Formal statement: the arrows are the only allowed dependencies (table above). No build reads the oracle, a golden file or another build; the runner compares outputs only through `conformance/tolerances/`; the contract number is the one the runner requires (`CONTRACT` in `conformance/runner/runner.py`: 1.16.0 at v0.10.0, 1.17.0 on main since stage K round 1, read 2026-11-20). Worked example: `exec.impact.sqrt` with quantity 100,000, daily volume 10,000,000, daily volatility 0.02 and coefficient 1 is specified in `specifications/10-execution/impact.md`, written as golden `imp_h-0001` (impact 0.002) by the oracle, and each build's CLI must return 0.002 within its tolerance class; the Python build printed `"impact":0.002` on 2026-11-19 (observed, local). Per-domain flows, one diagram per domain 01 to 12, are in [Diagrams: per-domain flows](docs/diagrams/README.md#per-domain-flows).
 
 ## Rules that shape it
 
 - No language is a reference. The oracle is the source of golden results.
 - No shared code, FFI or generated maths between implementations.
 - The only interface that counts is the CLI: case JSON in, result JSON out.
-- Libraries first, services last. Infrastructure arrives as local adapters in stage K.
+- Libraries first, services last. Infrastructure arrives as local adapters in stage K; in round 1 that means two scheduled jobs on GitHub Actions and no service (see [Stage K round 1](#stage-k-round-1-platform-pieces-daily-jobs-and-capital-on-main-unreleased)).
 - Trading is simulated only. There are no live orders.
 
 The specification remains a shared-error risk: four builds and a hand case can share one misreading. That is why outside libraries are used wherever a licence allows. Validation is self-assessment: there is no second review (owner decision, 2026-11-18).
@@ -58,7 +58,7 @@ Stage B calculations are pure functions of their inputs, so stage F can add AD (
 
 ## What each stage added
 
-Services, `infra/` and domain 12 (platform) do not exist yet; stage K builds them. Domains 09 and 10 have the stage H slices below.
+Services and `infra/` do not exist. Domain 12 (platform) has two specs from stage K round 1, the daily paper ledger and the daily curve run (`specifications/12-platform/`), implemented as jobs in `tools/` that send cases to the Python CLI, not as library operations (see [Stage K round 1](#stage-k-round-1-platform-pieces-daily-jobs-and-capital-on-main-unreleased)). Domains 09 and 10 have the stage H slices below.
 
 ### Stage A: Foundation
 
@@ -195,3 +195,83 @@ Built in all four languages, the `paper.*` operations included. The specs are co
 - **Paper trading is a Python application above the library.** `python/quantforge_core/paper.py` (book, explain, pre-trade, ledger) and `paper_fills.py` (fills) sit above the library: they call the operations that exist in all four languages (`exec.sim.lit.run`, `exec.sim.dark.run`, `exec.sor.allocate`, `exec.tca.shortfall`) through one dispatch and keep the stateful parts (positions, cash, the ledger file) to themselves. That keeps the four-language contract stateless and lets acceptance test A7 replay every venue golden through the paper path. Round 3 also exposes the stateless steps as CLI operations (`paper.book.apply_fill`, `.end_of_day`, `paper.ledger.append`, `.verify`, `paper.pnl.explain`, `paper.pretrade.check`, `paper.session.run`; goldens `pt_h` 34 and `e1_hpt` 5), in all four languages (Python `cli/ops_paper.py`, Java `org.quantforge.paper.Paper`, C++ and Rust `paper` modules), each reproducing the Python ledger hashes byte for byte. No module under `paper*` imports a network library (test A5). See the [ledger flow](docs/diagrams/README.md#paper-trading-ledger-flow).
 - **How the stage was checked.** No free library covers stage H, so the outside check is a blind second-lane re-derivation or a printed paper figure (DR-H2): 160 of 205 value cases, 78.0% (`oracle/OUTSIDE_SHARES.md`). The blind lane reads the same rules, so it catches arithmetic and convention slips, not a wrong rule. A different-model audit (plan rule 14.10-5) reported 0 Critical, 17 Major and 15 Minor findings, all ruled (HR-121 to HR-129); three code faults were fixed, each in all four builds. Self-assessment; no second review (owner decision 2026-11-18).
 - **Round 3 operations.** Microstructure estimators (`micro.est.*`, H-4b), venue analytics (`exec.venue.analytics`, H-16), adaptive algorithms (`exec.algo.*`, H-14) and pre-trade and attribution TCA (H-17) are pure functions like the wave 1 formulas. The low-latency book (H-9) is a second implementation of `micro.book.rebuild` in C++, Rust and Java (no CLI operation; Python has none), held to the same answers, with its own benchmark binaries and a CI regression workflow.
+
+### Stage K round 1: platform pieces, daily jobs and capital (on main, unreleased)
+
+**Status.** Merged to main by 2026-11-20 (pull requests #58 and #59), not tagged; released with v1.0.0. The last tag is v0.10.0 (owner decision 2026-11-20: no v0.10.1 tag). Every round 1 operation is implemented and registered in all four builds (CLI contract 1.17.0); the two daily jobs are scheduled on main since 2026-11-20 (pull request #59), and 0 days were recorded as of 2026-11-20 13:00 UTC (`CHANGELOG.md`, "Unreleased, for v1.0.0"). Open audit items are in [`docs/known-issues.md`](docs/known-issues.md). Validation is self-assessment; there is no second review (owner decision 2026-11-18).
+
+| Item | Operation or job | Spec | Goldens or pinned test | Where the code is |
+|---|---|---|---|---|
+| K-4a bitemporal store | `core.store.bitemporal_query` | `01-core/bitemporal-store.md` | `stage_k/bt_k.json` | the stage K module of each build (Python `quantforge_core/stage_k.py`) |
+| K-4b incremental curve update | `curve.bootstrap.par_annual`, `curve.incremental.update` | `02-curves/incremental-update.md` | `inc_k.json` | same module; library entry points on the stage B bootstraps (Python `ois.bootstrap_incremental`) |
+| K-4c recalibration triggers | `calib.trigger.check` | `03-calibration/recalibration-triggers.md` | `trig_k.json` | same module |
+| K-5a intraday risk with a bound | `risk.intraday.delta_gamma_bound` | `06-risk/intraday-risk-bounds.md` | `idr_k.json` | same module |
+| K-8 guard and ladder method | `num.richardson.check`; `method` on the stage G Bermudan operations | `06-risk/bermudan-ladder-k8.md` | `rich_k.json`, `k8_k.json` | the stage G lattice code of each build |
+| K-8d SA-CCR | `risk.saccr.ead` | `06-risk/sa-ccr.md` | `saccr_k.json` | Python `quantforge_core/saccr.py` and its ports |
+| K-8e FRTB backtesting | `risk.frtb.backtest.zone`, `.desk`, `.count` | `06-risk/frtb-ima-backtest.md` | `btk_k.json`, `tlk_k.json` | Python `quantforge_core/frtb_backtest.py` and its ports |
+| K-2 daily paper ledger | job, not an operation | `12-platform/paper-ledger-daily.md` | row hashes pinned in `python/tests/test_paper_daily.py::test_goldens_pl_k` | `tools/paper_daily/`, `.github/workflows/paper-ledger.yml` |
+| K-11 daily curve run | job, not an operation | `12-platform/daily-curve-run.md` | none; 38 tests in `python/tests/test_curve_daily.py` (spec acceptance C4) | `tools/curve_daily/`, `.github/workflows/curve-daily.yml` |
+
+Read from the specs and `datasets/golden/stage_k/` on this branch, 2026-11-20. Wave 2 (DRC, RRAO, IMA, CVA capital, leverage and large exposures) is specified and blind-checked but not implemented (`program/STAGE_K_W2_GATE.md`).
+
+#### How the four platform operations fit together
+
+Plain idea: a desk's intraday loop asks four questions. What did we know, and when? Which part of the curve does a new quote change? Has the input moved far enough to recalibrate? What is the P&L of a move, and how wrong can the fast number be? Stage K round 1 answers each with one stateless operation. They are separate operations: no code in the repository chains them, and there is no persistent store or service. The diagram [Stage K platform pieces](docs/diagrams/README.md#stage-k-platform-pieces-how-a-caller-composes-them) shows how a caller would compose them.
+
+Formal statement. Each operation is a pure function of its request (section "Inside one implementation" above). (1) `core.store.bitemporal_query` takes the whole log in the request and answers `(K, V)`: among records with `knowledge_time <= K` and `valid_from <= V < valid_to`, the largest `sequence` wins (KR-2). (2) `curve.incremental.update` takes the previous quotes, the cached discount factors and the new quotes, refuses a cache that is not the bootstrap of the previous quotes bit for bit (`E_INPUT`), copies the pillars before the first changed index and solves the rest again (KR-5). (3) `calib.trigger.check` fires iff `|x_now - x_ref| > k sigma sqrt(d)` and reports the false-alarm rate of the trigger as used, `P(|T_(n-1)| > k)` (KR-232). (4) `risk.intraday.delta_gamma_bound` returns a delta-gamma estimate and a bound that holds against full revaluation in binary64 (KR-234). The state a desk would keep between calls (the log, the cached curve, the last calibration point) stays with the caller.
+
+Worked example (observed 2026-11-20 on branch `k-v1-docs2`, Python build through `uv run --locked quantforge batch`, local laptop, not the acceptance machine; the requests are in the [cookbook](COOKBOOK.md#stage-k-desk-recipes)). (1) A February value of 100, learned 2 January, is corrected to 105 on 1 April: asked as of 15 March the store still answers 100 from record 1, asked as of 1 April it answers 105 from record 3 (the log of `bt_k-0002` moved one year later). (2) The 2-year quote moves from 2.5% to 2.6%: `curve.incremental.update` returns `first_changed_index` 1, `recomputed` 2 and discount factors `[0.9803921568627451, 0.9498146237052325, 0.9146541714397676]`, the same bits as `curve.bootstrap.par_annual` on the new quotes (`inc_k-0002`). (3) Four changes `+1, -1, +1, -1` and a move of 5 fire at `k = 3` (`trig_k-0001`: threshold 3.4641, `false_alarm_rate` 0.0577, `nominal_rate` 0.0027). (4) A 1,000,000 five-year zero at 4% and a parallel move of +1%: estimate -39,913.12, bound 17.06 (`idr_k-0001`); full revaluation gives -39,929.97, an error of 16.85, which is 98.8% of the bound (computed with `math.exp` in binary64; inferred accurate to about 1e-10).
+
+What it does not show: the four answers come from four separate requests. A caller who passes a stale log or a cache from another curve gets a correct answer to the wrong question; only `curve.incremental.update` checks its own input against itself.
+
+#### The daily jobs: data flow, hash chain, verifier and what runs on GitHub Actions
+
+Plain idea: two jobs run on free GitHub runners each US business day. The curve run downloads the Treasury par yield file and fits a Nelson-Siegel curve to it; the paper ledger marks four constant-maturity exposures on the five par yields the recorder already keeps and sends one fixed-rule order to the simulated lit venue. Each writes one row a day to its own branch, each row carries the hash of the row before it, and the head is stamped with OpenTimestamps so that a rewrite of an old row is visible. A verifier that anyone can run replays the rows.
+
+Formal statement (`specifications/12-platform/paper-ledger-daily.md`, `daily-curve-run.md`; rulings KR-70 to KR-107, KR-200 to KR-214, KR-254, KR-255).
+
+| | Daily paper ledger (K-2) | Daily curve run (K-11) |
+|---|---|---|
+| Workflow | `.github/workflows/paper-ledger.yml` | `.github/workflows/curve-daily.yml` |
+| Started by | completion of `recorder.yml`, and cron 03:00 and 06:00 UTC Tuesday to Saturday (KR-206) | cron 23:45 UTC Monday to Friday, 03:30 and 06:30 UTC Tuesday to Saturday |
+| Reads | the `forward-log` branch only; no market-data request (KR-70) | the Treasury par yield file and the Fed's fitted-curve file, kept in the runner's memory only (KR-209) |
+| Calls | the Python CLI (`exec.tca.pretrade`, `paper.pretrade.check`, `exec.sim.lit.run`, `exec.tca.attribution`, `paper.book.end_of_day` and others) | the Python CLI (`bond.price.from_yield`, `bond.fit.nelson_siegel`, `bond.yield.from_price`) |
+| Writes | `ledger/ledger.jsonl` on `paper-ledger`; anchors on `paper-ledger-anchors` | the ledger on `curve-daily`; anchors on `curve-daily-anchors` |
+| Never writes | `main`, `forward-log` | `main`, `forward-log` |
+| Row label | "paper marks on a fitted curve; not tradable" | "fitted to public US Treasury par yields with a library Nelson-Siegel fit; not an official curve" |
+| Verifier | `tools/paper_daily/verify_ledger.py verify` | `tools/curve_daily/verify_chain.py verify` |
+| State on 2026-11-20 | 0 of 20 recorded trading days (13:00 UTC) | 0 rows recorded; the one real day tried by hand (2026-11-13) missed the Fed consistency tolerance, RMSE 17.36 bp against 15 bp: a recorded miss of a consistency check, not proof |
+
+The chain rule is the stage H paper-trading rule (HR-45): a row's `hash` is the SHA-256 of its canonical bytes (keys sorted, no spaces, ASCII escapes) with the `hash` field left out, and its `prev` is the hash of the row above; the first row's `prev` is 64 zeros. Both verifiers stop at the first failure and never repair; their reasons are listed in the specs (`HASH`, `LINK`, `SEQ`, `CONFIG`, `MISSING`, `HOLDOUT`, `ANCHOR` and others). The paper ledger's verifier also replays every day in exact decimal from the row's own numbers (`--no-cli`), rebuilds each day through the CLI, checks each row's yields against the recorder log (`SOURCE`) and, for the K-2 count, reads each anchor's Bitcoin block time from a header the verifying person supplies: a day counts only if that time plus two hours is before the day's cut-off (KR-200 to KR-202). The row's own "on time" label is never counted. Diagrams: [daily paper ledger](docs/diagrams/README.md#daily-paper-ledger-run-hash-chain-and-anchor) and [daily curve run](docs/diagrams/README.md#daily-curve-run-fetch-fit-compare-and-chain).
+
+Worked example of the chain rule (observed 2026-11-20, Python build): the one-row ledger of golden `pt_h-0021` with `limit_price` "101" hashes to `72c85984...7e81`, and `paper.ledger.verify` returns `ok` true; the same row with "102", the golden as written, returns `ok` false, `first_bad_seq` 0, `reason` `HASH`, because the stored hash is that of "101" and "102" hashes to `937f6a4d...4e90` (recipe [Catch an edited ledger row](COOKBOOK.md#catch-an-edited-ledger-row-and-recompute-its-hash)). For the daily ledger itself, `python/tests/test_paper_daily.py::test_goldens_pl_k` builds a 30-business-day ledger from synthetic yields (dates from 2027-01-04, invented, not market data) through the real job code and pins its first, second, third and last row hashes; CI runs it in job `python-daily-jobs-bytes` (`.github/workflows/python.yml`).
+
+What runs where: the two jobs run only on GitHub Actions, only in this repository and only for `main`. Everything else in stage K runs where the conformance suite runs: the four CLIs, on CI and on the laptop. A paper-ledger day that cannot be built before its cut-off stops the run with exit code 2; after the cut-off the day becomes a `build_refused` gap and the ledger continues (KR-210).
+
+#### The four-build conformance model, and why two wrong inputs give one error
+
+Plain idea: one specification, one set of expected answers, four independent programs. A runner that knows no finance sends each golden case to each program and compares. For that to work when a request is wrong in two ways at once, every program must check the rules in the same order; otherwise one build would answer `E_DOMAIN` and another `E_INPUT` for the same request.
+
+Formal statement. A golden case holds `operation`, `inputs`, `expected` (an `ok` result with outputs, an `error` with a code, or, for invariance cases, `any` and `same_as`) and a tolerance class (`conformance/tolerances/`). The order of checks is repo-wide (HR-66, applied to stage H by HR-122 and to stage K by KR-230): `E_SCHEMA` (shape, type, an unlisted enum value); `E_LIMIT` (a size limit on the input itself); a non-finite Real, `E_DOMAIN`; structural `E_INPUT` (empty lists, counts, lengths, cross-field consistency); then `E_DOMAIN` for one value outside its domain. Invariance pairs pin two requests to the same answer without an expected number, which is how the deprecated alias `xva.simm.ir_delta` is held to `xva.sbim.ir_delta` (`stage_k/sbim_alias_k.json`, KR-152; it stays in v1.0.0 and is removed in the first release after it, KR-256).
+
+Worked example (goldens `e2_k-0008` and `e2_k-0011`, observed 2026-11-20 in the Python build). `calib.trigger.check` with one change and `k = 0` breaks a structural rule (at least two changes) and a domain rule (`k > 0`): the answer is `E_INPUT`, "changes must hold at least two one-day changes", because the structural step comes first. `risk.intraday.delta_gamma_bound` with no positions and shift `"NaN"` breaks a structural rule and the finite rule: the answer is `E_DOMAIN`, "shift is not finite", because the finite rule comes before the structural step. Each of the four builds must return those codes for the goldens to pass (`conformance.yml`).
+
+#### What is simulated or placeholder
+
+Every label below is fixed in a spec and printed on the output or row it qualifies; a claim made from one of these outputs carries its label (read 2026-11-20 with `git grep` in `python/quantforge_core`, `tools` and `specifications`).
+
+| Part | Label, as printed | What it means | Source |
+|---|---|---|---|
+| Lit matching engine and the multi-asset venues | "simulated venue; not a real exchange" | deterministic simulator; no venue connection | `specifications/10-execution/lit-matching.md`, `auction.md`, `fx-rfq-venue.md`; HR-111 |
+| Dark pool | "simulated venue; not a real dark pool" | no real dark-pool data is used | `specifications/10-execution/dark-pool.md` |
+| Smart order router (with `report_se`) | "simulated venues; router scored in simulation only" | fill distributions are inputs | `specifications/10-execution/smart-order-router.md` |
+| Stage H paper book | "crypto venue; simulated" | simulated fills; never a live order | `specifications/10-execution/paper-trading.md` |
+| Recorded crypto book and the H-9 benchmark | "crypto venue; not equities or rates"; "in-process, simulated feed; no network or venue latency" | one venue's public lit book; timings from a local laptop, not the acceptance machine | `specifications/09-microstructure/low-latency-targets.md` |
+| Impact and Almgren-Chriss outputs | "assumed parameters; not calibrated to any venue" | parameters are inputs, not fitted | `specifications/stage-h-rulings-w1.md`, HR-10 |
+| Intraday risk bound | "latency-aware analytics on simulated data" | zero-coupon positions only | `specifications/06-risk/intraday-risk-bounds.md`, KR-10 |
+| Daily paper ledger | "paper marks on a fitted curve; not tradable"; fills "simulated"; pre-trade estimate "placeholder weights" | the order rule ignores the market; no performance claim | `specifications/12-platform/paper-ledger-daily.md` |
+| Daily curve run | "fitted to public US Treasury par yields with a library Nelson-Siegel fit; not an official curve"; Fed comparison "consistency check, not proof" | one fitted curve compared with another; neither is the truth | `specifications/12-platform/daily-curve-run.md` |
+| Sensitivity-based initial margin (`xva.sbim.ir_delta` goldens, K-8h table) | "placeholder weights" | `RW = 10 x k`, `rho = 1 - 0.1 abs(k - l)`; no ISDA material; not a margin anyone could post | `specifications/06-risk/sbim-placeholder.md`, KR-130, KR-150 |
+| Bermudan ladder, both methods | R6 use restriction: not for hedging | `CN_RANNACHER_SMOOTHED` passes acceptance only in-sample at 201/100 | ruling KR-113, `docs/model-inventory.md` |
+
+Not in the table because they are not simulated: SA-CCR and the FRTB backtesting operations compute the regulator's formulas on the inputs they are given, and their goldens include the Basel published examples (CRE99, MAR99 Table 2). The other inputs in the stage K goldens are synthetic.

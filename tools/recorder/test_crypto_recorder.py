@@ -1,4 +1,4 @@
-﻿"""Tests for the crypto L2 recorder's file handling and the tolerant reader (2026-11-18). Run: python -I -m pytest
+"""Tests for the crypto L2 recorder's file handling and the tolerant reader (2026-11-18). Run: python -I -m pytest
 tools/recorder/test_crypto_recorder.py, or python -I tools/recorder/test_crypto_recorder.py."""
 import gzip
 import sys

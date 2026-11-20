@@ -47,6 +47,16 @@ def render(doc):
             suites = ", ".join(f"`{x}`" for x in v.get("suites", []))
             out.append(f"| {item} | {suites} | {v['cases']} | {v['counted_with_rederivation']} | "
                        f"{pct(v['share_with_rederivation'])} | {'met' if v.get('meets_item_floor') else 'NOT MET'} |")
+        u = s.get("under_review")
+        if u:
+            low = [f"{it} {v['counted']} of {v['cases']} ({pct(v['counted'] / v['cases'])})" for it, v in u["per_item"].items()
+                   if v["cases"] and v["counted"] / v["cases"] < floor]
+            t = u["stage"]
+            out += ["", f"**Stage {stage} shares above are under review, not settled (audit finding {u['finding']}, {u['status']}; "
+                    "`docs/known-issues.md`).** They count cases checked against a figure printed in the regulator text, on part of "
+                    "their outputs and at print precision. By the strict reading of the rule (every compared output checked) the "
+                    f"stage is {t['counted']} of {t['cases']} ({pct(t['counted'] / t['cases'])}); items under the "
+                    f"floor by that reading: {'; '.join(low) or 'none'}."]
     return "\n".join(out)
 
 

@@ -27,15 +27,18 @@
      "fire": true,
      "sigma": 1.1547005383792515,
      "threshold": 3.4641016151377544,
-     "false_alarm_rate": 0.002699796063260189
+     "false_alarm_rate": 0.057668885622437306,
+     "nominal_rate": 0.002699796063260189
     }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH",
-    "SciPy 2*norm.sf(k) outside check (KR-11): agrees to 1e-14 relative"
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 was not covered by that match; see the version 2 entry)",
+    "SciPy 2*norm.sf(k) outside check of nominal_rate (KR-11): agrees to 1e-14 relative",
+    "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 1e-16 relative",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -45,7 +48,8 @@
    ],
    "description": "planted move",
    "output_classes": {
-    "fire": "date_and_convention"
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
    },
    "tolerance_limit": {
     "absolute": 0.0,
@@ -73,15 +77,18 @@
      "fire": false,
      "sigma": 1.1547005383792515,
      "threshold": 3.4641016151377544,
-     "false_alarm_rate": 0.002699796063260189
+     "false_alarm_rate": 0.057668885622437306,
+     "nominal_rate": 0.002699796063260189
     }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH",
-    "SciPy 2*norm.sf(k) outside check (KR-11): agrees to 1e-14 relative"
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 was not covered by that match; see the version 2 entry)",
+    "SciPy 2*norm.sf(k) outside check of nominal_rate (KR-11): agrees to 1e-14 relative",
+    "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 1e-16 relative",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -91,7 +98,8 @@
    ],
    "description": "noise",
    "output_classes": {
-    "fire": "date_and_convention"
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
    },
    "tolerance_limit": {
     "absolute": 0.0,
@@ -119,15 +127,18 @@
      "fire": false,
      "sigma": 1.1547005383792515,
      "threshold": 6.928203230275509,
-     "false_alarm_rate": 0.002699796063260189
+     "false_alarm_rate": 0.057668885622437306,
+     "nominal_rate": 0.002699796063260189
     }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH",
-    "SciPy 2*norm.sf(k) outside check (KR-11): agrees to 1e-14 relative"
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 was not covered by that match; see the version 2 entry)",
+    "SciPy 2*norm.sf(k) outside check of nominal_rate (KR-11): agrees to 1e-14 relative",
+    "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 1e-16 relative",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -137,7 +148,8 @@
    ],
    "description": "four days since calibration double the threshold",
    "output_classes": {
-    "fire": "date_and_convention"
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
    },
    "tolerance_limit": {
     "absolute": 0.0,
@@ -169,15 +181,18 @@
      "fire": false,
      "sigma": 1.0,
      "threshold": 2.5,
-     "false_alarm_rate": 0.01241933065155227
+     "false_alarm_rate": 0.040992218585752895,
+     "nominal_rate": 0.01241933065155227
     }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH on sigma, threshold, false_alarm_rate; fire decided by gap ruling KR-13, not blind",
-    "SciPy 2*norm.sf(k) outside check (KR-11): agrees to 1e-14 relative"
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 is not blind) on sigma, threshold, false_alarm_rate; fire decided by gap ruling KR-13, not blind",
+    "SciPy 2*norm.sf(k) outside check of nominal_rate (KR-11): agrees to 1e-14 relative",
+    "SciPy 2*t.sf(k, 7) outside check of false_alarm_rate (KR-232): agrees to 2e-16 relative",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -187,7 +202,8 @@
    ],
    "description": "move equal to the threshold does not fire (KR-13)",
    "output_classes": {
-    "fire": "date_and_convention"
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
    },
    "tolerance_limit": {
     "absolute": 0.0,
@@ -219,15 +235,18 @@
      "fire": true,
      "sigma": 1.0,
      "threshold": 2.5,
-     "false_alarm_rate": 0.01241933065155227
+     "false_alarm_rate": 0.040992218585752895,
+     "nominal_rate": 0.01241933065155227
     }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH",
-    "SciPy 2*norm.sf(k) outside check (KR-11): agrees to 1e-14 relative"
+    "blind re-derivation DR-H2 2026-11-18 (program/STAGE_K_BLIND_W1.md): MATCH (on the KR-6 rate, now nominal_rate; false_alarm_rate redefined by KR-232 was not covered by that match; see the version 2 entry)",
+    "SciPy 2*norm.sf(k) outside check of nominal_rate (KR-11): agrees to 1e-14 relative",
+    "SciPy 2*t.sf(k, 7) outside check of false_alarm_rate (KR-232): agrees to 2e-16 relative",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -237,7 +256,8 @@
    ],
    "description": "just past the threshold",
    "output_classes": {
-    "fire": "date_and_convention"
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
    },
    "tolerance_limit": {
     "absolute": 0.0,
@@ -360,15 +380,18 @@
      "fire": false,
      "sigma": 1.1547005383792515,
      "threshold": 34.64101615137755,
-     "false_alarm_rate": 9.813427854296374e-198
+     "false_alarm_rate": 8.135280427163959e-05,
+     "nominal_rate": 9.813427854296374e-198
     }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "hand",
     "mpmath 50 digits",
-    "added 2026-11-19 (branch k-w1-fu) so that every build keeps the stated 2 (1 - Phi(k)) in the far tail: not blind",
-    "SciPy 2*norm.sf(k) is 5.7e-14 relative off (it rounds k / sqrt 2 first): no outside check"
+    "added 2026-11-19 (branch k-w1-fu) so that every build keeps the stated 2 (1 - Phi(k)) in the far tail; not in the wave-1 packet, blind re-derived by the K-4c version 2 lane",
+    "SciPy 2*norm.sf(k) is 5.7e-14 relative off on nominal_rate (it rounds k / sqrt 2 first): no outside check of nominal_rate",
+    "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 2e-16 relative",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
    ],
    "tags": [
     "stage_k",
@@ -376,13 +399,806 @@
     "trigger",
     "synthetic"
    ],
-   "description": "far tail k = 30: 2 (1 - Phi(k)) to 1e-14; a bare erfc(k / sqrt 2) is 1.2e-13 off",
+   "description": "far tail k = 30: 2 (1 - Phi(k)) to 1e-14 in nominal_rate; a bare erfc(k / sqrt 2) is 1.2e-13 off",
    "output_classes": {
-    "fire": "date_and_convention"
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
    },
    "tolerance_limit": {
     "absolute": 0.0,
     "relative": 1e-14
+   }
+  },
+  {
+   "case_id": "trig_k-0010",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0,
+     -1.0
+    ],
+    "x_ref": 0.0,
+    "x_now": 10.0,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": true,
+     "sigma": 1.4142135623730951,
+     "threshold": 4.242640687119285,
+     "false_alarm_rate": 0.20483276469913345,
+     "nominal_rate": 0.002699796063260189
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "SciPy 2*t.sf(k, 1) outside check of false_alarm_rate (KR-232): agrees to 1e-17 relative",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "KR-232: n = 2 (1 degree of freedom): rate 2 atan(1/3) / pi",
+   "output_classes": {
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
+  },
+  {
+   "case_id": "trig_k-0011",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     0.5,
+     -0.25,
+     1.0
+    ],
+    "x_ref": 0.0,
+    "x_now": 1.0,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": false,
+     "sigma": 0.6291528696058958,
+     "threshold": 1.8874586088176875,
+     "false_alarm_rate": 0.09546596626670913,
+     "nominal_rate": 0.002699796063260189
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "SciPy 2*t.sf(k, 2) outside check of false_alarm_rate (KR-232): agrees to 1e-17 relative",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "KR-232: n = 3 (2 degrees of freedom): rate 1 - 3 / sqrt(11)",
+   "output_classes": {
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
+  },
+  {
+   "case_id": "trig_k-0012",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     0.5,
+     -0.25,
+     1.0,
+     -1.0,
+     0.75
+    ],
+    "x_ref": 0.0,
+    "x_now": 4.0,
+    "days_since": 2.0,
+    "k": 2.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": true,
+     "sigma": 0.8177713616898064,
+     "threshold": 2.3130067012440754,
+     "false_alarm_rate": 0.11611652351681559,
+     "nominal_rate": 0.04550026389635842
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "SciPy 2*t.sf(k, 4) outside check of false_alarm_rate (KR-232): agrees to 2e-16 relative",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "KR-232: n = 5, k = 2, d = 2",
+   "output_classes": {
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
+  },
+  {
+   "case_id": "trig_k-0013",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     0.5,
+     -0.5625,
+     0.625,
+     -0.6875,
+     0.75,
+     -0.8125,
+     0.875,
+     -0.9375,
+     1.0,
+     -1.0625,
+     1.125,
+     -1.1875,
+     1.25,
+     -1.3125,
+     1.375,
+     -1.4375,
+     1.5,
+     -1.5625,
+     1.625,
+     -1.6875,
+     1.75,
+     -1.8125,
+     1.875,
+     -1.9375,
+     2.0,
+     -2.0625,
+     2.125,
+     -2.1875,
+     2.25,
+     -2.3125
+    ],
+    "x_ref": 0.0,
+    "x_now": 1.0,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": false,
+     "sigma": 1.5321403991104101,
+     "threshold": 4.596421197331231,
+     "false_alarm_rate": 0.0054991921339034066,
+     "nominal_rate": 0.002699796063260189
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "SciPy 2*t.sf(k, 29) outside check of false_alarm_rate (KR-232): agrees to 9e-16 relative",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "KR-232: n = 30",
+   "output_classes": {
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
+  },
+  {
+   "case_id": "trig_k-0014",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5,
+     1.625,
+     -1.75,
+     1.0,
+     -1.125,
+     1.25,
+     -1.375,
+     1.5,
+     -1.625,
+     1.75,
+     -1.0,
+     1.125,
+     -1.25,
+     1.375,
+     -1.5
+    ],
+    "x_ref": 0.0,
+    "x_now": 5.0,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": true,
+     "sigma": 1.3977668829372603,
+     "threshold": 4.193300648811781,
+     "false_alarm_rate": 0.0029737859324150116,
+     "nominal_rate": 0.002699796063260189
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "SciPy 2*t.sf(k, 249) outside check of false_alarm_rate (KR-232): agrees to 9e-16 relative",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "KR-232: n = 250: the window of the spec's simulation",
+   "output_classes": {
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
+  },
+  {
+   "case_id": "trig_k-0015",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0,
+     -1.0,
+     1.0,
+     -1.0
+    ],
+    "x_ref": 0.0,
+    "x_now": 1.0,
+    "days_since": 1.0,
+    "k": 0.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": true,
+     "sigma": 1.1547005383792515,
+     "threshold": 0.5773502691896257,
+     "false_alarm_rate": 0.651447964848151,
+     "nominal_rate": 0.6170750774519738
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "SciPy 2*t.sf(k, 3) outside check of false_alarm_rate (KR-232): agrees to 1e-17 relative",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "KR-232: small k: the complement branch (rate above 1/8)",
+   "output_classes": {
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
+  },
+  {
+   "case_id": "trig_k-0016",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     0.5,
+     -1.0,
+     1.5,
+     -0.5,
+     0.0,
+     1.0,
+     -1.5,
+     0.0
+    ],
+    "x_ref": 0.0,
+    "x_now": 1.0,
+    "days_since": 1.0,
+    "k": 1000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": false,
+     "sigma": 1.0,
+     "threshold": 1000.0,
+     "false_alarm_rate": 2.6409838375211874e-19,
+     "nominal_rate": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "SciPy 2*t.sf(k, 7) outside check of false_alarm_rate (KR-232): agrees to 2e-16 relative",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "KR-232: large k = 1e3 with n = 8: remainder branch, k above sqrt(nu)",
+   "output_classes": {
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-14
+   }
+  },
+  {
+   "case_id": "trig_k-0017",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     0.1,
+     0.1,
+     0.1
+    ],
+    "x_ref": 0.0,
+    "x_now": 0.0,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic",
+    "error"
+   ],
+   "description": "KR-233: constant window [0.1] x 3: binary64 sigma 1.7e-17, below 2^-26 max|c| (KA-A5)"
+  },
+  {
+   "case_id": "trig_k-0018",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     0.2,
+     0.2,
+     0.2,
+     0.2,
+     0.2,
+     0.2
+    ],
+    "x_ref": 0.0,
+    "x_now": 0.0,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic",
+    "error"
+   ],
+   "description": "KR-233: constant window [0.2] x 6 (KA-A5)"
+  },
+  {
+   "case_id": "trig_k-0019",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     0.0,
+     0.0
+    ],
+    "x_ref": 0.0,
+    "x_now": 0.0,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic",
+    "error"
+   ],
+   "description": "KR-233: zero window: sigma 0 and max|c| 0"
+  },
+  {
+   "case_id": "trig_k-0020",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0,
+     1.00000002
+    ],
+    "x_ref": 0.0,
+    "x_now": 0.0,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic",
+    "error"
+   ],
+   "description": "KR-233: sigma 1.41e-8 just below 2^-26 x 1.00000002 = 1.49e-8"
+  },
+  {
+   "case_id": "trig_k-0021",
+   "operation": "calib.trigger.check",
+   "inputs": {
+    "changes": [
+     1.0,
+     1.000000022
+    ],
+    "x_ref": 0.0,
+    "x_now": 1e-07,
+    "days_since": 1.0,
+    "k": 3.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fire": true,
+     "sigma": 1.5556349217168183e-08,
+     "threshold": 4.666904765150455e-08,
+     "false_alarm_rate": 0.20483276469913345,
+     "nominal_rate": 0.002699796063260189
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits",
+    "added by the audit-response lane 2026-11-19 (STAGE_K_R1_AUDIT_A.md; rulings KR-230 to KR-238): hand and oracle; blind re-derived afterwards by the K-4c version 2 lane",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TRIG_V2.md, spec 1.1.0): MATCH on fire, sigma, threshold, false_alarm_rate and nominal_rate"
+   ],
+   "tags": [
+    "stage_k",
+    "calibration",
+    "trigger",
+    "synthetic"
+   ],
+   "description": "KR-233: sigma 1.56e-8 just above 2^-26 x max|c|: a usable noise scale",
+   "output_classes": {
+    "fire": "date_and_convention",
+    "false_alarm_rate": "tail_probability"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 3e-08
    }
   }
  ]

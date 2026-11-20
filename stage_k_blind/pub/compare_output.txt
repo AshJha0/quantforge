@@ -1,0 +1,387 @@
+case	path	expected	blind	result	notes
+saccr_k-0001	ead	569.4701409373457	569.4701409373457	MATCH	
+saccr_k-0001	rc	60.0	60	MATCH	
+saccr_k-0001	pfe	346.76438638381836	346.7643863838184	MATCH	
+saccr_k-0001	multiplier	1.0	1.0	MATCH	
+saccr_k-0001	addon_aggregate	346.76438638381836	346.7643863838184	MATCH	
+saccr_k-0001	addon/IR	346.76438638381836	346.7643863838184	MATCH	
+saccr_k-0001	addon/FX	0.0	0.0	MATCH	
+saccr_k-0001	addon/CREDIT	0.0	0.0	MATCH	
+saccr_k-0001	addon/EQUITY	0.0	0.0	MATCH	
+saccr_k-0001	addon/COMMODITY	0.0	0.0	MATCH	
+saccr_k-0001	v	60.0	60	MATCH	 rule-field
+saccr_k-0001	c	0.0	0	MATCH	 rule-field
+saccr_k-0001	margined	False	False	MATCH	 rule-field
+saccr_k-0001	mpor_days	None	None	MATCH	
+saccr_k-0001	ead_unmargined	None	None	MATCH	
+saccr_k-0001	capped	False	False	MATCH	
+saccr_k-0001	hedging_sets[0]/asset_class	'IR'	'IR'	MATCH	
+saccr_k-0001	hedging_sets[0]/treatment	'NORMAL'	'NORMAL'	MATCH	
+saccr_k-0001	hedging_sets[0]/key	'EUR'	'EUR'	MATCH	
+saccr_k-0001	hedging_sets[0]/addon	50.4145690652664	50.414569065266406	MATCH	
+saccr_k-0001	hedging_sets[1]/asset_class	'IR'	'IR'	MATCH	
+saccr_k-0001	hedging_sets[1]/treatment	'NORMAL'	'NORMAL'	MATCH	
+saccr_k-0001	hedging_sets[1]/key	'USD'	'USD'	MATCH	
+saccr_k-0001	hedging_sets[1]/addon	296.34981731855197	296.349817318552	MATCH	
+saccr_k-0001	trades[0]/id	'1'	'1'	MATCH	
+saccr_k-0001	trades[0]/supervisory_duration	7.8693868057473315	7.8693868057473315	MATCH	
+saccr_k-0001	trades[0]/adjusted_notional	78693.86805747332	78693.86805747332	MATCH	
+saccr_k-0001	trades[0]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0001	trades[0]/delta	1.0	1.0	MATCH	
+saccr_k-0001	trades[0]/effective_notional	78693.86805747332	78693.86805747332	MATCH	
+saccr_k-0001	trades[0]/supervisory_factor	0.005	0.005	MATCH	
+saccr_k-0001	trades[1]/id	'2'	'2'	MATCH	
+saccr_k-0001	trades[1]/supervisory_duration	3.6253849384403627	3.6253849384403636	MATCH	
+saccr_k-0001	trades[1]/adjusted_notional	36253.84938440363	36253.849384403635	MATCH	
+saccr_k-0001	trades[1]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0001	trades[1]/delta	-1.0	-1.0	MATCH	
+saccr_k-0001	trades[1]/effective_notional	-36253.84938440363	-36253.849384403635	MATCH	
+saccr_k-0001	trades[1]/supervisory_factor	0.005	0.005	MATCH	
+saccr_k-0001	trades[2]/id	'3'	'3'	MATCH	
+saccr_k-0001	trades[2]/supervisory_duration	7.485592282404546	7.485592282404547	MATCH	
+saccr_k-0001	trades[2]/adjusted_notional	37427.961412022734	37427.961412022734	MATCH	
+saccr_k-0001	trades[2]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0001	trades[2]/delta	-0.26939521771053265	-0.2693952177105327	MATCH	
+saccr_k-0001	trades[2]/effective_notional	-10082.91381305328	-10082.913813053281	MATCH	
+saccr_k-0001	trades[2]/supervisory_factor	0.005	0.005	MATCH	
+saccr_k-0002	ead	381.2383187469393	381.2383187469392	MATCH	
+saccr_k-0002	rc	0.0	0.0	MATCH	
+saccr_k-0002	pfe	272.31308481924236	272.3130848192423	MATCH	
+saccr_k-0002	multiplier	0.965208280997999	0.965208280997999	MATCH	
+saccr_k-0002	addon_aggregate	282.12883185966666	282.1288318596666	MATCH	
+saccr_k-0002	addon/IR	0.0	0.0	MATCH	
+saccr_k-0002	addon/FX	0.0	0.0	MATCH	
+saccr_k-0002	addon/CREDIT	282.12883185966666	282.1288318596666	MATCH	
+saccr_k-0002	addon/EQUITY	0.0	0.0	MATCH	
+saccr_k-0002	addon/COMMODITY	0.0	0.0	MATCH	
+saccr_k-0002	v	-20.0	-20	MATCH	 rule-field
+saccr_k-0002	c	0.0	0	MATCH	 rule-field
+saccr_k-0002	margined	False	False	MATCH	 rule-field
+saccr_k-0002	mpor_days	None	None	MATCH	
+saccr_k-0002	ead_unmargined	None	None	MATCH	
+saccr_k-0002	capped	False	False	MATCH	
+saccr_k-0002	hedging_sets[0]/asset_class	'CREDIT'	'CREDIT'	MATCH	
+saccr_k-0002	hedging_sets[0]/treatment	'NORMAL'	'NORMAL'	MATCH	
+saccr_k-0002	hedging_sets[0]/key	''	''	MATCH	
+saccr_k-0002	hedging_sets[0]/addon	282.12883185966666	282.1288318596666	MATCH	
+saccr_k-0002	trades[0]/id	'4'	'4'	MATCH	
+saccr_k-0002	trades[0]/supervisory_duration	2.785840471498844	2.785840471498844	MATCH	
+saccr_k-0002	trades[0]/adjusted_notional	27858.40471498844	27858.40471498844	MATCH	
+saccr_k-0002	trades[0]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0002	trades[0]/delta	1.0	1.0	MATCH	
+saccr_k-0002	trades[0]/effective_notional	27858.40471498844	27858.40471498844	MATCH	
+saccr_k-0002	trades[0]/supervisory_factor	0.0038	0.0038	MATCH	
+saccr_k-0002	trades[1]/id	'5'	'5'	MATCH	
+saccr_k-0002	trades[1]/supervisory_duration	5.183635586365643	5.183635586365642	MATCH	
+saccr_k-0002	trades[1]/adjusted_notional	51836.35586365643	51836.35586365642	MATCH	
+saccr_k-0002	trades[1]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0002	trades[1]/delta	-1.0	-1.0	MATCH	
+saccr_k-0002	trades[1]/effective_notional	-51836.35586365643	-51836.35586365642	MATCH	
+saccr_k-0002	trades[1]/supervisory_factor	0.0054	0.0054	MATCH	
+saccr_k-0002	trades[2]/id	'6'	'6'	MATCH	
+saccr_k-0002	trades[2]/supervisory_duration	4.423984338571903	4.423984338571902	MATCH	
+saccr_k-0002	trades[2]/adjusted_notional	44239.843385719025	44239.84338571902	MATCH	
+saccr_k-0002	trades[2]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0002	trades[2]/delta	1.0	1.0	MATCH	
+saccr_k-0002	trades[2]/effective_notional	44239.843385719025	44239.84338571902	MATCH	
+saccr_k-0002	trades[2]/supervisory_factor	0.0038	0.0038	MATCH	
+saccr_k-0003	ead	5405.615982463215	5405.615982463214	MATCH	
+saccr_k-0003	rc	20.0	20	MATCH	
+saccr_k-0003	pfe	3841.1542731880104	3841.1542731880104	MATCH	
+saccr_k-0003	multiplier	1.0	1.0	MATCH	
+saccr_k-0003	addon_aggregate	3841.1542731880104	3841.1542731880104	MATCH	
+saccr_k-0003	addon/IR	0.0	0.0	MATCH	
+saccr_k-0003	addon/FX	0.0	0.0	MATCH	
+saccr_k-0003	addon/CREDIT	0.0	0.0	MATCH	
+saccr_k-0003	addon/EQUITY	0.0	0.0	MATCH	
+saccr_k-0003	addon/COMMODITY	3841.1542731880104	3841.1542731880104	MATCH	
+saccr_k-0003	v	20.0	20	MATCH	 rule-field
+saccr_k-0003	c	0.0	0	MATCH	 rule-field
+saccr_k-0003	margined	False	False	MATCH	 rule-field
+saccr_k-0003	mpor_days	None	None	MATCH	
+saccr_k-0003	ead_unmargined	None	None	MATCH	
+saccr_k-0003	capped	False	False	MATCH	
+saccr_k-0003	hedging_sets[0]/asset_class	'COMMODITY'	'COMMODITY'	MATCH	
+saccr_k-0003	hedging_sets[0]/treatment	'NORMAL'	'NORMAL'	MATCH	
+saccr_k-0003	hedging_sets[0]/key	'ENERGY'	'ENERGY'	MATCH	
+saccr_k-0003	hedging_sets[0]/addon	2041.1542731880104	2041.1542731880104	MATCH	
+saccr_k-0003	hedging_sets[1]/asset_class	'COMMODITY'	'COMMODITY'	MATCH	
+saccr_k-0003	hedging_sets[1]/treatment	'NORMAL'	'NORMAL'	MATCH	
+saccr_k-0003	hedging_sets[1]/key	'METALS'	'METALS'	MATCH	
+saccr_k-0003	hedging_sets[1]/addon	1800.0	1800.0	MATCH	
+saccr_k-0003	trades[0]/id	'7'	'7'	MATCH	
+saccr_k-0003	trades[0]/supervisory_duration	None	None	MATCH	
+saccr_k-0003	trades[0]/adjusted_notional	10000.0	10000	MATCH	
+saccr_k-0003	trades[0]/maturity_factor	0.8660254037844386	0.8660254037844386	MATCH	
+saccr_k-0003	trades[0]/delta	1.0	1.0	MATCH	
+saccr_k-0003	trades[0]/effective_notional	8660.254037844386	8660.254037844386	MATCH	
+saccr_k-0003	trades[0]/supervisory_factor	0.18	0.18	MATCH	
+saccr_k-0003	trades[1]/id	'8'	'8'	MATCH	
+saccr_k-0003	trades[1]/supervisory_duration	None	None	MATCH	
+saccr_k-0003	trades[1]/adjusted_notional	20000.0	20000	MATCH	
+saccr_k-0003	trades[1]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0003	trades[1]/delta	-1.0	-1.0	MATCH	
+saccr_k-0003	trades[1]/effective_notional	-20000.0	-20000.0	MATCH	
+saccr_k-0003	trades[1]/supervisory_factor	0.18	0.18	MATCH	
+saccr_k-0003	trades[2]/id	'9'	'9'	MATCH	
+saccr_k-0003	trades[2]/supervisory_duration	None	None	MATCH	
+saccr_k-0003	trades[2]/adjusted_notional	10000.0	10000	MATCH	
+saccr_k-0003	trades[2]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0003	trades[2]/delta	1.0	1.0	MATCH	
+saccr_k-0003	trades[2]/effective_notional	10000.0	10000.0	MATCH	
+saccr_k-0003	trades[2]/supervisory_factor	0.18	0.18	MATCH	
+saccr_k-0004	ead	936.450505540879	936.450505540879	MATCH	
+saccr_k-0004	rc	40.0	40	MATCH	
+saccr_k-0004	pfe	628.8932182434851	628.8932182434851	MATCH	
+saccr_k-0004	multiplier	1.0	1.0	MATCH	
+saccr_k-0004	addon_aggregate	628.8932182434851	628.8932182434851	MATCH	
+saccr_k-0004	addon/IR	346.76438638381836	346.7643863838184	MATCH	
+saccr_k-0004	addon/FX	0.0	0.0	MATCH	
+saccr_k-0004	addon/CREDIT	282.12883185966666	282.1288318596666	MATCH	
+saccr_k-0004	addon/EQUITY	0.0	0.0	MATCH	
+saccr_k-0004	addon/COMMODITY	0.0	0.0	MATCH	
+saccr_k-0004	v	40.0	40	MATCH	 rule-field
+saccr_k-0004	c	0.0	0	MATCH	 rule-field
+saccr_k-0004	margined	False	False	MATCH	 rule-field
+saccr_k-0004	mpor_days	None	None	MATCH	
+saccr_k-0004	ead_unmargined	None	None	MATCH	
+saccr_k-0004	capped	False	False	MATCH	
+saccr_k-0004	hedging_sets[0]/asset_class	'IR'	'IR'	MATCH	
+saccr_k-0004	hedging_sets[0]/treatment	'NORMAL'	'NORMAL'	MATCH	
+saccr_k-0004	hedging_sets[0]/key	'EUR'	'EUR'	MATCH	
+saccr_k-0004	hedging_sets[0]/addon	50.4145690652664	50.414569065266406	MATCH	
+saccr_k-0004	hedging_sets[1]/asset_class	'IR'	'IR'	MATCH	
+saccr_k-0004	hedging_sets[1]/treatment	'NORMAL'	'NORMAL'	MATCH	
+saccr_k-0004	hedging_sets[1]/key	'USD'	'USD'	MATCH	
+saccr_k-0004	hedging_sets[1]/addon	296.34981731855197	296.349817318552	MATCH	
+saccr_k-0004	hedging_sets[2]/asset_class	'CREDIT'	'CREDIT'	MATCH	
+saccr_k-0004	hedging_sets[2]/treatment	'NORMAL'	'NORMAL'	MATCH	
+saccr_k-0004	hedging_sets[2]/key	''	''	MATCH	
+saccr_k-0004	hedging_sets[2]/addon	282.12883185966666	282.1288318596666	MATCH	
+saccr_k-0004	trades[0]/id	'1'	'1'	MATCH	
+saccr_k-0004	trades[0]/supervisory_duration	7.8693868057473315	7.8693868057473315	MATCH	
+saccr_k-0004	trades[0]/adjusted_notional	78693.86805747332	78693.86805747332	MATCH	
+saccr_k-0004	trades[0]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0004	trades[0]/delta	1.0	1.0	MATCH	
+saccr_k-0004	trades[0]/effective_notional	78693.86805747332	78693.86805747332	MATCH	
+saccr_k-0004	trades[0]/supervisory_factor	0.005	0.005	MATCH	
+saccr_k-0004	trades[1]/id	'2'	'2'	MATCH	
+saccr_k-0004	trades[1]/supervisory_duration	3.6253849384403627	3.6253849384403636	MATCH	
+saccr_k-0004	trades[1]/adjusted_notional	36253.84938440363	36253.849384403635	MATCH	
+saccr_k-0004	trades[1]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0004	trades[1]/delta	-1.0	-1.0	MATCH	
+saccr_k-0004	trades[1]/effective_notional	-36253.84938440363	-36253.849384403635	MATCH	
+saccr_k-0004	trades[1]/supervisory_factor	0.005	0.005	MATCH	
+saccr_k-0004	trades[2]/id	'3'	'3'	MATCH	
+saccr_k-0004	trades[2]/supervisory_duration	7.485592282404546	7.485592282404547	MATCH	
+saccr_k-0004	trades[2]/adjusted_notional	37427.961412022734	37427.961412022734	MATCH	
+saccr_k-0004	trades[2]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0004	trades[2]/delta	-0.26939521771053265	-0.2693952177105327	MATCH	
+saccr_k-0004	trades[2]/effective_notional	-10082.91381305328	-10082.913813053281	MATCH	
+saccr_k-0004	trades[2]/supervisory_factor	0.005	0.005	MATCH	
+saccr_k-0004	trades[3]/id	'4'	'4'	MATCH	
+saccr_k-0004	trades[3]/supervisory_duration	2.785840471498844	2.785840471498844	MATCH	
+saccr_k-0004	trades[3]/adjusted_notional	27858.40471498844	27858.40471498844	MATCH	
+saccr_k-0004	trades[3]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0004	trades[3]/delta	1.0	1.0	MATCH	
+saccr_k-0004	trades[3]/effective_notional	27858.40471498844	27858.40471498844	MATCH	
+saccr_k-0004	trades[3]/supervisory_factor	0.0038	0.0038	MATCH	
+saccr_k-0004	trades[4]/id	'5'	'5'	MATCH	
+saccr_k-0004	trades[4]/supervisory_duration	5.183635586365643	5.183635586365642	MATCH	
+saccr_k-0004	trades[4]/adjusted_notional	51836.35586365643	51836.35586365642	MATCH	
+saccr_k-0004	trades[4]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0004	trades[4]/delta	-1.0	-1.0	MATCH	
+saccr_k-0004	trades[4]/effective_notional	-51836.35586365643	-51836.35586365642	MATCH	
+saccr_k-0004	trades[4]/supervisory_factor	0.0054	0.0054	MATCH	
+saccr_k-0004	trades[5]/id	'6'	'6'	MATCH	
+saccr_k-0004	trades[5]/supervisory_duration	4.423984338571903	4.423984338571902	MATCH	
+saccr_k-0004	trades[5]/adjusted_notional	44239.843385719025	44239.84338571902	MATCH	
+saccr_k-0004	trades[5]/maturity_factor	1.0	1.0	MATCH	
+saccr_k-0004	trades[5]/delta	1.0	1.0	MATCH	
+saccr_k-0004	trades[5]/effective_notional	44239.843385719025	44239.84338571902	MATCH	
+saccr_k-0004	trades[5]/supervisory_factor	0.0038	0.0038	MATCH	
+saccr_k-0005	ead	1879.2126315015523	1879.2126315015523	MATCH	
+saccr_k-0005	rc	0.0	0.0	MATCH	
+saccr_k-0005	pfe	1342.294736786823	1342.2947367868233	MATCH	
+saccr_k-0005	multiplier	0.958123327392663	0.958123327392663	MATCH	
+saccr_k-0005	addon_aggregate	1400.9623796965723	1400.9623796965723	MATCH	
+saccr_k-0005	addon/IR	123.0891465470551	123.08914654705512	MATCH	
+saccr_k-0005	addon/FX	0.0	0.0	MATCH	
+saccr_k-0005	addon/CREDIT	0.0	0.0	MATCH	
+saccr_k-0005	addon/EQUITY	0.0	0.0	MATCH	
+saccr_k-0005	addon/COMMODITY	1277.873233149517	1277.873233149517	MATCH	
+saccr_k-0005	v	80.0	80	MATCH	 rule-field
+saccr_k-0005	c	200.0	200	MATCH	 rule-field
+saccr_k-0005	margined	True	True	MATCH	 rule-field
+saccr_k-0005	mpor_days	14	14	MATCH	
+saccr_k-0005	ead_unmargined	5779.716352199414	5779.716352199415	MATCH	
+saccr_k-0005	capped	False	False	MATCH	
+saccr_k-0005	hedging_sets[0]/asset_class	'IR'	'IR'	MATCH	
+saccr_k-0005	hedging_sets[0]/treatment	'NORMAL'	'NORMAL'	MATCH	
+saccr_k-0005	hedging_sets[0]/key	'EUR'	'EUR'	MATCH	
+saccr_k-0005	hedging_sets[0]/addon	17.89539676924211	17.895396769242115	MATCH	
+saccr_k-0005	hedging_sets[1]/asset_class	'IR'	'IR'	MATCH	
+saccr_k-0005	hedging_sets[1]/treatment	'NORMAL'	'NORMAL'	MATCH	
+saccr_k-0005	hedging_sets[1]/key	'USD'	'USD'	MATCH	
+saccr_k-0005	hedging_sets[1]/addon	105.193749777813	105.19374977781301	MATCH	
+saccr_k-0005	hedging_sets[2]/asset_class	'COMMODITY'	'COMMODITY'	MATCH	
+saccr_k-0005	hedging_sets[2]/treatment	'NORMAL'	'NORMAL'	MATCH	
+saccr_k-0005	hedging_sets[2]/key	'ENERGY'	'ENERGY'	MATCH	
+saccr_k-0005	hedging_sets[2]/addon	638.9366165747585	638.9366165747585	MATCH	
+saccr_k-0005	hedging_sets[3]/asset_class	'COMMODITY'	'COMMODITY'	MATCH	
+saccr_k-0005	hedging_sets[3]/treatment	'NORMAL'	'NORMAL'	MATCH	
+saccr_k-0005	hedging_sets[3]/key	'METALS'	'METALS'	MATCH	
+saccr_k-0005	hedging_sets[3]/addon	638.9366165747585	638.9366165747585	MATCH	
+saccr_k-0005	trades[0]/id	'1'	'1'	MATCH	
+saccr_k-0005	trades[0]/supervisory_duration	7.8693868057473315	7.8693868057473315	MATCH	
+saccr_k-0005	trades[0]/adjusted_notional	78693.86805747332	78693.86805747332	MATCH	
+saccr_k-0005	trades[0]/maturity_factor	0.35496478698597694	0.354964786985977	MATCH	
+saccr_k-0005	trades[0]/delta	1.0	1.0	MATCH	
+saccr_k-0005	trades[0]/effective_notional	27933.55211212359	27933.552112123594	MATCH	
+saccr_k-0005	trades[0]/supervisory_factor	0.005	0.005	MATCH	
+saccr_k-0005	trades[1]/id	'2'	'2'	MATCH	
+saccr_k-0005	trades[1]/supervisory_duration	3.6253849384403627	3.6253849384403636	MATCH	
+saccr_k-0005	trades[1]/adjusted_notional	36253.84938440363	36253.849384403635	MATCH	
+saccr_k-0005	trades[1]/maturity_factor	0.35496478698597694	0.354964786985977	MATCH	
+saccr_k-0005	trades[1]/delta	-1.0	-1.0	MATCH	
+saccr_k-0005	trades[1]/effective_notional	-12868.839924156526	-12868.83992415653	MATCH	
+saccr_k-0005	trades[1]/supervisory_factor	0.005	0.005	MATCH	
+saccr_k-0005	trades[2]/id	'3'	'3'	MATCH	
+saccr_k-0005	trades[2]/supervisory_duration	7.485592282404546	7.485592282404547	MATCH	
+saccr_k-0005	trades[2]/adjusted_notional	37427.961412022734	37427.961412022734	MATCH	
+saccr_k-0005	trades[2]/maturity_factor	0.35496478698597694	0.354964786985977	MATCH	
+saccr_k-0005	trades[2]/delta	-0.26939521771053265	-0.2693952177105327	MATCH	
+saccr_k-0005	trades[2]/effective_notional	-3579.079353848422	-3579.079353848423	MATCH	
+saccr_k-0005	trades[2]/supervisory_factor	0.005	0.005	MATCH	
+saccr_k-0005	trades[3]/id	'7'	'7'	MATCH	
+saccr_k-0005	trades[3]/supervisory_duration	None	None	MATCH	
+saccr_k-0005	trades[3]/adjusted_notional	10000.0	10000	MATCH	
+saccr_k-0005	trades[3]/maturity_factor	0.35496478698597694	0.354964786985977	MATCH	
+saccr_k-0005	trades[3]/delta	1.0	1.0	MATCH	
+saccr_k-0005	trades[3]/effective_notional	3549.64786985977	3549.64786985977	MATCH	
+saccr_k-0005	trades[3]/supervisory_factor	0.18	0.18	MATCH	
+saccr_k-0005	trades[4]/id	'8'	'8'	MATCH	
+saccr_k-0005	trades[4]/supervisory_duration	None	None	MATCH	
+saccr_k-0005	trades[4]/adjusted_notional	20000.0	20000	MATCH	
+saccr_k-0005	trades[4]/maturity_factor	0.35496478698597694	0.354964786985977	MATCH	
+saccr_k-0005	trades[4]/delta	-1.0	-1.0	MATCH	
+saccr_k-0005	trades[4]/effective_notional	-7099.29573971954	-7099.29573971954	MATCH	
+saccr_k-0005	trades[4]/supervisory_factor	0.18	0.18	MATCH	
+saccr_k-0005	trades[5]/id	'9'	'9'	MATCH	
+saccr_k-0005	trades[5]/supervisory_duration	None	None	MATCH	
+saccr_k-0005	trades[5]/adjusted_notional	10000.0	10000	MATCH	
+saccr_k-0005	trades[5]/maturity_factor	0.35496478698597694	0.354964786985977	MATCH	
+saccr_k-0005	trades[5]/delta	1.0	1.0	MATCH	
+saccr_k-0005	trades[5]/effective_notional	3549.64786985977	3549.64786985977	MATCH	
+saccr_k-0005	trades[5]/supervisory_factor	0.18	0.18	MATCH	
+btk_k-0001	exceptions	0	0	MATCH	 rule-field
+btk_k-0001	cumulative_probability	0.08105851616218146	0.08105851616218146	MATCH	
+btk_k-0001	zone	'GREEN'	'GREEN'	MATCH	 rule-field
+btk_k-0001	amber_from	5	5	MATCH	 rule-field
+btk_k-0001	red_from	10	10	MATCH	 rule-field
+btk_k-0001	multiplier	1.5	1.5	MATCH	 rule-field
+btk_k-0002	exceptions	1	1	MATCH	 rule-field
+btk_k-0002	cumulative_probability	0.2857517387939528	0.2857517387939528	MATCH	
+btk_k-0002	zone	'GREEN'	'GREEN'	MATCH	 rule-field
+btk_k-0002	amber_from	5	5	MATCH	 rule-field
+btk_k-0002	red_from	10	10	MATCH	 rule-field
+btk_k-0002	multiplier	1.5	1.5	MATCH	 rule-field
+btk_k-0003	exceptions	2	2	MATCH	 rule-field
+btk_k-0003	cumulative_probability	0.5431689733157259	0.5431689733157259	MATCH	
+btk_k-0003	zone	'GREEN'	'GREEN'	MATCH	 rule-field
+btk_k-0003	amber_from	5	5	MATCH	 rule-field
+btk_k-0003	red_from	10	10	MATCH	 rule-field
+btk_k-0003	multiplier	1.5	1.5	MATCH	 rule-field
+btk_k-0004	exceptions	3	3	MATCH	 rule-field
+btk_k-0004	cumulative_probability	0.7581166977648832	0.7581166977648832	MATCH	
+btk_k-0004	zone	'GREEN'	'GREEN'	MATCH	 rule-field
+btk_k-0004	amber_from	5	5	MATCH	 rule-field
+btk_k-0004	red_from	10	10	MATCH	 rule-field
+btk_k-0004	multiplier	1.5	1.5	MATCH	 rule-field
+btk_k-0005	exceptions	4	4	MATCH	 rule-field
+btk_k-0005	cumulative_probability	0.8921876269036253	0.8921876269036253	MATCH	
+btk_k-0005	zone	'GREEN'	'GREEN'	MATCH	 rule-field
+btk_k-0005	amber_from	5	5	MATCH	 rule-field
+btk_k-0005	red_from	10	10	MATCH	 rule-field
+btk_k-0005	multiplier	1.5	1.5	MATCH	 rule-field
+btk_k-0006	exceptions	5	5	MATCH	 rule-field
+btk_k-0006	cumulative_probability	0.9588168159301517	0.9588168159301517	MATCH	
+btk_k-0006	zone	'AMBER'	'AMBER'	MATCH	 rule-field
+btk_k-0006	amber_from	5	5	MATCH	 rule-field
+btk_k-0006	red_from	10	10	MATCH	 rule-field
+btk_k-0006	multiplier	1.7	1.7	MATCH	 rule-field
+btk_k-0007	exceptions	6	6	MATCH	 rule-field
+btk_k-0007	cumulative_probability	0.9862985521447963	0.9862985521447963	MATCH	
+btk_k-0007	zone	'AMBER'	'AMBER'	MATCH	 rule-field
+btk_k-0007	amber_from	5	5	MATCH	 rule-field
+btk_k-0007	red_from	10	10	MATCH	 rule-field
+btk_k-0007	multiplier	1.76	1.76	MATCH	 rule-field
+btk_k-0008	exceptions	7	7	MATCH	 rule-field
+btk_k-0008	cumulative_probability	0.9959746612881922	0.9959746612881922	MATCH	
+btk_k-0008	zone	'AMBER'	'AMBER'	MATCH	 rule-field
+btk_k-0008	amber_from	5	5	MATCH	 rule-field
+btk_k-0008	red_from	10	10	MATCH	 rule-field
+btk_k-0008	multiplier	1.83	1.83	MATCH	 rule-field
+btk_k-0009	exceptions	8	8	MATCH	 rule-field
+btk_k-0009	cumulative_probability	0.9989434675026432	0.9989434675026432	MATCH	
+btk_k-0009	zone	'AMBER'	'AMBER'	MATCH	 rule-field
+btk_k-0009	amber_from	5	5	MATCH	 rule-field
+btk_k-0009	red_from	10	10	MATCH	 rule-field
+btk_k-0009	multiplier	1.88	1.88	MATCH	 rule-field
+btk_k-0010	exceptions	9	9	MATCH	 rule-field
+btk_k-0010	cumulative_probability	0.9997498099312595	0.9997498099312595	MATCH	
+btk_k-0010	zone	'AMBER'	'AMBER'	MATCH	 rule-field
+btk_k-0010	amber_from	5	5	MATCH	 rule-field
+btk_k-0010	red_from	10	10	MATCH	 rule-field
+btk_k-0010	multiplier	1.92	1.92	MATCH	 rule-field
+btk_k-0011	exceptions	10	10	MATCH	 rule-field
+btk_k-0011	cumulative_probability	0.999946101370953	0.999946101370953	MATCH	
+btk_k-0011	zone	'RED'	'RED'	MATCH	 rule-field
+btk_k-0011	amber_from	5	5	MATCH	 rule-field
+btk_k-0011	red_from	10	10	MATCH	 rule-field
+btk_k-0011	multiplier	2.0	2.0	MATCH	 rule-field
+btk_k-0012	exceptions	12	12	MATCH	 rule-field
+btk_k-0012	cumulative_probability	0.9999980641362446	0.9999980641362446	MATCH	
+btk_k-0012	zone	'RED'	'RED'	MATCH	 rule-field
+btk_k-0012	amber_from	5	5	MATCH	 rule-field
+btk_k-0012	red_from	10	10	MATCH	 rule-field
+btk_k-0012	multiplier	2.0	2.0	MATCH	 rule-field
+tlk_k-0001	cumulative_probability	0.08105851616218146	0.08105851616218146	MATCH	
+tlk_k-0001	zone	'GREEN'	'GREEN'	MATCH	 rule-field
+tlk_k-0001	plus_factor	0.0	0.0	MATCH	 rule-field
+tlk_k-0002	cumulative_probability	0.2857517387939528	0.2857517387939528	MATCH	
+tlk_k-0002	zone	'GREEN'	'GREEN'	MATCH	 rule-field
+tlk_k-0002	plus_factor	0.0	0.0	MATCH	 rule-field
+tlk_k-0003	cumulative_probability	0.5431689733157259	0.5431689733157259	MATCH	
+tlk_k-0003	zone	'GREEN'	'GREEN'	MATCH	 rule-field
+tlk_k-0003	plus_factor	0.0	0.0	MATCH	 rule-field
+tlk_k-0004	cumulative_probability	0.7581166977648832	0.7581166977648832	MATCH	
+tlk_k-0004	zone	'GREEN'	'GREEN'	MATCH	 rule-field
+tlk_k-0004	plus_factor	0.0	0.0	MATCH	 rule-field
+tlk_k-0005	cumulative_probability	0.8921876269036253	0.8921876269036253	MATCH	
+tlk_k-0005	zone	'GREEN'	'GREEN'	MATCH	 rule-field
+tlk_k-0005	plus_factor	0.0	0.0	MATCH	 rule-field
+tlk_k-0006	cumulative_probability	0.9588168159301517	0.9588168159301517	MATCH	
+tlk_k-0006	zone	'YELLOW'	'YELLOW'	MATCH	 rule-field
+tlk_k-0006	plus_factor	0.4	0.4	MATCH	 rule-field
+tlk_k-0007	cumulative_probability	0.9862985521447963	0.9862985521447963	MATCH	
+tlk_k-0007	zone	'YELLOW'	'YELLOW'	MATCH	 rule-field
+tlk_k-0007	plus_factor	0.5	0.5	MATCH	 rule-field
+tlk_k-0008	cumulative_probability	0.9959746612881922	0.9959746612881922	MATCH	
+tlk_k-0008	zone	'YELLOW'	'YELLOW'	MATCH	 rule-field
+tlk_k-0008	plus_factor	0.65	0.65	MATCH	 rule-field
+tlk_k-0009	cumulative_probability	0.9989434675026432	0.9989434675026432	MATCH	
+tlk_k-0009	zone	'YELLOW'	'YELLOW'	MATCH	 rule-field
+tlk_k-0009	plus_factor	0.75	0.75	MATCH	 rule-field
+tlk_k-0010	cumulative_probability	0.9997498099312595	0.9997498099312595	MATCH	
+tlk_k-0010	zone	'YELLOW'	'YELLOW'	MATCH	 rule-field
+tlk_k-0010	plus_factor	0.85	0.85	MATCH	 rule-field
+tlk_k-0011	cumulative_probability	0.999946101370953	0.999946101370953	MATCH	
+tlk_k-0011	zone	'RED'	'RED'	MATCH	 rule-field
+tlk_k-0011	plus_factor	1.0	1.0	MATCH	 rule-field
+
+PUB	cases 28	MATCH 28	MISMATCH 0	MISSING 0	eligible 28
+K-8d	counted blind MATCH 5 of 5	needed 3	share 12 of 16 (75.0%)
+K-8e	counted blind MATCH 12 of 12	needed 4	share 23 of 24 (95.8%)
+F (existing traffic_light)	counted blind MATCH 11 of 11	needed 7	share 11 of 11 (100.0%)
+stage K	78 of 87 (89.7%)

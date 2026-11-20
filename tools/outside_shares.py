@@ -4,7 +4,10 @@
     python tools/outside_shares.py            write oracle/OUTSIDE_SHARES.json and oracle/OUTSIDE_SHARES.md
     python tools/outside_shares.py --check    regenerate in memory; exit 1 if the committed copy differs, if a
                                               register's suite totals differ from the goldens, or if a stage is
-                                              under the 60% floor on value-checked cases
+                                              under the 60% floor on value-checked cases, if a stage H or K
+                                              plan item is under the 60% per-item floor (audit KF-19, no
+                                              exemption list), or if a generated stage K block in the docs
+                                              differs (audit KF-18; the blocks are rewritten without --check)
 
 Evidence classes (D6). A case counts towards the outside share only as `library-object` or `library-primitive`,
 and only if every compared output of the case is checked:
@@ -23,6 +26,7 @@ class is ruled per suite in SUITE_CLASS and the per-case regeneration of those r
 """
 import argparse
 import json
+import re
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -229,18 +233,33 @@ def load_stage_h():
 # blind at the golden's tolerance: a case whose `verified_by` says "not blind" (gap-decided fields, oracle-only
 # cases) or "only to 6 decimals" (idr_k-0001..0004 `bound`, compared at 1e-9 relative but blind-checked to 5e-7
 # absolute) does not count. The mpmath values are our own oracle and never count (KR-11).
-# Stage K wave 1b (integration 2026-11-19, program/STAGE_K_W1B_HANDOVER.md): a case also counts when its `verified_by`
-# records a figure printed in the regulator text with MATCH ("published: ... MATCH", CRE99 and MAR99 Table 2), as stage H
-# counts printed paper figures. SciPy `binom.cdf` checks on btk_k are not counted: the D6 precedent is stage F's
+# Stage K wave 1b: a printed regulator figure ("published: ... MATCH", CRE99 and MAR99 Table 2) does NOT count on its own
+# (ruling KR-250, audit KA-C18, program/STAGE_K_AUDIT_C18_RESPONSE.md). The integration of 2026-11-19 had counted it,
+# citing stage H; but stage H never counts a printed figure alone (as_h-0005..0007 and ac_h-0005 count through their
+# DR-H2 blind MATCH, the printed figure is an "extra check"; ob_h-0001's printed checksum is not counted), stage F
+# classes the Cboe VIX worked example `none` (vix_f-0001..0003), and the D6 docstring above says a published worked
+# example alone does not count. A printed figure checks some outputs at print precision, not every compared output
+# at the golden's tolerance. `--count-printed` prints the shares under the withdrawn reading, for comparison only. SciPy `binom.cdf` checks on btk_k are not counted: the D6 precedent is stage F's
 # REIMPL_ROWS ("SCIPY.BINOM"), under which risk_f4-0082 (`risk.backtest.traffic_light`, the same binomial sum) is
 # `reimplementation`; a library primitive computing the same closed-form quantity is not a different formulation.
-# K-5a: the K-5a blind packet
-# (program/STAGE_K_BLIND_K5A.md, 2026-11-19) re-derived idr_k-0001..0005 at 1e-9 relative, 5 of 5 MATCH; their
-# verified_by now records that run, so they count as blind re-derivation.
+# K-5a: KR-234 redefined `bound`, so the version 1 packet (program/STAGE_K_BLIND_K5A.md) no longer covers it. The
+# version 2 packet (program/STAGE_K_BLIND_K5A_V2.md, 2026-11-19) re-derived 11 cases at 1e-9 relative: 9 MATCH,
+# counted; idr_k-0012 and idr_k-0013 MISMATCH on estimate_pnl and are NOT counted.
+# trig_k: KR-232 redefined `false_alarm_rate`, so the wave-1 blind MATCH no longer covers every compared output and
+# trig_k lost its blind credit (verified_by says "not blind"); the SciPy checks do not count (KR-11).
+# K-4c version 2 packet (program/STAGE_K_BLIND_TRIG_V2.md, 2026-11-20): 14 of 14 MATCH, 13 counted (trig_k-0004's
+# fire stays gap-decided by KR-13).
+# The 28 printed-figure cases count through the blind pub packet (program/STAGE_K_BLIND_PUB.md, 28 of 28 MATCH at
+# full tolerance), not through the printed figure (KR-250).
 STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-5a", "rich_k": "K-8 guard",
                  "k8_k": "K-8", "e1_k": None, "e2_k": None,  # e1_k, e2_k: error cases only
-                 "saccr_k": "K-8d", "btk_k": "K-8e", "tlk_k": "F (existing traffic_light)"}
+                 "saccr_k": "K-8d", "btk_k": "K-8e", "tlk_k": "F (existing traffic_light)",
+                 "sbim_alias_k": None,  # KR-153: the deprecated alias's invariance and error cases; no value case
+                 "lim_k": None}  # KR-230/KR-231: size-limit error cases only (bitemporal_query, trigger.check)
 K_PUBLISHED_SRC = "figure printed in the regulator text (Basel Framework CRE99, MAR99 Table 2)"
+
+
+COUNT_PRINTED = False  # reporting switch for --count-printed only; never written to the committed files
 
 
 def load_stage_k():
@@ -250,7 +269,7 @@ def load_stage_k():
             vb = " | ".join(c.get("verified_by", []))
             if "DR-H2" in vb and "MATCH" in vb and "not blind" not in vb and "only to 6 decimals" not in vb:
                 out[c["case_id"]] = (REDERIVED, H_REDERIVE_SRC)
-            elif any(v.startswith("published:") and "MATCH" in v for v in c.get("verified_by", [])):
+            elif COUNT_PRINTED and any(v.startswith("published:") and "MATCH" in v for v in c.get("verified_by", [])):
                 out[c["case_id"]] = (REDERIVED, K_PUBLISHED_SRC)
     return out
 
@@ -373,8 +392,103 @@ def build(problems):
                 v["suites"] = sorted({r[0] for r in rs})
                 v["meets_item_floor"] = (v["share_with_rederivation"] or 0.0) >= FLOOR
                 entry["per_item"][it] = v
+                # Audit KF-19 (2026-11-20): the plan 15 per-item rule is a gate, not a column. No exemption list.
+                if not v["meets_item_floor"]:
+                    problems.append(f"stage {st}: item {it} ({', '.join(v['suites'])}) is {v['counted_with_rederivation']} of "
+                                    f"{v['cases']} ({(v['share_with_rederivation'] or 0):.1%}), under the {FLOOR:.0%} per-item floor")
+            if st == "K":
+                # Audit finding KA-C18 (2026-11-19, open): cases counted on a figure printed in the regulator text are
+                # checked on part of their outputs and at print precision, so by the strict reading of the rule above
+                # ("only if every compared output is checked") they do not count. Ruled by KR-250: the strict reading is the count.
+                def strict(rs):
+                    val = [r for r in rs if r[5]]
+                    return {"cases": len(val), "counted": sum(r[2] == REDERIVED and r[4] != K_PUBLISHED_SRC for r in val)}
+                # Ruling KR-250 made the strict reading the count. The note is emitted only if the two counts differ
+                # again (for example if a printed-figure case regains credit), so the page never prints a stale review.
+                st_counts = strict(core)
+                if st_counts["counted"] != entry["without_sweeps"]["counted_with_rederivation"]:
+                    entry["under_review"] = {
+                        "finding": "KA-C18", "status": "reopened: the strict count differs from the count",
+                        "strict_reading": "a case counted on a printed regulator figure does not count",
+                        "stage": st_counts,
+                        "per_item": {it: strict(rs) for it, rs in sorted(items.items())}}
         out["stages"][st] = entry
     return out
+
+
+def under_review_text(u):
+    s = u["stage"]
+    low = [f"{it} {v['counted']} of {v['cases']} ({v['counted'] / v['cases']:.1%})" for it, v in u["per_item"].items()
+           if v["cases"] and v["counted"] / v["cases"] < FLOOR]
+    return (f"**Stage K shares are under review (audit finding {u['finding']}, {u['status']}; `docs/known-issues.md`).** The table above "
+            "counts a case checked against a figure printed in the regulator text. Such a case is checked on part of its "
+            "outputs and at print precision, which the rule at the top of this page (\"only if every compared output is "
+            f"checked\") does not allow. By the strict reading stage K is {s['counted']} of {s['cases']} "
+            f"({s['counted'] / s['cases']:.1%}); items under the floor by that reading: {'; '.join(low) or 'none'}. "
+            "Neither figure is settled until a ruling says which reading holds.")
+
+
+# Audit KF-18 (2026-11-20): the stage K figures that docs quote are generated into marked blocks,
+#   <!-- generated:NAME -->TEXT<!-- /generated -->
+# on one line, so a block can sit inside a sentence or a table cell. `--check` compares every block byte for byte.
+BLOCK = re.compile(r"<!-- generated:(stage-k-[a-z-]+) -->(.*?)<!-- /generated -->")
+# Docs that state stage K or per-item shares must carry the blocks (a doc may hold more than one copy).
+BLOCK_DOCS = {"README.md": ("stage-k-total", "stage-k-items"), "LEARN.md": ("stage-k-total", "stage-k-items"), "CHANGELOG.md": ("stage-k-total",), "ROADMAP.md": ("stage-k-total", "stage-k-items"), "docs/known-issues.md": ("stage-k-total",),
+              "docs/releases/v0.10.1.md": ("stage-k-total", "stage-k-items")}
+ITEM_NAME = {"K-8": "K-8 method", "K-8d": "K-8d SA-CCR", "K-8e": "K-8e FRTB backtesting"}
+
+
+def item_label(it, v):
+    if it.startswith("K-"):
+        return ITEM_NAME.get(it, it)
+    return " ".join(f"`{x}`" for x in v["suites"])  # an item outside the K numbering, named by its suite
+
+
+def doc_blocks(doc):
+    k = doc["stages"]["K"]
+    w = k["without_sweeps"]
+    parts, low = [], []
+    for it, v in sorted(k["per_item"].items(), key=lambda kv: (not kv[0].startswith("K-"), kv[0])):
+        mark = "" if v["meets_item_floor"] else ", NOT MET"
+        parts.append(f"{item_label(it, v)} {v['counted_with_rederivation']} of {v['cases']} "
+                     f"({(v['share_with_rederivation'] or 0):.1%}{mark})")
+        if not v["meets_item_floor"]:
+            low.append(item_label(it, v) + ("" if it.startswith("K-") else " (the existing stage F traffic light)"))
+    floor = ("every item meets the 60% per-item rule" if not low else
+             "the 60% per-item rule is NOT MET by " + ", ".join(low) + ", recorded as a miss (`oracle/OUTSIDE_SHARES.md`)")
+    return {"stage-k-total": f"{w['counted_with_rederivation']} of {w['cases']} value cases ({w['share_with_rederivation']:.1%})",
+            "stage-k-items": ", ".join(parts) + "; " + floor}
+
+
+def sync_blocks(blocks, write, problems):
+    """Rewrite (or, with write False, compare) every generated block in the tracked Markdown files."""
+    import subprocess
+    files = subprocess.run(["git", "ls-files", "*.md"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
+    seen = defaultdict(set)
+    for rel in files:
+        p = ROOT / rel
+        if not p.is_file():
+            continue
+        text = p.read_text(encoding="utf-8")
+        if "<!-- generated:stage-k-" not in text:
+            continue
+
+        def sub(m, rel=rel):
+            name = m.group(1)
+            seen[rel].add(name)
+            if name not in blocks:
+                problems.append(f"{rel}: unknown generated block {name}")
+                return m.group(0)
+            if m.group(2) != blocks[name] and not write:
+                problems.append(f"{rel}: generated block {name} differs from a fresh run; run tools/outside_shares.py and commit")
+            return f"<!-- generated:{name} -->{blocks[name]}<!-- /generated -->"
+        new = BLOCK.sub(sub, text)
+        if write and new != text:
+            p.write_text(new, encoding="utf-8", newline="\n")
+    for rel, names in BLOCK_DOCS.items():
+        for name in names:
+            if name not in seen[rel]:
+                problems.append(f"{rel}: has no generated block {name} (stage K shares must be quoted from the generator)")
 
 
 def markdown(doc):
@@ -410,14 +524,25 @@ def markdown(doc):
               "Ruling KR-11: SciPy checks only trig_k `false_alarm_rate`, one of four compared outputs, so no case is "
               "library-checked. A case counts as `independent-rederivation` only if the wave-1 blind lane (DR-H2) checked "
               "every compared output at the golden's tolerance; gap-decided, oracle-only and 6-decimal bound cases do not count. "
-              "Wave 1b also counts a figure printed in the regulator text (CRE99 Examples 1 to 5, MAR99 Table 2) and the "
-              "seven SA-CCR cases the wave-1b blind lane matched (program/STAGE_K_BLIND_W1B.md); SciPy binomial checks on "
-              "btk_k are not counted. Later blind packets, counted the same way: K-5a idr_k-0001..0005 "
-              "(program/STAGE_K_BLIND_K5A.md), the K-8 ladder k8_k (program/STAGE_K_BLIND_K8.md) and eleven btk_k cases "
-              "(program/STAGE_K_BLIND_BTK.md; btk_k-0017 matched and is not counted). The mpmath oracle is our own and never counts.", "",
+              "A figure printed in the regulator text (CRE99 Examples 1 to 5, MAR99 Table 2) does not count on its own "
+              "(ruling KR-250, audit KA-C18): it checks some outputs at print precision, not every compared output at the "
+              "golden's tolerance; those 28 cases count through the blind packet that matched them 28 of 28 (program/STAGE_K_BLIND_PUB.md). "
+              "Counted from wave 1b: the seven SA-CCR cases the wave-1b blind lane matched (program/STAGE_K_BLIND_W1B.md); SciPy binomial checks on "
+              "btk_k are not counted. trig_k lost its wave-1 blind credit when KR-232 redefined false_alarm_rate (the SciPy check does not count); "
+              "the K-4c version 2 packet re-derived its 14 value cases, 14 of 14 MATCH, 13 counted (trig_k-0004: fire gap-decided by KR-13; program/STAGE_K_BLIND_TRIG_V2.md). "
+              "That K-4c credit checks a re-implementation of the stated algorithm (the packet gave the rule, the "
+              "deriver wrote it again and matched): it shows the rule is unambiguous and the arithmetic right, not "
+              "that the rule reads the source correctly (audit KF-7). "
+              "Later blind packets, counted the same way: K-5a version 2, 9 of 11 (program/STAGE_K_BLIND_K5A_V2.md; "
+              "idr_k-0012 and idr_k-0013 mismatched and are not counted), the K-8 ladder k8_k (program/STAGE_K_BLIND_K8.md) and eleven btk_k cases "
+              "(program/STAGE_K_BLIND_BTK.md; btk_k-0017 matched and is not counted) and the KR-253 traffic-light goldens tlk_k-0012 to -0020 "
+              "(program/STAGE_K_BLIND_TLK_V2.md; 9 of 9 matched, 6 counted: the three n = 1 cases tlk_k-0016 to -0018 have the answer in "
+              "the rule text and are not counted; tlk_k-0021 was added later and has no blind re-derivation). The mpmath oracle is our own and never counts.", "",
               "| Item | Suites | Value cases | Blind | Share | 60% per item |", "|---|---|---:|---:|---:|---|"]
         L += [f"| {it} | {', '.join('`' + s + '`' for s in v['suites'])} | {v['cases']} | {v['counted_with_rederivation']} | "
               f"{(v['share_with_rederivation'] or 0):.1%} | {'met' if v['meets_item_floor'] else 'NOT MET'} |" for it, v in ek["per_item"].items()]
+    if ek and ek.get("under_review"):
+        L += ["", under_review_text(ek["under_review"])]
     L += ["", "## Value classes with no free outside reference", "", "| Suite | Reason |", "|---|---|"]
     for e in doc["stages"].values():
         L += [f"| `{k}` | {v} |" for k, v in e["no_outside_reference"].items()]
@@ -431,7 +556,22 @@ def markdown(doc):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--count-printed", action="store_true",
+                    help="print stage K shares as if a printed regulator figure alone counted (withdrawn reading, KR-250); writes nothing")
     a = ap.parse_args(argv)
+    global COUNT_PRINTED
+    if a.count_printed:
+        COUNT_PRINTED = True
+        try:
+            doc = build([])
+        finally:
+            COUNT_PRINTED = False
+        ek = doc["stages"]["K"]
+        w = ek["without_sweeps"]
+        print(f"stage K (printed figure counted, withdrawn reading): {w['counted_with_rederivation']} of {w['cases']} = {w['share_with_rederivation']:.1%}")
+        for it, v in ek["per_item"].items():
+            print(f"  {it}: {v['counted_with_rederivation']} of {v['cases']} = {(v['share_with_rederivation'] or 0):.1%}")
+        return 0
     problems = []
     doc = build(problems)
     js = json.dumps(doc, indent=1, ensure_ascii=False) + "\n"
@@ -444,6 +584,7 @@ def main(argv=None):
     else:
         jp.write_text(js, encoding="utf-8", newline="\n")
         mp.write_text(md, encoding="utf-8", newline="\n")
+    sync_blocks(doc_blocks(doc), not a.check, problems)
     for st, e in doc["stages"].items():
         w = e["without_sweeps"]
         print(f"stage {st}: value {w['counted']} of {w['cases']} = {w['share']:.1%}, old all-case {w['all_cases_share']:.1%}, with sweeps {e['with_sweeps']['share']:.1%}"

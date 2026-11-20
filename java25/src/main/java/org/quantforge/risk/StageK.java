@@ -12,15 +12,18 @@ import org.quantforge.research.StressDrift;
  * bitemporal store query, the sequential par bootstrap and its incremental update, the recalibration trigger, the
  * intraday delta-gamma estimate with a Lagrange bound, and the Richardson guard.
  *
- * <p>Error order HR-66: structural E_INPUT (the {@code check*Shape} methods and {@link #checkLog}, which the CLI calls
- * before the finite rule), then E_DOMAIN (the finite rule first), then value-dependent E_INPUT, then E_LIMIT.
+ * <p>Error order HR-122 (ruling KR-230): E_LIMIT for the input sizes (the command-line gate; here, for library calls,
+ * the first check of each operation), the finite rule, structural E_INPUT, E_DOMAIN, then the stale-cache E_INPUT of
+ * the incremental update.
  */
 public final class StageK {
     private StageK() {}
 
     /** KR-10. */
     public static final String LABEL = "latency-aware analytics on simulated data";
-    public static final int MAX_RECORDS = 1_000_000;
+    /** The generic array cap of limits.md (KR-231 supersedes 1,000,000). */
+    public static final int MAX_RECORDS = 100_000;
+    /** The limits.md row of the quote lists (KR-231). */
     public static final int MAX_QUOTES = 200;
     public static final int MAX_CHANGES = 100_000;
     public static final int MAX_POSITIONS = 100_000;
@@ -46,7 +49,7 @@ public final class StageK {
     /** The answer of a query: {@code FOUND} with the row, or {@code WITHDRAWN} / {@code NONE} with null. */
     public record Answer(String status, BiRecord row) {}
 
-    /** Log checks 2 to 4 (structural E_INPUT), in the spec's order. */
+    /** Log checks 2 to 4 (structural E_INPUT), in the spec's order (after E_LIMIT and the finite rule, KR-230). */
     public static void checkLog(List<BiRecord> records) {
         for (int i = 1; i < records.size(); i++) {
             if (records.get(i).sequence() <= records.get(i - 1).sequence()) {
@@ -70,15 +73,15 @@ public final class StageK {
      * whose valid interval holds V. A deleted winner is WITHDRAWN (it masks older records).
      */
     public static Answer bitemporalQuery(List<BiRecord> records, String seriesId, long knowledgeAsOf, long validAt) {
-        checkLog(records);
+        if (records.size() > MAX_RECORDS) {
+            throw limit("records", MAX_RECORDS);
+        }
         for (BiRecord r : records) {
             if (r.value() instanceof Double d) {
                 Finite.check("value", d);
             }
         }
-        if (records.size() > MAX_RECORDS) {
-            throw limit("records", MAX_RECORDS);
-        }
+        checkLog(records);
         BiRecord best = null;
         for (BiRecord r : records) {
             if (r.seriesId().equals(seriesId) && r.knowledgeTime() <= knowledgeAsOf && r.validFrom() <= validAt
@@ -134,12 +137,12 @@ public final class StageK {
 
     /** {@code curve.bootstrap.par_annual}: discount factors of annual par swaps with accrual 1. */
     public static double[] parAnnual(double[] quotes) {
-        checkQuotesShape(quotes.length);
-        Finite.check("quotes", quotes);
-        checkQuotes(quotes, "quotes");
         if (quotes.length > MAX_QUOTES) {
             throw limit("quotes", MAX_QUOTES);
         }
+        Finite.check("quotes", quotes);
+        checkQuotesShape(quotes.length);
+        checkQuotes(quotes, "quotes");
         return bootstrapFrom(quotes, quotes, 0);
     }
 
@@ -155,13 +158,23 @@ public final class StageK {
 
     /**
      * {@code curve.incremental.update}: copies the pillars before the first changed quote and solves the rest. The
-     * cache must equal the bootstrap of {@code previousQuotes} bit for bit (E_INPUT otherwise).
+     * cache must equal the bootstrap of {@code previousQuotes} bit for bit (E_INPUT otherwise; the last check, KR-230
+     * step 6).
      */
     public static Update incrementalUpdate(double[] previousQuotes, double[] previousDfs, double[] newQuotes) {
-        checkUpdateShape(previousQuotes.length, previousDfs.length, newQuotes.length);
+        if (previousQuotes.length > MAX_QUOTES) {
+            throw limit("previous_quotes", MAX_QUOTES);
+        }
+        if (previousDfs.length > MAX_QUOTES) {
+            throw limit("previous_discount_factors", MAX_QUOTES);
+        }
+        if (newQuotes.length > MAX_QUOTES) {
+            throw limit("new_quotes", MAX_QUOTES);
+        }
         Finite.check("previous_quotes", previousQuotes);
         Finite.check("previous_discount_factors", previousDfs);
         Finite.check("new_quotes", newQuotes);
+        checkUpdateShape(previousQuotes.length, previousDfs.length, newQuotes.length);
         checkQuotes(previousQuotes, "previous_quotes");
         checkQuotes(newQuotes, "new_quotes");
         double[] fresh = bootstrapFrom(previousQuotes, previousQuotes, 0);
@@ -170,9 +183,6 @@ public final class StageK {
                 throw input("previous_discount_factors is not the bootstrap of previous_quotes",
                         "previous_discount_factors");
             }
-        }
-        if (newQuotes.length > MAX_QUOTES) {
-            throw limit("new_quotes", MAX_QUOTES);
         }
         int j = -1;
         for (int i = 0; i < newQuotes.length; i++) {
@@ -195,6 +205,7 @@ public final class StageK {
         }
     }
 
+    /** KR-233: exactly rounded sums, {@code mean = S1 / n}, {@code sigma = sqrt(S2 / (n - 1))}. */
     static double sampleSd(double[] xs) {
         double mean = StressDrift.fsum(xs) / xs.length;
         double[] sq = new double[xs.length];
@@ -204,17 +215,26 @@ public final class StageK {
         return Math.sqrt(StressDrift.fsum(sq) / (xs.length - 1));
     }
 
-    /** Output of the trigger check. */
-    public record Trigger(boolean fire, double sigma, double threshold, double falseAlarmRate) {}
+    /** KR-233: sigma at or below 2^-26 max|c_i| is no noise scale. */
+    public static final double NOISE_FLOOR = 0x1p-26;
+
+    /**
+     * Output of the trigger check: {@code falseAlarmRate} is the rate on noise with sigma estimated from the window
+     * (Student-t, n - 1 degrees of freedom, KR-232); {@code nominalRate} is the known-sigma {@code 2 Phi(-k)}.
+     */
+    public record Trigger(boolean fire, double sigma, double threshold, double falseAlarmRate, double nominalRate) {}
 
     /** {@code calib.trigger.check}: fires iff {@code |x_now - x_ref| > k sigma sqrt(d)}, strictly. */
     public static Trigger triggerCheck(double[] changes, double xRef, double xNow, double daysSince, double k) {
-        checkChangesShape(changes.length);
+        if (changes.length > MAX_CHANGES) {
+            throw limit("changes", MAX_CHANGES);
+        }
         Finite.check("changes", changes);
         Finite.check("x_ref", xRef);
         Finite.check("x_now", xNow);
         Finite.check("days_since", daysSince);
         Finite.check("k", k);
+        checkChangesShape(changes.length);
         if (!(k > 0)) {
             throw domain("k must be above 0", "k");
         }
@@ -222,17 +242,94 @@ public final class StageK {
             throw domain("days_since must be at least 1", "days_since");
         }
         double sigma = sampleSd(changes);
-        if (sigma == 0) {
-            throw domain("the changes have zero standard deviation: no noise scale", "changes");
+        double maxAbs = 0.0;
+        for (double c : changes) {
+            maxAbs = Math.max(maxAbs, Math.abs(c));
         }
-        if (changes.length > MAX_CHANGES) {
-            throw limit("changes", MAX_CHANGES);
+        if (sigma <= NOISE_FLOOR * maxAbs) {
+            throw domain("the changes have no noise scale (sigma at or below 2^-26 max|c|)", "changes");
         }
         double threshold = k * sigma * Math.sqrt(daysSince);
-        // 2 (1 - N(k)) of KR-6, as 2 N(-k): Normal.cdf works on the tail in k itself, so it keeps full
+        // nominal_rate: 2 (1 - N(k)) of KR-6, as 2 N(-k): Normal.cdf works on the tail in k itself, so it keeps full
         // precision far out (a bare erfc(k / sqrt 2) loses 1.2e-13 relative at k = 30, trig_k-0009).
         return new Trigger(Math.abs(xNow - xRef) > threshold, sigma, threshold,
-                2.0 * org.quantforge.core.Normal.cdf(-k));
+                studentTTwoSidedTail(changes.length - 1, k), 2.0 * org.quantforge.core.Normal.cdf(-k));
+    }
+
+    private static final double TWO_OVER_PI = 0.6366197723675814;
+    private static final double T_UP = 0x1p500;
+    private static final double T_DOWN = 0x1p-500;
+
+    private static double tStep(double t, int j, double c2, boolean odd) {
+        if (odd) {
+            return (t * ((double) (2 * j + 2) * c2)) / (double) (2 * j + 3);
+        }
+        return (t * ((double) (2 * j + 1) * c2)) / (double) (2 * j + 2);
+    }
+
+    /**
+     * {@code P(|T_nu| > k)} for an integer {@code nu >= 1} and {@code k > 0}, by the stated algorithm of KR-232 (as
+     * Python {@code stage_k.student_t_two_sided_tail}): the closed-form finite sum of the t distribution where the tail
+     * is at least 1/8, else its remainder series (positive terms, no cancellation). Only + - * /, sqrt and one atan2
+     * (odd nu), so the builds agree to the last bit except through atan2.
+     */
+    public static double studentTTwoSidedTail(int nu, double k) {
+        double rn = Math.sqrt(nu);
+        double s;
+        double c;
+        double c2;
+        if (k <= rn) {
+            double den = nu + k * k;
+            c2 = nu / den;
+            double root = Math.sqrt(den);
+            s = k / root;
+            c = rn / root;
+        } else {
+            double r = rn / k;
+            double w = Math.sqrt(1.0 + r * r);
+            s = 1.0 / w;
+            c = r / w;
+            c2 = c * c;
+        }
+        boolean odd = nu % 2 == 1;
+        int m = odd ? (nu - 1) / 2 : nu / 2;
+        double t = 1.0;
+        double total = 0.0;
+        int e = 0;
+        for (int j = 0; j < m; j++) {
+            if (e == 0) {
+                total += t;
+            }
+            t = tStep(t, j, c2, odd);
+            if (0.0 < t && t < T_DOWN) {
+                t *= T_UP;
+                e++;
+            }
+        }
+        double a = odd ? TWO_OVER_PI * (Math.atan2(c, s) - s * c * total) : 1.0 - s * total;
+        if (a >= 0.125) {
+            return a;
+        }
+        double rem = 0.0;
+        int j = m;
+        while (true) {
+            rem += t;
+            t = tStep(t, j, c2, odd);
+            j++;
+            if (t <= rem * 0x1p-60) {
+                break;
+            }
+            if (t < T_DOWN) {
+                t *= T_UP;
+                rem *= T_UP;
+                e++;
+            }
+        }
+        double out = odd ? TWO_OVER_PI * s * c * rem : s * rem;
+        for (int i = 0; i < e; i++) {
+            out *= T_DOWN;
+        }
+        return out;
     }
 
     // --- intraday delta-gamma with a Lagrange bound (KR-7, KR-10, KR-12) ------------------------------
@@ -246,11 +343,32 @@ public final class StageK {
         }
     }
 
-    /** {@code |h|^3 M3 / 6} with {@code M3 = T^3 |N| exp(-T min(y, y + h))}. */
+    /**
+     * The Lagrange bound {@code |h|^3 M3 / 6} with {@code M3 = T^3 |N| exp(-T min(y, y + h))} (KR-15), in the order of
+     * KR-234.
+     */
     static double positionBound(ZeroPosition p, double shift) {
         double t = p.maturity();
-        double m3 = Math.pow(t, 3) * Math.abs(p.notional()) * Math.exp(-t * Math.min(p.yield(), p.yield() + shift));
-        return Math.pow(Math.abs(shift), 3) * m3 / 6;
+        double ah = Math.abs(shift);
+        double e = Math.exp(-t * Math.min(p.yield(), p.yield() + shift));
+        return ah * ah * ah * (t * t * t * Math.abs(p.notional()) * e) / 6;
+    }
+
+    /** 16 u (KR-234). */
+    static final double ROUNDING_FACTOR = 0x1p-49;
+
+    /**
+     * The rounding allowance {@code rho} of KR-234: covers the binary64 error of the estimate, of the computed Lagrange
+     * bound and of the binary64 revaluation of the position.
+     */
+    static double positionRounding(ZeroPosition p, double shift) {
+        double t = p.maturity();
+        double ah = Math.abs(shift);
+        double v = p.notional() * Math.exp(-p.yield() * t);
+        double g = Math.abs(Math.expm1(-shift * t));
+        double scale = 1 + t * Math.abs(p.yield()) + t * ah;
+        return ROUNDING_FACTOR * scale
+                * (Math.abs(v) * (t * ah + t * t * (shift * shift) + g) + positionBound(p, shift));
     }
 
     /** {@code V' h + V'' h^2 / 2} with {@code V = N exp(-y T)}. */
@@ -264,30 +382,35 @@ public final class StageK {
     public record Intraday(double estimatePnl, double bound, String label) {}
 
     /**
-     * {@code risk.intraday.delta_gamma_bound}: the delta-gamma P&amp;L of a parallel yield move and the sum of the
-     * per-position remainder bounds (no netting: their signs are unknown in general).
+     * {@code risk.intraday.delta_gamma_bound}: the delta-gamma P&amp;L of a parallel yield move and a bound on its
+     * distance from the full revaluation: the per-position Lagrange bounds (no netting: their signs are unknown in
+     * general) plus the binary64 rounding allowance (KR-234), one exactly rounded sum over all 2n terms.
      */
     public static Intraday deltaGammaBound(List<ZeroPosition> positions, double shift) {
-        checkPositionsShape(positions.size());
+        if (positions.size() > MAX_POSITIONS) {
+            throw limit("positions", MAX_POSITIONS);
+        }
         for (ZeroPosition p : positions) {
             Finite.check("notional", p.notional());
             Finite.check("maturity", p.maturity());
             Finite.check("yield", p.yield());
         }
         Finite.check("shift", shift);
+        checkPositionsShape(positions.size());
         for (ZeroPosition p : positions) {
             if (!(p.maturity() > 0)) {
                 throw domain("every maturity must be above 0", "positions.maturity");
             }
         }
-        if (positions.size() > MAX_POSITIONS) {
-            throw limit("positions", MAX_POSITIONS);
-        }
-        double[] est = new double[positions.size()];
-        double[] bound = new double[positions.size()];
-        for (int i = 0; i < est.length; i++) {
+        int n = positions.size();
+        double[] est = new double[n];
+        double[] bound = new double[2 * n];
+        for (int i = 0; i < n; i++) {
             est[i] = positionEstimate(positions.get(i), shift);
             bound[i] = positionBound(positions.get(i), shift);
+        }
+        for (int i = 0; i < n; i++) {
+            bound[n + i] = positionRounding(positions.get(i), shift);
         }
         return new Intraday(StressDrift.fsum(est), StressDrift.fsum(bound), LABEL);
     }
@@ -326,10 +449,10 @@ public final class StageK {
      * within 0.5 of the assumed order.
      */
     public static Richardson richardsonCheck(double[] values, double ratio, double assumedOrder) {
-        checkValuesShape(values.length);
         Finite.check("values", values);
         Finite.check("ratio", ratio);
         Finite.check("assumed_order", assumedOrder);
+        checkValuesShape(values.length);
         if (!(ratio > 1)) {
             throw domain("ratio must be above 1", "ratio");
         }

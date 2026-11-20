@@ -557,28 +557,31 @@ def _check_surface_grid(raw: Raw, grid: str) -> None:
             raise _over(key, limit)
 
 
-# Stage K wave 1 verbs check their own sizes in the core, after E_DOMAIN (HR-66: E_LIMIT last), with
-# the spec sizes (records 1,000,000; quotes 200; changes and positions 100,000).
-STAGE_K_OPS = frozenset(
+# Stage K wave 1 (ruling KR-231): the quote lists are capped at 200 by their own limits.md row; `records`,
+# `changes` and `positions` take the generic 100,000. They are checked here, at step (2) of the HR-122 order
+# (KR-230), like every other size limit. The generic 100-quote rule does not apply to these verbs.
+STAGE_F_ARRAYS["curve.bootstrap.par_annual"] = {"quotes": 200}
+STAGE_F_ARRAYS["curve.incremental.update"] = {
+    "previous_quotes": 200,
+    "previous_discount_factors": 200,
+    "new_quotes": 200,
+}
+NO_CURVE_RULE = frozenset(
     (
-        "core.store.bitemporal_query",
+        "book.marks.resolve",  # its quotes are marks, not curve quotes
+        "core.store.bitemporal_query",  # `value` is any JSON; its keys are not curve inputs
         "curve.bootstrap.par_annual",
         "curve.incremental.update",
-        "calib.trigger.check",
-        "risk.intraday.delta_gamma_bound",
-        "num.richardson.check",
     )
 )
 
 
 def check_limits(operation: str, raw: Raw) -> None:
-    if operation in STAGE_K_OPS:
-        return
     stage_f = STAGE_F_ARRAYS.get(operation)
     _check_arrays(raw, stage_f)
     if stage_f is not None:
         _check_stage_f(raw, stage_f)
-    if operation != "book.marks.resolve":  # its quotes are marks, not curve quotes
+    if operation not in NO_CURVE_RULE:
         _check_curve_sizes(raw)
     grid = SURFACE_GRIDS.get(operation)
     if grid is not None:

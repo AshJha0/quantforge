@@ -1,5 +1,5 @@
 //! Deterministic xVA layer on given paths (`06-risk/xva-framework.md`, rulings G-40 to G-44):
-//! collateralised exposure, valuation adjustments, SIMM-style IR delta margin, Hull-White
+//! collateralised exposure, valuation adjustments, sensitivity-based IR delta margin, Hull-White
 //! wrong-way risk.
 use crate::error::{Result, fail};
 
@@ -280,8 +280,9 @@ pub fn adjustments(x: &AdjInputs) -> Result<Adjustments> {
     Ok(o)
 }
 
-/// `xva.simm.ir_delta` (G-43): `(weighted sensitivities, concentration factor, margin)`.
-pub fn simm_ir_delta(
+/// `xva.sbim.ir_delta` (G-43; deprecated alias `xva.simm.ir_delta`, KR-152):
+/// `(weighted sensitivities, concentration factor, margin)`.
+pub fn sbim_ir_delta(
     s: &[f64],
     rw: &[f64],
     rho: &[Vec<f64>],
@@ -510,10 +511,11 @@ mod tests {
     }
 
     #[test]
-    fn simm_single_factor() {
-        let (ws, cr, m) = simm_ir_delta(&[10_000.0], &[90.0], &[vec![1.0]], 1e9).unwrap();
-        assert_eq!((ws[0], cr), (900_000.0, 1.0));
-        assert!((m - 900_000.0).abs() < 1e-9);
+    fn sbim_single_factor() {
+        // Weight 30: the 2Y entry of specifications/tables/stage_k/sbim-ir-delta-g.json (RW = 10 x 3, KR-150).
+        let (ws, cr, m) = sbim_ir_delta(&[10_000.0], &[30.0], &[vec![1.0]], 1e9).unwrap();
+        assert_eq!((ws[0], cr), (300_000.0, 1.0));
+        assert!((m - 300_000.0).abs() < 1e-9);
     }
 }
 

@@ -1,6 +1,6 @@
 # Stage K: blind re-derivation (DR-H2) of the seven K-8 value cases
 
-Written 2026-11-19 by the packet builder (Claude Opus 5.5, branch `k-k8-ports`). The packet builder is not the blind lane and ran no derivation. Process: `program/STAGE_H_BLIND_LANE.md` (DR-H2); pattern of `STAGE_K_BLIND_W2.md` (branch `k-w2-spec`) and `STAGE_K_BLIND_K5A.md` (branch `k-w1-fu`). Scope: k8_k-0001..0007, the value cases of `datasets/golden/stage_k/k8_k.json` (`rates.shortrate.bermudan_ladder` and `rates.shortrate.bermudan_swaption` with `method` `CN_RANNACHER_SMOOTHED`, spec `06-risk/bermudan-ladder-k8.md`). Status: **packet built, blind lane not yet run.**
+Written 2026-11-19 by the packet builder (Claude Opus 5.5, branch `k-k8-ports`). The packet builder is not the blind lane and ran no derivation. Process: `program/STAGE_H_BLIND_LANE.md` (DR-H2); pattern of `STAGE_K_BLIND_W2.md` (branch `k-w2-spec`) and `STAGE_K_BLIND_K5A.md` (branch `k-w1-fu`). Scope: k8_k-0001..0007, the value cases of `datasets/golden/stage_k/k8_k.json` (`rates.shortrate.bermudan_ladder` and `rates.shortrate.bermudan_swaption` with `method` `CN_RANNACHER_SMOOTHED`, spec `06-risk/bermudan-ladder-k8.md`). Status: **blind lane run 2026-11-19: 7 of 7 MATCH, counted** (second Results section below; header corrected 2026-11-19, audit finding KA-B12).
 
 ## Plain idea
 
@@ -15,7 +15,7 @@ The seven K-8 goldens are the Python build's own output; the other three builds 
 - KR-11 and acceptance 1 ("QuantLib is the counted outside check", owner decision K-QA) say QuantLib is the outside check for K-8, but they do not override D6's every-output rule, and `load_stage_k` in `outside_shares.py` has no library path at all (stage K counts only DR-H2 blind matches). Treating three partly-checked cases as library-checked would stretch D6, so it was not done.
 - What the coordinator could decide instead (not done here): fix, in a commit and before any run, a per-output tolerance for the price and an absolute floor for the near-zero rows, then run a per-case QuantLib check as stage G did. That is a new acceptance test and needs a ruling.
 
-Share unchanged: stage K 57.1%, K-8 0 of 7 on this branch. (Stage K reaches 25 of 35, 71.4%, once the K-5a blind result of branch `k-w1-fu` is integrated; K-8 stays at 0 of 7 until this blind lane runs.)
+Share unchanged: stage K 57.1%, K-8 0 of 7 on this branch. (Stage K reaches 25 of 35, 71.4%, once the K-5a blind result of branch `k-w1-fu` is integrated; K-8 stays at 0 of 7 until this blind lane runs.) Later the same day the lane ran: K-8 is 7 of 7 (Results below).
 
 ## What was built (evidence class: measured, 2026-11-19, local laptop, not the acceptance machine)
 
@@ -82,7 +82,7 @@ A MISMATCH can mean either a defect in the deriver's code or a choice the spec s
 
 ## Results
 
-Not run. (Date, deriver and model, manifest check, frozen hash and commit, gaps and rulings, compare run and output path, per-case table of MATCH / MISMATCH / MISSING and counted, resolution of each mismatch: to be filled by the coordinator.)
+Superseded: this was the empty form before the run; the filled record is the next section. (Date, deriver and model, manifest check, frozen hash and commit, gaps and rulings, compare run and output path, per-case table of MATCH / MISMATCH / MISSING and counted, resolution of each mismatch: to be filled by the coordinator.)
 
 ## Results (2026-11-19; first and only compare run)
 

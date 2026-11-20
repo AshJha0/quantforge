@@ -356,6 +356,34 @@ TEST_CASE("K-8d: rules and edges", "[k_w1b]") {
     CHECK_FALSE(unm.trades[0].supervisory_duration.has_value());
 }
 
+TEST_CASE("KR-236: equity volatility trades form one hedging set; commodity by category; no label needed",
+          "[k_w1b]") {
+    // Two equity variance swaps, long and short, labelled V1 and V2: CRE52.47 puts them in one set. SF = 1.6,
+    // a = +-160, rho = 0.5: sqrt(0 + 0.75 (160^2 + 160^2)) = sqrt(38,400); two label sets would give 320.
+    saccr::Trade v1 = k_named("v1", "EQUITY", 100, 0, 1, "LONG", "X", "SINGLE");
+    v1.treatment = "VOLATILITY";
+    v1.hedging_set = "V1";
+    saccr::Trade v2 = k_named("v2", "EQUITY", 100, 0, 1, "SHORT", "Y", "SINGLE");
+    v2.treatment = "VOLATILITY";
+    v2.hedging_set = "V2";
+    const saccr::Result r = k_plain_ead({v1, v2});
+    CHECK(std::fabs(r.addon[3] / std::sqrt(38400.0) - 1.0) <= 1e-15);
+    REQUIRE(r.hedging_sets.size() == 1);
+    CHECK(r.hedging_sets[0].treatment == "VOLATILITY");
+    CHECK(r.hedging_sets[0].key == "");
+    // hedging_set is needed only for IR, FX and BASIS trades: a volatility trade without a label is accepted.
+    v1.hedging_set.reset();
+    v2.hedging_set.reset();
+    CHECK(std::fabs(k_plain_ead({v1, v2}).addon[3] - r.addon[3]) == 0.0);
+    // The one-entity-two-subclasses check uses the same key: entity X in two volatility labels is one set.
+    saccr::Trade v3 = k_named("v3", "EQUITY", 100, 0, 1, "LONG", "X", "INDEX");
+    v3.treatment = "VOLATILITY";
+    v3.hedging_set = "OTHER";
+    std::string field;
+    CHECK(k_code_of([&] { (void)k_plain_ead({v1, v3}); }, &field) == "E_INPUT");
+    CHECK(field == "subclass");
+}
+
 TEST_CASE("K-8d: errors, structure before domain (HR-122)", "[k_w1b]") {
     const auto expect = [](const std::string& code, const std::string& field, std::vector<saccr::Trade> t,
                            std::optional<saccr::Margin> m = std::nullopt, double collateral = 0.0) {
@@ -503,6 +531,15 @@ TEST_CASE("K-8e: MAR99 Table 2, zone boundaries, desk and counting", "[k_w1b]") 
     }
     CHECK_FALSE(frtb_backtest::zone(260, 6, 6).multiplier.has_value());
     CHECK(frtb_backtest::zone(1, 0, 0).zone == "AMBER");  // KR-42
+    // KR-237: the one binomial algorithm (only + - * /) gives the Python build's bits; at n = 100,000 the old
+    // lgamma form was 1.3e-10 off (KA-A16). Values from python/quantforge_core/frtb_backtest.py (measured).
+    CHECK(frtb_backtest::binomial_cdf(100000, 1050, 0.01) == 0.9448722135510401);
+    CHECK(frtb_backtest::binomial_cdf(1000000, 10200, 0.01) == 0.9777910867630771);
+    const auto large = frtb_backtest::zone(1000000, 10100, 0);
+    CHECK(large.cumulative_probability == 0.8437605031450767);
+    CHECK(large.amber_from == 10164);
+    CHECK(large.red_from == 10372);
+    CHECK(large.zone == "GREEN");
     CHECK(frtb_backtest::binomial_cdf(10, -1, 0.01) == 0.0);
     CHECK(frtb_backtest::binomial_cdf(10, 10, 0.01) == 1.0);
     CHECK(frtb_backtest::first_at_least(1, 0.5, 0.9999) == 1);

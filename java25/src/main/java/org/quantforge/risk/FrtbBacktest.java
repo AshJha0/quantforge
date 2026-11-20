@@ -53,37 +53,84 @@ public final class FrtbBacktest {
     public record Count(long observations, long exceptionsActual, long exceptionsHypothetical, long exceptions,
             List<Long> daysActual, List<Long> daysHypothetical) {}
 
-    /** Neumaier-compensated running sum of binomial terms, in log space with a running log binomial coefficient. */
-    private static final class Terms {
-        private final long n;
-        private final double lnp;
-        private final double lnq;
-        private double lnChoose;
-        private double sum;
-        private double comp;
-        private long k = -1;
+    /** KR-237: the binary64 literal nearest 1/100 (not 1 - COVERAGE, which is 0.010000000000000009). */
+    static final double P_99 = 0.01;
+    static final double P_975 = 0.025;
+    private static final double UP = 0x1p600;
+    private static final double DOWN = 0x1p-600;
 
-        Terms(long n, double p) {
-            this.n = n;
-            this.lnp = Math.log(p);
-            this.lnq = Math.log1p(-p);
-        }
+    /** Compensated partial sums with their scale counts (KR-237), as Python {@code binomial_partial_sums}. */
+    record PartialSums(double[] sums, int[] scales, int size) {}
 
-        /** Adds the next term and returns the compensated partial sum P(X &lt;= k). */
-        double next() {
-            k++;
-            if (k > 0) {
-                lnChoose += Math.log((double) (n - k + 1)) - Math.log((double) k);
+    /**
+     * KR-237: compensated partial sums of the unnormalised weights {@code w_0 = 1},
+     * {@code w_(k+1) = w_k ((n - k) p) / ((k + 1) q)}, each with its scale count (a weight above 2^600 rescales the
+     * weight and the sum by 2^-600). Stops at n, or past the mode once the ratio is at most 1/2 and the weight at most
+     * 2^-64 of the sum. Only + - * /, so every build gives the same bits.
+     */
+    static PartialSums binomialPartialSums(long n, double p) {
+        return binomialPartialSums(n, p, 1.0 - p);
+    }
+
+    /** KR-237 sums with the non-exception probability q given (KR-253: the traffic light passes q = c). */
+    static PartialSums binomialPartialSums(long n, double p, double q) {
+        double mode = Math.floor((double) (n + 1) * p);
+        double w = 1.0;
+        double s = 0.0;
+        double c = 0.0;
+        int e = 0;
+        double[] sums = new double[16];
+        int[] scales = new int[16];
+        int size = 0;
+        long k = 0;
+        while (true) {
+            double t = s + w;
+            c += Math.abs(s) >= Math.abs(w) ? (s - t) + w : (w - t) + s;
+            s = t;
+            if (size == sums.length) {
+                sums = java.util.Arrays.copyOf(sums, 2 * size);
+                scales = java.util.Arrays.copyOf(scales, 2 * size);
             }
-            double term = Math.exp(lnChoose + k * lnp + (n - k) * lnq);
-            double t = sum + term;
-            comp += Math.abs(sum) >= Math.abs(term) ? (sum - t) + term : (term - t) + sum;
-            sum = t;
-            return sum + comp;
+            sums[size] = s + c;
+            scales[size] = e;
+            size++;
+            if (k == n) {
+                return new PartialSums(sums, scales, size);
+            }
+            double r = ((double) (n - k) * p) / ((double) (k + 1) * q);
+            w = w * r;
+            k++;
+            if (k > mode && r <= 0.5 && w <= (s + c) * 0x1p-64) {
+                return new PartialSums(sums, scales, size);
+            }
+            if (w > UP) {
+                w *= DOWN;
+                s *= DOWN;
+                c *= DOWN;
+                e++;
+            }
         }
     }
 
-    /** P(X &lt;= x) for X ~ Binomial(n, p), 0 &lt; p &lt; 1. */
+    static double cdfFrom(PartialSums ps, long n, long x) {
+        if (x < 0) {
+            return 0.0;
+        }
+        if (x >= n || x >= ps.size() - 1) {
+            return 1.0;
+        }
+        double sx = ps.sums()[(int) x];
+        int ex = ps.scales()[(int) x];
+        double st = ps.sums()[ps.size() - 1];
+        int et = ps.scales()[ps.size() - 1];
+        double v = sx / st;
+        for (int i = 0; i < et - ex; i++) {
+            v *= DOWN;
+        }
+        return Math.min(v, 1.0);
+    }
+
+    /** P(X &lt;= x) for X ~ Binomial(n, p), 0 &lt; p &lt; 1 (KR-237). */
     public static double binomialCdf(long n, long x, double p) {
         if (x < 0) {
             return 0.0;
@@ -91,19 +138,63 @@ public final class FrtbBacktest {
         if (x >= n) {
             return 1.0;
         }
-        Terms t = new Terms(n, p);
-        double s = 0.0;
-        for (long k = 0; k <= x; k++) {
-            s = t.next();
-        }
-        return Math.min(s, 1.0);
+        return cdfFrom(binomialPartialSums(n, p), n, x);
     }
 
-    /** The smallest k in 0..n with P(X &lt;= k) &gt;= level. */
-    static long firstAtLeast(long n, double p, double level) {
-        Terms t = new Terms(n, p);
+    /** Dekker's exact product a * b = hi + lo (Veltkamp split by 2^27 + 1); only + - *. */
+    private static double[] twoProd(double a, double b) {
+        double p = a * b;
+        double t = 134217729.0 * a;
+        double ah = t - (t - a);
+        double al = a - ah;
+        t = 134217729.0 * b;
+        double bh = t - (t - b);
+        double bl = b - bh;
+        return new double[] {p, ((ah * bh - p) + ah * bl + al * bh) + al * bl};
+    }
+
+    private static double[] ddMul(double[] x, double[] y) {
+        double[] pe = twoProd(x[0], y[0]);
+        double e = pe[1] + (x[0] * y[1] + x[1] * y[0]);
+        double s = pe[0] + e;
+        return new double[] {s, e - (s - pe[0])};
+    }
+
+    /** KR-253: q^n by right-to-left binary powering in double-double; q^1 is q exactly. */
+    static double power(double q, long n) {
+        double[] r = {1.0, 0.0};
+        double[] b = {q, 0.0};
+        long m = n;
+        while (m != 0) {
+            if ((m & 1L) != 0) {
+                r = ddMul(r, b);
+            }
+            m >>= 1;
+            if (m != 0) {
+                b = ddMul(b, b);
+            }
+        }
+        return r[0] + r[1];
+    }
+
+    /**
+     * KR-253: P(X <= x), X ~ Binomial(n, 1 - c), with q = c taken exactly: x = 0 is c^n, otherwise the KR-237
+     * sums with q = c.
+     */
+    public static double trafficLightCdf(long n, long x, double c) {
+        if (x == 0) {
+            return power(c, n);
+        }
+        if (x >= n) {
+            return 1.0;
+        }
+        return cdfFrom(binomialPartialSums(n, 1.0 - c, c), n, x);
+    }
+
+    /** The smallest k in 0..n with P(X &lt;= k) &gt;= level (exists: P(X &lt;= n) = 1). */
+    static long firstAtLeast(PartialSums ps, long n, double level) {
         for (long k = 0; k < n; k++) {
-            if (t.next() >= level) {
+            if (cdfFrom(ps, n, k) >= level) {
                 return k;
             }
         }
@@ -132,10 +223,10 @@ public final class FrtbBacktest {
         count(observations, exceptionsActual, "exceptions_actual");
         count(observations, exceptionsHypothetical, "exceptions_hypothetical");
         long x = Math.max(exceptionsActual, exceptionsHypothetical);
-        double p = 1.0 - FrtbBacktestTables.COVERAGE;
-        double cumulative = binomialCdf(observations, x, p);
-        long amber = firstAtLeast(observations, p, FrtbBacktestTables.AMBER_FROM);
-        long red = firstAtLeast(observations, p, FrtbBacktestTables.RED_FROM);
+        PartialSums sums = binomialPartialSums(observations, P_99);
+        double cumulative = cdfFrom(sums, observations, x);
+        long amber = firstAtLeast(sums, observations, FrtbBacktestTables.AMBER_FROM);
+        long red = firstAtLeast(sums, observations, FrtbBacktestTables.RED_FROM);
         String z = x >= red ? "RED" : x >= amber ? "AMBER" : "GREEN";
         Double multiplier = null;
         if (observations == FrtbBacktestTables.TABLE_OBSERVATIONS) {
@@ -157,7 +248,8 @@ public final class FrtbBacktest {
         long x975 = Math.max(e975Actual, e975Hypothetical);
         boolean b99 = x99 > FrtbBacktestTables.DESK_LIMIT_99;
         boolean b975 = x975 > FrtbBacktestTables.DESK_LIMIT_975;
-        return new Desk(x99, x975, binomialCdf(observations, x99, 0.01), binomialCdf(observations, x975, 0.025), b99,
+        return new Desk(x99, x975, binomialCdf(observations, x99, P_99),
+                binomialCdf(observations, x975, P_975), b99,
                 b975, !(b99 || b975));
     }
 

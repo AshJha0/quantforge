@@ -5,15 +5,28 @@ every golden suite except the e1_* files themselves and stage_g (stage F operati
 gets NaN, +inf and -inf cases expecting E_DOMAIN, and one negative-zero case: a copy of the base expected
 result when the base leaf is exactly zero, else a pair (+0.0 anchor expecting "any", -0.0 expecting
 "same_as" the anchor). Files are split by operation domain and kept under 1 MB (plan item E11).
+
+Two modes, and they are not alike:
+- `G` (stage G, ruling G-45): writes every `stage_g_e1/e1g_*.json` and `oracle/E1G_SUMMARY.json` in full. The
+  committed files must be this mode's exact output; `python oracle/python/gen_stage_f_e1.py G --check` fails on
+  any byte difference (repo-gates). Run from oracle/python.
+- no argument (stage F): the committed `stage_f/e1_*` files are a PATCHWORK by design. Later stages took
+  selected lines from reruns and left the rest (program/R6_HANDOVER.md, wave 3B; a full rerun on 2026-11-20 adds
+  115 operations and changes 19, program/STAGE_K_R2_INTEGRATION.md step 9). Do not rerun this mode over the
+  committed files, and it has no --check: later E1 coverage lives in per-stage suites (e.g. r6/e1_r6), checked
+  by tools/check_e1_coverage.py.
 """
 import json
 from pathlib import Path
 
-from qf_oracle.common import ROOT
+ROOT = Path(__file__).resolve().parents[2]  # same root as qf_oracle.common.ROOT; no mpmath, so repo-gates needs no packages
 
 GOLD = ROOT / "datasets" / "golden"
 import sys
-STAGE_G = "G" in sys.argv[1:]  # ruling G-45: E1 for the stage G operations, written to stage_g_e1/ as e1g_* suites
+STAGE_G = "G" in sys.argv[1:]
+CHECK = "--check" in sys.argv[1:]
+if CHECK and not STAGE_G:
+    sys.exit("--check is for stage G mode only: the stage F e1_* files are a patchwork by design (see docstring)")  # ruling G-45: E1 for the stage G operations, written to stage_g_e1/ as e1g_* suites
 OUT = GOLD / ("stage_g_e1" if STAGE_G else "stage_f")
 PREFIX = "e1g_" if STAGE_G else "e1_"
 SPEC = "specifications/stage-f-rulings.md"
@@ -140,9 +153,7 @@ def main():
                               "expected": {"status": "same_as", "case_id": None}, **judged_fields(b, peer=True),
                               "verified_by": ["rule-F-3"],
                               "tags": ["e1", "negative_zero", f"base:{b['case_id']}", f"input:{where}"]})
-    OUT.mkdir(parents=True, exist_ok=True)
-    for old in OUT.glob(f"{PREFIX}*.json"):
-        old.unlink()
+    files = {}  # path -> text, written (or compared) at the end
     total = 0
     written = []
     for dom, cases in sorted(by_domain.items()):
@@ -174,12 +185,26 @@ def main():
                    "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)", "cases": ordered}
             text = json.dumps(doc, indent=1, ensure_ascii=True) + "\n"
             assert len(text.encode()) < 1_000_000, suite
-            (OUT / f"{suite}.json").write_text(text, encoding="utf-8", newline="\n")
+            files[OUT / f"{suite}.json"] = text
             total += len(chunk)
             written.append((suite, len(chunk)))
     stats["cases"] = total
     stats["files"] = written
-    (ROOT / "oracle" / ("E1G_SUMMARY.json" if STAGE_G else "E1_SUMMARY.json")).write_text(json.dumps(stats, indent=1) + "\n", encoding="utf-8", newline="\n")
+    files[ROOT / "oracle" / ("E1G_SUMMARY.json" if STAGE_G else "E1_SUMMARY.json")] = json.dumps(stats, indent=1) + "\n"
+    if CHECK:
+        bad = sorted(str(p.relative_to(ROOT)) for p, t in files.items()
+                     if not p.exists() or p.read_bytes() != t.encode("utf-8"))
+        bad += sorted(str(p.relative_to(ROOT)) + " (not generated)" for p in OUT.glob(f"{PREFIX}*.json") if p not in files)
+        if bad:
+            sys.exit("stage G E1 files differ from `gen_stage_f_e1.py G` output; rerun it from oracle/python:\n  "
+                     + "\n  ".join(bad))
+        print(f"stage G E1 check: {len(files)} files match the generator byte for byte")
+        return
+    OUT.mkdir(parents=True, exist_ok=True)
+    for old in OUT.glob(f"{PREFIX}*.json"):
+        old.unlink()
+    for p, t in files.items():
+        p.write_text(t, encoding="utf-8", newline="\n")
     print(f"E1: {stats['operations']} operations, {stats['leaves']} real leaves, {total} cases in {len(written)} files; "
           f"{len(stats['no_real_input'])} operations with no real input")
 

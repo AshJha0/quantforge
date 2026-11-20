@@ -292,12 +292,12 @@ pub fn structure(trades: &[Trade]) -> Result<()> {
             need(t, t.start.as_ref(), "start", "for IR and CREDIT trades")?;
             need(t, t.end.as_ref(), "end", "for IR and CREDIT trades")?;
         }
-        if matches!(c, "IR" | "FX") || t.treatment != "NORMAL" {
+        if matches!(c, "IR" | "FX") || t.treatment == "BASIS" {
             need(
                 t,
                 t.hedging_set.as_ref(),
                 "hedging_set",
-                "for IR, FX, basis and volatility trades",
+                "for IR, FX and basis trades",
             )?;
         }
         if named_class(c) {
@@ -363,7 +363,7 @@ pub fn structure(trades: &[Trade]) -> Result<()> {
             need(t, t.detachment.as_ref(), "detachment", "for CDO trades")?;
         }
     }
-    let mut entity_sub: HashMap<(&str, &str, &str, &str), &str> = HashMap::new();
+    let mut entity_sub: HashMap<(&str, &str, String, &str), &str> = HashMap::new();
     for t in trades {
         let (Some(entity), Some(sub)) = (t.entity.as_deref(), t.subclass.as_deref()) else {
             continue;
@@ -371,7 +371,7 @@ pub fn structure(trades: &[Trade]) -> Result<()> {
         let key = (
             t.asset_class.as_str(),
             t.treatment.as_str(),
-            t.hedging_set.as_deref().unwrap_or(""),
+            group_key(t),
             entity,
         );
         if *entity_sub.entry(key).or_insert(sub) != sub {
@@ -567,15 +567,18 @@ struct Netting {
     eff: Vec<f64>,
 }
 
+/// The hedging-set key within (class, treatment). CRE52.45 for NORMAL trades and, by CRE52.47, for
+/// VOLATILITY trades (ruling KR-236): IR the currency and FX the pair (`hedging_set`), credit and
+/// equity one set, commodity the category of the subclass. BASIS trades: the caller's label
+/// (CRE52.46, KR-34).
 fn group_key(t: &Trade) -> String {
-    let normal = t.treatment == "NORMAL";
-    if t.asset_class == "COMMODITY" && normal {
+    if t.treatment == "BASIS" || matches!(t.asset_class.as_str(), "IR" | "FX") {
+        return t.hedging_set.clone().unwrap_or_default();
+    }
+    if t.asset_class == "COMMODITY" {
         return row_of(t).hedging_set.clone().unwrap_or_default();
     }
-    if matches!(t.asset_class.as_str(), "CREDIT" | "EQUITY") && normal {
-        return String::new();
-    }
-    t.hedging_set.clone().unwrap_or_default()
+    String::new()
 }
 
 fn ir_addon(

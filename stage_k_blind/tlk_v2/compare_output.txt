@@ -1,0 +1,37 @@
+﻿tlk_k-0012 cumulative_probability expected=0.9448722135510369 got=0.9448722135510369 ok
+tlk_k-0012 zone expected='GREEN' got='GREEN' ok
+tlk_k-0012 plus_factor expected=None got=None ok
+tlk_k-0012 MATCH counted=True
+tlk_k-0013 cumulative_probability expected=0.9786033201901807 got=0.9786033201901807 ok
+tlk_k-0013 zone expected='YELLOW' got='YELLOW' ok
+tlk_k-0013 plus_factor expected=None got=None ok
+tlk_k-0013 MATCH counted=True
+tlk_k-0014 cumulative_probability expected=0.9505763522838253 got=0.9505763522838253 ok
+tlk_k-0014 zone expected='YELLOW' got='YELLOW' ok
+tlk_k-0014 plus_factor expected=None got=None ok
+tlk_k-0014 MATCH counted=True
+tlk_k-0015 cumulative_probability expected=0.022212510364731913 got=0.022212510364731913 ok
+tlk_k-0015 zone expected='GREEN' got='GREEN' ok
+tlk_k-0015 plus_factor expected=None got=None ok
+tlk_k-0015 MATCH counted=True
+tlk_k-0016 cumulative_probability expected=0.95 got=0.95 ok
+tlk_k-0016 zone expected='YELLOW' got='YELLOW' ok
+tlk_k-0016 plus_factor expected=None got=None ok
+tlk_k-0016 MATCH (R_NOCREDIT) counted=False
+tlk_k-0017 cumulative_probability expected=0.99 got=0.99 ok
+tlk_k-0017 zone expected='YELLOW' got='YELLOW' ok
+tlk_k-0017 plus_factor expected=None got=None ok
+tlk_k-0017 MATCH (R_NOCREDIT) counted=False
+tlk_k-0018 cumulative_probability expected=0.9999 got=0.9999 ok
+tlk_k-0018 zone expected='RED' got='RED' ok
+tlk_k-0018 plus_factor expected=None got=None ok
+tlk_k-0018 MATCH (R_NOCREDIT) counted=False
+tlk_k-0019 cumulative_probability expected=0.9588168159301514 got=0.9588168159301514 ok
+tlk_k-0019 zone expected='YELLOW' got='YELLOW' ok
+tlk_k-0019 plus_factor expected=0.4 got=0.4 ok
+tlk_k-0019 MATCH counted=True
+tlk_k-0020 cumulative_probability expected=0.08105851616218128 got=0.08105851616218128 ok
+tlk_k-0020 zone expected='GREEN' got='GREEN' ok
+tlk_k-0020 plus_factor expected=0.0 got=0 ok
+tlk_k-0020 MATCH counted=True
+TOTAL cases=9 counted=6 eligible=6

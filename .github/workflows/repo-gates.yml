@@ -41,6 +41,14 @@ jobs:
         run: python3 tools/build_references.py --check && python3 tools/test_build_references.py
       - name: E1 error-case coverage, every operation with a Real input has an E1 golden (J0B)
         run: python3 tools/check_e1_coverage.py
+      - name: stage G E1 goldens and cpp26 cli_cases.inc are their generators' output (KR step 9)
+        run: python3 oracle/python/gen_stage_f_e1.py G --check && python3 cpp26/tests/gen_cli_cases.py --check
+      - name: sbim placeholder table is the generator's output (K-8h, KR-130)
+        run: python3 tools/test_sbim_placeholder.py
+      - name: stage K share figures in docs match oracle/OUTSIDE_SHARES.json (KF-3, KF-13, KF-18)
+        run: python3 tools/check_share_figures.py --self-test && python3 tools/check_share_figures.py
+      - name: generated status ladder page is current (KF-18)
+        run: python3 tools/validation/status_ladder.py --check
       - run: python3 tools/quality_gate.py --check-register --check-specs --check-docs
       - name: ignores (G9)
         run: |

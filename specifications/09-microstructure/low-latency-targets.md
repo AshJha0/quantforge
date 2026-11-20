@@ -82,7 +82,7 @@ Run on the laptop under WSL (not the acceptance machine), on the recorded window
 
 The figures are the median of 5 runs, pooled over message kinds, as the headline rule requires (corrected 2026-11-19, audit HA-28: this table first showed run 1 of 5; the medians were already in `benchmarks/results/h9/README.md`, and the verdict is the same). C++ and Rust: WSL 2, pinned with `taskset -c 2`; Java: native Windows, not pinned. Clock p50 21 ns in WSL; Java `nanoTime` steps 100 ns on this machine.
 
-Context only, not a reason to pass: a form B update applies about 58 level changes on average (one per changed level in a one-second snapshot difference), at roughly 40 ns per level, so a per-update cost of a few microseconds is what the per-level speed implies. The targets were written for one or a few levels per update (HR-19, "How the numbers were chosen" item 1). Owner decision 2026-11-19: the per-update targets stay the acceptance test and the miss stays recorded. The per-level figure (about 40 ns) is descriptive only and has no target. A per-level target, if one is wanted, is committed before a fresh recorded window is measured (v0.10.1 or later); the window already seen is never judged against it.
+Context only, not a reason to pass: a form B update applies about 58 level changes on average (one per changed level in a one-second snapshot difference), at roughly 40 ns per level, so a per-update cost of a few microseconds is what the per-level speed implies. The targets were written for one or a few levels per update (HR-19, "How the numbers were chosen" item 1). Owner decision 2026-11-19: the per-update targets stay the acceptance test and the miss stays recorded. The per-level figure (about 40 ns) is descriptive only and has no target. A per-level target, if one is wanted, is committed before a fresh recorded window is measured (after v0.10.0); the window already seen is never judged against it.
 
 ## Workload R2 and the per-level rows (added 2026-11-19, before any R2 timing; rulings HR-130, HR-131)
 
@@ -98,9 +98,13 @@ The R figures of table (a) apply to R2 without change, because "How the numbers 
 | L2-R2 | Rust | R2 | <= 100 ns | <= 500 ns | <= 2 us |
 | L3-R2 | Java | R2 | <= 200 ns | <= 1 us | <= 5 us |
 
+*Amended 2026-11-19 (table kept as first fixed):* the R2 window is exactly 6 hours of the first qualifying session on any day (`stage-h-rulings-audit.md` HR-133, HR-134), not 6 to 8 hours. The figures are unchanged.
+
 Headline as in (a): all message kinds pooled, median of 5 runs, per symbol; a row passes only if both symbols pass all three percentiles. HR-21 decides between per-message and batch timing exactly as for R and S. L4 (allocation) and L5 (queries) are measured on R2 as well and reported against their existing targets.
 
 Correctness on R2 (L6, form A): after every message, the CRC32 of our top 10 equals the venue's `checksum` field; and for every per-second recorder row in the window, the full 100 levels a side equal our book as it stood at the last raw message received before the row's `t`. Zero top-10 checksum mismatches in each language, or the R2 run fails whatever its latency. Mismatches below level 10 (`order-book.md`: a truncated level the venue does not resend) are counted separately and published; they fail the run too, unless `order-book.md` as it stood before this change already classes that case as the venue's, in which case the count is published and the row is marked "passes with N venue-side holes".
+
+*Amended 2026-11-19 (paragraph kept as first fixed):* "at the last raw message received before the row's `t`" is read as HR-132 fixes it: the row must equal our book after at least one of the messages from lo (last with t < row t) to hi (last with t <= row t), the counts at lo, at hi and only inside the tie are published, and the tie guard of HR-135 applies (rows without a tie at least 25 %, rows matched only inside the tie at most 6 %, per symbol; otherwise no timing until reviewed).
 
 ### (h) L7: per-level cost on the one-second differenced stream
 
@@ -110,6 +114,8 @@ Correctness on R2 (L6, form A): after every message, the CRC32 of our top 10 equ
 | L7 | Java | same | <= 200 ns | <= 1 us | <= 5 us |
 
 How the numbers were chosen, and what was already known. The figures are the R per-message targets carried over unchanged per level: item 1 above budgets one level change at tens of nanoseconds warm and a few hundred on a miss to memory, and that budget is per level, not per message. They were not fitted to a measurement. It must be said plainly that this row was written after the 2026-11-19 R run, whose descriptive mean was about 40 ns a level in C++ and Rust: the p50 is therefore expected to pass, and only the tail is an open question. For that reason L7 is a secondary row. It does not replace, soften or re-judge L1 to L3 on R, which stay a recorded MISS for the 2026-11-18/19 window, and the release notes, this file and tutorial 48 keep saying so. The headline H-9 result after this change is R2 (table g).
+
+*Added 2026-11-19, before any L7 timing (HR-135, audit KA-B15):* headline as in (a): median of 5 runs, per symbol; a language passes L7 only if both symbols pass all three percentiles. Every L7 line carries the label "per level, not per message; L1-L3 on R remain a recorded MISS".
 
 ### R2 status (2026-11-19)
 
