@@ -16,7 +16,9 @@ does not import quantforge_core.
 
     cd oracle/python && uv run python -W ignore gen_stage_k_rev1.py
 """
+import json
 import math
+from pathlib import Path
 
 import mpmath as mp
 
@@ -139,12 +141,34 @@ def ivdeep():
     s.write()
 
 
+def fuzzfix():
+    """Two fuzz inputs fixed before stage K without a golden of the exact input (oracle/python/data/fuzz_k_inputs.jsonl).
+
+    Expected codes follow R6-8.1 (a finite input whose required intermediate is not finite is E_NON_FINITE):
+    CIR with sigma = 5e297 needs sigma^2 = 2.5e595 (above the largest binary64, about 1.8e308); the GARCH
+    Student-t estimate on a return of 2.68e297 needs its square for the sample variance start.
+    """
+    s = Suite("fuzzfix_k", "specifications/01-core/limits.md", G)
+    big = mp.mpf(2) ** 1024
+    for line in (Path(__file__).parent / "data" / "fuzz_k_inputs.jsonl").read_text("utf-8").splitlines():
+        row = json.loads(line)
+        ins = row["inputs"]
+        if row["operation"] == "rates.shortrate.zcb_option":
+            assert M(ins["sigma"]) ** 2 >= big
+        else:
+            assert max(M(abs(r)) for r in ins["returns"]) ** 2 >= big
+        s.add(row["operation"], ins, error="E_NON_FINITE", cls="date_and_convention", verified=["R6-8.1 rule (hand)"],
+              tags=["stage_k", "fuzz"], description=f"fuzz run {row['fuzz_run']}, seed case {row['seed_case']}")
+    s.write()
+
+
 def main():
     keep = common.GOLDEN
     common.GOLDEN = keep.parent / "stage_k"
     try:
         sabrz()
         ivdeep()
+        fuzzfix()
     finally:
         common.GOLDEN = keep
 
