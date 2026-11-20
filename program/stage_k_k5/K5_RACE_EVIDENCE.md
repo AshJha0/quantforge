@@ -30,3 +30,11 @@ Not run under ThreadSanitizer locally: the pinned toolchain 1.99.1 is stable, an
 ## Python (Windows 11)
 
 `python/tests/test_live_snapshot.py`, 21 tests pass: reference semantics only. Python is not lock-free.
+
+## K-5 acceptance: 1,000 shared moves inside the intraday bound
+
+Shared file `datasets/scenarios/k5a_intraday_moves.json` (the K-5a acceptance book, numpy `default_rng(20261118)`, 50 positions, 1,000 moves `h ~ U[-0.02, 0.02]`), read by every build. Pass rule: `abs(estimate_pnl - full revaluation) <= bound` on every move, in binary64.
+
+- Python (`test_live_snapshot.py::test_k5a_1000_moves_shared_file`): 0 violations, worst error over bound 0.0104814.
+- Java (`LiveSnapshotTest.k5a1000MovesSharedFile`): 0 violations, worst error over bound 0.0104814.
+- C++ (`qf_snapshot_race moves`, ctest `qf_k5a_moves`) and Rust (`tests/k5a_moves.rs`): written, **not yet run**; the WSL job `~/k_k5_moves.sh` was queued behind the shared lock, held for over an hour by another lane's mutation run.
