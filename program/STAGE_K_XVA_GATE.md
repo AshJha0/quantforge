@@ -13,6 +13,8 @@ Written 2026-11-19 by the K-8b xVA spec lane, before any implementation or ORE r
 
 ## 2. Gate table
 
+**Update 2026-11-20 (blind v2, `program/STAGE_K_BLIND_XVA.md` "Version 2"):** the DR-H2 blind lane matched all 41 B candidates (41 of 41, measured). Once implemented with those marks: AAD 8 of 12, ColVA 6 of 10, stressed 6 of 8, MPoR 12 of 14, funding 6 of 10, WWR 10 of 10 meet 60%; **MVA 5 of 10 and the shock library 2 of 6 do not** and still need ORE runs under WSL. The table below is the 2026-11-19 state, kept as written.
+
 | Item | Spec | Value cases | P | L (measured) | Strict now | O planned | O-approx | B candidates | Needed for 60% | Verdict |
 |---|---|---|---|---|---|---|---|---|---|---|
 | AAD xVA sensitivities | `xva-aad-sensitivities.md` | 12 | 0 | 0 | 0% | 5 (aadx 0008-0012) | 0 | 8 (0001-0008) | 8 | **Moves to a point release unless** a DR-H2 blind lane matches all 8 B candidates (8/12 = 67%), or the 5 ORE bump-and-revalue cases pass and the blind lane matches at least 3 of aadx 0001-0007 |
