@@ -1,0 +1,27 @@
+# K-3 smoke stack (specifications/12-platform/adapters.md 2.2). Runs on GitHub Actions only (SC-2).
+# Simulated; not a certified implementation; not connected to any venue.
+# One sender, two listeners on one bridge network; QF-MOLD-S packets to group 239.192.0.1:30001
+# (adapters.md 3.5). DROP_PACKET plants a dropped packet (empty = none).
+x-py: &py
+  image: python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90
+  working_dir: /repo
+  environment:
+    PYTHONPATH: /repo/platform/python
+  networks: [feed]
+services:
+  listener1:
+    <<: *py
+    volumes: ["../../..:/repo:ro", "./work:/work"]
+    command: ["python", "-m", "quantforge_adapters.multicast", "listen", "--name", "L1"]
+  listener2:
+    <<: *py
+    volumes: ["../../..:/repo:ro", "./work:/work"]
+    command: ["python", "-m", "quantforge_adapters.multicast", "listen", "--name", "L2"]
+  sender:
+    <<: *py
+    volumes: ["../../..:/repo:ro", "./work:/work"]
+    depends_on: [listener1, listener2]
+    command: ["sh", "-c", "python -m quantforge_adapters.multicast send --records datasets/adapters/records-10000.jsonl ${DROP_PACKET:+--drop-packet $DROP_PACKET}"]
+networks:
+  feed:
+    driver: bridge
