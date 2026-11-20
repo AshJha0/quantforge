@@ -10584,6 +10584,34 @@
     "weighted_sensitivities"
    ]
   },
+  "xva.sens.aad": {
+   "spec": "specifications/06-risk/xva-aad-adjustments.md",
+   "rust": "quantforge::xva::sens_aad",
+   "python": "quantforge.xva.sens_aad",
+   "java": "Xva.sensAad",
+   "cpp": "qf::xva::sens_aad",
+   "inputs": {
+    "inputs": {
+     "java": "inputs"
+    },
+    "operation": {
+     "java": "operation"
+    },
+    "wrt": {
+     "java": "wrt"
+    }
+   },
+   "outputs": [
+    "cva",
+    "dva",
+    "fba",
+    "fca",
+    "fva",
+    "gradient",
+    "kva",
+    "mva"
+   ]
+  },
   "xva.simm.ir_delta": {
    "spec": "specifications/06-risk/xva-framework.md",
    "rust": "quantforge::xva::sbim_ir_delta",
