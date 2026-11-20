@@ -246,7 +246,8 @@ def test_smooth_maturity_past_last_knot_names_the_field() -> None:
 _WWR_MIXED = [[30.0, 25.0, 40.0], [-20.0, 5.0, -35.0], [10.0, 40.0, 0.0], [2.0, -8.0, 15.0]]
 
 
-def _wclose(got: float, want: float) -> bool:
+def _wclose(got: object, want: float) -> bool:
+    assert isinstance(got, float)
     return abs(got - want) <= 1e-9 + 1e-12 * abs(want)
 
 
@@ -262,7 +263,8 @@ def test_wwr_identical_paths_closed_form(bv: float) -> None:
         * max(bv, 0.0)
         * (0.97 * -math.expm1(-0.01) + 0.94 * (math.exp(-0.01) - math.exp(-0.02)))
     )
-    assert abs(out["cva"] - want) <= 1e-12 * want
+    cva = out["cva"]
+    assert isinstance(cva, float) and abs(cva - want) <= 1e-12 * want
 
 
 @pytest.mark.parametrize(
@@ -332,3 +334,81 @@ def test_wwr_limit_errors() -> None:
     )
     out = xva.wwr_cva([1.0], [[10.0], [-10.0]], [0.97], 708.0, 0.4, 70.0)
     assert out["cva"] == pytest.approx(0.6 * 0.97 * 5.0, rel=1e-12)
+
+
+# Kills for the KR-257 mutation-report sample (lane k-v1-wwr, python seed 2689916947, 26 of 40
+# before these tests). The unreachable E_NO_CONVERGENCE raise of _wwr_root (mutants 128, 136) and
+# the `strict=None` zip of its derivative sum (51, equivalent: both lists have one entry per path)
+# stay alive. Text mutants stay alive as above; a message replaced by None is not text: the CLI
+# contract writes the message as a JSON string, so every error must carry a non-empty str.
+
+
+def test_sbim_diagonal_is_one_and_correlation_floor_is_minus_one() -> None:
+    # G-43: rho_kk = 1 whatever the matrix holds on its diagonal (0.25 here): margin = |RW s| = 10.
+    out = xva.sbim_ir_delta([10.0], [1.0], [[0.25]], 1e9)
+    assert out["margin"] == pytest.approx(10.0, rel=1e-15)
+    assert _err(xva.sbim_ir_delta, [10.0], [1.0], [[-1.5]], 1e9) == ("E_DOMAIN", "correlations")
+
+
+def test_xva_length_errors_name_their_input() -> None:
+    name = xva.Name(0.01, 0.4)
+    one = [1.0, 1.0]
+    base: tuple[Any, ...] = (
+        [0.5, 1.0],
+        one,
+        one,
+        [-1.0, -1.0],
+        name,
+        name,
+        0.0,
+        0.0,
+        False,
+        None,
+        None,
+        None,
+        None,
+    )
+    for pos, key in ((1, "discount_factors"), (2, "ee"), (3, "ene")):
+        args = list(base)
+        args[pos] = [args[pos][0]]
+        assert _err(xva.adjustments, *args) == ("E_INPUT", key)
+    args = list(base)
+    args[11] = [1.0, 1.0]  # capital without hurdle_rate
+    assert _err(xva.adjustments, *args) == ("E_INPUT", "capital")
+    assert _err(xva.collateralised, [0.5, 1.0], [("S", [[1.0]])], {}, 0.5) == ("E_INPUT", "trades")
+
+
+def _message(fn: Any, *args: Any) -> object:
+    with pytest.raises(QfError) as e:
+        fn(*args)
+    return e.value.message
+
+
+def test_xva_errors_carry_a_message() -> None:
+    name = xva.Name(0.01, 0.4)
+    one = [1.0, 1.0]
+    calls: list[tuple[Any, ...]] = [
+        (
+            xva.adjustments,
+            [0.5, 1.0],
+            one,
+            one,
+            [1.0, -1.0],
+            name,
+            name,
+            0.0,
+            0.0,
+            False,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (xva.dispersion, {"A": 1.0}, "A"),
+        (xva.wwr_cva, [1.0], [[1.0]], [0.97], 709.0, 0.4, 0.0),
+        (xva.collateralised, [0.5, 1.0], [], {}, 0.5),
+        (xva.sbim_ir_delta, [1.0], [1.0, 2.0], [[1.0]], 1.0),
+    ]
+    for fn, *args in calls:
+        msg = _message(fn, *args)
+        assert isinstance(msg, str) and msg, fn
