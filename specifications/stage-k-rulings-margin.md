@@ -1,5 +1,7 @@
 # Stage K rulings, stage G margin replacement (v0.10.1): KR-150 to KR-155
 
+Correction 2026-11-20 (owner decision): there is no v0.10.1 tag and there will not be one. This work is merged to `main` (pull requests #58 and #59), not tagged, and released with v1.0.0; the last tag is v0.10.0. The text below is kept as written at the time.
+
 Written 2026-11-19 by the stage G margin-model fix lane (branch `k-margin`), before any value, golden or code change; the change itself follows in later commits on the same branch. Status: lane ruling, for the coordinator to confirm. Numbering starts at KR-150 so it cannot collide with the other stage K lanes (KR-1 to KR-141 are used on this and other branches). Append-only.
 
 Why these rulings exist (plain idea): the stage G operation `xva.simm.ir_delta` takes its weights and correlations as inputs (G-43), so the code holds no number; but the numbers written into its goldens, the tutorial, the question bank and two unit tests were typed by hand in commit `ca78abb2` with the comment "illustrative, regular-volatility-style magnitudes", and no ruling or spec says they were invented by a rule (`program/STAGE_K_ISDA_AUDIT.md`, finding (c), evidence class: read). The project uses no ISDA material (owner decision 2026-11-19). The owner decided on 2026-11-19 to replace those values and rename the operation in this round. This lane did not open, fetch, search for or quote any ISDA document or parameter set, did not open the Open Source Risk Engine's margin calibration files, and compared no value with any outside parameter set.

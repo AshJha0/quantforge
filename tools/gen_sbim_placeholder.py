@@ -24,7 +24,7 @@ are deliberately artificial so that nobody can mistake the table for a calibrati
 It also writes specifications/tables/stage_k/sbim-ir-delta-g.json, the table of the stage G operation
 `xva.sbim.ir_delta` (formerly `xva.simm.ir_delta`; rulings KR-150 to KR-155), by the same rule on the stage G
 tenor grid. That operation takes weights and correlations as inputs (G-43); the table is what the goldens, the
-tutorial and the docs feed it. It replaced hand-typed values whose origin was not documented (v0.10.1):
+tutorial and the docs feed it. It replaced hand-typed values whose origin was not documented (stage K round 1, on main since 2026-11-20):
 
   tenors           0.25, 1, 2, 5, 10, 30 years with index k = 1..6 (labels only; no number depends on them)
   RW               10 x k                                   (10, 20, 30, 40, 50, 60)

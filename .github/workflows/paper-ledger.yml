@@ -15,7 +15,7 @@ name: Paper ledger
 # start when the recorder finishes (the recorder's evening run is what writes the day's curve), with two cron
 # slots as a second and third chance that land between 06:25 and 15:00 UTC under every delay measured.
 on:
-  # schedule restored at the v0.10.1 release (2026-11-20) after the follow-up different-model audit was
+  # schedule restored on main 2026-11-20 (pull request #59; no v0.10.1 tag) after the follow-up different-model audit was
   # clean and the stage K coordinator confirmed rulings KR-200 to KR-214 and KR-254, KR-255 (KR-206; python/tests/
   # test_daily_jobs_bytes.py checks these lines against the measured start delays).
   workflow_run:

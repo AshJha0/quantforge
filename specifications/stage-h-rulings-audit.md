@@ -1,5 +1,7 @@
 # Stage H rulings from the different-model audit (HR-121 to HR-129)
 
+Correction 2026-11-20 (owner decision): there is no v0.10.1 tag and there will not be one; where HR-134 below names v0.10.1, the stage K round 1 content it meant is merged to `main` (pull requests #58 and #59), not tagged, and released with v1.0.0. The text below is kept as written at the time.
+
 Written 2026-11-19 by the stage H coordinator under the owner's delegation. The audit (plan rule 14.10-5; Claude Opus 5.5, read-only, no view of goldens, oracle or tests) reported no Critical finding, 17 Major (HA-1 to HA-17) and 15 Minor (HA-18 to HA-32). Each finding was first reproduced by sending probe cases to the four builds. Where the four builds already agreed, the ruling states that behaviour and a golden pins it. Where they disagreed, or a build broke the stated rule, the code changed in all four builds. Goldens: suite `rule_h` (`oracle/python/gen_stage_h_audit.py`), 11 value cases and 29 error cases. Normative on merge; append-only.
 
 ## What the probes found

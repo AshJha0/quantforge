@@ -1,5 +1,7 @@
 # Stage K rulings, wave 1
 
+Correction 2026-11-20 (owner decision): there is no v0.10.1 tag and there will not be one. This work is merged to `main` (pull requests #58 and #59), not tagged, and released with v1.0.0; the last tag is v0.10.0. The text below is kept as written at the time.
+
 **Status: CONFIRMED 2026-11-19 by the stage K coordinator lane (branch k-w1), except KR-8**, which stayed PROPOSED with the K-8 lane that owns `bermudan-ladder-k8.md` and is now superseded in part by KR-18 (see its row below). Each ruling was checked against the text of its spec; the result of each check is in "Confirmation" at the end. A ruling found wrong or incomplete is not edited: KR-15 to KR-17 correct or complete it and bind with it. The spec lane's text follows unchanged.
 
 ## As drafted (spec lane, 2026-11-18)

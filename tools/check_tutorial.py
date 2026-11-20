@@ -74,7 +74,11 @@ def check(lang, page):
     p = subprocess.run(argv, input=stdin, cwd=ROOT, capture_output=True, text=True)
     seconds = time.monotonic() - start
     if p.returncode != 0:
-        print(f"{page.name}: {lang} block exited {p.returncode}:\n{p.stderr}", file=sys.stderr)
+        # `mvn -q` and some build tools write their errors to stdout, so show its tail too (main run 44737927696:
+        # page 1's Maven build exited 1 with an empty stderr, and the cause could not be read from the log).
+        tail = "\n".join(p.stdout.splitlines()[-40:])
+        print(f"{page.name}: {lang} block exited {p.returncode}:\n{p.stderr}\n--- last 40 lines of stdout ---\n{tail}",
+              file=sys.stderr)
         return 1
     # Build tools (Ninja) may log to stdout first; the tutorial's own output is the last lines.
     actual = [x for x in p.stdout.splitlines() if x.strip()][-len(expected):]
