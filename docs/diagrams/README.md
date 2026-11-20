@@ -673,7 +673,7 @@ Plain idea: a latency figure is a claim about one machine, one workload and one 
 
 ## Stage K: risk platform and capital (in progress)
 
-Stage K round 1 is merged to main by 2026-11-20 (pull requests #58 and #59), not tagged; it is released with v1.0.0. The last tag is v0.10.0. Each diagram names the spec it was drawn from (read 2026-11-19). All four rendered in the locally built site of the docs lane with every node drawn and no parse error (checked in the built-in browser, 2026-11-19); the site is rebuilt on `k-r1` (`program/STAGE_K_DOCS_PENDING.md`).
+Stage K round 1 is merged to main by 2026-11-20 (pull requests #58 and #59), not tagged; it is released with v1.0.0. The last tag is v0.10.0. Each diagram names the spec it was drawn from (read 2026-11-19). All four rendered in the locally built site of the docs lane with every node drawn and no parse error (checked in the built-in browser, 2026-11-19); the site is rebuilt on `k-r1` (`program/STAGE_K_DOCS_PENDING.md`). The three diagrams added on 2026-11-20 (platform pieces, daily curve run, error order) follow the same syntax and the site build passes with 0 broken links, but they have not been checked rendered in a browser.
 
 ### SA-CCR: from trades to EAD
 

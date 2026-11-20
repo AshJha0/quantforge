@@ -31,7 +31,7 @@ Each result below is real output from the CLIs, on the date each section gives. 
 | [Stage I: hedging](#stage-i-hedging) | Least-squares and QP hedges, costs and switch points, backtests and effectiveness |
 | [Stage J: backtest overfitting and research statistics](#stage-j-backtest-overfitting-and-research-statistics) | Lag and look-ahead, purged CV, PSR, DSR, PBO, power, regimes |
 | [Stage H: execution and microstructure (v0.10.0)](#stage-h-execution-and-microstructure-v0100) | Schedules, Almgren-Chriss, shortfall, three impact models, order books and quotes, simulated venues, equity, FX and rates conventions, paper trading, and how the stage was checked |
-| [Stage K: risk platform and capital (in progress)](#stage-k-risk-platform-and-capital-in-progress) | Bitemporal store, incremental curves, recalibration triggers, intraday risk bounds, the K-8 ladder fix, SA-CCR, backtesting zones, the daily paper ledger, blind re-derivation; merged to `main` (2026-11-19), not released |
+| [Stage K: risk platform and capital (in progress)](#stage-k-risk-platform-and-capital-in-progress) | Bitemporal store, incremental curves, recalibration triggers, intraday risk bounds, the K-8 ladder fix, SA-CCR, backtesting zones, the daily paper ledger, the daily curve run, blind re-derivation; merged to main by 2026-11-20, not tagged; released with v1.0.0 |
 
 ## Foundations
 
