@@ -1,6 +1,6 @@
 # Value at risk, expected shortfall and backtests
 
-Spec version 1.0.0. Status: Specified (stage F, slice F4, plan item Q2). Rulings: `stage-f-rulings.md` F-31 to F-32. Suite `stage_f/risk_f4`, written by `oracle/python/gen_stage_f_w2.py` (slice `F4`).
+Spec version 1.1.0 (1.0.0 to 1.1.0 on 2026-11-20: traffic light arithmetic changed by KR-253, a behaviour change of a released operation, audit KF-20). Status: Specified (stage F, slice F4, plan item Q2). Rulings: `stage-f-rulings.md` F-31 to F-32. Suite `stage_f/risk_f4`, written by `oracle/python/gen_stage_f_w2.py` (slice `F4`).
 
 **Plain idea.** Value at risk (VaR) answers "how much could we lose on a bad day, at 99% confidence?"; expected shortfall (ES) answers "and when it is that bad, how much on average?". Both are read off a set of profit-and-loss scenarios: past days replayed (historical), past days rescaled to today's volatility (filtered historical), simulated days (Monte Carlo), or a normal distribution (parametric). A backtest then asks whether the model's losses broke VaR as often as they should (Kupiec), whether the breaks bunch together (Christoffersen), and which supervisory zone that puts the bank in (the Basel traffic light).
 
