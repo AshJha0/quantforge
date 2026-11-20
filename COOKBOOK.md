@@ -1354,7 +1354,7 @@ Expected (spec worked example and golden `btk_k-0020`): the first gives `excepti
 git fetch origin paper-ledger paper-ledger-anchors
 git show origin/paper-ledger:ledger/ledger.jsonl > ledger.jsonl
 python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --no-cli         # from the ledger alone
-python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --require-days 20
+python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --anchors A --forward-log F --bitcoin-headers H --require-days 20
 ```
 
 `--no-cli` checks the chain, the configuration, the dates and holdout windows, and replays every day in exact decimal from the ledger's own numbers; the full run also rebuilds each day through the CLI. The tool is merged (`tools/paper_daily/verify_ledger.py`, spec `specifications/12-platform/paper-ledger-daily.md`). The `paper-ledger` branch does not exist until the workflow first runs on `main`, so the daily ledger is not yet running: **0 of 20 recorded trading days.** Every row is labelled "paper marks on a fitted curve; not tradable"; no performance claim is made. Not run: there is no ledger to fetch (2026-11-19, `k-r1`). Checked only that `verify_ledger.py --help` lists the `verify` command and the `--ledger`, `--no-cli` and `--require-days` options used above.

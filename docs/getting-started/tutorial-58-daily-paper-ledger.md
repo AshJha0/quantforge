@@ -8,7 +8,7 @@ The plain idea: each US business day a small job reads the Treasury par yield cu
 
 You will replay the spec's worked day in exact decimal and see the P&L explain close with an unexplained term of exactly zero, then build a two-row chain and catch a one-digit edit. Budget 15 minutes.
 
-<p class="note">Stage K. The daily job and its verifier (<code>tools/paper_daily/</code>), the workflow <code>.github/workflows/paper-ledger.yml</code> and the spec <code>specifications/12-platform/paper-ledger-daily.md</code> 0.1.0 (rulings KR-70 to KR-89, confirmed 2026-11-19) are merged to <code>main</code> (2026-11-19; not yet released). <strong>The ledger is not running yet: 0 of the 20 recorded trading days the v1.0.0 gate needs.</strong> The workflow has never run on a GitHub runner, and its schedule is withheld until the fixes for audit findings KA-C1 to KA-C5 and KA-C9 to KA-C13 (branch <code>k-audit-jobs</code>) are merged; those fixes change the gate command, the day count and the worked day below, and this page will be updated with them (<code>docs/known-issues.md</code>). Step 1 restates the arithmetic with the standard library and is the block CI checks; Step 2 is the verifier, run by hand once the ledger exists.</p>
+<p class="note">Stage K. The daily job and its verifier (<code>tools/paper_daily/</code>), the workflow <code>.github/workflows/paper-ledger.yml</code> and the spec <code>specifications/12-platform/paper-ledger-daily.md</code> 0.1.0 (rulings KR-70 to KR-89, confirmed 2026-11-19) are merged to <code>main</code> (2026-11-19; not yet released). <strong>The ledger is not running yet: 0 of the 20 recorded trading days the v1.0.0 gate needs.</strong> The workflow has never run on a GitHub runner, and its schedule is withheld until the fixes for audit findings KA-C1 to KA-C5 and KA-C9 to KA-C13 (merged on <code>k-r2</code> in 03772bf6) have their rulings KR-200 to KR-214 confirmed; this page shows the merged gate command, day count and worked day (<code>docs/known-issues.md</code>). Step 1 restates the arithmetic with the standard library and is the block CI checks; Step 2 is the verifier, run by hand once the ledger exists.</p>
 
 Terms, defined here. A **DAY row** is one business day's record; a **GAP row** marks a business day with no recorded curve; a row written after its cut-off is **late** and carries no order. **Carry** is the coupon accrued plus interest on cash; **roll-down** is what the bond gains by ageing along yesterday's curve; **curve move** is what today's curve does to it; **fills and costs** is each fill against par. **Unexplained** is the NAV change minus those four. The **anchor** is an OpenTimestamps stamp of the head hash on a separate branch.
 
@@ -32,7 +32,7 @@ from decimal import ROUND_HALF_EVEN, Decimal as D
 
 units, accrued, clean_roll, clean_close = D(26500), D("0.013287"), D("100.000625"), D("99.925390")
 cash_open, rate = D("7349714.0625"), D("0.0428")
-fills = [(4200, D("100.0078125")), (2200, D("100.01171875")), (4700, D("100.015625"))]  # BUY 5Y, simulated
+fills = [(4800, D("100.0078125")), (3800, D("100.01171875")), (2700, D("100.015625"))]  # BUY 5Y, simulated
 nav_open = cash_open + 100 * units
 
 coupon_accrual = units * accrued
@@ -87,8 +87,8 @@ Output (CI checks these lines):
 
 <!-- tutorial:expect -->
 ```text
-carry 1213.9355 roll_down 16.5625 curve_move -1993.7275 fills_costs -132.03125
-NAV 9999714.0625 -> 9998818.80175: change -895.26075, explained -895.26075, unexplained 0
+carry 1213.9355 roll_down 16.5625 curve_move -1993.7275 fills_costs -124.21875
+NAV 9999714.0625 -> 9998826.61425: change -887.44825, explained -887.44825, unexplained 0
 miniature chain verifies: (True, None, None)
 P&L -285.9375 edited to -285.9374: (False, 1, 'HASH')
 ```
@@ -98,8 +98,8 @@ P&L -285.9375 edited to -285.9374: (False, 1, 'HASH')
 - **Carry.** Coupon accrued over one day on 26,500 units: `26,500 x 0.013287 = 352.1055` (accrued = `2.405 x 1/181`, half the 4.81 coupon over a 181-day period, rounded to 6 decimals). Cash interest `7,349,714.0625 x 0.0428 / 365 = 861.83`, posted to the cent. Carry 1,213.9355.
 - **Roll-down.** Yesterday's 2-year bond is now one day shorter; read on yesterday's curve at its new maturity its yield is 4.809585, so its clean price is 100.000625: `26,500 x 0.000625 = 16.5625`.
 - **Curve move.** Today's curve gives it 4.849562 and a clean price of 99.925390: `26,500 x (99.925390 - 100.000625) = -1,993.7275`.
-- **Fills and costs.** The rule's step 1 buys the 5-year exposure: 11,300 units asked, the simulated book shows 4,200, 2,200 and 4,700 at three prices just above par, so 11,100 fill and 200 are cancelled. Each fill against par costs `q x (p - 100)`: 32.8125 + 25.78125 + 73.4375 = 132.03125.
-- **The identity.** `1,213.9355 + 16.5625 - 1,993.7275 - 132.03125 = -895.26075`, which is exactly NAV 9,998,818.80175 minus 9,999,714.0625. Unexplained 0.
+- **Fills and costs.** The rule's step 1 buys the 5-year exposure: 11,300 units asked, the simulated book shows 4,800, 3,800 and 4,600 at three prices just above par, so 4,800, 3,800 and 2,700 fill (11,300 in all) and nothing is cancelled. Each fill against par costs `q x (p - 100)`: 37.5 + 44.53125 + 42.1875 = 124.21875, which is 1.0993 bp of the order (the TCA spread).
+- **The identity.** `1,213.9355 + 16.5625 - 1,993.7275 - 124.21875 = -887.44825`, which is exactly NAV 9,998,826.61425 minus 9,999,714.0625. Unexplained 0.
 - **The chain.** Each row's hash is SHA-256 of its canonical bytes, which include the previous row's hash. Changing one digit of a P&L makes that row's hash wrong. The miniature above uses the same canonical rule (HR-45) but not the full row format of `qf-paper-ledger/1`.
 
 ### Why the unexplained term must be exactly zero, and what that does not show
@@ -114,12 +114,12 @@ The verifier (`tools/paper_daily/verify_ledger.py verify`) checks in a fixed ord
 
 1. **The chain**, row by row: `PARSE` (including a repeated key), `SEQ`, `HASH`, `LINK`, `LABEL`, `FORMAT`, `KIND`.
 2. **The configuration**: the genesis row holds the whole configuration and its hash; a later change to it is `CONFIG`.
-3. **Dates**: each a business day, none missing (`MISSING_DAY`), the on-time or late label recomputed from the row's write time (`TIMING`), and no date inside a preregistered study's holdout window (`HOLDOUT`).
+3. **Dates**: each a business day, none missing (`MISSING_DAY`), the on-time or late label checked against the row's write time (`TIMING`); that time is the runner's own clock, so the label is declared, not proven (KR-200), and no date inside a preregistered study's holdout window (`HOLDOUT`).
 4. **Exact replay from the ledger alone**: from the genesis cash, each day opens at the previous day's close, and cash interest, every explain term, cash, positions, NAV and P&L are recomputed in exact decimal from the row's own marks and fills (`CASH`, `POSITION`, `NAV`, `EXPLAIN`, `ORDER`, `COUNT`). This path uses no CLI and no data outside the ledger; it is what Step 1 does for one day.
 5. **Rebuild through the CLI** (`RECOMPUTE`): marks, the rule's order, the seed and book, the limit check, the fills and both TCA records are rebuilt and compared, with a 1e-6 relative allowance on decimal fields because bond prices pass through binary64 `pow`. The exact replay of step 4 has no allowance, so the allowance cannot hide a wrong P&L.
-6. **Anchors and the day count** (`ANCHOR`, `DAYS`): every anchor held must match the ledger line it names, which catches a consistent rewrite of old rows and a truncated tail; `--require-days 20` is the v1.0.0 gate.
+6. **Anchors and the day count** (`ANCHOR`, `DAYS`): every anchor held must match the ledger line it names, which catches a consistent rewrite of old rows and a truncated tail; the day count comes only from Bitcoin block times: a day counts when a block whose header is checked by proof of work, mined at least two hours (7,200 s) before the day's cut-off, covers its row (KR-200, KR-201). With `--forward-log` each row's yields are checked against the recorder (`SOURCE`, KR-211). The v1.0.0 gate is `--anchors A --forward-log F --bitcoin-headers H --require-days 20`, and it refuses (`GATE`) with `--no-cli` or without any of the three inputs (KR-202).
 
-Acceptance tests P1 to P11 were fixed in the spec before the first scheduled run. Planted faults, each shown failing with its own reason, are test P7; they were measured on the local laptop (40 tests, Windows, Python 3.15), not on CI.
+Acceptance tests P1 to P11 were fixed in the spec before the first scheduled run; P11 was rewritten for the block-time count by the audit response (KR-200 to KR-202, proposed) before any row exists. Planted faults, each shown failing with its own reason, are test P7; they were measured on the local laptop (40 tests, Windows, Python 3.15), not on CI.
 
 ## Step 2: the real verifier (by hand, once the ledger exists)
 
@@ -138,7 +138,7 @@ git fetch origin paper-ledger paper-ledger-anchors
 git show origin/paper-ledger:ledger/ledger.jsonl > ledger.jsonl
 python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --no-cli
 python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl
-python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --require-days 20
+python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --anchors A --forward-log F --bitcoin-headers H --require-days 20   # A, F, H: anchors folder, recorder log, block headers (spec, KR-202)
 ```
 
 `--no-cli` says so in its output (`"calendar_checked": false, "recomputed": false`).
@@ -146,7 +146,7 @@ python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --require
 ## For practitioners
 
 - **What a hash chain proves.** It proves the rows were not edited after the anchor that covers them. It does not prove the yields were right or that the simulator is realistic.
-- **Late days and gaps are counted as what they are.** Only on-time DAY rows count towards the 20 days; a late day carries no order; a gap is never filled in later.
+- **Late days and gaps are counted as what they are.** A day counts towards the 20 only if a Bitcoin block time, plus two hours, falls before its cut-off; a row's own "on time" label is not counted (`declared_on_time_days`); a late day carries no order; a gap is never filled in later.
 - **Never repair the ledger.** A rewrite, a rebase or a force-push makes it no longer evidence; the anchors make a rewrite visible. A changed configuration needs a new format string and a new ledger.
 - **Why not real Treasury prices.** FedInvest end-of-day prices are not used: the site's robots file disallows automated agents and its terms limit use to personal viewing (read 2026-11-19, KR-70). This is a reading of published terms, not legal advice. The ledger uses the plan's fallback, constant-maturity exposures on a curve through the five par yields the recorder already keeps.
 
