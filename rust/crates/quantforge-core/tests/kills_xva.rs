@@ -96,6 +96,39 @@ fn adjustment_names_need_both_hazard_and_recovery_in_domain() {
     assert_eq!(adj(zero, zero).unwrap().cva, 0.0);
 }
 
+#[test]
+fn adjustment_times_must_be_positive_and_increasing() {
+    // G-41: buckets start at 0, so times are t_1 < ... < t_n with t_1 > 0. Either failure alone
+    // is E_INPUT: a zero first time on an increasing grid, or a positive grid that decreases.
+    let good = Name {
+        hazard_rate: 0.02,
+        recovery: 0.4,
+    };
+    let run = |times: Vec<f64>| {
+        adjustments(&AdjInputs {
+            times,
+            discount_factors: vec![1.0, 1.0],
+            ee: vec![1.0, 1.0],
+            ene: vec![-1.0, -1.0],
+            counterparty: good,
+            own: good,
+            borrow_spread: 0.0,
+            lend_spread: 0.0,
+            exclude_dva_overlap: false,
+            im: None,
+            capital: None,
+        })
+    };
+    for times in [vec![0.0, 1.0], vec![-0.5, 1.0], vec![1.0, 0.5], vec![1.0, 1.0]] {
+        assert_eq!(run(times.clone()).unwrap_err().code, "E_INPUT", "{times:?}");
+    }
+    // Two buckets (0, 0.5] and (0.5, 1], D = 1, ee = 1, both hazards 0.02:
+    // CVA = 0.6 sum (S_c(p) - S_c(t)) S_b(p) = 0.6 [(1 - e^-0.01) + (e^-0.01 - e^-0.02) e^-0.01].
+    let r = run(vec![0.5, 1.0]).unwrap();
+    let (s1, s2) = ((-0.01_f64).exp(), (-0.02_f64).exp());
+    assert!(close(r.cva, 0.6 * ((1.0 - s1) + (s1 - s2) * s1), 1e-14), "{}", r.cva);
+}
+
 fn curve() -> HwCurve {
     HwCurve::new(
         &[0.5, 1.0, 2.0, 5.0, 10.0, 30.0],
@@ -162,6 +195,11 @@ fn exposure_profiles_are_linear_in_the_notional() {
                     assert!(small.pfe[q][i] > 0.0);
                 }
             }
+        }
+        // The value has a positive density, so the 99% point lies strictly above the 95% point
+        // (a bisection that stops at its upper start would return the same bound for both).
+        for i in 0..ex.len() {
+            assert!(small.pfe[1][i] < small.pfe[2][i], "n={small_n} i={i}");
         }
         assert!(close(small.epe, k * big.epe, 1e-12));
         assert!(close(small.cva, k * big.cva, 1e-12));
