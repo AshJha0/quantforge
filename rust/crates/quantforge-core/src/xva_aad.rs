@@ -248,7 +248,13 @@ fn gradient_of(tp: &Tape, bar: Bar, spread_key: Option<&str>, prof_key: Option<&
         direct += d;
         *h += d;
     }
-    let spread = |k: &str| Entry::Scalar(if spread_key == Some(k) { bar.spread } else { 0.0 });
+    let spread = |k: &str| {
+        Entry::Scalar(if spread_key == Some(k) {
+            bar.spread
+        } else {
+            0.0
+        })
+    };
     let prof = |k: &str| {
         Entry::Profile(if prof_key == Some(k) {
             bar.prof.clone()
@@ -304,7 +310,12 @@ pub fn gradient(x: &AdjInputs, names: &[&'static str]) -> Vec<(&'static str, Gra
         Some("funding.borrow_spread"),
         None,
     );
-    let fba = gradient_of(&tp, fba_bar(&tp, x, branch), Some("funding.lend_spread"), None);
+    let fba = gradient_of(
+        &tp,
+        fba_bar(&tp, x, branch),
+        Some("funding.lend_spread"),
+        None,
+    );
     let fva = minus(&fca, &fba);
     let mut raw = vec![
         ("cva", gradient_of(&tp, cva_bar(&tp, x), None, None)),
@@ -314,7 +325,12 @@ pub fn gradient(x: &AdjInputs, names: &[&'static str]) -> Vec<(&'static str, Gra
         ("fva", fva),
     ];
     if let Some((im, s)) = &x.im {
-        let g = gradient_of(&tp, funding_bar(&tp, *s, im, false), Some("im_spread"), Some("im"));
+        let g = gradient_of(
+            &tp,
+            funding_bar(&tp, *s, im, false),
+            Some("im_spread"),
+            Some("im"),
+        );
         raw.push(("mva", g));
     }
     if let Some((cap, h)) = &x.capital {

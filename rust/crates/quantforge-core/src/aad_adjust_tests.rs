@@ -66,12 +66,24 @@ fn golden_one_selected_entries() {
     let x = base();
     let g = gradient(&x, &keys(false, false));
     let cva = find(&g, "cva");
-    assert!(near(scalar(cva, "counterparty.hazard_rate"), 133.0258166316599, 1e-12));
-    assert!(near(scalar(cva, "counterparty.recovery"), -4.51643629000504, 1e-12));
+    assert!(near(
+        scalar(cva, "counterparty.hazard_rate"),
+        133.0258166316599,
+        1e-12
+    ));
+    assert!(near(
+        scalar(cva, "counterparty.recovery"),
+        -4.51643629000504,
+        1e-12
+    ));
     assert!(near(profile(cva, "ee")[1], 0.005704780048492856, 1e-12));
     assert_eq!(profile(cva, "own.hazard_buckets")[3], 0.0);
     let fca = find(&g, "fca");
-    assert!(near(scalar(fca, "funding.borrow_spread"), 226.952805418071, 1e-12));
+    assert!(near(
+        scalar(fca, "funding.borrow_spread"),
+        226.952805418071,
+        1e-12
+    ));
     assert_eq!(g.len(), 5);
 }
 
@@ -93,8 +105,16 @@ fn identities_on_random_requests() {
             acc += 0.01 + 3.0 * r.next();
             x.times.push(acc);
             x.discount_factors.push(0.3 + 0.75 * r.next());
-            x.ee.push(if r.next() < 0.15 { 0.0 } else { scale * r.next() });
-            x.ene.push(if r.next() < 0.15 { 0.0 } else { -scale * r.next() });
+            x.ee.push(if r.next() < 0.15 {
+                0.0
+            } else {
+                scale * r.next()
+            });
+            x.ene.push(if r.next() < 0.15 {
+                0.0
+            } else {
+                -scale * r.next()
+            });
             im.push(scale * r.next());
             cap.push(scale * r.next());
         }
@@ -122,8 +142,16 @@ fn identities_on_random_requests() {
         }
         let rc = x.counterparty.recovery;
         let rb = x.own.recovery;
-        assert!(near(scalar(find(&g, "cva"), "counterparty.recovery"), -v.cva / (1.0 - rc), 1e-12));
-        assert!(near(scalar(find(&g, "dva"), "own.recovery"), -v.dva / (1.0 - rb), 1e-12));
+        assert!(near(
+            scalar(find(&g, "cva"), "counterparty.recovery"),
+            -v.cva / (1.0 - rc),
+            1e-12
+        ));
+        assert!(near(
+            scalar(find(&g, "dva"), "own.recovery"),
+            -v.dva / (1.0 - rb),
+            1e-12
+        ));
         let gk = profile(find(&g, "kva"), "capital");
         let lin: f64 = gk.iter().zip(&cap).map(|(a, b)| a * b).sum();
         assert!(near(lin, v.kva.unwrap(), 1e-12));
@@ -185,7 +213,10 @@ fn wrt_rules() {
     assert_eq!(keys(false, true)[11..], ["capital", "hurdle_rate"]);
     assert_eq!(check_wrt(None, &all).unwrap(), all);
     let w = vec!["ene".to_string(), "own.recovery".to_string()];
-    assert_eq!(check_wrt(Some(&w), &all).unwrap(), vec!["own.recovery", "ene"]);
+    assert_eq!(
+        check_wrt(Some(&w), &all).unwrap(),
+        vec!["own.recovery", "ene"]
+    );
     for bad in [vec![], vec!["ee", "ee"], vec!["capital"], vec!["x"]] {
         let b: Vec<String> = bad.iter().map(|s| s.to_string()).collect();
         assert_eq!(check_wrt(Some(&b), &all).unwrap_err().code, "E_INPUT");
