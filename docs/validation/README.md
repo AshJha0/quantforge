@@ -12,6 +12,7 @@ This folder gathers the evidence behind each curve in the [Curves gallery](../cu
 | AI review packet | [`docs/validation/ai-review/`](ai-review/README.md) (one self-contained prompt per curve, about 30,000 characters or less) | Spec text, rulings, golden cases, evidence and questions for an outside model with no repository access; its answer is filed as a labelled "AI review" section and checked against the repository before anything is acted on |
 | How to use the pack | [HOW-TO-REVIEW.md](HOW-TO-REVIEW.md) | Rebuilding the pack and running the optional AI check |
 | Status ladder and the 60% rule | [status-ladder.md](status-ladder.md) | The six status rungs, the outside-check rule per stage and per plan item, current shares generated from `oracle/OUTSIDE_SHARES.json` by `tools/validation/status_ladder.py`, and the stage K round 1 shares quoted from lane files |
+| One report per model | [`docs/validation/models/`](models/README.md) (one page per entry of `docs/model-inventory.md`) | Goldens by class, outside-checked value cases, unit-test files and mutation modules per model, counted by `tools/validation/model_reports.py` (`--check` in `repo-gates`); plan 14.8 K-7 |
 | Page generator | `tools/validation/build_checklists.py` (`--check` for staleness) | Reads the counts from the gallery data and the goldens, so a page cannot drift from them |
 
 ## Outside-library checks (option C)

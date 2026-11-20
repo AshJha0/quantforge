@@ -49,6 +49,16 @@ jobs:
         run: python3 tools/check_share_figures.py --self-test && python3 tools/check_share_figures.py
       - name: generated status ladder page is current (KF-18)
         run: python3 tools/validation/status_ladder.py --check
+      - name: K-7 release evidence checks, each first failing its planted faults (KR-224, KR-223, KR-225; confirmed 2026-11-20)
+        run: |
+          python3 tools/validation/model_reports.py --self-test && python3 tools/validation/model_reports.py --check
+          python3 tools/results_page.py --self-test && python3 tools/results_page.py --check
+          python3 tools/check_known_issues.py --self-test && python3 tools/check_known_issues.py
+          python3 tools/check_runbooks.py --self-test && python3 tools/check_runbooks.py
+          python3 tools/check_examples.py --self-test && python3 tools/check_examples.py --static
+          python3 tools/release_verify.py --self-test
+          python3 tools/check_ruleset.py --self-test
+          python3 tools/check_versions.py --self-test && python3 tools/check_versions.py
       - run: python3 tools/quality_gate.py --check-register --check-specs --check-docs
       - name: ignores (G9)
         run: |
