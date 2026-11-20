@@ -218,7 +218,7 @@ def self_test():
             (d / "ex.json").write_text(json.dumps({"i.int.op": reason}), encoding="utf-8")
             return check(d / "nm.json", d / "g", d / "ex.json", root=d)[0]
         # the btk_k-0029 shape with its premise pinned passes
-        assert run4([val, schema_k, nan_k]) == [], "KR-251/212 clean"
+        assert run4([val, schema_k, nan_k]) == [], "KR-251/252 clean"
         # KR-251 planted fault (KA-C20 (1)): a genuine Real field at a path the value goldens never hold as an integer,
         # beside a missing key, expecting E_SCHEMA, fails
         planted = dict(schema_k, inputs={"n": 250, "rate": 0.25})

@@ -1,6 +1,6 @@
 # Stage K rulings, daily curve run lane
 
-**Status: CONFIRMED 2026-11-19 by the stage K coordinator lane (branch k-r1), KR-91 to KR-107; KR-90 binds only together with KR-109, which corrects its last sentence.** Results in "Confirmation" at the end. Rulings KR-203, KR-204, KR-207 and KR-209, proposed 2026-11-19 after different-model audit C, are in the last section; KR-209 withdraws KR-90's statement that rows hold no source row.
+**Status: CONFIRMED 2026-11-19 by the stage K coordinator lane (branch k-r1), KR-91 to KR-107; KR-90 binds only together with KR-109, which corrects its last sentence.** Results in "Confirmation" at the end. Rulings KR-203, KR-204, KR-207 and KR-209, proposed 2026-11-19 after different-model audit C, are in the section after the confirmation; KR-209 withdraws KR-90's statement that rows hold no source row. Rulings KR-254 and KR-255, proposed 2026-11-20 after the follow-up audit, are in the last section.
 
 Proposed by lane k-curve-daily, 2026-11-19, for plan item K-11; not normative until the stage K coordinator confirms them. They govern `12-platform/daily-curve-run.md` and `tools/curve_daily/`. A separate file from the other stage K lanes so branches merge without conflict. Append-only; an amendment is a new row that names the row it amends. Reviewer: none: self-assessment; no second review (owner decision 2026-11-18).
 
