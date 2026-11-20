@@ -1283,7 +1283,7 @@ In the first case `participation` 1.5 is outside its domain and `market_volume` 
 
 ## Stage K recipes
 
-Stage K round 1 is merged on the integration branch `k-r1` and is not released. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
+Stage K round 1 is merged to `main` (2026-11-19) and is not released; round 2 audit fixes are on the integration branch `k-r2`. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
 
 ### Query a bitemporal log
 
@@ -1317,7 +1317,7 @@ Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `thres
 {"schema_version": "1.0", "case_id": "idr", "operation": "risk.intraday.delta_gamma_bound", "inputs": {"positions": [{"notional": 1000000.0, "maturity": 5.0, "yield": 0.04}], "shift": 0.01}}
 ```
 
-Expected (golden `idr_k-0001`): `estimate_pnl` -39913.124212551615, `bound` 17.05689068912462, `label` "latency-aware analytics on simulated data". Zero-coupon positions only. The item's outside-check share is 5 of 5 value cases, by the K-5a blind packet (`program/STAGE_K_BLIND_K5A.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `estimate_pnl` -39913.124212551615, `bound` 17.056890689124625 (the golden's 17.05689068912462 differs in the last place, inside the tolerance), `label` as expected.
+Expected (golden `idr_k-0001`, spec 1.1.0): `estimate_pnl` -39913.124212551615, `bound` 17.056890689308766, `label` "latency-aware analytics on simulated data". The bound is the Lagrange term plus a binary64 rounding allowance (KR-234); it is 1.1e-11 relative above the 1.0.0 value 17.05689068912462. Zero-coupon positions only. Outside check: the version 2 blind packet matched all 11 bounds and 9 of 11 cases (`program/STAGE_K_BLIND_K5A_V2.md`). Observed (2026-11-20 on `k-r2-docs`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the three values above, bit for bit.
 
 ### Guard a Richardson extrapolation
 

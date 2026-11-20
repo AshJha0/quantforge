@@ -31,7 +31,7 @@ Each result below is real output from the CLIs, on the date each section gives. 
 | [Stage I: hedging](#stage-i-hedging) | Least-squares and QP hedges, costs and switch points, backtests and effectiveness |
 | [Stage J: backtest overfitting and research statistics](#stage-j-backtest-overfitting-and-research-statistics) | Lag and look-ahead, purged CV, PSR, DSR, PBO, power, regimes |
 | [Stage H: execution and microstructure (v0.10.0)](#stage-h-execution-and-microstructure-v0100) | Schedules, Almgren-Chriss, shortfall, three impact models, order books and quotes, simulated venues, equity, FX and rates conventions, paper trading, and how the stage was checked |
-| [Stage K: risk platform and capital (in progress)](#stage-k-risk-platform-and-capital-in-progress) | Bitemporal store, incremental curves, recalibration triggers, intraday risk bounds, the K-8 ladder fix, SA-CCR, backtesting zones, the daily paper ledger, blind re-derivation; merged on the integration branch `k-r1`, not released |
+| [Stage K: risk platform and capital (in progress)](#stage-k-risk-platform-and-capital-in-progress) | Bitemporal store, incremental curves, recalibration triggers, intraday risk bounds, the K-8 ladder fix, SA-CCR, backtesting zones, the daily paper ledger, blind re-derivation; merged to `main` (2026-11-19), not released |
 
 ## Foundations
 
@@ -938,7 +938,7 @@ Stage K round 1 is **in progress and not released**. Its work is merged to `main
 
 ### What stage K's evidence does and does not show, so far
 
-- Stage K round 1 is merged on the integration branch `k-r1` and not released. Every figure above names its file.
+- Stage K round 1 is merged to `main` (2026-11-19) and not released. Every figure above names its file.
 - Every round 1 item meets the 60% outside-check rule per item (`oracle/OUTSIDE_SHARES.md`, generated): K-4a 6 of 8, K-4b 4 of 4, K-4c 4 of 6, K-5a 5 of 5, K-8 guard 6 of 6, K-8 method 7 of 7, SA-CCR 12 of 16, FRTB backtesting 23 of 24. A blind match shows the rules are unambiguous and the arithmetic right, not that the rules read the source correctly.
 - The wave 1 property tests write evidence files in Python and Java; C++ and Rust run the same properties in their unit tests.
 - K-8: the use restriction stays for both methods (KR-113); `CN_RANNACHER_SMOOTHED` is second order on three in-sample cases at 201/100 and misses 1% at 101/50 on two of them.
