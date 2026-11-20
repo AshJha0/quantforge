@@ -1309,7 +1309,7 @@ Expected (golden `inc_k-0002`): `first_changed_index` 1, `recomputed` 2, `discou
 {"schema_version": "1.0", "case_id": "trig", "operation": "calib.trigger.check", "inputs": {"changes": [1.0, -1.0, 1.0, -1.0], "x_ref": 100.0, "x_now": 105.0, "days_since": 1.0, "k": 3.0}}
 ```
 
-Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `threshold` 3.4641016151377544, `false_alarm_rate` 0.002699796063260189. A move exactly equal to the threshold does not fire (KR-13). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the four values above, bit for bit. `false_alarm_rate` is the stated `2 (1 - Phi(k))`, computed as `2 Phi(-k)` with a tail-accurate normal CDF (far-tail golden `trig_k-0009`). K-4c outside share: 4 of 6 value cases, by blind re-derivation.
+Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `threshold` 3.4641016151377544, `false_alarm_rate` 0.057668885622437306, `nominal_rate` 0.002699796063260189. A move exactly equal to the threshold does not fire (KR-13). `false_alarm_rate` is the rate of the trigger as used, with `sigma` estimated from four changes: `P(abs(T_3) > 3)` (spec 1.1.0, KR-232, class `tail_probability`, 1e-11 relative); `nominal_rate` is the known-sigma rate `2 (1 - Phi(k))`, computed as `2 Phi(-k)` (far-tail golden `trig_k-0009`). Observed (2026-11-20 on `k-r2-docs`, Python build through Tutorial 53 Step 2, local laptop, not the acceptance machine): these values to the printed six decimals. K-4c outside share: see `oracle/OUTSIDE_SHARES.md` (the blind matches cover `nominal_rate`).
 
 ### Intraday P&L with an error bound
 
