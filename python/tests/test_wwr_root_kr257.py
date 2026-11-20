@@ -17,7 +17,11 @@ from quantforge_core import xva
 from quantforge_core.errors import QfError
 
 GOLDEN = Path(__file__).resolve().parents[2] / "datasets" / "golden" / "stage_g" / "wwr_g.json"
-CASES: list[dict[str, Any]] = json.loads(GOLDEN.read_text(encoding="utf-8"))["cases"]
+# Cases tagged hr122 (E_SCHEMA and the finite rule before a structural fault) are decided by the CLI input layer,
+# not by `xva.wwr_cva`; the conformance runner replays them through the command line.
+CASES: list[dict[str, Any]] = [
+    c for c in json.loads(GOLDEN.read_text(encoding="utf-8"))["cases"] if "hr122" not in c["tags"]
+]
 
 
 def _call(inp: dict[str, Any]) -> dict[str, Any]:
