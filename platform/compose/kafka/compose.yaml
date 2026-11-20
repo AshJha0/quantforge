@@ -1,0 +1,14 @@
+# K-3 smoke stack (specifications/12-platform/adapters.md 2.2). Runs on GitHub Actions only (SC-2).
+# Simulated; not a certified implementation; not connected to any venue.
+# The image's default configuration is a single KRaft node (broker and controller) with a PLAINTEXT listener
+# advertised as localhost:9092; topics are auto-created with one partition.
+services:
+  kafka:
+    image: apache/kafka:4.1.0@sha256:bff074a5d0051dbc0bbbcd25b045bb1fe84833ec0d3c7c965d1797dd289ec88f
+    ports:
+      - "127.0.0.1:9092:9092"
+    healthcheck:
+      test: ["CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092"]
+      interval: 3s
+      timeout: 10s
+      retries: 60
