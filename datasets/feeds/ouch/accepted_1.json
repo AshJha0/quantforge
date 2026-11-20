@@ -1,0 +1,14 @@
+{
+ "format": "QF-OUCH-S",
+ "label": "simulated; not a certified implementation; not connected to any venue",
+ "fields": {
+  "type": "A",
+  "timestamp": 34200000000500,
+  "token": "QF0000000001  ",
+  "order_ref": 1
+ },
+ "hex": "4100001f1aced9f1f451463030303030303030303120200000000000000001",
+ "length": 31,
+ "sha256": "85f1675c6ef329d81cfbc481641393fd26acd753222e9b9459138a09ced1b4d6",
+ "derivation": "specifications/12-platform/adapters.md section 3.3"
+}

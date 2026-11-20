@@ -1,0 +1,30 @@
+# K-3 smoke stack (specifications/12-platform/adapters.md 2.2). Runs on GitHub Actions only (SC-2).
+# Simulated; not a certified implementation; not connected to any venue.
+services:
+  exporter:
+    image: python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90
+    working_dir: /repo
+    environment:
+      PYTHONPATH: /repo/platform/python
+    volumes:
+      - ../../..:/repo:ro
+    command: ["python", "-m", "quantforge_adapters.services.exporter", "--records", "datasets/adapters/records-10000.jsonl"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9108/metrics', timeout=2)"]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  prometheus:
+    image: prom/prometheus:v3.7.3@sha256:49214755b6153f90a597adcbff0252cc61069f8ab69ce8411285cd4a560e8038
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      exporter:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:9090:9090"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9090/-/ready"]
+      interval: 2s
+      timeout: 3s
+      retries: 60

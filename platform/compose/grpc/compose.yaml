@@ -1,0 +1,19 @@
+# K-3 smoke stack (specifications/12-platform/adapters.md 2.2). Runs on GitHub Actions only (SC-2).
+# Simulated; not a certified implementation; not connected to any venue.
+services:
+  grpc:
+    image: python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90
+    working_dir: /repo
+    environment:
+      PYTHONPATH: /repo/platform/python
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+    volumes:
+      - ../../..:/repo:ro
+    command: ["sh", "-c", "pip install --no-cache-dir --quiet grpcio==1.85.3 && python -m quantforge_adapters.services.grpc_server --port 50051"]
+    ports:
+      - "127.0.0.1:50051:50051"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket,sys; socket.create_connection((\"127.0.0.1\", int(sys.argv[1])), 2)", "50051"]
+      interval: 2s
+      timeout: 3s
+      retries: 150

@@ -1,0 +1,8 @@
+# K-3 Prometheus scrape configuration: one target, the K-3 exporter (10,000 gauge series).
+global:
+  scrape_interval: 5s
+  scrape_timeout: 4s
+scrape_configs:
+  - job_name: k3
+    static_configs:
+      - targets: ["exporter:9108"]

@@ -61,6 +61,10 @@ jobs:
           python3 tools/release_verify.py --self-test
           python3 tools/check_ruleset.py --self-test
           python3 tools/check_versions.py --self-test && python3 tools/check_versions.py
+      - name: K-3 libraries name no adapter, after the planted faults; feed fixtures current (KR-281; confirmed 2026-11-20)
+        run: |
+          python3 tools/check_adapter_deps.py --self-test && python3 tools/check_adapter_deps.py
+          python3 tools/adapters/build_feed_fixtures.py --check
       - run: python3 tools/quality_gate.py --check-register --check-specs --check-docs
       - name: ignores (G9)
         run: |
