@@ -232,8 +232,8 @@ public final class PortfolioRisk {
         if (n < 1 || x < 0 || x > n) {
             throw new QfError("E_DOMAIN", "need n >= 1 and 0 <= exceptions <= n", "exceptions");
         }
-        // KR-253: the KR-237 arithmetic-only binomial; p stays 1 - c as stage J computes it.
-        double s = FrtbBacktest.binomialCdf(n, x, 1.0 - c);
+        // KR-253: q = c exactly, p = 1 - c; x = 0 is c^n, otherwise the KR-237 sums.
+        double s = FrtbBacktest.trafficLightCdf(n, x, c);
         String zone = s < 0.95 ? "GREEN" : s < 0.9999 ? "YELLOW" : "RED";
         Double plus = null;
         if (n == 250 && c == 0.99) {

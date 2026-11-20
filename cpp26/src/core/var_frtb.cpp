@@ -181,8 +181,8 @@ Christoffersen backtest_christoffersen(const std::vector<bool>& exceptions, doub
 TrafficLight backtest_traffic_light(long long observations, long long exceptions, double confidence) {
     check_confidence(confidence);
     check_counts(observations, exceptions);
-    // KR-253: the KR-237 arithmetic-only binomial; p stays 1 - confidence as stage J computes it.
-    const double cdf = frtb_backtest::binomial_cdf(observations, exceptions, 1.0 - confidence);
+    // KR-253: q = confidence exactly, p = 1 - confidence; x = 0 is confidence^n, otherwise the KR-237 sums.
+    const double cdf = frtb_backtest::traffic_light_cdf(observations, exceptions, confidence);
     const TrafficZone zone = cdf < 0.95 ? TrafficZone::Green : cdf < 0.9999 ? TrafficZone::Yellow : TrafficZone::Red;
     std::optional<double> plus;
     if (observations == 250 && confidence == 0.99) {

@@ -61,7 +61,11 @@ const DOWN: f64 = 2.409919865102884e-181; // 2^-600
 /// most 1/2 and the weight at most 2^-64 of the sum. Only `+ - * /`, so every build gives the same
 /// bits. A port of `frtb_backtest.binomial_partial_sums`.
 pub fn binomial_partial_sums(n: i64, p: f64) -> Vec<(f64, i64)> {
-    let q = 1.0 - p;
+    binomial_partial_sums_q(n, p, 1.0 - p)
+}
+
+/// KR-237 sums with the non-exception probability `q` given (KR-253: the traffic light passes `q = c`).
+pub fn binomial_partial_sums_q(n: i64, p: f64, q: f64) -> Vec<(f64, i64)> {
     let mode = ((n + 1) as f64 * p).floor();
     let (mut w, mut s, mut c, mut e) = (1.0f64, 0.0f64, 0.0f64, 0i64);
     let mut out = Vec::new();
@@ -119,6 +123,52 @@ pub fn binomial_cdf(n: i64, x: i64, p: f64) -> f64 {
         return 1.0;
     }
     cdf_from(&binomial_partial_sums(n, p), n, x)
+}
+
+/// Dekker's exact product `a * b = hi + lo` (Veltkamp split by 2^27 + 1); only `+ - *` (KR-253).
+fn two_prod(a: f64, b: f64) -> (f64, f64) {
+    let p = a * b;
+    let t = 134_217_729.0 * a;
+    let ah = t - (t - a);
+    let al = a - ah;
+    let t = 134_217_729.0 * b;
+    let bh = t - (t - b);
+    let bl = b - bh;
+    (p, ((ah * bh - p) + ah * bl + al * bh) + al * bl)
+}
+
+fn dd_mul(a: (f64, f64), b: (f64, f64)) -> (f64, f64) {
+    let (p, lo) = two_prod(a.0, b.0);
+    let e = lo + (a.0 * b.1 + a.1 * b.0);
+    let s = p + e;
+    (s, e - (s - p))
+}
+
+/// KR-253: `q^n` by right-to-left binary powering in double-double; `q^1` is `q` exactly.
+pub fn power(q: f64, n: i64) -> f64 {
+    let (mut r, mut b, mut m) = ((1.0, 0.0), (q, 0.0), n);
+    while m != 0 {
+        if m & 1 != 0 {
+            r = dd_mul(r, b);
+        }
+        m >>= 1;
+        if m != 0 {
+            b = dd_mul(b, b);
+        }
+    }
+    r.0 + r.1
+}
+
+/// KR-253: `P(X <= x)`, `X ~ Binomial(n, 1 - c)`, with `q = c` exact: `x = 0` is `c^n`, otherwise the KR-237
+/// sums with `q = c`.
+pub fn traffic_light_cdf(n: i64, x: i64, c: f64) -> f64 {
+    if x == 0 {
+        return power(c, n);
+    }
+    if x >= n {
+        return 1.0;
+    }
+    cdf_from(&binomial_partial_sums_q(n, 1.0 - c, c), n, x)
 }
 
 fn first_from(sums: &[(f64, i64)], n: i64, level: f64) -> i64 {

@@ -610,6 +610,33 @@ def gen_traffic_light():
               limit={"absolute": 1e-15, "relative": 1e-12},
               description=f"KR-253: {n:,} observations, {x:,} exceptions at {conf}: the stage J binomial at large n "
                           "(the lgamma form drifted past 1e-10 here)")
+    # KR-253 amendment (coordinator 2026-11-20): exact boundaries. q = c is taken exactly as given, so at n = 1,
+    # x = 0 the cumulative probability is c itself and the zone edge (>= 0.95, >= 0.9999) is decided exactly.
+    for n, x, conf in [(1, 0, 0.95), (1, 0, 0.99), (1, 0, 0.9999), (250, 5, 0.99), (250, 0, 0.99)]:
+        qf = Fraction(conf)
+        pf = 1 - qf
+        a, b = pf.numerator, pf.denominator
+        cc = b - a
+        term = cc ** n
+        total = term
+        for k in range(x):
+            term = term * (n - k) * a // ((k + 1) * cc)
+            total += term
+        exact = Fraction(total, b ** n)
+        cum = float(exact)
+        if n == 1:
+            assert exact == qf and cum == conf
+        zone = "GREEN" if cum < 0.95 else "YELLOW" if cum < 0.9999 else "RED"
+        plus = (0.0 if x <= 4 else {5: 0.40, 6: 0.50, 7: 0.65, 8: 0.75, 9: 0.85}.get(x, 1.0)) if (n, conf) == (250, 0.99) else None
+        s.add("risk.backtest.traffic_light", {"observations": n, "exceptions": x, "confidence": conf},
+              {"cumulative_probability": cum, "zone": zone, "plus_factor": plus},
+              verified=[f"{kr253} amendment: exact rational arithmetic with q = c exactly (Python fractions)",
+                        "hand" if n == 1 else SCIPY + ": binom.cdf MATCH 1e-12"],
+              tags=["stage_k", "traffic_light", "boundary"], output_classes=oc,
+              limit={"absolute": 0.0, "relative": 0.0} if n == 1 else {"absolute": 1e-15, "relative": 1e-12},
+              description=f"KR-253 amendment: {n} observation(s), {x} exception(s) at {conf}: "
+                          + ("P(X <= 0) = c exactly, on the zone edge" if n == 1 else
+                             "MAR99 Table 2 row, exact rational at the binary64 q"))
     s.write()
     return s
 

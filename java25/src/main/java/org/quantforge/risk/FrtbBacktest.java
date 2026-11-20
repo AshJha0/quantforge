@@ -69,7 +69,11 @@ public final class FrtbBacktest {
      * 2^-64 of the sum. Only + - * /, so every build gives the same bits.
      */
     static PartialSums binomialPartialSums(long n, double p) {
-        double q = 1.0 - p;
+        return binomialPartialSums(n, p, 1.0 - p);
+    }
+
+    /** KR-237 sums with the non-exception probability q given (KR-253: the traffic light passes q = c). */
+    static PartialSums binomialPartialSums(long n, double p, double q) {
         double mode = Math.floor((double) (n + 1) * p);
         double w = 1.0;
         double s = 0.0;
@@ -135,6 +139,56 @@ public final class FrtbBacktest {
             return 1.0;
         }
         return cdfFrom(binomialPartialSums(n, p), n, x);
+    }
+
+    /** Dekker's exact product a * b = hi + lo (Veltkamp split by 2^27 + 1); only + - *. */
+    private static double[] twoProd(double a, double b) {
+        double p = a * b;
+        double t = 134217729.0 * a;
+        double ah = t - (t - a);
+        double al = a - ah;
+        t = 134217729.0 * b;
+        double bh = t - (t - b);
+        double bl = b - bh;
+        return new double[] {p, ((ah * bh - p) + ah * bl + al * bh) + al * bl};
+    }
+
+    private static double[] ddMul(double[] x, double[] y) {
+        double[] pe = twoProd(x[0], y[0]);
+        double e = pe[1] + (x[0] * y[1] + x[1] * y[0]);
+        double s = pe[0] + e;
+        return new double[] {s, e - (s - pe[0])};
+    }
+
+    /** KR-253: q^n by right-to-left binary powering in double-double; q^1 is q exactly. */
+    static double power(double q, long n) {
+        double[] r = {1.0, 0.0};
+        double[] b = {q, 0.0};
+        long m = n;
+        while (m != 0) {
+            if ((m & 1L) != 0) {
+                r = ddMul(r, b);
+            }
+            m >>= 1;
+            if (m != 0) {
+                b = ddMul(b, b);
+            }
+        }
+        return r[0] + r[1];
+    }
+
+    /**
+     * KR-253: P(X <= x), X ~ Binomial(n, 1 - c), with q = c taken exactly: x = 0 is c^n, otherwise the KR-237
+     * sums with q = c.
+     */
+    public static double trafficLightCdf(long n, long x, double c) {
+        if (x == 0) {
+            return power(c, n);
+        }
+        if (x >= n) {
+            return 1.0;
+        }
+        return cdfFrom(binomialPartialSums(n, 1.0 - c, c), n, x);
     }
 
     /** The smallest k in 0..n with P(X &lt;= k) &gt;= level (exists: P(X &lt;= n) = 1). */

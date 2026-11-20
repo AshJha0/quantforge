@@ -262,8 +262,8 @@ pub fn traffic_light(
         );
     }
     let n = observations;
-    // KR-253: the KR-237 arithmetic-only binomial; p stays 1 - c as stage J computes it.
-    let cdf = crate::frtb_backtest::binomial_cdf(n, exceptions, 1.0 - c);
+    // KR-253: q = c exactly, p = 1 - c; x = 0 is c^n, otherwise the KR-237 sums.
+    let cdf = crate::frtb_backtest::traffic_light_cdf(n, exceptions, c);
     let zone = if cdf < 0.95 {
         "GREEN"
     } else if cdf < 0.9999 {
