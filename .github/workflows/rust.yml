@@ -52,7 +52,7 @@ jobs:
       - name: planted faults must be reported
         run: |
           for f in relaxed skip; do
-            if QF_SNAPSHOT_FAULTS=1 QF_SNAPSHOT_FAULT=$f cargo +"$NIGHTLY" test -Zbuild-std --target x86_64-unknown-linux-gnu --release -p quantforge-core --test snapshot_race planted_faults_under_tsan > fault_$f.log 2>&1; then echo "fault $f NOT reported"; exit 1; fi
+            if TSAN_OPTIONS="halt_on_error=1 symbolize=0" QF_SNAPSHOT_FAULTS=1 QF_SNAPSHOT_FAULT=$f cargo +"$NIGHTLY" test -Zbuild-std --target x86_64-unknown-linux-gnu --release -p quantforge-core --test snapshot_race planted_faults_under_tsan > fault_$f.log 2>&1; then echo "fault $f NOT reported"; exit 1; fi
             grep -q "ThreadSanitizer: data race" fault_$f.log || { echo "fault $f failed without a TSan report"; tail -20 fault_$f.log; exit 1; }
             echo "fault $f reported by ThreadSanitizer"
           done

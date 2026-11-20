@@ -64,7 +64,7 @@ jobs:
       - name: planted faults must be reported
         run: |
           for f in relaxed skip; do
-            if ./build/qf_snapshot_race race 4 20000 $f > fault_$f.log 2>&1; then echo "fault $f NOT reported"; exit 1; fi
+            if TSAN_OPTIONS="halt_on_error=1 symbolize=0" ./build/qf_snapshot_race race 4 20000 $f > fault_$f.log 2>&1; then echo "fault $f NOT reported"; exit 1; fi
             grep -q "ThreadSanitizer: data race" fault_$f.log || { echo "fault $f failed without a TSan report"; tail -20 fault_$f.log; exit 1; }
             echo "fault $f reported by ThreadSanitizer"
           done
