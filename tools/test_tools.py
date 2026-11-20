@@ -1238,5 +1238,37 @@ class SiteView(unittest.TestCase):
                           (Path(tmp) / "site-view.md").read_text(encoding="utf-8"))
 
 
+
+class SiteA11y(unittest.TestCase):
+    """tools/check_site_a11y.py (KR-227 read strictly: pa11y AA on every page) and build_site.a11y_fix."""
+
+    def test_self_test_catches_every_planted_fault(self):
+        import contextlib
+        import io
+        sp = importlib.util.spec_from_file_location("check_site_a11y", ROOT / "tools/check_site_a11y.py")
+        m = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(m)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(m.self_test(), 0)
+
+    def test_a11y_fix(self):
+        sp = importlib.util.spec_from_file_location("build_site_a11y", ROOT / "tools/build_site.py")
+        m = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(m)
+        nl = chr(10)
+        t1 = nl.join(["<table>", "<thead>", "<tr>", "<th></th>", "<th>A</th>", "</tr>", "</thead>",
+                      "<tbody><tr><td>r</td><td>1</td></tr></tbody></table>"])
+        t2 = nl.join(["<table>", "<thead>", "<tr>", "<th></th>", "<th></th>", "</tr>", "</thead>", "<tbody>",
+                      "<tr>", "<td>k</td>", "<td>v</td>", "</tr>", "</tbody></table>"])
+        out = m.a11y_fix('<h2 id="a">A</h2><h4 id="b">B</h4><pre><code>x</code></pre>' + t1 + t2, "T & U")
+        self.assertTrue(out.startswith("<h1>T &amp; U</h1>"))
+        self.assertIn('<h2 id="a">A</h2><h3 id="b">B</h3>', out)
+        self.assertIn('<pre tabindex="0">', out)
+        self.assertIn("<td></td>" + nl + "<th>A</th>", out)
+        self.assertNotIn("<th></th>", out)
+        self.assertIn('<th scope="row">k</th>', out)
+        self.assertEqual(out.count("<thead>"), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

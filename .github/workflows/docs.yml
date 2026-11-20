@@ -8,6 +8,11 @@ name: Docs
 # pa11y AA a second time on a copy of the site with the dark colours forced on. docs-site-view-summary writes the
 # table the release notes quote (artifact site-view, file site-view.md). Added 2026-11-20 on branch k-v1-k7b; not
 # yet run in CI.
+# KR-227 read strictly (coordinator, 2026-11-20): docs-site-a11y runs pa11y AA (pa11y-ci 3.1.0, as in docs-site) on
+# every page of the built site, light and dark, in 12 shards (tools/check_site_a11y.py), after a planted contrast
+# failure is reported; docs-site-a11y-summary fails if any shard failed or any page was not reported on, and writes
+# the counts for the release notes (artifact site-a11y, a11y-summary.md). Added 2026-11-20 on branch k-v1-a11y; not
+# yet run in CI.
 on:
   push:
     branches: [main]
@@ -39,6 +44,9 @@ jobs:
       - run: uv run --no-project --with markdown==3.11.2 python tools/build_site.py --out site
       # Relative links and #anchors in every tracked .md and every href in the built site (build_site checks files only)
       - run: python3 tools/check_md_anchors.py --site site
+      # Static WCAG pre-check of every built page (lang, title, alt, names, ids, headings, table headers, focusable
+      # scrolling boxes, colour tokens); its planted faults fail first (KR-227)
+      - run: python3 tools/check_site_a11y.py --self-test && python3 tools/check_site_a11y.py --static site
       # WCAG 2 AA, zero errors, on home, LEARN, COOKBOOK and the Curves gallery (plan 13.2 E6)
       - name: accessibility (pa11y-ci, axe and HTML_CodeSniffer)
         run: |
