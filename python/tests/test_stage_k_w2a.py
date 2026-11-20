@@ -249,13 +249,21 @@ def test_drc_properties(
     assert total >= 0
     for b in out["buckets"]:  # type: ignore[attr-defined]
         assert b["drc"] >= 0 and (b["hbr"] is None or 0 <= b["hbr"] <= 1)
-    # adding a long never lowers its bucket's DRC
+    # KR-327 (proposed): "adding a long never lowers its bucket's DRC" is false in general
+    # (test_drc_a3_monotonicity_counterexample); it holds when the obligor has no net short and its
+    # risk weight is at least that of every obligor with a net short in the bucket.
     more = drc.drc_nonsec(
         [*book, Position("new", ob, _BKT[ob], sen, float(extra), float(extra), 2.0)], _RAT
     )
     before = {b["bucket"]: b["drc"] for b in out["buckets"]}  # type: ignore[attr-defined]
     after = {b["bucket"]: b["drc"] for b in more["buckets"]}  # type: ignore[attr-defined]
-    assert after[_BKT[ob]] >= before.get(_BKT[ob], 0.0) - 1e-9 * (1 + after[_BKT[ob]])
+    rows = {o["obligor"]: o for o in out["obligors"]}  # type: ignore[attr-defined]
+    short_rw = [
+        o["rw"] for o in rows.values() if _BKT[o["obligor"]] == _BKT[ob] and o["net_short"] != 0
+    ]
+    no_short = ob not in rows or rows[ob]["net_short"] == 0
+    if no_short and drc.RISK_WEIGHT[_RAT[ob]] >= max(short_rw, default=0.0):
+        assert after[_BKT[ob]] >= before.get(_BKT[ob], 0.0) - 1e-9 * (1 + after[_BKT[ob]])
     # permutation leaves every output unchanged (totals to rounding)
     shuffled = list(book)
     rnd.shuffle(shuffled)
@@ -277,6 +285,37 @@ def test_drc_properties(
         for p in book
     ]
     assert drc.drc_nonsec(scaled, _RAT)["drc"] == pytest.approx(c * total, rel=1e-12, abs=1e-12)
+
+
+def test_drc_a3_monotonicity_counterexample() -> None:
+    """KR-327 (proposed): the pinned book where a covered long of 885 added to obligor A lowers DRC_b.
+
+    The long offsets A's shorts, so the bucket's net short S falls and the HBR rises from 0.288 to
+    0.395; the weight on the remaining shorts rises more than the weighted long does. Found by the
+    Java property at seed -24 (program/STAGE_K_W2A_JAVA_HANDOVER.md, point 0).
+    """
+    rows = [
+        ("p0", "B", "COVERED", 932, 943, 0.25),
+        ("p1", "B", "SENIOR", -773, 819, 3.0),
+        ("p2", "B", "NON_SENIOR", 627, 943, 0.1),
+        ("p3", "A", "SENIOR", -805, -412, 0.1),
+        ("p4", "A", "EQUITY", -231, -355, 0.25),
+        ("p5", "A", "COVERED", 368, 834, 0.25),
+        ("p6", "B", "SENIOR", -663, -798, 0.5),
+        ("p7", "A", "SENIOR", -684, 387, 0.1),
+        ("p8", "C", "COVERED", 756, 381, 1.0),
+        ("p9", "A", "EQUITY", -673, -326, 3.0),
+    ]
+    book = [Position(i, o, _BKT[o], s, float(n), float(mv), m) for i, o, s, n, mv, m in rows]
+    out = drc.drc_nonsec(book, _RAT)
+    more = drc.drc_nonsec(
+        [*book, Position("new", "A", "CORPORATE", "COVERED", 885.0, 885.0, 2.0)], _RAT
+    )
+    before = {b["bucket"]: b["drc"] for b in out["buckets"]}  # type: ignore[attr-defined]
+    after = {b["bucket"]: b["drc"] for b in more["buckets"]}  # type: ignore[attr-defined]
+    assert before["CORPORATE"] == pytest.approx(18.67915216395695, rel=1e-12)
+    assert after["CORPORATE"] == pytest.approx(17.739318324443047, rel=1e-12)
+    assert after["CORPORATE"] < before["CORPORATE"]
 
 
 # ---- K-8f units -----------------------------------------------------------------------------------

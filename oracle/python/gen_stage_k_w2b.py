@@ -421,8 +421,9 @@ def blind(s, cid, op, fn, oc, tags, desc):
           description=desc)
 
 
-def hand(s, op, inp, fn, oc, tags, desc):
-    k8i = op.startswith("risk.capital.")  # the four K-8i hand cases, re-derived blind on 2026-11-20
+def hand(s, op, inp, fn, oc, tags, desc, rederived=True):
+    # the four K-8i hand cases of 2026-11-19 were re-derived blind on 2026-11-20; later cases pass rederived=False
+    k8i = op.startswith("risk.capital.") and rederived
     s.add(op, inp, to_float(fn(inp)), limit=LIM, output_classes=oc, verified=["hand", ORACLE, BLIND_K8I if k8i else ADDED],
           tags=tags + (["hand", "outside_checked", "blind"] if k8i else ["hand"]),
           description="hand: " + desc)
@@ -651,6 +652,14 @@ def gen_lev():
             {"id": "c1", "counterparty": "Q", "seniority": "SENIOR", "notional": 0, "market_value": 3}],
         "crm": [{"counterparty": "R", "provider": "Q", "protected": 20}]},
         lex, OC_LEX, TAGS_L, "KR-53 offsets across ranks; a G-SIB member makes the group G-SIB (KR-324); notional 0 is long (KR-323)")
+    # KR-324 confirmed 2026-11-20: a mixed group (one member G-SIB, one not) between 15% and 25% of Tier 1 breaches
+    # under "any member" (limit 150) and would not under "every member" (limit 250); GN is the all-non-G-SIB contrast.
+    hand(s, "risk.capital.large_exposures", {"tier1": 1000, "bank_gsib": True, "counterparties": [
+        {"id": "M1", "group": "GM", "gsib": True}, {"id": "M2", "group": "GM"},
+        {"id": "N1", "group": "GN"}, {"id": "N2", "group": "GN"}],
+        "banking_book": [{"counterparty": c, "value": 100} for c in ("M1", "M2", "N1", "N2")]},
+        lex, OC_LEX, TAGS_L, "mixed group: one G-SIB member and one not, exposure 20% of Tier 1, breaches the 15% limit (KR-324 any member)",
+        rederived=False)
     s.write()
 
 

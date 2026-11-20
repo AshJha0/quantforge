@@ -1,6 +1,6 @@
 # Stage K wave 2, lane A Java port: FRTB DRC and RRAO (K-8a) and FRTB IMA (K-8f)
 
-Branch `k-w2-java-a` (off `k-w2-py-a` at fc3ea73f), Java only, written 2026-11-19 by Claude Opus 5.5. The Python reference, specs, rulings (KR-50 to KR-69, KR-112 to KR-122) and goldens are those of `program/STAGE_K_W2A_HANDOVER.md`; nothing here changes them, and no golden was touched. The pattern is the SA-CCR port of `program/STAGE_K_W1B_PORTS_HANDOVER.md` (origin/k-r1). None of the central files was edited: `cli/Operations.java`, `cli/In.java`, `cli-contract.md`, `name-map.json`, registries and generated checklists are untouched. Evidence class of every result below: measured, 2026-11-19, local laptop, not the acceptance machine.
+Branch `k-w2-java-a` (off `k-w2-py-a` at fc3ea73f), Java only, written 2026-11-19 by Claude Opus 5.5. The Python reference, specs, rulings (KR-50 to KR-69, KR-300 to KR-310) and goldens are those of `program/STAGE_K_W2A_HANDOVER.md`; nothing here changes them, and no golden was touched. The pattern is the SA-CCR port of `program/STAGE_K_W1B_PORTS_HANDOVER.md` (origin/k-r1). None of the central files was edited: `cli/Operations.java`, `cli/In.java`, `cli-contract.md`, `name-map.json`, registries and generated checklists are untouched. Evidence class of every result below: measured, 2026-11-19, local laptop, not the acceptance machine.
 
 ## Files added
 
@@ -39,9 +39,9 @@ Each handler reads every input first (E_SCHEMA, enum values included: bucket, se
 
 ## PLA statistics (from the spec's definitions, no library)
 
-- Spearman (MAR32.36 to MAR32.38, KR-56, KR-117): average ranks as doubled integer ranks, ties found with primitive `==` after a stable sort with a primitive comparator (so -0.0 ties 0.0, as in Python); centred doubled ranks `2r - (n + 1)`; `S_xy`, `S_xx`, `S_yy` in `long` (exact up to n = 1,000,000); `S_xx` and `S_yy` converted to binary64 before the product; clamped to [-1, 1].
+- Spearman (MAR32.36 to MAR32.38, KR-56, KR-305): average ranks as doubled integer ranks, ties found with primitive `==` after a stable sort with a primitive comparator (so -0.0 ties 0.0, as in Python); centred doubled ranks `2r - (n + 1)`; `S_xy`, `S_xx`, `S_yy` in `long` (exact up to n = 1,000,000); `S_xx` and `S_yy` converted to binary64 before the product; clamped to [-1, 1].
 - KS (MAR32.39 to MAR32.41): `d` by one merge of the two sorted lists, counting the values at or below each pooled value; `ks = d / n`; zones on integers (`100 d < 9 n`, `100 d > 12 n`).
-- `Q_KS` (KR-117): 1 at x <= 0, the theta series for 0 < x < 1, the alternating series for x >= 1, terms added until one is 0, summed with the repo's correctly rounded `fsum`.
+- `Q_KS` (KR-305): 1 at x <= 0, the theta series for 0 < x < 1, the alternating series for x >= 1, terms added until one is 0, summed with the repo's correctly rounded `fsum`.
 - Checks without SciPy (`FrtbImaTest`): a brute-force Spearman on average ranks in doubles and a brute-force KS over every pooled value agree on 300 random tied series; the two `Q_KS` series agree with each other on x from 0.3 to 3.9; the printed MAR32.42 p-values 0.264 and 0.055 within 1e-3.
 
 ## Evidence
@@ -62,5 +62,5 @@ Not verified: the full Java suite, `GoldenSuiteTest` and the conformance runner 
 1. **Lane rules and the brief disagree on error order.** `LANE_RULES_K.md` (lesson, HR-66) lists "E_SCHEMA, structural E_INPUT, E_DOMAIN, E_LIMIT"; the brief, KR-67 and the goldens say E_SCHEMA, E_LIMIT, finite rule, E_INPUT, E_DOMAIN. This port follows KR-67 (the goldens fail otherwise). The lesson line in the lane rules should be updated for wave 2.
 2. **Commit trailer.** `LANE_RULES_K.md` says to end commits with "Claude Fable 5.2"; the brief says to use the actual model name. The commits on this branch carry "Claude Opus 5.5", the model that wrote them.
 3. **The page-limit line (registration line 2) touches `In.java`**, a central file the brief did not list. It is left as a registration line, not edited here, to avoid a merge conflict with other lanes.
-4. **KR-122, carried over:** the A3 sentence of `frtb-ima.md` on single-horizon scaling is wrong; the Java properties test the two corrected statements, as Python does. "An LH class key repeated" cannot occur in Java either (a JSON object).
+4. **KR-310, carried over:** the A3 sentence of `frtb-ima.md` on single-horizon scaling is wrong; the Java properties test the two corrected statements, as Python does. "An LH class key repeated" cannot occur in Java either (a JSON object).
 5. **SES underflow, carried over:** squares of charges below about 1e-154 underflow to 0 in binary64; the single-entry property is tested from 1e-100, as in Python.

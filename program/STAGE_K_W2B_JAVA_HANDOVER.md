@@ -1,6 +1,6 @@
 # Stage K wave 2b Java port: CVA capital (K-8g) and leverage ratio and large exposures, simplified (K-8i)
 
-Branch `k-w2-java-b` (off `k-w2-py-b` at 85f4ad12), written 2026-11-19 by the wave 2b Java port lane (Claude Opus 5.5). The Python reference, specs, rulings (KR-50 to KR-69, KR-120 to KR-135) and the nine goldens are those of `program/STAGE_K_W2B_HANDOVER.md`; nothing here changes them. Java only: no C++, no Rust. None of the central registration files was edited: `cli/Operations.java`, `specifications/cli-contract.md`, `name-map.json`, the registries and the generated checklists are untouched. The coordinator applies the lines below at integration. The pattern is the wave 1b SA-CCR port (`program/STAGE_K_W1B_PORTS_HANDOVER.md` on `k-r1`).
+Branch `k-w2-java-b` (off `k-w2-py-b` at 85f4ad12), written 2026-11-19 by the wave 2b Java port lane (Claude Opus 5.5). The Python reference, specs, rulings (KR-50 to KR-69, KR-311 to KR-326) and the nine goldens are those of `program/STAGE_K_W2B_HANDOVER.md`; nothing here changes them. Java only: no C++, no Rust. None of the central registration files was edited: `cli/Operations.java`, `specifications/cli-contract.md`, `name-map.json`, the registries and the generated checklists are untouched. The coordinator applies the lines below at integration. The pattern is the wave 1b SA-CCR port (`program/STAGE_K_W1B_PORTS_HANDOVER.md` on `k-r1`).
 
 ## Files
 
@@ -24,7 +24,7 @@ Branch `k-w2-java-b` (off `k-w2-py-b` at 85f4ad12), written 2026-11-19 by the wa
             new Registry.Module("stage_k_w2b", OpsStageKW2b::register)
 ```
 
-Then delete the test `registersFourVerbsAndNoCollision` in `java25/src/test/java/org/quantforge/cli/StageKW2bCliTest.java` (it asserts the verbs are not yet registered). `GoldenSuiteTest` will then replay the nine suites through `Main.handle` as well. No `In.pageLimited` entry: the 100,000 caps are the generic per-array cap (KR-126), which `In` already applies.
+Then delete the test `registersFourVerbsAndNoCollision` in `java25/src/test/java/org/quantforge/cli/StageKW2bCliTest.java` (it asserts the verbs are not yet registered). `GoldenSuiteTest` will then replay the nine suites through `Main.handle` as well. No `In.pageLimited` entry: the 100,000 caps are the generic per-array cap (KR-317), which `In` already applies.
 
 Suggested CI line (coordinator's choice of job): `python tools/gen_k_w2b_tables.py --check` next to `gen_k_w1b_tables.py --check`. Contract text: the wave 2b Python handover's "Contract entry" with "Implemented in Python only" changed to "Implemented in Python and Java".
 
@@ -36,11 +36,11 @@ The handler reads every input first; anything missing, mistyped or an enum value
 
 | Reading | Where | As built (= Python reference) |
 |---|---|---|
-| KR-133 G-SIB 15% group limit: any member or every member | `Leverage.GSIB_GROUP_ANY_MEMBER` (one boolean, marked `OPEN READING KR-133`) | `true`: any member flagged, with `bank_gsib` |
-| KR-121 CCS buckets 1a and 1b | `Cva.CCS_MERGE_1A_1B` (marked `OPEN READING KR-121`), used only by `Cva.ccsAggregationBucket` | `true`: one aggregation bucket `1` |
-| KR-124 equity vega 78% buckets | `Cva.EQ_VEGA_LARGE_CAP` (marked `OPEN READING KR-124`), used only by `Cva.eqVegaKey` | buckets 1 to 8 and 12 |
+| KR-324 G-SIB 15% group limit: any member or every member | `Leverage.GSIB_GROUP_ANY_MEMBER` (one boolean, marked `OPEN READING KR-324`) | `true`: any member flagged, with `bank_gsib` |
+| KR-312 CCS buckets 1a and 1b | `Cva.CCS_MERGE_1A_1B` (marked `OPEN READING KR-312`), used only by `Cva.ccsAggregationBucket` | `true`: one aggregation bucket `1` |
+| KR-315 equity vega 78% buckets | `Cva.EQ_VEGA_LARGE_CAP` (marked `OPEN READING KR-315`), used only by `Cva.eqVegaKey` | buckets 1 to 8 and 12 |
 
-If KR-121 changes to two buckets, Table 6 has no gamma between 1a and 1b; `ccsGamma` maps both labels to row 1 today, which would give gamma 1 between them, so that case also needs a ruling.
+If KR-312 changes to two buckets, Table 6 has no gamma between 1a and 1b; `ccsGamma` maps both labels to row 1 today, which would give gamma 1 between them, so that case also needs a ruling.
 
 ## Evidence (measured 2026-11-19, local laptop, not the acceptance machine)
 

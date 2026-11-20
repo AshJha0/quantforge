@@ -14,7 +14,7 @@ import org.quantforge.research.StressDrift;
 
 /**
  * FRTB standardised approach: default risk charge (DRC) and residual risk add-on (RRAO), plan item K-8a
- * (specifications/06-risk/frtb-drc-rrao.md; rulings KR-50 to KR-55, KR-67 to KR-69 and KR-112 to KR-116 of
+ * (specifications/06-risk/frtb-drc-rrao.md; rulings KR-50 to KR-55, KR-67 to KR-69 and KR-300 to KR-304 of
  * specifications/stage-k-rulings-w2.md). A port of python/quantforge_core/frtb_drc.py; the parameters come from
  * {@link FrtbDrcTables}, generated from specifications/tables/stage_k/mar22_drc.json and mar23_rrao.json.
  *
@@ -32,7 +32,7 @@ public final class FrtbDrc {
             "securitisation risk weights supplied by the caller (CRE40-CRE44 not implemented)";
     /** KR-67: positions and instruments per call. */
     public static final int MAX_POSITIONS = 100_000;
-    /** MAR22.22, in output order (KR-114). */
+    /** MAR22.22, in output order (KR-302). */
     public static final List<String> BUCKETS = List.of("CORPORATE", "SOVEREIGN", "LOCAL_GOV");
     /** KR-51 seniorities. */
     public static final List<String> SENIORITIES = List.of("COVERED", "SENIOR", "NON_SENIOR", "EQUITY");
@@ -297,7 +297,7 @@ public final class FrtbDrc {
             if (!ratings.containsKey(p.obligor())) {
                 throw new QfError("E_INPUT", "obligor " + p.obligor() + " has no rating", "positions/" + k + "/obligor");
             }
-            if (!bucketOf.computeIfAbsent(p.obligor(), o -> p.bucket()).equals(p.bucket())) { // KR-113
+            if (!bucketOf.computeIfAbsent(p.obligor(), o -> p.bucket()).equals(p.bucket())) { // KR-301
                 throw new QfError("E_INPUT", "obligor " + p.obligor() + " is in two buckets",
                         "positions/" + k + "/bucket");
             }
@@ -311,7 +311,7 @@ public final class FrtbDrc {
                 if (m != FrtbDrcTables.CASH_EQUITY_SHORT && m < FrtbDrcTables.CAPITAL_HORIZON) { // KR-52
                     throw new QfError("E_DOMAIN", "cash equity maturity must be 0.25 or at least 1", path);
                 }
-                if (!p.seniority().equals("EQUITY") || p.notional() != p.marketValue()) { // KR-112
+                if (!p.seniority().equals("EQUITY") || p.notional() != p.marketValue()) { // KR-300
                     throw new QfError("E_DOMAIN", "cash equity must be EQUITY with notional = market value", path);
                 }
             }
@@ -363,7 +363,7 @@ public final class FrtbDrc {
         }
     }
 
-    /** Sums scaled JTDs per netting key (MAR22.29, MAR22.39(1)); one rw per key (KR-115). Value {rw, net}. */
+    /** Sums scaled JTDs per netting key (MAR22.29, MAR22.39(1)); one rw per key (KR-303). Value {rw, net}. */
     private static Map<List<String>, double[]> netGroups(List<List<String>> keys, double[] rws, double[] scaled,
             String field) {
         Map<List<String>, Double> rwOf = new HashMap<>();

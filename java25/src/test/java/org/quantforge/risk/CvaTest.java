@@ -114,7 +114,7 @@ class CvaTest {
         assertEquals(12.5 * red.capital(), red.rwa());
         Cva.BaResult none = Cva.baCva(List.of(new Cva.Counterparty("A", "other", "IG", List.of())), "REDUCED",
                 List.of(), List.of());
-        assertEquals(0.0, none.counterparties().get(0).scva()); // KR-122
+        assertEquals(0.0, none.counterparties().get(0).scva()); // KR-313
     }
 
     // --- seeded BA-CVA properties (Python: Hypothesis) ---------------------------------------------------------
@@ -252,7 +252,7 @@ class CvaTest {
         assertEquals("E_INPUT", saCode(Map.of("CCS.DELTA", List.of(
                 new Cva.Sensitivity("2", null, credit("X", "1Y", "IG"), 1, 0),
                 new Cva.Sensitivity("2", null, credit("X", "5Y", "HY_NR"), 1, 0))), "USD", 1));
-        // KR-121: the same name and tenor under 1a and 1b is one factor of bucket 1 twice
+        // KR-312: the same name and tenor under 1a and 1b is one factor of bucket 1 twice
         assertEquals("E_INPUT", saCode(Map.of("CCS.DELTA", List.of(
                 new Cva.Sensitivity("1a", null, credit("X", "1Y", "IG"), 1, 0),
                 new Cva.Sensitivity("1b", null, credit("X", "1Y", "IG"), 1, 0))), "USD", 1));
@@ -366,7 +366,7 @@ class CvaTest {
         Cva.SaResult out = Cva.saCva(book, "USD", 1.0);
         Map<String, Cva.ClassResult> cls = out.classes();
         assertEquals(List.of("CCS.DELTA", "RCS.DELTA", "EQ.DELTA", "EQ.VEGA", "COM.DELTA"),
-                new ArrayList<>(cls.keySet())); // KR-125 order
+                new ArrayList<>(cls.keySet())); // KR-316 order
         double w0 = 0.005 * 1e5;
         double w1 = 0.02 * 1e5;
         assertTrue(close(cls.get("RCS.DELTA").k(), Math.sqrt(w0 * w0 + w1 * w1 + 2 * 0.5 * w0 * w1), 1e-12));

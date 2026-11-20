@@ -176,7 +176,7 @@ class StageKW2bCliTest {
         // empty classes: total 0
         Map<String, Object> r = run("risk.cva.sa", parse("{\"reporting_currency\":\"USD\",\"classes\":{}}"));
         assertEquals(0.0, ((Json.Number) ((Map<?, ?>) r.get("outputs")).get("total")).value());
-        // the ignored trading book fields are still read for type and finiteness (KR-131)
+        // the ignored trading book fields are still read for type and finiteness (KR-322)
         assertEquals("E_SCHEMA", code(run("risk.capital.large_exposures", parse("{\"tier1\":100,\"counterparties\":"
                 + "[{\"id\":\"A\"}],\"trading_book\":[{\"id\":\"p\",\"counterparty\":\"A\",\"seniority\":\"SENIOR\","
                 + "\"notional\":1,\"market_value\":1,\"cash_equity\":1}]}"))));
@@ -186,7 +186,7 @@ class StageKW2bCliTest {
         // optional lists absent: leverage with on-balance items only
         r = run("risk.capital.leverage", parse("{\"tier1\":3,\"on_balance\":[100]}"));
         assertEquals(true, ((Map<?, ?>) r.get("outputs")).get("meets_minimum"));
-        // the generic per-array cap (KR-126) is E_LIMIT, ahead of E_DOMAIN
+        // the generic per-array cap (KR-317) is E_LIMIT, ahead of E_DOMAIN
         List<Object> many = new ArrayList<>();
         for (int i = 0; i < 100_001; i++) {
             many.add(new Json.Number(1.0, "1"));

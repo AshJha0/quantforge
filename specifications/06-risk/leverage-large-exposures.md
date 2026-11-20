@@ -33,12 +33,12 @@ Outputs: each part, `exposure`, `ratio`, `meets_minimum`, `label`.
 
 ### `risk.capital.large_exposures`
 
-Inputs (KR-66): `tier1 > 0`; `counterparties` [{id, group?, gsib?, exempt?}]; `banking_book` [{counterparty, value >= 0}]; `off_balance` [{counterparty, notional >= 0, ccf}] (the caller's standardised CCF, floored at 0.10 by the operation, LEX30.6); `crm` [{counterparty, provider, protected >= 0}] (LEX30.13-30.14); `trading_book` positions as KR-51 with a `counterparty` field.
+Inputs (KR-66): `tier1 > 0`; `bank_gsib` (optional Boolean, default false: whether the reporting bank is itself a G-SIB, KR-324; the text requires the fact, the field name and the default are ours, evidence class inferred, KR-319); `counterparties` [{id, group?, gsib?, exempt?}]; `banking_book` [{counterparty, value >= 0}]; `off_balance` [{counterparty, notional >= 0, ccf}] (the caller's standardised CCF, floored at 0.10 by the operation, LEX30.6); `crm` [{counterparty, provider, protected >= 0}] (LEX30.13-30.14); `trading_book` positions as KR-51 with a `counterparty` field.
 
 - Trading book (LEX30.17-30.19, 30.22-30.23, 30.30): gross JTD of MAR22.11 with LGD 1 and no maturity weight; offsets per counterparty by the KR-53 rule; a net short counts 0.
 - Exposure per counterparty = banking book + converted off-balance sheet + trading book net long - protected amounts + amounts received as provider (LEX30.14, LEX30.15).
 - Exposure per group = sum over members (LEX10.9); a counterparty without a group is its own group.
-- `large` = exposure >= 0.10 tier1 (LEX10.8); `limit` = 0.15 tier1 if the bank and the counterparty are both flagged G-SIB, else 0.25 tier1 (LEX20.1); `breach` = exposure > limit; exempt counterparties are reported, never breach.
+- `large` = exposure >= 0.10 tier1 (LEX10.8); `limit` = 0.15 tier1 if `bank_gsib` is true and at least one member of the group is flagged `gsib` (LEX20.1; KR-324 "any member", an inferred reading), else 0.25 tier1; `breach` = exposure > limit; exempt counterparties are reported, never breach.
 - Report list: every group with `large` true, plus the 20 largest (LEX20.4(1), (4)).
 
 Outputs: per group `exposure`, `share` (exposure / tier1), `large`, `limit`, `breach`; `report`; `label`.
@@ -77,6 +77,7 @@ Outputs: per group `exposure`, `share` (exposure / tier1), `large`, `limit`, `br
 | lex_k-0005 | H: long bond 50/50; short same issue -80/-80 | 0 (net short) | LEX30.22, 30.30 | B |
 | lex_k-0006 | off balance notional 1000, ccf 0 | 100 | floor 10% (LEX30.6) | B |
 | lex_k-0007 | bank and counterparty G-SIB; exposure 160, tier1 1000 | limit 150; breach | LEX20.1 | B |
+| lex_k-0010 | `bank_gsib`; group GM of M1 (`gsib`) and M2 (not), 100 each; group GN of N1 and N2 (neither `gsib`), 100 each; tier1 1000 | GM limit 150, breach (200 > 150); GN limit 250, no breach | KR-324 "any member": under "every member" GM would take 250 and not breach. Added 2026-11-20 when KR-324 was confirmed; hand case, not counted as outside-checked (KR-68) | none |
 
 Error goldens: lev_ke-0001 `tier1` 0 (`E_DOMAIN`); lev_ke-0002 `exposures` and `collateral` lengths 2 and 1 (`E_INPUT`); lev_ke-0003 unlisted CCF category and a negative notional at once (`E_SCHEMA`); lex_ke-0001 counterparty in two groups (`E_INPUT`); lex_ke-0002 `ccf` 1.5 (`E_DOMAIN`).
 
@@ -91,5 +92,9 @@ Value cases 18; printed (P) 5; library (L) 0. Strict share 5/18 = 28%.
 ## Limits (what is left out, exactly)
 
 Leverage ratio (KR-65): Tier 1 and its deductions (LEV30.3) are inputs; PFE is an input or comes from the SA-CCR operation (K-8d) with the multiplier forced to 1; CCP client clearing (LEV30.26-30.29); cash pooling (LEV30.12); trade-date accounting offsets (LEV30.10-30.11); securitisation derecognition (LEV30.5); central bank reserves exemption (LEV30.7); agent SFTs (LEV30.41-30.44); eligibility tests for purchased protection (LEV30.31(1)-(5), 30.32-30.34: the caller asserts `purchased_offset`); exclusion of written CD PFE (LEV30.35); provisions against off-balance sheet items (LEV30.48); the G-SIB leverage buffer (LEV40); quarter-end or averaging rules (LEV20.6).
+
+Large exposures, the G-SIB rule for groups (KR-324, inferred): the Basel text (LEX20.1, LEX40.1, LEX40.3) gives a G-SIB a 15% limit for its exposure to another G-SIB but does not say what happens when a group of connected counterparties has some members that are G-SIBs and some that are not. We apply 15% to the whole group when any one member is flagged `gsib`, so that adding a non-G-SIB member to a group can never loosen the limit the G-SIB member would have on its own. This is our reading, not text; golden lex_k-0010 pins it.
+
+Written credit derivatives (KR-320): the input is the signed `fair_value`, and the operation reduces the notional by `max(0, -fair_value)`. This assumes the full negative fair value has been incorporated in Tier 1 (LEV30.31); a partial incorporation is not modelled.
 
 Large exposures (KR-66): connectedness (LEX10.9-10.18) is the caller's group map; exemptions are a flag (LEX30.31-30.59 not modelled: sovereigns, covered bonds, interbank, CCPs); look-through for funds and securitisations (LEX30.41-30.53); the LEX30.28 rule for CDS with a non-financial provider or reference; SFT haircuts (LEX30.5) and the standardised CCFs themselves (LEX30.6, only the 10% floor is applied); maturity mismatch of CRM (LEX30.10-30.11, the caller passes the recognised amount); reporting before and after CRM (LEX20.4(1)-(2)) is reduced to one list after CRM.

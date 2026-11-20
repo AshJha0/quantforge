@@ -122,7 +122,7 @@ class FrtbImaTest {
     }
 
     /**
-     * The two series of Q_KS agree where both converge (KR-117: either form alone stays within the tolerance for
+     * The two series of Q_KS agree where both converge (KR-305: either form alone stays within the tolerance for
      * x &gt; 0); here the theta form is evaluated at x &gt;= 1 and the alternating form at x &lt; 1.
      */
     @Test
@@ -270,11 +270,11 @@ class FrtbImaTest {
         classes.put("IR", new double[] {1, 2, 1});
         FrtbIma.Imcc im = FrtbIma.imcc(new double[] {1, 1, 1}, classes);
         assertEquals(List.of("CS"), im.classesFloored());
-        assertEquals(List.of("IR", "CS"), new ArrayList<>(im.classes().keySet())); // KR-114 order
+        assertEquals(List.of("IR", "CS"), new ArrayList<>(im.classes().keySet())); // KR-302 order
         FrtbIma.Capital c = FrtbIma.capital(10, 0, 10, 0, 12, 0, List.of(), 0, 100, 0.25);
         assertEquals(2.25, c.mC());
         assertEquals(0, c.k());
-        assertEquals(45.0, c.acrTotal()); // no desks: SA_G,A 0 (KR-120)
+        assertEquals(45.0, c.acrTotal()); // no desks: SA_G,A 0 (KR-308)
         assertEquals("E_LIMIT", code(() -> FrtbIma.capital(1, 1, 1, 1, 0, 0,
                 Collections.nCopies(FrtbIma.MAX_LIST + 1, new FrtbIma.Desk("GREEN", 1)), 0, 1, 0)));
         assertEquals("E_LIMIT", code(() -> FrtbIma.ses(new double[FrtbIma.MAX_LIST + 1], e, e)));
@@ -294,7 +294,7 @@ class FrtbImaTest {
         double[] single = new double[5];
         single[j] = e;
         assertEquals(e * Math.sqrt(w[j]), FrtbIma.esLh(single, null, null).es(), 1e-14 * e);
-        // every risk factor at horizon LH_j: ES_1 = ... = ES_j = E, the rest 0 -> E sqrt(LH_j / 10) (KR-122)
+        // every risk factor at horizon LH_j: ES_1 = ... = ES_j = E, the rest 0 -> E sqrt(LH_j / 10) (KR-310)
         double[] nested = new double[5];
         for (int k = 0; k <= j; k++) {
             nested[k] = e;

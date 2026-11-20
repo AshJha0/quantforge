@@ -15,12 +15,12 @@ import org.quantforge.research.StressDrift;
 
 /**
  * FRTB internal models approach, plan item K-8f (specifications/06-risk/frtb-ima.md; rulings KR-50, KR-56 to KR-61,
- * KR-67 to KR-69 and KR-117 to KR-122 of specifications/stage-k-rulings-w2.md): the PLA test, liquidity horizons, ES
+ * KR-67 to KR-69 and KR-305 to KR-310 of specifications/stage-k-rulings-w2.md): the PLA test, liquidity horizons, ES
  * with the liquidity-horizon cascade, stressed ES, IMCC, SES, the capital aggregation and the RFET. A port of
  * python/quantforge_core/frtb_ima.py; parameters from {@link FrtbImaTables}, generated from
  * specifications/tables/stage_k/mar31_rfet.json, mar32_pla.json and mar33_ima.json.
  *
- * <p>The PLA statistics are written from the spec's definitions (MAR32.36 to MAR32.41, KR-56, KR-117), with no
+ * <p>The PLA statistics are written from the spec's definitions (MAR32.36 to MAR32.41, KR-56, KR-305), with no
  * statistics library: average ranks, Pearson correlation of the ranks in exact integer sums, the two-sample KS count
  * by a merge of the sorted lists, and the Kolmogorov tail by its two series. Error order KR-67: E_LIMIT, structural
  * E_INPUT, E_DOMAIN here; E_SCHEMA and the finite rule in the input layer.
@@ -38,12 +38,12 @@ public final class FrtbIma {
     static final int PLA_MIN_N = 3;
     /** MAR33.45. */
     static final double SURCHARGE_K = 0.5;
-    /** MAR33.15 risk classes, in output order (KR-114). */
+    /** MAR33.15 risk classes, in output order (KR-302). */
     public static final List<String> IMCC_CLASSES = List.of("IR", "EQ", "FX", "COM", "CS");
     /** MAR33.12 Table 2 categories. */
     public static final List<String> LH_CATEGORIES = List.of(FrtbImaTables.LH_CATEGORY);
 
-    // ---- PLA (MAR32.34 to MAR32.44, KR-56, KR-117) ----------------------------------------------------------
+    // ---- PLA (MAR32.34 to MAR32.44, KR-56, KR-305) ----------------------------------------------------------
 
     /** The result of {@link #pla}. */
     public record Pla(long n, double spearman, double ks, long ksCount, String zone, double ksPvalueAsymptotic,
@@ -75,7 +75,7 @@ public final class FrtbIma {
     /**
      * MAR32.36 to MAR32.38: the Pearson correlation of the average ranks, on centred doubled ranks 2r - (n + 1)
      * (integers in [-(n-1), n-1]; every sum exact in 64 bits up to n = 1,000,000), one rounding at the end, clamped
-     * to [-1, 1] (KR-117).
+     * to [-1, 1] (KR-305).
      */
     public static double spearman(double[] hpl, double[] rtpl) {
         int n = hpl.length;
@@ -120,7 +120,7 @@ public final class FrtbIma {
     }
 
     /**
-     * Kolmogorov tail Q_KS(x) = 2 sum_{k&gt;=1} (-1)^(k-1) exp(-2 k^2 x^2) (KR-56), evaluated as KR-117: 1 at
+     * Kolmogorov tail Q_KS(x) = 2 sum_{k&gt;=1} (-1)^(k-1) exp(-2 k^2 x^2) (KR-56), evaluated as KR-305: 1 at
      * x &lt;= 0; for 0 &lt; x &lt; 1 the theta series 1 - sqrt(2 pi)/x sum_{k&gt;=1} exp(-(2k-1)^2 pi^2 / (8 x^2));
      * terms are added in order of k until one is 0 in binary64.
      */
@@ -180,7 +180,7 @@ public final class FrtbIma {
         return new Pla(n, rs, ks, d, zone, pvalue(ks, n), n == FrtbImaTables.PLA_WINDOW);
     }
 
-    /** Q_KS(ks sqrt(n/2)), for the printed p-values of MAR32.42 (KR-117: n &gt;= 1). */
+    /** Q_KS(ks sqrt(n/2)), for the printed p-values of MAR32.42 (KR-305: n &gt;= 1). */
     public static double plaKsPvalue(double ks, long n) {
         if (!(ks >= 0 && ks <= 1)) {
             throw new QfError("E_DOMAIN", "ks must be in [0, 1]", "ks");
@@ -191,7 +191,7 @@ public final class FrtbIma {
         return pvalue(ks, n);
     }
 
-    // ---- Liquidity horizons (MAR33.12, KR-60, KR-118) ------------------------------------------------------
+    // ---- Liquidity horizons (MAR33.12, KR-60, KR-306) ------------------------------------------------------
 
     /**
      * One index constituent (MAR33.12 FAQ5).
@@ -259,7 +259,7 @@ public final class FrtbIma {
     }
 
     /**
-     * MAR33.12 Table 2, footnote 309, FAQ4 (maturity) and FAQ5 (index constituents); KR-60, KR-118. Exactly one of
+     * MAR33.12 Table 2, footnote 309, FAQ4 (maturity) and FAQ5 (index constituents); KR-60, KR-306. Exactly one of
      * {@code category}, {@code fxPair} and {@code constituents} is non-null; {@code maturityDays} may be null.
      */
     public static Horizon liquidityHorizon(String category, String fxPair, List<Constituent> constituents,
@@ -405,7 +405,7 @@ public final class FrtbIma {
             for (int j = 0; j < horizons; j++) {
                 double v = pnl[j].length == 0 ? 0.0
                         : PortfolioRisk.historical(pnl[j], FrtbImaTables.ES_CONFIDENCE).es();
-                if (v < 0) { // KR-119
+                if (v < 0) { // KR-307
                     throw new QfError("E_DOMAIN", "the ES of a P&L list is negative (its tail is a gain)", "pnl/" + j);
                 }
                 es[j] = v;
@@ -500,7 +500,7 @@ public final class FrtbIma {
         return new Ses(a, b, c, a + b + c);
     }
 
-    // ---- Capital (MAR33.41 to MAR33.45, KR-61, KR-120) ------------------------------------------------------
+    // ---- Capital (MAR33.41 to MAR33.45, KR-61, KR-308) ------------------------------------------------------
 
     /**
      * One trading desk of the capital aggregation.
@@ -529,7 +529,7 @@ public final class FrtbIma {
         String[] names = {"imcc_prev", "ses_prev", "imcc_avg", "ses_avg", "drc", "c_u", "sa_all", "qualitative_addon"};
         double[] values = {imccPrev, sesPrev, imccAvg, sesAvg, drc, cU, saAll, qualitativeAddon};
         for (int i = 0; i < names.length; i++) {
-            if (values[i] < 0) { // KR-120
+            if (values[i] < 0) { // KR-308
                 throw new QfError("E_DOMAIN", names[i] + " must be 0 or above", names[i]);
             }
         }
@@ -540,7 +540,7 @@ public final class FrtbIma {
         List<Double> amber = new ArrayList<>();
         for (int j = 0; j < all.length; j++) {
             Desk d = desks.get(j);
-            if (d.sa() < 0) { // KR-120
+            if (d.sa() < 0) { // KR-308
                 throw new QfError("E_DOMAIN", "a desk SA must be 0 or above", "desks/" + j + "/sa");
             }
             all[j] = d.sa();
@@ -562,7 +562,7 @@ public final class FrtbIma {
         return new Capital(mC, cA, imaGa, saGa, k, surcharge, acr);
     }
 
-    // ---- RFET (MAR31.12 to MAR31.16, KR-59, KR-121) ---------------------------------------------------------
+    // ---- RFET (MAR31.12 to MAR31.16, KR-59, KR-309) ---------------------------------------------------------
 
     /**
      * The result of {@link #rfet}; the window fields are null when no 90-day window fits.
@@ -644,7 +644,7 @@ public final class FrtbIma {
 
     /**
      * MAR31.16 Table 1 bucket (1-based), lower bound inclusive, upper exclusive (KR-59). Rows A to C take a maturity
-     * {@code t} in years, row D an option {@code delta} (KR-121); the other must be null.
+     * {@code t} in years, row D an option {@code delta} (KR-309); the other must be null.
      */
     public static Bucket rfetBucket(String row, Double t, Double delta) {
         boolean d = row.equals("D");

@@ -15,7 +15,7 @@ import org.quantforge.research.StressDrift;
 
 /**
  * CVA risk capital (plan item K-8g, cva-capital.md): BA-CVA reduced (MAR50.14) and full (MAR50.20), and SA-CVA
- * (MAR50.42 to 50.53). Rulings KR-50, KR-62 to KR-64, KR-67 to KR-69 and KR-120 to KR-127
+ * (MAR50.42 to 50.53). Rulings KR-50, KR-62 to KR-64, KR-67 to KR-69 and KR-311 to KR-318
  * (stage-k-rulings-w2.md). Port of {@code python/quantforge_core/cva.py}: same checks in the same order (KR-67: E_SCHEMA,
  * then structural E_INPUT, then E_DOMAIN; the CLI layer holds E_LIMIT and the finite rule ahead of the core), same
  * sums (math.fsum as {@link StressDrift#fsum}, Python's built-in sum as {@link #pySum}). Every parameter is read from
@@ -259,7 +259,7 @@ public final class Cva {
         Set<String> ids = new HashSet<>();
         for (Counterparty c : cps) {
             if (!ids.add(c.id())) {
-                throw input("counterparty " + c.id() + " appears twice", "id"); // KR-121
+                throw input("counterparty " + c.id() + " appears twice", "id"); // KR-312
             }
         }
         if (version.equals("REDUCED") && (!single.isEmpty() || !index.isEmpty())) {
@@ -301,7 +301,7 @@ public final class Cva {
             List<Double> w = new ArrayList<>();
             for (Constituent k : ih.constituents()) {
                 if (k.weight() < 0) {
-                    throw domain("index weights must not be negative", "weight"); // KR-122
+                    throw domain("index weights must not be negative", "weight"); // KR-313
                 }
                 w.add(k.weight());
             }
@@ -419,7 +419,7 @@ public final class Cva {
     public static final List<String> RISK_CLASSES = List.of("IR", "FX", "CCS", "RCS", "EQ", "COM");
     /** Delta and vega. */
     public static final List<String> KINDS = List.of("DELTA", "VEGA");
-    /** Output and processing order of the class keys (KR-125); CCS has no vega. */
+    /** Output and processing order of the class keys (KR-316); CCS has no vega. */
     public static final List<String> CLASS_KEYS;
 
     static {
@@ -436,11 +436,11 @@ public final class Cva {
 
     /** MAR50.56(1), "inflation" included. */
     static final List<String> IR_TENORS = strings(list("ir.tenors_specified"));
-    /** KR-120: the parallel-shift factor of an unspecified currency (MAR50.57). */
+    /** KR-311: the parallel-shift factor of an unspecified currency (MAR50.57). */
     public static final String IR_CURVE = "CURVE";
-    /** IR delta factor names (KR-120). */
+    /** IR delta factor names (KR-311). */
     public static final List<String> IR_DELTA_FACTORS;
-    /** IR vega factor names (KR-120, MAR50.58(1)). */
+    /** IR vega factor names (KR-311, MAR50.58(1)). */
     public static final List<String> IR_VEGA_FACTORS = List.of("IR_VOL", "INFLATION_VOL");
     /** MAR50.65(1). */
     public static final List<String> CCS_TENORS = strings(list("ccs.tenors"));
@@ -455,13 +455,12 @@ public final class Cva {
 
     private static final Pattern CURRENCY = Pattern.compile("[A-Z]{3}");
 
-    // ===== OPEN READING KR-121 (CCS buckets 1a and 1b), under check against the Basel text by another lane. =====
-    // true: 1a and 1b select the risk weight and aggregate as one bucket "1" (the Python reference). false: they are
-    // two buckets "1a" and "1b" (gamma between them then needs a ruling; ccsGamma maps both to Table 6 row 1).
+    // KR-312, CONFIRMED 2026-11-20 (one bucket; read from MAR50.63 Table 6, which has one row for bucket 1):
+    // 1a and 1b select the risk weight and aggregate as one bucket "1", as in the Python reference.
     static final boolean CCS_MERGE_1A_1B = true;
 
-    // ===== OPEN READING KR-124 (equity vega 78% buckets), under check against the Basel text by another lane. =====
-    // MAR50.73(3) "large market capitalisation buckets": Table 11 "Large" buckets 1 to 8 and the index bucket 12.
+    // KR-315, CONFIRMED 2026-11-20: MAR50.73(3) "large market capitalisation buckets" are Table 11 "Large" buckets
+    // 1 to 8 (read) and the index bucket 12, "Large cap, advanced economies" (applying the phrase to it: inferred).
     static final Set<Integer> EQ_VEGA_LARGE_CAP = Set.of(1, 2, 3, 4, 5, 6, 7, 8, 12);
 
     private static List<String> strings(List<Object> l) {
@@ -507,7 +506,7 @@ public final class Cva {
      * @param kB K_b
      * @param sB S_b, clipped
      * @param sumWs sum of WS_k before clipping
-     * @param floored true when the radicand was below 0 (KR-62, KR-127)
+     * @param floored true when the radicand was below 0 (KR-62, KR-318)
      */
     public record BucketRow(String bucket, double kB, double sB, double sumWs, boolean floored) {}
 
@@ -587,7 +586,7 @@ public final class Cva {
         return tenor * name * quality;
     }
 
-    /** MAR50.67 Table 9 rows: 1/8 .. 7/14 are rows 0..6, then 15, 16, 17 are rows 7, 8, 9 (KR-125). */
+    /** MAR50.67 Table 9 rows: 1/8 .. 7/14 are rows 0..6, then 15, 16, 17 are rows 7, 8, 9 (KR-316). */
     static int rcsRow(int b) {
         return b <= 7 ? b - 1 : b - 8;
     }
@@ -631,17 +630,17 @@ public final class Cva {
         return b.equals("1a") || b.equals("1b") ? 0 : Integer.parseInt(b) - 1;
     }
 
-    /** MAR50.64 Table 6; buckets 1a and 1b are bucket 1 (KR-121). */
+    /** MAR50.64 Table 6; buckets 1a and 1b are bucket 1 (KR-312). */
     static double ccsGamma(String b, String c) {
         return upper("ccs.gamma", ccsRow(b), ccsRow(c));
     }
 
-    /** The aggregation bucket of a CCS bucket label (KR-121, see {@link #CCS_MERGE_1A_1B}). */
+    /** The aggregation bucket of a CCS bucket label (KR-312, see {@link #CCS_MERGE_1A_1B}). */
     static String ccsAggregationBucket(String b) {
         return CCS_MERGE_1A_1B && (b.equals("1a") || b.equals("1b")) ? "1" : b;
     }
 
-    /** The equity vega risk weight key of a bucket (KR-124, see {@link #EQ_VEGA_LARGE_CAP}). */
+    /** The equity vega risk weight key of a bucket (KR-315, see {@link #EQ_VEGA_LARGE_CAP}). */
     static String eqVegaKey(int bucket) {
         return EQ_VEGA_LARGE_CAP.contains(bucket) ? "large_cap" : "other";
     }
@@ -750,7 +749,7 @@ public final class Cva {
         return new Entry(b, List.of(), rw, s);
     }
 
-    /** A CCS name (bucket 8: an index series) has one quality and one legal group (KR-123). */
+    /** A CCS name (bucket 8: an index series) has one quality and one legal group (KR-314). */
     private static void checkNames(List<Entry> entries) {
         Map<List<Object>, List<String>> seen = new HashMap<>();
         for (Entry e : entries) {

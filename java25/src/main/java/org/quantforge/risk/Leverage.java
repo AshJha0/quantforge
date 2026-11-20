@@ -15,7 +15,7 @@ import org.quantforge.research.StressDrift;
 
 /**
  * Leverage ratio and large exposures, simplified (plan item K-8i, leverage-large-exposures.md). Rulings KR-50 to
- * KR-53, KR-65 to KR-69 and KR-128 to KR-135 (stage-k-rulings-w2.md). Port of
+ * KR-53, KR-65 to KR-69 and KR-319 to KR-326 (stage-k-rulings-w2.md). Port of
  * {@code python/quantforge_core/leverage.py}: same checks in the same order (E_SCHEMA, structural E_INPUT, E_DOMAIN;
  * the CLI layer holds E_LIMIT and the finite rule ahead of the core) and the same correctly rounded sums
  * ({@link StressDrift#fsum}, as math.fsum). Parameters come from the generated {@link KW2bTables}. "Simplified" means
@@ -74,9 +74,8 @@ public final class Leverage {
         RANKS = Collections.unmodifiableMap(m);
     }
 
-    // ===== OPEN READING KR-133 (G-SIB 15% group limit), under check against the Basel text by another lane. =====
-    // true: a group takes the 15% limit when the bank is a G-SIB and ANY member is flagged (the Python reference).
-    // false: only when EVERY member is flagged (the blind lane's assumption).
+    // KR-324, CONFIRMED 2026-11-20 as an inferred reading (LEX20.1 and LEX40 are silent on mixed groups): a group
+    // takes the 15% limit when the bank is a G-SIB and ANY member is flagged. Golden lex_k-0010 is the mixed group.
     static final boolean GSIB_GROUP_ANY_MEMBER = true;
 
     private static QfError schema(String message, String field) {
@@ -148,7 +147,7 @@ public final class Leverage {
      * The leverage ratio result.
      *
      * @param onBalance on-balance sheet part
-     * @param derivatives derivative part (netting sets plus written CDs, KR-129)
+     * @param derivatives derivative part (netting sets plus written CDs, KR-320)
      * @param derivativeNettingSets netting sets only
      * @param writtenCreditDerivatives written CD effective notionals
      * @param sfts SFT part
@@ -263,7 +262,7 @@ public final class Leverage {
             parts.add(writtenCdEffectiveNotional(w));
         }
         double writtenSum = fsum(parts);
-        double deriv = nettingSets + writtenSum; // KR-129: written credit derivatives sit in the derivatives part
+        double deriv = nettingSets + writtenSum; // KR-320: written credit derivatives sit in the derivatives part
         parts.clear();
         for (Sft s : sfts) {
             parts.add(sftExposure(s));
@@ -276,7 +275,7 @@ public final class Leverage {
         double obs = fsum(parts);
         double exposure = StressDrift.fsum(new double[] {on, deriv, sft, obs}); // LEV20.5
         if (!(exposure > 0)) {
-            throw domain("the exposure measure is zero: no ratio (KR-130)", "on_balance");
+            throw domain("the exposure measure is zero: no ratio (KR-321)", "on_balance");
         }
         return new LeverageResult(on, deriv, nettingSets, writtenSum, sft, obs, exposure, tier1 / exposure,
                 tier1 >= MIN_RATIO * exposure, LEVERAGE_LABEL); // LEV20.3, LEV20.7 in binary64
@@ -327,12 +326,12 @@ public final class Leverage {
 
     /**
      * A trading book position (KR-51 with a counterparty, KR-66); maturity, cash equity and LGD flags are read and
-     * ignored (LEX30.17-30.18, KR-131).
+     * ignored (LEX30.17-30.18, KR-322).
      *
      * @param id position id, unique
      * @param counterparty counterparty id
      * @param seniority one of {@link #RANKS}
-     * @param notional notional (>= 0 long, KR-132)
+     * @param notional notional (>= 0 long, KR-323)
      * @param marketValue market value
      */
     public record TradingPosition(String id, String counterparty, String seniority, double notional,
@@ -429,7 +428,7 @@ public final class Leverage {
     }
 
     /**
-     * LEX30.17: gross JTD of MAR22.11 with LGD 100% is the market value, kept on the position's side (KR-132).
+     * LEX30.17: gross JTD of MAR22.11 with LGD 100% is the market value, kept on the position's side (KR-323).
      *
      * @param p the position
      * @return signed JTD
@@ -449,7 +448,7 @@ public final class Leverage {
         }
         for (LeCounterparty c : cps) {
             if (c.group() != null && groupOf.containsKey(c.group()) && !c.group().equals(groupOf.get(c.group()))) {
-                throw input("group " + c.group() + " is also a counterparty outside it (KR-133)", "group");
+                throw input("group " + c.group() + " is also a counterparty outside it (KR-324)", "group");
             }
         }
         for (String[] r : refs) {
@@ -592,7 +591,7 @@ public final class Leverage {
             for (LeCounterparty c : ms) {
                 all.add(exposure.get(c.id()));
                 if (!c.exempt()) {
-                    counted.add(exposure.get(c.id())); // KR-134
+                    counted.add(exposure.get(c.id())); // KR-325
                 }
                 ids.add(c.id());
                 anyGsib |= c.gsib();
@@ -601,9 +600,9 @@ public final class Leverage {
             }
             double total = fsum(all); // LEX10.9
             double countedSum = fsum(counted);
-            boolean gsib = bankGsib && (GSIB_GROUP_ANY_MEMBER ? anyGsib : everyGsib); // KR-133, open reading
+            boolean gsib = bankGsib && (GSIB_GROUP_ANY_MEMBER ? anyGsib : everyGsib); // KR-324, open reading
             double limit = (gsib ? LIMIT_GSIB : LIMIT) * tier1;
-            boolean large = total >= LARGE * tier1; // LEX10.8, binary64 (KR-135)
+            boolean large = total >= LARGE * tier1; // LEX10.8, binary64 (KR-326)
             groups.add(new GroupRow(g.getKey(), List.copyOf(ids), total, total / tier1, large, limit,
                     countedSum > limit, allExempt));
         }

@@ -21,7 +21,7 @@ import org.quantforge.risk.Leverage;
 final class OpsStageKW2b {
     private OpsStageKW2b() {}
 
-    /** An optional array of objects: absent means empty (KR-122, KR-128). */
+    /** An optional array of objects: absent means empty (KR-313, KR-319). */
     private static List<In> list(In in, String key) {
         return in.has(key) ? in.objects(key) : List.of();
     }
@@ -81,7 +81,7 @@ final class OpsStageKW2b {
             rows.add(Operations.out("id", c.id(), "scva", c.scva(), "snh", c.snh(), "hma", c.hma(), "netting_sets",
                     sets).outputs());
         }
-        // Arrays.asList: the FULL-only fields are null for REDUCED (KR-122)
+        // Arrays.asList: the FULL-only fields are null for REDUCED (KR-313)
         return Arrays.asList("version", r.version(), "counterparties", rows, "ih", r.ih(), "k_reduced", r.kReduced(),
                 "k_hedged", r.kHedged(), "k_full", r.kFull(), "capital", r.capital(), "rwa", r.rwa(), "label",
                 r.label());
@@ -208,7 +208,7 @@ final class OpsStageKW2b {
             String seniority = choice(t, "seniority", seniorities);
             double notional = t.real("notional");
             double mv = t.real("market_value");
-            t.realOrNull("maturity_years"); // read for its type and the finite rule only (KR-131)
+            t.realOrNull("maturity_years"); // read for its type and the finite rule only (KR-322)
             t.bool("cash_equity", false);
             t.bool("lgd_applies", true);
             tb.add(new Leverage.TradingPosition(id, cp, seniority, notional, mv));

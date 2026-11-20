@@ -113,7 +113,7 @@ class FrtbDrcTest {
         // structural before domain, over every position (KR-67)
         assertEquals("E_INPUT", code(() -> FrtbDrc.drcNonsec(List.of(p("a", "X", "SENIOR", 1, 1, -1),
                 p("b", "Y", "SENIOR", 1, 1, 1)), Map.of("X", "A"))));
-        // code-point order of ids and obligors (KR-114): U+FF5E sorts before U+1F600, UTF-16 order would not
+        // code-point order of ids and obligors (KR-302): U+FF5E sorts before U+1F600, UTF-16 order would not
         out = FrtbDrc.drcNonsec(List.of(p("😀", "😀", "SENIOR", 1, 1, 5),
                 p("～", "～", "SENIOR", 1, 1, 5)), Map.of("😀", "A", "～", "A"));
         assertEquals("～", out.positions().get(0).id());
@@ -218,7 +218,7 @@ class FrtbDrcTest {
         return new FrtbDrc.Position(id, ob, BUCKET.get(ob), sen, n, mv, m, false, true);
     }
 
-    @Property(tries = 300)
+    @Property(tries = 10000)
     void drcProperties(@ForAll long seed) {
         Random rnd = new Random(seed);
         List<FrtbDrc.Position> book = book(new Random(seed), 1.0);
@@ -227,12 +227,30 @@ class FrtbDrcTest {
         for (FrtbDrc.BucketRow b : out.buckets()) {
             assertTrue(b.drc() >= 0 && (b.hbr() == null || (b.hbr() >= 0 && b.hbr() <= 1)));
         }
-        // "adding a long never lowers its bucket's DRC" (A3 of frtb-drc-rrao.md) is not asserted: it is false under
-        // MAR22.25 (see a3MonotonicityCounterexample and program/STAGE_K_W2A_JAVA_HANDOVER.md); the draws are kept so
-        // the remaining checks see the same random stream as the Python property.
-        rnd.nextInt(3);
-        rnd.nextInt(1001);
-        rnd.nextInt(4);
+        // A3 of frtb-drc-rrao.md as corrected by KR-327 (proposed): "adding a long never lowers its bucket's DRC" is
+        // false under MAR22.25 (a3MonotonicityCounterexample); it holds when the obligor has no net short and its risk
+        // weight is at least that of every obligor with a net short in the bucket.
+        String ob = OBLIGORS[rnd.nextInt(3)];
+        double extra = rnd.nextInt(1001);
+        String sen = FrtbDrc.SENIORITIES.get(rnd.nextInt(4));
+        String bk = BUCKET.get(ob);
+        double shortRw = 0;
+        boolean noShort = true;
+        for (FrtbDrc.ObligorRow o : out.obligors()) {
+            if (BUCKET.get(o.obligor()).equals(bk) && o.netShort() != 0) {
+                shortRw = Math.max(shortRw, o.rw());
+            }
+            if (o.obligor().equals(ob) && o.netShort() != 0) {
+                noShort = false;
+            }
+        }
+        if (noShort && FrtbDrc.riskWeight(RATING.get(ob)) >= shortRw) {
+            List<FrtbDrc.Position> more = new ArrayList<>(book);
+            more.add(new FrtbDrc.Position("new", ob, bk, sen, extra, extra, 2.0, false, true));
+            double after = byBucket(FrtbDrc.drcNonsec(more, RATING)).get(bk);
+            double before = byBucket(out).getOrDefault(bk, 0.0);
+            assertTrue(after >= before - 1e-9 * (1 + after), "KR-327 monotonicity");
+        }
         // permutation leaves every output unchanged (totals to rounding)
         List<FrtbDrc.Position> shuffled = new ArrayList<>(book);
         Collections.shuffle(shuffled, rnd);

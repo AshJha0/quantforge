@@ -81,7 +81,7 @@ class LeverageTest {
         try {
             return Leverage.leverage(1.0, p.on(), p.d(), p.w(), p.s(), p.o()).exposure();
         } catch (QfError e) {
-            assertEquals("E_DOMAIN", e.code()); // exposure measure zero (KR-130)
+            assertEquals("E_DOMAIN", e.code()); // exposure measure zero (KR-321)
             return 0.0;
         }
     }
@@ -212,7 +212,7 @@ class LeverageTest {
 
     @Test
     void gsibGroupReadingAndExemptions() {
-        // KR-133 open reading: a mixed group takes 15% under "any member" (the Python reference)
+        // KR-324 open reading: a mixed group takes 15% under "any member" (the Python reference)
         assertTrue(Leverage.GSIB_GROUP_ANY_MEMBER);
         Map<String, Leverage.GroupRow> g = le(Map.of("a", 100.0, "b", 100.0), List.of(
                 new Leverage.LeCounterparty("a", "G", true, false), new Leverage.LeCounterparty("b", "G", false,
@@ -220,7 +220,7 @@ class LeverageTest {
         Leverage.GroupRow row = g.get("G");
         assertEquals(150.0, row.limit());
         assertEquals(200.0, row.exposure());
-        assertFalse(row.breach()); // only the non-exempt 100 is counted (KR-134)
+        assertFalse(row.breach()); // only the non-exempt 100 is counted (KR-325)
         assertFalse(row.exempt());
         assertEquals(List.of("a", "b"), row.members());
     }
