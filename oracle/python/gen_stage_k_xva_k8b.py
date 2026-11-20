@@ -344,7 +344,7 @@ def replay(base, ten, bp, scale=1):
 
 
 def shocked_curve(inp):
-    sc = inp["scenario_shift"]
+    sc = inp["scenario"]
     ap = replay(inp["curve"]["tenors"], sc["tenors"], sc["shift_bp"], inp.get("scale", 1))
     z = [M(zj) + a / 10000 for zj, a in zip(inp["curve"]["zero_rates"], ap)]
     return {"applied_bp": ap, "shocked_zero_rates": z,
@@ -388,7 +388,12 @@ def wwr_full(inp):
 def portfolio_cva(inp):
     """xva.exposure.portfolio_hw CVA on a fixed exact EE (the expsim_g golden's discounted_ee)."""
     t = [M(0)] + [M(x) for x in inp["exposure_times"]]
-    dee = [M(x) for x in inp["discounted_ee"]]
+    if "discounted_ee" in inp:
+        dee = [M(x) for x in inp["discounted_ee"]]
+    else:  # the real operation's inputs: the exact EE is the matching expsim_g golden's (mpmath-25 quadrature)
+        key = {k: v for k, v in inp.items() if k not in ("hazard_rate", "recovery")}
+        hit = [c for c in EXPSIM.values() if {k: v for k, v in c["inputs"].items() if k not in ("hazard_rate", "recovery")} == key]
+        dee = [M(x) for x in hit[0]["expected"]["outputs"]["discounted_ee"]]
     h, R = M(inp["hazard_rate"]), M(inp["recovery"])
     return {"cva": (1 - R) * sum(dee[i - 1] * (S(h, t[i - 1]) - S(h, t[i])) for i in range(1, len(t)))}
 
@@ -555,8 +560,8 @@ def cases():
     for cid, sc in (("0001", "hikes_2022"), ("0002", "covid_2020")):
         s = SHOCKS[sc]
         C.append(("shk_k", f"shk_k-{cid}", "xva.stress.shocked", {
-            "curve": {"tenors": [1.0, 2.0, 5.0, 15.0, 20.0], "zero_rates": [0.03] * 5}, "scenario": sc,
-            "scenario_shift": {"tenors": s["tenors"], "shift_bp": s["shift_bp"]}}, f"curve outputs, {sc}", T12))
+            "curve": {"tenors": [1.0, 2.0, 5.0, 15.0, 20.0], "zero_rates": [0.03] * 5},
+            "scenario": {"tenors": s["tenors"], "shift_bp": s["shift_bp"]}}, f"curve outputs, {sc}", T12))
     # ---- WWR
     TW = {"absolute": 1e-15, "relative": 1e-12, "reason": "spec A1 (special_function; Phi_2 dominates)"}
     one = {"times": [1.0], "discount_factors": [1.0], "stdev": [1.0], "pd_at_times": [0.02], "recovery": 0.0}
@@ -606,11 +611,9 @@ def cases():
     aadc("aadx_k-0007", "xva.exposure.closeout_normal", cl5, ["sigma", "im", "v0", "threshold_receive"], ["ee"],
          "close-out on cln_k-0005 with the IM given as a number")
     es = EXPSIM["expsim_g-0003"]
-    pin = {"exposure_times": es["inputs"]["exposure_times"], "discounted_ee": es["expected"]["outputs"]["discounted_ee"],
-           "hazard_rate": es["inputs"]["hazard_rate"], "recovery": es["inputs"]["recovery"]}
+    pin = copy.deepcopy(es["inputs"])
     aadc("aadx_k-0008", "xva.exposure.portfolio_hw", pin, ["hazard_rate", "recovery"], ["cva"],
-         "CVA of expsim_g-0003 (S5P) on its exact EE (the golden's discounted_ee, fixed)",
-         {"absolute": 1e-6, "relative": 1e-8, "reason": "inherits expsim_g's EE accuracy (quadrature, 1e-8 relative)"})
+         "CVA of expsim_g-0003 (S5P); the oracle holds the golden's discounted_ee fixed (KR-162)")
     return C
 
 

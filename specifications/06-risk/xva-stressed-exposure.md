@@ -37,7 +37,7 @@ Grid `(0, 0.25, 0.5, 0.75, 1)` unless stated.
 | str_k-0003 | one set, current = stressed `(5, 6, 7, 8, 9)`: tie, current used |
 | str_k-0004 | one set, `maturity 0.5`, current `(10, 12, 9, 0, 0)`, stressed `(10, 15, 11, 0, 0)` |
 | str_k-0005 | as 0001 with `alpha 1.25`, `own_alpha true` |
-| str_k-0006 | monthly grid to one year, current `ee_k = 100 sqrt(t_k)`, stressed `ee_k = 150 sqrt(t_k)`, one set |
+| str_k-0006 | monthly grid to one year (`t_k = k / 12`, `k = 0 .. 12`, each the binary64 rounding), current `ee_k = 100 sqrt(t_k)`, stressed `ee_k = 150 sqrt(t_k)` (each rounded once to binary64), one set, `w 0.08` (KR-298) |
 | str_k-0007, 0008 | ORE cases, see "Outside-check design" |
 
 <!-- strip:begin -->
@@ -56,7 +56,7 @@ Grid `(0, 0.25, 0.5, 0.75, 1)` unless stated.
 | str_k-0003 | calibration current (tie) | B |
 | str_k-0004 | horizon 0.5: eepe current `(12 + 12) x 0.25 / 0.5 = 12`, stressed 15 | B |
 | str_k-0005 | ead scaled by 1.25 | B |
-| str_k-0006 | oracle | B |
+| str_k-0006 | candidate file `oracle/xva_k8b_candidates/str_k.json` | B |
 | str_k-0007, 0008 | exact undiscounted EE by G-42 quadrature (current `sigma`, stressed `sigma`) | O |
 <!-- strip:end -->
 

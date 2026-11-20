@@ -28,7 +28,7 @@ Bucket term, with `c = -rho`, `a_i = -mu_i / s_i`, `beta_i = Phi^-1(PD(t_i))` (`
 
 `CVA = (1 - R) sum_i D_i (G_i(beta_i) - G_i(beta_(i-1)))`; per bucket `wwr_factor_i = (G_i(beta_i) - G_i(beta_(i-1))) / (EE_i (PD(t_i) - PD(t_(i-1))))`, `EE_i = mu_i Phi(mu_i/s_i) + s_i phi(mu_i/s_i)`.
 
-Outputs: `cva`, `cva_independent` (the same with `rho = 0`), `wwr_factor` per bucket, `bucket_terms`.
+Outputs: `cva`, `cva_independent` (the same with `rho = 0`), `wwr_factor` per bucket, `bucket_terms` per bucket, `bucket_terms_i = (1 - R) D_i (G_i(beta_i) - G_i(beta_(i-1)))` so that `cva = sum bucket_terms` (KR-298).
 
 `Phi_2` to 1e-14 absolute (KR-167). The identity for `E[Z 1{...}]` follows by writing `Z = c U + r W` and integrating (inferred; the L check below tests it).
 
@@ -78,7 +78,7 @@ Two buckets `times (1, 2)`, `h 0.02`, `R 0.4`, `D_i = exp(-0.03 t_i)`, `s_i = sq
 | wwr_k-0007 | cva 0.029999146946385117 | 0.029999146946385134 | **L** |
 | wwr_k-0008 | cva 0.0013268543824397623 | 0.0013268543824397727 | **L** |
 | wwr_k-0009 | cva 0.026384614677401826 | 0.02638461467740185 | **L** |
-| wwr_k-0010 | oracle, 50 digits | to be measured with the same script | B (L candidate) |
+| wwr_k-0010 | candidate file `oracle/xva_k8b_candidates/wwr_k.json` (50 digits) | to be measured with the same script | B (L candidate) |
 <!-- strip:end -->
 
 L method: `scipy.integrate.dblquad` of the defining integral `int_{u in bucket} int_{z > a} (mu + s z) phi_2(z, u; c) dz du` (bivariate normal density written out, integration bounds at 12 standard deviations, `epsabs 1e-14`, `epsrel 1e-12`). It does not evaluate `Phi_2` or the identity above, so it is a different formulation (KR-173). The expected values in the table came from SciPy 1.17.1 `multivariate_normal.cdf` for `Phi_2` in scratch; the oracle lane recomputes them with mpmath at 50 digits before freezing, and any change beyond 1e-13 relative is recorded. Largest relative difference between the two columns: 7.8e-15 (wwr_k-0008).

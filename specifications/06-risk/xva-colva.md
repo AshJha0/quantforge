@@ -19,12 +19,12 @@ Spec version 0.1.0. Status: **PROPOSED** (stage K item K-8b; xVA spec lane 2026-
 
 Inputs: `times` `t_0 < t_1 < ... < t_n` (`n >= 1`); `collateral` `C_0 .. C_(n-1)` (expected balance at the start of each bucket, positive = received by us); `discount_factors` `D(t_1) .. D(t_n)` in `(0, inf)`; `spread` either one number or `n` numbers `Delta_i` (collateral rate minus discount rate on `(t_i, t_(i+1)]`); optional `survival` `NONE` (default) or `BOTH` with `counterparty` and `own` `{hazard_rate >= 0}`; optional `overnight_rates` `r_0 .. r_(n-1)` (enables the floor output).
 
-- `colva = - sum_(i=0)^(n-1) C_i Delta_i delta_i D(t_(i+1)) W_i`, `delta_i = t_(i+1) - t_i`, `W_i = 1` (`NONE`) or `exp(-(h_C + h_B) t_(i+1))` (`BOTH`).
+- `colva = - sum_(i=0)^(n-1) C_i Delta_i delta_i D(t_(i+1)) W_i`, `delta_i = t_(i+1) - t_i`, `W_i = 1` (`NONE`) or `exp(-(h_C + h_B) t_i)` (`BOTH`): both names alive at the START of the bucket `(t_i, t_(i+1)]`, the same survival point as FCA, FBA and MVA (KR-297, proposed 2026-11-20; the version-0.1.0 text had `t_(i+1)`).
 - `collateral_floor = - sum C_i max(-r_i, 0) delta_i D(t_(i+1)) W_i` (only with `overnight_rates`; reported, not added).
 
 Outputs: `colva`, `terms` (the `n` summands), `collateral_floor` (or absent).
 
-Path form: `xva.colva.value` also accepts `paths` (G-40 inputs and CSA) instead of `collateral`; then `C_i` is the path mean of G-40's held collateral at `t_i`, and the output adds `collateral_profile`. Label "simulated" on the path form.
+Path form: `xva.colva.value` also accepts `paths` (G-40 inputs and CSA) instead of `collateral`; then `C_i` is the path mean of G-40's held collateral at `t_i` for `i = 0 .. n-1` (G-40's `C_i = K_(max(i - l, 0))`, `l = mpor_steps`), `discount_factors` are given at `t_1 .. t_n`, and the output adds `collateral_profile` (those `n` means, KR-298). Label "simulated" on the path form.
 
 ## Case inputs (kept for the blind packet)
 
@@ -45,7 +45,7 @@ Common: `times = (0, 0.5, 1, 1.5, 2)`, `D(t) = exp(-0.03 t)` at `t_1..t_4`.
 
 **colva_k-0001.** Buckets of half a year. Terms `-C_i x 0.001 x 0.5 x exp(-0.03 t_(i+1))`: `-100 x 0.0005 x 0.98511194 = -0.04925560`; `-80 x 0.0005 x 0.97044553 = -0.03881782`; `-50 x 0.0005 x 0.95599748 = -0.02389994`; `-20 x 0.0005 x 0.94176453 = -0.00941765`. Sum `colva = -0.12139100070376345`. Holding 100 of collateral for half a year and paying 10 bp over the discount rate costs about 0.05.
 
-**colva_k-0002.** Each term times `exp(-0.03 t_(i+1))`: `colva = -0.11791034201974765`.
+**colva_k-0002.** Each term times `exp(-0.03 t_i)` (KR-297): `colva = -0.11969232863755361` (`-0.11791034201974765` under the version-0.1.0 bucket-end weight, smaller in size by `exp(-0.015)`).
 
 **colva_k-0003.** Floor terms `-C_i max(-r_i, 0) x 0.5 x D`: `-100 x 0.005 x 0.5 x 0.98511194 = -0.24627798`, 0, 0, `-20 x 0.002 x 0.5 x 0.94176453 = -0.01883529`; `collateral_floor = -0.2651132755724506`. The floor is worth more than the spread here because a 50 bp negative overnight rate is floored at zero.
 
@@ -54,11 +54,11 @@ Common: `times = (0, 0.5, 1, 1.5, 2)`, `D(t) = exp(-0.03 t)` at `t_1..t_4`.
 | Case | Expected | Arithmetic | Outside check |
 |---|---|---|---|
 | colva_k-0001 | colva -0.12139100070376345 | above | B |
-| colva_k-0002 | colva -0.11791034201974765 | above | B |
+| colva_k-0002 | colva -0.11969232863755361 (KR-297; -0.11791034201974765 at bucket end) | above | B |
 | colva_k-0003 | colva as 0001; collateral_floor -0.2651132755724506 | above | B |
-| colva_k-0004 | to be computed by the oracle at 50 digits | signs mixed: received and posted with positive and negative spreads | B |
-| colva_k-0005 | oracle | time-dependent spread with survival | B |
-| colva_k-0006 | oracle | G-40 held collateral averaged over paths | B |
+| colva_k-0004 | candidate file `oracle/xva_k8b_candidates/colva_k.json` | signs mixed: received and posted with positive and negative spreads | B |
+| colva_k-0005 | candidate file `oracle/xva_k8b_candidates/colva_k.json` | time-dependent spread with survival | B |
+| colva_k-0006 | candidate file `oracle/xva_k8b_candidates/colva_k.json` | G-40 held collateral averaged over paths | B |
 | colva_k-0007 .. 0010 | one-factor quadrature (see below) | `-Delta sum delta_i E^N[V(t_i) / N(t_(i+1))]` | O |
 <!-- strip:end -->
 

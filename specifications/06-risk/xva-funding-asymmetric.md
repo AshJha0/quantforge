@@ -9,6 +9,7 @@ Spec version 0.1.0. Status: **PROPOSED** (stage K item K-8b; xVA spec lane 2026-
 | Ref | Source | Evidence class | Used for |
 |---|---|---|---|
 | [ORE-X] | ORE 1.8.17.0 User Guide, `methods/xva.tex`, FVA section (`f_b`, `f_l` relative to OIS; survival at `t_(i-1)`; exposure `[NPV - C]^+` and `[-NPV + C]^+` at `t_i`) | read 2026-11-19 | the formula, as written; the ORE comparison |
+| [ORE-C] | ORE source `staticcreditxvacalculator.cpp` (`calculateNettingSetFcaIncrement`, `...FbaIncrement`, `...MvaIncrement`), tag v1.8.16.0 and master: survival at `d0`, the bucket start, for FCA, FBA and MVA alike | read 2026-11-20 (GitHub API) | KR-296: one survival point for FVA and MVA |
 | [ORE-P] | same, `parameterisation/ore.tex`: `fvaBorrowingCurve`, `fvaLendingCurve` | read 2026-11-19 | the ORE inputs |
 | [GK14] | arXiv:1405.0508v2 p. 7 eq. 35 (FCA by semi-replication, symmetric funding) | read 2026-11-19 | the single-curve special case |
 | [BK11] | Burgard and Kjaer, asymmetric funding | **not read** (SSRN 403) | not used for any formula |
@@ -22,7 +23,7 @@ Inputs: `times` `t_1 < ... < t_n` (buckets from `t_0 = 0`); `discount_factors` `
 
 - Spread at time `T` from a curve: `s(T)` by linear interpolation of `s T` in `T` between pillars, with `s(0) T = 0` at the origin, flat forward beyond the last pillar (KR-164).
 - Forward spread on bucket `i`: `f_i = (s(t_i) t_i - s(t_(i-1)) t_(i-1)) / delta_i`.
-- `FCA = sum_i f_b,i delta_i S_C(t_(i-1)) S_B(t_(i-1)) D_i ee_i`; `FBA = sum_i f_l,i' delta_i S_C(t_(i-1)) S_B(t_(i-1)) D_i |ene_i|`, `f_l,i' = f_l,i` or, with `exclude_dva_overlap`, `max(f_l,i - h_B (1 - R_B), 0)`; `FVA = FCA - FBA`. `S(t) = exp(-h t)`.
+- `FCA = sum_i f_b,i delta_i S_C(t_(i-1)) S_B(t_(i-1)) D_i ee_i`; `FBA = sum_i f_l,i' delta_i S_C(t_(i-1)) S_B(t_(i-1)) D_i |ene_i|`, `f_l,i' = f_l,i` or, with `exclude_dva_overlap`, `max(f_l,i - h_B (1 - R_B), 0)`; `FVA = FCA - FBA`. `S(t) = exp(-h t)`. Survival at the bucket start `t_(i-1)` is the one convention for FCA, FBA, MVA and the ColVA survival weight (KR-296, proposed 2026-11-20).
 
 Outputs: `fca`, `fba`, `fva`, `forward_borrow`, `forward_lend` (per bucket, after the overlap rule).
 
@@ -35,7 +36,7 @@ Outputs: `fca`, `fba`, `fva`, `forward_borrow`, `forward_lend` (per bucket, afte
 | fva_k-0003 | `xvaadj_g-0001` inputs with both curves flat at 0.008 (the G-41 case) |
 | fva_k-0004 | `times (0.5, 1, 1.5, 2)`, `xvaadj_g-0001` profiles, borrow curve pillars `(0.75, 3)` spreads `(0.009, 0.015)` (interpolation inside buckets), lend curve one pillar `5` spread `0.004` |
 | fva_k-0005 | as 0004, lend curve spreads chosen so the overlap binds in some buckets and not others: pillars `(1, 2)`, `(0.002, 0.009)`, `h_B 0.01`, `R_B 0.4`, `exclude_dva_overlap true` |
-| fva_k-0006 | `ee` all zero, `ene` from 0004: FCA 0 |
+| fva_k-0006 | as 0004 (times, discount factors, `ene`, credit, both curves) with `ee (0, 0, 0, 0)` |
 | fva_k-0007 .. 0010 | ORE cases, see "Outside-check design" |
 
 <!-- strip:begin -->
@@ -52,8 +53,8 @@ Outputs: `fca`, `fba`, `fva`, `forward_borrow`, `forward_lend` (per bucket, afte
 | fva_k-0001 | fca 0.17381477291763398; fba 0.05939582542979509; fva 0.11441894748783889 | above | B |
 | fva_k-0002 | fba 0.01462289896433965; fca as 0001 | above | B |
 | fva_k-0003 | fca 1.815622443344568; fba 1.2027298203433914 (equal to `xvaadj_g-0001`) | flat curves | B |
-| fva_k-0004 | oracle, 50 digits | pillar interpolation inside buckets | B |
-| fva_k-0005 | oracle | overlap partly binding | B |
+| fva_k-0004 | candidate file `oracle/xva_k8b_candidates/fva_k.json` (50 digits) | pillar interpolation inside buckets | B |
+| fva_k-0005 | candidate file `oracle/xva_k8b_candidates/fva_k.json` | overlap partly binding | B |
 | fva_k-0006 | fca 0; fba as 0004 | | B |
 | fva_k-0007 .. 0010 | exact one-factor EE and ENE (G-42 quadrature) with deterministic survival | ORE `fva = Y` | O |
 <!-- strip:end -->

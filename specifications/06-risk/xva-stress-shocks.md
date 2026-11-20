@@ -29,7 +29,7 @@ Outputs: `applied_bp`, `shocked_zero_rates`, `shocked_discount_factors` (pillars
 
 | Case | Inputs |
 |---|---|
-| shk_k-0001 | curve pillars `(1, 2, 5, 15, 20)` all at 3%; scenario `hikes_2022`; curve outputs only |
+| shk_k-0001 | curve pillars `(1, 2, 5, 15, 20)` all at 3%; scenario `hikes_2022` (its `tenors` and `shift_bp` as stored in `datasets/scenarios/us_treasury_shocks.json`, given directly as the `scenario` object, KR-298); curve outputs only |
 | shk_k-0002 | same curve; scenario `covid_2020`; curve outputs only |
 | shk_k-0003 .. 0006 | ORE cases: one G-42b netting set (portfolio `P5` of run `runb2` (`a = 0.03`, `sigma = 0.01`), its curve converted to zero rates `z_j = -ln P_j / T_j` at its own pillars, its credit), one per scenario `gfc_2008`, `taper_2013`, `covid_2020`, `hikes_2022` |
 

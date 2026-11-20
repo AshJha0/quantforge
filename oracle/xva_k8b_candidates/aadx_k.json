@@ -890,17 +890,58 @@
    "inputs": {
     "operation": "xva.exposure.portfolio_hw",
     "inputs": {
+     "curve": {
+      "times": [
+       0.4986301369863014,
+       1.0,
+       2.0,
+       3.0,
+       5.002739726027397,
+       7.005479452054795,
+       10.005479452054795,
+       15.01095890410959,
+       20.013698630136986,
+       30.019178082191782
+      ],
+      "discount_factors": [
+       0.98085,
+       0.9619,
+       0.9254,
+       0.8906,
+       0.8242,
+       0.762,
+       0.6787,
+       0.561,
+       0.467,
+       0.332
+      ]
+     },
+     "mean_reversion": 0.03,
+     "sigma": 0.005,
+     "trades": [
+      {
+       "notional": 10000000.0,
+       "fixed_rate": 0.039,
+       "side": "PAY",
+       "start_years": 0.0,
+       "payment_times": [
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0
+       ]
+      }
+     ],
      "exposure_times": [
       1.0,
       2.0,
       3.0,
       4.0
      ],
-     "discounted_ee": [
-      73697.95926238483,
-      74187.67736867144,
-      59889.66625470719,
-      33616.92704282685
+     "pfe_quantiles": [
+      0.95,
+      0.99
      ],
      "hazard_rate": 0.02,
      "recovery": 0.4
@@ -926,9 +967,9 @@
     }
    },
    "tolerance_limit": {
-    "absolute": 1e-06,
-    "relative": 1e-08,
-    "reason": "inherits expsim_g's EE accuracy (quadrature, 1e-8 relative)"
+    "absolute": 1e-12,
+    "relative": 1e-10,
+    "reason": "spec A1/A2: AAD of the operation as computed (KR-161)"
    },
    "verified_by": [
     "mpmath-50"
@@ -938,7 +979,7 @@
     "k8b",
     "candidate"
    ],
-   "description": "CVA of expsim_g-0003 (S5P) on its exact EE (the golden's discounted_ee, fixed)"
+   "description": "CVA of expsim_g-0003 (S5P); the oracle holds the golden's discounted_ee fixed (KR-162)"
   }
  ]
 }

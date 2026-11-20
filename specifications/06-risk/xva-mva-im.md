@@ -9,7 +9,8 @@ Spec version 0.1.0. Status: **PROPOSED** (stage K item K-8b; xVA spec lane 2026-
 | Ref | Source | Evidence class | Used for |
 |---|---|---|---|
 | [GK14] | Green and Kenyon, arXiv:1405.0508v2, p. 7 eq. 37 (MVA as an integral over the expected IM profile of `(1 - R_B) lambda_B - s_I`, discounted at `r + lambda_B + lambda_C`); Section 3.2 (IM by regression on simulated states) | read 2026-11-19 | the quantity; the regression idea |
-| [ORE-X] | ORE User Guide `methods/xva.tex`, "Dynamic Initial Margin and MVA": `MVA = sum (f_b - s_I) delta_i S_C(t_i) S_B(t_i) E^N[DIM(t_i) D(t_i)]`; regression DIM `alpha sqrt(E_t[X^2] - E_t^2[X])`, `X` the netted value change over the MPoR, `E_t[X]` replaced by the across-path mean, polynomial regression on a market variable; "it needs benchmarking/validation" | read 2026-11-19 | the discrete formula and the regression method, as written |
+| [ORE-X] | ORE User Guide `methods/xva.tex`, "Dynamic Initial Margin and MVA": `MVA = sum (f_b - s_I) delta_i S_C(t_i) S_B(t_i) E^N[DIM(t_i) D(t_i)]`; regression DIM `alpha sqrt(E_t[X^2] - E_t^2[X])`, `X` the netted value change over the MPoR, `E_t[X]` replaced by the across-path mean, polynomial regression on a market variable; "it needs benchmarking/validation" | read 2026-11-19 | the regression method, as written; the discrete formula's survival point is NOT followed (KR-296) |
+| [ORE-C] | ORE source `OREAnalytics/orea/aggregation/staticcreditxvacalculator.cpp`, `calculateNettingSetMvaIncrement`, at tag v1.8.16.0 and on master (commit 3d75a69087): survival of both names evaluated at `d0`, the bucket START, times `expectedIM` at `d1` and the day-count fraction; FCA and FBA increments likewise at `d0` | read 2026-11-20 (GitHub API) | the survival point (KR-296): ORE's code differs from its own documented formula |
 | [ORE-P] | `ore.tex`: `dimModel` (`Regression` or `Flat`), `dimQuantile`, `dimHorizonCalendarDays`, `dimRegressionOrder`, `dimRegressors` | read 2026-11-19 | the ORE inputs |
 | the project's placeholder initial margin model | branch `k-simm-spec`, being renamed | not used | **TODO: final operation id (KR-160)** |
 
@@ -17,7 +18,7 @@ Spec version 0.1.0. Status: **PROPOSED** (stage K item K-8b; xVA spec lane 2026-
 
 ### `xva.mva.value` (KR-165)
 
-Inputs: `times` `t_1 < ... < t_n` (from `t_0 = 0`); `discount_factors`; `expected_im` `IM_i >= 0` (from `xva.im.project` or the caller); `borrow_curve` (KR-164) or `borrow_spread` (flat); `im_spread` `s_I`; `counterparty`, `own` hazards. `MVA = sum_i (f_b,i - s_I) delta_i S_C(t_i) S_B(t_i) D_i IM_i`. Outputs `mva`, `terms`.
+Inputs: `times` `t_1 < ... < t_n` (from `t_0 = 0`); `discount_factors`; `expected_im` `IM_i >= 0` (from `xva.im.project` or the caller); `borrow_curve` (KR-164) or `borrow_spread` (flat); `im_spread` `s_I`; `counterparty`, `own` hazards. `MVA = sum_i (f_b,i - s_I) delta_i S_C(t_(i-1)) S_B(t_(i-1)) D_i IM_i`: survival at the bucket START, as FCA and FBA (`xva-funding-asymmetric.md`), the G-41 MVA, and ORE's code [ORE-C] (KR-296, proposed 2026-11-20; the version-0.1.0 text had `S(t_i)`, as [ORE-X] prints it). `f_b,i` is the KR-164 forward spread of `borrow_curve` on bucket `i`, or `borrow_spread` for every bucket. `expected_im` is either a list (one value per bucket end `t_i`) or an object holding `xva.im.project` inputs with `method` `GIVEN` (`profile`) or `NORMAL_MPOR` (`stdev`, `mpor_days`, `days_per_year`, `quantile`); then `IM_i` is that operation's output, reported as `expected_im` (KR-298). Outputs `mva`, `terms` (the `n` summands, in bucket order), and `expected_im` when it was projected.
 
 ### `xva.im.project` (KR-166)
 
@@ -43,9 +44,9 @@ Common for MVA cases: `times (0.5, 1, 1.5, 2)`, `discount_factors (0.985, 0.97, 
 <!-- strip:begin -->
 ## Worked examples
 
-**mva_k-0001.** `(f_b - s_I) = 0.007`, `delta = 0.5`, survival at bucket ends `exp(-0.03 t_i)`: terms `0.007 x 0.5 x 0.98511 x 0.985 x 100 = 0.33961`, `... x 0.97045 x 0.97 x 90 = 0.29652`, `... x 0.95600 x 0.955 x 70 = 0.22367`, `... x 0.94176 x 0.94 x 40 = 0.12394`; `mva = 0.9837526973854892`.
+**mva_k-0001.** `(f_b - s_I) = 0.007`, `delta = 0.5`, survival at bucket starts `exp(-0.03 t_(i-1))` (KR-296): terms `0.007 x 0.5 x 1 x 0.985 x 100 = 0.34475`, `... x 0.98511 x 0.97 x 90 = 0.30100`, `... x 0.97045 x 0.955 x 70 = 0.22706`, `... x 0.95600 x 0.94 x 40 = 0.12581`; `mva = 0.9986202154669639`. Under the version-0.1.0 bucket-end wording it was `0.9837526973854892`, smaller by the factor `exp(-0.015)` (every bucket is half a year and `h_C + h_B = 0.03`).
 
-**mva_k-0002.** `sqrt(10/250) = 0.2`, `Phi^-1(0.99) = 2.3263478740408408`: IM `(465.2695748081682, 558.3234897698018, 418.74261732735135, 232.6347874040841)`; `mva = 5.478479731127988`.
+**mva_k-0002.** `sqrt(10/250) = 0.2`, `Phi^-1(0.99) = 2.3263478740408408`: IM `(465.2695748081682, 558.3234897698018, 418.74261732735135, 232.6347874040841)`; `mva = 5.561276349300432` (KR-296; `5.478479731127988` at bucket end).
 
 **mva_k-0003.** Regress `X^2 = (9, 4, 1, 1, 4, 16)` on `(1, x)`: intercept `5.333333`, slope `2.0`; fitted `(3.3333, 4.3333, 5.3333, 6.3333, 7.3333, 8.3333)`; `mean(X) = -1/6`, `mean(X)^2 = 0.0277778`; `im_p = 2.3263479 sqrt(fit_p - 0.0277778)`: `(4.22957654, 4.82713291, 5.35846121, 5.84166081, 6.28783710, 6.70438587)`; `expected_im 5.541509073311709`. The regression lets IM rise with the regressor, where the larger moves are.
 
@@ -53,11 +54,11 @@ Common for MVA cases: `times (0.5, 1, 1.5, 2)`, `discount_factors (0.985, 0.97, 
 
 | Case | Expected | Outside check |
 |---|---|---|
-| mva_k-0001 | mva 0.9837526973854892 | B |
-| mva_k-0002 | im as above; mva 5.478479731127988 | B |
+| mva_k-0001 | mva 0.9986202154669639 (KR-296; 0.9837526973854892 at bucket end) | B |
+| mva_k-0002 | im as above; mva 5.561276349300432 (KR-296; 5.478479731127988 at bucket end) | B |
 | mva_k-0003 | im as above; expected_im 5.541509073311709 | B |
-| mva_k-0004 | expected_im `2.3263479 x sqrt(35/6 - 1/36)` (oracle digits) | B |
-| mva_k-0005 | oracle | B |
+| mva_k-0004 | expected_im `2.3263479 x sqrt(35/6 - 1/36)` (oracle digits: candidate file `oracle/xva_k8b_candidates/mva_k.json`) | B |
+| mva_k-0005 | candidate file `oracle/xva_k8b_candidates/mva_k.json` | B |
 | mva_k-0006, 0007 | `IM_0 (f_b - s_I) sum delta_i S_C S_B P(0, t_i)` | O |
 | mva_k-0008 .. 0010 | exact conditional-variance DIM by two-dimensional quadrature | O-approx (not counted strictly) |
 <!-- strip:end -->
@@ -89,7 +90,7 @@ Common for MVA cases: `times (0.5, 1, 1.5, 2)`, `discount_factors (0.985, 0.97, 
 ## Outside-check design (registered here before any run)
 
 - **B (5):** 0001 to 0005.
-- **O (2), ORE `xva` with `dim = Y`, `mva = Y`, `dimModel Flat`:** two G-42b netting sets, IM today given through the collateral balances file (`InitialMargin` 1,000,000), `dimScaling` 1, `f_b` a flat 80 bp borrowing curve, `s_I = 0`; with `Flat` ORE uses today's IM on every path ([ORE-P]), so its MVA is `IM_0 (f_b - s_I) sum delta_i S_C(t_i) S_B(t_i) E^N[D(t_i)]` and `E^N[D(t_i)]` is a Monte Carlo estimate of `P(0, t_i)`. Golden: the same sum with `P(0, t_i)` exact. Check: `|golden - ORE| <= max(3, z_Bonf) SE`, SE of `sum w_i D_p(t_i)` from the cube. This checks ORE's MVA aggregation (spreads, survival at bucket ends, discounting), not IM projection.
+- **O (2), ORE `xva` with `dim = Y`, `mva = Y`, `dimModel Flat`:** two G-42b netting sets, IM today given through the collateral balances file (`InitialMargin` 1,000,000), `dimScaling` 1, `f_b` a flat 80 bp borrowing curve, `s_I = 0`; with `Flat` ORE uses today's IM on every path ([ORE-P]), so its MVA is `IM_0 (f_b - s_I) sum delta_i S_C(t_(i-1)) S_B(t_(i-1)) E^N[D(t_i)]` and `E^N[D(t_i)]` is a Monte Carlo estimate of `P(0, t_i)`. Golden: the same sum with `P(0, t_i)` exact. Check: `|golden - ORE| <= max(3, z_Bonf) SE`, SE of `sum w_i D_p(t_i)` from the cube. This checks ORE's MVA aggregation (spreads, survival at bucket starts, as ORE's code computes it [ORE-C], KR-296, discounting), not IM projection. Not read: whether ORE's `expectedIM` profile is already discounted (the increment multiplies it by the day-count fraction only, [ORE-C]); the O-route lane reads `dimcalculator` before registering the comparison.
 - **O-approx (3), `dimModel Regression`, order 1, `dimQuantile 0.99`, `dimHorizonCalendarDays 14`:** three G-42b single swaps. Golden: exact `E^N[Phi^-1(q) sd(V(t + 14/365) - V(t) | x(t)) D(t)]` by quadrature. Tolerance registered now: `max(3, z_Bonf) SE + 3%` of the golden MVA. Reported, **not counted** in the strict share (KR-173: ORE's regression is an approximation of our quantity, not the same computation). Values from ORE's `dim_evolution` output are compared date by date and reported.
 - **None:** 0.
 

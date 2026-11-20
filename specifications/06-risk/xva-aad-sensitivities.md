@@ -27,14 +27,14 @@ Definition: the derivative of the operation **as computed** (KR-161). For `xva.e
 
 | Case | Operation and inputs | Entries in the golden |
 |---|---|---|
-| aadx_k-0001 | `xva.adjustments.value` on `xvaadj_g-0001` | full gradient of cva, dva, fca, fba, fva |
-| aadx_k-0002 | `xva.adjustments.value` on `xvaadj_g-0002` (overlap on; `s_l - h_b (1 - R_b) = 0.002`, 20 bp from the kink) | full gradient |
-| aadx_k-0003 | `xva.colva.value` on colva_k-0005 | full gradient |
-| aadx_k-0004 | `xva.funding.asymmetric` on fva_k-0004 | full gradient |
-| aadx_k-0005 | `xva.mva.value` on mva_k-0002 (IM from `NORMAL_MPOR`; gradient also through `sigma_i`) | full gradient |
-| aadx_k-0006 | `xva.wwr.cva_gaussian_copula` on wwr_k-0009 | `d cva / d rho`, `/ d h`, `/ d mu`, `/ d s_i` |
-| aadx_k-0007 | `xva.exposure.closeout_normal` on cln_k-0005 | `d ee / d sigma`, `/ d im`, `/ d v0`, `/ d threshold_receive` |
-| aadx_k-0008 | `xva.exposure.portfolio_hw` on one G-42b single-swap case with credit | `d cva / d h`, `d cva / d R` |
+| aadx_k-0001 | `xva.adjustments.value` on `xvaadj_g-0001` | gradient of cva, dva, fca, fba, fva over `wrt` = `discount_factors[0..3]`, `ee[0..3]`, `ene[0..3]`, `counterparty.hazard_rate`, `counterparty.recovery`, `own.hazard_rate`, `own.recovery`, `funding.borrow_spread`, `funding.lend_spread` (times are the grid, not differentiated; KR-298) |
+| aadx_k-0002 | `xva.adjustments.value` on `xvaadj_g-0002` (overlap on; `s_l - h_b (1 - R_b) = 0.002`, 20 bp from the kink) | as 0001 |
+| aadx_k-0003 | `xva.colva.value` on colva_k-0005 | colva over `collateral[0..3]`, `spread[0..3]`, `discount_factors[0..3]`, `counterparty.hazard_rate`, `own.hazard_rate` |
+| aadx_k-0004 | `xva.funding.asymmetric` on fva_k-0004 | fca, fba, fva over `discount_factors[0..3]`, `ee[0..3]`, `ene[0..3]`, `counterparty.hazard_rate`, `own.hazard_rate`, `own.recovery`, `borrow_curve.zero_spreads[0..1]`, `lend_curve.zero_spreads[0]` |
+| aadx_k-0005 | `xva.mva.value` on mva_k-0002 (IM from `NORMAL_MPOR` given as the `expected_im` object; gradient also through `sigma_i`) | mva over `expected_im.stdev[0..3]`, `discount_factors[0..3]`, `borrow_spread`, `im_spread`, `counterparty.hazard_rate`, `own.hazard_rate` |
+| aadx_k-0006 | `xva.wwr.cva_gaussian_copula` on wwr_k-0009 | cva over `rho`, `hazard_rate`, `mean[0..1]`, `stdev[0..1]` |
+| aadx_k-0007 | `xva.exposure.closeout_normal` on cln_k-0005 with `im` given as a number (the binary64 rounding of `Phi^-1(0.99) x 1e6 x sqrt(10/250)`) in place of `im_quantile`, so that `im` is an input (KR-298) | `d ee / d sigma`, `/ d im`, `/ d v0`, `/ d threshold_receive` |
+| aadx_k-0008 | `xva.exposure.portfolio_hw` CVA on `expsim_g-0003` (single payer swap S5P, four exposure dates, `h 0.02`, `R 0.4`), its golden `discounted_ee` held fixed (KR-162) | `d cva / d h`, `d cva / d R` |
 | aadx_k-0009 .. 0012 | `xva.exposure.portfolio_hw` on four G-42b netting sets (two swaps, two portfolios) | `d cva / d h`, `d cva / d R` (ORE cases) |
 
 <!-- strip:begin -->
@@ -47,12 +47,12 @@ Definition: the derivative of the operation **as computed** (KR-161). For `xva.e
 | Case | Expected (selected entries; the oracle writes every entry at 50 digits) | Outside check |
 |---|---|---|
 | aadx_k-0001 | d_cva_d_h_c 133.0258166316599; d_cva_d_r_c -4.516436290005047; d_cva_d_h_b -1.790935732181199; d_fca_d_s_b 226.95280541807102; d_cva_d_ee[1] 0.005704780048492915 | B |
-| aadx_k-0002 | oracle | B |
-| aadx_k-0003 | oracle | B |
-| aadx_k-0004 | oracle | B |
-| aadx_k-0005 | oracle | B |
-| aadx_k-0006 | oracle | B |
-| aadx_k-0007 | `d ee / d im = -Phi(m/s)`, `d ee / d sigma = phi(m/s) s / sigma` at cln_k-0005 (oracle digits) | B |
+| aadx_k-0002 | candidate file `oracle/xva_k8b_candidates/aadx_k.json` | B |
+| aadx_k-0003 | candidate file `oracle/xva_k8b_candidates/aadx_k.json` | B |
+| aadx_k-0004 | candidate file `oracle/xva_k8b_candidates/aadx_k.json` | B |
+| aadx_k-0005 | candidate file `oracle/xva_k8b_candidates/aadx_k.json` | B |
+| aadx_k-0006 | candidate file `oracle/xva_k8b_candidates/aadx_k.json` | B |
+| aadx_k-0007 | `d ee / d im = -Phi(m/s)`, `d ee / d sigma = phi(m/s) s / sigma` at cln_k-0005 (candidate file `oracle/xva_k8b_candidates/aadx_k.json`) | B |
 | aadx_k-0008 | closed forms above on the exact EE | B, and O as 0009 |
 | aadx_k-0009 .. 0012 | closed forms above on the exact EE | O |
 <!-- strip:end -->

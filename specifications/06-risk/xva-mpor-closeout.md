@@ -43,7 +43,7 @@ Inputs: `v0` (netted value at the last good margin call), `sigma` (`> 0`, annual
 | cln_k-0003 | normal | `v0 5e5`, `sigma 1e6`, 10 days, `H 1e6`, `im 0` |
 | cln_k-0004 | normal | `v0 5e6`, `sigma 1e6`, 10 days, `H 0`, `im_quantile 0.99` |
 | cln_k-0005 | normal | `v0 5e6`, `sigma 1e6`, 10 days, `H 1e6`, `im_quantile 0.99` |
-| clp_k-0001 | paths | `collexp_g-0004` paths and CSA, `im_received` profile `(0, 0.5, 0.5, 0.5, 0.5)` |
+| clp_k-0001 | paths | `collexp_g-0004` inputs (times, trades, CSA with `mpor_steps 1`, `pfe_quantile 0.75`), `im_received` profile `(0, 0.5, 0.5, 0.5, 0.5)` lagged like VM (`IM(t_(max(i - l, 0)))`), no `im_posted`; outputs for `NS1` |
 | clp_k-0002, 0003 | paths | ORE cases, see "Outside-check design" |
 
 <!-- strip:begin -->
@@ -72,7 +72,7 @@ Inputs: `v0` (netted value at the last good margin call), `sigma` (`> 0`, annual
 | cln_k-0003 | vm 0; m 5e5; ee 500400.8274358256 | **L** (500400.8274358257) |
 | cln_k-0004 | im 465269.5748081682; ee 677.732692609934 | **L** (677.7326926099279) |
 | cln_k-0005 | ee 534961.4566317102 | **L** (534961.4566317102) |
-| clp_k-0001 | oracle, exact arithmetic on the paths | B |
+| clp_k-0001 | candidate file `oracle/xva_k8b_candidates/clp_k.json` (exact arithmetic on the paths) | B |
 | clp_k-0002, 0003 | two-dimensional Gaussian quadrature (below) | O |
 <!-- strip:end -->
 
