@@ -354,3 +354,7 @@ TOTALS: 15940 value 7866 error 5560 invariance 2514
 Stage K wave 1 (2026-11-19, k-w1, rulings KR-1 to KR-14 plus the confirmation rulings): `bt_k`, `inc_k`, `trig_k`, `idr_k`, `rich_k`, `e1_k`, `e2_k` (two errors at once): 59 cases (28 value, 31 error).
 
 TOTALS: 15999 value 7894 error 5591 invariance 2514
+
+Stage K round 1 (2026-11-19 to 2026-11-20, k-r1 merged as PR #58, then k-r2): waves 1b and 2 Python, K-8, paper and curve daily jobs, margin replacement (`sbim_g`, `sbim_alias_k`), audit A/B/C and follow-up audit responses, E1 NaN goldens, traffic-light large-n and boundary goldens, stage G E1 regenerated (+79). Read from `tools/case_figures.py` at k-r2 2026-11-20.
+
+TOTALS: 16256 value 7989 error 5707 invariance 2560
