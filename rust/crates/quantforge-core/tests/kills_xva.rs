@@ -292,7 +292,8 @@ fn wwr_identical_paths_match_the_closed_form_for_large_b_v() {
             assert!((x - exact).abs() <= 1e-14 * exact.abs().max(1.0), "bv {bv}: a {x} vs {exact}");
         }
         let want = 0.6 * bv.max(0.0) * (0.97 * -(-0.01_f64).exp_m1() + 0.94 * ((-0.01_f64).exp() - (-0.02_f64).exp()));
-        assert!((cva - want).abs() <= 1e-13 * want, "bv {bv}: cva {cva} vs {want}");
+        // The spec cva tolerance, 1e-12 relative: a + b V carries eps |b V| ~ 1.6e-13 at |b V| = 700.
+        assert!((cva - want).abs() <= 1e-12 * want, "bv {bv}: cva {cva} vs {want}");
     }
 }
 

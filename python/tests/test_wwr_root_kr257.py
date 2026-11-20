@@ -68,7 +68,8 @@ def test_identical_paths_root_is_closed_form_to_1e_14(bv: float) -> None:
     assert isinstance(a, list)
     assert all(abs(x - exact) <= 1e-14 * max(1.0, abs(exact)) for x in a)
     cva = 0.6 * max(bv, 0.0) * (0.97 * -math.expm1(-0.01) + 0.94 * (math.exp(-0.01) - math.exp(-0.02)))
-    assert out["cva"] == pytest.approx(cva, rel=1e-13, abs=1e-300)
+    # The spec cva tolerance (1e-12 relative): a + b V carries eps |b V| ~ 1.6e-13 at |b V| = 700.
+    assert out["cva"] == pytest.approx(cva, rel=1e-12, abs=1e-300)
 
 
 def test_limit_and_non_finite_fields() -> None:

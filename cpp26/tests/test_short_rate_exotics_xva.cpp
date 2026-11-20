@@ -581,7 +581,7 @@ TEST_CASE("KR-257 wwr root: closed form for large |b V|, oracle values, limit an
         const double exact = std::log(0.01) - bv;
         CHECK(std::fabs(first_a(w) - exact) <= 1e-14 * std::max(1.0, std::fabs(exact)));
         const double cva = 0.6 * std::max(bv, 0.0) * (0.97 * -std::expm1(-0.01) + 0.94 * (std::exp(-0.01) - std::exp(-0.02)));
-        CHECK(std::fabs(g_number_after(w, "cva") - cva) <= 1e-13 * cva);
+        CHECK(std::fabs(g_number_after(w, "cva") - cva) <= 1e-12 * cva);  // spec tolerance: a + b V carries eps |b V|
     }
     const std::string mixed = g_run(
         "xva.wwr.cva_hw",

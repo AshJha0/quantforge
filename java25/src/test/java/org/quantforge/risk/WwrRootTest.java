@@ -34,7 +34,7 @@ class WwrRootTest {
             }
             double want = 0.6 * Math.max(bv, 0.0)
                     * (0.97 * -Math.expm1(-0.01) + 0.94 * (Math.exp(-0.01) - Math.exp(-0.02)));
-            assertTrue(Math.abs(cva - want) <= 1e-13 * want, bv + ": " + cva);
+            assertTrue(Math.abs(cva - want) <= 1e-12 * want, bv + ": " + cva); // spec tolerance: a + b V carries eps |b V|
         }
     }
 
