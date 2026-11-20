@@ -48,6 +48,7 @@ STAGE_K_OPERATIONS = (
     "risk.frtb.backtest.count",
     "rates.shortrate.bermudan_swaption",
     "rates.shortrate.bermudan_ladder",
+    "xva.sens.aad",
 )
 
 

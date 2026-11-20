@@ -570,3 +570,11 @@ Rulings `stage-k-rulings-w1b.md` KR-30 to KR-47. No new error code; the contract
 ### Stage K margin rename (contract 1.17.0; rulings `stage-k-rulings-margin.md` KR-150 to KR-155)
 
 `xva.sbim.ir_delta` is the stage G operation formerly named `xva.simm.ir_delta`, with the same inputs, outputs, error codes and error order (`06-risk/xva-framework.md`, G-43). The old id is a deprecated alias in v1.0.0, removed in the first release after it (KR-256; section "Deprecated aliases"). Adding the new id is a minor change under "Versioning", and KR-1 gives every stage K change the one number 1.17.0, so the contract number does not move (KR-154). The goldens' weights and correlations are now placeholder weights from a stated rule (KR-150, `specifications/tables/stage_k/sbim-ir-delta-g.json`); the formula is unchanged. Goldens `datasets/golden/stage_g/sbim_g.json` and `datasets/golden/stage_k/sbim_alias_k.json` (`oracle/python/gen_stage_g_w4b.py`).
+
+### Stage K AAD of the valuation adjustments (contract 1.17.0; rulings `stage-k-rulings-xva-aad.md` KR-262 to KR-268, PROPOSED)
+
+`xva.sens.aad` returns the outputs of the wrapped operation and their derivatives by reverse-mode AAD, written by hand in each build (`06-risk/xva-aad-adjustments.md`, plan item K-8). In this version the wrapped operation is `xva.adjustments.value` only; any other `operation` is `E_SCHEMA` (KR-262). Adding the operation is a minor change and KR-1 keeps the one number 1.17.0. No new error code. Error order KR-230 / HR-122: `E_SCHEMA`, `E_LIMIT` (at most 10,000 buckets, KR-266), the F-2 finite rule, structural `E_INPUT` (`wrt` rules, then G-41's), `E_DOMAIN` (G-41's). Gradient entries are per unit absolute change of each input (KR-263). Goldens `datasets/golden/stage_k/aadadj_k.json` (`oracle/python/gen_stage_k_aadadj.py`), class `aad_sensitivity` with the golden's tighter limit, 1e-12 absolute plus 1e-10 relative (KR-265).
+
+| Operation | Spec | Inputs | Outputs |
+|---|---|---|---|
+| `xva.sens.aad` | `06-risk/xva-aad-adjustments.md` (K-8) | `operation` (`"xva.adjustments.value"`), `inputs` (the G-41 request), optional `wrt` (keys of KR-263) | `cva`, `dva`, `fca`, `fba`, `fva`, optional `mva`, `kva`; `gradient` (output name to input key to derivative; profile keys and `hazard_buckets` as arrays) |
