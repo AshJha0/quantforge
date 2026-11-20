@@ -410,7 +410,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "added by lane k-r2-tl 2026-11-20 (ruling KR-253): exact rational arithmetic at the binary64 p (Python fractions)",
-    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TLK_V2.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -446,7 +447,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "added by lane k-r2-tl 2026-11-20 (ruling KR-253): exact rational arithmetic at the binary64 p (Python fractions)",
-    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TLK_V2.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -482,7 +484,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "added by lane k-r2-tl 2026-11-20 (ruling KR-253): mpmath 50 digits at the binary64 p (term recurrence)",
-    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TLK_V2.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -518,7 +521,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "added by lane k-r2-tl 2026-11-20 (ruling KR-253): mpmath 50 digits at the binary64 p (term recurrence)",
-    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TLK_V2.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -554,7 +558,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "added by lane k-r2-tl 2026-11-20 (ruling KR-253) amendment: exact rational arithmetic with q = c exactly (Python fractions)",
-    "hand"
+    "hand",
+    "blind lane program/STAGE_K_BLIND_TLK_V2.md 2026-11-20 matched, not counted: not blind (n = 1, the rules text gives P = c)"
    ],
    "tags": [
     "stage_k",
@@ -590,7 +595,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "added by lane k-r2-tl 2026-11-20 (ruling KR-253) amendment: exact rational arithmetic with q = c exactly (Python fractions)",
-    "hand"
+    "hand",
+    "blind lane program/STAGE_K_BLIND_TLK_V2.md 2026-11-20 matched, not counted: not blind (n = 1, the rules text gives P = c)"
    ],
    "tags": [
     "stage_k",
@@ -626,7 +632,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "added by lane k-r2-tl 2026-11-20 (ruling KR-253) amendment: exact rational arithmetic with q = c exactly (Python fractions)",
-    "hand"
+    "hand",
+    "blind lane program/STAGE_K_BLIND_TLK_V2.md 2026-11-20 matched, not counted: not blind (n = 1, the rules text gives P = c)"
    ],
    "tags": [
     "stage_k",
@@ -662,12 +669,14 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "added by lane k-r2-tl 2026-11-20 (ruling KR-253) amendment: exact rational arithmetic with q = c exactly (Python fractions)",
-    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TLK_V2.md): MATCH"
    ],
    "tags": [
     "stage_k",
     "traffic_light",
-    "boundary"
+    "boundary",
+    "outside_checked"
    ],
    "description": "KR-253 amendment: 250 observation(s), 5 exception(s) at 0.99: MAR99 Table 2 row, exact rational at the binary64 q",
    "output_classes": {
@@ -698,12 +707,14 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "added by lane k-r2-tl 2026-11-20 (ruling KR-253) amendment: exact rational arithmetic with q = c exactly (Python fractions)",
-    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12",
+    "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TLK_V2.md): MATCH"
    ],
    "tags": [
     "stage_k",
     "traffic_light",
-    "boundary"
+    "boundary",
+    "outside_checked"
    ],
    "description": "KR-253 amendment: 250 observation(s), 0 exception(s) at 0.99: MAR99 Table 2 row, exact rational at the binary64 q",
    "output_classes": {
