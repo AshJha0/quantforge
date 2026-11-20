@@ -2,11 +2,12 @@ name: Tutorial
 # Runs every code block of the tutorials (docs/getting-started/tutorial-*.md) on a fresh runner, one job per
 # language, and fails if a block prints anything other than the lines a page shows (plan 13.2 E2). Page 1 builds
 # each CLI and pages 2 to 26 reuse it. Tutorial 1's acceptance test is under 10 minutes per language from a cold
-# start, so the jobs use no build cache; the timeout allows for the twenty-five later pages.
+# start, so the jobs use no build cache; the timeout allows for the later pages. After the pages each job sends every
+# examples/*.json case to the CLI page 1 built (tools/check_examples.py; K-7, ruling KR-222, proposed).
 on:
   push:
     branches: [main]
-    paths: ['docs/getting-started/tutorial-*.md', 'examples/tutorial_*.py', 'examples/tutorials/**',
+    paths: ['docs/getting-started/tutorial-*.md', 'examples/**', 'tools/check_examples.py',
             'datasets/golden/stage_f/risk_f4.json', 'tools/check_tutorial.py',
             'python/**', 'rust/**', 'java25/**', 'cpp26/**', '.github/workflows/tutorial.yml']
   pull_request:
@@ -27,6 +28,8 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
       - run: python3 tools/check_tutorial.py --lang python
+      # K-7 clean machine (KR-222): every example case and the example scripts no page runs, on the CLI page 1 built
+      - run: python3 tools/check_examples.py --lang python
   rust:
     name: tutorial-rust
     runs-on: ubuntu-24.04
@@ -36,6 +39,8 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 tools/check_tutorial.py --lang rust
+      # K-7 clean machine (KR-222): every example case and the example scripts no page runs, on the CLI page 1 built
+      - run: python3 tools/check_examples.py --lang rust
   java:
     name: tutorial-java
     runs-on: ubuntu-24.04
@@ -49,6 +54,8 @@ jobs:
           distribution: temurin
           java-version: "25.0.5"
       - run: python3 tools/check_tutorial.py --lang java
+      # K-7 clean machine (KR-222): every example case and the example scripts no page runs, on the CLI page 1 built
+      - run: python3 tools/check_examples.py --lang java
   cpp:
     name: tutorial-cpp
     runs-on: ubuntu-24.04
@@ -60,3 +67,5 @@ jobs:
           persist-credentials: false
       - run: apt-get update && apt-get install -y cmake ninja-build python3
       - run: python3 tools/check_tutorial.py --lang cpp
+      # K-7 clean machine (KR-222): every example case and the example scripts no page runs, on the CLI page 1 built
+      - run: python3 tools/check_examples.py --lang cpp
