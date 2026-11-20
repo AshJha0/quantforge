@@ -216,9 +216,11 @@ def page(root=ROOT):
               f"{fig['outside_shares']}. Stages A to C, R2 and R6 are not in the share table.", "",
               "## Evidence classes per stage", "",
               "Read from each value-checked case's `verified_by` labels; a case counts once, in the first class below "
-              "that one of its labels matches. This is a reading of the labels, not rule D6: stage J's outside checks "
-              "are recorded in `oracle/OUTSIDE_J.json`, not in the labels, so its `library` column is lower than its D6 "
-              "share, and stage K's `library` column counts SciPy cross-checks of single outputs that D6 does not count.", ""]
+              "that one of its labels matches. This is a reading of the labels, not rule D6, and the D6 share above is "
+              "the figure to quote. They differ where a stage records its outside checks in a separate register rather "
+              "than in the labels (stage F's re-derivation and library registers, stage J's `oracle/OUTSIDE_J.json`, "
+              "stage K's blind packets), and where a label names a library check of single outputs that D6 does not "
+              "count (some stage K SciPy cross-checks).", ""]
     lines += [f"- `{k}`: {desc}" for k, desc, _ in EVIDENCE_ORDER]
     lines += [""] + table
     lines += ["", "Exceptions to design principle 5 (expected results never come from an implementation): "

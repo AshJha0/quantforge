@@ -57,7 +57,7 @@ Before stage E, R1 works on how far the existing results can be trusted. It adds
 | Conformance matrix | 3 OS by 4 languages on Actions; local Linux C++ under WSL | Built; first run after push. WSL C++ passed 5,514 v0.4 goldens |
 | Workflows (a) and (c) | EOD curves with sanity bands (USD proxy curve, BoE GBP pass or fail) and a SOFR averages check, through `--batch` | Built; first local runs passed 2026-11-07 |
 | Targets and mutation | [Targets](benchmarks/targets.md) written before measuring; per-stage mutation report | Measured (C++ stage D mutation 82.5%, measured in R2); Python T1 and T4 and Java T1 missed |
-| Coverage | Unit-test line coverage: C++ 94.2%, Java 97.3%, Python 97.2%, Rust 96.5% | Measured |
+| Coverage | Unit-test line coverage at R1/R2 (historical; current figures in `docs/results.md`): C++ 94.2%, Java 97.3%, Python 97.2%, Rust 96.5% | Measured |
 | Citations | A `## Sources` section in 50 specs (`program/R1_CITATION_FINDINGS.md`) | Done. The citations lane reports 10 sources opened and confirmed, 2 partly confirmed and 16 unreachable; licensed sources are still not opened |
 | R3 preregistrations | Three studies in `research/preregs/` | Signed by Claude under the owner's delegation; holdout run once 2026-11-14: all three null, pass-rule power 13 % to 15 % at the MDS; forward-log back-fill waits for a new amendment (`research/r3/RESULTS.md`) |
 
