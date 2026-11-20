@@ -40,17 +40,22 @@ def test_binomial_cdf_values() -> None:
     assert fb.binomial_cdf(1, 0, 0.25) == pytest.approx(0.75, abs=1e-15)
 
 
+def _fal(n: int, p: float, level: float) -> int:
+    # audit A signature: the partial sums are built once by the caller
+    return fb._first_at_least(fb.binomial_partial_sums(n, p), n, level)
+
+
 def test_first_at_least() -> None:
-    assert fb._first_at_least(250, 0.01, 0.95) == 5
-    assert fb._first_at_least(250, 0.01, 0.9999) == 10
-    assert fb._first_at_least(500, 0.01, 0.95) == 9
-    assert fb._first_at_least(500, 0.01, 0.9999) == 15
-    assert fb._first_at_least(100, 0.01, 0.95) == 3
-    assert fb._first_at_least(100, 0.01, 0.9999) == 6
-    assert fb._first_at_least(1, 0.01, 0.95) == 0
-    assert fb._first_at_least(1, 0.01, 0.9999) == 1
-    assert fb._first_at_least(2, 0.5, 0.7) == 1
-    assert fb._first_at_least(2, 0.5, 0.999) == 2
+    assert _fal(250, 0.01, 0.95) == 5
+    assert _fal(250, 0.01, 0.9999) == 10
+    assert _fal(500, 0.01, 0.95) == 9
+    assert _fal(500, 0.01, 0.9999) == 15
+    assert _fal(100, 0.01, 0.95) == 3
+    assert _fal(100, 0.01, 0.9999) == 6
+    assert _fal(1, 0.01, 0.95) == 0
+    assert _fal(1, 0.01, 0.9999) == 1
+    assert _fal(2, 0.5, 0.7) == 1
+    assert _fal(2, 0.5, 0.999) == 2
 
 
 @pytest.mark.parametrize(
