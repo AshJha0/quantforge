@@ -26,7 +26,9 @@ def main() -> None:
     ap.add_argument("--port", type=int, default=50051)
     port = ap.parse_args().port
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=8))
-    handler = grpc.method_handlers_generic_handler(SERVICE, {METHOD: grpc.unary_unary_rpc_method_handler(handle)})
+    handler = grpc.method_handlers_generic_handler(
+        SERVICE, {METHOD: grpc.unary_unary_rpc_method_handler(handle)}
+    )
     server.add_generic_rpc_handlers((handler,))
     server.add_insecure_port(f"0.0.0.0:{port}")
     server.start()

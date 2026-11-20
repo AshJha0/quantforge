@@ -31,4 +31,5 @@ tools/.coverage
 oracle/python/.r6_jac_cache/
 research/r3/data/
 platform/compose/*/work/
+platform/compose/work/
 benchmarks/results/k3/

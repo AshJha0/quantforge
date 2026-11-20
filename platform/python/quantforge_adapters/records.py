@@ -35,8 +35,9 @@ def make_record(seq: int, u: list[int]) -> Record:
         t = 1_000_000 + u0 % 1_000_000
         body.update(bid=dec(t, 4), ask=dec(t + 1 + u1 % 10, 4))
     elif kind == "trade":
-        body.update(price=dec(1_000_000 + u0 % 1_000_000, 4), qty=str(1 + u1 % 10_000),
-                    side="B" if u2 % 2 else "S")
+        body.update(
+            price=dec(1_000_000 + u0 % 1_000_000, 4), qty=str(1 + u1 % 10_000), side="B" if u2 % 2 else "S"
+        )
     elif kind == "curve_point":
         body.update(tenor=TENORS[u0 % 8], rate=dec(u1 % 100_000 - 20_000, 6))
     else:
@@ -49,6 +50,7 @@ def make_records(next_u64: Callable[[int, int, int], list[int]], n: int = N) -> 
 
 
 # ---- canonical form (01-core/snapshot-hash.md) -----------------------------------------------------------
+
 
 def _string(text: str) -> str:
     out = ['"']
@@ -95,6 +97,7 @@ def snapshot_id(record: Record) -> str:
 
 # ---- the content hash and the verdict ---------------------------------------------------------------------
 
+
 class Verdict(Exception):
     """COUNT, HASH or BYPASS (adapters.md 1.2, 1.4)."""
 
@@ -110,7 +113,9 @@ def count_check(records: Iterable[Record], n: int = N) -> list[Record]:
     dupes = [s for s, c in seqs.items() if c > 1]
     extra = [s for s in seqs if not (isinstance(s, int) and 1 <= s <= n)]
     if missing or dupes or extra or len(rows) != n:
-        raise Verdict("COUNT", f"{len(rows)} rows; missing {missing[:3]}, duplicated {dupes[:3]}, extra {extra[:3]}")
+        raise Verdict(
+            "COUNT", f"{len(rows)} rows; missing {missing[:3]}, duplicated {dupes[:3]}, extra {extra[:3]}"
+        )
     return sorted(rows, key=lambda r: int(r["seq"]))
 
 
@@ -146,7 +151,7 @@ def from_canon(raw: bytes | str) -> Record:
         nonlocal pos
         c = text[pos]
         if c == "#":
-            bits = bytes.fromhex(text[pos + 1:pos + 17])
+            bits = bytes.fromhex(text[pos + 1 : pos + 17])
             pos += 17
             x = struct.unpack(">d", bits)[0]
             return int(x) if x.is_integer() and abs(x) < 2**53 else x
@@ -157,7 +162,7 @@ def from_canon(raw: bytes | str) -> Record:
                 if text[end] == "\\":
                     nxt = text[end + 1]
                     if nxt == "u":
-                        out.append(chr(int(text[end + 2:end + 6], 16)))
+                        out.append(chr(int(text[end + 2 : end + 6], 16)))
                         end += 6
                     else:
                         out.append(nxt)

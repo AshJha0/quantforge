@@ -1,6 +1,15 @@
 """The one exception a decoder or encoder may raise (adapters.md section 3, KR-279)."""
 
-CODES = ("E_TRUNCATED", "E_LENGTH", "E_TYPE", "E_CHECKSUM", "E_OVERLONG", "E_OVERFLOW", "E_FIELD", "E_SESSION")
+CODES = (
+    "E_TRUNCATED",
+    "E_LENGTH",
+    "E_TYPE",
+    "E_CHECKSUM",
+    "E_OVERLONG",
+    "E_OVERFLOW",
+    "E_FIELD",
+    "E_SESSION",
+)
 
 
 class FeedError(ValueError):

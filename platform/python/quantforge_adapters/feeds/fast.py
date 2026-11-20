@@ -20,6 +20,7 @@ USED_BITS = 5
 
 # ---- primitives -------------------------------------------------------------------------------------------
 
+
 def enc_u(value: int) -> bytes:
     groups = []
     while True:
@@ -63,7 +64,7 @@ class _Reader:
             b = self.data[self.pos]
             self.pos += 1
             if b & 0x80:
-                return self.data[start:self.pos]
+                return self.data[start : self.pos]
             if self.pos - start >= max_bytes:
                 raise FeedError(too_long, f"{what} longer than {max_bytes} bytes")
 
@@ -107,6 +108,7 @@ class _Reader:
 
 
 # ---- messages ---------------------------------------------------------------------------------------------
+
 
 def _check(msg: Any) -> None:
     if not isinstance(msg, dict) or set(msg) != set(FIELDS):

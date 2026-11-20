@@ -1,6 +1,6 @@
 """REST service for the K-3 smoke: POST /v1/run {"document_text": ...} -> {"canonical", "snapshot_id"}.
 
-    python -m quantforge_adapters.services.rest_server [--port 8080]
+python -m quantforge_adapters.services.rest_server [--port 8080]
 """
 
 import argparse
@@ -23,13 +23,13 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def do_GET(self) -> None:  # noqa: N802 (http.server API)
+    def do_GET(self) -> None:
         if self.path == "/healthz":
             self._send(200, {"status": "ok"})
         else:
             self._send(404, {"error": "not found"})
 
-    def do_POST(self) -> None:  # noqa: N802
+    def do_POST(self) -> None:
         if self.path != "/v1/run":
             self._send(404, {"error": "not found"})
             return
@@ -45,7 +45,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         self._send(200, {"canonical": form, "snapshot_id": sid})
 
-    def log_message(self, format: str, *args: object) -> None:  # noqa: A002 (quiet: 10,000 requests)
+    def log_message(self, format: str, *args: object) -> None:
         return
 
 

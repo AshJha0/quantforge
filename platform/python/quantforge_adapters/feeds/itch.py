@@ -4,14 +4,26 @@ Simulated; not a certified implementation; not connected to any venue. One messa
 from QF-MOLD-S. Messages are dicts: {"type", "locate", "tracking", "timestamp", ...type fields}.
 """
 
-from quantforge_adapters.feeds._binary import MIN_ONE, Field, Message, decode_fields, encode_fields, layout_length
+from quantforge_adapters.feeds._binary import (
+    MIN_ONE,
+    Field,
+    Message,
+    decode_fields,
+    encode_fields,
+    layout_length,
+)
 from quantforge_adapters.feeds.errors import FeedError
 
 HEADER: list[Field] = [("locate", "u", 2, None), ("tracking", "u", 2, None), ("timestamp", "u", 6, None)]
 BODIES: dict[str, list[Field]] = {
     "S": [("event", "c", 1, "OSQMEC")],
-    "A": [("order_ref", "u", 8, None), ("side", "c", 1, "BS"), ("shares", "u", 4, MIN_ONE),
-          ("stock", "a", 8, None), ("price", "u", 4, None)],
+    "A": [
+        ("order_ref", "u", 8, None),
+        ("side", "c", 1, "BS"),
+        ("shares", "u", 4, MIN_ONE),
+        ("stock", "a", 8, None),
+        ("price", "u", 4, None),
+    ],
     "E": [("order_ref", "u", 8, None), ("shares", "u", 4, MIN_ONE), ("match", "u", 8, None)],
     "X": [("order_ref", "u", 8, None), ("shares", "u", 4, MIN_ONE)],
     "D": [("order_ref", "u", 8, None)],

@@ -22,7 +22,7 @@ Http = Callable[[str, str, bytes | None, dict[str, str]], bytes]
 
 def urllib_http(method: str, url: str, body: bytes | None, headers: dict[str, str]) -> bytes:
     req = urllib.request.Request(url, data=body, method=method, headers=headers)
-    with urllib.request.urlopen(req, timeout=60) as resp:  # noqa: S310 (URLs are the compose services)
+    with urllib.request.urlopen(req, timeout=60) as resp:
         data: bytes = resp.read()
         return data
 
@@ -48,6 +48,7 @@ class SnapshotMismatch(Exception):
 
 # ---- REST and gRPC: the service is the store (no restart; phase "all") -------------------------------------
 
+
 class Rest:
     name = "rest"
 
@@ -59,7 +60,9 @@ class Rest:
         self.got = []
         for r in rows:
             body = json.dumps({"document_text": json_text(r)}).encode()
-            resp = json.loads(self.http("POST", self.base + "/v1/run", body, {"Content-Type": "application/json"}))
+            resp = json.loads(
+                self.http("POST", self.base + "/v1/run", body, {"Content-Type": "application/json"})
+            )
             if resp["snapshot_id"] != snapshot_id(r):
                 raise SnapshotMismatch(f"seq {r['seq']}: {resp['snapshot_id']}")
             self.got.append(from_canon(resp["canonical"]))
@@ -99,18 +102,25 @@ class Grpc:
 
 # ---- Arrow ------------------------------------------------------------------------------------------------
 
+
 def _to_table(rows: list[Record]) -> Any:
     import pyarrow as pa
 
-    return pa.table({"seq": pa.array([r["seq"] for r in rows], pa.int64()),
-                     "kind": pa.array([r["kind"] for r in rows], pa.utf8()),
-                     "body": pa.array([canonical(r["body"]) for r in rows], pa.utf8())})
+    return pa.table(
+        {
+            "seq": pa.array([r["seq"] for r in rows], pa.int64()),
+            "kind": pa.array([r["kind"] for r in rows], pa.utf8()),
+            "body": pa.array([canonical(r["body"]) for r in rows], pa.utf8()),
+        }
+    )
 
 
 def _from_table(table: Any) -> list[Record]:
     cols = table.to_pydict()
-    return [{"seq": s, "kind": k, "body": from_canon(b)} for s, k, b in zip(cols["seq"], cols["kind"], cols["body"],
-                                                                          strict=True)]
+    return [
+        {"seq": s, "kind": k, "body": from_canon(b)}
+        for s, k, b in zip(cols["seq"], cols["kind"], cols["body"], strict=True)
+    ]
 
 
 class ArrowIpc:
@@ -169,6 +179,7 @@ class ArrowFlight:
 
 # ---- Kafka ------------------------------------------------------------------------------------------------
 
+
 class Kafka:
     name = "kafka"
     TOPIC = "k3"
@@ -183,7 +194,9 @@ class Kafka:
             return self.consumer_factory()
         from kafka import KafkaConsumer, TopicPartition
 
-        c = KafkaConsumer(bootstrap_servers=self.bootstrap, enable_auto_commit=False, consumer_timeout_ms=10_000)
+        c = KafkaConsumer(
+            bootstrap_servers=self.bootstrap, enable_auto_commit=False, consumer_timeout_ms=10_000
+        )
         tp = TopicPartition(self.TOPIC, 0)
         c.assign([tp])
         c.seek_to_beginning(tp)
@@ -221,16 +234,21 @@ class Kafka:
 
 # ---- PostgreSQL -------------------------------------------------------------------------------------------
 
+
 class Postgres:
     name = "postgres"
     CREATE = "CREATE TABLE IF NOT EXISTS k3 (seq bigint PRIMARY KEY, kind text NOT NULL, body jsonb NOT NULL)"
 
-    def __init__(self, connect: Callable[[], Any] | None = None, host: str = "localhost", port: int = 5432) -> None:
+    def __init__(
+        self, connect: Callable[[], Any] | None = None, host: str = "localhost", port: int = 5432
+    ) -> None:
         if connect is None:
+
             def connect() -> Any:
                 import pg8000.native
 
                 return pg8000.native.Connection("k3", host=host, port=port, password="k3", database="k3")
+
         self.connect = connect
 
     @staticmethod
@@ -246,7 +264,10 @@ class Postgres:
         con = self.connect()
         con.run(self.CREATE)
         con.run("TRUNCATE k3")
-        con.run("COPY k3 (seq, kind, body) FROM STDIN WITH (FORMAT csv)", stream=io.StringIO(self.copy_payload(rows)))
+        con.run(
+            "COPY k3 (seq, kind, body) FROM STDIN WITH (FORMAT csv)",
+            stream=io.StringIO(self.copy_payload(rows)),
+        )
         con.close()
 
     def read(self) -> list[Record]:
@@ -264,11 +285,17 @@ class Postgres:
 
 # ---- ClickHouse (HTTP interface, standard library) --------------------------------------------------------
 
+
 class ClickHouse:
     name = "clickhouse"
 
-    def __init__(self, url: str = "http://localhost:8123", user: str = "k3", password: str = "k3",
-                 http: Http = urllib_http) -> None:
+    def __init__(
+        self,
+        url: str = "http://localhost:8123",
+        user: str = "k3",
+        password: str = "k3",
+        http: Http = urllib_http,
+    ) -> None:
         self.url, self.http = url.rstrip("/"), http
         token = base64.b64encode(f"{user}:{password}".encode()).decode()
         self.headers = {"Authorization": f"Basic {token}"}
@@ -277,10 +304,14 @@ class ClickHouse:
         return self.http("POST", self.url + "/?query=" + urllib.parse.quote(sql), body, self.headers)
 
     def write(self, rows: list[Record]) -> None:
-        self.q("CREATE TABLE IF NOT EXISTS k3 (seq UInt64, kind String, body String) ENGINE = MergeTree ORDER BY seq")
+        self.q(
+            "CREATE TABLE IF NOT EXISTS k3 (seq UInt64, kind String, body String) ENGINE = MergeTree ORDER BY seq"
+        )
         self.q("TRUNCATE TABLE k3")
-        payload = "".join(json.dumps({"seq": r["seq"], "kind": r["kind"], "body": canonical(r["body"])}) + "\n"
-                          for r in rows).encode()
+        payload = "".join(
+            json.dumps({"seq": r["seq"], "kind": r["kind"], "body": canonical(r["body"])}) + "\n"
+            for r in rows
+        ).encode()
         self.q("INSERT INTO k3 FORMAT JSONEachRow", payload)
 
     def read(self) -> list[Record]:
@@ -297,12 +328,15 @@ class ClickHouse:
 
 # ---- Prometheus (HTTP API, standard library) --------------------------------------------------------------
 
+
 class Prometheus:
     """Reduced records {seq, value} (adapters.md 2.2); the exporter is a compose service, so write is a no-op."""
 
     name = "prometheus"
 
-    def __init__(self, url: str = "http://localhost:9090", http: Http = urllib_http, wait_s: float = 120) -> None:
+    def __init__(
+        self, url: str = "http://localhost:9090", http: Http = urllib_http, wait_s: float = 120
+    ) -> None:
         self.url, self.http, self.wait_s = url.rstrip("/"), http, wait_s
 
     @staticmethod
@@ -310,7 +344,9 @@ class Prometheus:
         return [{"seq": r["seq"], "value": float(r["body"]["value"])} for r in rows]
 
     def _query(self, expr: str) -> list[Any]:
-        data = json.loads(self.http("GET", f"{self.url}/api/v1/query?query={urllib.parse.quote(expr)}", None, {}))
+        data = json.loads(
+            self.http("GET", f"{self.url}/api/v1/query?query={urllib.parse.quote(expr)}", None, {})
+        )
         if data.get("status") != "success":
             raise RuntimeError(f"query failed: {data}")
         result: list[Any] = data["data"]["result"]
@@ -333,6 +369,7 @@ class Prometheus:
 
 
 # ---- Aeron: the Java publisher and subscriber exchange files with the driver -------------------------------
+
 
 class Aeron:
     """write: the canonical lines the Java publisher sends; read: the lines the Java subscriber received."""

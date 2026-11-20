@@ -21,7 +21,7 @@ def _alpha_ok(raw: bytes) -> bool:
 
 def decode_fields(data: bytes, offset: int, layout: list[Field], out: Message) -> None:
     for name, kind, width, allowed in layout:
-        raw = data[offset:offset + width]
+        raw = data[offset : offset + width]
         if kind == "u":
             value = int.from_bytes(raw, "big")
             if allowed == MIN_ONE and value < 1:

@@ -36,9 +36,19 @@ def _ticks(text: str) -> int:
 def add_order(r: Record) -> bytes:
     body = r["body"]
     price = _ticks(body["bid"]) if "bid" in body else _ticks(body["price"]) if "price" in body else 1_000_000
-    return itch.encode({"type": "A", "locate": 1, "tracking": 0, "timestamp": 34_200_000_000_000 + 1_000 * r["seq"],
-                        "order_ref": r["seq"], "side": "B" if r["seq"] % 2 else "S",
-                        "shares": int(body["qty"]) if "qty" in body else 100, "stock": "QFSIM   ", "price": price})
+    return itch.encode(
+        {
+            "type": "A",
+            "locate": 1,
+            "tracking": 0,
+            "timestamp": 34_200_000_000_000 + 1_000 * r["seq"],
+            "order_ref": r["seq"],
+            "side": "B" if r["seq"] % 2 else "S",
+            "shares": int(body["qty"]) if "qty" in body else 100,
+            "stock": "QFSIM   ",
+            "price": price,
+        }
+    )
 
 
 def packets(rows: list[Record], drop_packet: int | None = None) -> Iterator[bytes]:
@@ -47,11 +57,14 @@ def packets(rows: list[Record], drop_packet: int | None = None) -> Iterator[byte
     msgs = [add_order(r) for r in sorted(rows, key=lambda r: r["seq"])]
     for k, start in enumerate(range(0, len(msgs), PER_PACKET), 1):
         if k != drop_packet:
-            blocks = msgs[start:start + PER_PACKET]
-            yield mold.encode({"session": SESSION, "sequence": start + 1, "count": len(blocks), "blocks": blocks})
+            blocks = msgs[start : start + PER_PACKET]
+            yield mold.encode(
+                {"session": SESSION, "sequence": start + 1, "count": len(blocks), "blocks": blocks}
+            )
     for _ in range(3):
-        yield mold.encode({"session": SESSION, "sequence": len(msgs) + 1, "count": mold.END_OF_SESSION,
-                           "blocks": []})
+        yield mold.encode(
+            {"session": SESSION, "sequence": len(msgs) + 1, "count": mold.END_OF_SESSION, "blocks": []}
+        )
 
 
 def sender_hash(rows: list[Record]) -> str:
@@ -80,13 +93,21 @@ class Listener:
         h = hashlib.sha256()
         for seq in sorted(self.msgs):
             h.update(self.msgs[seq])
-        return {"listener": name, "n": len(self.msgs), "h_bytes": h.hexdigest(), "gaps": self.gaps.gaps,
-                "duplicates": self.gaps.duplicates, "ended": self.gaps.ended, "errors": self.errors[:5],
-                "label": LABEL}
+        return {
+            "listener": name,
+            "n": len(self.msgs),
+            "h_bytes": h.hexdigest(),
+            "gaps": self.gaps.gaps,
+            "duplicates": self.gaps.duplicates,
+            "ended": self.gaps.ended,
+            "errors": self.errors[:5],
+            "label": LABEL,
+        }
 
 
-def run_in_process(rows: list[Record], drop_packet: int | None = None,
-                   listeners: int = 2) -> list[dict[str, Any]]:
+def run_in_process(
+    rows: list[Record], drop_packet: int | None = None, listeners: int = 2
+) -> list[dict[str, Any]]:
     ls = [Listener() for _ in range(listeners)]
     for p in packets(rows, drop_packet):
         for lst in ls:
@@ -110,6 +131,7 @@ def judge(sent_hash: str, results: Iterable[dict[str, Any]], drop_packet: int | 
 
 # ---- sockets (run in the compose containers on GitHub Actions only) ---------------------------------------
 
+
 def send(rows: list[Record], ready: Path, listeners: int, drop_packet: int | None) -> None:
     deadline = time.monotonic() + 60
     while len(list(ready.glob("*.ready"))) < listeners:
@@ -129,8 +151,11 @@ def listen(name: str, ready: Path, out: Path, timeout_s: float = 180) -> None:
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4 << 20)
     s.bind(("", PORT))
-    s.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, struct.pack("4sl", socket.inet_aton(GROUP),
-                                                                           socket.INADDR_ANY))
+    s.setsockopt(
+        socket.IPPROTO_IP,
+        socket.IP_ADD_MEMBERSHIP,
+        struct.pack("4sl", socket.inet_aton(GROUP), socket.INADDR_ANY),
+    )
     s.settimeout(5)
     ready.mkdir(parents=True, exist_ok=True)
     (ready / f"{name}.ready").write_text("ready")

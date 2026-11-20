@@ -76,8 +76,8 @@ def test_malformed_gives_its_code(case: dict[str, str]) -> None:
 # ---- round-trip properties ---------------------------------------------------------------------------------
 
 alpha = st.text(alphabet=st.characters(min_codepoint=0x20, max_codepoint=0x7E), min_size=1, max_size=1)
-u = lambda bits: st.integers(0, 2**bits - 1)  # noqa: E731
-u1 = lambda bits: st.integers(1, 2**bits - 1)  # noqa: E731
+u = lambda bits: st.integers(0, 2**bits - 1)
+u1 = lambda bits: st.integers(1, 2**bits - 1)
 
 
 def fixed(n: int) -> st.SearchStrategy[str]:
@@ -85,54 +85,138 @@ def fixed(n: int) -> st.SearchStrategy[str]:
 
 
 itch_msgs = st.one_of(
-    st.fixed_dictionaries({"type": st.just("S"), "locate": u(16), "tracking": u(16), "timestamp": u(48),
-                           "event": st.sampled_from("OSQMEC")}),
-    st.fixed_dictionaries({"type": st.just("A"), "locate": u(16), "tracking": u(16), "timestamp": u(48),
-                           "order_ref": u(64), "side": st.sampled_from("BS"), "shares": u1(32),
-                           "stock": fixed(8), "price": u(32)}),
-    st.fixed_dictionaries({"type": st.just("E"), "locate": u(16), "tracking": u(16), "timestamp": u(48),
-                           "order_ref": u(64), "shares": u1(32), "match": u(64)}),
-    st.fixed_dictionaries({"type": st.just("X"), "locate": u(16), "tracking": u(16), "timestamp": u(48),
-                           "order_ref": u(64), "shares": u1(32)}),
-    st.fixed_dictionaries({"type": st.just("D"), "locate": u(16), "tracking": u(16), "timestamp": u(48),
-                           "order_ref": u(64)}),
+    st.fixed_dictionaries(
+        {
+            "type": st.just("S"),
+            "locate": u(16),
+            "tracking": u(16),
+            "timestamp": u(48),
+            "event": st.sampled_from("OSQMEC"),
+        }
+    ),
+    st.fixed_dictionaries(
+        {
+            "type": st.just("A"),
+            "locate": u(16),
+            "tracking": u(16),
+            "timestamp": u(48),
+            "order_ref": u(64),
+            "side": st.sampled_from("BS"),
+            "shares": u1(32),
+            "stock": fixed(8),
+            "price": u(32),
+        }
+    ),
+    st.fixed_dictionaries(
+        {
+            "type": st.just("E"),
+            "locate": u(16),
+            "tracking": u(16),
+            "timestamp": u(48),
+            "order_ref": u(64),
+            "shares": u1(32),
+            "match": u(64),
+        }
+    ),
+    st.fixed_dictionaries(
+        {
+            "type": st.just("X"),
+            "locate": u(16),
+            "tracking": u(16),
+            "timestamp": u(48),
+            "order_ref": u(64),
+            "shares": u1(32),
+        }
+    ),
+    st.fixed_dictionaries(
+        {"type": st.just("D"), "locate": u(16), "tracking": u(16), "timestamp": u(48), "order_ref": u(64)}
+    ),
 )
 
 ouch_msgs = st.one_of(
-    st.fixed_dictionaries({"type": st.just("O"), "token": fixed(14), "side": st.sampled_from("BS"),
-                           "shares": u1(32), "stock": fixed(8), "price": u(32), "time_in_force": u(32),
-                           "firm": fixed(4), "display": st.sampled_from("YN"), "capacity": st.sampled_from("APRO"),
-                           "sweep": st.sampled_from("YN"), "min_qty": u(32), "cross_type": st.sampled_from("NOC"),
-                           "customer_type": st.sampled_from("RN ")}),
+    st.fixed_dictionaries(
+        {
+            "type": st.just("O"),
+            "token": fixed(14),
+            "side": st.sampled_from("BS"),
+            "shares": u1(32),
+            "stock": fixed(8),
+            "price": u(32),
+            "time_in_force": u(32),
+            "firm": fixed(4),
+            "display": st.sampled_from("YN"),
+            "capacity": st.sampled_from("APRO"),
+            "sweep": st.sampled_from("YN"),
+            "min_qty": u(32),
+            "cross_type": st.sampled_from("NOC"),
+            "customer_type": st.sampled_from("RN "),
+        }
+    ),
     st.fixed_dictionaries({"type": st.just("X"), "token": fixed(14), "shares": u(32)}),
     st.fixed_dictionaries({"type": st.just("A"), "timestamp": u(64), "token": fixed(14), "order_ref": u(64)}),
-    st.fixed_dictionaries({"type": st.just("C"), "timestamp": u(64), "token": fixed(14), "shares": u(32),
-                           "reason": st.sampled_from("ABCDEFGHIJKLMNOPQRSTUVWXYZ")}),
+    st.fixed_dictionaries(
+        {
+            "type": st.just("C"),
+            "timestamp": u(64),
+            "token": fixed(14),
+            "shares": u(32),
+            "reason": st.sampled_from("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+        }
+    ),
 )
 
 printable = st.text(alphabet=st.characters(min_codepoint=0x20, max_codepoint=0x7E), min_size=1, max_size=16)
 fix_msgs = st.one_of(
-    st.fixed_dictionaries({"msg_type": st.just("0"), "seq": st.integers(1, 2**31 - 1), "sender": printable,
-                           "target": printable, "body": st.just([])}),
-    st.builds(lambda seq, s, t, cl, sym, side, qty, px: {
-        "msg_type": "D", "seq": seq, "sender": s, "target": t,
-        "body": [[11, cl], [55, sym], [54, side], [38, str(qty)], [40, "2"], [44, px]]},
-        st.integers(1, 2**31 - 1), printable, printable,
+    st.fixed_dictionaries(
+        {
+            "msg_type": st.just("0"),
+            "seq": st.integers(1, 2**31 - 1),
+            "sender": printable,
+            "target": printable,
+            "body": st.just([]),
+        }
+    ),
+    st.builds(
+        lambda seq, s, t, cl, sym, side, qty, px: {
+            "msg_type": "D",
+            "seq": seq,
+            "sender": s,
+            "target": t,
+            "body": [[11, cl], [55, sym], [54, side], [38, str(qty)], [40, "2"], [44, px]],
+        },
+        st.integers(1, 2**31 - 1),
+        printable,
+        printable,
         st.text(alphabet=st.characters(min_codepoint=0x20, max_codepoint=0x7E), min_size=1, max_size=20),
         st.text(alphabet=st.characters(min_codepoint=0x20, max_codepoint=0x7E), min_size=1, max_size=8),
-        st.sampled_from("12"), st.integers(1, 999_999_999),
-        st.builds(lambda i, f: str(i) + f, st.integers(0, 10**9),
-                  st.one_of(st.just(""), st.from_regex(r"\.[0-9]{1,4}", fullmatch=True)))),
+        st.sampled_from("12"),
+        st.integers(1, 999_999_999),
+        st.builds(
+            lambda i, f: str(i) + f,
+            st.integers(0, 10**9),
+            st.one_of(st.just(""), st.from_regex(r"\.[0-9]{1,4}", fullmatch=True)),
+        ),
+    ),
 )
 
 symbol = st.text(alphabet=st.characters(min_codepoint=0x21, max_codepoint=0x7E), min_size=1, max_size=8)
-quote = st.fixed_dictionaries({"template": st.just(1), "seq": u(32), "symbol": symbol,
-                               "bid_px": st.integers(0, 2**62 - 1), "bid_size": u(32),
-                               "ask_px": st.integers(0, 2**62 - 1), "ask_size": u(32)})
+quote = st.fixed_dictionaries(
+    {
+        "template": st.just(1),
+        "seq": u(32),
+        "symbol": symbol,
+        "bid_px": st.integers(0, 2**62 - 1),
+        "bid_size": u(32),
+        "ask_px": st.integers(0, 2**62 - 1),
+        "ask_size": u(32),
+    }
+)
 # Runs of nearly identical quotes exercise the omit paths of copy and increment.
-quote_runs = st.lists(quote, min_size=1, max_size=6).flatmap(
-    lambda qs: st.lists(st.sampled_from(qs), min_size=1, max_size=12)).map(
-    lambda qs: [{**q, "seq": (qs[0]["seq"] + i) % 2**32} for i, q in enumerate(qs)])
+quote_runs = (
+    st.lists(quote, min_size=1, max_size=6)
+    .flatmap(lambda qs: st.lists(st.sampled_from(qs), min_size=1, max_size=12))
+    .map(lambda qs: [{**q, "seq": (qs[0]["seq"] + i) % 2**32} for i, q in enumerate(qs)])
+)
 
 
 @settings(max_examples=300)
@@ -181,8 +265,11 @@ def test_fast_unsigned_primitive(x: int) -> None:
 
 
 @settings(max_examples=300)
-@given(fixed(10).filter(lambda s: s != " " * 10), u(64),
-       st.lists(st.binary(min_size=1, max_size=40), max_size=10))
+@given(
+    fixed(10).filter(lambda s: s != " " * 10),
+    u(64),
+    st.lists(st.binary(min_size=1, max_size=40), max_size=10),
+)
 def test_mold_round_trip(session: str, seq: int, blocks: list[bytes]) -> None:
     pkt = {"session": session, "sequence": seq, "count": len(blocks), "blocks": blocks}
     data = mold.encode(pkt)
@@ -190,6 +277,7 @@ def test_mold_round_trip(session: str, seq: int, blocks: list[bytes]) -> None:
 
 
 # ---- canonical encodings: anything that decodes re-encodes to the same bytes (KR-276) ---------------------
+
 
 def _reencode(fmt: str, data: bytes) -> bytes | None:
     try:
@@ -218,7 +306,7 @@ def _mutations(seed: int) -> list[tuple[str, bytes]]:
         if op == 0 and b:
             b[rnd.randrange(len(b))] = rnd.randrange(256)
         elif op == 1:
-            del b[rnd.randrange(len(b) + 1):]
+            del b[rnd.randrange(len(b) + 1) :]
         elif op == 2:
             b += bytes(rnd.randrange(256) for _ in range(rnd.randrange(1, 8)))
         else:
@@ -252,26 +340,45 @@ def test_hypothesis_random_bytes(data: bytes) -> None:
 
 # ---- encoders validate ------------------------------------------------------------------------------------
 
-@pytest.mark.parametrize("call", [
-    lambda: itch.encode({"type": "Z"}),
-    lambda: itch.encode({"type": "D", "locate": 1, "tracking": 0, "timestamp": 2**48, "order_ref": 1}),
-    lambda: itch.encode({"type": "D", "locate": 1, "tracking": 0, "timestamp": 0, "order_ref": 1, "x": 1}),
-    lambda: itch.encode({"type": "S", "locate": 1, "tracking": 0, "timestamp": 0, "event": "Z"}),
-    lambda: ouch.encode({"type": "X", "token": "short", "shares": 1}),
-    lambda: ouch.encode({"type": "X", "token": "é" * 14, "shares": 1}),
-    lambda: fix.encode({"msg_type": "0", "seq": 0, "sender": "A", "target": "B", "body": []}),
-    lambda: fix.encode({"msg_type": "0", "seq": 1, "sender": "A\x01", "target": "B", "body": []}),
-    lambda: fix.encode({"msg_type": "Q", "seq": 1, "sender": "A", "target": "B", "body": []}),
-    lambda: fast.encode_packet([{"template": 2, "seq": 1, "symbol": "Q", "bid_px": 0, "bid_size": 0,
-                                 "ask_px": 0, "ask_size": 0}]),
-    lambda: fast.encode_packet([{"template": 1, "seq": 2**32, "symbol": "Q", "bid_px": 0, "bid_size": 0,
-                                 "ask_px": 0, "ask_size": 0}]),
-    lambda: fast.encode_packet([{"template": 1, "seq": 1, "symbol": "", "bid_px": 0, "bid_size": 0,
-                                 "ask_px": 0, "ask_size": 0}]),
-    lambda: mold.encode({"session": "QFSIM00001", "sequence": 1, "count": 2, "blocks": [b"x"]}),
-    lambda: mold.encode({"session": "QFSIM00001", "sequence": 1, "count": 65535, "blocks": [b"x"]}),
-    lambda: mold.encode({"session": "short", "sequence": 1, "count": 0, "blocks": []}),
-])
+
+@pytest.mark.parametrize(
+    "call",
+    [
+        lambda: itch.encode({"type": "Z"}),
+        lambda: itch.encode({"type": "D", "locate": 1, "tracking": 0, "timestamp": 2**48, "order_ref": 1}),
+        lambda: itch.encode(
+            {"type": "D", "locate": 1, "tracking": 0, "timestamp": 0, "order_ref": 1, "x": 1}
+        ),
+        lambda: itch.encode({"type": "S", "locate": 1, "tracking": 0, "timestamp": 0, "event": "Z"}),
+        lambda: ouch.encode({"type": "X", "token": "short", "shares": 1}),
+        lambda: ouch.encode({"type": "X", "token": "é" * 14, "shares": 1}),
+        lambda: fix.encode({"msg_type": "0", "seq": 0, "sender": "A", "target": "B", "body": []}),
+        lambda: fix.encode({"msg_type": "0", "seq": 1, "sender": "A\x01", "target": "B", "body": []}),
+        lambda: fix.encode({"msg_type": "Q", "seq": 1, "sender": "A", "target": "B", "body": []}),
+        lambda: fast.encode_packet(
+            [{"template": 2, "seq": 1, "symbol": "Q", "bid_px": 0, "bid_size": 0, "ask_px": 0, "ask_size": 0}]
+        ),
+        lambda: fast.encode_packet(
+            [
+                {
+                    "template": 1,
+                    "seq": 2**32,
+                    "symbol": "Q",
+                    "bid_px": 0,
+                    "bid_size": 0,
+                    "ask_px": 0,
+                    "ask_size": 0,
+                }
+            ]
+        ),
+        lambda: fast.encode_packet(
+            [{"template": 1, "seq": 1, "symbol": "", "bid_px": 0, "bid_size": 0, "ask_px": 0, "ask_size": 0}]
+        ),
+        lambda: mold.encode({"session": "QFSIM00001", "sequence": 1, "count": 2, "blocks": [b"x"]}),
+        lambda: mold.encode({"session": "QFSIM00001", "sequence": 1, "count": 65535, "blocks": [b"x"]}),
+        lambda: mold.encode({"session": "short", "sequence": 1, "count": 0, "blocks": []}),
+    ],
+)
 def test_encoders_reject_invalid_input(call: Any) -> None:
     with pytest.raises(FeedError):
         call()
@@ -279,10 +386,15 @@ def test_encoders_reject_invalid_input(call: Any) -> None:
 
 # ---- gap detector (adapters.md 3.5 worked example) --------------------------------------------------------
 
+
 def _pkt(seq: int, n: int, count: int | None = None, session: str = "QFSIM00001") -> dict[str, Any]:
     blocks = [bytes([seq + i]) for i in range(n)]
-    return {"session": session, "sequence": seq, "count": len(blocks) if count is None else count,
-            "blocks": blocks}
+    return {
+        "session": session,
+        "sequence": seq,
+        "count": len(blocks) if count is None else count,
+        "blocks": blocks,
+    }
 
 
 def test_gap_detector_worked_example() -> None:

@@ -33,13 +33,13 @@ def decode(data: bytes) -> dict[str, Any]:
         for _ in range(count):
             if len(data) - pos < 2:
                 raise FeedError("E_TRUNCATED", f"block length cut at offset {pos}")
-            length = int.from_bytes(data[pos:pos + 2], "big")
+            length = int.from_bytes(data[pos : pos + 2], "big")
             pos += 2
             if length == 0:
                 raise FeedError("E_LENGTH", f"zero block length at offset {pos - 2}")
             if len(data) - pos < length:
                 raise FeedError("E_TRUNCATED", f"block of {length} bytes cut at offset {pos}")
-            blocks.append(data[pos:pos + length])
+            blocks.append(data[pos : pos + length])
             pos += length
         if pos != len(data):
             raise FeedError("E_LENGTH", f"{len(data) - pos} bytes after the last block")

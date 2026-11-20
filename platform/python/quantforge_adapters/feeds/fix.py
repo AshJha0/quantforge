@@ -71,8 +71,8 @@ def decode(data: bytes) -> dict[str, Any]:
     cut = data.rfind(SOH + b"10=")
     if not data.endswith(SOH) or cut < 0:
         raise FeedError("E_TRUNCATED", "no complete checksum field at the end")
-    head = data[:cut + 1]
-    trailer = data[cut + 1:]
+    head = data[: cut + 1]
+    trailer = data[cut + 1 :]
     fields = _split(head)
     if len(fields) < 2 or fields[0] != ("8", BEGIN):
         raise FeedError("E_FIELD", f"the first field must be 8={BEGIN}")
@@ -104,8 +104,13 @@ def decode(data: bytes) -> dict[str, Any]:
         body.append((int(tag), value))
     _check_header(seq, rest[1][1], rest[2][1])
     _check_body(msg_type, body)
-    return {"msg_type": msg_type, "seq": seq, "sender": rest[1][1], "target": rest[2][1],
-            "body": [[t, v] for t, v in body]}
+    return {
+        "msg_type": msg_type,
+        "seq": seq,
+        "sender": rest[1][1],
+        "target": rest[2][1],
+        "body": [[t, v] for t, v in body],
+    }
 
 
 def encode(msg: dict[str, Any]) -> bytes:
@@ -120,8 +125,12 @@ def encode(msg: dict[str, Any]) -> bytes:
         raise FeedError("E_FIELD", "body must be a list of [tag, value]")
     body: list[tuple[int, str]] = []
     for item in body_in:
-        if (not isinstance(item, (list, tuple)) or len(item) != 2 or type(item[0]) is not int
-                or not isinstance(item[1], str)):
+        if (
+            not isinstance(item, (list, tuple))
+            or len(item) != 2
+            or type(item[0]) is not int
+            or not isinstance(item[1], str)
+        ):
             raise FeedError("E_FIELD", "body items are [int tag, str value]")
         body.append((item[0], item[1]))
     _check_body(msg_type, body)

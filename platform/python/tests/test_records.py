@@ -69,6 +69,7 @@ def test_from_canon_inverts_canon(rows: list[records.Record]) -> None:
 
 # ---- planted faults of adapters.md 1.4 ----------------------------------------------------------------------
 
+
 def _copy(rows: list[records.Record]) -> list[records.Record]:
     return json.loads(json.dumps(rows))
 
@@ -77,10 +78,17 @@ def test_pass(rows: list[records.Record]) -> None:
     assert records.verdict(rows, _copy(rows), store_count=10_000) == "PASS"
 
 
-@pytest.mark.parametrize("plant,code", [
-    ("drop", "COUNT"), ("duplicate", "COUNT"), ("byte", "HASH"), ("float", "HASH"), ("reorder", "PASS"),
-    ("bypass", "BYPASS"),
-])
+@pytest.mark.parametrize(
+    "plant,code",
+    [
+        ("drop", "COUNT"),
+        ("duplicate", "COUNT"),
+        ("byte", "HASH"),
+        ("float", "HASH"),
+        ("reorder", "PASS"),
+        ("bypass", "BYPASS"),
+    ],
+)
 def test_planted_faults(rows: list[records.Record], plant: str, code: str) -> None:
     from quantforge_adapters.smoke import apply_plant
 

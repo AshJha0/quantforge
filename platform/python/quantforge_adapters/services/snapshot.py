@@ -18,6 +18,6 @@ def _reject_constant(name: str) -> Any:
 def hash_document(text: str) -> tuple[str, str]:
     doc = json.loads(text, parse_constant=_reject_constant)
     if not isinstance(doc, dict):
-        raise ValueError("the top level is not an object")
+        raise ValueError("the top level is not an object")  # noqa: TRY004 (a 400, not a bug)
     form = canonical({k: v for k, v in doc.items() if k != "snapshot_id"})
     return form, "sha256:" + hashlib.sha256(form.encode("utf-8")).hexdigest()

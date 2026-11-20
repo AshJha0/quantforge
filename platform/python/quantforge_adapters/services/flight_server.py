@@ -1,6 +1,6 @@
 """Arrow Flight service for the K-3 smoke: keeps each uploaded table in memory by descriptor path.
 
-    python -m quantforge_adapters.services.flight_server [--port 8815]
+python -m quantforge_adapters.services.flight_server [--port 8815]
 """
 
 import argparse

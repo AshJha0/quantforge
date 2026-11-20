@@ -3,18 +3,40 @@
 Simulated; not a certified implementation; not connected to any venue.
 """
 
-from quantforge_adapters.feeds._binary import MIN_ONE, Field, Message, decode_fields, encode_fields, layout_length
+from quantforge_adapters.feeds._binary import (
+    MIN_ONE,
+    Field,
+    Message,
+    decode_fields,
+    encode_fields,
+    layout_length,
+)
 from quantforge_adapters.feeds.errors import FeedError
 
 BODIES: dict[str, list[Field]] = {
-    "O": [("token", "a", 14, None), ("side", "c", 1, "BS"), ("shares", "u", 4, MIN_ONE), ("stock", "a", 8, None),
-          ("price", "u", 4, None), ("time_in_force", "u", 4, None), ("firm", "a", 4, None),
-          ("display", "c", 1, "YN"), ("capacity", "c", 1, "APRO"), ("sweep", "c", 1, "YN"),
-          ("min_qty", "u", 4, None), ("cross_type", "c", 1, "NOC"), ("customer_type", "c", 1, "RN ")],
+    "O": [
+        ("token", "a", 14, None),
+        ("side", "c", 1, "BS"),
+        ("shares", "u", 4, MIN_ONE),
+        ("stock", "a", 8, None),
+        ("price", "u", 4, None),
+        ("time_in_force", "u", 4, None),
+        ("firm", "a", 4, None),
+        ("display", "c", 1, "YN"),
+        ("capacity", "c", 1, "APRO"),
+        ("sweep", "c", 1, "YN"),
+        ("min_qty", "u", 4, None),
+        ("cross_type", "c", 1, "NOC"),
+        ("customer_type", "c", 1, "RN "),
+    ],
     "X": [("token", "a", 14, None), ("shares", "u", 4, None)],
     "A": [("timestamp", "u", 8, None), ("token", "a", 14, None), ("order_ref", "u", 8, None)],
-    "C": [("timestamp", "u", 8, None), ("token", "a", 14, None), ("shares", "u", 4, None),
-          ("reason", "c", 1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")],
+    "C": [
+        ("timestamp", "u", 8, None),
+        ("token", "a", 14, None),
+        ("shares", "u", 4, None),
+        ("reason", "c", 1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+    ],
 }
 LENGTHS = {t: 1 + layout_length(b) for t, b in BODIES.items()}
 
@@ -60,13 +82,13 @@ def decode_stream(data: bytes) -> list[Message]:
     while pos < len(data):
         if len(data) - pos < 2:
             raise FeedError("E_TRUNCATED", f"length field cut at offset {pos}")
-        length = int.from_bytes(data[pos:pos + 2], "big")
+        length = int.from_bytes(data[pos : pos + 2], "big")
         pos += 2
         if length == 0:
             raise FeedError("E_LENGTH", f"zero frame length at offset {pos - 2}")
         if len(data) - pos < length:
             raise FeedError("E_TRUNCATED", f"frame of {length} bytes cut at offset {pos}")
-        frame = data[pos:pos + length]
+        frame = data[pos : pos + length]
         kind = _type_of(frame)
         if length != LENGTHS[kind]:
             raise FeedError("E_LENGTH", f"frame length {length} for type {kind} of {LENGTHS[kind]} bytes")

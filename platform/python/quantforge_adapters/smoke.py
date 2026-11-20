@@ -24,10 +24,26 @@ ROOT = Path(__file__).resolve().parents[3]
 RECORDS = ROOT / "datasets" / "adapters" / "records-10000.jsonl"
 COMPOSE = ROOT / "platform" / "compose"
 PINNED = re.compile(r"^\s*image:\s*[a-z0-9][a-z0-9._/-]*:[A-Za-z0-9._-]+@sha256:[0-9a-f]{64}\s*$")
-ADAPTERS = ("rest", "grpc", "arrow-ipc", "arrow-flight", "kafka", "postgres", "clickhouse", "prometheus", "aeron")
+ADAPTERS = (
+    "rest",
+    "grpc",
+    "arrow-ipc",
+    "arrow-flight",
+    "kafka",
+    "postgres",
+    "clickhouse",
+    "prometheus",
+    "aeron",
+)
 # Every planted fault and the verdict it must give (adapters.md 1.4). "bypass" needs a store count query.
-PLANTS = {"drop": "COUNT", "duplicate": "COUNT", "byte": "HASH", "float": "HASH", "reorder": "PASS",
-          "bypass": "BYPASS"}
+PLANTS = {
+    "drop": "COUNT",
+    "duplicate": "COUNT",
+    "byte": "HASH",
+    "float": "HASH",
+    "reorder": "PASS",
+    "bypass": "BYPASS",
+}
 
 
 def check_pinned(compose_file: Path) -> list[str]:
@@ -54,7 +70,7 @@ def apply_plant(plant: str, rows: list[Record], count: int | None) -> tuple[list
         body[key] = body[key][:-1] + ("0" if body[key][-1] != "0" else "1")
     elif plant == "float":
         r = rows[len(rows) // 4]
-        target = r["body"] if "body" in r else r
+        target = r.get("body", r)
         target["value"] = math.nextafter(float(target["value"]), math.inf)
     elif plant == "reorder":
         rows[0], rows[-1] = rows[-1], rows[0]
@@ -124,10 +140,16 @@ def smoke(a: ad.Adapter, phase: str, sent: list[Record], digests: list[str], out
         result = v.code
     plants = run_plants(expected, read, count) if result == "PASS" else {}
     doc: dict[str, Any] = {
-        "adapter": a.name, "n_sent": len(sent), "n_read": len(read), "store_count": count,
-        "verdict": result, "plants": plants, "image_digests": digests,
+        "adapter": a.name,
+        "n_sent": len(sent),
+        "n_read": len(read),
+        "store_count": count,
+        "verdict": result,
+        "plants": plants,
+        "image_digests": digests,
         "wall_s": round(time.monotonic() - started, 3),
-        "host": os.environ.get("K3_HOST_LABEL", "GitHub Actions runner"), "label": LABEL,
+        "host": os.environ.get("K3_HOST_LABEL", "GitHub Actions runner"),
+        "label": LABEL,
     }
     try:
         doc["h_sent"] = content_hash(expected)

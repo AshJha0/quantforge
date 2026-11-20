@@ -2,14 +2,14 @@
 # Simulated; not a certified implementation; not connected to any venue.
 # No official Aeron image exists (KR-273): the publisher and subscriber are our Java programs
 # (platform/java/aeron-smoke, built by the workflow) on the Temurin JRE image, each with an embedded media
-# driver, over UDP unicast. The work directory holds send.txt (written by the driver) and received.txt.
+# driver, over UDP unicast. The work directory platform/compose/work/aeron holds send.txt (written by the driver) and received.txt.
 services:
   sub:
     image: eclipse-temurin:25-jre@sha256:945247f9d092703e0c6be92243ef3c51640229e23ab34d353c8dcdc73e6cd4e6
     shm_size: 256m
     volumes:
       - ../../java/aeron-smoke/target:/app:ro
-      - ./work:/work
+      - ../work/aeron:/work
     command: ["java", "--sun-misc-unsafe-memory-access=allow", "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED", "--add-opens", "java.base/java.util.zip=ALL-UNNAMED", "-cp", "/app/aeron-smoke.jar", "org.quantforge.k3.AeronSmoke", "sub", "0.0.0.0:40123", "/work/received.txt", "10000"]
   pub:
     image: eclipse-temurin:25-jre@sha256:945247f9d092703e0c6be92243ef3c51640229e23ab34d353c8dcdc73e6cd4e6
@@ -17,5 +17,5 @@ services:
     depends_on: [sub]
     volumes:
       - ../../java/aeron-smoke/target:/app:ro
-      - ./work:/work:ro
+      - ../work/aeron:/work:ro
     command: ["java", "--sun-misc-unsafe-memory-access=allow", "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED", "--add-opens", "java.base/java.util.zip=ALL-UNNAMED", "-cp", "/app/aeron-smoke.jar", "org.quantforge.k3.AeronSmoke", "pub", "sub:40123", "/work/send.txt", "10000"]

@@ -6,6 +6,7 @@ platform/python/quantforge_adapters/records.py (adapters.md 1.1). Run with the l
 
     cd python && uv run python ../tools/adapters/gen_records.py [--check]
 """
+
 import hashlib
 import json
 import sys
@@ -14,8 +15,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / "python"), str(ROOT / "platform" / "python")]
 
-from quantforge_adapters import records  # noqa: E402
-from quantforge_core import rng  # noqa: E402
+from quantforge_core import rng
+
+from quantforge_adapters import records
 
 OUT = ROOT / "datasets" / "adapters" / "records-10000.jsonl"
 SUM = OUT.with_suffix(".sha256")

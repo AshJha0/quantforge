@@ -12,7 +12,7 @@ import urllib.parse
 import urllib.request
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import pytest
 
@@ -95,8 +95,10 @@ class FakeClickHouse:
             return f"{len(self.rows)}\n".encode()
         elif sql.startswith("SELECT"):
             # ClickHouse quotes 64-bit integers in JSON output by default.
-            return "".join(json.dumps({**r, "seq": str(r["seq"])}) + "\n"
-                           for r in sorted(self.rows, key=lambda r: r["seq"])).encode()
+            return "".join(
+                json.dumps({**r, "seq": str(r["seq"])}) + "\n"
+                for r in sorted(self.rows, key=lambda r: r["seq"])
+            ).encode()
         return b""
 
 
@@ -121,8 +123,12 @@ def test_prometheus_with_the_real_exporter_and_a_fake_query_api(rows: list[Recor
         for line in text.splitlines():
             if line.startswith("k3_value{"):
                 labels, value = line.rsplit(" ", 1)
-                series.append({"metric": {"__name__": "k3_value", "seq": labels.split('"')[1]},
-                               "value": [1.0, _go_float(value)]})
+                series.append(
+                    {
+                        "metric": {"__name__": "k3_value", "seq": labels.split('"')[1]},
+                        "value": [1.0, _go_float(value)],
+                    }
+                )
         expr = urllib.parse.unquote(url.split("query=", 1)[1])
         result = [{"metric": {}, "value": [1.0, str(len(series))]}] if expr.startswith("count(") else series
         return json.dumps({"status": "success", "data": {"resultType": "vector", "result": result}}).encode()
@@ -136,7 +142,7 @@ def test_prometheus_with_the_real_exporter_and_a_fake_query_api(rows: list[Recor
 class FakePg:
     """Stores COPY rows; returns body::text the way jsonb prints it (its own key order, ', ' and ': ')."""
 
-    table: dict[int, tuple[str, str]] = {}
+    table: ClassVar[dict[int, tuple[str, str]]] = {}
 
     def run(self, sql: str, stream: Any = None) -> Any:
         if sql.startswith("TRUNCATE"):
@@ -145,8 +151,10 @@ class FakePg:
             for seq, kind, body in csv.reader(io.StringIO(stream.read())):
                 obj = json.loads(body)
                 keys = sorted(obj, key=lambda k: (len(k), k))  # jsonb orders keys by length, then bytes
-                FakePg.table[int(seq)] = (kind, "{" + ", ".join(f"{json.dumps(k)}: {json.dumps(obj[k])}"
-                                                                   for k in keys) + "}")
+                FakePg.table[int(seq)] = (
+                    kind,
+                    "{" + ", ".join(f"{json.dumps(k)}: {json.dumps(obj[k])}" for k in keys) + "}",
+                )
         elif sql.startswith("SELECT count"):
             return [[len(FakePg.table)]]
         elif sql.startswith("SELECT"):
@@ -226,6 +234,7 @@ def test_failing_store_gives_count_and_exit_1(rows: list[Record], tmp_path: Path
 
 # ---- compose files and the image lock ----------------------------------------------------------------------
 
+
 def test_unpinned_image_is_refused(tmp_path: Path) -> None:
     f = tmp_path / "compose.yaml"
     f.write_text("services:\n  db:\n    image: postgres:17\n", encoding="utf-8")
@@ -248,6 +257,7 @@ def test_every_compose_file_is_pinned_to_the_lock() -> None:
 
 
 # ---- multicast, in process ---------------------------------------------------------------------------------
+
 
 def test_multicast_in_process(rows: list[Record]) -> None:
     results = multicast.run_in_process(rows)

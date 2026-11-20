@@ -22,7 +22,7 @@ def make_server(rows: list[Record], host: str = "0.0.0.0", port: int = 9108) -> 
     body = exposition(rows)
 
     class Handler(BaseHTTPRequestHandler):
-        def do_GET(self) -> None:  # noqa: N802
+        def do_GET(self) -> None:
             ok = self.path == "/metrics"
             data = body if ok else b"not found\n"
             self.send_response(200 if ok else 404)
@@ -31,7 +31,7 @@ def make_server(rows: list[Record], host: str = "0.0.0.0", port: int = 9108) -> 
             self.end_headers()
             self.wfile.write(data)
 
-        def log_message(self, format: str, *args: object) -> None:  # noqa: A002
+        def log_message(self, format: str, *args: object) -> None:
             return
 
     return ThreadingHTTPServer((host, port), Handler)
