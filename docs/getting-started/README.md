@@ -61,7 +61,7 @@ Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the f
 
 ## Stage K, in progress
 
-These eight pages cover stage K round 1. They are not released: the operations they describe are merged on the integration branch `k-r1` (2026-11-19), in all four builds, and none is in a tag. Each page first restates the spec's rule with the standard library on the golden inputs; Tutorials 51 to 57 then call the library in Step 2 through the Python build, and CI checks that Step 2 prints the page's lines (turned on at integration, `program/STAGE_K_DOCS_PENDING.md`). Tutorial 58 checks Step 1 only, because the paper ledger is not running yet. Numbers are taken from evidence files and goldens, and each page names the file.
+These eight pages cover stage K round 1. They are not released: the operations they describe are merged to `main` (2026-11-19, pull request #58), in all four builds, and none is in a tag. Each page first restates the spec's rule with the standard library on the golden inputs; Tutorials 51 to 57 then call the library in Step 2 through the Python build, and CI checks that Step 2 prints the page's lines (turned on at integration, `program/STAGE_K_DOCS_PENDING.md`). Tutorial 58 checks Step 1 only, because the paper ledger is not running yet. Numbers are taken from evidence files and goldens, and each page names the file.
 
 | Tutorial | What you do | Operations | Stage |
 |---|---|---|---|

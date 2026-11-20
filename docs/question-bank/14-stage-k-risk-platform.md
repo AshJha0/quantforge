@@ -1,6 +1,6 @@
 # Question bank 14: Stage K: data platform, intraday risk, capital and the paper ledger
 
-This set covers the stage K round 1 work, which is **in progress and not released**: the bitemporal store, incremental curve updates, recalibration triggers, intraday risk with error bounds, the Bermudan ladder convergence fix, SA-CCR and FRTB backtesting, and the daily paper ledger. All of it is merged on the integration branch `k-r1` (2026-11-19), in all four builds, and none of it is on `main` or in a tag. It is for a reader who has worked through [Tutorials 51 to 58](../getting-started/README.md#stage-k-in-progress). Every worked-example number is rechecked by `verify/v14_stage_k.py`, which restates the formulas with the standard library and compares them with the goldens' values. All data is synthetic, except the Basel examples, which are the regulator's own sample portfolios.
+This set covers the stage K round 1 work, which is **in progress and not released**: the bitemporal store, incremental curve updates, recalibration triggers, intraday risk with error bounds, the Bermudan ladder convergence fix, SA-CCR and FRTB backtesting, and the daily paper ledger. All of it is merged to `main` (2026-11-19, pull request #58), in all four builds, and none of it is on `main` or in a tag. It is for a reader who has worked through [Tutorials 51 to 58](../getting-started/README.md#stage-k-in-progress). Every worked-example number is rechecked by `verify/v14_stage_k.py`, which restates the formulas with the standard library and compares them with the goldens' values. All data is synthetic, except the Basel examples, which are the regulator's own sample portfolios.
 
 ## Bitemporal store
 
@@ -346,7 +346,7 @@ Carry (coupon accrual and cash interest), roll-down, curve move, and fills and c
 
 Every term is an exact decimal product of recorded 6-decimal marks and whole lots, the three market terms telescope to `n x (mark - 100)`, and the only rounding (cash interest to the cent) is posted as rounded, so the residual is zero by construction (KR-79).
 
-**Worked example.** The spec's worked day: carry 1,213.9355, roll-down 16.5625, curve move -1,993.7275, fills and costs -132.03125; sum -895.26075, equal to NAV 9,998,818.80175 minus 9,999,714.0625.
+**Worked example.** The spec's worked day: carry 1,213.9355, roll-down 16.5625, curve move -1,993.7275, fills and costs -124.21875; sum -887.44825, equal to NAV 9,998,826.61425 minus 9,999,714.0625.
 
 The pitfall is reading the zero as model quality: it is a bookkeeping test, with no performance claim.
 
@@ -376,6 +376,6 @@ The pitfall is a ledger without published anchors: truncating the last line leav
 
 Zero of the 20 that the v1.0.0 gate needs: the workflow has never run, and the earliest 20th on-time day is 20 US business days after it reaches `main`. FedInvest prices are not used because the site's robots file disallows automated agents and its terms limit use to personal viewing (KR-70); the ledger uses constant-maturity exposures on a curve through the five Treasury par yields the recorder already keeps.
 
-**Worked example.** Only on-time DAY rows in a ledger that passes full verification count; late days and gaps do not. `verify_ledger.py verify --require-days 20` is the gate; it failed with `DAYS` on a 1-day local dry run, as it should.
+**Worked example.** A day counts only if a Bitcoin block time, plus two hours, falls before its cut-off in a ledger that passes full verification; the row's own on-time label is not counted (KR-200, KR-201). The gate is `verify_ledger.py verify --ledger L --anchors A --forward-log F --bitcoin-headers H --require-days 20` (KR-202); it refuses with `--no-cli` or without the anchors, the recorder log or the headers. A 30-day ledger written in one sitting and stamped afterwards records 0 days (spec worked example, synthetic).
 
 The pitfall is calling the marks prices: they are paper marks on a fitted curve, not tradable.

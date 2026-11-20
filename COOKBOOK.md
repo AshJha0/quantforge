@@ -1283,7 +1283,7 @@ In the first case `participation` 1.5 is outside its domain and `market_volume` 
 
 ## Stage K recipes
 
-Stage K round 1 is merged on the integration branch `k-r1` and is not released. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
+Stage K round 1 is merged to `main` (2026-11-19) and is not released; round 2 audit fixes are on the integration branch `k-r2`. Every operation below is registered in all four builds (CLI contract 1.17.0), and its goldens pass the conformance runner in each. Send each case line to a build's `run` or `batch` command and compare with the golden named. The "Observed" lines were run once by hand (items C1 to C9 of `program/STAGE_K_DOCS_PENDING.md`); no checker runs these blocks. Where an observed value differs from the golden in the last digit or two, the golden is the 50-digit oracle value rounded to binary64 and the build is inside the golden's tolerance class (`simple_analytic`).
 
 ### Query a bitemporal log
 
@@ -1309,7 +1309,7 @@ Expected (golden `inc_k-0002`): `first_changed_index` 1, `recomputed` 2, `discou
 {"schema_version": "1.0", "case_id": "trig", "operation": "calib.trigger.check", "inputs": {"changes": [1.0, -1.0, 1.0, -1.0], "x_ref": 100.0, "x_now": 105.0, "days_since": 1.0, "k": 3.0}}
 ```
 
-Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `threshold` 3.4641016151377544, `false_alarm_rate` 0.002699796063260189. A move exactly equal to the threshold does not fire (KR-13). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the four values above, bit for bit. `false_alarm_rate` is the stated `2 (1 - Phi(k))`, computed as `2 Phi(-k)` with a tail-accurate normal CDF (far-tail golden `trig_k-0009`). K-4c outside share: 4 of 6 value cases, by blind re-derivation.
+Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `threshold` 3.4641016151377544, `false_alarm_rate` 0.057668885622437306, `nominal_rate` 0.002699796063260189. A move exactly equal to the threshold does not fire (KR-13). `false_alarm_rate` is the rate of the trigger as used, with `sigma` estimated from four changes: `P(abs(T_3) > 3)` (spec 1.1.0, KR-232, class `tail_probability`, 1e-11 relative); `nominal_rate` is the known-sigma rate `2 (1 - Phi(k))`, computed as `2 Phi(-k)` (far-tail golden `trig_k-0009`). Observed (2026-11-20 on `k-r2-docs`, Python build through Tutorial 53 Step 2, local laptop, not the acceptance machine): these values to the printed six decimals. K-4c outside share: see `oracle/OUTSIDE_SHARES.md` (the blind matches cover `nominal_rate`).
 
 ### Intraday P&L with an error bound
 
@@ -1317,7 +1317,7 @@ Expected (golden `trig_k-0001`): `fire` true, `sigma` 1.1547005383792515, `thres
 {"schema_version": "1.0", "case_id": "idr", "operation": "risk.intraday.delta_gamma_bound", "inputs": {"positions": [{"notional": 1000000.0, "maturity": 5.0, "yield": 0.04}], "shift": 0.01}}
 ```
 
-Expected (golden `idr_k-0001`): `estimate_pnl` -39913.124212551615, `bound` 17.05689068912462, `label` "latency-aware analytics on simulated data". Zero-coupon positions only. The item's outside-check share is 5 of 5 value cases, by the K-5a blind packet (`program/STAGE_K_BLIND_K5A.md`). Observed (observed 2026-11-19 on `k-r1`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): `estimate_pnl` -39913.124212551615, `bound` 17.056890689124625 (the golden's 17.05689068912462 differs in the last place, inside the tolerance), `label` as expected.
+Expected (golden `idr_k-0001`, spec 1.1.0): `estimate_pnl` -39913.124212551615, `bound` 17.056890689308766, `label` "latency-aware analytics on simulated data". The bound is the Lagrange term plus a binary64 rounding allowance (KR-234); it is 1.1e-11 relative above the 1.0.0 value 17.05689068912462. Zero-coupon positions only. Outside check: the version 2 blind packet matched all 11 bounds and 9 of 11 cases (`program/STAGE_K_BLIND_K5A_V2.md`). Observed (2026-11-20 on `k-r2-docs`, Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine): the three values above, bit for bit.
 
 ### Guard a Richardson extrapolation
 
@@ -1354,7 +1354,7 @@ Expected (spec worked example and golden `btk_k-0020`): the first gives `excepti
 git fetch origin paper-ledger paper-ledger-anchors
 git show origin/paper-ledger:ledger/ledger.jsonl > ledger.jsonl
 python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --no-cli         # from the ledger alone
-python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --require-days 20
+python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --anchors A --forward-log F --bitcoin-headers H --require-days 20
 ```
 
 `--no-cli` checks the chain, the configuration, the dates and holdout windows, and replays every day in exact decimal from the ledger's own numbers; the full run also rebuilds each day through the CLI. The tool is merged (`tools/paper_daily/verify_ledger.py`, spec `specifications/12-platform/paper-ledger-daily.md`). The `paper-ledger` branch does not exist until the workflow first runs on `main`, so the daily ledger is not yet running: **0 of 20 recorded trading days.** Every row is labelled "paper marks on a fitted curve; not tradable"; no performance claim is made. Not run: there is no ledger to fetch (2026-11-19, `k-r1`). Checked only that `verify_ledger.py --help` lists the `verify` command and the `--ledger`, `--no-cli` and `--require-days` options used above.

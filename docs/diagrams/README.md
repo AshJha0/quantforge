@@ -673,7 +673,7 @@ Plain idea: a latency figure is a claim about one machine, one workload and one 
 
 ## Stage K: risk platform and capital (in progress)
 
-Stage K round 1 is merged on the integration branch `k-r1` (2026-11-19); nothing here is released. Each diagram names the spec it was drawn from (read 2026-11-19). All four rendered in the locally built site of the docs lane with every node drawn and no parse error (checked in the built-in browser, 2026-11-19); the site is rebuilt on `k-r1` (`program/STAGE_K_DOCS_PENDING.md`).
+Stage K round 1 is merged to `main` (2026-11-19, pull request #58); nothing here is released. Each diagram names the spec it was drawn from (read 2026-11-19). All four rendered in the locally built site of the docs lane with every node drawn and no parse error (checked in the built-in browser, 2026-11-19); the site is rebuilt on `k-r1` (`program/STAGE_K_DOCS_PENDING.md`).
 
 ### SA-CCR: from trades to EAD
 
@@ -726,7 +726,7 @@ Rule KR-2 of `specifications/01-core/bitemporal-store.md`. `valid_to` is exclusi
 flowchart TB
   accTitle: Daily paper ledger run with its hash chain and anchor
   accDescr: The scheduled job reads the Treasury par yields the recorder already wrote to the forward-log branch. For each due business day it marks four constant-maturity exposures on a linear curve through five par yields, sends the fixed rule's one order through the pre-trade estimate and limit check to the simulated lit venue, computes the post-trade TCA and the P&L explain, and refuses the day unless the unexplained term is exactly zero. The row is hashed with the previous row's hash and appended to the ledger on the paper-ledger branch. The whole ledger is verified, the summary written, and the new head hash with the row count is stamped with OpenTimestamps on the paper-ledger-anchors branch. A day with no recorded curve becomes a GAP row; a day past its cut-off becomes a late row with no order.
-  FL[("forward-log branch<br/>five recorded par yields a day")] -.->|"read only"| RUN["run_day.py<br/>00:40 and 15:10 UTC"]
+  FL[("forward-log branch<br/>five recorded par yields a day")] -.->|"read only"| RUN["run_day.py<br/>schedule withheld"]
   RUN --> DUE{"curve recorded<br/>for the business day?"}
   DUE -->|"no, cut-off passed"| GAP[GAP row]
   DUE -->|yes| MK["marks: 4 constant-maturity exposures<br/>paper marks on a fitted curve; not tradable"]
@@ -743,7 +743,7 @@ flowchart TB
   class SIM sim
 ```
 
-From `specifications/12-platform/paper-ledger-daily.md` and `docs/developer-guides/paper-ledger.md` (rulings KR-70 to KR-89, proposed). The job writes only to its own two branches, never to `main` or `forward-log`. **Not running yet: 0 of 20 recorded trading days**; the workflow has never run on a GitHub runner. No performance claim is made: the order rule ignores the market and fills are simulated. The chain shows rows were not edited after writing; the anchor catches a consistent rewrite of old rows and a truncated tail. Worked through in [Tutorial 58](../getting-started/tutorial-58-daily-paper-ledger.md). The stage H paper book's ledger, a different file, is in the [paper-trading ledger flow](#paper-trading-ledger-flow).
+From `specifications/12-platform/paper-ledger-daily.md` and `docs/developer-guides/paper-ledger.md` (rulings KR-70 to KR-89, confirmed 2026-11-19). The `schedule:` trigger is withheld (commit 1d184366) until rulings KR-200 to KR-214 (audit C fixes, merged on `k-r2` in 03772bf6, proposed) are confirmed; the proposed slots are after the recorder's run, with cron fallbacks at 03:00 and 06:00 UTC (KR-206). The job writes only to its own two branches, never to `main` or `forward-log`. **Not running yet: 0 of 20 recorded trading days**; the workflow has never run on a GitHub runner. No performance claim is made: the order rule ignores the market and fills are simulated. The chain shows rows were not edited after writing; the anchor catches a consistent rewrite of old rows and a truncated tail. Worked through in [Tutorial 58](../getting-started/tutorial-58-daily-paper-ledger.md). The stage H paper book's ledger, a different file, is in the [paper-trading ledger flow](#paper-trading-ledger-flow).
 
 ### Blind re-derivation: packet, deriver, compare
 

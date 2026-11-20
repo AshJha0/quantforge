@@ -1239,10 +1239,10 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MK-3 Recalibration trigger (stage K wave 1, K-4c)
 - **Purpose:** fires when a monitored input moves more than k sample sigmas times sqrt(days) since calibration (`calib.trigger.check`), in all four languages.
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-19; two-sided normal level only, which understates the false-alarm rate of a short window (the acceptance uses the Student-t predictive rate); CUSUM and EWMA are out of wave 1.
+- **Limitations:** spec 1.1.0 (KR-232, KR-233, after different-model audit A): `false_alarm_rate` is the Student-t rate of the trigger with sigma estimated from the window; the normal level is `nominal_rate`. Both assume independent normal changes, so fat tails raise the real rate; CUSUM and EWMA are out of wave 1.
 - **Validation:** goldens `trig_k`; simulation of 100,000 noise paths inside the 99% binomial interval and a planted 6-sigma move firing on every path, Python and Java (`program/stage_k_w1/`). **Review:** 2026-11-19.
 - **Tier:** 3.
-- **Challenger:** blind re-derivation (DR-H2), 4 of 6 value cases (66.7%, after the far-tail case trig_k-0009, `oracle/OUTSIDE_SHARES.md`); SciPy `2*norm.sf(k)` on `false_alarm_rate` only (KR-11). `false_alarm_rate` is computed as `2 Phi(-k)` with a tail-accurate normal CDF in all four builds.
+- **Challenger:** blind re-derivation (DR-H2) of the 1.0.0 outputs, which now cover `nominal_rate` (`oracle/OUTSIDE_SHARES.md`); SciPy `2*norm.sf(k)` on `nominal_rate` and `scipy.stats.t.sf` on `false_alarm_rate` (spec 1.1.0). `nominal_rate` is computed as `2 Phi(-k)` with a tail-accurate normal CDF in all four builds.
 - **Monitoring thresholds:** observed noise fire rate outside the 99% binomial interval of its stated level.
 - **Data lineage hash:** sha256 b3297f772ed002b9b369e10ef77c1d70b952dcff32604c2b9cf6b9105aafb5b3 (`trig_k`, 8 cases) (2026-11-19).
 - **Retirement trigger:** a superseding stage K ruling.
@@ -1251,10 +1251,10 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MK-4 Intraday delta-gamma risk with a Lagrange bound (stage K wave 1, K-5a)
 - **Purpose:** delta-gamma P&L of a parallel yield move on zero-coupon positions with a bound on its error (`risk.intraday.delta_gamma_bound`), in all four languages.
 - **Inputs:** as in the spec page.
-- **Limitations:** spec confirmed 2026-11-19; zero-coupon positions only (other instruments have no `M3`, so no bound); latency-aware analytics on simulated data; the binary64 comparison is meaningful only for `T abs(h)` well above 1e-7 (KR-17).
-- **Validation:** goldens `idr_k`; 1,000 seeded moves with zero violations in Python and Java, rechecked at 50 digits (`oracle/IDR_K_MOVES_CHECK_W1.json`). **Review:** 2026-11-19.
+- **Limitations:** spec confirmed 2026-11-19; zero-coupon positions only (other instruments have no `M3`, so no bound); latency-aware analytics on simulated data. Spec 1.1.0 (KR-234, after different-model audit A, KA-A6): the bound adds a binary64 rounding allowance on a stated domain, so it also holds for small moves, where the 1.0.0 bound was exceeded (21.6 times at h = 1e-9, measured by the auditor). On cancelling books the estimate is sensitive to the order of operations (KR-240; known-issues row K-5a).
+- **Validation:** goldens `idr_k`; 1,000 seeded moves with zero violations in Python and Java, rechecked at 50 digits (`oracle/IDR_K_MOVES_CHECK_W1.json`); KR-234 sweep, 29,274 sweep points per build, 0 violations judged at 50 digits in all four builds (`oracle/STAGE_K_AUDIT_A_CHECKS.json`). **Review:** 2026-11-19.
 - **Tier:** 3.
-- **Challenger:** blind re-derivation (DR-H2), 5 of 5 value cases at 1e-9 relative by a second, clean packet (`program/STAGE_K_BLIND_K5A.md`; the first blind lane had checked the bounds only to 6 decimals and lacked idr_k-0005); `oracle/OUTSIDE_SHARES.md`. It checks the spec's arithmetic, not the bound's derivation; mpmath is our own oracle and does not count.
+- **Challenger:** blind re-derivation (DR-H2). The 1.0.0 packet (5 of 5, `program/STAGE_K_BLIND_K5A.md`) no longer covers the KR-234 bound; the version 2 packet matched 9 of 11 (all 11 bounds; the estimates of the cancelling books idr_k-0012 and -0013 are not reproduced to 1e-9 relative, recorded as mismatches; `program/STAGE_K_BLIND_K5A_V2.md`); `oracle/OUTSIDE_SHARES.md`. It checks the spec's arithmetic, not the bound's derivation; mpmath is our own oracle and does not count.
 - **Monitoring thresholds:** any move with abs(estimate - revaluation) above the bound.
 - **Data lineage hash:** sha256 7529524f6558dbdf27d65327bbe53396e1efaffdfa33159b6ce314afbbf7e153 (`idr_k`, 7 cases) (2026-11-19).
 - **Retirement trigger:** a superseding stage K ruling.
