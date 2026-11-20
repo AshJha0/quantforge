@@ -34,4 +34,19 @@ This file, the compare script and the expected file are committed and pushed bef
 
 ## Results
 
-(Written after the compare; see below.)
+Run 2026-11-20, the first and only compare run (evidence class: measured; hashes and output are in the repository).
+
+- Time gap: packet, compare and tolerances committed and pushed in 51180fb2 (09:20:24 UTC); the deriver was started after the push; frozen results committed in 370f24d7 (09:26:41 UTC); the compare ran after that commit.
+- Deriver: a separate subagent on Claude Sonnet (not Opus 5.5), given only the packet folder and its own folder `C:/Work/Claude/qf-blind/tlk_k_v2/`, told not to read the repository. Value source: exact integer and rational arithmetic (Python `fractions`, `q = Fraction(c)`), rounded once to binary64; it did not implement the KR-237 floating-point algorithm, so this is a genuinely independent computation of the value, not a second copy of our algorithm. Its own statements, not independently logged: it read nothing outside the two folders; the manifest matched on all 5 files.
+- Frozen results: `stage_k_blind/tlk_v2/` (`blind_results.json`, `blind_ref.py`, `notes.md`). SHA-256 of `blind_results.json` as handed back: `8944efa5fc95df26aa73f0f5ba0c0df192d948bb8fa20692871ca8acf1a10fcc`, recomputed by the builder, equal (git stores it with LF line ends).
+- Compare: `python -I program/stage_h_blind_w2/tlk_v2_compare.py . stage_k_blind/tlk_v2/blind_results.json`; output `stage_k_blind/tlk_v2/compare_output.txt`.
+
+| Item | Cases | MATCH | MISMATCH | Eligible | Counted |
+|---|---:|---:|---:|---:|---:|
+| `tlk_k` 0012 to 0020 (KR-253) | 9 | 9 | 0 | 6 | 6 |
+
+Every output of every case matches. tlk_k-0016 to -0018 match but are not counted, as fixed above. Reading the deriver recorded (`notes.md`): at n = 1 the zone edge compares the binary64 value against the literals 0.95 and 0.9999 with strict "below"; not ruled a gap.
+
+Credit: `oracle/python/gen_stage_k_w1b.py` adds `BLIND_TLK` to the six counted cases and a "not blind" note to 0016 to 0018; KF-22: the tag `outside_checked` is now set only on counted cases (0016 to 0018 do not carry it). `python tools/outside_shares.py --check`: exit 0; `tlk_k` **17 of 20, 85.0%, met** (was 11 of 20, 55.0%); stage K 97 of 122 (79.5%).
+
+What this does not show: the six counted cases include tlk_k-0019 and -0020, whose inputs repeat earlier rows (KF-22), so they add little new coverage. The per-item floor is still not enforced by a gate (rest of KF-19, outside this lane).
