@@ -65,4 +65,4 @@ Worked example: CVA 0.04363 with `b = 0` (equal to the independent bucket CVA on
 |---|---|---|---|---|
 | Exposure statistics | exact | `collexp_g` | zero thresholds, MTA 0, no lag: exposure 0 (asserted) | definition |
 | Adjustments | exact | `xvaadj_g` | own hazard 0: DVA 0 (asserted) | definition |
-| WWR `a(t)` root | 1e-40 in the oracle; builds to 1e-14 relative | `wwr_g` | `b = 0`: independent CVA (asserted) | [HW12] |
+| WWR `a(t)` root | 1e-40 in the oracle; builds to 1e-14 relative | `wwr_g` | `b = 0`: independent CVA (asserted); identical `V` on every path: `a_i = ln h - b V_i` (asserted, KR-257) | [HW12] |
