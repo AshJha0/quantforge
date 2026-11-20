@@ -339,6 +339,8 @@ def test_t_tail_closed_forms(k: float) -> None:
         (9, 1e6, 5.091794074026567e-51),
         (60, 1e5, 2.2677354768709296e-248),
         (61, 1e5, 2.8843982046547086e-252),
+        (16, 1e9, 8.434483200000006e-136),
+        (17, 1e9, 5.484643666634028e-144),
     ],
 )
 def test_t_tail_values(nu: int, k: float, value: float) -> None:
