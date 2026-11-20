@@ -63,7 +63,7 @@ tests_dir = ["tests/test_core.py", "tests/test_cli.py", "tests/test_stage_b.py",
              "tests/test_equity_xva_fits_kills.py",
              "tests/test_roots_kills.py", "tests/test_compounding_kills.py",
              "tests/test_frtb_backtest_kills.py", "tests/test_stage_k_kills.py",
-             "tests/test_saccr_kills.py"]
+             "tests/test_saccr_kills.py", "tests/test_bermudan_k8_kills.py"]
 pytest_add_cli_args = ["--deselect=tests/test_core.py::test_sobol_table_equals_the_spec_data"]
 do_not_mutate = ["quantforge_core/_sobol_data.py", "quantforge_core/_legendre_1024.py"]
 
