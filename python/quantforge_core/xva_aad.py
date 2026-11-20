@@ -9,6 +9,7 @@ import math
 from collections.abc import Sequence
 
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 from .xva import Floats, Name, adjustments
 
@@ -254,3 +255,6 @@ def adjustments_aad(
     out: dict[str, object] = dict(values)
     out["gradient"] = {o: {k: raw[o][k] for k in names} for o in values}
     return out
+
+
+guard(globals())
