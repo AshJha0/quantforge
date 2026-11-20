@@ -239,9 +239,12 @@ impl Option_ {
         let scale = v * self.vega(v);
         let error = (self.value(v) - price).abs()
             + f64::EPSILON * mag
-            + 2f64.powi(-1070) * (1.0 + d * (f.abs() + k.abs() + root));
+            + f64::from_bits(16) * (1.0 + d * (f.abs() + k.abs() + root)); // 2^-1070
         if scale.is_nan() || scale <= 0.0 || error > 1e-10 * scale {
-            return fail("E_NO_CONVERGENCE", "the price does not identify the vol in binary64");
+            return fail(
+                "E_NO_CONVERGENCE",
+                "the price does not identify the vol in binary64",
+            );
         }
         Ok(v)
     }
