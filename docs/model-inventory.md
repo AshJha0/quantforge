@@ -59,7 +59,7 @@ Stage E has its own index tables (ME-A1 to ME-A8, EB1 to EB12) under "Stage E mo
 | MG-5 | LIBOR market model, closed-form layer and simulation (G4a, waves 3b and 3c) | `04-pricing/lmm.md` | G | Implemented | 53 of 53 (0 library object, 53 numpy or scipy primitive; D6, generated) |
 | MG-6 | AAD ladder of the Bermudan scheme (Q3b) | `06-risk/aad-core.md` | G | Implemented | 0 of 3 (0 library object, 0 numpy or scipy primitive; D6, generated) |
 | MG-7 | Model-reserve dispersion (Q9 part 2) | `06-risk/model-reserve.md` | G | Implemented | 0 of 6 (0 library object, 0 numpy or scipy primitive; D6, generated) |
-| MG-8 | Deterministic xVA layer (G5b) | `06-risk/xva-framework.md` | G | Implemented | 0 of 24 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-8 | Deterministic xVA layer (G5b) | `06-risk/xva-framework.md` | G | Implemented | 0 of 39 (0 library object, 0 numpy or scipy primitive; D6, generated) |
 | MG-9 | Portfolio exposure under Hull-White, ORE-checked (G5c) | `06-risk/xva-exposure-portfolio.md` | G | Implemented | 80 of 96 (80 library object, 0 numpy or scipy primitive; D6, generated) |
 | MG-10 | F3 sensitivities (inflation01, dividend and borrow, correlation) | `06-risk/f3-sensitivities.md` | G | Implemented | 9 of 18 |
 | MG-11 | FRTB-SA delta for FX, equity, CSR and commodity | `06-risk/frtb-sa-fx-equity.md` | G | Implemented | see entry |
