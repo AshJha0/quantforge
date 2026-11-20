@@ -17,7 +17,7 @@ fn close(a: f64, b: f64, tol: f64) -> bool {
 }
 
 fn one_path(times: &[f64], path: &[f64]) -> quantforge_core::xva::SetExposure {
-    set_exposure(times, &[path.to_vec()], None, 0.5).unwrap()
+    set_exposure(times, &[path.to_vec()], None, 0.5).expect("valid exposure inputs")
 }
 
 #[test]
@@ -86,8 +86,16 @@ fn adjustment_names_need_both_hazard_and_recovery_in_domain() {
         recovery: 0.5,
     };
     let r = adj(good, own).unwrap();
-    assert!(close(r.cva, 0.6 * -(-0.02_f64).exp_m1(), 1e-14), "{}", r.cva);
-    assert!(close(r.dva, 0.5 * -(-0.01_f64).exp_m1(), 1e-14), "{}", r.dva);
+    assert!(
+        close(r.cva, 0.6 * -(-0.02_f64).exp_m1(), 1e-14),
+        "{}",
+        r.cva
+    );
+    assert!(
+        close(r.dva, 0.5 * -(-0.01_f64).exp_m1(), 1e-14),
+        "{}",
+        r.dva
+    );
     // Hazard 0 and recovery 0 are inside the domain; zero hazard gives zero CVA.
     let zero = Name {
         hazard_rate: 0.0,
@@ -119,14 +127,23 @@ fn adjustment_times_must_be_positive_and_increasing() {
             capital: None,
         })
     };
-    for times in [vec![0.0, 1.0], vec![-0.5, 1.0], vec![1.0, 0.5], vec![1.0, 1.0]] {
+    for times in [
+        vec![0.0, 1.0],
+        vec![-0.5, 1.0],
+        vec![1.0, 0.5],
+        vec![1.0, 1.0],
+    ] {
         assert_eq!(run(times.clone()).unwrap_err().code, "E_INPUT", "{times:?}");
     }
     // Two buckets (0, 0.5] and (0.5, 1], D = 1, ee = 1, both hazards 0.02:
     // CVA = 0.6 sum (S_c(p) - S_c(t)) S_b(p) = 0.6 [(1 - e^-0.01) + (e^-0.01 - e^-0.02) e^-0.01].
     let r = run(vec![0.5, 1.0]).unwrap();
     let (s1, s2) = ((-0.01_f64).exp(), (-0.02_f64).exp());
-    assert!(close(r.cva, 0.6 * ((1.0 - s1) + (s1 - s2) * s1), 1e-14), "{}", r.cva);
+    assert!(
+        close(r.cva, 0.6 * ((1.0 - s1) + (s1 - s2) * s1), 1e-14),
+        "{}",
+        r.cva
+    );
 }
 
 fn curve() -> HwCurve {
@@ -134,7 +151,7 @@ fn curve() -> HwCurve {
         &[0.5, 1.0, 2.0, 5.0, 10.0, 30.0],
         &[0.985, 0.97, 0.94, 0.85, 0.70, 0.33],
     )
-    .unwrap()
+    .expect("valid curve")
 }
 
 #[test]
@@ -150,10 +167,31 @@ fn pfe_quantiles_must_be_strictly_inside_zero_one() {
     };
     let c = curve();
     for q in [0.0, 1.0, -0.5] {
-        let e = portfolio_hw(&c, 0.05, 0.01, std::slice::from_ref(&leg), &[1.0], &[q], 0.02, 0.4);
+        let e = portfolio_hw(
+            &c,
+            0.05,
+            0.01,
+            std::slice::from_ref(&leg),
+            &[1.0],
+            &[q],
+            0.02,
+            0.4,
+        );
         assert_eq!(e.unwrap_err().code, "E_DOMAIN", "q={q}");
     }
-    assert!(portfolio_hw(&c, 0.05, 0.01, std::slice::from_ref(&leg), &[1.0], &[1e-9], 0.02, 0.4).is_ok());
+    assert!(
+        portfolio_hw(
+            &c,
+            0.05,
+            0.01,
+            std::slice::from_ref(&leg),
+            &[1.0],
+            &[1e-9],
+            0.02,
+            0.4
+        )
+        .is_ok()
+    );
 }
 
 #[test]
@@ -173,16 +211,33 @@ fn exposure_profiles_are_linear_in_the_notional() {
             payer: true,
             notional,
         };
-        portfolio_hw(&c, 0.05, 0.01, std::slice::from_ref(&leg), &ex, &[0.5, 0.95, 0.99], 0.02, 0.4)
-            .unwrap()
+        portfolio_hw(
+            &c,
+            0.05,
+            0.01,
+            std::slice::from_ref(&leg),
+            &ex,
+            &[0.5, 0.95, 0.99],
+            0.02,
+            0.4,
+        )
+        .unwrap()
     };
     let big = run(1e7);
     for small_n in [1.0, 1e-8] {
         let small = run(small_n);
         let k = small_n / 1e7;
         for i in 0..ex.len() {
-            assert!(close(small.discounted_ee[i], k * big.discounted_ee[i], 1e-12));
-            assert!(close(small.discounted_ene[i], k * big.discounted_ene[i], 1e-12));
+            assert!(close(
+                small.discounted_ee[i],
+                k * big.discounted_ee[i],
+                1e-12
+            ));
+            assert!(close(
+                small.discounted_ene[i],
+                k * big.discounted_ene[i],
+                1e-12
+            ));
             for q in 0..3 {
                 assert!(
                     close(small.pfe[q][i], k * big.pfe[q][i], 1e-9),
