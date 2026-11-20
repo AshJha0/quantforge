@@ -7,11 +7,11 @@ import argparse
 from typing import Any
 
 
-def main() -> None:
+def make_server(location: str) -> Any:
     import pyarrow.flight as fl
 
     class Server(fl.FlightServerBase):  # type: ignore[misc]
-        def __init__(self, location: str) -> None:
+        def __init__(self) -> None:
             super().__init__(location)
             self.tables: dict[bytes, Any] = {}
 
@@ -21,9 +21,13 @@ def main() -> None:
         def do_get(self, context: Any, ticket: Any) -> Any:
             return fl.RecordBatchStream(self.tables[ticket.ticket])
 
+    return Server()
+
+
+def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8815)
-    Server(f"grpc://0.0.0.0:{ap.parse_args().port}").serve()
+    make_server(f"grpc://0.0.0.0:{ap.parse_args().port}").serve()
 
 
 if __name__ == "__main__":

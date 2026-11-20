@@ -37,6 +37,11 @@ class Adapter(Protocol):
     def count(self) -> int | None: ...
 
 
+def json_text(r: Record) -> str:
+    """The document the REST and gRPC services receive: JSON text (the canonical form is not JSON)."""
+    return json.dumps(r, sort_keys=True, separators=(",", ":"))
+
+
 class SnapshotMismatch(Exception):
     pass
 
@@ -53,7 +58,7 @@ class Rest:
     def write(self, rows: list[Record]) -> None:
         self.got = []
         for r in rows:
-            body = json.dumps({"document_text": canon(r).decode()}).encode()
+            body = json.dumps({"document_text": json_text(r)}).encode()
             resp = json.loads(self.http("POST", self.base + "/v1/run", body, {"Content-Type": "application/json"}))
             if resp["snapshot_id"] != snapshot_id(r):
                 raise SnapshotMismatch(f"seq {r['seq']}: {resp['snapshot_id']}")
@@ -80,7 +85,7 @@ class Grpc:
     def write(self, rows: list[Record]) -> None:
         self.got = []
         for r in rows:
-            sid, _, form = bytes(self.call(canon(r), timeout=30)).decode().partition("\n")
+            sid, _, form = bytes(self.call(json_text(r).encode(), timeout=30)).decode().partition("\n")
             if sid != snapshot_id(r):
                 raise SnapshotMismatch(f"seq {r['seq']}: {sid}")
             self.got.append(from_canon(form))

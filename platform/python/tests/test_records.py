@@ -23,7 +23,7 @@ def test_canon_worked_example() -> None:
     rec = {"seq": 1, "kind": "quote", "body": {"bid": "101.25", "ask": "101.26"}}
     form = records.canon(rec)
     literal = b'{"body":{"ask":"101.26","bid":"101.25"},"kind":"quote","seq":#3ff0000000000000}'
-    assert form == literal and len(form) == 77
+    assert form == literal and len(form) == 79
     h = records.content_hash([rec], n=1)
     assert h == hashlib.sha256(literal + b"\n").hexdigest()
     print("adapters.md 1.2 worked example H =", h)

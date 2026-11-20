@@ -48,8 +48,9 @@ def apply_plant(plant: str, rows: list[Record], count: int | None) -> tuple[list
     elif plant == "duplicate":
         rows.append(rows[len(rows) // 3])
     elif plant == "byte":
-        body = rows[len(rows) // 2]["body"]
-        key = next(k for k, v in sorted(body.items()) if isinstance(v, str))
+        r = rows[len(rows) // 2]
+        body = r.get("body", r)
+        key = next(k for k, v in sorted(body.items()) if isinstance(v, str))  # StopIteration: no string field
         body[key] = body[key][:-1] + ("0" if body[key][-1] != "0" else "1")
     elif plant == "float":
         r = rows[len(rows) // 4]
@@ -70,7 +71,11 @@ def run_plants(sent: list[Record], read: list[Record], count: int | None) -> dic
         if plant == "bypass" and count is None:
             out[plant] = "not applicable: no store count query"
             continue
-        rows, c = apply_plant(plant, read, count)
+        try:
+            rows, c = apply_plant(plant, read, count)
+        except StopIteration:
+            out[plant] = "not applicable: the read records have no string field"
+            continue
         try:
             got = verdict(sent, rows, store_count=c)
         except Verdict as v:

@@ -260,3 +260,14 @@ def test_multicast_planted_drop_is_one_gap(rows: list[Record]) -> None:
     assert results[0]["gaps"] == [(361, 370)]
     assert multicast.judge(multicast.sender_hash(rows), results, 37) == "PASS"
     assert multicast.judge(multicast.sender_hash(rows), results, None).startswith("FAIL")
+
+
+def test_arrow_flight_against_the_real_service_in_process(rows: list[Record], tmp_path: Path) -> None:
+    pytest.importorskip("pyarrow.flight")
+    from quantforge_adapters.services import flight_server
+
+    server = flight_server.make_server("grpc://127.0.0.1:0")
+    try:
+        _run(ad.ArrowFlight(f"grpc://127.0.0.1:{server.port}"), rows, tmp_path)
+    finally:
+        server.shutdown()

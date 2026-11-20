@@ -1,6 +1,6 @@
 """gRPC service for the K-3 smoke: unary /qf.k3.Run/Run, raw bytes in and out (no .proto; generic handler).
 
-Request: canon(record) bytes. Response: snapshot_id, LF, canonical form.
+Request: the record as UTF-8 JSON text. Response: snapshot_id, LF, canonical form.
 
     python -m quantforge_adapters.services.grpc_server [--port 50051]
 """
