@@ -565,6 +565,54 @@ TEST_CASE("G5b limits: zero thresholds and no lag give zero exposure; own hazard
     CHECK(r.find(R"("worst_model":"A")") != std::string::npos);
 }
 
+// KR-257 (confirmed 2026-11-20): the a(t) root for large |b V|. Identical V on every path: a_i = ln h - b V_i and
+// cva = (1 - R) sum D_i max(V_i, 0) (e^(-h t_(i-1)) - e^(-h t_i)). Mixed paths: wwr_g oracle values.
+TEST_CASE("KR-257 wwr root: closed form for large |b V|, oracle values, limit and non-finite errors") {
+    const auto first_a = [](const std::string& json) {
+        const auto at = json.find(R"("a":[)");
+        REQUIRE(at != std::string::npos);
+        return std::strtod(json.c_str() + at + 5, nullptr);
+    };
+    for (const double bv : {-700.0, -60.0, -10.0, 10.0, 20.0, 60.0, 700.0}) {
+        const std::string v = std::to_string(bv);
+        const std::string w = g_run("xva.wwr.cva_hw", R"({"times":[1,2],"values":[[)" + v + "," + v + "],[" + v + "," + v +
+                                                          R"(]],"discount_factors":[0.97,0.94],"hazard_rate":0.01,"recovery":0.4,"wwr_b":1})");
+        INFO(w);
+        const double exact = std::log(0.01) - bv;
+        CHECK(std::fabs(first_a(w) - exact) <= 1e-14 * std::max(1.0, std::fabs(exact)));
+        const double cva = 0.6 * std::max(bv, 0.0) * (0.97 * -std::expm1(-0.01) + 0.94 * (std::exp(-0.01) - std::exp(-0.02)));
+        CHECK(std::fabs(g_number_after(w, "cva") - cva) <= 1e-12 * cva);  // spec tolerance: a + b V carries eps |b V|
+    }
+    const std::string mixed = g_run(
+        "xva.wwr.cva_hw",
+        R"({"times":[0.5,1,2],"values":[[30,25,40],[-20,5,-35],[10,40,0],[2,-8,15]],"discount_factors":[0.99,0.98,0.955],"hazard_rate":0.02,"recovery":0.4,"wwr_b":1})");
+    INFO(mixed);
+    CHECK(std::fabs(g_number_after(mixed, "cva") - 0.853870876724446) <= 1e-9 + 1e-12 * 0.853870876724446);
+    CHECK(std::fabs(first_a(mixed) + 32.51048602143332) <= 1e-9 + 1e-12 * 32.51048602143332);
+    const std::string big = g_run("xva.wwr.cva_hw",
+                                  R"({"times":[1],"values":[[5],[-5],[1]],"discount_factors":[0.97],"hazard_rate":40,"recovery":0.4,"wwr_b":0.2})");
+    CHECK(std::fabs(first_a(big) - 4.661029923801264) <= 1e-9 + 1e-12 * 4.661029923801264);
+    const std::string low = g_run("xva.wwr.cva_hw",
+                                  R"({"times":[1],"values":[[10],[10]],"discount_factors":[0.97],"hazard_rate":1e-50,"recovery":0.4,"wwr_b":70})");
+    CHECK(std::fabs(first_a(low) + 815.1292546497023) <= 1e-9 + 1e-12 * 815.1292546497023);
+    const auto code = [](const std::string& json) {
+        const auto at = json.find(R"("code":")");
+        return at == std::string::npos ? std::string("none") : json.substr(at + 8, json.find('"', at + 8) - at - 8);
+    };
+    CHECK(code(g_run("xva.wwr.cva_hw", R"({"times":[1],"values":[[1],[-10]],"discount_factors":[0.97],"hazard_rate":0.01,"recovery":0.4,"wwr_b":70.01})")) ==
+          "E_DOMAIN");
+    CHECK(code(g_run("xva.wwr.cva_hw", R"({"times":[1],"values":[[1]],"discount_factors":[0.97],"hazard_rate":709,"recovery":0.4,"wwr_b":0})")) ==
+          "E_NON_FINITE");
+    CHECK(code(g_run("xva.wwr.cva_hw", R"({"times":[1],"values":[[1]],"discount_factors":[0.97],"hazard_rate":2e-308,"recovery":0.4,"wwr_b":0})")) ==
+          "E_NON_FINITE");
+    CHECK(code(g_run("xva.wwr.cva_hw", R"({"times":[1],"values":[[1]],"discount_factors":[0.97],"hazard_rate":800,"recovery":1,"wwr_b":0})")) ==
+          "E_DOMAIN");
+    const std::string edge = g_run("xva.wwr.cva_hw",
+                                   R"({"times":[1],"values":[[10],[-10]],"discount_factors":[0.97],"hazard_rate":708,"recovery":0.4,"wwr_b":70})");
+    INFO(edge);
+    CHECK(std::fabs(g_number_after(edge, "cva") - 0.6 * 0.97 * 5.0) <= 1e-12 * 2.91);
+}
+
 TEST_CASE("Stage F carry-over limits: one FRTB factor is RW |s|; rho = 0 is the square-root rule; Gamma = 0 reverse stress") {
     CHECK(g_number_after(g_run("risk.frtb.fx_delta", R"({"sensitivities":[{"pair":"EURUSD","sensitivity":-2000000}]})"), "capital") == 300000.0);
     CHECK(g_number_after(g_run("risk.frtb.equity_delta", R"({"sensitivities":[{"issuer":"A","bucket":5,"kind":"SPOT","sensitivity":1000000}]})"),

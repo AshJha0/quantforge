@@ -10,10 +10,10 @@ Every capability moves through `Proposed → Specified → Implemented → Valid
 |---|---|---|
 | Proposed | a capability named in a plan or a spec draft | stage K wave 2 items, the sensitivity-based initial margin (`sbim`, K-8h) |
 | Specified | a spec with inputs, outputs, errors, golden cases and an acceptance test fixed before any run | stage K wave 2 specs merged on the integration branch `k-r1` without an implementation |
-| Implemented | all four languages pass the goldens (`docs/model-inventory.md`, "Status words") | stages A to J, R6 and H, released; stage K round 1 items, released in v0.10.1 |
+| Implemented | all four languages pass the goldens (`docs/model-inventory.md`, "Status words") | stages A to J, R6 and H, released; stage K round 1 items, merged to main by 2026-11-20 (pull requests #58 and #59), not tagged, released with v1.0.0 |
 | Validated | tested on real data against an independent benchmark, with a written report (`docs/model-inventory.md`) | **nothing**; every golden input to date is synthetic, except the stage J shock-library Treasury yields and the stage H crypto book |
 | Benchmarked | timed against targets fixed before the run, on the stated acceptance machine | nothing; H-9 has laptop timings only, labelled "local laptop, not the acceptance machine", and its workload R result of 2026-11-19 is a recorded MISS |
-| Operationally tested | run on a schedule, unattended, with its own evidence trail | nothing; the stage K paper ledger is built, is scheduled from v0.10.1 (2026-11-20), and had 0 of the 20 recorded days its gate needs at the release |
+| Operationally tested | run on a schedule, unattended, with its own evidence trail | nothing; the stage K paper ledger is built, is scheduled on main since 2026-11-20 (pull request #59), and had 0 of the 20 recorded days its gate needs as of 2026-11-20 13:00 UTC |
 
 "Outside-checked" is not a rung. It is evidence attached to Implemented: some goldens are re-derived outside the author's own code (`docs/model-inventory.md`). There is no second review, human or otherwise (owner decision 2026-11-18), so every rung above Specified rests on self-assessment plus the outside checks below.
 
@@ -40,7 +40,7 @@ Source: `oracle/OUTSIDE_SHARES.json` (written by `tools/outside_shares.py`). Flo
 | D | 526 | 451 | 85.7% | 451 | 85.7% | met |
 | E | 710 | 557 | 78.5% | 557 | 78.5% | met |
 | F | 417 | 224 | 53.7% | 355 | 85.1% | met |
-| G | 441 | 359 | 81.4% | 359 | 81.4% | met |
+| G | 456 | 359 | 78.7% | 359 | 78.7% | met |
 | I | 153 | 102 | 66.7% | 102 | 66.7% | met |
 | J | 215 | 143 | 66.5% | 143 | 66.5% | met |
 | H | 205 | 0 | 0.0% | 160 | 78.0% | met |

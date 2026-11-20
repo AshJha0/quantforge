@@ -10610,7 +10610,7 @@
     "weighted_sensitivities"
    ],
    "deprecated_alias_of": "xva.sbim.ir_delta",
-   "removal": "v1.0.0"
+   "removal": "first release after v1.0.0 (carried in v1.0.0)"
   },
   "xva.wwr.cva_hw": {
    "spec": "specifications/06-risk/xva-framework.md",

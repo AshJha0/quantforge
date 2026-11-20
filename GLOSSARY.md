@@ -170,7 +170,7 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value
 | EE, ENE, PFE, EPE | Expected positive and negative exposure at a date, a high quantile of exposure, and EE averaged over time (`06-risk/xva-exposure.md`) |
 | Margin period of risk (MPoR) | The time between the last collateral call met and the close-out after a default |
 | CVA, DVA, FVA (FCA, FBA) | Prices of counterparty default, own default, and funding of uncollateralised exposure (`06-risk/xva-framework.md`) |
-| Sensitivity-based initial margin (sbim) | The project's own initial-margin aggregation from weighted sensitivities, on placeholder weights; not a regulatory or industry-standard calculation, and no ISDA material is used (owner decision 2026-11-19). In stage G, `xva.sbim.ir_delta` is a single-bucket IR delta aggregation on weights the caller supplies; its old id `xva.simm.ir_delta` is a deprecated alias until v1.0.0 (KR-152). Why there is no industry model here: `docs/model-inventory.md#why-there-is-no-isda-simm-here` |
+| Sensitivity-based initial margin (sbim) | The project's own initial-margin aggregation from weighted sensitivities, on placeholder weights; not a regulatory or industry-standard calculation, and no ISDA material is used (owner decision 2026-11-19). In stage G, `xva.sbim.ir_delta` is a single-bucket IR delta aggregation on weights the caller supplies; its old id `xva.simm.ir_delta` is a deprecated alias in v1.0.0, removed in the first release after it (KR-152, KR-256). Why there is no industry model here: `docs/model-inventory.md#why-there-is-no-isda-simm-here` |
 | Wrong-way risk | Exposure that grows when the counterparty is more likely to default |
 | BGK correction | Broadie, Glasserman and Kou's barrier shift `exp(0.5826 sigma sqrt(dt))`, which turns a continuous barrier formula into a discrete one (ruling G-7) |
 
@@ -330,7 +330,7 @@ Stage H (v0.10.0, execution and microstructure) is implemented in all four langu
 
 ## Stage K terms (in progress)
 
-Stage K round 1 is released in v0.10.1 (2026-11-20, pull requests #58 and #59); these terms are defined as its specs use them (read 2026-11-19). [Tutorials 51 to 58](docs/getting-started/README.md#stage-k-in-progress) use them.
+Stage K round 1 is merged to main by 2026-11-20 (pull requests #58 and #59), not tagged, and released with v1.0.0; these terms are defined as its specs use them (read 2026-11-19). [Tutorials 51 to 58](docs/getting-started/README.md#stage-k-in-progress) use them.
 
 | Term | Meaning |
 |---|---|

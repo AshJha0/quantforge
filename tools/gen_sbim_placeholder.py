@@ -24,7 +24,7 @@ are deliberately artificial so that nobody can mistake the table for a calibrati
 It also writes specifications/tables/stage_k/sbim-ir-delta-g.json, the table of the stage G operation
 `xva.sbim.ir_delta` (formerly `xva.simm.ir_delta`; rulings KR-150 to KR-155), by the same rule on the stage G
 tenor grid. That operation takes weights and correlations as inputs (G-43); the table is what the goldens, the
-tutorial and the docs feed it. It replaced hand-typed values whose origin was not documented (v0.10.1):
+tutorial and the docs feed it. It replaced hand-typed values whose origin was not documented (stage K round 1, on main since 2026-11-20):
 
   tenors           0.25, 1, 2, 5, 10, 30 years with index k = 1..6 (labels only; no number depends on them)
   RW               10 x k                                   (10, 20, 30, 40, 50, 60)
@@ -138,7 +138,7 @@ def build_g():
         "notice": NOTICE,
         "status": "ruled 2026-11-19 (KR-150, KR-151; stage K margin lane); replaces hand-typed values of v0.7.0 to v0.10.0",
         "generator": "tools/gen_sbim_placeholder.py (the file must equal its output: tools/test_sbim_placeholder.py)",
-        "operation": "xva.sbim.ir_delta (deprecated alias xva.simm.ir_delta until v1.0.0)",
+        "operation": "xva.sbim.ir_delta (deprecated alias xva.simm.ir_delta in v1.0.0, removed in the first release after it, KR-256)",
         "numbers": "decimal strings (HR-12)",
         "rules": [
             "tenors 0.25, 1, 2, 5, 10, 30 years: index k = 1..6 (labels only; no number depends on them)",

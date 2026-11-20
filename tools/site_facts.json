@@ -1,7 +1,8 @@
 {
   "note": "Release facts for the site home (tools/site_home.html) and the README Status at a glance block (status_glance: rows of [label, text], text with {{name}} placeholders; tools/status_glance.py --write puts it in README.md, tools/build_site.py fails if README is stale). A release edits this file only: tools/build_site.py fills {{name}} placeholders from here, and counts the rest (version from python/pyproject.toml unless set here, golden cases, suite files and stage E cases and operations from datasets/golden, recorder sources from tools/recorder/sources.json). The build fails on an unknown or unfilled placeholder.",
-  "release": "v0.10.1, stage K round 1: audit-answered platform pieces, intraday risk, SA-CCR, backtesting, daily jobs",
-  "released": "2026-11-20",
+  "release": "v0.10.0, stage H: microstructure and execution on simulated venues",
+  "released": "2026-11-19",
+  "main_state": "stage K round 1 (audit-answered platform pieces, intraday risk, SA-CCR, backtesting, daily jobs), merged to main by 2026-11-20 (pull requests #58 and #59), not tagged; released with v1.0.0 (owner decision 2026-11-20: there is no v0.10.1 tag)",
   "implemented_stages": "A to J, plus R6",
   "languages": "Java 25, C++26, Python 3.15, Rust 2024",
   "domains": "12",
@@ -14,7 +15,7 @@
   "status_glance": [
     [
       "Release",
-      "{{release}}, released {{released}}. Next: {{next_stage}}."
+      "Latest release {{release}}, released {{released}}. On main, unreleased: {{main_state}}. Next: {{next_stage}}."
     ],
     [
       "Built",
@@ -34,7 +35,7 @@
     ],
     [
       "Missed",
-      "H-9 workload R (recorded 6-hour crypto window, 2026-11-18/19): correctness passes, timing is a recorded MISS at p99 and p99.9 in every language (local laptop, not the acceptance machine). H-9 R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS. Stage K item K-8 misses its acceptance for lifting the R6 use restriction: the second-order Bermudan ladder method passes acceptance 1 to 3 at 201/100 only on the three cases it was developed on (in-sample), misses 1% at 101/50 on two of them, and has no out-of-sample acceptance yet; the use restriction is kept for both methods (KR-113), lifting it moves to a later point release, and the threshold is not loosened. Stage K round 1 is released as v0.10.1 (2026-11-20); its open items are in docs/known-issues.md."
+      "H-9 workload R (recorded 6-hour crypto window, 2026-11-18/19): correctness passes, timing is a recorded MISS at p99 and p99.9 in every language (local laptop, not the acceptance machine). H-9 R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS. Stage K item K-8 misses its acceptance for lifting the R6 use restriction: the second-order Bermudan ladder method passes acceptance 1 to 3 at 201/100 only on the three cases it was developed on (in-sample), misses 1% at 101/50 on two of them, and has no out-of-sample acceptance yet; the use restriction is kept for both methods (KR-113), lifting it moves to a later point release, and the threshold is not loosened. Stage K round 1 is merged to main (2026-11-20, pull requests #58 and #59), not tagged, and is released with v1.0.0; its open items are in docs/known-issues.md."
     ],
     [
       "No outside check",

@@ -59,7 +59,7 @@ Stage E has its own index tables (ME-A1 to ME-A8, EB1 to EB12) under "Stage E mo
 | MG-5 | LIBOR market model, closed-form layer and simulation (G4a, waves 3b and 3c) | `04-pricing/lmm.md` | G | Implemented | 53 of 53 (0 library object, 53 numpy or scipy primitive; D6, generated) |
 | MG-6 | AAD ladder of the Bermudan scheme (Q3b) | `06-risk/aad-core.md` | G | Implemented | 0 of 3 (0 library object, 0 numpy or scipy primitive; D6, generated) |
 | MG-7 | Model-reserve dispersion (Q9 part 2) | `06-risk/model-reserve.md` | G | Implemented | 0 of 6 (0 library object, 0 numpy or scipy primitive; D6, generated) |
-| MG-8 | Deterministic xVA layer (G5b) | `06-risk/xva-framework.md` | G | Implemented | 0 of 24 (0 library object, 0 numpy or scipy primitive; D6, generated) |
+| MG-8 | Deterministic xVA layer (G5b) | `06-risk/xva-framework.md` | G | Implemented | 0 of 39 (0 library object, 0 numpy or scipy primitive; D6, generated) |
 | MG-9 | Portfolio exposure under Hull-White, ORE-checked (G5c) | `06-risk/xva-exposure-portfolio.md` | G | Implemented | 80 of 96 (80 library object, 0 numpy or scipy primitive; D6, generated) |
 | MG-10 | F3 sensitivities (inflation01, dividend and borrow, correlation) | `06-risk/f3-sensitivities.md` | G | Implemented | 9 of 18 |
 | MG-11 | FRTB-SA delta for FX, equity, CSR and commodity | `06-risk/frtb-sa-fx-equity.md` | G | Implemented | see entry |
@@ -638,14 +638,14 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Validation report:** `specifications/06-risk/model-reserve.md`.
 
 ### MG-8 Deterministic xVA layer (G5b)
-- **Purpose:** collateralised exposure with netting sets, CSA thresholds, MTA, independent amount and MPoR; CVA, DVA, FCA, FBA (DVA overlap rule), MVA, KVA; sensitivity-based IR delta margin (`xva.sbim.ir_delta`; deprecated alias `xva.simm.ir_delta` until v1.0.0); Hull-White wrong-way CVA.
+- **Purpose:** collateralised exposure with netting sets, CSA thresholds, MTA, independent amount and MPoR; CVA, DVA, FCA, FBA (DVA overlap rule), MVA, KVA; sensitivity-based IR delta margin (`xva.sbim.ir_delta`; deprecated alias `xva.simm.ir_delta` in v1.0.0, removed in the first release after it, KR-256); Hull-White wrong-way CVA.
 - **Inputs:** simulated paths per trade; CSA terms; exposure, discount, IM and capital profiles; hazard and recovery; sensitivities with weights and correlations.
 - **Limitations:** paths are inputs (no simulation here); the sensitivity-based margin is a project definition on caller-supplied weights (goldens on rule-generated placeholder weights, KR-150), not ISDA SIMM, and no ISDA material is used (see "Why there is no ISDA SIMM here" below); bucket-end exposure; independence except in the WWR model.
 - **Validation:** 50-digit mpmath, asserted limit cases (zero thresholds give zero exposure, `b = 0` gives the independent CVA). **Review:** 2026-11-11.
 - **Tier:** 1.
 - **Challenger:** ORE's collateral and xVA engine: not run (no stage set). ORE checks only MG-9.
 - **Monitoring thresholds:** any asserted limit case failing, or exposure differing from ORE beyond 3 SE once compared.
-- **Data lineage hash:** sha256 fef567a51bb097b31a202ab9ab1536819849f12f42fe8f801e7e2375e29b8647 (`collexp_g`); d51113f2e26b021d3e71ab18fa992782592b2c727640c68efe9c21bc0b33de39 (`xvaadj_g`); ce63cac19143868a10ad27bdf61347865011b7cd4cb1bfb7c5c956fa43dbed61 (`sbim_g`, file sha256 at v0.10.1 after KR-150; the suite was `simm_g`, 2b477e2f2be440985d9c41e1d767609483f591aa00642543e9959f6f906d512b at v0.7.0); d7f291fe26868f3174c9696986b050ae38e60d98e000937ea6c01957352582db (`wwr_g`)
+- **Data lineage hash:** sha256 fef567a51bb097b31a202ab9ab1536819849f12f42fe8f801e7e2375e29b8647 (`collexp_g`); d51113f2e26b021d3e71ab18fa992782592b2c727640c68efe9c21bc0b33de39 (`xvaadj_g`); ce63cac19143868a10ad27bdf61347865011b7cd4cb1bfb7c5c956fa43dbed61 (`sbim_g`, file sha256 on main since 2026-11-20 after KR-150; the suite was `simm_g`, 2b477e2f2be440985d9c41e1d767609483f591aa00642543e9959f6f906d512b at v0.7.0); d7f291fe26868f3174c9696986b050ae38e60d98e000937ea6c01957352582db (`wwr_g`)
 - **Retirement trigger:** a full simulated xVA engine with the bank's CSA library.
 - **Validation report:** `specifications/06-risk/xva-framework.md`.
 
@@ -1350,7 +1350,7 @@ Plain idea: ISDA SIMM is the initial-margin methodology many dealers use for unc
 
 What the repository has instead (evidence class: read, the specs named):
 
-- `xva.sbim.ir_delta` (stage G, MG-8; `specifications/06-risk/xva-framework.md`, G-43; named `xva.simm.ir_delta` in v0.7.0 to v0.10.0, that id now a deprecated alias until v1.0.0, KR-152): a sensitivity-based single-bucket interest-rate delta aggregation, `CR = max(1, sqrt(|sum s_k| / T))`, `WS_k = RW_k s_k CR`, `margin = sqrt(max(0, sum sum rho WS WS))`, on weights, correlations and a threshold the caller supplies. It is not ISDA SIMM. The weights in its goldens, tutorial and question bank were hand-typed in v0.7.0 to v0.10.0 with no documented origin; v0.10.1 replaced them by placeholder weights from a stated artificial rule (`RW = 10 x k`, `rho = 1 - 0.1 |k - l|`, KR-150, `specifications/tables/stage_k/sbim-ir-delta-g.json`).
+- `xva.sbim.ir_delta` (stage G, MG-8; `specifications/06-risk/xva-framework.md`, G-43; named `xva.simm.ir_delta` in v0.7.0 to v0.10.0, that id now a deprecated alias in v1.0.0, removed in the first release after it, KR-152 and KR-256): a sensitivity-based single-bucket interest-rate delta aggregation, `CR = max(1, sqrt(|sum s_k| / T))`, `WS_k = RW_k s_k CR`, `margin = sqrt(max(0, sum sum rho WS WS))`, on weights, correlations and a threshold the caller supplies. It is not ISDA SIMM. The weights in its goldens, tutorial and question bank were hand-typed in v0.7.0 to v0.10.0 with no documented origin; stage K round 1 (on main since 2026-11-20, released with v1.0.0) replaced them by placeholder weights from a stated artificial rule (`RW = 10 x k`, `rho = 1 - 0.1 |k - l|`, KR-150, `specifications/tables/stage_k/sbim-ir-delta-g.json`).
 - `risk.sbim.placeholder` (stage K item K-8h, PROPOSED; `specifications/06-risk/sbim-placeholder.md`): the project's own sensitivity-based initial margin in the general family of bucketed weighted-sensitivity models (interest rate, FX and equity; delta, vega, curvature; concentration factors; correlations within and across buckets and risk classes), on artificial placeholder weights generated by a stated rule. Every formula's evidence class is "project definition". Its blind-checked cases check our own algebra, nothing more.
 
 What neither is: a regulatory or industry-standard initial margin, a reproduction of any industry model, or a number to call or post margin with. No compliance claim is made, and no release names ISDA SIMM as a feature.

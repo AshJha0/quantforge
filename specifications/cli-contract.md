@@ -362,12 +362,12 @@ A deprecated alias is an old operation id that every build still accepts for a s
 handler as its target, so its outputs, error codes and diagnostics are those of the target; nothing in the result
 marks it (extra keys in `outputs` are a failure, see "Result document"). The deprecation is stated here and in
 `specifications/deprecated-aliases.json`, which `tools/gen_name_map.py` reads. Removing an alias is a major change
-(KR-154): it is done with the release named below. Golden suites pin each alias with invariance pairs (the target
+(KR-154): it is done with the release named below, never in the release that first ships the deprecation (KR-256). Golden suites pin each alias with invariance pairs (the target
 with expected `any`, the alias with `same_as`), so a build whose alias drifts from its target fails.
 
 | Alias (deprecated) | Target | Deprecated in | Removal | Ruling |
 |---|---|---|---|---|
-| `xva.simm.ir_delta` | `xva.sbim.ir_delta` | contract 1.17.0 (release v0.10.1) | v1.0.0 | KR-152; goldens `stage_k/sbim_alias_k.json` |
+| `xva.simm.ir_delta` | `xva.sbim.ir_delta` | contract 1.17.0 (on main since 2026-11-20; no v0.10.1 tag) | first release after v1.0.0 (carried in v1.0.0) | KR-152, KR-256; goldens `stage_k/sbim_alias_k.json` |
 
 ## R6 changes (contract 1.12.0, rulings `r6-rulings.md`)
 
@@ -569,4 +569,4 @@ Rulings `stage-k-rulings-w1b.md` KR-30 to KR-47. No new error code; the contract
 
 ### Stage K margin rename (contract 1.17.0; rulings `stage-k-rulings-margin.md` KR-150 to KR-155)
 
-`xva.sbim.ir_delta` is the stage G operation formerly named `xva.simm.ir_delta`, with the same inputs, outputs, error codes and error order (`06-risk/xva-framework.md`, G-43). The old id is a deprecated alias until v1.0.0 (section "Deprecated aliases"). Adding the new id is a minor change under "Versioning", and KR-1 gives every stage K change the one number 1.17.0, so the contract number does not move (KR-154). The goldens' weights and correlations are now placeholder weights from a stated rule (KR-150, `specifications/tables/stage_k/sbim-ir-delta-g.json`); the formula is unchanged. Goldens `datasets/golden/stage_g/sbim_g.json` and `datasets/golden/stage_k/sbim_alias_k.json` (`oracle/python/gen_stage_g_w4b.py`).
+`xva.sbim.ir_delta` is the stage G operation formerly named `xva.simm.ir_delta`, with the same inputs, outputs, error codes and error order (`06-risk/xva-framework.md`, G-43). The old id is a deprecated alias in v1.0.0, removed in the first release after it (KR-256; section "Deprecated aliases"). Adding the new id is a minor change under "Versioning", and KR-1 gives every stage K change the one number 1.17.0, so the contract number does not move (KR-154). The goldens' weights and correlations are now placeholder weights from a stated rule (KR-150, `specifications/tables/stage_k/sbim-ir-delta-g.json`); the formula is unchanged. Goldens `datasets/golden/stage_g/sbim_g.json` and `datasets/golden/stage_k/sbim_alias_k.json` (`oracle/python/gen_stage_g_w4b.py`).
