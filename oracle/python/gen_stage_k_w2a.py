@@ -618,7 +618,7 @@ def gen_ima():
         check(abs(sc - f(q)) <= 1e-12, f"{cid} SciPy kstwobign.sf {sc!r}")
         s.add_as(cid, pv, {"ks": ks, "n": 250}, {"pvalue": f(q), "label": LABEL},
                  verified=[ORACLE, f"published: Basel Framework MAR32.42, PDF p.667, printed p-value {prn}: MATCH within 1e-3 (tolerance fixed in the spec before any run; the asymptotic value is {val})",
-                           f"{sp} stats.kstwobign.sf (independent library): MATCH 1e-12; " + NOT_COUNTED_SCIPY, BLIND_IMA2],
+                           f"{sp} stats.kstwobign.sf (independent library): MATCH 1e-12; " + NOT_COUNTED_SCIPY],
                  tags=TAGS_F + ["outside_checked", "published"], limit=LIMIT, description=f"Kolmogorov tail at KS {ks}, n 250 (MAR32.42)")
 
     def blind(cid, op, inp, oracle, desc):
