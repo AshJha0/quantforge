@@ -86,6 +86,7 @@ The Java soak was not run on the laptop on 2026-11-20 (it would have ended after
 
 | File | Build | Host | Commit | Verdict | Reasons | Slope (MiB/h) | Slope 95 % CI | Range / median | Median (MiB) | Samples | Cases |
 |---|---|---|---|---|---|---|---|---|---|---|---|
+| `soak-python-2026-11-20-planted-leak-every-1.verdict.json` | python | local laptop, not the acceptance machine | `d75b6d7a` | LEAK CAUGHT | SLOPE, RANGE | 171.8955 | n/a | 0.06026 | 475.613 | 61 | 48,661 |
 | `soak-python-2026-11-20-planted-leak.verdict.json` | python | local laptop, not the acceptance machine | `254e61c5` | LEAK MISSED | none | -46.9742 | n/a | 0.01507 | 429.371 | 43 | 27,694 |
 | `soak-python-2026-11-20.verdict.json` | python | local laptop, not the acceptance machine | `a95aa175` | MISS | SLOPE | 2.3243 | [1.696, 3.7996] | 0.03013 | 432.59 | 671 | 199,127 |
 <!-- capacity-generated: end -->
