@@ -57,3 +57,30 @@ What this does not show: same model family as the author (Sonnet against Opus 5.
 ## ORE licence wording (evidence class: read)
 
 `oracle/LICENCES.md` records ORE 1.8.17.0 as Modified BSD (3-clause), from `license.txt` read through the GitHub API on 2026-11-12. The two specs that said "Apache 2.0" (`cva-capital.md`, `xva-exposure-portfolio.md`) now say Modified BSD and state the use: an outside oracle run locally on inputs we generate, no ORE code kept. Open for the coordinator: whether the PyPI wheel carries the same licence as the repository tag was not read on this branch.
+
+## Version 2 (2026-11-20, lane k-xva-spec, Claude Opus 5.5 as builder)
+
+**Why.** Version 1 lacked the G-40 and G-41 rules and the `xvaadj_g-0001` inputs (3 MISMATCH, all null outputs), and 20 of the 41 B candidates had no frozen value. Version 1 and its frozen results (`stage_k_blind/xva_v1/`) are unchanged.
+
+**What changed before the run (evidence class: measured unless stated).**
+- Oracle values for all 41 B candidates, and the 23 other spec value cases computable without ORE, by `oracle/python/gen_stage_k_xva_k8b.py` (mpmath 50 digits, rounded once). Held as candidate goldens under `oracle/xva_k8b_candidates/` (KR-299), because the conformance runner fails on an unimplemented operation. The generator first reproduces `xvaadj_g-0001`, `-0002`, `collexp_g-0004` and `expsim_g-0003`, and it reproduces every value printed in the specs except the three that the survival ruling moves.
+- Proposed rulings KR-296 (one survival point, the bucket start, for FCA, FBA, MVA) and KR-297 (ColVA `BOTH` likewise), and KR-298 (the spec gaps an implementer needs), in `specifications/stage-k-rulings-xva.md`. The specs carry them.
+- Packet builder `program/stage_k_blind_xva/xva_make_packet_v2.py`: eight stripped specs, a stage G excerpt (formal statements only), the ruling rows with their numerical-effect sentences removed, `inputs.json` (inputs only, read from the candidate files), `template.json`, `fixed_inputs.json` (the `expsim_g-0003` EE held fixed for aadx_k-0008). Packet at `C:/Work/Claude/qf-blind/xva_v2_packet/` (not committed). MANIFEST.sha256 file hash: `2fb743050b478768edc3b8ce71d98ac9b605b093136f2e15820b66c7e8463d6b`. Leak check (every non-integer expected leaf, full and 8-character prefix, in every packet file except the inputs): 0 hits.
+- Compare `program/stage_k_blind_xva/xva_compare_v2.py` (`--self-test` PASS), each case at its own `tolerance_limit` (spec A1; AAD 1e-10 relative), every leaf must match. Commit 24979d8e (18:00:32 UTC), before the deriver started.
+
+**Run.** Deriver: a separate subagent on Claude Sonnet, given only the packet folder and its own output folder, told not to read the repository (its own statement, not logged); its own Python at 60-digit mpmath, gradients by 4th-order central differences at 60 digits. Manifest verified. Frozen results `stage_k_blind/xva_v2/` committed in 9930309c (18:08:43 UTC); SHA-256 as handed back (CRLF) `0111c2ed64de2b3005ec4ba603d9dcf4ec64883b4e0a89302be8b01e76ba804e`. One compare run after that commit: `stage_k_blind/xva_v2/compare_output.txt`, **41 MATCH of 41**, no null leaf.
+
+| Item | Value cases | Outside-checked once implemented | Share | Floor 60% | Still missing |
+|---|---:|---|---:|---|---|
+| AAD | 12 | 8 B (aadx 0001-0008) | 66.7% | met | ORE bump cases 0009-0012 not run |
+| ColVA | 10 | 6 B | 60.0% | met (exactly) | ORE `colva` 0007-0010 not run |
+| MVA | 10 | 5 B | 50.0% | **NOT MET** | one ORE `dimModel Flat` case (0006 or 0007) must pass; WSL run not done |
+| WWR copula | 10 | 9 L + 1 B | 100% | met | the D6 reading of L (gate file section 3.1) |
+| Stressed exposure | 8 | 6 B | 75.0% | met | ORE `BaselEEPE` definition unread |
+| MPoR and close-out | 14 counted from the spec (the gate table says 13) | 7 B + 5 L | 85.7% | met | ORE close-out cases clp 0002, 0003 |
+| Funding | 10 | 6 B | 60.0% | met (exactly) | ORE `fva` 0007-0010 |
+| Shock library | 6 | 2 B | 33.3% | **NOT MET** | at least 2 ORE cases (WSL) |
+
+These shares hold only once the implementation lane writes the goldens with the `DR-H2 ... MATCH` mark (`tools/outside_shares.py` counts that mark for stage K); today `tools/outside_shares.py` sees none of these suites. The v1 credits of mva_k-0001, 0002 and colva_k-0002 were for the old survival point and are replaced by the v2 matches.
+
+**What this does not show.** Same model family as the builder (Sonnet against Opus 5.5); the match shows that the packet's rules are unambiguous and the arithmetic agrees, not that the rules read the sources correctly (KF-26). The deriver read KR-296 and KR-297, so the match does not test the survival choice itself. The case inputs in `inputs.json` were written by the builder from the case tables; an error there would be shared by both sides.
