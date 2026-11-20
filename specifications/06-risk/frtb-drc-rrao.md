@@ -94,7 +94,7 @@ Value cases 18; printed (P) 2; library (L) 0. Strict outside share 2/18 = 11% wi
 
 - A1 Every value golden above reproduced in all four builds to 1e-12 relative (1e-15 absolute at 0).
 - A2 Error goldens give the stated code in all four builds.
-- A3 Property (10,000 random portfolios): DRC is 0 or positive; adding a long only to a bucket never lowers that bucket's DRC; permuting the input order leaves every output unchanged (KR-53 greedy is order-independent in its totals); scaling every notional and market value by c > 0 scales DRC by c.
+- A3 Property (10,000 random portfolios): DRC is 0 or positive; a long added to an obligor with no net short, with risk weight at least that of every obligor with a net short in the bucket, never lowers DRC_b (KR-327: a long added without that premise can lower DRC_b, for example by offsetting the same obligor's short); permuting the input order leaves every output unchanged (KR-53 greedy is order-independent in its totals); scaling every notional and market value by c > 0 scales DRC by c.
 - A4 Gate (plan section 15): at least 60% of the 18 value cases outside-checked under KR-68. Without a DR-H2 blind lane the share is 11% and K-8a moves to a point release (`program/STAGE_K_W2_GATE.md`).
 
 ## Limits
