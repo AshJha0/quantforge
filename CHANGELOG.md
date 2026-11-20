@@ -229,7 +229,7 @@ Stage J did not change these modules apart from formatting. A 12-mutant sample i
 - `var.rs` re-verify of the last targeted lines is pending.
 - The C++ J-0c kill rate (83.6 %) is a lower bound.
 - Tutorials 25 and 26 were first checked locally in Python, Java and C++ only (Application Control blocked a fresh Rust binary); `tutorial.yml` has since run every page, Rust included, green on `main` at `a148d0e` (2026-11-14).
-- Fuzzing has not run on `main` since the 0.8.3 fixes; the last runs (2026-11-13) predate them.
+- Fuzzing has not run on `main` since the 0.8.3 fixes; the last runs (2026-11-13) predate them. Correction (2026-11-20, K-9 review finding 1): that was wrong when written; the scheduled fuzz run of 2026-11-16 on `a148d0ea` ran after the 0.8.3 fixes and failed (C++ undefined behaviour at `hedging.cpp:1033`, a 20 s timeout, Rust error code `E_CONVERGENCE`); open as K9-1a in `docs/known-issues.md`.
 - The `mutation-report` job on the stage J pull request was red on Rust `hedge_solvers` alone with the old 12-mutant sample (10 of 12 killed; pooled 83.1 %); the cause was the sample size (see Changed), and the full run above gives 91.7 %.
 - The pa11y accessibility check runs in CI only, not on the development machine.
 - The G-42b ORE re-test job passed on the stage J pull request and on `main` (2026-11-14); its uploaded count has not been reviewed or copied into the repo.

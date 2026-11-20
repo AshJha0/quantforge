@@ -5,7 +5,8 @@ name: Repo gates
 #   - model register (plan 12.2 A2) and convergence rule (Q5b) ratchets over
 #     conformance/quality/governance_baseline.json;
 #   - build and test leftovers stay ignored (plan 12.2 G9);
-#   - docs status (tools/check_docs_status.py): curve table rows against the name map, release wording against tags.
+#   - docs status (tools/check_docs_status.py): curve table rows against the name map, release wording against tags;
+#   - red scheduled workflows (tools/check_scheduled_runs.py): each must be named in docs/known-issues.md (reads the API).
 on:
   pull_request:
   push:
@@ -13,6 +14,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read  # tools/check_scheduled_runs.py reads the last scheduled run of each workflow on main
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -59,6 +61,10 @@ jobs:
           python3 tools/release_verify.py --self-test
           python3 tools/check_ruleset.py --self-test
           python3 tools/check_versions.py --self-test && python3 tools/check_versions.py
+      - name: every red scheduled workflow on main has an open known-issues row (K-9 review finding 1)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 tools/check_scheduled_runs.py --self-test && python3 tools/check_scheduled_runs.py
       - name: K-3 libraries name no adapter, after the planted faults; feed fixtures current (KR-281; confirmed 2026-11-20)
         run: |
           python3 tools/check_adapter_deps.py --self-test && python3 tools/check_adapter_deps.py
