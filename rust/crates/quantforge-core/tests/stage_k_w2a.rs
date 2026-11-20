@@ -73,7 +73,10 @@ fn parameters_match_tables() {
         ima::RFET_MIN_PER_WINDOW as f64,
         num(&f["rfet.min_obs_per_window"])
     );
-    assert_eq!(ima::RFET_ALT_MIN_DAYS as f64, num(&f["rfet.alt_min_obs_12m"]));
+    assert_eq!(
+        ima::RFET_ALT_MIN_DAYS as f64,
+        num(&f["rfet.alt_min_obs_12m"])
+    );
     assert_eq!(
         ima::RFET_LOOKBACK_MONTHS as f64,
         num(&f["rfet.lookback_months"])
@@ -88,7 +91,10 @@ fn parameters_match_tables() {
             .map(|p| num(&pair(p)[1]))
             .collect();
         assert_eq!(&lows[1..], highs.as_slice(), "row {row}");
-        let last = pair(printed.last().unwrap())[1].as_str().unwrap().to_string();
+        let last = pair(printed.last().unwrap())[1]
+            .as_str()
+            .unwrap()
+            .to_string();
         assert_eq!(last, if row == "D" { "1.00" } else { "inf" });
     }
 
@@ -171,10 +177,19 @@ fn jtd_and_weight_details() {
     let mut p = pos("a", "X", "SENIOR", 100.0, 100.0, 5.0);
     p.lgd_applies = false;
     assert_eq!(drc::gross_jtd(&p), 100.0);
-    assert_eq!(drc::gross_jtd(&pos("a", "X", "SENIOR", 100.0, 100.0, 5.0)), 75.0);
+    assert_eq!(
+        drc::gross_jtd(&pos("a", "X", "SENIOR", 100.0, 100.0, 5.0)),
+        75.0
+    );
     assert_eq!(drc::gross_jtd(&pos("a", "X", "SENIOR", 0.0, 0.0, 5.0)), 0.0);
-    assert_eq!(drc::gross_jtd(&pos("a", "X", "SENIOR", 100.0, 10.0, 5.0)), 0.0);
-    assert_eq!(drc::gross_jtd(&pos("a", "X", "SENIOR", -100.0, -10.0, 5.0)), 0.0);
+    assert_eq!(
+        drc::gross_jtd(&pos("a", "X", "SENIOR", 100.0, 10.0, 5.0)),
+        0.0
+    );
+    assert_eq!(
+        drc::gross_jtd(&pos("a", "X", "SENIOR", -100.0, -10.0, 5.0)),
+        0.0
+    );
     assert_eq!(drc::maturity_weight(0.1), 0.25);
     assert_eq!(drc::maturity_weight(0.6), 0.6);
     assert_eq!(drc::maturity_weight(3.0), 1.0);
@@ -257,21 +272,33 @@ fn nonsec_errors_in_kr67_order() {
     assert_eq!(code(drc::drc_nonsec(&two, &r)), "E_INPUT");
     let mut other_bucket = pos("b", "X", "SENIOR", 1.0, 1.0, 1.0);
     other_bucket.bucket = "SOVEREIGN".to_string();
-    let e = drc::drc_nonsec(&[pos("a", "X", "SENIOR", 1.0, 1.0, 1.0), other_bucket], &r)
-        .unwrap_err();
-    assert_eq!((e.code, e.field.as_deref()), ("E_INPUT", Some("positions/1/bucket")));
+    let e =
+        drc::drc_nonsec(&[pos("a", "X", "SENIOR", 1.0, 1.0, 1.0), other_bucket], &r).unwrap_err();
     assert_eq!(
-        code(drc::drc_nonsec(&[pos("a", "X", "SENIOR", 1.0, 1.0, 0.0)], &r)),
+        (e.code, e.field.as_deref()),
+        ("E_INPUT", Some("positions/1/bucket"))
+    );
+    assert_eq!(
+        code(drc::drc_nonsec(
+            &[pos("a", "X", "SENIOR", 1.0, 1.0, 0.0)],
+            &r
+        )),
         "E_DOMAIN"
     );
     assert_eq!(
-        code(drc::drc_nonsec(&[pos("a", "X", "SENIOR", 0.0, 1.0, 1.0)], &r)),
+        code(drc::drc_nonsec(
+            &[pos("a", "X", "SENIOR", 0.0, 1.0, 1.0)],
+            &r
+        )),
         "E_DOMAIN"
     );
     // Cash equity: maturity 0.25 or at least 1 (KR-52), EQUITY with notional = market value (KR-300).
     let mut eq = pos("a", "X", "EQUITY", 5.0, 5.0, 0.5);
     eq.cash_equity = true;
-    assert_eq!(code(drc::drc_nonsec(std::slice::from_ref(&eq), &r)), "E_DOMAIN");
+    assert_eq!(
+        code(drc::drc_nonsec(std::slice::from_ref(&eq), &r)),
+        "E_DOMAIN"
+    );
     eq.maturity_years = 0.25;
     assert!(drc::drc_nonsec(std::slice::from_ref(&eq), &r).is_ok());
     eq.seniority = "SENIOR".to_string();
@@ -307,23 +334,43 @@ fn sec_and_ctp_details() {
     let out = drc::drc_sec_nonctp(&[sec("a", 10.0, 0.5, 0.2), sec("b", -4.0, 0.5, 0.2)]).unwrap();
     assert!((out.buckets[0].wtd_long - 0.2 * 3.0).abs() < 1e-15);
     assert_eq!(out.positions[0].gross_jtd, None);
-    assert_eq!(drc::drc_sec_nonctp(&[sec("a", -4.0, 2.0, 0.2)]).unwrap().drc, 0.0);
+    assert_eq!(
+        drc::drc_sec_nonctp(&[sec("a", -4.0, 2.0, 0.2)])
+            .unwrap()
+            .drc,
+        0.0
+    );
     // One rw per netting group (KR-303), checked before the rw cap (structural first).
     assert_eq!(
-        code(drc::drc_sec_nonctp(&[sec("a", 1.0, 1.0, 13.0), sec("b", 1.0, 1.0, 0.5)])),
+        code(drc::drc_sec_nonctp(&[
+            sec("a", 1.0, 1.0, 13.0),
+            sec("b", 1.0, 1.0, 0.5)
+        ])),
         "E_INPUT"
     );
-    assert_eq!(code(drc::drc_sec_nonctp(&[sec("a", 1.0, 1.0, 13.0)])), "E_DOMAIN");
-    assert_eq!(code(drc::drc_sec_nonctp(&[sec("a", 1.0, 0.0, 0.5)])), "E_DOMAIN");
+    assert_eq!(
+        code(drc::drc_sec_nonctp(&[sec("a", 1.0, 1.0, 13.0)])),
+        "E_DOMAIN"
+    );
+    assert_eq!(
+        code(drc::drc_sec_nonctp(&[sec("a", 1.0, 0.0, 0.5)])),
+        "E_DOMAIN"
+    );
 
     assert_eq!(drc::drc_ctp(Some(&[]), None).unwrap().hbr_ctp, None);
-    let out = drc::drc_ctp(Some(&[ctp("a", "I", 100.0, 0.1), ctp("b", "I", -40.0, 0.1)]), None)
-        .unwrap();
+    let out = drc::drc_ctp(
+        Some(&[ctp("a", "I", 100.0, 0.1), ctp("b", "I", -40.0, 0.1)]),
+        None,
+    )
+    .unwrap();
     assert_eq!(out.hbr_ctp, Some(1.0));
     assert!((out.drc - 6.0).abs() < 1e-12);
     // Two indices, one net short: the short index's DRC_b is negative and counts half (MAR22.45).
-    let out = drc::drc_ctp(Some(&[ctp("a", "I", 100.0, 0.1), ctp("b", "J", -40.0, 0.5)]), None)
-        .unwrap();
+    let out = drc::drc_ctp(
+        Some(&[ctp("a", "I", 100.0, 0.1), ctp("b", "J", -40.0, 0.5)]),
+        None,
+    )
+    .unwrap();
     let hbr = 100.0 / 140.0;
     assert_eq!(out.buckets[1].drc, -hbr * 20.0);
     assert!((out.drc - (10.0 - 0.5 * hbr * 20.0)).abs() < 1e-12);
@@ -359,7 +406,10 @@ fn rrao_details() {
     neg.gross_notional = -1.0;
     assert_eq!(code(drc::rrao(&[neg])), "E_DOMAIN");
     assert_eq!(
-        code(drc::rrao(&[x("a", "EXOTIC", false, false), x("a", "OTHER", false, false)])),
+        code(drc::rrao(&[
+            x("a", "EXOTIC", false, false),
+            x("a", "OTHER", false, false)
+        ])),
         "E_INPUT"
     );
 }
@@ -379,10 +429,13 @@ fn prop_pos(id: &str, ob: &str, sen: &str, n: f64, mv: f64, m: f64) -> Position 
 }
 
 fn bucket_drc(out: &drc::NonsecResult, bucket: &str) -> Option<f64> {
-    out.buckets.iter().find(|b| b.bucket == bucket).map(|b| b.drc)
+    out.buckets
+        .iter()
+        .find(|b| b.bucket == bucket)
+        .map(|b| b.drc)
 }
 
-/// KR-327 (CONFIRMED 2026-11-20): a covered long of 885 added to obligor A lowers CORPORATE DRC_b.
+/// KR-327 (CONFIRMED 2026-11-20): a covered long of 885 added to obligor A lowers CORPORATE `DRC_b`.
 /// The long offsets A's shorts, so the bucket's net short falls and the HBR rises from 0.288 to
 /// 0.395; the weight on the remaining shorts rises more than the weighted long does. The book is the
 /// Java seed -24 book of `FrtbDrcTest.a3MonotonicityCounterexample`; the old A3 sentence ("adding a
@@ -453,7 +506,7 @@ proptest! {
 
     /// A3 of `frtb-drc-rrao.md` as corrected by KR-327: DRC is 0 or positive; a long added to an
     /// obligor with no net short, with risk weight at least that of every obligor with a net short in
-    /// the bucket, never lowers DRC_b; permuting the input leaves every output unchanged (totals to
+    /// the bucket, never lowers `DRC_b`; permuting the input leaves every output unchanged (totals to
     /// rounding); scaling every notional and market value by c > 0 scales DRC by c.
     #[test]
     fn drc_a3_properties(
@@ -525,7 +578,12 @@ fn pla_and_pvalue_details() {
     assert_eq!(out.spearman, 1.0);
     assert_eq!(out.ks_pvalue_asymptotic, 1.0);
     assert!(!out.regulatory_window);
-    assert_eq!(ima::pla(&[1.0, 2.0, 3.0], &[3.0, 2.0, 1.0]).unwrap().spearman, -1.0);
+    assert_eq!(
+        ima::pla(&[1.0, 2.0, 3.0], &[3.0, 2.0, 1.0])
+            .unwrap()
+            .spearman,
+        -1.0
+    );
     assert_eq!(ima::doubled_ranks(&[5.0, 1.0, 5.0, 5.0]), [6, 2, 6, 6]);
     assert_eq!(ima::doubled_ranks(&[0.0, -0.0]), [3, 3]);
     assert_eq!(ima::kolmogorov_q(0.0), 1.0);
@@ -537,8 +595,14 @@ fn pla_and_pvalue_details() {
     assert_eq!(ima::pla_ks_pvalue(0.0, 250).unwrap(), 1.0);
     assert_eq!(code(ima::pla_ks_pvalue(1.5, 250)), "E_DOMAIN");
     assert_eq!(code(ima::pla_ks_pvalue(0.5, 0)), "E_DOMAIN");
-    assert_eq!(code(ima::pla(&vec![0.0; ima::MAX_PNL + 1], &[0.0])), "E_LIMIT");
-    assert_eq!(code(ima::pla(&[0.0], &vec![0.0; ima::MAX_PNL + 1])), "E_LIMIT");
+    assert_eq!(
+        code(ima::pla(&vec![0.0; ima::MAX_PNL + 1], &[0.0])),
+        "E_LIMIT"
+    );
+    assert_eq!(
+        code(ima::pla(&[0.0], &vec![0.0; ima::MAX_PNL + 1])),
+        "E_LIMIT"
+    );
     assert_eq!(code(ima::pla(&[1.0, 2.0, 3.0], &[1.0, 2.0])), "E_INPUT");
     assert_eq!(code(ima::pla(&[1.0, 2.0], &[1.0, 2.0])), "E_DOMAIN");
     let e = ima::pla(&[1.0, 2.0, 3.0], &[1.0, 1.0, 1.0]).unwrap_err();
@@ -582,11 +646,17 @@ fn liquidity_horizon_details() {
     };
     assert_eq!(lh(None, Some("ISK/PLN"), None, None).unwrap().n, 20);
     let r = lh(None, Some("EUR/USD"), None, Some(5.0)).unwrap();
-    assert_eq!((r.n, r.table_n, r.rule.as_str()), (10, 10, "fx_pair+maturity"));
+    assert_eq!(
+        (r.n, r.table_n, r.rule.as_str()),
+        (10, 10, "fx_pair+maturity")
+    );
     let r = lh(Some("EQ_large_cap"), None, None, Some(200.0)).unwrap();
     assert_eq!(r.rule, "table");
     let r = lh(Some("CS_volatility"), None, None, Some(30.0)).unwrap();
-    assert_eq!((r.n, r.table_n, r.rule.as_str()), (40, 120, "table+maturity"));
+    assert_eq!(
+        (r.n, r.table_n, r.rule.as_str()),
+        (40, 120, "table+maturity")
+    );
     let r = lh(None, None, Some(&[(1.0, 120)]), Some(1.0)).unwrap();
     assert_eq!((r.n, r.rule.as_str()), (10, "index+maturity"));
     // FAQ5: weights 0.5 x 10 + 0.5 x 60 = 35, the next horizon is 40.
@@ -595,24 +665,40 @@ fn liquidity_horizon_details() {
     let r = lh(None, None, Some(&[(1.0, 120)]), Some(500.0)).unwrap();
     assert_eq!(r.n, 120);
     assert_eq!(code(lh(None, None, None, None)), "E_INPUT");
-    assert_eq!(code(lh(Some("IR_other"), Some("EUR/USD"), None, None)), "E_INPUT");
+    assert_eq!(
+        code(lh(Some("IR_other"), Some("EUR/USD"), None, None)),
+        "E_INPUT"
+    );
     assert_eq!(code(lh(None, None, Some(&[]), None)), "E_INPUT");
     let big = vec![(0.0, 10); ima::MAX_LIST + 1];
     assert_eq!(code(lh(None, None, Some(&big), None)), "E_LIMIT");
     assert_eq!(code(lh(None, Some("USD/USD"), None, None)), "E_DOMAIN");
-    assert_eq!(code(lh(Some("IR_other"), None, None, Some(0.0))), "E_DOMAIN");
-    assert_eq!(code(lh(None, None, Some(&[(-0.5, 10), (1.5, 10)]), None)), "E_DOMAIN");
+    assert_eq!(
+        code(lh(Some("IR_other"), None, None, Some(0.0))),
+        "E_DOMAIN"
+    );
+    assert_eq!(
+        code(lh(None, None, Some(&[(-0.5, 10), (1.5, 10)]), None)),
+        "E_DOMAIN"
+    );
     assert_eq!(code(lh(None, None, Some(&[(1.0, 30)]), None)), "E_DOMAIN");
     assert_eq!(code(lh(None, None, Some(&[(0.5, 10)]), None)), "E_DOMAIN");
-    assert_eq!(code(lh(Some("NOT_A_CATEGORY"), None, None, None)), "E_SCHEMA");
+    assert_eq!(
+        code(lh(Some("NOT_A_CATEGORY"), None, None, None)),
+        "E_SCHEMA"
+    );
     assert_eq!(ima::table_horizon("COM_other_types"), Some(120));
 }
 
 #[test]
 fn es_details() {
     assert_eq!(ima::horizon_weights(), [1.0, 1.0, 2.0, 2.0, 6.0]);
-    let out = ima::es_lh(None, None, Some(&[vec![-1.0, -2.0, -3.0], vec![], vec![], vec![], vec![]]))
-        .unwrap();
+    let out = ima::es_lh(
+        None,
+        None,
+        Some(&[vec![-1.0, -2.0, -3.0], vec![], vec![], vec![], vec![]]),
+    )
+    .unwrap();
     assert_eq!((out.mode, out.es), ("pnl", 3.0));
     // A single horizon: ES_1 alone (es_k hand case).
     let out = ima::es_lh(Some(&[1.0, 0.0, 0.0, 0.0, 0.0]), None, None).unwrap();
@@ -621,9 +707,15 @@ fn es_details() {
     assert_eq!(out.mode, "sigma");
     assert_eq!(out.es, ima::normal_es_factor());
     assert_eq!(code(ima::es_lh(None, None, None)), "E_INPUT");
-    assert_eq!(code(ima::es_lh(Some(&[1.0; 5]), Some(&[1.0; 5]), None)), "E_INPUT");
+    assert_eq!(
+        code(ima::es_lh(Some(&[1.0; 5]), Some(&[1.0; 5]), None)),
+        "E_INPUT"
+    );
     assert_eq!(code(ima::es_lh(Some(&[1.0; 4]), None, None)), "E_INPUT");
-    assert_eq!(code(ima::es_lh(None, Some(&[1.0, -1.0, 0.0, 0.0, 0.0]), None)), "E_DOMAIN");
+    assert_eq!(
+        code(ima::es_lh(None, Some(&[1.0, -1.0, 0.0, 0.0, 0.0]), None)),
+        "E_DOMAIN"
+    );
     let gain = vec![vec![1.0, 2.0], vec![], vec![], vec![], vec![]];
     assert_eq!(code(ima::es_lh(None, None, Some(&gain))), "E_DOMAIN");
     let big = vec![vec![0.0; ima::MAX_PNL + 1], vec![], vec![], vec![], vec![]];
@@ -642,20 +734,32 @@ fn stressed_imcc_ses_details() {
     let (_, floored, es) = ima::es_stressed(10.0, 2.0, 4.0).unwrap();
     assert_eq!((floored, es), (true, 10.0));
     assert_eq!(code(ima::es_stressed(-1.0, 1.0, 1.0)), "E_DOMAIN");
-    assert_eq!(ima::es_stressed(1.0, 1.0, 0.0).unwrap_err().field.as_deref(), Some("es_rc"));
+    assert_eq!(
+        ima::es_stressed(1.0, 1.0, 0.0)
+            .unwrap_err()
+            .field
+            .as_deref(),
+        Some("es_rc")
+    );
 
     let cls = |v: &[(&str, [f64; 3])]| -> Vec<(String, [f64; 3])> {
         v.iter().map(|(k, t)| ((*k).to_string(), *t)).collect()
     };
-    let out = ima::imcc([1.0, 1.0, 1.0], &cls(&[("CS", [1.0, 1.0, 2.0]), ("IR", [1.0, 2.0, 1.0])]))
-        .unwrap();
+    let out = ima::imcc(
+        [1.0, 1.0, 1.0],
+        &cls(&[("CS", [1.0, 1.0, 2.0]), ("IR", [1.0, 2.0, 1.0])]),
+    )
+    .unwrap();
     assert_eq!(out.classes_floored, ["CS"]);
     let names: Vec<&str> = out.classes.iter().map(|c| c.0).collect();
     assert_eq!(names, ["IR", "CS"]);
     assert_eq!(out.imcc, 0.5 * 1.0 + 0.5 * (2.0 + 1.0));
     assert!(!out.portfolio_floored);
     assert_eq!(code(ima::imcc([1.0; 3], &[])), "E_INPUT");
-    assert_eq!(code(ima::imcc([1.0; 3], &cls(&[("XX", [1.0; 3])]))), "E_SCHEMA");
+    assert_eq!(
+        code(ima::imcc([1.0; 3], &cls(&[("XX", [1.0; 3])]))),
+        "E_SCHEMA"
+    );
     let e = ima::imcc([1.0; 3], &cls(&[("EQ", [1.0, 1.0, 0.0])])).unwrap_err();
     assert_eq!(e.field.as_deref(), Some("classes.EQ.es_rc"));
 
@@ -664,7 +768,10 @@ fn stressed_imcc_ses_details() {
     assert!((c - (1.44f64 + 0.64 * 2.0).sqrt()).abs() < 1e-15);
     assert_eq!(total, a + b + c);
     assert_eq!(code(ima::ses(&[], &[-1.0], &[])), "E_DOMAIN");
-    assert_eq!(code(ima::ses(&vec![0.0; ima::MAX_LIST + 1], &[], &[])), "E_LIMIT");
+    assert_eq!(
+        code(ima::ses(&vec![0.0; ima::MAX_LIST + 1], &[], &[])),
+        "E_LIMIT"
+    );
 }
 
 fn capital_inputs(desks: Vec<(&str, f64)>) -> CapitalInputs {
@@ -695,8 +802,14 @@ fn capital_details() {
     assert_eq!(ima::multiplier(0), 1.5);
     assert_eq!(ima::multiplier(9), 1.92);
     assert_eq!(ima::multiplier(10), 2.0);
-    assert_eq!(code(ima::capital(&capital_inputs(vec![("AMBER", 0.0)]))), "E_DOMAIN");
-    assert_eq!(code(ima::capital(&capital_inputs(vec![("GREEN", -1.0)]))), "E_DOMAIN");
+    assert_eq!(
+        code(ima::capital(&capital_inputs(vec![("AMBER", 0.0)]))),
+        "E_DOMAIN"
+    );
+    assert_eq!(
+        code(ima::capital(&capital_inputs(vec![("GREEN", -1.0)]))),
+        "E_DOMAIN"
+    );
     let mut x = capital_inputs(vec![]);
     x.exceptions = -1;
     assert_eq!(code(ima::capital(&x)), "E_DOMAIN");
@@ -734,10 +847,19 @@ fn rfet_details() {
     let big = vec![d(2026, 1, 1); ima::MAX_LIST + 1];
     assert_eq!(code(ima::rfet(d(2026, 6, 30), &big)), "E_LIMIT");
 
-    assert_eq!(ima::rfet_bucket("A", Some(40.0), None).unwrap(), (9, 35.0, None));
-    assert_eq!(ima::rfet_bucket("D", None, Some(0.99)).unwrap(), (5, 0.95, Some(1.0)));
+    assert_eq!(
+        ima::rfet_bucket("A", Some(40.0), None).unwrap(),
+        (9, 35.0, None)
+    );
+    assert_eq!(
+        ima::rfet_bucket("D", None, Some(0.99)).unwrap(),
+        (5, 0.95, Some(1.0))
+    );
     assert_eq!(ima::rfet_bucket("A", Some(0.0), None).unwrap().0, 1);
-    assert_eq!(ima::rfet_bucket("B", Some(4.0), None).unwrap(), (3, 4.0, Some(10.0)));
+    assert_eq!(
+        ima::rfet_bucket("B", Some(4.0), None).unwrap(),
+        (3, 4.0, Some(10.0))
+    );
     assert_eq!(code(ima::rfet_bucket("A", None, Some(0.5))), "E_INPUT");
     assert_eq!(code(ima::rfet_bucket("D", Some(1.0), Some(0.5))), "E_INPUT");
     assert_eq!(code(ima::rfet_bucket("C", Some(-1.0), None)), "E_DOMAIN");
@@ -803,8 +925,8 @@ proptest! {
         prop_assert_eq!(brute_ks(&h, &r), base.ks_count);
     }
 
-    /// KR-310: a single horizon scales by sqrt of its weight; nested horizons (every factor at LH_j)
-    /// give E sqrt(LH_j / 10).
+    /// KR-310: a single horizon scales by sqrt of its weight; nested horizons (every factor at `LH_j`)
+    /// give E sqrt(`LH_j` / 10).
     #[test]
     fn es_cascade_scaling(j in 0usize..5, e in 0.0f64..1e6) {
         let w = ima::horizon_weights();
@@ -818,7 +940,7 @@ proptest! {
         prop_assert!((es - e * (lh / 10.0).sqrt()).abs() <= 1e-14 * es.max(1e-300));
     }
 
-    /// Stressed ES is never below ES_R,S.
+    /// Stressed ES is never below `ES_R,S`.
     #[test]
     fn es_stressed_floor(rs in 0.0f64..1e6, fc in 0.0f64..1e6, rc in 1e-6f64..1e6) {
         prop_assert!(ima::es_stressed(rs, fc, rc).unwrap().2 >= rs);

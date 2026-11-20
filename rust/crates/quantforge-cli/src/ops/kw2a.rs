@@ -261,9 +261,8 @@ fn drc_sec(i: &Inputs) -> Result<Outcome> {
 }
 
 fn drc_ctp(i: &Inputs) -> Result<Outcome> {
-    let positions = match i.opt("positions") {
-        None => None,
-        Some(_) => Some(
+    let positions = if i.opt("positions").is_some() {
+        Some(
             objects(i, "positions")?
                 .iter()
                 .map(|p| {
@@ -278,7 +277,9 @@ fn drc_ctp(i: &Inputs) -> Result<Outcome> {
                     })
                 })
                 .collect::<Result<Vec<_>>>()?,
-        ),
+        )
+    } else {
+        None
     };
     let bucket_drc = i
         .opt("bucket_drc")
@@ -361,24 +362,24 @@ fn lh(i: &Inputs) -> Result<Outcome> {
         .opt("category")
         .map(|_| choice(i, "category", &categories))
         .transpose()?;
-    let fx_pair = match i.opt("fx_pair") {
-        None => None,
-        Some(_) => {
-            let p = string(i, "fx_pair")?;
-            if !fx_pair_form(&p) {
-                return Err(schema("fx_pair", "not of the form AAA/BBB"));
-            }
-            Some(p)
+    let fx_pair = if i.opt("fx_pair").is_some() {
+        let p = string(i, "fx_pair")?;
+        if !fx_pair_form(&p) {
+            return Err(schema("fx_pair", "not of the form AAA/BBB"));
         }
+        Some(p)
+    } else {
+        None
     };
-    let constituents = match i.opt("constituents") {
-        None => None,
-        Some(_) => Some(
+    let constituents = if i.opt("constituents").is_some() {
+        Some(
             objects(i, "constituents")?
                 .iter()
                 .map(|c| Ok((c.f64("weight")?, c.int("n")?)))
                 .collect::<Result<Vec<_>>>()?,
-        ),
+        )
+    } else {
+        None
     };
     let maturity = i.opt_f64("maturity_days")?;
     i.gate()?;
