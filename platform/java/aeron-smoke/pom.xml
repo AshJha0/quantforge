@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- K-3 Aeron smoke programs (specifications/12-platform/adapters.md 2.2, KR-273). A separate Maven project:
+     the numerical library (java25/) never depends on it. Simulated; not connected to any venue. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.quantforge</groupId>
+  <artifactId>aeron-smoke</artifactId>
+  <version>0.1.0</version>
+  <properties><maven.compiler.release>25</maven.compiler.release><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>
+  <dependencies>
+    <!-- Apache 2.0; aeron-all bundles Agrona. -->
+    <dependency><groupId>io.aeron</groupId><artifactId>aeron-all</artifactId><version>1.48.0</version></dependency>
+  </dependencies>
+  <build>
+    <finalName>aeron-smoke</finalName>
+    <plugins>
+      <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.16.0</version></plugin>
+      <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>3.5.1</version></plugin>
+      <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId><version>3.6.2</version>
+        <executions><execution><phase>package</phase><goals><goal>shade</goal></goals>
+          <configuration><createDependencyReducedPom>false</createDependencyReducedPom></configuration>
+        </execution></executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

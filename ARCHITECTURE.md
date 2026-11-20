@@ -273,5 +273,23 @@ Every label below is fixed in a spec and printed on the output or row it qualifi
 | Daily curve run | "fitted to public US Treasury par yields with a library Nelson-Siegel fit; not an official curve"; Fed comparison "consistency check, not proof" | one fitted curve compared with another; neither is the truth | `specifications/12-platform/daily-curve-run.md` |
 | Sensitivity-based initial margin (`xva.sbim.ir_delta` goldens, K-8h table) | "placeholder weights" | `RW = 10 x k`, `rho = 1 - 0.1 abs(k - l)`; no ISDA material; not a margin anyone could post | `specifications/06-risk/sbim-placeholder.md`, KR-130, KR-150 |
 | Bermudan ladder, both methods | R6 use restriction: not for hedging | `CN_RANNACHER_SMOOTHED` passes acceptance only in-sample at 201/100 | ruling KR-113, `docs/model-inventory.md` |
+| K-3 feed codecs and adapter results | "simulated; not a certified implementation; not connected to any venue" | this project's own simplified FIX-, ITCH-, OUCH-, FAST- and MoldUDP64-style formats from recalled public knowledge; symbol `QFSIM`; no venue, broker or vendor connection | `specifications/12-platform/adapters.md` section 3, KR-274, KR-275 (confirmed 2026-11-20) |
 
 Not in the table because they are not simulated: SA-CCR and the FRTB backtesting operations compute the regulator's formulas on the inputs they are given, and their goldens include the Basel published examples (CRE99, MAR99 Table 2). The other inputs in the stage K goldens are synthetic.
+
+#### K-3 adapters and simulated feeds (branch `k-v1-k3`, rulings proposed)
+
+Plain idea: the libraries compute; an adapter only carries their inputs and outputs through a piece of infrastructure. So an adapter's test is a round trip, not a number: 10,000 known records go in, come back out, and one SHA-256 over their canonical form must match on both sides. ADR-0006 puts services last, so all of this sits outside the library trees and the libraries build without it.
+
+Formal statement (`specifications/12-platform/adapters.md` 0.2.0; rulings KR-270 to KR-283 in `specifications/stage-k-rulings-k3.md`, confirmed 2026-11-20).
+
+| Part | Where | Depends on | Tested where |
+|---|---|---|---|
+| Feed codecs QF-FIX-S, QF-ITCH-S, QF-OUCH-S, QF-FAST-S, QF-MOLD-S | `platform/python/quantforge_adapters/feeds/` | Python standard library | locally and in `adapters-codecs`: 17 fixtures, 39 malformed inputs, round-trip properties, random-byte fuzzing |
+| Records and content hash | `quantforge_adapters/records.py`, `datasets/adapters/records-10000.jsonl` | the library's `core.rng` (generation only) | locally; canonical form byte-identical to `quantforge_core.snapshot.canonical` over all 10,000 records |
+| Adapters and smoke driver | `quantforge_adapters/adapters.py`, `smoke.py`, `services/` | client libraries as optional extras | locally against in-process fakes; containers in `adapter-smoke-*` on GitHub Actions only, **untested until its first run** |
+| Compose stacks | `platform/compose/<adapter>/compose.yaml`, `images.lock` | digest-pinned free images | GitHub Actions only |
+| Aeron programs | `platform/java/aeron-smoke` (separate Maven project) | `io.aeron:aeron-all` | 10,000 messages over UDP on the laptop (measured 2026-11-20; not in a container); container run in CI only |
+| Library isolation | `tools/check_adapter_deps.py`, job `libraries-without-services` | none | repo gates (every pull request) and `adapters.yml` |
+
+Worked example (adapters.md 1.2, measured 2026-11-20 by `platform/python/tests/test_records.py`): the record `{"seq":1,"kind":"quote","body":{"bid":"101.25","ask":"101.26"}}` has the 79-byte canonical form `{"body":{"ask":"101.26","bid":"101.25"},"kind":"quote","seq":#3ff0000000000000}`; the content hash of the one-record list is SHA-256 of those bytes plus a line feed. A store that returns the record with its keys reordered (PostgreSQL `jsonb` does) still matches, because the hash is over the canonical form, not the stored text; a store that changes one character of a price does not. The developer guide is `docs/developer-guides/adapters.md`.

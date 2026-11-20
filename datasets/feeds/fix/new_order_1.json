@@ -1,0 +1,40 @@
+{
+ "format": "QF-FIX-S",
+ "label": "simulated; not a certified implementation; not connected to any venue",
+ "fields": {
+  "msg_type": "D",
+  "seq": 2,
+  "sender": "QFA",
+  "target": "QFB",
+  "body": [
+   [
+    11,
+    "QF1"
+   ],
+   [
+    55,
+    "QFSIM"
+   ],
+   [
+    54,
+    "1"
+   ],
+   [
+    38,
+    "100"
+   ],
+   [
+    40,
+    "2"
+   ],
+   [
+    44,
+    "101.25"
+   ]
+  ]
+ },
+ "hex": "383d514653494d2e3101393d36370133353d440133343d320134393d5146410135363d5146420131313d5146310135353d514653494d0135343d310133383d3130300134303d320134343d3130312e32350131303d30363601",
+ "length": 89,
+ "sha256": "a9e6f6098769d3e995f211213467fe4ddd3a638d54a03a6f5e2542cd78360fcf",
+ "derivation": "specifications/12-platform/adapters.md section 3.1"
+}

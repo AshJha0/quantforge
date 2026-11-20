@@ -1,0 +1,183 @@
+name: Adapters
+# K-3 infrastructure adapters and simulated feeds (specifications/12-platform/adapters.md; rulings KR-270 to
+# KR-283, confirmed 2026-11-20). Containers run here only, never on the development laptop (SC-2). Every image is pinned by
+# digest in platform/compose/images.lock; the smoke driver refuses a tag-only image (UNPINNED).
+# Simulated; not a certified implementation; not connected to any venue.
+on:
+  pull_request:
+    paths:
+      - 'platform/**'
+      - 'datasets/feeds/**'
+      - 'datasets/adapters/**'
+      - 'tools/adapters/**'
+      - 'tools/check_adapter_deps.py'
+      - '.github/workflows/adapters.yml'
+  schedule:
+    - cron: '41 4 * * 2'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: adapters-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  K3_HOST_LABEL: GitHub Actions runner
+
+jobs:
+  codecs:
+    name: adapters-codecs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: hand-built feed fixtures are current (adapters.md 3.6)
+        run: python3 tools/adapters/build_feed_fixtures.py --check
+      - name: codecs, records, adapters against in-process fakes (AD2, AD3 in process, AD5)
+        working-directory: platform/python
+        run: >
+          uv run --no-project --python 3.13 --with pytest==9.2.0 --with hypothesis==6.170.15 --with pyarrow==26.0.1
+          --with ruff==0.17.5 --with mypy==2.4.1
+          sh -c 'python -m pytest -q tests && ruff check . && ruff format --check . && mypy quantforge_adapters'
+
+  without-services:
+    name: libraries-without-services
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      MAVEN_ARGS: --settings ${{ github.workspace }}/java25/.mvn/ci-settings.xml
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: static check of the four library trees, after its planted faults (KR-281)
+        run: python3 tools/check_adapter_deps.py --self-test && python3 tools/check_adapter_deps.py
+      - name: Python library builds and imports with no adapter package installed (AD4)
+        working-directory: python
+        run: |
+          uv sync --locked
+          uv run python - <<'EOF'
+          import importlib, pkgutil, sys
+          import quantforge_core
+          names = [m.name for m in pkgutil.walk_packages(quantforge_core.__path__, "quantforge_core.")]
+          for n in names:
+              importlib.import_module(n)
+          forbidden = ("quantforge_adapters", "grpc", "pyarrow", "kafka", "pg8000", "psycopg", "prometheus_client")
+          loaded = sorted(m for m in sys.modules if m.split(".")[0] in forbidden)
+          assert not loaded, loaded
+          try:
+              import quantforge_adapters  # noqa: F401
+          except ModuleNotFoundError:
+              print(f"imported {len(names)} library modules; no adapter module present or loaded")
+          else:
+              raise SystemExit("quantforge_adapters is importable in the library environment")
+          EOF
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "25.0.5"
+          cache: maven
+      - name: Java library packages without the adapter project (AD4)
+        working-directory: java25
+        run: mvn -B -q -DskipTests package
+
+  smoke:
+    name: adapter-smoke-${{ matrix.adapter }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter: [rest, grpc, arrow-ipc, arrow-flight, kafka, postgres, clickhouse, prometheus, aeron]
+    env:
+      A: ${{ matrix.adapter }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: adapter environment (client libraries pinned in platform/python/pyproject.toml)
+        run: uv venv --python 3.13 .venv-k3 && uv pip install --python .venv-k3 -e "platform/python[all]"
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        if: matrix.adapter == 'aeron'
+        with:
+          distribution: temurin
+          java-version: "25.0.5"
+          cache: maven
+      - name: build the Aeron programs
+        if: matrix.adapter == 'aeron'
+        working-directory: platform/java/aeron-smoke
+        run: mvn -B -q --settings "$GITHUB_WORKSPACE/java25/.mvn/ci-settings.xml" package
+      - name: write, restart the store, read, compare hashes, run the planted faults (AD1, AD5)
+        run: |
+          set -euo pipefail
+          PY=.venv-k3/bin/python
+          case "$A" in
+            arrow-ipc) $PY -m quantforge_adapters.smoke arrow-ipc --phase all; exit $? ;;
+            arrow-flight) D=arrow ;;
+            *) D=$A ;;
+          esac
+          F=platform/compose/$D/compose.yaml
+          if [ "$A" = aeron ]; then
+            $PY -m quantforge_adapters.smoke aeron --phase write
+            docker compose -f "$F" up -d
+            docker compose -f "$F" wait sub pub
+            docker compose -f "$F" logs --tail 20
+            $PY -m quantforge_adapters.smoke aeron --phase read
+            exit $?
+          fi
+          docker compose -f "$F" up -d --wait --wait-timeout 300
+          case "$A" in
+            kafka|postgres|clickhouse)
+              $PY -m quantforge_adapters.smoke "$A" --phase write
+              docker compose -f "$F" restart
+              docker compose -f "$F" up -d --wait --wait-timeout 300
+              $PY -m quantforge_adapters.smoke "$A" --phase read ;;
+            *) $PY -m quantforge_adapters.smoke "$A" --phase all ;;
+          esac
+      - name: container logs on failure
+        if: failure()
+        run: |
+          D=${A%%-*}; [ -f platform/compose/$D/compose.yaml ] && docker compose -f platform/compose/$D/compose.yaml logs --tail 80 || true
+      - name: down
+        if: always()
+        run: |
+          D=${A%%-*}; [ -f platform/compose/$D/compose.yaml ] && docker compose -f platform/compose/$D/compose.yaml down -v || true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: k3-${{ matrix.adapter }}
+          path: benchmarks/results/k3/
+          if-no-files-found: warn
+
+  multicast:
+    name: adapter-smoke-multicast
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: 10,000 ITCH-style messages over QF-MOLD-S multicast to two listeners, then the planted drop (AD3)
+        run: |
+          set -euo pipefail
+          F=platform/compose/multicast/compose.yaml
+          W=platform/compose/multicast/work
+          for DROP in "" 37; do
+            sudo rm -rf "$W" && mkdir -p "$W"  # files written by the containers are owned by root
+            DROP_PACKET="$DROP" docker compose -f "$F" up -d
+            docker compose -f "$F" wait listener1 listener2 sender
+            docker compose -f "$F" logs --tail 20
+            PYTHONPATH=platform/python python3 -m quantforge_adapters.multicast judge --ready "$W/ready" --out "$W/out"
+            docker compose -f "$F" down -v
+            mkdir -p benchmarks/results/k3 && cp "$W/out/L1.json" "benchmarks/results/k3/multicast-L1-drop${DROP:-none}.json"
+          done
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: k3-multicast
+          path: benchmarks/results/k3/
+          if-no-files-found: warn

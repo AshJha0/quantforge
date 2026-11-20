@@ -1,0 +1,17 @@
+{
+ "format": "QF-ITCH-S",
+ "label": "simulated; not a certified implementation; not connected to any venue",
+ "fields": {
+  "type": "E",
+  "locate": 1,
+  "tracking": 0,
+  "timestamp": 34200000001000,
+  "order_ref": 1,
+  "shares": 40,
+  "match": 7
+ },
+ "hex": "45000100001f1aced9f3e80000000000000001000000280000000000000007",
+ "length": 31,
+ "sha256": "8b008857fc419727d3609c72e4dce09b12359709cccc52e0fc0d5e33a105be51",
+ "derivation": "specifications/12-platform/adapters.md section 3.2"
+}
