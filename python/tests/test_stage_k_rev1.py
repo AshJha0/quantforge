@@ -38,7 +38,7 @@ def test_chi_small_z_direct_form_loses_digits() -> None:
 
 
 def test_implied_deep_otm_returns_the_vol() -> None:
-    # Black-76 call F = 100, K = 300, T = 0.1, vol 0.1: price 1.48e-265 (golden ivdeep_k-0008)
+    # Black-76 call F = 100, K = 300, T = 0.1, vol 0.1: price 1.48e-265 (golden ivdeep_c-0008)
     o = Option(BLACK_76, "CALL", 300.0, 0.1, 100.0)
     p = black.price(o, 0.1)
     assert p < 1e-260

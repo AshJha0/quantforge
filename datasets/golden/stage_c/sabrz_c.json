@@ -1,13 +1,13 @@
 {
  "schema_version": "1.0",
- "suite": "sabrz_k",
+ "suite": "sabrz_c",
  "spec": "specifications/05-volatility/sabr.md",
  "spec_version": "1.0.0",
  "generator": "oracle/python/gen_stage_k_rev1.py",
  "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
  "cases": [
   {
-   "case_id": "sabrz_k-0001",
+   "case_id": "sabrz_c-0001",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -30,7 +30,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -44,7 +45,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0002",
+   "case_id": "sabrz_c-0002",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -67,7 +68,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -81,7 +83,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0003",
+   "case_id": "sabrz_c-0003",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -104,7 +106,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -118,7 +121,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0004",
+   "case_id": "sabrz_c-0004",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -141,7 +144,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -155,7 +159,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0005",
+   "case_id": "sabrz_c-0005",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -178,7 +182,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -192,7 +197,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0006",
+   "case_id": "sabrz_c-0006",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -215,7 +220,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -229,7 +235,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0007",
+   "case_id": "sabrz_c-0007",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -252,7 +258,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -266,7 +273,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0008",
+   "case_id": "sabrz_c-0008",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -289,7 +296,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -303,7 +311,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0009",
+   "case_id": "sabrz_c-0009",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -326,7 +334,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -340,7 +349,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0010",
+   "case_id": "sabrz_c-0010",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -363,7 +372,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -377,7 +387,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0011",
+   "case_id": "sabrz_c-0011",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -400,7 +410,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -414,7 +425,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0012",
+   "case_id": "sabrz_c-0012",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -437,7 +448,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -451,7 +463,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0013",
+   "case_id": "sabrz_c-0013",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -474,7 +486,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -488,7 +501,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0014",
+   "case_id": "sabrz_c-0014",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -511,7 +524,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -525,7 +539,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0015",
+   "case_id": "sabrz_c-0015",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -548,7 +562,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -562,7 +577,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0016",
+   "case_id": "sabrz_c-0016",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -585,7 +600,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -599,7 +615,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0017",
+   "case_id": "sabrz_c-0017",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -622,7 +638,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -636,7 +653,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0018",
+   "case_id": "sabrz_c-0018",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -659,7 +676,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -673,7 +691,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0019",
+   "case_id": "sabrz_c-0019",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -696,7 +714,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -710,7 +729,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0020",
+   "case_id": "sabrz_c-0020",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -733,7 +752,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -747,7 +767,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0021",
+   "case_id": "sabrz_c-0021",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -770,7 +790,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -784,7 +805,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0022",
+   "case_id": "sabrz_c-0022",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -807,7 +828,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -821,7 +843,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0023",
+   "case_id": "sabrz_c-0023",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -844,7 +866,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -858,7 +881,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0024",
+   "case_id": "sabrz_c-0024",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -881,7 +904,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -895,7 +919,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0025",
+   "case_id": "sabrz_c-0025",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 0.01,
@@ -925,7 +949,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -940,7 +965,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0026",
+   "case_id": "sabrz_c-0026",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 0.01,
@@ -970,7 +995,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -985,7 +1011,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0027",
+   "case_id": "sabrz_c-0027",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -1010,7 +1036,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -1024,7 +1051,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0028",
+   "case_id": "sabrz_c-0028",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -1049,7 +1076,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -1063,7 +1091,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0029",
+   "case_id": "sabrz_c-0029",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -1088,7 +1116,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -1102,7 +1131,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0030",
+   "case_id": "sabrz_c-0030",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -1127,7 +1156,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -1141,7 +1171,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0031",
+   "case_id": "sabrz_c-0031",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -1166,7 +1196,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",
@@ -1180,7 +1211,7 @@
    }
   },
   {
-   "case_id": "sabrz_k-0032",
+   "case_id": "sabrz_c-0032",
    "operation": "vol.sabr.hagan",
    "inputs": {
     "forward": 100.0,
@@ -1205,7 +1236,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"
    ],
    "tags": [
     "stage_k",

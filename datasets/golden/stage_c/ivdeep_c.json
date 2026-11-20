@@ -1,13 +1,13 @@
 {
  "schema_version": "1.0",
- "suite": "ivdeep_k",
+ "suite": "ivdeep_c",
  "spec": "specifications/05-volatility/black-models.md",
  "spec_version": "1.0.0",
  "generator": "oracle/python/gen_stage_k_rev1.py",
  "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
  "cases": [
   {
-   "case_id": "ivdeep_k-0001",
+   "case_id": "ivdeep_c-0001",
    "operation": "vol.option.implied",
    "inputs": {
     "model": "BLACK_76",
@@ -26,7 +26,8 @@
    },
    "tolerance_class": "root_finding",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
    ],
    "tags": [
     "stage_k",
@@ -40,7 +41,7 @@
    }
   },
   {
-   "case_id": "ivdeep_k-0002",
+   "case_id": "ivdeep_c-0002",
    "operation": "vol.option.implied",
    "inputs": {
     "model": "BLACK_76",
@@ -59,7 +60,8 @@
    },
    "tolerance_class": "root_finding",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
    ],
    "tags": [
     "stage_k",
@@ -73,7 +75,7 @@
    }
   },
   {
-   "case_id": "ivdeep_k-0003",
+   "case_id": "ivdeep_c-0003",
    "operation": "vol.option.implied",
    "inputs": {
     "model": "BLACK_76",
@@ -92,7 +94,8 @@
    },
    "tolerance_class": "root_finding",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
    ],
    "tags": [
     "stage_k",
@@ -106,7 +109,7 @@
    }
   },
   {
-   "case_id": "ivdeep_k-0004",
+   "case_id": "ivdeep_c-0004",
    "operation": "vol.option.implied",
    "inputs": {
     "model": "BLACK_76",
@@ -125,7 +128,8 @@
    },
    "tolerance_class": "root_finding",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
    ],
    "tags": [
     "stage_k",
@@ -139,7 +143,7 @@
    }
   },
   {
-   "case_id": "ivdeep_k-0005",
+   "case_id": "ivdeep_c-0005",
    "operation": "vol.option.implied",
    "inputs": {
     "model": "BLACK_76",
@@ -158,7 +162,8 @@
    },
    "tolerance_class": "root_finding",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
    ],
    "tags": [
     "stage_k",
@@ -172,7 +177,7 @@
    }
   },
   {
-   "case_id": "ivdeep_k-0006",
+   "case_id": "ivdeep_c-0006",
    "operation": "vol.option.implied",
    "inputs": {
     "model": "BACHELIER",
@@ -191,7 +196,8 @@
    },
    "tolerance_class": "root_finding",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
    ],
    "tags": [
     "stage_k",
@@ -205,7 +211,7 @@
    }
   },
   {
-   "case_id": "ivdeep_k-0007",
+   "case_id": "ivdeep_c-0007",
    "operation": "vol.option.implied",
    "inputs": {
     "model": "BACHELIER",
@@ -224,7 +230,8 @@
    },
    "tolerance_class": "root_finding",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
    ],
    "tags": [
     "stage_k",
@@ -238,7 +245,7 @@
    }
   },
   {
-   "case_id": "ivdeep_k-0008",
+   "case_id": "ivdeep_c-0008",
    "operation": "vol.option.implied",
    "inputs": {
     "model": "BLACK_76",
@@ -257,7 +264,8 @@
    },
    "tolerance_class": "root_finding",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
    ],
    "tags": [
     "stage_k",
@@ -271,7 +279,7 @@
    }
   },
   {
-   "case_id": "ivdeep_k-0009",
+   "case_id": "ivdeep_c-0009",
    "operation": "vol.option.implied",
    "inputs": {
     "model": "BLACK_76",
@@ -290,7 +298,8 @@
    },
    "tolerance_class": "root_finding",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
    ],
    "tags": [
     "stage_k",
@@ -304,7 +313,7 @@
    }
   },
   {
-   "case_id": "ivdeep_k-0010",
+   "case_id": "ivdeep_c-0010",
    "operation": "vol.option.implied",
    "inputs": {
     "model": "BLACK_76",
@@ -323,7 +332,8 @@
    },
    "tolerance_class": "root_finding",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
    ],
    "tags": [
     "stage_k",
@@ -337,7 +347,7 @@
    }
   },
   {
-   "case_id": "ivdeep_k-0011",
+   "case_id": "ivdeep_c-0011",
    "operation": "vol.option.implied",
    "inputs": {
     "model": "BACHELIER",
@@ -364,7 +374,7 @@
    "description": "price 1.58e-319; KR-341 estimate 6.5e-05: the price does not identify the vol"
   },
   {
-   "case_id": "ivdeep_k-0012",
+   "case_id": "ivdeep_c-0012",
    "operation": "vol.option.implied",
    "inputs": {
     "model": "BACHELIER",
@@ -383,7 +393,8 @@
    },
    "tolerance_class": "root_finding",
    "verified_by": [
-    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
    ],
    "tags": [
     "stage_k",

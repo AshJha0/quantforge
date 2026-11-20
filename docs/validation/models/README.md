@@ -21,10 +21,10 @@ No model is Validated in the ladder's sense (tested on real data against an inde
 | [M11](m11.md) | CDS | Implemented | 4 | 42 | 30 of 34 (88.2%) |
 | [M12](m12.md) | Equity | Implemented | 10 | 28 | 0 of 15 (0.0%) |
 | [M13](m13.md) | Inflation | Implemented | 4 | 11 | 0 of 11 (0.0%) |
-| [M14](m14.md) | Black-76 and Bachelier | Implemented | 2 | 218 | 5 of 5 (100.0%) |
+| [M14](m14.md) | Black-76 and Bachelier | Implemented | 2 | 229 | 5 of 5 (100.0%) |
 | [M15](m15.md) | Caps, floors, swaptions | Implemented | 2 | 22 | 22 of 22 (100.0%) |
 | [M16](m16.md) | Smile, SVI, SSVI, surface | Implemented | 9 | 35 | not in the share table |
-| [M17](m17.md) | SABR | Implemented | 4 | 35 | not in the share table |
+| [M17](m17.md) | SABR | Implemented | 4 | 67 | not in the share table |
 | [M18](m18.md) | Commodities | Implemented | 2 | 4 | 0 of 4 (0.0%) |
 | [M19](m19.md) | Agency MBS | Implemented | 2 | 8 | 0 of 6 (0.0%) |
 | [M20](m20.md) | Rates sensitivities | Implemented | 2 | 10 | not in the share table |
@@ -63,7 +63,7 @@ No model is Validated in the ladder's sense (tested on real data against an inde
 | [MF-9](mf-9.md) | FRTB-SA GIRR delta (Q2) | Implemented | 2 | 18 | 13 of 13 (100.0%) |
 | [MF-10](mf-10.md) | Book lifecycle and marks (F5) | Implemented | 2 | 23 | 23 of 23 (100.0%) |
 | [MF-11](mf-11.md) | Factor attribution (use case 4) | Implemented | 3 | 6 | not in the share table |
-| [MG-1](mg-1.md) | One-factor short-rate models (G1) | Implemented | 9 | 240 | 175 of 190 (92.1%) |
+| [MG-1](mg-1.md) | One-factor short-rate models (G1) | Implemented | 9 | 240 | 151 of 162 (93.2%) |
 | [MG-2](mg-2.md) | Discrete barrier correction (R9) | Implemented | 1 | 70 | 8 of 9 (88.9%) |
 | [MG-3](mg-3.md) | Monte Carlo Greeks (Q9 part 1) | Implemented | 1 | 12 | 0 of 12 (0.0%) |
 | [MG-4](mg-4.md) | Closed-form swap exposure and CVA (G5a) | Implemented | 1 | 7 | 0 of 7 (0.0%) |
