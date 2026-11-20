@@ -1,4 +1,4 @@
-"""Stage K wave 1b goldens: SA-CCR (K-8d, suite saccr_k), FRTB IMA backtesting (K-8e, suite btk_k) and
+﻿"""Stage K wave 1b goldens: SA-CCR (K-8d, suite saccr_k), FRTB IMA backtesting (K-8e, suite btk_k) and
 the MAR99 Table 2 outside check of the existing stage F operation risk.backtest.traffic_light
 (suite tlk_k).
 
@@ -274,6 +274,10 @@ BLIND_BTK = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_BTK.md)
 # Printed-figure blind lane (program/STAGE_K_BLIND_PUB.md, compare fixed at 00167bf5): 28 of 28 MATCH at full
 # tolerance (saccr_k-0001..0005, btk_k-0001..0012, tlk_k-0001..0011), counted per KR-250; recorded 2026-11-20.
 BLIND_PUB = "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_PUB.md): MATCH"
+# tlk_k v2 blind lane (program/STAGE_K_BLIND_TLK_V2.md, compare fixed and pushed at 51180fb2, results 370f24d7):
+# 9 of 9 MATCH, 6 counted; tlk_k-0016..0018 (n = 1) matched but are not counted: the rules text gives the answer.
+BLIND_TLK = "blind re-derivation DR-H2 2026-11-20 (program/STAGE_K_BLIND_TLK_V2.md): MATCH"
+BLIND_TLK_NC = "blind lane program/STAGE_K_BLIND_TLK_V2.md 2026-11-20 matched, not counted: not blind (n = 1, the rules text gives P = c)"
 
 
 def gen_saccr():
@@ -606,7 +610,7 @@ def gen_traffic_light():
         zone = "GREEN" if cum < 0.95 else "YELLOW" if cum < 0.9999 else "RED"
         s.add("risk.backtest.traffic_light", {"observations": n, "exceptions": x, "confidence": conf},
               {"cumulative_probability": cum, "zone": zone, "plus_factor": None},
-              verified=[f"{kr253}: {how}", SCIPY + ": binom.cdf MATCH 1e-12"],
+              verified=[f"{kr253}: {how}", SCIPY + ": binom.cdf MATCH 1e-12", BLIND_TLK],
               tags=["stage_k", "traffic_light", "outside_checked"], output_classes=oc,
               limit={"absolute": 1e-15, "relative": 1e-12},
               description=f"KR-253: {n:,} observations, {x:,} exceptions at {conf}: the stage J binomial at large n "
@@ -632,8 +636,9 @@ def gen_traffic_light():
         s.add("risk.backtest.traffic_light", {"observations": n, "exceptions": x, "confidence": conf},
               {"cumulative_probability": cum, "zone": zone, "plus_factor": plus},
               verified=[f"{kr253} amendment: exact rational arithmetic with q = c exactly (Python fractions)",
-                        "hand" if n == 1 else SCIPY + ": binom.cdf MATCH 1e-12"],
-              tags=["stage_k", "traffic_light", "boundary"], output_classes=oc,
+                        "hand" if n == 1 else SCIPY + ": binom.cdf MATCH 1e-12",
+                        BLIND_TLK_NC if n == 1 else BLIND_TLK],
+              tags=["stage_k", "traffic_light", "boundary"] + ([] if n == 1 else ["outside_checked"]), output_classes=oc,
               limit={"absolute": 0.0, "relative": 0.0} if n == 1 else {"absolute": 1e-15, "relative": 1e-12},
               description=f"KR-253 amendment: {n} observation(s), {x} exception(s) at {conf}: "
                           + ("P(X <= 0) = c exactly, on the zone edge" if n == 1 else
