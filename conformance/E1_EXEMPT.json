@@ -30,5 +30,6 @@
  "rates.schedule.generate": "no Real input in any golden: a non-finite value cannot be sent",
  "research.cv.cpcv_paths": "no Real input in any golden: a non-finite value cannot be sent",
  "risk.frtb.backtest.desk": "no Real input in any golden: a non-finite value cannot be sent (five Integer counts; a non-finite token is E_SCHEMA, not an integer)",
- "risk.frtb.backtest.zone": "no Real input in any golden except btk_k-0029, which expects E_SCHEMA (a non-integer count is refused; ruling KR-112, owner decision 2026-11-19): three Integer counts; a non-finite token is E_SCHEMA, not an integer"
+ "risk.frtb.backtest.zone": "no Real input in any golden except btk_k-0029, which expects E_SCHEMA (a non-integer count is refused; ruling KR-112, owner decision 2026-11-19): three Integer counts; a non-finite token is E_SCHEMA, not an integer",
+ "risk.frtb.rfet": "no Real input in any golden: a non-finite value cannot be sent (dates only: as_of and observation dates, KR-68/frtb-ima.md; added at integration 2026-11-20)"
 }

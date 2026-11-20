@@ -8,12 +8,19 @@ name: Docs
 # pa11y AA a second time on a copy of the site with the dark colours forced on. docs-site-view-summary writes the
 # table the release notes quote (artifact site-view, file site-view.md). Added 2026-11-20 on branch k-v1-k7b; not
 # yet run in CI.
+# Split 2026-11-20: the docs-site-a11y and docs-site-a11y-summary jobs described below are held on branch k-v1-a11y-ci
+# until every page passes; they are not in this file yet. KR-227 stays not met.
+# KR-227 read strictly (coordinator, 2026-11-20): docs-site-a11y runs pa11y AA (pa11y-ci 3.1.0, as in docs-site) on
+# every page of the built site, light and dark, in 12 shards (tools/check_site_a11y.py), after a planted contrast
+# failure is reported; docs-site-a11y-summary fails if any shard failed or any page was not reported on, and writes
+# the counts for the release notes (artifact site-a11y, a11y-summary.md). Added 2026-11-20 on branch k-v1-a11y; not
+# yet run in CI.
 on:
   push:
     branches: [main]
-    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/check_site_view.py', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
+    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/check_site_view.py', 'tools/check_site_a11y.py', 'tools/a11y_detail.js', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
   pull_request:
-    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/check_site_view.py', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
+    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/check_site_view.py', 'tools/check_site_a11y.py', 'tools/a11y_detail.js', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -39,6 +46,9 @@ jobs:
       - run: uv run --no-project --with markdown==3.11.2 python tools/build_site.py --out site
       # Relative links and #anchors in every tracked .md and every href in the built site (build_site checks files only)
       - run: python3 tools/check_md_anchors.py --site site
+      # Static WCAG pre-check of every built page (lang, title, alt, names, ids, headings, table headers, focusable
+      # scrolling boxes, colour tokens); its planted faults fail first (KR-227)
+      - run: python3 tools/check_site_a11y.py --self-test && python3 tools/check_site_a11y.py --static site
       # WCAG 2 AA, zero errors, on home, LEARN, COOKBOOK and the Curves gallery (plan 13.2 E6)
       - name: accessibility (pa11y-ci, axe and HTML_CodeSniffer)
         run: |
@@ -114,6 +124,10 @@ jobs:
           name: site-view
           path: site-view/
           retention-days: 90
+  # KR-227 read strictly (coordinator, 2026-11-20): pa11y AA on EVERY page of the built site, light and dark.
+  # tools/check_site_a11y.py writes each shard's URL list from the built site; 2 modes x 6 shards of about 137 pages,
+  # pa11y-ci at concurrency 1 in batches of 10 (tools/check_site_a11y.py --run), expected about 8 to 15 minutes a job against 45.
+  # Each job first runs pa11y-ci on a planted contrast failure, which must be reported (--check-plant).
   deploy:
     name: docs-deploy
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && !github.event.repository.private

@@ -153,6 +153,14 @@ gh run download <run-id> --repo AshJha0/quantforge --name site-view --dir site-v
 
 If a page fails, it is fixed or listed in `docs/known-issues.md` with its measured width; it is never left out of the check. Written 2026-11-20 before these jobs first ran in CI (inferred from the workflow file).
 
+pa11y AA on every page (KR-227 read strictly by the coordinator, 2026-11-20) is part of the same run: jobs `docs-site-a11y` (12 shards: light and dark, 6 shards each; each first shows that pa11y-ci reports a planted contrast failure) and `docs-site-a11y-summary`, which fails if any shard failed or any page of the site was not reported on. Download the counts and paste `a11y-summary.md` into the release notes with the layout table: Split 2026-11-20: the jobs `docs-site-a11y` and `docs-site-a11y-summary` are not in `docs.yml` on main yet; they are held on branch `k-v1-a11y-ci` until every page passes (first CI runs, pull request #63: 33 pages per mode were reported for chart-text contrast that the tool could not measure, since changed to light and dark chart images; tutorials 36 and 39 still fail in both modes, cause not established). The tool, its self-test and the site fixes are on main. KR-227 stays not met.
+
+```bash
+gh run download <run-id> --repo AshJha0/quantforge --name site-a11y --dir site-a11y
+```
+
+A page with a pa11y error is fixed in the site templates (`tools/build_site.py`, `tools/site_home.html`) or listed in `docs/known-issues.md` with the rule id and page count; it is never excluded from the URL list. Written 2026-11-20 on branch `k-v1-a11y` before these jobs first ran in CI (inferred from the workflow file).
+
 ## 8. Rollback
 
 **The release run failed before `gh release create`.** Nothing was published. Delete the tag, fix on a branch, merge, tag again:

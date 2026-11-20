@@ -338,8 +338,16 @@ mod tests {
         assert!(operations().windows(2).all(|w| w[0] < w[1]));
         for op in operations() {
             // Every key of `hedge.minvar.ratio` is optional, and its spec makes "neither input
-            // form" an `E_INPUT` (hedge-solvers.md, check 1).
-            let want = if *op == "hedge.minvar.ratio" {
+            // form" an `E_INPUT` (hedge-solvers.md, check 1). The same holds for the stage K wave 2
+            // verbs that take exactly one of several optional inputs (frtb-drc-rrao.md CTP modes,
+            // frtb-ima.md liquidity horizon and ES inputs; KR-306).
+            let one_of = [
+                "hedge.minvar.ratio",
+                "risk.frtb.drc_ctp",
+                "risk.frtb.ima.lh",
+                "risk.frtb.ima.es_lh",
+            ];
+            let want = if one_of.contains(op) {
                 "E_INPUT"
             } else {
                 "E_SCHEMA"

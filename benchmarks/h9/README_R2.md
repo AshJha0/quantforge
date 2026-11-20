@@ -1,4 +1,11 @@
-# H-9 workload R2 and row L7: how to run
+# H-9 workload R2 and row L7: how it was to be run (CLOSED 2026-11-20)
+
+**Closed.** R2 was not obtained. It needed one unbroken 6-hour recording session (HR-134); all 30 sessions on
+2026-11-19 and 2026-11-20 ended before hour 6 (websocket keepalive ping timeouts; whole-connection stalls of 50 to
+107 s seen before drops; cause not established: network path or machine load). The owner ended the attempt on
+2026-11-20 and the recorder is stopped (evidence class: read, recorder log and `r2_status.py`). The workload R MISS
+of 2026-11-19 stands; targets and the 6-hour rule are unchanged. The text below is kept as the record of the
+procedure; it is not running.
 
 Crypto venue; not equities or rates. In-process, simulated feed; no network or venue latency. Local laptop, not the
 acceptance machine.
