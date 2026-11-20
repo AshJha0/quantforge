@@ -725,6 +725,41 @@
     "absolute": 1e-15,
     "relative": 1e-12
    }
+  },
+  {
+   "case_id": "tlk_k-0021",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 1000000,
+    "exceptions": 0,
+    "confidence": 0.999999
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.36787925722106646,
+     "zone": "GREEN",
+     "plus_factor": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "added by lane k-r2-gate 2026-11-20 (audit KF-21): exact integer arithmetic, a^n / 2^(kn) rounded once to binary64; mpmath 60 digits agrees; the audit's own exact check gave the same value"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "power"
+   ],
+   "description": "KF-21: 1,000,000 observations, 0 exceptions at 0.999999: P(X <= 0) = c^n; plain binary64 powering is 7.6e-13 off and fails this tolerance",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 2.3e-16
+   }
   }
  ]
 }

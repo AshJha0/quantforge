@@ -357,4 +357,4 @@ TOTALS: 15999 value 7894 error 5591 invariance 2514
 
 Stage K round 1 (2026-11-19 to 2026-11-20, k-r1 merged as PR #58, then k-r2): waves 1b and 2 Python, K-8, paper and curve daily jobs, margin replacement (`sbim_g`, `sbim_alias_k`), audit A/B/C and follow-up audit responses, E1 NaN goldens, traffic-light large-n and boundary goldens, stage G E1 regenerated (+79). Read from `tools/case_figures.py` at k-r2 2026-11-20.
 
-TOTALS: 16256 value 7989 error 5707 invariance 2560
+TOTALS: 16257 value 7990 error 5707 invariance 2560

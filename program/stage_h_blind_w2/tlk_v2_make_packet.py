@@ -1,4 +1,4 @@
-﻿"""tlk_k v2 blind packet (DR-H2) for tlk_k-0012..0020 (risk.backtest.traffic_light after KR-253).
+"""tlk_k v2 blind packet (DR-H2) for tlk_k-0012..0020 (risk.backtest.traffic_light after KR-253).
 
 Pattern: trig_v2_make_packet.py. Writes into <packet dir> (outside every worktree, empty):
   README.md, specs/traffic-light.blind.md, rulings/kr237-kr253.blind.md, inputs/tlk_k.inputs.json,

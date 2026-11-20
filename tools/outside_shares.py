@@ -4,7 +4,10 @@
     python tools/outside_shares.py            write oracle/OUTSIDE_SHARES.json and oracle/OUTSIDE_SHARES.md
     python tools/outside_shares.py --check    regenerate in memory; exit 1 if the committed copy differs, if a
                                               register's suite totals differ from the goldens, or if a stage is
-                                              under the 60% floor on value-checked cases
+                                              under the 60% floor on value-checked cases, if a stage H or K
+                                              plan item is under the 60% per-item floor (audit KF-19, no
+                                              exemption list), or if a generated stage K block in the docs
+                                              differs (audit KF-18; the blocks are rewritten without --check)
 
 Evidence classes (D6). A case counts towards the outside share only as `library-object` or `library-primitive`,
 and only if every compared output of the case is checked:
@@ -23,6 +26,7 @@ class is ruled per suite in SUITE_CLASS and the per-case regeneration of those r
 """
 import argparse
 import json
+import re
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -388,6 +392,10 @@ def build(problems):
                 v["suites"] = sorted({r[0] for r in rs})
                 v["meets_item_floor"] = (v["share_with_rederivation"] or 0.0) >= FLOOR
                 entry["per_item"][it] = v
+                # Audit KF-19 (2026-11-20): the plan 15 per-item rule is a gate, not a column. No exemption list.
+                if not v["meets_item_floor"]:
+                    problems.append(f"stage {st}: item {it} ({', '.join(v['suites'])}) is {v['counted_with_rederivation']} of "
+                                    f"{v['cases']} ({(v['share_with_rederivation'] or 0):.1%}), under the {FLOOR:.0%} per-item floor")
             if st == "K":
                 # Audit finding KA-C18 (2026-11-19, open): cases counted on a figure printed in the regulator text are
                 # checked on part of their outputs and at print precision, so by the strict reading of the rule above
@@ -418,6 +426,69 @@ def under_review_text(u):
             f"checked\") does not allow. By the strict reading stage K is {s['counted']} of {s['cases']} "
             f"({s['counted'] / s['cases']:.1%}); items under the floor by that reading: {'; '.join(low) or 'none'}. "
             "Neither figure is settled until a ruling says which reading holds.")
+
+
+# Audit KF-18 (2026-11-20): the stage K figures that docs quote are generated into marked blocks,
+#   <!-- generated:NAME -->TEXT<!-- /generated -->
+# on one line, so a block can sit inside a sentence or a table cell. `--check` compares every block byte for byte.
+BLOCK = re.compile(r"<!-- generated:(stage-k-[a-z-]+) -->(.*?)<!-- /generated -->")
+# Docs that state stage K or per-item shares must carry the blocks (a doc may hold more than one copy).
+BLOCK_DOCS = {"README.md": ("stage-k-total", "stage-k-items"), "LEARN.md": ("stage-k-total", "stage-k-items"), "CHANGELOG.md": ("stage-k-total",), "ROADMAP.md": ("stage-k-total", "stage-k-items"), "docs/known-issues.md": ("stage-k-total",),
+              "docs/releases/v0.10.1.md": ("stage-k-total", "stage-k-items")}
+ITEM_NAME = {"K-8": "K-8 method", "K-8d": "K-8d SA-CCR", "K-8e": "K-8e FRTB backtesting"}
+
+
+def item_label(it, v):
+    if it.startswith("K-"):
+        return ITEM_NAME.get(it, it)
+    return " ".join(f"`{x}`" for x in v["suites"])  # an item outside the K numbering, named by its suite
+
+
+def doc_blocks(doc):
+    k = doc["stages"]["K"]
+    w = k["without_sweeps"]
+    parts, low = [], []
+    for it, v in sorted(k["per_item"].items(), key=lambda kv: (not kv[0].startswith("K-"), kv[0])):
+        mark = "" if v["meets_item_floor"] else ", NOT MET"
+        parts.append(f"{item_label(it, v)} {v['counted_with_rederivation']} of {v['cases']} "
+                     f"({(v['share_with_rederivation'] or 0):.1%}{mark})")
+        if not v["meets_item_floor"]:
+            low.append(item_label(it, v) + ("" if it.startswith("K-") else " (the existing stage F traffic light)"))
+    floor = ("every item meets the 60% per-item rule" if not low else
+             "the 60% per-item rule is NOT MET by " + ", ".join(low) + ", recorded as a miss (`oracle/OUTSIDE_SHARES.md`)")
+    return {"stage-k-total": f"{w['counted_with_rederivation']} of {w['cases']} value cases ({w['share_with_rederivation']:.1%})",
+            "stage-k-items": ", ".join(parts) + "; " + floor}
+
+
+def sync_blocks(blocks, write, problems):
+    """Rewrite (or, with write False, compare) every generated block in the tracked Markdown files."""
+    import subprocess
+    files = subprocess.run(["git", "ls-files", "*.md"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
+    seen = defaultdict(set)
+    for rel in files:
+        p = ROOT / rel
+        if not p.is_file():
+            continue
+        text = p.read_text(encoding="utf-8")
+        if "<!-- generated:stage-k-" not in text:
+            continue
+
+        def sub(m, rel=rel):
+            name = m.group(1)
+            seen[rel].add(name)
+            if name not in blocks:
+                problems.append(f"{rel}: unknown generated block {name}")
+                return m.group(0)
+            if m.group(2) != blocks[name] and not write:
+                problems.append(f"{rel}: generated block {name} differs from a fresh run; run tools/outside_shares.py and commit")
+            return f"<!-- generated:{name} -->{blocks[name]}<!-- /generated -->"
+        new = BLOCK.sub(sub, text)
+        if write and new != text:
+            p.write_text(new, encoding="utf-8", newline="\n")
+    for rel, names in BLOCK_DOCS.items():
+        for name in names:
+            if name not in seen[rel]:
+                problems.append(f"{rel}: has no generated block {name} (stage K shares must be quoted from the generator)")
 
 
 def markdown(doc):
@@ -459,9 +530,14 @@ def markdown(doc):
               "Counted from wave 1b: the seven SA-CCR cases the wave-1b blind lane matched (program/STAGE_K_BLIND_W1B.md); SciPy binomial checks on "
               "btk_k are not counted. trig_k lost its wave-1 blind credit when KR-232 redefined false_alarm_rate (the SciPy check does not count); "
               "the K-4c version 2 packet re-derived its 14 value cases, 14 of 14 MATCH, 13 counted (trig_k-0004: fire gap-decided by KR-13; program/STAGE_K_BLIND_TRIG_V2.md). "
+              "That K-4c credit checks a re-implementation of the stated algorithm (the packet gave the rule, the "
+              "deriver wrote it again and matched): it shows the rule is unambiguous and the arithmetic right, not "
+              "that the rule reads the source correctly (audit KF-7). "
               "Later blind packets, counted the same way: K-5a version 2, 9 of 11 (program/STAGE_K_BLIND_K5A_V2.md; "
               "idr_k-0012 and idr_k-0013 mismatched and are not counted), the K-8 ladder k8_k (program/STAGE_K_BLIND_K8.md) and eleven btk_k cases "
-              "(program/STAGE_K_BLIND_BTK.md; btk_k-0017 matched and is not counted). The mpmath oracle is our own and never counts.", "",
+              "(program/STAGE_K_BLIND_BTK.md; btk_k-0017 matched and is not counted) and the KR-253 traffic-light goldens tlk_k-0012 to -0020 "
+              "(program/STAGE_K_BLIND_TLK_V2.md; 9 of 9 matched, 6 counted: the three n = 1 cases tlk_k-0016 to -0018 have the answer in "
+              "the rule text and are not counted; tlk_k-0021 was added later and has no blind re-derivation). The mpmath oracle is our own and never counts.", "",
               "| Item | Suites | Value cases | Blind | Share | 60% per item |", "|---|---|---:|---:|---:|---|"]
         L += [f"| {it} | {', '.join('`' + s + '`' for s in v['suites'])} | {v['cases']} | {v['counted_with_rederivation']} | "
               f"{(v['share_with_rederivation'] or 0):.1%} | {'met' if v['meets_item_floor'] else 'NOT MET'} |" for it, v in ek["per_item"].items()]
@@ -508,6 +584,7 @@ def main(argv=None):
     else:
         jp.write_text(js, encoding="utf-8", newline="\n")
         mp.write_text(md, encoding="utf-8", newline="\n")
+    sync_blocks(doc_blocks(doc), not a.check, problems)
     for st, e in doc["stages"].items():
         w = e["without_sweeps"]
         print(f"stage {st}: value {w['counted']} of {w['cases']} = {w['share']:.1%}, old all-case {w['all_cases_share']:.1%}, with sweeps {e['with_sweeps']['share']:.1%}"

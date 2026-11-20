@@ -44,7 +44,7 @@ Source: `oracle/OUTSIDE_SHARES.json` (written by `tools/outside_shares.py`). Flo
 | I | 153 | 102 | 66.7% | 102 | 66.7% | met |
 | J | 215 | 143 | 66.5% | 143 | 66.5% | met |
 | H | 205 | 0 | 0.0% | 160 | 78.0% | met |
-| K | 122 | 0 | 0.0% | 97 | 79.5% | met |
+| K | 123 | 0 | 0.0% | 97 | 78.9% | met |
 
 Stage H per plan item (plan section 15: at least 60.0% of each item's value cases):
 
@@ -73,7 +73,7 @@ Stage K per plan item (plan section 15: at least 60.0% of each item's value case
 
 | Item | Suites | Value cases | Counted | Share | Per item |
 |---|---|---:|---:|---:|---|
-| F (existing traffic_light) | `tlk_k` | 20 | 17 | 85.0% | met |
+| F (existing traffic_light) | `tlk_k` | 21 | 17 | 81.0% | met |
 | K-4a | `bt_k` | 10 | 6 | 60.0% | met |
 | K-4b | `inc_k` | 6 | 4 | 66.7% | met |
 | K-4c | `trig_k` | 14 | 13 | 92.9% | met |
