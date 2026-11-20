@@ -65,6 +65,7 @@ pub mod joint;
 pub mod json;
 pub mod linalg;
 pub mod lit_matching;
+pub mod live_snapshot;
 pub mod lmm;
 pub mod mbs;
 pub mod mc;

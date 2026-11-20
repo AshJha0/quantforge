@@ -1,0 +1,224 @@
+{
+ "label": "latency-aware analytics on simulated data",
+ "spec": "specifications/12-platform/lock-free-snapshots.md",
+ "rulings": "specifications/stage-k-rulings-k5.md (KR-280 to KR-288, confirmed 2026-11-20)",
+ "data": "simulated; book drawn from random.Random(20261120); no market data",
+ "shift_rule": "version 0: 0; version k >= 1: ((k * 7919) mod 401 - 200) * 5e-5",
+ "checksum": {
+  "seed": "0x9E3779B97F4A7C15",
+  "mul": "0x94D049BB133111EB",
+  "rotl": 27
+ },
+ "book": [
+  {
+   "notional": -92000.0,
+   "maturity": 17.65,
+   "yield": 0.0293
+  },
+  {
+   "notional": 472000.0,
+   "maturity": 6.58,
+   "yield": 0.017
+  },
+  {
+   "notional": -783000.0,
+   "maturity": 27.73,
+   "yield": 0.0312
+  },
+  {
+   "notional": 761000.0,
+   "maturity": 4.01,
+   "yield": 0.0209
+  },
+  {
+   "notional": -44000.0,
+   "maturity": 11.18,
+   "yield": 0.0265
+  },
+  {
+   "notional": 193000.0,
+   "maturity": 19.8,
+   "yield": 0.0249
+  },
+  {
+   "notional": -388000.0,
+   "maturity": 1.84,
+   "yield": 0.0458
+  },
+  {
+   "notional": 180000.0,
+   "maturity": 27.24,
+   "yield": 0.0301
+  },
+  {
+   "notional": -356000.0,
+   "maturity": 11.51,
+   "yield": 0.0284
+  },
+  {
+   "notional": -969000.0,
+   "maturity": 23.34,
+   "yield": 0.0395
+  },
+  {
+   "notional": -277000.0,
+   "maturity": 7.1,
+   "yield": 0.0348
+  },
+  {
+   "notional": 493000.0,
+   "maturity": 12.79,
+   "yield": 0.0122
+  },
+  {
+   "notional": 777000.0,
+   "maturity": 15.72,
+   "yield": 0.0258
+  },
+  {
+   "notional": -18000.0,
+   "maturity": 13.91,
+   "yield": 0.0593
+  },
+  {
+   "notional": -442000.0,
+   "maturity": 12.23,
+   "yield": 0.0285
+  },
+  {
+   "notional": 511000.0,
+   "maturity": 17.38,
+   "yield": 0.0586
+  },
+  {
+   "notional": -921000.0,
+   "maturity": 15.61,
+   "yield": 0.0432
+  },
+  {
+   "notional": -783000.0,
+   "maturity": 6.3,
+   "yield": 0.0185
+  },
+  {
+   "notional": 685000.0,
+   "maturity": 2.12,
+   "yield": 0.0535
+  },
+  {
+   "notional": -327000.0,
+   "maturity": 8.66,
+   "yield": 0.0268
+  }
+ ],
+ "hedge": {
+  "maturity": 10.0,
+  "yield": 0.04
+ },
+ "race": {
+  "publishes_default": 20000,
+  "publishes_long": 1000000,
+  "publishes_long_r16": 200000,
+  "readers": [
+   1,
+   4,
+   16
+  ],
+  "verify_every": 64
+ },
+ "exactness_publishes": 1000,
+ "tolerance_relative": 1e-09,
+ "expected": [
+  {
+   "version": 0,
+   "shift": 0.0,
+   "estimate_pnl": 0.0,
+   "bound": 0.0,
+   "book_delta": 14384841.98122617,
+   "hedge_unit_delta": -6.703200460356394,
+   "hedge_notional": 2145966.2539260183
+  },
+  {
+   "version": 1,
+   "shift": 0.005,
+   "estimate_pnl": 67545.43903958287,
+   "bound": 458.7282545849789,
+   "book_delta": 12740024.14947548,
+   "hedge_unit_delta": -6.376281516217733,
+   "hedge_notional": 1998033.5117061418
+  },
+  {
+   "version": 2,
+   "shift": -5e-05,
+   "estimate_pnl": -719.6799761479635,
+   "bound": 0.00045922895816162757,
+   "book_delta": 14402368.213034369,
+   "hedge_unit_delta": -6.706552898626297,
+   "hedge_notional": 2147506.8385704383
+  },
+  {
+   "version": 3,
+   "shift": -0.0051,
+   "estimate_pnl": -77918.36731381,
+   "bound": 544.3478037028868,
+   "book_delta": 16292702.320862105,
+   "hedge_unit_delta": -7.053931302699544,
+   "hedge_notional": 2309733.625365316
+  },
+  {
+   "version": 200,
+   "shift": 0.00255,
+   "estimate_pnl": 35542.4287497376,
+   "bound": 60.850761699688995,
+   "book_delta": 13519917.306725476,
+   "hedge_unit_delta": -6.534429819448869,
+   "hedge_notional": 2069027.8540424788
+  },
+  {
+   "version": 401,
+   "shift": -0.01,
+   "estimate_pnl": -161363.50327845366,
+   "bound": 4572.503200601582,
+   "book_delta": 18375587.956910502,
+   "hedge_unit_delta": -7.4081822068171785,
+   "hedge_notional": 2480444.9248023173
+  },
+  {
+   "version": 402,
+   "shift": 0.005,
+   "estimate_pnl": 67545.43903958287,
+   "bound": 458.7282545849789,
+   "book_delta": 12740024.14947548,
+   "hedge_unit_delta": -6.376281516217733,
+   "hedge_notional": 1998033.5117061418
+  },
+  {
+   "version": 500,
+   "shift": -0.008700000000000001,
+   "estimate_pnl": -138405.2919122284,
+   "bound": 2925.570632919139,
+   "book_delta": 17797248.802633617,
+   "hedge_unit_delta": -7.31249912568882,
+   "hedge_notional": 2433812.093065674
+  },
+  {
+   "version": 999,
+   "shift": -0.00235,
+   "estimate_pnl": -34771.64914030195,
+   "bound": 50.136867626470995,
+   "book_delta": 15233183.916522121,
+   "hedge_unit_delta": -6.86259117686769,
+   "hedge_notional": 2219742.299070632
+  },
+  {
+   "version": 1000,
+   "shift": -0.0074,
+   "estimate_pnl": -116039.0903671604,
+   "bound": 1749.3309292065292,
+   "book_delta": 17237873.042945184,
+   "hedge_unit_delta": -7.218051874317157,
+   "hedge_notional": 2388161.4240374137
+  }
+ ],
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)"
+}

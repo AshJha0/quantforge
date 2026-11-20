@@ -66,5 +66,34 @@
         </plugin>
       </plugins></build>
     </profile>
+    <!-- Stage K, K-5 (KR-285): jcstress race tests of the snapshot cell. Not part of the normal build.
+         Short run (quick mode):  mvn -B -Pjcstress package exec:exec@jcstress
+         CI run (default mode):   mvn -B -Pjcstress -Djcstress.mode=default package exec:exec@jcstress
+         jcstress is an OpenJDK test harness (GPL-2.0 with the Classpath exception), used only in this profile. -->
+    <profile>
+      <id>jcstress</id>
+      <properties><jcstress.version>0.16</jcstress.version><jcstress.mode>quick</jcstress.mode></properties>
+      <dependencies>
+        <dependency><groupId>org.openjdk.jcstress</groupId><artifactId>jcstress-core</artifactId><version>${jcstress.version}</version></dependency>
+      </dependencies>
+      <!-- Its own output directory, so jcstress classes never linger in target/ for the normal build. -->
+      <build><directory>${project.basedir}/target-jcstress</directory><plugins>
+        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.8.0</version>
+          <executions><execution><id>jcstress-sources</id><phase>generate-sources</phase><goals><goal>add-source</goal></goals>
+            <configuration><sources><source>src/jcstress/java</source></sources></configuration></execution></executions>
+        </plugin>
+        <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.16.0</version>
+          <configuration><annotationProcessorPaths><path><groupId>org.openjdk.jcstress</groupId><artifactId>jcstress-core</artifactId><version>${jcstress.version}</version></path></annotationProcessorPaths></configuration>
+        </plugin>
+        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>exec-maven-plugin</artifactId><version>3.7.0</version>
+          <executions><execution><id>jcstress</id><goals><goal>exec</goal></goals>
+            <configuration><executable>java</executable>
+              <arguments><argument>-cp</argument><classpath/><argument>org.openjdk.jcstress.Main</argument><argument>-v</argument>
+                <argument>-m</argument><argument>${jcstress.mode}</argument><argument>-t</argument><argument>org.quantforge.jcstress</argument>
+                <argument>-r</argument><argument>${project.build.directory}/jcstress-results</argument></arguments>
+            </configuration></execution></executions>
+        </plugin>
+      </plugins></build>
+    </profile>
   </profiles>
 </project>
