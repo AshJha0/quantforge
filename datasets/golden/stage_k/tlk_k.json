@@ -390,6 +390,330 @@
     "zone": "date_and_convention",
     "plus_factor": "date_and_convention"
    }
+  },
+  {
+   "case_id": "tlk_k-0012",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 100000,
+    "exceptions": 1050,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.9448722135510369,
+     "zone": "GREEN",
+     "plus_factor": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "added by lane k-r2-tl 2026-11-20 (ruling KR-253): exact rational arithmetic at the binary64 p (Python fractions)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked"
+   ],
+   "description": "KR-253: 100,000 observations, 1,050 exceptions at 0.99: the stage J binomial at large n (the lgamma form drifted past 1e-10 here)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "tlk_k-0013",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 100000,
+    "exceptions": 2600,
+    "confidence": 0.975
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.9786033201901807,
+     "zone": "YELLOW",
+     "plus_factor": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "added by lane k-r2-tl 2026-11-20 (ruling KR-253): exact rational arithmetic at the binary64 p (Python fractions)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked"
+   ],
+   "description": "KR-253: 100,000 observations, 2,600 exceptions at 0.975: the stage J binomial at large n (the lgamma form drifted past 1e-10 here)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "tlk_k-0014",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 1000000,
+    "exceptions": 10164,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.9505763522838253,
+     "zone": "YELLOW",
+     "plus_factor": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "added by lane k-r2-tl 2026-11-20 (ruling KR-253): mpmath 50 digits at the binary64 p (term recurrence)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked"
+   ],
+   "description": "KR-253: 1,000,000 observations, 10,164 exceptions at 0.99: the stage J binomial at large n (the lgamma form drifted past 1e-10 here)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "tlk_k-0015",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 1000000,
+    "exceptions": 9800,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.022212510364731913,
+     "zone": "GREEN",
+     "plus_factor": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "added by lane k-r2-tl 2026-11-20 (ruling KR-253): mpmath 50 digits at the binary64 p (term recurrence)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "outside_checked"
+   ],
+   "description": "KR-253: 1,000,000 observations, 9,800 exceptions at 0.99: the stage J binomial at large n (the lgamma form drifted past 1e-10 here)",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "tlk_k-0016",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 1,
+    "exceptions": 0,
+    "confidence": 0.95
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.95,
+     "zone": "YELLOW",
+     "plus_factor": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "added by lane k-r2-tl 2026-11-20 (ruling KR-253) amendment: exact rational arithmetic with q = c exactly (Python fractions)",
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "boundary"
+   ],
+   "description": "KR-253 amendment: 1 observation(s), 0 exception(s) at 0.95: P(X <= 0) = c exactly, on the zone edge",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 0.0
+   }
+  },
+  {
+   "case_id": "tlk_k-0017",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 1,
+    "exceptions": 0,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.99,
+     "zone": "YELLOW",
+     "plus_factor": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "added by lane k-r2-tl 2026-11-20 (ruling KR-253) amendment: exact rational arithmetic with q = c exactly (Python fractions)",
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "boundary"
+   ],
+   "description": "KR-253 amendment: 1 observation(s), 0 exception(s) at 0.99: P(X <= 0) = c exactly, on the zone edge",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 0.0
+   }
+  },
+  {
+   "case_id": "tlk_k-0018",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 1,
+    "exceptions": 0,
+    "confidence": 0.9999
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.9999,
+     "zone": "RED",
+     "plus_factor": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "added by lane k-r2-tl 2026-11-20 (ruling KR-253) amendment: exact rational arithmetic with q = c exactly (Python fractions)",
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "boundary"
+   ],
+   "description": "KR-253 amendment: 1 observation(s), 0 exception(s) at 0.9999: P(X <= 0) = c exactly, on the zone edge",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 0.0
+   }
+  },
+  {
+   "case_id": "tlk_k-0019",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 5,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.9588168159301514,
+     "zone": "YELLOW",
+     "plus_factor": 0.4
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "added by lane k-r2-tl 2026-11-20 (ruling KR-253) amendment: exact rational arithmetic with q = c exactly (Python fractions)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "boundary"
+   ],
+   "description": "KR-253 amendment: 250 observation(s), 5 exception(s) at 0.99: MAR99 Table 2 row, exact rational at the binary64 q",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "tlk_k-0020",
+   "operation": "risk.backtest.traffic_light",
+   "inputs": {
+    "observations": 250,
+    "exceptions": 0,
+    "confidence": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cumulative_probability": 0.08105851616218128,
+     "zone": "GREEN",
+     "plus_factor": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "added by lane k-r2-tl 2026-11-20 (ruling KR-253) amendment: exact rational arithmetic with q = c exactly (Python fractions)",
+    "scipy.stats.binom 1.x (independent library): binom.cdf MATCH 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "traffic_light",
+    "boundary"
+   ],
+   "description": "KR-253 amendment: 250 observation(s), 0 exception(s) at 0.99: MAR99 Table 2 row, exact rational at the binary64 q",
+   "output_classes": {
+    "zone": "date_and_convention",
+    "plus_factor": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
   }
  ]
 }

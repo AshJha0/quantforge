@@ -572,6 +572,71 @@ def gen_traffic_light():
                         f"published: MAR99 Table 2 (Basel Framework PDF p.758) row {x}: {printed[x]}%, zone {TABLES['printed_table2_zone'][x]} (YELLOW = Amber): MATCH", BLIND_PUB],
               tags=["stage_k", "traffic_light", "outside_checked", "published"], output_classes=oc,
               description=f"existing operation, {x} of 250 at 0.99, against MAR99 Table 2 (zone and cumulative only; plus_factor is the 1996 table)")
+    # KR-253 (KA-A16 applied to stage J), appended so that the case ids above stay as they were. p is 1 - c as the
+    # operation computes it in binary64 (0.99 gives 0.010000000000000009), taken exactly; tolerance fixed here.
+    import sys
+    from fractions import Fraction
+    sys.set_int_max_str_digits(0)
+    kr253 = "added by lane k-r2-tl 2026-11-20 (ruling KR-253)"
+    for n, x, conf in [(100_000, 1_050, 0.99), (100_000, 2_600, 0.975), (1_000_000, 10_164, 0.99), (1_000_000, 9_800, 0.99)]:
+        pf = Fraction(1.0 - conf)
+        if n <= 100_000:
+            a, b = pf.numerator, pf.denominator
+            cc = b - a
+            term = cc ** n
+            total = term
+            for k in range(x):
+                term = term * (n - k) * a // ((k + 1) * cc)
+                total += term
+            cum = float(Fraction(total, b ** n))
+            how = "exact rational arithmetic at the binary64 p (Python fractions)"
+        else:
+            with mp.workdps(50):
+                pm = mp.mpf(pf.numerator) / pf.denominator
+                t = (1 - pm) ** n
+                acc = t
+                for k in range(x):
+                    t = t * (n - k) * pm / ((k + 1) * (1 - pm))
+                    acc += t
+                cum = float(acc)
+            how = "mpmath 50 digits at the binary64 p (term recurrence)"
+        sc = float(binom.cdf(x, n, 1.0 - conf))
+        assert abs(sc / cum - 1) <= 1e-12, (n, x, sc, cum)
+        zone = "GREEN" if cum < 0.95 else "YELLOW" if cum < 0.9999 else "RED"
+        s.add("risk.backtest.traffic_light", {"observations": n, "exceptions": x, "confidence": conf},
+              {"cumulative_probability": cum, "zone": zone, "plus_factor": None},
+              verified=[f"{kr253}: {how}", SCIPY + ": binom.cdf MATCH 1e-12"],
+              tags=["stage_k", "traffic_light", "outside_checked"], output_classes=oc,
+              limit={"absolute": 1e-15, "relative": 1e-12},
+              description=f"KR-253: {n:,} observations, {x:,} exceptions at {conf}: the stage J binomial at large n "
+                          "(the lgamma form drifted past 1e-10 here)")
+    # KR-253 amendment (coordinator 2026-11-20): exact boundaries. q = c is taken exactly as given, so at n = 1,
+    # x = 0 the cumulative probability is c itself and the zone edge (>= 0.95, >= 0.9999) is decided exactly.
+    for n, x, conf in [(1, 0, 0.95), (1, 0, 0.99), (1, 0, 0.9999), (250, 5, 0.99), (250, 0, 0.99)]:
+        qf = Fraction(conf)
+        pf = 1 - qf
+        a, b = pf.numerator, pf.denominator
+        cc = b - a
+        term = cc ** n
+        total = term
+        for k in range(x):
+            term = term * (n - k) * a // ((k + 1) * cc)
+            total += term
+        exact = Fraction(total, b ** n)
+        cum = float(exact)
+        if n == 1:
+            assert exact == qf and cum == conf
+        zone = "GREEN" if cum < 0.95 else "YELLOW" if cum < 0.9999 else "RED"
+        plus = (0.0 if x <= 4 else {5: 0.40, 6: 0.50, 7: 0.65, 8: 0.75, 9: 0.85}.get(x, 1.0)) if (n, conf) == (250, 0.99) else None
+        s.add("risk.backtest.traffic_light", {"observations": n, "exceptions": x, "confidence": conf},
+              {"cumulative_probability": cum, "zone": zone, "plus_factor": plus},
+              verified=[f"{kr253} amendment: exact rational arithmetic with q = c exactly (Python fractions)",
+                        "hand" if n == 1 else SCIPY + ": binom.cdf MATCH 1e-12"],
+              tags=["stage_k", "traffic_light", "boundary"], output_classes=oc,
+              limit={"absolute": 0.0, "relative": 0.0} if n == 1 else {"absolute": 1e-15, "relative": 1e-12},
+              description=f"KR-253 amendment: {n} observation(s), {x} exception(s) at {conf}: "
+                          + ("P(X <= 0) = c exactly, on the zone edge" if n == 1 else
+                             "MAR99 Table 2 row, exact rational at the binary64 q"))
     s.write()
     return s
 

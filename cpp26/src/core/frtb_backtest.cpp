@@ -54,8 +54,11 @@ struct Partial {
 // each with its scale count (a weight above 2^600 rescales the weight and the sum by 2^-600). Stops at n, or past
 // the mode once the ratio is at most 1/2 and the weight at most 2^-64 of the sum. Only + - * /, as the Python
 // build's binomial_partial_sums, so every build gives the same bits.
-std::vector<Partial> partial_sums(long long n, double p) {
-    const double q = 1.0 - p;
+std::vector<Partial> partial_sums(long long n, double p, double q);
+std::vector<Partial> partial_sums(long long n, double p) { return partial_sums(n, p, 1.0 - p); }
+
+// KR-237 sums with the non-exception probability q given (KR-253: the traffic light passes q = c).
+std::vector<Partial> partial_sums(long long n, double p, double q) {
     const double mode = std::floor(double(n + 1) * p);
     double w = 1.0, s = 0.0, c = 0.0;
     long long e = 0;
@@ -130,6 +133,45 @@ double binomial_cdf(long long n, long long x, double p) {
     if (x < 0) return 0.0;
     if (x >= n) return 1.0;
     return cdf_from(partial_sums(n, p), n, x);
+}
+
+namespace {
+struct DD {
+    double hi, lo;
+};
+// Dekker's exact product a * b = hi + lo (Veltkamp split by 2^27 + 1); only + - * (KR-253).
+DD two_prod(double a, double b) {
+    const double p = a * b;
+    double t = 134217729.0 * a;
+    const double ah = t - (t - a);
+    const double al = a - ah;
+    t = 134217729.0 * b;
+    const double bh = t - (t - b);
+    const double bl = b - bh;
+    return {p, ((ah * bh - p) + ah * bl + al * bh) + al * bl};
+}
+DD dd_mul(DD a, DD b) {
+    const DD pe = two_prod(a.hi, b.hi);
+    const double e = pe.lo + (a.hi * b.lo + a.lo * b.hi);
+    const double s = pe.hi + e;
+    return {s, e - (s - pe.hi)};
+}
+}  // namespace
+
+double power(double q, long long n) {
+    DD r{1.0, 0.0}, b{q, 0.0};
+    while (n != 0) {
+        if ((n & 1) != 0) r = dd_mul(r, b);
+        n >>= 1;
+        if (n != 0) b = dd_mul(b, b);
+    }
+    return r.hi + r.lo;
+}
+
+double traffic_light_cdf(long long n, long long x, double c) {
+    if (x == 0) return power(c, n);
+    if (x >= n) return 1.0;
+    return cdf_from(partial_sums(n, 1.0 - c, c), n, x);
 }
 
 long long first_at_least(long long n, double p, double level) { return first_at_least_in(partial_sums(n, p), n, level); }

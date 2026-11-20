@@ -8,6 +8,7 @@ from collections.abc import Sequence
 from . import rng
 from .errors import QfError
 from .finite import guard
+from .frtb_backtest import traffic_light_cdf
 
 LR_ZERO = 1e-12  # ruling F-32
 _PLUS = {5: 0.40, 6: 0.50, 7: 0.65, 8: 0.75, 9: 0.85}
@@ -183,15 +184,8 @@ def traffic_light(n: int, x: int, c: float) -> dict[str, object]:
         raise QfError("E_DOMAIN", "observations must be at least 1", "observations")
     if not 0 <= x <= n:
         raise QfError("E_DOMAIN", "exceptions must be in [0, observations]", "exceptions")
-    p = 1 - c
-    lp, lq = math.log(p), math.log1p(-p)
-    terms = [
-        math.exp(
-            math.lgamma(n + 1) - math.lgamma(k + 1) - math.lgamma(n - k + 1) + k * lp + (n - k) * lq
-        )
-        for k in range(x + 1)
-    ]
-    cumulative = min(math.fsum(terms), 1.0)
+    # KR-253: q = c exactly, p = 1 - c; x = 0 is c^n, otherwise the KR-237 sums.
+    cumulative = traffic_light_cdf(n, x, c)
     zone = "GREEN" if cumulative < 0.95 else "YELLOW" if cumulative < 0.9999 else "RED"
     plus: float | None = None
     if n == 250 and c == 0.99:

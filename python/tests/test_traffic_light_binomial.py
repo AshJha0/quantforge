@@ -41,7 +41,9 @@ def _exact_cdf(n: int, x: int, p: Fraction) -> Fraction:
         (20_000, 160, 0.99),  # below the mean
     ],
 )
-def test_traffic_light_cumulative_matches_exact_rationals(n: int, x: int, confidence: float) -> None:
+def test_traffic_light_cumulative_matches_exact_rationals(
+    n: int, x: int, confidence: float
+) -> None:
     exact = _exact_cdf(n, x, Fraction(1.0 - confidence))
     got = var_risk.traffic_light(n, x, confidence)["cumulative_probability"]
     assert isinstance(got, float)
@@ -52,7 +54,9 @@ def test_traffic_light_small_n_unchanged_by_the_switch() -> None:
     """The stage J table point: n = 250, c = 0.99. P(X <= 4) by the exact sum, and the zones of the table."""
     exact = _exact_cdf(250, 4, Fraction(1.0 - 0.99))
     r = var_risk.traffic_light(250, 4, 0.99)
-    assert abs(Fraction(r["cumulative_probability"]) / exact - 1) <= Fraction(1, 10**14)  # type: ignore[arg-type]
+    got = r["cumulative_probability"]
+    assert isinstance(got, float)
+    assert abs(Fraction(got) / exact - 1) <= Fraction(1, 10**14)
     assert [var_risk.traffic_light(250, k, 0.99)["zone"] for k in (4, 5, 9, 10)] == [
         "GREEN",
         "YELLOW",

@@ -22,6 +22,10 @@ const Tables& tables();
 
 /// P(X <= x) for X ~ Binomial(n, p), 0 < p < 1 (KR-237: compensated partial sums of the binomial weight recursion).
 double binomial_cdf(long long n, long long x, double p);
+// KR-253: q^n by binary powering in double-double (q^1 is q exactly).
+double power(double q, long long n);
+// KR-253: P(X <= x), X ~ Binomial(n, 1 - c), with q = c exact: x = 0 is c^n, otherwise the KR-237 sums with q = c.
+double traffic_light_cdf(long long n, long long x, double c);
 /// The smallest k in 0..n with P(X <= k) >= level.
 long long first_at_least(long long n, double p, double level);
 

@@ -33,12 +33,14 @@ _UP = 2.0**600
 _DOWN = 2.0**-600
 
 
-def binomial_partial_sums(n: int, p: float) -> list[tuple[float, int]]:
+def binomial_partial_sums(n: int, p: float, q: float | None = None) -> list[tuple[float, int]]:
     """KR-237: compensated partial sums of the unnormalised weights `w_0 = 1`,
     `w_(k+1) = w_k ((n - k) p) / ((k + 1) q)`, each with its scale count (a weight above 2^600 rescales the
     weight and the sum by 2^-600). Stops at n, or past the mode once the ratio is at most 1/2 and the weight at
-    most 2^-64 of the sum. Only + - * /, so every build gives the same bits."""
-    q = 1.0 - p
+    most 2^-64 of the sum. Only + - * /, so every build gives the same bits. `q` defaults to `1 - p`; the
+    traffic light passes its exact `q = c` (KR-253)."""
+    if q is None:
+        q = 1.0 - p
     mode = math.floor((n + 1) * p)
     w, s, c, e = 1.0, 0.0, 0.0, 0
     out: list[tuple[float, int]] = []
@@ -72,13 +74,54 @@ def _cdf_from(sums: list[tuple[float, int]], n: int, x: int) -> float:
     return min(v, 1.0)
 
 
-def binomial_cdf(n: int, x: int, p: float) -> float:
-    """P(X <= x) for X ~ Binomial(n, p), 0 < p < 1 (KR-237)."""
+def binomial_cdf(n: int, x: int, p: float, q: float | None = None) -> float:
+    """P(X <= x) for X ~ Binomial(n, p), 0 < p < 1 (KR-237); `q` defaults to `1 - p` (KR-253)."""
     if x < 0:
         return 0.0
     if x >= n:
         return 1.0
-    return _cdf_from(binomial_partial_sums(n, p), n, x)
+    return _cdf_from(binomial_partial_sums(n, p, q), n, x)
+
+
+def _two_prod(a: float, b: float) -> tuple[float, float]:
+    """Dekker's exact product a * b = p + e (Veltkamp split by 2^27 + 1); only + - *."""
+    p = a * b
+    t = 134217729.0 * a
+    ah = t - (t - a)
+    al = a - ah
+    t = 134217729.0 * b
+    bh = t - (t - b)
+    bl = b - bh
+    return p, ((ah * bh - p) + ah * bl + al * bh) + al * bl
+
+
+def _dd_mul(x: tuple[float, float], y: tuple[float, float]) -> tuple[float, float]:
+    p, e = _two_prod(x[0], y[0])
+    e += x[0] * y[1] + x[1] * y[0]
+    s = p + e
+    return s, e - (s - p)
+
+
+def power(q: float, n: int) -> float:
+    """q^n for 0 < q < 1 by right-to-left binary powering in double-double (KR-253): r = 1, b = q; for each bit
+    of n from the lowest, r = r * b if the bit is set, then b = b * b while bits remain; the result is the sum of
+    the two parts. Only + - *, so every build gives the same bits; q^1 is q exactly."""
+    r, b = (1.0, 0.0), (q, 0.0)
+    while n:
+        if n & 1:
+            r = _dd_mul(r, b)
+        n >>= 1
+        if n:
+            b = _dd_mul(b, b)
+    return r[0] + r[1]
+
+
+def traffic_light_cdf(n: int, x: int, c: float) -> float:
+    """KR-253: P(X <= x), X ~ Binomial(n, 1 - c), with the non-exception probability q = c taken exactly as
+    given: x = 0 is q^n by binary powering (so c itself at n = 1), otherwise the KR-237 sums with q = c."""
+    if x == 0 and n >= 1:
+        return power(c, n)
+    return binomial_cdf(n, x, 1.0 - c, c)
 
 
 def _first_at_least(sums: list[tuple[float, int]], n: int, level: float) -> int:

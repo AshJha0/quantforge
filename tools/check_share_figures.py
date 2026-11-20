@@ -29,9 +29,7 @@ FILE_ITEM = {
 }
 # Files another lane is rewriting at the time this gate was added (k-r2, 2026-11-20). Each entry is a
 # known stale figure, listed in the k-r2-kf2 report; remove the entry when that lane merges.
-PENDING = {
-    "docs/getting-started/tutorial-57-backtesting-traffic-light.md",
-}
+PENDING: set[str] = set()
 SHARE = re.compile(r"\b(?:share|Challenger)\b([^.\n]|\.(?=[A-Za-z0-9_]))*?\b(\d+) of (\d+)\b")
 LABEL = re.compile(r"\bK-(4a|4b|4c|5a|8d|8e)\b")
 

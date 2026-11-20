@@ -6,7 +6,7 @@ The plain idea: a bank that uses its own model for market risk capital checks ev
 
 You will rebuild the published table of cumulative probabilities from the binomial distribution, find the zone boundaries for 250 and 500 days, see a literal reading of the rule give an odd answer for five days, and apply the desk exception limits. Budget 10 minutes.
 
-<p class="note">Stage K. The operations <code>risk.frtb.backtest.zone</code>, <code>.desk</code> and <code>.count</code> are merged to <code>main</code> in all four builds (2026-11-19; not in a tag) and registered in the CLI contract 1.17.0 (spec <code>specifications/06-risk/frtb-ima-backtest.md</code> 0.1.0, rulings KR-40 to KR-47). The published table (MAR99 Table 2) matches for the new operation and for the existing stage F <code>risk.backtest.traffic_light</code>. Outside share of <code>btk_k</code>: 23 of 24 value cases, 12 against the printed table and 11 by blind re-derivation (<code>program/STAGE_K_BLIND_BTK.md</code>). Step 1 uses the standard library in exact rational arithmetic; Step 2 calls the library, and CI checks that it prints the lines shown under Step 1.</p>
+<p class="note">Stage K. The operations <code>risk.frtb.backtest.zone</code>, <code>.desk</code> and <code>.count</code> are merged to <code>main</code> in all four builds (2026-11-19; not in a tag) and registered in the CLI contract 1.17.0 (spec <code>specifications/06-risk/frtb-ima-backtest.md</code> 0.1.0, rulings KR-40 to KR-47). The published table (MAR99 Table 2) matches for the new operation and for the existing stage F <code>risk.backtest.traffic_light</code>. Outside share of <code>btk_k</code>: 23 of 28 value cases counted under KR-250 (<code>oracle/OUTSIDE_SHARES.json</code>; blind re-derivation in <code>program/STAGE_K_BLIND_BTK.md</code>). Step 1 uses the standard library in exact rational arithmetic; Step 2 calls the library, and CI checks that it prints the lines shown under Step 1.</p>
 
 Terms, defined here. An **exception** is a day whose loss exceeds the VaR (strictly: a loss equal to VaR is not one; a missing P&L or VaR counts as one). **Actual** P&L includes the day's trading; **hypothetical** P&L revalues the start-of-day positions only; the count used is the larger of the two. `X ~ Binomial(n, 0.01)` is the exception count of a correct 99% model over `n` days, and `cdf(k) = P(X <= k)`.
 
@@ -89,7 +89,7 @@ From `specifications/06-risk/frtb-ima-backtest.md` 0.1.0 (MAR32 pp.658 to 668 an
 - Count: day `t` is an exception when VaR or P&L is null, or when `-P&L_t > VaR_t` (strict; KR-45).
 - Relation to stage F (KR-40): `risk.backtest.traffic_light` implements the 1996 framework (zones GREEN, YELLOW, RED and a plus factor on a multiplier of 3). The FRTB operations are new operations, not an extension, because the output, the count rule and the desk test all differ. Both agree on the zone and the cumulative probability at every count; suite `tlk_k` checks the existing operation against MAR99 Table 2 (YELLOW = amber).
 - Acceptance (fixed before the goldens): Table 2 rows 0 to 10 for both operations, and every value within 1e-12 relative of `scipy.stats.binom.cdf`. Result (measured by the k-w1b lane, 2026-11-19): all rows match; MAR99 Table 1 (176 printed numbers) also matches SciPy at one decimal.
-- Outside share (handover table): `btk_k` 23 of 24 value cases (96%), `tlk_k` 11 of 11, if `binom.cdf` counts as a library check. Whether it does, when `binom.cdf` is itself the compared quantity, is the coordinator's classification decision (handover, "Outside-check share").
+- Outside share (`oracle/OUTSIDE_SHARES.json`, regenerated 2026-11-20; read): `btk_k` 23 of 28 value cases and `tlk_k` 11 of 20. Under KR-250 a SciPy `binom.cdf` check of the same binomial sum and a printed figure alone do not count; the counted cases are those with a blind re-derivation. The `tlk_k` cases from 0012 on (KR-253: large n and exact boundaries) are checked against our own exact rationals and mpmath only, so they are not counted.
 - Not covered (KR-47): the P&L attribution test, the 10% eligibility criterion, the NMRF waiver, the qualitative add-on and capital.
 
 ## Step 2: the same questions through the library
@@ -109,7 +109,8 @@ def call(op, inputs):
     return r["outputs"]
 
 
-tlk = json.load(open("datasets/golden/stage_k/tlk_k.json", encoding="utf-8"))["cases"]
+tlk = [c for c in json.load(open("datasets/golden/stage_k/tlk_k.json", encoding="utf-8"))["cases"]
+       if "published" in c["tags"]]  # the MAR99 Table 2 rows (tlk_k-0012 on are the KR-253 cases)
 row = [f"{100 * call(c['operation'], c['inputs'])['cumulative_probability']:.2f}" for c in tlk]
 printed = ["8.11", "28.58", "54.32", "75.81", "89.22", "95.88", "98.63", "99.60", "99.89", "99.97", "99.99"]
 print("cumulative % at 250, 0 to 10 exceptions:", " ".join(row))
