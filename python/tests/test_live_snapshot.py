@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from quantforge_core import snapshot as sn
+from quantforge_core import live_snapshot as sn
 from quantforge_core import stage_k as sk
 
 ROOT = Path(__file__).resolve().parents[2]

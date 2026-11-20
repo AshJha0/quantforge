@@ -94,6 +94,7 @@ pub mod schedule;
 pub mod sha256;
 pub mod shortrate;
 pub mod smile;
+pub mod live_snapshot;
 pub mod snapshot;
 pub mod sobol;
 pub mod sor;
