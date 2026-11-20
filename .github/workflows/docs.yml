@@ -16,9 +16,9 @@ name: Docs
 on:
   push:
     branches: [main]
-    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/check_site_view.py', 'tools/check_site_a11y.py', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
+    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/check_site_view.py', 'tools/check_site_a11y.py', 'tools/a11y_detail.js', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
   pull_request:
-    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/check_site_view.py', 'tools/check_site_a11y.py', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
+    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/build_references.py', 'specifications/**', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/gallery_j.py', 'examples/research_workflow_j.json', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/status_glance.py', 'tools/check_md_anchors.py', 'datasets/golden/**', 'conformance/runner/runner.py', '.pa11yci.json', 'tools/check_site_view.py', 'tools/check_site_a11y.py', 'tools/a11y_detail.js', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -124,12 +124,12 @@ jobs:
           retention-days: 90
   # KR-227 read strictly (coordinator, 2026-11-20): pa11y AA on EVERY page of the built site, light and dark.
   # tools/check_site_a11y.py writes each shard's URL list from the built site; 2 modes x 6 shards of about 137 pages,
-  # pa11y-ci at concurrency 2, so a job is expected to take about 5 to 10 minutes against a 30-minute limit.
+  # pa11y-ci at concurrency 1 in batches of 10 (tools/check_site_a11y.py --run), expected about 8 to 15 minutes a job against 45.
   # Each job first runs pa11y-ci on a planted contrast failure, which must be reported (--check-plant).
   site-a11y:
     name: docs-site-a11y
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -142,17 +142,19 @@ jobs:
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
       - run: python3 tools/check_site_a11y.py --self-test
       - run: uv run --no-project --with markdown==3.11.2 python tools/build_site.py --out site
+      # pa11y-ci runs through check_site_a11y.py --run: batches of 10 pages with a fresh browser each, and a page
+      # whose result is a browser or protocol failure (not a WCAG error) is run again on its own, at most twice
+      # (run 44791215797: one Chromium crash failed every later page of its pa11y-ci run)
       - name: planted contrast failure must be reported by pa11y-ci
         run: |
+          mkdir -p a11y
           python3 tools/check_site_a11y.py --plant "$RUNNER_TEMP/plant" --base http://127.0.0.1:8002
           python3 -m http.server 8002 --bind 127.0.0.1 --directory "$RUNNER_TEMP/plant" >/dev/null 2>&1 &
           sleep 1
-          set +e
-          npx --yes pa11y-ci@3.1.0 --config "$RUNNER_TEMP/plant/pa11y-plant.json" --json > "$RUNNER_TEMP/plant-results.json"
-          rc=$?
-          set -e
-          test "$rc" -ne 0 || { echo "pa11y-ci exited 0 on the planted contrast failure"; exit 1; }
-          python3 tools/check_site_a11y.py --check-plant "$RUNNER_TEMP/plant-results.json" --base http://127.0.0.1:8002
+          rc=0
+          python3 tools/check_site_a11y.py --run "$RUNNER_TEMP/plant/pa11y-plant.json" --results a11y/plant-results.json --raw a11y/raw-plant || rc=$?
+          test "$rc" -ne 0 || { echo "pa11y-ci found nothing on the planted contrast failure"; exit 1; }
+          python3 tools/check_site_a11y.py --check-plant a11y/plant-results.json --base http://127.0.0.1:8002
       - name: pa11y AA on every page of the shard (${{ matrix.mode }} ${{ matrix.shard }})
         env:
           MODE: ${{ matrix.mode }}
@@ -167,11 +169,15 @@ jobs:
           sleep 1
           python3 tools/check_site_a11y.py --urls --site site --shard "$SHARD" --mode "$MODE" --base http://127.0.0.1:8000 --out a11y
           tag="$MODE-${SHARD%/*}of${SHARD#*/}"
-          set +e
-          npx --yes pa11y-ci@3.1.0 --config "a11y/pa11y-$tag.json" --json > "a11y/a11y-$tag.results.json"
-          echo $? > "a11y/a11y-$tag.rc"
-          set -e
+          python3 tools/check_site_a11y.py --run "a11y/pa11y-$tag.json" --results "a11y/a11y-$tag.results.json"             --raw "a11y/raw-$tag" --out "a11y/a11y-$tag.rc" || true
           test "$(cat "a11y/a11y-$tag.rc")" = 0
+      # Diagnostic only: axe-core's own colour figures for up to four pages with a contrast error (those with no element named first)
+      - name: contrast details on failure (diagnostic, not a verdict)
+        if: failure()
+        run: |
+          nm=$(dirname "$(dirname "$(find ~/.npm/_npx -path '*/node_modules/pa11y-ci/package.json' | head -1)")")
+          urls=$(python3 -c "import glob,json; r={}; [r.update(json.load(open(f))['results']) for f in glob.glob('a11y/a11y-*.results.json')]; c=[(not any(x.get('code')=='color-contrast' and not x.get('selector') for x in v),u) for u,v in r.items() if any(x.get('code')=='color-contrast' for x in v)]; print(' '.join(u for _,u in sorted(c)[:4]))" || true)
+          if [ -n "$urls" ]; then node tools/a11y_detail.js "$nm" $urls | tee a11y/contrast-detail.txt || true; fi
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
