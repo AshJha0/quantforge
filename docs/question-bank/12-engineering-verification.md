@@ -88,7 +88,7 @@ The same reasoning moved the outside-check floor (R6-13, owner decision D6): the
 
 A property that holds without a known answer. Some outputs have no outside reference value, but there is still something that must be true: two inputs that mean the same thing must give the same answer. An invariance pair encodes that: the `any` base case passes on any finite answer, and the `same_as` case passes only if the build's answer equals its answer to the base.
 
-All of them are in `stage_f` (1,063 pairs) and `stage_g_e1` (194 pairs), 1,257 pairs in all, written by `oracle/python/gen_stage_f_e1.py` for plan item E1. They pin the negative-zero rule F-3: for each operation, a Real input set to `+0.0` is the `any` anchor and the same input set to `-0.0` must give the `same_as` answer. The same generator writes NaN and infinity variants of each input, which are error cases expecting `E_DOMAIN`.
+All of them are in `stage_f` (1,063 pairs) and `stage_g_e1` (209 pairs), 1,272 pairs in all, written by `oracle/python/gen_stage_f_e1.py` for plan item E1. They pin the negative-zero rule F-3: for each operation, a Real input set to `+0.0` is the `any` anchor and the same input set to `-0.0` must give the `same_as` answer. The same generator writes NaN and infinity variants of each input, which are error cases expecting `E_DOMAIN`.
 
 The limit is stated by construction: an invariance pair can be passed by a build that is consistently wrong. It catches inconsistency, not error, so it is counted apart from the value-checked cases and never used to claim accuracy.
 

@@ -1,8 +1,8 @@
 {
- "operations": 20,
+ "operations": 21,
  "no_real_input": [],
- "leaves": 208,
- "cases": 1026,
+ "leaves": 224,
+ "cases": 1105,
  "files": [
   [
    "e1g_exotic",
@@ -18,7 +18,7 @@
   ],
   [
    "e1g_xva",
-   264
+   343
   ]
  ]
 }
