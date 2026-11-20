@@ -1278,7 +1278,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Limitations:** rulings KR-30 to KR-39 confirmed 2026-11-19; KR-39 scope limits (one margin agreement per netting set, no haircut computation, no CCP rules); closed form, no iteration.
 - **Validation:** goldens `saccr_k` passed by every build through the neutral runner (observed, local laptop, 2026-11-19); CRE99 Examples 1 to 5 reproduce the printed EADs (KR-30). **Review:** 2026-11-19.
 - **Tier:** 3.
-- **Challenger:** 12 of 16 value cases (75%): 5 printed CRE99 examples and 7 blind re-derivations (DR-H2, `program/STAGE_K_BLIND_W1B.md`); 4 further blind matches excluded for a recorded process failure.
+- **Challenger:** 12 of 19 value cases (63.2%; `oracle/OUTSIDE_SHARES.md`): the 5 CRE99 examples re-derived blind (`program/STAGE_K_BLIND_PUB.md`; printed figures alone do not count, KR-250) and 7 blind re-derivations (DR-H2, `program/STAGE_K_BLIND_W1B.md`); 4 further blind matches excluded for a recorded process failure; saccr_k-0040 to 0042 have no blind check.
 - **Monitoring thresholds:** any golden difference across the four builds; any CRE99 printed EAD not reproduced at its printed digits.
 - **Data lineage hash:** sha256 e0fedebf674fc978431991dd6b16c67bf4eaa5e216682172c24c837d4a91561e (`saccr_k`, 39 cases) (2026-11-19).
 - **Retirement trigger:** a superseding stage K ruling or a change of CRE52.
@@ -1290,7 +1290,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Limitations:** rulings KR-40 to KR-47 confirmed 2026-11-19; KR-44 (limits 12 and 30, "more than" covering both) is an inferred reading; backtesting only, no PLA test or capital (KR-47); `risk.frtb.backtest.zone` has no E1 golden (Integer inputs only, open point).
 - **Validation:** goldens `btk_k` and `tlk_k` passed by every build (observed, local laptop, 2026-11-19); MAR99 Table 2 rows 0 to 10 reproduced. **Review:** 2026-11-19.
 - **Tier:** 3.
-- **Challenger:** 23 of 24 `btk_k` value cases (95.8%, floor 60%): MAR99 Table 2 printed figures on 12, and 11 blind re-derivations (DR-H2, `program/STAGE_K_BLIND_BTK.md`, 12 of 12 MATCH; btk_k-0017 matched but is not counted, the rules text states its answer). SciPy `binom.cdf` on 23 of 24 is not counted (D6 precedent: stage F `SCIPY.BINOM` is `reimplementation`, risk_f4-0082).
+- **Challenger:** 23 of 28 `btk_k` value cases (82.1%, floor 60%; `oracle/OUTSIDE_SHARES.md`): the 12 MAR99 Table 2 cases re-derived blind (`program/STAGE_K_BLIND_PUB.md`; printed figures alone do not count, KR-250), and 11 blind re-derivations (DR-H2, `program/STAGE_K_BLIND_BTK.md`, 12 of 12 MATCH; btk_k-0017 matched but is not counted, the rules text states its answer). SciPy `binom.cdf` checks are not counted (D6 precedent: stage F `SCIPY.BINOM` is `reimplementation`, risk_f4-0082).
 - **Monitoring thresholds:** any zone, limit or count difference across the four builds; any MAR99 Table 2 row not reproduced.
 - **Data lineage hash:** sha256 a987ea2f465fd2d1d139da303d3edaa4addd78b0b989fd90656595ec6cd31160 (`btk_k`, 40 cases; after the blind-lane `verified_by` entries, outputs unchanged) (2026-11-19).
 - **Retirement trigger:** a superseding stage K ruling or a change of MAR32.

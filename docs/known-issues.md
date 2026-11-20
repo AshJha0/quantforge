@@ -39,5 +39,8 @@ Minor findings are tracked in the audit responses, not here.
 
 ## Also recorded (not audit findings)
 
+- Follow-up audit KF-6 (Minor), K-4c version 2 blind lane: the packet commit 1aaa62b4 precedes the frozen results 59ef92f2 by 71 seconds, too little for the deriver to have run after it, so "fixed before any blind result" is not shown for the compare script and the eligibility rule. The expected values equal the `trig_k` goldens, whose values are unchanged since 120ffc92 (2026-11-19 evening), so the results could not shape them. Read from git; record corrected in `program/STAGE_K_BLIND_TRIG_V2.md`. No code change.
+- Follow-up audit KF-7 (Minor), K-4c blind credit: the deriver implemented the KR-232 algorithm the packet states, so the 13 of 14 match shows the algorithm is stated completely and followed, not that the tail values agree with an independent source. Value evidence is our own oracle grid (`oracle/STAGE_K_AUDIT_A_CHECKS.json`, `kr232_t_tail_accuracy`). Read; `program/STAGE_K_BLIND_TRIG_V2.md`. No code change.
+
 - H-9 workload R (recorded 6-hour crypto window, 2026-11-18/19): timing is a recorded MISS at p99 and p99.9 in every language (local laptop, not the acceptance machine); targets unchanged. Measured; `benchmarks/h9/`.
 - H-9 R2: not yet run. Raw recording is on; as of the morning of 2026-11-20 no recording session has run 6 hours (HR-134 takes the first one that does). Read from `benchmarks/h9/README_R2.md` and the recorder status.

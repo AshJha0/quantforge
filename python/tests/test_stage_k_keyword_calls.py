@@ -50,3 +50,12 @@ def test_keyword_call_keeps_limit_before_finite_rule() -> None:
     with pytest.raises(QfError) as e:
         stage_k.trigger_check(changes=big, x_ref=float("nan"), x_now=1.0, days_since=1.0, k=3.0)
     assert e.value.code == "E_LIMIT"
+
+
+def test_a_missing_argument_names_the_public_function() -> None:
+    """KF-16: omitting the checked argument raises the TypeError Python gives, naming `trigger_check`, not the
+    private limit check."""
+    with pytest.raises(TypeError, match=r"^trigger_check\(\) missing"):
+        stage_k.trigger_check()  # type: ignore[call-arg]
+    with pytest.raises(TypeError, match=r"^trigger_check\(\) missing"):
+        stage_k.trigger_check(x_ref=1.0, x_now=1.0, days_since=1.0, k=3.0)  # type: ignore[call-arg]
