@@ -182,7 +182,8 @@ class FrtbDrcTest {
             }
         }
         if (out.isEmpty()) {
-            out.add(new FrtbDrc.Position("p0", "A", "CORPORATE", "SENIOR", 1, 1, 1, false, true));
+            // the fallback is scaled too, so the scaling property holds when every draw is filtered out
+            out.add(new FrtbDrc.Position("p0", "A", "CORPORATE", "SENIOR", scale, scale, 1, false, true));
         }
         return out;
     }
