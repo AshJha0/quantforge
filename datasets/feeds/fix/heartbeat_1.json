@@ -1,0 +1,15 @@
+{
+ "format": "QF-FIX-S",
+ "label": "simulated; not a certified implementation; not connected to any venue",
+ "fields": {
+  "msg_type": "0",
+  "seq": 1,
+  "sender": "QFA",
+  "target": "QFB",
+  "body": []
+ },
+ "hex": "383d514653494d2e3101393d32340133353d300133343d310134393d5146410135363d5146420131303d32323701",
+ "length": 46,
+ "sha256": "6797431ede2b5610165d53363a4640d4f118ab75d7230a2bc3fcb79777c986d3",
+ "derivation": "specifications/12-platform/adapters.md section 3.1"
+}
