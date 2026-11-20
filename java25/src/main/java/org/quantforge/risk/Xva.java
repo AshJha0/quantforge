@@ -8,6 +8,9 @@ import org.quantforge.core.QfError;
  * valuation adjustments, sensitivity-based IR delta margin and Hull-White wrong-way CVA.
  */
 public final class Xva {
+    /** KR-257: the largest {@code |b V|} the wrong-way root accepts ({@code E_DOMAIN} above it). */
+    public static final double WWR_MAX_BV = 700.0;
+
     private Xva() {}
 
     /**
@@ -193,42 +196,121 @@ public final class Xva {
      * @return the CVA
      */
     public static double wwrCva(double[] t, double[][] v, double[] df, double h, double r, double b, double[] a) {
+        for (double[] path : v) {
+            for (double x : path) {
+                if (Math.abs(b * x) > WWR_MAX_BV) {
+                    throw new QfError("E_DOMAIN", "|wwr_b * value| must be at most 700 (KR-257)", "wwr_b");
+                }
+            }
+        }
+        double prev = 0.0;
+        for (double ti : t) {
+            if (Math.exp(-h * ti) < Double.MIN_NORMAL || -Math.expm1(-h * (ti - prev)) < Double.MIN_NORMAL) {
+                throw new QfError("E_NON_FINITE",
+                        "the survival target or a bucket default probability is below the smallest normal double",
+                        "hazard_rate");
+            }
+            prev = ti;
+        }
         int np = v.length;
         double[] surv = new double[np];
         Arrays.fill(surv, 1.0);
-        double[] next = new double[np];
+        double[] cs = new double[np];
         double cva = 0.0;
-        double prev = 0.0;
+        prev = 0.0;
         for (int i = 0; i < t.length; i++) {
             double dt = t[i] - prev;
-            double target = Math.exp(-h * t[i]) * np;
-            double x = Math.log(h);
-            for (int it = 0; it < 200; it++) {
-                double f = -target;
-                double d = 0.0;
-                for (int p = 0; p < np; p++) {
-                    double lam = Math.exp(x + b * v[p][i]);
-                    double sp = surv[p] * Math.exp(-lam * dt);
-                    f += sp;
-                    d -= sp * lam * dt;
-                }
-                double step = f / d;
-                x -= step;
-                if (Math.abs(step) <= 1e-15 * Math.max(1.0, Math.abs(x))) {
-                    break;
-                }
+            for (int p = 0; p < np; p++) {
+                cs[p] = b * v[p][i];
             }
-            a[i] = x;
+            a[i] = wwrRoot(surv, cs, dt, h);
             double sum = 0.0;
             for (int p = 0; p < np; p++) {
-                next[p] = surv[p] * Math.exp(-Math.exp(x + b * v[p][i]) * dt);
-                sum += Math.max(v[p][i], 0.0) * (surv[p] - next[p]);
+                double[] w = wwrTerms(a[i] + cs[p], dt);
+                sum += Math.max(v[p][i], 0.0) * surv[p] * w[0];
+                surv[p] *= w[1];
             }
             cva += df[i] * sum / np;
-            System.arraycopy(next, 0, surv, 0, np);
             prev = t[i];
         }
         return (1.0 - r) * cva;
+    }
+
+    /**
+     * KR-257: for hazard {@code exp(z)} over {@code dt}, the default probability {@code q = 1 - e^-x}, the survival
+     * {@code r = e^-x} and {@code dq/dz = x e^-x}, with {@code x = exp(z) dt}; an overflowing {@code exp(z)} is
+     * infinite (q = 1, r = 0).
+     */
+    static double[] wwrTerms(double z, double dt) {
+        double x = (z > 709.0 ? Double.POSITIVE_INFINITY : Math.exp(z)) * dt;
+        double r = Math.exp(-x);
+        return new double[] {-Math.expm1(-x), r, r == 0.0 ? 0.0 : x * r};
+    }
+
+    /**
+     * KR-257: {@code a} with {@code sum_p S_p (1 - e^(-x_p)) = (1 - e^(-h dt)) sum_p S_p}, {@code x_p = exp(a + c_p)
+     * dt} (the G-44 equation divided through by {@code S(t_(i-1))}; above a bucket default probability of 1/2 the
+     * survival form {@code sum_p S_p e^(-x_p) = e^(-h dt) sum_p S_p}). Bracket {@code [ln h - max c - 1, ln h - min c +
+     * 1]} (closed form, sign change by monotonicity), safeguarded Newton (rtsafe) from {@code ln h - (S-weighted mean of
+     * c)}, step to 1e-15 relative, at most 200 steps.
+     */
+    static double wwrRoot(double[] surv, double[] cs, double dt, double h) {
+        double qT = -Math.expm1(-h * dt);
+        double rT = Math.exp(-h * dt);
+        boolean useQ = qT <= 0.5;
+        double total = 0.0;
+        double wsum = 0.0;
+        double cMax = Double.NEGATIVE_INFINITY;
+        double cMin = Double.POSITIVE_INFINITY;
+        for (int p = 0; p < surv.length; p++) {
+            total += surv[p];
+            wsum += surv[p] * cs[p];
+            cMax = Math.max(cMax, cs[p]);
+            cMin = Math.min(cMin, cs[p]);
+        }
+        double lnH = Math.log(h);
+        double lo = lnH - cMax - 1.0;
+        double hi = lnH - cMin + 1.0;
+        double x = lnH - wsum / total;
+        double dx = hi - lo;
+        double[] fd = wwrValue(surv, cs, dt, useQ, qT, rT, total, x);
+        for (int it = 0; it < 200; it++) {
+            if (fd[0] > 0) {
+                hi = x;
+            } else if (fd[0] < 0) {
+                lo = x;
+            } else {
+                return x;
+            }
+            double dxOld = dx;
+            dx = fd[1] > 0 ? fd[0] / fd[1] : Double.POSITIVE_INFINITY;
+            double step = x - dx;
+            if (!(lo < step && step < hi && Math.abs(dx) <= 0.5 * Math.abs(dxOld))) {
+                dx = 0.5 * (hi - lo);
+                step = lo + dx;
+            }
+            if (Math.abs(step - x) <= 1e-15 * Math.max(1.0, Math.abs(x))) {
+                return step;
+            }
+            x = step;
+            fd = wwrValue(surv, cs, dt, useQ, qT, rT, total, x);
+        }
+        throw new QfError("E_NO_CONVERGENCE", "the a(t) root did not converge in 200 steps", "wwr_b");
+    }
+
+    /** KR-257: the bracketed function (increasing in {@code x}) and its derivative. */
+    private static double[] wwrValue(double[] surv, double[] cs, double dt, boolean useQ, double qT, double rT,
+            double total, double x) {
+        double sq = 0.0;
+        double sr = 0.0;
+        double d = 0.0;
+        for (int p = 0; p < surv.length; p++) {
+            double[] w = wwrTerms(x + cs[p], dt);
+            sq += surv[p] * w[0];
+            sr += surv[p] * w[1];
+            d += surv[p] * w[2];
+        }
+        return new double[] {useQ ? sq - qT * total : rT * total - sr, d};
     }
 
     /** Validation helper: a non-empty, strictly increasing grid. */

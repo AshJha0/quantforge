@@ -402,6 +402,1039 @@
     "synthetic"
    ],
    "description": "hazard 0 (a(t) undefined)"
+  },
+  {
+   "case_id": "wwr_g-0007",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0,
+     2.0
+    ],
+    "values": [
+     [
+      10.0,
+      10.0
+     ],
+     [
+      10.0,
+      10.0
+     ]
+    ],
+    "discount_factors": [
+     0.97,
+     0.94
+    ],
+    "hazard_rate": 0.01,
+    "recovery": 0.4,
+    "wwr_b": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.11347051247504984,
+     "a": [
+      -14.605170185988092,
+      -14.605170185988092
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "closed-form"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "reported example: b V = 10 on every path (old builds: a = -2.6e33, cva = 0)",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0008",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0,
+     2.0
+    ],
+    "values": [
+     [
+      20.0,
+      20.0
+     ],
+     [
+      20.0,
+      20.0
+     ]
+    ],
+    "discount_factors": [
+     0.97,
+     0.94
+    ],
+    "hazard_rate": 0.01,
+    "recovery": 0.4,
+    "wwr_b": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.22694102495009968,
+     "a": [
+      -24.60517018598809,
+      -24.60517018598809
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "closed-form"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "b V = 20 on every path",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0009",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0,
+     2.0
+    ],
+    "values": [
+     [
+      10.0,
+      10.0
+     ],
+     [
+      10.0,
+      10.0
+     ]
+    ],
+    "discount_factors": [
+     0.97,
+     0.94
+    ],
+    "hazard_rate": 0.01,
+    "recovery": 0.4,
+    "wwr_b": -1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.11347051247504984,
+     "a": [
+      5.394829814011909,
+      5.394829814011909
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "closed-form"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "b V = -10 on every path, positive exposure",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0010",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0,
+     2.0
+    ],
+    "values": [
+     [
+      -30.0,
+      -30.0
+     ],
+     [
+      -30.0,
+      -30.0
+     ]
+    ],
+    "discount_factors": [
+     0.97,
+     0.94
+    ],
+    "hazard_rate": 0.01,
+    "recovery": 0.4,
+    "wwr_b": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.0,
+     "a": [
+      25.39482981401191,
+      25.39482981401191
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "closed-form"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "b V = -30 on every path, no positive exposure",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0011",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0,
+     2.0
+    ],
+    "values": [
+     [
+      60.0,
+      60.0
+     ],
+     [
+      60.0,
+      60.0
+     ]
+    ],
+    "discount_factors": [
+     0.97,
+     0.94
+    ],
+    "hazard_rate": 0.01,
+    "recovery": 0.4,
+    "wwr_b": -1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.680823074850299,
+     "a": [
+      55.394829814011906,
+      55.394829814011906
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "closed-form"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "b V = -60 on every path: root a = 55.4, above the old C++ bracket end 50",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0012",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 1e-50,
+    "recovery": 0.4,
+    "values": [
+     [
+      10.0
+     ],
+     [
+      10.0
+     ]
+    ],
+    "wwr_b": 70.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 5.82e-50,
+     "a": [
+      -815.1292546497023
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "closed-form"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "h = 1e-50, b V = 700: root a = -815.1, below the old C++ bracket end -800",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0013",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 0.01,
+    "recovery": 0.4,
+    "values": [
+     [
+      10.0
+     ],
+     [
+      10.0
+     ]
+    ],
+    "wwr_b": 70.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.057909967579841924,
+     "a": [
+      -704.6051701859881
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "closed-form"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "boundary |b V| = 700 on every path",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0014",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 700.0,
+    "recovery": 0.4,
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.582,
+     "a": [
+      6.051080335043404
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "closed-form"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "boundary h t = 700: target e^-700 is a normal double",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0015",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0,
+     2.0
+    ],
+    "values": [
+     [
+      3.0,
+      -2.0
+     ],
+     [
+      3.0,
+      -2.0
+     ]
+    ],
+    "discount_factors": [
+     0.97,
+     0.94
+    ],
+    "hazard_rate": 1e-10,
+    "recovery": 0.4,
+    "wwr_b": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 1.7459999999126998e-10,
+     "a": [
+      -23.925850929940456,
+      -22.425850929940456
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "closed-form"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "tiny hazard 1e-10: no cancellation in 1 - e^(-h t)",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0016",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     2.0
+    ],
+    "values": [
+     [
+      30.0,
+      25.0,
+      40.0
+     ],
+     [
+      -20.0,
+      5.0,
+      -35.0
+     ],
+     [
+      10.0,
+      40.0,
+      0.0
+     ],
+     [
+      2.0,
+      -8.0,
+      15.0
+     ]
+    ],
+    "discount_factors": [
+     0.99,
+     0.98,
+     0.955
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4,
+    "wwr_b": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.853870876724446,
+     "a": [
+      -32.51048602143332,
+      -42.520691113242584,
+      -42.473238050471814
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "mixed V across paths, b = 1: |b V| up to 40",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0017",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     2.0
+    ],
+    "values": [
+     [
+      30.0,
+      25.0,
+      40.0
+     ],
+     [
+      -20.0,
+      5.0,
+      -35.0
+     ],
+     [
+      10.0,
+      40.0,
+      0.0
+     ],
+     [
+      2.0,
+      -8.0,
+      15.0
+     ]
+    ],
+    "discount_factors": [
+     0.99,
+     0.98,
+     0.955
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4,
+    "wwr_b": -0.75
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 1.6546995325270438e-06,
+     "a": [
+      -17.51048609054749,
+      -8.520749073538585,
+      -28.72323562116894
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "mixed V across paths, right way b = -0.75",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0018",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 0.01,
+    "recovery": 0.4,
+    "values": [
+     [
+      10.0
+     ],
+     [
+      -10.0
+     ]
+    ],
+    "wwr_b": 70.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.057909967579841924,
+     "a": [
+      -703.9069851686718
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "boundary mixed: b V = +700 and -700",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0019",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     2.0
+    ],
+    "values": [
+     [
+      30.0,
+      25.0,
+      40.0
+     ],
+     [
+      -20.0,
+      5.0,
+      -35.0
+     ],
+     [
+      10.0,
+      40.0,
+      0.0
+     ],
+     [
+      2.0,
+      -8.0,
+      15.0
+     ]
+    ],
+    "discount_factors": [
+     0.99,
+     0.98,
+     0.955
+    ],
+    "hazard_rate": 2.0,
+    "recovery": 0.4,
+    "wwr_b": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 7.864264489887716,
+     "a": [
+      0.3535902179958872,
+      0.45596668900756426,
+      3.6961779146431604
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "hazard 2 with a 1-year bucket: bucket default probability above 1/2",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0020",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 40.0,
+    "recovery": 0.4,
+    "values": [
+     [
+      5.0
+     ],
+     [
+      -5.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 1.164,
+     "a": [
+      4.661029923801264
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "hazard 40: 1 - e^(-h dt) rounds to 1 in binary64",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0021",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     2.0
+    ],
+    "values": [
+     [
+      30.0,
+      25.0,
+      40.0
+     ],
+     [
+      -20.0,
+      5.0,
+      -35.0
+     ],
+     [
+      10.0,
+      40.0,
+      0.0
+     ],
+     [
+      2.0,
+      -8.0,
+      15.0
+     ]
+    ],
+    "discount_factors": [
+     0.99,
+     0.98,
+     0.955
+    ],
+    "hazard_rate": 1e-10,
+    "recovery": 0.4,
+    "wwr_b": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 4.351665120150955e-09,
+     "a": [
+      -30.6422568451193,
+      -33.65063209843197,
+      -33.64011564101081
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "tiny hazard 1e-10, mixed V",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0022",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 0.01,
+    "recovery": 0.4,
+    "values": [
+     [
+      10.0
+     ],
+     [
+      10.0
+     ]
+    ],
+    "wwr_b": 70.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "|b V| = 705 above 700"
+  },
+  {
+   "case_id": "wwr_g-0023",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 0.01,
+    "recovery": 0.4,
+    "values": [
+     [
+      10.0,
+      1.0
+     ],
+     [
+      10.0
+     ]
+    ],
+    "wwr_b": 70.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "two errors: path length differs and |b V| above 700"
+  },
+  {
+   "case_id": "wwr_g-0024",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 800.0,
+    "recovery": 0.4,
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NON_FINITE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "target e^-800 underflows"
+  },
+  {
+   "case_id": "wwr_g-0025",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 800.0,
+    "recovery": 1.0,
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "two errors: recovery 1 and target underflow"
+  },
+  {
+   "case_id": "wwr_g-0026",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     0.97
+    ],
+    "hazard_rate": 1e-310,
+    "recovery": 0.4,
+    "values": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NON_FINITE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr257",
+    "synthetic"
+   ],
+   "description": "bucket default probability below the smallest normal double"
   }
  ]
 }

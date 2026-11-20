@@ -1,6 +1,6 @@
 # xVA framework on given paths: collateral, netting, adjustments, sensitivity-based margin, wrong-way risk
 
-Spec version 1.0.0. Status: Specified (stage G, wave 4b). Rulings: `stage-g-rulings.md` G-40 to G-44. Suites `stage_g/collexp_g` (17), `xvaadj_g` (12), `sbim_g` (8; `simm_g` until v0.10.0), `wwr_g` (6), written by `oracle/python/gen_stage_g_w4b.py`; alias suite `stage_k/sbim_alias_k` (21, KR-153). Stage K rulings KR-150 to KR-155 (`stage-k-rulings-margin.md`) replaced the margin goldens' weights and renamed the operation on main (2026-11-20, pull request #59; released with v1.0.0).
+Spec version 1.0.0. Status: Specified (stage G, wave 4b). Rulings: `stage-g-rulings.md` G-40 to G-44. Suites `stage_g/collexp_g` (17), `xvaadj_g` (12), `sbim_g` (8; `simm_g` until v0.10.0), `wwr_g` (26; 6 until KR-257 added 20 on 2026-11-20), written by `oracle/python/gen_stage_g_w4b.py`; alias suite `stage_k/sbim_alias_k` (21, KR-153). Stage K rulings KR-150 to KR-155 (`stage-k-rulings-margin.md`) replaced the margin goldens' weights and renamed the operation on main (2026-11-20, pull request #59; released with v1.0.0).
 
 **Plain idea.** A bank's loss if a counterparty defaults depends on the whole relationship with that counterparty, not on one trade. Trades under one legal netting agreement offset each other. Under a credit support annex (CSA), collateral changes hands when the netted value moves past a threshold, but only in steps of at least the minimum transfer amount, and after a default it takes some days (the margin period of risk, MPoR) before the position can be closed out, so the collateral held lags the exposure. This page takes simulated values as **inputs**, so every formula can be checked exactly. It then turns exposure profiles into the valuation adjustments: CVA (counterparty default), DVA (own default), FVA (funding), MVA (funding initial margin), KVA (holding capital). It adds a sensitivity-based initial margin for interest-rate delta (on placeholder weights) and the Hull-White wrong-way-risk model. The simulation that produces the paths, and its check against ORE, is the separate wave 4c slice.
 
@@ -51,6 +51,10 @@ Formal statement [HW12]: on path `p` the hazard in bucket `i` is `exp(a_i + b V_
 
 Worked example: CVA 0.04363 with `b = 0` (equal to the independent bucket CVA on the path-mean EE, asserted), 0.06115 at `b = 0.1`, 0.08649 at `b = 0.3` (wrong way), 0.01557 at `b = -0.2` (right way).
 
+**Root and limits (KR-257, confirmed 2026-11-20, `stage-k-rulings-wwr.md`).** Each `a_i` is found on the closed-form bracket `[ln h - max_p b V_p - 1, ln h - min_p b V_p + 1]` by safeguarded Newton, to `1e-15 max(1, |a|)`, in the cancellation-free form of the bucket equation. `|b V_p(t_i)| <= 700` for every path and time, else `E_DOMAIN` (`wwr_b`); `e^(-h t_i)` and `1 - e^(-h dt_i)` must be normal binary64 numbers, else `E_NON_FINITE` (`hazard_rate`); both checked after the domain checks above. Worked example (`wwr_g-0007`): `h = 0.01`, `b = 1`, `V = 10` on both paths, `times = [1, 2]`: `a = ln 0.01 - 10 = -14.605170185988092` in both buckets, CVA 0.11347 (closed form; the builds before KR-257 returned `a = -2.6e33`, CVA 0 in Python and Rust).
+
+**Limits.** Before KR-257 (v0.7.0 to v0.10.0 and main until 2026-11-20) the root was silently wrong outside a window of about `b V` in `[-6.5, 9.25]` at `h = 0.01` (narrower at larger `h`) and lost about `eps / (h dt)` relative at small `h`; see the CHANGELOG and `docs/known-issues.md`. Above `|b V| = 700` the operation refuses rather than return a CVA whose rounding (`eps |b V|`) could exceed the 1e-12 relative tolerance.
+
 ## Tolerances and outside share
 
 1e-9 absolute plus 1e-12 relative (`root_finding` class for `wwr_g`). Outside: none (formulas on given inputs; G-40). The simulated slice (wave 4c) carries the ORE comparison.
@@ -61,4 +65,4 @@ Worked example: CVA 0.04363 with `b = 0` (equal to the independent bucket CVA on
 |---|---|---|---|---|
 | Exposure statistics | exact | `collexp_g` | zero thresholds, MTA 0, no lag: exposure 0 (asserted) | definition |
 | Adjustments | exact | `xvaadj_g` | own hazard 0: DVA 0 (asserted) | definition |
-| WWR `a(t)` root | 1e-40 in the oracle; builds to 1e-14 relative | `wwr_g` | `b = 0`: independent CVA (asserted) | [HW12] |
+| WWR `a(t)` root | 1e-40 in the oracle; builds to 1e-14 relative | `wwr_g` | `b = 0`: independent CVA (asserted); identical `V` on every path: `a_i = ln h - b V_i` (asserted, KR-257) | [HW12] |

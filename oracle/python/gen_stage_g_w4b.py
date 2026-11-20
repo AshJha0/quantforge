@@ -142,6 +142,12 @@ def sbim(inp, mut=None):
 
 # ------------------------------------------------------------------------------------------------ WWR (Hull-White 2012)
 def wwr(inp, mut=None):
+    # 130 digits: mean_p S_p - e^(-h t) cancels about -log10(h dt) digits (50 at h = 1e-50); 80 are left for the root.
+    with mp.workdps(130):
+        return _wwr(inp, mut)
+
+
+def _wwr(inp, mut=None):
     t = [mp.mpf(0)] + [mp.mpf(x) for x in inp["times"]]
     V = [[mp.mpf(x) for x in row] for row in inp["values"]]
     df = [mp.mpf(1)] + [mp.mpf(x) for x in inp["discount_factors"]]
@@ -153,12 +159,71 @@ def wwr(inp, mut=None):
         dt = t[i] - t[i - 1]
         tgt = mp.exp(-h * t[i])
         f = lambda a: sum(S[p] * mp.exp(-mp.exp(a + b * V[p][i - 1]) * dt) for p in range(n)) / n - tgt  # noqa: E731
-        a = mp.findroot(f, mp.log(h), tol=mp.mpf(10) ** -40)
+        # KR-257: bisection on the closed-form bracket [ln h - max bV - 1, ln h - min bV + 1] (f > 0 at the left end,
+        # f < 0 at the right end because mean_p S_p(t_(i-1)) = e^(-h t_(i-1))), to 1e-40 relative. The old findroot
+        # from ln h (a secant) gave the same roots on the first four goldens and fails for large |b V|.
+        c = [b * V[p][i - 1] for p in range(n)]
+        lo, hi = mp.log(h) - max(c) - 1, mp.log(h) - min(c) + 1
+        assert f(lo) > 0 > f(hi), "closed-form bracket does not change sign"
+        while hi - lo > mp.mpf(10) ** -40 * max(1, abs(lo)):
+            mid = (lo + hi) / 2
+            lo, hi = (mid, hi) if f(mid) > 0 else (lo, mid)
+        a = (lo + hi) / 2
         avals.append(a)
         newS = [S[p] * mp.exp(-mp.exp(a + b * V[p][i - 1]) * dt) for p in range(n)]
         cva += (1 - R) * df[i] * sum(max(V[p][i - 1], 0) * (S[p] - newS[p]) for p in range(n)) / n
         S = newS
     return {"cva": float(cva), "a": [float(x) for x in avals]}
+
+
+def wwr_closed(inp):
+    """Identical V on every path: S_p is the same on every path, so mean_p S_p(t_i) = e^(-h t_i) holds bucket by bucket
+    with exp(a_i + b V_i) = h, hence a_i = ln h - b V_i and CVA = (1 - R) sum D_i max(V_i, 0) (e^(-h t_(i-1)) - e^(-h t_i))."""
+    t = [mp.mpf(0)] + [mp.mpf(x) for x in inp["times"]]
+    h, R, b = mp.mpf(inp["hazard_rate"]), mp.mpf(inp["recovery"]), mp.mpf(inp["wwr_b"])
+    v = [mp.mpf(x) for x in inp["values"][0]]
+    assert all(row == inp["values"][0] for row in inp["values"])
+    cva = sum(mp.mpf(d) * max(v[i], 0) * (mp.exp(-h * t[i]) - mp.exp(-h * t[i + 1])) for i, d in enumerate(inp["discount_factors"]))
+    return {"cva": float((1 - R) * cva), "a": [float(mp.log(h) - b * x) for x in v]}
+
+
+def wwr_root_cases(s):
+    """KR-257 (confirmed 2026-11-20): the a(t) root for large |b V| (a mutation lane found the old Newton silently
+    returning a = -2.6e33 and cva = 0 for h = 0.01, b = 1, V = 10), tiny and large hazards, the |b V| <= 700 limit,
+    and the E_NON_FINITE cases. Identical-V cases are checked against the closed form."""
+    op, tg = "xva.wwr.cva_hw", ["xva", "wwr", "kr257"]
+    rep = dict(times=[1.0, 2.0], values=[[10.0, 10.0], [10.0, 10.0]], discount_factors=[0.97, 0.94], hazard_rate=0.01, recovery=0.4, wwr_b=1.0)
+    mixed = dict(times=[0.5, 1.0, 2.0], values=[[30.0, 25.0, 40.0], [-20.0, 5.0, -35.0], [10.0, 40.0, 0.0], [2.0, -8.0, 15.0]],
+                 discount_factors=[0.99, 0.98, 0.955], hazard_rate=0.02, recovery=0.4, wwr_b=1.0)
+    one = dict(times=[1.0], discount_factors=[0.97], hazard_rate=0.01, recovery=0.4)
+    closed = [(rep, "reported example: b V = 10 on every path (old builds: a = -2.6e33, cva = 0)"),
+              (dict(rep, values=[[20.0, 20.0], [20.0, 20.0]]), "b V = 20 on every path"),
+              (dict(rep, wwr_b=-1.0), "b V = -10 on every path, positive exposure"),
+              (dict(rep, values=[[-30.0, -30.0], [-30.0, -30.0]]), "b V = -30 on every path, no positive exposure"),
+              (dict(rep, values=[[60.0, 60.0], [60.0, 60.0]], wwr_b=-1.0), "b V = -60 on every path: root a = 55.4, above the old C++ bracket end 50"),
+              (dict(one, values=[[10.0], [10.0]], hazard_rate=1e-50, wwr_b=70.0), "h = 1e-50, b V = 700: root a = -815.1, below the old C++ bracket end -800"),
+              (dict(one, values=[[10.0], [10.0]], wwr_b=70.0), "boundary |b V| = 700 on every path"),
+              (dict(one, values=[[1.0], [1.0]], hazard_rate=700.0, wwr_b=0.5), "boundary h t = 700: target e^-700 is a normal double"),
+              (dict(rep, values=[[3.0, -2.0], [3.0, -2.0]], hazard_rate=1e-10, wwr_b=0.3), "tiny hazard 1e-10: no cancellation in 1 - e^(-h t)")]
+    for inp, d in closed:
+        out = wwr(inp)
+        cf = wwr_closed(inp)
+        assert abs(out["cva"] - cf["cva"]) <= 1e-15 * max(1.0, abs(cf["cva"])) and all(abs(x - y) <= 1e-15 * max(1.0, abs(y)) for x, y in zip(out["a"], cf["a"])), d
+        s.add(op, inp, out, cls="root_finding", verified=["mpmath-50", "closed-form"], tags=tg, limit=LIM, description=d)
+    general = [(mixed, "mixed V across paths, b = 1: |b V| up to 40"), (dict(mixed, wwr_b=-0.75), "mixed V across paths, right way b = -0.75"),
+               (dict(one, values=[[10.0], [-10.0]], wwr_b=70.0), "boundary mixed: b V = +700 and -700"),
+               (dict(mixed, hazard_rate=2.0, wwr_b=0.1), "hazard 2 with a 1-year bucket: bucket default probability above 1/2"),
+               (dict(one, values=[[5.0], [-5.0], [1.0]], hazard_rate=40.0, wwr_b=0.2), "hazard 40: 1 - e^(-h dt) rounds to 1 in binary64"),
+               (dict(mixed, hazard_rate=1e-10, wwr_b=0.3), "tiny hazard 1e-10, mixed V")]
+    for inp, d in general:
+        s.add(op, inp, wwr(inp), cls="root_finding", verified=["mpmath-50"], tags=tg, limit=LIM, description=d)
+    errs = [(dict(one, values=[[10.0], [10.0]], wwr_b=70.5), "E_DOMAIN", "|b V| = 705 above 700"),
+            (dict(one, values=[[10.0, 1.0], [10.0]], wwr_b=70.5), "E_INPUT", "two errors: path length differs and |b V| above 700"),
+            (dict(one, values=[[1.0], [1.0]], hazard_rate=800.0, wwr_b=0.0), "E_NON_FINITE", "target e^-800 underflows"),
+            (dict(one, values=[[1.0], [1.0]], hazard_rate=800.0, recovery=1.0, wwr_b=0.0), "E_DOMAIN", "two errors: recovery 1 and target underflow"),
+            (dict(one, values=[[1.0], [1.0]], hazard_rate=1e-310, wwr_b=0.0), "E_NON_FINITE", "bucket default probability below the smallest normal double")]
+    for inp, code, d in errs:
+        s.add(op, inp, error=code, cls="date_and_convention", tags=["invalid", "xva", "kr257"], description=d)
 
 
 OP, ALIAS = "xva.sbim.ir_delta", "xva.simm.ir_delta"  # KR-152, KR-256: the old id is a deprecated alias in v1.0.0, removed in the first release after it
@@ -322,6 +387,7 @@ def main():
     errs = [(dict(wbase, values=[[1.0]]), "E_INPUT", "path length differs"), (dict(wbase, hazard_rate=0.0), "E_DOMAIN", "hazard 0 (a(t) undefined)")]
     for inp, code, d in errs:
         s.add("xva.wwr.cva_hw", inp, error=code, cls="date_and_convention", tags=["invalid", "xva"], description=d)
+    wwr_root_cases(s)
     write(s)
     n4 = len(s.cases)
     reg = json.loads((HERE.parent / "outside_register_g.json").read_text(encoding="utf-8"))

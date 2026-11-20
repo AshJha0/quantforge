@@ -236,3 +236,179 @@ def test_smooth_maturity_past_last_knot_names_the_field() -> None:
         "E_INPUT",
         "maturities",
     )
+
+
+# --- KR-257 (confirmed 2026-11-20): the wrong-way root a(t) ------------------------------------
+# Self-contained (mutmut runs this file in a copy of python/ without datasets/). Identical V on
+# every path: a_i = ln h - b V_i and cva = (1 - R) sum D_i max(V_i, 0) (e^(-h t_(i-1)) - e^(-h t_i)).
+# Mixed paths: the 50-digit oracle values of wwr_g (gen_stage_g_w4b.py).
+
+_WWR_MIXED = [[30.0, 25.0, 40.0], [-20.0, 5.0, -35.0], [10.0, 40.0, 0.0], [2.0, -8.0, 15.0]]
+
+
+def _wclose(got: object, want: float) -> bool:
+    assert isinstance(got, float)
+    return abs(got - want) <= 1e-9 + 1e-12 * abs(want)
+
+
+@pytest.mark.parametrize("bv", [-700.0, -60.0, -10.0, 10.0, 20.0, 60.0, 700.0])
+def test_wwr_identical_paths_closed_form(bv: float) -> None:
+    out = xva.wwr_cva([1.0, 2.0], [[bv, bv], [bv, bv]], [0.97, 0.94], 0.01, 0.4, 1.0)
+    exact = math.log(0.01) - bv
+    a = out["a"]
+    assert isinstance(a, list) and len(a) == 2
+    assert all(abs(x - exact) <= 1e-14 * max(1.0, abs(exact)) for x in a)
+    want = (
+        0.6
+        * max(bv, 0.0)
+        * (0.97 * -math.expm1(-0.01) + 0.94 * (math.exp(-0.01) - math.exp(-0.02)))
+    )
+    cva = out["cva"]
+    assert isinstance(cva, float) and abs(cva - want) <= 1e-12 * want
+
+
+@pytest.mark.parametrize(
+    ("h", "b", "cva", "a"),
+    [
+        (
+            0.02,
+            1.0,
+            0.853870876724446,
+            [-32.51048602143332, -42.520691113242584, -42.473238050471814],
+        ),
+        (
+            0.02,
+            -0.75,
+            1.6546995325270438e-06,
+            [-17.51048609054749, -8.520749073538585, -28.72323562116894],
+        ),
+        (
+            2.0,
+            0.1,
+            7.864264489887716,
+            [0.3535902179958872, 0.45596668900756426, 3.6961779146431604],
+        ),
+        (
+            1e-10,
+            0.3,
+            4.351665120150955e-09,
+            [-30.6422568451193, -33.65063209843197, -33.64011564101081],
+        ),
+    ],
+)
+def test_wwr_mixed_paths_oracle(h: float, b: float, cva: float, a: list[float]) -> None:
+    out = xva.wwr_cva([0.5, 1.0, 2.0], _WWR_MIXED, [0.99, 0.98, 0.955], h, 0.4, b)
+    assert _wclose(out["cva"], cva)
+    got = out["a"]
+    assert isinstance(got, list)
+    assert all(_wclose(x, y) for x, y in zip(got, a, strict=True))
+
+
+def test_wwr_one_bucket_oracle_values() -> None:
+    out = xva.wwr_cva([1.0], [[10.0], [-10.0]], [0.97], 0.01, 0.4, 70.0)
+    assert _wclose(out["cva"], 0.057909967579841924) and out["a"] == pytest.approx(
+        [-703.9069851686718], rel=1e-12
+    )
+    out = xva.wwr_cva([1.0], [[5.0], [-5.0], [1.0]], [0.97], 40.0, 0.4, 0.2)
+    assert _wclose(out["cva"], 1.164) and out["a"] == pytest.approx([4.661029923801264], rel=1e-12)
+    out = xva.wwr_cva([1.0], [[10.0], [10.0]], [0.97], 1e-50, 0.4, 70.0)
+    assert out["a"] == pytest.approx([-815.1292546497023], rel=1e-14)
+    out = xva.wwr_cva([1.0], [[1.0], [1.0]], [0.97], 700.0, 0.4, 0.5)
+    assert out["cva"] == pytest.approx(0.582, rel=1e-14) and out["a"] == pytest.approx(
+        [6.051080335043404], rel=1e-14
+    )
+
+
+def test_wwr_limit_errors() -> None:
+    assert _err(xva.wwr_cva, [1.0], [[1.0], [-10.0]], [0.97], 0.01, 0.4, 70.01) == (
+        "E_DOMAIN",
+        "wwr_b",
+    )
+    assert _err(xva.wwr_cva, [1.0], [[1.0]], [0.97], 709.0, 0.4, 0.0) == (
+        "E_NON_FINITE",
+        "hazard_rate",
+    )
+    assert _err(xva.wwr_cva, [1.0], [[1.0]], [0.97], 2e-308, 0.4, 0.0) == (
+        "E_NON_FINITE",
+        "hazard_rate",
+    )
+    out = xva.wwr_cva([1.0], [[10.0], [-10.0]], [0.97], 708.0, 0.4, 70.0)
+    assert out["cva"] == pytest.approx(0.6 * 0.97 * 5.0, rel=1e-12)
+
+
+# Kills for the KR-257 mutation-report sample (lane k-v1-wwr, python seed 2689916947, 26 of 40
+# before these tests). The unreachable E_NO_CONVERGENCE raise of _wwr_root (mutants 128, 136) and
+# the `strict=None` zip of its derivative sum (51, equivalent: both lists have one entry per path)
+# stay alive. Text mutants stay alive as above; a message replaced by None is not text: the CLI
+# contract writes the message as a JSON string, so every error must carry a non-empty str.
+
+
+def test_sbim_diagonal_is_one_and_correlation_floor_is_minus_one() -> None:
+    # G-43: rho_kk = 1 whatever the matrix holds on its diagonal (0.25 here): margin = |RW s| = 10.
+    out = xva.sbim_ir_delta([10.0], [1.0], [[0.25]], 1e9)
+    assert out["margin"] == pytest.approx(10.0, rel=1e-15)
+    assert _err(xva.sbim_ir_delta, [10.0], [1.0], [[-1.5]], 1e9) == ("E_DOMAIN", "correlations")
+
+
+def test_xva_length_errors_name_their_input() -> None:
+    name = xva.Name(0.01, 0.4)
+    one = [1.0, 1.0]
+    base: tuple[Any, ...] = (
+        [0.5, 1.0],
+        one,
+        one,
+        [-1.0, -1.0],
+        name,
+        name,
+        0.0,
+        0.0,
+        False,
+        None,
+        None,
+        None,
+        None,
+    )
+    for pos, key in ((1, "discount_factors"), (2, "ee"), (3, "ene")):
+        args = list(base)
+        args[pos] = [args[pos][0]]
+        assert _err(xva.adjustments, *args) == ("E_INPUT", key)
+    args = list(base)
+    args[11] = [1.0, 1.0]  # capital without hurdle_rate
+    assert _err(xva.adjustments, *args) == ("E_INPUT", "capital")
+    assert _err(xva.collateralised, [0.5, 1.0], [("S", [[1.0]])], {}, 0.5) == ("E_INPUT", "trades")
+
+
+def _message(fn: Any, *args: Any) -> object:
+    with pytest.raises(QfError) as e:
+        fn(*args)
+    return e.value.message
+
+
+def test_xva_errors_carry_a_message() -> None:
+    name = xva.Name(0.01, 0.4)
+    one = [1.0, 1.0]
+    calls: list[tuple[Any, ...]] = [
+        (
+            xva.adjustments,
+            [0.5, 1.0],
+            one,
+            one,
+            [1.0, -1.0],
+            name,
+            name,
+            0.0,
+            0.0,
+            False,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (xva.dispersion, {"A": 1.0}, "A"),
+        (xva.wwr_cva, [1.0], [[1.0]], [0.97], 709.0, 0.4, 0.0),
+        (xva.collateralised, [0.5, 1.0], [], {}, 0.5),
+        (xva.sbim_ir_delta, [1.0], [1.0, 2.0], [[1.0]], 1.0),
+    ]
+    for fn, *args in calls:
+        msg = _message(fn, *args)
+        assert isinstance(msg, str) and msg, fn
