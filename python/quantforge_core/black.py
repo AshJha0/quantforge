@@ -178,9 +178,15 @@ def _identified(o: Option, v: float, target: float) -> float:
         d1 = _d1(f, k, v, t)
         mag = d * (f * big_n(phi * d1) + k * big_n(phi * (d1 - root)))
     scale = v * _vega(o, v)
-    error = abs(_value(o, v) - target) + 2.0**-52 * mag + 2.0**-1070 * (1.0 + d * (abs(f) + abs(k) + root))
+    error = (
+        abs(_value(o, v) - target)
+        + 2.0**-52 * mag
+        + 2.0**-1070 * (1.0 + d * (abs(f) + abs(k) + root))
+    )
     if not scale > 0 or error > 1e-10 * scale:
-        raise QfError("E_NO_CONVERGENCE", "the price does not identify the vol in binary64", "price")
+        raise QfError(
+            "E_NO_CONVERGENCE", "the price does not identify the vol in binary64", "price"
+        )
     return v
 
 

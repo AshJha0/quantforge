@@ -11,7 +11,7 @@ from collections.abc import Callable, Hashable, Sequence
 
 from .errors import QfError
 from .finite import guard
-from .var_risk import _SCENARIOS, _scaled
+from .frtb_scenarios import SCENARIOS, scale_correlation
 
 Factor = tuple[Hashable, ...]
 Rho = Callable[[str, Factor, Factor], float]
@@ -177,7 +177,7 @@ def aggregate(
     order = sorted(buckets, key=bucket_key)
     scenarios: dict[str, object] = {}
     values: dict[str, float] = {}
-    for sc in _SCENARIOS:
+    for sc in SCENARIOS:
         ks, ss = [], []
         for name in order:
             items = buckets[name]
@@ -188,7 +188,7 @@ def aggregate(
                 for i, (fi, wi) in enumerate(items):
                     for j, (fj, wj) in enumerate(items):
                         if i != j:
-                            total += _scaled(rho(name, fi, fj), sc) * wi * wj
+                            total += scale_correlation(rho(name, fi, fj), sc) * wi * wj
                 ks.append(math.sqrt(max(0.0, total)))
             ss.append(sum(w for _, w in items))
 
@@ -197,7 +197,7 @@ def aggregate(
             for b in range(len(s)):
                 for c in range(len(s)):
                     if b != c:
-                        total += _scaled(gamma(order[b], order[c]), sc) * s[b] * s[c]
+                        total += scale_correlation(gamma(order[b], order[c]), sc) * s[b] * s[c]
             return total
 
         used = list(ss)
@@ -216,7 +216,7 @@ def aggregate(
             measure: values[sc],
             "alternative_used": alternative,
         }
-    binding = max(_SCENARIOS, key=lambda sc: (values[sc], -_SCENARIOS.index(sc)))
+    binding = max(SCENARIOS, key=lambda sc: (values[sc], -SCENARIOS.index(sc)))
     return {"scenarios": scenarios, "capital": values[binding], "binding_scenario": binding}
 
 
@@ -430,7 +430,7 @@ def curvature(
     gamma = _gamma(risk_class)
     scenarios: dict[str, object] = {}
     values: dict[str, float] = {}
-    for sc in _SCENARIOS:
+    for sc in SCENARIOS:
         ks: list[float] = []
         ss: list[float] = []
         sel: list[str] = []
@@ -450,7 +450,7 @@ def curvature(
                         for j, vj in enumerate(side):
                             if i != j:
                                 c = _name_rho(risk_class, label, names[i], names[j])
-                                total += _scaled(c * c, sc) * vi * vj * _psi(vi, vj)
+                                total += scale_correlation(c * c, sc) * vi * vj * _psi(vi, vj)
                     k2.append(math.sqrt(max(0.0, total)))
                 kp, km = k2
             up = kp > km or (kp == km and sums[0] > sums[1])
@@ -464,7 +464,7 @@ def curvature(
             for c in range(len(order)):
                 if b != c:
                     g = gamma(order[b], order[c])
-                    total += _scaled(g * g, sc) * ss[b] * ss[c] * _psi(ss[b], ss[c])
+                    total += scale_correlation(g * g, sc) * ss[b] * ss[c] * _psi(ss[b], ss[c])
         values[sc] = math.sqrt(max(0.0, total))
         scenarios[sc] = {
             "buckets": [
@@ -473,7 +473,7 @@ def curvature(
             ],
             "curvature": values[sc],
         }
-    binding = max(_SCENARIOS, key=lambda sc: (values[sc], -_SCENARIOS.index(sc)))
+    binding = max(SCENARIOS, key=lambda sc: (values[sc], -SCENARIOS.index(sc)))
     return {"scenarios": scenarios, "capital": values[binding], "binding_scenario": binding}
 
 
