@@ -59,3 +59,33 @@ def test_a_missing_argument_names_the_public_function() -> None:
         stage_k.trigger_check()  # type: ignore[call-arg]
     with pytest.raises(TypeError, match=r"^trigger_check\(\) missing"):
         stage_k.trigger_check(x_ref=1.0, x_now=1.0, days_since=1.0, k=3.0)  # type: ignore[call-arg]
+
+
+def test_limit_check_reaches_a_wrapper_that_hides_parameter_names() -> None:
+    """mutmut replaces each function by a (*args, **kwargs) trampoline; the guard must still pass the caller's
+    arguments to the limit check (PR #59 mutation job: "the unmutated build does not pass")."""
+    from quantforge_core import finite
+
+    seen: list[tuple[object, ...]] = []
+
+    def real_check(xs: list[float], k: float) -> None:
+        seen.append((xs, k))
+        if len(xs) > 2:
+            raise QfError("E_LIMIT", "too many")
+
+    def real(xs: list[float], k: float) -> float:
+        return sum(xs) * k
+
+    def check_tramp(*args: object, **kwargs: object) -> None:
+        real_check(*args, **kwargs)  # type: ignore[arg-type]
+
+    def tramp(*args: object, **kwargs: object) -> float:
+        return real(*args, **kwargs)  # type: ignore[arg-type]
+
+    finite.limits_first(check_tramp)(tramp)
+    wrapped = finite._wrap(tramp)
+    assert wrapped([1.0, 2.0], 3.0) == 9.0
+    assert seen == [([1.0, 2.0], 3.0)]
+    with pytest.raises(QfError) as e:
+        wrapped([1.0, 2.0, 3.0], 1.0)
+    assert e.value.code == "E_LIMIT"

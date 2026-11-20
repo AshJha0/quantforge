@@ -7,7 +7,8 @@
   4. a stage under 60% of its value-checked cases fails (no dated-plan fallback, owner 2026-11-12), and error
      cases leave the denominator;
   5. a stage F case marked SCIPY.CHI2 counts as reimplementation, not as an outside check;
-  6. a stage K case whose only outside record is a printed regulator figure is not counted (KR-250, audit KA-C18).
+  6. a stage K case whose only outside record is a printed regulator figure is not counted (KR-250, audit KA-C18);
+  7. an item under the 60% per-item floor is a problem (audit KF-19), and a stale generated doc block is caught (KF-18).
 """
 import contextlib
 import io
@@ -131,6 +132,32 @@ def main():
             S.GOLDEN, S.ORACLE = real_golden, real_oracle
     c = S.classify_case_register([{"case_id": "x", "library": "QuantLib", "convention_rows": ["SCIPY.CHI2"]}], set())
     check("SCIPY.CHI2 case is reimplementation", c["x"][0] == "reimplementation")
+    # Audit KF-19 (2026-11-20): an item under the 60% per-item floor is a problem, so --check fails; no exemption list.
+    doc = S.build([])
+    k = doc["stages"]["K"]["per_item"]
+    low = [it for it, v in k.items() if not v["meets_item_floor"]]
+    p = []
+    S.build(p)
+    check("every stage K item under the per-item floor is in the problems list",
+          all(any(f"item {it} " in x and "per-item floor" in x for x in p) for it in low))
+    keep = S.FLOOR
+    S.FLOOR = 0.99
+    try:
+        p = []
+        S.build(p)
+        check("planted: a per-item floor no item meets puts every item in the problems list",
+              sum("per-item floor" in x for x in p) >= len(k))
+    finally:
+        S.FLOOR = keep
+    # Audit KF-18: a planted stale figure inside a generated doc block is caught by --check.
+    b = S.doc_blocks(doc)
+    check("doc blocks carry the stage total and every item", b["stage-k-total"].startswith(
+        f"{doc['stages']['K']['without_sweeps']['counted_with_rederivation']} of ") and all(
+        f" {v['counted_with_rederivation']} of {v['cases']} (" in b["stage-k-items"] for v in k.values()))
+    stale = dict(b, **{"stage-k-total": "91 of 113 value cases (80.5%)"})
+    p = []
+    S.sync_blocks(stale, False, p)
+    check("planted stale stage total in a doc block is caught", any("stage-k-total differs" in x for x in p))
     print(f"{len(FAILS)} failure(s)")
     return 1 if FAILS else 0
 

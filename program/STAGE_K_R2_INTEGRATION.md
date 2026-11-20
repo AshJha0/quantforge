@@ -21,11 +21,11 @@ Integration lane: Claude Opus 5.5. Reviewer: none: self-assessment; no second re
 | 4 | merge k-audit-shares (ab7e8a31), renumber KR-210..212 to KR-250..252 | merged on lane k-r2-e1; KR-210..212 renumbered KR-250..252 | 0c225b83 |
 | 5 | outside_shares: lim_k, dropped blind credit, KR-250 records | lane k-r2-e1; then K-4c blind lane k-r2-blind 14/14 MATCH, 13 counted; stage K 91 of 113 | 0c225b83, 9c8b8272 |
 | 6 | E1 gate: NaN goldens for backtest.zone and .desk | lane k-r2-e1; check_e1_coverage 0 problems | 0c225b83 |
-| 7 | risk.backtest.traffic_light binomial (KR-237) in four builds | lane k-r2-tl (KR-253); boundary fix in progress | pending |
+| 7 | risk.backtest.traffic_light binomial (KR-237) in four builds | merged: lane k-r2-tl (KR-253, with the q = c boundary amendment) | 86e3d84d |
 | 8 | mutation modules for saccr, stage_k, bermudan_k8; stage F kill tests | lane k-r2-mut: 40/40, 39/40 + 1 Equivalent, 40/40 on CI sample; four stage F survivors killed | 91588373 |
 | 9 | generator drift (stage G E1, gen_cli_cases.py) | lane k-r2-gen2: stage G E1 and cli_cases.inc regenerated, --check gates | 49857faa |
-| 10 | docs to the merged state | lanes k-r2-docs, k-r2-kf3 (KF-3), k-r2-kf2 (KF-13..16) | b6cdcf8d, 918d7609, pending |
-| 11 | verification | early chains at e0f52a65 green except stale case total; follow-up audit KF-1..12 and its check done; final chains pending | 91c99115 |
+| 10 | docs to the merged state | merged: lanes k-r2-docs, k-r2-kf3 (KF-3), k-r2-kf2 (KF-13..16) | b6cdcf8d, 918d7609, ae60e2b9 |
+| 11 | verification | early chains at e0f52a65 green except stale case total; follow-up audit KF-1..12 and its check done; chains at 617f3874: Java, Python, repo gates and docs green; status ladder fixed in ef411039; final check before tag KF-17..23 answered on lane k-r2-gate | 91c99115, 617f3874, ef411039 |
 
 ## Log
 

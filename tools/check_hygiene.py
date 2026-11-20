@@ -63,11 +63,22 @@ def empty_packages(files, sizes):
     return bad
 
 
+def python_boms(files, root=ROOT):
+    """A tracked .py file that starts with a UTF-8 byte-order mark (audit KF-27, 2026-11-20)."""
+    bad = []
+    for f in files:
+        if f.endswith(".py"):
+            with open(root / f, "rb") as fh:
+                if fh.read(3) == bytes((0xEF, 0xBB, 0xBF)):
+                    bad.append(f"{f}: starts with a UTF-8 byte-order mark")
+    return bad
+
+
 def main():
     files = tracked()
     sizes = {f: (ROOT / f).stat().st_size for f in files if (ROOT / f).is_file()}
     files = [f for f in files if f in sizes]
-    bad = large_files(files, sizes, read_allow()) + empty_packages(files, sizes)
+    bad = large_files(files, sizes, read_allow()) + empty_packages(files, sizes) + python_boms(files)
     for b in bad:
         print("BAD", b)
     print(f"hygiene: {len(files)} tracked files, {len(bad)} problems")
