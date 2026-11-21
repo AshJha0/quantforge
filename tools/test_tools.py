@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """Tests for the recorder and forward log: python tools/test_tools.py"""
+import contextlib
+import email.message
 import hashlib
 import importlib.util
+import io
 import json
 import re
 import subprocess
 import sys
 import tempfile
 import unittest
+import urllib.error
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -412,6 +416,105 @@ class Workflows(unittest.TestCase):
         self.assertEqual(c["inputs"]["days"], [2, 1, 1])
         c = self.sofr.window_case("y", "2026-10-07", 2, fix)  # starts on a business day
         self.assertEqual(c["operation"], "rates.ois.compound_dated")
+
+
+class WorkflowFetch(unittest.TestCase):
+    """K9-1b: common.fetch retries a transient bad answer and, when every try fails, names what came back. No network."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(ROOT / "tools/workflows"))
+        import common
+        cls.c = common
+
+    class Resp:
+        def __init__(self, body, status=200, ctype="application/json"):
+            self.body, self.status, self.headers = body, status, {"Content-Type": ctype}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def read(self):
+            return self.body
+
+    def opener(self, answers):
+        """Fake urlopen: returns or raises the next planted answer, and records each request URL."""
+        self.urls, self.waits = [], []
+        it = iter(answers)
+
+        def op(req, timeout):
+            self.urls.append(req.full_url)
+            a = next(it)
+            if isinstance(a, BaseException):
+                raise a
+            return a
+        return op
+
+    def run_fetch(self, answers, **kw):
+        op = self.opener(answers)
+        with contextlib.redirect_stderr(io.StringIO()):
+            return self.c.fetch("https://example.test/x.json", opener=op, sleep=self.waits.append, **kw)
+
+    def http_error(self, code, body=b"", ctype="text/html"):
+        h = email.message.Message()
+        h["Content-Type"] = ctype
+        return urllib.error.HTTPError("https://example.test/x.json", code, "x", h, io.BytesIO(body))
+
+    def test_good_body_is_returned_unchanged_on_the_first_try(self):
+        body = b'{"refRates": [1]}'
+        self.assertEqual(self.run_fetch([self.Resp(body)], expect_json=True), body)
+        self.assertEqual(len(self.urls), 1)
+        self.assertEqual(self.waits, [])
+
+    def test_html_then_json_succeeds_after_one_retry(self):
+        body = b'{"refRates": []}'
+        got = self.run_fetch([self.Resp(b"<html>maintenance</html>", ctype="text/html"), self.Resp(body)], expect_json=True)
+        self.assertEqual(got, body)
+        self.assertEqual(self.waits, [30.0])
+
+    def test_non_json_is_accepted_when_json_is_not_expected(self):
+        csv = b"Date,1 Mo\n11/20/2026,4.1\n"
+        self.assertEqual(self.run_fetch([self.Resp(csv, ctype="text/csv")]), csv)
+
+    def test_three_bad_answers_raise_a_self_describing_error(self):
+        page = b"<html>" + b"x" * 400
+        with self.assertRaises(self.c.FetchError) as cm:
+            self.run_fetch([self.Resp(page, ctype="text/html")] * 3, expect_json=True)
+        msg = str(cm.exception)
+        for part in ("after 3 attempts", "https://example.test/x.json", "HTTP 200", "'text/html'", "first 200 bytes",
+                     "not JSON", "<html>"):
+            self.assertIn(part, msg)
+        self.assertNotIn("x" * 250, msg)  # only the first 200 bytes are quoted
+        self.assertEqual(self.waits, [30.0, 60.0])
+        self.assertEqual(len(self.urls), 3)
+
+    def test_empty_body_5xx_and_network_errors_are_retried(self):
+        body = b"[1]"
+        got = self.run_fetch([self.Resp(b"  "), self.http_error(503, b"busy"), urllib.error.URLError("reset"), self.Resp(body)],
+                             expect_json=True, attempts=4)
+        self.assertEqual(got, body)
+        self.assertEqual(len(self.urls), 4)
+        with self.assertRaises(self.c.FetchError) as cm:
+            self.run_fetch([self.Resp(b"")] * 3)
+        self.assertIn("empty body", str(cm.exception))
+
+    def test_other_4xx_fails_at_once_with_status_and_body(self):
+        with self.assertRaises(self.c.FetchError) as cm:
+            self.run_fetch([self.http_error(404, b"<html>not found</html>")], expect_json=True)
+        msg = str(cm.exception)
+        self.assertEqual(len(self.urls), 1)
+        self.assertEqual(self.waits, [])
+        for part in ("not retried", "HTTP 404", "'text/html'", "not found"):
+            self.assertIn(part, msg)
+
+    def test_last_failure_is_a_network_error(self):
+        with self.assertRaises(self.c.FetchError) as cm:
+            self.run_fetch([TimeoutError("timed out")] * 3)
+        self.assertIn("TimeoutError", str(cm.exception))
+        self.assertIn("https://example.test/x.json", str(cm.exception))
 
 
 class GalleryVol(unittest.TestCase):

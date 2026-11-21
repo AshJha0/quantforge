@@ -33,10 +33,10 @@ UST_TENORS = {"1 Mo": "1M", "2 Mo": "2M", "3 Mo": "3M", "4 Mo": "4M", "6 Mo": "6
 CURVE_LABEL = "USD proxy curve: Treasury par yields bootstrapped with SOFR OIS conventions. Not a SOFR swap curve."
 
 
-def load(name, url, data_dir):
+def load(name, url, data_dir, expect_json=False):
     if data_dir:
         return (Path(data_dir) / name).read_bytes()
-    return c.fetch(url)
+    return c.fetch(url, expect_json=expect_json)
 
 
 def treasury(raw):
@@ -68,7 +68,7 @@ def main():
     a = ap.parse_args()
     year = dt.date.today().year
     ust = treasury(load("us-treasury-par-yields.csv", c.source_url("us-treasury-par-yields", year), a.data))
-    sf = sofr(load("nyfed-sofr.json", c.source_url("nyfed-sofr", year), a.data))
+    sf = sofr(load("nyfed-sofr.json", c.source_url("nyfed-sofr", year), a.data, expect_json=True))
     so = sonia(load("boe-sonia.csv", c.source_url("boe-sonia", year), a.data))
     as_of, quotes = ust[-1]
     prev_quotes = ust[-2][1] if len(ust) > 1 else None
