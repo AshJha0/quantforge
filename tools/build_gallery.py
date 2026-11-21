@@ -755,6 +755,7 @@ HAND_PAGES = [
     ("cross-gamma.md", "Cross gamma on a curve", "`risk.curve.cross_gamma`"),
     ("curve-pca.md", "Principal components of curve moves", "`risk.curve.pca`"),
     ("linker-price-curve.md", "Inflation-linked bond priced on a CPI curve", "`infl.linker.price_curve`"),
+    ("xccy-pv.md", "Cross-currency basis swap PV", "`fx.xccy.pv`"),
 ]
 
 
