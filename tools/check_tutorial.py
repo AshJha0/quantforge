@@ -15,6 +15,7 @@ Exit 0 when every page matches, 1 otherwise. Standard library only.
 """
 import argparse
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -41,7 +42,10 @@ def command(kind, body):
     if kind == "bash":
         # The page says `python`; some runners only have python3, so it means this interpreter.
         shim = f'python() {{ "{Path(sys.executable).as_posix()}" "$@"; }}\n'
-        return ["bash", "-e"], shim + body
+        # A bare "bash" makes Windows CreateProcess search System32 before PATH, which finds the WSL launcher
+        # (no distribution on the hosted runner: 34 of 58 pages failed in cross-platform run 44896558134).
+        # shutil.which follows PATH, so under Git Bash it is Git's bash.
+        return [shutil.which("bash") or "bash", "-e"], shim + body
     raise ValueError(f"cannot run a {kind} block")
 
 

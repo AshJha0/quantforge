@@ -1,0 +1,2142 @@
+{
+ "schema_version": "1.0",
+ "suite": "fuzzfix_k",
+ "spec": "specifications/cli-contract.md; specifications/02-curves/projection-and-fra.md; specifications/10-execution/smart-order-router.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_fuzz.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "fuzzfix_k-0001",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      9007199254740992
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 12,
+     "tenor_months": 60,
+     "strike": 0.045,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "ratesvol",
+    "months",
+    "synthetic"
+   ],
+   "description": "the fuzz input: last node expiry 2^53 months, above the 1 to 1200 range (Java overflowed LocalDate; fuzz run 44815591552, seed 5, ratesvol_e-0003)"
+  },
+  {
+   "case_id": "fuzzfix_k-0002",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      -9007199254740992,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 12,
+     "tenor_months": 60,
+     "strike": 0.045,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "ratesvol",
+    "months",
+    "synthetic"
+   ],
+   "description": "first node expiry -2^53 months (still increasing), below the 1 to 1200 range"
+  },
+  {
+   "case_id": "fuzzfix_k-0003",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      1201
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 12,
+     "tenor_months": 60,
+     "strike": 0.045,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "ratesvol",
+    "months",
+    "synthetic"
+   ],
+   "description": "last node expiry 1201 months, one above the range (was E_DATE_RANGE in Java, Python and Rust)"
+  },
+  {
+   "case_id": "fuzzfix_k-0004",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 1201,
+     "tenor_months": 60,
+     "strike": 0.045,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "ratesvol",
+    "months",
+    "synthetic"
+   ],
+   "description": "trade expiry 1201 months, one above the range (was E_DATE_RANGE in Python and Rust)"
+  },
+  {
+   "case_id": "fuzzfix_k-0005",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      9007199254740992
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       -0.05,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 12,
+     "tenor_months": 60,
+     "strike": 0.045,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "ratesvol",
+    "months",
+    "two_errors",
+    "synthetic"
+   ],
+   "description": "two errors: node expiry 2^53 [structural] and a negative alpha [domain]; E_INPUT first"
+  },
+  {
+   "case_id": "fuzzfix_k-0006",
+   "operation": "rates.swaption.price",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "vol": 0.21,
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 1201,
+     "tenor_months": 60,
+     "strike": 0.037,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "swaption",
+    "months",
+    "synthetic"
+   ],
+   "description": "swaption expiry 1201 months, one above the range (was E_DATE_RANGE in Python and Rust)"
+  },
+  {
+   "case_id": "fuzzfix_k-0007",
+   "operation": "rates.swaption.price",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "vol": 0.21,
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 9007199254740992,
+     "tenor_months": 60,
+     "strike": 0.037,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "swaption",
+    "months",
+    "synthetic"
+   ],
+   "description": "swaption expiry 2^53 months (Rust cast the year to i32)"
+  },
+  {
+   "case_id": "fuzzfix_k-0008",
+   "operation": "rates.cap.price",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "vol": 0.22,
+    "trade": {
+     "type": "CAP",
+     "start_months": 1201,
+     "tenor_months": 24,
+     "strike": 0.038,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "cap",
+    "months",
+    "synthetic"
+   ],
+   "description": "cap start 1201 months, one above the range (was E_DATE_RANGE in Python and Rust)"
+  },
+  {
+   "case_id": "fuzzfix_k-0009",
+   "operation": "rates.cap.price",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "vol": 0.22,
+    "trade": {
+     "type": "CAP",
+     "start_months": 9007199254740992,
+     "tenor_months": 24,
+     "strike": 0.038,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "cap",
+    "months",
+    "synthetic"
+   ],
+   "description": "cap start 2^53 months"
+  },
+  {
+   "case_id": "fuzzfix_k-0010",
+   "operation": "rates.cap.strip",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "start_months": 1201,
+    "strike": 0.037,
+    "cap_tenors_months": [
+     12,
+     24,
+     36,
+     48,
+     60
+    ],
+    "flat_vols": [
+     0.24,
+     0.235,
+     0.228,
+     0.222,
+     0.215
+    ],
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "strip",
+    "months",
+    "synthetic"
+   ],
+   "description": "strip start 1201 months, one above the range (was E_DATE_RANGE in Python and Rust)"
+  },
+  {
+   "case_id": "fuzzfix_k-0011",
+   "operation": "rates.cap.strip",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "start_months": 9007199254740992,
+    "strike": 0.037,
+    "cap_tenors_months": [
+     12,
+     24,
+     36,
+     48,
+     60
+    ],
+    "flat_vols": [
+     0.24,
+     0.235,
+     0.228,
+     0.222,
+     0.215
+    ],
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "strip",
+    "months",
+    "synthetic"
+   ],
+   "description": "strip start 2^53 months"
+  },
+  {
+   "case_id": "fuzzfix_k-0012",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "10",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "10",
+    "lit_samples": [
+     [
+      "0"
+     ],
+     [
+      "0"
+     ],
+     1,
+     [
+      "2"
+     ]
+    ],
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "0",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "sor",
+    "mistyped",
+    "synthetic"
+   ],
+   "description": "the fuzz input: a lit_samples row that is a number (Python crashed, Java said E_INPUT; fuzz run 44815591552, seed 5, sor_h-0002)"
+  },
+  {
+   "case_id": "fuzzfix_k-0013",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "10",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "10",
+    "lit_samples": 5,
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "0",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "sor",
+    "mistyped",
+    "synthetic"
+   ],
+   "description": "lit_samples a number with a LIT venue (was E_INPUT in C++, Java and Rust)"
+  },
+  {
+   "case_id": "fuzzfix_k-0014",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "4",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "1",
+    "theta": "0",
+    "venues": [
+     {
+      "as": "0.1",
+      "kind": "DARK",
+      "r": "0",
+      "tail": [
+       "0.5",
+       "0.5",
+       "0.5",
+       "0"
+      ]
+     }
+    ],
+    "lit_samples": "x"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "sor",
+    "mistyped",
+    "synthetic"
+   ],
+   "description": "lit_samples a string with only a DARK venue (C++ and Rust ignored it; Python iterated the string)"
+  },
+  {
+   "case_id": "fuzzfix_k-0015",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "4",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "1",
+    "lit_samples": [
+     [
+      "0"
+     ],
+     [
+      "4"
+     ]
+    ],
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "0",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2"
+     },
+     {
+      "as": "0.1",
+      "kind": "DARK",
+      "r": "0",
+      "tail": 1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "sor",
+    "mistyped",
+    "synthetic"
+   ],
+   "description": "a DARK venue's tail that is a number (Python crashed)"
+  },
+  {
+   "case_id": "fuzzfix_k-0016",
+   "operation": "exec.sor.allocate",
+   "inputs": {
+    "S": "10",
+    "f": "0.3",
+    "h": "0.5",
+    "lambda_o": "1",
+    "lambda_u": "10",
+    "lit_samples": [
+     [
+      "0",
+      "1"
+     ],
+     1
+    ],
+    "theta": "0",
+    "venues": [
+     {
+      "Q": "0",
+      "as": "0",
+      "kind": "LIT",
+      "r": "0.2"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "fuzz",
+    "sor",
+    "mistyped",
+    "two_errors",
+    "synthetic"
+   ],
+   "description": "two errors: a row of the wrong length [structural] then a row that is a number [schema]; E_SCHEMA first"
+  }
+ ]
+}

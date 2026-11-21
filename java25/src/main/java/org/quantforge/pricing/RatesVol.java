@@ -82,6 +82,13 @@ public final class RatesVol {
         if (expiryMonths < 1 || expiryMonths > 1200 || tenorMonths < 1 || tenorMonths > 1200) {
             throw new QfError("E_INPUT", "expiry_months and tenor_months must be 1 to 1200", "trade");
         }
+        for (long m : c.expiriesMonths()) {
+            // Node months share the 1 to 1200 range of every month count (projection-and-fra.md, D40), so a huge
+            // count is E_INPUT before any date is built (fuzz run 44815591552: 2^53 overflowed LocalDate).
+            if (m < 1 || m > 1200) {
+                throw new QfError("E_INPUT", "a node expiry is out of range", "cube");
+            }
+        }
         double[] te = new double[rows];
         for (int i = 0; i < rows; i++) {
             te[i] = d.time(CapSwaption.start(d, c.expiriesMonths()[i]));

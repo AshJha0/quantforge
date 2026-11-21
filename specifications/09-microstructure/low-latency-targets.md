@@ -121,6 +121,8 @@ How the numbers were chosen, and what was already known. The figures are the R p
 
 R2 not yet run: on 2026-11-19 four recording sessions were cut short by network drops, the longest 3 h 20 min; targets and rules were fixed before any timing (HR-130 to HR-134); the measurement uses the first 6-hour session that completes; the 2026-11-19 workload R result remains a recorded MISS. Rows L1-R2 to L3-R2 and L7 stay open; no figure for them is stated anywhere until that session is measured (`specifications/stage-h-rulings-audit.md`, HR-132 to HR-134).
 
+*Status 2026-11-20 (target and 6-hour rule unchanged):* R2 not obtained. No session in 30 on 2026-11-19 and 2026-11-20 ran an unbroken 6 hours (websocket keepalive ping timeouts; whole-connection stalls of 50 to 107 s seen before drops; cause not established: network path or machine load). The owner ended the attempt on 2026-11-20 and the recorder is stopped. Rows L1-R2 to L3-R2 and L7 stay without a figure; the workload R result of 2026-11-19 remains a recorded MISS (`stage-h-rulings-audit.md`, status line under HR-134; evidence class: read).
+
 ### Order of work (owner decision 2026-11-19)
 
 1. Record the window, build and hash the R2 input and the form B input of the same window, run correctness, then timing; publish the first measurement as it is.

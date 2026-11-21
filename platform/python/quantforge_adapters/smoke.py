@@ -179,6 +179,7 @@ def main(argv: list[str] | None = None) -> int:
     except Verdict as v:
         print(v)
         return 3
+    a.work.mkdir(parents=True, exist_ok=True)  # a fresh checkout has no work directory (first CI run, PR #62)
     return smoke(make(a.adapter, a.work), a.phase, load(a.records), digests, a.out)
 
 

@@ -65,16 +65,16 @@ jobs:
         id: sofr
         continue-on-error: true
         run: python3 tools/workflows/sofr_check.py --impl "$IMPL" --out out/reports
-      - name: (b) Rich/cheap screen (scaffold until the R2 spec and a price source land)
+      - name: (b) Rich/cheap screen (no automated price source, ruling R2-A11; without price files it writes a BLOCKED report)
         id: richcheap
         continue-on-error: true
         run: python3 tools/workflows/rich_cheap.py --impl "$IMPL" --out out/reports
-      - name: P&L explain (spec harness when the CLI has risk.pnl.explain; interim key-rate job otherwise)
+      - name: P&L explain (spec harness; key-rate fallback for a CLI without risk.pnl.explain)
         id: pnl
         continue-on-error: true
         run: |
-          # pnl_explain.py (specifications/06-risk/pnl-explain.md) over last year's real Treasury moves, once the CLI lists
-          # risk.pnl.explain; until the r2-lang branches are merged, the interim keyrate_explain.py runs instead.
+          # pnl_explain.py (specifications/06-risk/pnl-explain.md) over last year's real Treasury moves. Every CLI lists
+          # risk.pnl.explain since R2 (v0.4.2); the key-rate fallback is kept only for a CLI built without it.
           ops=$(python3 -c "import sys,json; sys.path.insert(0,'tools/workflows'); import common as c, subprocess;             impls=json.load(open('conformance/runner/implementations.json')); base,cwd=c.resolve_command(impls['$IMPL']);             print(subprocess.run(base+['operations'],cwd=cwd,capture_output=True,text=True).stdout)")
           if echo "$ops" | grep -q '"risk.pnl.explain"'; then
             python3 tools/workflows/pnl_explain.py --impl "$IMPL" --out out/reports

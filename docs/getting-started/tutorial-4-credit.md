@@ -2,7 +2,7 @@
 
 The plain idea: a **credit default swap** (CDS) is insurance against a borrower's default. The protection buyer pays a running premium; if the borrower defaults, the seller pays the loss, one minus the **recovery rate**. The market quotes, for each maturity, the **par spread**: the premium that makes the contract worth zero. From those quotes you can work out the market's **survival probabilities**, the chance the borrower has not defaulted by each date. That set of probabilities is a credit curve, and it is to credit what the discount curve of [Tutorial 1](tutorial-1-swap.md) is to rates.
 
-This tutorial bootstraps a CDS curve with the ISDA standard model, prices a five-year CDS on it, reads the survival probabilities, then builds a sector curve from three names. It uses three operations from stage D. Budget 10 to 15 minutes after Tutorial 1. Every number shown is a real output; CI runs the code in all four languages and fails if a printed line differs.
+This tutorial bootstraps a CDS curve with ISDA-standard-model conventions (checked against QuantLib), prices a five-year CDS on it, reads the survival probabilities, then builds a sector curve from three names. It uses three operations from stage D. Budget 10 to 15 minutes after Tutorial 1. Every number shown is a real output; CI runs the code in all four languages and fails if a printed line differs.
 
 ## What you need
 
@@ -112,7 +112,7 @@ Each prints the nine lines of step 1.
 
 ## For practitioners
 
-- **Model.** This is the ISDA CDS standard model as QuantLib's `IsdaCdsEngine` implements it (Taylor fix, no accrual bias, piecewise-flat forwards): accrual paid on default, step-in one day after the trade date, cash settlement three business days after, weekends but no holidays. QuantLib's NPVs agree within 7e-16 per unit on the golden suite `stage_d/credit_d`; the ISDA C library itself was not run.
+- **Model.** ISDA-standard-model conventions, checked against QuantLib's `IsdaCdsEngine` and written to agree with it (Taylor fix, no accrual bias, piecewise-flat forwards): accrual paid on default, step-in one day after the trade date, cash settlement three business days after, weekends but no holidays. QuantLib's NPVs agree within 7e-16 per unit on the golden suite `stage_d/credit_d`; the ISDA C library itself was not run.
 - **Discount curve.** Only `LOG_LINEAR_DF` (flat forwards) is accepted, as the ISDA model assumes; any other interpolation is `E_INPUT`. The real ISDA convention builds this curve from deposit and swap rates; this page gives the curve directly.
 - **Survival pillars** are at each quote's maturity date, not maturity plus one day (ruling D20). Some systems put them a day later.
 - **Sector curves** here average spreads, then bootstrap. Averaging survival probabilities or hazard rates gives a different curve; the spec fixes the spread average.

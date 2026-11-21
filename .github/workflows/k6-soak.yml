@@ -1,0 +1,110 @@
+name: K-6 soak and capacity
+# Plan 14.8 K-6 (spec specifications/12-platform/soak-eod-capacity.md, rulings KR-217 to KR-221): a 2-hour soak of
+# one long-lived `quantforge batch` process per build, judged by the frozen rule in benchmarks/soak/analyse.py,
+# then the capacity rows of benchmarks/soak/capacity.py at 1, 2 and 4 processes. The Python job also runs the two
+# planted faults (a 20-minute leaking soak that must be flagged, and a corrupted golden that must stop its row).
+# Results are uploaded as artifacts labelled "GitHub Actions runner (shared, unpinned)"; nothing is committed.
+# Manual and weekly only: never on pull requests (a 2-hour job per build would hold every PR).
+on:
+  schedule:
+    - cron: '41 2 * * 0'
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: soak length in minutes (at least 120; 130 leaves room for the warm-up)
+        default: '130'
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  MAVEN_ARGS: --settings ${{ github.workspace }}/java25/.mvn/ci-settings.xml
+  QF_HOST_LABEL: GitHub Actions runner (shared, unpinned)
+  PYTHONUTF8: '1'
+jobs:
+  soak-python:
+    name: k6-soak-python
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - run: uv sync --locked --project python
+      - name: soak, capacity and planted faults
+        env:
+          MINUTES: ${{ github.event.inputs.minutes || '130' }}
+        run: bash benchmarks/soak/ci_run.sh python "$MINUTES" planted
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: k6-soak-python
+          path: benchmarks/results/k6/
+  soak-java:
+    name: k6-soak-java
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "25.0.5"
+          cache: maven
+      - run: mvn -B -q -DskipTests package
+        working-directory: java25
+      - name: soak and capacity
+        env:
+          MINUTES: ${{ github.event.inputs.minutes || '130' }}
+        run: bash benchmarks/soak/ci_run.sh java "$MINUTES"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: k6-soak-java
+          path: benchmarks/results/k6/
+  soak-cpp:
+    name: k6-soak-cpp
+    runs-on: ubuntu-24.04
+    container: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: apt-get update && apt-get install -y cmake ninja-build python3
+      - run: cmake -S cpp26 -B cpp26/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
+      - run: cmake --build cpp26/build --parallel
+      - name: soak and capacity
+        env:
+          MINUTES: ${{ github.event.inputs.minutes || '130' }}
+        run: bash benchmarks/soak/ci_run.sh cpp "$MINUTES"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: k6-soak-cpp
+          path: benchmarks/results/k6/
+  soak-rust:
+    name: k6-soak-rust
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: rustup show
+        working-directory: rust
+      - run: cargo build --release -p quantforge-cli
+        working-directory: rust
+      - name: soak and capacity
+        env:
+          MINUTES: ${{ github.event.inputs.minutes || '130' }}
+        run: bash benchmarks/soak/ci_run.sh rust "$MINUTES"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: k6-soak-rust
+          path: benchmarks/results/k6/

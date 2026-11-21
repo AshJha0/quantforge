@@ -12,8 +12,11 @@ pub struct Period {
 
 /// Adds months, clipping the day to the target month.
 pub fn add_months(d: Date, months: i64) -> Date {
-    let total = i64::from(d.y) * 12 + i64::from(d.m) - 1 + months;
-    let y = total.div_euclid(12) as i32;
+    // Saturating, and a year outside i32 is clamped, so a huge count reaches the caller's year
+    // check (E_DATE_RANGE) instead of wrapping into a valid year (fuzz run 44815591552).
+    let total = (i64::from(d.y) * 12 + i64::from(d.m) - 1).saturating_add(months);
+    let clamp = if total < 0 { i32::MIN } else { i32::MAX };
+    let y = i32::try_from(total.div_euclid(12)).unwrap_or(clamp);
     let m = total.rem_euclid(12) as u32 + 1;
     Date::new(y, m, d.d.min(days_in_month(y, m)))
 }

@@ -230,9 +230,21 @@ the measurement calls) and 0 GC events in the timed regions (`gc_R_*.log` not ke
 
 Raw output: `cpp_R_BTC-USD.json`, `cpp_R_ETH-USD.json`, `rust_R_*.json`, `java_R_*.json`.
 
-## Workload R2 and row L7: not yet run
+## Workload R2 and row L7: not obtained (attempt ended 2026-11-20)
 
 Targets fixed in commit f2d90738 (low-latency-targets.md (g) and (h)) before any R2 file was read. The raw window
 started recording 2026-11-19 11:41:24 UTC. The builder, the Python reference, the harness support and the runner are
-in `benchmarks/h9/` (`README_R2.md` gives the commands in order). No R2 or L7 figure exists yet; the 14-minute sample
+in `benchmarks/h9/` (`README_R2.md` keeps the commands as a record). No R2 or L7 figure exists; the 14-minute sample
 was used for correctness only and gave no timing figure.
+
+**Outcome (read from the recorder log and `benchmarks/h9/r2_status.py`, 2026-11-20).** R2 needed one unbroken 6-hour
+session (HR-134). All 30 sessions on 2026-11-19 and 2026-11-20 ended before hour 6. The drops were websocket
+keepalive ping timeouts; whole-connection stalls of 50 to 107 s were seen before drops. The cause is not established:
+the network path or load on the laptop could explain it, and nothing recorded tells them apart. The owner ended the
+attempt on 2026-11-20 and the recorder is stopped. The workload R result of 2026-11-19 stays a recorded MISS; the
+targets and the 6-hour rule are unchanged. No raw recorded row is published here, only these counts.
+
+**A note on one monitor (inferred, 2026-11-20).** Between 13:15 and 13:24 UTC on 2026-11-20 a diagnostic monitor
+started by the coordinator read the recorder's heartbeat file and most likely stopped the recorder's housekeeping
+task (the heartbeat writes). Recording continued, and no session was ended by it: sessions before and after that
+interval broke in the same way.

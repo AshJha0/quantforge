@@ -1,0 +1,38 @@
+{
+ "implementation": "python",
+ "host": "local laptop, not the acceptance machine",
+ "commit": "55e8dd67726e2dd081ba844490ac2e489a9e05e3",
+ "platform": "win32",
+ "logical_cpus": 12,
+ "memory_key": "private_bytes",
+ "run_at": "2026-11-20T17:38:40+00:00",
+ "planted_wrong": true,
+ "rows": [
+  {
+   "row": "mix/heavy",
+   "cases": 750,
+   "processes": 1,
+   "wall_s": 1098.478,
+   "cases_per_s": 0.7,
+   "p50_us": 1239.3,
+   "p99_us": 20025059.2,
+   "peak_rss_mib": 54.0,
+   "peak_judged_mib": 429.0,
+   "exit_codes": [
+    0
+   ],
+   "wrong": 1,
+   "wrong_examples": [
+    {
+     "case_id": "hedgeqp_large_r6-0001",
+     "why": "objective: 35.678858433387184 vs 54.51828765008078, error 1.884e+01, limit abs 1e-10 rel 1e-10"
+    }
+   ],
+   "status": "WRONG_RESULT"
+  }
+ ],
+ "failed_rows": [
+  "mix/heavy"
+ ],
+ "verdict": "WRONG_RESULT CAUGHT"
+}

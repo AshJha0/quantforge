@@ -1,0 +1,66 @@
+{
+ "cases": {
+  "pla_k-0001": {
+   "spearman": 0.9,
+   "ks": 0.2,
+   "ks_count": 1,
+   "zone": "RED",
+   "ks_pvalue_asymptotic": 0.9999652306540077
+  },
+  "pla_k-0002": {
+   "spearman": 0.9947392104476375,
+   "ks": 0.036,
+   "ks_count": 9,
+   "zone": "GREEN",
+   "ks_pvalue_asymptotic": 0.9969310429234816
+  },
+  "pla_k-0003": {
+   "spearman": 0.7672508040128642,
+   "ks": 0.12,
+   "ks_count": 30,
+   "zone": "AMBER",
+   "ks_pvalue_asymptotic": 0.05464633011386356
+  },
+  "pla_k-0004": {
+   "spearman": 1.0,
+   "ks": 0.396,
+   "ks_count": 99,
+   "zone": "RED",
+   "ks_pvalue_asymptotic": 1.8834284534259718e-17
+  },
+  "pla_k-0005": {
+   "spearman": 0.009858589737435799,
+   "ks": 0.008,
+   "ks_count": 2,
+   "zone": "RED",
+   "ks_pvalue_asymptotic": 1.0
+  },
+  "pla_k-0006": {
+   "spearman": 0.6504192387078194,
+   "ks": 0.196,
+   "ks_count": 49,
+   "zone": "RED",
+   "ks_pvalue_asymptotic": 0.00013491672530608698
+  },
+  "es_k-0001": {
+   "es_by_horizon": [
+    2.337802792201402,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "es": 2.337802792201402
+  },
+  "es_k-0002": {
+   "es_by_horizon": [
+    2.337802792201402,
+    2.337802792201402,
+    2.337802792201402,
+    2.337802792201402,
+    2.337802792201402
+   ],
+   "es": 8.09838642833843
+  }
+ }
+}

@@ -1,0 +1,281 @@
+{
+ "what": "hidden expected values of the 8 ima_k value cases whose only outside check was SciPy (K-8f second blind lane, DR-H2); never in the packet",
+ "source": "datasets/golden/stage_k/ima_k.json",
+ "source_sha256": "ca5bb2ed4affc74d248865a8299e9047ec1dad15acf71ed425ee4a1f958fc24d",
+ "omitted_fields": {
+  "n": "input length, no derivation",
+  "regulatory_window": "n == 250, a rule on the input length",
+  "label": "fixed string (KR-69)",
+  "mode": "names the input mode given"
+ },
+ "tolerance": {
+  "real": {
+   "rule": "|b - e| <= max(1e-12 |e|, 1e-15) (KR-67; frtb-ima.md A1; golden tolerance_limit relative 1e-12, absolute 1e-15)"
+  },
+  "exact": {
+   "rule": "integers by value, strings exactly"
+  }
+ },
+ "cases": {
+  "pla_k-0001": {
+   "operation": "risk.frtb.pla",
+   "fields": [
+    {
+     "path": "spearman",
+     "value": 0.9,
+     "class": "real"
+    },
+    {
+     "path": "ks",
+     "value": 0.2,
+     "class": "real"
+    },
+    {
+     "path": "ks_count",
+     "value": 1,
+     "class": "exact"
+    },
+    {
+     "path": "zone",
+     "value": "RED",
+     "class": "exact"
+    },
+    {
+     "path": "ks_pvalue_asymptotic",
+     "value": 0.9999652306540077,
+     "class": "real"
+    }
+   ],
+   "omitted": [
+    "label",
+    "n",
+    "regulatory_window"
+   ]
+  },
+  "pla_k-0002": {
+   "operation": "risk.frtb.pla",
+   "fields": [
+    {
+     "path": "spearman",
+     "value": 0.9947392104476375,
+     "class": "real"
+    },
+    {
+     "path": "ks",
+     "value": 0.036,
+     "class": "real"
+    },
+    {
+     "path": "ks_count",
+     "value": 9,
+     "class": "exact"
+    },
+    {
+     "path": "zone",
+     "value": "GREEN",
+     "class": "exact"
+    },
+    {
+     "path": "ks_pvalue_asymptotic",
+     "value": 0.9969310429234816,
+     "class": "real"
+    }
+   ],
+   "omitted": [
+    "label",
+    "n",
+    "regulatory_window"
+   ]
+  },
+  "pla_k-0003": {
+   "operation": "risk.frtb.pla",
+   "fields": [
+    {
+     "path": "spearman",
+     "value": 0.7672508040128642,
+     "class": "real"
+    },
+    {
+     "path": "ks",
+     "value": 0.12,
+     "class": "real"
+    },
+    {
+     "path": "ks_count",
+     "value": 30,
+     "class": "exact"
+    },
+    {
+     "path": "zone",
+     "value": "AMBER",
+     "class": "exact"
+    },
+    {
+     "path": "ks_pvalue_asymptotic",
+     "value": 0.05464633011386356,
+     "class": "real"
+    }
+   ],
+   "omitted": [
+    "label",
+    "n",
+    "regulatory_window"
+   ]
+  },
+  "pla_k-0004": {
+   "operation": "risk.frtb.pla",
+   "fields": [
+    {
+     "path": "spearman",
+     "value": 1.0,
+     "class": "real"
+    },
+    {
+     "path": "ks",
+     "value": 0.396,
+     "class": "real"
+    },
+    {
+     "path": "ks_count",
+     "value": 99,
+     "class": "exact"
+    },
+    {
+     "path": "zone",
+     "value": "RED",
+     "class": "exact"
+    },
+    {
+     "path": "ks_pvalue_asymptotic",
+     "value": 1.883428453425973e-17,
+     "class": "real"
+    }
+   ],
+   "omitted": [
+    "label",
+    "n",
+    "regulatory_window"
+   ]
+  },
+  "pla_k-0005": {
+   "operation": "risk.frtb.pla",
+   "fields": [
+    {
+     "path": "spearman",
+     "value": 0.009858589737435799,
+     "class": "real"
+    },
+    {
+     "path": "ks",
+     "value": 0.008,
+     "class": "real"
+    },
+    {
+     "path": "ks_count",
+     "value": 2,
+     "class": "exact"
+    },
+    {
+     "path": "zone",
+     "value": "RED",
+     "class": "exact"
+    },
+    {
+     "path": "ks_pvalue_asymptotic",
+     "value": 1.0,
+     "class": "real"
+    }
+   ],
+   "omitted": [
+    "label",
+    "n",
+    "regulatory_window"
+   ]
+  },
+  "pla_k-0006": {
+   "operation": "risk.frtb.pla",
+   "fields": [
+    {
+     "path": "spearman",
+     "value": 0.6504192387078194,
+     "class": "real"
+    },
+    {
+     "path": "ks",
+     "value": 0.196,
+     "class": "real"
+    },
+    {
+     "path": "ks_count",
+     "value": 49,
+     "class": "exact"
+    },
+    {
+     "path": "zone",
+     "value": "RED",
+     "class": "exact"
+    },
+    {
+     "path": "ks_pvalue_asymptotic",
+     "value": 0.00013491672530608736,
+     "class": "real"
+    }
+   ],
+   "omitted": [
+    "label",
+    "n",
+    "regulatory_window"
+   ]
+  },
+  "es_k-0001": {
+   "operation": "risk.frtb.ima.es_lh",
+   "fields": [
+    {
+     "path": "es_by_horizon",
+     "value": [
+      2.3378027922014146,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "class": "real"
+    },
+    {
+     "path": "es",
+     "value": 2.3378027922014146,
+     "class": "real"
+    }
+   ],
+   "omitted": [
+    "label",
+    "mode"
+   ]
+  },
+  "es_k-0002": {
+   "operation": "risk.frtb.ima.es_lh",
+   "fields": [
+    {
+     "path": "es_by_horizon",
+     "value": [
+      2.3378027922014146,
+      2.3378027922014146,
+      2.3378027922014146,
+      2.3378027922014146,
+      2.3378027922014146
+     ],
+     "class": "real"
+    },
+    {
+     "path": "es",
+     "value": 8.098386428338472,
+     "class": "real"
+    }
+   ],
+   "omitted": [
+    "label",
+    "mode"
+   ]
+  }
+ }
+}
