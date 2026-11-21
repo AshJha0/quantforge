@@ -14,7 +14,8 @@ Each check shows the gate failing on a planted fault and passing on the real con
      survivors allowed per module and a pass probability of at least 0.9 at a true 90% kill rate (a
      12-mutant sample allowed none and passed a 90% module 28% of the time);
   7. a mutmut timeout (its own per-mutant CPU limit, as for an endless loop) counts as caught, as a C++
-     hang does; a survivor and a segfault do not.
+     hang does; a survivor and a segfault do not;
+  8. a failed unmutated baseline command prints the tail of its output (K9-1c); mutant runs stay silent.
 """
 import contextlib
 import io
@@ -218,6 +219,31 @@ def timeout_checks():
     check("planted endless-loop mutant counts as caught (1 of 3)", s["sample_either_killed"] == 1)
 
 
+def baseline_tail_checks():
+    """K9-1c: a failed baseline command prints the tail of its output; a mutant run (keep=False) prints nothing."""
+    script = "import sys\nfor i in range(200): print('line', i)\nprint('FAILED test_x', file=sys.stderr)\nsys.exit(3)"
+    err = io.StringIO()
+    with contextlib.redirect_stderr(err):
+        code = golden_mutants.run([sys.executable, "-c", script], keep=True)
+    text = err.getvalue()
+    check("failed baseline: exit code returned", code == 3)
+    check("failed baseline: stderr line and last stdout line in the tail", "FAILED test_x" in text and "line 199" in text)
+    check(f"failed baseline: only the last {golden_mutants.TAIL_LINES} lines", "line 100\n" not in text and "line 130" in text)
+    check("failed baseline: header names the command and exit", "exit 3" in text and "of 201 output lines" in text)
+    err = io.StringIO()
+    with contextlib.redirect_stderr(err):
+        code = golden_mutants.run([sys.executable, "-c", script])
+    check("mutant run: output still discarded", code == 3 and err.getvalue() == "")
+    err = io.StringIO()
+    with contextlib.redirect_stderr(err):
+        code = golden_mutants.run([sys.executable, "-c", "print('ok')"], keep=True)
+    check("passing baseline: nothing printed", code == 0 and err.getvalue() == "")
+    err = io.StringIO()
+    with contextlib.redirect_stderr(err):
+        code = golden_mutants.run([sys.executable, "-c", "import time; print('slow', flush=True); time.sleep(30)"], keep=True, timeout=2)
+    check("timed-out baseline: None and the tail so far", code is None and "timed out" in err.getvalue() and "slow" in err.getvalue())
+
+
 def main():
     cfg = json.loads((HERE / "stages.json").read_text(encoding="utf-8"))
     with tempfile.TemporaryDirectory() as d:
@@ -273,6 +299,7 @@ def main():
     skip_and_seed_checks()
     joint_pass_checks()
     timeout_checks()
+    baseline_tail_checks()
     lo, hi = stage_report.wilson(17, 20)
     check("Wilson 17/20 is 64% to 95%", round(lo, 2) == 0.64 and round(hi, 2) == 0.95)
     print(f"{len(FAILS)} failure(s)")

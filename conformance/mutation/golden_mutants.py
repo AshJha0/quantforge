@@ -14,6 +14,7 @@ Python needs Linux or WSL, because mutmut forks. It needs uv; Rust needs cargo-m
 Exit status: 0 the run finished, whatever survived; 2 the unmutated build failed or a tool failed.
 """
 import argparse
+import contextlib
 import fnmatch
 import json
 import os
@@ -52,23 +53,41 @@ MEMCAP = (["prlimit", f"--as={os.environ['QF_MUTANT_AS']}", "--"]
           if os.environ.get("QF_MUTANT_AS") and shutil.which("prlimit") else [])
 
 
-def run(cmd, cwd=None, env=None, timeout=None):
+TAIL_LINES = 80  # lines of a failed baseline command's output printed to the log
+
+
+def run(cmd, cwd=None, env=None, timeout=None, keep=False):
     """Returns the exit code, with None for a timeout. Output is kept out of the way.
+
+    keep=True (the unmutated baseline commands) keeps stdout and stderr in a temporary file and, if the command
+    fails or times out, prints its last TAIL_LINES lines to stderr, so the job log names the failing test. K9-1c:
+    run 43716417939 lost the output of a failed unmutated `cargo test` on rust surfaces_local_vol--s0. Mutant runs
+    keep the old behaviour: their output is discarded.
 
     The command runs in its own process group so a timeout also kills what it started (a hung test
     binary under cargo), not just the direct child."""
     posix = os.name == "posix"
-    p = subprocess.Popen(cmd, cwd=cwd, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                         start_new_session=posix)
-    try:
-        return p.wait(timeout=timeout)
-    except subprocess.TimeoutExpired:
-        if posix:
-            os.killpg(p.pid, signal.SIGKILL)
-        else:
-            p.kill()
-        p.wait()
-        return None
+    with (tempfile.TemporaryFile() if keep else contextlib.nullcontext(subprocess.DEVNULL)) as out:
+        p = subprocess.Popen(cmd, cwd=cwd, env=env, stdout=out, stderr=subprocess.STDOUT if keep else subprocess.DEVNULL,
+                             start_new_session=posix)
+        try:
+            code = p.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            if posix:
+                os.killpg(p.pid, signal.SIGKILL)
+            else:
+                p.kill()
+            p.wait()
+            code = None
+        if keep and code != 0:
+            out.seek(0)
+            lines = out.read().decode("utf-8", "replace").splitlines()
+            shown = "timed out" if code is None else f"exit {code}"
+            print(f"--- baseline command failed ({shown}): {' '.join(map(str, cmd))}; last {min(len(lines), TAIL_LINES)} "
+                  f"of {len(lines)} output lines ---", file=sys.stderr)
+            print("\n".join(lines[-TAIL_LINES:]), file=sys.stderr)
+            print("--- end of baseline output ---", file=sys.stderr, flush=True)
+    return code
 
 
 class Golden:
@@ -81,15 +100,15 @@ class Golden:
 
     def baseline(self, env=None):
         start = time.monotonic()
-        code = self.check(env)
+        code = self.check(env, keep=True)
         took = time.monotonic() - start
         self.limit = max(30.0, 5 * took)
         return code, took
 
-    def check(self, env=None):
+    def check(self, env=None, keep=False):
         return run(MEMCAP + [sys.executable, str(RUNNER), "--impl", self.impl, "--config", str(self.config),
                              "--suite", self.suite, "--report", str(self.work / "report"), "--timeout", str(self.limit)],
-                   env=env, timeout=4 * self.limit)
+                   env=env, timeout=4 * self.limit, keep=keep)
 
 
 def copy_tree(work):
@@ -133,11 +152,11 @@ def score_rust(a, work):
     build = ["cargo", "build", "--release", "-p", "quantforge-cli"]
     tests = ["cargo", "test", "-p", "quantforge-core"]
     golden = Golden("rust", [str(rust / "target" / "release" / "quantforge")], repo, work, a.suite)
-    if run(build, cwd=rust) or golden.baseline()[0] or run(tests + ["--no-run"], cwd=rust):
-        raise SystemExit("the unmutated build does not pass")
+    if run(build, cwd=rust, keep=True) or golden.baseline()[0] or run(tests + ["--no-run"], cwd=rust, keep=True):
+        raise SystemExit("the unmutated build does not pass (output tail above)")
     start = time.monotonic()
-    if run(tests, cwd=rust):
-        raise SystemExit("the unmutated unit tests do not pass")
+    if run(tests, cwd=rust, keep=True):
+        raise SystemExit("the unmutated unit tests do not pass (output tail above)")
     unit_limit = max(60.0, 5 * (time.monotonic() - start))
     skip = skips.load("rust")
     for r in rows:
@@ -195,7 +214,7 @@ def score_python(a, work):
     golden = Golden("python", command, project / "mutants", work, a.suite)
     env = dict(os.environ, PYTHONPATH=str(project / "mutants"), MUTANT_UNDER_TEST="")
     if golden.baseline(env)[0]:
-        raise SystemExit("the unmutated build does not pass")
+        raise SystemExit("the unmutated build does not pass (output tail above)")
     for row in sample(rows, a):
         row["golden"] = verdict(golden.check(dict(env, MUTANT_UNDER_TEST=row["id"])))
     return rows
