@@ -12,13 +12,13 @@ Branch `k-v1-aad` now holds `k-xva-spec` (c7a036cc, merge 1st) and local `k-v1` 
 
 **Merged head counts** (generated): 388 operations, 16,646 cases (8,155 value-checked, 5,937 error, 2,554 invariance).
 
-Verification at the final merged head (490b9b59 and later doc-only commits), 2026-11-21, local laptop, not the acceptance machine:
+Verification at the final merged head (490b9b59; later commits touch only this note), 2026-11-21, local laptop, not the acceptance machine:
 
 | Language | Command | Result |
 |---|---|---|
 | Python (Windows) | `uv run ruff check .`, `ruff format --check .`, `mypy .` | rc 0, rc 0, rc 0 |
-| Python | `coverage run -m pytest -q` + per-file coverage gate | PY_RESULT |
-| Python | conformance runner, full tree | PYCONF_RESULT |
+| Python | `coverage run -m pytest -q` + per-file coverage gate | 4,478 passed, 2 skipped; gate: 8 modules at 85%, 0 below |
+| Python | conformance runner, full tree | 16,646 of 16,646 (aadadj_k 37 of 37) |
 | Java (Windows, mvn lock) | `mvn -B -Pcoverage verify` + coverage gate; package | 1,102 tests, 0 failures, 1 skipped; 8 modules at 85%, 0 below; rc 0 |
 | Java | conformance runner; `check_tutorial.py --lang java` | 16,646 of 16,646; rc 0 |
 | Rust (WSL) | `cargo fmt --check`, `clippy -D warnings`, `cargo test --workspace` | rc 0, rc 0, 801 passed in 39 binaries |
