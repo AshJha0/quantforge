@@ -7,7 +7,8 @@ Each check shows the gate failing on a planted fault and passing on the real con
   1. every stage in stages.json plans a non-empty matrix; a planted empty stage F makes plan_matrix exit 1;
   2. check_stages.py passes on the committed file and fails on an empty stage and on a target naming no file;
   3. stage_report --gate fails a 17/20 module (85%, Wilson lower bound 64%) and passes a 39/40 module;
-  4. a countersigned reason clears a listed module; an unsigned one does not;
+  4. a countersigned reason clears a listed module; an unsigned one does not; a Rust module with a shard
+     file missing fails the gate however well the shards present scored (K9-1c);
   5. semantic_changes drops formatting/comment-only edits and keeps real, new and unknown changes;
   6. the pull-request sample in mutation-stage.yml is large enough to pass a good module: at least 3
      survivors allowed per module and a pass probability of at least 0.9 at a true 90% kill rate (a
@@ -256,6 +257,16 @@ def main():
         empty = tmp / "empty"
         empty.mkdir()
         check("no results at all: gate fails", quiet(stage_report.main, ["--stage", "T", "--stages", str(sp), "--results", str(empty), "--gate"]) == 1)
+        rs = tmp / "rs.json"
+        rs.write_text(json.dumps({"target": {"T": 0.8}, "stages": {"T": [{"module": "m", "suite": "x", "rust": "**/m.rs"}]}}),
+                      encoding="utf-8")
+        rres = tmp / "rres"
+        rres.mkdir()
+        result(rres, "rust", "m--s1", 40, 0)
+        rbase = ["--stage", "T", "--stages", str(rs), "--results", str(rres), "--gate", "--reasons", str(tmp / "none.json")]
+        check("planted missing Rust shard s0 (s1 scores 40/40): gate fails", quiet(stage_report.main, rbase) == 1)
+        result(rres, "rust", "m--s0", 40, 0)
+        check("both Rust shards present: gate passes", quiet(stage_report.main, rbase) == 0)
     semantic_checks()
     pr_sample_checks()
     cpp_site_checks()

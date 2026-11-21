@@ -1198,6 +1198,37 @@ class StageFInfra(unittest.TestCase):
             self.assertEqual((killed, survived), (33, 7))
             self.assertIn("sample 40 of 100", note)
 
+    def test_mutation_report_flags_a_missing_rust_shard(self):
+        """K9-1c: a module scored on fewer shards than configured is reported incomplete and fails the gate."""
+        sr = load("stage_report", "conformance/mutation/stage_report.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            res = Path(tmp) / "res"
+            res.mkdir()
+            stages = Path(tmp) / "stages.json"
+            stages.write_text(json.dumps({"target": {"T": 0.8}, "stages": {"T": [{"module": "m", "suite": "s", "rust": "**/m.rs"}]}}),
+                              encoding="utf-8")
+            summary = {"mutants": 100, "unviable": 0, "unit_killed_all": 20, "sampled": 20, "sample_unit_killed": 20,
+                       "sample_golden_killed": 0, "sample_either_killed": 20, "sample_golden_timeouts": 0, "unit_verdicts": {}}
+            (res / "rust--m--s1.json").write_text(json.dumps({"summary": summary}), encoding="utf-8")
+            out = Path(tmp) / "report.md"
+            args = ["--stage", "T", "--stages", str(stages), "--results", str(res), "--out", str(out), "--gate",
+                    "--reasons", str(Path(tmp) / "none.json")]
+            with contextlib.redirect_stdout(io.StringIO()):
+                code = sr.main(args)
+            text = out.read_text(encoding="utf-8")
+            self.assertEqual(code, 1)  # 20/20 on the shard present, yet not a pass
+            self.assertIn("incomplete: shard s0 missing", text)
+            self.assertIn("Missing results: 1.", text)
+            self.assertNotIn("100.0%", text)
+            (res / "rust--m--s0.json").write_text(json.dumps({"summary": summary}), encoding="utf-8")
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(sr.main(args), 0)  # both shards: scored 40/40 and passes
+            self.assertIn("100.0%", out.read_text(encoding="utf-8"))
+            self.assertEqual(sr.missing_shards(res / "rust--m.json", 2), [])
+            (res / "rust--m--s0.json").unlink()
+            (res / "rust--m.json").write_text(json.dumps({"summary": summary}), encoding="utf-8")
+            self.assertEqual(sr.missing_shards(res / "rust--m.json", 2), [])  # unsharded local 0/1 file is complete
+
 
 class DocsStatus(unittest.TestCase):
     """tools/check_docs_status.py: stale Planned curve rows and stale release wording fail."""
