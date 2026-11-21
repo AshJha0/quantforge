@@ -13,7 +13,7 @@ Back to [Curves](README.md).
 - `infl.linker.price_curve`: `nominal_dirty = sum_k CF_k x ref(d_k) / base_ref_cpi x D(d_k) / D(settlement)`, real cash flows from the bond object. A reference month before `base_month` is `E_OUT_OF_RANGE`. No deflation floor in this stage.
 - The companion `infl.linker.price` prices from a quoted real yield and published fixings, with Treasury's rounding of the index ratio (ruling R6-7.5); this page's operation does not round, because its CPI values are projections.
 
-**Worked example** (`inflation_d-0013`). A 4.5% semi-annual linker maturing 2036-08-15, settlement 2026-11-09, `base_ref_cpi` 287.65. CPI curve: base month 2026-08 at 322.15; swaps 1Y 2.65%, 2Y 2.55%, 3Y 2.50%, 5Y 2.45%, 7Y 2.45%, 10Y 2.50%, 20Y 2.55%; seasonality factors from 0.9978 (January) to 1.0018 (April). Discounting on a log-linear SOFR curve.
+**Worked example** (`inflation_d-0013`). A 4.5% semi-annual linker maturing 2036-08-15, settlement 2026-11-09, `base_ref_cpi` 287.65. CPI curve: base month August 2026 (synthetic) at 322.15; swaps 1Y 2.65%, 2Y 2.55%, 3Y 2.50%, 5Y 2.45%, 7Y 2.45%, 10Y 2.50%, 20Y 2.55%; seasonality factors from 0.9978 (January) to 1.0018 (April). Discounting on a log-linear SOFR curve.
 
 | Step | Value | By hand |
 |---|---|---|
