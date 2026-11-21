@@ -459,4 +459,62 @@ for i, plant in enumerate(["GAP", "HOLDOUT", "HASH", "EXPLAIN", "DOMAIN", "LABEL
 assert all(x["status"] == "pass" for x in json.loads((K6 / "eod-2026-11-19-forward-log.json").read_text(encoding="utf-8"))["steps"])
 has("the failing step was E1, E2, E3, E4, E5, E6 and E7 respectively")
 
+# Q14.68 to Q14.82: the fourth pass (added 2026-11-21).
+GOLD_ROOT = GOLD.parent
+
+
+def gany(folder: str, suite: str, case_id: str) -> dict:
+    for c in json.loads((GOLD_ROOT / folder / f"{suite}.json").read_text(encoding="utf-8"))["cases"]:
+        if c["case_id"] == case_id:
+            return c
+    raise KeyError(case_id)
+
+
+s1 = gany("stage_d", "steps_d", "steps_d-0001")["expected"]["outputs"]
+close(math.exp(-0.0425 * 34 / 365), s1["discount_factors"][2], 1e-15)
+close(math.exp(-(0.0425 * 34 + 0.04) / 365), s1["discount_factors"][3], 1e-15)
+assert s1["overnight_forwards"][2] == 0.04
+has("`D(2026-12-10) = exp(-0.0425 x 34/365) = 0.9960489220202466`")
+s2 = gany("stage_d", "steps_d", "steps_d-0002")["expected"]["outputs"]
+close(-math.log(0.999989041155939) * 365, 0.004, 1e-9)
+assert s2["discount_factors"][4] == s1["discount_factors"][4]
+close(s1["discount_factors"][5] * 0.999989041155939, s2["discount_factors"][5], 1e-15)
+has("`-ln(0.999989041155939) x 365 = 0.004`")
+jf = gany("stage_f", "joint_f", "joint_f-0003")["expected"]["outputs"]["jacobian"]
+U, Qs, M = jf["unknowns"], jf["quotes"], jf["matrix"]
+i10 = U.index("USD-TERM-3M:pillar:2036-11-12")
+assert round(M[i10][Qs.index("SOFR-10Y")], 5) == 0.11329 and round(M[i10][Qs.index("T-SW10")], 3) == -10.732
+assert all(M[i][j] == 0.0 for i in range(8) for j in range(8, 14))
+assert round(M[0][0], 5) == -0.10239 and round(37 / 360, 5) == 0.10278
+has("`d ln D_term(2036-11-12) / d SOFR-10Y = +0.11329`")
+has("`tau = 37/360 = 0.10278`, and the golden entry is -0.10239")
+r = lambda i: gany("r2", "risk_r2", i)["expected"]["outputs"]
+J, kr, par3 = r("risk_r2-0031")["jacobian"], r("risk_r2-0004")["key_rates"], r("risk_r2-0003")
+assert round(r("risk_r2-0003")["zero_dv01"] / r("risk_r2-0001")["par_dv01"], 4) == 1.0221
+assert [round(J[k][k], 4) for k in (4, 5, 12)] == [0.9804, 0.9957, 1.497]
+chain = sum(kr[i] * J[i][5] for i in range(13))
+assert round(chain, 4) == -4808.1269 and abs(chain - r("risk_r2-0001")["par_buckets"][5]) < 3e-6
+has("Multiplying the pillar key rates by the 2-year column gives -4,808.1269")
+assert [round(x, 2) for x in par3["key_rates"]] == [-56.6, -4834.42, -22.19, 0.0, 0.0] and round(sum(par3["key_rates"]), 2) == -4913.22
+assert round(kr[5], 2) == -4828.7 and round(kr[4], 2) == -110.67
+has("-56.60, -4,834.42, -22.19, 0, 0, summing to the zero DV01 -4,913.22")
+i1, i2 = out("inc_k", "inc_k-0001")["discount_factors"], out("inc_k", "inc_k-0002")["discount_factors"]
+assert i2[1] < i1[1] and i2[2] > i1[2]
+close((1 - 0.03 * (i2[0] + i2[1])) / 1.03, i2[2], 1e-15)
+has("so `P_3` rises from 0.9145993230349208 to 0.9146541714397676")
+assert gany("stage_f", "joint_f", "joint_f-0015")["expected"]["error_code"] == "E_NO_CONVERGENCE"
+has("`joint_f-0015` expects `E_NO_CONVERGENCE`")
+K5 = json.loads((GOLD_ROOT.parent / "scenarios" / "k5_snapshot.json").read_text(encoding="utf-8"))
+assert ((7919 * 1) % 401 - 200) * 5e-5 == 0.005
+hu = -10 * math.exp(-0.45)
+close(-12740024.14947548 / hu, 1998033.51, 1e-8); assert round(hu, 5) == -6.37628
+assert "12740024.14947548" in json.dumps(K5)
+has("`hedge_notional = 12,740,024.149 / 6.37628 = 1,998,033.51`")
+close(4913.22 / 4806.94, 1.0221, 1e-4)
+has("Java: `mix/cheap` 737.2 cases a second, `batch/1000000` 5,275.4; Python: 7,420.9 and 1,105.4")
+CAP = (GOLD_ROOT.parents[1] / "docs" / "capacity.md").read_text(encoding="utf-8")
+for row in ("| java | `mix/cheap` | pass | 3,806 | 1 | 737.2 |", "| java | `batch/1000000` | pass | 1,000,000 | 1 | 5,275.4 |",
+            "| python | `mix/cheap` | pass | 3,806 | 1 | 7,420.9 |", "| python | `batch/1000000` | pass | 1,000,000 | 1 | 1,105.4 |"):
+    assert row in CAP, row
+
 print(f"v14: {checks} strings checked")

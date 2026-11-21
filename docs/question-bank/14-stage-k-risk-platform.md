@@ -1,6 +1,6 @@
 # Question bank 14: Stage K: data platform, intraday risk, capital and the paper ledger
 
-This set covers the stage K round 1 work, which is **merged to main by 2026-11-20, not tagged, and released with v1.0.0** (stage K as a whole continues toward v1.0.0): the bitemporal store, incremental curve updates, recalibration triggers, intraday risk with error bounds, the Bermudan ladder convergence fix, SA-CCR and FRTB backtesting, and the daily paper ledger. All of it is in all four builds and on `main` (pull requests #58 and #59; there is no v0.10.1 tag). The third pass (Q14.53 to Q14.67, added 2026-11-21) covers pull requests #60 to #64: wave 2 capital, the wrong-way CVA root fix KR-257, K-5 snapshots, K-3 adapters and feed codecs, and the K-6 soak and rehearsal. It is for a reader who has worked through [Tutorials 51 to 58](../getting-started/README.md#stage-k-in-progress). Every worked-example number is rechecked by `verify/v14_stage_k.py`, which restates the formulas with the standard library and compares them with the goldens' values. All data is synthetic, except the Basel examples, which are the regulator's own sample portfolios.
+This set covers the stage K round 1 work, which is **merged to main by 2026-11-20, not tagged, and released with v1.0.0** (stage K as a whole continues toward v1.0.0): the bitemporal store, incremental curve updates, recalibration triggers, intraday risk with error bounds, the Bermudan ladder convergence fix, SA-CCR and FRTB backtesting, and the daily paper ledger. All of it is in all four builds and on `main` (pull requests #58 and #59; there is no v0.10.1 tag). The fourth pass (Q14.68 to Q14.82, added 2026-11-21) covers curve methods (meeting steps, turns, joint solve, curve risk, incremental update) and K-5 and K-6 practice. The third pass (Q14.53 to Q14.67, added 2026-11-21) covers pull requests #60 to #64: wave 2 capital, the wrong-way CVA root fix KR-257, K-5 snapshots, K-3 adapters and feed codecs, and the K-6 soak and rehearsal. It is for a reader who has worked through [Tutorials 51 to 58](../getting-started/README.md#stage-k-in-progress). Every worked-example number is rechecked by `verify/v14_stage_k.py`, which restates the formulas with the standard library and compares them with the goldens' values. All data is synthetic, except the Basel examples, which are the regulator's own sample portfolios.
 
 ## Bitemporal store
 
@@ -803,3 +803,173 @@ Steps E1 to E8 run in order and stop at the first failure; the planted faults `G
 **Worked example.** On the recorded date 2026-11-19 every step passed; in the seven planted runs the failing step was E1, E2, E3, E4, E5, E6 and E7 respectively, every earlier step passed and every later step was "not run" (read 2026-11-21 from `eod-2026-11-19-*.json`; local laptop, not the acceptance machine).
 
 The pitfall is a planted fault that fails at E1 every time: the run then proves only that the log check works.
+
+## Fourth pass: curve methods, snapshots and soak practice (added 2026-11-21)
+
+Curve questions here go with the hand-written [Curves method pages](../curves/README.md#method-pages); set 3 has the curve definitions. Numbers are from goldens, recomputed by `verify/v14_stage_k.py`; the Python build agreed with each golden used when run on 2026-11-21 (measured, local laptop, not the acceptance machine).
+
+### Q14.68 A meeting step to 4.00% takes effect on 2026-12-10. Why is the discount factor to 2026-12-10 still computed entirely at the old 4.25%?
+
+*Level: foundation. Evidence: spec (read); golden (`steps_d-0001`); computed. Source: `specifications/02-curves/meeting-steps.md`, [Meeting steps](../curves/meeting-steps.md)*
+
+A discount factor to a date integrates the overnight forward up to that date. A step that takes effect on 2026-12-10 governs the night that starts on 2026-12-10, which is after the discount date, so it has not yet accrued.
+
+`D(d) = exp(-integral_0^t(d) f)`, `f = base_rate` before the first step date and the step's rate from its date on.
+
+**Worked example.** As of 2026-11-06 (34 days before the step): `D(2026-12-10) = exp(-0.0425 x 34/365) = 0.9960489220202466`; one day later `D(2026-12-11) = exp(-(0.0425 x 34 + 0.04)/365) = 0.9959397719549326` (`steps_d-0001`). The reported overnight forward on 2026-12-10 is already 4.00%.
+
+The pitfall is reading "takes effect on" as "applies to the discount factor of that date": the curve would be one day early at every meeting.
+
+### Q14.69 A year-end turn factor is 0.999989041155939. What funding spread does it represent, and which discount factors does it change?
+
+*Level: practitioner. Evidence: spec (read); golden (`steps_d-0002`); computed. Source: `specifications/02-curves/meeting-steps.md`, `curve-framework.md`*
+
+A turn is a one-off jump: one night of dearer funding. Its factor is the extra discounting of that night, so its log divided by the night's year fraction is the extra rate.
+
+A jump dated `d_J` multiplies `D(d)` for every `d` strictly after `d_J`.
+
+**Worked example.** `-ln(0.999989041155939) x 365 = 0.004`: 40 bp for one night. `D(2026-12-31)` is unchanged at 0.9937592807153228; `D(2027-01-01)` falls from 0.9936503815558554 to 0.9936394922962728, and every later factor is scaled by the same 0.99998904 (`steps_d-0002`).
+
+The pitfall is spreading the turn over the month around year end with a smooth interpolation: the forward is then wrong on thirty days instead of one.
+
+### Q14.70 In the joint solve of `joint_f-0003`, why does the 10-year pillar of the term curve depend on the SOFR 10-year quote?
+
+*Level: advanced. Evidence: spec (read; F-24, F-25); golden (`joint_f-0003`). Source: `specifications/02-curves/joint-solve-and-funding.md`, [Joint solve](../curves/joint-solve.md)*
+
+The 10-year term swap is discounted on the SOFR curve. If SOFR rates rise, the swap's legs are discounted more, and the term curve must move to keep the swap at its quoted rate.
+
+`J = -(dR/dx)^(-1) (dR/dq)`; the term curve's residuals depend on SOFR unknowns, so its rows have non-zero entries in SOFR columns; SOFR rows have zeros in term columns (block lower triangular).
+
+**Worked example.** `d ln D_term(2036-11-12) / d SOFR-10Y = +0.11329`, against `-10.732` for its own quote T-SW10; every SOFR row has 0 in all six term columns (`joint_f-0003`).
+
+The pitfall is hedging a term-curve position with term swaps only: the SOFR column is a real exposure that a one-curve model does not show.
+
+### Q14.71 Why is `d ln D / d quote` for the 1-month SOFR pillar close to -0.10?
+
+*Level: foundation. Evidence: golden (`joint_f-0003`); inferred. Source: [Joint solve](../curves/joint-solve.md)*
+
+For a one-period OIS, the par rate is `(1/D - 1) / tau`, so `ln D` is about `-tau x rate` and its derivative in the rate is about `-tau D`, with `tau` the ACT/360 year fraction of the period.
+
+**Worked example.** As of 2026-11-09 the pillar is 2026-12-16, 37 days: `tau = 37/360 = 0.10278`, and the golden entry is -0.10239; the small gap is the factor `D` and the period's own dates (inferred from the formula).
+
+The pitfall is reading Jacobian entries as "bp of zero per bp of quote" when the rows are `ln D`: in `rates.curve.joint_solve` they are `ln D`, while `risk.curve.jacobian` reports zero rates.
+
+### Q14.72 A two-year receiver has par DV01 -4,806.94 but zero DV01 -4,913.22. Why do they differ by about 2%?
+
+*Level: practitioner. Evidence: golden (`risk_r2-0001`, `-0003`, `-0031`); computed. Source: `specifications/06-risk/par-and-key-rate.md`, [Curve risk](../curves/curve-risk.md)*
+
+They move different things. A 1 bp move in every par quote is not a 1 bp move in every continuously compounded zero rate: the Jacobian of zeros against quotes has a diagonal near but not at 1.
+
+`par_buckets[j] ~ sum_i key_rates_PILLAR[i] J[i][j]`.
+
+**Worked example.** `4,913.22 / 4,806.94 = 1.0221`. The Jacobian diagonal is 0.9804 at the 1-year pillar and 0.9957 at 2 years, and rises to 1.497 at 30 years on this curve (`risk_r2-0031`). Multiplying the pillar key rates by the 2-year column gives -4,808.1269, the par bucket to within 3e-6 (`risk_r2-0001`, `-0004`).
+
+The pitfall is comparing a par DV01 from one system with a zero DV01 from another and calling the gap a model error.
+
+### Q14.73 Why does a triangular key-rate set put -22.19 on the 5-year key for a two-year swap?
+
+*Level: practitioner. Evidence: golden (`risk_r2-0003`, `-0004`); spec (read); inferred (why). Source: `specifications/06-risk/par-and-key-rate.md`*
+
+A triangular key shifts zero rates with a tent that falls to zero at the neighbouring keys. With keys at 1, 2 and 5 years, the two-year key's tent covers the swap's cash flows only up to its own date on one side, so cash flows dated a little after the 2-year key time fall partly under the 5-year tent.
+
+Weights `w_i(t)` are 1 at `k_i`, linear to 0 at `k_(i-1)` and `k_(i+1)`, and sum to 1 at every `t`.
+
+**Worked example.** Keys 1Y, 2Y, 5Y, 10Y, 30Y: -56.60, -4,834.42, -22.19, 0, 0, summing to the zero DV01 -4,913.22 (`risk_r2-0003`). Pillar keys put the same risk on the 2-year pillar (-4,828.70) and 1-year pillar (-110.67) (`risk_r2-0004`).
+
+The pitfall is hedging the 5-year key with a 5-year swap: the exposure is an artefact of the key dates, and moves when the key dates move.
+
+### Q14.74 The 2-year par quote rises from 2.5% to 2.6%. Why does the 3-year discount factor rise?
+
+*Level: advanced. Evidence: golden (`inc_k-0001`, `inc_k-0002`); computed. Source: [Incremental update](../curves/incremental-update.md)*
+
+In the 3-year par equation the earlier discount factors appear as an annuity that the 3-year coupon is paid on. A higher 2-year quote lowers the 2-year factor, so that annuity is smaller, and the 3-year factor that solves the equation is larger.
+
+`P_3 = (1 - S_3 (P_1 + P_2)) / (1 + S_3)`.
+
+**Worked example.** `P_2` falls from 0.9516977522716404 to 0.9498146237052325, so `P_3` rises from 0.9145993230349208 to 0.9146541714397676, with `S_3 = 3%` unchanged (`inc_k-0001`, `inc_k-0002`).
+
+The pitfall is expecting a quote move to change only its own pillar: a sequential bootstrap passes it on to every later one, with a sign that depends on the curve.
+
+### Q14.75 Two instruments with the same dates and different quotes are given to the joint solve. What comes back, and why?
+
+*Level: practitioner. Evidence: spec (read); golden (`joint_f-0015`). Source: `specifications/02-curves/joint-solve-and-funding.md`*
+
+Two equations in one unknown that disagree have no solution; the Jacobian `dR/dx` is singular. The operation reports that it could not converge rather than return a curve that reprices neither quote.
+
+**Worked example.** `joint_f-0015` expects `E_NO_CONVERGENCE`; the rule is that every residual must reach 1e-13 or the solve fails.
+
+The pitfall is a least-squares fallback that quietly averages the two quotes: the curve looks fine and reprices neither instrument.
+
+### Q14.76 The K-5 writer publishes version 1 with shift `h = 0.005`. How is the hedge notional 1,998,033.51 obtained?
+
+*Level: practitioner. Evidence: spec (read; KR-283); scenario file; computed. Source: `specifications/12-platform/lock-free-snapshots.md` section 3*
+
+Choose the number of hedge zeros whose parallel delta cancels the book's.
+
+`book_delta = fsum_i(-T_i N_i exp(-(y_i + h) T_i))`, `hedge_unit_delta = -T_H exp(-(y_H + h) T_H)`, `hedge_notional = -book_delta / hedge_unit_delta`; version `k` has shift `((7919 k mod 401) - 200) x 5e-5`.
+
+**Worked example.** Version 1: `7919 mod 401 = 300`, so `h = 100 x 5e-5 = 0.005`. `book_delta = 12,740,024.149` (scenario `datasets/scenarios/k5_snapshot.json`); hedge zero `T_H = 10`, `y_H = 4%`: `-10 exp(-0.45) = -6.37628`; `hedge_notional = 12,740,024.149 / 6.37628 = 1,998,033.51`.
+
+The pitfall is calling this an order: it is a recommended quantity on simulated data; no order is formed and the hedge has no goldens.
+
+### Q14.77 Why does the K-5 snapshot store results instead of computing them when a reader asks?
+
+*Level: practitioner. Evidence: spec (read; KR-284). Source: `specifications/12-platform/lock-free-snapshots.md` section 1*
+
+So that every reader sees the same numbers and those numbers equal a direct call. If readers computed, two readers of one snapshot could round differently, and the snapshot could not promise exactness.
+
+Guarantee 5: every number read through a snapshot is bit-identical to calling the same functions directly with the same inputs; the scenario file holds expected values at 10 versions to 1e-9 relative.
+
+**Worked example.** At version 1 the stored `estimate_pnl` 67,545.44 and `bound` 458.73 are those of `risk.intraday.delta_gamma_bound` on the scenario book at `h = 0.005`.
+
+The pitfall is putting a cache of derived values next to the snapshot and updating it separately: a reader can then see a new snapshot with old derived numbers, which is a torn read by another name.
+
+### Q14.78 What staleness does K-5 promise, and why not a bound in microseconds?
+
+*Level: advanced. Evidence: spec (read; guarantee 4, KR-286); inferred (example). Source: `specifications/12-platform/lock-free-snapshots.md`*
+
+A read returns the snapshot current at the reader's validating load, so while the reader uses it, newer snapshots may be published. Staleness is counted in publishes, not time, because no timing run has been made.
+
+**Worked example.** If the writer publishes versions 5 and 6 while a reader prices from version 4, the reader's result is two publishes stale; its next read returns 6 or later, never 3 (monotone versions per reader).
+
+The pitfall is quoting a latency from a laptop run as a property of the design: the targets S1 to S5 are fixed and unmeasured, and the label stays "latency-aware analytics on simulated data".
+
+### Q14.79 Why is the K-5 Python snapshot useful although it is not lock-free?
+
+*Level: foundation. Evidence: spec (read; KR-281). Source: `specifications/12-platform/lock-free-snapshots.md` section 2*
+
+It is the reference for the numbers. Its publish takes a lock only to refuse a second writer, and a read is one reference load of a frozen object, so its values can be compared with the three lock-free builds without any concurrency doubt about the reference itself.
+
+**Worked example.** The 1,000 shared moves in `datasets/scenarios/k5a_intraday_moves.json` ran in all four builds with 0 bound violations and the same worst error over bound, 0.0104814 (Rust prints 0.010481), measured 2026-11-20 by the K-5 lane.
+
+The pitfall is reporting the Python build in a list of lock-free implementations.
+
+### Q14.80 Why does the K-6 soak read memory only when no case is in flight?
+
+*Level: foundation. Evidence: spec (read; KR-218). Source: `specifications/12-platform/soak-eod-capacity.md` section 1*
+
+Some golden cases are heavy, for example a large Monte Carlo case, and briefly use a lot of memory. Reading in the middle of one would look like growth. At an idle point the process holds only what it keeps between requests, which is what a leak changes.
+
+**Worked example.** The 145-minute Python soak took 671 judged samples after a 2,037 s warm-up; the range was 3.0% of the 432.6 MiB median, under the 5% rule, while the slope, 2.32 MiB/h, missed the 1 MiB/h bound: a recorded miss with cause not found.
+
+The pitfall is reading every 10 s without draining: the range rule then measures the golden mix, not the process.
+
+### Q14.81 On Windows the soak judges committed private bytes, not the working set. Why?
+
+*Level: practitioner. Evidence: spec (read; the Windows effect recalled, not measured). Source: `specifications/12-platform/soak-eod-capacity.md` section 1*
+
+Windows trims a process's working set on its own schedule, more so at below-normal priority, so the working set measures the memory manager as well as the program. Committed private bytes are what the program has asked for and not returned.
+
+**Worked example.** The Python soak ran at below-normal priority on a shared laptop; its judged series was committed private bytes; Linux runs judge VmRSS; Java judges heap used after a requested full collection, with RSS reported but not judged.
+
+The pitfall is a "flat" working set that only shows Windows trimming harder as the program grows.
+
+### Q14.82 In `docs/capacity.md`, Java runs the cheap mix at 737 cases a second and Python at 7,421. Then Java reaches 5,275 a second on a million lines. What explains both?
+
+*Level: practitioner. Evidence: measured (`docs/capacity.md`, local laptop, not the acceptance machine); inferred. Source: `specifications/12-platform/soak-eod-capacity.md` section 2*
+
+Cases per second is measured over wall time with start-up included. One pass of 3,806 cheap cases is short, so the JVM's start and warm-up dominate; over a million lines they are amortised and the compiled code runs faster than the interpreter.
+
+**Worked example.** Java: `mix/cheap` 737.2 cases a second, `batch/1000000` 5,275.4; Python: 7,420.9 and 1,105.4 (2026-11-20). Peak memory: Java about 354 to 368 MiB, Python about 17 to 20 MiB.
+
+The pitfall is ranking builds by one row: the order flips with the length of the run, and neither figure is from the acceptance machine.
