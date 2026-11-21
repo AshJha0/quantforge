@@ -26,9 +26,12 @@ Branch `k-v1-docs-b`, cut from main 11ba1b40. Files owned: LEARN.md, ARCHITECTUR
 - tools/build_gallery.py: minimal change, HAND_PAGES list and a "Method pages" section in the generated index (fails if a listed file is missing); README regenerated with --evidence-only; --check 0 differences; tools/test_tools.py -k gallery 16 passed.
 - Diagrams: curve build data flow, error-order decision table with two-fault goldens, K-7 release evidence chain; view check 67 of 67 render.
 - Question bank: Q14.68 to Q14.82; v14 65 strings pass; index 500.
-- Remaining curve items without a page: risk.curve.cross_gamma and risk.curve.pca (spec only, no worked page), infl.linker.price_curve, fx.xccy.pv; calib.curve.robust/smooth and rates.basis.ois_spread are covered in question set 3.
-- Stale in the generator text (tools/build_gallery.py RISK_CAPITAL, rendered into docs/curves/README.md): "FRTB internal-model liquidity horizons (wave 2, specification only)": wave 2 is implemented and on main (#63). Not changed (outside the minimal change).
 - README.md:157 count is now 500 (was 470).
+
+## Round 3 (coordinator, 2026-11-21): done, pushed
+- Four method pages, one commit each, all four operations implemented in every build: docs/curves/cross-gamma.md (risk_f3-0039), curve-pca.md (risk_f3-0010, -0012, error goldens), linker-price-curve.md (inflation_d-0013 plus two un-goldened requests on the same inputs, stated), xccy-pv.md (xccy_d-0002 to -0004 plus one spread-0 request, stated). Each listed in HAND_PAGES; index regenerated; --check 0 differences each time.
+- The linker page first named a synthetic base month inside the holdout window as YYYY-MM and failed research/test_preregs.py; fixed by naming it in words (commit b7ba014d); test_preregs OK.
+- Generator text fixed: liquidity horizons implemented in all four builds (Python ops_k_w2a.py, Java OpsStageKW2a, Rust kw2a.rs, C++ ops_frtb_drc_ima.inc) and on main via #63.
 
 ## Checks run (Windows, 2026-11-21)
 check_md_anchors (843 files, 0 problems), check_hygiene (0 problems), research/test_preregs (OK), check_links (0 unreachable; 12 refused external), build_site (0 broken links), check_site_a11y --static (no error-level finding), check_site_view on docs/diagrams/README.html (64 of 64 diagrams render, 3 views), build_gallery --check (0 differences), check_docs_status (0 problems), verify/v14_stage_k.py (55 strings), git grep -i interview (none).
