@@ -42,7 +42,8 @@ Commands and results at da368e49 (code identical to 6142d78f; the later commit c
 | Rust | release build, `runner.py --impl rust` | 16,586 of 16,586 |
 | C++ | Release `-DQF_WERROR=ON` build (first part timed out at 600 s, rerun incremental), `ctest` | 6 of 6 |
 | C++ | `runner.py --impl cpp` | 16,586 of 16,586 |
-| C++ | ASan + UBSan build and `ctest` | ASAN_RESULT |
+| C++ | ASan + UBSan build (RelWithDebInfo, address, undefined, float-cast-overflow) | built (first part timed out at 600 s, rerun incremental) |
+| C++ | ASan `ctest` | the five small tests pass; `quantforge_core_tests` as one ctest exceeded the 600 s cap, so it was run directly: 705 of 706 test cases pass (`--order decl`, all but one, 2,023,148 assertions, no sanitizer report); the fast-book property test (1,000 seeded streams of 10,000 messages, `test_fast_book.cpp`) did not finish in its own 600 s cap (SIGTERM, 1,626 assertions passed before it, no sanitizer report): NOT FINISHED under ASan; this branch does not touch the fast book |
 | repo | `python -m pytest -q tools` | 110 passed, 4 skipped |
 | repo | `tools/check_case_total.py` | pass (16,586; first run failed before the TOTALS line was added) |
 | repo | `research/test_preregs.py`, `check_known_issues.py`, `results_page.py --check` | pass |
@@ -58,3 +59,30 @@ Not done: it is a four-build change with spec edits and new goldens, not small. 
   - Reading S (the number as it stands in this tree): KR-133 is the SBIM clipped bucket sum, `specifications/stage-k-rulings-sbim.md` line 14, cited by `specifications/06-risk/sbim-placeholder.md` line 92. It has no free choice to expose: an "explicit input" would mean an option to switch the clip off, which the ruling itself excludes ("no unclipped first attempt").
   - Reading G (what the decision text points at): the G-SIB 15% group rule of `risk.capital.large_exposures`. Evidence (read): the coordinator's stage K resume file (outside the repo), line 77 ("k-basel-check (KR-133 mixed G-SIB group and KR-44 genuinely open: plan = explicit inputs with current default)") and `program/STAGE_K_BASEL_READINGS.md` on branch `k-basel-check` (0f1eae79, 2026-11-19) items 1 and 4. On `k-v1` this rule was renumbered KR-324 (`specifications/stage-k-rulings-w2.md` line 69, CONFIRMED 2026-11-20, "any member", inferred), it is implemented in all four builds (correcting the 2026-11-20 note above, which predates the wave 2 merge), Java holds it as `Leverage.GSIB_GROUP_ANY_MEMBER` (marked open reading), and golden `lex_k-0010` pins a mixed group. Under G the work is an optional input (for example `gsib_group_rule`: `ANY_MEMBER` default, `EVERY_MEMBER`) in four builds plus goldens for both values; the defaults keep every current golden.
   - The two numbers collide, inferred, because the Basel readings file was written before the wave 2 rulings were renumbered into the KR-300 block (the KR-133 text quoted there matches KR-324); the coordinator may want the readings file's "KR-133" read as KR-324.
+
+## Second merge (2026-11-21, about 19:00 UTC): `origin/k-v1` 5e4facc9
+
+On the coordinator's notice, merged `origin/k-v1` 5e4facc9 (adds a11y2, tools, `k-v1-rev1`; vol code in four builds, no file shared with this branch's code). Merge ae328723. Conflicts in counts only (README, LEARN, `R6_HANDOVER.md`, generated `case-figures.md`, `results.md`), resolved as before; all generators rerun, every `--check` passes. Totals now 16,632 (value 8,142, error 5,936, invariance 2,554) = 16,609 of `k-v1` plus the 23 error goldens of this branch; TOTALS line updated.
+
+Reruns after this merge (measured, local laptop, not the acceptance machine):
+
+| Language | Command | Result |
+|---|---|---|
+| Java | `mvn -B -Pcoverage verify`, coverage gate, package | BUILD SUCCESS, 1,097 tests, 0 failures, 1 skipped; 8 modules at 85%, 0 below |
+| Java | `runner.py --impl java` | 16,632 of 16,632 |
+| Python | ruff, ruff format, mypy | pass |
+| Python | `uv run pytest -q` (full suite) | 4,395 passed, 2 skipped, 36 min |
+| Python | `runner.py --impl python` | 16,632 of 16,632 |
+| Rust | fmt, clippy, `cargo test`, release build, `runner.py --impl rust` | pass, pass, 795 passed 0 failed, built, 16,632 of 16,632 |
+| C++ | Release `-DQF_WERROR=ON` build, `ctest`, `runner.py --impl cpp` | built, 6 of 6, 16,632 of 16,632 |
+| repo | `pytest -q tools`, `check_case_total.py`, `test_preregs.py` | 118 passed 4 skipped; pass (16,632); pass |
+
+ASan was not rerun after this merge (the merge brings no C++ change that this branch touches; `k-v1` lanes ran their own).
+
+## Open at stop
+
+- Item 2 (KV-EXPLICIT): KR-44 explicit input not started; KR-133 reading for the coordinator to decide (above).
+- S1 to S9 (KV-XVASWEEP): listed, not fixed.
+- Ruling KR-258: PROPOSED, needs the coordinator's confirmation.
+- Mutation samples: not run (pull-request CI).
+- ASan: fast-book property test not finished within the 10-minute cap.
