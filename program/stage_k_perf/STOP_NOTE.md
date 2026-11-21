@@ -70,7 +70,10 @@ far under. The remaining gap to the pre-KR-341 time is the extra Newton iteratio
 
 ## CI bench run
 
-CI_RESULT
+Run 44951550794 on `k-v1-perf` (head dea0b531, the stop-note commit), all four bench jobs success (read). Java
+`implied_vol` 887.3 +/- 14.4 ns/op, 0.90x the baseline of 991; allocation 0.006 B/op (read: job log). That is lower
+than the 1,240 ns projected above, so the runner-to-runner spread is large on this bench (inferred from the 1,263
+to 1,749 ns spread at unchanged code); one run is one sample.
 
 ## For the coordinator
 
