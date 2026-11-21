@@ -754,6 +754,7 @@ HAND_PAGES = [
     ("incremental-update.md", "Incremental curve update (stage K)", "`curve.bootstrap.par_annual`, `curve.incremental.update`"),
     ("cross-gamma.md", "Cross gamma on a curve", "`risk.curve.cross_gamma`"),
     ("curve-pca.md", "Principal components of curve moves", "`risk.curve.pca`"),
+    ("linker-price-curve.md", "Inflation-linked bond priced on a CPI curve", "`infl.linker.price_curve`"),
 ]
 
 

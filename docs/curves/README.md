@@ -58,6 +58,7 @@ Written by hand rather than generated from `docs/curves/data/`: each explains a 
 | [Incremental curve update (stage K)](incremental-update.md) | `curve.bootstrap.par_annual`, `curve.incremental.update` |
 | [Cross gamma on a curve](cross-gamma.md) | `risk.curve.cross_gamma` |
 | [Principal components of curve moves](curve-pca.md) | `risk.curve.pca` |
+| [Inflation-linked bond priced on a CPI curve](linker-price-curve.md) | `infl.linker.price_curve` |
 
 Stage J wave 3 (historical scenario stress, interpolation backtests, drift detectors) has no gallery page: those operations take a curve, a smile or a series rather than build a curve, so they are worked through in [Tutorial 33](../getting-started/tutorial-33-stress-test-and-watch-for-drift.md) instead.
 
