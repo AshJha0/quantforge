@@ -14,10 +14,10 @@ Branch `k-v1-docs-a` (cut from main 11ba1b40). Files owned: COOKBOOK.md, docs/ge
 ## Round 2 (coordinator, 2026-11-21)
 - Done: `tools/check_cookbook.py` (runs COOKBOOK bash blocks marked `cookbook:run` and checks the strings in the following `cookbook:expect` comment); 16 recipes marked. Commands: `python tools/check_cookbook.py` (16 of 16 match, about 17 s on the laptop) and `python tools/test_check_cookbook.py` (9 tests). Not wired into any workflow.
 - Done: Tutorial 62, the default risk charge (`docs/getting-started/tutorial-62-default-risk-charge.md`), 8 lines match.
+- Done: developer guide `docs/developer-guides/adding-an-operation.md` (follows `risk.frtb.rrao` through every file). Note: `python tools/check_case_total.py` exits 1 on main (16,547 cases against 16,545 stated in program/R6_HANDOVER.md), not caused by this lane.
 
 ## Next, in order
-1. Developer guide docs/developer-guides/adding-an-operation.md.
-2. If time: wrong-way CVA tutorial (63).
+1. If time: wrong-way CVA tutorial (63).
 
 ## How to resume
 Python build on Windows: Smart App Control blocks the `quantforge` exe, so use `uv run --locked --project python python -m quantforge_core.cli.main batch`. No WSL.
